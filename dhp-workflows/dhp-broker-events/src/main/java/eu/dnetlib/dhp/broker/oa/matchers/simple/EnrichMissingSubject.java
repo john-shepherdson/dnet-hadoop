@@ -35,7 +35,7 @@ public class EnrichMissingSubject extends UpdateMatcher<OaBrokerTypedValue> {
 				}
 			},
 			(p, s) -> p.getSubjects().add(s),
-			s -> subjectAsString(s));
+			EnrichMissingSubject::subjectAsString);
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class EnrichMissingSubject extends UpdateMatcher<OaBrokerTypedValue> {
 		final Set<String> existingSubject = target
 			.getSubjects()
 			.stream()
-			.map(s -> subjectAsString(s))
+			.map(EnrichMissingSubject::subjectAsString)
 			.collect(Collectors.toSet());
 
 		return source

@@ -17,7 +17,7 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 @ExtendWith(MockitoExtension.class)
-public class QueryInformationSystemTest {
+class QueryInformationSystemTest {
 
 	private static final String XQUERY = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') "
 		+
@@ -513,7 +513,7 @@ public class QueryInformationSystemTest {
 	}
 
 	@Test
-	public void testSizeEntity() throws ISLookUpException {
+	void testSizeEntity() throws ISLookUpException {
 
 		List<ContextInfo> cInfoList = new ArrayList<>();
 		final Consumer<ContextInfo> consumer = ci -> cInfoList.add(ci);
@@ -523,7 +523,7 @@ public class QueryInformationSystemTest {
 	}
 
 	@Test
-	public void testSizeRelation() throws ISLookUpException {
+	void testSizeRelation() throws ISLookUpException {
 
 		List<ContextInfo> cInfoList = new ArrayList<>();
 		final Consumer<ContextInfo> consumer = ci -> cInfoList.add(ci);
@@ -534,7 +534,7 @@ public class QueryInformationSystemTest {
 	}
 
 	@Test
-	public void testContentRelation() throws ISLookUpException {
+	void testContentRelation() throws ISLookUpException {
 
 		List<ContextInfo> cInfoList = new ArrayList<>();
 		final Consumer<ContextInfo> consumer = ci -> cInfoList.add(ci);
@@ -572,7 +572,7 @@ public class QueryInformationSystemTest {
 	}
 
 	@Test
-	public void testContentEntity() throws ISLookUpException {
+	void testContentEntity() throws ISLookUpException {
 
 		List<ContextInfo> cInfoList = new ArrayList<>();
 		final Consumer<ContextInfo> consumer = ci -> cInfoList.add(ci);

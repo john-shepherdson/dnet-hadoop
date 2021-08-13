@@ -32,13 +32,13 @@ public class Creator {
 
 	public static Creator newInstance(String name, String affiliation, String orcid) {
 		Creator c = new Creator();
-		if (!(name == null)) {
+		if (name != null) {
 			c.name = name;
 		}
-		if (!(affiliation == null)) {
+		if (affiliation != null) {
 			c.affiliation = affiliation;
 		}
-		if (!(orcid == null)) {
+		if (orcid != null) {
 			c.orcid = orcid;
 		}
 

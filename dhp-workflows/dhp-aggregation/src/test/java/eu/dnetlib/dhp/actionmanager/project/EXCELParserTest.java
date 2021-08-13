@@ -13,24 +13,24 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.dhp.actionmanager.project.utils.EXCELParser;
-import eu.dnetlib.dhp.collection.CollectorException;
-import eu.dnetlib.dhp.collection.HttpConnector2;
+import eu.dnetlib.dhp.common.collection.CollectorException;
+import eu.dnetlib.dhp.common.collection.HttpConnector2;
 
 @Disabled
 public class EXCELParserTest {
 
 	private static Path workingDir;
-	private HttpConnector2 httpConnector = new HttpConnector2();
+	private final HttpConnector2 httpConnector = new HttpConnector2();
 	private static final String URL = "https://cordis.europa.eu/data/reference/cordisref-h2020topics.xlsx";
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
-		workingDir = Files.createTempDirectory(CSVParserTest.class.getSimpleName());
+		workingDir = Files.createTempDirectory(EXCELParserTest.class.getSimpleName());
 
 	}
 
 	@Test
-	public void test1() throws CollectorException, IOException, InvalidFormatException, ClassNotFoundException,
+	void test1() throws CollectorException, IOException, InvalidFormatException, ClassNotFoundException,
 		IllegalAccessException, InstantiationException {
 
 		EXCELParser excelParser = new EXCELParser();

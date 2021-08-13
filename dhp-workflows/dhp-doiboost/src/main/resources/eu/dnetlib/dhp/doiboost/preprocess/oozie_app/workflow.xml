@@ -76,6 +76,7 @@
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
+
     <action name="ImportCrossRef">
         <java>
             <job-tracker>${jobTracker}</job-tracker>

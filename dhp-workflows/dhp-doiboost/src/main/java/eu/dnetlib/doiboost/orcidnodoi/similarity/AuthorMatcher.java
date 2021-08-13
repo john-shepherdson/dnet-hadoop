@@ -1,26 +1,14 @@
 
 package eu.dnetlib.doiboost.orcidnodoi.similarity;
 
-import java.io.IOException;
 import java.text.Normalizer;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.similarity.JaroWinklerSimilarity;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.ximpleware.NavException;
-import com.ximpleware.ParseException;
-import com.ximpleware.XPathEvalException;
-import com.ximpleware.XPathParseException;
-
-import eu.dnetlib.dhp.parser.utility.VtdException;
 import eu.dnetlib.dhp.schema.orcid.AuthorData;
 import eu.dnetlib.dhp.schema.orcid.Contributor;
-import eu.dnetlib.dhp.schema.orcid.WorkDetail;
 
 /**
  * This class is used for searching from a list of publication contributors a
@@ -29,18 +17,16 @@ import eu.dnetlib.dhp.schema.orcid.WorkDetail;
  * the match is found (if exist) author informations are used to enrich the
  * matched contribuotr inside contributors list
  */
-
 public class AuthorMatcher {
 
-	private static final Logger logger = LoggerFactory.getLogger(AuthorMatcher.class);
-	public static final Double threshold = 0.8;
+	public static final Double THRESHOLD = 0.8;
 
-	public static void match(AuthorData author, List<Contributor> contributors)
-		throws IOException, XPathEvalException, XPathParseException, NavException, VtdException, ParseException {
+	private AuthorMatcher() {
+	}
 
+	public static void match(AuthorData author, List<Contributor> contributors) {
 		int matchCounter = 0;
 		List<Integer> matchCounters = Arrays.asList(matchCounter);
-		Contributor contributor = null;
 		contributors
 			.stream()
 			.filter(c -> !StringUtils.isBlank(c.getCreditName()))
@@ -62,8 +48,8 @@ public class AuthorMatcher {
 					c.setScore(bestMatch(author.getName(), author.getSurname(), c.getCreditName()));
 					return c;
 				})
-				.filter(c -> c.getScore() >= threshold)
-				.max(Comparator.comparing(c -> c.getScore()));
+				.filter(c -> c.getScore() >= THRESHOLD)
+				.max(Comparator.comparing(Contributor::getScore));
 			Contributor bestMatchContributor = null;
 			if (optCon.isPresent()) {
 				bestMatchContributor = optCon.get();
@@ -73,14 +59,14 @@ public class AuthorMatcher {
 		} else if (matchCounters.get(0) > 1) {
 			Optional<Contributor> optCon = contributors
 				.stream()
-				.filter(c -> c.isSimpleMatch())
+				.filter(Contributor::isSimpleMatch)
 				.filter(c -> !StringUtils.isBlank(c.getCreditName()))
 				.map(c -> {
 					c.setScore(bestMatch(author.getName(), author.getSurname(), c.getCreditName()));
 					return c;
 				})
-				.filter(c -> c.getScore() >= threshold)
-				.max(Comparator.comparing(c -> c.getScore()));
+				.filter(c -> c.getScore() >= THRESHOLD)
+				.max(Comparator.comparing(Contributor::getScore));
 			Contributor bestMatchContributor = null;
 			if (optCon.isPresent()) {
 				bestMatchContributor = optCon.get();
@@ -92,7 +78,7 @@ public class AuthorMatcher {
 	}
 
 	public static boolean simpleMatchOnOtherNames(String name, List<String> otherNames) {
-		if (otherNames == null || (otherNames != null && otherNames.isEmpty())) {
+		if (otherNames == null || otherNames.isEmpty()) {
 			return false;
 		}
 		return otherNames.stream().filter(o -> simpleMatch(name, o)).count() > 0;
@@ -132,8 +118,7 @@ public class AuthorMatcher {
 	}
 
 	public static Double similarity(String nameA, String surnameA, String nameB, String surnameB) {
-		Double score = similarityJaroWinkler(nameA, surnameA, nameB, surnameB);
-		return score;
+		return similarityJaroWinkler(nameA, surnameA, nameB, surnameB);
 	}
 
 	private static Double similarityJaroWinkler(String nameA, String surnameA, String nameB, String surnameB) {
@@ -179,7 +164,7 @@ public class AuthorMatcher {
 	public static void updateAuthorsSimilarityMatch(List<Contributor> contributors, AuthorData author) {
 		contributors
 			.stream()
-			.filter(c -> c.isBestMatch())
+			.filter(Contributor::isBestMatch)
 			.forEach(c -> {
 				c.setName(author.getName());
 				c.setSurname(author.getSurname());
@@ -206,9 +191,4 @@ public class AuthorMatcher {
 		}
 	}
 
-	private static String toJson(WorkDetail work) {
-		GsonBuilder builder = new GsonBuilder();
-		Gson gson = builder.create();
-		return gson.toJson(work);
-	}
 }

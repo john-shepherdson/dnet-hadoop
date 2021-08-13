@@ -231,7 +231,7 @@ object DoiBoostMappingUtil {
       var hb = new KeyValue
       if (item != null) {
         hb.setValue(item.officialname)
-        hb.setKey(generateDSId(item.id))
+        hb.setKey(item.id)
         if (item.openAccess) {
           i.setAccessright(getOpenAccessQualifier())
           i.getAccessright.setOpenAccessRoute(OpenAccessRoute.gold)

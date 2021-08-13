@@ -86,7 +86,7 @@ public class CreateEntityTest {
 	}
 
 	@Test
-	public void test1() throws ISLookUpException, IOException {
+	void test1() throws ISLookUpException, IOException {
 		List<ContextInfo> cInfoList = new ArrayList<>();
 		final Consumer<ContextInfo> consumer = ci -> cInfoList.add(ci);
 		queryInformationSystem.getContextInformation(consumer);
@@ -144,7 +144,7 @@ public class CreateEntityTest {
 
 	@Test
 	@Disabled
-	public void test2() throws IOException, ISLookUpException {
+	void test2() throws IOException, ISLookUpException {
 		LocalFileSystem fs = FileSystem.getLocal(new Configuration());
 
 		Path hdfsWritePath = new Path(workingDir + "/prova");

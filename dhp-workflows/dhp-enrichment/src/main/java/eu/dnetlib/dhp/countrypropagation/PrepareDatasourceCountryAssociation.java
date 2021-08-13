@@ -6,11 +6,10 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -18,11 +17,11 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Datasource;
+import eu.dnetlib.dhp.schema.oaf.Organization;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 
 /**
  * For the association of the country to the datasource The association is computed only for datasource of specific type
@@ -77,16 +76,16 @@ public class PrepareDatasourceCountryAssociation {
 		List<String> allowedtypes,
 		String inputPath,
 		String outputPath) {
-		String whitelisted = " d.id = '" + whitelist.get(0) + "'";
-		for (int i = 1; i < whitelist.size(); i++) {
-			whitelisted += " OR d.id = '" + whitelist.get(i) + "'";
-		}
 
-		String allowed = "d.datasourcetype.classid = '" + allowedtypes.get(0) + "'";
+		final String whitelisted = whitelist
+			.stream()
+			.map(id -> " d.id = '" + id + "'")
+			.collect(Collectors.joining(" OR "));
 
-		for (int i = 1; i < allowedtypes.size(); i++) {
-			allowed += " OR d.datasourcetype.classid = '" + allowedtypes.get(i) + "'";
-		}
+		final String allowed = allowedtypes
+			.stream()
+			.map(type -> " d.datasourcetype.classid = '" + type + "'")
+			.collect(Collectors.joining(" OR "));
 
 		Dataset<Datasource> datasource = readPath(spark, inputPath + "/datasource", Datasource.class);
 		Dataset<Relation> relation = readPath(spark, inputPath + "/relation", Relation.class);

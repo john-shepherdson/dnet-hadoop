@@ -12,10 +12,10 @@ import java.util.zip.GZIPInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
-import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
-import eu.dnetlib.dhp.collection.CollectorException;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
+import eu.dnetlib.dhp.common.collection.CollectorException;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class MongoDbDumpCollectorPlugin implements CollectorPlugin {
@@ -23,7 +23,7 @@ public class MongoDbDumpCollectorPlugin implements CollectorPlugin {
 	public static final String PATH_PARAM = "path";
 	public static final String BODY_JSONPATH = "$.body";
 
-	public FileSystem fileSystem;
+	private final FileSystem fileSystem;
 
 	public MongoDbDumpCollectorPlugin(FileSystem fileSystem) {
 		this.fileSystem = fileSystem;

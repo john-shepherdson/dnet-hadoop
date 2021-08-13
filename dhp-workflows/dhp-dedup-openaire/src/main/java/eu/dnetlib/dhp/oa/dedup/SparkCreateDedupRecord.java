@@ -13,6 +13,7 @@ import org.apache.spark.sql.SparkSession;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.EntityType;
@@ -54,7 +55,7 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
 
 	@Override
 	public void run(ISLookUpService isLookUpService)
-		throws ISLookUpException, DocumentException, IOException {
+		throws ISLookUpException, DocumentException, IOException, SAXException {
 
 		final String graphBasePath = parser.get("graphBasePath");
 		final String isLookUpUrl = parser.get("isLookUpUrl");

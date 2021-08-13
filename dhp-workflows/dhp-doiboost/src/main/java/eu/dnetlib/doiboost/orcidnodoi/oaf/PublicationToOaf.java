@@ -18,6 +18,7 @@ import com.google.gson.*;
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.doiboost.orcidnodoi.util.DumpToActionsUtility;
@@ -26,21 +27,19 @@ import eu.dnetlib.doiboost.orcidnodoi.util.Pair;
 /**
  * This class converts an orcid publication from json format to oaf
  */
-
 public class PublicationToOaf implements Serializable {
 
 	static Logger logger = LoggerFactory.getLogger(PublicationToOaf.class);
 
-	public final static String orcidPREFIX = "orcid_______";
+	public static final String orcidPREFIX = "orcid_______";
 	public static final String OPENAIRE_PREFIX = "openaire____";
-	public static final String SEPARATOR = "::";
+	public static final String SEPARATOR = IdentifierFactory.ID_SEPARATOR;
 	public static final String DEACTIVATED_NAME = "Given Names Deactivated";
 	public static final String DEACTIVATED_SURNAME = "Family Name Deactivated";
 
 	private String dateOfCollection = "";
 	private final LongAccumulator parsedPublications;
 	private final LongAccumulator enrichedPublications;
-	private final LongAccumulator errorsGeneric;
 	private final LongAccumulator errorsInvalidTitle;
 	private final LongAccumulator errorsNotFoundAuthors;
 	private final LongAccumulator errorsInvalidType;
@@ -52,7 +51,6 @@ public class PublicationToOaf implements Serializable {
 	public PublicationToOaf(
 		LongAccumulator parsedPublications,
 		LongAccumulator enrichedPublications,
-		LongAccumulator errorsGeneric,
 		LongAccumulator errorsInvalidTitle,
 		LongAccumulator errorsNotFoundAuthors,
 		LongAccumulator errorsInvalidType,
@@ -63,7 +61,6 @@ public class PublicationToOaf implements Serializable {
 		String dateOfCollection) {
 		this.parsedPublications = parsedPublications;
 		this.enrichedPublications = enrichedPublications;
-		this.errorsGeneric = errorsGeneric;
 		this.errorsInvalidTitle = errorsInvalidTitle;
 		this.errorsNotFoundAuthors = errorsNotFoundAuthors;
 		this.errorsInvalidType = errorsInvalidType;
@@ -77,7 +74,6 @@ public class PublicationToOaf implements Serializable {
 	public PublicationToOaf() {
 		this.parsedPublications = null;
 		this.enrichedPublications = null;
-		this.errorsGeneric = null;
 		this.errorsInvalidTitle = null;
 		this.errorsNotFoundAuthors = null;
 		this.errorsInvalidType = null;
@@ -88,19 +84,8 @@ public class PublicationToOaf implements Serializable {
 		this.dateOfCollection = null;
 	}
 
-	private static final Map<String, Pair<String, String>> datasources = new HashMap<String, Pair<String, String>>() {
-
-		{
-			put(
-				ModelConstants.ORCID,
-				new Pair<>(ModelConstants.ORCID.toUpperCase(), OPENAIRE_PREFIX + SEPARATOR + ModelConstants.ORCID));
-
-		}
-	};
-
 	// json external id will be mapped to oaf:pid/@classid Map to oaf:pid/@classname
 	private static final Map<String, Pair<String, String>> externalIds = new HashMap<String, Pair<String, String>>() {
-
 		{
 			put("ark".toLowerCase(), new Pair<>("ark", "ark"));
 			put("arxiv".toLowerCase(), new Pair<>("arXiv", "arXiv"));
@@ -208,10 +193,8 @@ public class PublicationToOaf implements Serializable {
 			.setTitle(
 				titles
 					.stream()
-					.map(t -> {
-						return mapStructuredProperty(t, ModelConstants.MAIN_TITLE_QUALIFIER, null);
-					})
-					.filter(s -> s != null)
+					.map(t -> mapStructuredProperty(t, ModelConstants.MAIN_TITLE_QUALIFIER, null))
+					.filter(Objects::nonNull)
 					.collect(Collectors.toList()));
 		// Adding identifier
 		final String id = getStringValue(rootElement, "id");
@@ -226,7 +209,7 @@ public class PublicationToOaf implements Serializable {
 		publication.setId(sourceId);
 
 		// Adding relevant date
-		settingRelevantDate(rootElement, publication, "publication_date", "issued", true);
+		settingRelevantDate(rootElement, publication, "issued", true);
 
 		// Adding collectedfrom
 		publication.setCollectedfrom(Arrays.asList(createCollectedFrom()));
@@ -243,7 +226,7 @@ public class PublicationToOaf implements Serializable {
 			Map<String, String> publicationType = typologiesMapping.get(type);
 			if ((publicationType == null || publicationType.isEmpty()) && errorsInvalidType != null) {
 				errorsInvalidType.add(1);
-				logger.error("publication_type_not_found: " + type);
+				logger.error("publication_type_not_found: {}", type);
 				return null;
 			}
 
@@ -307,7 +290,7 @@ public class PublicationToOaf implements Serializable {
 
 		// Adding authors
 		final List<Author> authors = createAuthors(rootElement);
-		if (authors != null && authors.size() > 0) {
+		if (authors != null && !authors.isEmpty()) {
 			if (authors.stream().filter(a -> {
 				return ((Objects.nonNull(a.getName()) && a.getName().equals(DEACTIVATED_NAME)) ||
 					(Objects.nonNull(a.getSurname()) && a.getSurname().equals(DEACTIVATED_SURNAME)));
@@ -322,8 +305,7 @@ public class PublicationToOaf implements Serializable {
 		} else {
 			if (authors == null) {
 				Gson gson = new GsonBuilder().setPrettyPrinting().create();
-				String json = gson.toJson(rootElement);
-				throw new RuntimeException("not_valid_authors: " + json);
+				throw new RuntimeException("not_valid_authors: " + gson.toJson(rootElement));
 			} else {
 				if (errorsNotFoundAuthors != null) {
 					errorsNotFoundAuthors.add(1);
@@ -434,7 +416,6 @@ public class PublicationToOaf implements Serializable {
 
 	private void settingRelevantDate(final JsonObject rootElement,
 		final Publication publication,
-		final String jsonKey,
 		final String dictionaryKey,
 		final boolean addToDateOfAcceptance) {
 
@@ -450,10 +431,8 @@ public class PublicationToOaf implements Serializable {
 					Arrays
 						.asList(pubDate)
 						.stream()
-						.map(r -> {
-							return mapStructuredProperty(r, q, null);
-						})
-						.filter(s -> s != null)
+						.map(r -> mapStructuredProperty(r, q, null))
+						.filter(Objects::nonNull)
 						.collect(Collectors.toList()));
 		}
 	}
@@ -498,7 +477,7 @@ public class PublicationToOaf implements Serializable {
 
 		final String type = getStringValue(rootElement, "type");
 		if (!typologiesMapping.containsKey(type)) {
-			logger.error("unknowntype_" + type);
+			logger.error("unknowntype_{}", type);
 			if (errorsInvalidType != null) {
 				errorsInvalidType.add(1);
 			}
@@ -550,7 +529,7 @@ public class PublicationToOaf implements Serializable {
 	}
 
 	private StructuredProperty mapStructuredProperty(String value, Qualifier qualifier, DataInfo dataInfo) {
-		if (value == null | StringUtils.isBlank(value)) {
+		if (value == null || StringUtils.isBlank(value)) {
 			return null;
 		}
 

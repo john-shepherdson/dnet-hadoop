@@ -40,7 +40,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					SparkCreateSimRels.class
+					SparkPropagateRelation.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/oa/dedup/propagateRelation_parameters.json")));
 
@@ -113,7 +113,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 					.join(r.getSource(), r.getTarget(), r.getRelType(), r.getSubRelType(), r.getRelClass()),
 				Encoders.STRING())
 			.agg(new RelationAggregator().toColumn())
-			.map((MapFunction<Tuple2<String, Relation>, Relation>) t -> t._2(), Encoders.bean(Relation.class));
+			.map((MapFunction<Tuple2<String, Relation>, Relation>) Tuple2::_2, Encoders.bean(Relation.class));
 	}
 
 	// redirect the relations to the dedupID
@@ -163,7 +163,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 	private FilterFunction<Relation> getRelationFilterFunction() {
 		return r -> StringUtils.isNotBlank(r.getSource()) ||
 			StringUtils.isNotBlank(r.getTarget()) ||
-			StringUtils.isNotBlank(r.getRelClass()) ||
+			StringUtils.isNotBlank(r.getRelType()) ||
 			StringUtils.isNotBlank(r.getSubRelType()) ||
 			StringUtils.isNotBlank(r.getRelClass());
 	}

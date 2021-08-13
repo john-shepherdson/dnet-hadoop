@@ -93,7 +93,7 @@ public class ResultMapper implements Serializable {
 								.setDocumentationUrl(
 									value
 										.stream()
-										.map(v -> v.getValue())
+										.map(Field::getValue)
 										.collect(Collectors.toList())));
 
 					Optional
@@ -109,20 +109,20 @@ public class ResultMapper implements Serializable {
 						.setContactgroup(
 							Optional
 								.ofNullable(ir.getContactgroup())
-								.map(value -> value.stream().map(cg -> cg.getValue()).collect(Collectors.toList()))
+								.map(value -> value.stream().map(Field::getValue).collect(Collectors.toList()))
 								.orElse(null));
 
 					out
 						.setContactperson(
 							Optional
 								.ofNullable(ir.getContactperson())
-								.map(value -> value.stream().map(cp -> cp.getValue()).collect(Collectors.toList()))
+								.map(value -> value.stream().map(Field::getValue).collect(Collectors.toList()))
 								.orElse(null));
 					out
 						.setTool(
 							Optional
 								.ofNullable(ir.getTool())
-								.map(value -> value.stream().map(t -> t.getValue()).collect(Collectors.toList()))
+								.map(value -> value.stream().map(Field::getValue).collect(Collectors.toList()))
 								.orElse(null));
 
 					out.setType(ModelConstants.ORP_DEFAULT_RESULTTYPE.getClassname());
@@ -132,7 +132,8 @@ public class ResultMapper implements Serializable {
 
 			Optional
 				.ofNullable(input.getAuthor())
-				.ifPresent(ats -> out.setAuthor(ats.stream().map(at -> getAuthor(at)).collect(Collectors.toList())));
+				.ifPresent(
+					ats -> out.setAuthor(ats.stream().map(ResultMapper::getAuthor).collect(Collectors.toList())));
 
 			// I do not map Access Right UNKNOWN or OTHER
 
@@ -219,11 +220,12 @@ public class ResultMapper implements Serializable {
 			if (oInst.isPresent()) {
 				if (Constants.DUMPTYPE.COMPLETE.getType().equals(dumpType)) {
 					((GraphResult) out)
-						.setInstance(oInst.get().stream().map(i -> getGraphInstance(i)).collect(Collectors.toList()));
+						.setInstance(
+							oInst.get().stream().map(ResultMapper::getGraphInstance).collect(Collectors.toList()));
 				} else {
 					((CommunityResult) out)
 						.setInstance(
-							oInst.get().stream().map(i -> getCommunityInstance(i)).collect(Collectors.toList()));
+							oInst.get().stream().map(ResultMapper::getCommunityInstance).collect(Collectors.toList()));
 				}
 			}
 
@@ -422,7 +424,7 @@ public class ResultMapper implements Serializable {
 		Optional
 			.ofNullable(i.getInstancetype())
 			.ifPresent(value -> instance.setType(value.getClassname()));
-		Optional.ofNullable(i.getUrl()).ifPresent(value -> instance.setUrl(value));
+		Optional.ofNullable(i.getUrl()).ifPresent(instance::setUrl);
 
 	}
 

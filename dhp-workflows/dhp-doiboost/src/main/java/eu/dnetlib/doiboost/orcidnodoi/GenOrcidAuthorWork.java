@@ -3,9 +3,9 @@ package eu.dnetlib.doiboost.orcidnodoi;
 
 import java.io.IOException;
 
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.mortbay.log.Log;
 
@@ -16,7 +16,6 @@ import eu.dnetlib.doiboost.orcid.OrcidDSManager;
  * This job generates one sequence file, the key is an orcid identifier and the
  * value is an orcid publication in json format
  */
-
 public class GenOrcidAuthorWork extends OrcidDSManager {
 
 	private String activitiesFileNameTarGz;
@@ -30,13 +29,12 @@ public class GenOrcidAuthorWork extends OrcidDSManager {
 
 	public void generateAuthorsDOIsData() throws Exception {
 		Configuration conf = initConfigurationObject();
-		FileSystem fs = initFileSystemObject(conf);
 		String tarGzUri = hdfsServerUri.concat(workingPath).concat(activitiesFileNameTarGz);
 		Path outputPath = new Path(hdfsServerUri.concat(workingPath).concat(outputWorksPath));
 		ActivitiesDumpReader.parseGzActivities(conf, tarGzUri, outputPath);
 	}
 
-	private void loadArgs(String[] args) throws Exception {
+	private void loadArgs(String[] args) throws ParseException, IOException {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(

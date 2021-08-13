@@ -2,6 +2,7 @@
 package eu.dnetlib.doiboost.crossref;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.zip.Inflater;
 
@@ -22,9 +23,11 @@ public class CrossrefImporter {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					CrossrefImporter.class
-						.getResourceAsStream(
-							"/eu/dnetlib/dhp/doiboost/import_from_es.json")));
+					Objects
+						.requireNonNull(
+							CrossrefImporter.class
+								.getResourceAsStream(
+									"/eu/dnetlib/dhp/doiboost/import_from_es.json"))));
 
 		parser.parseArgument(args);
 

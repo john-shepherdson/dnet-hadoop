@@ -18,7 +18,7 @@ public class EnrichMoreProject extends UpdateMatcher<OaBrokerProject> {
 		super(20,
 			prj -> Topic.ENRICH_MORE_PROJECT,
 			(p, prj) -> p.getProjects().add(prj),
-			prj -> prj.getOpenaireId());
+			OaBrokerProject::getOpenaireId);
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class EnrichMoreProject extends UpdateMatcher<OaBrokerProject> {
 		final Set<String> existingProjects = target
 			.getProjects()
 			.stream()
-			.map(p -> p.getOpenaireId())
+			.map(OaBrokerProject::getOpenaireId)
 			.collect(Collectors.toSet());
 
 		return source

@@ -67,7 +67,7 @@ public class ResultToOrganizationJobTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void NoUpdateTest() throws Exception {
+	void NoUpdateTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/sample/noupdate_updatenomix")
 			.getPath();
@@ -110,7 +110,7 @@ public class ResultToOrganizationJobTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void UpdateNoMixTest() throws Exception {
+	void UpdateNoMixTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/sample/noupdate_updatenomix")
 			.getPath();
@@ -176,7 +176,7 @@ public class ResultToOrganizationJobTest {
 	}
 
 	@Test
-	public void UpdateMixTest() throws Exception {
+	void UpdateMixTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/sample/updatemix")
 			.getPath();

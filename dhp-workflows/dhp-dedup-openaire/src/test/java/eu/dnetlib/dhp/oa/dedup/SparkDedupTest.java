@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
-import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -148,7 +147,7 @@ public class SparkDedupTest implements Serializable {
 
 	@Test
 	@Order(1)
-	public void createSimRelsTest() throws Exception {
+	void createSimRelsTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -196,14 +195,14 @@ public class SparkDedupTest implements Serializable {
 
 		assertEquals(3082, orgs_simrel);
 		assertEquals(7036, pubs_simrel);
-		assertEquals(344, sw_simrel);
+		assertEquals(336, sw_simrel);
 		assertEquals(442, ds_simrel);
 		assertEquals(6750, orp_simrel);
 	}
 
 	@Test
 	@Order(2)
-	public void cutMergeRelsTest() throws Exception {
+	void cutMergeRelsTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -299,7 +298,7 @@ public class SparkDedupTest implements Serializable {
 
 	@Test
 	@Order(3)
-	public void createMergeRelsTest() throws Exception {
+	void createMergeRelsTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -347,7 +346,7 @@ public class SparkDedupTest implements Serializable {
 
 		assertEquals(1272, orgs_mergerel);
 		assertEquals(1438, pubs_mergerel);
-		assertEquals(288, sw_mergerel);
+		assertEquals(286, sw_mergerel);
 		assertEquals(472, ds_mergerel);
 		assertEquals(718, orp_mergerel);
 
@@ -355,7 +354,7 @@ public class SparkDedupTest implements Serializable {
 
 	@Test
 	@Order(4)
-	public void createDedupRecordTest() throws Exception {
+	void createDedupRecordTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -402,7 +401,7 @@ public class SparkDedupTest implements Serializable {
 
 	@Test
 	@Order(5)
-	public void updateEntityTest() throws Exception {
+	void updateEntityTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -518,7 +517,7 @@ public class SparkDedupTest implements Serializable {
 
 	@Test
 	@Order(6)
-	public void propagateRelationTest() throws Exception {
+	void propagateRelationTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -536,7 +535,7 @@ public class SparkDedupTest implements Serializable {
 
 		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
 
-		assertEquals(4862, relations);
+		assertEquals(4860, relations);
 
 		// check deletedbyinference
 		final Dataset<Relation> mergeRels = spark
@@ -568,7 +567,7 @@ public class SparkDedupTest implements Serializable {
 
 	@Test
 	@Order(7)
-	public void testRelations() throws Exception {
+	void testRelations() throws Exception {
 		testUniqueness("/eu/dnetlib/dhp/dedup/test/relation_1.json", 12, 10);
 		testUniqueness("/eu/dnetlib/dhp/dedup/test/relation_2.json", 10, 2);
 	}

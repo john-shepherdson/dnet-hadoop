@@ -1,0 +1,628 @@
+<RESOURCE_PROFILE>
+    <HEADER>
+        <RESOURCE_IDENTIFIER value="4801c33c-66ca-4ab6-af64-aa812194ec67_V29ya2Zsb3dEU1Jlc291cmNlcy9Xb3JrZmxvd0RTUmVzb3VyY2VUeXBl"/>
+        <RESOURCE_TYPE value="WorkflowDSResourceType"/>
+        <RESOURCE_KIND value="WorkflowDSResources"/>
+        <RESOURCE_URI value=""/>
+        <DATE_OF_CREATION value="2021-07-30T09:42:23+00:00"/>
+    </HEADER>
+    <BODY>
+        <WORKFLOW_NAME>Graph construction for IIS [BETA]</WORKFLOW_NAME>
+        <WORKFLOW_TYPE>IIS</WORKFLOW_TYPE>
+        <WORKFLOW_PRIORITY>30</WORKFLOW_PRIORITY>
+        <CONFIGURATION start="manual">
+            <NODE isStart="true" name="setNsPrefixBlacklist" type="SetEnvParameter">
+                <DESCRIPTION>set blacklist of funder nsPrefixes</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">nsPrefixBlacklist</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">gsrt________,rcuk________</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setIdMappingPath" type="SetEnvParameter">
+                <DESCRIPTION>set the path of the map defining the relations id mappings</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">idMappingPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/data/maps/fct_map.json</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setMergedGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the MERGED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">mergedGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_inference/graph/01_graph_merged</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setRawGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the RAW graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">rawGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_inference/graph/02_graph_raw</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setCleanedFirstGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the CLEANED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">cleanedFirstGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_inference/graph/03_graph_clean_first</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setDedupGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the DEDUPED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">dedupGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_inference/graph/04_graph_dedup</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setConsistentGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the CONSISTENCY graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">consistentGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_inference/graph/05_graph_consistent</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setCleanedGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the CLEANED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">cleanedGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_inference/graph/06_graph_cleaned</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setDedupConfig" type="SetEnvParameter">
+                <DESCRIPTION>Set the dedup orchestrator name</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">dedupConfig</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">dedup-similarity-result-decisiontree-v2</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="actionSetsRaw" type="SetEnvParameter">
+                <DESCRIPTION>declares the ActionSet ids to promote in the RAW graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">actionSetIdsRawGraph</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">scholexplorer-dump,doiboost,orcidworks-no-doi,datacite</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setIsLookUpUrl" type="SetEnvParameter">
+                <DESCRIPTION>Set the IS lookup service address</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">isLookUpUrl</PARAM>
+                    <PARAM managedBy="system" name="parameterValue" required="true" type="string">http://beta.services.openaire.eu:8280/is/services/isLookUp?wsdl</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isJoin="true" name="waitConfig">
+                <DESCRIPTION>wait configurations</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="reuseODFClaims_PROD"/>
+                    <ARC to="reuseODFClaims_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseODFClaims_PROD" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached ODF claims from the PROD aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseODFClaims_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseODF_hdfs_PROD"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseODF_hdfs_PROD" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached ODF records on HDFS from the PROD aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseODFhdfs_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseOAFClaims_PROD"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseOAFClaims_PROD" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached OAF claims from the PROD aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseOAFClaims_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseOAF_hdfs_PROD"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseOAF_hdfs_PROD" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached OAF records on HDFS from the PROD aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseOAFhdfs_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseDB_PROD"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseDB_PROD" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached DB content from the PROD aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseDB_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseDBOpenorgs_PROD"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseDBOpenorgs_PROD" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached OpenOrgs content from the PROD aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseDBOpenorgs_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseODF_PROD"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseODF_PROD" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached ODF content from the PROD aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseODF_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseOAF_PROD"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseOAF_PROD" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached OAF content from the PROD aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseOAF_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="patchRelations_PROD"/>
+                </ARCS>
+            </NODE>
+            <NODE name="patchRelations_PROD" type="SetEnvParameter">
+                <DESCRIPTION>should apply the relations id patching based on the provided idMapping on PROD?</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">shouldPatchRelations_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">false</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="contentPathProd"/>
+                </ARCS>
+            </NODE>
+            <NODE name="contentPathProd" type="SetEnvParameter">
+                <DESCRIPTION>set the PROD aggregator content path</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">prodContentPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_aggregator_for_beta</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="prodAggregatorGraphPath"/>
+                </ARCS>
+            </NODE>
+            <NODE name="prodAggregatorGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the path containing the PROD AGGREGATOR graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">prodAggregatorGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_inference/graph/00_prod_graph_aggregator</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig2"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseODFClaims_BETA" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached ODF claims from the BETA aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseODFClaims_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseODF_hdfs_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseODF_hdfs_BETA" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached ODF records on HDFS from the BETA aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseODFhdfs_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseOAFClaims_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseOAFClaims_BETA" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached OAF claims from the BETA aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseOAFClaims_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseOAF_hdfs_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseOAF_hdfs_BETA" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached OAF records on HDFS from the BETA aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseOAFhdfs_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseDB_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseDB_BETA" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached DB content from the BETA aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseDB_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseDBOpenorgs_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseDBOpenorgs_BETA" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached OpenOrgs content from the BETA aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseDBOpenorgs_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseODF_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseODF_BETA" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached ODF content from the BETA aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseODF_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseOAF_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseOAF_BETA" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached OAF content from the BETA aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseOAF_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="patchRelations_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="patchRelations_BETA" type="SetEnvParameter">
+                <DESCRIPTION>should apply the relations id patching based on the provided idMapping on BETA?</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">shouldPatchRelations_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">false</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="contentPathBeta"/>
+                </ARCS>
+            </NODE>
+            <NODE name="contentPathBeta" type="SetEnvParameter">
+                <DESCRIPTION>set the BETA aggregator content path</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">betaContentPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_aggregator</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="betaAggregatorGraphPath"/>
+                </ARCS>
+            </NODE>
+            <NODE name="betaAggregatorGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the path containing the BETA AGGREGATOR graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">betaAggregatorGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_inference/graph/00_beta_graph_aggregator</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig2"/>
+                </ARCS>
+            </NODE>
+            <NODE isJoin="true" name="waitConfig2">
+                <DESCRIPTION>wait configurations</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="betaAggregatorGraph"/>
+                    <ARC to="prodAggregatorGraph"/>
+                </ARCS>
+            </NODE>
+            <NODE name="betaAggregatorGraph" type="SubmitHadoopJob">
+                <DESCRIPTION>create the BETA AGGREGATOR graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'graphOutputPath' : 'betaAggregatorGraphPath',
+                        'isLookupUrl' : 'isLookUpUrl',
+                        'reuseODFClaims' : 'reuseODFClaims_BETA',
+                        'reuseOAFClaims' : 'reuseOAFClaims_BETA',
+                        'reuseDB' : 'reuseDB_BETA',
+                        'reuseDBOpenorgs' : 'reuseDBOpenorgs_BETA',
+                        'reuseODF' : 'reuseODF_BETA',
+                        'reuseODF_hdfs' : 'reuseODFhdfs_BETA',
+                        'reuseOAF' : 'reuseOAF_BETA',
+                        'reuseOAF_hdfs' : 'reuseOAFhdfs_BETA',
+                        'contentPath' : 'betaContentPath',
+                        'nsPrefixBlacklist' : 'nsPrefixBlacklist',
+                        'shouldPatchRelations' : 'shouldPatchRelations_BETA',
+                        'idMappingPath' : 'idMappingPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/graph/raw_all/oozie_app',
+                        'mongoURL' : '',
+                        'mongoDb' : '',
+                        'mdstoreManagerUrl' : '',
+                        'postgresURL' : '',
+                        'postgresUser' : '',
+                        'postgresPassword' : '',
+                        'postgresOpenOrgsURL' : '',
+                        'postgresOpenOrgsUser' : '',
+                        'postgresOpenOrgsPassword' : '',
+                        'shouldHashId' : 'true',
+                        'importOpenorgs' : 'true',
+                        'workingDir' : '/tmp/beta_inference/working_dir/beta_aggregator'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitAggregatorGraph"/>
+                </ARCS>
+            </NODE>
+            <NODE name="prodAggregatorGraph" type="SubmitHadoopJob">
+                <DESCRIPTION>create the PROD AGGREGATOR graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'graphOutputPath' : 'prodAggregatorGraphPath',
+                        'isLookupUrl' : 'isLookUpUrl',
+                        'reuseODFClaims' : 'reuseODFClaims_PROD',
+                        'reuseOAFClaims' : 'reuseOAFClaims_PROD',
+                        'reuseDB' : 'reuseDB_PROD',
+                        'reuseDBOpenorgs' : 'reuseDBOpenorgs_PROD',
+                        'reuseODF' : 'reuseODF_PROD',
+                        'reuseODF_hdfs' : 'reuseODFhdfs_PROD',
+                        'reuseOAF' : 'reuseOAF_PROD',
+                        'reuseOAF_hdfs' : 'reuseOAFhdfs_PROD',
+                        'contentPath' : 'prodContentPath',
+                        'nsPrefixBlacklist' : 'nsPrefixBlacklist',
+                        'shouldPatchRelations' : 'shouldPatchRelations_PROD',
+                        'idMappingPath' : 'idMappingPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/graph/raw_all/oozie_app',
+                        'mongoURL' : '',
+                        'mongoDb' : '',
+                        'mdstoreManagerUrl' : '',
+                        'postgresURL' : '',
+                        'postgresUser' : '',
+                        'postgresPassword' : '',
+                        'postgresOpenOrgsURL' : '',
+                        'postgresOpenOrgsUser' : '',
+                        'postgresOpenOrgsPassword' : '',
+                        'shouldHashId' : 'true',
+                        'importOpenorgs' : 'true',
+                        'workingDir' : '/tmp/beta_inference/working_dir/prod_aggregator'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitAggregatorGraph"/>
+                </ARCS>
+            </NODE>
+            <NODE isJoin="true" name="waitAggregatorGraph">
+                <DESCRIPTION>wait configurations</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="mergeAggregatorGraphs"/>
+                </ARCS>
+            </NODE>
+            <NODE name="mergeAggregatorGraphs" type="SubmitHadoopJob">
+                <DESCRIPTION>create the AGGREGATOR graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'betaInputGraphPath' : 'betaAggregatorGraphPath',
+                        'prodInputGraphPath' : 'prodAggregatorGraphPath',
+                        'graphOutputPath' : 'mergedGraphPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/graph/merge/oozie_app',
+                        'workingDir' : '/tmp/beta_inference/working_dir/merge_graph',
+                        'priority' : 'BETA'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="promoteActionsRaw"/>
+                </ARCS>
+            </NODE>
+            <NODE name="promoteActionsRaw" type="SubmitHadoopJob">
+                <DESCRIPTION>create the RAW graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'inputActionSetIds' : 'actionSetIdsRawGraph',
+                        'inputGraphRootPath' : 'mergedGraphPath',
+                        'outputGraphRootPath' : 'rawGraphPath',
+                        'isLookupUrl' : 'isLookUpUrl'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/actionmanager/wf/main/oozie_app',
+                        'sparkExecutorCores' : '3',
+                        'sparkExecutorMemory' : '10G',
+                        'activePromoteDatasetActionPayload' : 'true',
+                        'activePromoteDatasourceActionPayload' : 'true',
+                        'activePromoteOrganizationActionPayload' : 'true',
+                        'activePromoteOtherResearchProductActionPayload' : 'true',
+                        'activePromoteProjectActionPayload' : 'true',
+                        'activePromotePublicationActionPayload' : 'true',
+                        'activePromoteRelationActionPayload' : 'true',
+                        'activePromoteResultActionPayload' : 'true',
+                        'activePromoteSoftwareActionPayload' : 'true',
+                        'mergeAndGetStrategy' : 'MERGE_FROM_AND_GET',
+                        'workingDir' : '/tmp/beta_inference/working_dir/promoteActionsRaw'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="graphCleaningFirst"/>
+                </ARCS>
+            </NODE>
+            <NODE name="graphCleaningFirst" type="SubmitHadoopJob">
+                <DESCRIPTION>clean the properties in the graph typed as Qualifier according to the vocabulary indicated in schemeid</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'graphInputPath' : 'rawGraphPath',
+                        'graphOutputPath': 'cleanedFirstGraphPath',
+                        'isLookupUrl': 'isLookUpUrl'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/graph/clean/oozie_app',
+                        'workingDir' : '/tmp/beta_inference/working_dir/clean_first'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="duplicateScan"/>
+                </ARCS>
+            </NODE>
+            <NODE name="duplicateScan" type="SubmitHadoopJob">
+                <DESCRIPTION>search for duplicates in the raw graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'actionSetId' : 'dedupConfig',
+                        'graphBasePath' : 'cleanedFirstGraphPath',
+                        'dedupGraphPath': 'dedupGraphPath',
+                        'isLookUpUrl' : 'isLookUpUrl'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/dedup/scan/oozie_app',
+                        'actionSetIdOpenorgs' : 'dedup-similarity-organization-simple',
+                        'workingPath' : '/tmp/beta_inference/working_dir/dedup',
+                        'sparkExecutorCores' : '3',
+                        'sparkExecutorMemory' : '10G'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="dedupConsistency"/>
+                </ARCS>
+            </NODE>
+            <NODE name="dedupConsistency" type="SubmitHadoopJob">
+                <DESCRIPTION>mark duplicates as deleted and redistribute the relationships</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'graphBasePath' : 'dedupGraphPath',
+                        'graphOutputPath': 'consistentGraphPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/dedup/consistency/oozie_app',
+                        'workingPath' : '/tmp/beta_inference/working_dir/dedup'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="graphCleaning"/>
+                </ARCS>
+            </NODE>
+            <NODE name="graphCleaning" type="SubmitHadoopJob">
+                <DESCRIPTION>clean the properties in the graph typed as Qualifier according to the vocabulary indicated in schemeid</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'graphInputPath' : 'consistentGraphPath',
+                        'graphOutputPath': 'cleanedGraphPath',
+                        'isLookupUrl': 'isLookUpUrl'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/graph/clean/oozie_app',
+                        'workingDir' : '/tmp/beta_inference/working_dir/clean'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="success"/>
+                </ARCS>
+            </NODE>
+        </CONFIGURATION>
+        <STATUS>
+            <LAST_EXECUTION_ID>wf_20210730_094240_462</LAST_EXECUTION_ID>
+            <LAST_EXECUTION_DATE>2021-07-30T15:04:19+00:00</LAST_EXECUTION_DATE>
+            <LAST_EXECUTION_STATUS>SUCCESS</LAST_EXECUTION_STATUS>
+            <LAST_EXECUTION_ERROR/>
+        </STATUS>
+    </BODY>
+</RESOURCE_PROFILE>

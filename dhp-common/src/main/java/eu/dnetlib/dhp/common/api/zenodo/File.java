@@ -3,16 +3,11 @@ package eu.dnetlib.dhp.common.api.zenodo;
 
 import java.io.Serializable;
 
-import net.minidev.json.annotate.JsonIgnore;
-
 public class File implements Serializable {
 	private String checksum;
 	private String filename;
 	private long filesize;
 	private String id;
-
-	@JsonIgnore
-	// private Links links;
 
 	public String getChecksum() {
 		return checksum;
@@ -46,13 +41,4 @@ public class File implements Serializable {
 		this.id = id;
 	}
 
-//    @JsonIgnore
-//    public Links getLinks() {
-//        return links;
-//    }
-//
-//    @JsonIgnore
-//    public void setLinks(Links links) {
-//        this.links = links;
-//    }
 }

@@ -519,6 +519,16 @@
 				<version>${common.text.version}</version>
 			</dependency>
 
+			<dependency>
+				<groupId>com.opencsv</groupId>
+				<artifactId>opencsv</artifactId>
+				<version>5.5</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.classgraph</groupId>
+				<artifactId>classgraph</artifactId>
+				<version>4.8.71</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

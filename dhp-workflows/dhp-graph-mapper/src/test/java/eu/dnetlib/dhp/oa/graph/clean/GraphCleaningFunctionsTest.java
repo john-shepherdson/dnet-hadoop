@@ -50,7 +50,7 @@ public class GraphCleaningFunctionsTest {
 	}
 
 	@Test
-	public void testCleaning() throws Exception {
+	void testCleaning() throws Exception {
 
 		assertNotNull(vocabularies);
 		assertNotNull(mapping);
@@ -166,10 +166,6 @@ public class GraphCleaningFunctionsTest {
 
 		// TODO add more assertions to verity the cleaned values
 		System.out.println(MAPPER.writeValueAsString(p_cleaned));
-
-		/*
-		 * assertTrue( p_out .getPid() .stream() .allMatch(sp -> StringUtils.isNotBlank(sp.getValue())));
-		 */
 	}
 
 	private Stream<Qualifier> getAuthorPidTypes(Result pub) {

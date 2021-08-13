@@ -13,12 +13,18 @@ import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 public class TransformationFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(TransformationFactory.class);
-	public static final String TRULE_XQUERY = "for $x in collection('/db/DRIVER/TransformationRuleDSResources/TransformationRuleDSResourceType') where $x//RESOURCE_IDENTIFIER/@value = \"%s\" return $x//CODE/*[local-name() =\"stylesheet\"]";
+	public static final String TRULE_XQUERY = "for $x in collection('/db/DRIVER/TransformationRuleDSResources/TransformationRuleDSResourceType') "
+		+
+		"where $x//RESOURCE_IDENTIFIER/@value = \"%s\" return $x//CODE/*[local-name() =\"stylesheet\"]";
+
+	private TransformationFactory() {
+	}
 
 	public static MapFunction<MetadataRecord, MetadataRecord> getTransformationPlugin(
 		final Map<String, String> jobArgument, final AggregationCounter counters, final ISLookUpService isLookupService)
@@ -27,7 +33,7 @@ public class TransformationFactory {
 		try {
 			final String transformationPlugin = jobArgument.get("transformationPlugin");
 
-			log.info("Transformation plugin required " + transformationPlugin);
+			log.info("Transformation plugin required {}", transformationPlugin);
 			switch (transformationPlugin) {
 				case "XSLT_TRANSFORM": {
 					final String transformationRuleId = jobArgument.get("transformationRuleId");
@@ -38,7 +44,7 @@ public class TransformationFactory {
 					final String transformationRule = queryTransformationRuleFromIS(
 						transformationRuleId, isLookupService);
 
-					final long dateOfTransformation = new Long(jobArgument.get("dateOfTransformation"));
+					final long dateOfTransformation = Long.parseLong(jobArgument.get("dateOfTransformation"));
 					return new XSLTTransformationFunction(counters, transformationRule, dateOfTransformation,
 						vocabularies);
 
@@ -46,7 +52,6 @@ public class TransformationFactory {
 				default:
 					throw new DnetTransformationException(
 						"transformation plugin does not exists for " + transformationPlugin);
-
 			}
 
 		} catch (Throwable e) {
@@ -55,9 +60,9 @@ public class TransformationFactory {
 	}
 
 	private static String queryTransformationRuleFromIS(final String transformationRuleId,
-		final ISLookUpService isLookUpService) throws Exception {
+		final ISLookUpService isLookUpService) throws DnetTransformationException, ISLookUpException {
 		final String query = String.format(TRULE_XQUERY, transformationRuleId);
-		System.out.println("asking query to IS: " + query);
+		log.info("asking query to IS: {}", query);
 		List<String> result = isLookUpService.quickSearchProfile(query);
 
 		if (result == null || result.isEmpty())

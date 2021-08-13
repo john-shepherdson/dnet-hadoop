@@ -1,0 +1,40 @@
+[
+  {
+    "paramName":"fu",
+    "paramLongName":"fileURL",
+    "paramDescription": "the url to download the csv file ",
+    "paramRequired": true
+  },
+  {
+    "paramName":"tf",
+    "paramLongName":"tmpFile",
+    "paramDescription": "the temporary local file storing the cleaned CSV contents for unibi gold list and doj artciles",
+    "paramRequired": true
+  },
+  {
+    "paramName":"of",
+    "paramLongName":"outputFile",
+    "paramDescription": "the output json file produced by the CSV downlaod procedure",
+    "paramRequired": true
+  },
+  {
+    "paramName": "hnn",
+    "paramLongName": "hdfsNameNode",
+    "paramDescription": "the path used to store the HostedByMap",
+    "paramRequired": true
+  },
+  {
+    "paramName": "cfn",
+    "paramLongName": "classForName",
+    "paramDescription": "true if the spark session is managed, false otherwise",
+    "paramRequired": true
+  },
+  {
+    "paramName": "d",
+    "paramLongName": "delimiter",
+    "paramDescription": "csv delimiter character",
+    "paramRequired": false
+  }
+]
+
+
