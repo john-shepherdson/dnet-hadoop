@@ -19,10 +19,10 @@ import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
-import eu.dnetlib.dhp.collection.CollectorException;
-import eu.dnetlib.dhp.collection.HttpConnector2;
 import eu.dnetlib.dhp.collection.XmlCleaner;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
+import eu.dnetlib.dhp.common.collection.CollectorException;
+import eu.dnetlib.dhp.common.collection.HttpConnector2;
 
 public class OaiIterator implements Iterator<String> {
 

@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.aggregation.common;
+package eu.dnetlib.dhp.common.aggregation;
 
 import java.io.Closeable;
 import java.io.IOException;

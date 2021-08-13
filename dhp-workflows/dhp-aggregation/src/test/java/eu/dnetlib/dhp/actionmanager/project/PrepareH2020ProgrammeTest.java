@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.utils.CSVProgramme;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProgramme;
 
 public class PrepareH2020ProgrammeTest {
 
@@ -92,7 +92,7 @@ public class PrepareH2020ProgrammeTest {
 
 		Assertions.assertEquals(0, verificationDataset.filter("classification = ''").count());
 
-		// tmp.foreach(csvProgramme -> System.out.println(OBJECT_MAPPER.writeValueAsString(csvProgramme)));
+		//tmp.foreach(csvProgramme -> System.out.println(OBJECT_MAPPER.writeValueAsString(csvProgramme)));
 
 		Assertions
 			.assertEquals(

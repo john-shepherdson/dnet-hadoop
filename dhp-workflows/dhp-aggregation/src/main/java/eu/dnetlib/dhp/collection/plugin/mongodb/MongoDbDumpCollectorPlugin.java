@@ -12,10 +12,10 @@ import java.util.zip.GZIPInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
-import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
-import eu.dnetlib.dhp.collection.CollectorException;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
+import eu.dnetlib.dhp.common.collection.CollectorException;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class MongoDbDumpCollectorPlugin implements CollectorPlugin {

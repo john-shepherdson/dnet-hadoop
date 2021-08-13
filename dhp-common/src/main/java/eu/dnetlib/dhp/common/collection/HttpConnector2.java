@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.collection;
+package eu.dnetlib.dhp.common.collection;
 
 import static eu.dnetlib.dhp.utils.DHPUtils.*;
 
@@ -15,7 +15,7 @@ import org.apache.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 
 /**
  * Migrated from https://svn.driver.research-infrastructures.eu/driver/dnet45/modules/dnet-modular-collector-service/trunk/src/main/java/eu/dnetlib/data/collector/plugins/HttpConnector.java

@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.collection;
+package eu.dnetlib.dhp.common.collection;
 
 /**
  * Bundles the http connection parameters driving the client behaviour.

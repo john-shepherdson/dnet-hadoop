@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.utils.CSVProject;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProject;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import scala.Tuple2;

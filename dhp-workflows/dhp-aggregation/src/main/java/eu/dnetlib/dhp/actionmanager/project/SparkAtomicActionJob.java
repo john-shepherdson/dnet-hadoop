@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.actionmanager.project;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -22,9 +21,9 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.utils.CSVProgramme;
-import eu.dnetlib.dhp.actionmanager.project.utils.CSVProject;
-import eu.dnetlib.dhp.actionmanager.project.utils.EXCELTopic;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProgramme;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProject;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.EXCELTopic;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;

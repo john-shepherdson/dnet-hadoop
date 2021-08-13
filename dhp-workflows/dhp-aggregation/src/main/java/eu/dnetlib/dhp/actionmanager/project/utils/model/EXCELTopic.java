@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.actionmanager.project.utils;
+package eu.dnetlib.dhp.actionmanager.project.utils.model;
 
 import java.io.Serializable;
 

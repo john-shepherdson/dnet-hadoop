@@ -17,6 +17,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import eu.dnetlib.dhp.actionmanager.project.utils.model.EXCELTopic;
+
 /**
  * Reads a generic excel file and maps it into classes that mirror its schema
  */
@@ -30,7 +32,7 @@ public class EXCELParser {
 
 			XSSFSheet sheet = wb.getSheet(sheetName);
 
-			if (sheetName == null) {
+			if (sheet == null) {
 				throw new IllegalArgumentException("Sheet name " + sheetName + " not present in current file");
 			}
 

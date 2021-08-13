@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.collection;
+package eu.dnetlib.dhp.common.collection;
 
 public class CollectorException extends Exception {
 
