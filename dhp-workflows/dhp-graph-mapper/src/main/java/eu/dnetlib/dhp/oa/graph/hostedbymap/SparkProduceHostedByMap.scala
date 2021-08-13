@@ -111,7 +111,7 @@ object SparkProduceHostedByMap {
 
 
   def goldToHostedbyItemType(gold: UnibiGoldModel): HostedByItemType = {
-    return getHostedByItemType(Constants.UNIBI, gold.getTitle, gold.getIssn, "", gold.getIssn_l, true)
+    return getHostedByItemType(Constants.UNIBI, gold.getTitle, gold.getIssn, "", gold.getIssnL, true)
   }
 
 

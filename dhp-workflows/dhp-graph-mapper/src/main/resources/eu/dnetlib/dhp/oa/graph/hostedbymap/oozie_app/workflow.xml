@@ -100,10 +100,11 @@
 
     <action name="download_gold">
         <java>
-            <main-class>eu.dnetlib.dhp.common.collection.GetCSV</main-class>
+            <main-class>eu.dnetlib.dhp.common.collection.DownloadCSV</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--fileURL</arg><arg>${unibiFileURL}</arg>
             <arg>--workingPath</arg><arg>${workingDir}/unibi_gold</arg>
+            <arg>--outputFile</arg><arg>${workingDir}/unibi_gold.json</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.oa.graph.hostedbymap.model.UnibiGoldModel</arg>
         </java>
         <ok to="join_download"/>
@@ -112,10 +113,11 @@
 
     <action name="download_doaj">
         <java>
-            <main-class>eu.dnetlib.dhp.common.collection.GetCSV</main-class>
+            <main-class>eu.dnetlib.dhp.common.collection.DownloadCSV</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--fileURL</arg><arg>${doajFileURL}</arg>
             <arg>--workingPath</arg><arg>${workingDir}/doaj</arg>
+            <arg>--outputFile</arg><arg>${workingDir}/doaj.json</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.oa.graph.hostedbymap.model.DOAJModel</arg>
             <arg>--replace</arg><arg>true</arg>
         </java>

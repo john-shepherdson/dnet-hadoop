@@ -6,14 +6,15 @@ import java.io.Serializable;
 import com.opencsv.bean.CsvBindByName;
 
 public class UnibiGoldModel implements Serializable {
+
 	@CsvBindByName(column = "ISSN")
 	private String issn;
 	@CsvBindByName(column = "ISSN_L")
-	private String issn_l;
+	private String issnL;
 	@CsvBindByName(column = "TITLE")
 	private String title;
 	@CsvBindByName(column = "TITLE_SOURCE")
-	private String title_source;
+	private String titleSource;
 
 	public String getIssn() {
 		return issn;
@@ -23,8 +24,12 @@ public class UnibiGoldModel implements Serializable {
 		this.issn = issn;
 	}
 
-	public String getIssn_l() {
-		return issn_l;
+	public String getIssnL() {
+		return issnL;
+	}
+
+	public void setIssnL(String issnL) {
+		this.issnL = issnL;
 	}
 
 	public String getTitle() {
@@ -35,11 +40,11 @@ public class UnibiGoldModel implements Serializable {
 		this.title = title;
 	}
 
-	public String getTitle_source() {
-		return title_source;
+	public String getTitleSource() {
+		return titleSource;
 	}
 
-	public void setTitle_source(String title_source) {
-		this.title_source = title_source;
+	public void setTitleSource(String titleSource) {
+		this.titleSource = titleSource;
 	}
 }

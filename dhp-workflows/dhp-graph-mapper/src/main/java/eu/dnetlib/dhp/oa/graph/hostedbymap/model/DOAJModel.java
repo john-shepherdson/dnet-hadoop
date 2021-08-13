@@ -6,6 +6,7 @@ import java.io.Serializable;
 import com.opencsv.bean.CsvBindByName;
 
 public class DOAJModel implements Serializable {
+
 	@CsvBindByName(column = "Journal title")
 	private String journalTitle;
 

@@ -75,8 +75,8 @@ class TestPrepare extends java.io.Serializable{
 
     assertEquals(2,  ds.count)
 
-    assertEquals("50|4dc99724cf04::ed1ba83e1add6ce292433729acd8b0d9", ds.filter(ei => ei.getJournal_id.equals("1728-5852")).first().getId)
-    assertEquals("50|4dc99724cf04::ed1ba83e1add6ce292433729acd8b0d9", ds.filter(ei => ei.getJournal_id.equals("0001-396X")).first().getId)
+    assertEquals("50|4dc99724cf04::ed1ba83e1add6ce292433729acd8b0d9", ds.filter(ei => ei.getJournalId.equals("1728-5852")).first().getId)
+    assertEquals("50|4dc99724cf04::ed1ba83e1add6ce292433729acd8b0d9", ds.filter(ei => ei.getJournalId.equals("0001-396X")).first().getId)
 
     spark.close()
   }
@@ -109,10 +109,10 @@ class TestPrepare extends java.io.Serializable{
     val ei:EntityInfo = ds.first()
 
     assertEquals("50|4dc99724cf04::ed1ba83e1add6ce292433729acd8b0d9", ei.getId)
-    assertEquals("10|issn___print::e4b6d6d978f67520f6f37679a98c5735", ei.getHb_id)
-    assertEquals("0001-396X", ei.getJournal_id)
+    assertEquals("10|issn___print::e4b6d6d978f67520f6f37679a98c5735", ei.getHostedById)
+    assertEquals("0001-396X", ei.getJournalId)
     assertEquals("Academic Therapy", ei.getName)
-    assertTrue(!ei.getOpenaccess)
+    assertTrue(!ei.getOpenAccess)
 
     spark.close()
   }
@@ -145,9 +145,9 @@ class TestPrepare extends java.io.Serializable{
     val ei:EntityInfo = ds.first()
 
     assertEquals("50|4dc99724cf04::ed1ba83e1add6ce292433729acd8b0d9", ei.getId)
-    assertEquals("10|issn___print::e4b6d6d978f67520f6f37679a98c5735", ei.getHb_id)
+    assertEquals("10|issn___print::e4b6d6d978f67520f6f37679a98c5735", ei.getHostedById)
     assertEquals("Academic Therapy", ei.getName)
-    assertTrue(ei.getOpenaccess)
+    assertTrue(ei.getOpenAccess)
 
     ds.foreach(e => println(mapper.writeValueAsString(e)))
 

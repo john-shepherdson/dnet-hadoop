@@ -64,13 +64,13 @@ object SparkPrepareHostedByInfoToApply {
   }
 
   def joinResHBM(res: Dataset[EntityInfo], hbm: Dataset[EntityInfo]): Dataset[EntityInfo] = {
-    Aggregators.resultToSingleId(res.joinWith(hbm, res.col("journal_id").equalTo(hbm.col("journal_id")), "left")
+    Aggregators.resultToSingleId(res.joinWith(hbm, res.col("journalId").equalTo(hbm.col("journalId")), "left")
       .map(t2 => {
         val res: EntityInfo = t2._1
         if(t2._2 != null ){
           val ds = t2._2
-          res.setHb_id(ds.getId)
-          res.setOpenaccess(ds.getOpenaccess)
+          res.setHostedById(ds.getId)
+          res.setOpenAccess(ds.getOpenAccess)
           res.setName(ds.getName)
         }
         res

@@ -78,11 +78,11 @@ object Aggregators {
       if(b2 == null){
         return b1
       }
-      if(!b1.getHb_id.equals("")){
-        b1.setOpenaccess(b1.getOpenaccess || b2.getOpenaccess)
+      if(!b1.getHostedById.equals("")){
+        b1.setOpenAccess(b1.getOpenAccess || b2.getOpenAccess)
         return b1
       }
-      b2.setOpenaccess(b1.getOpenaccess || b2.getOpenaccess)
+      b2.setOpenAccess(b1.getOpenAccess || b2.getOpenAccess)
       b2
 
     }
@@ -116,7 +116,7 @@ object Aggregators {
       if(b2 == null){
         return b1
       }
-      if(!b1.getHb_id.equals("")){
+      if(!b1.getHostedById.equals("")){
         return b1
       }
       b2
@@ -131,7 +131,7 @@ object Aggregators {
 
   def datasourceToSingleId(df:Dataset[EntityInfo]): Dataset[EntityInfo] = {
     val transformedData : Dataset[EntityInfo] = df
-      .groupByKey(_.getHb_id)(Encoders.STRING)
+      .groupByKey(_.getHostedById)(Encoders.STRING)
       .agg(Aggregators.datasourceToSingleIdAggregator)
       .map{
         case (id:String , res: EntityInfo) => res

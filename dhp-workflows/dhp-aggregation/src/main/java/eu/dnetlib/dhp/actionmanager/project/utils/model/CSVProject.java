@@ -19,7 +19,6 @@ public class CSVProject implements Serializable {
 	@CsvBindByName(column = "topics")
 	private String topics;
 
-
 	public String getId() {
 		return id;
 	}
@@ -27,8 +26,6 @@ public class CSVProject implements Serializable {
 	public void setId(String id) {
 		this.id = id;
 	}
-
-
 
 	public String getProgramme() {
 		return programme;
@@ -45,7 +42,5 @@ public class CSVProject implements Serializable {
 	public void setTopics(String topics) {
 		this.topics = topics;
 	}
-
-
 
 }

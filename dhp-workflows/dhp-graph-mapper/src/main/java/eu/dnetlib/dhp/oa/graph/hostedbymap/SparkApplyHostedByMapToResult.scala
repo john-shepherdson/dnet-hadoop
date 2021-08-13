@@ -26,9 +26,9 @@ object SparkApplyHostedByMapToResult {
           val i = p.getInstance().asScala
           if (i.size == 1) {
             val inst: Instance = i(0)
-            inst.getHostedby.setKey(ei.getHb_id)
+            inst.getHostedby.setKey(ei.getHostedById)
             inst.getHostedby.setValue(ei.getName)
-            if (ei.getOpenaccess) {
+            if (ei.getOpenAccess) {
               inst.setAccessright(OafMapperUtils.accessRight(ModelConstants.ACCESS_RIGHT_OPEN, "Open Access", ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES))
               inst.getAccessright.setOpenAccessRoute(OpenAccessRoute.hybrid)
               p.setBestaccessright(OafMapperUtils.createBestAccessRights(p.getInstance()));

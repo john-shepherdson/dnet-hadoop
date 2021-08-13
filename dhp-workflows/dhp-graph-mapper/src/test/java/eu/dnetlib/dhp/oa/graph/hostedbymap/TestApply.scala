@@ -117,14 +117,14 @@ class TestApply extends java.io.Serializable{
       val pb : Datasource = t2._1
       val pa : Datasource = t2._2
       assertTrue(t2._1.getId.equals(t2._2.getId))
-      if(pb.getId.equals("10|doajarticles::0ab37b7620eb9a73ac95d3ca4320c97d")){
+      if(pb.getId.equals("10|doajarticles::0ab37b7620eb9a73ac95d3ca4320c97d")) {
         assertTrue(pa.getOpenairecompatibility().getClassid.equals("hostedBy"))
         assertTrue(pa.getOpenairecompatibility().getClassname.equals("collected from a compatible aggregator"))
 
         assertTrue(pb.getOpenairecompatibility().getClassid.equals(ModelConstants.UNKNOWN))
 
 
-      }else{
+      } else {
         assertTrue(pa.getOpenairecompatibility().getClassid.equals(pb.getOpenairecompatibility.getClassid))
         assertTrue(pa.getOpenairecompatibility().getClassname.equals(pb.getOpenairecompatibility.getClassname))
 

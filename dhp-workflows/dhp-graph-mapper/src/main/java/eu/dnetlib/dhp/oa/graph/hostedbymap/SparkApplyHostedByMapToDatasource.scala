@@ -15,7 +15,7 @@ import org.slf4j.{Logger, LoggerFactory}
 object SparkApplyHostedByMapToDatasource {
 
   def applyHBtoDats(join: Dataset[EntityInfo], dats: Dataset[Datasource]): Dataset[Datasource] = {
-    dats.joinWith(join, dats.col("id").equalTo(join.col("hb_id")), "left")
+    dats.joinWith(join, dats.col("id").equalTo(join.col("hostedById")), "left")
       .map(t2 => {
         val d: Datasource = t2._1
         if (t2._2 != null) {
