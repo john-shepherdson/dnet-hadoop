@@ -209,8 +209,8 @@ object SparkProduceHostedByMap {
 
 
     Aggregators.explodeHostedByItemType(oaHostedByDataset(spark, datasourcePath)
-      .union(goldHostedByDataset(spark, workingDirPath + "/unibi_gold"))
-      .union(doajHostedByDataset(spark, workingDirPath + "/doaj"))
+      .union(goldHostedByDataset(spark, workingDirPath + "/unibi_gold.json"))
+      .union(doajHostedByDataset(spark, workingDirPath + "/doaj.json"))
       .flatMap(hbi => toList(hbi))).filter(hbi => hbi._2.id.startsWith("10|"))
       .map(hbi => toHostedByMap(hbi))(Encoders.STRING)
       .rdd.saveAsTextFile(outputPath , classOf[GzipCodec])

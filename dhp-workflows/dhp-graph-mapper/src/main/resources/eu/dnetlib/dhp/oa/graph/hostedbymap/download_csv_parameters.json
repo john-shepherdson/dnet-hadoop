@@ -1,13 +1,10 @@
-
 [
-
   {
     "paramName":"fu",
     "paramLongName":"fileURL",
     "paramDescription": "the url to download the csv file ",
     "paramRequired": true
   },
-
   {
     "paramName":"wp",
     "paramLongName":"workingPath",
@@ -27,9 +24,9 @@
     "paramRequired": true
   },
   {
-    "paramName": "sr",
-    "paramLongName": "replace",
-    "paramDescription": "true if the input file has to be cleaned before parsing",
+    "paramName": "d",
+    "paramLongName": "delimiter",
+    "paramDescription": "csv delimiter character",
     "paramRequired": false
   }
 ]
