@@ -77,9 +77,8 @@ public class PartitionEventsByDsIdJob {
 		}
 		log.info("validOpendoarIds: {}", validOpendoarIds);
 
-		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
-
-			ClusterUtils
+		runWithSparkSession(
+			conf, isSparkSessionManaged, spark -> ClusterUtils
 				.readPath(spark, eventsPath, Event.class)
 				.filter((FilterFunction<Event>) e -> StringUtils.isNotBlank(e.getMap().getTargetDatasourceId()))
 				.filter((FilterFunction<Event>) e -> e.getMap().getTargetDatasourceId().startsWith(OPENDOAR_NSPREFIX))
@@ -92,9 +91,7 @@ public class PartitionEventsByDsIdJob {
 				.partitionBy("group")
 				.mode(SaveMode.Overwrite)
 				.option("compression", "gzip")
-				.json(partitionPath);
-
-		});
+				.json(partitionPath));
 		renameSubDirs(partitionPath);
 
 	}
@@ -102,14 +99,14 @@ public class PartitionEventsByDsIdJob {
 	private static void renameSubDirs(final String path) throws IOException {
 		final FileSystem fs = FileSystem.get(new Configuration());
 
-		log.info("** Renaming subdirs of " + path);
+		log.info("** Renaming subdirs of {}", path);
 		for (final FileStatus fileStatus : fs.listStatus(new Path(path))) {
 			if (fileStatus.isDirectory()) {
 				final Path oldPath = fileStatus.getPath();
 				final String oldName = oldPath.getName();
 				if (oldName.contains("=")) {
 					final Path newPath = new Path(path + "/" + StringUtils.substringAfter(oldName, "="));
-					log.info(" * " + oldPath.getName() + " -> " + newPath.getName());
+					log.info(" * {} -> {}", oldPath.getName(), newPath.getName());
 					fs.rename(oldPath, newPath);
 				}
 			}

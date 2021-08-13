@@ -13,7 +13,7 @@ public class License implements Serializable {
 	@JsonProperty("license")
 	private String license;
 
-	private final static long serialVersionUID = -194308261058176439L;
+	private static final long serialVersionUID = -194308261058176439L;
 
 	public String getAttribution() {
 		return attribution;

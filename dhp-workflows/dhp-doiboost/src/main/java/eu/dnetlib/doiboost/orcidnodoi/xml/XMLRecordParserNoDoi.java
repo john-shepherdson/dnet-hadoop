@@ -5,9 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.ximpleware.*;
 
 import eu.dnetlib.dhp.parser.utility.VtdException;
@@ -20,27 +17,19 @@ import eu.dnetlib.dhp.schema.orcid.WorkDetail;
 /**
  * This class is used for parsing xml data with vtd parser
  */
-
 public class XMLRecordParserNoDoi {
-
-	private static final Logger logger = LoggerFactory.getLogger(XMLRecordParserNoDoi.class);
 
 	private static final String NS_COMMON_URL = "http://www.orcid.org/ns/common";
 	private static final String NS_COMMON = "common";
-	private static final String NS_PERSON_URL = "http://www.orcid.org/ns/person";
-	private static final String NS_PERSON = "person";
-	private static final String NS_DETAILS_URL = "http://www.orcid.org/ns/personal-details";
-	private static final String NS_DETAILS = "personal-details";
-	private static final String NS_OTHER_URL = "http://www.orcid.org/ns/other-name";
-	private static final String NS_OTHER = "other-name";
-	private static final String NS_RECORD_URL = "http://www.orcid.org/ns/record";
-	private static final String NS_RECORD = "record";
 	private static final String NS_ERROR_URL = "http://www.orcid.org/ns/error";
 
 	private static final String NS_WORK = "work";
 	private static final String NS_WORK_URL = "http://www.orcid.org/ns/work";
 
 	private static final String NS_ERROR = "error";
+
+	private XMLRecordParserNoDoi() {
+	}
 
 	public static WorkDetail VTDParseWorkData(byte[] bytes)
 		throws VtdException, ParseException, XPathParseException,
@@ -100,16 +89,16 @@ public class XMLRecordParserNoDoi {
 			workData.setUrls(urls);
 		}
 
-		workData.setPublicationDates(getPublicationDates(vg, vn, ap));
-		workData.setExtIds(getExternalIds(vg, vn, ap));
-		workData.setContributors(getContributors(vg, vn, ap));
+		workData.setPublicationDates(getPublicationDates(vn, ap));
+		workData.setExtIds(getExternalIds(vn, ap));
+		workData.setContributors(getContributors(vn, ap));
 		return workData;
 
 	}
 
-	private static List<PublicationDate> getPublicationDates(VTDGen vg, VTDNav vn, AutoPilot ap)
+	private static List<PublicationDate> getPublicationDates(VTDNav vn, AutoPilot ap)
 		throws XPathParseException, NavException, XPathEvalException {
-		List<PublicationDate> publicationDates = new ArrayList<PublicationDate>();
+		List<PublicationDate> publicationDates = new ArrayList<>();
 		int yearIndex = 0;
 		ap.selectXPath("//common:publication-date/common:year");
 		while (ap.evalXPath() != -1) {
@@ -142,9 +131,9 @@ public class XMLRecordParserNoDoi {
 		return publicationDates;
 	}
 
-	private static List<ExternalId> getExternalIds(VTDGen vg, VTDNav vn, AutoPilot ap)
+	private static List<ExternalId> getExternalIds(VTDNav vn, AutoPilot ap)
 		throws XPathParseException, NavException, XPathEvalException {
-		List<ExternalId> extIds = new ArrayList<ExternalId>();
+		List<ExternalId> extIds = new ArrayList<>();
 		int typeIndex = 0;
 		ap.selectXPath("//common:external-id/common:external-id-type");
 		while (ap.evalXPath() != -1) {
@@ -177,12 +166,12 @@ public class XMLRecordParserNoDoi {
 		if (typeIndex == valueIndex) {
 			return extIds;
 		}
-		return new ArrayList<ExternalId>();
+		return new ArrayList<>();
 	}
 
-	private static List<Contributor> getContributors(VTDGen vg, VTDNav vn, AutoPilot ap)
+	private static List<Contributor> getContributors(VTDNav vn, AutoPilot ap)
 		throws XPathParseException, NavException, XPathEvalException {
-		List<Contributor> contributors = new ArrayList<Contributor>();
+		List<Contributor> contributors = new ArrayList<>();
 		ap.selectXPath("//work:contributors/work:contributor");
 		while (ap.evalXPath() != -1) {
 			Contributor contributor = new Contributor();

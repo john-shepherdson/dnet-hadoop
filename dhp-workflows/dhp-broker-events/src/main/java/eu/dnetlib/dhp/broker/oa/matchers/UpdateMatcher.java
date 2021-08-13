@@ -26,7 +26,7 @@ public abstract class UpdateMatcher<T> {
 	private final BiConsumer<OaBrokerMainEntity, T> compileHighlightFunction;
 	private final Function<T, String> highlightToStringFunction;
 
-	public UpdateMatcher(final int maxNumber, final Function<T, Topic> topicFunction,
+	protected UpdateMatcher(final int maxNumber, final Function<T, Topic> topicFunction,
 		final BiConsumer<OaBrokerMainEntity, T> compileHighlightFunction,
 		final Function<T, String> highlightToStringFunction) {
 		this.maxNumber = maxNumber;

@@ -32,7 +32,7 @@ import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 @ExtendWith(MockitoExtension.class)
-public class MigrateDbEntitiesApplicationTest {
+class MigrateDbEntitiesApplicationTest {
 
 	private MigrateDbEntitiesApplication app;
 
@@ -58,7 +58,7 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessDatasource() throws Exception {
+	void testProcessDatasource() throws Exception {
 		final List<TypedField> fields = prepareMocks("datasources_resultset_entry.json");
 
 		final List<Oaf> list = app.processDatasource(rs);
@@ -81,7 +81,7 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessProject() throws Exception {
+	void testProcessProject() throws Exception {
 		final List<TypedField> fields = prepareMocks("projects_resultset_entry.json");
 
 		final List<Oaf> list = app.processProject(rs);
@@ -99,7 +99,7 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessOrganization() throws Exception {
+	void testProcessOrganization() throws Exception {
 		final List<TypedField> fields = prepareMocks("organizations_resultset_entry.json");
 
 		final List<Oaf> list = app.processOrganization(rs);
@@ -126,7 +126,7 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessDatasourceOrganization() throws Exception {
+	void testProcessDatasourceOrganization() throws Exception {
 		final List<TypedField> fields = prepareMocks("datasourceorganization_resultset_entry.json");
 
 		final List<Oaf> list = app.processDatasourceOrganization(rs);
@@ -143,7 +143,7 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessProjectOrganization() throws Exception {
+	void testProcessProjectOrganization() throws Exception {
 		final List<TypedField> fields = prepareMocks("projectorganization_resultset_entry.json");
 
 		final List<Oaf> list = app.processProjectOrganization(rs);
@@ -162,7 +162,7 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessClaims_context() throws Exception {
+	void testProcessClaims_context() throws Exception {
 		final List<TypedField> fields = prepareMocks("claimscontext_resultset_entry.json");
 
 		final List<Oaf> list = app.processClaims(rs);
@@ -177,7 +177,7 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessClaims_rels() throws Exception {
+	void testProcessClaims_rels() throws Exception {
 		final List<TypedField> fields = prepareMocks("claimsrel_resultset_entry.json");
 
 		final List<Oaf> list = app.processClaims(rs);
@@ -208,9 +208,6 @@ public class MigrateDbEntitiesApplicationTest {
 
 		assertValidId(r1.getCollectedfrom().get(0).getKey());
 		assertValidId(r2.getCollectedfrom().get(0).getKey());
-
-		// System.out.println(new ObjectMapper().writeValueAsString(r1));
-		// System.out.println(new ObjectMapper().writeValueAsString(r2));
 	}
 
 	private List<TypedField> prepareMocks(final String jsonFile) throws IOException, SQLException {
@@ -273,7 +270,7 @@ public class MigrateDbEntitiesApplicationTest {
 						final String[] values = ((List<?>) tf.getValue())
 							.stream()
 							.filter(Objects::nonNull)
-							.map(o -> o.toString())
+							.map(Object::toString)
 							.toArray(String[]::new);
 
 						Mockito.when(arr.getArray()).thenReturn(values);
@@ -334,6 +331,7 @@ public class MigrateDbEntitiesApplicationTest {
 		return new Float(getValueAs(name, fields).toString());
 	}
 
+	@SuppressWarnings("unchecked")
 	private <T> T getValueAs(final String name, final List<TypedField> fields) {
 		return fields
 			.stream()

@@ -18,7 +18,6 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -141,33 +140,30 @@ public class SparkOrcidToResultFromSemRelJob {
 				author_surname = author.getSurname();
 			}
 			if (StringUtils.isNotEmpty(author_surname)) {
+				// have the same surname. Check the name
 				if (autoritative_author
 					.getSurname()
 					.trim()
-					.equalsIgnoreCase(author_surname.trim())) {
-
-					// have the same surname. Check the name
-					if (StringUtils.isNotEmpty(autoritative_author.getName())) {
-						if (StringUtils.isNotEmpty(author.getName())) {
-							author_name = author.getName();
+					.equalsIgnoreCase(author_surname.trim()) && StringUtils.isNotEmpty(autoritative_author.getName())) {
+					if (StringUtils.isNotEmpty(author.getName())) {
+						author_name = author.getName();
+					}
+					if (StringUtils.isNotEmpty(author_name)) {
+						if (autoritative_author
+							.getName()
+							.trim()
+							.equalsIgnoreCase(author_name.trim())) {
+							toaddpid = true;
 						}
-						if (StringUtils.isNotEmpty(author_name)) {
+						// they could be differently written (i.e. only the initials of the name
+						// in one of the two
+						else {
 							if (autoritative_author
 								.getName()
 								.trim()
-								.equalsIgnoreCase(author_name.trim())) {
+								.substring(0, 0)
+								.equalsIgnoreCase(author_name.trim().substring(0, 0))) {
 								toaddpid = true;
-							}
-							// they could be differently written (i.e. only the initials of the name
-							// in one of the two
-							else {
-								if (autoritative_author
-									.getName()
-									.trim()
-									.substring(0, 0)
-									.equalsIgnoreCase(author_name.trim().substring(0, 0))) {
-									toaddpid = true;
-								}
 							}
 						}
 					}

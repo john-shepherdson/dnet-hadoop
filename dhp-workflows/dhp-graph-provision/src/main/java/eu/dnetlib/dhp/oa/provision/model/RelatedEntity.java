@@ -34,7 +34,6 @@ public class RelatedEntity implements Serializable {
 	private Qualifier datasourcetype;
 	private Qualifier datasourcetypeui;
 	private Qualifier openairecompatibility;
-	// private String aggregatortype;
 
 	// organization
 	private String legalname;

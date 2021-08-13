@@ -31,14 +31,15 @@ import eu.dnetlib.dhp.common.DbClient;
  */
 public class ReadProjectsFromDB implements Closeable {
 
-	private final DbClient dbClient;
 	private static final Log log = LogFactory.getLog(ReadProjectsFromDB.class);
+
+	private static final String query = "SELECT code  " +
+		"from projects where id like 'corda__h2020%' ";
+
+	private final DbClient dbClient;
 	private final Configuration conf;
 	private final BufferedWriter writer;
 	private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
-	private final static String query = "SELECT code  " +
-		"from projects where id like 'corda__h2020%' ";
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -65,9 +66,9 @@ public class ReadProjectsFromDB implements Closeable {
 		}
 	}
 
-	public void execute(final String sql, final Function<ResultSet, List<ProjectSubset>> producer) throws Exception {
+	public void execute(final String sql, final Function<ResultSet, List<ProjectSubset>> producer) {
 
-		final Consumer<ResultSet> consumer = rs -> producer.apply(rs).forEach(r -> writeProject(r));
+		final Consumer<ResultSet> consumer = rs -> producer.apply(rs).forEach(this::writeProject);
 
 		dbClient.processResults(sql, consumer);
 	}
@@ -94,20 +95,20 @@ public class ReadProjectsFromDB implements Closeable {
 
 	public ReadProjectsFromDB(
 		final String hdfsPath, String hdfsNameNode, final String dbUrl, final String dbUser, final String dbPassword)
-		throws Exception {
+		throws IOException {
 
 		this.dbClient = new DbClient(dbUrl, dbUser, dbPassword);
 		this.conf = new Configuration();
 		this.conf.set("fs.defaultFS", hdfsNameNode);
 		FileSystem fileSystem = FileSystem.get(this.conf);
 		Path hdfsWritePath = new Path(hdfsPath);
-		FSDataOutputStream fsDataOutputStream = null;
+
 		if (fileSystem.exists(hdfsWritePath)) {
 			fileSystem.delete(hdfsWritePath, false);
 		}
-		fsDataOutputStream = fileSystem.create(hdfsWritePath);
+		FSDataOutputStream fos = fileSystem.create(hdfsWritePath);
 
-		this.writer = new BufferedWriter(new OutputStreamWriter(fsDataOutputStream, StandardCharsets.UTF_8));
+		this.writer = new BufferedWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8));
 	}
 
 	@Override

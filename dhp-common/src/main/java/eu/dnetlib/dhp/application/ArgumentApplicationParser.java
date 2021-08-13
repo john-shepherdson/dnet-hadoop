@@ -56,13 +56,13 @@ public class ArgumentApplicationParser implements Serializable {
 			final StringWriter stringWriter = new StringWriter();
 			IOUtils.copy(gis, stringWriter);
 			return stringWriter.toString();
-		} catch (Throwable e) {
-			log.error("Wrong value to decompress:" + abstractCompressed);
-			throw new RuntimeException(e);
+		} catch (IOException e) {
+			log.error("Wrong value to decompress: {}", abstractCompressed);
+			throw new IllegalArgumentException(e);
 		}
 	}
 
-	public static String compressArgument(final String value) throws Exception {
+	public static String compressArgument(final String value) throws IOException {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		GZIPOutputStream gzip = new GZIPOutputStream(out);
 		gzip.write(value.getBytes());

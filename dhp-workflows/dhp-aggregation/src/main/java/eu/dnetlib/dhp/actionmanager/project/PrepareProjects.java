@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.utils.CSVProject;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProject;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import scala.Tuple2;
@@ -29,7 +29,7 @@ import scala.Tuple2;
  */
 public class PrepareProjects {
 
-	private static final Logger log = LoggerFactory.getLogger(PrepareProgramme.class);
+	private static final Logger log = LoggerFactory.getLogger(PrepareProjects.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(String[] args) throws Exception {

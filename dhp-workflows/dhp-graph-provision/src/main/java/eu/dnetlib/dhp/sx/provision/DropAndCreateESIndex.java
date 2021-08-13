@@ -45,6 +45,7 @@ public class DropAndCreateESIndex {
 					.requireNonNull(
 						DropAndCreateESIndex.class.getResourceAsStream("/eu/dnetlib/dhp/sx/provision/cluster.json")));
 
+		@SuppressWarnings("unchecked")
 		Map<String, String> clusterMap = new ObjectMapper().readValue(clusterJson, Map.class);
 
 		final String ip = clusterMap.get(cluster).split(",")[0];

@@ -18,7 +18,7 @@ public class EnrichMoreSoftware extends UpdateMatcher<OaBrokerRelatedSoftware> {
 		super(10,
 			s -> Topic.ENRICH_MORE_SOFTWARE,
 			(p, s) -> p.getSoftwares().add(s),
-			s -> s.getOpenaireId());
+			OaBrokerRelatedSoftware::getOpenaireId);
 	}
 
 	@Override

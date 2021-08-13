@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
@@ -91,13 +92,11 @@ public class PrepareResultInstRepoAssociation {
 
 	private static void prepareDatasourceOrganization(
 		SparkSession spark, String datasourceOrganizationPath, List<String> blacklist) {
-		String blacklisted = "";
-		if (blacklist.size() > 0) {
-			blacklisted = " AND  id != '" + blacklist.get(0) + "'";
-			for (int i = 1; i < blacklist.size(); i++) {
-				blacklisted += " AND id != '" + blacklist.get(i) + "'";
-			}
-		}
+
+		final String blacklisted = blacklist
+			.stream()
+			.map(s -> " AND id != '" + s + "'")
+			.collect(Collectors.joining());
 
 		String query = "SELECT source datasourceId, target organizationId "
 			+ "FROM ( SELECT id "

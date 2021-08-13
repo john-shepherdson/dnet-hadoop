@@ -25,7 +25,7 @@ public class ZkServers {
 		// quorum0:2182,quorum1:2182,quorum2:2182,quorum3:2182,quorum4:2182/solr-dev-openaire
 		String urls = zkUrl;
 		final Optional<String> chRoot = Optional.of(SEPARATOR + StringUtils.substringAfterLast(zkUrl, SEPARATOR));
-		if (chRoot.isPresent() && StringUtils.isNotBlank(chRoot.get())) {
+		if (StringUtils.isNotBlank(chRoot.get())) {
 			log.debug(String.format("found zk chroot %s", chRoot));
 			urls = zkUrl.replace(chRoot.get(), "");
 		}

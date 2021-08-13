@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 @Disabled
-public class ZenodoAPIClientTest {
+class ZenodoAPIClientTest {
 
 	private final String URL_STRING = "https://sandbox.zenodo.org/api/deposit/depositions";
 	private final String ACCESS_TOKEN = "";
@@ -22,7 +22,7 @@ public class ZenodoAPIClientTest {
 	private final String depositionId = "674915";
 
 	@Test
-	public void testUploadOldDeposition() throws IOException, MissingConceptDoiException {
+	void testUploadOldDeposition() throws IOException, MissingConceptDoiException {
 		ZenodoAPIClient client = new ZenodoAPIClient(URL_STRING,
 			ACCESS_TOKEN);
 		Assertions.assertEquals(200, client.uploadOpenDeposition(depositionId));
@@ -44,7 +44,7 @@ public class ZenodoAPIClientTest {
 	}
 
 	@Test
-	public void testNewDeposition() throws IOException {
+	void testNewDeposition() throws IOException {
 
 		ZenodoAPIClient client = new ZenodoAPIClient(URL_STRING,
 			ACCESS_TOKEN);
@@ -67,7 +67,7 @@ public class ZenodoAPIClientTest {
 	}
 
 	@Test
-	public void testNewVersionNewName() throws IOException, MissingConceptDoiException {
+	void testNewVersionNewName() throws IOException, MissingConceptDoiException {
 
 		ZenodoAPIClient client = new ZenodoAPIClient(URL_STRING,
 			ACCESS_TOKEN);
@@ -87,7 +87,7 @@ public class ZenodoAPIClientTest {
 	}
 
 	@Test
-	public void testNewVersionOldName() throws IOException, MissingConceptDoiException {
+	void testNewVersionOldName() throws IOException, MissingConceptDoiException {
 
 		ZenodoAPIClient client = new ZenodoAPIClient(URL_STRING,
 			ACCESS_TOKEN);

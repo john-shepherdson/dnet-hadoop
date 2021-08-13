@@ -8,10 +8,12 @@ import static org.mockito.Mockito.lenient;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.dom4j.DocumentException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.oa.graph.clean.GraphCleaningFunctionsTest;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
@@ -29,7 +30,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 @ExtendWith(MockitoExtension.class)
-public class MappersTest {
+class MappersTest {
 
 	@Mock
 	private ISLookUpService isLookUpService;
@@ -48,9 +49,9 @@ public class MappersTest {
 	}
 
 	@Test
-	void testPublication() throws IOException {
+	void testPublication() throws IOException, DocumentException {
 
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_record.xml"));
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_record.xml")));
 
 		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
@@ -71,7 +72,7 @@ public class MappersTest {
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 		assertFalse(p.getDataInfo().getInvisible());
-		assertTrue(p.getSource().size() == 1);
+		assertEquals(1, p.getSource().size());
 		assertTrue(StringUtils.isNotBlank(p.getDateofcollection()));
 		assertTrue(StringUtils.isNotBlank(p.getDateoftransformation()));
 
@@ -88,7 +89,7 @@ public class MappersTest {
 			.getPid()
 			.stream()
 			.findFirst()
-			.get();
+			.orElseThrow(() -> new IllegalStateException("missing author pid"));
 		assertEquals("0000-0001-6651-1178", pid.getValue());
 		assertEquals(ModelConstants.ORCID_PENDING, pid.getQualifier().getClassid());
 		assertEquals(ModelConstants.ORCID_CLASSNAME, pid.getQualifier().getClassname());
@@ -108,7 +109,6 @@ public class MappersTest {
 		assertTrue(p.getInstance().size() > 0);
 		p
 			.getInstance()
-			.stream()
 			.forEach(i -> {
 				assertNotNull(i.getAccessright());
 				assertEquals("OPEN", i.getAccessright().getClassid());
@@ -141,17 +141,15 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(r2.getRelType()));
 		assertTrue(r1.getValidated());
 		assertTrue(r2.getValidated());
-		assertEquals(r1.getValidationDate(), "2020-01-01");
-		assertEquals(r2.getValidationDate(), "2020-01-01");
-		// System.out.println(new ObjectMapper().writeValueAsString(p));
-		// System.out.println(new ObjectMapper().writeValueAsString(r1));
-		// System.out.println(new ObjectMapper().writeValueAsString(r2));
+		assertEquals("2020-01-01", r1.getValidationDate());
+		assertEquals("2020-01-01", r2.getValidationDate());
 	}
 
 	@Test
-	void testPublication_PubMed() throws IOException {
+	void testPublication_PubMed() throws IOException, DocumentException {
 
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_record_pubmed.xml"));
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_record_pubmed.xml")));
 
 		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
@@ -196,23 +194,22 @@ public class MappersTest {
 
 		assertTrue(p.getSubject().size() > 0);
 		assertTrue(p.getPid().size() > 0);
-		assertEquals(p.getPid().get(0).getValue(), "PMC1517292");
-		assertEquals(p.getPid().get(0).getQualifier().getClassid(), "pmc");
+		assertEquals("PMC1517292", p.getPid().get(0).getValue());
+		assertEquals("pmc", p.getPid().get(0).getQualifier().getClassid());
 
 		assertNotNull(p.getInstance());
 		assertTrue(p.getInstance().size() > 0);
 		p
 			.getInstance()
-			.stream()
 			.forEach(i -> {
 				assertNotNull(i.getAccessright());
 				assertEquals("OPEN", i.getAccessright().getClassid());
 			});
 		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
 		assertNotNull(p.getInstance().get(0).getPid());
-		assertTrue(p.getInstance().get(0).getPid().size() == 2);
+		assertEquals(2, p.getInstance().get(0).getPid().size());
 
-		assertTrue(p.getInstance().get(0).getAlternateIdentifier().size() == 1);
+		assertEquals(1, p.getInstance().get(0).getAlternateIdentifier().size());
 		assertEquals("doi", p.getInstance().get(0).getAlternateIdentifier().get(0).getQualifier().getClassid());
 		assertEquals("10.3897/oneeco.2.e13718", p.getInstance().get(0).getAlternateIdentifier().get(0).getValue());
 
@@ -221,9 +218,9 @@ public class MappersTest {
 	}
 
 	@Test
-	void testPublicationInvisible() throws IOException {
+	void testPublicationInvisible() throws IOException, DocumentException {
 
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_record.xml"));
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_record.xml")));
 
 		final List<Oaf> list = new OafToOafMapper(vocs, true, true).processMdRecord(xml);
 
@@ -237,8 +234,18 @@ public class MappersTest {
 	}
 
 	@Test
-	void testDataset() throws IOException {
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_dataset.xml"));
+	void testOdfFwfEBookLibrary() throws IOException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_fwfebooklibrary.xml")));
+
+		assertThrows(
+			IllegalArgumentException.class,
+			() -> new OdfToOafMapper(vocs, false, true).processMdRecord(xml));
+	}
+
+	@Test
+	void testDataset() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_dataset.xml")));
 
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
@@ -281,12 +288,13 @@ public class MappersTest {
 			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
 			.findFirst();
 		assertTrue(author.isPresent());
-		final StructuredProperty pid = author
+		final Optional<StructuredProperty> oPid = author
 			.get()
 			.getPid()
 			.stream()
-			.findFirst()
-			.get();
+			.findFirst();
+		assertTrue(oPid.isPresent());
+		final StructuredProperty pid = oPid.get();
 		assertEquals("0000-0001-9074-1619", pid.getValue());
 		assertEquals(ModelConstants.ORCID_PENDING, pid.getQualifier().getClassid());
 		assertEquals(ModelConstants.ORCID_CLASSNAME, pid.getQualifier().getClassname());
@@ -315,7 +323,6 @@ public class MappersTest {
 		assertTrue(d.getInstance().size() > 0);
 		d
 			.getInstance()
-			.stream()
 			.forEach(i -> {
 				assertNotNull(i.getAccessright());
 				assertEquals("OPEN", i.getAccessright().getClassid());
@@ -345,13 +352,14 @@ public class MappersTest {
 		assertTrue(StringUtils.isNotBlank(r2.getRelType()));
 		assertTrue(r1.getValidated());
 		assertTrue(r2.getValidated());
-		assertEquals(r1.getValidationDate(), "2020-01-01");
-		assertEquals(r2.getValidationDate(), "2020-01-01");
+		assertEquals("2020-01-01", r1.getValidationDate());
+		assertEquals("2020-01-01", r2.getValidationDate());
 	}
 
 	@Test
-	void testOdfBielefeld() throws IOException {
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_bielefeld.xml"));
+	void testOdfBielefeld() throws IOException, DocumentException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_bielefeld.xml")));
 
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
@@ -389,7 +397,6 @@ public class MappersTest {
 		assertTrue(p.getInstance().size() > 0);
 		p
 			.getInstance()
-			.stream()
 			.forEach(i -> {
 				assertNotNull(i.getAccessright());
 				assertEquals("OPEN", i.getAccessright().getClassid());
@@ -398,8 +405,9 @@ public class MappersTest {
 	}
 
 	@Test
-	void testOpentrial() throws IOException {
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_opentrial.xml"));
+	void testOpentrial() throws IOException, DocumentException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_opentrial.xml")));
 
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
@@ -444,7 +452,7 @@ public class MappersTest {
 		assertEquals(1, d.getDescription().size());
 		assertTrue(StringUtils.isNotBlank(d.getDescription().get(0).getValue()));
 
-		assertTrue(d.getAuthor().size() == 1);
+		assertEquals(1, d.getAuthor().size());
 		assertEquals("Jensen, Kristian K", d.getAuthor().get(0).getFullname());
 		assertEquals("Kristian K.", d.getAuthor().get(0).getName());
 		assertEquals("Jensen", d.getAuthor().get(0).getSurname());
@@ -462,7 +470,7 @@ public class MappersTest {
 		assertTrue(d.getContext().isEmpty());
 
 		assertNotNull(d.getInstance());
-		assertTrue(d.getInstance().size() == 1);
+		assertEquals(1, d.getInstance().size());
 
 		final Instance i = d.getInstance().get(0);
 
@@ -514,8 +522,8 @@ public class MappersTest {
 	}
 
 	@Test
-	void testSoftware() throws IOException {
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_software.xml"));
+	void testSoftware() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_software.xml")));
 
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
@@ -532,30 +540,23 @@ public class MappersTest {
 		assertTrue(s.getInstance().size() > 0);
 	}
 
-	// @Test
-	void testDataset_2() throws IOException {
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_dataset_2.xml"));
-
-		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
-
-		System.out.println("***************");
-		System.out.println(new ObjectMapper().writeValueAsString(list));
-		System.out.println("***************");
-	}
-
 	@Test
-	void testClaimDedup() throws IOException {
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_claim_dedup.xml"));
+	void testClaimDedup() throws IOException, DocumentException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_claim_dedup.xml")));
 		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
+		assertNotNull(list);
+		assertFalse(list.isEmpty());
+
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");
 	}
 
 	@Test
-	void testNakala() throws IOException {
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_nakala.xml"));
+	void testNakala() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_nakala.xml")));
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
@@ -582,8 +583,8 @@ public class MappersTest {
 	}
 
 	@Test
-	void testEnermaps() throws IOException {
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("enermaps.xml"));
+	void testEnermaps() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("enermaps.xml")));
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
@@ -607,8 +608,9 @@ public class MappersTest {
 	}
 
 	@Test
-	void testClaimFromCrossref() throws IOException {
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_claim_crossref.xml"));
+	void testClaimFromCrossref() throws IOException, DocumentException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_claim_crossref.xml")));
 		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
@@ -623,8 +625,8 @@ public class MappersTest {
 	}
 
 	@Test
-	void testODFRecord() throws IOException {
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_record.xml"));
+	void testODFRecord() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_record.xml")));
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
@@ -637,8 +639,8 @@ public class MappersTest {
 	}
 
 	@Test
-	void testTextGrid() throws IOException {
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("textgrid.xml"));
+	void testTextGrid() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("textgrid.xml")));
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
@@ -652,9 +654,9 @@ public class MappersTest {
 		assertEquals(1, p.getAuthor().size());
 		assertEquals("OPEN", p.getBestaccessright().getClassid());
 
-		assertTrue(p.getPid().size() == 1);
+		assertEquals(1, p.getPid().size());
 		assertTrue(PidType.isValid(p.getPid().get(0).getQualifier().getClassid()));
-		assertTrue(PidType.handle.equals(PidType.valueOf(p.getPid().get(0).getQualifier().getClassid())));
+		assertEquals(PidType.handle, PidType.valueOf(p.getPid().get(0).getQualifier().getClassid()));
 		assertEquals("hdl:11858/00-1734-0000-0003-EE73-2", p.getPid().get(0).getValue());
 		assertEquals("dataset", p.getResulttype().getClassname());
 		assertEquals(1, p.getInstance().size());
@@ -671,8 +673,8 @@ public class MappersTest {
 	}
 
 	@Test
-	void testBologna() throws IOException {
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf-bologna.xml"));
+	void testBologna() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf-bologna.xml")));
 		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
@@ -688,8 +690,8 @@ public class MappersTest {
 	}
 
 	@Test
-	void testJairo() throws IOException {
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("oaf_jairo.xml"));
+	void testJairo() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_jairo.xml")));
 		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
@@ -702,7 +704,7 @@ public class MappersTest {
 
 		assertNotNull(p.getTitle());
 		assertFalse(p.getTitle().isEmpty());
-		assertTrue(p.getTitle().size() == 1);
+		assertEquals(1, p.getTitle().size());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 
 		final Publication p_cleaned = cleanup(fixVocabularyNames(p));
@@ -712,8 +714,9 @@ public class MappersTest {
 	}
 
 	@Test
-	void testOdfFromHdfs() throws IOException {
-		final String xml = IOUtils.toString(getClass().getResourceAsStream("odf_from_hdfs.xml"));
+	void testOdfFromHdfs() throws IOException, DocumentException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_from_hdfs.xml")));
 
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
@@ -749,7 +752,6 @@ public class MappersTest {
 		assertTrue(p.getInstance().size() > 0);
 		p
 			.getInstance()
-			.stream()
 			.forEach(i -> {
 				assertNotNull(i.getAccessright());
 				assertEquals("UNKNOWN", i.getAccessright().getClassid());
@@ -768,13 +770,16 @@ public class MappersTest {
 	private List<String> vocs() throws IOException {
 		return IOUtils
 			.readLines(
-				GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
+				Objects
+					.requireNonNull(MappersTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt")));
 	}
 
 	private List<String> synonyms() throws IOException {
 		return IOUtils
 			.readLines(
-				GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
+				Objects
+					.requireNonNull(
+						MappersTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt")));
 	}
 
 }

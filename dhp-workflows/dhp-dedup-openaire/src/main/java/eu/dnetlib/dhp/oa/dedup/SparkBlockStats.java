@@ -9,7 +9,6 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -17,6 +16,7 @@ import org.apache.spark.sql.SparkSession;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.model.Block;
@@ -63,7 +63,7 @@ public class SparkBlockStats extends AbstractSparkAction {
 
 	@Override
 	public void run(ISLookUpService isLookUpService)
-		throws DocumentException, IOException, ISLookUpException {
+		throws DocumentException, IOException, ISLookUpException, SAXException {
 
 		// read oozie parameters
 		final String graphBasePath = parser.get("graphBasePath");

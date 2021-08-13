@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Address implements Serializable {
 
+	private static final long serialVersionUID = 2444635485253443195L;
+
 	@JsonProperty("lat")
 	private Float lat;
 
@@ -36,8 +38,6 @@ public class Address implements Serializable {
 
 	@JsonProperty("line")
 	private String line;
-
-	private final static long serialVersionUID = 2444635485253443195L;
 
 	public Float getLat() {
 		return lat;

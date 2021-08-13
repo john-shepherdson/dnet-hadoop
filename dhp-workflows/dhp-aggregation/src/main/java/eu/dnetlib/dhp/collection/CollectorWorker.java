@@ -16,7 +16,6 @@ import org.apache.hadoop.io.compress.DeflateCodec;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.aggregation.common.ReporterCallback;
 import eu.dnetlib.dhp.aggregation.common.ReportingJob;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
@@ -24,6 +23,9 @@ import eu.dnetlib.dhp.collection.plugin.mongodb.MDStoreCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.mongodb.MongoDbDumpCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.oai.OaiCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.rest.RestCollectorPlugin;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
+import eu.dnetlib.dhp.common.collection.CollectorException;
+import eu.dnetlib.dhp.common.collection.HttpClientParams;
 import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;
 
 public class CollectorWorker extends ReportingJob {
@@ -116,7 +118,7 @@ public class CollectorWorker extends ReportingJob {
 				final CollectorPlugin.NAME.OTHER_NAME plugin = Optional
 					.ofNullable(api.getParams().get("other_plugin_type"))
 					.map(CollectorPlugin.NAME.OTHER_NAME::valueOf)
-					.get();
+					.orElseThrow(() -> new IllegalArgumentException("invalid other_plugin_type"));
 
 				switch (plugin) {
 					case mdstore_mongodb_dump:

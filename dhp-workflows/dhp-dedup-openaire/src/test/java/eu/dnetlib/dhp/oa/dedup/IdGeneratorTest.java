@@ -56,7 +56,7 @@ public class IdGeneratorTest {
 	}
 
 	@Test
-	public void generateIdTest1() {
+	void generateIdTest1() {
 		String id1 = IdGenerator.generate(bestIds, "50|defaultID");
 
 		System.out
@@ -66,7 +66,7 @@ public class IdGeneratorTest {
 	}
 
 	@Test
-	public void generateIdTest2() {
+	void generateIdTest2() {
 		String id1 = IdGenerator.generate(bestIds2, "50|defaultID");
 		String id2 = IdGenerator.generate(bestIds3, "50|defaultID");
 
@@ -82,7 +82,7 @@ public class IdGeneratorTest {
 	}
 
 	@Test
-	public void generateIdOrganizationTest() {
+	void generateIdOrganizationTest() {
 		String id1 = IdGenerator.generate(bestIdsOrg, "20|defaultID");
 
 		assertEquals("20|openorgs____::599c15a70fcb03be6ba08f75f14d6076", id1);

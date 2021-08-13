@@ -30,7 +30,9 @@ public class TrustUtils {
 		} catch (final IOException e) {
 			log.error("Error loading dedupConfig, e");
 		}
+	}
 
+	private TrustUtils() {
 	}
 
 	protected static float calculateTrust(final OaBrokerMainEntity r1, final OaBrokerMainEntity r2) {

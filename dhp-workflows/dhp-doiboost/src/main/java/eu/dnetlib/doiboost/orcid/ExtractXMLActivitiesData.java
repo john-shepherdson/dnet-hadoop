@@ -3,6 +3,7 @@ package eu.dnetlib.doiboost.orcid;
 
 import java.io.IOException;
 
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -10,7 +11,6 @@ import org.apache.hadoop.fs.Path;
 import org.mortbay.log.Log;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork;
 
 public class ExtractXMLActivitiesData extends OrcidDSManager {
 	private String outputWorksPath;
@@ -22,11 +22,11 @@ public class ExtractXMLActivitiesData extends OrcidDSManager {
 		extractXMLActivitiesData.extractWorks();
 	}
 
-	private void loadArgs(String[] args) throws Exception {
+	private void loadArgs(String[] args) throws ParseException, IOException {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					GenOrcidAuthorWork.class
+					ExtractXMLActivitiesData.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/doiboost/gen_orcid_works-no-doi_from_activities.json")));
 		parser.parseArgument(args);
@@ -43,7 +43,6 @@ public class ExtractXMLActivitiesData extends OrcidDSManager {
 
 	private void extractWorks() throws Exception {
 		Configuration conf = initConfigurationObject();
-		FileSystem fs = initFileSystemObject(conf);
 		String tarGzUri = hdfsServerUri.concat(workingPath).concat(activitiesFileNameTarGz);
 		Path outputPath = new Path(
 			hdfsServerUri

@@ -9,6 +9,7 @@ import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.listKeyValues;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.qualifier;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -74,7 +75,7 @@ public class GenerateRorActionSetJob {
 
 		final String jsonConfiguration = IOUtils
 			.toString(
-				SparkAtomicActionJob.class
+				GenerateRorActionSetJob.class
 					.getResourceAsStream("/eu/dnetlib/dhp/actionmanager/ror/action_set_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
@@ -108,7 +109,7 @@ public class GenerateRorActionSetJob {
 
 	private static void processRorOrganizations(final SparkSession spark,
 		final String inputPath,
-		final String outputPath) throws Exception {
+		final String outputPath) throws IOException {
 
 		readInputPath(spark, inputPath)
 			.map(
@@ -203,7 +204,7 @@ public class GenerateRorActionSetJob {
 
 	private static Dataset<RorOrganization> readInputPath(
 		final SparkSession spark,
-		final String path) throws Exception {
+		final String path) throws IOException {
 
 		try (final FileSystem fileSystem = FileSystem.get(new Configuration());
 			final InputStream is = fileSystem.open(new Path(path))) {

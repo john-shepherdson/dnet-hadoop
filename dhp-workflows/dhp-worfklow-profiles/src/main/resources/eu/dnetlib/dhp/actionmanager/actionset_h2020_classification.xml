@@ -1,0 +1,132 @@
+<RESOURCE_PROFILE>
+    <HEADER>
+        <RESOURCE_IDENTIFIER value="4bb067d5-a2f2-42b9-844c-4e1d8d71b80f_V29ya2Zsb3dEU1Jlc291cmNlcy9Xb3JrZmxvd0RTUmVzb3VyY2VUeXBl"/>
+        <RESOURCE_TYPE value="WorkflowDSResourceType"/>
+        <RESOURCE_KIND value="WorkflowDSResources"/>
+        <RESOURCE_URI value=""/>
+        <DATE_OF_CREATION value="2021-05-20T15:00:27+00:00"/>
+    </HEADER>
+    <BODY>
+        <WORKFLOW_NAME>Import H2020classification</WORKFLOW_NAME>
+        <WORKFLOW_TYPE>Import H2020classification</WORKFLOW_TYPE>
+        <WORKFLOW_PRIORITY>30</WORKFLOW_PRIORITY>
+        <CONFIGURATION start="manual">
+            <NODE isStart="true" name="setProjectFileURL" type="SetEnvParameter">
+                <DESCRIPTION>sets the URL to download the project file</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">projectFileURL</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">https://cordis.europa.eu/data/cordis-h2020projects.csv</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setProgrammeFileURL" type="SetEnvParameter">
+                <DESCRIPTION>sets the URL to download the programme file</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">programmeFileURL</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">https://cordis.europa.eu/data/reference/cordisref-h2020programmes.csv</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setTopicFileURL" type="SetEnvParameter">
+                <DESCRIPTION>sets the URL to download the topics file</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">topicFileURL</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">https://cordis.europa.eu/data/reference/cordisref-h2020topics.xlsx</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setSheetName" type="SetEnvParameter">
+                <DESCRIPTION>sets the name of the sheet in the topic file to be read</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">sheetName</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">Topics</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isJoin="true" name="waitConfig">
+                <DESCRIPTION>wait configurations</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="prepareActionSets"/>
+                </ARCS>
+            </NODE>
+            <NODE name="prepareActionSets" type="PrepareActionSets">
+                <DESCRIPTION>prepare action sets</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="sets" required="true" type="string">
+                        [
+                        {
+                        'set' : 'h2020classification',
+                        'jobProperty' : 'export_action_set_h2020classification',
+                        'enablingProperty' : 'active_h2020classification',
+                        'enabled' : 'true'
+                        }
+                        ]
+                    </PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="extractOutputPath"/>
+                </ARCS>
+            </NODE>
+            <NODE name="extractOutputPath" type="ExtractOutputPath">
+                <DESCRIPTION>extract the hdfs output path generated in the previous node</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hdfsOutputPathParam" required="true" type="string">outputPath</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="h2020ClassificationUpdate"/>
+                </ARCS>
+            </NODE>
+            <NODE name="h2020ClassificationUpdate" type="SubmitHadoopJob">
+                <DESCRIPTION>prepare updates for the H2020 Classification</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'outputPath': 'outputPath',
+                        'sheetName':'sheetName',
+                        'projectFileURL' : 'projectFileURL',
+                        'programmeFileURL' : 'programmeFileURL',
+                        'topicFileURL':'topicFileURL'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/PROD/actionmanager/project/oozie_app',
+                        'workingDir' : '/tmp/prod_provision/working_dir/h2020classification',
+                        'postgresURL':'',
+                        'postgresUser':'',
+                        'postgresPassword':''
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="updateActionSets"/>
+                </ARCS>
+            </NODE>
+            <NODE name="updateActionSets" type="UpdateActionSets">
+                <DESCRIPTION>update action sets</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="success"/>
+                </ARCS>
+            </NODE>
+        </CONFIGURATION>
+        <STATUS>
+            <LAST_EXECUTION_ID>wf_20210524_084803_740</LAST_EXECUTION_ID>
+            <LAST_EXECUTION_DATE>2021-05-24T09:05:50+00:00</LAST_EXECUTION_DATE>
+            <LAST_EXECUTION_STATUS>SUCCESS</LAST_EXECUTION_STATUS>
+            <LAST_EXECUTION_ERROR/>
+        </STATUS>
+    </BODY>
+</RESOURCE_PROFILE>

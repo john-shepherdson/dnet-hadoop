@@ -26,8 +26,6 @@ import io.fares.junit.mongodb.MongoForAllExtension;
 @Disabled
 public class MigrateMongoMdstoresApplicationTest {
 
-	private static final Logger log = LoggerFactory.getLogger(MigrateMongoMdstoresApplicationTest.class);
-
 	public static final String COLL_NAME = "9eed8a4d-bb41-47c3-987f-9d06aee0dec0::1453898911558";
 
 	@RegisterExtension

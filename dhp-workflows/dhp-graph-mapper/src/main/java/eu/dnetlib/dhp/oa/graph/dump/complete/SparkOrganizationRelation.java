@@ -61,7 +61,7 @@ public class SparkOrganizationRelation implements Serializable {
 		log.info("organization map : {}", new Gson().toJson(organizationMap));
 
 		final String communityMapPath = parser.get("communityMapPath");
-		log.info("communityMapPath: {} ", communityMapPath);
+		log.info("communityMapPath: {}", communityMapPath);
 
 		SparkConf conf = new SparkConf();
 
@@ -117,15 +117,12 @@ public class SparkOrganizationRelation implements Serializable {
 						}
 					}));
 
-		// if (relList.size() > 0) {
 		spark
 			.createDataset(relList, Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.graph.Relation.class))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
-		// }
-
 	}
 
 	@NotNull

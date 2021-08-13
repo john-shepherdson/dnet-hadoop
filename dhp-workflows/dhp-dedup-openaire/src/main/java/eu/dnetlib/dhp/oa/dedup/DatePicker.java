@@ -23,6 +23,9 @@ public class DatePicker {
 	private static final int YEAR_LB = 1300;
 	private static final int YEAR_UB = Year.now().getValue() + 5;
 
+	private DatePicker() {
+	}
+
 	public static Field<String> pick(final Collection<String> dateofacceptance) {
 
 		final Map<String, Integer> frequencies = dateofacceptance
@@ -61,7 +64,7 @@ public class DatePicker {
 				.entrySet()
 				.stream()
 				.filter(e -> e.getValue() >= acceptThreshold)
-				.map(e -> e.getKey())
+				.map(Map.Entry::getKey)
 				.collect(Collectors.toList());
 
 			// cannot find strong majority
