@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.common.collection;
 import java.io.*;
 import java.nio.file.Files;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocalFileSystem;
