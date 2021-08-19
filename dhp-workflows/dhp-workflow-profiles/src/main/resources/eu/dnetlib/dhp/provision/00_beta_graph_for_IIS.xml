@@ -11,10 +11,20 @@
         <WORKFLOW_TYPE>IIS</WORKFLOW_TYPE>
         <WORKFLOW_PRIORITY>30</WORKFLOW_PRIORITY>
         <CONFIGURATION start="manual">
-            <NODE isStart="true" name="setNsPrefixBlacklist" type="SetEnvParameter">
-                <DESCRIPTION>set blacklist of funder nsPrefixes</DESCRIPTION>
+            <NODE isStart="true" name="setNsPrefixBlacklistForBETA" type="SetEnvParameter">
+                <DESCRIPTION>set blacklist of funder nsPrefixes from the beta aggregator</DESCRIPTION>
                 <PARAMETERS>
-                    <PARAM managedBy="system" name="parameterName" required="true" type="string">nsPrefixBlacklist</PARAM>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">nsPrefixBlacklist_BETA</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">gsrt________,rcuk________,fct_________</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setNsPrefixBlacklistForPROD" type="SetEnvParameter">
+                <DESCRIPTION>set blacklist of funder nsPrefixes from the production aggregator</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">nsPrefixBlacklist_PROD</PARAM>
                     <PARAM managedBy="user" name="parameterValue" required="true" type="string">gsrt________,rcuk________</PARAM>
                 </PARAMETERS>
                 <ARCS>
@@ -375,7 +385,7 @@
                         'reuseOAF' : 'reuseOAF_BETA',
                         'reuseOAF_hdfs' : 'reuseOAFhdfs_BETA',
                         'contentPath' : 'betaContentPath',
-                        'nsPrefixBlacklist' : 'nsPrefixBlacklist',
+                        'nsPrefixBlacklist' : 'nsPrefixBlacklist_BETA',
                         'shouldPatchRelations' : 'shouldPatchRelations_BETA',
                         'idMappingPath' : 'idMappingPath'
                         }
@@ -421,7 +431,7 @@
                         'reuseOAF' : 'reuseOAF_PROD',
                         'reuseOAF_hdfs' : 'reuseOAFhdfs_PROD',
                         'contentPath' : 'prodContentPath',
-                        'nsPrefixBlacklist' : 'nsPrefixBlacklist',
+                        'nsPrefixBlacklist' : 'nsPrefixBlacklist_PROD',
                         'shouldPatchRelations' : 'shouldPatchRelations_PROD',
                         'idMappingPath' : 'idMappingPath'
                         }
