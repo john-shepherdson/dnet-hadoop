@@ -51,9 +51,6 @@
         </switch>
     </decision>
 
-    <start to="removeFiles"/>
-
-
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
