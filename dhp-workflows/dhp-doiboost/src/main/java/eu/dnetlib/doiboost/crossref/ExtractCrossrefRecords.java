@@ -26,7 +26,7 @@ public class ExtractCrossrefRecords {
 				.toString(
 					ExtractCrossrefRecords.class
 						.getResourceAsStream(
-							"/eu/dnetlib/dhp/doiboost/crossref_dump_reader.json")));
+							"/eu/dnetlib/dhp/doiboost/crossref_dump_reader/crossref_dump_reader.json")));
 		parser.parseArgument(args);
 		final String hdfsServerUri = parser.get("hdfsServerUri");
 		final String workingPath = hdfsServerUri.concat(parser.get("workingPath"));
