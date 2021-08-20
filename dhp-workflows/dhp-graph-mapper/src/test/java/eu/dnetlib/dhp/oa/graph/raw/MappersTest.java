@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.DocumentException;
@@ -757,6 +758,40 @@ class MappersTest {
 				assertEquals("UNKNOWN", i.getAccessright().getClassid());
 			});
 		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
+	}
+
+
+	@Test
+	void testXMLEncodedURL() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("encoded-url.xml")));
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		final Publication p = (Publication) list.get(0);
+		assertTrue(p.getInstance().size() > 0);
+
+		String decoded = "https://www.ec.europa.eu/research/participants/documents/downloadPublic?documentIds=080166e5af388993&appId=PPGMS";
+		assertEquals(decoded, p.getInstance().get(0).getUrl().get(0));
+	}
+
+	@Test
+	void testXMLEncodedURL_ODF() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("encoded-url_odf.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		final Dataset p = (Dataset) list.get(0);
+		assertTrue(p.getInstance().size() > 0);
+		for(String url : p.getInstance().get(0).getUrl()){
+			System.out.println(url);
+			assertTrue(!url.contains("&amp;"));
+		}
 	}
 
 	private void assertValidId(final String id) {

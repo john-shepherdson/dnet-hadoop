@@ -4,6 +4,8 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -137,17 +139,17 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		final Set<String> url = new HashSet<>();
 		for (final Object o : doc
 			.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='URL']")) {
-			url.add(((Node) o).getText().trim());
+			url.add(trimAndDecodeUrl(((Node) o).getText().trim()));
 		}
 		for (final Object o : doc
 			.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='landingPage']")) {
-			url.add(((Node) o).getText().trim());
+			url.add(trimAndDecodeUrl(((Node) o).getText().trim()));
 		}
 		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='URL']")) {
-			url.add(((Node) o).getText().trim());
+			url.add(trimAndDecodeUrl(((Node) o).getText().trim()));
 		}
 		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='landingPage']")) {
-			url.add(((Node) o).getText().trim());
+			url.add(trimAndDecodeUrl(((Node) o).getText().trim()));
 		}
 		for (final Object o : doc
 			.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='DOI']")) {
@@ -161,6 +163,14 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 			instance.getUrl().addAll(url);
 		}
 		return Arrays.asList(instance);
+	}
+
+	protected String trimAndDecodeUrl(String url){
+		try {
+			return URLDecoder.decode(url.trim(), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			return url;
+		}
 	}
 
 	@Override

@@ -4,6 +4,8 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -164,6 +166,13 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 					.filter(n -> StringUtils.isNotBlank(n.getText()))
 					.map(n -> n.getText().trim())
 					.filter(u -> u.startsWith("http"))
+					.map(s -> {
+						try {
+							return URLDecoder.decode(s, "UTF-8");
+						} catch (UnsupportedEncodingException e) {
+							return s;
+						}
+					})
 					.distinct()
 					.collect(Collectors.toCollection(ArrayList::new)));
 
