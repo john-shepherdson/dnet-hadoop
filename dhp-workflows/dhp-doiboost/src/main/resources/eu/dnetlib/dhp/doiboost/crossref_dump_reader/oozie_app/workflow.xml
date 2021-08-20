@@ -41,6 +41,16 @@
         </configuration>
     </global>
 
+    <start to="resume_from"/>
+
+    <decision name="resume_from">
+        <switch>
+            <case to="ImportCrossRef">${wf:conf('resumeFrom') eq 'ImportCrossRef'}</case>
+            <case to="UnpackCrossrefEntries">${wf:conf('resumeFrom') eq 'Unpack'}</case>
+            <default to="removeFiles"/> <!-- first action to be done when downloadDump is to be performed -->
+        </switch>
+    </decision>
+
     <start to="removeFiles"/>
 
 
