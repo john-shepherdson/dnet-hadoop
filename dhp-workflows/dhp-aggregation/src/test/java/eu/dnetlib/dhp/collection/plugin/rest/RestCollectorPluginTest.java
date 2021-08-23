@@ -12,16 +12,16 @@ import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
-import eu.dnetlib.dhp.collection.CollectorException;
-import eu.dnetlib.dhp.collection.HttpClientParams;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
+import eu.dnetlib.dhp.common.collection.CollectorException;
+import eu.dnetlib.dhp.common.collection.HttpClientParams;
 
 /**
  * @author js, Andreas Czerniak
  *
  */
-public class RestCollectorPluginTest {
+class RestCollectorPluginTest {
 
 	private static final Logger log = LoggerFactory.getLogger(RestCollectorPluginTest.class);
 
@@ -65,7 +65,7 @@ public class RestCollectorPluginTest {
 
 	@Disabled
 	@Test
-	public void test() throws CollectorException {
+	void test() throws CollectorException {
 		AtomicInteger i = new AtomicInteger(0);
 		final Stream<String> stream = rcp.collect(api, new AggregatorReport());
 

@@ -9,18 +9,23 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
+import eu.dnetlib.broker.objects.OaBrokerAuthor;
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.broker.objects.OaBrokerRelatedDatasource;
+import eu.dnetlib.broker.objects.OaBrokerTypedValue;
 import eu.dnetlib.dhp.broker.oa.util.BrokerConstants;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 
 public class EventFactory {
 
-	private final static String PRODUCER_ID = "OpenAIRE";
+	private static final String PRODUCER_ID = "OpenAIRE";
 
-	private final static String[] DATE_PATTERNS = {
+	private static final String[] DATE_PATTERNS = {
 		"yyyy-MM-dd"
 	};
+
+	private EventFactory() {
+	}
 
 	public static Event newBrokerEvent(final UpdateInfo<?> updateInfo) {
 
@@ -61,7 +66,7 @@ public class EventFactory {
 		map.setTargetResultId(target.getOpenaireId());
 
 		final List<String> titles = target.getTitles();
-		if (titles.size() > 0) {
+		if (!titles.isEmpty()) {
 			map.setTargetResultTitle(titles.get(0));
 		}
 
@@ -70,8 +75,12 @@ public class EventFactory {
 			map.setTargetDateofacceptance(date);
 		}
 
-		map.setTargetSubjects(target.getSubjects().stream().map(s -> s.getValue()).collect(Collectors.toList()));
-		map.setTargetAuthors(target.getCreators().stream().map(a -> a.getFullname()).collect(Collectors.toList()));
+		map
+			.setTargetSubjects(
+				target.getSubjects().stream().map(OaBrokerTypedValue::getValue).collect(Collectors.toList()));
+		map
+			.setTargetAuthors(
+				target.getCreators().stream().map(OaBrokerAuthor::getFullname).collect(Collectors.toList()));
 
 		// PROVENANCE INFO
 		map.setTrust(updateInfo.getTrust());

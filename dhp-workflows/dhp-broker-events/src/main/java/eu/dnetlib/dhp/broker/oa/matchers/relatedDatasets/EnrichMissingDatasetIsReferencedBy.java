@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.broker.oa.matchers.relatedDatasets;
 
 import eu.dnetlib.dhp.broker.model.Topic;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 
 public class EnrichMissingDatasetIsReferencedBy extends AbstractEnrichMissingDataset {
 
@@ -11,7 +12,7 @@ public class EnrichMissingDatasetIsReferencedBy extends AbstractEnrichMissingDat
 
 	@Override
 	protected boolean filterByType(final String relType) {
-		return relType.equals("isReferencedBy");
+		return relType.equals(ModelConstants.IS_REFERENCED_BY);
 	}
 
 }

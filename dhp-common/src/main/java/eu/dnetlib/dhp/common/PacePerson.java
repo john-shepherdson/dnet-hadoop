@@ -24,7 +24,6 @@ import com.google.common.hash.Hashing;
  */
 public class PacePerson {
 
-	private static final String UTF8 = "UTF-8";
 	private List<String> name = Lists.newArrayList();
 	private List<String> surname = Lists.newArrayList();
 	private List<String> fullname = Lists.newArrayList();

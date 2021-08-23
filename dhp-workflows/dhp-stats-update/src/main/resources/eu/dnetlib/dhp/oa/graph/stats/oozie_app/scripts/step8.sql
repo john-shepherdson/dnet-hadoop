@@ -17,7 +17,9 @@ CREATE TABLE ${stats_db_name}.datasource_tmp
     `latitude`         STRING,
     `longitude`        STRING,
     `websiteurl`       STRING,
-    `compatibility`    STRING
+    `compatibility`    STRING,
+    issn_printed       STRING,
+    issn_online        STRING
 ) CLUSTERED BY (id) INTO 100 buckets stored AS orc tblproperties ('transactional' = 'true');
 
 -- Insert statement that takes into account the piwik_id of the openAIRE graph
@@ -32,7 +34,9 @@ SELECT substr(d1.id, 4)                                          AS id,
        d1.latitude.value                                         AS latitude,
        d1.longitude.value                                        AS longitude,
        d1.websiteurl.value                                       AS websiteurl,
-       d1.openairecompatibility.classid                          AS compatibility
+       d1.openairecompatibility.classid                          AS compatibility,
+       d1.journal.issnprinted                                    AS issn_printed,
+       d1.journal.issnonline                                    AS issn_online
 FROM ${openaire_db_name}.datasource d1
          LEFT OUTER JOIN
      (SELECT id, split(originalidd, '\\:')[1] as piwik_id
@@ -51,7 +55,7 @@ CREATE TABLE ${stats_db_name}.dual
 INSERT INTO ${stats_db_name}.dual
 VALUES ('X');
 INSERT INTO ${stats_db_name}.datasource_tmp (`id`, `name`, `type`, `dateofvalidation`, `yearofvalidation`, `harvested`,
-                                             `piwik_id`, `latitude`, `longitude`, `websiteurl`, `compatibility`)
+                                             `piwik_id`, `latitude`, `longitude`, `websiteurl`, `compatibility`, `issn_printed`, `issn_online`)
 SELECT 'other',
        'Other',
        'Repository',
@@ -62,7 +66,9 @@ SELECT 'other',
        NULL,
        NULL,
        NULL,
-       'unknown'
+       'unknown',
+       null,
+       null
 FROM ${stats_db_name}.dual
 WHERE 'other' not in (SELECT id FROM ${stats_db_name}.datasource_tmp WHERE name = 'Unknown Repository');
 DROP TABLE ${stats_db_name}.dual;
@@ -98,12 +104,3 @@ where d.datainfo.deletedbyinference = false;
 CREATE OR REPLACE VIEW ${stats_db_name}.datasource_results AS
 SELECT datasource AS id, id AS result
 FROM ${stats_db_name}.result_datasources;
-
--- ANALYZE TABLE ${stats_db_name}.datasource_tmp COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.datasource_tmp COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.datasource_languages COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.datasource_languages COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.datasource_oids COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.datasource_oids COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.datasource_organizations COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.datasource_organizations COMPUTE STATISTICS FOR COLUMNS;

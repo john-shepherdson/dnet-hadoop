@@ -3,9 +3,9 @@ package eu.dnetlib.dhp.collection.plugin;
 
 import java.util.stream.Stream;
 
-import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
-import eu.dnetlib.dhp.collection.CollectorException;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
+import eu.dnetlib.dhp.common.collection.CollectorException;
 
 public interface CollectorPlugin {
 

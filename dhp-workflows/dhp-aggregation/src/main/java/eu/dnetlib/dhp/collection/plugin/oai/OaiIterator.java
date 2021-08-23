@@ -2,7 +2,6 @@
 package eu.dnetlib.dhp.collection.plugin.oai;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -16,21 +15,21 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
-import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
-import eu.dnetlib.dhp.collection.CollectorException;
-import eu.dnetlib.dhp.collection.HttpConnector2;
 import eu.dnetlib.dhp.collection.XmlCleaner;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
+import eu.dnetlib.dhp.common.collection.CollectorException;
+import eu.dnetlib.dhp.common.collection.HttpConnector2;
 
 public class OaiIterator implements Iterator<String> {
 
 	private static final Logger log = LoggerFactory.getLogger(OaiIterator.class);
 
-	private final static String REPORT_PREFIX = "oai:";
+	private static final String REPORT_PREFIX = "oai:";
+	public static final String UTF_8 = "UTF-8";
 
 	private final Queue<String> queue = new PriorityBlockingQueue<>();
 
@@ -68,7 +67,7 @@ public class OaiIterator implements Iterator<String> {
 			try {
 				this.token = firstPage();
 			} catch (final CollectorException e) {
-				throw new RuntimeException(e);
+				throw new IllegalStateException(e);
 			}
 		}
 	}
@@ -90,7 +89,7 @@ public class OaiIterator implements Iterator<String> {
 				try {
 					token = otherPages(token);
 				} catch (final CollectorException e) {
-					throw new RuntimeException(e);
+					throw new IllegalStateException(e);
 				}
 			}
 			return res;
@@ -99,23 +98,24 @@ public class OaiIterator implements Iterator<String> {
 
 	@Override
 	public void remove() {
+		throw new UnsupportedOperationException();
 	}
 
 	private String firstPage() throws CollectorException {
 		try {
-			String url = baseUrl + "?verb=ListRecords&metadataPrefix=" + URLEncoder.encode(mdFormat, "UTF-8");
+			String url = baseUrl + "?verb=ListRecords&metadataPrefix=" + URLEncoder.encode(mdFormat, UTF_8);
 			if (set != null && !set.isEmpty()) {
-				url += "&set=" + URLEncoder.encode(set, "UTF-8");
+				url += "&set=" + URLEncoder.encode(set, UTF_8);
 			}
 			if (fromDate != null && (fromDate.matches(OaiCollectorPlugin.DATE_REGEX)
 				|| fromDate.matches(OaiCollectorPlugin.UTC_DATETIME_REGEX))) {
-				url += "&from=" + URLEncoder.encode(fromDate, "UTF-8");
+				url += "&from=" + URLEncoder.encode(fromDate, UTF_8);
 			}
 			if (untilDate != null && (untilDate.matches(OaiCollectorPlugin.DATE_REGEX)
 				|| untilDate.matches(OaiCollectorPlugin.UTC_DATETIME_REGEX))) {
-				url += "&until=" + URLEncoder.encode(untilDate, "UTF-8");
+				url += "&until=" + URLEncoder.encode(untilDate, UTF_8);
 			}
-			log.info("Start harvesting using url: " + url);
+			log.info("Start harvesting using url: {}", url);
 
 			return downloadPage(url);
 		} catch (final UnsupportedEncodingException e) {
@@ -143,7 +143,7 @@ public class OaiIterator implements Iterator<String> {
 			return downloadPage(
 				baseUrl
 					+ "?verb=ListRecords&resumptionToken="
-					+ URLEncoder.encode(resumptionToken, "UTF-8"));
+					+ URLEncoder.encode(resumptionToken, UTF_8));
 		} catch (final UnsupportedEncodingException e) {
 			report.put(e.getClass().getName(), e.getMessage());
 			throw new CollectorException(e);

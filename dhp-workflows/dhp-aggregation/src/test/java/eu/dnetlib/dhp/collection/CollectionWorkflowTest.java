@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.common.collection.HttpClientParams;
 import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

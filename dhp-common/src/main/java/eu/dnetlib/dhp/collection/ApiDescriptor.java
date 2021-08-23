@@ -34,7 +34,7 @@ public class ApiDescriptor {
 		return params;
 	}
 
-	public void setParams(final HashMap<String, String> params) {
+	public void setParams(final Map<String, String> params) {
 		this.params = params;
 	}
 

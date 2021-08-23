@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.utils.CSVProgramme;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProgramme;
 
 public class PrepareH2020ProgrammeTest {
 
@@ -66,7 +66,7 @@ public class PrepareH2020ProgrammeTest {
 	}
 
 	@Test
-	public void numberDistinctProgrammeTest() throws Exception {
+	void numberDistinctProgrammeTest() throws Exception {
 		PrepareProgramme
 			.main(
 				new String[] {

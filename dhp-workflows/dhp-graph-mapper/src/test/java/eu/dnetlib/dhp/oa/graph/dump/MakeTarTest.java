@@ -22,7 +22,7 @@ public class MakeTarTest {
 	}
 
 	@Test
-	public void testTar() throws IOException {
+	void testTar() throws IOException {
 		LocalFileSystem fs = FileSystem.getLocal(new Configuration());
 
 		fs

@@ -49,9 +49,11 @@ public class CreateRelatedEntitiesJob_phase2 {
 
 		String jsonConfiguration = IOUtils
 			.toString(
-				PrepareRelationsJob.class
-					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/provision/input_params_related_entities_pahase2.json"));
+				Objects
+					.requireNonNull(
+						CreateRelatedEntitiesJob_phase2.class
+							.getResourceAsStream(
+								"/eu/dnetlib/dhp/oa/provision/input_params_related_entities_pahase2.json")));
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
 

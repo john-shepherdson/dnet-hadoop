@@ -34,6 +34,9 @@ public class DHPUtils {
 
 	private static final Logger log = LoggerFactory.getLogger(DHPUtils.class);
 
+	private DHPUtils() {
+	}
+
 	public static Seq<String> toSeq(List<String> list) {
 		return JavaConverters.asScalaIteratorConverter(list.iterator()).asScala().toSeq();
 	}
@@ -44,40 +47,13 @@ public class DHPUtils {
 			md.update(s.getBytes(StandardCharsets.UTF_8));
 			return new String(Hex.encodeHex(md.digest()));
 		} catch (final Exception e) {
-			System.err.println("Error creating id");
+			log.error("Error creating id from {}", s);
 			return null;
 		}
 	}
 
 	public static String generateIdentifier(final String originalId, final String nsPrefix) {
 		return String.format("%s::%s", nsPrefix, DHPUtils.md5(originalId));
-	}
-
-	public static String compressString(final String input) {
-		try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-			Base64OutputStream b64os = new Base64OutputStream(out)) {
-			GZIPOutputStream gzip = new GZIPOutputStream(b64os);
-			gzip.write(input.getBytes(StandardCharsets.UTF_8));
-			gzip.close();
-			return out.toString();
-		} catch (Throwable e) {
-			return null;
-		}
-	}
-
-	public static String decompressString(final String input) {
-		byte[] byteArray = Base64.decodeBase64(input.getBytes());
-		int len;
-		try (GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream((byteArray)));
-			ByteArrayOutputStream bos = new ByteArrayOutputStream(byteArray.length)) {
-			byte[] buffer = new byte[1024];
-			while ((len = gis.read(buffer)) != -1) {
-				bos.write(buffer, 0, len);
-			}
-			return bos.toString();
-		} catch (Exception e) {
-			return null;
-		}
 	}
 
 	public static String getJPathString(final String jsonPath, final String json) {

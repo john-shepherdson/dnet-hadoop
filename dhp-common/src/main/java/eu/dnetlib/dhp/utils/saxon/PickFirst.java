@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.utils.saxon;
 
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import org.apache.commons.lang3.StringUtils;
 
 import net.sf.saxon.expr.XPathContext;
@@ -26,7 +28,8 @@ public class PickFirst extends AbstractExtensionFunction {
 		final String s1 = getValue(arguments[0]);
 		final String s2 = getValue(arguments[1]);
 
-		return new StringValue(StringUtils.isNotBlank(s1) ? s1 : StringUtils.isNotBlank(s2) ? s2 : "");
+		final String value = isNotBlank(s1) ? s1 : isNotBlank(s2) ? s2 : "";
+		return new StringValue(value);
 	}
 
 	private String getValue(final Sequence arg) throws XPathException {

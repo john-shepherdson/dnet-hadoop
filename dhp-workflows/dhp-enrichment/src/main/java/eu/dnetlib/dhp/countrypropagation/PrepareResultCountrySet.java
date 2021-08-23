@@ -85,13 +85,12 @@ public class PrepareResultCountrySet {
 
 		Dataset<R> result = readPath(spark, inputPath, resultClazz);
 		result.createOrReplaceTempView("result");
-		// log.info("number of results: {}", result.count());
+
 		createCfHbforResult(spark);
 
 		Dataset<DatasourceCountry> datasource_country = readPath(spark, datasourcecountrypath, DatasourceCountry.class);
 
 		datasource_country.createOrReplaceTempView("datasource_country");
-		// log.info("datasource_country number : {}", datasource_country.count());
 
 		spark
 			.sql(RESULT_COUNTRYSET_QUERY)
@@ -102,7 +101,7 @@ public class PrepareResultCountrySet {
 				ArrayList<CountrySbs> countryList = a.getCountrySet();
 				Set<String> countryCodes = countryList
 					.stream()
-					.map(country -> country.getClassid())
+					.map(CountrySbs::getClassid)
 					.collect(Collectors.toSet());
 				b
 					.getCountrySet()
@@ -119,10 +118,6 @@ public class PrepareResultCountrySet {
 			})
 			.map(couple -> OBJECT_MAPPER.writeValueAsString(couple._2()))
 			.saveAsTextFile(outputPath, GzipCodec.class);
-//			.write()
-//			.option("compression", "gzip")
-//			.mode(SaveMode.Append)
-//			.json(outputPath);
 	}
 
 }

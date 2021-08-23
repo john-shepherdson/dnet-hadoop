@@ -2,9 +2,7 @@
 package eu.dnetlib.dhp.oa.graph.dump.community;
 
 import java.io.Serializable;
-import java.util.*;
-
-import javax.swing.text.html.Option;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -12,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.DumpProducts;
-import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.oaf.Result;
 

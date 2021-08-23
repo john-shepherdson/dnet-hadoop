@@ -25,6 +25,9 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 public class Utils {
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
+	private Utils() {
+	}
+
 	public static void removeOutputDir(SparkSession spark, String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}
@@ -57,7 +60,7 @@ public class Utils {
 
 	public static CommunityMap readCommunityMap(FileSystem fileSystem, String communityMapPath) throws IOException {
 		BufferedReader br = new BufferedReader(new InputStreamReader(fileSystem.open(new Path(communityMapPath))));
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		try {
 			String line;
 			while ((line = br.readLine()) != null) {

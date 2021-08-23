@@ -7,16 +7,8 @@
 package eu.dnetlib.oa.graph.usagerawdata.export;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
 
-import org.apache.log4j.Logger;
-
-/**
- * @author D. Pierrakos, S. Zoupanos
- */
 /**
  * @author D. Pierrakos, S. Zoupanos
  */
@@ -31,7 +23,9 @@ public abstract class ConnectDB {
 	private static String dbImpalaUrl;
 	private static String usageStatsDBSchema;
 	private static String statsDBSchema;
-	private final static Logger log = Logger.getLogger(ConnectDB.class);
+
+	private ConnectDB() {
+	}
 
 	static void init() throws ClassNotFoundException {
 
@@ -72,10 +66,6 @@ public abstract class ConnectDB {
 	}
 
 	private static Connection connectHive() throws SQLException {
-		/*
-		 * Connection connection = DriverManager.getConnection(dbHiveUrl); Statement stmt =
-		 * connection.createStatement(); log.debug("Opened database successfully"); return connection;
-		 */
 		ComboPooledDataSource cpds = new ComboPooledDataSource();
 		cpds.setJdbcUrl(dbHiveUrl);
 		cpds.setAcquireIncrement(1);
@@ -97,10 +87,6 @@ public abstract class ConnectDB {
 	}
 
 	private static Connection connectImpala() throws SQLException {
-		/*
-		 * Connection connection = DriverManager.getConnection(dbImpalaUrl); Statement stmt =
-		 * connection.createStatement(); log.debug("Opened database successfully"); return connection;
-		 */
 		ComboPooledDataSource cpds = new ComboPooledDataSource();
 		cpds.setJdbcUrl(dbImpalaUrl);
 		cpds.setAcquireIncrement(1);

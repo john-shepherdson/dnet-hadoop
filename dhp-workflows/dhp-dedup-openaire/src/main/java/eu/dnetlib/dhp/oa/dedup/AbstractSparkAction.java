@@ -20,6 +20,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.xml.sax.SAXException;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,23 +44,26 @@ abstract class AbstractSparkAction implements Serializable {
 	protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
-	public ArgumentApplicationParser parser; // parameters for the spark action
-	public SparkSession spark; // the spark session
+	public final ArgumentApplicationParser parser; // parameters for the spark action
+	public final SparkSession spark; // the spark session
 
-	public AbstractSparkAction(ArgumentApplicationParser parser, SparkSession spark) {
+	protected AbstractSparkAction(ArgumentApplicationParser parser, SparkSession spark) {
 
 		this.parser = parser;
 		this.spark = spark;
 	}
 
 	public List<DedupConfig> getConfigurations(ISLookUpService isLookUpService, String orchestrator)
-		throws ISLookUpException, DocumentException, IOException {
+		throws ISLookUpException, DocumentException, IOException, SAXException {
 
 		final String xquery = String.format("/RESOURCE_PROFILE[.//DEDUPLICATION/ACTION_SET/@id = '%s']", orchestrator);
 
 		String orchestratorProfile = isLookUpService.getResourceProfileByQuery(xquery);
 
-		final Document doc = new SAXReader().read(new StringReader(orchestratorProfile));
+		final SAXReader reader = new SAXReader();
+		reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+
+		final Document doc = reader.read(new StringReader(orchestratorProfile));
 
 		final String actionSetId = doc.valueOf("//DEDUPLICATION/ACTION_SET/@id");
 
@@ -93,7 +97,7 @@ abstract class AbstractSparkAction implements Serializable {
 	}
 
 	abstract void run(ISLookUpService isLookUpService)
-		throws DocumentException, IOException, ISLookUpException;
+		throws DocumentException, IOException, ISLookUpException, SAXException;
 
 	protected static SparkSession getSparkSession(SparkConf conf) {
 		return SparkSession.builder().config(conf).getOrCreate();
@@ -139,9 +143,7 @@ abstract class AbstractSparkAction implements Serializable {
 				c -> c
 					.stream()
 					.filter(Objects::nonNull)
-					.filter(kv -> ModelConstants.OPENORGS_NAME.equals(kv.getValue()))
-					.findFirst()
-					.isPresent())
+					.anyMatch(kv -> ModelConstants.OPENORGS_NAME.equals(kv.getValue())))
 			.orElse(false);
 	}
 

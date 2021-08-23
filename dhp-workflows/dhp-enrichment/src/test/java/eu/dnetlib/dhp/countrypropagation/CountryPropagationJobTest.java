@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -25,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.oaf.Country;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import scala.Tuple2;
 
@@ -67,7 +67,7 @@ public class CountryPropagationJobTest {
 	}
 
 	@Test
-	public void testCountryPropagationSoftware() throws Exception {
+	void testCountryPropagationSoftware() throws Exception {
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/countrypropagation/sample/software")
 			.getPath();
@@ -105,7 +105,7 @@ public class CountryPropagationJobTest {
 		Dataset<String> countryExploded = verificationDs
 			.flatMap(
 				(FlatMapFunction<Software, Country>) row -> row.getCountry().iterator(), Encoders.bean(Country.class))
-			.map((MapFunction<Country, String>) c -> c.getClassid(), Encoders.STRING());
+			.map((MapFunction<Country, String>) Qualifier::getClassid, Encoders.STRING());
 
 		Assertions.assertEquals(9, countryExploded.count());
 
@@ -119,10 +119,9 @@ public class CountryPropagationJobTest {
 
 		Dataset<Tuple2<String, String>> countryExplodedWithCountryclassid = verificationDs
 			.flatMap((FlatMapFunction<Software, Tuple2<String, String>>) row -> {
-				List<Tuple2<String, String>> prova = new ArrayList();
-				List<Country> country_list = row.getCountry();
-				country_list
-					.stream()
+				List<Tuple2<String, String>> prova = new ArrayList<>();
+				List<Country> countryList = row.getCountry();
+				countryList
 					.forEach(
 						c -> prova
 							.add(
@@ -180,10 +179,9 @@ public class CountryPropagationJobTest {
 		Dataset<Tuple2<String, String>> countryExplodedWithCountryclassname = verificationDs
 			.flatMap(
 				(FlatMapFunction<Software, Tuple2<String, String>>) row -> {
-					List<Tuple2<String, String>> prova = new ArrayList();
-					List<Country> country_list = row.getCountry();
-					country_list
-						.stream()
+					List<Tuple2<String, String>> prova = new ArrayList<>();
+					List<Country> countryList = row.getCountry();
+					countryList
 						.forEach(
 							c -> prova
 								.add(
@@ -241,10 +239,9 @@ public class CountryPropagationJobTest {
 		Dataset<Tuple2<String, String>> countryExplodedWithCountryProvenance = verificationDs
 			.flatMap(
 				(FlatMapFunction<Software, Tuple2<String, String>>) row -> {
-					List<Tuple2<String, String>> prova = new ArrayList();
-					List<Country> country_list = row.getCountry();
-					country_list
-						.stream()
+					List<Tuple2<String, String>> prova = new ArrayList<>();
+					List<Country> countryList = row.getCountry();
+					countryList
 						.forEach(
 							c -> prova
 								.add(

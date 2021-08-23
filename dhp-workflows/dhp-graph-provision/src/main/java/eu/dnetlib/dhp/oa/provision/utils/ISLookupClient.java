@@ -25,11 +25,9 @@ public class ISLookupClient {
 	 *
 	 * @param format the Metadata format name
 	 * @return the string representation of the list of fields to be indexed
-	 * @throws ISLookUpDocumentNotFoundException
 	 * @throws ISLookUpException
 	 */
-	public String getLayoutSource(final String format)
-		throws ISLookUpDocumentNotFoundException, ISLookUpException {
+	public String getLayoutSource(final String format) throws ISLookUpException {
 		return doLookup(
 			String
 				.format(
@@ -41,7 +39,6 @@ public class ISLookupClient {
 	 * Method retrieves from the information system the openaireLayoutToRecordStylesheet
 	 *
 	 * @return the string representation of the XSLT contained in the transformation rule profile
-	 * @throws ISLookUpDocumentNotFoundException
 	 * @throws ISLookUpException
 	 */
 	public String getLayoutTransformer() throws ISLookUpException {
@@ -78,9 +75,9 @@ public class ISLookupClient {
 	}
 
 	private String doLookup(String xquery) throws ISLookUpException {
-		log.info(String.format("running xquery: %s", xquery));
+		log.info("running xquery: {}", xquery);
 		final String res = getIsLookup().getResourceProfileByQuery(xquery);
-		log.info(String.format("got response (100 chars): %s", StringUtils.left(res, 100) + " ..."));
+		log.info("got response (100 chars): {} ...", StringUtils.left(res, 100));
 		return res;
 	}
 

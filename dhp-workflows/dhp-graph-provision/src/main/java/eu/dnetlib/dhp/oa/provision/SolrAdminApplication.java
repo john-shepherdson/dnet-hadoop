@@ -17,7 +17,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.provision.utils.ISLookupClient;
 import eu.dnetlib.dhp.oa.provision.utils.ZkServers;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 public class SolrAdminApplication implements Closeable {
 

@@ -3,7 +3,7 @@ package eu.dnetlib.doiboost.orcidnodoi;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -14,21 +14,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.util.LongAccumulator;
-import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
@@ -75,7 +70,7 @@ public class SparkGenEnrichedOrcidWorks {
 			spark -> {
 				String lastUpdate = HDFSUtil.readFromTextFile(hdfsServerUri, workingPath, "last_update.txt");
 				if (StringUtils.isBlank(lastUpdate)) {
-					throw new RuntimeException("last update info not found");
+					throw new FileNotFoundException("last update info not found");
 				}
 				final String dateOfCollection = lastUpdate.substring(0, 10);
 				JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -86,10 +81,10 @@ public class SparkGenEnrichedOrcidWorks {
 							.textFile(workingPath.concat(orcidDataFolder).concat("/authors/*"))
 							.map(item -> OBJECT_MAPPER.readValue(item, AuthorSummary.class))
 							.filter(authorSummary -> authorSummary.getAuthorData() != null)
-							.map(authorSummary -> authorSummary.getAuthorData())
+							.map(AuthorSummary::getAuthorData)
 							.rdd(),
 						Encoders.bean(AuthorData.class));
-				logger.info("Authors data loaded: " + authorDataset.count());
+				logger.info("Authors data loaded: {}", authorDataset.count());
 
 				Dataset<WorkDetail> workDataset = spark
 					.createDataset(
@@ -97,7 +92,7 @@ public class SparkGenEnrichedOrcidWorks {
 							.textFile(workingPath.concat(orcidDataFolder).concat("/works/*"))
 							.map(item -> OBJECT_MAPPER.readValue(item, Work.class))
 							.filter(work -> work.getWorkDetail() != null)
-							.map(work -> work.getWorkDetail())
+							.map(Work::getWorkDetail)
 							.filter(work -> work.getErrorCode() == null)
 							.filter(
 								work -> work
@@ -107,7 +102,7 @@ public class SparkGenEnrichedOrcidWorks {
 									.noneMatch(e -> e.getType().equalsIgnoreCase("doi")))
 							.rdd(),
 						Encoders.bean(WorkDetail.class));
-				logger.info("Works data loaded: " + workDataset.count());
+				logger.info("Works data loaded: {}", workDataset.count());
 
 				final LongAccumulator warnNotFoundContributors = spark
 					.sparkContext()
@@ -122,7 +117,7 @@ public class SparkGenEnrichedOrcidWorks {
 							WorkDetail w = value._1;
 							AuthorData a = value._2;
 							if (w.getContributors() == null
-								|| (w.getContributors() != null && w.getContributors().size() == 0)) {
+								|| (w.getContributors() != null && w.getContributors().isEmpty())) {
 								Contributor c = new Contributor();
 								c.setName(a.getName());
 								c.setSurname(a.getSurname());
@@ -163,7 +158,6 @@ public class SparkGenEnrichedOrcidWorks {
 				final PublicationToOaf publicationToOaf = new PublicationToOaf(
 					parsedPublications,
 					enrichedPublications,
-					errorsGeneric,
 					errorsInvalidTitle,
 					errorsNotFoundAuthors,
 					errorsInvalidType,
@@ -172,13 +166,10 @@ public class SparkGenEnrichedOrcidWorks {
 					titleNotProvidedAcc,
 					noUrlAcc,
 					dateOfCollection);
+
 				JavaRDD<Publication> oafPublicationRDD = enrichedWorksRDD
-					.map(
-						e -> {
-							return (Publication) publicationToOaf
-								.generatePublicationActionsFromJson(e._2());
-						})
-					.filter(p -> p != null);
+					.map(e -> (Publication) publicationToOaf.generatePublicationActionsFromJson(e._2()))
+					.filter(Objects::nonNull);
 
 				sc.hadoopConfiguration().set("mapreduce.output.fileoutputformat.compress", "true");
 
@@ -186,7 +177,7 @@ public class SparkGenEnrichedOrcidWorks {
 					.mapToPair(
 						p -> new Tuple2<>(p.getClass().toString(),
 							OBJECT_MAPPER.writeValueAsString(new AtomicAction<>(Publication.class, p))))
-					.mapToPair(t -> new Tuple2(new Text(t._1()), new Text(t._2())))
+					.mapToPair(t -> new Tuple2<>(new Text(t._1()), new Text(t._2())))
 					.saveAsNewAPIHadoopFile(
 						outputEnrichedWorksPath,
 						Text.class,
@@ -194,17 +185,17 @@ public class SparkGenEnrichedOrcidWorks {
 						SequenceFileOutputFormat.class,
 						sc.hadoopConfiguration());
 
-				logger.info("parsedPublications: " + parsedPublications.value().toString());
-				logger.info("enrichedPublications: " + enrichedPublications.value().toString());
-				logger.info("warnNotFoundContributors: " + warnNotFoundContributors.value().toString());
-				logger.info("errorsGeneric: " + errorsGeneric.value().toString());
-				logger.info("errorsInvalidTitle: " + errorsInvalidTitle.value().toString());
-				logger.info("errorsNotFoundAuthors: " + errorsNotFoundAuthors.value().toString());
-				logger.info("errorsInvalidType: " + errorsInvalidType.value().toString());
-				logger.info("otherTypeFound: " + otherTypeFound.value().toString());
-				logger.info("deactivatedAcc: " + deactivatedAcc.value().toString());
-				logger.info("titleNotProvidedAcc: " + titleNotProvidedAcc.value().toString());
-				logger.info("noUrlAcc: " + noUrlAcc.value().toString());
+				logger.info("parsedPublications: {}", parsedPublications.value());
+				logger.info("enrichedPublications: {}", enrichedPublications.value());
+				logger.info("warnNotFoundContributors: {}", warnNotFoundContributors.value());
+				logger.info("errorsGeneric: {}", errorsGeneric.value());
+				logger.info("errorsInvalidTitle: {}", errorsInvalidTitle.value());
+				logger.info("errorsNotFoundAuthors: {}", errorsNotFoundAuthors.value());
+				logger.info("errorsInvalidType: {}", errorsInvalidType.value());
+				logger.info("otherTypeFound: {}", otherTypeFound.value());
+				logger.info("deactivatedAcc: {}", deactivatedAcc.value());
+				logger.info("titleNotProvidedAcc: {}", titleNotProvidedAcc.value());
+				logger.info("noUrlAcc: {}", noUrlAcc.value());
 			});
 	}
 }

@@ -4,7 +4,6 @@ package eu.dnetlib.doiboost.orcid;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static org.apache.spark.sql.functions.*;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,8 +16,10 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
 import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +36,12 @@ import scala.Tuple2;
 
 public class SparkUpdateOrcidAuthors {
 
+	public static final Logger logger = LoggerFactory.getLogger(SparkUpdateOrcidAuthors.class);
+
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
 	public static void main(String[] args) throws Exception {
-		Logger logger = LoggerFactory.getLogger(SparkUpdateOrcidAuthors.class);
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -53,7 +55,6 @@ public class SparkUpdateOrcidAuthors {
 			.map(Boolean::valueOf)
 			.orElse(Boolean.TRUE);
 		final String workingPath = parser.get("workingPath");
-//		final String outputPath = parser.get("outputPath");
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
@@ -87,7 +88,7 @@ public class SparkUpdateOrcidAuthors {
 					String jsonData = data._2().toString();
 					JsonElement jElement = new JsonParser().parse(jsonData);
 					String statusCode = getJsonValue(jElement, "statusCode");
-					String downloadDate = getJsonValue(jElement, "lastModifiedDate");
+
 					if (statusCode.equals("200")) {
 						String compressedData = getJsonValue(jElement, "compressedData");
 						if (StringUtils.isEmpty(compressedData)) {
@@ -135,7 +136,7 @@ public class SparkUpdateOrcidAuthors {
 							.col("authorData.oid")
 							.equalTo(downloadedAuthorSummaryDS.col("authorData.oid")),
 						"full_outer")
-					.map(value -> {
+					.map((MapFunction<Tuple2<AuthorSummary, AuthorSummary>, AuthorSummary>) value -> {
 						Optional<AuthorSummary> opCurrent = Optional.ofNullable(value._1());
 						Optional<AuthorSummary> opDownloaded = Optional.ofNullable(value._2());
 						if (!opCurrent.isPresent()) {
@@ -183,7 +184,8 @@ public class SparkUpdateOrcidAuthors {
 					.groupBy("authorData.oid")
 					.agg(array_max(collect_list("downloadDate")))
 					.map(
-						row -> new Tuple2<>(row.get(0).toString(), row.get(1).toString()),
+						(MapFunction<Row, Tuple2<String, String>>) row -> new Tuple2<>(row.get(0).toString(),
+							row.get(1).toString()),
 						Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
 					.toJavaRDD()
 					.collect();
@@ -214,25 +216,24 @@ public class SparkUpdateOrcidAuthors {
 					.dropDuplicates("downloadDate", "authorData");
 				cleanedDS
 					.toJavaRDD()
-					.map(authorSummary -> OBJECT_MAPPER.writeValueAsString(authorSummary))
+					.map(OBJECT_MAPPER::writeValueAsString)
 					.saveAsTextFile(workingPath.concat("orcid_dataset/new_authors"), GzipCodec.class);
 				long cleanedDSCount = cleanedDS.count();
 
-				logger.info("report_oldAuthorsFoundAcc: " + oldAuthorsFoundAcc.value().toString());
-				logger.info("report_newAuthorsFoundAcc: " + newAuthorsFoundAcc.value().toString());
-				logger.info("report_updatedAuthorsFoundAcc: " + updatedAuthorsFoundAcc.value().toString());
-				logger.info("report_errorCodeFoundAcc: " + errorCodeAuthorsFoundAcc.value().toString());
-				logger.info("report_errorLoadingJsonFoundAcc: " + errorLoadingAuthorsJsonFoundAcc.value().toString());
-				logger.info("report_errorParsingXMLFoundAcc: " + errorParsingAuthorsXMLFoundAcc.value().toString());
-				logger.info("report_merged_count: " + mergedCount);
-				logger.info("report_cleaned_count: " + cleanedDSCount);
+				logger.info("report_oldAuthorsFoundAcc: {}", oldAuthorsFoundAcc.value());
+				logger.info("report_newAuthorsFoundAcc: {}", newAuthorsFoundAcc.value());
+				logger.info("report_updatedAuthorsFoundAcc: {}", updatedAuthorsFoundAcc.value());
+				logger.info("report_errorCodeFoundAcc: {}", errorCodeAuthorsFoundAcc.value());
+				logger.info("report_errorLoadingJsonFoundAcc: {}", errorLoadingAuthorsJsonFoundAcc.value());
+				logger.info("report_errorParsingXMLFoundAcc: {}", errorParsingAuthorsXMLFoundAcc.value());
+				logger.info("report_merged_count: {}", mergedCount);
+				logger.info("report_cleaned_count: {}", cleanedDSCount);
 			});
 	}
 
 	private static String getJsonValue(JsonElement jElement, String property) {
 		if (jElement.getAsJsonObject().has(property)) {
-			JsonElement name = null;
-			name = jElement.getAsJsonObject().get(property);
+			JsonElement name = jElement.getAsJsonObject().get(property);
 			if (name != null && !name.isJsonNull()) {
 				return name.getAsString();
 			}

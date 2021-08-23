@@ -9,11 +9,11 @@ import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.StringUtils;
 
-import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
-import eu.dnetlib.dhp.collection.CollectorException;
-import eu.dnetlib.dhp.collection.HttpClientParams;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
+import eu.dnetlib.dhp.common.collection.CollectorException;
+import eu.dnetlib.dhp.common.collection.HttpClientParams;
 
 /**
  * TODO: delegate HTTP requests to the common HttpConnector2 implementation.
