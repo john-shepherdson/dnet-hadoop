@@ -51,8 +51,11 @@ public class MigrateDbEntitiesApplicationTest {
 	public void setUp() {
 		lenient()
 			.when(vocs.getTermAsQualifier(anyString(), anyString()))
-			.thenAnswer(invocation -> OafMapperUtils
-				.qualifier(invocation.getArgument(1), invocation.getArgument(1), invocation.getArgument(0), invocation.getArgument(0)));
+			.thenAnswer(
+				invocation -> OafMapperUtils
+					.qualifier(
+						invocation.getArgument(1), invocation.getArgument(1), invocation.getArgument(0),
+						invocation.getArgument(0)));
 
 		lenient().when(vocs.termExists(anyString(), anyString())).thenReturn(true);
 
@@ -235,72 +238,73 @@ public class MigrateDbEntitiesApplicationTest {
 	private List<TypedField> prepareMocks(final String jsonFile) throws IOException, SQLException {
 		final String json = IOUtils.toString(getClass().getResourceAsStream(jsonFile));
 		final ObjectMapper mapper = new ObjectMapper();
-		final List<TypedField> list = mapper.readValue(json, new TypeReference<List<TypedField>>() {});
+		final List<TypedField> list = mapper.readValue(json, new TypeReference<List<TypedField>>() {
+		});
 
 		for (final TypedField tf : list) {
 			if (tf.getValue() == null) {
 				switch (tf.getType()) {
-				case "not_used":
-					break;
-				case "boolean":
-					Mockito.when(rs.getBoolean(tf.getField())).thenReturn(false);
-					break;
-				case "date":
-					Mockito.when(rs.getDate(tf.getField())).thenReturn(null);
-					break;
-				case "int":
-					Mockito.when(rs.getInt(tf.getField())).thenReturn(0);
-					break;
-				case "double":
-					Mockito.when(rs.getDouble(tf.getField())).thenReturn(0.0);
-					break;
-				case "array":
-					Mockito.when(rs.getArray(tf.getField())).thenReturn(null);
-					break;
-				case "string":
-				default:
-					Mockito.when(rs.getString(tf.getField())).thenReturn(null);
-					break;
+					case "not_used":
+						break;
+					case "boolean":
+						Mockito.when(rs.getBoolean(tf.getField())).thenReturn(false);
+						break;
+					case "date":
+						Mockito.when(rs.getDate(tf.getField())).thenReturn(null);
+						break;
+					case "int":
+						Mockito.when(rs.getInt(tf.getField())).thenReturn(0);
+						break;
+					case "double":
+						Mockito.when(rs.getDouble(tf.getField())).thenReturn(0.0);
+						break;
+					case "array":
+						Mockito.when(rs.getArray(tf.getField())).thenReturn(null);
+						break;
+					case "string":
+					default:
+						Mockito.when(rs.getString(tf.getField())).thenReturn(null);
+						break;
 				}
 			} else {
 				switch (tf.getType()) {
-				case "not_used":
-					break;
-				case "boolean":
-					Mockito
-						.when(rs.getBoolean(tf.getField()))
-						.thenReturn(Boolean.parseBoolean(tf.getValue().toString()));
-					break;
-				case "date":
-					Mockito
-						.when(rs.getDate(tf.getField()))
-						.thenReturn(Date.valueOf(tf.getValue().toString()));
-					break;
-				case "int":
-					Mockito
-						.when(rs.getInt(tf.getField()))
-						.thenReturn(new Integer(tf.getValue().toString()));
-					break;
-				case "double":
-					Mockito
-						.when(rs.getDouble(tf.getField()))
-						.thenReturn(new Double(tf.getValue().toString()));
-					break;
-				case "array":
-					final Array arr = Mockito.mock(Array.class);
-					final String[] values = ((List<?>) tf.getValue())
-						.stream()
-						.filter(Objects::nonNull)
-						.map(o -> o.toString())
-						.toArray(String[]::new);
+					case "not_used":
+						break;
+					case "boolean":
+						Mockito
+							.when(rs.getBoolean(tf.getField()))
+							.thenReturn(Boolean.parseBoolean(tf.getValue().toString()));
+						break;
+					case "date":
+						Mockito
+							.when(rs.getDate(tf.getField()))
+							.thenReturn(Date.valueOf(tf.getValue().toString()));
+						break;
+					case "int":
+						Mockito
+							.when(rs.getInt(tf.getField()))
+							.thenReturn(new Integer(tf.getValue().toString()));
+						break;
+					case "double":
+						Mockito
+							.when(rs.getDouble(tf.getField()))
+							.thenReturn(new Double(tf.getValue().toString()));
+						break;
+					case "array":
+						final Array arr = Mockito.mock(Array.class);
+						final String[] values = ((List<?>) tf.getValue())
+							.stream()
+							.filter(Objects::nonNull)
+							.map(o -> o.toString())
+							.toArray(String[]::new);
 
-					Mockito.when(arr.getArray()).thenReturn(values);
-					Mockito.when(rs.getArray(tf.getField())).thenReturn(arr);
-					break;
-				case "string":
-				default:
-					Mockito.when(rs.getString(tf.getField())).thenReturn(tf.getValue().toString());
-					break;
+						Mockito.when(arr.getArray()).thenReturn(values);
+						Mockito.when(rs.getArray(tf.getField())).thenReturn(arr);
+						break;
+					case "string":
+					default:
+						Mockito.when(rs.getString(tf.getField())).thenReturn(tf.getValue().toString());
+						break;
 				}
 			}
 		}
@@ -312,27 +316,27 @@ public class MigrateDbEntitiesApplicationTest {
 		for (final TypedField tf : list) {
 
 			switch (tf.getType()) {
-			case "not_used":
-				break;
-			case "boolean":
-				Mockito.verify(rs, Mockito.atLeastOnce()).getBoolean(tf.getField());
-				break;
-			case "date":
-				Mockito.verify(rs, Mockito.atLeastOnce()).getDate(tf.getField());
-				break;
-			case "int":
-				Mockito.verify(rs, Mockito.atLeastOnce()).getInt(tf.getField());
-				break;
-			case "double":
-				Mockito.verify(rs, Mockito.atLeastOnce()).getDouble(tf.getField());
-				break;
-			case "array":
-				Mockito.verify(rs, Mockito.atLeastOnce()).getArray(tf.getField());
-				break;
-			case "string":
-			default:
-				Mockito.verify(rs, Mockito.atLeastOnce()).getString(tf.getField());
-				break;
+				case "not_used":
+					break;
+				case "boolean":
+					Mockito.verify(rs, Mockito.atLeastOnce()).getBoolean(tf.getField());
+					break;
+				case "date":
+					Mockito.verify(rs, Mockito.atLeastOnce()).getDate(tf.getField());
+					break;
+				case "int":
+					Mockito.verify(rs, Mockito.atLeastOnce()).getInt(tf.getField());
+					break;
+				case "double":
+					Mockito.verify(rs, Mockito.atLeastOnce()).getDouble(tf.getField());
+					break;
+				case "array":
+					Mockito.verify(rs, Mockito.atLeastOnce()).getArray(tf.getField());
+					break;
+				case "string":
+				default:
+					Mockito.verify(rs, Mockito.atLeastOnce()).getString(tf.getField());
+					break;
 			}
 		}
 	}
