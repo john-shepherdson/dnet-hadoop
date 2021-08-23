@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.oa.provision;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
-import java.util.Objects;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -33,7 +32,7 @@ import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
  *
  * The input is a JoinedEntity, i.e. a json representation of an OpenAIRE entity that embeds all the linked entities.
  */
-class IndexRecordTransformerTest {
+public class IndexRecordTransformerTest {
 
 	public static final String VERSION = "2021-04-15T10:05:53Z";
 	public static final String DSID = "b9ee796a-c49f-4473-a708-e7d67b84c16d_SW5kZXhEU1Jlc291cmNlcy9JbmRleERTUmVzb3VyY2VUeXBl";
@@ -46,23 +45,23 @@ class IndexRecordTransformerTest {
 	}
 
 	@Test
-	void testPreBuiltRecordTransformation() throws IOException, TransformerException {
-		String record = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("record.xml")));
+	public void testPreBuiltRecordTransformation() throws IOException, TransformerException {
+		final String record = IOUtils.toString(getClass().getResourceAsStream("record.xml"));
 
 		testRecordTransformation(record);
 	}
 
 	@Test
-	void testPublicationRecordTransformation() throws IOException, TransformerException {
+	public void testPublicationRecordTransformation() throws IOException, TransformerException {
 
-		XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false, XmlConverterJob.SCHEMA_LOCATION,
-			XmlRecordFactoryTest.otherDsTypeId);
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+			XmlConverterJob.schemaLocation);
 
-		Publication p = load("publication.json", Publication.class);
-		Project pj = load("project.json", Project.class);
-		Relation rel = load("relToValidatedProject.json", Relation.class);
+		final Publication p = load("publication.json", Publication.class);
+		final Project pj = load("project.json", Project.class);
+		final Relation rel = load("relToValidatedProject.json", Relation.class);
 
-		JoinedEntity<Publication> je = new JoinedEntity<>(p);
+		final JoinedEntity je = new JoinedEntity<>(p);
 		je
 			.setLinks(
 				Lists
@@ -70,25 +69,25 @@ class IndexRecordTransformerTest {
 						new RelatedEntityWrapper(rel,
 							CreateRelatedEntitiesJob_phase1.asRelatedEntity(pj, Project.class))));
 
-		String record = xmlRecordFactory.build(je);
+		final String record = xmlRecordFactory.build(je);
 
 		assertNotNull(record);
 
 		testRecordTransformation(record);
 	}
 
-	private void testRecordTransformation(String record) throws IOException, TransformerException {
-		String fields = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("fields.xml")));
-		String xslt = IOUtils
-			.toString(Objects.requireNonNull(getClass().getResourceAsStream("layoutToRecordTransformer.xsl")));
+	private void testRecordTransformation(final String record) throws IOException, TransformerException {
+		final String fields = IOUtils.toString(getClass().getResourceAsStream("fields.xml"));
+		final String xslt = IOUtils.toString(getClass().getResourceAsStream("layoutToRecordTransformer.xsl"));
 
-		String transformer = XmlIndexingJob.getLayoutTransformer("DMF", fields, xslt);
+		final String transformer = XmlIndexingJob.getLayoutTransformer("DMF", fields, xslt);
 
-		Transformer tr = SaxonTransformerFactory.newInstance(transformer);
+		final Transformer tr = SaxonTransformerFactory.newInstance(transformer);
 
-		String indexRecordXML = XmlIndexingJob.toIndexRecord(tr, record);
+		final String indexRecordXML = XmlIndexingJob.toIndexRecord(tr, record);
 
-		SolrInputDocument solrDoc = new StreamingInputDocumentFactory(VERSION, DSID).parseDocument(indexRecordXML);
+		final SolrInputDocument solrDoc = new StreamingInputDocumentFactory(VERSION, DSID)
+			.parseDocument(indexRecordXML);
 
 		final String xmlDoc = ClientUtils.toXML(solrDoc);
 
@@ -96,9 +95,9 @@ class IndexRecordTransformerTest {
 		System.out.println(xmlDoc);
 	}
 
-	private <T> T load(String fileName, Class<T> clazz) throws IOException {
+	private <T> T load(final String fileName, final Class<T> clazz) throws IOException {
 		return XmlRecordFactoryTest.OBJECT_MAPPER
-			.readValue(IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream(fileName))), clazz);
+			.readValue(IOUtils.toString(getClass().getResourceAsStream(fileName)), clazz);
 	}
 
 }

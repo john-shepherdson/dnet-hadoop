@@ -205,11 +205,6 @@
 				<artifactId>dateparser</artifactId>
 				<version>1.0.7</version>
 			</dependency>
-			<dependency>
-				<groupId>me.xuender</groupId>
-				<artifactId>unidecode</artifactId>
-				<version>0.0.7</version>
-			</dependency>
 
 			<dependency>
 				<groupId>com.google.guava</groupId>
@@ -519,16 +514,6 @@
 				<version>${common.text.version}</version>
 			</dependency>
 
-			<dependency>
-				<groupId>com.opencsv</groupId>
-				<artifactId>opencsv</artifactId>
-				<version>5.5</version>
-			</dependency>
-			<dependency>
-				<groupId>io.github.classgraph</groupId>
-				<artifactId>classgraph</artifactId>
-				<version>4.8.71</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -751,7 +736,7 @@
 		<mockito-core.version>3.3.3</mockito-core.version>
 		<mongodb.driver.version>3.4.2</mongodb.driver.version>
 		<vtd.version>[2.12,3.0)</vtd.version>
-		<dhp-schemas.version>[2.7.15]</dhp-schemas.version>
+		<dhp-schemas.version>[2.7.15-SNAPSHOT]</dhp-schemas.version>
 		<dnet-actionmanager-api.version>[4.0.3]</dnet-actionmanager-api.version>
 		<dnet-actionmanager-common.version>[6.0.5]</dnet-actionmanager-common.version>
 		<dnet-openaire-broker-common.version>[3.1.6]</dnet-openaire-broker-common.version>

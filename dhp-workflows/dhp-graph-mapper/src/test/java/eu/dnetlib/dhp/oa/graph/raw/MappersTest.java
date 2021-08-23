@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.DocumentException;
@@ -21,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
@@ -760,7 +760,6 @@ class MappersTest {
 		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
 	}
 
-
 	@Test
 	void testXMLEncodedURL() throws IOException, DocumentException {
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("encoded-url.xml")));
@@ -779,7 +778,8 @@ class MappersTest {
 
 	@Test
 	void testXMLEncodedURL_ODF() throws IOException, DocumentException {
-		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("encoded-url_odf.xml")));
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("encoded-url_odf.xml")));
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		System.out.println("***************");
@@ -788,7 +788,7 @@ class MappersTest {
 
 		final Dataset p = (Dataset) list.get(0);
 		assertTrue(p.getInstance().size() > 0);
-		for(String url : p.getInstance().get(0).getUrl()){
+		for (String url : p.getInstance().get(0).getUrl()) {
 			System.out.println(url);
 			assertTrue(!url.contains("&amp;"));
 		}
