@@ -1,9 +1,12 @@
 package eu.dnetlib.dhp.sx.graph.bio.pubmed
 
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
+import eu.dnetlib.dhp.schema.common.ModelConstants
+import eu.dnetlib.dhp.schema.oaf.utils.{CleaningFunctions, OafMapperUtils, PidType}
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Relation, Result}
 import eu.dnetlib.dhp.sx.graph.bio.BioDBToOAF.ScholixResolved
 import eu.dnetlib.dhp.sx.graph.bio.BioDBToOAF
+import eu.dnetlib.dhp.sx.graph.bio.pubmed.PubMedToOaf.dataInfo
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.parse
@@ -64,6 +67,9 @@ class BioScholixTest extends AbstractVocabularyTest{
     assertEquals(10, r.size)
     assertTrue(r.map(p => p.asInstanceOf[Result]).flatMap(p => p.getInstance().asScala.map(i => i.getInstancetype.getClassid)).exists(p => "0037".equalsIgnoreCase(p)))
     println(mapper.writeValueAsString(r.head))
+
+
+
   }
 
 
@@ -179,13 +185,6 @@ class BioScholixTest extends AbstractVocabularyTest{
     val result:List[Oaf] = l.map(s => BioDBToOAF.scholixResolvedToOAF(s))
 
     assertTrue(result.nonEmpty)
-
-
-
-
-
-
-
   }
 
 }
