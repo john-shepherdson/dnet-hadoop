@@ -168,7 +168,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	protected String trimAndDecodeUrl(String url) {
 		try {
 			return URLDecoder.decode(url.trim(), "UTF-8");
-		} catch (UnsupportedEncodingException e) {
+		} catch (Throwable t) {
 			return url;
 		}
 	}
