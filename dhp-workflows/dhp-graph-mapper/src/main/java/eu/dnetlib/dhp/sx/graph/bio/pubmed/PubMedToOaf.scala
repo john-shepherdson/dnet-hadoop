@@ -1,10 +1,10 @@
 package eu.dnetlib.dhp.sx.graph.bio.pubmed
-import java.util.regex.Pattern
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.utils.{CleaningFunctions, GraphCleaningFunctions, IdentifierFactory, OafMapperUtils, PidType}
 import eu.dnetlib.dhp.schema.oaf._
+import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactory, OafMapperUtils, PidType}
 
+import java.util.regex.Pattern
 import scala.collection.JavaConverters._
 
 object PubMedToOaf {
@@ -17,7 +17,7 @@ object PubMedToOaf {
 
   def cleanDoi(doi:String):String = {
 
-    val regex = "10.\\d{4,9}\\/[-._;()\\/:A-Z0-9]+$"
+    val regex = "^10.\\d{4,9}\\/[\\[\\]\\-\\<\\>._;()\\/:A-Z0-9]+$"
 
 
     val pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE)
