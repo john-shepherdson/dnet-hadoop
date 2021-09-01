@@ -111,7 +111,7 @@
             <case to="CreateDOIBoost">${wf:conf('resumeFrom') eq 'CreateDOIBoost'}</case>
             <case to="GenerateActionSet">${wf:conf('resumeFrom') eq 'GenerateActionSet'}</case>
             <case to="GenerateCrossrefDataset">${wf:conf('resumeFrom') eq 'GenerateCrossrefDataset'}</case>
-            <default to="ImportCrossRef"/>
+            <default to="ProcessORCID"/>
         </switch>
     </decision>
 
@@ -319,7 +319,7 @@
                 --executor-memory=${sparkExecutorIntersectionMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=7680
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}

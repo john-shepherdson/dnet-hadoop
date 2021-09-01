@@ -84,7 +84,7 @@ object ORCIDToOAF {
       JField("type", JString(typeValue)) <- extIds
       JField("value", JString(value)) <- extIds
       if "doi".equalsIgnoreCase(typeValue)
-    } yield (typeValue, value)
+    } yield (typeValue, DoiBoostMappingUtil.normalizeDoi(value))
     if (doi.nonEmpty) {
       return doi.map(l =>OrcidWork(oid, l._2))
     }
@@ -102,7 +102,7 @@ object ORCIDToOAF {
   def convertTOOAF(input:ORCIDItem) :Publication = {
     val doi = input.doi
     val pub:Publication = new Publication
-    pub.setPid(List(createSP(doi.toLowerCase, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
+    pub.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
     pub.setDataInfo(generateDataInfo())
 
     pub.setId(IdentifierFactory.createDOIBoostIdentifier(pub))

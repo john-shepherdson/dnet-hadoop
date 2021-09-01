@@ -21,6 +21,9 @@ import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
 
 public class OaiCollectorPlugin implements CollectorPlugin {
 
+	public static final String DATE_REGEX = "\\d{4}-\\d{2}-\\d{2}";
+	public static final String UTC_DATETIME_REGEX = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z";
+
 	private static final String FORMAT_PARAM = "format";
 	private static final String OAI_SET_PARAM = "set";
 	private static final Object OAI_FROM_DATE_PARAM = "fromDate";
@@ -62,13 +65,11 @@ public class OaiCollectorPlugin implements CollectorPlugin {
 			throw new CollectorException("Param 'mdFormat' is null or empty");
 		}
 
-		if (fromDate != null && !fromDate.matches("\\d{4}-\\d{2}-\\d{2}")
-			&& !fromDate.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z")) {
+		if (fromDate != null && !fromDate.matches(DATE_REGEX) && !fromDate.matches(UTC_DATETIME_REGEX)) {
 			throw new CollectorException("Invalid date (YYYY-MM-DD or YYYY-MM-DDT00:00:00Z): " + fromDate);
 		}
 
-		if (untilDate != null && !untilDate.matches("\\d{4}-\\d{2}-\\d{2}")
-			&& !untilDate.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z")) {
+		if (untilDate != null && !untilDate.matches(DATE_REGEX) && !untilDate.matches(UTC_DATETIME_REGEX)) {
 			throw new CollectorException("Invalid date (YYYY-MM-DD or YYYY-MM-DDT00:00:00Z): " + untilDate);
 		}
 

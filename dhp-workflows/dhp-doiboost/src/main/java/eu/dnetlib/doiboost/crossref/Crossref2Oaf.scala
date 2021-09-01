@@ -16,8 +16,9 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.matching.Regex
 import eu.dnetlib.dhp.schema.scholexplorer.OafUtils
-
 import java.util
+
+import eu.dnetlib.doiboost.DoiBoostMappingUtil
 
 case class CrossrefDT(doi: String, json:String, timestamp: Long) {}
 
@@ -89,7 +90,7 @@ case object Crossref2Oaf {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
     //MAPPING Crossref DOI into PID
-    val doi: String = (json \ "DOI").extract[String]
+    val doi: String = DoiBoostMappingUtil.normalizeDoi((json \ "DOI").extract[String])
     result.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
 
     //MAPPING Crossref DOI into OriginalId
@@ -100,6 +101,7 @@ case object Crossref2Oaf {
 
     val originalIds = new util.ArrayList(tmp.filter(id => id != null).asJava)
     result.setOriginalId(originalIds)
+
 
     // Add DataInfo
     result.setDataInfo(generateDataInfo())

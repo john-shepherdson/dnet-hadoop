@@ -1,6 +1,7 @@
 package eu.dnetlib.doiboost.crossref
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
+import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.crossref.CrossrefDataset.to_item
 import eu.dnetlib.doiboost.crossref.UnpackCrtossrefEntries.getClass
 import org.apache.hadoop.io.{IntWritable, Text}
@@ -27,7 +28,7 @@ object GenerateCrossrefDataset {
   def crossrefElement(meta: String): CrossrefDT = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(meta)
-    val doi:String = (json \ "DOI").extract[String]
+    val doi:String = DoiBoostMappingUtil.normalizeDoi((json \ "DOI").extract[String])
     val timestamp: Long = (json \ "indexed" \ "timestamp").extract[Long]
     CrossrefDT(doi, meta, timestamp)
 

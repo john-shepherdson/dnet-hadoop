@@ -3,6 +3,7 @@ package eu.dnetlib.doiboost.uw
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.schema.oaf.{AccessRight, Instance, OpenAccessRoute, Publication}
+import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
@@ -53,7 +54,10 @@ object UnpayWallToOAF {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(input)
 
-    val doi = (json \"doi").extract[String]
+    val doi = DoiBoostMappingUtil.normalizeDoi((json \"doi").extract[String])
+
+    if(doi == null)
+      return null
 
     val is_oa = (json\ "is_oa").extract[Boolean]
 

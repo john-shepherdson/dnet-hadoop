@@ -20,16 +20,26 @@ class UnpayWallMappingTest {
 
     val Ilist = Source.fromInputStream(getClass.getResourceAsStream("input.json")).mkString
 
-
+    var i:Int = 0
     for (line <-Ilist.lines) {
       val p = UnpayWallToOAF.convertToOAF(line)
 
       if(p!= null) {
         assertTrue(p.getInstance().size()==1)
+        if (i== 0){
+          assertTrue(p.getPid.get(0).getValue.equals("10.1038/2211089b0"))
+        }
+        if (i== 1){
+          assertTrue(p.getPid.get(0).getValue.equals("10.1021/acs.bioconjchem.8b00058.s001"))
+        }
+        if (i== 2){
+          assertTrue(p.getPid.get(0).getValue.equals("10.1021/acs.bioconjchem.8b00086.s001"))
+        }
         logger.info(s"ID : ${p.getId}")
       }
       assertNotNull(line)
       assertTrue(line.nonEmpty)
+       i = i+1
     }
 
 
@@ -39,7 +49,9 @@ class UnpayWallMappingTest {
     val item = UnpayWallToOAF.convertToOAF(l)
 
     assertEquals(item.getInstance().get(0).getAccessright.getOpenAccessRoute, OpenAccessRoute.bronze)
+
     logger.info(mapper.writeValueAsString(item))
+
   }
 
 }

@@ -38,6 +38,9 @@ object DoiBoostMappingUtil {
   val OPENAIRE_PREFIX = "openaire____"
   val SEPARATOR = "::"
 
+  val DOI_PREFIX_REGEX = "(^10\\.|\\/10.)"
+  val DOI_PREFIX = "10."
+
   val invalidName = List(",", "none none", "none, none", "none &na;", "(:null)", "test test test", "test test", "test", "&na; &na;")
 
   def toActionSet(item:Oaf) :(String, String) = {
@@ -351,6 +354,29 @@ object DoiBoostMappingUtil {
 
 
   }
+
+  def isEmpty(x: String) = x == null || x.trim.isEmpty
+
+  def normalizeDoi(input : String) :String ={
+    if(input == null)
+      return null
+    val replaced = input.replaceAll("(?:\\n|\\r|\\t|\\s)", "").toLowerCase.replaceFirst(DOI_PREFIX_REGEX, DOI_PREFIX)
+    if  (isEmpty(replaced))
+      return null
+
+    if(replaced.indexOf("10.") < 0)
+      return null
+
+    val ret = replaced.substring(replaced.indexOf("10."))
+
+    if (!ret.startsWith(DOI_PREFIX))
+      return null
+
+    return ret
+
+
+  }
+
 
 
 }
