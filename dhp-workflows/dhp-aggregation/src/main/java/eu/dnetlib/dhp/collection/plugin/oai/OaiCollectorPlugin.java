@@ -62,12 +62,14 @@ public class OaiCollectorPlugin implements CollectorPlugin {
 			throw new CollectorException("Param 'mdFormat' is null or empty");
 		}
 
-		if (fromDate != null && !fromDate.matches("\\d{4}-\\d{2}-\\d{2}") && !fromDate.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z")) {
-			throw new CollectorException("Invalid date (YYYY-MM-DD): " + fromDate);
+		if (fromDate != null && !fromDate.matches("\\d{4}-\\d{2}-\\d{2}")
+			&& !fromDate.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z")) {
+			throw new CollectorException("Invalid date (YYYY-MM-DD or YYYY-MM-DDT00:00:00Z): " + fromDate);
 		}
 
-		if (untilDate != null && !untilDate.matches("\\d{4}-\\d{2}-\\d{2}") && !untilDate.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z")) {
-			throw new CollectorException("Invalid date (YYYY-MM-DD): " + untilDate);
+		if (untilDate != null && !untilDate.matches("\\d{4}-\\d{2}-\\d{2}")
+			&& !untilDate.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z")) {
+			throw new CollectorException("Invalid date (YYYY-MM-DD or YYYY-MM-DDT00:00:00Z): " + untilDate);
 		}
 
 		final Iterator<Iterator<String>> iters = sets
