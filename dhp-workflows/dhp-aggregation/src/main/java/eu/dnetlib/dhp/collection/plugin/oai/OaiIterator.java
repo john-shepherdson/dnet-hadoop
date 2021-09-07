@@ -161,7 +161,7 @@ public class OaiIterator implements Iterator<String> {
 			report.put(e.getClass().getName(), e.getMessage());
 			final String cleaned = XmlCleaner.cleanAllEntities(xml);
 			try {
-				doc = DocumentHelper.parseText(xml);
+				doc = DocumentHelper.parseText(cleaned);
 			} catch (final DocumentException e1) {
 				final String resumptionToken = extractResumptionToken(xml);
 				if (resumptionToken == null) {
