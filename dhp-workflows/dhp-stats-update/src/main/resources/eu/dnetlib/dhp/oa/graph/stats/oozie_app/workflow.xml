@@ -239,6 +239,17 @@
 			<param>stats_db_name=${stats_db_name}</param>
 			<param>openaire_db_name=${openaire_db_name}</param>
         </hive2>
+        <ok to="Step15_5"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step15_5">
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
+            <jdbc-url>${hive_jdbc_url}</jdbc-url>
+            <script>scripts/step15_5.sql</script>
+            <param>stats_db_name=${stats_db_name}</param>
+            <param>openaire_db_name=${openaire_db_name}</param>
+        </hive2>
         <ok to="Step16-createIndicatorsTables"/>
         <error to="Kill"/>
     </action>
@@ -271,17 +282,6 @@
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
             <script>scripts/step16_5.sql</script>
-            <param>stats_db_name=${stats_db_name}</param>
-            <param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step16_6"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step16_6">
-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hive_jdbc_url}</jdbc-url>
-            <script>scripts/step16_6.sql</script>
             <param>stats_db_name=${stats_db_name}</param>
             <param>openaire_db_name=${openaire_db_name}</param>
         </hive2>
