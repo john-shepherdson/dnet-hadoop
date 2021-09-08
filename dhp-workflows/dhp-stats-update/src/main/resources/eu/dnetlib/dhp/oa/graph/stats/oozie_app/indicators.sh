@@ -15,5 +15,5 @@ hdfs dfs -copyToLocal $SCRIPT_PATH
 echo "Creating indicators"
 impala-shell -q "invalidate metadata"
 impala-shell -d ${TARGET} -q "show tables" --delimited | sed "s/^\(.*\)/compute stats ${TARGET}.\1;/" | impala-shell -c -f -
-cat step16_7-createIndicatorsTables.sql | impala-shell -d $TARGET -f -
+cat step16-createIndicatorsTables.sql | impala-shell -d $TARGET -f -
 echo "Indicators created"
