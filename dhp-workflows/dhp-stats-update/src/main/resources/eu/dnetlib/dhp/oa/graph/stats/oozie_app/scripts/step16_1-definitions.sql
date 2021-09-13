@@ -5,7 +5,7 @@
 -- Peer reviewed:
 create table ${stats_db_name}.result_peerreviewed as
 select r.id as id, case when doi.doi_from_crossref=1 and grey.grey_lit=0 then true else false end as peer_reviewed
-from result r
+from ${stats_db_name}.result r
 left outer join ${stats_db_name}.indi_pub_doi_from_crossref doi on doi.id=r.id
 left outer join ${stats_db_name}.indi_pub_grey_lit grey on grey.id=r.id;
 
