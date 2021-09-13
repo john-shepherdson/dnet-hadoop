@@ -250,6 +250,19 @@
             <param>stats_db_name=${stats_db_name}</param>
             <param>openaire_db_name=${openaire_db_name}</param>
         </hive2>
+        <ok to="Contexts"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Contexts">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>contexts.sh</exec>
+            <argument>${context_api_url}</argument>
+            <argument>${stats_db_name}</argument>
+            <file>contexts.sh</file>
+        </shell>
         <ok to="Step16-createIndicatorsTables"/>
         <error to="Kill"/>
     </action>
@@ -285,19 +298,6 @@
             <param>stats_db_name=${stats_db_name}</param>
             <param>openaire_db_name=${openaire_db_name}</param>
         </hive2>
-        <ok to="Step18-contexts"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step18-contexts">
-        <shell xmlns="uri:oozie:shell-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <exec>contexts.sh</exec>
-            <argument>${context_api_url}</argument>
-            <argument>${stats_db_name}</argument>
-            <file>contexts.sh</file>
-        </shell>
         <ok to="Step19-finalize"/>
         <error to="Kill"/>
     </action>
