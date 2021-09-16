@@ -1,7 +1,7 @@
 create table TARGET.result_affiliated_country stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa,
-  r.peer_reviewed, rln.count > 0 as cc_licence, r.abstract as abstract, r.type, c.code as ccode, c.name as cname
+  r.peer_reviewed, coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, c.code as ccode, c.name as cname
 from SOURCE.result r
 join SOURCE.result_organization ro on ro.id=r.id
 join SOURCE.organization o on o.id=ro.organization
@@ -19,7 +19,7 @@ group by r.green, r.gold, licence, pid, oa, r.peer_reviewed, r.type, cc_licence,
 create table TARGET.result_affiliated_year stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa, r.peer_reviewed,
-       rln.count > 0 as cc_licence, r.abstract as abstract, r.type, r.year
+       coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, r.year
 from SOURCE.result r
 join SOURCE.result_organization ro on ro.id=r.id
 join SOURCE.organization o on o.id=ro.organization
@@ -37,7 +37,7 @@ group by r.green, r.gold, licence, pid, oa, r.peer_reviewed, r.type, cc_licence,
 create table TARGET.result_affiliated_year_country stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa,
-  r.peer_reviewed, rln.count > 0 as cc_licence, r.abstract as abstract, r.type, r.year, c.code as ccode, c.name as cname
+  r.peer_reviewed, coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, r.year, c.code as ccode, c.name as cname
 from SOURCE.result r
 join SOURCE.result_organization ro on ro.id=r.id
 join SOURCE.organization o on o.id=ro.organization
@@ -55,7 +55,7 @@ group by r.green, r.gold, licence, pid, oa, r.peer_reviewed, r.type, cc_licence,
 create table TARGET.result_affiliated_datasource stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa, r.peer_reviewed,
-       rln.count > 0 as cc_licence, r.abstract as abstract, r.type, d.name as dname
+       coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, d.name as dname
 from SOURCE.result r
 join SOURCE.result_organization ro on ro.id=r.id
 join SOURCE.organization o on o.id=ro.organization
@@ -75,7 +75,7 @@ group by r.green, r.gold, licence, pid, oa, r.peer_reviewed, r.type, cc_licence,
 create table TARGET.result_affiliated_datasource_country stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa,
-  r.peer_reviewed, rln.count > 0 as cc_licence, r.abstract as abstract, r.type, d.name as dname, c.code as ccode, c.name as cname
+  r.peer_reviewed, coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, d.name as dname, c.code as ccode, c.name as cname
 from SOURCE.result r
 join SOURCE.result_organization ro on ro.id=r.id
 join SOURCE.organization o on o.id=ro.organization
@@ -95,7 +95,7 @@ group by r.green, r.gold, licence, pid, oa, r.peer_reviewed, r.type, cc_licence,
 create table TARGET.result_affiliated_organization stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa,
-  r.peer_reviewed, rln.count > 0 as cc_licence, r.abstract as abstract, r.type, o.name as oname
+  r.peer_reviewed, coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, o.name as oname
 from SOURCE.result r
 join SOURCE.result_organization ro on ro.id=r.id
 join SOURCE.organization o on o.id=ro.organization
@@ -113,7 +113,7 @@ group by r.green, r.gold, licence, pid, oa, r.peer_reviewed, r.type, cc_licence,
 create table TARGET.result_affiliated_organization_country stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa,
-  r.peer_reviewed, rln.count > 0 as cc_licence, r.abstract as abstract, r.type, o.name as oname, c.code as ccode, c.name as cname
+  r.peer_reviewed, coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, o.name as oname, c.code as ccode, c.name as cname
 from SOURCE.result r
 join SOURCE.result_organization ro on ro.id=r.id
 join SOURCE.organization o on o.id=ro.organization
@@ -131,7 +131,7 @@ group by r.green, r.gold, licence, pid, oa, r.peer_reviewed, r.type, cc_licence,
 create table TARGET.result_affiliated_funder stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa, r.peer_reviewed,
-       rln.count > 0 as cc_licence, r.abstract as abstract, r.type, p.funder as pfunder
+       coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, p.funder as pfunder
 from SOURCE.result r
 join SOURCE.result_organization ro on ro.id=r.id
 join SOURCE.organization o on o.id=ro.organization
@@ -151,7 +151,7 @@ group by r.green, r.gold, licence, pid, oa, r.peer_reviewed, r.type, cc_licence,
 create table TARGET.result_affiliated_funder_country stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa,
-  r.peer_reviewed, rln.count > 0 as cc_licence, r.abstract as abstract, r.type, p.funder as pfunder, c.code as ccode, c.name as cname
+  r.peer_reviewed, coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, p.funder as pfunder, c.code as ccode, c.name as cname
 from SOURCE.result r
 join SOURCE.result_organization ro on ro.id=r.id
 join SOURCE.organization o on o.id=ro.organization
@@ -171,7 +171,7 @@ group by r.green, r.gold, licence, pid, oa, r.peer_reviewed, r.type, cc_licence,
 create table TARGET.result_deposited_country stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa,
-  r.peer_reviewed, rln.count > 0 as cc_licence, r.abstract as abstract, r.type, c.code as ccode, c.name as cname
+  r.peer_reviewed, coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, c.code as ccode, c.name as cname
 from SOURCE.result r
 join SOURCE.result_datasources rd on rd.id=r.id
 join SOURCE.datasource d on d.id=rd.datasource and d.type in ('Institutional Repository','Data Repository', 'Repository', 'Publication Repository')
@@ -191,7 +191,7 @@ group by r.green, r.gold, licence, pid, oa, r.peer_reviewed, r.type, cc_licence,
 create table TARGET.result_deposited_year stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa, r.peer_reviewed,
-       rln.count > 0 as cc_licence, r.abstract as abstract, r.type, r.year
+       coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, r.year
 from SOURCE.result r
 join SOURCE.result_datasources rd on rd.id=r.id
 join SOURCE.datasource d on d.id=rd.datasource and d.type in ('Institutional Repository','Data Repository', 'Repository', 'Publication Repository')
@@ -211,7 +211,7 @@ group by r.green, r.gold, licence, pid, oa, r.peer_reviewed, r.type, cc_licence,
 create table TARGET.result_deposited_year_country stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa,
-  r.peer_reviewed, rln.count > 0 as cc_licence, r.abstract as abstract, r.type, r.year, c.code as ccode, c.name as cname
+  r.peer_reviewed, coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, r.year, c.code as ccode, c.name as cname
 from SOURCE.result r
 join SOURCE.result_datasources rd on rd.id=r.id
 join SOURCE.datasource d on d.id=rd.datasource and d.type in ('Institutional Repository','Data Repository', 'Repository', 'Publication Repository')
@@ -231,7 +231,7 @@ group by r.green, r.gold, licence, pid, oa, r.peer_reviewed, r.type, cc_licence,
 create table TARGET.result_deposited_datasource stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa,
-  r.peer_reviewed, rln.count > 0 as cc_licence, r.abstract as abstract, r.type, d.name as dname
+  r.peer_reviewed, coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, d.name as dname
 from SOURCE.result r
 join SOURCE.result_datasources rd on rd.id=r.id
 join SOURCE.datasource d on d.id=rd.datasource and d.type in ('Institutional Repository','Data Repository', 'Repository', 'Publication Repository')
@@ -251,7 +251,7 @@ group by r.green, r.gold, licence, pid, oa, r.peer_reviewed, r.type, cc_licence,
 create table TARGET.result_deposited_datasource_country stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa,
-  r.peer_reviewed, rln.count > 0 as cc_licence, r.abstract as abstract, r.type, d.name as dname, c.code as ccode, c.name as cname
+  r.peer_reviewed, coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, d.name as dname, c.code as ccode, c.name as cname
 from SOURCE.result r
 join SOURCE.result_datasources rd on rd.id=r.id
 join SOURCE.datasource d on d.id=rd.datasource and d.type in ('Institutional Repository','Data Repository', 'Repository', 'Publication Repository')
@@ -271,7 +271,7 @@ group by r.green, r.gold, licence, pid, oa, r.peer_reviewed, r.type, cc_licence,
 create table TARGET.result_deposited_organization stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa, r.peer_reviewed,
-       rln.count > 0 as cc_licence, r.abstract as abstract, r.type, o.name as oname
+       coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, o.name as oname
 from SOURCE.result r
 join SOURCE.result_datasources rd on rd.id=r.id
 join SOURCE.datasource d on d.id=rd.datasource and d.type in ('Institutional Repository','Data Repository', 'Repository', 'Publication Repository')
@@ -291,7 +291,7 @@ group by r.green, r.gold, licence, pid, oa, r.peer_reviewed, r.type, cc_licence,
 create table TARGET.result_deposited_organization_country stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa,
-  r.peer_reviewed, rln.count > 0 as cc_licence, r.abstract as abstract, r.type, o.name as oname, c.code as ccode, c.name as cname
+  r.peer_reviewed, coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, o.name as oname, c.code as ccode, c.name as cname
 from SOURCE.result r
 join SOURCE.result_datasources rd on rd.id=r.id
 join SOURCE.datasource d on d.id=rd.datasource and d.type in ('Institutional Repository','Data Repository', 'Repository', 'Publication Repository')
@@ -311,7 +311,7 @@ group by r.green, r.gold, licence, pid, oa, r.peer_reviewed, r.type, cc_licence,
 create table TARGET.result_deposited_funder stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa,
-  r.peer_reviewed, rln.count > 0 as cc_licence, r.abstract as abstract, r.type, p.funder as pfunder
+  r.peer_reviewed, coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, p.funder as pfunder
 from SOURCE.result r
 join SOURCE.result_datasources rd on rd.id=r.id
 join SOURCE.datasource d on d.id=rd.datasource and d.type in ('Institutional Repository','Data Repository', 'Repository', 'Publication Repository')
@@ -333,7 +333,7 @@ group by r.green, r.gold, licence, pid, oa, r.peer_reviewed, r.type, cc_licence,
 create table TARGET.result_deposited_funder_country stored as parquet as
 select count(distinct r.id) as total, r.green, r.gold, case when rl.type is not null then true else false end as licence,
   case when pids.pid is not null then true else false end as pid, case when r.access_mode in ('Open Access', 'Open Source') then true else false end as oa,
-  r.peer_reviewed, rln.count > 0 as cc_licence, r.abstract as abstract, r.type, p.funder as pfunder, c.code as ccode, c.name as cname
+  r.peer_reviewed, coalesce(rln.count, 0) > 0 as cc_licence, r.abstract as abstract, r.type, p.funder as pfunder, c.code as ccode, c.name as cname
 from SOURCE.result r
 join SOURCE.result_datasources rd on rd.id=r.id
 join SOURCE.datasource d on d.id=rd.datasource and d.type in ('Institutional Repository','Data Repository', 'Repository', 'Publication Repository')
