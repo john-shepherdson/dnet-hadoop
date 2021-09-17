@@ -18,7 +18,9 @@ echo "Creating observatory database"
 impala-shell -q "drop database if exists ${TARGET} cascade"
 impala-shell -q "create database if not exists ${TARGET}"
 impala-shell -d ${SOURCE} -q "show tables" --delimited | sed "s/\(.*\)/create view ${TARGET}.\1 as select * from ${SOURCE}.\1;/" | impala-shell -f -
-cat step21-createObservatoryDB.sql | sed s/SOURCE/$1/g | sed s/TARGET/$2/g1 | impala-shell -f -
+cat step21-createObservatoryDB.sql | sed s/SOURCE/$1/g | sed s/TARGET/$2/g1 | hive -f -
+impala-shell -q "invalidate metadata;"
+impala-shell -d ${TARGET} -q "show tables" --delimited | sed "s/\(.*\)/compute stats ${TARGET}.\1;/" | impala-shell -f -
 echo "Impala shell finished"
 
 echo "Updating shadow observatory database"
