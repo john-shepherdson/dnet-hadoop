@@ -1232,3 +1232,13 @@ dnet:review_levels @=@ 0001 @=@ 印刷物/電子媒体-紀要論文（査読有�
 dnet:review_levels @=@ 0001 @=@ 印刷物/電子媒体-雑誌記事（査読有り）
 dnet:review_levels @=@ 0001 @=@ 原著論文（査読有り）
 dnet:review_levels @=@ 0001 @=@ 査読論文
+dnet:relation_relClass @=@ Cites @=@ cites
+dnet:relation_relClass @=@ IsCitedBy @=@ isCitedBy
+dnet:relation_relClass @=@ HasPart @=@ hasPart
+dnet:relation_relClass @=@ IsPartOf @=@ isPartOf
+dnet:relation_relClass @=@ IsReviewedBy @=@ isReviewedBy
+dnet:relation_relClass @=@ Reviews @=@ reviews
+dnet:relation_relClass @=@ IsSupplementTo @=@ isSupplementTo
+dnet:relation_relClass @=@ IsSupplementedBy @=@ isSupplementedBy
+dnet:relation_relClass @=@ IsRelatedTo @=@ isRelatedTo
+dnet:relation_subRelType @=@ relationship @=@ publicationDataset
