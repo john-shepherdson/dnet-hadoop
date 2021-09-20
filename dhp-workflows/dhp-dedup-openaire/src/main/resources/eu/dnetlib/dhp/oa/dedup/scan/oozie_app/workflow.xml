@@ -21,6 +21,10 @@
             <description>path for the working directory</description>
         </property>
         <property>
+            <name>whiteListPath</name>
+            <description>path for the whitelist of similarity relations</description>
+        </property>
+        <property>
             <name>dedupGraphPath</name>
             <description>path for the output graph</description>
         </property>
@@ -128,6 +132,34 @@
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--actionSetId</arg><arg>${actionSetId}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--numPartitions</arg><arg>8000</arg>
+        </spark>
+        <ok to="WhitelistSimRels"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="WhitelistSimRels">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Add Whitelist Similarity Relations</name>
+            <class>eu.dnetlib.dhp.oa.dedup.SparkWhitelistSimRels</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--actionSetId</arg><arg>${actionSetId}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--whiteListPath</arg><arg>${whiteListPath}</arg>
             <arg>--numPartitions</arg><arg>8000</arg>
         </spark>
         <ok to="CreateMergeRel"/>
