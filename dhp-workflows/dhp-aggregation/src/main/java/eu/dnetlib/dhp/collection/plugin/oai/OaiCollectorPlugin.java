@@ -66,11 +66,11 @@ public class OaiCollectorPlugin implements CollectorPlugin {
 		}
 
 		if (fromDate != null && !fromDate.matches(DATE_REGEX) && !fromDate.matches(UTC_DATETIME_REGEX)) {
-			throw new CollectorException("Invalid date (YYYY-MM-DD): " + fromDate);
+			throw new CollectorException("Invalid date (YYYY-MM-DD or YYYY-MM-DDT00:00:00Z): " + fromDate);
 		}
 
 		if (untilDate != null && !untilDate.matches(DATE_REGEX) && !untilDate.matches(UTC_DATETIME_REGEX)) {
-			throw new CollectorException("Invalid date (YYYY-MM-DD): " + untilDate);
+			throw new CollectorException("Invalid date (YYYY-MM-DD or YYYY-MM-DDT00:00:00Z): " + untilDate);
 		}
 
 		final Iterator<Iterator<String>> iters = sets

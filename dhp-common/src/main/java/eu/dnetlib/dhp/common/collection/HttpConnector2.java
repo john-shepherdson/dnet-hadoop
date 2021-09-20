@@ -15,12 +15,13 @@ import org.apache.http.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.dnetlib.dhp.common.Constants;
 import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 
 /**
  * Migrated from https://svn.driver.research-infrastructures.eu/driver/dnet45/modules/dnet-modular-collector-service/trunk/src/main/java/eu/dnetlib/data/collector/plugins/HttpConnector.java
  *
- * @author jochen, michele, andrea, alessia, claudio
+ * @author jochen, michele, andrea, alessia, claudio, andreas
  */
 public class HttpConnector2 {
 
@@ -112,6 +113,17 @@ public class HttpConnector2 {
 			}
 
 			int retryAfter = obtainRetryAfter(urlConn.getHeaderFields());
+			String rateLimit = urlConn.getHeaderField(Constants.HTTPHEADER_IETF_DRAFT_RATELIMIT_LIMIT);
+			String rateRemaining = urlConn.getHeaderField(Constants.HTTPHEADER_IETF_DRAFT_RATELIMIT_REMAINING);
+
+			if ((rateLimit != null) && (rateRemaining != null) && (Integer.parseInt(rateRemaining) < 2)) {
+				if (retryAfter > 0) {
+					backoffAndSleep(retryAfter);
+				} else {
+					backoffAndSleep(1000);
+				}
+			}
+
 			if (is2xx(urlConn.getResponseCode())) {
 				input = urlConn.getInputStream();
 				responseType = urlConn.getContentType();
