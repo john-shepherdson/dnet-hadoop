@@ -30,7 +30,7 @@ from ${stats_db_name}.result r
          join ${stats_db_name}.country c on c.code=o.country and c.continent_name='Europe'
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
@@ -59,7 +59,7 @@ from ${stats_db_name}.result r
          join ${stats_db_name}.country c on c.code=o.country and c.continent_name='Europe'
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
@@ -88,7 +88,7 @@ from ${stats_db_name}.result r
          join ${stats_db_name}.country c on c.code=o.country and c.continent_name='Europe'
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
@@ -119,7 +119,7 @@ from ${stats_db_name}.result r
          left outer join ${stats_db_name}.datasource d on d.id=rd.datasource
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
@@ -150,7 +150,7 @@ from ${stats_db_name}.result r
          left outer join ${stats_db_name}.datasource d on d.id=rd.datasource
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
@@ -179,7 +179,7 @@ from ${stats_db_name}.result r
          join ${stats_db_name}.country c on c.code=o.country and c.continent_name='Europe'
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
@@ -208,7 +208,7 @@ from ${stats_db_name}.result r
          join ${stats_db_name}.country c on c.code=o.country and c.continent_name='Europe'
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
@@ -239,7 +239,7 @@ from ${stats_db_name}.result r
          join ${stats_db_name}.project p on p.id=rp.project
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
@@ -270,7 +270,7 @@ from ${stats_db_name}.result r
          join ${stats_db_name}.project p on p.id=rp.project
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
@@ -301,7 +301,7 @@ from ${stats_db_name}.result r
          join ${stats_db_name}.country c on c.code=o.country and c.continent_name='Europe'
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
@@ -332,7 +332,7 @@ from ${stats_db_name}.result r
          join ${stats_db_name}.country c on c.code=o.country and c.continent_name='Europe'
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
@@ -363,7 +363,7 @@ from ${stats_db_name}.result r
          join ${stats_db_name}.country c on c.code=o.country and c.continent_name='Europe'
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
@@ -394,7 +394,7 @@ from ${stats_db_name}.result r
          join ${stats_db_name}.country c on c.code=o.country and c.continent_name='Europe'
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
@@ -425,7 +425,7 @@ from ${stats_db_name}.result r
          join ${stats_db_name}.country c on c.code=o.country and c.continent_name='Europe'
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
@@ -456,7 +456,7 @@ from ${stats_db_name}.result r
          join ${stats_db_name}.country c on c.code=o.country and c.continent_name='Europe'
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
@@ -487,7 +487,7 @@ from ${stats_db_name}.result r
          join ${stats_db_name}.country c on c.code=o.country and c.continent_name='Europe'
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
@@ -520,7 +520,7 @@ from ${stats_db_name}.result r
          join ${stats_db_name}.project p on p.id=rp.project
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
@@ -553,7 +553,7 @@ from ${stats_db_name}.result r
          join ${stats_db_name}.project p on p.id=rp.project
          left outer join ${stats_db_name}.result_licenses rl on rl.id=r.id
          left outer join ${stats_db_name}.result_pids pids on pids.id=r.id
-         left outer join ${stats_db_name}.result_cc_licence rln on rln.id=r.id
+         left outer join ${observatory_db_name}.result_cc_licence rln on rln.id=r.id
          left outer join ${stats_db_name}.result_projectcount rpc on rpc.id=r.id
          left outer join ${stats_db_name}.result_fundercount rfc on rfc.id=r.id
 group by r.green, r.gold, case when rl.type is not null then true else false end, case when pids.pid is not null then true else false end,
