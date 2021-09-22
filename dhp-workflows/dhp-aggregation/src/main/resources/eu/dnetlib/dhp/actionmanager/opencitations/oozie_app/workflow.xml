@@ -1,0 +1,64 @@
+<workflow-app name="OpenCitations Integration" xmlns="uri:oozie:workflow:0.5">
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+
+        </configuration>
+    </global>
+
+
+
+    <start to="download"/>
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <action name="download">
+        <shell xmlns="uri:oozie:shell-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <exec>download.sh</exec>
+            <argument>${url}</argument>
+            <argument>${crossrefDumpPath}</argument>
+            <argument>${crossrefdumpfilename}</argument>
+            <argument>${crossrefdumptoken}</argument>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>download.sh</file>
+            <capture-output/>
+        </shell>
+        <ok to="ImportCrossRef"/>
+        <error to="Kill"/>
+    </action>
+    <action name="extract">
+        <java>
+            <main-class>eu.dnetlib.dhp.actionmanager.opencitations.GetOpenCitationsRefs</main-class>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--inputFile</arg><arg>${inputFile}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/OpenCitations</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <end name="End"/>
+</workflow-app>
