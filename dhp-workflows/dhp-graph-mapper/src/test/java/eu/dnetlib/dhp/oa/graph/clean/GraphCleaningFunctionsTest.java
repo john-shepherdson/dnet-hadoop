@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -16,12 +17,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -29,7 +30,8 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 @ExtendWith(MockitoExtension.class)
 public class GraphCleaningFunctionsTest {
 
-	public static final ObjectMapper MAPPER = new ObjectMapper();
+	public static final ObjectMapper MAPPER = new ObjectMapper()
+		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	@Mock
 	private ISLookUpService isLookUpService;
@@ -47,6 +49,23 @@ public class GraphCleaningFunctionsTest {
 
 		vocabularies = VocabularyGroup.loadVocsFromIS(isLookUpService);
 		mapping = CleaningRuleMap.create(vocabularies);
+	}
+
+	@Test
+	void testCleanRelations() throws Exception {
+
+		List<String> lines = IOUtils
+			.readLines(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/relation.json"));
+		for (String json : lines) {
+			Relation r_in = MAPPER.readValue(json, Relation.class);
+			assertNotNull(r_in);
+
+			assertFalse(vocabularies.getTerms(ModelConstants.DNET_RELATION_RELCLASS).contains(r_in.getRelClass()));
+
+			Relation r_out = OafCleaner.apply(r_in, mapping);
+			assertTrue(vocabularies.getTerms(ModelConstants.DNET_RELATION_RELCLASS).contains(r_out.getRelClass()));
+			assertTrue(vocabularies.getTerms(ModelConstants.DNET_RELATION_SUBRELTYPE).contains(r_out.getSubRelType()));
+		}
 	}
 
 	@Test
@@ -87,7 +106,7 @@ public class GraphCleaningFunctionsTest {
 			p_out
 				.getPid()
 				.stream()
-				.map(p -> p.getQualifier())
+				.map(StructuredProperty::getQualifier)
 				.allMatch(q -> pidTerms.contains(q.getClassid())));
 
 		List<Instance> poi = p_out.getInstance();
@@ -101,8 +120,8 @@ public class GraphCleaningFunctionsTest {
 		assertEquals(2, poii.getPid().size());
 
 		assertTrue(
-			poii.getPid().stream().filter(s -> s.getValue().equals("10.1007/s109090161569x")).findFirst().isPresent());
-		assertTrue(poii.getPid().stream().filter(s -> s.getValue().equals("10.1008/abcd")).findFirst().isPresent());
+			poii.getPid().stream().anyMatch(s -> s.getValue().equals("10.1007/s109090161569x")));
+		assertTrue(poii.getPid().stream().anyMatch(s -> s.getValue().equals("10.1008/abcd")));
 
 		assertNotNull(poii.getAlternateIdentifier());
 		assertEquals(2, poii.getAlternateIdentifier().size());
@@ -111,16 +130,12 @@ public class GraphCleaningFunctionsTest {
 			poii
 				.getAlternateIdentifier()
 				.stream()
-				.filter(s -> s.getValue().equals("10.1007/s109090161569x"))
-				.findFirst()
-				.isPresent());
+				.anyMatch(s -> s.getValue().equals("10.1007/s109090161569x")));
 		assertTrue(
 			poii
 				.getAlternateIdentifier()
 				.stream()
-				.filter(s -> s.getValue().equals("10.1009/qwerty"))
-				.findFirst()
-				.isPresent());
+				.anyMatch(s -> s.getValue().equals("10.1009/qwerty")));
 
 		Publication p_cleaned = GraphCleaningFunctions.cleanup(p_out);
 
@@ -142,8 +157,8 @@ public class GraphCleaningFunctionsTest {
 		assertEquals(2, pcii.getPid().size());
 
 		assertTrue(
-			pcii.getPid().stream().filter(s -> s.getValue().equals("10.1007/s109090161569x")).findFirst().isPresent());
-		assertTrue(pcii.getPid().stream().filter(s -> s.getValue().equals("10.1008/abcd")).findFirst().isPresent());
+			pcii.getPid().stream().anyMatch(s -> s.getValue().equals("10.1007/s109090161569x")));
+		assertTrue(pcii.getPid().stream().anyMatch(s -> s.getValue().equals("10.1008/abcd")));
 
 		assertNotNull(pcii.getAlternateIdentifier());
 		assertEquals(1, pcii.getAlternateIdentifier().size());
@@ -151,9 +166,7 @@ public class GraphCleaningFunctionsTest {
 			pcii
 				.getAlternateIdentifier()
 				.stream()
-				.filter(s -> s.getValue().equals("10.1009/qwerty"))
-				.findFirst()
-				.isPresent());
+				.anyMatch(s -> s.getValue().equals("10.1009/qwerty")));
 
 		getAuthorPids(p_cleaned).forEach(pid -> {
 			System.out
@@ -172,17 +185,17 @@ public class GraphCleaningFunctionsTest {
 		return pub
 			.getAuthor()
 			.stream()
-			.map(a -> a.getPid())
-			.flatMap(p -> p.stream())
-			.map(s -> s.getQualifier());
+			.map(Author::getPid)
+			.flatMap(Collection::stream)
+			.map(StructuredProperty::getQualifier);
 	}
 
 	private Stream<StructuredProperty> getAuthorPids(Result pub) {
 		return pub
 			.getAuthor()
 			.stream()
-			.map(a -> a.getPid())
-			.flatMap(p -> p.stream());
+			.map(Author::getPid)
+			.flatMap(Collection::stream);
 	}
 
 	private List<String> vocs() throws IOException {
