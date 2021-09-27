@@ -36,8 +36,8 @@ public class GetOpenCitationsRefs implements Serializable {
 
 		parser.parseArgument(args);
 
-		final String inputFile = parser.get("inputFile");
-		log.info("inputFile {}", inputFile);
+		final String[] inputFile = parser.get("inputFile").split(";");
+		log.info("inputFile {}", inputFile.toString());
 
 		final String workingPath = parser.get("workingPath");
 		log.info("workingPath {}", workingPath);
@@ -45,14 +45,17 @@ public class GetOpenCitationsRefs implements Serializable {
 		final String hdfsNameNode = parser.get("hdfsNameNode");
 		log.info("hdfsNameNode {}", hdfsNameNode);
 
-
-
 		Configuration conf = new Configuration();
 		conf.set("fs.defaultFS", hdfsNameNode);
 
 		FileSystem fileSystem = FileSystem.get(conf);
 
-		new GetOpenCitationsRefs().doExtract(inputFile, workingPath, fileSystem);
+		GetOpenCitationsRefs ocr = new GetOpenCitationsRefs();
+
+		for (String file : inputFile) {
+			ocr.doExtract(workingPath + "/Original/" + file, workingPath, fileSystem);
+		}
+
 	}
 
 	private void doExtract(String inputFile, String workingPath, FileSystem fileSystem)

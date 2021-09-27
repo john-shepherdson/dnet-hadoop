@@ -10,6 +10,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opencsv.bean.CsvToBeanBuilder;
 
 public class GetCSV {
 
