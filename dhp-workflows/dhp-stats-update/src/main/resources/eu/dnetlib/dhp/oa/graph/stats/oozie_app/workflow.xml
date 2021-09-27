@@ -239,14 +239,51 @@
 			<param>stats_db_name=${stats_db_name}</param>
 			<param>openaire_db_name=${openaire_db_name}</param>
         </hive2>
-        <ok to="Step16"/>
+        <ok to="Step15_5"/>
         <error to="Kill"/>
     </action>
 
-    <action name="Step16">
+    <action name="Step15_5">
         <hive2 xmlns="uri:oozie:hive2-action:0.1">
             <jdbc-url>${hive_jdbc_url}</jdbc-url>
-            <script>scripts/step16.sql</script>
+            <script>scripts/step15_5.sql</script>
+            <param>stats_db_name=${stats_db_name}</param>
+            <param>openaire_db_name=${openaire_db_name}</param>
+        </hive2>
+        <ok to="Contexts"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Contexts">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>contexts.sh</exec>
+            <argument>${context_api_url}</argument>
+            <argument>${stats_db_name}</argument>
+            <file>contexts.sh</file>
+        </shell>
+        <ok to="Step16-createIndicatorsTables"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step16-createIndicatorsTables">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>indicators.sh</exec>
+            <argument>${stats_db_name}</argument>
+            <argument>${wf:appPath()}/scripts/step16-createIndicatorsTables.sql</argument>
+            <file>indicators.sh</file>
+        </shell>
+        <ok to="Step16_1-definitions"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step16_1-definitions">
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
+            <jdbc-url>${hive_jdbc_url}</jdbc-url>
+            <script>scripts/step16_1-definitions.sql</script>
             <param>stats_db_name=${stats_db_name}</param>
             <param>openaire_db_name=${openaire_db_name}</param>
         </hive2>
@@ -261,48 +298,11 @@
             <param>stats_db_name=${stats_db_name}</param>
             <param>openaire_db_name=${openaire_db_name}</param>
         </hive2>
-        <ok to="Step16_6"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step16_6">
-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hive_jdbc_url}</jdbc-url>
-            <script>scripts/step16_6.sql</script>
-            <param>stats_db_name=${stats_db_name}</param>
-            <param>openaire_db_name=${openaire_db_name}</param>
-        </hive2>
-        <ok to="Step16_7-createIndicatorsTables"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step16_7-createIndicatorsTables">
-        <shell xmlns="uri:oozie:shell-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <exec>indicators.sh</exec>
-            <argument>${stats_db_name}</argument>
-            <argument>${wf:appPath()}/scripts/step16_7-createIndicatorsTables.sql</argument>
-            <file>indicators.sh</file>
-        </shell>
-        <ok to="Step17"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="Step17">
-        <shell xmlns="uri:oozie:shell-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <exec>contexts.sh</exec>
-            <argument>${context_api_url}</argument>
-            <argument>${stats_db_name}</argument>
-            <file>contexts.sh</file>
-        </shell>
-        <ok to="Step19"/>
+        <ok to="Step19-finalize"/>
         <error to="Kill"/>
     </action>
         
-    <action name="Step19">
+    <action name="Step19-finalize">
         <shell xmlns="uri:oozie:shell-action:0.1">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
@@ -326,20 +326,44 @@
             <argument>${wf:appPath()}/scripts/step20-createMonitorDB.sql</argument>
             <file>monitor.sh</file>
         </shell>
+        <ok to="step21-createObservatoryDB-pre"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="step21-createObservatoryDB-pre">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>observatory-pre.sh</exec>
+            <argument>${stats_db_name}</argument>
+            <argument>${observatory_db_name}</argument>
+            <argument>${observatory_db_shadow_name}</argument>
+            <file>observatory-pre.sh</file>
+        </shell>
         <ok to="step21-createObservatoryDB"/>
         <error to="Kill"/>
     </action>
 
     <action name="step21-createObservatoryDB">
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
+            <jdbc-url>${hive_jdbc_url}</jdbc-url>
+            <script>scripts/step21-createObservatoryDB.sql</script>
+            <param>stats_db_name=${stats_db_name}</param>
+            <param>observatory_db_name=${observatory_db_name}</param>
+        </hive2>
+        <ok to="step21-createObservatoryDB-post"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="step21-createObservatoryDB-post">
         <shell xmlns="uri:oozie:shell-action:0.1">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
-            <exec>observatory.sh</exec>
+            <exec>observatory-post.sh</exec>
             <argument>${stats_db_name}</argument>
             <argument>${observatory_db_name}</argument>
             <argument>${observatory_db_shadow_name}</argument>
-            <argument>${wf:appPath()}/scripts/step21-createObservatoryDB.sql</argument>
-            <file>observatory.sh</file>
+            <file>observatory-post.sh</file>
         </shell>
         <ok to="Step22"/>
         <error to="Kill"/>

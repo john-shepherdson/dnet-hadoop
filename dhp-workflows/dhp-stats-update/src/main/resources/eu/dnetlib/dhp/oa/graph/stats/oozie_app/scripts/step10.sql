@@ -23,6 +23,11 @@ CREATE OR REPLACE VIEW ${stats_db_name}.rndexpediture AS
 SELECT *
 FROM ${external_stats_db_name}.rndexpediture;
 
+CREATE OR REPLACE VIEW ${stats_db_name}.licenses_normalized AS
+SELECT *
+FROM ${external_stats_db_name}.licenses_normalized;
+
+
 ------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------
 -- Creation date of the database
