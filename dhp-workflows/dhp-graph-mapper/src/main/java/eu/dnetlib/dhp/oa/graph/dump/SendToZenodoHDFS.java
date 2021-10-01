@@ -17,9 +17,9 @@ import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 
 public class SendToZenodoHDFS implements Serializable {
 
-	private final static String NEW = "new"; // to be used for a brand new deposition in zenodo
-	private final static String VERSION = "version"; // to be used to upload a new version of a published deposition
-	private final static String UPDATE = "update"; // to upload content to an open deposition not published
+	private static final String NEW = "new"; // to be used for a brand new deposition in zenodo
+	private static final String VERSION = "version"; // to be used to upload a new version of a published deposition
+	private static final String UPDATE = "update"; // to upload content to an open deposition not published
 
 	private static final Log log = LogFactory.getLog(SendToZenodoHDFS.class);
 
@@ -85,7 +85,6 @@ public class SendToZenodoHDFS implements Serializable {
 			Path p = fileStatus.getPath();
 			String p_string = p.toString();
 			if (!p_string.endsWith("_SUCCESS")) {
-				// String tmp = p_string.substring(0, p_string.lastIndexOf("/"));
 				String name = p_string.substring(p_string.lastIndexOf("/") + 1);
 //				log.info("Sending information for community: " + name);
 //				if (communityMap.containsKey(name.substring(0, name.lastIndexOf(".")))) {
@@ -102,9 +101,9 @@ public class SendToZenodoHDFS implements Serializable {
 			zenodoApiClient.sendMretadata(metadata);
 		}
 
-		if (publish)
+		if (publish) {
 			zenodoApiClient.publish();
-
+		}
 	}
 
 }

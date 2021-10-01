@@ -20,7 +20,7 @@ public class MergeAndGetTest {
 	class MergeFromAndGetStrategy {
 
 		@Test
-		public void shouldThrowForOafAndOaf() {
+		void shouldThrowForOafAndOaf() {
 			// given
 			Oaf a = mock(Oaf.class);
 			Oaf b = mock(Oaf.class);
@@ -33,7 +33,7 @@ public class MergeAndGetTest {
 		}
 
 		@Test
-		public void shouldThrowForOafAndRelation() {
+		void shouldThrowForOafAndRelation() {
 			// given
 			Oaf a = mock(Oaf.class);
 			Relation b = mock(Relation.class);
@@ -46,7 +46,7 @@ public class MergeAndGetTest {
 		}
 
 		@Test
-		public void shouldThrowForOafAndOafEntity() {
+		void shouldThrowForOafAndOafEntity() {
 			// given
 			Oaf a = mock(Oaf.class);
 			OafEntity b = mock(OafEntity.class);
@@ -59,7 +59,7 @@ public class MergeAndGetTest {
 		}
 
 		@Test
-		public void shouldThrowForRelationAndOaf() {
+		void shouldThrowForRelationAndOaf() {
 			// given
 			Relation a = mock(Relation.class);
 			Oaf b = mock(Oaf.class);
@@ -72,7 +72,7 @@ public class MergeAndGetTest {
 		}
 
 		@Test
-		public void shouldThrowForRelationAndOafEntity() {
+		void shouldThrowForRelationAndOafEntity() {
 			// given
 			Relation a = mock(Relation.class);
 			OafEntity b = mock(OafEntity.class);
@@ -85,7 +85,7 @@ public class MergeAndGetTest {
 		}
 
 		@Test
-		public void shouldBehaveProperlyForRelationAndRelation() {
+		void shouldBehaveProperlyForRelationAndRelation() {
 			// given
 			Relation a = mock(Relation.class);
 			Relation b = mock(Relation.class);
@@ -101,7 +101,7 @@ public class MergeAndGetTest {
 		}
 
 		@Test
-		public void shouldThrowForOafEntityAndOaf() {
+		void shouldThrowForOafEntityAndOaf() {
 			// given
 			OafEntity a = mock(OafEntity.class);
 			Oaf b = mock(Oaf.class);
@@ -114,7 +114,7 @@ public class MergeAndGetTest {
 		}
 
 		@Test
-		public void shouldThrowForOafEntityAndRelation() {
+		void shouldThrowForOafEntityAndRelation() {
 			// given
 			OafEntity a = mock(OafEntity.class);
 			Relation b = mock(Relation.class);
@@ -127,7 +127,7 @@ public class MergeAndGetTest {
 		}
 
 		@Test
-		public void shouldThrowForOafEntityAndOafEntityButNotSubclasses() {
+		void shouldThrowForOafEntityAndOafEntityButNotSubclasses() {
 			// given
 			class OafEntitySub1 extends OafEntity {
 			}
@@ -145,7 +145,7 @@ public class MergeAndGetTest {
 		}
 
 		@Test
-		public void shouldBehaveProperlyForOafEntityAndOafEntity() {
+		void shouldBehaveProperlyForOafEntityAndOafEntity() {
 			// given
 			OafEntity a = mock(OafEntity.class);
 			OafEntity b = mock(OafEntity.class);
@@ -165,7 +165,7 @@ public class MergeAndGetTest {
 	class SelectNewerAndGetStrategy {
 
 		@Test
-		public void shouldThrowForOafEntityAndRelation() {
+		void shouldThrowForOafEntityAndRelation() {
 			// given
 			OafEntity a = mock(OafEntity.class);
 			Relation b = mock(Relation.class);
@@ -178,7 +178,7 @@ public class MergeAndGetTest {
 		}
 
 		@Test
-		public void shouldThrowForRelationAndOafEntity() {
+		void shouldThrowForRelationAndOafEntity() {
 			// given
 			Relation a = mock(Relation.class);
 			OafEntity b = mock(OafEntity.class);
@@ -191,7 +191,7 @@ public class MergeAndGetTest {
 		}
 
 		@Test
-		public void shouldThrowForOafEntityAndResult() {
+		void shouldThrowForOafEntityAndResult() {
 			// given
 			OafEntity a = mock(OafEntity.class);
 			Result b = mock(Result.class);
@@ -204,7 +204,7 @@ public class MergeAndGetTest {
 		}
 
 		@Test
-		public void shouldThrowWhenSuperTypeIsNewerForResultAndOafEntity() {
+		void shouldThrowWhenSuperTypeIsNewerForResultAndOafEntity() {
 			// given
 			// real types must be used because subclass-superclass resolution does not work for
 			// mocks
@@ -221,7 +221,7 @@ public class MergeAndGetTest {
 		}
 
 		@Test
-		public void shouldShouldReturnLeftForOafEntityAndOafEntity() {
+		void shouldShouldReturnLeftForOafEntityAndOafEntity() {
 			// given
 			OafEntity a = mock(OafEntity.class);
 			when(a.getLastupdatetimestamp()).thenReturn(1L);
@@ -238,7 +238,7 @@ public class MergeAndGetTest {
 		}
 
 		@Test
-		public void shouldShouldReturnRightForOafEntityAndOafEntity() {
+		void shouldShouldReturnRightForOafEntityAndOafEntity() {
 			// given
 			OafEntity a = mock(OafEntity.class);
 			when(a.getLastupdatetimestamp()).thenReturn(2L);

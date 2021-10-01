@@ -114,10 +114,8 @@ public class SparkRemoveBlacklistedRelationJob {
 			.map((MapFunction<Tuple2<Relation, Relation>, Relation>) c -> {
 				Relation ir = c._1();
 				Optional<Relation> obl = Optional.ofNullable(c._2());
-				if (obl.isPresent()) {
-					if (ir.equals(obl.get())) {
-						return null;
-					}
+				if (obl.isPresent() && ir.equals(obl.get())) {
+					return null;
 				}
 				return ir;
 			}, Encoders.bean(Relation.class))

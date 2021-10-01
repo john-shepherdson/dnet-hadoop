@@ -6,8 +6,6 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import javax.xml.crypto.Data;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
@@ -16,7 +14,6 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -55,9 +51,11 @@ public class MergeGraphTableSparkJob {
 
 		String jsonConfiguration = IOUtils
 			.toString(
-				CleanGraphSparkJob.class
-					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/graph/merge_graphs_parameters.json"));
+				Objects
+					.requireNonNull(
+						MergeGraphTableSparkJob.class
+							.getResourceAsStream(
+								"/eu/dnetlib/dhp/oa/graph/merge_graphs_parameters.json")));
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
 
@@ -133,7 +131,7 @@ public class MergeGraphTableSparkJob {
 				HashSet<String> collectedFromNames = Optional
 					.ofNullable(o.getCollectedfrom())
 					.map(c -> c.stream().map(KeyValue::getValue).collect(Collectors.toCollection(HashSet::new)))
-					.orElse(new HashSet<String>());
+					.orElse(new HashSet<>());
 				return !collectedFromNames.contains("Datacite");
 			})
 			.write()

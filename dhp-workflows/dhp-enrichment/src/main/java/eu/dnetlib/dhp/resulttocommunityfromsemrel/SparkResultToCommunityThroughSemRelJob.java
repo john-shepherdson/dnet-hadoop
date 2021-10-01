@@ -7,6 +7,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -62,6 +63,7 @@ public class SparkResultToCommunityThroughSemRelJob {
 			.orElse(Boolean.TRUE);
 		log.info("saveGraph: {}", saveGraph);
 
+		@SuppressWarnings("unchecked")
 		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		runWithSparkHiveSession(
@@ -105,15 +107,15 @@ public class SparkResultToCommunityThroughSemRelJob {
 			R ret = value._1();
 			Optional<ResultCommunityList> rcl = Optional.ofNullable(value._2());
 			if (rcl.isPresent()) {
-				Set<String> context_set = new HashSet<>();
-				ret.getContext().stream().forEach(c -> context_set.add(c.getId()));
+				Set<String> contexts = new HashSet<>();
+				ret.getContext().forEach(c -> contexts.add(c.getId()));
 				List<Context> contextList = rcl
 					.get()
 					.getCommunityList()
 					.stream()
 					.map(
 						c -> {
-							if (!context_set.contains(c)) {
+							if (!contexts.contains(c)) {
 								Context newContext = new Context();
 								newContext.setId(c);
 								newContext
@@ -123,14 +125,18 @@ public class SparkResultToCommunityThroughSemRelJob {
 												getDataInfo(
 													PROPAGATION_DATA_INFO_TYPE,
 													PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID,
-													PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME)));
+													PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME,
+														ModelConstants.DNET_PROVENANCE_ACTIONS)));
 								return newContext;
 							}
 							return null;
 						})
 					.filter(Objects::nonNull)
 					.collect(Collectors.toList());
+
+				@SuppressWarnings("unchecked")
 				R r = (R) ret.getClass().newInstance();
+
 				r.setId(ret.getId());
 				r.setContext(contextList);
 				ret.mergeFrom(r);

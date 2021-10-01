@@ -8,6 +8,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
@@ -40,7 +41,7 @@ public class QueryInformationSystem {
 		"</community>";
 
 	public CommunityMap getCommunityMap(boolean singleCommunity, String community_id)
-		throws ISLookUpException, DocumentException {
+		throws ISLookUpException, DocumentException, SAXException {
 		if (singleCommunity)
 			return getMap(isLookUp.quickSearchProfile(XQUERY_CI.replace("%s", "'" + community_id + "'")));
 		return getMap(isLookUp.quickSearchProfile(XQUERY_ALL));
@@ -55,12 +56,14 @@ public class QueryInformationSystem {
 		this.isLookUp = isLookUpService;
 	}
 
-	private CommunityMap getMap(List<String> communityMap) throws DocumentException {
+	private CommunityMap getMap(List<String> communityMap) throws DocumentException, SAXException {
 		final CommunityMap map = new CommunityMap();
 
 		for (String xml : communityMap) {
 			final Document doc;
-			doc = new SAXReader().read(new StringReader(xml));
+			final SAXReader reader = new SAXReader();
+			reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			doc = reader.read(new StringReader(xml));
 			Element root = doc.getRootElement();
 			map.put(root.attribute("id").getValue(), root.attribute("label").getValue());
 		}

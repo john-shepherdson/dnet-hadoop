@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, Ser
 import eu.dnetlib.dhp.schema.oaf.{Relation, Result}
 import eu.dnetlib.dhp.schema.sx.scholix.Scholix
 import eu.dnetlib.dhp.schema.sx.summary.ScholixSummary
+import eu.dnetlib.dhp.sx.graph.SparkResolveRelation
 import eu.dnetlib.dhp.sx.graph.bio.pubmed.AbstractVocabularyTest
 import org.json4s
 import org.json4s.DefaultFormats
@@ -29,6 +30,16 @@ class ScholixGraphTest extends AbstractVocabularyTest{
     super.setUpVocabulary()
   }
 
+
+  @Test
+  def testExtractPids():Unit = {
+
+    val input = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/scholix/result.json")).mkString
+    val res =SparkResolveRelation.extractPidsFromRecord(input)
+    assertNotNull(res)
+    assertTrue(res._2.size == 2)
+
+  }
 
   @Test
   def testOAFToSummary():Unit= {

@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.dom4j.DocumentException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 
 import com.google.gson.Gson;
 
@@ -20,12 +21,12 @@ import eu.dnetlib.dhp.bulktag.community.SelectionConstraints;
 import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
 
 /** Created by miriam on 03/08/2018. */
-public class CommunityConfigurationFactoryTest {
+class CommunityConfigurationFactoryTest {
 
 	private final VerbResolver resolver = new VerbResolver();
 
 	@Test
-	public void parseTest() throws DocumentException, IOException {
+	void parseTest() throws DocumentException, IOException, SAXException {
 		String xml = IOUtils
 			.toString(
 				getClass()
@@ -39,7 +40,7 @@ public class CommunityConfigurationFactoryTest {
 	}
 
 	@Test
-	public void applyVerb()
+	void applyVerb()
 		throws InvocationTargetException, IllegalAccessException, NoSuchMethodException,
 		InstantiationException {
 		Constraint sc = new Constraint();
@@ -52,7 +53,7 @@ public class CommunityConfigurationFactoryTest {
 	}
 
 	@Test
-	public void loadSelCriteriaTest() throws DocumentException, IOException {
+	void loadSelCriteriaTest() throws DocumentException, IOException, SAXException {
 		String xml = IOUtils
 			.toString(
 				getClass()

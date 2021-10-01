@@ -29,8 +29,10 @@ public class ActivitiesDecompressor {
 	private static final int MAX_XML_WORKS_PARSED = -1;
 	private static final int XML_WORKS_PARSED_COUNTER_LOG_INTERVAL = 100000;
 
-	public static void parseGzActivities(Configuration conf, String inputUri, Path outputPath)
-		throws Exception {
+	private ActivitiesDecompressor() {
+	}
+
+	public static void parseGzActivities(Configuration conf, String inputUri, Path outputPath) throws IOException {
 		String uri = inputUri;
 		FileSystem fs = FileSystem.get(URI.create(uri), conf);
 		Path inputPath = new Path(uri);
@@ -44,7 +46,7 @@ public class ActivitiesDecompressor {
 		InputStream gzipInputStream = null;
 		try {
 			gzipInputStream = codec.createInputStream(fs.open(inputPath));
-			parseTarActivities(fs, conf, gzipInputStream, outputPath);
+			parseTarActivities(conf, gzipInputStream, outputPath);
 
 		} finally {
 			Log.debug("Closing gzip stream");
@@ -52,8 +54,7 @@ public class ActivitiesDecompressor {
 		}
 	}
 
-	private static void parseTarActivities(
-		FileSystem fs, Configuration conf, InputStream gzipInputStream, Path outputPath) {
+	private static void parseTarActivities(Configuration conf, InputStream gzipInputStream, Path outputPath) {
 		int counter = 0;
 		int doiFound = 0;
 		int errorFromOrcidFound = 0;
@@ -79,11 +80,11 @@ public class ActivitiesDecompressor {
 							BufferedReader br = new BufferedReader(new InputStreamReader(tais)); // Read directly from
 																									// tarInput
 							String line;
-							StringBuffer buffer = new StringBuffer();
+							StringBuilder builder = new StringBuilder();
 							while ((line = br.readLine()) != null) {
-								buffer.append(line);
+								builder.append(line);
 							}
-							WorkData workData = XMLRecordParser.VTDParseWorkData(buffer.toString().getBytes());
+							WorkData workData = XMLRecordParser.VTDParseWorkData(builder.toString().getBytes());
 							if (workData != null) {
 								if (workData.getErrorCode() != null) {
 									errorFromOrcidFound += 1;
@@ -113,7 +114,7 @@ public class ActivitiesDecompressor {
 								}
 
 							} else {
-								Log.warn("Data not retrievable [" + entry.getName() + "] " + buffer);
+								Log.warn("Data not retrievable [" + entry.getName() + "] " + builder);
 								xmlParserErrorFound += 1;
 							}
 						}
@@ -177,11 +178,11 @@ public class ActivitiesDecompressor {
 							counter++;
 							BufferedReader br = new BufferedReader(new InputStreamReader(tais));
 							String line;
-							StringBuffer buffer = new StringBuffer();
+							StringBuilder builder = new StringBuilder();
 							while ((line = br.readLine()) != null) {
-								buffer.append(line);
+								builder.append(line);
 							}
-							String xml = buffer.toString();
+							String xml = builder.toString();
 							String[] filenameParts = filename.split("/");
 							final Text key = new Text(
 								XMLRecordParser

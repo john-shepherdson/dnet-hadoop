@@ -13,6 +13,7 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.jetbrains.annotations.NotNull;
+import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
@@ -87,8 +88,9 @@ public class QueryInformationSystem {
 			final Document doc;
 
 			try {
-
-				doc = new SAXReader().read(new StringReader(xml));
+				final SAXReader reader = new SAXReader();
+				reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+				doc = reader.read(new StringReader(xml));
 				Element root = doc.getRootElement();
 				cinfo.setId(root.attributeValue("id"));
 
@@ -105,7 +107,7 @@ public class QueryInformationSystem {
 
 				}
 				consumer.accept(cinfo);
-			} catch (DocumentException e) {
+			} catch (DocumentException | SAXException e) {
 				e.printStackTrace();
 			}
 

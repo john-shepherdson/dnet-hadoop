@@ -4,7 +4,9 @@ package eu.dnetlib.dhp.oa.graph.dump.funderresults;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -15,16 +17,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.api.zenodo.Community;
-import eu.dnetlib.dhp.oa.graph.dump.Constants;
-import eu.dnetlib.dhp.oa.graph.dump.ResultMapper;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
-import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
 import eu.dnetlib.dhp.schema.oaf.Relation;
-import scala.Tuple2;
 
 /**
  * Splits the dumped results by funder and stores them in a folder named as the funder nsp (for all the funders, but the EC

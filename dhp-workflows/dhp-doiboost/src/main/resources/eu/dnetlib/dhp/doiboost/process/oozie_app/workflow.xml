@@ -1,4 +1,4 @@
-<workflow-app name="Generate DOIBoost ActionSet for BETA - PROCESS" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Generate DOIBoost ActionSet - PROCESS" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>sparkDriverMemory</name>
@@ -27,6 +27,12 @@
             <name>hostedByMapPath</name>
             <description>the hostedByMap Path</description>
         </property>
+        <property>
+            <name>openaireOrganizationPath</name>
+            <description>the OpenAire Organizations Path</description>
+        </property>
+
+
         <property>
             <name>outputPath</name>
             <description>the Path of the sequence file action set</description>
@@ -75,6 +81,7 @@
 
     <decision name="resume_from">
         <switch>
+            <case to="End">${wf:conf('resumeFrom') eq 'Skip'}</case>
             <case to="ProcessMAG">${wf:conf('resumeFrom') eq 'PreprocessMag'}</case>
             <case to="ProcessUW">${wf:conf('resumeFrom') eq 'PreprocessUW'}</case>
             <case to="ProcessORCID">${wf:conf('resumeFrom') eq 'ProcessORCID'}</case>
@@ -213,6 +220,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--hostedByMapPath</arg><arg>${hostedByMapPath}</arg>
+            <arg>--openaireOrganizationPath</arg><arg>${openaireOrganizationPath}</arg>
             <arg>--affiliationPath</arg><arg>${inputPathMAG}/dataset/Affiliations</arg>
             <arg>--paperAffiliationPath</arg><arg>${inputPathMAG}/dataset/PaperAuthorAffiliations</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>

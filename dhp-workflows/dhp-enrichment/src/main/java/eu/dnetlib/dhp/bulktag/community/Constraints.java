@@ -19,11 +19,8 @@ import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
 /** Created by miriam on 02/08/2018. */
 public class Constraints implements Serializable {
 	private static final Log log = LogFactory.getLog(Constraints.class);
-	// private ConstraintEncapsulator ce;
-	private List<Constraint> constraint;
 
-	public Constraints() {
-	}
+	private List<Constraint> constraint;
 
 	public List<Constraint> getConstraint() {
 		return constraint;
@@ -44,13 +41,8 @@ public class Constraints implements Serializable {
 
 			try {
 				st.setSelection(resolver);
-			} catch (NoSuchMethodException e) {
-				log.error(e.getMessage());
-			} catch (IllegalAccessException e) {
-				log.error(e.getMessage());
-			} catch (InvocationTargetException e) {
-				log.error(e.getMessage());
-			} catch (InstantiationException e) {
+			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException
+				| InstantiationException e) {
 				log.error(e.getMessage());
 			}
 		}

@@ -11,6 +11,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class RorOrganization implements Serializable {
 
+	private static final long serialVersionUID = -2658312087616043225L;
+
 	@JsonProperty("ip_addresses")
 	private List<String> ipAddresses = new ArrayList<>();
 
@@ -58,8 +60,6 @@ public class RorOrganization implements Serializable {
 
 	@JsonProperty("status")
 	private String status;
-
-	private final static long serialVersionUID = -2658312087616043225L;
 
 	public List<String> getIpAddresses() {
 		return ipAddresses;

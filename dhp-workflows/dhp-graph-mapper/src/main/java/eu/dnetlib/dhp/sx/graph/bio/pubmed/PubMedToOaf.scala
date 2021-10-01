@@ -1,10 +1,10 @@
 package eu.dnetlib.dhp.sx.graph.bio.pubmed
-
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactory, OafMapperUtils, PidType}
 import eu.dnetlib.dhp.schema.oaf._
+import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactory, OafMapperUtils, PidType}
 
+import java.util.regex.Pattern
 import scala.collection.JavaConverters._
 
 object PubMedToOaf {
@@ -14,6 +14,20 @@ object PubMedToOaf {
     "pmid" -> "https://pubmed.ncbi.nlm.nih.gov/",
     "doi" -> "https://dx.doi.org/"
   )
+
+  def cleanDoi(doi:String):String = {
+
+    val regex = "^10.\\d{4,9}\\/[\\[\\]\\-\\<\\>._;()\\/:A-Z0-9]+$"
+
+
+    val pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE)
+    val matcher = pattern.matcher(doi)
+
+    if (matcher.find) {
+      return matcher.group(0)
+    }
+    null
+  }
 
   def createResult(cobjQualifier: Qualifier, vocabularies: VocabularyGroup): Result = {
     val result_typologies = getVocabularyTerm(ModelConstants.DNET_RESULT_TYPOLOGIES, vocabularies, cobjQualifier.getClassid)
@@ -60,8 +74,12 @@ object PubMedToOaf {
     var pidList: List[StructuredProperty] = List(OafMapperUtils.structuredProperty(article.getPmid, PidType.pmid.toString, PidType.pmid.toString, ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES, dataInfo))
     if (pidList == null)
       return null
+
+    var alternateIdentifier :StructuredProperty = null
     if (article.getDoi != null) {
-      pidList = pidList ::: List(OafMapperUtils.structuredProperty(article.getDoi, PidType.doi.toString, PidType.doi.toString, ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES, dataInfo))
+      val normalizedPid = cleanDoi(article.getDoi)
+      if (normalizedPid!= null)
+        alternateIdentifier = OafMapperUtils.structuredProperty(normalizedPid, PidType.doi.toString, PidType.doi.toString, ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES, dataInfo)
     }
 
     // If the article contains the typology Journal Article then we apply this type
@@ -84,9 +102,9 @@ object PubMedToOaf {
       return result
     result.setDataInfo(dataInfo)
     i.setPid(pidList.asJava)
+    if (alternateIdentifier!= null)
+      i.setAlternateIdentifier(List(alternateIdentifier).asJava)
     result.setInstance(List(i).asJava)
-
-
     i.getPid.asScala.filter(p => "pmid".equalsIgnoreCase(p.getQualifier.getClassid)).map(p => p.getValue)(collection breakOut)
     val urlLists: List[String] = pidList
       .map(s => (urlMap.getOrElse(s.getQualifier.getClassid, ""), s.getValue))

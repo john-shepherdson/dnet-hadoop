@@ -12,6 +12,9 @@ import net.sf.saxon.TransformerFactoryImpl;
 
 public class SaxonTransformerFactory {
 
+	private SaxonTransformerFactory() {
+	}
+
 	/**
 	 * Creates the index record transformer from the given XSLT
 	 *

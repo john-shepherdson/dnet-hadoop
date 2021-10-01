@@ -1,10 +1,11 @@
 
 package eu.dnetlib.dhp.oa.graph.dump;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.neethi.Assertion;
@@ -17,7 +18,6 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -38,8 +38,6 @@ public class PrepareResultProjectJobTest {
 
 	private static final Logger log = LoggerFactory
 		.getLogger(eu.dnetlib.dhp.oa.graph.dump.PrepareResultProjectJobTest.class);
-
-	private static final HashMap<String, String> map = new HashMap<>();
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
@@ -71,7 +69,7 @@ public class PrepareResultProjectJobTest {
 	}
 
 	@Test
-	public void testNoMatch() throws Exception {
+	void testNoMatch() throws Exception {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultProject/no_match")
@@ -92,12 +90,12 @@ public class PrepareResultProjectJobTest {
 		org.apache.spark.sql.Dataset<ResultProject> verificationDataset = spark
 			.createDataset(tmp.rdd(), Encoders.bean(ResultProject.class));
 
-		Assertions.assertEquals(0, verificationDataset.count());
+		assertEquals(0, verificationDataset.count());
 
 	}
 
 	@Test
-	public void testMatchOne() throws Exception {
+	void testMatchOne() throws Exception {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultProject/match_one")
@@ -118,12 +116,11 @@ public class PrepareResultProjectJobTest {
 		org.apache.spark.sql.Dataset<ResultProject> verificationDataset = spark
 			.createDataset(tmp.rdd(), Encoders.bean(ResultProject.class));
 
-		Assertions.assertTrue(verificationDataset.count() == 1);
+		assertEquals(1, verificationDataset.count());
 
-		Assertions
-			.assertEquals(
-				1,
-				verificationDataset.filter("resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'").count());
+		assertEquals(
+			1,
+			verificationDataset.filter("resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'").count());
 
 		verificationDataset.createOrReplaceTempView("table");
 
@@ -133,14 +130,14 @@ public class PrepareResultProjectJobTest {
 					"from table " +
 					"lateral view explode (projectsList) pl as projList");
 
-		Assertions.assertEquals(1, check.filter("provenance = 'sysimport:crosswalk:entityregistry'").count());
+		assertEquals(1, check.filter("provenance = 'sysimport:crosswalk:entityregistry'").count());
 
 		verificationDataset.show(false);
 
 	}
 
 	@Test
-	public void testMatch() throws Exception {
+	void testMatch() throws Exception {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultProject/match")
@@ -161,16 +158,14 @@ public class PrepareResultProjectJobTest {
 		org.apache.spark.sql.Dataset<ResultProject> verificationDataset = spark
 			.createDataset(tmp.rdd(), Encoders.bean(ResultProject.class));
 
-		Assertions.assertTrue(verificationDataset.count() == 2);
+		assertEquals(2, verificationDataset.count());
 
-		Assertions
-			.assertEquals(
-				1,
-				verificationDataset.filter("resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'").count());
-		Assertions
-			.assertEquals(
-				1,
-				verificationDataset.filter("resultId = '50|dedup_wf_001::51b88f272ba9c3bb181af64e70255a80'").count());
+		assertEquals(
+			1,
+			verificationDataset.filter("resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'").count());
+		assertEquals(
+			1,
+			verificationDataset.filter("resultId = '50|dedup_wf_001::51b88f272ba9c3bb181af64e70255a80'").count());
 
 		verificationDataset.createOrReplaceTempView("dataset");
 
@@ -179,62 +174,54 @@ public class PrepareResultProjectJobTest {
 			+ "lateral view explode(projectsList) p as MyT ";
 
 		org.apache.spark.sql.Dataset<Row> resultExplodedProvenance = spark.sql(query);
-		Assertions.assertEquals(3, resultExplodedProvenance.count());
-		Assertions
-			.assertEquals(
-				2,
-				resultExplodedProvenance
-					.filter("resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'")
-					.count());
+		assertEquals(3, resultExplodedProvenance.count());
+		assertEquals(
+			2,
+			resultExplodedProvenance
+				.filter("resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'")
+				.count());
 
-		Assertions
-			.assertEquals(
-				1,
-				resultExplodedProvenance
-					.filter("resultId = '50|dedup_wf_001::51b88f272ba9c3bb181af64e70255a80'")
-					.count());
+		assertEquals(
+			1,
+			resultExplodedProvenance
+				.filter("resultId = '50|dedup_wf_001::51b88f272ba9c3bb181af64e70255a80'")
+				.count());
 
-		Assertions
-			.assertEquals(
-				2,
-				resultExplodedProvenance
-					.filter("project = '40|aka_________::0f7d119de1f656b5763a16acf876fed6'")
-					.count());
+		assertEquals(
+			2,
+			resultExplodedProvenance
+				.filter("project = '40|aka_________::0f7d119de1f656b5763a16acf876fed6'")
+				.count());
 
-		Assertions
-			.assertEquals(
-				1,
-				resultExplodedProvenance
-					.filter(
-						"project = '40|aka_________::0f7d119de1f656b5763a16acf876fed6' and resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'")
-					.count());
+		assertEquals(
+			1,
+			resultExplodedProvenance
+				.filter(
+					"project = '40|aka_________::0f7d119de1f656b5763a16acf876fed6' and resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'")
+				.count());
 
-		Assertions
-			.assertEquals(
-				1,
-				resultExplodedProvenance
-					.filter(
-						"project = '40|aka_________::0f7d119de1f656b5763a16acf876fed6' and resultId = '50|dedup_wf_001::51b88f272ba9c3bb181af64e70255a80'")
-					.count());
+		assertEquals(
+			1,
+			resultExplodedProvenance
+				.filter(
+					"project = '40|aka_________::0f7d119de1f656b5763a16acf876fed6' and resultId = '50|dedup_wf_001::51b88f272ba9c3bb181af64e70255a80'")
+				.count());
 
-		Assertions
-			.assertEquals(
-				1,
-				resultExplodedProvenance
-					.filter("project = '40|aka_________::03376222b28a3aebf2730ac514818d04'")
-					.count());
+		assertEquals(
+			1,
+			resultExplodedProvenance
+				.filter("project = '40|aka_________::03376222b28a3aebf2730ac514818d04'")
+				.count());
 
-		Assertions
-			.assertEquals(
-				1,
-				resultExplodedProvenance
-					.filter(
-						"project = '40|aka_________::03376222b28a3aebf2730ac514818d04' and resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'")
-					.count());
+		assertEquals(
+			1,
+			resultExplodedProvenance
+				.filter(
+					"project = '40|aka_________::03376222b28a3aebf2730ac514818d04' and resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'")
+				.count());
 
-		Assertions
-			.assertEquals(
-				3, resultExplodedProvenance.filter("provenance = 'sysimport:crosswalk:entityregistry'").count());
+		assertEquals(
+			3, resultExplodedProvenance.filter("provenance = 'sysimport:crosswalk:entityregistry'").count());
 
 	}
 

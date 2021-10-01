@@ -24,6 +24,7 @@ import org.apache.spark.sql.SparkSession;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 import com.google.common.hash.Hashing;
@@ -76,7 +77,7 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 
 	@Override
 	public void run(ISLookUpService isLookUpService)
-		throws ISLookUpException, DocumentException, IOException {
+		throws ISLookUpException, DocumentException, IOException, SAXException {
 
 		final String graphBasePath = parser.get("graphBasePath");
 		final String workingPath = parser.get("workingPath");
@@ -161,11 +162,11 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 
 	private <T extends OafEntity> ConnectedComponent generateID(String key, Iterator<Tuple2<String, T>> values) {
 
-		List<Identifier<T>> identifiers = Lists.newArrayList(values).stream().map(v -> {
-			T entity = v._2();
-			Identifier<T> identifier = Identifier.newInstance(entity);
-			return identifier;
-		}).collect(Collectors.toList());
+		List<Identifier<T>> identifiers = Lists
+			.newArrayList(values)
+			.stream()
+			.map(v -> Identifier.newInstance(v._2()))
+			.collect(Collectors.toList());
 
 		String rootID = IdGenerator.generate(identifiers, key);
 
@@ -235,7 +236,6 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 		info.setProvenanceaction(provenanceAction);
 
 		// TODO calculate the trust value based on the similarity score of the elements in the CC
-		// info.setTrust();
 
 		r.setDataInfo(info);
 		return r;

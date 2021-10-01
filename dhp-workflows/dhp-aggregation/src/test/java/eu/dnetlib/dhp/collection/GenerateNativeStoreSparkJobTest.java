@@ -97,7 +97,7 @@ public class GenerateNativeStoreSparkJobTest extends AbstractVocabularyTest {
 
 	@Test
 	@Order(1)
-	public void testGenerateNativeStoreSparkJobRefresh() throws Exception {
+	void testGenerateNativeStoreSparkJobRefresh() throws Exception {
 
 		MDStoreVersion mdStoreV1 = prepareVersion("/eu/dnetlib/dhp/collection/mdStoreVersion_1.json");
 		FileUtils.forceMkdir(new File(mdStoreV1.getHdfsPath()));
@@ -125,7 +125,7 @@ public class GenerateNativeStoreSparkJobTest extends AbstractVocabularyTest {
 
 	@Test
 	@Order(2)
-	public void testGenerateNativeStoreSparkJobIncremental() throws Exception {
+	void testGenerateNativeStoreSparkJobIncremental() throws Exception {
 
 		MDStoreVersion mdStoreV2 = prepareVersion("/eu/dnetlib/dhp/collection/mdStoreVersion_2.json");
 		FileUtils.forceMkdir(new File(mdStoreV2.getHdfsPath()));
@@ -155,7 +155,7 @@ public class GenerateNativeStoreSparkJobTest extends AbstractVocabularyTest {
 
 	@Test
 	@Order(3)
-	public void testTransformSparkJob() throws Exception {
+	void testTransformSparkJob() throws Exception {
 
 		setUpVocabulary();
 
@@ -206,7 +206,7 @@ public class GenerateNativeStoreSparkJobTest extends AbstractVocabularyTest {
 	}
 
 	@Test
-	public void testJSONSerialization() throws Exception {
+	void testJSONSerialization() throws Exception {
 		final String s = IOUtils.toString(getClass().getResourceAsStream("mdStoreVersion_1.json"));
 		System.out.println("s = " + s);
 		final ObjectMapper mapper = new ObjectMapper();
@@ -217,7 +217,7 @@ public class GenerateNativeStoreSparkJobTest extends AbstractVocabularyTest {
 	}
 
 	@Test
-	public void testGenerationMetadataRecord() throws Exception {
+	void testGenerationMetadataRecord() throws Exception {
 
 		final String xml = IOUtils.toString(this.getClass().getResourceAsStream("./record.xml"));
 
@@ -236,7 +236,7 @@ public class GenerateNativeStoreSparkJobTest extends AbstractVocabularyTest {
 	}
 
 	@Test
-	public void testEquals() throws IOException {
+	void testEquals() throws IOException {
 
 		final String xml = IOUtils.toString(this.getClass().getResourceAsStream("./record.xml"));
 		final MetadataRecord record = GenerateNativeStoreSparkJob

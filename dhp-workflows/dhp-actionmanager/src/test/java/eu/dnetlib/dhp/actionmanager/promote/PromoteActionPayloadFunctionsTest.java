@@ -44,7 +44,7 @@ public class PromoteActionPayloadFunctionsTest {
 	class JoinTableWithActionPayloadAndMerge {
 
 		@Test
-		public void shouldThrowWhenTableTypeIsNotSubtypeOfActionPayloadType() {
+		void shouldThrowWhenTableTypeIsNotSubtypeOfActionPayloadType() {
 			// given
 			class OafImpl extends Oaf {
 			}
@@ -58,7 +58,7 @@ public class PromoteActionPayloadFunctionsTest {
 		}
 
 		@Test
-		public void shouldRunProperlyWhenActionPayloadTypeAndTableTypeAreTheSame() {
+		void shouldRunProperlyWhenActionPayloadTypeAndTableTypeAreTheSame() {
 			// given
 			String id0 = "id0";
 			String id1 = "id1";
@@ -138,7 +138,7 @@ public class PromoteActionPayloadFunctionsTest {
 		}
 
 		@Test
-		public void shouldRunProperlyWhenActionPayloadTypeIsSuperTypeOfTableType() {
+		void shouldRunProperlyWhenActionPayloadTypeIsSuperTypeOfTableType() {
 			// given
 			String id0 = "id0";
 			String id1 = "id1";
@@ -218,7 +218,7 @@ public class PromoteActionPayloadFunctionsTest {
 	class GroupTableByIdAndMerge {
 
 		@Test
-		public void shouldRunProperly() {
+		void shouldRunProperly() {
 			// given
 			String id1 = "id1";
 			String id2 = "id2";

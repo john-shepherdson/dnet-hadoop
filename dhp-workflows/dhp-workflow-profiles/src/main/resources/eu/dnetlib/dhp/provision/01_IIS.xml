@@ -1,0 +1,225 @@
+<RESOURCE_PROFILE xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <HEADER>
+        <RESOURCE_IDENTIFIER value="47340fe4-36e1-41cb-9660-b13eeeb874be_V29ya2Zsb3dEU1Jlc291cmNlcy9Xb3JrZmxvd0RTUmVzb3VyY2VUeXBl"/>
+        <RESOURCE_TYPE value="WorkflowDSResourceType"/>
+        <RESOURCE_KIND value="WorkflowDSResources"/>
+        <RESOURCE_URI value=""/>
+        <DATE_OF_CREATION value="2021-08-06T09:15:17+00:00"/>
+    </HEADER>
+    <BODY>
+        <WORKFLOW_NAME>IIS main workflow V3 [PROD]</WORKFLOW_NAME>
+        <WORKFLOW_TYPE>IIS</WORKFLOW_TYPE>
+        <WORKFLOW_PRIORITY>30</WORKFLOW_PRIORITY>
+        <CONFIGURATION start="manual">
+            <NODE isStart="true" name="start">
+                <DESCRIPTION>start</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="setFundersBlacklist"/>
+                </ARCS>
+            </NODE>
+            <NODE name="setFundersBlacklist" type="SetEnvParameter">
+                <DESCRIPTION>Set a regex of funder shortnames to exclude from the project reference processing</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">referenceextraction_project_fundingclass_blacklist_regex</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">^DFG::.*$|^CONICYT::.*$|^RSF::.*$|^SGOV::.*$|^GSRT::.*$|^MIUR::.*$|^INNOVIRIS::.*$|^RIF::.*$|^SFRS::.*$</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="prepareActionSets"/>
+                </ARCS>
+            </NODE>
+            <NODE name="prepareActionSets" type="PrepareActionSets">
+                <DESCRIPTION>prepare action sets</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="sets" required="true" type="string">
+                        [
+                        {
+                        'set' : 'iis-document-affiliation',
+                        'jobProperty' : 'export_action_set_id_matched_doc_organizations',
+                        'enablingProperty' : 'active_document_affiliation',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-referenced-projects-main',
+                        'jobProperty' : 'export_action_set_id_document_referencedProjects',
+                        'enablingProperty' : 'active_referenceextraction_project',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-referenced-datasets-main',
+                        'jobProperty' : 'export_action_set_id_document_referencedDatasets',
+                        'enablingProperty' : 'active_referenceextraction_dataset',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-researchinitiative',
+                        'jobProperty' : 'export_action_set_id_document_research_initiative',
+                        'enablingProperty' : 'active_referenceextraction_researchinitiative',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-document-similarities',
+                        'jobProperty' : 'export_action_set_id_document_similarities_standard',
+                        'enablingProperty' : 'active_documentssimilarity',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-document-classes',
+                        'jobProperty' : 'export_action_set_id_document_classes',
+                        'enablingProperty' : 'active_documentsclassification',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-document-citations',
+                        'jobProperty' : 'export_action_set_id_document_referencedDocuments',
+                        'enablingProperty' : 'active_citationmatching',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-document-citations-relations',
+                        'jobProperty' : 'export_action_set_id_citation_relations',
+                        'enablingProperty' : 'active_citationmatching_relations',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-referenceextraction-pdb',
+                        'jobProperty' : 'export_action_set_id_document_pdb',
+                        'enablingProperty' : 'active_referenceextraction_pdb',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'document_software_url',
+                        'jobProperty' : 'export_action_set_id_document_software_url',
+                        'enablingProperty' : 'active_referenceextraction_software_url',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-entities-software',
+                        'jobProperty' : 'export_action_set_id_entity_software',
+                        'enablingProperty' : 'active_referenceextraction_software_url',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-communities',
+                        'jobProperty' : 'export_action_set_id_document_community',
+                        'enablingProperty' : 'active_referenceextraction_community',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-referenced-patents',
+                        'jobProperty' : 'export_action_set_id_document_patent',
+                        'enablingProperty' : 'active_referenceextraction_patent',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-entities-patent',
+                        'jobProperty' : 'export_action_set_id_entity_patent',
+                        'enablingProperty' : 'active_referenceextraction_patent',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-covid-19',
+                        'jobProperty' : 'export_action_set_id_document_covid19',
+                        'enablingProperty' : 'active_referenceextraction_covid19',
+                        'enabled' : 'true'
+                        }
+                        ]
+                    </PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="prepareParameters"/>
+                </ARCS>
+            </NODE>
+            <NODE name="prepareParameters" type="PrepareIisMainParamsV2">
+                <DESCRIPTION>prepare parameters</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="islookupLocationParam" required="true" type="string">import_islookup_service_location</PARAM>
+                    <PARAM managedBy="system" name="objectStoreParam" required="true" type="string">import_content_objectstores_csv</PARAM>
+                    <PARAM managedBy="system" name="objectStoreLocationParam" required="true" type="string">import_content_object_store_location</PARAM>
+                    <PARAM managedBy="system" name="mdStoreStoreLocationParam" required="true" type="string">import_mdstore_service_location</PARAM>
+                    <PARAM managedBy="system" name="mdStoreDatasetParam" required="true" type="string">import_dataset_mdstore_ids_csv</PARAM>
+                    <PARAM managedBy="system" name="oozieWfAppPathParam" required="true" type="string">oozie.wf.application.path</PARAM>
+                    <PARAM managedBy="user" name="oozieWfAppPath" required="true" type="string">/lib/iis/primary/snapshots/2021-06-23</PARAM>
+                    <PARAM function="validValues(['IIS','DM'])" managedBy="user" name="clusterName" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="user" name="importHbaseDumpLocation" required="true" type="string">/tmp/prod_inference/graph/05_graph_cleaned</PARAM>
+                    <PARAM managedBy="system" name="importHbaseDumpLocationParam" required="true" type="string">import_infospace_graph_location</PARAM>
+                    <PARAM managedBy="user" name="objectStoreBlacklistCSV" required="false" type="string"/>
+                    <PARAM managedBy="system" name="importProjectConceptsContextCSVParam" required="true" type="string">import_project_concepts_context_ids_csv</PARAM>
+                    <PARAM managedBy="user" name="importProjectConceptsContextCSV" required="true" type="string">aginfra,beopen,clarin,covid-19,dariah,dh-ch,oa-pg,egi,elixir-gr,enermaps,epos,fam,fet-fp7,fet-h2020,gotriple,instruct,mes,ni,rda,science-innovation-policy,risis,rural-digital-europe,sdsn-gr,sobigdata</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="main"/>
+                </ARCS>
+            </NODE>
+            <NODE isJoin="true" name="main" type="SubmitHadoopJob">
+                <DESCRIPTION>IIS main</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">iisMainJobV3</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'cluster' : 'cluster',
+                        'oozie.wf.application.path' : 'oozie.wf.application.path',
+                        'referenceextraction_project_fundingclass_blacklist_regex' : 'referenceextraction_project_fundingclass_blacklist_regex',
+
+                        'active_document_affiliation' : 'active_document_affiliation',
+                        'active_referenceextraction_project' : 'active_referenceextraction_project',
+                        'active_referenceextraction_dataset' : 'active_referenceextraction_dataset',
+                        'active_referenceextraction_researchinitiative' : 'active_referenceextraction_researchinitiative',
+                        'active_documentsclassification' : 'active_documentsclassification',
+                        'active_documentssimilarity' : 'active_documentssimilarity',
+                        'active_citationmatching' : 'active_citationmatching',
+                        'active_citationmatching_relations' : 'active_citationmatching_relations',
+                        'active_referenceextraction_pdb' : 'active_referenceextraction_pdb',
+                        'active_referenceextraction_software_url' : 'active_referenceextraction_software_url',
+                        'active_referenceextraction_community' : 'active_referenceextraction_community',
+                        'active_referenceextraction_patent' : 'active_referenceextraction_patent',
+                        'active_referenceextraction_covid19' : 'active_referenceextraction_covid19',
+
+                        'import_content_objectstores_csv' : 'import_content_objectstores_csv',
+                        'import_content_object_store_location' : 'import_content_object_store_location',
+                        'import_mdstore_service_location' : 'import_mdstore_service_location',
+                        'import_islookup_service_location' : 'import_islookup_service_location',
+                        'import_project_concepts_context_ids_csv' : 'import_project_concepts_context_ids_csv',
+                        'import_dataset_mdstore_ids_csv' : 'import_dataset_mdstore_ids_csv',
+                        'import_infospace_graph_location' : 'import_infospace_graph_location',
+
+                        'export_action_set_id_matched_doc_organizations' : 'export_action_set_id_matched_doc_organizations',
+                        'export_action_set_id_document_referencedDatasets' : 'export_action_set_id_document_referencedDatasets',
+                        'export_action_set_id_document_referencedProjects' : 'export_action_set_id_document_referencedProjects',
+                        'export_action_set_id_document_research_initiative' : 'export_action_set_id_document_research_initiative',
+                        'export_action_set_id_document_similarities_standard' : 'export_action_set_id_document_similarities_standard',
+
+                        'export_action_set_id_document_referencedDocuments' : 'export_action_set_id_document_referencedDocuments',
+                        'export_action_set_id_document_pdb' : 'export_action_set_id_document_pdb',
+                        'export_action_set_id_document_software_url' : 'export_action_set_id_document_software_url',
+                        'export_action_set_id_entity_software' : 'export_action_set_id_entity_software',
+                        'export_action_set_id_document_community' :  'export_action_set_id_document_community',
+                        'export_action_set_id_document_patent' : 'export_action_set_id_document_patent',
+                        'export_action_set_id_entity_patent' : 'export_action_set_id_entity_patent',
+                        'export_action_set_id_document_covid19' : 'export_action_set_id_document_covid19',
+                        'export_action_set_id_document_classes' : 'export_action_set_id_document_classes'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="user" name="simulation" required="true" type="boolean">false</PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="updateActionSets"/>
+                </ARCS>
+            </NODE>
+            <NODE name="updateActionSets" type="UpdateActionSets">
+                <DESCRIPTION>update action sets</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="success"/>
+                </ARCS>
+            </NODE>
+        </CONFIGURATION>
+        <STATUS>
+            <LAST_EXECUTION_ID>wf_20210719_221139_780</LAST_EXECUTION_ID>
+            <LAST_EXECUTION_DATE>2021-07-21T01:23:13+00:00</LAST_EXECUTION_DATE>
+            <LAST_EXECUTION_STATUS>SUCCESS</LAST_EXECUTION_STATUS>
+            <LAST_EXECUTION_ERROR/>
+        </STATUS>
+    </BODY>
+</RESOURCE_PROFILE>

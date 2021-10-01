@@ -4,7 +4,9 @@ package eu.dnetlib.dhp.countrypropagation;
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -17,18 +19,15 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Country;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import scala.Tuple2;
 
 public class SparkCountryPropagationJob {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkCountryPropagationJob.class);
-
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(String[] args) throws Exception {
 
@@ -90,7 +89,6 @@ public class SparkCountryPropagationJob {
 		boolean saveGraph) {
 
 		if (saveGraph) {
-			// updateResultTable(spark, potentialUpdates, inputPath, resultClazz, outputPath);
 			log.info("Reading Graph table from: {}", sourcePath);
 			Dataset<R> res = readPath(spark, sourcePath, resultClazz);
 
@@ -122,7 +120,7 @@ public class SparkCountryPropagationJob {
 	private static List<Country> merge(List<Country> c1, List<CountrySbs> c2) {
 		HashSet<String> countries = c1
 			.stream()
-			.map(c -> c.getClassid())
+			.map(Qualifier::getClassid)
 			.collect(Collectors.toCollection(HashSet::new));
 
 		return c2

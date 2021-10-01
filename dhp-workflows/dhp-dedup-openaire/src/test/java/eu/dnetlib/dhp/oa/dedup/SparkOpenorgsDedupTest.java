@@ -67,7 +67,7 @@ public class SparkOpenorgsDedupTest implements Serializable {
 	public static void cleanUp() throws IOException, URISyntaxException {
 
 		testGraphBasePath = Paths
-			.get(SparkDedupTest.class.getResource("/eu/dnetlib/dhp/dedup/openorgs/dedup").toURI())
+			.get(SparkOpenorgsDedupTest.class.getResource("/eu/dnetlib/dhp/dedup/openorgs/dedup").toURI())
 			.toFile()
 			.getAbsolutePath();
 		testOutputBasePath = createTempDirectory(SparkDedupTest.class.getSimpleName() + "-")
@@ -101,7 +101,7 @@ public class SparkOpenorgsDedupTest implements Serializable {
 			.thenReturn(
 				IOUtils
 					.toString(
-						SparkDedupTest.class
+						SparkOpenorgsDedupTest.class
 							.getResourceAsStream(
 								"/eu/dnetlib/dhp/dedup/profiles/mock_orchestrator_openorgs.xml")));
 
@@ -110,14 +110,14 @@ public class SparkOpenorgsDedupTest implements Serializable {
 			.thenReturn(
 				IOUtils
 					.toString(
-						SparkDedupTest.class
+						SparkOpenorgsDedupTest.class
 							.getResourceAsStream(
 								"/eu/dnetlib/dhp/dedup/conf/org.curr.conf.json")));
 	}
 
 	@Test
 	@Order(1)
-	public void createSimRelsTest() throws Exception {
+	void createSimRelsTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -148,7 +148,7 @@ public class SparkOpenorgsDedupTest implements Serializable {
 
 	@Test
 	@Order(2)
-	public void copyOpenorgsSimRels() throws Exception {
+	void copyOpenorgsSimRels() throws Exception {
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
@@ -177,7 +177,7 @@ public class SparkOpenorgsDedupTest implements Serializable {
 
 	@Test
 	@Order(3)
-	public void createMergeRelsTest() throws Exception {
+	void createMergeRelsTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -230,11 +230,11 @@ public class SparkOpenorgsDedupTest implements Serializable {
 
 	@Test
 	@Order(4)
-	public void prepareOrgRelsTest() throws Exception {
+	void prepareOrgRelsTest() throws Exception {
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					SparkCreateSimRels.class
+					SparkPrepareOrgRels.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/oa/dedup/prepareOrgRels_parameters.json")));
 		parser
@@ -313,11 +313,11 @@ public class SparkOpenorgsDedupTest implements Serializable {
 
 	@Test
 	@Order(5)
-	public void prepareNewOrgsTest() throws Exception {
+	void prepareNewOrgsTest() throws Exception {
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					SparkCreateSimRels.class
+					SparkPrepareNewOrgs.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/oa/dedup/prepareNewOrgs_parameters.json")));
 		parser

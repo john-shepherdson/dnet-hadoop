@@ -9,6 +9,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+import org.xml.sax.SAXException;
 
 import com.google.common.base.Joiner;
 
@@ -23,7 +24,7 @@ public class ContextMapper extends HashMap<String, ContextDef> implements Serial
 	private static final String XQUERY = "for $x in //RESOURCE_PROFILE[.//RESOURCE_TYPE/@value='ContextDSResourceType']//*[name()='context' or name()='category' or name()='concept'] return <entry id=\"{$x/@id}\" label=\"{$x/@label|$x/@name}\" name=\"{$x/name()}\" type=\"{$x/@type}\"/>";
 
 	public static ContextMapper fromIS(final String isLookupUrl)
-		throws DocumentException, ISLookUpException {
+		throws DocumentException, ISLookUpException, SAXException {
 		ISLookUpService isLookUp = ISLookupClientFactory.getLookUpService(isLookupUrl);
 		StringBuilder sb = new StringBuilder("<ContextDSResources>");
 		Joiner.on("").appendTo(sb, isLookUp.quickSearchProfile(XQUERY));
@@ -31,10 +32,12 @@ public class ContextMapper extends HashMap<String, ContextDef> implements Serial
 		return fromXml(sb.toString());
 	}
 
-	public static ContextMapper fromXml(final String xml) throws DocumentException {
+	public static ContextMapper fromXml(final String xml) throws DocumentException, SAXException {
 		final ContextMapper contextMapper = new ContextMapper();
 
-		final Document doc = new SAXReader().read(new StringReader(xml));
+		final SAXReader reader = new SAXReader();
+		reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		final Document doc = reader.read(new StringReader(xml));
 		for (Object o : doc.selectNodes("//entry")) {
 			Node node = (Node) o;
 			String id = node.valueOf("./@id");

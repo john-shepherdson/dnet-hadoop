@@ -74,7 +74,7 @@ public class UpdateProjectInfoTest {
 	}
 
 	@Test
-	public void test1() throws Exception {
+	void test1() throws Exception {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/addProjectInfo")

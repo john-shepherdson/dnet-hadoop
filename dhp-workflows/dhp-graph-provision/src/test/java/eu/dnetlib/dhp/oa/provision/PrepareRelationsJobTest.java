@@ -1,6 +1,9 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -62,7 +65,7 @@ public class PrepareRelationsJobTest {
 	}
 
 	@Test
-	public void testRunPrepareRelationsJob(@TempDir Path testPath) throws Exception {
+	void testRunPrepareRelationsJob(@TempDir Path testPath) throws Exception {
 
 		final int maxRelations = 20;
 		PrepareRelationsJob
@@ -83,7 +86,7 @@ public class PrepareRelationsJobTest {
 			.as(Encoders.bean(Relation.class))
 			.cache();
 
-		Assertions.assertEquals(maxRelations, out.count());
+		assertEquals(maxRelations, out.count());
 
 		Dataset<Row> freq = out
 			.toDF()
@@ -97,13 +100,13 @@ public class PrepareRelationsJobTest {
 		long participation = getRows(freq, PARTICIPATION).get(0).getAs("count");
 		long affiliation = getRows(freq, AFFILIATION).get(0).getAs("count");
 
-		Assertions.assertTrue(participation == outcome);
-		Assertions.assertTrue(outcome > affiliation);
-		Assertions.assertTrue(participation > affiliation);
+		assertEquals(outcome, participation);
+		assertTrue(outcome > affiliation);
+		assertTrue(participation > affiliation);
 
-		Assertions.assertEquals(7, outcome);
-		Assertions.assertEquals(7, participation);
-		Assertions.assertEquals(6, affiliation);
+		assertEquals(7, outcome);
+		assertEquals(7, participation);
+		assertEquals(6, affiliation);
 	}
 
 	protected List<Row> getRows(Dataset<Row> freq, String col) {

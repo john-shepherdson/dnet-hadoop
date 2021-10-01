@@ -10,11 +10,12 @@ import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.*;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -109,10 +110,6 @@ public class PrepareResultCommunitySet {
 			})
 			.map(value -> OBJECT_MAPPER.writeValueAsString(value._2()))
 			.saveAsTextFile(outputPath, GzipCodec.class);
-//                      .write()
-//                      .mode(SaveMode.Overwrite)
-//                      .option("compression", "gzip")
-//                      .json(outputPath);
 	}
 
 	private static MapFunction<ResultOrganizations, ResultCommunityList> mapResultCommunityFn(
@@ -131,7 +128,7 @@ public class PrepareResultCommunitySet {
 						communitySet.addAll(organizationMap.get(oId));
 					}
 				}
-			if (communitySet.size() > 0) {
+			if (!communitySet.isEmpty()) {
 				ResultCommunityList rcl = new ResultCommunityList();
 				rcl.setResultId(rId);
 				ArrayList<String> communityList = new ArrayList<>();

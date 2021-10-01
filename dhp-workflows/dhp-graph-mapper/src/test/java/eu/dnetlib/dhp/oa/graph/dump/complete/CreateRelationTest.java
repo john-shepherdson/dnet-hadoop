@@ -17,7 +17,7 @@ import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
-public class CreateRelationTest {
+class CreateRelationTest {
 
 	List<String> communityContext = Arrays
 		.asList(
@@ -533,7 +533,7 @@ public class CreateRelationTest {
 	}
 
 	@Test
-	public void test1() {
+	void test1() {
 		List<ContextInfo> cInfoList = new ArrayList<>();
 		final Consumer<ContextInfo> consumer = ci -> cInfoList.add(ci);
 

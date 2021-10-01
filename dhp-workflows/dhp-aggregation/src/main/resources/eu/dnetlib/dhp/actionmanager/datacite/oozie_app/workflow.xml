@@ -70,7 +70,7 @@
             <arg>--sourcePath</arg><arg>${mainPath}/datacite_dump</arg>
             <arg>--targetPath</arg><arg>${mainPath}/datacite_oaf</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--exportLinks</arg><arg>true</arg>
+            <arg>--exportLinks</arg><arg>false</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
         <ok to="End"/>

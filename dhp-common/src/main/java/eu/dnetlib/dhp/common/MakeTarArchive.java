@@ -14,38 +14,33 @@ public class MakeTarArchive implements Serializable {
 
 	private static TarArchiveOutputStream getTar(FileSystem fileSystem, String outputPath) throws IOException {
 		Path hdfsWritePath = new Path(outputPath);
-		FSDataOutputStream fsDataOutputStream = null;
 		if (fileSystem.exists(hdfsWritePath)) {
 			fileSystem.delete(hdfsWritePath, true);
 
 		}
-		fsDataOutputStream = fileSystem.create(hdfsWritePath);
-
-		return new TarArchiveOutputStream(fsDataOutputStream.getWrappedStream());
+		return new TarArchiveOutputStream(fileSystem.create(hdfsWritePath).getWrappedStream());
 	}
 
 	private static void write(FileSystem fileSystem, String inputPath, String outputPath, String dir_name)
 		throws IOException {
 
 		Path hdfsWritePath = new Path(outputPath);
-		FSDataOutputStream fsDataOutputStream = null;
 		if (fileSystem.exists(hdfsWritePath)) {
 			fileSystem.delete(hdfsWritePath, true);
 
 		}
-		fsDataOutputStream = fileSystem.create(hdfsWritePath);
+		try (TarArchiveOutputStream ar = new TarArchiveOutputStream(
+			fileSystem.create(hdfsWritePath).getWrappedStream())) {
 
-		TarArchiveOutputStream ar = new TarArchiveOutputStream(fsDataOutputStream.getWrappedStream());
+			RemoteIterator<LocatedFileStatus> iterator = fileSystem
+				.listFiles(
+					new Path(inputPath), true);
 
-		RemoteIterator<LocatedFileStatus> fileStatusListIterator = fileSystem
-			.listFiles(
-				new Path(inputPath), true);
+			while (iterator.hasNext()) {
+				writeCurrentFile(fileSystem, dir_name, iterator, ar, 0);
+			}
 
-		while (fileStatusListIterator.hasNext()) {
-			writeCurrentFile(fileSystem, dir_name, fileStatusListIterator, ar, 0);
 		}
-
-		ar.close();
 	}
 
 	public static void tarMaxSize(FileSystem fileSystem, String inputPath, String outputPath, String dir_name,

@@ -20,7 +20,7 @@ public class EnrichMissingAuthorOrcid extends UpdateMatcher<OaBrokerAuthor> {
 		super(40,
 			aut -> Topic.ENRICH_MISSING_AUTHOR_ORCID,
 			(p, aut) -> p.getCreators().add(aut),
-			aut -> aut.getOrcid());
+			OaBrokerAuthor::getOrcid);
 	}
 
 	@Override

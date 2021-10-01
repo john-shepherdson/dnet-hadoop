@@ -64,6 +64,7 @@ public class SparkResultLinkedToProject implements Serializable {
 		final String graphPath = parser.get("graphPath");
 		log.info("graphPath: {}", graphPath);
 
+		@SuppressWarnings("unchecked")
 		Class<? extends Result> inputClazz = (Class<? extends Result>) Class.forName(resultClassName);
 		SparkConf conf = new SparkConf();
 
@@ -79,7 +80,7 @@ public class SparkResultLinkedToProject implements Serializable {
 	private static <R extends Result> void writeResultsLinkedToProjects(SparkSession spark, Class<R> inputClazz,
 		String inputPath, String outputPath, String graphPath) {
 
-		
+
 		Dataset<R> results = Utils
 			.readPath(spark, inputPath, inputClazz)
 			.filter("dataInfo.deletedbyinference = false and datainfo.invisible = false");
@@ -114,6 +115,6 @@ public class SparkResultLinkedToProject implements Serializable {
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
-	
+
 	}
 }

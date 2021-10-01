@@ -69,7 +69,7 @@ public class ProjectPropagationJobTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void NoUpdateTest() throws Exception {
+	void NoUpdateTest() throws Exception {
 
 		final String potentialUpdateDate = getClass()
 			.getResource(
@@ -106,7 +106,7 @@ public class ProjectPropagationJobTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void UpdateTenTest() throws Exception {
+	void UpdateTenTest() throws Exception {
 		final String potentialUpdatePath = getClass()
 			.getResource(
 				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/tenupdates/potentialUpdates")
@@ -178,7 +178,7 @@ public class ProjectPropagationJobTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void UpdateMixTest() throws Exception {
+	void UpdateMixTest() throws Exception {
 		final String potentialUpdatepath = getClass()
 			.getResource(
 				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/updatesmixed/potentialUpdates")

@@ -50,7 +50,7 @@ public class TemplateFactory {
 	public String getChild(final String name, final String id, final List<String> metadata) {
 		return getTemplate(resources.getChild())
 			.add("name", name)
-			.add("hasId", !(id == null))
+			.add("hasId", id != null)
 			.add("id", id != null ? escapeXml(removePrefix(id)) : "")
 			.add("metadata", metadata)
 			.render();
@@ -103,7 +103,7 @@ public class TemplateFactory {
 				(webresources != null ? webresources : new ArrayList<String>())
 					.stream()
 					.filter(StringUtils::isNotBlank)
-					.map(w -> getWebResource(w))
+					.map(this::getWebResource)
 					.collect(Collectors.toList()))
 			.render();
 	}

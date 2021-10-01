@@ -28,7 +28,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Datasource;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Organization;
+import eu.dnetlib.dhp.schema.oaf.Project;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -78,6 +83,23 @@ public class MigrateDbEntitiesApplicationTest {
 		assertEquals(getValueAsString("issnPrinted", fields), ds.getJournal().getIssnPrinted());
 		assertEquals(getValueAsString("issnOnline", fields), ds.getJournal().getIssnOnline());
 		assertEquals(getValueAsString("issnLinking", fields), ds.getJournal().getIssnLinking());
+
+		assertEquals("pubsrepository::journal", ds.getDatasourcetype().getClassid());
+		assertEquals("dnet:datasource_typologies", ds.getDatasourcetype().getSchemeid());
+
+		assertEquals("pubsrepository::journal", ds.getDatasourcetypeui().getClassid());
+		assertEquals("dnet:datasource_typologies_ui", ds.getDatasourcetypeui().getSchemeid());
+
+		assertEquals("National", ds.getJurisdiction().getClassid());
+		assertEquals("eosc:jurisdictions", ds.getJurisdiction().getSchemeid());
+
+		assertTrue(ds.getThematic());
+		assertTrue(ds.getKnowledgegraph());
+
+		assertEquals(1, ds.getContentpolicies().size());
+		assertEquals("Journal article", ds.getContentpolicies().get(0).getClassid());
+		assertEquals("eosc:contentpolicies", ds.getContentpolicies().get(0).getSchemeid());
+
 	}
 
 	@Test
@@ -119,7 +141,7 @@ public class MigrateDbEntitiesApplicationTest {
 		assertEquals(getValueAsString("country", fields).split("@@@")[1], o.getCountry().getSchemeid());
 		assertEquals(getValueAsString("country", fields).split("@@@")[1], o.getCountry().getSchemename());
 		assertEquals(getValueAsString("collectedfromname", fields), o.getCollectedfrom().get(0).getValue());
-		List<String> alternativenames = getValueAsList("alternativenames", fields);
+		final List<String> alternativenames = getValueAsList("alternativenames", fields);
 		assertEquals(2, alternativenames.size());
 		assertTrue(alternativenames.contains("Pippo"));
 		assertTrue(alternativenames.contains("Foo"));

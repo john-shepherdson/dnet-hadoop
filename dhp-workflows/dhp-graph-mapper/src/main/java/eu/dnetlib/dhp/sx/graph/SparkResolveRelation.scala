@@ -80,7 +80,7 @@ object SparkResolveRelation {
   }
 
 
-  private def extractPidsFromRecord(input:String):(String,List[(String,String)]) = {
+  def extractPidsFromRecord(input:String):(String,List[(String,String)]) = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(input)
     val id:String = (json \ "id").extract[String]
@@ -90,7 +90,15 @@ object SparkResolveRelation {
       JField("qualifier", JObject(qualifier)) <- pids
       JField("classname", JString(pidType)) <- qualifier
     } yield (pidValue, pidType)
-    (id,result)
+
+    val alternateIds: List[(String,String)] = for {
+      JObject(pids) <- json \\ "alternateIdentifier"
+      JField("value", JString(pidValue)) <- pids
+      JField("qualifier", JObject(qualifier)) <- pids
+      JField("classname", JString(pidType)) <- qualifier
+    } yield (pidValue, pidType)
+
+    (id,result:::alternateIds)
   }
 
   private def extractPidResolvedTableFromJsonRDD(spark: SparkSession, entityPath: String, workingPath: String) = {

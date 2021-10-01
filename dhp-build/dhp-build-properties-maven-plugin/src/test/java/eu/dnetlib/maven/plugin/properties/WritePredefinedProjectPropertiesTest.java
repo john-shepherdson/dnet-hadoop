@@ -20,7 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 /** @author mhorst, claudio.atzori */
 @ExtendWith(MockitoExtension.class)
-public class WritePredefinedProjectPropertiesTest {
+class WritePredefinedProjectPropertiesTest {
 
 	@Mock
 	private MavenProject mavenProject;
@@ -39,7 +39,7 @@ public class WritePredefinedProjectPropertiesTest {
 	// ----------------------------------- TESTS ---------------------------------------------
 
 	@Test
-	public void testExecuteEmpty() throws Exception {
+	void testExecuteEmpty() throws Exception {
 		// execute
 		mojo.execute();
 
@@ -50,7 +50,7 @@ public class WritePredefinedProjectPropertiesTest {
 	}
 
 	@Test
-	public void testExecuteWithProjectProperties() throws Exception {
+	void testExecuteWithProjectProperties() throws Exception {
 		// given
 		String key = "projectPropertyKey";
 		String value = "projectPropertyValue";
@@ -70,7 +70,7 @@ public class WritePredefinedProjectPropertiesTest {
 	}
 
 	@Test()
-	public void testExecuteWithProjectPropertiesAndInvalidOutputFile(@TempDir File testFolder) {
+	void testExecuteWithProjectPropertiesAndInvalidOutputFile(@TempDir File testFolder) {
 		// given
 		String key = "projectPropertyKey";
 		String value = "projectPropertyValue";
@@ -84,7 +84,7 @@ public class WritePredefinedProjectPropertiesTest {
 	}
 
 	@Test
-	public void testExecuteWithProjectPropertiesExclusion(@TempDir File testFolder) throws Exception {
+	void testExecuteWithProjectPropertiesExclusion(@TempDir File testFolder) throws Exception {
 		// given
 		String key = "projectPropertyKey";
 		String value = "projectPropertyValue";
@@ -108,7 +108,7 @@ public class WritePredefinedProjectPropertiesTest {
 	}
 
 	@Test
-	public void testExecuteWithProjectPropertiesInclusion(@TempDir File testFolder) throws Exception {
+	void testExecuteWithProjectPropertiesInclusion(@TempDir File testFolder) throws Exception {
 		// given
 		String key = "projectPropertyKey";
 		String value = "projectPropertyValue";
@@ -132,7 +132,7 @@ public class WritePredefinedProjectPropertiesTest {
 	}
 
 	@Test
-	public void testExecuteIncludingPropertyKeysFromFile(@TempDir File testFolder) throws Exception {
+	void testExecuteIncludingPropertyKeysFromFile(@TempDir File testFolder) throws Exception {
 		// given
 		String key = "projectPropertyKey";
 		String value = "projectPropertyValue";
@@ -164,7 +164,7 @@ public class WritePredefinedProjectPropertiesTest {
 	}
 
 	@Test
-	public void testExecuteIncludingPropertyKeysFromClasspathResource(@TempDir File testFolder)
+	void testExecuteIncludingPropertyKeysFromClasspathResource(@TempDir File testFolder)
 		throws Exception {
 		// given
 		String key = "projectPropertyKey";
@@ -194,7 +194,7 @@ public class WritePredefinedProjectPropertiesTest {
 	}
 
 	@Test
-	public void testExecuteIncludingPropertyKeysFromBlankLocation() {
+	void testExecuteIncludingPropertyKeysFromBlankLocation() {
 		// given
 		String key = "projectPropertyKey";
 		String value = "projectPropertyValue";
@@ -214,7 +214,7 @@ public class WritePredefinedProjectPropertiesTest {
 	}
 
 	@Test
-	public void testExecuteIncludingPropertyKeysFromXmlFile(@TempDir File testFolder)
+	void testExecuteIncludingPropertyKeysFromXmlFile(@TempDir File testFolder)
 		throws Exception {
 		// given
 		String key = "projectPropertyKey";
@@ -247,7 +247,7 @@ public class WritePredefinedProjectPropertiesTest {
 	}
 
 	@Test
-	public void testExecuteIncludingPropertyKeysFromInvalidXmlFile(@TempDir File testFolder)
+	void testExecuteIncludingPropertyKeysFromInvalidXmlFile(@TempDir File testFolder)
 		throws Exception {
 		// given
 		String key = "projectPropertyKey";
@@ -273,7 +273,7 @@ public class WritePredefinedProjectPropertiesTest {
 	}
 
 	@Test
-	public void testExecuteWithQuietModeOn(@TempDir File testFolder) throws Exception {
+	void testExecuteWithQuietModeOn(@TempDir File testFolder) throws Exception {
 		// given
 		mojo.setQuiet(true);
 		mojo.setIncludePropertyKeysFromFiles(new String[] {
@@ -290,7 +290,7 @@ public class WritePredefinedProjectPropertiesTest {
 	}
 
 	@Test
-	public void testExecuteIncludingPropertyKeysFromInvalidFile() {
+	void testExecuteIncludingPropertyKeysFromInvalidFile() {
 		// given
 		mojo.setIncludePropertyKeysFromFiles(new String[] {
 			"invalid location"
@@ -301,7 +301,7 @@ public class WritePredefinedProjectPropertiesTest {
 	}
 
 	@Test
-	public void testExecuteWithEnvironmentProperties(@TempDir File testFolder) throws Exception {
+	void testExecuteWithEnvironmentProperties(@TempDir File testFolder) throws Exception {
 		// given
 		mojo.setIncludeEnvironmentVariables(true);
 
@@ -318,7 +318,7 @@ public class WritePredefinedProjectPropertiesTest {
 	}
 
 	@Test
-	public void testExecuteWithSystemProperties(@TempDir File testFolder) throws Exception {
+	void testExecuteWithSystemProperties(@TempDir File testFolder) throws Exception {
 		// given
 		String key = "systemPropertyKey";
 		String value = "systemPropertyValue";
@@ -337,7 +337,7 @@ public class WritePredefinedProjectPropertiesTest {
 	}
 
 	@Test
-	public void testExecuteWithSystemPropertiesAndEscapeChars(@TempDir File testFolder)
+	void testExecuteWithSystemPropertiesAndEscapeChars(@TempDir File testFolder)
 		throws Exception {
 		// given
 		String key = "systemPropertyKey ";

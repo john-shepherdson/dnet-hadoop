@@ -2,14 +2,8 @@
 package eu.dnetlib.dhp.bulktag.community;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -21,8 +15,6 @@ import eu.dnetlib.dhp.bulktag.criteria.Selection;
 
 /** Created by miriam on 02/08/2018. */
 public class CommunityConfiguration implements Serializable {
-
-	private static final Log log = LogFactory.getLog(CommunityConfiguration.class);
 
 	private Map<String, Community> communities;
 
@@ -136,7 +128,7 @@ public class CommunityConfiguration implements Serializable {
 					else
 						return null;
 				})
-			.filter(st -> (st != null))
+			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
 	}
 
@@ -161,7 +153,7 @@ public class CommunityConfiguration implements Serializable {
 
 	private List<String> getContextIds(List<Pair<String, SelectionConstraints>> list) {
 		if (list != null) {
-			return list.stream().map(p -> p.getFst()).collect(Collectors.toList());
+			return list.stream().map(Pair::getFst).collect(Collectors.toList());
 		}
 		return Lists.newArrayList();
 	}

@@ -87,7 +87,7 @@ public class PrepareResultOrcidAssociationStep2 {
 							});
 					return a;
 				})
-			.map(c -> c._2())
+			.map(Tuple2::_2)
 			.map(r -> OBJECT_MAPPER.writeValueAsString(r))
 			.saveAsTextFile(outputPath, GzipCodec.class);
 	}
