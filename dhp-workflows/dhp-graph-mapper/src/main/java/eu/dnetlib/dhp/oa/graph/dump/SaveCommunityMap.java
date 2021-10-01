@@ -86,10 +86,10 @@ public class SaveCommunityMap implements Serializable {
 
 	private void saveCommunityMap(boolean singleCommunity, String community_id)
 		throws ISLookUpException, IOException, DocumentException, SAXException {
-        writer
-                .write(
-                        Utils.OBJECT_MAPPER
-                                .writeValueAsString(queryInformationSystem.getCommunityMap(singleCommunity, community_id)));
-    }
+		writer
+			.write(
+				Utils.OBJECT_MAPPER
+					.writeValueAsString(queryInformationSystem.getCommunityMap(singleCommunity, community_id)));
+	}
 
 }

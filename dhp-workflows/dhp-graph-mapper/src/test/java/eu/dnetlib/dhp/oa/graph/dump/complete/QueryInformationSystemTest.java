@@ -6,7 +6,6 @@ import static org.mockito.Mockito.lenient;
 import java.util.*;
 import java.util.function.Consumer;
 
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
@@ -529,7 +529,8 @@ class QueryInformationSystemTest {
 		List<ContextInfo> cInfoList = new ArrayList<>();
 		final Consumer<ContextInfo> consumer = ci -> cInfoList.add(ci);
 		queryInformationSystem.execContextRelationQuery();
-		queryInformationSystem.getContextRelation(consumer, "contentproviders", ModelSupport.entityIdPrefix.get("datasource"));
+		queryInformationSystem
+			.getContextRelation(consumer, "contentproviders", ModelSupport.entityIdPrefix.get("datasource"));
 
 		Assertions.assertEquals(5, cInfoList.size());
 	}
@@ -540,7 +541,8 @@ class QueryInformationSystemTest {
 		List<ContextInfo> cInfoList = new ArrayList<>();
 		final Consumer<ContextInfo> consumer = ci -> cInfoList.add(ci);
 		queryInformationSystem.execContextRelationQuery();
-		queryInformationSystem.getContextRelation(consumer, "contentproviders", ModelSupport.entityIdPrefix.get("datasource"));
+		queryInformationSystem
+			.getContextRelation(consumer, "contentproviders", ModelSupport.entityIdPrefix.get("datasource"));
 
 		cInfoList.forEach(contextInfo -> {
 			switch (contextInfo.getId()) {

@@ -145,8 +145,8 @@ public class SplitPerFunderTest {
 
 		// CONICYT 0
 		tmp = sc
-				.textFile(workingDir.toString() + "/split/CONICYTF")
-				.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+			.textFile(workingDir.toString() + "/split/CONICYTF")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 		Assertions.assertEquals(0, tmp.count());
 
 	}

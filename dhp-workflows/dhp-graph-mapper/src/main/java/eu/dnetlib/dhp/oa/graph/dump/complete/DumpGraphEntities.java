@@ -9,7 +9,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.ForeachFunction;
@@ -22,6 +21,8 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.oa.graph.dump.DumpProducts;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
@@ -453,18 +454,20 @@ public class DumpGraphEntities implements Serializable {
 
 	private static <E extends OafEntity> void organizationMap(SparkSession spark, String inputPath, String outputPath,
 		Class<E> inputClazz) {
-		Utils.readPath(spark, inputPath, inputClazz)
-				.map(
-						(MapFunction<E, Organization>) o -> mapOrganization((eu.dnetlib.dhp.schema.oaf.Organization) o),
-						Encoders.bean(Organization.class))
-				.filter((FilterFunction<Organization>) o -> o!= null)
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression", "gzip")
-				.json(outputPath);
+		Utils
+			.readPath(spark, inputPath, inputClazz)
+			.map(
+				(MapFunction<E, Organization>) o -> mapOrganization((eu.dnetlib.dhp.schema.oaf.Organization) o),
+				Encoders.bean(Organization.class))
+			.filter((FilterFunction<Organization>) o -> o != null)
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(outputPath);
 	}
 
-	private static eu.dnetlib.dhp.schema.dump.oaf.graph.Organization mapOrganization(eu.dnetlib.dhp.schema.oaf.Organization org) {
+	private static eu.dnetlib.dhp.schema.dump.oaf.graph.Organization mapOrganization(
+		eu.dnetlib.dhp.schema.oaf.Organization org) {
 		if (org.getDataInfo().getDeletedbyinference())
 			return null;
 		Organization organization = new Organization();

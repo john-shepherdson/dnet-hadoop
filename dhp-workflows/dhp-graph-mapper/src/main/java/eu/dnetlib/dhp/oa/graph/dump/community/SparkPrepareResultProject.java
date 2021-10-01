@@ -8,8 +8,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.dump.oaf.community.Validated;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -28,9 +26,11 @@ import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Funder;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
+import eu.dnetlib.dhp.schema.dump.oaf.community.Validated;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -80,7 +80,9 @@ public class SparkPrepareResultProject implements Serializable {
 	private static void prepareResultProjectList(SparkSession spark, String inputPath, String outputPath) {
 		Dataset<Relation> relation = Utils
 			.readPath(spark, inputPath + "/relation", Relation.class)
-			.filter("dataInfo.deletedbyinference = false and lower(relClass) = '" + ModelConstants.IS_PRODUCED_BY.toLowerCase() + "'");
+			.filter(
+				"dataInfo.deletedbyinference = false and lower(relClass) = '"
+					+ ModelConstants.IS_PRODUCED_BY.toLowerCase() + "'");
 		Dataset<eu.dnetlib.dhp.schema.oaf.Project> projects = Utils
 			.readPath(spark, inputPath + "/project", eu.dnetlib.dhp.schema.oaf.Project.class);
 
@@ -159,7 +161,7 @@ public class SparkPrepareResultProject implements Serializable {
 			provenance.setTrust(di.get().getTrust());
 			p.setProvenance(provenance);
 		}
-		if (relation.getValidated()){
+		if (relation.getValidated()) {
 			p.setValidated(Validated.newInstance(relation.getValidated(), relation.getValidationDate()));
 		}
 		return p;

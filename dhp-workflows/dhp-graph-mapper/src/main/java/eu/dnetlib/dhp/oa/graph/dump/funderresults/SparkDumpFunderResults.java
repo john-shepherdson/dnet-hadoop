@@ -41,9 +41,9 @@ public class SparkDumpFunderResults implements Serializable {
 		parser.parseArgument(args);
 
 		Boolean isSparkSessionManaged = Optional
-				.ofNullable(parser.get("isSparkSessionManaged"))
-				.map(Boolean::valueOf)
-				.orElse(Boolean.TRUE);
+			.ofNullable(parser.get("isSparkSessionManaged"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		final String inputPath = parser.get("sourcePath");
@@ -58,32 +58,31 @@ public class SparkDumpFunderResults implements Serializable {
 		SparkConf conf = new SparkConf();
 
 		runWithSparkSession(
-				conf,
-				isSparkSessionManaged,
-				spark -> {
-					Utils.removeOutputDir(spark, outputPath);
-					writeResultProjectList(spark, inputPath, outputPath, graphPath);
-				});
+			conf,
+			isSparkSessionManaged,
+			spark -> {
+				Utils.removeOutputDir(spark, outputPath);
+				writeResultProjectList(spark, inputPath, outputPath, graphPath);
+			});
 	}
 
 	private static void writeResultProjectList(SparkSession spark, String inputPath, String outputPath,
-											   String graphPath) {
+		String graphPath) {
 
 		Dataset<eu.dnetlib.dhp.schema.oaf.Project> project = Utils
-				.readPath(spark, graphPath + "/project", eu.dnetlib.dhp.schema.oaf.Project.class);
+			.readPath(spark, graphPath + "/project", eu.dnetlib.dhp.schema.oaf.Project.class);
 
 		Dataset<CommunityResult> result = Utils
-				.readPath(spark, inputPath + "/publication", CommunityResult.class)
-				.union(Utils.readPath(spark, inputPath + "/dataset", CommunityResult.class))
-				.union(Utils.readPath(spark, inputPath + "/orp", CommunityResult.class))
-				.union(Utils.readPath(spark, inputPath + "/software", CommunityResult.class));
-
+			.readPath(spark, inputPath + "/publication", CommunityResult.class)
+			.union(Utils.readPath(spark, inputPath + "/dataset", CommunityResult.class))
+			.union(Utils.readPath(spark, inputPath + "/orp", CommunityResult.class))
+			.union(Utils.readPath(spark, inputPath + "/software", CommunityResult.class));
 
 		List<String> funderList = project
-				.select("id")
-				.map((MapFunction<Row, String>) value -> value.getString(0).substring(0, 15), Encoders.STRING())
-				.distinct()
-				.collectAsList();
+			.select("id")
+			.map((MapFunction<Row, String>) value -> value.getString(0).substring(0, 15), Encoders.STRING())
+			.distinct()
+			.collectAsList();
 
 		funderList.forEach(funder -> {
 			String fundernsp = funder.substring(3);
@@ -104,7 +103,7 @@ public class SparkDumpFunderResults implements Serializable {
 	}
 
 	private static void dumpResults(String nsp, Dataset<CommunityResult> results, String outputPath,
-									String funderName) {
+		String funderName) {
 
 		results.map((MapFunction<CommunityResult, CommunityResult>) r -> {
 			if (!Optional.ofNullable(r.getProjects()).isPresent()) {
@@ -123,15 +122,15 @@ public class SparkDumpFunderResults implements Serializable {
 			}
 			return null;
 		}, Encoders.bean(CommunityResult.class))
-				.filter(Objects::nonNull)
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression", "gzip")
-				.json(outputPath + "/" + funderName);
+			.filter(Objects::nonNull)
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(outputPath + "/" + funderName);
 	}
 
 	private static void writeFunderResult(String funder, Dataset<CommunityResult> results, String outputPath,
-										  String funderDump) {
+		String funderDump) {
 
 		if (funder.startsWith("40|irb")) {
 			dumpResults(funder, results, outputPath, "HRZZ");

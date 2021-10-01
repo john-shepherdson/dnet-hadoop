@@ -5,8 +5,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.function.Consumer;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -15,6 +13,8 @@ import org.dom4j.io.SAXReader;
 import org.jetbrains.annotations.NotNull;
 import org.xml.sax.SAXException;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -140,7 +140,7 @@ public class QueryInformationSystem {
 	}
 
 	private String makeOpenaireId(Node el, String prefix) {
-		if (!prefix.equals(ModelSupport.entityIdPrefix.get("project"))){
+		if (!prefix.equals(ModelSupport.entityIdPrefix.get("project"))) {
 			return null;
 		}
 		String funder = null;

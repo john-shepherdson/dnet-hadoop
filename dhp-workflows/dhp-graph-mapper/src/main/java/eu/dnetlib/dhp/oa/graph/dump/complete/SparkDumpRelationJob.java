@@ -107,7 +107,7 @@ public class SparkDumpRelationJob implements Serializable {
 						}
 					}
 				}
-				if(relation.getValidated()){
+				if (relation.getValidated()) {
 					rel_new.setValidated(relation.getValidated());
 					rel_new.setValidationDate(relation.getValidationDate());
 				}

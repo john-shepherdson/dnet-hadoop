@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.logging.Filter;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.dump.oaf.community.Funder;
-import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -31,6 +29,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.oa.graph.dump.community.SparkUpdateProjectInfo;
 import eu.dnetlib.dhp.schema.dump.oaf.Result;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
+import eu.dnetlib.dhp.schema.dump.oaf.community.Funder;
+import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
 
 public class UpdateProjectInfoTest {
 
@@ -142,26 +142,26 @@ public class UpdateProjectInfoTest {
 	}
 
 	@Test
-	public void testValidatedRelation() throws Exception{
+	public void testValidatedRelation() throws Exception {
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/addProjectInfo")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/addProjectInfo")
+			.getPath();
 
 		SparkUpdateProjectInfo.main(new String[] {
-				"-isSparkSessionManaged", Boolean.FALSE.toString(),
-				"-preparedInfoPath", sourcePath + "/preparedInfoValidated",
-				"-outputPath", workingDir.toString() + "/result",
-				"-sourcePath", sourcePath + "/publication_extendedmodel"
+			"-isSparkSessionManaged", Boolean.FALSE.toString(),
+			"-preparedInfoPath", sourcePath + "/preparedInfoValidated",
+			"-outputPath", workingDir.toString() + "/result",
+			"-sourcePath", sourcePath + "/publication_extendedmodel"
 		});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<CommunityResult> tmp = sc
-				.textFile(workingDir.toString() + "/result")
-				.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
 		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
-				.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
+			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
 
 		verificationDataset.show(false);
 
@@ -169,10 +169,10 @@ public class UpdateProjectInfoTest {
 		verificationDataset.createOrReplaceTempView("dataset");
 
 		String query = "select id, MyT.code code, MyT.title title, MyT.funder.name funderName, MyT.funder.shortName funderShortName, "
-				+
-				"MyT.funder.jurisdiction funderJurisdiction, MyT.funder.fundingStream fundingStream, MyT.validated "
-				+ "from dataset " +
-				"lateral view explode(projects) p as MyT ";
+			+
+			"MyT.funder.jurisdiction funderJurisdiction, MyT.funder.fundingStream fundingStream, MyT.validated "
+			+ "from dataset " +
+			"lateral view explode(projects) p as MyT ";
 
 		org.apache.spark.sql.Dataset<Row> resultExplodedProvenance = spark.sql(query);
 
@@ -180,27 +180,34 @@ public class UpdateProjectInfoTest {
 		resultExplodedProvenance.show(false);
 
 		Assertions
-				.assertEquals(
-						2,
-						resultExplodedProvenance.filter("id = '50|pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2'").count());
+			.assertEquals(
+				2,
+				resultExplodedProvenance.filter("id = '50|pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2'").count());
 
 		Assertions
-				.assertEquals(
-						1,
-						resultExplodedProvenance
-								.filter("id = '50|pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2' and code = '123455'")
-								.count());
+			.assertEquals(
+				1,
+				resultExplodedProvenance
+					.filter("id = '50|pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2' and code = '123455'")
+					.count());
 
 		Assertions
-				.assertEquals(
-						1,
-						resultExplodedProvenance
-								.filter("id = '50|pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2' and code = '119027'")
-								.count());
+			.assertEquals(
+				1,
+				resultExplodedProvenance
+					.filter("id = '50|pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2' and code = '119027'")
+					.count());
 
 		Project project = verificationDataset
-		.map((MapFunction<CommunityResult, Project>) cr -> cr.getProjects().stream().filter(p -> p.getValidated() != null).collect(Collectors.toList()).get(0)
-		, Encoders.bean(Project.class)).first();
+			.map(
+				(MapFunction<CommunityResult, Project>) cr -> cr
+					.getProjects()
+					.stream()
+					.filter(p -> p.getValidated() != null)
+					.collect(Collectors.toList())
+					.get(0),
+				Encoders.bean(Project.class))
+			.first();
 
 		Assertions.assertTrue(project.getFunder().getName().equals("Academy of Finland"));
 		Assertions.assertTrue(project.getFunder().getShortName().equals("AKA"));
@@ -208,17 +215,21 @@ public class UpdateProjectInfoTest {
 		Assertions.assertTrue(project.getFunder().getFundingStream() == null);
 		Assertions.assertTrue(project.getValidated().getValidationDate().equals("2021-08-06"));
 
-
 		project = verificationDataset
-				.map((MapFunction<CommunityResult, Project>) cr -> cr.getProjects().stream().filter(p -> p.getValidated() == null).collect(Collectors.toList()).get(0)
-						, Encoders.bean(Project.class)).first();
-
+			.map(
+				(MapFunction<CommunityResult, Project>) cr -> cr
+					.getProjects()
+					.stream()
+					.filter(p -> p.getValidated() == null)
+					.collect(Collectors.toList())
+					.get(0),
+				Encoders.bean(Project.class))
+			.first();
 
 		Assertions.assertTrue(project.getFunder().getName().equals("European Commission"));
 		Assertions.assertTrue(project.getFunder().getShortName().equals("EC"));
 		Assertions.assertTrue(project.getFunder().getJurisdiction().equals("EU"));
 		Assertions.assertTrue(project.getFunder().getFundingStream().equals("H2020"));
-
 
 	}
 

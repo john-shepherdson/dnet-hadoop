@@ -7,17 +7,10 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.sun.xml.internal.ws.policy.AssertionSet;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.dump.oaf.Instance;
-import eu.dnetlib.dhp.schema.dump.oaf.OpenAccessRoute;
 import org.apache.commons.io.FileUtils;
-import org.apache.neethi.Assertion;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -25,10 +18,14 @@ import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.dump.oaf.Instance;
+import eu.dnetlib.dhp.schema.dump.oaf.OpenAccessRoute;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.GraphResult;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
@@ -145,70 +142,121 @@ public class DumpJobTest {
 	}
 
 	@Test
-	public void testPublicationDump(){
+	public void testPublicationDump() {
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/publication_extendedinstance")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/publication_extendedinstance")
+			.getPath();
 
 		final String communityMapPath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
+			.getPath();
 
 		DumpProducts dump = new DumpProducts();
 		dump
-				.run(
-						// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
-						false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
-						GraphResult.class, Constants.DUMPTYPE.COMPLETE.getType());
+			.run(
+				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
+				false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
+				GraphResult.class, Constants.DUMPTYPE.COMPLETE.getType());
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<GraphResult> tmp = sc
-				.textFile(workingDir.toString() + "/result")
-				.map(item -> OBJECT_MAPPER.readValue(item, GraphResult.class));
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, GraphResult.class));
 
 		org.apache.spark.sql.Dataset<GraphResult> verificationDataset = spark
-				.createDataset(tmp.rdd(), Encoders.bean(GraphResult.class));
+			.createDataset(tmp.rdd(), Encoders.bean(GraphResult.class));
 
 		Assertions.assertEquals(1, verificationDataset.count());
 
 		GraphResult gr = verificationDataset.first();
 
-
 		Assertions.assertEquals(2, gr.getMeasures().size());
-		Assertions.assertTrue(gr.getMeasures().stream().anyMatch(m -> m.getKey().equals("influence")
-				&& m.getValue().equals("1.62759106106e-08")));
-		Assertions.assertTrue(gr.getMeasures().stream().anyMatch(m -> m.getKey().equals("popularity")
-				&& m.getValue().equals("0.22519296")));
+		Assertions
+			.assertTrue(
+				gr
+					.getMeasures()
+					.stream()
+					.anyMatch(
+						m -> m.getKey().equals("influence")
+							&& m.getValue().equals("1.62759106106e-08")));
+		Assertions
+			.assertTrue(
+				gr
+					.getMeasures()
+					.stream()
+					.anyMatch(
+						m -> m.getKey().equals("popularity")
+							&& m.getValue().equals("0.22519296")));
 
 		Assertions.assertEquals(6, gr.getAuthor().size());
-		Assertions.assertTrue(gr.getAuthor().stream().anyMatch(a -> a.getFullname().equals("Nikolaidou,Charitini") &&
-				a.getName().equals("Charitini") && a.getSurname().equals("Nikolaidou")
-				&& a.getRank() == 1 && a.getPid() == null));
+		Assertions
+			.assertTrue(
+				gr
+					.getAuthor()
+					.stream()
+					.anyMatch(
+						a -> a.getFullname().equals("Nikolaidou,Charitini") &&
+							a.getName().equals("Charitini") && a.getSurname().equals("Nikolaidou")
+							&& a.getRank() == 1 && a.getPid() == null));
 
-		Assertions.assertTrue(gr.getAuthor().stream().anyMatch(a -> a.getFullname().equals("Votsi,Nefta") &&
-				a.getName().equals("Nefta") && a.getSurname().equals("Votsi")
-				&& a.getRank() == 2 && a.getPid().getId().getScheme().equals(ModelConstants.ORCID)
-				&& a.getPid().getId().getValue().equals("0000-0001-6651-1178") && a.getPid().getProvenance() != null));
+		Assertions
+			.assertTrue(
+				gr
+					.getAuthor()
+					.stream()
+					.anyMatch(
+						a -> a.getFullname().equals("Votsi,Nefta") &&
+							a.getName().equals("Nefta") && a.getSurname().equals("Votsi")
+							&& a.getRank() == 2 && a.getPid().getId().getScheme().equals(ModelConstants.ORCID)
+							&& a.getPid().getId().getValue().equals("0000-0001-6651-1178")
+							&& a.getPid().getProvenance() != null));
 
-		Assertions.assertTrue(gr.getAuthor().stream().anyMatch(a -> a.getFullname().equals("Sgardelis,Steanos") &&
-				a.getName().equals("Steanos") && a.getSurname().equals("Sgardelis")
-				&& a.getRank() == 3 && a.getPid().getId().getScheme().equals(ModelConstants.ORCID_PENDING)
-				&& a.getPid().getId().getValue().equals("0000-0001-6651-1178") && a.getPid().getProvenance() != null));
+		Assertions
+			.assertTrue(
+				gr
+					.getAuthor()
+					.stream()
+					.anyMatch(
+						a -> a.getFullname().equals("Sgardelis,Steanos") &&
+							a.getName().equals("Steanos") && a.getSurname().equals("Sgardelis")
+							&& a.getRank() == 3 && a.getPid().getId().getScheme().equals(ModelConstants.ORCID_PENDING)
+							&& a.getPid().getId().getValue().equals("0000-0001-6651-1178")
+							&& a.getPid().getProvenance() != null));
 
-		Assertions.assertTrue(gr.getAuthor().stream().anyMatch(a -> a.getFullname().equals("Halley,John") &&
-				a.getName().equals("John") && a.getSurname().equals("Halley")
-				&& a.getRank() == 4 && a.getPid() == null));
+		Assertions
+			.assertTrue(
+				gr
+					.getAuthor()
+					.stream()
+					.anyMatch(
+						a -> a.getFullname().equals("Halley,John") &&
+							a.getName().equals("John") && a.getSurname().equals("Halley")
+							&& a.getRank() == 4 && a.getPid() == null));
 
-		Assertions.assertTrue(gr.getAuthor().stream().anyMatch(a -> a.getFullname().equals("Pantis,John") &&
-				a.getName().equals("John") && a.getSurname().equals("Pantis")
-				&& a.getRank() == 5 && a.getPid().getId().getScheme().equals(ModelConstants.ORCID)
-				&& a.getPid().getId().getValue().equals("0000-0001-6651-1178") && a.getPid().getProvenance() != null));
+		Assertions
+			.assertTrue(
+				gr
+					.getAuthor()
+					.stream()
+					.anyMatch(
+						a -> a.getFullname().equals("Pantis,John") &&
+							a.getName().equals("John") && a.getSurname().equals("Pantis")
+							&& a.getRank() == 5 && a.getPid().getId().getScheme().equals(ModelConstants.ORCID)
+							&& a.getPid().getId().getValue().equals("0000-0001-6651-1178")
+							&& a.getPid().getProvenance() != null));
 
-		Assertions.assertTrue(gr.getAuthor().stream().anyMatch(a -> a.getFullname().equals("Tsiafouli,Maria") &&
-				a.getName().equals("Maria") && a.getSurname().equals("Tsiafouli")
-				&& a.getRank() == 6 && a.getPid().getId().getScheme().equals(ModelConstants.ORCID_PENDING)
-				&& a.getPid().getId().getValue().equals("0000-0001-6651-1178") && a.getPid().getProvenance() != null));
+		Assertions
+			.assertTrue(
+				gr
+					.getAuthor()
+					.stream()
+					.anyMatch(
+						a -> a.getFullname().equals("Tsiafouli,Maria") &&
+							a.getName().equals("Maria") && a.getSurname().equals("Tsiafouli")
+							&& a.getRank() == 6 && a.getPid().getId().getScheme().equals(ModelConstants.ORCID_PENDING)
+							&& a.getPid().getId().getValue().equals("0000-0001-6651-1178")
+							&& a.getPid().getProvenance() != null));
 
 		Assertions.assertEquals("publication", gr.getType());
 
@@ -216,27 +264,52 @@ public class DumpJobTest {
 		Assertions.assertEquals("English", gr.getLanguage().getLabel());
 
 		Assertions.assertEquals(1, gr.getCountry().size());
-		Assertions.assertEquals("IT" , gr.getCountry().get(0).getCode());
-		Assertions.assertEquals("Italy" , gr.getCountry().get(0).getLabel());
-		Assertions.assertTrue( gr.getCountry().get(0).getProvenance() == null);
+		Assertions.assertEquals("IT", gr.getCountry().get(0).getCode());
+		Assertions.assertEquals("Italy", gr.getCountry().get(0).getLabel());
+		Assertions.assertTrue(gr.getCountry().get(0).getProvenance() == null);
 
 		Assertions.assertEquals(12, gr.getSubjects().size());
-		Assertions.assertTrue(gr.getSubjects().stream().anyMatch(s -> s.getSubject().getValue().equals("Ecosystem Services hotspots")
-				&& s.getSubject().getScheme().equals("ACM") && s.getProvenance() != null  &&
-				s.getProvenance().getProvenance().equals("sysimport:crosswalk:repository")));
-		Assertions.assertTrue(gr.getSubjects().stream().anyMatch(s -> s.getSubject().getValue().equals("Natura 2000")
-				&& s.getSubject().getScheme().equals("") && s.getProvenance() != null  &&
-				s.getProvenance().getProvenance().equals("sysimport:crosswalk:repository")));
+		Assertions
+			.assertTrue(
+				gr
+					.getSubjects()
+					.stream()
+					.anyMatch(
+						s -> s.getSubject().getValue().equals("Ecosystem Services hotspots")
+							&& s.getSubject().getScheme().equals("ACM") && s.getProvenance() != null &&
+							s.getProvenance().getProvenance().equals("sysimport:crosswalk:repository")));
+		Assertions
+			.assertTrue(
+				gr
+					.getSubjects()
+					.stream()
+					.anyMatch(
+						s -> s.getSubject().getValue().equals("Natura 2000")
+							&& s.getSubject().getScheme().equals("") && s.getProvenance() != null &&
+							s.getProvenance().getProvenance().equals("sysimport:crosswalk:repository")));
 
-		Assertions.assertEquals("Ecosystem Service capacity is higher in areas of multiple designation types",
+		Assertions
+			.assertEquals(
+				"Ecosystem Service capacity is higher in areas of multiple designation types",
 				gr.getMaintitle());
 
 		Assertions.assertEquals(null, gr.getSubtitle());
 
 		Assertions.assertEquals(1, gr.getDescription().size());
 
-		Assertions.assertTrue(gr.getDescription().get(0).startsWith("The implementation of the Ecosystem Service (ES) concept into practice"));
-		Assertions.assertTrue(gr.getDescription().get(0).endsWith("start complying with new standards and demands for nature conservation and environmental management."));
+		Assertions
+			.assertTrue(
+				gr
+					.getDescription()
+					.get(0)
+					.startsWith("The implementation of the Ecosystem Service (ES) concept into practice"));
+		Assertions
+			.assertTrue(
+				gr
+					.getDescription()
+					.get(0)
+					.endsWith(
+						"start complying with new standards and demands for nature conservation and environmental management."));
 
 		Assertions.assertEquals("2017-01-01", gr.getPublicationdate());
 
@@ -255,7 +328,9 @@ public class DumpJobTest {
 		Assertions.assertEquals(0, gr.getCoverage().size());
 
 		Assertions.assertEquals(ModelConstants.ACCESS_RIGHT_OPEN, gr.getBestaccessright().getLabel());
-		Assertions.assertEquals(Constants.accessRightsCoarMap.get(ModelConstants.ACCESS_RIGHT_OPEN), gr.getBestaccessright().getCode());
+		Assertions
+			.assertEquals(
+				Constants.accessRightsCoarMap.get(ModelConstants.ACCESS_RIGHT_OPEN), gr.getBestaccessright().getCode());
 		Assertions.assertEquals(null, gr.getBestaccessright().getOpenAccessRoute());
 
 		Assertions.assertEquals("One Ecosystem", gr.getContainer().getName());
@@ -284,12 +359,16 @@ public class DumpJobTest {
 		Assertions.assertEquals("50|pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2", gr.getId());
 
 		Assertions.assertEquals(2, gr.getOriginalId().size());
-		Assertions.assertTrue(gr.getOriginalId().contains("50|pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2")
-				&& gr.getOriginalId().contains("10.3897/oneeco.2.e13718"));
+		Assertions
+			.assertTrue(
+				gr.getOriginalId().contains("50|pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2")
+					&& gr.getOriginalId().contains("10.3897/oneeco.2.e13718"));
 
 		Assertions.assertEquals(1, gr.getPid().size());
-		Assertions.assertTrue(gr.getPid().get(0).getScheme().equals("doi")
-				&& gr.getPid().get(0).getValue().equals("10.1016/j.triboint.2014.05.004"));
+		Assertions
+			.assertTrue(
+				gr.getPid().get(0).getScheme().equals("doi")
+					&& gr.getPid().get(0).getValue().equals("10.1016/j.triboint.2014.05.004"));
 
 		Assertions.assertEquals("2020-03-23T00:20:51.392Z", gr.getDateofcollection());
 
@@ -298,53 +377,63 @@ public class DumpJobTest {
 		Instance instance = gr.getInstance().get(0);
 		Assertions.assertEquals(0, instance.getPid().size());
 		Assertions.assertEquals(1, instance.getAlternateIdentifier().size());
-		Assertions.assertTrue(instance.getAlternateIdentifier().get(0).getScheme().equals("doi")
-				&& instance.getAlternateIdentifier().get(0).getValue().equals("10.3897/oneeco.2.e13718"));
+		Assertions
+			.assertTrue(
+				instance.getAlternateIdentifier().get(0).getScheme().equals("doi")
+					&& instance.getAlternateIdentifier().get(0).getValue().equals("10.3897/oneeco.2.e13718"));
 		Assertions.assertEquals(null, instance.getLicense());
-		Assertions.assertTrue(instance.getAccessright().getCode().equals(Constants.accessRightsCoarMap
-				.get(ModelConstants.ACCESS_RIGHT_OPEN)));
+		Assertions
+			.assertTrue(
+				instance
+					.getAccessright()
+					.getCode()
+					.equals(
+						Constants.accessRightsCoarMap
+							.get(ModelConstants.ACCESS_RIGHT_OPEN)));
 		Assertions.assertTrue(instance.getAccessright().getLabel().equals(ModelConstants.ACCESS_RIGHT_OPEN));
 		Assertions.assertTrue(instance.getAccessright().getOpenAccessRoute().equals(OpenAccessRoute.green));
 		Assertions.assertTrue(instance.getType().equals("Article"));
 		Assertions.assertEquals(2, instance.getUrl().size());
-		Assertions.assertTrue(instance.getUrl().contains("https://doi.org/10.3897/oneeco.2.e13718")
-				&& instance.getUrl().contains("https://oneecosystem.pensoft.net/article/13718/"));
-		Assertions.assertEquals("2017-01-01",instance.getPublicationdate());
-		Assertions.assertEquals(null,instance.getArticleprocessingcharge());
+		Assertions
+			.assertTrue(
+				instance.getUrl().contains("https://doi.org/10.3897/oneeco.2.e13718")
+					&& instance.getUrl().contains("https://oneecosystem.pensoft.net/article/13718/"));
+		Assertions.assertEquals("2017-01-01", instance.getPublicationdate());
+		Assertions.assertEquals(null, instance.getArticleprocessingcharge());
 		Assertions.assertEquals("peerReviewed", instance.getRefereed());
 	}
 
-
 	@Test
-	public void testDatasetDump(){
+	public void testDatasetDump() {
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/dataset_extendedinstance")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/dataset_extendedinstance")
+			.getPath();
 
 		final String communityMapPath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
+			.getPath();
 
 		DumpProducts dump = new DumpProducts();
 		dump
-				.run(false, sourcePath, workingDir.toString() + "/result",
-						communityMapPath, Dataset.class,
-						GraphResult.class, Constants.DUMPTYPE.COMPLETE.getType());
+			.run(
+				false, sourcePath, workingDir.toString() + "/result",
+				communityMapPath, Dataset.class,
+				GraphResult.class, Constants.DUMPTYPE.COMPLETE.getType());
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<GraphResult> tmp = sc
-				.textFile(workingDir.toString() + "/result")
-				.map(item -> OBJECT_MAPPER.readValue(item, GraphResult.class));
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, GraphResult.class));
 
 		org.apache.spark.sql.Dataset<GraphResult> verificationDataset = spark
-				.createDataset(tmp.rdd(), Encoders.bean(GraphResult.class));
+			.createDataset(tmp.rdd(), Encoders.bean(GraphResult.class));
 
 		Assertions.assertEquals(1, verificationDataset.count());
 
 		Assertions.assertEquals(1, verificationDataset.filter("type = 'dataset'").count());
 
-		//the common fields in the result have been already checked. Now checking only
+		// the common fields in the result have been already checked. Now checking only
 		// community specific fields
 
 		GraphResult gr = verificationDataset.first();
@@ -353,10 +442,33 @@ public class DumpJobTest {
 		Assertions.assertEquals(2, gr.getGeolocation().stream().filter(gl -> gl.getBox().equals("")).count());
 		Assertions.assertEquals(1, gr.getGeolocation().stream().filter(gl -> gl.getPlace().equals("")).count());
 		Assertions.assertEquals(1, gr.getGeolocation().stream().filter(gl -> gl.getPoint().equals("")).count());
-		Assertions.assertEquals(1, gr.getGeolocation().stream().filter(gl -> gl.getPlace().equals("18 York St, Ottawa, ON K1N 5S6; Ottawa; Ontario; Canada")).count());
-		Assertions.assertEquals(1, gr.getGeolocation().stream().filter(gl -> gl.getPoint().equals("45.427242 -75.693904")).count());
-		Assertions.assertEquals(1, gr.getGeolocation().stream().filter(gl -> gl.getPoint().equals("") && !gl.getPlace().equals("")).count());
-		Assertions.assertEquals(1, gr.getGeolocation().stream().filter(gl -> !gl.getPoint().equals("") && gl.getPlace().equals("")).count());
+		Assertions
+			.assertEquals(
+				1,
+				gr
+					.getGeolocation()
+					.stream()
+					.filter(gl -> gl.getPlace().equals("18 York St, Ottawa, ON K1N 5S6; Ottawa; Ontario; Canada"))
+					.count());
+		Assertions
+			.assertEquals(
+				1, gr.getGeolocation().stream().filter(gl -> gl.getPoint().equals("45.427242 -75.693904")).count());
+		Assertions
+			.assertEquals(
+				1,
+				gr
+					.getGeolocation()
+					.stream()
+					.filter(gl -> gl.getPoint().equals("") && !gl.getPlace().equals(""))
+					.count());
+		Assertions
+			.assertEquals(
+				1,
+				gr
+					.getGeolocation()
+					.stream()
+					.filter(gl -> !gl.getPoint().equals("") && gl.getPlace().equals(""))
+					.count());
 
 		Assertions.assertEquals("1024Gb", gr.getSize());
 
@@ -373,30 +485,30 @@ public class DumpJobTest {
 	}
 
 	@Test
-	public void testSoftwareDump(){
+	public void testSoftwareDump() {
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/software_extendedinstance")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/software_extendedinstance")
+			.getPath();
 
 		final String communityMapPath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
+			.getPath();
 
 		DumpProducts dump = new DumpProducts();
 		dump
-				.run(false, sourcePath, workingDir.toString() + "/result",
-						communityMapPath, Software.class,
-						GraphResult.class, Constants.DUMPTYPE.COMPLETE.getType());
+			.run(
+				false, sourcePath, workingDir.toString() + "/result",
+				communityMapPath, Software.class,
+				GraphResult.class, Constants.DUMPTYPE.COMPLETE.getType());
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-
 		JavaRDD<GraphResult> tmp = sc
-				.textFile(workingDir.toString() + "/result")
-				.map(item -> OBJECT_MAPPER.readValue(item, GraphResult.class));
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, GraphResult.class));
 
 		org.apache.spark.sql.Dataset<GraphResult> verificationDataset = spark
-				.createDataset(tmp.rdd(), Encoders.bean(GraphResult.class));
+			.createDataset(tmp.rdd(), Encoders.bean(GraphResult.class));
 
 		Assertions.assertEquals(1, verificationDataset.count());
 
@@ -412,7 +524,6 @@ public class DumpJobTest {
 
 		Assertions.assertEquals("perl", gr.getProgrammingLanguage());
 
-
 		Assertions.assertEquals(null, gr.getContainer());
 		Assertions.assertEquals(null, gr.getContactperson());
 		Assertions.assertEquals(null, gr.getContactgroup());
@@ -424,30 +535,30 @@ public class DumpJobTest {
 	}
 
 	@Test
-	public void testOrpDump(){
+	public void testOrpDump() {
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/orp_extendedinstance")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/orp_extendedinstance")
+			.getPath();
 
 		final String communityMapPath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
+			.getPath();
 
 		DumpProducts dump = new DumpProducts();
 		dump
-				.run(false, sourcePath, workingDir.toString() + "/result",
-						communityMapPath, OtherResearchProduct.class,
-						GraphResult.class, Constants.DUMPTYPE.COMPLETE.getType());
+			.run(
+				false, sourcePath, workingDir.toString() + "/result",
+				communityMapPath, OtherResearchProduct.class,
+				GraphResult.class, Constants.DUMPTYPE.COMPLETE.getType());
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-
 		JavaRDD<GraphResult> tmp = sc
-				.textFile(workingDir.toString() + "/result")
-				.map(item -> OBJECT_MAPPER.readValue(item, GraphResult.class));
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, GraphResult.class));
 
 		org.apache.spark.sql.Dataset<GraphResult> verificationDataset = spark
-				.createDataset(tmp.rdd(), Encoders.bean(GraphResult.class));
+			.createDataset(tmp.rdd(), Encoders.bean(GraphResult.class));
 
 		Assertions.assertEquals(1, verificationDataset.count());
 
@@ -466,7 +577,6 @@ public class DumpJobTest {
 		Assertions.assertTrue(gr.getTool().contains("tool1"));
 		Assertions.assertTrue(gr.getTool().contains("tool2"));
 
-
 		Assertions.assertEquals(null, gr.getContainer());
 		Assertions.assertEquals(null, gr.getDocumentationUrl());
 		Assertions.assertEquals(null, gr.getCodeRepositoryUrl());
@@ -481,32 +591,33 @@ public class DumpJobTest {
 	public void testPublicationDumpCommunity() throws JsonProcessingException {
 
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/publication_extendedinstance")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/resultDump/publication_extendedinstance")
+			.getPath();
 
 		final String communityMapPath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/communityMapPath/communitymap.json")
+			.getPath();
 
 		DumpProducts dump = new DumpProducts();
 		dump
-				.run(false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
-						CommunityResult.class, Constants.DUMPTYPE.COMMUNITY.getType());
+			.run(
+				false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
+				CommunityResult.class, Constants.DUMPTYPE.COMMUNITY.getType());
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<CommunityResult> tmp = sc
-				.textFile(workingDir.toString() + "/result")
-				.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+			.textFile(workingDir.toString() + "/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
 		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
-				.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
+			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
 
 		Assertions.assertEquals(1, verificationDataset.count());
 
 		Assertions.assertEquals(1, verificationDataset.filter("type = 'publication'").count());
 
-		//the common fields in the result have been already checked. Now checking only
+		// the common fields in the result have been already checked. Now checking only
 		// community specific fields
 
 		CommunityResult cr = verificationDataset.first();
@@ -519,15 +630,20 @@ public class DumpJobTest {
 		Assertions.assertEquals("0.9", cr.getContext().get(0).getProvenance().get(0).getTrust());
 
 		Assertions.assertEquals(1, cr.getCollectedfrom().size());
-		Assertions.assertEquals("10|openaire____::fdc7e0400d8c1634cdaf8051dbae23db", cr.getCollectedfrom().get(0).getKey());
+		Assertions
+			.assertEquals("10|openaire____::fdc7e0400d8c1634cdaf8051dbae23db", cr.getCollectedfrom().get(0).getKey());
 		Assertions.assertEquals("Pensoft", cr.getCollectedfrom().get(0).getValue());
 
 		Assertions.assertEquals(1, cr.getInstance().size());
-		Assertions.assertEquals("10|openaire____::fdc7e0400d8c1634cdaf8051dbae23db", cr.getInstance().get(0).getCollectedfrom().getKey());
+		Assertions
+			.assertEquals(
+				"10|openaire____::fdc7e0400d8c1634cdaf8051dbae23db",
+				cr.getInstance().get(0).getCollectedfrom().getKey());
 		Assertions.assertEquals("Pensoft", cr.getInstance().get(0).getCollectedfrom().getValue());
-		Assertions.assertEquals("10|openaire____::e707e544b9a5bd23fc27fbfa65eb60dd", cr.getInstance().get(0).getHostedby().getKey());
-		Assertions.assertEquals("One Ecosystem",cr.getInstance().get(0).getHostedby().getValue());
-
+		Assertions
+			.assertEquals(
+				"10|openaire____::e707e544b9a5bd23fc27fbfa65eb60dd", cr.getInstance().get(0).getHostedby().getKey());
+		Assertions.assertEquals("One Ecosystem", cr.getInstance().get(0).getHostedby().getValue());
 
 	}
 
@@ -586,8 +702,6 @@ public class DumpJobTest {
 		Assertions.assertTrue(verificationDataset.filter("size(context) > 0").count() == 90);
 
 		Assertions.assertTrue(verificationDataset.filter("type = 'dataset'").count() == 90);
-
-
 
 	}
 
@@ -649,7 +763,6 @@ public class DumpJobTest {
 			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
 
 		Assertions.assertEquals(0, verificationDataset.count());
-
 
 	}
 
@@ -717,7 +830,6 @@ public class DumpJobTest {
 		Assertions.assertEquals(6, verificationDataset.count());
 
 		Assertions.assertEquals(6, verificationDataset.filter("type = 'software'").count());
-
 
 	}
 
@@ -814,7 +926,6 @@ public class DumpJobTest {
 
 		Assertions.assertEquals(23, verificationDataset.count());
 
-
 		Assertions.assertEquals(23, verificationDataset.filter("type = 'publication'").count());
 
 		verificationDataset.createOrReplaceTempView("check");
@@ -831,7 +942,6 @@ public class DumpJobTest {
 		Assertions.assertTrue(temp.filter("id = '50|datacite____::05c611fdfc93d7a2a703d1324e28104a'").count() == 1);
 
 		Assertions.assertTrue(temp.filter("id = '50|dedup_wf_001::01e6a28565ca01376b7548e530c6f6e8'").count() == 1);
-
 
 	}
 

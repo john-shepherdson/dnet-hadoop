@@ -6,6 +6,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Encoders;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.dump.oaf.*;
@@ -23,8 +25,6 @@ import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Context;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.GraphResult;
 import eu.dnetlib.dhp.schema.oaf.*;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Encoders;
 
 public class ResultMapper implements Serializable {
 
@@ -278,16 +278,17 @@ public class ResultMapper implements Serializable {
 
 			}
 
-
 			Optional
 				.ofNullable(input.getPid())
 				.ifPresent(
-					value -> out.setPid(value
-						.stream()
-						.map(
-							p ->
-									ControlledField
-										.newInstance(p.getQualifier().getClassid(), p.getValue())).collect(Collectors.toList())));
+					value -> out
+						.setPid(
+							value
+								.stream()
+								.map(
+									p -> ControlledField
+										.newInstance(p.getQualifier().getClassid(), p.getValue()))
+								.collect(Collectors.toList())));
 
 			oStr = Optional.ofNullable(input.getDateofacceptance());
 			if (oStr.isPresent()) {
@@ -298,11 +299,10 @@ public class ResultMapper implements Serializable {
 				out.setPublisher(oStr.get().getValue());
 			}
 
-
 			Optional
 				.ofNullable(input.getSource())
-				.ifPresent(value -> out.setSource(value.stream().map(s -> s.getValue()).collect(Collectors.toList()) ));
-					//	value.stream().forEach(s -> sourceList.add(s.getValue())));
+				.ifPresent(value -> out.setSource(value.stream().map(s -> s.getValue()).collect(Collectors.toList())));
+			// value.stream().forEach(s -> sourceList.add(s.getValue())));
 			// out.setSource(input.getSource().stream().map(s -> s.getValue()).collect(Collectors.toList()));
 			List<Subject> subjectList = new ArrayList<>();
 			Optional
@@ -577,48 +577,60 @@ public class ResultMapper implements Serializable {
 		Optional<DataInfo> di = Optional.ofNullable(pid.getDataInfo());
 		if (di.isPresent()) {
 			return Pid
-					.newInstance(
-							ControlledField
-									.newInstance(
-											pid.getQualifier().getClassid(),
-											pid.getValue()),
-							Provenance
-									.newInstance(
-											di.get().getProvenanceaction().getClassname(),
-											di.get().getTrust()));
+				.newInstance(
+					ControlledField
+						.newInstance(
+							pid.getQualifier().getClassid(),
+							pid.getValue()),
+					Provenance
+						.newInstance(
+							di.get().getProvenanceaction().getClassname(),
+							di.get().getTrust()));
 		} else {
 			return Pid
-					.newInstance(
-							ControlledField
-									.newInstance(
-											pid.getQualifier().getClassid(),
-											pid.getValue())
+				.newInstance(
+					ControlledField
+						.newInstance(
+							pid.getQualifier().getClassid(),
+							pid.getValue())
 
-					);
+				);
 		}
 	}
 
 	private static Pid getOrcid(List<StructuredProperty> p) {
 		List<StructuredProperty> pid_list = p.stream().map(pid -> {
 			if (pid.getQualifier().getClassid().equals(ModelConstants.ORCID) ||
-					(pid.getQualifier().getClassid().equals(ModelConstants.ORCID_PENDING))){
+				(pid.getQualifier().getClassid().equals(ModelConstants.ORCID_PENDING))) {
 				return pid;
 			}
-			return  null;
+			return null;
 		}).filter(pid -> pid != null).collect(Collectors.toList());
 
-		if(pid_list.size() == 1){
+		if (pid_list.size() == 1) {
 			return getAuthorPid(pid_list.get(0));
 		}
 
-		List<StructuredProperty> orcid = pid_list.stream().filter(ap -> ap.getQualifier().getClassid()
-				.equals(ModelConstants.ORCID)).collect(Collectors.toList());
-		if(orcid.size() == 1){
+		List<StructuredProperty> orcid = pid_list
+			.stream()
+			.filter(
+				ap -> ap
+					.getQualifier()
+					.getClassid()
+					.equals(ModelConstants.ORCID))
+			.collect(Collectors.toList());
+		if (orcid.size() == 1) {
 			return getAuthorPid(orcid.get(0));
 		}
-		orcid = pid_list.stream().filter(ap -> ap.getQualifier().getClassid()
-				.equals(ModelConstants.ORCID_PENDING)).collect(Collectors.toList());
-		if(orcid.size() == 1){
+		orcid = pid_list
+			.stream()
+			.filter(
+				ap -> ap
+					.getQualifier()
+					.getClassid()
+					.equals(ModelConstants.ORCID_PENDING))
+			.collect(Collectors.toList());
+		if (orcid.size() == 1) {
 			return getAuthorPid(orcid.get(0));
 		}
 

@@ -80,7 +80,6 @@ public class SparkResultLinkedToProject implements Serializable {
 	private static <R extends Result> void writeResultsLinkedToProjects(SparkSession spark, Class<R> inputClazz,
 		String inputPath, String outputPath, String graphPath) {
 
-
 		Dataset<R> results = Utils
 			.readPath(spark, inputPath, inputClazz)
 			.filter("dataInfo.deletedbyinference = false and datainfo.invisible = false");
