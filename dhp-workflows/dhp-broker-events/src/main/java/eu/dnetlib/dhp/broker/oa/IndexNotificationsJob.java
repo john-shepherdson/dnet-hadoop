@@ -17,7 +17,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -25,7 +24,6 @@ import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.util.LongAccumulator;
-import org.elasticsearch.spark.rdd.api.java.JavaEsSpark;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,13 +44,14 @@ public class IndexNotificationsJob {
 
 	private static final Logger log = LoggerFactory.getLogger(IndexNotificationsJob.class);
 
+	private static Map<String, Map<String, List<ConditionParams>>> conditionsForSubscriptions = new HashMap<>();
+
 	public static void main(final String[] args) throws Exception {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(
-					IndexNotificationsJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_notifications.json")));
+				.toString(IndexNotificationsJob.class
+					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_notifications.json")));
 		parser.parseArgument(args);
 
 		final SparkConf conf = new SparkConf();
@@ -89,6 +88,8 @@ public class IndexNotificationsJob {
 
 		final List<Subscription> subscriptions = listSubscriptions(brokerApiBaseUrl);
 
+		initConditionsForSubscriptions(subscriptions);
+
 		log.info("Number of subscriptions: " + subscriptions.size());
 
 		if (subscriptions.size() > 0) {
@@ -96,9 +97,7 @@ public class IndexNotificationsJob {
 			final Encoder<Notification> nEncoder = Encoders.bean(Notification.class);
 			final Dataset<Notification> notifications = ClusterUtils
 				.readPath(spark, eventsPath, Event.class)
-				.map(
-					(MapFunction<Event, NotificationGroup>) e -> generateNotifications(e, subscriptions, startTime),
-					ngEncoder)
+				.map((MapFunction<Event, NotificationGroup>) e -> generateNotifications(e, subscriptions, startTime), ngEncoder)
 				.flatMap((FlatMapFunction<NotificationGroup, Notification>) g -> g.getData().iterator(), nEncoder);
 
 			notifications
@@ -108,18 +107,25 @@ public class IndexNotificationsJob {
 		}
 	}
 
-	private static NotificationGroup generateNotifications(final Event e,
+	protected static void initConditionsForSubscriptions(final List<Subscription> subscriptions) {
+		subscriptions.forEach(s -> conditionsForSubscriptions.put(s.getSubscriptionId(), s.conditionsAsMap()));
+	}
+
+	protected static NotificationGroup generateNotifications(final Event e,
 		final List<Subscription> subscriptions,
 		final long date) {
 		final List<Notification> list = subscriptions
 			.stream()
-			.filter(
-				s -> StringUtils.isBlank(s.getTopic()) || s.getTopic().equals("*") || s.getTopic().equals(e.getTopic()))
-			.filter(s -> verifyConditions(e.getMap(), s.conditionsAsMap()))
+			.filter(s -> StringUtils.isBlank(s.getTopic()) || s.getTopic().equals("*") || s.getTopic().equals(e.getTopic()))
+			.filter(s -> verifyConditions(e.getMap(), conditionsAsMap(s)))
 			.map(s -> generateNotification(s, e, date))
 			.collect(Collectors.toList());
 
 		return new NotificationGroup(list);
+	}
+
+	private static Map<String, List<ConditionParams>> conditionsAsMap(final Subscription s) {
+		return conditionsForSubscriptions.get(s.getSubscriptionId());
 	}
 
 	private static Notification generateNotification(final Subscription s, final Event e, final long date) {
@@ -145,18 +151,15 @@ public class IndexNotificationsJob {
 
 		if (conditions.containsKey("trust")
 			&& !SubscriptionUtils
-				.verifyFloatRange(
-					map.getTrust(), conditions.get("trust").get(0).getValue(),
-					conditions.get("trust").get(0).getOtherValue())) {
+				.verifyFloatRange(map.getTrust(), conditions.get("trust").get(0).getValue(), conditions.get("trust").get(0).getOtherValue())) {
 			return false;
 		}
 
 		if (conditions.containsKey("targetDateofacceptance") && !conditions
 			.get("targetDateofacceptance")
 			.stream()
-			.anyMatch(
-				c -> SubscriptionUtils
-					.verifyDateRange(map.getTargetDateofacceptance(), c.getValue(), c.getOtherValue()))) {
+			.anyMatch(c -> SubscriptionUtils
+				.verifyDateRange(map.getTargetDateofacceptance(), c.getValue(), c.getOtherValue()))) {
 			return false;
 		}
 
