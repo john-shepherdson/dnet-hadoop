@@ -17,6 +17,7 @@ import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
+import eu.dnetlib.dhp.oa.graph.dump.exceptions.NoAvailableEntityTypeException;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 /**
@@ -66,7 +67,7 @@ public class DumpProducts implements Serializable {
 
 	private static <I extends OafEntity, O extends eu.dnetlib.dhp.schema.dump.oaf.Result> O execMap(I value,
 		CommunityMap communityMap,
-		String dumpType) {
+		String dumpType) throws NoAvailableEntityTypeException {
 
 		Optional<DataInfo> odInfo = Optional.ofNullable(value.getDataInfo());
 		if (odInfo.isPresent()) {
@@ -94,7 +95,7 @@ public class DumpProducts implements Serializable {
 				}
 				return null;
 			}).filter(Objects::nonNull).collect(Collectors.toList());
-			if (toDumpFor.size() == 0) {
+			if (toDumpFor.isEmpty()) {
 				return null;
 			}
 		}

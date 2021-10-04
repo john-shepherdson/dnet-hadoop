@@ -5,7 +5,6 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.spark.SparkConf;
@@ -16,6 +15,7 @@ import org.apache.spark.sql.SparkSession;
 
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
+import eu.dnetlib.dhp.schema.dump.oaf.community.Context;
 
 /**
  * This class splits the dumped results according to the research community - research initiative/infrastructure they
@@ -56,10 +56,10 @@ public class CommunitySplit implements Serializable {
 	}
 
 	private static void printResult(String c, Dataset<CommunityResult> result, String outputPath) {
-		Dataset<CommunityResult> community_products = result
+		Dataset<CommunityResult> communityProducts = result
 			.filter((FilterFunction<CommunityResult>) r -> containsCommunity(r, c));
 
-		community_products
+		communityProducts
 			.write()
 			.option("compression", "gzip")
 			.mode(SaveMode.Overwrite)
@@ -72,7 +72,7 @@ public class CommunitySplit implements Serializable {
 			return r
 				.getContext()
 				.stream()
-				.map(con -> con.getCode())
+				.map(Context::getCode)
 				.collect(Collectors.toList())
 				.contains(c);
 		}

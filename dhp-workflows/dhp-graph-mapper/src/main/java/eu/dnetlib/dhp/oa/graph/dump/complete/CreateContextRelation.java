@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
+import eu.dnetlib.dhp.oa.graph.dump.exceptions.MyRuntimeException;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
@@ -120,7 +121,7 @@ public class CreateContextRelation implements Serializable {
 			writer.write(Utils.OBJECT_MAPPER.writeValueAsString(r));
 			writer.newLine();
 		} catch (final Exception e) {
-			throw new RuntimeException(e);
+			throw new MyRuntimeException(e);
 		}
 	}
 

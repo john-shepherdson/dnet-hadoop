@@ -40,10 +40,10 @@ public class QueryInformationSystem {
 		"{$x//CONFIGURATION/context/@label}" +
 		"</community>";
 
-	public CommunityMap getCommunityMap(boolean singleCommunity, String community_id)
+	public CommunityMap getCommunityMap(boolean singleCommunity, String communityId)
 		throws ISLookUpException, DocumentException, SAXException {
 		if (singleCommunity)
-			return getMap(isLookUp.quickSearchProfile(XQUERY_CI.replace("%s", "'" + community_id + "'")));
+			return getMap(isLookUp.quickSearchProfile(XQUERY_CI.replace("%s", "'" + communityId + "'")));
 		return getMap(isLookUp.quickSearchProfile(XQUERY_ALL));
 
 	}

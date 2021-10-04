@@ -54,7 +54,7 @@ class TestApply extends java.io.Serializable{
         assertTrue(pa.getInstance().get(0).getHostedby.getValue.equals("Academic Therapy"))
         assertTrue(pa.getInstance().get(0).getAccessright.getClassid.equals("OPEN"))
         assertTrue(pa.getInstance().get(0).getAccessright.getClassname.equals("Open Access"))
-        assertTrue(pa.getInstance().get(0).getAccessright.getOpenAccessRoute.equals(OpenAccessRoute.hybrid))
+        assertTrue(pa.getInstance().get(0).getAccessright.getOpenAccessRoute.equals(OpenAccessRoute.gold))
         assertTrue(pa.getBestaccessright.getClassid.equals("OPEN"))
         assertTrue(pa.getBestaccessright.getClassname.equals("Open Access"))
 

@@ -6,9 +6,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Encoders;
 
+import eu.dnetlib.dhp.oa.graph.dump.exceptions.NoAvailableEntityTypeException;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.dump.oaf.*;
 import eu.dnetlib.dhp.schema.dump.oaf.AccessRight;
@@ -29,7 +28,7 @@ import eu.dnetlib.dhp.schema.oaf.*;
 public class ResultMapper implements Serializable {
 
 	public static <E extends eu.dnetlib.dhp.schema.oaf.OafEntity> Result map(
-		E in, Map<String, String> communityMap, String dumpType) {
+		E in, Map<String, String> communityMap, String dumpType) throws NoAvailableEntityTypeException {
 
 		Result out;
 		if (Constants.DUMPTYPE.COMPLETE.getType().equals(dumpType)) {
@@ -136,6 +135,8 @@ public class ResultMapper implements Serializable {
 					out.setType(ModelConstants.ORP_DEFAULT_RESULTTYPE.getClassname());
 
 					break;
+				default:
+					throw new NoAvailableEntityTypeException();
 			}
 
 			Optional<List<Measure>> mes = Optional.ofNullable(input.getMeasures());
@@ -156,17 +157,15 @@ public class ResultMapper implements Serializable {
 			// I do not map Access Right UNKNOWN or OTHER
 
 			Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> oar = Optional.ofNullable(input.getBestaccessright());
-			if (oar.isPresent()) {
-				if (Constants.accessRightsCoarMap.containsKey(oar.get().getClassid())) {
-					String code = Constants.accessRightsCoarMap.get(oar.get().getClassid());
-					out
-						.setBestaccessright(
-							AccessRight
-								.newInstance(
-									code,
-									Constants.coarCodeLabelMap.get(code),
-									Constants.COAR_ACCESS_RIGHT_SCHEMA));
-				}
+			if (oar.isPresent() && Constants.accessRightsCoarMap.containsKey(oar.get().getClassid())) {
+				String code = Constants.accessRightsCoarMap.get(oar.get().getClassid());
+				out
+					.setBestaccessright(
+						AccessRight
+							.newInstance(
+								code,
+								Constants.coarCodeLabelMap.get(code),
+								Constants.COAR_ACCESS_RIGHT_SCHEMA));
 			}
 
 			final List<String> contributorList = new ArrayList<>();
@@ -263,7 +262,7 @@ public class ResultMapper implements Serializable {
 					.stream()
 					.filter(t -> t.getQualifier().getClassid().equalsIgnoreCase("main title"))
 					.collect(Collectors.toList());
-				if (iTitle.size() > 0) {
+				if (!iTitle.isEmpty()) {
 					out.setMaintitle(iTitle.get(0).getValue());
 				}
 
@@ -272,7 +271,7 @@ public class ResultMapper implements Serializable {
 					.stream()
 					.filter(t -> t.getQualifier().getClassid().equalsIgnoreCase("subtitle"))
 					.collect(Collectors.toList());
-				if (iTitle.size() > 0) {
+				if (!iTitle.isEmpty()) {
 					out.setSubtitle(iTitle.get(0).getValue());
 				}
 
@@ -301,9 +300,8 @@ public class ResultMapper implements Serializable {
 
 			Optional
 				.ofNullable(input.getSource())
-				.ifPresent(value -> out.setSource(value.stream().map(s -> s.getValue()).collect(Collectors.toList())));
-			// value.stream().forEach(s -> sourceList.add(s.getValue())));
-			// out.setSource(input.getSource().stream().map(s -> s.getValue()).collect(Collectors.toList()));
+				.ifPresent(value -> out.setSource(value.stream().map(Field::getValue).collect(Collectors.toList())));
+
 			List<Subject> subjectList = new ArrayList<>();
 			Optional
 				.ofNullable(input.getSubject())
@@ -334,14 +332,14 @@ public class ResultMapper implements Serializable {
 					value -> value
 						.stream()
 						.map(c -> {
-							String community_id = c.getId();
-							if (community_id.indexOf("::") > 0) {
-								community_id = community_id.substring(0, community_id.indexOf("::"));
+							String communityId = c.getId();
+							if (communityId.contains("::")) {
+								communityId = communityId.substring(0, communityId.indexOf("::"));
 							}
-							if (communities.contains(community_id)) {
+							if (communities.contains(communityId)) {
 								Context context = new Context();
-								context.setCode(community_id);
-								context.setLabel(communityMap.get(community_id));
+								context.setCode(communityId);
+								context.setLabel(communityMap.get(communityId));
 								Optional<List<DataInfo>> dataInfo = Optional.ofNullable(c.getDataInfo());
 								if (dataInfo.isPresent()) {
 									List<Provenance> provenance = new ArrayList<>();
@@ -361,7 +359,11 @@ public class ResultMapper implements Serializable {
 												.filter(Objects::nonNull)
 												.collect(Collectors.toSet()));
 
-									context.setProvenance(getUniqueProvenance(provenance));
+									try {
+										context.setProvenance(getUniqueProvenance(provenance));
+									} catch (NoAvailableEntityTypeException e) {
+										e.printStackTrace();
+									}
 								}
 								return context;
 							}
@@ -371,7 +373,7 @@ public class ResultMapper implements Serializable {
 						.collect(Collectors.toList()))
 				.orElse(new ArrayList<>());
 
-			if (contextList.size() > 0) {
+			if (!contextList.isEmpty()) {
 				Set<Integer> hashValue = new HashSet<>();
 				List<Context> remainigContext = new ArrayList<>();
 				contextList.forEach(c -> {
@@ -417,35 +419,34 @@ public class ResultMapper implements Serializable {
 	private static <I extends Instance> void setCommonValue(eu.dnetlib.dhp.schema.oaf.Instance i, I instance) {
 		Optional<eu.dnetlib.dhp.schema.oaf.AccessRight> opAr = Optional.ofNullable(i.getAccessright());
 
-		if (opAr.isPresent()) {
-			if (Constants.accessRightsCoarMap.containsKey(opAr.get().getClassid())) {
-				String code = Constants.accessRightsCoarMap.get(opAr.get().getClassid());
+		if (opAr.isPresent() && Constants.accessRightsCoarMap.containsKey(opAr.get().getClassid())) {
+			String code = Constants.accessRightsCoarMap.get(opAr.get().getClassid());
 
-				instance
-					.setAccessright(
-						AccessRight
-							.newInstance(
-								code,
-								Constants.coarCodeLabelMap.get(code),
-								Constants.COAR_ACCESS_RIGHT_SCHEMA));
-				if (opAr.get().getOpenAccessRoute() != null) {
-					switch (opAr.get().getOpenAccessRoute()) {
-						case hybrid:
-							instance.getAccessright().setOpenAccessRoute(OpenAccessRoute.hybrid);
-							break;
-						case gold:
-							instance.getAccessright().setOpenAccessRoute(OpenAccessRoute.gold);
-							break;
-						case green:
-							instance.getAccessright().setOpenAccessRoute(OpenAccessRoute.green);
-							break;
-						case bronze:
-							instance.getAccessright().setOpenAccessRoute(OpenAccessRoute.bronze);
-							break;
+			instance
+				.setAccessright(
+					AccessRight
+						.newInstance(
+							code,
+							Constants.coarCodeLabelMap.get(code),
+							Constants.COAR_ACCESS_RIGHT_SCHEMA));
+			if (opAr.get().getOpenAccessRoute() != null) {
+				switch (opAr.get().getOpenAccessRoute()) {
+					case hybrid:
+						instance.getAccessright().setOpenAccessRoute(OpenAccessRoute.hybrid);
+						break;
+					case gold:
+						instance.getAccessright().setOpenAccessRoute(OpenAccessRoute.gold);
+						break;
+					case green:
+						instance.getAccessright().setOpenAccessRoute(OpenAccessRoute.green);
+						break;
+					case bronze:
+						instance.getAccessright().setOpenAccessRoute(OpenAccessRoute.bronze);
+						break;
 
-					}
 				}
 			}
+
 		}
 
 		Optional
@@ -498,7 +499,8 @@ public class ResultMapper implements Serializable {
 
 	}
 
-	private static List<Provenance> getUniqueProvenance(List<Provenance> provenance) {
+	private static List<Provenance> getUniqueProvenance(List<Provenance> provenance)
+		throws NoAvailableEntityTypeException {
 		Provenance iProv = new Provenance();
 
 		Provenance hProv = new Provenance();
@@ -520,6 +522,8 @@ public class ResultMapper implements Serializable {
 				case Constants.USER_CLAIM:
 					lProv = getHighestTrust(lProv, p);
 					break;
+				default:
+					throw new NoAvailableEntityTypeException();
 			}
 
 		}
@@ -599,19 +603,19 @@ public class ResultMapper implements Serializable {
 	}
 
 	private static Pid getOrcid(List<StructuredProperty> p) {
-		List<StructuredProperty> pid_list = p.stream().map(pid -> {
+		List<StructuredProperty> pidList = p.stream().map(pid -> {
 			if (pid.getQualifier().getClassid().equals(ModelConstants.ORCID) ||
 				(pid.getQualifier().getClassid().equals(ModelConstants.ORCID_PENDING))) {
 				return pid;
 			}
 			return null;
-		}).filter(pid -> pid != null).collect(Collectors.toList());
+		}).filter(Objects::nonNull).collect(Collectors.toList());
 
-		if (pid_list.size() == 1) {
-			return getAuthorPid(pid_list.get(0));
+		if (pidList.size() == 1) {
+			return getAuthorPid(pidList.get(0));
 		}
 
-		List<StructuredProperty> orcid = pid_list
+		List<StructuredProperty> orcid = pidList
 			.stream()
 			.filter(
 				ap -> ap
@@ -622,7 +626,7 @@ public class ResultMapper implements Serializable {
 		if (orcid.size() == 1) {
 			return getAuthorPid(orcid.get(0));
 		}
-		orcid = pid_list
+		orcid = pidList
 			.stream()
 			.filter(
 				ap -> ap

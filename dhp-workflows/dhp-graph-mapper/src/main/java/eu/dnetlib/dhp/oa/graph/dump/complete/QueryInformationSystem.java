@@ -13,7 +13,6 @@ import org.dom4j.io.SAXReader;
 import org.jetbrains.annotations.NotNull;
 import org.xml.sax.SAXException;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
@@ -94,9 +93,9 @@ public class QueryInformationSystem {
 				Element root = doc.getRootElement();
 				cinfo.setId(root.attributeValue("id"));
 
-				Iterator it = root.elementIterator();
+				Iterator<Element> it = root.elementIterator();
 				while (it.hasNext()) {
-					Element el = (Element) it.next();
+					Element el = it.next();
 					if (el.getName().equals("category")) {
 						String categoryId = el.attributeValue("id");
 						categoryId = categoryId.substring(categoryId.lastIndexOf("::") + 2);
@@ -143,7 +142,7 @@ public class QueryInformationSystem {
 		if (!prefix.equals(ModelSupport.entityIdPrefix.get("project"))) {
 			return null;
 		}
-		String funder = null;
+		String funder = "";
 		String grantId = null;
 		String funding = null;
 		for (Object node : el.selectNodes(".//param")) {
@@ -158,9 +157,12 @@ public class QueryInformationSystem {
 				case "CD_PROJECT_NUMBER":
 					grantId = n.getText();
 					break;
+				default:
+					break;
 			}
 		}
 		String nsp = null;
+
 		switch (funder.toLowerCase()) {
 			case "ec":
 				if (funding == null) {
@@ -179,10 +181,12 @@ public class QueryInformationSystem {
 				nsp = "dfgf________::";
 				break;
 			default:
-				nsp = funder.toLowerCase();
+				StringBuilder bld = new StringBuilder();
+				bld.append(funder.toLowerCase());
 				for (int i = funder.length(); i < 12; i++)
-					nsp += "_";
-				nsp += "::";
+					bld.append("_");
+				bld.append("::");
+				nsp = bld.toString();
 		}
 
 		return prefix + "|" + nsp + DHPUtils.md5(grantId);

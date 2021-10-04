@@ -62,22 +62,7 @@ public class Extractor implements Serializable {
 			.readPath(spark, inputPath, inputClazz)
 			.flatMap((FlatMapFunction<R, Relation>) value -> {
 				List<Relation> relationList = new ArrayList<>();
-				Optional
-					.ofNullable(value.getInstance())
-					.ifPresent(inst -> inst.forEach(instance -> {
-						Optional
-							.ofNullable(instance.getCollectedfrom())
-							.ifPresent(
-								cf -> getRelatioPair(
-									value, relationList, cf,
-									ModelConstants.IS_PROVIDED_BY, ModelConstants.PROVIDES, hashCodes));
-						Optional
-							.ofNullable(instance.getHostedby())
-							.ifPresent(
-								hb -> getRelatioPair(
-									value, relationList, hb,
-									Constants.IS_HOSTED_BY, Constants.HOSTS, hashCodes));
-					}));
+				extractRelationsFromInstance(hashCodes, value, relationList);
 				Set<String> communities = communityMap.keySet();
 				Optional
 					.ofNullable(value.getContext())
@@ -136,8 +121,28 @@ public class Extractor implements Serializable {
 
 	}
 
+	private <R extends Result> void extractRelationsFromInstance(Set<Integer> hashCodes, R value,
+		List<Relation> relationList) {
+		Optional
+			.ofNullable(value.getInstance())
+			.ifPresent(inst -> inst.forEach(instance -> {
+				Optional
+					.ofNullable(instance.getCollectedfrom())
+					.ifPresent(
+						cf -> getRelatioPair(
+							value, relationList, cf,
+							ModelConstants.IS_PROVIDED_BY, ModelConstants.PROVIDES, hashCodes));
+				Optional
+					.ofNullable(instance.getHostedby())
+					.ifPresent(
+						hb -> getRelatioPair(
+							value, relationList, hb,
+							Constants.IS_HOSTED_BY, Constants.HOSTS, hashCodes));
+			}));
+	}
+
 	private static <R extends Result> void getRelatioPair(R value, List<Relation> relationList, KeyValue cf,
-		String result_dtasource, String datasource_result,
+		String resultDatasource, String datasourceResult,
 		Set<Integer> hashCodes) {
 		Provenance provenance = Optional
 			.ofNullable(cf.getDataInfo())
@@ -162,7 +167,7 @@ public class Extractor implements Serializable {
 		Relation r = getRelation(
 			value.getId(),
 			cf.getKey(), Constants.RESULT_ENTITY, Constants.DATASOURCE_ENTITY,
-			result_dtasource, ModelConstants.PROVISION,
+			resultDatasource, ModelConstants.PROVISION,
 			provenance);
 		if (!hashCodes.contains(r.hashCode())) {
 			relationList
@@ -173,7 +178,7 @@ public class Extractor implements Serializable {
 		r = getRelation(
 			cf.getKey(), value.getId(),
 			Constants.DATASOURCE_ENTITY, Constants.RESULT_ENTITY,
-			datasource_result, ModelConstants.PROVISION,
+			datasourceResult, ModelConstants.PROVISION,
 			provenance);
 
 		if (!hashCodes.contains(r.hashCode())) {

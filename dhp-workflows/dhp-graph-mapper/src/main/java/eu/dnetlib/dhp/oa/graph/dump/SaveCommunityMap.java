@@ -31,9 +31,9 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 public class SaveCommunityMap implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(SaveCommunityMap.class);
-	private final QueryInformationSystem queryInformationSystem;
+	private final transient QueryInformationSystem queryInformationSystem;
 
-	private final BufferedWriter writer;
+	private final transient BufferedWriter writer;
 
 	public SaveCommunityMap(String hdfsPath, String hdfsNameNode, String isLookUpUrl) throws IOException {
 		final Configuration conf = new Configuration();
@@ -84,12 +84,12 @@ public class SaveCommunityMap implements Serializable {
 
 	}
 
-	private void saveCommunityMap(boolean singleCommunity, String community_id)
+	private void saveCommunityMap(boolean singleCommunity, String communityId)
 		throws ISLookUpException, IOException, DocumentException, SAXException {
 		writer
 			.write(
 				Utils.OBJECT_MAPPER
-					.writeValueAsString(queryInformationSystem.getCommunityMap(singleCommunity, community_id)));
+					.writeValueAsString(queryInformationSystem.getCommunityMap(singleCommunity, communityId)));
 	}
 
 }

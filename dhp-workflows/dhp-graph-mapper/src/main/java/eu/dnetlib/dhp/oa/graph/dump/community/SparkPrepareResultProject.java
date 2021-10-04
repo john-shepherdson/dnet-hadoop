@@ -161,7 +161,7 @@ public class SparkPrepareResultProject implements Serializable {
 			provenance.setTrust(di.get().getTrust());
 			p.setProvenance(provenance);
 		}
-		if (relation.getValidated()) {
+		if (Boolean.TRUE.equals(relation.getValidated())) {
 			p.setValidated(Validated.newInstance(relation.getValidated(), relation.getValidationDate()));
 		}
 		return p;
@@ -179,8 +179,8 @@ public class SparkPrepareResultProject implements Serializable {
 			f.setName(((Node) (doc.selectNodes("//funder/name").get(0))).getText());
 			f.setJurisdiction(((Node) (doc.selectNodes("//funder/jurisdiction").get(0))).getText());
 			for (Object o : doc.selectNodes("//funding_level_0")) {
-				List node = ((Node) o).selectNodes("./name");
-				f.setFundingStream(((Node) node.get(0)).getText());
+				List<Node> node = ((Node) o).selectNodes("./name");
+				f.setFundingStream((node.get(0)).getText());
 			}
 
 			return f;

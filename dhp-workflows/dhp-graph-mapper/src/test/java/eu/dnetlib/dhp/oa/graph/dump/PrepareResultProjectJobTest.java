@@ -8,17 +8,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.commons.io.FileUtils;
-
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -248,14 +245,14 @@ public class PrepareResultProjectJobTest {
 		org.apache.spark.sql.Dataset<ResultProject> verificationDataset = spark
 			.createDataset(tmp.rdd(), Encoders.bean(ResultProject.class));
 
-		assertEquals(2, verificationDataset.count() );
+		assertEquals(2, verificationDataset.count());
 
 		assertEquals(
-				1,
-				verificationDataset.filter("resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'").count());
+			1,
+			verificationDataset.filter("resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'").count());
 		assertEquals(
-				1,
-				verificationDataset.filter("resultId = '50|dedup_wf_001::51b88f272ba9c3bb181af64e70255a80'").count());
+			1,
+			verificationDataset.filter("resultId = '50|dedup_wf_001::51b88f272ba9c3bb181af64e70255a80'").count());
 
 		verificationDataset.createOrReplaceTempView("dataset");
 
@@ -269,59 +266,59 @@ public class PrepareResultProjectJobTest {
 		assertEquals(3, resultExplodedProvenance.count());
 		assertEquals(3, resultExplodedProvenance.filter("validatedByFunder = true").count());
 		assertEquals(
-				2,
-				resultExplodedProvenance
-					.filter("resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'")
-					.count());
+			2,
+			resultExplodedProvenance
+				.filter("resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'")
+				.count());
 
 		assertEquals(
-				1,
-				resultExplodedProvenance
-					.filter("resultId = '50|dedup_wf_001::51b88f272ba9c3bb181af64e70255a80'")
-					.count());
+			1,
+			resultExplodedProvenance
+				.filter("resultId = '50|dedup_wf_001::51b88f272ba9c3bb181af64e70255a80'")
+				.count());
 
 		assertEquals(
-				2,
-				resultExplodedProvenance
-					.filter("project = '40|aka_________::0f7d119de1f656b5763a16acf876fed6'")
-					.count());
+			2,
+			resultExplodedProvenance
+				.filter("project = '40|aka_________::0f7d119de1f656b5763a16acf876fed6'")
+				.count());
 
 		assertEquals(
-				1,
-				resultExplodedProvenance
-					.filter(
-						"project = '40|aka_________::0f7d119de1f656b5763a16acf876fed6' " +
-							"and resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb' " +
-							"and validatedByFunder = true " +
-							"and validationDate = '2021-08-06'")
-					.count());
+			1,
+			resultExplodedProvenance
+				.filter(
+					"project = '40|aka_________::0f7d119de1f656b5763a16acf876fed6' " +
+						"and resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb' " +
+						"and validatedByFunder = true " +
+						"and validationDate = '2021-08-06'")
+				.count());
 
 		assertEquals(
-				1,
-				resultExplodedProvenance
-					.filter(
-						"project = '40|aka_________::0f7d119de1f656b5763a16acf876fed6' " +
-							"and resultId = '50|dedup_wf_001::51b88f272ba9c3bb181af64e70255a80' " +
-							"and validatedByFunder = true and validationDate = '2021-08-04'")
-					.count());
+			1,
+			resultExplodedProvenance
+				.filter(
+					"project = '40|aka_________::0f7d119de1f656b5763a16acf876fed6' " +
+						"and resultId = '50|dedup_wf_001::51b88f272ba9c3bb181af64e70255a80' " +
+						"and validatedByFunder = true and validationDate = '2021-08-04'")
+				.count());
 
 		assertEquals(
-				1,
-				resultExplodedProvenance
-					.filter("project = '40|aka_________::03376222b28a3aebf2730ac514818d04'")
-					.count());
+			1,
+			resultExplodedProvenance
+				.filter("project = '40|aka_________::03376222b28a3aebf2730ac514818d04'")
+				.count());
 
 		assertEquals(
-				1,
-				resultExplodedProvenance
-					.filter(
-						"project = '40|aka_________::03376222b28a3aebf2730ac514818d04' " +
-							"and resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb' " +
-							"and validatedByFunder = true and validationDate = '2021-08-05'")
-					.count());
+			1,
+			resultExplodedProvenance
+				.filter(
+					"project = '40|aka_________::03376222b28a3aebf2730ac514818d04' " +
+						"and resultId = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb' " +
+						"and validatedByFunder = true and validationDate = '2021-08-05'")
+				.count());
 
 		assertEquals(
-				3, resultExplodedProvenance.filter("provenance = 'sysimport:crosswalk:entityregistry'").count());
+			3, resultExplodedProvenance.filter("provenance = 'sysimport:crosswalk:entityregistry'").count());
 
 	}
 }

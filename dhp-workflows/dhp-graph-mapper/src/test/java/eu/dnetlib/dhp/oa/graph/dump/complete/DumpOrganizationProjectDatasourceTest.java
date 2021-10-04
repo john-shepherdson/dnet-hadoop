@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 
+import eu.dnetlib.dhp.oa.graph.dump.exceptions.NoAvailableEntityTypeException;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -98,7 +99,7 @@ public class DumpOrganizationProjectDatasourceTest {
 	}
 
 	@Test
-	public void dumpProjectTest() {
+	public void dumpProjectTest() throws NoAvailableEntityTypeException {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/complete/project")
@@ -127,7 +128,7 @@ public class DumpOrganizationProjectDatasourceTest {
 	}
 
 	@Test
-	public void dumpDatasourceTest() {
+	public void dumpDatasourceTest() throws NoAvailableEntityTypeException {
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/complete/datasource")
 			.getPath();

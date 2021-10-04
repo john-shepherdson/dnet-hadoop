@@ -131,7 +131,6 @@ public class SparkSelectValidRelationsJob implements Serializable {
 			.option("compression", "gzip")
 			.mode(SaveMode.Overwrite)
 			.json(outputPath);
-		;
 
 	}
 }
