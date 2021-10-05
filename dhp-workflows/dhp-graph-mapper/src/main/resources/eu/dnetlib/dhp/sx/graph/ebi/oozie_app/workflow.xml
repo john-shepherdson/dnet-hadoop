@@ -74,7 +74,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>Create Baselnie DataSet</name>
+            <name>Create Baseline DataSet</name>
 
             <class>eu.dnetlib.dhp.sx.ebi.SparkAddLinkUpdates</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>

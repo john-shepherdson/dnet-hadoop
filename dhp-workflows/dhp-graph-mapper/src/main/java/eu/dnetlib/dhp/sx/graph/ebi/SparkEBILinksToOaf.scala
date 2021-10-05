@@ -32,14 +32,9 @@ object SparkEBILinksToOaf {
     import spark.implicits._
     implicit  val PMEncoder: Encoder[Oaf] = Encoders.kryo(classOf[Oaf])
 
-    val ebi_rdd:Dataset[EBILinkItem] = spark.createDataset(spark.sparkContext.textFile(sourcePath).map(s => BioDBToOAF.extractEBILinksFromDump(s))).as[EBILinkItem]
-
-    ebi_rdd.write.mode(SaveMode.Overwrite).save(s"${sourcePath}_dataset")
-
     val ebLinks:Dataset[EBILinkItem] = spark.read.load(s"${sourcePath}_dataset").as[EBILinkItem].filter(l => l.links!= null)
 
     ebLinks.flatMap(j =>BioDBToOAF.parse_ebi_links(j.links))
-      .repartition(4000)
       .filter(p => BioDBToOAF.EBITargetLinksFilter(p))
       .flatMap(p => BioDBToOAF.convertEBILinksToOaf(p))
       .write.mode(SaveMode.Overwrite).save(targetPath)
