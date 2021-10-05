@@ -92,6 +92,8 @@ public class IndexNotificationsJob {
 		if (subscriptions.size() > 0) {
 			final Map<String, Map<String, List<ConditionParams>>> conditionsMap = prepareConditionsMap(subscriptions);
 
+			log.info("ConditionsMap: " + new ObjectMapper().writeValueAsString(conditionsMap));
+
 			final Encoder<NotificationGroup> ngEncoder = Encoders.bean(NotificationGroup.class);
 			final Encoder<Notification> nEncoder = Encoders.bean(Notification.class);
 			final Dataset<Notification> notifications = ClusterUtils
