@@ -4,6 +4,8 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.sx.graph.bio.BioDBToOAF.EBILinkItem
 import eu.dnetlib.dhp.sx.graph.bio.pubmed.{PMArticle, PMAuthor, PMJournal}
 import org.apache.commons.io.IOUtils
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.{HttpGet, HttpUriRequest}
 import org.apache.http.impl.client.HttpClientBuilder
@@ -25,38 +27,78 @@ object SparkDownloadEBILinks {
   }
 
 
-  def requestLinks(PMID:Long):String = {
-    val r = new HttpGet(s"https://www.ebi.ac.uk/europepmc/webservices/rest/MED/$PMID/datalinks?format=json")
-      val timeout = 60; // seconds
-      val config = RequestConfig.custom()
-        .setConnectTimeout(timeout * 1000)
-        .setConnectionRequestTimeout(timeout * 1000)
-        .setSocketTimeout(timeout * 1000).build()
-      val client = HttpClientBuilder.create().setDefaultRequestConfig(config).build()
-      try {
-        var tries = 4
-        while (tries > 0) {
-          println(s"requesting ${r.getURI}")
-          try {
-            val response = client.execute(r)
-            println(s"get response with status${response.getStatusLine.getStatusCode}")
-            if (response.getStatusLine.getStatusCode > 400) {
-              tries -= 1
-            }
-            else
-              return IOUtils.toString(response.getEntity.getContent)
-          } catch {
-            case e: Throwable =>
-              println(s"Error on requesting ${r.getURI}")
-              e.printStackTrace()
-              tries -= 1
+  def requestPage(url:String):String = {
+    val r = new HttpGet(url)
+    val timeout = 60; // seconds
+    val config = RequestConfig.custom()
+      .setConnectTimeout(timeout * 1000)
+      .setConnectionRequestTimeout(timeout * 1000)
+      .setSocketTimeout(timeout * 1000).build()
+    val client = HttpClientBuilder.create().setDefaultRequestConfig(config).build()
+    try {
+      var tries = 4
+      while (tries > 0) {
+        println(s"requesting ${r.getURI}")
+        try {
+          val response = client.execute(r)
+          println(s"get response with status${response.getStatusLine.getStatusCode}")
+          if (response.getStatusLine.getStatusCode > 400) {
+            tries -= 1
           }
+          else
+            return IOUtils.toString(response.getEntity.getContent)
+        } catch {
+          case e: Throwable =>
+            println(s"Error on requesting ${r.getURI}")
+            e.printStackTrace()
+            tries -= 1
         }
-        ""
-      } finally {
-        if (client != null)
-          client.close()
       }
+      ""
+    } finally {
+      if (client != null)
+        client.close()
+    }
+  }
+
+
+  def requestBaseLineUpdatePage():List[String] = {
+    val data =requestPage("https://ftp.ncbi.nlm.nih.gov/pubmed/updatefiles/")
+
+    val result =data.lines.filter(l => l.startsWith("<a href=")).map{l =>
+      val end = l.lastIndexOf("\">")
+      val start = l.indexOf("<a href=\"")
+
+      if (start>= 0 && end >start)
+        l.substring(start+9, (end-start))
+      else
+        ""
+    }.filter(s =>s.endsWith(".gz") ).map(s => s"https://ftp.ncbi.nlm.nih.gov/pubmed/updatefiles/$s").toList
+
+    result
+  }
+
+  def downloadBaseLineUpdate(baselinePath:String, hdfsServerUri:String ):Unit = {
+
+
+    val conf = new Configuration
+    conf.set("fs.defaultFS", hdfsServerUri)
+    val fs =  FileSystem.get(conf)
+    val p = new Path((baselinePath))
+    val files = fs.listFiles(p,false)
+
+    while (files.hasNext) {
+      val c = files.next()
+      c.getPath
+
+    }
+
+
+  }
+
+
+  def requestLinks(PMID:Long):String = {
+    requestPage(s"https://www.ebi.ac.uk/europepmc/webservices/rest/MED/$PMID/datalinks?format=json")
 
   }
   def main(args: Array[String]): Unit = {
