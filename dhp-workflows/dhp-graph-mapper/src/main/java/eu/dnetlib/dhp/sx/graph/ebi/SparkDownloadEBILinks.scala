@@ -4,19 +4,15 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.sx.graph.bio.BioDBToOAF.EBILinkItem
 import eu.dnetlib.dhp.sx.graph.bio.pubmed.{PMArticle, PMAuthor, PMJournal}
 import org.apache.commons.io.IOUtils
-import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.http.client.config.RequestConfig
-import org.apache.http.client.methods.{HttpGet, HttpUriRequest}
+import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql.functions.max
-import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
+import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
 
 object SparkDownloadEBILinks {
-
 
   def createEBILinks(pmid:Long):EBILinkItem = {
 
@@ -25,7 +21,6 @@ object SparkDownloadEBILinks {
       return EBILinkItem(pmid, res)
     null
   }
-
 
   def requestPage(url:String):String = {
     val r = new HttpGet(url)
@@ -60,42 +55,6 @@ object SparkDownloadEBILinks {
         client.close()
     }
   }
-
-
-  def requestBaseLineUpdatePage():List[String] = {
-    val data =requestPage("https://ftp.ncbi.nlm.nih.gov/pubmed/updatefiles/")
-
-    val result =data.lines.filter(l => l.startsWith("<a href=")).map{l =>
-      val end = l.lastIndexOf("\">")
-      val start = l.indexOf("<a href=\"")
-
-      if (start>= 0 && end >start)
-        l.substring(start+9, (end-start))
-      else
-        ""
-    }.filter(s =>s.endsWith(".gz") ).map(s => s"https://ftp.ncbi.nlm.nih.gov/pubmed/updatefiles/$s").toList
-
-    result
-  }
-
-  def downloadBaseLineUpdate(baselinePath:String, hdfsServerUri:String ):Unit = {
-
-
-    val conf = new Configuration
-    conf.set("fs.defaultFS", hdfsServerUri)
-    val fs =  FileSystem.get(conf)
-    val p = new Path((baselinePath))
-    val files = fs.listFiles(p,false)
-
-    while (files.hasNext) {
-      val c = files.next()
-      c.getPath
-
-    }
-
-
-  }
-
 
   def requestLinks(PMID:Long):String = {
     requestPage(s"https://www.ebi.ac.uk/europepmc/webservices/rest/MED/$PMID/datalinks?format=json")

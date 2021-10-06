@@ -51,12 +51,7 @@ class BioScholixTest extends AbstractVocabularyTest{
   }
 
 
-  @Test
-  def testDownloadEBIUpdate() = {
-    val data = SparkDownloadEBILinks.requestBaseLineUpdatePage()
-    println(data)
-  }
-
+ 
 
   @Test
   def testEBIData() = {
