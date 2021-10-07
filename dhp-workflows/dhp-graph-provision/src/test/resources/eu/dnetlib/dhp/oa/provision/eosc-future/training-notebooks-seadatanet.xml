@@ -1,10 +1,8 @@
 <record>
     <result xmlns:dri="http://www.driver-repository.eu/namespace/dri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <header>
-            <dri:objIdentifier>r37b0ad08687::eb430fb7438e1533ba95d6aa50a477eb</dri:objIdentifier>
+            <dri:objIdentifier>doi_dedup___::8539a8de8996e01350f0de8ca4899b7f</dri:objIdentifier>
             <dri:dateOfCollection>2021-09-22T08:53:13Z</dri:dateOfCollection>
-            <dri:status>under curation</dri:status>
-            <counters />
         </header>
         <metadata>
         <oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
@@ -13,10 +11,10 @@
             <oaf:result>
                     <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title">EGI-Foundation/training-notebooks-seadatanet: Version 0.4</title>
                     <creator rank="1" name="" surname="">Enol Fernández</creator>
-                    <dateofacceptance />
+                    <dateofacceptance>2019-12-04</dateofacceptance>
                     <resulttype classid="software" classname="software" schemeid="dnet:result_typologies" schemename="dnet:result_typologies" />
                     <language classid="" classname="" schemeid="dnet:languages" schemename="dnet:languages" />
-                    <description>A sample notebook using SeaDataNet data to plot a map that shows surface temperature of Black Sea, Arctic Sea and Baltic Sea. The data is available at EGI DataHub with PID http://hdl.handle.net/21.T15999/qVk6JWQ (run at EGI Notebooks service for easy access to data).This release updates the PID for the data.</description>
+                    <description>A sample notebook using SeaDataNet data to plot a map that shows surface temperature of Black Sea, Arctic Sea and Baltic Sea. The data is available at EGI DataHub with PID http://hdl.handle.net/21.T15999/3Byz9Cw (run at EGI Notebooks service for easy access to data). This release uses the correct path of the data share from the EGI DataHub.</description>
                     <country classid="" classname="" schemeid="" schemename="" />
                     <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">EOSC Jupyter Notebook</subject>
                     <relevantdate classid="" classname="" schemeid="" schemename="" />
@@ -43,6 +41,9 @@
                     <collectedfrom name="Zenodo" id="re3data_____::7b0ad08687b2c960d5aeef06f811d5e6" />
                     <pid classid="oai" classname="Open Archives Initiative" schemeid="dnet:pid_types" schemename="dnet:pid_types">oai:zenodo.org:3561323</pid>
                     <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types">10.5281/zenodo.3561323</pid>
+                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.3443996</pid>
+                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.3475539</pid>
+                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.3475785</pid>
                     <bestaccessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
                     <datainfo>
                         <inferred>false</inferred>

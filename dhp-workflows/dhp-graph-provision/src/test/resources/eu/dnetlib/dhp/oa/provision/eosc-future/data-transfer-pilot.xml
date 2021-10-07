@@ -1,26 +1,25 @@
 <record>
     <result xmlns:dri="http://www.driver-repository.eu/namespace/dri" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <header>
-            <dri:objIdentifier>r37b0ad08687::dec0d8520e726f2adda9a51280ac7299</dri:objIdentifier>
-            <dri:dateOfCollection>2021-09-22T08:53:16Z</dri:dateOfCollection>
-            <dri:status>under curation</dri:status>
-            <counters />
+            <dri:objIdentifier>doi_dedup___::ab57f086011a9ae23d1165211dc6e04b</dri:objIdentifier>
+            <dri:dateOfCollection>2020-11-03T05:39:50+0000</dri:dateOfCollection>
+            <dri:dateOfTransformation>2020-11-03T05:39:50+0000</dri:dateOfTransformation>
         </header>
         <metadata>
             <oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
                         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://namespace.openaire.eu/oaf http://namespace.openaire.eu/oaf http://www.openaire.eu/schema/0.2/oaf-0.2.xsd">
             <oaf:result>
                     <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title">EGI-Foundation/data-transfer-pilot: Include libraries in environment.yml</title>
-                    <creator rank="1" name="" surname="">Giuseppe La Rocca</creator>
-                    <creator rank="2" name="" surname="">Enol Fernández</creator>
-                    <creator rank="3" name="" surname="">Andrea Manzi</creator>
-                    <dateofacceptance />
+                    <creator rank="1" name="Giuseppe" surname="La Rocca">Giuseppe La Rocca</creator>
+                    <creator rank="2" name="Enol" surname="Fernández">Enol Fernández</creator>
+                    <creator rank="3" name="Andrea" surname="Manzi">Andrea Manzi</creator>
+                    <dateofacceptance>2020-11-03</dateofacceptance>
                     <resulttype classid="software" classname="software" schemeid="dnet:result_typologies" schemename="dnet:result_typologies" />
                     <language classid="" classname="" schemeid="dnet:languages" schemename="dnet:languages" />
                     <description>This notebook is used to demonstrate how a scientist from one of the PaNOSC RIs can use the resources provided by EGI to perform analysis on the data sets obtained during an expirement.</description>
                     <country classid="" classname="" schemeid="" schemename="" />
                     <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">EOSC Jupyter Notebook</subject>
-                    <relevantdate classid="" classname="" schemeid="" schemename="" />
+                    <relevantdate classid="issued" classname="issued" schemeid="dnet:dataCite_date" schemename="dnet:dataCite_date">2020-11-03</relevantdate>
                     <publisher>Zenodo</publisher>
                     <embargoenddate />
                     <journal issn="" eissn="" lissn="" ep="" iss="" sp="" vol="" />
@@ -43,8 +42,8 @@
                     <originalId>oai:zenodo.org:4218562</originalId>
                     <collectedfrom name="Zenodo" id="re3data_____::7b0ad08687b2c960d5aeef06f811d5e6" />
                     <pid classid="oai" classname="Open Archives Initiative" schemeid="dnet:pid_types" schemename="dnet:pid_types">oai:zenodo.org:4218562</pid>
-                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types">10.5281/zenodo.4218562</pid>
-                    <bestaccessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.4195418</pid>
+                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.4218562</pid><bestaccessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
                     <datainfo>
                         <inferred>false</inferred>
                         <deletedbyinference>false</deletedbyinference>
@@ -59,7 +58,7 @@
                             <collectedfrom name="Zenodo" id="re3data_____::7b0ad08687b2c960d5aeef06f811d5e6" />
                             <hostedby name="Zenodo" id="re3data_____::7b0ad08687b2c960d5aeef06f811d5e6" />
                             <accessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
-                            <dateofacceptance />
+                            <dateofacceptance>2020-11-03</dateofacceptance>
                             <webresource>
                                 <url>https://zenodo.org/record/4218562</url>
                             </webresource>
