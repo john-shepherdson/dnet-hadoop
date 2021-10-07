@@ -5,16 +5,14 @@ import eu.dnetlib.dhp.sx.graph.bio.BioDBToOAF.EBILinkItem
 import eu.dnetlib.dhp.sx.graph.bio.pubmed.{PMArticle, PMAuthor, PMJournal}
 import org.apache.commons.io.IOUtils
 import org.apache.http.client.config.RequestConfig
-import org.apache.http.client.methods.{HttpGet, HttpUriRequest}
+import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql.functions.max
-import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
+import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
 
 object SparkDownloadEBILinks {
-
 
   def createEBILinks(pmid:Long):EBILinkItem = {
 
@@ -24,39 +22,42 @@ object SparkDownloadEBILinks {
     null
   }
 
+  def requestPage(url:String):String = {
+    val r = new HttpGet(url)
+    val timeout = 60; // seconds
+    val config = RequestConfig.custom()
+      .setConnectTimeout(timeout * 1000)
+      .setConnectionRequestTimeout(timeout * 1000)
+      .setSocketTimeout(timeout * 1000).build()
+    val client = HttpClientBuilder.create().setDefaultRequestConfig(config).build()
+    try {
+      var tries = 4
+      while (tries > 0) {
+        println(s"requesting ${r.getURI}")
+        try {
+          val response = client.execute(r)
+          println(s"get response with status${response.getStatusLine.getStatusCode}")
+          if (response.getStatusLine.getStatusCode > 400) {
+            tries -= 1
+          }
+          else
+            return IOUtils.toString(response.getEntity.getContent)
+        } catch {
+          case e: Throwable =>
+            println(s"Error on requesting ${r.getURI}")
+            e.printStackTrace()
+            tries -= 1
+        }
+      }
+      ""
+    } finally {
+      if (client != null)
+        client.close()
+    }
+  }
 
   def requestLinks(PMID:Long):String = {
-    val r = new HttpGet(s"https://www.ebi.ac.uk/europepmc/webservices/rest/MED/$PMID/datalinks?format=json")
-      val timeout = 60; // seconds
-      val config = RequestConfig.custom()
-        .setConnectTimeout(timeout * 1000)
-        .setConnectionRequestTimeout(timeout * 1000)
-        .setSocketTimeout(timeout * 1000).build()
-      val client = HttpClientBuilder.create().setDefaultRequestConfig(config).build()
-      try {
-        var tries = 4
-        while (tries > 0) {
-          println(s"requesting ${r.getURI}")
-          try {
-            val response = client.execute(r)
-            println(s"get response with status${response.getStatusLine.getStatusCode}")
-            if (response.getStatusLine.getStatusCode > 400) {
-              tries -= 1
-            }
-            else
-              return IOUtils.toString(response.getEntity.getContent)
-          } catch {
-            case e: Throwable =>
-              println(s"Error on requesting ${r.getURI}")
-              e.printStackTrace()
-              tries -= 1
-          }
-        }
-        ""
-      } finally {
-        if (client != null)
-          client.close()
-      }
+    requestPage(s"https://www.ebi.ac.uk/europepmc/webservices/rest/MED/$PMID/datalinks?format=json")
 
   }
   def main(args: Array[String]): Unit = {

@@ -7,6 +7,7 @@ import eu.dnetlib.dhp.schema.oaf.{Oaf, Relation, Result}
 import eu.dnetlib.dhp.sx.graph.bio.BioDBToOAF.ScholixResolved
 import eu.dnetlib.dhp.sx.graph.bio.BioDBToOAF
 import eu.dnetlib.dhp.sx.graph.bio.pubmed.PubMedToOaf.dataInfo
+import eu.dnetlib.dhp.sx.graph.ebi.SparkDownloadEBILinks
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.parse
@@ -49,6 +50,8 @@ class BioScholixTest extends AbstractVocabularyTest{
     }
   }
 
+
+ 
 
   @Test
   def testEBIData() = {

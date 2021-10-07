@@ -29,6 +29,11 @@
             <description>password to access the OpenOrgs database</description>
         </property>
         <property>
+            <name>dbConnections</name>
+            <value>10</value>
+            <description>number of connections to the postgres db</description>
+        </property>
+        <property>
             <name>workingPath</name>
             <description>path for the working directory</description>
         </property>
@@ -223,7 +228,7 @@
             <arg>--dbTable</arg><arg>${dbTable}</arg>
             <arg>--dbUser</arg><arg>${dbUser}</arg>
             <arg>--dbPwd</arg><arg>${dbPwd}</arg>
-            <arg>--numConnections</arg><arg>20</arg>
+            <arg>--numConnections</arg><arg>${dbConnections}</arg>
         </spark>
         <ok to="PrepareNewOrgs"/>
         <error to="Kill"/>
@@ -254,19 +259,24 @@
             <arg>--dbTable</arg><arg>${dbTable}</arg>
             <arg>--dbUser</arg><arg>${dbUser}</arg>
             <arg>--dbPwd</arg><arg>${dbPwd}</arg>
-            <arg>--numConnections</arg><arg>20</arg>
+            <arg>--numConnections</arg><arg>${dbConnections}</arg>
         </spark>
         <ok to="update_openorgs"/>
         <error to="Kill"/>
     </action>
 
     <action name="update_openorgs">
-        <shell xmlns="uri:oozie:shell-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <exec>/usr/bin/curl</exec>
-            <argument>${apiUrl}</argument>
-        </shell>
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.oa.dedup.UpdateOpenorgsJob</main-class>
+            <arg>--apiUrl</arg><arg>${apiUrl}</arg>
+            <arg>--delay</arg><arg>5</arg>
+        </java>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
