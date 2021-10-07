@@ -267,6 +267,12 @@
 
     <action name="update_openorgs">
         <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
             <main-class>eu.dnetlib.dhp.oa.dedup.UpdateOpenorgsJob</main-class>
             <arg>--apiUrl</arg><arg>${apiUrl}</arg>
             <arg>--delay</arg><arg>5</arg>

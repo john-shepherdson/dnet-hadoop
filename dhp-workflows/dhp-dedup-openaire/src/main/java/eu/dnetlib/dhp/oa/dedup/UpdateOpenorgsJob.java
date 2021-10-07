@@ -1,7 +1,8 @@
+
 package eu.dnetlib.dhp.oa.dedup;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -10,16 +11,21 @@ import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.TimeUnit;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
 public class UpdateOpenorgsJob {
 
-    private static final Logger log = LoggerFactory.getLogger(UpdateOpenorgsJob.class);
+	private static final Logger log = LoggerFactory.getLogger(UpdateOpenorgsJob.class);
 
 	public static void main(String[] args) throws Exception {
-	    ArgumentApplicationParser parser = new ArgumentApplicationParser(
-                    IOUtils.toString(SparkCreateSimRels.class.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/updateOpenorgsJob_parameters.json")));
-            parser.parseArgument(args);
+		ArgumentApplicationParser parser = new ArgumentApplicationParser(
+			IOUtils
+				.toString(
+					SparkCreateSimRels.class
+						.getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/updateOpenorgsJob_parameters.json")));
+		parser.parseArgument(args);
 
 		final String apiUrl = parser.get("apiUrl");
 		final int delay = Integer.parseInt(parser.get("delay"));
@@ -28,17 +34,17 @@ public class UpdateOpenorgsJob {
 		log.info("delay: '{}'", delay);
 
 		APIResponse res = httpCall(apiUrl);
-		while(res!=null && res.getStatus().equals(ImportStatus.RUNNING)){
+		while (res != null && res.getStatus().equals(ImportStatus.RUNNING)) {
 			TimeUnit.MINUTES.sleep(delay);
 			res = httpCall(apiUrl + "/status");
 		}
 
-		if (res==null) {
+		if (res == null) {
 			log.error("Openorgs Update FAILED: No response");
 			throw new RuntimeException("Openorgs Update FAILED: No response");
 		}
 
-		if (res.getStatus()==null || !res.getStatus().equals(ImportStatus.SUCCESS)) {
+		if (res.getStatus() == null || !res.getStatus().equals(ImportStatus.SUCCESS)) {
 			log.error("Openorgs Update FAILED: '{}' - '{}'", res.getStatus(), res.getMessage());
 			throw new RuntimeException(res.getMessage());
 		}
@@ -107,9 +113,5 @@ class APIResponse {
 }
 
 enum ImportStatus {
-	SUCCESS,
-	FAILED,
-	RUNNING,
-	NOT_LAUNCHED,
-	NOT_YET_STARTED
+	SUCCESS, FAILED, RUNNING, NOT_LAUNCHED, NOT_YET_STARTED
 }
