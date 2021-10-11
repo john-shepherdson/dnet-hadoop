@@ -4,6 +4,8 @@ package eu.dnetlib.dhp.actionmanager.ror;
 import java.io.FileInputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -30,7 +32,9 @@ class GenerateRorActionSetJobTest {
 			.readValue(IOUtils.toString(getClass().getResourceAsStream("ror_org.json")), RorOrganization.class);
 		final Organization org = GenerateRorActionSetJob.convertRorOrg(r);
 
-		System.out.println(mapper.writeValueAsString(org));
+		final String s = mapper.writeValueAsString(org);
+		Assertions.assertTrue(StringUtils.isNotBlank(s));
+		System.out.println(s);
 	}
 
 	@Test
@@ -39,7 +43,9 @@ class GenerateRorActionSetJobTest {
 			.readValue(IOUtils.toString(new FileInputStream(local_file_path)), RorOrganization[].class);
 
 		for (final RorOrganization r : arr) {
-			GenerateRorActionSetJob.convertRorOrg(r);
+			Organization o = GenerateRorActionSetJob.convertRorOrg(r);
+			Assertions.assertNotNull(o);
+			Assertions.assertTrue(StringUtils.isNotBlank(o.getId()));
 		}
 	}
 

@@ -18,13 +18,16 @@ public class ISLookupClientFactory {
 	private static final int requestTimeout = 60000 * 10;
 	private static final int connectTimeout = 60000 * 10;
 
+	private ISLookupClientFactory() {
+	}
+
 	public static ISLookUpService getLookUpService(final String isLookupUrl) {
 		return getServiceStub(ISLookUpService.class, isLookupUrl);
 	}
 
 	@SuppressWarnings("unchecked")
 	private static <T> T getServiceStub(final Class<T> clazz, final String endpoint) {
-		log.info(String.format("creating %s stub from %s", clazz.getName(), endpoint));
+		log.info("creating {} stub from {}", clazz.getName(), endpoint);
 		final JaxWsProxyFactoryBean jaxWsProxyFactory = new JaxWsProxyFactoryBean();
 		jaxWsProxyFactory.setServiceClass(clazz);
 		jaxWsProxyFactory.setAddress(endpoint);
@@ -38,12 +41,10 @@ public class ISLookupClientFactory {
 
 			log
 				.info(
-					String
-						.format(
-							"setting connectTimeout to %s, requestTimeout to %s for service %s",
-							connectTimeout,
-							requestTimeout,
-							clazz.getCanonicalName()));
+					"setting connectTimeout to {}, requestTimeout to {} for service {}",
+					connectTimeout,
+					requestTimeout,
+					clazz.getCanonicalName());
 
 			policy.setConnectionTimeout(connectTimeout);
 			policy.setReceiveTimeout(requestTimeout);

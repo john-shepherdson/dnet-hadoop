@@ -86,7 +86,7 @@ public class CreateEntityTest {
 	}
 
 	@Test
-	public void test1() throws ISLookUpException, IOException {
+	void test1() throws ISLookUpException, IOException {
 		List<ContextInfo> cInfoList = new ArrayList<>();
 		final Consumer<ContextInfo> consumer = ci -> cInfoList.add(ci);
 		queryInformationSystem.getContextInformation(consumer);
@@ -97,7 +97,7 @@ public class CreateEntityTest {
 		Assertions.assertEquals(12, riList.size());
 
 		riList.stream().forEach(c -> {
-			switch (c.getOriginalId()) {
+			switch (c.getAcronym()) {
 				case "mes":
 					Assertions
 						.assertTrue(c.getType().equals(eu.dnetlib.dhp.oa.graph.dump.Constants.RESEARCH_COMMUNITY));
@@ -115,9 +115,9 @@ public class CreateEntityTest {
 									String
 										.format(
 											"%s|%s::%s", Constants.CONTEXT_ID, Constants.CONTEXT_NS_PREFIX,
-											DHPUtils.md5(c.getOriginalId()))));
+											DHPUtils.md5(c.getAcronym()))));
 					Assertions.assertTrue(c.getZenodo_community().equals("https://zenodo.org/communities/oac_mes"));
-					Assertions.assertTrue("mes".equals(c.getOriginalId()));
+					Assertions.assertTrue("mes".equals(c.getAcronym()));
 					break;
 				case "clarin":
 					Assertions
@@ -130,9 +130,9 @@ public class CreateEntityTest {
 									String
 										.format(
 											"%s|%s::%s", Constants.CONTEXT_ID, Constants.CONTEXT_NS_PREFIX,
-											DHPUtils.md5(c.getOriginalId()))));
+											DHPUtils.md5(c.getAcronym()))));
 					Assertions.assertTrue(c.getZenodo_community().equals("https://zenodo.org/communities/oac_clarin"));
-					Assertions.assertTrue("clarin".equals(c.getOriginalId()));
+					Assertions.assertTrue("clarin".equals(c.getAcronym()));
 					break;
 			}
 			// TODO add check for all the others Entities
@@ -144,7 +144,7 @@ public class CreateEntityTest {
 
 	@Test
 	@Disabled
-	public void test2() throws IOException, ISLookUpException {
+	void test2() throws IOException, ISLookUpException {
 		LocalFileSystem fs = FileSystem.getLocal(new Configuration());
 
 		Path hdfsWritePath = new Path(workingDir + "/prova");

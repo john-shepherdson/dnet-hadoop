@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.oa.dedup;
 import static java.nio.file.Files.createTempDirectory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.lenient;
 
 import java.io.File;
@@ -12,8 +11,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -31,9 +28,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -110,7 +104,7 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 
 	@Test
 	@Order(1)
-	public void copyOpenorgsMergeRelTest() throws Exception {
+	void copyOpenorgsMergeRelTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -143,7 +137,7 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 
 	@Test
 	@Order(2)
-	public void createOrgsDedupRecordTest() throws Exception {
+	void createOrgsDedupRecordTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -176,7 +170,7 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 
 	@Test
 	@Order(3)
-	public void updateEntityTest() throws Exception {
+	void updateEntityTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -216,7 +210,7 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 
 	@Test
 	@Order(4)
-	public void copyRelationsNoOpenorgsTest() throws Exception {
+	void copyRelationsNoOpenorgsTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -239,7 +233,7 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 
 	@Test
 	@Order(5)
-	public void propagateRelationsTest() throws Exception {
+	void propagateRelationsTest() throws Exception {
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(

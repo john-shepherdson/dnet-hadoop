@@ -15,13 +15,13 @@ public class IdGenerator implements Serializable {
 
 	// pick the best pid from the list (consider date and pidtype)
 	public static <T extends OafEntity> String generate(List<Identifier<T>> pids, String defaultID) {
-		if (pids == null || pids.size() == 0)
+		if (pids == null || pids.isEmpty())
 			return defaultID;
 
 		Identifier<T> bp = pids
 			.stream()
 			.min(Identifier::compareTo)
-			.get();
+			.orElseThrow(() -> new IllegalStateException("unable to generate id"));
 
 		String prefix = substringBefore(bp.getOriginalID(), "|");
 		String ns = substringBefore(substringAfter(bp.getOriginalID(), "|"), "::");

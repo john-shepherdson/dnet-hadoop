@@ -26,7 +26,7 @@ public class ExtractYear extends AbstractExtensionFunction {
 
 	@Override
 	public Sequence doCall(XPathContext context, Sequence[] arguments) throws XPathException {
-		if (arguments == null | arguments.length == 0) {
+		if (arguments == null || arguments.length == 0) {
 			return new StringValue("");
 		}
 		final Item item = arguments[0].head();
@@ -63,8 +63,7 @@ public class ExtractYear extends AbstractExtensionFunction {
 		for (String format : dateFormats) {
 			try {
 				c.setTime(new SimpleDateFormat(format).parse(s));
-				String year = String.valueOf(c.get(Calendar.YEAR));
-				return year;
+				return String.valueOf(c.get(Calendar.YEAR));
 			} catch (ParseException e) {
 			}
 		}

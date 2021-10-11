@@ -7,13 +7,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Country implements Serializable {
 
+	private static final long serialVersionUID = 4357848706229493627L;
+
 	@JsonProperty("country_code")
 	private String countryCode;
 
 	@JsonProperty("country_name")
 	private String countryName;
-
-	private final static long serialVersionUID = 4357848706229493627L;
 
 	public String getCountryCode() {
 		return countryCode;

@@ -1,0 +1,200 @@
+<RESOURCE_PROFILE>
+    <HEADER>
+        <RESOURCE_IDENTIFIER value="e03f256e-1e4d-4b3d-9c07-91faf5d25208_V29ya2Zsb3dEU1Jlc291cmNlcy9Xb3JrZmxvd0RTUmVzb3VyY2VUeXBl"/>
+        <RESOURCE_TYPE value="WorkflowDSResourceType"/>
+        <RESOURCE_KIND value="WorkflowDSResources"/>
+        <RESOURCE_URI value=""/>
+        <DATE_OF_CREATION value="2021-07-13T15:15:19+00:00"/>
+    </HEADER>
+    <BODY>
+        <WORKFLOW_NAME>Import DOIboost</WORKFLOW_NAME>
+        <WORKFLOW_TYPE>Import InfoSpace</WORKFLOW_TYPE>
+        <WORKFLOW_PRIORITY>30</WORKFLOW_PRIORITY>
+        <CONFIGURATION start="manual">
+            <NODE isStart="true" name="setMAGDumpPath" type="SetEnvParameter">
+                <DESCRIPTION>set the input path for MAG</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">MAGDumpPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/data/doiboost/mag-2021-02-15</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setCROSSREFDumpPath" type="SetEnvParameter">
+                <DESCRIPTION>set the input path for CROSSREF dump</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">crossrefDumpPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/data/doiboost/crossref/</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setIntemediatePathMAG" type="SetEnvParameter">
+                <DESCRIPTION>set the intermediate path used to process MAG</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">intermediatePathMAG</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/data/doiboost/input/mag</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setInputPathCrossref" type="SetEnvParameter">
+                <DESCRIPTION>set the input path for Crossref</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">inputPathCrossref</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/data/doiboost/input/crossref</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setCrossrefTimestamp" type="SetEnvParameter">
+                <DESCRIPTION>set the timestamp for the Crossref incremental harvesting</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">crossrefTimestamp</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="false" type="string">1607614921429</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setInputPathUnpayWall" type="SetEnvParameter">
+                <DESCRIPTION>set the input path for UnpayWall</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">inputPathUnpayWall</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/data/doiboost/input/unpayWall</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setInputPathOrcid" type="SetEnvParameter">
+                <DESCRIPTION>set the input path for ORCID</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">inputPathOrcid</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/data/orcid_activities_2020/last_orcid_dataset</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setWorkingPathOrcid" type="SetEnvParameter">
+                <DESCRIPTION>set the working path for ORCID</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">workingPathOrcid</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/data/doiboost/input/orcid</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setHostedByMapPath" type="SetEnvParameter">
+                <DESCRIPTION>set the hostedBy map path</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">hostedByMapPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/data/doiboost/input/hostedBy/hbMap.gz</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setResumeFrom" type="SetEnvParameter">
+                <DESCRIPTION>set the oozie workflow name from which the execution will be resumed</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">resumeFrom</PARAM>
+                    <PARAM function="validValues(['ConvertCrossrefToOAF','PreprocessMag','PreprocessUW', 'ProcessORCID', 'CreateDOIBoost', 'GenerateActionSet'])" managedBy="user" name="parameterValue" required="false" type="string">ConvertCrossrefToOAF</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isJoin="true" name="waitConfig">
+                <DESCRIPTION>wait configurations</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="prepareActionSets"/>
+                </ARCS>
+            </NODE>
+            <NODE name="prepareActionSets" type="PrepareActionSets">
+                <DESCRIPTION>prepare action sets</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="sets" required="true" type="string">
+                        [
+                        {
+                        'set' : 'doiboost',
+                        'jobProperty' : 'export_action_set_doiboost',
+                        'enablingProperty' : 'active_doiboost',
+                        'enabled' : 'true'
+                        }
+                        ]
+                    </PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="extractOutputPath"/>
+                </ARCS>
+            </NODE>
+            <NODE name="extractOutputPath" type="ExtractOutputPath">
+                <DESCRIPTION>extract the hdfs output path generated in the previous node</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hdfsOutputPathParam" required="true" type="string">outputPath</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="updateDOIBoost"/>
+                </ARCS>
+            </NODE>
+            <NODE name="updateDOIBoost" type="SubmitHadoopJob">
+                <DESCRIPTION>prepare a new version of DOIBoost</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'crossrefTimestamp' : 'crossrefTimestamp',
+                        'hostedByMapPath' : 'hostedByMapPath',
+                        'MAGDumpPath' :'MAGDumpPath',
+                        'inputPathMAG' : 'intermediatePathMAG',
+                        'inputPathCrossref' : 'inputPathCrossref',
+                        'crossrefDumpPath':'crossrefDumpPath',
+                        'inputPathUnpayWall' : 'inputPathUnpayWall',
+                        'inputPathOrcid' : 'inputPathOrcid',
+                        'outputPath' : 'outputPath',
+                        'workingPathOrcid':'workingPathOrcid',
+                        'resumeFrom' : 'resumeFrom'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/PROD/actionmanager/doiboost_process/oozie_app',
+                        'workingPath' : '/data/doiboost/process_p',
+                        'sparkExecutorCores' : '2',
+                        'sparkExecutorIntersectionMemory' : '12G',
+                        'sparkExecutorMemory' : '8G',
+                        'esServer' : '[es_server]',
+                        'esIndex' : 'crossref'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="updateActionSets"/>
+                </ARCS>
+            </NODE>
+            <NODE name="updateActionSets" type="UpdateActionSets">
+                <DESCRIPTION>update action sets</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="success"/>
+                </ARCS>
+            </NODE>
+        </CONFIGURATION>
+        <STATUS>
+            <LAST_EXECUTION_ID>wf_20210714_075237_381</LAST_EXECUTION_ID>
+            <LAST_EXECUTION_DATE>2021-07-14T09:51:46+00:00</LAST_EXECUTION_DATE>
+            <LAST_EXECUTION_STATUS>SUCCESS</LAST_EXECUTION_STATUS>
+            <LAST_EXECUTION_ERROR/>
+        </STATUS>
+    </BODY>
+</RESOURCE_PROFILE>

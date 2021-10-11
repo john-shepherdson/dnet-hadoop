@@ -46,7 +46,7 @@ public class Vocabulary implements Serializable {
 	}
 
 	public VocabularyTerm getTerm(final String id) {
-		return Optional.ofNullable(id).map(s -> s.toLowerCase()).map(s -> terms.get(s)).orElse(null);
+		return Optional.ofNullable(id).map(String::toLowerCase).map(terms::get).orElse(null);
 	}
 
 	protected void addTerm(final String id, final String name) {
@@ -81,7 +81,6 @@ public class Vocabulary implements Serializable {
 			.ofNullable(getTermBySynonym(syn))
 			.map(term -> getTermAsQualifier(term.getId()))
 			.orElse(null);
-		// .orElse(OafMapperUtils.unknown(getId(), getName()));
 	}
 
 }

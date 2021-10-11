@@ -3,7 +3,6 @@ package eu.dnetlib.doiboost.orcid;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,13 +52,13 @@ public class SparkGenerateDoiAuthorList {
 			.orElse(Boolean.TRUE);
 		logger.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 		final String workingPath = parser.get("workingPath");
-		logger.info("workingPath: ", workingPath);
+		logger.info("workingPath: {}", workingPath);
 		final String outputDoiAuthorListPath = parser.get("outputDoiAuthorListPath");
-		logger.info("outputDoiAuthorListPath: ", outputDoiAuthorListPath);
+		logger.info("outputDoiAuthorListPath: {}", outputDoiAuthorListPath);
 		final String authorsPath = parser.get("authorsPath");
-		logger.info("authorsPath: ", authorsPath);
+		logger.info("authorsPath: {}", authorsPath);
 		final String xmlWorksPath = parser.get("xmlWorksPath");
-		logger.info("xmlWorksPath: ", xmlWorksPath);
+		logger.info("xmlWorksPath: {}", xmlWorksPath);
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
@@ -128,8 +127,7 @@ public class SparkGenerateDoiAuthorList {
 									.concat(
 										d1.stream(),
 										d2.stream());
-								List<AuthorData> mergedAuthors = mergedStream.collect(Collectors.toList());
-								return mergedAuthors;
+								return mergedStream.collect(Collectors.toList());
 							}
 							if (d1 != null) {
 								return d1;
@@ -168,14 +166,6 @@ public class SparkGenerateDoiAuthorList {
 		authorData.setSurname(getJsonValue(jElement, "surname"));
 		authorData.setCreditName(getJsonValue(jElement, "creditname"));
 		return authorData;
-	}
-
-	private static WorkData loadWorkFromJson(Text orcidId, Text json) {
-		WorkData workData = new WorkData();
-		workData.setOid(orcidId.toString());
-		JsonElement jElement = new JsonParser().parse(json.toString());
-		workData.setDoi(getJsonValue(jElement, "doi"));
-		return workData;
 	}
 
 	private static String getJsonValue(JsonElement jElement, String property) {

@@ -1,0 +1,288 @@
+<record>
+    <result xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <header>
+            <dri:objIdentifier>doi_dedup___::44fd8a9b5b79adb0783ac245b21e3127</dri:objIdentifier>
+            <dri:dateOfCollection>2019-09-19T07:43:31+0000</dri:dateOfCollection>
+            <dri:dateOfTransformation>2019-09-19T07:43:31+0000</dri:dateOfTransformation>
+        </header>
+        <metadata>
+            <oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf http://namespace.openaire.eu/oaf http://www.openaire.eu/schema/0.2/oaf-0.2.xsd">
+
+                <oaf:result>
+                    <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254"/>
+                    <collectedfrom name="B2FIND" id="re3data_____::730f562f9efe8a3b3742d2da510d4335"/>
+                    <originalId>10.23728/b2share.ebcd2972c5fb44199f8b3fdf9f6413c6</originalId>
+                    <originalId>10.23728/b2share.a69a7b2dcc22449e8734552dde4d3906</originalId>
+                    <originalId>6a93c069-a167-44cb-bfe8-74c275637347</originalId>
+                    <originalId>50|r3730f562f9e::9b434fedc00d568b8e00611a7fa19f41</originalId>
+                    <originalId>10.23728/b2share.7c8655b6f25348358b4e6fece7ab6016</originalId>
+                    <originalId>ada23067-496a-494f-bd82-6ffe3cf4f0fb</originalId>
+                    <originalId>50|r3730f562f9e::b9cd774e8126b6902d56f9a4aa03e1dc</originalId>
+                    <originalId>f3bd1041-422c-439d-8e68-c1d0711d130d</originalId>
+                    <originalId>50|r3730f562f9e::b847821a0ca5365b0d971dd89dea6bf1</originalId>
+                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types"
+                         schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset"
+                         trust="0.9">10.23728/b2share.ebcd2972c5fb44199f8b3fdf9f6413c6
+                    </pid>
+                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types"
+                         schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset"
+                         trust="0.9">10.23728/b2share.a69a7b2dcc22449e8734552dde4d3906
+                    </pid>
+                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types"
+                         schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset"
+                         trust="0.9">10.23728/b2share.7c8655b6f25348358b4e6fece7ab6016
+                    </pid>
+                    <title classid="main title" classname="main title" schemeid="dnet:dataCite_title"
+                           schemename="dnet:dataCite_title">HCG16 L-band VLA C+D array final data
+                    </title>
+                    <bestaccessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes"
+                                     schemename="dnet:access_modes"/>
+                    <creator rank="1" name="Michael G." surname="Jones">Jones, Michael G.</creator>
+                    <dateofacceptance>2019-01-01</dateofacceptance>
+                    <description>These are the reduced final data associated with the paper Jones et al. 2019 submitted
+                        to Astronomy &amp; Astrophysics. They are used by a mybinder (https://gke.mybinder.org/)
+                        executable environment to generate the final plots of that paper. The link for this environment
+                        is https://mybinder.org/v2/gh/AMIGA-IAA/hcg-16/master. The raw VLA D and C array data of HCG 16
+                        were collected by the Very Large Array (http://www.vla.nrao.edu/) in 1989 and 1999, under PI
+                        projects of Barbara Williams. The project numbers are AW234 and AW500 respectively. The file
+                        also includes a grz colour image and r-band image from DECaLS DR8
+                        (http://legacysurvey.org/decamls/), a GBT HI spectrum published in Borthakur et al. 2010 (ApJ
+                        710, 385), an HI data cube from HIPASS (https://www.atnf.csiro.au/research/multibeam/release/),
+                        and a source mask (and associated parameters file) for the HIPASS cube generated using SoFiA
+                        (https://github.com/SoFiA-Admin/SoFiA-2).
+                    </description>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies">3.5.2.1.1 → Observational astronomy →
+                        Radio astronomy
+                    </subject>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies">HI
+                    </subject>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies">VLA
+                    </subject>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies">HCG16
+                    </subject>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="false"
+                             provenanceaction="sysimport:crosswalk:repository" trust="0.9">Various
+                    </subject>
+                    <language classid="und" classname="Undetermined" schemeid="dnet:languages"
+                              schemename="dnet:languages"/>
+                    <relevantdate classid="issued" classname="issued" schemeid="dnet:dataCite_date"
+                                  schemename="dnet:dataCite_date">2019-01-01
+                    </relevantdate>
+                    <publisher>https://b2share.eudat.eu</publisher>
+                    <resulttype classid="other" classname="other" schemeid="dnet:result_typologies"
+                                schemename="dnet:result_typologies"/>
+                    <resourcetype classid="UNKNOWN" classname="Unknown" schemeid="dnet:dataCite_resource"
+                                  schemename="dnet:dataCite_resource"/>
+                    <datainfo>
+                        <inferred>true</inferred>
+                        <deletedbyinference>false</deletedbyinference>
+                        <trust>0.8</trust>
+                        <inferenceprovenance>dedup-similarity-result-decisiontree-v2</inferenceprovenance>
+                        <provenanceaction classid="sysimport:dedup" classname="Inferred by OpenAIRE"
+                                          schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+                    </datainfo>
+                    <rels>
+                        <rel inferred="false" trust="0.9" inferenceprovenance="" provenanceaction="user:claim">
+                            <to class="IsRelatedTo" scheme="dnet:result_result_relations" type="software">userclaim___::ee29372a239b79db3ac4c5debe44d6e6</to>
+                            <collectedfrom name="B2FIND" id="re3data_____::730f562f9efe8a3b3742d2da510d4335"/>
+                            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title">Plot scripts for HCG-16 Project</title>
+                        </rel>
+                    </rels>
+                    <children>
+                        <result objidentifier="r3730f562f9e::9b434fedc00d568b8e00611a7fa19f41">
+                            <dateofacceptance>2019-01-01</dateofacceptance>
+                            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title"
+                                   schemename="dnet:dataCite_title" inferred="false"
+                                   provenanceaction="sysimport:crosswalk:repository" trust="0.9">HCG16 L-band VLA C+D
+                                array final data
+                            </title>
+                            <collectedfrom name="B2FIND" id="re3data_____::730f562f9efe8a3b3742d2da510d4335"/>
+                            <publisher>B2SHARE</publisher>
+                        </result>
+                        <result objidentifier="doi_________::929c1e415f4bb04797679d1af7cb706f">
+                            <dateofacceptance>2019-01-01</dateofacceptance>
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types"
+                                 schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset"
+                                 trust="0.9">10.23728/b2share.a69a7b2dcc22449e8734552dde4d3906
+                            </pid>
+                            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title"
+                                   schemename="dnet:dataCite_title">HCG16 L-band VLA C+D array final data
+                            </title>
+                            <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254"/>
+                            <publisher>https://b2share.eudat.eu</publisher>
+                        </result>
+                        <result objidentifier="doi_________::e24d8a6399c5d8df9a78aed032573b81">
+                            <dateofacceptance>2019-01-01</dateofacceptance>
+                            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title"
+                                   schemename="dnet:dataCite_title">HCG16 L-band VLA C+D array final data
+                            </title>
+                            <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254"/>
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types"
+                                 schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset"
+                                 trust="0.9">10.23728/b2share.7c8655b6f25348358b4e6fece7ab6016
+                            </pid>
+                            <publisher>https://b2share.eudat.eu</publisher>
+                        </result>
+                        <result objidentifier="r3730f562f9e::b9cd774e8126b6902d56f9a4aa03e1dc">
+                            <dateofacceptance>2019-01-01</dateofacceptance>
+                            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title"
+                                   schemename="dnet:dataCite_title" inferred="false"
+                                   provenanceaction="sysimport:crosswalk:repository" trust="0.9">HCG16 L-band VLA C+D
+                                array final data
+                            </title>
+                            <collectedfrom name="B2FIND" id="re3data_____::730f562f9efe8a3b3742d2da510d4335"/>
+                            <publisher>B2SHARE</publisher>
+                        </result>
+                        <result objidentifier="doi_________::44fd8a9b5b79adb0783ac245b21e3127">
+                            <dateofacceptance>2019-01-01</dateofacceptance>
+                            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title"
+                                   schemename="dnet:dataCite_title">HCG16 L-band VLA C+D array final data
+                            </title>
+                            <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254"/>
+                            <publisher>https://b2share.eudat.eu</publisher>
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types"
+                                 schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset"
+                                 trust="0.9">10.23728/b2share.ebcd2972c5fb44199f8b3fdf9f6413c6
+                            </pid>
+                        </result>
+                        <result objidentifier="r3730f562f9e::b847821a0ca5365b0d971dd89dea6bf1">
+                            <dateofacceptance>2019-01-01</dateofacceptance>
+                            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title"
+                                   schemename="dnet:dataCite_title" inferred="false"
+                                   provenanceaction="sysimport:crosswalk:repository" trust="0.9">HCG16 L-band VLA C+D
+                                array final data
+                            </title>
+                            <collectedfrom name="B2FIND" id="re3data_____::730f562f9efe8a3b3742d2da510d4335"/>
+                            <publisher>B2SHARE</publisher>
+                        </result>
+                        <instance id="openaire____::55045bd2a65019fd8e6741a755395c8c">
+                            <accessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes"
+                                         schemename="dnet:access_modes"/>
+                            <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254"/>
+                            <hostedby name="Unknown Repository" id="openaire____::55045bd2a65019fd8e6741a755395c8c"/>
+                            <dateofacceptance>2019-01-01</dateofacceptance>
+                            <instancetype classid="0020" classname="Other ORP type" schemeid="dnet:publication_resource"
+                                          schemename="dnet:publication_resource"/>
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types"
+                                 schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset"
+                                 trust="0.9">10.23728/b2share.ebcd2972c5fb44199f8b3fdf9f6413c6
+                            </pid>
+                            <refereed classid="0000" classname="Unknown" schemeid="dnet:review_levels"
+                                      schemename="dnet:review_levels"/>
+                            <webresource>
+                                <url>https://dx.doi.org/10.23728/b2share.ebcd2972c5fb44199f8b3fdf9f6413c6</url>
+                            </webresource>
+                        </instance>
+                        <instance id="openaire____::55045bd2a65019fd8e6741a755395c8c">
+                            <accessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes"
+                                         schemename="dnet:access_modes"/>
+                            <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254"/>
+                            <hostedby name="Unknown Repository" id="openaire____::55045bd2a65019fd8e6741a755395c8c"/>
+                            <dateofacceptance>2019-01-01</dateofacceptance>
+                            <instancetype classid="0020" classname="Other ORP type" schemeid="dnet:publication_resource"
+                                          schemename="dnet:publication_resource"/>
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types"
+                                 schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset"
+                                 trust="0.9">10.23728/b2share.a69a7b2dcc22449e8734552dde4d3906
+                            </pid>
+                            <refereed classid="0000" classname="Unknown" schemeid="dnet:review_levels"
+                                      schemename="dnet:review_levels"/>
+                            <webresource>
+                                <url>https://dx.doi.org/10.23728/b2share.a69a7b2dcc22449e8734552dde4d3906</url>
+                            </webresource>
+                        </instance>
+                        <instance id="re3data_____::730f562f9efe8a3b3742d2da510d4335">
+                            <accessright classid="UNKNOWN" classname="not available" schemeid="dnet:access_modes"
+                                         schemename="dnet:access_modes"/>
+                            <collectedfrom name="B2FIND" id="re3data_____::730f562f9efe8a3b3742d2da510d4335"/>
+                            <hostedby name="B2FIND" id="re3data_____::730f562f9efe8a3b3742d2da510d4335"/>
+                            <dateofacceptance>2019-01-01</dateofacceptance>
+                            <instancetype classid="0000" classname="Unknown" schemeid="dnet:publication_resource"
+                                          schemename="dnet:publication_resource"/>
+                            <alternateidentifier classid="doi" classname="Digital Object Identifier"
+                                                 schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false"
+                                                 provenanceaction="sysimport:crosswalk:repository" trust="0.9">
+                                https://doi.org10.23728/b2share.ebcd2972c5fb44199f8b3fdf9f6413c6
+                            </alternateidentifier>
+                            <refereed classid="0000" classname="Unknown" schemeid="dnet:review_levels"
+                                      schemename="dnet:review_levels"/>
+                            <webresource>
+                                <url>
+                                    http://dx.doi.org/https://doi.org/10.23728/b2share.ebcd2972c5fb44199f8b3fdf9f6413c6
+                                </url>
+                            </webresource>
+                        </instance>
+                        <instance id="openaire____::55045bd2a65019fd8e6741a755395c8c">
+                            <accessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes"
+                                         schemename="dnet:access_modes"/>
+                            <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254"/>
+                            <hostedby name="Unknown Repository" id="openaire____::55045bd2a65019fd8e6741a755395c8c"/>
+                            <dateofacceptance>2019-01-01</dateofacceptance>
+                            <instancetype classid="0020" classname="Other ORP type" schemeid="dnet:publication_resource"
+                                          schemename="dnet:publication_resource"/>
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types"
+                                 schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset"
+                                 trust="0.9">10.23728/b2share.7c8655b6f25348358b4e6fece7ab6016
+                            </pid>
+                            <refereed classid="0000" classname="Unknown" schemeid="dnet:review_levels"
+                                      schemename="dnet:review_levels"/>
+                            <webresource>
+                                <url>https://dx.doi.org/10.23728/b2share.7c8655b6f25348358b4e6fece7ab6016</url>
+                            </webresource>
+                        </instance>
+                        <instance id="re3data_____::730f562f9efe8a3b3742d2da510d4335">
+                            <accessright classid="UNKNOWN" classname="not available" schemeid="dnet:access_modes"
+                                         schemename="dnet:access_modes"/>
+                            <collectedfrom name="B2FIND" id="re3data_____::730f562f9efe8a3b3742d2da510d4335"/>
+                            <hostedby name="B2FIND" id="re3data_____::730f562f9efe8a3b3742d2da510d4335"/>
+                            <dateofacceptance>2019-01-01</dateofacceptance>
+                            <instancetype classid="0000" classname="Unknown" schemeid="dnet:publication_resource"
+                                          schemename="dnet:publication_resource"/>
+                            <alternateidentifier classid="doi" classname="Digital Object Identifier"
+                                                 schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false"
+                                                 provenanceaction="sysimport:crosswalk:repository" trust="0.9">
+                                https://doi.org10.23728/b2share.7c8655b6f25348358b4e6fece7ab6016
+                            </alternateidentifier>
+                            <refereed classid="0000" classname="Unknown" schemeid="dnet:review_levels"
+                                      schemename="dnet:review_levels"/>
+                            <webresource>
+                                <url>
+                                    http://dx.doi.org/https://doi.org/10.23728/b2share.7c8655b6f25348358b4e6fece7ab6016
+                                </url>
+                            </webresource>
+                        </instance>
+                        <instance id="re3data_____::730f562f9efe8a3b3742d2da510d4335">
+                            <accessright classid="UNKNOWN" classname="not available" schemeid="dnet:access_modes"
+                                         schemename="dnet:access_modes"/>
+                            <collectedfrom name="B2FIND" id="re3data_____::730f562f9efe8a3b3742d2da510d4335"/>
+                            <hostedby name="B2FIND" id="re3data_____::730f562f9efe8a3b3742d2da510d4335"/>
+                            <dateofacceptance>2019-01-01</dateofacceptance>
+                            <instancetype classid="0000" classname="Unknown" schemeid="dnet:publication_resource"
+                                          schemename="dnet:publication_resource"/>
+                            <alternateidentifier classid="doi" classname="Digital Object Identifier"
+                                                 schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false"
+                                                 provenanceaction="sysimport:crosswalk:repository" trust="0.9">
+                                https://doi.org10.23728/b2share.a69a7b2dcc22449e8734552dde4d3906
+                            </alternateidentifier>
+                            <refereed classid="0000" classname="Unknown" schemeid="dnet:review_levels"
+                                      schemename="dnet:review_levels"/>
+                            <webresource>
+                                <url>
+                                    http://dx.doi.org/https://doi.org/10.23728/b2share.a69a7b2dcc22449e8734552dde4d3906
+                                </url>
+                            </webresource>
+                        </instance>
+                    </children>
+                </oaf:result>
+            </oaf:entity>
+        </metadata>
+    </result>
+</record>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:dri="http://www.driver-repository.eu/namespace/dri" xmlns:oaf="http://namespace.openaire.eu/oaf">
+    <header>
+        <dri:objIdentifier>r3c4b2081b22::0001f1a60b1acbb28dd66b4f6c7d881f</dri:objIdentifier>
+        <dri:recordIdentifier>https://www.ec.europa.eu/research/participants/documents/downloadPublic?documentIds=080166e5af388993&amp;appId=PPGMS</dri:recordIdentifier>
+        <dri:dateOfCollection>2021-06-24T10:40:25.346Z</dri:dateOfCollection>
+        <oaf:datasourceprefix>r3c4b2081b22</oaf:datasourceprefix>
+        <dr:dateOfTransformation>2021-06-24T10:40:55.153Z</dr:dateOfTransformation>
+    </header>
+    <metadata>
+        <dc:identifier>https://www.ec.europa.eu/research/participants/documents/downloadPublic?documentIds=080166e5af388993&amp;appId=PPGMS</dc:identifier>
+        <dc:title>Progress report on preparing Strategic plan for Technology transfer from EPPL/FMPI CU</dc:title>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:hostedBy id="openaire____::participantPortal" name="European Commission Participant Portal"/>
+        <dc:type>Documents, reports</dc:type>
+        <dr:CobjCategory type="publication">0034</dr:CobjCategory>
+        <dc:description>Progress report on preparation process of the technology transfer plan for CU.</dc:description>
+        <oaf:projectid validationDate="2019-11-26 09:39:59">corda__h2020::692335</oaf:projectid>
+        <oaf:collectedFrom id="re3data_____::r3d100011728" name="European Union Open Data Portal"/>
+    </metadata>
+    <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+        <originDescription altered="true" harvestDate="2021-06-24T10:40:25.346Z">
+            <baseURL>file%3A%2F%2F%2Fvar%2Flib%2Fdnet%2Fdata%2Fopendata%2Fcordis-h2020projectDeliverables.tsv</baseURL>
+            <identifier/>
+            <datestamp/>
+            <metadataNamespace/>
+        </originDescription>
+    </provenance>
+    <oaf:datainfo>
+        <oaf:inferred>false</oaf:inferred>
+        <oaf:deletedbyinference>false</oaf:deletedbyinference>
+        <oaf:trust>0.9</oaf:trust>
+        <oaf:inferenceprovenance/>
+        <oaf:provenanceaction classid="sysimport:crosswalk"
+                              classname="sysimport:crosswalk" schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+    </oaf:datainfo>
+</record>

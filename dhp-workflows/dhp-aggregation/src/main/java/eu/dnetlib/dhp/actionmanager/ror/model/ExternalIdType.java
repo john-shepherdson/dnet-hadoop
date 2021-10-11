@@ -13,7 +13,7 @@ public class ExternalIdType implements Serializable {
 
 	private String preferred;
 
-	private final static long serialVersionUID = 2616688352998387611L;
+	private static final long serialVersionUID = 2616688352998387611L;
 
 	public ExternalIdType() {
 	}

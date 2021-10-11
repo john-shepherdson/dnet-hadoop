@@ -17,13 +17,16 @@ import eu.dnetlib.dhp.schema.oaf.*;
 
 public class OafMapperUtils {
 
+	private OafMapperUtils() {
+	}
+
 	public static Oaf merge(final Oaf left, final Oaf right) {
 		if (ModelSupport.isSubClass(left, OafEntity.class)) {
 			return mergeEntities((OafEntity) left, (OafEntity) right);
 		} else if (ModelSupport.isSubClass(left, Relation.class)) {
 			((Relation) left).mergeFrom((Relation) right);
 		} else {
-			throw new RuntimeException("invalid Oaf type:" + left.getClass().getCanonicalName());
+			throw new IllegalArgumentException("invalid Oaf type:" + left.getClass().getCanonicalName());
 		}
 		return left;
 	}
@@ -38,7 +41,7 @@ public class OafMapperUtils {
 		} else if (ModelSupport.isSubClass(left, Project.class)) {
 			left.mergeFrom(right);
 		} else {
-			throw new RuntimeException("invalid OafEntity subtype:" + left.getClass().getCanonicalName());
+			throw new IllegalArgumentException("invalid OafEntity subtype:" + left.getClass().getCanonicalName());
 		}
 		return left;
 	}
@@ -62,7 +65,7 @@ public class OafMapperUtils {
 
 	public static List<KeyValue> listKeyValues(final String... s) {
 		if (s.length % 2 > 0) {
-			throw new RuntimeException("Invalid number of parameters (k,v,k,v,....)");
+			throw new IllegalArgumentException("Invalid number of parameters (k,v,k,v,....)");
 		}
 
 		final List<KeyValue> list = new ArrayList<>();
@@ -88,7 +91,7 @@ public class OafMapperUtils {
 			.stream(values)
 			.map(v -> field(v, info))
 			.filter(Objects::nonNull)
-			.filter(distinctByKey(f -> f.getValue()))
+			.filter(distinctByKey(Field::getValue))
 			.collect(Collectors.toList());
 	}
 
@@ -97,7 +100,7 @@ public class OafMapperUtils {
 			.stream()
 			.map(v -> field(v, info))
 			.filter(Objects::nonNull)
-			.filter(distinctByKey(f -> f.getValue()))
+			.filter(distinctByKey(Field::getValue))
 			.collect(Collectors.toList());
 	}
 
@@ -342,10 +345,10 @@ public class OafMapperUtils {
 		if (instanceList != null) {
 			final Optional<AccessRight> min = instanceList
 				.stream()
-				.map(i -> i.getAccessright())
+				.map(Instance::getAccessright)
 				.min(new AccessRightComparator<>());
 
-			final Qualifier rights = min.isPresent() ? qualifier(min.get()) : new Qualifier();
+			final Qualifier rights = min.map(OafMapperUtils::qualifier).orElseGet(Qualifier::new);
 
 			if (StringUtils.isBlank(rights.getClassid())) {
 				rights.setClassid(UNKNOWN);

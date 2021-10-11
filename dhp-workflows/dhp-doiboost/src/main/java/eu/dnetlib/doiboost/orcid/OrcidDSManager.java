@@ -25,9 +25,8 @@ public class OrcidDSManager {
 		orcidDSManager.generateAuthors();
 	}
 
-	public void generateAuthors() throws Exception {
+	public void generateAuthors() throws IOException {
 		Configuration conf = initConfigurationObject();
-		FileSystem fs = initFileSystemObject(conf);
 		String tarGzUri = hdfsServerUri.concat(workingPath).concat(summariesFileNameTarGz);
 		Path outputPath = new Path(
 			hdfsServerUri

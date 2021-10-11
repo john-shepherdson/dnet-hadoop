@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.bulktag.community;
 import java.util.List;
 
 import org.dom4j.DocumentException;
+import org.xml.sax.SAXException;
 
 import com.google.common.base.Joiner;
 
@@ -63,7 +64,7 @@ public class QueryInformationSystem {
 		+ "  </community>";
 
 	public static CommunityConfiguration getCommunityConfiguration(final String isLookupUrl)
-		throws ISLookUpException, DocumentException {
+		throws ISLookUpException, DocumentException, SAXException {
 		ISLookUpService isLookUp = ISLookupClientFactory.getLookUpService(isLookupUrl);
 		final List<String> res = isLookUp.quickSearchProfile(XQUERY);
 

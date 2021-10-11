@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.broker.oa.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,8 +13,6 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Function;
 
 import eu.dnetlib.broker.objects.OaBrokerAuthor;
 import eu.dnetlib.broker.objects.OaBrokerExternalReference;
@@ -46,6 +45,9 @@ public class ConversionUtils {
 
 	private static final Logger log = LoggerFactory.getLogger(ConversionUtils.class);
 
+	private ConversionUtils() {
+	}
+
 	public static List<OaBrokerInstance> oafInstanceToBrokerInstances(final Instance i) {
 		if (i == null) {
 			return new ArrayList<>();
@@ -69,7 +71,7 @@ public class ConversionUtils {
 		return sp != null ? new OaBrokerTypedValue(classId(sp.getQualifier()), sp.getValue()) : null;
 	}
 
-	public static final OaBrokerRelatedDataset oafDatasetToBrokerDataset(final Dataset d) {
+	public static OaBrokerRelatedDataset oafDatasetToBrokerDataset(final Dataset d) {
 		if (d == null) {
 			return null;
 		}
@@ -100,7 +102,7 @@ public class ConversionUtils {
 		return res;
 	}
 
-	public static final OaBrokerMainEntity oafResultToBrokerResult(final Result result) {
+	public static OaBrokerMainEntity oafResultToBrokerResult(final Result result) {
 		if (result == null) {
 			return null;
 		}
@@ -142,12 +144,12 @@ public class ConversionUtils {
 		final String pids = author.getPid() != null ? author
 			.getPid()
 			.stream()
-			.filter(pid -> pid != null)
+			.filter(Objects::nonNull)
 			.filter(pid -> pid.getQualifier() != null)
 			.filter(pid -> pid.getQualifier().getClassid() != null)
 			.filter(pid -> pid.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID))
-			.map(pid -> pid.getValue())
-			.map(pid -> cleanOrcid(pid))
+			.map(StructuredProperty::getValue)
+			.map(ConversionUtils::cleanOrcid)
 			.filter(StringUtils::isNotBlank)
 			.findFirst()
 			.orElse(null) : null;
@@ -187,7 +189,7 @@ public class ConversionUtils {
 		return res;
 	}
 
-	public static final OaBrokerProject oafProjectToBrokerProject(final Project p) {
+	public static OaBrokerProject oafProjectToBrokerProject(final Project p) {
 		if (p == null) {
 			return null;
 		}
@@ -206,14 +208,14 @@ public class ConversionUtils {
 				res.setJurisdiction(fdoc.valueOf("/fundingtree/funder/jurisdiction"));
 				res.setFundingProgram(fdoc.valueOf("//funding_level_0/name"));
 			} catch (final DocumentException e) {
-				log.error("Error in record " + p.getId() + ": invalid fundingtree: " + ftree);
+				log.error("Error in record {}: invalid fundingtree: {}", p.getId(), ftree);
 			}
 		}
 
 		return res;
 	}
 
-	public static final OaBrokerRelatedSoftware oafSoftwareToBrokerSoftware(final Software sw) {
+	public static OaBrokerRelatedSoftware oafSoftwareToBrokerSoftware(final Software sw) {
 		if (sw == null) {
 			return null;
 		}
@@ -228,7 +230,7 @@ public class ConversionUtils {
 		return res;
 	}
 
-	public static final OaBrokerRelatedDatasource oafDatasourceToBrokerDatasource(final Datasource ds) {
+	public static OaBrokerRelatedDatasource oafDatasourceToBrokerDatasource(final Datasource ds) {
 		if (ds == null) {
 			return null;
 		}
@@ -241,7 +243,7 @@ public class ConversionUtils {
 	}
 
 	private static String first(final List<String> list) {
-		return list != null && list.size() > 0 ? list.get(0) : null;
+		return list != null && !list.isEmpty() ? list.get(0) : null;
 	}
 
 	private static String kvValue(final KeyValue kv) {

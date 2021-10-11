@@ -12,6 +12,9 @@ public class Constants {
 
 	public static String COAR_ACCESS_RIGHT_SCHEMA = "http://vocabularies.coar-repositories.org/documentation/access_rights/";
 
+	private Constants() {
+	}
+
 	static {
 		accessRightsCoarMap.put("OPEN", "c_abf2");
 		accessRightsCoarMap.put("RESTRICTED", "c_16ec");
@@ -48,5 +51,11 @@ public class Constants {
 	public static final String CONTENT_TOTALITEMS = "TotalItems";
 	public static final String CONTENT_INVALIDRECORDS = "InvalidRecords";
 	public static final String CONTENT_TRANSFORMEDRECORDS = "transformedItems";
+
+	// IETF Draft and used by Repositories like ZENODO , not included in APACHE HTTP java packages
+	// see https://ietf-wg-httpapi.github.io/ratelimit-headers/draft-ietf-httpapi-ratelimit-headers.html
+	public static final String HTTPHEADER_IETF_DRAFT_RATELIMIT_LIMIT = "X-RateLimit-Limit";
+	public static final String HTTPHEADER_IETF_DRAFT_RATELIMIT_REMAINING = "X-RateLimit-Remaining";
+	public static final String HTTPHEADER_IETF_DRAFT_RATELIMIT_RESET = "X-RateLimit-Reset";
 
 }

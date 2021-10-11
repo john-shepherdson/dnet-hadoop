@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.elasticsearch.spark.rdd.api.java.JavaEsSpark;
@@ -61,7 +62,7 @@ public class IndexOnESJob {
 
 		final JavaRDD<String> inputRdd = ClusterUtils
 			.readPath(spark, eventsPath, Event.class)
-			.map(IndexOnESJob::eventAsJsonString, Encoders.STRING())
+			.map((MapFunction<Event, String>) IndexOnESJob::eventAsJsonString, Encoders.STRING())
 			.javaRDD();
 
 		final Map<String, String> esCfg = new HashMap<>();

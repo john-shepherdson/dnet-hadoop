@@ -3,9 +3,9 @@ package eu.dnetlib.dhp.collection.plugin.oai;
 
 import java.util.Iterator;
 
-import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
-import eu.dnetlib.dhp.collection.HttpClientParams;
-import eu.dnetlib.dhp.collection.HttpConnector2;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
+import eu.dnetlib.dhp.common.collection.HttpClientParams;
+import eu.dnetlib.dhp.common.collection.HttpConnector2;
 
 public class OaiIteratorFactory {
 

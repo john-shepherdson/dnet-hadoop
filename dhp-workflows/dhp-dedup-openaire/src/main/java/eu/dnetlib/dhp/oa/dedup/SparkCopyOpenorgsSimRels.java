@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -17,8 +16,6 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
@@ -78,7 +75,7 @@ public class SparkCopyOpenorgsSimRels extends AbstractSparkAction {
 
 		saveParquet(rawRels, outputPath, SaveMode.Append);
 
-		log.info("Copied " + rawRels.count() + " Similarity Relations");
+		log.info("Copied {} Similarity Relations", rawRels.count());
 	}
 
 	private boolean filterOpenorgsRels(Relation rel) {

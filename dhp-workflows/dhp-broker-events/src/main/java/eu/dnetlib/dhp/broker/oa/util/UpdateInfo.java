@@ -88,14 +88,14 @@ public final class UpdateInfo<T> {
 			.getDatasources()
 			.stream()
 			.filter(ds -> ds.getRelType().equals(BrokerConstants.COLLECTED_FROM_REL))
-			.map(ds -> ds.getName())
+			.map(OaBrokerRelatedDatasource::getName)
 			.findFirst()
 			.orElse("");
 		final String provType = getSource()
 			.getDatasources()
 			.stream()
 			.filter(ds -> ds.getRelType().equals(BrokerConstants.COLLECTED_FROM_REL))
-			.map(ds -> ds.getType())
+			.map(OaBrokerRelatedDatasource::getType)
 			.findFirst()
 			.orElse("");
 

@@ -31,7 +31,6 @@ public class ZenodoCommunity implements Serializable {
 	}
 
 	private void setSelCriteria(String json) {
-		// Type collectionType = new TypeToken<Collection<Constraints>>(){}.getType();
 		selCriteria = new Gson().fromJson(json, SelectionConstraints.class);
 	}
 

@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.broker.oa;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -98,7 +99,6 @@ public class IndexEventSubsetJob {
 			.javaRDD();
 
 		final Map<String, String> esCfg = new HashMap<>();
-		// esCfg.put("es.nodes", "10.19.65.51, 10.19.65.52, 10.19.65.53, 10.19.65.54");
 
 		esCfg.put("es.index.auto.create", "false");
 		esCfg.put("es.nodes", indexHost);
@@ -114,11 +114,11 @@ public class IndexEventSubsetJob {
 
 		log.info("*** Deleting old events");
 		final String message = deleteOldEvents(brokerApiBaseUrl, now - 1000);
-		log.info("*** Deleted events: " + message);
+		log.info("*** Deleted events: {}", message);
 
 	}
 
-	private static String deleteOldEvents(final String brokerApiBaseUrl, final long l) throws Exception {
+	private static String deleteOldEvents(final String brokerApiBaseUrl, final long l) throws IOException {
 		final String url = brokerApiBaseUrl + "/api/events/byCreationDate/0/" + l;
 		final HttpDelete req = new HttpDelete(url);
 

@@ -7,10 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
-public class ArgumentApplicationParserTest {
+class ArgumentApplicationParserTest {
 
 	@Test
-	public void testParseParameter() throws Exception {
+	void testParseParameter() throws Exception {
 		final String jsonConfiguration = IOUtils
 			.toString(
 				this.getClass().getResourceAsStream("/eu/dnetlib/application/parameters.json"));

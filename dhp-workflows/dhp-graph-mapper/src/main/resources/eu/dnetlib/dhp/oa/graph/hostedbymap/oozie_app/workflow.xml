@@ -1,0 +1,238 @@
+<workflow-app name="hosted_by_map" xmlns="uri:oozie:workflow:0.5">
+
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>outputPath</name>
+            <description>the output path</description>
+        </property>
+        <property>
+            <name>hostedByMapPath</name>
+            <description>the output path</description>
+        </property>
+        <property>
+            <name>sparkDriverMemory</name>
+            <description>memory for driver process</description>
+        </property>
+        <property>
+            <name>sparkExecutorMemory</name>
+            <description>memory for individual executor</description>
+        </property>
+        <property>
+            <name>sparkExecutorCores</name>
+            <description>number of cores used by single executor</description>
+        </property>
+        <property>
+            <name>oozieActionShareLibForSpark2</name>
+            <description>oozie action sharelib for spark 2.*</description>
+        </property>
+        <property>
+            <name>spark2ExtraListeners</name>
+            <value>com.cloudera.spark.lineage.NavigatorAppListener</value>
+            <description>spark 2.* extra listeners classname</description>
+        </property>
+        <property>
+            <name>spark2SqlQueryExecutionListeners</name>
+            <value>com.cloudera.spark.lineage.NavigatorQueryListener</value>
+            <description>spark 2.* sql query execution listeners classname</description>
+        </property>
+        <property>
+            <name>spark2YarnHistoryServerAddress</name>
+            <description>spark 2.* yarn history server address</description>
+        </property>
+        <property>
+            <name>spark2EventLogDir</name>
+            <description>spark 2.* event log dir location</description>
+        </property>
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+
+        </configuration>
+    </global>
+
+    <start to="resume_from"/>
+
+    <decision name="resume_from">
+        <switch>
+            <case to="produceHBM">${wf:conf('resumeFrom') eq 'ProduceHBM'}</case>
+            <case to="remove_hbmpath">${wf:conf('resumeFrom') eq 'download_csv'}</case>
+            <default to="prepareInfo"/>
+        </switch>
+    </decision>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="remove_hbmpath">
+        <fs>
+            <delete path="${hostedByMapPath}"/>
+<!--            <mkdir path="${hostedByMapPath}"/>-->
+        </fs>
+        <ok to="fork_downloads_csv"/>
+        <error to="Kill"/>
+    </action>
+
+    <fork name="fork_downloads_csv">
+        <path start="download_gold"/>
+        <path start="download_doaj"/>
+    </fork>
+
+    <action name="download_gold">
+        <java>
+            <main-class>eu.dnetlib.dhp.oa.graph.hostedbymap.DownloadCSV2</main-class>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--fileURL</arg><arg>${unibiFileURL}</arg>
+            <arg>--tmpFile</arg><arg>/tmp/unibi_gold_replaced.csv</arg>
+            <arg>--outputFile</arg><arg>${workingDir}/unibi_gold.json</arg>
+            <arg>--classForName</arg><arg>eu.dnetlib.dhp.oa.graph.hostedbymap.model.UnibiGoldModel</arg>
+        </java>
+        <ok to="join_download"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="download_doaj">
+        <java>
+            <main-class>eu.dnetlib.dhp.oa.graph.hostedbymap.DownloadCSV2</main-class>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--fileURL</arg><arg>${doajFileURL}</arg>
+            <arg>--tmpFile</arg><arg>/tmp/doaj_replaced.csv</arg>
+            <arg>--outputFile</arg><arg>${workingDir}/doaj.json</arg>
+            <arg>--classForName</arg><arg>eu.dnetlib.dhp.oa.graph.hostedbymap.model.DOAJModel</arg>
+        </java>
+        <ok to="join_download"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="join_download" to="produceHBM"/>
+
+    <action name="produceHBM">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn-cluster</master>
+            <name>Produce the new HostedByMap</name>
+            <class>eu.dnetlib.dhp.oa.graph.hostedbymap.SparkProduceHostedByMap</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--datasourcePath</arg><arg>${sourcePath}/datasource</arg>
+            <arg>--workingPath</arg><arg>/user/${wf:user()}/data</arg>
+            <arg>--outputPath</arg><arg>${hostedByMapPath}</arg>
+            <arg>--master</arg><arg>yarn-cluster</arg>
+        </spark>
+        <ok to="prepareInfo"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="prepareInfo">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn-cluster</master>
+            <name>Prepare info to apply the hbm</name>
+            <class>eu.dnetlib.dhp.oa.graph.hostedbymap.SparkPrepareHostedByInfoToApply</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--hostedByMapPath</arg><arg>${hostedByMapPath}</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
+            <arg>--graphPath</arg><arg>${sourcePath}</arg>
+            <arg>--master</arg><arg>yarn-cluster</arg>
+        </spark>
+        <ok to="fork_apply"/>
+        <error to="Kill"/>
+    </action>
+
+    <fork name="fork_apply">
+        <path start="apply_result"/>
+        <path start="apply_datasource"/>
+    </fork>
+
+    <action name="apply_result">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn-cluster</master>
+            <name>Apply hbm to result</name>
+            <class>eu.dnetlib.dhp.oa.graph.hostedbymap.SparkApplyHostedByMapToResult</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
+            <arg>--graphPath</arg><arg>${sourcePath}</arg>
+            <arg>--master</arg><arg>yarn-cluster</arg>
+        </spark>
+        <ok to="join_apply"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="apply_datasource">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn-cluster</master>
+            <name>Apply hbm to datasource</name>
+            <class>eu.dnetlib.dhp.oa.graph.hostedbymap.SparkApplyHostedByMapToDatasource</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--outputPath</arg><arg>${outputPath}/datasource</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
+            <arg>--graphPath</arg><arg>${sourcePath}</arg>
+            <arg>--master</arg><arg>yarn-cluster</arg>
+        </spark>
+        <ok to="join_apply"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="join_apply" to="End"/>
+
+
+    <end name="End"/>
+
+</workflow-app>

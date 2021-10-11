@@ -4,6 +4,8 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,7 +21,6 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
@@ -56,8 +57,8 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 				.valueOf("./@nameIdentifierScheme")
 				.trim()
 				.toUpperCase()
-				.replaceAll(" ", "")
-				.replaceAll("_", "");
+				.replace(" ", "")
+				.replace("_", "");
 
 			author.setPid(new ArrayList<>());
 
@@ -165,6 +166,13 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 					.filter(n -> StringUtils.isNotBlank(n.getText()))
 					.map(n -> n.getText().trim())
 					.filter(u -> u.startsWith("http"))
+					.map(s -> {
+						try {
+							return URLDecoder.decode(s, "UTF-8");
+						} catch (Throwable t) {
+							return s;
+						}
+					})
 					.distinct()
 					.collect(Collectors.toCollection(ArrayList::new)));
 

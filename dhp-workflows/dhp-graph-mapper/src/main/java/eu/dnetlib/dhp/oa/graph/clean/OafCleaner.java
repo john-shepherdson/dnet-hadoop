@@ -16,7 +16,7 @@ public class OafCleaner implements Serializable {
 		try {
 			navigate(oaf, mapping);
 		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
+			throw new IllegalStateException(e);
 		}
 		return oaf;
 	}

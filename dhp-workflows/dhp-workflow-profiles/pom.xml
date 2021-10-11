@@ -8,20 +8,5 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>dhp-workflow-profiles</artifactId>
-    <packaging>jar</packaging>
-
-    <!--
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-site-plugin</artifactId>
-                    <version>3.7.1</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
-    -->
 
 </project>

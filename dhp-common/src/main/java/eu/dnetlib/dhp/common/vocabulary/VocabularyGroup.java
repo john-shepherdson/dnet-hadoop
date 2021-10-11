@@ -46,7 +46,6 @@ public class VocabularyGroup implements Serializable {
 				}
 
 				vocs.addTerm(vocId, termId, termName);
-				// vocs.addSynonyms(vocId, termId, termId);
 			}
 		}
 
@@ -58,7 +57,6 @@ public class VocabularyGroup implements Serializable {
 				final String syn = arr[2].trim();
 
 				vocs.addSynonyms(vocId, termId, syn);
-				// vocs.addSynonyms(vocId, termId, termId);
 			}
 		}
 
@@ -98,7 +96,7 @@ public class VocabularyGroup implements Serializable {
 			.getTerms()
 			.values()
 			.stream()
-			.map(t -> t.getId())
+			.map(VocabularyTerm::getId)
 			.collect(Collectors.toCollection(HashSet::new));
 	}
 
@@ -154,16 +152,19 @@ public class VocabularyGroup implements Serializable {
 		return Optional
 			.ofNullable(vocId)
 			.map(String::toLowerCase)
-			.map(id -> vocs.containsKey(id))
+			.map(vocs::containsKey)
 			.orElse(false);
 	}
 
 	private void addSynonyms(final String vocId, final String termId, final String syn) {
 		String id = Optional
 			.ofNullable(vocId)
-			.map(s -> s.toLowerCase())
+			.map(String::toLowerCase)
 			.orElseThrow(
-				() -> new IllegalArgumentException(String.format("empty vocabulary id for [term:%s, synonym:%s]")));
+				() -> new IllegalArgumentException(
+					String
+						.format(
+							"empty vocabulary id for [term:%s, synonym:%s]", termId, syn)));
 		Optional
 			.ofNullable(vocs.get(id))
 			.orElseThrow(() -> new IllegalArgumentException("missing vocabulary id: " + vocId))

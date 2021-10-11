@@ -4,11 +4,6 @@ package eu.dnetlib.dhp.transformation.xslt;
 import static eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction.QNAME_BASE_URI;
 
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import net.sf.saxon.s9api.*;

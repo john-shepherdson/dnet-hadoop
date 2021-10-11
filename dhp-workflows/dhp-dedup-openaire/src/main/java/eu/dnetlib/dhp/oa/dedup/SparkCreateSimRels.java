@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Dataset;
@@ -17,6 +16,7 @@ import org.apache.spark.sql.SparkSession;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.model.Block;
@@ -26,8 +26,6 @@ import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.model.FieldListImpl;
-import eu.dnetlib.pace.model.FieldValueImpl;
 import eu.dnetlib.pace.model.MapDocument;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import scala.Tuple2;
@@ -56,7 +54,7 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 
 	@Override
 	public void run(ISLookUpService isLookUpService)
-		throws DocumentException, IOException, ISLookUpException {
+		throws DocumentException, IOException, ISLookUpException, SAXException {
 
 		// read oozie parameters
 		final String graphBasePath = parser.get("graphBasePath");
@@ -110,9 +108,6 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 					Encoders.bean(Relation.class));
 
 			saveParquet(simRels, outputPath, SaveMode.Overwrite);
-
-			log.info("Generated " + simRels.count() + " Similarity Relations");
-
 		}
 	}
 

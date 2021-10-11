@@ -3,6 +3,9 @@ package eu.dnetlib.dhp.bulktag.community;
 
 public class TaggingConstants {
 
+	private TaggingConstants() {
+	}
+
 	public static final String BULKTAG_DATA_INFO_TYPE = "bulktagging";
 
 	public static final String CLASS_ID_SUBJECT = "community:subject";

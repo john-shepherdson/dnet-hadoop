@@ -10,8 +10,6 @@ import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +19,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.QueryBuilder;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
@@ -46,7 +45,7 @@ public class MdstoreClient implements Closeable {
 
 		final String currentId = Optional
 			.ofNullable(getColl(db, COLL_METADATA_MANAGER, true).find(query))
-			.map(r -> r.first())
+			.map(FindIterable::first)
 			.map(d -> d.getString("currentId"))
 			.orElseThrow(() -> new IllegalArgumentException("cannot find current mdstore id for: " + mdId));
 
@@ -84,7 +83,7 @@ public class MdstoreClient implements Closeable {
 		if (!Iterables.contains(client.listDatabaseNames(), dbName)) {
 			final String err = String.format("Database '%s' not found in %s", dbName, client.getAddress());
 			log.warn(err);
-			throw new RuntimeException(err);
+			throw new IllegalArgumentException(err);
 		}
 		return client.getDatabase(dbName);
 	}
@@ -97,7 +96,7 @@ public class MdstoreClient implements Closeable {
 					String.format("Missing collection '%s' in database '%s'", collName, db.getName()));
 			log.warn(err);
 			if (abortIfMissing) {
-				throw new RuntimeException(err);
+				throw new IllegalArgumentException(err);
 			} else {
 				return null;
 			}

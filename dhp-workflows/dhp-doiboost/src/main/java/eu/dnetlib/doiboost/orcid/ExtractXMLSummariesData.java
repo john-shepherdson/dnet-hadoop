@@ -5,12 +5,13 @@ import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.mortbay.log.Log;
 
+import com.ximpleware.ParseException;
+
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.doiboost.orcidnodoi.GenOrcidAuthorWork;
+import eu.dnetlib.dhp.parser.utility.VtdException;
 
 public class ExtractXMLSummariesData extends OrcidDSManager {
 
@@ -27,7 +28,7 @@ public class ExtractXMLSummariesData extends OrcidDSManager {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					GenOrcidAuthorWork.class
+					ExtractXMLSummariesData.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/doiboost/gen_orcid_authors_from_summaries.json")));
 		parser.parseArgument(args);
@@ -42,9 +43,8 @@ public class ExtractXMLSummariesData extends OrcidDSManager {
 		Log.info("Output Authors Data: " + outputAuthorsPath);
 	}
 
-	public void extractAuthors() throws Exception {
+	public void extractAuthors() throws IOException, VtdException, ParseException {
 		Configuration conf = initConfigurationObject();
-		FileSystem fs = initFileSystemObject(conf);
 		String tarGzUri = hdfsServerUri.concat(workingPath).concat(summariesFileNameTarGz);
 		Path outputPath = new Path(
 			hdfsServerUri
