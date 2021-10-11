@@ -84,13 +84,15 @@ public class IndexRecordTransformerTest {
 
 	@Test
 	public void testForEOSCFutureTraining() throws IOException, TransformerException {
-		final String record = IOUtils.toString(getClass().getResourceAsStream("eosc-future/training-notebooks-seadatanet.xml"));
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/training-notebooks-seadatanet.xml"));
 		testRecordTransformation(record);
 	}
 
 	@Test
 	public void testForEOSCFutureAirQualityCopernicus() throws IOException, TransformerException {
-		final String record = IOUtils.toString(getClass().getResourceAsStream("eosc-future/air-quality-copernicus.xml"));
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/air-quality-copernicus.xml"));
 		testRecordTransformation(record);
 	}
 
@@ -102,11 +104,10 @@ public class IndexRecordTransformerTest {
 
 	@Test
 	public void testForEOSCFutureB2SharePlotRelatedORP() throws IOException, TransformerException {
-		final String record = IOUtils.toString(getClass().getResourceAsStream("eosc-future/b2share-plot-related-orp.xml"));
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/b2share-plot-related-orp.xml"));
 		testRecordTransformation(record);
 	}
-
-
 
 	private void testRecordTransformation(final String record) throws IOException, TransformerException {
 		final String fields = IOUtils.toString(getClass().getResourceAsStream("fields.xml"));
