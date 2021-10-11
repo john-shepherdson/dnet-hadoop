@@ -369,15 +369,15 @@
   <field name="trust" type="string" multiValued="true" indexed="true" stored="false"/>
   <field name="versioning" type="string" multiValued="true" indexed="true" stored="false"/>
 
-  <!-- Copy fields -->
+  <!-- Copy field definitions follow: -->
+
+  <!-- Data source -->
   <copyField source="datasourceenglishname" dest="__all"/>
   <copyField source="datasourceoddescription" dest="__all"/>
   <copyField source="datasourceofficialname" dest="__all"/>
   <copyField source="datasourcesubject" dest="__all"/>
-  <copyField source="externalreflabel" dest="__all"/>
-  <copyField source="fundinglevel0_description" dest="__all"/>
-  <copyField source="fundinglevel1_description" dest="__all"/>
-  <copyField source="fundinglevel2_description" dest="__all"/>
+
+  <!-- Organization -->
   <copyField source="organizationalternativenames" dest="__all"/>
   <copyField source="organizationecenterprise" dest="__all"/>
   <copyField source="organizationecinternationalorganization" dest="__all"/>
@@ -390,22 +390,35 @@
   <copyField source="organizationecsmevalidated" dest="__all"/>
   <copyField source="organizationlegalname" dest="__all"/>
   <copyField source="organizationlegalshortname" dest="__all"/>
+
+  <!-- Project -->
   <copyField source="projectacronym" dest="__all"/>
   <copyField source="projectcode" dest="__all"/>
   <copyField source="projectkeywords" dest="__all"/>
   <copyField source="projecttitle" dest="__all"/>
+
+  <!-- Result -->
+  <copyField source="resultpublisher" dest="__all"/>
+  <copyField source="resultsource" dest="__all"/>
+  <copyField source="resultidentifier" dest="__all"/>
+  <copyField source="resultauthor" dest="__all"/>
+  <copyField source="resulttitle" dest="__all"/>
+  <copyField source="resultdescription" dest="__all"/>
+  <copyField source="resultsubject" dest="__all"/>
+  <copyField source="resultacceptanceyear" dest="__all"/>
+
+  <!-- Other -->
+  <copyField source="externalreflabel" dest="__all"/>
+
+  <copyField source="fundinglevel0_description" dest="__all"/>
+  <copyField source="fundinglevel1_description" dest="__all"/>
+  <copyField source="fundinglevel2_description" dest="__all"/>
+
   <copyField source="relcontracttypename" dest="__all"/>
   <copyField source="relorganizationcountryname" dest="__all"/>
   <copyField source="relorganizationname" dest="__all"/>
   <copyField source="relorganizationshortname" dest="__all"/>
   <copyField source="relprojecttitle" dest="__all"/>
-  <copyField source="resultpublisher" dest="__all"/>
-  <copyField source="resultsource" dest="__all"/>
-
-  <!-- Commented copy fields below are queried independently by /exploreSearch query handler -->
-  <!-- <copyField source="resultidentifier" dest="__all"/> -->
-  <!-- <copyField source="resultauthor" dest="__all"/> -->
-  <!-- <copyField source="resulttitle" dest="__all"/> -->
-  <!-- <copyField source="resultdescription" dest="__all"/> -->
+  <copyField source="relprojectname" dest="__all"/>
 
 </schema>
