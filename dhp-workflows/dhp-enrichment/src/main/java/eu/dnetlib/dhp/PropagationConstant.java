@@ -69,7 +69,7 @@ public class PropagationConstant {
 					PROPAGATION_DATA_INFO_TYPE,
 					PROPAGATION_COUNTRY_INSTREPO_CLASS_ID,
 					PROPAGATION_COUNTRY_INSTREPO_CLASS_NAME,
-						ModelConstants.DNET_PROVENANCE_ACTIONS));
+					ModelConstants.DNET_PROVENANCE_ACTIONS));
 		return nc;
 	}
 
@@ -84,7 +84,8 @@ public class PropagationConstant {
 		return di;
 	}
 
-	public static Qualifier getQualifier(String inference_class_id, String inference_class_name, String qualifierSchema) {
+	public static Qualifier getQualifier(String inference_class_id, String inference_class_name,
+		String qualifierSchema) {
 		Qualifier pa = new Qualifier();
 		pa.setClassid(inference_class_id);
 		pa.setClassname(inference_class_name);
@@ -108,7 +109,11 @@ public class PropagationConstant {
 		r.setRelClass(rel_class);
 		r.setRelType(rel_type);
 		r.setSubRelType(subrel_type);
-		r.setDataInfo(getDataInfo(inference_provenance, inference_class_id, inference_class_name, ModelConstants.DNET_PROVENANCE_ACTIONS));
+		r
+			.setDataInfo(
+				getDataInfo(
+					inference_provenance, inference_class_id, inference_class_name,
+					ModelConstants.DNET_PROVENANCE_ACTIONS));
 		return r;
 	}
 

@@ -1,8 +1,8 @@
-package eu.dnetlib.dhp.sx.graph.bio
+package eu.dnetllib.dhp.sx.bio
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.dhp.schema.oaf.{Oaf, Result}
-import BioDBToOAF.ScholixResolved
+import eu.dnetlib.dhp.schema.oaf.Oaf
+import eu.dnetllib.dhp.sx.bio.BioDBToOAF.ScholixResolved
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}
@@ -31,17 +31,16 @@ object SparkTransformBioDatabaseToOAF {
         .master(parser.get("master")).getOrCreate()
     val sc = spark.sparkContext
 
-    implicit  val resultEncoder: Encoder[Oaf] = Encoders.kryo(classOf[Oaf])
-    import  spark.implicits._
-
+    implicit val resultEncoder: Encoder[Oaf] = Encoders.kryo(classOf[Oaf])
+    import spark.implicits._
     database.toUpperCase() match {
       case "UNIPROT" =>
         spark.createDataset(sc.textFile(dbPath).flatMap(i => BioDBToOAF.uniprotToOAF(i))).write.mode(SaveMode.Overwrite).save(targetPath)
-      case "PDB"=>
+      case "PDB" =>
         spark.createDataset(sc.textFile(dbPath).flatMap(i => BioDBToOAF.pdbTOOaf(i))).write.mode(SaveMode.Overwrite).save(targetPath)
       case "SCHOLIX" =>
         spark.read.load(dbPath).as[ScholixResolved].map(i => BioDBToOAF.scholixResolvedToOAF(i)).write.mode(SaveMode.Overwrite).save(targetPath)
-      case "CROSSREF_LINKS"=>
+      case "CROSSREF_LINKS" =>
         spark.createDataset(sc.textFile(dbPath).map(i => BioDBToOAF.crossrefLinksToOaf(i))).write.mode(SaveMode.Overwrite).save(targetPath)
     }
   }

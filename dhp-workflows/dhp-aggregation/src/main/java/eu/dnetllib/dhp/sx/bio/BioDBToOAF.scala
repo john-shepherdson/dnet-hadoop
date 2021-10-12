@@ -1,14 +1,12 @@
-package eu.dnetlib.dhp.sx.graph.bio
+package eu.dnetllib.dhp.sx.bio
 
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, OafMapperUtils}
-import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Dataset, Instance, KeyValue, Oaf, Relation, StructuredProperty}
+import eu.dnetlib.dhp.schema.oaf._
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.{compact, parse, render}
-
-import scala.collection.JavaConverters._
-
+import collection.JavaConverters._
 object BioDBToOAF {
 
   case class EBILinkItem(id: Long, links: String) {}
@@ -17,23 +15,23 @@ object BioDBToOAF {
 
   case class UniprotDate(date: String, date_info: String) {}
 
-  case class ScholixResolved(pid:String, pidType:String, typology:String, tilte:List[String], datasource:List[String], date:List[String], authors:List[String]){}
+  case class ScholixResolved(pid: String, pidType: String, typology: String, tilte: List[String], datasource: List[String], date: List[String], authors: List[String]) {}
 
   val DATA_INFO: DataInfo = OafMapperUtils.dataInfo(false, null, false, false, ModelConstants.PROVENANCE_ACTION_SET_QUALIFIER, "0.9")
   val SUBJ_CLASS = "Keywords"
 
   val DATE_RELATION_KEY = "RelationDate"
 
-  val resolvedURL:Map[String,String] = Map(
-    "genbank"->             "https://www.ncbi.nlm.nih.gov/nuccore/",
-    "ncbi-n" ->             "https://www.ncbi.nlm.nih.gov/nuccore/",
-    "ncbi-wgs" ->           "https://www.ncbi.nlm.nih.gov/nuccore/",
-    "ncbi-p" ->             "https://www.ncbi.nlm.nih.gov/protein/",
-    "ena" ->                "https://www.ebi.ac.uk/ena/browser/view/",
-    "clinicaltrials.gov"->  "https://clinicaltrials.gov/ct2/show/",
-    "onim"->                "https://omim.org/entry/",
-    "refseq"->              "https://www.ncbi.nlm.nih.gov/nuccore/",
-    "geo"->                 "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc="
+  val resolvedURL: Map[String, String] = Map(
+    "genbank" -> "https://www.ncbi.nlm.nih.gov/nuccore/",
+    "ncbi-n" -> "https://www.ncbi.nlm.nih.gov/nuccore/",
+    "ncbi-wgs" -> "https://www.ncbi.nlm.nih.gov/nuccore/",
+    "ncbi-p" -> "https://www.ncbi.nlm.nih.gov/protein/",
+    "ena" -> "https://www.ebi.ac.uk/ena/browser/view/",
+    "clinicaltrials.gov" -> "https://clinicaltrials.gov/ct2/show/",
+    "onim" -> "https://omim.org/entry/",
+    "refseq" -> "https://www.ncbi.nlm.nih.gov/nuccore/",
+    "geo" -> "https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc="
   )
 
 
@@ -45,7 +43,7 @@ object BioDBToOAF {
     val ElsevierCollectedFrom: KeyValue = OafMapperUtils.keyValue("10|openaire____::8f87e10869299a5fe80b315695296b88", "Elsevier")
     val springerNatureCollectedFrom: KeyValue = OafMapperUtils.keyValue("10|openaire____::6e380d9cf51138baec8480f5a0ce3a2e", "Springer Nature")
     val EBICollectedFrom: KeyValue = OafMapperUtils.keyValue("10|opendoar____::83e60e09c222f206c725385f53d7e567c", "EMBL-EBIs Protein Data Bank in Europe (PDBe)")
-    val pubmedCollectedFrom:KeyValue = OafMapperUtils.keyValue(ModelConstants.EUROPE_PUBMED_CENTRAL_ID, "Europe PubMed Central")
+    val pubmedCollectedFrom: KeyValue = OafMapperUtils.keyValue(ModelConstants.EUROPE_PUBMED_CENTRAL_ID, "Europe PubMed Central")
 
     UNIPROTCollectedFrom.setDataInfo(DATA_INFO)
     PDBCollectedFrom.setDataInfo(DATA_INFO)
@@ -58,9 +56,9 @@ object BioDBToOAF {
 
     Map(
       "uniprot" -> UNIPROTCollectedFrom,
-      "pdb"-> PDBCollectedFrom,
-      "elsevier" ->ElsevierCollectedFrom,
-      "ebi" ->EBICollectedFrom,
+      "pdb" -> PDBCollectedFrom,
+      "elsevier" -> ElsevierCollectedFrom,
+      "ebi" -> EBICollectedFrom,
       "Springer Nature" -> springerNatureCollectedFrom,
       "NCBI Nucleotide" -> ncbiCollectedFrom,
       "European Nucleotide Archive" -> enaCollectedFrom,
@@ -68,7 +66,7 @@ object BioDBToOAF {
     )
   }
 
-  def crossrefLinksToOaf(input:String):Oaf = {
+  def crossrefLinksToOaf(input: String): Oaf = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json = parse(input)
     val source_pid = (json \ "Source" \ "Identifier" \ "ID").extract[String].toLowerCase
@@ -77,16 +75,16 @@ object BioDBToOAF {
     val target_pid = (json \ "Target" \ "Identifier" \ "ID").extract[String].toLowerCase
     val target_pid_type = (json \ "Target" \ "Identifier" \ "IDScheme").extract[String].toLowerCase
 
-    val relation_semantic= (json \ "RelationshipType" \ "Name").extract[String]
+    val relation_semantic = (json \ "RelationshipType" \ "Name").extract[String]
 
     val date = GraphCleaningFunctions.cleanDate((json \ "LinkedPublicationDate").extract[String])
 
-    createRelation(target_pid, target_pid_type, generate_unresolved_id(source_pid, source_pid_type),collectedFromMap("elsevier"),"relationship", relation_semantic, date)
+    createRelation(target_pid, target_pid_type, generate_unresolved_id(source_pid, source_pid_type), collectedFromMap("elsevier"), "relationship", relation_semantic, date)
 
   }
 
 
-  def scholixResolvedToOAF(input:ScholixResolved):Oaf = {
+  def scholixResolvedToOAF(input: ScholixResolved): Oaf = {
 
     val d = new Dataset
 
@@ -127,18 +125,18 @@ object BioDBToOAF {
     d.setInstance(List(i).asJava)
 
     if (input.authors != null && input.authors.nonEmpty) {
-      val authors = input.authors.map(a =>{
+      val authors = input.authors.map(a => {
         val authorOAF = new Author
         authorOAF.setFullname(a)
         authorOAF
       })
       d.setAuthor(authors.asJava)
     }
-    if (input.date!= null && input.date.nonEmpty) {
-        val dt = input.date.head
-        i.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(dt), DATA_INFO))
-        d.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(dt), DATA_INFO))
-      }
+    if (input.date != null && input.date.nonEmpty) {
+      val dt = input.date.head
+      i.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(dt), DATA_INFO))
+      d.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(dt), DATA_INFO))
+    }
     d
   }
 
@@ -190,7 +188,7 @@ object BioDBToOAF {
           OafMapperUtils.structuredProperty(s, SUBJ_CLASS, SUBJ_CLASS, ModelConstants.DNET_SUBJECT_TYPOLOGIES, ModelConstants.DNET_SUBJECT_TYPOLOGIES, null)
         ).asJava)
     }
-    var i_date:Option[UniprotDate] = None
+    var i_date: Option[UniprotDate] = None
 
     if (dates.nonEmpty) {
       i_date = dates.find(d => d.date_info.contains("entry version"))
@@ -218,12 +216,12 @@ object BioDBToOAF {
 
 
     if (references_pmid != null && references_pmid.nonEmpty) {
-      val rel = createRelation(references_pmid.head, "pmid", d.getId, collectedFromMap("uniprot"), ModelConstants.RELATIONSHIP, ModelConstants.IS_RELATED_TO, if  (i_date.isDefined) i_date.get.date else null)
+      val rel = createRelation(references_pmid.head, "pmid", d.getId, collectedFromMap("uniprot"), ModelConstants.RELATIONSHIP, ModelConstants.IS_RELATED_TO, if (i_date.isDefined) i_date.get.date else null)
       rel.getCollectedfrom
       List(d, rel)
     }
     else if (references_doi != null && references_doi.nonEmpty) {
-      val rel = createRelation(references_doi.head, "doi", d.getId, collectedFromMap("uniprot"), ModelConstants.RELATIONSHIP, ModelConstants.IS_RELATED_TO, if  (i_date.isDefined) i_date.get.date else null)
+      val rel = createRelation(references_doi.head, "doi", d.getId, collectedFromMap("uniprot"), ModelConstants.RELATIONSHIP, ModelConstants.IS_RELATED_TO, if (i_date.isDefined) i_date.get.date else null)
       List(d, rel)
     }
     else
@@ -231,13 +229,12 @@ object BioDBToOAF {
   }
 
 
-
-  def generate_unresolved_id(pid:String, pidType:String) :String = {
+  def generate_unresolved_id(pid: String, pidType: String): String = {
     s"unresolved::$pid::$pidType"
   }
 
 
-  def createRelation(pid: String, pidType: String, sourceId: String, collectedFrom: KeyValue, subRelType:String, relClass:String, date:String):Relation = {
+  def createRelation(pid: String, pidType: String, sourceId: String, collectedFrom: KeyValue, subRelType: String, relClass: String, date: String): Relation = {
 
     val rel = new Relation
     rel.setCollectedfrom(List(collectedFromMap("pdb")).asJava)
@@ -251,7 +248,7 @@ object BioDBToOAF {
     rel.setTarget(s"unresolved::$pid::$pidType")
 
 
-    val dateProps:KeyValue = OafMapperUtils.keyValue(DATE_RELATION_KEY, date)
+    val dateProps: KeyValue = OafMapperUtils.keyValue(DATE_RELATION_KEY, date)
 
     rel.setProperties(List(dateProps).asJava)
 
@@ -262,8 +259,8 @@ object BioDBToOAF {
   }
 
 
-  def createSupplementaryRelation(pid: String, pidType: String, sourceId: String, collectedFrom: KeyValue, date:String): Relation = {
-    createRelation(pid,pidType,sourceId,collectedFrom, ModelConstants.SUPPLEMENT, ModelConstants.IS_SUPPLEMENT_TO, date)
+  def createSupplementaryRelation(pid: String, pidType: String, sourceId: String, collectedFrom: KeyValue, date: String): Relation = {
+    createRelation(pid, pidType, sourceId, collectedFrom, ModelConstants.SUPPLEMENT, ModelConstants.IS_SUPPLEMENT_TO, date)
   }
 
 
@@ -338,7 +335,7 @@ object BioDBToOAF {
 
   def EBITargetLinksFilter(input: EBILinks): Boolean = {
 
-    input.targetPidType.equalsIgnoreCase("ena") ||   input.targetPidType.equalsIgnoreCase("pdb") ||  input.targetPidType.equalsIgnoreCase("uniprot")
+    input.targetPidType.equalsIgnoreCase("ena") || input.targetPidType.equalsIgnoreCase("pdb") || input.targetPidType.equalsIgnoreCase("uniprot")
 
   }
 

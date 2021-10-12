@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -22,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import scala.Tuple2;
@@ -130,7 +130,7 @@ public class SparkResultToCommunityFromOrganizationJob {
 											PROPAGATION_DATA_INFO_TYPE,
 											PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_ID,
 											PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_NAME,
-												ModelConstants.DNET_PROVENANCE_ACTIONS)));
+											ModelConstants.DNET_PROVENANCE_ACTIONS)));
 						propagatedContexts.add(newContext);
 					}
 				}
