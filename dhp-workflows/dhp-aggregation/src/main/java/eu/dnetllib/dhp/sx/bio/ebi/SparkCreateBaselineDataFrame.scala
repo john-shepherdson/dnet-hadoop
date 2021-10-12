@@ -114,11 +114,7 @@ object SparkCreateBaselineDataFrame {
       val hdfsWritePath: Path = new Path(s"$baselinePath/${u._1}")
       val fsDataOutputStream: FSDataOutputStream = fs.create(hdfsWritePath, true)
       val i = downloadBaselinePart(u._2)
-      val buffer = Array.fill[Byte](1024)(0)
-      while (i.read(buffer) > 0) {
-        fsDataOutputStream.write(buffer)
-      }
-      i.close()
+      IOUtils.copy(i, fsDataOutputStream)
       println(s"Downloaded ${u._2} into $baselinePath/${u._1}")
       fsDataOutputStream.close()
     }
@@ -182,7 +178,7 @@ object SparkCreateBaselineDataFrame {
 
     downloadBaseLineUpdate(s"$workingPath/baseline", hdfsServerUri)
 
-    val k: RDD[(String, String)] = sc.wholeTextFiles(s"$workingPath/baseline_ftp", 2000)
+    val k: RDD[(String, String)] = sc.wholeTextFiles(s"$workingPath/baseline", 2000)
     val ds: Dataset[PMArticle] = spark.createDataset(k.filter(i => i._1.endsWith(".gz")).flatMap(i => {
       val xml = new XMLEventReader(Source.fromBytes(i._2.getBytes()))
       new PMParser(xml)
