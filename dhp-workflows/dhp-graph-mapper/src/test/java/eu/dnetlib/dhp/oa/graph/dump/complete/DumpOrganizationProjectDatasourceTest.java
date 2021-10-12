@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 
-import eu.dnetlib.dhp.oa.graph.dump.exceptions.NoAvailableEntityTypeException;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -23,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.oa.graph.dump.exceptions.NoAvailableEntityTypeException;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Project;
