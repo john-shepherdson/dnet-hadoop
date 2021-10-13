@@ -30,7 +30,7 @@
 		"paramLongName": "communityId",
 		"paramDescription": "the id of the community for which to create the dump",
 		"paramRequired": true
-	}		}
+	}
 ]
 
 

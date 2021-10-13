@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -57,7 +58,7 @@ public class DumpProducts implements Serializable {
 		Utils
 			.readPath(spark, inputPath, inputClazz)
 			.map((MapFunction<I, O>) value -> execMap(value, communityMap, dumpType), Encoders.bean(outputClazz))
-			.filter(Objects::nonNull)
+			.filter((FilterFunction<O>) value -> value != null)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")

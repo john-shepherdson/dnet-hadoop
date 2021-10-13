@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
 /**
@@ -86,10 +87,13 @@ public class SaveCommunityMap implements Serializable {
 
 	private void saveCommunityMap(boolean singleCommunity, String communityId)
 		throws ISLookUpException, IOException, DocumentException, SAXException {
+		final String communityMapString = Utils.OBJECT_MAPPER
+			.writeValueAsString(queryInformationSystem.getCommunityMap(singleCommunity, communityId));
+		log.info("communityMap {} ", communityMapString);
 		writer
 			.write(
-				Utils.OBJECT_MAPPER
-					.writeValueAsString(queryInformationSystem.getCommunityMap(singleCommunity, communityId)));
+				communityMapString);
+		writer.close();
 	}
 
 }

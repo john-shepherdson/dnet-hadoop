@@ -40,353 +40,369 @@ public class ResultMapper implements Serializable {
 		eu.dnetlib.dhp.schema.oaf.Result input = (eu.dnetlib.dhp.schema.oaf.Result) in;
 		Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> ort = Optional.ofNullable(input.getResulttype());
 		if (ort.isPresent()) {
-			switch (ort.get().getClassid()) {
-				case "publication":
-					Optional<Journal> journal = Optional
-						.ofNullable(((eu.dnetlib.dhp.schema.oaf.Publication) input).getJournal());
-					if (journal.isPresent()) {
-						Journal j = journal.get();
-						Container c = new Container();
-						c.setConferencedate(j.getConferencedate());
-						c.setConferenceplace(j.getConferenceplace());
-						c.setEdition(j.getEdition());
-						c.setEp(j.getEp());
-						c.setIss(j.getIss());
-						c.setIssnLinking(j.getIssnLinking());
-						c.setIssnOnline(j.getIssnOnline());
-						c.setIssnPrinted(j.getIssnPrinted());
-						c.setName(j.getName());
-						c.setSp(j.getSp());
-						c.setVol(j.getVol());
-						out.setContainer(c);
-						out.setType(ModelConstants.PUBLICATION_DEFAULT_RESULTTYPE.getClassname());
-					}
-					break;
-				case "dataset":
-					eu.dnetlib.dhp.schema.oaf.Dataset id = (eu.dnetlib.dhp.schema.oaf.Dataset) input;
-					Optional.ofNullable(id.getSize()).ifPresent(v -> out.setSize(v.getValue()));
-					Optional.ofNullable(id.getVersion()).ifPresent(v -> out.setVersion(v.getValue()));
+			try {
 
-					out
-						.setGeolocation(
-							Optional
-								.ofNullable(id.getGeolocation())
-								.map(
-									igl -> igl
-										.stream()
-										.filter(Objects::nonNull)
-										.map(gli -> {
-											GeoLocation gl = new GeoLocation();
-											gl.setBox(gli.getBox());
-											gl.setPlace(gli.getPlace());
-											gl.setPoint(gli.getPoint());
-											return gl;
-										})
-										.collect(Collectors.toList()))
-								.orElse(null));
-
-					out.setType(ModelConstants.DATASET_DEFAULT_RESULTTYPE.getClassname());
-					break;
-				case "software":
-
-					eu.dnetlib.dhp.schema.oaf.Software is = (eu.dnetlib.dhp.schema.oaf.Software) input;
-					Optional
-						.ofNullable(is.getCodeRepositoryUrl())
-						.ifPresent(value -> out.setCodeRepositoryUrl(value.getValue()));
-					Optional
-						.ofNullable(is.getDocumentationUrl())
-						.ifPresent(
-							value -> out
-								.setDocumentationUrl(
-									value
-										.stream()
-										.map(Field::getValue)
-										.collect(Collectors.toList())));
-
-					Optional
-						.ofNullable(is.getProgrammingLanguage())
-						.ifPresent(value -> out.setProgrammingLanguage(value.getClassid()));
-
-					out.setType(ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE.getClassname());
-					break;
-				case "other":
-
-					eu.dnetlib.dhp.schema.oaf.OtherResearchProduct ir = (eu.dnetlib.dhp.schema.oaf.OtherResearchProduct) input;
-					out
-						.setContactgroup(
-							Optional
-								.ofNullable(ir.getContactgroup())
-								.map(value -> value.stream().map(Field::getValue).collect(Collectors.toList()))
-								.orElse(null));
-
-					out
-						.setContactperson(
-							Optional
-								.ofNullable(ir.getContactperson())
-								.map(value -> value.stream().map(Field::getValue).collect(Collectors.toList()))
-								.orElse(null));
-					out
-						.setTool(
-							Optional
-								.ofNullable(ir.getTool())
-								.map(value -> value.stream().map(Field::getValue).collect(Collectors.toList()))
-								.orElse(null));
-
-					out.setType(ModelConstants.ORP_DEFAULT_RESULTTYPE.getClassname());
-
-					break;
-				default:
-					throw new NoAvailableEntityTypeException();
-			}
-
-			Optional<List<Measure>> mes = Optional.ofNullable(input.getMeasures());
-			if (mes.isPresent()) {
-				List<KeyValue> measure = new ArrayList<>();
-				mes
-					.get()
-					.forEach(
-						m -> m.getUnit().forEach(u -> measure.add(KeyValue.newInstance(m.getId(), u.getValue()))));
-				out.setMeasures(measure);
-			}
-
-			Optional
-				.ofNullable(input.getAuthor())
-				.ifPresent(
-					ats -> out.setAuthor(ats.stream().map(ResultMapper::getAuthor).collect(Collectors.toList())));
-
-			// I do not map Access Right UNKNOWN or OTHER
-
-			Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> oar = Optional.ofNullable(input.getBestaccessright());
-			if (oar.isPresent() && Constants.accessRightsCoarMap.containsKey(oar.get().getClassid())) {
-				String code = Constants.accessRightsCoarMap.get(oar.get().getClassid());
-				out
-					.setBestaccessright(
-						AccessRight
-							.newInstance(
-								code,
-								Constants.coarCodeLabelMap.get(code),
-								Constants.COAR_ACCESS_RIGHT_SCHEMA));
-			}
-
-			final List<String> contributorList = new ArrayList<>();
-			Optional
-				.ofNullable(input.getContributor())
-				.ifPresent(value -> value.stream().forEach(c -> contributorList.add(c.getValue())));
-			out.setContributor(contributorList);
-
-			Optional
-				.ofNullable(input.getCountry())
-				.ifPresent(
-					value -> out
-						.setCountry(
-							value
-								.stream()
-								.map(
-									c -> {
-										if (c.getClassid().equals((ModelConstants.UNKNOWN))) {
-											return null;
-										}
-										Country country = new Country();
-										country.setCode(c.getClassid());
-										country.setLabel(c.getClassname());
-										Optional
-											.ofNullable(c.getDataInfo())
-											.ifPresent(
-												provenance -> country
-													.setProvenance(
-														Provenance
-															.newInstance(
-																provenance
-																	.getProvenanceaction()
-																	.getClassname(),
-																c.getDataInfo().getTrust())));
-										return country;
-									})
-								.filter(Objects::nonNull)
-								.collect(Collectors.toList())));
-
-			final List<String> coverageList = new ArrayList<>();
-			Optional
-				.ofNullable(input.getCoverage())
-				.ifPresent(value -> value.stream().forEach(c -> coverageList.add(c.getValue())));
-			out.setCoverage(coverageList);
-
-			out.setDateofcollection(input.getDateofcollection());
-
-			final List<String> descriptionList = new ArrayList<>();
-			Optional
-				.ofNullable(input.getDescription())
-				.ifPresent(value -> value.forEach(d -> descriptionList.add(d.getValue())));
-			out.setDescription(descriptionList);
-			Optional<Field<String>> oStr = Optional.ofNullable(input.getEmbargoenddate());
-			if (oStr.isPresent()) {
-				out.setEmbargoenddate(oStr.get().getValue());
-			}
-
-			final List<String> formatList = new ArrayList<>();
-			Optional
-				.ofNullable(input.getFormat())
-				.ifPresent(value -> value.stream().forEach(f -> formatList.add(f.getValue())));
-			out.setFormat(formatList);
-			out.setId(input.getId());
-			out.setOriginalId(input.getOriginalId());
-
-			Optional<List<eu.dnetlib.dhp.schema.oaf.Instance>> oInst = Optional
-				.ofNullable(input.getInstance());
-
-			if (oInst.isPresent()) {
-				if (Constants.DUMPTYPE.COMPLETE.getType().equals(dumpType)) {
-					((GraphResult) out)
-						.setInstance(
-							oInst.get().stream().map(ResultMapper::getGraphInstance).collect(Collectors.toList()));
-				} else {
-					((CommunityResult) out)
-						.setInstance(
-							oInst.get().stream().map(ResultMapper::getCommunityInstance).collect(Collectors.toList()));
-				}
-			}
-
-			Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> oL = Optional.ofNullable(input.getLanguage());
-			if (oL.isPresent()) {
-				eu.dnetlib.dhp.schema.oaf.Qualifier language = oL.get();
-				out.setLanguage(Qualifier.newInstance(language.getClassid(), language.getClassname()));
-			}
-			Optional<Long> oLong = Optional.ofNullable(input.getLastupdatetimestamp());
-			if (oLong.isPresent()) {
-				out.setLastupdatetimestamp(oLong.get());
-			}
-			Optional<List<StructuredProperty>> otitle = Optional.ofNullable(input.getTitle());
-			if (otitle.isPresent()) {
-				List<StructuredProperty> iTitle = otitle
-					.get()
-					.stream()
-					.filter(t -> t.getQualifier().getClassid().equalsIgnoreCase("main title"))
-					.collect(Collectors.toList());
-				if (!iTitle.isEmpty()) {
-					out.setMaintitle(iTitle.get(0).getValue());
+				addTypeSpecificInformation(out, input, ort);
+				Optional<List<Measure>> mes = Optional.ofNullable(input.getMeasures());
+				if (mes.isPresent()) {
+					List<KeyValue> measure = new ArrayList<>();
+					mes
+						.get()
+						.forEach(
+							m -> m.getUnit().forEach(u -> measure.add(KeyValue.newInstance(m.getId(), u.getValue()))));
+					out.setMeasures(measure);
 				}
 
-				iTitle = otitle
-					.get()
-					.stream()
-					.filter(t -> t.getQualifier().getClassid().equalsIgnoreCase("subtitle"))
-					.collect(Collectors.toList());
-				if (!iTitle.isEmpty()) {
-					out.setSubtitle(iTitle.get(0).getValue());
+				Optional
+					.ofNullable(input.getAuthor())
+					.ifPresent(
+						ats -> out.setAuthor(ats.stream().map(ResultMapper::getAuthor).collect(Collectors.toList())));
+
+				// I do not map Access Right UNKNOWN or OTHER
+
+				Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> oar = Optional.ofNullable(input.getBestaccessright());
+				if (oar.isPresent() && Constants.accessRightsCoarMap.containsKey(oar.get().getClassid())) {
+					String code = Constants.accessRightsCoarMap.get(oar.get().getClassid());
+					out
+						.setBestaccessright(
+							AccessRight
+								.newInstance(
+									code,
+									Constants.coarCodeLabelMap.get(code),
+									Constants.COAR_ACCESS_RIGHT_SCHEMA));
 				}
 
-			}
+				final List<String> contributorList = new ArrayList<>();
+				Optional
+					.ofNullable(input.getContributor())
+					.ifPresent(value -> value.stream().forEach(c -> contributorList.add(c.getValue())));
+				out.setContributor(contributorList);
 
-			Optional
-				.ofNullable(input.getPid())
-				.ifPresent(
-					value -> out
-						.setPid(
-							value
-								.stream()
-								.map(
-									p -> ControlledField
-										.newInstance(p.getQualifier().getClassid(), p.getValue()))
-								.collect(Collectors.toList())));
-
-			oStr = Optional.ofNullable(input.getDateofacceptance());
-			if (oStr.isPresent()) {
-				out.setPublicationdate(oStr.get().getValue());
-			}
-			oStr = Optional.ofNullable(input.getPublisher());
-			if (oStr.isPresent()) {
-				out.setPublisher(oStr.get().getValue());
-			}
-
-			Optional
-				.ofNullable(input.getSource())
-				.ifPresent(value -> out.setSource(value.stream().map(Field::getValue).collect(Collectors.toList())));
-
-			List<Subject> subjectList = new ArrayList<>();
-			Optional
-				.ofNullable(input.getSubject())
-				.ifPresent(
-					value -> value
-						.forEach(s -> subjectList.add(getSubject(s))));
-
-			out.setSubjects(subjectList);
-
-			out.setType(input.getResulttype().getClassid());
-		}
-
-		if (!Constants.DUMPTYPE.COMPLETE.getType().equals(dumpType)) {
-			((CommunityResult) out)
-				.setCollectedfrom(
-					input
-						.getCollectedfrom()
-						.stream()
-						.map(cf -> KeyValue.newInstance(cf.getKey(), cf.getValue()))
-						.collect(Collectors.toList()));
-
-			Set<String> communities = communityMap.keySet();
-			List<Context> contextList = Optional
-				.ofNullable(
-					input
-						.getContext())
-				.map(
-					value -> value
-						.stream()
-						.map(c -> {
-							String communityId = c.getId();
-							if (communityId.contains("::")) {
-								communityId = communityId.substring(0, communityId.indexOf("::"));
-							}
-							if (communities.contains(communityId)) {
-								Context context = new Context();
-								context.setCode(communityId);
-								context.setLabel(communityMap.get(communityId));
-								Optional<List<DataInfo>> dataInfo = Optional.ofNullable(c.getDataInfo());
-								if (dataInfo.isPresent()) {
-									List<Provenance> provenance = new ArrayList<>();
-									provenance
-										.addAll(
-											dataInfo
-												.get()
-												.stream()
-												.map(
-													di -> Optional
-														.ofNullable(di.getProvenanceaction())
-														.map(
-															provenanceaction -> Provenance
+				Optional
+					.ofNullable(input.getCountry())
+					.ifPresent(
+						value -> out
+							.setCountry(
+								value
+									.stream()
+									.map(
+										c -> {
+											if (c.getClassid().equals((ModelConstants.UNKNOWN))) {
+												return null;
+											}
+											Country country = new Country();
+											country.setCode(c.getClassid());
+											country.setLabel(c.getClassname());
+											Optional
+												.ofNullable(c.getDataInfo())
+												.ifPresent(
+													provenance -> country
+														.setProvenance(
+															Provenance
 																.newInstance(
-																	provenanceaction.getClassname(), di.getTrust()))
-														.orElse(null))
-												.filter(Objects::nonNull)
-												.collect(Collectors.toSet()));
+																	provenance
+																		.getProvenanceaction()
+																		.getClassname(),
+																	c.getDataInfo().getTrust())));
+											return country;
+										})
+									.filter(Objects::nonNull)
+									.collect(Collectors.toList())));
 
-									try {
-										context.setProvenance(getUniqueProvenance(provenance));
-									} catch (NoAvailableEntityTypeException e) {
-										e.printStackTrace();
-									}
-								}
-								return context;
-							}
-							return null;
-						})
-						.filter(Objects::nonNull)
-						.collect(Collectors.toList()))
-				.orElse(new ArrayList<>());
+				final List<String> coverageList = new ArrayList<>();
+				Optional
+					.ofNullable(input.getCoverage())
+					.ifPresent(value -> value.stream().forEach(c -> coverageList.add(c.getValue())));
+				out.setCoverage(coverageList);
 
-			if (!contextList.isEmpty()) {
-				Set<Integer> hashValue = new HashSet<>();
-				List<Context> remainigContext = new ArrayList<>();
-				contextList.forEach(c -> {
-					if (!hashValue.contains(c.hashCode())) {
-						remainigContext.add(c);
-						hashValue.add(c.hashCode());
+				out.setDateofcollection(input.getDateofcollection());
+
+				final List<String> descriptionList = new ArrayList<>();
+				Optional
+					.ofNullable(input.getDescription())
+					.ifPresent(value -> value.forEach(d -> descriptionList.add(d.getValue())));
+				out.setDescription(descriptionList);
+				Optional<Field<String>> oStr = Optional.ofNullable(input.getEmbargoenddate());
+				if (oStr.isPresent()) {
+					out.setEmbargoenddate(oStr.get().getValue());
+				}
+
+				final List<String> formatList = new ArrayList<>();
+				Optional
+					.ofNullable(input.getFormat())
+					.ifPresent(value -> value.stream().forEach(f -> formatList.add(f.getValue())));
+				out.setFormat(formatList);
+				out.setId(input.getId());
+				out.setOriginalId(input.getOriginalId());
+
+				Optional<List<eu.dnetlib.dhp.schema.oaf.Instance>> oInst = Optional
+					.ofNullable(input.getInstance());
+
+				if (oInst.isPresent()) {
+					if (Constants.DUMPTYPE.COMPLETE.getType().equals(dumpType)) {
+						((GraphResult) out)
+							.setInstance(
+								oInst.get().stream().map(ResultMapper::getGraphInstance).collect(Collectors.toList()));
+					} else {
+						((CommunityResult) out)
+							.setInstance(
+								oInst
+									.get()
+									.stream()
+									.map(ResultMapper::getCommunityInstance)
+									.collect(Collectors.toList()));
 					}
-				});
-				((CommunityResult) out).setContext(remainigContext);
+				}
+
+				Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> oL = Optional.ofNullable(input.getLanguage());
+				if (oL.isPresent()) {
+					eu.dnetlib.dhp.schema.oaf.Qualifier language = oL.get();
+					out.setLanguage(Qualifier.newInstance(language.getClassid(), language.getClassname()));
+				}
+				Optional<Long> oLong = Optional.ofNullable(input.getLastupdatetimestamp());
+				if (oLong.isPresent()) {
+					out.setLastupdatetimestamp(oLong.get());
+				}
+				Optional<List<StructuredProperty>> otitle = Optional.ofNullable(input.getTitle());
+				if (otitle.isPresent()) {
+					List<StructuredProperty> iTitle = otitle
+						.get()
+						.stream()
+						.filter(t -> t.getQualifier().getClassid().equalsIgnoreCase("main title"))
+						.collect(Collectors.toList());
+					if (!iTitle.isEmpty()) {
+						out.setMaintitle(iTitle.get(0).getValue());
+					}
+
+					iTitle = otitle
+						.get()
+						.stream()
+						.filter(t -> t.getQualifier().getClassid().equalsIgnoreCase("subtitle"))
+						.collect(Collectors.toList());
+					if (!iTitle.isEmpty()) {
+						out.setSubtitle(iTitle.get(0).getValue());
+					}
+
+				}
+
+				Optional
+					.ofNullable(input.getPid())
+					.ifPresent(
+						value -> out
+							.setPid(
+								value
+									.stream()
+									.map(
+										p -> ControlledField
+											.newInstance(p.getQualifier().getClassid(), p.getValue()))
+									.collect(Collectors.toList())));
+
+				oStr = Optional.ofNullable(input.getDateofacceptance());
+				if (oStr.isPresent()) {
+					out.setPublicationdate(oStr.get().getValue());
+				}
+				oStr = Optional.ofNullable(input.getPublisher());
+				if (oStr.isPresent()) {
+					out.setPublisher(oStr.get().getValue());
+				}
+
+				Optional
+					.ofNullable(input.getSource())
+					.ifPresent(
+						value -> out.setSource(value.stream().map(Field::getValue).collect(Collectors.toList())));
+
+				List<Subject> subjectList = new ArrayList<>();
+				Optional
+					.ofNullable(input.getSubject())
+					.ifPresent(
+						value -> value
+							.forEach(s -> subjectList.add(getSubject(s))));
+
+				out.setSubjects(subjectList);
+
+				out.setType(input.getResulttype().getClassid());
+
+				if (!Constants.DUMPTYPE.COMPLETE.getType().equals(dumpType)) {
+					((CommunityResult) out)
+						.setCollectedfrom(
+							input
+								.getCollectedfrom()
+								.stream()
+								.map(cf -> KeyValue.newInstance(cf.getKey(), cf.getValue()))
+								.collect(Collectors.toList()));
+
+					Set<String> communities = communityMap.keySet();
+					List<Context> contextList = Optional
+						.ofNullable(
+							input
+								.getContext())
+						.map(
+							value -> value
+								.stream()
+								.map(c -> {
+									String communityId = c.getId();
+									if (communityId.contains("::")) {
+										communityId = communityId.substring(0, communityId.indexOf("::"));
+									}
+									if (communities.contains(communityId)) {
+										Context context = new Context();
+										context.setCode(communityId);
+										context.setLabel(communityMap.get(communityId));
+										Optional<List<DataInfo>> dataInfo = Optional.ofNullable(c.getDataInfo());
+										if (dataInfo.isPresent()) {
+											List<Provenance> provenance = new ArrayList<>();
+											provenance
+												.addAll(
+													dataInfo
+														.get()
+														.stream()
+														.map(
+															di -> Optional
+																.ofNullable(di.getProvenanceaction())
+																.map(
+																	provenanceaction -> Provenance
+																		.newInstance(
+																			provenanceaction.getClassname(),
+																			di.getTrust()))
+																.orElse(null))
+														.filter(Objects::nonNull)
+														.collect(Collectors.toSet()));
+
+											try {
+												context.setProvenance(getUniqueProvenance(provenance));
+											} catch (NoAvailableEntityTypeException e) {
+												e.printStackTrace();
+											}
+										}
+										return context;
+									}
+									return null;
+								})
+								.filter(Objects::nonNull)
+								.collect(Collectors.toList()))
+						.orElse(new ArrayList<>());
+
+					if (!contextList.isEmpty()) {
+						Set<Integer> hashValue = new HashSet<>();
+						List<Context> remainigContext = new ArrayList<>();
+						contextList.forEach(c -> {
+							if (!hashValue.contains(c.hashCode())) {
+								remainigContext.add(c);
+								hashValue.add(c.hashCode());
+							}
+						});
+						((CommunityResult) out).setContext(remainigContext);
+					}
+				}
+			} catch (ClassCastException cce) {
+				return out;
 			}
 		}
+
 		return out;
 
+	}
+
+	private static void addTypeSpecificInformation(Result out, eu.dnetlib.dhp.schema.oaf.Result input,
+		Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> ort) throws NoAvailableEntityTypeException {
+		switch (ort.get().getClassid()) {
+			case "publication":
+				Optional<Journal> journal = Optional
+					.ofNullable(((Publication) input).getJournal());
+				if (journal.isPresent()) {
+					Journal j = journal.get();
+					Container c = new Container();
+					c.setConferencedate(j.getConferencedate());
+					c.setConferenceplace(j.getConferenceplace());
+					c.setEdition(j.getEdition());
+					c.setEp(j.getEp());
+					c.setIss(j.getIss());
+					c.setIssnLinking(j.getIssnLinking());
+					c.setIssnOnline(j.getIssnOnline());
+					c.setIssnPrinted(j.getIssnPrinted());
+					c.setName(j.getName());
+					c.setSp(j.getSp());
+					c.setVol(j.getVol());
+					out.setContainer(c);
+					out.setType(ModelConstants.PUBLICATION_DEFAULT_RESULTTYPE.getClassname());
+				}
+				break;
+			case "dataset":
+				Dataset id = (Dataset) input;
+				Optional.ofNullable(id.getSize()).ifPresent(v -> out.setSize(v.getValue()));
+				Optional.ofNullable(id.getVersion()).ifPresent(v -> out.setVersion(v.getValue()));
+
+				out
+					.setGeolocation(
+						Optional
+							.ofNullable(id.getGeolocation())
+							.map(
+								igl -> igl
+									.stream()
+									.filter(Objects::nonNull)
+									.map(gli -> {
+										GeoLocation gl = new GeoLocation();
+										gl.setBox(gli.getBox());
+										gl.setPlace(gli.getPlace());
+										gl.setPoint(gli.getPoint());
+										return gl;
+									})
+									.collect(Collectors.toList()))
+							.orElse(null));
+
+				out.setType(ModelConstants.DATASET_DEFAULT_RESULTTYPE.getClassname());
+				break;
+			case "software":
+
+				Software is = (Software) input;
+				Optional
+					.ofNullable(is.getCodeRepositoryUrl())
+					.ifPresent(value -> out.setCodeRepositoryUrl(value.getValue()));
+				Optional
+					.ofNullable(is.getDocumentationUrl())
+					.ifPresent(
+						value -> out
+							.setDocumentationUrl(
+								value
+									.stream()
+									.map(Field::getValue)
+									.collect(Collectors.toList())));
+
+				Optional
+					.ofNullable(is.getProgrammingLanguage())
+					.ifPresent(value -> out.setProgrammingLanguage(value.getClassid()));
+
+				out.setType(ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE.getClassname());
+				break;
+			case "other":
+
+				OtherResearchProduct ir = (OtherResearchProduct) input;
+				out
+					.setContactgroup(
+						Optional
+							.ofNullable(ir.getContactgroup())
+							.map(value -> value.stream().map(Field::getValue).collect(Collectors.toList()))
+							.orElse(null));
+
+				out
+					.setContactperson(
+						Optional
+							.ofNullable(ir.getContactperson())
+							.map(value -> value.stream().map(Field::getValue).collect(Collectors.toList()))
+							.orElse(null));
+				out
+					.setTool(
+						Optional
+							.ofNullable(ir.getTool())
+							.map(value -> value.stream().map(Field::getValue).collect(Collectors.toList()))
+							.orElse(null));
+
+				out.setType(ModelConstants.ORP_DEFAULT_RESULTTYPE.getClassname());
+
+				break;
+			default:
+				throw new NoAvailableEntityTypeException();
+		}
 	}
 
 	private static Instance getGraphInstance(eu.dnetlib.dhp.schema.oaf.Instance i) {

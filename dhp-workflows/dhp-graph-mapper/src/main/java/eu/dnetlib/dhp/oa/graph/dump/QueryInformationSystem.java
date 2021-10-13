@@ -62,7 +62,7 @@ public class QueryInformationSystem {
 		for (String xml : communityMap) {
 			final Document doc;
 			final SAXReader reader = new SAXReader();
-			reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			// reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 			doc = reader.read(new StringReader(xml));
 			Element root = doc.getRootElement();
 			map.put(root.attribute("id").getValue(), root.attribute("label").getValue());
