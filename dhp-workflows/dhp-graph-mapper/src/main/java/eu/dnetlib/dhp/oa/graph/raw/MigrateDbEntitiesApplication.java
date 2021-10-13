@@ -699,12 +699,16 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			final String orgId1 = createOpenaireId(20, rs.getString("source"), true);
 			final String orgId2 = createOpenaireId(20, rs.getString("target"), true);
 
-			final List<KeyValue> collectedFrom = listKeyValues(createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
+			final List<KeyValue> collectedFrom = listKeyValues(
+				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
 
 			final Relation r = new Relation();
 			r.setRelType(ORG_ORG_RELTYPE);
 			r.setSubRelType(ModelConstants.RELATIONSHIP);
-			r.setRelClass(rs.getString("reltype").equalsIgnoreCase("parent") ? ModelConstants.IS_PARENT_OF : ModelConstants.IS_CHILD_OF);
+			r
+				.setRelClass(
+					rs.getString("reltype").equalsIgnoreCase("parent") ? ModelConstants.IS_PARENT_OF
+						: ModelConstants.IS_CHILD_OF);
 			r.setSource(orgId1);
 			r.setTarget(orgId2);
 			r.setCollectedfrom(collectedFrom);
