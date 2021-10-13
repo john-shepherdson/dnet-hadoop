@@ -48,7 +48,11 @@
         <!--    MAG Parameters    -->
         <property>
             <name>inputPathMAG</name>
-            <description>the MAG working path</description>
+            <description>the MAG input path</description>
+        </property>
+        <property>
+            <name>workingPathMAG</name>
+            <description>the MAG working path where to store the intermediate process results</description>
         </property>
 
 
@@ -138,7 +142,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${inputPathMAG}/dataset</arg>
-            <arg>--workingPath</arg><arg>${inputPathMAG}/process_p</arg>
+            <arg>--workingPath</arg><arg>${workingPathMAG}</arg>
             <arg>--targetPath</arg><arg>${workingPath}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
