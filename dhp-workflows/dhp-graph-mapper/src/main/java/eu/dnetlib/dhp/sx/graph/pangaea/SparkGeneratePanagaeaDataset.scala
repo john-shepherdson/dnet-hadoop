@@ -1,7 +1,6 @@
 package eu.dnetlib.dhp.sx.graph.pangaea
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.dhp.sx.graph.ebi.SparkEBILinksToOaf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}

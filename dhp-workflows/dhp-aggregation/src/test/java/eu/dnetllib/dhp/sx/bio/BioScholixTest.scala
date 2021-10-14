@@ -1,13 +1,10 @@
-package eu.dnetlib.dhp.sx.graph.bio.pubmed
+package eu.dnetllib.dhp.sx.bio
 
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
-import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.utils.{CleaningFunctions, OafMapperUtils, PidType}
+import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Relation, Result}
-import eu.dnetlib.dhp.sx.graph.bio.BioDBToOAF.ScholixResolved
-import eu.dnetlib.dhp.sx.graph.bio.BioDBToOAF
-import eu.dnetlib.dhp.sx.graph.bio.pubmed.PubMedToOaf.dataInfo
-import eu.dnetlib.dhp.sx.graph.ebi.SparkDownloadEBILinks
+import eu.dnetllib.dhp.sx.bio.BioDBToOAF.ScholixResolved
+import eu.dnetllib.dhp.sx.bio.pubmed.{PMArticle, PMParser, PubMedToOaf}
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.parse
@@ -51,16 +48,11 @@ class BioScholixTest extends AbstractVocabularyTest{
   }
 
 
-  @Test
-  def testDownloadEBIUpdate() = {
-    val data = SparkDownloadEBILinks.requestBaseLineUpdatePage()
-    println(data)
-  }
-
+ 
 
   @Test
   def testEBIData() = {
-    val inputXML = Source.fromInputStream(getClass.getResourceAsStream("pubmed.xml")).mkString
+    val inputXML = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml")).mkString
     val xml = new XMLEventReader(Source.fromBytes(inputXML.getBytes()))
     new PMParser(xml).foreach(s =>println(mapper.writeValueAsString(s)))
   }
@@ -70,7 +62,7 @@ class BioScholixTest extends AbstractVocabularyTest{
   def testPubmedToOaf(): Unit = {
     assertNotNull(vocabularies)
     assertTrue(vocabularies.vocabularyExists("dnet:publication_resource"))
-    val records:String =Source.fromInputStream(getClass.getResourceAsStream("pubmed_dump")).mkString
+    val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed_dump")).mkString
     val r:List[Oaf] = records.lines.toList.map(s=>mapper.readValue(s, classOf[PMArticle])).map(a => PubMedToOaf.convert(a, vocabularies))
     assertEquals(10, r.size)
     assertTrue(r.map(p => p.asInstanceOf[Result]).flatMap(p => p.getInstance().asScala.map(i => i.getInstancetype.getClassid)).exists(p => "0037".equalsIgnoreCase(p)))

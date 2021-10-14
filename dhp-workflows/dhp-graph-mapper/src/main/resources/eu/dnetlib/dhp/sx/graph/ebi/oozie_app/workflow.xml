@@ -25,7 +25,6 @@
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-
     <action name="GenerateBaselineDataset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn-cluster</master>
@@ -43,6 +42,7 @@
             </spark-opts>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--master</arg><arg>yarn</arg>
+            <arg>--hdfsServerUri</arg><arg>${nameNode}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

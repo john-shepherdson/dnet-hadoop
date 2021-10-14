@@ -173,14 +173,17 @@ public class SparkOrcidToResultFromSemRelJob {
 		if (toaddpid) {
 			StructuredProperty p = new StructuredProperty();
 			p.setValue(autoritative_author.getOrcid());
-			p.setQualifier(getQualifier(ModelConstants.ORCID_PENDING, ModelConstants.ORCID_CLASSNAME, ModelConstants.DNET_PID_TYPES));
+			p
+				.setQualifier(
+					getQualifier(
+						ModelConstants.ORCID_PENDING, ModelConstants.ORCID_CLASSNAME, ModelConstants.DNET_PID_TYPES));
 			p
 				.setDataInfo(
 					getDataInfo(
 						PROPAGATION_DATA_INFO_TYPE,
 						PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_ID,
 						PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME,
-							ModelConstants.DNET_PROVENANCE_ACTIONS));
+						ModelConstants.DNET_PROVENANCE_ACTIONS));
 
 			Optional<List<StructuredProperty>> authorPid = Optional.ofNullable(author.getPid());
 			if (authorPid.isPresent()) {

@@ -208,7 +208,7 @@ object SparkGenerateDoiBoost {
         (r.getTarget,r)
         else
         ("resolved", r)
-    })
+    })(Encoders.tuple(Encoders.STRING, mapEncoderRel))
 
     val openaireOrganization:Dataset[(String,String)] = spark.read.text(openaireOrganizationPath).as[String].flatMap(s => extractIdGRID(s)).groupByKey(_._2).reduceGroups((x,y) => if (x != null) x else y ).map(_._2)
 
@@ -222,7 +222,7 @@ object SparkGenerateDoiBoost {
           else
             currentRels.setTarget(currentOrgs._1)
       currentRels
-      }.write.save(s"$workingDirPath/doiBoostPublicationAffiliation")
+      }.filter(r=> !r.getSource.startsWith("unresolved") && !r.getTarget.startsWith("unresolved")).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/doiBoostPublicationAffiliation")
 
     magPubs.joinWith(a,magPubs("_1").equalTo(a("PaperId"))).map( item => {
       val affiliation = item._2

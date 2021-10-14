@@ -1,0 +1,14 @@
+[
+  {
+    "paramName": "api",
+    "paramLongName": "apiUrl",
+    "paramDescription": "the url of the API",
+    "paramRequired": true
+  },
+  {
+    "paramName": "d",
+    "paramLongName": "delay",
+    "paramDescription": "delay for the HTTP call in minutes",
+    "paramRequired": true
+  }
+]
