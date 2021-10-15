@@ -1,9 +1,10 @@
-package eu.dnetllib.dhp.sx.bio.ebi
+package eu.dnetlib.dhp.sx.bio.ebi
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.oaf.Oaf
-import eu.dnetllib.dhp.sx.bio.BioDBToOAF
-import eu.dnetllib.dhp.sx.bio.BioDBToOAF.EBILinkItem
+import eu.dnetlib.dhp.sx.bio.BioDBToOAF
+import eu.dnetlib.dhp.sx.bio.BioDBToOAF.EBILinkItem
+import BioDBToOAF.EBILinkItem
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql._

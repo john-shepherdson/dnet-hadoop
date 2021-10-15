@@ -1,10 +1,10 @@
-package eu.dnetllib.dhp.sx.bio
+package eu.dnetlib.dhp.sx.bio
 
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
 import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Relation, Result}
-import eu.dnetllib.dhp.sx.bio.BioDBToOAF.ScholixResolved
-import eu.dnetllib.dhp.sx.bio.pubmed.{PMArticle, PMParser, PubMedToOaf}
+import eu.dnetlib.dhp.sx.bio.BioDBToOAF.ScholixResolved
+import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMParser, PubMedToOaf}
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.parse
