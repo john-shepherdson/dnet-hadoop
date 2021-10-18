@@ -14,7 +14,7 @@ object SparkEBILinksToOaf {
   def main(args: Array[String]): Unit = {
     val log: Logger = LoggerFactory.getLogger(getClass)
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/ebi/ebi_to_df_params.json")))
+    val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/ebi/ebi_to_df_params.json")))
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession
@@ -31,7 +31,7 @@ object SparkEBILinksToOaf {
     log.info(s"targetPath  -> $targetPath")
     implicit val PMEncoder: Encoder[Oaf] = Encoders.kryo(classOf[Oaf])
 
-    val ebLinks: Dataset[EBILinkItem] = spark.read.load(s"${sourcePath}_dataset").as[EBILinkItem].filter(l => l.links != null)
+    val ebLinks: Dataset[EBILinkItem] = spark.read.load(sourcePath).as[EBILinkItem].filter(l => l.links != null && l.links.startsWith("{"))
 
     ebLinks.flatMap(j => BioDBToOAF.parse_ebi_links(j.links))
       .filter(p => BioDBToOAF.EBITargetLinksFilter(p))

@@ -66,7 +66,7 @@ object SparkDownloadEBILinks {
     val log: Logger = LoggerFactory.getLogger(getClass)
     val MAX_ITEM_PER_PARTITION = 20000
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/ebi/ebi_download_update.json")))
+    val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/ebi/ebi_download_update.json")))
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession
@@ -86,7 +86,7 @@ object SparkDownloadEBILinks {
     val workingPath = parser.get("workingPath")
     log.info(s"workingPath  -> $workingPath")
 
-    log.info("Getting max pubmedId where the links have been requested")
+    log.info("Getting max pubmedId where the links have already requested")
     val links: Dataset[EBILinkItem] = spark.read.load(s"$sourcePath/ebi_links_dataset").as[EBILinkItem]
     val lastPMIDRequested = links.map(l => l.id).select(max("value")).first.getLong(0)
 
