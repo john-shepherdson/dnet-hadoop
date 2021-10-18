@@ -32,7 +32,7 @@ object SparkCreateBaselineDataFrame {
       val start = l.indexOf("<a href=\"")
 
       if (start >= 0 && end > start)
-        l.substring(start + 9, (end - start))
+        l.substring(start + 9, end - start)
       else
         ""
     }.filter(s => s.endsWith(".gz")).filter(s => s > maxFile).map(s => (s, s"https://ftp.ncbi.nlm.nih.gov/pubmed/updatefiles/$s")).toList
@@ -114,11 +114,7 @@ object SparkCreateBaselineDataFrame {
       val hdfsWritePath: Path = new Path(s"$baselinePath/${u._1}")
       val fsDataOutputStream: FSDataOutputStream = fs.create(hdfsWritePath, true)
       val i = downloadBaselinePart(u._2)
-      val buffer = Array.fill[Byte](1024)(0)
-      while (i.read(buffer) > 0) {
-        fsDataOutputStream.write(buffer)
-      }
-      i.close()
+      IOUtils.copy(i, fsDataOutputStream)
       println(s"Downloaded ${u._2} into $baselinePath/${u._1}")
       fsDataOutputStream.close()
     }
@@ -162,6 +158,9 @@ object SparkCreateBaselineDataFrame {
     val hdfsServerUri = parser.get("hdfsServerUri")
     log.info("hdfsServerUri: {}", targetPath)
 
+    val skipUpdate = parser.get("skipUpdate")
+    log.info("skipUpdate: {}", skipUpdate)
+
 
     val isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl)
     val vocabularies = VocabularyGroup.loadVocsFromIS(isLookupService)
@@ -180,18 +179,17 @@ object SparkCreateBaselineDataFrame {
     implicit val PMAEncoder: Encoder[PMAuthor] = Encoders.kryo(classOf[PMAuthor])
     implicit val resultEncoder: Encoder[Result] = Encoders.kryo(classOf[Result])
 
-    downloadBaseLineUpdate(s"$workingPath/baseline", hdfsServerUri)
-
-    val k: RDD[(String, String)] = sc.wholeTextFiles(s"$workingPath/baseline_ftp", 2000)
-    val ds: Dataset[PMArticle] = spark.createDataset(k.filter(i => i._1.endsWith(".gz")).flatMap(i => {
-      val xml = new XMLEventReader(Source.fromBytes(i._2.getBytes()))
-      new PMParser(xml)
-
-    }))
-
-    ds.map(p => (p.getPmid, p))(Encoders.tuple(Encoders.STRING, PMEncoder)).groupByKey(_._1)
-      .agg(pmArticleAggregator.toColumn)
-      .map(p => p._2).write.mode(SaveMode.Overwrite).save(s"$workingPath/baseline_dataset")
+    if (!"true".equalsIgnoreCase(skipUpdate)) {
+      downloadBaseLineUpdate(s"$workingPath/baseline", hdfsServerUri)
+      val k: RDD[(String, String)] = sc.wholeTextFiles(s"$workingPath/baseline", 2000)
+      val ds: Dataset[PMArticle] = spark.createDataset(k.filter(i => i._1.endsWith(".gz")).flatMap(i => {
+        val xml = new XMLEventReader(Source.fromBytes(i._2.getBytes()))
+        new PMParser(xml)
+      }))
+      ds.map(p => (p.getPmid, p))(Encoders.tuple(Encoders.STRING, PMEncoder)).groupByKey(_._1)
+        .agg(pmArticleAggregator.toColumn)
+        .map(p => p._2).write.mode(SaveMode.Overwrite).save(s"$workingPath/baseline_dataset")
+    }
 
     val exported_dataset = spark.read.load(s"$workingPath/baseline_dataset").as[PMArticle]
     exported_dataset
