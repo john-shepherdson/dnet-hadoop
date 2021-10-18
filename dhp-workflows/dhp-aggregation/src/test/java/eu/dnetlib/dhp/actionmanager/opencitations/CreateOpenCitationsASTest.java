@@ -84,6 +84,8 @@ public class CreateOpenCitationsASTest {
 				new String[] {
 					"-isSparkSessionManaged",
 					Boolean.FALSE.toString(),
+						"-shouldDuplicateRels",
+						Boolean.TRUE.toString(),
 					"-inputPath",
 					inputPath,
 					"-outputPath",
@@ -99,7 +101,39 @@ public class CreateOpenCitationsASTest {
 
 		assertEquals(60, tmp.count());
 
-		tmp.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
+	//	tmp.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
+
+	}
+
+	@Test
+	void testNumberofRelations2() throws Exception {
+
+		String inputPath = getClass()
+				.getResource(
+						"/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles")
+				.getPath();
+
+		CreateActionSetSparkJob
+				.main(
+						new String[] {
+								"-isSparkSessionManaged",
+								Boolean.FALSE.toString(),
+								"-inputPath",
+								inputPath,
+								"-outputPath",
+								workingDir.toString() + "/actionSet"
+						});
+
+		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+
+		JavaRDD<Relation> tmp = sc
+				.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)
+				.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
+				.map(aa -> ((Relation) aa.getPayload()));
+
+		assertEquals(44, tmp.count());
+
+		//	tmp.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
 
 	}
 
@@ -206,8 +240,8 @@ public class CreateOpenCitationsASTest {
 			assertEquals("citation", r.getSubRelType());
 			assertEquals("resultResult", r.getRelType());
 		});
-		assertEquals(30, tmp.filter(r -> r.getRelClass().equals("Cites")).count());
-		assertEquals(30, tmp.filter(r -> r.getRelClass().equals("IsCitedBy")).count());
+		assertEquals(22, tmp.filter(r -> r.getRelClass().equals("Cites")).count());
+		assertEquals(22, tmp.filter(r -> r.getRelClass().equals("IsCitedBy")).count());
 
 	}
 

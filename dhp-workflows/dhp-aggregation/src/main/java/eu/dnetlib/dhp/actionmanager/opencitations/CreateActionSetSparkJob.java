@@ -65,7 +65,10 @@ public class CreateActionSetSparkJob implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath {}", outputPath);
 
-		final boolean shouldDuplicateRels = Boolean.valueOf(parser.get("shouldDuplicateRels"));
+		final boolean shouldDuplicateRels =
+				Optional.ofNullable(parser.get("shouldDuplicateRels"))
+				.map(Boolean::valueOf)
+				.orElse(Boolean.FALSE);
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
