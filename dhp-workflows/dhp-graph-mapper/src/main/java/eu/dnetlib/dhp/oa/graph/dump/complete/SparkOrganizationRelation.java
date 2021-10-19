@@ -58,7 +58,8 @@ public class SparkOrganizationRelation implements Serializable {
 
 		final OrganizationMap organizationMap = new Gson()
 			.fromJson(parser.get("organizationCommunityMap"), OrganizationMap.class);
-		log.info("organization map : {}", new Gson().toJson(organizationMap));
+		final String serializedOrganizationMap = new Gson().toJson(organizationMap);
+		log.info("organization map : {}", serializedOrganizationMap);
 
 		final String communityMapPath = parser.get("communityMapPath");
 		log.info("communityMapPath: {}", communityMapPath);

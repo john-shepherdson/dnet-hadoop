@@ -107,7 +107,6 @@
     <action name="ResetMagWorkingPath">
         <fs>
             <delete path="${inputPathMAG}/dataset"/>
-            <delete path="${inputPathMAG}/process"/>
         </fs>
         <ok to="ConvertMagToDataset"/>
         <error to="Kill"/>

@@ -57,16 +57,16 @@ public class MakeTar implements Serializable {
 	public static void makeTArArchive(FileSystem fileSystem, String inputPath, String outputPath, int gBperSplit)
 		throws IOException {
 
-		RemoteIterator<LocatedFileStatus> dir_iterator = fileSystem.listLocatedStatus(new Path(inputPath));
+		RemoteIterator<LocatedFileStatus> dirIterator = fileSystem.listLocatedStatus(new Path(inputPath));
 
-		while (dir_iterator.hasNext()) {
-			LocatedFileStatus fileStatus = dir_iterator.next();
+		while (dirIterator.hasNext()) {
+			LocatedFileStatus fileStatus = dirIterator.next();
 
 			Path p = fileStatus.getPath();
-			String p_string = p.toString();
-			String entity = p_string.substring(p_string.lastIndexOf("/") + 1);
+			String pathString = p.toString();
+			String entity = pathString.substring(pathString.lastIndexOf("/") + 1);
 
-			MakeTarArchive.tarMaxSize(fileSystem, p_string, outputPath + "/" + entity, entity, gBperSplit);
+			MakeTarArchive.tarMaxSize(fileSystem, pathString, outputPath + "/" + entity, entity, gBperSplit);
 		}
 
 	}
