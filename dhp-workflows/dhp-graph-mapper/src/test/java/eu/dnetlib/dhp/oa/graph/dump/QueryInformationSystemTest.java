@@ -25,7 +25,7 @@ class QueryInformationSystemTest {
 	private static final String XQUERY = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') "
 		+
 		"  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] " +
-		" and ($x//context/param[./@name = 'status']/text() = 'manager'  or $x//context/param[./@name = 'status']/text() = 'all') "
+		" and ($x//context/param[./@name = 'status']/text() = 'all') "
 		+
 		"  return " +
 		"<community> " +
@@ -71,7 +71,7 @@ class QueryInformationSystemTest {
 		lenient().when(isLookUpService.quickSearchProfile(XQUERY)).thenReturn(communityMap);
 		queryInformationSystem = new QueryInformationSystem();
 		queryInformationSystem.setIsLookUp(isLookUpService);
-		map = queryInformationSystem.getCommunityMap();
+		map = queryInformationSystem.getCommunityMap(false, null);
 	}
 
 	@Test

@@ -1,6 +1,23 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
+    "AccessRight":{
+      "type":"object",
+      "properties":{
+        "code": {
+          "type": "string",
+          "description": "COAR access mode code: http://vocabularies.coar-repositories.org/documentation/access_rights/"
+        },
+        "label": {
+          "type": "string",
+          "description": "Label for the access mode"
+        },
+        "scheme": {
+          "type": "string",
+          "description": "Scheme of reference for access right code. Always set to COAR access rights vocabulary: http://vocabularies.coar-repositories.org/documentation/access_rights/"
+        }
+      }
+    },
     "ControlledField": {
       "type": "object",
       "properties": {
@@ -266,6 +283,57 @@
         ]
       }
     },
+    "instance":{
+      "type":"array",
+      "items":{
+        "type":"object",
+        "properties":{
+          "accessright":{
+            "allOf":[
+              {
+                "$ref":"#/definitions/AccessRight"
+              },
+              {
+                "description":"The accessright of this materialization of the result"
+              }
+            ]
+          },
+          "articleprocessingcharge":{
+            "type":"object",
+            "properties":{
+              "amount":{
+                "type":"string"
+              },
+              "currency":{
+                "type":"string"
+              }
+            }
+          },
+          "license":{
+            "type":"string"
+          },
+          "publicationdate":{
+            "type":"string"
+          },
+          "refereed":{
+            "type":"string"
+          },
+          "type":{
+            "type":"string",
+            "description":"The specific sub-type of this materialization of the result (see https://api.openaire.eu/vocabularies/dnet:result_typologies following the links)"
+          },
+          "url":{
+            "description":"Description of url",
+            "type":"array",
+            "items":{
+              "type":"string",
+              "description":"urls where it is possible to access the materialization of the result"
+            }
+          }
+        },
+        "description":"One of the materialization for this result"
+      }
+    },
     "programmingLanguage": {
       "type": "string",
       "description": "Only for results with type 'software': the programming language"
@@ -302,7 +370,7 @@
           "subject": {
             "allOf": [
               {"$ref": "#/definitions/ControlledField"},
-              {"description": "OpenAIRE subject classification scheme (https://api.openaire.eu/vocabularies/dnet:subject_classification_typologies) and value. When the scheme is 'keyword', it means that the subject is free-text (i.e. not a term from a controlled vocabulary)."},
+              {"description": "OpenAIRE subject classification scheme (https://api.openaire.eu/vocabularies/dnet:subject_classification_typologies) and value. When the scheme is 'keyword', it means that the subject is free-text (i.e. not a term from a controlled vocabulary)."}
             ]
           }
         }

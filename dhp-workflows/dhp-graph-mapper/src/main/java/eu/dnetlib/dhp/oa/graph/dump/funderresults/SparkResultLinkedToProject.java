@@ -20,13 +20,13 @@ import org.slf4j.LoggerFactory;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
-import scala.Tuple2;
 
 /**
  * Selects the results linked to projects. Only for these results the dump will be performed.
- * The code to perform the dump and to expend the dumped results with the informaiton related to projects
+ * The code to perform the dump and to expend the dumped results with the information related to projects
  * is the one used for the dump of the community products
  */
 public class SparkResultLinkedToProject implements Serializable {
@@ -58,8 +58,8 @@ public class SparkResultLinkedToProject implements Serializable {
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
-		final String relationPath = parser.get("relationPath");
-		log.info("relationPath: {}", relationPath);
+		final String graphPath = parser.get("graphPath");
+		log.info("graphPath: {}", graphPath);
 
 		@SuppressWarnings("unchecked")
 		Class<? extends Result> inputClazz = (Class<? extends Result>) Class.forName(resultClassName);
@@ -70,37 +70,47 @@ public class SparkResultLinkedToProject implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				writeResultsLinkedToProjects(spark, inputClazz, inputPath, outputPath, relationPath);
+				writeResultsLinkedToProjects(spark, inputClazz, inputPath, outputPath, graphPath);
 			});
 	}
 
 	private static <R extends Result> void writeResultsLinkedToProjects(SparkSession spark, Class<R> inputClazz,
-		String inputPath, String outputPath, String relationPath) {
+		String inputPath, String outputPath, String graphPath) {
 
 		Dataset<R> results = Utils
 			.readPath(spark, inputPath, inputClazz)
 			.filter("dataInfo.deletedbyinference = false and datainfo.invisible = false");
 		Dataset<Relation> relations = Utils
-			.readPath(spark, relationPath, Relation.class)
+			.readPath(spark, graphPath + "/relation", Relation.class)
 			.filter(
 				"dataInfo.deletedbyinference = false and lower(relClass) = '"
 					+ ModelConstants.IS_PRODUCED_BY.toLowerCase() + "'");
+		Dataset<Project> project = Utils.readPath(spark, graphPath + "/project", Project.class);
 
-		relations
-			.joinWith(
-				results, relations.col("source").equalTo(results.col("id")),
-				"inner")
+		results.createOrReplaceTempView("result");
+		relations.createOrReplaceTempView("relation");
+		project.createOrReplaceTempView("project");
+
+		Dataset<R> tmp = spark
+			.sql(
+				"Select res.* " +
+					"from relation rel " +
+					"join result res " +
+					"on rel.source = res.id " +
+					"join project p " +
+					"on rel.target = p.id " +
+					"")
+			.as(Encoders.bean(inputClazz));
+		tmp
 			.groupByKey(
-				(MapFunction<Tuple2<Relation, R>, String>) value -> value
-					._2()
+				(MapFunction<R, String>) value -> value
 					.getId(),
 				Encoders.STRING())
-			.mapGroups(
-				(MapGroupsFunction<String, Tuple2<Relation, R>, R>) (k, it) -> it.next()._2(),
-				Encoders.bean(inputClazz))
+			.mapGroups((MapGroupsFunction<String, R, R>) (k, it) -> it.next(), Encoders.bean(inputClazz))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
+
 	}
 }
