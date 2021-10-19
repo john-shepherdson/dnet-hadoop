@@ -101,24 +101,15 @@ public class CopyHdfsOafApplication extends AbstractMigrationApplication {
 					.as(Encoders.kryo(Oaf.class));
 
 			// dispatch each entity type individually in the respective graph subdirectory in append mode
-			for(Map.Entry<EntityType, Class> e : ModelSupport.entityTypes.entrySet()) {
+			for(Map.Entry<String, Class> e : ModelSupport.oafTypes.entrySet()) {
 				oaf
-					.filter((FilterFunction<Oaf>) o -> o.getClass().getSimpleName().toLowerCase().equals(e.getKey().toString()))
+					.filter((FilterFunction<Oaf>) o -> o.getClass().getSimpleName().toLowerCase().equals(e.getKey()))
 					.map((MapFunction<Oaf, String>) OBJECT_MAPPER::writeValueAsString, Encoders.bean(e.getValue()))
 					.write()
 					.option("compression", "gzip")
 					.mode(SaveMode.Append)
 					.text(outputPath + "/" + e.getKey());
 			}
-
-			oaf
-					.flatMap((FlatMapFunction<Oaf, Relation>) o -> {
-						Relation rel = (Relation) o;
-						List<Relation> rels = Lists.newArrayList();
-						rels.add(getInverse(rel, vocs));
-
-						return rels.iterator();
-					}, Encoders.bean(Relation.class));
 		}
 	}
 
