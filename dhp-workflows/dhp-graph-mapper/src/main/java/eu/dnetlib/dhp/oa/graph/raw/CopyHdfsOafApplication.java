@@ -1,18 +1,10 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import com.clearspring.analytics.util.Lists;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
-import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+
+import java.util.*;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -26,9 +18,19 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import com.clearspring.analytics.util.Lists;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
+import eu.dnetlib.dhp.schema.common.EntityType;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 public class CopyHdfsOafApplication extends AbstractMigrationApplication {
 
@@ -96,12 +98,12 @@ public class CopyHdfsOafApplication extends AbstractMigrationApplication {
 		if (validPaths.length > 0) {
 			// load the dataset
 			Dataset<Oaf> oaf = spark
-					.read()
-					.load(validPaths)
-					.as(Encoders.kryo(Oaf.class));
+				.read()
+				.load(validPaths)
+				.as(Encoders.kryo(Oaf.class));
 
 			// dispatch each entity type individually in the respective graph subdirectory in append mode
-			for(Map.Entry<String, Class> e : ModelSupport.oafTypes.entrySet()) {
+			for (Map.Entry<String, Class> e : ModelSupport.oafTypes.entrySet()) {
 				oaf
 					.filter((FilterFunction<Oaf>) o -> o.getClass().getSimpleName().toLowerCase().equals(e.getKey()))
 					.map((MapFunction<Oaf, String>) OBJECT_MAPPER::writeValueAsString, Encoders.bean(e.getValue()))

@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.mdstore.MDStoreWithInfo;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -17,15 +16,16 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.dnetlib.dhp.schema.oaf.Oaf;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.schema.mdstore.MDStoreWithInfo;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
 
 public class AbstractMigrationApplication implements Closeable {
 
@@ -68,9 +68,9 @@ public class AbstractMigrationApplication implements Closeable {
 	 * @throws IOException in case of HTTP communication issues
 	 */
 	protected static Set<String> mdstorePaths(final String mdstoreManagerUrl,
-											final String format,
-											final String layout,
-											final String interpretation) throws IOException {
+		final String format,
+		final String layout,
+		final String interpretation) throws IOException {
 		final String url = mdstoreManagerUrl + "/mdstores/";
 		final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -81,15 +81,15 @@ public class AbstractMigrationApplication implements Closeable {
 				final String json = IOUtils.toString(response.getEntity().getContent());
 				final MDStoreWithInfo[] mdstores = objectMapper.readValue(json, MDStoreWithInfo[].class);
 				return Arrays
-						.stream(mdstores)
-						.filter(md -> md.getFormat().equalsIgnoreCase(format))
-						.filter(md -> md.getLayout().equalsIgnoreCase(layout))
-						.filter(md -> md.getInterpretation().equalsIgnoreCase(interpretation))
-						.filter(md -> StringUtils.isNotBlank(md.getHdfsPath()))
-						.filter(md -> StringUtils.isNotBlank(md.getCurrentVersion()))
-						.filter(md -> md.getSize() > 0)
-						.map(md -> md.getHdfsPath() + "/" + md.getCurrentVersion() + "/store")
-						.collect(Collectors.toSet());
+					.stream(mdstores)
+					.filter(md -> md.getFormat().equalsIgnoreCase(format))
+					.filter(md -> md.getLayout().equalsIgnoreCase(layout))
+					.filter(md -> md.getInterpretation().equalsIgnoreCase(interpretation))
+					.filter(md -> StringUtils.isNotBlank(md.getHdfsPath()))
+					.filter(md -> StringUtils.isNotBlank(md.getCurrentVersion()))
+					.filter(md -> md.getSize() > 0)
+					.map(md -> md.getHdfsPath() + "/" + md.getCurrentVersion() + "/store")
+					.collect(Collectors.toSet());
 			}
 		}
 	}
