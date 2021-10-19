@@ -1,5 +1,5 @@
 
-package eu.dnetllib.dhp.sx.bio.pubmed;
+package eu.dnetlib.dhp.sx.bio.pubmed;
 
 public class PMSubject {
 	private String value;

@@ -25,102 +25,102 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 @ExtendWith(MockitoExtension.class)
 public class SolrConfigExploreTest extends SolrExploreTest {
 
-    protected static SparkSession spark;
+	protected static SparkSession spark;
 
-    private static final Integer batchSize = 100;
+	private static final Integer batchSize = 100;
 
-    @Mock
-    private ISLookUpService isLookUpService;
+	@Mock
+	private ISLookUpService isLookUpService;
 
-    @Mock
-    private ISLookupClient isLookupClient;
+	@Mock
+	private ISLookupClient isLookupClient;
 
-    @BeforeEach
-    public void prepareMocks() throws ISLookUpException, IOException {
-        isLookupClient.setIsLookup(isLookUpService);
+	@BeforeEach
+	public void prepareMocks() throws ISLookUpException, IOException {
+		isLookupClient.setIsLookup(isLookUpService);
 
-        int solrPort = URI.create("http://" + miniCluster.getZkClient().getZkServerAddress()).getPort();
+		int solrPort = URI.create("http://" + miniCluster.getZkClient().getZkServerAddress()).getPort();
 
-        Mockito
-                .when(isLookupClient.getDsId(Mockito.anyString()))
-                .thenReturn("313f0381-23b6-466f-a0b8-c72a9679ac4b_SW5kZXhEU1Jlc291cmNlcy9JbmRleERTUmVzb3VyY2VUeXBl");
-        Mockito.when(isLookupClient.getZkHost()).thenReturn(String.format("127.0.0.1:%s/solr", solrPort));
-        Mockito
-                .when(isLookupClient.getLayoutSource(Mockito.anyString()))
-                .thenReturn(IOUtils.toString(getClass().getResourceAsStream("fields.xml")));
-        Mockito
-                .when(isLookupClient.getLayoutTransformer())
-                .thenReturn(IOUtils.toString(getClass().getResourceAsStream("layoutToRecordTransformer.xsl")));
-    }
+		Mockito
+			.when(isLookupClient.getDsId(Mockito.anyString()))
+			.thenReturn("313f0381-23b6-466f-a0b8-c72a9679ac4b_SW5kZXhEU1Jlc291cmNlcy9JbmRleERTUmVzb3VyY2VUeXBl");
+		Mockito.when(isLookupClient.getZkHost()).thenReturn(String.format("127.0.0.1:%s/solr", solrPort));
+		Mockito
+			.when(isLookupClient.getLayoutSource(Mockito.anyString()))
+			.thenReturn(IOUtils.toString(getClass().getResourceAsStream("fields.xml")));
+		Mockito
+			.when(isLookupClient.getLayoutTransformer())
+			.thenReturn(IOUtils.toString(getClass().getResourceAsStream("layoutToRecordTransformer.xsl")));
+	}
 
-    @BeforeAll
-    public static void before() {
+	@BeforeAll
+	public static void before() {
 
-        SparkConf conf = new SparkConf();
-        conf.setAppName(XmlIndexingJobTest.class.getSimpleName());
-        conf.registerKryoClasses(new Class[] {
-                SerializableSolrInputDocument.class
-        });
+		SparkConf conf = new SparkConf();
+		conf.setAppName(XmlIndexingJobTest.class.getSimpleName());
+		conf.registerKryoClasses(new Class[] {
+			SerializableSolrInputDocument.class
+		});
 
-        conf.setMaster("local[1]");
-        conf.set("spark.driver.host", "localhost");
-        conf.set("hive.metastore.local", "true");
-        conf.set("spark.ui.enabled", "false");
-        conf.set("spark.sql.warehouse.dir", workingDir.resolve("spark").toString());
+		conf.setMaster("local[1]");
+		conf.set("spark.driver.host", "localhost");
+		conf.set("hive.metastore.local", "true");
+		conf.set("spark.ui.enabled", "false");
+		conf.set("spark.sql.warehouse.dir", workingDir.resolve("spark").toString());
 
-        spark = SparkSession
-                .builder()
-                .appName(XmlIndexingJobTest.class.getSimpleName())
-                .config(conf)
-                .getOrCreate();
+		spark = SparkSession
+			.builder()
+			.appName(XmlIndexingJobTest.class.getSimpleName())
+			.config(conf)
+			.getOrCreate();
 
+	}
 
-    }
+	@AfterAll
+	public static void tearDown() {
+		spark.stop();
+	}
 
-    @AfterAll
-    public static void tearDown() {
-        spark.stop();
-    }
+	@Test
+	public void testSolrConfig() throws Exception {
 
-    @Test
-    public void testSolrConfig() throws Exception {
+		String inputPath = "src/test/resources/eu/dnetlib/dhp/oa/provision/xml";
 
-        String inputPath = "src/test/resources/eu/dnetlib/dhp/oa/provision/xml";
+		new XmlIndexingJob(spark, inputPath, FORMAT, batchSize, XmlIndexingJob.OutputFormat.SOLR, null)
+			.run(isLookupClient);
+		Assertions.assertEquals(0, miniCluster.getSolrClient().commit().getStatus());
 
-        new XmlIndexingJob(spark, inputPath, FORMAT, batchSize, XmlIndexingJob.OutputFormat.SOLR, null).run(isLookupClient);
-        Assertions.assertEquals(0, miniCluster.getSolrClient().commit().getStatus());
+		String[] queryStrings = {
+			"cancer",
+			"graph",
+			"graphs"
+		};
 
-        String[] queryStrings = {
-                "cancer",
-                "graph",
-                "graphs"
-        };
+		for (String q : queryStrings) {
+			SolrQuery query = new SolrQuery();
+			query.setRequestHandler("/exploreSearch");
+			query.add(CommonParams.Q, q);
+			query.set("debugQuery", "on");
 
-        for (String q : queryStrings) {
-            SolrQuery query = new SolrQuery();
-            query.setRequestHandler("/exploreSearch");
-            query.add(CommonParams.Q, q);
-            query.set("debugQuery", "on");
-
-            log.info("Submit query to Solr with params: {}", query.toString());
-            QueryResponse rsp = miniCluster.getSolrClient().query(query);
+			log.info("Submit query to Solr with params: {}", query.toString());
+			QueryResponse rsp = miniCluster.getSolrClient().query(query);
 //            System.out.println(rsp.getHighlighting());
 //            System.out.println(rsp.getExplainMap());
 
-            for (SolrDocument doc : rsp.getResults()) {
-                System.out.println(
-                        doc.get("score") + "\t" +
-                        doc.get("__indexrecordidentifier") + "\t" +
-                        doc.get("resultidentifier") + "\t" +
-                        doc.get("resultauthor") + "\t" +
-                        doc.get("resultacceptanceyear") + "\t" +
-                        doc.get("resultsubject") + "\t" +
-                        doc.get("resulttitle") + "\t" +
-                        doc.get("relprojectname") + "\t" +
-                        doc.get("resultdescription") + "\t" +
-                        doc.get("__all") + "\t"
-                );
-            }
-        }
-    }
+			for (SolrDocument doc : rsp.getResults()) {
+				System.out
+					.println(
+						doc.get("score") + "\t" +
+							doc.get("__indexrecordidentifier") + "\t" +
+							doc.get("resultidentifier") + "\t" +
+							doc.get("resultauthor") + "\t" +
+							doc.get("resultacceptanceyear") + "\t" +
+							doc.get("resultsubject") + "\t" +
+							doc.get("resulttitle") + "\t" +
+							doc.get("relprojectname") + "\t" +
+							doc.get("resultdescription") + "\t" +
+							doc.get("__all") + "\t");
+			}
+		}
+	}
 }

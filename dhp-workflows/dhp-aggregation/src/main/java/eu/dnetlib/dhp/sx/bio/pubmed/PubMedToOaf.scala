@@ -1,4 +1,4 @@
-package eu.dnetllib.dhp.sx.bio.pubmed
+package eu.dnetlib.dhp.sx.bio.pubmed
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.common.ModelConstants

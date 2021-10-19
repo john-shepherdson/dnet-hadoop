@@ -91,8 +91,8 @@ public class ReadBlacklistFromDB implements Closeable {
 
 			String encoding = rs.getString("relationship");
 			RelationInverse ri = ModelSupport.relationInverseMap.get(encoding);
-			direct.setRelClass(ri.getRelation());
-			inverse.setRelClass(ri.getInverse());
+			direct.setRelClass(ri.getRelClass());
+			inverse.setRelClass(ri.getInverseRelClass());
 			direct.setRelType(ri.getRelType());
 			inverse.setRelType(ri.getRelType());
 			direct.setSubRelType(ri.getSubReltype());
