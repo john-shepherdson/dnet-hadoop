@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.actionmanager.bipfinder;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -67,7 +69,7 @@ public class SparkAtomicActionScoreJobTest {
 	}
 
 	@Test
-	public void matchOne() throws Exception {
+	void matchOne() throws Exception {
 		String bipScoresPath = getClass()
 			.getResource("/eu/dnetlib/dhp/actionmanager/bipfinder/bip_scores.json")
 			.getPath();
@@ -98,7 +100,7 @@ public class SparkAtomicActionScoreJobTest {
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Publication) aa.getPayload()));
 
-		Assertions.assertTrue(tmp.count() == 1);
+		assertEquals(1, tmp.count());
 
 		Dataset<Publication> verificationDataset = spark.createDataset(tmp.rdd(), Encoders.bean(Publication.class));
 		verificationDataset.createOrReplaceTempView("publication");
@@ -129,7 +131,7 @@ public class SparkAtomicActionScoreJobTest {
 	}
 
 	@Test
-	public void matchOneWithTwo() throws Exception {
+	void matchOneWithTwo() throws Exception {
 		String bipScoresPath = getClass()
 			.getResource("/eu/dnetlib/dhp/actionmanager/bipfinder/bip_scores.json")
 			.getPath();
@@ -160,7 +162,7 @@ public class SparkAtomicActionScoreJobTest {
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Publication) aa.getPayload()));
 
-		Assertions.assertTrue(tmp.count() == 1);
+		assertEquals(1, tmp.count());
 
 		Dataset<Publication> verificationDataset = spark.createDataset(tmp.rdd(), Encoders.bean(Publication.class));
 		verificationDataset.createOrReplaceTempView("publication");
@@ -190,23 +192,21 @@ public class SparkAtomicActionScoreJobTest {
 
 		List<Row> tmp_ds = execVerification.filter("id = 'influence'").select("value").collectAsList();
 		String tmp_influence = tmp_ds.get(0).getString(0);
-		Assertions
-			.assertTrue(
-				"1.47565045883e-08".equals(tmp_influence) ||
-					"1.98956540239e-08".equals(tmp_influence));
+		assertTrue(
+			"1.47565045883e-08".equals(tmp_influence) ||
+				"1.98956540239e-08".equals(tmp_influence));
 
 		tmp_influence = tmp_ds.get(1).getString(0);
-		Assertions
-			.assertTrue(
-				"1.47565045883e-08".equals(tmp_influence) ||
-					"1.98956540239e-08".equals(tmp_influence));
+		assertTrue(
+			"1.47565045883e-08".equals(tmp_influence) ||
+				"1.98956540239e-08".equals(tmp_influence));
 
-		Assertions.assertTrue(!tmp_ds.get(0).getString(0).equals(tmp_ds.get(1).getString(0)));
+		assertNotEquals(tmp_ds.get(1).getString(0), tmp_ds.get(0).getString(0));
 
 	}
 
 	@Test
-	public void matchTwo() throws Exception {
+	void matchTwo() throws Exception {
 		String bipScoresPath = getClass()
 			.getResource("/eu/dnetlib/dhp/actionmanager/bipfinder/bip_scores.json")
 			.getPath();
@@ -237,7 +237,7 @@ public class SparkAtomicActionScoreJobTest {
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Publication) aa.getPayload()));
 
-		Assertions.assertTrue(tmp.count() == 2);
+		assertEquals(2, tmp.count());
 
 		Dataset<Publication> verificationDataset = spark.createDataset(tmp.rdd(), Encoders.bean(Publication.class));
 		verificationDataset.createOrReplaceTempView("publication");

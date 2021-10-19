@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-public class PacePersonTest {
+class PacePersonTest {
 
 	@Test
-	public void pacePersonTest1() {
+	void pacePersonTest1() {
 
 		PacePerson p = new PacePerson("Artini, Michele", false);
 		assertEquals("Artini", p.getSurnameString());
@@ -17,7 +17,7 @@ public class PacePersonTest {
 	}
 
 	@Test
-	public void pacePersonTest2() {
+	void pacePersonTest2() {
 		PacePerson p = new PacePerson("Michele G. Artini", false);
 		assertEquals("Artini, Michele G.", p.getNormalisedFullname());
 		assertEquals("Michele G", p.getNameString());

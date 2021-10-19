@@ -65,7 +65,7 @@ public class ResultToCommunityJobTest {
 	}
 
 	@Test
-	public void testSparkResultToCommunityThroughSemRelJob() throws Exception {
+	void testSparkResultToCommunityThroughSemRelJob() throws Exception {
 		SparkResultToCommunityThroughSemRelJob
 			.main(
 				new String[] {

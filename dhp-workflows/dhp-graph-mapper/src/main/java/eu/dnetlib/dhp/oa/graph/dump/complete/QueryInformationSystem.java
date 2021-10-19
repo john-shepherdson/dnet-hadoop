@@ -11,7 +11,10 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.jetbrains.annotations.NotNull;
+import org.xml.sax.SAXException;
 
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
@@ -84,14 +87,15 @@ public class QueryInformationSystem {
 			final Document doc;
 
 			try {
-
-				doc = new SAXReader().read(new StringReader(xml));
+				final SAXReader reader = new SAXReader();
+				reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+				doc = reader.read(new StringReader(xml));
 				Element root = doc.getRootElement();
 				cinfo.setId(root.attributeValue("id"));
 
-				Iterator it = root.elementIterator();
+				Iterator<Element> it = root.elementIterator();
 				while (it.hasNext()) {
-					Element el = (Element) it.next();
+					Element el = it.next();
 					if (el.getName().equals("category")) {
 						String categoryId = el.attributeValue("id");
 						categoryId = categoryId.substring(categoryId.lastIndexOf("::") + 2);
@@ -102,7 +106,7 @@ public class QueryInformationSystem {
 
 				}
 				consumer.accept(cinfo);
-			} catch (DocumentException e) {
+			} catch (DocumentException | SAXException e) {
 				e.printStackTrace();
 			}
 
@@ -113,14 +117,79 @@ public class QueryInformationSystem {
 	@NotNull
 	private List<String> getCategoryList(Element el, String prefix) {
 		List<String> datasourceList = new ArrayList<>();
-		for (Object node : el.selectNodes(".//param")) {
-			Node n = (Node) node;
-			if (n.valueOf("./@name").equals("openaireId")) {
-				datasourceList.add(prefix + "|" + n.getText());
-			}
+		for (Object node : el.selectNodes(".//concept")) {
+			String oid = getOpenaireId((Node) node, prefix);
+			if (oid != null)
+				datasourceList.add(oid);
 		}
 
 		return datasourceList;
+	}
+
+	private String getOpenaireId(Node el, String prefix) {
+		for (Object node : el.selectNodes(".//param")) {
+			Node n = (Node) node;
+			if (n.valueOf("./@name").equals("openaireId")) {
+				return prefix + "|" + n.getText();
+			}
+		}
+
+		return makeOpenaireId(el, prefix);
+
+	}
+
+	private String makeOpenaireId(Node el, String prefix) {
+		if (!prefix.equals(ModelSupport.entityIdPrefix.get("project"))) {
+			return null;
+		}
+		String funder = "";
+		String grantId = null;
+		String funding = null;
+		for (Object node : el.selectNodes(".//param")) {
+			Node n = (Node) node;
+			switch (n.valueOf("./@name")) {
+				case "funding":
+					funding = n.getText();
+					break;
+				case "funder":
+					funder = n.getText();
+					break;
+				case "CD_PROJECT_NUMBER":
+					grantId = n.getText();
+					break;
+				default:
+					break;
+			}
+		}
+		String nsp = null;
+
+		switch (funder.toLowerCase()) {
+			case "ec":
+				if (funding == null) {
+					return null;
+				}
+				if (funding.toLowerCase().contains("h2020")) {
+					nsp = "corda__h2020::";
+				} else {
+					nsp = "corda_______::";
+				}
+				break;
+			case "tubitak":
+				nsp = "tubitakf____::";
+				break;
+			case "dfg":
+				nsp = "dfgf________::";
+				break;
+			default:
+				StringBuilder bld = new StringBuilder();
+				bld.append(funder.toLowerCase());
+				for (int i = funder.length(); i < 12; i++)
+					bld.append("_");
+				bld.append("::");
+				nsp = bld.toString();
+		}
+
+		return prefix + "|" + nsp + DHPUtils.md5(grantId);
 	}
 
 }

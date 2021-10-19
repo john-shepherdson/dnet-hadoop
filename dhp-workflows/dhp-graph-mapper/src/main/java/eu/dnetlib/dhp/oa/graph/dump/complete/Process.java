@@ -6,11 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.oa.graph.dump.Constants;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
+import eu.dnetlib.dhp.oa.graph.dump.exceptions.MyRuntimeException;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
@@ -21,8 +20,8 @@ import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
  * context entity and datasource/projects related to the context.
  */
 public class Process implements Serializable {
-	private static final Logger log = LoggerFactory.getLogger(Process.class);
 
+	@SuppressWarnings("unchecked")
 	public static <R extends ResearchInitiative> R getEntity(ContextInfo ci) {
 		try {
 			ResearchInitiative ri;
@@ -35,7 +34,7 @@ public class Process implements Serializable {
 				ri.setType(Constants.RESEARCH_INFRASTRUCTURE);
 			}
 			ri.setId(Utils.getContextId(ci.getId()));
-			ri.setOriginalId(ci.getId());
+			ri.setAcronym(ci.getId());
 
 			ri.setDescription(ci.getDescription());
 			ri.setName(ci.getName());
@@ -45,7 +44,7 @@ public class Process implements Serializable {
 			return (R) ri;
 
 		} catch (final Exception e) {
-			throw new RuntimeException(e);
+			throw new MyRuntimeException(e);
 		}
 	}
 
@@ -93,7 +92,7 @@ public class Process implements Serializable {
 			return relationList;
 
 		} catch (final Exception e) {
-			throw new RuntimeException(e);
+			throw new MyRuntimeException(e);
 		}
 	}
 

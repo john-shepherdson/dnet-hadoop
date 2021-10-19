@@ -69,14 +69,14 @@ public class ResultLinkedToProjectTest {
 	}
 
 	@Test
-	public void testNoMatch() throws Exception {
+	void testNoMatch() throws Exception {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/nomatch/papers.json")
 			.getPath();
 
-		final String relationPath = getClass()
-			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/nomatch/relations.json")
+		final String graphPath = getClass()
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/nomatch")
 			.getPath();
 
 		SparkResultLinkedToProject.main(new String[] {
@@ -84,7 +84,7 @@ public class ResultLinkedToProjectTest {
 			"-outputPath", workingDir.toString() + "/preparedInfo",
 			"-sourcePath", sourcePath,
 			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
-			"-relationPath", relationPath
+			"-graphPath", graphPath
 
 		});
 
@@ -102,14 +102,14 @@ public class ResultLinkedToProjectTest {
 	}
 
 	@Test
-	public void testMatchOne() throws Exception {
+	void testMatchOne() throws Exception {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/match/papers.json")
 			.getPath();
 
 		final String relationPath = getClass()
-			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/match/relations.json")
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/match")
 			.getPath();
 
 		SparkResultLinkedToProject.main(new String[] {
@@ -117,7 +117,7 @@ public class ResultLinkedToProjectTest {
 			"-outputPath", workingDir.toString() + "/preparedInfo",
 			"-sourcePath", sourcePath,
 			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
-			"-relationPath", relationPath
+			"-graphPath", relationPath
 
 		});
 

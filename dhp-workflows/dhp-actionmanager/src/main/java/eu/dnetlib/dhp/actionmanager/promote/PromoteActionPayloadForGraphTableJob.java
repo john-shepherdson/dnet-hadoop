@@ -74,7 +74,9 @@ public class PromoteActionPayloadForGraphTableJob {
 			.orElse(true);
 		logger.info("shouldGroupById: {}", shouldGroupById);
 
+		@SuppressWarnings("unchecked")
 		Class<? extends Oaf> rowClazz = (Class<? extends Oaf>) Class.forName(graphTableClassName);
+		@SuppressWarnings("unchecked")
 		Class<? extends Oaf> actionPayloadClazz = (Class<? extends Oaf>) Class.forName(actionPayloadClassName);
 
 		throwIfGraphTableClassIsNotSubClassOfActionPayloadClass(rowClazz, actionPayloadClazz);
@@ -152,7 +154,7 @@ public class PromoteActionPayloadForGraphTableJob {
 		return spark
 			.read()
 			.parquet(path)
-			.map((MapFunction<Row, String>) value -> extractPayload(value), Encoders.STRING())
+			.map((MapFunction<Row, String>) PromoteActionPayloadForGraphTableJob::extractPayload, Encoders.STRING())
 			.map(
 				(MapFunction<String, A>) value -> decodePayload(actionPayloadClazz, value),
 				Encoders.bean(actionPayloadClazz));

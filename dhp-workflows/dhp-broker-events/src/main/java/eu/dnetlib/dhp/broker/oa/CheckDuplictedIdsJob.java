@@ -10,14 +10,10 @@ import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.TypedColumn;
 import org.apache.spark.sql.expressions.Aggregator;
 import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.model.Event;
@@ -88,8 +84,7 @@ class CountAggregator extends Aggregator<Tuple2<String, Long>, Tuple2<String, Lo
 
 	@Override
 	public Tuple2<String, Long> merge(final Tuple2<String, Long> arg0, final Tuple2<String, Long> arg1) {
-		final String s = StringUtils.defaultIfBlank(arg0._1, arg1._1);
-		return new Tuple2<>(s, arg0._2 + arg1._2);
+		return doMerge(arg0, arg1);
 	}
 
 	@Override
@@ -99,6 +94,10 @@ class CountAggregator extends Aggregator<Tuple2<String, Long>, Tuple2<String, Lo
 
 	@Override
 	public Tuple2<String, Long> reduce(final Tuple2<String, Long> arg0, final Tuple2<String, Long> arg1) {
+		return doMerge(arg0, arg1);
+	}
+
+	private Tuple2<String, Long> doMerge(final Tuple2<String, Long> arg0, final Tuple2<String, Long> arg1) {
 		final String s = StringUtils.defaultIfBlank(arg0._1, arg1._1);
 		return new Tuple2<>(s, arg0._2 + arg1._2);
 	}

@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.collector.worker;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -11,10 +11,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
 
 @Disabled
-public class CollectorWorkerApplicationTests {
+class CollectorWorkerApplicationTests {
 
 	@Test
-	public void testCollectionOAI() throws Exception {
+	void testCollectionOAI() throws Exception {
 		final ApiDescriptor api = new ApiDescriptor();
 		api.setId("oai");
 		api.setProtocol("oai");

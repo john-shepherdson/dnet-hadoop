@@ -14,9 +14,10 @@ import com.google.gson.Gson;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.Relation;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
+import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
-public class CreateRelationTest {
+class CreateRelationTest {
 
 	List<String> communityContext = Arrays
 		.asList(
@@ -203,6 +204,7 @@ public class CreateRelationTest {
 				"    <param name=\"suggestedAcknowledgement\"/>\n" +
 				"    <param name=\"zenodoCommunity\">oac_ni</param>\n" +
 				"    <param name=\"creationdate\">2018-03-01T12:00:00</param>\n" +
+				"    <category claim=\"false\" id=\"ni::projects\" label=\"NI Content providers\"/>\n" +
 				"    <category claim=\"false\" id=\"ni::contentproviders\" label=\"NI Content providers\">\n" +
 				"        <concept claim=\"false\" id=\"ni::contentproviders::1\" label=\"OpenNeuro\">\n" +
 				"            <param name=\"openaireId\">re3data_____::5b9bf9171d92df854cf3c520692e9122</param>\n" +
@@ -376,7 +378,7 @@ public class CreateRelationTest {
 				"            <param name=\"rule\"/>\n" +
 				"            <param name=\"CD_PROJECT_NUMBER\">675858</param>\n" +
 				"            <param name=\"url\"/>\n" +
-				"            <param name=\"funding\">H2020-EINFRA-2015-1</param>\n" +
+				"            <param name=\"funding\">EC | H2020 | RIA</param>\n" +
 				"            <param name=\"funder\">EC</param>\n" +
 				"            <param name=\"acronym\">West-Life</param>\n" +
 				"        </concept>\n" +
@@ -437,7 +439,65 @@ public class CreateRelationTest {
 				"    <param name=\"suggestedAcknowledgement\"/>\n" +
 				"    <param name=\"zenodoCommunity\">oaa_elixir-gr</param>\n" +
 				"    <param name=\"creationdate\">2018-03-01T12:00:00</param>\n" +
-				"    <category claim=\"false\" id=\"elixir-gr::projects\" label=\"ELIXIR GR Projects\"/>\n" +
+				"    <category claim=\"false\" id=\"elixir-gr::projects\" label=\"ELIXIR GR Projects\">\n" +
+				"                    <concept claim=\"false\" id=\"ni::projects::12\" label=\"\">\n" +
+				"                        <param name=\"projectfullname\">BIO-INFORMATICS RESEARCH NETWORK COORDINATING CENTER (BIRN-CC)</param>\n"
+				+
+				"                        <param name=\"acronym\"/>\n" +
+				"                        <param name=\"CD_PROJECT_NUMBER\">1U24RR025736-01</param>\n" +
+				"                        <param name=\"funder\">NIH</param>\n" +
+				"                    </concept>\n" +
+				"                    <concept claim=\"false\" id=\"ni::projects::13\" label=\"\">\n" +
+				"                        <param name=\"projectfullname\">COLLABORATIVE RESEARCH: The Cognitive Neuroscience of Category Learning</param>\n"
+				+
+				"                        <param name=\"acronym\"/>\n" +
+				"                        <param name=\"CD_PROJECT_NUMBER\">0223843</param>\n" +
+				"                        <param name=\"funder\">NSF</param>\n" +
+				"                    </concept>\n" +
+				"                    <concept claim=\"false\" id=\"ni::projects::14\" label=\"\">\n" +
+				"                        <param name=\"projectfullname\">The Cognitive Atlas: Developing an Interdisciplinary Knowledge Base Through Socia</param>\n"
+				+
+				"                        <param name=\"acronym\"/>\n" +
+				"                        <param name=\"CD_PROJECT_NUMBER\">5R01MH082795-05</param>\n" +
+				"                        <param name=\"funder\">NIH</param>\n" +
+				"                    </concept>\n" +
+				"                    <concept claim=\"false\" id=\"ni::projects::15\" label=\"\">\n" +
+				"                        <param name=\"projectfullname\">Fragmented early life environmental and emotional / cognitive vulnerabilities</param>\n"
+				+
+				"                        <param name=\"acronym\"/>\n" +
+				"                        <param name=\"CD_PROJECT_NUMBER\">1P50MH096889-01A1</param>\n" +
+				"                        <param name=\"funder\">NIH</param>\n" +
+				"                    </concept>\n" +
+				"                    <concept claim=\"false\" id=\"ni::projects::16\" label=\"\">\n" +
+				"                        <param name=\"projectfullname\">Enhancement of the 1000 Functional Connectome Project</param>\n"
+				+
+				"                        <param name=\"acronym\"/>\n" +
+				"                        <param name=\"CD_PROJECT_NUMBER\">1R03MH096321-01A1</param>\n" +
+				"                        <param name=\"funder\">TUBITAK</param>\n" +
+				"                    </concept>\n" +
+				"                    <concept claim=\"false\" id=\"ni::projects::17\" label=\"\">\n" +
+				"                        <param name=\"projectfullname\">CRCNS Data Sharing: An open data repository for cognitive neuroscience: The OpenfMRI Project</param>\n"
+				+
+				"                        <param name=\"acronym\"/>\n" +
+				"                        <param name=\"CD_PROJECT_NUMBER\">1131441</param>\n" +
+				"                        <param name=\"funder\">NSF</param>\n" +
+				"                    </concept>\n" +
+				"                    <concept claim=\"false\" id=\"ni::projects::18\" label=\"\">\n" +
+				"                        <param name=\"projectfullname\">Enhancing Human Cortical Plasticity: Visual Psychophysics and fMRI</param>\n"
+				+
+				"                        <param name=\"acronym\"/>\n" +
+				"                        <param name=\"CD_PROJECT_NUMBER\">0121950</param>\n" +
+				"                        <param name=\"funder\">NSF</param>\n" +
+				"                    </concept>\n" +
+				"                    <concept claim=\"false\" id=\"ni::projects::18\" label=\"\">\n" +
+				"                        <param name=\"projectfullname\">Transforming statistical methodology for neuroimaging meta-analysis.</param>\n"
+				+
+				"                        <param name=\"acronym\"/>\n" +
+				"                        <param name=\"CD_PROJECT_NUMBER\">100309</param>\n" +
+				"                        <param name=\"funder\">WT</param>\n" +
+				"                    </concept>\n" +
+				"                </category>" +
+
 				"    <category claim=\"false\" id=\"elixir-gr::contentproviders\" label=\"Elixir-GR Content providers\">\n"
 				+
 				"        <concept claim=\"false\" id=\"elixir-gr::contentproviders::1\" label=\"bio.tools\">\n" +
@@ -473,7 +533,7 @@ public class CreateRelationTest {
 	}
 
 	@Test
-	public void test1() {
+	void test1() {
 		List<ContextInfo> cInfoList = new ArrayList<>();
 		final Consumer<ContextInfo> consumer = ci -> cInfoList.add(ci);
 
@@ -564,6 +624,100 @@ public class CreateRelationTest {
 					tmp.contains("10|re3data_____::a48f09c562b247a9919acfe195549b47") &&
 					tmp.contains("10|opendoar____::97275a23ca44226c9964043c8462be96") &&
 					tmp.contains("10|doajarticles::2899208a99aa7d142646e0a80bfeef05"));
+
+	}
+
+	@Test
+	public void test2() {
+		List<ContextInfo> cInfoList = new ArrayList<>();
+		final Consumer<ContextInfo> consumer = ci -> cInfoList.add(ci);
+
+		queryInformationSystem
+			.getContextRelation(consumer, "projects", ModelSupport.getIdPrefix(Project.class));
+
+		cInfoList.forEach(c -> System.out.println(new Gson().toJson(c)));
+
+		List<Relation> rList = new ArrayList<>();
+
+		cInfoList.forEach(cInfo -> Process.getRelation(cInfo).forEach(rList::add));
+
+		Assertions.assertEquals(44, rList.size());
+
+		Assertions
+			.assertFalse(
+				rList
+					.stream()
+					.map(r -> r.getSource().getId())
+					.collect(Collectors.toSet())
+					.contains(
+						String
+							.format(
+								"%s|%s::%s", Constants.CONTEXT_ID,
+								Constants.CONTEXT_NS_PREFIX,
+								DHPUtils.md5("dh-ch"))));
+
+		Assertions
+			.assertEquals(
+				2,
+				rList
+					.stream()
+					.filter(
+						r -> r
+							.getSource()
+							.getId()
+							.equals(
+								String
+									.format(
+										"%s|%s::%s", Constants.CONTEXT_ID,
+										Constants.CONTEXT_NS_PREFIX,
+										DHPUtils.md5("clarin"))))
+					.collect(Collectors.toList())
+					.size());
+
+		Assertions
+			.assertEquals(
+				2,
+				rList
+					.stream()
+					.filter(
+						r -> r
+							.getTarget()
+							.getId()
+							.equals(
+								String
+									.format(
+										"%s|%s::%s", Constants.CONTEXT_ID,
+										Constants.CONTEXT_NS_PREFIX,
+										DHPUtils.md5("clarin"))))
+					.collect(Collectors.toList())
+					.size());
+
+		Set<String> tmp = rList
+			.stream()
+			.filter(
+				r -> r
+					.getSource()
+					.getId()
+					.equals(
+						String
+							.format(
+								"%s|%s::%s", Constants.CONTEXT_ID,
+								Constants.CONTEXT_NS_PREFIX,
+								DHPUtils.md5("clarin"))))
+			.map(r -> r.getTarget().getId())
+			.collect(Collectors.toSet());
+
+		Assertions
+			.assertTrue(
+				tmp.contains("40|corda__h2020::b5a4eb56bf84bef2ebc193306b4d423f") &&
+					tmp.contains("40|corda_______::ef782b2d85676aa3e5a907427feb18c4"));
+
+		rList.forEach(rel -> {
+			if (rel.getSource().getId().startsWith("40|")) {
+				String proj = rel.getSource().getId().substring(3);
+				Assertions.assertTrue(proj.substring(0, proj.indexOf("::")).length() == 12);
+			}
+		});
 
 	}
 }

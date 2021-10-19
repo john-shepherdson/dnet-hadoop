@@ -22,13 +22,17 @@ import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Funder;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
+import eu.dnetlib.dhp.schema.dump.oaf.community.Validated;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 
@@ -76,7 +80,9 @@ public class SparkPrepareResultProject implements Serializable {
 	private static void prepareResultProjectList(SparkSession spark, String inputPath, String outputPath) {
 		Dataset<Relation> relation = Utils
 			.readPath(spark, inputPath + "/relation", Relation.class)
-			.filter("dataInfo.deletedbyinference = false and lower(relClass) = 'isproducedby'");
+			.filter(
+				"dataInfo.deletedbyinference = false and lower(relClass) = '"
+					+ ModelConstants.IS_PRODUCED_BY.toLowerCase() + "'");
 		Dataset<eu.dnetlib.dhp.schema.oaf.Project> projects = Utils
 			.readPath(spark, inputPath + "/project", eu.dnetlib.dhp.schema.oaf.Project.class);
 
@@ -96,7 +102,7 @@ public class SparkPrepareResultProject implements Serializable {
 					rp.setResultId(s);
 					eu.dnetlib.dhp.schema.oaf.Project p = first._1();
 					projectSet.add(p.getId());
-					Project ps = getProject(p);
+					Project ps = getProject(p, first._2);
 
 					List<Project> projList = new ArrayList<>();
 					projList.add(ps);
@@ -105,7 +111,7 @@ public class SparkPrepareResultProject implements Serializable {
 						eu.dnetlib.dhp.schema.oaf.Project op = c._1();
 						if (!projectSet.contains(op.getId())) {
 							projList
-								.add(getProject(op));
+								.add(getProject(op, c._2));
 
 							projectSet.add(op.getId());
 
@@ -120,18 +126,18 @@ public class SparkPrepareResultProject implements Serializable {
 			.json(outputPath);
 	}
 
-	private static Project getProject(eu.dnetlib.dhp.schema.oaf.Project op) {
+	private static Project getProject(eu.dnetlib.dhp.schema.oaf.Project op, Relation relation) {
 		Project p = Project
 			.newInstance(
 				op.getId(),
 				op.getCode().getValue(),
 				Optional
 					.ofNullable(op.getAcronym())
-					.map(a -> a.getValue())
+					.map(Field::getValue)
 					.orElse(null),
 				Optional
 					.ofNullable(op.getTitle())
-					.map(v -> v.getValue())
+					.map(Field::getValue)
 					.orElse(null),
 				Optional
 					.ofNullable(op.getFundingtree())
@@ -140,7 +146,7 @@ public class SparkPrepareResultProject implements Serializable {
 							.stream()
 							.map(ft -> getFunder(ft.getValue()))
 							.collect(Collectors.toList());
-						if (tmp.size() > 0) {
+						if (!tmp.isEmpty()) {
 							return tmp.get(0);
 						} else {
 							return null;
@@ -155,36 +161,31 @@ public class SparkPrepareResultProject implements Serializable {
 			provenance.setTrust(di.get().getTrust());
 			p.setProvenance(provenance);
 		}
-
+		if (Boolean.TRUE.equals(relation.getValidated())) {
+			p.setValidated(Validated.newInstance(relation.getValidated(), relation.getValidationDate()));
+		}
 		return p;
 
 	}
 
 	private static Funder getFunder(String fundingtree) {
-		// ["<fundingtree><funder><id>nsf_________::NSF</id><shortname>NSF</shortname><name>National Science
-		// Foundation</name><jurisdiction>US</jurisdiction></funder><funding_level_1><id>nsf_________::NSF::CISE/OAD::CISE/CCF</id><description>Division
-		// of Computing and Communication Foundations</description><name>Division of Computing and Communication
-		// Foundations</name><parent><funding_level_0><id>nsf_________::NSF::CISE/OAD</id><description>Directorate for
-		// Computer &amp; Information Science &amp; Engineering</description><name>Directorate for Computer &amp;
-		// Information Science &amp;
-		// Engineering</name><parent/><class>nsf:fundingStream</class></funding_level_0></parent></funding_level_1></fundingtree>"]
-		Funder f = new Funder();
+		final Funder f = new Funder();
 		final Document doc;
 		try {
-			doc = new SAXReader().read(new StringReader(fundingtree));
+			final SAXReader reader = new SAXReader();
+			reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			doc = reader.read(new StringReader(fundingtree));
 			f.setShortName(((Node) (doc.selectNodes("//funder/shortname").get(0))).getText());
 			f.setName(((Node) (doc.selectNodes("//funder/name").get(0))).getText());
 			f.setJurisdiction(((Node) (doc.selectNodes("//funder/jurisdiction").get(0))).getText());
 			for (Object o : doc.selectNodes("//funding_level_0")) {
-				List node = ((Node) o).selectNodes("./name");
-				f.setFundingStream(((Node) node.get(0)).getText());
-
+				List<Node> node = ((Node) o).selectNodes("./name");
+				f.setFundingStream((node.get(0)).getText());
 			}
 
 			return f;
-		} catch (DocumentException e) {
-			e.printStackTrace();
+		} catch (DocumentException | SAXException e) {
+			throw new IllegalArgumentException(e);
 		}
-		return f;
 	}
 }

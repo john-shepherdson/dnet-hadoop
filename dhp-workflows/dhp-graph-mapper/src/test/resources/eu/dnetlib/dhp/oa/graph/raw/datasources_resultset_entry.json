@@ -223,6 +223,11 @@
 		"value": "pubsrepository::journal@@@dnet:datasource_typologies"
 	},
 	{
+		"field": "datasourcetypeui",
+		"type": "string",
+		"value": "pubsrepository::journal@@@dnet:datasource_typologies_ui"
+	},
+	{
 		"field": "provenanceaction",
 		"type": "not_used",
 		"value": "sysimport:crosswalk:entityregistry@@@dnet:provenance_actions"
@@ -241,5 +246,27 @@
 		"field": "issnLinking",
 		"type": "string",
 		"value": "2579-5447"
+	},
+	{
+		"field": "jurisdiction",
+		"type": "string",
+		"value": "National@@@eosc:jurisdictions"
+	},
+	{
+		"field": "thematic",
+		"type": "boolean",
+		"value": true
+	},
+	{
+		"field": "knowledgegraph",
+		"type": "boolean",
+		"value": true
+	},
+	{
+		"field": "contentpolicies",
+		"type": "array",
+		"value": [
+			"Journal article@@@eosc:contentpolicies"
+		]
 	}
 ]

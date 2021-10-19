@@ -9,9 +9,6 @@ public class OptionsParameter {
 	private boolean paramRequired;
 	private boolean compressed;
 
-	public OptionsParameter() {
-	}
-
 	public String getParamName() {
 		return paramName;
 	}

@@ -62,7 +62,7 @@ public class SplitForCommunityTest {
 	}
 
 	@Test
-	public void test1() {
+	void testCommunitySplit() {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/splitForCommunity")
@@ -79,7 +79,7 @@ public class SplitForCommunityTest {
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<CommunityResult> tmp = sc
-			.textFile(workingDir.toString() + "/split/dh-ch")
+			.textFile(workingDir.toString() + "/split/Digital_Humanities_and_Cultural_Heritage")
 			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
 		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
@@ -92,7 +92,7 @@ public class SplitForCommunityTest {
 				1, verificationDataset.filter("id = '50|dedup_wf_001::51b88f272ba9c3bb181af64e70255a80'").count());
 
 		tmp = sc
-			.textFile(workingDir.toString() + "/split/egi")
+			.textFile(workingDir.toString() + "/split/EGI_Federation")
 			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
 		verificationDataset = spark
@@ -105,7 +105,7 @@ public class SplitForCommunityTest {
 				1, verificationDataset.filter("id = '50|dedup_wf_001::e4805d005bfab0cd39a1642cbf477fdb'").count());
 
 		tmp = sc
-			.textFile(workingDir.toString() + "/split/ni")
+			.textFile(workingDir.toString() + "/split/Neuroinformatics")
 			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
 		verificationDataset = spark
@@ -118,7 +118,7 @@ public class SplitForCommunityTest {
 				1, verificationDataset.filter("id = '50|datacite____::6b1e3a2fa60ed8c27317a66d6357f795'").count());
 
 		tmp = sc
-			.textFile(workingDir.toString() + "/split/science-innovation-policy")
+			.textFile(workingDir.toString() + "/split/Science_and_Innovation_Policy_Studies")
 			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
 		verificationDataset = spark

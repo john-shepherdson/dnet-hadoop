@@ -5,9 +5,11 @@ import static java.nio.file.Files.createTempDirectory;
 
 import static org.apache.spark.sql.functions.count;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.lenient;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URISyntaxException;
@@ -56,6 +58,10 @@ public class SparkDedupTest implements Serializable {
 	private static String testOutputBasePath;
 	private static String testDedupGraphBasePath;
 	private static final String testActionSetId = "test-orchestrator";
+	private static String whitelistPath;
+	private static List<String> whiteList;
+
+	private static String WHITELIST_SEPARATOR = "####";
 
 	@BeforeAll
 	public static void cleanUp() throws IOException, URISyntaxException {
@@ -71,6 +77,12 @@ public class SparkDedupTest implements Serializable {
 		testDedupGraphBasePath = createTempDirectory(SparkDedupTest.class.getSimpleName() + "-")
 			.toAbsolutePath()
 			.toString();
+
+		whitelistPath = Paths
+			.get(SparkDedupTest.class.getResource("/eu/dnetlib/dhp/dedup/whitelist.simrels.txt").toURI())
+			.toFile()
+			.getAbsolutePath();
+		whiteList = IOUtils.readLines(new FileReader(whitelistPath));
 
 		FileUtils.deleteDirectory(new File(testOutputBasePath));
 		FileUtils.deleteDirectory(new File(testDedupGraphBasePath));
@@ -148,7 +160,7 @@ public class SparkDedupTest implements Serializable {
 
 	@Test
 	@Order(1)
-	public void createSimRelsTest() throws Exception {
+	void createSimRelsTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -196,14 +208,92 @@ public class SparkDedupTest implements Serializable {
 
 		assertEquals(3082, orgs_simrel);
 		assertEquals(7036, pubs_simrel);
-		assertEquals(344, sw_simrel);
+		assertEquals(336, sw_simrel);
 		assertEquals(442, ds_simrel);
 		assertEquals(6750, orp_simrel);
 	}
 
 	@Test
 	@Order(2)
-	public void cutMergeRelsTest() throws Exception {
+	void whitelistSimRelsTest() throws Exception {
+
+		ArgumentApplicationParser parser = new ArgumentApplicationParser(
+			IOUtils
+				.toString(
+					SparkWhitelistSimRels.class
+						.getResourceAsStream(
+							"/eu/dnetlib/dhp/oa/dedup/whitelistSimRels_parameters.json")));
+
+		parser
+			.parseArgument(
+				new String[] {
+					"-i", testGraphBasePath,
+					"-asi", testActionSetId,
+					"-la", "lookupurl",
+					"-w", testOutputBasePath,
+					"-np", "50",
+					"-wl", whitelistPath
+				});
+
+		new SparkWhitelistSimRels(parser, spark).run(isLookUpService);
+
+		long orgs_simrel = spark
+			.read()
+			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "organization"))
+			.count();
+
+		long pubs_simrel = spark
+			.read()
+			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "publication"))
+			.count();
+
+		long ds_simrel = spark
+			.read()
+			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "dataset"))
+			.count();
+
+		long orp_simrel = spark
+			.read()
+			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "otherresearchproduct"))
+			.count();
+
+		// entities simrels supposed to be equal to the number of previous step (no rels in whitelist)
+		assertEquals(3082, orgs_simrel);
+		assertEquals(7036, pubs_simrel);
+		assertEquals(442, ds_simrel);
+		assertEquals(6750, orp_simrel);
+
+		// entities simrels to be different from the number of previous step (new simrels in the whitelist)
+		Dataset<Row> sw_simrel = spark
+			.read()
+			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "software"));
+
+		// check if the first relation in the whitelist exists
+		assertTrue(
+			sw_simrel
+				.as(Encoders.bean(Relation.class))
+				.toJavaRDD()
+				.filter(
+					rel -> rel.getSource().equalsIgnoreCase(whiteList.get(0).split(WHITELIST_SEPARATOR)[0])
+						&& rel.getTarget().equalsIgnoreCase(whiteList.get(0).split(WHITELIST_SEPARATOR)[1]))
+				.count() > 0);
+		// check if the second relation in the whitelist exists
+		assertTrue(
+			sw_simrel
+				.as(Encoders.bean(Relation.class))
+				.toJavaRDD()
+				.filter(
+					rel -> rel.getSource().equalsIgnoreCase(whiteList.get(1).split(WHITELIST_SEPARATOR)[0])
+						&& rel.getTarget().equalsIgnoreCase(whiteList.get(1).split(WHITELIST_SEPARATOR)[1]))
+				.count() > 0);
+
+		assertEquals(338, sw_simrel.count());
+
+	}
+
+	@Test
+	@Order(3)
+	void cutMergeRelsTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -298,8 +388,8 @@ public class SparkDedupTest implements Serializable {
 	}
 
 	@Test
-	@Order(3)
-	public void createMergeRelsTest() throws Exception {
+	@Order(4)
+	void createMergeRelsTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -347,15 +437,15 @@ public class SparkDedupTest implements Serializable {
 
 		assertEquals(1272, orgs_mergerel);
 		assertEquals(1438, pubs_mergerel);
-		assertEquals(288, sw_mergerel);
+		assertEquals(286, sw_mergerel);
 		assertEquals(472, ds_mergerel);
 		assertEquals(718, orp_mergerel);
 
 	}
 
 	@Test
-	@Order(4)
-	public void createDedupRecordTest() throws Exception {
+	@Order(5)
+	void createDedupRecordTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -395,14 +485,14 @@ public class SparkDedupTest implements Serializable {
 
 		assertEquals(85, orgs_deduprecord);
 		assertEquals(65, pubs_deduprecord);
-		assertEquals(51, sw_deduprecord);
+		assertEquals(49, sw_deduprecord);
 		assertEquals(97, ds_deduprecord);
 		assertEquals(89, orp_deduprecord);
 	}
 
 	@Test
-	@Order(5)
-	public void updateEntityTest() throws Exception {
+	@Order(6)
+	void updateEntityTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -480,7 +570,7 @@ public class SparkDedupTest implements Serializable {
 		assertEquals(838, organizations);
 		assertEquals(100, projects);
 		assertEquals(100, datasource);
-		assertEquals(200, softwares);
+		assertEquals(198, softwares);
 		assertEquals(389, dataset);
 		assertEquals(517, otherresearchproduct);
 
@@ -517,8 +607,8 @@ public class SparkDedupTest implements Serializable {
 	}
 
 	@Test
-	@Order(6)
-	public void propagateRelationTest() throws Exception {
+	@Order(7)
+	void propagateRelationTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
@@ -536,7 +626,7 @@ public class SparkDedupTest implements Serializable {
 
 		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
 
-		assertEquals(4862, relations);
+		assertEquals(4860, relations);
 
 		// check deletedbyinference
 		final Dataset<Relation> mergeRels = spark
@@ -567,8 +657,8 @@ public class SparkDedupTest implements Serializable {
 	}
 
 	@Test
-	@Order(7)
-	public void testRelations() throws Exception {
+	@Order(8)
+	void testRelations() throws Exception {
 		testUniqueness("/eu/dnetlib/dhp/dedup/test/relation_1.json", 12, 10);
 		testUniqueness("/eu/dnetlib/dhp/dedup/test/relation_2.json", 10, 2);
 	}

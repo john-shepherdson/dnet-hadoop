@@ -24,10 +24,7 @@ import eu.dnetlib.doiboost.orcidnodoi.json.JsonWriter;
 import eu.dnetlib.doiboost.orcidnodoi.xml.XMLRecordParserNoDoi;
 
 public class XMLRecordParserTest {
-	private static final String NS_WORK = "work";
-	private static final String NS_WORK_URL = "http://www.orcid.org/ns/work";
-	private static final String NS_COMMON_URL = "http://www.orcid.org/ns/common";
-	private static final String NS_COMMON = "common";
+
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	private static Path testPath;
@@ -38,11 +35,9 @@ public class XMLRecordParserTest {
 	}
 
 	@Test
-	public void testOrcidAuthorDataXMLParser() throws Exception {
+	void testOrcidAuthorDataXMLParser() throws Exception {
 
 		String xml = IOUtils.toString(this.getClass().getResourceAsStream("summary_0000-0001-6828-479X.xml"));
-
-		XMLRecordParser p = new XMLRecordParser();
 
 		AuthorData authorData = XMLRecordParser.VTDParseAuthorData(xml.getBytes());
 		assertNotNull(authorData);
@@ -54,11 +49,9 @@ public class XMLRecordParserTest {
 	}
 
 	@Test
-	public void testOrcidXMLErrorRecordParser() throws Exception {
+	void testOrcidXMLErrorRecordParser() throws Exception {
 
 		String xml = IOUtils.toString(this.getClass().getResourceAsStream("summary_error.xml"));
-
-		XMLRecordParser p = new XMLRecordParser();
 
 		AuthorData authorData = XMLRecordParser.VTDParseAuthorData(xml.getBytes());
 		assertNotNull(authorData);
@@ -67,13 +60,11 @@ public class XMLRecordParserTest {
 	}
 
 	@Test
-	public void testOrcidWorkDataXMLParser() throws Exception {
+	void testOrcidWorkDataXMLParser() throws Exception {
 
 		String xml = IOUtils
 			.toString(
 				this.getClass().getResourceAsStream("activity_work_0000-0003-2760-1191.xml"));
-
-		XMLRecordParser p = new XMLRecordParser();
 
 		WorkData workData = XMLRecordParser.VTDParseWorkData(xml.getBytes());
 		assertNotNull(workData);
@@ -83,7 +74,7 @@ public class XMLRecordParserTest {
 	}
 
 	@Test
-	public void testOrcidOtherNamesXMLParser() throws Exception {
+	void testOrcidOtherNamesXMLParser() throws Exception {
 
 		String xml = IOUtils
 			.toString(
@@ -91,30 +82,13 @@ public class XMLRecordParserTest {
 		AuthorData authorData = XMLRecordParser.VTDParseAuthorData(xml.getBytes());
 		assertNotNull(authorData);
 		assertNotNull(authorData.getOtherNames());
-		assertTrue(authorData.getOtherNames().get(0).equals("Andrew C. Porteus"));
+		assertEquals("Andrew C. Porteus", authorData.getOtherNames().get(0));
 		String jsonData = JsonWriter.create(authorData);
 		assertNotNull(jsonData);
 	}
 
-//	@Test
-//	private void testWorkIdLastModifiedDateXMLParser() throws Exception {
-//		String xml = IOUtils
-//			.toString(
-//				this.getClass().getResourceAsStream("record_0000-0001-5004-5918.xml"));
-//		Map<String, String> workIdLastModifiedDate = XMLRecordParser.retrieveWorkIdLastModifiedDate(xml.getBytes());
-//		workIdLastModifiedDate.forEach((k, v) -> {
-//			try {
-//				OrcidClientTest
-//					.logToFile(
-//						k + " " + v + " isModified after " + SparkDownloadOrcidWorks.lastUpdateValue + ": "
-//							+ SparkDownloadOrcidWorks.isModified("0000-0001-5004-5918", v));
-//			} catch (IOException e) {
-//			}
-//		});
-//	}
-
 	@Test
-	public void testAuthorSummaryXMLParser() throws Exception {
+	void testAuthorSummaryXMLParser() throws Exception {
 		String xml = IOUtils
 			.toString(
 				this.getClass().getResourceAsStream("record_0000-0001-5004-5918.xml"));
@@ -124,7 +98,7 @@ public class XMLRecordParserTest {
 	}
 
 	@Test
-	public void testWorkDataXMLParser() throws Exception {
+	void testWorkDataXMLParser() throws Exception {
 		String xml = IOUtils
 			.toString(
 				this.getClass().getResourceAsStream("activity_work_0000-0003-2760-1191.xml"));

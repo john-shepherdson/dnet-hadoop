@@ -1,7 +1,6 @@
 
 package eu.dnetlib.dhp.transformation.xslt;
 
-import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -18,11 +17,11 @@ import net.sf.saxon.s9api.*;
 
 public class XSLTTransformationFunction implements MapFunction<MetadataRecord, MetadataRecord>, Serializable {
 
-	public final static String QNAME_BASE_URI = "http://eu/dnetlib/transform";
+	public static final String QNAME_BASE_URI = "http://eu/dnetlib/transform";
 
-	private final static String DATASOURCE_ID_PARAM = "varDataSourceId";
+	private static final String DATASOURCE_ID_PARAM = "varDataSourceId";
 
-	private final static String DATASOURCE_NAME_PARAM = "varOfficialName";
+	private static final String DATASOURCE_NAME_PARAM = "varOfficialName";
 
 	private final AggregationCounter aggregationCounter;
 
@@ -38,8 +37,7 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 		final AggregationCounter aggregationCounter,
 		final String transformationRule,
 		long dateOfTransformation,
-		final VocabularyGroup vocabularies)
-		throws Exception {
+		final VocabularyGroup vocabularies) {
 		this.aggregationCounter = aggregationCounter;
 		this.transformationRule = transformationRule;
 		this.vocabularies = vocabularies;
@@ -83,7 +81,8 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 			return value;
 		} catch (Throwable e) {
 			aggregationCounter.getErrorItems().add(1);
-			throw new RuntimeException(e);
+			return null;
+//			throw new RuntimeException(e);
 		}
 	}
 

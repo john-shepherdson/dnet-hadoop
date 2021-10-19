@@ -14,17 +14,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.xml.sax.SAXException;
 
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 @ExtendWith(MockitoExtension.class)
-public class QueryInformationSystemTest {
+class QueryInformationSystemTest {
 
 	private static final String XQUERY = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') "
 		+
 		"  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] " +
-		" and ($x//context/param[./@name = 'status']/text() = 'manager'  or $x//context/param[./@name = 'status']/text() = 'all') "
+		" and ($x//context/param[./@name = 'status']/text() = 'all') "
 		+
 		"  return " +
 		"<community> " +
@@ -66,21 +67,21 @@ public class QueryInformationSystemTest {
 	private Map<String, String> map;
 
 	@BeforeEach
-	public void setUp() throws ISLookUpException, DocumentException {
+	public void setUp() throws ISLookUpException, DocumentException, SAXException {
 		lenient().when(isLookUpService.quickSearchProfile(XQUERY)).thenReturn(communityMap);
 		queryInformationSystem = new QueryInformationSystem();
 		queryInformationSystem.setIsLookUp(isLookUpService);
-		map = queryInformationSystem.getCommunityMap();
+		map = queryInformationSystem.getCommunityMap(false, null);
 	}
 
 	@Test
-	public void testSize() throws ISLookUpException {
+	void testSize() throws ISLookUpException {
 
 		Assertions.assertEquals(23, map.size());
 	}
 
 	@Test
-	public void testContent() {
+	void testContent() {
 		Assertions.assertTrue(map.containsKey("egi") && map.get("egi").equals("EGI Federation"));
 
 		Assertions.assertTrue(map.containsKey("fet-fp7") && map.get("fet-fp7").equals("FET FP7"));

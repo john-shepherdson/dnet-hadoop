@@ -13,9 +13,6 @@ public class Constraint implements Serializable {
 	private String value;
 	private Selection selection;
 
-	public Constraint() {
-	}
-
 	public String getVerb() {
 		return verb;
 	}

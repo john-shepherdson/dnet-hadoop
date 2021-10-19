@@ -31,7 +31,7 @@ public class GeonamesCity implements Serializable {
 	@JsonProperty("license")
 	private License license;
 
-	private final static long serialVersionUID = -8389480201526252955L;
+	private static final long serialVersionUID = -8389480201526252955L;
 
 	public NameAndCode getNutsLevel2() {
 		return nutsLevel2;

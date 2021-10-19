@@ -28,12 +28,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.DocumentFactory;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Node;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.dom4j.*;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -88,8 +83,6 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected static final Map<String, String> nsContext = new HashMap<>();
 
-	private static final Logger log = LoggerFactory.getLogger(DispatchEntitiesApplication.class);
-
 	static {
 		nsContext.put("dr", "http://www.driver-repository.eu/namespace/dr");
 		nsContext.put("dri", "http://www.driver-repository.eu/namespace/dri");
@@ -116,66 +109,56 @@ public abstract class AbstractMdRecordToOafMapper {
 		this.forceOriginalId = false;
 	}
 
-	public List<Oaf> processMdRecord(final String xml) {
+	public List<Oaf> processMdRecord(final String xml) throws DocumentException {
 
-		// log.info("Processing record: " + xml);
+		DocumentFactory.getInstance().setXPathNamespaceURIs(nsContext);
 
-		try {
-			DocumentFactory.getInstance().setXPathNamespaceURIs(nsContext);
+		final Document doc = DocumentHelper
+			.parseText(
+				xml
+					.replaceAll(DATACITE_SCHEMA_KERNEL_4, DATACITE_SCHEMA_KERNEL_3)
+					.replaceAll(DATACITE_SCHEMA_KERNEL_4_SLASH, DATACITE_SCHEMA_KERNEL_3)
+					.replaceAll(DATACITE_SCHEMA_KERNEL_3_SLASH, DATACITE_SCHEMA_KERNEL_3));
 
-			final Document doc = DocumentHelper
-				.parseText(
-					xml
-						.replaceAll(DATACITE_SCHEMA_KERNEL_4, DATACITE_SCHEMA_KERNEL_3)
-						.replaceAll(DATACITE_SCHEMA_KERNEL_4_SLASH, DATACITE_SCHEMA_KERNEL_3)
-						.replaceAll(DATACITE_SCHEMA_KERNEL_3_SLASH, DATACITE_SCHEMA_KERNEL_3));
+		final KeyValue collectedFrom = getProvenanceDatasource(
+			doc, "//oaf:collectedFrom/@id", "//oaf:collectedFrom/@name");
 
-			final KeyValue collectedFrom = getProvenanceDatasource(
-				doc, "//oaf:collectedFrom/@id", "//oaf:collectedFrom/@name");
-
-			if (collectedFrom == null) {
-				return null;
-			}
-
-			final KeyValue hostedBy = StringUtils.isBlank(doc.valueOf("//oaf:hostedBy/@id"))
-				? collectedFrom
-				: getProvenanceDatasource(doc, "//oaf:hostedBy/@id", "//oaf:hostedBy/@name");
-
-			if (hostedBy == null) {
-				return null;
-			}
-
-			final DataInfo info = prepareDataInfo(doc, invisible);
-			final long lastUpdateTimestamp = new Date().getTime();
-
-			final List<Instance> instances = prepareInstances(doc, info, collectedFrom, hostedBy);
-
-			final String type = getResultType(doc, instances);
-
-			return createOafs(doc, type, instances, collectedFrom, info, lastUpdateTimestamp);
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
+		if (collectedFrom == null) {
+			return Lists.newArrayList();
 		}
+
+		final KeyValue hostedBy = StringUtils.isBlank(doc.valueOf("//oaf:hostedBy/@id"))
+			? collectedFrom
+			: getProvenanceDatasource(doc, "//oaf:hostedBy/@id", "//oaf:hostedBy/@name");
+
+		if (hostedBy == null) {
+			return Lists.newArrayList();
+		}
+
+		final DataInfo info = prepareDataInfo(doc, invisible);
+		final long lastUpdateTimestamp = new Date().getTime();
+
+		final List<Instance> instances = prepareInstances(doc, info, collectedFrom, hostedBy);
+
+		final String type = getResultType(doc, instances);
+
+		return createOafs(doc, type, instances, collectedFrom, info, lastUpdateTimestamp);
 	}
 
 	protected String getResultType(final Document doc, final List<Instance> instances) {
 		final String type = doc.valueOf("//dr:CobjCategory/@type");
 
-		if (StringUtils.isBlank(type) & vocs.vocabularyExists(ModelConstants.DNET_RESULT_TYPOLOGIES)) {
+		if (StringUtils.isBlank(type) && vocs.vocabularyExists(ModelConstants.DNET_RESULT_TYPOLOGIES)) {
 			final String instanceType = instances
 				.stream()
 				.map(i -> i.getInstancetype().getClassid())
 				.findFirst()
-				.map(s -> UNKNOWN.equalsIgnoreCase(s) ? "0000" : s)
+				.filter(s -> !UNKNOWN.equalsIgnoreCase(s))
 				.orElse("0000"); // Unknown
 			return Optional
 				.ofNullable(vocs.getSynonymAsQualifier(ModelConstants.DNET_RESULT_TYPOLOGIES, instanceType))
-				.map(q -> q.getClassid())
+				.map(Qualifier::getClassid)
 				.orElse("0000");
-			/*
-			 * .orElseThrow( () -> new IllegalArgumentException( String.format("'%s' not mapped in %s", instanceType,
-			 * DNET_RESULT_TYPOLOGIES)));
-			 */
 		}
 
 		return type;
@@ -185,7 +168,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		final String dsId = doc.valueOf(xpathId);
 		final String dsName = doc.valueOf(xpathName);
 
-		if (StringUtils.isBlank(dsId) | StringUtils.isBlank(dsName)) {
+		if (StringUtils.isBlank(dsId) || StringUtils.isBlank(dsName)) {
 			return null;
 		}
 
@@ -498,7 +481,6 @@ public abstract class AbstractMdRecordToOafMapper {
 		accessRight.setSchemename(qualifier.getSchemename());
 
 		// TODO set the OAStatus
-		// accessRight.setOaStatus(...);
 
 		return accessRight;
 	}
@@ -509,22 +491,6 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected Qualifier prepareQualifier(final String classId, final String schemeId) {
 		return vocs.getTermAsQualifier(schemeId, classId);
-	}
-
-	protected List<StructuredProperty> prepareListStructProps(
-		final Node node,
-		final String xpath,
-		final String xpathClassId,
-		final String schemeId,
-		final DataInfo info) {
-		final List<StructuredProperty> res = new ArrayList<>();
-
-		for (final Object o : node.selectNodes(xpath)) {
-			final Node n = (Node) o;
-			final String classId = n.valueOf(xpathClassId).trim();
-			res.add(structuredProperty(n.getText(), prepareQualifier(classId, schemeId), info));
-		}
-		return res;
 	}
 
 	protected List<StructuredProperty> prepareListStructPropsWithValidQualifier(

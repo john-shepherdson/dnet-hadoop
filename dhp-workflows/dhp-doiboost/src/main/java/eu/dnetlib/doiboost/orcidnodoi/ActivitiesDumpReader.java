@@ -33,6 +33,9 @@ public class ActivitiesDumpReader {
 	private static final int MAX_XML_WORKS_PARSED = -1;
 	private static final int XML_WORKS_PARSED_COUNTER_LOG_INTERVAL = 100000;
 
+	private ActivitiesDumpReader() {
+	}
+
 	public static void parseGzActivities(Configuration conf, String inputUri, Path outputPath)
 		throws Exception {
 		String uri = inputUri;
@@ -48,7 +51,7 @@ public class ActivitiesDumpReader {
 		InputStream gzipInputStream = null;
 		try {
 			gzipInputStream = codec.createInputStream(fs.open(inputPath));
-			parseTarActivities(fs, conf, gzipInputStream, outputPath);
+			parseTarActivities(conf, gzipInputStream, outputPath);
 
 		} finally {
 			Log.debug("Closing gzip stream");
@@ -56,8 +59,7 @@ public class ActivitiesDumpReader {
 		}
 	}
 
-	private static void parseTarActivities(
-		FileSystem fs, Configuration conf, InputStream gzipInputStream, Path outputPath) {
+	private static void parseTarActivities(Configuration conf, InputStream gzipInputStream, Path outputPath) {
 		int counter = 0;
 		int noDoiFound = 0;
 		int errorFromOrcidFound = 0;
@@ -73,7 +75,7 @@ public class ActivitiesDumpReader {
 					SequenceFile.Writer.valueClass(Text.class))) {
 				while ((entry = tais.getNextTarEntry()) != null) {
 					String filename = entry.getName();
-					StringBuffer buffer = new StringBuffer();
+					StringBuilder builder = new StringBuilder();
 					try {
 						if (entry.isDirectory() || !filename.contains("works")) {
 
@@ -83,12 +85,12 @@ public class ActivitiesDumpReader {
 							BufferedReader br = new BufferedReader(new InputStreamReader(tais)); // Read directly from
 																									// tarInput
 							String line;
-							buffer = new StringBuffer();
+							builder = new StringBuilder();
 							while ((line = br.readLine()) != null) {
-								buffer.append(line);
+								builder.append(line);
 							}
 							WorkDetail workDetail = XMLRecordParserNoDoi
-								.VTDParseWorkData(buffer.toString().getBytes());
+								.VTDParseWorkData(builder.toString().getBytes());
 							if (workDetail != null) {
 								if (workDetail.getErrorCode() != null) {
 									errorFromOrcidFound += 1;
@@ -123,7 +125,7 @@ public class ActivitiesDumpReader {
 								}
 
 							} else {
-								Log.warn("Data not retrievable [" + entry.getName() + "] " + buffer);
+								Log.warn("Data not retrievable [" + entry.getName() + "] " + builder);
 								xmlParserErrorFound += 1;
 							}
 						}

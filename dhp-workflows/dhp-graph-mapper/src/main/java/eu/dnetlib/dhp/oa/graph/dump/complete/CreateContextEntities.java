@@ -1,12 +1,14 @@
 
 package eu.dnetlib.dhp.oa.graph.dump.complete;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.apache.commons.crypto.utils.IoUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -14,15 +16,13 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
-import org.apache.hadoop.io.compress.CompressionOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.ResearchInitiative;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
 /**
  * Writes on HDFS Context entities. It queries the Information System at the lookup url provided as parameter and
@@ -33,8 +33,8 @@ import eu.dnetlib.dhp.schema.dump.oaf.graph.ResearchInitiative;
 public class CreateContextEntities implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(CreateContextEntities.class);
-	private final Configuration conf;
-	private final BufferedWriter writer;
+	private final transient Configuration conf;
+	private final transient BufferedWriter writer;
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
@@ -88,7 +88,7 @@ public class CreateContextEntities implements Serializable {
 	}
 
 	public <R extends ResearchInitiative> void execute(final Function<ContextInfo, R> producer, String isLookUpUrl)
-		throws Exception {
+		throws ISLookUpException {
 
 		QueryInformationSystem queryInformationSystem = new QueryInformationSystem();
 		queryInformationSystem.setIsLookUp(Utils.getIsLookUpService(isLookUpUrl));
@@ -101,10 +101,9 @@ public class CreateContextEntities implements Serializable {
 	protected <R extends ResearchInitiative> void writeEntity(final R r) {
 		try {
 			writer.write(Utils.OBJECT_MAPPER.writeValueAsString(r));
-			// log.info("writing context : {}", new Gson().toJson(r));
 			writer.newLine();
-		} catch (final Exception e) {
-			throw new RuntimeException(e);
+		} catch (final IOException e) {
+			throw new IllegalArgumentException(e);
 		}
 	}
 

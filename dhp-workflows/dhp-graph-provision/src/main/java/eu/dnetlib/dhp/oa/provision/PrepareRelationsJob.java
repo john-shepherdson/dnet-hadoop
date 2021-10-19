@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -81,6 +82,7 @@ public class PrepareRelationsJob {
 
 		Set<String> relationFilter = Optional
 			.ofNullable(parser.get("relationFilter"))
+			.map(String::toLowerCase)
 			.map(s -> Sets.newHashSet(Splitter.on(",").split(s)))
 			.orElse(new HashSet<>());
 		log.info("relationFilter: {}", relationFilter);
@@ -129,14 +131,15 @@ public class PrepareRelationsJob {
 		Set<String> relationFilter, int sourceMaxRelations, int targetMaxRelations, int relPartitions) {
 
 		JavaRDD<Relation> rels = readPathRelationRDD(spark, inputRelationsPath)
-			.filter(rel -> rel.getDataInfo().getDeletedbyinference() == false)
-			.filter(rel -> relationFilter.contains(rel.getRelClass()) == false);
+			.filter(rel -> !(rel.getSource().startsWith("unresolved") || rel.getTarget().startsWith("unresolved")))
+			.filter(rel -> !rel.getDataInfo().getDeletedbyinference())
+			.filter(rel -> !relationFilter.contains(StringUtils.lowerCase(rel.getRelClass())));
 
 		JavaRDD<Relation> pruned = pruneRels(
 			pruneRels(
 				rels,
-				sourceMaxRelations, relPartitions, (Function<Relation, String>) r -> r.getSource()),
-			targetMaxRelations, relPartitions, (Function<Relation, String>) r -> r.getTarget());
+				sourceMaxRelations, relPartitions, (Function<Relation, String>) Relation::getSource),
+			targetMaxRelations, relPartitions, (Function<Relation, String>) Relation::getTarget);
 		spark
 			.createDataset(pruned.rdd(), Encoders.bean(Relation.class))
 			.repartition(relPartitions)
@@ -168,8 +171,8 @@ public class PrepareRelationsJob {
 			.map(
 				(MapFunction<String, Relation>) s -> OBJECT_MAPPER.readValue(s, Relation.class),
 				Encoders.kryo(Relation.class))
-			.filter((FilterFunction<Relation>) rel -> rel.getDataInfo().getDeletedbyinference() == false)
-			.filter((FilterFunction<Relation>) rel -> relationFilter.contains(rel.getRelClass()) == false)
+			.filter((FilterFunction<Relation>) rel -> !rel.getDataInfo().getDeletedbyinference())
+			.filter((FilterFunction<Relation>) rel -> !relationFilter.contains(rel.getRelClass()))
 			.groupByKey(
 				(MapFunction<Relation, String>) Relation::getSource,
 				Encoders.STRING())

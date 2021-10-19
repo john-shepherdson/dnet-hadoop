@@ -4,12 +4,8 @@ package eu.dnetlib.dhp.schema.oaf.utils;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -19,15 +15,34 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.dhp.schema.oaf.Result;
+import me.xuender.unidecode.Unidecode;
 
-public class OafMapperUtilsTest {
+class OafMapperUtilsTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	@Test
-	public void testDateValidation() {
+	public void testUnidecode() {
+
+		assertEquals("Liu Ben Mu hiruzuSen tawa", Unidecode.decode("六本木ヒルズ森タワ"));
+		assertEquals("Nan Wu A Mi Tuo Fo", Unidecode.decode("南无阿弥陀佛"));
+		assertEquals("Yi Tiao Hui Zou Lu De Yu", Unidecode.decode("一条会走路的鱼"));
+		assertEquals("amidaniyorai", Unidecode.decode("あみだにょらい"));
+		assertEquals("T`owrk`iayi", Unidecode.decode("Թուրքիայի"));
+		assertEquals("Obzor tematiki", Unidecode.decode("Обзор тематики"));
+		assertEquals("GERMANSKIE IaZYKI", Unidecode.decode("ГЕРМАНСКИЕ ЯЗЫКИ"));
+		assertEquals("Diereunese tes ikanopoieses", Unidecode.decode("Διερεύνηση της ικανοποίησης"));
+		assertEquals("lqDy l'wly@", Unidecode.decode("القضايا الأولية"));
+		assertEquals("abc def ghi", Unidecode.decode("abc def ghi"));
+	}
+
+	@Test
+	void testDateValidation() {
 
 		assertTrue(GraphCleaningFunctions.doCleanDate("2016-05-07T12:41:19.202Z  ").isPresent());
 		assertTrue(GraphCleaningFunctions.doCleanDate("2020-09-10 11:08:52 ").isPresent());
@@ -132,44 +147,46 @@ public class OafMapperUtilsTest {
 	}
 
 	@Test
-	public void testDate() {
-		System.out.println(GraphCleaningFunctions.cleanDate("23-FEB-1998"));
+	void testDate() {
+		final String date = GraphCleaningFunctions.cleanDate("23-FEB-1998");
+		assertNotNull(date);
+		System.out.println(date);
 	}
 
 	@Test
-	public void testMergePubs() throws IOException {
+	void testMergePubs() throws IOException {
 		Publication p1 = read("publication_1.json", Publication.class);
 		Publication p2 = read("publication_2.json", Publication.class);
 		Dataset d1 = read("dataset_1.json", Dataset.class);
 		Dataset d2 = read("dataset_2.json", Dataset.class);
 
-		assertEquals(p1.getCollectedfrom().size(), 1);
-		assertEquals(p1.getCollectedfrom().get(0).getKey(), ModelConstants.CROSSREF_ID);
-		assertEquals(d2.getCollectedfrom().size(), 1);
+		assertEquals(1, p1.getCollectedfrom().size());
+		assertEquals(ModelConstants.CROSSREF_ID, p1.getCollectedfrom().get(0).getKey());
+		assertEquals(1, d2.getCollectedfrom().size());
 		assertFalse(cfId(d2.getCollectedfrom()).contains(ModelConstants.CROSSREF_ID));
 
-		assertTrue(
+		assertEquals(
+			ModelConstants.PUBLICATION_RESULTTYPE_CLASSID,
 			OafMapperUtils
 				.mergeResults(p1, d2)
 				.getResulttype()
-				.getClassid()
-				.equals(ModelConstants.PUBLICATION_RESULTTYPE_CLASSID));
+				.getClassid());
 
-		assertEquals(p2.getCollectedfrom().size(), 1);
+		assertEquals(1, p2.getCollectedfrom().size());
 		assertFalse(cfId(p2.getCollectedfrom()).contains(ModelConstants.CROSSREF_ID));
-		assertEquals(d1.getCollectedfrom().size(), 1);
+		assertEquals(1, d1.getCollectedfrom().size());
 		assertTrue(cfId(d1.getCollectedfrom()).contains(ModelConstants.CROSSREF_ID));
 
-		assertTrue(
+		assertEquals(
+			ModelConstants.DATASET_RESULTTYPE_CLASSID,
 			OafMapperUtils
 				.mergeResults(p2, d1)
 				.getResulttype()
-				.getClassid()
-				.equals(ModelConstants.DATASET_RESULTTYPE_CLASSID));
+				.getClassid());
 	}
 
 	protected HashSet<String> cfId(List<KeyValue> collectedfrom) {
-		return collectedfrom.stream().map(c -> c.getKey()).collect(Collectors.toCollection(HashSet::new));
+		return collectedfrom.stream().map(KeyValue::getKey).collect(Collectors.toCollection(HashSet::new));
 	}
 
 	protected <T extends Result> T read(String filename, Class<T> clazz) throws IOException {

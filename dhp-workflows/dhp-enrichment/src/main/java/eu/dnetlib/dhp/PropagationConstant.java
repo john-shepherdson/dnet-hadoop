@@ -14,12 +14,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.resulttocommunityfromorganization.ResultCommunityList;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Country;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class PropagationConstant {
+
+	private PropagationConstant() {
+	}
+
 	public static final String INSTITUTIONAL_REPO_TYPE = "pubsrepository::institutional";
 
 	public static final String PROPAGATION_DATA_INFO_TYPE = "propagation";
@@ -63,27 +68,29 @@ public class PropagationConstant {
 				getDataInfo(
 					PROPAGATION_DATA_INFO_TYPE,
 					PROPAGATION_COUNTRY_INSTREPO_CLASS_ID,
-					PROPAGATION_COUNTRY_INSTREPO_CLASS_NAME));
+					PROPAGATION_COUNTRY_INSTREPO_CLASS_NAME,
+					ModelConstants.DNET_PROVENANCE_ACTIONS));
 		return nc;
 	}
 
 	public static DataInfo getDataInfo(
-		String inference_provenance, String inference_class_id, String inference_class_name) {
+		String inference_provenance, String inference_class_id, String inference_class_name, String qualifierSchema) {
 		DataInfo di = new DataInfo();
 		di.setInferred(true);
 		di.setDeletedbyinference(false);
 		di.setTrust("0.85");
 		di.setInferenceprovenance(inference_provenance);
-		di.setProvenanceaction(getQualifier(inference_class_id, inference_class_name));
+		di.setProvenanceaction(getQualifier(inference_class_id, inference_class_name, qualifierSchema));
 		return di;
 	}
 
-	public static Qualifier getQualifier(String inference_class_id, String inference_class_name) {
+	public static Qualifier getQualifier(String inference_class_id, String inference_class_name,
+		String qualifierSchema) {
 		Qualifier pa = new Qualifier();
 		pa.setClassid(inference_class_id);
 		pa.setClassname(inference_class_name);
-		pa.setSchemeid(ModelConstants.DNET_PID_TYPES);
-		pa.setSchemename(ModelConstants.DNET_PID_TYPES);
+		pa.setSchemeid(qualifierSchema);
+		pa.setSchemename(qualifierSchema);
 		return pa;
 	}
 
@@ -102,7 +109,11 @@ public class PropagationConstant {
 		r.setRelClass(rel_class);
 		r.setRelType(rel_type);
 		r.setSubRelType(subrel_type);
-		r.setDataInfo(getDataInfo(inference_provenance, inference_class_id, inference_class_name));
+		r
+			.setDataInfo(
+				getDataInfo(
+					inference_provenance, inference_class_id, inference_class_name,
+					ModelConstants.DNET_PROVENANCE_ACTIONS));
 		return r;
 	}
 

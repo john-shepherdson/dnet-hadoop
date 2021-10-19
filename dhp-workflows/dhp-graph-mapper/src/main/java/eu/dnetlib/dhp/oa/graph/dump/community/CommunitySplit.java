@@ -5,7 +5,6 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.spark.SparkConf;
@@ -16,6 +15,7 @@ import org.apache.spark.sql.SparkSession;
 
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
+import eu.dnetlib.dhp.schema.dump.oaf.community.Context;
 
 /**
  * This class splits the dumped results according to the research community - research initiative/infrastructure they
@@ -34,12 +34,13 @@ public class CommunitySplit implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				execSplit(spark, inputPath, outputPath, Utils.getCommunityMap(spark, communityMapPath).keySet());
+				CommunityMap communityMap = Utils.getCommunityMap(spark, communityMapPath);
+				execSplit(spark, inputPath, outputPath, communityMap);
 			});
 	}
 
 	private static void execSplit(SparkSession spark, String inputPath, String outputPath,
-		Set<String> communities) {
+		CommunityMap communities) {
 
 		Dataset<CommunityResult> result = Utils
 			.readPath(spark, inputPath + "/publication", CommunityResult.class)
@@ -48,25 +49,21 @@ public class CommunitySplit implements Serializable {
 			.union(Utils.readPath(spark, inputPath + "/software", CommunityResult.class));
 
 		communities
+			.keySet()
 			.stream()
-			.forEach(c -> printResult(c, result, outputPath));
+			.forEach(c -> printResult(c, result, outputPath + "/" + communities.get(c).replace(" ", "_")));
 
 	}
 
 	private static void printResult(String c, Dataset<CommunityResult> result, String outputPath) {
-		Dataset<CommunityResult> community_products = result
+		Dataset<CommunityResult> communityProducts = result
 			.filter((FilterFunction<CommunityResult>) r -> containsCommunity(r, c));
 
-		try {
-			community_products.first();
-			community_products
-				.write()
-				.option("compression", "gzip")
-				.mode(SaveMode.Overwrite)
-				.json(outputPath + "/" + c);
-		} catch (Exception e) {
-
-		}
+		communityProducts
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Overwrite)
+			.json(outputPath);
 
 	}
 
@@ -75,9 +72,9 @@ public class CommunitySplit implements Serializable {
 			return r
 				.getContext()
 				.stream()
-				.filter(con -> con.getCode().equals(c))
+				.map(Context::getCode)
 				.collect(Collectors.toList())
-				.size() > 0;
+				.contains(c);
 		}
 		return false;
 	}

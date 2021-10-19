@@ -15,8 +15,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class ExternalIdTypeDeserializer extends JsonDeserializer<ExternalIdType> {
 
 	@Override
-	public ExternalIdType deserialize(final JsonParser p, final DeserializationContext ctxt)
-		throws IOException, JsonProcessingException {
+	public ExternalIdType deserialize(final JsonParser p, final DeserializationContext ctxt) throws IOException {
 		final ObjectCodec oc = p.getCodec();
 		final JsonNode node = oc.readTree(p);
 

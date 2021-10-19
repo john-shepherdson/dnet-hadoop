@@ -25,7 +25,12 @@
 		"paramLongName": "isSparkSessionManaged",
 		"paramDescription": "true if the spark session is managed, false otherwise",
 		"paramRequired": false
-	}
+	},	{
+	"paramName":"cid",
+	"paramLongName":"communityId",
+	"paramDescription": "the id of the community to be dumped",
+	"paramRequired": false
+}
 ]
 
 

@@ -4,7 +4,9 @@ package eu.dnetlib.dhp.oa.graph.dump.funderresults;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -14,16 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.api.zenodo.Community;
-import eu.dnetlib.dhp.oa.graph.dump.Constants;
-import eu.dnetlib.dhp.oa.graph.dump.ResultMapper;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
-import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import scala.Tuple2;
 
 /**
  * Splits the dumped results by funder and stores them in a folder named as the funder nsp (for all the funders, but the EC
@@ -54,8 +49,8 @@ public class SparkDumpFunderResults implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		final String relationPath = parser.get("relationPath");
-		log.info("relationPath: {}", relationPath);
+		final String graphPath = parser.get("graphPath");
+		log.info("relationPath: {}", graphPath);
 
 		SparkConf conf = new SparkConf();
 
@@ -64,18 +59,15 @@ public class SparkDumpFunderResults implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				writeResultProjectList(spark, inputPath, outputPath, relationPath);
+				writeResultProjectList(spark, inputPath, outputPath, graphPath);
 			});
 	}
 
 	private static void writeResultProjectList(SparkSession spark, String inputPath, String outputPath,
-		String relationPath) {
+		String graphPath) {
 
-		Dataset<Relation> relation = Utils
-			.readPath(spark, relationPath + "/relation", Relation.class)
-			.filter(
-				"dataInfo.deletedbyinference = false and lower(relClass) = '"
-					+ ModelConstants.IS_PRODUCED_BY.toLowerCase() + "'");
+		Dataset<eu.dnetlib.dhp.schema.oaf.Project> project = Utils
+			.readPath(spark, graphPath + "/project", eu.dnetlib.dhp.schema.oaf.Project.class);
 
 		Dataset<CommunityResult> result = Utils
 			.readPath(spark, inputPath + "/publication", CommunityResult.class)
@@ -83,8 +75,8 @@ public class SparkDumpFunderResults implements Serializable {
 			.union(Utils.readPath(spark, inputPath + "/orp", CommunityResult.class))
 			.union(Utils.readPath(spark, inputPath + "/software", CommunityResult.class));
 
-		List<String> funderList = relation
-			.select("target")
+		List<String> funderList = project
+			.select("id")
 			.map((MapFunction<Row, String>) value -> value.getString(0).substring(0, 15), Encoders.STRING())
 			.distinct()
 			.collectAsList();
@@ -102,19 +94,26 @@ public class SparkDumpFunderResults implements Serializable {
 			} else {
 				funderdump = fundernsp.substring(0, fundernsp.indexOf("_")).toUpperCase();
 			}
-			writeFunderResult(funder, result, outputPath + "/" + funderdump);
+			writeFunderResult(funder, result, outputPath, funderdump);
 		});
 
 	}
 
-	private static void writeFunderResult(String funder, Dataset<CommunityResult> results, String outputPath) {
+	private static void dumpResults(String nsp, Dataset<CommunityResult> results, String outputPath,
+		String funderName) {
 
 		results.map((MapFunction<CommunityResult, CommunityResult>) r -> {
 			if (!Optional.ofNullable(r.getProjects()).isPresent()) {
 				return null;
 			}
 			for (Project p : r.getProjects()) {
-				if (p.getId().startsWith(funder)) {
+				if (p.getId().startsWith(nsp)) {
+					if (nsp.startsWith("40|irb")) {
+						if (p.getFunder().getShortName().equals(funderName))
+							return r;
+						else
+							return null;
+					}
 					return r;
 				}
 			}
@@ -124,7 +123,18 @@ public class SparkDumpFunderResults implements Serializable {
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.json(outputPath);
+			.json(outputPath + "/" + funderName);
+	}
+
+	private static void writeFunderResult(String funder, Dataset<CommunityResult> results, String outputPath,
+		String funderDump) {
+
+		if (funder.startsWith("40|irb")) {
+			dumpResults(funder, results, outputPath, "HRZZ");
+			dumpResults(funder, results, outputPath, "MZOS");
+		} else
+			dumpResults(funder, results, outputPath, funderDump);
+
 	}
 
 }

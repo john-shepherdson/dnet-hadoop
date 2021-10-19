@@ -3,29 +3,15 @@ package eu.dnetlib.dhp.oa.dedup.graph;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.spark.api.java.function.MapFunction;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 
-import eu.dnetlib.dhp.oa.dedup.DedupUtility;
-import eu.dnetlib.dhp.oa.dedup.IdGenerator;
-import eu.dnetlib.dhp.oa.dedup.model.Identifier;
-import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.utils.DHPUtils;
-import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.util.MapDocumentUtil;
 import eu.dnetlib.pace.util.PaceException;
 
 public class ConnectedComponent implements Serializable {

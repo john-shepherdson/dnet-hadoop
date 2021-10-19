@@ -11,8 +11,11 @@ public class XmlSerializationUtils {
 
 	// XML 1.0
 	// #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
-	private static final String xml10pattern = "[^" + "\u0009\r\n" + "\u0020-\uD7FF" + "\uE000-\uFFFD"
+	private static final String XML_10_PATTERN = "[^" + "\u0009\r\n" + "\u0020-\uD7FF" + "\uE000-\uFFFD"
 		+ "\ud800\udc00-\udbff\udfff" + "]";
+
+	private XmlSerializationUtils() {
+	}
 
 	public static String mapJournal(Journal j) {
 		final String attrs = new StringBuilder()
@@ -50,12 +53,12 @@ public class XmlSerializationUtils {
 
 	public static String escapeXml(final String value) {
 		return value
-			.replaceAll("&", "&amp;")
-			.replaceAll("<", "&lt;")
-			.replaceAll(">", "&gt;")
-			.replaceAll("\"", "&quot;")
-			.replaceAll("'", "&apos;")
-			.replaceAll(xml10pattern, "");
+			.replace("&", "&amp;")
+			.replace("<", "&lt;")
+			.replace(">", "&gt;")
+			.replace("\"", "&quot;")
+			.replace("'", "&apos;")
+			.replaceAll(XML_10_PATTERN, "");
 	}
 
 	public static String parseDataInfo(final DataInfo dataInfo) {
@@ -68,18 +71,6 @@ public class XmlSerializationUtils {
 			.append(asXmlElement("provenanceaction", null, dataInfo.getProvenanceaction(), null))
 			.append("</datainfo>")
 			.toString();
-	}
-
-	private static StringBuilder dataInfoAsAttributes(final StringBuilder sb, final DataInfo info) {
-		return sb
-			.append(
-				attr("inferred", info.getInferred() != null ? info.getInferred().toString() : ""))
-			.append(attr("inferenceprovenance", info.getInferenceprovenance()))
-			.append(
-				attr(
-					"provenanceaction",
-					info.getProvenanceaction() != null ? info.getProvenanceaction().getClassid() : ""))
-			.append(attr("trust", info.getTrust()));
 	}
 
 	public static String mapKeyValue(final String name, final KeyValue kv) {

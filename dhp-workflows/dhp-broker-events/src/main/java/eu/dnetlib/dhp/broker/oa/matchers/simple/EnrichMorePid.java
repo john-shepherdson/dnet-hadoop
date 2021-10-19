@@ -18,7 +18,7 @@ public class EnrichMorePid extends UpdateMatcher<OaBrokerTypedValue> {
 		super(20,
 			pid -> Topic.ENRICH_MORE_PID,
 			(p, pid) -> p.getPids().add(pid),
-			pid -> pidAsString(pid));
+			EnrichMorePid::pidAsString);
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class EnrichMorePid extends UpdateMatcher<OaBrokerTypedValue> {
 		final Set<String> existingPids = target
 			.getPids()
 			.stream()
-			.map(pid -> pidAsString(pid))
+			.map(EnrichMorePid::pidAsString)
 			.collect(Collectors.toSet());
 
 		return source

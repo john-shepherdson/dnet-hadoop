@@ -69,7 +69,7 @@ public class SparkUpdateProjectTest {
 	}
 
 	@Test
-	public void numberDistinctProgrammeTest() throws Exception {
+	void numberDistinctProgrammeTest() throws Exception {
 		SparkAtomicActionJob
 			.main(
 				new String[] {
@@ -78,7 +78,7 @@ public class SparkUpdateProjectTest {
 					"-programmePath",
 					getClass()
 						.getResource(
-							"/eu/dnetlib/dhp/actionmanager/project/preparedProgramme_whole.json.gz")
+							"/eu/dnetlib/dhp/actionmanager/project/preparedProgramme_whole.json")
 						.getPath(),
 					"-projectPath",
 					getClass().getResource("/eu/dnetlib/dhp/actionmanager/project/prepared_projects.json").getPath(),

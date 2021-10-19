@@ -19,7 +19,7 @@ public class GeonamesAdmin implements Serializable {
 	@JsonProperty("code")
 	private String code;
 
-	private final static long serialVersionUID = 7294958526269195673L;
+	private static final long serialVersionUID = 7294958526269195673L;
 
 	public String getAsciiName() {
 		return asciiName;

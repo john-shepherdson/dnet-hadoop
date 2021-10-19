@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.oa.provision;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -16,11 +15,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
-import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.StreamingInputDocumentFactory;
@@ -49,7 +46,7 @@ public class IndexRecordTransformerTest {
 
 	@Test
 	public void testPreBuiltRecordTransformation() throws IOException, TransformerException {
-		String record = IOUtils.toString(getClass().getResourceAsStream("record.xml"));
+		final String record = IOUtils.toString(getClass().getResourceAsStream("record.xml"));
 
 		testRecordTransformation(record);
 	}
@@ -57,14 +54,14 @@ public class IndexRecordTransformerTest {
 	@Test
 	public void testPublicationRecordTransformation() throws IOException, TransformerException {
 
-		XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false, XmlConverterJob.schemaLocation,
-			XmlRecordFactoryTest.otherDsTypeId);
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+			XmlConverterJob.schemaLocation);
 
-		Publication p = load("publication.json", Publication.class);
-		Project pj = load("project.json", Project.class);
-		Relation rel = load("relToValidatedProject.json", Relation.class);
+		final Publication p = load("publication.json", Publication.class);
+		final Project pj = load("project.json", Project.class);
+		final Relation rel = load("relToValidatedProject.json", Relation.class);
 
-		JoinedEntity je = new JoinedEntity<>(p);
+		final JoinedEntity je = new JoinedEntity<>(p);
 		je
 			.setLinks(
 				Lists
@@ -72,24 +69,58 @@ public class IndexRecordTransformerTest {
 						new RelatedEntityWrapper(rel,
 							CreateRelatedEntitiesJob_phase1.asRelatedEntity(pj, Project.class))));
 
-		String record = xmlRecordFactory.build(je);
+		final String record = xmlRecordFactory.build(je);
 
 		assertNotNull(record);
 
 		testRecordTransformation(record);
 	}
 
-	private void testRecordTransformation(String record) throws IOException, TransformerException {
-		String fields = IOUtils.toString(getClass().getResourceAsStream("fields.xml"));
-		String xslt = IOUtils.toString(getClass().getResourceAsStream("layoutToRecordTransformer.xsl"));
+	@Test
+	public void testForEOSCFutureDataTransferPilot() throws IOException, TransformerException {
+		final String record = IOUtils.toString(getClass().getResourceAsStream("eosc-future/data-transfer-pilot.xml"));
+		testRecordTransformation(record);
+	}
 
-		String transformer = XmlIndexingJob.getLayoutTransformer("DMF", fields, xslt);
+	@Test
+	public void testForEOSCFutureTraining() throws IOException, TransformerException {
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/training-notebooks-seadatanet.xml"));
+		testRecordTransformation(record);
+	}
 
-		Transformer tr = SaxonTransformerFactory.newInstance(transformer);
+	@Test
+	public void testForEOSCFutureAirQualityCopernicus() throws IOException, TransformerException {
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/air-quality-copernicus.xml"));
+		testRecordTransformation(record);
+	}
 
-		String indexRecordXML = XmlIndexingJob.toIndexRecord(tr, record);
+	@Test
+	public void testForEOSCFutureB2SharePlotSw() throws IOException, TransformerException {
+		final String record = IOUtils.toString(getClass().getResourceAsStream("eosc-future/b2share-plot-sw.xml"));
+		testRecordTransformation(record);
+	}
 
-		SolrInputDocument solrDoc = new StreamingInputDocumentFactory(VERSION, DSID).parseDocument(indexRecordXML);
+	@Test
+	public void testForEOSCFutureB2SharePlotRelatedORP() throws IOException, TransformerException {
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/b2share-plot-related-orp.xml"));
+		testRecordTransformation(record);
+	}
+
+	private void testRecordTransformation(final String record) throws IOException, TransformerException {
+		final String fields = IOUtils.toString(getClass().getResourceAsStream("fields.xml"));
+		final String xslt = IOUtils.toString(getClass().getResourceAsStream("layoutToRecordTransformer.xsl"));
+
+		final String transformer = XmlIndexingJob.getLayoutTransformer("DMF", fields, xslt);
+
+		final Transformer tr = SaxonTransformerFactory.newInstance(transformer);
+
+		final String indexRecordXML = XmlIndexingJob.toIndexRecord(tr, record);
+
+		final SolrInputDocument solrDoc = new StreamingInputDocumentFactory(VERSION, DSID)
+			.parseDocument(indexRecordXML);
 
 		final String xmlDoc = ClientUtils.toXML(solrDoc);
 
@@ -97,7 +128,7 @@ public class IndexRecordTransformerTest {
 		System.out.println(xmlDoc);
 	}
 
-	private <T> T load(String fileName, Class<T> clazz) throws IOException {
+	private <T> T load(final String fileName, final Class<T> clazz) throws IOException {
 		return XmlRecordFactoryTest.OBJECT_MAPPER
 			.readValue(IOUtils.toString(getClass().getResourceAsStream(fileName)), clazz);
 	}

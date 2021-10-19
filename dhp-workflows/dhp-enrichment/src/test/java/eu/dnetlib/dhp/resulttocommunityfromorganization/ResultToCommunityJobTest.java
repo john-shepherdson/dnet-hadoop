@@ -65,7 +65,7 @@ public class ResultToCommunityJobTest {
 	}
 
 	@Test
-	public void testSparkResultToCommunityFromOrganizationJob() throws Exception {
+	void testSparkResultToCommunityFromOrganizationJob() throws Exception {
 		final String preparedInfoPath = getClass()
 			.getResource("/eu/dnetlib/dhp/resulttocommunityfromorganization/preparedInfo")
 			.getPath();

@@ -43,7 +43,6 @@ public class ResultTagger implements Serializable {
 				param.put(key, jsonContext.read(params.get(key)));
 			} catch (com.jayway.jsonpath.PathNotFoundException e) {
 				param.put(key, new ArrayList<>());
-				// throw e;
 			}
 		}
 		return param;
@@ -52,9 +51,6 @@ public class ResultTagger implements Serializable {
 	public <R extends Result> R enrichContextCriteria(
 		final R result, final CommunityConfiguration conf, final Map<String, String> criteria) {
 
-		// }
-		// public Result enrichContextCriteria(final Result result, final CommunityConfiguration
-		// conf, final Map<String,String> criteria) {
 		final Map<String, List<String>> param = getParamMap(result, criteria);
 
 		// Verify if the entity is deletedbyinference. In case verify if to clean the context list
@@ -74,7 +70,7 @@ public class ResultTagger implements Serializable {
 			result
 				.getSubject()
 				.stream()
-				.map(subject -> subject.getValue())
+				.map(StructuredProperty::getValue)
 				.filter(StringUtils::isNotBlank)
 				.map(String::toLowerCase)
 				.map(String::trim)
@@ -90,15 +86,11 @@ public class ResultTagger implements Serializable {
 
 		if (Objects.nonNull(result.getInstance())) {
 			for (Instance i : result.getInstance()) {
-				if (Objects.nonNull(i.getCollectedfrom())) {
-					if (Objects.nonNull(i.getCollectedfrom().getKey())) {
-						tmp.add(StringUtils.substringAfter(i.getCollectedfrom().getKey(), "|"));
-					}
+				if (Objects.nonNull(i.getCollectedfrom()) && Objects.nonNull(i.getCollectedfrom().getKey())) {
+					tmp.add(StringUtils.substringAfter(i.getCollectedfrom().getKey(), "|"));
 				}
-				if (Objects.nonNull(i.getHostedby())) {
-					if (Objects.nonNull(i.getHostedby().getKey())) {
-						tmp.add(StringUtils.substringAfter(i.getHostedby().getKey(), "|"));
-					}
+				if (Objects.nonNull(i.getHostedby()) && Objects.nonNull(i.getHostedby().getKey())) {
+					tmp.add(StringUtils.substringAfter(i.getHostedby().getKey(), "|"));
 				}
 
 			}
@@ -149,52 +141,46 @@ public class ResultTagger implements Serializable {
 			return result;
 		}
 
-		result
-			.getContext()
-			.stream()
-			.map(
-				c -> {
-					if (communities.contains(c.getId())) {
-						Optional<List<DataInfo>> opt_dataInfoList = Optional.ofNullable(c.getDataInfo());
-						List<DataInfo> dataInfoList;
-						if (opt_dataInfoList.isPresent())
-							dataInfoList = opt_dataInfoList.get();
-						else {
-							dataInfoList = new ArrayList<>();
-							c.setDataInfo(dataInfoList);
-						}
-						if (subjects.contains(c.getId()))
-							dataInfoList
-								.add(
-									getDataInfo(
-										BULKTAG_DATA_INFO_TYPE,
-										CLASS_ID_SUBJECT,
-										CLASS_NAME_BULKTAG_SUBJECT,
-										TAGGING_TRUST));
-						if (datasources.contains(c.getId()))
-							dataInfoList
-								.add(
-									getDataInfo(
-										BULKTAG_DATA_INFO_TYPE,
-										CLASS_ID_DATASOURCE,
-										CLASS_NAME_BULKTAG_DATASOURCE,
-										TAGGING_TRUST));
-						if (czenodo.contains(c.getId()))
-							dataInfoList
-								.add(
-									getDataInfo(
-										BULKTAG_DATA_INFO_TYPE,
-										CLASS_ID_CZENODO,
-										CLASS_NAME_BULKTAG_ZENODO,
-										TAGGING_TRUST));
-					}
-					return c;
-				})
-			.collect(Collectors.toList());
+		result.getContext().forEach(c -> {
+			if (communities.contains(c.getId())) {
+				Optional<List<DataInfo>> opt_dataInfoList = Optional.ofNullable(c.getDataInfo());
+				List<DataInfo> dataInfoList;
+				if (opt_dataInfoList.isPresent())
+					dataInfoList = opt_dataInfoList.get();
+				else {
+					dataInfoList = new ArrayList<>();
+					c.setDataInfo(dataInfoList);
+				}
+				if (subjects.contains(c.getId()))
+					dataInfoList
+						.add(
+							getDataInfo(
+								BULKTAG_DATA_INFO_TYPE,
+								CLASS_ID_SUBJECT,
+								CLASS_NAME_BULKTAG_SUBJECT,
+								TAGGING_TRUST));
+				if (datasources.contains(c.getId()))
+					dataInfoList
+						.add(
+							getDataInfo(
+								BULKTAG_DATA_INFO_TYPE,
+								CLASS_ID_DATASOURCE,
+								CLASS_NAME_BULKTAG_DATASOURCE,
+								TAGGING_TRUST));
+				if (czenodo.contains(c.getId()))
+					dataInfoList
+						.add(
+							getDataInfo(
+								BULKTAG_DATA_INFO_TYPE,
+								CLASS_ID_CZENODO,
+								CLASS_NAME_BULKTAG_ZENODO,
+								TAGGING_TRUST));
+			}
+		});
 
 		communities
 			.removeAll(
-				result.getContext().stream().map(c -> c.getId()).collect(Collectors.toSet()));
+				result.getContext().stream().map(Context::getId).collect(Collectors.toSet()));
 
 		if (communities.isEmpty())
 			return result;

@@ -8,6 +8,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
@@ -17,10 +18,10 @@ public class QueryInformationSystem {
 
 	private ISLookUpService isLookUp;
 
-	private static final String XQUERY = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') "
+	private static final String XQUERY_ALL = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') "
 		+
 		"  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] " +
-		" and ($x//context/param[./@name = 'status']/text() = 'manager'  or $x//context/param[./@name = 'status']/text() = 'all') "
+		" and ($x//context/param[./@name = 'status']/text() = 'all') "
 		+
 		"  return " +
 		"<community> " +
@@ -28,9 +29,22 @@ public class QueryInformationSystem {
 		"{$x//CONFIGURATION/context/@label}" +
 		"</community>";
 
-	public CommunityMap getCommunityMap()
-		throws ISLookUpException, DocumentException {
-		return getMap(isLookUp.quickSearchProfile(XQUERY));
+	private static final String XQUERY_CI = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') "
+		+
+		"  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] " +
+		" and  $x//CONFIGURATION/context[./@id=%s]  "
+		+
+		"  return " +
+		"<community> " +
+		"{$x//CONFIGURATION/context/@id}" +
+		"{$x//CONFIGURATION/context/@label}" +
+		"</community>";
+
+	public CommunityMap getCommunityMap(boolean singleCommunity, String communityId)
+		throws ISLookUpException, DocumentException, SAXException {
+		if (singleCommunity)
+			return getMap(isLookUp.quickSearchProfile(XQUERY_CI.replace("%s", "'" + communityId + "'")));
+		return getMap(isLookUp.quickSearchProfile(XQUERY_ALL));
 
 	}
 
@@ -42,12 +56,14 @@ public class QueryInformationSystem {
 		this.isLookUp = isLookUpService;
 	}
 
-	private CommunityMap getMap(List<String> communityMap) throws DocumentException {
+	private CommunityMap getMap(List<String> communityMap) throws DocumentException, SAXException {
 		final CommunityMap map = new CommunityMap();
 
 		for (String xml : communityMap) {
 			final Document doc;
-			doc = new SAXReader().read(new StringReader(xml));
+			final SAXReader reader = new SAXReader();
+			reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			doc = reader.read(new StringReader(xml));
 			Element root = doc.getRootElement();
 			map.put(root.attribute("id").getValue(), root.attribute("label").getValue());
 		}

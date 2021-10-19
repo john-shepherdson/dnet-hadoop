@@ -10,6 +10,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.xml.sax.SAXException;
 
 import com.google.common.collect.Sets;
 
@@ -24,6 +25,9 @@ public class DedupUtility {
 
 	public static final String OPENORGS_ID_PREFIX = "openorgs____";
 	public static final String CORDA_ID_PREFIX = "corda";
+
+	private DedupUtility() {
+	}
 
 	public static Map<String, LongAccumulator> constructAccumulator(
 		final DedupConfig dedupConf, final SparkContext context) {
@@ -92,14 +96,16 @@ public class DedupUtility {
 	}
 
 	public static List<DedupConfig> getConfigurations(String isLookUpUrl, String orchestrator)
-		throws ISLookUpException, DocumentException {
+		throws ISLookUpException, DocumentException, SAXException {
 		final ISLookUpService isLookUpService = ISLookupClientFactory.getLookUpService(isLookUpUrl);
 
 		final String xquery = String.format("/RESOURCE_PROFILE[.//DEDUPLICATION/ACTION_SET/@id = '%s']", orchestrator);
 
 		String orchestratorProfile = isLookUpService.getResourceProfileByQuery(xquery);
 
-		final Document doc = new SAXReader().read(new StringReader(orchestratorProfile));
+		final SAXReader reader = new SAXReader();
+		reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		final Document doc = reader.read(new StringReader(orchestratorProfile));
 
 		final String actionSetId = doc.valueOf("//DEDUPLICATION/ACTION_SET/@id");
 		final List<DedupConfig> configurations = new ArrayList<>();

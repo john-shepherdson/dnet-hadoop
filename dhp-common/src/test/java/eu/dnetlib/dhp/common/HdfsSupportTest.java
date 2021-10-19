@@ -21,13 +21,13 @@ public class HdfsSupportTest {
 	class Remove {
 
 		@Test
-		public void shouldThrowARuntimeExceptionOnError() {
+		void shouldThrowARuntimeExceptionOnError() {
 			// when
 			assertThrows(RuntimeException.class, () -> HdfsSupport.remove(null, new Configuration()));
 		}
 
 		@Test
-		public void shouldRemoveADirFromHDFS(@TempDir Path tempDir) {
+		void shouldRemoveADirFromHDFS(@TempDir Path tempDir) {
 			// when
 			HdfsSupport.remove(tempDir.toString(), new Configuration());
 
@@ -36,7 +36,7 @@ public class HdfsSupportTest {
 		}
 
 		@Test
-		public void shouldRemoveAFileFromHDFS(@TempDir Path tempDir) throws IOException {
+		void shouldRemoveAFileFromHDFS(@TempDir Path tempDir) throws IOException {
 			// given
 			Path file = Files.createTempFile(tempDir, "p", "s");
 
@@ -52,13 +52,13 @@ public class HdfsSupportTest {
 	class ListFiles {
 
 		@Test
-		public void shouldThrowARuntimeExceptionOnError() {
+		void shouldThrowARuntimeExceptionOnError() {
 			// when
 			assertThrows(RuntimeException.class, () -> HdfsSupport.listFiles(null, new Configuration()));
 		}
 
 		@Test
-		public void shouldListFilesLocatedInPath(@TempDir Path tempDir) throws IOException {
+		void shouldListFilesLocatedInPath(@TempDir Path tempDir) throws IOException {
 			Path subDir1 = Files.createTempDirectory(tempDir, "list_me");
 			Path subDir2 = Files.createTempDirectory(tempDir, "list_me");
 

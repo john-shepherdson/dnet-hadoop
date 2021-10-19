@@ -45,6 +45,7 @@ public class DropAndCreateESIndex {
 					.requireNonNull(
 						DropAndCreateESIndex.class.getResourceAsStream("/eu/dnetlib/dhp/sx/provision/cluster.json")));
 
+		@SuppressWarnings("unchecked")
 		Map<String, String> clusterMap = new ObjectMapper().readValue(clusterJson, Map.class);
 
 		final String ip = clusterMap.get(cluster).split(",")[0];
@@ -70,6 +71,9 @@ public class DropAndCreateESIndex {
 			log.info("deleting Index SCHOLIX");
 			log.info(STATUS_CODE_TEXT, response.getStatusLine());
 		}
+
+		log.info("Sleeping 60 seconds to avoid to lost the creation of index request");
+		Thread.sleep(60000);
 
 		try (CloseableHttpClient client = HttpClients.createDefault()) {
 

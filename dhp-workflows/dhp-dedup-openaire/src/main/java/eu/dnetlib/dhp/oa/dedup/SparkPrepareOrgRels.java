@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
+import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -32,6 +33,7 @@ import scala.Tuple3;
 public class SparkPrepareOrgRels extends AbstractSparkAction {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkPrepareOrgRels.class);
+	public static final String GROUP_PREFIX = "group::";
 
 	public SparkPrepareOrgRels(ArgumentApplicationParser parser, SparkSession spark) {
 		super(parser, spark);
@@ -41,7 +43,7 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					SparkCreateSimRels.class
+					SparkPrepareOrgRels.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/oa/dedup/prepareOrgRels_parameters.json")));
 		parser.parseArgument(args);
@@ -81,8 +83,9 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 		log.info("table:         '{}'", dbTable);
 		log.info("dbPwd:         '{}'", "xxx");
 
-		final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, "organization");
-		final String entityPath = DedupUtility.createEntityPath(graphBasePath, "organization");
+		final String organization = ModelSupport.getMainType(EntityType.organization);
+		final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, organization);
+		final String entityPath = DedupUtility.createEntityPath(graphBasePath, organization);
 		final String relationPath = DedupUtility.createEntityPath(graphBasePath, "relation");
 
 		Dataset<OrgSimRel> relations = createRelations(spark, mergeRelPath, relationPath, entityPath);
@@ -168,7 +171,7 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 			.map(g -> Lists.newArrayList(g._2()))
 			.filter(l -> l.size() > 1)
 			.flatMap(l -> {
-				String groupId = "group::" + UUID.randomUUID();
+				String groupId = GROUP_PREFIX + UUID.randomUUID();
 				List<String> ids = sortIds(l); // sort IDs by type
 				List<Tuple2<Tuple2<String, String>, String>> rels = new ArrayList<>();
 				String source = ids.get(0);
@@ -192,7 +195,7 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 					.collect(Collectors.toList())))
 			// <source|||target, list(group_id, "diffRel")>: take only relations with only the group_id, it
 			// means they are correct. If the diffRel is present the relation has to be removed
-			.filter(g -> g._2().size() == 1 && g._2().get(0).contains("group::"))
+			.filter(g -> g._2().size() == 1 && g._2().get(0).contains(GROUP_PREFIX))
 			.map(
 				t -> new Tuple3<>(
 					t._1().split("@@@")[0],
@@ -255,7 +258,7 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 
 	// Sort IDs basing on the type. Priority: 1) openorgs, 2)corda, 3)alphabetic
 	public static List<String> sortIds(List<String> ids) {
-		ids.sort((o1, o2) -> DedupUtility.compareOpenOrgIds(o1, o2));
+		ids.sort(DedupUtility::compareOpenOrgIds);
 		return ids;
 	}
 
@@ -289,9 +292,10 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 						List<Tuple2<String, String>> rels = new ArrayList<>();
 						for (String id1 : g._2()) {
 							for (String id2 : g._2()) {
-								if (!id1.equals(id2))
-									if (id1.contains(DedupUtility.OPENORGS_ID_PREFIX) && !id2.contains("openorgsmesh"))
-										rels.add(new Tuple2<>(id1, id2));
+								if (!id1.equals(id2) && id1.contains(DedupUtility.OPENORGS_ID_PREFIX)
+									&& !id2.contains("openorgsmesh")) {
+									rels.add(new Tuple2<>(id1, id2));
+								}
 							}
 						}
 						return rels.iterator();
@@ -310,7 +314,7 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 					r._2()._2().getCountry() != null ? r._2()._2().getCountry().getClassid() : "",
 					r._2()._2().getWebsiteurl() != null ? r._2()._2().getWebsiteurl().getValue() : "",
 					r._2()._2().getCollectedfrom().get(0).getValue(),
-					"group::" + r._1()._1(),
+					GROUP_PREFIX + r._1()._1(),
 					structuredPropertyListToString(r._2()._2().getPid()),
 					parseECField(r._2()._2().getEclegalbody()),
 					parseECField(r._2()._2().getEclegalperson()),

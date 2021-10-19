@@ -32,7 +32,7 @@ public class ZenodoUploadTest {
 	}
 
 	@Test
-	public void testNewDeposition() throws IOException {
+	void testNewDeposition() throws IOException {
 		CommunityMap communityMap = new CommunityMap();
 		communityMap.put("ni", "Neuroinformatics");
 		communityMap.put("dh-ch", "Digital Humanities and Cultural Heritage");
@@ -86,7 +86,7 @@ public class ZenodoUploadTest {
 	}
 
 	@Test
-	public void testNewVersion() throws IOException, MissingConceptDoiException {
+	void testNewVersion() throws IOException, MissingConceptDoiException {
 
 		ZenodoAPIClient client = new ZenodoAPIClient(URL_STRING,
 			ACCESS_TOKEN);
@@ -137,7 +137,7 @@ public class ZenodoUploadTest {
 	}
 
 	@Test
-	public void readCommunityMap() throws IOException {
+	void readCommunityMap() throws IOException {
 		LocalFileSystem fs = FileSystem.getLocal(new Configuration());
 		System.out
 			.println(

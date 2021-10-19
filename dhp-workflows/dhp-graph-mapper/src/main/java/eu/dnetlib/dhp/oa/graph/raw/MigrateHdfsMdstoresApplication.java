@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -82,11 +83,11 @@ public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication
 	public static void processPaths(final SparkSession spark,
 		final String outputPath,
 		final Set<String> paths,
-		final String type) throws Exception {
+		final String type) {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		log.info("Found " + paths.size() + " not empty mdstores");
+		log.info("Found {} not empty mdstores", paths.size());
 		paths.forEach(log::info);
 
 		final String[] validPaths = paths
@@ -98,7 +99,7 @@ public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication
 			spark
 				.read()
 				.parquet(validPaths)
-				.map((MapFunction<Row, String>) r -> enrichRecord(r), Encoders.STRING())
+				.map((MapFunction<Row, String>) MigrateHdfsMdstoresApplication::enrichRecord, Encoders.STRING())
 				.toJavaRDD()
 				.mapToPair(xml -> new Tuple2<>(new Text(UUID.randomUUID() + ":" + type), new Text(xml)))
 				// .coalesce(1)
@@ -120,7 +121,9 @@ public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication
 		final String tranDate = dateFormat.format(new Date((Long) r.getAs("dateOfTransformation")));
 
 		try {
-			final Document doc = new SAXReader().read(new StringReader(xml));
+			final SAXReader reader = new SAXReader();
+			reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			final Document doc = reader.read(new StringReader(xml));
 			final Element head = (Element) doc.selectSingleNode("//*[local-name() = 'header']");
 			head.addElement(new QName("objIdentifier", DRI_NS_PREFIX)).addText(r.getAs("id"));
 			head.addElement(new QName("dateOfCollection", DRI_NS_PREFIX)).addText(collDate);
@@ -132,31 +135,4 @@ public class MigrateHdfsMdstoresApplication extends AbstractMigrationApplication
 		}
 	}
 
-	private static Set<String> mdstorePaths(final String mdstoreManagerUrl,
-		final String format,
-		final String layout,
-		final String interpretation)
-		throws Exception {
-		final String url = mdstoreManagerUrl + "/mdstores/";
-		final ObjectMapper objectMapper = new ObjectMapper();
-
-		final HttpGet req = new HttpGet(url);
-
-		try (final CloseableHttpClient client = HttpClients.createDefault()) {
-			try (final CloseableHttpResponse response = client.execute(req)) {
-				final String json = IOUtils.toString(response.getEntity().getContent());
-				final MDStoreWithInfo[] mdstores = objectMapper.readValue(json, MDStoreWithInfo[].class);
-				return Arrays
-					.stream(mdstores)
-					.filter(md -> md.getFormat().equalsIgnoreCase(format))
-					.filter(md -> md.getLayout().equalsIgnoreCase(layout))
-					.filter(md -> md.getInterpretation().equalsIgnoreCase(interpretation))
-					.filter(md -> StringUtils.isNotBlank(md.getHdfsPath()))
-					.filter(md -> StringUtils.isNotBlank(md.getCurrentVersion()))
-					.filter(md -> md.getSize() > 0)
-					.map(md -> md.getHdfsPath() + "/" + md.getCurrentVersion() + "/store")
-					.collect(Collectors.toSet());
-			}
-		}
-	}
 }

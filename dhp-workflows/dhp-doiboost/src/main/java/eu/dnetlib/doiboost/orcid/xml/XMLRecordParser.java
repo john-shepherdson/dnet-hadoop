@@ -1,7 +1,6 @@
 
 package eu.dnetlib.doiboost.orcid.xml;
 
-import java.io.IOException;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +36,9 @@ public class XMLRecordParser {
 	private static final String NS_HISTORY_URL = "http://www.orcid.org/ns/history";
 
 	private static final String NS_ERROR = "error";
+
+	private XMLRecordParser() {
+	}
 
 	public static AuthorData VTDParseAuthorData(byte[] bytes)
 		throws VtdException, ParseException {
@@ -90,46 +92,6 @@ public class XMLRecordParser {
 			authorData.setOtherNames(otherNames);
 		}
 
-//		final String creationMethod = VtdUtilityParser.getSingleValue(ap, vn, "//history:creation-method");
-//		if (StringUtils.isNoneBlank(creationMethod)) {
-//			authorData.setCreationMethod(creationMethod);
-//		}
-//
-//		final String completionDate = VtdUtilityParser.getSingleValue(ap, vn, "//history:completion-date");
-//		if (StringUtils.isNoneBlank(completionDate)) {
-//			authorData.setCompletionDate(completionDate);
-//		}
-//
-//		final String submissionDate = VtdUtilityParser.getSingleValue(ap, vn, "//history:submission-date");
-//		if (StringUtils.isNoneBlank(submissionDate)) {
-//			authorData.setSubmissionDate(submissionDate);
-//		}
-//
-//		final String claimed = VtdUtilityParser.getSingleValue(ap, vn, "//history:claimed");
-//		if (StringUtils.isNoneBlank(claimed)) {
-//			authorData.setClaimed(Boolean.parseBoolean(claimed));
-//		}
-//
-//		final String verifiedEmail = VtdUtilityParser.getSingleValue(ap, vn, "//history:verified-email");
-//		if (StringUtils.isNoneBlank(verifiedEmail)) {
-//			authorData.setVerifiedEmail(Boolean.parseBoolean(verifiedEmail));
-//		}
-//
-//		final String verifiedPrimaryEmail = VtdUtilityParser.getSingleValue(ap, vn, "//history:verified-primary-email");
-//		if (StringUtils.isNoneBlank(verifiedPrimaryEmail)) {
-//			authorData.setVerifiedPrimaryEmail(Boolean.parseBoolean(verifiedPrimaryEmail));
-//		}
-//
-//		final String deactivationDate = VtdUtilityParser.getSingleValue(ap, vn, "//history:deactivation-date");
-//		if (StringUtils.isNoneBlank(deactivationDate)) {
-//			authorData.setDeactivationDate(deactivationDate);
-//		}
-//
-//		final String lastModifiedDate = VtdUtilityParser
-//			.getSingleValue(ap, vn, "//history:history/common:last-modified-date");
-//		if (StringUtils.isNoneBlank(lastModifiedDate)) {
-//			authorData.setLastModifiedDate(lastModifiedDate);
-//		}
 		return authorData;
 	}
 
@@ -207,7 +169,7 @@ public class XMLRecordParser {
 	}
 
 	public static Map<String, String> retrieveWorkIdLastModifiedDate(byte[] bytes)
-		throws ParseException, XPathParseException, NavException, XPathEvalException, IOException {
+		throws ParseException, XPathParseException, NavException, XPathEvalException {
 		final VTDGen vg = new VTDGen();
 		vg.setDoc(bytes);
 		vg.parse(true);
@@ -251,15 +213,15 @@ public class XMLRecordParser {
 		ap.declareXPathNameSpace(NS_ERROR, NS_ERROR_URL);
 		ap.declareXPathNameSpace(NS_HISTORY, NS_HISTORY_URL);
 
-		AuthorData authorData = retrieveAuthorData(ap, vn, bytes);
-		AuthorHistory authorHistory = retrieveAuthorHistory(ap, vn, bytes);
+		AuthorData authorData = retrieveAuthorData(ap, vn);
+		AuthorHistory authorHistory = retrieveAuthorHistory(ap, vn);
 		AuthorSummary authorSummary = new AuthorSummary();
 		authorSummary.setAuthorData(authorData);
 		authorSummary.setAuthorHistory(authorHistory);
 		return authorSummary;
 	}
 
-	private static AuthorData retrieveAuthorData(AutoPilot ap, VTDNav vn, byte[] bytes)
+	private static AuthorData retrieveAuthorData(AutoPilot ap, VTDNav vn)
 		throws VtdException {
 		AuthorData authorData = new AuthorData();
 		final List<String> errors = VtdUtilityParser.getTextValue(ap, vn, "//error:response-code");
@@ -300,7 +262,7 @@ public class XMLRecordParser {
 		return authorData;
 	}
 
-	private static AuthorHistory retrieveAuthorHistory(AutoPilot ap, VTDNav vn, byte[] bytes)
+	private static AuthorHistory retrieveAuthorHistory(AutoPilot ap, VTDNav vn)
 		throws VtdException {
 		AuthorHistory authorHistory = new AuthorHistory();
 		final String creationMethod = VtdUtilityParser.getSingleValue(ap, vn, "//history:creation-method");

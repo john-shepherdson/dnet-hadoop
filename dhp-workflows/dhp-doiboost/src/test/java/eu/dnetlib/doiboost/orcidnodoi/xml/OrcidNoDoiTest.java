@@ -1,8 +1,7 @@
 
 package eu.dnetlib.doiboost.orcidnodoi.xml;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.*;
@@ -25,7 +24,7 @@ import eu.dnetlib.dhp.schema.orcid.Contributor;
 import eu.dnetlib.dhp.schema.orcid.WorkDetail;
 import eu.dnetlib.doiboost.orcidnodoi.similarity.AuthorMatcher;
 
-public class OrcidNoDoiTest {
+class OrcidNoDoiTest {
 
 	private static final Logger logger = LoggerFactory.getLogger(OrcidNoDoiTest.class);
 
@@ -34,7 +33,7 @@ public class OrcidNoDoiTest {
 	static String orcidIdA = "0000-0003-2760-1191";
 
 	@Test
-	public void readPublicationFieldsTest()
+	void readPublicationFieldsTest()
 		throws IOException, XPathEvalException, XPathParseException, NavException, VtdException, ParseException {
 		logger.info("running loadPublicationFieldsTest ....");
 		String xml = IOUtils
@@ -43,10 +42,6 @@ public class OrcidNoDoiTest {
 
 		if (xml == null) {
 			logger.info("Resource not found");
-		}
-		XMLRecordParserNoDoi p = new XMLRecordParserNoDoi();
-		if (p == null) {
-			logger.info("XMLRecordParserNoDoi null");
 		}
 		WorkDetail workData = null;
 		try {
@@ -87,7 +82,7 @@ public class OrcidNoDoiTest {
 	}
 
 	@Test
-	public void authorDoubleMatchTest() throws Exception {
+	void authorDoubleMatchTest() throws Exception {
 		logger.info("running authorSimpleMatchTest ....");
 		String orcidWork = "activity_work_0000-0003-2760-1191-similarity.xml";
 		AuthorData author = new AuthorData();
@@ -98,71 +93,49 @@ public class OrcidNoDoiTest {
 			.toString(
 				OrcidNoDoiTest.class.getResourceAsStream(orcidWork));
 
-		if (xml == null) {
-			logger.info("Resource not found");
-		}
-		XMLRecordParserNoDoi p = new XMLRecordParserNoDoi();
-		if (p == null) {
-			logger.info("XMLRecordParserNoDoi null");
-		}
-		WorkDetail workData = null;
-		try {
-			workData = XMLRecordParserNoDoi.VTDParseWorkData(xml.getBytes());
-		} catch (Exception e) {
-			logger.error("parsing xml", e);
-		}
+		WorkDetail workData = XMLRecordParserNoDoi.VTDParseWorkData(xml.getBytes());
+
 		assertNotNull(workData);
 
 		Contributor a = workData.getContributors().get(0);
-		assertTrue(a.getCreditName().equals("Abdel-Dayem K"));
+		assertEquals("Abdel-Dayem K", a.getCreditName());
 
 		AuthorMatcher.match(author, workData.getContributors());
 
-		assertTrue(workData.getContributors().size() == 6);
+		assertEquals(6, workData.getContributors().size());
 	}
 
 	@Test
-	public void readContributorsTest()
+	void readContributorsTest()
 		throws IOException, XPathEvalException, XPathParseException, NavException, VtdException, ParseException {
 		logger.info("running loadPublicationFieldsTest ....");
 		String xml = IOUtils
 			.toString(
 				OrcidNoDoiTest.class.getResourceAsStream("activity_work_0000-0003-2760-1191_contributors.xml"));
 
-		if (xml == null) {
-			logger.info("Resource not found");
-		}
-		XMLRecordParserNoDoi p = new XMLRecordParserNoDoi();
-		if (p == null) {
-			logger.info("XMLRecordParserNoDoi null");
-		}
-		WorkDetail workData = null;
-		try {
-			workData = XMLRecordParserNoDoi.VTDParseWorkData(xml.getBytes());
-		} catch (Exception e) {
-			logger.error("parsing xml", e);
-		}
+		WorkDetail workData = XMLRecordParserNoDoi.VTDParseWorkData(xml.getBytes());
+
 		assertNotNull(workData.getContributors());
-		assertTrue(workData.getContributors().size() == 5);
+		assertEquals(5, workData.getContributors().size());
 		assertTrue(StringUtils.isBlank(workData.getContributors().get(0).getCreditName()));
-		assertTrue(workData.getContributors().get(0).getSequence().equals("seq0"));
-		assertTrue(workData.getContributors().get(0).getRole().equals("role0"));
-		assertTrue(workData.getContributors().get(1).getCreditName().equals("creditname1"));
+		assertEquals("seq0", workData.getContributors().get(0).getSequence());
+		assertEquals("role0", workData.getContributors().get(0).getRole());
+		assertEquals("creditname1", workData.getContributors().get(1).getCreditName());
 		assertTrue(StringUtils.isBlank(workData.getContributors().get(1).getSequence()));
 		assertTrue(StringUtils.isBlank(workData.getContributors().get(1).getRole()));
-		assertTrue(workData.getContributors().get(2).getCreditName().equals("creditname2"));
-		assertTrue(workData.getContributors().get(2).getSequence().equals("seq2"));
+		assertEquals("creditname2", workData.getContributors().get(2).getCreditName());
+		assertEquals("seq2", workData.getContributors().get(2).getSequence());
 		assertTrue(StringUtils.isBlank(workData.getContributors().get(2).getRole()));
-		assertTrue(workData.getContributors().get(3).getCreditName().equals("creditname3"));
+		assertEquals("creditname3", workData.getContributors().get(3).getCreditName());
 		assertTrue(StringUtils.isBlank(workData.getContributors().get(3).getSequence()));
-		assertTrue(workData.getContributors().get(3).getRole().equals("role3"));
+		assertEquals("role3", workData.getContributors().get(3).getRole());
 		assertTrue(StringUtils.isBlank(workData.getContributors().get(4).getCreditName()));
-		assertTrue(workData.getContributors().get(4).getSequence().equals("seq4"));
-		assertTrue(workData.getContributors().get(4).getRole().equals("role4"));
+		assertEquals("seq4", workData.getContributors().get(4).getSequence());
+		assertEquals("role4", workData.getContributors().get(4).getRole());
 	}
 
 	@Test
-	public void authorSimpleMatchTest() throws Exception {
+	void authorSimpleMatchTest() throws Exception {
 		String orcidWork = "activity_work_0000-0002-5982-8983.xml";
 		AuthorData author = new AuthorData();
 		author.setName("Parkhouse");
@@ -175,10 +148,6 @@ public class OrcidNoDoiTest {
 		if (xml == null) {
 			logger.info("Resource not found");
 		}
-		XMLRecordParserNoDoi p = new XMLRecordParserNoDoi();
-		if (p == null) {
-			logger.info("XMLRecordParserNoDoi null");
-		}
 		WorkDetail workData = null;
 		try {
 			workData = XMLRecordParserNoDoi.VTDParseWorkData(xml.getBytes());
@@ -188,20 +157,21 @@ public class OrcidNoDoiTest {
 		assertNotNull(workData);
 
 		Contributor a = workData.getContributors().get(0);
-		assertTrue(a.getCreditName().equals("Parkhouse, H."));
+		assertEquals("Parkhouse, H.", a.getCreditName());
 
 		AuthorMatcher.match(author, workData.getContributors());
 
-		assertTrue(workData.getContributors().size() == 2);
+		assertEquals(2, workData.getContributors().size());
 		Contributor c = workData.getContributors().get(0);
-		assertTrue(c.getOid().equals("0000-0002-5982-8983"));
-		assertTrue(c.getName().equals("Parkhouse"));
-		assertTrue(c.getSurname().equals("H."));
-		assertTrue(c.getCreditName().equals("Parkhouse, H."));
+
+		assertEquals("0000-0002-5982-8983", c.getOid());
+		assertEquals("Parkhouse", c.getName());
+		assertEquals("H.", c.getSurname());
+		assertEquals("Parkhouse, H.", c.getCreditName());
 	}
 
 	@Test
-	public void match() {
+	void match() {
 
 		AuthorData author = new AuthorData();
 		author.setName("Joe");
@@ -210,7 +180,6 @@ public class OrcidNoDoiTest {
 		Contributor contributor = new Contributor();
 		contributor.setCreditName("Joe Dodge");
 		List<Contributor> contributors = Arrays.asList(contributor);
-		AuthorMatcher am = new AuthorMatcher();
 		int matchCounter = 0;
 		List<Integer> matchCounters = Arrays.asList(matchCounter);
 		contributors
@@ -225,12 +194,13 @@ public class OrcidNoDoiTest {
 				}
 			});
 
-		assertTrue(matchCounters.get(0) == 1);
+		assertEquals(1, matchCounters.get(0));
 		AuthorMatcher.updateAuthorsSimpleMatch(contributors, author);
-		assertTrue(contributors.get(0).getName().equals("Joe"));
-		assertTrue(contributors.get(0).getSurname().equals("Dodge"));
-		assertTrue(contributors.get(0).getCreditName().equals("Joe Dodge"));
-		assertTrue(contributors.get(0).getOid().equals("0000-1111-2222-3333"));
+
+		assertEquals("Joe", contributors.get(0).getName());
+		assertEquals("Dodge", contributors.get(0).getSurname());
+		assertEquals("Joe Dodge", contributors.get(0).getCreditName());
+		assertEquals("0000-1111-2222-3333", contributors.get(0).getOid());
 
 		AuthorData authorX = new AuthorData();
 		authorX.setName(nameA);
@@ -259,7 +229,7 @@ public class OrcidNoDoiTest {
 				}
 			});
 
-		assertTrue(matchCounters2.get(0) == 2);
+		assertEquals(2, matchCounters2.get(0));
 		assertTrue(contributorList.get(0).isSimpleMatch());
 		assertTrue(contributorList.get(1).isSimpleMatch());
 
@@ -271,7 +241,7 @@ public class OrcidNoDoiTest {
 				c.setScore(AuthorMatcher.bestMatch(authorX.getName(), authorX.getSurname(), c.getCreditName()));
 				return c;
 			})
-			.filter(c -> c.getScore() >= AuthorMatcher.threshold)
+			.filter(c -> c.getScore() >= AuthorMatcher.THRESHOLD)
 			.max(Comparator.comparing(c -> c.getScore()));
 		assertTrue(optCon.isPresent());
 
@@ -281,15 +251,16 @@ public class OrcidNoDoiTest {
 		assertTrue(contributorList.get(0).isBestMatch());
 		assertTrue(!contributorList.get(1).isBestMatch());
 		AuthorMatcher.updateAuthorsSimilarityMatch(contributorList, authorX);
-		assertTrue(contributorList.get(0).getName().equals(nameA));
-		assertTrue(contributorList.get(0).getSurname().equals(surnameA));
-		assertTrue(contributorList.get(0).getCreditName().equals("Abdel-Dayem Khai"));
-		assertTrue(contributorList.get(0).getOid().equals(orcidIdA));
+
+		assertEquals(nameA, contributorList.get(0).getName());
+		assertEquals(surnameA, contributorList.get(0).getSurname());
+		assertEquals("Abdel-Dayem Khai", contributorList.get(0).getCreditName());
+		assertEquals(orcidIdA, contributorList.get(0).getOid());
 		assertTrue(StringUtils.isBlank(contributorList.get(1).getOid()));
 	}
 
 	@Test
-	public void authorBestMatchTest() throws Exception {
+	void authorBestMatchTest() throws Exception {
 		String name = "Khairy";
 		String surname = "Abdel Dayem";
 		String orcidWork = "activity_work_0000-0003-2760-1191.xml";
@@ -304,10 +275,6 @@ public class OrcidNoDoiTest {
 		if (xml == null) {
 			logger.info("Resource not found");
 		}
-		XMLRecordParserNoDoi p = new XMLRecordParserNoDoi();
-		if (p == null) {
-			logger.info("XMLRecordParserNoDoi null");
-		}
 		WorkDetail workData = null;
 		try {
 			workData = XMLRecordParserNoDoi.VTDParseWorkData(xml.getBytes());
@@ -315,16 +282,17 @@ public class OrcidNoDoiTest {
 			logger.error("parsing xml", e);
 		}
 		AuthorMatcher.match(author, workData.getContributors());
-		assertTrue(workData.getContributors().size() == 5);
+		assertEquals(5, workData.getContributors().size());
 		List<Contributor> c = workData.getContributors();
-		assertTrue(c.get(0).getName().equals(name));
-		assertTrue(c.get(0).getSurname().equals(surname));
-		assertTrue(c.get(0).getCreditName().equals("Khair Abde Daye"));
-		assertTrue(c.get(0).getOid().equals(orcidIdA));
+
+		assertEquals(name, c.get(0).getName());
+		assertEquals(surname, c.get(0).getSurname());
+		assertEquals("Khair Abde Daye", c.get(0).getCreditName());
+		assertEquals(orcidIdA, c.get(0).getOid());
 	}
 
 	@Test
-	public void otherNamesMatchTest()
+	void otherNamesMatchTest()
 		throws VtdException, ParseException, IOException, XPathEvalException, NavException, XPathParseException {
 
 		AuthorData author = new AuthorData();
@@ -341,8 +309,9 @@ public class OrcidNoDoiTest {
 		contributor.setCreditName("XY");
 		List<Contributor> contributors = Arrays.asList(contributor);
 		AuthorMatcher.match(author, contributors);
-		assertTrue(contributors.get(0).getName().equals("Joe"));
-		assertTrue(contributors.get(0).getSurname().equals("Dodge"));
-		assertTrue(contributors.get(0).getOid().equals("0000-1111-2222-3333"));
+
+		assertEquals("Joe", contributors.get(0).getName());
+		assertEquals("Dodge", contributors.get(0).getSurname());
+		assertEquals("0000-1111-2222-3333", contributors.get(0).getOid());
 	}
 }

@@ -3,40 +3,37 @@ package eu.dnetlib.dhp.actionmanager;
 
 import java.io.Serializable;
 import java.io.StringReader;
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Triple;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
-import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.actionmanager.rmi.ActionManagerException;
-import eu.dnetlib.actionmanager.set.ActionManagerSet;
-import eu.dnetlib.actionmanager.set.ActionManagerSet.ImpactTypes;
-import eu.dnetlib.dhp.actionmanager.partition.PartitionActionSetsByPayloadTypeJob;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import scala.Tuple2;
 
 public class ISClient implements Serializable {
 
-	private static final Logger log = LoggerFactory.getLogger(PartitionActionSetsByPayloadTypeJob.class);
+	private static final Logger log = LoggerFactory.getLogger(ISClient.class);
 
 	private static final String INPUT_ACTION_SET_ID_SEPARATOR = ",";
 
-	private final ISLookUpService isLookup;
+	private final transient ISLookUpService isLookup;
 
 	public ISClient(String isLookupUrl) {
 		isLookup = ISLookupClientFactory.getLookUpService(isLookupUrl);
@@ -63,7 +60,7 @@ public class ISClient implements Serializable {
 				.map(
 					sets -> sets
 						.stream()
-						.map(set -> parseSetInfo(set))
+						.map(ISClient::parseSetInfo)
 						.filter(t -> ids.contains(t.getLeft()))
 						.map(t -> buildDirectory(basePath, t))
 						.collect(Collectors.toList()))
@@ -73,15 +70,17 @@ public class ISClient implements Serializable {
 		}
 	}
 
-	private Triple<String, String, String> parseSetInfo(String set) {
+	private static Triple<String, String, String> parseSetInfo(String set) {
 		try {
-			Document doc = new SAXReader().read(new StringReader(set));
+			final SAXReader reader = new SAXReader();
+			reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+			Document doc = reader.read(new StringReader(set));
 			return Triple
 				.of(
 					doc.valueOf("//SET/@id"),
 					doc.valueOf("//SET/@directory"),
 					doc.valueOf("//SET/@latest"));
-		} catch (DocumentException e) {
+		} catch (DocumentException | SAXException e) {
 			throw new IllegalStateException(e);
 		}
 	}
@@ -99,7 +98,7 @@ public class ISClient implements Serializable {
 		final String q = "for $x in /RESOURCE_PROFILE[.//RESOURCE_TYPE/@value='ActionManagerServiceResourceType'] return $x//SERVICE_PROPERTIES/PROPERTY[./@ key='"
 			+ propertyName
 			+ "']/@value/string()";
-		log.debug("quering for service property: " + q);
+		log.debug("quering for service property: {}", q);
 		try {
 			final List<String> value = isLookup.quickSearchProfile(q);
 			return Iterables.getOnlyElement(value);

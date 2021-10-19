@@ -105,7 +105,7 @@ public class PrepareRelatedDatasourcesJob {
 			.filter((FilterFunction<T>) r -> !ClusterUtils.isDedupRoot(r.getId()))
 			.filter((FilterFunction<T>) r -> r.getDataInfo().getDeletedbyinference())
 			.map(
-				(MapFunction<T, DatasourceRelationsAccumulator>) r -> DatasourceRelationsAccumulator.calculateTuples(r),
+				(MapFunction<T, DatasourceRelationsAccumulator>) DatasourceRelationsAccumulator::calculateTuples,
 				Encoders.bean(DatasourceRelationsAccumulator.class))
 			.flatMap(
 				(FlatMapFunction<DatasourceRelationsAccumulator, Tuple3<String, String, String>>) acc -> acc

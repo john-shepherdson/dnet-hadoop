@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
+import eu.dnetlib.dhp.oa.graph.dump.exceptions.MyRuntimeException;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
@@ -31,10 +33,10 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
  * and the project is not created because of a low coverage in the profiles of openaire ids related to projects
  */
 public class CreateContextRelation implements Serializable {
-	private static final Logger log = LoggerFactory.getLogger(CreateContextEntities.class);
-	private final Configuration conf;
-	private final BufferedWriter writer;
-	private final QueryInformationSystem queryInformationSystem;
+	private static final Logger log = LoggerFactory.getLogger(CreateContextRelation.class);
+	private final transient Configuration conf;
+	private final transient BufferedWriter writer;
+	private final transient QueryInformationSystem queryInformationSystem;
 
 	private static final String CONTEX_RELATION_DATASOURCE = "contentproviders";
 	private static final String CONTEX_RELATION_PROJECT = "projects";
@@ -42,9 +44,11 @@ public class CreateContextRelation implements Serializable {
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
 			.toString(
-				CreateContextRelation.class
-					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/graph/dump/complete/input_entity_parameter.json"));
+				Objects
+					.requireNonNull(
+						CreateContextRelation.class
+							.getResourceAsStream(
+								"/eu/dnetlib/dhp/oa/graph/dump/complete/input_entity_parameter.json")));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
@@ -70,10 +74,10 @@ public class CreateContextRelation implements Serializable {
 		cce.execute(Process::getRelation, CONTEX_RELATION_DATASOURCE, ModelSupport.getIdPrefix(Datasource.class));
 
 		log.info("Creating relations for projects... ");
-//		cce
-//			.execute(
-//				Process::getRelation, CONTEX_RELATION_PROJECT,
-//				ModelSupport.getIdPrefix(eu.dnetlib.dhp.schema.oaf.Project.class));
+		cce
+			.execute(
+				Process::getRelation, CONTEX_RELATION_PROJECT,
+				ModelSupport.getIdPrefix(eu.dnetlib.dhp.schema.oaf.Project.class));
 
 		cce.close();
 
@@ -107,7 +111,7 @@ public class CreateContextRelation implements Serializable {
 
 	public void execute(final Function<ContextInfo, List<Relation>> producer, String category, String prefix) {
 
-		final Consumer<ContextInfo> consumer = ci -> producer.apply(ci).forEach(c -> writeEntity(c));
+		final Consumer<ContextInfo> consumer = ci -> producer.apply(ci).forEach(this::writeEntity);
 
 		queryInformationSystem.getContextRelation(consumer, category, prefix);
 	}
@@ -117,7 +121,7 @@ public class CreateContextRelation implements Serializable {
 			writer.write(Utils.OBJECT_MAPPER.writeValueAsString(r));
 			writer.newLine();
 		} catch (final Exception e) {
-			throw new RuntimeException(e);
+			throw new MyRuntimeException(e);
 		}
 	}
 

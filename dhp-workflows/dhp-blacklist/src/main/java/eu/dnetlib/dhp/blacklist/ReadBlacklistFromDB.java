@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
@@ -32,11 +33,11 @@ public class ReadBlacklistFromDB implements Closeable {
 
 	private final DbClient dbClient;
 	private static final Log log = LogFactory.getLog(ReadBlacklistFromDB.class);
-	private final Configuration conf;
+
 	private final BufferedWriter writer;
 	private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	private final static String query = "SELECT source_type, unnest(original_source_objects) as source, " +
+	private static final String QUERY = "SELECT source_type, unnest(original_source_objects) as source, " +
 		"target_type, unnest(original_target_objects) as target, " +
 		"relationship FROM blacklist WHERE status = 'ACCEPTED'";
 
@@ -60,12 +61,12 @@ public class ReadBlacklistFromDB implements Closeable {
 			dbPassword)) {
 
 			log.info("Processing blacklist...");
-			rbl.execute(query, rbl::processBlacklistEntry);
+			rbl.execute(QUERY, rbl::processBlacklistEntry);
 
 		}
 	}
 
-	public void execute(final String sql, final Function<ResultSet, List<Relation>> producer) throws Exception {
+	public void execute(final String sql, final Function<ResultSet, List<Relation>> producer) {
 
 		final Consumer<ResultSet> consumer = rs -> producer.apply(rs).forEach(r -> writeRelation(r));
 
@@ -90,8 +91,8 @@ public class ReadBlacklistFromDB implements Closeable {
 
 			String encoding = rs.getString("relationship");
 			RelationInverse ri = ModelSupport.relationInverseMap.get(encoding);
-			direct.setRelClass(ri.getRelation());
-			inverse.setRelClass(ri.getInverse());
+			direct.setRelClass(ri.getRelClass());
+			inverse.setRelClass(ri.getInverseRelClass());
 			direct.setRelType(ri.getRelType());
 			inverse.setRelType(ri.getRelType());
 			direct.setSubRelType(ri.getSubReltype());
@@ -99,7 +100,7 @@ public class ReadBlacklistFromDB implements Closeable {
 
 			return Arrays.asList(direct, inverse);
 
-		} catch (final Exception e) {
+		} catch (final SQLException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -112,12 +113,14 @@ public class ReadBlacklistFromDB implements Closeable {
 
 	public ReadBlacklistFromDB(
 		final String hdfsPath, String hdfsNameNode, final String dbUrl, final String dbUser, final String dbPassword)
-		throws Exception {
+		throws IOException {
 
 		this.dbClient = new DbClient(dbUrl, dbUser, dbPassword);
-		this.conf = new Configuration();
-		this.conf.set("fs.defaultFS", hdfsNameNode);
-		FileSystem fileSystem = FileSystem.get(this.conf);
+
+		Configuration conf = new Configuration();
+		conf.set("fs.defaultFS", hdfsNameNode);
+
+		FileSystem fileSystem = FileSystem.get(conf);
 		Path hdfsWritePath = new Path(hdfsPath);
 		FSDataOutputStream fsDataOutputStream = null;
 		if (fileSystem.exists(hdfsWritePath)) {
@@ -133,7 +136,7 @@ public class ReadBlacklistFromDB implements Closeable {
 		try {
 			writer.write(OBJECT_MAPPER.writeValueAsString(r));
 			writer.newLine();
-		} catch (final Exception e) {
+		} catch (final IOException e) {
 			throw new RuntimeException(e);
 		}
 	}

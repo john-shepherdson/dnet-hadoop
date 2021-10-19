@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -289,7 +290,7 @@ public class WritePredefinedProjectProperties extends AbstractMojo {
 	 */
 	protected List<String> getEscapeChars(String escapeChars) {
 		List<String> tokens = getListFromCSV(escapeChars);
-		List<String> realTokens = new ArrayList<String>();
+		List<String> realTokens = new ArrayList<>();
 		for (String token : tokens) {
 			String realToken = getRealToken(token);
 			realTokens.add(realToken);
@@ -324,7 +325,7 @@ public class WritePredefinedProjectProperties extends AbstractMojo {
 	 * @return content
 	 */
 	protected String getContent(String comment, Properties properties, List<String> escapeTokens) {
-		List<String> names = new ArrayList<String>(properties.stringPropertyNames());
+		List<String> names = new ArrayList<>(properties.stringPropertyNames());
 		Collections.sort(names);
 		StringBuilder sb = new StringBuilder();
 		if (!StringUtils.isBlank(comment)) {
@@ -352,7 +353,7 @@ public class WritePredefinedProjectProperties extends AbstractMojo {
 		throws MojoExecutionException {
 		try {
 			String content = getContent(comment, properties, escapeTokens);
-			FileUtils.writeStringToFile(file, content, ENCODING_UTF8);
+			FileUtils.writeStringToFile(file, content, StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			throw new MojoExecutionException("Error creating properties file", e);
 		}
@@ -399,9 +400,9 @@ public class WritePredefinedProjectProperties extends AbstractMojo {
 	 */
 	protected static final List<String> getListFromCSV(String csv) {
 		if (StringUtils.isBlank(csv)) {
-			return new ArrayList<String>();
+			return new ArrayList<>();
 		}
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		String[] tokens = StringUtils.split(csv, ",");
 		for (String token : tokens) {
 			list.add(token.trim());

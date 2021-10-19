@@ -89,7 +89,7 @@ public class XmlIndexingJobTest extends SolrTest {
 	}
 
 	@Test
-	public void testXmlIndexingJob_onSolr() throws Exception {
+	void testXmlIndexingJob_onSolr() throws Exception {
 
 		String inputPath = "src/test/resources/eu/dnetlib/dhp/oa/provision/xml";
 
@@ -112,7 +112,7 @@ public class XmlIndexingJobTest extends SolrTest {
 	}
 
 	@Test
-	public void testXmlIndexingJob_saveOnHDFS() throws Exception {
+	void testXmlIndexingJob_saveOnHDFS() throws Exception {
 		final String ID_XPATH = "//header/*[local-name()='objIdentifier']";
 
 		String inputPath = "src/test/resources/eu/dnetlib/dhp/oa/provision/xml";

@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.oa.merge;
 import java.text.Normalizer;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,6 +17,9 @@ import scala.Tuple2;
 public class AuthorMerger {
 
 	private static final Double THRESHOLD = 0.95;
+
+	private AuthorMerger() {
+	}
 
 	public static List<Author> merge(List<List<Author>> authors) {
 
@@ -36,7 +38,8 @@ public class AuthorMerger {
 	public static List<Author> mergeAuthor(final List<Author> a, final List<Author> b, Double threshold) {
 		int pa = countAuthorsPids(a);
 		int pb = countAuthorsPids(b);
-		List<Author> base, enrich;
+		List<Author> base;
+		List<Author> enrich;
 		int sa = authorsSize(a);
 		int sb = authorsSize(b);
 
@@ -62,7 +65,7 @@ public class AuthorMerger {
 		// <pidComparableString, Author> (if an Author has more than 1 pid, it appears 2 times in the list)
 		final Map<String, Author> basePidAuthorMap = base
 			.stream()
-			.filter(a -> a.getPid() != null && a.getPid().size() > 0)
+			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
 			.flatMap(
 				a -> a
 					.getPid()
@@ -74,7 +77,7 @@ public class AuthorMerger {
 		// <pid, Author> (list of pid that are missing in the other list)
 		final List<Tuple2<StructuredProperty, Author>> pidToEnrich = enrich
 			.stream()
-			.filter(a -> a.getPid() != null && a.getPid().size() > 0)
+			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
 			.flatMap(
 				a -> a
 					.getPid()
@@ -117,9 +120,9 @@ public class AuthorMerger {
 	}
 
 	public static String pidToComparableString(StructuredProperty pid) {
-		return (pid.getQualifier() != null
-			? pid.getQualifier().getClassid() != null ? pid.getQualifier().getClassid().toLowerCase() : ""
-			: "")
+		final String classid = pid.getQualifier().getClassid() != null ? pid.getQualifier().getClassid().toLowerCase()
+			: "";
+		return (pid.getQualifier() != null ? classid : "")
 			+ (pid.getValue() != null ? pid.getValue().toLowerCase() : "");
 	}
 
