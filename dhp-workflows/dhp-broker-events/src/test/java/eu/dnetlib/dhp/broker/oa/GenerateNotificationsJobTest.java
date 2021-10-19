@@ -16,7 +16,7 @@ import eu.dnetlib.dhp.broker.model.MappedFields;
 import eu.dnetlib.dhp.broker.model.Subscription;
 import eu.dnetlib.dhp.broker.oa.util.NotificationGroup;
 
-class IndexNotificationsJobTest {
+class GenerateNotificationsJobTest {
 
 	private List<Subscription> subscriptions;
 
@@ -32,7 +32,7 @@ class IndexNotificationsJobTest {
 			.setConditions(
 				"[{\"field\":\"targetDatasourceName\",\"fieldType\":\"STRING\",\"operator\":\"EXACT\",\"listParams\":[{\"value\":\"reposiTUm\"}]},{\"field\":\"trust\",\"fieldType\":\"FLOAT\",\"operator\":\"RANGE\",\"listParams\":[{\"value\":\"0\",\"otherValue\":\"1\"}]}]");
 		subscriptions = Arrays.asList(s);
-		conditionsMap = IndexNotificationsJob.prepareConditionsMap(subscriptions);
+		conditionsMap = GenerateNotificationsJob.prepareConditionsMap(subscriptions);
 	}
 
 	@Test
@@ -40,7 +40,7 @@ class IndexNotificationsJobTest {
 		final Event event = new Event();
 		event.setTopic("ENRICH/MISSING/PROJECT");
 
-		final NotificationGroup res = IndexNotificationsJob
+		final NotificationGroup res = GenerateNotificationsJob
 			.generateNotifications(event, subscriptions, conditionsMap, 0);
 		assertEquals(0, res.getData().size());
 	}
@@ -53,7 +53,7 @@ class IndexNotificationsJobTest {
 		event.getMap().setTargetDatasourceName("reposiTUm");
 		event.getMap().setTrust(0.8f);
 
-		final NotificationGroup res = IndexNotificationsJob
+		final NotificationGroup res = GenerateNotificationsJob
 			.generateNotifications(event, subscriptions, conditionsMap, 0);
 		assertEquals(1, res.getData().size());
 	}
@@ -66,7 +66,7 @@ class IndexNotificationsJobTest {
 		event.getMap().setTargetDatasourceName("Puma");
 		event.getMap().setTrust(0.8f);
 
-		final NotificationGroup res = IndexNotificationsJob
+		final NotificationGroup res = GenerateNotificationsJob
 			.generateNotifications(event, subscriptions, conditionsMap, 0);
 		assertEquals(0, res.getData().size());
 	}
@@ -77,11 +77,11 @@ class IndexNotificationsJobTest {
 		event.setTopic("ENRICH/MISSING/PROJECT");
 
 		// warm up
-		IndexNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
+		GenerateNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
 
 		final long start = System.currentTimeMillis();
 		for (int i = 0; i < N_TIMES; i++) {
-			IndexNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
+			GenerateNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
 		}
 		final long end = System.currentTimeMillis();
 		System.out
@@ -98,11 +98,11 @@ class IndexNotificationsJobTest {
 		event.getMap().setTrust(0.8f);
 
 		// warm up
-		IndexNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
+		GenerateNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
 
 		final long start = System.currentTimeMillis();
 		for (int i = 0; i < N_TIMES; i++) {
-			IndexNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
+			GenerateNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
 		}
 		final long end = System.currentTimeMillis();
 		System.out
@@ -118,11 +118,11 @@ class IndexNotificationsJobTest {
 		event.getMap().setTrust(0.8f);
 
 		// warm up
-		IndexNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
+		GenerateNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
 
 		final long start = System.currentTimeMillis();
 		for (int i = 0; i < N_TIMES; i++) {
-			IndexNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
+			GenerateNotificationsJob.generateNotifications(event, subscriptions, conditionsMap, 0);
 		}
 		final long end = System.currentTimeMillis();
 		System.out

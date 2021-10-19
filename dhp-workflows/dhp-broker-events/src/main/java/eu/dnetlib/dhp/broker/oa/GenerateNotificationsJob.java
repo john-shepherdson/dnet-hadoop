@@ -45,8 +45,9 @@ public class GenerateNotificationsJob {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(GenerateNotificationsJob.class
-					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/generate_notifications.json")));
+				.toString(
+					GenerateNotificationsJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/generate_notifications.json")));
 		parser.parseArgument(args);
 
 		final SparkConf conf = new SparkConf();
@@ -79,7 +80,10 @@ public class GenerateNotificationsJob {
 			final Encoder<Notification> nEncoder = Encoders.bean(Notification.class);
 			final Dataset<Notification> notifications = ClusterUtils
 				.readPath(spark, eventsPath, Event.class)
-				.map((MapFunction<Event, NotificationGroup>) e -> generateNotifications(e, subscriptions, conditionsMap, startTime), ngEncoder)
+				.map(
+					(MapFunction<Event, NotificationGroup>) e -> generateNotifications(
+						e, subscriptions, conditionsMap, startTime),
+					ngEncoder)
 				.flatMap((FlatMapFunction<NotificationGroup, Notification>) g -> g.getData().iterator(), nEncoder);
 
 			ClusterUtils.save(notifications, notificationsPath, Notification.class, total);
@@ -99,7 +103,8 @@ public class GenerateNotificationsJob {
 		final long date) {
 		final List<Notification> list = subscriptions
 			.stream()
-			.filter(s -> StringUtils.isBlank(s.getTopic()) || s.getTopic().equals("*") || s.getTopic().equals(e.getTopic()))
+			.filter(
+				s -> StringUtils.isBlank(s.getTopic()) || s.getTopic().equals("*") || s.getTopic().equals(e.getTopic()))
 			.filter(s -> verifyConditions(e.getMap(), conditionsMap.get(s.getSubscriptionId())))
 			.map(s -> generateNotification(s, e, date))
 			.collect(Collectors.toList());
@@ -130,15 +135,18 @@ public class GenerateNotificationsJob {
 
 		if (conditions.containsKey("trust")
 			&& !SubscriptionUtils
-				.verifyFloatRange(map.getTrust(), conditions.get("trust").get(0).getValue(), conditions.get("trust").get(0).getOtherValue())) {
+				.verifyFloatRange(
+					map.getTrust(), conditions.get("trust").get(0).getValue(),
+					conditions.get("trust").get(0).getOtherValue())) {
 			return false;
 		}
 
 		if (conditions.containsKey("targetDateofacceptance") && !conditions
 			.get("targetDateofacceptance")
 			.stream()
-			.anyMatch(c -> SubscriptionUtils
-				.verifyDateRange(map.getTargetDateofacceptance(), c.getValue(), c.getOtherValue()))) {
+			.anyMatch(
+				c -> SubscriptionUtils
+					.verifyDateRange(map.getTargetDateofacceptance(), c.getValue(), c.getOtherValue()))) {
 			return false;
 		}
 

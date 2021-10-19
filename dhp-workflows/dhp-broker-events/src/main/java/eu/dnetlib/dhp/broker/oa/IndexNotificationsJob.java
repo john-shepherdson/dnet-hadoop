@@ -36,8 +36,9 @@ public class IndexNotificationsJob {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
-				.toString(IndexNotificationsJob.class
-					.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_notifications.json")));
+				.toString(
+					IndexNotificationsJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/index_notifications.json")));
 		parser.parseArgument(args);
 
 		final SparkConf conf = new SparkConf();
