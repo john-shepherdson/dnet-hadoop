@@ -135,7 +135,6 @@
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
-                --conf spark.dynamicAllocation.maxExecutors="8" 
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
