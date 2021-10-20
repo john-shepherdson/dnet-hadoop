@@ -1,44 +1,23 @@
 <workflow-app name="Resolve Relation" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>entityPath</name>
-            <description>the path of deduplicate Entities</description>
+            <name>graphBasePath</name>
+            <description>the path of the graph</description>
         </property>
-        <property>
-            <name>relationPath</name>
-            <description>the path of relation unresolved</description>
-        </property>
-        <property>
-            <name>targetPath</name>
-            <description>the path of relation unresolved</description>
-        </property>
-
     </parameters>
 
-    <start to="DropRelFolder"/>
+    <start to="ResolveRelations"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-
-    <action name="DropRelFolder">
-        <fs>
-            <delete path='${targetPath}/relation'/>
-            <delete path='${targetPath}/relation_resolved'/>
-            <delete path='${targetPath}/resolvedSource'/>
-            <delete path='${targetPath}/resolvedPid'/>
-
-        </fs>
-        <ok to="ResolveRelations"/>
-        <error to="Kill"/>
-    </action>
     <action name="ResolveRelations">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Resolve Relations in raw graph</name>
-            <class>eu.dnetlib.dhp.sx.graph.SparkResolveRelation</class>
+            <class>eu.dnetlib.dhp.oa.graph.resolution.SparkResolveRelation</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -51,9 +30,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--master</arg><arg>yarn</arg>
-            <arg>--relationPath</arg><arg>${relationPath}</arg>
-            <arg>--workingPath</arg><arg>${targetPath}</arg>
-            <arg>--entityPath</arg><arg>${entityPath}</arg>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

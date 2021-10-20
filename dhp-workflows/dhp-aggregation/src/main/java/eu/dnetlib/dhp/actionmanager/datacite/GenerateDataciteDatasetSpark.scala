@@ -1,9 +1,13 @@
 package eu.dnetlib.dhp.actionmanager.datacite
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
+import eu.dnetlib.dhp.common.Constants.{MDSTORE_DATA_PATH, MDSTORE_SIZE_PATH}
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
-import eu.dnetlib.dhp.schema.mdstore.MetadataRecord
+import eu.dnetlib.dhp.collection.CollectionUtils.fixRelations
+import eu.dnetlib.dhp.schema.mdstore.{MDStoreVersion, MetadataRecord}
 import eu.dnetlib.dhp.schema.oaf.Oaf
+import eu.dnetlib.dhp.utils.DHPUtils.writeHdfsFile
 import eu.dnetlib.dhp.utils.ISLookupClientFactory
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}
@@ -21,7 +25,6 @@ object GenerateDataciteDatasetSpark {
     parser.parseArgument(args)
     val master = parser.get("master")
     val sourcePath = parser.get("sourcePath")
-    val targetPath = parser.get("targetPath")
     val exportLinks = "true".equalsIgnoreCase(parser.get("exportLinks"))
     val isLookupUrl: String = parser.get("isLookupUrl")
     log.info("isLookupUrl: {}", isLookupUrl)
@@ -39,10 +42,22 @@ object GenerateDataciteDatasetSpark {
 
     import spark.implicits._
 
+    val mdstoreOutputVersion = parser.get("mdstoreOutputVersion")
+    val mapper = new ObjectMapper()
+    val cleanedMdStoreVersion = mapper.readValue(mdstoreOutputVersion, classOf[MDStoreVersion])
+    val outputBasePath = cleanedMdStoreVersion.getHdfsPath
+
+    log.info("outputBasePath: {}", outputBasePath)
+    val targetPath = s"$outputBasePath/$MDSTORE_DATA_PATH"
+
     spark.read.load(sourcePath).as[DataciteType]
       .filter(d => d.isActive)
       .flatMap(d => DataciteToOAFTransformation.generateOAF(d.json, d.timestamp, d.timestamp, vocabularies, exportLinks))
       .filter(d => d != null)
+      .flatMap(i=> fixRelations(i)).filter(i => i != null)
       .write.mode(SaveMode.Overwrite).save(targetPath)
+
+    val total_items =spark.read.load(targetPath).as[Oaf].count()
+    writeHdfsFile(spark.sparkContext.hadoopConfiguration, s"$total_items", outputBasePath + MDSTORE_SIZE_PATH)
   }
 }

@@ -10,6 +10,7 @@ import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.codec.binary.Hex;
@@ -54,6 +55,14 @@ public class DHPUtils {
 
 	public static String generateIdentifier(final String originalId, final String nsPrefix) {
 		return String.format("%s::%s", nsPrefix, DHPUtils.md5(originalId));
+	}
+
+
+	public static String generateUnresolvedIdentifier(final String pid, final String pidType) {
+
+		final String cleanedPid = CleaningFunctions.normalizePidValue(pidType, pid);
+
+		return String.format("unresolved::%s::%s", cleanedPid, pidType.toLowerCase().trim());
 	}
 
 	public static String getJPathString(final String jsonPath, final String json) {
