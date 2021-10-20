@@ -1,8 +1,7 @@
-package eu.dnetlib.dhp.actionmanager.datacite
+package eu.dnetlib.dhp.datacite
 
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
 import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest
 import eu.dnetlib.dhp.schema.oaf.Oaf
 import org.junit.jupiter.api.extension.ExtendWith

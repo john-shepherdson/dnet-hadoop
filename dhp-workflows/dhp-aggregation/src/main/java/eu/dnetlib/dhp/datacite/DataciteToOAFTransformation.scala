@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.actionmanager.datacite
+package eu.dnetlib.dhp.datacite
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup

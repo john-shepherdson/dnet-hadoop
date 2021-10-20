@@ -47,7 +47,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>TransformJob</name>
-            <class>eu.dnetlib.dhp.actionmanager.datacite.GenerateDataciteDatasetSpark</class>
+            <class>eu.dnetlib.dhp.datacite.GenerateDataciteDatasetSpark</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}

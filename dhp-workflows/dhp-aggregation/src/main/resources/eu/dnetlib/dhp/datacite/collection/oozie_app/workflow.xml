@@ -28,7 +28,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>ImportDatacite</name>
-            <class>eu.dnetlib.dhp.actionmanager.datacite.ImportDatacite</class>
+            <class>eu.dnetlib.dhp.datacite.ImportDatacite</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
