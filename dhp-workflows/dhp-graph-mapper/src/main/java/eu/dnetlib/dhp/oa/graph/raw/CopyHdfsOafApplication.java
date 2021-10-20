@@ -76,6 +76,9 @@ public class CopyHdfsOafApplication extends AbstractMigrationApplication {
 		final Set<String> paths = mdstorePaths(mdstoreManagerUrl, mdFormat, mdLayout, mdInterpretation);
 
 		final SparkConf conf = new SparkConf();
+		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+		conf.registerKryoClasses(ModelSupport.getOafModelClasses());
+
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> processPaths(spark, vocs, hdfsPath, paths));
 	}
 
