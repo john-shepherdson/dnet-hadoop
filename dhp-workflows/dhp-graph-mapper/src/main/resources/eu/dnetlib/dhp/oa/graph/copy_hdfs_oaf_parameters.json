@@ -28,11 +28,5 @@
 		"paramLongName": "mdInterpretation",
 		"paramDescription": "metadata interpretation",
 		"paramRequired": true
-	},
-	{
-		"paramName": "isu",
-		"paramLongName": "isLookupUrl",
-		"paramDescription": "the url of the ISLookupService",
-		"paramRequired": true
 	}
 ]

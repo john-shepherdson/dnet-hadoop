@@ -67,23 +67,16 @@ public class CopyHdfsOafApplication extends AbstractMigrationApplication {
 		final String hdfsPath = parser.get("hdfsPath");
 		log.info("hdfsPath: {}", hdfsPath);
 
-		final String isLookupUrl = parser.get("isLookupUrl");
-		log.info("isLookupUrl: {}", isLookupUrl);
-
-		final ISLookUpService isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl);
-		final VocabularyGroup vocs = VocabularyGroup.loadVocsFromIS(isLookupService);
-
 		final Set<String> paths = mdstorePaths(mdstoreManagerUrl, mdFormat, mdLayout, mdInterpretation);
 
 		final SparkConf conf = new SparkConf();
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 		conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
-		runWithSparkSession(conf, isSparkSessionManaged, spark -> processPaths(spark, vocs, hdfsPath, paths));
+		runWithSparkSession(conf, isSparkSessionManaged, spark -> processPaths(spark, hdfsPath, paths));
 	}
 
 	public static void processPaths(final SparkSession spark,
-		final VocabularyGroup vocs,
 		final String outputPath,
 		final Set<String> paths) {
 

@@ -569,7 +569,6 @@
             <arg>--mdFormat</arg><arg>OAF</arg>
             <arg>--mdLayout</arg><arg>store</arg>
             <arg>--mdInterpretation</arg><arg>graph</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
         <ok to="wait_graphs"/>
         <error to="Kill"/>
