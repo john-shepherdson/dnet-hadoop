@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import eu.dnetlib.dhp.KeyValueSet;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -28,7 +29,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkResultToOrganizationFromIstRepoJob.class);
 
-	private static final String RESULT_ORGANIZATIONSET_QUERY = "SELECT id resultId, collect_set(organizationId) organizationSet "
+	private static final String RESULT_ORGANIZATIONSET_QUERY = "SELECT id key, collect_set(organizationId) valueSet "
 		+ "FROM ( SELECT id, organizationId "
 		+ "FROM rels "
 		+ "JOIN cfhb "
@@ -107,14 +108,14 @@ public class SparkResultToOrganizationFromIstRepoJob {
 
 		Dataset<DatasourceOrganization> dsOrg = readPath(spark, datasourceorganization, DatasourceOrganization.class);
 
-		Dataset<ResultOrganizationSet> potentialUpdates = getPotentialRelations(spark, inputPath, clazz, dsOrg);
+		Dataset<KeyValueSet> potentialUpdates = getPotentialRelations(spark, inputPath, clazz, dsOrg);
 
-		Dataset<ResultOrganizationSet> alreadyLinked = readPath(spark, alreadyLinkedPath, ResultOrganizationSet.class);
+		Dataset<KeyValueSet> alreadyLinked = readPath(spark, alreadyLinkedPath, KeyValueSet.class);
 
 		potentialUpdates
 			.joinWith(
 				alreadyLinked,
-				potentialUpdates.col("resultId").equalTo(alreadyLinked.col("resultId")),
+				potentialUpdates.col("key").equalTo(alreadyLinked.col("key")),
 				"left_outer")
 			.flatMap(createRelationFn(), Encoders.bean(Relation.class))
 			.write()
@@ -123,18 +124,18 @@ public class SparkResultToOrganizationFromIstRepoJob {
 			.json(outputPath);
 	}
 
-	private static FlatMapFunction<Tuple2<ResultOrganizationSet, ResultOrganizationSet>, Relation> createRelationFn() {
+	private static FlatMapFunction<Tuple2<KeyValueSet, KeyValueSet>, Relation> createRelationFn() {
 		return value -> {
 			List<Relation> newRelations = new ArrayList<>();
-			ResultOrganizationSet potentialUpdate = value._1();
-			Optional<ResultOrganizationSet> alreadyLinked = Optional.ofNullable(value._2());
-			List<String> organizations = potentialUpdate.getOrganizationSet();
+			KeyValueSet potentialUpdate = value._1();
+			Optional<KeyValueSet> alreadyLinked = Optional.ofNullable(value._2());
+			List<String> organizations = potentialUpdate.getValueSet();
 			alreadyLinked
 				.ifPresent(
 					resOrg -> resOrg
-						.getOrganizationSet()
+						.getValueSet()
 						.forEach(organizations::remove));
-			String resultId = potentialUpdate.getResultId();
+			String resultId = potentialUpdate.getKey();
 			organizations
 				.forEach(
 					orgId -> {
@@ -165,7 +166,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
 		};
 	}
 
-	private static <R extends Result> Dataset<ResultOrganizationSet> getPotentialRelations(
+	private static <R extends Result> Dataset<KeyValueSet> getPotentialRelations(
 		SparkSession spark,
 		String inputPath,
 		Class<R> resultClazz,
@@ -179,7 +180,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
 
 		return spark
 			.sql(RESULT_ORGANIZATIONSET_QUERY)
-			.as(Encoders.bean(ResultOrganizationSet.class));
+			.as(Encoders.bean(KeyValueSet.class));
 	}
 
 }

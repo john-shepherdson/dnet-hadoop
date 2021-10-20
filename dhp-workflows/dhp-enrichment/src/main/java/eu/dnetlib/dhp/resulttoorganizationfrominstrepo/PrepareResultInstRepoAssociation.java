@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.KeyValueSet;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
@@ -124,7 +125,7 @@ public class PrepareResultInstRepoAssociation {
 
 	private static void prepareAlreadyLinkedAssociation(
 		SparkSession spark, String alreadyLinkedPath) {
-		String query = "Select source resultId, collect_set(target) organizationSet "
+		String query = "Select source key, collect_set(target) valueSet "
 			+ "from relation "
 			+ "where datainfo.deletedbyinference = false "
 			+ "and lower(relClass) = '"
@@ -134,7 +135,7 @@ public class PrepareResultInstRepoAssociation {
 
 		spark
 			.sql(query)
-			.as(Encoders.bean(ResultOrganizationSet.class))
+			.as(Encoders.bean(KeyValueSet.class))
 			// TODO retry to stick with datasets
 			.toJavaRDD()
 			.map(r -> OBJECT_MAPPER.writeValueAsString(r))
