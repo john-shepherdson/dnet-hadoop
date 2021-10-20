@@ -258,7 +258,7 @@
         <switch>
             <case to="ImportDB">${wf:conf('reuseDB') eq false}</case>
             <case to="reuse_odf">${wf:conf('reuseDB') eq true}</case>
-            <default to="ImportDB_claims"/>
+            <default to="ImportDB"/>
         </switch>
     </decision>
 
