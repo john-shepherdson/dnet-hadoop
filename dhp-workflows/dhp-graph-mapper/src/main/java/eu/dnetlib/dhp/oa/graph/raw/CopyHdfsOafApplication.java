@@ -102,7 +102,7 @@ public class CopyHdfsOafApplication extends AbstractMigrationApplication {
 			for (Map.Entry<String, Class> e : ModelSupport.oafTypes.entrySet()) {
 				oaf
 					.filter((FilterFunction<Oaf>) o -> o.getClass().getSimpleName().toLowerCase().equals(e.getKey()))
-					.map((MapFunction<Oaf, String>) OBJECT_MAPPER::writeValueAsString, Encoders.bean(e.getValue()))
+					.map((MapFunction<Oaf, String>) OBJECT_MAPPER::writeValueAsString, Encoders.STRING())
 					.write()
 					.option("compression", "gzip")
 					.mode(SaveMode.Append)
