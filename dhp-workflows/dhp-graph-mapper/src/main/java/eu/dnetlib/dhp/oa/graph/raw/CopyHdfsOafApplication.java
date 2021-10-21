@@ -31,6 +31,7 @@ import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import scala.Tuple2;
 
 public class CopyHdfsOafApplication extends AbstractMigrationApplication {
 
@@ -73,10 +74,13 @@ public class CopyHdfsOafApplication extends AbstractMigrationApplication {
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 		conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
-		runWithSparkSession(conf, isSparkSessionManaged, spark -> processPaths(spark, hdfsPath, paths));
+		final List<String> oafTypes = Lists.newArrayList(ModelSupport.oafTypes.keySet());
+
+		runWithSparkSession(conf, isSparkSessionManaged, spark -> processPaths(spark, oafTypes, hdfsPath, paths));
 	}
 
 	public static void processPaths(final SparkSession spark,
+		final List<String> oafTypes,
 		final String outputPath,
 		final Set<String> paths) {
 
@@ -99,16 +103,16 @@ public class CopyHdfsOafApplication extends AbstractMigrationApplication {
 				.as(Encoders.kryo(Oaf.class));
 
 			// dispatch each entity type individually in the respective graph subdirectory in append mode
-			for (Map.Entry<String, Class> e : ModelSupport.oafTypes.entrySet()) {
+			for (String type : oafTypes) {
 				oaf
-					.filter((FilterFunction<Oaf>) o -> o.getClass().getSimpleName().toLowerCase().equals(e.getKey()))
+					.filter((FilterFunction<Oaf>) o -> o.getClass().getSimpleName().toLowerCase().equals(type))
 					.map((MapFunction<Oaf, String>) OBJECT_MAPPER::writeValueAsString, Encoders.STRING())
 					.write()
 					.option("compression", "gzip")
 					.mode(SaveMode.Append)
-					.text(outputPath + "/" + e.getKey());
+					.text(outputPath + "/" + type);
 			}
 		}
 	}
-	
+
 }
