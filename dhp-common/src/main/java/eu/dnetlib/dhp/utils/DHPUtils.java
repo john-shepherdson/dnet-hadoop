@@ -10,7 +10,6 @@ import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.apache.commons.codec.binary.Hex;
@@ -27,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import com.jayway.jsonpath.JsonPath;
 
+import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import net.minidev.json.JSONArray;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
@@ -56,7 +56,6 @@ public class DHPUtils {
 	public static String generateIdentifier(final String originalId, final String nsPrefix) {
 		return String.format("%s::%s", nsPrefix, DHPUtils.md5(originalId));
 	}
-
 
 	public static String generateUnresolvedIdentifier(final String pid, final String pidType) {
 
