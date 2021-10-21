@@ -110,23 +110,5 @@ public class CopyHdfsOafApplication extends AbstractMigrationApplication {
 			}
 		}
 	}
-
-	private static Relation getInverse(Relation rel, VocabularyGroup vocs) {
-		final Relation inverse = new Relation();
-
-		inverse.setProperties(rel.getProperties());
-		inverse.setValidated(rel.getValidated());
-		inverse.setValidationDate(rel.getValidationDate());
-		inverse.setCollectedfrom(rel.getCollectedfrom());
-		inverse.setDataInfo(rel.getDataInfo());
-		inverse.setLastupdatetimestamp(rel.getLastupdatetimestamp());
-
-		inverse.setSource(rel.getTarget());
-		inverse.setTarget(rel.getSource());
-		inverse.setRelType(rel.getRelType());
-		inverse.setSubRelType(rel.getSubRelType());
-
-		return inverse;
-	}
-
+	
 }
