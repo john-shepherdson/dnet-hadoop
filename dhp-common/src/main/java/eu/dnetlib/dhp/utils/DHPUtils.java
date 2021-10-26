@@ -1,35 +1,34 @@
 
 package eu.dnetlib.dhp.utils;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Base64OutputStream;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
+import com.jayway.jsonpath.JsonPath;
+import eu.dnetlib.dhp.schema.mdstore.MDStoreWithInfo;
+import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
+import net.minidev.json.JSONArray;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SaveMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
-import com.jayway.jsonpath.JsonPath;
-
-import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
-import net.minidev.json.JSONArray;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DHPUtils {
 
@@ -50,6 +49,45 @@ public class DHPUtils {
 		} catch (final Exception e) {
 			log.error("Error creating id from {}", s);
 			return null;
+		}
+	}
+
+	/**
+	 * Retrieves from the metadata store manager application the list of paths associated with mdstores characterized
+	 * by he given format, layout, interpretation
+	 * @param mdstoreManagerUrl the URL of the mdstore manager service
+	 * @param format the mdstore format
+	 * @param layout the mdstore layout
+	 * @param interpretation the mdstore interpretation
+	 * @param includeEmpty include Empty mdstores
+	 * @return the set of hdfs paths
+	 * @throws IOException in case of HTTP communication issues
+	 */
+	public static Set<String> mdstorePaths(final String mdstoreManagerUrl,
+		final String format,
+		final String layout,
+		final String interpretation,
+		boolean includeEmpty) throws IOException {
+		final String url = mdstoreManagerUrl + "/mdstores/";
+		final ObjectMapper objectMapper = new ObjectMapper();
+
+		final HttpGet req = new HttpGet(url);
+
+		try (final CloseableHttpClient client = HttpClients.createDefault()) {
+			try (final CloseableHttpResponse response = client.execute(req)) {
+				final String json = IOUtils.toString(response.getEntity().getContent());
+				final MDStoreWithInfo[] mdstores = objectMapper.readValue(json, MDStoreWithInfo[].class);
+				return Arrays
+					.stream(mdstores)
+					.filter(md -> md.getFormat().equalsIgnoreCase(format))
+					.filter(md -> md.getLayout().equalsIgnoreCase(layout))
+					.filter(md -> md.getInterpretation().equalsIgnoreCase(interpretation))
+					.filter(md -> StringUtils.isNotBlank(md.getHdfsPath()))
+					.filter(md -> StringUtils.isNotBlank(md.getCurrentVersion()))
+					.filter(md -> includeEmpty || md.getSize() > 0)
+					.map(md -> md.getHdfsPath() + "/" + md.getCurrentVersion() + "/store")
+					.collect(Collectors.toSet());
+			}
 		}
 	}
 

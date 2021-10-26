@@ -24,6 +24,12 @@
 		"paramRequired": true
 	},
 	{
+		"paramName": "m",
+		"paramLongName": "master",
+		"paramDescription": "should be yarn or local",
+		"paramRequired": true
+	},
+	{
 		"paramName": "i",
 		"paramLongName": "mdInterpretation",
 		"paramDescription": "metadata interpretation",
