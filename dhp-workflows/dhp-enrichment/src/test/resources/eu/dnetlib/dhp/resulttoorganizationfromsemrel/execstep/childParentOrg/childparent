@@ -1,0 +1,6 @@
+{"key":"20|opendoar____::a5fcb8eb25ebd6f7cd219e0fa1e6ddc1","valueSet":["20|doajarticles::1cae0b82b56ccd97c2db1f698def7074"]}
+{"key":"20|pippo_wf_001::2899e571609779168222fdeb59cb916d","valueSet":["20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f","20|dedup_wf_001::2899e571609779168222fdeb59cb916d"]}
+{"key":"20|doajarticles::1cae0b82b56ccd97c2db1f698def7074","valueSet":["20|openaire____::ec653e804967133b9436fdd30d3ff51d"]}
+{"key":"20|doajarticles::396262ee936f3d3e26ff0e60bea6cae0","valueSet":["20|dedup_wf_001::2899e571609779168222fdeb59cb916d"]}
+{"key":"20|dedup_wf_001::2899e571609779168222fdeb59cb916d","valueSet":["20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"]}
+{"key":"20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f","valueSet":["20|doajarticles::03748bcb5d754c951efec9700e18a56d"]}
