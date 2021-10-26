@@ -104,14 +104,14 @@ object SparkResolveRelation {
       JObject(pids) <- json \\ "instance" \ "pid"
       JField("value", JString(pidValue)) <- pids
       JField("qualifier", JObject(qualifier)) <- pids
-      JField("classname", JString(pidType)) <- qualifier
+      JField("classid", JString(pidType)) <- qualifier
     } yield (pidValue, pidType)
 
     val alternateIds: List[(String, String)] = for {
       JObject(pids) <- json \\ "alternateIdentifier"
       JField("value", JString(pidValue)) <- pids
       JField("qualifier", JObject(qualifier)) <- pids
-      JField("classname", JString(pidType)) <- qualifier
+      JField("classid", JString(pidType)) <- qualifier
     } yield (pidValue, pidType)
 
     (id, result ::: alternateIds)

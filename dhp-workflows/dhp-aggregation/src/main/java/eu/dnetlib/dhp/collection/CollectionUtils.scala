@@ -34,6 +34,12 @@ object CollectionUtils {
         inverse.setRelType(currentRel.getRelType)
         inverse.setSubRelType(currentRel.getSubReltype)
         inverse.setRelClass(currentRel.getInverseRelClass)
+        inverse.setCollectedfrom(r.getCollectedfrom)
+        inverse.setDataInfo(r.getDataInfo)
+        inverse.setProperties(r.getProperties)
+        inverse.setLastupdatetimestamp(r.getLastupdatetimestamp)
+        inverse.setValidated(r.getValidated)
+        inverse.setValidationDate(r.getValidationDate)
         return List(r, inverse)
       }
     }
