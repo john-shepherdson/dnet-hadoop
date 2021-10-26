@@ -1,12 +1,12 @@
 
 package eu.dnetlib.dhp.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
-import com.jayway.jsonpath.JsonPath;
-import eu.dnetlib.dhp.schema.mdstore.MDStoreWithInfo;
-import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
-import net.minidev.json.JSONArray;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -21,14 +21,16 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SaveMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
+import com.jayway.jsonpath.JsonPath;
+
+import eu.dnetlib.dhp.schema.mdstore.MDStoreWithInfo;
+import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
+import net.minidev.json.JSONArray;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class DHPUtils {
 
