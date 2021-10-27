@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.mdstore.MDStoreWithInfo;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class AbstractMigrationApplication implements Closeable {
 
@@ -71,27 +72,7 @@ public class AbstractMigrationApplication implements Closeable {
 		final String format,
 		final String layout,
 		final String interpretation) throws IOException {
-		final String url = mdstoreManagerUrl + "/mdstores/";
-		final ObjectMapper objectMapper = new ObjectMapper();
-
-		final HttpGet req = new HttpGet(url);
-
-		try (final CloseableHttpClient client = HttpClients.createDefault()) {
-			try (final CloseableHttpResponse response = client.execute(req)) {
-				final String json = IOUtils.toString(response.getEntity().getContent());
-				final MDStoreWithInfo[] mdstores = objectMapper.readValue(json, MDStoreWithInfo[].class);
-				return Arrays
-					.stream(mdstores)
-					.filter(md -> md.getFormat().equalsIgnoreCase(format))
-					.filter(md -> md.getLayout().equalsIgnoreCase(layout))
-					.filter(md -> md.getInterpretation().equalsIgnoreCase(interpretation))
-					.filter(md -> StringUtils.isNotBlank(md.getHdfsPath()))
-					.filter(md -> StringUtils.isNotBlank(md.getCurrentVersion()))
-					.filter(md -> md.getSize() > 0)
-					.map(md -> md.getHdfsPath() + "/" + md.getCurrentVersion() + "/store")
-					.collect(Collectors.toSet());
-			}
-		}
+		return DHPUtils.mdstorePaths(mdstoreManagerUrl, format, layout, interpretation, false);
 	}
 
 	private Configuration getConf() {

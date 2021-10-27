@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.actionmanager.datacite
+package eu.dnetlib.dhp.datacite
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
@@ -325,8 +325,9 @@ object DataciteToOAFTransformation {
       val grantId = m.matcher(awardUri).replaceAll("$2")
       val targetId = s"$p${DHPUtils.md5(grantId)}"
       List(
-        generateRelation(sourceId, targetId, "isProducedBy", DATACITE_COLLECTED_FROM, dataInfo),
-        generateRelation(targetId, sourceId, "produces", DATACITE_COLLECTED_FROM, dataInfo)
+        generateRelation(sourceId, targetId, "isProducedBy", DATACITE_COLLECTED_FROM, dataInfo)
+// REMOVED INVERSE RELATION since there is a specific method that should generate later
+//        generateRelation(targetId, sourceId, "produces", DATACITE_COLLECTED_FROM, dataInfo)
       )
     }
     else
@@ -580,11 +581,11 @@ object DataciteToOAFTransformation {
         rel.setProperties(List(dateProps).asJava)
 
         rel.setSource(id)
-        rel.setTarget(s"unresolved::${r.relatedIdentifier}::${r.relatedIdentifierType}")
+        rel.setTarget(DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier,r.relatedIdentifierType))
         rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
-        rel.getCollectedfrom.asScala.map(c => c.getValue)(collection.breakOut)
+        rel.getCollectedfrom.asScala.map(c => c.getValue).toList
         rel
-      })(collection breakOut)
+      }).toList
   }
 
   def generateDataInfo(trust: String): DataInfo = {

@@ -7,8 +7,8 @@
   },
 
   {
-    "paramName": "t",
-    "paramLongName": "targetPath",
+    "paramName": "mo",
+    "paramLongName": "mdstoreOutputVersion",
     "paramDescription": "the target mdstore path",
     "paramRequired": true
   },

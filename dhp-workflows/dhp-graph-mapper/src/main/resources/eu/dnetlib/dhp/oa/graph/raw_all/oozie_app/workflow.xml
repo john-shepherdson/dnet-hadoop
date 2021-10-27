@@ -553,7 +553,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>ImportOAF_hdfs_graph</name>
-            <class>eu.dnetlib.dhp.oa.graph.raw.CopyHdfsOafApplication</class>
+            <class>eu.dnetlib.dhp.oa.graph.raw.CopyHdfsOafSparkApplication</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory ${sparkExecutorMemory}
@@ -568,8 +568,8 @@
             <arg>--mdstoreManagerUrl</arg><arg>${mdstoreManagerUrl}</arg>
             <arg>--mdFormat</arg><arg>OAF</arg>
             <arg>--mdLayout</arg><arg>store</arg>
+            <arg>--master</arg><arg>yarn</arg>
             <arg>--mdInterpretation</arg><arg>graph</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
         <ok to="wait_graphs"/>
         <error to="Kill"/>

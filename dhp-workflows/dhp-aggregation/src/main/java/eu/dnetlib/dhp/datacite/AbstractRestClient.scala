@@ -1,12 +1,10 @@
-package eu.dnetlib.dhp.actionmanager.datacite
+package eu.dnetlib.dhp.datacite
 
 import org.apache.commons.io.IOUtils
 import org.apache.http.client.config.RequestConfig
-import org.apache.http.client.methods.{HttpGet, HttpPost, HttpRequestBase, HttpUriRequest}
+import org.apache.http.client.methods.{HttpGet, HttpPost, HttpUriRequest}
 import org.apache.http.entity.StringEntity
-import org.apache.http.impl.client.{HttpClientBuilder, HttpClients}
-
-import java.io.IOException
+import org.apache.http.impl.client.HttpClientBuilder
 
 
 abstract class AbstractRestClient extends Iterator[String] {

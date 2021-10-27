@@ -1,6 +1,5 @@
-package eu.dnetlib.dhp.actionmanager.datacite
+package eu.dnetlib.dhp.datacite
 
-import eu.dnetlib.dhp.actionmanager.datacite.DataciteToOAFTransformation.df_it
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, LocalFileSystem, Path}
@@ -9,14 +8,14 @@ import org.apache.hadoop.io.{IntWritable, SequenceFile, Text}
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.expressions.Aggregator
+import org.apache.spark.sql.functions.max
 import org.apache.spark.sql.{Dataset, Encoder, SaveMode, SparkSession}
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
-import org.apache.spark.sql.functions.max
 import org.slf4j.{Logger, LoggerFactory}
 
-import java.time.format.DateTimeFormatter._
-import java.time.{LocalDate, LocalDateTime, ZoneOffset}
+import java.time.format.DateTimeFormatter.ISO_DATE_TIME
+import java.time.{LocalDateTime, ZoneOffset}
 import scala.io.Source
 
 object ImportDatacite {
@@ -138,11 +137,11 @@ object ImportDatacite {
     }
   }
 
-  private def writeSequenceFile(hdfsTargetPath: Path, timestamp: Long, conf: Configuration, bs:Int): Long = {
-    var from:Long = timestamp * 1000
-    val delta:Long = 100000000L
+  private def writeSequenceFile(hdfsTargetPath: Path, timestamp: Long, conf: Configuration, bs: Int): Long = {
+    var from: Long = timestamp * 1000
+    val delta: Long = 100000000L
     var client: DataciteAPIImporter = null
-    val now :Long =System.currentTimeMillis()
+    val now: Long = System.currentTimeMillis()
     var i = 0
     try {
       val writer = SequenceFile.createWriter(conf, SequenceFile.Writer.file(hdfsTargetPath), SequenceFile.Writer.keyClass(classOf[IntWritable]), SequenceFile.Writer.valueClass(classOf[Text]))
@@ -168,7 +167,7 @@ object ImportDatacite {
               start = System.currentTimeMillis
             }
           }
-          println(s"updating from value: $from  -> ${from+delta}")
+          println(s"updating from value: $from  -> ${from + delta}")
           from = from + delta
         }
       } catch {

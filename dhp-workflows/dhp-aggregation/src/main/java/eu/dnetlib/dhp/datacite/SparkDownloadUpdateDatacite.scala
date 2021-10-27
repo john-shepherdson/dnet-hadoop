@@ -1,18 +1,14 @@
-package eu.dnetlib.dhp.actionmanager.datacite
-
+package eu.dnetlib.dhp.datacite
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Result}
-import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.LocalFileSystem
-import org.apache.hadoop.hdfs.DistributedFileSystem
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
 import org.apache.spark.sql.functions.max
+import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
 import org.slf4j.{Logger, LoggerFactory}
 
 import java.text.SimpleDateFormat
-import java.util.{Date, Locale}
+import java.util.Locale
 import scala.io.Source
 
 object SparkDownloadUpdateDatacite {
@@ -21,7 +17,7 @@ object SparkDownloadUpdateDatacite {
   def main(args: Array[String]): Unit = {
 
     val conf = new SparkConf
-    val parser = new ArgumentApplicationParser(Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/actionmanager/datacite/generate_dataset_params.json")).mkString)
+    val parser = new ArgumentApplicationParser(Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/datacite/generate_dataset_params.json")).mkString)
     parser.parseArgument(args)
     val master = parser.get("master")
     val sourcePath = parser.get("sourcePath")
@@ -42,9 +38,9 @@ object SparkDownloadUpdateDatacite {
     import spark.implicits._
 
 
-    val maxDate:String = spark.read.load(workingPath).as[Oaf].filter(s => s.isInstanceOf[Result]).map(r => r.asInstanceOf[Result].getDateofcollection).select(max("value")).first().getString(0)
+    val maxDate: String = spark.read.load(workingPath).as[Oaf].filter(s => s.isInstanceOf[Result]).map(r => r.asInstanceOf[Result].getDateofcollection).select(max("value")).first().getString(0)
     val ISO8601FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US)
-    val string_to_date =ISO8601FORMAT.parse(maxDate)
+    val string_to_date = ISO8601FORMAT.parse(maxDate)
     val ts = string_to_date.getTime
 
 
