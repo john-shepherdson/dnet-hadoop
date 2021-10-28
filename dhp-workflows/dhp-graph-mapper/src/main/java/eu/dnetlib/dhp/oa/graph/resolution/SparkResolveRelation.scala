@@ -75,7 +75,7 @@ object SparkResolveRelation {
         if (targetResolved != null && targetResolved._1.nonEmpty)
           currentRelation.setTarget(targetResolved._1)
         currentRelation
-    }.filter(r => !r.getSource.startsWith("unresolved") && !r.getTarget.startsWith("unresolved"))
+    }
       .write
       .mode(SaveMode.Overwrite)
       .save(s"$workingPath/relation_resolved")
@@ -88,6 +88,7 @@ object SparkResolveRelation {
     fs.rename(new Path(s"$graphBasePath/relation"), new Path(s"$workingPath/relation"))
 
     spark.read.load(s"$workingPath/relation_resolved").as[Relation]
+      .filter(r => !r.getSource.startsWith("unresolved") && !r.getTarget.startsWith("unresolved"))
       .map(r => mapper.writeValueAsString(r))
       .write
       .option("compression", "gzip")
