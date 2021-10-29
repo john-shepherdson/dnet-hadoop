@@ -23,87 +23,87 @@ import org.slf4j.LoggerFactory;
 
 public abstract class SolrExploreTest {
 
-    protected static final Logger log = LoggerFactory.getLogger(SolrTest.class);
+	protected static final Logger log = LoggerFactory.getLogger(SolrTest.class);
 
-    protected static final String FORMAT = "test";
-    protected static final String DEFAULT_COLLECTION = FORMAT + "-index-openaire";
-    protected static final String CONFIG_NAME = "testConfig";
+	protected static final String FORMAT = "test";
+	protected static final String DEFAULT_COLLECTION = FORMAT + "-index-openaire";
+	protected static final String CONFIG_NAME = "testConfig";
 
-    protected static MiniSolrCloudCluster miniCluster;
+	protected static MiniSolrCloudCluster miniCluster;
 
-    @TempDir
-    public static Path workingDir;
+	@TempDir
+	public static Path workingDir;
 
-    @BeforeAll
-    public static void setup() throws Exception {
+	@BeforeAll
+	public static void setup() throws Exception {
 
-        // random unassigned HTTP port
-        final int jettyPort = 0;
-        final JettyConfig jettyConfig = JettyConfig.builder().setPort(jettyPort).build();
+		// random unassigned HTTP port
+		final int jettyPort = 0;
+		final JettyConfig jettyConfig = JettyConfig.builder().setPort(jettyPort).build();
 
-        log.info(String.format("working directory: %s", workingDir.toString()));
-        System.setProperty("solr.log.dir", workingDir.resolve("logs").toString());
+		log.info(String.format("working directory: %s", workingDir.toString()));
+		System.setProperty("solr.log.dir", workingDir.resolve("logs").toString());
 
-        // create a MiniSolrCloudCluster instance
-        miniCluster = new MiniSolrCloudCluster(2, workingDir.resolve("solr"), jettyConfig);
+		// create a MiniSolrCloudCluster instance
+		miniCluster = new MiniSolrCloudCluster(2, workingDir.resolve("solr"), jettyConfig);
 
-        // Upload Solr configuration directory to ZooKeeper
-        String solrZKConfigDir = "src/test/resources/eu/dnetlib/dhp/oa/provision/solr/conf/exploreTestConfig";
-        File configDir = new File(solrZKConfigDir);
+		// Upload Solr configuration directory to ZooKeeper
+		String solrZKConfigDir = "src/test/resources/eu/dnetlib/dhp/oa/provision/solr/conf/exploreTestConfig";
+		File configDir = new File(solrZKConfigDir);
 
-        miniCluster.uploadConfigSet(configDir.toPath(), CONFIG_NAME);
+		miniCluster.uploadConfigSet(configDir.toPath(), CONFIG_NAME);
 
-        // override settings in the solrconfig include
-        System.setProperty("solr.tests.maxBufferedDocs", "100000");
-        System.setProperty("solr.tests.maxIndexingThreads", "-1");
-        System.setProperty("solr.tests.ramBufferSizeMB", "100");
+		// override settings in the solrconfig include
+		System.setProperty("solr.tests.maxBufferedDocs", "100000");
+		System.setProperty("solr.tests.maxIndexingThreads", "-1");
+		System.setProperty("solr.tests.ramBufferSizeMB", "100");
 
-        // use non-test classes so RandomizedRunner isn't necessary
-        System.setProperty("solr.tests.mergeScheduler", "org.apache.lucene.index.ConcurrentMergeScheduler");
-        System.setProperty("solr.directoryFactory", "solr.RAMDirectoryFactory");
-        System.setProperty("solr.lock.type", "single");
+		// use non-test classes so RandomizedRunner isn't necessary
+		System.setProperty("solr.tests.mergeScheduler", "org.apache.lucene.index.ConcurrentMergeScheduler");
+		System.setProperty("solr.directoryFactory", "solr.RAMDirectoryFactory");
+		System.setProperty("solr.lock.type", "single");
 
-        log.info(new ConfigSetAdminRequest.List().process(miniCluster.getSolrClient()).toString());
-        log
-                .info(
-                        CollectionAdminRequest.ClusterStatus
-                                .getClusterStatus()
-                                .process(miniCluster.getSolrClient())
-                                .toString());
+		log.info(new ConfigSetAdminRequest.List().process(miniCluster.getSolrClient()).toString());
+		log
+			.info(
+				CollectionAdminRequest.ClusterStatus
+					.getClusterStatus()
+					.process(miniCluster.getSolrClient())
+					.toString());
 
-        NamedList<Object> res = createCollection(
-                miniCluster.getSolrClient(), DEFAULT_COLLECTION, 4, 2, 20, CONFIG_NAME);
-        res.forEach(o -> log.info(o.toString()));
+		NamedList<Object> res = createCollection(
+			miniCluster.getSolrClient(), DEFAULT_COLLECTION, 4, 2, 20, CONFIG_NAME);
+		res.forEach(o -> log.info(o.toString()));
 
-        miniCluster.getSolrClient().setDefaultCollection(DEFAULT_COLLECTION);
+		miniCluster.getSolrClient().setDefaultCollection(DEFAULT_COLLECTION);
 
-        log
-                .info(
-                        CollectionAdminRequest.ClusterStatus
-                                .getClusterStatus()
-                                .process(miniCluster.getSolrClient())
-                                .toString());
+		log
+			.info(
+				CollectionAdminRequest.ClusterStatus
+					.getClusterStatus()
+					.process(miniCluster.getSolrClient())
+					.toString());
 
-    }
+	}
 
-    @AfterAll
-    public static void shutDown() throws Exception {
-        miniCluster.shutdown();
-        FileUtils.deleteDirectory(workingDir.toFile());
-    }
+	@AfterAll
+	public static void shutDown() throws Exception {
+		miniCluster.shutdown();
+		FileUtils.deleteDirectory(workingDir.toFile());
+	}
 
-    protected static NamedList<Object> createCollection(CloudSolrClient client, String name, int numShards,
-                                                        int replicationFactor, int maxShardsPerNode, String configName) throws Exception {
-        ModifiableSolrParams modParams = new ModifiableSolrParams();
-        modParams.set(CoreAdminParams.ACTION, CollectionParams.CollectionAction.CREATE.name());
-        modParams.set("name", name);
-        modParams.set("numShards", numShards);
-        modParams.set("replicationFactor", replicationFactor);
-        modParams.set("collection.configName", configName);
-        modParams.set("maxShardsPerNode", maxShardsPerNode);
-        QueryRequest request = new QueryRequest(modParams);
-        request.setPath("/admin/collections");
-        return client.request(request);
-    }
+	protected static NamedList<Object> createCollection(CloudSolrClient client, String name, int numShards,
+		int replicationFactor, int maxShardsPerNode, String configName) throws Exception {
+		ModifiableSolrParams modParams = new ModifiableSolrParams();
+		modParams.set(CoreAdminParams.ACTION, CollectionParams.CollectionAction.CREATE.name());
+		modParams.set("name", name);
+		modParams.set("numShards", numShards);
+		modParams.set("replicationFactor", replicationFactor);
+		modParams.set("collection.configName", configName);
+		modParams.set("maxShardsPerNode", maxShardsPerNode);
+		QueryRequest request = new QueryRequest(modParams);
+		request.setPath("/admin/collections");
+		return client.request(request);
+	}
 
 }

@@ -30,7 +30,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Convert Baseline to OAF Dataset</name>
-            <class>eu.dnetllib.dhp.sx.bio.ebi.SparkCreateBaselineDataFrame</class>
+            <class>eu.dnetlib.dhp.sx.bio.ebi.SparkCreateBaselineDataFrame</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}

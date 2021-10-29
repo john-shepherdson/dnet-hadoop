@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
+import eu.dnetlib.dhp.oa.graph.dump.exceptions.MyRuntimeException;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
@@ -38,6 +39,7 @@ public class CreateContextRelation implements Serializable {
 	private final transient QueryInformationSystem queryInformationSystem;
 
 	private static final String CONTEX_RELATION_DATASOURCE = "contentproviders";
+	private static final String CONTEX_RELATION_PROJECT = "projects";
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
@@ -72,6 +74,10 @@ public class CreateContextRelation implements Serializable {
 		cce.execute(Process::getRelation, CONTEX_RELATION_DATASOURCE, ModelSupport.getIdPrefix(Datasource.class));
 
 		log.info("Creating relations for projects... ");
+		cce
+			.execute(
+				Process::getRelation, CONTEX_RELATION_PROJECT,
+				ModelSupport.getIdPrefix(eu.dnetlib.dhp.schema.oaf.Project.class));
 
 		cce.close();
 
@@ -115,7 +121,7 @@ public class CreateContextRelation implements Serializable {
 			writer.write(Utils.OBJECT_MAPPER.writeValueAsString(r));
 			writer.newLine();
 		} catch (final Exception e) {
-			throw new RuntimeException(e);
+			throw new MyRuntimeException(e);
 		}
 	}
 

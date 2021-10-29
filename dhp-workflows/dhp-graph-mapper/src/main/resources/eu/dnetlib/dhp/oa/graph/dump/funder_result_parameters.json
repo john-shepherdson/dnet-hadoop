@@ -18,8 +18,8 @@
 		"paramRequired": false
 	},
 {
-	"paramName": "rp",
-	"paramLongName": "relationPath",
+	"paramName": "gp",
+	"paramLongName": "graphPath",
 	"paramDescription": "the relationPath",
 	"paramRequired": true
 }

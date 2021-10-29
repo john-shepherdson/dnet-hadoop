@@ -30,6 +30,8 @@ hdfs dfs -copyFromLocal concepts.csv ${TMP}
 hdfs dfs -chmod -R 777 ${TMP}
 
 echo "Creating and populating impala tables"
+impala-shell -q "invalidate metadata"
+impala-shell -d ${TARGET_DB} -q "invalidate metadata"
 impala-shell -q "create table ${TARGET_DB}.context (id string, name string) row format delimited fields terminated by ','"
 impala-shell -q "create table ${TARGET_DB}.category (context string, id string, name string) row format delimited fields terminated by ','"
 impala-shell -q "create table ${TARGET_DB}.concept (category string, id string, name string) row format delimited fields terminated by ','"

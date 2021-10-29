@@ -52,7 +52,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Incremental Download EBI Links</name>
-            <class>eu.dnetllib.dhp.sx.bio.ebi.SparkDownloadEBILinks</class>
+            <class>eu.dnetlib.dhp.sx.bio.ebi.SparkDownloadEBILinks</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -85,7 +85,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Create OAF DataSet</name>
-            <class>eu.dnetllib.dhp.sx.bio.ebi.SparkEBILinksToOaf</class>
+            <class>eu.dnetlib.dhp.sx.bio.ebi.SparkEBILinksToOaf</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}

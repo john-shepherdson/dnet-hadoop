@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.oa.graph.dump.exceptions.NoAvailableEntityTypeException;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Project;
@@ -88,7 +89,7 @@ public class DumpOrganizationProjectDatasourceTest {
 		org.apache.spark.sql.Dataset<eu.dnetlib.dhp.schema.dump.oaf.graph.Organization> verificationDataset = spark
 			.createDataset(tmp.rdd(), Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.graph.Organization.class));
 
-		Assertions.assertEquals(34, verificationDataset.count());
+		Assertions.assertEquals(15, verificationDataset.count());
 
 		verificationDataset
 			.foreach(
@@ -98,7 +99,7 @@ public class DumpOrganizationProjectDatasourceTest {
 	}
 
 	@Test
-	public void dumpProjectTest() {
+	public void dumpProjectTest() throws NoAvailableEntityTypeException {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/complete/project")
@@ -127,7 +128,7 @@ public class DumpOrganizationProjectDatasourceTest {
 	}
 
 	@Test
-	public void dumpDatasourceTest() {
+	public void dumpDatasourceTest() throws NoAvailableEntityTypeException {
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/complete/datasource")
 			.getPath();
