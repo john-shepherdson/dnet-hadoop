@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.KeyValueSet;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -19,6 +18,7 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.dnetlib.dhp.KeyValueSet;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -138,30 +138,15 @@ public class SparkResultToOrganizationFromIstRepoJob {
 			String resultId = potentialUpdate.getKey();
 			organizations
 				.forEach(
-					orgId -> {
-						newRelations
-							.add(
-								getRelation(
-									orgId,
-									resultId,
-									ModelConstants.IS_AUTHOR_INSTITUTION_OF,
-									ModelConstants.RESULT_ORGANIZATION,
-									ModelConstants.AFFILIATION,
-									PROPAGATION_DATA_INFO_TYPE,
-									PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_ID,
-									PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME));
-						newRelations
-							.add(
-								getRelation(
-									resultId,
-									orgId,
-									ModelConstants.HAS_AUTHOR_INSTITUTION,
-									ModelConstants.RESULT_ORGANIZATION,
-									ModelConstants.AFFILIATION,
-									PROPAGATION_DATA_INFO_TYPE,
-									PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_ID,
-									PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME));
-					});
+					orgId -> newRelations
+						.addAll(
+							getOrganizationRelationPair(
+								orgId,
+								resultId,
+								PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_ID,
+								PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME))
+
+				);
 			return newRelations.iterator();
 		};
 	}

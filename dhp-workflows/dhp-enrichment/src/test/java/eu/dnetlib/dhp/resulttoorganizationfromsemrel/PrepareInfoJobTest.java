@@ -1,10 +1,13 @@
 
 package eu.dnetlib.dhp.resulttoorganizationfromsemrel;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.KeyValueSet;
-import eu.dnetlib.dhp.projecttoresult.SparkResultToProjectThroughSemRelJob;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import static eu.dnetlib.dhp.PropagationConstant.readPath;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -22,10 +25,11 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.KeyValueSet;
+import eu.dnetlib.dhp.projecttoresult.SparkResultToProjectThroughSemRelJob;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class PrepareInfoJobTest {
 
@@ -65,259 +69,484 @@ public class PrepareInfoJobTest {
 		spark.stop();
 	}
 
-
 	@Test
-	public  void childParentTest1()  {
+	public void childParentTest1() throws Exception {
 
-		PrepareInfo.prepareChildrenParent(spark, getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/childparenttest1")
-				.getPath(), workingDir.toString() + "/childParentOrg/");
+		PrepareInfo
+			.main(
+				new String[] {
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-graphPath", getClass()
+						.getResource(
+							"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/childparenttest1")
+						.getPath(),
+					"-hive_metastore_uris", "",
+					"-leavesPath", workingDir.toString() + "/currentIteration/",
+					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
+					"-childParentPath", workingDir.toString() + "/childParentOrg/",
+
+				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<KeyValueSet> tmp = sc
-				.textFile( workingDir.toString() + "/childParentOrg/")
-				.map(item -> OBJECT_MAPPER.readValue(item, KeyValueSet.class));
+			.textFile(workingDir.toString() + "/childParentOrg/")
+			.map(item -> OBJECT_MAPPER.readValue(item, KeyValueSet.class));
 
 		Dataset<KeyValueSet> verificationDs = spark.createDataset(tmp.rdd(), Encoders.bean(KeyValueSet.class));
 
 		Assertions.assertEquals(6, verificationDs.count());
 
-		Assertions.assertEquals(1, verificationDs.filter("key = '20|dedup_wf_001::2899e571609779168222fdeb59cb916d'")
-				.collectAsList().get(0).getValueSet().size());
-		Assertions.assertEquals("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f",
-				verificationDs.filter("key = '20|dedup_wf_001::2899e571609779168222fdeb59cb916d'")
-						.collectAsList().get(0).getValueSet().get(0));
+		Assertions
+			.assertEquals(
+				1, verificationDs
+					.filter("key = '20|dedup_wf_001::2899e571609779168222fdeb59cb916d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertEquals(
+				"20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f",
+				verificationDs
+					.filter("key = '20|dedup_wf_001::2899e571609779168222fdeb59cb916d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.get(0));
 
-		Assertions.assertEquals(2, verificationDs.filter("key = '20|pippo_wf_001::2899e571609779168222fdeb59cb916d'")
-				.collectAsList().get(0).getValueSet().size());
-		Assertions.assertTrue(verificationDs.filter("key = '20|pippo_wf_001::2899e571609779168222fdeb59cb916d'")
-				.collectAsList().get(0).getValueSet().contains("20|dedup_wf_001::2899e571609779168222fdeb59cb916d"));
-		Assertions.assertTrue(verificationDs.filter("key = '20|pippo_wf_001::2899e571609779168222fdeb59cb916d'")
-				.collectAsList().get(0).getValueSet().contains("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"));
+		Assertions
+			.assertEquals(
+				2, verificationDs
+					.filter("key = '20|pippo_wf_001::2899e571609779168222fdeb59cb916d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '20|pippo_wf_001::2899e571609779168222fdeb59cb916d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|dedup_wf_001::2899e571609779168222fdeb59cb916d"));
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '20|pippo_wf_001::2899e571609779168222fdeb59cb916d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"));
 
-		Assertions.assertEquals(1, verificationDs.filter("key = '20|doajarticles::396262ee936f3d3e26ff0e60bea6cae0'")
-				.collectAsList().get(0).getValueSet().size());
-		Assertions.assertTrue(verificationDs.filter("key = '20|doajarticles::396262ee936f3d3e26ff0e60bea6cae0'")
-				.collectAsList().get(0).getValueSet().contains("20|dedup_wf_001::2899e571609779168222fdeb59cb916d"));
+		Assertions
+			.assertEquals(
+				1, verificationDs
+					.filter("key = '20|doajarticles::396262ee936f3d3e26ff0e60bea6cae0'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '20|doajarticles::396262ee936f3d3e26ff0e60bea6cae0'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|dedup_wf_001::2899e571609779168222fdeb59cb916d"));
 
-		Assertions.assertEquals(1, verificationDs.filter("key = '20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
-				.collectAsList().get(0).getValueSet().size());
-		Assertions.assertTrue(verificationDs.filter("key = '20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
-				.collectAsList().get(0).getValueSet().contains("20|doajarticles::03748bcb5d754c951efec9700e18a56d"));
+		Assertions
+			.assertEquals(
+				1, verificationDs
+					.filter("key = '20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|doajarticles::03748bcb5d754c951efec9700e18a56d"));
 
-		Assertions.assertEquals(1, verificationDs.filter("key = '20|doajarticles::1cae0b82b56ccd97c2db1f698def7074'")
-				.collectAsList().get(0).getValueSet().size());
-		Assertions.assertTrue(verificationDs.filter("key = '20|doajarticles::1cae0b82b56ccd97c2db1f698def7074'")
-				.collectAsList().get(0).getValueSet().contains("20|openaire____::ec653e804967133b9436fdd30d3ff51d"));
+		Assertions
+			.assertEquals(
+				1, verificationDs
+					.filter("key = '20|doajarticles::1cae0b82b56ccd97c2db1f698def7074'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '20|doajarticles::1cae0b82b56ccd97c2db1f698def7074'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|openaire____::ec653e804967133b9436fdd30d3ff51d"));
 
-		Assertions.assertEquals(1, verificationDs.filter("key = '20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
-				.collectAsList().get(0).getValueSet().size());
-		Assertions.assertTrue(verificationDs.filter("key = '20|opendoar____::a5fcb8eb25ebd6f7cd219e0fa1e6ddc1'")
-				.collectAsList().get(0).getValueSet().contains("20|doajarticles::1cae0b82b56ccd97c2db1f698def7074"));
+		Assertions
+			.assertEquals(
+				1, verificationDs
+					.filter("key = '20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '20|opendoar____::a5fcb8eb25ebd6f7cd219e0fa1e6ddc1'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|doajarticles::1cae0b82b56ccd97c2db1f698def7074"));
+
+		verificationDs
+			.foreach((ForeachFunction<KeyValueSet>) v -> System.out.println(OBJECT_MAPPER.writeValueAsString(v)));
 
 	}
 
-
-
 	@Test
-	public  void childParentTest2()  {
+	public void childParentTest2() throws Exception {
 
-		PrepareInfo.prepareChildrenParent(spark, getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/childparenttest2")
-				.getPath(), workingDir.toString() + "/childParentOrg/");
+		PrepareInfo
+			.main(
+				new String[] {
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-graphPath", getClass()
+						.getResource(
+							"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/childparenttest2")
+						.getPath(),
+					"-hive_metastore_uris", "",
+					"-leavesPath", workingDir.toString() + "/currentIteration/",
+					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
+					"-childParentPath", workingDir.toString() + "/childParentOrg/",
 
+				});
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<KeyValueSet> tmp = sc
-				.textFile( workingDir.toString() + "/childParentOrg/")
-				.map(item -> OBJECT_MAPPER.readValue(item, KeyValueSet.class));
+			.textFile(workingDir.toString() + "/childParentOrg/")
+			.map(item -> OBJECT_MAPPER.readValue(item, KeyValueSet.class));
 
 		Dataset<KeyValueSet> verificationDs = spark.createDataset(tmp.rdd(), Encoders.bean(KeyValueSet.class));
 
 		Assertions.assertEquals(5, verificationDs.count());
 
-		Assertions.assertEquals(0, verificationDs.filter("key = '20|dedup_wf_001::2899e571609779168222fdeb59cb916d'").count());
+		Assertions
+			.assertEquals(
+				0, verificationDs.filter("key = '20|dedup_wf_001::2899e571609779168222fdeb59cb916d'").count());
 
-		Assertions.assertEquals(1, verificationDs.filter("key = '20|pippo_wf_001::2899e571609779168222fdeb59cb916d'")
-				.collectAsList().get(0).getValueSet().size());
-		Assertions.assertEquals("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f",
-				verificationDs.filter("key = '20|pippo_wf_001::2899e571609779168222fdeb59cb916d'")
-				.collectAsList().get(0).getValueSet().get(0));
+		Assertions
+			.assertEquals(
+				1, verificationDs
+					.filter("key = '20|pippo_wf_001::2899e571609779168222fdeb59cb916d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertEquals(
+				"20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f",
+				verificationDs
+					.filter("key = '20|pippo_wf_001::2899e571609779168222fdeb59cb916d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.get(0));
 
-		Assertions.assertEquals(1, verificationDs.filter("key = '20|doajarticles::396262ee936f3d3e26ff0e60bea6cae0'")
-				.collectAsList().get(0).getValueSet().size());
-		Assertions.assertTrue(verificationDs.filter("key = '20|doajarticles::396262ee936f3d3e26ff0e60bea6cae0'")
-				.collectAsList().get(0).getValueSet().contains("20|dedup_wf_001::2899e571609779168222fdeb59cb916d"));
+		Assertions
+			.assertEquals(
+				1, verificationDs
+					.filter("key = '20|doajarticles::396262ee936f3d3e26ff0e60bea6cae0'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '20|doajarticles::396262ee936f3d3e26ff0e60bea6cae0'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|dedup_wf_001::2899e571609779168222fdeb59cb916d"));
 
-		Assertions.assertEquals(1, verificationDs.filter("key = '20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
-				.collectAsList().get(0).getValueSet().size());
-		Assertions.assertTrue(verificationDs.filter("key = '20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
-				.collectAsList().get(0).getValueSet().contains("20|doajarticles::03748bcb5d754c951efec9700e18a56d"));
+		Assertions
+			.assertEquals(
+				1, verificationDs
+					.filter("key = '20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|doajarticles::03748bcb5d754c951efec9700e18a56d"));
 
-		Assertions.assertEquals(1, verificationDs.filter("key = '20|doajarticles::1cae0b82b56ccd97c2db1f698def7074'")
-				.collectAsList().get(0).getValueSet().size());
-		Assertions.assertTrue(verificationDs.filter("key = '20|doajarticles::1cae0b82b56ccd97c2db1f698def7074'")
-				.collectAsList().get(0).getValueSet().contains("20|openaire____::ec653e804967133b9436fdd30d3ff51d"));
+		Assertions
+			.assertEquals(
+				1, verificationDs
+					.filter("key = '20|doajarticles::1cae0b82b56ccd97c2db1f698def7074'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '20|doajarticles::1cae0b82b56ccd97c2db1f698def7074'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|openaire____::ec653e804967133b9436fdd30d3ff51d"));
 
-		Assertions.assertEquals(1, verificationDs.filter("key = '20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
-				.collectAsList().get(0).getValueSet().size());
-		Assertions.assertTrue(verificationDs.filter("key = '20|opendoar____::a5fcb8eb25ebd6f7cd219e0fa1e6ddc1'")
-				.collectAsList().get(0).getValueSet().contains("20|doajarticles::1cae0b82b56ccd97c2db1f698def7074"));
+		Assertions
+			.assertEquals(
+				1, verificationDs
+					.filter("key = '20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '20|opendoar____::a5fcb8eb25ebd6f7cd219e0fa1e6ddc1'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|doajarticles::1cae0b82b56ccd97c2db1f698def7074"));
 
 	}
 
-
 	@Test
-	public  void resultOrganizationTest1(){
+	public void resultOrganizationTest1() throws Exception {
 
-	}
-
-	/**
-	 * All the possible updates will produce a new relation. No relations are already linked in the grpha
-	 *
-	 * @throws Exception
-	 */
-	@Test
-	void UpdateTenTest() throws Exception {
-		final String potentialUpdatePath = getClass()
-			.getResource(
-				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/tenupdates/potentialUpdates")
-			.getPath();
-		final String alreadyLinkedPath = getClass()
-			.getResource(
-				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/alreadyLinked")
-			.getPath();
-		SparkResultToProjectThroughSemRelJob
+		PrepareInfo
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-graphPath", getClass()
+						.getResource(
+							"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/resultorganizationtest")
+						.getPath(),
 					"-hive_metastore_uris", "",
-					"-saveGraph", "true",
-					"-outputPath", workingDir.toString() + "/relation",
-					"-potentialUpdatePath", potentialUpdatePath,
-					"-alreadyLinkedPath", alreadyLinkedPath,
+					"-leavesPath", workingDir.toString() + "/currentIteration/",
+					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
+					"-childParentPath", workingDir.toString() + "/childParentOrg/",
+
 				});
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<KeyValueSet> tmp = sc
+			.textFile(workingDir.toString() + "/resultOrganization/")
+			.map(item -> OBJECT_MAPPER.readValue(item, KeyValueSet.class));
+
+		Dataset<KeyValueSet> verificationDs = spark.createDataset(tmp.rdd(), Encoders.bean(KeyValueSet.class));
+
+		Assertions.assertEquals(5, verificationDs.count());
+
+		Assertions
+			.assertEquals(
+				2, verificationDs
+					.filter("key = '50|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '50|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|dedup_wf_001::2899e571609779168222fdeb59cb916d"));
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '50|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|pippo_wf_001::2899e571609779168222fdeb59cb916d"));
+
+		Assertions
+			.assertEquals(
+				2, verificationDs
+					.filter("key = '50|dedup_wf_001::2899e571609779168222fdeb59cb916d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '50|dedup_wf_001::2899e571609779168222fdeb59cb916d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|doajarticles::396262ee936f3d3e26ff0e60bea6cae0"));
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '50|dedup_wf_001::2899e571609779168222fdeb59cb916d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|pippo_wf_001::2899e571609779168222fdeb59cb916d"));
+
+		Assertions
+			.assertEquals(
+				1, verificationDs
+					.filter("key = '50|doajarticles::03748bcb5d754c951efec9700e18a56d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '50|doajarticles::03748bcb5d754c951efec9700e18a56d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"));
+
+		Assertions
+			.assertEquals(
+				1, verificationDs
+					.filter("key = '50|openaire____::ec653e804967133b9436fdd30d3ff51d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '50|openaire____::ec653e804967133b9436fdd30d3ff51d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|doajarticles::1cae0b82b56ccd97c2db1f698def7074"));
+
+		Assertions
+			.assertEquals(
+				1, verificationDs
+					.filter("key = '50|doajarticles::1cae0b82b56ccd97c2db1f698def7074'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '50|doajarticles::1cae0b82b56ccd97c2db1f698def7074'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|opendoar____::a5fcb8eb25ebd6f7cd219e0fa1e6ddc1"));
+
+		verificationDs
+			.foreach((ForeachFunction<KeyValueSet>) v -> System.out.println(OBJECT_MAPPER.writeValueAsString(v)));
+
+	}
+
+	@Test
+	public void foundLeavesTest1() throws Exception {
+//		PrepareInfo.prepareInfo(spark, getClass()
+//				.getResource(
+//						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/resultorganizationtest")
+//				.getPath(), workingDir.toString() + "/childParentOrg/", workingDir.toString() + "/currentIteration/",workingDir.toString() + "/resultOrganization/");
+
+		PrepareInfo
+			.main(
+				new String[] {
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-graphPath", getClass()
+						.getResource(
+							"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/resultorganizationtest")
+						.getPath(),
+					"-hive_metastore_uris", "",
+					"-leavesPath", workingDir.toString() + "/currentIteration/",
+					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
+					"-childParentPath", workingDir.toString() + "/childParentOrg/",
+
+				});
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<String> tmp = sc
+			.textFile(workingDir.toString() + "/currentIteration/")
+			.map(item -> OBJECT_MAPPER.readValue(item, String.class));
+
+		Assertions.assertEquals(0, tmp.count());
+
+	}
+
+	@Test
+	public void foundLeavesTest2() throws Exception {
+		PrepareInfo
+			.main(
+				new String[] {
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-graphPath", getClass()
+						.getResource(
+							"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/childparenttest1")
+						.getPath(),
+					"-hive_metastore_uris", "",
+					"-leavesPath", workingDir.toString() + "/currentIteration/",
+					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
+					"-childParentPath", workingDir.toString() + "/childParentOrg/",
+
+				});
+//		PrepareInfo.prepareInfo(spark, getClass()
+//				.getResource(
+//						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/childparenttest1")
+//				.getPath(), workingDir.toString() + "/childParentOrg/", workingDir.toString() + "/currentIteration/",workingDir.toString() + "/resultOrganization/");
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		JavaRDD<Relation> tmp = sc
-			.textFile(workingDir.toString() + "/relation")
-			.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
+		JavaRDD<Leaves> tmp = sc
+			.textFile(workingDir.toString() + "/currentIteration/")
+			.map(item -> OBJECT_MAPPER.readValue(item, Leaves.class));
 
-		// got 20 new relations because "produces" and "isProducedBy" are added
-		Assertions.assertEquals(10, tmp.count());
+		Dataset<Leaves> verificationDs = spark.createDataset(tmp.rdd(), Encoders.bean(Leaves.class));
 
-		Dataset<Relation> verificationDs = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
-
-		Assertions.assertEquals(5, verificationDs.filter("relClass = 'produces'").count());
-		Assertions.assertEquals(5, verificationDs.filter("relClass = 'isProducedBy'").count());
+		Assertions.assertEquals(3, verificationDs.count());
 
 		Assertions
 			.assertEquals(
-				5,
-				verificationDs
-					.filter(
-						(FilterFunction<Relation>) r -> r.getSource().startsWith("50")
-							&& r.getTarget().startsWith("40")
-							&& r.getRelClass().equals("isProducedBy"))
+				1, verificationDs
+					.filter("value = '20|doajarticles::396262ee936f3d3e26ff0e60bea6cae0'")
 					.count());
-		Assertions
-			.assertEquals(
-				5,
-				verificationDs
-					.filter(
-						(FilterFunction<Relation>) r -> r.getSource().startsWith("40")
-							&& r.getTarget().startsWith("50")
-							&& r.getRelClass().equals("produces"))
-					.count());
-
-		verificationDs.createOrReplaceTempView("temporary");
 
 		Assertions
 			.assertEquals(
-				10,
-				spark
-					.sql(
-						"Select * from temporary where datainfo.inferenceprovenance = 'propagation'")
+				1, verificationDs
+					.filter("value = '20|opendoar____::a5fcb8eb25ebd6f7cd219e0fa1e6ddc1'")
 					.count());
+
+		Assertions
+			.assertEquals(
+				1, verificationDs
+					.filter("value = '20|pippo_wf_001::2899e571609779168222fdeb59cb916d'")
+					.count());
+
+		verificationDs.foreach((ForeachFunction<Leaves>) l -> System.out.println(OBJECT_MAPPER.writeValueAsString(l)));
+
 	}
 
-	/**
-	 * One of the relations in the possible updates is already linked to the project in the graph. All the others are
-	 * not. There will be 9 new associations leading to 18 new relations
-	 *
-	 * @throws Exception
-	 */
-	@Test
-	void UpdateMixTest() throws Exception {
-		final String potentialUpdatepath = getClass()
-			.getResource(
-				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/updatesmixed/potentialUpdates")
-			.getPath();
-		final String alreadyLinkedPath = getClass()
-			.getResource(
-				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/alreadyLinked")
-			.getPath();
-		SparkResultToProjectThroughSemRelJob
-			.main(
-				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
-					"-isSparkSessionManaged", Boolean.FALSE.toString(),
-					"-hive_metastore_uris", "",
-					"-saveGraph", "true",
-					"-outputPath", workingDir.toString() + "/relation",
-					"-potentialUpdatePath", potentialUpdatepath,
-					"-alreadyLinkedPath", alreadyLinkedPath,
-				});
-
-		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-
-		JavaRDD<Relation> tmp = sc
-			.textFile(workingDir.toString() + "/relation")
-			.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
-
-		// JavaRDD<Relation> tmp = sc.textFile("/tmp/relation")
-		// .map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
-
-		// got 20 new relations because "produces" and "isProducedBy" are added
-		Assertions.assertEquals(8, tmp.count());
-
-		Dataset<Relation> verificationDs = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
-
-		Assertions.assertEquals(4, verificationDs.filter("relClass = 'produces'").count());
-		Assertions.assertEquals(4, verificationDs.filter("relClass = 'isProducedBy'").count());
-
-		Assertions
-			.assertEquals(
-				4,
-				verificationDs
-					.filter(
-						(FilterFunction<Relation>) r -> r.getSource().startsWith("50")
-							&& r.getTarget().startsWith("40")
-							&& r.getRelClass().equals("isProducedBy"))
-					.count());
-		Assertions
-			.assertEquals(
-				4,
-				verificationDs
-					.filter(
-						(FilterFunction<Relation>) r -> r.getSource().startsWith("40")
-							&& r.getTarget().startsWith("50")
-							&& r.getRelClass().equals("produces"))
-					.count());
-
-		verificationDs.createOrReplaceTempView("temporary");
-
-		Assertions
-			.assertEquals(
-				8,
-				spark
-					.sql(
-						"Select * from temporary where datainfo.inferenceprovenance = 'propagation'")
-					.count());
-	}
 }

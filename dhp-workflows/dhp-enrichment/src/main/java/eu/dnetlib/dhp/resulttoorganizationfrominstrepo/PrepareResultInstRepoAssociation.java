@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.KeyValueSet;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
@@ -23,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.KeyValueSet;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
