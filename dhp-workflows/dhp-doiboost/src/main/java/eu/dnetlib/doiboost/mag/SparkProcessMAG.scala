@@ -111,20 +111,22 @@ object SparkProcessMAG {
       .map(item => ConversionUtil.updatePubsWithConferenceInfo(item))
       .write
       .mode(SaveMode.Overwrite)
-      .save(s"$workingPath/merge_step_2_conference")
-
-
-    magPubs= spark.read.load(s"$workingPath/merge_step_2_conference").as[Publication]
-      .map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
-
-    val paperUrlDataset = spark.read.load(s"$sourcePath/PaperUrls").as[MagPaperUrl].groupBy("PaperId").agg(collect_list(struct("sourceUrl")).as("instances")).as[MagUrl]
-
-
-    logger.info("Phase 5) enrich publication with URL and Instances")
-    magPubs.joinWith(paperUrlDataset, col("_1").equalTo(paperUrlDataset("PaperId")), "left")
-      .map { a: ((String, Publication), MagUrl) => ConversionUtil.addInstances((a._1._2, a._2)) }
-      .write.mode(SaveMode.Overwrite)
       .save(s"$workingPath/merge_step_3")
+
+
+    //no more needed to add the instance to mag records
+//    magPubs= spark.read.load(s"$workingPath/merge_step_2_conference").as[Publication]
+//      .map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
+//
+//    val paperUrlDataset = spark.read.load(s"$sourcePath/PaperUrls").as[MagPaperUrl].groupBy("PaperId").agg(collect_list(struct("sourceUrl")).as("instances")).as[MagUrl]
+//
+//
+//
+//    logger.info("Phase 5) enrich publication with URL and Instances")
+//    magPubs.joinWith(paperUrlDataset, col("_1").equalTo(paperUrlDataset("PaperId")), "left")
+//      .map { a: ((String, Publication), MagUrl) => ConversionUtil.addInstances((a._1._2, a._2)) }
+//      .write.mode(SaveMode.Overwrite)
+//      .save(s"$workingPath/merge_step_3")
 
 
 //    logger.info("Phase 6) Enrich Publication with description")
