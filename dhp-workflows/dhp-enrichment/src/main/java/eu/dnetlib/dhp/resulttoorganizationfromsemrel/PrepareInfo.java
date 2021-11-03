@@ -6,9 +6,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import org.apache.commons.collections.iterators.ArrayListIterator;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.*;
@@ -17,15 +15,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.tools.internal.ws.processor.model.Model;
 
 import eu.dnetlib.dhp.KeyValueSet;
-import eu.dnetlib.dhp.PropagationConstant;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.resulttoorganizationfrominstrepo.SparkResultToOrganizationFromIstRepoJob;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
-import net.sf.saxon.expr.instruct.ForEach;
 import scala.Tuple2;
 
 /**
