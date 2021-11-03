@@ -207,7 +207,7 @@ case object Crossref2Oaf {
       instance.setDateofacceptance(asField(createdDate.getValue))
     }
     val s: String = (json \ "URL").extract[String]
-    val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null).distinct
+    val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null && !p.contains("api.elsevier.com...")).distinct
     if (links.nonEmpty) {
       instance.setUrl(links.asJava)
     }
