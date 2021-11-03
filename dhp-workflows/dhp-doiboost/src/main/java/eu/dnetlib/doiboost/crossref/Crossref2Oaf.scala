@@ -206,11 +206,16 @@ case object Crossref2Oaf {
     else {
       instance.setDateofacceptance(asField(createdDate.getValue))
     }
-    val s: String = (json \ "URL").extract[String]
-    val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null && p.toLowerCase().contains(doi.toLowerCase())).distinct
-    if (links.nonEmpty) {
-      instance.setUrl(links.asJava)
-    }
+    val s: List[String] = List((json \ "URL").extract[String])
+//    val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null && p.toLowerCase().contains(doi.toLowerCase())).distinct
+//    if (links.nonEmpty) {
+//      instance.setUrl(links.asJava)
+//    }
+    if(s.nonEmpty)
+      {
+        instance.setUrl(s.asJava)
+      }
+
     result.setInstance(List(instance).asJava)
 
     //IMPORTANT
