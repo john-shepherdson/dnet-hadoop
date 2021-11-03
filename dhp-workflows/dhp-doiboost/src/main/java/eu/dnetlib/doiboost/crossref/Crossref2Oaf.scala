@@ -70,7 +70,7 @@ case object Crossref2Oaf {
     "reference-book" -> "0002 Book",
     "monograph" -> "0002 Book",
     "journal-article" -> "0001 Article",
-    "dissertation" -> "0006 Doctoral thesis",
+    "dissertation" -> "0044 Thesis",
     "other" -> "0038 Other literature type",
     "peer-review" -> "0015 Review",
     "proceedings" -> "0004 Conference object",
