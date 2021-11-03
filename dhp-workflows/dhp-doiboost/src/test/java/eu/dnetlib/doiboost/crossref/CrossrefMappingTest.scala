@@ -629,7 +629,7 @@ class CrossrefMappingTest {
 
     assertEquals(1, item.getInstance().size())
     assertEquals(1, item.getInstance().get(0).getUrl().size())
-    assertEquals("http://dx.doi.org/10.1016/j.jas.2019.105013", item.getInstance().get(0).getUrl().get(0))
+    assertEquals("https://doi.org/10.1016/j.jas.2019.105013", item.getInstance().get(0).getUrl().get(0))
     //println(mapper.writeValueAsString(item))
 
   }
