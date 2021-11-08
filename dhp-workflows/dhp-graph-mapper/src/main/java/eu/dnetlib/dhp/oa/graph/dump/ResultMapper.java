@@ -133,9 +133,21 @@ public class ResultMapper implements Serializable {
 					.ifPresent(value -> value.stream().forEach(f -> formatList.add(f.getValue())));
 				out.setFormat(formatList);
 				out.setId(input.getId());
-				out
-					.setOriginalId(
-						input.getOriginalId().stream().filter(s -> !s.startsWith("50|")).collect(Collectors.toList()));
+				out.setOriginalId(new ArrayList<>());
+				Optional
+					.ofNullable(input.getOriginalId())
+					.ifPresent(
+						v -> out
+							.setOriginalId(
+								input
+									.getOriginalId()
+									.stream()
+									.filter(s -> !s.startsWith("50|"))
+									.collect(Collectors.toList())));
+//				Optional
+//					.ofNullable(
+//						input.getOriginalId().stream().filter(s -> !s.startsWith("50|")).collect(Collectors.toList()))
+//					.ifPresent(v -> out.setOriginalId(v));
 
 				Optional<List<eu.dnetlib.dhp.schema.oaf.Instance>> oInst = Optional
 					.ofNullable(input.getInstance());
