@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.bypassactionset;
+package eu.dnetlib.dhp.bypassactionset.fos;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 

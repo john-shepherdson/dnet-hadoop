@@ -1,7 +1,9 @@
-package eu.dnetlib.dhp.bypassactionset;
+package eu.dnetlib.dhp.bypassactionset.fos;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.bypassactionset.model.FOSDataModel;
+import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -9,6 +11,7 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,16 +21,18 @@ import java.util.Arrays;
 import java.util.List;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
+import static eu.dnetlib.dhp.bypassactionset.Utils.getIdentifier;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-public class DistributeFOSSparkJob implements Serializable {
-    private static final Logger log = LoggerFactory.getLogger(DistributeFOSSparkJob.class);
+public class PrepareFOSSparkJob implements Serializable {
+    private static final Logger log = LoggerFactory.getLogger(PrepareFOSSparkJob.class);
+
 
     public static void main(String[] args) throws Exception {
 
         String jsonConfiguration = IOUtils
                 .toString(
-                        DistributeFOSSparkJob.class
+                        PrepareFOSSparkJob.class
                                 .getResourceAsStream(
                                         "/eu/dnetlib/dhp/bypassactionset/distribute_fos_parameters.json"));
 
@@ -71,7 +76,8 @@ public class DistributeFOSSparkJob implements Serializable {
             final String level1 = v.getLevel1();
             final String level2 = v.getLevel2();
             final String level3 = v.getLevel3();
-            Arrays.stream(v.getDoi().split("\u0002")).forEach(d -> fosList.add(FOSDataModel.newInstance(d, level1, level2, level3)));
+            Arrays.stream(v.getDoi().split("\u0002")).forEach(d ->
+                    fosList.add(FOSDataModel.newInstance(getIdentifier(d), level1, level2, level3)));
             return fosList.iterator();
         }, Encoders.bean(FOSDataModel.class))
                 .write()
@@ -79,6 +85,8 @@ public class DistributeFOSSparkJob implements Serializable {
                 .option("compression","gzip")
                 .json(outputPath);
     }
+
+
 
 
 }

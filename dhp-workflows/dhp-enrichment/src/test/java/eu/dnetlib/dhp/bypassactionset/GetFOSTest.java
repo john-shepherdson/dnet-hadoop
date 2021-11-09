@@ -1,9 +1,13 @@
 package eu.dnetlib.dhp.bypassactionset;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.bypassactionset.fos.PrepareFOSSparkJob;
+import eu.dnetlib.dhp.bypassactionset.fos.GetFOSData;
 import eu.dnetlib.dhp.bypassactionset.model.FOSDataModel;
 import eu.dnetlib.dhp.common.collection.CollectorException;
 import eu.dnetlib.dhp.countrypropagation.CountryPropagationJobTest;
+import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -35,6 +39,7 @@ public class GetFOSTest {
     private static SparkSession spark;
     private static LocalFileSystem fs;
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final String ID_PREFIX = "50|doi_________";
 
     @BeforeAll
     public static void beforeAll() throws IOException {
@@ -103,7 +108,7 @@ public class GetFOSTest {
                 .getResource("/eu/dnetlib/dhp/bypassactionset/fos/fos.json")
                 .getPath();
 
-        DistributeFOSSparkJob
+        PrepareFOSSparkJob
                 .main(
                         new String[] {
                                 "--isSparkSessionManaged", Boolean.FALSE.toString(),
@@ -119,17 +124,21 @@ public class GetFOSTest {
                 .textFile(workingDir.toString() + "/distribute")
                 .map(item -> OBJECT_MAPPER.readValue(item, FOSDataModel.class));
 
+        String doi1 = ID_PREFIX +
+                IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.3390/s18072310"));
 
         assertEquals(50, tmp.count());
-        assertEquals(1, tmp.filter(row -> row.getDoi().equals("10.3390/s18072310")).count());
-        assertEquals("engineering and technology", tmp.filter(r -> r.getDoi().equals("10.3390/s18072310")).collect().get(0).getLevel1());
-        assertEquals("nano-technology", tmp.filter(r -> r.getDoi().equals("10.3390/s18072310")).collect().get(0).getLevel2());
-        assertEquals("nanoscience & nanotechnology", tmp.filter(r -> r.getDoi().equals("10.3390/s18072310")).collect().get(0).getLevel3());
+        assertEquals(1, tmp.filter(row -> row.getDoi().equals(doi1)).count());
+        assertEquals("engineering and technology", tmp.filter(r -> r.getDoi().equals(doi1)).collect().get(0).getLevel1());
+        assertEquals("nano-technology", tmp.filter(r -> r.getDoi().equals(doi1)).collect().get(0).getLevel2());
+        assertEquals("nanoscience & nanotechnology", tmp.filter(r -> r.getDoi().equals(doi1)).collect().get(0).getLevel3());
 
-        assertEquals(1, tmp.filter(row -> row.getDoi().equals("10.1111/1365-2656.12831")).count());
-        assertEquals("social sciences", tmp.filter(r -> r.getDoi().equals("10.1111/1365-2656.12831")).collect().get(0).getLevel1());
-        assertEquals("psychology and cognitive sciences", tmp.filter(r -> r.getDoi().equals("10.1111/1365-2656.12831")).collect().get(0).getLevel2());
-        assertEquals("NULL", tmp.filter(r -> r.getDoi().equals("10.1111/1365-2656.12831")).collect().get(0).getLevel3());
+        String doi = ID_PREFIX +
+                IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1111/1365-2656.12831"));
+        assertEquals(1, tmp.filter(row -> row.getDoi().equals(doi)).count());
+        assertEquals("social sciences", tmp.filter(r -> r.getDoi().equals(doi)).collect().get(0).getLevel1());
+        assertEquals("psychology and cognitive sciences", tmp.filter(r -> r.getDoi().equals(doi)).collect().get(0).getLevel2());
+        assertEquals("NULL", tmp.filter(r -> r.getDoi().equals(doi)).collect().get(0).getLevel3());
 
 //        {"doi":"10.1111/1365-2656.12831\u000210.17863/cam.24369","level1":"social sciences","level2":"psychology and cognitive sciences","level3":"NULL"}
 

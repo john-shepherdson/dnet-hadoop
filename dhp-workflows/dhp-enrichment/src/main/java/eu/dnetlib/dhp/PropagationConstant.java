@@ -25,6 +25,19 @@ public class PropagationConstant {
 	private PropagationConstant() {
 	}
 
+
+
+	public static final String UPDATE_DATA_INFO_TYPE = "update";
+	public static final String UPDATE_SUBJECT_FOS_CLASS_ID = "subject:fos";
+	public static final String UPDATE_SUBJECT_FOS_CLASS_NAME = "Update of results with FOS subjects";
+	public static final String UPDATE_MEASURE_BIP_CLASS_ID = "measure:bip";
+	public static final String UPDATE_MEASURE_BIP_CLASS_NAME = "Update of results with BipFinder! measures";
+	public static final String FOS_CLASS_ID = "fos";
+	public static final String FOS_CLASS_NAME = "Subject from fos classification";
+
+
+
+
 	public static final String INSTITUTIONAL_REPO_TYPE = "pubsrepository::institutional";
 
 	public static final String PROPAGATION_DATA_INFO_TYPE = "propagation";
@@ -75,10 +88,17 @@ public class PropagationConstant {
 
 	public static DataInfo getDataInfo(
 		String inference_provenance, String inference_class_id, String inference_class_name, String qualifierSchema) {
+
+		return getDataInfo(inference_provenance, inference_class_id, inference_class_name, qualifierSchema, "0.85");
+	}
+
+	public static DataInfo getDataInfo(
+			String inference_provenance, String inference_class_id, String inference_class_name, String qualifierSchema,
+			String trust) {
 		DataInfo di = new DataInfo();
 		di.setInferred(true);
 		di.setDeletedbyinference(false);
-		di.setTrust("0.85");
+		di.setTrust(trust);
 		di.setInferenceprovenance(inference_provenance);
 		di.setProvenanceaction(getQualifier(inference_class_id, inference_class_name, qualifierSchema));
 		return di;
