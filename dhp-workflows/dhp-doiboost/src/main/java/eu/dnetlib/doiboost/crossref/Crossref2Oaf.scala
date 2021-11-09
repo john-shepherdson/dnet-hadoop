@@ -358,7 +358,7 @@ case object Crossref2Oaf {
           case "10.13039/100000001" =>      generateSimpleRelationFromAward(funder, "nsf_________", a => a)
           case "10.13039/501100001665" =>   generateSimpleRelationFromAward(funder, "anr_________", a => a)
           case "10.13039/501100002341" =>   generateSimpleRelationFromAward(funder, "aka_________", a => a)
-          case "10.13039/501100001602" =>   generateSimpleRelationFromAward(funder, "aka_________", a => a.replace("SFI", ""))
+          case "10.13039/501100001602" =>   generateSimpleRelationFromAward(funder, "sfi_________", a => a.replace("SFI", ""))
           case "10.13039/501100000923" =>   generateSimpleRelationFromAward(funder, "arc_________", a => a)
           case "10.13039/501100000038"=>    val targetId = getProjectId("nserc_______" , "1e5e62235d094afd01cd56e65112fc63")
                                             queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
