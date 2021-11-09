@@ -25,18 +25,23 @@ public class PropagationConstant {
 	private PropagationConstant() {
 	}
 
-
+	public static final String DOI = "doi";
+	public static final String REF_DOI = ".refs";
 
 	public static final String UPDATE_DATA_INFO_TYPE = "update";
 	public static final String UPDATE_SUBJECT_FOS_CLASS_ID = "subject:fos";
 	public static final String UPDATE_SUBJECT_FOS_CLASS_NAME = "Update of results with FOS subjects";
 	public static final String UPDATE_MEASURE_BIP_CLASS_ID = "measure:bip";
 	public static final String UPDATE_MEASURE_BIP_CLASS_NAME = "Update of results with BipFinder! measures";
-	public static final String FOS_CLASS_ID = "fos";
+	public static final String FOS_CLASS_ID = "FOS";
 	public static final String FOS_CLASS_NAME = "Subject from fos classification";
 
+	public static final String OPENCITATIONS_CLASSID = "sysimport:crosswalk:opencitations";
+	public static final String OPENCITATIONS_CLASSNAME = "Imported from OpenCitations";
+	public static final String ID_PREFIX = "50|doi_________::";
+	public static final String OC_TRUST = "0.91";
 
-
+	public final static String NULL = "NULL";
 
 	public static final String INSTITUTIONAL_REPO_TYPE = "pubsrepository::institutional";
 
@@ -95,8 +100,15 @@ public class PropagationConstant {
 	public static DataInfo getDataInfo(
 			String inference_provenance, String inference_class_id, String inference_class_name, String qualifierSchema,
 			String trust) {
+		return getDataInfo(inference_provenance, inference_class_id, inference_class_name, qualifierSchema, trust, true);
+
+	}
+
+	public static DataInfo getDataInfo(
+			String inference_provenance, String inference_class_id, String inference_class_name, String qualifierSchema,
+			String trust, boolean inferred) {
 		DataInfo di = new DataInfo();
-		di.setInferred(true);
+		di.setInferred(inferred);
 		di.setDeletedbyinference(false);
 		di.setTrust(trust);
 		di.setInferenceprovenance(inference_provenance);

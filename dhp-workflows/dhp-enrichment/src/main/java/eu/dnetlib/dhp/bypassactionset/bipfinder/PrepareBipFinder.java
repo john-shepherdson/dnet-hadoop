@@ -2,7 +2,6 @@ package eu.dnetlib.dhp.bypassactionset.bipfinder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.bypassactionset.SparkUpdateBip;
 import eu.dnetlib.dhp.bypassactionset.model.BipDeserialize;
 import eu.dnetlib.dhp.bypassactionset.model.BipScore;
 import eu.dnetlib.dhp.schema.oaf.Result;

@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.bypassactionset;
+package eu.dnetlib.dhp.bypassactionset.bipfinder;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.bypassactionset.model.BipScore;

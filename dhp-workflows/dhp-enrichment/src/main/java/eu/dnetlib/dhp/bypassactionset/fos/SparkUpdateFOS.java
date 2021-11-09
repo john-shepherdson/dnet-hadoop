@@ -1,11 +1,9 @@
-package eu.dnetlib.dhp.bypassactionset;
+package eu.dnetlib.dhp.bypassactionset.fos;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
 import eu.dnetlib.dhp.bypassactionset.model.FOSDataModel;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Measure;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import org.apache.commons.io.IOUtils;
@@ -28,8 +26,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 public class SparkUpdateFOS implements Serializable {
     private static final Logger log = LoggerFactory.getLogger(SparkUpdateFOS.class);
-    private final static String NULL = "NULL";
-    private final static String DNET_RESULT_SUBJECT = "dnet:result_subject";
+
 
     public static <I extends Result> void main(String[] args) throws Exception {
 
@@ -108,7 +105,7 @@ public class SparkUpdateFOS implements Serializable {
             return null;
         StructuredProperty sp = new StructuredProperty();
         sp.setValue(sbj);
-        sp.setQualifier(getQualifier(FOS_CLASS_ID, FOS_CLASS_NAME, DNET_RESULT_SUBJECT));
+        sp.setQualifier(getQualifier(FOS_CLASS_ID, FOS_CLASS_NAME, ModelConstants.DNET_SUBJECT_TYPOLOGIES));
         sp.setDataInfo(getDataInfo(UPDATE_DATA_INFO_TYPE,
                 UPDATE_SUBJECT_FOS_CLASS_ID,
                 UPDATE_SUBJECT_FOS_CLASS_NAME,
