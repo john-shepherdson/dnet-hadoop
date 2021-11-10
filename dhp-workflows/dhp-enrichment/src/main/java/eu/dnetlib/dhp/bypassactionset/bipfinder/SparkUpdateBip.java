@@ -1,35 +1,34 @@
 
 package eu.dnetlib.dhp.bypassactionset.bipfinder;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.bypassactionset.model.BipScore;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
-import org.apache.commons.io.IOUtils;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
-
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import scala.Tuple2;
+import static eu.dnetlib.dhp.PropagationConstant.*;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static eu.dnetlib.dhp.PropagationConstant.*;
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import org.apache.commons.io.IOUtils;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.SparkSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.bypassactionset.model.BipScore;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
+import scala.Tuple2;
 
 /**
  * created the Atomic Action for each tipe of results
  */
 public class SparkUpdateBip implements Serializable {
-
 
 	private static final Logger log = LoggerFactory.getLogger(SparkUpdateBip.class);
 
@@ -37,9 +36,9 @@ public class SparkUpdateBip implements Serializable {
 
 		String jsonConfiguration = IOUtils
 			.toString(
-					SparkUpdateBip.class
+				SparkUpdateBip.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/actionmanager/bipfinder/input_parameters.json"));
+						"/eu/dnetlib/dhp/bypassactionset/bip_update_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -71,10 +70,9 @@ public class SparkUpdateBip implements Serializable {
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
-			spark ->
-				updateBipFinder(spark, inputPath, outputPath, bipScorePath, inputClazz)
+			spark -> updateBipFinder(spark, inputPath, outputPath, bipScorePath, inputClazz)
 
-			);
+		);
 	}
 
 	private static <I extends Result> void updateBipFinder(SparkSession spark, String inputPath, String outputPath,
@@ -83,18 +81,19 @@ public class SparkUpdateBip implements Serializable {
 		Dataset<I> results = readPath(spark, inputPath, inputClazz);
 		Dataset<BipScore> bipScores = readPath(spark, bipScorePath, BipScore.class);
 
-		results.joinWith(bipScores, results.col("id").equalTo(bipScores.col("id")), "left")
-				.map((MapFunction<Tuple2<I,BipScore>, I>) value -> {
-					if (!Optional.ofNullable(value._2()).isPresent()){
-						return value._1();
-					}
-					value._1().setMeasures(getMeasure(value._2()));
+		results
+			.joinWith(bipScores, results.col("id").equalTo(bipScores.col("id")), "left")
+			.map((MapFunction<Tuple2<I, BipScore>, I>) value -> {
+				if (!Optional.ofNullable(value._2()).isPresent()) {
 					return value._1();
-				}, Encoders.bean(inputClazz))
-		.write()
-		.mode(SaveMode.Overwrite)
-		.option("compression","gzip")
-		.json(outputPath + "/bip");
+				}
+				value._1().setMeasures(getMeasure(value._2()));
+				return value._1();
+			}, Encoders.bean(inputClazz))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(outputPath + "/bip");
 
 	}
 
@@ -114,10 +113,13 @@ public class SparkUpdateBip implements Serializable {
 								KeyValue kv = new KeyValue();
 								kv.setValue(unit.getValue());
 								kv.setKey(unit.getKey());
-								kv.setDataInfo(getDataInfo(UPDATE_DATA_INFO_TYPE,
-										UPDATE_MEASURE_BIP_CLASS_ID,
-										UPDATE_MEASURE_BIP_CLASS_NAME,
-										ModelConstants.DNET_PROVENANCE_ACTIONS, ""));
+								kv
+									.setDataInfo(
+										getDataInfo(
+											UPDATE_DATA_INFO_TYPE,
+											UPDATE_MEASURE_BIP_CLASS_ID,
+											UPDATE_CLASS_NAME,
+											ModelConstants.DNET_PROVENANCE_ACTIONS, ""));
 								return kv;
 							})
 							.collect(Collectors.toList()));
@@ -125,11 +127,5 @@ public class SparkUpdateBip implements Serializable {
 			})
 			.collect(Collectors.toList());
 	}
-
-
-
-
-
-
 
 }

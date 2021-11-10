@@ -1,11 +1,13 @@
+
 package eu.dnetlib.dhp.bypassactionset.fos;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import static eu.dnetlib.dhp.PropagationConstant.*;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import eu.dnetlib.dhp.bypassactionset.model.FOSDataModel;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -15,104 +17,105 @@ import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.bypassactionset.model.FOSDataModel;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import scala.Tuple2;
 
-import java.io.Serializable;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static eu.dnetlib.dhp.PropagationConstant.*;
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-
 public class SparkUpdateFOS implements Serializable {
-    private static final Logger log = LoggerFactory.getLogger(SparkUpdateFOS.class);
+	private static final Logger log = LoggerFactory.getLogger(SparkUpdateFOS.class);
 
+	public static <I extends Result> void main(String[] args) throws Exception {
 
-    public static <I extends Result> void main(String[] args) throws Exception {
+		String jsonConfiguration = IOUtils
+			.toString(
+				SparkUpdateFOS.class
+					.getResourceAsStream(
+						"/eu/dnetlib/dhp/bypassactionset/fos_update_parameters.json"));
 
-        String jsonConfiguration = IOUtils
-                .toString(
-                        SparkUpdateFOS.class
-                                .getResourceAsStream(
-                                        "/eu/dnetlib/dhp/actionmanager/bipfinder/input_parameters.json"));
+		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
+		parser.parseArgument(args);
 
-        parser.parseArgument(args);
+		Boolean isSparkSessionManaged = Optional
+			.ofNullable(parser.get("isSparkSessionManaged"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.TRUE);
 
-        Boolean isSparkSessionManaged = Optional
-                .ofNullable(parser.get("isSparkSessionManaged"))
-                .map(Boolean::valueOf)
-                .orElse(Boolean.TRUE);
+		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-        log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
+		final String inputPath = parser.get("inputPath");
+		log.info("inputPath {}: ", inputPath);
 
-        final String inputPath = parser.get("inputPath");
-        log.info("inputPath {}: ", inputPath);
+		final String outputPath = parser.get("outputPath");
+		log.info("outputPath {}: ", outputPath);
 
-        final String outputPath = parser.get("outputPath");
-        log.info("outputPath {}: ", outputPath);
+		final String fosPath = parser.get("fosPath");
+		log.info("fosPath: {}", fosPath);
 
-        final String fosPath = parser.get("fosPath");
-        log.info("fosPath: {}", fosPath);
+		final String resultClassName = parser.get("resultTableName");
+		log.info("resultTableName: {}", resultClassName);
 
-        final String resultClassName = parser.get("resultTableName");
-        log.info("resultTableName: {}", resultClassName);
+		Class<I> inputClazz = (Class<I>) Class.forName(resultClassName);
 
-        Class<I> inputClazz = (Class<I>) Class.forName(resultClassName);
+		SparkConf conf = new SparkConf();
 
-        SparkConf conf = new SparkConf();
+		runWithSparkSession(
+			conf,
+			isSparkSessionManaged,
+			spark -> updateFos(spark, inputPath, outputPath, fosPath, inputClazz)
 
-        runWithSparkSession(
-                conf,
-                isSparkSessionManaged,
-                spark ->
-                        updateFos(spark, inputPath, outputPath, fosPath, inputClazz)
+		);
+	}
 
-        );
-    }
+	private static <I extends Result> void updateFos(SparkSession spark, String inputPath, String outputPath,
+		String fosPath, Class<I> inputClazz) {
 
-    private static <I extends Result> void updateFos(SparkSession spark, String inputPath, String outputPath,
-                                                           String bipScorePath, Class<I> inputClazz) {
+		Dataset<I> results = readPath(spark, inputPath, inputClazz);
+		Dataset<FOSDataModel> fosDataModelDataset = readPath(spark, fosPath, FOSDataModel.class);
 
-        Dataset<I> results = readPath(spark, inputPath, inputClazz);
-        Dataset<FOSDataModel> bipScores = readPath(spark, bipScorePath, FOSDataModel.class);
+		results
+			.joinWith(fosDataModelDataset, results.col("id").equalTo(fosDataModelDataset.col("doi")), "left")
+			.map((MapFunction<Tuple2<I, FOSDataModel>, I>) value -> {
+				if (!Optional.ofNullable(value._2()).isPresent()) {
+					return value._1();
+				}
+				value._1().getSubject().addAll(getSubjects(value._2()));
+				return value._1();
+			}, Encoders.bean(inputClazz))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(outputPath);
 
-        results.joinWith(bipScores, results.col("id").equalTo(bipScores.col("id")), "left")
-                .map((MapFunction<Tuple2<I,FOSDataModel>, I>) value -> {
-                    if (!Optional.ofNullable(value._2()).isPresent()){
-                        return value._1();
-                    }
-                    value._1().getSubject().addAll(getSubjects(value._2()));
-                    return value._1();
-                }, Encoders.bean(inputClazz))
-                .write()
-                .mode(SaveMode.Overwrite)
-                .option("compression","gzip")
-                .json(outputPath);
+	}
 
-    }
+	private static List<StructuredProperty> getSubjects(FOSDataModel fos) {
+		return Arrays
+			.asList(getSubject(fos.getLevel1()), getSubject(fos.getLevel2()), getSubject(fos.getLevel3()))
+			.stream()
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
+	}
 
-    private static List<StructuredProperty> getSubjects(FOSDataModel fos) {
-        return Arrays.asList(getSubject(fos.getLevel1()), getSubject(fos.getLevel2()), getSubject(fos.getLevel3()))
-                .stream()
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-    }
+	private static StructuredProperty getSubject(String sbj) {
+		if (sbj.equals(NULL))
+			return null;
+		StructuredProperty sp = new StructuredProperty();
+		sp.setValue(sbj);
+		sp.setQualifier(getQualifier(FOS_CLASS_ID, FOS_CLASS_NAME, ModelConstants.DNET_SUBJECT_TYPOLOGIES));
+		sp
+			.setDataInfo(
+				getDataInfo(
+					UPDATE_DATA_INFO_TYPE,
+					UPDATE_SUBJECT_FOS_CLASS_ID,
+					UPDATE_CLASS_NAME,
+					ModelConstants.DNET_PROVENANCE_ACTIONS, ""));
+		return sp;
 
-    private static StructuredProperty getSubject(String sbj) {
-        if (sbj.equals(NULL))
-            return null;
-        StructuredProperty sp = new StructuredProperty();
-        sp.setValue(sbj);
-        sp.setQualifier(getQualifier(FOS_CLASS_ID, FOS_CLASS_NAME, ModelConstants.DNET_SUBJECT_TYPOLOGIES));
-        sp.setDataInfo(getDataInfo(UPDATE_DATA_INFO_TYPE,
-                UPDATE_SUBJECT_FOS_CLASS_ID,
-                UPDATE_SUBJECT_FOS_CLASS_NAME,
-                ModelConstants.DNET_PROVENANCE_ACTIONS, ""));
-        return sp;
-
-    }
-
+	}
 
 }
