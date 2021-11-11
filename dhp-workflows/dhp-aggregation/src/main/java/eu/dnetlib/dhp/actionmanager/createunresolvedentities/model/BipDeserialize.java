@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.bypassactionset.model;
+package eu.dnetlib.dhp.actionmanager.createunresolvedentities.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -23,5 +23,11 @@
     "paramLongName": "hdfsNameNode",
     "paramDescription": "the path used to store the HostedByMap",
     "paramRequired": true
+  },
+  {
+    "paramName": "cfn",
+    "paramLongName": "classForName",
+    "paramDescription": "the path used to store the HostedByMap",
+    "paramRequired": true
   }
 ]

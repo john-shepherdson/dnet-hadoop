@@ -1,7 +1,9 @@
 
-package eu.dnetlib.dhp.bypassactionset.fos;
+package eu.dnetlib.dhp.actionmanager.createunresolvedentities;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -29,17 +31,17 @@ public class GetFOSData implements Serializable {
 						.requireNonNull(
 							GetFOSData.class
 								.getResourceAsStream(
-									"/eu/dnetlib/dhp/bypassactionset/get_fos_parameters.json"))));
+									"/eu/dnetlib/dhp/actionmanager/createunresolvedentities/get_fos_parameters.json"))));
 
 		parser.parseArgument(args);
 
 		// the path where the original fos csv file is stored
-		final String inputPath = parser.get("inputPath");
-		log.info("inputPath {}", inputPath);
+		final String sourcePath = parser.get("sourcePath");
+		log.info("sourcePath {}", sourcePath);
 
 		// the path where to put the file as json
-		final String outputFile = parser.get("outputFile");
-		log.info("outputFile {}", outputFile);
+		final String outputPath = parser.get("outputPath");
+		log.info("outputPath {}", outputPath);
 
 		final String hdfsNameNode = parser.get("hdfsNameNode");
 		log.info("hdfsNameNode {}", hdfsNameNode);
@@ -58,7 +60,7 @@ public class GetFOSData implements Serializable {
 
 		FileSystem fileSystem = FileSystem.get(conf);
 
-		new GetFOSData().doRewrite(inputPath, outputFile, classForName, delimiter, fileSystem);
+		new GetFOSData().doRewrite(sourcePath, outputPath, classForName, delimiter, fileSystem);
 
 	}
 

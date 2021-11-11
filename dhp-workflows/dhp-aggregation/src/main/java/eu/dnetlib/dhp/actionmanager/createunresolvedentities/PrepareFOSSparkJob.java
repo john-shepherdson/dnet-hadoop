@@ -1,30 +1,30 @@
 
-package eu.dnetlib.dhp.bypassactionset.fos;
+package eu.dnetlib.dhp.actionmanager.createunresolvedentities;
 
-import static eu.dnetlib.dhp.PropagationConstant.*;
-import static eu.dnetlib.dhp.bypassactionset.Utils.getIdentifier;
+import static eu.dnetlib.dhp.actionmanager.createunresolvedentities.Constants.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.FOSDataModel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.bypassactionset.model.FOSDataModel;
-import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 public class PrepareFOSSparkJob implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(PrepareFOSSparkJob.class);
@@ -35,7 +35,7 @@ public class PrepareFOSSparkJob implements Serializable {
 			.toString(
 				PrepareFOSSparkJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/bypassactionset/distribute_fos_parameters.json"));
+						"/eu/dnetlib/dhp/actionmanager/createunresolvedentities/distribute_fos_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -55,7 +55,6 @@ public class PrepareFOSSparkJob implements Serializable {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				removeOutputDir(spark, outputPath);
 				distributeFOSdois(
 					spark,
 					sourcePath,
@@ -74,13 +73,60 @@ public class PrepareFOSSparkJob implements Serializable {
 			final String level3 = v.getLevel3();
 			Arrays
 				.stream(v.getDoi().split("\u0002"))
-				.forEach(d -> fosList.add(FOSDataModel.newInstance(getIdentifier(d), level1, level2, level3)));
+				.forEach(d -> fosList.add(FOSDataModel.newInstance(d, level1, level2, level3)));
 			return fosList.iterator();
 		}, Encoders.bean(FOSDataModel.class))
+			.map((MapFunction<FOSDataModel, Result>) value -> {
+				Result r = new Result();
+				r.setId(getUnresolvedDoiIndentifier(value.getDoi()));
+				r.setSubject(getSubjects(value));
+				return r;
+			}, Encoders.bean(Result.class))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.json(outputPath);
+			.json(outputPath + "/fos");
+	}
+
+	private static List<StructuredProperty> getSubjects(FOSDataModel fos) {
+		return Arrays
+			.asList(getSubject(fos.getLevel1()), getSubject(fos.getLevel2()), getSubject(fos.getLevel3()))
+			.stream()
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
+	}
+
+	private static StructuredProperty getSubject(String sbj) {
+		if (sbj.equals(NULL))
+			return null;
+		StructuredProperty sp = new StructuredProperty();
+		sp.setValue(sbj);
+		sp
+			.setQualifier(
+				OafMapperUtils
+					.qualifier(
+						FOS_CLASS_ID,
+						FOS_CLASS_NAME,
+						ModelConstants.DNET_SUBJECT_TYPOLOGIES,
+						ModelConstants.DNET_SUBJECT_TYPOLOGIES));
+		sp
+			.setDataInfo(
+				OafMapperUtils
+					.dataInfo(
+						false,
+						UPDATE_DATA_INFO_TYPE,
+						true,
+						false,
+						OafMapperUtils
+							.qualifier(
+								UPDATE_SUBJECT_FOS_CLASS_ID,
+								UPDATE_CLASS_NAME,
+								ModelConstants.DNET_PROVENANCE_ACTIONS,
+								ModelConstants.DNET_PROVENANCE_ACTIONS),
+						""));
+
+		return sp;
+
 	}
 
 }
