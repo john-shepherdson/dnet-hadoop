@@ -128,7 +128,7 @@ object SparkResolveRelation {
     source != null
   }
 
-  private def extractPidResolvedTableFromJsonRDD(spark: SparkSession, graphPath: String, workingPath: String) = {
+  def extractPidResolvedTableFromJsonRDD(spark: SparkSession, graphPath: String, workingPath: String) = {
     import spark.implicits._
 
     val d: RDD[(String, String)] = spark.sparkContext.textFile(s"$graphPath/*")
