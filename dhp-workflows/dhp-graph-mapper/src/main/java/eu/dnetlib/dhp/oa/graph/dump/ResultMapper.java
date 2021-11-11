@@ -65,7 +65,8 @@ public class ResultMapper implements Serializable {
 					String code = Constants.accessRightsCoarMap.get(oar.get().getClassid());
 					out
 						.setBestaccessright(
-							AccessRight
+
+							BestAccessRight
 								.newInstance(
 									code,
 									Constants.coarCodeLabelMap.get(code),
