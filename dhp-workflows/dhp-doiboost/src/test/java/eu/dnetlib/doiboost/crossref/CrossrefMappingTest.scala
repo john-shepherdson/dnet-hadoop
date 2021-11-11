@@ -612,4 +612,26 @@ class CrossrefMappingTest {
 
   }
 
+  @Test
+  def testMultipleURLs() :Unit = {
+    val json = Source.fromInputStream(getClass.getResourceAsStream("multiple_urls.json")).mkString
+
+
+    assertNotNull(json)
+    assertFalse(json.isEmpty);
+
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+
+    assertTrue(resultList.nonEmpty)
+
+
+    val item : Result = resultList.filter(p => p.isInstanceOf[Result]).head.asInstanceOf[Result]
+
+    assertEquals(1, item.getInstance().size())
+    assertEquals(1, item.getInstance().get(0).getUrl().size())
+    assertEquals("https://doi.org/10.1016/j.jas.2019.105013", item.getInstance().get(0).getUrl().get(0))
+    //println(mapper.writeValueAsString(item))
+
+  }
+
 }
