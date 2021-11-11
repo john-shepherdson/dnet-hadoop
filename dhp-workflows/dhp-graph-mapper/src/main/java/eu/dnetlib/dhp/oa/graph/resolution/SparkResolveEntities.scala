@@ -2,9 +2,11 @@ package eu.dnetlib.dhp.oa.graph.resolution
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
+import eu.dnetlib.dhp.common.HdfsSupport
 import eu.dnetlib.dhp.schema.common.EntityType
 import eu.dnetlib.dhp.schema.oaf.{OtherResearchProduct, Publication, Result, Software, Dataset => OafDataset}
 import org.apache.commons.io.IOUtils
+import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
@@ -34,13 +36,22 @@ object SparkResolveEntities {
     val unresolvedPath = parser.get("unresolvedPath")
     log.info(s"unresolvedPath  -> $unresolvedPath")
 
+    val fs = FileSystem.get(spark.sparkContext.hadoopConfiguration)
+    fs.mkdirs(new Path(workingPath))
 
     resolveEntities(spark, workingPath, unresolvedPath)
-
-
     generateResolvedEntities(spark, workingPath, graphBasePath)
 
-  }
+    // TO BE conservative we keep the original entities in the working dir
+    // and save the resolved entities on the graphBasePath
+    //In future these lines of code should be removed
+    entities.foreach {
+      e =>
+        fs.rename(new Path(s"$graphBasePath/$e"), new Path(s"$workingPath/${e}_old"))
+        fs.rename(new Path(s"$workingPath/resolvedGraph/$e"), new Path(s"$graphBasePath/$e"))
+    }
+
+}
 
 
 def resolveEntities(spark: SparkSession, workingPath: String, unresolvedPath: String) = {
