@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.hdfs.client.HdfsUtils;
 import org.apache.spark.SparkConf;
@@ -93,7 +94,7 @@ public class PrepareBipFinder implements Serializable {
 			.map((MapFunction<BipScore, Result>) v -> {
 				Result r = new Result();
 
-				r.setId(getUnresolvedDoiIndentifier(v.getId()));
+				r.setId(DHPUtils.generateUnresolvedIdentifier(v.getId(), "doi"));
 				r.setMeasures(getMeasure(v));
 				return r;
 			}, Encoders.bean(Result.class))

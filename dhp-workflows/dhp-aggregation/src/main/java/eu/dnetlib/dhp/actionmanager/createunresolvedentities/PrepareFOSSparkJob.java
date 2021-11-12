@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -78,7 +79,7 @@ public class PrepareFOSSparkJob implements Serializable {
 		}, Encoders.bean(FOSDataModel.class))
 			.map((MapFunction<FOSDataModel, Result>) value -> {
 				Result r = new Result();
-				r.setId(getUnresolvedDoiIndentifier(value.getDoi()));
+				r.setId(DHPUtils.generateUnresolvedIdentifier(value.getDoi(), "doi"));
 				r.setSubject(getSubjects(value));
 				return r;
 			}, Encoders.bean(Result.class))
