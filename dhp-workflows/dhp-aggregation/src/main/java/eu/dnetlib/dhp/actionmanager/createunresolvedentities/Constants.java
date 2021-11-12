@@ -11,8 +11,7 @@ import org.apache.spark.sql.SparkSession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
+
 
 public class Constants {
 
@@ -28,9 +27,11 @@ public class Constants {
 	public static final String FOS_CLASS_ID = "FOS";
 	public static final String FOS_CLASS_NAME = "Fields of Science and Technology classification";
 
-	public final static String NULL = "NULL";
+	public static final String NULL = "NULL";
 
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+	private Constants(){}
 
 	public static Boolean isSparkSessionManaged(ArgumentApplicationParser parser) {
 		return Optional
@@ -47,9 +48,5 @@ public class Constants {
 			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
 	}
 
-	public static String getUnresolvedDoiIndentifier(String doi) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(UNREOSLVED_PREFIX).append(doi).append(UNREOSLVED_POSTFIX_DOI);
-		return sb.toString();
-	}
+
 }
