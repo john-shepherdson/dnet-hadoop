@@ -308,7 +308,8 @@
                   }
                },
           "publicationdate":{
-            "type":"string"
+            "type":"string",
+            "description": "Date of the research product"
           },
           "refereed":{
             "description": "If this instance has been peer-reviewed or not. Allowed values are peerReviewed, nonPeerReviewed, UNKNOWN (as defined in https://api.openaire.eu/vocabularies/dnet:review_levels)",
@@ -326,7 +327,6 @@
             }
           }
         }
-
       }
     },
     "language": {
@@ -338,7 +338,7 @@
         },
         "label": {
           "type": "string",
-          "description": "English label"
+          "description": "Language label in English"
         }
       }
     },
@@ -347,7 +347,12 @@
       "description": "Timestamp of last update of the record in OpenAIRE"
     },
     "maintitle": {
-      "type": "string"
+      "type": "string",
+      "descriptio": "A name or title by which a scientific result is known. May be the title of a publication, of a dataset or the name of a piece of software."
+    },
+    "subtitle": {
+      "type": "string",
+      "descriptio": "Explanatory or alternative name by which a scientific result is known."
     },
     "originalId": {
       "description": "Identifiers of the record at the original sources",
@@ -366,16 +371,17 @@
         ]
       }
     },
-
     "programmingLanguage": {
       "type": "string",
       "description": "Only for results with type 'software': the programming language"
     },
     "publicationdate": {
-      "type": "string"
+      "type": "string",
+      "description": "Main date of the research product: typically the publication or issued date. In case of a research result with different versions with different dates, the date of the result is selected as the most frequent well-formatted date. If not available, then the most recent and complete date among those that are well-formatted. For statistics, the year is extracted and the result is counted only among the result of that year. Example: Pre-print date: 2019-02-03, Article date provided by repository: 2020-02, Article date provided by Crossref: 2020, OpenAIRE will set as date 2019-02-03, because it’s the most recent among the complete and well-formed dates. If then the repository updates the metadata and set a complete date (e.g. 2020-02-12), then this will be the new date for the result because it becomes the most recent most complete date. However, if OpenAIRE then collects the pre-print from another repository with date 2019-02-03, then this will be the “winning date” because it becomes the most frequent well-formatted date."
     },
     "publisher": {
-      "type": "string"
+      "type": "string",
+      "description": "The name of the entity that holds, archives, publishes prints, distributes, releases, issues, or produces the resource."
     },
     "size": {
       "type": "string",
@@ -408,9 +414,6 @@
           }
         }
       }
-    },
-    "subtitle": {
-      "type": "string"
     },
     "tool": {
       "description": "Only for results with type 'other': tool useful for the interpretation and/or re-used of the research product",
