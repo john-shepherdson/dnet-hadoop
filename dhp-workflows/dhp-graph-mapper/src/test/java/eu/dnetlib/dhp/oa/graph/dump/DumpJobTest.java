@@ -331,7 +331,6 @@ public class DumpJobTest {
 		Assertions
 			.assertEquals(
 				Constants.accessRightsCoarMap.get(ModelConstants.ACCESS_RIGHT_OPEN), gr.getBestaccessright().getCode());
-		Assertions.assertEquals(null, gr.getBestaccessright().getOpenAccessRoute());
 
 		Assertions.assertEquals("One Ecosystem", gr.getContainer().getName());
 		Assertions.assertEquals("2367-8194", gr.getContainer().getIssnOnline());
