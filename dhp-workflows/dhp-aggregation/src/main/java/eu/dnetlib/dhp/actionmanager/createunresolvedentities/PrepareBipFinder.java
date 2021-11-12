@@ -45,7 +45,7 @@ public class PrepareBipFinder implements Serializable {
 			.toString(
 				PrepareBipFinder.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/actionmanager/createunresolvedentities/bip_prepare_parameters.json"));
+						"/eu/dnetlib/dhp/actionmanager/createunresolvedentities/prepare_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 

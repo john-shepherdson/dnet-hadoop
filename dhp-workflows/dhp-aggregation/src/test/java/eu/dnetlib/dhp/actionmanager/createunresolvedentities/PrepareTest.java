@@ -143,7 +143,7 @@ public class PrepareTest {
 	}
 
 	@Test
-	void getFOSFileTest() throws CollectorException, IOException, ClassNotFoundException {
+	void getFOSFileTest() throws IOException, ClassNotFoundException {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/fos/h2020_fos_sbs.csv")

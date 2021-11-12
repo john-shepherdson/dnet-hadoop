@@ -1,3 +1,4 @@
+
 <workflow-app name="UnresolvedEntities" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
@@ -49,6 +50,25 @@
         </property>
     </parameters>
 
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+
+        </configuration>
+    </global>
     <start to="prepareInfo"/>
 
     <kill name="Kill">
@@ -79,7 +99,7 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${bipScorePath}</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/prepared/bip</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/prepared</arg>
         </spark>
         <ok to="join"/>
         <error to="Kill"/>
@@ -102,7 +122,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Produces the unresolved from FOS!</name>
-            <class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
+            <class>eu.dnetlib.dhp.actionmanager.createunresolvedentities.PrepareFOSSparkJob</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -115,8 +135,7 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/input/fos</arg>
-
-            <arg>--outputPath</arg><arg>${workingDir}/prepared/fos</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/prepared</arg>
 
         </spark>
         <ok to="join"/>
@@ -132,7 +151,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Saves the result produced for bip and fos by grouping results with the same id</name>
-            <class>eu.dnetlib.dhp.actionmanager.bipfinder.CollectAndSave</class>
+            <class>eu.dnetlib.dhp.actionmanager.createunresolvedentities.SparkSaveUnresolved</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -144,7 +163,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--inputPath</arg><arg>${workingDir}/prepared</arg>
+            <arg>--sourcePath</arg><arg>${workingDir}/prepared</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>

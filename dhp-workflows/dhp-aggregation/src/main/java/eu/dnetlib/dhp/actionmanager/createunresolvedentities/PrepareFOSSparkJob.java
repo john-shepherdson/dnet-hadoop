@@ -35,7 +35,7 @@ public class PrepareFOSSparkJob implements Serializable {
 			.toString(
 				PrepareFOSSparkJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/actionmanager/createunresolvedentities/distribute_fos_parameters.json"));
+						"/eu/dnetlib/dhp/actionmanager/createunresolvedentities/prepare_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
