@@ -1,34 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "definitions": {
-    "AccessRight":{
-      "type":"object",
-      "properties":{
-        "code": {
-          "type": "string",
-          "description": "COAR access mode code: http://vocabularies.coar-repositories.org/documentation/access_rights/"
-        },
-        "label": {
-          "type": "string",
-          "description": "Label for the access mode"
-        },
-        "openAccessRoute":{
-               "type":"string",
-               "enum":[
-                  "gold",
-                  "green",
-                  "hybrid",
-                  "bronze"
-               ],
-               "description":"The type of OpenAccess applied to the result"
-            },
-        "scheme": {
-          "type": "string",
-          "description": "Scheme of reference for access right code. Always set to COAR access rights vocabulary: http://vocabularies.coar-repositories.org/documentation/access_rights/"
-        }
-      }
-    },
-    "ControlledField": {
+     "ControlledField": {
       "type": "object",
       "properties": {
         "scheme": {
@@ -94,14 +67,21 @@
       }
     },
      "bestaccessright":{
-         "allOf":[
-            {
-               "$ref":"#/definitions/AccessRight"
-            },
-            {
-               "description":"The openest access right associated to the manifestations of this research results"
-            }
-         ]
+       "type":"object",
+       "properties":{
+         "code": {
+           "type": "string",
+           "description": "COAR access mode code: http://vocabularies.coar-repositories.org/documentation/access_rights/"
+         },
+         "label": {
+           "type": "string",
+           "description": "Label for the access mode"
+         },
+        "scheme": {
+           "type": "string",
+           "description": "Scheme of reference for access right code. Always set to COAR access rights vocabulary: http://vocabularies.coar-repositories.org/documentation/access_rights/"
+         }
+       }
       },
     "codeRepositoryUrl": {
       "type": "string",
@@ -255,29 +235,32 @@
         "type":"object",
         "properties":{
           "accessright":{
-            "allOf":[
-              {
-                "$ref":"#/definitions/AccessRight"
+            "type":"object",
+            "properties":{
+              "code": {
+                "type": "string",
+                "description": "COAR access mode code: http://vocabularies.coar-repositories.org/documentation/access_rights/"
               },
-              {
-                "description":"The accessright of this instance. One result may have multiple instances, each with a different accessright"
+              "label": {
+                "type": "string",
+                "description": "Label for the access mode"
+              },
+              "openAccessRoute":{
+                "type":"string",
+                "enum":[
+                  "gold",
+                  "green",
+                  "hybrid",
+                  "bronze"
+                ],
+                "description":"The type of OpenAccess applied to the result"
+              },
+              "scheme": {
+                "type": "string",
+                "description": "Scheme of reference for access right code. Always set to COAR access rights vocabulary: http://vocabularies.coar-repositories.org/documentation/access_rights/"
               }
-            ]
+            }
           },
-          "alternateIdentifier":{
-                  "description":"All the identifiers associated to the result other than the authoritative ones",
-                  "type":"array",
-                  "items":{
-                     "allOf":[
-                        {
-                           "$ref":"#/definitions/ControlledField"
-                        },
-                        {
-                           "description":"Description of alternateIdentifier"
-                        }
-                     ]
-                  }
-               },
           "articleprocessingcharge":{
             "description": "The money spent to make this book or article available in Open Access. Source for this information is the OpenAPC initiative.",
             "type":"object",
