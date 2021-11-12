@@ -96,6 +96,21 @@ object SparkResolveRelation {
       .text(s"$graphBasePath/relation")
   }
 
+  def extractInstanceCF(input: String): List[(String, String)] = {
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+    lazy val json: json4s.JValue = parse(input)
+    val result: List[(String, String)] = for {
+      JObject(iObj) <- json \ "instance"
+      JField("collectedfrom", JObject(cf)) <- iObj
+      JField("instancetype", JObject(instancetype)) <- iObj
+      JField("value", JString(collectedFrom)) <- cf
+      JField("classname", JString(classname)) <- instancetype
+    } yield (classname, collectedFrom)
+
+    result
+
+  }
+
 
   def extractPidsFromRecord(input: String): (String, List[(String, String)]) = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
@@ -108,14 +123,7 @@ object SparkResolveRelation {
       JField("classid", JString(pidType)) <- qualifier
     } yield (pidValue, pidType)
 
-    val alternateIds: List[(String, String)] = for {
-      JObject(pids) <- json \\ "alternateIdentifier"
-      JField("value", JString(pidValue)) <- pids
-      JField("qualifier", JObject(qualifier)) <- pids
-      JField("classid", JString(pidType)) <- qualifier
-    } yield (pidValue, pidType)
-
-    (id, result ::: alternateIds)
+    (id, result)
   }
 
 
@@ -128,7 +136,7 @@ object SparkResolveRelation {
     source != null
   }
 
-  private def extractPidResolvedTableFromJsonRDD(spark: SparkSession, graphPath: String, workingPath: String) = {
+  def extractPidResolvedTableFromJsonRDD(spark: SparkSession, graphPath: String, workingPath: String) = {
     import spark.implicits._
 
     val d: RDD[(String, String)] = spark.sparkContext.textFile(s"$graphPath/*")
