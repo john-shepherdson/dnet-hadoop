@@ -79,7 +79,7 @@ public class PrepareFOSSparkJob implements Serializable {
 		}, Encoders.bean(FOSDataModel.class))
 			.map((MapFunction<FOSDataModel, Result>) value -> {
 				Result r = new Result();
-				r.setId(DHPUtils.generateUnresolvedIdentifier(value.getDoi(), "doi"));
+				r.setId(DHPUtils.generateUnresolvedIdentifier(value.getDoi(), DOI));
 				r.setSubject(getSubjects(value));
 				return r;
 			}, Encoders.bean(Result.class))

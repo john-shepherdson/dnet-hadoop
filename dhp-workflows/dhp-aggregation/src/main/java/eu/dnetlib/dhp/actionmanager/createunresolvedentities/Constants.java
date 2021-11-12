@@ -15,8 +15,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
 public class Constants {
 
-	public static final String UNREOSLVED_PREFIX = "unresolved:";
-	public static final String UNREOSLVED_POSTFIX_DOI = ":doi";
 	public static final String DOI = "doi";
 
 	public static final String UPDATE_DATA_INFO_TYPE = "update";

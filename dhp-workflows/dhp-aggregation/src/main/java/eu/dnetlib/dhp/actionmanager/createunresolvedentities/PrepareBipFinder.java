@@ -94,7 +94,7 @@ public class PrepareBipFinder implements Serializable {
 			.map((MapFunction<BipScore, Result>) v -> {
 				Result r = new Result();
 
-				r.setId(DHPUtils.generateUnresolvedIdentifier(v.getId(), "doi"));
+				r.setId(DHPUtils.generateUnresolvedIdentifier(v.getId(), DOI));
 				r.setMeasures(getMeasure(v));
 				return r;
 			}, Encoders.bean(Result.class))
