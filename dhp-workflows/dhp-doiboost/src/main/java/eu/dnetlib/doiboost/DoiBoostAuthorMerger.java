@@ -21,17 +21,17 @@ import scala.Tuple2;
  * that should be enriched with each author in the enriching list. For each enriching author we select the best match that is
  * the author with the highest similarity score.
  * The association is done from the enriching author to the enriched because in this way only one match per enriching author can be found
- * One enriching author can have the same maximum similarity score with more than one
+ * One enriching author can have the same maximum similarity score with more than one enrich author
  *
  *
  *
  *
- * The idea is to enrich the most similar authors having at least one
- * word of the name in
- * common
- * Quello che faccio e’ abbastanza semplice: ho una struttura dati che mantine l’informazione di associazione fra il record che puo’ possibilmente arricchire e quello che deve essere arricchito.
- * 6:22
- * Questa struttura ha la lista di autori che possono essere arricchiti, l’autore che arricchisce e lo score di similarita fra l’autore che arricchisce e gli autori arricchiti. E’ il valore di una mappa che per chiave la il fullname dell’autore che arricchisce
+ * The idea is to enrich the most similar authors having at least one word of the name in common
+ *
+ * It is defined a data structure to store the association information between the enriching and the enriched authors.
+ * This structure contains the list of authors that can be possibly enriched, the enriching author and the similarity score among the enriching authors and the enriched ones
+ * Questa struttura ha la lista di autori che possono essere arricchiti, l’autore che arricchisce e lo score di similarita fra l’autore che arricchisce e gli autori arricchiti.
+ * E’ il valore di una mappa che per chiave la il fullname dell’autore che arricchisce
  * 6:23
  * per ogni autore che puo’ essere arricchito verifico se la entri nella mappa di quello che arricchisce e’ associata ad un autore con score di similarita’ piu’ basso. Se cosi’ e’ modifico l’associazione nella mappa per l’autore che arricchisce, sostituendo l’autore arricchito a cui era associato prima con quello nuovo che ha score piu’ alto. Se lo score e’ lo stesso, aggiungo il nuovo autore da arricchire alla lista degli autori associata all’autore che arricchisce
  * 6:25
@@ -65,6 +65,8 @@ public class DoiBoostAuthorMerger {
 
     }
 
+    //If we have a list of authors coming from crossref we take that and we enrich it
+    //If we do not have a list of authors coming from crossref we enrich the longest at each step
     public static Tuple2<List<Author>, Boolean> mergeAuthor(final List<Author> baseAuthor, final List<Author> otherAuthor,
                                                             final Boolean crossref) {
 
@@ -89,6 +91,10 @@ public class DoiBoostAuthorMerger {
     }
 
 
+    //valutare se questa cosa va invertita: dovrei prendere per ogni enriching author quello che piu' gli somiglia
+    //nella base list non il contrario
+
+
     private static void enrichPidFromList(List<Author> base, List<Author> enrich) {
 
         //search authors having identifiers in the enrich list
@@ -104,13 +110,19 @@ public class DoiBoostAuthorMerger {
                 .collect(Collectors.toMap(Tuple2::_1, Tuple2::_2, (x1, x2) -> x1));
 
 
-        //for each author in the base list, we search the best enriched match
+        //for each author in the base list, we search the best enriching match
+        //we create the association (author, list of (enriching author, similatiry score))
         base.stream()
-                .map(a -> new Tuple2<>(a, authorsWithPids.stream()
-                        .map(e -> new Tuple2<>(e, sim(a, e))).collect(Collectors.toList())))
+                .map(a ->
+                        new Tuple2<>(a,
+                                     authorsWithPids.stream()
+                                        .map(e -> new Tuple2<>(e, sim(a, e)))
+                                        .collect(Collectors.toList()))
+                )
                 .forEach(t2 -> {
-
+                    String enriched_name = t2._1().getFullname();
                     for (Tuple2<Author, Double> t : t2._2()) {
+                        //we get the fullname of the enriching
                         String mapEntry = DHPUtils.md5(t._1().getFullname());
                         AuthorAssoc aa = assocMap.get(mapEntry);
                         if(aa.getScore() < t._2() && aa.getScore() < 0.9){

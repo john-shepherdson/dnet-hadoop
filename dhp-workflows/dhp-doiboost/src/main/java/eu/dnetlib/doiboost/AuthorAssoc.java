@@ -6,6 +6,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class stores the association information between the enriching author and the possibly enriched ones.
+ * It also contains the value of the similarity score between the enriching author and the possibly enriched ones.
+ * Possibly enriched authors with the same similarity score with the enriching are put in the to_be_enriched list.
+ */
 public class AuthorAssoc implements Serializable {
     private Double score ;
     private List<Author> to_be_enriched;

@@ -248,7 +248,7 @@ public class DoiBoostAuthorMergerTest {
     @Test
     public void mergeTestCrossrefEmpty3() throws JsonProcessingException {
 
-        authors = readSample(publicationsBasePath + "/empty_crossref_author_third.json", Publication.class)
+        authors = readSample(publicationsBasePath + "/empty_crossref_authors_third.json", Publication.class)
                 .stream()
                 .map(p -> p._2().getAuthor())
                 .collect(Collectors.toList());
@@ -283,7 +283,7 @@ public class DoiBoostAuthorMergerTest {
     @Test
     public void mergeTestCrossrefEmpty4() throws JsonProcessingException {
 
-        authors = readSample(publicationsBasePath + "/empty_crossref_author_fourth.json", Publication.class)
+        authors = readSample(publicationsBasePath + "/empty_crossref_authors_fourth.json", Publication.class)
                 .stream()
                 .map(p -> p._2().getAuthor())
                 .collect(Collectors.toList());
@@ -377,6 +377,13 @@ public class DoiBoostAuthorMergerTest {
                 .map(p -> p._2().getAuthor())
                 .collect(Collectors.toList());
 
+        for (List<Author> authors1 : authors) {
+            System.out.println("List " + (authors.indexOf(authors1) + 1));
+            for (Author author : authors1) {
+                System.out.println(authorToString(author));
+            }
+        }
+
 
         List<Author> merge = DoiBoostAuthorMerger.merge(authors,  true);
 
@@ -385,21 +392,21 @@ public class DoiBoostAuthorMergerTest {
             System.out.println(authorToString(author));
         }
 
-//		Assertions.assertTrue(5 == merge.stream().filter(a -> a.getPid() !=null)
-//				.filter(a -> a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals(ModelConstants.ORCID))).count());
-//
-//		Assertions.assertTrue(34 == merge.stream().filter(a -> a.getPid() !=null)
-//				.filter(a -> a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals(ModelConstants.ORCID_PENDING))).count());
-//
-//		merge.stream().filter(a -> a.getFullname().equals("da luz geraldo eduardo"))
-//				.forEach(a ->
-//						Assertions.assertTrue(a.getPid()
-//								.stream()
-//								.anyMatch(pid -> pid.getValue().equals("http://orcid.org/0000-0003-2434-0387")
-//										&& pid.getQualifier().getClassid().equals(ModelConstants.ORCID_PENDING)
-//								)
-//						)
-//				);
+		Assertions.assertTrue(5 == merge.stream().filter(a -> a.getPid() !=null)
+				.filter(a -> a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals(ModelConstants.ORCID))).count());
+
+		Assertions.assertTrue(34 == merge.stream().filter(a -> a.getPid() !=null)
+				.filter(a -> a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals(ModelConstants.ORCID_PENDING))).count());
+
+		merge.stream().filter(a -> a.getFullname().equals("da luz geraldo eduardo"))
+				.forEach(a ->
+						Assertions.assertTrue(a.getPid()
+								.stream()
+								.anyMatch(pid -> pid.getValue().equals("http://orcid.org/0000-0003-2434-0387")
+										&& pid.getQualifier().getClassid().equals(ModelConstants.ORCID_PENDING)
+								)
+						)
+				);
 
 
     }
