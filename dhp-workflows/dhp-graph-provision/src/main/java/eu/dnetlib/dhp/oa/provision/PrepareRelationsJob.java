@@ -131,6 +131,7 @@ public class PrepareRelationsJob {
 		Set<String> relationFilter, int sourceMaxRelations, int targetMaxRelations, int relPartitions) {
 
 		JavaRDD<Relation> rels = readPathRelationRDD(spark, inputRelationsPath)
+			.filter(rel -> !(rel.getSource().startsWith("unresolved") || rel.getTarget().startsWith("unresolved")))
 			.filter(rel -> !rel.getDataInfo().getDeletedbyinference())
 			.filter(rel -> !relationFilter.contains(StringUtils.lowerCase(rel.getRelClass())));
 

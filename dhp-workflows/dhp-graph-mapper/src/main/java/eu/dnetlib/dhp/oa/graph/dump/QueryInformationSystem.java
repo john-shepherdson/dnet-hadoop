@@ -18,10 +18,10 @@ public class QueryInformationSystem {
 
 	private ISLookUpService isLookUp;
 
-	private static final String XQUERY = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') "
+	private static final String XQUERY_ALL = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') "
 		+
 		"  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] " +
-		" and ($x//context/param[./@name = 'status']/text() = 'manager'  or $x//context/param[./@name = 'status']/text() = 'all') "
+		" and ($x//context/param[./@name = 'status']/text() = 'all') "
 		+
 		"  return " +
 		"<community> " +
@@ -29,9 +29,22 @@ public class QueryInformationSystem {
 		"{$x//CONFIGURATION/context/@label}" +
 		"</community>";
 
-	public CommunityMap getCommunityMap()
+	private static final String XQUERY_CI = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType') "
+		+
+		"  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] " +
+		" and  $x//CONFIGURATION/context[./@id=%s]  "
+		+
+		"  return " +
+		"<community> " +
+		"{$x//CONFIGURATION/context/@id}" +
+		"{$x//CONFIGURATION/context/@label}" +
+		"</community>";
+
+	public CommunityMap getCommunityMap(boolean singleCommunity, String communityId)
 		throws ISLookUpException, DocumentException, SAXException {
-		return getMap(isLookUp.quickSearchProfile(XQUERY));
+		if (singleCommunity)
+			return getMap(isLookUp.quickSearchProfile(XQUERY_CI.replace("%s", "'" + communityId + "'")));
+		return getMap(isLookUp.quickSearchProfile(XQUERY_ALL));
 
 	}
 

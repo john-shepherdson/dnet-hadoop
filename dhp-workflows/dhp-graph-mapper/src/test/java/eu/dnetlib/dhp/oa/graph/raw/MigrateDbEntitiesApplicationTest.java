@@ -28,11 +28,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Datasource;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.Organization;
+import eu.dnetlib.dhp.schema.oaf.Project;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 @ExtendWith(MockitoExtension.class)
-class MigrateDbEntitiesApplicationTest {
+public class MigrateDbEntitiesApplicationTest {
 
 	private MigrateDbEntitiesApplication app;
 
@@ -58,7 +63,7 @@ class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	void testProcessDatasource() throws Exception {
+	public void testProcessDatasource() throws Exception {
 		final List<TypedField> fields = prepareMocks("datasources_resultset_entry.json");
 
 		final List<Oaf> list = app.processDatasource(rs);
@@ -78,10 +83,27 @@ class MigrateDbEntitiesApplicationTest {
 		assertEquals(getValueAsString("issnPrinted", fields), ds.getJournal().getIssnPrinted());
 		assertEquals(getValueAsString("issnOnline", fields), ds.getJournal().getIssnOnline());
 		assertEquals(getValueAsString("issnLinking", fields), ds.getJournal().getIssnLinking());
+
+		assertEquals("pubsrepository::journal", ds.getDatasourcetype().getClassid());
+		assertEquals("dnet:datasource_typologies", ds.getDatasourcetype().getSchemeid());
+
+		assertEquals("pubsrepository::journal", ds.getDatasourcetypeui().getClassid());
+		assertEquals("dnet:datasource_typologies_ui", ds.getDatasourcetypeui().getSchemeid());
+
+		assertEquals("National", ds.getJurisdiction().getClassid());
+		assertEquals("eosc:jurisdictions", ds.getJurisdiction().getSchemeid());
+
+		assertTrue(ds.getThematic());
+		assertTrue(ds.getKnowledgegraph());
+
+		assertEquals(1, ds.getContentpolicies().size());
+		assertEquals("Journal article", ds.getContentpolicies().get(0).getClassid());
+		assertEquals("eosc:contentpolicies", ds.getContentpolicies().get(0).getSchemeid());
+
 	}
 
 	@Test
-	void testProcessProject() throws Exception {
+	public void testProcessProject() throws Exception {
 		final List<TypedField> fields = prepareMocks("projects_resultset_entry.json");
 
 		final List<Oaf> list = app.processProject(rs);
@@ -99,7 +121,7 @@ class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	void testProcessOrganization() throws Exception {
+	public void testProcessOrganization() throws Exception {
 		final List<TypedField> fields = prepareMocks("organizations_resultset_entry.json");
 
 		final List<Oaf> list = app.processOrganization(rs);
@@ -119,14 +141,14 @@ class MigrateDbEntitiesApplicationTest {
 		assertEquals(getValueAsString("country", fields).split("@@@")[1], o.getCountry().getSchemeid());
 		assertEquals(getValueAsString("country", fields).split("@@@")[1], o.getCountry().getSchemename());
 		assertEquals(getValueAsString("collectedfromname", fields), o.getCollectedfrom().get(0).getValue());
-		List<String> alternativenames = getValueAsList("alternativenames", fields);
+		final List<String> alternativenames = getValueAsList("alternativenames", fields);
 		assertEquals(2, alternativenames.size());
 		assertTrue(alternativenames.contains("Pippo"));
 		assertTrue(alternativenames.contains("Foo"));
 	}
 
 	@Test
-	void testProcessDatasourceOrganization() throws Exception {
+	public void testProcessDatasourceOrganization() throws Exception {
 		final List<TypedField> fields = prepareMocks("datasourceorganization_resultset_entry.json");
 
 		final List<Oaf> list = app.processDatasourceOrganization(rs);
@@ -143,7 +165,7 @@ class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	void testProcessProjectOrganization() throws Exception {
+	public void testProcessProjectOrganization() throws Exception {
 		final List<TypedField> fields = prepareMocks("projectorganization_resultset_entry.json");
 
 		final List<Oaf> list = app.processProjectOrganization(rs);
@@ -162,7 +184,7 @@ class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	void testProcessClaims_context() throws Exception {
+	public void testProcessClaims_context() throws Exception {
 		final List<TypedField> fields = prepareMocks("claimscontext_resultset_entry.json");
 
 		final List<Oaf> list = app.processClaims(rs);
@@ -177,7 +199,7 @@ class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	void testProcessClaims_rels() throws Exception {
+	public void testProcessClaims_rels() throws Exception {
 		final List<TypedField> fields = prepareMocks("claimsrel_resultset_entry.json");
 
 		final List<Oaf> list = app.processClaims(rs);
@@ -208,6 +230,9 @@ class MigrateDbEntitiesApplicationTest {
 
 		assertValidId(r1.getCollectedfrom().get(0).getKey());
 		assertValidId(r2.getCollectedfrom().get(0).getKey());
+
+		// System.out.println(new ObjectMapper().writeValueAsString(r1));
+		// System.out.println(new ObjectMapper().writeValueAsString(r2));
 	}
 
 	private List<TypedField> prepareMocks(final String jsonFile) throws IOException, SQLException {
@@ -270,7 +295,7 @@ class MigrateDbEntitiesApplicationTest {
 						final String[] values = ((List<?>) tf.getValue())
 							.stream()
 							.filter(Objects::nonNull)
-							.map(Object::toString)
+							.map(o -> o.toString())
 							.toArray(String[]::new);
 
 						Mockito.when(arr.getArray()).thenReturn(values);
@@ -331,7 +356,6 @@ class MigrateDbEntitiesApplicationTest {
 		return new Float(getValueAs(name, fields).toString());
 	}
 
-	@SuppressWarnings("unchecked")
 	private <T> T getValueAs(final String name, final List<TypedField> fields) {
 		return fields
 			.stream()

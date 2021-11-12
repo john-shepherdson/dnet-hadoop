@@ -25,6 +25,24 @@ public class PropagationConstant {
 	private PropagationConstant() {
 	}
 
+	public static final String DOI = "doi";
+	public static final String REF_DOI = ".refs";
+
+	public static final String UPDATE_DATA_INFO_TYPE = "update";
+	public static final String UPDATE_SUBJECT_FOS_CLASS_ID = "subject:fos";
+	public static final String UPDATE_CLASS_NAME = "Inferred  by OpenAIRE";
+	public static final String UPDATE_MEASURE_BIP_CLASS_ID = "measure:bip";
+
+	public static final String FOS_CLASS_ID = "FOS";
+	public static final String FOS_CLASS_NAME = "Fields of Science and Technology classification";
+
+	public static final String OPENCITATIONS_CLASSID = "sysimport:crosswalk:opencitations";
+	public static final String OPENCITATIONS_CLASSNAME = "Imported from OpenCitations";
+	public static final String ID_PREFIX = "50|doi_________::";
+	public static final String OC_TRUST = "0.91";
+
+	public final static String NULL = "NULL";
+
 	public static final String INSTITUTIONAL_REPO_TYPE = "pubsrepository::institutional";
 
 	public static final String PROPAGATION_DATA_INFO_TYPE = "propagation";
@@ -68,27 +86,44 @@ public class PropagationConstant {
 				getDataInfo(
 					PROPAGATION_DATA_INFO_TYPE,
 					PROPAGATION_COUNTRY_INSTREPO_CLASS_ID,
-					PROPAGATION_COUNTRY_INSTREPO_CLASS_NAME));
+					PROPAGATION_COUNTRY_INSTREPO_CLASS_NAME,
+					ModelConstants.DNET_PROVENANCE_ACTIONS));
 		return nc;
 	}
 
 	public static DataInfo getDataInfo(
-		String inference_provenance, String inference_class_id, String inference_class_name) {
+		String inference_provenance, String inference_class_id, String inference_class_name, String qualifierSchema) {
+
+		return getDataInfo(inference_provenance, inference_class_id, inference_class_name, qualifierSchema, "0.85");
+	}
+
+	public static DataInfo getDataInfo(
+		String inference_provenance, String inference_class_id, String inference_class_name, String qualifierSchema,
+		String trust) {
+		return getDataInfo(
+			inference_provenance, inference_class_id, inference_class_name, qualifierSchema, trust, true);
+
+	}
+
+	public static DataInfo getDataInfo(
+		String inference_provenance, String inference_class_id, String inference_class_name, String qualifierSchema,
+		String trust, boolean inferred) {
 		DataInfo di = new DataInfo();
-		di.setInferred(true);
+		di.setInferred(inferred);
 		di.setDeletedbyinference(false);
-		di.setTrust("0.85");
+		di.setTrust(trust);
 		di.setInferenceprovenance(inference_provenance);
-		di.setProvenanceaction(getQualifier(inference_class_id, inference_class_name));
+		di.setProvenanceaction(getQualifier(inference_class_id, inference_class_name, qualifierSchema));
 		return di;
 	}
 
-	public static Qualifier getQualifier(String inference_class_id, String inference_class_name) {
+	public static Qualifier getQualifier(String inference_class_id, String inference_class_name,
+		String qualifierSchema) {
 		Qualifier pa = new Qualifier();
 		pa.setClassid(inference_class_id);
 		pa.setClassname(inference_class_name);
-		pa.setSchemeid(ModelConstants.DNET_PID_TYPES);
-		pa.setSchemename(ModelConstants.DNET_PID_TYPES);
+		pa.setSchemeid(qualifierSchema);
+		pa.setSchemename(qualifierSchema);
 		return pa;
 	}
 
@@ -107,7 +142,11 @@ public class PropagationConstant {
 		r.setRelClass(rel_class);
 		r.setRelType(rel_type);
 		r.setSubRelType(subrel_type);
-		r.setDataInfo(getDataInfo(inference_provenance, inference_class_id, inference_class_name));
+		r
+			.setDataInfo(
+				getDataInfo(
+					inference_provenance, inference_class_id, inference_class_name,
+					ModelConstants.DNET_PROVENANCE_ACTIONS));
 		return r;
 	}
 

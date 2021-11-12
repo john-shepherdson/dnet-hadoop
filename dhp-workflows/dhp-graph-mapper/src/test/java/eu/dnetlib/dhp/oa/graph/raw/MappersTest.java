@@ -13,12 +13,14 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.dom4j.DocumentException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
@@ -48,7 +50,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testPublication() throws IOException {
+	void testPublication() throws IOException, DocumentException {
 
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_record.xml")));
 
@@ -145,7 +147,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testPublication_PubMed() throws IOException {
+	void testPublication_PubMed() throws IOException, DocumentException {
 
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_record_pubmed.xml")));
@@ -217,7 +219,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testPublicationInvisible() throws IOException {
+	void testPublicationInvisible() throws IOException, DocumentException {
 
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_record.xml")));
 
@@ -233,7 +235,17 @@ class MappersTest {
 	}
 
 	@Test
-	void testDataset() throws IOException {
+	void testOdfFwfEBookLibrary() throws IOException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_fwfebooklibrary.xml")));
+
+		assertThrows(
+			IllegalArgumentException.class,
+			() -> new OdfToOafMapper(vocs, false, true).processMdRecord(xml));
+	}
+
+	@Test
+	void testDataset() throws IOException, DocumentException {
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_dataset.xml")));
 
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
@@ -346,7 +358,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testOdfBielefeld() throws IOException {
+	void testOdfBielefeld() throws IOException, DocumentException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_bielefeld.xml")));
 
@@ -394,7 +406,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testOpentrial() throws IOException {
+	void testOpentrial() throws IOException, DocumentException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_opentrial.xml")));
 
@@ -511,7 +523,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testSoftware() throws IOException {
+	void testSoftware() throws IOException, DocumentException {
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_software.xml")));
 
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
@@ -530,7 +542,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testClaimDedup() throws IOException {
+	void testClaimDedup() throws IOException, DocumentException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_claim_dedup.xml")));
 		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
@@ -544,7 +556,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testNakala() throws IOException {
+	void testNakala() throws IOException, DocumentException {
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_nakala.xml")));
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
@@ -572,7 +584,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testEnermaps() throws IOException {
+	void testEnermaps() throws IOException, DocumentException {
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("enermaps.xml")));
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
@@ -597,7 +609,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testClaimFromCrossref() throws IOException {
+	void testClaimFromCrossref() throws IOException, DocumentException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_claim_crossref.xml")));
 		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
@@ -614,7 +626,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testODFRecord() throws IOException {
+	void testODFRecord() throws IOException, DocumentException {
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_record.xml")));
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 		System.out.println("***************");
@@ -628,7 +640,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testTextGrid() throws IOException {
+	void testTextGrid() throws IOException, DocumentException {
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("textgrid.xml")));
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
@@ -662,7 +674,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testBologna() throws IOException {
+	void testBologna() throws IOException, DocumentException {
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf-bologna.xml")));
 		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
@@ -679,7 +691,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testJairo() throws IOException {
+	void testJairo() throws IOException, DocumentException {
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_jairo.xml")));
 		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
@@ -703,7 +715,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testOdfFromHdfs() throws IOException {
+	void testOdfFromHdfs() throws IOException, DocumentException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_from_hdfs.xml")));
 
@@ -746,6 +758,40 @@ class MappersTest {
 				assertEquals("UNKNOWN", i.getAccessright().getClassid());
 			});
 		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
+	}
+
+	@Test
+	void testXMLEncodedURL() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("encoded-url.xml")));
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		final Publication p = (Publication) list.get(0);
+		assertTrue(p.getInstance().size() > 0);
+
+		String decoded = "https://www.ec.europa.eu/research/participants/documents/downloadPublic?documentIds=080166e5af388993&appId=PPGMS";
+		assertEquals(decoded, p.getInstance().get(0).getUrl().get(0));
+	}
+
+	@Test
+	void testXMLEncodedURL_ODF() throws IOException, DocumentException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("encoded-url_odf.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		final Dataset p = (Dataset) list.get(0);
+		assertTrue(p.getInstance().size() > 0);
+		for (String url : p.getInstance().get(0).getUrl()) {
+			System.out.println(url);
+			assertTrue(!url.contains("&amp;"));
+		}
 	}
 
 	private void assertValidId(final String id) {

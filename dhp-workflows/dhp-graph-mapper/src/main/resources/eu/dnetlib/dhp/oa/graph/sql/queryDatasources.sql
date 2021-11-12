@@ -84,13 +84,18 @@ SELECT
 	dc.id                                                                                                      AS collectedfromid,
 	dc.officialname                                                                                            AS collectedfromname,
 	d.typology||'@@@dnet:datasource_typologies'                                                                AS datasourcetype,
+	d.typology||'@@@dnet:datasource_typologies_ui'                                                             AS datasourcetypeui,
 	'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions'                                             AS provenanceaction,
 	d.issn                                                                                                     AS issnPrinted,
 	d.eissn                                                                                                    AS issnOnline,
-	d.lissn                                                                                                    AS issnLinking
+	d.lissn                                                                                                    AS issnLinking,
+	de.jurisdiction||'@@@eosc:jurisdictions'                                                                   AS jurisdiction,
+	de.thematic                                                                                                AS thematic,
+	de.knowledge_graph                                                                                         AS knowledgegraph,
+	array(select unnest(de.content_policies)||'@@@eosc:contentpolicies')                                       AS contentpolicies
 
 FROM dsm_datasources d
-
+LEFT OUTER JOIN dsm_datasources_eosc de on (d.id = de.id)
 LEFT OUTER JOIN dsm_datasources dc on (d.collectedfrom = dc.id)
 LEFT OUTER JOIN dsm_api a ON (d.id = a.datasource)
 LEFT OUTER JOIN dsm_datasourcepids di ON (d.id = di.datasource)
@@ -126,4 +131,8 @@ GROUP BY
 	dc.officialname,
 	d.issn,
 	d.eissn,
-	d.lissn
+	d.lissn,
+	de.jurisdiction,
+	de.thematic,
+	de.knowledge_graph,
+	de.content_policies

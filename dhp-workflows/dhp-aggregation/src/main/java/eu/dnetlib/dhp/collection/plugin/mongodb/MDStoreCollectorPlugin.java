@@ -13,11 +13,11 @@ import org.slf4j.LoggerFactory;
 
 import com.mongodb.client.MongoCollection;
 
-import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
-import eu.dnetlib.dhp.collection.CollectorException;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
 import eu.dnetlib.dhp.common.MdstoreClient;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
+import eu.dnetlib.dhp.common.collection.CollectorException;
 
 public class MDStoreCollectorPlugin implements CollectorPlugin {
 

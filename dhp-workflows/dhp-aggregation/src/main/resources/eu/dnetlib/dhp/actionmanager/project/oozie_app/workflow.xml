@@ -58,7 +58,7 @@
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--fileURL</arg><arg>${projectFileURL}</arg>
             <arg>--hdfsPath</arg><arg>${workingDir}/projects</arg>
-            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.CSVProject</arg>
+            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProject</arg>
         </java>
         <ok to="wait_projects"/>
         <error to="Kill"/>
@@ -70,7 +70,7 @@
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--fileURL</arg><arg>${programmeFileURL}</arg>
             <arg>--hdfsPath</arg><arg>${workingDir}/programme</arg>
-            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.CSVProgramme</arg>
+            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProgramme</arg>
         </java>
         <ok to="prepare_programme"/>
         <error to="Kill"/>
@@ -83,7 +83,7 @@
             <arg>--fileURL</arg><arg>${topicFileURL}</arg>
             <arg>--hdfsPath</arg><arg>${workingDir}/topic</arg>
             <arg>--sheetName</arg><arg>${sheetName}</arg>
-            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.EXCELTopic</arg>
+            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.model.EXCELTopic</arg>
         </java>
         <ok to="wait"/>
         <error to="Kill"/>

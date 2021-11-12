@@ -1,0 +1,508 @@
+{
+  "collectedfrom": [
+    {
+      "key": "10|opendoar____::8b6dd7db9af49e67306feb59a8bdc52c",
+      "value": "Europe PubMed Central",
+      "dataInfo": null
+    }
+  ],
+  "dataInfo": {
+    "invisible": false,
+    "inferred": false,
+    "deletedbyinference": false,
+    "trust": "0.9",
+    "inferenceprovenance": null,
+    "provenanceaction": {
+      "classid": "sysimport:actionset",
+      "classname": "sysimport:actionset",
+      "schemeid": "dnet:provenanceActions",
+      "schemename": "dnet:provenanceActions"
+    }
+  },
+  "lastupdatetimestamp": null,
+  "id": "50|pmid________::cd23b96c02d937c971c1b56d6aa0bf4f",
+  "originalId": [
+    "10025635"
+  ],
+  "pid": [
+    {
+      "value": "10025635",
+      "qualifier": {
+        "classid": "pmid",
+        "classname": "pmid",
+        "schemeid": "dnet:pid_types",
+        "schemename": "dnet:pid_types"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.9",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:actionset",
+          "classname": "sysimport:actionset",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    }
+  ],
+  "dateofcollection": null,
+  "dateoftransformation": null,
+  "extraInfo": null,
+  "oaiprovenance": null,
+  "measures": null,
+  "author": [
+    {
+      "fullname": "D J, Marcellin-Little",
+      "name": "D J",
+      "surname": "Marcellin-Little",
+      "rank": 1,
+      "pid": null,
+      "affiliation": null
+    },
+    {
+      "fullname": "B A, DeYoung",
+      "name": "B A",
+      "surname": "DeYoung",
+      "rank": 2,
+      "pid": null,
+      "affiliation": null
+    },
+    {
+      "fullname": "D H, Doyens",
+      "name": "D H",
+      "surname": "Doyens",
+      "rank": 3,
+      "pid": null,
+      "affiliation": null
+    },
+    {
+      "fullname": "D J, DeYoung",
+      "name": "D J",
+      "surname": "DeYoung",
+      "rank": 4,
+      "pid": null,
+      "affiliation": null
+    }
+  ],
+  "resulttype": {
+    "classid": "dataset",
+    "classname": "dataset",
+    "schemeid": "dnet:result_typologies",
+    "schemename": "dnet:result_typologies"
+  },
+  "language": null,
+  "country": null,
+  "subject": [
+    {
+      "value": "Animals",
+      "qualifier": {
+        "classid": "keywords",
+        "classname": "keywords",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.9",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:actionset",
+          "classname": "sysimport:actionset",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "Arthroplasty, Replacement, Hip",
+      "qualifier": {
+        "classid": "keywords",
+        "classname": "keywords",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.9",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:actionset",
+          "classname": "sysimport:actionset",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "Dogs",
+      "qualifier": {
+        "classid": "keywords",
+        "classname": "keywords",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.9",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:actionset",
+          "classname": "sysimport:actionset",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "Follow-Up Studies",
+      "qualifier": {
+        "classid": "keywords",
+        "classname": "keywords",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.9",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:actionset",
+          "classname": "sysimport:actionset",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "Hip Joint",
+      "qualifier": {
+        "classid": "keywords",
+        "classname": "keywords",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.9",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:actionset",
+          "classname": "sysimport:actionset",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "Hip Prosthesis",
+      "qualifier": {
+        "classid": "keywords",
+        "classname": "keywords",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.9",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:actionset",
+          "classname": "sysimport:actionset",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "Osseointegration",
+      "qualifier": {
+        "classid": "keywords",
+        "classname": "keywords",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.9",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:actionset",
+          "classname": "sysimport:actionset",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "Prospective Studies",
+      "qualifier": {
+        "classid": "keywords",
+        "classname": "keywords",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.9",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:actionset",
+          "classname": "sysimport:actionset",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "Radiography",
+      "qualifier": {
+        "classid": "keywords",
+        "classname": "keywords",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.9",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:actionset",
+          "classname": "sysimport:actionset",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "Survival Analysis",
+      "qualifier": {
+        "classid": "keywords",
+        "classname": "keywords",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.9",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:actionset",
+          "classname": "sysimport:actionset",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "Treatment Outcome",
+      "qualifier": {
+        "classid": "keywords",
+        "classname": "keywords",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.9",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:actionset",
+          "classname": "sysimport:actionset",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    }
+  ],
+  "title": [
+    {
+      "value": "Canine uncemented porous-coated anatomic total hip arthroplasty: results of a long-term prospective evaluation of 50 consecutive cases.",
+      "qualifier": {
+        "classid": "main title",
+        "classname": "main title",
+        "schemeid": "dnet:dataCite_title",
+        "schemename": "dnet:dataCite_title"
+      },
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.9",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:actionset",
+          "classname": "sysimport:actionset",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    }
+  ],
+  "relevantdate": null,
+  "description": [
+    {
+      "value": "To evaluate the long-term clinical and radiographic results of a canine uncemented porous-coated anatomic (PCA) total hip arthroplasty (THA).Prospective study of consecutive clinical patients using survival analysis.Forty-one dogs that underwent PCA THA; nine had bilateral PCA THA (50 prostheses).Gait observation, orthopedic examination, and radiographic assessment were conducted before THA, 6 months after THA, and yearly thereafter. A zonal analysis system was used to document osseous changes in the femur and the acetabulum. Acetabular cup and femoral stem subsidence and migration, femoral canal fill, and implant orientation were measured. Survival analysis of the procedure was conducted.Long-term follow-up was available for 37 dogs (46 prostheses). The median follow-up was 63 months. Limb function was normal for 37 limbs and abnormal for 9 limbs because of dislocation (n = 3), lumbosacral disease (n = 2), degenerative myelopathy (n = 1), autoimmune disease (n = 1), brain tumor (n = 1), or osteosarcoma of the femur (n = 1). All prosthetic stems and cups were fixed by bone ingrowth fixation. Osteolysis was not observed. Bone infarction occurred in five femoral canals (four dogs). The 6-year survival rate for the procedure was 87% (95% confidence interval, 72%-96%).Long-term fixation of the uncemented PCA acetabular cup and stem is successful in dogs, and long-term clinical function is excellent.",
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.9",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:actionset",
+          "classname": "sysimport:actionset",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    }
+  ],
+  "dateofacceptance": {
+    "value": "1999-02-20",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.9",
+      "inferenceprovenance": null,
+      "provenanceaction": {
+        "classid": "sysimport:actionset",
+        "classname": "sysimport:actionset",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "publisher": null,
+  "embargoenddate": null,
+  "source": null,
+  "fulltext": null,
+  "format": null,
+  "contributor": null,
+  "resourcetype": null,
+  "coverage": null,
+  "bestaccessright": null,
+  "context": null,
+  "externalReference": null,
+  "instance": [
+    {
+      "license": null,
+      "accessright": null,
+      "instancetype": {
+        "classid": "0037",
+        "classname": "Clinical Trial",
+        "schemeid": "dnet:publication_resource",
+        "schemename": "dnet:publication_resource"
+      },
+      "hostedby": null,
+      "url": [
+        "https://pubmed.ncbi.nlm.nih.gov/10025635"
+      ],
+      "distributionlocation": null,
+      "collectedfrom": {
+        "key": "10|opendoar____::8b6dd7db9af49e67306feb59a8bdc52c",
+        "value": "Europe PubMed Central",
+        "dataInfo": null
+      },
+      "pid": [
+        {
+          "value": "10025635",
+          "qualifier": {
+            "classid": "pmid",
+            "classname": "pmid",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "dataInfo": {
+            "invisible": false,
+            "inferred": false,
+            "deletedbyinference": false,
+            "trust": "0.9",
+            "inferenceprovenance": null,
+            "provenanceaction": {
+              "classid": "sysimport:actionset",
+              "classname": "sysimport:actionset",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        }
+      ],
+      "alternateIdentifier": [
+        {
+          "value": "10.1053/jvet.1999.0010",
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "dataInfo": {
+            "invisible": false,
+            "inferred": false,
+            "deletedbyinference": false,
+            "trust": "0.9",
+            "inferenceprovenance": null,
+            "provenanceaction": {
+              "classid": "sysimport:actionset",
+              "classname": "sysimport:actionset",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        }
+      ],
+      "dateofacceptance": {
+        "value": "1999-02-20",
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": null,
+          "provenanceaction": {
+            "classid": "sysimport:actionset",
+            "classname": "sysimport:actionset",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      },
+      "processingchargeamount": null,
+      "processingchargecurrency": null,
+      "refereed": null
+    }
+  ],
+  "storagedate": null,
+  "device": null,
+  "size": null,
+  "version": null,
+  "lastmetadataupdate": null,
+  "metadataversionnumber": null,
+  "geolocation": null
+}

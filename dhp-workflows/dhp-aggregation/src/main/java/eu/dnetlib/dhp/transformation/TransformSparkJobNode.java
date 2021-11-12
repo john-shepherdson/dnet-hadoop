@@ -7,6 +7,7 @@ import static eu.dnetlib.dhp.utils.DHPUtils.*;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -23,8 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
-import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.message.MessageSender;
 import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;
@@ -126,7 +127,8 @@ public class TransformSparkJobNode {
 				JavaRDD<MetadataRecord> mdstore = inputMDStore
 					.javaRDD()
 					.repartition(getRepartitionNumber(totalInput, rpt))
-					.map((Function<MetadataRecord, MetadataRecord>) x::call);
+					.map((Function<MetadataRecord, MetadataRecord>) x::call)
+					.filter((Function<MetadataRecord, Boolean>) Objects::nonNull);
 				saveDataset(spark.createDataset(mdstore.rdd(), encoder), outputBasePath + MDSTORE_DATA_PATH);
 
 				log.info("Transformed item {}", ct.getProcessedItems().count());

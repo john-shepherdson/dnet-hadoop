@@ -11,12 +11,16 @@ TARGET_DB=$2
 
 TMP=/tmp/stats-update-`tr -dc A-Za-z0-9 </dev/urandom | head -c 6`
 
-echo "Downloading context data"
+echo "Downloading context ids"
 curl -L ${CONTEXT_API}/contexts/?type=ri,community -H "accept: application/json" | /usr/local/sbin/jq -r '.[] | "\(.id),\(.label)"' > contexts.csv
+
+echo "Downloading categories data"
 cat contexts.csv | cut -d , -f1 | xargs -I {} curl -L ${CONTEXT_API}/context/{}/?all=true | /usr/local/sbin/jq -r '.[]|"\(.id|split(":")[0]),\(.id),\(.label)"' > categories.csv
+
+echo "Downloading concepts data"
 cat categories.csv | cut -d , -f2 | sed 's/:/%3A/g'| xargs -I {} curl -L ${CONTEXT_API}/context/category/{}/?all=true | /usr/local/sbin/jq -r '.[]|"\(.id|split("::")[0])::\(.id|split("::")[1]),\(.id),\(.label)"' > concepts.csv
 cat contexts.csv | sed 's/^\(.*\),\(.*\)/\1,\1::other,\2/' >> categories.csv
-cat categories.csv | grep -v ::other | sed 's/^.*,\(.*\),\(.*\)/\1,\1::other,\2/' >> concepts.csv
+cat categories.csv | sed 's/^.*,\(.*\),\(.*\)/\1,\1::other,\2/' >> concepts.csv
 
 echo "uploading context data to hdfs"
 hdfs dfs -mkdir ${TMP}
@@ -26,6 +30,8 @@ hdfs dfs -copyFromLocal concepts.csv ${TMP}
 hdfs dfs -chmod -R 777 ${TMP}
 
 echo "Creating and populating impala tables"
+impala-shell -q "invalidate metadata"
+impala-shell -d ${TARGET_DB} -q "invalidate metadata"
 impala-shell -q "create table ${TARGET_DB}.context (id string, name string) row format delimited fields terminated by ','"
 impala-shell -q "create table ${TARGET_DB}.category (context string, id string, name string) row format delimited fields terminated by ','"
 impala-shell -q "create table ${TARGET_DB}.concept (category string, id string, name string) row format delimited fields terminated by ','"

@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.oa.graph.dump.Constants;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
+import eu.dnetlib.dhp.oa.graph.dump.exceptions.MyRuntimeException;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
@@ -33,7 +34,7 @@ public class Process implements Serializable {
 				ri.setType(Constants.RESEARCH_INFRASTRUCTURE);
 			}
 			ri.setId(Utils.getContextId(ci.getId()));
-			ri.setOriginalId(ci.getId());
+			ri.setAcronym(ci.getId());
 
 			ri.setDescription(ci.getDescription());
 			ri.setName(ci.getName());
@@ -43,7 +44,7 @@ public class Process implements Serializable {
 			return (R) ri;
 
 		} catch (final Exception e) {
-			throw new RuntimeException(e);
+			throw new MyRuntimeException(e);
 		}
 	}
 
@@ -91,7 +92,7 @@ public class Process implements Serializable {
 			return relationList;
 
 		} catch (final Exception e) {
-			throw new RuntimeException(e);
+			throw new MyRuntimeException(e);
 		}
 	}
 

@@ -1,0 +1,36 @@
+
+[
+
+  {
+    "paramName":"pip",
+    "paramLongName":"preparedInfoPath",
+    "paramDescription": "the path where to find the pre-processed data for unibi gold list and doj artciles",
+    "paramRequired": true
+  },
+
+  {
+    "paramName": "ssm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "true if the spark session is managed, false otherwise",
+    "paramRequired": false
+  },
+  {
+    "paramName": "m",
+    "paramLongName": "master",
+    "paramDescription": "true if the spark session is managed, false otherwise",
+    "paramRequired": true
+  },
+
+  {
+    "paramName": "gp",
+    "paramLongName": "graphPath",
+    "paramDescription": "true if the spark session is managed, false otherwise",
+    "paramRequired": true
+  },
+  {
+    "paramName": "out",
+    "paramLongName": "outputPath",
+    "paramDescription": "true if the spark session is managed, false otherwise",
+    "paramRequired": true
+  }
+]

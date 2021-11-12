@@ -60,14 +60,10 @@ object SparkCreateActionset {
 
     val entities: Dataset[(String, Result)] = spark.read.load(s"$sourcePath/entities/*").as[Result].map(p => (p.getId, p))(Encoders.tuple(Encoders.STRING, resultEncoders))
 
-
-    entities.filter(r => r.isInstanceOf[Result]).map(r => r.asInstanceOf[Result])
     entities
       .joinWith(idRelation, entities("_1").equalTo(idRelation("value")))
       .map(p => p._1._2)
       .write.mode(SaveMode.Append).save(s"$workingDirFolder/actionSetOaf")
-
-
   }
 
 }

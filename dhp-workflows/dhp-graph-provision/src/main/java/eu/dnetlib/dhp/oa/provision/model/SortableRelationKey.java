@@ -18,17 +18,18 @@ public class SortableRelationKey implements Comparable<SortableRelationKey>, Ser
 
 	static {
 		weights.put(ModelConstants.PARTICIPATION, 0);
-
 		weights.put(ModelConstants.OUTCOME, 1);
 		weights.put(ModelConstants.AFFILIATION, 2);
 		weights.put(ModelConstants.DEDUP, 3);
 		weights.put(ModelConstants.PUBLICATION_DATASET, 4);
-		weights.put(ModelConstants.CITATION, 5);
-		weights.put(ModelConstants.SUPPLEMENT, 6);
-		weights.put(ModelConstants.REVIEW, 7);
-		weights.put(ModelConstants.RELATIONSHIP, 8);
+		weights.put(ModelConstants.SUPPLEMENT, 5);
+		weights.put(ModelConstants.REVIEW, 6);
+		weights.put(ModelConstants.RELATIONSHIP, 7);
+		weights.put(ModelConstants.PART, 8);
 		weights.put(ModelConstants.PROVISION, 9);
-		weights.put(ModelConstants.SIMILARITY, 10);
+		weights.put(ModelConstants.VERSION, 10);
+		weights.put(ModelConstants.SIMILARITY, 11);
+		weights.put(ModelConstants.CITATION, 12);
 	}
 
 	private static final long serialVersionUID = 3232323;

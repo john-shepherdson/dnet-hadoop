@@ -26,10 +26,6 @@
             <description>maximum number of relations allowed for a each entity grouping by target</description>
         </property>
         <property>
-            <name>otherDsTypeId</name>
-            <description>mapping used to populate datasourceTypeUi field</description>
-        </property>
-        <property>
             <name>format</name>
             <description>metadata format name (DMF|TMF)</description>
         </property>
@@ -582,7 +578,6 @@
             <arg>--inputPath</arg><arg>${workingDir}/join_entities</arg>
             <arg>--outputPath</arg><arg>${workingDir}/xml</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--otherDsTypeId</arg><arg>${otherDsTypeId}</arg>
         </spark>
         <ok to="should_index"/>
         <error to="Kill"/>

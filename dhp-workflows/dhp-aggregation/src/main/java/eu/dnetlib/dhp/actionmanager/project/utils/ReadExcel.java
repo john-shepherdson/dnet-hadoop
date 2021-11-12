@@ -16,8 +16,8 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.collection.CollectorException;
-import eu.dnetlib.dhp.collection.HttpConnector2;
+import eu.dnetlib.dhp.common.collection.CollectorException;
+import eu.dnetlib.dhp.common.collection.HttpConnector2;
 
 /**
  * Applies the parsing of an excel file and writes the Serialization of it in hdfs
@@ -33,7 +33,7 @@ public class ReadExcel implements Closeable {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					ReadCSV.class
+					ReadExcel.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/actionmanager/project/parameters.json")));
 

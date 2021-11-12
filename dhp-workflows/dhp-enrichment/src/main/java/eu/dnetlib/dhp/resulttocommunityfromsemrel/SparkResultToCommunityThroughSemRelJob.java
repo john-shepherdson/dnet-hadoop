@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.resulttocommunityfromorganization.ResultCommunityList;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
 
@@ -124,7 +125,8 @@ public class SparkResultToCommunityThroughSemRelJob {
 												getDataInfo(
 													PROPAGATION_DATA_INFO_TYPE,
 													PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID,
-													PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME)));
+													PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME,
+													ModelConstants.DNET_PROVENANCE_ACTIONS)));
 								return newContext;
 							}
 							return null;

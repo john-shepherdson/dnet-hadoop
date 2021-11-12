@@ -51,10 +51,14 @@ object SparkCreateScholix {
 
     relationDS.joinWith(summaryDS, relationDS("_1").equalTo(summaryDS("_1")), "left")
       .map { input: ((String, Relation), (String, ScholixSummary)) =>
-        val rel: Relation = input._1._2
-        val source: ScholixSummary = input._2._2
-        (rel.getTarget, ScholixUtils.scholixFromSource(rel, source))
+        if (input._1!= null && input._2!= null) {
+          val rel: Relation = input._1._2
+          val source: ScholixSummary = input._2._2
+          (rel.getTarget, ScholixUtils.scholixFromSource(rel, source))
+        }
+        else  null
       }(Encoders.tuple(Encoders.STRING, scholixEncoder))
+      .filter(r => r!= null)
       .write.mode(SaveMode.Overwrite).save(s"$targetPath/scholix_from_source")
 
     val scholixSource: Dataset[(String, Scholix)] = spark.read.load(s"$targetPath/scholix_from_source").as[(String, Scholix)](Encoders.tuple(Encoders.STRING, scholixEncoder))

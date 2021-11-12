@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
 /**
@@ -30,9 +32,9 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 public class SaveCommunityMap implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(SaveCommunityMap.class);
-	private final QueryInformationSystem queryInformationSystem;
+	private final transient QueryInformationSystem queryInformationSystem;
 
-	private final BufferedWriter writer;
+	private final transient BufferedWriter writer;
 
 	public SaveCommunityMap(String hdfsPath, String hdfsNameNode, String isLookUpUrl) throws IOException {
 		final Configuration conf = new Configuration();
@@ -70,13 +72,28 @@ public class SaveCommunityMap implements Serializable {
 		final String isLookUpUrl = parser.get("isLookUpUrl");
 		log.info("isLookUpUrl: {}", isLookUpUrl);
 
+		final Boolean singleCommunity = Optional
+			.ofNullable(parser.get("singleDeposition"))
+			.map(Boolean::valueOf)
+			.orElse(false);
+
+		final String community_id = Optional.ofNullable(parser.get("communityId")).orElse(null);
+
 		final SaveCommunityMap scm = new SaveCommunityMap(outputPath, nameNode, isLookUpUrl);
 
-		scm.saveCommunityMap();
+		scm.saveCommunityMap(singleCommunity, community_id);
+
 	}
 
-	private void saveCommunityMap() throws ISLookUpException, IOException, DocumentException, SAXException {
-		writer.write(Utils.OBJECT_MAPPER.writeValueAsString(queryInformationSystem.getCommunityMap()));
+	private void saveCommunityMap(boolean singleCommunity, String communityId)
+		throws ISLookUpException, IOException, DocumentException, SAXException {
+		final String communityMapString = Utils.OBJECT_MAPPER
+			.writeValueAsString(queryInformationSystem.getCommunityMap(singleCommunity, communityId));
+		log.info("communityMap {} ", communityMapString);
+		writer
+			.write(
+				communityMapString);
 		writer.close();
 	}
+
 }

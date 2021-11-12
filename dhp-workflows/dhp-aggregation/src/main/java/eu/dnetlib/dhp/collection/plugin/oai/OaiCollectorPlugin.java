@@ -13,11 +13,11 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
-import eu.dnetlib.dhp.aggregation.common.AggregatorReport;
 import eu.dnetlib.dhp.collection.ApiDescriptor;
-import eu.dnetlib.dhp.collection.CollectorException;
-import eu.dnetlib.dhp.collection.HttpClientParams;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
+import eu.dnetlib.dhp.common.collection.CollectorException;
+import eu.dnetlib.dhp.common.collection.HttpClientParams;
 
 public class OaiCollectorPlugin implements CollectorPlugin {
 
@@ -66,11 +66,11 @@ public class OaiCollectorPlugin implements CollectorPlugin {
 		}
 
 		if (fromDate != null && !fromDate.matches(DATE_REGEX) && !fromDate.matches(UTC_DATETIME_REGEX)) {
-			throw new CollectorException("Invalid date (YYYY-MM-DD): " + fromDate);
+			throw new CollectorException("Invalid date (YYYY-MM-DD or YYYY-MM-DDT00:00:00Z): " + fromDate);
 		}
 
 		if (untilDate != null && !untilDate.matches(DATE_REGEX) && !untilDate.matches(UTC_DATETIME_REGEX)) {
-			throw new CollectorException("Invalid date (YYYY-MM-DD): " + untilDate);
+			throw new CollectorException("Invalid date (YYYY-MM-DD or YYYY-MM-DDT00:00:00Z): " + untilDate);
 		}
 
 		final Iterator<Iterator<String>> iters = sets
