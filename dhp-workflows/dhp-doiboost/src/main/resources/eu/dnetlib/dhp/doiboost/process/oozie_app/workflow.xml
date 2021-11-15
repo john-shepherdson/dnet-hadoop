@@ -28,6 +28,12 @@
             <description>the hostedByMap Path</description>
         </property>
         <property>
+            <name>openaireOrganizationPath</name>
+            <description>the OpenAire Organizations Path</description>
+        </property>
+
+
+        <property>
             <name>outputPath</name>
             <description>the Path of the sequence file action set</description>
         </property>
@@ -42,7 +48,7 @@
         <!--    MAG Parameters    -->
         <property>
             <name>inputPathMAG</name>
-            <description>the MAG working path</description>
+            <description>the MAG input path</description>
         </property>
 
 
@@ -132,7 +138,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${inputPathMAG}/dataset</arg>
-            <arg>--workingPath</arg><arg>${inputPathMAG}/process_p</arg>
+            <arg>--workingPath</arg><arg>${workingPath}/MAG</arg>
             <arg>--targetPath</arg><arg>${workingPath}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
@@ -214,6 +220,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--hostedByMapPath</arg><arg>${hostedByMapPath}</arg>
+            <arg>--openaireOrganizationPath</arg><arg>${openaireOrganizationPath}</arg>
             <arg>--affiliationPath</arg><arg>${inputPathMAG}/dataset/Affiliations</arg>
             <arg>--paperAffiliationPath</arg><arg>${inputPathMAG}/dataset/PaperAuthorAffiliations</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>

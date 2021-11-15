@@ -1,6 +1,0 @@
-[
-  {"paramName":"mt",  "paramLongName":"master",       "paramDescription": "should be local or yarn",    "paramRequired": true},
-  {"paramName":"r",   "paramLongName":"relationPath", "paramDescription": "the source Path",            "paramRequired": true},
-  {"paramName":"w",   "paramLongName":"workingPath",  "paramDescription": "the source Path",            "paramRequired": true},
-  {"paramName":"e",   "paramLongName":"entityPath",   "paramDescription": "the path of the raw graph",  "paramRequired": true}
-]

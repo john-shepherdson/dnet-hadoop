@@ -126,7 +126,7 @@ FROM ${stats_db_name}.otherresearchproduct_topics;
 CREATE TABLE ${stats_db_name}.result_organization AS
 SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS organization
 FROM ${openaire_db_name}.relation r
-WHERE r.reltype = 'resultOrganization'
+WHERE r.reltype = 'resultOrganization' and r.relclass='hasAuthorInstitution' and r.subreltype='affiliation'
   and r.datainfo.deletedbyinference = false;
 
 CREATE TABLE ${stats_db_name}.result_projects AS

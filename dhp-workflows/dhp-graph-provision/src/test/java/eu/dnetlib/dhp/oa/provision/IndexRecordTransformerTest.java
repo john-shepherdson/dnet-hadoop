@@ -84,7 +84,28 @@ public class IndexRecordTransformerTest {
 
 	@Test
 	public void testForEOSCFutureTraining() throws IOException, TransformerException {
-		final String record = IOUtils.toString(getClass().getResourceAsStream("eosc-future/training-notebooks-seadatanet.xml"));
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/training-notebooks-seadatanet.xml"));
+		testRecordTransformation(record);
+	}
+
+	@Test
+	public void testForEOSCFutureAirQualityCopernicus() throws IOException, TransformerException {
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/air-quality-copernicus.xml"));
+		testRecordTransformation(record);
+	}
+
+	@Test
+	public void testForEOSCFutureB2SharePlotSw() throws IOException, TransformerException {
+		final String record = IOUtils.toString(getClass().getResourceAsStream("eosc-future/b2share-plot-sw.xml"));
+		testRecordTransformation(record);
+	}
+
+	@Test
+	public void testForEOSCFutureB2SharePlotRelatedORP() throws IOException, TransformerException {
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/b2share-plot-related-orp.xml"));
 		testRecordTransformation(record);
 	}
 

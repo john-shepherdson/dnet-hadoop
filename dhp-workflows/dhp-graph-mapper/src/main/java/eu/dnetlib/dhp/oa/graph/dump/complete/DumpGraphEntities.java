@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.oa.graph.dump.complete;
 
+import static com.jayway.jsonpath.Filter.filter;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
@@ -9,7 +10,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
@@ -17,6 +21,8 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.oa.graph.dump.DumpProducts;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
@@ -453,13 +459,17 @@ public class DumpGraphEntities implements Serializable {
 			.map(
 				(MapFunction<E, Organization>) o -> mapOrganization((eu.dnetlib.dhp.schema.oaf.Organization) o),
 				Encoders.bean(Organization.class))
+			.filter((FilterFunction<Organization>) o -> o != null)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
 	}
 
-	private static Organization mapOrganization(eu.dnetlib.dhp.schema.oaf.Organization org) {
+	private static eu.dnetlib.dhp.schema.dump.oaf.graph.Organization mapOrganization(
+		eu.dnetlib.dhp.schema.oaf.Organization org) {
+		if (org.getDataInfo().getDeletedbyinference())
+			return null;
 		Organization organization = new Organization();
 
 		Optional

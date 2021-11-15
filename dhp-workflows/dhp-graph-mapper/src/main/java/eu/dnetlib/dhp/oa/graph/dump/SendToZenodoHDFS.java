@@ -5,23 +5,19 @@ import java.io.Serializable;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.api.MissingConceptDoiException;
 import eu.dnetlib.dhp.common.api.ZenodoAPIClient;
-import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
+import eu.dnetlib.dhp.oa.graph.dump.exceptions.NoAvailableEntityTypeException;
 
 public class SendToZenodoHDFS implements Serializable {
 
 	private static final String NEW = "new"; // to be used for a brand new deposition in zenodo
 	private static final String VERSION = "version"; // to be used to upload a new version of a published deposition
 	private static final String UPDATE = "update"; // to upload content to an open deposition not published
-
-	private static final Log log = LogFactory.getLog(SendToZenodoHDFS.class);
 
 	public static void main(final String[] args) throws Exception, MissingConceptDoiException {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -48,14 +44,11 @@ public class SendToZenodoHDFS implements Serializable {
 			.orElse(false);
 
 		final String depositionId = Optional.ofNullable(parser.get("depositionId")).orElse(null);
-		final String communityMapPath = parser.get("communityMapPath");
 
 		Configuration conf = new Configuration();
 		conf.set("fs.defaultFS", hdfsNameNode);
 
 		FileSystem fileSystem = FileSystem.get(conf);
-
-		CommunityMap communityMap = Utils.readCommunityMap(fileSystem, communityMapPath);
 
 		RemoteIterator<LocatedFileStatus> fileStatusListIterator = fileSystem
 			.listFiles(
@@ -77,19 +70,17 @@ public class SendToZenodoHDFS implements Serializable {
 				}
 				zenodoApiClient.uploadOpenDeposition(depositionId);
 				break;
+			default:
+				throw new NoAvailableEntityTypeException();
 		}
 
 		while (fileStatusListIterator.hasNext()) {
 			LocatedFileStatus fileStatus = fileStatusListIterator.next();
 
 			Path p = fileStatus.getPath();
-			String p_string = p.toString();
-			if (!p_string.endsWith("_SUCCESS")) {
-				String name = p_string.substring(p_string.lastIndexOf("/") + 1);
-				log.info("Sending information for community: " + name);
-				if (communityMap.containsKey(name.substring(0, name.lastIndexOf(".")))) {
-					name = communityMap.get(name.substring(0, name.lastIndexOf("."))).replace(" ", "_") + ".tar";
-				}
+			String pString = p.toString();
+			if (!pString.endsWith("_SUCCESS")) {
+				String name = pString.substring(pString.lastIndexOf("/") + 1);
 
 				FSDataInputStream inputStream = fileSystem.open(p);
 				zenodoApiClient.uploadIS(inputStream, name, fileStatus.getLen());
@@ -101,7 +92,7 @@ public class SendToZenodoHDFS implements Serializable {
 			zenodoApiClient.sendMretadata(metadata);
 		}
 
-		if (publish) {
+		if (Boolean.TRUE.equals(publish)) {
 			zenodoApiClient.publish();
 		}
 	}

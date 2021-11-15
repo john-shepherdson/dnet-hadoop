@@ -11,12 +11,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 
 import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
+import eu.dnetlib.dhp.oa.graph.dump.exceptions.NoAvailableEntityTypeException;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 /**
@@ -37,7 +39,8 @@ public class DumpProducts implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				execDump(spark, inputPath, outputPath, communityMapPath, inputClazz, outputClazz, dumpType);
+				execDump(
+					spark, inputPath, outputPath, communityMapPath, inputClazz, outputClazz, dumpType);
 			});
 	}
 
@@ -55,7 +58,7 @@ public class DumpProducts implements Serializable {
 		Utils
 			.readPath(spark, inputPath, inputClazz)
 			.map((MapFunction<I, O>) value -> execMap(value, communityMap, dumpType), Encoders.bean(outputClazz))
-			.filter(Objects::nonNull)
+			.filter((FilterFunction<O>) value -> value != null)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
@@ -65,7 +68,7 @@ public class DumpProducts implements Serializable {
 
 	private static <I extends OafEntity, O extends eu.dnetlib.dhp.schema.dump.oaf.Result> O execMap(I value,
 		CommunityMap communityMap,
-		String dumpType) {
+		String dumpType) throws NoAvailableEntityTypeException {
 
 		Optional<DataInfo> odInfo = Optional.ofNullable(value.getDataInfo());
 		if (odInfo.isPresent()) {
@@ -89,11 +92,11 @@ public class DumpProducts implements Serializable {
 					return c.getId();
 				}
 				if (c.getId().contains("::") && communities.contains(c.getId().substring(0, c.getId().indexOf("::")))) {
-					return c.getId().substring(0, 3);
+					return c.getId().substring(0, c.getId().indexOf("::"));
 				}
 				return null;
 			}).filter(Objects::nonNull).collect(Collectors.toList());
-			if (toDumpFor.size() == 0) {
+			if (toDumpFor.isEmpty()) {
 				return null;
 			}
 		}

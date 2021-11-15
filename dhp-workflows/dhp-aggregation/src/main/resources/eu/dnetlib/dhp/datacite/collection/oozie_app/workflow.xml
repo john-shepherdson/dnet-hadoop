@@ -1,0 +1,52 @@
+<workflow-app name="Collect_Datacite" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>mainPath</name>
+            <description>the working path of Datacite stores</description>
+        </property>
+        <property>
+            <name>isLookupUrl</name>
+            <description>The IS lookUp service endopoint</description>
+        </property>
+        <property>
+            <name>blocksize</name>
+            <value>100</value>
+            <description>The request block size</description>
+        </property>
+
+    </parameters>
+
+    <start to="ImportDatacite"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+
+    <action name="ImportDatacite">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>ImportDatacite</name>
+            <class>eu.dnetlib.dhp.datacite.ImportDatacite</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--targetPath</arg><arg>${mainPath}/datacite_update</arg>
+            <arg>--dataciteDumpPath</arg><arg>${mainPath}/datacite_dump</arg>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--master</arg><arg>yarn-cluster</arg>
+            <arg>--blocksize</arg><arg>${blocksize}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    <end name="End"/>
+</workflow-app>

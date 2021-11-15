@@ -1,0 +1,114 @@
+<record>
+    <result xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <header>
+            <dri:objIdentifier>r37b0ad08687::a8df7db30ae0e4e0b875a098df7b652f</dri:objIdentifier>
+            <dri:dateOfCollection>2021-10-07T01:56:56Z</dri:dateOfCollection>
+            <dri:status>under curation</dri:status>
+            <counters/>
+        </header>
+        <metadata>
+            <oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf http://namespace.openaire.eu/oaf http://www.openaire.eu/schema/0.2/oaf-0.2.xsd">
+
+                <oaf:result>
+                    <title classid="main title" classname="main title" schemeid="dnet:dataCite_title"
+                           schemename="dnet:dataCite_title">Using CAMS European air quality analysis from Copernicus
+                        Atmosphere Monitoring with RELIANCE services
+                    </title>
+                    <creator rank="1" name="Simone" surname="Mantovani" orcid_pending="0000-0003-3979-3645">Simone Mantovani</creator>
+                    <dateofacceptance>2021-10-07</dateofacceptance>
+                    <resulttype classid="software" classname="software" schemeid="dnet:result_typologies"
+                                schemename="dnet:result_typologies"/>
+                    <language classid="" classname="" schemeid="dnet:languages" schemename="dnet:languages"/>
+                    <description>
+                        This notebook shows how to discover and access the Copernicus Atmosphere Monitoring products available in the RELIANCE datacube resources.
+                        The process is structured in 6 steps, including example of data analysis and visualization with the Python libraries installed in the Jupyter environment
+                    </description>
+                    <country classid="" classname="" schemeid="" schemename=""/>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies">EOSC Jupyter Notebook
+                    </subject>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies">RELIANCE
+                    </subject>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies">Copernicus
+                    </subject>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies">Air quality
+                    </subject>
+
+                    <relevantdate classid="" classname="" schemeid="" schemename=""/>
+                    <publisher>Zenodo</publisher>
+                    <embargoenddate/>
+                    <journal issn="" eissn="" lissn="" ep="" iss="" sp="" vol=""/>
+                    <source/>
+                    <fulltext/>
+                    <format/>
+                    <storagedate/>
+                    <resourcetype classid="" classname="" schemeid="" schemename=""/>
+                    <device/>
+                    <size/>
+                    <version/>
+                    <lastmetadataupdate/>
+                    <metadataversionnumber/>
+                    <documentationUrl/>
+                    <codeRepositoryUrl/>
+                    <programmingLanguage classid="" classname="" schemeid="" schemename=""/>
+                    <contactperson/>
+                    <contactgroup/>
+                    <tool/>
+                    <originalId>oai:zenodo.org:5554786</originalId>
+                    <collectedfrom name="Zenodo" id="re3data_____::7b0ad08687b2c960d5aeef06f811d5e6"/>
+                    <pid classid="oai" classname="Open Archives Initiative" schemeid="dnet:pid_types"
+                         schemename="dnet:pid_types">oai:zenodo.org:5554786
+                    </pid>
+                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types"
+                         schemename="dnet:pid_types">10.5281/zenodo.5554786
+                    </pid>
+                    <bestaccessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes"
+                                     schemename="dnet:access_modes"/>
+                    <datainfo>
+                        <inferred>false</inferred>
+                        <deletedbyinference>false</deletedbyinference>
+                        <trust>0.9</trust>
+                        <inferenceprovenance/>
+                        <provenanceaction classid="user:insert" classname="user:insert"
+                                          schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+                    </datainfo>
+                    <rels>
+                        <rel inferred="false" trust="0.9" inferenceprovenance="" provenanceaction="user:claim">
+                            <to class="isProducedBy" scheme="dnet:result_project_relations" type="project">
+                                corda__h2020::8771f523c34e38902d4921037d545ef8
+                            </to>
+                            <title>REsearch LIfecycle mAnagemeNt for Earth Science Communities and CopErnicus users in EOSC</title>
+                            <code>101017501</code>
+                            <acronym>RELIANCE</acronym>
+                            <funding>
+                                <funder id="ec__________::EC" shortname="EC" name="European Commission" jurisdiction="EU" />
+                                <funding_level_0 name="H2020">ec__________::EC::H2020</funding_level_0>
+                                <funding_level_1 name="RIA">ec__________::EC::H2020::RIA</funding_level_1>
+                            </funding>
+                        </rel>
+                    </rels>
+                    <children>
+                        <instance id="r37b0ad08687::a8df7db30ae0e4e0b875a098df7b652f">
+                            <instancetype classid="0029" classname="Software" schemeid="dnet:publication_resource"
+                                          schemename="dnet:publication_resource"/>
+                            <collectedfrom name="Zenodo" id="re3data_____::7b0ad08687b2c960d5aeef06f811d5e6"/>
+                            <hostedby name="Zenodo" id="re3data_____::7b0ad08687b2c960d5aeef06f811d5e6"/>
+                            <accessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes"
+                                         schemename="dnet:access_modes"/>
+                            <dateofacceptance/>
+                            <webresource>
+                                <url>https://zenodo.org/record/5554786</url>
+                            </webresource>
+                        </instance>
+                    </children>
+                </oaf:result>
+            </oaf:entity>
+        </metadata>
+    </result>
+</record>

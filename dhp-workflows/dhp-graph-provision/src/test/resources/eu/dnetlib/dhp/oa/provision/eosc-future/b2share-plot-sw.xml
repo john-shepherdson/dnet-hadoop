@@ -1,0 +1,112 @@
+<record>
+    <result xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <header>
+            <dri:objIdentifier>userclaim___::ee29372a239b79db3ac4c5debe44d6e6</dri:objIdentifier>
+            <dri:dateOfCollection>2021-10-07T12:42:54Z</dri:dateOfCollection>
+            <counters/>
+        </header>
+        <metadata>
+            <oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf http://namespace.openaire.eu/oaf http://www.openaire.eu/schema/0.2/oaf-0.2.xsd">
+
+                <oaf:result>
+                    <title classid="main title" classname="main title" schemeid="dnet:dataCite_title"
+                           schemename="dnet:dataCite_title">Plot scripts for HCG-16 Project
+                    </title>
+                    <creator rank="1" name="Michael G." surname="Jones">Jones, Michael G.</creator>
+                    <creator rank="2" name="Sebastián" surname="Luna-Valero">Jones, Michael G.</creator>
+                    <dateofacceptance>2021-09-30</dateofacceptance>
+                    <resulttype classid="software" classname="software" schemeid="dnet:result_typologies"
+                                schemename="dnet:result_typologies"/>
+                    <language classid="" classname="" schemeid="dnet:languages" schemename="dnet:languages"/>
+                    <description>These are the notebooks to general the final data plots of the paper Jones et al. 2019
+                        submitted to Astronomy &amp; Astrophysics. They can be used in a notebooks environment (like
+                        https://notebooks.egi.eu/) with the proper libraries installed. A mybinder
+                        (https://mybinder.org/)
+                        ready version can be started from https://mybinder.org/v2/gh/AMIGA-IAA/hcg-16/master. Data to
+                        generate plots is also available from B2SHARE:
+                        https://b2share.eudat.eu/records/a69a7b2dcc22449e8734552dde4d3906
+                    </description>
+                    <country classid="" classname="" schemeid="" schemename=""/>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies">EOSC Jupyter Notebook
+                    </subject>
+                    <relevantdate classid="" classname="" schemeid="" schemename=""/>
+                    <publisher>B2SHARE</publisher>
+                    <embargoenddate/>
+                    <journal issn="" eissn="" lissn="" ep="" iss="" sp="" vol=""/>
+                    <source/>
+                    <fulltext/>
+                    <format/>
+                    <storagedate/>
+                    <resourcetype classid="" classname="" schemeid="" schemename=""/>
+                    <device/>
+                    <size/>
+                    <version/>
+                    <lastmetadataupdate/>
+                    <metadataversionnumber/>
+                    <documentationUrl/>
+                    <codeRepositoryUrl/>
+                    <programmingLanguage classid="" classname="" schemeid="" schemename=""/>
+                    <contactperson/>
+                    <contactgroup/>
+                    <tool/>
+                    <originalId>userclaim___::ee29372a239b79db3ac4c5debe44d6e6</originalId>
+                    <collectedfrom name="B2FIND" id="re3data_____::730f562f9efe8a3b3742d2da510d4335"/>
+                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types"
+                         schemename="dnet:pid_types">10.23728/b2share.adf6e2e942b04561a8640c449b48c14a
+                    </pid>
+                    <bestaccessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes"
+                                     schemename="dnet:access_modes"/>
+                    <datainfo>
+                        <inferred>false</inferred>
+                        <deletedbyinference>false</deletedbyinference>
+                        <trust>0.9</trust>
+                        <inferenceprovenance/>
+                        <provenanceaction classid="user:insert" classname="user:insert"
+                                          schemeid="dnet:provenanceActions"
+                                          schemename="dnet:provenanceActions"/>
+                    </datainfo>
+                    <rels>
+                        <rel inferred="false" trust="0.9" inferenceprovenance="" provenanceaction="user:claim">
+                            <to class="IsRelatedTo" scheme="dnet:result_result_relations" type="otherresearchproduct">doi_dedup___::44fd8a9b5b79adb0783ac245b21e3127</to>
+                            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title">HCG16 L-band VLA C+D array final data</title>
+                            <dateofacceptance>2019-01-01</dateofacceptance>
+                            <publisher>https://b2share.eudat.eu</publisher>
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types"
+                                 schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset"
+                                 trust="0.9">10.23728/b2share.ebcd2972c5fb44199f8b3fdf9f6413c6
+                            </pid>
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types"
+                                 schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset"
+                                 trust="0.9">10.23728/b2share.a69a7b2dcc22449e8734552dde4d3906
+                            </pid>
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types"
+                                 schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset"
+                                 trust="0.9">10.23728/b2share.7c8655b6f25348358b4e6fece7ab6016
+                            </pid>
+                            <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254"/>
+                            <collectedfrom name="B2FIND" id="re3data_____::730f562f9efe8a3b3742d2da510d4335"/>
+                        </rel>
+                    </rels>
+                    <children>
+                        <instance id="userclaim___::ee29372a239b79db3ac4c5debe44d6e6">
+                            <instancetype classid="0029" classname="Software" schemeid="dnet:publication_resource"
+                                          schemename="dnet:publication_resource"/>
+                            <collectedfrom name="B2FIND" id="re3data_____::730f562f9efe8a3b3742d2da510d4335"/>
+                            <hostedby name="B2SHARE" id="re3data_____::ad3609c351bd520edf6f10f5e0d9b877"/>
+                            <accessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes"
+                                         schemename="dnet:access_modes"/>
+                            <dateofacceptance>2021-09-30</dateofacceptance>
+                            <webresource>
+                                <url>http://dx.doi.org/10.23728/b2share.adf6e2e942b04561a8640c449b48c14a</url>
+                            </webresource>
+                        </instance>
+                    </children>
+                </oaf:result>
+            </oaf:entity>
+        </metadata>
+    </result>
+</record>
