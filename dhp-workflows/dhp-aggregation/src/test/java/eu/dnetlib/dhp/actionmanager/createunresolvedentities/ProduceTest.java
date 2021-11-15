@@ -109,12 +109,12 @@ public class ProduceTest {
 
 		Assertions.assertEquals(135, tmp.count());
 
-		Assertions.assertEquals(1, tmp.filter(row -> row.getId().equals("unresolved:10.3390/s18072310:doi")).count());
+		Assertions.assertEquals(1, tmp.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi")).count());
 
 		Assertions
 			.assertEquals(
 				3, tmp
-					.filter(row -> row.getId().equals("unresolved:10.3390/s18072310:doi"))
+					.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi"))
 					.collect()
 					.get(0)
 					.getSubject()
@@ -123,14 +123,14 @@ public class ProduceTest {
 		Assertions
 			.assertEquals(
 				3, tmp
-					.filter(row -> row.getId().equals("unresolved:10.3390/s18072310:doi"))
+					.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi"))
 					.collect()
 					.get(0)
 					.getMeasures()
 					.size());
 
 		List<StructuredProperty> sbjs = tmp
-			.filter(row -> row.getId().equals("unresolved:10.3390/s18072310:doi"))
+			.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi"))
 			.flatMap(row -> row.getSubject().iterator())
 			.collect();
 
@@ -178,7 +178,7 @@ public class ProduceTest {
 		sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("nanoscience & nanotechnology"));
 
 		List<Measure> measures = tmp
-			.filter(row -> row.getId().equals("unresolved:10.3390/s18072310:doi"))
+			.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi"))
 			.flatMap(row -> row.getMeasures().iterator())
 			.collect();
 		Assertions
@@ -217,7 +217,7 @@ public class ProduceTest {
 		Assertions
 			.assertEquals(
 				49, tmp
-					.filter(row -> !row.getId().equals("unresolved:10.3390/s18072310:doi"))
+					.filter(row -> !row.getId().equals("unresolved::10.3390/s18072310::doi"))
 					.filter(row -> row.getSubject() != null)
 					.count());
 
@@ -225,7 +225,7 @@ public class ProduceTest {
 			.assertEquals(
 				85,
 				tmp
-					.filter(row -> !row.getId().equals("unresolved:10.3390/s18072310:doi"))
+					.filter(row -> !row.getId().equals("unresolved::10.3390/s18072310::doi"))
 					.filter(r -> r.getMeasures() != null)
 					.count());
 
