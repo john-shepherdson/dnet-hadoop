@@ -93,7 +93,7 @@ public class PrepareTest {
 
 		Assertions.assertEquals(86, tmp.count());
 
-		String doi1 = "unresolved:10.0000/096020199389707:doi";
+		String doi1 = "unresolved::10.0000/096020199389707::doi";
 
 		Assertions.assertEquals(1, tmp.filter(r -> r.getId().equals(doi1)).count());
 		Assertions.assertEquals(3, tmp.filter(r -> r.getId().equals(doi1)).collect().get(0).getMeasures().size());
@@ -193,7 +193,7 @@ public class PrepareTest {
 			.textFile(workingDir.toString() + "/work/fos")
 			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
 
-		String doi1 = "unresolved:10.3390/s18072310:doi";
+		String doi1 = "unresolved::10.3390/s18072310::doi";
 
 		assertEquals(50, tmp.count());
 		assertEquals(1, tmp.filter(row -> row.getId().equals(doi1)).count());
@@ -220,7 +220,7 @@ public class PrepareTest {
 				.collect()
 				.contains("nanoscience & nanotechnology"));
 
-		String doi = "unresolved:10.1111/1365-2656.12831:doi";
+		String doi = "unresolved::10.1111/1365-2656.12831::doi";
 		assertEquals(1, tmp.filter(row -> row.getId().equals(doi)).count());
 		assertTrue(
 			tmp
