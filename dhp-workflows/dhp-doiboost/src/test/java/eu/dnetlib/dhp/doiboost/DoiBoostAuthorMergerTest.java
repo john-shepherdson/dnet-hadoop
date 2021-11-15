@@ -346,11 +346,25 @@ public class DoiBoostAuthorMergerTest {
                 .collect(Collectors.toList());
 
 
+        for (List<Author> authors1 : authors) {
+            System.out.println("List " + (authors.indexOf(authors1) + 1));
+            for (Author author : authors1) {
+                System.out.println(authorToString(author));
+            }
+        }
+
         List<Author> merge = DoiBoostAuthorMerger.merge(authors,  true);
 
 
+        merge.stream().filter(a -> a.getPid() != null).forEach(a -> {
+            try {
+                System.out.println(new ObjectMapper().writeValueAsString(a));
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        });
 
-        Assertions.assertTrue(5 == merge.stream().filter(a -> a.getPid() !=null)
+        Assertions.assertEquals(6 , merge.stream().filter(a -> a.getPid() !=null)
                 .filter(a -> a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals(ModelConstants.ORCID))).count());
 
         Assertions.assertTrue(34 == merge.stream().filter(a -> a.getPid() !=null)
@@ -392,10 +406,10 @@ public class DoiBoostAuthorMergerTest {
             System.out.println(authorToString(author));
         }
 
-		Assertions.assertTrue(5 == merge.stream().filter(a -> a.getPid() !=null)
+		Assertions.assertEquals(5 , merge.stream().filter(a -> a.getPid() !=null)
 				.filter(a -> a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals(ModelConstants.ORCID))).count());
 
-		Assertions.assertTrue(34 == merge.stream().filter(a -> a.getPid() !=null)
+		Assertions.assertEquals(34 , merge.stream().filter(a -> a.getPid() !=null)
 				.filter(a -> a.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals(ModelConstants.ORCID_PENDING))).count());
 
 		merge.stream().filter(a -> a.getFullname().equals("da luz geraldo eduardo"))

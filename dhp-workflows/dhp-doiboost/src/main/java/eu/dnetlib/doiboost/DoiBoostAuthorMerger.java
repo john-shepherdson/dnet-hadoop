@@ -5,6 +5,7 @@ import java.text.Normalizer;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.wcohen.ss.Jaccard;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
@@ -109,6 +110,8 @@ public class DoiBoostAuthorMerger {
                         a -> new Tuple2<>(DHPUtils.md5(a.getFullname()), AuthorAssoc.newInstance(a)))
                 .collect(Collectors.toMap(Tuple2::_1, Tuple2::_2, (x1, x2) -> x1));
 
+        Map<String, Tuple2<List<String>, Double>> baseAssoc = new HashMap<>();
+
 
         //for each author in the base list, we search the best enriching match
         //we create the association (author, list of (enriching author, similatiry score))
@@ -117,21 +120,36 @@ public class DoiBoostAuthorMerger {
                         new Tuple2<>(a,
                                      authorsWithPids.stream()
                                         .map(e -> new Tuple2<>(e, sim(a, e)))
+                                             .filter(t2 -> t2._2() > 0.0)
                                         .collect(Collectors.toList()))
                 )
                 .forEach(t2 -> {
-                    String enriched_name = t2._1().getFullname();
+                    String base_name = DHPUtils.md5(t2._1().getFullname());
+                    Double max_score = 0.0;
+                    List<String> enrich_name = new ArrayList();
                     for (Tuple2<Author, Double> t : t2._2()) {
                         //we get the fullname of the enriching
                         String mapEntry = DHPUtils.md5(t._1().getFullname());
+
+                        if(t._2() > max_score){
+                            max_score = t._2();
+                            enrich_name = new ArrayList();
+                            enrich_name.add(mapEntry);
+                        }else if(t._2() > 0 && t._2().equals(max_score)){
+                            enrich_name.add(mapEntry);
+                        }
+
                         AuthorAssoc aa = assocMap.get(mapEntry);
-                        if(aa.getScore() < t._2() && aa.getScore() < 0.9){
+                        if(aa.getScore() < t._2()){
                             aa.setScore(t._2());
                             aa.setTo_be_enriched(new ArrayList<>());
                             aa.getTo_be_enriched().add(t2._1());
-                        }else if(t._2() > 0.9){
+                        }else {
                             aa.getTo_be_enriched().add(t2._1());
                         }
+                    }
+                    if(max_score > 0){
+                        baseAssoc.put(base_name, new Tuple2<>(enrich_name, max_score));
                     }
 
                 });
@@ -210,7 +228,7 @@ public class DoiBoostAuthorMerger {
 
 
     private static Double sim(Author a, Author b) {
-        return new JaroWinkler()
+        return new Jaccard()
                 .score(normalizeString(a.getFullname()), normalizeString(b.getFullname()));
 
     }
