@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.utils.DHPUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -26,6 +25,7 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class PrepareFOSSparkJob implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(PrepareFOSSparkJob.class);

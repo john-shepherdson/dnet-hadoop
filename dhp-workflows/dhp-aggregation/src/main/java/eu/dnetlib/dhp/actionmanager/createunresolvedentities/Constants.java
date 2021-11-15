@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
-
 public class Constants {
 
 	public static final String DOI = "doi";
@@ -29,7 +28,8 @@ public class Constants {
 
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	private Constants(){}
+	private Constants() {
+	}
 
 	public static Boolean isSparkSessionManaged(ArgumentApplicationParser parser) {
 		return Optional
@@ -45,6 +45,5 @@ public class Constants {
 			.textFile(inputPath)
 			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
 	}
-
 
 }
