@@ -37,7 +37,7 @@
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingDir}</arg>
         </spark>
-        <ok to="End"/>
+        <ok to="ResolveEntities"/>
         <error to="Kill"/>
     </action>
 
@@ -67,6 +67,6 @@
         <error to="Kill"/>
     </action>
 
-
     <end name="End"/>
+
 </workflow-app>

@@ -1,0 +1,20 @@
+[
+  {
+    "paramName": "if",
+    "paramLongName": "inputFile",
+    "paramDescription": "the zipped opencitations file",
+    "paramRequired": true
+  },
+  {
+    "paramName": "wp",
+    "paramLongName": "workingPath",
+    "paramDescription": "the working path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "hnn",
+    "paramLongName": "hdfsNameNode",
+    "paramDescription": "the hdfs name node",
+    "paramRequired": true
+  }
+]
