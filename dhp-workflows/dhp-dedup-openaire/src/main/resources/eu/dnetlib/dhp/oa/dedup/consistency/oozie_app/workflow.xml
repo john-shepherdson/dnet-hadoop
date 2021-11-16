@@ -89,7 +89,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--o</arg><arg>${graphOutputPath}</arg>
@@ -114,7 +114,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--graphInputPath</arg><arg>${graphBasePath}</arg>
             <arg>--outputPath</arg><arg>${workingPath}/grouped_entities</arg>
