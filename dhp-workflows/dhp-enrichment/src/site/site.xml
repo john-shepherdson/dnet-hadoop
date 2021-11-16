@@ -16,15 +16,10 @@
             <item name="Code" href="https://code-repo.d4science.org/" />
         </links>
         <menu name="Documentation">
-            <item name="Mappings" href="mappings.html" collapse="true">
-                <item name="Pubmed" href="pubmed.html"/>
-                <item name="Datacite" href="datacite.html"/>
+            <item name="Link1 Collapsable" href="about.html" collapse="true">
+                <item name="item1" href="pubmed.html"/>
+                <item name="item2" href="datacite.html"/>
             </item>
-            <item name="General Information" href="about.html"/>
-
-            <item name="JavaDoc" href="apidocs/" />
-            <item name="ScalaDoc" href="scaladocs/" />
-
         </menu>
         <menu ref="reports"/>
     </body>
