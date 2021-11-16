@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.hdfs.client.HdfsUtils;
+
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -42,7 +42,7 @@ public class PrepareBipFinder implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(PrepareBipFinder.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	public static <I extends Result> void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
 
 		String jsonConfiguration = IOUtils
 			.toString(
@@ -78,7 +78,7 @@ public class PrepareBipFinder implements Serializable {
 			});
 	}
 
-	private static <I extends Result> void prepareResults(SparkSession spark, String inputPath, String outputPath) {
+	private static void prepareResults(SparkSession spark, String inputPath, String outputPath) {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 

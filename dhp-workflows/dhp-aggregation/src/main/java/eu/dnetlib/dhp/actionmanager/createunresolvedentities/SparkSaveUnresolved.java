@@ -20,13 +20,13 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class SparkSaveUnresolved implements Serializable {
-	private static final Logger log = LoggerFactory.getLogger(PrepareFOSSparkJob.class);
+	private static final Logger log = LoggerFactory.getLogger(SparkSaveUnresolved.class);
 
 	public static void main(String[] args) throws Exception {
 
 		String jsonConfiguration = IOUtils
 			.toString(
-				PrepareFOSSparkJob.class
+					SparkSaveUnresolved.class
 					.getResourceAsStream(
 						"/eu/dnetlib/dhp/actionmanager/createunresolvedentities/produce_unresolved_parameters.json"));
 
@@ -47,13 +47,13 @@ public class SparkSaveUnresolved implements Serializable {
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
-			spark -> {
+			spark ->
 				saveUnresolved(
 					spark,
 					sourcePath,
 
-					outputPath);
-			});
+					outputPath)
+			);
 	}
 
 	private static void saveUnresolved(SparkSession spark, String sourcePath, String outputPath) {
@@ -64,7 +64,7 @@ public class SparkSaveUnresolved implements Serializable {
 			.map(
 				(MapFunction<String, Result>) l -> OBJECT_MAPPER.readValue(l, Result.class),
 				Encoders.bean(Result.class))
-			.groupByKey((MapFunction<Result, String>) r -> r.getId(), Encoders.STRING())
+			.groupByKey((MapFunction<Result,String>)Result::getId, Encoders.STRING())
 			.mapGroups((MapGroupsFunction<String, Result, Result>) (k, it) -> {
 				Result ret = it.next();
 				it.forEachRemaining(r -> ret.mergeFrom(r));

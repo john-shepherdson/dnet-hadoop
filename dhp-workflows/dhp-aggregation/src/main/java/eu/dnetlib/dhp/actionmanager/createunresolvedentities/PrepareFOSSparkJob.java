@@ -55,13 +55,13 @@ public class PrepareFOSSparkJob implements Serializable {
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
-			spark -> {
+			spark ->
 				distributeFOSdois(
 					spark,
 					sourcePath,
 
-					outputPath);
-			});
+					outputPath)
+			);
 	}
 
 	private static void distributeFOSdois(SparkSession spark, String sourcePath, String outputPath) {

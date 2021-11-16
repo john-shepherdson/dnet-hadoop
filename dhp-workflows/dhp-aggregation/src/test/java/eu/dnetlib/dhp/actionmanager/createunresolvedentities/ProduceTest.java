@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 
-public class ProduceTest {
+class ProduceTest {
 	private static final Logger log = LoggerFactory.getLogger(ProduceTest.class);
 
 	private static Path workingDir;
