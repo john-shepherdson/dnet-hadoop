@@ -30,25 +30,17 @@ import scala.Tuple2;
 
 public class PrepareInfo implements Serializable {
 
-	// leggo le relazioni e seleziono quelle fra result ed organizzazioni
-	// raggruppo per result e salvo
-	// r => {o1, o2, o3}
-
-	// leggo le relazioni fra le organizzazioni e creo la gerarchia delle parentele:
-	// hashMap key organizzazione -> value tutti i suoi padri
-	// o => {p1, p2}
-
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	private static final Logger log = LoggerFactory.getLogger(PrepareInfo.class);
 
 	// associate orgs with all their parent
-	private static final String relOrgQuery = "SELECT target key, collect_set(source) as valueSet " +
+	private static final String ORGANIZATION_ORGANIZATION_QUERY = "SELECT target key, collect_set(source) as valueSet " +
 		"FROM relation " +
 		"WHERE lower(relclass) = '" + ModelConstants.IS_PARENT_OF.toLowerCase() +
 		"' and datainfo.deletedbyinference = false " +
 		"GROUP BY target";
 
-	private static final String relResQuery = "SELECT source key, collect_set(target) as valueSet " +
+	//associates results with all the orgs they are affiliated to
+	private static final String RESULT_ORGANIZATION_QUERY = "SELECT source key, collect_set(target) as valueSet " +
 		"FROM relation " +
 		"WHERE lower(relclass) = '" + ModelConstants.HAS_AUTHOR_INSTITUTION.toLowerCase() +
 		"' and datainfo.deletedbyinference = false " +
@@ -101,7 +93,7 @@ public class PrepareInfo implements Serializable {
 		relation.createOrReplaceTempView("relation");
 
 		spark
-			.sql(relOrgQuery)
+			.sql(ORGANIZATION_ORGANIZATION_QUERY)
 			.as(Encoders.bean(KeyValueSet.class))
 			.write()
 			.mode(SaveMode.Overwrite)
@@ -109,7 +101,7 @@ public class PrepareInfo implements Serializable {
 			.json(childParentOrganizationPath);
 
 		spark
-			.sql(relResQuery)
+			.sql(RESULT_ORGANIZATION_QUERY)
 			.as(Encoders.bean(KeyValueSet.class))
 			.write()
 			.mode(SaveMode.Overwrite)
@@ -130,7 +122,7 @@ public class PrepareInfo implements Serializable {
 					"' and datainfo.deletedbyinference = false")
 			.as(Encoders.STRING());
 
-		// prendo dalla join i risultati che hanno solo il lato sinistro: sono foglie
+		// takes from the join the entities having only the left hand side: the leaves. Saves them
 		children
 			.joinWith(parent, children.col("child").equalTo(parent.col("parent")), "left")
 			.map((MapFunction<Tuple2<String, String>, String>) value -> {

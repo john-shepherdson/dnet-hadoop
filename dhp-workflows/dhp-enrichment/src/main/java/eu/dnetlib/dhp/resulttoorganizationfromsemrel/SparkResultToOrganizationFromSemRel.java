@@ -32,6 +32,7 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 public class SparkResultToOrganizationFromSemRel implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(SparkResultToOrganizationFromSemRel.class);
 	private static final int MAX_ITERATION = 5;
+	public static final String NEW_RELATION_PATH = "/newRelation";
 
 	public static void main(String[] args) throws Exception {
 
@@ -120,11 +121,11 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 			iteration++;
 			StepActions
 				.execStep(
-					spark, graphPath, workingPath + "/newRelation",
+					spark, graphPath, workingPath + NEW_RELATION_PATH,
 					leavesPath, childParentPath, resultOrganizationPath);
 			StepActions
 				.prepareForNextStep(
-					spark, workingPath + "/newRelation", resultOrganizationPath, leavesPath,
+					spark, workingPath + NEW_RELATION_PATH, resultOrganizationPath, leavesPath,
 					childParentPath, workingPath + "/leaves", workingPath + "/resOrg");
 			moveOutput(spark, workingPath, leavesPath, resultOrganizationPath);
 			leavesCount = readPath(spark, leavesPath, Leaves.class).count();
@@ -154,7 +155,7 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 			propagationCounter.getNotReachedFirstParent().add(1);
 		}
 
-		addNewRelations(spark, workingPath + "/newRelation", outputPath);
+		addNewRelations(spark, workingPath + NEW_RELATION_PATH, outputPath);
 	}
 
 	private static void moveOutput(SparkSession spark, String workingPath, String leavesPath,

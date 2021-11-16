@@ -27,7 +27,6 @@ import scala.Tuple2;
 public class StepActions implements Serializable {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-	private static final Logger log = LoggerFactory.getLogger(StepActions.class);
 
 	public static void execStep(SparkSession spark,
 		String graphPath, String newRelationPath,
@@ -185,10 +184,9 @@ public class StepActions implements Serializable {
 					"GROUP BY resId")
 			.as(Encoders.bean(KeyValueSet.class));
 
-		// resultParent.foreach((ForeachFunction<KeyValueSet>)kv ->
-		// System.out.println(OBJECT_MAPPER.writeValueAsString(kv)));
+
 		// create new relations from result to organization for each result linked to a leaf
-		Dataset<Relation> tmp = resultParent
+		return resultParent
 			.flatMap(
 				(FlatMapFunction<KeyValueSet, Relation>) v -> v
 					.getValueSet()
@@ -206,8 +204,8 @@ public class StepActions implements Serializable {
 					.collect(Collectors.toList())
 					.iterator(),
 				Encoders.bean(Relation.class));
-		tmp.foreach((ForeachFunction<Relation>) r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
-		return tmp;
+
+
 	}
 
 }
