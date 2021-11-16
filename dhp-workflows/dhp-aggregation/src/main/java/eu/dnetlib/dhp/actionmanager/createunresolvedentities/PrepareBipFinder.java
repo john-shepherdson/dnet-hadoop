@@ -6,6 +6,7 @@ import static eu.dnetlib.dhp.actionmanager.createunresolvedentities.Constants.UP
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,6 +30,7 @@ import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.BipScore;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Instance;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Measure;
 import eu.dnetlib.dhp.schema.oaf.Result;
@@ -93,9 +95,10 @@ public class PrepareBipFinder implements Serializable {
 			}).collect(Collectors.toList()).iterator()).rdd(), Encoders.bean(BipScore.class))
 			.map((MapFunction<BipScore, Result>) v -> {
 				Result r = new Result();
-
 				r.setId(DHPUtils.generateUnresolvedIdentifier(v.getId(), DOI));
-				r.setMeasures(getMeasure(v));
+				Instance inst = new Instance();
+				inst.setMeasures(getMeasure(v));
+				r.setInstance(Arrays.asList(inst));
 				return r;
 			}, Encoders.bean(Result.class))
 			.write()
