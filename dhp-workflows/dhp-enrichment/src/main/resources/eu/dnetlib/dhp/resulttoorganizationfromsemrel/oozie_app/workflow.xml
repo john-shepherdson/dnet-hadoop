@@ -150,6 +150,7 @@
             <arg>--leavesPath</arg><arg>${workingDir}/preparedInfo/leavesPath</arg>
             <arg>--childParentPath</arg><arg>${workingDir}/preparedInfo/childParentPath</arg>
             <arg>--resultOrgPath</arg><arg>${workingDir}/preparedInfo/resultOrgPath</arg>
+            <arg>--relationPath</arg><arg>${workingDir}/preparedInfo/relation</arg>
         </spark>
         <ok to="apply_resulttoorganization_propagation"/>
         <error to="Kill"/>
@@ -173,7 +174,7 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--graphPath</arg><arg>${sourcePath}</arg>
+            <arg>--relationPath</arg><arg>${workingDir}/preparedInfo/relation</arg>
             <arg>--outputPath</arg><arg>${outputPath}/relation</arg>
             <arg>--leavesPath</arg><arg>${workingDir}/preparedInfo/leavesPath</arg>
             <arg>--childParentPath</arg><arg>${workingDir}/preparedInfo/childParentPath</arg>

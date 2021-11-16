@@ -26,16 +26,11 @@ import scala.Tuple2;
 
 public class StepActions implements Serializable {
 
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
 	public static void execStep(SparkSession spark,
 		String graphPath, String newRelationPath,
 		String leavesPath, String chldParentOrgPath, String resultOrgPath) {
 
-		Dataset<Relation> relationGraph = readPath(spark, graphPath + "/relation", Relation.class)
-			.filter(
-				(FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference() &&
-					r.getRelClass().equals(ModelConstants.HAS_AUTHOR_INSTITUTION));
+		Dataset<Relation> relationGraph = readPath(spark, graphPath, Relation.class);
 		// select only the relation source target among those proposed by propagation that are not already existent
 		getNewRels(
 			newRelationPath, relationGraph,
@@ -80,8 +75,8 @@ public class StepActions implements Serializable {
 				ret.setValueSet(orgs);
 				return ret;
 			}, Encoders.bean(KeyValueSet.class))
-			.write()
-			.mode(SaveMode.Overwrite)
+				.write()
+					.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
 	}
@@ -116,7 +111,7 @@ public class StepActions implements Serializable {
 		// union of new propagation relations to the relation set
 		// grouping from sourcetarget (we are sure the only relations are those from result to organization by
 		// construction of the set)
-		// if at least one relation in the set was harvested no new relation will be returned
+		// if at least one relation in the set was not produced by propagation no new relation will be returned
 
 		relationDataset
 			.union(newRels)

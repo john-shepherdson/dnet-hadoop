@@ -1,7 +1,7 @@
 [
   {
-    "paramName":"gp",
-    "paramLongName":"graphPath",
+    "paramName":"rep",
+    "paramLongName":"relationPath",
     "paramDescription": "the path of the sequencial file to read",
     "paramRequired": true
   },

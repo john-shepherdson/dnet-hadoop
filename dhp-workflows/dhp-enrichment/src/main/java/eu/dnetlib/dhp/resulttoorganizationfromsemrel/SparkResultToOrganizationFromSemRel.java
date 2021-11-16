@@ -49,8 +49,8 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 		Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		String graphPath = parser.get("graphPath");
-		log.info("graphPath: {}", graphPath);
+		String relationPath = parser.get("relationPath");
+		log.info("relationPath: {}", relationPath);
 
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
@@ -78,7 +78,7 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 				leavesPath,
 				childParentPath,
 				resultOrganizationPath,
-				graphPath,
+				relationPath,
 				workingPath,
 				outputPath));
 	}

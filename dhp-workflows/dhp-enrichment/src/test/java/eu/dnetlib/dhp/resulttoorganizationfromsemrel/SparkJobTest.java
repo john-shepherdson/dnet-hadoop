@@ -101,9 +101,9 @@ public class SparkJobTest {
 			.main(
 				new String[] {
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
-					"-graphPath", graphPath,
+					"-relationPath", graphPath,
 					"-hive_metastore_uris", "",
-					"-outputPath", workingDir.toString() + "/relation",
+					"-outputPath", workingDir.toString() + "/finalrelation",
 					"-leavesPath", workingDir.toString() + "/leavesInput",
 					"-resultOrgPath", workingDir.toString() + "/orgsInput",
 					"-childParentPath", childParentPath,
@@ -113,8 +113,10 @@ public class SparkJobTest {
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
-			.textFile(workingDir.toString() + "/relation")
+			.textFile(workingDir.toString() + "/finalrelation")
 			.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
+
+		tmp.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
 
 		Assertions.assertEquals(18, tmp.count());
 		tmp.foreach(r -> Assertions.assertEquals(ModelConstants.AFFILIATION, r.getSubRelType()));

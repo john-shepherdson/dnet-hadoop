@@ -73,6 +73,9 @@ public class PrepareInfo implements Serializable {
 		final String resultOrganizationPath = parser.get("resultOrgPath");
 		log.info("resultOrganizationPath: {}", resultOrganizationPath);
 
+		final String relationPath = parser.get("relationPath");
+		log.info("relationPath: {}", relationPath);
+
 		SparkConf conf = new SparkConf();
 		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
@@ -84,11 +87,12 @@ public class PrepareInfo implements Serializable {
 				graphPath,
 				childParentPath,
 				leavesPath,
-				resultOrganizationPath));
+				resultOrganizationPath,
+					relationPath));
 	}
 
 	private static void prepareInfo(SparkSession spark, String inputPath, String childParentOrganizationPath,
-		String currentIterationPath, String resultOrganizationPath) {
+		String currentIterationPath, String resultOrganizationPath, String relationPath) {
 		Dataset<Relation> relation = readPath(spark, inputPath + "/relation", Relation.class);
 		relation.createOrReplaceTempView("relation");
 
@@ -107,6 +111,15 @@ public class PrepareInfo implements Serializable {
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(resultOrganizationPath);
+
+		relation
+				.filter(
+						(FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference() &&
+								r.getRelClass().equals(ModelConstants.HAS_AUTHOR_INSTITUTION))
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression","gzip")
+				.json(relationPath);
 
 		Dataset<String> children = spark
 			.sql(

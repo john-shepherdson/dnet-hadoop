@@ -34,5 +34,11 @@
     "paramLongName": "isSparkSessionManaged",
     "paramDescription": "the path where prepared info have been stored",
     "paramRequired": false
+  },
+  {
+    "paramName": "rep",
+    "paramLongName": "relationPath",
+    "paramDescription": "the path where to store the selected subset of relations",
+    "paramRequired": false
   }
 ]
