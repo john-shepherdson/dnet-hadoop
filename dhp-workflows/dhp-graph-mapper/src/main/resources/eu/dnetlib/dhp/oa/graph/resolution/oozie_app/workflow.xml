@@ -1,4 +1,4 @@
-<workflow-app name="Resolve Relation" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Resolve relation and entities" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>graphBasePath</name>
@@ -37,7 +37,7 @@
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingDir}</arg>
         </spark>
-        <ok to="End"/>
+        <ok to="ResolveEntities"/>
         <error to="Kill"/>
     </action>
 
@@ -45,7 +45,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Resolve Relations in raw graph</name>
+            <name>Resolve Entities in raw graph</name>
             <class>eu.dnetlib.dhp.oa.graph.resolution.SparkResolveEntities</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
@@ -67,6 +67,6 @@
         <error to="Kill"/>
     </action>
 
-
     <end name="End"/>
+
 </workflow-app>
