@@ -229,7 +229,7 @@ public class ProduceTest {
 				85,
 				tmp
 					.filter(row -> !row.getId().equals("unresolved::10.3390/s18072310::doi"))
-					.filter(r -> r.getMeasures() != null)
+					.filter(r -> r.getInstance() != null)
 					.count());
 
 	}
