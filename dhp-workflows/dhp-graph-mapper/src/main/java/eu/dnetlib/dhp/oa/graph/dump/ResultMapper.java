@@ -43,15 +43,6 @@ public class ResultMapper implements Serializable {
 			try {
 
 				addTypeSpecificInformation(out, input, ort);
-//				Optional<List<Measure>> mes = Optional.ofNullable(input.getMeasures());
-//				if (mes.isPresent()) {
-//					List<KeyValue> measure = new ArrayList<>();
-//					mes
-//						.get()
-//						.forEach(
-//							m -> m.getUnit().forEach(u -> measure.add(KeyValue.newInstance(m.getId(), u.getValue()))));
-//					out.setMeasures(measure);
-//				}
 
 				Optional
 					.ofNullable(input.getAuthor())
@@ -460,6 +451,17 @@ public class ResultMapper implements Serializable {
 							code,
 							Constants.coarCodeLabelMap.get(code),
 							Constants.COAR_ACCESS_RIGHT_SCHEMA));
+
+			Optional<List<Measure>> mes = Optional.ofNullable(i.getMeasures());
+			if (mes.isPresent()){
+				List<KeyValue> measure = new ArrayList<>();
+				mes
+						.get()
+						.forEach(
+								m -> m.getUnit().forEach(u -> measure.add(KeyValue.newInstance(m.getId(), u.getValue()))));
+				instance.setMeasures(measure );
+			}
+
 			if (opAr.get().getOpenAccessRoute() != null) {
 				switch (opAr.get().getOpenAccessRoute()) {
 					case hybrid:

@@ -171,10 +171,14 @@ public class DumpJobTest {
 
 		GraphResult gr = verificationDataset.first();
 
-		Assertions.assertEquals(2, gr.getMeasures().size());
+		Assertions.assertEquals(1, gr.getInstance().size());
+
+		Assertions.assertEquals(2, gr.getInstance().get(0).getMeasures().size());
 		Assertions
 			.assertTrue(
 				gr
+						.getInstance()
+						.get(0)
 					.getMeasures()
 					.stream()
 					.anyMatch(
@@ -183,6 +187,8 @@ public class DumpJobTest {
 		Assertions
 			.assertTrue(
 				gr
+						.getInstance()
+						.get(0)
 					.getMeasures()
 					.stream()
 					.anyMatch(
@@ -357,11 +363,12 @@ public class DumpJobTest {
 
 		Assertions.assertEquals("50|pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2", gr.getId());
 
-		Assertions.assertEquals(2, gr.getOriginalId().size());
+		System.out.println(gr.getOriginalId().size());
+
+		Assertions.assertEquals(1, gr.getOriginalId().size());
 		Assertions
 			.assertTrue(
-				gr.getOriginalId().contains("50|pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2")
-					&& gr.getOriginalId().contains("10.3897/oneeco.2.e13718"));
+				gr.getOriginalId().contains("10.3897/oneeco.2.e13718"));
 
 		Assertions.assertEquals(1, gr.getPid().size());
 		Assertions
