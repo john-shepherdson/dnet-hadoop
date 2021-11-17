@@ -22,9 +22,9 @@ The id is set by using a particular encoding of the given PID
 
 where
 
-1 *unresolved* is a constant value
-2 *pid*  is the persistent id value, e.g. 10.5281/zenodo.4707307
-3 *pidtype* is the persistent id type, e.g. doi
+1. *unresolved* is a constant value
+2. *pid*  is the persistent id value, e.g. 10.5281/zenodo.4707307
+3. *pidtype* is the persistent id type, e.g. doi
 
 Such entities are matched against those available in the graph using the result.instance.pid values.
 
