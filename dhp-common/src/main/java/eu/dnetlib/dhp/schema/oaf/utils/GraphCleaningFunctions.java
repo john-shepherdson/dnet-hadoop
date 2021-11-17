@@ -27,7 +27,10 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	public static final int ORCID_LEN = 19;
 	public static final String CLEANING_REGEX = "(?:\\n|\\r|\\t)";
 	public static final String INVALID_AUTHOR_REGEX = ".*deactivated.*";
-	public static final String TITLE_FILTER_REGEX = "(test)|\\W|\\d";
+
+	public static final String TITLE_TEST = "test";
+	public static final String TITLE_FILTER_REGEX = String.format("(%s)|\\W|\\d", TITLE_TEST);
+
 	public static final int TITLE_FILTER_RESIDUAL_LENGTH = 5;
 
 	public static <T extends Oaf> T fixVocabularyNames(T value) {
@@ -195,10 +198,16 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 									final String title = sp
 										.getValue()
 										.toLowerCase();
-									final String residual = Unidecode
-										.decode(title)
-										.replaceAll(TITLE_FILTER_REGEX, "");
-									return residual.length() > TITLE_FILTER_RESIDUAL_LENGTH;
+									final String decoded = Unidecode.decode(title);
+
+									if (StringUtils.contains(decoded, TITLE_TEST)) {
+										return decoded
+											.replaceAll(TITLE_FILTER_REGEX, "")
+											.length() > TITLE_FILTER_RESIDUAL_LENGTH;
+									}
+									return !decoded
+										.replaceAll("\\W|\\d", "")
+										.isEmpty();
 								})
 							.map(GraphCleaningFunctions::cleanValue)
 							.collect(Collectors.toList()));
