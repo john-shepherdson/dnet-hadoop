@@ -52,8 +52,6 @@ class ResolveEntitiesTest extends Serializable {
   }
 
 
-
-
   def generateUpdates(spark:SparkSession):Unit = {
     val template = Source.fromInputStream(this.getClass.getResourceAsStream("updates")).mkString
 
@@ -149,7 +147,6 @@ class ResolveEntitiesTest extends Serializable {
     val m = new ObjectMapper()
     SparkResolveEntities.resolveEntities(spark,s"$workingDir/work", s"$workingDir/updates" )
     SparkResolveEntities.generateResolvedEntities(spark,s"$workingDir/work",s"$workingDir/graph" )
-
 
 
 
