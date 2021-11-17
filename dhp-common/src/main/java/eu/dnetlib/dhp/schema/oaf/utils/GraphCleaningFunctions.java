@@ -27,8 +27,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	public static final int ORCID_LEN = 19;
 	public static final String CLEANING_REGEX = "(?:\\n|\\r|\\t)";
 	public static final String INVALID_AUTHOR_REGEX = ".*deactivated.*";
-	public static final String TITLE_FILTER_REGEX = "[.*test.*\\W\\d]";
-	public static final int TITLE_FILTER_RESIDUAL_LENGTH = 10;
+	public static final String TITLE_FILTER_REGEX = "(test)|\\W|\\d";
+	public static final int TITLE_FILTER_RESIDUAL_LENGTH = 5;
 
 	public static <T extends Oaf> T fixVocabularyNames(T value) {
 		if (value instanceof Datasource) {
