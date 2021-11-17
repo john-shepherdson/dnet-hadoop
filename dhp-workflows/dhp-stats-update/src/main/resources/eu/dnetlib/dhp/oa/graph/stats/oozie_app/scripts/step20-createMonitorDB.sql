@@ -21,7 +21,8 @@ create table TARGET.result stored as parquet as
             'openorgs____::759d59f05d77188faee99b7493b46805',
             'openorgs____::b84450f9864182c67b8611b5593f4250',
             'openorgs____::d41cf6bd4ab1b1362a44397e0b95c975',
-            'openorgs____::eadc8da90a546e98c03f896661a2e4d4') )) foo;
+            'openorgs____::eadc8da90a546e98c03f896661a2e4d4',
+            'openorgs____::d2a09b9d5eabb10c95f9470e172d05d2') )) foo;
 compute stats TARGET.result;
 
 create table TARGET.result_citations stored as parquet as select * from SOURCE.result_citations orig where exists (select 1 from TARGET.result r where r.id=orig.id);
