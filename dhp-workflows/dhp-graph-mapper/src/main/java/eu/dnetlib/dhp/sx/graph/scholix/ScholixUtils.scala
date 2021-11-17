@@ -289,7 +289,7 @@ object ScholixUtils {
     if (r.getInstance() == null || r.getInstance().isEmpty)
       return List()
     r.getInstance().asScala.filter(i => i.getUrl!= null && !i.getUrl.isEmpty)
-
+      .filter(i => i.getPid!= null && i.getUrl != null)
       .flatMap(i => findURLForPID(i.getPid.asScala.toList, i.getUrl.asScala.toList))
       .map(i => new ScholixIdentifier(i._1.getValue, i._1.getQualifier.getClassid, i._2)).distinct.toList
   }

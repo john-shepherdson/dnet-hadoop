@@ -1,0 +1,34 @@
+[
+  {
+    "paramName": "s",
+    "paramLongName": "sourcePath",
+    "paramDescription": "the source mdstore path",
+    "paramRequired": true
+  },
+
+  {
+    "paramName": "mo",
+    "paramLongName": "mdstoreOutputVersion",
+    "paramDescription": "the target mdstore path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "m",
+    "paramLongName": "master",
+    "paramDescription": "the master name",
+    "paramRequired": true
+  },
+  {
+    "paramName": "i",
+    "paramLongName": "isLookupUrl",
+    "paramDescription": "the isLookup URL",
+    "paramRequired": true
+  },
+  {
+    "paramName": "l",
+    "paramLongName": "exportLinks",
+    "paramDescription": "should export also links",
+    "paramRequired": false
+  }
+
+]

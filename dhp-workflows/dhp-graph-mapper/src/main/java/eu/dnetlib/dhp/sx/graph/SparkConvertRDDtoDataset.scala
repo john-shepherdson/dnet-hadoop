@@ -59,7 +59,12 @@ object SparkConvertRDDtoDataset {
     log.info("Converting Relation")
 
 
-    val rddRelation =spark.sparkContext.textFile(s"$sourcePath/relation").map(s => mapper.readValue(s, classOf[Relation]))
+    val relationSemanticFilter = List("cites", "iscitedby","merges", "ismergedin")
+
+    val rddRelation =spark.sparkContext.textFile(s"$sourcePath/relation")
+      .map(s => mapper.readValue(s, classOf[Relation]))
+      .filter(r=> r.getSource.startsWith("50") && r.getTarget.startsWith("50"))
+      .filter(r => !relationSemanticFilter.exists(k => k.equalsIgnoreCase(r.getRelClass)))
     spark.createDataset(rddRelation).as[Relation].write.mode(SaveMode.Overwrite).save(s"$relPath")
 
 

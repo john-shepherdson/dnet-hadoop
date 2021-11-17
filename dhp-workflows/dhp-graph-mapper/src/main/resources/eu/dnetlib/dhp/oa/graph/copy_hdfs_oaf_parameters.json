@@ -24,15 +24,15 @@
 		"paramRequired": true
 	},
 	{
-		"paramName": "i",
-		"paramLongName": "mdInterpretation",
-		"paramDescription": "metadata interpretation",
+		"paramName": "m",
+		"paramLongName": "master",
+		"paramDescription": "should be yarn or local",
 		"paramRequired": true
 	},
 	{
-		"paramName": "isu",
-		"paramLongName": "isLookupUrl",
-		"paramDescription": "the url of the ISLookupService",
+		"paramName": "i",
+		"paramLongName": "mdInterpretation",
+		"paramDescription": "metadata interpretation",
 		"paramRequired": true
 	}
 ]
