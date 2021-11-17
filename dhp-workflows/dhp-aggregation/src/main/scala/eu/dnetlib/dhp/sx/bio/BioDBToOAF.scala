@@ -7,6 +7,7 @@ import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.{compact, parse, render}
 import collection.JavaConverters._
+
 object BioDBToOAF {
 
   case class EBILinkItem(id: Long, links: String) {}

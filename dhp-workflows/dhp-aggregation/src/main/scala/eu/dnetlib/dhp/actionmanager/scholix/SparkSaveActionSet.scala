@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.actionmanager.scholix
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.action.AtomicAction
-import eu.dnetlib.dhp.schema.oaf.{Oaf, Dataset => OafDataset,Publication, Software, OtherResearchProduct, Relation}
+import eu.dnetlib.dhp.schema.oaf.{Dataset => OafDataset, Oaf, Publication, Software, OtherResearchProduct, Relation}
 import org.apache.hadoop.io.Text
 import org.apache.hadoop.io.compress.GzipCodec
 import org.apache.hadoop.mapred.SequenceFileOutputFormat

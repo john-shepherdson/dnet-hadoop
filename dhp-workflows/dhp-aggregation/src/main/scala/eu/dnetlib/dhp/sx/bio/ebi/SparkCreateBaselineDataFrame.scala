@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.sx.bio.ebi
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.oaf.Result
-import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMAuthor, PMJournal, PMParser, PubMedToOaf}
+import eu.dnetlib.dhp.sx.bio.pubmed._
 import eu.dnetlib.dhp.utils.ISLookupClientFactory
 import org.apache.commons.io.IOUtils
 import org.apache.hadoop.conf.Configuration

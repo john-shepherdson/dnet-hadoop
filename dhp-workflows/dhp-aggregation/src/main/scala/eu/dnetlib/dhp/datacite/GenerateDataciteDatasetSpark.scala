@@ -3,8 +3,7 @@ package eu.dnetlib.dhp.datacite
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.collection.CollectionUtils.fixRelations
-import eu.dnetlib.dhp.common.Constants.MDSTORE_DATA_PATH
-import eu.dnetlib.dhp.common.Constants.MDSTORE_SIZE_PATH
+import eu.dnetlib.dhp.common.Constants.{MDSTORE_DATA_PATH, MDSTORE_SIZE_PATH}
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.mdstore.{MDStoreVersion, MetadataRecord}
 import eu.dnetlib.dhp.schema.oaf.Oaf

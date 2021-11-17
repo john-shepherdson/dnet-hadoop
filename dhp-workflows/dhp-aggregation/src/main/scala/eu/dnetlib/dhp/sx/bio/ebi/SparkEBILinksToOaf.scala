@@ -1,11 +1,10 @@
 package eu.dnetlib.dhp.sx.bio.ebi
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
+import eu.dnetlib.dhp.collection.CollectionUtils
 import eu.dnetlib.dhp.schema.oaf.Oaf
 import eu.dnetlib.dhp.sx.bio.BioDBToOAF
 import eu.dnetlib.dhp.sx.bio.BioDBToOAF.EBILinkItem
-import BioDBToOAF.EBILinkItem
-import eu.dnetlib.dhp.collection.CollectionUtils
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql._
@@ -38,7 +37,7 @@ object SparkEBILinksToOaf {
     ebLinks.flatMap(j => BioDBToOAF.parse_ebi_links(j.links))
       .filter(p => BioDBToOAF.EBITargetLinksFilter(p))
       .flatMap(p => BioDBToOAF.convertEBILinksToOaf(p))
-      .flatMap(i=> CollectionUtils.fixRelations(i)).filter(i => i != null)
+      .flatMap(i => CollectionUtils.fixRelations(i)).filter(i => i != null)
       .write.mode(SaveMode.Overwrite).save(targetPath)
   }
 }

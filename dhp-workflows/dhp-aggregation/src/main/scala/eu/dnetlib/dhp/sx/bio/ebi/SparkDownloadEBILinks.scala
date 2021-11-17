@@ -1,9 +1,8 @@
 package eu.dnetlib.dhp.sx.bio.ebi
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMAuthor, PMJournal}
 import eu.dnetlib.dhp.sx.bio.BioDBToOAF.EBILinkItem
-import eu.dnetlib.dhp.sx.bio.pubmed.PMJournal
+import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMAuthor, PMJournal}
 import org.apache.commons.io.IOUtils
 import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.methods.HttpGet
