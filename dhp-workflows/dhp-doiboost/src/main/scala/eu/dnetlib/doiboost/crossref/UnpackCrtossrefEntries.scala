@@ -2,8 +2,8 @@ package eu.dnetlib.doiboost.crossref
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import org.apache.hadoop.io.compress.GzipCodec
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.JArray
@@ -17,9 +17,7 @@ object UnpackCrtossrefEntries {
   val log: Logger = LoggerFactory.getLogger(UnpackCrtossrefEntries.getClass)
 
 
-
-
-  def extractDump(input:String):List[String] = {
+  def extractDump(input: String): List[String] = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(input)
 
@@ -28,7 +26,6 @@ object UnpackCrtossrefEntries {
 
 
   }
-
 
 
   def main(args: Array[String]): Unit = {
@@ -45,7 +42,7 @@ object UnpackCrtossrefEntries {
       .getOrCreate()
     val sc: SparkContext = spark.sparkContext
 
-    sc.wholeTextFiles(sourcePath,6000).flatMap(d =>extractDump(d._2))
+    sc.wholeTextFiles(sourcePath, 6000).flatMap(d => extractDump(d._2))
       .saveAsTextFile(targetPath, classOf[GzipCodec])
 
 

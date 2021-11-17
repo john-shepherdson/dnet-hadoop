@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.doiboost
+package eu.dnetlib.doiboost
 
 import eu.dnetlib.dhp.schema.oaf.{Publication, Dataset => OafDataset}
 import eu.dnetlib.doiboost.{DoiBoostMappingUtil, HostedByItemType}

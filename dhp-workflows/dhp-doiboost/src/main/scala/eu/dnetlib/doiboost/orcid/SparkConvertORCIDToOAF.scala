@@ -11,10 +11,10 @@ object SparkConvertORCIDToOAF {
   val logger: Logger = LoggerFactory.getLogger(SparkConvertORCIDToOAF.getClass)
 
 
-  def run(spark:SparkSession, workingPath:String, targetPath:String) :Unit = {
+  def run(spark: SparkSession, workingPath: String, targetPath: String): Unit = {
     implicit val mapEncoderPubs: Encoder[Publication] = Encoders.kryo[Publication]
     import spark.implicits._
-    val dataset: Dataset[ORCIDItem] =spark.read.load(s"$workingPath/orcidworksWithAuthor").as[ORCIDItem]
+    val dataset: Dataset[ORCIDItem] = spark.read.load(s"$workingPath/orcidworksWithAuthor").as[ORCIDItem]
 
     logger.info("Converting ORCID to OAF")
     dataset.map(o => ORCIDToOAF.convertTOOAF(o)).write.mode(SaveMode.Overwrite).save(targetPath)
@@ -35,7 +35,7 @@ object SparkConvertORCIDToOAF {
     val workingPath = parser.get("workingPath")
     val targetPath = parser.get("targetPath")
 
-   run(spark,workingPath, targetPath)
+    run(spark, workingPath, targetPath)
 
   }
 

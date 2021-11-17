@@ -5,19 +5,16 @@ import eu.dnetlib.dhp.schema.oaf.Publication
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.functions.{col, collect_list, struct}
 import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
-
 import scala.collection.JavaConverters._
-
 object SparkProcessMAG {
 
-  def getDistinctResults (d:Dataset[MagPapers]):Dataset[MagPapers]={
+  def getDistinctResults(d: Dataset[MagPapers]): Dataset[MagPapers] = {
     d.where(col("Doi").isNotNull)
       .groupByKey(mp => DoiBoostMappingUtil.normalizeDoi(mp.Doi))(Encoders.STRING)
-      .reduceGroups((p1:MagPapers,p2:MagPapers) => ConversionUtil.choiceLatestMagArtitcle(p1,p2))
+      .reduceGroups((p1: MagPapers, p2: MagPapers) => ConversionUtil.choiceLatestMagArtitcle(p1, p2))
       .map(_._2)(Encoders.product[MagPapers])
       .map(mp => {
         new MagPapers(mp.PaperId, mp.Rank, DoiBoostMappingUtil.normalizeDoi(mp.Doi),
@@ -98,13 +95,13 @@ object SparkProcessMAG {
 
     var magPubs: Dataset[(String, Publication)] =
       spark.read.load(s"$workingPath/merge_step_2").as[Publication]
-      .map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
+        .map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
 
 
     val conference = spark.read.load(s"$sourcePath/ConferenceInstances")
-      .select($"ConferenceInstanceId".as("ci"), $"DisplayName", $"Location", $"StartDate",$"EndDate" )
+      .select($"ConferenceInstanceId".as("ci"), $"DisplayName", $"Location", $"StartDate", $"EndDate")
     val conferenceInstance = conference.joinWith(papers, papers("ConferenceInstanceId").equalTo(conference("ci")))
-      .select($"_1.ci", $"_1.DisplayName", $"_1.Location", $"_1.StartDate",$"_1.EndDate", $"_2.PaperId").as[MagConferenceInstance]
+      .select($"_1.ci", $"_1.DisplayName", $"_1.Location", $"_1.StartDate", $"_1.EndDate", $"_2.PaperId").as[MagConferenceInstance]
 
 
     magPubs.joinWith(conferenceInstance, col("_1").equalTo(conferenceInstance("PaperId")), "left")
@@ -122,7 +119,7 @@ object SparkProcessMAG {
 
     magPubs.joinWith(paperAbstract, col("_1").equalTo(paperAbstract("PaperId")), "left")
       .map(item => ConversionUtil.updatePubsWithDescription(item)
-    ).write.mode(SaveMode.Overwrite).save(s"$workingPath/merge_step_4")
+      ).write.mode(SaveMode.Overwrite).save(s"$workingPath/merge_step_4")
 
 
     logger.info("Phase 7) Enrich Publication with FieldOfStudy")
@@ -148,10 +145,9 @@ object SparkProcessMAG {
     spark.read.load(s"$workingPath/mag_publication").as[Publication]
       .filter(p => p.getId == null)
       .groupByKey(p => p.getId)
-      .reduceGroups((a:Publication, b:Publication) => ConversionUtil.mergePublication(a,b))
+      .reduceGroups((a: Publication, b: Publication) => ConversionUtil.mergePublication(a, b))
       .map(_._2)
       .write.mode(SaveMode.Overwrite).save(s"$targetPath/magPublication")
-
 
 
   }

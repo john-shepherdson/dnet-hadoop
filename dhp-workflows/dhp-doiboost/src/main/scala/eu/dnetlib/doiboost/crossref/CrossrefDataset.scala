@@ -6,7 +6,7 @@ import org.apache.commons.io.IOUtils
 import org.apache.hadoop.io.{IntWritable, Text}
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.expressions.Aggregator
-import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
+import org.apache.spark.sql.{Dataset, Encoder, SaveMode, SparkSession}
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
@@ -17,18 +17,17 @@ object CrossrefDataset {
   val logger: Logger = LoggerFactory.getLogger(SparkMapDumpIntoOAF.getClass)
 
 
-  def to_item(input:String):CrossrefDT = {
+  def to_item(input: String): CrossrefDT = {
 
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(input)
-    val ts:Long = (json \ "indexed" \ "timestamp").extract[Long]
-    val doi:String  = DoiBoostMappingUtil.normalizeDoi((json \ "DOI").extract[String])
+    val ts: Long = (json \ "indexed" \ "timestamp").extract[Long]
+    val doi: String = DoiBoostMappingUtil.normalizeDoi((json \ "DOI").extract[String])
     CrossrefDT(doi, input, ts)
 
   }
 
   def main(args: Array[String]): Unit = {
-
 
 
     val conf: SparkConf = new SparkConf()
@@ -54,7 +53,7 @@ object CrossrefDataset {
           return b
 
 
-        if(a.timestamp >b.timestamp) {
+        if (a.timestamp > b.timestamp) {
           return a
         }
         b
@@ -66,7 +65,7 @@ object CrossrefDataset {
         if (a == null)
           return b
 
-        if(a.timestamp >b.timestamp) {
+        if (a.timestamp > b.timestamp) {
           return a
         }
         b
@@ -79,20 +78,20 @@ object CrossrefDataset {
       override def finish(reduction: CrossrefDT): CrossrefDT = reduction
     }
 
-    val workingPath:String = parser.get("workingPath")
+    val workingPath: String = parser.get("workingPath")
 
 
-    val main_ds:Dataset[CrossrefDT] = spark.read.load(s"$workingPath/crossref_ds").as[CrossrefDT]
+    val main_ds: Dataset[CrossrefDT] = spark.read.load(s"$workingPath/crossref_ds").as[CrossrefDT]
 
 
     val update =
-      spark.createDataset(spark.sparkContext.sequenceFile(s"$workingPath/index_update",  classOf[IntWritable], classOf[Text])
-        .map(i =>CrossrefImporter.decompressBlob(i._2.toString))
-        .map(i =>to_item(i)))
+      spark.createDataset(spark.sparkContext.sequenceFile(s"$workingPath/index_update", classOf[IntWritable], classOf[Text])
+        .map(i => CrossrefImporter.decompressBlob(i._2.toString))
+        .map(i => to_item(i)))
 
     main_ds.union(update).groupByKey(_.doi)
       .agg(crossrefAggregator.toColumn)
-      .map(s=>s._2)
+      .map(s => s._2)
       .write.mode(SaveMode.Overwrite).save(s"$workingPath/crossref_ds_updated")
 
   }

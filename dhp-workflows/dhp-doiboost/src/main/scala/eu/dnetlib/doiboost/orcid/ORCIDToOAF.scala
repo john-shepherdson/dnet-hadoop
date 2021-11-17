@@ -4,17 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Publication}
-import eu.dnetlib.dhp.schema.orcid.{AuthorData, OrcidDOI}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.DoiBoostMappingUtil.{createSP, generateDataInfo}
 import org.apache.commons.lang.StringUtils
-import org.slf4j.{Logger, LoggerFactory}
-
-import scala.collection.JavaConverters._
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST._
 import org.json4s.jackson.JsonMethods._
+import org.slf4j.{Logger, LoggerFactory}
+
+import scala.collection.JavaConverters._
 
 
 case class ORCIDItem(doi:String, authors:List[OrcidAuthor]){}

@@ -3,9 +3,9 @@ package eu.dnetlib.doiboost.mag
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Dataset, SparkSession}
 import org.codehaus.jackson.map.ObjectMapper
+import org.json4s.DefaultFormats
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
-import org.json4s.DefaultFormats
 import org.slf4j.{Logger, LoggerFactory}
 
 import java.sql.Timestamp

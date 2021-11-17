@@ -4,10 +4,8 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.oaf
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Publication, Relation, Dataset => OafDataset}
 import org.apache.commons.io.IOUtils
-
 import org.apache.spark.SparkConf
-
-import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
+import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
 
 

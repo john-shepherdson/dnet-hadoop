@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.doiboost
+package eu.dnetlib.doiboost
 
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import org.junit.jupiter.api.Test

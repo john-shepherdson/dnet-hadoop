@@ -4,14 +4,13 @@ import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.schema.oaf.{AccessRight, Instance, OpenAccessRoute, Publication}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
+import eu.dnetlib.doiboost.DoiBoostMappingUtil._
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
-import eu.dnetlib.doiboost.DoiBoostMappingUtil._
-import eu.dnetlib.doiboost.uw.UnpayWallToOAF.get_unpaywall_color
 
 
 

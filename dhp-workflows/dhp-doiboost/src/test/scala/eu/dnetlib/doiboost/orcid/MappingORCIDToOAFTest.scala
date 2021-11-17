@@ -10,9 +10,8 @@ import org.junit.jupiter.api.io.TempDir
 import org.slf4j.{Logger, LoggerFactory}
 
 import java.nio.file.Path
-import scala.io.Source
-
 import scala.collection.JavaConversions._
+import scala.io.Source
 
 class MappingORCIDToOAFTest {
   val logger: Logger = LoggerFactory.getLogger(ORCIDToOAF.getClass)

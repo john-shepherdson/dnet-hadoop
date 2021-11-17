@@ -3,11 +3,11 @@ package eu.dnetlib.doiboost.uw
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.oaf.OpenAccessRoute
+import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.io.Source
-import org.junit.jupiter.api.Assertions._
-import org.slf4j.{Logger, LoggerFactory}
 
 class UnpayWallMappingTest {
 

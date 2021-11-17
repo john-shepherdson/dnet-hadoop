@@ -5,10 +5,10 @@ import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.schema.oaf.{Instance, Journal, Publication, StructuredProperty}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
+import eu.dnetlib.doiboost.DoiBoostMappingUtil._
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
-import eu.dnetlib.doiboost.DoiBoostMappingUtil._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable

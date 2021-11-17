@@ -4,20 +4,19 @@ import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf._
 import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils}
 import eu.dnetlib.dhp.utils.DHPUtils
-import eu.dnetlib.doiboost.DoiBoostMappingUtil.{decideAccessRight, _}
+import eu.dnetlib.doiboost.DoiBoostMappingUtil
+import eu.dnetlib.doiboost.DoiBoostMappingUtil._
 import org.apache.commons.lang.StringUtils
 import org.json4s
 import org.json4s.DefaultFormats
-import org.json4s.JsonAST.{JValue, _}
+import org.json4s.JsonAST._
 import org.json4s.jackson.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 
+import java.util
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.util.matching.Regex
-import java.util
-
-import eu.dnetlib.doiboost.DoiBoostMappingUtil
 
 case class CrossrefDT(doi: String, json:String, timestamp: Long) {}
 

@@ -1,15 +1,13 @@
 package eu.dnetlib.doiboost.uw
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-
 import eu.dnetlib.dhp.schema.oaf.Publication
 import eu.dnetlib.doiboost.crossref.SparkMapDumpIntoOAF
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
+import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
-
 
 object SparkMapUnpayWallToOAF {
 
@@ -32,11 +30,11 @@ object SparkMapUnpayWallToOAF {
 
     val sourcePath = parser.get("sourcePath")
     val targetPath = parser.get("targetPath")
-    val inputRDD:RDD[String] = spark.sparkContext.textFile(s"$sourcePath")
+    val inputRDD: RDD[String] = spark.sparkContext.textFile(s"$sourcePath")
 
     logger.info("Converting UnpayWall to OAF")
 
-    val d:Dataset[Publication] = spark.createDataset(inputRDD.map(UnpayWallToOAF.convertToOAF).filter(p=>p!=null)).as[Publication]
+    val d: Dataset[Publication] = spark.createDataset(inputRDD.map(UnpayWallToOAF.convertToOAF).filter(p => p != null)).as[Publication]
     d.write.mode(SaveMode.Overwrite).save(targetPath)
   }
 
