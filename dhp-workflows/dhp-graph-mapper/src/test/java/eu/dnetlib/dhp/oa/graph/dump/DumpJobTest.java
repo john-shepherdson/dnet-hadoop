@@ -177,8 +177,8 @@ public class DumpJobTest {
 		Assertions
 			.assertTrue(
 				gr
-						.getInstance()
-						.get(0)
+					.getInstance()
+					.get(0)
 					.getMeasures()
 					.stream()
 					.anyMatch(
@@ -187,8 +187,8 @@ public class DumpJobTest {
 		Assertions
 			.assertTrue(
 				gr
-						.getInstance()
-						.get(0)
+					.getInstance()
+					.get(0)
 					.getMeasures()
 					.stream()
 					.anyMatch(
