@@ -8,6 +8,9 @@ import scala.collection.JavaConverters._
 
 import java.util.regex.Pattern
 
+/**
+ *
+ */
 object PubMedToOaf {
 
   val SUBJ_CLASS = "keywords"
@@ -15,7 +18,17 @@ object PubMedToOaf {
     "pmid" -> "https://pubmed.ncbi.nlm.nih.gov/",
     "doi" -> "https://dx.doi.org/"
   )
+  val dataInfo: DataInfo = OafMapperUtils.dataInfo(false, null, false, false, ModelConstants.PROVENANCE_ACTION_SET_QUALIFIER, "0.9")
+  val collectedFrom: KeyValue = OafMapperUtils.keyValue(ModelConstants.EUROPE_PUBMED_CENTRAL_ID, "Europe PubMed Central")
 
+
+
+  /**
+   * Cleaning the DOI Applying regex in order to
+   * remove doi starting with URL
+   * @param doi input DOI
+   * @return cleaned DOI
+   */
   def cleanDoi(doi: String): String = {
 
     val regex = "^10.\\d{4,9}\\/[\\[\\]\\-\\<\\>._;()\\/:A-Z0-9]+$"
@@ -30,6 +43,15 @@ object PubMedToOaf {
     null
   }
 
+  /**
+   *
+   * Create an instance of class extends Result
+   * starting from OAF instanceType value
+   *
+   * @param cobjQualifier OAF instance type
+   * @param vocabularies All dnet vocabularies
+   * @return the correct instance
+   */
   def createResult(cobjQualifier: Qualifier, vocabularies: VocabularyGroup): Result = {
     val result_typologies = getVocabularyTerm(ModelConstants.DNET_RESULT_TYPOLOGIES, vocabularies, cobjQualifier.getClassid)
     result_typologies.getClassid match {
@@ -42,6 +64,12 @@ object PubMedToOaf {
     }
   }
 
+  /**
+   *  Mapping the Pubmedjournal info into the OAF Journale
+   *
+   * @param j the pubmedJournal
+   * @return the OAF Journal
+   */
   def mapJournal(j: PMJournal): Journal = {
     if (j == null)
       return null
@@ -49,6 +77,7 @@ object PubMedToOaf {
 
     journal.setDataInfo(dataInfo)
     journal.setName(j.getTitle)
+    journal.setConferencedate(j.getDate)
     journal.setVol(j.getVolume)
     journal.setIssnPrinted(j.getIssn)
     journal.setIss(j.getIssue)
@@ -57,25 +86,43 @@ object PubMedToOaf {
 
   }
 
-
+  /**
+   *
+   * Find vocabulary term into synonyms and term in the vocabulary
+   *
+   * @param vocabularyName the input vocabulary name
+   * @param vocabularies all the vocabularies
+   * @param term the term to find
+   *
+   * @return the cleaned term value
+   */
   def getVocabularyTerm(vocabularyName: String, vocabularies: VocabularyGroup, term: String): Qualifier = {
     val a = vocabularies.getSynonymAsQualifier(vocabularyName, term)
     val b = vocabularies.getTermAsQualifier(vocabularyName, term)
     if (a == null) b else a
   }
 
-  val dataInfo: DataInfo = OafMapperUtils.dataInfo(false, null, false, false, ModelConstants.PROVENANCE_ACTION_SET_QUALIFIER, "0.9")
-  val collectedFrom: KeyValue = OafMapperUtils.keyValue(ModelConstants.EUROPE_PUBMED_CENTRAL_ID, "Europe PubMed Central")
 
+  /**
+   *  Map the Pubmed Article into the OAF instance
+   *
+   *
+   * @param article the pubmed articles
+   * @param vocabularies the vocabularies
+   * @return The OAF instance if the mapping did not fail
+   */
   def convert(article: PMArticle, vocabularies: VocabularyGroup): Result = {
 
     if (article.getPublicationTypes == null)
       return null
-    val i = new Instance
+
+
+    // MAP PMID into  pid with  classid = classname = pmid
     val pidList: List[StructuredProperty] = List(OafMapperUtils.structuredProperty(article.getPmid, PidType.pmid.toString, PidType.pmid.toString, ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES, dataInfo))
     if (pidList == null)
       return null
 
+    // MAP //ArticleId[./@IdType="doi"]   into  alternateIdentifier with classid = classname = doi
     var alternateIdentifier: StructuredProperty = null
     if (article.getDoi != null) {
       val normalizedPid = cleanDoi(article.getDoi)
@@ -83,43 +130,64 @@ object PubMedToOaf {
         alternateIdentifier = OafMapperUtils.structuredProperty(normalizedPid, PidType.doi.toString, PidType.doi.toString, ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES, dataInfo)
     }
 
+    // INSTANCE MAPPING
+    //--------------------------------------------------------------------------------------
+
     // If the article contains the typology Journal Article then we apply this type
     //else We have to find a terms that match the vocabulary otherwise we discard it
     val ja = article.getPublicationTypes.asScala.find(s => "Journal Article".equalsIgnoreCase(s.getValue))
+    val pubmedInstance = new Instance
     if (ja.isDefined) {
       val cojbCategory = getVocabularyTerm(ModelConstants.DNET_PUBLICATION_RESOURCE, vocabularies, ja.get.getValue)
-      i.setInstancetype(cojbCategory)
+      pubmedInstance.setInstancetype(cojbCategory)
     } else {
       val i_type = article.getPublicationTypes.asScala
         .map(s => getVocabularyTerm(ModelConstants.DNET_PUBLICATION_RESOURCE, vocabularies, s.getValue))
         .find(q => q != null)
       if (i_type.isDefined)
-        i.setInstancetype(i_type.get)
+        pubmedInstance.setInstancetype(i_type.get)
       else
         return null
     }
-    val result = createResult(i.getInstancetype, vocabularies)
+    val result = createResult(pubmedInstance.getInstancetype, vocabularies)
     if (result == null)
       return result
     result.setDataInfo(dataInfo)
-    i.setPid(pidList.asJava)
+    pubmedInstance.setPid(pidList.asJava)
     if (alternateIdentifier != null)
-      i.setAlternateIdentifier(List(alternateIdentifier).asJava)
-    result.setInstance(List(i).asJava)
-    i.getPid.asScala.filter(p => "pmid".equalsIgnoreCase(p.getQualifier.getClassid)).map(p => p.getValue)(collection.breakOut)
+      pubmedInstance.setAlternateIdentifier(List(alternateIdentifier).asJava)
+    result.setInstance(List(pubmedInstance).asJava)
+    pubmedInstance.getPid.asScala.filter(p => "pmid".equalsIgnoreCase(p.getQualifier.getClassid)).map(p => p.getValue)(collection.breakOut)
+    //CREATE URL From pmid
     val urlLists: List[String] = pidList
       .map(s => (urlMap.getOrElse(s.getQualifier.getClassid, ""), s.getValue))
       .filter(t => t._1.nonEmpty)
       .map(t => t._1 + t._2)
     if (urlLists != null)
-      i.setUrl(urlLists.asJava)
-    i.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(article.getDate), dataInfo))
-    i.setCollectedfrom(collectedFrom)
+      pubmedInstance.setUrl(urlLists.asJava)
+
+    //ASSIGN DateofAcceptance
+    pubmedInstance.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(article.getDate), dataInfo))
+    //ASSIGN COLLECTEDFROM
+    pubmedInstance.setCollectedfrom(collectedFrom)
     result.setPid(pidList.asJava)
+
+    //END INSTANCE MAPPING
+    //--------------------------------------------------------------------------------------
+
+
+    // JOURNAL MAPPING
+    //--------------------------------------------------------------------------------------
     if (article.getJournal != null && result.isInstanceOf[Publication])
       result.asInstanceOf[Publication].setJournal(mapJournal(article.getJournal))
     result.setCollectedfrom(List(collectedFrom).asJava)
+    //END JOURNAL MAPPING
+    //--------------------------------------------------------------------------------------
 
+
+
+    // RESULT MAPPING
+    //--------------------------------------------------------------------------------------
     result.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(article.getDate), dataInfo))
 
     if (article.getTitle == null || article.getTitle.isEmpty)
@@ -159,6 +227,9 @@ object PubMedToOaf {
 
     result.setId(article.getPmid)
 
+
+    // END RESULT MAPPING
+    //--------------------------------------------------------------------------------------
     val id = IdentifierFactory.createIdentifier(result)
     if (article.getPmid.equalsIgnoreCase(id))
       return null

@@ -2,6 +2,12 @@ package eu.dnetlib.dhp.sx.bio.pubmed
 
 import scala.xml.MetaData
 import scala.xml.pull.{EvElemEnd, EvElemStart, EvText, XMLEventReader}
+
+
+/**
+ *
+ * @param xml
+ */
 class PMParser(xml:XMLEventReader) extends Iterator[PMArticle] {
 
   var currentArticle:PMArticle = generateNextArticle()
