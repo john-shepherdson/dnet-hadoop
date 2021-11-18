@@ -864,7 +864,7 @@
         "schemeid": "dnet:dataCite_title",
         "schemename": "dnet:dataCite_title"
       },
-      "value": "Optical response of strained- and unstrained-silicon cold-electron bolometers"
+      "value": "Optical response of strained- and unstrained-silicon cold-electron bolometers test"
     },
     {
       "dataInfo": {
@@ -887,6 +887,72 @@
         "schemename": "dnet:dataCite_title"
       },
       "value": "test test 123 test"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "main title",
+        "classname": "main title",
+        "schemeid": "dnet:dataCite_title",
+        "schemename": "dnet:dataCite_title"
+      },
+      "value": "omic"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "main title",
+        "classname": "main title",
+        "schemeid": "dnet:dataCite_title",
+        "schemename": "dnet:dataCite_title"
+      },
+      "value": "｢マキャベリ的知性と心の理論の進化論｣ リチャード・バーン， アンドリュー・ホワイトゥン 編／藤田和生， 山下博志， 友永雅巳 監訳"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "main title",
+        "classname": "main title",
+        "schemeid": "dnet:dataCite_title",
+        "schemename": "dnet:dataCite_title"
+      },
+      "value": "-"
     }
   ]
 }
