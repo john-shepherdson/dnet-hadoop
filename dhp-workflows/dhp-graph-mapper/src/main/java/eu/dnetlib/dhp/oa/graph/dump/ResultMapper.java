@@ -43,15 +43,6 @@ public class ResultMapper implements Serializable {
 			try {
 
 				addTypeSpecificInformation(out, input, ort);
-				// Optional<List<Measure>> mes = Optional.ofNullable(input.getMeasures());
-				// if (mes.isPresent()) {
-				// 	List<KeyValue> measure = new ArrayList<>();
-				// 	mes
-				// 		.get()
-				// 		.forEach(
-				// 			m -> m.getUnit().forEach(u -> measure.add(KeyValue.newInstance(m.getId(), u.getValue()))));
-				// 	out.setMeasures(measure);
-				// }
 
 				Optional
 					.ofNullable(input.getAuthor())
