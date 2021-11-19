@@ -232,20 +232,7 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 
 		final JavaRDD<String> rels = jsc.textFile(testDedupGraphBasePath + "/relation");
 
-		long relations = rels.count();
-
-		final ObjectMapper mapper = new ObjectMapper();
-		List<String> relTypes = rels
-			.map(r -> mapper.readValue(r, Relation.class))
-			.map(
-				r -> r.getRelType() + "_" + r.getSubRelType() + "_" + r.getRelClass() + "|" +
-					r.getCollectedfrom().stream().map(cf -> cf.getValue()).collect(Collectors.joining(",")))
-			.distinct()
-			.collect();
-
-		relTypes.forEach(r -> System.out.println("relType: " + r));
-
-		assertEquals(2382, relations);
+		assertEquals(2382, rels.count());
 
 	}
 
