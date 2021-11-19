@@ -19,7 +19,7 @@ object SparkResolveEntities {
   def main(args: Array[String]): Unit = {
     val log: Logger = LoggerFactory.getLogger(getClass)
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/resolution/resolve_params.json")))
+    val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/resolution/resolve_entities_params.json")))
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession

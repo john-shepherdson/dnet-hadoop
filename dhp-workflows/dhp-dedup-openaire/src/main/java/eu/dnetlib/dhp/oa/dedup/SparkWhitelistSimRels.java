@@ -124,31 +124,12 @@ public class SparkWhitelistSimRels extends AbstractSparkAction {
 
 			Dataset<Relation> whiteListSimRels = whiteListRels2
 				.map(
-					(MapFunction<Tuple2<String, String>, Relation>) r -> createSimRel(r._1(), r._2(), entity),
+					(MapFunction<Tuple2<String, String>, Relation>) r -> DedupUtility
+						.createSimRel(r._1(), r._2(), entity),
 					Encoders.bean(Relation.class));
 
 			saveParquet(whiteListSimRels, outputPath, SaveMode.Append);
 		}
 	}
 
-	private Relation createSimRel(String source, String target, String entity) {
-		final Relation r = new Relation();
-		r.setSource(source);
-		r.setTarget(target);
-		r.setSubRelType("dedupSimilarity");
-		r.setRelClass("isSimilarTo");
-		r.setDataInfo(new DataInfo());
-
-		switch (entity) {
-			case "result":
-				r.setRelType("resultResult");
-				break;
-			case "organization":
-				r.setRelType("organizationOrganization");
-				break;
-			default:
-				throw new IllegalArgumentException("unmanaged entity type: " + entity);
-		}
-		return r;
-	}
 }

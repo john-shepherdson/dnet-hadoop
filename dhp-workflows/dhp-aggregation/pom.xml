@@ -29,6 +29,13 @@
                             <goal>testCompile</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>scala-doc</id>
+                        <phase>process-resources</phase> <!-- or wherever -->
+                        <goals>
+                            <goal>doc</goal>
+                        </goals>
+                    </execution>
                 </executions>
                 <configuration>
                     <scalaVersion>${scala.version}</scalaVersion>
