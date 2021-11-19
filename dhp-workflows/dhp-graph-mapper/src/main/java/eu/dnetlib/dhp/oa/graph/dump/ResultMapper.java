@@ -12,14 +12,12 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.dump.oaf.*;
 import eu.dnetlib.dhp.schema.dump.oaf.AccessRight;
 import eu.dnetlib.dhp.schema.dump.oaf.Author;
-import eu.dnetlib.dhp.schema.dump.oaf.Country;
 import eu.dnetlib.dhp.schema.dump.oaf.GeoLocation;
 import eu.dnetlib.dhp.schema.dump.oaf.Instance;
-import eu.dnetlib.dhp.schema.dump.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.dump.oaf.Measure;
 import eu.dnetlib.dhp.schema.dump.oaf.OpenAccessRoute;
-import eu.dnetlib.dhp.schema.dump.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.dump.oaf.Result;
+import eu.dnetlib.dhp.schema.dump.oaf.community.CfHbKeyValue;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityInstance;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Context;
@@ -231,7 +229,7 @@ public class ResultMapper implements Serializable {
 							input
 								.getCollectedfrom()
 								.stream()
-								.map(cf -> KeyValue.newInstance(cf.getKey(), cf.getValue()))
+								.map(cf -> CfHbKeyValue.newInstance(cf.getKey(), cf.getValue()))
 								.collect(Collectors.toList()));
 
 					Set<String> communities = communityMap.keySet();
@@ -424,12 +422,12 @@ public class ResultMapper implements Serializable {
 
 		instance
 			.setCollectedfrom(
-				KeyValue
+				CfHbKeyValue
 					.newInstance(i.getCollectedfrom().getKey(), i.getCollectedfrom().getValue()));
 
 		instance
 			.setHostedby(
-				KeyValue.newInstance(i.getHostedby().getKey(), i.getHostedby().getValue()));
+				CfHbKeyValue.newInstance(i.getHostedby().getKey(), i.getHostedby().getValue()));
 
 		return instance;
 
