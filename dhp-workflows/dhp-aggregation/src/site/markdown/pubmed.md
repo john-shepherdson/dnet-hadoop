@@ -4,7 +4,7 @@ This section describes the mapping implemented for [MEDLINE/PubMed](https://pubm
 Collection
 ---------
 The native data is collected from [ftp baseline](https://ftp.ncbi.nlm.nih.gov/pubmed/baseline/) containing XML with 
-the following [shcema](https://www.nlm.nih.gov/bsd/licensee/elements_descriptions.html) 
+the following [schema](https://www.nlm.nih.gov/bsd/licensee/elements_descriptions.html) 
 
 
 Parsing
@@ -49,6 +49,10 @@ The table below describes the mapping from the XML Native to the OAF mapping
 |//Author/ForeName| author.Forename| |
 |//Author/FullName| author.Forename| Concatenation of forname + lastName if exist |
 |FOR ALL AUTHOR | author.rank| sequential number starting from 1|
+
+#TODO
+
+Missing item mapped
 
 
 
