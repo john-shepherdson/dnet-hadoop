@@ -140,7 +140,7 @@ public class DumpGraphEntities implements Serializable {
 			.ofNullable(d.getDatasourcetype())
 			.ifPresent(
 				dsType -> datasource
-					.setDatasourcetype(ControlledField.newInstance(dsType.getClassid(), dsType.getClassname())));
+					.setDatasourcetype(DatasourceSchemeValue.newInstance(dsType.getClassid(), dsType.getClassname())));
 
 		Optional
 			.ofNullable(d.getOpenairecompatibility())
@@ -499,7 +499,7 @@ public class DumpGraphEntities implements Serializable {
 			.ifPresent(
 				value -> {
 					if (!value.getClassid().equals(Constants.UNKNOWN)) {
-						organization.setCountry(Qualifier.newInstance(value.getClassid(), value.getClassname()));
+						organization.setCountry(Country.newInstance(value.getClassid(), value.getClassname()));
 					}
 
 				});
@@ -515,7 +515,7 @@ public class DumpGraphEntities implements Serializable {
 					.setPid(
 						value
 							.stream()
-							.map(p -> ControlledField.newInstance(p.getQualifier().getClassid(), p.getValue()))
+							.map(p -> OrganizationPid.newInstance(p.getQualifier().getClassid(), p.getValue()))
 							.collect(Collectors.toList())));
 
 		return organization;
