@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
@@ -137,9 +138,21 @@ public class GraphCleaningFunctionsTest {
 				.stream()
 				.anyMatch(s -> s.getValue().equals("10.1009/qwerty")));
 
+		assertEquals(5, p_out.getTitle().size());
+
 		Publication p_cleaned = GraphCleaningFunctions.cleanup(p_out);
 
-		assertEquals(1, p_cleaned.getTitle().size());
+		assertEquals(3, p_cleaned.getTitle().size());
+
+		List<String> titles = p_cleaned
+			.getTitle()
+			.stream()
+			.map(StructuredProperty::getValue)
+			.collect(Collectors.toList());
+		assertTrue(titles.contains("omic"));
+		assertTrue(
+			titles.contains("Optical response of strained- and unstrained-silicon cold-electron bolometers test"));
+		assertTrue(titles.contains("｢マキャベリ的知性と心の理論の進化論｣ リチャード・バーン， アンドリュー・ホワイトゥン 編／藤田和生， 山下博志， 友永雅巳 監訳"));
 
 		assertEquals("CLOSED", p_cleaned.getBestaccessright().getClassid());
 		assertNull(p_out.getPublisher());
