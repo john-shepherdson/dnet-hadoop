@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -28,6 +30,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -226,9 +230,23 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 
 		new SparkCopyRelationsNoOpenorgs(parser, spark).run(isLookUpService);
 
-		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
+		final JavaRDD<String> rels = jsc.textFile(testDedupGraphBasePath + "/relation");
 
-		assertEquals(2380, relations);
+		long relations = rels.count();
+
+		final ObjectMapper mapper = new ObjectMapper();
+		List<String> relTypes = rels
+			.map(r -> mapper.readValue(r, Relation.class))
+			.map(
+				r -> r.getRelType() + "_" + r.getSubRelType() + "_" + r.getRelClass() + "|" +
+					r.getCollectedfrom().stream().map(cf -> cf.getValue()).collect(Collectors.joining(",")))
+			.distinct()
+			.collect();
+
+		relTypes.forEach(r -> System.out.println("relType: " + r));
+
+		assertEquals(2382, relations);
+
 	}
 
 	@Test
@@ -250,7 +268,7 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 
 		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
 
-		assertEquals(4894, relations);
+		assertEquals(4896, relations);
 
 		// check deletedbyinference
 		final Dataset<Relation> mergeRels = spark
