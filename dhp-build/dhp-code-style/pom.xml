@@ -24,11 +24,18 @@
         </repository>
         <site>
             <id>DHPSite</id>
-            <url>file://${dhp.site.stage.path}/site/dhp-build/dhp-code-style</url>
+            <url>${dhp.site.stage.path}/dhp-build/dhp-code-style</url>
         </site>
     </distributionManagement>
 
     <build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.10</version>
+            </extension>
+        </extensions>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -47,7 +54,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dhp.site.stage.path>/tmp/dhp-site</dhp.site.stage.path>
+        <dhp.site.stage.path>sftp://dnet-hadoop@static-web.d4science.org/dnet-hadoop</dhp.site.stage.path>
     </properties>
 
 </project>

@@ -24,7 +24,7 @@
  <distributionManagement>
 	 <site>
 		 <id>DHPSite</id>
-		 <url>file://${dhp.site.stage.path}/site/dhp-build</url>
+		 <url>${dhp.site.stage.path}/dhp-build</url>
 	 </site>
  </distributionManagement>
 

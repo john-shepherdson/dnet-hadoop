@@ -18,7 +18,7 @@
     <distributionManagement>
         <site>
             <id>DHPSite</id>
-            <url>file://${dhp.site.stage.path}/site/dhp-workflows</url>
+            <url>${dhp.site.stage.path}/dhp-workflows</url>
         </site>
     </distributionManagement>
 

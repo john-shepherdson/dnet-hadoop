@@ -16,7 +16,7 @@
 	<distributionManagement>
 		<site>
 			<id>DHPSite</id>
-			<url>file://${dhp.site.stage.path}/site/dhp-common</url>
+			<url>${dhp.site.stage.path}/dhp-common</url>
 		</site>
 	</distributionManagement>
 

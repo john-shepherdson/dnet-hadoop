@@ -721,7 +721,7 @@
 		</repository>
 		<site>
 			<id>DHPSite</id>
-			<url>file://${dhp.site.stage.path}/site/</url>
+			<url>${dhp.site.stage.path}/</url>
 		</site>
 	</distributionManagement>
 	<reporting>
@@ -738,7 +738,7 @@
 	</reporting>
 
 	<properties>
-		<dhp.site.stage.path>/tmp/dhp-site</dhp.site.stage.path>
+		<dhp.site.stage.path>sftp://dnet-hadoop@static-web.d4science.org/dnet-hadoop</dhp.site.stage.path>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
