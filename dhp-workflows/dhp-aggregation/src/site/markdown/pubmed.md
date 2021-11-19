@@ -9,8 +9,8 @@ the following [schema](https://www.nlm.nih.gov/bsd/licensee/elements_description
 
 Parsing
 -------
-The resposible class of parsing is [PMParser](./scaladocs/#eu.dnetlib.dhp.sx.bio.pubmed.PMParser) that generates 
-an intermediate mapping of PubMed Article defined [here](/apidocs/eu/dnetlib/dhp/sx/bio/pubmed/package-summary.html)
+The resposible class of parsing is [PMParser](/dnet-hadoop/scaladocs/#eu.dnetlib.dhp.sx.bio.pubmed.PMParser) that generates 
+an intermediate mapping of PubMed Article defined [here](/dnet-hadoop/apidocs/eu/dnetlib/dhp/sx/bio/pubmed/package-summary.html)
 
 
 Mapping
