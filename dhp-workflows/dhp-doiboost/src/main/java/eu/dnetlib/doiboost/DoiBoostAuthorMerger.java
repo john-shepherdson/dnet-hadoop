@@ -94,8 +94,6 @@ public class DoiBoostAuthorMerger {
 
     //valutare se questa cosa va invertita: dovrei prendere per ogni enriching author quello che piu' gli somiglia
     //nella base list non il contrario
-
-
     private static void enrichPidFromList(List<Author> base, List<Author> enrich) {
 
         //search authors having identifiers in the enrich list
@@ -110,7 +108,7 @@ public class DoiBoostAuthorMerger {
                         a -> new Tuple2<>(DHPUtils.md5(a.getFullname()), AuthorAssoc.newInstance(a)))
                 .collect(Collectors.toMap(Tuple2::_1, Tuple2::_2, (x1, x2) -> x1));
 
-        Map<String, Tuple2<List<String>, Double>> baseAssoc = new HashMap<>();
+        Map<String, Tuple2<String,Tuple2<List<String>, Double>>> baseAssoc = new HashMap<>();
 
 
         //for each author in the base list, we search the best enriching match
@@ -124,7 +122,8 @@ public class DoiBoostAuthorMerger {
                                         .collect(Collectors.toList()))
                 )
                 .forEach(t2 -> {
-                    String base_name = DHPUtils.md5(t2._1().getFullname());
+                    String base_name = t2._1().getFullname();
+                    String base_name_md5 = DHPUtils.md5(t2._1().getFullname());
                     Double max_score = 0.0;
                     List<String> enrich_name = new ArrayList();
                     for (Tuple2<Author, Double> t : t2._2()) {
@@ -149,12 +148,53 @@ public class DoiBoostAuthorMerger {
                         }
                     }
                     if(max_score > 0){
-                        baseAssoc.put(base_name, new Tuple2<>(enrich_name, max_score));
+                        baseAssoc.put(base_name_md5, new Tuple2(base_name, new Tuple2<>(enrich_name, max_score)));
                     }
 
                 });
+        List<Tuple2<Double, Tuple2<String, List<String>>>> list = baseAssoc.keySet().stream().map(k -> {
+            Tuple2<String, Tuple2<List<String>, Double>> map_entry = baseAssoc.get(k);
+            return new Tuple2<>(map_entry._2()._2(), new Tuple2<>(map_entry._1(), map_entry._2()._1()));
+        })
+                .collect(Collectors.toList());
+        list.sort(Comparator.comparing(e -> e._1()));
+        //ordino per max score la baseAssoc
+        for (int i = list.size() -1 ; i>=0 ; i-- ){
+            Tuple2<Double, Tuple2<String, List<String>>> tmp = list.get(i);
+            List<String> entries = tmp._2()._2();
+            //se len = 1 => ho un solo e che con questo a ha max score
+            if(entries.size() == 1){
+                if(assocMap.containsKey(entries.get(0))) {
+                    enrichAuthor(assocMap.get(entries.get(0)));
+                    assocMap.remove(entries.get(0));
+                }
+            }else{
+                String author_fullname = tmp._2()._1();
+                long commonWords = 0;
+                String enriching = null;
+                for(String entry : entries){
+                    if (assocMap.containsKey(entry)){
+                        long words = getCommonWords(normalize(entry),
+                                normalize(author_fullname));
+                        if (words > commonWords){
+                            commonWords = words;
+                            enriching = entry;
+                        }
+                        if(words == commonWords){
+                            enriching = null;
+                        }
+                    }
 
-        assocMap.keySet().forEach(k -> enrichAuthor(assocMap.get(k)));
+                }
+                if(enriching != null){
+                    enrichAuthor(assocMap.get(entries.get(0)));
+                    assocMap.remove(entries.get(0));
+                }
+                //TODO pensare ad un modo per arricchire con il miglior e questo autore
+                //Siamo nel caso in cui un autore ha piu' di un e con lo stesso similarity score
+            }
+        }
+      //  assocMap.keySet().forEach(k -> enrichAuthor(assocMap.get(k)));
 
 
     }
