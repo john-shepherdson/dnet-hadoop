@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-public class SubscriptionUtilsTest {
+class SubscriptionUtilsTest {
 
 	@Test
 	void testVerifyListSimilar() {

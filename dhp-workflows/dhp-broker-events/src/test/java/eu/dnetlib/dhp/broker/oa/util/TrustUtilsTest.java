@@ -9,7 +9,7 @@ import eu.dnetlib.broker.objects.OaBrokerAuthor;
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.broker.objects.OaBrokerTypedValue;
 
-public class TrustUtilsTest {
+class TrustUtilsTest {
 
 	private static final double THRESHOLD = 0.95;
 
