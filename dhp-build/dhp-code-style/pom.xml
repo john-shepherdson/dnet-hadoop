@@ -22,6 +22,10 @@
             <id>dnet45-releases</id>
             <url>https://maven.d4science.org/nexus/content/repositories/dnet45-releases</url>
         </repository>
+        <site>
+            <id>DHPSite</id>
+            <url>file://${dhp.site.stage.path}/site/dhp-build/dhp-code-style</url>
+        </site>
     </distributionManagement>
 
     <build>
@@ -43,6 +47,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <dhp.site.stage.path>/tmp/dhp-site</dhp.site.stage.path>
     </properties>
 
 </project>
