@@ -80,12 +80,11 @@ object SparkResolveEntities {
     implicit val resEncoder: Encoder[Result] = Encoders.kryo(classOf[Result])
     import spark.implicits._
 
-    val re: Dataset[(String, Result)] = spark.read.load(s"$workingPath/resolvedEntities").as[Result].map(r => (r.getId, r))
+    val re: Dataset[(String, Result)] = spark.read.load(s"$workingPath/resolvedEntities").as[Result].map(r => (r.getId, r))(Encoders.tuple(Encoders.STRING, resEncoder))
     entities.foreach {
       e => {
 
-        val currentEntityDataset: Dataset[(String, Result)] = spark.read.text(s"$graphBasePath/$e").as[String].map(s => deserializeObject(s, e)).map(r => (r.getId, r))
-
+        val currentEntityDataset: Dataset[(String, Result)] = spark.read.text(s"$graphBasePath/$e").as[String].map(s => deserializeObject(s, e)).map(r => (r.getId, r))(Encoders.tuple(Encoders.STRING, resEncoder))
 
         currentEntityDataset.joinWith(re, currentEntityDataset("_1").equalTo(re("_1")), "left").map(k => {
 
