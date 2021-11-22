@@ -69,10 +69,44 @@
             <arg>--workingPath</arg><arg>${workingDir}</arg>
             <arg>--targetPath</arg><arg>${targetPath}</arg>
         </spark>
-        <ok to="End"/>
+        <ok to="copy_entities"/>
         <error to="Kill"/>
     </action>
 
-    <end name="End"/>
+    <fork name="copy_entities">
+        <path start="copy_organization"/>
+        <path start="copy_projects"/>
+        <path start="copy_datasources"/>
+    </fork>
 
+    <action name="copy_organization">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/organization</arg>
+            <arg>${nameNode}/${targetPath}/organization</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_projects">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/project</arg>
+            <arg>${nameNode}/${targetPath}/project</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_datasources">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/datasource</arg>
+            <arg>${nameNode}/${targetPath}/datasource</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="copy_wait" to="End"/>
+
+    <end name="End"/>
 </workflow-app>
