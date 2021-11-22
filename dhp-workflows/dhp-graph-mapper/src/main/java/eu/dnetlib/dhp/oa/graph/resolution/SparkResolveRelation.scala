@@ -35,6 +35,9 @@ object SparkResolveRelation {
     val workingPath = parser.get("workingPath")
     log.info(s"workingPath  -> $workingPath")
 
+    val targetPath = parser.get("targetPath")
+    log.info(s"targetPath  -> $targetPath")
+
     implicit val relEncoder: Encoder[Relation] = Encoders.kryo(classOf[Relation])
     import spark.implicits._
 
@@ -80,20 +83,13 @@ object SparkResolveRelation {
       .mode(SaveMode.Overwrite)
       .save(s"$workingPath/relation_resolved")
 
-
-    // TO BE conservative we keep the original relation in the working dir
-    // and save the relation resolved on the graphBasePath
-    //In future this two line of code should be removed
-
-    fs.rename(new Path(s"$graphBasePath/relation"), new Path(s"$workingPath/relation"))
-
     spark.read.load(s"$workingPath/relation_resolved").as[Relation]
       .filter(r => !r.getSource.startsWith("unresolved") && !r.getTarget.startsWith("unresolved"))
       .map(r => mapper.writeValueAsString(r))
       .write
       .option("compression", "gzip")
       .mode(SaveMode.Overwrite)
-      .text(s"$graphBasePath/relation")
+      .text(s"$targetPath/relation")
   }
 
   def extractInstanceCF(input: String): List[(String, String)] = {

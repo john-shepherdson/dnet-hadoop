@@ -14,7 +14,7 @@ import org.slf4j.{Logger, LoggerFactory}
 object SparkResolveEntities {
 
   val mapper = new ObjectMapper()
-  val entities = List(EntityType.dataset,EntityType.publication, EntityType.software, EntityType.otherresearchproduct)
+  val entities = List(EntityType.dataset, EntityType.publication, EntityType.software, EntityType.otherresearchproduct)
 
   def main(args: Array[String]): Unit = {
     val log: Logger = LoggerFactory.getLogger(getClass)
@@ -36,25 +36,19 @@ object SparkResolveEntities {
     val unresolvedPath = parser.get("unresolvedPath")
     log.info(s"unresolvedPath  -> $unresolvedPath")
 
+    val targetPath = parser.get("targetPath")
+    log.info(s"targetPath  -> $targetPath")
+
+
     val fs = FileSystem.get(spark.sparkContext.hadoopConfiguration)
     fs.mkdirs(new Path(workingPath))
 
     resolveEntities(spark, workingPath, unresolvedPath)
-    generateResolvedEntities(spark, workingPath, graphBasePath)
-
-    // TO BE conservative we keep the original entities in the working dir
-    // and save the resolved entities on the graphBasePath
-    //In future these lines of code should be removed
-    entities.foreach {
-      e =>
-        fs.rename(new Path(s"$graphBasePath/$e"), new Path(s"$workingPath/${e}_old"))
-        fs.rename(new Path(s"$workingPath/resolvedGraph/$e"), new Path(s"$graphBasePath/$e"))
-    }
-
-}
+    generateResolvedEntities(spark, workingPath, graphBasePath, targetPath)
+  }
 
 
-def resolveEntities(spark: SparkSession, workingPath: String, unresolvedPath: String) = {
+  def resolveEntities(spark: SparkSession, workingPath: String, unresolvedPath: String) = {
     implicit val resEncoder: Encoder[Result] = Encoders.kryo(classOf[Result])
     import spark.implicits._
 
@@ -71,37 +65,43 @@ def resolveEntities(spark: SparkSession, workingPath: String, unresolvedPath: St
   }
 
 
-  def deserializeObject(input:String,  entity:EntityType ) :Result = {
+  def deserializeObject(input: String, entity: EntityType): Result = {
 
-   entity match {
-     case EntityType.publication => mapper.readValue(input, classOf[Publication])
-     case EntityType.dataset => mapper.readValue(input, classOf[OafDataset])
-     case EntityType.software=> mapper.readValue(input, classOf[Software])
-     case EntityType.otherresearchproduct=> mapper.readValue(input, classOf[OtherResearchProduct])
-   }
+    entity match {
+      case EntityType.publication => mapper.readValue(input, classOf[Publication])
+      case EntityType.dataset => mapper.readValue(input, classOf[OafDataset])
+      case EntityType.software => mapper.readValue(input, classOf[Software])
+      case EntityType.otherresearchproduct => mapper.readValue(input, classOf[OtherResearchProduct])
+    }
   }
 
- def generateResolvedEntities(spark:SparkSession,  workingPath: String, graphBasePath:String) = {
+  def generateResolvedEntities(spark: SparkSession, workingPath: String, graphBasePath: String, targetPath:String) = {
 
     implicit val resEncoder: Encoder[Result] = Encoders.kryo(classOf[Result])
     import spark.implicits._
 
-    val re:Dataset[Result] = spark.read.load(s"$workingPath/resolvedEntities").as[Result]
+    val re: Dataset[(String, Result)] = spark.read.load(s"$workingPath/resolvedEntities").as[Result].map(r => (r.getId, r))
     entities.foreach {
-      e =>
+      e => {
 
-        spark.read.text(s"$graphBasePath/$e").as[String]
-          .map(s => deserializeObject(s, e))
-          .union(re)
-          .groupByKey(_.getId)
-          .reduceGroups {
-            (x, y) =>
-              x.mergeFrom(y)
-              x
-          }.map(_._2)
-          .filter(r => r.getClass.getSimpleName.toLowerCase != "result")
-          .map(r => mapper.writeValueAsString(r))(Encoders.STRING)
-          .write.mode(SaveMode.Overwrite).option("compression", "gzip").text(s"$workingPath/resolvedGraph/$e")
+        val currentEntityDataset: Dataset[(String, Result)] = spark.read.text(s"$graphBasePath/$e").as[String].map(s => deserializeObject(s, e)).map(r => (r.getId, r))
+
+
+        currentEntityDataset.joinWith(re, currentEntityDataset("_1").equalTo(re("_1")), "left").map(k => {
+
+          val a = k._1
+          val b = k._2
+          if (b == null)
+            a._2
+          else {
+            a._2.mergeFrom(b._2)
+            a._2
+          }
+        }).map(r => mapper.writeValueAsString(r))(Encoders.STRING)
+          .write.mode(SaveMode.Overwrite).option("compression", "gzip").text(s"$targetPath/$e")
+      }
+
+
     }
   }
 }

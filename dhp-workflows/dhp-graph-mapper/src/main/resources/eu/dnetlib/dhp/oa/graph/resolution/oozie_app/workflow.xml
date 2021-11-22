@@ -8,6 +8,10 @@
             <name>unresolvedPath</name>
             <description>the path of the unresolved Entities</description>
         </property>
+        <property>
+            <name>targetPath</name>
+            <description>the target path after resolution</description>
+        </property>
     </parameters>
 
     <start to="ResolveRelations"/>
@@ -36,6 +40,7 @@
             <arg>--master</arg><arg>yarn</arg>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingDir}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}</arg>
         </spark>
         <ok to="ResolveEntities"/>
         <error to="Kill"/>
@@ -62,6 +67,7 @@
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--unresolvedPath</arg><arg>${unresolvedPath}</arg>
             <arg>--workingPath</arg><arg>${workingDir}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

@@ -4,7 +4,7 @@ package eu.dnetlib.dhp.oa.graph.resolution
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.common.EntityType
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils
-import eu.dnetlib.dhp.schema.oaf.{Result, StructuredProperty}
+import eu.dnetlib.dhp.schema.oaf.{Publication, Result, StructuredProperty}
 import org.apache.commons.io.FileUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql._
@@ -154,17 +154,37 @@ class ResolveEntitiesTest extends Serializable {
     val t  = pubDS.filter(p => p.getTitle!=null && p.getSubject!=null).filter(p => p.getTitle.asScala.exists(t => t.getValue.equalsIgnoreCase("FAKETITLE"))).count()
 
 
+    var ct = pubDS.count()
+    var et = pubDS.filter(p => p.getTitle!= null && p.getTitle.asScala.forall(t => t.getValue != null && t.getValue.nonEmpty)).count()
+
+    assertEquals(ct, et)
+
+
 
     val datDS:Dataset[Result] = spark.read.text(s"$workingDir/work/resolvedGraph/dataset").as[String].map(s => SparkResolveEntities.deserializeObject(s, EntityType.dataset))
     val td  = datDS.filter(p => p.getTitle!=null && p.getSubject!=null).filter(p => p.getTitle.asScala.exists(t => t.getValue.equalsIgnoreCase("FAKETITLE"))).count()
+    ct = datDS.count()
+    et = datDS.filter(p => p.getTitle!= null && p.getTitle.asScala.forall(t => t.getValue != null && t.getValue.nonEmpty)).count()
+    assertEquals(ct, et)
 
 
     val softDS:Dataset[Result] = spark.read.text(s"$workingDir/work/resolvedGraph/software").as[String].map(s => SparkResolveEntities.deserializeObject(s, EntityType.software))
     val ts  = softDS.filter(p => p.getTitle!=null && p.getSubject!=null).filter(p => p.getTitle.asScala.exists(t => t.getValue.equalsIgnoreCase("FAKETITLE"))).count()
+    ct = softDS.count()
+    et = softDS.filter(p => p.getTitle!= null && p.getTitle.asScala.forall(t => t.getValue != null && t.getValue.nonEmpty)).count()
+    assertEquals(ct, et)
 
 
     val orpDS:Dataset[Result] = spark.read.text(s"$workingDir/work/resolvedGraph/otherresearchproduct").as[String].map(s => SparkResolveEntities.deserializeObject(s, EntityType.otherresearchproduct))
     val to  = orpDS.filter(p => p.getTitle!=null && p.getSubject!=null).filter(p => p.getTitle.asScala.exists(t => t.getValue.equalsIgnoreCase("FAKETITLE"))).count()
+
+
+    ct = orpDS.count()
+    et = orpDS.filter(p => p.getTitle!= null && p.getTitle.asScala.forall(t => t.getValue != null && t.getValue.nonEmpty)).count()
+    assertEquals(ct, et)
+
+
+
 
 
     assertEquals(0, t)
@@ -176,6 +196,32 @@ class ResolveEntitiesTest extends Serializable {
 
 
 
+
+
+  @Test
+  def testMerge():Unit = {
+
+    val r = new Result
+    r.setSubject(List(OafMapperUtils.structuredProperty(FAKE_SUBJECT, OafMapperUtils.qualifier("fos","fosCS", "fossSchema", "fossiFIgo"), null)).asJava)
+
+    val mapper = new ObjectMapper()
+
+    val p = mapper.readValue(Source.fromInputStream(this.getClass.getResourceAsStream(s"publication")).mkString.lines.next(), classOf[Publication])
+
+
+    r.mergeFrom(p)
+
+
+    println(mapper.writeValueAsString(r))
+
+
+
+
+
+
+
+
+  }
 
 
 
