@@ -41,7 +41,7 @@ case class FundingReferenceType(funderIdentifierType: Option[String], awardTitle
 
 case class DateType(date: Option[String], dateType: Option[String]) {}
 
-case class HostedByMapType(openaire_id: String, datacite_name: String, official_name: String, similarity: Option[Float]) {}
+//case class HostedByMapType(openaire_id: String, datacite_name: String, official_name: String, similarity: Option[Float]) {}
 
 object DataciteToOAFTransformation {
 
@@ -90,17 +90,11 @@ object DataciteToOAFTransformation {
   }
 
   val mapper = new ObjectMapper()
-  val unknown_repository: HostedByMapType = HostedByMapType(ModelConstants.UNKNOWN_REPOSITORY_ORIGINALID, ModelConstants.UNKNOWN_REPOSITORY.getValue, ModelConstants.UNKNOWN_REPOSITORY.getValue, Some(1.0F))
 
   val dataInfo: DataInfo = generateDataInfo("0.9")
   val DATACITE_COLLECTED_FROM: KeyValue = OafMapperUtils.keyValue(ModelConstants.DATACITE_ID, "Datacite")
 
-  val hostedByMap: Map[String, HostedByMapType] = {
-    val s = Source.fromInputStream(getClass.getResourceAsStream("hostedBy_map.json")).mkString
-    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
-    lazy val json: org.json4s.JValue = parse(s)
-    json.extract[Map[String, HostedByMapType]]
-  }
+
 
   val df_en: DateTimeFormatter = DateTimeFormatter.ofPattern("[MM-dd-yyyy][MM/dd/yyyy][dd-MM-yy][dd-MMM-yyyy][dd/MMM/yyyy][dd-MMM-yy][dd/MMM/yy][dd-MM-yy][dd/MM/yy][dd-MM-yyyy][dd/MM/yyyy][yyyy-MM-dd][yyyy/MM/dd]", Locale.ENGLISH)
   val df_it: DateTimeFormatter = DateTimeFormatter.ofPattern("[dd-MM-yyyy][dd/MM/yyyy]", Locale.ITALIAN)
@@ -516,8 +510,8 @@ object DataciteToOAFTransformation {
     val access_rights_qualifier = if (aRights.isDefined) aRights.get else OafMapperUtils.accessRight(ModelConstants.UNKNOWN, ModelConstants.NOT_AVAILABLE, ModelConstants.DNET_ACCESS_MODES, ModelConstants.DNET_ACCESS_MODES)
 
     if (client.isDefined) {
-      val hb = hostedByMap.getOrElse(client.get.toUpperCase(), unknown_repository)
-      instance.setHostedby(OafMapperUtils.keyValue(generateDSId(hb.openaire_id), hb.official_name))
+
+      instance.setHostedby(OafMapperUtils.keyValue(generateDSId(ModelConstants.UNKNOWN_REPOSITORY_ORIGINALID), ModelConstants.UNKNOWN_REPOSITORY.getValue))
       instance.setCollectedfrom(DATACITE_COLLECTED_FROM)
       instance.setUrl(List(s"https://dx.doi.org/$doi").asJava)
       instance.setAccessright(access_rights_qualifier)

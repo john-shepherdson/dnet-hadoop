@@ -36,7 +36,7 @@ class DataciteToOAFTest extends  AbstractVocabularyTest{
 
   @Test
   def testMapping() :Unit = {
-    val record =Source.fromInputStream(getClass.getResourceAsStream("record.json")).mkString
+    val record =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/actionmanager/datacite/record.json")).mkString
 
 
 
