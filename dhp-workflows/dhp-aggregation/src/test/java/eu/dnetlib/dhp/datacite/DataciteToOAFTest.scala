@@ -4,11 +4,12 @@ package eu.dnetlib.dhp.datacite
 import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
 import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest
 import eu.dnetlib.dhp.schema.oaf.Oaf
+import org.apache.commons.io.FileUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.functions.{col, count}
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.api.{BeforeEach, Test}
+import org.junit.jupiter.api.{AfterEach, BeforeEach, Test}
 import org.mockito.junit.jupiter.MockitoExtension
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -20,7 +21,7 @@ import org.junit.jupiter.api.Assertions._
 @ExtendWith(Array(classOf[MockitoExtension]))
 class DataciteToOAFTest extends  AbstractVocabularyTest{
 
-  var workingDir:Path= null
+  private var workingDir:Path = null
   val log: Logger = LoggerFactory.getLogger(getClass)
 
   @BeforeEach
@@ -28,6 +29,11 @@ class DataciteToOAFTest extends  AbstractVocabularyTest{
 
     workingDir= Files.createTempDirectory(getClass.getSimpleName)
     super.setUpVocabulary()
+  }
+
+  @AfterEach
+  def tearDown() :Unit = {
+    FileUtils.deleteDirectory(workingDir.toFile)
   }
 
 
