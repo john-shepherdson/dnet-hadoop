@@ -2,6 +2,7 @@ package eu.dnetlib.dhp.datacite
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
+import eu.dnetlib.dhp.datacite.DataciteModelConstants._
 import eu.dnetlib.dhp.schema.action.AtomicAction
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils}
@@ -12,115 +13,30 @@ import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.parse
 
-import java.nio.charset.CodingErrorAction
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.chrono.ThaiBuddhistDate
 import java.time.format.DateTimeFormatter
-import java.util.regex.Pattern
 import java.util.{Date, Locale}
 import scala.collection.JavaConverters._
-import scala.io.{Codec, Source}
-import scala.language.postfixOps
 
-case class DataciteType(doi: String, timestamp: Long, isActive: Boolean, json: String) {}
-
-case class RelatedIdentifierType(relationType: String, relatedIdentifier: String, relatedIdentifierType: String) {}
-
-case class NameIdentifiersType(nameIdentifierScheme: Option[String], schemeUri: Option[String], nameIdentifier: Option[String]) {}
-
-case class CreatorType(nameType: Option[String], nameIdentifiers: Option[List[NameIdentifiersType]], name: Option[String], familyName: Option[String], givenName: Option[String], affiliation: Option[List[String]]) {}
-
-case class TitleType(title: Option[String], titleType: Option[String], lang: Option[String]) {}
-
-case class SubjectType(subject: Option[String], subjectScheme: Option[String]) {}
-
-case class DescriptionType(descriptionType: Option[String], description: Option[String]) {}
-
-case class FundingReferenceType(funderIdentifierType: Option[String], awardTitle: Option[String], awardUri: Option[String], funderName: Option[String], funderIdentifier: Option[String], awardNumber: Option[String]) {}
-
-case class DateType(date: Option[String], dateType: Option[String]) {}
-
-//case class HostedByMapType(openaire_id: String, datacite_name: String, official_name: String, similarity: Option[Float]) {}
 
 object DataciteToOAFTransformation {
 
-  val REL_TYPE_VALUE:String = "resultResult"
-  val DATE_RELATION_KEY = "RelationDate"
-
-  val subRelTypeMapping: Map[String,(String,String)] = Map(
-    "References" ->("IsReferencedBy","relationship"),
-    "IsSupplementTo" ->("IsSupplementedBy","supplement"),
-    "IsPartOf" ->("HasPart","part"),
-    "HasPart" ->("IsPartOf","part"),
-    "IsVersionOf" ->("HasVersion","version"),
-    "HasVersion" ->("IsVersionOf","version"),
-    "IsIdenticalTo" ->("IsIdenticalTo","relationship"),
-    "IsPreviousVersionOf" ->("IsNewVersionOf","version"),
-    "IsContinuedBy" ->("Continues","relationship"),
-    "Continues" ->("IsContinuedBy","relationship"),
-    "IsNewVersionOf" ->("IsPreviousVersionOf","version"),
-    "IsSupplementedBy" ->("IsSupplementTo","supplement"),
-    "IsDocumentedBy" ->("Documents","relationship"),
-    "IsSourceOf" ->("IsDerivedFrom","relationship"),
-    "Cites" ->("IsCitedBy","citation"),
-    "IsCitedBy" ->("Cites","citation"),
-    "IsDerivedFrom" ->("IsSourceOf","relationship"),
-    "IsVariantFormOf" ->("IsDerivedFrom","version"),
-    "IsReferencedBy" ->("References","relationship"),
-    "IsObsoletedBy" ->("IsNewVersionOf","version"),
-    "Reviews" ->("IsReviewedBy","review"),
-    "Documents" ->("IsDocumentedBy","relationship"),
-    "IsCompiledBy" ->("Compiles","relationship"),
-    "Compiles" ->("IsCompiledBy","relationship"),
-    "IsReviewedBy" ->("Reviews","review")
-  )
-
-  implicit val codec: Codec = Codec("UTF-8")
-  codec.onMalformedInput(CodingErrorAction.REPLACE)
-  codec.onUnmappableCharacter(CodingErrorAction.REPLACE)
-
-  val DOI_CLASS = "doi"
-  val SUBJ_CLASS = "keywords"
-
-
-  val j_filter: List[String] = {
-    val s = Source.fromInputStream(getClass.getResourceAsStream("datacite_filter")).mkString
-    s.lines.toList
-  }
-
   val mapper = new ObjectMapper()
 
-  val dataInfo: DataInfo = generateDataInfo("0.9")
-  val DATACITE_COLLECTED_FROM: KeyValue = OafMapperUtils.keyValue(ModelConstants.DATACITE_ID, "Datacite")
 
-
-
-  val df_en: DateTimeFormatter = DateTimeFormatter.ofPattern("[MM-dd-yyyy][MM/dd/yyyy][dd-MM-yy][dd-MMM-yyyy][dd/MMM/yyyy][dd-MMM-yy][dd/MMM/yy][dd-MM-yy][dd/MM/yy][dd-MM-yyyy][dd/MM/yyyy][yyyy-MM-dd][yyyy/MM/dd]", Locale.ENGLISH)
-  val df_it: DateTimeFormatter = DateTimeFormatter.ofPattern("[dd-MM-yyyy][dd/MM/yyyy]", Locale.ITALIAN)
-
-  val funder_regex: List[(Pattern, String)] = List(
-    (Pattern.compile("(info:eu-repo/grantagreement/ec/h2020/)(\\d\\d\\d\\d\\d\\d)(.*)", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE), "40|corda__h2020::"),
-    (Pattern.compile("(info:eu-repo/grantagreement/ec/fp7/)(\\d\\d\\d\\d\\d\\d)(.*)", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE), "40|corda_______::")
-
-  )
-
-  val Date_regex: List[Pattern] = List(
-    //Y-M-D
-    Pattern.compile("(18|19|20)\\d\\d([- /.])(0[1-9]|1[012])\\2(0[1-9]|[12][0-9]|3[01])", Pattern.MULTILINE),
-    //M-D-Y
-    Pattern.compile("((0[1-9]|1[012])|([1-9]))([- /.])(0[1-9]|[12][0-9]|3[01])([- /.])(18|19|20)?\\d\\d", Pattern.MULTILINE),
-    //D-M-Y
-    Pattern.compile("(?:(?:31(/|-|\\.)(?:0?[13578]|1[02]|(?:Jan|Mar|May|Jul|Aug|Oct|Dec)))\\1|(?:(?:29|30)(/|-|\\.)(?:0?[1,3-9]|1[0-2]|(?:Jan|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))\\2))(?:(?:1[6-9]|[2-9]\\d)?\\d{2})|(?:29(/|-|\\.)(?:0?2|(?:Feb))\\3(?:(?:(?:1[6-9]|[2-9]\\d)?(?:0[48]|[2468][048]|[13579][26])|(?:(?:16|[2468][048]|[3579][26])00))))|(?:0?[1-9]|1\\d|2[0-8])(/|-|\\.)(?:(?:0?[1-9]|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep))|(?:1[0-2]|(?:Oct|Nov|Dec)))\\4(?:(?:1[6-9]|[2-9]\\d)?\\d{2})", Pattern.MULTILINE),
-    //Y
-    Pattern.compile("(19|20)\\d\\d", Pattern.MULTILINE)
-  )
-
-
-  def filter_json(json: String): Boolean = {
-    j_filter.exists(f => json.contains(f))
+  /**
+   * This method should skip record if json contains invalid text
+   * defined in gile datacite_filter
+   * @param json
+   * @return True if the record should be skipped
+   */
+  def skip_record(json: String): Boolean = {
+    datacite_filter.exists(f => json.contains(f))
   }
 
+  @deprecated("this method will be removed", "dhp")
   def toActionSet(item: Oaf): (String, String) = {
     val mapper = new ObjectMapper()
 
@@ -200,6 +116,8 @@ object DataciteToOAFTransformation {
       case _: Throwable => ""
     }
   }
+
+
   def getTypeQualifier(resourceType: String, resourceTypeGeneral: String, schemaOrg: String, vocabularies: VocabularyGroup): (Qualifier, Qualifier) = {
     if (resourceType != null && resourceType.nonEmpty) {
       val typeQualifier = vocabularies.getSynonymAsQualifier(ModelConstants.DNET_PUBLICATION_RESOURCE, resourceType)
@@ -318,11 +236,7 @@ object DataciteToOAFTransformation {
       val p = match_pattern.get._2
       val grantId = m.matcher(awardUri).replaceAll("$2")
       val targetId = s"$p${DHPUtils.md5(grantId)}"
-      List(
-        generateRelation(sourceId, targetId, "isProducedBy", DATACITE_COLLECTED_FROM, dataInfo)
-// REMOVED INVERSE RELATION since there is a specific method that should generate later
-//        generateRelation(targetId, sourceId, "produces", DATACITE_COLLECTED_FROM, dataInfo)
-      )
+      List( generateRelation(sourceId, targetId, "isProducedBy", DATACITE_COLLECTED_FROM, dataInfo) )
     }
     else
       List()
@@ -331,7 +245,7 @@ object DataciteToOAFTransformation {
 
 
   def generateOAF(input: String, ts: Long, dateOfCollection: Long, vocabularies: VocabularyGroup, exportLinks: Boolean): List[Oaf] = {
-    if (filter_json(input))
+    if (skip_record(input))
       return List()
 
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
@@ -565,7 +479,7 @@ object DataciteToOAFTransformation {
         rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
         rel.setDataInfo(dataInfo)
 
-        val subRelType = subRelTypeMapping(r.relationType)._2
+        val subRelType = subRelTypeMapping(r.relationType).relType
         rel.setRelType(REL_TYPE_VALUE)
         rel.setSubRelType(subRelType)
         rel.setRelClass(r.relationType)
@@ -579,18 +493,9 @@ object DataciteToOAFTransformation {
         rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
         rel.getCollectedfrom.asScala.map(c => c.getValue).toList
         rel
-      }).toList
+      })
   }
 
-  def generateDataInfo(trust: String): DataInfo = {
-    val di = new DataInfo
-    di.setDeletedbyinference(false)
-    di.setInferred(false)
-    di.setInvisible(false)
-    di.setTrust(trust)
-    di.setProvenanceaction(ModelConstants.PROVENANCE_ACTION_SET_QUALIFIER)
-    di
-  }
 
   def generateDSId(input: String): String = {
     val b = StringUtils.substringBefore(input, "::")
