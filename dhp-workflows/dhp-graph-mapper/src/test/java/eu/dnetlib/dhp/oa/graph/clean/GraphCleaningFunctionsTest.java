@@ -225,28 +225,26 @@ public class GraphCleaningFunctionsTest {
 				GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
 	}
 
-
-
 	@Test
 	public void testCleanDoiBoost() throws IOException {
-		String json = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/doiboostpub.json"));
+		String json = IOUtils
+			.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/doiboostpub.json"));
 		Publication p_in = MAPPER.readValue(json, Publication.class);
 		Publication p_out = OafCleaner.apply(GraphCleaningFunctions.fixVocabularyNames(p_in), mapping);
 		Publication cleaned = GraphCleaningFunctions.cleanup(p_out);
 
-
-		Assertions.assertEquals(true,GraphCleaningFunctions.filter(cleaned) );
+		Assertions.assertEquals(true, GraphCleaningFunctions.filter(cleaned));
 	}
 
 	@Test
 	public void testCleanDoiBoost2() throws IOException {
-		String json = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/doiboostpub2.json"));
+		String json = IOUtils
+			.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/doiboostpub2.json"));
 		Publication p_in = MAPPER.readValue(json, Publication.class);
 		Publication p_out = OafCleaner.apply(GraphCleaningFunctions.fixVocabularyNames(p_in), mapping);
 		Publication cleaned = GraphCleaningFunctions.cleanup(p_out);
 
-
-		Assertions.assertEquals(true,GraphCleaningFunctions.filter(cleaned) );
+		Assertions.assertEquals(true, GraphCleaningFunctions.filter(cleaned));
 
 	}
 }

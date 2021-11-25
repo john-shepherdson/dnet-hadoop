@@ -210,11 +210,16 @@ public class DoiBoostAuthorMerger {
 				enrich.setPid(new ArrayList<>());
 			}
 			Set<String> aPids = enrich.getPid().stream().map(p -> pidToComparableString(p)).collect(Collectors.toSet());
+			ArrayList<StructuredProperty> newPids = new ArrayList<>();
+			newPids.addAll(enrich.getPid());
 			enriching.getPid().forEach(p -> {
-				if (!aPids.contains(pidToComparableString(p))) {
-					enrich.getPid().add(p);
+				String pidToComparableString = pidToComparableString(p);
+				if (!aPids.contains(pidToComparableString)) {
+					newPids.add(p);
+					aPids.add(pidToComparableString);
 				}
 			});
+			enrich.setPid(newPids);
 			if (enrich.getAffiliation() == null) {
 				if (enriching.getAffiliation() != null) {
 					enrich.setAffiliation(enriching.getAffiliation());

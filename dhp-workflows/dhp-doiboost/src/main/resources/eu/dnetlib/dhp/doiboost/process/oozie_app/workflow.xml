@@ -86,7 +86,7 @@
             <case to="ProcessUW">${wf:conf('resumeFrom') eq 'PreprocessUW'}</case>
             <case to="ProcessORCID">${wf:conf('resumeFrom') eq 'ProcessORCID'}</case>
             <case to="CreateDOIBoost">${wf:conf('resumeFrom') eq 'CreateDOIBoost'}</case>
-            <case to="GenerateActionSet">${wf:conf('resumeFrom') eq 'GenerateActionSet'}</case>
+<!--            <case to="GenerateActionSet">${wf:conf('resumeFrom') eq 'GenerateActionSet'}</case>-->
             <default to="ConvertCrossrefToOAF"/>
         </switch>
     </decision>
@@ -226,40 +226,40 @@
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--master</arg><arg>yarn-cluster</arg>
         </spark>
-        <ok to="GenerateActionSet"/>
-        <error to="Kill"/>
-    </action>
-
-
-    <action name="GenerateActionSet">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn-cluster</master>
-            <mode>cluster</mode>
-            <name>Generate DOIBoost ActionSet</name>
-            <class>eu.dnetlib.doiboost.SparkGenerateDOIBoostActionSet</class>
-            <jar>dhp-doiboost-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.sql.shuffle.partitions=3840
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-            </spark-opts>
-            <arg>--dbPublicationPath</arg><arg>${workingPath}/doiBoostPublicationFiltered</arg>
-            <arg>--dbDatasetPath</arg><arg>${workingPath}/crossrefDataset</arg>
-            <arg>--crossRefRelation</arg><arg>${workingPath}/crossrefRelation</arg>
-            <arg>--dbaffiliationRelationPath</arg><arg>${workingPath}/doiBoostPublicationAffiliation</arg>
-            <arg>--dbOrganizationPath</arg><arg>${workingPath}/doiBoostOrganization</arg>
-            <arg>--targetPath</arg><arg>${workingPath}/actionDataSet</arg>
-            <arg>--sFilePath</arg><arg>${outputPath}</arg>
-            <arg>--master</arg><arg>yarn-cluster</arg>
-        </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
+
+
+<!--    <action name="GenerateActionSet">-->
+<!--        <spark xmlns="uri:oozie:spark-action:0.2">-->
+<!--            <master>yarn-cluster</master>-->
+<!--            <mode>cluster</mode>-->
+<!--            <name>Generate DOIBoost ActionSet</name>-->
+<!--            <class>eu.dnetlib.doiboost.SparkGenerateDOIBoostActionSet</class>-->
+<!--            <jar>dhp-doiboost-${projectVersion}.jar</jar>-->
+<!--            <spark-opts>-->
+<!--                &#45;&#45;executor-memory=${sparkExecutorMemory}-->
+<!--                &#45;&#45;executor-cores=${sparkExecutorCores}-->
+<!--                &#45;&#45;driver-memory=${sparkDriverMemory}-->
+<!--                &#45;&#45;conf spark.sql.shuffle.partitions=3840-->
+<!--                &#45;&#45;conf spark.extraListeners=${spark2ExtraListeners}-->
+<!--                &#45;&#45;conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}-->
+<!--                &#45;&#45;conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}-->
+<!--                &#45;&#45;conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}-->
+<!--            </spark-opts>-->
+<!--            <arg>&#45;&#45;dbPublicationPath</arg><arg>${workingPath}/doiBoostPublicationFiltered</arg>-->
+<!--            <arg>&#45;&#45;dbDatasetPath</arg><arg>${workingPath}/crossrefDataset</arg>-->
+<!--            <arg>&#45;&#45;crossRefRelation</arg><arg>${workingPath}/crossrefRelation</arg>-->
+<!--            <arg>&#45;&#45;dbaffiliationRelationPath</arg><arg>${workingPath}/doiBoostPublicationAffiliation</arg>-->
+<!--            <arg>&#45;&#45;dbOrganizationPath</arg><arg>${workingPath}/doiBoostOrganization</arg>-->
+<!--            <arg>&#45;&#45;targetPath</arg><arg>${workingPath}/actionDataSet</arg>-->
+<!--            <arg>&#45;&#45;sFilePath</arg><arg>${outputPath}</arg>-->
+<!--            <arg>&#45;&#45;master</arg><arg>yarn-cluster</arg>-->
+<!--        </spark>-->
+<!--        <ok to="End"/>-->
+<!--        <error to="Kill"/>-->
+<!--    </action>-->
 
     <end name="End"/>
 </workflow-app>
