@@ -29,8 +29,6 @@ select rcount.pid, sum(case when rcount.type='publication' then rcount.count els
 from rcount
 group by rcount.pid;
 
-create view ${stats_db_name}.rndexpenditure as select * from stats_ext.rndexpediture;
-
 create table ${stats_db_name}.result_instance stored as parquet as
 select distinct r.*
 from (
@@ -39,12 +37,10 @@ from (
          from ${openaire_db_name}.result r lateral view explode(r.instance) instances as inst lateral view explode(inst.pid) pids as p) r
 join ${stats_db_name}.result res on res.id=r.id;
 
-create table ${stats_db_name}.result_apc as
+create table ${stats_db_name}.result_apc STORED AS PARQUET as
 select r.id, r.amount, r.currency
 from (
          select substr(r.id, 4) as id, cast(inst.processingchargeamount.value as float) as amount, inst.processingchargecurrency.value as currency
          from ${openaire_db_name}.result r lateral view explode(r.instance) instances as inst) r
 join ${stats_db_name}.result res on res.id=r.id
 where r.amount is not null;
-
-create view ${stats_db_name}.issn_gold_oa_dataset as select * from stats_ext.issn_gold_oa_dataset;

@@ -104,7 +104,7 @@ WHERE otherresearchproduct_tmp.id IN (SELECT distinct r.id
                                         AND pr.id = p.id
                                         AND to_date(r.date) - to_date(p.enddate) > 0);
 
-CREATE OR REPLACE VIEW ${stats_db_name}.project_results_publication AS
+CREATE OR REPLACE VIEW ${stats_db_name}.project_results_publication STORED AS PARQUET AS
 SELECT result_projects.id          AS result,
        result_projects.project     AS project_results,
        result.date                 as resultdate,
