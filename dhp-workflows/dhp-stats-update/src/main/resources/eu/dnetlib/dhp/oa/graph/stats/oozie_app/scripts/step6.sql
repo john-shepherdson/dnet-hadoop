@@ -3,7 +3,7 @@
 -- Project table/view and Project related tables/views
 ------------------------------------------------------
 ------------------------------------------------------
-CREATE TABLE ${stats_db_name}.project_oids AS
+CREATE TABLE ${stats_db_name}.project_oids STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, oids.ids AS oid
 FROM ${openaire_db_name}.project p LATERAL VIEW explode(p.originalid) oids AS ids;
 CREATE TABLE ${stats_db_name}.project_organizations AS
@@ -12,13 +12,13 @@ from ${openaire_db_name}.relation r
 WHERE r.reltype = 'projectOrganization'
   and r.datainfo.deletedbyinference = false;
 
-CREATE TABLE ${stats_db_name}.project_results AS
+CREATE TABLE ${stats_db_name}.project_results STORED AS PARQUET AS
 SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS result, r.datainfo.provenanceaction.classname as provenance
 FROM ${openaire_db_name}.relation r
 WHERE r.reltype = 'resultProject'
   and r.datainfo.deletedbyinference = false;
 
-create table ${stats_db_name}.project_classification as
+create table ${stats_db_name}.project_classification STORED AS PARQUET as
 select substr(p.id, 4) as id, class.h2020programme.code, class.level1, class.level2, class.level3
 from ${openaire_db_name}.project p
     lateral view explode(p.h2020classification) classifs as class
@@ -74,7 +74,7 @@ SELECT substr(p.id, 4)                                                 AS id,
 FROM ${openaire_db_name}.project p
 WHERE p.datainfo.deletedbyinference = false;
 
-create table ${stats_db_name}.funder as
+create table ${stats_db_name}.funder STORED AS PARQUET as
 select distinct xpath_string(fund, '//funder/id')        as id,
                 xpath_string(fund, '//funder/name')      as name,
                 xpath_string(fund, '//funder/shortname') as shortname

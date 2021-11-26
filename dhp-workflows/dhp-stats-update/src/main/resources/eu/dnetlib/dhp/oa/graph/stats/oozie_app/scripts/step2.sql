@@ -40,13 +40,13 @@ SELECT substr(p.id, 4)                                            as id,
 from ${openaire_db_name}.publication p
 where p.datainfo.deletedbyinference = false;
 
-CREATE TABLE ${stats_db_name}.publication_classifications AS
+CREATE TABLE ${stats_db_name}.publication_classifications STORED AS PARQUET AS
 SELECT substr(p.id, 4) as id, instancetype.classname as type
 from ${openaire_db_name}.publication p
          LATERAL VIEW explode(p.instance.instancetype) instances as instancetype
 where p.datainfo.deletedbyinference = false;
 
-CREATE TABLE ${stats_db_name}.publication_concepts AS
+CREATE TABLE ${stats_db_name}.publication_concepts STORED AS PARQUET AS
 SELECT substr(p.id, 4) as id, case
     when contexts.context.id RLIKE '^[^::]+::[^::]+::.+$' then contexts.context.id
     when contexts.context.id RLIKE '^[^::]+::[^::]+$' then concat(contexts.context.id, '::other')
@@ -55,7 +55,7 @@ from ${openaire_db_name}.publication p
          LATERAL VIEW explode(p.context) contexts as context
 where p.datainfo.deletedbyinference = false;
 
-CREATE TABLE ${stats_db_name}.publication_datasources as
+CREATE TABLE ${stats_db_name}.publication_datasources STORED AS PARQUET as
 SELECT p.id, case when d.id is null then 'other' else p.datasource end as datasource
 FROM (
          SELECT substr(p.id, 4) as id, substr(instances.instance.hostedby.key, 4) as datasource
@@ -66,30 +66,30 @@ FROM (
     from ${openaire_db_name}.datasource d
     WHERE d.datainfo.deletedbyinference = false) d on p.datasource = d.id;
 
-CREATE TABLE ${stats_db_name}.publication_languages AS
+CREATE TABLE ${stats_db_name}.publication_languages STORED AS PARQUET AS
 select substr(p.id, 4) as id, p.language.classname as language
 FROM ${openaire_db_name}.publication p
 where p.datainfo.deletedbyinference = false;
 
-CREATE TABLE ${stats_db_name}.publication_oids AS
+CREATE TABLE ${stats_db_name}.publication_oids STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, oids.ids AS oid
 FROM ${openaire_db_name}.publication p
          LATERAL VIEW explode(p.originalid) oids AS ids
 where p.datainfo.deletedbyinference = false;
 
-CREATE TABLE ${stats_db_name}.publication_pids AS
+CREATE TABLE ${stats_db_name}.publication_pids STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, ppid.qualifier.classname AS type, ppid.value as pid
 FROM ${openaire_db_name}.publication p
          LATERAL VIEW explode(p.pid) pids AS ppid
 where p.datainfo.deletedbyinference = false;
 
-CREATE TABLE ${stats_db_name}.publication_topics as
+CREATE TABLE ${stats_db_name}.publication_topics STORED AS PARQUET as
 select substr(p.id, 4) AS id, subjects.subject.qualifier.classname AS TYPE, subjects.subject.value AS topic
 FROM ${openaire_db_name}.publication p
          LATERAL VIEW explode(p.subject) subjects AS subject
 where p.datainfo.deletedbyinference = false;
 
-CREATE TABLE ${stats_db_name}.publication_citations AS
+CREATE TABLE ${stats_db_name}.publication_citations STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, xpath_string(citation.value, "//citation/id[@type='openaire']/@value") AS cites
 FROM ${openaire_db_name}.publication p
          lateral view explode(p.extrainfo) citations AS citation

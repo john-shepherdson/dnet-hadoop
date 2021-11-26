@@ -4,29 +4,28 @@
 ------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------
 CREATE OR REPLACE VIEW ${stats_db_name}.fundref AS
-SELECT *
-FROM ${external_stats_db_name}.fundref;
+SELECT * FROM ${external_stats_db_name}.fundref;
 
 CREATE OR REPLACE VIEW ${stats_db_name}.country AS
-SELECT *
-FROM ${external_stats_db_name}.country;
+SELECT * FROM ${external_stats_db_name}.country;
 
 CREATE OR REPLACE VIEW ${stats_db_name}.countrygdp AS
-SELECT *
-FROM ${external_stats_db_name}.countrygdp;
+SELECT * FROM ${external_stats_db_name}.countrygdp;
 
 CREATE OR REPLACE VIEW ${stats_db_name}.roarmap AS
-SELECT *
-FROM ${external_stats_db_name}.roarmap;
+SELECT * FROM ${external_stats_db_name}.roarmap;
 
 CREATE OR REPLACE VIEW ${stats_db_name}.rndexpediture AS
-SELECT *
-FROM ${external_stats_db_name}.rndexpediture;
+SELECT * FROM ${external_stats_db_name}.rndexpediture;
 
 CREATE OR REPLACE VIEW ${stats_db_name}.licenses_normalized AS
-SELECT *
-FROM ${external_stats_db_name}.licenses_normalized;
+SELECT * FROM ${external_stats_db_name}.licenses_normalized;
 
+create view ${stats_db_name}.rndexpenditure as
+select * from stats_ext.rndexpediture;
+
+create view ${stats_db_name}.issn_gold_oa_dataset as
+select * from stats_ext.issn_gold_oa_dataset;
 
 ------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------

@@ -30,18 +30,14 @@ hdfs dfs -copyFromLocal concepts.csv ${TMP}
 hdfs dfs -chmod -R 777 ${TMP}
 
 echo "Creating and populating impala tables"
-impala-shell -q "invalidate metadata"
-impala-shell -d ${TARGET_DB} -q "invalidate metadata"
-impala-shell -q "create table ${TARGET_DB}.context (id string, name string) row format delimited fields terminated by ','"
-impala-shell -q "create table ${TARGET_DB}.category (context string, id string, name string) row format delimited fields terminated by ','"
-impala-shell -q "create table ${TARGET_DB}.concept (category string, id string, name string) row format delimited fields terminated by ','"
-impala-shell -d ${TARGET_DB} -q "invalidate metadata"
-impala-shell -q "load data inpath '${TMP}/contexts.csv' into table ${TARGET_DB}.context"
-impala-shell -q "load data inpath '${TMP}/categories.csv' into table ${TARGET_DB}.category"
-impala-shell -q "load data inpath '${TMP}/concepts.csv' into table ${TARGET_DB}.concept"
+hive -e "create table ${TARGET_DB}.context (id string, name string) row format delimited fields terminated by ','"
+hive -e "create table ${TARGET_DB}.category (context string, id string, name string) row format delimited fields terminated by ','"
+hive -e "create table ${TARGET_DB}.concept (category string, id string, name string) row format delimited fields terminated by ','"
+hive -e "load data inpath '${TMP}/contexts.csv' into table ${TARGET_DB}.context"
+hive -e "load data inpath '${TMP}/categories.csv' into table ${TARGET_DB}.category"
+hive -e "load data inpath '${TMP}/concepts.csv' into table ${TARGET_DB}.concept"
 
 echo "Cleaning up"
-hdfs dfs -rm -f -r -skipTrash ${TMP}
 rm concepts.csv
 rm categories.csv
 rm contexts.csv
