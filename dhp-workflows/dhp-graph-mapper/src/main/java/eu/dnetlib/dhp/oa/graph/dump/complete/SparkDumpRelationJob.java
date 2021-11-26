@@ -71,22 +71,22 @@ public class SparkDumpRelationJob implements Serializable {
 		Dataset<Relation> relations = Utils.readPath(spark, inputPath, Relation.class);
 		relations
 			.map((MapFunction<Relation, eu.dnetlib.dhp.schema.dump.oaf.graph.Relation>) relation -> {
-				eu.dnetlib.dhp.schema.dump.oaf.graph.Relation rel_new = new eu.dnetlib.dhp.schema.dump.oaf.graph.Relation();
-				rel_new
+				eu.dnetlib.dhp.schema.dump.oaf.graph.Relation relNew = new eu.dnetlib.dhp.schema.dump.oaf.graph.Relation();
+				relNew
 					.setSource(
 						Node
 							.newInstance(
 								relation.getSource(),
 								ModelSupport.idPrefixEntity.get(relation.getSource().substring(0, 2))));
 
-				rel_new
+				relNew
 					.setTarget(
 						Node
 							.newInstance(
 								relation.getTarget(),
 								ModelSupport.idPrefixEntity.get(relation.getTarget().substring(0, 2))));
 
-				rel_new
+				relNew
 					.setReltype(
 						RelType
 							.newInstance(
@@ -96,26 +96,22 @@ public class SparkDumpRelationJob implements Serializable {
 				Optional<DataInfo> odInfo = Optional.ofNullable(relation.getDataInfo());
 				if (odInfo.isPresent()) {
 					DataInfo dInfo = odInfo.get();
-					if (Optional.ofNullable(dInfo.getProvenanceaction()).isPresent()) {
-						if (Optional.ofNullable(dInfo.getProvenanceaction().getClassname()).isPresent()) {
-							rel_new
-								.setProvenance(
-									Provenance
-										.newInstance(
-											dInfo.getProvenanceaction().getClassname(),
-											dInfo.getTrust()));
-						}
+					if (Optional.ofNullable(dInfo.getProvenanceaction()).isPresent() &&
+						Optional.ofNullable(dInfo.getProvenanceaction().getClassname()).isPresent()) {
+						relNew
+							.setProvenance(
+								Provenance
+									.newInstance(
+										dInfo.getProvenanceaction().getClassname(),
+										dInfo.getTrust()));
 					}
 				}
-//						Optional
-//								.ofNullable(relation.getDataInfo())
-//								.ifPresent(
-//										datainfo -> rel_new
-//												.setProvenance(
-//														Provenance
-//																.newInstance(datainfo.getProvenanceaction().getClassname(), datainfo.getTrust())));
+				if (Boolean.TRUE.equals(relation.getValidated())) {
+					relNew.setValidated(relation.getValidated());
+					relNew.setValidationDate(relation.getValidationDate());
+				}
 
-				return rel_new;
+				return relNew;
 
 			}, Encoders.bean(eu.dnetlib.dhp.schema.dump.oaf.graph.Relation.class))
 			.write()

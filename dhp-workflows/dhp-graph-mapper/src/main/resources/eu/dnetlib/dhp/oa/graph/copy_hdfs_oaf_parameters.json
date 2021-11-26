@@ -1,0 +1,38 @@
+[
+	{
+		"paramName": "p",
+		"paramLongName": "hdfsPath",
+		"paramDescription": "the path where storing the sequential file",
+		"paramRequired": true
+	},
+	{
+		"paramName": "u",
+		"paramLongName": "mdstoreManagerUrl",
+		"paramDescription": "the MdstoreManager url",
+		"paramRequired": true
+	},
+	{
+		"paramName": "f",
+		"paramLongName": "mdFormat",
+		"paramDescription": "metadata format",
+		"paramRequired": true
+	},
+	{
+		"paramName": "l",
+		"paramLongName": "mdLayout",
+		"paramDescription": "metadata layout",
+		"paramRequired": true
+	},
+	{
+		"paramName": "m",
+		"paramLongName": "master",
+		"paramDescription": "should be yarn or local",
+		"paramRequired": true
+	},
+	{
+		"paramName": "i",
+		"paramLongName": "mdInterpretation",
+		"paramDescription": "metadata interpretation",
+		"paramRequired": true
+	}
+]

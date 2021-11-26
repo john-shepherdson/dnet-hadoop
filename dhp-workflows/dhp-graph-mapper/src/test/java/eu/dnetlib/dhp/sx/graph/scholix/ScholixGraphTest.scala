@@ -1,10 +1,10 @@
 package eu.dnetlib.dhp.sx.graph.scholix
 
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
+import eu.dnetlib.dhp.oa.graph.resolution.SparkResolveRelation
 import eu.dnetlib.dhp.schema.oaf.{Relation, Result}
 import eu.dnetlib.dhp.schema.sx.scholix.Scholix
 import eu.dnetlib.dhp.schema.sx.summary.ScholixSummary
-import eu.dnetlib.dhp.sx.graph.SparkResolveRelation
 import eu.dnetlib.dhp.sx.graph.bio.pubmed.AbstractVocabularyTest
 import org.json4s
 import org.json4s.DefaultFormats

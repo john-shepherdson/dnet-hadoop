@@ -20,6 +20,7 @@ import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.model.Block;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
@@ -102,7 +103,7 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 				.createDataset(
 					Deduper
 						.computeRelations(sc, blocks, dedupConf)
-						.map(t -> createSimRel(t._1(), t._2(), entity))
+						.map(t -> DedupUtility.createSimRel(t._1(), t._2(), entity))
 						.repartition(numPartitions)
 						.rdd(),
 					Encoders.bean(Relation.class));
@@ -111,24 +112,4 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 		}
 	}
 
-	private Relation createSimRel(String source, String target, String entity) {
-		final Relation r = new Relation();
-		r.setSource(source);
-		r.setTarget(target);
-		r.setSubRelType("dedupSimilarity");
-		r.setRelClass("isSimilarTo");
-		r.setDataInfo(new DataInfo());
-
-		switch (entity) {
-			case "result":
-				r.setRelType("resultResult");
-				break;
-			case "organization":
-				r.setRelType("organizationOrganization");
-				break;
-			default:
-				throw new IllegalArgumentException("unmanaged entity type: " + entity);
-		}
-		return r;
-	}
 }

@@ -61,9 +61,11 @@ public class SparkCopyRelationsNoOpenorgs extends AbstractSparkAction {
 			.textFile(relationPath)
 			.map(patchRelFn(), Encoders.bean(Relation.class))
 			.toJavaRDD()
-			.filter(x -> !isOpenorgs(x));
+			.filter(x -> !isOpenorgsDedupRel(x));
 
-		log.info("Number of non-Openorgs relations collected: {}", simRels.count());
+		if (log.isDebugEnabled()) {
+			log.debug("Number of non-Openorgs relations collected: {}", simRels.count());
+		}
 
 		spark
 			.createDataset(simRels.rdd(), Encoders.bean(Relation.class))

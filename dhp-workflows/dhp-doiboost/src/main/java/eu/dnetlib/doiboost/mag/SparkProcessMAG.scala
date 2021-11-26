@@ -111,25 +111,8 @@ object SparkProcessMAG {
       .map(item => ConversionUtil.updatePubsWithConferenceInfo(item))
       .write
       .mode(SaveMode.Overwrite)
-      .save(s"$workingPath/merge_step_2_conference")
-
-
-    magPubs= spark.read.load(s"$workingPath/merge_step_2_conference").as[Publication]
-      .map(p => (ConversionUtil.extractMagIdentifier(p.getOriginalId.asScala), p)).as[(String, Publication)]
-
-    val paperUrlDataset = spark.read.load(s"$sourcePath/PaperUrls").as[MagPaperUrl].groupBy("PaperId").agg(collect_list(struct("sourceUrl")).as("instances")).as[MagUrl]
-
-
-    logger.info("Phase 5) enrich publication with URL and Instances")
-    magPubs.joinWith(paperUrlDataset, col("_1").equalTo(paperUrlDataset("PaperId")), "left")
-      .map { a: ((String, Publication), MagUrl) => ConversionUtil.addInstances((a._1._2, a._2)) }
-      .write.mode(SaveMode.Overwrite)
       .save(s"$workingPath/merge_step_3")
 
-
-//    logger.info("Phase 6) Enrich Publication with description")
-//    val pa = spark.read.load(s"${parser.get("sourcePath")}/PaperAbstractsInvertedIndex").as[MagPaperAbstract]
-//    pa.map(ConversionUtil.transformPaperAbstract).write.mode(SaveMode.Overwrite).save(s"${parser.get("targetPath")}/PaperAbstract")
 
     val paperAbstract = spark.read.load((s"$workingPath/PaperAbstract")).as[MagPaperAbstract]
 
@@ -162,12 +145,14 @@ object SparkProcessMAG {
       .write.mode(SaveMode.Overwrite)
       .save(s"$workingPath/mag_publication")
 
+    spark.read.load(s"$workingPath/mag_publication").as[Publication]
+      .filter(p => p.getId != null)
+      .groupByKey(p => p.getId)
+      .reduceGroups((a:Publication, b:Publication) => ConversionUtil.mergePublication(a,b))
+      .map(_._2)
+      .write.mode(SaveMode.Overwrite).save(s"$targetPath/magPublication")
 
-    val s:RDD[Publication] = spark.read.load(s"$workingPath/mag_publication").as[Publication]
-      .map(p=>Tuple2(p.getId, p)).rdd.reduceByKey((a:Publication, b:Publication) => ConversionUtil.mergePublication(a,b))
-    .map(_._2)
 
-    spark.createDataset(s).as[Publication].write.mode(SaveMode.Overwrite).save(s"$targetPath/magPublication")
 
   }
 }

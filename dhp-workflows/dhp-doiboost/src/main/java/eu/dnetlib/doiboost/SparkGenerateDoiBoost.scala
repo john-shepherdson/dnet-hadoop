@@ -206,7 +206,7 @@ object SparkGenerateDoiBoost {
         (r.getSource, r)
       else if (r.getTarget.startsWith("unresolved"))
         (r.getTarget,r)
-      else
+        else
         ("resolved", r)
     })(Encoders.tuple(Encoders.STRING, mapEncoderRel))
 
@@ -221,7 +221,7 @@ object SparkGenerateDoiBoost {
             currentRels.setSource(currentOrgs._1)
           else
             currentRels.setTarget(currentOrgs._1)
-        currentRels
+      currentRels
       }.filter(r=> !r.getSource.startsWith("unresolved") && !r.getTarget.startsWith("unresolved")).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/doiBoostPublicationAffiliation")
 
     magPubs.joinWith(a,magPubs("_1").equalTo(a("PaperId"))).map( item => {
@@ -242,6 +242,6 @@ object SparkGenerateDoiBoost {
       else
         null
     }).filter(o=> o!=null).write.mode(SaveMode.Overwrite).save(s"$workingDirPath/doiBoostOrganization")
-  }
+    }
 
 }

@@ -13,7 +13,51 @@
 	<artifactId>dhp-common</artifactId>
 	<packaging>jar</packaging>
 
+	<distributionManagement>
+		<site>
+			<id>DHPSite</id>
+			<url>${dhp.site.stage.path}/dhp-common</url>
+		</site>
+	</distributionManagement>
+
 	<description>This module contains common utilities meant to be used across the dnet-hadoop submodules</description>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>scala-maven-plugin</artifactId>
+				<version>${net.alchim31.maven.version}</version>
+				<executions>
+					<execution>
+						<id>scala-compile-first</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>add-source</goal>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>scala-test-compile</id>
+						<phase>process-test-resources</phase>
+						<goals>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>scala-doc</id>
+						<phase>process-resources</phase> <!-- or wherever -->
+						<goals>
+							<goal>doc</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<scalaVersion>${scala.version}</scalaVersion>
+				</configuration>
+			</plugin>
+		</plugins>
+
+	</build>
 
 	<dependencies>
 

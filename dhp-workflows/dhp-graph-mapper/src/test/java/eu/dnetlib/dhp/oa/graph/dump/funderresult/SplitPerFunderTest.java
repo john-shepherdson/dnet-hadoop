@@ -75,7 +75,7 @@ public class SplitPerFunderTest {
 			"-isSparkSessionManaged", Boolean.FALSE.toString(),
 			"-outputPath", workingDir.toString() + "/split",
 			"-sourcePath", sourcePath,
-			"-relationPath", sourcePath
+			"-graphPath", sourcePath
 
 		});
 
@@ -136,6 +136,18 @@ public class SplitPerFunderTest {
 			.textFile(workingDir.toString() + "/split/EC_H2020")
 			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 		Assertions.assertEquals(3, tmp.count());
+
+		// MZOS 1
+		tmp = sc
+			.textFile(workingDir.toString() + "/split/MZOS")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+		Assertions.assertEquals(1, tmp.count());
+
+		// CONICYT 0
+		tmp = sc
+			.textFile(workingDir.toString() + "/split/CONICYTF")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+		Assertions.assertEquals(0, tmp.count());
 
 	}
 }

@@ -26,9 +26,11 @@ import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.dump.oaf.Provenance;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Funder;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
+import eu.dnetlib.dhp.schema.dump.oaf.community.Validated;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -78,7 +80,9 @@ public class SparkPrepareResultProject implements Serializable {
 	private static void prepareResultProjectList(SparkSession spark, String inputPath, String outputPath) {
 		Dataset<Relation> relation = Utils
 			.readPath(spark, inputPath + "/relation", Relation.class)
-			.filter("dataInfo.deletedbyinference = false and lower(relClass) = 'isproducedby'");
+			.filter(
+				"dataInfo.deletedbyinference = false and lower(relClass) = '"
+					+ ModelConstants.IS_PRODUCED_BY.toLowerCase() + "'");
 		Dataset<eu.dnetlib.dhp.schema.oaf.Project> projects = Utils
 			.readPath(spark, inputPath + "/project", eu.dnetlib.dhp.schema.oaf.Project.class);
 
@@ -98,7 +102,7 @@ public class SparkPrepareResultProject implements Serializable {
 					rp.setResultId(s);
 					eu.dnetlib.dhp.schema.oaf.Project p = first._1();
 					projectSet.add(p.getId());
-					Project ps = getProject(p);
+					Project ps = getProject(p, first._2);
 
 					List<Project> projList = new ArrayList<>();
 					projList.add(ps);
@@ -107,7 +111,7 @@ public class SparkPrepareResultProject implements Serializable {
 						eu.dnetlib.dhp.schema.oaf.Project op = c._1();
 						if (!projectSet.contains(op.getId())) {
 							projList
-								.add(getProject(op));
+								.add(getProject(op, c._2));
 
 							projectSet.add(op.getId());
 
@@ -122,7 +126,7 @@ public class SparkPrepareResultProject implements Serializable {
 			.json(outputPath);
 	}
 
-	private static Project getProject(eu.dnetlib.dhp.schema.oaf.Project op) {
+	private static Project getProject(eu.dnetlib.dhp.schema.oaf.Project op, Relation relation) {
 		Project p = Project
 			.newInstance(
 				op.getId(),
@@ -157,7 +161,9 @@ public class SparkPrepareResultProject implements Serializable {
 			provenance.setTrust(di.get().getTrust());
 			p.setProvenance(provenance);
 		}
-
+		if (Boolean.TRUE.equals(relation.getValidated())) {
+			p.setValidated(Validated.newInstance(relation.getValidated(), relation.getValidationDate()));
+		}
 		return p;
 
 	}
@@ -173,8 +179,8 @@ public class SparkPrepareResultProject implements Serializable {
 			f.setName(((Node) (doc.selectNodes("//funder/name").get(0))).getText());
 			f.setJurisdiction(((Node) (doc.selectNodes("//funder/jurisdiction").get(0))).getText());
 			for (Object o : doc.selectNodes("//funding_level_0")) {
-				List node = ((Node) o).selectNodes("./name");
-				f.setFundingStream(((Node) node.get(0)).getText());
+				List<Node> node = ((Node) o).selectNodes("./name");
+				f.setFundingStream((node.get(0)).getText());
 			}
 
 			return f;

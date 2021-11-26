@@ -70,7 +70,7 @@ case object Crossref2Oaf {
     "reference-book" -> "0002 Book",
     "monograph" -> "0002 Book",
     "journal-article" -> "0001 Article",
-    "dissertation" -> "0006 Doctoral thesis",
+    "dissertation" -> "0044 Thesis",
     "other" -> "0038 Other literature type",
     "peer-review" -> "0015 Review",
     "proceedings" -> "0004 Conference object",
@@ -206,11 +206,16 @@ case object Crossref2Oaf {
     else {
       instance.setDateofacceptance(asField(createdDate.getValue))
     }
-    val s: String = (json \ "URL").extract[String]
-    val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null).distinct
-    if (links.nonEmpty) {
-      instance.setUrl(links.asJava)
-    }
+    val s: List[String] = List("https://doi.org/" + doi)
+//    val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null && p.toLowerCase().contains(doi.toLowerCase())).distinct
+//    if (links.nonEmpty) {
+//      instance.setUrl(links.asJava)
+//    }
+    if(s.nonEmpty)
+      {
+        instance.setUrl(s.asJava)
+      }
+
     result.setInstance(List(instance).asJava)
 
     //IMPORTANT

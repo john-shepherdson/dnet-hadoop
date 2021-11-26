@@ -11,7 +11,7 @@ create view if not exists TARGET.funder as select * from SOURCE.funder;
 create view if not exists TARGET.fundref as select * from SOURCE.fundref;
 create view if not exists TARGET.rndexpenditure as select * from SOURCE.rndexpediture;
 
-create table TARGET.result as
+create table TARGET.result stored as parquet as
     select distinct * from (
         select * from SOURCE.result r where exists (select 1 from SOURCE.result_projects rp join SOURCE.project p on rp.project=p.id where rp.id=r.id)
         union all
@@ -21,61 +21,62 @@ create table TARGET.result as
             'openorgs____::759d59f05d77188faee99b7493b46805',
             'openorgs____::b84450f9864182c67b8611b5593f4250',
             'openorgs____::d41cf6bd4ab1b1362a44397e0b95c975',
-            'openorgs____::eadc8da90a546e98c03f896661a2e4d4') )) foo;
+            'openorgs____::eadc8da90a546e98c03f896661a2e4d4',
+            'openorgs____::d2a09b9d5eabb10c95f9470e172d05d2') )) foo;
 compute stats TARGET.result;
 
-create table TARGET.result_citations as select * from SOURCE.result_citations orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_citations stored as parquet as select * from SOURCE.result_citations orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_citations;
 
-create table TARGET.result_classifications as select * from SOURCE.result_classifications orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_classifications stored as parquet as select * from SOURCE.result_classifications orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_classifications;
 
-create table TARGET.result_concepts as select * from SOURCE.result_concepts orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_concepts stored as parquet as select * from SOURCE.result_concepts orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_concepts;
 
-create table TARGET.result_datasources as select * from SOURCE.result_datasources orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_datasources stored as parquet as select * from SOURCE.result_datasources orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_datasources;
 
-create table TARGET.result_fundercount as select * from SOURCE.result_fundercount orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_fundercount stored as parquet as select * from SOURCE.result_fundercount orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_fundercount;
 
-create table TARGET.result_gold as select * from SOURCE.result_gold orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_gold stored as parquet as select * from SOURCE.result_gold orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_gold;
 
-create table TARGET.result_greenoa as select * from SOURCE.result_greenoa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_greenoa stored as parquet as select * from SOURCE.result_greenoa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_greenoa;
 
-create table TARGET.result_languages as select * from SOURCE.result_languages orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_languages stored as parquet as select * from SOURCE.result_languages orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_languages;
 
-create table TARGET.result_licences as select * from SOURCE.result_licenses orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_licences stored as parquet as select * from SOURCE.result_licenses orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_licences;
 
-create table TARGET.result_oids as select * from SOURCE.result_oids orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_oids stored as parquet as select * from SOURCE.result_oids orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_oids;
 
-create table TARGET.result_organization as select * from SOURCE.result_organization orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_organization stored as parquet as select * from SOURCE.result_organization orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_organization;
 
-create table TARGET.result_peerreviewed as select * from SOURCE.result_peerreviewed orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_peerreviewed stored as parquet as select * from SOURCE.result_peerreviewed orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_peerreviewed;
 
-create table TARGET.result_pids as select * from SOURCE.result_pids orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_pids stored as parquet as select * from SOURCE.result_pids orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_pids;
 
-create table TARGET.result_projectcount as select * from SOURCE.result_projectcount orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_projectcount stored as parquet as select * from SOURCE.result_projectcount orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_projectcount;
 
-create table TARGET.result_projects as select * from SOURCE.result_projects orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_projects stored as parquet as select * from SOURCE.result_projects orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_projects;
 
-create table TARGET.result_refereed as select * from SOURCE.result_refereed orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_refereed stored as parquet as select * from SOURCE.result_refereed orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_refereed;
 
-create table TARGET.result_sources as select * from SOURCE.result_sources orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_sources stored as parquet as select * from SOURCE.result_sources orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_sources;
 
-create table TARGET.result_topics as select * from SOURCE.result_topics orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_topics stored as parquet as select * from SOURCE.result_topics orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_topics;
 
 -- datasources
@@ -84,7 +85,7 @@ create view if not exists TARGET.datasource_oids as select * from SOURCE.datasou
 create view if not exists TARGET.datasource_organizations as select * from SOURCE.datasource_organizations;
 create view if not exists TARGET.datasource_sources as select * from SOURCE.datasource_sources;
 
-create table TARGET.datasource_results as select id as result, datasource as id from TARGET.result_datasources;
+create table TARGET.datasource_results stored as parquet as select id as result, datasource as id from TARGET.result_datasources;
 compute stats TARGET.datasource_results;
 
 -- organizations
@@ -100,7 +101,7 @@ create view if not exists TARGET.project_oids as select * from SOURCE.project_oi
 create view if not exists TARGET.project_organizations as select * from SOURCE.project_organizations;
 create view if not exists TARGET.project_resultcount as select * from SOURCE.project_resultcount;
 
-create table TARGET.project_results as select id as result, project as id from TARGET.result_projects;
+create table TARGET.project_results stored as parquet as select id as result, project as id from TARGET.result_projects;
 compute stats TARGET.project_results;
 
 -- indicators
@@ -121,19 +122,19 @@ create view TARGET.indi_pub_avg_year_content_oa as select * from SOURCE.indi_pub
 create view TARGET.indi_pub_avg_year_context_oa as select * from SOURCE.indi_pub_avg_year_context_oa orig;
 create view TARGET.indi_pub_avg_year_country_oa as select * from SOURCE.indi_pub_avg_year_country_oa orig;
 
-create table TARGET.indi_pub_green_oa as select * from SOURCE.indi_pub_green_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.indi_pub_green_oa stored as parquet as select * from SOURCE.indi_pub_green_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_green_oa;
-create table TARGET.indi_pub_grey_lit as select * from SOURCE.indi_pub_grey_lit orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.indi_pub_grey_lit stored as parquet as select * from SOURCE.indi_pub_grey_lit orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_grey_lit;
-create table TARGET.indi_pub_doi_from_crossref as select * from SOURCE.indi_pub_doi_from_crossref orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.indi_pub_doi_from_crossref stored as parquet as select * from SOURCE.indi_pub_doi_from_crossref orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_doi_from_crossref;
-create table TARGET.indi_pub_gold_oa as select * from SOURCE.indi_pub_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.indi_pub_gold_oa stored as parquet as select * from SOURCE.indi_pub_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_gold_oa;
-create table TARGET.indi_pub_has_abstract as select * from SOURCE.indi_pub_has_abstract orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.indi_pub_has_abstract stored as parquet as select * from SOURCE.indi_pub_has_abstract orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_has_abstract;
-create table TARGET.indi_pub_has_cc_licence as select * from SOURCE.indi_pub_has_cc_licence orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.indi_pub_has_cc_licence stored as parquet as select * from SOURCE.indi_pub_has_cc_licence orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_has_cc_licence;
-create table TARGET.indi_pub_has_cc_licence_url as select * from SOURCE.indi_pub_has_cc_licence_url orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.indi_pub_has_cc_licence_url stored as parquet as select * from SOURCE.indi_pub_has_cc_licence_url orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_has_cc_licence_url;
 
 create view TARGET.indi_software_avg_year_content_oa as select * from SOURCE.indi_software_avg_year_content_oa orig;
@@ -143,13 +144,13 @@ create view TARGET.indi_software_avg_year_country_oa as select * from SOURCE.ind
 --denorm
 alter table TARGET.result rename to TARGET.res_tmp;
 
-create table TARGET.result_denorm as
+create table TARGET.result_denorm stored as parquet as
     select distinct r.*, rp.project, p.acronym as pacronym, p.title as ptitle, p.funder as pfunder, p.funding_lvl0 as pfunding_lvl0, rd.datasource, d.name as dname, d.type as dtype
     from TARGET.res_tmp r
-    join TARGET.result_projects rp on rp.id=r.id
-    join TARGET.result_datasources rd on rd.id=r.id
-    join TARGET.project p on p.id=rp.project
-    join TARGET.datasource d on d.id=rd.datasource;
+    left outer join TARGET.result_projects rp on rp.id=r.id
+    left outer join TARGET.result_datasources rd on rd.id=r.id
+    left outer join TARGET.project p on p.id=rp.project
+    left outer join TARGET.datasource d on d.id=rd.datasource;
 compute stats TARGET.result_denorm;
 
 alter table TARGET.result_denorm rename to TARGET.result;

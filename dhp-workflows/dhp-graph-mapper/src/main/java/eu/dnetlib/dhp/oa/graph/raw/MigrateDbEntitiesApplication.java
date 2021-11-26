@@ -186,6 +186,9 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 					log.info("Processing Openorgs Merge Rels...");
 					smdbe.execute("queryOpenOrgsSimilarityForProvision.sql", smdbe::processOrgOrgMergeRels);
+
+					log.info("Processing Openorgs Parent/Child Rels...");
+					smdbe.execute("queryParentChildRelsOpenOrgs.sql", smdbe::processOrgOrgParentChildRels);
 					break;
 
 				case openaire_organizations:
@@ -684,6 +687,35 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			r2.setDataInfo(info);
 			r2.setLastupdatetimestamp(lastUpdateTimestamp);
 			return Arrays.asList(r1, r2);
+		} catch (final Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public List<Oaf> processOrgOrgParentChildRels(final ResultSet rs) {
+		try {
+			final DataInfo info = prepareDataInfo(rs); // TODO
+
+			final String orgId1 = createOpenaireId(20, rs.getString("source"), true);
+			final String orgId2 = createOpenaireId(20, rs.getString("target"), true);
+
+			final List<KeyValue> collectedFrom = listKeyValues(
+				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
+
+			final Relation r = new Relation();
+			r.setRelType(ORG_ORG_RELTYPE);
+			r.setSubRelType(ModelConstants.RELATIONSHIP);
+			r
+				.setRelClass(
+					rs.getString("type").equalsIgnoreCase("parent") ? ModelConstants.IS_PARENT_OF
+						: ModelConstants.IS_CHILD_OF);
+			r.setSource(orgId1);
+			r.setTarget(orgId2);
+			r.setCollectedfrom(collectedFrom);
+			r.setDataInfo(info);
+			r.setLastupdatetimestamp(lastUpdateTimestamp);
+
+			return Arrays.asList(r);
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}

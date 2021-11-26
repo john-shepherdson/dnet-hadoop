@@ -127,13 +127,6 @@ public class MergeGraphTableSparkJob {
 				}
 			}, Encoders.bean(p_clazz))
 			.filter((FilterFunction<P>) Objects::nonNull)
-			.filter((FilterFunction<P>) o -> {
-				HashSet<String> collectedFromNames = Optional
-					.ofNullable(o.getCollectedfrom())
-					.map(c -> c.stream().map(KeyValue::getValue).collect(Collectors.toCollection(HashSet::new)))
-					.orElse(new HashSet<>());
-				return !collectedFromNames.contains("Datacite");
-			})
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")

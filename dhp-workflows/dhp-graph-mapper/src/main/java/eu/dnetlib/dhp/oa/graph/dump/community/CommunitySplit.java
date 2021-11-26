@@ -4,9 +4,7 @@ package eu.dnetlib.dhp.oa.graph.dump.community;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
-import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.spark.SparkConf;
@@ -17,6 +15,7 @@ import org.apache.spark.sql.SparkSession;
 
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
+import eu.dnetlib.dhp.schema.dump.oaf.community.Context;
 
 /**
  * This class splits the dumped results according to the research community - research initiative/infrastructure they
@@ -35,12 +34,13 @@ public class CommunitySplit implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				execSplit(spark, inputPath, outputPath, Utils.getCommunityMap(spark, communityMapPath).keySet());
+				CommunityMap communityMap = Utils.getCommunityMap(spark, communityMapPath);
+				execSplit(spark, inputPath, outputPath, communityMap);
 			});
 	}
 
 	private static void execSplit(SparkSession spark, String inputPath, String outputPath,
-		Set<String> communities) {
+		CommunityMap communities) {
 
 		Dataset<CommunityResult> result = Utils
 			.readPath(spark, inputPath + "/publication", CommunityResult.class)
@@ -49,34 +49,32 @@ public class CommunitySplit implements Serializable {
 			.union(Utils.readPath(spark, inputPath + "/software", CommunityResult.class));
 
 		communities
-			.forEach(c -> printResult(c, result, outputPath));
+			.keySet()
+			.stream()
+			.forEach(c -> printResult(c, result, outputPath + "/" + communities.get(c).replace(" ", "_")));
 
 	}
 
-	private static void printResult(String community, Dataset<CommunityResult> result, String outputPath) {
+	private static void printResult(String c, Dataset<CommunityResult> result, String outputPath) {
 		Dataset<CommunityResult> communityProducts = result
-			.filter((FilterFunction<CommunityResult>) r -> containsCommunity(r, community));
+			.filter((FilterFunction<CommunityResult>) r -> containsCommunity(r, c));
 
-		try {
-			communityProducts.first();
-			communityProducts
-				.write()
-				.option("compression", "gzip")
-				.mode(SaveMode.Overwrite)
-				.json(outputPath + "/" + community);
-		} catch (NoSuchElementException e) {
-			// ignoring it on purpose
-		}
+		communityProducts
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Overwrite)
+			.json(outputPath);
+
 	}
 
-	private static boolean containsCommunity(CommunityResult r, String community) {
+	private static boolean containsCommunity(CommunityResult r, String c) {
 		if (Optional.ofNullable(r.getContext()).isPresent()) {
-			return !r
+			return r
 				.getContext()
 				.stream()
-				.filter(con -> con.getCode().equals(community))
+				.map(Context::getCode)
 				.collect(Collectors.toList())
-				.isEmpty();
+				.contains(c);
 		}
 		return false;
 	}
