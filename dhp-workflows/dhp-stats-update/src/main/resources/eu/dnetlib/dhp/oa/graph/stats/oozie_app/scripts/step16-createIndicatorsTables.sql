@@ -236,13 +236,13 @@ on p.id= tmp.id;
 -- de facto standard in scholarly communication and is promoted by many initiatives
 -- like Plan S. This indicator might be only useful when applied 
 -- to openly available publications.
-create table indi_pub_has_cc_licence_tr stored as parquet as  
-select distinct p.id, case when lic='' or lic is null then 0 else 1 end as has_cc_license_tr
-from publication p  
-left outer join (select p.id, license.type as lic from publication p
-join publication_licenses as license on license.id = p.id  
-where lower(license.type) LIKE '%creativecommons.org%' OR lower(license.type) LIKE '%cc-%') tmp  
-on p.id= tmp.id
+--create table indi_pub_has_cc_licence_tr stored as parquet as  
+--select distinct p.id, case when lic='' or lic is null then 0 else 1 end as has_cc_license_tr
+--from publication p  
+--left outer join (select p.id, license.type as lic from publication p
+--join publication_licenses as license on license.id = p.id  
+--where lower(license.type) LIKE '%creativecommons.org%' OR lower(license.type) LIKE '%cc-%') tmp  
+--on p.id= tmp.id
 
 -- #EOSC-F2-01M_cc  Rich metadata for scholarly publications
 -- ## Indicator: has_cc_license. Creative Commons licensing has become a
@@ -298,6 +298,17 @@ from tmp as o1
 join tmp as o2 on o1.result=o2.result
 where o1.id<>o2.id
 group by o1.id, o2.id, o1.type
+
+create table indi_funder_country_collab stored as parquet as  
+with tmp as (select funder, project, country from organization_projects op 
+join organization o on o.id=op.id 
+join project p on p.id=op.project 
+where country <> 'UNKNOWN')
+select f1.funder, f1.country, f2.country, count(distinct f1.project) as collaborations
+from tmp as f1
+join tmp as f2 on f1.project=f2.project
+where f1.country<>f2.country 
+group by f1.funder, f2.country, f1.country
 
 create table indi_pub_diamond stored as parquet as
 select distinct pd.id, coalesce(in_diamond_journal, 0) as in_diamond_journal 
