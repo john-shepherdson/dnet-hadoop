@@ -13,7 +13,7 @@ echo "Getting file from " $SCRIPT_PATH
 hdfs dfs -copyToLocal $SCRIPT_PATH
 
 echo "Creating indicators"
-impala-shell -q "invalidate metadata"
-impala-shell -d ${TARGET} -q "show tables" --delimited | sed "s/^\(.*\)/compute stats ${TARGET}.\1;/" | impala-shell -c -f -
-cat step16-createIndicatorsTables.sql | impala-shell -d $TARGET -f -
+hive --database ${TARGET} -e "show tables" | grep -v WARN | sed "s/^\(.*\)/analyze table ${TARGET}.\1 compute statistics;/" > foo
+hive -f foo
+hive --database ${TARGET} -f step16-createIndicatorsTables.sql
 echo "Indicators created"

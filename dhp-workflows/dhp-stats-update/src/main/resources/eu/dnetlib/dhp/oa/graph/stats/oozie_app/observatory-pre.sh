@@ -11,6 +11,7 @@ export TARGET=$2
 export SHADOW=$3
 
 echo "Creating observatory database"
-impala-shell -q "drop database if exists ${TARGET} cascade"
-impala-shell -q "create database if not exists ${TARGET}"
-impala-shell -d ${SOURCE} -q "show tables" --delimited | grep -iv roar | sed "s/\(.*\)/create view ${TARGET}.\1 as select * from ${SOURCE}.\1;/" | impala-shell -f -
+hive -e "drop database if exists ${TARGET} cascade"
+hive -e "create database if not exists ${TARGET}"
+hive --database ${SOURCE} -e "show tables" | grep -v WARN | grep -iv roar | sed "s/\(.*\)/create view ${TARGET}.\1 as select * from ${SOURCE}.\1;/" > foo
+hive -f foo
