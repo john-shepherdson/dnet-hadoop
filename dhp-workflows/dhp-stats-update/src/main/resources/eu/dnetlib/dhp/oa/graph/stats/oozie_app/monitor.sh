@@ -15,11 +15,14 @@ echo "Getting file from " $4
 hdfs dfs -copyToLocal $4
 
 echo "Creating monitor database"
-cat step20-createMonitorDB.sql | sed s/SOURCE/$1/g | sed s/TARGET/$2/g1 | impala-shell -f -
+cat step20-createMonitorDB.sql | sed s/SOURCE/$1/g | sed s/TARGET/$2/g1 > foo
+hive -f foo
 echo "Impala shell finished"
 
 echo "Updating shadow monitor database"
-impala-shell -q "create database if not exists ${SHADOW}"
-impala-shell -d ${SHADOW} -q "show tables" --delimited | sed "s/^/drop view if exists ${SHADOW}./" | sed "s/$/;/" | impala-shell -f -
-impala-shell -d ${TARGET} -q "show tables" --delimited | sed "s/\(.*\)/create view ${SHADOW}.\1 as select * from ${TARGET}.\1;/" | impala-shell -f -
+hive -e "create database if not exists ${SHADOW}"
+hive --database ${SHADOW} -e "show tables" | grep -v WARN | sed "s/^/drop view if exists ${SHADOW}./" | sed "s/$/;/" > foo
+hive -f foo
+hive --database ${TARGET} -e "show tables" | grep -v WARN | sed "s/\(.*\)/create view ${SHADOW}.\1 as select * from ${TARGET}.\1;/" > foo
+hive -f foo
 echo "Shadow db ready!"
