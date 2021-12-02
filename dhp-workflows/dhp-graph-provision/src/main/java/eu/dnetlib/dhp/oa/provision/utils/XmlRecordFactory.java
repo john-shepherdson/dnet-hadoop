@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,7 +18,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -27,7 +31,11 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.apache.solr.common.util.URLUtil;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -49,25 +57,9 @@ import com.mycila.xmltool.XMLTag;
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
-import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.common.MainEntityType;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.ExternalReference;
-import eu.dnetlib.dhp.schema.oaf.ExtraInfo;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.Journal;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.oa.provision.model.XmlInstance;
+import eu.dnetlib.dhp.schema.common.*;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public class XmlRecordFactory implements Serializable {
@@ -1112,37 +1104,64 @@ public class XmlRecordFactory implements Serializable {
 		if (MainEntityType.result.toString().equals(ModelSupport.getMainType(entityType))) {
 			final List<Instance> instances = ((Result) entity).getInstance();
 			if (instances != null) {
-				for (final Instance instance : ((Result) entity).getInstance()) {
 
+				groupInstancesByUrl(((Result) entity).getInstance()).forEach(instance -> {
 					final List<String> fields = Lists.newArrayList();
 
 					if (instance.getAccessright() != null && !instance.getAccessright().isBlank()) {
 						fields
 							.add(XmlSerializationUtils.mapQualifier("accessright", instance.getAccessright()));
 					}
-					if (instance.getCollectedfrom() != null && kvNotBlank(instance.getCollectedfrom())) {
+					if (instance.getCollectedfrom() != null) {
 						fields
-							.add(XmlSerializationUtils.mapKeyValue("collectedfrom", instance.getCollectedfrom()));
+							.addAll(
+								instance
+									.getCollectedfrom()
+									.stream()
+									.filter(cf -> kvNotBlank(cf))
+									.map(cf -> XmlSerializationUtils.mapKeyValue("collectedfrom", cf))
+									.collect(Collectors.toList()));
 					}
-					if (instance.getHostedby() != null && kvNotBlank(instance.getHostedby())) {
-						fields.add(XmlSerializationUtils.mapKeyValue("hostedby", instance.getHostedby()));
-					}
-					if (instance.getDateofacceptance() != null
-						&& isNotBlank(instance.getDateofacceptance().getValue())) {
+
+					if (instance.getHostedby() != null) {
 						fields
-							.add(
-								XmlSerializationUtils
-									.asXmlElement("dateofacceptance", instance.getDateofacceptance().getValue()));
+							.addAll(
+								instance
+									.getHostedby()
+									.stream()
+									.filter(hb -> kvNotBlank(hb))
+									.map(hb -> XmlSerializationUtils.mapKeyValue("hostedby", hb))
+									.collect(Collectors.toList()));
 					}
-					if (instance.getInstancetype() != null && !instance.getInstancetype().isBlank()) {
+					if (instance.getDateofacceptance() != null) {
 						fields
-							.add(XmlSerializationUtils.mapQualifier("instancetype", instance.getInstancetype()));
+							.addAll(
+								instance
+									.getDateofacceptance()
+									.stream()
+									.filter(d -> isNotBlank(d))
+									.map(d -> XmlSerializationUtils.asXmlElement("dateofacceptance", d))
+									.collect(Collectors.toList()));
 					}
-					if (isNotBlank(instance.getDistributionlocation())) {
+					if (instance.getInstancetype() != null) {
 						fields
-							.add(
-								XmlSerializationUtils
-									.asXmlElement("distributionlocation", instance.getDistributionlocation()));
+							.addAll(
+								instance
+									.getInstancetype()
+									.stream()
+									.filter(t -> !t.isBlank())
+									.map(t -> XmlSerializationUtils.mapQualifier("instancetype", t))
+									.collect(Collectors.toList()));
+					}
+					if (instance.getDistributionlocation() != null) {
+						fields
+							.addAll(
+								instance
+									.getDistributionlocation()
+									.stream()
+									.filter(d -> isNotBlank(d))
+									.map(d -> XmlSerializationUtils.asXmlElement("distributionlocation", d))
+									.collect(Collectors.toList()));
 					}
 					if (instance.getPid() != null) {
 						fields
@@ -1165,32 +1184,39 @@ public class XmlRecordFactory implements Serializable {
 									.collect(Collectors.toList()));
 					}
 
-					if (instance.getRefereed() != null && !instance.getRefereed().isBlank()) {
+					if (instance.getRefereed() != null) {
 						fields
-							.add(XmlSerializationUtils.mapQualifier("refereed", instance.getRefereed()));
+							.addAll(
+								instance
+									.getRefereed()
+									.stream()
+									.filter(Objects::nonNull)
+									.filter(r -> !r.isBlank())
+									.map(r -> XmlSerializationUtils.mapQualifier("refereed", r))
+									.collect(Collectors.toList()));
 					}
 					if (instance.getProcessingchargeamount() != null
-						&& isNotBlank(instance.getProcessingchargeamount().getValue())) {
+						&& isNotBlank(instance.getProcessingchargeamount())) {
 						fields
 							.add(
 								XmlSerializationUtils
 									.asXmlElement(
-										"processingchargeamount", instance.getProcessingchargeamount().getValue()));
+										"processingchargeamount", instance.getProcessingchargeamount()));
 					}
 					if (instance.getProcessingchargecurrency() != null
-						&& isNotBlank(instance.getProcessingchargecurrency().getValue())) {
+						&& isNotBlank(instance.getProcessingchargecurrency())) {
 						fields
 							.add(
 								XmlSerializationUtils
 									.asXmlElement(
-										"processingchargecurrency", instance.getProcessingchargecurrency().getValue()));
+										"processingchargecurrency", instance.getProcessingchargecurrency()));
 					}
 
 					children
 						.add(
 							templateFactory
-								.getInstance(instance.getHostedby().getKey(), fields, instance.getUrl()));
-				}
+								.getInstance(fields, instance.getUrl()));
+				});
 			}
 			final List<ExternalReference> ext = ((Result) entity).getExternalReference();
 			if (ext != null) {
@@ -1232,6 +1258,85 @@ public class XmlRecordFactory implements Serializable {
 		}
 
 		return children;
+	}
+
+	private Stream<XmlInstance> groupInstancesByUrl(List<Instance> instance) {
+		return instance
+			.stream()
+			.map(i -> {
+				i
+					.setUrl(
+						i
+							.getUrl()
+							.stream()
+							.filter(this::isValidUrl)
+							.collect(Collectors.toList()));
+				return i;
+			})
+			.filter(
+				i -> Optional
+					.ofNullable(i.getUrl())
+					.map(u -> !u.isEmpty())
+					.orElse(false))
+			.map(this::pickByUrl)
+			.collect(Collectors.groupingBy(ImmutablePair::getLeft))
+			.values()
+			.stream()
+			.map(this::mergeInstances);
+	}
+
+	private boolean isValidUrl(String url) {
+		try {
+			new URL(url).toURI();
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	private ImmutablePair<String, Instance> pickByUrl(Instance i) {
+		return new ImmutablePair<>(i.getUrl().get(0), i);
+	}
+
+	private XmlInstance mergeInstances(List<ImmutablePair<String, Instance>> instances) {
+
+		final XmlInstance instance = new XmlInstance();
+
+		instance.setUrl(instances.get(0).getLeft());
+		instance
+			.setAccessright(
+				instances
+					.stream()
+					.map(Pair::getValue)
+					.map(Instance::getAccessright)
+					.min(new AccessRightComparator<AccessRight>())
+					.orElse(XmlInstance.UNKNOWN_ACCESS_RIGHT));
+
+		instances.forEach(p -> {
+			final Instance i = p.getRight();
+			instance.getCollectedfrom().add(i.getCollectedfrom());
+			instance.getHostedby().add(i.getHostedby());
+			instance.getInstancetype().add(i.getInstancetype());
+			instance.getLicense().add(i.getLicense().getValue());
+			instance.getDistributionlocation().add(i.getDistributionlocation());
+			instance.getPid().addAll(i.getPid());
+			instance.getAlternateIdentifier().addAll(i.getAlternateIdentifier());
+			instance.getDateofacceptance().add(i.getDateofacceptance().getValue());
+			instance
+				.setProcessingchargeamount(
+					Optional.ofNullable(i.getProcessingchargeamount()).map(apc -> apc.getValue()).orElse(null));
+			instance
+				.setProcessingchargecurrency(
+					Optional.ofNullable(i.getProcessingchargecurrency()).map(c -> c.getValue()).orElse(null));
+			instance.getRefereed().add(i.getRefereed());
+		});
+
+		if (instance.getHostedby().size() > 1
+			&& instance.getHostedby().stream().anyMatch(hb -> ModelConstants.UNKNOWN_REPOSITORY.equals(hb))) {
+			instance.getHostedby().remove(ModelConstants.UNKNOWN_REPOSITORY);
+		}
+
+		return instance;
 	}
 
 	private boolean isDuplicate(final RelatedEntityWrapper link) {
