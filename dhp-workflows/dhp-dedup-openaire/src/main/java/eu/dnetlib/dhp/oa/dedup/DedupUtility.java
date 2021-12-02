@@ -14,6 +14,9 @@ import org.xml.sax.SAXException;
 
 import com.google.common.collect.Sets;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -150,6 +153,27 @@ public class DedupUtility {
 			return 1;
 
 		return o1.compareTo(o2);
+	}
+
+	public static Relation createSimRel(String source, String target, String entity) {
+		final Relation r = new Relation();
+		r.setSource(source);
+		r.setTarget(target);
+		r.setSubRelType("dedupSimilarity");
+		r.setRelClass(ModelConstants.IS_SIMILAR_TO);
+		r.setDataInfo(new DataInfo());
+
+		switch (entity) {
+			case "result":
+				r.setRelType(ModelConstants.RESULT_RESULT);
+				break;
+			case "organization":
+				r.setRelType(ModelConstants.ORG_ORG_RELTYPE);
+				break;
+			default:
+				throw new IllegalArgumentException("unmanaged entity type: " + entity);
+		}
+		return r;
 	}
 
 }

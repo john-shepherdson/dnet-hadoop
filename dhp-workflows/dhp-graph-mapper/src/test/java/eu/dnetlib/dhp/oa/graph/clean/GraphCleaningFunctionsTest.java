@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.MappableBlock;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,6 +68,9 @@ public class GraphCleaningFunctionsTest {
 			Relation r_out = OafCleaner.apply(r_in, mapping);
 			assertTrue(vocabularies.getTerms(ModelConstants.DNET_RELATION_RELCLASS).contains(r_out.getRelClass()));
 			assertTrue(vocabularies.getTerms(ModelConstants.DNET_RELATION_SUBRELTYPE).contains(r_out.getSubRelType()));
+
+			assertEquals("iis", r_out.getDataInfo().getProvenanceaction().getClassid());
+			assertEquals("Inferred by OpenAIRE", r_out.getDataInfo().getProvenanceaction().getClassname());
 		}
 	}
 
@@ -221,5 +226,28 @@ public class GraphCleaningFunctionsTest {
 		return IOUtils
 			.readLines(
 				GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
+	}
+
+	@Test
+	public void testCleanDoiBoost() throws IOException {
+		String json = IOUtils
+			.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/doiboostpub.json"));
+		Publication p_in = MAPPER.readValue(json, Publication.class);
+		Publication p_out = OafCleaner.apply(GraphCleaningFunctions.fixVocabularyNames(p_in), mapping);
+		Publication cleaned = GraphCleaningFunctions.cleanup(p_out);
+
+		Assertions.assertEquals(true, GraphCleaningFunctions.filter(cleaned));
+	}
+
+	@Test
+	public void testCleanDoiBoost2() throws IOException {
+		String json = IOUtils
+			.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/doiboostpub2.json"));
+		Publication p_in = MAPPER.readValue(json, Publication.class);
+		Publication p_out = OafCleaner.apply(GraphCleaningFunctions.fixVocabularyNames(p_in), mapping);
+		Publication cleaned = GraphCleaningFunctions.cleanup(p_out);
+
+		Assertions.assertEquals(true, GraphCleaningFunctions.filter(cleaned));
+
 	}
 }

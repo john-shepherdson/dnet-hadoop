@@ -146,7 +146,7 @@ object SparkProcessMAG {
       .save(s"$workingPath/mag_publication")
 
     spark.read.load(s"$workingPath/mag_publication").as[Publication]
-      .filter(p => p.getId == null)
+      .filter(p => p.getId != null)
       .groupByKey(p => p.getId)
       .reduceGroups((a:Publication, b:Publication) => ConversionUtil.mergePublication(a,b))
       .map(_._2)
