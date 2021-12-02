@@ -22,7 +22,7 @@ public class SparkDumpEntitiesJob implements Serializable {
 			.toString(
 				SparkDumpEntitiesJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/graph/dump/complete/input_parameters.json"));
+                            "/eu/dnetlib/dhp/oa/graph/dump/wf/input_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);

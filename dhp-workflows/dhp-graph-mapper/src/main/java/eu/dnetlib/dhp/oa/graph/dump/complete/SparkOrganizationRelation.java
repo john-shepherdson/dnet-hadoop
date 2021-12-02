@@ -39,7 +39,7 @@ public class SparkOrganizationRelation implements Serializable {
 			.toString(
 				SparkOrganizationRelation.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/graph/dump/complete/input_organization_parameters.json"));
+                            "/eu/dnetlib/dhp/oa/graph/dump/input_organization_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
