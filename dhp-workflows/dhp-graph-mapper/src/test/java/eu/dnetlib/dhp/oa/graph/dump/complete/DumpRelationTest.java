@@ -260,4 +260,54 @@ public class DumpRelationTest {
 								.count());
 	}
 
+	@Test
+	public void test4() throws Exception {//
+		final String sourcePath = getClass()
+				.getResource("/eu/dnetlib/dhp/oa/graph/dump/relation/relation")
+				.getPath();
+
+		SparkDumpRelationJob.main(new String[] {
+				"-isSparkSessionManaged", Boolean.FALSE.toString(),
+				"-outputPath", workingDir.toString() + "/relation",
+				"-sourcePath", sourcePath,
+				"-removeSet", "isParticipant;isAuthorInstitutionOf"
+		});
+
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Relation> tmp = sc
+				.textFile(workingDir.toString() + "/relation")
+				.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
+
+		org.apache.spark.sql.Dataset<Relation> verificationDataset = spark
+				.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
+
+		verificationDataset.createOrReplaceTempView("table");
+
+		verificationDataset
+				.foreach((ForeachFunction<Relation>) r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+
+		Dataset<Row> check = spark
+				.sql(
+						"SELECT reltype.name, source.id source, source.type stype, target.id target,target.type ttype, provenance.provenance "
+								+
+								"from table ");
+
+		Assertions.assertEquals(22, check.filter("name = 'isProvidedBy'").count());
+		Assertions
+				.assertEquals(
+						22, check
+								.filter(
+										"name = 'isProvidedBy' and stype = 'datasource' and ttype = 'organization' and " +
+												"provenance = 'Harvested'")
+								.count());
+
+		Assertions.assertEquals(0, check.filter("name = 'isParticipant'").count());
+
+
+		Assertions.assertEquals(0, check.filter("name = 'isAuthorInstitutionOf'").count());
+
+	}
+
 }
