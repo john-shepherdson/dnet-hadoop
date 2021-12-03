@@ -1,4 +1,4 @@
-<instance id="$instanceId$">
+<instance>
     $metadata:{ it | $it$ }$
 	$webresources:{ it | $it$ }$
 </instance>
