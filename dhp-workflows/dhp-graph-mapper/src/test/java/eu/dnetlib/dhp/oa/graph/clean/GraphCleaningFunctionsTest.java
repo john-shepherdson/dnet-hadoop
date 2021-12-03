@@ -75,6 +75,53 @@ public class GraphCleaningFunctionsTest {
 	}
 
 	@Test
+	void testFilter_false() throws Exception {
+
+		assertNotNull(vocabularies);
+		assertNotNull(mapping);
+
+		String json = IOUtils
+			.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/result_invisible.json"));
+		Publication p_in = MAPPER.readValue(json, Publication.class);
+
+		assertTrue(p_in instanceof Result);
+		assertTrue(p_in instanceof Publication);
+
+		assertEquals(false, GraphCleaningFunctions.filter(p_in));
+	}
+
+	@Test
+	void testFilter_true() throws Exception {
+
+		assertNotNull(vocabularies);
+		assertNotNull(mapping);
+
+		String json = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/result.json"));
+		Publication p_in = MAPPER.readValue(json, Publication.class);
+
+		assertTrue(p_in instanceof Result);
+		assertTrue(p_in instanceof Publication);
+
+		assertEquals(true, GraphCleaningFunctions.filter(p_in));
+	}
+
+	@Test
+	void testFilter_missing_invisible() throws Exception {
+
+		assertNotNull(vocabularies);
+		assertNotNull(mapping);
+
+		String json = IOUtils
+			.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/result_missing_invisible.json"));
+		Publication p_in = MAPPER.readValue(json, Publication.class);
+
+		assertTrue(p_in instanceof Result);
+		assertTrue(p_in instanceof Publication);
+
+		assertEquals(true, GraphCleaningFunctions.filter(p_in));
+	}
+
+	@Test
 	void testCleaning() throws Exception {
 
 		assertNotNull(vocabularies);
