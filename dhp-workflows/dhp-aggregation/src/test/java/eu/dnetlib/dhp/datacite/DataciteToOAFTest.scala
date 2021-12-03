@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import scala.io.Source
 import org.junit.jupiter.api.Assertions._
+
 @ExtendWith(Array(classOf[MockitoExtension]))
 class DataciteToOAFTest extends  AbstractVocabularyTest{
 
