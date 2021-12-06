@@ -37,7 +37,8 @@ class ScholixGraphTest extends AbstractVocabularyTest{
     val input = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/scholix/result.json")).mkString
     val res =SparkResolveRelation.extractPidsFromRecord(input)
     assertNotNull(res)
-    assertTrue(res._2.size == 2)
+
+    assertEquals(1,res._2.size)
 
   }
 

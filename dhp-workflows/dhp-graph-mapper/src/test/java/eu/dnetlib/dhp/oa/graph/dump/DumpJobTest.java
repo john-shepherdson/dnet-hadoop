@@ -171,24 +171,6 @@ public class DumpJobTest {
 
 		GraphResult gr = verificationDataset.first();
 
-		Assertions.assertEquals(2, gr.getMeasures().size());
-		Assertions
-			.assertTrue(
-				gr
-					.getMeasures()
-					.stream()
-					.anyMatch(
-						m -> m.getKey().equals("influence")
-							&& m.getValue().equals("1.62759106106e-08")));
-		Assertions
-			.assertTrue(
-				gr
-					.getMeasures()
-					.stream()
-					.anyMatch(
-						m -> m.getKey().equals("popularity")
-							&& m.getValue().equals("0.22519296")));
-
 		Assertions.assertEquals(6, gr.getAuthor().size());
 		Assertions
 			.assertTrue(
