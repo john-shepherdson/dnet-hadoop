@@ -4,7 +4,7 @@ import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactory, OafMapperUtils, PidType}
 import eu.dnetlib.dhp.schema.oaf._
-import scala.collection.JavaConverters._
+import collection.JavaConverters._
 
 import java.util.regex.Pattern
 
@@ -22,10 +22,10 @@ object PubMedToOaf {
   val collectedFrom: KeyValue = OafMapperUtils.keyValue(ModelConstants.EUROPE_PUBMED_CENTRAL_ID, "Europe PubMed Central")
 
 
-
   /**
    * Cleaning the DOI Applying regex in order to
    * remove doi starting with URL
+   *
    * @param doi input DOI
    * @return cleaned DOI
    */
@@ -49,7 +49,7 @@ object PubMedToOaf {
    * starting from OAF instanceType value
    *
    * @param cobjQualifier OAF instance type
-   * @param vocabularies All dnet vocabularies
+   * @param vocabularies  All dnet vocabularies
    * @return the correct instance
    */
   def createResult(cobjQualifier: Qualifier, vocabularies: VocabularyGroup): Result = {
@@ -65,7 +65,7 @@ object PubMedToOaf {
   }
 
   /**
-   *  Mapping the Pubmedjournal info into the OAF Journale
+   * Mapping the Pubmedjournal info into the OAF Journale
    *
    * @param j the pubmedJournal
    * @return the OAF Journal
@@ -91,9 +91,8 @@ object PubMedToOaf {
    * Find vocabulary term into synonyms and term in the vocabulary
    *
    * @param vocabularyName the input vocabulary name
-   * @param vocabularies all the vocabularies
-   * @param term the term to find
-   *
+   * @param vocabularies   all the vocabularies
+   * @param term           the term to find
    * @return the cleaned term value
    */
   def getVocabularyTerm(vocabularyName: String, vocabularies: VocabularyGroup, term: String): Qualifier = {
@@ -104,10 +103,9 @@ object PubMedToOaf {
 
 
   /**
-   *  Map the Pubmed Article into the OAF instance
+   * Map the Pubmed Article into the OAF instance
    *
-   *
-   * @param article the pubmed articles
+   * @param article      the pubmed articles
    * @param vocabularies the vocabularies
    * @return The OAF instance if the mapping did not fail
    */
@@ -183,7 +181,6 @@ object PubMedToOaf {
     result.setCollectedfrom(List(collectedFrom).asJava)
     //END JOURNAL MAPPING
     //--------------------------------------------------------------------------------------
-
 
 
     // RESULT MAPPING

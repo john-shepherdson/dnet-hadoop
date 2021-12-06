@@ -1,8 +1,8 @@
 package eu.dnetlib.dhp.datacite
 
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.{DataInfo, KeyValue}
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils
+import eu.dnetlib.dhp.schema.oaf.{DataInfo, KeyValue}
 
 import java.io.InputStream
 import java.time.format.DateTimeFormatter

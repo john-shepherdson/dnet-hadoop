@@ -8,6 +8,7 @@ import org.apache.commons.io.FileUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.functions.{col, count}
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
+import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.{AfterEach, BeforeEach, Test}
 import org.mockito.junit.jupiter.MockitoExtension
@@ -17,7 +18,6 @@ import java.nio.file.{Files, Path}
 import java.text.SimpleDateFormat
 import java.util.Locale
 import scala.io.Source
-import org.junit.jupiter.api.Assertions._
 
 @ExtendWith(Array(classOf[MockitoExtension]))
 class DataciteToOAFTest extends  AbstractVocabularyTest{

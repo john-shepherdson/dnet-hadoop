@@ -6,7 +6,7 @@ import eu.dnetlib.dhp.datacite.DataciteModelConstants._
 import eu.dnetlib.dhp.schema.action.AtomicAction
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils}
-import eu.dnetlib.dhp.schema.oaf.{AccessRight, Author, DataInfo, Instance, KeyValue, Oaf, OtherResearchProduct, Publication, Qualifier, Relation, Result, Software, StructuredProperty, Dataset => OafDataset}
+import eu.dnetlib.dhp.schema.oaf.{Dataset => OafDataset, _}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang3.StringUtils
 import org.json4s.DefaultFormats
@@ -29,6 +29,7 @@ object DataciteToOAFTransformation {
   /**
    * This method should skip record if json contains invalid text
    * defined in gile datacite_filter
+   *
    * @param json
    * @return True if the record should be skipped
    */
@@ -107,9 +108,9 @@ object DataciteToOAFTransformation {
     d
   }
 
-  def fix_thai_date(input:String, format:String) :String = {
+  def fix_thai_date(input: String, format: String): String = {
     try {
-      val a_date = LocalDate.parse(input,DateTimeFormatter.ofPattern(format))
+      val a_date = LocalDate.parse(input, DateTimeFormatter.ofPattern(format))
       val d = ThaiBuddhistDate.of(a_date.getYear, a_date.getMonth.getValue, a_date.getDayOfMonth)
       LocalDate.from(d).toString
     } catch {
@@ -236,7 +237,7 @@ object DataciteToOAFTransformation {
       val p = match_pattern.get._2
       val grantId = m.matcher(awardUri).replaceAll("$2")
       val targetId = s"$p${DHPUtils.md5(grantId)}"
-      List( generateRelation(sourceId, targetId, "isProducedBy", DATACITE_COLLECTED_FROM, dataInfo) )
+      List(generateRelation(sourceId, targetId, "isProducedBy", DATACITE_COLLECTED_FROM, dataInfo))
     }
     else
       List()
@@ -335,15 +336,15 @@ object DataciteToOAFTransformation {
       .map(d => d.get)
 
     if (a_date.isDefined) {
-      if(doi.startsWith("10.14457"))
-        result.setEmbargoenddate(OafMapperUtils.field(fix_thai_date(a_date.get,"[yyyy-MM-dd]"), null))
+      if (doi.startsWith("10.14457"))
+        result.setEmbargoenddate(OafMapperUtils.field(fix_thai_date(a_date.get, "[yyyy-MM-dd]"), null))
       else
         result.setEmbargoenddate(OafMapperUtils.field(a_date.get, null))
     }
     if (i_date.isDefined && i_date.get.isDefined) {
-      if(doi.startsWith("10.14457")) {
-        result.setDateofacceptance(OafMapperUtils.field(fix_thai_date(i_date.get.get,"[yyyy-MM-dd]"), null))
-        result.getInstance().get(0).setDateofacceptance(OafMapperUtils.field(fix_thai_date(i_date.get.get,"[yyyy-MM-dd]"), null))
+      if (doi.startsWith("10.14457")) {
+        result.setDateofacceptance(OafMapperUtils.field(fix_thai_date(i_date.get.get, "[yyyy-MM-dd]"), null))
+        result.getInstance().get(0).setDateofacceptance(OafMapperUtils.field(fix_thai_date(i_date.get.get, "[yyyy-MM-dd]"), null))
       }
       else {
         result.setDateofacceptance(OafMapperUtils.field(i_date.get.get, null))
@@ -351,9 +352,9 @@ object DataciteToOAFTransformation {
       }
     }
     else if (publication_year != null) {
-      if(doi.startsWith("10.14457")) {
-        result.setDateofacceptance(OafMapperUtils.field(fix_thai_date(s"01-01-$publication_year","[dd-MM-yyyy]"), null))
-        result.getInstance().get(0).setDateofacceptance(OafMapperUtils.field(fix_thai_date(s"01-01-$publication_year","[dd-MM-yyyy]"), null))
+      if (doi.startsWith("10.14457")) {
+        result.setDateofacceptance(OafMapperUtils.field(fix_thai_date(s"01-01-$publication_year", "[dd-MM-yyyy]"), null))
+        result.getInstance().get(0).setDateofacceptance(OafMapperUtils.field(fix_thai_date(s"01-01-$publication_year", "[dd-MM-yyyy]"), null))
 
       } else {
         result.setDateofacceptance(OafMapperUtils.field(s"01-01-$publication_year", null))
@@ -457,7 +458,7 @@ object DataciteToOAFTransformation {
         JField("relatedIdentifier", JString(relatedIdentifier)) <- relIdentifier
       } yield RelatedIdentifierType(relationType, relatedIdentifier, relatedIdentifierType)
 
-      relations = relations ::: generateRelations(rels,result.getId, if (i_date.isDefined && i_date.get.isDefined) i_date.get.get else null)
+      relations = relations ::: generateRelations(rels, result.getId, if (i_date.isDefined && i_date.get.isDefined) i_date.get.get else null)
     }
     if (relations != null && relations.nonEmpty) {
       List(result) ::: relations
@@ -466,7 +467,7 @@ object DataciteToOAFTransformation {
       List(result)
   }
 
-  private def generateRelations(rels: List[RelatedIdentifierType], id:String, date:String):List[Relation] = {
+  private def generateRelations(rels: List[RelatedIdentifierType], id: String, date: String): List[Relation] = {
     rels
       .filter(r =>
         subRelTypeMapping.contains(r.relationType) && (
@@ -484,12 +485,12 @@ object DataciteToOAFTransformation {
         rel.setSubRelType(subRelType)
         rel.setRelClass(r.relationType)
 
-        val dateProps:KeyValue = OafMapperUtils.keyValue(DATE_RELATION_KEY, date)
+        val dateProps: KeyValue = OafMapperUtils.keyValue(DATE_RELATION_KEY, date)
 
         rel.setProperties(List(dateProps).asJava)
 
         rel.setSource(id)
-        rel.setTarget(DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier,r.relatedIdentifierType))
+        rel.setTarget(DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType))
         rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
         rel.getCollectedfrom.asScala.map(c => c.getValue).toList
         rel
