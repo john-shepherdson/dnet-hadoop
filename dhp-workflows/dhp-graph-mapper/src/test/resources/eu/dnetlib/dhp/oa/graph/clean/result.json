@@ -403,6 +403,92 @@
         "http://juuli.fi/Record/0275158616",
         "http://dx.doi.org/10.1007/s109090161569x"
       ]
+    },
+    {
+      "pid": [
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1002/s21010127267xy"
+        },
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1008/abcd"
+        }
+      ],
+      "alternateIdentifier": [
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1007/s109090161569x"
+        },
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1009/qwerty"
+        }
+      ],
+      "accessright": {
+        "classid": "CLOSED",
+        "classname": "CLOSED",
+        "schemeid": "dnet:access_modes",
+        "schemename": "dnet:access_modes"
+      },
+      "collectedfrom": {
+        "key": "10|CSC_________::a2b9ce8435390bcbfc05f3cae3948747",
+        "value": "VIRTA"
+      },
+      "dateofacceptance": {
+        "dataInfo": {
+          "deletedbyinference": false,
+          "inferenceprovenance": "",
+          "inferred": false,
+          "invisible": false,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:datasetarchive",
+            "classname": "sysimport:crosswalk:datasetarchive",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          },
+          "trust": "0.9"
+        },
+        "value": "2016-01-01"
+      },
+      "distributionlocation": "",
+      "hostedby": {
+        "key": "10|CSC_________::a2b9ce8435390bcbfc05f3cae3948747",
+        "value": "VIRTA"
+      },
+      "instancetype": {
+        "classid": "Audiovisual",
+        "classname": "Audiovisual",
+        "schemeid": "dnet:publication_resource",
+        "schemename": "dnet:publication_resource"
+      },
+      "url": [
+        "http://dx.doi.org/10.1002/s21010127267xy"
+      ]
     }
   ],
   "journal": {
