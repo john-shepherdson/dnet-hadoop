@@ -1212,6 +1212,17 @@ public class XmlRecordFactory implements Serializable {
 										"processingchargecurrency", instance.getProcessingchargecurrency()));
 					}
 
+					if (instance.getLicense() != null) {
+						fields
+							.addAll(
+								instance
+									.getLicense()
+									.stream()
+									.filter(d -> isNotBlank(d))
+									.map(d -> XmlSerializationUtils.asXmlElement("license", d))
+									.collect(Collectors.toList()));
+					}
+
 					children
 						.add(
 							templateFactory
