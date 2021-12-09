@@ -101,6 +101,9 @@ public class GraphCleaningFunctionsTest {
 		assertEquals("0018", p_out.getInstance().get(0).getInstancetype().getClassid());
 		assertEquals("Annotation", p_out.getInstance().get(0).getInstancetype().getClassname());
 
+		assertEquals("0033", p_out.getInstance().get(1).getInstancetype().getClassid());
+		assertEquals("Audiovisual", p_out.getInstance().get(1).getInstancetype().getClassname());
+
 		assertEquals("CLOSED", p_out.getInstance().get(0).getAccessright().getClassid());
 		assertEquals("Closed Access", p_out.getInstance().get(0).getAccessright().getClassname());
 
@@ -114,7 +117,7 @@ public class GraphCleaningFunctionsTest {
 
 		List<Instance> poi = p_out.getInstance();
 		assertNotNull(poi);
-		assertEquals(1, poi.size());
+		assertEquals(2, poi.size());
 
 		final Instance poii = poi.get(0);
 		assertNotNull(poii);
@@ -163,7 +166,7 @@ public class GraphCleaningFunctionsTest {
 
 		final List<Instance> pci = p_cleaned.getInstance();
 		assertNotNull(pci);
-		assertEquals(1, pci.size());
+		assertEquals(2, pci.size());
 
 		final Instance pcii = pci.get(0);
 		assertNotNull(pcii);
