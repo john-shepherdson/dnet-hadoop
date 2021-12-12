@@ -1293,6 +1293,7 @@ public class XmlRecordFactory implements Serializable {
 			.collect(Collectors.groupingBy(ImmutablePair::getLeft))
 			.values()
 			.stream()
+			.filter(Objects::nonNull)
 			.map(this::mergeInstances);
 	}
 
