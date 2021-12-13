@@ -13,11 +13,3 @@ export SHADOW=$3
 hive --database ${TARGET} -e "show tables" | grep -v WARN | sed "s/\(.*\)/analyze table ${TARGET}.\1 compute statistics;/" > foo
 hive -f foo
 echo "Impala shell finished"
-
-echo "Updating shadow observatory database"
-hive -e "create database if not exists ${SHADOW}"
-hive --database ${SHADOW} -e "show tables" | grep -v WARN | sed "s/^/drop view if exists ${SHADOW}./" | sed "s/$/;/" > foo
-hive -f foo
-hive -d ${TARGET} -e "show tables" | grep -v WARN | sed "s/\(.*\)/create view ${SHADOW}.\1 as select * from ${TARGET}.\1;/" > foo
-hive -f foo
-echo "Shadow db ready!"
