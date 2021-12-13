@@ -26,7 +26,7 @@ select substr(r.id, 4) as id, inst.refereed.classname as refereed
 from ${openaire_db_name}.otherresearchproduct r lateral view explode(r.instance) instances as inst
 where r.datainfo.deletedbyinference=false and r.datainfo.invisible = FALSE;
 
-CREATE VIEW IF NOT EXISTS ${stats_db_name}.result_refereed STORED AS PARQUET as
+CREATE VIEW IF NOT EXISTS ${stats_db_name}.result_refereed as
 select * from ${stats_db_name}.publication_refereed
 union all
 select * from ${stats_db_name}.dataset_refereed
