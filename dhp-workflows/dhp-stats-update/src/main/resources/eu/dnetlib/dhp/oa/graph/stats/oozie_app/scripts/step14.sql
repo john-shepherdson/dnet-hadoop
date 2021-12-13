@@ -25,7 +25,7 @@ SELECT substr(p.id, 4) as id, licenses.value as type
 from ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.instance.license) instances as licenses
 where licenses.value is not null and licenses.value != '' and p.datainfo.deletedbyinference=false;
 
-CREATE VIEW IF NOT EXISTS ${stats_db_name}.result_licenses STORED AS PARQUET AS
+CREATE VIEW IF NOT EXISTS ${stats_db_name}.result_licenses AS
 SELECT * FROM ${stats_db_name}.publication_licenses
 UNION ALL
 SELECT * FROM ${stats_db_name}.dataset_licenses
