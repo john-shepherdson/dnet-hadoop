@@ -35,7 +35,7 @@ public class SparkSelectValidRelationsJob implements Serializable {
 			.toString(
 				SparkSelectValidRelationsJob.class
 					.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/graph/dump/input_relationdump_parameters.json"));
+						"/eu/dnetlib/dhp/oa/graph/dump/input_relationdump_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);

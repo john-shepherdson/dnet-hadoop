@@ -38,7 +38,7 @@ public class SparkDumpRelationJob implements Serializable {
 			.toString(
 				SparkDumpRelationJob.class
 					.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/graph/dump/input_relationdump_parameters.json"));
+						"/eu/dnetlib/dhp/oa/graph/dump/input_relationdump_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
@@ -55,12 +55,11 @@ public class SparkDumpRelationJob implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		Optional<String> rs  = Optional.ofNullable(parser.get("removeSet"));
+		Optional<String> rs = Optional.ofNullable(parser.get("removeSet"));
 		final Set<String> removeSet = new HashSet<>();
-		if(rs.isPresent()){
+		if (rs.isPresent()) {
 			Collections.addAll(removeSet, rs.get().split(";"));
 		}
-
 
 		SparkConf conf = new SparkConf();
 
@@ -78,7 +77,7 @@ public class SparkDumpRelationJob implements Serializable {
 	private static void dumpRelation(SparkSession spark, String inputPath, String outputPath, Set<String> removeSet) {
 		Dataset<Relation> relations = Utils.readPath(spark, inputPath, Relation.class);
 		relations
-				.filter((FilterFunction<Relation>)r -> !removeSet.contains(r.getRelClass()))
+			.filter((FilterFunction<Relation>) r -> !removeSet.contains(r.getRelClass()))
 			.map((MapFunction<Relation, eu.dnetlib.dhp.schema.dump.oaf.graph.Relation>) relation -> {
 				eu.dnetlib.dhp.schema.dump.oaf.graph.Relation relNew = new eu.dnetlib.dhp.schema.dump.oaf.graph.Relation();
 				relNew

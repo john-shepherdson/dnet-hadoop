@@ -4,9 +4,7 @@ package eu.dnetlib.dhp.oa.graph.dump.complete;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import java.util.HashMap;
-
 
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
@@ -83,7 +81,6 @@ public class DumpRelationTest {
 			"-sourcePath", sourcePath
 		});
 
-
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
@@ -144,7 +141,6 @@ public class DumpRelationTest {
 			"-outputPath", workingDir.toString() + "/relation",
 			"-sourcePath", sourcePath
 		});
-
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -207,104 +203,100 @@ public class DumpRelationTest {
 	@Test
 	public void test3() throws Exception {//
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/relation/relation")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/relation/relation")
+			.getPath();
 
 		SparkDumpRelationJob.main(new String[] {
-				"-isSparkSessionManaged", Boolean.FALSE.toString(),
-				"-outputPath", workingDir.toString() + "/relation",
-				"-sourcePath", sourcePath,
-				"-removeSet", "isParticipant"
+			"-isSparkSessionManaged", Boolean.FALSE.toString(),
+			"-outputPath", workingDir.toString() + "/relation",
+			"-sourcePath", sourcePath,
+			"-removeSet", "isParticipant"
 		});
-
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
-				.textFile(workingDir.toString() + "/relation")
-				.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
+			.textFile(workingDir.toString() + "/relation")
+			.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
 
 		org.apache.spark.sql.Dataset<Relation> verificationDataset = spark
-				.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
+			.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
 
 		verificationDataset.createOrReplaceTempView("table");
 
 		verificationDataset
-				.foreach((ForeachFunction<Relation>) r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+			.foreach((ForeachFunction<Relation>) r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
 
 		Dataset<Row> check = spark
-				.sql(
-						"SELECT reltype.name, source.id source, source.type stype, target.id target,target.type ttype, provenance.provenance "
-								+
-								"from table ");
+			.sql(
+				"SELECT reltype.name, source.id source, source.type stype, target.id target,target.type ttype, provenance.provenance "
+					+
+					"from table ");
 
 		Assertions.assertEquals(22, check.filter("name = 'isProvidedBy'").count());
 		Assertions
-				.assertEquals(
-						22, check
-								.filter(
-										"name = 'isProvidedBy' and stype = 'datasource' and ttype = 'organization' and " +
-												"provenance = 'Harvested'")
-								.count());
+			.assertEquals(
+				22, check
+					.filter(
+						"name = 'isProvidedBy' and stype = 'datasource' and ttype = 'organization' and " +
+							"provenance = 'Harvested'")
+					.count());
 
 		Assertions.assertEquals(0, check.filter("name = 'isParticipant'").count());
 
-
 		Assertions.assertEquals(1, check.filter("name = 'isAuthorInstitutionOf'").count());
 		Assertions
-				.assertEquals(
-						1, check
-								.filter(
-										"name = 'isAuthorInstitutionOf' and stype = 'organization' and ttype = 'result' " +
-												"and provenance = 'Inferred by OpenAIRE'")
-								.count());
+			.assertEquals(
+				1, check
+					.filter(
+						"name = 'isAuthorInstitutionOf' and stype = 'organization' and ttype = 'result' " +
+							"and provenance = 'Inferred by OpenAIRE'")
+					.count());
 	}
 
 	@Test
 	public void test4() throws Exception {//
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/relation/relation")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/relation/relation")
+			.getPath();
 
 		SparkDumpRelationJob.main(new String[] {
-				"-isSparkSessionManaged", Boolean.FALSE.toString(),
-				"-outputPath", workingDir.toString() + "/relation",
-				"-sourcePath", sourcePath,
-				"-removeSet", "isParticipant;isAuthorInstitutionOf"
+			"-isSparkSessionManaged", Boolean.FALSE.toString(),
+			"-outputPath", workingDir.toString() + "/relation",
+			"-sourcePath", sourcePath,
+			"-removeSet", "isParticipant;isAuthorInstitutionOf"
 		});
-
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
-				.textFile(workingDir.toString() + "/relation")
-				.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
+			.textFile(workingDir.toString() + "/relation")
+			.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
 
 		org.apache.spark.sql.Dataset<Relation> verificationDataset = spark
-				.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
+			.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
 
 		verificationDataset.createOrReplaceTempView("table");
 
 		verificationDataset
-				.foreach((ForeachFunction<Relation>) r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+			.foreach((ForeachFunction<Relation>) r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
 
 		Dataset<Row> check = spark
-				.sql(
-						"SELECT reltype.name, source.id source, source.type stype, target.id target,target.type ttype, provenance.provenance "
-								+
-								"from table ");
+			.sql(
+				"SELECT reltype.name, source.id source, source.type stype, target.id target,target.type ttype, provenance.provenance "
+					+
+					"from table ");
 
 		Assertions.assertEquals(22, check.filter("name = 'isProvidedBy'").count());
 		Assertions
-				.assertEquals(
-						22, check
-								.filter(
-										"name = 'isProvidedBy' and stype = 'datasource' and ttype = 'organization' and " +
-												"provenance = 'Harvested'")
-								.count());
+			.assertEquals(
+				22, check
+					.filter(
+						"name = 'isProvidedBy' and stype = 'datasource' and ttype = 'organization' and " +
+							"provenance = 'Harvested'")
+					.count());
 
 		Assertions.assertEquals(0, check.filter("name = 'isParticipant'").count());
-
 
 		Assertions.assertEquals(0, check.filter("name = 'isAuthorInstitutionOf'").count());
 
