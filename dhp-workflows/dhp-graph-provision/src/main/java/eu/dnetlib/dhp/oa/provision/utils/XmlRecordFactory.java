@@ -1,22 +1,24 @@
 
 package eu.dnetlib.dhp.oa.provision.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.mycila.xmltool.XMLDoc;
-import com.mycila.xmltool.XMLTag;
-import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
-import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
-import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
-import eu.dnetlib.dhp.oa.provision.model.XmlInstance;
-import eu.dnetlib.dhp.schema.common.*;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.authorPidTypes;
+import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.getRelDescriptor;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.URL;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -29,22 +31,23 @@ import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.URL;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.mycila.xmltool.XMLDoc;
+import com.mycila.xmltool.XMLTag;
 
-import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.authorPidTypes;
-import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.getRelDescriptor;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
+import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
+import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
+import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
+import eu.dnetlib.dhp.oa.provision.model.XmlInstance;
+import eu.dnetlib.dhp.schema.common.*;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public class XmlRecordFactory implements Serializable {
 
@@ -1314,8 +1317,6 @@ public class XmlRecordFactory implements Serializable {
 			instance.getCollectedfrom().add(i.getCollectedfrom());
 			instance.getHostedby().add(i.getHostedby());
 			instance.getInstancetype().add(i.getInstancetype());
-			instance.getPid().addAll(i.getPid());
-			instance.getAlternateIdentifier().addAll(i.getAlternateIdentifier());
 			instance.getRefereed().add(i.getRefereed());
 			instance
 				.setProcessingchargeamount(
@@ -1323,6 +1324,12 @@ public class XmlRecordFactory implements Serializable {
 			instance
 				.setProcessingchargecurrency(
 					Optional.ofNullable(i.getProcessingchargecurrency()).map(c -> c.getValue()).orElse(null));
+			Optional
+				.ofNullable(i.getPid())
+				.ifPresent(pid -> instance.getPid().addAll(pid));
+			Optional
+				.ofNullable(i.getAlternateIdentifier())
+				.ifPresent(altId -> instance.getAlternateIdentifier().addAll(altId));
 			Optional
 				.ofNullable(i.getDateofacceptance())
 				.ifPresent(d -> instance.getDateofacceptance().add(d.getValue()));
