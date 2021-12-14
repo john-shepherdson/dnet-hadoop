@@ -50,7 +50,7 @@ public class SparkAtomicActionScoreJob implements Serializable {
 			.toString(
 				SparkAtomicActionScoreJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/actionmanager/bipfinder/input_parameters.json"));
+						"/eu/dnetlib/dhp/actionmanager/bipfinder/input_actionset_parameter.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -69,14 +69,6 @@ public class SparkAtomicActionScoreJob implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath {}: ", outputPath);
 
-		final String bipScorePath = parser.get("bipScorePath");
-		log.info("bipScorePath: {}", bipScorePath);
-
-		final String resultClassName = parser.get("resultTableName");
-		log.info("resultTableName: {}", resultClassName);
-
-		Class<I> inputClazz = (Class<I>) Class.forName(resultClassName);
-
 		SparkConf conf = new SparkConf();
 
 		runWithSparkSession(
@@ -84,12 +76,11 @@ public class SparkAtomicActionScoreJob implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				removeOutputDir(spark, outputPath);
-				prepareResults(spark, inputPath, outputPath, bipScorePath, inputClazz);
+				prepareResults(spark, inputPath, outputPath);
 			});
 	}
 
-	private static <I extends Result> void prepareResults(SparkSession spark, String inputPath, String outputPath,
-		String bipScorePath, Class<I> inputClazz) {
+	private static <I extends Result> void prepareResults(SparkSession spark, String bipScorePath, String outputPath) {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -105,26 +96,7 @@ public class SparkAtomicActionScoreJob implements Serializable {
 				return bs;
 			}).collect(Collectors.toList()).iterator()).rdd(), Encoders.bean(BipScore.class));
 
-		Dataset<I> results = readPath(spark, inputPath, inputClazz);
-
-		results.createOrReplaceTempView("result");
-
-		Dataset<Row> preparedResult = spark
-			.sql(
-				"select id " +
-					"from result " +
-
-					"where dataInfo.deletedbyinference = false ");
-
 		bipScores
-			.joinWith(
-				preparedResult, bipScores.col("id").equalTo(preparedResult.col("id")),
-				"inner")
-			.map((MapFunction<Tuple2<BipScore, Row>, BipScore>) value -> {
-				BipScore ret = value._1();
-				ret.setId(value._1().getId());
-				return ret;
-			}, Encoders.bean(BipScore.class))
 
 			.map((MapFunction<BipScore, Result>) bs -> {
 				Result ret = new Result();
@@ -136,7 +108,7 @@ public class SparkAtomicActionScoreJob implements Serializable {
 				return ret;
 			}, Encoders.bean(Result.class))
 			.toJavaRDD()
-			.map(p -> new AtomicAction(inputClazz, p))
+			.map(p -> new AtomicAction(Result.class, p))
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
