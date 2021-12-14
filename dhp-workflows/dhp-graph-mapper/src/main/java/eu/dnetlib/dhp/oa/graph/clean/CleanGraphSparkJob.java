@@ -88,7 +88,7 @@ public class CleanGraphSparkJob {
 		readTableFromPath(spark, inputPath, clazz)
 			.map((MapFunction<T, T>) GraphCleaningFunctions::fixVocabularyNames, Encoders.bean(clazz))
 			.map((MapFunction<T, T>) value -> OafCleaner.apply(value, mapping), Encoders.bean(clazz))
-			.map((MapFunction<T, T>) GraphCleaningFunctions::cleanup, Encoders.bean(clazz))
+			.map((MapFunction<T, T>) value -> GraphCleaningFunctions.cleanup(value, vocs), Encoders.bean(clazz))
 			.filter((FilterFunction<T>) GraphCleaningFunctions::filter)
 			.write()
 			.mode(SaveMode.Overwrite)

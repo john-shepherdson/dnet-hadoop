@@ -171,30 +171,6 @@ public class DumpJobTest {
 
 		GraphResult gr = verificationDataset.first();
 
-		Assertions.assertEquals(1, gr.getInstance().size());
-
-		Assertions.assertEquals(2, gr.getInstance().get(0).getMeasures().size());
-		Assertions
-			.assertTrue(
-				gr
-					.getInstance()
-					.get(0)
-					.getMeasures()
-					.stream()
-					.anyMatch(
-						m -> m.getKey().equals("influence")
-							&& m.getValue().equals("1.62759106106e-08")));
-		Assertions
-			.assertTrue(
-				gr
-					.getInstance()
-					.get(0)
-					.getMeasures()
-					.stream()
-					.anyMatch(
-						m -> m.getKey().equals("popularity")
-							&& m.getValue().equals("0.22519296")));
-
 		Assertions.assertEquals(6, gr.getAuthor().size());
 		Assertions
 			.assertTrue(
@@ -362,8 +338,6 @@ public class DumpJobTest {
 		Assertions.assertTrue(null == gr.getGeolocation() || gr.getGeolocation().size() == 0);
 
 		Assertions.assertEquals("50|pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2", gr.getId());
-
-		System.out.println(gr.getOriginalId().size());
 
 		Assertions.assertEquals(1, gr.getOriginalId().size());
 		Assertions

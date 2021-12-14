@@ -89,13 +89,13 @@ public class CreateOpenCitationsASTest {
 					"-inputPath",
 					inputPath,
 					"-outputPath",
-					workingDir.toString() + "/actionSet"
+					workingDir.toString() + "/actionSet1"
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
-			.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)
+			.sequenceFile(workingDir.toString() + "/actionSet1", Text.class, Text.class)
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
@@ -121,13 +121,13 @@ public class CreateOpenCitationsASTest {
 					"-inputPath",
 					inputPath,
 					"-outputPath",
-					workingDir.toString() + "/actionSet"
+					workingDir.toString() + "/actionSet2"
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
-			.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)
+			.sequenceFile(workingDir.toString() + "/actionSet2", Text.class, Text.class)
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
@@ -153,13 +153,13 @@ public class CreateOpenCitationsASTest {
 					"-inputPath",
 					inputPath,
 					"-outputPath",
-					workingDir.toString() + "/actionSet"
+					workingDir.toString() + "/actionSet3"
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
-			.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)
+			.sequenceFile(workingDir.toString() + "/actionSet3", Text.class, Text.class)
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
@@ -186,13 +186,13 @@ public class CreateOpenCitationsASTest {
 					"-inputPath",
 					inputPath,
 					"-outputPath",
-					workingDir.toString() + "/actionSet"
+					workingDir.toString() + "/actionSet4"
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
-			.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)
+			.sequenceFile(workingDir.toString() + "/actionSet4", Text.class, Text.class)
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
@@ -226,13 +226,13 @@ public class CreateOpenCitationsASTest {
 					"-inputPath",
 					inputPath,
 					"-outputPath",
-					workingDir.toString() + "/actionSet"
+					workingDir.toString() + "/actionSet5"
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
-			.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)
+			.sequenceFile(workingDir.toString() + "/actionSet5", Text.class, Text.class)
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
@@ -261,13 +261,13 @@ public class CreateOpenCitationsASTest {
 					"-inputPath",
 					inputPath,
 					"-outputPath",
-					workingDir.toString() + "/actionSet"
+					workingDir.toString() + "/actionSet6"
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
-			.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)
+			.sequenceFile(workingDir.toString() + "/actionSet6", Text.class, Text.class)
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
@@ -306,13 +306,13 @@ public class CreateOpenCitationsASTest {
 					"-inputPath",
 					inputPath,
 					"-outputPath",
-					workingDir.toString() + "/actionSet"
+					workingDir.toString() + "/actionSet7"
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
-			.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)
+			.sequenceFile(workingDir.toString() + "/actionSet7", Text.class, Text.class)
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
