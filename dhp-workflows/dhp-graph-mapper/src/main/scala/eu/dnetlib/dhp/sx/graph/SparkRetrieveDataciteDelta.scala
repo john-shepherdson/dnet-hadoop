@@ -1,9 +1,9 @@
 package eu.dnetlib.dhp.sx.graph
 
 import eu.dnetlib.dhp.application.AbstractScalaApplication
-import eu.dnetlib.dhp.schema.oaf.{Oaf, Result}
-import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
+import eu.dnetlib.dhp.schema.oaf.Result
 import org.apache.spark.sql.functions.max
+import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
 import org.slf4j.Logger
 
 class SparkRetrieveDataciteDelta (propertyPath:String, args:Array[String], log:Logger) extends  AbstractScalaApplication(propertyPath, args, log:Logger) {
