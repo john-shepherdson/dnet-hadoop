@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.actionmanager.bipfinder;
 
+import static eu.dnetlib.dhp.actionmanager.createunresolvedentities.Constants.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
@@ -18,6 +19,7 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +29,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import scala.Tuple2;
 
 /**
@@ -105,32 +109,29 @@ public class SparkAtomicActionScoreJob implements Serializable {
 
 		results.createOrReplaceTempView("result");
 
-		Dataset<PreparedResult> preparedResult = spark
+		Dataset<Row> preparedResult = spark
 			.sql(
-				"select pIde.value value, id " +
+				"select id " +
 					"from result " +
-					"lateral view explode (pid) p as pIde " +
-					"where dataInfo.deletedbyinference = false and pIde.qualifier.classid = '" + DOI + "'")
-			.as(Encoders.bean(PreparedResult.class));
+
+					"where dataInfo.deletedbyinference = false ");
 
 		bipScores
 			.joinWith(
-				preparedResult, bipScores.col("id").equalTo(preparedResult.col("value")),
+				preparedResult, bipScores.col("id").equalTo(preparedResult.col("id")),
 				"inner")
-			.map((MapFunction<Tuple2<BipScore, PreparedResult>, BipScore>) value -> {
+			.map((MapFunction<Tuple2<BipScore, Row>, BipScore>) value -> {
 				BipScore ret = value._1();
-				ret.setId(value._2().getId());
+				ret.setId(value._1().getId());
 				return ret;
 			}, Encoders.bean(BipScore.class))
-			.groupByKey((MapFunction<BipScore, String>) BipScore::getId, Encoders.STRING())
-			.mapGroups((MapGroupsFunction<String, BipScore, Result>) (k, it) -> {
-				Result ret = new Result();
-				ret.setDataInfo(getDataInfo());
-				BipScore first = it.next();
-				ret.setId(first.getId());
 
-				ret.setMeasures(getMeasure(first));
-				it.forEachRemaining(value -> ret.getMeasures().addAll(getMeasure(value)));
+			.map((MapFunction<BipScore, Result>) bs -> {
+				Result ret = new Result();
+
+				ret.setId(bs.getId());
+
+				ret.setMeasures(getMeasure(bs));
 
 				return ret;
 			}, Encoders.bean(Result.class))
@@ -159,28 +160,27 @@ public class SparkAtomicActionScoreJob implements Serializable {
 								KeyValue kv = new KeyValue();
 								kv.setValue(unit.getValue());
 								kv.setKey(unit.getKey());
-								kv.setDataInfo(getDataInfo());
+								kv
+									.setDataInfo(
+										OafMapperUtils
+											.dataInfo(
+												false,
+												UPDATE_DATA_INFO_TYPE,
+												true,
+												false,
+												OafMapperUtils
+													.qualifier(
+														UPDATE_MEASURE_BIP_CLASS_ID,
+														UPDATE_CLASS_NAME,
+														ModelConstants.DNET_PROVENANCE_ACTIONS,
+														ModelConstants.DNET_PROVENANCE_ACTIONS),
+												""));
 								return kv;
 							})
 							.collect(Collectors.toList()));
 				return m;
 			})
 			.collect(Collectors.toList());
-	}
-
-	private static DataInfo getDataInfo() {
-		DataInfo di = new DataInfo();
-		di.setInferred(false);
-		di.setInvisible(false);
-		di.setDeletedbyinference(false);
-		di.setTrust("");
-		Qualifier qualifier = new Qualifier();
-		qualifier.setClassid("sysimport:actionset");
-		qualifier.setClassname("Harvested");
-		qualifier.setSchemename("dnet:provenanceActions");
-		qualifier.setSchemeid("dnet:provenanceActions");
-		di.setProvenanceaction(qualifier);
-		return di;
 	}
 
 	private static void removeOutputDir(SparkSession spark, String path) {
