@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.MappableBlock;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,7 +68,57 @@ public class GraphCleaningFunctionsTest {
 			Relation r_out = OafCleaner.apply(r_in, mapping);
 			assertTrue(vocabularies.getTerms(ModelConstants.DNET_RELATION_RELCLASS).contains(r_out.getRelClass()));
 			assertTrue(vocabularies.getTerms(ModelConstants.DNET_RELATION_SUBRELTYPE).contains(r_out.getSubRelType()));
+
+			assertEquals("iis", r_out.getDataInfo().getProvenanceaction().getClassid());
+			assertEquals("Inferred by OpenAIRE", r_out.getDataInfo().getProvenanceaction().getClassname());
 		}
+	}
+
+	@Test
+	void testFilter_false() throws Exception {
+
+		assertNotNull(vocabularies);
+		assertNotNull(mapping);
+
+		String json = IOUtils
+			.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/result_invisible.json"));
+		Publication p_in = MAPPER.readValue(json, Publication.class);
+
+		assertTrue(p_in instanceof Result);
+		assertTrue(p_in instanceof Publication);
+
+		assertEquals(false, GraphCleaningFunctions.filter(p_in));
+	}
+
+	@Test
+	void testFilter_true() throws Exception {
+
+		assertNotNull(vocabularies);
+		assertNotNull(mapping);
+
+		String json = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/result.json"));
+		Publication p_in = MAPPER.readValue(json, Publication.class);
+
+		assertTrue(p_in instanceof Result);
+		assertTrue(p_in instanceof Publication);
+
+		assertEquals(true, GraphCleaningFunctions.filter(p_in));
+	}
+
+	@Test
+	void testFilter_missing_invisible() throws Exception {
+
+		assertNotNull(vocabularies);
+		assertNotNull(mapping);
+
+		String json = IOUtils
+			.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/result_missing_invisible.json"));
+		Publication p_in = MAPPER.readValue(json, Publication.class);
+
+		assertTrue(p_in instanceof Result);
+		assertTrue(p_in instanceof Publication);
+
+		assertEquals(true, GraphCleaningFunctions.filter(p_in));
 	}
 
 	@Test
@@ -99,6 +151,12 @@ public class GraphCleaningFunctionsTest {
 		assertEquals("0018", p_out.getInstance().get(0).getInstancetype().getClassid());
 		assertEquals("Annotation", p_out.getInstance().get(0).getInstancetype().getClassname());
 
+		assertEquals("0027", p_out.getInstance().get(1).getInstancetype().getClassid());
+		assertEquals("Model", p_out.getInstance().get(1).getInstancetype().getClassname());
+
+		assertEquals("xyz", p_out.getInstance().get(2).getInstancetype().getClassid());
+		assertEquals("xyz", p_out.getInstance().get(2).getInstancetype().getClassname());
+
 		assertEquals("CLOSED", p_out.getInstance().get(0).getAccessright().getClassid());
 		assertEquals("Closed Access", p_out.getInstance().get(0).getAccessright().getClassname());
 
@@ -112,7 +170,7 @@ public class GraphCleaningFunctionsTest {
 
 		List<Instance> poi = p_out.getInstance();
 		assertNotNull(poi);
-		assertEquals(1, poi.size());
+		assertEquals(3, poi.size());
 
 		final Instance poii = poi.get(0);
 		assertNotNull(poii);
@@ -140,7 +198,7 @@ public class GraphCleaningFunctionsTest {
 
 		assertEquals(5, p_out.getTitle().size());
 
-		Publication p_cleaned = GraphCleaningFunctions.cleanup(p_out);
+		Publication p_cleaned = GraphCleaningFunctions.cleanup(p_out, vocabularies);
 
 		assertEquals(3, p_cleaned.getTitle().size());
 
@@ -159,9 +217,12 @@ public class GraphCleaningFunctionsTest {
 
 		assertEquals("1970-10-07", p_cleaned.getDateofacceptance().getValue());
 
+		assertEquals("0038", p_cleaned.getInstance().get(2).getInstancetype().getClassid());
+		assertEquals("Other literature type", p_cleaned.getInstance().get(2).getInstancetype().getClassname());
+
 		final List<Instance> pci = p_cleaned.getInstance();
 		assertNotNull(pci);
-		assertEquals(1, pci.size());
+		assertEquals(3, pci.size());
 
 		final Instance pcii = pci.get(0);
 		assertNotNull(pcii);
@@ -221,5 +282,28 @@ public class GraphCleaningFunctionsTest {
 		return IOUtils
 			.readLines(
 				GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
+	}
+
+	@Test
+	public void testCleanDoiBoost() throws IOException {
+		String json = IOUtils
+			.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/doiboostpub.json"));
+		Publication p_in = MAPPER.readValue(json, Publication.class);
+		Publication p_out = OafCleaner.apply(GraphCleaningFunctions.fixVocabularyNames(p_in), mapping);
+		Publication cleaned = GraphCleaningFunctions.cleanup(p_out, vocabularies);
+
+		Assertions.assertEquals(true, GraphCleaningFunctions.filter(cleaned));
+	}
+
+	@Test
+	public void testCleanDoiBoost2() throws IOException {
+		String json = IOUtils
+			.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/doiboostpub2.json"));
+		Publication p_in = MAPPER.readValue(json, Publication.class);
+		Publication p_out = OafCleaner.apply(GraphCleaningFunctions.fixVocabularyNames(p_in), mapping);
+		Publication cleaned = GraphCleaningFunctions.cleanup(p_out, vocabularies);
+
+		Assertions.assertEquals(true, GraphCleaningFunctions.filter(cleaned));
+
 	}
 }

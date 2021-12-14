@@ -2,5 +2,6 @@
   {"paramName":"mt",  "paramLongName":"master",       "paramDescription": "should be local or yarn",    "paramRequired": true},
   {"paramName":"w",   "paramLongName":"workingPath",  "paramDescription": "the source Path",            "paramRequired": true},
   {"paramName":"u",   "paramLongName":"unresolvedPath",  "paramDescription": "the source Path",            "paramRequired": true},
-  {"paramName":"g",   "paramLongName":"graphBasePath",   "paramDescription": "the path of the raw graph",  "paramRequired": true}
+  {"paramName":"g",   "paramLongName":"graphBasePath",   "paramDescription": "the path of the raw graph",  "paramRequired": true},
+  {"paramName":"t",   "paramLongName":"targetPath",   "paramDescription": "the target path",  "paramRequired": true}
 ]

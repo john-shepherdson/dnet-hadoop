@@ -139,12 +139,26 @@ abstract class AbstractSparkAction implements Serializable {
 	protected boolean isOpenorgs(Relation rel) {
 		return Optional
 			.ofNullable(rel.getCollectedfrom())
-			.map(
-				c -> c
-					.stream()
-					.filter(Objects::nonNull)
-					.anyMatch(kv -> ModelConstants.OPENORGS_NAME.equals(kv.getValue())))
+			.map(c -> isCollectedFromOpenOrgs(c))
 			.orElse(false);
+	}
+
+	protected boolean isOpenorgsDedupRel(Relation rel) {
+		return isOpenorgs(rel) && isOpenOrgsDedupMergeRelation(rel);
+	}
+
+	private boolean isCollectedFromOpenOrgs(List<KeyValue> c) {
+		return c
+			.stream()
+			.filter(Objects::nonNull)
+			.anyMatch(kv -> ModelConstants.OPENORGS_NAME.equals(kv.getValue()));
+	}
+
+	private boolean isOpenOrgsDedupMergeRelation(Relation rel) {
+		return ModelConstants.ORG_ORG_RELTYPE.equals(rel.getRelType()) &&
+			ModelConstants.DEDUP.equals(rel.getSubRelType())
+			&& (ModelConstants.IS_MERGED_IN.equals(rel.getRelClass()) ||
+				ModelConstants.MERGES.equals(rel.getRelClass()));
 	}
 
 	protected static Boolean parseECField(Field<String> field) {

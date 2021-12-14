@@ -719,6 +719,10 @@
 			<id>dnet45-releases</id>
 			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-releases</url>
 		</repository>
+		<site>
+			<id>DHPSite</id>
+			<url>${dhp.site.stage.path}/</url>
+		</site>
 	</distributionManagement>
 	<reporting>
 		<plugins>
@@ -734,6 +738,7 @@
 	</reporting>
 
 	<properties>
+		<dhp.site.stage.path>sftp://dnet-hadoop@static-web.d4science.org/dnet-hadoop</dhp.site.stage.path>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>

@@ -22,9 +22,20 @@
             <id>dnet45-releases</id>
             <url>https://maven.d4science.org/nexus/content/repositories/dnet45-releases</url>
         </repository>
+        <site>
+            <id>DHPSite</id>
+            <url>${dhp.site.stage.path}/dhp-build/dhp-code-style</url>
+        </site>
     </distributionManagement>
 
     <build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.10</version>
+            </extension>
+        </extensions>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -35,7 +46,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.7.1</version>
+                    <version>3.9.1</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -43,6 +54,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <dhp.site.stage.path>sftp://dnet-hadoop@static-web.d4science.org/dnet-hadoop</dhp.site.stage.path>
     </properties>
 
 </project>

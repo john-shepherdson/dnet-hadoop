@@ -708,7 +708,7 @@ class MappersTest {
 		assertEquals(1, p.getTitle().size());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 
-		final Publication p_cleaned = cleanup(fixVocabularyNames(p));
+		final Publication p_cleaned = cleanup(fixVocabularyNames(p), vocs);
 
 		assertNotNull(p_cleaned.getTitle());
 		assertFalse(p_cleaned.getTitle().isEmpty());
