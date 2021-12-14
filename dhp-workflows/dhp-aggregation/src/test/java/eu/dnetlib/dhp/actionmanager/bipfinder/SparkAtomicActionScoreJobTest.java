@@ -85,11 +85,9 @@ public class SparkAtomicActionScoreJobTest {
 					"-isSparkSessionManaged",
 					Boolean.FALSE.toString(),
 					"-inputPath",
-					inputPath,
-					"-bipScorePath",
+
 					bipScoresPath,
-					"-resultTableName",
-					"eu.dnetlib.dhp.schema.oaf.Publication",
+
 					"-outputPath",
 					workingDir.toString() + "/actionSet"
 				});
