@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.KeyValueSet;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
@@ -124,7 +125,7 @@ public class PrepareResultInstRepoAssociation {
 
 	private static void prepareAlreadyLinkedAssociation(
 		SparkSession spark, String alreadyLinkedPath) {
-		String query = "Select source resultId, collect_set(target) organizationSet "
+		String query = "Select source key, collect_set(target) valueSet "
 			+ "from relation "
 			+ "where datainfo.deletedbyinference = false "
 			+ "and lower(relClass) = '"
@@ -134,7 +135,7 @@ public class PrepareResultInstRepoAssociation {
 
 		spark
 			.sql(query)
-			.as(Encoders.bean(ResultOrganizationSet.class))
+			.as(Encoders.bean(KeyValueSet.class))
 			// TODO retry to stick with datasets
 			.toJavaRDD()
 			.map(r -> OBJECT_MAPPER.writeValueAsString(r))
