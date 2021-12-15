@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -55,6 +56,9 @@ public class PropagationConstant {
 	public static final String PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_ID = "result:organization:instrepo";
 	public static final String PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME = "Propagation of affiliation to result collected from datasources of type institutional repository";
 
+	public static final String PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_ID = "result:organization:semrel";
+	public static final String PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_NAME = "Propagation of affiliation to result through sematic relations";
+
 	public static final String PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID = "result:project:semrel";
 	public static final String PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_NAME = "Propagation of result to project through semantic relation";
 
@@ -66,6 +70,13 @@ public class PropagationConstant {
 
 	public static final String PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_ID = "authorpid:result";
 	public static final String PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME = "Propagation of authors pid to result through semantic relations";
+
+	public static final String ITERATION_ONE = "ExitAtFirstIteration";
+	public static final String ITERATION_TWO = "ExitAtSecondIteration";
+	public static final String ITERATION_THREE = "ExitAtThirdIteration";
+	public static final String ITERATION_FOUR = "ExitAtFourthIteration";
+	public static final String ITERATION_FIVE = "ExitAtFifthIteration";
+	public static final String ITERATION_NO_PARENT = "ExitAtNoFirstParentReached";
 
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -125,6 +136,39 @@ public class PropagationConstant {
 		pa.setSchemeid(qualifierSchema);
 		pa.setSchemename(qualifierSchema);
 		return pa;
+	}
+
+	public static ArrayList<Relation> getOrganizationRelationPair(String orgId,
+		String resultId,
+		String classID,
+		String className
+
+	) {
+		ArrayList<Relation> newRelations = new ArrayList();
+		newRelations
+			.add(
+				getRelation(
+					orgId,
+					resultId,
+					ModelConstants.IS_AUTHOR_INSTITUTION_OF,
+					ModelConstants.RESULT_ORGANIZATION,
+					ModelConstants.AFFILIATION,
+					PROPAGATION_DATA_INFO_TYPE,
+					classID,
+					className));
+		newRelations
+			.add(
+				getRelation(
+					resultId,
+					orgId,
+					ModelConstants.HAS_AUTHOR_INSTITUTION,
+					ModelConstants.RESULT_ORGANIZATION,
+					ModelConstants.AFFILIATION,
+					PROPAGATION_DATA_INFO_TYPE,
+					classID,
+					className));
+
+		return newRelations;
 	}
 
 	public static Relation getRelation(
