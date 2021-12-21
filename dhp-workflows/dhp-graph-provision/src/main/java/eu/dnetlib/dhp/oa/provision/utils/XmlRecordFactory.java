@@ -11,31 +11,17 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collector;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.solr.common.util.URLUtil;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -60,6 +46,7 @@ import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.oa.provision.model.XmlInstance;
 import eu.dnetlib.dhp.schema.common.*;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public class XmlRecordFactory implements Serializable {
@@ -1274,6 +1261,7 @@ public class XmlRecordFactory implements Serializable {
 	private Stream<XmlInstance> groupInstancesByUrl(List<Instance> instance) {
 		return instance
 			.stream()
+			.filter(i -> Objects.nonNull(i.getUrl()))
 			.map(i -> {
 				i
 					.setUrl(
@@ -1329,18 +1317,28 @@ public class XmlRecordFactory implements Serializable {
 			instance.getCollectedfrom().add(i.getCollectedfrom());
 			instance.getHostedby().add(i.getHostedby());
 			instance.getInstancetype().add(i.getInstancetype());
-			instance.getLicense().add(i.getLicense().getValue());
-			instance.getDistributionlocation().add(i.getDistributionlocation());
-			instance.getPid().addAll(i.getPid());
-			instance.getAlternateIdentifier().addAll(i.getAlternateIdentifier());
-			instance.getDateofacceptance().add(i.getDateofacceptance().getValue());
+			instance.getRefereed().add(i.getRefereed());
 			instance
 				.setProcessingchargeamount(
 					Optional.ofNullable(i.getProcessingchargeamount()).map(apc -> apc.getValue()).orElse(null));
 			instance
 				.setProcessingchargecurrency(
 					Optional.ofNullable(i.getProcessingchargecurrency()).map(c -> c.getValue()).orElse(null));
-			instance.getRefereed().add(i.getRefereed());
+			Optional
+				.ofNullable(i.getPid())
+				.ifPresent(pid -> instance.getPid().addAll(pid));
+			Optional
+				.ofNullable(i.getAlternateIdentifier())
+				.ifPresent(altId -> instance.getAlternateIdentifier().addAll(altId));
+			Optional
+				.ofNullable(i.getDateofacceptance())
+				.ifPresent(d -> instance.getDateofacceptance().add(d.getValue()));
+			Optional
+				.ofNullable(i.getLicense())
+				.ifPresent(license -> instance.getLicense().add(license.getValue()));
+			Optional
+				.ofNullable(i.getDistributionlocation())
+				.ifPresent(dl -> instance.getDistributionlocation().add(dl));
 		});
 
 		if (instance.getHostedby().size() > 1
