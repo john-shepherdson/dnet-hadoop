@@ -84,7 +84,7 @@ public class PrepareInfoJobTest {
 					"-leavesPath", workingDir.toString() + "/currentIteration/",
 					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
 					"-childParentPath", workingDir.toString() + "/childParentOrg/",
-						"-relationPath", workingDir.toString() + "/relation"
+					"-relationPath", workingDir.toString() + "/relation"
 
 				});
 
@@ -229,7 +229,7 @@ public class PrepareInfoJobTest {
 					"-leavesPath", workingDir.toString() + "/currentIteration/",
 					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
 					"-childParentPath", workingDir.toString() + "/childParentOrg/",
-						"-relationPath", workingDir.toString() + "/relation"
+					"-relationPath", workingDir.toString() + "/relation"
 
 				});
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -335,34 +335,35 @@ public class PrepareInfoJobTest {
 	}
 
 	@Test
-	public void relationTest()throws Exception {
+	public void relationTest() throws Exception {
 
 		PrepareInfo
-				.main(
-						new String[] {
-								"-isSparkSessionManaged", Boolean.FALSE.toString(),
-								"-graphPath", getClass()
-								.getResource(
-										"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/resultorganizationtest")
-								.getPath(),
-								"-hive_metastore_uris", "",
-								"-leavesPath", workingDir.toString() + "/currentIteration/",
-								"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
-								"-childParentPath", workingDir.toString() + "/childParentOrg/",
-								"-relationPath", workingDir.toString() + "/relation"
+			.main(
+				new String[] {
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-graphPath", getClass()
+						.getResource(
+							"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/resultorganizationtest")
+						.getPath(),
+					"-hive_metastore_uris", "",
+					"-leavesPath", workingDir.toString() + "/currentIteration/",
+					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
+					"-childParentPath", workingDir.toString() + "/childParentOrg/",
+					"-relationPath", workingDir.toString() + "/relation"
 
-						});
+				});
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
-				.textFile(workingDir.toString() + "/relation")
-				.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
+			.textFile(workingDir.toString() + "/relation")
+			.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
 
 		Dataset<Relation> verificationDs = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
 
 		Assertions.assertEquals(7, verificationDs.count());
 
 	}
+
 	@Test
 	public void resultOrganizationTest1() throws Exception {
 
@@ -378,7 +379,7 @@ public class PrepareInfoJobTest {
 					"-leavesPath", workingDir.toString() + "/currentIteration/",
 					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
 					"-childParentPath", workingDir.toString() + "/childParentOrg/",
-						"-relationPath", workingDir.toString() + "/relation"
+					"-relationPath", workingDir.toString() + "/relation"
 
 				});
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -512,7 +513,7 @@ public class PrepareInfoJobTest {
 					"-leavesPath", workingDir.toString() + "/currentIteration/",
 					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
 					"-childParentPath", workingDir.toString() + "/childParentOrg/",
-						"-relationPath", workingDir.toString() + "/relation"
+					"-relationPath", workingDir.toString() + "/relation"
 
 				});
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -539,7 +540,7 @@ public class PrepareInfoJobTest {
 					"-leavesPath", workingDir.toString() + "/currentIteration/",
 					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
 					"-childParentPath", workingDir.toString() + "/childParentOrg/",
-						"-relationPath", workingDir.toString() + "/relation"
+					"-relationPath", workingDir.toString() + "/relation"
 
 				});
 

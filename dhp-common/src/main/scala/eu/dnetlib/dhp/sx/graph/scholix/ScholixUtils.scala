@@ -12,7 +12,7 @@ import org.json4s.jackson.JsonMethods.parse
 import scala.collection.JavaConverters._
 import scala.io.Source
 
-object ScholixUtils {
+object ScholixUtils extends Serializable {
 
 
   val DNET_IDENTIFIER_SCHEMA: String = "DNET Identifier"
@@ -24,7 +24,7 @@ object ScholixUtils {
   case class RelatedEntities(id: String, relatedDataset: Long, relatedPublication: Long) {}
 
   val relations: Map[String, RelationVocabulary] = {
-    val input = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/relations.json")).mkString
+    val input = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/scholexplorer/relation/relations.json")).mkString
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
     lazy val json: json4s.JValue = parse(input)
@@ -53,8 +53,6 @@ object ScholixUtils {
     else {
       summary.getDate.get(0)
     }
-
-
   }
 
   def inverseRelationShip(rel: ScholixRelationship): ScholixRelationship = {
@@ -64,11 +62,15 @@ object ScholixUtils {
   }
 
 
+  def generateScholixResourceFromResult(r:Result) :ScholixResource = {
+    generateScholixResourceFromSummary(ScholixUtils.resultToSummary(r))
+  }
+
+
   val statsAggregator: Aggregator[(String, String, Long), RelatedEntities, RelatedEntities] = new Aggregator[(String, String, Long), RelatedEntities, RelatedEntities] with Serializable {
     override def zero: RelatedEntities = null
 
     override def reduce(b: RelatedEntities, a: (String, String, Long)): RelatedEntities = {
-      val id = a._1
       val relatedDataset = if ("dataset".equalsIgnoreCase(a._2)) a._3 else 0
       val relatedPublication = if ("publication".equalsIgnoreCase(a._2)) a._3 else 0
 
@@ -142,6 +144,14 @@ object ScholixUtils {
 
   }
 
+  def extractCollectedFrom(summary: ScholixResource): List[ScholixEntityId] = {
+    if (summary.getCollectedFrom != null && !summary.getCollectedFrom.isEmpty) {
+      val l: List[ScholixEntityId] = summary.getCollectedFrom.asScala.map {
+        d => new ScholixEntityId(d.getProvider.getName, d.getProvider.getIdentifiers)
+      }(collection.breakOut)
+      l
+    } else List()
+  }
 
   def extractCollectedFrom(summary: ScholixSummary): List[ScholixEntityId] = {
     if (summary.getDatasources != null && !summary.getDatasources.isEmpty) {
@@ -160,7 +170,7 @@ object ScholixUtils {
         c =>
 
           new ScholixEntityId(c.getValue, List(new ScholixIdentifier(c.getKey, DNET_IDENTIFIER_SCHEMA, null)).asJava)
-      }(collection breakOut)
+      }.toList
       l
     } else List()
   }
@@ -174,6 +184,19 @@ object ScholixUtils {
     s.setRelationship(scholix.getRelationship)
     s.setSource(scholix.getSource)
     s.setTarget(generateScholixResourceFromSummary(target))
+    s.setIdentifier(DHPUtils.md5(s"${s.getSource.getIdentifier}::${s.getRelationship.getName}::${s.getTarget.getIdentifier}"))
+    s
+  }
+
+
+  def generateCompleteScholix(scholix: Scholix, target: ScholixResource): Scholix = {
+    val s = new Scholix
+    s.setPublicationDate(scholix.getPublicationDate)
+    s.setPublisher(scholix.getPublisher)
+    s.setLinkprovider(scholix.getLinkprovider)
+    s.setRelationship(scholix.getRelationship)
+    s.setSource(scholix.getSource)
+    s.setTarget(target)
     s.setIdentifier(DHPUtils.md5(s"${s.getSource.getIdentifier}::${s.getRelationship.getName}::${s.getTarget.getIdentifier}"))
     s
   }
@@ -219,6 +242,38 @@ object ScholixUtils {
 
     }
     r
+  }
+
+
+
+  def scholixFromSource(relation: Relation, source: ScholixResource):Scholix = {
+    if (relation == null || source == null)
+      return null
+    val s = new Scholix
+    var l: List[ScholixEntityId] = extractCollectedFrom(relation)
+    if (l.isEmpty)
+      l = extractCollectedFrom(source)
+    if (l.isEmpty)
+      return null
+    s.setLinkprovider(l.asJava)
+    var d = extractRelationDate(relation)
+    if (d == null)
+      d = source.getPublicationDate
+
+    s.setPublicationDate(d)
+
+
+    if (source.getPublisher != null && !source.getPublisher.isEmpty) {
+      s.setPublisher(source.getPublisher)
+    }
+
+    val semanticRelation = relations.getOrElse(relation.getRelClass.toLowerCase, null)
+    if (semanticRelation == null)
+      return null
+    s.setRelationship(new ScholixRelationship(semanticRelation.original, "datacite", semanticRelation.inverse))
+    s.setSource(source)
+
+    s
   }
 
 
@@ -303,7 +358,7 @@ object ScholixUtils {
     s.setSubType(r.getInstance().get(0).getInstancetype.getClassname)
 
     if (r.getTitle != null && r.getTitle.asScala.nonEmpty) {
-      val titles: List[String] = r.getTitle.asScala.map(t => t.getValue)(collection breakOut)
+      val titles: List[String] = r.getTitle.asScala.map(t => t.getValue).toList
       if (titles.nonEmpty)
         s.setTitle(titles.asJava)
       else
@@ -311,12 +366,12 @@ object ScholixUtils {
     }
 
     if (r.getAuthor != null && !r.getAuthor.isEmpty) {
-      val authors: List[String] = r.getAuthor.asScala.map(a => a.getFullname)(collection breakOut)
-      if (authors nonEmpty)
+      val authors: List[String] = r.getAuthor.asScala.map(a => a.getFullname).toList
+      if (authors.nonEmpty)
         s.setAuthor(authors.asJava)
     }
     if (r.getInstance() != null) {
-      val dt: List[String] = r.getInstance().asScala.filter(i => i.getDateofacceptance != null).map(i => i.getDateofacceptance.getValue)(collection.breakOut)
+      val dt: List[String] = r.getInstance().asScala.filter(i => i.getDateofacceptance != null).map(i => i.getDateofacceptance.getValue).toList
       if (dt.nonEmpty)
         s.setDate(dt.distinct.asJava)
     }
@@ -327,7 +382,7 @@ object ScholixUtils {
     }
 
     if (r.getSubject != null && !r.getSubject.isEmpty) {
-      val subjects: List[SchemeValue] = r.getSubject.asScala.map(s => new SchemeValue(s.getQualifier.getClassname, s.getValue))(collection breakOut)
+      val subjects: List[SchemeValue] = r.getSubject.asScala.map(s => new SchemeValue(s.getQualifier.getClassname, s.getValue)).toList
       if (subjects.nonEmpty)
         s.setSubject(subjects.asJava)
     }
@@ -336,7 +391,7 @@ object ScholixUtils {
       s.setPublisher(List(r.getPublisher.getValue).asJava)
 
     if (r.getCollectedfrom != null && !r.getCollectedfrom.isEmpty) {
-      val cf: List[CollectedFromType] = r.getCollectedfrom.asScala.map(c => new CollectedFromType(c.getValue, c.getKey, "complete"))(collection breakOut)
+      val cf: List[CollectedFromType] = r.getCollectedfrom.asScala.map(c => new CollectedFromType(c.getValue, c.getKey, "complete")).toList
       if (cf.nonEmpty)
         s.setDatasources(cf.distinct.asJava)
     }
