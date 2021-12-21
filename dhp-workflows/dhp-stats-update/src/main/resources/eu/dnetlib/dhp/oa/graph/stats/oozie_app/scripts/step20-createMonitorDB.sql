@@ -52,7 +52,8 @@ compute stats TARGET.result_languages;
 create table TARGET.result_licenses stored as parquet as select * from SOURCE.result_licenses orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_licenses;
 
-create table TARGET.licenses_normalized as select * from SOURCE.licenses_normalized;
+create table TARGET.licenses_normalized stored as parquet as select * from SOURCE.licenses_normalized orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.licenses_normalized;
 
 create table TARGET.result_oids stored as parquet as select * from SOURCE.result_oids orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_oids;
@@ -140,9 +141,6 @@ compute stats TARGET.indi_pub_closed_other_open;
 
 create table TARGET.indi_result_no_of_copies stored as parquet as select * from SOURCE.indi_result_no_of_copies orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_result_no_of_copies;
-
---- Usage statistics
-create table TARGET.usage_stats stored as parquet as select * from SOURCE.usage_stats orig where exists (select 1 from TARGET.result r where r.id=orig.result_id);
 
 --denorm
 alter table TARGET.result rename to TARGET.res_tmp;
