@@ -75,8 +75,8 @@ public class StepActions implements Serializable {
 				ret.setValueSet(orgs);
 				return ret;
 			}, Encoders.bean(KeyValueSet.class))
-				.write()
-					.mode(SaveMode.Overwrite)
+			.write()
+			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
 	}
@@ -179,7 +179,6 @@ public class StepActions implements Serializable {
 					"GROUP BY resId")
 			.as(Encoders.bean(KeyValueSet.class));
 
-
 		// create new relations from result to organization for each result linked to a leaf
 		return resultParent
 			.flatMap(
@@ -199,7 +198,6 @@ public class StepActions implements Serializable {
 					.collect(Collectors.toList())
 					.iterator(),
 				Encoders.bean(Relation.class));
-
 
 	}
 

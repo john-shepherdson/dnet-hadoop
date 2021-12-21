@@ -12,7 +12,7 @@ import org.json4s.jackson.JsonMethods.parse
 import scala.collection.JavaConverters._
 import scala.io.Source
 
-object ScholixUtils {
+object ScholixUtils extends Serializable {
 
 
   val DNET_IDENTIFIER_SCHEMA: String = "DNET Identifier"
@@ -24,7 +24,7 @@ object ScholixUtils {
   case class RelatedEntities(id: String, relatedDataset: Long, relatedPublication: Long) {}
 
   val relations: Map[String, RelationVocabulary] = {
-    val input = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/relations.json")).mkString
+    val input = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/scholexplorer/relation/relations.json")).mkString
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
     lazy val json: json4s.JValue = parse(input)
@@ -59,6 +59,11 @@ object ScholixUtils {
     new ScholixRelationship(rel.getInverse, rel.getSchema, rel.getName)
 
 
+  }
+
+
+  def generateScholixResourceFromResult(r:Result) :ScholixResource = {
+    generateScholixResourceFromSummary(ScholixUtils.resultToSummary(r))
   }
 
 
@@ -179,6 +184,19 @@ object ScholixUtils {
     s.setRelationship(scholix.getRelationship)
     s.setSource(scholix.getSource)
     s.setTarget(generateScholixResourceFromSummary(target))
+    s.setIdentifier(DHPUtils.md5(s"${s.getSource.getIdentifier}::${s.getRelationship.getName}::${s.getTarget.getIdentifier}"))
+    s
+  }
+
+
+  def generateCompleteScholix(scholix: Scholix, target: ScholixResource): Scholix = {
+    val s = new Scholix
+    s.setPublicationDate(scholix.getPublicationDate)
+    s.setPublisher(scholix.getPublisher)
+    s.setLinkprovider(scholix.getLinkprovider)
+    s.setRelationship(scholix.getRelationship)
+    s.setSource(scholix.getSource)
+    s.setTarget(target)
     s.setIdentifier(DHPUtils.md5(s"${s.getSource.getIdentifier}::${s.getRelationship.getName}::${s.getTarget.getIdentifier}"))
     s
   }

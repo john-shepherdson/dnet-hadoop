@@ -9,9 +9,10 @@ import eu.dnetlib.dhp.schema.sx.scholix.{Scholix, ScholixResource}
 import eu.dnetlib.dhp.schema.sx.summary.ScholixSummary
 import eu.dnetlib.dhp.sx.graph.scholix.ScholixUtils
 import eu.dnetlib.dhp.utils.{DHPUtils, ISLookupClientFactory}
+import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.sql.functions.max
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode, SparkSession}
-import org.slf4j.Logger
+import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
 import java.text.SimpleDateFormat
@@ -58,14 +59,15 @@ class SparkRetrieveDataciteDelta (propertyPath:String, args:Array[String], log:L
   def retrieveLastCollectedFrom(spark:SparkSession, entitiesPath:String):Long = {
     log.info("Retrieve last entities collected From")
 
-    implicit val oafEncoder:Encoder[Result] = Encoders.kryo[Result]
+    implicit val oafEncoder:Encoder[Oaf] = Encoders.kryo[Oaf]
+    implicit val resultEncoder:Encoder[Result] = Encoders.kryo[Result]
     import spark.implicits._
 
-    val entitiesDS = spark.read.load(s"$entitiesPath/*").as[Result]
+    val entitiesDS = spark.read.load(s"$entitiesPath/*").as[Oaf].filter(o =>o.isInstanceOf[Result]).map(r => r.asInstanceOf[Result])
 
     val date = entitiesDS.filter(r => r.getDateofcollection!= null).map(_.getDateofcollection).select(max("value")).first.getString(0)
 
-    ISO8601toEpochMillis(date)
+    ISO8601toEpochMillis(date) / 1000
   }
 
 
@@ -73,7 +75,7 @@ class SparkRetrieveDataciteDelta (propertyPath:String, args:Array[String], log:L
    * The method of update Datacite relationships on Scholexplorer
    * needs some utilities data structures
    * One is the scholixResource DS that stores all the nodes in the Scholix Graph
-   * in format (dnetID, ScholixResource )
+   * in format ScholixResource
    * @param summaryPath the path of the summary in Scholix
    * @param workingPath the working path
    * @param spark the spark session
@@ -84,11 +86,37 @@ class SparkRetrieveDataciteDelta (propertyPath:String, args:Array[String], log:L
 
     log.info("Convert All summary to ScholixResource")
     spark.read.load(summaryPath).as[ScholixSummary]
-      .map(ScholixUtils.generateScholixResourceFromSummary)
+      .map(ScholixUtils.generateScholixResourceFromSummary)(scholixResourceEncoder)
       .filter(r => r.getIdentifier!= null && r.getIdentifier.size>0)
-      .map(r=> (r.getIdentifier,r))(Encoders.tuple(Encoders.STRING, scholixResourceEncoder))
-      .write.mode(SaveMode.Overwrite).save(scholixResourcePath(workingPath))
+      .write.mode(SaveMode.Overwrite).save(s"${scholixResourcePath(workingPath)}_native")
+  }
 
+  /**
+   * This method convert the new Datacite Resource into Scholix Resource
+   * Needed to fill the source and the type of Scholix Relationships
+   * @param workingPath the Working Path
+   * @param spark The spark Session
+   */
+  def addMissingScholixResource(workingPath:String, spark:SparkSession ) :Unit = {
+    implicit val oafEncoder:Encoder[Oaf] = Encoders.kryo[Oaf]
+    implicit val scholixResourceEncoder:Encoder[ScholixResource] = Encoders.kryo[ScholixResource]
+    implicit val resultEncoder:Encoder[Result] = Encoders.kryo[Result]
+    import spark.implicits._
+
+    spark.read.load(dataciteOAFPath(workingPath)).as[Oaf]
+      .filter(_.isInstanceOf[Result])
+      .map(_.asInstanceOf[Result])
+      .map(ScholixUtils.generateScholixResourceFromResult)
+      .filter(r => r.getIdentifier!= null && r.getIdentifier.size>0)
+      .write.mode(SaveMode.Overwrite).save(s"${scholixResourcePath(workingPath)}_update")
+
+    val update = spark.read.load(s"${scholixResourcePath(workingPath)}_update").as[ScholixResource]
+    val native = spark.read.load(s"${scholixResourcePath(workingPath)}_native").as[ScholixResource]
+    val graph = update.union(native)
+      .groupByKey(_.getDnetIdentifier)
+      .reduceGroups((a,b) => if (a!= null && a.getDnetIdentifier!= null) a else  b)
+      .map(_._2)
+    graph.write.mode(SaveMode.Overwrite).save(s"${scholixResourcePath(workingPath)}_graph")
   }
 
 
@@ -102,28 +130,19 @@ class SparkRetrieveDataciteDelta (propertyPath:String, args:Array[String], log:L
    * @param vocabularies Vocabularies needed for transformation
    */
 
-  def getDataciteUpdate(datacitePath:String, timestamp:Long, workingPath:String, spark:SparkSession,vocabularies: VocabularyGroup): Unit = {
+  def getDataciteUpdate(datacitePath:String, timestamp:Long, workingPath:String, spark:SparkSession,vocabularies: VocabularyGroup): Long = {
     import spark.implicits._
     val ds = spark.read.load(datacitePath).as[DataciteType]
     implicit val oafEncoder:Encoder[Oaf] = Encoders.kryo[Oaf]
-    ds.filter(_.timestamp>=timestamp)
-      .flatMap(d => DataciteToOAFTransformation.generateOAF(d.json, d.timestamp, d.timestamp, vocabularies, exportLinks = true))
-      .flatMap(i => fixRelations(i)).filter(i => i != null)
-      .write.mode(SaveMode.Overwrite).save(dataciteOAFPath(workingPath))
-
+    val total = ds.filter(_.timestamp>=timestamp).count()
+    if (total >0) {
+      ds.filter(_.timestamp >= timestamp)
+        .flatMap(d => DataciteToOAFTransformation.generateOAF(d.json, d.timestamp, d.timestamp, vocabularies, exportLinks = true))
+        .flatMap(i => fixRelations(i)).filter(i => i != null)
+        .write.mode(SaveMode.Overwrite).save(dataciteOAFPath(workingPath))
+    }
+    total
   }
-
-
-  /**
-   * This method convert an Instance of OAF Result into
-   * Scholix Resource
-    * @param r The input Result
-   * @return The Scholix Resource
-   */
-  def resultToScholixResource(r:Result):ScholixResource = {
-    ScholixUtils.generateScholixResourceFromSummary(ScholixUtils.resultToSummary(r))
-  }
-
 
   /**
    * After added the new ScholixResource, we need to update the scholix Pid Map
@@ -135,38 +154,17 @@ class SparkRetrieveDataciteDelta (propertyPath:String, args:Array[String], log:L
   def generatePidMap(workingPath:String, spark:SparkSession ) :Unit = {
     implicit val scholixResourceEncoder:Encoder[ScholixResource] = Encoders.kryo[ScholixResource]
     import spark.implicits._
-    spark.read.load(scholixResourcePath(workingPath)).as[(String,ScholixResource)]
+    spark.read.load(s"${scholixResourcePath(workingPath)}_graph").as[ScholixResource]
       .flatMap(r=>
-                  r._2.getIdentifier.asScala
+                  r.getIdentifier.asScala
                                       .map(i =>DHPUtils.generateUnresolvedIdentifier(i.getIdentifier, i.getSchema))
-                                      .map((_, r._1))
+                                      .map(t =>(t, r.getDnetIdentifier))
               )(Encoders.tuple(Encoders.STRING, Encoders.STRING))
       .groupByKey(_._1)
       .reduceGroups((a,b) => if (a!= null && a._2!= null) a else  b)
       .map(_._2)(Encoders.tuple(Encoders.STRING, Encoders.STRING))
       .write.mode(SaveMode.Overwrite).save(pidMapPath(workingPath))
   }
-
-  /**
-   * This method convert the new Datacite Resource into Scholix Resource
-   * Needed to fill the source and the type of Scholix Relationships
-   * @param workingPath the Working Path
-   * @param spark The spark Session
-   */
-  def addMissingScholixResource(workingPath:String, spark:SparkSession ) :Unit = {
-    implicit val oafEncoder:Encoder[Oaf] = Encoders.kryo[Oaf]
-    implicit val scholixResourceEncoder:Encoder[ScholixResource] = Encoders.kryo[ScholixResource]
-    implicit val resultEncoder:Encoder[Result] = Encoders.kryo[Result]
-
-    spark.read.load(dataciteOAFPath(workingPath)).as[Oaf]
-      .filter(_.isInstanceOf[Result])
-      .map(_.asInstanceOf[Result])
-      .map(resultToScholixResource)
-      .filter(r => r.getIdentifier!= null && r.getIdentifier.size>0)
-      .map(r=> (r.getIdentifier,r))(Encoders.tuple(Encoders.STRING, scholixResourceEncoder))
-      .write.mode(SaveMode.Append).save(scholixResourcePath(workingPath))
-  }
-
 
   /**
    * This method resolve the datacite relation and filter the resolved
@@ -222,25 +220,26 @@ class SparkRetrieveDataciteDelta (propertyPath:String, args:Array[String], log:L
     implicit val scholixEncoder:Encoder[Scholix] = Encoders.kryo[Scholix]
     implicit val scholixResourceEncoder:Encoder[ScholixResource] = Encoders.kryo[ScholixResource]
     implicit val relationEncoder:Encoder[Relation] = Encoders.kryo[Relation]
-    import spark.implicits._
+    implicit val intermediateEncoder :Encoder[(String,Scholix)] = Encoders.tuple(Encoders.STRING, scholixEncoder)
 
-    val relationss:Dataset[(String, Relation)] = spark.read.load(s"$workingPath/ResolvedRelation").as[Relation].map(r =>(r.getSource,r))(Encoders.tuple(Encoders.STRING, relationEncoder))
 
-    val id_summary:Dataset[(String,ScholixResource)] = spark.read.load(scholixResourcePath(workingPath)).as[(String,ScholixResource)]
+    val relations:Dataset[(String, Relation)] = spark.read.load(resolvedRelationPath(workingPath)).as[Relation].map(r =>(r.getSource,r))(Encoders.tuple(Encoders.STRING, relationEncoder))
 
-    relationss.joinWith(id_summary, relationss("_1").equalTo(id_summary("_1")),"inner")
-      .map(t => (t._1._2.getTarget,ScholixUtils.scholixFromSource(t._1._2, t._2._2)))(Encoders.tuple(Encoders.STRING, scholixEncoder))
-      .write.mode(SaveMode.Overwrite)
-      .save(s"$workingPath/scholix_one_verse")
+    val id_summary:Dataset[(String,ScholixResource)] = spark.read.load(s"${scholixResourcePath(workingPath)}_graph").as[ScholixResource].map(r => (r.getDnetIdentifier,r))(Encoders.tuple(Encoders.STRING, scholixResourceEncoder))
 
-    val source_scholix:Dataset[(String,Scholix)] = spark.read.load(s"$workingPath/scholix_one_verse").as[(String,Scholix)]
+    id_summary.cache()
+
+    relations.joinWith(id_summary, relations("_1").equalTo(id_summary("_1")),"inner")
+    .map(t => (t._1._2.getTarget,ScholixUtils.scholixFromSource(t._1._2, t._2._2)))
+    .write.mode(SaveMode.Overwrite).save(s"$workingPath/scholix_one_verse")
+
+    val source_scholix:Dataset[(String, Scholix)] =spark.read.load(s"$workingPath/scholix_one_verse").as[(String,Scholix)]
 
     source_scholix.joinWith(id_summary, source_scholix("_1").equalTo(id_summary("_1")),"inner")
       .map(t => {
-        val target = t._2._2
-        val scholix = t._1._2
-        scholix.setTarget(target)
-        scholix
+        val target:ScholixResource =t._2._2
+        val scholix:Scholix = t._1._2
+        ScholixUtils.generateCompleteScholix(scholix,target)
       })(scholixEncoder).write.mode(SaveMode.Overwrite).save(s"$workingPath/scholix")
   }
 
@@ -259,7 +258,7 @@ class SparkRetrieveDataciteDelta (propertyPath:String, args:Array[String], log:L
     val datacitePath = parser.get("datacitePath")
     log.info(s"DatacitePath is '$datacitePath'")
 
-    val workingPath  = parser.get("workingPath")
+    val workingPath  = parser.get("workingSupportPath")
     log.info(s"workingPath is '$workingPath'")
 
     val isLookupUrl: String = parser.get("isLookupUrl")
@@ -279,13 +278,28 @@ class SparkRetrieveDataciteDelta (propertyPath:String, args:Array[String], log:L
       log.info("Retrieve last entities collected From starting from scholix Graph")
       lastCollectionDate  = retrieveLastCollectedFrom(spark, s"$sourcePath/entities")
     }
+    else {
+      val fs = FileSystem.get(spark.sparkContext.hadoopConfiguration)
+      fs.delete(new Path(s"${scholixResourcePath(workingPath)}_native"), true)
+      fs.rename(new Path(s"${scholixResourcePath(workingPath)}_graph"), new Path(s"${scholixResourcePath(workingPath)}_native"))
+      lastCollectionDate  = retrieveLastCollectedFrom(spark, dataciteOAFPath(workingPath))
+    }
 
-    getDataciteUpdate(datacitePath, lastCollectionDate, workingPath, spark, vocabularies)
-    addMissingScholixResource(workingPath,spark)
-    generatePidMap(workingPath, spark)
-    resolveUpdateRelation(workingPath,spark)
-    generateScholixUpdate(workingPath, spark)
+    val numRecords = getDataciteUpdate(datacitePath, lastCollectionDate, workingPath, spark, vocabularies)
+    if (numRecords>0) {
+      addMissingScholixResource(workingPath,spark)
+      generatePidMap(workingPath, spark)
+      resolveUpdateRelation(workingPath,spark)
+      generateScholixUpdate(workingPath, spark)
+    }
+  }
+}
 
 
+object SparkRetrieveDataciteDelta {
+  val log: Logger = LoggerFactory.getLogger(SparkRetrieveDataciteDelta.getClass)
+
+  def main(args: Array[String]): Unit = {
+    new SparkRetrieveDataciteDelta("/eu/dnetlib/dhp/sx/graph/retrieve_datacite_delta_params.json", args, log).initialize().run()
   }
 }
