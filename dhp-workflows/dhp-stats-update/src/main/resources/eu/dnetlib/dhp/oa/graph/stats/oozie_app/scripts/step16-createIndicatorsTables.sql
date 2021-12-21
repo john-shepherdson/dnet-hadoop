@@ -304,7 +304,7 @@ with tmp as (select funder, project, country from organization_projects op
 join organization o on o.id=op.id 
 join project p on p.id=op.project 
 where country <> 'UNKNOWN')
-select f1.funder, f1.country, f2.country, count(distinct f1.project) as collaborations
+select f1.funder, f1.country as country1, f2.country as country2, count(distinct f1.project) as collaborations
 from tmp as f1
 join tmp as f2 on f1.project=f2.project
 where f1.country<>f2.country 
