@@ -115,10 +115,10 @@ create table TARGET.indi_pub_gold_oa stored as parquet as select * from SOURCE.i
 compute stats TARGET.indi_pub_gold_oa;
 create table TARGET.indi_pub_has_abstract stored as parquet as select * from SOURCE.indi_pub_has_abstract orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_has_abstract;
-create table TARGET.indi_pub_has_cc_licence stored as parquet as select * from SOURCE.indi_pub_has_cc_licence orig where exists (select 1 from TARGET.result r where r.id=orig.id);
-compute stats TARGET.indi_pub_has_cc_licence;
-create table TARGET.indi_pub_has_cc_licence_url stored as parquet as select * from SOURCE.indi_pub_has_cc_licence_url orig where exists (select 1 from TARGET.result r where r.id=orig.id);
-compute stats TARGET.indi_pub_has_cc_licence_url;
+create table TARGET.indi_result_has_cc_licence_f stored as parquet as select * from SOURCE.indi_result_has_cc_licence_f orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_result_has_cc_licence_f;
+create table TARGET.indi_result_has_cc_licence_url stored as parquet as select * from SOURCE.indi_result_has_cc_licence_url orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_result_has_cc_licence_url;
 
 create view TARGET.indi_funder_country_collab stored as select * from SOURCE.indi_funder_country_collab;
 
@@ -134,6 +134,9 @@ create table TARGET.indi_pub_in_transformative stored as parquet as select * fro
 compute stats TARGET.indi_pub_in_transformative;
 create table TARGET.indi_pub_closed_other_open stored as parquet as select * from SOURCE.indi_pub_closed_other_open orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_closed_other_open;
+
+create table TARGET.indi_result_no_of_copies stored as parquet as select * from SOURCE.indi_result_no_of_copies orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_result_no_of_copies;
 
 --denorm
 alter table TARGET.result rename to TARGET.res_tmp;
