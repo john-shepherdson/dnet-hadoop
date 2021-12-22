@@ -67,8 +67,216 @@ public class ProduceTest {
 	}
 
 	@Test
-	void produceTest() throws Exception {
+	void produceTestSubjects()throws Exception{
 
+		JavaRDD<Result> tmp = getResultJavaRDD();
+
+		List<StructuredProperty> sbjs = tmp
+				.filter(row -> row.getSubject()!= null && row.getSubject().size()>0)
+				.flatMap(row -> row.getSubject().iterator())
+				.collect();
+
+		sbjs.forEach(sbj -> Assertions.assertEquals("FOS", sbj.getQualifier().getClassid()));
+		sbjs
+				.forEach(
+						sbj -> Assertions
+								.assertEquals(
+										"Fields of Science and Technology classification", sbj.getQualifier().getClassname()));
+		sbjs
+				.forEach(
+						sbj -> Assertions
+								.assertEquals(ModelConstants.DNET_SUBJECT_TYPOLOGIES, sbj.getQualifier().getSchemeid()));
+		sbjs
+				.forEach(
+						sbj -> Assertions
+								.assertEquals(ModelConstants.DNET_SUBJECT_TYPOLOGIES, sbj.getQualifier().getSchemename()));
+
+		sbjs.forEach(sbj -> Assertions.assertEquals(false, sbj.getDataInfo().getDeletedbyinference()));
+		sbjs.forEach(sbj -> Assertions.assertEquals(true, sbj.getDataInfo().getInferred()));
+		sbjs.forEach(sbj -> Assertions.assertEquals(false, sbj.getDataInfo().getInvisible()));
+		sbjs.forEach(sbj -> Assertions.assertEquals("", sbj.getDataInfo().getTrust()));
+		sbjs.forEach(sbj -> Assertions.assertEquals("update", sbj.getDataInfo().getInferenceprovenance()));
+		sbjs
+				.forEach(
+						sbj -> Assertions.assertEquals("subject:fos", sbj.getDataInfo().getProvenanceaction().getClassid()));
+		sbjs
+				.forEach(
+						sbj -> Assertions
+								.assertEquals("Inferred by OpenAIRE", sbj.getDataInfo().getProvenanceaction().getClassname()));
+		sbjs
+				.forEach(
+						sbj -> Assertions
+								.assertEquals(
+										ModelConstants.DNET_PROVENANCE_ACTIONS, sbj.getDataInfo().getProvenanceaction().getSchemeid()));
+		sbjs
+				.forEach(
+						sbj -> Assertions
+								.assertEquals(
+										ModelConstants.DNET_PROVENANCE_ACTIONS,
+										sbj.getDataInfo().getProvenanceaction().getSchemename()));
+	}
+
+	@Test
+	void produceTestMeasuress()throws Exception{
+
+		JavaRDD<Result> tmp = getResultJavaRDD();
+
+		List<KeyValue> mes = tmp
+				.filter(row -> row.getInstance()!= null && row.getInstance().size()>0)
+				.flatMap(row -> row.getInstance().iterator())
+				.flatMap(i->i.getMeasures().iterator())
+				.flatMap(m ->m.getUnit().iterator())
+				.collect();
+
+
+
+		mes.forEach(sbj -> Assertions.assertEquals(false, sbj.getDataInfo().getDeletedbyinference()));
+		mes.forEach(sbj -> Assertions.assertEquals(true, sbj.getDataInfo().getInferred()));
+		mes.forEach(sbj -> Assertions.assertEquals(false, sbj.getDataInfo().getInvisible()));
+		mes.forEach(sbj -> Assertions.assertEquals("", sbj.getDataInfo().getTrust()));
+		mes.forEach(sbj -> Assertions.assertEquals("update", sbj.getDataInfo().getInferenceprovenance()));
+		mes
+				.forEach(
+						sbj -> Assertions.assertEquals("measure:bip", sbj.getDataInfo().getProvenanceaction().getClassid()));
+		mes
+				.forEach(
+						sbj -> Assertions
+								.assertEquals("Inferred by OpenAIRE", sbj.getDataInfo().getProvenanceaction().getClassname()));
+		mes
+				.forEach(
+						sbj -> Assertions
+								.assertEquals(
+										ModelConstants.DNET_PROVENANCE_ACTIONS, sbj.getDataInfo().getProvenanceaction().getSchemeid()));
+		mes
+				.forEach(
+						sbj -> Assertions
+								.assertEquals(
+										ModelConstants.DNET_PROVENANCE_ACTIONS,
+										sbj.getDataInfo().getProvenanceaction().getSchemename()));
+	}
+	@Test
+	void produceTest6Subjects() throws Exception{
+		final String doi = "unresolved::10.3390/s18072310::doi";
+
+		JavaRDD<Result> tmp = getResultJavaRDD();
+
+		Assertions
+				.assertEquals(
+						6, tmp
+								.filter(row -> row.getId().equals(doi))
+								.collect()
+								.get(0)
+								.getSubject()
+								.size());
+
+		List<StructuredProperty> sbjs = tmp
+				.filter(row -> row.getId().equals(doi))
+				.flatMap(row -> row.getSubject().iterator())
+				.collect();
+
+
+		Assertions
+				.assertEquals(
+						true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("04 agricultural and veterinary sciences")));
+
+		Assertions
+				.assertEquals(
+						true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("0404 agricultural biotechnology")));
+		Assertions.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("040502 food science")));
+
+		Assertions
+				.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("03 medical and health sciences")));
+		Assertions.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("0303 health sciences")));
+		Assertions
+				.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("030309 nutrition & dietetics")));
+
+
+	}
+
+	@Test
+	void produceTest3Measures()throws Exception{
+		final String doi = "unresolved::10.3390/s18072310::doi";
+		JavaRDD<Result> tmp = getResultJavaRDD();
+
+		Assertions
+				.assertEquals(
+						3, tmp
+								.filter(row -> row.getId().equals(doi))
+								.collect()
+								.get(0)
+								.getInstance()
+								.get(0)
+								.getMeasures()
+								.size());
+
+
+		List<Measure> measures = tmp
+				.filter(row -> row.getId().equals(doi))
+				.flatMap(row -> row.getInstance().iterator())
+				.flatMap(inst -> inst.getMeasures().iterator())
+				.collect();
+		Assertions
+				.assertEquals(
+						"7.5597134689e-09", measures
+								.stream()
+								.filter(mes -> mes.getId().equals("influence"))
+								.collect(Collectors.toList())
+								.get(0)
+								.getUnit()
+								.get(0)
+								.getValue());
+
+		Assertions
+				.assertEquals(
+						"4.903880192", measures
+								.stream()
+								.filter(mes -> mes.getId().equals("popularity_alt"))
+								.collect(Collectors.toList())
+								.get(0)
+								.getUnit()
+								.get(0)
+								.getValue());
+
+		Assertions
+				.assertEquals(
+						"1.17977512835e-08", measures
+								.stream()
+								.filter(mes -> mes.getId().equals("popularity"))
+								.collect(Collectors.toList())
+								.get(0)
+								.getUnit()
+								.get(0)
+								.getValue());
+
+	}
+	@Test
+	void produceTestSomeNumbers() throws Exception {
+
+		final String doi = "unresolved::10.3390/s18072310::doi";
+		JavaRDD<Result> tmp = getResultJavaRDD();
+
+		Assertions.assertEquals(105, tmp.count());
+
+		Assertions.assertEquals(1, tmp.filter(row -> row.getId().equals(doi)).count());
+
+		Assertions
+			.assertEquals(
+				19, tmp
+					.filter(row -> !row.getId().equals(doi))
+					.filter(row -> row.getSubject() != null)
+					.count());
+
+		Assertions
+			.assertEquals(
+				85,
+				tmp
+					.filter(row -> !row.getId().equals(doi))
+					.filter(r -> r.getInstance() != null && r.getInstance().size() > 0)
+					.count());
+
+	}
+
+	private JavaRDD<Result> getResultJavaRDD() throws Exception {
 		final String bipPath = getClass()
 			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/bip/bip.json")
 			.getPath();
@@ -103,146 +311,49 @@ public class ProduceTest {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		JavaRDD<Result> tmp = sc
+		return sc
 			.textFile(workingDir.toString() + "/unresolved")
 			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(105, tmp.count());
-
-		Assertions.assertEquals(1, tmp.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi")).count());
-
-		Assertions
-			.assertEquals(
-				6, tmp
-					.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi"))
-					.collect()
-					.get(0)
-					.getSubject()
-					.size());
-
-		Assertions
-			.assertEquals(
-				3, tmp
-					.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi"))
-					.collect()
-					.get(0)
-					.getInstance()
-					.get(0)
-					.getMeasures()
-					.size());
-
-		List<StructuredProperty> sbjs = tmp
-			.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi"))
-			.flatMap(row -> row.getSubject().iterator())
-			.collect();
-
-		sbjs.forEach(sbj -> Assertions.assertEquals("FOS", sbj.getQualifier().getClassid()));
-		sbjs
-			.forEach(
-				sbj -> Assertions
-					.assertEquals(
-						"Fields of Science and Technology classification", sbj.getQualifier().getClassname()));
-		sbjs
-			.forEach(
-				sbj -> Assertions
-					.assertEquals(ModelConstants.DNET_SUBJECT_TYPOLOGIES, sbj.getQualifier().getSchemeid()));
-		sbjs
-			.forEach(
-				sbj -> Assertions
-					.assertEquals(ModelConstants.DNET_SUBJECT_TYPOLOGIES, sbj.getQualifier().getSchemename()));
-
-		sbjs.forEach(sbj -> Assertions.assertEquals(false, sbj.getDataInfo().getDeletedbyinference()));
-		sbjs.forEach(sbj -> Assertions.assertEquals(true, sbj.getDataInfo().getInferred()));
-		sbjs.forEach(sbj -> Assertions.assertEquals(false, sbj.getDataInfo().getInvisible()));
-		sbjs.forEach(sbj -> Assertions.assertEquals("", sbj.getDataInfo().getTrust()));
-		sbjs.forEach(sbj -> Assertions.assertEquals("update", sbj.getDataInfo().getInferenceprovenance()));
-		sbjs
-			.forEach(
-				sbj -> Assertions.assertEquals("subject:fos", sbj.getDataInfo().getProvenanceaction().getClassid()));
-		sbjs
-			.forEach(
-				sbj -> Assertions
-					.assertEquals("Inferred by OpenAIRE", sbj.getDataInfo().getProvenanceaction().getClassname()));
-		sbjs
-			.forEach(
-				sbj -> Assertions
-					.assertEquals(
-						ModelConstants.DNET_PROVENANCE_ACTIONS, sbj.getDataInfo().getProvenanceaction().getSchemeid()));
-		sbjs
-			.forEach(
-				sbj -> Assertions
-					.assertEquals(
-						ModelConstants.DNET_PROVENANCE_ACTIONS,
-						sbj.getDataInfo().getProvenanceaction().getSchemename()));
-
-		Assertions
-			.assertEquals(
-				true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("04 agricultural and veterinary sciences")));
-		Assertions.assertEquals(false, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("nano-technology")));
-		Assertions
-			.assertEquals(
-				true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("0404 agricultural biotechnology")));
-		Assertions.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("040502 food science")));
-
-		Assertions
-			.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("03 medical and health sciences")));
-		Assertions.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("0303 health sciences")));
-		Assertions
-			.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("030309 nutrition & dietetics")));
-
-		List<Measure> measures = tmp
-			.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi"))
-			.flatMap(row -> row.getInstance().iterator())
-			.flatMap(inst -> inst.getMeasures().iterator())
-			.collect();
-		Assertions
-			.assertEquals(
-				"7.5597134689e-09", measures
-					.stream()
-					.filter(mes -> mes.getId().equals("influence"))
-					.collect(Collectors.toList())
-					.get(0)
-					.getUnit()
-					.get(0)
-					.getValue());
-
-		Assertions
-			.assertEquals(
-				"4.903880192", measures
-					.stream()
-					.filter(mes -> mes.getId().equals("popularity_alt"))
-					.collect(Collectors.toList())
-					.get(0)
-					.getUnit()
-					.get(0)
-					.getValue());
-
-		Assertions
-			.assertEquals(
-				"1.17977512835e-08", measures
-					.stream()
-					.filter(mes -> mes.getId().equals("popularity"))
-					.collect(Collectors.toList())
-					.get(0)
-					.getUnit()
-					.get(0)
-					.getValue());
-
-		Assertions
-			.assertEquals(
-				19, tmp
-					.filter(row -> !row.getId().equals("unresolved::10.3390/s18072310::doi"))
-					.filter(row -> row.getSubject() != null)
-					.count());
-
-		Assertions
-			.assertEquals(
-				85,
-				tmp
-					.filter(row -> !row.getId().equals("unresolved::10.3390/s18072310::doi"))
-					.filter(r -> r.getInstance() != null && r.getInstance().size() > 0)
-					.count());
-
 	}
 
+
+	@Test
+	void prepareTest5Subjects()throws Exception{
+		final String doi = "unresolved::10.3390/s18072310::doi";
+		JavaRDD<Result> tmp = getResultJavaRDD();
+
+		Assertions.assertEquals(1, tmp.filter(row -> row.getId().equals(doi)).count());
+
+		Assertions
+				.assertEquals(
+						5, tmp
+								.filter(row -> row.getId().equals(doi))
+								.collect()
+								.get(0)
+								.getSubject()
+								.size());
+
+
+
+
+		List<StructuredProperty> sbjs = tmp
+				.filter(row -> row.getId().equals(doi))
+				.flatMap(row -> row.getSubject().iterator())
+				.collect();
+
+
+
+		Assertions
+				.assertEquals(
+						true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("01 natural sciences")));
+		Assertions.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("0103 physical sciences")));
+
+		Assertions
+				.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("010304 chemical physics")));
+		Assertions.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("0104 chemical sciences")));
+		Assertions
+				.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("010402 general chemistry")));
+
+	}
+	
 }

@@ -79,6 +79,7 @@ public class PrepareFOSSparkJob implements Serializable {
 					level1.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME)));
 					level2.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME)));
 					level3.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME)));
+					r.setSubject(sbjs);
 					return r;
 				}, Encoders.bean(Result.class))
 			.write()
