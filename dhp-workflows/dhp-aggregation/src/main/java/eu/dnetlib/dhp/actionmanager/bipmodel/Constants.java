@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.actionmanager.createunresolvedentities;
+package eu.dnetlib.dhp.actionmanager.bipmodel;
 
 import java.util.Optional;
 

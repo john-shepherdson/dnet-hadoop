@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.actionmanager.bipfinder;
+package eu.dnetlib.dhp.actionmanager.bipmodel;
 
 import java.io.Serializable;
 import java.util.List;
