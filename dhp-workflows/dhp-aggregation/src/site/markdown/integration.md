@@ -9,7 +9,7 @@ The information integrated so far is:
 1. Article impact measures
     1. [Bip!Finder](https://dl.acm.org/doi/10.1145/3357384.3357850) scores
 2. Result Subjects
-    1. Integration of Fields od Science and Techonology ([FOS](https://www.qnrf.org/en-us/FOS))  classification in
+    1. Integration of Fields of Science and Techonology ([FOS](https://www.qnrf.org/en-us/FOS))  classification in
     results subjects.
 
 
@@ -18,7 +18,7 @@ and the element in the OAF model that should be used to map the information we w
 
 The id is set by using a particular encoding of the given PID
 
-*unresolved:[pid]:[pidtype]*
+*unresolved::[pid]::[pidtype]*
 
 where
 
@@ -31,6 +31,6 @@ Such entities are matched against those available in the graph using the result.
 This mechanism can be used to integrate enrichments produced as associated by a given PID.
 If a match will be found with one of the results already in the graph that said result will be enriched with the information
 present in the new OAF.
-All the objects for which a match is not found are discarded.
+All the entities for which a match is not found are discarded.
 
 

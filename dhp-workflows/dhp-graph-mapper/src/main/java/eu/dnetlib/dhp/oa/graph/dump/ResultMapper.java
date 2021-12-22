@@ -12,13 +12,12 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.dump.oaf.*;
 import eu.dnetlib.dhp.schema.dump.oaf.AccessRight;
 import eu.dnetlib.dhp.schema.dump.oaf.Author;
-import eu.dnetlib.dhp.schema.dump.oaf.Country;
 import eu.dnetlib.dhp.schema.dump.oaf.GeoLocation;
 import eu.dnetlib.dhp.schema.dump.oaf.Instance;
-import eu.dnetlib.dhp.schema.dump.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.dump.oaf.Measure;
 import eu.dnetlib.dhp.schema.dump.oaf.OpenAccessRoute;
-import eu.dnetlib.dhp.schema.dump.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.dump.oaf.Result;
+import eu.dnetlib.dhp.schema.dump.oaf.community.CfHbKeyValue;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityInstance;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.dump.oaf.community.Context;
@@ -56,7 +55,8 @@ public class ResultMapper implements Serializable {
 					String code = Constants.accessRightsCoarMap.get(oar.get().getClassid());
 					out
 						.setBestaccessright(
-							AccessRight
+
+							BestAccessRight
 								.newInstance(
 									code,
 									Constants.coarCodeLabelMap.get(code),
@@ -81,7 +81,7 @@ public class ResultMapper implements Serializable {
 											if (c.getClassid().equals((ModelConstants.UNKNOWN))) {
 												return null;
 											}
-											Country country = new Country();
+											ResultCountry country = new ResultCountry();
 											country.setCode(c.getClassid());
 											country.setLabel(c.getClassname());
 											Optional
@@ -124,7 +124,17 @@ public class ResultMapper implements Serializable {
 					.ifPresent(value -> value.stream().forEach(f -> formatList.add(f.getValue())));
 				out.setFormat(formatList);
 				out.setId(input.getId());
-				out.setOriginalId(input.getOriginalId());
+				out.setOriginalId(new ArrayList<>());
+				Optional
+					.ofNullable(input.getOriginalId())
+					.ifPresent(
+						v -> out
+							.setOriginalId(
+								input
+									.getOriginalId()
+									.stream()
+									.filter(s -> !s.startsWith("50|"))
+									.collect(Collectors.toList())));
 
 				Optional<List<eu.dnetlib.dhp.schema.oaf.Instance>> oInst = Optional
 					.ofNullable(input.getInstance());
@@ -148,7 +158,7 @@ public class ResultMapper implements Serializable {
 				Optional<eu.dnetlib.dhp.schema.oaf.Qualifier> oL = Optional.ofNullable(input.getLanguage());
 				if (oL.isPresent()) {
 					eu.dnetlib.dhp.schema.oaf.Qualifier language = oL.get();
-					out.setLanguage(Qualifier.newInstance(language.getClassid(), language.getClassname()));
+					out.setLanguage(Language.newInstance(language.getClassid(), language.getClassname()));
 				}
 				Optional<Long> oLong = Optional.ofNullable(input.getLastupdatetimestamp());
 				if (oLong.isPresent()) {
@@ -184,7 +194,7 @@ public class ResultMapper implements Serializable {
 								value
 									.stream()
 									.map(
-										p -> ControlledField
+										p -> ResultPid
 											.newInstance(p.getQualifier().getClassid(), p.getValue()))
 									.collect(Collectors.toList())));
 
@@ -219,7 +229,7 @@ public class ResultMapper implements Serializable {
 							input
 								.getCollectedfrom()
 								.stream()
-								.map(cf -> KeyValue.newInstance(cf.getKey(), cf.getValue()))
+								.map(cf -> CfHbKeyValue.newInstance(cf.getKey(), cf.getValue()))
 								.collect(Collectors.toList()));
 
 					Set<String> communities = communityMap.keySet();
@@ -412,12 +422,12 @@ public class ResultMapper implements Serializable {
 
 		instance
 			.setCollectedfrom(
-				KeyValue
+				CfHbKeyValue
 					.newInstance(i.getCollectedfrom().getKey(), i.getCollectedfrom().getValue()));
 
 		instance
 			.setHostedby(
-				KeyValue.newInstance(i.getHostedby().getKey(), i.getHostedby().getValue()));
+				CfHbKeyValue.newInstance(i.getHostedby().getKey(), i.getHostedby().getValue()));
 
 		return instance;
 
@@ -436,6 +446,17 @@ public class ResultMapper implements Serializable {
 							code,
 							Constants.coarCodeLabelMap.get(code),
 							Constants.COAR_ACCESS_RIGHT_SCHEMA));
+
+			Optional<List<eu.dnetlib.dhp.schema.oaf.Measure>> mes = Optional.ofNullable(i.getMeasures());
+			if (mes.isPresent()) {
+				List<Measure> measure = new ArrayList<>();
+				mes
+					.get()
+					.forEach(
+						m -> m.getUnit().forEach(u -> measure.add(Measure.newInstance(m.getId(), u.getValue()))));
+				instance.setMeasures(measure);
+			}
+
 			if (opAr.get().getOpenAccessRoute() != null) {
 				switch (opAr.get().getOpenAccessRoute()) {
 					case hybrid:
@@ -463,7 +484,7 @@ public class ResultMapper implements Serializable {
 					.setPid(
 						pid
 							.stream()
-							.map(p -> ControlledField.newInstance(p.getQualifier().getClassid(), p.getValue()))
+							.map(p -> ResultPid.newInstance(p.getQualifier().getClassid(), p.getValue()))
 							.collect(Collectors.toList())));
 
 		Optional
@@ -473,7 +494,7 @@ public class ResultMapper implements Serializable {
 					.setAlternateIdentifier(
 						ai
 							.stream()
-							.map(p -> ControlledField.newInstance(p.getQualifier().getClassid(), p.getValue()))
+							.map(p -> AlternateIdentifier.newInstance(p.getQualifier().getClassid(), p.getValue()))
 							.collect(Collectors.toList())));
 
 		Optional
@@ -553,7 +574,7 @@ public class ResultMapper implements Serializable {
 
 	private static Subject getSubject(StructuredProperty s) {
 		Subject subject = new Subject();
-		subject.setSubject(ControlledField.newInstance(s.getQualifier().getClassid(), s.getValue()));
+		subject.setSubject(SubjectSchemeValue.newInstance(s.getQualifier().getClassid(), s.getValue()));
 		Optional<DataInfo> di = Optional.ofNullable(s.getDataInfo());
 		if (di.isPresent()) {
 			Provenance p = new Provenance();
@@ -575,7 +596,7 @@ public class ResultMapper implements Serializable {
 		Optional<List<StructuredProperty>> oPids = Optional
 			.ofNullable(oa.getPid());
 		if (oPids.isPresent()) {
-			Pid pid = getOrcid(oPids.get());
+			AuthorPid pid = getOrcid(oPids.get());
 			if (pid != null) {
 				a.setPid(pid);
 			}
@@ -584,12 +605,12 @@ public class ResultMapper implements Serializable {
 		return a;
 	}
 
-	private static Pid getAuthorPid(StructuredProperty pid) {
+	private static AuthorPid getAuthorPid(StructuredProperty pid) {
 		Optional<DataInfo> di = Optional.ofNullable(pid.getDataInfo());
 		if (di.isPresent()) {
-			return Pid
+			return AuthorPid
 				.newInstance(
-					ControlledField
+					AuthorPidSchemeValue
 						.newInstance(
 							pid.getQualifier().getClassid(),
 							pid.getValue()),
@@ -598,9 +619,9 @@ public class ResultMapper implements Serializable {
 							di.get().getProvenanceaction().getClassname(),
 							di.get().getTrust()));
 		} else {
-			return Pid
+			return AuthorPid
 				.newInstance(
-					ControlledField
+					AuthorPidSchemeValue
 						.newInstance(
 							pid.getQualifier().getClassid(),
 							pid.getValue())
@@ -609,7 +630,7 @@ public class ResultMapper implements Serializable {
 		}
 	}
 
-	private static Pid getOrcid(List<StructuredProperty> p) {
+	private static AuthorPid getOrcid(List<StructuredProperty> p) {
 		List<StructuredProperty> pidList = p.stream().map(pid -> {
 			if (pid.getQualifier().getClassid().equals(ModelConstants.ORCID) ||
 				(pid.getQualifier().getClassid().equals(ModelConstants.ORCID_PENDING))) {
