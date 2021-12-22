@@ -1,8 +1,8 @@
 
 package eu.dnetlib.dhp.actionmanager.createunresolvedentities;
 
-import static eu.dnetlib.dhp.actionmanager.createunresolvedentities.Constants.*;
-import static eu.dnetlib.dhp.actionmanager.createunresolvedentities.Constants.UPDATE_CLASS_NAME;
+import static eu.dnetlib.dhp.actionmanager.common.Constants.*;
+import static eu.dnetlib.dhp.actionmanager.common.Constants.UPDATE_CLASS_NAME;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.hdfs.client.HdfsUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
