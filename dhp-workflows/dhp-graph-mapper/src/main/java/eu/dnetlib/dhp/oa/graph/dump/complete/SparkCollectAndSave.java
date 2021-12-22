@@ -31,7 +31,7 @@ public class SparkCollectAndSave implements Serializable {
 			.toString(
 				SparkCollectAndSave.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/graph/dump/complete/input_collect_and_save.json"));
+						"/eu/dnetlib/dhp/oa/graph/dump/input_collect_and_save.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
