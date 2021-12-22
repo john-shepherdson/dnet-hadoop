@@ -1,8 +1,11 @@
 
-package eu.dnetlib.dhp.actionmanager.bipmodel;
+package eu.dnetlib.dhp.actionmanager;
 
 import java.util.Optional;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -46,4 +49,36 @@ public class Constants {
 			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
 	}
 
+	public static StructuredProperty getSubject(String sbj, String classid, String classname) {
+		if (sbj.equals(NULL))
+			return null;
+		StructuredProperty sp = new StructuredProperty();
+		sp.setValue(sbj);
+		sp
+				.setQualifier(
+						OafMapperUtils
+								.qualifier(classid
+										,
+										classname,
+										ModelConstants.DNET_SUBJECT_TYPOLOGIES,
+										ModelConstants.DNET_SUBJECT_TYPOLOGIES));
+		sp
+				.setDataInfo(
+						OafMapperUtils
+								.dataInfo(
+										false,
+										UPDATE_DATA_INFO_TYPE,
+										true,
+										false,
+										OafMapperUtils
+												.qualifier(
+														UPDATE_SUBJECT_FOS_CLASS_ID,
+														UPDATE_CLASS_NAME,
+														ModelConstants.DNET_PROVENANCE_ACTIONS,
+														ModelConstants.DNET_PROVENANCE_ACTIONS),
+										""));
+
+		return sp;
+
+	}
 }
