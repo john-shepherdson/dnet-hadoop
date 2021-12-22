@@ -30,6 +30,9 @@ object SparkConvertObjectToJson {
     log.info(s"targetPath  -> $targetPath")
     val objectType = parser.get("objectType")
     log.info(s"objectType  -> $objectType")
+    val scholixUpdatePath = parser.get("scholixUpdatePath")
+    log.info(s"scholixUpdatePath  -> $scholixUpdatePath")
+
 
 
     implicit val scholixEncoder: Encoder[Scholix] = Encoders.kryo[Scholix]
@@ -42,7 +45,8 @@ object SparkConvertObjectToJson {
       case "scholix" =>
         log.info("Serialize Scholix")
         val d: Dataset[Scholix] = spark.read.load(sourcePath).as[Scholix]
-        d.map(s => mapper.writeValueAsString(s))(Encoders.STRING).rdd.repartition(6000).saveAsTextFile(targetPath, classOf[GzipCodec])
+        val u :Dataset[Scholix]= spark.read.load(s"$scholixUpdatePath/scholix").as[Scholix]
+        d.union(u).repartition(8000).map(s => mapper.writeValueAsString(s))(Encoders.STRING).rdd.saveAsTextFile(targetPath, classOf[GzipCodec])
       case "summary" =>
         log.info("Serialize Summary")
         val d: Dataset[ScholixSummary] = spark.read.load(sourcePath).as[ScholixSummary]

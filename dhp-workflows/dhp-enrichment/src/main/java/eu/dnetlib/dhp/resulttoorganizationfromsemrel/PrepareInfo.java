@@ -33,13 +33,14 @@ public class PrepareInfo implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(PrepareInfo.class);
 
 	// associate orgs with all their parent
-	private static final String ORGANIZATION_ORGANIZATION_QUERY = "SELECT target key, collect_set(source) as valueSet " +
+	private static final String ORGANIZATION_ORGANIZATION_QUERY = "SELECT target key, collect_set(source) as valueSet "
+		+
 		"FROM relation " +
 		"WHERE lower(relclass) = '" + ModelConstants.IS_PARENT_OF.toLowerCase() +
 		"' and datainfo.deletedbyinference = false " +
 		"GROUP BY target";
 
-	//associates results with all the orgs they are affiliated to
+	// associates results with all the orgs they are affiliated to
 	private static final String RESULT_ORGANIZATION_QUERY = "SELECT source key, collect_set(target) as valueSet " +
 		"FROM relation " +
 		"WHERE lower(relclass) = '" + ModelConstants.HAS_AUTHOR_INSTITUTION.toLowerCase() +
@@ -88,7 +89,7 @@ public class PrepareInfo implements Serializable {
 				childParentPath,
 				leavesPath,
 				resultOrganizationPath,
-					relationPath));
+				relationPath));
 	}
 
 	private static void prepareInfo(SparkSession spark, String inputPath, String childParentOrganizationPath,
@@ -113,13 +114,13 @@ public class PrepareInfo implements Serializable {
 			.json(resultOrganizationPath);
 
 		relation
-				.filter(
-						(FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference() &&
-								r.getRelClass().equals(ModelConstants.HAS_AUTHOR_INSTITUTION))
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression","gzip")
-				.json(relationPath);
+			.filter(
+				(FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference() &&
+					r.getRelClass().equals(ModelConstants.HAS_AUTHOR_INSTITUTION))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(relationPath);
 
 		Dataset<String> children = spark
 			.sql(

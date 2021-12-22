@@ -2,7 +2,6 @@
 package eu.dnetlib.dhp.resulttoorganizationfromsemrel;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
-
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
 import java.io.Serializable;
@@ -22,12 +21,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.KeyValueSet;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.resulttoorganizationfrominstrepo.SparkResultToOrganizationFromIstRepoJob;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
-
 
 public class SparkResultToOrganizationFromSemRel implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(SparkResultToOrganizationFromSemRel.class);
@@ -200,7 +197,5 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 			.option("compression", "gzip")
 			.json(outputPath);
 	}
-
-
 
 }
