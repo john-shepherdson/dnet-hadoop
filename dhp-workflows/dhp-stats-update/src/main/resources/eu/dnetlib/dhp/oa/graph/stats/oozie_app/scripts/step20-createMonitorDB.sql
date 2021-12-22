@@ -142,6 +142,9 @@ compute stats TARGET.indi_pub_closed_other_open;
 create table TARGET.indi_result_no_of_copies stored as parquet as select * from SOURCE.indi_result_no_of_copies orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_result_no_of_copies;
 
+--- Usage statistics
+create table TARGET.usage_stats stored as parquet as select * from SOURCE.usage_stats orig where exists (select 1 from TARGET.result r where r.id=orig.result_id);
+
 --denorm
 alter table TARGET.result rename to TARGET.res_tmp;
 
