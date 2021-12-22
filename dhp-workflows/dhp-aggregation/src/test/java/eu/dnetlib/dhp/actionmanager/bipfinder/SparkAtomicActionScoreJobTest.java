@@ -74,10 +74,6 @@ public class SparkAtomicActionScoreJobTest {
 		String bipScoresPath = getClass()
 			.getResource("/eu/dnetlib/dhp/actionmanager/bipfinder/bip_scores_oid.json")
 			.getPath();
-		String inputPath = getClass()
-			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/bipfinder/publicationoaid.json")
-			.getPath();
 
 		SparkAtomicActionScoreJob
 			.main(
