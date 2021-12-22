@@ -96,12 +96,17 @@ public class PrepareTest {
 		String doi1 = "unresolved::10.0000/096020199389707::doi";
 
 		Assertions.assertEquals(1, tmp.filter(r -> r.getId().equals(doi1)).count());
-		Assertions.assertEquals(3, tmp.filter(r -> r.getId().equals(doi1)).collect().get(0).getMeasures().size());
+		Assertions.assertEquals(1, tmp.filter(r -> r.getId().equals(doi1)).collect().get(0).getInstance().size());
+		Assertions
+			.assertEquals(
+				3, tmp.filter(r -> r.getId().equals(doi1)).collect().get(0).getInstance().get(0).getMeasures().size());
 		Assertions
 			.assertEquals(
 				"6.34596412687e-09", tmp
 					.filter(r -> r.getId().equals(doi1))
 					.collect()
+					.get(0)
+					.getInstance()
 					.get(0)
 					.getMeasures()
 					.stream()
@@ -117,6 +122,8 @@ public class PrepareTest {
 					.filter(r -> r.getId().equals(doi1))
 					.collect()
 					.get(0)
+					.getInstance()
+					.get(0)
 					.getMeasures()
 					.stream()
 					.filter(sl -> sl.getId().equals("popularity_alt"))
@@ -130,6 +137,8 @@ public class PrepareTest {
 				"2.33375102921e-09", tmp
 					.filter(r -> r.getId().equals(doi1))
 					.collect()
+					.get(0)
+					.getInstance()
 					.get(0)
 					.getMeasures()
 					.stream()
