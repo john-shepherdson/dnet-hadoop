@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.oaf.Instance;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -30,6 +29,7 @@ import eu.dnetlib.dhp.actionmanager.bipmodel.BipScore;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Instance;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Measure;
 import eu.dnetlib.dhp.schema.oaf.Result;
@@ -41,7 +41,7 @@ public class PrepareBipFinder implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(PrepareBipFinder.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	public static  void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
 
 		String jsonConfiguration = IOUtils
 			.toString(
