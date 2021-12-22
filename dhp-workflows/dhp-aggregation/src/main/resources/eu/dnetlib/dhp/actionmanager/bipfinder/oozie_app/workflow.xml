@@ -1,9 +1,5 @@
 <workflow-app name="BipFinderScore" xmlns="uri:oozie:workflow:0.5">
     <parameters>
-        <property>
-            <name>inputPath</name>
-            <description>the input path of the resources to be extended</description>
-        </property>
 
         <property>
             <name>bipScorePath</name>
@@ -107,8 +103,6 @@
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-
-
-
+    
     <end name="End"/>
 </workflow-app>
