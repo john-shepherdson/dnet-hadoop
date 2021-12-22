@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.actionmanager.common;
+package eu.dnetlib.dhp.actionmanager.bipmodel;
 
 import java.util.Optional;
 

@@ -1,10 +1,8 @@
 
-package eu.dnetlib.dhp.actionmanager.common;
+package eu.dnetlib.dhp.actionmanager.bipmodel;
 
 import java.io.Serializable;
 import java.util.List;
-
-import eu.dnetlib.dhp.actionmanager.bipfinder.Score;
 
 /**
  * Rewriting of the bipFinder input data by extracting the identifier of the result (doi)

@@ -1,8 +1,8 @@
 
 package eu.dnetlib.dhp.actionmanager.createunresolvedentities;
 
-import static eu.dnetlib.dhp.actionmanager.common.Constants.*;
-import static eu.dnetlib.dhp.actionmanager.common.Constants.UPDATE_CLASS_NAME;
+import static eu.dnetlib.dhp.actionmanager.bipmodel.Constants.*;
+import static eu.dnetlib.dhp.actionmanager.bipmodel.Constants.UPDATE_CLASS_NAME;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.BipDeserialize;
-import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.BipScore;
+import eu.dnetlib.dhp.actionmanager.bipmodel.BipDeserialize;
+import eu.dnetlib.dhp.actionmanager.bipmodel.BipScore;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -88,6 +88,7 @@ public class PrepareBipFinder implements Serializable {
 				BipScore bs = new BipScore();
 				bs.setId(key);
 				bs.setScoreList(entry.get(key));
+
 				return bs;
 			}).collect(Collectors.toList()).iterator()).rdd(), Encoders.bean(BipScore.class))
 			.map((MapFunction<BipScore, Result>) v -> {

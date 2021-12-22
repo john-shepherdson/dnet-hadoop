@@ -1,12 +1,10 @@
 
-package eu.dnetlib.dhp.actionmanager.common;
+package eu.dnetlib.dhp.actionmanager.bipmodel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import eu.dnetlib.dhp.actionmanager.bipfinder.Score;
 
 /**
  * Class that maps the model of the bipFinder! input data.

@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.actionmanager.bipfinder;
 
-import static eu.dnetlib.dhp.actionmanager.common.Constants.*;
+import static eu.dnetlib.dhp.actionmanager.bipmodel.Constants.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.common.BipDeserialize;
-import eu.dnetlib.dhp.actionmanager.common.BipScore;
+import eu.dnetlib.dhp.actionmanager.bipmodel.BipDeserialize;
+import eu.dnetlib.dhp.actionmanager.bipmodel.BipScore;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;

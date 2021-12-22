@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.actionmanager.createunresolvedentities;
 
-import static eu.dnetlib.dhp.actionmanager.common.Constants.*;
+import static eu.dnetlib.dhp.actionmanager.bipmodel.Constants.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
