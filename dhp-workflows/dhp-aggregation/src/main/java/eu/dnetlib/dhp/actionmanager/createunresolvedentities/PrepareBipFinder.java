@@ -6,10 +6,12 @@ import static eu.dnetlib.dhp.actionmanager.bipmodel.Constants.UPDATE_CLASS_NAME;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.oaf.Instance;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -39,7 +41,7 @@ public class PrepareBipFinder implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(PrepareBipFinder.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	public static <I extends Result> void main(String[] args) throws Exception {
+	public static  void main(String[] args) throws Exception {
 
 		String jsonConfiguration = IOUtils
 			.toString(
@@ -75,7 +77,7 @@ public class PrepareBipFinder implements Serializable {
 			});
 	}
 
-	private static <I extends Result> void prepareResults(SparkSession spark, String inputPath, String outputPath) {
+	private static void prepareResults(SparkSession spark, String inputPath, String outputPath) {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -95,7 +97,9 @@ public class PrepareBipFinder implements Serializable {
 				Result r = new Result();
 
 				r.setId(DHPUtils.generateUnresolvedIdentifier(v.getId(), DOI));
-				r.setMeasures(getMeasure(v));
+				Instance inst = new Instance();
+				inst.setMeasures(getMeasure(v));
+				r.setInstance(Arrays.asList(inst));
 				return r;
 			}, Encoders.bean(Result.class))
 			.write()

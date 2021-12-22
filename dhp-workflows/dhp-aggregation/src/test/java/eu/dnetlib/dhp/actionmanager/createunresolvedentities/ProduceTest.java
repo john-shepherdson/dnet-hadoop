@@ -126,6 +126,7 @@ public class ProduceTest {
 					.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi"))
 					.collect()
 					.get(0)
+							.getInstance().get(0)
 					.getMeasures()
 					.size());
 
@@ -179,7 +180,8 @@ public class ProduceTest {
 
 		List<Measure> measures = tmp
 			.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi"))
-			.flatMap(row -> row.getMeasures().iterator())
+			.flatMap(row -> row.getInstance().iterator())
+				.flatMap(inst -> inst.getMeasures().iterator())
 			.collect();
 		Assertions
 			.assertEquals(
@@ -226,7 +228,7 @@ public class ProduceTest {
 				85,
 				tmp
 					.filter(row -> !row.getId().equals("unresolved::10.3390/s18072310::doi"))
-					.filter(r -> r.getMeasures() != null)
+					.filter(r -> r.getInstance() != null)
 					.count());
 
 	}
