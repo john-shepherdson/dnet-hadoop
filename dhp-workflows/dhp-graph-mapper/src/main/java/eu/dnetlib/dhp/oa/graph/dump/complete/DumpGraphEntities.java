@@ -1,7 +1,6 @@
 
 package eu.dnetlib.dhp.oa.graph.dump.complete;
 
-import static com.jayway.jsonpath.Filter.filter;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
@@ -11,9 +10,7 @@ import java.util.stream.Collectors;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
-import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
@@ -21,8 +18,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.oa.graph.dump.DumpProducts;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
@@ -133,14 +128,14 @@ public class DumpGraphEntities implements Serializable {
 			.ifPresent(
 				pids -> pids
 					.stream()
-					.map(p -> ControlledField.newInstance(p.getQualifier().getClassid(), p.getValue()))
+					.map(p -> DatasourcePid.newInstance(p.getQualifier().getClassid(), p.getValue()))
 					.collect(Collectors.toList()));
 
 		Optional
 			.ofNullable(d.getDatasourcetype())
 			.ifPresent(
 				dsType -> datasource
-					.setDatasourcetype(ControlledField.newInstance(dsType.getClassid(), dsType.getClassname())));
+					.setDatasourcetype(DatasourceSchemeValue.newInstance(dsType.getClassid(), dsType.getClassname())));
 
 		Optional
 			.ofNullable(d.getOpenairecompatibility())
@@ -499,7 +494,7 @@ public class DumpGraphEntities implements Serializable {
 			.ifPresent(
 				value -> {
 					if (!value.getClassid().equals(Constants.UNKNOWN)) {
-						organization.setCountry(Qualifier.newInstance(value.getClassid(), value.getClassname()));
+						organization.setCountry(Country.newInstance(value.getClassid(), value.getClassname()));
 					}
 
 				});
@@ -515,7 +510,7 @@ public class DumpGraphEntities implements Serializable {
 					.setPid(
 						value
 							.stream()
-							.map(p -> ControlledField.newInstance(p.getQualifier().getClassid(), p.getValue()))
+							.map(p -> OrganizationPid.newInstance(p.getQualifier().getClassid(), p.getValue()))
 							.collect(Collectors.toList())));
 
 		return organization;

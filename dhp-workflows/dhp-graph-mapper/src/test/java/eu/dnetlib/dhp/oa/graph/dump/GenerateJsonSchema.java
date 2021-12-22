@@ -9,7 +9,7 @@ import com.github.victools.jsonschema.generator.*;
 
 import eu.dnetlib.dhp.schema.dump.oaf.graph.*;
 
-@Disabled
+//@Disabled
 class GenerateJsonSchema {
 
 	@Test
@@ -21,7 +21,7 @@ class GenerateJsonSchema {
 		configBuilder.forFields().withDescriptionResolver(field -> "Description of " + field.getDeclaredName());
 		SchemaGeneratorConfig config = configBuilder.build();
 		SchemaGenerator generator = new SchemaGenerator(config);
-		JsonNode jsonSchema = generator.generateSchema(Relation.class);
+		JsonNode jsonSchema = generator.generateSchema(GraphResult.class);
 
 		System.out.println(jsonSchema.toString());
 	}

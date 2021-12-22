@@ -19,6 +19,12 @@
 		"paramLongName": "isSparkSessionManaged",
 		"paramDescription": "true if the spark session is managed, false otherwise",
 		"paramRequired": false
+	},
+	{
+		"paramName": "rs",
+		"paramLongName": "removeSet",
+		"paramDescription": "the list of classname relations, split by ';',  not to be dumped",
+		"paramRequired": false
 	}
 ]
 
