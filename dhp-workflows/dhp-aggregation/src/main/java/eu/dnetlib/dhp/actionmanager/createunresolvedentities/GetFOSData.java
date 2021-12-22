@@ -21,7 +21,7 @@ public class GetFOSData implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(GetFOSData.class);
 
-	public static final char DEFAULT_DELIMITER = '\t';
+	public static final char DEFAULT_DELIMITER = ',';
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(

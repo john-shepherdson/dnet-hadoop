@@ -107,13 +107,13 @@ public class ProduceTest {
 			.textFile(workingDir.toString() + "/unresolved")
 			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
 
-		Assertions.assertEquals(135, tmp.count());
+		Assertions.assertEquals(105, tmp.count());
 
 		Assertions.assertEquals(1, tmp.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi")).count());
 
 		Assertions
 			.assertEquals(
-				3, tmp
+				6, tmp
 					.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi"))
 					.collect()
 					.get(0)
@@ -175,9 +175,20 @@ public class ProduceTest {
 						ModelConstants.DNET_PROVENANCE_ACTIONS,
 						sbj.getDataInfo().getProvenanceaction().getSchemename()));
 
-		sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("engineering and technology"));
-		sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("nano-technology"));
-		sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("nanoscience & nanotechnology"));
+		Assertions
+			.assertEquals(
+				true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("04 agricultural and veterinary sciences")));
+		Assertions.assertEquals(false, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("nano-technology")));
+		Assertions
+			.assertEquals(
+				true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("0404 agricultural biotechnology")));
+		Assertions.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("040502 food science")));
+
+		Assertions
+			.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("03 medical and health sciences")));
+		Assertions.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("0303 health sciences")));
+		Assertions
+			.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("030309 nutrition & dietetics")));
 
 		List<Measure> measures = tmp
 			.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi"))
@@ -219,7 +230,7 @@ public class ProduceTest {
 
 		Assertions
 			.assertEquals(
-				49, tmp
+				19, tmp
 					.filter(row -> !row.getId().equals("unresolved::10.3390/s18072310::doi"))
 					.filter(row -> row.getSubject() != null)
 					.count());
@@ -229,7 +240,7 @@ public class ProduceTest {
 				85,
 				tmp
 					.filter(row -> !row.getId().equals("unresolved::10.3390/s18072310::doi"))
-					.filter(r -> r.getInstance() != null)
+					.filter(r -> r.getInstance() != null && r.getInstance().size() > 0)
 					.count());
 
 	}

@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -64,26 +65,32 @@ public class PrepareFOSSparkJob implements Serializable {
 	private static void distributeFOSdois(SparkSession spark, String sourcePath, String outputPath) {
 		Dataset<FOSDataModel> fosDataset = readPath(spark, sourcePath, FOSDataModel.class);
 
-		fosDataset.map((MapFunction<FOSDataModel, Result>) value -> {
-				Result r = new Result();
-				r.setId(DHPUtils.generateUnresolvedIdentifier(value.getDoi(), DOI));
-				r.setSubject(getSubjects(value));
-				return r;
-			}, Encoders.bean(Result.class))
+		fosDataset.groupByKey((MapFunction<FOSDataModel,String>)v->v.getDoi(), Encoders.STRING())
+				.mapGroups((MapGroupsFunction<String, FOSDataModel, Result>)(k,it)->{
+					Result r = new Result();
+					FOSDataModel first = it.next();
+					r.setId(DHPUtils.generateUnresolvedIdentifier(first.getDoi(), DOI));
+					HashSet<String> level1 = new HashSet<>();
+					HashSet<String> level2 = new HashSet<>();
+					HashSet<String> level3 = new HashSet<>();
+					addLevels(level1, level2, level3, first);
+					it.forEachRemaining(v -> addLevels(level1, level2, level3, v));
+					List<StructuredProperty>sbjs = new ArrayList<>();
+					level1.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME)));
+					level2.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME)));
+					level3.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME)));
+					return r;
+				}, Encoders.bean(Result.class))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath + "/fos");
 	}
 
-	private static List<StructuredProperty> getSubjects(FOSDataModel fos) {
-		return Arrays
-			.asList(getSubject(fos.getLevel1(), FOS_CLASS_ID, FOS_CLASS_NAME),
-					getSubject(fos.getLevel2(), FOS_CLASS_ID, FOS_CLASS_NAME),
-					getSubject(fos.getLevel3(), FOS_CLASS_ID, FOS_CLASS_NAME))
-			.stream()
-			.filter(Objects::nonNull)
-			.collect(Collectors.toList());
+	private static void addLevels(HashSet<String> level1, HashSet<String> level2, HashSet<String> level3, FOSDataModel first) {
+		level1.add(first.getLevel1());
+		level2.add(first.getLevel2());
+		level3.add(first.getLevel3());
 	}
 
 

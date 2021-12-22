@@ -155,14 +155,14 @@ public class PrepareTest {
 	void getFOSFileTest() throws IOException, ClassNotFoundException {
 
 		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/fos/h2020_fos_sbs.csv")
+			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/fos/fos_sbs.csv")
 			.getPath();
 		final String outputPath = workingDir.toString() + "/fos.json";
 
 		new GetFOSData()
 			.doRewrite(
 				sourcePath, outputPath, "eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.FOSDataModel",
-				'\t', fs);
+				',', fs);
 
 		BufferedReader in = new BufferedReader(
 			new InputStreamReader(fs.open(new org.apache.hadoop.fs.Path(outputPath))));
@@ -176,7 +176,7 @@ public class PrepareTest {
 			count += 1;
 		}
 
-		assertEquals(38, count);
+		assertEquals(39, count);
 
 	}
 
