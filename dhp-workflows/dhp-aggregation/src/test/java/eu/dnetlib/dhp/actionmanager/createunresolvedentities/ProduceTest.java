@@ -67,72 +67,12 @@ public class ProduceTest {
 	}
 
 	@Test
-	void produceTest() throws Exception {
+	void produceTestSubjects() throws Exception {
 
-		final String bipPath = getClass()
-			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/bip/bip.json")
-			.getPath();
-
-		PrepareBipFinder
-			.main(
-				new String[] {
-					"--isSparkSessionManaged", Boolean.FALSE.toString(),
-					"--sourcePath", bipPath,
-					"--outputPath", workingDir.toString() + "/work"
-
-				});
-		final String fosPath = getClass()
-			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/fos/fos.json")
-			.getPath();
-
-		PrepareFOSSparkJob
-			.main(
-				new String[] {
-					"--isSparkSessionManaged", Boolean.FALSE.toString(),
-					"--sourcePath", fosPath,
-					"-outputPath", workingDir.toString() + "/work"
-				});
-
-		SparkSaveUnresolved.main(new String[] {
-			"--isSparkSessionManaged", Boolean.FALSE.toString(),
-			"--sourcePath", workingDir.toString() + "/work",
-
-			"-outputPath", workingDir.toString() + "/unresolved"
-
-		});
-
-		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-
-		JavaRDD<Result> tmp = sc
-			.textFile(workingDir.toString() + "/unresolved")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
-
-		Assertions.assertEquals(135, tmp.count());
-
-		Assertions.assertEquals(1, tmp.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi")).count());
-
-		Assertions
-			.assertEquals(
-				3, tmp
-					.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi"))
-					.collect()
-					.get(0)
-					.getSubject()
-					.size());
-
-		Assertions
-			.assertEquals(
-				3, tmp
-					.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi"))
-					.collect()
-					.get(0)
-					.getInstance()
-					.get(0)
-					.getMeasures()
-					.size());
+		JavaRDD<Result> tmp = getResultJavaRDD();
 
 		List<StructuredProperty> sbjs = tmp
-			.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi"))
+			.filter(row -> row.getSubject() != null && row.getSubject().size() > 0)
 			.flatMap(row -> row.getSubject().iterator())
 			.collect();
 
@@ -174,13 +114,100 @@ public class ProduceTest {
 					.assertEquals(
 						ModelConstants.DNET_PROVENANCE_ACTIONS,
 						sbj.getDataInfo().getProvenanceaction().getSchemename()));
+	}
 
-		sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("engineering and technology"));
-		sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("nano-technology"));
-		sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("nanoscience & nanotechnology"));
+	@Test
+	void produceTestMeasuress() throws Exception {
+
+		JavaRDD<Result> tmp = getResultJavaRDD();
+
+		List<KeyValue> mes = tmp
+			.filter(row -> row.getInstance() != null && row.getInstance().size() > 0)
+			.flatMap(row -> row.getInstance().iterator())
+			.flatMap(i -> i.getMeasures().iterator())
+			.flatMap(m -> m.getUnit().iterator())
+			.collect();
+
+		mes.forEach(sbj -> Assertions.assertEquals(false, sbj.getDataInfo().getDeletedbyinference()));
+		mes.forEach(sbj -> Assertions.assertEquals(true, sbj.getDataInfo().getInferred()));
+		mes.forEach(sbj -> Assertions.assertEquals(false, sbj.getDataInfo().getInvisible()));
+		mes.forEach(sbj -> Assertions.assertEquals("", sbj.getDataInfo().getTrust()));
+		mes.forEach(sbj -> Assertions.assertEquals("update", sbj.getDataInfo().getInferenceprovenance()));
+		mes
+			.forEach(
+				sbj -> Assertions.assertEquals("measure:bip", sbj.getDataInfo().getProvenanceaction().getClassid()));
+		mes
+			.forEach(
+				sbj -> Assertions
+					.assertEquals("Inferred by OpenAIRE", sbj.getDataInfo().getProvenanceaction().getClassname()));
+		mes
+			.forEach(
+				sbj -> Assertions
+					.assertEquals(
+						ModelConstants.DNET_PROVENANCE_ACTIONS, sbj.getDataInfo().getProvenanceaction().getSchemeid()));
+		mes
+			.forEach(
+				sbj -> Assertions
+					.assertEquals(
+						ModelConstants.DNET_PROVENANCE_ACTIONS,
+						sbj.getDataInfo().getProvenanceaction().getSchemename()));
+	}
+
+	@Test
+	void produceTest6Subjects() throws Exception {
+		final String doi = "unresolved::10.3390/s18072310::doi";
+
+		JavaRDD<Result> tmp = getResultJavaRDD();
+
+		Assertions
+			.assertEquals(
+				6, tmp
+					.filter(row -> row.getId().equals(doi))
+					.collect()
+					.get(0)
+					.getSubject()
+					.size());
+
+		List<StructuredProperty> sbjs = tmp
+			.filter(row -> row.getId().equals(doi))
+			.flatMap(row -> row.getSubject().iterator())
+			.collect();
+
+		Assertions
+			.assertEquals(
+				true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("04 agricultural and veterinary sciences")));
+
+		Assertions
+			.assertEquals(
+				true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("0404 agricultural biotechnology")));
+		Assertions.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("040502 food science")));
+
+		Assertions
+			.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("03 medical and health sciences")));
+		Assertions.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("0303 health sciences")));
+		Assertions
+			.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("030309 nutrition & dietetics")));
+
+	}
+
+	@Test
+	void produceTest3Measures() throws Exception {
+		final String doi = "unresolved::10.3390/s18072310::doi";
+		JavaRDD<Result> tmp = getResultJavaRDD();
+
+		Assertions
+			.assertEquals(
+				3, tmp
+					.filter(row -> row.getId().equals(doi))
+					.collect()
+					.get(0)
+					.getInstance()
+					.get(0)
+					.getMeasures()
+					.size());
 
 		List<Measure> measures = tmp
-			.filter(row -> row.getId().equals("unresolved::10.3390/s18072310::doi"))
+			.filter(row -> row.getId().equals(doi))
 			.flatMap(row -> row.getInstance().iterator())
 			.flatMap(inst -> inst.getMeasures().iterator())
 			.collect();
@@ -217,10 +244,22 @@ public class ProduceTest {
 					.get(0)
 					.getValue());
 
+	}
+
+	@Test
+	void produceTestSomeNumbers() throws Exception {
+
+		final String doi = "unresolved::10.3390/s18072310::doi";
+		JavaRDD<Result> tmp = getResultJavaRDD();
+
+		Assertions.assertEquals(105, tmp.count());
+
+		Assertions.assertEquals(1, tmp.filter(row -> row.getId().equals(doi)).count());
+
 		Assertions
 			.assertEquals(
-				49, tmp
-					.filter(row -> !row.getId().equals("unresolved::10.3390/s18072310::doi"))
+				19, tmp
+					.filter(row -> !row.getId().equals(doi))
 					.filter(row -> row.getSubject() != null)
 					.count());
 
@@ -228,9 +267,84 @@ public class ProduceTest {
 			.assertEquals(
 				85,
 				tmp
-					.filter(row -> !row.getId().equals("unresolved::10.3390/s18072310::doi"))
-					.filter(r -> r.getInstance() != null)
+					.filter(row -> !row.getId().equals(doi))
+					.filter(r -> r.getInstance() != null && r.getInstance().size() > 0)
 					.count());
+
+	}
+
+	private JavaRDD<Result> getResultJavaRDD() throws Exception {
+		final String bipPath = getClass()
+			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/bip/bip.json")
+			.getPath();
+
+		PrepareBipFinder
+			.main(
+				new String[] {
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--sourcePath", bipPath,
+					"--outputPath", workingDir.toString() + "/work"
+
+				});
+		final String fosPath = getClass()
+			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/fos/fos.json")
+			.getPath();
+
+		PrepareFOSSparkJob
+			.main(
+				new String[] {
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--sourcePath", fosPath,
+					"-outputPath", workingDir.toString() + "/work"
+				});
+
+		SparkSaveUnresolved.main(new String[] {
+			"--isSparkSessionManaged", Boolean.FALSE.toString(),
+			"--sourcePath", workingDir.toString() + "/work",
+
+			"-outputPath", workingDir.toString() + "/unresolved"
+
+		});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		return sc
+			.textFile(workingDir.toString() + "/unresolved")
+			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
+	}
+
+	@Test
+	void prepareTest5Subjects() throws Exception {
+		final String doi = "unresolved::10.1063/5.0032658::doi";
+
+		JavaRDD<Result> tmp = getResultJavaRDD();
+
+		Assertions.assertEquals(1, tmp.filter(row -> row.getId().equals(doi)).count());
+
+		Assertions
+			.assertEquals(
+				5, tmp
+					.filter(row -> row.getId().equals(doi))
+					.collect()
+					.get(0)
+					.getSubject()
+					.size());
+
+		List<StructuredProperty> sbjs = tmp
+			.filter(row -> row.getId().equals(doi))
+			.flatMap(row -> row.getSubject().iterator())
+			.collect();
+
+		Assertions
+			.assertEquals(
+				true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("01 natural sciences")));
+		Assertions.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("0103 physical sciences")));
+
+		Assertions
+			.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("010304 chemical physics")));
+		Assertions.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("0104 chemical sciences")));
+		Assertions
+			.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("010402 general chemistry")));
 
 	}
 

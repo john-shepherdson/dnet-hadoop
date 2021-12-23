@@ -6,19 +6,19 @@ import java.io.Serializable;
 import com.opencsv.bean.CsvBindByPosition;
 
 public class FOSDataModel implements Serializable {
-	@CsvBindByPosition(position = 1)
+	@CsvBindByPosition(position = 0)
 //    @CsvBindByName(column = "doi")
 	private String doi;
 
-	@CsvBindByPosition(position = 2)
+	@CsvBindByPosition(position = 1)
 //    @CsvBindByName(column = "level1")
 	private String level1;
 
-	@CsvBindByPosition(position = 3)
+	@CsvBindByPosition(position = 2)
 //    @CsvBindByName(column = "level2")
 	private String level2;
 
-	@CsvBindByPosition(position = 4)
+	@CsvBindByPosition(position = 3)
 //    @CsvBindByName(column = "level3")
 	private String level3;
 

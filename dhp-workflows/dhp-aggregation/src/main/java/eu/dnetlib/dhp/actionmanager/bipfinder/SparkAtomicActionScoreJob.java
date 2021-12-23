@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.actionmanager.bipfinder;
 
-import static eu.dnetlib.dhp.actionmanager.bipmodel.Constants.*;
+import static eu.dnetlib.dhp.actionmanager.Constants.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
