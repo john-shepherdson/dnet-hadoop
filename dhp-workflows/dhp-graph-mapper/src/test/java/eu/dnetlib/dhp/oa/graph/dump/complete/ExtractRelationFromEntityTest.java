@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.*;
@@ -96,6 +97,76 @@ public class ExtractRelationFromEntityTest {
 				9,
 				verificationDataset.filter("source.id = '50|dedup_wf_001::15270b996fa8fd2fb5723daxab3685c3'").count());
 
+		Assertions
+			.assertEquals(
+				"IsRelatedTo", verificationDataset
+					.filter((FilterFunction<Relation>) row -> row.getSource().getId().startsWith("00"))
+					.collectAsList()
+					.get(0)
+					.getReltype()
+					.getName());
+
+		Assertions
+			.assertEquals(
+				"relationship", verificationDataset
+					.filter((FilterFunction<Relation>) row -> row.getSource().getId().startsWith("00"))
+					.collectAsList()
+					.get(0)
+					.getReltype()
+					.getType());
+
+		Assertions
+				.assertEquals(
+						"context", verificationDataset
+								.filter((FilterFunction<Relation>) row -> row.getSource().getId().startsWith("00"))
+								.collectAsList()
+								.get(0)
+								.getSource()
+								.getType());
+
+		Assertions
+				.assertEquals(
+						"result", verificationDataset
+								.filter((FilterFunction<Relation>) row -> row.getSource().getId().startsWith("00"))
+								.collectAsList()
+								.get(0)
+								.getTarget()
+								.getType());
+		Assertions
+			.assertEquals(
+				"IsRelatedTo", verificationDataset
+					.filter((FilterFunction<Relation>) row -> row.getTarget().getId().startsWith("00"))
+					.collectAsList()
+					.get(0)
+					.getReltype()
+					.getName());
+
+		Assertions
+			.assertEquals(
+				"relationship", verificationDataset
+					.filter((FilterFunction<Relation>) row -> row.getTarget().getId().startsWith("00"))
+					.collectAsList()
+					.get(0)
+					.getReltype()
+					.getType());
+
+		Assertions
+				.assertEquals(
+						"context", verificationDataset
+								.filter((FilterFunction<Relation>) row -> row.getTarget().getId().startsWith("00"))
+								.collectAsList()
+								.get(0)
+								.getTarget()
+								.getType());
+
+		Assertions
+				.assertEquals(
+						"result", verificationDataset
+								.filter((FilterFunction<Relation>) row -> row.getTarget().getId().startsWith("00"))
+								.collectAsList()
+								.get(0)
+								.getSource()
+								.getType());
 	}
 
 }
