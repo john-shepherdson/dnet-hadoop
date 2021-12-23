@@ -49,8 +49,10 @@ compute stats TARGET.result_greenoa;
 create table TARGET.result_languages stored as parquet as select * from SOURCE.result_languages orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_languages;
 
-create table TARGET.result_licences stored as parquet as select * from SOURCE.result_licenses orig where exists (select 1 from TARGET.result r where r.id=orig.id);
-compute stats TARGET.result_licences;
+create table TARGET.result_licenses stored as parquet as select * from SOURCE.result_licenses orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.result_licenses;
+
+create table TARGET.licenses_normalized as select * from SOURCE.licenses_normalized;
 
 create table TARGET.result_oids stored as parquet as select * from SOURCE.result_oids orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_oids;
@@ -79,9 +81,6 @@ compute stats TARGET.result_sources;
 create table TARGET.result_topics stored as parquet as select * from SOURCE.result_topics orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_topics;
 
-create table TARGET.result_result stored as parquet as select * from SOURCE.result_result orig where exists (select 1 from TARGET.result r where r.id=orig.source or r.id=orig.target);
-compute stats TARGET.result_result;
-
 -- datasources
 create view if not exists TARGET.datasource as select * from SOURCE.datasource;
 create view if not exists TARGET.datasource_oids as select * from SOURCE.datasource_oids;
@@ -103,6 +102,7 @@ create view if not exists TARGET.project as select * from SOURCE.project;
 create view if not exists TARGET.project_oids as select * from SOURCE.project_oids;
 create view if not exists TARGET.project_organizations as select * from SOURCE.project_organizations;
 create view if not exists TARGET.project_resultcount as select * from SOURCE.project_resultcount;
+create view if not exists TARGET.project_classification as select * from SOURCE.project_classification;
 
 create table TARGET.project_results stored as parquet as select id as result, project as id from TARGET.result_projects;
 compute stats TARGET.project_results;
@@ -118,10 +118,10 @@ create table TARGET.indi_pub_gold_oa stored as parquet as select * from SOURCE.i
 compute stats TARGET.indi_pub_gold_oa;
 create table TARGET.indi_pub_has_abstract stored as parquet as select * from SOURCE.indi_pub_has_abstract orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_has_abstract;
-create table TARGET.indi_pub_has_cc_licence stored as parquet as select * from SOURCE.indi_pub_has_cc_licence orig where exists (select 1 from TARGET.result r where r.id=orig.id);
-compute stats TARGET.indi_pub_has_cc_licence;
-create table TARGET.indi_pub_has_cc_licence_url stored as parquet as select * from SOURCE.indi_pub_has_cc_licence_url orig where exists (select 1 from TARGET.result r where r.id=orig.id);
-compute stats TARGET.indi_pub_has_cc_licence_url;
+create table TARGET.indi_result_has_cc_licence stored as parquet as select * from SOURCE.indi_result_has_cc_licence orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_result_has_cc_licence;
+create table TARGET.indi_result_has_cc_licence_url stored as parquet as select * from SOURCE.indi_result_has_cc_licence_url orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_result_has_cc_licence_url;
 
 create view TARGET.indi_funder_country_collab stored as select * from SOURCE.indi_funder_country_collab;
 
@@ -137,6 +137,12 @@ create table TARGET.indi_pub_in_transformative stored as parquet as select * fro
 compute stats TARGET.indi_pub_in_transformative;
 create table TARGET.indi_pub_closed_other_open stored as parquet as select * from SOURCE.indi_pub_closed_other_open orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_closed_other_open;
+
+create table TARGET.indi_result_no_of_copies stored as parquet as select * from SOURCE.indi_result_no_of_copies orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_result_no_of_copies;
+
+--- Usage statistics
+create table TARGET.usage_stats stored as parquet as select * from SOURCE.usage_stats orig where exists (select 1 from TARGET.result r where r.id=orig.result_id);
 
 --denorm
 alter table TARGET.result rename to TARGET.res_tmp;
