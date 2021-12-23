@@ -52,8 +52,7 @@ compute stats TARGET.result_languages;
 create table TARGET.result_licenses stored as parquet as select * from SOURCE.result_licenses orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_licenses;
 
-create table TARGET.licenses_normalized stored as parquet as select * from SOURCE.licenses_normalized orig where exists (select 1 from TARGET.result r where r.id=orig.id);
-compute stats TARGET.licenses_normalized;
+create table TARGET.licenses_normalized as select * from SOURCE.licenses_normalized;
 
 create table TARGET.result_oids stored as parquet as select * from SOURCE.result_oids orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_oids;
