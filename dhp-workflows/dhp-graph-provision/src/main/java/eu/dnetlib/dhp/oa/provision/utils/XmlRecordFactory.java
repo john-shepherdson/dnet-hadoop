@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,6 +23,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.http.protocol.HTTP;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -55,6 +57,8 @@ public class XmlRecordFactory implements Serializable {
 	 *
 	 */
 	private static final long serialVersionUID = 2912912999272373172L;
+	public static final String DOI_ORG_AUTHORITY = "doi.org";
+	public static final String HTTPS = "https";
 
 	private final Map<String, LongAccumulator> accumulators;
 
@@ -1269,6 +1273,7 @@ public class XmlRecordFactory implements Serializable {
 							.getUrl()
 							.stream()
 							.filter(this::isValidUrl)
+							.map(XmlRecordFactory::normalizeDoiUrl)
 							.collect(Collectors.toList()));
 				return i;
 			})
@@ -1283,6 +1288,18 @@ public class XmlRecordFactory implements Serializable {
 			.stream()
 			.filter(Objects::nonNull)
 			.map(this::mergeInstances);
+	}
+
+	public static String normalizeDoiUrl(String url) {
+		if (url.contains(DOI_ORG_AUTHORITY)) {
+			try {
+				URL u = new URL(url);
+				return new URL(HTTPS, DOI_ORG_AUTHORITY, u.getFile()).toString();
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
+		return url;
 	}
 
 	private boolean isValidUrl(String url) {
