@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -15,13 +16,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.collection.GetCSV;
 
-public class GetFOSData implements Serializable {
+import static eu.dnetlib.dhp.actionmanager.Constants.DEFAULT_DELIMITER;
 
-	private static final Logger log = LoggerFactory.getLogger(GetFOSData.class);
+public class GetInputData implements Serializable {
 
-	public static final char DEFAULT_DELIMITER = ',';
+	private static final Logger log = LoggerFactory.getLogger(GetInputData.class);
+
+
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -29,9 +31,9 @@ public class GetFOSData implements Serializable {
 				.toString(
 					Objects
 						.requireNonNull(
-							GetFOSData.class
+							GetInputData.class
 								.getResourceAsStream(
-									"/eu/dnetlib/dhp/actionmanager/createunresolvedentities/get_fos_parameters.json"))));
+									"/eu/dnetlib/dhp/actionmanager/createunresolvedentities/get_input_parameters.json"))));
 
 		parser.parseArgument(args);
 
@@ -60,16 +62,17 @@ public class GetFOSData implements Serializable {
 
 		FileSystem fileSystem = FileSystem.get(conf);
 
-		new GetFOSData().doRewrite(sourcePath, outputPath, classForName, delimiter, fileSystem);
+		new GetInputData().doRewrite(sourcePath, outputPath, classForName, delimiter, fileSystem);
 
 	}
 
 	public void doRewrite(String inputPath, String outputFile, String classForName, char delimiter, FileSystem fs)
 		throws IOException, ClassNotFoundException {
 
+
 		// reads the csv and writes it as its json equivalent
-		try (InputStreamReader reader = new InputStreamReader(fs.open(new Path(inputPath)))) {
-			GetCSV.getCsv(fs, reader, outputFile, classForName, delimiter);
+		try (InputStreamReader reader = new InputStreamReader(new GZIPInputStream(fs.open(new Path(inputPath))))) {
+			eu.dnetlib.dhp.common.collection.GetCSV.getCsv(fs, reader, outputFile, classForName, delimiter);
 		}
 
 	}

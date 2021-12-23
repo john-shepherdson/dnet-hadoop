@@ -79,6 +79,7 @@
     <fork name="prepareInfo">
         <path start="prepareBip"/>
         <path start="getFOS"/>
+        <path start="getSDG"/>
     </fork>
 
     <action name="prepareBip">
@@ -107,7 +108,7 @@
 
     <action name="getFOS">
         <java>
-            <main-class>eu.dnetlib.dhp.actionmanager.createunresolvedentities.GetFOSData</main-class>
+            <main-class>eu.dnetlib.dhp.actionmanager.createunresolvedentities.GetInputData</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--sourcePath</arg><arg>${fosPath}</arg>
             <arg>--outputPath</arg><arg>${workingDir}/input/fos</arg>
@@ -142,6 +143,42 @@
         <error to="Kill"/>
     </action>
 
+    <action name="getSDG">
+        <java>
+            <main-class>eu.dnetlib.dhp.actionmanager.createunresolvedentities.GetInputData</main-class>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--sourcePath</arg><arg>${sdgPath}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/input/sdg</arg>
+            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.SDGDataModel</arg>
+        </java>
+        <ok to="prepareSDG"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="prepareSDG">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Produces the unresolved from FOS!</name>
+            <class>eu.dnetlib.dhp.actionmanager.createunresolvedentities.PrepareSDGSparkJob</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${workingDir}/input/sdg</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/prepared</arg>
+
+        </spark>
+        <ok to="join"/>
+        <error to="Kill"/>
+    </action>
 
 
     <join name="join" to="produceUnresolved"/>

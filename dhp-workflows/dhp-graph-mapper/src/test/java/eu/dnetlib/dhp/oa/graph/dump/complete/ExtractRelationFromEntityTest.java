@@ -116,22 +116,22 @@ public class ExtractRelationFromEntityTest {
 					.getType());
 
 		Assertions
-				.assertEquals(
-						"context", verificationDataset
-								.filter((FilterFunction<Relation>) row -> row.getSource().getId().startsWith("00"))
-								.collectAsList()
-								.get(0)
-								.getSource()
-								.getType());
+			.assertEquals(
+				"context", verificationDataset
+					.filter((FilterFunction<Relation>) row -> row.getSource().getId().startsWith("00"))
+					.collectAsList()
+					.get(0)
+					.getSource()
+					.getType());
 
 		Assertions
-				.assertEquals(
-						"result", verificationDataset
-								.filter((FilterFunction<Relation>) row -> row.getSource().getId().startsWith("00"))
-								.collectAsList()
-								.get(0)
-								.getTarget()
-								.getType());
+			.assertEquals(
+				"result", verificationDataset
+					.filter((FilterFunction<Relation>) row -> row.getSource().getId().startsWith("00"))
+					.collectAsList()
+					.get(0)
+					.getTarget()
+					.getType());
 		Assertions
 			.assertEquals(
 				"IsRelatedTo", verificationDataset
@@ -151,22 +151,22 @@ public class ExtractRelationFromEntityTest {
 					.getType());
 
 		Assertions
-				.assertEquals(
-						"context", verificationDataset
-								.filter((FilterFunction<Relation>) row -> row.getTarget().getId().startsWith("00"))
-								.collectAsList()
-								.get(0)
-								.getTarget()
-								.getType());
+			.assertEquals(
+				"context", verificationDataset
+					.filter((FilterFunction<Relation>) row -> row.getTarget().getId().startsWith("00"))
+					.collectAsList()
+					.get(0)
+					.getTarget()
+					.getType());
 
 		Assertions
-				.assertEquals(
-						"result", verificationDataset
-								.filter((FilterFunction<Relation>) row -> row.getTarget().getId().startsWith("00"))
-								.collectAsList()
-								.get(0)
-								.getSource()
-								.getType());
+			.assertEquals(
+				"result", verificationDataset
+					.filter((FilterFunction<Relation>) row -> row.getTarget().getId().startsWith("00"))
+					.collectAsList()
+					.get(0)
+					.getSource()
+					.getType());
 	}
 
 }
