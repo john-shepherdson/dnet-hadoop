@@ -19,13 +19,19 @@ public class Constants {
 
 	public static final String DOI = "doi";
 
+	public static final char DEFAULT_DELIMITER = ',';
+
 	public static final String UPDATE_DATA_INFO_TYPE = "update";
 	public static final String UPDATE_SUBJECT_FOS_CLASS_ID = "subject:fos";
 	public static final String UPDATE_CLASS_NAME = "Inferred by OpenAIRE";
 	public static final String UPDATE_MEASURE_BIP_CLASS_ID = "measure:bip";
+	public static final String UPDATE_SUBJECT_SDG_CLASS_ID = "subject:sdg";
 
 	public static final String FOS_CLASS_ID = "FOS";
 	public static final String FOS_CLASS_NAME = "Fields of Science and Technology classification";
+
+	public static final String SDG_CLASS_ID = "SDG";
+	public static final String SDG_CLASS_NAME = "Sustainable Development Goals";
 
 	public static final String NULL = "NULL";
 
@@ -49,7 +55,7 @@ public class Constants {
 			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
 	}
 
-	public static StructuredProperty getSubject(String sbj, String classid, String classname) {
+	public static StructuredProperty getSubject(String sbj, String classid, String classname, String diqualifierclassid) {
 		if (sbj.equals(NULL))
 			return null;
 		StructuredProperty sp = new StructuredProperty();
@@ -72,7 +78,7 @@ public class Constants {
 						false,
 						OafMapperUtils
 							.qualifier(
-								UPDATE_SUBJECT_FOS_CLASS_ID,
+									diqualifierclassid,
 								UPDATE_CLASS_NAME,
 								ModelConstants.DNET_PROVENANCE_ACTIONS,
 								ModelConstants.DNET_PROVENANCE_ACTIONS),

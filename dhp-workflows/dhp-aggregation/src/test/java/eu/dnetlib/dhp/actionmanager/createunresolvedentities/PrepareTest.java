@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.SDGDataModel;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -18,17 +19,13 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.FOSDataModel;
-import eu.dnetlib.dhp.common.collection.CollectorException;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class PrepareTest {
@@ -159,7 +156,7 @@ public class PrepareTest {
 			.getPath();
 		final String outputPath = workingDir.toString() + "/fos.json";
 
-		new GetFOSData()
+		new GetInputData()
 			.doRewrite(
 				sourcePath, outputPath, "eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.FOSDataModel",
 				',', fs);
@@ -179,6 +176,8 @@ public class PrepareTest {
 		assertEquals(39, count);
 
 	}
+
+
 
 	@Test
 	void fosPrepareTest() throws Exception {
@@ -204,15 +203,9 @@ public class PrepareTest {
 
 		String doi1 = "unresolved::10.3390/s18072310::doi";
 
-		assertEquals(50, tmp.count());
+		assertEquals(20, tmp.count());
 		assertEquals(1, tmp.filter(row -> row.getId().equals(doi1)).count());
-		assertTrue(
-			tmp
-				.filter(r -> r.getId().equals(doi1))
-				.flatMap(r -> r.getSubject().iterator())
-				.map(sbj -> sbj.getValue())
-				.collect()
-				.contains("engineering and technology"));
+
 
 		assertTrue(
 			tmp
@@ -220,16 +213,16 @@ public class PrepareTest {
 				.flatMap(r -> r.getSubject().iterator())
 				.map(sbj -> sbj.getValue())
 				.collect()
-				.contains("nano-technology"));
+				.contains("04 agricultural and veterinary sciences"));
 		assertTrue(
 			tmp
 				.filter(r -> r.getId().equals(doi1))
 				.flatMap(r -> r.getSubject().iterator())
 				.map(sbj -> sbj.getValue())
 				.collect()
-				.contains("nanoscience & nanotechnology"));
+				.contains("0404 agricultural biotechnology"));
 
-		String doi = "unresolved::10.1111/1365-2656.12831::doi";
+		String doi = "unresolved::10.1007/s11164-020-04383-6::doi";
 		assertEquals(1, tmp.filter(row -> row.getId().equals(doi)).count());
 		assertTrue(
 			tmp
@@ -237,7 +230,7 @@ public class PrepareTest {
 				.flatMap(r -> r.getSubject().iterator())
 				.map(sbj -> sbj.getValue())
 				.collect()
-				.contains("psychology and cognitive sciences"));
+				.contains("01 natural sciences"));
 
 		assertTrue(
 			tmp
@@ -245,15 +238,116 @@ public class PrepareTest {
 				.flatMap(r -> r.getSubject().iterator())
 				.map(sbj -> sbj.getValue())
 				.collect()
-				.contains("social sciences"));
-		assertFalse(
+				.contains("0104 chemical sciences"));
+		assertTrue(
 			tmp
 				.filter(r -> r.getId().equals(doi))
 				.flatMap(r -> r.getSubject().iterator())
 				.map(sbj -> sbj.getValue())
 				.collect()
-				.contains("NULL"));
+				.contains("010402 general chemistry"));
 
 	}
 
+	@Test
+	void getSDGFileTest() throws IOException, ClassNotFoundException {
+
+		final String sourcePath = getClass()
+				.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/sdg/sdg_sbs.csv")
+				.getPath();
+		final String outputPath = workingDir.toString() + "/sdg.json";
+
+		new GetInputData()
+				.doRewrite(
+						sourcePath, outputPath, "eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.SDGDataModel",
+						',', fs);
+
+		BufferedReader in = new BufferedReader(
+				new InputStreamReader(fs.open(new org.apache.hadoop.fs.Path(outputPath))));
+
+		String line;
+		int count = 0;
+		while ((line = in.readLine()) != null) {
+			SDGDataModel sdg = new ObjectMapper().readValue(line, SDGDataModel.class);
+
+			System.out.println(new ObjectMapper().writeValueAsString(sdg));
+			count += 1;
+		}
+
+		assertEquals(37, count);
+
+	}
+
+	@Test
+	void sdgPrepareTest() throws Exception {
+		final String sourcePath = getClass()
+				.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/sdg/sdg.json")
+				.getPath();
+
+		PrepareSDGSparkJob
+				.main(
+						new String[] {
+								"--isSparkSessionManaged", Boolean.FALSE.toString(),
+								"--sourcePath", sourcePath,
+
+								"-outputPath", workingDir.toString() + "/work"
+
+						});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Result> tmp = sc
+				.textFile(workingDir.toString() + "/work/sdg")
+				.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
+
+		String doi1 = "unresolved::10.1001/amaguidesnewsletters.2019.sepoct02::doi";
+
+		assertEquals(32, tmp.count());
+		assertEquals(1, tmp.filter(row -> row.getId().equals(doi1)).count());
+
+
+		assertTrue(
+				tmp
+						.filter(r -> r.getId().equals(doi1))
+						.flatMap(r -> r.getSubject().iterator())
+						.map(sbj -> sbj.getValue())
+						.collect()
+						.contains("3. Good health"));
+		assertTrue(
+				tmp
+						.filter(r -> r.getId().equals(doi1))
+						.flatMap(r -> r.getSubject().iterator())
+						.map(sbj -> sbj.getValue())
+						.collect()
+						.contains("8. Economic growth"));
+
+
+	}
+	@Disabled
+	@Test
+	void test2() throws Exception {
+		final String sourcePath = "/Users/miriam.baglioni/Downloads/doi_sdg_results_20_12_21.csv.gz";
+
+
+		final String outputPath = workingDir.toString() + "/sdg.json";
+
+		new GetInputData()
+				.doRewrite(
+						sourcePath, outputPath, "eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.SDGDataModel",
+						',', fs);
+
+		BufferedReader in = new BufferedReader(
+				new InputStreamReader(fs.open(new org.apache.hadoop.fs.Path(outputPath))));
+
+		String line;
+		int count = 0;
+		while ((line = in.readLine()) != null) {
+			SDGDataModel sdg = new ObjectMapper().readValue(line, SDGDataModel.class);
+
+			System.out.println(new ObjectMapper().writeValueAsString(sdg));
+			count += 1;
+		}
+
+
+	}
 }

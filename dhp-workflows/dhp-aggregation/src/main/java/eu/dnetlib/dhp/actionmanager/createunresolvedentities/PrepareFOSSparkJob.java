@@ -66,20 +66,20 @@ public class PrepareFOSSparkJob implements Serializable {
 		Dataset<FOSDataModel> fosDataset = readPath(spark, sourcePath, FOSDataModel.class);
 
 		fosDataset
-			.groupByKey((MapFunction<FOSDataModel, String>) v -> v.getDoi(), Encoders.STRING())
+			.groupByKey((MapFunction<FOSDataModel, String>) v -> v.getDoi().toLowerCase(), Encoders.STRING())
 			.mapGroups((MapGroupsFunction<String, FOSDataModel, Result>) (k, it) -> {
 				Result r = new Result();
 				FOSDataModel first = it.next();
-				r.setId(DHPUtils.generateUnresolvedIdentifier(first.getDoi(), DOI));
+				r.setId(DHPUtils.generateUnresolvedIdentifier(k, DOI));
 				HashSet<String> level1 = new HashSet<>();
 				HashSet<String> level2 = new HashSet<>();
 				HashSet<String> level3 = new HashSet<>();
 				addLevels(level1, level2, level3, first);
 				it.forEachRemaining(v -> addLevels(level1, level2, level3, v));
 				List<StructuredProperty> sbjs = new ArrayList<>();
-				level1.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME)));
-				level2.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME)));
-				level3.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME)));
+				level1.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID)));
+				level2.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID)));
+				level3.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID)));
 				r.setSubject(sbjs);
 				return r;
 			}, Encoders.bean(Result.class))
