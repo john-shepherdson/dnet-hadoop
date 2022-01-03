@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.actionmanager.Constants;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -25,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.actionmanager.Constants;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 
@@ -349,59 +349,57 @@ public class ProduceTest {
 
 	}
 
-
 	private JavaRDD<Result> getResultJavaRDDPlusSDG() throws Exception {
 		final String bipPath = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/bip/bip.json")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/bip/bip.json")
+			.getPath();
 
 		PrepareBipFinder
-				.main(
-						new String[] {
-								"--isSparkSessionManaged", Boolean.FALSE.toString(),
-								"--sourcePath", bipPath,
-								"--outputPath", workingDir.toString() + "/work"
+			.main(
+				new String[] {
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--sourcePath", bipPath,
+					"--outputPath", workingDir.toString() + "/work"
 
-						});
+				});
 		final String fosPath = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/fos/fos.json")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/fos/fos.json")
+			.getPath();
 
 		PrepareFOSSparkJob
-				.main(
-						new String[] {
-								"--isSparkSessionManaged", Boolean.FALSE.toString(),
-								"--sourcePath", fosPath,
-								"-outputPath", workingDir.toString() + "/work"
-						});
+			.main(
+				new String[] {
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--sourcePath", fosPath,
+					"-outputPath", workingDir.toString() + "/work"
+				});
 
 		final String sdgPath = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/sdg/sdg.json")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/sdg/sdg.json")
+			.getPath();
 
 		PrepareSDGSparkJob
-				.main(
-						new String[] {
-								"--isSparkSessionManaged", Boolean.FALSE.toString(),
-								"--sourcePath", sdgPath,
-								"-outputPath", workingDir.toString() + "/work"
-						});
+			.main(
+				new String[] {
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--sourcePath", sdgPath,
+					"-outputPath", workingDir.toString() + "/work"
+				});
 
 		SparkSaveUnresolved.main(new String[] {
-				"--isSparkSessionManaged", Boolean.FALSE.toString(),
-				"--sourcePath", workingDir.toString() + "/work",
+			"--isSparkSessionManaged", Boolean.FALSE.toString(),
+			"--sourcePath", workingDir.toString() + "/work",
 
-				"-outputPath", workingDir.toString() + "/unresolved"
+			"-outputPath", workingDir.toString() + "/unresolved"
 
 		});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		return sc
-				.textFile(workingDir.toString() + "/unresolved")
-				.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
+			.textFile(workingDir.toString() + "/unresolved")
+			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
 	}
-
 
 	@Test
 	void produceTestSomeNumbersWithSDG() throws Exception {
@@ -414,19 +412,19 @@ public class ProduceTest {
 		Assertions.assertEquals(1, tmp.filter(row -> row.getId().equals(doi)).count());
 
 		Assertions
-				.assertEquals(
-						50, tmp
-								.filter(row -> !row.getId().equals(doi))
-								.filter(row -> row.getSubject() != null)
-								.count());
+			.assertEquals(
+				50, tmp
+					.filter(row -> !row.getId().equals(doi))
+					.filter(row -> row.getSubject() != null)
+					.count());
 
 		Assertions
-				.assertEquals(
-						85,
-						tmp
-								.filter(row -> !row.getId().equals(doi))
-								.filter(r -> r.getInstance() != null && r.getInstance().size() > 0)
-								.count());
+			.assertEquals(
+				85,
+				tmp
+					.filter(row -> !row.getId().equals(doi))
+					.filter(r -> r.getInstance() != null && r.getInstance().size() > 0)
+					.count());
 
 	}
 
@@ -437,35 +435,35 @@ public class ProduceTest {
 		JavaRDD<Result> tmp = getResultJavaRDDPlusSDG();
 
 		Assertions
-				.assertEquals(
-						7, tmp
-								.filter(row -> row.getId().equals(doi))
-								.collect()
-								.get(0)
-								.getSubject()
-								.size());
+			.assertEquals(
+				7, tmp
+					.filter(row -> row.getId().equals(doi))
+					.collect()
+					.get(0)
+					.getSubject()
+					.size());
 
 		List<StructuredProperty> sbjs = tmp
-				.filter(row -> row.getId().equals(doi))
-				.flatMap(row -> row.getSubject().iterator())
-				.collect();
+			.filter(row -> row.getId().equals(doi))
+			.flatMap(row -> row.getSubject().iterator())
+			.collect();
 
 		Assertions
-				.assertEquals(
-						true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("04 agricultural and veterinary sciences")));
+			.assertEquals(
+				true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("04 agricultural and veterinary sciences")));
 
 		Assertions
-				.assertEquals(
-						true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("0404 agricultural biotechnology")));
+			.assertEquals(
+				true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("0404 agricultural biotechnology")));
 		Assertions.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("040502 food science")));
 
 		Assertions
-				.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("03 medical and health sciences")));
+			.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("03 medical and health sciences")));
 		Assertions.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("0303 health sciences")));
 		Assertions
-				.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("030309 nutrition & dietetics")));
+			.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("030309 nutrition & dietetics")));
 		Assertions
-				.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("1. No poverty")));
+			.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("1. No poverty")));
 
 	}
 
@@ -475,25 +473,25 @@ public class ProduceTest {
 		JavaRDD<Result> tmp = getResultJavaRDDPlusSDG();
 
 		List<StructuredProperty> sbjs_sdg = tmp
-				.filter(row -> row.getSubject() != null && row.getSubject().size() > 0)
-				.flatMap(row -> row.getSubject().iterator())
-				.filter(sbj -> sbj.getQualifier().getClassid().equals(Constants.SDG_CLASS_ID))
-				.collect();
+			.filter(row -> row.getSubject() != null && row.getSubject().size() > 0)
+			.flatMap(row -> row.getSubject().iterator())
+			.filter(sbj -> sbj.getQualifier().getClassid().equals(Constants.SDG_CLASS_ID))
+			.collect();
 
 		sbjs_sdg.forEach(sbj -> Assertions.assertEquals("SDG", sbj.getQualifier().getClassid()));
 		sbjs_sdg
-				.forEach(
-						sbj -> Assertions
-								.assertEquals(
-										"Sustainable Development Goals", sbj.getQualifier().getClassname()));
+			.forEach(
+				sbj -> Assertions
+					.assertEquals(
+						"Sustainable Development Goals", sbj.getQualifier().getClassname()));
 		sbjs_sdg
-				.forEach(
-						sbj -> Assertions
-								.assertEquals(ModelConstants.DNET_SUBJECT_TYPOLOGIES, sbj.getQualifier().getSchemeid()));
+			.forEach(
+				sbj -> Assertions
+					.assertEquals(ModelConstants.DNET_SUBJECT_TYPOLOGIES, sbj.getQualifier().getSchemeid()));
 		sbjs_sdg
-				.forEach(
-						sbj -> Assertions
-								.assertEquals(ModelConstants.DNET_SUBJECT_TYPOLOGIES, sbj.getQualifier().getSchemename()));
+			.forEach(
+				sbj -> Assertions
+					.assertEquals(ModelConstants.DNET_SUBJECT_TYPOLOGIES, sbj.getQualifier().getSchemename()));
 
 		sbjs_sdg.forEach(sbj -> Assertions.assertEquals(false, sbj.getDataInfo().getDeletedbyinference()));
 		sbjs_sdg.forEach(sbj -> Assertions.assertEquals(true, sbj.getDataInfo().getInferred()));
@@ -501,23 +499,23 @@ public class ProduceTest {
 		sbjs_sdg.forEach(sbj -> Assertions.assertEquals("", sbj.getDataInfo().getTrust()));
 		sbjs_sdg.forEach(sbj -> Assertions.assertEquals("update", sbj.getDataInfo().getInferenceprovenance()));
 		sbjs_sdg
-				.forEach(
-						sbj -> Assertions.assertEquals("subject:sdg", sbj.getDataInfo().getProvenanceaction().getClassid()));
+			.forEach(
+				sbj -> Assertions.assertEquals("subject:sdg", sbj.getDataInfo().getProvenanceaction().getClassid()));
 		sbjs_sdg
-				.forEach(
-						sbj -> Assertions
-								.assertEquals("Inferred by OpenAIRE", sbj.getDataInfo().getProvenanceaction().getClassname()));
+			.forEach(
+				sbj -> Assertions
+					.assertEquals("Inferred by OpenAIRE", sbj.getDataInfo().getProvenanceaction().getClassname()));
 		sbjs_sdg
-				.forEach(
-						sbj -> Assertions
-								.assertEquals(
-										ModelConstants.DNET_PROVENANCE_ACTIONS, sbj.getDataInfo().getProvenanceaction().getSchemeid()));
+			.forEach(
+				sbj -> Assertions
+					.assertEquals(
+						ModelConstants.DNET_PROVENANCE_ACTIONS, sbj.getDataInfo().getProvenanceaction().getSchemeid()));
 		sbjs_sdg
-				.forEach(
-						sbj -> Assertions
-								.assertEquals(
-										ModelConstants.DNET_PROVENANCE_ACTIONS,
-										sbj.getDataInfo().getProvenanceaction().getSchemename()));
+			.forEach(
+				sbj -> Assertions
+					.assertEquals(
+						ModelConstants.DNET_PROVENANCE_ACTIONS,
+						sbj.getDataInfo().getProvenanceaction().getSchemename()));
 	}
 
 }
