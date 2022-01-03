@@ -1,7 +1,9 @@
 package eu.dnetlib.dhp.collection
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.common.ModelSupport
 import eu.dnetlib.dhp.schema.oaf.{Oaf, OafEntity, Relation}
+import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode}
 
 object CollectionUtils {
 
@@ -44,6 +46,17 @@ object CollectionUtils {
       }
     }
     List()
+  }
+
+  def saveDataset(d: Dataset[Oaf], targetPath: String):Unit = {
+    implicit val resultEncoder: Encoder[Oaf] = Encoders.kryo(classOf[Oaf])
+    val mapper = new ObjectMapper
+
+    d
+      .flatMap(i => CollectionUtils.fixRelations(i))
+      .filter(i => i != null)
+      .map(r => mapper.writeValueAsString(r))(Encoders.STRING)
+      .write.mode(SaveMode.Overwrite).save(targetPath)
   }
 
 }

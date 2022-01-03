@@ -111,7 +111,7 @@ object PubMedToOaf {
    * @param vocabularies the vocabularies
    * @return The OAF instance if the mapping did not fail
    */
-  def convert(article: PMArticle, vocabularies: VocabularyGroup): Result = {
+  def convert(article: PMArticle, vocabularies: VocabularyGroup): Oaf = {
 
     if (article.getPublicationTypes == null)
       return null
