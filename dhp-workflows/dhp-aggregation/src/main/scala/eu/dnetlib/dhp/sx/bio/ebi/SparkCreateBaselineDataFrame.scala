@@ -1,8 +1,9 @@
 package eu.dnetlib.dhp.sx.bio.ebi
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
+import eu.dnetlib.dhp.collection.CollectionUtils
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
-import eu.dnetlib.dhp.schema.oaf.Result
+import eu.dnetlib.dhp.schema.oaf.{Oaf, Result}
 import eu.dnetlib.dhp.sx.bio.pubmed._
 import eu.dnetlib.dhp.utils.ISLookupClientFactory
 import org.apache.commons.io.IOUtils
@@ -177,7 +178,7 @@ object SparkCreateBaselineDataFrame {
     implicit val PMEncoder: Encoder[PMArticle] = Encoders.kryo(classOf[PMArticle])
     implicit val PMJEncoder: Encoder[PMJournal] = Encoders.kryo(classOf[PMJournal])
     implicit val PMAEncoder: Encoder[PMAuthor] = Encoders.kryo(classOf[PMAuthor])
-    implicit val resultEncoder: Encoder[Result] = Encoders.kryo(classOf[Result])
+    implicit val resultEncoder: Encoder[Oaf] = Encoders.kryo(classOf[Oaf])
 
     if (!"true".equalsIgnoreCase(skipUpdate)) {
       downloadBaseLineUpdate(s"$workingPath/baseline", hdfsServerUri)
@@ -192,9 +193,10 @@ object SparkCreateBaselineDataFrame {
     }
 
     val exported_dataset = spark.read.load(s"$workingPath/baseline_dataset").as[PMArticle]
-    exported_dataset
-      .map(a => PubMedToOaf.convert(a, vocabularies)).as[Result]
-      .filter(p => p != null)
-      .write.mode(SaveMode.Overwrite).save(targetPath)
+    CollectionUtils.saveDataset(exported_dataset
+      .map(a => PubMedToOaf.convert(a, vocabularies)).as[Oaf]
+      .filter(p => p != null),
+      targetPath)
+
   }
 }
