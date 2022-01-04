@@ -38,7 +38,7 @@ class GenerateDataciteDatasetSpark (propertyPath:String, args:Array[String], log
     val cleanedMdStoreVersion = mapper.readValue(mdstoreOutputVersion, classOf[MDStoreVersion])
     val outputBasePath = cleanedMdStoreVersion.getHdfsPath
     log.info(s"outputBasePath is '$outputBasePath'")
-    val targetPath = s"$outputBasePath/$MDSTORE_DATA_PATH"
+    val targetPath = s"$outputBasePath$MDSTORE_DATA_PATH"
     log.info(s"targetPath is '$targetPath'")
 
     generateDataciteDataset(sourcePath, exportLinks, vocabularies, targetPath, spark)
@@ -54,7 +54,7 @@ class GenerateDataciteDatasetSpark (propertyPath:String, args:Array[String], log
    * @param outputBasePath
    */
   def reportTotalSize( targetPath: String, outputBasePath: String ):Unit = {
-    val total_items = spark.read.load(targetPath).count()
+    val total_items = spark.read.text(targetPath).count()
     writeHdfsFile(spark.sparkContext.hadoopConfiguration, s"$total_items", outputBasePath + MDSTORE_SIZE_PATH)
   }
 
