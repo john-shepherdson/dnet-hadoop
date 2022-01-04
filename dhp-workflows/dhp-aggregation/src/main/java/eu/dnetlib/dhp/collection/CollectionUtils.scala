@@ -56,7 +56,10 @@ object CollectionUtils {
       .flatMap(i => CollectionUtils.fixRelations(i))
       .filter(i => i != null)
       .map(r => mapper.writeValueAsString(r))(Encoders.STRING)
-      .write.mode(SaveMode.Overwrite).save(targetPath)
+      .write
+      .mode(SaveMode.Overwrite)
+      .option("compression", "gzip")
+      .text(targetPath)
   }
 
 }
