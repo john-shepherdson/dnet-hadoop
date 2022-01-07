@@ -46,5 +46,11 @@
     "paramLongName": "outputPath",
     "paramDescription": "the path used to store temporary output files",
     "paramRequired": true
+  },
+  {
+    "paramName": "it",
+    "paramLongName": "iterations",
+    "paramDescription": "the number of iterations to be computed",
+    "paramRequired": false
   }
 ]
