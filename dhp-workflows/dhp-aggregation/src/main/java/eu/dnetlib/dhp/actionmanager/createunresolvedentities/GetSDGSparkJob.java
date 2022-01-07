@@ -69,8 +69,6 @@ public class GetSDGSparkJob implements Serializable {
 			.read()
 			.format("csv")
 			.option("sep", delimiter)
-			.option("inferSchema", "true")
-			.option("header", "true")
 			.option("quotes", "\"")
 			.load(sourcePath);
 
