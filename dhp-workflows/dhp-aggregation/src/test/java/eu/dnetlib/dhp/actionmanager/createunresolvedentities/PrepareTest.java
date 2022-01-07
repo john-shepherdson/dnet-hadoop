@@ -10,7 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.SDGDataModel;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -26,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.FOSDataModel;
+import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.SDGDataModel;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class PrepareTest {
@@ -149,37 +149,6 @@ public class PrepareTest {
 	}
 
 	@Test
-	void getFOSFileTest() throws IOException, ClassNotFoundException {
-
-		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/fos/fos_sbs.csv")
-			.getPath();
-		final String outputPath = workingDir.toString() + "/fos.json";
-
-		new GetInputData()
-			.doRewrite(
-				sourcePath, outputPath, "eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.FOSDataModel",
-				',', fs);
-
-		BufferedReader in = new BufferedReader(
-			new InputStreamReader(fs.open(new org.apache.hadoop.fs.Path(outputPath))));
-
-		String line;
-		int count = 0;
-		while ((line = in.readLine()) != null) {
-			FOSDataModel fos = new ObjectMapper().readValue(line, FOSDataModel.class);
-
-			System.out.println(new ObjectMapper().writeValueAsString(fos));
-			count += 1;
-		}
-
-		assertEquals(39, count);
-
-	}
-
-
-
-	@Test
 	void fosPrepareTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/fos/fos.json")
@@ -205,7 +174,6 @@ public class PrepareTest {
 
 		assertEquals(20, tmp.count());
 		assertEquals(1, tmp.filter(row -> row.getId().equals(doi1)).count());
-
 
 		assertTrue(
 			tmp
@@ -250,104 +218,100 @@ public class PrepareTest {
 	}
 
 	@Test
-	void getSDGFileTest() throws IOException, ClassNotFoundException {
-
-		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/sdg/sdg_sbs.csv")
-				.getPath();
-		final String outputPath = workingDir.toString() + "/sdg.json";
-
-		new GetInputData()
-				.doRewrite(
-						sourcePath, outputPath, "eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.SDGDataModel",
-						',', fs);
-
-		BufferedReader in = new BufferedReader(
-				new InputStreamReader(fs.open(new org.apache.hadoop.fs.Path(outputPath))));
-
-		String line;
-		int count = 0;
-		while ((line = in.readLine()) != null) {
-			SDGDataModel sdg = new ObjectMapper().readValue(line, SDGDataModel.class);
-
-			System.out.println(new ObjectMapper().writeValueAsString(sdg));
-			count += 1;
-		}
-
-		assertEquals(37, count);
-
-	}
-
-	@Test
 	void sdgPrepareTest() throws Exception {
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/sdg/sdg.json")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/sdg/sdg.json")
+			.getPath();
 
 		PrepareSDGSparkJob
-				.main(
-						new String[] {
-								"--isSparkSessionManaged", Boolean.FALSE.toString(),
-								"--sourcePath", sourcePath,
+			.main(
+				new String[] {
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--sourcePath", sourcePath,
 
-								"-outputPath", workingDir.toString() + "/work"
+					"-outputPath", workingDir.toString() + "/work"
 
-						});
+				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Result> tmp = sc
-				.textFile(workingDir.toString() + "/work/sdg")
-				.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
+			.textFile(workingDir.toString() + "/work/sdg")
+			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
 
 		String doi1 = "unresolved::10.1001/amaguidesnewsletters.2019.sepoct02::doi";
 
 		assertEquals(32, tmp.count());
 		assertEquals(1, tmp.filter(row -> row.getId().equals(doi1)).count());
 
-
 		assertTrue(
-				tmp
-						.filter(r -> r.getId().equals(doi1))
-						.flatMap(r -> r.getSubject().iterator())
-						.map(sbj -> sbj.getValue())
-						.collect()
-						.contains("3. Good health"));
+			tmp
+				.filter(r -> r.getId().equals(doi1))
+				.flatMap(r -> r.getSubject().iterator())
+				.map(sbj -> sbj.getValue())
+				.collect()
+				.contains("3. Good health"));
 		assertTrue(
-				tmp
-						.filter(r -> r.getId().equals(doi1))
-						.flatMap(r -> r.getSubject().iterator())
-						.map(sbj -> sbj.getValue())
-						.collect()
-						.contains("8. Economic growth"));
-
+			tmp
+				.filter(r -> r.getId().equals(doi1))
+				.flatMap(r -> r.getSubject().iterator())
+				.map(sbj -> sbj.getValue())
+				.collect()
+				.contains("8. Economic growth"));
 
 	}
-	@Disabled
+
 	@Test
-	void test2() throws Exception {
+	void test3() throws Exception {
+		final String sourcePath = "/Users/miriam.baglioni/Downloads/doi_fos_results_20_12_2021.csv.gz";
+
+		final String outputPath = workingDir.toString() + "/fos.json";
+		GetFOSSparkJob
+			.main(
+				new String[] {
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--sourcePath", sourcePath,
+
+					"-outputPath", outputPath
+
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<FOSDataModel> tmp = sc
+			.textFile(outputPath)
+			.map(item -> OBJECT_MAPPER.readValue(item, FOSDataModel.class));
+
+		tmp.foreach(t -> Assertions.assertTrue(t.getDoi() != null));
+		tmp.foreach(t -> Assertions.assertTrue(t.getLevel1() != null));
+		tmp.foreach(t -> Assertions.assertTrue(t.getLevel2() != null));
+		tmp.foreach(t -> Assertions.assertTrue(t.getLevel3() != null));
+
+	}
+
+	@Test
+	void test4() throws Exception {
 		final String sourcePath = "/Users/miriam.baglioni/Downloads/doi_sdg_results_20_12_21.csv.gz";
 
-
 		final String outputPath = workingDir.toString() + "/sdg.json";
+		GetSDGSparkJob
+			.main(
+				new String[] {
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--sourcePath", sourcePath,
 
-		new GetInputData()
-				.doRewrite(
-						sourcePath, outputPath, "eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.SDGDataModel",
-						',', fs);
+					"-outputPath", outputPath
 
-		BufferedReader in = new BufferedReader(
-				new InputStreamReader(fs.open(new org.apache.hadoop.fs.Path(outputPath))));
+				});
 
-		String line;
-		int count = 0;
-		while ((line = in.readLine()) != null) {
-			SDGDataModel sdg = new ObjectMapper().readValue(line, SDGDataModel.class);
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-			System.out.println(new ObjectMapper().writeValueAsString(sdg));
-			count += 1;
-		}
+		JavaRDD<SDGDataModel> tmp = sc
+			.textFile(outputPath)
+			.map(item -> OBJECT_MAPPER.readValue(item, SDGDataModel.class));
 
+		tmp.foreach(t -> Assertions.assertTrue(t.getDoi() != null));
+		tmp.foreach(t -> Assertions.assertTrue(t.getSbj() != null));
 
 	}
 }

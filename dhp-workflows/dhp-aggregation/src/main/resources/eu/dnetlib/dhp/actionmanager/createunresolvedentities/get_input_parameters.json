@@ -19,15 +19,9 @@
     "paramRequired": false
   },
   {
-    "paramName": "hnn",
-    "paramLongName": "hdfsNameNode",
-    "paramDescription": "the path used to store the HostedByMap",
-    "paramRequired": true
-  },
-  {
-    "paramName": "cfn",
-    "paramLongName": "classForName",
-    "paramDescription": "the path used to store the HostedByMap",
-    "paramRequired": true
+    "paramName": "d",
+    "paramLongName": "delimiter",
+    "paramDescription": "the delimiter if different from the default one (,)",
+    "paramRequired": false
   }
 ]

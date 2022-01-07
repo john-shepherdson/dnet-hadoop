@@ -19,7 +19,7 @@ public class Constants {
 
 	public static final String DOI = "doi";
 
-	public static final char DEFAULT_DELIMITER = ',';
+	public static final String DEFAULT_DELIMITER = ",";
 
 	public static final String UPDATE_DATA_INFO_TYPE = "update";
 	public static final String UPDATE_SUBJECT_FOS_CLASS_ID = "subject:fos";
@@ -55,7 +55,8 @@ public class Constants {
 			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
 	}
 
-	public static StructuredProperty getSubject(String sbj, String classid, String classname, String diqualifierclassid) {
+	public static StructuredProperty getSubject(String sbj, String classid, String classname,
+		String diqualifierclassid) {
 		if (sbj.equals(NULL))
 			return null;
 		StructuredProperty sp = new StructuredProperty();
@@ -78,7 +79,7 @@ public class Constants {
 						false,
 						OafMapperUtils
 							.qualifier(
-									diqualifierclassid,
+								diqualifierclassid,
 								UPDATE_CLASS_NAME,
 								ModelConstants.DNET_PROVENANCE_ACTIONS,
 								ModelConstants.DNET_PROVENANCE_ACTIONS),
