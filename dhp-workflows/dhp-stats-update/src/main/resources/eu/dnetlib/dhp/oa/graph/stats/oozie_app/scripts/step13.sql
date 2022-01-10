@@ -67,4 +67,17 @@ from (
     LATERAL VIEW explode(author) a as auth
     LATERAL VIEW explode(auth.pid) ap as auth_pid
     LATERAL VIEW explode(auth.pid.qualifier.classid) apt as author_pid_type
-    WHERE res.datainfo.deletedbyinference = FALSE and res.datainfo.invisible = FALSE and author_pid_type = 'orcid') as res
+    WHERE res.datainfo.deletedbyinference = FALSE and res.datainfo.invisible = FALSE and author_pid_type = 'orcid') as res;
+
+create table ${stats_db_name}.result_result stored as parquet as
+select substr(rel.source, 4) as source, substr(rel.target, 4) as target, relclass, subreltype
+from ${openaire_db_name}.relation rel
+join ${openaire_db_name}.result r1 on rel.source=r1.id
+join ${openaire_db_name}.result r2 on r2.id=rel.target
+where reltype='resultResult'
+    and r1.resulttype.classname!=r2.resulttype.classname
+    and r1.datainfo.deletedbyinference=false
+    and r2.datainfo.deletedbyinference=false
+    and r1.resulttype.classname != 'other'
+    and r2.resulttype.classname != 'other'
+    and rel.datainfo.deletedbyinference=false;

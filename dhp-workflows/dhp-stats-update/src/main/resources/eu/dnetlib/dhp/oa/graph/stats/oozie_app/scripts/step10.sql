@@ -27,6 +27,22 @@ CREATE OR REPLACE VIEW ${stats_db_name}.licenses_normalized AS
 SELECT *
 FROM ${external_stats_db_name}.licenses_normalized;
 
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+-- Usage statistics
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+create or replace view ${stats_db_name}.usage_stats as
+select * from openaire_prod_usage_stats.usage_stats;
+
+create or replace view ${stats_db_name}.downloads_stats as
+select * from openaire_prod_usage_stats.downloads_stats;
+
+create or replace view ${stats_db_name}.pageviews_stats as
+select * from openaire_prod_usage_stats.pageviews_stats;
+
+create or replace view ${stats_db_name}.views_stats as
+select * from openaire_prod_usage_stats.views_stats;
 
 ------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------

@@ -292,7 +292,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Import table project</name>
+            <name>Import table relation</name>
             <class>eu.dnetlib.dhp.oa.graph.hive.GraphHiveTableImporterJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>

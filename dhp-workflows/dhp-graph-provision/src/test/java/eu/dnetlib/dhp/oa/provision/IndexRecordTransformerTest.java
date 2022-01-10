@@ -1,9 +1,14 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -107,6 +112,30 @@ public class IndexRecordTransformerTest {
 		final String record = IOUtils
 			.toString(getClass().getResourceAsStream("eosc-future/b2share-plot-related-orp.xml"));
 		testRecordTransformation(record);
+	}
+
+	@Test
+	void testDoiUrlNormalization() throws MalformedURLException {
+
+		// TODO add more test examples when needed
+		List<String> urls = Arrays
+			.asList(
+				"https://dx.doi.org/10.1016/j.jas.2019.105013",
+				"http://dx.doi.org/10.13140/rg.2.2.26964.65927",
+				"https://dx.doi.org/10.13140/rg.2.2.26964.65927",
+				"http://dx.doi.org/10.1016/j.jas.2019.105013",
+				"http://hdl.handle.net/2072/369223",
+				"https://doi.org/10.1016/j.jas.2019.105013");
+
+		for (String url : urls) {
+			URL u = new URL(XmlRecordFactory.normalizeDoiUrl(url));
+			if (url.contains(XmlRecordFactory.DOI_ORG_AUTHORITY)) {
+				assertEquals(XmlRecordFactory.HTTPS, u.getProtocol());
+				assertEquals(XmlRecordFactory.DOI_ORG_AUTHORITY, u.getAuthority());
+			} else {
+				assertEquals(url, u.toString());
+			}
+		}
 	}
 
 	private void testRecordTransformation(final String record) throws IOException, TransformerException {

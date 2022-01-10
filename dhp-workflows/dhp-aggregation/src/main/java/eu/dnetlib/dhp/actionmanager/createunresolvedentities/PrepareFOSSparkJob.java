@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.actionmanager.createunresolvedentities;
 
-import static eu.dnetlib.dhp.actionmanager.createunresolvedentities.Constants.*;
+import static eu.dnetlib.dhp.actionmanager.Constants.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -21,10 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.FOSDataModel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class PrepareFOSSparkJob implements Serializable {
@@ -67,20 +65,22 @@ public class PrepareFOSSparkJob implements Serializable {
 	private static void distributeFOSdois(SparkSession spark, String sourcePath, String outputPath) {
 		Dataset<FOSDataModel> fosDataset = readPath(spark, sourcePath, FOSDataModel.class);
 
-		fosDataset.flatMap((FlatMapFunction<FOSDataModel, FOSDataModel>) v -> {
-			List<FOSDataModel> fosList = new ArrayList<>();
-			final String level1 = v.getLevel1();
-			final String level2 = v.getLevel2();
-			final String level3 = v.getLevel3();
-			Arrays
-				.stream(v.getDoi().split("\u0002"))
-				.forEach(d -> fosList.add(FOSDataModel.newInstance(d, level1, level2, level3)));
-			return fosList.iterator();
-		}, Encoders.bean(FOSDataModel.class))
-			.map((MapFunction<FOSDataModel, Result>) value -> {
+		fosDataset
+			.groupByKey((MapFunction<FOSDataModel, String>) v -> v.getDoi().toLowerCase(), Encoders.STRING())
+			.mapGroups((MapGroupsFunction<String, FOSDataModel, Result>) (k, it) -> {
 				Result r = new Result();
-				r.setId(DHPUtils.generateUnresolvedIdentifier(value.getDoi(), DOI));
-				r.setSubject(getSubjects(value));
+				FOSDataModel first = it.next();
+				r.setId(DHPUtils.generateUnresolvedIdentifier(k, DOI));
+				HashSet<String> level1 = new HashSet<>();
+				HashSet<String> level2 = new HashSet<>();
+				HashSet<String> level3 = new HashSet<>();
+				addLevels(level1, level2, level3, first);
+				it.forEachRemaining(v -> addLevels(level1, level2, level3, v));
+				List<StructuredProperty> sbjs = new ArrayList<>();
+				level1.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID)));
+				level2.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID)));
+				level3.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID)));
+				r.setSubject(sbjs);
 				return r;
 			}, Encoders.bean(Result.class))
 			.write()
@@ -89,45 +89,11 @@ public class PrepareFOSSparkJob implements Serializable {
 			.json(outputPath + "/fos");
 	}
 
-	private static List<StructuredProperty> getSubjects(FOSDataModel fos) {
-		return Arrays
-			.asList(getSubject(fos.getLevel1()), getSubject(fos.getLevel2()), getSubject(fos.getLevel3()))
-			.stream()
-			.filter(Objects::nonNull)
-			.collect(Collectors.toList());
-	}
-
-	private static StructuredProperty getSubject(String sbj) {
-		if (sbj.equals(NULL))
-			return null;
-		StructuredProperty sp = new StructuredProperty();
-		sp.setValue(sbj);
-		sp
-			.setQualifier(
-				OafMapperUtils
-					.qualifier(
-						FOS_CLASS_ID,
-						FOS_CLASS_NAME,
-						ModelConstants.DNET_SUBJECT_TYPOLOGIES,
-						ModelConstants.DNET_SUBJECT_TYPOLOGIES));
-		sp
-			.setDataInfo(
-				OafMapperUtils
-					.dataInfo(
-						false,
-						UPDATE_DATA_INFO_TYPE,
-						true,
-						false,
-						OafMapperUtils
-							.qualifier(
-								UPDATE_SUBJECT_FOS_CLASS_ID,
-								UPDATE_CLASS_NAME,
-								ModelConstants.DNET_PROVENANCE_ACTIONS,
-								ModelConstants.DNET_PROVENANCE_ACTIONS),
-						""));
-
-		return sp;
-
+	private static void addLevels(HashSet<String> level1, HashSet<String> level2, HashSet<String> level3,
+		FOSDataModel first) {
+		level1.add(first.getLevel1());
+		level2.add(first.getLevel2());
+		level3.add(first.getLevel3());
 	}
 
 }
