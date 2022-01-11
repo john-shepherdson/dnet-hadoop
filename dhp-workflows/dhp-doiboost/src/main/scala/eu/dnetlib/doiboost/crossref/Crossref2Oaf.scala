@@ -438,8 +438,8 @@ case object Crossref2Oaf {
       funders.foreach(funder => {
         if (funder.DOI.isDefined && funder.DOI.get.nonEmpty) {
           funder.DOI.get match {
-            case "10.13039/100010663" | "10.13039/100010661" |
-                "10.13039/501100007601" | "10.13039/501100000780" | "10.13039/100010665" =>
+            case "10.13039/100010663" | "10.13039/100010661" | "10.13039/501100007601" |
+                "10.13039/501100000780" | "10.13039/100010665" =>
               generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
             case "10.13039/100011199" | "10.13039/100004431" | "10.13039/501100004963" |
                 "10.13039/501100000780" =>
