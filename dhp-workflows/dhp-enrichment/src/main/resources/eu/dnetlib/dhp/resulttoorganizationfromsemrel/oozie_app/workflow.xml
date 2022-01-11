@@ -1,4 +1,4 @@
-<workflow-app name="affiliation_from_instrepo_propagation" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="affiliation_from_semrel_propagation" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>sourcePath</name>
@@ -181,6 +181,7 @@
             <arg>--resultOrgPath</arg><arg>${workingDir}/preparedInfo/resultOrgPath</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--workingDir</arg><arg>${workingDir}/working</arg>
+            <arg>--iterations</arg><arg>${iterations}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
