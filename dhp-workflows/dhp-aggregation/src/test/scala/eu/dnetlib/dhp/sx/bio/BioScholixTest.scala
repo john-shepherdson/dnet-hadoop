@@ -20,14 +20,13 @@ import scala.io.Source
 import scala.xml.pull.XMLEventReader
 
 @ExtendWith(Array(classOf[MockitoExtension]))
-class BioScholixTest extends AbstractVocabularyTest{
-
+class BioScholixTest extends AbstractVocabularyTest {
 
   val mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
-  mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false)
+  mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
   @BeforeEach
-  def setUp() :Unit = {
+  def setUp(): Unit = {
 
     super.setUpVocabulary()
   }
@@ -38,52 +37,54 @@ class BioScholixTest extends AbstractVocabularyTest{
   }
 
   object GzFileIterator {
+
     def apply(is: InputStream, encoding: String) = {
       new BufferedReaderIterator(
-        new BufferedReader(
-          new InputStreamReader(
-            new GZIPInputStream(
-              is), encoding)))
+        new BufferedReader(new InputStreamReader(new GZIPInputStream(is), encoding))
+      )
     }
   }
 
-
- 
-
   @Test
   def testEBIData() = {
-    val inputXML = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml")).mkString
+    val inputXML = Source
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml"))
+      .mkString
     val xml = new XMLEventReader(Source.fromBytes(inputXML.getBytes()))
-    new PMParser(xml).foreach(s =>println(mapper.writeValueAsString(s)))
+    new PMParser(xml).foreach(s => println(mapper.writeValueAsString(s)))
   }
-
 
   @Test
   def testPubmedToOaf(): Unit = {
     assertNotNull(vocabularies)
     assertTrue(vocabularies.vocabularyExists("dnet:publication_resource"))
-    val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed_dump")).mkString
-    val r:List[Oaf] = records.lines.toList.map(s=>mapper.readValue(s, classOf[PMArticle])).map(a => PubMedToOaf.convert(a, vocabularies))
+    val records: String = Source
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed_dump"))
+      .mkString
+    val r: List[Oaf] = records.lines.toList
+      .map(s => mapper.readValue(s, classOf[PMArticle]))
+      .map(a => PubMedToOaf.convert(a, vocabularies))
     assertEquals(10, r.size)
-    assertTrue(r.map(p => p.asInstanceOf[Result]).flatMap(p => p.getInstance().asScala.map(i => i.getInstancetype.getClassid)).exists(p => "0037".equalsIgnoreCase(p)))
+    assertTrue(
+      r.map(p => p.asInstanceOf[Result])
+        .flatMap(p => p.getInstance().asScala.map(i => i.getInstancetype.getClassid))
+        .exists(p => "0037".equalsIgnoreCase(p))
+    )
     println(mapper.writeValueAsString(r.head))
 
-
-
   }
 
-
   @Test
-  def testPDBToOAF():Unit = {
+  def testPDBToOAF(): Unit = {
 
     assertNotNull(vocabularies)
     assertTrue(vocabularies.vocabularyExists("dnet:publication_resource"))
-    val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pdb_dump")).mkString
+    val records: String = Source
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pdb_dump"))
+      .mkString
     records.lines.foreach(s => assertTrue(s.nonEmpty))
 
-    val result:List[Oaf]=  records.lines.toList.flatMap(o => BioDBToOAF.pdbTOOaf(o))
-
-
+    val result: List[Oaf] = records.lines.toList.flatMap(o => BioDBToOAF.pdbTOOaf(o))
 
     assertTrue(result.nonEmpty)
     result.foreach(r => assertNotNull(r))
@@ -93,19 +94,18 @@ class BioScholixTest extends AbstractVocabularyTest{
 
   }
 
-
   @Test
-  def testUNIprotToOAF():Unit = {
+  def testUNIprotToOAF(): Unit = {
 
     assertNotNull(vocabularies)
     assertTrue(vocabularies.vocabularyExists("dnet:publication_resource"))
 
-    val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/uniprot_dump")).mkString
+    val records: String = Source
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/uniprot_dump"))
+      .mkString
     records.lines.foreach(s => assertTrue(s.nonEmpty))
 
-    val result:List[Oaf]=  records.lines.toList.flatMap(o => BioDBToOAF.uniprotToOAF(o))
-
-
+    val result: List[Oaf] = records.lines.toList.flatMap(o => BioDBToOAF.uniprotToOAF(o))
 
     assertTrue(result.nonEmpty)
     result.foreach(r => assertNotNull(r))
@@ -115,35 +115,42 @@ class BioScholixTest extends AbstractVocabularyTest{
 
   }
 
-  case class EBILinks(relType:String, date:String, title:String, pmid:String, targetPid:String, targetPidType:String) {}
+  case class EBILinks(
+    relType: String,
+    date: String,
+    title: String,
+    pmid: String,
+    targetPid: String,
+    targetPidType: String
+  ) {}
 
-  def parse_ebi_links(input:String):List[EBILinks] ={
+  def parse_ebi_links(input: String): List[EBILinks] = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json = parse(input)
-    val pmid = (json \ "publication" \"pmid").extract[String]
+    val pmid = (json \ "publication" \ "pmid").extract[String]
     for {
-      JObject(link) <- json \\ "Link"
-      JField("Target",JObject(target)) <- link
-      JField("RelationshipType",JObject(relType)) <- link
-      JField("Name", JString(relation)) <- relType
-      JField("PublicationDate",JString(publicationDate)) <- link
-      JField("Title", JString(title)) <- target
-      JField("Identifier",JObject(identifier)) <- target
-      JField("IDScheme", JString(idScheme)) <- identifier
-      JField("ID", JString(id)) <- identifier
+      JObject(link)                                       <- json \\ "Link"
+      JField("Target", JObject(target))                   <- link
+      JField("RelationshipType", JObject(relType))        <- link
+      JField("Name", JString(relation))                   <- relType
+      JField("PublicationDate", JString(publicationDate)) <- link
+      JField("Title", JString(title))                     <- target
+      JField("Identifier", JObject(identifier))           <- target
+      JField("IDScheme", JString(idScheme))               <- identifier
+      JField("ID", JString(id))                           <- identifier
 
     } yield EBILinks(relation, publicationDate, title, pmid, id, idScheme)
   }
 
-
   @Test
-  def testCrossrefLinksToOAF():Unit = {
+  def testCrossrefLinksToOAF(): Unit = {
 
-    val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/crossref_links")).mkString
+    val records: String = Source
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/crossref_links"))
+      .mkString
     records.lines.foreach(s => assertTrue(s.nonEmpty))
 
-
-    val result:List[Oaf] =records.lines.map(s => BioDBToOAF.crossrefLinksToOaf(s)).toList
+    val result: List[Oaf] = records.lines.map(s => BioDBToOAF.crossrefLinksToOaf(s)).toList
 
     assertNotNull(result)
     assertTrue(result.nonEmpty)
@@ -153,36 +160,41 @@ class BioScholixTest extends AbstractVocabularyTest{
   }
 
   @Test
-  def testEBILinksToOAF():Unit = {
-    val iterator = GzFileIterator(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/ebi_links.gz"), "UTF-8")
+  def testEBILinksToOAF(): Unit = {
+    val iterator = GzFileIterator(
+      getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/ebi_links.gz"),
+      "UTF-8"
+    )
     val data = iterator.next()
 
-    val res = BioDBToOAF.parse_ebi_links(BioDBToOAF.extractEBILinksFromDump(data).links).filter(BioDBToOAF.EBITargetLinksFilter).flatMap(BioDBToOAF.convertEBILinksToOaf)
+    val res = BioDBToOAF
+      .parse_ebi_links(BioDBToOAF.extractEBILinksFromDump(data).links)
+      .filter(BioDBToOAF.EBITargetLinksFilter)
+      .flatMap(BioDBToOAF.convertEBILinksToOaf)
     print(res.length)
-
 
     println(mapper.writeValueAsString(res.head))
 
   }
 
-
-
-
   @Test
-  def scholixResolvedToOAF():Unit ={
+  def scholixResolvedToOAF(): Unit = {
 
-    val records:String =Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/scholix_resolved")).mkString
+    val records: String = Source
+      .fromInputStream(
+        getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/scholix_resolved")
+      )
+      .mkString
     records.lines.foreach(s => assertTrue(s.nonEmpty))
 
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
-    val l:List[ScholixResolved] = records.lines.map{input =>
+    val l: List[ScholixResolved] = records.lines.map { input =>
       lazy val json = parse(input)
       json.extract[ScholixResolved]
     }.toList
 
-
-    val result:List[Oaf] = l.map(s => BioDBToOAF.scholixResolvedToOAF(s))
+    val result: List[Oaf] = l.map(s => BioDBToOAF.scholixResolvedToOAF(s))
 
     assertTrue(result.nonEmpty)
   }

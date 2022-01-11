@@ -8,7 +8,6 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
 
-
 case class Reference(author: String, firstPage: String) {}
 
 object SparkMapDumpIntoOAF {
@@ -19,14 +18,21 @@ object SparkMapDumpIntoOAF {
 
     val logger: Logger = LoggerFactory.getLogger(SparkMapDumpIntoOAF.getClass)
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkMapDumpIntoOAF.getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/convert_crossref_dump_to_oaf_params.json")))
+    val parser = new ArgumentApplicationParser(
+      IOUtils.toString(
+        SparkMapDumpIntoOAF.getClass.getResourceAsStream(
+          "/eu/dnetlib/dhp/doiboost/convert_crossref_dump_to_oaf_params.json"
+        )
+      )
+    )
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession
         .builder()
         .config(conf)
         .appName(SparkMapDumpIntoOAF.getClass.getSimpleName)
-        .master(parser.get("master")).getOrCreate()
+        .master(parser.get("master"))
+        .getOrCreate()
 
     implicit val oafEncoder: Encoder[Oaf] = Encoders.kryo[Oaf]
     implicit val mapEncoderPubs: Encoder[Publication] = Encoders.kryo[Publication]
@@ -35,19 +41,34 @@ object SparkMapDumpIntoOAF {
 
     val targetPath = parser.get("targetPath")
 
-    spark.read.load(parser.get("sourcePath")).as[CrossrefDT]
+    spark.read
+      .load(parser.get("sourcePath"))
+      .as[CrossrefDT]
       .flatMap(k => Crossref2Oaf.convert(k.json))
       .filter(o => o != null)
-      .write.mode(SaveMode.Overwrite).save(s"$targetPath/mixObject")
+      .write
+      .mode(SaveMode.Overwrite)
+      .save(s"$targetPath/mixObject")
 
-    val ds:Dataset[Oaf] = spark.read.load(s"$targetPath/mixObject").as[Oaf]
+    val ds: Dataset[Oaf] = spark.read.load(s"$targetPath/mixObject").as[Oaf]
 
-    ds.filter(o => o.isInstanceOf[Publication]).map(o => o.asInstanceOf[Publication]).write.mode(SaveMode.Overwrite).save(s"$targetPath/crossrefPublication")
+    ds.filter(o => o.isInstanceOf[Publication])
+      .map(o => o.asInstanceOf[Publication])
+      .write
+      .mode(SaveMode.Overwrite)
+      .save(s"$targetPath/crossrefPublication")
 
-    ds.filter(o => o.isInstanceOf[Relation]).map(o => o.asInstanceOf[Relation]).write.mode(SaveMode.Overwrite).save(s"$targetPath/crossrefRelation")
+    ds.filter(o => o.isInstanceOf[Relation])
+      .map(o => o.asInstanceOf[Relation])
+      .write
+      .mode(SaveMode.Overwrite)
+      .save(s"$targetPath/crossrefRelation")
 
-    ds.filter(o => o.isInstanceOf[OafDataset]).map(o => o.asInstanceOf[OafDataset]).write.mode(SaveMode.Overwrite).save(s"$targetPath/crossrefDataset")
+    ds.filter(o => o.isInstanceOf[OafDataset])
+      .map(o => o.asInstanceOf[OafDataset])
+      .write
+      .mode(SaveMode.Overwrite)
+      .save(s"$targetPath/crossrefDataset")
   }
-
 
 }

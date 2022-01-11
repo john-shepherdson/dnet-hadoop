@@ -10,11 +10,11 @@ import org.slf4j.{Logger, LoggerFactory}
 object SparkConvertORCIDToOAF {
   val logger: Logger = LoggerFactory.getLogger(SparkConvertORCIDToOAF.getClass)
 
-
   def run(spark: SparkSession, workingPath: String, targetPath: String): Unit = {
     implicit val mapEncoderPubs: Encoder[Publication] = Encoders.kryo[Publication]
     import spark.implicits._
-    val dataset: Dataset[ORCIDItem] = spark.read.load(s"$workingPath/orcidworksWithAuthor").as[ORCIDItem]
+    val dataset: Dataset[ORCIDItem] =
+      spark.read.load(s"$workingPath/orcidworksWithAuthor").as[ORCIDItem]
 
     logger.info("Converting ORCID to OAF")
     dataset.map(o => ORCIDToOAF.convertTOOAF(o)).write.mode(SaveMode.Overwrite).save(targetPath)
@@ -22,15 +22,21 @@ object SparkConvertORCIDToOAF {
 
   def main(args: Array[String]): Unit = {
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkConvertORCIDToOAF.getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/convert_orcid_to_oaf_params.json")))
+    val parser = new ArgumentApplicationParser(
+      IOUtils.toString(
+        SparkConvertORCIDToOAF.getClass.getResourceAsStream(
+          "/eu/dnetlib/dhp/doiboost/convert_orcid_to_oaf_params.json"
+        )
+      )
+    )
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession
         .builder()
         .config(conf)
         .appName(getClass.getSimpleName)
-        .master(parser.get("master")).getOrCreate()
-
+        .master(parser.get("master"))
+        .getOrCreate()
 
     val workingPath = parser.get("workingPath")
     val targetPath = parser.get("targetPath")

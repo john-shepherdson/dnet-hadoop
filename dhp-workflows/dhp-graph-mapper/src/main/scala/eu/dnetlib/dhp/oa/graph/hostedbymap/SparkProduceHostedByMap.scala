@@ -17,9 +17,8 @@ import java.io.PrintWriter
 
 object SparkProduceHostedByMap {
 
-
-  implicit val tupleForJoinEncoder: Encoder[(String, HostedByItemType)] = Encoders.tuple(Encoders.STRING, Encoders.product[HostedByItemType])
-
+  implicit val tupleForJoinEncoder: Encoder[(String, HostedByItemType)] =
+    Encoders.tuple(Encoders.STRING, Encoders.product[HostedByItemType])
 
   def toHostedByItemType(input: ((HostedByInfo, HostedByInfo), HostedByInfo)): HostedByItemType = {
     val openaire: HostedByInfo = input._1._1
@@ -28,9 +27,33 @@ object SparkProduceHostedByMap {
     val isOpenAccess: Boolean = doaj == null && gold == null
 
     openaire.journal_id match {
-      case Constants.ISSN => HostedByItemType(openaire.id, openaire.officialname, openaire.journal_id, "", "", isOpenAccess)
-      case Constants.EISSN => HostedByItemType(openaire.id, openaire.officialname, "", openaire.journal_id, "", isOpenAccess)
-      case Constants.ISSNL => HostedByItemType(openaire.id, openaire.officialname, "", "", openaire.journal_id, isOpenAccess)
+      case Constants.ISSN =>
+        HostedByItemType(
+          openaire.id,
+          openaire.officialname,
+          openaire.journal_id,
+          "",
+          "",
+          isOpenAccess
+        )
+      case Constants.EISSN =>
+        HostedByItemType(
+          openaire.id,
+          openaire.officialname,
+          "",
+          openaire.journal_id,
+          "",
+          isOpenAccess
+        )
+      case Constants.ISSNL =>
+        HostedByItemType(
+          openaire.id,
+          openaire.officialname,
+          "",
+          "",
+          openaire.journal_id,
+          isOpenAccess
+        )
 
       // catch the default with a variable so you can print it
       case whoa => null
@@ -46,11 +69,16 @@ object SparkProduceHostedByMap {
 
     Serialization.write(map)
 
-
   }
 
-
-  def getHostedByItemType(id: String, officialname: String, issn: String, eissn: String, issnl: String, oa: Boolean): HostedByItemType = {
+  def getHostedByItemType(
+    id: String,
+    officialname: String,
+    issn: String,
+    eissn: String,
+    issnl: String,
+    oa: Boolean
+  ): HostedByItemType = {
     if (issn != null) {
       if (eissn != null) {
         if (issnl != null) {
@@ -85,7 +113,14 @@ object SparkProduceHostedByMap {
   def oaToHostedbyItemType(dats: Datasource): HostedByItemType = {
     if (dats.getJournal != null) {
 
-      return getHostedByItemType(dats.getId, dats.getOfficialname.getValue, dats.getJournal.getIssnPrinted, dats.getJournal.getIssnOnline, dats.getJournal.getIssnLinking, false)
+      return getHostedByItemType(
+        dats.getId,
+        dats.getOfficialname.getValue,
+        dats.getJournal.getIssnPrinted,
+        dats.getJournal.getIssnOnline,
+        dats.getJournal.getIssnLinking,
+        false
+      )
     }
     HostedByItemType("", "", "", "", "", false)
   }
@@ -94,32 +129,41 @@ object SparkProduceHostedByMap {
 
     import spark.implicits._
 
-
     val mapper = new ObjectMapper()
 
     implicit var encoderD = Encoders.kryo[Datasource]
 
-    val dd: Dataset[Datasource] = spark.read.textFile(datasourcePath)
+    val dd: Dataset[Datasource] = spark.read
+      .textFile(datasourcePath)
       .map(r => mapper.readValue(r, classOf[Datasource]))
 
     dd.map { ddt => oaToHostedbyItemType(ddt) }.filter(hb => !(hb.id.equals("")))
 
   }
 
-
   def goldToHostedbyItemType(gold: UnibiGoldModel): HostedByItemType = {
-    return getHostedByItemType(Constants.UNIBI, gold.getTitle, gold.getIssn, "", gold.getIssnL, true)
+    return getHostedByItemType(
+      Constants.UNIBI,
+      gold.getTitle,
+      gold.getIssn,
+      "",
+      gold.getIssnL,
+      true
+    )
   }
 
-
-  def goldHostedByDataset(spark: SparkSession, datasourcePath: String): Dataset[HostedByItemType] = {
+  def goldHostedByDataset(
+    spark: SparkSession,
+    datasourcePath: String
+  ): Dataset[HostedByItemType] = {
     import spark.implicits._
 
     implicit val mapEncoderUnibi: Encoder[UnibiGoldModel] = Encoders.kryo[UnibiGoldModel]
 
     val mapper = new ObjectMapper()
 
-    val dd: Dataset[UnibiGoldModel] = spark.read.textFile(datasourcePath)
+    val dd: Dataset[UnibiGoldModel] = spark.read
+      .textFile(datasourcePath)
       .map(r => mapper.readValue(r, classOf[UnibiGoldModel]))
 
     dd.map { ddt => goldToHostedbyItemType(ddt) }.filter(hb => !(hb.id.equals("")))
@@ -128,17 +172,28 @@ object SparkProduceHostedByMap {
 
   def doajToHostedbyItemType(doaj: DOAJModel): HostedByItemType = {
 
-    return getHostedByItemType(Constants.DOAJ, doaj.getJournalTitle, doaj.getIssn, doaj.getEissn, "", true)
+    return getHostedByItemType(
+      Constants.DOAJ,
+      doaj.getJournalTitle,
+      doaj.getIssn,
+      doaj.getEissn,
+      "",
+      true
+    )
   }
 
-  def doajHostedByDataset(spark: SparkSession, datasourcePath: String): Dataset[HostedByItemType] = {
+  def doajHostedByDataset(
+    spark: SparkSession,
+    datasourcePath: String
+  ): Dataset[HostedByItemType] = {
     import spark.implicits._
 
     implicit val mapEncoderDOAJ: Encoder[DOAJModel] = Encoders.kryo[DOAJModel]
 
     val mapper = new ObjectMapper()
 
-    val dd: Dataset[DOAJModel] = spark.read.textFile(datasourcePath)
+    val dd: Dataset[DOAJModel] = spark.read
+      .textFile(datasourcePath)
       .map(r => mapper.readValue(r, classOf[DOAJModel]))
 
     dd.map { ddt => doajToHostedbyItemType(ddt) }.filter(hb => !(hb.id.equals("")))
@@ -159,7 +214,6 @@ object SparkProduceHostedByMap {
     lst
   }
 
-
   def writeToHDFS(input: Array[String], outputPath: String, hdfsNameNode: String): Unit = {
     val conf = new Configuration()
 
@@ -169,49 +223,51 @@ object SparkProduceHostedByMap {
     val writer = new PrintWriter(output)
     try {
       input.foreach(hbi => writer.println(hbi))
-    }
-    finally {
+    } finally {
       writer.close()
 
     }
 
   }
 
-
   def main(args: Array[String]): Unit = {
 
     val logger: Logger = LoggerFactory.getLogger(getClass)
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/hostedbymap/hostedby_params.json")))
+    val parser = new ArgumentApplicationParser(
+      IOUtils.toString(
+        getClass.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/hostedbymap/hostedby_params.json")
+      )
+    )
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession
         .builder()
         .config(conf)
         .appName(getClass.getSimpleName)
-        .master(parser.get("master")).getOrCreate()
-
+        .master(parser.get("master"))
+        .getOrCreate()
 
     val datasourcePath = parser.get("datasourcePath")
     val workingDirPath = parser.get("workingPath")
     val outputPath = parser.get("outputPath")
 
-
     implicit val formats = DefaultFormats
-
 
     logger.info("Getting the Datasources")
 
-
-    Aggregators.explodeHostedByItemType(oaHostedByDataset(spark, datasourcePath)
-      .union(goldHostedByDataset(spark, workingDirPath + "/unibi_gold.json"))
-      .union(doajHostedByDataset(spark, workingDirPath + "/doaj.json"))
-      .flatMap(hbi => toList(hbi))).filter(hbi => hbi._2.id.startsWith("10|"))
+    Aggregators
+      .explodeHostedByItemType(
+        oaHostedByDataset(spark, datasourcePath)
+          .union(goldHostedByDataset(spark, workingDirPath + "/unibi_gold.json"))
+          .union(doajHostedByDataset(spark, workingDirPath + "/doaj.json"))
+          .flatMap(hbi => toList(hbi))
+      )
+      .filter(hbi => hbi._2.id.startsWith("10|"))
       .map(hbi => toHostedByMap(hbi))(Encoders.STRING)
-      .rdd.saveAsTextFile(outputPath, classOf[GzipCodec])
-
+      .rdd
+      .saveAsTextFile(outputPath, classOf[GzipCodec])
 
   }
-
 
 }
