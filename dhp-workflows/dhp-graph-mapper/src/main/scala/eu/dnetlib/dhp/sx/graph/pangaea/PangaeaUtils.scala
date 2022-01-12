@@ -90,8 +90,7 @@ object PangaeaUtils {
     )
   }
 
-  def getDatasetAggregator()
-    : Aggregator[(String, PangaeaDataModel), PangaeaDataModel, PangaeaDataModel] =
+  def getDatasetAggregator(): Aggregator[(String, PangaeaDataModel), PangaeaDataModel, PangaeaDataModel] =
     new Aggregator[(String, PangaeaDataModel), PangaeaDataModel, PangaeaDataModel] {
 
       override def zero: PangaeaDataModel = null

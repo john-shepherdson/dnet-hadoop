@@ -438,11 +438,10 @@ case object Crossref2Oaf {
       funders.foreach(funder => {
         if (funder.DOI.isDefined && funder.DOI.get.nonEmpty) {
           funder.DOI.get match {
-            case "10.13039/100010663" | "10.13039/100010661" | "10.13039/501100007601" |
-                "10.13039/501100000780" | "10.13039/100010665" =>
+            case "10.13039/100010663" | "10.13039/100010661" | "10.13039/501100007601" | "10.13039/501100000780" |
+                "10.13039/100010665" =>
               generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
-            case "10.13039/100011199" | "10.13039/100004431" | "10.13039/501100004963" |
-                "10.13039/501100000780" =>
+            case "10.13039/100011199" | "10.13039/100004431" | "10.13039/501100004963" | "10.13039/501100000780" =>
               generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
             case "10.13039/501100000781" =>
               generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
@@ -512,8 +511,7 @@ case object Crossref2Oaf {
             case "European Union's" =>
               generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
               generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
-            case "The French National Research Agency (ANR)" |
-                "The French National Research Agency" =>
+            case "The French National Research Agency (ANR)" | "The French National Research Agency" =>
               generateSimpleRelationFromAward(funder, "anr_________", a => a)
             case "CONICYT, Programa de Formación de Capital Humano Avanzado" =>
               generateSimpleRelationFromAward(funder, "conicytf____", extractECAward)

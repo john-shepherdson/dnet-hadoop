@@ -51,8 +51,7 @@ class TestPreprocess extends java.io.Serializable {
       ds.filter(hbi => hbi.issn.equals("0212-8365") && hbi.eissn.equals("2253-900X")).count == 1
     )
     assertTrue(
-      ds.filter(hbi => hbi.issn.equals("0212-8365") && hbi.officialname.equals("Thémata"))
-        .count == 1
+      ds.filter(hbi => hbi.issn.equals("0212-8365") && hbi.officialname.equals("Thémata")).count == 1
     )
     assertTrue(
       ds.filter(hbi =>

@@ -327,9 +327,7 @@ object DataciteToOAFTransformation {
       a.setFullname(c.name.orNull)
       a.setName(c.givenName.orNull)
       a.setSurname(c.familyName.orNull)
-      if (
-        c.nameIdentifiers != null && c.nameIdentifiers.isDefined && c.nameIdentifiers.get != null
-      ) {
+      if (c.nameIdentifiers != null && c.nameIdentifiers.isDefined && c.nameIdentifiers.get != null) {
         a.setPid(
           c.nameIdentifiers.get
             .map(ni => {
@@ -395,9 +393,7 @@ object DataciteToOAFTransformation {
       .find(d => d.dateType.get.equalsIgnoreCase("issued"))
       .map(d => extract_date(d.date.get))
     val a_date: Option[String] = dates
-      .filter(d =>
-        d.date.isDefined && d.dateType.isDefined && d.dateType.get.equalsIgnoreCase("available")
-      )
+      .filter(d => d.date.isDefined && d.dateType.isDefined && d.dateType.get.equalsIgnoreCase("available"))
       .map(d => extract_date(d.date.get))
       .find(d => d != null && d.isDefined)
       .map(d => d.get)

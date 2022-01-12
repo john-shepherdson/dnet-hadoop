@@ -59,8 +59,7 @@ object SparkGenerateDoiBoost {
     val workingDirPath = parser.get("workingPath")
     val openaireOrganizationPath = parser.get("openaireOrganizationPath")
 
-    val crossrefAggregator = new Aggregator[(String, Publication), Publication, Publication]
-      with Serializable {
+    val crossrefAggregator = new Aggregator[(String, Publication), Publication, Publication] with Serializable {
       override def zero: Publication = new Publication
 
       override def reduce(b: Publication, a: (String, Publication)): Publication = {

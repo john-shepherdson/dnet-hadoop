@@ -2,12 +2,7 @@ package eu.dnetlib.dhp.sx.bio.pubmed
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.utils.{
-  GraphCleaningFunctions,
-  IdentifierFactory,
-  OafMapperUtils,
-  PidType
-}
+import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactory, OafMapperUtils, PidType}
 import eu.dnetlib.dhp.schema.oaf._
 import collection.JavaConverters._
 
@@ -169,9 +164,7 @@ object PubMedToOaf {
       pubmedInstance.setInstancetype(cojbCategory)
     } else {
       val i_type = article.getPublicationTypes.asScala
-        .map(s =>
-          getVocabularyTerm(ModelConstants.DNET_PUBLICATION_RESOURCE, vocabularies, s.getValue)
-        )
+        .map(s => getVocabularyTerm(ModelConstants.DNET_PUBLICATION_RESOURCE, vocabularies, s.getValue))
         .find(q => q != null)
       if (i_type.isDefined)
         pubmedInstance.setInstancetype(i_type.get)

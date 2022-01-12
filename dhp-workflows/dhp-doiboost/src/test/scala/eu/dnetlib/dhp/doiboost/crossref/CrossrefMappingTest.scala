@@ -223,9 +223,7 @@ class CrossrefMappingTest {
 
     val collectedFromList = result.getCollectedfrom.asScala
     assert(
-      collectedFromList.exists(c =>
-        c.getKey.equalsIgnoreCase("10|openaire____::081b82f96300b6a6e3d282bad31cb6e2")
-      ),
+      collectedFromList.exists(c => c.getKey.equalsIgnoreCase("10|openaire____::081b82f96300b6a6e3d282bad31cb6e2")),
       "Wrong collected from assertion"
     )
 
@@ -301,9 +299,7 @@ class CrossrefMappingTest {
 
     val collectedFromList = result.getCollectedfrom.asScala
     assert(
-      collectedFromList.exists(c =>
-        c.getKey.equalsIgnoreCase("10|openaire____::081b82f96300b6a6e3d282bad31cb6e2")
-      ),
+      collectedFromList.exists(c => c.getKey.equalsIgnoreCase("10|openaire____::081b82f96300b6a6e3d282bad31cb6e2")),
       "Wrong collected from assertion"
     )
 
@@ -435,9 +431,7 @@ class CrossrefMappingTest {
 
     val collectedFromList = result.getCollectedfrom.asScala
     assert(
-      collectedFromList.exists(c =>
-        c.getKey.equalsIgnoreCase("10|openaire____::081b82f96300b6a6e3d282bad31cb6e2")
-      ),
+      collectedFromList.exists(c => c.getKey.equalsIgnoreCase("10|openaire____::081b82f96300b6a6e3d282bad31cb6e2")),
       "Wrong collected from assertion"
     )
 
@@ -553,9 +547,7 @@ class CrossrefMappingTest {
     println(mapper.writeValueAsString(item))
 
     assertTrue(
-      item.getInstance().asScala exists (i =>
-        i.getLicense.getValue.equals("https://www.springer.com/vor")
-      )
+      item.getInstance().asScala exists (i => i.getLicense.getValue.equals("https://www.springer.com/vor"))
     )
     assertTrue(
       item.getInstance().asScala exists (i => i.getAccessright.getClassid.equals("CLOSED"))
@@ -590,9 +582,7 @@ class CrossrefMappingTest {
     )
     assertTrue(item.getInstance().asScala exists (i => i.getAccessright.getClassid.equals("OPEN")))
     assertTrue(
-      item.getInstance().asScala exists (i =>
-        i.getAccessright.getOpenAccessRoute == OpenAccessRoute.hybrid
-      )
+      item.getInstance().asScala exists (i => i.getAccessright.getOpenAccessRoute == OpenAccessRoute.hybrid)
     )
     mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
     println(mapper.writeValueAsString(item))
@@ -627,9 +617,7 @@ class CrossrefMappingTest {
     )
     assertTrue(item.getInstance().asScala exists (i => i.getAccessright.getClassid.equals("OPEN")))
     assertTrue(
-      item.getInstance().asScala exists (i =>
-        i.getAccessright.getOpenAccessRoute == OpenAccessRoute.hybrid
-      )
+      item.getInstance().asScala exists (i => i.getAccessright.getOpenAccessRoute == OpenAccessRoute.hybrid)
     )
     mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
     println(mapper.writeValueAsString(item))

@@ -2,14 +2,7 @@ package eu.dnetlib.dhp.sx.graph
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
-import eu.dnetlib.dhp.schema.oaf.{
-  OtherResearchProduct,
-  Publication,
-  Relation,
-  Result,
-  Software,
-  Dataset => OafDataset
-}
+import eu.dnetlib.dhp.schema.oaf.{OtherResearchProduct, Publication, Relation, Result, Software, Dataset => OafDataset}
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}

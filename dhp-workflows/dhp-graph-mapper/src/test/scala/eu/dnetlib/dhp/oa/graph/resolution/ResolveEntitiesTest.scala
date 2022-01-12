@@ -189,11 +189,7 @@ class ResolveEntitiesTest extends Serializable {
 
     var ct = pubDS.count()
     var et = pubDS
-      .filter(p =>
-        p.getTitle != null && p.getTitle.asScala.forall(t =>
-          t.getValue != null && t.getValue.nonEmpty
-        )
-      )
+      .filter(p => p.getTitle != null && p.getTitle.asScala.forall(t => t.getValue != null && t.getValue.nonEmpty))
       .count()
 
     assertEquals(ct, et)
@@ -208,11 +204,7 @@ class ResolveEntitiesTest extends Serializable {
       .count()
     ct = datDS.count()
     et = datDS
-      .filter(p =>
-        p.getTitle != null && p.getTitle.asScala.forall(t =>
-          t.getValue != null && t.getValue.nonEmpty
-        )
-      )
+      .filter(p => p.getTitle != null && p.getTitle.asScala.forall(t => t.getValue != null && t.getValue.nonEmpty))
       .count()
     assertEquals(ct, et)
 
@@ -226,11 +218,7 @@ class ResolveEntitiesTest extends Serializable {
       .count()
     ct = softDS.count()
     et = softDS
-      .filter(p =>
-        p.getTitle != null && p.getTitle.asScala.forall(t =>
-          t.getValue != null && t.getValue.nonEmpty
-        )
-      )
+      .filter(p => p.getTitle != null && p.getTitle.asScala.forall(t => t.getValue != null && t.getValue.nonEmpty))
       .count()
     assertEquals(ct, et)
 
@@ -245,11 +233,7 @@ class ResolveEntitiesTest extends Serializable {
 
     ct = orpDS.count()
     et = orpDS
-      .filter(p =>
-        p.getTitle != null && p.getTitle.asScala.forall(t =>
-          t.getValue != null && t.getValue.nonEmpty
-        )
-      )
+      .filter(p => p.getTitle != null && p.getTitle.asScala.forall(t => t.getValue != null && t.getValue.nonEmpty))
       .count()
     assertEquals(ct, et)
 

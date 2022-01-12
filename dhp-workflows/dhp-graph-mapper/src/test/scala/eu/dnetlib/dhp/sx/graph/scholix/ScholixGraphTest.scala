@@ -56,9 +56,7 @@ class ScholixGraphTest extends AbstractVocabularyTest {
     assertNotNull(result)
 
     assertEquals(result.size, items.size)
-    val d = result.find(s =>
-      s.getLocalIdentifier.asScala.exists(i => i.getUrl == null || i.getUrl.isEmpty)
-    )
+    val d = result.find(s => s.getLocalIdentifier.asScala.exists(i => i.getUrl == null || i.getUrl.isEmpty))
     assertFalse(d.isDefined)
     println(mapper.writeValueAsString(result.head))
 
@@ -74,9 +72,7 @@ class ScholixGraphTest extends AbstractVocabularyTest {
     val result: List[(Relation, ScholixSummary)] = inputRelations.lines
       .sliding(2)
       .map(s => (s.head, s(1)))
-      .map(p =>
-        (mapper.readValue(p._1, classOf[Relation]), mapper.readValue(p._2, classOf[ScholixSummary]))
-      )
+      .map(p => (mapper.readValue(p._1, classOf[Relation]), mapper.readValue(p._2, classOf[ScholixSummary])))
       .toList
     assertNotNull(result)
     assertTrue(result.nonEmpty)

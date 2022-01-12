@@ -1,11 +1,7 @@
 package eu.dnetlib.dhp.oa.graph.hostedbymap
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import eu.dnetlib.dhp.oa.graph.hostedbymap.SparkPrepareHostedByInfoToApply.{
-  joinResHBM,
-  prepareResultInfo,
-  toEntityInfo
-}
+import eu.dnetlib.dhp.oa.graph.hostedbymap.SparkPrepareHostedByInfoToApply.{joinResHBM, prepareResultInfo, toEntityInfo}
 import eu.dnetlib.dhp.oa.graph.hostedbymap.model.EntityInfo
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}

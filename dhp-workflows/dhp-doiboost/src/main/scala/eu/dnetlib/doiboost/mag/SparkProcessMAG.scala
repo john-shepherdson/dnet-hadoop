@@ -15,9 +15,7 @@ object SparkProcessMAG {
   def getDistinctResults(d: Dataset[MagPapers]): Dataset[MagPapers] = {
     d.where(col("Doi").isNotNull)
       .groupByKey(mp => DoiBoostMappingUtil.normalizeDoi(mp.Doi))(Encoders.STRING)
-      .reduceGroups((p1: MagPapers, p2: MagPapers) =>
-        ConversionUtil.choiceLatestMagArtitcle(p1, p2)
-      )
+      .reduceGroups((p1: MagPapers, p2: MagPapers) => ConversionUtil.choiceLatestMagArtitcle(p1, p2))
       .map(_._2)(Encoders.product[MagPapers])
       .map(mp => {
         MagPapers(
