@@ -18,6 +18,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 public class Constants {
 
 	public static final String DOI = "doi";
+	public static final String DOI_CLASSNAME = "Digital Object Identifier";
 
 	public static final String DEFAULT_DELIMITER = ",";
 
