@@ -245,26 +245,47 @@ public class ProduceTest {
 					.get(0)
 					.getValue());
 
-		Assertions.assertEquals("10.3390/s18072310",
-				tmp.filter(row -> row.getId().equals(doi)).collect()
-						.get(0)
-						.getInstance().get(0)
-						.getPid().get(0)
-						.getValue().toLowerCase());
+		Assertions
+			.assertEquals(
+				"10.3390/s18072310",
+				tmp
+					.filter(row -> row.getId().equals(doi))
+					.collect()
+					.get(0)
+					.getInstance()
+					.get(0)
+					.getPid()
+					.get(0)
+					.getValue()
+					.toLowerCase());
 
-		Assertions.assertEquals("doi",
-				tmp.filter(row -> row.getId().equals(doi)).collect()
-						.get(0)
-						.getInstance().get(0)
-						.getPid().get(0)
-						.getQualifier().getClassid());
+		Assertions
+			.assertEquals(
+				"doi",
+				tmp
+					.filter(row -> row.getId().equals(doi))
+					.collect()
+					.get(0)
+					.getInstance()
+					.get(0)
+					.getPid()
+					.get(0)
+					.getQualifier()
+					.getClassid());
 
-		Assertions.assertEquals("Digital Object Identifier",
-				tmp.filter(row -> row.getId().equals(doi)).collect()
-						.get(0)
-						.getInstance().get(0)
-						.getPid().get(0)
-						.getQualifier().getClassname());
+		Assertions
+			.assertEquals(
+				"Digital Object Identifier",
+				tmp
+					.filter(row -> row.getId().equals(doi))
+					.collect()
+					.get(0)
+					.getInstance()
+					.get(0)
+					.getPid()
+					.get(0)
+					.getQualifier()
+					.getClassname());
 
 	}
 
@@ -274,15 +295,17 @@ public class ProduceTest {
 		JavaRDD<Result> tmp = getResultJavaRDD();
 
 		List<StructuredProperty> mes = tmp
-				.filter(row -> row.getInstance() != null && row.getInstance().size() > 0)
-				.flatMap(row -> row.getInstance().iterator())
-				.flatMap(i -> i.getPid().iterator())
-				.collect();
+			.filter(row -> row.getInstance() != null && row.getInstance().size() > 0)
+			.flatMap(row -> row.getInstance().iterator())
+			.flatMap(i -> i.getPid().iterator())
+			.collect();
 
 		Assertions.assertEquals(86, mes.size());
 
-		tmp.filter(row -> row.getInstance() != null && row.getInstance().size() > 0)
-				.foreach(e -> Assertions.assertEquals("sysimport:enrich", e.getDataInfo().getProvenanceaction().getClassid()));
+		tmp
+			.filter(row -> row.getInstance() != null && row.getInstance().size() > 0)
+			.foreach(
+				e -> Assertions.assertEquals("sysimport:enrich", e.getDataInfo().getProvenanceaction().getClassid()));
 
 	}
 
