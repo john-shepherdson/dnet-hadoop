@@ -681,7 +681,7 @@
 				<groupId>org.antipathy</groupId>
 				<artifactId>mvn-scalafmt_2.11</artifactId>
 				<configuration>
-					<configLocation>dhp-build/dhp-code-style/src/main/resources/scalafmt/scalafmt.conf</configLocation>
+					<configLocation>https://code-repo.d4science.org/D-Net/dnet-hadoop/raw/branch/beta/dhp-build/dhp-code-style/src/main/resources/scalafmt/scalafmt.conf</configLocation>
 					<skipTestSources>false</skipTestSources>
 					<skipSources>false</skipSources>
 					<sourceDirectories>
