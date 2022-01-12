@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.datacite
 import org.json4s.jackson.JsonMethods.{compact, parse, render}
 import org.json4s.{DefaultFormats, JValue}
 
-class DataciteAPIImporter(timestamp: Long = 0, blocks: Long = 10, until:Long = -1) extends AbstractRestClient {
+class DataciteAPIImporter(timestamp: Long = 0, blocks: Long = 10, until: Long = -1) extends AbstractRestClient {
 
   override def extractInfo(input: String): Unit = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
@@ -16,15 +16,17 @@ class DataciteAPIImporter(timestamp: Long = 0, blocks: Long = 10, until:Long = -
     current_index = 0
   }
 
-  def get_url():String ={
-    val to = if (until> 0) s"$until" else "*"
+  def get_url(): String = {
+    val to = if (until > 0) s"$until" else "*"
     s"https://api.datacite.org/dois?page[cursor]=1&page[size]=$blocks&query=updated:[$timestamp%20TO%20$to]"
 
   }
 
   override def getBufferData(): Unit = {
     if (!complete) {
-      val response = if (scroll_value.isDefined) doHTTPGETRequest(scroll_value.get) else doHTTPGETRequest(get_url())
+      val response =
+        if (scroll_value.isDefined) doHTTPGETRequest(scroll_value.get)
+        else doHTTPGETRequest(get_url())
       extractInfo(response)
     }
   }

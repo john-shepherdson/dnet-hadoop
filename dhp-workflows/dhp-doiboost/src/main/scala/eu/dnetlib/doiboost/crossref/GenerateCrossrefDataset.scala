@@ -18,7 +18,6 @@ object GenerateCrossrefDataset {
 
   implicit val mrEncoder: Encoder[CrossrefDT] = Encoders.kryo[CrossrefDT]
 
-
   def crossrefElement(meta: String): CrossrefDT = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(meta)
@@ -30,13 +29,23 @@ object GenerateCrossrefDataset {
 
   def main(args: Array[String]): Unit = {
     val conf = new SparkConf
-    val parser = new ArgumentApplicationParser(Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/crossref_dump_reader/generate_dataset_params.json")).mkString)
+    val parser = new ArgumentApplicationParser(
+      Source
+        .fromInputStream(
+          getClass.getResourceAsStream(
+            "/eu/dnetlib/dhp/doiboost/crossref_dump_reader/generate_dataset_params.json"
+          )
+        )
+        .mkString
+    )
     parser.parseArgument(args)
     val master = parser.get("master")
     val sourcePath = parser.get("sourcePath")
     val targetPath = parser.get("targetPath")
 
-    val spark: SparkSession = SparkSession.builder().config(conf)
+    val spark: SparkSession = SparkSession
+      .builder()
+      .config(conf)
       .appName(UnpackCrtossrefEntries.getClass.getSimpleName)
       .master(master)
       .getOrCreate()
@@ -44,12 +53,14 @@ object GenerateCrossrefDataset {
 
     import spark.implicits._
 
-
     val tmp: RDD[String] = sc.textFile(sourcePath, 6000)
 
-    spark.createDataset(tmp)
+    spark
+      .createDataset(tmp)
       .map(entry => crossrefElement(entry))
-      .write.mode(SaveMode.Overwrite).save(targetPath)
+      .write
+      .mode(SaveMode.Overwrite)
+      .save(targetPath)
     //               .map(meta => crossrefElement(meta))
     //               .toDS.as[CrossrefDT]
     //              .write.mode(SaveMode.Overwrite).save(targetPath)

@@ -15,15 +15,19 @@ object SparkEBILinksToOaf {
   def main(args: Array[String]): Unit = {
     val log: Logger = LoggerFactory.getLogger(getClass)
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/ebi/ebi_to_df_params.json")))
+    val parser = new ArgumentApplicationParser(
+      IOUtils.toString(
+        getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/ebi/ebi_to_df_params.json")
+      )
+    )
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession
         .builder()
         .config(conf)
         .appName(SparkEBILinksToOaf.getClass.getSimpleName)
-        .master(parser.get("master")).getOrCreate()
-
+        .master(parser.get("master"))
+        .getOrCreate()
 
     import spark.implicits._
     val sourcePath = parser.get("sourcePath")
@@ -32,11 +36,17 @@ object SparkEBILinksToOaf {
     log.info(s"targetPath  -> $targetPath")
     implicit val PMEncoder: Encoder[Oaf] = Encoders.kryo(classOf[Oaf])
 
-    val ebLinks: Dataset[EBILinkItem] = spark.read.load(sourcePath).as[EBILinkItem].filter(l => l.links != null && l.links.startsWith("{"))
+    val ebLinks: Dataset[EBILinkItem] = spark.read
+      .load(sourcePath)
+      .as[EBILinkItem]
+      .filter(l => l.links != null && l.links.startsWith("{"))
 
-    CollectionUtils.saveDataset(ebLinks.flatMap(j => BioDBToOAF.parse_ebi_links(j.links))
-      .filter(p => BioDBToOAF.EBITargetLinksFilter(p))
-      .flatMap(p => BioDBToOAF.convertEBILinksToOaf(p)),
-      targetPath)
+    CollectionUtils.saveDataset(
+      ebLinks
+        .flatMap(j => BioDBToOAF.parse_ebi_links(j.links))
+        .filter(p => BioDBToOAF.EBITargetLinksFilter(p))
+        .flatMap(p => BioDBToOAF.convertEBILinksToOaf(p)),
+      targetPath
+    )
   }
 }

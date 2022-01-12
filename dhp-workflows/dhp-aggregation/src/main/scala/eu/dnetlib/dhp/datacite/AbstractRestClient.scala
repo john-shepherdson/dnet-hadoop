@@ -6,7 +6,6 @@ import org.apache.http.client.methods.{HttpGet, HttpPost, HttpUriRequest}
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.HttpClientBuilder
 
-
 abstract class AbstractRestClient extends Iterator[String] {
 
   var buffer: List[String] = List()
@@ -16,11 +15,9 @@ abstract class AbstractRestClient extends Iterator[String] {
 
   var complete: Boolean = false
 
-
   def extractInfo(input: String): Unit
 
   protected def getBufferData(): Unit
-
 
   def doHTTPGETRequest(url: String): String = {
     val httpGet = new HttpGet(url)
@@ -43,7 +40,6 @@ abstract class AbstractRestClient extends Iterator[String] {
     buffer.nonEmpty && current_index < buffer.size
   }
 
-
   override def next(): String = {
     val next_item: String = buffer(current_index)
     current_index = current_index + 1
@@ -52,13 +48,14 @@ abstract class AbstractRestClient extends Iterator[String] {
     next_item
   }
 
-
   private def doHTTPRequest[A <: HttpUriRequest](r: A): String = {
     val timeout = 60; // seconds
-    val config = RequestConfig.custom()
+    val config = RequestConfig
+      .custom()
       .setConnectTimeout(timeout * 1000)
       .setConnectionRequestTimeout(timeout * 1000)
-      .setSocketTimeout(timeout * 1000).build()
+      .setSocketTimeout(timeout * 1000)
+      .build()
     val client = HttpClientBuilder.create().setDefaultRequestConfig(config).build()
     try {
       var tries = 4
@@ -69,8 +66,7 @@ abstract class AbstractRestClient extends Iterator[String] {
           println(s"get response with status${response.getStatusLine.getStatusCode}")
           if (response.getStatusLine.getStatusCode > 400) {
             tries -= 1
-          }
-          else
+          } else
             return IOUtils.toString(response.getEntity.getContent)
         } catch {
           case e: Throwable =>

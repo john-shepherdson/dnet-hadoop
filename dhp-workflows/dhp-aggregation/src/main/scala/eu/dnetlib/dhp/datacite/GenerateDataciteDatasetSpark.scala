@@ -12,12 +12,12 @@ import eu.dnetlib.dhp.utils.ISLookupClientFactory
 import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
 import org.slf4j.{Logger, LoggerFactory}
 
+class GenerateDataciteDatasetSpark(propertyPath: String, args: Array[String], log: Logger)
+    extends AbstractScalaApplication(propertyPath, args, log: Logger) {
 
-class GenerateDataciteDatasetSpark (propertyPath:String, args:Array[String], log:Logger) extends  AbstractScalaApplication(propertyPath, args, log:Logger) {
-  /**
-   * Here all the spark applications runs this method
-   * where the whole logic of the spark node is defined
-   */
+  /** Here all the spark applications runs this method
+    * where the whole logic of the spark node is defined
+    */
   override def run(): Unit = {
 
     val sourcePath = parser.get("sourcePath")
@@ -46,49 +46,65 @@ class GenerateDataciteDatasetSpark (propertyPath:String, args:Array[String], log
     reportTotalSize(targetPath, outputBasePath)
   }
 
-
-  /**
-   * For working with MDStore we need to store in a file on hdfs the size of
-   * the current dataset
-   * @param targetPath
-   * @param outputBasePath
-   */
-  def reportTotalSize( targetPath: String, outputBasePath: String ):Unit = {
+  /** For working with MDStore we need to store in a file on hdfs the size of
+    * the current dataset
+    * @param targetPath
+    * @param outputBasePath
+    */
+  def reportTotalSize(targetPath: String, outputBasePath: String): Unit = {
     val total_items = spark.read.text(targetPath).count()
-    writeHdfsFile(spark.sparkContext.hadoopConfiguration, s"$total_items", outputBasePath + MDSTORE_SIZE_PATH)
+    writeHdfsFile(
+      spark.sparkContext.hadoopConfiguration,
+      s"$total_items",
+      outputBasePath + MDSTORE_SIZE_PATH
+    )
   }
 
-  /**
-   * Generate the transformed and cleaned OAF Dataset from the native one
-
-   * @param sourcePath  sourcePath of the native Dataset in format JSON/Datacite
-   * @param exportLinks If true it generates unresolved links
-   * @param vocabularies vocabularies for cleaning
-   * @param targetPath the targetPath of the result Dataset
-   */
-  def generateDataciteDataset(sourcePath: String, exportLinks: Boolean, vocabularies: VocabularyGroup, targetPath: String, spark:SparkSession):Unit = {
-    require(spark!= null)
+  /** Generate the transformed and cleaned OAF Dataset from the native one
+    *
+    * @param sourcePath  sourcePath of the native Dataset in format JSON/Datacite
+    * @param exportLinks If true it generates unresolved links
+    * @param vocabularies vocabularies for cleaning
+    * @param targetPath the targetPath of the result Dataset
+    */
+  def generateDataciteDataset(
+    sourcePath: String,
+    exportLinks: Boolean,
+    vocabularies: VocabularyGroup,
+    targetPath: String,
+    spark: SparkSession
+  ): Unit = {
+    require(spark != null)
     import spark.implicits._
 
     implicit val mrEncoder: Encoder[MetadataRecord] = Encoders.kryo[MetadataRecord]
 
     implicit val resEncoder: Encoder[Oaf] = Encoders.kryo[Oaf]
     CollectionUtils.saveDataset(
-      spark.read.load(sourcePath).as[DataciteType]
+      spark.read
+        .load(sourcePath)
+        .as[DataciteType]
         .filter(d => d.isActive)
-        .flatMap(d => DataciteToOAFTransformation.generateOAF(d.json, d.timestamp, d.timestamp, vocabularies, exportLinks))
+        .flatMap(d =>
+          DataciteToOAFTransformation
+            .generateOAF(d.json, d.timestamp, d.timestamp, vocabularies, exportLinks)
+        )
         .filter(d => d != null),
-      targetPath)
+      targetPath
+    )
   }
 
 }
-
 
 object GenerateDataciteDatasetSpark {
 
   val log: Logger = LoggerFactory.getLogger(GenerateDataciteDatasetSpark.getClass)
 
   def main(args: Array[String]): Unit = {
-    new GenerateDataciteDatasetSpark("/eu/dnetlib/dhp/datacite/generate_dataset_params.json", args, log).initialize().run()
+    new GenerateDataciteDatasetSpark(
+      "/eu/dnetlib/dhp/datacite/generate_dataset_params.json",
+      args,
+      log
+    ).initialize().run()
   }
 }

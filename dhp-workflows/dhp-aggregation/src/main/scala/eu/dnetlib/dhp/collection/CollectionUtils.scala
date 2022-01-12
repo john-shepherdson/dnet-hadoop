@@ -7,16 +7,14 @@ import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode}
 
 object CollectionUtils {
 
-  /**
-   * This method in pipeline to the transformation phase,
-   * generates relations in both verse, typically it should be a phase of flatMap
-   *
-   * @param i input OAF
-   * @return
-   * If the input OAF is an entity -> List(i)
-   * If the input OAF is a relation -> List(relation, inverseRelation)
-   *
-   */
+  /** This method in pipeline to the transformation phase,
+    * generates relations in both verse, typically it should be a phase of flatMap
+    *
+    * @param i input OAF
+    * @return
+    * If the input OAF is an entity -> List(i)
+    * If the input OAF is a relation -> List(relation, inverseRelation)
+    */
 
   def fixRelations(i: Oaf): List[Oaf] = {
     if (i.isInstanceOf[OafEntity])

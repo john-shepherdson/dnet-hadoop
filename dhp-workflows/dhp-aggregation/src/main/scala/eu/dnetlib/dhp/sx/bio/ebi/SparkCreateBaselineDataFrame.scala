@@ -24,31 +24,37 @@ import scala.xml.pull.XMLEventReader
 
 object SparkCreateBaselineDataFrame {
 
-
   def requestBaseLineUpdatePage(maxFile: String): List[(String, String)] = {
     val data = requestPage("https://ftp.ncbi.nlm.nih.gov/pubmed/updatefiles/")
 
-    val result = data.lines.filter(l => l.startsWith("<a href=")).map { l =>
-      val end = l.lastIndexOf("\">")
-      val start = l.indexOf("<a href=\"")
+    val result = data.lines
+      .filter(l => l.startsWith("<a href="))
+      .map { l =>
+        val end = l.lastIndexOf("\">")
+        val start = l.indexOf("<a href=\"")
 
-      if (start >= 0 && end > start)
-        l.substring(start + 9, end - start)
-      else
-        ""
-    }.filter(s => s.endsWith(".gz")).filter(s => s > maxFile).map(s => (s, s"https://ftp.ncbi.nlm.nih.gov/pubmed/updatefiles/$s")).toList
+        if (start >= 0 && end > start)
+          l.substring(start + 9, end - start)
+        else
+          ""
+      }
+      .filter(s => s.endsWith(".gz"))
+      .filter(s => s > maxFile)
+      .map(s => (s, s"https://ftp.ncbi.nlm.nih.gov/pubmed/updatefiles/$s"))
+      .toList
 
     result
   }
 
-
   def downloadBaselinePart(url: String): InputStream = {
     val r = new HttpGet(url)
     val timeout = 60; // seconds
-    val config = RequestConfig.custom()
+    val config = RequestConfig
+      .custom()
       .setConnectTimeout(timeout * 1000)
       .setConnectionRequestTimeout(timeout * 1000)
-      .setSocketTimeout(timeout * 1000).build()
+      .setSocketTimeout(timeout * 1000)
+      .build()
     val client = HttpClientBuilder.create().setDefaultRequestConfig(config).build()
     val response = client.execute(r)
     println(s"get response with status${response.getStatusLine.getStatusCode}")
@@ -59,10 +65,12 @@ object SparkCreateBaselineDataFrame {
   def requestPage(url: String): String = {
     val r = new HttpGet(url)
     val timeout = 60; // seconds
-    val config = RequestConfig.custom()
+    val config = RequestConfig
+      .custom()
       .setConnectTimeout(timeout * 1000)
       .setConnectionRequestTimeout(timeout * 1000)
-      .setSocketTimeout(timeout * 1000).build()
+      .setSocketTimeout(timeout * 1000)
+      .build()
     val client = HttpClientBuilder.create().setDefaultRequestConfig(config).build()
     try {
       var tries = 4
@@ -73,8 +81,7 @@ object SparkCreateBaselineDataFrame {
           println(s"get response with status${response.getStatusLine.getStatusCode}")
           if (response.getStatusLine.getStatusCode > 400) {
             tries -= 1
-          }
-          else
+          } else
             return IOUtils.toString(response.getEntity.getContent)
         } catch {
           case e: Throwable =>
@@ -90,9 +97,7 @@ object SparkCreateBaselineDataFrame {
     }
   }
 
-
   def downloadBaseLineUpdate(baselinePath: String, hdfsServerUri: String): Unit = {
-
 
     val conf = new Configuration
     conf.set("fs.defaultFS", hdfsServerUri)
@@ -122,31 +127,36 @@ object SparkCreateBaselineDataFrame {
 
   }
 
+  val pmArticleAggregator: Aggregator[(String, PMArticle), PMArticle, PMArticle] =
+    new Aggregator[(String, PMArticle), PMArticle, PMArticle] with Serializable {
+      override def zero: PMArticle = new PMArticle
 
-  val pmArticleAggregator: Aggregator[(String, PMArticle), PMArticle, PMArticle] = new Aggregator[(String, PMArticle), PMArticle, PMArticle] with Serializable {
-    override def zero: PMArticle = new PMArticle
+      override def reduce(b: PMArticle, a: (String, PMArticle)): PMArticle = {
+        if (b != null && b.getPmid != null) b else a._2
+      }
 
-    override def reduce(b: PMArticle, a: (String, PMArticle)): PMArticle = {
-      if (b != null && b.getPmid != null) b else a._2
+      override def merge(b1: PMArticle, b2: PMArticle): PMArticle = {
+        if (b1 != null && b1.getPmid != null) b1 else b2
+
+      }
+
+      override def finish(reduction: PMArticle): PMArticle = reduction
+
+      override def bufferEncoder: Encoder[PMArticle] = Encoders.kryo[PMArticle]
+
+      override def outputEncoder: Encoder[PMArticle] = Encoders.kryo[PMArticle]
     }
-
-    override def merge(b1: PMArticle, b2: PMArticle): PMArticle = {
-      if (b1 != null && b1.getPmid != null) b1 else b2
-
-    }
-
-    override def finish(reduction: PMArticle): PMArticle = reduction
-
-    override def bufferEncoder: Encoder[PMArticle] = Encoders.kryo[PMArticle]
-
-    override def outputEncoder: Encoder[PMArticle] = Encoders.kryo[PMArticle]
-  }
-
 
   def main(args: Array[String]): Unit = {
     val conf: SparkConf = new SparkConf()
     val log: Logger = LoggerFactory.getLogger(getClass)
-    val parser = new ArgumentApplicationParser(IOUtils.toString(SparkEBILinksToOaf.getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/ebi/baseline_to_oaf_params.json")))
+    val parser = new ArgumentApplicationParser(
+      IOUtils.toString(
+        SparkEBILinksToOaf.getClass.getResourceAsStream(
+          "/eu/dnetlib/dhp/sx/bio/ebi/baseline_to_oaf_params.json"
+        )
+      )
+    )
     parser.parseArgument(args)
     val isLookupUrl: String = parser.get("isLookupUrl")
     log.info("isLookupUrl: {}", isLookupUrl)
@@ -162,7 +172,6 @@ object SparkCreateBaselineDataFrame {
     val skipUpdate = parser.get("skipUpdate")
     log.info("skipUpdate: {}", skipUpdate)
 
-
     val isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl)
     val vocabularies = VocabularyGroup.loadVocsFromIS(isLookupService)
     val spark: SparkSession =
@@ -170,7 +179,8 @@ object SparkCreateBaselineDataFrame {
         .builder()
         .config(conf)
         .appName(SparkEBILinksToOaf.getClass.getSimpleName)
-        .master(parser.get("master")).getOrCreate()
+        .master(parser.get("master"))
+        .getOrCreate()
 
     val sc = spark.sparkContext
     import spark.implicits._
@@ -183,20 +193,30 @@ object SparkCreateBaselineDataFrame {
     if (!"true".equalsIgnoreCase(skipUpdate)) {
       downloadBaseLineUpdate(s"$workingPath/baseline", hdfsServerUri)
       val k: RDD[(String, String)] = sc.wholeTextFiles(s"$workingPath/baseline", 2000)
-      val ds: Dataset[PMArticle] = spark.createDataset(k.filter(i => i._1.endsWith(".gz")).flatMap(i => {
-        val xml = new XMLEventReader(Source.fromBytes(i._2.getBytes()))
-        new PMParser(xml)
-      }))
-      ds.map(p => (p.getPmid, p))(Encoders.tuple(Encoders.STRING, PMEncoder)).groupByKey(_._1)
+      val ds: Dataset[PMArticle] = spark.createDataset(
+        k.filter(i => i._1.endsWith(".gz"))
+          .flatMap(i => {
+            val xml = new XMLEventReader(Source.fromBytes(i._2.getBytes()))
+            new PMParser(xml)
+          })
+      )
+      ds.map(p => (p.getPmid, p))(Encoders.tuple(Encoders.STRING, PMEncoder))
+        .groupByKey(_._1)
         .agg(pmArticleAggregator.toColumn)
-        .map(p => p._2).write.mode(SaveMode.Overwrite).save(s"$workingPath/baseline_dataset")
+        .map(p => p._2)
+        .write
+        .mode(SaveMode.Overwrite)
+        .save(s"$workingPath/baseline_dataset")
     }
 
     val exported_dataset = spark.read.load(s"$workingPath/baseline_dataset").as[PMArticle]
-    CollectionUtils.saveDataset(exported_dataset
-      .map(a => PubMedToOaf.convert(a, vocabularies)).as[Oaf]
-      .filter(p => p != null),
-      targetPath)
+    CollectionUtils.saveDataset(
+      exported_dataset
+        .map(a => PubMedToOaf.convert(a, vocabularies))
+        .as[Oaf]
+        .filter(p => p != null),
+      targetPath
+    )
 
   }
 }

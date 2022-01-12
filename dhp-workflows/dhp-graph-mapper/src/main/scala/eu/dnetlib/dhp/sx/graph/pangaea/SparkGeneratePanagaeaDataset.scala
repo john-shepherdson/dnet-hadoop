@@ -11,20 +11,25 @@ import scala.io.Source
 
 object SparkGeneratePanagaeaDataset {
 
-
   def main(args: Array[String]): Unit = {
     val logger: Logger = LoggerFactory.getLogger(getClass)
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/pangaea/pangaea_to_dataset.json")).mkString)
+    val parser = new ArgumentApplicationParser(
+      Source
+        .fromInputStream(
+          getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/pangaea/pangaea_to_dataset.json")
+        )
+        .mkString
+    )
     parser.parseArgument(args)
-
 
     val spark: SparkSession =
       SparkSession
         .builder()
         .config(conf)
         .appName(SparkGeneratePanagaeaDataset.getClass.getSimpleName)
-        .master(parser.get("master")).getOrCreate()
+        .master(parser.get("master"))
+        .getOrCreate()
 
     parser.getObjectMap.asScala.foreach(s => logger.info(s"${s._1} -> ${s._2}"))
     logger.info("Converting sequential file into Dataset")
@@ -34,16 +39,20 @@ object SparkGeneratePanagaeaDataset {
 
     implicit val pangaeaEncoders: Encoder[PangaeaDataModel] = Encoders.kryo[PangaeaDataModel]
 
-    val inputRDD: RDD[PangaeaDataModel] = sc.textFile(s"$workingPath/update").map(s => PangaeaUtils.toDataset(s))
+    val inputRDD: RDD[PangaeaDataModel] =
+      sc.textFile(s"$workingPath/update").map(s => PangaeaUtils.toDataset(s))
 
-    spark.createDataset(inputRDD).as[PangaeaDataModel]
+    spark
+      .createDataset(inputRDD)
+      .as[PangaeaDataModel]
       .map(s => (s.identifier, s))(Encoders.tuple(Encoders.STRING, pangaeaEncoders))
       .groupByKey(_._1)(Encoders.STRING)
       .agg(PangaeaUtils.getDatasetAggregator().toColumn)
       .map(s => s._2)
-      .write.mode(SaveMode.Overwrite).save(s"$workingPath/dataset")
+      .write
+      .mode(SaveMode.Overwrite)
+      .save(s"$workingPath/dataset")
 
   }
-
 
 }

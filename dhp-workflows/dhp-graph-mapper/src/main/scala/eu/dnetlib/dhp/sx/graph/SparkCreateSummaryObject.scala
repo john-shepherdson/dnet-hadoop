@@ -14,14 +14,19 @@ object SparkCreateSummaryObject {
   def main(args: Array[String]): Unit = {
     val log: Logger = LoggerFactory.getLogger(getClass)
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/create_summaries_params.json")))
+    val parser = new ArgumentApplicationParser(
+      IOUtils.toString(
+        getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/create_summaries_params.json")
+      )
+    )
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession
         .builder()
         .config(conf)
         .appName(getClass.getSimpleName)
-        .master(parser.get("master")).getOrCreate()
+        .master(parser.get("master"))
+        .getOrCreate()
 
     val sourcePath = parser.get("sourcePath")
     log.info(s"sourcePath  -> $sourcePath")
@@ -33,10 +38,17 @@ object SparkCreateSummaryObject {
 
     implicit val summaryEncoder: Encoder[ScholixSummary] = Encoders.kryo[ScholixSummary]
 
+    val ds: Dataset[Result] = spark.read
+      .load(s"$sourcePath/*")
+      .as[Result]
+      .filter(r => r.getDataInfo == null || r.getDataInfo.getDeletedbyinference == false)
 
-    val ds: Dataset[Result] = spark.read.load(s"$sourcePath/*").as[Result].filter(r => r.getDataInfo == null || r.getDataInfo.getDeletedbyinference == false)
-
-    ds.repartition(6000).map(r => ScholixUtils.resultToSummary(r)).filter(s => s != null).write.mode(SaveMode.Overwrite).save(targetPath)
+    ds.repartition(6000)
+      .map(r => ScholixUtils.resultToSummary(r))
+      .filter(s => s != null)
+      .write
+      .mode(SaveMode.Overwrite)
+      .save(targetPath)
 
   }
 

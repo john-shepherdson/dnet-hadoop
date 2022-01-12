@@ -20,7 +20,13 @@ object CopyHdfsOafSparkApplication {
   def main(args: Array[String]): Unit = {
     val log = LoggerFactory.getLogger(getClass)
     val conf = new SparkConf()
-    val parser = new ArgumentApplicationParser(Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/copy_hdfs_oaf_parameters.json")).mkString)
+    val parser = new ArgumentApplicationParser(
+      Source
+        .fromInputStream(
+          getClass.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/copy_hdfs_oaf_parameters.json")
+        )
+        .mkString
+    )
     parser.parseArgument(args)
 
     val spark =
@@ -28,7 +34,8 @@ object CopyHdfsOafSparkApplication {
         .builder()
         .config(conf)
         .appName(getClass.getSimpleName)
-        .master(parser.get("master")).getOrCreate()
+        .master(parser.get("master"))
+        .getOrCreate()
 
     val sc: SparkContext = spark.sparkContext
 
@@ -49,19 +56,22 @@ object CopyHdfsOafSparkApplication {
 
     implicit val oafEncoder: Encoder[Oaf] = Encoders.kryo[Oaf]
 
-    val paths = DHPUtils.mdstorePaths(mdstoreManagerUrl, mdFormat, mdLayout, mdInterpretation, true).asScala
+    val paths =
+      DHPUtils.mdstorePaths(mdstoreManagerUrl, mdFormat, mdLayout, mdInterpretation, true).asScala
 
-    val validPaths: List[String] = paths.filter(p => HdfsSupport.exists(p, sc.hadoopConfiguration)).toList
+    val validPaths: List[String] =
+      paths.filter(p => HdfsSupport.exists(p, sc.hadoopConfiguration)).toList
 
-    val types = ModelSupport.oafTypes.entrySet
-      .asScala
+    val types = ModelSupport.oafTypes.entrySet.asScala
       .map(e => Tuple2(e.getKey, e.getValue))
 
     if (validPaths.nonEmpty) {
       val oaf = spark.read.textFile(validPaths: _*)
-      val mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+      val mapper =
+        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-      types.foreach(t => oaf
+      types.foreach(t =>
+        oaf
           .filter(o => isOafType(o, t._1))
           .map(j => mapper.readValue(j, t._2).asInstanceOf[Oaf])
           .map(s => mapper.writeValueAsString(s))(Encoders.STRING)

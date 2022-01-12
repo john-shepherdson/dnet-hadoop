@@ -14,7 +14,11 @@ object SparkTransformBioDatabaseToOAF {
   def main(args: Array[String]): Unit = {
     val conf: SparkConf = new SparkConf()
     val log: Logger = LoggerFactory.getLogger(getClass)
-    val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/ebi/bio_to_oaf_params.json")))
+    val parser = new ArgumentApplicationParser(
+      IOUtils.toString(
+        getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/ebi/bio_to_oaf_params.json")
+      )
+    )
     parser.parseArgument(args)
     val database: String = parser.get("database")
     log.info("database: {}", database)
@@ -29,20 +33,33 @@ object SparkTransformBioDatabaseToOAF {
         .builder()
         .config(conf)
         .appName(getClass.getSimpleName)
-        .master(parser.get("master")).getOrCreate()
+        .master(parser.get("master"))
+        .getOrCreate()
     val sc = spark.sparkContext
 
     implicit val resultEncoder: Encoder[Oaf] = Encoders.kryo(classOf[Oaf])
     import spark.implicits._
     database.toUpperCase() match {
       case "UNIPROT" =>
-        CollectionUtils.saveDataset(spark.createDataset(sc.textFile(dbPath).flatMap(i => BioDBToOAF.uniprotToOAF(i))), targetPath)
+        CollectionUtils.saveDataset(
+          spark.createDataset(sc.textFile(dbPath).flatMap(i => BioDBToOAF.uniprotToOAF(i))),
+          targetPath
+        )
       case "PDB" =>
-        CollectionUtils.saveDataset(spark.createDataset(sc.textFile(dbPath).flatMap(i => BioDBToOAF.pdbTOOaf(i))), targetPath)
+        CollectionUtils.saveDataset(
+          spark.createDataset(sc.textFile(dbPath).flatMap(i => BioDBToOAF.pdbTOOaf(i))),
+          targetPath
+        )
       case "SCHOLIX" =>
-        CollectionUtils.saveDataset(spark.read.load(dbPath).as[ScholixResolved].map(i => BioDBToOAF.scholixResolvedToOAF(i)), targetPath)
+        CollectionUtils.saveDataset(
+          spark.read.load(dbPath).as[ScholixResolved].map(i => BioDBToOAF.scholixResolvedToOAF(i)),
+          targetPath
+        )
       case "CROSSREF_LINKS" =>
-        CollectionUtils.saveDataset(spark.createDataset(sc.textFile(dbPath).map(i => BioDBToOAF.crossrefLinksToOaf(i))), targetPath)
+        CollectionUtils.saveDataset(
+          spark.createDataset(sc.textFile(dbPath).map(i => BioDBToOAF.crossrefLinksToOaf(i))),
+          targetPath
+        )
     }
   }
 
