@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -95,11 +96,18 @@ public class PrepareBipFinder implements Serializable {
 			}).collect(Collectors.toList()).iterator()).rdd(), Encoders.bean(BipScore.class))
 			.map((MapFunction<BipScore, Result>) v -> {
 				Result r = new Result();
+				final String cleanedPid = CleaningFunctions.normalizePidValue(DOI, v.getId());
 
 				r.setId(DHPUtils.generateUnresolvedIdentifier(v.getId(), DOI));
 				Instance inst = new Instance();
 				inst.setMeasures(getMeasure(v));
+
+				inst.setPid(Arrays.asList(OafMapperUtils.structuredProperty(cleanedPid,
+						OafMapperUtils.qualifier(DOI, DOI_CLASSNAME,
+								ModelConstants.DNET_PID_TYPES,
+								ModelConstants.DNET_PID_TYPES), null)));
 				r.setInstance(Arrays.asList(inst));
+				r.setDataInfo(OafMapperUtils.dataInfo(false,null,null,false, OafMapperUtils.qualifier(ModelConstants.PROVENANCE_ENRICH, null,ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS)));
 				return r;
 			}, Encoders.bean(Result.class))
 			.write()
