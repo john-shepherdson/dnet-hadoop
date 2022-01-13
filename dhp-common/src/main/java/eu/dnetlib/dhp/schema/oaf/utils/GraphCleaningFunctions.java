@@ -101,7 +101,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 									.orElse(true))
 							.orElse(true))
 					.orElse(true))) {
-			return false;
+			return true;
 		}
 
 		if (value instanceof Datasource) {
