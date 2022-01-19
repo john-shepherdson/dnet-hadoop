@@ -47,6 +47,17 @@ public class OafMapperUtils {
 	}
 
 	public static Result mergeResults(Result left, Result right) {
+
+		final boolean leftFromDeletedAuthority = isFromDeletedAuthority(left);
+		final boolean rightFromDeletedAuthority = isFromDeletedAuthority(right);
+
+		if (leftFromDeletedAuthority && !rightFromDeletedAuthority) {
+			return left;
+		}
+		if (!leftFromDeletedAuthority && rightFromDeletedAuthority) {
+			return right;
+		}
+
 		if (new ResultTypeComparator().compare(left, right) < 0) {
 			left.mergeFrom(right);
 			return left;
@@ -54,6 +65,13 @@ public class OafMapperUtils {
 			right.mergeFrom(left);
 			return right;
 		}
+	}
+
+	private static boolean isFromDeletedAuthority(Result r) {
+		return r.getInstance()
+				.stream()
+				.map(i -> i.getCollectedfrom().getKey())
+				.anyMatch(cfId -> IdentifierFactory.delegatedAuthorityDatasourceIds().contains(cfId));
 	}
 
 	public static KeyValue keyValue(final String k, final String v) {

@@ -1,11 +1,11 @@
 
-package eu.dnetlib.dhp.oa.dedup;
+package eu.dnetlib.dhp.oa.merge;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-
-import java.util.Objects;
-import java.util.Optional;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -17,12 +17,10 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Objects;
+import java.util.Optional;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 public class DispatchEntitiesSparkJob {
 
@@ -38,7 +36,7 @@ public class DispatchEntitiesSparkJob {
 					.requireNonNull(
 						DispatchEntitiesSparkJob.class
 							.getResourceAsStream(
-								"/eu/dnetlib/dhp/oa/dedup/dispatch_entities_parameters.json")));
+								"/eu/dnetlib/dhp/oa/graph/group/dispatch_entities_parameters.json")));
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
 
