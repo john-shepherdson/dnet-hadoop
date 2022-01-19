@@ -68,10 +68,11 @@ public class OafMapperUtils {
 	}
 
 	private static boolean isFromDeletedAuthority(Result r) {
-		return r.getInstance()
-				.stream()
-				.map(i -> i.getCollectedfrom().getKey())
-				.anyMatch(cfId -> IdentifierFactory.delegatedAuthorityDatasourceIds().contains(cfId));
+		return r
+			.getInstance()
+			.stream()
+			.map(i -> i.getCollectedfrom().getKey())
+			.anyMatch(cfId -> IdentifierFactory.delegatedAuthorityDatasourceIds().contains(cfId));
 	}
 
 	public static KeyValue keyValue(final String k, final String v) {
