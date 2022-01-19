@@ -38,7 +38,7 @@ public class DispatchEntitiesSparkJob {
 					.requireNonNull(
 						DispatchEntitiesSparkJob.class
 							.getResourceAsStream(
-								"/eu/dnetlib/dhp/oa/graph/group/dispatch_entities_parameters.json")));
+								"/eu/dnetlib/dhp/oa/merge/dispatch_entities_parameters.json")));
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
 

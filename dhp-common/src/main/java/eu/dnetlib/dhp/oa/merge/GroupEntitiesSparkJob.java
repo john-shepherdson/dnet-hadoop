@@ -53,7 +53,7 @@ public class GroupEntitiesSparkJob {
 			.toString(
 				GroupEntitiesSparkJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/graph/group/group_graph_entities_parameters.json"));
+						"/eu/dnetlib/dhp/oa/merge/group_graph_entities_parameters.json"));
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
 
