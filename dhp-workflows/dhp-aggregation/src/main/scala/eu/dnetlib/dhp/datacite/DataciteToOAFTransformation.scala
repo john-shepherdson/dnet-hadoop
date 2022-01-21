@@ -19,10 +19,32 @@ import java.time.chrono.ThaiBuddhistDate
 import java.time.format.DateTimeFormatter
 import java.util.{Date, Locale}
 import scala.collection.JavaConverters._
+import scala.io.{Codec, Source}
 
 object DataciteToOAFTransformation {
 
+  case class HostedByMapType(
+    openaire_id: String,
+    datacite_name: String,
+    official_name: String,
+    similarity: Option[Float]
+  ) {}
+
   val mapper = new ObjectMapper()
+
+  val unknown_repository: HostedByMapType = HostedByMapType(
+    ModelConstants.UNKNOWN_REPOSITORY_ORIGINALID,
+    ModelConstants.UNKNOWN_REPOSITORY.getValue,
+    ModelConstants.UNKNOWN_REPOSITORY.getValue,
+    Some(1.0f)
+  )
+
+  val hostedByMap: Map[String, HostedByMapType] = {
+    val s = Source.fromInputStream(getClass.getResourceAsStream("hostedBy_map.json")).mkString
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+    lazy val json: org.json4s.JValue = parse(s)
+    json.extract[Map[String, HostedByMapType]]
+  }
 
   /** This method should skip record if json contains invalid text
     * defined in gile datacite_filter
@@ -534,12 +556,9 @@ object DataciteToOAFTransformation {
 
     if (client.isDefined) {
 
-      instance.setHostedby(
-        OafMapperUtils.keyValue(
-          generateDSId(ModelConstants.UNKNOWN_REPOSITORY_ORIGINALID),
-          ModelConstants.UNKNOWN_REPOSITORY.getValue
-        )
-      )
+      val hb = hostedByMap.getOrElse(client.get.toUpperCase(), unknown_repository)
+      instance.setHostedby(OafMapperUtils.keyValue(generateDSId(hb.openaire_id), hb.official_name))
+
       instance.setCollectedfrom(DATACITE_COLLECTED_FROM)
       instance.setUrl(List(s"https://dx.doi.org/$doi").asJava)
       instance.setAccessright(access_rights_qualifier)
