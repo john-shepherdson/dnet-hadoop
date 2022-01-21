@@ -283,7 +283,16 @@
         <error to="Kill"/>
     </action>
 
-    <join name="wait_dispatch" to="End"/>
+    <join name="wait_dispatch" to="copy_relation"/>
+
+    <action name="copy_relation">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/relation</arg>
+            <arg>${nameNode}/${graphOutputPath}/relation</arg>
+        </distcp>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
 
     <end name="End"/>
 </workflow-app>
