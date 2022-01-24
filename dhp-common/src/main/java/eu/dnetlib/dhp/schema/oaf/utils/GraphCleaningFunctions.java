@@ -88,6 +88,22 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	}
 
 	public static <T extends Oaf> boolean filter(T value) {
+		if (Boolean.TRUE
+			.equals(
+				Optional
+					.ofNullable(value)
+					.map(
+						o -> Optional
+							.ofNullable(o.getDataInfo())
+							.map(
+								d -> Optional
+									.ofNullable(d.getInvisible())
+									.orElse(true))
+							.orElse(true))
+					.orElse(true))) {
+			return true;
+		}
+
 		if (value instanceof Datasource) {
 			// nothing to evaluate here
 		} else if (value instanceof Project) {
