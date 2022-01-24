@@ -19,11 +19,20 @@
         </property>
     </parameters>
 
-    <start to="ResolveRelations"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
+    <action name="reset_outputpath">
+        <fs>
+            <delete path="${targetPath}"/>
+            <mkdir path="${targetPath}"/>
+        </fs>
+        <ok to="ResolveRelations"/>
+        <error to="Kill"/>
+    </action>
 
     <action name="ResolveRelations">
         <spark xmlns="uri:oozie:spark-action:0.2">
