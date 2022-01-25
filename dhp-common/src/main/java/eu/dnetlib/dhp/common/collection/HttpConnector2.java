@@ -116,7 +116,7 @@ public class HttpConnector2 {
 			String rateLimit = urlConn.getHeaderField(Constants.HTTPHEADER_IETF_DRAFT_RATELIMIT_LIMIT);
 			String rateRemaining = urlConn.getHeaderField(Constants.HTTPHEADER_IETF_DRAFT_RATELIMIT_REMAINING);
 
-			if ((rateLimit != null) && (rateRemaining != null) && (Integer.parseInt(rateRemaining) < 2)) {
+			if ((rateLimit != null) && (rateRemaining != null) && (Integer.parseInt(rateRemaining) < 9)) {
 				if (retryAfter > 0) {
 					backoffAndSleep(retryAfter);
 				} else {
