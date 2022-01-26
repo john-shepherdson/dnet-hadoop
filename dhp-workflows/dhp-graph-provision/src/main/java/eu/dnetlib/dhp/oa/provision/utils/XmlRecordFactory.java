@@ -49,6 +49,7 @@ import eu.dnetlib.dhp.oa.provision.model.XmlInstance;
 import eu.dnetlib.dhp.schema.common.*;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public class XmlRecordFactory implements Serializable {

@@ -1,7 +1,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:dnet="eu.dnetlib.data.transform.xml.AbstractDNetXsltFunctions" version="2.0">
 
-    <xsl:param    name="varDataSourceId" select="string('openaire____::eurocris')"/>
+    <xsl:param    name="varDataSourceId" select="string('eurocrisdris::dris')"/>
     <xsl:variable name="namespacePrefix" select="string('eurocrisdris')"/>
 
     <xsl:template match="/">
