@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.dedup;
+package eu.dnetlib.dhp.oa.merge;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static eu.dnetlib.dhp.utils.DHPUtils.toSeq;
@@ -53,7 +53,7 @@ public class GroupEntitiesSparkJob {
 			.toString(
 				GroupEntitiesSparkJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/dedup/group_graph_entities_parameters.json"));
+						"/eu/dnetlib/dhp/oa/merge/group_graph_entities_parameters.json"));
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
 
