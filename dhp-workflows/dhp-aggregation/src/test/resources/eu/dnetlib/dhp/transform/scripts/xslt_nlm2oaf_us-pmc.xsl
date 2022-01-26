@@ -31,11 +31,13 @@
      <xsl:variable name="year" select="format-number( ( //*[local-name()=&apos;article-meta&apos;]//*[local-name()=&apos;pub-date&apos;][@pub-type=&apos;epub&apos;]/*[local-name()=&apos;year&apos;] | //*[local-name()=&apos;article-meta&apos;]//*[local-name()=&apos;pub-date&apos;][@date-type=&apos;pub&apos; and @publication-format=&apos;electronic&apos;]/*[local-name()=&apos;year&apos;]), &apos;0000&apos;)" />
      <xsl:variable name="month" select="format-number( (//*[local-name()=&apos;article-meta&apos;]//*[local-name()=&apos;pub-date&apos;][@pub-type=&apos;epub&apos;]/*[local-name()=&apos;month&apos;] | //*[local-name()=&apos;article-meta&apos;]//*[local-name()=&apos;pub-date&apos;][@date-type=&apos;pub&apos; and @publication-format=&apos;electronic&apos;]/*[local-name()=&apos;month&apos;]), &apos;00&apos;)" />
      <xsl:variable name="day" select="format-number( (//*[local-name()=&apos;article-meta&apos;]//*[local-name()=&apos;pub-date&apos;][@pub-type=&apos;epub&apos;]/*[local-name()=&apos;day&apos;] | //*[local-name()=&apos;article-meta&apos;]//*[local-name()=&apos;pub-date&apos;][@date-type=&apos;pub&apos; and @publication-format=&apos;electronic&apos;]/*[local-name()=&apos;day&apos;]), &apos;00&apos;)" />
+
      <xsl:template name="terminate">
           <xsl:message terminate="yes">
                              	record is not compliant, transformation is interrupted.
           </xsl:message>
      </xsl:template>
+
      <xsl:template match="/">
           <record>
                <xsl:apply-templates select="//*[local-name() = &apos;header&apos;]" />

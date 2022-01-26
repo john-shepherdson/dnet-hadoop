@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type='text/xsl' href='/oai.xsl' ?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2021-11-18T15:55:16Z</responseDate>
+    <request identifier="oai:pub.uni-bielefeld.de:2527408" metadataPrefix="oai_openaire" verb="GetRecord">https://pub.uni-bielefeld.de/oai</request>
+
+    <GetRecord>
+        <record>
+            <header>
+                <identifier>oai:pub.uni-bielefeld.de:2527408</identifier>
+                <datestamp>2018-07-24T13:00:24Z</datestamp>
+                <setSpec>bi_dissertation</setSpec>
+                <setSpec>doc-type:doctoralThesis</setSpec>
+                <setSpec>ddc:540</setSpec>
+                <setSpec>bi_dissertationFtxt</setSpec>
+                <setSpec>open_access</setSpec>
+            </header>
+
+            <metadata>
+                <resource xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xmlns:dc="http://purl.org/dc/elements/1.1/"
+                    xmlns:dcterms="http://purl.org/dc/terms/"
+                    xmlns:datacite="http://datacite.org/schema/kernel-4"
+                    xmlns="http://namespace.openaire.eu/schema/oaire/" xsi:schemaLocation="http://namespace.openaire.eu/schema/oaire/ https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd">
+
+                    <datacite:titles>
+                        <datacite:title xml:lang="ger">Reaktionsverhalten organometallischer Verbindungen des Lithiums und des Calciums gegenüber Aminalen</datacite:title>
+                    </datacite:titles>
+                    <datacite:creators>
+                        <datacite:creator>
+                            <datacite:creatorName nameType="Personal">Hülsmann, Matthias</datacite:creatorName>
+                            <datacite:givenName>Matthias</datacite:givenName>
+                            <datacite:familyName>Hülsmann</datacite:familyName>
+                            <datacite:affiliation affiliationIdentifierScheme="ROR" schemeURI="https://ror.org/" affiliationIdentifier="02hpadn98">Bielefeld University</datacite:affiliation>
+                        </datacite:creator>
+                    </datacite:creators>
+
+                    <datacite:relatedIdentifiers>
+                        <datacite:relatedIdentifier relatedIdentifierType="URL" relationType="HasMetadata">https://pub.uni-bielefeld.de/record/2527408.json</datacite:relatedIdentifier>
+                    </datacite:relatedIdentifiers>
+                    <datacite:alternateIdentifiers>
+                        <datacite:alternateIdentifier alternateIdentifierType="URN">urn:nbn:de:hbz:361-25274082</datacite:alternateIdentifier>
+                    </datacite:alternateIdentifiers>
+
+                    <dc:language>ger</dc:language>
+                    <datacite:date dateType="Issued">2012</datacite:date>
+                    <resourceType resourceTypeGeneral="literature" uri="http://purl.org/coar/resource_type/c_1843">bi_dissertation</resourceType>
+                    <dc:format>application/pdf</dc:format>
+                    <datacite:identifier identifierType="URL">https://pub.uni-bielefeld.de/record/2527408</datacite:identifier>
+
+                    <datacite:rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</datacite:rights>
+                    <dc:source>Hülsmann M. <em>Reaktionsverhalten organometallischer Verbindungen des Lithiums und des Calciums gegenüber Aminalen</em>. Bielefeld: Universität Bielefeld; 2012.</dc:source>
+
+                    <datacite:subjects>
+                        <datacite:subject schemeURI="http://dewey.info/" subjectScheme="dewey">540</datacite:subject>
+                    </datacite:subjects>
+                    <licenseCondition uri="https://rightsstatements.org/page/InC/1.0/">In Copyright</licenseCondition>
+                    <datacite:sizes>
+                        <datacite:size>8 B</datacite:size>
+                    </datacite:sizes>
+                    <file accessRightsURI="" mimeType="application/pdf">https://pub.uni-bielefeld.de/download/2527408/2527412</file>
+
+                </resource>
+
+            </metadata>
+        </record>
+    </GetRecord>
+</OAI-PMH>

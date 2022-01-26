@@ -1,7 +1,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:dnet="eu.dnetlib.data.transform.xml.AbstractDNetXsltFunctions" version="2.0">
 
-    <xsl:param name="varDataSourceId" select="string('eurocrisdris::dris')"/>
+    <xsl:param    name="varDataSourceId" select="string('openaire____::eurocris')"/>
     <xsl:variable name="namespacePrefix" select="string('eurocrisdris')"/>
 
     <xsl:template match="/">
@@ -14,16 +14,16 @@
                 <xsl:variable name="apiId" select="concat('api_________::', $datasourceId, '::0')"/>
                 <xsl:variable name="repositoryType">
                     <xsl:choose>
-                        <xsl:when test="lower-case(normalize-space(//oat_included/label/en)) = 'Institutional'">
+                        <xsl:when test="lower-case(normalize-space(//scope)) = 'vocabs:scopes/classcerif00889'">
                             <xsl:value-of select="string('crissystem::institutional')"/>
                         </xsl:when>
-                        <xsl:when test="lower-case(normalize-space(//oat_included/label/en)) = 'National'">
+                        <xsl:when test="lower-case(normalize-space(//scope)) = 'vocabs:scopes/classcerif00939'">
                             <xsl:value-of select="string('crissystem::national')"/>
                         </xsl:when>
-                        <xsl:when test="lower-case(normalize-space(//oat_included/label/en)) = 'Funder'">
+                        <xsl:when test="lower-case(normalize-space(//scope)) = 'vocabs:scopes/classcerif00122'">
                             <xsl:value-of select="string('crissystem::funder')"/>
                         </xsl:when>
-                        <xsl:when test="lower-case(normalize-space(//oat_included/label/en)) = 'Regional'">
+                        <xsl:when test="lower-case(normalize-space(//scope)) = 'vocabs:scopes/classcerif00938'">
                             <xsl:value-of select="string('crissystem::regional')"/>
                         </xsl:when>
                         <xsl:otherwise>
@@ -90,6 +90,24 @@
                             </xsl:when>
                             <xsl:when test="lower-case(substring(normalize-space(oat_id),string-length(oat_id) -30 +1,30)) = 'cris-platforms/classcerif01767'">
                                 <xsl:value-of select="string('Symplectic Elements')"/>
+                            </xsl:when>
+                            <xsl:when test="lower-case(substring(normalize-space(oat_id),string-length(oat_id) -30 +1,30)) = 'cris-platforms/classcerif01768'">
+                                <xsl:value-of select="string('UXXI-INV')"/>
+                            </xsl:when>
+                            <xsl:when test="lower-case(substring(normalize-space(oat_id),string-length(oat_id) -30 +1,30)) = 'cris-platforms/classcerif01769'">
+                                <xsl:value-of select="string('VIVO')"/>
+                            </xsl:when>
+                            <xsl:when test="lower-case(substring(normalize-space(oat_id),string-length(oat_id) -30 +1,30)) = 'cris-platforms/classcerif01770'">
+                                <xsl:value-of select="string('Worktribe')"/>
+                            </xsl:when>
+                            <xsl:when test="lower-case(substring(normalize-space(oat_id),string-length(oat_id) -30 +1,30)) = 'cris-platforms/classcerif01854'">
+                                <xsl:value-of select="string('HISinOne-RES')"/>
+                            </xsl:when>
+                            <xsl:when test="lower-case(substring(normalize-space(oat_id),string-length(oat_id) -30 +1,30)) = 'cris-platforms/classcerif01960'">
+                                <xsl:value-of select="string('Dialnet CRIS')"/>
+                            </xsl:when>
+                            <xsl:when test="lower-case(substring(normalize-space(oat_id),string-length(oat_id) -30 +1,30)) = 'cris-platforms/classcerif01961'">
+                                <xsl:value-of select="string('Esploro')"/>
                             </xsl:when>
                         </xsl:choose>
                     </xsl:for-each>
@@ -332,7 +350,7 @@
                     </ROW>
                     </xsl:when>
 
-                </xsl:choose>
+                    </xsl:choose>
 
                 </ROWS>
             </metadata>

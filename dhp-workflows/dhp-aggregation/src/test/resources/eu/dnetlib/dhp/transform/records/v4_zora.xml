@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='UTF-8'?><?xml-stylesheet type='text/xsl' href='/oai2.xsl' ?>
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+    <responseDate>2021-11-18T15:55:56Z</responseDate>
+    <request verb="GetRecord" identifier="oai:www.zora.uzh.ch:10" metadataPrefix="oai_openaire">https://www.zora.uzh.ch/cgi/oai2</request>
+    <GetRecord>
+        <record>
+            <header>
+                <identifier>oai:www.zora.uzh.ch:10</identifier>
+                <datestamp>2021-02-12T18:13:36Z</datestamp>
+                <setSpec>7375626A656374733D3130323531:3130303832</setSpec>
+                <setSpec>7375626A656374733D3130323531:3130313834</setSpec>
+                <setSpec>7375626A656374733D3130313730:3130313938:3130313939</setSpec>
+                <setSpec>74797065733D61727469636C65</setSpec>
+                <setSpec>73776973736269623D596573</setSpec>
+                <setSpec>6574683D596573</setSpec>
+                <setSpec>6E623D4E6F</setSpec>
+            </header>
+            <metadata>
+                <oaire:resource xmlns:oaire="http://namespace.openaire.eu/schema/oaire/"
+                    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                    xmlns:dc="http://www.w3.org/2001/XMLSchema-instance"
+                    xmlns:datacite="http://datacite.org/schema/kernel-4"
+                    xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" xsi:schemaLocation="http://namespace.openaire.eu/schema/oaire/ https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                    <datacite:titles>
+                        <datacite:title>Adhesive properties of Enterobacter sakazakii to human epithelial and brain microvascular endothelial cells</datacite:title>
+                    </datacite:titles>
+                    <datacite:creators>
+                        <datacite:creator>
+                            <datacite:creatorName nameType="Personal">Mange, J P</datacite:creatorName>
+                            <datacite:givenName>J P</datacite:givenName>
+                            <datacite:familyName>Mange</datacite:familyName>
+                            <datacite:affiliation affiliationIdentifier="60012614" affiliationIdentifierScheme="Scopus" SchemeURI="https://www.scopus.com/">University of Zurich|Zurich|Switzerland</datacite:affiliation>
+                        </datacite:creator>
+                        <datacite:creator>
+                            <datacite:creatorName nameType="Personal">Stephan, Roger</datacite:creatorName>
+                            <datacite:givenName>Roger</datacite:givenName>
+                            <datacite:familyName>Stephan</datacite:familyName>
+                            <datacite:nameIdentifier schemeURI="http://orcid.org/" nameIdentifierScheme="ORCID">https://orcid.org/0000-0003-1002-4762</datacite:nameIdentifier>
+                            <datacite:affiliation affiliationIdentifier="60012614" affiliationIdentifierScheme="Scopus" SchemeURI="https://www.scopus.com/">University of Zurich|Zurich|Switzerland</datacite:affiliation>
+                        </datacite:creator>
+                        <datacite:creator>
+                            <datacite:creatorName nameType="Personal">Borel, Nicole</datacite:creatorName>
+                            <datacite:givenName>Nicole</datacite:givenName>
+                            <datacite:familyName>Borel</datacite:familyName>
+                            <datacite:nameIdentifier schemeURI="http://orcid.org/" nameIdentifierScheme="ORCID">https://orcid.org/0000-0002-1556-9262</datacite:nameIdentifier>
+                            <datacite:affiliation affiliationIdentifier="60012614" affiliationIdentifierScheme="Scopus" SchemeURI="https://www.scopus.com/">University of Zurich|Zurich|Switzerland</datacite:affiliation>
+                        </datacite:creator>
+                        <datacite:creator>
+                            <datacite:creatorName nameType="Personal">Wild, P</datacite:creatorName>
+                            <datacite:givenName>P</datacite:givenName>
+                            <datacite:familyName>Wild</datacite:familyName>
+                            <datacite:affiliation affiliationIdentifier="60012614" affiliationIdentifierScheme="Scopus" SchemeURI="https://www.scopus.com/">University of Zurich|Zurich|Switzerland</datacite:affiliation>
+                        </datacite:creator>
+                        <datacite:creator>
+                            <datacite:creatorName nameType="Personal">Kim, Kwang Sik</datacite:creatorName>
+                            <datacite:givenName>Kwang Sik</datacite:givenName>
+                            <datacite:familyName>Kim</datacite:familyName>
+                            <datacite:affiliation affiliationIdentifier="60005248" affiliationIdentifierScheme="Scopus" SchemeURI="https://www.scopus.com/">Johns Hopkins University|Baltimore|United States</datacite:affiliation>
+                        </datacite:creator>
+                        <datacite:creator>
+                            <datacite:creatorName nameType="Personal">Pospischil, A</datacite:creatorName>
+                            <datacite:givenName>A</datacite:givenName>
+                            <datacite:familyName>Pospischil</datacite:familyName>
+                            <datacite:affiliation affiliationIdentifier="60012614" affiliationIdentifierScheme="Scopus" SchemeURI="https://www.scopus.com/">University of Zurich|Zurich|Switzerland</datacite:affiliation>
+                        </datacite:creator>
+                        <datacite:creator>
+                            <datacite:creatorName nameType="Personal">Lehner, Angelika</datacite:creatorName>
+                            <datacite:givenName>Angelika</datacite:givenName>
+                            <datacite:familyName>Lehner</datacite:familyName>
+                            <datacite:nameIdentifier schemeURI="http://orcid.org/" nameIdentifierScheme="ORCID">https://orcid.org/0000-0003-1863-5090</datacite:nameIdentifier>
+                            <datacite:affiliation affiliationIdentifier="60012614" affiliationIdentifierScheme="Scopus" SchemeURI="https://www.scopus.com/">University of Zurich|Zurich|Switzerland</datacite:affiliation>
+                        </datacite:creator>
+                    </datacite:creators>
+                    <datacite:contributors>
+                        <datacite:contributor contributorType="HostingInstitution">
+                            <datacite:contributorName nameType="Organizational">University of Zurich</datacite:contributorName>
+                            <datacite:nameIdentifier schemeURI="http://www.crossref.org/fundref/" nameIdentifierScheme="CrossRef Funder DOI">https://doi.org/10.13039/501100006447</datacite:nameIdentifier>
+                        </datacite:contributor>
+                        <datacite:contributor contributorType="ContactPerson">
+                            <datacite:contributorName nameType="Personal">Stephan, Roger</datacite:contributorName>
+                            <datacite:givenName>Roger</datacite:givenName>
+                            <datacite:familyName>Stephan</datacite:familyName>
+                            <datacite:nameIdentifier schemeURI="http://orcid.org/" nameIdentifierScheme="ORCID">https://orcid.org/0000-0003-1002-4762</datacite:nameIdentifier>
+                            <datacite:affiliation affiliationIdentifier="60012614" affiliationIdentifierScheme="Scopus" SchemeURI="https://www.scopus.com/">University of Zurich|Zurich|Switzerland</datacite:affiliation>
+                        </datacite:contributor>
+                    </datacite:contributors>
+                    <datacite:alternateIdentifiers>
+                        <datacite:alternateIdentifier alternateIdentifierType="URL">https://www.zora.uzh.ch/id/eprint/10/</datacite:alternateIdentifier>
+                    </datacite:alternateIdentifiers>
+                    <datacite:relatedIdentifiers>
+                        <datacite:relatedIdentifier relationType="Cites" relatedIdentifierType="DOI">10.1186/1471-2180-6-58</datacite:relatedIdentifier>
+                        <datacite:relatedIdentifier relationType="Cites" relatedIdentifierType="PMID">16800879</datacite:relatedIdentifier>
+                        <datacite:relatedIdentifier relationType="HasPart" relatedIdentifierType="URL">https://www.zora.uzh.ch/id/eprint/10/1/Mange_Microb2006V.pdf</datacite:relatedIdentifier>
+                    </datacite:relatedIdentifiers>
+                    <datacite:dates>
+                        <datacite:date dateType="Created">2008-02-11T12:11:38</datacite:date>
+                        <datacite:date dateType="Created">2008-05-12T22:52:34</datacite:date>
+                        <datacite:date dateType="Accepted">2008-02-11T12:11:37</datacite:date>
+                        <datacite:date dateType="Updated">2021-02-12T18:13:36</datacite:date>
+                        <datacite:date dateType="Issued">2006</datacite:date>
+                    </datacite:dates>
+                    <dc:language>en</dc:language>
+                    <dc:publisher>BioMed Central</dc:publisher>
+                    <oaire:resourceType uri="http://purl.org/coar/resource_type/c_6501" resourceTypeGeneral="literature">journal article</oaire:resourceType>
+                    <dc:description>BACKGROUND: Enterobacter sakazakii is an opportunistic pathogen that has been associated with sporadic cases and outbreaks causing meningitis, necrotizing enterocolitis and sepsis especially in neonates. However, up to now little is known about the mechanisms of pathogenicity in E. sakazakii. A necessary state in the successful colonization, establishment and ultimately production of disease by microbial pathogens is the ability to adhere to host surfaces such as mucous membranes, gastric and intestinal epithelial or endothelial tissue.This study examined for the first time the adherence ability of 50 E. sakazakii strains to the two epithelial cell lines HEp-2 and Caco-2, as well as the brain microvascular endothelial cell line HBMEC. Furthermore, the effects of bacterial culture conditions on the adherence behaviour were investigated. An attempt was made to characterize the factors involved in adherence. RESULTS: Two distinctive adherence patterns, a diffuse adhesion and the formation of localized clusters of bacteria on the cell surface could be distinguished on all three cell lines. In some strains, a mixture of both patterns was observed. Adherence was maximal during late exponential phase, and increased with higher MOI. The adhesion capacity of E. sakazakii to HBMEC cells was affected by the addition of blood to the bacteria growth medium. Mannose, hemagglutination, trypsin digestion experiments and transmission electron microscopy suggested that the adhesion of E. sakazakii to the epithelial and endothelial cells is mainly non-fimbrial based. CONCLUSION: Adherence experiments show heterogeneity within different E. sakazakii strains. In agreement with studies on E. cloacae, we found no relationship between the adhesive capacities in E. sakazakii and the eventual production of specific fimbriae. Further studies will have to be carried out in order to determine the adhesin(s) involved in the interaction of E. sakazakii with cells and to enhance knowledge of the pathogenesis of E. sakazakii infection.</dc:description>
+                    <dc:formats>
+                        <dc:format>Mange_Microb2006V.pdf - application/pdf</dc:format>
+                    </dc:formats>
+                    <datacite:identifier identifierType="DOI">10.5167/uzh-10</datacite:identifier>
+                    <datacite:rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</datacite:rights>
+                    <dc:source>Mange, J P; Stephan, Roger; Borel, Nicole; Wild, P; Kim, Kwang Sik; Pospischil, A; Lehner, Angelika (2006). Adhesive properties of Enterobacter sakazakii to human epithelial and brain microvascular endothelial cells. BMC Microbiology, 6:58.</dc:source>
+                    <datacite:subjects>
+                        <datacite:subject classificationCode="570" valueURI="http://dewey.info/class/570/" subjectScheme="Dewey Decimal Classification" xml:lang="en" schemeURI="http://dewey.info/scheme/">570 Life sciences; biology</datacite:subject>
+                        <datacite:subject classificationCode="610" valueURI="http://dewey.info/class/610/" subjectScheme="Dewey Decimal Classification" xml:lang="en" schemeURI="http://dewey.info/scheme/">610 Medicine &amp; health</datacite:subject>
+                        <datacite:subject classificationCode="10082" valueURI="https://www.zora.uzh.ch/view/subjectsnew/10082.html" subjectScheme="ZORA Communities &amp; Collections" xml:lang="en">10082 Institute of Food Safety and Hygiene</datacite:subject>
+                        <datacite:subject classificationCode="10184" valueURI="https://www.zora.uzh.ch/view/subjectsnew/10184.html" subjectScheme="ZORA Communities &amp; Collections" xml:lang="en">10184 Institute of Veterinary Pathology</datacite:subject>
+                        <datacite:subject classificationCode="10199" valueURI="https://www.zora.uzh.ch/view/subjectsnew/10199.html" subjectScheme="ZORA Communities &amp; Collections" xml:lang="en">10199 Clinic for Clinical Pharmacology and Toxicology</datacite:subject>
+                        <datacite:subject classificationCode="2404" subjectScheme="Scopus Subject Areas" xml:lang="en">2404 Microbiology</datacite:subject>
+                        <datacite:subject classificationCode="2726" subjectScheme="Scopus Subject Areas" xml:lang="en">2726 Microbiology (medical)</datacite:subject>
+                    </datacite:subjects>
+                    <oaire:licenseCondition startDate="unknown" uri="http://creativecommons.org/licenses/by/2.0/">Creative Commons: Attribution 2.0 Generic (CC BY 2.0)</oaire:licenseCondition>
+                    <datacite:sizes>
+                        <datacite:size>1MB</datacite:size>
+                    </datacite:sizes>
+                </oaire:resource>
+            </metadata>
+        </record>
+    </GetRecord>
+</OAI-PMH>

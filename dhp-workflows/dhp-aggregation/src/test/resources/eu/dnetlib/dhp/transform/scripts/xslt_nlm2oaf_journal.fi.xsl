@@ -37,7 +37,7 @@
 
                <xsl:template name="terminate">
                 	<xsl:message terminate="yes">
-                             	record is not compliant, transformation is interrupted.
+                             	record is not compliant, transformation skipped this record.
                 	</xsl:message>
                </xsl:template>
 

@@ -1,0 +1,28 @@
+<RESOURCE_PROFILE>
+    <HEADER>
+        <RESOURCE_IDENTIFIER value="5c777768-c164-41aa-90f1-58d17b4b272d_VHJhbnNmb3JtYXRpb25SdWxlRFNSZXNvdXJjZXMvVHJhbnNmb3JtYXRpb25SdWxlRFNSZXNvdXJjZVR5cGU="/>
+        <RESOURCE_TYPE value="TransformationRuleDSResourceType"/>
+        <RESOURCE_KIND value="TransformationRuleDSResources"/>
+        <RESOURCE_URI value=""/>
+        <DATE_OF_CREATION value="2021-10-25T10:22:21+00:00"/>
+    </HEADER>
+    <BODY>
+        <CONFIGURATION>
+            <SOURCE_METADATA_FORMAT interpretation="cleaned" layout="store" name="odf"/>
+            <SINK_METADATA_FORMAT name="odf_hbase"/>
+            <IMPORTED/>
+            <SCRIPT>
+                <TITLE>xslt_...._hadoop</TITLE>
+                <CODE><!-- adaptation 2021-08-23 ; ACz/UNIBI -->
+
+
+
+
+
+                </CODE>
+            </SCRIPT>
+        </CONFIGURATION>
+        <STATUS/>
+        <SECURITY_PARAMETERS/>
+    </BODY>
+</RESOURCE_PROFILE>

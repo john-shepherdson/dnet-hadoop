@@ -8,44 +8,64 @@
         xmlns:vocabulary="http://eu/dnetlib/transform/clean"
         xmlns:dateCleaner="http://eu/dnetlib/transform/dateISO"
         exclude-result-prefixes="xsl vocabulary dateCleaner"
-        version="2.0">
+        version="3.0">
     <xsl:param name="varOfficialName" />
-    <xsl:param name="varDsType" />
     <xsl:param name="varDataSourceId" />
-    <xsl:param name="varFP7" select="'corda_______::'" />
-    <xsl:param name="varH2020" select="'corda__h2020::'" />
-    <xsl:param name="varAKA" select="'aka_________::'" />
-    <xsl:param name="varARC" select="'arc_________::'" />
-    <xsl:param name="varCONICYT" select="'conicytf____::'" />
-    <xsl:param name="varDFG" select="'dfgf________::'" />
-    <xsl:param name="varFCT" select="'fct_________::'" />
-    <xsl:param name="varFWF" select="'fwf_________::'" />
-    <xsl:param name="varHRZZ" select="'irb_hr______::'" /> <!-- HRZZ not found -->
-    <xsl:param name="varMESTD" select="'mestd_______::'" />
-    <xsl:param name="varMZOS" select="'irb_hr______::'" />
-    <xsl:param name="varNHMRC" select="'nhmrc_______::'" />
-    <xsl:param name="varNIH" select="'nih_________::'" />
-    <xsl:param name="varNSF" select="'nsf_________::'" />
-    <xsl:param name="varNWO" select="'nwo_________::'" />
-    <xsl:param name="varRCUK" select="'rcuk________::'" />
-    <xsl:param name="varSFI" select="'sfi_________::'" />
-    <xsl:param name="varSGOV" select="'sgov________::'" /> <!-- SGOV to be added, awaiting DOI from Pilar, found project ids not in CSV list? -->
-    <xsl:param name="varSNSF" select="'snsf________::'" />
-    <xsl:param name="varTARA" select="'taraexp_____::'" /> <!-- TARA to be added, awaiting DOI from André -->
-    <xsl:param name="varTUBITAK" select="'tubitakf____::'" />
-    <xsl:param name="varWT" select="'wt__________::'" />
+
+    <xsl:param name="varAKA"    select = "'aka_________::'"/>
+    <xsl:param name="varARC"    select = "'arc_________::'"/>
+    <xsl:param name="varANR"    select = "'anr_________::'"/>
+    <xsl:param name="varCHISTERA" select = "'chistera____::'"/>
+    <xsl:param name="varCONICYT" select = "'conicytf____::'"/>
+    <xsl:param name="varDFG"    select = "'dfgf________::'"/>
+    <xsl:param name="varEUENVAGENCY" select = "'euenvagency_::'"/>
+    <xsl:param name="varFCT"    select = "'fct_________::'"/>
+    <xsl:param name="varFP7"    select = "'corda_______::'"/>
+    <xsl:param name="varFWF"    select = "'fwf_________::'"/>
+    <xsl:param name="varGSRI"   select = "'gsri________::'"/>
+    <xsl:param name="varGSRT"   select = "'gsrt________::'"/>
+    <xsl:param name="varH2020"  select = "'corda__h2020::'"/>
+    <xsl:param name="varHRZZ"   select = "'irb_hr______::'"/>    <!-- HRZZ not found -->
+    <xsl:param name="varINNOVIRIS" select = "'innoviris___::'"/>
+    <xsl:param name="varMESTD"  select = "'mestd_______::'"/>
+    <xsl:param name="varMIUR"   select = "'miur________::'"/>
+    <xsl:param name="varMZOS"   select = "'irb_hr______::'"/>
+    <xsl:param name="varNHMRC"  select = "'nhmrc_______::'"/>
+    <xsl:param name="varNIH"    select = "'nih_________::'"/>
+    <xsl:param name="varNSF"    select = "'nsf_________::'"/>
+    <xsl:param name="varNWO"    select = "'nwo_________::'"/>
+    <xsl:param name="varRCUK"   select = "'rcuk________::'"/>     <!-- RCUK getting changed to UKRI -->
+    <xsl:param name="varRIF"    select = "'rif_________::'"/>
+    <xsl:param name="varRSF"    select = "'rsf_________::'"/>
+    <xsl:param name="varSFI"    select = "'sfi_________::'"/>
+    <xsl:param name="varSFRS"   select = "'sfrs________::'"/>
+    <xsl:param name="varSGOV"   select = "'sgov________::'"/>     <!-- SGOV to be added, awaiting DOI from Pilar, found project ids not in CSV list? -->
+    <xsl:param name="varSNSF"   select = "'snsf________::'"/>
+    <xsl:param name="varTARA"   select = "'taraexp_____::'"/>     <!-- TARA to be added, awaiting DOI from André -->
+    <xsl:param name="varTUBITAK" select = "'tubitakf____::'"/>
+    <xsl:param name="varUKRI"   select = "'ukri________::'"/>     <!-- RCUK getting changed to UKRI -->
+    <xsl:param name="varWT"     select = "'wt__________::'"/>
+
     <xsl:param name="index" select="0" />
     <xsl:param name="transDate" select="current-dateTime()" />
+
     <xsl:variable name="datasourcePrefix" select="normalize-space(//oaf:datasourceprefix)" />
+
     <xsl:template match="/">
         <xsl:call-template name="validRecord" />
     </xsl:template>
+
     <xsl:template name="terminate">
         <xsl:message terminate="yes">
             record is not compliant, transformation is interrupted.
         </xsl:message>
     </xsl:template>
+
     <xsl:template name="validRecord">
+
+        <xsl:value-of select="if(string(replace(normalize-space(.), '([0-9]{2})\D([0-9]{2})\D([0-9]{4})', '$3-$1-$2')) castable as xs:date) then normalize-space(.) else ''"></xsl:value-of>
+
+
         <record>
             <xsl:apply-templates select="//*[local-name() = 'header']" />
             <metadata>
@@ -85,7 +105,7 @@
                     <xsl:variable name="varEmbargoEndDate" select="dateCleaner:dateISO( normalize-space(//*[local-name()='date'][@dateType='Available']))" />
 
                     <xsl:choose>
-                        <xsl:when test="string-length($varEmbargoEndDate) &gt; 0">
+                        <xsl:when test="string-length($varEmbargoEndDate) > 0">
                             <oaf:embargoenddate>
                                 <xsl:value-of select="$varEmbargoEndDate" />
                             </oaf:embargoenddate>
@@ -158,6 +178,10 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:variable>
+                    
+                    <xsl:if test="not($theDate castable as xs:date))">
+                        <xsl:call-template name="terminate" />
+                    </xsl:if>
                     <xsl:value-of select="dateCleaner:dateISO( normalize-space($theDate) )" />
                 </oaf:dateAccepted>
                 <xsl:choose>
