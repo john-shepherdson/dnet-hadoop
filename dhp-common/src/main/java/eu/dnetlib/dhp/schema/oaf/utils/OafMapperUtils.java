@@ -48,13 +48,13 @@ public class OafMapperUtils {
 
 	public static Result mergeResults(Result left, Result right) {
 
-		final boolean leftFromDeletedAuthority = isFromDelegatedAuthority(left);
-		final boolean rightFromDeletedAuthority = isFromDelegatedAuthority(right);
+		final boolean leftFromDelegatedAuthority = isFromDelegatedAuthority(left);
+		final boolean rightFromDelegatedAuthority = isFromDelegatedAuthority(right);
 
-		if (leftFromDeletedAuthority && !rightFromDeletedAuthority) {
+		if (leftFromDelegatedAuthority && !rightFromDelegatedAuthority) {
 			return left;
 		}
-		if (!leftFromDeletedAuthority && rightFromDeletedAuthority) {
+		if (!leftFromDelegatedAuthority && rightFromDelegatedAuthority) {
 			return right;
 		}
 
