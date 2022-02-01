@@ -21,8 +21,10 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.SDGDataModel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class PrepareSDGSparkJob implements Serializable {
@@ -78,6 +80,19 @@ public class PrepareSDGSparkJob implements Serializable {
 						s -> sbjs
 							.add(getSubject(s.getSbj(), SDG_CLASS_ID, SDG_CLASS_NAME, UPDATE_SUBJECT_SDG_CLASS_ID)));
 				r.setSubject(sbjs);
+				r
+					.setDataInfo(
+						OafMapperUtils
+							.dataInfo(
+								false, null, true,
+								false,
+								OafMapperUtils
+									.qualifier(
+										ModelConstants.PROVENANCE_ENRICH,
+										null,
+										ModelConstants.DNET_PROVENANCE_ACTIONS,
+										ModelConstants.DNET_PROVENANCE_ACTIONS),
+								null));
 				return r;
 			}, Encoders.bean(Result.class))
 			.write()
