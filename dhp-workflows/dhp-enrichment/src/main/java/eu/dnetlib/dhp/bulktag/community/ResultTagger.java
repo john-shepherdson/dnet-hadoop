@@ -102,7 +102,8 @@ public class ResultTagger implements Serializable {
 //				.flatMap(p -> Stream.of(p.getFst(), p.getSnd()))
 //				.map(s -> StringUtils.substringAfter(s, "|"))
 //				.collect(Collectors.toCollection(HashSet::new))
-				tmp.forEach(
+			tmp
+				.forEach(
 					dsId -> datasources
 						.addAll(
 							conf.getCommunityForDatasource(dsId, param)));
