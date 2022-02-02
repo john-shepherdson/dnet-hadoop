@@ -814,6 +814,21 @@ class MappersTest {
 		}
 	}
 
+	@Test
+	void testOpenAPC() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_openapc.xml")));
+		final List<Oaf> list = new OafToOafMapper(vocs, true, true).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		final Publication p = (Publication) list.get(0);
+		assertTrue(p.getInstance().size() > 0);
+
+		assertEquals("https://doi.org/10.1155/2015/439379", p.getInstance().get(0).getUrl().get(0));
+	}
+
 	private void assertValidId(final String id) {
 		// System.out.println(id);
 
