@@ -14,7 +14,7 @@ LEFT OUTER JOIN
 (
     SELECT substr(d.id, 4) id 
     from ${openaire_db_name}.datasource d 
-    WHERE d.datainfo.deletedbyinference=false) d on p.datasource = d.id;
+    WHERE d.datainfo.deletedbyinference=false and d.datainfo.invisible = FALSE) d on p.datasource = d.id;
 
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.dataset_sources as 
 SELECT p.id, case when d.id is null then 'other' else p.datasource end as datasource 
@@ -25,7 +25,7 @@ LEFT OUTER JOIN
 (
     SELECT substr(d.id, 4) id 
     from ${openaire_db_name}.datasource d 
-    WHERE d.datainfo.deletedbyinference=false) d on p.datasource = d.id;
+    WHERE d.datainfo.deletedbyinference=false and d.datainfo.invisible = FALSE) d on p.datasource = d.id;
     
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.software_sources as 
 SELECT p.id, case when d.id is null then 'other' else p.datasource end as datasource 
@@ -36,7 +36,7 @@ LEFT OUTER JOIN
 (
     SELECT substr(d.id, 4) id 
     from ${openaire_db_name}.datasource d 
-    WHERE d.datainfo.deletedbyinference=false) d on p.datasource = d.id;
+    WHERE d.datainfo.deletedbyinference=false and d.datainfo.invisible = FALSE) d on p.datasource = d.id;
     
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.otherresearchproduct_sources as 
 SELECT p.id, case when d.id is null then 'other' else p.datasource end as datasource 
@@ -47,7 +47,7 @@ LEFT OUTER JOIN
 (
     SELECT substr(d.id, 4) id 
     from ${openaire_db_name}.datasource d 
-    WHERE d.datainfo.deletedbyinference=false) d on p.datasource = d.id;
+    WHERE d.datainfo.deletedbyinference=false and d.datainfo.invisible = FALSE) d on p.datasource = d.id;
     
 CREATE VIEW IF NOT EXISTS ${stats_db_name}.result_sources AS
 SELECT * FROM ${stats_db_name}.publication_sources
@@ -76,8 +76,8 @@ join ${openaire_db_name}.result r1 on rel.source=r1.id
 join ${openaire_db_name}.result r2 on r2.id=rel.target
 where reltype='resultResult'
     and r1.resulttype.classname!=r2.resulttype.classname
-    and r1.datainfo.deletedbyinference=false
-    and r2.datainfo.deletedbyinference=false
+    and r1.datainfo.deletedbyinference=false and r1.datainfo.invisible = FALSE
+    and r2.datainfo.deletedbyinference=false and r2.datainfo.invisible = FALSE
     and r1.resulttype.classname != 'other'
     and r2.resulttype.classname != 'other'
-    and rel.datainfo.deletedbyinference=false;
+    and rel.datainfo.deletedbyinference=false and rel.datainfo.invisible = FALSE;
