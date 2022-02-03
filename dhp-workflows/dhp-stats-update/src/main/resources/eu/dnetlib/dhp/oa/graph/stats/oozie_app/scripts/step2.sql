@@ -64,7 +64,7 @@ FROM (
          LEFT OUTER JOIN (
     SELECT substr(d.id, 4) id
     from ${openaire_db_name}.datasource d
-    WHERE d.datainfo.deletedbyinference = false and p.datainfo.invisible=false) d on p.datasource = d.id;
+    WHERE d.datainfo.deletedbyinference = false and d.datainfo.invisible=false) d on p.datasource = d.id;
 
 CREATE TABLE ${stats_db_name}.publication_languages AS
 select substr(p.id, 4) as id, p.language.classname as language
