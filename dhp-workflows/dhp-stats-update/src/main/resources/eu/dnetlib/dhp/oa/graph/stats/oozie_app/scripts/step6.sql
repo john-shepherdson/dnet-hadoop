@@ -5,24 +5,26 @@
 ------------------------------------------------------
 CREATE TABLE ${stats_db_name}.project_oids AS
 SELECT substr(p.id, 4) AS id, oids.ids AS oid
-FROM ${openaire_db_name}.project p LATERAL VIEW explode(p.originalid) oids AS ids;
+FROM ${openaire_db_name}.project p LATERAL VIEW explode(p.originalid) oids AS ids
+where p.datainfo.deletedbyinference=false  and p.datainfo.invisible=false;
+
 CREATE TABLE ${stats_db_name}.project_organizations AS
 SELECT substr(r.source, 4) AS id, substr(r.target, 4) AS organization
 from ${openaire_db_name}.relation r
 WHERE r.reltype = 'projectOrganization'
-  and r.datainfo.deletedbyinference = false;
+  and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false;
 
 CREATE TABLE ${stats_db_name}.project_results AS
 SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS result, r.datainfo.provenanceaction.classname as provenance
 FROM ${openaire_db_name}.relation r
 WHERE r.reltype = 'resultProject'
-  and r.datainfo.deletedbyinference = false;
+  and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false;
 
 create table ${stats_db_name}.project_classification as
 select substr(p.id, 4) as id, class.h2020programme.code, class.level1, class.level2, class.level3
 from ${openaire_db_name}.project p
     lateral view explode(p.h2020classification) classifs as class
-where p.datainfo.deletedbyinference=false and class.h2020programme is not null;
+where p.datainfo.deletedbyinference=false and p.datainfo.invisible=false and class.h2020programme is not null;
 
 CREATE TABLE ${stats_db_name}.project_tmp
 (
@@ -72,7 +74,7 @@ SELECT substr(p.id, 4)                                                 AS id,
        p.code.value                                                    AS code,
        p.totalcost                                                     AS totalcost
 FROM ${openaire_db_name}.project p
-WHERE p.datainfo.deletedbyinference = false;
+WHERE p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
 
 create table ${stats_db_name}.funder as
 select distinct xpath_string(fund, '//funder/id')        as id,

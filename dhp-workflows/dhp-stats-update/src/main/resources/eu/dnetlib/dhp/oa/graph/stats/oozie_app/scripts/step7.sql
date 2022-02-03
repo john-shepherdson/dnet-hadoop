@@ -127,7 +127,7 @@ CREATE TABLE ${stats_db_name}.result_organization AS
 SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS organization
 FROM ${openaire_db_name}.relation r
 WHERE r.reltype = 'resultOrganization'
-  and r.datainfo.deletedbyinference = false;
+  and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false;
 
 CREATE TABLE ${stats_db_name}.result_projects AS
 select pr.result AS id, pr.id AS project, datediff(p.enddate, p.startdate) AS daysfromend, pr.provenance as provenance

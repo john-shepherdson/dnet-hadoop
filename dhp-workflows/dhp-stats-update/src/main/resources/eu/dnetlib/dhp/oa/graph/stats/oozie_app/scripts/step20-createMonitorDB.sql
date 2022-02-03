@@ -81,7 +81,7 @@ compute stats TARGET.result_sources;
 create table TARGET.result_topics stored as parquet as select * from SOURCE.result_topics orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_topics;
 
-create table TARGET.result_result stored as parquet as select * from SOURCE.result_result orig where exists (select 1 from TARGET.result r where r.id=orig.source or r.id=orig.target);
+create table TARGET.result_result stored as parquet as select * from SOURCE.result_result orig where exists (select 1 from TARGET.result r where r.id=orig.source) or exists (select 1 from TARGET.result r where r.id=orig.target);
 compute stats TARGET.result_result;
 
 -- datasources
