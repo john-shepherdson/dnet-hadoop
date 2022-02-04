@@ -827,6 +827,12 @@ class MappersTest {
 		assertTrue(p.getInstance().size() > 0);
 
 		assertEquals("https://doi.org/10.1155/2015/439379", p.getInstance().get(0).getUrl().get(0));
+
+		assertTrue(p.getProcessingchargeamount() != null);
+		assertTrue(p.getProcessingchargecurrency() != null);
+
+		assertEquals("1721.47", p.getProcessingchargeamount().getValue());
+		assertEquals("EUR", p.getProcessingchargecurrency().getValue());
 	}
 
 	private void assertValidId(final String id) {
