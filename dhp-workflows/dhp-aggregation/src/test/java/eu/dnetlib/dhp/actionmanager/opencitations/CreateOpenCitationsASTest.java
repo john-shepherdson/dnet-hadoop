@@ -76,7 +76,7 @@ public class CreateOpenCitationsASTest {
 
 		String inputPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles")
+				"/eu/dnetlib/dhp/actionmanager/opencitations/COCI")
 			.getPath();
 
 		CreateActionSetSparkJob
@@ -99,7 +99,7 @@ public class CreateOpenCitationsASTest {
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
-		assertEquals(60, tmp.count());
+		assertEquals(62, tmp.count());
 
 		// tmp.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
 
@@ -110,7 +110,7 @@ public class CreateOpenCitationsASTest {
 
 		String inputPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles")
+				"/eu/dnetlib/dhp/actionmanager/opencitations/COCI")
 			.getPath();
 
 		CreateActionSetSparkJob
@@ -131,7 +131,7 @@ public class CreateOpenCitationsASTest {
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
-		assertEquals(44, tmp.count());
+		assertEquals(46, tmp.count());
 
 		// tmp.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
 
@@ -142,7 +142,7 @@ public class CreateOpenCitationsASTest {
 
 		String inputPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles")
+				"/eu/dnetlib/dhp/actionmanager/opencitations/COCI")
 			.getPath();
 
 		CreateActionSetSparkJob
@@ -175,7 +175,7 @@ public class CreateOpenCitationsASTest {
 
 		String inputPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles")
+				"/eu/dnetlib/dhp/actionmanager/opencitations/COCI")
 			.getPath();
 
 		CreateActionSetSparkJob
@@ -215,7 +215,7 @@ public class CreateOpenCitationsASTest {
 
 		String inputPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles")
+				"/eu/dnetlib/dhp/actionmanager/opencitations/COCI")
 			.getPath();
 
 		CreateActionSetSparkJob
@@ -240,8 +240,8 @@ public class CreateOpenCitationsASTest {
 			assertEquals("citation", r.getSubRelType());
 			assertEquals("resultResult", r.getRelType());
 		});
-		assertEquals(22, tmp.filter(r -> r.getRelClass().equals("Cites")).count());
-		assertEquals(22, tmp.filter(r -> r.getRelClass().equals("IsCitedBy")).count());
+		assertEquals(23, tmp.filter(r -> r.getRelClass().equals("Cites")).count());
+		assertEquals(23, tmp.filter(r -> r.getRelClass().equals("IsCitedBy")).count());
 
 	}
 
@@ -250,7 +250,7 @@ public class CreateOpenCitationsASTest {
 
 		String inputPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles")
+				"/eu/dnetlib/dhp/actionmanager/opencitations/COCI")
 			.getPath();
 
 		CreateActionSetSparkJob
@@ -295,7 +295,7 @@ public class CreateOpenCitationsASTest {
 
 		String inputPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles")
+				"/eu/dnetlib/dhp/actionmanager/opencitations/COCI")
 			.getPath();
 
 		CreateActionSetSparkJob
