@@ -130,7 +130,7 @@ compute stats TARGET.indi_result_has_cc_licence;
 create table TARGET.indi_result_has_cc_licence_url stored as parquet as select * from SOURCE.indi_result_has_cc_licence_url orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_result_has_cc_licence_url;
 
-create view TARGET.indi_funder_country_collab stored as select * from SOURCE.indi_funder_country_collab;
+create view TARGET.indi_funder_country_collab stored as parquet as select * from SOURCE.indi_funder_country_collab;
 
 create table TARGET.indi_result_with_orcid stored as parquet as select * from SOURCE.indi_result_with_orcid orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_result_with_orcid;
