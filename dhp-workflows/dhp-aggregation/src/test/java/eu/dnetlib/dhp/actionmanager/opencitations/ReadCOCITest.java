@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -73,15 +74,53 @@ public class ReadCOCITest {
 				"/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles")
 			.getPath();
 
+		LocalFileSystem fs = FileSystem.getLocal(new Configuration());
+		fs
+				.copyFromLocalFile(
+						false, new org.apache.hadoop.fs.Path(getClass()
+								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input1")
+								.getPath()),
+						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input1"));
+
+		fs
+				.copyFromLocalFile(
+						false, new org.apache.hadoop.fs.Path(getClass()
+								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input2")
+								.getPath()),
+						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input2"));
+
+		fs
+				.copyFromLocalFile(
+						false, new org.apache.hadoop.fs.Path(getClass()
+								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input3")
+								.getPath()),
+						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input3"));
+
+		fs
+				.copyFromLocalFile(
+						false, new org.apache.hadoop.fs.Path(getClass()
+								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input4")
+								.getPath()),
+						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input4"));
+
 		ReadCOCI
-			.doRead(
-				spark, FileSystem.getLocal(new Configuration()), inputPath,
-				workingDir.toString() + "/COCI", DEFAULT_DELIMITER);
+				.main(
+						new String[] {
+								"-isSparkSessionManaged",
+								Boolean.FALSE.toString(),
+								"-workingPath",
+								workingDir.toString() + "/COCI",
+								"-outputPath",
+								workingDir.toString() + "/COCI_json/",
+								"-inputFile", "input1;input2;input3;input4"
+						});
+
+
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<COCI> tmp = sc
-			.textFile(workingDir.toString() + "/COCI/*/")
+			.textFile(workingDir.toString() + "/COCI_json/*/")
 			.map(item -> OBJECT_MAPPER.readValue(item, COCI.class));
 
 		Assertions.assertEquals(23, tmp.count());

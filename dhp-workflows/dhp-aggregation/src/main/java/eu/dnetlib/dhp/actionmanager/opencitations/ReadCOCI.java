@@ -41,18 +41,14 @@ public class ReadCOCI implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		final String hdfsNameNode = parser.get("nameNode");
-		log.info("nameNode: {}", hdfsNameNode);
-
-		final String inputPath = parser.get("sourcePath");
-		log.info("input path : {}", inputPath);
+		final String[] inputFile = parser.get("inputFile").split(";");
+		log.info("inputFile {}", inputFile.toString());
 		Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		Configuration conf = new Configuration();
-		conf.set("fs.defaultFS", hdfsNameNode);
+		final String workingPath = parser.get("workingPath");
+		log.info("workingPath {}", workingPath);
 
-		FileSystem fileSystem = FileSystem.get(conf);
 		SparkConf sconf = new SparkConf();
 
 		final String delimiter = Optional
@@ -65,25 +61,20 @@ public class ReadCOCI implements Serializable {
 			spark -> {
 				doRead(
 					spark,
-					fileSystem,
-					inputPath,
+					workingPath,
+					inputFile,
 					outputPath,
 					delimiter);
 			});
 	}
 
-	public static void doRead(SparkSession spark, FileSystem fileSystem, String inputPath, String outputPath,
+	private static void doRead(SparkSession spark, String workingPath, String[] inputFiles,
+		String outputPath,
 		String delimiter) throws IOException {
 
-		RemoteIterator<LocatedFileStatus> iterator = fileSystem
-			.listFiles(
-				new Path(inputPath), true);
+		for(String inputFile : inputFiles){
+			String p_string = workingPath + "/" + inputFile ;
 
-		while (iterator.hasNext()) {
-			LocatedFileStatus fileStatus = iterator.next();
-
-			Path p = fileStatus.getPath();
-			String p_string = p.toString();
 			Dataset<Row> cociData = spark
 				.read()
 				.format("csv")
@@ -91,7 +82,8 @@ public class ReadCOCI implements Serializable {
 				.option("inferSchema", "true")
 				.option("header", "true")
 				.option("quotes", "\"")
-				.load(p_string);
+				.load(p_string)
+				.repartition(100);
 
 			cociData.map((MapFunction<Row, COCI>) row -> {
 				COCI coci = new COCI();
@@ -103,7 +95,7 @@ public class ReadCOCI implements Serializable {
 				.write()
 				.mode(SaveMode.Overwrite)
 				.option("compression", "gzip")
-				.json(outputPath + "/" + p_string.substring(p_string.lastIndexOf("/") + 1));
+				.json(outputPath + inputFile);
 		}
 
 	}

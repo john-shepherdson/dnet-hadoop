@@ -82,10 +82,10 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingPath}/COCI</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/COCI</arg>
-            <arg>--nameNode</arg><arg>${nameNode}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}/COCI</arg>
+            <arg>--outputPath</arg><arg>${workingPath}/COCI_JSON</arg>
             <arg>--delimiter</arg><arg>${delimiter}</arg>
+            <arg>--inputFile</arg><arg>${inputFileCoci}</arg>
         </spark>
         <ok to="create_actionset"/>
         <error to="Kill"/>
@@ -108,7 +108,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--inputPath</arg><arg>${workingPath}/COCI</arg>
+            <arg>--inputPath</arg><arg>${workingPath}/COCI_JSON</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>

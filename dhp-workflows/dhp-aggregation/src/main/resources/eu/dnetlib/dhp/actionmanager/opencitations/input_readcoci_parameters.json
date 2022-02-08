@@ -1,17 +1,12 @@
 [
   {
-    "paramName": "sp",
-    "paramLongName": "sourcePath",
+    "paramName": "wp",
+    "paramLongName": "workingPath",
     "paramDescription": "the zipped opencitations file",
     "paramRequired": true
   },
 
-  {
-    "paramName": "nn",
-    "paramLongName": "nameNode",
-    "paramDescription": "the hdfs name node",
-    "paramRequired": true
-  },
+
   {
     "paramName": "issm",
     "paramLongName": "isSparkSessionManaged",
@@ -28,7 +23,13 @@
     "paramName": "op",
     "paramLongName": "outputPath",
     "paramDescription": "the hdfs name node",
-    "paramRequired": false
+    "paramRequired": true
+  },
+  {
+    "paramName": "if",
+    "paramLongName": "inputFile",
+    "paramDescription": "the hdfs name node",
+    "paramRequired": true
   }
 ]
 
