@@ -115,18 +115,20 @@ public class CreateActionSetSparkJob implements Serializable {
 		final String cited = ID_PREFIX
 			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", value.getCited()));
 
-		relationList
-			.addAll(
-				getRelations(
-					citing,
-					cited));
+		if(!citing.equals(cited)){
+			relationList
+					.addAll(
+							getRelations(
+									citing,
+									cited));
 
-		if (duplicate && value.getCiting().endsWith(".refs")) {
-			citing = ID_PREFIX + IdentifierFactory
-				.md5(
-					CleaningFunctions
-						.normalizePidValue("doi", value.getCiting().substring(0, value.getCiting().indexOf(".refs"))));
-			relationList.addAll(getRelations(citing, cited));
+			if (duplicate && value.getCiting().endsWith(".refs")) {
+				citing = ID_PREFIX + IdentifierFactory
+						.md5(
+								CleaningFunctions
+										.normalizePidValue("doi", value.getCiting().substring(0, value.getCiting().indexOf(".refs"))));
+				relationList.addAll(getRelations(citing, cited));
+			}
 		}
 
 		return relationList;

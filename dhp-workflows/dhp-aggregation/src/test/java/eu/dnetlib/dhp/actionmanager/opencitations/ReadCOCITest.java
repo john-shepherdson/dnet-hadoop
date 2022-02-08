@@ -103,6 +103,13 @@ public class ReadCOCITest {
 								.getPath()),
 						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input4"));
 
+		fs
+				.copyFromLocalFile(
+						false, new org.apache.hadoop.fs.Path(getClass()
+								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input5")
+								.getPath()),
+						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input5"));
+
 		ReadCOCI
 				.main(
 						new String[] {
@@ -112,7 +119,7 @@ public class ReadCOCITest {
 								workingDir.toString() + "/COCI",
 								"-outputPath",
 								workingDir.toString() + "/COCI_json/",
-								"-inputFile", "input1;input2;input3;input4"
+								"-inputFile", "input1;input2;input3;input4;input5"
 						});
 
 
@@ -123,7 +130,7 @@ public class ReadCOCITest {
 			.textFile(workingDir.toString() + "/COCI_json/*/")
 			.map(item -> OBJECT_MAPPER.readValue(item, COCI.class));
 
-		Assertions.assertEquals(23, tmp.count());
+		Assertions.assertEquals(24, tmp.count());
 
 		Assertions.assertEquals(1, tmp.filter(c -> c.getCiting().equals("10.1207/s15327647jcd3,4-01")).count());
 
