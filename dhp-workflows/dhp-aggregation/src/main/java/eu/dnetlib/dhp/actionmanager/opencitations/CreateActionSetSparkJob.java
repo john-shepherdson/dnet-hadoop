@@ -90,9 +90,6 @@ public class CreateActionSetSparkJob implements Serializable {
 			.map(
 				(MapFunction<String, COCI>) value -> OBJECT_MAPPER.readValue(value, COCI.class),
 				Encoders.bean(COCI.class))
-//		spark
-//			.sqlContext()
-//			.createDataset(spark.sparkContext().textFile(inputPath + "/*", 6000), Encoders.STRING())
 			.flatMap(
 				(FlatMapFunction<COCI, Relation>) value -> createRelation(value, shouldDuplicateRels).iterator(),
 				Encoders.bean(Relation.class))
