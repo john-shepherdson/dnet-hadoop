@@ -185,6 +185,22 @@ class OafMapperUtilsTest {
 				.getClassid());
 	}
 
+	@Test
+	void testDelegatedAuthority() throws IOException {
+		Dataset d1 = read("dataset_2.json", Dataset.class);
+		Dataset d2 = read("dataset_delegated.json", Dataset.class);
+
+		assertEquals(1, d2.getCollectedfrom().size());
+		assertTrue(cfId(d2.getCollectedfrom()).contains(ModelConstants.ZENODO_OD_ID));
+
+		Result res = OafMapperUtils.mergeResults(d1, d2);
+
+		assertEquals(d2, res);
+
+		System.out.println(OBJECT_MAPPER.writeValueAsString(res));
+
+	}
+
 	protected HashSet<String> cfId(List<KeyValue> collectedfrom) {
 		return collectedfrom.stream().map(KeyValue::getKey).collect(Collectors.toCollection(HashSet::new));
 	}
