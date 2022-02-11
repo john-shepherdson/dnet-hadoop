@@ -1655,5 +1655,37 @@
       },
       "value": "Understanding Electromigration in Cu-CNT Composite Interconnects A Multiscale Electrothermal Simulation Study"
     }
-  ]
+  ],
+  "processingchargeamount": {
+    "value": "1721.47",
+    "dataInfo": {
+      "invisible": true,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.9",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:datasetarchive",
+        "classname": "sysimport:crosswalk:datasetarchive",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "processingchargecurrency": {
+    "value": "EUR",
+    "dataInfo": {
+      "invisible": true,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.9",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:datasetarchive",
+        "classname": "sysimport:crosswalk:datasetarchive",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  }
 }

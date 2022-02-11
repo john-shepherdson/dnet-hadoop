@@ -348,9 +348,9 @@ public abstract class AbstractMdRecordToOafMapper {
 		r.setContext(prepareContexts(doc, info));
 		r.setExternalReference(new ArrayList<>()); // NOT PRESENT IN MDSTORES
 		r
-				.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
+			.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
 		r
-				.setProcessingchargecurrency(field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
+			.setProcessingchargecurrency(field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
 
 		r.setInstance(instances);
 		r.setBestaccessright(OafMapperUtils.createBestAccessRights(instances));

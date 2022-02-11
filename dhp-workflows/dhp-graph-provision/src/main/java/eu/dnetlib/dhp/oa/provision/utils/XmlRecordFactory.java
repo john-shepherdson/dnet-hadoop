@@ -398,6 +398,16 @@ public class XmlRecordFactory implements Serializable {
 			if (r.getResourcetype() != null) {
 				metadata.add(XmlSerializationUtils.mapQualifier("resourcetype", r.getResourcetype()));
 			}
+			if (r.getProcessingchargeamount() != null) {
+				metadata
+					.add(
+						XmlSerializationUtils
+							.asXmlElement("processingchargeamount", r.getProcessingchargeamount().getValue()));
+				metadata
+					.add(
+						XmlSerializationUtils
+							.asXmlElement("processingchargecurrency", r.getProcessingchargecurrency().getValue()));
+			}
 		}
 
 		switch (type) {
