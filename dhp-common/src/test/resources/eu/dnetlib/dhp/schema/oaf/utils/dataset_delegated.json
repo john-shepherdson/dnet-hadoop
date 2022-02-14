@@ -21,8 +21,8 @@
   ],
   "collectedfrom": [
     {
-      "key": "10|openaire____::081b82f96300b6a6e3d282bad31cb6e3",
-      "value": "Repository B"
+      "key": "10|opendoar____::358aee4cc897452c00244351e4d91f69",
+      "value": "Zenodo"
     }
   ],
   "instance": [
@@ -110,8 +110,8 @@
         }
       ],
       "collectedfrom": {
-        "key": "10|openaire____::081b82f96300b6a6e3d282bad31cb6e3",
-        "value": "Repository B"
+        "key": "10|opendoar____::358aee4cc897452c00244351e4d91f69",
+        "value": "Zenodo"
       },
       "processingchargeamount": {
         "dataInfo": {
