@@ -78,37 +78,37 @@ public class ReadCOCITest {
 		fs
 				.copyFromLocalFile(
 						false, new org.apache.hadoop.fs.Path(getClass()
-								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input1")
+								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input1.gz")
 								.getPath()),
-						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input1"));
+						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input1.gz"));
 
 		fs
 				.copyFromLocalFile(
 						false, new org.apache.hadoop.fs.Path(getClass()
-								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input2")
+								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input2.gz")
 								.getPath()),
-						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input2"));
+						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input2.gz"));
 
 		fs
 				.copyFromLocalFile(
 						false, new org.apache.hadoop.fs.Path(getClass()
-								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input3")
+								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input3.gz")
 								.getPath()),
-						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input3"));
+						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input3.gz"));
 
 		fs
 				.copyFromLocalFile(
 						false, new org.apache.hadoop.fs.Path(getClass()
-								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input4")
+								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input4.gz")
 								.getPath()),
-						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input4"));
+						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input4.gz"));
 
 		fs
 				.copyFromLocalFile(
 						false, new org.apache.hadoop.fs.Path(getClass()
-								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input5")
+								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input5.gz")
 								.getPath()),
-						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input5"));
+						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input5.gz"));
 
 		ReadCOCI
 				.main(
