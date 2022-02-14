@@ -73,7 +73,7 @@ public class ReadCOCI implements Serializable {
 		String delimiter) throws IOException {
 
 		for(String inputFile : inputFiles){
-			String p_string = workingPath + "/" + inputFile ;
+			String p_string = workingPath + "/" + inputFile + ".gz";
 
 			Dataset<Row> cociData = spark
 				.read()

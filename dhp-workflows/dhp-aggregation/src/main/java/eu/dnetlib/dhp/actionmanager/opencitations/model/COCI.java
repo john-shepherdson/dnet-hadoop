@@ -37,5 +37,5 @@ public class COCI implements Serializable {
 		this.cited = cited;
 	}
 
-	
+
 }
