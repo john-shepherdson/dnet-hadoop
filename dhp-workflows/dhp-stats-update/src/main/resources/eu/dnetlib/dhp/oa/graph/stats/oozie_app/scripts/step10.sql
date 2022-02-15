@@ -29,6 +29,23 @@ select * from stats_ext.issn_gold_oa_dataset;
 
 ------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------
+-- Usage statistics
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
+create or replace view ${stats_db_name}.usage_stats as
+select * from openaire_prod_usage_stats.usage_stats;
+
+create or replace view ${stats_db_name}.downloads_stats as
+select * from openaire_prod_usage_stats.downloads_stats;
+
+create or replace view ${stats_db_name}.pageviews_stats as
+select * from openaire_prod_usage_stats.pageviews_stats;
+
+create or replace view ${stats_db_name}.views_stats as
+select * from openaire_prod_usage_stats.views_stats;
+
+------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------
 -- Creation date of the database
 ------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------

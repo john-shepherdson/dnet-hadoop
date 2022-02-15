@@ -44,7 +44,7 @@ FROM ${openaire_db_name}.datasource d1
                LATERAL VIEW EXPLODE(originalid) temp AS originalidd
       WHERE originalidd like "piwik:%") AS d2
      ON d1.id = d2.id
-WHERE d1.datainfo.deletedbyinference = FALSE;
+WHERE d1.datainfo.deletedbyinference = FALSE and d1.datainfo.invisible=false;
 
 -- Updating temporary table with everything that is not based on results -> This is done with the following "dual" table.
 -- Creating a temporary dual table that will be removed after the following insert
@@ -76,23 +76,25 @@ UPDATE ${stats_db_name}.datasource_tmp SET yearofvalidation=null WHERE yearofval
 
 CREATE TABLE ${stats_db_name}.datasource_languages STORED AS PARQUET AS
 SELECT substr(d.id, 4) AS id, langs.languages AS language
-FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.odlanguages.value) langs AS languages;
+FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.odlanguages.value) langs AS languages
+where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false;
 
 CREATE TABLE ${stats_db_name}.datasource_oids STORED AS PARQUET AS
 SELECT substr(d.id, 4) AS id, oids.ids AS oid
-FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.originalid) oids AS ids;
+FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.originalid) oids AS ids
+where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false;
 
 CREATE TABLE ${stats_db_name}.datasource_organizations STORED AS PARQUET AS
 SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS organization
 FROM ${openaire_db_name}.relation r
-WHERE r.reltype = 'datasourceOrganization' and r.datainfo.deletedbyinference = false;
+WHERE r.reltype = 'datasourceOrganization' and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false;
 
 -- datasource sources:
 -- where the datasource info have been collected from.
 create table if not exists ${stats_db_name}.datasource_sources STORED AS PARQUET AS
 select substr(d.id, 4) as id, substr(cf.key, 4) as datasource
 from ${openaire_db_name}.datasource d lateral view explode(d.collectedfrom) cfrom as cf
-where d.datainfo.deletedbyinference = false;
+where d.datainfo.deletedbyinference = false and d.datainfo.invisible=false;
 
 CREATE OR REPLACE VIEW ${stats_db_name}.datasource_results AS
 SELECT datasource AS id, id AS result
