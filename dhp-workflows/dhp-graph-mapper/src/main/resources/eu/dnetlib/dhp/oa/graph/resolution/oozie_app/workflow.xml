@@ -8,13 +8,31 @@
             <name>unresolvedPath</name>
             <description>the path of the unresolved Entities</description>
         </property>
+        <property>
+            <name>targetPath</name>
+            <description>the target path after resolution</description>
+        </property>
+        <property>
+            <name>shouldResolveEntities</name>
+            <value>true</value>
+            <description>allows to activate/deactivate the resolution process over the entities</description>
+        </property>
     </parameters>
 
-    <start to="ResolveRelations"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
+    <action name="reset_outputpath">
+        <fs>
+            <delete path="${targetPath}"/>
+            <mkdir path="${targetPath}"/>
+        </fs>
+        <ok to="ResolveRelations"/>
+        <error to="Kill"/>
+    </action>
 
     <action name="ResolveRelations">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -36,10 +54,19 @@
             <arg>--master</arg><arg>yarn</arg>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingDir}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}</arg>
         </spark>
-        <ok to="ResolveEntities"/>
+        <ok to="decision_resolveEntities"/>
         <error to="Kill"/>
     </action>
+
+    <decision name="decision_resolveEntities">
+        <switch>
+            <case to="copy_result">${wf:conf('shouldResolveEntities') eq false}</case>
+            <case to="ResolveEntities">${wf:conf('shouldResolveEntities') eq true}</case>
+            <default to="ResolveEntities"/>
+        </switch>
+    </decision>
 
     <action name="ResolveEntities">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -62,11 +89,91 @@
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--unresolvedPath</arg><arg>${unresolvedPath}</arg>
             <arg>--workingPath</arg><arg>${workingDir}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}</arg>
         </spark>
-        <ok to="End"/>
+        <ok to="copy_entities"/>
         <error to="Kill"/>
     </action>
 
-    <end name="End"/>
+    <fork name="copy_result">
+        <path start="copy_publication"/>
+        <path start="copy_dataset"/>
+        <path start="copy_otherresearchproduct"/>
+        <path start="copy_software"/>
+    </fork>
 
+    <action name="copy_publication">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/publication</arg>
+            <arg>${nameNode}/${targetPath}/publication</arg>
+        </distcp>
+        <ok to="copy_wait_result"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_dataset">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/dataset</arg>
+            <arg>${nameNode}/${targetPath}/dataset</arg>
+        </distcp>
+        <ok to="copy_wait_result"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_otherresearchproduct">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/otherresearchproduct</arg>
+            <arg>${nameNode}/${targetPath}/otherresearchproduct</arg>
+        </distcp>
+        <ok to="copy_wait_result"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_software">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/software</arg>
+            <arg>${nameNode}/${targetPath}/software</arg>
+        </distcp>
+        <ok to="copy_wait_result"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="copy_wait_result" to="copy_entities"/>
+
+    <fork name="copy_entities">
+        <path start="copy_organization"/>
+        <path start="copy_projects"/>
+        <path start="copy_datasource"/>
+    </fork>
+
+    <action name="copy_organization">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/organization</arg>
+            <arg>${nameNode}/${targetPath}/organization</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_projects">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/project</arg>
+            <arg>${nameNode}/${targetPath}/project</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_datasource">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/datasource</arg>
+            <arg>${nameNode}/${targetPath}/datasource</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="copy_wait" to="End"/>
+
+    <end name="End"/>
 </workflow-app>

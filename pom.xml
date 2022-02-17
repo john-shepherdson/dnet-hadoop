@@ -620,6 +620,18 @@
 						</dependency>
 					</dependencies>
 				</plugin>
+				<plugin>
+					<groupId>org.antipathy</groupId>
+					<artifactId>mvn-scalafmt_2.11</artifactId>
+					<version>1.0.1640073709.733712b</version>
+					<dependencies>
+						<dependency>
+							<groupId>eu.dnetlib.dhp</groupId>
+							<artifactId>dhp-code-style</artifactId>
+							<version>${project.version}</version>
+						</dependency>
+					</dependencies>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
@@ -661,6 +673,33 @@
 						<id>sort-imports</id>
 						<goals>
 							<goal>sort</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.antipathy</groupId>
+				<artifactId>mvn-scalafmt_2.11</artifactId>
+				<configuration>
+					<configLocation>https://code-repo.d4science.org/D-Net/dnet-hadoop/raw/branch/beta/dhp-build/dhp-code-style/src/main/resources/scalafmt/scalafmt.conf</configLocation>
+					<skipTestSources>false</skipTestSources>
+					<skipSources>false</skipSources>
+					<sourceDirectories>
+						<param>${project.basedir}/src/main/scala</param>
+					</sourceDirectories>
+					<testSourceDirectories>
+						<param>${project.basedir}/src/test/scala</param>
+					</testSourceDirectories>
+					<validateOnly>false</validateOnly>
+					<onlyChangedFiles>false</onlyChangedFiles>
+					<branch>: git rev-parse --abbrev-ref HEAD</branch>
+					<useSpecifiedRepositories>false</useSpecifiedRepositories>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>format</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -719,6 +758,10 @@
 			<id>dnet45-releases</id>
 			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-releases</url>
 		</repository>
+		<site>
+			<id>DHPSite</id>
+			<url>${dhp.site.stage.path}/</url>
+		</site>
 	</distributionManagement>
 	<reporting>
 		<plugins>
@@ -734,6 +777,7 @@
 	</reporting>
 
 	<properties>
+		<dhp.site.stage.path>sftp://dnet-hadoop@static-web.d4science.org/dnet-hadoop</dhp.site.stage.path>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
@@ -753,7 +797,7 @@
 		<mockito-core.version>3.3.3</mockito-core.version>
 		<mongodb.driver.version>3.4.2</mongodb.driver.version>
 		<vtd.version>[2.12,3.0)</vtd.version>
-		<dhp-schemas.version>[2.8.22]</dhp-schemas.version>
+		<dhp-schemas.version>[2.10.29]</dhp-schemas.version>
 		<dnet-actionmanager-api.version>[4.0.3]</dnet-actionmanager-api.version>
 		<dnet-actionmanager-common.version>[6.0.5]</dnet-actionmanager-common.version>
 		<dnet-openaire-broker-common.version>[3.1.6]</dnet-openaire-broker-common.version>

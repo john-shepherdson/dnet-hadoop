@@ -51,8 +51,8 @@ class GenerateEntitiesApplicationTest {
 		Result software = getResult("odf_software.xml", Software.class);
 		Result orp = getResult("oaf_orp.xml", OtherResearchProduct.class);
 
-		verifyMerge(publication, dataset, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
-		verifyMerge(dataset, publication, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
+		verifyMerge(publication, dataset, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
+		verifyMerge(dataset, publication, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
 
 		verifyMerge(publication, software, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
 		verifyMerge(software, publication, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);

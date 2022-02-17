@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -355,6 +356,25 @@ class MappersTest {
 		assertTrue(r2.getValidated());
 		assertEquals("2020-01-01", r1.getValidationDate());
 		assertEquals("2020-01-01", r2.getValidationDate());
+
+		assertNotNull(d.getTitle());
+		assertEquals(2, d.getTitle().size());
+		verifyTitle(d, "main title", "Temperature and ADCP data collected on Lake Geneva between 2015 and 2017");
+		verifyTitle(d, "Subtitle", "survey");
+	}
+
+	private void verifyTitle(Dataset d, String titleType, String title) {
+		Optional
+			.of(
+				d
+					.getTitle()
+					.stream()
+					.filter(t -> titleType.equals(t.getQualifier().getClassid()))
+					.collect(Collectors.toList()))
+			.ifPresent(t -> {
+				assertEquals(1, t.size());
+				assertEquals(title, t.get(0).getValue());
+			});
 	}
 
 	@Test
@@ -708,7 +728,7 @@ class MappersTest {
 		assertEquals(1, p.getTitle().size());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 
-		final Publication p_cleaned = cleanup(fixVocabularyNames(p));
+		final Publication p_cleaned = cleanup(fixVocabularyNames(p), vocs);
 
 		assertNotNull(p_cleaned.getTitle());
 		assertFalse(p_cleaned.getTitle().isEmpty());
@@ -792,6 +812,27 @@ class MappersTest {
 			System.out.println(url);
 			assertTrue(!url.contains("&amp;"));
 		}
+	}
+
+	@Test
+	void testOpenAPC() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_openapc.xml")));
+		final List<Oaf> list = new OafToOafMapper(vocs, true, true).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		final Publication p = (Publication) list.get(0);
+		assertTrue(p.getInstance().size() > 0);
+
+		assertEquals("https://doi.org/10.1155/2015/439379", p.getInstance().get(0).getUrl().get(0));
+
+		assertTrue(p.getProcessingchargeamount() != null);
+		assertTrue(p.getProcessingchargecurrency() != null);
+
+		assertEquals("1721.47", p.getProcessingchargeamount().getValue());
+		assertEquals("EUR", p.getProcessingchargecurrency().getValue());
 	}
 
 	private void assertValidId(final String id) {

@@ -16,6 +16,8 @@ import com.github.sisyphsu.dateparser.DateParserUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import eu.dnetlib.dhp.common.vocabulary.Vocabulary;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -86,6 +88,22 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	}
 
 	public static <T extends Oaf> boolean filter(T value) {
+		if (Boolean.TRUE
+			.equals(
+				Optional
+					.ofNullable(value)
+					.map(
+						o -> Optional
+							.ofNullable(o.getDataInfo())
+							.map(
+								d -> Optional
+									.ofNullable(d.getInvisible())
+									.orElse(true))
+							.orElse(true))
+					.orElse(true))) {
+			return true;
+		}
+
 		if (value instanceof Datasource) {
 			// nothing to evaluate here
 		} else if (value instanceof Project) {
@@ -115,7 +133,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		return true;
 	}
 
-	public static <T extends Oaf> T cleanup(T value) {
+	public static <T extends Oaf> T cleanup(T value, VocabularyGroup vocs) {
 		if (value instanceof Datasource) {
 			// nothing to clean here
 		} else if (value instanceof Project) {
@@ -212,6 +230,15 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 							.map(GraphCleaningFunctions::cleanValue)
 							.collect(Collectors.toList()));
 			}
+			if (Objects.nonNull(r.getFormat())) {
+				r
+					.setFormat(
+						r
+							.getFormat()
+							.stream()
+							.map(GraphCleaningFunctions::cleanValue)
+							.collect(Collectors.toList()));
+			}
 			if (Objects.nonNull(r.getDescription())) {
 				r
 					.setDescription(
@@ -234,6 +261,38 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 			if (Objects.nonNull(r.getInstance())) {
 
 				for (Instance i : r.getInstance()) {
+					if (!vocs.termExists(ModelConstants.DNET_PUBLICATION_RESOURCE, i.getInstancetype().getClassid())) {
+						if (r instanceof Publication) {
+							i
+								.setInstancetype(
+									OafMapperUtils
+										.qualifier(
+											"0038", "Other literature type", ModelConstants.DNET_PUBLICATION_RESOURCE,
+											ModelConstants.DNET_PUBLICATION_RESOURCE));
+						} else if (r instanceof Dataset) {
+							i
+								.setInstancetype(
+									OafMapperUtils
+										.qualifier(
+											"0039", "Other dataset type", ModelConstants.DNET_PUBLICATION_RESOURCE,
+											ModelConstants.DNET_PUBLICATION_RESOURCE));
+						} else if (r instanceof Software) {
+							i
+								.setInstancetype(
+									OafMapperUtils
+										.qualifier(
+											"0040", "Other software type", ModelConstants.DNET_PUBLICATION_RESOURCE,
+											ModelConstants.DNET_PUBLICATION_RESOURCE));
+						} else if (r instanceof OtherResearchProduct) {
+							i
+								.setInstancetype(
+									OafMapperUtils
+										.qualifier(
+											"0020", "Other ORP type", ModelConstants.DNET_PUBLICATION_RESOURCE,
+											ModelConstants.DNET_PUBLICATION_RESOURCE));
+						}
+					}
+
 					if (Objects.nonNull(i.getPid())) {
 						i.setPid(processPidCleaning(i.getPid()));
 					}

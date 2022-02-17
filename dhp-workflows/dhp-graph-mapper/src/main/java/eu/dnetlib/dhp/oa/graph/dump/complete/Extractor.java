@@ -89,7 +89,7 @@ public class Extractor implements Serializable {
 								value.getId(), contextId,
 								Constants.RESULT_ENTITY,
 								Constants.CONTEXT_ENTITY,
-								ModelConstants.RELATIONSHIP, ModelConstants.IS_RELATED_TO, provenance);
+								ModelConstants.IS_RELATED_TO, ModelConstants.RELATIONSHIP, provenance);
 							if (!hashCodes.contains(r.hashCode())) {
 								relationList
 									.add(r);
@@ -99,8 +99,8 @@ public class Extractor implements Serializable {
 								contextId, value.getId(),
 								Constants.CONTEXT_ENTITY,
 								Constants.RESULT_ENTITY,
-								ModelConstants.RELATIONSHIP,
-								ModelConstants.IS_RELATED_TO, provenance);
+								ModelConstants.IS_RELATED_TO,
+								ModelConstants.RELATIONSHIP, provenance);
 							if (!hashCodes.contains(r.hashCode())) {
 								relationList
 									.add(

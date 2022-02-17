@@ -57,8 +57,16 @@ public class VocabularyGroup implements Serializable {
 				final String syn = arr[2].trim();
 
 				vocs.addSynonyms(vocId, termId, syn);
+
 			}
 		}
+
+		// add the term names as synonyms
+		vocs.vocs.values().forEach(voc -> {
+			voc.getTerms().values().forEach(term -> {
+				voc.addSynonym(term.getName().toLowerCase(), term.getId());
+			});
+		});
 
 		return vocs;
 	}

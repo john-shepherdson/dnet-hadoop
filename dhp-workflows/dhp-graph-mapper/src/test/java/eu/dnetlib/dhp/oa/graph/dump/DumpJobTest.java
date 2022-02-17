@@ -171,24 +171,6 @@ public class DumpJobTest {
 
 		GraphResult gr = verificationDataset.first();
 
-		Assertions.assertEquals(2, gr.getMeasures().size());
-		Assertions
-			.assertTrue(
-				gr
-					.getMeasures()
-					.stream()
-					.anyMatch(
-						m -> m.getKey().equals("influence")
-							&& m.getValue().equals("1.62759106106e-08")));
-		Assertions
-			.assertTrue(
-				gr
-					.getMeasures()
-					.stream()
-					.anyMatch(
-						m -> m.getKey().equals("popularity")
-							&& m.getValue().equals("0.22519296")));
-
 		Assertions.assertEquals(6, gr.getAuthor().size());
 		Assertions
 			.assertTrue(
@@ -357,11 +339,10 @@ public class DumpJobTest {
 
 		Assertions.assertEquals("50|pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2", gr.getId());
 
-		Assertions.assertEquals(2, gr.getOriginalId().size());
+		Assertions.assertEquals(1, gr.getOriginalId().size());
 		Assertions
 			.assertTrue(
-				gr.getOriginalId().contains("50|pensoft_____::00ea4a1cd53806a97d62ea6bf268f2a2")
-					&& gr.getOriginalId().contains("10.3897/oneeco.2.e13718"));
+				gr.getOriginalId().contains("10.3897/oneeco.2.e13718"));
 
 		Assertions.assertEquals(1, gr.getPid().size());
 		Assertions
@@ -910,7 +891,6 @@ public class DumpJobTest {
 		DumpProducts dump = new DumpProducts();
 		dump
 			.run(
-				// false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
 				false, sourcePath, workingDir.toString() + "/result", communityMapPath, Publication.class,
 				GraphResult.class, Constants.DUMPTYPE.COMPLETE.getType());
 
@@ -942,6 +922,46 @@ public class DumpJobTest {
 
 		Assertions.assertTrue(temp.filter("id = '50|dedup_wf_001::01e6a28565ca01376b7548e530c6f6e8'").count() == 1);
 
+		temp = spark
+			.sql(
+				"select id, inst.articleprocessingcharge.amount, inst.articleprocessingcharge.currency " +
+					"from check " +
+					"lateral view explode (instance) i as inst " +
+					"where inst.articleprocessingcharge is not null");
+
+		Assertions
+			.assertEquals(
+				"3131.64",
+				temp
+					.filter("id = '50|datacite____::05c611fdfc93d7a2a703d1324e28104a'")
+					.collectAsList()
+					.get(0)
+					.getString(1));
+		Assertions
+			.assertEquals(
+				"EUR",
+				temp
+					.filter("id = '50|datacite____::05c611fdfc93d7a2a703d1324e28104a'")
+					.collectAsList()
+					.get(0)
+					.getString(2));
+
+		Assertions
+			.assertEquals(
+				"2578.35",
+				temp
+					.filter("id = '50|dedup_wf_001::01e6a28565ca01376b7548e530c6f6e8'")
+					.collectAsList()
+					.get(0)
+					.getString(1));
+		Assertions
+			.assertEquals(
+				"EUR",
+				temp
+					.filter("id = '50|dedup_wf_001::01e6a28565ca01376b7548e530c6f6e8'")
+					.collectAsList()
+					.get(0)
+					.getString(2));
 	}
 
 }

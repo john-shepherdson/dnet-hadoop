@@ -1,0 +1,1350 @@
+<RESOURCE_PROFILE>
+    <HEADER>
+        <RESOURCE_IDENTIFIER value="4801c33c-66ca-4ab6-af64-aa812194ec61_V29ya2Zsb3dEU1Jlc291cmNlcy9Xb3JrZmxvd0RTUmVzb3VyY2VUeXBl"/>
+        <RESOURCE_TYPE value="WorkflowDSResourceType"/>
+        <RESOURCE_KIND value="WorkflowDSResources"/>
+        <RESOURCE_URI value=""/>
+        <DATE_OF_CREATION value="2022-01-11T20:04:48+00:00"/>
+    </HEADER>
+    <BODY>
+        <WORKFLOW_NAME>Graph processing [EXPERIMENT]</WORKFLOW_NAME>
+        <WORKFLOW_TYPE>Data Provision</WORKFLOW_TYPE>
+        <WORKFLOW_PRIORITY>30</WORKFLOW_PRIORITY>
+        <CONFIGURATION start="manual">
+            <NODE isStart="true" name="setUnresolvedEntityPath" type="SetEnvParameter">
+                <DESCRIPTION>set the path of unresolved entities</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">unresolvedEntityPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/data/unresolved_BETA/content</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setNsPrefixBlacklistForBETA" type="SetEnvParameter">
+                <DESCRIPTION>set blacklist of funder nsPrefixes from the beta aggregator</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">nsPrefixBlacklist_BETA</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">gsrt________,rcuk________</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setNsPrefixBlacklistForPROD" type="SetEnvParameter">
+                <DESCRIPTION>set blacklist of funder nsPrefixes from the production aggregator</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">nsPrefixBlacklist_PROD</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">gsrt________,rcuk________,fct_________,nwo_________</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setIdMappingPath" type="SetEnvParameter">
+                <DESCRIPTION>set the path of the map defining the relations id mappings</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">idMappingPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/data/maps/fct_map.json</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setIterationNumbers" type="SetEnvParameter">
+                <DESCRIPTION>set the number of iteration in affiliation propagation</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">iterations</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">1</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setMergedGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the MERGED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">mergedGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/01_graph_merged</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setRawGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the RAW graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">rawGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/02_graph_raw</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setCleanedFirstGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the the consistent graph cleaned</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">cleanedFirstGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/03_graph_cleaned</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setResolvedGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the CLEANED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">resolvedGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/04_graph_resolved</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setGroupedGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the GROUPED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">groupedGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/05_graph_grouped</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setInferredGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the INFERRED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">inferredGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/06_graph_inferred</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setDedupGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the DEDUPED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">dedupGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/07_graph_dedup</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setConsistentGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the CONSISTENCY graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">consistentGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/08_graph_consistent</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setOrcidGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the ORCID enriched graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">orcidGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/09_graph_orcid</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setBulkTaggingGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the BULK TAGGED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">bulkTaggingGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/10_graph_bulktagging</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setAffiliationGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the AFFILIATION from INSTITUTIONAL REPOS graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">affiliationGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/11_graph_affiliation</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setAffiliationSemRelGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the AFFILIATION from SEMATIC RELATION graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">affiliationSemRelGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/12_graph_affiliationsr</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setCommunityOrganizationGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the COMMUNITY from SELECTED SOURCES graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">communityOrganizationGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/13_graph_community_organization</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setFundingGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the FUNDING from SEMANTIC RELATION graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">fundingGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/14_graph_funding</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setCommunitySemRelGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the COMMUNITY from SEMANTIC RELATION graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">communitySemRelGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/15_graph_community_sem_rel</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setCountryGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the COUNTRY enriched graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">countryGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/16_graph_country</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setCleanedGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the CLEANED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">cleanedGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/17_graph_cleaned</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setBlacklistedGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the blacklisted graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">blacklistedGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/18_graph_blacklisted</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setBulkTaggingPathMap" type="SetEnvParameter">
+                <DESCRIPTION>Set the map of paths for the Bulk Tagging</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">bulkTaggingPathMap</PARAM>
+                    <PARAM managedBy="system" name="parameterValue" required="true" type="string">{"author" : "$['author'][*]['fullname']", "title" : "$['title'][*]['value']", "orcid" : "$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']",   "contributor" : "$['contributor'][*]['value']",  "description" : "$['description'][*]['value']"}</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setPropagationOrganizationCommunityMap" type="SetEnvParameter">
+                <DESCRIPTION>Set the map of associations organization, community list for the propagation of community to result through organization</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">propagationOrganizationCommunityMap</PARAM>
+                    <PARAM managedBy="system" name="parameterValue" required="true" type="string">{"20|corda__h2020::3fb05a9524c3f790391261347852f638":["mes","euromarine"], "20|corda__h2020::e8dbe14cca9bf6fce09d468872f813f8":["mes","euromarine"], "20|snsf________::9b253f265e3bef5cae6d881fdf61aceb":["mes","euromarine"],"20|rcuk________::e054eea0a47665af8c3656b5785ccf76":["mes","euromarine"],"20|corda__h2020::edc18d67c9b11fb616ca9f6e1db1b151":["mes","euromarine"],"20|rcuk________::d5736d9da90521ddcdc7828a05a85e9a":["mes","euromarine"],"20|corda__h2020::f5d418d3aa1cf817ddefcc3fdc039f27":["mes","euromarine"],"20|snsf________::8fa091f8f25a846779acb4ea97b50aef":["mes","euromarine"],"20|corda__h2020::81e020977211c2c40fae2e1a50bffd71":["mes","euromarine"],"20|corda_______::81e020977211c2c40fae2e1a50bffd71":["mes","euromarine"],"20|snsf________::31d0a100e54e3cdb3c6f52d91e638c78":["mes","euromarine"],"20|corda__h2020::ea379ef91b8cc86f9ac5edc4169292db":["mes","euromarine"],"20|corda__h2020::f75ee2ee48e5cb0ec8c8d30aaa8fef70":["mes","euromarine"],"20|rcuk________::e16010089551a1a9182a94604fc0ea59":["mes","euromarine"],"20|corda__h2020::38531a2cce7c5c347ffc439b07c1f43b":["mes","euromarine"],"20|corda_______::38531a2cce7c5c347ffc439b07c1f43b":["mes","euromarine"],"20|grid________::b2cbbf5eadbbf87d534b022bad3191d7":["mes","euromarine"],"20|snsf________::74730ef1439d7f7636a8be58a6b471b8":["mes","euromarine"],"20|nsf_________::ad72e19043a5a467e35f9b444d11563e":["mes","euromarine"],"20|rcuk________::0fc3e92500290902a2d38ec2445e74c3":["mes","euromarine"],"20|grid________::ad2c29905da0eb3c06b3fa80cacd89ea":["mes","euromarine"],"20|corda__h2020::30b53e4d63d3724f00acb9cbaca40860":["mes","euromarine"],"20|corda__h2020::f60f84bee14ad93f0db0e49af1d5c317":["mes","euromarine"],  "20|corda__h2020::7bf251ac3765b5e89d82270a1763d09f":["mes","euromarine"],  "20|corda__h2020::65531bd11be9935948c7f2f4db1c1832":["mes","euromarine"],  "20|corda__h2020::e0e98f86bbc76638bbb72a8fe2302946":["mes","euromarine"],  "20|snsf________::3eb43582ac27601459a8d8b3e195724b":["mes","euromarine"],  "20|corda__h2020::af2481dab65d06c8ea0ae02b5517b9b6":["mes","euromarine"],  "20|corda__h2020::c19d05cfde69a50d3ebc89bd0ee49929":["mes","euromarine"],  "20|corda__h2020::af0bfd9fc09f80d9488f56d71a9832f0":["mes","euromarine"],  "20|rcuk________::f33c02afb0dc66c49d0ed97ca5dd5cb0":["beopen"],
+                        "20|grid________::a867f78acdc5041b34acfe4f9a349157":["beopen"],   "20|grid________::7bb116a1a9f95ab812bf9d2dea2be1ff":["beopen"],  "20|corda__h2020::6ab0e0739dbe625b99a2ae45842164ad":["beopen"],  "20|corda__h2020::8ba50792bc5f4d51d79fca47d860c602":["beopen"],  "20|corda_______::8ba50792bc5f4d51d79fca47d860c602":["beopen"],  "20|corda__h2020::e70e9114979e963eef24666657b807c3":["beopen"],  "20|corda_______::e70e9114979e963eef24666657b807c3":["beopen"],  "20|corda_______::15911e01e9744d57205825d77c218737":["beopen"],  "20|opendoar____::056a41e24e2a9a67215e87bbee6a80ab":["beopen"],  "20|opendoar____::7f67f2e6c6fbb0628f8160fcd3d92ae3":["beopen"],  "20|grid________::a8ecfd7c084e561168bcbe6bf0daf3e3":["beopen"],  "20|corda_______::7bbe6cc5d8ec1864739a04b0d020c9e9":["beopen"],  "20|corda_______::3ff558e30c2e434d688539548300b050":["beopen"],  "20|corda__h2020::5ffee5b3b83b33a8cf0e046877bd3a39":["beopen"],  "20|corda__h2020::5187217e2e806a6df3579c46f82401bc":["beopen"],  "20|grid________::5fa7e2709bcd945e26bfa18689adeec1":["beopen"],  "20|corda_______::d8696683c53027438031a96ad27c3c07":["beopen"],  "20|corda__h2020::d8696683c53027438031a96ad27c3c07":["beopen"],  "20|rcuk________::23a79ebdfa59790864e4a485881568c1":["beopen"],  "20|corda__h2020::b76cf8fe49590a966953c37e18608af9":["beopen"],  "20|grid________::d2f0204126ee709244a488a4cd3b91c2":["beopen"],  "20|corda__h2020::05aba9d2ed17533d15221e5655ac11e6":["beopen"],  "20|grid________::802401579481dc32062bdee69f5e6a34":["beopen"],  "20|corda__h2020::3f6d9d54cac975a517ba6b252c81582d":["beopen"]}
+                    </PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setDedupConfig" type="SetEnvParameter">
+                <DESCRIPTION>Set the dedup orchestrator name</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">dedupConfig</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">dedup-similarity-result-decisiontree-v2</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="actionSetsRaw" type="SetEnvParameter">
+                <DESCRIPTION>declares the ActionSet ids to promote in the RAW graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">actionSetIdsRawGraph</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">doiboost,orcidworks-no-doi,opencitations,h2020classification</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="actionSetsIIS" type="SetEnvParameter">
+                <DESCRIPTION>declares the ActionSet ids to promote in the INFERRED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">actionSetIdsIISGraph</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">iis-researchinitiative,iis-document-citations,iis-document-citations-relations,iis-document-affiliation,iis-document-classes,iis-document-similarities,iis-referenced-datasets-main,iis-referenced-projects-main,iis-referenceextraction-pdb,document_software_url,iis-extracted-metadata,iis-communities,iis-referenced-patents,iis-covid-19,iis-entities-software,iis-entities-patent</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="setIsLookUpUrl" type="SetEnvParameter">
+                <DESCRIPTION>Set the IS lookup service address</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">isLookUpUrl</PARAM>
+                    <PARAM managedBy="system" name="parameterValue" required="true" type="string">http://beta.services.openaire.eu:8280/is/services/isLookUp?wsdl</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isJoin="true" name="waitConfig">
+                <DESCRIPTION>wait configurations</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="reuseODFClaims_PROD"/>
+                    <ARC to="reuseODFClaims_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseODFClaims_PROD" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached ODF claims from the PROD aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseODFClaims_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseODF_hdfs_PROD"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseODF_hdfs_PROD" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached ODF records on HDFS from the PROD aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseODFhdfs_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseOAFClaims_PROD"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseOAFClaims_PROD" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached OAF claims from the PROD aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseOAFClaims_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseOAF_hdfs_PROD"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseOAF_hdfs_PROD" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached OAF records on HDFS from the PROD aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseOAFhdfs_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseDB_PROD"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseDB_PROD" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached DB content from the PROD aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseDB_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseDBOpenorgs_PROD"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseDBOpenorgs_PROD" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached OpenOrgs content from the PROD aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseDBOpenorgs_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseODF_PROD"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseODF_PROD" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached ODF content from the PROD aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseODF_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseOAF_PROD"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseOAF_PROD" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached OAF content from the PROD aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseOAF_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="patchRelations_PROD"/>
+                </ARCS>
+            </NODE>
+            <NODE name="patchRelations_PROD" type="SetEnvParameter">
+                <DESCRIPTION>should apply the relations id patching based on the provided idMapping on PROD?</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">shouldPatchRelations_PROD</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">false</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="contentPathProd"/>
+                </ARCS>
+            </NODE>
+            <NODE name="contentPathProd" type="SetEnvParameter">
+                <DESCRIPTION>set the PROD aggregator content path</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">prodContentPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_aggregator_for_beta</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="prodAggregatorGraphPath"/>
+                </ARCS>
+            </NODE>
+            <NODE name="prodAggregatorGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the path containing the PROD AGGREGATOR graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">prodAggregatorGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/00_prod_graph_aggregator</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig2"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseODFClaims_BETA" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached ODF claims from the BETA aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseODFClaims_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseODF_hdfs_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseODF_hdfs_BETA" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached ODF records on HDFS from the BETA aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseODFhdfs_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseOAFClaims_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseOAFClaims_BETA" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached OAF claims from the BETA aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseOAFClaims_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseOAF_hdfs_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseOAF_hdfs_BETA" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached OAF records on HDFS from the BETA aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseOAFhdfs_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseDB_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseDB_BETA" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached DB content from the BETA aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseDB_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseDBOpenorgs_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseDBOpenorgs_BETA" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached OpenOrgs content from the BETA aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseDBOpenorgs_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseODF_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseODF_BETA" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached ODF content from the BETA aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseODF_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="reuseOAF_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="reuseOAF_BETA" type="SetEnvParameter">
+                <DESCRIPTION>reuse cached OAF content from the BETA aggregation system</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">reuseOAF_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="patchRelations_BETA"/>
+                </ARCS>
+            </NODE>
+            <NODE name="patchRelations_BETA" type="SetEnvParameter">
+                <DESCRIPTION>should apply the relations id patching based on the provided idMapping on BETA?</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">shouldPatchRelations_BETA</PARAM>
+                    <PARAM function="validValues(['true', 'false'])" managedBy="user" name="parameterValue" required="true" type="string">true</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="contentPathBeta"/>
+                </ARCS>
+            </NODE>
+            <NODE name="contentPathBeta" type="SetEnvParameter">
+                <DESCRIPTION>set the BETA aggregator content path</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">betaContentPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_aggregator</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="betaAggregatorGraphPath"/>
+                </ARCS>
+            </NODE>
+            <NODE name="betaAggregatorGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the path containing the BETA AGGREGATOR graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">betaAggregatorGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_experiment/graph/00_beta_graph_aggregator</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig2"/>
+                </ARCS>
+            </NODE>
+            <NODE isJoin="true" name="waitConfig2">
+                <DESCRIPTION>wait configurations</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="betaAggregatorGraph"/>
+                    <ARC to="prodAggregatorGraph"/>
+                </ARCS>
+            </NODE>
+            <NODE name="betaAggregatorGraph" type="SubmitHadoopJob">
+                <DESCRIPTION>create the BETA AGGREGATOR graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'graphOutputPath' : 'betaAggregatorGraphPath',
+                        'isLookupUrl' : 'isLookUpUrl',
+                        'reuseODFClaims' : 'reuseODFClaims_BETA',
+                        'reuseOAFClaims' : 'reuseOAFClaims_BETA',
+                        'reuseDB' : 'reuseDB_BETA',
+                        'reuseDBOpenorgs' : 'reuseDBOpenorgs_BETA',
+                        'reuseODF' : 'reuseODF_BETA',
+                        'reuseODF_hdfs' : 'reuseODFhdfs_BETA',
+                        'reuseOAF' : 'reuseOAF_BETA',
+                        'reuseOAF_hdfs' : 'reuseOAFhdfs_BETA',
+                        'contentPath' : 'betaContentPath',
+                        'nsPrefixBlacklist' : 'nsPrefixBlacklist_BETA',
+                        'shouldPatchRelations' : 'shouldPatchRelations_BETA',
+                        'idMappingPath' : 'idMappingPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/graph/raw_all/oozie_app',
+                        'mongoURL' : 'mongodb://beta.services.openaire.eu',
+                        'mongoDb' : 'mdstore',
+                        'mdstoreManagerUrl' : 'https://beta.services.openaire.eu/mdstoremanager',
+                        'postgresURL' : 'jdbc:postgresql://beta.services.openaire.eu:5432/dnet_openaireplus',
+                        'postgresUser' : '',
+                        'postgresPassword' : '',
+                        'postgresOpenOrgsURL' : 'jdbc:postgresql://10.19.65.40:5432/oa_organizations',
+                        'postgresOpenOrgsUser' : '',
+                        'postgresOpenOrgsPassword' : '',
+                        'shouldHashId' : 'true',
+                        'importOpenorgs' : 'false',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/beta_aggregator'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitAggregatorGraph"/>
+                </ARCS>
+            </NODE>
+            <NODE name="prodAggregatorGraph" type="SubmitHadoopJob">
+                <DESCRIPTION>create the PROD AGGREGATOR graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'graphOutputPath' : 'prodAggregatorGraphPath',
+                        'isLookupUrl' : 'isLookUpUrl',
+                        'reuseODFClaims' : 'reuseODFClaims_PROD',
+                        'reuseOAFClaims' : 'reuseOAFClaims_PROD',
+                        'reuseDB' : 'reuseDB_PROD',
+                        'reuseDBOpenorgs' : 'reuseDBOpenorgs_PROD',
+                        'reuseODF' : 'reuseODF_PROD',
+                        'reuseODF_hdfs' : 'reuseODFhdfs_PROD',
+                        'reuseOAF' : 'reuseOAF_PROD',
+                        'reuseOAF_hdfs' : 'reuseOAFhdfs_PROD',
+                        'contentPath' : 'prodContentPath',
+                        'nsPrefixBlacklist' : 'nsPrefixBlacklist_PROD',
+                        'shouldPatchRelations' : 'shouldPatchRelations_PROD',
+                        'idMappingPath' : 'idMappingPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/graph/raw_all/oozie_app',
+                        'mongoURL' : 'mongodb://services.openaire.eu',
+                        'mongoDb' : 'mdstore',
+                        'mdstoreManagerUrl' : 'https://services.openaire.eu/mdstoremanager',
+                        'postgresURL' : 'jdbc:postgresql://postgresql.services.openaire.eu:5432/dnet_openaireplus',
+                        'postgresUser' : '',
+                        'postgresPassword' : '',
+                        'postgresOpenOrgsURL' : 'jdbc:postgresql://10.19.65.39:5432/oa_organizations',
+                        'postgresOpenOrgsUser' : '',
+                        'postgresOpenOrgsPassword' : '',
+                        'shouldHashId' : 'true',
+                        'importOpenorgs' : 'true',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/prod_aggregator'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitAggregatorGraph"/>
+                </ARCS>
+            </NODE>
+            <NODE isJoin="true" name="waitAggregatorGraph">
+                <DESCRIPTION>wait configurations</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="mergeAggregatorGraphs"/>
+                </ARCS>
+            </NODE>
+            <NODE name="mergeAggregatorGraphs" type="SubmitHadoopJob">
+                <DESCRIPTION>create the AGGREGATOR graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'betaInputGraphPath' : 'betaAggregatorGraphPath',
+                        'prodInputGraphPath' : 'prodAggregatorGraphPath',
+                        'graphOutputPath' : 'mergedGraphPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/graph/merge/oozie_app',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/merge_graph',
+                        'priority' : 'BETA'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="promoteActionsRaw"/>
+                </ARCS>
+            </NODE>
+            <NODE name="promoteActionsRaw" type="SubmitHadoopJob">
+                <DESCRIPTION>create the RAW graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'inputActionSetIds' : 'actionSetIdsRawGraph',
+                        'inputGraphRootPath' : 'mergedGraphPath',
+                        'outputGraphRootPath' : 'rawGraphPath',
+                        'isLookupUrl' : 'isLookUpUrl'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/actionmanager/wf/main/oozie_app',
+                        'sparkExecutorCores' : '3',
+                        'sparkExecutorMemory' : '10G',
+                        'activePromoteDatasetActionPayload' : 'true',
+                        'activePromoteDatasourceActionPayload' : 'true',
+                        'activePromoteOrganizationActionPayload' : 'true',
+                        'activePromoteOtherResearchProductActionPayload' : 'true',
+                        'activePromoteProjectActionPayload' : 'true',
+                        'activePromotePublicationActionPayload' : 'true',
+                        'activePromoteRelationActionPayload' : 'true',
+                        'activePromoteResultActionPayload' : 'true',
+                        'activePromoteSoftwareActionPayload' : 'true',
+                        'mergeAndGetStrategy' : 'MERGE_FROM_AND_GET',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/promoteActionsRaw'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="graphCleaningFirst"/>
+                </ARCS>
+            </NODE>
+            <NODE name="graphCleaningFirst" type="SubmitHadoopJob">
+                <DESCRIPTION>clean the properties in the graph typed as Qualifier according to the vocabulary indicated in schemeid</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'graphInputPath' : 'rawGraphPath',
+                        'graphOutputPath': 'cleanedFirstGraphPath',
+                        'isLookupUrl': 'isLookUpUrl'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/graph/clean/oozie_app',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/clean'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="patchHostedBy"/>
+                </ARCS>
+            </NODE>
+            <NODE name="patchHostedBy" type="SubmitHadoopJob">
+                <DESCRIPTION>updates publication's hostedby info according to the ISSNs available from DOAJ and UNIBI</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'sourcePath' : 'cleanedFirstGraphPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'resumeFrom' : 'produceHBM',
+                        'hostedByMapPath' : '/user/dnet.beta/data/hostedByMap',
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/graph/hostedbymap/oozie_app',
+                        'sparkExecutorCores' : '2',
+                        'sparkExecutorMemory' : '12G',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/hostedbymap',
+                        'outputPath' : '/tmp/beta_experiment/working_dir/hostedbymap'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="graphResolution"/>
+                </ARCS>
+            </NODE>
+            <NODE name="graphResolution" type="SubmitHadoopJob">
+                <DESCRIPTION>Resolve Relation</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                       {
+                        'graphBasePath':'cleanedFirstGraphPath',
+                        'unresolvedPath' :'unresolvedEntityPath',
+                        'targetPath':'resolvedGraphPath'
+                       }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/graph/resolution/oozie_app',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/relation_resolution',
+                        'sparkExecutorCores' : '2',
+                        'sparkExecutorMemory' : '12G'
+                        }
+                    </PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="graphEntityGrouping"/>
+                </ARCS>
+            </NODE>
+            <NODE name="graphEntityGrouping" type="SubmitHadoopJob">
+                <DESCRIPTION>Resolve Relation</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'graphBasePath':'resolvedGraphPath',
+                        'targetPath':'groupedGraphPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/graph/group/oozie_app',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/grouping',
+                        'sparkExecutorCores' : '4',
+                        'sparkExecutorMemory' : '7G'
+                        }
+                    </PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="prepareIISActionSets"/>
+                </ARCS>
+            </NODE>
+            <NODE name="prepareIISActionSets" type="PrepareActionSets">
+                <DESCRIPTION>prepare IIS action sets</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="sets" required="true" type="string">
+                        [
+                        {
+                        'set' : 'iis-document-affiliation',
+                        'jobProperty' : 'export_action_set_id_matched_doc_organizations',
+                        'enablingProperty' : 'active_document_affiliation',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-referenced-projects-main',
+                        'jobProperty' : 'export_action_set_id_document_referencedProjects',
+                        'enablingProperty' : 'active_referenceextraction_project',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-referenced-datasets-main',
+                        'jobProperty' : 'export_action_set_id_document_referencedDatasets',
+                        'enablingProperty' : 'active_referenceextraction_dataset',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-researchinitiative',
+                        'jobProperty' : 'export_action_set_id_document_research_initiative',
+                        'enablingProperty' : 'active_referenceextraction_researchinitiative',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-document-similarities',
+                        'jobProperty' : 'export_action_set_id_document_similarities_standard',
+                        'enablingProperty' : 'active_documentssimilarity',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-document-classes',
+                        'jobProperty' : 'export_action_set_id_document_classes',
+                        'enablingProperty' : 'active_documentsclassification',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-document-citations',
+                        'jobProperty' : 'export_action_set_id_document_referencedDocuments',
+                        'enablingProperty' : 'active_citationmatching',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-document-citations-relations',
+                        'jobProperty' : 'export_action_set_id_citation_relations',
+                        'enablingProperty' : 'active_citationmatching_relations',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-referenceextraction-pdb',
+                        'jobProperty' : 'export_action_set_id_document_pdb',
+                        'enablingProperty' : 'active_referenceextraction_pdb',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'document_software_url',
+                        'jobProperty' : 'export_action_set_id_document_software_url',
+                        'enablingProperty' : 'active_referenceextraction_software_url',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-entities-software',
+                        'jobProperty' : 'export_action_set_id_entity_software',
+                        'enablingProperty' : 'active_referenceextraction_software_url',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-communities',
+                        'jobProperty' : 'export_action_set_id_document_community',
+                        'enablingProperty' : 'active_referenceextraction_community',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-referenced-patents',
+                        'jobProperty' : 'export_action_set_id_document_patent',
+                        'enablingProperty' : 'active_referenceextraction_patent',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-entities-patent',
+                        'jobProperty' : 'export_action_set_id_entity_patent',
+                        'enablingProperty' : 'active_referenceextraction_patent',
+                        'enabled' : 'true'
+                        },
+                        {
+                        'set' : 'iis-covid-19',
+                        'jobProperty' : 'export_action_set_id_document_covid19',
+                        'enablingProperty' : 'active_referenceextraction_covid19',
+                        'enabled' : 'true'
+                        }
+                        ]
+                    </PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="prepareIISParameters"/>
+                </ARCS>
+            </NODE>
+            <NODE name="prepareIISParameters" type="PrepareIisMainParamsV2">
+                <DESCRIPTION>prepare IIS parameters</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="islookupLocationParam" required="true" type="string">import_islookup_service_location</PARAM>
+                    <PARAM managedBy="system" name="objectStoreParam" required="true" type="string">import_content_objectstores_csv</PARAM>
+                    <PARAM managedBy="system" name="objectStoreLocationParam" required="true" type="string">import_content_object_store_location</PARAM>
+                    <PARAM managedBy="system" name="mdStoreStoreLocationParam" required="true" type="string">import_mdstore_service_location</PARAM>
+                    <PARAM managedBy="system" name="mdStoreDatasetParam" required="true" type="string">import_dataset_mdstore_ids_csv</PARAM>
+                    <PARAM managedBy="system" name="oozieWfAppPathParam" required="true" type="string">oozie.wf.application.path</PARAM>
+                    <PARAM managedBy="user" name="oozieWfAppPath" required="true" type="string">/lib/iis/primary/snapshots/2021-12-09</PARAM>
+                    <PARAM function="validValues(['IIS','DM'])" managedBy="user" name="clusterName" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="user" name="importHbaseDumpLocation" required="true" type="string">deprecated - not used</PARAM>
+                    <PARAM managedBy="system" name="importHbaseDumpLocationParam" required="true" type="string">import_infospace_graph_location</PARAM>
+                    <PARAM managedBy="user" name="objectStoreBlacklistCSV" required="false" type="string"/>
+                    <PARAM managedBy="system" name="importProjectConceptsContextCSVParam" required="true" type="string">import_project_concepts_context_ids_csv</PARAM>
+                    <PARAM managedBy="user" name="importProjectConceptsContextCSV" required="true" type="string">aginfra,beopen,citizen-science,clarin,covid-19,dariah,dh-ch,oa-pg,egi,elixir-gr,embrc,enermaps,epos,euromarine,fet-fp7,fet-h2020,fam,galaxy,gotriple,ifremer,inspired-ris,instruct,mes,neanias-underwater,ni,rda,science-innovation-policy,risis,rural-digital-europe,sdsn-gr,sobigdata</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="IIS_main"/>
+                </ARCS>
+            </NODE>
+            <NODE name="IIS_main" type="SubmitHadoopJob">
+                <DESCRIPTION>IIS main</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">iisMainJobV3</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'cluster' : 'cluster',
+                        'oozie.wf.application.path' : 'oozie.wf.application.path',
+
+                        'active_document_affiliation' : 'active_document_affiliation',
+                        'active_referenceextraction_project' : 'active_referenceextraction_project',
+                        'active_referenceextraction_dataset' : 'active_referenceextraction_dataset',
+                        'active_referenceextraction_researchinitiative' : 'active_referenceextraction_researchinitiative',
+                        'active_documentsclassification' : 'active_documentsclassification',
+                        'active_documentssimilarity' : 'active_documentssimilarity',
+                        'active_citationmatching' : 'active_citationmatching',
+                        'active_citationmatching_relations' : 'active_citationmatching_relations',
+                        'active_referenceextraction_pdb' : 'active_referenceextraction_pdb',
+                        'active_referenceextraction_software_url' : 'active_referenceextraction_software_url',
+                        'active_referenceextraction_community' : 'active_referenceextraction_community',
+                        'active_referenceextraction_patent' : 'active_referenceextraction_patent',
+                        'active_referenceextraction_covid19' : 'active_referenceextraction_covid19',
+
+                        'import_content_objectstores_csv' : 'import_content_objectstores_csv',
+                        'import_content_object_store_location' : 'import_content_object_store_location',
+                        'import_mdstore_service_location' : 'import_mdstore_service_location',
+                        'import_islookup_service_location' : 'import_islookup_service_location',
+                        'import_project_concepts_context_ids_csv' : 'import_project_concepts_context_ids_csv',
+                        'import_dataset_mdstore_ids_csv' : 'import_dataset_mdstore_ids_csv',
+                        'import_infospace_graph_location' : 'groupedGraphPath',
+
+                        'export_action_set_id_matched_doc_organizations' : 'export_action_set_id_matched_doc_organizations',
+                        'export_action_set_id_document_referencedDatasets' : 'export_action_set_id_document_referencedDatasets',
+                        'export_action_set_id_document_referencedProjects' : 'export_action_set_id_document_referencedProjects',
+                        'export_action_set_id_document_research_initiative' : 'export_action_set_id_document_research_initiative',
+                        'export_action_set_id_document_similarities_standard' : 'export_action_set_id_document_similarities_standard',
+
+                        'export_action_set_id_document_referencedDocuments' : 'export_action_set_id_document_referencedDocuments',
+                        'export_action_set_id_citation_relations' : 'export_action_set_id_citation_relations',
+                        'export_action_set_id_document_pdb' : 'export_action_set_id_document_pdb',
+                        'export_action_set_id_document_software_url' : 'export_action_set_id_document_software_url',
+                        'export_action_set_id_entity_software' : 'export_action_set_id_entity_software',
+                        'export_action_set_id_document_community' :  'export_action_set_id_document_community',
+                        'export_action_set_id_document_patent' : 'export_action_set_id_document_patent',
+                        'export_action_set_id_entity_patent' : 'export_action_set_id_entity_patent',
+                        'export_action_set_id_document_covid19' : 'export_action_set_id_document_covid19',
+                        'export_action_set_id_document_classes' : 'export_action_set_id_document_classes'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'import_mdstore_service_location' : 'http://services.openaire.eu:8280/is/services/mdStore',
+                        'import_content_object_store_location' : 'http://services.openaire.eu:8280/is/services/objectStore',
+                        'import_islookup_service_location' : 'http://services.openaire.eu:8280/is/services/isLookUp',
+                        'import_content_objectstores_csv': '258755af-0b48-41ee-9652-939c5bd2fca3_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2ad5f567-386d-4812-8edb-c0922eacd107_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f3b32c75-9077-4788-83ee-c8451215043c_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7e780872-eff7-4a03-b5a2-13ad69c01366_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,0a0fcd82-ae5c-4a10-af47-5106e881b639_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,c16030ef-917e-462a-8414-2a8e2fac7619_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,8f3fdd6e-a2cd-49ad-ba93-73c8184190bf_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,909b5ec2-6859-4acf-a86e-22e31933392b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,cea77c2a-feba-4c02-ac3c-d51a159ec904_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2db71b6a-4838-4c25-9883-d4689148bb2a_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,8d7df838-62c9-4adc-8cd3-f7e84f732ff4_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f90b105b-d12e-4061-99d3-0fdb85d10258_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3e74e2c5-4844-40a4-b85f-b3ef920612b9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,ddd7b3cc-01c2-4512-9550-52b2446f7dfa_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2a09fb42-38f0-4a7a-a95d-97d81f716e77_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,83b7328f-2ab7-44eb-b213-2d770c4f074e_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,99d7d7f0-4f76-4cb5-9b22-3ee8ec28b9c9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,4a484614-fd61-4ca5-b520-610335065fa2_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,32a76449-27eb-4b5f-b0e9-11cd9af0e035_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9d22aa91-83c6-44d4-b614-943d855734a5_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,71ddf676-f6a4-48c9-9d1d-4ca6742e7316_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,d1f4546f-e47c-47c7-b19c-6334633b5f7e_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,03ebfd29-88a6-4757-9d05-64ff5018b91a_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,ba437ca2-8071-4835-9615-a14eb1fb9ff8_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3cf2373a-8228-4781-b0f2-9b4343487fc9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7818e488-0ba4-4558-8f76-83cacf2f7358_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,fcfcbfd8-4e7a-46a8-a5ff-281c5fa11767_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7b988985-c798-44f1-bff1-5574d2abe8af_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,24d97463-144b-4bb5-b6b6-7f1f5b014833_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,5b84e8f6-3ab9-40ad-be6f-7b60b24b9e42_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,a8c1d0ec-9f3e-42ba-8748-f9b5e62eb7a1_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3cd6626e-8e0c-49ae-89a7-5e1286bddf8e_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,097344eb-7312-4096-ab9d-204c6fd8395e_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,42e09e1f-352b-4ba4-98e9-0826635009d9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,792e67b2-29ed-40ac-a406-61726f5921ab_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f78c1ada-b747-4862-a68b-45d61613199f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,5707d04f-96b0-4e59-8607-5d095a3bd301_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,8fce096c-c0d8-410d-9f07-a93ac87cf2a6_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2f817fb6-3b23-474a-b137-0c4739c264b6_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3a5fb37f-8d49-4432-a294-538af185ac88_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,0b17e450-8f41-4edc-8d08-68f644a41c3e_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,cedeffa5-70ac-4415-9640-fcc997f36aa9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,ce93c295-ca6d-48e7-9a28-eaf26cf57cb3_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,62e02764-705a-471d-8057-359b0ed3c904_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,ac5b5231-e600-43ad-8f91-16a91695d81f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,27c2d995-e379-422a-9e4c-12999d6c9846_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,990226a9-28f8-49da-be60-806e1a09addc_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,5e940a8b-88df-496e-a856-aa0a949effe4_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,73979dd9-ccc7-495f-87ab-be0a6be4fcf0_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,b8eee4a1-1163-4b02-86b9-13443da6dc14_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,6af002f3-cb24-4086-b912-56583e4e9bd5_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,75f3089e-1cfd-40f0-bdfd-88c80e5d53f2_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,d794e42c-93fc-47ce-8fe8-e5e40220f770_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3bb435b7-2cec-43f1-b19e-89656d68b1b5_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,82563c20-9d34-4b42-8b18-af629d483133_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,30a18588-80c2-4c10-ac6a-7823a47bbea4_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,74373d10-aa93-4a81-b4a7-928801073f3d_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,6002b6ef-1cb3-4277-8e6b-50ca1c6b2bc0_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,bc097067-e9c6-44ef-9251-1dc1a9f4dd0a_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,70d8e385-b668-43ac-9b08-a0e2aa6b0b3b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f3550954-6dd4-4f70-b2b2-fa332f9cf0f9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,c3fd0f58-164c-420e-a0c1-45cd5de7dc8f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f8df0721-fbec-4d2c-be7f-9570406adcac_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2a51aa1c-16b2-43e4-bb84-ee353ddf77df_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f68c874d-dd8e-4006-ac73-094f6179d0ca_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,81f561d7-1008-4e85-8f49-3c862cc5257d_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7f30c022-1bb8-4752-81cb-2ce948353930_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,178a2b94-08e6-44c3-b8ba-e69329681e2b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3b37b1bc-64d5-4d41-b9e2-63234421d098_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,a88973fd-62ce-4284-a56f-c5197123d8f9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,e9f27bb4-0180-483b-903f-44358856aec7_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,75b967d0-92a9-4a02-96e6-2ccfd39f5305_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,ca01e02c-630c-4e69-b9c1-28e3196dd383_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,212aec8e-a1c0-4e82-b46c-5dce0feaa560_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,75b66f48-57f6-4920-9493-b667be192659_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,fcd93176-ec23-4676-9149-3fe525435943_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,5c75e6ff-31b0-41f7-b73c-bee9adf3fa60_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3ed071cf-f00f-4d9d-a0ba-8b50eaebeb2c_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,ea1c9a3d-369c-4658-b003-51d864c26659_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,b203ea92-1a60-41c9-98bd-6f9f6d5a5f03_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,df08df2b-e184-4b58-8c7b-13ee24caf292_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,1b7cee3d-4eb7-48d2-bd92-8166bc6bd61f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,521bc388-5d9d-43ae-9650-15767fae368e_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,192bf304-42b0-4f77-93da-ecc2cb2e9c7a_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2ae6ac56-a0dc-4014-ad35-fa6b060458df_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,217a415a-3b7c-4aa2-a501-8f68c8fa094a_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7387fc00-5cbb-417d-a334-f6ae17c1d0d7_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,b558b01d-e6b8-47fd-92bc-0a11d6e0ae19_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,d5cd3825-141d-4c8e-bb6f-a507d81532dc_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,36ff4b61-e1f1-4aa9-8149-3cc3f4259308_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,34fdb421-8142-42ee-96b1-1a3ed8850561_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,b102bbb2-5197-4773-bb85-adb5f019d53e_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,50789366-2c51-4caf-a0ea-1ae9466aad00_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3053ae8a-1a6b-4e4a-966f-968cdd982830_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9c86d5e7-14f6-42f4-9e00-860f235e5572_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7e04231c-9f98-4fcd-9659-865c692138f8_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,343a909a-21f4-4daa-9e1a-761c2e7ee2b1_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,389567f2-c640-40ce-a14d-089557398f26_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,1f08eaaa-f898-4c2c-a828-f0f7ce458835_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,6802f369-db89-4528-b5ec-f163b29ad804_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,45767cd1-d258-44c8-9498-48b63c836ea0_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7b135c9a-7516-4095-bca0-6cd09029ee25_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,8c2c2853-b126-45b4-b7c4-27a53490ec1d_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,88e4d72b-81a6-4b4d-93a7-57dbe6315fc0_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,cb8e86be-c771-4060-a7c0-87ea34056bc7_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,39513d48-6f56-44a5-9df7-252897877baa_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,80d6cbdd-2068-46a7-aae4-5b7978f34840_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,172957e8-5e2b-4ef7-be9f-d53159580fbc_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,23638864-2e5e-448d-bd43-ddc78ed00129_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,268c97ff-4374-4720-bee6-8ac03f934093_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,05c9ad76-ac3d-418e-88fb-0ebd28b865c7_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3cab6d9f-12d4-427e-baa4-992ff1e89d96_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,85624194-48c2-4f78-9dac-bd97afcdac97_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,333f85b4-4334-4eee-a137-41a889033f46_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,00299a55-13ef-4aca-a759-22982c0cae59_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9dce6dcf-dbea-4d9c-a3cf-d0c0c732d863_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f9a0d2cb-2657-4370-bbcb-0c7634a8d462_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,5193e9c6-766b-456f-a5f3-6fedbdd2bbad_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,06f8b1d5-7e21-4ce2-abce-3baa5ac840be_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,c5b6d4a2-892e-4ceb-a39c-ceb841739d9e_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,10ecbc8b-ea58-4133-9189-896f732114f4_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,881431d5-50c0-4983-bedf-09ba7b80543d_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f3bc9690-d4ac-4c28-9356-bfbafea2b9f6_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,a3e22dcd-214b-4204-9de4-9d19e16e9dbf_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,a065ba53-325a-4f0e-ac1c-1322b5f2b52f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,31ffcce8-2ba5-4f60-bf59-48f008d82ef3_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2f440571-f9e9-4599-b952-446f7ab24682_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,ec705b5f-f361-4a6f-8817-ef8c027c3c19_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,fccd2c7c-a889-4030-b827-7bda953b90e6_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,b0b1a376-7c0d-438e-b1b3-86660668e11b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,acb7a4f3-abf5-4cc7-a1fc-2d27882c2e06_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,823addf2-fcc1-4007-96e8-d11806c1cffe_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,0ce49a90-d900-4be5-bec6-2c64c4131817_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,79126722-17e9-4e3c-b726-cd2d010c97b9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3789780d-5fa3-4480-95b3-1a83fc0af151_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,879bbbfc-2d87-479c-a81d-8750954f0445_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,07e10331-ed9f-4173-baeb-510381815081_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,1bfc3890-b54a-4072-90e6-93ba1a2da3ad_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,1c85cbda-5e2e-4db9-ba93-408b84c90bd8_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f9c06301-29c4-4559-8bf9-220173597a7a_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,e0aec0ac-d954-4bae-827f-e8908c5fbd4b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,91dde45b-158c-4e81-b7e1-108dc68dcf55_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,877113b2-affd-4a70-b67b-fe9b555399ff_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,16887dca-84c7-49f6-a352-5cb9a80e1e24_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,b10c7251-0b77-4a9e-8ffd-4af48f66b6ee_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2563b673-7db2-476c-ab72-1538aebbc528_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,d29af09f-6d1d-4afb-9409-d2b001bfeee1_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,276c2099-31b2-4413-ad7f-efb8ae3b7f0f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,6e2e600f-614c-4405-b93d-6206630a5771_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2ab5b738-5a98-4dc1-a69e-bf42270defb4_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,ce6b6847-01eb-407f-bcff-e215702be3cd_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,c1e0ee7c-58ce-4430-8ffe-dc80c5c4ba8c_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,af0edc23-2ba1-4fb9-a3b4-9349d2ddb09a_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,e416ca69-df34-424e-8589-4c2c6973dcbd_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,98f665d7-662f-4a87-8b44-cb0bcc40ceb3_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,67550112-8af0-4b99-ad43-1c484811b986_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,00846284-de91-42a6-9bbc-0cb5c574ea44_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,6e3b2a99-a96f-4cbb-af06-36f6402ff8dd_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,01919ec6-2a78-48b0-8ad0-e68f395d28ff_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,02297d7f-96c1-4191-89d6-fc5a01754c66_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,6df51c9f-618e-433e-8db9-ccb302f8985f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,c4e0a3a4-9c00-4625-bb0d-595d217d9159_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,d7fac7fc-01b4-4f1f-a751-cf108bbe8662_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,4153debc-f82a-4fc6-814a-4b47d8252eec_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,96990cb0-046f-47df-bd03-af19ed27f8c5_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,60c83aed-9dc7-4f15-8cc5-25cdfcb67078_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,92f9e507-a0cb-4e40-93e8-73af84ae9d61_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,c97e4d00-7c5f-49ab-b562-4e136e07de56_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,c2457314-928e-4919-b82b-922d8449f3ef_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7ddd9cfe-ddcf-40ac-abfb-90f47f8f40b8_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,99535b31-190b-474a-8597-1b2b89e7509a_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,a8ddcc4d-3b31-40ed-8126-781698bcdfd8_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7735efdd-9bd4-428b-964f-e1ebabc30641_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9e5c6bc9-8e0f-491c-9f61-81a180dd7ee9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,40519d2f-4bcd-40ac-88af-106be7bc3955_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,dad827f3-5e0c-4ab2-b12b-178dceec35d5_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,dffd4e39-ace7-4640-9b32-51d41c42ee35_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,8bc564b6-c341-4245-b409-01b17bf9b0c6_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,cfcbca42-1a98-407d-aea2-f4c6d412b634_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,6d277175-f0e9-4838-a4c0-17b6067ec061_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,245a0fc3-d074-4c7f-9351-ee61aa35ddb1_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,66883fbd-e658-4b39-ab3d-8d08e27789e1_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,8fa62afa-53f5-4d1d-b05f-773c62fc7b87_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,d45be243-514a-473f-9648-ef696e41b6d5_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,6a9b4f86-cdd1-4fa2-ae0f-71a8bd22661d_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,fb62b38b-25b6-404e-8636-956de83c5394_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f05821b6-b895-47df-bbbc-a0412abefa32_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,55c0f5c6-d4e8-47b0-a093-0ed389da1d33_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,e4d01f17-5209-4bed-8e49-bdc0a39985d6_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9f562259-c706-4c32-beb5-deb7a5aa449b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9704d935-077e-4235-ac73-75b1eb7662a1_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,392c57e8-c9ff-4fb1-84b4-6e97d586b229_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,4915b64b-cbbe-4b67-a4f1-7e35cb30ad8a_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,0db9404c-0222-42aa-bd84-aeac28e6a50c_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,579a8c3a-d5de-4ac9-97c0-1e8decf4f781_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,76fb60c2-9e3b-4506-8011-bb14229ec67e_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,19afa842-8f2e-4bb1-860d-f39eccd96b18_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,c80b36d7-0945-4a75-a299-32c83893d19b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f89add62-eb50-401b-90a8-9441f105ca17_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,214a7942-8ff7-43c2-91be-32e6ebb67488_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f476dd49-671a-44bd-9b57-d3f6b3b15d1f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,b928b5aa-3e69-43db-805f-1250abaf0456_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,0271e5a0-b086-4f92-b0c8-89d7066add6b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,90e71a3b-9ea9-47be-bbf9-9a9df6b4747f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9b6b02f9-ca49-4896-bebf-d263297ab230_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,6301df3f-2da8-4f16-b01c-be02340d9713_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,df85bb2c-7c83-4747-bfae-b1fd20dbc001_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,0765fc2e-65e1-4510-bebe-7c9276221340_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7a39bcf1-c5e8-4eea-aadb-a2b4c43a159c_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,e6478ddc-5290-492d-a571-6a2e621a06c6_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f0211b1c-9a1c-40f2-85e8-5e22b1d29dc9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9517683c-c63e-4914-88e8-70127e57fab8_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7a705f7c-9252-4724-a3de-ead9413e68f0_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,abc008fb-4648-4b92-9213-559f609e9e8c_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,e82a5c42-798c-4314-8d07-e51b975f9167_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,c8309a3f-c374-4974-96cc-3bab9107cf36_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7ab041de-fac8-4914-add0-cbd1c5fabbdd_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,4a7ff1b1-43a3-4204-a026-3d7ac5aa3935_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,44fcd8ab-1b6b-4642-b1ba-f0cb9d5e1896_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,947d5bd8-2a5b-497f-bfff-26df1ca121cc_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,14d784ac-b5ee-48c2-a360-4a4d9ec3acb9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,afd138ca-c90d-4220-82fc-2baf12364bdc_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,213aad7f-e540-4eb6-b262-9c30cd83e848_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3b6082c5-2489-4209-ab3a-9bd8ea9be071_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2c111602-4bf5-49c3-8ad1-cc0db22242e1_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,bab223d1-1845-4a12-b345-8a26765c4213_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,97fa0e7e-f45b-4338-b983-726eaa7c364b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,55703b4b-7a6e-4088-ac81-5d43b6d19b33_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,03b240d3-fb71-4474-adab-ab48e7e2cc15_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,a9279aea-743e-4890-b520-4f430d04716c_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9528eee4-d154-4bf0-adc3-e7412d543da0_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,58f3d18e-ef7c-4b21-9816-36b3f6beba55_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,cfa16256-66b8-47cf-9279-b733da0f79a0_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3e2ea667-9887-414b-96f6-979eb76b35b4_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,59afef00-c880-4e9b-88ca-8c2379b117ae_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,09685143-e732-4ce5-bcb5-4f4917f0200c_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,bb924eae-dc4d-474b-947b-3476acef5f27_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3e1fe865-eaf7-4d09-8817-e53b2727917b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f98ee989-651a-4e7c-b092-9bcfb95529e0_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,66f1c2b1-15aa-4edb-ab32-f49ce982b306_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,6ba83161-8935-4c33-9dd5-4fff396a217f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,93c22207-5753-42eb-a479-b971a80b3137_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,c4e74e75-9f6e-4b1d-bc01-878b823a6b76_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,26755930-7ed3-417c-81ac-bf93fbe51e57_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,a770df9c-1ff2-4922-87af-d0d769378c2e_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,d3ffb188-6155-4f23-8666-2ae6d171f3e9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,65c55bd6-158a-4753-8aa9-03b4574f93ce_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,42d3fa69-20b5-44f3-a1b8-5f8828bbb9c9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f015f8a5-ee1c-439a-b545-8e50d45e95bc_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,04a1a309-bc60-4f2d-9e5e-5d852a9ffa63_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,4e1e3d94-79c5-4c3f-ac6b-e9bff29c4f0b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,55c3d882-5e9f-4db6-99b0-6b20ef388a69_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,e5ab2419-aa6a-4222-9c49-393d9823f6d6_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,71a6d543-9b9b-4e23-8e05-8e8d81f0fd7e_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,4cc9528a-882d-4cdd-b43e-eb120b0050b2_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,70799645-2100-44d8-a37a-a1ef6115a9a8_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,26964221-d113-4c24-ac92-4e870f647dd1_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,abd48a12-9e16-46ca-a1db-0cd30e3899bc_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,0e768d9c-0e6d-4ead-846a-dc732624be65_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,5ebea5b7-4667-4c77-b34b-1ec2fdb41e87_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,fcd35a53-64c6-47e6-a9ab-8b0c56aff4ef_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,593f01e4-86b2-4e38-a9d9-5c617703fe97_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,620fa76b-9033-418d-996e-d2da91f36e4d_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,96ce7f94-4ecd-42e1-a96f-16d5eb4cfbb2_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,b965d1a7-d911-428e-98cf-de78a25b4cf6_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,39f07181-4e67-4a0b-aa13-a625789834fa_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,1353dd10-b088-4ae0-9426-dd09a54af7cb_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2ab5aed4-b8eb-455b-b8ad-55566c9592d7_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9ba73764-bb52-44c0-b5eb-f272b89aa2f5_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,8fb38f2d-8a73-4572-9694-72d85478c6f3_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,65b6f6e0-c5f9-45f6-8cdb-2fa892cf0b31_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3fa68746-d403-45b0-9440-3820ab2abbe9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,68ffa111-c0ef-411b-9fd5-e8ac0bee1771_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,d16b49af-3113-4a4c-a709-e860c8810eaa_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,c31e4305-5d8c-473e-b4e9-bad6af132857_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,773a1004-6aec-4196-98f6-135a08c6fe74_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,fbdab11a-70b7-46dc-91e4-9228cb9d15e6_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,c590e698-eebf-448b-9cce-a7cce759a2eb_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,fc0cf5ba-1294-4d15-9671-620d0f50c80e_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,0327e908-54f3-470d-9300-fbf9d58fcfc8_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,554b305d-6112-446a-8de1-24da5da45847_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,b3fb2842-a6ba-4208-8203-78b8bf6b380b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,a87e2d54-4801-425a-a2ff-085d199d2165_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,e5390536-1946-421f-8427-fe1440403ea5_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7475a216-56da-44c7-92f6-ff1368ff8167_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9795c4f7-21c4-4876-9ab7-d1c717fc2985_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,50ca9829-300a-4bf6-96e5-33f1fb81d4d9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3b2ce259-00a1-4fd2-b4d5-8e1a6915cced_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,e43a557e-56d2-4d4d-8fbe-dd54140842d6_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,1eb5e1ee-ef00-446f-bf8e-e6e86d1c0911_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9f0b8522-96bf-41eb-b3af-703530077f72_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,522e4345-f690-4b76-8ef2-fbce695debfa_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f77c9673-1b3e-416d-b935-e0b0cade1ddb_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7fcb1dcb-8cb3-40f0-a965-dcbfa6cdce0c_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,e7accb29-1624-4731-8ada-666be2bc9ca4_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3f92004a-6fc8-4a31-a427-6a7035d9cf02_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,13b4cf1a-37e2-4cdd-b08d-14352cef6ba7_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9174da20-ff65-4875-8a36-7bb201a71ac3_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3bcea802-91c8-418c-9f1a-c136ed4513cd_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,32c27158-2a5f-4ce2-acf8-be57fe7087fe_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,c924ea03-1721-4db9-a432-bf917b18e57e_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,6325fe16-5f6d-45fa-ad4b-83ace4b371a7_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,d53d61a3-be3b-4a59-9051-3372768ebb7b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,cc8f9cce-b55f-4d54-8e65-8481fe6c1f1e_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9c73db00-24fe-4d1b-8099-18f47089acf1_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,37fc21cb-d23e-45e5-9959-82135d658ba6_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,4ebf4c19-0401-4d2f-b578-692c6962840b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,18e76570-2d08-4457-bf8a-c3a8d14fe346_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,fd0b3cb1-bfc4-4679-a320-2277c2cf7181_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,01336277-976b-41c4-92b6-507f3716fa7b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,cde297e1-54ee-44f5-99ad-23938b40ef89_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3e42e429-23ce-42fc-be9a-77b99d742cd2_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9b7eb529-d04e-4301-9078-fb02b79ee6e7_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,ef21449b-bde0-46f1-91a0-720a2c9921bb_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,fa856b69-08e0-4e99-8317-b2abdf007444_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,e557faae-63d7-4439-b32b-d11cdedd1820_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,a749af27-1fdd-4a6f-99f4-dbb9f05ba51b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,54a3ee50-46fc-492e-83f8-e3be5cf34a8f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,68ff4d3c-e1c5-443a-a575-6ba47c77c517_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,af10fbe8-8608-4801-890c-f6c01efbe0bb_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,0d0901b3-daeb-4b16-8915-fdf6fc0d0521_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f1a05918-9c80-4591-b889-a338feedd0d4_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,627f58cb-59ee-4846-991a-45e16c7cc3b8_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,fe58f033-823e-473d-8234-8ac5dc22f347_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2a93d54b-2c70-4f8e-935e-ffea440a4324_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,633f943b-f8a5-4702-8bc2-39df981ace6f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,82e48289-28f3-4fca-89fe-ca0655b8db87_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2f0894c1-2c82-4ebf-b8d6-07987369ece7_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f63e4258-a3fb-4383-ad43-d415ca032b2a_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,1568c709-b306-46df-8630-73d7aab57a9c_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,8f4bdef7-6301-44e3-884f-1e037ee4ea4c_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,d504551c-e608-43d2-be64-1c30067d3396_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,684c4d40-8f74-4965-a18c-8204c6f2d466_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,54e0a050-e716-40ba-bc97-ae80d0df9c8e_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,0a443e4c-8b18-4f6c-99f9-9fddabd13986_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3e1838b1-3485-421f-8806-57e14f46f00f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7737dd48-a89a-4fe7-ba95-29445391baed_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,d4cb47b7-ac3f-4034-bc7f-021b62ee7612_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,09f6b0dd-fdf5-4674-888e-5e75291a4181_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,fb45b9f6-e3fb-440e-9459-b15df356372b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,a355978e-abc2-4f1a-83f5-20e8d4189e91_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,aa11b8f2-1c33-404c-8227-1d27fa948a01_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,53a09ffb-b8ef-4be9-9363-6940aadbf414_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,e29fc1b0-db4d-4f89-88d1-bdecef46546f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7157d5dd-464a-4143-941a-c99d1ed25886_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f9a1f806-0ced-4b22-9b33-6e52296f47d9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,208c6e8c-ad86-4e69-9805-8342de977835_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,682feb2e-563c-407a-9480-32a260c819b3_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,b9ae064d-e76a-44e6-aab5-2c0de2d4aea7_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9be76f8a-ce7a-4d15-bd3b-2d182a265c1a_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7b5e7343-be40-4505-844a-7cd763358215_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,57b8dfa5-154a-4e6e-8409-5de1e4d3e12e_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,df135a7e-1cf6-487e-b231-d0130cbb3e94_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,99641569-0e73-482b-a4b9-c880ec2ca281_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,68c903e3-c0a5-4cc0-bec1-8f86f98b78ba_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,972456e7-148a-4849-8d1a-33d12ee57fac_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,5f5a112c-c38d-4973-acf1-4aefbb6608cd_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2cbead31-3ad5-4533-97a9-57169ae2d18d_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,67098888-0feb-41f6-9dc0-49b11436eef3_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,1e28984d-b120-45b0-ad4e-91b563186e2f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,50a2a72b-ea21-4ee8-8956-0d35ae1eb2e2_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,07413001-9767-4a53-94bc-d911ad6bf9fa_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,6f93032a-936f-4f70-8e6c-cd4935dce538_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,492066de-7eda-4ea2-bed7-84f498138b82_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,be1b0d20-b721-4d91-beb4-b34a2c30ea92_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,ef1b59bd-5245-4e24-ab34-6bcbdedc69a7_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,02fa6adf-4cc6-4f99-8368-08da9b78885a_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,cd6e7a8d-468b-43c1-95ae-8d869691787f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,ce7127d6-99fd-42be-b86c-1fcc9c1dc0c6_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,a96337dc-fa05-4968-9ba0-33a981278e37_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,542e43fb-2a43-4185-b308-5967ad9d9ac2_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,5137ca31-2ac8-41e9-ada9-4dc20f3839bf_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,36618a76-f6a9-45e9-a097-1b50a236afe6_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,06f1c21c-9509-49e9-8032-7f83e426df55_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,058a8510-05ea-4d44-a12d-91b759ff50dd_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,bee33dd6-dea6-4a82-a30c-362adb0045c1_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,736fb544-c839-48d1-bcb6-aac4c0b8f995_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,a98acfba-1f27-448b-a625-42263b985cdd_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,71de8115-0290-42f9-8101-fd01953bb93b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2913194c-f136-429c-8414-9f06156334e5_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,44e6daf0-db3f-4210-92f7-8e39054584b1_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,63140bbb-ad8a-429c-b66c-9f08a8cc2d6b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,4630a2a0-69ef-4558-896f-402d4820aa1f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9a04b295-8738-40ee-a9a9-155abe853cd4_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,b0159d0d-42e9-4fee-9e88-3711bfa5180d_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,1f295a0c-1ca6-40b3-844e-cdff57520cc6_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2890a3d5-0b79-48b9-874f-f157911b7bda_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f4f56e08-58d6-4bfa-a747-68f0ab436afb_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,612889ab-8e79-465a-9e76-ff881f74932c_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,0df9c398-9133-41ca-a8d8-6dd1df3475c8_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,bffbeb98-b8b1-4186-9ebe-440a3533a5d7_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,6d4119b2-8139-4a60-9080-cb5dc22b58ef_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,600ae3a4-d4fc-4146-9002-d225ffdb25aa_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9b1acfe1-28e1-4d8d-935d-f99d1cd23c8b_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,d2d82597-b8a5-4ee7-a3e2-16df33095de9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,81174703-1336-408b-b740-1566e032df53_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,747cece6-1b2b-47b6-850a-143b92b034ea_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,b5f5c68d-d68d-4b53-8c2c-8daa765dc252_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,d74fbcd9-6662-49c5-a809-9d892ae17c37_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,d19bdb3a-07eb-497b-af16-0700a2ac0bad_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2ff2d259-85ca-4227-a581-4270d1e2188f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,153fdbf9-5594-4425-a05c-5e804c01ecfb_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,d23e27c8-4696-4c59-9db4-e670acc8b922_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,76b04d5f-68c8-41d1-91f5-bd5e683c69b8_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,fcc406ac-80a4-436c-af81-da5659b0ba65_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,14c0d716-4b07-4861-8108-8a98ee259f5c_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,8b81d43a-88c4-47dd-af1f-a31795429ffb_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,03bdbb2f-95d8-40c2-be26-06b3153849a1_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,25828ad6-ce19-4869-ab00-f50c8af89912_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f043d6bf-1e27-4700-a099-bd6e1718bfc3_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,ed98162b-984d-48b5-9069-4e4676c220dd_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,74cf3342-d8ff-44c4-9b6c-82f32804fbb5_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,06857595-9a09-4ba9-b520-03962f211782_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,a98cfd91-a351-49cf-a901-2b731aed3d17_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,e2d0c4bf-c496-4637-9b36-c9989a8b26e0_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,ddbd3cb5-b244-425a-a975-94fb8eba5a85_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,a710a888-42f2-4885-bfe7-dfb95b62494e_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,e7cba260-b7dc-43b8-922f-5686a7daa57a_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,7b3ce677-ce27-4a26-b08a-361054209447_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,be4040a8-1ab6-4e07-bfe6-b054fe1e26d3_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,e33a1a7e-9a38-451a-b1b7-a7677059e691_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,a855a42c-f254-4749-a2e5-1053d5518ea9_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f6af618a-c667-4b57-b67f-947b0f0e5956_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,f68904d3-50f9-424f-a6a8-d643886d01f4_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,28ea697d-8e0c-417d-bd46-f0088c160bf0_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,6d74a029-4569-44ec-9e70-68d78cb7386c_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2d8a6b94-7bd2-4f80-b60c-5a9f4aafda2c_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,62f6b1f4-e06b-4106-bf34-fbaa637b5edd_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,cefb2ed0-5f56-4884-9444-5343e6ff248c_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3da72380-7057-489e-88a9-77160abc124d_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2bc98bbc-66e3-4d7d-b113-619cc4ff6ff7_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,af213802-4a8f-44d8-8a9a-db80e39ecb74_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,e43c85ac-14e8-4a08-b575-ce9220cd448a_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,9279d3f2-270b-4d23-a653-02573d4a1e85_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,ARCS3PDF-0e73-473b-8502-71793ea55769_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,2dca6fc4-fdfb-42f6-a18c-bfa6b1101ad6_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,4a4cf004-7f89-4362-869c-2b3fbb0c5266_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,18857150-a6f4-4315-8296-bd15ee8b0445_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,646d810f-4100-45da-96b6-47be0c3258ce_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,3239c2d2-7efe-43bd-8c5f-29e3c5f0b81f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,b8ff4cbc-a503-427d-bd4f-9ddf74210440_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,681407d2-10e2-41ce-87aa-d96c55c41743_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,82007298-16a8-41a0-876c-a018e24c40b0_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,e558703f-7d1c-45b4-b322-79fa83fc6b19_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,01d78f0a-4f3c-4c14-b47e-8a602640e04f_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,915a35fb-8be9-47d9-92b0-130d7303df59_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,c449e02d-cc9a-4737-b20c-fb5f8ba0fbfc_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl,62d58ec0-78bf-408b-b6a3-8f0a1477e2a8_T2JqZWN0U3RvcmVEU1Jlc291cmNlcy9PYmplY3RTdG9yZURTUmVzb3VyY2VUeXBl'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="user" name="simulation" required="true" type="boolean">false</PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="updateIISActionSets"/>
+                </ARCS>
+            </NODE>
+            <NODE name="updateIISActionSets" type="UpdateActionSets">
+                <DESCRIPTION>update IIS action sets</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="promoteActionsIIS"/>
+                </ARCS>
+            </NODE>
+            <NODE name="promoteActionsIIS" type="SubmitHadoopJob">
+                <DESCRIPTION>create the INFERRED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'inputActionSetIds' : 'actionSetIdsIISGraph',
+                        'inputGraphRootPath' : 'groupedGraphPath',
+                        'outputGraphRootPath' : 'inferredGraphPath',
+                        'isLookupUrl' : 'isLookUpUrl'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/actionmanager/wf/main/oozie_app',
+                        'sparkExecutorCores' : '3',
+                        'sparkExecutorMemory' : '10G',
+                        'activePromoteDatasetActionPayload' : 'true',
+                        'activePromoteDatasourceActionPayload' : 'true',
+                        'activePromoteOrganizationActionPayload' : 'true',
+                        'activePromoteOtherResearchProductActionPayload' : 'true',
+                        'activePromoteProjectActionPayload' : 'true',
+                        'activePromotePublicationActionPayload' : 'true',
+                        'activePromoteRelationActionPayload' : 'true',
+                        'activePromoteResultActionPayload' : 'true',
+                        'activePromoteSoftwareActionPayload' : 'true',
+                        'mergeAndGetStrategy' : 'MERGE_FROM_AND_GET',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/promoteActionsIIS'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="duplicateScan"/>
+                </ARCS>
+            </NODE>
+            <NODE name="duplicateScan" type="SubmitHadoopJob">
+                <DESCRIPTION>search for duplicates in the raw graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'actionSetId' : 'dedupConfig',
+                        'graphBasePath' : 'inferredGraphPath',
+                        'dedupGraphPath': 'dedupGraphPath',
+                        'isLookUpUrl' : 'isLookUpUrl'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/dedup/scan/oozie_app',
+                        'actionSetIdOpenorgs' : 'dedup-similarity-organization-simple',
+                        'workingPath' : '/tmp/beta_experiment/working_dir/dedup',
+                        'whiteListPath' : '/data/dedup/whitelist_beta',
+                        'sparkExecutorCores' : '4',
+                        'sparkExecutorMemory' : '7G',
+                        'sparkDriverMemory' : '6G'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="dedupConsistency"/>
+                </ARCS>
+            </NODE>
+            <NODE name="dedupConsistency" type="SubmitHadoopJob">
+                <DESCRIPTION>mark duplicates as deleted and redistribute the relationships</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'graphBasePath' : 'dedupGraphPath',
+                        'graphOutputPath': 'consistentGraphPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/dedup/consistency/oozie_app',
+                        'workingPath' : '/tmp/beta_experiment/working_dir/dedup'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="orcidPropagation"/>
+                </ARCS>
+            </NODE>
+            <NODE name="orcidPropagation" type="SubmitHadoopJob">
+                <DESCRIPTION>propagates ORCID among results linked by allowedsemrels semantic relationships</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'sourcePath' : 'consistentGraphPath',
+                        'outputPath': 'orcidGraphPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/enrichment/orcidtoresultfromsemrel/oozie_app',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/orcid',
+                        'allowedsemrels' : 'IsSupplementedBy;IsSupplementTo;isSupplementedBy;isSupplementTo',
+                        'saveGraph' : 'true',
+                        'sparkExecutorCores' : '3',
+                        'sparkExecutorMemory' : '10G'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="bulkTagging"/>
+                </ARCS>
+            </NODE>
+            <NODE name="bulkTagging" type="SubmitHadoopJob">
+                <DESCRIPTION>mark results respecting some rules as belonging to communities</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'sourcePath' : 'orcidGraphPath',
+                        'outputPath': 'bulkTaggingGraphPath',
+                        'isLookUpUrl' : 'isLookUpUrl',
+                        'pathMap' : 'bulkTaggingPathMap'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/enrichment/bulktag/oozie_app',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/bulktag'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="affiliationPropagation"/>
+                </ARCS>
+            </NODE>
+            <NODE name="affiliationPropagation" type="SubmitHadoopJob">
+                <DESCRIPTION>creates relashionships between results and organizations when the organizations are associated to institutional repositories</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'sourcePath' : 'bulkTaggingGraphPath',
+                        'outputPath': 'affiliationGraphPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/enrichment/affiliation/oozie_app',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/affiliation',
+                        'saveGraph' : 'true',
+                        'blacklist' : 'empty'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="affiliationSemRelPropagation"/>
+                </ARCS>
+            </NODE>
+            <NODE name="affiliationSemRelPropagation" type="SubmitHadoopJob">
+                <DESCRIPTION>creates relashionships between results and organizations when the organizations are in parent/child relationships. The childs to the parents</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'sourcePath' : 'affiliationGraphPath',
+                        'outputPath': 'affiliationSemRelGraphPath',
+                        'iterations':'iterations'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/enrichment/affiliation_semrel/oozie_app',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/affiliationsemrel'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="communityOrganizationPropagation"/>
+                </ARCS>
+            </NODE>
+            <NODE name="communityOrganizationPropagation" type="SubmitHadoopJob">
+                <DESCRIPTION>marks as belonging to communities the result collected from datasources related to the organizations specified in the organizationCommunityMap</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'sourcePath' : 'affiliationSemRelGraphPath',
+                        'outputPath': 'communityOrganizationGraphPath',
+                        'organizationtoresultcommunitymap': 'propagationOrganizationCommunityMap'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/enrichment/community_organization/oozie_app',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/community_organization',
+                        'saveGraph' : 'true'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="resultProjectPropagation"/>
+                </ARCS>
+            </NODE>
+            <NODE name="resultProjectPropagation" type="SubmitHadoopJob">
+                <DESCRIPTION>created relation between projects and results linked to other results trough allowedsemrel semantic relations linked to projects</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'sourcePath' : 'communityOrganizationGraphPath',
+                        'outputPath': 'fundingGraphPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/enrichment/funding/oozie_app',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/funding',
+                        'allowedsemrels' : 'IsSupplementedBy;IsSupplementTo',
+                        'saveGraph' : 'true'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="communitySemrelPropagation"/>
+                </ARCS>
+            </NODE>
+            <NODE name="communitySemrelPropagation" type="SubmitHadoopJob">
+                <DESCRIPTION>tag as belonging to communitites result in in allowedsemrels relation with other result already linked to communities </DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'sourcePath' : 'fundingGraphPath',
+                        'outputPath': 'communitySemRelGraphPath',
+                        'isLookUpUrl' : 'isLookUpUrl'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/enrichment/community_semrel/oozie_app',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/community_semrel',
+                        'allowedsemrels' : 'IsSupplementedBy;IsSupplementTo',
+                        'saveGraph' : 'true'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="countryPropagation"/>
+                </ARCS>
+            </NODE>
+            <NODE name="countryPropagation" type="SubmitHadoopJob">
+                <DESCRIPTION>associated to results colleced from allowedtypes and those in the whithelist the country of the organization(s) handling the datasource it is collected from </DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'sourcePath' : 'communitySemRelGraphPath',
+                        'outputPath': 'countryGraphPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/enrichment/country/oozie_app',
+                        'sparkExecutorCores' : '3',
+                        'sparkExecutorMemory' : '10G',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/country',
+                        'allowedtypes' : 'pubsrepository::institutional',
+                        'whitelist':'10|opendoar____::16e6a3326dd7d868cbc926602a61e4d0;10|eurocrisdris::fe4903425d9040f680d8610d9079ea14;10|openaire____::5b76240cc27a58c6f7ceef7d8c36660e;10|openaire____::172bbccecf8fca44ab6a6653e84cb92a;10|openaire____::149c6590f8a06b46314eed77bfca693f;10|eurocrisdris::a6026877c1a174d60f81fd71f62df1c1;10|openaire____::4692342f0992d91f9e705c26959f09e0;10|openaire____::8d529dbb05ec0284662b391789e8ae2a;10|openaire____::345c9d171ef3c5d706d08041d506428c;10|opendoar____::1c1d4df596d01da60385f0bb17a4a9e0;10|opendoar____::7a614fd06c325499f1680b9896beedeb;10|opendoar____::1ee3dfcd8a0645a25a35977997223d22;10|opendoar____::d296c101daa88a51f6ca8cfc1ac79b50;10|opendoar____::798ed7d4ee7138d49b8828958048130a;10|openaire____::c9d2209ecc4d45ba7b4ca7597acb88a2;10|eurocrisdris::c49e0fe4b9ba7b7fab717d1f0f0a674d;10|eurocrisdris::9ae43d14471c4b33661fedda6f06b539;10|eurocrisdris::432ca599953ff50cd4eeffe22faf3e48',
+                        'saveGraph' : 'true'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="graphCleaning"/>
+                </ARCS>
+            </NODE>
+            <NODE name="graphCleaning" type="SubmitHadoopJob">
+                <DESCRIPTION>clean the properties in the graph typed as Qualifier according to the vocabulary indicated in schemeid</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'graphInputPath' : 'countryGraphPath',
+                        'graphOutputPath': 'cleanedGraphPath',
+                        'isLookupUrl': 'isLookUpUrl'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/graph/clean/oozie_app',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/clean'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="blacklistRelations"/>
+                </ARCS>
+            </NODE>
+            <NODE name="blacklistRelations" type="SubmitHadoopJob">
+                <DESCRIPTION>removes blacklisted relations </DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'sourcePath' : 'cleanedGraphPath',
+                        'outputPath': 'blacklistedGraphPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/BETA/oa/enrichment/blacklist/oozie_app',
+                        'workingDir' : '/tmp/beta_experiment/working_dir/blacklist',
+                        'postgresURL' : 'jdbc:postgresql://beta.services.openaire.eu:5432/dnet_openaireplus',
+                        'postgresUser' : '',
+                        'postgresPassword' : ''
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="success"/>
+                </ARCS>
+            </NODE>
+        </CONFIGURATION>
+        <STATUS>
+            <LAST_EXECUTION_ID>wf_20220111_200505_785</LAST_EXECUTION_ID>
+            <LAST_EXECUTION_DATE>2022-01-11T20:08:53+00:00</LAST_EXECUTION_DATE>
+            <LAST_EXECUTION_STATUS></LAST_EXECUTION_STATUS>
+            <LAST_EXECUTION_ERROR></LAST_EXECUTION_ERROR>
+        </STATUS>
+    </BODY>
+</RESOURCE_PROFILE>

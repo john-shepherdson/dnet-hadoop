@@ -20,7 +20,9 @@
                 <item name="Pubmed" href="pubmed.html"/>
                 <item name="Datacite" href="datacite.html"/>
             </item>
-            <item name="Release Notes" href="release-notes.html" />
+            <item name="Integration" href="integration.html" collapse="true">
+
+            </item>
             <item name="General Information" href="about.html"/>
 
             <item name="JavaDoc" href="apidocs/" />

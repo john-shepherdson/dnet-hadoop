@@ -107,7 +107,7 @@ class OafMapperUtilsTest {
 		assertEquals("2006-01-02", GraphCleaningFunctions.doCleanDate("2006-01-02T15:04:05+0000").get());
 		assertEquals("2009-08-13", GraphCleaningFunctions.doCleanDate("2009-08-12T22:15:09-07:00").get());
 		assertEquals("2009-08-12", GraphCleaningFunctions.doCleanDate("2009-08-12T22:15:09").get());
-		assertEquals("2009-08-12", GraphCleaningFunctions.doCleanDate("2009-08-12T22:15:09Z").get());
+		assertEquals("2009-08-13", GraphCleaningFunctions.doCleanDate("2009-08-12T22:15:09Z").get());
 		assertEquals("2014-04-26", GraphCleaningFunctions.doCleanDate("2014-04-26 17:24:37.3186369").get());
 		assertEquals("2012-08-03", GraphCleaningFunctions.doCleanDate("2012-08-03 18:31:59.257000000").get());
 		assertEquals("2014-04-26", GraphCleaningFunctions.doCleanDate("2014-04-26 17:24:37.123").get());
@@ -183,6 +183,22 @@ class OafMapperUtilsTest {
 				.mergeResults(p2, d1)
 				.getResulttype()
 				.getClassid());
+	}
+
+	@Test
+	void testDelegatedAuthority() throws IOException {
+		Dataset d1 = read("dataset_2.json", Dataset.class);
+		Dataset d2 = read("dataset_delegated.json", Dataset.class);
+
+		assertEquals(1, d2.getCollectedfrom().size());
+		assertTrue(cfId(d2.getCollectedfrom()).contains(ModelConstants.ZENODO_OD_ID));
+
+		Result res = OafMapperUtils.mergeResults(d1, d2);
+
+		assertEquals(d2, res);
+
+		System.out.println(OBJECT_MAPPER.writeValueAsString(res));
+
 	}
 
 	protected HashSet<String> cfId(List<KeyValue> collectedfrom) {
