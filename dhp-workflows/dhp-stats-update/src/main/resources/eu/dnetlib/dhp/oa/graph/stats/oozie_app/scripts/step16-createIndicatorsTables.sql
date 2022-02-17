@@ -178,3 +178,182 @@ on tmp.id=ri.id;
 ---- Sprint 5 ----
 create table indi_result_no_of_copies stored as parquet as
 select id, count(id) as number_of_copies from result_instance group by id;
+
+---- Sprint 6 ----
+create table indi_pub_gold_oa_new stored as parquet as
+WITH gold_oa AS (SELECT issn_l, journal_is_in_doaj,journal_is_oa, issn_1 as issn
+FROM stats_ext.oa_journals
+WHERE issn_1 != ""
+UNION ALL
+SELECT issn_l, journal_is_in_doaj, journal_is_oa, issn_2 as issn
+FROM stats_ext.oa_journals
+WHERE issn_2 != "" ),
+issn AS (SELECT * FROM
+(SELECT id, issn_printed as issn
+FROM datasource WHERE issn_printed IS NOT NULL
+UNION
+SELECT id, issn_online as issn
+FROM datasource WHERE issn_online IS NOT NULL) as issn
+WHERE LENGTH(issn) > 7)
+SELECT DISTINCT pd.id, coalesce(is_gold, 0) as is_gold
+FROM publication_datasources pd
+LEFT OUTER JOIN
+(SELECT pd.id, 1 as is_gold FROM publication_datasources pd
+JOIN issn on issn.id=pd.datasource
+JOIN gold_oa  on issn.issn = gold_oa.issn) tmp
+ON pd.id=tmp.id;
+
+create table indi_datasets_gold_oa_new stored as parquet as
+WITH gold_oa AS (SELECT issn_l, journal_is_in_doaj, journal_is_oa, issn_1 as issn
+FROM stats_ext.oa_journals
+WHERE issn_1 != ""
+UNION
+ALL SELECT issn_l,journal_is_in_doaj,journal_is_oa,issn_2 as issn
+FROM stats_ext.oa_journals
+WHERE issn_2 != "" ),
+issn AS (SELECT *
+FROM (SELECT id,issn_printed as issn
+FROM datasource WHERE issn_printed IS NOT NULL
+UNION
+SELECT id, issn_online as issn
+FROM datasource
+WHERE issn_online IS NOT NULL ) as issn
+WHERE LENGTH(issn) > 7)
+SELECT DISTINCT pd.id, coalesce(is_gold, 0) as is_gold
+FROM dataset_datasources pd
+LEFT OUTER JOIN
+(SELECT pd.id, 1 as is_gold FROM dataset_datasources pd
+JOIN issn on issn.id=pd.datasource
+JOIN gold_oa  on issn.issn = gold_oa.issn) tmp
+ON pd.id=tmp.id;
+
+create table indi_software_gold_oa_new stored as parquet as
+WITH gold_oa AS (SELECT issn_l, journal_is_in_doaj, journal_is_oa, issn_1 as issn
+FROM stats_ext.oa_journals
+WHERE issn_1 != ""
+UNION
+ALL SELECT issn_l,journal_is_in_doaj,journal_is_oa,issn_2 as issn
+FROM stats_ext.oa_journals
+WHERE issn_2 != "" ),
+issn AS (SELECT *
+FROM (SELECT id,issn_printed as issn
+FROM datasource WHERE issn_printed IS NOT NULL
+UNION
+SELECT id, issn_online as issn
+FROM datasource
+WHERE issn_online IS NOT NULL ) as issn
+WHERE LENGTH(issn) > 7)
+SELECT DISTINCT pd.id, coalesce(is_gold, 0) as is_gold
+FROM software_datasources pd
+LEFT OUTER JOIN
+(SELECT pd.id, 1 as is_gold FROM software_datasources pd
+JOIN issn on issn.id=pd.datasource
+JOIN gold_oa  on issn.issn = gold_oa.issn) tmp
+ON pd.id=tmp.id;
+
+create table indi_org_findable stored as parquet as
+with result_with_pid as
+(select ro.organization organization, count(distinct rp.id) no_result_with_pid from result_organization ro
+join result_pids rp on rp.id=ro.id
+group by ro.organization),
+result_has_abstract as
+(select ro.organization organization, count(distinct rp.id) no_result_with_abstract from result_organization ro
+join result rp on rp.id=ro.id where rp.abstract=true
+group by ro.organization),
+allresults as (select organization, count(distinct id) no_allresults from result_organization
+group by organization),
+result_with_pid_share as(
+select allresults.organization, result_with_pid.no_result_with_pid/allresults.no_allresults pid_share
+from allresults
+join result_with_pid on result_with_pid.organization=allresults.organization),
+result_with_abstract_share as(
+select allresults.organization, result_has_abstract.no_result_with_abstract/allresults.no_allresults abstract_share
+from allresults
+join result_has_abstract on result_has_abstract.organization=allresults.organization)
+select allresults.organization, coalesce((pid_share+abstract_share)/2,pid_share) org_findable
+from allresults
+join result_with_pid_share on result_with_pid_share.organization=allresults.organization
+left outer join (
+select organization, abstract_share from result_with_abstract_share
+)tmp
+on tmp.organization=allresults.organization;
+
+create table indi_org_openess stored as parquet as
+WITH datasets_oa as (
+SELECT ro.organization, count(dg.id) no_oadatasets FROM indi_datasets_gold_oa_new dg
+join openaire_prod_stats.result_organization ro on dg.id=ro.id
+join openaire_prod_stats.dataset ds on dg.id=ds.id
+WHERE dg.is_gold=1
+group by ro.organization),
+software_oa as (
+SELECT ro.organization, count(dg.id) no_oasoftware FROM indi_software_gold_oa_new dg
+join openaire_prod_stats.result_organization ro on dg.id=ro.id
+join openaire_prod_stats.software ds on dg.id=ds.id
+WHERE dg.is_gold=1
+group by ro.organization),
+pubs_oa as (
+SELECT ro.organization, count(dg.id) no_oapubs FROM indi_pub_gold_oa_new dg
+join openaire_prod_stats.result_organization ro on dg.id=ro.id
+join openaire_prod_stats.publication ds on dg.id=ds.id
+where dg.is_gold=1
+group by ro.organization),
+allpubs as (
+SELECT ro.organization organization, count(ro.id) no_allpubs FROM result_organization ro
+join openaire_prod_stats.publication ps on ps.id=ro.id
+group by ro.organization),
+alldatasets as (
+SELECT ro.organization organization, count(ro.id) no_alldatasets FROM result_organization ro
+join openaire_prod_stats.dataset ps on ps.id=ro.id
+group by ro.organization),
+allsoftware as (
+SELECT ro.organization organization, count(ro.id) no_allsoftware FROM result_organization ro
+join openaire_prod_stats.software ps on ps.id=ro.id
+group by ro.organization),
+allpubsshare as (
+select pubs_oa.organization, pubs_oa.no_oapubs/allpubs.no_allpubs p from allpubs
+join pubs_oa on allpubs.organization=pubs_oa.organization),
+alldatasetssshare as (
+select datasets_oa.organization, datasets_oa.no_oadatasets/alldatasets.no_alldatasets c
+from alldatasets
+join datasets_oa on alldatasets.organization=datasets_oa.organization),
+allsoftwaresshare as (
+select software_oa.organization, software_oa.no_oasoftware/allsoftware.no_allsoftware s
+from allsoftware
+join software_oa on allsoftware.organization=software_oa.organization)
+select allpubsshare.organization, coalesce((c+p+s)/3, p) org_openess FROM allpubsshare
+left outer join (select organization,c from
+alldatasetssshare) tmp
+on tmp.organization=allpubsshare.organization
+left outer join (select organization,s from
+allsoftwaresshare) tmp1
+on tmp1.organization=allpubsshare.organization;
+
+create table indi_pub_hybrid_oa_with_cc stored as parquet as
+WITH hybrid_oa AS (SELECT issn_l, journal_is_in_doaj, journal_is_oa, issn_print as issn
+FROM stats_ext.plan_s_jn
+WHERE issn_print != ""
+UNION ALL
+SELECT issn_l, journal_is_in_doaj, journal_is_oa, issn_online as issn
+FROM stats_ext.plan_s_jn
+WHERE issn_online != "" and (journal_is_in_doaj = FALSE OR journal_is_oa = FALSE)),
+issn AS (SELECT * FROM
+(SELECT id, issn_printed as issn
+FROM datasource
+WHERE issn_printed IS NOT NULL
+UNION
+SELECT id,issn_online as issn
+FROM datasource
+WHERE issn_online IS NOT NULL ) as issn
+WHERE LENGTH(issn) > 7)
+SELECT DISTINCT pd.id, coalesce(is_hybrid_oa, 0) as is_hybrid_oa
+FROM publication_datasources pd
+LEFT OUTER JOIN (
+SELECT pd.id, 1 as is_hybrid_oa from publication_datasources pd
+JOIN datasource d on d.id=pd.datasource
+JOIN issn on issn.id=pd.datasource
+JOIN hybrid_oa ON issn.issn = hybrid_oa.issn
+JOIN indi_result_has_cc_licence cc on pd.id=cc.id
+where cc.has_cc_license=1) tmp
+on pd.id=tmp.id;
+
+
