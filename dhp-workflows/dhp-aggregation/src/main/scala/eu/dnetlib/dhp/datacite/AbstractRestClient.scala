@@ -49,7 +49,7 @@ abstract class AbstractRestClient extends Iterator[String] {
   }
 
   private def doHTTPRequest[A <: HttpUriRequest](r: A): String = {
-    val timeout = 60; // seconds
+    val timeout = 600; // seconds
     val config = RequestConfig
       .custom()
       .setConnectTimeout(timeout * 1000)
