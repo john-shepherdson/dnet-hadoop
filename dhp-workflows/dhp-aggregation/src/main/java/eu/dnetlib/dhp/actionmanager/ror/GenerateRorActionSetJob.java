@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.actionmanager.ror;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.ENTITYREGISTRY_PROVENANCE_ACTION;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.ORG_ORG_RELTYPE;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.dataInfo;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.field;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.listKeyValues;
@@ -29,8 +30,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Dataset;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
@@ -38,8 +38,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.SparkAtomicActionJob;
 import eu.dnetlib.dhp.actionmanager.ror.model.ExternalIdType;
+import eu.dnetlib.dhp.actionmanager.ror.model.Relationship;
 import eu.dnetlib.dhp.actionmanager.ror.model.RorOrganization;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
@@ -48,8 +48,10 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
@@ -112,24 +114,21 @@ public class GenerateRorActionSetJob {
 		final String outputPath) throws IOException {
 
 		readInputPath(spark, inputPath)
-			.map(
-				(MapFunction<RorOrganization, Organization>) GenerateRorActionSetJob::convertRorOrg,
-				Encoders.bean(Organization.class))
-			.toJavaRDD()
-			.map(o -> new AtomicAction<>(Organization.class, o))
+			.map(GenerateRorActionSetJob::convertRorOrg)
+			.flatMap(List::iterator)
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
 			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
 	}
 
-	protected static Organization convertRorOrg(final RorOrganization r) {
+	protected static List<AtomicAction<? extends Oaf>> convertRorOrg(final RorOrganization r) {
 
 		final Date now = new Date();
 
 		final Organization o = new Organization();
 
-		o.setId(String.format("20|%s::%s", ROR_NS_PREFIX, DHPUtils.md5(r.getId())));
+		o.setId(calculateOpenaireId(r.getId()));
 		o.setOriginalId(Arrays.asList(String.format("%s::%s", ROR_NS_PREFIX, r.getId())));
 		o.setCollectedfrom(ROR_COLLECTED_FROM);
 		o.setPid(pids(r));
@@ -166,7 +165,43 @@ public class GenerateRorActionSetJob {
 		o.setDataInfo(ROR_DATA_INFO);
 		o.setLastupdatetimestamp(now.getTime());
 
-		return o;
+		final List<AtomicAction<? extends Oaf>> res = new ArrayList<>();
+		res.add(new AtomicAction<>(Organization.class, o));
+
+		for (final Relationship rorRel : r.getRelationships()) {
+			if (rorRel.getType().equalsIgnoreCase("parent")) {
+				final String orgId1 = calculateOpenaireId(r.getId());
+				final String orgId2 = calculateOpenaireId(rorRel.getId());
+				res
+					.add(
+						new AtomicAction<>(Relation.class,
+							calculateHierarchyRel(orgId1, orgId2, ModelConstants.IS_PARENT_OF)));
+				res
+					.add(
+						new AtomicAction<>(Relation.class,
+							calculateHierarchyRel(orgId2, orgId1, ModelConstants.IS_CHILD_OF)));
+			}
+		}
+
+		return res;
+
+	}
+
+	private static Relation calculateHierarchyRel(final String source, final String target, final String relClass) {
+		final Relation rel = new Relation();
+		rel.setSource(source);
+		rel.setTarget(target);
+		rel.setRelType(ORG_ORG_RELTYPE);
+		rel.setSubRelType(ModelConstants.RELATIONSHIP);
+		rel.setRelClass(relClass);
+		rel.setCollectedfrom(ROR_COLLECTED_FROM);
+		rel.setDataInfo(ROR_DATA_INFO);
+		rel.setLastupdatetimestamp(System.currentTimeMillis());
+		return rel;
+	}
+
+	private static String calculateOpenaireId(final String rorId) {
+		return String.format("20|%s::%s", ROR_NS_PREFIX, DHPUtils.md5(rorId));
 	}
 
 	private static List<StructuredProperty> pids(final RorOrganization r) {
@@ -202,14 +237,14 @@ public class GenerateRorActionSetJob {
 			.collect(Collectors.toList());
 	}
 
-	private static Dataset<RorOrganization> readInputPath(
+	private static JavaRDD<RorOrganization> readInputPath(
 		final SparkSession spark,
 		final String path) throws IOException {
 
 		try (final FileSystem fileSystem = FileSystem.get(new Configuration());
 			final InputStream is = fileSystem.open(new Path(path))) {
 			final RorOrganization[] arr = OBJECT_MAPPER.readValue(is, RorOrganization[].class);
-			return spark.createDataset(Arrays.asList(arr), Encoders.bean(RorOrganization.class));
+			return spark.createDataset(Arrays.asList(arr), Encoders.bean(RorOrganization.class)).toJavaRDD();
 		}
 	}
 
