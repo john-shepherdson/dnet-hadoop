@@ -46,7 +46,7 @@ object ImportDatacite {
       Source
         .fromInputStream(
           getClass.getResourceAsStream(
-            "/eu/dnetlib/dhp/actionmanager/datacite/import_from_api.json"
+            "/eu/dnetlib/dhp/datacite/import_from_api.json"
           )
         )
         .mkString
