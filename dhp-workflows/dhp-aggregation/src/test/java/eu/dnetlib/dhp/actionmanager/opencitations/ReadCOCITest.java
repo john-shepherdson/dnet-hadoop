@@ -76,53 +76,51 @@ public class ReadCOCITest {
 
 		LocalFileSystem fs = FileSystem.getLocal(new Configuration());
 		fs
-				.copyFromLocalFile(
-						false, new org.apache.hadoop.fs.Path(getClass()
-								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input1.gz")
-								.getPath()),
-						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input1.gz"));
+			.copyFromLocalFile(
+				false, new org.apache.hadoop.fs.Path(getClass()
+					.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input1.gz")
+					.getPath()),
+				new org.apache.hadoop.fs.Path(workingDir + "/COCI/input1.gz"));
 
 		fs
-				.copyFromLocalFile(
-						false, new org.apache.hadoop.fs.Path(getClass()
-								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input2.gz")
-								.getPath()),
-						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input2.gz"));
+			.copyFromLocalFile(
+				false, new org.apache.hadoop.fs.Path(getClass()
+					.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input2.gz")
+					.getPath()),
+				new org.apache.hadoop.fs.Path(workingDir + "/COCI/input2.gz"));
 
 		fs
-				.copyFromLocalFile(
-						false, new org.apache.hadoop.fs.Path(getClass()
-								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input3.gz")
-								.getPath()),
-						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input3.gz"));
+			.copyFromLocalFile(
+				false, new org.apache.hadoop.fs.Path(getClass()
+					.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input3.gz")
+					.getPath()),
+				new org.apache.hadoop.fs.Path(workingDir + "/COCI/input3.gz"));
 
 		fs
-				.copyFromLocalFile(
-						false, new org.apache.hadoop.fs.Path(getClass()
-								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input4.gz")
-								.getPath()),
-						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input4.gz"));
+			.copyFromLocalFile(
+				false, new org.apache.hadoop.fs.Path(getClass()
+					.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input4.gz")
+					.getPath()),
+				new org.apache.hadoop.fs.Path(workingDir + "/COCI/input4.gz"));
 
 		fs
-				.copyFromLocalFile(
-						false, new org.apache.hadoop.fs.Path(getClass()
-								.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input5.gz")
-								.getPath()),
-						new org.apache.hadoop.fs.Path(workingDir + "/COCI/input5.gz"));
+			.copyFromLocalFile(
+				false, new org.apache.hadoop.fs.Path(getClass()
+					.getResource("/eu/dnetlib/dhp/actionmanager/opencitations/inputFiles/input5.gz")
+					.getPath()),
+				new org.apache.hadoop.fs.Path(workingDir + "/COCI/input5.gz"));
 
 		ReadCOCI
-				.main(
-						new String[] {
-								"-isSparkSessionManaged",
-								Boolean.FALSE.toString(),
-								"-workingPath",
-								workingDir.toString() + "/COCI",
-								"-outputPath",
-								workingDir.toString() + "/COCI_json/",
-								"-inputFile", "input1;input2;input3;input4;input5"
-						});
-
-
+			.main(
+				new String[] {
+					"-isSparkSessionManaged",
+					Boolean.FALSE.toString(),
+					"-workingPath",
+					workingDir.toString() + "/COCI",
+					"-outputPath",
+					workingDir.toString() + "/COCI_json/",
+					"-inputFile", "input1;input2;input3;input4;input5"
+				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 

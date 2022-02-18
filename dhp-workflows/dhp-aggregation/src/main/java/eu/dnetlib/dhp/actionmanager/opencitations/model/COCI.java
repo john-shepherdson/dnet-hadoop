@@ -12,7 +12,6 @@ public class COCI implements Serializable {
 
 	private String cited;
 
-
 	public String getOci() {
 		return oci;
 	}
@@ -36,6 +35,5 @@ public class COCI implements Serializable {
 	public void setCited(String cited) {
 		this.cited = cited;
 	}
-
 
 }
