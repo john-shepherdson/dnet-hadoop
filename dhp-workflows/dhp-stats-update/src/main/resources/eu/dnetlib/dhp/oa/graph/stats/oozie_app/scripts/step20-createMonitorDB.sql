@@ -123,6 +123,10 @@ create table TARGET.indi_pub_doi_from_crossref stored as parquet as select * fro
 compute stats TARGET.indi_pub_doi_from_crossref;
 create table TARGET.indi_pub_gold_oa stored as parquet as select * from SOURCE.indi_pub_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_gold_oa;
+create table TARGET.indi_datasets_gold_oa stored as parquet as select * from SOURCE.indi_datasets_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_datasets_gold_oa;
+create table TARGET.indi_software_gold_oa stored as parquet as select * from SOURCE.indi_software_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_software_gold_oa;
 create table TARGET.indi_pub_has_abstract stored as parquet as select * from SOURCE.indi_pub_has_abstract orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_has_abstract;
 create table TARGET.indi_result_has_cc_licence stored as parquet as select * from SOURCE.indi_result_has_cc_licence orig where exists (select 1 from TARGET.result r where r.id=orig.id);
@@ -147,6 +151,11 @@ compute stats TARGET.indi_pub_closed_other_open;
 
 create table TARGET.indi_result_no_of_copies stored as parquet as select * from SOURCE.indi_result_no_of_copies orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_result_no_of_copies;
+
+create view TARGET.indi_org_findable as select * from SOURCE.indi_org_findable;
+create view TARGET.indi_org_openess as select * from SOURCE.indi_org_openess;
+create table TARGET.indi_pub_hybrid_oa_with_cc stored as parquet as select * from SOURCE.indi_pub_hybrid_oa_with_cc orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_pub_hybrid_oa_with_cc;
 
 --- Usage statistics
 create table TARGET.usage_stats stored as parquet as select * from SOURCE.usage_stats orig where exists (select 1 from TARGET.result r where r.id=orig.result_id);
