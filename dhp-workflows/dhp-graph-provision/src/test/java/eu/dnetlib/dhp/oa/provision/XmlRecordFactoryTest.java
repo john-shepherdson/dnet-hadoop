@@ -69,6 +69,13 @@ public class XmlRecordFactoryTest {
 
 		assertEquals("1721.47", doc.valueOf("//processingchargeamount/text()"));
 		assertEquals("EUR", doc.valueOf("//processingchargecurrency/text()"));
+
+		assertEquals(
+			"1.00889953098e-08", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'influence']/@value"));
+		assertEquals(
+			"30.6576853333", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity_alt']/@value"));
+		assertEquals(
+			"4.62970429725e-08", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity']/@value"));
 	}
 
 	@Test

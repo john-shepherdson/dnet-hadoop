@@ -23,7 +23,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.protocol.HTTP;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -50,6 +49,7 @@ import eu.dnetlib.dhp.schema.common.*;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import scala.Tuple2;
 
 public class XmlRecordFactory implements Serializable {
 
@@ -208,6 +208,10 @@ public class XmlRecordFactory implements Serializable {
 
 		if (ModelSupport.isResult(type)) {
 			final Result r = (Result) entity;
+
+			if (r.getMeasures() != null) {
+				metadata.addAll(measuresAsXml(r.getMeasures()));
+			}
 
 			if (r.getContext() != null) {
 				contexts.addAll(r.getContext().stream().map(c -> c.getId()).collect(Collectors.toList()));
@@ -934,6 +938,23 @@ public class XmlRecordFactory implements Serializable {
 		}
 
 		return metadata;
+	}
+
+	private List<String> measuresAsXml(List<Measure> measures) {
+		return measures
+			.stream()
+			.flatMap(
+				m -> m
+					.getUnit()
+					.stream()
+					.map(
+						u -> Lists
+							.newArrayList(
+								new Tuple2<>("id", m.getId()),
+								new Tuple2<>("key", u.getKey()),
+								new Tuple2<>("value", u.getValue())))
+					.map(l -> XmlSerializationUtils.asXmlElement("measure", l)))
+			.collect(Collectors.toList());
 	}
 
 	private String getAuthorPidType(final String s) {
