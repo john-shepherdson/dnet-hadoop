@@ -1,4 +1,33 @@
 {
+  "measures": [
+    {
+      "id": "influence",
+      "unit": [
+        {
+          "key": "score",
+          "value": "1.00889953098e-08"
+        }
+      ]
+    },
+    {
+      "id": "popularity_alt",
+      "unit": [
+        {
+          "key": "score",
+          "value": "30.6576853333"
+        }
+      ]
+    },
+    {
+      "id": "popularity",
+      "unit": [
+        {
+          "key": "score",
+          "value": "4.62970429725e-08"
+        }
+      ]
+    }
+  ],
   "author": [
     {
       "affiliation": [],
@@ -284,6 +313,35 @@
   "id": "50|CSC_________::0000ec4dd9df012feaafa77e71a0fb4c",
   "instance": [
     {
+      "measures": [
+        {
+          "id": "influence",
+          "unit": [
+            {
+              "key": "score",
+              "value": "1.00889953098e-08"
+            }
+          ]
+        },
+        {
+          "id": "popularity_alt",
+          "unit": [
+            {
+              "key": "score",
+              "value": "30.6576853333"
+            }
+          ]
+        },
+        {
+          "id": "popularity",
+          "unit": [
+            {
+              "key": "score",
+              "value": "4.62970429725e-08"
+            }
+          ]
+        }
+      ],
       "pid": [
         {
           "dataInfo": {
