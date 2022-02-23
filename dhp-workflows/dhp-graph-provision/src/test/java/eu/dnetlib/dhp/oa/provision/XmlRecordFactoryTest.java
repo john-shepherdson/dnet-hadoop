@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
+import eu.dnetlib.dhp.schema.oaf.Datasource;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -128,5 +129,34 @@ public class XmlRecordFactoryTest {
 		assertNotNull(doc);
 		System.out.println(doc.asXML());
 		assertEquals("", doc.valueOf("//rel/validated"));
+	}
+
+	@Test
+	public void testDatasource() throws IOException, DocumentException {
+		final ContextMapper contextMapper = new ContextMapper();
+
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+				XmlConverterJob.schemaLocation);
+
+		final Datasource d = OBJECT_MAPPER
+				.readValue(IOUtils.toString(getClass().getResourceAsStream("datasource.json")), Datasource.class);
+
+		final String xml = xmlRecordFactory.build(new JoinedEntity<>(d));
+
+		assertNotNull(xml);
+
+		final Document doc = new SAXReader().read(new StringReader(xml));
+
+		assertNotNull(doc);
+
+		System.out.println(doc.asXML());
+
+		// TODO add assertions based of values extracted from the XML record
+
+		assertEquals("National", doc.valueOf("//jurisdiction/@classname"));
+		assertEquals("true", doc.valueOf("//thematic"));
+		assertEquals("Journal article", doc.valueOf("//contentpolicy/@classname"));
+		assertEquals("Journal archive", doc.valueOf("//datasourcetypeui/@classname"));
+
 	}
 }
