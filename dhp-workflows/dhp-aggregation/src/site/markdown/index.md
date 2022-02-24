@@ -16,5 +16,5 @@ It defines [mappings](mappings.md) for transformation of different datasource (S
 
 ### Integration of external information in the result
 
-The workflows create new entity in the OpenAIRE format (OAF) which aim is to enrich the result already contained in the graph.
+The workflows create new entity in the OpenAIRE format (OAF) whose aim is to enrich the result already contained in the graph.
 See integration section for more insight

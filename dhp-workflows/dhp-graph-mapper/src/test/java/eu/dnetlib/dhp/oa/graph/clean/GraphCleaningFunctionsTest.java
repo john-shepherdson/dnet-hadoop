@@ -68,6 +68,9 @@ public class GraphCleaningFunctionsTest {
 			Relation r_out = OafCleaner.apply(r_in, mapping);
 			assertTrue(vocabularies.getTerms(ModelConstants.DNET_RELATION_RELCLASS).contains(r_out.getRelClass()));
 			assertTrue(vocabularies.getTerms(ModelConstants.DNET_RELATION_SUBRELTYPE).contains(r_out.getSubRelType()));
+
+			assertEquals("iis", r_out.getDataInfo().getProvenanceaction().getClassid());
+			assertEquals("Inferred by OpenAIRE", r_out.getDataInfo().getProvenanceaction().getClassname());
 		}
 	}
 

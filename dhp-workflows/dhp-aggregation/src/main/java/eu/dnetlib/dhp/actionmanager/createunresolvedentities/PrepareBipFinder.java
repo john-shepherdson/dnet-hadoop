@@ -1,17 +1,17 @@
 
 package eu.dnetlib.dhp.actionmanager.createunresolvedentities;
 
-import static eu.dnetlib.dhp.actionmanager.createunresolvedentities.Constants.*;
-import static eu.dnetlib.dhp.actionmanager.createunresolvedentities.Constants.UPDATE_CLASS_NAME;
+import static eu.dnetlib.dhp.actionmanager.Constants.*;
+import static eu.dnetlib.dhp.actionmanager.Constants.UPDATE_CLASS_NAME;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.hdfs.client.HdfsUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -24,14 +24,16 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.BipDeserialize;
-import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.BipScore;
+import eu.dnetlib.dhp.actionmanager.bipmodel.BipDeserialize;
+import eu.dnetlib.dhp.actionmanager.bipmodel.BipScore;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Instance;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Measure;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
@@ -40,7 +42,7 @@ public class PrepareBipFinder implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(PrepareBipFinder.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	public static <I extends Result> void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
 
 		String jsonConfiguration = IOUtils
 			.toString(
@@ -76,7 +78,7 @@ public class PrepareBipFinder implements Serializable {
 			});
 	}
 
-	private static <I extends Result> void prepareResults(SparkSession spark, String inputPath, String outputPath) {
+	private static void prepareResults(SparkSession spark, String inputPath, String outputPath) {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -89,13 +91,44 @@ public class PrepareBipFinder implements Serializable {
 				BipScore bs = new BipScore();
 				bs.setId(key);
 				bs.setScoreList(entry.get(key));
+
 				return bs;
 			}).collect(Collectors.toList()).iterator()).rdd(), Encoders.bean(BipScore.class))
 			.map((MapFunction<BipScore, Result>) v -> {
 				Result r = new Result();
+				final String cleanedPid = CleaningFunctions.normalizePidValue(DOI, v.getId());
 
 				r.setId(DHPUtils.generateUnresolvedIdentifier(v.getId(), DOI));
-				r.setMeasures(getMeasure(v));
+				Instance inst = new Instance();
+				inst.setMeasures(getMeasure(v));
+
+				inst
+					.setPid(
+						Arrays
+							.asList(
+								OafMapperUtils
+									.structuredProperty(
+										cleanedPid,
+										OafMapperUtils
+											.qualifier(
+												DOI, DOI_CLASSNAME,
+												ModelConstants.DNET_PID_TYPES,
+												ModelConstants.DNET_PID_TYPES),
+										null)));
+				r.setInstance(Arrays.asList(inst));
+				r
+					.setDataInfo(
+						OafMapperUtils
+							.dataInfo(
+								false, null, true,
+								false,
+								OafMapperUtils
+									.qualifier(
+										ModelConstants.PROVENANCE_ENRICH,
+										null,
+										ModelConstants.DNET_PROVENANCE_ACTIONS,
+										ModelConstants.DNET_PROVENANCE_ACTIONS),
+								null));
 				return r;
 			}, Encoders.bean(Result.class))
 			.write()

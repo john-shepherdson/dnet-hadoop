@@ -230,6 +230,15 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 							.map(GraphCleaningFunctions::cleanValue)
 							.collect(Collectors.toList()));
 			}
+			if (Objects.nonNull(r.getFormat())) {
+				r
+					.setFormat(
+						r
+							.getFormat()
+							.stream()
+							.map(GraphCleaningFunctions::cleanValue)
+							.collect(Collectors.toList()));
+			}
 			if (Objects.nonNull(r.getDescription())) {
 				r
 					.setDescription(

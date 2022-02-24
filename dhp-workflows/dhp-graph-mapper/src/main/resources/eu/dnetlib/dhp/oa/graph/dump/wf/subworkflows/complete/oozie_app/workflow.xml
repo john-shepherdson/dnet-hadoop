@@ -325,6 +325,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/validrelation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation/relation</arg>
+            <arg>--removeSet</arg><arg>${removeSet}</arg>
         </spark>
         <ok to="join_dump"/>
         <error to="Kill"/>

@@ -4,10 +4,11 @@ package eu.dnetlib.dhp.oa.graph.dump.complete;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
-import java.util.Optional;
+import java.util.*;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -37,7 +38,7 @@ public class SparkDumpRelationJob implements Serializable {
 			.toString(
 				SparkDumpRelationJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/graph/dump/complete/input_relationdump_parameters.json"));
+						"/eu/dnetlib/dhp/oa/graph/dump/input_relationdump_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
@@ -54,6 +55,12 @@ public class SparkDumpRelationJob implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
+		Optional<String> rs = Optional.ofNullable(parser.get("removeSet"));
+		final Set<String> removeSet = new HashSet<>();
+		if (rs.isPresent()) {
+			Collections.addAll(removeSet, rs.get().split(";"));
+		}
+
 		SparkConf conf = new SparkConf();
 
 		runWithSparkSession(
@@ -61,15 +68,16 @@ public class SparkDumpRelationJob implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				dumpRelation(spark, inputPath, outputPath);
+				dumpRelation(spark, inputPath, outputPath, removeSet);
 
 			});
 
 	}
 
-	private static void dumpRelation(SparkSession spark, String inputPath, String outputPath) {
+	private static void dumpRelation(SparkSession spark, String inputPath, String outputPath, Set<String> removeSet) {
 		Dataset<Relation> relations = Utils.readPath(spark, inputPath, Relation.class);
 		relations
+			.filter((FilterFunction<Relation>) r -> !removeSet.contains(r.getRelClass()))
 			.map((MapFunction<Relation, eu.dnetlib.dhp.schema.dump.oaf.graph.Relation>) relation -> {
 				eu.dnetlib.dhp.schema.dump.oaf.graph.Relation relNew = new eu.dnetlib.dhp.schema.dump.oaf.graph.Relation();
 				relNew

@@ -13,7 +13,6 @@ import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -55,18 +54,29 @@ public class XmlRecordFactoryTest {
 
 		System.out.println(doc.asXML());
 
-		Assertions.assertEquals("0000-0001-9613-6638", doc.valueOf("//creator[@rank = '1']/@orcid"));
-		Assertions.assertEquals("0000-0001-9613-6639", doc.valueOf("//creator[@rank = '1']/@orcid_pending"));
+		assertEquals("0000-0001-9613-6638", doc.valueOf("//creator[@rank = '1']/@orcid"));
+		assertEquals("0000-0001-9613-6639", doc.valueOf("//creator[@rank = '1']/@orcid_pending"));
 
-		Assertions.assertEquals("0000-0001-9613-9956", doc.valueOf("//creator[@rank = '2']/@orcid"));
-		Assertions.assertEquals("", doc.valueOf("//creator[@rank = '2']/@orcid_pending"));
+		assertEquals("0000-0001-9613-9956", doc.valueOf("//creator[@rank = '2']/@orcid"));
+		assertEquals("", doc.valueOf("//creator[@rank = '2']/@orcid_pending"));
 
-		Assertions.assertEquals("doi", doc.valueOf("//instance/pid/@classid"));
-		Assertions.assertEquals("10.1109/TED.2018.2853550", doc.valueOf("//instance/pid/text()"));
+		assertEquals("doi", doc.valueOf("//instance/pid/@classid"));
+		assertEquals("10.1109/TED.2018.2853550", doc.valueOf("//instance/pid/text()"));
 
-		Assertions.assertEquals("doi", doc.valueOf("//instance/alternateidentifier/@classid"));
-		Assertions.assertEquals("10.5689/LIB.2018.2853550", doc.valueOf("//instance/alternateidentifier/text()"));
-		// TODO add assertions based of values extracted from the XML record
+		assertEquals("doi", doc.valueOf("//instance/alternateidentifier/@classid"));
+		assertEquals("10.5689/LIB.2018.2853550", doc.valueOf("//instance/alternateidentifier/text()"));
+
+		assertEquals(3, doc.selectNodes("//instance").size());
+
+		assertEquals("1721.47", doc.valueOf("//processingchargeamount/text()"));
+		assertEquals("EUR", doc.valueOf("//processingchargecurrency/text()"));
+
+		assertEquals(
+			"1.00889953098e-08", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'influence']/@value"));
+		assertEquals(
+			"30.6576853333", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity_alt']/@value"));
+		assertEquals(
+			"4.62970429725e-08", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity']/@value"));
 	}
 
 	@Test
@@ -97,7 +107,7 @@ public class XmlRecordFactoryTest {
 		final Document doc = new SAXReader().read(new StringReader(xml));
 		assertNotNull(doc);
 		System.out.println(doc.asXML());
-		Assertions.assertEquals("2021-01-01", doc.valueOf("//validated/@date"));
+		assertEquals("2021-01-01", doc.valueOf("//validated/@date"));
 	}
 
 	@Test

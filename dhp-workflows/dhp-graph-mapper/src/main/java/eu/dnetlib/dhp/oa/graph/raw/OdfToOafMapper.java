@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -11,7 +12,10 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
+import org.dom4j.Element;
 import org.dom4j.Node;
+
+import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
@@ -34,10 +38,25 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<StructuredProperty> prepareTitles(final Document doc, final DataInfo info) {
-		return prepareListStructProps(
-			doc,
-			"//*[local-name()='titles']/*[local-name()='title']|//*[local-name()='resource']/*[local-name()='title']",
-			MAIN_TITLE_QUALIFIER, info);
+
+		final List<StructuredProperty> title = Lists.newArrayList();
+		final String xpath = "//*[local-name()='titles']/*[local-name()='title']|//*[local-name()='resource']/*[local-name()='title']";
+
+		for (Object o : doc.selectNodes(xpath)) {
+			Element e = (Element) o;
+			final String titleValue = e.getTextTrim();
+			final String titleType = e.attributeValue("titleType");
+			if (StringUtils.isNotBlank(titleType)) {
+				title
+					.add(
+						structuredProperty(
+							titleValue, titleType, titleType, DNET_DATACITE_TITLE, DNET_DATACITE_TITLE, info));
+			} else {
+				title.add(structuredProperty(titleValue, MAIN_TITLE_QUALIFIER, info));
+			}
+		}
+
+		return title;
 	}
 
 	@Override

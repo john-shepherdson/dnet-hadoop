@@ -1,0 +1,41 @@
+[
+  {
+    "paramName": "s",
+    "paramLongName": "sourcePath",
+    "paramDescription": "the source mdstore path",
+    "paramRequired": true
+  },
+
+  {
+    "paramName": "d",
+    "paramLongName": "datacitePath",
+    "paramDescription": "the datacite native path",
+    "paramRequired": true
+  },
+
+  {
+    "paramName": "w",
+    "paramLongName": "workingSupportPath",
+    "paramDescription": "the working Support path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "i",
+    "paramLongName": "isLookupUrl",
+    "paramDescription": "the isLookup URL",
+    "paramRequired": true
+  },
+  {
+    "paramName": "m",
+    "paramLongName": "master",
+    "paramDescription": "the master name",
+    "paramRequired": true
+  },
+  {
+    "paramName": "u",
+    "paramLongName": "updateDS",
+    "paramDescription": "Need to regenerate all support Dataset",
+    "paramRequired": false
+  }
+
+]

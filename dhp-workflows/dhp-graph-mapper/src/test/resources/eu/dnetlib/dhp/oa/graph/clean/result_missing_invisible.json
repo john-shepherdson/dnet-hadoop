@@ -1,7 +1,8 @@
 {
   "author": [
     {
-      "affiliation": [],
+      "affiliation": [
+      ],
       "fullname": "Brien, Tom",
       "name": "Tom",
       "pid": [
@@ -76,7 +77,8 @@
       "surname": "Brien"
     },
     {
-      "affiliation": [],
+      "affiliation": [
+      ],
       "fullname": "Ade, Peter",
       "name": "Peter",
       "pid": [
@@ -129,7 +131,8 @@
       "surname": "Ade"
     },
     {
-      "affiliation": [],
+      "affiliation": [
+      ],
       "fullname": "Barry, Peter S.",
       "name": "Peter S.",
       "pid": null,
@@ -137,90 +140,112 @@
       "surname": "Barry"
     },
     {
-      "affiliation": [],
+      "affiliation": [
+      ],
       "fullname": "Dunscombe, Chris J.",
       "name": "Chris J.",
-      "pid": [],
+      "pid": [
+      ],
       "rank": 4,
       "surname": "Dunscombe"
     },
     {
-      "affiliation": [],
+      "affiliation": [
+      ],
       "fullname": "Leadley, David R.",
       "name": "David R.",
-      "pid": [],
+      "pid": [
+      ],
       "rank": 5,
       "surname": "Leadley"
     },
     {
-      "affiliation": [],
+      "affiliation": [
+      ],
       "fullname": "Morozov, Dmitry V.",
       "name": "Dmitry V.",
-      "pid": [],
+      "pid": [
+      ],
       "rank": 6,
       "surname": "Morozov"
     },
     {
-      "affiliation": [],
+      "affiliation": [
+      ],
       "fullname": "Myronov, Maksym",
       "name": "Maksym",
-      "pid": [],
+      "pid": [
+      ],
       "rank": 7,
       "surname": "Myronov"
     },
     {
-      "affiliation": [],
+      "affiliation": [
+      ],
       "fullname": "Parker, Evan",
       "name": "Evan",
-      "pid": [],
+      "pid": [
+      ],
       "rank": 8,
       "surname": "Parker"
     },
     {
-      "affiliation": [],
+      "affiliation": [
+      ],
       "fullname": "Prest, Martin J.",
       "name": "Martin J.",
-      "pid": [],
+      "pid": [
+      ],
       "rank": 9,
       "surname": "Prest"
     },
     {
-      "affiliation": [],
+      "affiliation": [
+      ],
       "fullname": "Prunnila, Mika",
       "name": "Mika",
-      "pid": [],
+      "pid": [
+      ],
       "rank": 10,
       "surname": "Prunnila"
     },
     {
-      "affiliation": [],
+      "affiliation": [
+      ],
       "fullname": "Sudiwala, Rashmi V.",
       "name": "Rashmi V.",
-      "pid": [],
+      "pid": [
+      ],
       "rank": 11,
       "surname": "Sudiwala"
     },
     {
-      "affiliation": [],
+      "affiliation": [
+      ],
       "fullname": "Whall, Terry E.",
       "name": "Terry E.",
-      "pid": [],
+      "pid": [
+      ],
       "rank": 12,
       "surname": "Whall"
     },
     {
-      "affiliation": [],
+      "affiliation": [
+      ],
       "fullname": "Mauskopf",
       "name": "",
-      "pid": [],
+      "pid": [
+      ],
       "rank": 13,
       "surname": ""
     },
     {
-      "affiliation": [],
+      "affiliation": [
+      ],
       "fullname": " P. D. ",
       "name": "",
-      "pid": [],
+      "pid": [
+      ],
       "rank": 14,
       "surname": ""
     }
@@ -235,8 +260,10 @@
       "value": "VIRTA"
     }
   ],
-  "context": [],
-  "contributor": [],
+  "context": [
+  ],
+  "contributor": [
+  ],
   "country": [
     {
       "classid": "DE",
@@ -245,7 +272,8 @@
       "schemename": "dnet:countries"
     }
   ],
-  "coverage": [],
+  "coverage": [
+  ],
   "dataInfo": {
     "deletedbyinference": false,
     "inferenceprovenance": "",
@@ -276,11 +304,16 @@
   },
   "dateofcollection": "",
   "dateoftransformation": "2020-04-22T12:34:08.009Z",
-  "description": [],
-  "externalReference": [],
-  "extraInfo": [],
-  "format": [],
-  "fulltext": [],
+  "description": [
+  ],
+  "externalReference": [
+  ],
+  "extraInfo": [
+  ],
+  "format": [
+  ],
+  "fulltext": [
+  ],
   "id": "50|CSC_________::2250a70c903c6ac6e4c01438259e9375",
   "instance": [
     {
@@ -483,7 +516,8 @@
       "value": ""
     }
   ],
-  "relevantdate": [],
+  "relevantdate": [
+  ],
   "resourcetype": {
     "classid": "0001",
     "classname": "0001",
@@ -496,7 +530,8 @@
     "schemeid": "dnet:result_typologies",
     "schemename": "dnet:result_typologies"
   },
-  "source": [],
+  "source": [
+  ],
   "subject": [
     {
       "dataInfo": {
