@@ -81,7 +81,11 @@ compute stats TARGET.result_sources;
 create table TARGET.result_topics stored as parquet as select * from SOURCE.result_topics orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_topics;
 
-create table TARGET.result_result stored as parquet as select * from SOURCE.result_result orig where exists (select 1 from TARGET.result r where r.id=orig.source or r.id=orig.target);
+create view TARGET.foo1 as select * from SOURCE.result_result rr where rr.source in (select id from TARGET.result);
+create view TARGET.foo2 as select * from SOURCE.result_result rr where rr.target in (select id from TARGET.result);
+create table TARGET.result_result as select distinct * from (select * from TARGET.foo1 union all select * from TARGET.foo2) foufou;
+drop view TARGET.foo1;
+drop view TARGET.foo2;
 compute stats TARGET.result_result;
 
 -- datasources
@@ -126,7 +130,7 @@ compute stats TARGET.indi_result_has_cc_licence;
 create table TARGET.indi_result_has_cc_licence_url stored as parquet as select * from SOURCE.indi_result_has_cc_licence_url orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_result_has_cc_licence_url;
 
-create view TARGET.indi_funder_country_collab stored as select * from SOURCE.indi_funder_country_collab;
+create view TARGET.indi_funder_country_collab stored as parquet as select * from SOURCE.indi_funder_country_collab;
 
 create table TARGET.indi_result_with_orcid stored as parquet as select * from SOURCE.indi_result_with_orcid orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_result_with_orcid;

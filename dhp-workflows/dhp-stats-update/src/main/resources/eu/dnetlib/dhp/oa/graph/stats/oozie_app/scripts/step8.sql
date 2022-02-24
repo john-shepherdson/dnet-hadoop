@@ -44,7 +44,7 @@ FROM ${openaire_db_name}.datasource d1
                LATERAL VIEW EXPLODE(originalid) temp AS originalidd
       WHERE originalidd like "piwik:%") AS d2
      ON d1.id = d2.id
-WHERE d1.datainfo.deletedbyinference = FALSE;
+WHERE d1.datainfo.deletedbyinference = FALSE and d1.datainfo.invisible=false;
 
 -- Updating temporary table with everything that is not based on results -> This is done with the following "dual" table.
 -- Creating a temporary dual table that will be removed after the following insert
