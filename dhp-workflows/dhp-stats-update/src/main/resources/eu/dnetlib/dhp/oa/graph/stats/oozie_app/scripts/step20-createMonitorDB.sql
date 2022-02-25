@@ -123,6 +123,10 @@ create table TARGET.indi_pub_doi_from_crossref stored as parquet as select * fro
 compute stats TARGET.indi_pub_doi_from_crossref;
 create table TARGET.indi_pub_gold_oa stored as parquet as select * from SOURCE.indi_pub_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_gold_oa;
+create table TARGET.indi_datasets_gold_oa stored as parquet as select * from SOURCE.indi_datasets_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_datasets_gold_oa;
+create table TARGET.indi_software_gold_oa stored as parquet as select * from SOURCE.indi_software_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_software_gold_oa;
 create table TARGET.indi_pub_has_abstract stored as parquet as select * from SOURCE.indi_pub_has_abstract orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_has_abstract;
 create table TARGET.indi_result_has_cc_licence stored as parquet as select * from SOURCE.indi_result_has_cc_licence orig where exists (select 1 from TARGET.result r where r.id=orig.id);
@@ -130,7 +134,7 @@ compute stats TARGET.indi_result_has_cc_licence;
 create table TARGET.indi_result_has_cc_licence_url stored as parquet as select * from SOURCE.indi_result_has_cc_licence_url orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_result_has_cc_licence_url;
 
-create view TARGET.indi_funder_country_collab stored as parquet as select * from SOURCE.indi_funder_country_collab;
+create view TARGET.indi_funder_country_collab as select * from SOURCE.indi_funder_country_collab;
 
 create table TARGET.indi_result_with_orcid stored as parquet as select * from SOURCE.indi_result_with_orcid orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_result_with_orcid;
@@ -148,8 +152,19 @@ compute stats TARGET.indi_pub_closed_other_open;
 create table TARGET.indi_result_no_of_copies stored as parquet as select * from SOURCE.indi_result_no_of_copies orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_result_no_of_copies;
 
---- Usage statistics
-create table TARGET.usage_stats stored as parquet as select * from SOURCE.usage_stats orig where exists (select 1 from TARGET.result r where r.id=orig.result_id);
+create view TARGET.indi_org_findable as select * from SOURCE.indi_org_findable;
+create view TARGET.indi_org_openess as select * from SOURCE.indi_org_openess;
+create table TARGET.indi_pub_hybrid_oa_with_cc stored as parquet as select * from SOURCE.indi_pub_hybrid_oa_with_cc orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_pub_hybrid_oa_with_cc;
+
+create table TARGET.indi_pub_downloads stored as parquet as select * from SOURCE.indi_pub_downloads orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_pub_downloads;
+create table TARGET.indi_pub_downloads_datasource stored as parquet as select * from SOURCE.indi_pub_downloads_datasource orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_pub_downloads_datasource;
+create table TARGET.indi_pub_downloads_year stored as parquet as select * from SOURCE.indi_pub_downloads_year orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_pub_downloads_year;
+create table TARGET.indi_pub_downloads_datasource_year stored as parquet as select * from SOURCE.indi_pub_downloads_datasource_year orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_pub_downloads_datasource_year;
 
 --denorm
 alter table TARGET.result rename to TARGET.res_tmp;
