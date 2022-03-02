@@ -17,6 +17,6 @@ left outer join ${stats_db_name}.indi_pub_green_oa green on green.id=r.id;
 
 -- GOLD OA:
 create table ${stats_db_name}.result_gold as
-select r.id, case when gold.gold_oa=1 then true else false end as gold
+select r.id, case when gold.is_gold=1 then true else false end as gold
 from ${stats_db_name}.result r
          left outer join ${stats_db_name}.indi_pub_gold_oa gold on gold.id=r.id;
