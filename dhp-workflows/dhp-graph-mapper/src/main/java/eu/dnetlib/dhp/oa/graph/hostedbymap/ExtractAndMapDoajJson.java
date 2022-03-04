@@ -9,7 +9,6 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Objects;
 
-import eu.dnetlib.dhp.oa.graph.hostedbymap.model.DOAJModel;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
@@ -24,6 +23,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.graph.hostedbymap.model.DOAJModel;
 import eu.dnetlib.dhp.oa.graph.hostedbymap.model.doaj.DOAJEntry;
 
 public class ExtractAndMapDoajJson {

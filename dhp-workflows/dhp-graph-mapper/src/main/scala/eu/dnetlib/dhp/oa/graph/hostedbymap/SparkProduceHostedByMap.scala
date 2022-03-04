@@ -36,9 +36,7 @@ object SparkProduceHostedByMap {
           openaire.journal_id,
           "",
           "",
-          isOpenAccess,
-          -1,
-          List[String]()
+          isOpenAccess
         )
       case Constants.EISSN =>
         HostedByItemType(
@@ -47,9 +45,7 @@ object SparkProduceHostedByMap {
           "",
           openaire.journal_id,
           "",
-          isOpenAccess,
-          -1,
-          List[String]()
+          isOpenAccess
         )
       case Constants.ISSNL =>
         HostedByItemType(
@@ -58,9 +54,7 @@ object SparkProduceHostedByMap {
           "",
           "",
           openaire.journal_id,
-          isOpenAccess,
-          -1,
-          List[String]()
+          isOpenAccess
         )
 
       // catch the default with a variable so you can print it
@@ -85,36 +79,34 @@ object SparkProduceHostedByMap {
     issn: String,
     eissn: String,
     issnl: String,
-    oa: Boolean,
-    oaDate: Int,
-    reviewProcess: List[String]
+    oa: Boolean
   ): HostedByItemType = {
     if (issn != null) {
       if (eissn != null) {
         if (issnl != null) {
-          HostedByItemType(id, officialname, issn, eissn, issnl, oa, oaDate, reviewProcess)
+          HostedByItemType(id, officialname, issn, eissn, issnl, oa)
         } else {
-          HostedByItemType(id, officialname, issn, eissn, "", oa, oaDate, reviewProcess)
+          HostedByItemType(id, officialname, issn, eissn, "", oa)
         }
       } else {
         if (issnl != null) {
-          HostedByItemType(id, officialname, issn, "", issnl, oa, oaDate, reviewProcess)
+          HostedByItemType(id, officialname, issn, "", issnl, oa)
         } else {
-          HostedByItemType(id, officialname, issn, "", "", oa, oaDate, reviewProcess)
+          HostedByItemType(id, officialname, issn, "", "", oa)
         }
       }
     } else {
       if (eissn != null) {
         if (issnl != null) {
-          HostedByItemType(id, officialname, "", eissn, issnl, oa, oaDate, reviewProcess)
+          HostedByItemType(id, officialname, "", eissn, issnl, oa)
         } else {
-          HostedByItemType(id, officialname, "", eissn, "", oa, oaDate, reviewProcess)
+          HostedByItemType(id, officialname, "", eissn, "", oa)
         }
       } else {
         if (issnl != null) {
-          HostedByItemType(id, officialname, "", "", issnl, oa, oaDate, reviewProcess)
+          HostedByItemType(id, officialname, "", "", issnl, oa)
         } else {
-          HostedByItemType("", "", "", "", "", oa, oaDate, reviewProcess)
+          HostedByItemType("", "", "", "", "", oa)
         }
       }
     }
@@ -129,12 +121,10 @@ object SparkProduceHostedByMap {
         dats.getJournal.getIssnPrinted,
         dats.getJournal.getIssnOnline,
         dats.getJournal.getIssnLinking,
-        false,
-        -1,
-        List[String]()
+        false
       )
     }
-    HostedByItemType("", "", "", "", "", false, -1, List[String]())
+    HostedByItemType("", "", "", "", "", false)
   }
 
   def oaHostedByDataset(spark: SparkSession, datasourcePath: String): Dataset[HostedByItemType] = {
@@ -160,9 +150,7 @@ object SparkProduceHostedByMap {
       gold.getIssn,
       "",
       gold.getIssnL,
-      true,
-      -1,
-      List[String]()
+      true
     )
   }
 
@@ -192,9 +180,7 @@ object SparkProduceHostedByMap {
         doaj.getIssn,
         doaj.getEissn,
         "",
-        true,
-        -1,
-        doaj.getReviewProcess.asScala.toList
+        true
       )
     }
     return getHostedByItemType(
@@ -203,9 +189,7 @@ object SparkProduceHostedByMap {
       doaj.getIssn,
       doaj.getEissn,
       "",
-      true,
-      doaj.getOaStart,
-      doaj.getReviewProcess.asScala.toList
+      true
     )
   }
 
