@@ -2,9 +2,10 @@ package eu.dnetlib.dhp.oa.graph.hostedbymap
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
+import eu.dnetlib.dhp.common.HdfsSupport
 import eu.dnetlib.dhp.oa.graph.hostedbymap.model.{DOAJModel, UnibiGoldModel}
 import eu.dnetlib.dhp.schema.oaf.Datasource
-import org.apache.commons.io.IOUtils
+import org.apache.commons.io.{FileUtils, IOUtils}
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.hadoop.io.compress.GzipCodec
@@ -13,7 +14,8 @@ import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
 import org.json4s.DefaultFormats
 import org.slf4j.{Logger, LoggerFactory}
 
-import java.io.PrintWriter
+import java.io.{File, PrintWriter}
+import scala.collection.JavaConverters._
 
 object SparkProduceHostedByMap {
 
@@ -34,7 +36,9 @@ object SparkProduceHostedByMap {
           openaire.journal_id,
           "",
           "",
-          isOpenAccess
+          isOpenAccess,
+          -1,
+          List[String]()
         )
       case Constants.EISSN =>
         HostedByItemType(
@@ -43,7 +47,9 @@ object SparkProduceHostedByMap {
           "",
           openaire.journal_id,
           "",
-          isOpenAccess
+          isOpenAccess,
+          -1,
+          List[String]()
         )
       case Constants.ISSNL =>
         HostedByItemType(
@@ -52,7 +58,9 @@ object SparkProduceHostedByMap {
           "",
           "",
           openaire.journal_id,
-          isOpenAccess
+          isOpenAccess,
+          -1,
+          List[String]()
         )
 
       // catch the default with a variable so you can print it
@@ -77,34 +85,36 @@ object SparkProduceHostedByMap {
     issn: String,
     eissn: String,
     issnl: String,
-    oa: Boolean
+    oa: Boolean,
+    oaDate: Int,
+    reviewProcess: List[String]
   ): HostedByItemType = {
     if (issn != null) {
       if (eissn != null) {
         if (issnl != null) {
-          HostedByItemType(id, officialname, issn, eissn, issnl, oa)
+          HostedByItemType(id, officialname, issn, eissn, issnl, oa, oaDate, reviewProcess)
         } else {
-          HostedByItemType(id, officialname, issn, eissn, "", oa)
+          HostedByItemType(id, officialname, issn, eissn, "", oa, oaDate, reviewProcess)
         }
       } else {
         if (issnl != null) {
-          HostedByItemType(id, officialname, issn, "", issnl, oa)
+          HostedByItemType(id, officialname, issn, "", issnl, oa, oaDate, reviewProcess)
         } else {
-          HostedByItemType(id, officialname, issn, "", "", oa)
+          HostedByItemType(id, officialname, issn, "", "", oa, oaDate, reviewProcess)
         }
       }
     } else {
       if (eissn != null) {
         if (issnl != null) {
-          HostedByItemType(id, officialname, "", eissn, issnl, oa)
+          HostedByItemType(id, officialname, "", eissn, issnl, oa, oaDate, reviewProcess)
         } else {
-          HostedByItemType(id, officialname, "", eissn, "", oa)
+          HostedByItemType(id, officialname, "", eissn, "", oa, oaDate, reviewProcess)
         }
       } else {
         if (issnl != null) {
-          HostedByItemType(id, officialname, "", "", issnl, oa)
+          HostedByItemType(id, officialname, "", "", issnl, oa, oaDate, reviewProcess)
         } else {
-          HostedByItemType("", "", "", "", "", oa)
+          HostedByItemType("", "", "", "", "", oa, oaDate, reviewProcess)
         }
       }
     }
@@ -119,10 +129,12 @@ object SparkProduceHostedByMap {
         dats.getJournal.getIssnPrinted,
         dats.getJournal.getIssnOnline,
         dats.getJournal.getIssnLinking,
-        false
+        false,
+        -1,
+        List[String]()
       )
     }
-    HostedByItemType("", "", "", "", "", false)
+    HostedByItemType("", "", "", "", "", false, -1, List[String]())
   }
 
   def oaHostedByDataset(spark: SparkSession, datasourcePath: String): Dataset[HostedByItemType] = {
@@ -148,7 +160,9 @@ object SparkProduceHostedByMap {
       gold.getIssn,
       "",
       gold.getIssnL,
-      true
+      true,
+      -1,
+      List[String]()
     )
   }
 
@@ -171,14 +185,27 @@ object SparkProduceHostedByMap {
   }
 
   def doajToHostedbyItemType(doaj: DOAJModel): HostedByItemType = {
-
+    if (doaj.getOaStart == null) {
+      return getHostedByItemType(
+        Constants.DOAJ,
+        doaj.getJournalTitle,
+        doaj.getIssn,
+        doaj.getEissn,
+        "",
+        true,
+        -1,
+        doaj.getReviewProcess.asScala.toList
+      )
+    }
     return getHostedByItemType(
       Constants.DOAJ,
       doaj.getJournalTitle,
       doaj.getIssn,
       doaj.getEissn,
       "",
-      true
+      true,
+      doaj.getOaStart,
+      doaj.getReviewProcess.asScala.toList
     )
   }
 
@@ -255,6 +282,8 @@ object SparkProduceHostedByMap {
     implicit val formats = DefaultFormats
 
     logger.info("Getting the Datasources")
+
+    HdfsSupport.remove(outputPath, spark.sparkContext.hadoopConfiguration)
 
     Aggregators
       .explodeHostedByItemType(
