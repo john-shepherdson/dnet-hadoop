@@ -56,12 +56,6 @@ public class SparkCountryPropagationJob {
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
-		final Boolean saveGraph = Optional
-			.ofNullable(parser.get("saveGraph"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.TRUE);
-		log.info("saveGraph: {}", saveGraph);
-
 		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		SparkConf conf = new SparkConf();
@@ -75,8 +69,7 @@ public class SparkCountryPropagationJob {
 					sourcePath,
 					preparedInfoPath,
 					outputPath,
-					resultClazz,
-					saveGraph);
+					resultClazz);
 			});
 	}
 
@@ -85,27 +78,26 @@ public class SparkCountryPropagationJob {
 		String sourcePath,
 		String preparedInfoPath,
 		String outputPath,
-		Class<R> resultClazz,
-		boolean saveGraph) {
+		Class<R> resultClazz) {
 
-		if (saveGraph) {
-			log.info("Reading Graph table from: {}", sourcePath);
-			Dataset<R> res = readPath(spark, sourcePath, resultClazz);
 
-			log.info("Reading prepared info: {}", preparedInfoPath);
-			Dataset<ResultCountrySet> prepared = spark
-				.read()
-				.json(preparedInfoPath)
-				.as(Encoders.bean(ResultCountrySet.class));
+		log.info("Reading Graph table from: {}", sourcePath);
+		Dataset<R> res = readPath(spark, sourcePath, resultClazz);
 
-			res
-				.joinWith(prepared, res.col("id").equalTo(prepared.col("resultId")), "left_outer")
-				.map(getCountryMergeFn(), Encoders.bean(resultClazz))
-				.write()
-				.option("compression", "gzip")
-				.mode(SaveMode.Overwrite)
-				.json(outputPath);
-		}
+		log.info("Reading prepared info: {}", preparedInfoPath);
+		Dataset<ResultCountrySet> prepared = spark
+			.read()
+			.json(preparedInfoPath)
+			.as(Encoders.bean(ResultCountrySet.class));
+
+		res
+			.joinWith(prepared, res.col("id").equalTo(prepared.col("resultId")), "left_outer")
+			.map(getCountryMergeFn(), Encoders.bean(resultClazz))
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Overwrite)
+			.json(outputPath);
+
 	}
 
 	private static <R extends Result> MapFunction<Tuple2<R, ResultCountrySet>, R> getCountryMergeFn() {
