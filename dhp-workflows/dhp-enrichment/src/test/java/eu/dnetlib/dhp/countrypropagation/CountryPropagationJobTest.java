@@ -315,7 +315,7 @@ public class CountryPropagationJobTest {
 		Assertions.assertEquals(2, countries.size());
 		Assertions.assertTrue(countries.stream().anyMatch(cs -> cs.getClassid().equals("IT") && cs.getClassname().equals("Italy")));
 		Assertions.assertTrue(countries.stream().anyMatch(cs -> cs.getClassid().equals("NL") && cs.getClassname().equals("Netherlands")));
-		
+
 		countries = tmp.filter(r -> r.getId().equals("50|355e65625b88::54a1c76f520bb2c8da27d12e42891088")).collect().get(0).getCountry();
 		Assertions.assertEquals(2, countries.size());
 		Assertions.assertTrue(countries.stream().anyMatch(cs -> cs.getClassid().equals("IT") && cs.getClassname().equals("Italy")));
