@@ -55,7 +55,6 @@ public class DownloadCsvTest {
 		new DownloadCSV()
 			.doDownload(
 				fileURL,
-				workingDir + "/unibi_gold",
 				outputFile,
 				UnibiGoldModel.class.getName(),
 				',',
@@ -89,56 +88,6 @@ public class DownloadCsvTest {
 		}
 
 		assertEquals(67028, count);
-	}
-
-	@Disabled
-	@Test
-	void getDoajFileTest() throws CollectorException, IOException, ClassNotFoundException {
-
-		String fileURL = "https://doaj.org/csv";
-
-		final String outputFile = workingDir + "/doaj.json";
-		new DownloadCSV()
-			.doDownload(
-				fileURL,
-				workingDir + "/doaj",
-				outputFile,
-				DOAJModel.class.getName(),
-				',',
-				fs);
-
-		BufferedReader in = new BufferedReader(new InputStreamReader(fs.open(new Path(outputFile))));
-
-		String line;
-		int count = 0;
-		while ((line = in.readLine()) != null) {
-			DOAJModel doaj = new ObjectMapper().readValue(line, DOAJModel.class);
-			if (count == 0) {
-				assertEquals("0001-3765", doaj.getIssn());
-				assertEquals("1678-2690", doaj.getEissn());
-				assertEquals("Anais da Academia Brasileira de Ciências", doaj.getJournalTitle());
-			}
-			if (count == 22) {
-				log.info(new ObjectMapper().writeValueAsString(doaj));
-				System.out.println(new ObjectMapper().writeValueAsString(doaj));
-			}
-			if (count == 7904) {
-				// log.info(new ObjectMapper().writeValueAsString(doaj));
-				assertEquals("", doaj.getIssn());
-				assertEquals("2055-7159", doaj.getEissn());
-				assertEquals("BJR|case reports", doaj.getJournalTitle());
-			}
-			if (count == 16707) {
-
-				assertEquals("2783-1043", doaj.getIssn());
-				assertEquals("2783-1051", doaj.getEissn());
-				assertEquals("فیزیک کاربردی ایران", doaj.getJournalTitle());
-			}
-
-			count += 1;
-		}
-
-		assertEquals(16715, count);
 	}
 
 	@AfterAll

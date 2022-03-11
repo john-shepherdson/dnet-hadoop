@@ -2,9 +2,10 @@ package eu.dnetlib.dhp.oa.graph.hostedbymap
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
+import eu.dnetlib.dhp.common.HdfsSupport
 import eu.dnetlib.dhp.oa.graph.hostedbymap.model.{DOAJModel, UnibiGoldModel}
 import eu.dnetlib.dhp.schema.oaf.Datasource
-import org.apache.commons.io.IOUtils
+import org.apache.commons.io.{FileUtils, IOUtils}
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.hadoop.io.compress.GzipCodec
@@ -13,7 +14,8 @@ import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
 import org.json4s.DefaultFormats
 import org.slf4j.{Logger, LoggerFactory}
 
-import java.io.PrintWriter
+import java.io.{File, PrintWriter}
+import scala.collection.JavaConverters._
 
 object SparkProduceHostedByMap {
 
@@ -255,6 +257,8 @@ object SparkProduceHostedByMap {
     implicit val formats = DefaultFormats
 
     logger.info("Getting the Datasources")
+
+    HdfsSupport.remove(outputPath, spark.sparkContext.hadoopConfiguration)
 
     Aggregators
       .explodeHostedByItemType(
