@@ -61,7 +61,7 @@ public class PrepareResultCountrySet {
 		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		SparkConf conf = new SparkConf();
-		//conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
+		// conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
 		runWithSparkSession(
 			conf,

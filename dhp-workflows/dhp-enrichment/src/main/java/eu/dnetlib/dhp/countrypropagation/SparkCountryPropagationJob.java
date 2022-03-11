@@ -80,7 +80,6 @@ public class SparkCountryPropagationJob {
 		String outputPath,
 		Class<R> resultClazz) {
 
-
 		log.info("Reading Graph table from: {}", sourcePath);
 		Dataset<R> res = readPath(spark, sourcePath, resultClazz);
 

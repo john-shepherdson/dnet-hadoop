@@ -7,7 +7,6 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
@@ -19,6 +18,8 @@ import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -100,8 +101,8 @@ public class PrepareDatasourceCountryAssociation {
 		Dataset<Organization> organization = readPath(spark, inputPath + "/organization", Organization.class)
 			.filter(
 				(FilterFunction<Organization>) o -> !o.getDataInfo().getDeletedbyinference() &&
-					o.getCountry().getClassid().length() > 0  &&
-						!o.getCountry().getClassid().equals(ModelConstants.UNKNOWN)) ;
+					o.getCountry().getClassid().length() > 0 &&
+					!o.getCountry().getClassid().equals(ModelConstants.UNKNOWN));
 
 		// associated the datasource id with the id of the organization providing the datasource
 		Dataset<EntityEntityRel> dse = datasource
