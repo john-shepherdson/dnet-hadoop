@@ -52,7 +52,7 @@ compute stats TARGET.result_languages;
 create table TARGET.result_licenses stored as parquet as select * from SOURCE.result_licenses orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_licenses;
 
-create table TARGET.licenses_normalized as select * from SOURCE.licenses_normalized;
+create table TARGET.licenses_normalized STORED AS PARQUET as select * from SOURCE.licenses_normalized;
 
 create table TARGET.result_oids stored as parquet as select * from SOURCE.result_oids orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_oids;
@@ -83,7 +83,7 @@ compute stats TARGET.result_topics;
 
 create view TARGET.foo1 as select * from SOURCE.result_result rr where rr.source in (select id from TARGET.result);
 create view TARGET.foo2 as select * from SOURCE.result_result rr where rr.target in (select id from TARGET.result);
-create table TARGET.result_result as select distinct * from (select * from TARGET.foo1 union all select * from TARGET.foo2) foufou;
+create table TARGET.result_result STORED AS PARQUET as select distinct * from (select * from TARGET.foo1 union all select * from TARGET.foo2) foufou;
 drop view TARGET.foo1;
 drop view TARGET.foo2;
 compute stats TARGET.result_result;

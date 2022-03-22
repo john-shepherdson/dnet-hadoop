@@ -1,21 +1,21 @@
 -------------------------------------------
 --- Extra tables, mostly used by indicators
 
-create table ${stats_db_name}.result_projectcount as
+create table ${stats_db_name}.result_projectcount STORED AS PARQUET as
 select r.id, count(distinct p.id) as count
 from ${stats_db_name}.result r
 left outer join ${stats_db_name}.result_projects rp on rp.id=r.id
 left outer join ${stats_db_name}.project p on p.id=rp.project
 group by r.id;
 
-create table ${stats_db_name}.result_fundercount as
+create table ${stats_db_name}.result_fundercount STORED AS PARQUET as
 select r.id, count(distinct p.funder) as count
 from ${stats_db_name}.result r
 left outer join ${stats_db_name}.result_projects rp on rp.id=r.id
 left outer join ${stats_db_name}.project p on p.id=rp.project
 group by r.id;
 
-create table ${stats_db_name}.project_resultcount as
+create table ${stats_db_name}.project_resultcount STORED AS PARQUET as
 with rcount as (
     select p.id as pid, count(distinct r.id) as `count`, r.type as type
     from ${stats_db_name}.project p
