@@ -51,6 +51,3 @@ select * from openaire_prod_usage_stats.views_stats;
 ------------------------------------------------------------------------------------------------
 create table ${stats_db_name}.creation_date STORED AS PARQUET as
 select date_format(current_date(), 'dd-MM-yyyy') as date;
---
--- ANALYZE TABLE ${stats_db_name}.creation_date COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.creation_date COMPUTE STATISTICS FOR COLUMNS;

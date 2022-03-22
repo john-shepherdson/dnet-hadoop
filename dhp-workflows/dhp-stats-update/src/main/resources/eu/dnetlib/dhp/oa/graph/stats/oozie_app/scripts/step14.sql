@@ -47,16 +47,3 @@ FROM (
         SELECT substr(d.id, 4) id 
         from ${openaire_db_name}.datasource d 
         WHERE d.datainfo.deletedbyinference=false and d.datainfo.invisible = FALSE) d on o.datasource = d.id;
-
--- ANALYZE TABLE ${stats_db_name}.publication_licenses COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.publication_licenses COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.dataset_licenses COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.dataset_licenses COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.software_licenses COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.software_licenses COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.otherresearchproduct_licenses COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.otherresearchproduct_licenses COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.organization_pids COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.organization_pids COMPUTE STATISTICS FOR COLUMNS;
--- ANALYZE TABLE ${stats_db_name}.organization_sources COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.organization_sources COMPUTE STATISTICS FOR COLUMNS;
