@@ -81,15 +81,15 @@ public class SplitPerFunderTest {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		// FP7 3
+		// FP7 3 and H2020 3
 		JavaRDD<CommunityResult> tmp = sc
-			.textFile(workingDir.toString() + "/split/EC_FP7")
+			.textFile(workingDir.toString() + "/split/EC")
 			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
 		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
 			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
 
-		Assertions.assertEquals(3, verificationDataset.count());
+		Assertions.assertEquals(6, verificationDataset.count());
 
 		Assertions
 			.assertEquals(
@@ -132,10 +132,10 @@ public class SplitPerFunderTest {
 		Assertions.assertEquals(1, tmp.count());
 
 		// H2020 3
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/EC_H2020")
-			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
-		Assertions.assertEquals(3, tmp.count());
+//		tmp = sc
+//			.textFile(workingDir.toString() + "/split/EC_H2020")
+//			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+//		Assertions.assertEquals(3, tmp.count());
 
 		// MZOS 1
 		tmp = sc

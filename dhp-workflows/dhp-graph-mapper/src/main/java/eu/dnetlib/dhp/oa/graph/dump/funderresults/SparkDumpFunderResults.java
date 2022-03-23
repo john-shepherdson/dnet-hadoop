@@ -84,6 +84,15 @@ public class SparkDumpFunderResults implements Serializable {
 						, Encoders.STRING())
 				.distinct();
 
+		Dataset<CommunityResult> pubs;
+		Dataset<CommunityResult> result ;
+		pubs = Utils
+				.readPath(spark, inputPath + "/publication", CommunityResult.class);
+		Dataset<CommunityResult> dats = Utils.readPath(spark, inputPath + "/dataset", CommunityResult.class);
+		Dataset<CommunityResult> orp = Utils.readPath(spark, inputPath + "/otherresearchproduct", CommunityResult.class);
+		Dataset<CommunityResult> sw = Utils.readPath(spark, inputPath + "/software", CommunityResult.class);
+		result = pubs.union(dats).union(orp).union(sw);
+
 		funderList.foreach((ForeachFunction<String>) funder ->
 				getFunderResult(funder, inputPath, spark)
 				.write()
@@ -99,12 +108,15 @@ public class SparkDumpFunderResults implements Serializable {
 
 	@Nullable
 	private static Dataset<CommunityResult> getFunderResult(String funderName, String inputPath, SparkSession spark) {
-		Dataset<CommunityResult> result = Utils
-				.readPath(spark, inputPath + "/publication", CommunityResult.class)
-				.union(Utils.readPath(spark, inputPath + "/dataset", CommunityResult.class))
-				.union(Utils.readPath(spark, inputPath + "/otherresearchproduct", CommunityResult.class))
-				.union(Utils.readPath(spark, inputPath + "/software", CommunityResult.class));
-		return result.map((MapFunction<CommunityResult, CommunityResult>) cr -> {
+		Dataset<CommunityResult> pubs;
+		Dataset<CommunityResult> result ;
+				pubs = Utils
+				.readPath(spark, inputPath + "/publication", CommunityResult.class);
+		Dataset<CommunityResult> dats = Utils.readPath(spark, inputPath + "/dataset", CommunityResult.class);
+		Dataset<CommunityResult> orp = Utils.readPath(spark, inputPath + "/otherresearchproduct", CommunityResult.class);
+		Dataset<CommunityResult> sw = Utils.readPath(spark, inputPath + "/software", CommunityResult.class);
+		result = pubs.union(dats).union(orp).union(sw);
+		Dataset<CommunityResult> tmp = result.map((MapFunction<CommunityResult, CommunityResult>) cr -> {
 					if (!Optional.ofNullable(cr.getProjects()).isPresent()) {
 						return null;
 					}
@@ -116,6 +128,8 @@ public class SparkDumpFunderResults implements Serializable {
 					return null;
 				}, Encoders.bean(CommunityResult.class))
 				.filter(Objects::nonNull);
+		System.out.println(tmp.count());
+		return tmp;
 
 	}
 
