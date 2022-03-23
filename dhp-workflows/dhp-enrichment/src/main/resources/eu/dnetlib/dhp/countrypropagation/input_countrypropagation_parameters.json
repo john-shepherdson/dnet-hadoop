@@ -6,12 +6,6 @@
     "paramRequired": true
   },
   {
-    "paramName":"h",
-    "paramLongName":"hive_metastore_uris",
-    "paramDescription": "the hive metastore uris",
-    "paramRequired": false
-  },
-  {
     "paramName":"tn",
     "paramLongName":"resultTableName",
     "paramDescription": "the name of the result table we are currently working on",

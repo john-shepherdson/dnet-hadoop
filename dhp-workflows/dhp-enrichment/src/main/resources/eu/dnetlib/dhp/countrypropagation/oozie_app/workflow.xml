@@ -110,7 +110,6 @@
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--whitelist</arg><arg>${whitelist}</arg>
             <arg>--allowedtypes</arg><arg>${allowedtypes}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--outputPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="fork_join_prepare_result_country"/>
@@ -146,7 +145,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/publication</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/workingP</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
@@ -176,7 +175,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dataset</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/workingD</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
@@ -206,7 +205,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/otherresearchproduct</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/workingO</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
@@ -236,7 +235,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/software</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/workingS</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
