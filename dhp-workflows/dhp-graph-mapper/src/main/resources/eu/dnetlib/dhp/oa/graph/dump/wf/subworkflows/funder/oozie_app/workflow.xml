@@ -77,12 +77,59 @@
         </configuration>
     </global>
 
-    <start to="fork_result_linked_to_projects"/>
+    <start to="prepareResultProject"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
+    <action name="prepareResultProject">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Prepare association result subset of project info</name>
+            <class>eu.dnetlib.dhp.oa.graph.dump.community.SparkPrepareResultProject</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo</arg>
+        </spark>
+        <ok to="fork_result_linked_to_projects"/>
+        <error to="Kill"/>
+    </action>
+
+<!--    <action name="select_relations">-->
+<!--        <spark xmlns="uri:oozie:spark-action:0.2">-->
+<!--            <master>yarn</master>-->
+<!--            <mode>cluster</mode>-->
+<!--            <name>Dump funder results </name>-->
+<!--            <class>eu.dnetlib.dhp.oa.graph.dump.funderresults.SparkSelectRelations</class>-->
+<!--            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>-->
+<!--            <spark-opts>-->
+<!--                &#45;&#45;executor-memory=${sparkExecutorMemory}-->
+<!--                &#45;&#45;executor-cores=${sparkExecutorCores}-->
+<!--                &#45;&#45;driver-memory=${sparkDriverMemory}-->
+<!--                &#45;&#45;conf spark.extraListeners=${spark2ExtraListeners}-->
+<!--                &#45;&#45;conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}-->
+<!--                &#45;&#45;conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}-->
+<!--                &#45;&#45;conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}-->
+<!--                &#45;&#45;conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}-->
+<!--            </spark-opts>-->
+<!--            <arg>&#45;&#45;sourcePath</arg><arg>${sourcePath}/relation</arg>-->
+<!--            <arg>&#45;&#45;outputPath</arg><arg>${workingDir}/preparedInfo</arg>-->
+<!--        </spark>-->
+<!--        <ok to="fork_result_linked_to_projects"/>-->
+<!--        <error to="Kill"/>-->
+<!--    </action>-->
 
     <fork name="fork_result_linked_to_projects">
         <path start="select_publication_linked_to_projects"/>
@@ -111,7 +158,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/result/publication</arg>
-            <arg>--graphPath</arg><arg>${sourcePath}</arg>
+            <arg>--graphPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="join_link"/>
         <error to="Kill"/>
@@ -137,7 +184,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/result/dataset</arg>
-            <arg>--graphPath</arg><arg>${sourcePath}</arg>
+            <arg>--graphPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="join_link"/>
         <error to="Kill"/>
@@ -163,7 +210,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/result/otherresearchproduct</arg>
-            <arg>--graphPath</arg><arg>${sourcePath}</arg>
+            <arg>--graphPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="join_link"/>
         <error to="Kill"/>
@@ -189,41 +236,41 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/result/software</arg>
-            <arg>--graphPath</arg><arg>${sourcePath}</arg>
+            <arg>--graphPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="join_link"/>
         <error to="Kill"/>
     </action>
 
-    <join name="join_link" to="common_action_community_funder"/>
+    <join name="join_link" to="dump_funder_results"/>
 
-    <action name="common_action_community_funder">
-        <sub-workflow>
-            <app-path>${wf:appPath()}/dump_common
-            </app-path>
-            <propagate-configuration/>
-            <configuration>
-                <property>
-                    <name>sourcePath</name>
-                    <value>${sourcePath}</value>
-                </property>
-                <property>
-                    <name>selectedResults</name>
-                    <value>${workingDir}/result</value>
-                </property>
-                <property>
-                    <name>communityMapPath</name>
-                    <value>${workingDir}/communityMap</value>
-                </property>
-                <property>
-                    <name>outputPath</name>
-                    <value>${workingDir}</value>
-                </property>
-            </configuration>
-        </sub-workflow>
-        <ok to="dump_funder_results" />
-        <error to="Kill" />
-    </action>
+<!--    <action name="common_action_community_funder">-->
+<!--        <sub-workflow>-->
+<!--            <app-path>${wf:appPath()}/dump_common-->
+<!--            </app-path>-->
+<!--            <propagate-configuration/>-->
+<!--            <configuration>-->
+<!--                <property>-->
+<!--                    <name>sourcePath</name>-->
+<!--                    <value>${sourcePath}</value>-->
+<!--                </property>-->
+<!--                <property>-->
+<!--                    <name>selectedResults</name>-->
+<!--                    <value>${workingDir}/result</value>-->
+<!--                </property>-->
+<!--                <property>-->
+<!--                    <name>communityMapPath</name>-->
+<!--                    <value>${workingDir}/communityMap</value>-->
+<!--                </property>-->
+<!--                <property>-->
+<!--                    <name>outputPath</name>-->
+<!--                    <value>${workingDir}</value>-->
+<!--                </property>-->
+<!--            </configuration>-->
+<!--        </sub-workflow>-->
+<!--        <ok to="dump_funder_results" />-->
+<!--        <error to="Kill" />-->
+<!--    </action>-->
 
     <action name="dump_funder_results">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -242,7 +289,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/ext</arg>
+            <arg>--sourcePath</arg><arg>${workingDir}/result</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
             <arg>--graphPath</arg><arg>${sourcePath}</arg>
         </spark>

@@ -6,8 +6,15 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import java.io.Serializable;
 import java.util.Optional;
 
+import eu.dnetlib.dhp.oa.graph.dump.Constants;
+import eu.dnetlib.dhp.oa.graph.dump.DumpProducts;
+import eu.dnetlib.dhp.oa.graph.dump.ResultMapper;
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
+import eu.dnetlib.dhp.oa.graph.dump.community.ResultProject;
+import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
@@ -23,6 +30,7 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import scala.Tuple2;
 
 /**
  * Selects the results linked to projects. Only for these results the dump will be performed.
@@ -58,8 +66,10 @@ public class SparkResultLinkedToProject implements Serializable {
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
-		final String graphPath = parser.get("graphPath");
-		log.info("graphPath: {}", graphPath);
+		final String resultProjectsPath = parser.get("graphPath");
+		log.info("graphPath: {}", resultProjectsPath);
+
+		String communityMapPath = parser.get("communityMapPath");
 
 		@SuppressWarnings("unchecked")
 		Class<? extends Result> inputClazz = (Class<? extends Result>) Class.forName(resultClassName);
@@ -70,43 +80,32 @@ public class SparkResultLinkedToProject implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				writeResultsLinkedToProjects(spark, inputClazz, inputPath, outputPath, graphPath);
+				writeResultsLinkedToProjects(communityMapPath, spark, inputClazz, inputPath, outputPath, resultProjectsPath);
 			});
 	}
 
-	private static <R extends Result> void writeResultsLinkedToProjects(SparkSession spark, Class<R> inputClazz,
-		String inputPath, String outputPath, String graphPath) {
+	private static <R extends Result> void writeResultsLinkedToProjects(String communityMapPath, SparkSession spark, Class<R> inputClazz,
+		String inputPath, String outputPath, String resultProjectsPath) {
 
 		Dataset<R> results = Utils
 			.readPath(spark, inputPath, inputClazz)
-			.filter("dataInfo.deletedbyinference = false and datainfo.invisible = false");
-		Dataset<Relation> relations = Utils
-			.readPath(spark, graphPath + "/relation", Relation.class)
-			.filter(
-				"dataInfo.deletedbyinference = false and lower(relClass) = '"
-					+ ModelConstants.IS_PRODUCED_BY.toLowerCase() + "'");
-		Dataset<Project> project = Utils.readPath(spark, graphPath + "/project", Project.class);
+				.filter((FilterFunction<R>) r -> !r.getDataInfo().getDeletedbyinference() &&
+						!r.getDataInfo().getInvisible())
+			;
+		Dataset<ResultProject> resultProjectDataset = Utils
+			.readPath(spark, resultProjectsPath , ResultProject.class)
+			;
+		CommunityMap communityMap = Utils.getCommunityMap(spark, communityMapPath);
+		results.joinWith(resultProjectDataset, results.col("id").equalTo(resultProjectDataset.col("resultId")))
+				.map((MapFunction<Tuple2<R, ResultProject>, CommunityResult>) t2 ->
+						{
+							CommunityResult cr = (CommunityResult) ResultMapper.map(t2._1(),
+									communityMap, Constants.DUMPTYPE.FUNDER.getType());
+							cr.setProjects(t2._2().getProjectsList());
+							return cr;
+						}
 
-		results.createOrReplaceTempView("result");
-		relations.createOrReplaceTempView("relation");
-		project.createOrReplaceTempView("project");
-
-		Dataset<R> tmp = spark
-			.sql(
-				"Select res.* " +
-					"from relation rel " +
-					"join result res " +
-					"on rel.source = res.id " +
-					"join project p " +
-					"on rel.target = p.id " +
-					"")
-			.as(Encoders.bean(inputClazz));
-		tmp
-			.groupByKey(
-				(MapFunction<R, String>) value -> value
-					.getId(),
-				Encoders.STRING())
-			.mapGroups((MapGroupsFunction<String, R, R>) (k, it) -> it.next(), Encoders.bean(inputClazz))
+						, Encoders.bean(CommunityResult.class) )
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")

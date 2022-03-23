@@ -76,8 +76,7 @@ public class SparkDumpFunderResults implements Serializable {
 			.union(Utils.readPath(spark, inputPath + "/software", CommunityResult.class));
 
 		List<String> funderList = project
-			.select("id")
-			.map((MapFunction<Row, String>) value -> value.getString(0).substring(0, 15), Encoders.STRING())
+			.map((MapFunction<eu.dnetlib.dhp.schema.oaf.Project, String>) p -> p.getId(),Encoders.STRING() )
 			.distinct()
 			.collectAsList();
 
