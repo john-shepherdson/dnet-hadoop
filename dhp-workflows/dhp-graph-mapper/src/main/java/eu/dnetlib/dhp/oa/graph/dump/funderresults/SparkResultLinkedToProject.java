@@ -5,6 +5,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import eu.dnetlib.dhp.oa.graph.dump.Constants;
 import eu.dnetlib.dhp.oa.graph.dump.DumpProducts;
@@ -15,6 +16,7 @@ import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
@@ -104,12 +106,12 @@ public class SparkResultLinkedToProject implements Serializable {
 							cr.setProjects(t2._2().getProjectsList());
 							return cr;
 						}
-
 						, Encoders.bean(CommunityResult.class) )
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
+
 
 	}
 }

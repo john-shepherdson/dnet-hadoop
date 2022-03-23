@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 
+import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -76,28 +77,30 @@ public class ResultLinkedToProjectTest {
 			.getPath();
 
 		final String graphPath = getClass()
-			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/nomatch")
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/preparedInfo")
 			.getPath();
+
+		final String communityMapPath = getClass()
+				.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/communityMapPath")
+				.getPath();
 
 		SparkResultLinkedToProject.main(new String[] {
 			"-isSparkSessionManaged", Boolean.FALSE.toString(),
 			"-outputPath", workingDir.toString() + "/preparedInfo",
 			"-sourcePath", sourcePath,
 			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
-			"-graphPath", graphPath
+			"-graphPath", graphPath,
+				"-communityMapPath",communityMapPath
 
 		});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		JavaRDD<Result> tmp = sc
+		JavaRDD<CommunityResult> tmp = sc
 			.textFile(workingDir.toString() + "/preparedInfo")
-			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
-		org.apache.spark.sql.Dataset<Result> verificationDataset = spark
-			.createDataset(tmp.rdd(), Encoders.bean(Result.class));
-
-		Assertions.assertEquals(0, verificationDataset.count());
+		Assertions.assertEquals(0, tmp.count());
 
 	}
 
@@ -108,29 +111,31 @@ public class ResultLinkedToProjectTest {
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/match/papers.json")
 			.getPath();
 
-		final String relationPath = getClass()
-			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/match")
-			.getPath();
+		final String graphPath = getClass()
+				.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/preparedInfo")
+				.getPath();
+
+		final String communityMapPath = getClass()
+				.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/communityMapPath")
+				.getPath();
 
 		SparkResultLinkedToProject.main(new String[] {
 			"-isSparkSessionManaged", Boolean.FALSE.toString(),
 			"-outputPath", workingDir.toString() + "/preparedInfo",
 			"-sourcePath", sourcePath,
 			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
-			"-graphPath", relationPath
+			"-graphPath", graphPath,
+				"-communityMapPath", communityMapPath
 
 		});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		JavaRDD<Publication> tmp = sc
+		JavaRDD<CommunityResult> tmp = sc
 			.textFile(workingDir.toString() + "/preparedInfo")
-			.map(item -> OBJECT_MAPPER.readValue(item, Publication.class));
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
-		org.apache.spark.sql.Dataset<Publication> verificationDataset = spark
-			.createDataset(tmp.rdd(), Encoders.bean(Publication.class));
-
-		Assertions.assertEquals(1, verificationDataset.count());
+		Assertions.assertEquals(1, tmp.count());
 
 	}
 
