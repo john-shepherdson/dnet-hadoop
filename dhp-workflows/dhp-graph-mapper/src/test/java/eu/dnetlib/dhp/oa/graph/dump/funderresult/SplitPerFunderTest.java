@@ -5,10 +5,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+//import eu.dnetlib.dhp.oa.graph.dump.funderresults.SparkDumpFunderResults2;
+//import eu.dnetlib.dhp.oa.graph.dump.funderresults.SparkGetFunderList;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.ForeachFunction;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
@@ -68,14 +72,14 @@ public class SplitPerFunderTest {
 	void test1() throws Exception {
 
 		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/extendeddump")
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/ext")
 			.getPath();
+
 
 		SparkDumpFunderResults.main(new String[] {
 			"-isSparkSessionManaged", Boolean.FALSE.toString(),
 			"-outputPath", workingDir.toString() + "/split",
-			"-sourcePath", sourcePath,
-			"-graphPath", sourcePath
+			"-sourcePath", sourcePath
 
 		});
 
@@ -83,13 +87,13 @@ public class SplitPerFunderTest {
 
 		// FP7 3 and H2020 3
 		JavaRDD<CommunityResult> tmp = sc
-			.textFile(workingDir.toString() + "/split/EC")
+			.textFile(workingDir.toString() + "/split/EC_FP7")
 			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
 		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
 			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
 
-		Assertions.assertEquals(6, verificationDataset.count());
+		Assertions.assertEquals(3, verificationDataset.count());
 
 		Assertions
 			.assertEquals(
@@ -132,10 +136,10 @@ public class SplitPerFunderTest {
 		Assertions.assertEquals(1, tmp.count());
 
 		// H2020 3
-//		tmp = sc
-//			.textFile(workingDir.toString() + "/split/EC_H2020")
-//			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
-//		Assertions.assertEquals(3, tmp.count());
+		tmp = sc
+			.textFile(workingDir.toString() + "/split/EC_H2020")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+		Assertions.assertEquals(3, tmp.count());
 
 		// MZOS 1
 		tmp = sc
@@ -143,11 +147,9 @@ public class SplitPerFunderTest {
 			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 		Assertions.assertEquals(1, tmp.count());
 
-		// CONICYT 0
-		tmp = sc
-			.textFile(workingDir.toString() + "/split/CONICYTF")
-			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
-		Assertions.assertEquals(0, tmp.count());
+
 
 	}
+
+
 }

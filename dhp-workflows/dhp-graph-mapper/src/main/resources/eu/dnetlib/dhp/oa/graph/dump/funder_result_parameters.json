@@ -21,6 +21,6 @@
 	"paramName": "gp",
 	"paramLongName": "graphPath",
 	"paramDescription": "the relationPath",
-	"paramRequired": true
+	"paramRequired": false
 }
 ]

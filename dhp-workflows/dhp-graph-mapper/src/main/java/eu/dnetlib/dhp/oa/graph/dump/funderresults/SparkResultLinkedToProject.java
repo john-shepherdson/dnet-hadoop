@@ -7,12 +7,6 @@ import java.io.Serializable;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.oa.graph.dump.Constants;
-import eu.dnetlib.dhp.oa.graph.dump.DumpProducts;
-import eu.dnetlib.dhp.oa.graph.dump.ResultMapper;
-import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
-import eu.dnetlib.dhp.oa.graph.dump.community.ResultProject;
-import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
@@ -27,8 +21,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.graph.dump.Constants;
+import eu.dnetlib.dhp.oa.graph.dump.DumpProducts;
+import eu.dnetlib.dhp.oa.graph.dump.ResultMapper;
 import eu.dnetlib.dhp.oa.graph.dump.Utils;
+import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
+import eu.dnetlib.dhp.oa.graph.dump.community.ResultProject;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
@@ -82,36 +82,37 @@ public class SparkResultLinkedToProject implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Utils.removeOutputDir(spark, outputPath);
-				writeResultsLinkedToProjects(communityMapPath, spark, inputClazz, inputPath, outputPath, resultProjectsPath);
+				writeResultsLinkedToProjects(
+					communityMapPath, spark, inputClazz, inputPath, outputPath, resultProjectsPath);
 			});
 	}
 
-	private static <R extends Result> void writeResultsLinkedToProjects(String communityMapPath, SparkSession spark, Class<R> inputClazz,
+	private static <R extends Result> void writeResultsLinkedToProjects(String communityMapPath, SparkSession spark,
+		Class<R> inputClazz,
 		String inputPath, String outputPath, String resultProjectsPath) {
 
 		Dataset<R> results = Utils
 			.readPath(spark, inputPath, inputClazz)
-				.filter((FilterFunction<R>) r -> !r.getDataInfo().getDeletedbyinference() &&
-						!r.getDataInfo().getInvisible())
-			;
+			.filter(
+				(FilterFunction<R>) r -> !r.getDataInfo().getDeletedbyinference() &&
+					!r.getDataInfo().getInvisible());
 		Dataset<ResultProject> resultProjectDataset = Utils
-			.readPath(spark, resultProjectsPath , ResultProject.class)
-			;
+			.readPath(spark, resultProjectsPath, ResultProject.class);
 		CommunityMap communityMap = Utils.getCommunityMap(spark, communityMapPath);
-		results.joinWith(resultProjectDataset, results.col("id").equalTo(resultProjectDataset.col("resultId")))
-				.map((MapFunction<Tuple2<R, ResultProject>, CommunityResult>) t2 ->
-						{
-							CommunityResult cr = (CommunityResult) ResultMapper.map(t2._1(),
-									communityMap, Constants.DUMPTYPE.FUNDER.getType());
-							cr.setProjects(t2._2().getProjectsList());
-							return cr;
-						}
-						, Encoders.bean(CommunityResult.class) )
+		results
+			.joinWith(resultProjectDataset, results.col("id").equalTo(resultProjectDataset.col("resultId")))
+			.map((MapFunction<Tuple2<R, ResultProject>, CommunityResult>) t2 -> {
+				CommunityResult cr = (CommunityResult) ResultMapper
+					.map(
+						t2._1(),
+						communityMap, Constants.DUMPTYPE.FUNDER.getType());
+				cr.setProjects(t2._2().getProjectsList());
+				return cr;
+			}, Encoders.bean(CommunityResult.class))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
-
 
 	}
 }

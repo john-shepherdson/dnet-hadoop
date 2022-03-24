@@ -326,20 +326,20 @@ public class PrepareResultProjectJobTest {
 	void testMatchx() throws Exception {
 
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/match")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/match")
+			.getPath();
 
-		SparkPrepareResultProject.main(new String[]{
-				"-isSparkSessionManaged", Boolean.FALSE.toString(),
-				"-outputPath", workingDir.toString() + "/preparedInfo",
-				"-sourcePath", sourcePath
+		SparkPrepareResultProject.main(new String[] {
+			"-isSparkSessionManaged", Boolean.FALSE.toString(),
+			"-outputPath", workingDir.toString() + "/preparedInfo",
+			"-sourcePath", sourcePath
 		});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<ResultProject> tmp = sc
-				.textFile(workingDir.toString() + "/preparedInfo")
-				.map(item -> OBJECT_MAPPER.readValue(item, ResultProject.class));
+			.textFile(workingDir.toString() + "/preparedInfo")
+			.map(item -> OBJECT_MAPPER.readValue(item, ResultProject.class));
 
 		tmp.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
 	}

@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 
-import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -23,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.oa.graph.dump.funderresults.SparkResultLinkedToProject;
+import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
@@ -81,8 +81,8 @@ public class ResultLinkedToProjectTest {
 			.getPath();
 
 		final String communityMapPath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/communityMapPath")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/communityMapPath")
+			.getPath();
 
 		SparkResultLinkedToProject.main(new String[] {
 			"-isSparkSessionManaged", Boolean.FALSE.toString(),
@@ -90,7 +90,7 @@ public class ResultLinkedToProjectTest {
 			"-sourcePath", sourcePath,
 			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
 			"-graphPath", graphPath,
-				"-communityMapPath",communityMapPath
+			"-communityMapPath", communityMapPath
 
 		});
 
@@ -112,12 +112,12 @@ public class ResultLinkedToProjectTest {
 			.getPath();
 
 		final String graphPath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/preparedInfo")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/preparedInfo")
+			.getPath();
 
 		final String communityMapPath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/communityMapPath")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/communityMapPath")
+			.getPath();
 
 		SparkResultLinkedToProject.main(new String[] {
 			"-isSparkSessionManaged", Boolean.FALSE.toString(),
@@ -125,7 +125,7 @@ public class ResultLinkedToProjectTest {
 			"-sourcePath", sourcePath,
 			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
 			"-graphPath", graphPath,
-				"-communityMapPath", communityMapPath
+			"-communityMapPath", communityMapPath
 
 		});
 
