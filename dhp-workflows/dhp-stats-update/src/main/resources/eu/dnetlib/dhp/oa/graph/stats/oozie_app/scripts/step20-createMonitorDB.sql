@@ -22,7 +22,16 @@ create table TARGET.result stored as parquet as
             'openorgs____::b84450f9864182c67b8611b5593f4250',
             'openorgs____::d41cf6bd4ab1b1362a44397e0b95c975',
             'openorgs____::eadc8da90a546e98c03f896661a2e4d4',
-            'openorgs____::d2a09b9d5eabb10c95f9470e172d05d2') )) foo;
+            'openorgs____::d2a09b9d5eabb10c95f9470e172d05d2',
+            'openorgs____::d169c7407dd417152596908d48c11460',
+            'openorgs____::1ec924b1759bb16d0a02f2dad8689b21',
+            'openorgs____::2fb1e47b4612688d9de9169d579939a7',
+            'openorgs____::759d59f05d77188faee99b7493b46805',
+            'openorgs____::cad284878801b9465fa51a95b1d779db',
+            'openorgs____::eadc8da90a546e98c03f896661a2e4d4',
+            'openorgs____::c0286313e36479eff8676dba9b724b40'
+            -- ,'openorgs____::c80a8243a5e5c620d7931c88d93bf17a' -- Paris Diderot
+            ) )) foo;
 compute stats TARGET.result;
 
 create table TARGET.result_citations stored as parquet as select * from SOURCE.result_citations orig where exists (select 1 from TARGET.result r where r.id=orig.id);
