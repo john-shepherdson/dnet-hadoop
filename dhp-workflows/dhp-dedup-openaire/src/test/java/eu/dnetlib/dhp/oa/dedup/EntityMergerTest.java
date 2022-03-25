@@ -77,7 +77,16 @@ class EntityMergerTest implements Serializable {
 		// verify id
 		assertEquals(dedupId, pub_merged.getId());
 
-		assertEquals(pub_top.getJournal(), pub_merged.getJournal());
+		assertEquals(pub_top.getJournal().getName(), pub_merged.getJournal().getName());
+		assertEquals(pub_top.getJournal().getIssnOnline(), pub_merged.getJournal().getIssnOnline());
+		assertEquals(pub_top.getJournal().getIssnLinking(), pub_merged.getJournal().getIssnLinking());
+		assertEquals(pub_top.getJournal().getIssnPrinted(), pub_merged.getJournal().getIssnPrinted());
+		assertEquals(pub_top.getJournal().getIss(), pub_merged.getJournal().getIss());
+		assertEquals(pub_top.getJournal().getEp(), pub_merged.getJournal().getEp());
+		assertEquals(pub_top.getJournal().getSp(), pub_merged.getJournal().getSp());
+		assertEquals(pub_top.getJournal().getVol(), pub_merged.getJournal().getVol());
+		assertEquals(pub_top.getJournal().getConferencedate(), pub_merged.getJournal().getConferencedate());
+		assertEquals(pub_top.getJournal().getConferenceplace(), pub_merged.getJournal().getConferenceplace());
 		assertEquals("OPEN", pub_merged.getBestaccessright().getClassid());
 		assertEquals(pub_top.getResulttype(), pub_merged.getResulttype());
 		assertEquals(pub_top.getLanguage(), pub_merged.getLanguage());
