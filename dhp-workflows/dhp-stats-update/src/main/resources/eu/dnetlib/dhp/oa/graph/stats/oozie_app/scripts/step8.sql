@@ -80,24 +80,24 @@ UPDATE ${stats_db_name}.datasource_tmp
 SET yearofvalidation=null
 WHERE yearofvalidation = '-1';
 
-CREATE TABLE ${stats_db_name}.datasource_languages AS
+CREATE TABLE ${stats_db_name}.datasource_languages STORED AS PARQUET AS
 SELECT substr(d.id, 4) AS id, langs.languages AS language
 FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.odlanguages.value) langs AS languages
 where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false;
 
-CREATE TABLE ${stats_db_name}.datasource_oids AS
+CREATE TABLE ${stats_db_name}.datasource_oids STORED AS PARQUET AS
 SELECT substr(d.id, 4) AS id, oids.ids AS oid
 FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.originalid) oids AS ids
 where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false;
 
-CREATE TABLE ${stats_db_name}.datasource_organizations AS
+CREATE TABLE ${stats_db_name}.datasource_organizations STORED AS PARQUET AS
 SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS organization
 FROM ${openaire_db_name}.relation r
 WHERE r.reltype = 'datasourceOrganization' and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false;
 
 -- datasource sources:
 -- where the datasource info have been collected from.
-create table if not exists ${stats_db_name}.datasource_sources AS
+create table if not exists ${stats_db_name}.datasource_sources STORED AS PARQUET AS
 select substr(d.id, 4) as id, substr(cf.key, 4) as datasource
 from ${openaire_db_name}.datasource d lateral view explode(d.collectedfrom) cfrom as cf
 where d.datainfo.deletedbyinference = false and d.datainfo.invisible=false;

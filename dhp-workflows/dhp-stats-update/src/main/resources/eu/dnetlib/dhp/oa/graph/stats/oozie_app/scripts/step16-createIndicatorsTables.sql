@@ -265,19 +265,19 @@ left outer join (
 
 create table indi_org_openess stored as parquet as
 WITH datasets_oa as (
-    SELECT ro.organization, count(dg.id) no_oadatasets FROM indi_datasets_gold_oa_new dg
+    SELECT ro.organization, count(dg.id) no_oadatasets FROM indi_datasets_gold_oa dg
     join openaire_prod_stats.result_organization ro on dg.id=ro.id
     join openaire_prod_stats.dataset ds on dg.id=ds.id
     WHERE dg.is_gold=1
     group by ro.organization),
 software_oa as (
-    SELECT ro.organization, count(dg.id) no_oasoftware FROM indi_software_gold_oa_new dg
+    SELECT ro.organization, count(dg.id) no_oasoftware FROM indi_software_gold_oa dg
     join openaire_prod_stats.result_organization ro on dg.id=ro.id
     join openaire_prod_stats.software ds on dg.id=ds.id
     WHERE dg.is_gold=1
     group by ro.organization),
 pubs_oa as (
-    SELECT ro.organization, count(dg.id) no_oapubs FROM indi_pub_gold_oa_new dg
+    SELECT ro.organization, count(dg.id) no_oapubs FROM indi_pub_gold_oa dg
     join openaire_prod_stats.result_organization ro on dg.id=ro.id
     join openaire_prod_stats.publication ds on dg.id=ds.id
     where dg.is_gold=1
