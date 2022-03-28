@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
-import eu.dnetlib.dhp.schema.oaf.Datasource;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -24,6 +23,7 @@ import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
+import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -146,10 +146,10 @@ public class XmlRecordFactoryTest {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-				XmlConverterJob.schemaLocation);
+			XmlConverterJob.schemaLocation);
 
 		final Datasource d = OBJECT_MAPPER
-				.readValue(IOUtils.toString(getClass().getResourceAsStream("datasource.json")), Datasource.class);
+			.readValue(IOUtils.toString(getClass().getResourceAsStream("datasource.json")), Datasource.class);
 
 		final String xml = xmlRecordFactory.build(new JoinedEntity<>(d));
 

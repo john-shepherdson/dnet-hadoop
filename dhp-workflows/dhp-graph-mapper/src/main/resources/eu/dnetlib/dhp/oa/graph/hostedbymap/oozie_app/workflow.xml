@@ -92,7 +92,7 @@
 
     <action name="download_gold">
         <java>
-            <main-class>eu.dnetlib.dhp.oa.graph.hostedbymap.DownloadCSV2</main-class>
+            <main-class>eu.dnetlib.dhp.oa.graph.hostedbymap.DownloadCSV</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--fileURL</arg><arg>${unibiFileURL}</arg>
             <arg>--tmpFile</arg><arg>/tmp/unibi_gold_replaced.csv</arg>
