@@ -31,6 +31,7 @@ import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.json4s.Xml;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
@@ -1208,14 +1209,8 @@ public class XmlRecordFactory implements Serializable {
 
 					if (instance.getRefereed() != null) {
 						fields
-							.addAll(
-								instance
-									.getRefereed()
-									.stream()
-									.filter(Objects::nonNull)
-									.filter(r -> !r.isBlank())
-									.map(r -> XmlSerializationUtils.mapQualifier("refereed", r))
-									.collect(Collectors.toList()));
+							.add(
+								XmlSerializationUtils.mapQualifier("refereed", instance.getRefereed()));
 					}
 					if (instance.getProcessingchargeamount() != null
 						&& isNotBlank(instance.getProcessingchargeamount())) {
@@ -1359,13 +1354,20 @@ public class XmlRecordFactory implements Serializable {
 					.map(Instance::getAccessright)
 					.min(new AccessRightComparator<AccessRight>())
 					.orElse(XmlInstance.UNKNOWN_ACCESS_RIGHT));
+		instance
+			.setRefereed(
+				instances
+					.stream()
+					.map(Pair::getValue)
+					.map(i -> Optional.ofNullable(i.getRefereed()).orElse(XmlInstance.UNKNOWN_REVIEW_LEVEL))
+					.min(new RefereedComparator())
+					.orElse(XmlInstance.UNKNOWN_REVIEW_LEVEL));
 
 		instances.forEach(p -> {
 			final Instance i = p.getRight();
 			instance.getCollectedfrom().add(i.getCollectedfrom());
 			instance.getHostedby().add(i.getHostedby());
 			instance.getInstancetype().add(i.getInstancetype());
-			instance.getRefereed().add(i.getRefereed());
 			instance
 				.setProcessingchargeamount(
 					Optional.ofNullable(i.getProcessingchargeamount()).map(apc -> apc.getValue()).orElse(null));
