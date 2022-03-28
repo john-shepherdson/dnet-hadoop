@@ -268,5 +268,20 @@
 		"value": [
 			"Journal article@@@eosc:contentpolicies"
 		]
+	},
+	{
+		"field": "consenttermsofuse",
+		"type": "boolean",
+		"value": true
+	},
+	{
+		"field": "fulltextdownload",
+		"type": "boolean",
+		"value": true
+	},
+	{
+		"field": "consenttermsofusedate",
+		"type": "date",
+		"value": "2022-03-11"
 	}
 ]
