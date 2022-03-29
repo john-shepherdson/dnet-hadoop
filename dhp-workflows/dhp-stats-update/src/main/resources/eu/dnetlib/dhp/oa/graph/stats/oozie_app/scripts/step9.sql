@@ -11,7 +11,7 @@ SELECT substr(o.id, 4)        as id,
 FROM ${openaire_db_name}.organization o
 WHERE o.datainfo.deletedbyinference = FALSE and o.datainfo.invisible = FALSE;
 
-CREATE OR REPLACE VIEW ${stats_db_name}.organization_datasources STORED AS PARQUET AS
+CREATE OR REPLACE VIEW ${stats_db_name}.organization_datasources AS
 SELECT organization AS id, id AS datasource
 FROM ${stats_db_name}.datasource_organizations;
 
