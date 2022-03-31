@@ -136,6 +136,7 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/result/publication</arg>
             <arg>--graphPath</arg><arg>${workingDir}/preparedInfo</arg>
+            <arg>--communityMapPath</arg><arg>${communityMapPath}</arg>
         </spark>
         <ok to="join_link"/>
         <error to="Kill"/>
@@ -162,6 +163,7 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/result/dataset</arg>
             <arg>--graphPath</arg><arg>${workingDir}/preparedInfo</arg>
+            <arg>--communityMapPath</arg><arg>${communityMapPath}</arg>
         </spark>
         <ok to="join_link"/>
         <error to="Kill"/>
@@ -188,6 +190,7 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/result/otherresearchproduct</arg>
             <arg>--graphPath</arg><arg>${workingDir}/preparedInfo</arg>
+            <arg>--communityMapPath</arg><arg>${communityMapPath}</arg>
         </spark>
         <ok to="join_link"/>
         <error to="Kill"/>
@@ -214,6 +217,7 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/result/software</arg>
             <arg>--graphPath</arg><arg>${workingDir}/preparedInfo</arg>
+            <arg>--communityMapPath</arg><arg>${communityMapPath}</arg>
         </spark>
         <ok to="join_link"/>
         <error to="Kill"/>

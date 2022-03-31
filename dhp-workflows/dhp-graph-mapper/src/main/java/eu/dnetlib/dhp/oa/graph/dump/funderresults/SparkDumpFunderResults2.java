@@ -1,10 +1,14 @@
 
 package eu.dnetlib.dhp.oa.graph.dump.funderresults;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.graph.dump.Utils;
-import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
-import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -13,13 +17,10 @@ import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.graph.dump.Utils;
+import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
+import eu.dnetlib.dhp.schema.dump.oaf.community.Project;
 
 /**
  * Splits the dumped results by funder and stores them in a folder named as the funder nsp (for all the funders, but the EC
@@ -72,16 +73,16 @@ public class SparkDumpFunderResults2 implements Serializable {
 			.union(Utils.readPath(spark, inputPath + "/otherresearchproduct", CommunityResult.class))
 			.union(Utils.readPath(spark, inputPath + "/software", CommunityResult.class));
 
-
-		List<String> funderList = result.flatMap((FlatMapFunction<CommunityResult, String>) cr ->
-						cr.getProjects().stream().map(p -> {
-							String fName = p.getFunder().getShortName();
-							if (fName.equalsIgnoreCase("ec")) {
-								fName += "_" + p.getFunder().getFundingStream();
-							}
-							return fName;
-						}).collect(Collectors.toList()).iterator()
-				, Encoders.STRING()).distinct().collectAsList();
+		List<String> funderList = result
+			.flatMap((FlatMapFunction<CommunityResult, String>) cr -> cr.getProjects().stream().map(p -> {
+				String fName = p.getFunder().getShortName();
+				if (fName.equalsIgnoreCase("ec")) {
+					fName += "_" + p.getFunder().getFundingStream();
+				}
+				return fName;
+			}).collect(Collectors.toList()).iterator(), Encoders.STRING())
+			.distinct()
+			.collectAsList();
 
 		funderList.forEach(funder -> {
 
@@ -98,7 +99,7 @@ public class SparkDumpFunderResults2 implements Serializable {
 			}
 			for (Project p : r.getProjects()) {
 				String fName = p.getFunder().getShortName();
-				if (fName.equalsIgnoreCase("ec")){
+				if (fName.equalsIgnoreCase("ec")) {
 					fName += "_" + p.getFunder().getFundingStream();
 				}
 				if (fName.equalsIgnoreCase(funder)) {
@@ -113,7 +114,5 @@ public class SparkDumpFunderResults2 implements Serializable {
 			.option("compression", "gzip")
 			.json(outputPath + "/" + funder);
 	}
-
-
 
 }

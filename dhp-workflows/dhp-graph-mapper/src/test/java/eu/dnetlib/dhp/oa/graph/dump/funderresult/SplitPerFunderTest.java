@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-//import eu.dnetlib.dhp.oa.graph.dump.funderresults.SparkDumpFunderResults2;
-//import eu.dnetlib.dhp.oa.graph.dump.funderresults.SparkGetFunderList;
+// import eu.dnetlib.dhp.oa.graph.dump.funderresults.SparkDumpFunderResults2;
+// import eu.dnetlib.dhp.oa.graph.dump.funderresults.SparkGetFunderList;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -74,7 +74,6 @@ public class SplitPerFunderTest {
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/ext")
 			.getPath();
-
 
 		SparkDumpFunderResults.main(new String[] {
 			"-isSparkSessionManaged", Boolean.FALSE.toString(),
@@ -147,9 +146,6 @@ public class SplitPerFunderTest {
 			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 		Assertions.assertEquals(1, tmp.count());
 
-
-
 	}
-
 
 }
