@@ -81,7 +81,7 @@ public class SparkDumpFunderResults implements Serializable {
 
 			}).collect(Collectors.toList()).iterator(), Encoders.STRING())
 			.distinct();
-		tmp.foreach((ForeachFunction<String>) f -> log.info("Found Funder {}", f));
+
 		List<String> funderList = tmp.collectAsList();
 
 		funderList.forEach(funder -> {
