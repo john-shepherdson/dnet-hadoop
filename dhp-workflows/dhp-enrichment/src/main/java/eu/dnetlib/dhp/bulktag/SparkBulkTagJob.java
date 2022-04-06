@@ -111,6 +111,13 @@ public class SparkBulkTagJob {
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
+
+		readPath(spark, outputPath, resultClazz)
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression","gzip")
+				.json(inputPath);
+
 	}
 
 	public static <R> Dataset<R> readPath(

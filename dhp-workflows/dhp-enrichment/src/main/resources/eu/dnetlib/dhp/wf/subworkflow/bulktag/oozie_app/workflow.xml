@@ -13,7 +13,7 @@
             <description>the json path associated to each selection field</description>
         </property>
         <property>
-            <name>outputPath</name>
+            <name>workingPath</name>
             <description>the output path</description>
         </property>
     </parameters>
@@ -29,65 +29,12 @@
         </configuration>
     </global>
 
-    <start to="reset_outputpath"/>
+    <start to="fork_exec_bulktag"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="reset_outputpath">
-        <fs>
-            <delete path="${outputPath}"/>
-            <mkdir path="${outputPath}"/>
-        </fs>
-        <ok to="copy_entities"/>
-        <error to="Kill"/>
-    </action>
-
-    <fork name="copy_entities">
-        <path start="copy_relation"/>
-        <path start="copy_organization"/>
-        <path start="copy_projects"/>
-        <path start="copy_datasources"/>
-    </fork>
-
-    <action name="copy_relation">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/relation</arg>
-            <arg>${nameNode}/${outputPath}/relation</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_organization">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/organization</arg>
-            <arg>${nameNode}/${outputPath}/organization</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_projects">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/project</arg>
-            <arg>${nameNode}/${outputPath}/project</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_datasources">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/datasource</arg>
-            <arg>${nameNode}/${outputPath}/datasource</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <join name="copy_wait" to="fork_exec_bulktag"/>
 
     <fork name="fork_exec_bulktag">
         <path start="join_bulktag_publication"/>
@@ -115,7 +62,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
+            <arg>--workingPath</arg><arg>${workingPath}/publication</arg>
             <arg>--pathMap</arg><arg>${pathMap}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
@@ -142,7 +89,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
+            <arg>--workingPath</arg><arg>${workingPath}/dataset</arg>
             <arg>--pathMap</arg><arg>${pathMap}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
@@ -169,7 +116,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
+            <arg>--workingPath</arg><arg>${workingPath}/otherresearchproduct</arg>
             <arg>--pathMap</arg><arg>${pathMap}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
@@ -196,7 +143,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/software</arg>
+            <arg>--workingPath</arg><arg>${workingPath}/software</arg>
             <arg>--pathMap</arg><arg>${pathMap}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
