@@ -100,6 +100,9 @@ public class MigrateDbEntitiesApplicationTest {
 		assertEquals("Journal article", ds.getContentpolicies().get(0).getClassid());
 		assertEquals("eosc:contentpolicies", ds.getContentpolicies().get(0).getSchemeid());
 
+		assertEquals(true, ds.getConsenttermsofuse());
+		assertEquals(true, ds.getFulltextdownload());
+		assertEquals("2022-03-11", ds.getConsenttermsofusedate());
 	}
 
 	@Test

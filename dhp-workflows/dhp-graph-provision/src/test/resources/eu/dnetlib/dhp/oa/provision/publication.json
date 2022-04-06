@@ -453,6 +453,12 @@
         "schemeid": "dnet:dataCite_resource",
         "schemename": "dnet:dataCite_resource"
       },
+      "refereed": {
+        "classid": "0001",
+        "classname": "peerReviewed",
+        "schemeid": "dnet:review_levels",
+        "schemename": "dnet:review_levels"
+      },
       "license": {
         "dataInfo": {
           "deletedbyinference": false,
@@ -584,6 +590,12 @@
         "classname": "Article",
         "schemeid": "dnet:dataCite_resource",
         "schemename": "dnet:dataCite_resource"
+      },
+      "refereed": {
+        "classid": "0000",
+        "classname": "UNKNOWN",
+        "schemeid": "dnet:review_levels",
+        "schemename": "dnet:review_levels"
       },
       "license": {
         "dataInfo": {
@@ -717,6 +729,12 @@
         "schemeid": "dnet:dataCite_resource",
         "schemename": "dnet:dataCite_resource"
       },
+      "refereed": {
+        "classid": "0002",
+        "classname": "nonPeerReviewed",
+        "schemeid": "dnet:review_levels",
+        "schemename": "dnet:review_levels"
+      },
       "license": {
         "dataInfo": {
           "deletedbyinference": false,
@@ -849,6 +867,12 @@
         "schemeid": "dnet:dataCite_resource",
         "schemename": "dnet:dataCite_resource"
       },
+      "refereed": {
+        "classid": "0001",
+        "classname": "peerReviewed",
+        "schemeid": "dnet:review_levels",
+        "schemename": "dnet:review_levels"
+      },
       "license": {
         "dataInfo": {
           "deletedbyinference": false,
@@ -866,7 +890,7 @@
         "value": ""
       },
       "url": [
-        "http://dx.doi.org/10.1109/TED.2018.2853552",
+        "http://dx.doi.org/10.1109/TED.2018.2853551",
         "http://dx.doi.org/10.1109/TED.2018.2853554"
       ]
     },

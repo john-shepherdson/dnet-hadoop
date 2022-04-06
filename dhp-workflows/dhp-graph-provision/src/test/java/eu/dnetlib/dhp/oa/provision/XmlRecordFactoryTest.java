@@ -66,7 +66,7 @@ public class XmlRecordFactoryTest {
 		assertEquals("doi", doc.valueOf("//instance/alternateidentifier/@classid"));
 		assertEquals("10.5689/LIB.2018.2853550", doc.valueOf("//instance/alternateidentifier/text()"));
 
-		assertEquals(3, doc.selectNodes("//instance").size());
+		assertEquals(2, doc.selectNodes("//instance").size());
 
 		assertEquals("1721.47", doc.valueOf("//processingchargeamount/text()"));
 		assertEquals("EUR", doc.valueOf("//processingchargecurrency/text()"));

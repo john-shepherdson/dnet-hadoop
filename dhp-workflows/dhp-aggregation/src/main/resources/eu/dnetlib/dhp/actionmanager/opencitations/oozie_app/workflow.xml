@@ -83,7 +83,7 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--workingPath</arg><arg>${workingPath}/COCI</arg>
-            <arg>--outputPath</arg><arg>${workingPath}/COCI_JSON</arg>
+            <arg>--outputPath</arg><arg>${workingPath}/COCI_JSON/</arg>
             <arg>--delimiter</arg><arg>${delimiter}</arg>
             <arg>--inputFile</arg><arg>${inputFileCoci}</arg>
         </spark>

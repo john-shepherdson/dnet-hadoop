@@ -107,7 +107,7 @@ public class DedupRecordFactory {
 		entity.setId(id);
 
 		entity.setLastupdatetimestamp(ts);
-		entity.getDataInfo().setDeletedbyinference(false);
+		entity.setDataInfo(dataInfo);
 
 		return entity;
 	}

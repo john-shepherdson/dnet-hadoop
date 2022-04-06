@@ -309,6 +309,9 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			ds.setThematic(rs.getBoolean("thematic"));
 			ds.setKnowledgegraph(rs.getBoolean("knowledgegraph"));
 			ds.setContentpolicies(prepareListOfQualifiers(rs.getArray("contentpolicies")));
+			ds.setConsenttermsofuse(rs.getBoolean("consenttermsofuse"));
+			ds.setFulltextdownload(rs.getBoolean("fulltextdownload"));
+			ds.setConsenttermsofusedate(rs.getDate("consenttermsofusedate").toString());
 
 			return Arrays.asList(ds);
 		} catch (final Exception e) {

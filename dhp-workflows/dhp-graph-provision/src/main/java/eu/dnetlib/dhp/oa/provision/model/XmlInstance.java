@@ -12,6 +12,7 @@ import scala.Serializable;
 public class XmlInstance implements Serializable {
 
 	public static final AccessRight UNKNOWN_ACCESS_RIGHT;
+	public static final Qualifier UNKNOWN_REVIEW_LEVEL;
 
 	static {
 		UNKNOWN_ACCESS_RIGHT = new AccessRight();
@@ -19,6 +20,12 @@ public class XmlInstance implements Serializable {
 		UNKNOWN_ACCESS_RIGHT.setClassname(ModelConstants.UNKNOWN);
 		UNKNOWN_ACCESS_RIGHT.setSchemeid(ModelConstants.DNET_ACCESS_MODES);
 		UNKNOWN_ACCESS_RIGHT.setSchemename(ModelConstants.DNET_ACCESS_MODES);
+
+		UNKNOWN_REVIEW_LEVEL = new Qualifier();
+		UNKNOWN_REVIEW_LEVEL.setClassid("0000");
+		UNKNOWN_REVIEW_LEVEL.setClassname(ModelConstants.UNKNOWN);
+		UNKNOWN_ACCESS_RIGHT.setSchemeid(ModelConstants.DNET_REVIEW_LEVELS);
+		UNKNOWN_REVIEW_LEVEL.setSchemename(ModelConstants.DNET_REVIEW_LEVELS);
 	}
 
 	private String url;
@@ -50,7 +57,7 @@ public class XmlInstance implements Serializable {
 	// typed results
 	private String processingchargecurrency;
 
-	private Set<Qualifier> refereed = Sets.newHashSet();; // peer-review status
+	private Qualifier refereed; // peer-review status
 
 	public String getUrl() {
 		return url;
@@ -148,11 +155,11 @@ public class XmlInstance implements Serializable {
 		this.processingchargecurrency = processingchargecurrency;
 	}
 
-	public Set<Qualifier> getRefereed() {
+	public Qualifier getRefereed() {
 		return refereed;
 	}
 
-	public void setRefereed(Set<Qualifier> refereed) {
+	public void setRefereed(Qualifier refereed) {
 		this.refereed = refereed;
 	}
 }
