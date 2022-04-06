@@ -42,10 +42,7 @@ import java.io.IOException;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -311,7 +308,13 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			ds.setContentpolicies(prepareListOfQualifiers(rs.getArray("contentpolicies")));
 			ds.setConsenttermsofuse(rs.getBoolean("consenttermsofuse"));
 			ds.setFulltextdownload(rs.getBoolean("fulltextdownload"));
-			ds.setConsenttermsofusedate(rs.getDate("consenttermsofusedate").toString());
+			ds
+				.setConsenttermsofusedate(
+					Optional
+						.ofNullable(
+							rs.getDate("consenttermsofusedate"))
+						.map(c -> c.toString())
+						.orElse(null));
 
 			return Arrays.asList(ds);
 		} catch (final Exception e) {
