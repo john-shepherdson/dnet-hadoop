@@ -173,7 +173,16 @@ object SparkProduceHostedByMap {
   }
 
   def doajToHostedbyItemType(doaj: DOAJModel): HostedByItemType = {
-
+    if (doaj.getOaStart == null) {
+      return getHostedByItemType(
+        Constants.DOAJ,
+        doaj.getJournalTitle,
+        doaj.getIssn,
+        doaj.getEissn,
+        "",
+        true
+      )
+    }
     return getHostedByItemType(
       Constants.DOAJ,
       doaj.getJournalTitle,

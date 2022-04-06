@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.common.collection;
 
 import java.io.BufferedOutputStream;
@@ -15,25 +16,25 @@ import org.apache.hadoop.fs.Path;
 
 public class DecompressTarGz {
 
-    public static void doExtract(FileSystem fs, String outputPath, String tarGzPath) throws IOException {
+	public static void doExtract(FileSystem fs, String outputPath, String tarGzPath) throws IOException {
 
-        FSDataInputStream inputFileStream = fs.open(new Path(tarGzPath));
-        try (TarArchiveInputStream tais = new TarArchiveInputStream(
-                new GzipCompressorInputStream(inputFileStream))) {
-            TarArchiveEntry entry = null;
-            while ((entry = tais.getNextTarEntry()) != null) {
-                if (!entry.isDirectory()) {
-                    try (
-                            FSDataOutputStream out = fs
-                                    .create(new Path(outputPath.concat(entry.getName()).concat(".gz")));
-                            GZIPOutputStream gzipOs = new GZIPOutputStream(new BufferedOutputStream(out))) {
+		FSDataInputStream inputFileStream = fs.open(new Path(tarGzPath));
+		try (TarArchiveInputStream tais = new TarArchiveInputStream(
+			new GzipCompressorInputStream(inputFileStream))) {
+			TarArchiveEntry entry = null;
+			while ((entry = tais.getNextTarEntry()) != null) {
+				if (!entry.isDirectory()) {
+					try (
+						FSDataOutputStream out = fs
+							.create(new Path(outputPath.concat(entry.getName()).concat(".gz")));
+						GZIPOutputStream gzipOs = new GZIPOutputStream(new BufferedOutputStream(out))) {
 
-                        IOUtils.copy(tais, gzipOs);
+						IOUtils.copy(tais, gzipOs);
 
-                    }
+					}
 
-                }
-            }
-        }
-    }
+				}
+			}
+		}
+	}
 }

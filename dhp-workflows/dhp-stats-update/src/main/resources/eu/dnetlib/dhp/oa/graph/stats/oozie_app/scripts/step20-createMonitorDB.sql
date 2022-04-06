@@ -22,7 +22,16 @@ create table TARGET.result stored as parquet as
             'openorgs____::b84450f9864182c67b8611b5593f4250',
             'openorgs____::d41cf6bd4ab1b1362a44397e0b95c975',
             'openorgs____::eadc8da90a546e98c03f896661a2e4d4',
-            'openorgs____::d2a09b9d5eabb10c95f9470e172d05d2') )) foo;
+            'openorgs____::d2a09b9d5eabb10c95f9470e172d05d2',
+            'openorgs____::d169c7407dd417152596908d48c11460',
+            'openorgs____::1ec924b1759bb16d0a02f2dad8689b21',
+            'openorgs____::2fb1e47b4612688d9de9169d579939a7',
+            'openorgs____::759d59f05d77188faee99b7493b46805',
+            'openorgs____::cad284878801b9465fa51a95b1d779db',
+            'openorgs____::eadc8da90a546e98c03f896661a2e4d4',
+            'openorgs____::c0286313e36479eff8676dba9b724b40'
+            -- ,'openorgs____::c80a8243a5e5c620d7931c88d93bf17a' -- Paris Diderot
+            ) )) foo;
 compute stats TARGET.result;
 
 create table TARGET.result_citations stored as parquet as select * from SOURCE.result_citations orig where exists (select 1 from TARGET.result r where r.id=orig.id);
@@ -52,7 +61,7 @@ compute stats TARGET.result_languages;
 create table TARGET.result_licenses stored as parquet as select * from SOURCE.result_licenses orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_licenses;
 
-create table TARGET.licenses_normalized as select * from SOURCE.licenses_normalized;
+create table TARGET.licenses_normalized STORED AS PARQUET as select * from SOURCE.licenses_normalized;
 
 create table TARGET.result_oids stored as parquet as select * from SOURCE.result_oids orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_oids;
@@ -81,9 +90,14 @@ compute stats TARGET.result_sources;
 create table TARGET.result_topics stored as parquet as select * from SOURCE.result_topics orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_topics;
 
+create table TARGET.result_apc stored as parquet as select * from SOURCE.result_apc orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.result_apc;
+
+
+
 create view TARGET.foo1 as select * from SOURCE.result_result rr where rr.source in (select id from TARGET.result);
 create view TARGET.foo2 as select * from SOURCE.result_result rr where rr.target in (select id from TARGET.result);
-create table TARGET.result_result as select distinct * from (select * from TARGET.foo1 union all select * from TARGET.foo2) foufou;
+create table TARGET.result_result STORED AS PARQUET as select distinct * from (select * from TARGET.foo1 union all select * from TARGET.foo2) foufou;
 drop view TARGET.foo1;
 drop view TARGET.foo2;
 compute stats TARGET.result_result;
@@ -157,13 +171,13 @@ create view TARGET.indi_org_openess as select * from SOURCE.indi_org_openess;
 create table TARGET.indi_pub_hybrid_oa_with_cc stored as parquet as select * from SOURCE.indi_pub_hybrid_oa_with_cc orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_hybrid_oa_with_cc;
 
-create table TARGET.indi_pub_downloads stored as parquet as select * from SOURCE.indi_pub_downloads orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.indi_pub_downloads stored as parquet as select * from SOURCE.indi_pub_downloads orig where exists (select 1 from TARGET.result r where r.id=orig.result_id);
 compute stats TARGET.indi_pub_downloads;
-create table TARGET.indi_pub_downloads_datasource stored as parquet as select * from SOURCE.indi_pub_downloads_datasource orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.indi_pub_downloads_datasource stored as parquet as select * from SOURCE.indi_pub_downloads_datasource orig where exists (select 1 from TARGET.result r where r.id=orig.result_id);
 compute stats TARGET.indi_pub_downloads_datasource;
-create table TARGET.indi_pub_downloads_year stored as parquet as select * from SOURCE.indi_pub_downloads_year orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.indi_pub_downloads_year stored as parquet as select * from SOURCE.indi_pub_downloads_year orig where exists (select 1 from TARGET.result r where r.id=orig.result_id);
 compute stats TARGET.indi_pub_downloads_year;
-create table TARGET.indi_pub_downloads_datasource_year stored as parquet as select * from SOURCE.indi_pub_downloads_datasource_year orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.indi_pub_downloads_datasource_year stored as parquet as select * from SOURCE.indi_pub_downloads_datasource_year orig where exists (select 1 from TARGET.result r where r.id=orig.result_id);
 compute stats TARGET.indi_pub_downloads_datasource_year;
 
 --denorm
