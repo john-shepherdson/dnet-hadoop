@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import eu.dnetlib.dhp.collection.plugin.fileGZip.FileGZipCollectorPlugin;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -114,6 +115,8 @@ public class CollectorWorker extends ReportingJob {
 				return new OaiCollectorPlugin(clientParams);
 			case rest_json2xml:
 				return new RestCollectorPlugin(clientParams);
+			case fileGZip:
+				return new FileGZipCollectorPlugin();
 			case other:
 				final CollectorPlugin.NAME.OTHER_NAME plugin = Optional
 					.ofNullable(api.getParams().get("other_plugin_type"))
