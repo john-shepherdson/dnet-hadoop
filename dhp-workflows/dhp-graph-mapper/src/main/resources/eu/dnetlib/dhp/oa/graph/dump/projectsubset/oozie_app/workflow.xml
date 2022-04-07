@@ -121,7 +121,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/project</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/project</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/project</arg>
             <arg>--communityMapPath</arg><arg>noneed</arg>
         </spark>
         <ok to="get_new_projects"/>
@@ -145,8 +145,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${sourcePath}/project</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/project</arg>
+            <arg>--sourcePath</arg><arg>${workingDir}/project</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/tar/project</arg>
             <arg>--projectListPath</arg><arg>${projectListPath}</arg>
         </spark>
         <ok to="make_archive"/>
