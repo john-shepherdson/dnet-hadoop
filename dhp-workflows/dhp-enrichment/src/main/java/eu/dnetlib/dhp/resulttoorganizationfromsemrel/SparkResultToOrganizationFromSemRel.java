@@ -225,7 +225,6 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 
 				, Encoders.bean(Relation.class))
 			.write()
-
 			.mode(SaveMode.Append)
 			.option("compression", "gzip")
 			.json(outputPath);

@@ -25,105 +25,12 @@
         </configuration>
     </global>
 
-    <start to="reset_outputpath"/>
+    <start to="prepare_project_results_association"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="reset_outputpath">
-        <fs>
-            <delete path="${outputPath}"/>
-            <mkdir path="${outputPath}"/>
-        </fs>
-        <ok to="copy_entities"/>
-        <error to="Kill"/>
-    </action>
-
-    <fork name="copy_entities">
-        <path start="copy_relation"/>
-        <path start="copy_publication"/>
-        <path start="copy_dataset"/>
-        <path start="copy_orp"/>
-        <path start="copy_software"/>
-        <path start="copy_organization"/>
-        <path start="copy_projects"/>
-        <path start="copy_datasources"/>
-    </fork>
-
-    <action name="copy_relation">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/relation</arg>
-            <arg>${nameNode}/${outputPath}/relation</arg>
-        </distcp>
-        <ok to="wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_publication">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/publication</arg>
-            <arg>${nameNode}/${outputPath}/publication</arg>
-        </distcp>
-        <ok to="wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_dataset">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/dataset</arg>
-            <arg>${nameNode}/${outputPath}/dataset</arg>
-        </distcp>
-        <ok to="wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_orp">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/otherresearchproduct</arg>
-            <arg>${nameNode}/${outputPath}/otherresearchproduct</arg>
-        </distcp>
-        <ok to="wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_software">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/software</arg>
-            <arg>${nameNode}/${outputPath}/software</arg>
-        </distcp>
-        <ok to="wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_organization">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/organization</arg>
-            <arg>${nameNode}/${outputPath}/organization</arg>
-        </distcp>
-        <ok to="wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_projects">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/project</arg>
-            <arg>${nameNode}/${outputPath}/project</arg>
-        </distcp>
-        <ok to="wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_datasources">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/datasource</arg>
-            <arg>${nameNode}/${outputPath}/datasource</arg>
-        </distcp>
-        <ok to="wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <join name="wait" to="prepare_project_results_association"/>
     
     <action name="prepare_project_results_association">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -144,8 +51,8 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--potentialUpdatePath</arg><arg>${workingDir}/preparedInfo/potentialUpdates</arg>
-            <arg>--alreadyLinkedPath</arg><arg>${workingDir}/preparedInfo/alreadyLinked</arg>
+            <arg>--potentialUpdatePath</arg><arg>${workingDir}/resultproject/preparedInfo/potentialUpdates</arg>
+            <arg>--alreadyLinkedPath</arg><arg>${workingDir}/resultproject/preparedInfo/alreadyLinked</arg>
         </spark>
         <ok to="apply_propagation"/>
         <error to="Kill"/>
@@ -172,8 +79,8 @@
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--outputPath</arg><arg>${outputPath}/relation</arg>
-            <arg>--potentialUpdatePath</arg><arg>${workingDir}/preparedInfo/potentialUpdates</arg>
-            <arg>--alreadyLinkedPath</arg><arg>${workingDir}/preparedInfo/alreadyLinked</arg>
+            <arg>--potentialUpdatePath</arg><arg>${workingDir}/resultproject/preparedInfo/potentialUpdates</arg>
+            <arg>--alreadyLinkedPath</arg><arg>${workingDir}/resultproject/preparedInfo/alreadyLinked</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

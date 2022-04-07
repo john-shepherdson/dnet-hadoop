@@ -41,54 +41,9 @@
             <delete path="${outputPath}"/>
             <mkdir path="${outputPath}"/>
         </fs>
-        <ok to="copy_entities"/>
+        <ok to="prepare_datasource_country_association"/>
         <error to="Kill"/>
     </action>
-
-    <fork name="copy_entities">
-        <path start="copy_relation"/>
-        <path start="copy_organization"/>
-        <path start="copy_projects"/>
-        <path start="copy_datasources"/>
-    </fork>
-
-    <action name="copy_relation">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/relation</arg>
-            <arg>${nameNode}/${outputPath}/relation</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_organization">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/organization</arg>
-            <arg>${nameNode}/${outputPath}/organization</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_projects">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/project</arg>
-            <arg>${nameNode}/${outputPath}/project</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_datasources">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/datasource</arg>
-            <arg>${nameNode}/${outputPath}/datasource</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <join name="copy_wait" to="prepare_datasource_country_association"/>
 
     <action name="prepare_datasource_country_association">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -110,7 +65,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--whitelist</arg><arg>${whitelist}</arg>
             <arg>--allowedtypes</arg><arg>${allowedtypes}</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/country/preparedInfo</arg>
         </spark>
         <ok to="fork_join_prepare_result_country"/>
         <error to="Kill"/>
@@ -144,10 +99,10 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/publication</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/workingP</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/country/publication</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/country/workingP</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/country/preparedInfo</arg>
         </spark>
         <ok to="wait_prepare"/>
         <error to="Kill"/>
@@ -174,10 +129,10 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/dataset</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/workingD</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/country/dataset</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/country/workingD</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/country/preparedInfo</arg>
         </spark>
         <ok to="wait_prepare"/>
         <error to="Kill"/>
@@ -204,10 +159,10 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/otherresearchproduct</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/workingO</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/country/otherresearchproduct</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/country/workingO</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/country/preparedInfo</arg>
         </spark>
         <ok to="wait_prepare"/>
         <error to="Kill"/>
@@ -234,10 +189,10 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/software</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/workingS</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/country/software</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/country/workingS</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/country/preparedInfo</arg>
         </spark>
         <ok to="wait_prepare"/>
         <error to="Kill"/>
@@ -273,7 +228,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/publication</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/country/publication</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
@@ -303,7 +258,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/dataset</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/country/dataset</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
@@ -333,7 +288,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/otherresearchproduct</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/country/otherresearchproduct</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>

@@ -62,7 +62,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--workingPath</arg><arg>${workingPath}/publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/bulktag/publication</arg>
             <arg>--pathMap</arg><arg>${pathMap}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
@@ -89,7 +89,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--workingPath</arg><arg>${workingPath}/dataset</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/bulktag/dataset</arg>
             <arg>--pathMap</arg><arg>${pathMap}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
@@ -116,7 +116,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--workingPath</arg><arg>${workingPath}/otherresearchproduct</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/bulktag/otherresearchproduct</arg>
             <arg>--pathMap</arg><arg>${pathMap}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
@@ -143,7 +143,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--workingPath</arg><arg>${workingPath}/software</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/bulktag/software</arg>
             <arg>--pathMap</arg><arg>${pathMap}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>

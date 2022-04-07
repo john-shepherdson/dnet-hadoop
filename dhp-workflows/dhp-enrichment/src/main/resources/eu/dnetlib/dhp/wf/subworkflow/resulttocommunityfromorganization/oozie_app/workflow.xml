@@ -36,54 +36,9 @@
             <delete path="${outputPath}"/>
             <mkdir path="${outputPath}"/>
         </fs>
-        <ok to="copy_entities"/>
+        <ok to="prepare_result_communitylist"/>
         <error to="Kill"/>
     </action>
-
-    <fork name="copy_entities">
-        <path start="copy_relation"/>
-        <path start="copy_organization"/>
-        <path start="copy_projects"/>
-        <path start="copy_datasources"/>
-    </fork>
-
-    <action name="copy_relation">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/relation</arg>
-            <arg>${nameNode}/${outputPath}/relation</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_organization">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/organization</arg>
-            <arg>${nameNode}/${outputPath}/organization</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_projects">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/project</arg>
-            <arg>${nameNode}/${outputPath}/project</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_datasources">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <arg>${nameNode}/${sourcePath}/datasource</arg>
-            <arg>${nameNode}/${outputPath}/datasource</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <join name="copy_wait" to="prepare_result_communitylist"/>
 
     <action name="prepare_result_communitylist">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -104,7 +59,7 @@
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communityorganization/preparedInfo/resultCommunityList</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--organizationtoresultcommunitymap</arg><arg>${organizationtoresultcommunitymap}</arg>
         </spark>
@@ -137,9 +92,9 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/communityorganization/preparedInfo/resultCommunityList</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communityorganization/publication</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
@@ -166,9 +121,9 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/communityorganization/preparedInfo/resultCommunityList</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communityorganization/dataset</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
@@ -195,9 +150,9 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/communityorganization/preparedInfo/resultCommunityList</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communityorganization/otherresearchproduct</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
@@ -224,9 +179,9 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/communityorganization/preparedInfo/resultCommunityList</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/software</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communityorganization/software</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>

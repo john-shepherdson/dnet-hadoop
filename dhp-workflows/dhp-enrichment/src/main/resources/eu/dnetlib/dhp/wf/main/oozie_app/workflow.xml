@@ -6,14 +6,33 @@
             <description>the source path</description>
         </property>
         <property>
-            <name>allowedsemrels</name>
+            <name>allowedsemrelsorginstrepo</name>
             <description>the semantic relationships allowed for propagation</description>
+        </property>
+        <property>
+            <name>allowedsemrelsresultproject</name>
+            <description>the allowed semantics </description>
+        </property>
+        <property>
+            <name>allowedsemrelscommunitysemrel</name>
+            <description>the semantic relationships allowed for propagation</description>
+        </property>
+        <property>
+            <name>whitelist</name>
+            <description>the white list</description>
+        </property>
+        <property>
+            <name>allowedtypes</name>
+            <description>the allowed types</description>
         </property>
         <property>
             <name>outputPath</name>
             <description>the output path</description>
         </property>
-
+        <property>
+            <name>organizationtoresultcommunitymap</name>
+            <description>organization community map</description>
+        </property>
         <property>
             <name>isLookUpUrl</name>
             <description>the isLookup service endpoint</description>
@@ -117,7 +136,7 @@
                 </property>
                 <property>
                     <name>allowedsemrels</name>
-                    <value>${allowedsemrels}</value>
+                    <value>${allowedsemrelsorginstrepo}</value>
                 </property>
                 <property>
                     <name>outputPath</name>
@@ -159,7 +178,7 @@
 
     <action name="affiliation_inst_repo">
         <sub-workflow>
-            <app-path>${wf:appPath()}/bulk_tagging
+            <app-path>${wf:appPath()}/affiliation_inst_repo
             </app-path>
             <propagate-configuration/>
             <configuration>
@@ -177,10 +196,129 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="bulk_tagging" />
+        <ok to="affiliation_semantic_relation" />
         <error to="Kill" />
     </action>
 
+    <action name="affiliation_semantic_relation">
+        <sub-workflow>
+            <app-path>${wf:appPath()}/affiliation_semantic_relation
+            </app-path>
+            <propagate-configuration/>
+            <configuration>
+                <property>
+                    <name>sourcePath</name>
+                    <value>${outputPath}</value>
+                </property>
+                <property>
+                    <name>outputPath</name>
+                    <value>${outputPath}</value>
+                </property>
+            </configuration>
+        </sub-workflow>
+        <ok to="community_organization" />
+        <error to="Kill" />
+    </action>
+
+    <action name="community_organization">
+        <sub-workflow>
+            <app-path>${wf:appPath()}/community_organization
+            </app-path>
+            <propagate-configuration/>
+            <configuration>
+                <property>
+                    <name>sourcePath</name>
+                    <value>${outputPath}</value>
+                </property>
+                <property>
+                    <name>outputPath</name>
+                    <value>${outputPath}</value>
+                </property>
+                <property>
+                    <name>organizationtoresultcommunitymap</name>
+                    <value>${organizationtoresultcommunitymap}</value>
+                </property>
+            </configuration>
+        </sub-workflow>
+        <ok to="result_project" />
+        <error to="Kill" />
+    </action>
+
+    <action name="result_project">
+        <sub-workflow>
+            <app-path>${wf:appPath()}/result_project
+            </app-path>
+            <propagate-configuration/>
+            <configuration>
+                <property>
+                    <name>sourcePath</name>
+                    <value>${outputPath}</value>
+                </property>
+                <property>
+                    <name>outputPath</name>
+                    <value>${outputPath}</value>
+                </property>
+                <property>
+                    <name>allowedsemrels</name>
+                    <value>${allowedsemrelsresultproject}</value>
+                </property>
+            </configuration>
+        </sub-workflow>
+        <ok to="community_sem_rel" />
+        <error to="Kill" />
+    </action>
+
+    <action name="community_sem_rel">
+        <sub-workflow>
+            <app-path>${wf:appPath()}/result_project
+            </app-path>
+            <propagate-configuration/>
+            <configuration>
+                <property>
+                    <name>sourcePath</name>
+                    <value>${outputPath}</value>
+                </property>
+                <property>
+                    <name>outputPath</name>
+                    <value>${workingDir}/communitysemrel</value>
+                </property>
+                <property>
+                    <name>allowedsemrels</name>
+                    <value>${allowedsemrelscommunitysemrel}</value>
+                </property>
+            </configuration>
+        </sub-workflow>
+        <ok to="country_propagation" />
+        <error to="Kill" />
+    </action>
+
+    <action name="country_propagation">
+        <sub-workflow>
+            <app-path>${wf:appPath()}/country_propagation
+            </app-path>
+            <propagate-configuration/>
+            <configuration>
+                <property>
+                    <name>sourcePath</name>
+                    <value>${outputPath}</value>
+                </property>
+                <property>
+                    <name>outputPath</name>
+                    <value>${workingDir}/country/result</value>
+                </property>
+                <property>
+                    <name>whitelist</name>
+                    <value>${whitelist}</value>
+                </property>
+                <property>
+                    <name>allowedtypes</name>
+                    <value>${allowedtupes}</value>
+                </property>
+            </configuration>
+        </sub-workflow>
+        <ok to="End" />
+        <error to="Kill" />
+    </action>
 
     <end name="End"/>
 

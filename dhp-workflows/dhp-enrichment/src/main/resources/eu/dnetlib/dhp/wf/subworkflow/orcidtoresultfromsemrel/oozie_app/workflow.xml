@@ -72,7 +72,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
         </spark>
         <ok to="wait"/>
@@ -100,7 +100,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
         </spark>
         <ok to="wait"/>
@@ -128,7 +128,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
         </spark>
         <ok to="wait"/>
@@ -156,7 +156,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
         </spark>
         <ok to="wait"/>
@@ -183,8 +183,8 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/mergedOrcidAssoc</arg>
         </spark>
         <ok to="fork-join-exec-propagation"/>
         <error to="Kill"/>
@@ -219,7 +219,7 @@
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/preparedInfo/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
@@ -250,7 +250,7 @@
                 --conf spark.hadoop.mapreduce.map.speculative=false
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
-            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/preparedInfo/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
@@ -281,7 +281,7 @@
                 --conf spark.hadoop.mapreduce.map.speculative=false
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
-            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/preparedInfo/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
@@ -312,7 +312,7 @@
                 --conf spark.hadoop.mapreduce.map.speculative=false
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
-            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/preparedInfo/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
