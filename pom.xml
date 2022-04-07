@@ -551,6 +551,9 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
 					<version>3.9.1</version>
+					<configuration>
+						<skip>${dhp.site.skip}</skip>
+					</configuration>
 				</plugin>
 
 				<plugin>
@@ -791,6 +794,7 @@
 		<dhp.spark.version>2.4.0.cloudera2</dhp.spark.version>
 		<dhp.jackson.version>2.9.6</dhp.jackson.version>
 		<dhp.commons.lang.version>3.5</dhp.commons.lang.version>
+		<dhp.site.skip>true</dhp.site.skip>
 		<dhp.guava.version>11.0.2</dhp.guava.version>
 		<scala.version>2.11.12</scala.version>
 		<junit-jupiter.version>5.6.1</junit-jupiter.version>
