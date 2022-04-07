@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import eu.dnetlib.dhp.collection.plugin.file.FileCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.file.FileGZipCollectorPlugin;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -115,6 +116,8 @@ public class CollectorWorker extends ReportingJob {
 				return new OaiCollectorPlugin(clientParams);
 			case rest_json2xml:
 				return new RestCollectorPlugin(clientParams);
+			case file:
+				return new FileCollectorPlugin();
 			case fileGZip:
 				return new FileGZipCollectorPlugin();
 			case other:

@@ -22,8 +22,7 @@ public class FileGZipCollectorPlugin extends AbstractSplittedRecordPlugin {
             GZIPInputStream stream = new GZIPInputStream(new FileInputStream(baseUrl));
             return new BufferedInputStream(stream);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new CollectorException(e);
+            throw new CollectorException("Error reading file " + baseUrl, e);
         }
     }
 }

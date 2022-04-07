@@ -12,12 +12,12 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.stream.Stream;
 
-public class FileGZipCollectorPluginTest {
+public class FileCollectorPluginTest {
 
     private static final Logger log = LoggerFactory.getLogger(FileGZipCollectorPluginTest.class);
 
     private final ApiDescriptor api = new ApiDescriptor();
-    private FileGZipCollectorPlugin plugin;
+    private FileCollectorPlugin plugin;
 
     private static final String SPLIT_ON_ELEMENT = "repository";
 
@@ -26,7 +26,7 @@ public class FileGZipCollectorPluginTest {
 
         final String gzipFile = this
                 .getClass()
-                .getResource("/eu/dnetlib/dhp/collection/plugin/file/opendoar.xml.gz")
+                .getResource("/eu/dnetlib/dhp/collection/plugin/file/opendoar.xml")
                 .getFile();
 
         api.setBaseUrl(gzipFile);
@@ -36,7 +36,7 @@ public class FileGZipCollectorPluginTest {
 
         api.setParams(params);
 
-        plugin = new FileGZipCollectorPlugin();
+        plugin = new FileCollectorPlugin();
     }
 
     @Test
@@ -50,3 +50,4 @@ public class FileGZipCollectorPluginTest {
         });
     }
 }
+
