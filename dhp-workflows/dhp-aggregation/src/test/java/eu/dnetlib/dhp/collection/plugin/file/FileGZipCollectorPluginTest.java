@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.collection.plugin.fileGZip;
+package eu.dnetlib.dhp.collection.plugin.file;
 
 import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
@@ -20,22 +20,19 @@ public class FileGZipCollectorPluginTest {
     private FileGZipCollectorPlugin plugin;
 
     private static final String SPLIT_ON_ELEMENT = "repository";
-    private static final String ENCODING = "UTF-8";
 
     @BeforeEach
     public void setUp() {
 
         final String gzipFile = this
                 .getClass()
-                .getResource("/eu/dnetlib/dhp/collection/plugin/fileGZip/opendoar.xml.gz")
+                .getResource("/eu/dnetlib/dhp/collection/plugin/file/gzip/opendoar.xml.gz")
                 .getFile();
 
-        System.out.println(gzipFile);
         api.setBaseUrl(gzipFile);
 
         HashMap<String, String> params = new HashMap<>();
         params.put("splitOnElement", SPLIT_ON_ELEMENT);
-        params.put("encoding", ENCODING);
 
         api.setParams(params);
 

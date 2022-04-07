@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.dnetlib.dhp.collection.plugin.fileGZip.FileGZipCollectorPlugin;
+import eu.dnetlib.dhp.collection.plugin.file.FileGZipCollectorPlugin;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
