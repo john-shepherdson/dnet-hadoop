@@ -6,12 +6,6 @@
     "paramRequired": true
   },
   {
-    "paramName":"sg",
-    "paramLongName":"saveGraph",
-    "paramDescription": "true if the new version of the graph must be saved",
-    "paramRequired": false
-  },
-  {
     "paramName":"h",
     "paramLongName":"hive_metastore_uris",
     "paramDescription": "the hive metastore uris",

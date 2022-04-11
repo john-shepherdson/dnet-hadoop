@@ -124,10 +124,10 @@ public class SparkResultToOrganizationFromIstRepoJob {
 			.json(outputPath);
 
 		readPath(spark, outputPath, Relation.class)
-				.write()
-				.mode(SaveMode.Append)
-				.option("compression","gzip")
-				.json(inputPath.substring(0, inputPath.indexOf("/") + 1) + "relation");
+			.write()
+			.mode(SaveMode.Append)
+			.option("compression", "gzip")
+			.json(inputPath.substring(0, inputPath.indexOf("/") + 1) + "relation");
 	}
 
 	private static FlatMapFunction<Tuple2<KeyValueSet, KeyValueSet>, Relation> createRelationFn() {

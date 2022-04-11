@@ -1,4 +1,4 @@
-<workflow-app name="dump_graph" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="enrichment_main" xmlns="uri:oozie:workflow:0.5">
 
     <parameters>
         <property>
@@ -6,7 +6,7 @@
             <description>the source path</description>
         </property>
         <property>
-            <name>allowedsemrelsorginstrepo</name>
+            <name>allowedsemrelsorcidprop</name>
             <description>the semantic relationships allowed for propagation</description>
         </property>
         <property>
@@ -18,7 +18,7 @@
             <description>the semantic relationships allowed for propagation</description>
         </property>
         <property>
-            <name>whitelist</name>
+            <name>datasourceWhitelistForCountryPropagation</name>
             <description>the white list</description>
         </property>
         <property>
@@ -118,7 +118,13 @@
 
     <decision name="resumeFrom">
         <switch>
-            <case to="send_zenodo">${wf:conf('onlyUpload') eq true}</case>
+            <case to="bulk_tagging">${wf:conf('resumeFrom') eq 'BulkTagging'}</case>
+            <case to="affiliation_inst_repo">${wf:conf('resumeFrom') eq 'AffiliationInstitutionalRepository'}</case>
+            <case to="affiliation_semantic_relation">${wf:conf('resumeFrom') eq 'AffiliationSemanticRelation'}</case>
+            <case to="community_organization">${wf:conf('resumeFrom') eq 'CommunityOrganization'}</case>
+            <case to="result_project">${wf:conf('resumeFrom') eq 'ResultProject'}</case>
+            <case to="community_sem_rel">${wf:conf('resumeFrom') eq 'CommunitySemanticRelation'}</case>
+            <case to="country_propagation">${wf:conf('resumeFrom') eq 'CountryPropagation'}</case>
             <default to="orcid_propagation"/>
         </switch>
     </decision>
@@ -136,7 +142,7 @@
                 </property>
                 <property>
                     <name>allowedsemrels</name>
-                    <value>${allowedsemrelsorginstrepo}</value>
+                    <value>${allowedsemrelsorcidprop}</value>
                 </property>
                 <property>
                     <name>outputPath</name>
@@ -308,7 +314,7 @@
                 </property>
                 <property>
                     <name>whitelist</name>
-                    <value>${whitelist}</value>
+                    <value>${datasourceWhitelistForCountryPropagation}</value>
                 </property>
                 <property>
                     <name>allowedtypes</name>
