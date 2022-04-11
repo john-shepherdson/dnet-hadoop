@@ -41,6 +41,10 @@
             <name>pathMap</name>
             <description>the json path associated to each selection field</description>
         </property>
+        <property>
+            <name>blacklist</name>
+            <description>list of datasources in blacklist for the affiliation from instrepo propagation</description>
+        </property>
 
         <property>
             <name>hiveDbName</name>

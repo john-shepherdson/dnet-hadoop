@@ -13,7 +13,7 @@
             <description>the json path associated to each selection field</description>
         </property>
         <property>
-            <name>workingPath</name>
+            <name>outputPath</name>
             <description>the output path</description>
         </property>
     </parameters>

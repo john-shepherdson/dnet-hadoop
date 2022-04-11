@@ -40,4 +40,13 @@ public class AutoritativeAuthor {
 		this.orcid = orcid;
 	}
 
+	public static AutoritativeAuthor newInstance(String name, String surname, String fullname, String orcid) {
+		AutoritativeAuthor aa = new AutoritativeAuthor();
+		aa.name = name;
+		aa.surname = surname;
+		aa.fullname = fullname;
+		aa.orcid = orcid;
+		return aa;
+	}
+
 }

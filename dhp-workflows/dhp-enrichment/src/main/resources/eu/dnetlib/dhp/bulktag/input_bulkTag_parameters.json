@@ -25,7 +25,7 @@
   },
   {
     "paramName": "out",
-    "paramLongName": "workingPath",
+    "paramLongName": "outputPath",
     "paramDescription": "the path used to store temporary output files",
     "paramRequired": true
   },

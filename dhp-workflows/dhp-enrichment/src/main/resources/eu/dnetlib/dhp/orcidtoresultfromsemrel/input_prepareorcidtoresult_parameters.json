@@ -12,9 +12,9 @@
     "paramRequired": true
   },
   {
-    "paramName":"h",
-    "paramLongName":"hive_metastore_uris",
-    "paramDescription": "the hive metastore uris",
+    "paramName":"ap",
+    "paramLongName":"allowedpids",
+    "paramDescription": "the allowed pid type to be used for propagation",
     "paramRequired": true
   },
   {

@@ -225,7 +225,7 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
+            <arg>--sourcePath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
             <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/mergedOrcidAssoc</arg>
         </spark>
         <ok to="fork-join-exec-propagation"/>
