@@ -10,6 +10,8 @@ import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,33 +65,30 @@ public class PrepareResultOrcidAssociationStep2 {
 			.union(readPath(spark, inputPath + "/software", ResultOrcidList.class));
 
 		resultOrcidAssoc
-			.toJavaRDD()
-			.mapToPair(r -> new Tuple2<>(r.getResultId(), r))
-			.reduceByKey(
-				(a, b) -> {
-					if (a == null) {
-						return b;
-					}
-					if (b == null) {
-						return a;
-					}
+				.groupByKey((MapFunction<ResultOrcidList, String>) rol -> rol.getResultId(), Encoders.STRING())
+				.mapGroups((MapGroupsFunction<String, ResultOrcidList, ResultOrcidList>) (k, it) ->{
+					ResultOrcidList resultOrcidList = it.next();
+					if(it.hasNext())
+					{
 					Set<String> orcid_set = new HashSet<>();
-					a.getAuthorList().stream().forEach(aa -> orcid_set.add(aa.getOrcid()));
-					b
-						.getAuthorList()
-						.stream()
-						.forEach(
-							aa -> {
-								if (!orcid_set.contains(aa.getOrcid())) {
-									a.getAuthorList().add(aa);
-									orcid_set.add(aa.getOrcid());
-								}
-							});
-					return a;
-				})
-			.map(Tuple2::_2)
-			.map(r -> OBJECT_MAPPER.writeValueAsString(r))
-			.saveAsTextFile(outputPath, GzipCodec.class);
+					resultOrcidList.getAuthorList().stream().forEach(aa -> orcid_set.add(aa.getOrcid()));
+					it.forEachRemaining(val -> val
+							.getAuthorList()
+							.stream()
+							.forEach(
+									aa -> {
+										if (!orcid_set.contains(aa.getOrcid())) {
+											resultOrcidList.getAuthorList().add(aa);
+											orcid_set.add(aa.getOrcid());
+										}
+									}));
+					}
+					return resultOrcidList;
+				},Encoders.bean(ResultOrcidList.class) )
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression","gzip")
+				.json(outputPath);
 	}
 
 }

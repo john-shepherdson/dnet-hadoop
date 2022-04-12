@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -56,7 +57,9 @@ public class PrepareResultOrcidAssociationStep1 {
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
-		final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrels").split(";"));
+		final List<String> allowedsemrel = Arrays.stream(parser.get("allowedsemrels").split(";"))
+				.map(s -> s.toLowerCase()).collect(Collectors.toList());
+
 		log.info("allowedSemRel: {}", new Gson().toJson(allowedsemrel));
 
 		final List<String> allowedPids = Arrays.asList(parser.get("allowedpids").split(";"));
@@ -122,28 +125,27 @@ public class PrepareResultOrcidAssociationStep1 {
 		Dataset<R> result = readPath(spark, outputPath + "/resultSubset", resultClazz);
 
 		result
-			.joinWith(relation, result.col("id").equalTo(relation.col("source")))
-			.map((MapFunction<Tuple2<R, Relation>, ResultOrcidList>) t2 -> {
-				ResultOrcidList rol = new ResultOrcidList();
-				rol.setResultId(t2._2().getTarget());
-				List<AutoritativeAuthor> aal = new ArrayList<>();
-				t2._1().getAuthor().stream().forEach(a -> {
-					a.getPid().stream().forEach(p -> {
-						if (allowedPids.contains(p.getQualifier().getClassid().toLowerCase())) {
-							aal
-								.add(
-									AutoritativeAuthor
-										.newInstance(a.getName(), a.getSurname(), a.getFullname(), p.getValue()));
-						}
+				.joinWith(relation, result.col("id").equalTo(relation.col("source")))
+				.map((MapFunction<Tuple2<R, Relation>, ResultOrcidList>) t2 -> {
+					ResultOrcidList rol = new ResultOrcidList();
+					rol.setResultId(t2._2().getTarget());
+					List<AutoritativeAuthor> aal = new ArrayList<>();
+					t2._1().getAuthor().stream().forEach(a -> {
+						a.getPid().stream().forEach(p -> {
+							if (allowedPids.contains(p.getQualifier().getClassid().toLowerCase())) {
+								aal
+										.add(
+												AutoritativeAuthor
+														.newInstance(a.getName(), a.getSurname(), a.getFullname(), p.getValue()));
+							}
+						});
 					});
-				});
-				return rol;
-			}, Encoders.bean(ResultOrcidList.class))
-			.write()
+					return rol;
+				}, Encoders.bean(ResultOrcidList.class)).write()
 			.option("compression", "gzip")
 			.mode(SaveMode.Overwrite)
 			.json(outputPath + "/" + resultType);
-		;
+
 
 	}
 

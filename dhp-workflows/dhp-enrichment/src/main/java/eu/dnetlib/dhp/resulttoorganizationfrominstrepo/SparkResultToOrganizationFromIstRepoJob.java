@@ -11,10 +11,7 @@ import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,8 +156,14 @@ public class SparkResultToOrganizationFromIstRepoJob {
 
 		Dataset<R> result = readPath(spark, inputPath, resultClazz);
 		result.createOrReplaceTempView("result");
-		createCfHbforResult(spark);
 
+		Dataset<Row> cfhb = spark.sql("select distinct r.id, inst.collectedfrom.key cf, inst.hostedby.key hb "
+				+
+				"from result r " +
+				"lateral view explode(instance) i as inst " +
+				"where r.datainfo.deletedbyinference=false");
+		//createCfHbforResult(spark);
+		cfhb.createOrReplaceTempView("cfhb");
 		dsOrg.createOrReplaceTempView("rels");
 
 		return spark

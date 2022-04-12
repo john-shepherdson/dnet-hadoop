@@ -228,8 +228,12 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
+<<<<<<< HEAD:dhp-workflows/dhp-enrichment/src/main/resources/eu/dnetlib/dhp/wf/subworkflows/countrypropagation/oozie_app/workflow.xml
             <arg>--preparedInfoPath</arg><arg>${workingDir}/country/publication</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+=======
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/publication</arg>
+>>>>>>> beta:dhp-workflows/dhp-enrichment/src/main/resources/eu/dnetlib/dhp/countrypropagation/oozie_app/workflow.xml
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
         </spark>
@@ -258,8 +262,12 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
+<<<<<<< HEAD:dhp-workflows/dhp-enrichment/src/main/resources/eu/dnetlib/dhp/wf/subworkflows/countrypropagation/oozie_app/workflow.xml
             <arg>--preparedInfoPath</arg><arg>${workingDir}/country/dataset</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+=======
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/dataset</arg>
+>>>>>>> beta:dhp-workflows/dhp-enrichment/src/main/resources/eu/dnetlib/dhp/countrypropagation/oozie_app/workflow.xml
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
         </spark>
@@ -288,8 +296,12 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
+<<<<<<< HEAD:dhp-workflows/dhp-enrichment/src/main/resources/eu/dnetlib/dhp/wf/subworkflows/countrypropagation/oozie_app/workflow.xml
             <arg>--preparedInfoPath</arg><arg>${workingDir}/country/otherresearchproduct</arg>
             <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+=======
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/otherresearchproduct</arg>
+>>>>>>> beta:dhp-workflows/dhp-enrichment/src/main/resources/eu/dnetlib/dhp/countrypropagation/oozie_app/workflow.xml
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
         </spark>
@@ -319,7 +331,6 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/software</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${outputPath}/software</arg>
         </spark>

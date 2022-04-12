@@ -461,6 +461,86 @@ class CrossrefMappingTest {
 
   }
 
+
+  @Test
+  def testConvertArticleFromCrossRef2OafSFI(): Unit = {
+    val json = Source
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/doiboost/crossref/sfi_funded_article.json"))
+      .mkString
+    assertNotNull(json)
+
+    assertFalse(json.isEmpty);
+
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+
+    assertTrue(resultList.nonEmpty)
+
+    val items = resultList.filter(p => p.isInstanceOf[Publication])
+
+    assert(items.nonEmpty)
+    assert(items.size == 1)
+    val result: Result = items.head.asInstanceOf[Publication]
+    assertNotNull(result)
+
+    logger.info(mapper.writeValueAsString(result));
+
+    assertNotNull(result.getDataInfo, "Datainfo test not null Failed");
+    assertNotNull(
+      result.getDataInfo.getProvenanceaction,
+      "DataInfo/Provenance test not null Failed"
+    );
+    assertFalse(
+      result.getDataInfo.getProvenanceaction.getClassid.isEmpty,
+      "DataInfo/Provenance/classId test not null Failed"
+    );
+    assertFalse(
+      result.getDataInfo.getProvenanceaction.getClassname.isEmpty,
+      "DataInfo/Provenance/className test not null Failed"
+    );
+    assertFalse(
+      result.getDataInfo.getProvenanceaction.getSchemeid.isEmpty,
+      "DataInfo/Provenance/SchemeId test not null Failed"
+    );
+    assertFalse(
+      result.getDataInfo.getProvenanceaction.getSchemename.isEmpty,
+      "DataInfo/Provenance/SchemeName test not null Failed"
+    );
+
+    assertNotNull(result.getCollectedfrom, "CollectedFrom test not null Failed");
+    assertFalse(result.getCollectedfrom.isEmpty);
+
+    val collectedFromList = result.getCollectedfrom.asScala
+    assert(
+      collectedFromList.exists(c => c.getKey.equalsIgnoreCase("10|openaire____::081b82f96300b6a6e3d282bad31cb6e2")),
+      "Wrong collected from assertion"
+    )
+
+    assert(
+      collectedFromList.exists(c => c.getValue.equalsIgnoreCase("crossref")),
+      "Wrong collected from assertion"
+    )
+
+    val relevantDates = result.getRelevantdate.asScala
+
+    assert(
+      relevantDates.exists(d => d.getQualifier.getClassid.equalsIgnoreCase("created")),
+      "Missing relevant date of type created"
+    )
+
+    val rels = resultList.filter(p => p.isInstanceOf[Relation]).asInstanceOf[List[Relation]]
+    assertFalse(rels.isEmpty)
+    rels.foreach(relation => {
+      assertNotNull(relation)
+      assertFalse(relation.getSource.isEmpty)
+      assertFalse(relation.getTarget.isEmpty)
+      assertFalse(relation.getRelClass.isEmpty)
+      assertFalse(relation.getRelType.isEmpty)
+      assertFalse(relation.getSubRelType.isEmpty)
+
+    })
+
+  }
+
   @Test
   def testSetDateOfAcceptanceCrossRef2Oaf(): Unit = {
 

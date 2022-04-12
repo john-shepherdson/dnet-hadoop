@@ -1,0 +1,982 @@
+
+{
+
+    "indexed": {
+      "date-parts": [
+        [
+          2022,
+          4,
+          5
+        ]
+      ],
+      "date-time": "2022-04-05T11:07:00Z",
+      "timestamp": 1649156820730
+    },
+    "reference-count": 63,
+    "publisher": "Public Library of Science (PLoS)",
+    "issue": "5",
+    "license": [
+      {
+        "start": {
+          "date-parts": [
+            [
+              2020,
+              5,
+              29
+            ]
+          ],
+          "date-time": "2020-05-29T00:00:00Z",
+          "timestamp": 1590710400000
+        },
+        "content-version": "vor",
+        "delay-in-days": 0,
+        "URL": "http://creativecommons.org/licenses/by/4.0/"
+      }
+    ],
+    "funder": [
+      {
+        "DOI": "10.13039/501100001602",
+        "name": "Science Foundation Ireland",
+        "doi-asserted-by": "crossref",
+        "award": [
+          "SFI/12/RC/2273"
+        ]
+      },
+      {
+        "DOI": "10.13039/501100001602",
+        "name": "Science Foundation Ireland",
+        "doi-asserted-by": "crossref",
+        "award": [
+          "SFI/12/RC/2273"
+        ]
+      },
+      {
+        "DOI": "10.13039/501100001602",
+        "name": "Science Foundation Ireland",
+        "doi-asserted-by": "crossref",
+        "award": [
+          "SFI/12/RC/2273"
+        ]
+      },
+      {
+        "DOI": "10.13039/501100001602",
+        "name": "Science Foundation Ireland",
+        "doi-asserted-by": "crossref",
+        "award": [
+          "SFI/12/RC/2273"
+        ]
+      }
+    ],
+    "content-domain": {
+      "domain": [
+        "www.plosone.org"
+      ],
+      "crossmark-restriction": false
+    },
+    "short-container-title": [
+      "PLoS ONE"
+    ],
+    "DOI": "10.1371/journal.pone.0233284",
+    "type": "journal-article",
+    "created": {
+      "date-parts": [
+        [
+          2020,
+          5,
+          29
+        ]
+      ],
+      "date-time": "2020-05-29T17:53:47Z",
+      "timestamp": 1590774827000
+    },
+    "page": "e0233284",
+    "update-policy": "http://dx.doi.org/10.1371/journal.pone.corrections_policy",
+    "source": "Crossref",
+    "is-referenced-by-count": 13,
+    "title": [
+      "Vancomycin and nisin A are effective against biofilms of multi-drug resistant Staphylococcus aureus isolates from human milk"
+    ],
+    "prefix": "10.1371",
+    "volume": "15",
+    "author": [
+      {
+        "ORCID": "http://orcid.org/0000-0003-4107-0278",
+        "authenticated-orcid": true,
+        "given": "Angeliki",
+        "family": "Angelopoulou",
+        "sequence": "first",
+        "affiliation": [
+
+        ]
+      },
+      {
+        "given": "Des",
+        "family": "Field",
+        "sequence": "additional",
+        "affiliation": [
+
+        ]
+      },
+      {
+        "given": "Mariana",
+        "family": "Pérez-Ibarreche",
+        "sequence": "additional",
+        "affiliation": [
+
+        ]
+      },
+      {
+        "ORCID": "http://orcid.org/0000-0001-8317-6455",
+        "authenticated-orcid": true,
+        "given": "Alicja K.",
+        "family": "Warda",
+        "sequence": "additional",
+        "affiliation": [
+
+        ]
+      },
+      {
+        "given": "Colin",
+        "family": "Hill",
+        "sequence": "additional",
+        "affiliation": [
+
+        ]
+      },
+      {
+        "given": "R. Paul",
+        "family": "Ross",
+        "sequence": "additional",
+        "affiliation": [
+
+        ]
+      }
+    ],
+    "member": "340",
+    "published-online": {
+      "date-parts": [
+        [
+          2020,
+          5,
+          29
+        ]
+      ]
+    },
+    "reference": [
+      {
+        "issue": "7–8",
+        "key": "pone.0233284.ref001",
+        "doi-asserted-by": "crossref",
+        "first-page": "509",
+        "DOI": "10.1016/S0899-9007(00)00363-4",
+        "article-title": "Breast milk: a truly functional food",
+        "volume": "16",
+        "author": "B. Lönnerdal",
+        "year": "2000",
+        "journal-title": "Nutrition"
+      },
+      {
+        "key": "pone.0233284.ref002",
+        "first-page": "1",
+        "volume-title": "Mastitis: causes and management",
+        "author": "WHO",
+        "year": "2000"
+      },
+      {
+        "issue": "1–2",
+        "key": "pone.0233284.ref003",
+        "doi-asserted-by": "crossref",
+        "first-page": "115",
+        "DOI": "10.1038/pr.2014.178",
+        "article-title": "Human milk and infant intestinal mucosal glycans guide succession of the neonatal intestinal microbiota",
+        "volume": "77",
+        "author": "DS Newburg",
+        "year": "2015",
+        "journal-title": "Pediatr Res"
+      },
+      {
+        "issue": "7",
+        "key": "pone.0233284.ref004",
+        "doi-asserted-by": "crossref",
+        "first-page": "647",
+        "DOI": "10.1001/jamapediatrics.2017.0378",
+        "article-title": "Association between breast milk bacterial communities and establishment and development of the infant gut microbiome",
+        "volume": "171",
+        "author": "PS Pannaraj",
+        "year": "2017",
+        "journal-title": "JAMA Pediatr"
+      },
+      {
+        "issue": "Suppl 2:",
+        "key": "pone.0233284.ref005",
+        "doi-asserted-by": "crossref",
+        "first-page": "S69",
+        "DOI": "10.1542/peds.2008-1315i",
+        "article-title": "Why mothers stop breastfeeding: mothers' self-reported reasons for stopping during the first year",
+        "volume": "122",
+        "author": "R Li",
+        "year": "2008",
+        "journal-title": "Pediatrics"
+      },
+      {
+        "issue": "2",
+        "key": "pone.0233284.ref006",
+        "doi-asserted-by": "crossref",
+        "first-page": "83",
+        "DOI": "10.1007/s00430-017-0532-z",
+        "article-title": "The microbiology and treatment of human mastitis",
+        "volume": "207",
+        "author": "A Angelopoulou",
+        "year": "2018",
+        "journal-title": "Med Microbiol Immunol"
+      },
+      {
+        "issue": "2",
+        "key": "pone.0233284.ref007",
+        "doi-asserted-by": "crossref",
+        "first-page": "169",
+        "DOI": "10.3920/BM2013.0036",
+        "article-title": "Probiotics for human lactational mastitis",
+        "volume": "5",
+        "author": "L Fernández",
+        "year": "2014",
+        "journal-title": "Benef Microbes"
+      },
+      {
+        "issue": "15",
+        "key": "pone.0233284.ref008",
+        "doi-asserted-by": "crossref",
+        "first-page": "4650",
+        "DOI": "10.1128/AEM.02599-07",
+        "article-title": "Oral administration of Lactobacillus strains isolated from breast milk as an alternative for the treatment of infectious mastitis during lactation",
+        "volume": "74",
+        "author": "E Jiménez",
+        "year": "2008",
+        "journal-title": "Appl Environ Microbiol"
+      },
+      {
+        "issue": "3",
+        "key": "pone.0233284.ref009",
+        "doi-asserted-by": "crossref",
+        "first-page": "406",
+        "DOI": "10.1177/0890334415585078",
+        "article-title": "Metagenomic analysis of milk of healthy and mastitis-suffering women",
+        "volume": "31",
+        "author": "E Jiménez",
+        "year": "2015",
+        "journal-title": "J Hum Lact"
+      },
+      {
+        "issue": "2",
+        "key": "pone.0233284.ref010",
+        "doi-asserted-by": "crossref",
+        "first-page": "176",
+        "DOI": "10.1086/589241",
+        "article-title": "Risk of infection and death due to methicillin-resistant Staphylococcus aureus in long-term carriers",
+        "volume": "47",
+        "author": "R Datta",
+        "year": "2008",
+        "journal-title": "Clin Infect Dis"
+      },
+      {
+        "issue": "4",
+        "key": "pone.0233284.ref011",
+        "doi-asserted-by": "crossref",
+        "DOI": "10.1128/microbiolspec.GPP3-0023-2018",
+        "article-title": "Staphylococcal biofilms",
+        "volume": "6",
+        "author": "M. Otto",
+        "year": "2018",
+        "journal-title": "Microbiol Spectr"
+      },
+      {
+        "issue": "1",
+        "key": "pone.0233284.ref012",
+        "doi-asserted-by": "crossref",
+        "first-page": "9",
+        "DOI": "10.1038/s41522-018-0053-6",
+        "article-title": "Fighting biofilms with lantibiotics and other groups of bacteriocins",
+        "volume": "4",
+        "author": "H Mathur",
+        "year": "2018",
+        "journal-title": "NPJ Biofilms Microbiomes"
+      },
+      {
+        "issue": "2",
+        "key": "pone.0233284.ref013",
+        "doi-asserted-by": "crossref",
+        "first-page": "310",
+        "DOI": "10.1128/MMBR.00041-08",
+        "article-title": "Signals, regulatory networks, and materials that build and break bacterial biofilms",
+        "volume": "73",
+        "author": "E Karatan",
+        "year": "2009",
+        "journal-title": "Microbiol Mol Biol Rev"
+      },
+      {
+        "issue": "3",
+        "key": "pone.0233284.ref014",
+        "doi-asserted-by": "crossref",
+        "first-page": "147",
+        "DOI": "10.1016/S1473-3099(01)00091-3",
+        "article-title": "Vancomycin-resistant Staphylococcus aureus: a new model of antibiotic resistance",
+        "volume": "1",
+        "author": "K Hiramatsu",
+        "year": "2001",
+        "journal-title": "Lancet Infect Dis"
+      },
+      {
+        "key": "pone.0233284.ref015",
+        "doi-asserted-by": "crossref",
+        "first-page": "339",
+        "DOI": "10.1146/annurev.mi.38.100184.002011",
+        "article-title": "The structure and mode of action of glycopeptide antibiotics of the vancomycin group",
+        "volume": "38",
+        "author": "JC Barna",
+        "year": "1984",
+        "journal-title": "Annu Rev Microbiol"
+      },
+      {
+        "key": "pone.0233284.ref016",
+        "unstructured": "Health Service Executive Mastitis Factsheet for Health Care Professionals. Available at: https://www.breastfeeding.ie/Uploads/Mastitis.pdf"
+      },
+      {
+        "issue": "3",
+        "key": "pone.0233284.ref017",
+        "first-page": "136",
+        "article-title": "Breast infection: a review of diagnosis and management practices",
+        "volume": "14",
+        "author": "E Boakes",
+        "year": "2018",
+        "journal-title": "Eur J Breast Health"
+      },
+      {
+        "key": "pone.0233284.ref018",
+        "doi-asserted-by": "crossref",
+        "first-page": "1205",
+        "DOI": "10.3389/fmicb.2017.01205",
+        "article-title": "Bacteriocin-antimicrobial synergy: A medical and food perspective",
+        "volume": "8",
+        "author": "H Mathur",
+        "year": "2017",
+        "journal-title": "Front Microbiol"
+      },
+      {
+        "issue": "1",
+        "key": "pone.0233284.ref019",
+        "doi-asserted-by": "crossref",
+        "first-page": "223",
+        "DOI": "10.1016/S0005-2736(99)00208-4",
+        "article-title": "The lantibiotic nisin, a special case or not?",
+        "volume": "1462",
+        "author": "E Breukink",
+        "year": "1999",
+        "journal-title": "Biochim Biophys Acta"
+      },
+      {
+        "issue": "10",
+        "key": "pone.0233284.ref020",
+        "doi-asserted-by": "crossref",
+        "first-page": "963",
+        "DOI": "10.1038/nsmb830",
+        "article-title": "The nisin-lipid II complex reveals a pyrophosphate cage that provides a blueprint for novel antibiotics",
+        "volume": "11",
+        "author": "ST Hsu",
+        "year": "2004",
+        "journal-title": "Nat Struct Mol Biol"
+      },
+      {
+        "issue": "5793",
+        "key": "pone.0233284.ref021",
+        "doi-asserted-by": "crossref",
+        "first-page": "1636",
+        "DOI": "10.1126/science.1129818",
+        "article-title": "An alternative bactericidal mechanism of action for lantibiotic peptides that target lipid II",
+        "volume": "313",
+        "author": "HE Hasper",
+        "year": "2006",
+        "journal-title": "Science"
+      },
+      {
+        "issue": "3",
+        "key": "pone.0233284.ref022",
+        "doi-asserted-by": "crossref",
+        "first-page": "1772",
+        "DOI": "10.1074/jbc.M006770200",
+        "article-title": "Specific binding of nisin to the peptidoglycan precursor lipid II combines pore formation and inhibition of cell wall biosynthesis for potent antibiotic activity",
+        "volume": "276",
+        "author": "I Wiedemann",
+        "year": "2001",
+        "journal-title": "J Biol Chem"
+      },
+      {
+        "key": "pone.0233284.ref023",
+        "doi-asserted-by": "crossref",
+        "first-page": "104539",
+        "DOI": "10.1016/j.idairyj.2019.104539",
+        "article-title": "Bovine mastitis is a polymicrobial disease requiring a polydiagnostic approach",
+        "volume": "99",
+        "author": "A Angelopoulou",
+        "year": "2019",
+        "journal-title": "Int Dairy J"
+      },
+      {
+        "issue": "4",
+        "key": "pone.0233284.ref024",
+        "doi-asserted-by": "crossref",
+        "first-page": "493",
+        "DOI": "10.1093/ajcp/45.4_ts.493",
+        "article-title": "Antibiotic susceptibility testing by a standardized single disk method",
+        "volume": "45",
+        "author": "AW Bauer",
+        "year": "1966",
+        "journal-title": "Am Journal Clin Pathol"
+      },
+      {
+        "key": "pone.0233284.ref025",
+        "unstructured": "v_9.0_Breakpoint_Tables.pdf. Available at: http://www.eucast.org/fileadmin/src/media/PDFs/EUCAST_files/Breakpoint_tables/v_9.0_Breakpoint_Tables.pdf (Accessed: 28th July 2019)."
+      },
+      {
+        "issue": "1–2",
+        "key": "pone.0233284.ref026",
+        "doi-asserted-by": "crossref",
+        "first-page": "67",
+        "DOI": "10.1016/j.vetmic.2010.05.044",
+        "article-title": "(GTG)5-PCR fingerprinting for the classification and identification of coagulase-negative Staphylococcus species from bovine milk and teat apices: a comparison of type strains and field isolates",
+        "volume": "147",
+        "author": "G Braem",
+        "year": "2011",
+        "journal-title": "Vet Microbiol"
+      },
+      {
+        "key": "pone.0233284.ref027",
+        "doi-asserted-by": "crossref",
+        "first-page": "270",
+        "DOI": "10.1186/s12859-015-0703-0",
+        "article-title": "GelJ a tool for analyzing DNA fingerprint gel images",
+        "volume": "16",
+        "author": "J Heras",
+        "year": "2015",
+        "journal-title": "BMC bioinformatics"
+      },
+      {
+        "issue": "4",
+        "key": "pone.0233284.ref028",
+        "doi-asserted-by": "crossref",
+        "first-page": "473",
+        "DOI": "10.1111/j.1751-7915.2010.00184.x",
+        "article-title": "Studies with bioengineered nisin peptides highlight the broad-spectrum potency of nisin V",
+        "volume": "3",
+        "author": "D Field",
+        "year": "2010",
+        "journal-title": "Microb Biotechnol"
+      },
+      {
+        "issue": "11",
+        "key": "pone.0233284.ref029",
+        "doi-asserted-by": "crossref",
+        "first-page": "e79563",
+        "DOI": "10.1371/journal.pone.0079563",
+        "article-title": "Intensive mutagenesis of the nisin hinge leads to the rational design of enhanced derivatives",
+        "volume": "8",
+        "author": "B Healy",
+        "year": "2013",
+        "journal-title": "PLoS One"
+      },
+      {
+        "issue": "10",
+        "key": "pone.0233284.ref030",
+        "doi-asserted-by": "crossref",
+        "first-page": "e46884",
+        "DOI": "10.1371/journal.pone.0046884",
+        "article-title": "Bioengineered nisin A derivatives with enhanced activity against both Gram positive and Gram negative pathogens",
+        "volume": "7",
+        "author": "D Field",
+        "year": "2012",
+        "journal-title": "PLoS One"
+      },
+      {
+        "issue": "3",
+        "key": "pone.0233284.ref031",
+        "doi-asserted-by": "crossref",
+        "first-page": "e0119684",
+        "DOI": "10.1371/journal.pone.0119684",
+        "article-title": "A Bioengineered nisin derivative to control biofilms of Staphylococcus pseudintermedius",
+        "volume": "10",
+        "author": "D Field",
+        "year": "2015a",
+        "journal-title": "PLoS One"
+      },
+      {
+        "issue": "2",
+        "key": "pone.0233284.ref032",
+        "doi-asserted-by": "crossref",
+        "first-page": "207",
+        "DOI": "10.1007/s13765-012-3253-4",
+        "article-title": "Biofilm formation, attachment, and cell hydrophobicity of foodborne pathogens under varied environmental conditions",
+        "volume": "56",
+        "author": "NY Choi",
+        "year": "2013",
+        "journal-title": "J Korean Soc Appl Biol Chem"
+      },
+      {
+        "issue": "2",
+        "key": "pone.0233284.ref033",
+        "doi-asserted-by": "crossref",
+        "first-page": "175",
+        "DOI": "10.1016/S0167-7012(00)00122-6",
+        "article-title": "A modified microtiter-plate test for quantification of staphylococcal biofilm formation",
+        "volume": "40",
+        "author": "S Stepanović",
+        "year": "2000",
+        "journal-title": "J Microbiol Methods"
+      },
+      {
+        "issue": "2",
+        "key": "pone.0233284.ref034",
+        "doi-asserted-by": "crossref",
+        "first-page": "225",
+        "DOI": "10.1111/j.1574-695X.2011.00806.x",
+        "article-title": "Characterization of Staphylococcus aureus strains involved in human and bovine mastitis",
+        "volume": "62",
+        "author": "S Delgado",
+        "year": "2011",
+        "journal-title": "FEMS Immunol Med Microbiol"
+      },
+      {
+        "key": "pone.0233284.ref035",
+        "doi-asserted-by": "crossref",
+        "first-page": "53",
+        "DOI": "10.2174/1874285801711010053",
+        "article-title": "Understanding the mechanism of bacterial biofilms resistance to antimicrobial agents",
+        "volume": "11",
+        "author": "S Singh",
+        "year": "2017",
+        "journal-title": "Open Microbiol J"
+      },
+      {
+        "issue": "1",
+        "key": "pone.0233284.ref036",
+        "doi-asserted-by": "crossref",
+        "first-page": "61",
+        "DOI": "10.2174/1389203053027584",
+        "article-title": "Bacterial lantibiotics: strategies to improve therapeutic potential",
+        "volume": "6",
+        "author": "PD Cotter",
+        "year": "2005",
+        "journal-title": "Curr Protein Pept Sci"
+      },
+      {
+        "issue": "5",
+        "key": "pone.0233284.ref037",
+        "doi-asserted-by": "crossref",
+        "first-page": "494",
+        "DOI": "10.1016/j.ijantimicag.2015.07.011",
+        "article-title": "Bacteriocins and their position in the next wave of conventional antibiotics",
+        "volume": "46",
+        "author": "VL Cavera",
+        "year": "2015",
+        "journal-title": "Int J Antimicrob Agents"
+      },
+      {
+        "key": "pone.0233284.ref038",
+        "doi-asserted-by": "crossref",
+        "first-page": "1363",
+        "DOI": "10.3389/fmicb.2015.01363",
+        "article-title": "Bioengineering lantibiotics for therapeutic success",
+        "volume": "6",
+        "author": "D Field",
+        "year": "2015b",
+        "journal-title": "Front Microbiol"
+      },
+      {
+        "issue": "11",
+        "key": "pone.0233284.ref039",
+        "doi-asserted-by": "crossref",
+        "first-page": "5572",
+        "DOI": "10.1128/AAC.00888-13",
+        "article-title": "Effects of bacteriocins on methicillin-resistant Staphylococcus aureus biofilm",
+        "volume": "57",
+        "author": "K Okuda",
+        "year": "2013",
+        "journal-title": "Antimicrob Agents Chemother"
+      },
+      {
+        "issue": "6",
+        "key": "pone.0233284.ref040",
+        "doi-asserted-by": "crossref",
+        "first-page": "511",
+        "DOI": "10.1159/000335598",
+        "article-title": "In vitro activities of nisin alone or in combination with vancomycin and ciprofloxacin against methicillin-resistant and methicillin-susceptible Staphylococcus aureus strains",
+        "volume": "57",
+        "author": "S Dosler",
+        "year": "2011",
+        "journal-title": "Chemotherapy"
+      },
+      {
+        "issue": "18",
+        "key": "pone.0233284.ref041",
+        "doi-asserted-by": "crossref",
+        "first-page": "5809",
+        "DOI": "10.1128/AEM.01104-07",
+        "article-title": "Dissection and modulation of the four distinct activities of nisin by mutagenesis of rings A and B and by C-terminal truncation",
+        "volume": "73",
+        "author": "R Rink",
+        "year": "2007",
+        "journal-title": "Appl Environ Microbiol"
+      },
+      {
+        "issue": "6",
+        "key": "pone.0233284.ref042",
+        "doi-asserted-by": "crossref",
+        "first-page": "806",
+        "DOI": "10.1007/s00253-004-1599-1",
+        "article-title": "Site-directed mutagenesis of the hinge region of nisinZ and properties of nisinZ mutants",
+        "volume": "64",
+        "author": "J Yuan",
+        "year": "2004",
+        "journal-title": "Appl Microbiol Biotechnol"
+      },
+      {
+        "key": "pone.0233284.ref043",
+        "doi-asserted-by": "crossref",
+        "first-page": "508",
+        "DOI": "10.3389/fmicb.2016.00508",
+        "article-title": "In vitro activities of nisin and nisin derivatives alone and in combination with antibiotics against Staphylococcus biofilms",
+        "volume": "7",
+        "author": "D Field",
+        "year": "2016",
+        "journal-title": "Front Microbiol"
+      },
+      {
+        "issue": "18",
+        "key": "pone.0233284.ref044",
+        "doi-asserted-by": "crossref",
+        "first-page": "1573",
+        "DOI": "10.2217/fmb-2019-0153",
+        "article-title": "Nisin Z and lacticin 3147 improve efficacy of antibiotics against clinically significant bacteria",
+        "volume": "14",
+        "author": "JC Ellis",
+        "year": "2020",
+        "journal-title": "Future Microbiol"
+      },
+      {
+        "issue": "3",
+        "key": "pone.0233284.ref045",
+        "doi-asserted-by": "crossref",
+        "first-page": "311",
+        "DOI": "10.1177/0890334408317435",
+        "article-title": "The bacteriocin nisin, an effective agent for the treatment of staphylococcal mastitis during lactation",
+        "volume": "24",
+        "author": "L Fernández",
+        "year": "2008",
+        "journal-title": "J Hum Lact"
+      },
+      {
+        "issue": "1",
+        "key": "pone.0233284.ref046",
+        "doi-asserted-by": "crossref",
+        "first-page": "33",
+        "DOI": "10.1159/000272223",
+        "article-title": "Inflammatory breast diseases during lactation: milk stasis, puerperal mastitis, abscesses of the breast, and malignant tumors–current and evidence-based strategies for diagnosis and therapy",
+        "volume": "5",
+        "author": "M Abou-Dakn",
+        "year": "2010",
+        "journal-title": "Breast Care"
+      },
+      {
+        "issue": "6",
+        "key": "pone.0233284.ref047",
+        "doi-asserted-by": "crossref",
+        "first-page": "430",
+        "DOI": "10.1007/s12262-012-0776-1",
+        "article-title": "Management of lactational mastitis and breast abscesses: review of current knowledge and practice",
+        "volume": "75",
+        "author": "K Kataria",
+        "year": "2013",
+        "journal-title": "Indian J Surg"
+      },
+      {
+        "issue": "2",
+        "key": "pone.0233284.ref048",
+        "doi-asserted-by": "crossref",
+        "first-page": "77",
+        "DOI": "10.1016/j.micres.2012.09.004",
+        "article-title": "Genotypic diversity and virulent factors of Staphylococcus epidermidis isolated from human breast milk",
+        "volume": "168",
+        "author": "J Begović",
+        "year": "2013",
+        "journal-title": "Microbiol Res"
+      },
+      {
+        "issue": "Pt 8",
+        "key": "pone.0233284.ref049",
+        "doi-asserted-by": "crossref",
+        "first-page": "761",
+        "DOI": "10.1099/jmm.0.05453-0",
+        "article-title": "Antimicrobial-resistance and enterotoxin-encoding genes among staphylococci isolated from expressed human breast milk",
+        "volume": "53",
+        "author": "LA Carneiro",
+        "year": "2004",
+        "journal-title": "J Med Microbiol"
+      },
+      {
+        "issue": "2",
+        "key": "pone.0233284.ref050",
+        "doi-asserted-by": "crossref",
+        "first-page": "113",
+        "DOI": "10.1007/s00284-015-0925-4",
+        "article-title": "Antibiotic susceptibility of commensal bacteria from human milk",
+        "volume": "72",
+        "author": "PW Chen",
+        "year": "2016",
+        "journal-title": "Curr Microbiol"
+      },
+      {
+        "key": "pone.0233284.ref051",
+        "doi-asserted-by": "crossref",
+        "first-page": "2512",
+        "DOI": "10.3389/fmicb.2018.02512",
+        "article-title": "Microbial community dynamics in mother's milk and infant's mouth and gut in moderately preterm infants",
+        "volume": "9",
+        "author": "E Biagi",
+        "year": "2018",
+        "journal-title": "Front Microbiol"
+      },
+      {
+        "key": "pone.0233284.ref052",
+        "doi-asserted-by": "crossref",
+        "first-page": "4",
+        "DOI": "10.3410/M4-4",
+        "article-title": "Reduced vancomycin susceptibility among clinical Staphylococcus aureus isolates ('the MIC Creep'): implications for therapy",
+        "volume": "4",
+        "author": "A Dhand",
+        "year": "2012",
+        "journal-title": "F1000 Med Rep"
+      },
+      {
+        "issue": "12",
+        "key": "pone.0233284.ref053",
+        "doi-asserted-by": "crossref",
+        "first-page": "1112",
+        "DOI": "10.1136/jcp.2009.069021",
+        "article-title": "Low concentrations of vancomycin stimulate biofilm formation in some clinical isolates of Staphylococcus epidermidis",
+        "volume": "62",
+        "author": "JS Cargill",
+        "year": "2009",
+        "journal-title": "J Clin Pathol"
+      },
+      {
+        "issue": "2",
+        "key": "pone.0233284.ref054",
+        "doi-asserted-by": "crossref",
+        "first-page": "191",
+        "DOI": "10.1002/jobm.201000221",
+        "article-title": "Effect of sub-lethal doses of vancomycin and oxacillin on biofilm formation by vancomycin intermediate resistant Staphylococcus aureus",
+        "volume": "51",
+        "author": "ZA Mirani",
+        "year": "2011",
+        "journal-title": "J Basic Microbiol"
+      },
+      {
+        "key": "pone.0233284.ref055",
+        "doi-asserted-by": "crossref",
+        "first-page": "225",
+        "DOI": "10.1016/j.micpath.2017.07.004",
+        "article-title": "Vancomycin-induced biofilm formation by methicillin-resistant Staphylococcus aureus is associated with the secretion of membrane vesicles",
+        "volume": "110",
+        "author": "X He",
+        "year": "2017",
+        "journal-title": "Microb Pathog"
+      },
+      {
+        "issue": "9",
+        "key": "pone.0233284.ref056",
+        "doi-asserted-by": "crossref",
+        "first-page": "1627",
+        "DOI": "10.4315/0362-028X.JFP-12-001",
+        "article-title": "Effects of nisin and lysozyme on growth inhibition and biofilm formation capacity of Staphylococcus aureus strains isolated from raw milk and cheese samples",
+        "volume": "75",
+        "author": "M Sudagidan",
+        "year": "2012",
+        "journal-title": "J Food Prot"
+      },
+      {
+        "issue": "3",
+        "key": "pone.0233284.ref057",
+        "doi-asserted-by": "crossref",
+        "first-page": "253",
+        "DOI": "10.1016/j.ijfoodmicro.2008.01.011",
+        "article-title": "Nisin-bacteriophage cross-resistance in Staphylococcus aureus",
+        "volume": "122",
+        "author": "B Martinez",
+        "year": "2008",
+        "journal-title": "Int J Food Microbiol"
+      },
+      {
+        "issue": "1",
+        "key": "pone.0233284.ref058",
+        "doi-asserted-by": "crossref",
+        "first-page": "82",
+        "DOI": "10.2146/ajhp080434",
+        "article-title": "Therapeutic monitoring of vancomycin in adult patients: a consensus review of the american society of health-system pharmacists, the infectious diseases society of america, and the society of infectious diseases pharmacists",
+        "volume": "66",
+        "author": "M Rybak",
+        "year": "2009",
+        "journal-title": "Am J Health Syst Pharm"
+      },
+      {
+        "issue": "2",
+        "key": "pone.0233284.ref059",
+        "doi-asserted-by": "crossref",
+        "first-page": "277",
+        "DOI": "10.1111/j.1574-695X.2007.00300.x",
+        "article-title": "Increased tolerance of Staphylococcus aureus to vancomycin in viscous media",
+        "volume": "51",
+        "author": "V Kostenko",
+        "year": "2007",
+        "journal-title": "FEMS Immunol Med Microbiol"
+      },
+      {
+        "key": "pone.0233284.ref060",
+        "first-page": "107",
+        "article-title": "Multidrug tolerance of biofilms and persister cells",
+        "volume": "322",
+        "author": "K. Lewis",
+        "year": "2008",
+        "journal-title": "Curr Top Microbiol Immunol"
+      },
+      {
+        "issue": "6",
+        "key": "pone.0233284.ref061",
+        "doi-asserted-by": "crossref",
+        "first-page": "ftw056",
+        "DOI": "10.1093/femspd/ftw056",
+        "article-title": "Penetration barrier contributes to bacterial biofilm-associated resistance against only select antibiotics, and exhibits genus-, strain- and antibiotic-specific differences",
+        "volume": "74",
+        "author": "R Singh",
+        "year": "2016",
+        "journal-title": "Pathog Dis"
+      },
+      {
+        "issue": "12",
+        "key": "pone.0233284.ref062",
+        "doi-asserted-by": "crossref",
+        "first-page": "7273",
+        "DOI": "10.1128/AAC.03132-14",
+        "article-title": "Extracellular DNA impedes the transport of vancomycin in Staphylococcus epidermidis biofilms preexposed to subinhibitory concentrations of vancomycin",
+        "volume": "58",
+        "author": "N Doroshenko",
+        "year": "2014",
+        "journal-title": "Antimicrob Agents Chemotherapy"
+      },
+      {
+        "issue": "1",
+        "key": "pone.0233284.ref063",
+        "doi-asserted-by": "crossref",
+        "first-page": "46",
+        "DOI": "10.1007/s00776-005-0968-7",
+        "article-title": "Antimicrobial susceptibility of Staphylococcus aureus and Staphylococcus epidermidis biofilms isolated from infected total hip arthroplasty cases",
+        "volume": "11",
+        "author": "S Nishimura",
+        "year": "2006",
+        "journal-title": "J Orthop Sci"
+      }
+    ],
+    "container-title": [
+      "PLOS ONE"
+    ],
+    "original-title": [
+
+    ],
+    "language": "en",
+    "link": [
+      {
+        "URL": "https://dx.plos.org/10.1371/journal.pone.0233284",
+        "content-type": "unspecified",
+        "content-version": "vor",
+        "intended-application": "similarity-checking"
+      }
+    ],
+    "deposited": {
+      "date-parts": [
+        [
+          2020,
+          5,
+          29
+        ]
+      ],
+      "date-time": "2020-05-29T17:54:37Z",
+      "timestamp": 1590774877000
+    },
+    "score": 1,
+    "resource": {
+      "primary": {
+        "URL": "https://dx.plos.org/10.1371/journal.pone.0233284"
+      }
+    },
+    "subtitle": [
+
+    ],
+    "editor": [
+      {
+        "given": "Rita G.",
+        "family": "Sobral",
+        "sequence": "first",
+        "affiliation": [
+
+        ]
+      }
+    ],
+    "short-title": [
+
+    ],
+    "issued": {
+      "date-parts": [
+        [
+          2020,
+          5,
+          29
+        ]
+      ]
+    },
+    "references-count": 63,
+    "journal-issue": {
+      "issue": "5",
+      "published-online": {
+        "date-parts": [
+          [
+            2020,
+            5,
+            29
+          ]
+        ]
+      }
+    },
+    "URL": "http://dx.doi.org/10.1371/journal.pone.0233284",
+    "relation": {
+
+    },
+    "ISSN": [
+      "1932-6203"
+    ],
+    "issn-type": [
+      {
+        "value": "1932-6203",
+        "type": "electronic"
+      }
+    ],
+    "subject": [
+      "Multidisciplinary"
+    ],
+    "published": {
+      "date-parts": [
+        [
+          2020,
+          5,
+          29
+        ]
+      ]
+    }
+
+}

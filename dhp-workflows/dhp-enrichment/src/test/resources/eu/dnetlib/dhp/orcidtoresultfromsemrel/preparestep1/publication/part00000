@@ -11,3 +11,4 @@
 
 
 
+{u'dataInfo': {u'invisible': False, u'provenanceaction': {u'classid': u'sysimport:crosswalk:entityregistry', u'classname': u'Harvested', u'schemeid': u'dnet:provenanceActions', u'schemename': u'dnet:provenanceActions'}, u'trust': u'0.91', u'inferred': False, u'deletedbyinference': False}, u'qualifier': {u'classid': u'orcid', u'classname': u'Open Researcher and Contributor ID', u'schemeid': u'dnet:pid_types', u'schemename': u'dnet:pid_types'}, u'value': u'0000-0002-5001-6911'}

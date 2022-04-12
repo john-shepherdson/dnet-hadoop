@@ -5,9 +5,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-
-import com.google.gson.Gson;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import org.apache.commons.io.FileUtils;
+import org.apache.neethi.Assertion;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
@@ -63,8 +64,7 @@ public class PrepareStep1Test {
 	}
 
 	@Test
-	void noUpdateTest() throws Exception {
-		//7 relationi fra issupplementedby e issupplementto
+	void noMatchTest() throws Exception {
 
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/orcidtoresultfromsemrel/preparestep1")
@@ -77,19 +77,25 @@ public class PrepareStep1Test {
 					"-sourcePath", sourcePath,
 					"-resultTableName", Dataset.class.getCanonicalName(),
 					"-outputPath", workingDir.toString() + "/preparedInfo",
-						"-allowedsemrels", "IsSupplementedBy;IsSupplementTo",
-						"-allowedpids","orcid;orcid_pending"
+					"-allowedsemrels", "IsSupplementedBy;IsSupplementTo",
+					"-allowedpids", "orcid;orcid_pending"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<ResultOrcidList> tmp = sc
-			.textFile(workingDir.toString() + "/preparedInfo")
+			.textFile(workingDir.toString() + "/preparedInfo/dataset")
 			.map(item -> OBJECT_MAPPER.readValue(item, ResultOrcidList.class));
 
-		System.out.println("***************** COUNT ********************* \n" + tmp.count());
-		tmp.map(s -> new Gson().toJson(s)).foreach(s -> System.out.println(s));
+		Assertions.assertEquals(0, tmp.count());
 
+		Assertions.assertEquals(7, sc
+				.textFile(workingDir.toString() + "/preparedInfo/relationSubset")
+				.map(item -> OBJECT_MAPPER.readValue(item, Relation.class)).count());
+
+		Assertions.assertEquals(0, sc
+				.textFile(workingDir.toString() + "/preparedInfo/resultSubset")
+				.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class)).count());
 
 	}
 
