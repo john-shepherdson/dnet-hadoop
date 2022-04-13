@@ -53,7 +53,7 @@ public class PrepareResultOrcidAssociationStep1 {
 		String inputPath = parser.get("sourcePath");
 		log.info("inputPath: {}", inputPath);
 
-		final String outputPath = parser.get("outputPath");
+		final String outputPath = parser.get("workingPath");
 		log.info("outputPath: {}", outputPath);
 
 		final String resultClassName = parser.get("resultTableName");
@@ -75,15 +75,6 @@ public class PrepareResultOrcidAssociationStep1 {
 		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		SparkConf conf = new SparkConf();
-
-		String inputRelationPath = inputPath + "/relation";
-		log.info("inputRelationPath: {}", inputRelationPath);
-
-		String inputResultPath = inputPath + "/" + resultType;
-		log.info("inputResultPath: {}", inputResultPath);
-
-		String outputResultPath = outputPath + "/" + resultType;
-		log.info("outputResultPath: {}", outputResultPath);
 
 		runWithSparkSession(
 			conf,
@@ -112,11 +103,13 @@ public class PrepareResultOrcidAssociationStep1 {
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.json(outputPath + "/relationSubset");
+			.json(outputPath + "/" + resultType + "/relationSubset");
 
 		Dataset<Relation> relation = readPath(spark, outputPath + "/relationSubset", Relation.class);
 
 		log.info("Reading Graph table from: {}", inputResultPath);
+
+		final String resultOutputPath = outputPath + "/resultSubset/" + resultType;
 
 		readPath(spark, inputResultPath, resultClazz)
 			.filter(
@@ -135,11 +128,11 @@ public class PrepareResultOrcidAssociationStep1 {
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.json(outputPath + "/resultSubset");
+			.json(resultOutputPath);
 
-		Dataset<R> result = readPath(spark, outputPath + "/resultSubset", resultClazz);
+		Dataset<R> result = readPath(spark, resultOutputPath, resultClazz);
 
-		result.foreach((ForeachFunction<R>) r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+		// result.foreach((ForeachFunction<R>) r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
 
 		result
 			.joinWith(relation, result.col("id").equalTo(relation.col("source")))

@@ -52,7 +52,7 @@ public class PrepareResultOrcidAssociationStep2 {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				removeOutputDir(spark, outputPath);
+				// removeOutputDir(spark, outputPath);
 				mergeInfo(spark, inputPath, outputPath);
 			});
 	}

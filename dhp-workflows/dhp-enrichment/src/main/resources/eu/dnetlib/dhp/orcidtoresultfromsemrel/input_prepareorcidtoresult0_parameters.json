@@ -12,14 +12,8 @@
     "paramRequired": true
   },
   {
-    "paramName":"ap",
-    "paramLongName":"allowedpids",
-    "paramDescription": "the allowed pid type to be used for propagation",
-    "paramRequired": true
-  },
-  {
-    "paramName": "wp",
-    "paramLongName": "workingPath",
+    "paramName": "out",
+    "paramLongName": "outputPath",
     "paramDescription": "the path used to store temporary output files",
     "paramRequired": true
   },
@@ -28,11 +22,5 @@
     "paramLongName": "isSparkSessionManaged",
     "paramDescription": "true if the spark session is managed, false otherwise",
     "paramRequired": false
-  },
-  {
-    "paramName":"tn",
-    "paramLongName":"resultTableName",
-    "paramDescription": "the name of the result table we are currently working on",
-    "paramRequired": true
   }
 ]

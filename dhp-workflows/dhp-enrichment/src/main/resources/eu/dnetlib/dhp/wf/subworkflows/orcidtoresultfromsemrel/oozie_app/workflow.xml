@@ -14,7 +14,7 @@
         </property>
     </parameters>
 
-    <start to="reset_outputpath"/>
+    <start to="fork_prepare_assoc_step1"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -80,7 +80,37 @@
         <error to="Kill"/>
     </action>
 
-    <join name="copy_wait" to="fork_prepare_assoc_step1"/>
+    <join name="copy_wait" to="prepare_relations"/>
+
+    <action name="prepare_relations">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>ORCIDPropagation-PreparePhase0-SelectRELATIONS</name>
+            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.PrepareResultOrcidAssociationStep0</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.speculation=false
+                --conf spark.hadoop.mapreduce.map.speculative=false
+                --conf spark.hadoop.mapreduce.reduce.speculative=false
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/orcidprop/relationSubset</arg>
+            <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
+        </spark>
+        <ok to="wait"/>
+        <error to="Kill"/>
+    </action>
 
     <fork name="fork_prepare_assoc_step1">
         <path start="join_prepare_publication"/>
@@ -113,7 +143,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/orcidprop</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
             <arg>--allowedpids</arg><arg>${allowedpids}</arg>
         </spark>
@@ -141,7 +171,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/orcidprop</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
             <arg>--allowedpids</arg><arg>${allowedpids}</arg>
         </spark>
@@ -169,7 +199,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/orcidprop</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
             <arg>--allowedpids</arg><arg>${allowedpids}</arg>
         </spark>
@@ -197,7 +227,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/orcidprop</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
             <arg>--allowedpids</arg><arg>${allowedpids}</arg>
         </spark>
@@ -225,8 +255,8 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--sourcePath</arg><arg>${workingDir}/orcidprop</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/orcidprop//mergedOrcidAssoc</arg>
         </spark>
         <ok to="fork-join-exec-propagation"/>
         <error to="Kill"/>
@@ -261,7 +291,7 @@
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
@@ -291,7 +321,7 @@
                 --conf spark.hadoop.mapreduce.map.speculative=false
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
-            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
@@ -321,7 +351,7 @@
                 --conf spark.hadoop.mapreduce.map.speculative=false
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
-            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
@@ -351,7 +381,7 @@
                 --conf spark.hadoop.mapreduce.map.speculative=false
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
-            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/preparedInfo/mergedOrcidAssoc</arg>
+            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${outputPath}/software</arg>
