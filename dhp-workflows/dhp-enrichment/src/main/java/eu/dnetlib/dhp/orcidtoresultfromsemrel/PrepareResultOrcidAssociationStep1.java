@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -22,6 +23,7 @@ import org.apache.spark.sql.sources.v2.reader.InputPartition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -57,8 +59,10 @@ public class PrepareResultOrcidAssociationStep1 {
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
-		final List<String> allowedsemrel = Arrays.stream(parser.get("allowedsemrels").split(";"))
-				.map(s -> s.toLowerCase()).collect(Collectors.toList());
+		final List<String> allowedsemrel = Arrays
+			.stream(parser.get("allowedsemrels").split(";"))
+			.map(s -> s.toLowerCase())
+			.collect(Collectors.toList());
 
 		log.info("allowedSemRel: {}", new Gson().toJson(allowedsemrel));
 
@@ -124,28 +128,31 @@ public class PrepareResultOrcidAssociationStep1 {
 
 		Dataset<R> result = readPath(spark, outputPath + "/resultSubset", resultClazz);
 
+		result.foreach((ForeachFunction<R>) r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+
 		result
-				.joinWith(relation, result.col("id").equalTo(relation.col("source")))
-				.map((MapFunction<Tuple2<R, Relation>, ResultOrcidList>) t2 -> {
-					ResultOrcidList rol = new ResultOrcidList();
-					rol.setResultId(t2._2().getTarget());
-					List<AutoritativeAuthor> aal = new ArrayList<>();
-					t2._1().getAuthor().stream().forEach(a -> {
-						a.getPid().stream().forEach(p -> {
-							if (allowedPids.contains(p.getQualifier().getClassid().toLowerCase())) {
-								aal
-										.add(
-												AutoritativeAuthor
-														.newInstance(a.getName(), a.getSurname(), a.getFullname(), p.getValue()));
-							}
-						});
+			.joinWith(relation, result.col("id").equalTo(relation.col("source")))
+			.map((MapFunction<Tuple2<R, Relation>, ResultOrcidList>) t2 -> {
+				ResultOrcidList rol = new ResultOrcidList();
+				rol.setResultId(t2._2().getTarget());
+				List<AutoritativeAuthor> aal = new ArrayList<>();
+				t2._1().getAuthor().stream().forEach(a -> {
+					a.getPid().stream().forEach(p -> {
+						if (allowedPids.contains(p.getQualifier().getClassid().toLowerCase())) {
+							aal
+								.add(
+									AutoritativeAuthor
+										.newInstance(a.getName(), a.getSurname(), a.getFullname(), p.getValue()));
+						}
 					});
-					return rol;
-				}, Encoders.bean(ResultOrcidList.class)).write()
+				});
+				rol.setAuthorList(aal);
+				return rol;
+			}, Encoders.bean(ResultOrcidList.class))
+			.write()
 			.option("compression", "gzip")
 			.mode(SaveMode.Overwrite)
 			.json(outputPath + "/" + resultType);
-
 
 	}
 

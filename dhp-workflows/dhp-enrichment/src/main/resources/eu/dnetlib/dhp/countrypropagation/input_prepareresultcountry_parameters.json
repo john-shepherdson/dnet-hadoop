@@ -6,12 +6,6 @@
     "paramRequired": true
   },
   {
-    "paramName":"out",
-    "paramLongName":"outputPath",
-    "paramDescription": "the output path",
-    "paramRequired": true
-  },
-  {
     "paramName":"w",
     "paramLongName":"workingPath",
     "paramDescription": "the working path",
@@ -23,12 +17,7 @@
     "paramDescription": "the name of the result table we are currently working on",
     "paramRequired": true
   },
-  {
-    "paramName": "p",
-    "paramLongName": "preparedInfoPath",
-    "paramDescription": "the path where prepared info have been stored",
-    "paramRequired": true
-  },
+
   {
     "paramName": "ssm",
     "paramLongName": "isSparkSessionManaged",

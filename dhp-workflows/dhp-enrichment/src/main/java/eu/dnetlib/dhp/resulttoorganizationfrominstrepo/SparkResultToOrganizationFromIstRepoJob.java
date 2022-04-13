@@ -118,7 +118,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
 			.write()
 			.mode(SaveMode.Append)
 			.option("compression", "gzip")
-			.json(inputPath.substring(0, inputPath.indexOf("/") + 1) + "relation");
+			.json(inputPath.substring(0, inputPath.lastIndexOf("/") + 1) + "relation");
 	}
 
 	private static FlatMapFunction<Tuple2<KeyValueSet, KeyValueSet>, Relation> createRelationFn() {
@@ -157,12 +157,14 @@ public class SparkResultToOrganizationFromIstRepoJob {
 		Dataset<R> result = readPath(spark, inputPath, resultClazz);
 		result.createOrReplaceTempView("result");
 
-		Dataset<Row> cfhb = spark.sql("select distinct r.id, inst.collectedfrom.key cf, inst.hostedby.key hb "
-				+
-				"from result r " +
-				"lateral view explode(instance) i as inst " +
-				"where r.datainfo.deletedbyinference=false");
-		//createCfHbforResult(spark);
+		Dataset<Row> cfhb = spark
+			.sql(
+				"select distinct r.id, inst.collectedfrom.key cf, inst.hostedby.key hb "
+					+
+					"from result r " +
+					"lateral view explode(instance) i as inst " +
+					"where r.datainfo.deletedbyinference=false");
+		// createCfHbforResult(spark);
 		cfhb.createOrReplaceTempView("cfhb");
 		dsOrg.createOrReplaceTempView("rels");
 

@@ -65,30 +65,31 @@ public class PrepareResultOrcidAssociationStep2 {
 			.union(readPath(spark, inputPath + "/software", ResultOrcidList.class));
 
 		resultOrcidAssoc
-				.groupByKey((MapFunction<ResultOrcidList, String>) rol -> rol.getResultId(), Encoders.STRING())
-				.mapGroups((MapGroupsFunction<String, ResultOrcidList, ResultOrcidList>) (k, it) ->{
-					ResultOrcidList resultOrcidList = it.next();
-					if(it.hasNext())
-					{
+			.groupByKey((MapFunction<ResultOrcidList, String>) rol -> rol.getResultId(), Encoders.STRING())
+			.mapGroups((MapGroupsFunction<String, ResultOrcidList, ResultOrcidList>) (k, it) -> {
+				ResultOrcidList resultOrcidList = it.next();
+				if (it.hasNext()) {
 					Set<String> orcid_set = new HashSet<>();
 					resultOrcidList.getAuthorList().stream().forEach(aa -> orcid_set.add(aa.getOrcid()));
-					it.forEachRemaining(val -> val
-							.getAuthorList()
-							.stream()
-							.forEach(
+					it
+						.forEachRemaining(
+							val -> val
+								.getAuthorList()
+								.stream()
+								.forEach(
 									aa -> {
 										if (!orcid_set.contains(aa.getOrcid())) {
 											resultOrcidList.getAuthorList().add(aa);
 											orcid_set.add(aa.getOrcid());
 										}
 									}));
-					}
-					return resultOrcidList;
-				},Encoders.bean(ResultOrcidList.class) )
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression","gzip")
-				.json(outputPath);
+				}
+				return resultOrcidList;
+			}, Encoders.bean(ResultOrcidList.class))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(outputPath);
 	}
 
 }

@@ -6,12 +6,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.neethi.Assertion;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
+import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -21,16 +19,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
-public class PrepareStep1Test {
+public class PrepareStep2Test {
 
-	private static final Logger log = LoggerFactory.getLogger(PrepareStep1Test.class);
+	private static final Logger log = LoggerFactory.getLogger(PrepareStep2Test.class);
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -40,11 +36,11 @@ public class PrepareStep1Test {
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
-		workingDir = Files.createTempDirectory(PrepareStep1Test.class.getSimpleName());
+		workingDir = Files.createTempDirectory(PrepareStep2Test.class.getSimpleName());
 		log.info("using work dir {}", workingDir);
 
 		SparkConf conf = new SparkConf();
-		conf.setAppName(PrepareStep1Test.class.getSimpleName());
+		conf.setAppName(PrepareStep2Test.class.getSimpleName());
 
 		conf.setMaster("local[*]");
 		conf.set("spark.driver.host", "localhost");
@@ -53,7 +49,7 @@ public class PrepareStep1Test {
 
 		spark = SparkSession
 			.builder()
-			.appName(PrepareStep1Test.class.getSimpleName())
+			.appName(PrepareStep2Test.class.getSimpleName())
 			.config(conf)
 			.getOrCreate();
 	}
@@ -65,44 +61,63 @@ public class PrepareStep1Test {
 	}
 
 	@Test
-	void noMatchTest() throws Exception {
+	void testMatch() throws Exception {
 
 		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/orcidtoresultfromsemrel/preparestep1")
+			.getResource("/eu/dnetlib/dhp/orcidtoresultfromsemrel/preparedInfo/resultSubset")
 			.getPath();
 
-		PrepareResultOrcidAssociationStep1
+		PrepareResultOrcidAssociationStep2
 			.main(
 				new String[] {
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
-					"-resultTableName", Dataset.class.getCanonicalName(),
-					"-outputPath", workingDir.toString() + "/preparedInfo",
-					"-allowedsemrels", "IsSupplementedBy;IsSupplementTo",
-					"-allowedpids", "orcid;orcid_pending"
+					"-outputPath", workingDir.toString() + "/preparedInfo/mergedOrcidAssoc"
+
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<ResultOrcidList> tmp = sc
-			.textFile(workingDir.toString() + "/preparedInfo/dataset")
+			.textFile(workingDir.toString() + "/preparedInfo/mergedOrcidAssoc")
 			.map(item -> OBJECT_MAPPER.readValue(item, ResultOrcidList.class));
 
-		Assertions.assertEquals(0, tmp.count());
+		Assertions.assertEquals(1, tmp.count());
 
 		Assertions
 			.assertEquals(
-				7, sc
-					.textFile(workingDir.toString() + "/preparedInfo/relationSubset")
-					.map(item -> OBJECT_MAPPER.readValue(item, Relation.class))
+				1,
+				tmp
+					.filter(rol -> rol.getResultId().equals("50|475c1990cbb2::46b9f15a3e887ccb154a696c4e7e4217"))
 					.count());
 
 		Assertions
 			.assertEquals(
-				0, sc
-					.textFile(workingDir.toString() + "/preparedInfo/resultSubset")
-					.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class))
-					.count());
+				2, tmp
+					.filter(rol -> rol.getResultId().equals("50|475c1990cbb2::46b9f15a3e887ccb154a696c4e7e4217"))
+					.collect()
+					.get(0)
+					.getAuthorList()
+					.size());
+
+		Assertions
+			.assertTrue(
+				tmp
+					.filter(rol -> rol.getResultId().equals("50|475c1990cbb2::46b9f15a3e887ccb154a696c4e7e4217"))
+					.collect()
+					.get(0)
+					.getAuthorList()
+					.stream()
+					.anyMatch(aa -> aa.getOrcid().equals("0000-0002-1234-5678")));
+		Assertions
+			.assertTrue(
+				tmp
+					.filter(rol -> rol.getResultId().equals("50|475c1990cbb2::46b9f15a3e887ccb154a696c4e7e4217"))
+					.collect()
+					.get(0)
+					.getAuthorList()
+					.stream()
+					.anyMatch(aa -> aa.getOrcid().equals("0000-0002-5001-6911")));
 
 	}
 

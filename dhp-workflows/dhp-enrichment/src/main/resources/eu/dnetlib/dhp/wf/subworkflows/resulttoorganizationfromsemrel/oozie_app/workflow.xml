@@ -4,10 +4,10 @@
             <name>sourcePath</name>
             <description>the source path</description>
         </property>
-        <property>
-            <name>outputPath</name>
-            <description>sets the outputPath</description>
-        </property>
+<!--        <property>-->
+<!--            <name>outputPath</name>-->
+<!--            <description>sets the outputPath</description>-->
+<!--        </property>-->
     </parameters>
 
     <global>
@@ -21,27 +21,27 @@
         </configuration>
     </global>
 
-    <start to="resume_from"/>
+    <start to="prepare_info"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <decision name="resume_from">
-        <switch>
-            <case to="prepare_info">${wf:conf('resumeFrom') eq 'PrepareInfo'}</case>
-            <default to="reset_outputpath"/> <!-- first action to be done when downloadDump is to be performed -->
-        </switch>
-    </decision>
+<!--    <decision name="resume_from">-->
+<!--        <switch>-->
+<!--            <case to="prepare_info">${wf:conf('resumeFrom') eq 'PrepareInfo'}</case>-->
+<!--            <default to="reset_outputpath"/> &lt;!&ndash; first action to be done when downloadDump is to be performed &ndash;&gt;-->
+<!--        </switch>-->
+<!--    </decision>-->
 
-    <action name="reset_outputpath">
-        <fs>
-            <delete path="${outputPath}"/>
-            <mkdir path="${outputPath}"/>
-        </fs>
-        <ok to="prepare_info"/>
-        <error to="Kill"/>
-    </action>
+<!--    <action name="reset_outputpath">-->
+<!--        <fs>-->
+<!--            <delete path="${outputPath}"/>-->
+<!--            <mkdir path="${outputPath}"/>-->
+<!--        </fs>-->
+<!--        <ok to="prepare_info"/>-->
+<!--        <error to="Kill"/>-->
+<!--    </action>-->
 
 
     <action name="prepare_info">
@@ -91,7 +91,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--relationPath</arg><arg>${workingDir}/affiliationSemanticRelation/preparedInfo/relation</arg>
-            <arg>--outputPath</arg><arg>${outputPath}</arg>
+            <arg>--outputPath</arg><arg>${sourcePath}</arg>
             <arg>--leavesPath</arg><arg>${workingDir}/affiliationSemanticRelation/preparedInfo/leavesPath</arg>
             <arg>--childParentPath</arg><arg>${workingDir}/affiliationSemanticRelation/preparedInfo/childParentPath</arg>
             <arg>--resultOrgPath</arg><arg>${workingDir}/affiliationSemanticRelation/preparedInfo/resultOrgPath</arg>

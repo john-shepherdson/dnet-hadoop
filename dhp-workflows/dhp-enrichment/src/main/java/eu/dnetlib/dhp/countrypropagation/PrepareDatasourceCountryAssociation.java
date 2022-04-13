@@ -10,7 +10,6 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
-import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -19,8 +18,7 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import eu.dnetlib.dhp.EntityEntityRel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
@@ -56,8 +54,8 @@ public class PrepareDatasourceCountryAssociation {
 		String inputPath = parser.get("sourcePath");
 		log.info("inputPath: {}", inputPath);
 
-		final String outputPath = parser.get("outputPath");
-		log.info("outputPath {}: ", outputPath);
+		final String workingPath = parser.get("workingPath");
+		log.info("workingPath {}: ", workingPath);
 
 		SparkConf conf = new SparkConf();
 
@@ -65,13 +63,13 @@ public class PrepareDatasourceCountryAssociation {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				removeOutputDir(spark, outputPath);
+				removeOutputDir(spark, workingPath);
 				prepareDatasourceCountryAssociation(
 					spark,
 					Arrays.asList(parser.get("whitelist").split(";")),
 					Arrays.asList(parser.get("allowedtypes").split(";")),
 					inputPath,
-					outputPath);
+					workingPath + "/datasourceCountry");
 			});
 	}
 

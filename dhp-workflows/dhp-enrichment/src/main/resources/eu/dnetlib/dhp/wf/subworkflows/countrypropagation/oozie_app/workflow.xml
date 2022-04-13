@@ -65,7 +65,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--whitelist</arg><arg>${whitelist}</arg>
             <arg>--allowedtypes</arg><arg>${allowedtypes}</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/country/preparedInfo</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/country</arg>
         </spark>
         <ok to="fork_join_prepare_result_country"/>
         <error to="Kill"/>
@@ -99,10 +99,8 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/country/publication</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/country/workingP</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/country</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/country/preparedInfo</arg>
         </spark>
         <ok to="wait_prepare"/>
         <error to="Kill"/>
@@ -129,10 +127,8 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/country/dataset</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/country/workingD</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/country</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/country/preparedInfo</arg>
         </spark>
         <ok to="wait_prepare"/>
         <error to="Kill"/>
@@ -159,10 +155,8 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/country/otherresearchproduct</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/country/workingO</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/country</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/country/preparedInfo</arg>
         </spark>
         <ok to="wait_prepare"/>
         <error to="Kill"/>
@@ -189,10 +183,8 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/country/software</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/country/workingS</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/country</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/country/preparedInfo</arg>
         </spark>
         <ok to="wait_prepare"/>
         <error to="Kill"/>
@@ -228,12 +220,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
-<<<<<<< HEAD:dhp-workflows/dhp-enrichment/src/main/resources/eu/dnetlib/dhp/wf/subworkflows/countrypropagation/oozie_app/workflow.xml
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/country/publication</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
-=======
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/publication</arg>
->>>>>>> beta:dhp-workflows/dhp-enrichment/src/main/resources/eu/dnetlib/dhp/countrypropagation/oozie_app/workflow.xml
+            <arg>--workingPath</arg><arg>${workingDir}/country/publication</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
         </spark>
@@ -262,12 +249,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
-<<<<<<< HEAD:dhp-workflows/dhp-enrichment/src/main/resources/eu/dnetlib/dhp/wf/subworkflows/countrypropagation/oozie_app/workflow.xml
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/country/dataset</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
-=======
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/dataset</arg>
->>>>>>> beta:dhp-workflows/dhp-enrichment/src/main/resources/eu/dnetlib/dhp/countrypropagation/oozie_app/workflow.xml
+            <arg>--workingPath</arg><arg>${workingDir}/country/dataset</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
         </spark>
@@ -296,12 +278,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
-<<<<<<< HEAD:dhp-workflows/dhp-enrichment/src/main/resources/eu/dnetlib/dhp/wf/subworkflows/countrypropagation/oozie_app/workflow.xml
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/country/otherresearchproduct</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
-=======
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/otherresearchproduct</arg>
->>>>>>> beta:dhp-workflows/dhp-enrichment/src/main/resources/eu/dnetlib/dhp/countrypropagation/oozie_app/workflow.xml
+            <arg>--workingPath</arg><arg>${workingDir}/country/otherresearchproduct</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
         </spark>
@@ -330,7 +307,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/software</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/country/software</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${outputPath}/software</arg>
         </spark>

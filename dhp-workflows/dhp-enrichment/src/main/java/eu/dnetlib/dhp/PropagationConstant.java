@@ -4,22 +4,21 @@ package eu.dnetlib.dhp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Country;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class PropagationConstant {
 
@@ -221,9 +220,28 @@ public class PropagationConstant {
 			.orElse(Boolean.FALSE);
 	}
 
-	public static void createCfHbforResult(SparkSession spark) {
-		org.apache.spark.sql.Dataset<Row> cfhb = spark.sql(cfHbforResultQuery);
-		cfhb.createOrReplaceTempView("cfhb");
+	// of the results collects the distinct keys for collected from (at the level of the result) and hosted by
+	// and produces pairs resultId, key for each distinct key associated to the result
+	public static <R extends Result> void createCfHbforResult(SparkSession spark, String inputPath, String outputPath,
+		Class<R> resultClazz) {
+		readPath(spark, inputPath, resultClazz)
+			.filter(
+				(FilterFunction<R>) r -> !r.getDataInfo().getDeletedbyinference() &&
+					!r.getDataInfo().getInvisible())
+			.flatMap((FlatMapFunction<R, EntityEntityRel>) r -> {
+				Set<String> cfhb = r.getCollectedfrom().stream().map(cf -> cf.getKey()).collect(Collectors.toSet());
+				cfhb.addAll(r.getInstance().stream().map(i -> i.getHostedby().getKey()).collect(Collectors.toSet()));
+				return cfhb
+					.stream()
+					.map(value -> EntityEntityRel.newInstance(r.getId(), value))
+					.collect(Collectors.toList())
+					.iterator();
+			}, Encoders.bean(EntityEntityRel.class))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(outputPath);
+
 	}
 
 	public static <R> Dataset<R> readPath(

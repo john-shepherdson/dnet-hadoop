@@ -2,17 +2,14 @@
 package eu.dnetlib.dhp.countrypropagation;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.FlatMapFunction;
@@ -23,6 +20,8 @@ import org.apache.spark.sql.Dataset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.dnetlib.dhp.EntityEntityRel;
+import eu.dnetlib.dhp.PropagationConstant;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
@@ -49,14 +48,17 @@ public class PrepareResultCountrySet {
 		String inputPath = parser.get("sourcePath");
 		log.info("inputPath: {}", inputPath);
 
-		String outputPath = parser.get("outputPath");
-		log.info("outputPath: {}", outputPath);
-
-		final String datasourcecountrypath = parser.get("preparedInfoPath");
-		log.info("preparedInfoPath: {}", datasourcecountrypath);
-
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
+
+		final String resultType = resultClassName.substring(resultClassName.lastIndexOf(".") + 1).toLowerCase();
+		log.info("resultType: {}", resultType);
+
+		String outputPath = workingPath + "/" + resultType; // parser.get("outputPath");
+		log.info("outputPath: {}", outputPath);
+
+		final String datasourcecountrypath = workingPath + "/datasourceCountry";// parser.get("preparedInfoPath");
+		log.info("preparedInfoPath: {}", datasourcecountrypath);
 
 		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
@@ -72,7 +74,7 @@ public class PrepareResultCountrySet {
 					inputPath,
 					outputPath,
 					datasourcecountrypath,
-					workingPath,
+					workingPath + "/resultCfHb/" + resultType,
 					resultClazz);
 			});
 	}
@@ -85,31 +87,11 @@ public class PrepareResultCountrySet {
 		String workingPath,
 		Class<R> resultClazz) {
 
-		// selects all the results non deleted by inference and non invisible
-		Dataset<R> result = readPath(spark, inputPath, resultClazz)
-			.filter(
-				(FilterFunction<R>) r -> !r.getDataInfo().getDeletedbyinference() &&
-					!r.getDataInfo().getInvisible());
-
-		// of the results collects the distinct keys for collected from (at the level of the result) and hosted by
-		// and produces pairs resultId, key for each distinct key associated to the result
-		result.flatMap((FlatMapFunction<R, EntityEntityRel>) r -> {
-			Set<String> cfhb = r.getCollectedfrom().stream().map(cf -> cf.getKey()).collect(Collectors.toSet());
-			cfhb.addAll(r.getInstance().stream().map(i -> i.getHostedby().getKey()).collect(Collectors.toSet()));
-			return cfhb
-				.stream()
-				.map(value -> EntityEntityRel.newInstance(r.getId(), value))
-				.collect(Collectors.toList())
-				.iterator();
-		}, Encoders.bean(EntityEntityRel.class))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(workingPath + "/resultCfHb");
+		PropagationConstant.createCfHbforResult(spark, inputPath, workingPath, resultClazz);
 
 		Dataset<DatasourceCountry> datasource_country = readPath(spark, datasourcecountrypath, DatasourceCountry.class);
 
-		Dataset<EntityEntityRel> cfhb = readPath(spark, workingPath + "/resultCfHb", EntityEntityRel.class);
+		Dataset<EntityEntityRel> cfhb = readPath(spark, workingPath, EntityEntityRel.class);
 
 		datasource_country
 			.joinWith(

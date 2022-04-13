@@ -112,10 +112,10 @@
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
+            <arg>--allowedpis</arg><arg>${allowedpids}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -140,10 +140,10 @@
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
+            <arg>--allowedpis</arg><arg>${allowedpids}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -168,10 +168,10 @@
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
+            <arg>--allowedpis</arg><arg>${allowedpids}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -196,10 +196,10 @@
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
+            <arg>--allowedpis</arg><arg>${allowedpids}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -263,7 +263,6 @@
             </spark-opts>
             <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/preparedInfo/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
         </spark>
@@ -294,7 +293,6 @@
             </spark-opts>
             <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/preparedInfo/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
         </spark>
@@ -325,7 +323,6 @@
             </spark-opts>
             <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/preparedInfo/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
         </spark>
@@ -356,7 +353,6 @@
             </spark-opts>
             <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/preparedInfo/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${outputPath}/software</arg>
         </spark>

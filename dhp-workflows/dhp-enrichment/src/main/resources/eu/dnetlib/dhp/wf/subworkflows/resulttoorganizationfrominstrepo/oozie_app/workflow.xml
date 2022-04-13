@@ -45,9 +45,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/datasourceOrganization</arg>
-            <arg>--alreadyLinkedPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/alreadyLinked</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/affiliationInstRepo</arg>
             <arg>--blacklist</arg><arg>${blacklist}</arg>
         </spark>
         <ok to="fork_join_apply_resulttoorganization_propagation"/>

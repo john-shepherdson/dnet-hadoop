@@ -23,4 +23,11 @@ public class DatasourceOrganization implements Serializable {
 	public void setOrganizationId(String organizationId) {
 		this.organizationId = organizationId;
 	}
+
+	public static DatasourceOrganization newInstance(String datasourceId, String organizationId) {
+		DatasourceOrganization dso = new DatasourceOrganization();
+		dso.datasourceId = datasourceId;
+		dso.organizationId = organizationId;
+		return dso;
+	}
 }

@@ -1,7 +1,9 @@
 
 package eu.dnetlib.dhp.orcidtoresultfromsemrel;
 
-public class AutoritativeAuthor {
+import java.io.Serializable;
+
+public class AutoritativeAuthor implements Serializable {
 
 	private String name;
 	private String surname;

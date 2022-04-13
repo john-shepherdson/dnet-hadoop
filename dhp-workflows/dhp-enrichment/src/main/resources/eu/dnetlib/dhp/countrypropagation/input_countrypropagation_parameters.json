@@ -18,8 +18,8 @@
     "paramRequired": true
   },
   {
-    "paramName": "p",
-    "paramLongName": "preparedInfoPath",
+    "paramName": "wp",
+    "paramLongName": "workingPath",
     "paramDescription": "the path where prepared info have been stored",
     "paramRequired": false
   },

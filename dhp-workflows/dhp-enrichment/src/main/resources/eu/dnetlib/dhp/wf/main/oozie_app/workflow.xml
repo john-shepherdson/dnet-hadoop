@@ -220,10 +220,10 @@
                     <name>sourcePath</name>
                     <value>${outputPath}</value>
                 </property>
-                <property>
-                    <name>outputPath</name>
-                    <value>${outputPath}</value>
-                </property>
+<!--                <property>-->
+<!--                    <name>outputPath</name>-->
+<!--                    <value>${outputPath}</value>-->
+<!--                </property>-->
             </configuration>
         </sub-workflow>
         <ok to="community_organization" />

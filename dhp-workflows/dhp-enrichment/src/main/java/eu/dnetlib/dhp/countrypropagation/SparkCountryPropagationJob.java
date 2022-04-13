@@ -47,8 +47,8 @@ public class SparkCountryPropagationJob {
 		String sourcePath = parser.get("sourcePath");
 		log.info("sourcePath: {}", sourcePath);
 
-		String preparedInfoPath = parser.get("preparedInfoPath");
-		log.info("preparedInfoPath: {}", preparedInfoPath);
+		String workingPath = parser.get("workingPath");
+		log.info("workingPath: {}", workingPath);
 
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
@@ -67,7 +67,7 @@ public class SparkCountryPropagationJob {
 				execPropagation(
 					spark,
 					sourcePath,
-					preparedInfoPath,
+					workingPath,
 					outputPath,
 					resultClazz);
 			});
