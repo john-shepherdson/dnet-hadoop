@@ -115,7 +115,7 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--allowedpis</arg><arg>${allowedpids}</arg>
+            <arg>--allowedpids</arg><arg>${allowedpids}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -143,7 +143,7 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--allowedpis</arg><arg>${allowedpids}</arg>
+            <arg>--allowedpids</arg><arg>${allowedpids}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -171,7 +171,7 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--allowedpis</arg><arg>${allowedpids}</arg>
+            <arg>--allowedpids</arg><arg>${allowedpids}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -199,7 +199,7 @@
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/orcidprop/preparedInfo/targetOrcidAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--allowedpis</arg><arg>${allowedpids}</arg>
+            <arg>--allowedpids</arg><arg>${allowedpids}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
