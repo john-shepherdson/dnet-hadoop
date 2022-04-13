@@ -117,22 +117,25 @@ public class PrepareResultOrcidAssociationStep1 {
 		Dataset<Relation> relation = readPath(spark, outputPath + "/relationSubset", Relation.class);
 
 		log.info("Reading Graph table from: {}", inputResultPath);
-		
+
 		readPath(spark, inputResultPath, resultClazz)
-				.filter(
-						(FilterFunction<R>) r -> !r.getDataInfo().getDeletedbyinference() && !r.getDataInfo().getInvisible())
-				.filter((FilterFunction<R>) r ->
-						Optional.ofNullable(r.getAuthor())
-								.map(al -> al.stream().anyMatch(
-										a ->  hasAllowedPid(a, allowedPids)))
-								.orElse(false)
+			.filter(
+				(FilterFunction<R>) r -> !r.getDataInfo().getDeletedbyinference() && !r.getDataInfo().getInvisible())
+			.filter(
+				(FilterFunction<R>) r -> Optional
+					.ofNullable(r.getAuthor())
+					.map(
+						al -> al
+							.stream()
+							.anyMatch(
+								a -> hasAllowedPid(a, allowedPids)))
+					.orElse(false)
 
-				)
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression", "gzip")
-				.json(outputPath + "/resultSubset");
-
+			)
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(outputPath + "/resultSubset");
 
 		Dataset<R> result = readPath(spark, outputPath + "/resultSubset", resultClazz);
 
