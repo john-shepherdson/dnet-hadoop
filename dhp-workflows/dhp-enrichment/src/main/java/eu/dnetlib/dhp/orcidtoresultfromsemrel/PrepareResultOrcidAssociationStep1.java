@@ -80,7 +80,7 @@ public class PrepareResultOrcidAssociationStep1 {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				removeOutputDir(spark, outputPath);
+				// removeOutputDir(spark, outputPath);
 				prepareInfo(
 					spark, inputPath, outputPath, resultType, resultClazz, allowedsemrel, allowedPids);
 			});
@@ -96,14 +96,6 @@ public class PrepareResultOrcidAssociationStep1 {
 		List<String> allowedPids) {
 
 		final String inputResultPath = inputPath + "/" + resultType;
-		readPath(spark, inputPath + "/relation", Relation.class)
-			.filter(
-				(FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference()
-					&& allowedsemrel.contains(r.getRelClass().toLowerCase()))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(outputPath + "/" + resultType + "/relationSubset");
 
 		Dataset<Relation> relation = readPath(spark, outputPath + "/relationSubset", Relation.class);
 
