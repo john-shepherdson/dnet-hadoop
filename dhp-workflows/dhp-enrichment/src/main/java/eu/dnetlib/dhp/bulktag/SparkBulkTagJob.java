@@ -126,9 +126,6 @@ public class SparkBulkTagJob {
 	// TODO remove this hack as soon as the values fixed by this method will be provided as NON null
 	private static <R extends Result> MapFunction<R, R> patchResult() {
 		return r -> {
-			if(r.getDataInfo() == null){
-				return null;
-			}
 			if (r.getDataInfo().getDeletedbyinference() == null) {
 				r.getDataInfo().setDeletedbyinference(false);
 			}
