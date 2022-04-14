@@ -71,6 +71,7 @@ object SparkGenerateDoiBoost {
           }
         } else {
           if (a != null && a._2 != null) {
+            b.mergeOAFDataInfo(a._2)
             b.mergeFrom(a._2)
             b.setId(a._1)
             val authors = AuthorMerger.mergeAuthor(b.getAuthor, a._2.getAuthor)
@@ -87,6 +88,7 @@ object SparkGenerateDoiBoost {
             return b2
         } else {
           if (b2 != null) {
+            b1.mergeOAFDataInfo(b2)
             b1.mergeFrom(b2)
             val authors = AuthorMerger.mergeAuthor(b1.getAuthor, b2.getAuthor)
             b1.setAuthor(authors)
