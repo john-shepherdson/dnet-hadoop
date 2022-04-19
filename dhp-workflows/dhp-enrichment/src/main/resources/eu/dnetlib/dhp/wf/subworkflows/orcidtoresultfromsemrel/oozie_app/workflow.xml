@@ -14,7 +14,7 @@
         </property>
     </parameters>
 
-    <start to="prepare_relations"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -108,7 +108,7 @@
             <arg>--outputPath</arg><arg>${workingDir}/orcidprop/relationSubset</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
         </spark>
-        <ok to="wait"/>
+        <ok to="fork_prepare_assoc_step1"/>
         <error to="Kill"/>
     </action>
 
