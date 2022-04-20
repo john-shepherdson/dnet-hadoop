@@ -1,0 +1,26 @@
+[
+  {
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "when true will stop SparkSession after job execution",
+    "paramRequired": false
+  },
+  {
+    "paramName": "hmu",
+    "paramLongName": "hive_metastore_uris",
+    "paramDescription": "the URI for the hive metastore",
+    "paramRequired": true
+  },
+  {
+    "paramName": "o",
+    "paramLongName": "outputPath",
+    "paramDescription": "the path of the new ActionSet",
+    "paramRequired": true
+  },
+  {
+    "paramName": "sdb",
+    "paramLongName": "statsdb",
+    "paramDescription": "the name of the db to be used",
+    "paramRequired": true
+  }
+]
