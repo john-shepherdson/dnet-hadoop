@@ -94,19 +94,19 @@ public class SparkAtomicActionUsageJob implements Serializable {
 
 	public static void prepareResults(String db, SparkSession spark, String workingPath) {
 		spark
-				.sql(
-						"Select result_id, downloads, views " +
-								"from " + db + ".usage_stats")
-				.as(Encoders.bean(UsageStatsModel.class))
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression", "gzip")
-				.json(workingPath);
+			.sql(
+				"Select result_id, downloads, views " +
+					"from " + db + ".usage_stats")
+			.as(Encoders.bean(UsageStatsModel.class))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(workingPath);
 	}
 
-	public static void prepareActionSet(SparkSession spark, String inputPath, String outputPath){
-			readPath(spark, inputPath, UsageStatsModel.class)
-					.groupByKey((MapFunction<UsageStatsModel, String>) us -> us.getResult_id(), Encoders.STRING())
+	public static void prepareActionSet(SparkSession spark, String inputPath, String outputPath) {
+		readPath(spark, inputPath, UsageStatsModel.class)
+			.groupByKey((MapFunction<UsageStatsModel, String>) us -> us.getResult_id(), Encoders.STRING())
 			.mapGroups((MapGroupsFunction<String, UsageStatsModel, Result>) (k, it) -> {
 				UsageStatsModel first = it.next();
 				it.forEachRemaining(us -> {
@@ -116,7 +116,6 @@ public class SparkAtomicActionUsageJob implements Serializable {
 
 				Result res = new Result();
 				res.setId("50|" + k);
-
 
 				res.setMeasures(getMeasure(first.getDownloads(), first.getViews()));
 				return res;

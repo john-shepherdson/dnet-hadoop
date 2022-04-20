@@ -75,7 +75,7 @@ public class SparkAtomicActionCountJobTest {
 			.getResource("/eu/dnetlib/dhp/actionmanager/usagestats/usagestatsdb")
 			.getPath();
 
-		SparkAtomicActionUsageJob.prepareActionSet(spark, usageScoresPath,  workingDir.toString() + "/actionSet");
+		SparkAtomicActionUsageJob.prepareActionSet(spark, usageScoresPath, workingDir.toString() + "/actionSet");
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
@@ -86,48 +86,174 @@ public class SparkAtomicActionCountJobTest {
 		Assertions.assertEquals(9, tmp.count());
 
 		tmp.foreach(r -> Assertions.assertEquals(2, r.getMeasures().size()));
-		tmp.foreach(r -> r.getMeasures().stream().forEach(m ->
-				m.getUnit().stream().forEach(u -> Assertions.assertFalse(u.getDataInfo().getDeletedbyinference()))));
-		tmp.foreach(r -> r.getMeasures().stream().forEach(m ->
-				m.getUnit().stream().forEach(u -> Assertions.assertTrue(u.getDataInfo().getInferred()))));
-		tmp.foreach(r -> r.getMeasures().stream().forEach(m ->
-				m.getUnit().stream().forEach(u -> Assertions.assertFalse(u.getDataInfo().getInvisible()))));
+		tmp
+			.foreach(
+				r -> r
+					.getMeasures()
+					.stream()
+					.forEach(
+						m -> m
+							.getUnit()
+							.stream()
+							.forEach(u -> Assertions.assertFalse(u.getDataInfo().getDeletedbyinference()))));
+		tmp
+			.foreach(
+				r -> r
+					.getMeasures()
+					.stream()
+					.forEach(
+						m -> m.getUnit().stream().forEach(u -> Assertions.assertTrue(u.getDataInfo().getInferred()))));
+		tmp
+			.foreach(
+				r -> r
+					.getMeasures()
+					.stream()
+					.forEach(
+						m -> m
+							.getUnit()
+							.stream()
+							.forEach(u -> Assertions.assertFalse(u.getDataInfo().getInvisible()))));
 
-		tmp.foreach(r -> r.getMeasures().stream().forEach(m ->
-				m.getUnit().stream().forEach(u -> Assertions.assertEquals("measure:usage_counts",
-						u.getDataInfo().getProvenanceaction().getClassid()))));
-		tmp.foreach(r -> r.getMeasures().stream().forEach(m ->
-				m.getUnit().stream().forEach(u -> Assertions.assertEquals("Inferred by OpenAIRE",
-						u.getDataInfo().getProvenanceaction().getClassname()))));
+		tmp
+			.foreach(
+				r -> r
+					.getMeasures()
+					.stream()
+					.forEach(
+						m -> m
+							.getUnit()
+							.stream()
+							.forEach(
+								u -> Assertions
+									.assertEquals(
+										"measure:usage_counts",
+										u.getDataInfo().getProvenanceaction().getClassid()))));
+		tmp
+			.foreach(
+				r -> r
+					.getMeasures()
+					.stream()
+					.forEach(
+						m -> m
+							.getUnit()
+							.stream()
+							.forEach(
+								u -> Assertions
+									.assertEquals(
+										"Inferred by OpenAIRE",
+										u.getDataInfo().getProvenanceaction().getClassname()))));
 
-		tmp.foreach(r -> r.getMeasures().stream().forEach(m ->
-				m.getUnit().stream().forEach(u -> Assertions.assertEquals("count",
-						u.getKey()))));
+		tmp
+			.foreach(
+				r -> r
+					.getMeasures()
+					.stream()
+					.forEach(
+						m -> m
+							.getUnit()
+							.stream()
+							.forEach(
+								u -> Assertions
+									.assertEquals(
+										"count",
+										u.getKey()))));
 
-		Assertions.assertEquals(1, tmp.filter(r -> r.getId().equals("50|dedup_wf_001::53575dc69e9ace947e02d47ecd54a7a6")).count());
+		Assertions
+			.assertEquals(
+				1, tmp.filter(r -> r.getId().equals("50|dedup_wf_001::53575dc69e9ace947e02d47ecd54a7a6")).count());
 
-		Assertions.assertEquals("0", tmp.filter(r -> r.getId().equals("50|dedup_wf_001::53575dc69e9ace947e02d47ecd54a7a6")).collect().get(0)
-				.getMeasures().stream().filter(m -> m.getId().equals("downloads")).collect(Collectors.toList()).get(0)
-				.getUnit().get(0).getValue());
-		Assertions.assertEquals("5", tmp.filter(r -> r.getId().equals("50|dedup_wf_001::53575dc69e9ace947e02d47ecd54a7a6")).collect().get(0)
-				.getMeasures().stream().filter(m -> m.getId().equals("views")).collect(Collectors.toList()).get(0)
-				.getUnit().get(0).getValue());
+		Assertions
+			.assertEquals(
+				"0",
+				tmp
+					.filter(r -> r.getId().equals("50|dedup_wf_001::53575dc69e9ace947e02d47ecd54a7a6"))
+					.collect()
+					.get(0)
+					.getMeasures()
+					.stream()
+					.filter(m -> m.getId().equals("downloads"))
+					.collect(Collectors.toList())
+					.get(0)
+					.getUnit()
+					.get(0)
+					.getValue());
+		Assertions
+			.assertEquals(
+				"5",
+				tmp
+					.filter(r -> r.getId().equals("50|dedup_wf_001::53575dc69e9ace947e02d47ecd54a7a6"))
+					.collect()
+					.get(0)
+					.getMeasures()
+					.stream()
+					.filter(m -> m.getId().equals("views"))
+					.collect(Collectors.toList())
+					.get(0)
+					.getUnit()
+					.get(0)
+					.getValue());
 
-		Assertions.assertEquals("0", tmp.filter(r -> r.getId().equals("50|doi_________::17eda2ff77407538fbe5d3d719b9d1c0")).collect().get(0)
-				.getMeasures().stream().filter(m -> m.getId().equals("downloads")).collect(Collectors.toList()).get(0)
-				.getUnit().get(0).getValue());
-		Assertions.assertEquals("1", tmp.filter(r -> r.getId().equals("50|doi_________::17eda2ff77407538fbe5d3d719b9d1c0")).collect().get(0)
-				.getMeasures().stream().filter(m -> m.getId().equals("views")).collect(Collectors.toList()).get(0)
-				.getUnit().get(0).getValue());
+		Assertions
+			.assertEquals(
+				"0",
+				tmp
+					.filter(r -> r.getId().equals("50|doi_________::17eda2ff77407538fbe5d3d719b9d1c0"))
+					.collect()
+					.get(0)
+					.getMeasures()
+					.stream()
+					.filter(m -> m.getId().equals("downloads"))
+					.collect(Collectors.toList())
+					.get(0)
+					.getUnit()
+					.get(0)
+					.getValue());
+		Assertions
+			.assertEquals(
+				"1",
+				tmp
+					.filter(r -> r.getId().equals("50|doi_________::17eda2ff77407538fbe5d3d719b9d1c0"))
+					.collect()
+					.get(0)
+					.getMeasures()
+					.stream()
+					.filter(m -> m.getId().equals("views"))
+					.collect(Collectors.toList())
+					.get(0)
+					.getUnit()
+					.get(0)
+					.getValue());
 
-		Assertions.assertEquals("2", tmp.filter(r -> r.getId().equals("50|doi_________::3085e4c6e051378ca6157fe7f0430c1f")).collect().get(0)
-				.getMeasures().stream().filter(m -> m.getId().equals("downloads")).collect(Collectors.toList()).get(0)
-				.getUnit().get(0).getValue());
-		Assertions.assertEquals("6", tmp.filter(r -> r.getId().equals("50|doi_________::3085e4c6e051378ca6157fe7f0430c1f")).collect().get(0)
-				.getMeasures().stream().filter(m -> m.getId().equals("views")).collect(Collectors.toList()).get(0)
-				.getUnit().get(0).getValue());
+		Assertions
+			.assertEquals(
+				"2",
+				tmp
+					.filter(r -> r.getId().equals("50|doi_________::3085e4c6e051378ca6157fe7f0430c1f"))
+					.collect()
+					.get(0)
+					.getMeasures()
+					.stream()
+					.filter(m -> m.getId().equals("downloads"))
+					.collect(Collectors.toList())
+					.get(0)
+					.getUnit()
+					.get(0)
+					.getValue());
+		Assertions
+			.assertEquals(
+				"6",
+				tmp
+					.filter(r -> r.getId().equals("50|doi_________::3085e4c6e051378ca6157fe7f0430c1f"))
+					.collect()
+					.get(0)
+					.getMeasures()
+					.stream()
+					.filter(m -> m.getId().equals("views"))
+					.collect(Collectors.toList())
+					.get(0)
+					.getUnit()
+					.get(0)
+					.getValue());
 	}
-
-
 
 }
