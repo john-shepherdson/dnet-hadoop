@@ -20,7 +20,7 @@
   {
     "paramName": "ci",
     "paramLongName": "contextId",
-    "paramDescription": "url to the ISLookup Service",
+    "paramDescription": "the id of the context to be removed",
     "paramRequired": true
   },
   {
@@ -31,7 +31,7 @@
   },{
   "paramName": "vf",
   "paramLongName": "verifyParam",
-  "paramDescription": "url to the ISLookup Service",
+  "paramDescription": "the parameter to be verified to remove the context",
   "paramRequired": true
 }
 ]
