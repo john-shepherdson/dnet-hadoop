@@ -87,7 +87,7 @@ public class SparkAtomicActionUsageJob implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				removeOutputDir(spark, outputPath);
-				prepareResults(dbname, spark, outputPath);
+				prepareResults(dbname, spark, workingPath);
 				prepareActionSet(spark, workingPath, outputPath);
 			});
 	}
