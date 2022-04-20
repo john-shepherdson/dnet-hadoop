@@ -4,8 +4,6 @@ package eu.dnetlib.dhp.oa.graph.hostedbymap.model.doaj;
 import java.io.Serializable;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class BibJson implements Serializable {
 	private Editorial editorial;
 	private PidScheme pid_scheme;
