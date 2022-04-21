@@ -71,7 +71,6 @@ public class ProjectsSubsetSparkJob implements Serializable {
 
 		Dataset<String> projectList = spark.read().textFile(projectListPath);
 
-		// projectList.show(false);
 		Dataset<Project> projects;
 		projects = Utils.readPath(spark, inputPath, Project.class);
 
