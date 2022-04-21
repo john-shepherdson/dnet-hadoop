@@ -13,6 +13,10 @@
             <name>isLookupUrl</name>
             <description>the address of the lookUp service</description>
         </property>
+        <property>
+            <name>shouldCleanContext</name>
+            <value>false</value>
+        </property>
 
         <property>
             <name>sparkDriverMemory</name>
@@ -275,7 +279,23 @@
         <error to="Kill"/>
     </action>
 
-    <join name="wait_clean" to="End"/>
+    <join name="wait_clean" to="clean_context"/>
+
+    <decision name="clean_context">
+        <switch>
+            <case to="fork_clean_context">${wf:conf('shouldCleanContext') eq true}</case>
+            <default to="End"/>
+        </switch>
+    </decision>
+
+
+    <fork name="fork_clean_context">
+        <path start="clean_publication_context"/>
+        <path start="clean_dataset_context"/>
+        <path start="clean_otherresearchproduct_context"/>
+        <path start="clean_software_context"/>
+    </fork>
+
 
     <end name="End"/>
 </workflow-app>
