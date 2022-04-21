@@ -31,7 +31,7 @@ import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 /**
- * created the Atomic Action for each tipe of results
+ * created the Atomic Action for each type of results
  */
 public class SparkAtomicActionUsageJob implements Serializable {
 
