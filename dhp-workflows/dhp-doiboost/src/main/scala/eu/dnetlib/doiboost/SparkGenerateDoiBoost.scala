@@ -208,7 +208,7 @@ object SparkGenerateDoiBoost {
 
       )
       .filter(s => s!= null && s._2!=null)
-      .map(s => s._2)
+      .map(s => s._2._2)
       .write
       .mode(SaveMode.Overwrite)
       .save(s"$workingDirPath/doiBoostPublicationFiltered")
