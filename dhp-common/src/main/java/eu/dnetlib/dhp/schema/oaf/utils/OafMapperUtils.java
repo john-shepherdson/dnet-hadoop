@@ -392,7 +392,7 @@ public class OafMapperUtils {
 		return null;
 	}
 
-	public static KeyValue newKeyValueInstance (String key, String value, DataInfo dataInfo){
+	public static KeyValue newKeyValueInstance(String key, String value, DataInfo dataInfo) {
 		KeyValue kv = new KeyValue();
 		kv.setDataInfo(dataInfo);
 		kv.setKey(key);

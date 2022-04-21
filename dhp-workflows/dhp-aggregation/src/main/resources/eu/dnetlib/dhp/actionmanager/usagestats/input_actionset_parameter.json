@@ -19,7 +19,7 @@
   },
   {
     "paramName": "sdb",
-    "paramLongName": "statsdb",
+    "paramLongName": "usagestatsdb",
     "paramDescription": "the name of the db to be used",
     "paramRequired": true
   },

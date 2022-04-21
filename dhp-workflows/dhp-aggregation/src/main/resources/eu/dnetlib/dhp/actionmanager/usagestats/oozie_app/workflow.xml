@@ -5,8 +5,8 @@
             <description>the path where to store the actionset</description>
         </property>
         <property>
-            <name>statsdb</name>
-            <description>the path where to store the actionset</description>
+            <name>usagestatsdb</name>
+            <description>the name of the db to be used</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -88,7 +88,7 @@
             </spark-opts>
             <arg>--hive_metastore_uris</arg><arg>${hiveMetastoreUris}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
-            <arg>--statsdb</arg><arg>${statsdb}</arg>
+            <arg>--usagestatsdb</arg><arg>${usagestatsdb}</arg>
             <arg>--workingPath</arg><arg>${workingDir}/usageDb</arg>
         </spark>
         <ok to="End"/>

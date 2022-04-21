@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -30,7 +29,6 @@ import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Measure;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
-
 
 /**
  * created the Atomic Action for each tipe of results
@@ -65,7 +63,7 @@ public class SparkAtomicActionUsageJob implements Serializable {
 		SparkConf conf = new SparkConf();
 		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
-		final String dbname = parser.get("statsdb");
+		final String dbname = parser.get("usagestatsdb");
 
 		final String workingPath = parser.get("workingPath");
 
@@ -130,8 +128,9 @@ public class SparkAtomicActionUsageJob implements Serializable {
 
 		return Arrays
 			.asList(
-				OafMapperUtils.newMeasureInstance("downloads", String.valueOf(downloads), UPDATE_KEY_USAGE_COUNTS, dataInfo),
-					OafMapperUtils.newMeasureInstance("views", String.valueOf(views), UPDATE_KEY_USAGE_COUNTS, dataInfo));
+				OafMapperUtils
+					.newMeasureInstance("downloads", String.valueOf(downloads), UPDATE_KEY_USAGE_COUNTS, dataInfo),
+				OafMapperUtils.newMeasureInstance("views", String.valueOf(views), UPDATE_KEY_USAGE_COUNTS, dataInfo));
 
 	}
 
