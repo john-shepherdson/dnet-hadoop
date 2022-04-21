@@ -17,6 +17,14 @@
             <name>shouldCleanContext</name>
             <description>true if the context have to be cleaned</description>
         </property>
+        <property>
+            <name>contextId</name>
+            <value>sobigdata</value>
+        </property>
+        <property>
+            <name>verifyParam</name>
+            <value>gcube </value>
+        </property>
 
         <property>
             <name>sparkDriverMemory</name>
