@@ -12,6 +12,8 @@ and (ri.accessright = 'Open Access'
 or ri.accessright = 'Embargo' or ri.accessright = 'Open Source')) tmp
 on p.id= tmp.id;
 
+compute stats indi_pub_green_oa;
+
 create table indi_pub_grey_lit stored as parquet as
 select distinct p.id, coalesce(grey_lit, 0) as grey_lit
 from publication p
@@ -22,6 +24,8 @@ join result_classifications rt on rt.id = p.id
 where rt.type not in ('Article','Part of book or chapter of book','Book','Doctoral thesis','Master thesis','Data Paper', 'Thesis', 'Bachelor thesis', 'Conference object') and
 not exists (select 1 from result_classifications rc where type ='Other literature type' and rc.id=p.id)) tmp on p.id=tmp.id;
 
+compute stats indi_pub_grey_lit;
+
 create table indi_pub_doi_from_crossref stored as parquet as
 select distinct p.id, coalesce(doi_from_crossref, 0) as doi_from_crossref
 from publication p
@@ -31,6 +35,7 @@ join datasource d on d.id = ri.collectedfrom
 where pidtype='Digital Object Identifier' and d.name ='Crossref') tmp
 on tmp.id=p.id;
 
+compute stats indi_pub_doi_from_crossref;
 ---- Sprint 2 ----
 create table indi_result_has_cc_licence stored as parquet as
 select distinct r.id, (case when lic='' or lic is null then 0 else 1 end) as has_cc_license
@@ -39,6 +44,8 @@ left outer join (select r.id, license.type as lic from result r
 join result_licenses as license on license.id = r.id
 where lower(license.type) LIKE '%creativecommons.org%' OR lower(license.type) LIKE '%cc-%') tmp
 on r.id= tmp.id;
+
+compute stats indi_result_has_cc_licence;
 
 create table indi_result_has_cc_licence_url stored as parquet as
 select distinct r.id, case when lic_host='' or lic_host is null then 0 else 1 end as has_cc_license_url
@@ -49,9 +56,13 @@ join result_licenses as license on license.id = r.id
 WHERE lower(parse_url(license.type, "HOST")) = "creativecommons.org") tmp
 on r.id= tmp.id;
 
+compute stats indi_result_has_cc_licence_url;
+
 create table indi_pub_has_abstract stored as parquet as
 select distinct publication.id, coalesce(abstract, 1) has_abstract
 from publication;
+
+compute stats indi_pub_has_abstract;
 
 create table indi_result_with_orcid stored as parquet as
 select distinct r.id, coalesce(has_orcid, 0) as has_orcid
@@ -59,6 +70,7 @@ from result r
 left outer join (select id, 1 as has_orcid from result_orcid) tmp
 on r.id= tmp.id;
 
+compute stats indi_result_with_orcid;
 
 ---- Sprint 3 ----
 create table indi_funded_result_with_fundref stored as parquet as
@@ -67,6 +79,8 @@ from project_results r
 left outer join (select distinct id, 1 as fundref from project_results
 where provenance='Harvested') tmp
 on r.id= tmp.id;
+
+compute stats indi_funded_result_with_fundref;
 
 create table indi_result_org_country_collab stored as parquet as
 with tmp as
@@ -79,6 +93,8 @@ join tmp as o2 on o1.result=o2.result
 where o1.id<>o2.id and o1.country<>o2.country
 group by o1.id, o1.type,o2.country;
 
+compute stats indi_result_org_country_collab;
+
 create table indi_result_org_collab stored as parquet as
 with tmp as
 (select o.id, ro.id as result,r.type  from organization o
@@ -89,6 +105,8 @@ from tmp as o1
 join tmp as o2 on o1.result=o2.result
 where o1.id<>o2.id
 group by o1.id, o2.id, o1.type;
+
+compute stats indi_result_org_collab;
 
 create table indi_funder_country_collab stored as parquet as
 with tmp as (select funder, project, country from organization_projects op
@@ -101,6 +119,8 @@ join tmp as f2 on f1.project=f2.project
 where f1.country<>f2.country
 group by f1.funder, f2.country, f1.country;
 
+compute stats indi_funder_country_collab;
+
 create table indi_result_country_collab stored as parquet as
 with tmp as
 (select country, ro.id as result,r.type  from organization o
@@ -111,6 +131,8 @@ from tmp as o1
 join tmp as o2 on o1.result=o2.result
 where o1.country<>o2.country
 group by o1.country, o2.country, o1.type;
+
+compute stats indi_result_country_collab;
 
 ---- Sprint 4 ----
 create table indi_pub_diamond stored as parquet as
@@ -123,6 +145,8 @@ join stats_ext.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_onli
 and (ps.journal_is_in_doaj=true or ps.journal_is_oa=true) and ps.has_apc=false) tmp
 on pd.id=tmp.id;
 
+compute stats indi_pub_diamond;
+
 create table indi_pub_hybrid stored as parquet as
 select distinct pd.id, coalesce(is_hybrid, 0) as is_hybrid
 from publication_datasources pd
@@ -132,6 +156,8 @@ join datasource d on d.id=pd.datasource
 join stats_ext.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_online=d.issn_online)
 and (ps.journal_is_in_doaj=false and ps.journal_is_oa=false)) tmp
 on pd.id=tmp.id;
+
+compute stats indi_pub_hybrid;
 
 create table indi_pub_in_transformative stored as parquet as
 select distinct pd.id, coalesce(is_transformative, 0) as is_transformative
@@ -143,6 +169,8 @@ join stats_ext.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_onli
 and ps.is_transformative_journal=true) tmp
 on pd.id=tmp.id;
 
+compute stats indi_pub_in_transformative;
+
 create table indi_pub_closed_other_open stored as parquet as
 select distinct ri.id, coalesce(pub_closed_other_open, 0) as pub_closed_other_open from result_instance ri
 left outer join
@@ -153,11 +181,12 @@ where d.type like '%Journal%' and ri.accessright='Closed Access' and
 (p.bestlicence='Open Access' or p.bestlicence='Open Source')) tmp
 on tmp.id=ri.id;
 
-
+compute stats indi_pub_closed_other_open;
 ---- Sprint 5 ----
 create table indi_result_no_of_copies stored as parquet as
 select id, count(id) as number_of_copies from result_instance group by id;
 
+compute stats indi_result_no_of_copies;
 ---- Sprint 6 ----
 create table indi_pub_gold_oa stored as parquet as
 WITH gold_oa AS (
@@ -182,6 +211,8 @@ LEFT OUTER JOIN (
     SELECT pd.id, 1 as is_gold FROM publication_datasources pd
     JOIN issn on issn.id=pd.datasource
     JOIN gold_oa  on issn.issn = gold_oa.issn) tmp ON pd.id=tmp.id;
+
+compute stats indi_pub_gold_oa;
 
 create table indi_datasets_gold_oa stored as parquet as
 WITH gold_oa AS (
@@ -210,6 +241,8 @@ LEFT OUTER JOIN (
     JOIN issn on issn.id=pd.datasource
     JOIN gold_oa  on issn.issn = gold_oa.issn) tmp ON pd.id=tmp.id;
 
+compute stats indi_datasets_gold_oa;
+
 create table indi_software_gold_oa stored as parquet as
 WITH gold_oa AS (
     SELECT issn_l, journal_is_in_doaj, journal_is_oa, issn_1 as issn
@@ -237,6 +270,8 @@ LEFT OUTER JOIN (
     JOIN issn on issn.id=pd.datasource
     JOIN gold_oa  on issn.issn = gold_oa.issn) tmp ON pd.id=tmp.id;
 
+compute stats indi_software_gold_oa;
+
 create table indi_org_findable stored as parquet as
 with result_with_pid as (
     select ro.organization organization, count(distinct rp.id) no_result_with_pid from result_organization ro
@@ -262,6 +297,8 @@ from allresults
 join result_with_pid_share on result_with_pid_share.organization=allresults.organization
 left outer join (
     select organization, abstract_share from result_with_abstract_share) tmp on tmp.organization=allresults.organization;
+
+compute stats indi_org_findable;
 
 create table indi_org_openess stored as parquet as
 WITH datasets_oa as (
@@ -313,6 +350,8 @@ left outer join (
 left outer join (
     select organization,s from allsoftwaresshare) tmp1 on tmp1.organization=allpubsshare.organization;
 
+compute stats indi_org_openess;
+
 create table indi_pub_hybrid_oa_with_cc stored as parquet as
 WITH hybrid_oa AS (
     SELECT issn_l, journal_is_in_doaj, journal_is_oa, issn_print as issn
@@ -343,12 +382,16 @@ LEFT OUTER JOIN (
     JOIN indi_result_has_cc_licence cc on pd.id=cc.id
     where cc.has_cc_license=1) tmp on pd.id=tmp.id;
 
+compute stats indi_pub_hybrid_oa_with_cc;
+
 create table indi_pub_downloads stored as parquet as
 SELECT result_id, sum(downloads) no_dowloads from openaire_prod_usage_stats.usage_stats
 join publication on result_id=id
 where downloads>0
 GROUP BY result_id
 order by no_dowloads desc;
+
+compute stats indi_pub_downloads;
 
 create table indi_pub_downloads_datasource stored as parquet as
 SELECT result_id, repository_id, sum(downloads) no_dowloads from openaire_prod_usage_stats.usage_stats
@@ -357,11 +400,15 @@ where downloads>0
 GROUP BY result_id, repository_id
 order by result_id;
 
+compute stats indi_pub_downloads_datasource;
+
 create table indi_pub_downloads_year stored as parquet as
 SELECT result_id, substring(us.`date`, 1,4) as `year`, sum(downloads) no_dowloads from openaire_prod_usage_stats.usage_stats us
 join publication on result_id=id where downloads>0
 GROUP BY result_id, `year`
 order by `year` asc;
+
+compute stats indi_pub_downloads_year;
 
 create table indi_pub_downloads_datasource_year stored as parquet as
 SELECT result_id, substring(us.`date`, 1,4) as `year`, repository_id, sum(downloads) no_dowloads from openaire_prod_usage_stats.usage_stats us
@@ -369,3 +416,5 @@ join publication on result_id=id
 where downloads>0
 GROUP BY result_id, repository_id, `year`
 order by `year` asc, result_id;
+
+compute stats indi_pub_downloads_datasource_year;
