@@ -14,6 +14,9 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static eu.dnetlib.dhp.PropagationConstant.readPath;
@@ -72,11 +75,17 @@ public class SparkEoscTag {
 
         readPath(spark, inputPath + "/software", Software.class)
                 .map((MapFunction<Software, Software>) s -> {
+                    List<StructuredProperty> sbject;
+                    if (!Optional.ofNullable(s.getSubject()).isPresent())
+                        s.setSubject(new ArrayList<>());
+                    sbject = s.getSubject();
+
                     if(containsCriteriaNotebook(s)){
-                        s.getSubject().add(EOSC_NOTEBOOK);
+                        sbject.add(EOSC_NOTEBOOK);
+
                     }
                     if(containsCriteriaGalaxy(s)){
-                        s.getSubject().add(EOSC_GALAXY);
+                        sbject.add(EOSC_GALAXY);
                     }
                     return s;
                 }, Encoders.bean(Software.class) )
@@ -94,11 +103,15 @@ public class SparkEoscTag {
         readPath(spark, inputPath + "/otherresearchproduct", OtherResearchProduct.class)
                 .map((MapFunction<OtherResearchProduct, OtherResearchProduct>) orp ->
                 {
+                    List<StructuredProperty> sbject;
+                    if (!Optional.ofNullable(orp.getSubject()).isPresent())
+                        orp.setSubject(new ArrayList<>());
+                    sbject = orp.getSubject();
                     if(containsCriteriaGalaxy(orp)){
-                        orp.getSubject().add(EOSC_GALAXY);
+                        sbject.add(EOSC_GALAXY);
                     }
                     if(containscriteriaTwitter(orp)){
-                        orp.getSubject().add(EOSC_TWITTER);
+                        sbject.add(EOSC_TWITTER);
                     }
                     return orp;
                 }, Encoders.bean(OtherResearchProduct.class))
@@ -115,8 +128,12 @@ public class SparkEoscTag {
 
         readPath(spark, inputPath + "/dataset", Dataset.class)
                 .map((MapFunction<Dataset, Dataset>) d -> {
+                    List<StructuredProperty> sbject;
+                    if (!Optional.ofNullable(d.getSubject()).isPresent())
+                        d.setSubject(new ArrayList<>());
+                    sbject = d.getSubject();
                     if(containscriteriaTwitter(d)){
-                        d.getSubject().add(EOSC_TWITTER);
+                        sbject.add(EOSC_TWITTER);
                     }
                     return d;
                 } , Encoders.bean(Dataset.class) )
