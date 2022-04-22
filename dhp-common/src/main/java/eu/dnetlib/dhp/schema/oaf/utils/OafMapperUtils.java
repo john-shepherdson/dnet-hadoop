@@ -391,4 +391,19 @@ public class OafMapperUtils {
 		}
 		return null;
 	}
+
+	public static KeyValue newKeyValueInstance(String key, String value, DataInfo dataInfo) {
+		KeyValue kv = new KeyValue();
+		kv.setDataInfo(dataInfo);
+		kv.setKey(key);
+		kv.setValue(value);
+		return kv;
+	}
+
+	public static Measure newMeasureInstance(String id, String value, String key, DataInfo dataInfo) {
+		Measure m = new Measure();
+		m.setId(id);
+		m.setUnit(Arrays.asList(newKeyValueInstance(key, value, dataInfo)));
+		return m;
+	}
 }
