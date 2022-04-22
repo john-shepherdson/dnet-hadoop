@@ -1,4 +1,33 @@
 {
+  "measures": [
+    {
+      "id": "influence",
+      "unit": [
+        {
+          "key": "score",
+          "value": "1.00889953098e-08"
+        }
+      ]
+    },
+    {
+      "id": "popularity_alt",
+      "unit": [
+        {
+          "key": "score",
+          "value": "30.6576853333"
+        }
+      ]
+    },
+    {
+      "id": "popularity",
+      "unit": [
+        {
+          "key": "score",
+          "value": "4.62970429725e-08"
+        }
+      ]
+    }
+  ],
   "author": [
     {
       "affiliation": [],
@@ -284,6 +313,35 @@
   "id": "50|CSC_________::0000ec4dd9df012feaafa77e71a0fb4c",
   "instance": [
     {
+      "measures": [
+        {
+          "id": "influence",
+          "unit": [
+            {
+              "key": "score",
+              "value": "1.00889953098e-08"
+            }
+          ]
+        },
+        {
+          "id": "popularity_alt",
+          "unit": [
+            {
+              "key": "score",
+              "value": "30.6576853333"
+            }
+          ]
+        },
+        {
+          "id": "popularity",
+          "unit": [
+            {
+              "key": "score",
+              "value": "4.62970429725e-08"
+            }
+          ]
+        }
+      ],
       "pid": [
         {
           "dataInfo": {
@@ -394,6 +452,12 @@
         "classname": "Article",
         "schemeid": "dnet:dataCite_resource",
         "schemename": "dnet:dataCite_resource"
+      },
+      "refereed": {
+        "classid": "0001",
+        "classname": "peerReviewed",
+        "schemeid": "dnet:review_levels",
+        "schemename": "dnet:review_levels"
       },
       "license": {
         "dataInfo": {
@@ -527,6 +591,12 @@
         "schemeid": "dnet:dataCite_resource",
         "schemename": "dnet:dataCite_resource"
       },
+      "refereed": {
+        "classid": "0000",
+        "classname": "UNKNOWN",
+        "schemeid": "dnet:review_levels",
+        "schemename": "dnet:review_levels"
+      },
       "license": {
         "dataInfo": {
           "deletedbyinference": false,
@@ -658,6 +728,12 @@
         "classname": "Article",
         "schemeid": "dnet:dataCite_resource",
         "schemename": "dnet:dataCite_resource"
+      },
+      "refereed": {
+        "classid": "0002",
+        "classname": "nonPeerReviewed",
+        "schemeid": "dnet:review_levels",
+        "schemename": "dnet:review_levels"
       },
       "license": {
         "dataInfo": {
@@ -791,6 +867,12 @@
         "schemeid": "dnet:dataCite_resource",
         "schemename": "dnet:dataCite_resource"
       },
+      "refereed": {
+        "classid": "0001",
+        "classname": "peerReviewed",
+        "schemeid": "dnet:review_levels",
+        "schemename": "dnet:review_levels"
+      },
       "license": {
         "dataInfo": {
           "deletedbyinference": false,
@@ -808,7 +890,7 @@
         "value": ""
       },
       "url": [
-        "http://dx.doi.org/10.1109/TED.2018.2853552",
+        "http://dx.doi.org/10.1109/TED.2018.2853551",
         "http://dx.doi.org/10.1109/TED.2018.2853554"
       ]
     },
@@ -1655,5 +1737,37 @@
       },
       "value": "Understanding Electromigration in Cu-CNT Composite Interconnects A Multiscale Electrothermal Simulation Study"
     }
-  ]
+  ],
+  "processingchargeamount": {
+    "value": "1721.47",
+    "dataInfo": {
+      "invisible": true,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.9",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:datasetarchive",
+        "classname": "sysimport:crosswalk:datasetarchive",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "processingchargecurrency": {
+    "value": "EUR",
+    "dataInfo": {
+      "invisible": true,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.9",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:datasetarchive",
+        "classname": "sysimport:crosswalk:datasetarchive",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  }
 }

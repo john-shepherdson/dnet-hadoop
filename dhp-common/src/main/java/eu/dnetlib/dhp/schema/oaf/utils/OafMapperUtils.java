@@ -47,6 +47,17 @@ public class OafMapperUtils {
 	}
 
 	public static Result mergeResults(Result left, Result right) {
+
+		final boolean leftFromDelegatedAuthority = isFromDelegatedAuthority(left);
+		final boolean rightFromDelegatedAuthority = isFromDelegatedAuthority(right);
+
+		if (leftFromDelegatedAuthority && !rightFromDelegatedAuthority) {
+			return left;
+		}
+		if (!leftFromDelegatedAuthority && rightFromDelegatedAuthority) {
+			return right;
+		}
+
 		if (new ResultTypeComparator().compare(left, right) < 0) {
 			left.mergeFrom(right);
 			return left;
@@ -54,6 +65,18 @@ public class OafMapperUtils {
 			right.mergeFrom(left);
 			return right;
 		}
+	}
+
+	private static boolean isFromDelegatedAuthority(Result r) {
+		return Optional
+			.ofNullable(r.getInstance())
+			.map(
+				instance -> instance
+					.stream()
+					.filter(i -> Objects.nonNull(i.getCollectedfrom()))
+					.map(i -> i.getCollectedfrom().getKey())
+					.anyMatch(cfId -> IdentifierFactory.delegatedAuthorityDatasourceIds().contains(cfId)))
+			.orElse(false);
 	}
 
 	public static KeyValue keyValue(final String k, final String v) {
@@ -367,5 +390,20 @@ public class OafMapperUtils {
 			return rights;
 		}
 		return null;
+	}
+
+	public static KeyValue newKeyValueInstance(String key, String value, DataInfo dataInfo) {
+		KeyValue kv = new KeyValue();
+		kv.setDataInfo(dataInfo);
+		kv.setKey(key);
+		kv.setValue(value);
+		return kv;
+	}
+
+	public static Measure newMeasureInstance(String id, String value, String key, DataInfo dataInfo) {
+		Measure m = new Measure();
+		m.setId(id);
+		m.setUnit(Arrays.asList(newKeyValueInstance(key, value, dataInfo)));
+		return m;
 	}
 }

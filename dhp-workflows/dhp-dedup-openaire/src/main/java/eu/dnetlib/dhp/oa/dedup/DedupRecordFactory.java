@@ -77,6 +77,7 @@ public class DedupRecordFactory {
 		throws IllegalAccessException, InstantiationException {
 
 		T entity = clazz.newInstance();
+		entity.setDataInfo(dataInfo);
 
 		final Collection<String> dates = Lists.newArrayList();
 		final List<List<Author>> authors = Lists.newArrayList();

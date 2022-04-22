@@ -23,7 +23,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.protocol.HTTP;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -32,6 +31,7 @@ import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.json4s.Xml;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
@@ -50,6 +50,7 @@ import eu.dnetlib.dhp.schema.common.*;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import scala.Tuple2;
 
 public class XmlRecordFactory implements Serializable {
 
@@ -208,6 +209,10 @@ public class XmlRecordFactory implements Serializable {
 
 		if (ModelSupport.isResult(type)) {
 			final Result r = (Result) entity;
+
+			if (r.getMeasures() != null) {
+				metadata.addAll(measuresAsXml(r.getMeasures()));
+			}
 
 			if (r.getContext() != null) {
 				contexts.addAll(r.getContext().stream().map(c -> c.getId()).collect(Collectors.toList()));
@@ -397,6 +402,16 @@ public class XmlRecordFactory implements Serializable {
 			}
 			if (r.getResourcetype() != null) {
 				metadata.add(XmlSerializationUtils.mapQualifier("resourcetype", r.getResourcetype()));
+			}
+			if (r.getProcessingchargeamount() != null) {
+				metadata
+					.add(
+						XmlSerializationUtils
+							.asXmlElement("processingchargeamount", r.getProcessingchargeamount().getValue()));
+				metadata
+					.add(
+						XmlSerializationUtils
+							.asXmlElement("processingchargecurrency", r.getProcessingchargecurrency().getValue()));
 			}
 		}
 
@@ -926,6 +941,23 @@ public class XmlRecordFactory implements Serializable {
 		return metadata;
 	}
 
+	private List<String> measuresAsXml(List<Measure> measures) {
+		return measures
+			.stream()
+			.flatMap(
+				m -> m
+					.getUnit()
+					.stream()
+					.map(
+						u -> Lists
+							.newArrayList(
+								new Tuple2<>("id", m.getId()),
+								new Tuple2<>("key", u.getKey()),
+								new Tuple2<>("value", u.getValue())))
+					.map(l -> XmlSerializationUtils.asXmlElement("measure", l)))
+			.collect(Collectors.toList());
+	}
+
 	private String getAuthorPidType(final String s) {
 		return XmlSerializationUtils
 			.escapeXml(s)
@@ -1177,14 +1209,8 @@ public class XmlRecordFactory implements Serializable {
 
 					if (instance.getRefereed() != null) {
 						fields
-							.addAll(
-								instance
-									.getRefereed()
-									.stream()
-									.filter(Objects::nonNull)
-									.filter(r -> !r.isBlank())
-									.map(r -> XmlSerializationUtils.mapQualifier("refereed", r))
-									.collect(Collectors.toList()));
+							.add(
+								XmlSerializationUtils.mapQualifier("refereed", instance.getRefereed()));
 					}
 					if (instance.getProcessingchargeamount() != null
 						&& isNotBlank(instance.getProcessingchargeamount())) {
@@ -1328,13 +1354,20 @@ public class XmlRecordFactory implements Serializable {
 					.map(Instance::getAccessright)
 					.min(new AccessRightComparator<AccessRight>())
 					.orElse(XmlInstance.UNKNOWN_ACCESS_RIGHT));
+		instance
+			.setRefereed(
+				instances
+					.stream()
+					.map(Pair::getValue)
+					.map(i -> Optional.ofNullable(i.getRefereed()).orElse(XmlInstance.UNKNOWN_REVIEW_LEVEL))
+					.min(new RefereedComparator())
+					.orElse(XmlInstance.UNKNOWN_REVIEW_LEVEL));
 
 		instances.forEach(p -> {
 			final Instance i = p.getRight();
 			instance.getCollectedfrom().add(i.getCollectedfrom());
 			instance.getHostedby().add(i.getHostedby());
 			instance.getInstancetype().add(i.getInstancetype());
-			instance.getRefereed().add(i.getRefereed());
 			instance
 				.setProcessingchargeamount(
 					Optional.ofNullable(i.getProcessingchargeamount()).map(apc -> apc.getValue()).orElse(null));

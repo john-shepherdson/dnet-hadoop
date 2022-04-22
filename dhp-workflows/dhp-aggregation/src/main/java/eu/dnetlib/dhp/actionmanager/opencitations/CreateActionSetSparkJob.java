@@ -14,6 +14,7 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.actionmanager.opencitations.model.COCI;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -83,10 +85,13 @@ public class CreateActionSetSparkJob implements Serializable {
 	private static void extractContent(SparkSession spark, String inputPath, String outputPath,
 		boolean shouldDuplicateRels) {
 		spark
-			.sqlContext()
-			.createDataset(spark.sparkContext().textFile(inputPath + "/*", 6000), Encoders.STRING())
+			.read()
+			.textFile(inputPath + "/*")
+			.map(
+				(MapFunction<String, COCI>) value -> OBJECT_MAPPER.readValue(value, COCI.class),
+				Encoders.bean(COCI.class))
 			.flatMap(
-				(FlatMapFunction<String, Relation>) value -> createRelation(value, shouldDuplicateRels).iterator(),
+				(FlatMapFunction<COCI, Relation>) value -> createRelation(value, shouldDuplicateRels).iterator(),
 				Encoders.bean(Relation.class))
 			.filter((FilterFunction<Relation>) value -> value != null)
 			.toJavaRDD()
@@ -98,26 +103,30 @@ public class CreateActionSetSparkJob implements Serializable {
 
 	}
 
-	private static List<Relation> createRelation(String value, boolean duplicate) {
-		String[] line = value.split(",");
-		if (!line[1].startsWith("10.")) {
-			return new ArrayList<>();
-		}
+	private static List<Relation> createRelation(COCI value, boolean duplicate) {
+
 		List<Relation> relationList = new ArrayList<>();
 
-		String citing = ID_PREFIX + IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", line[1]));
-		final String cited = ID_PREFIX + IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", line[2]));
+		String citing = ID_PREFIX
+			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", value.getCiting()));
+		final String cited = ID_PREFIX
+			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", value.getCited()));
 
-		relationList
-			.addAll(
-				getRelations(
-					citing,
-					cited));
+		if (!citing.equals(cited)) {
+			relationList
+				.addAll(
+					getRelations(
+						citing,
+						cited));
 
-		if (duplicate && line[1].endsWith(".refs")) {
-			citing = ID_PREFIX + IdentifierFactory
-				.md5(CleaningFunctions.normalizePidValue("doi", line[1].substring(0, line[1].indexOf(".refs"))));
-			relationList.addAll(getRelations(citing, cited));
+			if (duplicate && value.getCiting().endsWith(".refs")) {
+				citing = ID_PREFIX + IdentifierFactory
+					.md5(
+						CleaningFunctions
+							.normalizePidValue(
+								"doi", value.getCiting().substring(0, value.getCiting().indexOf(".refs"))));
+				relationList.addAll(getRelations(citing, cited));
+			}
 		}
 
 		return relationList;

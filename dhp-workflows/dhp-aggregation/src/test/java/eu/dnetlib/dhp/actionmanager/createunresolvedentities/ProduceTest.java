@@ -196,6 +196,9 @@ public class ProduceTest {
 		final String doi = "unresolved::10.3390/s18072310::doi";
 		JavaRDD<Result> tmp = getResultJavaRDD();
 
+		tmp
+			.filter(row -> row.getId().equals(doi))
+			.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
 		Assertions
 			.assertEquals(
 				3, tmp

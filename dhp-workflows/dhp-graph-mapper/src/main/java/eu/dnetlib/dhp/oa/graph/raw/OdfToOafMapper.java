@@ -25,7 +25,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
-	public static final String HTTP_DX_DOI_PREIFX = "http://dx.doi.org/";
+	public static final String HTTP_DX_DOI_PREIFX = "https://dx.doi.org/";
 
 	public OdfToOafMapper(final VocabularyGroup vocs, final boolean invisible, final boolean shouldHashId,
 		final boolean forceOrginalId) {

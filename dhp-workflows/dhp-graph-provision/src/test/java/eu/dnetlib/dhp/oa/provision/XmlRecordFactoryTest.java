@@ -23,6 +23,7 @@ import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
+import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -65,7 +66,17 @@ public class XmlRecordFactoryTest {
 		assertEquals("doi", doc.valueOf("//instance/alternateidentifier/@classid"));
 		assertEquals("10.5689/LIB.2018.2853550", doc.valueOf("//instance/alternateidentifier/text()"));
 
-		assertEquals(3, doc.selectNodes("//instance").size());
+		assertEquals(2, doc.selectNodes("//instance").size());
+
+		assertEquals("1721.47", doc.valueOf("//processingchargeamount/text()"));
+		assertEquals("EUR", doc.valueOf("//processingchargecurrency/text()"));
+
+		assertEquals(
+			"1.00889953098e-08", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'influence']/@value"));
+		assertEquals(
+			"30.6576853333", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity_alt']/@value"));
+		assertEquals(
+			"4.62970429725e-08", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity']/@value"));
 	}
 
 	@Test
@@ -128,5 +139,34 @@ public class XmlRecordFactoryTest {
 		assertNotNull(doc);
 		System.out.println(doc.asXML());
 		assertEquals("", doc.valueOf("//rel/validated"));
+	}
+
+	@Test
+	public void testDatasource() throws IOException, DocumentException {
+		final ContextMapper contextMapper = new ContextMapper();
+
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+			XmlConverterJob.schemaLocation);
+
+		final Datasource d = OBJECT_MAPPER
+			.readValue(IOUtils.toString(getClass().getResourceAsStream("datasource.json")), Datasource.class);
+
+		final String xml = xmlRecordFactory.build(new JoinedEntity<>(d));
+
+		assertNotNull(xml);
+
+		final Document doc = new SAXReader().read(new StringReader(xml));
+
+		assertNotNull(doc);
+
+		System.out.println(doc.asXML());
+
+		// TODO add assertions based of values extracted from the XML record
+
+		assertEquals("National", doc.valueOf("//jurisdiction/@classname"));
+		assertEquals("true", doc.valueOf("//thematic"));
+		assertEquals("Journal article", doc.valueOf("//contentpolicy/@classname"));
+		assertEquals("Journal archive", doc.valueOf("//datasourcetypeui/@classname"));
+
 	}
 }

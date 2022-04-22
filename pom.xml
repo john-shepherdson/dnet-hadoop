@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.dnetlib.dhp</groupId>
 	<artifactId>dhp</artifactId>
-	<version>1.2.4-SNAPSHOT</version>
+	<version>1.2.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<licenses>
@@ -568,6 +568,9 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
 					<version>3.9.1</version>
+					<configuration>
+						<skip>${dhp.site.skip}</skip>
+					</configuration>
 				</plugin>
 
 				<plugin>
@@ -708,7 +711,7 @@
 						<param>${project.basedir}/src/test/scala</param>
 					</testSourceDirectories>
 					<validateOnly>false</validateOnly>
-					<onlyChangedFiles>true</onlyChangedFiles>
+					<onlyChangedFiles>false</onlyChangedFiles>
 					<branch>: git rev-parse --abbrev-ref HEAD</branch>
 					<useSpecifiedRepositories>false</useSpecifiedRepositories>
 				</configuration>
@@ -808,6 +811,7 @@
 		<dhp.spark.version>2.4.0.cloudera2</dhp.spark.version>
 		<dhp.jackson.version>2.9.6</dhp.jackson.version>
 		<dhp.commons.lang.version>3.5</dhp.commons.lang.version>
+		<dhp.site.skip>true</dhp.site.skip>
 		<dhp.guava.version>11.0.2</dhp.guava.version>
 		<scala.version>2.11.12</scala.version>
 		<junit-jupiter.version>5.6.1</junit-jupiter.version>
@@ -818,7 +822,7 @@
 		<dnet-actionmanager-api.version>[4.0.3]</dnet-actionmanager-api.version>
 		<dnet-actionmanager-common.version>[6.0.5]</dnet-actionmanager-common.version>
 		<dnet-openaire-broker-common.version>[3.1.6]</dnet-openaire-broker-common.version>
-		<dnet-pace-core.version>[4.1.7]</dnet-pace-core.version>
+		<dnet-pace-core.version>[4.1.12]</dnet-pace-core.version>
 		<cnr-rmi-api.version>[2.6.1]</cnr-rmi-api.version>
 		<solr.version>7.5.0</solr.version>
 		<okhttp.version>4.7.2</okhttp.version>

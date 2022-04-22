@@ -70,6 +70,8 @@ class DataciteToOAFTest extends AbstractVocabularyTest {
 
     assertEquals(100, nativeSize)
 
+    spark.read.load(targetPath).printSchema();
+
     val result: Dataset[Oaf] = spark.read.load(targetPath).as[Oaf]
 
     result

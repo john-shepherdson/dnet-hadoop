@@ -75,7 +75,7 @@ public class GraphCleaningFunctionsTest {
 	}
 
 	@Test
-	void testFilter_false() throws Exception {
+	void testFilter_invisible_true() throws Exception {
 
 		assertNotNull(vocabularies);
 		assertNotNull(mapping);
@@ -87,11 +87,11 @@ public class GraphCleaningFunctionsTest {
 		assertTrue(p_in instanceof Result);
 		assertTrue(p_in instanceof Publication);
 
-		assertEquals(false, GraphCleaningFunctions.filter(p_in));
+		assertEquals(true, GraphCleaningFunctions.filter(p_in));
 	}
 
 	@Test
-	void testFilter_true() throws Exception {
+	void testFilter_true_nothing_to_filter() throws Exception {
 
 		assertNotNull(vocabularies);
 		assertNotNull(mapping);
