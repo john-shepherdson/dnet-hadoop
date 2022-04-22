@@ -20,10 +20,15 @@
         <property>
             <name>contextId</name>
             <value>sobigdata</value>
+            <description>It is the context id that should be removed from the result if the condition is matched.
+            Now it is just sobigdata. In a futere implementation I plan to have the contextId as value in a json
+            where to specify also the constraints that should be verified to remove the context from the result</description>
         </property>
         <property>
             <name>verifyParam</name>
             <value>gcube </value>
+            <description>It is the constrint to be verified. This time is hardcoded as gcube and it is searched for in
+            the title. If title starts with gcube than the context sobigdata will be removed by the result if present</description>
         </property>
 
         <property>
