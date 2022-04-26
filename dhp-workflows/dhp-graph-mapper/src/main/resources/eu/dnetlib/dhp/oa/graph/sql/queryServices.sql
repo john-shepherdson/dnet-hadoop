@@ -1,6 +1,6 @@
 SELECT
 	d.id                                                                                                       AS datasourceid,
-	d.id || array_agg(distinct di.pid)                                                                         AS identities,
+	array_remove(d.id || array_agg(distinct di.pid) filter (where di.pid like 'piwik%') || array_agg(distinct dds.duplicate), NULL) AS identities,
 	d.officialname                                                                                             AS officialname,
 	d.englishname                                                                                              AS englishname,
 	d.contactemail                                                                                             AS contactemail,
@@ -57,7 +57,8 @@ SELECT
 	NULL                                                                                                       AS odpolicies,
 	ARRAY(SELECT trim(s)
 	      FROM unnest(string_to_array(d.languages, ',')) AS s)                                                 AS odlanguages,
-	
+	ARRAY(SELECT trim(s)
+	      FROM unnest(string_to_array(d.languages, ',')) AS s)                                                 AS languages,
 	-- Term provided only by OpenDOAR: 
 	--   probably updating the TR it could be replaced by research_entity_types[]
 	--   But a study on the vocabulary terms is needed
@@ -74,40 +75,54 @@ SELECT
 	d.releaseenddate                                                                                           AS releaseenddate,
 	d.missionstatementurl                                                                                      AS missionstatementurl,
 	-- the following 2 fields (provided by re3data) have been replaced by research_entity_types[]
-	--  VALUE 'Research Data' : d.dataprovider                                                                                             AS dataprovider,
-	--  VALUE 'Services'      : d.serviceprovider                                                                                          AS serviceprovider,
+	--  VALUE 'Research Data' : d.dataprovider                                                                 AS dataprovider,
+	--  VALUE 'Services'      : d.serviceprovider                                                              AS serviceprovider,
 	d.databaseaccesstype                                                                                       AS databaseaccesstype,
 	d.datauploadtype                                                                                           AS datauploadtype,
 	d.databaseaccessrestriction                                                                                AS databaseaccessrestriction,
 	d.datauploadrestriction                                                                                    AS datauploadrestriction,
 	-- REPLACED BY version_control : d.versioning                                                                                               AS versioning,
-	d.version_control                                                                                               AS versioning,
+	d.version_control                                                                                          AS versioning,
+	d.version_control                                                                                          AS versioncontrol,
 	d.citationguidelineurl                                                                                     AS citationguidelineurl,
-	-- REMOVED (it was provided only by re3data: yes, no, unknown): d.qualitymanagementkind                                                                                    AS qualitymanagementkind,
+
 	d.pidsystems                                                                                               AS pidsystems,
 	d.certificates                                                                                             AS certificates,
 	ARRAY[]::text[]                                                                                            AS policies,
-	dc.id                                                                                                      AS collectedfromid,
-	dc.officialname                                                                                            AS collectedfromname,
+	array_remove(dc.id||'@@@'||dc.officialname || array_agg(distinct dds_cf.id||'@@@'||dds_cf.officialname), NULL) AS collectedfrom,
+
 	d._typology_to_remove_||'@@@dnet:datasource_typologies'                                                    AS datasourcetype,
-	d.eosc_type||'@@@dnet:eosc_types'                                                                          AS eosc_type,
-	d.eosc_datasource_type||'@@@dnet:eosc_datasource_types'                                                    AS eosc_datasoorce_type,
+	d.eosc_type||'@@@dnet:eosc_types'                                                                          AS eosctype,
+	d.eosc_datasource_type||'@@@dnet:eosc_datasource_types'                                                    AS eoscdatasourcetype,
 	'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions'                                             AS provenanceaction,
 	d.issn                                                                                                     AS issnPrinted,
 	d.eissn                                                                                                    AS issnOnline,
 	d.lissn                                                                                                    AS issnLinking,
+	d.research_entity_types                                                                                    AS researchentitytypes,
 	d.consenttermsofuse                                                                                        AS consenttermsofuse,
 	d.fulltextdownload                                                                                         AS fulltextdownload,
 	d.consenttermsofusedate                                                                                    AS consenttermsofusedate,
-	d.jurisdiction||'@@@eosc:jurisdictions'                                                                   AS jurisdiction,
-	d.thematic                                                                                                AS thematic,
-	-- REMOVED ???: d.knowledge_graph                                                                                         AS knowledgegraph,
-	array(select unnest(d.content_policies)||'@@@eosc:contentpolicies')                                       AS contentpolicies
+	d.lastconsenttermsofusedate                                                                                AS lastconsenttermsofusedate,
+	d.jurisdiction||'@@@eosc:jurisdictions'                                                                    AS jurisdiction,
+	d.thematic                                                                                                 AS thematic,
+	-- REMOVED ???: d.knowledge_graph                                                                          AS knowledgegraph,
+	array(select unnest(d.content_policies)||'@@@eosc:contentpolicies')                                        AS contentpolicies,
+	d.submission_policy_url                                                                                    AS submissionpolicyurl,
+	d.preservation_policy_url                                                                                  AS preservationpolicyurl,
+	d.research_product_access_policies                                                                         AS researchproductaccesspolicies,
+    d.research_product_metadata_access_policies                                                                AS researchproductmetadataaccesspolicies
 
 FROM dsm_services d
 LEFT OUTER JOIN dsm_services dc on (d.collectedfrom = dc.id)
 LEFT OUTER JOIN dsm_api a ON (d.id = a.service)
 LEFT OUTER JOIN dsm_servicepids di ON (d.id = di.service)
+LEFT OUTER JOIN dsm_dedup_services dds ON (d.id = dds.id)
+LEFT OUTER JOIN dsm_services dds_dup ON (dds.duplicate = dds_dup.id)
+LEFT OUTER JOIN dsm_services dds_cf ON (dds_dup.collectedfrom = dds_cf.id)
+
+
+WHERE
+    d.dedup_main_service = true
 
 GROUP BY
 	d.id,
@@ -132,7 +147,7 @@ GROUP BY
 	d.databaseaccessrestriction,
 	d.datauploadrestriction,
 	-- REPLACED BY version_control : d.versioning,
-	d.version_control
+	d.version_control,
 	d.citationguidelineurl,
 	-- REMOVED: d.qualitymanagementkind,
 	d.pidsystems,
@@ -145,4 +160,8 @@ GROUP BY
 	d.jurisdiction,
 	d.thematic,
 	-- REMOVED ???: de.knowledge_graph,
-	d.content_policies
+	d.content_policies,
+	d.submission_policy_url,
+	d.preservation_policy_url,
+	d.research_product_access_policies,
+    d.research_product_metadata_access_policies

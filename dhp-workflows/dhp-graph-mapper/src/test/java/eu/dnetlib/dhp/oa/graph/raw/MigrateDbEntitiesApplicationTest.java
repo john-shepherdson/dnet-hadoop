@@ -63,10 +63,10 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessDatasource() throws Exception {
+	public void testProcessService() throws Exception {
 		final List<TypedField> fields = prepareMocks("datasources_resultset_entry.json");
 
-		final List<Oaf> list = app.processDatasource(rs);
+		final List<Oaf> list = app.processService(rs);
 		assertEquals(1, list.size());
 		verifyMocks(fields);
 

@@ -143,8 +143,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 					smdbe.execute("queryClaims.sql", smdbe::processClaims);
 					break;
 				case openaire:
-					log.info("Processing datasources...");
-					smdbe.execute("queryDatasources.sql", smdbe::processDatasource, verifyNamespacePrefix);
+					log.info("Processing services...");
+					smdbe.execute("queryServices.sql", smdbe::processService, verifyNamespacePrefix);
 
 					log.info("Processing projects...");
 					if (dbSchema.equalsIgnoreCase("beta")) {
@@ -235,7 +235,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		dbClient.processResults(sql, consumer);
 	}
 
-	public List<Oaf> processDatasource(final ResultSet rs) {
+	public List<Oaf> processService(final ResultSet rs) {
 		try {
 			final DataInfo info = prepareDataInfo(rs);
 
