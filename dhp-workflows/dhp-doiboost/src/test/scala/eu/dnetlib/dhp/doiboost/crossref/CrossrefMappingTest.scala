@@ -73,6 +73,20 @@ class CrossrefMappingTest {
 
   }
 
+
+  @Test
+  def crossrefIssueDateTest(): Unit = {
+    val json = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/doiboost/crossref/issue_date.json")).mkString
+    assertNotNull(json)
+    assertFalse(json.isEmpty)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    assertTrue(resultList.nonEmpty)
+
+    val items = resultList.filter(p => p.isInstanceOf[Result])
+
+    println(mapper.writeValueAsString(items.head))
+  }
+
   @Test
   def testOrcidID(): Unit = {
     val json = Source
@@ -82,7 +96,7 @@ class CrossrefMappingTest {
       .mkString
 
     assertNotNull(json)
-    assertFalse(json.isEmpty);
+    assertFalse(json.isEmpty)
 
     val resultList: List[Oaf] = Crossref2Oaf.convert(json)
 
