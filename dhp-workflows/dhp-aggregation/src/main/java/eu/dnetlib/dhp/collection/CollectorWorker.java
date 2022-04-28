@@ -117,9 +117,9 @@ public class CollectorWorker extends ReportingJob {
 			case rest_json2xml:
 				return new RestCollectorPlugin(clientParams);
 			case file:
-				return new FileCollectorPlugin();
+				return new FileCollectorPlugin(fileSystem);
 			case fileGZip:
-				return new FileGZipCollectorPlugin();
+				return new FileGZipCollectorPlugin(fileSystem);
 			case other:
 				final CollectorPlugin.NAME.OTHER_NAME plugin = Optional
 					.ofNullable(api.getParams().get("other_plugin_type"))
