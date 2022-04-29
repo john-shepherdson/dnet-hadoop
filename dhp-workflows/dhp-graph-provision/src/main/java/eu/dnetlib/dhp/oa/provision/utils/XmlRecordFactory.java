@@ -695,12 +695,6 @@ public class XmlRecordFactory implements Serializable {
 							XmlSerializationUtils
 								.asXmlElement("citationguidelineurl", ds.getCitationguidelineurl().getValue()));
 				}
-				if (ds.getQualitymanagementkind() != null) {
-					metadata
-						.add(
-							XmlSerializationUtils
-								.asXmlElement("qualitymanagementkind", ds.getQualitymanagementkind().getValue()));
-				}
 				if (ds.getPidsystems() != null) {
 					metadata
 						.add(XmlSerializationUtils.asXmlElement("pidsystems", ds.getPidsystems().getValue()));
