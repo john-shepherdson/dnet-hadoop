@@ -8,12 +8,13 @@ fi
 
 export TARGET=$1
 export SCRIPT_PATH=$2
+export HIVE_OPTS="-hiveconf mapred.job.queue.name=analytics -hiveconf hive.spark.client.connect.timeout=120000ms -hiveconf hive.spark.client.server.connect.timeout=300000ms"
 
 echo "Getting file from " $SCRIPT_PATH
 hdfs dfs -copyToLocal $SCRIPT_PATH
 
 echo "Creating indicators"
-hive --database ${TARGET} -e "show tables" | grep -v WARN | sed "s/^\(.*\)/analyze table ${TARGET}.\1 compute statistics;/" > foo
-hive -f foo
-hive --database ${TARGET} -f step16-createIndicatorsTables.sql
+hive $HIVE_OPTS --database ${TARGET} -e "show tables" | grep -v WARN | sed "s/^\(.*\)/analyze table ${TARGET}.\1 compute statistics;/" > foo
+hive $HIVE_OPTS -f foo
+hive $HIVE_OPTS --database ${TARGET} -f step16-createIndicatorsTables.sql
 echo "Indicators created"
