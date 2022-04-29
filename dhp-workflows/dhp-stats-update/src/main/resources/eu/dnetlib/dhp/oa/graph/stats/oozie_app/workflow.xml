@@ -67,10 +67,14 @@
             	<name>hive.txn.timeout</name>
             	<value>${hive_timeout}</value>
             </property>
+	<property>
+	    <name>mapred.job.queue.name</name>
+	    <value>analytics</value>
+	</property>
         </configuration>
     </global>
 
-    <start to="Step1"/>
+    <start to="Step16-createIndicatorsTables"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -276,7 +280,7 @@
             <argument>${wf:appPath()}/scripts/step16-createIndicatorsTables.sql</argument>
             <file>indicators.sh</file>
         </shell>
-        <ok to="Step16_1-definitions"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 
