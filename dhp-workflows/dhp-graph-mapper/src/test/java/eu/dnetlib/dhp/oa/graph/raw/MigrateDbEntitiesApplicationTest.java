@@ -75,6 +75,12 @@ public class MigrateDbEntitiesApplicationTest {
 			.stream()
 			.map(KeyValue::getKey)
 			.forEach(dsId -> assertValidId(dsId));
+
+		assertEquals(1, ds.getPid().size());
+		assertEquals("r3d100010218", ds.getPid().get(0).getValue());
+		assertEquals("re3data", ds.getPid().get(0).getQualifier().getClassid());
+		assertEquals("dnet:pid_types", ds.getPid().get(0).getQualifier().getSchemeid());
+
 		assertEquals(getValueAsString("officialname", fields), ds.getOfficialname().getValue());
 		assertEquals(getValueAsString("englishname", fields), ds.getEnglishname().getValue());
 		assertEquals(getValueAsString("websiteurl", fields), ds.getWebsiteurl().getValue());
