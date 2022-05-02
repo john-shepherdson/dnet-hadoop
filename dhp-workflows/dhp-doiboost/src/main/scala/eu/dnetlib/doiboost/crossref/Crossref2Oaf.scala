@@ -584,12 +584,10 @@ case object Crossref2Oaf {
         if (dp.length == 10) {
           return GraphCleaningFunctions.cleanDate(dp)
         }
-      }
-      else if (res.size ==2) {
+      } else if (res.size == 2) {
         val dp = f"${res.head}-${res(1)}%02d-01"
         return GraphCleaningFunctions.cleanDate(dp)
-      }
-      else if (res.size ==1) {
+      } else if (res.size == 1) {
         return GraphCleaningFunctions.cleanDate(s"${res.head}-01-01")
       }
     }
