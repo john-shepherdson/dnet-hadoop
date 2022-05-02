@@ -1,5 +1,5 @@
 SELECT
-	d.id                                                                                                       AS datasourceid,
+	d.id                                                                                                       AS id,
 	array_remove(d.id || array_agg(distinct CASE WHEN dp.pid like 'piwik%' THEN di.pid ELSE NULL END) || array_agg(distinct dds.duplicate), NULL)                AS originalid,
 	array_remove(array_agg(distinct CASE WHEN di.pid NOT LIKE 'piwik%' THEN di.pid||'###'||di.issuertype||'@@@'||'dnet:pid_types' ELSE NULL END), NULL) as pid,
 	d.officialname                                                                                             AS officialname,

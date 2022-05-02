@@ -233,7 +233,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 			final Datasource ds = new Datasource();
 
-			ds.setId(createOpenaireId(10, rs.getString("datasourceid"), true));
+			ds.setId(createOpenaireId(10, rs.getString("id"), true));
 			ds
 				.setOriginalId(
 					Arrays
