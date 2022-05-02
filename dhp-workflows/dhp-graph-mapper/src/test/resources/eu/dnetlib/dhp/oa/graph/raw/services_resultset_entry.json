@@ -141,13 +141,6 @@
 		]
 	},
 	{
-		"field": "odcontenttypes",
-		"type": "array",
-		"value": [
-			"Journal articles"
-		]
-	},
-	{
 		"field": "accessinfopackage",
 		"type": "array",
 		"value": [
@@ -167,16 +160,6 @@
 	{
 		"field": "missionstatementurl",
 		"type": "string",
-		"value": null
-	},
-	{
-		"field": "dataprovider",
-		"type": "boolean",
-		"value": null
-	},
-	{
-		"field": "serviceprovider",
-		"type": "boolean",
 		"value": null
 	},
 	{

@@ -109,7 +109,6 @@ SELECT
 	d.lastconsenttermsofusedate                                                                                AS lastconsenttermsofusedate,
 	d.jurisdiction||'@@@eosc:jurisdictions'                                                                    AS jurisdiction,
 	d.thematic                                                                                                 AS thematic,
-	-- REMOVED ???: d.knowledge_graph                                                                          AS knowledgegraph,
 	array(select unnest(d.content_policies)||'@@@eosc:contentpolicies')                                        AS contentpolicies,
 	nullif(trim(d.submission_policy_url), '')                                                                  AS submissionpolicyurl,
 	nullif(trim(d.preservation_policy_url), '')                                                                                  AS preservationpolicyurl,

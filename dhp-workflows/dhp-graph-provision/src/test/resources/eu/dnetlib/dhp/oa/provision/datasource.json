@@ -254,24 +254,6 @@
     }
   ],
   "languages" : [ "English", "German" ],
-  "odcontenttypes": [
-    {
-      "value": "Journal articles",
-      "dataInfo": {
-        "invisible": false,
-        "inferred": false,
-        "deletedbyinference": false,
-        "trust": "0.900",
-        "inferenceprovenance": null,
-        "provenanceaction": {
-          "classid": "sysimport:crosswalk:entityregistry",
-          "classname": "sysimport:crosswalk:entityregistry",
-          "schemeid": "dnet:provenanceActions",
-          "schemename": "dnet:provenanceActions"
-        }
-      }
-    }
-  ],
   "accessinfopackage": [
     {
       "value": "http://www.revista.vocesdelaeducacion.com.mx/index.php/index/oai",
@@ -387,7 +369,6 @@
     "schemename": "eosc:jurisdictions"
   },
   "thematic": true,
-  "knowledgegraph": true,
   "contentpolicies": [
     {
       "classid": "Journal article",

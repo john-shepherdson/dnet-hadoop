@@ -148,10 +148,10 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 					log.info("Processing Organizations...");
 					smdbe.execute("queryOrganizations.sql", smdbe::processOrganization, verifyNamespacePrefix);
 
-					log.info("Processing relationsNoRemoval ds <-> orgs ...");
+					log.info("Processing relations services <-> orgs ...");
 					smdbe
 						.execute(
-							"queryDatasourceOrganization.sql", smdbe::processDatasourceOrganization,
+							"queryServiceOrganization.sql", smdbe::processServiceOrganization,
 							verifyNamespacePrefix);
 
 					log.info("Processing projects <-> orgs ...");
@@ -268,13 +268,10 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			ds.setOdpolicies(field(rs.getString("odpolicies"), info));
 			ds.setOdlanguages(prepareListFields(rs.getArray("odlanguages"), info));
 			ds.setLanguages(listValues(rs.getArray("languages")));
-			ds.setOdcontenttypes(prepareListFields(rs.getArray("odcontenttypes"), info));
 			ds.setAccessinfopackage(prepareListFields(rs.getArray("accessinfopackage"), info));
 			ds.setReleasestartdate(field(asString(rs.getDate("releasestartdate")), info));
 			ds.setReleaseenddate(field(asString(rs.getDate("releaseenddate")), info));
 			ds.setMissionstatementurl(field(rs.getString("missionstatementurl"), info));
-			ds.setDataprovider(field(rs.getBoolean("dataprovider"), info));
-			ds.setServiceprovider(field(rs.getBoolean("serviceprovider"), info));
 			ds.setDatabaseaccesstype(field(rs.getString("databaseaccesstype"), info));
 			ds.setDatauploadtype(field(rs.getString("datauploadtype"), info));
 			ds.setDatabaseaccessrestriction(field(rs.getString("databaseaccessrestriction"), info));
@@ -293,10 +290,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 						rs.getString("issnLinking"), info)); // Journal
 
 			ds.setResearchentitytypes(listValues(rs.getArray("researchentitytypes")));
-			ds.setProvidedproducttypes(listValues(rs.getArray("providedproducttypes")));
 			ds.setJurisdiction(prepareQualifierSplitting(rs.getString("jurisdiction")));
 			ds.setThematic(rs.getBoolean("thematic"));
-			ds.setKnowledgegraph(rs.getBoolean("knowledgegraph"));
 			ds.setContentpolicies(prepareListOfQualifiers(rs.getArray("contentpolicies")));
 			ds.setSubmissionpolicyurl(rs.getString("submissionpolicyurl"));
 			ds.setPreservationpolicyurl(rs.getString("preservationpolicyurl"));
@@ -434,11 +429,11 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		}
 	}
 
-	public List<Oaf> processDatasourceOrganization(final ResultSet rs) {
+	public List<Oaf> processServiceOrganization(final ResultSet rs) {
 		try {
 			final DataInfo info = prepareDataInfo(rs);
 			final String orgId = createOpenaireId(20, rs.getString("organization"), true);
-			final String dsId = createOpenaireId(10, rs.getString("datasource"), true);
+			final String dsId = createOpenaireId(10, rs.getString("service"), true);
 			final List<KeyValue> collectedFrom = listKeyValues(
 				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
 

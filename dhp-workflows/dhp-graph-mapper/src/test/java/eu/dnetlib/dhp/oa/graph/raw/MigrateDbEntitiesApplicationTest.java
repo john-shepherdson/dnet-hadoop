@@ -130,9 +130,6 @@ public class MigrateDbEntitiesApplicationTest {
 			ds.getOdlanguages().stream().map(Field::getValue).collect(Collectors.toList()));
 		assertEquals(getValueAsList("languages", fields), ds.getLanguages());
 		assertEquals(
-			getValueAsList("odcontenttypes", fields),
-			ds.getOdcontenttypes().stream().map(Field::getValue).collect(Collectors.toList()));
-		assertEquals(
 			getValueAsList("accessinfopackage", fields),
 			ds.getAccessinfopackage().stream().map(Field::getValue).collect(Collectors.toList()));
 		assertEquals(getValueAsString("releasestartdate", fields), ds.getReleasestartdate());
@@ -155,13 +152,11 @@ public class MigrateDbEntitiesApplicationTest {
 		assertEquals(getValueAsString("certificates", fields), ds.getCertificates());
 
 		assertEquals(getValueAsList("researchentitytypes", fields), ds.getResearchentitytypes());
-		assertEquals(getValueAsList("providedproducttypes", fields), ds.getProvidedproducttypes());
 
 		assertEquals("National", ds.getJurisdiction().getClassid());
 		assertEquals("eosc:jurisdictions", ds.getJurisdiction().getSchemeid());
 
 		assertTrue(ds.getThematic());
-		assertTrue(ds.getKnowledgegraph());
 
 		HashSet<String> cpSchemeId = ds
 			.getContentpolicies()
@@ -246,7 +241,7 @@ public class MigrateDbEntitiesApplicationTest {
 	public void testProcessDatasourceOrganization() throws Exception {
 		final List<TypedField> fields = prepareMocks("datasourceorganization_resultset_entry.json");
 
-		final List<Oaf> list = app.processDatasourceOrganization(rs);
+		final List<Oaf> list = app.processServiceOrganization(rs);
 
 		assertEquals(2, list.size());
 		verifyMocks(fields);
