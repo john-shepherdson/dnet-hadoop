@@ -56,10 +56,10 @@ SELECT
 	d.description                                                                                              AS description,
 	NULL                                                                                                       AS odpolicies,
 	array_remove(ARRAY(SELECT trim(s)
-	      FROM unnest(string_to_array(regexp_replace(d.languages, '{|}|"', '', 'g') ',')) AS s), '{}')         AS odlanguages,
+	      FROM unnest(string_to_array(regexp_replace(d.languages, '{|}|"', '', 'g'), ',')) AS s), '{}')         AS odlanguages,
 	array_remove(ARRAY(SELECT trim(s)
-	      FROM unnest(string_to_array(regexp_replace(d.languages, '{|}|"', '', 'g') ',')) AS s), '{}')         AS languages,
-	-- Term provided only by OpenDOAR: 
+	      FROM unnest(string_to_array(regexp_replace(d.languages, '{|}|"', '', 'g'), ',')) AS s), '{}')         AS languages,
+	-- Term provided only by     OpenDOAR:
 	--   probably updating the TR it could be replaced by research_entity_types[]
 	--   But a study on the vocabulary terms is needed
 	--   REMOVED: ARRAY(SELECT trim(s) FROM unnest(string_to_array(d.od_contenttypes, '-')) AS s)              AS odcontenttypes,
