@@ -774,11 +774,6 @@ public class XmlRecordFactory implements Serializable {
 					metadata.add(XmlSerializationUtils.asXmlElement("thematic", ds.getThematic().toString()));
 				}
 
-				if (ds.getKnowledgegraph() != null) {
-					metadata
-						.add(XmlSerializationUtils.asXmlElement("knowledgegraph", ds.getKnowledgegraph().toString()));
-				}
-
 				if (ds.getContentpolicies() != null) {
 					metadata
 						.addAll(
