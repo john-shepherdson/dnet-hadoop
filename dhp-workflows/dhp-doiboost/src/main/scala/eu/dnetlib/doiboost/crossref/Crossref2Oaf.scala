@@ -280,10 +280,10 @@ case object Crossref2Oaf {
       instance.setDateofacceptance(asField(createdDate.getValue))
     }
     val s: List[String] = List("https://doi.org/" + doi)
-//    val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null && p.toLowerCase().contains(doi.toLowerCase())).distinct
-//    if (links.nonEmpty) {
-//      instance.setUrl(links.asJava)
-//    }
+    //    val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null && p.toLowerCase().contains(doi.toLowerCase())).distinct
+    //    if (links.nonEmpty) {
+    //      instance.setUrl(links.asJava)
+    //    }
     if (s.nonEmpty) {
       instance.setUrl(s.asJava)
     }
@@ -584,12 +584,10 @@ case object Crossref2Oaf {
         if (dp.length == 10) {
           return GraphCleaningFunctions.cleanDate(dp)
         }
-      }
-      else if (res.size ==2) {
+      } else if (res.size == 2) {
         val dp = f"${res.head}-${res(1)}%02d-01"
         return GraphCleaningFunctions.cleanDate(dp)
-      }
-      else if (res.size ==1) {
+      } else if (res.size == 1) {
         return GraphCleaningFunctions.cleanDate(s"${res.head}-01-01")
       }
     }
