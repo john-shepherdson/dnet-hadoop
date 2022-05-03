@@ -27,6 +27,8 @@ public class Constants {
 	public static final String UPDATE_CLASS_NAME = "Inferred by OpenAIRE";
 	public static final String UPDATE_MEASURE_BIP_CLASS_ID = "measure:bip";
 	public static final String UPDATE_SUBJECT_SDG_CLASS_ID = "subject:sdg";
+	public static final String UPDATE_MEASURE_USAGE_COUNTS_CLASS_ID = "measure:usage_counts";
+	public static final String UPDATE_KEY_USAGE_COUNTS = "count";
 
 	public static final String FOS_CLASS_ID = "FOS";
 	public static final String FOS_CLASS_NAME = "Fields of Science and Technology classification";
