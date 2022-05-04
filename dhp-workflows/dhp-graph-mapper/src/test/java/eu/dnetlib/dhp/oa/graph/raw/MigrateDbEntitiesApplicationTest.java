@@ -12,8 +12,11 @@ import java.sql.Array;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,12 +31,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,22 +61,32 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessDatasource() throws Exception {
-		final List<TypedField> fields = prepareMocks("datasources_resultset_entry.json");
+	public void testProcessService() throws Exception {
+		final List<TypedField> fields = prepareMocks("services_resultset_entry.json");
 
-		final List<Oaf> list = app.processDatasource(rs);
+		final List<Oaf> list = app.processService(rs);
 		assertEquals(1, list.size());
 		verifyMocks(fields);
 
 		final Datasource ds = (Datasource) list.get(0);
 		assertValidId(ds.getId());
-		assertValidId(ds.getCollectedfrom().get(0).getKey());
+		ds
+			.getCollectedfrom()
+			.stream()
+			.map(KeyValue::getKey)
+			.forEach(dsId -> assertValidId(dsId));
+
+		assertEquals(1, ds.getPid().size());
+		assertEquals("r3d100010218", ds.getPid().get(0).getValue());
+		assertEquals("re3data", ds.getPid().get(0).getQualifier().getClassid());
+		assertEquals("dnet:pid_types", ds.getPid().get(0).getQualifier().getSchemeid());
+
 		assertEquals(getValueAsString("officialname", fields), ds.getOfficialname().getValue());
 		assertEquals(getValueAsString("englishname", fields), ds.getEnglishname().getValue());
-		assertEquals(getValueAsString("contactemail", fields), ds.getContactemail().getValue());
 		assertEquals(getValueAsString("websiteurl", fields), ds.getWebsiteurl().getValue());
+		assertEquals(getValueAsString("logourl", fields), ds.getLogourl());
+		assertEquals(getValueAsString("contactemail", fields), ds.getContactemail().getValue());
 		assertEquals(getValueAsString("namespaceprefix", fields), ds.getNamespaceprefix().getValue());
-		assertEquals(getValueAsString("collectedfromname", fields), ds.getCollectedfrom().get(0).getValue());
 		assertEquals(getValueAsString("officialname", fields), ds.getJournal().getName());
 		assertEquals(getValueAsString("issnPrinted", fields), ds.getJournal().getIssnPrinted());
 		assertEquals(getValueAsString("issnOnline", fields), ds.getJournal().getIssnOnline());
@@ -90,19 +98,98 @@ public class MigrateDbEntitiesApplicationTest {
 		assertEquals("pubsrepository::journal", ds.getDatasourcetypeui().getClassid());
 		assertEquals("dnet:datasource_typologies_ui", ds.getDatasourcetypeui().getSchemeid());
 
+		assertEquals("Data Source", ds.getEosctype().getClassid());
+		assertEquals("Data Source", ds.getEosctype().getClassname());
+		assertEquals("dnet:eosc_types", ds.getEosctype().getSchemeid());
+		assertEquals("dnet:eosc_types", ds.getEosctype().getSchemename());
+
+		assertEquals("Journal archive", ds.getEoscdatasourcetype().getClassid());
+		assertEquals("Journal archive", ds.getEoscdatasourcetype().getClassname());
+		assertEquals("dnet:eosc_datasource_types", ds.getEoscdatasourcetype().getSchemeid());
+		assertEquals("dnet:eosc_datasource_types", ds.getEoscdatasourcetype().getSchemename());
+
+		assertEquals("openaire4.0", ds.getOpenairecompatibility().getClassid());
+		assertEquals("openaire4.0", ds.getOpenairecompatibility().getClassname());
+		assertEquals("dnet:datasourceCompatibilityLevel", ds.getOpenairecompatibility().getSchemeid());
+		assertEquals("dnet:datasourceCompatibilityLevel", ds.getOpenairecompatibility().getSchemename());
+
+		assertEquals(getValueAsDouble("latitude", fields).toString(), ds.getLatitude().getValue());
+		assertEquals(getValueAsDouble("longitude", fields).toString(), ds.getLongitude().getValue());
+		assertEquals(getValueAsString("dateofvalidation", fields), ds.getDateofvalidation());
+
+		assertEquals(getValueAsString("description", fields), ds.getDescription().getValue());
+
+		// TODO assertEquals(getValueAsString("subjects", fields), ds.getSubjects());
+
+		assertEquals("0.0", ds.getOdnumberofitems().getValue());
+		assertEquals(getValueAsString("odnumberofitemsdate", fields), ds.getOdnumberofitemsdate());
+		assertEquals(getValueAsString("odpolicies", fields), ds.getOdpolicies());
+
+		assertEquals(
+			getValueAsList("odlanguages", fields),
+			ds.getOdlanguages().stream().map(Field::getValue).collect(Collectors.toList()));
+		assertEquals(getValueAsList("languages", fields), ds.getLanguages());
+		assertEquals(
+			getValueAsList("accessinfopackage", fields),
+			ds.getAccessinfopackage().stream().map(Field::getValue).collect(Collectors.toList()));
+		assertEquals(getValueAsString("releasestartdate", fields), ds.getReleasestartdate());
+		assertEquals(getValueAsString("releaseenddate", fields), ds.getReleasestartdate());
+		assertEquals(getValueAsString("missionstatementurl", fields), ds.getMissionstatementurl());
+
+		assertEquals(false, ds.getDataprovider().getValue());
+		assertEquals(false, ds.getServiceprovider().getValue());
+
+		assertEquals(getValueAsString("databaseaccesstype", fields), ds.getDatabaseaccesstype());
+		assertEquals(getValueAsString("datauploadtype", fields), ds.getDatauploadtype());
+		assertEquals(getValueAsString("databaseaccessrestriction", fields), ds.getDatabaseaccessrestriction());
+		assertEquals(getValueAsString("datauploadrestriction", fields), ds.getDatauploadrestriction());
+
+		assertEquals(false, ds.getVersioning().getValue());
+		assertEquals(false, ds.getVersioncontrol());
+
+		assertEquals(getValueAsString("citationguidelineurl", fields), ds.getCitationguidelineurl());
+		assertEquals(getValueAsString("pidsystems", fields), ds.getPidsystems());
+		assertEquals(getValueAsString("certificates", fields), ds.getCertificates());
+
+		assertEquals(getValueAsList("researchentitytypes", fields), ds.getResearchentitytypes());
+
 		assertEquals("National", ds.getJurisdiction().getClassid());
 		assertEquals("eosc:jurisdictions", ds.getJurisdiction().getSchemeid());
 
 		assertTrue(ds.getThematic());
-		assertTrue(ds.getKnowledgegraph());
 
-		assertEquals(1, ds.getContentpolicies().size());
-		assertEquals("Journal article", ds.getContentpolicies().get(0).getClassid());
-		assertEquals("eosc:contentpolicies", ds.getContentpolicies().get(0).getSchemeid());
+		HashSet<String> cpSchemeId = ds
+			.getContentpolicies()
+			.stream()
+			.map(Qualifier::getSchemeid)
+			.collect(Collectors.toCollection(HashSet::new));
+		assertTrue(cpSchemeId.size() == 1);
+		assertTrue(cpSchemeId.contains("eosc:contentpolicies"));
+		HashSet<String> cpSchemeName = ds
+			.getContentpolicies()
+			.stream()
+			.map(Qualifier::getSchemename)
+			.collect(Collectors.toCollection(HashSet::new));
+		assertTrue(cpSchemeName.size() == 1);
+		assertTrue(cpSchemeName.contains("eosc:contentpolicies"));
+		assertEquals(2, ds.getContentpolicies().size());
+		assertEquals("Taxonomic classification", ds.getContentpolicies().get(0).getClassid());
+		assertEquals("Resource collection", ds.getContentpolicies().get(1).getClassid());
+
+		assertEquals(getValueAsString("submissionpolicyurl", fields), ds.getSubmissionpolicyurl());
+		assertEquals(getValueAsString("preservationpolicyurl", fields), ds.getPreservationpolicyurl());
+
+		assertEquals(
+			getValueAsList("researchproductaccesspolicies", fields),
+			ds.getResearchproductaccesspolicies());
+		assertEquals(
+			getValueAsList("researchproductmetadataaccesspolicies", fields),
+			ds.getResearchproductmetadataaccesspolicies());
 
 		assertEquals(true, ds.getConsenttermsofuse());
 		assertEquals(true, ds.getFulltextdownload());
 		assertEquals("2022-03-11", ds.getConsenttermsofusedate());
+		assertEquals("2022-03-11", ds.getLastconsenttermsofusedate());
 	}
 
 	@Test
@@ -154,7 +241,7 @@ public class MigrateDbEntitiesApplicationTest {
 	public void testProcessDatasourceOrganization() throws Exception {
 		final List<TypedField> fields = prepareMocks("datasourceorganization_resultset_entry.json");
 
-		final List<Oaf> list = app.processDatasourceOrganization(rs);
+		final List<Oaf> list = app.processServiceOrganization(rs);
 
 		assertEquals(2, list.size());
 		verifyMocks(fields);
@@ -356,18 +443,31 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	private Float getValueAsFloat(final String name, final List<TypedField> fields) {
-		return new Float(getValueAs(name, fields).toString());
+		final Object value = getValueAs(name, fields);
+		return value != null ? new Float(value.toString()) : null;
+	}
+
+	private Double getValueAsDouble(final String name, final List<TypedField> fields) {
+		final Object value = getValueAs(name, fields);
+		return value != null ? new Double(value.toString()) : null;
+	}
+
+	private Integer getValueAsInt(final String name, final List<TypedField> fields) {
+		final Object value = getValueAs(name, fields);
+		return value != null ? new Integer(value.toString()) : null;
 	}
 
 	private <T> T getValueAs(final String name, final List<TypedField> fields) {
-		return fields
+		final Optional<T> field = fields
 			.stream()
 			.filter(f -> f.getField().equals(name))
-			.map(TypedField::getValue)
-			.filter(Objects::nonNull)
-			.map(o -> (T) o)
 			.findFirst()
-			.get();
+			.map(TypedField::getValue)
+			.map(o -> (T) o);
+		if (!field.isPresent()) {
+			return null;
+		}
+		return field.get();
 	}
 
 	private List<String> getValueAsList(final String name, final List<TypedField> fields) {

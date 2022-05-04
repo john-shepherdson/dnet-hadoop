@@ -31,6 +31,11 @@
             <description>a blacklist of nsprefixes (comma separeted)</description>
         </property>
         <property>
+            <name>reuseContent</name>
+            <value>false</value>
+            <description>reuse content in the aggregator database</description>
+        </property>
+        <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
         </property>
@@ -85,11 +90,19 @@
         </configuration>
     </global>
 
-	<start to="ImportDB"/>
+	<start to="reuse_db"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
+    <decision name="reuse_db">
+        <switch>
+            <case to="ImportDB">${wf:conf('reuseContent') eq false}</case>
+            <case to="GenerateEntities">${wf:conf('reuseContent') eq true}</case>
+            <default to="ImportDB"/>
+        </switch>
+    </decision>
 
     <action name="ImportDB">
         <java>
@@ -102,6 +115,7 @@
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--action</arg><arg>openaire</arg>
             <arg>--dbschema</arg><arg>${dbSchema}</arg>
             <arg>--nsPrefixBlacklist</arg><arg>${nsPrefixBlacklist}</arg>
         </java>
@@ -124,6 +138,55 @@
             <arg>--action</arg><arg>claims</arg>
             <arg>--nsPrefixBlacklist</arg><arg>${nsPrefixBlacklist}</arg>
         </java>
+        <ok to="GenerateEntities"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="GenerateEntities">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>GenerateEntities</name>
+            <class>eu.dnetlib.dhp.oa.graph.raw.GenerateEntitiesApplication</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePaths</arg><arg>${contentPath}/db_records,${contentPath}/db_claims</arg>
+            <arg>--targetPath</arg><arg>${workingDir}/entities</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--shouldHashId</arg><arg>true</arg>
+        </spark>
+        <ok to="GenerateGraph"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="GenerateGraph">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>GenerateGraph</name>
+            <class>eu.dnetlib.dhp.oa.graph.raw.DispatchEntitiesApplication</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${workingDir}/entities</arg>
+            <arg>--graphRawPath</arg><arg>${workingDir}/graph_aggregator</arg>
+        </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
