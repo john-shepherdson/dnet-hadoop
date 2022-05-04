@@ -322,7 +322,7 @@ public class EOSCTagJobTest {
 			.textFile(workingDir.toString() + "/input/software")
 			.map(item -> OBJECT_MAPPER.readValue(item, Software.class));
 
-		Assertions.assertEquals(10, tmp.count());
+		Assertions.assertEquals(11, tmp.count());
 
 		Assertions
 			.assertEquals(
@@ -534,11 +534,11 @@ public class EOSCTagJobTest {
 			.textFile(workingDir.toString() + "/input/dataset")
 			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
 
-		Assertions.assertEquals(10, dats.count());
+		Assertions.assertEquals(11, dats.count());
 
 		Assertions
 			.assertEquals(
-				2,
+				3,
 				dats
 					.filter(s -> s.getSubject().stream().anyMatch(sbj -> sbj.getValue().equals("EOSC::Twitter Data")))
 					.count());

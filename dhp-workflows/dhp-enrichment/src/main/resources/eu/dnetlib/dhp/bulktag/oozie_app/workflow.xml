@@ -29,7 +29,7 @@
         </configuration>
     </global>
 
-    <start to="reset_outputpath"/>
+    <start to="eosc_tag"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -226,7 +226,7 @@
             <arg>--sourcePath</arg><arg>${outputPath}</arg>
             <arg>--workingPath</arg><arg>${workingDir}/eoscTag</arg>
         </spark>
-        <ok to="wait"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 

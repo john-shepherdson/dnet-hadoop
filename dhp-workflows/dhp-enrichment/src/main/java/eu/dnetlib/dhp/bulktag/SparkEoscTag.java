@@ -179,12 +179,11 @@ public class SparkEoscTag {
 		Set<String> words = getWordsSP(r.getTitle());
 		words.addAll(getWordsF(r.getDescription()));
 		if (words.contains("galaxy") &&
-			(words.contains("workflow") || words.contains("software")))
+			words.contains("workflow"))
 			return true;
 
 		if (r.getSubject().stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("galaxy")) &&
-			(r.getSubject().stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("workflow"))) ||
-			r.getSubject().stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("software")))
+			r.getSubject().stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("workflow")))
 			return true;
 		return false;
 	}
@@ -214,17 +213,30 @@ public class SparkEoscTag {
 
 	private static Set<String> getWordsSP(List<StructuredProperty> elem) {
 		Set<String> words = new HashSet<>();
-		elem
-			.forEach(
-				t -> words.addAll(Arrays.asList(t.getValue().toLowerCase().replaceAll("[^a-zA-Z ]", "").split(" "))));
+		Optional
+			.ofNullable(elem)
+			.ifPresent(
+				e -> e
+					.forEach(
+						t -> words
+							.addAll(
+								Arrays.asList(t.getValue().toLowerCase().replaceAll("[^a-zA-Z ]", "").split(" ")))));
 		return words;
 	}
 
 	private static Set<String> getWordsF(List<Field<String>> elem) {
 		Set<String> words = new HashSet<>();
-		elem
-			.forEach(
-				t -> words.addAll(Arrays.asList(t.getValue().toLowerCase().replaceAll("[^a-zA-Z ]", "").split(" "))));
+		Optional
+			.ofNullable(elem)
+			.ifPresent(
+				e -> e
+					.forEach(
+						t -> words
+							.addAll(
+								Arrays.asList(t.getValue().toLowerCase().replaceAll("[^a-zA-Z ]", "").split(" ")))));
+//		elem
+//			.forEach(
+//				t -> words.addAll(Arrays.asList(t.getValue().toLowerCase().replaceAll("[^a-zA-Z ]", "").split(" "))));
 		return words;
 
 	}
