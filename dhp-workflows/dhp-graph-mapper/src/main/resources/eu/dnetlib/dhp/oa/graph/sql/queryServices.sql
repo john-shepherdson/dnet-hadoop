@@ -47,7 +47,7 @@ SELECT
 	d.namespaceprefix                                                                                          AS namespaceprefix,
 	NULL                                                                                                       AS odnumberofitems,
 	NULL                                                                                                       AS odnumberofitemsdate,
-	(SELECT array_agg(s|| '###keywords@@@dnet:subject_classification_typologies')
+	(SELECT array_agg(s|| '###keyword@@@dnet:subject_classification_typologies')
 		FROM UNNEST(
 			ARRAY(
 				SELECT trim(s)
