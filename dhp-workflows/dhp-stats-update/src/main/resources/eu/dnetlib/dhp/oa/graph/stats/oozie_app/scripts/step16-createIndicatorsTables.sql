@@ -82,18 +82,18 @@ on r.id= tmp.id;
 
 compute stats indi_funded_result_with_fundref;
 
-create table indi_result_org_country_collab stored as parquet as
-with tmp as
-(select o.id as id, o.country , ro.id as result,r.type  from organization o
-join result_organization ro on o.id=ro.organization
-join result r on r.id=ro.id where o.country <> 'UNKNOWN')
-select o1.id org1,o2.country country2, o1.type, count(distinct o1.result) as collaborations
-from tmp as o1
-join tmp as o2 on o1.result=o2.result
-where o1.id<>o2.id and o1.country<>o2.country
-group by o1.id, o1.type,o2.country;
-
-compute stats indi_result_org_country_collab;
+-- create table indi_result_org_country_collab stored as parquet as
+-- with tmp as
+-- (select o.id as id, o.country , ro.id as result,r.type  from organization o
+-- join result_organization ro on o.id=ro.organization
+-- join result r on r.id=ro.id where o.country <> 'UNKNOWN')
+-- select o1.id org1,o2.country country2, o1.type, count(distinct o1.result) as collaborations
+-- from tmp as o1
+-- join tmp as o2 on o1.result=o2.result
+-- where o1.id<>o2.id and o1.country<>o2.country
+-- group by o1.id, o1.type,o2.country;
+--
+-- compute stats indi_result_org_country_collab;
 
 create table indi_result_org_collab stored as parquet as
 with tmp as
