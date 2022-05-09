@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.schema.action.AtomicAction;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
@@ -27,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Measure;
@@ -109,12 +109,12 @@ public class SparkAtomicActionUsageJob implements Serializable {
 				res.setMeasures(getMeasure(first.getDownloads(), first.getViews()));
 				return res;
 			}, Encoders.bean(Result.class))
-				.toJavaRDD()
-				.map(p -> new AtomicAction(p.getClass(), p))
-				.mapToPair(
-						aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
-								new Text(OBJECT_MAPPER.writeValueAsString(aa))))
-				.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
+			.toJavaRDD()
+			.map(p -> new AtomicAction(p.getClass(), p))
+			.mapToPair(
+				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
+					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
+			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
 
 	}
 

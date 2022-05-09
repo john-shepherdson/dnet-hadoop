@@ -8,7 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.action.AtomicAction;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
@@ -24,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class SparkAtomicActionCountJobTest {
@@ -68,19 +68,19 @@ public class SparkAtomicActionCountJobTest {
 	@Test
 	void testMatch() {
 		String usageScoresPath = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/usagestats/usagestatsdb")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/actionmanager/usagestats/usagestatsdb")
+			.getPath();
 
 		SparkAtomicActionUsageJob.writeActionSet(spark, usageScoresPath, workingDir.toString() + "/actionSet");
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
-		JavaRDD<Result> tmp = sc.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)
-				.map(usm -> OBJECT_MAPPER.readValue(usm._2.getBytes(), AtomicAction.class))
-				.map(aa -> (Result) aa.getPayload());
+		JavaRDD<Result> tmp = sc
+			.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)
+			.map(usm -> OBJECT_MAPPER.readValue(usm._2.getBytes(), AtomicAction.class))
+			.map(aa -> (Result) aa.getPayload());
 
 		Assertions.assertEquals(9, tmp.count());
-
 
 		tmp.foreach(r -> Assertions.assertEquals(2, r.getMeasures().size()));
 		tmp
