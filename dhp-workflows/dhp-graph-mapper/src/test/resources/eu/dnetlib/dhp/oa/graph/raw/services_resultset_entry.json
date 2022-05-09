@@ -1,6 +1,6 @@
 [
 	{
-		"field": "datasourceid",
+		"field": "id",
 		"type": "string",
 		"value": "274269ac6f3b::2579-5449"
 	},
@@ -269,24 +269,12 @@
 		]
 	},
 	{
-		"field": "providedproducttypes",
-		"type": "array",
-		"value": [
-
-		]
-	},
-	{
 		"field": "jurisdiction",
 		"type": "string",
 		"value": "National@@@eosc:jurisdictions"
 	},
 	{
 		"field": "thematic",
-		"type": "boolean",
-		"value": true
-	},
-	{
-		"field": "knowledgegraph",
 		"type": "boolean",
 		"value": true
 	},

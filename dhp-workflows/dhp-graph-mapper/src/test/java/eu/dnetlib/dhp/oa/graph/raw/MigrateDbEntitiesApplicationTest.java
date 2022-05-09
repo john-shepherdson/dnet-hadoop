@@ -136,8 +136,8 @@ public class MigrateDbEntitiesApplicationTest {
 		assertEquals(getValueAsString("releaseenddate", fields), ds.getReleasestartdate());
 		assertEquals(getValueAsString("missionstatementurl", fields), ds.getMissionstatementurl());
 
-		assertEquals(false, ds.getDataprovider().getValue());
-		assertEquals(false, ds.getServiceprovider().getValue());
+		assertEquals(null, ds.getDataprovider());
+		assertEquals(null, ds.getServiceprovider());
 
 		assertEquals(getValueAsString("databaseaccesstype", fields), ds.getDatabaseaccesstype());
 		assertEquals(getValueAsString("datauploadtype", fields), ds.getDatauploadtype());
