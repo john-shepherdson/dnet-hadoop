@@ -711,10 +711,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			final Relation r = new Relation();
 			r.setRelType(ORG_ORG_RELTYPE);
 			r.setSubRelType(ModelConstants.RELATIONSHIP);
-			r
-				.setRelClass(
-					rs.getString("type").equalsIgnoreCase("parent") ? ModelConstants.IS_PARENT_OF
-						: ModelConstants.IS_CHILD_OF);
+			r.setRelClass(rs.getString("type"));
 			r.setSource(orgId1);
 			r.setTarget(orgId2);
 			r.setCollectedfrom(collectedFrom);
