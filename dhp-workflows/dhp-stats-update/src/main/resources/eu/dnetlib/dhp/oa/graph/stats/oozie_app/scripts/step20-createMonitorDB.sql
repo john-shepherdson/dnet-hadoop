@@ -18,20 +18,27 @@ create table TARGET.result stored as parquet as
         select * from SOURCE.result r where exists (select 1 from SOURCE.result_concepts rc where rc.id=r.id)
         union all
         select * from SOURCE.result r where exists (select 1 from SOURCE.result_organization ro where ro.id=r.id and ro.organization in (
-            'openorgs____::759d59f05d77188faee99b7493b46805',
-            'openorgs____::b84450f9864182c67b8611b5593f4250',
-            'openorgs____::d41cf6bd4ab1b1362a44397e0b95c975',
-            'openorgs____::eadc8da90a546e98c03f896661a2e4d4',
-            'openorgs____::d2a09b9d5eabb10c95f9470e172d05d2',
-            'openorgs____::d169c7407dd417152596908d48c11460',
-            'openorgs____::1ec924b1759bb16d0a02f2dad8689b21',
-            'openorgs____::2fb1e47b4612688d9de9169d579939a7',
-            'openorgs____::759d59f05d77188faee99b7493b46805',
-            'openorgs____::cad284878801b9465fa51a95b1d779db',
-            'openorgs____::eadc8da90a546e98c03f896661a2e4d4',
-            'openorgs____::c0286313e36479eff8676dba9b724b40'
-            -- ,'openorgs____::c80a8243a5e5c620d7931c88d93bf17a' -- Paris Diderot
-            ) )) foo;
+             'openorgs____::b84450f9864182c67b8611b5593f4250', --"Athena Research and Innovation Center In Information Communication & Knowledge Technologies', --ARC"
+             'openorgs____::d41cf6bd4ab1b1362a44397e0b95c975', --National Research Council
+             'openorgs____::d2a09b9d5eabb10c95f9470e172d05d2', --??? Not exists ??
+             'openorgs____::d169c7407dd417152596908d48c11460', --Masaryk University
+             'openorgs____::1ec924b1759bb16d0a02f2dad8689b21', --University of Belgrade
+             'openorgs____::2fb1e47b4612688d9de9169d579939a7', --University of Helsinki
+             'openorgs____::759d59f05d77188faee99b7493b46805', --University of Minho
+             'openorgs____::cad284878801b9465fa51a95b1d779db', --Universidad Politécnica de Madrid
+             'openorgs____::eadc8da90a546e98c03f896661a2e4d4', --University of Göttingen
+             'openorgs____::c0286313e36479eff8676dba9b724b40', --National and Kapodistrian University of Athens
+             -- 'openorgs____::c80a8243a5e5c620d7931c88d93bf17a', --Université Paris Diderot
+             'openorgs____::c08634f0a6b0081c3dc6e6c93a4314f3', --Bielefeld University
+             'openorgs____::6fc85e4a8f7ecaf4b0c738d010e967ea', --University of Southern Denmark
+             'openorgs____::3d6122f87f9a97a99d8f6e3d73313720', --Humboldt-Universität zu Berlin
+             'openorgs____::16720ada63d0fa8ca41601feae7d1aa5', --TU Darmstadt
+             'openorgs____::ccc0a066b56d2cfaf90c2ae369df16f5', --KU Leuven
+             'openorgs____::4c6f119632adf789746f0a057ed73e90', --University of the Western Cape
+             'openorgs____::ec3665affa01aeafa28b7852c4176dbd', --Rudjer Boskovic Institute
+             'openorgs____::5f31346d444a7f06a28c880fb170b0f6', --Ghent University
+             'openorgs____::2dbe47117fd5409f9c61620813456632', --University of Luxembourg
+             'openorgs____::6445d7758d3a40c4d997953b6632a368', --National Institute of Informatics (NII)            ) )) foo;
 compute stats TARGET.result;
 
 create table TARGET.result_citations stored as parquet as select * from SOURCE.result_citations orig where exists (select 1 from TARGET.result r where r.id=orig.id);
