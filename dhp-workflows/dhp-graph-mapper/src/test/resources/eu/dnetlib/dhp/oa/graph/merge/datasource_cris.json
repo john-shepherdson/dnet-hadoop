@@ -1,1 +1,5 @@
-{ "id": "10|274269ac6f3b::2a2e2793b500f3f7b47ef24b1a9277b7", "openairecompatibility": { "classid": "openaire-cris_1.1" }}
+{ "id": "10|274269ac6f3b::2a2e2793b500f3f7b47ef24b1a9277b7", "openairecompatibility": { "classid": "openaire-cris_1.1" },
+  "originalId": ["eurocrisdris::1234"],
+  "collectedfrom": [{"key": "eurocrisdris::2b29d08e383ff4cd8a2b6b226ce37e38", "value": "Directory of Research Information System (DRIS)"}],
+  "pid": [{"value": "10.1010.xyx", "qualifier": {"classid": "doi"}}]
+}
