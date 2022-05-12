@@ -3,6 +3,8 @@ package eu.dnetlib.dhp.schema.oaf.utils;
 
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
+import java.sql.Array;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -115,6 +117,17 @@ public class OafMapperUtils {
 			.map(v -> field(v, info))
 			.filter(Objects::nonNull)
 			.filter(distinctByKey(Field::getValue))
+			.collect(Collectors.toList());
+	}
+
+	public static <T> List<T> listValues(Array values) throws SQLException {
+		if (Objects.isNull(values)) {
+			return null;
+		}
+		return Arrays
+			.stream((T[]) values.getArray())
+			.filter(Objects::nonNull)
+			.distinct()
 			.collect(Collectors.toList());
 	}
 
@@ -390,5 +403,20 @@ public class OafMapperUtils {
 			return rights;
 		}
 		return null;
+	}
+
+	public static KeyValue newKeyValueInstance(String key, String value, DataInfo dataInfo) {
+		KeyValue kv = new KeyValue();
+		kv.setDataInfo(dataInfo);
+		kv.setKey(key);
+		kv.setValue(value);
+		return kv;
+	}
+
+	public static Measure newMeasureInstance(String id, String value, String key, DataInfo dataInfo) {
+		Measure m = new Measure();
+		m.setId(id);
+		m.setUnit(Arrays.asList(newKeyValueInstance(key, value, dataInfo)));
+		return m;
 	}
 }

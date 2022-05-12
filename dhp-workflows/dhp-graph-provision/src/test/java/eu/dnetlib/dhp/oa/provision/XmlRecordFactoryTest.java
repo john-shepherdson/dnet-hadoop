@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.junit.jupiter.api.Test;
 
@@ -142,7 +143,7 @@ public class XmlRecordFactoryTest {
 	}
 
 	@Test
-	public void testDatasource() throws IOException, DocumentException {
+	public void testService() throws IOException, DocumentException {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
@@ -167,6 +168,14 @@ public class XmlRecordFactoryTest {
 		assertEquals("true", doc.valueOf("//thematic"));
 		assertEquals("Journal article", doc.valueOf("//contentpolicy/@classname"));
 		assertEquals("Journal archive", doc.valueOf("//datasourcetypeui/@classname"));
+		assertEquals("Data Source", doc.valueOf("//eosctype/@classname"));
 
+		final List pids = doc.selectNodes("//pid");
+		assertEquals(1, pids.size());
+		assertEquals("re3data", ((Element) pids.get(0)).attribute("classid").getValue());
+		assertEquals(
+			"Registry of research data repositories", ((Element) pids.get(0)).attribute("classname").getValue());
+		assertEquals("dnet:pid_types", ((Element) pids.get(0)).attribute("schemeid").getValue());
+		assertEquals("dnet:pid_types", ((Element) pids.get(0)).attribute("schemename").getValue());
 	}
 }

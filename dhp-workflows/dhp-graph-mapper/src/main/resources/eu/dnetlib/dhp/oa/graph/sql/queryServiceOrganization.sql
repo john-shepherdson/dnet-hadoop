@@ -1,5 +1,5 @@
 SELECT
-	dor.datasource                                           AS datasource,
+	dor.service                                              AS service,
 	dor.organization                                         AS organization,
 	NULL                                                     AS startdate,
 	NULL                                                     AS enddate,
@@ -11,6 +11,6 @@ SELECT
     dc.officialname                                          AS collectedfromname,
 	'providedBy@@@dnet:datasources_organizations_typologies' AS semantics,
 	d.provenanceaction || '@@@dnet:provenanceActions'        AS provenanceaction
-FROM dsm_datasource_organization dor
-	LEFT OUTER JOIN dsm_datasources d  ON (dor.datasource = d.id)
-	LEFT OUTER JOIN dsm_datasources dc ON (dc.id = d.collectedfrom);
+FROM dsm_service_organization dor
+	LEFT OUTER JOIN dsm_services d  ON (dor.service = d.id)
+	LEFT OUTER JOIN dsm_services dc ON (dc.id = d.collectedfrom);
