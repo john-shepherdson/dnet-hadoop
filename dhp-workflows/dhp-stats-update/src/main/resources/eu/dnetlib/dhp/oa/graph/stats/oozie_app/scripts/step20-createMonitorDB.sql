@@ -38,14 +38,24 @@ create table TARGET.result stored as parquet as
              'openorgs____::ec3665affa01aeafa28b7852c4176dbd', --Rudjer Boskovic Institute
              'openorgs____::5f31346d444a7f06a28c880fb170b0f6', --Ghent University
              'openorgs____::2dbe47117fd5409f9c61620813456632', --University of Luxembourg
-             'openorgs____::6445d7758d3a40c4d997953b6632a368', --National Institute of Informatics (NII)            ) )) foo;
+             'openorgs____::6445d7758d3a40c4d997953b6632a368' --National Institute of Informatics (NII)
+        ) )) foo;
 compute stats TARGET.result;
 
 create table TARGET.result_citations stored as parquet as select * from SOURCE.result_citations orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_citations;
 
+create table TARGET.result_references_oc stored as parquet as select * from SOURCE.result_references_oc orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.result_references_oc;
+
+create table TARGET.result_citations_oc stored as parquet as select * from SOURCE.result_citations_oc orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.result_citations_oc;
+
 create table TARGET.result_classifications stored as parquet as select * from SOURCE.result_classifications orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_classifications;
+
+create table TARGET.result_apc stored as parquet as select * from SOURCE.result_apc orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.result_apc;
 
 create table TARGET.result_concepts stored as parquet as select * from SOURCE.result_concepts orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_concepts;
