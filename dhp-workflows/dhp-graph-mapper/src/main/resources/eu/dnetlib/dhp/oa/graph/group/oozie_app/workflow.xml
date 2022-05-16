@@ -283,7 +283,15 @@
         <error to="Kill"/>
     </action>
 
-    <join name="wait_dispatch" to="copy_relation"/>
+    <join name="wait_dispatch" to="delete_target_relation"/>
+
+    <action name="delete_target_relation">
+        <fs>
+            <delete path="${nameNode}/${graphOutputPath}/relation"/>
+        </fs>
+        <ok to="copy_relation"/>
+        <error to="Kill"/>
+    </action>
 
     <action name="copy_relation">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
