@@ -3,7 +3,6 @@ package eu.dnetlib.dhp.actionmanager.ror;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.ENTITYREGISTRY_PROVENANCE_ACTION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.ORG_ORG_RELTYPE;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.dataInfo;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.field;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.listKeyValues;
@@ -39,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.actionmanager.ror.model.ExternalIdType;
-import eu.dnetlib.dhp.actionmanager.ror.model.Relationship;
 import eu.dnetlib.dhp.actionmanager.ror.model.RorOrganization;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
@@ -51,7 +49,6 @@ import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
@@ -64,21 +61,17 @@ public class GenerateRorActionSetJob {
 
 	private static final String ROR_NS_PREFIX = "ror_________";
 
-	private static final List<KeyValue> ROR_COLLECTED_FROM = listKeyValues(
-		"10|openaire____::993a7ae7a863813cf95028b50708e222", "ROR");
+	private static final List<KeyValue> ROR_COLLECTED_FROM = listKeyValues("10|openaire____::993a7ae7a863813cf95028b50708e222", "ROR");
 
-	private static final DataInfo ROR_DATA_INFO = dataInfo(
-		false, "", false, false, ENTITYREGISTRY_PROVENANCE_ACTION, "0.92");
+	private static final DataInfo ROR_DATA_INFO = dataInfo(false, "", false, false, ENTITYREGISTRY_PROVENANCE_ACTION, "0.92");
 
-	private static final Qualifier ROR_PID_TYPE = qualifier(
-		"ROR", "ROR", ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES);
+	private static final Qualifier ROR_PID_TYPE = qualifier("ROR", "ROR", ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES);
 
 	public static void main(final String[] args) throws Exception {
 
 		final String jsonConfiguration = IOUtils
-			.toString(
-				GenerateRorActionSetJob.class
-					.getResourceAsStream("/eu/dnetlib/dhp/actionmanager/ror/action_set_parameters.json"));
+			.toString(GenerateRorActionSetJob.class
+				.getResourceAsStream("/eu/dnetlib/dhp/actionmanager/ror/action_set_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -116,9 +109,8 @@ public class GenerateRorActionSetJob {
 		readInputPath(spark, inputPath)
 			.map(GenerateRorActionSetJob::convertRorOrg)
 			.flatMap(List::iterator)
-			.mapToPair(
-				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
-					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
+			.mapToPair(aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
+				new Text(OBJECT_MAPPER.writeValueAsString(aa))))
 			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
 	}
 
@@ -153,12 +145,9 @@ public class GenerateRorActionSetJob {
 		o.setEcnutscode(null);
 		if (r.getCountry() != null) {
 			o
-				.setCountry(
-					qualifier(
-						r.getCountry().getCountryCode(), r
-							.getCountry()
-							.getCountryName(),
-						ModelConstants.DNET_COUNTRY_TYPE, ModelConstants.DNET_COUNTRY_TYPE));
+				.setCountry(qualifier(r.getCountry().getCountryCode(), r
+					.getCountry()
+					.getCountryName(), ModelConstants.DNET_COUNTRY_TYPE, ModelConstants.DNET_COUNTRY_TYPE));
 		} else {
 			o.setCountry(null);
 		}
@@ -168,36 +157,8 @@ public class GenerateRorActionSetJob {
 		final List<AtomicAction<? extends Oaf>> res = new ArrayList<>();
 		res.add(new AtomicAction<>(Organization.class, o));
 
-		for (final Relationship rorRel : r.getRelationships()) {
-			if (rorRel.getType().equalsIgnoreCase("parent")) {
-				final String orgId1 = calculateOpenaireId(r.getId());
-				final String orgId2 = calculateOpenaireId(rorRel.getId());
-				res
-					.add(
-						new AtomicAction<>(Relation.class,
-							calculateHierarchyRel(orgId1, orgId2, ModelConstants.IS_PARENT_OF)));
-				res
-					.add(
-						new AtomicAction<>(Relation.class,
-							calculateHierarchyRel(orgId2, orgId1, ModelConstants.IS_CHILD_OF)));
-			}
-		}
-
 		return res;
 
-	}
-
-	private static Relation calculateHierarchyRel(final String source, final String target, final String relClass) {
-		final Relation rel = new Relation();
-		rel.setSource(source);
-		rel.setTarget(target);
-		rel.setRelType(ORG_ORG_RELTYPE);
-		rel.setSubRelType(ModelConstants.RELATIONSHIP);
-		rel.setRelClass(relClass);
-		rel.setCollectedfrom(ROR_COLLECTED_FROM);
-		rel.setDataInfo(ROR_DATA_INFO);
-		rel.setLastupdatetimestamp(System.currentTimeMillis());
-		return rel;
 	}
 
 	private static String calculateOpenaireId(final String rorId) {
@@ -212,8 +173,7 @@ public class GenerateRorActionSetJob {
 			final String type = e.getKey();
 			final List<String> all = e.getValue().getAll();
 			if (all != null) {
-				final Qualifier qualifier = qualifier(
-					type, type, ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES);
+				final Qualifier qualifier = qualifier(type, type, ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES);
 				for (final String pid : all) {
 					pids
 						.add(structuredProperty(pid, qualifier, ROR_DATA_INFO));
