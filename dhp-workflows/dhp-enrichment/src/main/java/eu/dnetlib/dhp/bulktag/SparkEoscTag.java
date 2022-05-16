@@ -30,7 +30,7 @@ public class SparkEoscTag {
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	public static final Qualifier EOSC_QUALIFIER = OafMapperUtils
 		.qualifier(
-			"eosc",
+			"EOSC",
 			"European Open Science Cloud",
 			ModelConstants.DNET_SUBJECT_TYPOLOGIES, ModelConstants.DNET_SUBJECT_TYPOLOGIES);
 	public static final DataInfo EOSC_DATAINFO = OafMapperUtils
@@ -95,7 +95,14 @@ public class SparkEoscTag {
 
 				if (containsCriteriaNotebook(s)) {
 					sbject.add(EOSC_NOTEBOOK);
-
+					if (sbject.stream().anyMatch(sb -> sb.getValue().equals("EOSC Jupyter Notebook"))){
+						sbject = sbject.stream().map(sb -> {
+							if (sb.getValue().equals("EOSC Jupyter Notebook")){
+								return null;
+							}
+							return sb;
+						}).filter(Objects::nonNull).collect(Collectors.toList());
+					}
 				}
 				if (containsCriteriaGalaxy(s)) {
 					sbject.add(EOSC_GALAXY);
