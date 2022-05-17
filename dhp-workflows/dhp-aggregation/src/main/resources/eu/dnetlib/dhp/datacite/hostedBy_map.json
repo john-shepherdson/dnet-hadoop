@@ -15,7 +15,7 @@
   "official_name": "Aperta TÜBİTAK Open Archive"
  },
  "BL.CAM": {
-  "openaire_id": "re3data_____::r3d100010620",
+  "openaire_id": "opendoar____::109",
   "datacite_name": "Apollo",
   "official_name": "Apollo"
  },
@@ -196,7 +196,7 @@
  },
  "CSIC.DIGITAL": {
   "openaire_id": "re3data_____::r3d100011076",
-  "datacite_name": "DIGITAL.CSIC",
+  "datacite_name": "Digital CSIC",
   "official_name": "DIGITAL.CSIC"
  },
  "BL.DRI": {
@@ -644,6 +644,11 @@
   "datacite_name": "PANGAEA",
   "official_name": "PANGAEA"
  },
+ "TIB.PANGAEA": {
+  "openaire_id": "re3data_____::r3d100010134",
+  "datacite_name": "PANGAEA",
+  "official_name": "PANGAEA"
+ },
  "NASAPDS.NASAPDS": {
   "openaire_id": "re3data_____::r3d100010121",
   "datacite_name": "PDS",
@@ -896,7 +901,7 @@
  },
  "FIGSHARE.UCT": {
   "openaire_id": "re3data_____::r3d100012633",
-  "datacite_name": "ZivaHub",
+  "datacite_name": "University of Cape Town (UCT)",
   "official_name": "ZivaHub"
  },
  "BL.UCLAN": {
@@ -1030,9 +1035,9 @@
   "official_name": "ZBW Journal Data Archive"
  },
  "CERN.ZENODO": {
-  "openaire_id": "re3data_____::r3d100010468",
+  "openaire_id": "opendoar____::2659",
   "datacite_name": "Zenodo",
-  "official_name": "Zenodo"
+  "official_name": "ZENODO"
  },
  "ZBW.ZEW": {
   "openaire_id": "re3data_____::r3d100010399",
