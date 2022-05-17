@@ -132,7 +132,7 @@ public class EOSCTagJobTest {
 
 		Assertions
 			.assertEquals(
-				2, tmp
+				1, tmp
 					.filter(sw -> sw.getId().equals("50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4"))
 					.collect()
 					.get(0)
@@ -326,7 +326,7 @@ public class EOSCTagJobTest {
 
 		Assertions
 			.assertEquals(
-				2,
+				1,
 				tmp
 					.filter(
 						s -> s.getSubject().stream().anyMatch(sbj -> sbj.getValue().equals("EOSC::Galaxy Workflow")))
@@ -352,21 +352,12 @@ public class EOSCTagJobTest {
 
 		Assertions
 			.assertEquals(
-				6, tmp
+				5, tmp
 					.filter(sw -> sw.getId().equals("50|od______1582::501b25d420f808c8eddcd9b16e917f11"))
 					.collect()
 					.get(0)
 					.getSubject()
 					.size());
-		Assertions
-			.assertTrue(
-				tmp
-					.filter(sw -> sw.getId().equals("50|od______1582::501b25d420f808c8eddcd9b16e917f11"))
-					.collect()
-					.get(0)
-					.getSubject()
-					.stream()
-					.anyMatch(s -> s.getValue().equals("EOSC::Galaxy Workflow")));
 
 		Assertions
 			.assertEquals(
@@ -394,7 +385,7 @@ public class EOSCTagJobTest {
 
 		Assertions
 			.assertEquals(
-				2,
+				1,
 				orp
 					.filter(
 						s -> s.getSubject().stream().anyMatch(sbj -> sbj.getValue().equals("EOSC::Galaxy Workflow")))
@@ -438,14 +429,14 @@ public class EOSCTagJobTest {
 
 		Assertions
 			.assertEquals(
-				3, orp
+				2, orp
 					.filter(sw -> sw.getId().equals("50|od______2017::1e400f1747487fd15998735c41a55c72"))
 					.collect()
 					.get(0)
 					.getSubject()
 					.size());
 		Assertions
-			.assertTrue(
+			.assertFalse(
 				orp
 					.filter(sw -> sw.getId().equals("50|od______2017::1e400f1747487fd15998735c41a55c72"))
 					.collect()
