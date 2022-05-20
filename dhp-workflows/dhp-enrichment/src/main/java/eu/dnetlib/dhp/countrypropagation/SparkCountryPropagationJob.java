@@ -102,7 +102,7 @@ public class SparkCountryPropagationJob {
 	private static <R extends Result> MapFunction<Tuple2<R, ResultCountrySet>, R> getCountryMergeFn() {
 		return t -> {
 			Optional.ofNullable(t._2()).ifPresent(r -> {
-				if(Optional.ofNullable(t._1().getCountry()).isPresent())
+				if (Optional.ofNullable(t._1().getCountry()).isPresent())
 					t._1().getCountry().addAll(merge(t._1().getCountry(), r.getCountrySet()));
 				else
 					t._1().setCountry(merge(null, t._2().getCountrySet()));
@@ -113,11 +113,12 @@ public class SparkCountryPropagationJob {
 
 	private static List<Country> merge(List<Country> c1, List<CountrySbs> c2) {
 		HashSet<String> countries = new HashSet<>();
-				if(Optional.ofNullable(c1).isPresent()){
-					countries = c1.stream().map(Qualifier::getClassid)
-							.collect(Collectors.toCollection(HashSet::new));
-				}
-
+		if (Optional.ofNullable(c1).isPresent()) {
+			countries = c1
+				.stream()
+				.map(Qualifier::getClassid)
+				.collect(Collectors.toCollection(HashSet::new));
+		}
 
 		HashSet<String> finalCountries = countries;
 		return c2
