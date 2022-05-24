@@ -103,21 +103,19 @@ object SparkConvertRDDtoDataset {
       "IsAmongTopNSimilarDocuments"
     )
 
-
     val rddRelation = spark.sparkContext
       .textFile(s"$sourcePath/relation")
       .map(s => mapper.readValue(s, classOf[Relation]))
       .filter(r => r.getDataInfo != null && r.getDataInfo.getDeletedbyinference == false)
       .filter(r => r.getSource.startsWith("50") && r.getTarget.startsWith("50"))
       //filter OpenCitations relations
-      .filter(r => r.getCollectedfrom!= null && r.getCollectedfrom.size()>0 && !r.getCollectedfrom.asScala.exists(k => "opencitations".equalsIgnoreCase(k.getValue)))
+      .filter(r =>
+        r.getCollectedfrom != null && r.getCollectedfrom.size() > 0 && !r.getCollectedfrom.asScala.exists(k =>
+          "opencitations".equalsIgnoreCase(k.getValue)
+        )
+      )
       .filter(r => !relationSemanticFilter.exists(k => k.equalsIgnoreCase(r.getRelClass)))
     spark.createDataset(rddRelation).as[Relation].write.mode(SaveMode.Overwrite).save(s"$relPath")
-
-
-
-
-
 
   }
 }
