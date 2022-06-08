@@ -476,6 +476,34 @@ class CrossrefMappingTest {
   }
 
   @Test
+  def testConvertFromCrossRef2OafIssue(): Unit = {
+    val json = Source
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/doiboost/crossref/article_nojournal.json"))
+      .mkString
+    assertNotNull(json)
+
+    assertFalse(json.isEmpty);
+
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+
+    assertTrue(resultList.nonEmpty)
+
+    val items = resultList.filter(p => p.isInstanceOf[Publication])
+
+    assert(items.nonEmpty)
+    assert(items.size == 1)
+    val pub: Publication = items.head.asInstanceOf[Publication]
+
+    assertNotNull(pub.getJournal.getIssnPrinted)
+    assertNotNull(pub.getJournal.getIssnOnline)
+    assertNotNull(pub.getJournal.getName)
+
+
+
+
+  }
+
+  @Test
   def testSetDateOfAcceptanceCrossRef2Oaf(): Unit = {
 
     val json = Source
