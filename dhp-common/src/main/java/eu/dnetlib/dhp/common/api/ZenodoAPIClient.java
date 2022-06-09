@@ -191,7 +191,7 @@ public class ZenodoAPIClient implements Serializable {
 	 * @throws MissingConceptDoiException
 	 */
 	public int newVersion(String concept_rec_id) throws IOException, MissingConceptDoiException {
-		setDepositionId(concept_rec_id);
+		setDepositionId(concept_rec_id, 1);
 		String json = "{}";
 
 		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
@@ -253,9 +253,9 @@ public class ZenodoAPIClient implements Serializable {
 
 	}
 
-	private void setDepositionId(String concept_rec_id) throws IOException, MissingConceptDoiException {
+	private void setDepositionId(String concept_rec_id, Integer page) throws IOException, MissingConceptDoiException {
 
-		ZenodoModelList zenodoModelList = new Gson().fromJson(getPrevDepositions(), ZenodoModelList.class);
+		ZenodoModelList zenodoModelList = new Gson().fromJson(getPrevDepositions(String.valueOf(page)), ZenodoModelList.class);
 
 		for (ZenodoModel zm : zenodoModelList) {
 			if (zm.getConceptrecid().equals(concept_rec_id)) {
@@ -263,20 +263,26 @@ public class ZenodoAPIClient implements Serializable {
 				return;
 			}
 		}
-
-		throw new MissingConceptDoiException("The concept record id specified was missing in the list of depositions");
+		if(zenodoModelList.size() == 0)
+			throw new MissingConceptDoiException("The concept record id specified was missing in the list of depositions");
+		setDepositionId(concept_rec_id, page + 1);
 
 	}
 
-	private String getPrevDepositions() throws IOException {
+	private String getPrevDepositions(String page) throws IOException {
+
 		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
 
+		HttpUrl.Builder urlBuilder = HttpUrl.parse(urlString).newBuilder();
+		urlBuilder.addQueryParameter("page", page);
+		String url = urlBuilder.build().toString();
+
 		Request request = new Request.Builder()
-			.url(urlString)
-			.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString()) // add request headers
-			.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + access_token)
-			.get()
-			.build();
+				.url(url)
+				.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString()) // add request headers
+				.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + access_token)
+				.get()
+				.build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
 
@@ -288,6 +294,7 @@ public class ZenodoAPIClient implements Serializable {
 		}
 
 	}
+
 
 	private String getBucket(String url) throws IOException {
 		OkHttpClient httpClient = new OkHttpClient.Builder()
