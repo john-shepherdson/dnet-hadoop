@@ -164,6 +164,7 @@ dnet:publication_resource @=@ dnet:publication_resource @=@ 0030 @=@ Sound
 dnet:publication_resource @=@ dnet:publication_resource @=@ 0044 @=@ Thesis
 dnet:publication_resource @=@ dnet:publication_resource @=@ 0000 @=@ Unknown
 dnet:publication_resource @=@ dnet:publication_resource @=@ 0042 @=@ Virtual Appliance
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0048 @=@ Research Object
 ec:funding_typologies @=@ ec:funding_typologies @=@ ec:frameworkprogram @=@ frameworkprogram
 ec:funding_typologies @=@ ec:funding_typologies @=@ ec:program @=@ program
 ec:funding_typologies @=@ ec:funding_typologies @=@ ec:specificprogram @=@ specificprogram

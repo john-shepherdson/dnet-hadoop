@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:datacite="http://datacite.org/schema/kernel-4"
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+        xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:oaire="http://namespace.openaire.eu/schema/oaire/"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <header xmlns="http://www.openarchives.org/OAI/2.0/">
+        <dri:objIdentifier>eosca5322f5f::4dd1aaf93ae136b65dc9ee4e6f76eac9</dri:objIdentifier>
+        <dri:recordIdentifier>53aa90bf-c593-4e6d-923f-d4711ac4b0e1</dri:recordIdentifier>
+        <dri:dateOfCollection>2022-05-25T15:35:48.262Z</dri:dateOfCollection>
+        <oaf:datasourceprefix>eosca5322f5f</oaf:datasourceprefix>
+        <identifier>53aa90bf-c593-4e6d-923f-d4711ac4b0e1</identifier>
+        <datestamp>2022-05-25T15:35:38Z</datestamp>
+        <setSpec>rohub_data</setSpec>
+        <setSpec>ro-crate_data</setSpec>
+        <dr:dateOfTransformation>2022-05-25T15:36:11.094Z</dr:dateOfTransformation>
+    </header>
+    <metadata>
+        <oaire:resource xmlns="http://namespace.openaire.eu/schema/oaire/">
+            <datacite:identifier identifierType="landingPage">https://w3id.org/ro-id/53aa90bf-c593-4e6d-923f-d4711ac4b0e1</datacite:identifier>
+            <datacite:alternateIdentifiers>
+                <datacite:alternateIdentifier alternateIdentifierType="URL">http://api.rohub.org/api/ros/53aa90bf-c593-4e6d-923f-d4711ac4b0e1/</datacite:alternateIdentifier>
+            </datacite:alternateIdentifiers>
+            <datacite:relatedIdentifiers>
+                <datacite:relatedIdentifier relatedIdentifierType="" relationType="">
+                    https://github.com/NordicESMhub/RELIANCE/blob/main/content/science/notebooks/air_quality_lockdown.ipynb
+                </datacite:relatedIdentifier>
+                <datacite:relatedIdentifier relatedIdentifierType="URI" relationType="IsPartOf">https://github.com/NordicESMhub/RELIANCE/blob/main/content/science/notebooks/air_quality_lockdown.ipynb</datacite:relatedIdentifier>
+                <datacite:relatedIdentifier relatedIdentifierType="" relationType="">
+                    https://nordicesmhub.github.io/RELIANCE/science/notebooks/air_quality_lockdown.html
+                </datacite:relatedIdentifier>
+                <datacite:relatedIdentifier relatedIdentifierType="URI" relationType="IsPartOf">https://nordicesmhub.github.io/RELIANCE/science/notebooks/air_quality_lockdown.html</datacite:relatedIdentifier>
+            </datacite:relatedIdentifiers>
+            <creators xmlns="http://datacite.org/schema/kernel-4">
+                <creator>
+                    <creator>
+                        <creatorName>Anne Fouilloux</creatorName>
+                    </creator>
+                </creator>
+            </creators>
+            <dates xmlns="http://datacite.org/schema/kernel-4">
+                <date dateType="Created">2021-12-19T21:18:33Z</date>
+            </dates>
+            <dc:descriptions>
+                <dc:description descriptionType="Abstract">The COVID-19 pandemic has led to significant reductions in economic activity, especially during lockdowns. Several studies has shown that the concentration of nitrogen dioxyde and particulate matter levels have reduced during lockdown events. Reductions in transportation sector emissions are most likely largely responsible for the NO2 anomalies. In this study, we analyze the impact of lockdown events on the air quality using data from Copernicus Atmosphere Monitoring Service over Europe and at selected locations.</dc:description>
+            </dc:descriptions>
+            <oaire:fundingReferences>
+                <oaire:fundingReference>
+                    <oaire:funderName>European Commission</oaire:funderName>
+                    <oaire:funderIdentifier funderIdentifierType="Crossref Funder ID">10.13039/501100000781</oaire:funderIdentifier>
+                    <oaire:awardNumber awardURI="">101017502</oaire:awardNumber>
+                    <oaire:awardTitle>Research Lifecycle Management for Earth Science Communities and Copernicus Users</oaire:awardTitle>
+                </oaire:fundingReference>
+            </oaire:fundingReferences>
+            <oaire:licenseCondition uri="https://opensource.org/licenses/MIT">MIT License</oaire:licenseCondition>
+            <dc:publisher>University of Oslo</dc:publisher>
+            <dc:publicationYear>2021</dc:publicationYear>
+            <oaire:resourceType resourceTypeGeneral="other research product" uri="http://purl.org/coar/resource_type/c_1843">RO-crate</oaire:resourceType>
+            <rightsList xmlns="http://datacite.org/schema/kernel-4">
+                <rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</rights>
+            </rightsList>
+            <sizes xmlns="http://datacite.org/schema/kernel-4">
+                <size>11.971 MB</size>
+            </sizes>
+            <subjects xmlns="http://datacite.org/schema/kernel-4">
+                <subject>Applied sciences</subject>
+                <subject>Meteorology</subject>
+                <subject>EOSC::RO-crate</subject>
+            </subjects>
+            <titles xmlns="http://datacite.org/schema/kernel-4">
+                <title>Impact of the Covid-19 Lockdown on Air quality over Europe</title>
+            </titles>
+        </oaire:resource>
+        <oaf:identifier identifierType="URL">https://w3id.org/ro-id/53aa90bf-c593-4e6d-923f-d4711ac4b0e1</oaf:identifier>
+        <dr:CobjCategory type="other">0048</dr:CobjCategory>
+        <oaf:dateAccepted/>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:license>https://opensource.org/licenses/MIT</oaf:license>
+        <oaf:language>und</oaf:language>
+        <oaf:hostedBy id="eosc________::psnc::psnc.rohub" name="ROHub"/>
+        <oaf:collectedFrom id="eosc________::psnc::psnc.rohub" name="ROHub"/>
+    </metadata>
+    <about xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">
+        <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+            <originDescription altered="true" harvestDate="2022-05-25T15:35:48.262Z">
+                <baseURL>https%3A%2F%2Fapi.rohub.org%2Fapi%2Foai2d%2F</baseURL>
+                <identifier>53aa90bf-c593-4e6d-923f-d4711ac4b0e1</identifier>
+                <datestamp>2022-05-25T15:35:38Z</datestamp>
+                <metadataNamespace/>
+            </originDescription>
+        </provenance>
+        <oaf:datainfo>
+            <oaf:inferred>false</oaf:inferred>
+            <oaf:deletedbyinference>false</oaf:deletedbyinference>
+            <oaf:trust>0.9</oaf:trust>
+            <oaf:inferenceprovenance/>
+            <oaf:provenanceaction classid="sysimport:crosswalk"
+                                  classname="Harvested" schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+        </oaf:datainfo>
+    </about>
+</record>
