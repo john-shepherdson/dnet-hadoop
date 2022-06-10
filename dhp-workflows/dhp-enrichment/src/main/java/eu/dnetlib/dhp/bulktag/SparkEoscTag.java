@@ -95,13 +95,14 @@ public class SparkEoscTag {
 
 				if (containsCriteriaNotebook(s)) {
 					sbject.add(EOSC_NOTEBOOK);
-					if (sbject.stream().anyMatch(sb -> sb.getValue().equals("EOSC Jupyter Notebook"))){
+					if (sbject.stream().anyMatch(sb -> sb.getValue().equals("EOSC Jupyter Notebook"))) {
 						sbject = sbject.stream().map(sb -> {
-							if (sb.getValue().equals("EOSC Jupyter Notebook")){
+							if (sb.getValue().equals("EOSC Jupyter Notebook")) {
 								return null;
 							}
 							return sb;
 						}).filter(Objects::nonNull).collect(Collectors.toList());
+						s.setSubject(sbject);
 					}
 				}
 				if (containsCriteriaGalaxy(s)) {
