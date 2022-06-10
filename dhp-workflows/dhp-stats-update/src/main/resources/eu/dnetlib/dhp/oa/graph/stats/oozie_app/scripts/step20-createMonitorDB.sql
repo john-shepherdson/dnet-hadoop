@@ -107,11 +107,6 @@ compute stats TARGET.result_sources;
 create table TARGET.result_topics stored as parquet as select * from SOURCE.result_topics orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_topics;
 
-create table TARGET.result_apc stored as parquet as select * from SOURCE.result_apc orig where exists (select 1 from TARGET.result r where r.id=orig.id);
-compute stats TARGET.result_apc;
-
-
-
 create view TARGET.foo1 as select * from SOURCE.result_result rr where rr.source in (select id from TARGET.result);
 create view TARGET.foo2 as select * from SOURCE.result_result rr where rr.target in (select id from TARGET.result);
 create table TARGET.result_result STORED AS PARQUET as select distinct * from (select * from TARGET.foo1 union all select * from TARGET.foo2) foufou;
