@@ -18,14 +18,7 @@ import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.oaiIProvenance;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.qualifier;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.*;
@@ -35,6 +28,7 @@ import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.AccessRight;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Context;
@@ -199,8 +193,13 @@ public abstract class AbstractMdRecordToOafMapper {
 		final List<Oaf> oafs = Lists.newArrayList(entity);
 
 		if (!oafs.isEmpty()) {
-			oafs.addAll(addProjectRels(doc, entity));
-			oafs.addAll(addOtherResultRels(doc, entity));
+			Set<Oaf> rels = Sets.newHashSet();
+
+			rels.addAll(addProjectRels(doc, entity));
+			rels.addAll(addOtherResultRels(doc, entity));
+			rels.addAll(addRelations(doc, entity));
+
+			oafs.addAll(rels);
 		}
 
 		return oafs;
@@ -276,6 +275,52 @@ public abstract class AbstractMdRecordToOafMapper {
 		}
 
 		return res;
+	}
+
+	private List<Oaf> addRelations(Document doc, OafEntity entity) {
+
+		final List<Oaf> rels = Lists.newArrayList();
+
+		for (Object o : doc.selectNodes("//oaf:relation")) {
+			Element element = (Element) o;
+
+			final Relation rel = new Relation();
+			rel.setCollectedfrom(entity.getCollectedfrom());
+			rel.setDataInfo(entity.getDataInfo());
+			rel.setLastupdatetimestamp(entity.getLastupdatetimestamp());
+
+			String relType = element.attributeValue("relType");
+			String subRelType = element.attributeValue("subRelType");
+			String relClass = element.attributeValue("relClass");
+			String relClassInverse = ModelSupport
+				.findInverse(ModelSupport.rel(relType, subRelType, relClass))
+				.getInverseRelClass();
+
+			rel.setSource(entity.getId());
+			String target = StringUtils.trim(element.getText());
+
+			final String validationdDate = ((Node) o).valueOf("@validationDate");
+
+			if (StringUtils.isNotBlank(target)) {
+
+				// TODO discover the target entity type with a dedicated attribute, e.g. @targetType.
+				final String[] parts = relType.split("(?=\\p{Upper})");
+				final String targetType = parts[1].toLowerCase();
+				final String targetId = createOpenaireId(targetType, target, true);
+
+				rels
+					.add(
+						getRelation(
+							entity.getId(), targetId, relType, subRelType, relClass, entity, validationdDate));
+				rels
+					.add(
+						getRelation(
+							targetId, entity.getId(), relType, subRelType, relClassInverse, entity, validationdDate));
+			}
+
+		}
+
+		return rels;
 	}
 
 	protected Relation getRelation(final String source,
