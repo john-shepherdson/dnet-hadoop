@@ -61,17 +61,21 @@ public class GenerateRorActionSetJob {
 
 	private static final String ROR_NS_PREFIX = "ror_________";
 
-	private static final List<KeyValue> ROR_COLLECTED_FROM = listKeyValues("10|openaire____::993a7ae7a863813cf95028b50708e222", "ROR");
+	private static final List<KeyValue> ROR_COLLECTED_FROM = listKeyValues(
+		"10|openaire____::993a7ae7a863813cf95028b50708e222", "ROR");
 
-	private static final DataInfo ROR_DATA_INFO = dataInfo(false, "", false, false, ENTITYREGISTRY_PROVENANCE_ACTION, "0.92");
+	private static final DataInfo ROR_DATA_INFO = dataInfo(
+		false, "", false, false, ENTITYREGISTRY_PROVENANCE_ACTION, "0.92");
 
-	private static final Qualifier ROR_PID_TYPE = qualifier("ROR", "ROR", ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES);
+	private static final Qualifier ROR_PID_TYPE = qualifier(
+		"ROR", "ROR", ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES);
 
 	public static void main(final String[] args) throws Exception {
 
 		final String jsonConfiguration = IOUtils
-			.toString(GenerateRorActionSetJob.class
-				.getResourceAsStream("/eu/dnetlib/dhp/actionmanager/ror/action_set_parameters.json"));
+			.toString(
+				GenerateRorActionSetJob.class
+					.getResourceAsStream("/eu/dnetlib/dhp/actionmanager/ror/action_set_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -109,8 +113,9 @@ public class GenerateRorActionSetJob {
 		readInputPath(spark, inputPath)
 			.map(GenerateRorActionSetJob::convertRorOrg)
 			.flatMap(List::iterator)
-			.mapToPair(aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
-				new Text(OBJECT_MAPPER.writeValueAsString(aa))))
+			.mapToPair(
+				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
+					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
 			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
 	}
 
@@ -145,9 +150,12 @@ public class GenerateRorActionSetJob {
 		o.setEcnutscode(null);
 		if (r.getCountry() != null) {
 			o
-				.setCountry(qualifier(r.getCountry().getCountryCode(), r
-					.getCountry()
-					.getCountryName(), ModelConstants.DNET_COUNTRY_TYPE, ModelConstants.DNET_COUNTRY_TYPE));
+				.setCountry(
+					qualifier(
+						r.getCountry().getCountryCode(), r
+							.getCountry()
+							.getCountryName(),
+						ModelConstants.DNET_COUNTRY_TYPE, ModelConstants.DNET_COUNTRY_TYPE));
 		} else {
 			o.setCountry(null);
 		}
@@ -173,7 +181,8 @@ public class GenerateRorActionSetJob {
 			final String type = e.getKey();
 			final List<String> all = e.getValue().getAll();
 			if (all != null) {
-				final Qualifier qualifier = qualifier(type, type, ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES);
+				final Qualifier qualifier = qualifier(
+					type, type, ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES);
 				for (final String pid : all) {
 					pids
 						.add(structuredProperty(pid, qualifier, ROR_DATA_INFO));
