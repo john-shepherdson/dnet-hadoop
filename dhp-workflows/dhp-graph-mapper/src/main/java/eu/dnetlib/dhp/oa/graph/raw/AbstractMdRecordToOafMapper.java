@@ -284,42 +284,36 @@ public abstract class AbstractMdRecordToOafMapper {
 		for (Object o : doc.selectNodes("//oaf:relation")) {
 			Element element = (Element) o;
 
-			final Relation rel = new Relation();
-			rel.setCollectedfrom(entity.getCollectedfrom());
-			rel.setDataInfo(entity.getDataInfo());
-			rel.setLastupdatetimestamp(entity.getLastupdatetimestamp());
+			final String target = StringUtils.trim(element.getText());
+			final String relType = element.attributeValue("relType");
+			final String subRelType = element.attributeValue("subRelType");
+			final String relClass = element.attributeValue("relClass");
 
-			String relType = element.attributeValue("relType");
-			String subRelType = element.attributeValue("subRelType");
-			String relClass = element.attributeValue("relClass");
-			String relClassInverse = ModelSupport
-				.findInverse(ModelSupport.rel(relType, subRelType, relClass))
-				.getInverseRelClass();
+			if (StringUtils.isNotBlank(target) && StringUtils.isNotBlank(relType) && StringUtils.isNotBlank(subRelType)
+				&& StringUtils.isNotBlank(relClass)) {
 
-			rel.setSource(entity.getId());
-			String target = StringUtils.trim(element.getText());
+				final String relClassInverse = ModelSupport
+					.findInverse(ModelSupport.rel(relType, subRelType, relClass))
+					.getInverseRelClass();
+				final String validationdDate = ((Node) o).valueOf("@validationDate");
 
-			final String validationdDate = ((Node) o).valueOf("@validationDate");
-
-			if (StringUtils.isNotBlank(target)) {
-
-				// TODO discover the target entity type with a dedicated attribute, e.g. @targetType.
-				final String[] parts = relType.split("(?=\\p{Upper})");
-				final String targetType = parts[1].toLowerCase();
-				final String targetId = createOpenaireId(targetType, target, true);
-
-				rels
-					.add(
-						getRelation(
-							entity.getId(), targetId, relType, subRelType, relClass, entity, validationdDate));
-				rels
-					.add(
-						getRelation(
-							targetId, entity.getId(), relType, subRelType, relClassInverse, entity, validationdDate));
+				if (StringUtils.isNotBlank(target)) {
+					final String targetType = element.attributeValue("targetType");
+					if (StringUtils.isNotBlank(targetType)) {
+						final String targetId = createOpenaireId(targetType, target, true);
+						rels
+							.add(
+								getRelation(
+									entity.getId(), targetId, relType, subRelType, relClass, entity, validationdDate));
+						rels
+							.add(
+								getRelation(
+									targetId, entity.getId(), relType, subRelType, relClassInverse, entity,
+									validationdDate));
+					}
+				}
 			}
-
 		}
-
 		return rels;
 	}
 

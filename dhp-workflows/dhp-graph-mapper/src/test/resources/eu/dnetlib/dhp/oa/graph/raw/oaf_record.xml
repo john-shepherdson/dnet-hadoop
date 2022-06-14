@@ -62,10 +62,12 @@
     <oaf:refereed>0001</oaf:refereed>
     <oaf:relation relClass="hasAuthorInstitution"
                   relType="resultOrganization"
-                  subRelType="affiliation">ror_________::https://ror.org/02gdcn153</oaf:relation>
+                  subRelType="affiliation"
+                  targetType="organization">ror_________::https://ror.org/02gdcn153</oaf:relation>
     <oaf:relation relClass="isProducedBy"
                   relType="resultProject"
                   subRelType="outcome"
+                  targetType="project"
                   validationDate="2020-01-01">corda_______::226852</oaf:relation>
   </metadata>
   <about xmlns:oai="http://www.openarchives.org/OAI/2.0/">
