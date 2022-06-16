@@ -835,6 +835,20 @@ class MappersTest {
 		assertEquals("EUR", p.getProcessingchargecurrency().getValue());
 	}
 
+	@Test
+	void testROHub() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("rohub.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+//		final Dataset p = (Dataset) list.get(0);
+//		assertValidId(p.getId());
+//		assertValidId(p.getCollectedfrom().get(0).getKey());
+//		System.out.println(p.getTitle().get(0).getValue());
+//		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+	}
+
 	private void assertValidId(final String id) {
 		// System.out.println(id);
 

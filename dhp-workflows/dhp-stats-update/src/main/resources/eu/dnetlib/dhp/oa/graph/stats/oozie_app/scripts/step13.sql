@@ -81,3 +81,33 @@ where reltype='resultResult'
     and r1.resulttype.classname != 'other'
     and r2.resulttype.classname != 'other'
     and rel.datainfo.deletedbyinference=false and rel.datainfo.invisible = FALSE;
+
+create table ${stats_db_name}.result_citations_oc stored as parquet as
+select substr(target, 4) as id, count(distinct substr(source, 4)) as citations
+from ${openaire_db_name}.relation rel
+join ${openaire_db_name}.result r1 on rel.source=r1.id
+join ${openaire_db_name}.result r2 on r2.id=rel.target
+where relClass='Cites' and rel.datainfo.provenanceaction.classid = 'sysimport:crosswalk:opencitations'
+    and reltype='resultResult'
+    and r1.resulttype.classname!=r2.resulttype.classname
+    and r1.datainfo.deletedbyinference=false and r1.datainfo.invisible = FALSE
+    and r2.datainfo.deletedbyinference=false and r2.datainfo.invisible = FALSE
+    and r1.resulttype.classname != 'other'
+    and r2.resulttype.classname != 'other'
+    and rel.datainfo.deletedbyinference=false and rel.datainfo.invisible = FALSE
+group by substr(target, 4);
+
+create table ${stats_db_name}.result_references_oc stored as parquet as
+select substr(source, 4) as id, count(distinct substr(target, 4)) as references
+from ${openaire_db_name}.relation rel
+         join ${openaire_db_name}.result r1 on rel.source=r1.id
+         join ${openaire_db_name}.result r2 on r2.id=rel.target
+where relClass='Cites' and rel.datainfo.provenanceaction.classid = 'sysimport:crosswalk:opencitations'
+  and reltype='resultResult'
+  and r1.resulttype.classname!=r2.resulttype.classname
+    and r1.datainfo.deletedbyinference=false and r1.datainfo.invisible = FALSE
+    and r2.datainfo.deletedbyinference=false and r2.datainfo.invisible = FALSE
+    and r1.resulttype.classname != 'other'
+    and r2.resulttype.classname != 'other'
+    and rel.datainfo.deletedbyinference=false and rel.datainfo.invisible = FALSE
+group by substr(source, 4);

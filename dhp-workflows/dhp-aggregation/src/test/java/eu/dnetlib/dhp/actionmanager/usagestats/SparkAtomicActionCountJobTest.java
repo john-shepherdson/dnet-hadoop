@@ -13,9 +13,6 @@ import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -26,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
@@ -75,13 +71,14 @@ public class SparkAtomicActionCountJobTest {
 			.getResource("/eu/dnetlib/dhp/actionmanager/usagestats/usagestatsdb")
 			.getPath();
 
-		SparkAtomicActionUsageJob.prepareActionSet(spark, usageScoresPath, workingDir.toString() + "/actionSet");
+		SparkAtomicActionUsageJob.writeActionSet(spark, usageScoresPath, workingDir.toString() + "/actionSet");
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<Result> tmp = sc
-			.textFile(workingDir.toString() + "/actionSet")
-			.map(usm -> OBJECT_MAPPER.readValue(usm, Result.class));
+			.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)
+			.map(usm -> OBJECT_MAPPER.readValue(usm._2.getBytes(), AtomicAction.class))
+			.map(aa -> (Result) aa.getPayload());
 
 		Assertions.assertEquals(9, tmp.count());
 

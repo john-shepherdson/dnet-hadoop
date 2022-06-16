@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
@@ -24,11 +26,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Measure;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import scala.Tuple2;
 
 /**
  * created the Atomic Action for each type of results
@@ -73,7 +77,7 @@ public class SparkAtomicActionUsageJob implements Serializable {
 			spark -> {
 				removeOutputDir(spark, outputPath);
 				prepareResults(dbname, spark, workingPath);
-				prepareActionSet(spark, workingPath, outputPath);
+				writeActionSet(spark, workingPath, outputPath);
 			});
 	}
 
@@ -89,7 +93,7 @@ public class SparkAtomicActionUsageJob implements Serializable {
 			.json(workingPath);
 	}
 
-	public static void prepareActionSet(SparkSession spark, String inputPath, String outputPath) {
+	public static void writeActionSet(SparkSession spark, String inputPath, String outputPath) {
 		readPath(spark, inputPath, UsageStatsModel.class)
 			.groupByKey((MapFunction<UsageStatsModel, String>) us -> us.getResult_id(), Encoders.STRING())
 			.mapGroups((MapGroupsFunction<String, UsageStatsModel, Result>) (k, it) -> {
@@ -105,10 +109,13 @@ public class SparkAtomicActionUsageJob implements Serializable {
 				res.setMeasures(getMeasure(first.getDownloads(), first.getViews()));
 				return res;
 			}, Encoders.bean(Result.class))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(outputPath);
+			.toJavaRDD()
+			.map(p -> new AtomicAction(p.getClass(), p))
+			.mapToPair(
+				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
+					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
+			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
+
 	}
 
 	private static List<Measure> getMeasure(Long downloads, Long views) {

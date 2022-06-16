@@ -27,15 +27,7 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_RESULT;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.USER_CLAIM;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.asString;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.dataInfo;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.field;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.journal;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.listFields;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.listKeyValues;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.qualifier;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -143,8 +135,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 					smdbe.execute("queryClaims.sql", smdbe::processClaims);
 					break;
 				case openaire:
-					log.info("Processing datasources...");
-					smdbe.execute("queryDatasources.sql", smdbe::processDatasource, verifyNamespacePrefix);
+					log.info("Processing services...");
+					smdbe.execute("queryServices.sql", smdbe::processService, verifyNamespacePrefix);
 
 					log.info("Processing projects...");
 					if (dbSchema.equalsIgnoreCase("beta")) {
@@ -156,10 +148,10 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 					log.info("Processing Organizations...");
 					smdbe.execute("queryOrganizations.sql", smdbe::processOrganization, verifyNamespacePrefix);
 
-					log.info("Processing relationsNoRemoval ds <-> orgs ...");
+					log.info("Processing relations services <-> orgs ...");
 					smdbe
 						.execute(
-							"queryDatasourceOrganization.sql", smdbe::processDatasourceOrganization,
+							"queryServiceOrganization.sql", smdbe::processServiceOrganization,
 							verifyNamespacePrefix);
 
 					log.info("Processing projects <-> orgs ...");
@@ -235,32 +227,30 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		dbClient.processResults(sql, consumer);
 	}
 
-	public List<Oaf> processDatasource(final ResultSet rs) {
+	public List<Oaf> processService(final ResultSet rs) {
 		try {
 			final DataInfo info = prepareDataInfo(rs);
 
 			final Datasource ds = new Datasource();
 
-			ds.setId(createOpenaireId(10, rs.getString("datasourceid"), true));
+			ds.setId(createOpenaireId(10, rs.getString("id"), true));
 			ds
 				.setOriginalId(
 					Arrays
-						.asList((String[]) rs.getArray("identities").getArray())
+						.asList((String[]) rs.getArray("originalid").getArray())
 						.stream()
 						.filter(StringUtils::isNotBlank)
 						.collect(Collectors.toList()));
-			ds
-				.setCollectedfrom(
-					listKeyValues(
-						createOpenaireId(10, rs.getString("collectedfromid"), true),
-						rs.getString("collectedfromname")));
-			ds.setPid(new ArrayList<>());
+			ds.setCollectedfrom(prepareCollectedfrom(rs.getArray("collectedfrom")));
+			ds.setPid(prepareListOfStructProps(rs.getArray("pid"), info));
 			ds.setDateofcollection(asString(rs.getDate("dateofcollection")));
 			ds.setDateoftransformation(null); // Value not returned by the SQL query
 			ds.setExtraInfo(new ArrayList<>()); // Values not present in the DB
 			ds.setOaiprovenance(null); // Values not present in the DB
 			ds.setDatasourcetype(prepareQualifierSplitting(rs.getString("datasourcetype")));
 			ds.setDatasourcetypeui(prepareQualifierSplitting(rs.getString("datasourcetypeui")));
+			ds.setEosctype(prepareQualifierSplitting(rs.getString("eosctype")));
+			ds.setEoscdatasourcetype(prepareQualifierSplitting(rs.getString("eoscdatasourcetype")));
 			ds.setOpenairecompatibility(prepareQualifierSplitting(rs.getString("openairecompatibility")));
 			ds.setOfficialname(field(rs.getString("officialname"), info));
 			ds.setEnglishname(field(rs.getString("englishname"), info));
@@ -277,20 +267,19 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			ds.setOdnumberofitemsdate(field(asString(rs.getDate("odnumberofitemsdate")), info));
 			ds.setOdpolicies(field(rs.getString("odpolicies"), info));
 			ds.setOdlanguages(prepareListFields(rs.getArray("odlanguages"), info));
-			ds.setOdcontenttypes(prepareListFields(rs.getArray("odcontenttypes"), info));
+			ds.setLanguages(listValues(rs.getArray("languages")));
 			ds.setAccessinfopackage(prepareListFields(rs.getArray("accessinfopackage"), info));
 			ds.setReleasestartdate(field(asString(rs.getDate("releasestartdate")), info));
 			ds.setReleaseenddate(field(asString(rs.getDate("releaseenddate")), info));
 			ds.setMissionstatementurl(field(rs.getString("missionstatementurl"), info));
-			ds.setDataprovider(field(rs.getBoolean("dataprovider"), info));
-			ds.setServiceprovider(field(rs.getBoolean("serviceprovider"), info));
 			ds.setDatabaseaccesstype(field(rs.getString("databaseaccesstype"), info));
 			ds.setDatauploadtype(field(rs.getString("datauploadtype"), info));
 			ds.setDatabaseaccessrestriction(field(rs.getString("databaseaccessrestriction"), info));
 			ds.setDatauploadrestriction(field(rs.getString("datauploadrestriction"), info));
 			ds.setVersioning(field(rs.getBoolean("versioning"), info));
+			ds.setVersioncontrol(rs.getBoolean("versioncontrol"));
 			ds.setCitationguidelineurl(field(rs.getString("citationguidelineurl"), info));
-			ds.setQualitymanagementkind(field(rs.getString("qualitymanagementkind"), info));
+
 			ds.setPidsystems(field(rs.getString("pidsystems"), info));
 			ds.setCertificates(field(rs.getString("certificates"), info));
 			ds.setPolicies(new ArrayList<>()); // The sql query returns an empty array
@@ -299,13 +288,18 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 					journal(
 						rs.getString("officialname"), rs.getString("issnPrinted"), rs.getString("issnOnline"),
 						rs.getString("issnLinking"), info)); // Journal
-			ds.setDataInfo(info);
-			ds.setLastupdatetimestamp(lastUpdateTimestamp);
 
+			ds.setResearchentitytypes(listValues(rs.getArray("researchentitytypes")));
 			ds.setJurisdiction(prepareQualifierSplitting(rs.getString("jurisdiction")));
 			ds.setThematic(rs.getBoolean("thematic"));
-			ds.setKnowledgegraph(rs.getBoolean("knowledgegraph"));
 			ds.setContentpolicies(prepareListOfQualifiers(rs.getArray("contentpolicies")));
+			ds.setSubmissionpolicyurl(rs.getString("submissionpolicyurl"));
+			ds.setPreservationpolicyurl(rs.getString("preservationpolicyurl"));
+			ds.setResearchproductaccesspolicies(listValues(rs.getArray("researchproductaccesspolicies")));
+			ds
+				.setResearchproductmetadataaccesspolicies(
+					listValues(rs.getArray("researchproductmetadataaccesspolicies")));
+
 			ds.setConsenttermsofuse(rs.getBoolean("consenttermsofuse"));
 			ds.setFulltextdownload(rs.getBoolean("fulltextdownload"));
 			ds
@@ -313,8 +307,18 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 					Optional
 						.ofNullable(
 							rs.getDate("consenttermsofusedate"))
-						.map(c -> c.toString())
+						.map(java.sql.Date::toString)
 						.orElse(null));
+			ds
+				.setLastconsenttermsofusedate(
+					Optional
+						.ofNullable(
+							rs.getDate("lastconsenttermsofusedate"))
+						.map(java.sql.Date::toString)
+						.orElse(null));
+
+			ds.setDataInfo(info);
+			ds.setLastupdatetimestamp(lastUpdateTimestamp);
 
 			return Arrays.asList(ds);
 		} catch (final Exception e) {
@@ -425,11 +429,11 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		}
 	}
 
-	public List<Oaf> processDatasourceOrganization(final ResultSet rs) {
+	public List<Oaf> processServiceOrganization(final ResultSet rs) {
 		try {
 			final DataInfo info = prepareDataInfo(rs);
 			final String orgId = createOpenaireId(20, rs.getString("organization"), true);
-			final String dsId = createOpenaireId(10, rs.getString("datasource"), true);
+			final String dsId = createOpenaireId(10, rs.getString("service"), true);
 			final List<KeyValue> collectedFrom = listKeyValues(
 				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
 
@@ -603,6 +607,32 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			String.format("%.3f", trust));
 	}
 
+	private List<KeyValue> prepareCollectedfrom(Array values) throws SQLException {
+		if (Objects.isNull(values)) {
+			return null;
+		}
+		return Arrays
+			.stream((String[]) values.getArray())
+			.filter(Objects::nonNull)
+			.distinct()
+			.map(s -> keyValueSplitting(s, "@@@"))
+			.collect(Collectors.toList());
+	}
+
+	public static KeyValue keyValueSplitting(final String s, String separator) {
+		if (StringUtils.isBlank(s)) {
+			return null;
+		}
+		final String[] arr = s.split(separator);
+		if (arr.length != 2) {
+			return null;
+		}
+		KeyValue kv = new KeyValue();
+		kv.setKey(createOpenaireId(10, arr[0], true));
+		kv.setValue(arr[1]);
+		return kv;
+	}
+
 	private Qualifier prepareQualifierSplitting(final String s) {
 		if (StringUtils.isBlank(s)) {
 			return null;
@@ -711,10 +741,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			final Relation r = new Relation();
 			r.setRelType(ORG_ORG_RELTYPE);
 			r.setSubRelType(ModelConstants.RELATIONSHIP);
-			r
-				.setRelClass(
-					rs.getString("type").equalsIgnoreCase("parent") ? ModelConstants.IS_PARENT_OF
-						: ModelConstants.IS_CHILD_OF);
+			r.setRelClass(rs.getString("type"));
 			r.setSource(orgId1);
 			r.setTarget(orgId2);
 			r.setCollectedfrom(collectedFrom);

@@ -1,1 +1,4 @@
-{ "id": "10|274269ac6f3b::2a2e2793b500f3f7b47ef24b1a9277b7", "openairecompatibility": { "classid": "openaire2.0" }}
+{ "id": "10|274269ac6f3b::2a2e2793b500f3f7b47ef24b1a9277b7", "openairecompatibility": { "classid": "openaire2.0" },
+  "originalId": ["opendoar____::1234"],
+  "collectedfrom": [{"key": "openaire____::47ce9e9f4fad46e732cff06419ecaabb", "value": "OpenDOAR"}]
+}

@@ -2,7 +2,7 @@ package eu.dnetlib.doiboost.crossref
 
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf._
-import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils}
+import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactory, OafMapperUtils}
 import eu.dnetlib.dhp.utils.DHPUtils
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.DoiBoostMappingUtil._
@@ -280,10 +280,10 @@ case object Crossref2Oaf {
       instance.setDateofacceptance(asField(createdDate.getValue))
     }
     val s: List[String] = List("https://doi.org/" + doi)
-//    val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null && p.toLowerCase().contains(doi.toLowerCase())).distinct
-//    if (links.nonEmpty) {
-//      instance.setUrl(links.asJava)
-//    }
+    //    val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null && p.toLowerCase().contains(doi.toLowerCase())).distinct
+    //    if (links.nonEmpty) {
+    //      instance.setUrl(links.asJava)
+    //    }
     if (s.nonEmpty) {
       instance.setUrl(s.asJava)
     }
@@ -576,14 +576,19 @@ case object Crossref2Oaf {
 
   def extractDate(dt: String, datePart: List[List[Int]]): String = {
     if (StringUtils.isNotBlank(dt))
-      return dt
+      return GraphCleaningFunctions.cleanDate(dt)
     if (datePart != null && datePart.size == 1) {
       val res = datePart.head
       if (res.size == 3) {
         val dp = f"${res.head}-${res(1)}%02d-${res(2)}%02d"
         if (dp.length == 10) {
-          return dp
+          return GraphCleaningFunctions.cleanDate(dp)
         }
+      } else if (res.size == 2) {
+        val dp = f"${res.head}-${res(1)}%02d-01"
+        return GraphCleaningFunctions.cleanDate(dp)
+      } else if (res.size == 1) {
+        return GraphCleaningFunctions.cleanDate(s"${res.head}-01-01")
       }
     }
     null
