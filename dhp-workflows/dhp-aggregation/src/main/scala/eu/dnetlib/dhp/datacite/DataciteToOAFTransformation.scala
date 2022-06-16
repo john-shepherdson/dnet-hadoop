@@ -47,13 +47,18 @@ object DataciteToOAFTransformation {
   }
 
   /** This method should skip record if json contains invalid text
-    * defined in gile datacite_filter
+    * defined in file datacite_filter
     *
-    * @param json
+    * @param record : unparsed datacite record
+    * @param json : parsed record
     * @return True if the record should be skipped
     */
-  def skip_record(json: String): Boolean = {
-    datacite_filter.exists(f => json.contains(f))
+  def skip_record(record: String, json: org.json4s.JValue): Boolean = {
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+    datacite_filter.exists(f => record.contains(f)) || (json \\ "publisher")
+      .extractOrElse[String]("")
+      .equalsIgnoreCase("FAIRsharing")
+
   }
 
   @deprecated("this method will be removed", "dhp")
@@ -304,11 +309,12 @@ object DataciteToOAFTransformation {
     vocabularies: VocabularyGroup,
     exportLinks: Boolean
   ): List[Oaf] = {
-    if (skip_record(input))
-      return List()
 
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json = parse(input)
+
+    if (skip_record(input, json))
+      return List()
 
     val resourceType = (json \ "attributes" \ "types" \ "resourceType").extractOrElse[String](null)
     val resourceTypeGeneral =

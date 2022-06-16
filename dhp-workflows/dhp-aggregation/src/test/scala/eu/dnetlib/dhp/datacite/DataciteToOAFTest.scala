@@ -107,4 +107,19 @@ class DataciteToOAFTest extends AbstractVocabularyTest {
 
   }
 
+  @Test
+  def testFilter(): Unit = {
+    val record = Source
+      .fromInputStream(
+        getClass.getResourceAsStream("/eu/dnetlib/dhp/actionmanager/datacite/record_fairsharing.json")
+      )
+      .mkString
+
+    val mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
+    val res: List[Oaf] = DataciteToOAFTransformation.generateOAF(record, 0L, 0L, vocabularies, true)
+
+    assertTrue(res.isEmpty)
+
+  }
+
 }
