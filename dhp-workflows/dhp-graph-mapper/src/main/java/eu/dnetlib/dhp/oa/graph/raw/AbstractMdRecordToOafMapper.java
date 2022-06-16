@@ -18,14 +18,7 @@ import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.oaiIProvenance;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.qualifier;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.*;
@@ -35,6 +28,7 @@ import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.AccessRight;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Context;
@@ -199,8 +193,13 @@ public abstract class AbstractMdRecordToOafMapper {
 		final List<Oaf> oafs = Lists.newArrayList(entity);
 
 		if (!oafs.isEmpty()) {
-			oafs.addAll(addProjectRels(doc, entity));
-			oafs.addAll(addOtherResultRels(doc, entity));
+			Set<Oaf> rels = Sets.newHashSet();
+
+			rels.addAll(addProjectRels(doc, entity));
+			rels.addAll(addOtherResultRels(doc, entity));
+			rels.addAll(addRelations(doc, entity));
+
+			oafs.addAll(rels);
 		}
 
 		return oafs;
@@ -276,6 +275,46 @@ public abstract class AbstractMdRecordToOafMapper {
 		}
 
 		return res;
+	}
+
+	private List<Oaf> addRelations(Document doc, OafEntity entity) {
+
+		final List<Oaf> rels = Lists.newArrayList();
+
+		for (Object o : doc.selectNodes("//oaf:relation")) {
+			Element element = (Element) o;
+
+			final String target = StringUtils.trim(element.getText());
+			final String relType = element.attributeValue("relType");
+			final String subRelType = element.attributeValue("subRelType");
+			final String relClass = element.attributeValue("relClass");
+
+			if (StringUtils.isNotBlank(target) && StringUtils.isNotBlank(relType) && StringUtils.isNotBlank(subRelType)
+				&& StringUtils.isNotBlank(relClass)) {
+
+				final String relClassInverse = ModelSupport
+					.findInverse(ModelSupport.rel(relType, subRelType, relClass))
+					.getInverseRelClass();
+				final String validationdDate = ((Node) o).valueOf("@validationDate");
+
+				if (StringUtils.isNotBlank(target)) {
+					final String targetType = element.attributeValue("targetType");
+					if (StringUtils.isNotBlank(targetType)) {
+						final String targetId = createOpenaireId(targetType, target, true);
+						rels
+							.add(
+								getRelation(
+									entity.getId(), targetId, relType, subRelType, relClass, entity, validationdDate));
+						rels
+							.add(
+								getRelation(
+									targetId, entity.getId(), relType, subRelType, relClassInverse, entity,
+									validationdDate));
+					}
+				}
+			}
+		}
+		return rels;
 	}
 
 	protected Relation getRelation(final String source,

@@ -57,14 +57,10 @@ class MappersTest {
 
 		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
-		assertEquals(3, list.size());
-		assertTrue(list.get(0) instanceof Publication);
-		assertTrue(list.get(1) instanceof Relation);
-		assertTrue(list.get(2) instanceof Relation);
+		assertEquals(1, list.stream().filter(o -> o instanceof Publication).count());
+		assertEquals(4, list.stream().filter(o -> o instanceof Relation).count());
 
-		final Publication p = (Publication) list.get(0);
-		final Relation r1 = (Relation) list.get(1);
-		final Relation r2 = (Relation) list.get(2);
+		Publication p = (Publication) list.stream().filter(o -> o instanceof Publication).findFirst().get();
 
 		assertValidId(p.getId());
 
@@ -125,26 +121,58 @@ class MappersTest {
 
 		assertNotNull(p.getBestaccessright());
 		assertEquals("OPEN", p.getBestaccessright().getClassid());
-		assertValidId(r1.getSource());
-		assertValidId(r1.getTarget());
-		assertValidId(r2.getSource());
-		assertValidId(r2.getTarget());
-		assertValidId(r1.getCollectedfrom().get(0).getKey());
-		assertValidId(r2.getCollectedfrom().get(0).getKey());
-		assertNotNull(r1.getDataInfo());
-		assertNotNull(r2.getDataInfo());
-		assertNotNull(r1.getDataInfo().getTrust());
-		assertNotNull(r2.getDataInfo().getTrust());
-		assertEquals(r1.getSource(), r2.getTarget());
-		assertEquals(r2.getSource(), r1.getTarget());
-		assertTrue(StringUtils.isNotBlank(r1.getRelClass()));
-		assertTrue(StringUtils.isNotBlank(r2.getRelClass()));
-		assertTrue(StringUtils.isNotBlank(r1.getRelType()));
-		assertTrue(StringUtils.isNotBlank(r2.getRelType()));
-		assertTrue(r1.getValidated());
-		assertTrue(r2.getValidated());
-		assertEquals("2020-01-01", r1.getValidationDate());
-		assertEquals("2020-01-01", r2.getValidationDate());
+
+		// RESULT PROJECT
+		List<Relation> resultProject = list
+			.stream()
+			.filter(o -> o instanceof Relation)
+			.map(o -> (Relation) o)
+			.filter(r -> ModelConstants.RESULT_PROJECT.equals(r.getRelType()))
+			.collect(Collectors.toList());
+
+		assertEquals(2, resultProject.size());
+		final Relation rp1 = resultProject.get(0);
+		final Relation rp2 = resultProject.get(1);
+
+		verifyRelation(rp1);
+		verifyRelation(rp2);
+
+		assertTrue(rp1.getValidated());
+		assertTrue(rp2.getValidated());
+		assertEquals("2020-01-01", rp1.getValidationDate());
+		assertEquals("2020-01-01", rp2.getValidationDate());
+
+		assertEquals(rp1.getSource(), rp2.getTarget());
+		assertEquals(rp2.getSource(), rp1.getTarget());
+
+		// AFFILIATIONS
+		List<Relation> affiliation = list
+			.stream()
+			.filter(o -> o instanceof Relation)
+			.map(o -> (Relation) o)
+			.filter(r -> ModelConstants.RESULT_ORGANIZATION.equals(r.getRelType()))
+			.collect(Collectors.toList());
+
+		assertEquals(2, affiliation.size());
+		final Relation aff1 = affiliation.get(0);
+		final Relation aff2 = affiliation.get(1);
+
+		verifyRelation(aff1);
+		verifyRelation(aff2);
+
+		assertEquals(aff1.getSource(), aff2.getTarget());
+		assertEquals(aff2.getSource(), aff1.getTarget());
+	}
+
+	private void verifyRelation(Relation r) {
+		assertValidId(r.getSource());
+		assertValidId(r.getTarget());
+		assertValidId(r.getCollectedfrom().get(0).getKey());
+		assertNotNull(r.getDataInfo());
+		assertNotNull(r.getDataInfo().getTrust());
+		assertTrue(StringUtils.isNotBlank(r.getRelClass()));
+		assertTrue(StringUtils.isNotBlank(r.getRelType()));
+
 	}
 
 	@Test
