@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.dnetlib.dhp.collection.plugin.file.FileCollectorPlugin;
-import eu.dnetlib.dhp.collection.plugin.file.FileGZipCollectorPlugin;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -21,6 +19,8 @@ import org.slf4j.LoggerFactory;
 import eu.dnetlib.dhp.aggregation.common.ReporterCallback;
 import eu.dnetlib.dhp.aggregation.common.ReportingJob;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
+import eu.dnetlib.dhp.collection.plugin.file.FileCollectorPlugin;
+import eu.dnetlib.dhp.collection.plugin.file.FileGZipCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.mongodb.MDStoreCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.mongodb.MongoDbDumpCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.oai.OaiCollectorPlugin;
