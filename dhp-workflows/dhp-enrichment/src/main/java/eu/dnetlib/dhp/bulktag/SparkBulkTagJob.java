@@ -103,7 +103,7 @@ public class SparkBulkTagJob {
 		ResultTagger resultTagger = new ResultTagger();
 		readPath(spark, inputPath, resultClazz)
 			.map(patchResult(), Encoders.bean(resultClazz))
-				.filter(Objects::nonNull)
+			.filter(Objects::nonNull)
 			.map(
 				(MapFunction<R, R>) value -> resultTagger
 					.enrichContextCriteria(
