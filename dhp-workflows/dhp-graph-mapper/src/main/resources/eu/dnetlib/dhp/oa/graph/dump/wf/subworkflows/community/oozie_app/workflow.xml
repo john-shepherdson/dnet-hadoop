@@ -107,7 +107,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${selectedResults}/publication</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dump/publication</arg>
             <arg>--communityMapPath</arg><arg>${communityMapPath}</arg>
@@ -134,7 +134,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${selectedResults}/dataset</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dump/dataset</arg>
             <arg>--communityMapPath</arg><arg>${communityMapPath}</arg>
@@ -160,7 +160,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${selectedResults}/otherresearchproduct</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dump/otherresearchproduct</arg>
             <arg>--communityMapPath</arg><arg>${communityMapPath}</arg>
@@ -186,7 +186,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${selectedResults}/software</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${workingDir}/dump/software</arg>
             <arg>--communityMapPath</arg><arg>${communityMapPath}</arg>
@@ -246,7 +246,7 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/dump/publication</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/ext/publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/ext/publication</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="join_extend"/>
@@ -271,7 +271,7 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/dump/dataset</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/ext/dataset</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/ext/dataset</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="join_extend"/>
@@ -296,7 +296,7 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/dump/otherresearchproduct</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/ext/orp</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/ext/orp</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="join_extend"/>
@@ -321,7 +321,7 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/dump/software</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/ext/software</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/ext/software</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo</arg>
         </spark>
         <ok to="join_extend"/>
