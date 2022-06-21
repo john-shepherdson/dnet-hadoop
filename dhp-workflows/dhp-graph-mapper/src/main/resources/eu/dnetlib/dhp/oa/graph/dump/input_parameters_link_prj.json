@@ -28,6 +28,12 @@
 		"paramLongName":"graphPath",
 		"paramDescription": "the path to the relations",
 		"paramRequired": true
+	},
+	{
+		"paramName":"cmp",
+		"paramLongName":"communityMapPath",
+		"paramDescription": "the path to the relations",
+		"paramRequired": true
 	}
 ]
 
