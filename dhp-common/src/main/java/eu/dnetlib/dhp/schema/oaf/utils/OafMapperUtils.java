@@ -419,4 +419,62 @@ public class OafMapperUtils {
 		m.setUnit(Arrays.asList(newKeyValueInstance(key, value, dataInfo)));
 		return m;
 	}
+
+	public static Relation getRelation(final String source,
+		final String target,
+		final String relType,
+		final String subRelType,
+		final String relClass,
+		final OafEntity entity) {
+		return getRelation(source, target, relType, subRelType, relClass, entity, null);
+	}
+
+	public static Relation getRelation(final String source,
+		final String target,
+		final String relType,
+		final String subRelType,
+		final String relClass,
+		final OafEntity entity,
+		final String validationDate) {
+		return getRelation(
+			source, target, relType, subRelType, relClass, entity.getCollectedfrom(), entity.getDataInfo(),
+			entity.getLastupdatetimestamp(), validationDate, null);
+	}
+
+	public static Relation getRelation(final String source,
+		final String target,
+		final String relType,
+		final String subRelType,
+		final String relClass,
+		final List<KeyValue> collectedfrom,
+		final DataInfo dataInfo,
+		final Long lastupdatetimestamp) {
+		return getRelation(
+			source, target, relType, subRelType, relClass, collectedfrom, dataInfo, lastupdatetimestamp, null, null);
+	}
+
+	public static Relation getRelation(final String source,
+		final String target,
+		final String relType,
+		final String subRelType,
+		final String relClass,
+		final List<KeyValue> collectedfrom,
+		final DataInfo dataInfo,
+		final Long lastupdatetimestamp,
+		final String validationDate,
+		final List<KeyValue> properties) {
+		final Relation rel = new Relation();
+		rel.setRelType(relType);
+		rel.setSubRelType(subRelType);
+		rel.setRelClass(relClass);
+		rel.setSource(source);
+		rel.setTarget(target);
+		rel.setCollectedfrom(collectedfrom);
+		rel.setDataInfo(dataInfo);
+		rel.setLastupdatetimestamp(lastupdatetimestamp);
+		rel.setValidated(StringUtils.isNotBlank(validationDate));
+		rel.setValidationDate(StringUtils.isNotBlank(validationDate) ? validationDate : null);
+		rel.setProperties(properties);
+		return rel;
+	}
 }

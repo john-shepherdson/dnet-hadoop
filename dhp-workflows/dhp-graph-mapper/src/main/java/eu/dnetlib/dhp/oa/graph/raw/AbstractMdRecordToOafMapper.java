@@ -267,10 +267,13 @@ public abstract class AbstractMdRecordToOafMapper {
 
 				res
 					.add(
-						getRelation(
-							docId, projectId, RESULT_PROJECT, OUTCOME, IS_PRODUCED_BY, entity, validationdDate));
+						OafMapperUtils
+							.getRelation(
+								docId, projectId, RESULT_PROJECT, OUTCOME, IS_PRODUCED_BY, entity, validationdDate));
 				res
-					.add(getRelation(projectId, docId, RESULT_PROJECT, OUTCOME, PRODUCES, entity, validationdDate));
+					.add(
+						OafMapperUtils
+							.getRelation(projectId, docId, RESULT_PROJECT, OUTCOME, PRODUCES, entity, validationdDate));
 			}
 		}
 
@@ -303,48 +306,21 @@ public abstract class AbstractMdRecordToOafMapper {
 						final String targetId = createOpenaireId(targetType, target, true);
 						rels
 							.add(
-								getRelation(
-									entity.getId(), targetId, relType, subRelType, relClass, entity, validationdDate));
+								OafMapperUtils
+									.getRelation(
+										entity.getId(), targetId, relType, subRelType, relClass, entity,
+										validationdDate));
 						rels
 							.add(
-								getRelation(
-									targetId, entity.getId(), relType, subRelType, relClassInverse, entity,
-									validationdDate));
+								OafMapperUtils
+									.getRelation(
+										targetId, entity.getId(), relType, subRelType, relClassInverse, entity,
+										validationdDate));
 					}
 				}
 			}
 		}
 		return rels;
-	}
-
-	protected Relation getRelation(final String source,
-		final String target,
-		final String relType,
-		final String subRelType,
-		final String relClass,
-		final OafEntity entity) {
-		return getRelation(source, target, relType, subRelType, relClass, entity, null);
-	}
-
-	protected Relation getRelation(final String source,
-		final String target,
-		final String relType,
-		final String subRelType,
-		final String relClass,
-		final OafEntity entity,
-		final String validationDate) {
-		final Relation rel = new Relation();
-		rel.setRelType(relType);
-		rel.setSubRelType(subRelType);
-		rel.setRelClass(relClass);
-		rel.setSource(source);
-		rel.setTarget(target);
-		rel.setCollectedfrom(entity.getCollectedfrom());
-		rel.setDataInfo(entity.getDataInfo());
-		rel.setLastupdatetimestamp(entity.getLastupdatetimestamp());
-		rel.setValidated(StringUtils.isNotBlank(validationDate));
-		rel.setValidationDate(StringUtils.isNotBlank(validationDate) ? validationDate : null);
-		return rel;
 	}
 
 	protected abstract List<Oaf> addOtherResultRels(
