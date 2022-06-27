@@ -763,6 +763,51 @@ class MappersTest {
 	}
 
 	@Test
+	void testZenodo() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_zenodo.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		final Publication p = (Publication) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+
+		assertNotNull(p.getTitle());
+		assertFalse(p.getTitle().isEmpty());
+		assertEquals(1, p.getTitle().size());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+
+		assertNotNull(p.getAuthor());
+		assertEquals(2, p.getAuthor().size());
+
+		Author author = p
+			.getAuthor()
+			.stream()
+			.filter(a -> a.getPid().stream().anyMatch(pi -> pi.getValue().equals("0000-0003-3272-8007")))
+			.findFirst()
+			.get();
+		assertNotNull(author);
+		assertTrue(StringUtils.isBlank(author.getSurname()));
+		assertTrue(StringUtils.isBlank(author.getName()));
+		assertEquals("Anne van Weerden", author.getFullname());
+
+		author = p
+			.getAuthor()
+			.stream()
+			.filter(a -> a.getPid().stream().anyMatch(pi -> pi.getValue().equals("0000-0003-3272-8008")))
+			.findFirst()
+			.get();
+		assertNotNull(author);
+		assertFalse(StringUtils.isBlank(author.getSurname()));
+		assertFalse(StringUtils.isBlank(author.getName()));
+		assertFalse(StringUtils.isBlank(author.getFullname()));
+
+	}
+
+	@Test
 	void testOdfFromHdfs() throws IOException, DocumentException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_from_hdfs.xml")));
