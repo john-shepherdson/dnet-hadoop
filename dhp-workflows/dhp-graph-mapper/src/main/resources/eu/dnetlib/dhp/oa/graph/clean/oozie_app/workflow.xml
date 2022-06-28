@@ -13,6 +13,23 @@
             <name>isLookupUrl</name>
             <description>the address of the lookUp service</description>
         </property>
+        <property>
+            <name>shouldCleanContext</name>
+            <description>true if the context have to be cleaned</description>
+        </property>
+        <property>
+            <name>contextId</name>
+            <value>sobigdata</value>
+            <description>It is the context id that should be removed from the result if the condition is matched.
+            Now it is just sobigdata. In a futere implementation I plan to have the contextId as value in a json
+            where to specify also the constraints that should be verified to remove the context from the result</description>
+        </property>
+        <property>
+            <name>verifyParam</name>
+            <value>gcube </value>
+            <description>It is the constrint to be verified. This time is hardcoded as gcube and it is searched for in
+            the title. If title starts with gcube than the context sobigdata will be removed by the result if present</description>
+        </property>
 
         <property>
             <name>sparkDriverMemory</name>
@@ -275,7 +292,131 @@
         <error to="Kill"/>
     </action>
 
-    <join name="wait_clean" to="End"/>
+    <join name="wait_clean" to="clean_context"/>
+
+    <decision name="clean_context">
+        <switch>
+            <case to="fork_clean_context">${wf:conf('shouldCleanContext') eq true}</case>
+            <default to="End"/>
+        </switch>
+    </decision>
+
+
+    <fork name="fork_clean_context">
+        <path start="clean_publication_context"/>
+        <path start="clean_dataset_context"/>
+        <path start="clean_otherresearchproduct_context"/>
+        <path start="clean_software_context"/>
+    </fork>
+    <action name="clean_publication_context">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Clean publications context</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanContextSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphOutputPath}/publication</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/working/publication</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+        </spark>
+        <ok to="wait_clean_context"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="clean_dataset_context">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Clean datasets Context</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanContextSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphOutputPath}/dataset</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/working/dataset</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+        </spark>
+        <ok to="wait_clean_context"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="clean_otherresearchproduct_context">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Clean otherresearchproducts context</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanContextSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphOutputPath}/otherresearchproduct</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/working/otherresearchproduct</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+        </spark>
+        <ok to="wait_clean_context"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="clean_software_context">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Clean softwares context</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanContextSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphOutputPath}/software</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/working/software</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+        </spark>
+        <ok to="wait_clean_context"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="wait_clean_context" to="End"/>
 
     <end name="End"/>
 </workflow-app>
