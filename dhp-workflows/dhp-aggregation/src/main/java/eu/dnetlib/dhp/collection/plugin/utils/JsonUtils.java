@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.collection;
+package eu.dnetlib.dhp.collection.plugin.utils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
