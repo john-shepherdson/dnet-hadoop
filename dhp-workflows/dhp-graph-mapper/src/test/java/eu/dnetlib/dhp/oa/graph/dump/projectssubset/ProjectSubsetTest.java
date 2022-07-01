@@ -30,7 +30,6 @@ public class ProjectSubsetTest {
 	private static final Logger log = LoggerFactory
 		.getLogger(eu.dnetlib.dhp.oa.graph.dump.projectssubset.ProjectSubsetTest.class);
 
-
 	@BeforeAll
 	public static void beforeAll() throws IOException {
 		workingDir = Files
