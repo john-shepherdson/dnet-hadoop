@@ -5,7 +5,37 @@
       "unit": [
         {
           "key": "score",
-          "value": "1.00889953098e-08"
+          "value": "5.06690394631e-09",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        },
+        {
+          "key": "class",
+          "value": "C",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
         }
       ]
     },
@@ -14,7 +44,37 @@
       "unit": [
         {
           "key": "score",
-          "value": "30.6576853333"
+          "value": "0.0",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        },
+        {
+          "key": "class",
+          "value": "C",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
         }
       ]
     },
@@ -23,7 +83,115 @@
       "unit": [
         {
           "key": "score",
-          "value": "4.62970429725e-08"
+          "value": "3.11855618382e-09",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        },
+        {
+          "key": "class",
+          "value": "C",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "influence_alt",
+      "unit": [
+        {
+          "key": "score",
+          "value": "0.0",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        },
+        {
+          "key": "class",
+          "value": "C",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "impulse",
+      "unit": [
+        {
+          "key": "score",
+          "value": "0.0",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        },
+        {
+          "key": "class",
+          "value": "C",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
         }
       ]
     }
