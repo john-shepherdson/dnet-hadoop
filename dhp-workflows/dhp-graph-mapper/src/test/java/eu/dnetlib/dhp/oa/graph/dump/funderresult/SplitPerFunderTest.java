@@ -56,10 +56,10 @@ public class SplitPerFunderTest {
 		conf.set("hive.metastore.warehouse.dir", workingDir.resolve("warehouse").toString());
 
 		spark = SparkSession
-				.builder()
-				.appName(SplitPerFunderTest.class.getSimpleName())
-				.config(conf)
-				.getOrCreate();
+			.builder()
+			.appName(SplitPerFunderTest.class.getSimpleName())
+			.config(conf)
+			.getOrCreate();
 	}
 
 	@AfterAll
@@ -72,13 +72,13 @@ public class SplitPerFunderTest {
 	void test1() throws Exception {
 
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/ext")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/ext")
+			.getPath();
 
 		SparkDumpFunderResults.main(new String[] {
-				"-isSparkSessionManaged", Boolean.FALSE.toString(),
-				"-outputPath", workingDir.toString() + "/split",
-				"-sourcePath", sourcePath
+			"-isSparkSessionManaged", Boolean.FALSE.toString(),
+			"-outputPath", workingDir.toString() + "/split",
+			"-sourcePath", sourcePath
 
 		});
 
@@ -86,64 +86,64 @@ public class SplitPerFunderTest {
 
 		// FP7 3 and H2020 3
 		JavaRDD<CommunityResult> tmp = sc
-				.textFile(workingDir.toString() + "/split/EC_FP7")
-				.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+			.textFile(workingDir.toString() + "/split/EC_FP7")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
 		org.apache.spark.sql.Dataset<CommunityResult> verificationDataset = spark
-				.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
+			.createDataset(tmp.rdd(), Encoders.bean(CommunityResult.class));
 
 		Assertions.assertEquals(3, verificationDataset.count());
 
 		Assertions
-				.assertEquals(
-						1, verificationDataset.filter("id = '50|dedup_wf_001::0d16b1714ab3077df73893a8ea57d776'").count());
+			.assertEquals(
+				1, verificationDataset.filter("id = '50|dedup_wf_001::0d16b1714ab3077df73893a8ea57d776'").count());
 
 		// CIHR 2
 		tmp = sc
-				.textFile(workingDir.toString() + "/split/CIHR")
-				.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+			.textFile(workingDir.toString() + "/split/CIHR")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 		Assertions.assertEquals(2, tmp.count());
 
 		// NWO 1
 		tmp = sc
-				.textFile(workingDir.toString() + "/split/NWO")
-				.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+			.textFile(workingDir.toString() + "/split/NWO")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 		Assertions.assertEquals(1, tmp.count());
 
 		// NIH 3
 		tmp = sc
-				.textFile(workingDir.toString() + "/split/NIH")
-				.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+			.textFile(workingDir.toString() + "/split/NIH")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 		Assertions.assertEquals(2, tmp.count());
 
 		// NSF 1
 		tmp = sc
-				.textFile(workingDir.toString() + "/split/NSF")
-				.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+			.textFile(workingDir.toString() + "/split/NSF")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 		Assertions.assertEquals(1, tmp.count());
 
 		// SNSF 1
 		tmp = sc
-				.textFile(workingDir.toString() + "/split/SNSF")
-				.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+			.textFile(workingDir.toString() + "/split/SNSF")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 		Assertions.assertEquals(1, tmp.count());
 
 		// NHMRC 1
 		tmp = sc
-				.textFile(workingDir.toString() + "/split/NHMRC")
-				.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+			.textFile(workingDir.toString() + "/split/NHMRC")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 		Assertions.assertEquals(1, tmp.count());
 
 		// H2020 3
 		tmp = sc
-				.textFile(workingDir.toString() + "/split/EC_H2020")
-				.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+			.textFile(workingDir.toString() + "/split/EC_H2020")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 		Assertions.assertEquals(3, tmp.count());
 
 		// MZOS 1
 		tmp = sc
-				.textFile(workingDir.toString() + "/split/MZOS")
-				.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+			.textFile(workingDir.toString() + "/split/MZOS")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 		Assertions.assertEquals(1, tmp.count());
 
 	}

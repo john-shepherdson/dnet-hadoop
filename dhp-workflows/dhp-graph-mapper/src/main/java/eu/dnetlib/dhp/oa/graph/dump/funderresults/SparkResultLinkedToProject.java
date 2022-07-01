@@ -45,18 +45,18 @@ public class SparkResultLinkedToProject implements Serializable {
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
-				.toString(
-						SparkResultLinkedToProject.class
-								.getResourceAsStream(
-										"/eu/dnetlib/dhp/oa/graph/dump/input_parameters_link_prj.json"));
+			.toString(
+				SparkResultLinkedToProject.class
+					.getResourceAsStream(
+						"/eu/dnetlib/dhp/oa/graph/dump/input_parameters_link_prj.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
 
 		Boolean isSparkSessionManaged = Optional
-				.ofNullable(parser.get("isSparkSessionManaged"))
-				.map(Boolean::valueOf)
-				.orElse(Boolean.TRUE);
+			.ofNullable(parser.get("isSparkSessionManaged"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		final String inputPath = parser.get("sourcePath");
@@ -78,41 +78,41 @@ public class SparkResultLinkedToProject implements Serializable {
 		SparkConf conf = new SparkConf();
 
 		runWithSparkSession(
-				conf,
-				isSparkSessionManaged,
-				spark -> {
-					Utils.removeOutputDir(spark, outputPath);
-					writeResultsLinkedToProjects(
-							communityMapPath, spark, inputClazz, inputPath, outputPath, resultProjectsPath);
-				});
+			conf,
+			isSparkSessionManaged,
+			spark -> {
+				Utils.removeOutputDir(spark, outputPath);
+				writeResultsLinkedToProjects(
+					communityMapPath, spark, inputClazz, inputPath, outputPath, resultProjectsPath);
+			});
 	}
 
 	private static <R extends Result> void writeResultsLinkedToProjects(String communityMapPath, SparkSession spark,
-																		Class<R> inputClazz,
-																		String inputPath, String outputPath, String resultProjectsPath) {
+		Class<R> inputClazz,
+		String inputPath, String outputPath, String resultProjectsPath) {
 
 		Dataset<R> results = Utils
-				.readPath(spark, inputPath, inputClazz)
-				.filter(
-						(FilterFunction<R>) r -> !r.getDataInfo().getDeletedbyinference() &&
-								!r.getDataInfo().getInvisible());
+			.readPath(spark, inputPath, inputClazz)
+			.filter(
+				(FilterFunction<R>) r -> !r.getDataInfo().getDeletedbyinference() &&
+					!r.getDataInfo().getInvisible());
 		Dataset<ResultProject> resultProjectDataset = Utils
-				.readPath(spark, resultProjectsPath, ResultProject.class);
+			.readPath(spark, resultProjectsPath, ResultProject.class);
 		CommunityMap communityMap = Utils.getCommunityMap(spark, communityMapPath);
 		results
-				.joinWith(resultProjectDataset, results.col("id").equalTo(resultProjectDataset.col("resultId")))
-				.map((MapFunction<Tuple2<R, ResultProject>, CommunityResult>) t2 -> {
-					CommunityResult cr = (CommunityResult) ResultMapper
-							.map(
-									t2._1(),
-									communityMap, Constants.DUMPTYPE.FUNDER.getType());
-					cr.setProjects(t2._2().getProjectsList());
-					return cr;
-				}, Encoders.bean(CommunityResult.class))
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression", "gzip")
-				.json(outputPath);
+			.joinWith(resultProjectDataset, results.col("id").equalTo(resultProjectDataset.col("resultId")))
+			.map((MapFunction<Tuple2<R, ResultProject>, CommunityResult>) t2 -> {
+				CommunityResult cr = (CommunityResult) ResultMapper
+					.map(
+						t2._1(),
+						communityMap, Constants.DUMPTYPE.FUNDER.getType());
+				cr.setProjects(t2._2().getProjectsList());
+				return cr;
+			}, Encoders.bean(CommunityResult.class))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(outputPath);
 
 	}
 }

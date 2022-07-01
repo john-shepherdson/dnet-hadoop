@@ -35,15 +35,15 @@ public class ResultLinkedToProjectTest {
 	private static Path workingDir;
 
 	private static final Logger log = LoggerFactory
-			.getLogger(eu.dnetlib.dhp.oa.graph.dump.funderresult.ResultLinkedToProjectTest.class);
+		.getLogger(eu.dnetlib.dhp.oa.graph.dump.funderresult.ResultLinkedToProjectTest.class);
 
 	private static final HashMap<String, String> map = new HashMap<>();
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
 		workingDir = Files
-				.createTempDirectory(
-						eu.dnetlib.dhp.oa.graph.dump.funderresult.ResultLinkedToProjectTest.class.getSimpleName());
+			.createTempDirectory(
+				eu.dnetlib.dhp.oa.graph.dump.funderresult.ResultLinkedToProjectTest.class.getSimpleName());
 		log.info("using work dir {}", workingDir);
 
 		SparkConf conf = new SparkConf();
@@ -57,10 +57,10 @@ public class ResultLinkedToProjectTest {
 		conf.set("hive.metastore.warehouse.dir", workingDir.resolve("warehouse").toString());
 
 		spark = SparkSession
-				.builder()
-				.appName(eu.dnetlib.dhp.oa.graph.dump.funderresult.ResultLinkedToProjectTest.class.getSimpleName())
-				.config(conf)
-				.getOrCreate();
+			.builder()
+			.appName(eu.dnetlib.dhp.oa.graph.dump.funderresult.ResultLinkedToProjectTest.class.getSimpleName())
+			.config(conf)
+			.getOrCreate();
 	}
 
 	@AfterAll
@@ -73,32 +73,32 @@ public class ResultLinkedToProjectTest {
 	void testNoMatch() throws Exception {
 
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/nomatch/papers.json")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/nomatch/papers.json")
+			.getPath();
 
 		final String graphPath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/preparedInfo")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/preparedInfo")
+			.getPath();
 
 		final String communityMapPath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/communityMapPath")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/communityMapPath")
+			.getPath();
 
 		SparkResultLinkedToProject.main(new String[] {
-				"-isSparkSessionManaged", Boolean.FALSE.toString(),
-				"-outputPath", workingDir.toString() + "/preparedInfo",
-				"-sourcePath", sourcePath,
-				"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
-				"-graphPath", graphPath,
-				"-communityMapPath", communityMapPath
+			"-isSparkSessionManaged", Boolean.FALSE.toString(),
+			"-outputPath", workingDir.toString() + "/preparedInfo",
+			"-sourcePath", sourcePath,
+			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
+			"-graphPath", graphPath,
+			"-communityMapPath", communityMapPath
 
 		});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<CommunityResult> tmp = sc
-				.textFile(workingDir.toString() + "/preparedInfo")
-				.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+			.textFile(workingDir.toString() + "/preparedInfo")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
 		Assertions.assertEquals(0, tmp.count());
 
@@ -108,32 +108,32 @@ public class ResultLinkedToProjectTest {
 	void testMatchOne() throws Exception {
 
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/match/papers.json")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/match/papers.json")
+			.getPath();
 
 		final String graphPath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/preparedInfo")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/preparedInfo")
+			.getPath();
 
 		final String communityMapPath = getClass()
-				.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/communityMapPath")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/oa/graph/dump/funderresource/communityMapPath")
+			.getPath();
 
 		SparkResultLinkedToProject.main(new String[] {
-				"-isSparkSessionManaged", Boolean.FALSE.toString(),
-				"-outputPath", workingDir.toString() + "/preparedInfo",
-				"-sourcePath", sourcePath,
-				"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
-				"-graphPath", graphPath,
-				"-communityMapPath", communityMapPath
+			"-isSparkSessionManaged", Boolean.FALSE.toString(),
+			"-outputPath", workingDir.toString() + "/preparedInfo",
+			"-sourcePath", sourcePath,
+			"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
+			"-graphPath", graphPath,
+			"-communityMapPath", communityMapPath
 
 		});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<CommunityResult> tmp = sc
-				.textFile(workingDir.toString() + "/preparedInfo")
-				.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
+			.textFile(workingDir.toString() + "/preparedInfo")
+			.map(item -> OBJECT_MAPPER.readValue(item, CommunityResult.class));
 
 		Assertions.assertEquals(1, tmp.count());
 
