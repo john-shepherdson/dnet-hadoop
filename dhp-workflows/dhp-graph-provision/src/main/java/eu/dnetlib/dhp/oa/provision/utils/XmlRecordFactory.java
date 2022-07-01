@@ -999,17 +999,11 @@ public class XmlRecordFactory implements Serializable {
 	private List<String> measuresAsXml(List<Measure> measures) {
 		return measures
 			.stream()
-			.flatMap(
-				m -> m
-					.getUnit()
-					.stream()
-					.map(
-						u -> Lists
-							.newArrayList(
-								new Tuple2<>("id", m.getId()),
-								new Tuple2<>("key", u.getKey()),
-								new Tuple2<>("value", u.getValue())))
-					.map(l -> XmlSerializationUtils.asXmlElement("measure", l)))
+			.map(m -> {
+				List<Tuple2<String, String>> l = Lists.newArrayList(new Tuple2<>("id", m.getId()));
+				m.getUnit().forEach(kv -> l.add(new Tuple2<>(kv.getKey(), kv.getValue())));
+				return XmlSerializationUtils.asXmlElement("measure", l);
+			})
 			.collect(Collectors.toList());
 	}
 
