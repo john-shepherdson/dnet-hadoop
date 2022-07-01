@@ -73,11 +73,20 @@ public class XmlRecordFactoryTest {
 		assertEquals("EUR", doc.valueOf("//processingchargecurrency/text()"));
 
 		assertEquals(
-			"1.00889953098e-08", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'influence']/@value"));
+			"5.06690394631e-09", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'influence']/@score"));
 		assertEquals(
-			"30.6576853333", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity_alt']/@value"));
+			"C", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'influence']/@class"));
+
 		assertEquals(
-			"4.62970429725e-08", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity']/@value"));
+			"0.0", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity_alt']/@score"));
+		assertEquals(
+			"C", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity_alt']/@class"));
+
+		assertEquals(
+			"3.11855618382e-09", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity']/@score"));
+		assertEquals(
+			"C", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity']/@class"));
+
 	}
 
 	@Test
