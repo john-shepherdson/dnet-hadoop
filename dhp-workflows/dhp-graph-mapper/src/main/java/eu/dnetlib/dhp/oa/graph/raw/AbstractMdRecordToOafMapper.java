@@ -379,7 +379,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		r.setPublisher(preparePublisher(doc, info));
 		r.setEmbargoenddate(prepareField(doc, "//oaf:embargoenddate", info));
 		r.setSource(prepareSources(doc, info));
-		r.setFulltext(new ArrayList<>()); // NOT PRESENT IN MDSTORES
+		r.setFulltext(prepareListFields(doc, "//oaf:fulltext", info));
 		r.setFormat(prepareFormats(doc, info));
 		r.setContributor(prepareContributors(doc, info));
 		r.setResourcetype(prepareResourceType(doc, info));

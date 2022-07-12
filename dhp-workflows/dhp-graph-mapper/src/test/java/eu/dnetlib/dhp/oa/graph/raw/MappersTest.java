@@ -122,6 +122,10 @@ class MappersTest {
 		assertNotNull(p.getBestaccessright());
 		assertEquals("OPEN", p.getBestaccessright().getClassid());
 
+		assertNotNull(p.getFulltext());
+		assertEquals(1, p.getFulltext().size());
+		assertEquals("https://oneecosystem.pensoft.net/article/13718/", p.getFulltext().get(0).getValue());
+
 		// RESULT PROJECT
 		List<Relation> resultProject = list
 			.stream()
