@@ -298,6 +298,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--outputPath</arg><arg>${workingDir}/validrelation</arg>

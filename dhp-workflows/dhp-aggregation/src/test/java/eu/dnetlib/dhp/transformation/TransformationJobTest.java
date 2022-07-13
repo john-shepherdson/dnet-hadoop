@@ -142,7 +142,8 @@ class TransformationJobTest extends AbstractVocabularyTest {
 
 	@Test
 	@DisplayName("Test TransformSparkJobNode.main with oaiOpenaire_datacite (v4)")
-	void transformTestITGv4OAIdatacite(@TempDir final Path testDir) throws Exception {
+	void transformTestITGv4OAIdatacite(@TempDir
+	final Path testDir) throws Exception {
 
 		try (SparkSession spark = SparkSession.builder().config(sparkConf).getOrCreate()) {
 
@@ -152,7 +153,9 @@ class TransformationJobTest extends AbstractVocabularyTest {
 				.getFile();
 			final String mdstore_output = testDir.toString() + "/version";
 
-			mockupTrasformationRule("simpleTRule", "/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_oaiOpenaire_datacite_ExchangeLandingpagePid.xsl");
+			mockupTrasformationRule(
+				"simpleTRule",
+				"/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_oaiOpenaire_datacite_ExchangeLandingpagePid.xsl");
 
 			final Map<String, String> parameters = Stream.of(new String[][] {
 				{
@@ -203,7 +206,8 @@ class TransformationJobTest extends AbstractVocabularyTest {
 
 	@Test
 	@DisplayName("Test TransformSparkJobNode.main")
-	void transformTest(@TempDir final Path testDir) throws Exception {
+	void transformTest(@TempDir
+	final Path testDir) throws Exception {
 
 		try (SparkSession spark = SparkSession.builder().config(sparkConf).getOrCreate()) {
 
