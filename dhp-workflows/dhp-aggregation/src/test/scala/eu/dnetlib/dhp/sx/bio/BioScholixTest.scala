@@ -2,7 +2,8 @@ package eu.dnetlib.dhp.sx.bio
 
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
 import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest
-import eu.dnetlib.dhp.schema.oaf.{Oaf, Relation, Result}
+import eu.dnetlib.dhp.schema.oaf.utils.PidType
+import eu.dnetlib.dhp.schema.oaf.{Oaf, Publication, Relation, Result}
 import eu.dnetlib.dhp.sx.bio.BioDBToOAF.ScholixResolved
 import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMParser, PubMedToOaf}
 import org.json4s.DefaultFormats
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import java.io.{BufferedReader, InputStream, InputStreamReader}
 import java.util.zip.GZIPInputStream
 import scala.collection.JavaConverters._
+import scala.collection.mutable.ListBuffer
 import scala.io.Source
 import scala.xml.pull.XMLEventReader
 
@@ -71,6 +73,73 @@ class BioScholixTest extends AbstractVocabularyTest {
         .exists(p => "0037".equalsIgnoreCase(p))
     )
     println(mapper.writeValueAsString(r.head))
+
+  }
+
+
+  private def checkPMArticle(article:PMArticle): Unit = {
+    assertNotNull(article.getPmid)
+    assertNotNull(article.getTitle)
+    assertNotNull(article.getAuthors)
+    article.getAuthors.asScala.foreach{a =>
+      assertNotNull(a)
+      assertNotNull(a.getFullName)
+    }
+
+  }
+
+  @Test
+  def  testParsingPubmedXML():Unit = {
+    val xml = new XMLEventReader(Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml")))
+    val parser = new PMParser(xml)
+    parser.foreach(checkPMArticle)
+  }
+
+
+  private def checkPubmedPublication(o:Oaf): Unit = {
+    assertTrue(o.isInstanceOf[Publication])
+    val p:Publication = o.asInstanceOf[Publication]
+    assertNotNull(p.getId)
+    assertNotNull(p.getTitle)
+    p.getTitle.asScala.foreach(t =>assertNotNull(t.getValue))
+    p.getAuthor.asScala.foreach(a =>assertNotNull(a.getFullname))
+    assertNotNull(p.getInstance())
+    p.getInstance().asScala.foreach { i =>
+      assertNotNull(i.getCollectedfrom)
+      assertNotNull(i.getPid)
+      assertNotNull(i.getInstancetype)
+    }
+    assertNotNull(p.getOriginalId)
+    p.getOriginalId.asScala.foreach(oId => assertNotNull(oId))
+
+
+    val hasPMC = p.getInstance().asScala.exists(i => i.getPid.asScala.exists(pid => pid.getQualifier.getClassid.equalsIgnoreCase(PidType.pmc.toString)))
+
+
+
+    if (hasPMC) {
+      assertTrue(p.getOriginalId.asScala.exists(oId => oId.startsWith("od_______267::")))
+
+
+    }
+
+
+
+  }
+  @Test
+  def testPubmedMapping() :Unit = {
+
+    val xml = new XMLEventReader(Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml")))
+    val parser = new PMParser(xml)
+    val results = ListBuffer[Oaf]()
+    parser.foreach(x => results += PubMedToOaf.convert(x, vocabularies))
+
+
+
+
+    results.foreach(checkPubmedPublication)
+
+
 
   }
 

@@ -98,6 +98,7 @@ class PMParser(xml: XMLEventReader) extends Iterator[PMArticle] {
               case "PMID" => currentArticle.setPmid(text.trim)
               case "ArticleId" =>
                 if ("doi".equalsIgnoreCase(currentArticleType)) currentArticle.setDoi(text.trim)
+                if ("pmc".equalsIgnoreCase(currentArticleType)) currentArticle.setPmcId(text.trim)
               case "Language"                           => currentArticle.setLanguage(text.trim)
               case "ISSN"                               => currentJournal.setIssn(text.trim)
               case "GrantID"                            => currentGrant.setGrantID(text.trim)
