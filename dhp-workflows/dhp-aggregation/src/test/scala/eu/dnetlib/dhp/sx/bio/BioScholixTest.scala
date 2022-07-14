@@ -5,7 +5,7 @@ import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest
 import eu.dnetlib.dhp.schema.oaf.utils.PidType
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Publication, Relation, Result}
 import eu.dnetlib.dhp.sx.bio.BioDBToOAF.ScholixResolved
-import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMParser, PubMedToOaf}
+import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMParser, PMSubject, PubMedToOaf}
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.parse
@@ -119,13 +119,42 @@ class BioScholixTest extends AbstractVocabularyTest {
 
     if (hasPMC) {
       assertTrue(p.getOriginalId.asScala.exists(oId => oId.startsWith("od_______267::")))
-
-
     }
-
-
-
   }
+
+
+  @Test
+  def testPubmedOriginalID():Unit = {
+    val article:PMArticle  = new PMArticle
+
+
+    article.setPmid("1234")
+
+    article.setTitle("a Title")
+
+    // VERIFY PUBLICATION IS NOT NULL
+    article.getPublicationTypes.add( new PMSubject("article",null, null))
+    var publication = PubMedToOaf.convert(article, vocabularies).asInstanceOf[Publication]
+    assertNotNull(publication)
+    assertEquals("50|pmid________::81dc9bdb52d04dc20036dbd8313ed055", publication.getId)
+
+    // VERIFY PUBLICATION ID DOES NOT CHANGE ALSO IF SETTING PMC IDENTIFIER
+    article.setPmcId("PMC1517292")
+    publication = PubMedToOaf.convert(article, vocabularies).asInstanceOf[Publication]
+    assertNotNull(publication)
+    assertEquals("50|pmid________::81dc9bdb52d04dc20036dbd8313ed055", publication.getId)
+
+    // VERIFY ORIGINAL ID GENERATE IN OLD WAY USING PMC IDENTIFIER EXISTS
+
+
+    val oldOpenaireID ="od_______267::0000072375bc0e68fa09d4e6b7658248"
+
+    val hasOldOpenAIREID = publication.getOriginalId.asScala.exists(o => o.equalsIgnoreCase(oldOpenaireID))
+
+    assertTrue(hasOldOpenAIREID)
+  }
+
+
   @Test
   def testPubmedMapping() :Unit = {
 
