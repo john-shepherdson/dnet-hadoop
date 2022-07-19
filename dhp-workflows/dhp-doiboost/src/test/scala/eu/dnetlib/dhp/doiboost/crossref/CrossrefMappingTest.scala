@@ -498,9 +498,6 @@ class CrossrefMappingTest {
     assertNotNull(pub.getJournal.getIssnOnline)
     assertNotNull(pub.getJournal.getName)
 
-
-
-
   }
 
   @Test
