@@ -59,54 +59,6 @@ object SparkGenerateDoiBoost {
     val workingDirPath = parser.get("workingPath")
     val openaireOrganizationPath = parser.get("openaireOrganizationPath")
 
-    val crossrefAggregator = new Aggregator[(String, Publication), Publication, Publication] with Serializable {
-      override def zero: Publication = null
-
-      override def reduce(b: Publication, a: (String, Publication)): Publication = {
-
-        if (b == null) {
-          if (a != null && a._2 != null) {
-            a._2.setId(a._1)
-            return a._2
-          }
-        } else {
-          if (a != null && a._2 != null) {
-            b.mergeOAFDataInfo(a._2)
-            b.mergeFrom(a._2)
-            b.setId(a._1)
-            val authors = AuthorMerger.mergeAuthor(b.getAuthor, a._2.getAuthor)
-            b.setAuthor(authors)
-            return b
-          }
-        }
-        new Publication
-      }
-
-      override def merge(b1: Publication, b2: Publication): Publication = {
-        if (b1 == null) {
-          if (b2 != null)
-            return b2
-        } else {
-          if (b2 != null) {
-            b1.mergeOAFDataInfo(b2)
-            b1.mergeFrom(b2)
-            val authors = AuthorMerger.mergeAuthor(b1.getAuthor, b2.getAuthor)
-            b1.setAuthor(authors)
-            if (b2.getId != null && b2.getId.nonEmpty)
-              b1.setId(b2.getId)
-            return b1
-          }
-        }
-        new Publication
-      }
-
-      override def finish(reduction: Publication): Publication = reduction
-
-      override def bufferEncoder: Encoder[Publication] = Encoders.kryo[Publication]
-
-      override def outputEncoder: Encoder[Publication] = Encoders.kryo[Publication]
-    }
-
     implicit val mapEncoderPub: Encoder[Publication] = Encoders.kryo[Publication]
     implicit val mapEncoderOrg: Encoder[Organization] = Encoders.kryo[Organization]
     implicit val mapEncoderDataset: Encoder[OafDataset] = Encoders.kryo[OafDataset]

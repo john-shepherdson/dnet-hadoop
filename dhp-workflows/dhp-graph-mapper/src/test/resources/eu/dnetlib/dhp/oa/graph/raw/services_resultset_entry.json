@@ -1,0 +1,333 @@
+[
+	{
+		"field": "id",
+		"type": "string",
+		"value": "274269ac6f3b::2579-5449"
+	},
+	{
+		"field": "originalid",
+		"type": "array",
+		"value": [
+			"fairsharing_::1562",
+			"piwik:13",
+			null,
+			"re3data_____::r3d100010213"
+		]
+	},
+	{
+		"field": "pid",
+		"type": "array",
+		"value": [
+			"r3d100010218###re3data@@@dnet:pid_types"
+		]
+	},
+	{
+		"field": "datasourcetype",
+		"type": "string",
+		"value": "pubsrepository::journal@@@dnet:datasource_typologies"
+	},
+	{
+		"field": "datasourcetypeui",
+		"type": "string",
+		"value": "pubsrepository::journal@@@dnet:datasource_typologies_ui"
+	},
+	{
+		"field": "eosctype",
+		"type": "string",
+		"value": "Data Source@@@dnet:eosc_types"
+	},
+	{
+		"field": "eoscdatasourcetype",
+		"type": "string",
+		"value": "Journal archive@@@dnet:eosc_datasource_types"
+	},
+	{
+		"field": "openairecompatibility",
+		"type": "string",
+		"value": "openaire4.0@@@dnet:datasourceCompatibilityLevel"
+	},
+	{
+		"field": "officialname",
+		"type": "string",
+		"value": "Jurnal Ilmiah Pendidikan Scholastic"
+	},
+	{
+		"field": "englishname",
+		"type": "string",
+		"value": "Jurnal Ilmiah Pendidikan Scholastic"
+	},
+	{
+		"field": "websiteurl",
+		"type": "string",
+		"value": "http://e-journal.sastra-unes.com/index.php/JIPS/index"
+	},
+	{
+		"field": "logourl",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "contactemail",
+		"type": "string",
+		"value": "test@test.it"
+	},
+	{
+		"field": "namespaceprefix",
+		"type": "string",
+		"value": "ojs_25795449"
+	},
+	{
+		"field": "latitude",
+		"type": "double",
+		"value": 0
+	},
+	{
+		"field": "longitude",
+		"type": "double",
+		"value": 0
+	},
+	{
+		"field": "dateofvalidation",
+		"type": "date",
+		"value": null
+	},
+	{
+		"field": "description",
+		"type": "string",
+		"value": "veterinary medicine"
+	},
+	{
+		"field": "subjects",
+		"type": "array",
+		"value": []
+	},
+	{
+		"field": "odnumberofitems",
+		"type": "int",
+		"value": null
+	},
+	{
+		"field": "odnumberofitemsdate",
+		"type": "date",
+		"value": null
+	},
+	{
+		"field": "odpolicies",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "odlanguages",
+		"type": "array",
+		"value": [
+			"English",
+			"German",
+			"French",
+			"Danish",
+			"Norwegian",
+			"Swedish"
+		]
+	},
+	{
+		"field": "languages",
+		"type": "array",
+		"value": [
+			"English",
+			"German",
+			"French",
+			"Danish",
+			"Norwegian",
+			"Swedish"
+		]
+	},
+	{
+		"field": "accessinfopackage",
+		"type": "array",
+		"value": [
+			"http://www.revista.vocesdelaeducacion.com.mx/index.php/index/oai"
+		]
+	},
+	{
+		"field": "releasestartdate",
+		"type": "date",
+		"value": null
+	},
+	{
+		"field": "releaseenddate",
+		"type": "date",
+		"value": null
+	},
+	{
+		"field": "missionstatementurl",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "databaseaccesstype",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "datauploadtype",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "databaseaccessrestriction",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "datauploadrestriction",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "versioning",
+		"type": "boolean",
+		"value": null
+	},
+	{
+		"field": "versioncontrol",
+		"type": "boolean",
+		"value": null
+	},
+	{
+		"field": "citationguidelineurl",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "pidsystems",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "certificates",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "policies",
+		"type": "not_used",
+		"value": []
+	},
+	{
+		"field": "inferred",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "deletedbyinference",
+		"type": "boolean",
+		"value": false
+	},
+	{
+		"field": "trust",
+		"type": "double",
+		"value": 0.9
+	},
+	{
+		"field": "inferenceprovenance",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "dateofcollection",
+		"type": "date",
+		"value": "2020-01-21"
+	},
+	{
+		"field": "collectedfrom",
+		"type": "array",
+		"value": [
+			"openaire____::fairsharing@@@FAIRsharing.org",
+			"openaire____::opendoar@@@OpenDOAR",
+			"openaire____::re3data@@@Registry of Research Data Repository"
+		]
+	},
+	{
+		"field": "issnPrinted",
+		"type": "string",
+		"value": "2579-5449"
+	},
+	{
+		"field": "issnOnline",
+		"type": "string",
+		"value": "2579-5448"
+	},
+	{
+		"field": "issnLinking",
+		"type": "string",
+		"value": "2579-5447"
+	},
+	{
+		"field": "researchentitytypes",
+		"type": "array",
+		"value": [
+			"Research Data"
+		]
+	},
+	{
+		"field": "jurisdiction",
+		"type": "string",
+		"value": "National@@@eosc:jurisdictions"
+	},
+	{
+		"field": "thematic",
+		"type": "boolean",
+		"value": true
+	},
+	{
+		"field": "contentpolicies",
+		"type": "array",
+		"value": [
+			"Taxonomic classification@@@eosc:contentpolicies",
+			"Resource collection@@@eosc:contentpolicies"
+		]
+	},
+	{
+		"field": "submissionpolicyurl",
+		"type": "string",
+		"value": null
+	},
+	{
+		"field": "preservationpolicyurl",
+		"type": "string",
+		"value": "Permanent Archiving https://datadryad.org/stash/faq"
+	},
+	{
+		"field": "researchproductaccesspolicies",
+		"type": "array",
+		"value": [
+			"https://100percentit.com/legal/"
+		]
+	},
+	{
+		"field": "researchproductmetadataaccesspolicies",
+		"type": "array",
+		"value": [
+			"https://wenmr.science.uu.nl/conditions"
+		]
+	},
+	{
+		"field": "consenttermsofuse",
+		"type": "boolean",
+		"value": true
+	},
+	{
+		"field": "fulltextdownload",
+		"type": "boolean",
+		"value": true
+	},
+	{
+		"field": "consenttermsofusedate",
+		"type": "date",
+		"value": "2022-03-11"
+	},
+	{
+		"field": "lastconsenttermsofusedate",
+		"type": "date",
+		"value": "2022-03-11"
+	}
+]

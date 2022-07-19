@@ -5,6 +5,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -136,7 +137,7 @@ public class MergeGraphTableSparkJob {
 	/**
 	 * Datasources involved in the merge operation doesn't obey to the infra precedence policy, but relies on a custom
 	 * behaviour that, given two datasources from beta and prod returns the one from prod with the highest
-	 * compatibility among the two.
+	 * compatibility among the two. Furthermore, the procedure merges the collectedfrom, originalId, and pid lists.
 	 *
 	 * @param p datasource from PROD
 	 * @param b datasource from BETA
@@ -160,7 +161,35 @@ public class MergeGraphTableSparkJob {
 
 		List<Qualifier> list = Arrays.asList(dp.getOpenairecompatibility(), db.getOpenairecompatibility());
 		dp.setOpenairecompatibility(Collections.min(list, new DatasourceCompatibilityComparator()));
+		dp
+			.setCollectedfrom(
+				Stream
+					.concat(
+						Optional
+							.ofNullable(dp.getCollectedfrom())
+							.map(Collection::stream)
+							.orElse(Stream.empty()),
+						Optional
+							.ofNullable(db.getCollectedfrom())
+							.map(Collection::stream)
+							.orElse(Stream.empty()))
+					.distinct() // relies on KeyValue.equals
+					.collect(Collectors.toList()));
+
+		dp.setOriginalId(mergeLists(dp.getOriginalId(), db.getOriginalId()));
+		dp.setPid(mergeLists(dp.getPid(), db.getPid()));
+
 		return (P) dp;
+	}
+
+	private static final <T> List<T> mergeLists(final List<T>... lists) {
+		return Arrays
+			.stream(lists)
+			.filter(Objects::nonNull)
+			.flatMap(List::stream)
+			.filter(Objects::nonNull)
+			.distinct()
+			.collect(Collectors.toList());
 	}
 
 	private static <P extends Oaf, B extends Oaf> P mergeWithPriorityToPROD(Optional<P> p, Optional<B> b) {

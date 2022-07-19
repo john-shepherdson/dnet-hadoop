@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.oa.graph.merge;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -25,7 +26,23 @@ class MergeGraphTableSparkJobTest {
 	}
 
 	@Test
-	void testMergeDatasources() throws IOException {
+	void testMerge() throws IOException {
+		Datasource d = MergeGraphTableSparkJob
+			.mergeDatasource(
+				d("datasource_cris.json"),
+				d("datasource_openaire2.0.json"));
+
+		assertEquals("10|274269ac6f3b::2a2e2793b500f3f7b47ef24b1a9277b7", d.getId());
+		assertNotNull(d.getOriginalId());
+		assertEquals(2, d.getOriginalId().size());
+		assertNotNull(d.getCollectedfrom());
+		assertEquals(2, d.getCollectedfrom().size());
+		assertNotNull(d.getPid());
+		assertEquals(1, d.getPid().size());
+	}
+
+	@Test
+	void testMergeCompatibility() throws IOException {
 		assertEquals(
 			"openaire-cris_1.1",
 			MergeGraphTableSparkJob

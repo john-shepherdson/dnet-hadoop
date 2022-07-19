@@ -7,6 +7,7 @@ import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}
 import org.slf4j.{Logger, LoggerFactory}
+import scala.collection.JavaConverters._
 
 object SparkConvertRDDtoDataset {
 
@@ -94,8 +95,8 @@ object SparkConvertRDDtoDataset {
     log.info("Converting Relation")
 
     val relationSemanticFilter = List(
-      "cites",
-      "iscitedby",
+//      "cites",
+//      "iscitedby",
       "merges",
       "ismergedin",
       "HasAmongTopNSimilarDocuments",
@@ -107,6 +108,12 @@ object SparkConvertRDDtoDataset {
       .map(s => mapper.readValue(s, classOf[Relation]))
       .filter(r => r.getDataInfo != null && r.getDataInfo.getDeletedbyinference == false)
       .filter(r => r.getSource.startsWith("50") && r.getTarget.startsWith("50"))
+      //filter OpenCitations relations
+      .filter(r =>
+        r.getCollectedfrom != null && r.getCollectedfrom.size() > 0 && !r.getCollectedfrom.asScala.exists(k =>
+          "opencitations".equalsIgnoreCase(k.getValue)
+        )
+      )
       .filter(r => !relationSemanticFilter.exists(k => k.equalsIgnoreCase(r.getRelClass)))
     spark.createDataset(rddRelation).as[Relation].write.mode(SaveMode.Overwrite).save(s"$relPath")
 

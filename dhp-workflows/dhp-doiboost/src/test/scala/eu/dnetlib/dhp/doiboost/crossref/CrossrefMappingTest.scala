@@ -74,6 +74,20 @@ class CrossrefMappingTest {
   }
 
   @Test
+  def crossrefIssueDateTest(): Unit = {
+    val json =
+      Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/doiboost/crossref/issue_date.json")).mkString
+    assertNotNull(json)
+    assertFalse(json.isEmpty)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    assertTrue(resultList.nonEmpty)
+
+    val items = resultList.filter(p => p.isInstanceOf[Result])
+
+    println(mapper.writeValueAsString(items.head))
+  }
+
+  @Test
   def testOrcidID(): Unit = {
     val json = Source
       .fromInputStream(
@@ -82,7 +96,7 @@ class CrossrefMappingTest {
       .mkString
 
     assertNotNull(json)
-    assertFalse(json.isEmpty);
+    assertFalse(json.isEmpty)
 
     val resultList: List[Oaf] = Crossref2Oaf.convert(json)
 
@@ -458,6 +472,31 @@ class CrossrefMappingTest {
       assertFalse(relation.getSubRelType.isEmpty)
 
     })
+
+  }
+
+  @Test
+  def testConvertFromCrossRef2OafIssue(): Unit = {
+    val json = Source
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/doiboost/crossref/article_nojournal.json"))
+      .mkString
+    assertNotNull(json)
+
+    assertFalse(json.isEmpty);
+
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+
+    assertTrue(resultList.nonEmpty)
+
+    val items = resultList.filter(p => p.isInstanceOf[Publication])
+
+    assert(items.nonEmpty)
+    assert(items.size == 1)
+    val pub: Publication = items.head.asInstanceOf[Publication]
+
+    assertNotNull(pub.getJournal.getIssnPrinted)
+    assertNotNull(pub.getJournal.getIssnOnline)
+    assertNotNull(pub.getJournal.getName)
 
   }
 

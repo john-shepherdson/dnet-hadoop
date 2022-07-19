@@ -535,6 +535,12 @@ public class XmlRecordFactory implements Serializable {
 				if (ds.getDatasourcetypeui() != null) {
 					metadata.add(XmlSerializationUtils.mapQualifier("datasourcetypeui", ds.getDatasourcetypeui()));
 				}
+				if (ds.getEosctype() != null) {
+					metadata.add(XmlSerializationUtils.mapQualifier("eosctype", ds.getEosctype()));
+				}
+				if (ds.getEoscdatasourcetype() != null) {
+					metadata.add(XmlSerializationUtils.mapQualifier("eoscdatasourcetype", ds.getEoscdatasourcetype()));
+				}
 				if (ds.getOpenairecompatibility() != null) {
 					metadata
 						.add(
@@ -583,6 +589,16 @@ public class XmlRecordFactory implements Serializable {
 					metadata
 						.add(XmlSerializationUtils.asXmlElement("description", ds.getDescription().getValue()));
 				}
+				if (ds.getSubjects() != null) {
+					metadata
+						.addAll(
+							ds
+								.getSubjects()
+								.stream()
+								.filter(Objects::nonNull)
+								.map(sp -> XmlSerializationUtils.mapStructuredProperty("subjects", sp))
+								.collect(Collectors.toList()));
+				}
 				if (ds.getOdnumberofitems() != null) {
 					metadata
 						.add(
@@ -607,6 +623,16 @@ public class XmlRecordFactory implements Serializable {
 								.stream()
 								.filter(Objects::nonNull)
 								.map(c -> XmlSerializationUtils.asXmlElement("odlanguages", c.getValue()))
+								.collect(Collectors.toList()));
+				}
+				if (ds.getLanguages() != null) {
+					metadata
+						.addAll(
+							ds
+								.getLanguages()
+								.stream()
+								.filter(Objects::nonNull)
+								.map(c -> XmlSerializationUtils.asXmlElement("languages", c))
 								.collect(Collectors.toList()));
 				}
 				if (ds.getOdcontenttypes() != null) {
@@ -689,17 +715,17 @@ public class XmlRecordFactory implements Serializable {
 							XmlSerializationUtils
 								.asXmlElement("versioning", ds.getVersioning().getValue().toString()));
 				}
+				if (ds.getVersioncontrol() != null) {
+					metadata
+						.add(
+							XmlSerializationUtils
+								.asXmlElement("versioncontrol", ds.getVersioncontrol().toString()));
+				}
 				if (ds.getCitationguidelineurl() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
 								.asXmlElement("citationguidelineurl", ds.getCitationguidelineurl().getValue()));
-				}
-				if (ds.getQualitymanagementkind() != null) {
-					metadata
-						.add(
-							XmlSerializationUtils
-								.asXmlElement("qualitymanagementkind", ds.getQualitymanagementkind().getValue()));
 				}
 				if (ds.getPidsystems() != null) {
 					metadata
@@ -722,28 +748,30 @@ public class XmlRecordFactory implements Serializable {
 				if (ds.getJournal() != null) {
 					metadata.add(XmlSerializationUtils.mapJournal(ds.getJournal()));
 				}
-				if (ds.getSubjects() != null) {
+				if (ds.getResearchentitytypes() != null) {
 					metadata
 						.addAll(
 							ds
-								.getSubjects()
+								.getResearchentitytypes()
 								.stream()
-								.filter(Objects::nonNull)
-								.map(sp -> XmlSerializationUtils.mapStructuredProperty("subjects", sp))
+								.map(c -> XmlSerializationUtils.asXmlElement("researchentitytypes", c))
 								.collect(Collectors.toList()));
 				}
-
+				if (ds.getProvidedproducttypes() != null) {
+					metadata
+						.addAll(
+							ds
+								.getProvidedproducttypes()
+								.stream()
+								.map(c -> XmlSerializationUtils.asXmlElement("providedproducttypes", c))
+								.collect(Collectors.toList()));
+				}
 				if (ds.getJurisdiction() != null) {
 					metadata.add(XmlSerializationUtils.mapQualifier("jurisdiction", ds.getJurisdiction()));
 				}
 
 				if (ds.getThematic() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("thematic", ds.getThematic().toString()));
-				}
-
-				if (ds.getKnowledgegraph() != null) {
-					metadata
-						.add(XmlSerializationUtils.asXmlElement("knowledgegraph", ds.getKnowledgegraph().toString()));
 				}
 
 				if (ds.getContentpolicies() != null) {
@@ -756,7 +784,34 @@ public class XmlRecordFactory implements Serializable {
 								.map(q -> XmlSerializationUtils.mapQualifier("contentpolicy", q))
 								.collect(Collectors.toList()));
 				}
-
+				if (ds.getSubmissionpolicyurl() != null) {
+					metadata
+						.add(XmlSerializationUtils.asXmlElement("submissionpolicyurl", ds.getSubmissionpolicyurl()));
+				}
+				if (ds.getPreservationpolicyurl() != null) {
+					metadata
+						.add(
+							XmlSerializationUtils.asXmlElement("preservationpolicyurl", ds.getPreservationpolicyurl()));
+				}
+				if (ds.getResearchproductaccesspolicies() != null) {
+					metadata
+						.addAll(
+							ds
+								.getResearchproductaccesspolicies()
+								.stream()
+								.map(c -> XmlSerializationUtils.asXmlElement("researchproductaccesspolicies", c))
+								.collect(Collectors.toList()));
+				}
+				if (ds.getResearchproductmetadataaccesspolicies() != null) {
+					metadata
+						.addAll(
+							ds
+								.getResearchproductmetadataaccesspolicies()
+								.stream()
+								.map(
+									c -> XmlSerializationUtils.asXmlElement("researchproductmetadataaccesspolicies", c))
+								.collect(Collectors.toList()));
+				}
 				break;
 			case organization:
 				final Organization o = (Organization) entity;
@@ -944,17 +999,11 @@ public class XmlRecordFactory implements Serializable {
 	private List<String> measuresAsXml(List<Measure> measures) {
 		return measures
 			.stream()
-			.flatMap(
-				m -> m
-					.getUnit()
-					.stream()
-					.map(
-						u -> Lists
-							.newArrayList(
-								new Tuple2<>("id", m.getId()),
-								new Tuple2<>("key", u.getKey()),
-								new Tuple2<>("value", u.getValue())))
-					.map(l -> XmlSerializationUtils.asXmlElement("measure", l)))
+			.map(m -> {
+				List<Tuple2<String, String>> l = Lists.newArrayList(new Tuple2<>("id", m.getId()));
+				m.getUnit().forEach(kv -> l.add(new Tuple2<>(kv.getKey(), kv.getValue())));
+				return XmlSerializationUtils.asXmlElement("measure", l);
+			})
 			.collect(Collectors.toList());
 	}
 

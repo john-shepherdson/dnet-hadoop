@@ -497,6 +497,7 @@ dnet:publication_resource @=@ 0044 @=@ Graduate diploma
 dnet:publication_resource @=@ 0044 @=@ Undergraduate diploma
 dnet:publication_resource @=@ 0000 @=@ UNKNOWN
 dnet:publication_resource @=@ 0042 @=@ EGI Virtual Appliance
+dnet:publication_resource @=@ 0048 @=@ RO-crate
 dnet:languages @=@ abk @=@ ab
 dnet:languages @=@ aar @=@ aa
 dnet:languages @=@ afr @=@ af
