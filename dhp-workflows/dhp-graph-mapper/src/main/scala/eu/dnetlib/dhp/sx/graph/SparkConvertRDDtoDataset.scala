@@ -112,13 +112,11 @@ object SparkConvertRDDtoDataset {
             "opencitations".equalsIgnoreCase(k.getValue)
           )
         )
-        .filter(r => r.getRelClass != null && r.getRelClass.equalsIgnoreCase(filterRelation))
+        .filter(r => r.getSubRelType != null && r.getSubRelType.equalsIgnoreCase(filterRelation))
       spark.createDataset(rddRelation).as[Relation].write.mode(SaveMode.Overwrite).save(s"$relPath")
     } else {
 
       val relationSemanticFilter = List(
-        //      "cites",
-        //      "iscitedby",
         "merges",
         "ismergedin",
         "HasAmongTopNSimilarDocuments",
