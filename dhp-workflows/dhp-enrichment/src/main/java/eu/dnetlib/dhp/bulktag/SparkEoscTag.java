@@ -80,13 +80,14 @@ public class SparkEoscTag {
 				if (containsCriteriaNotebook(s)) {
 					if (!Optional.ofNullable(s.getEoscifguidelines()).isPresent())
 						s.setEoscifguidelines(new ArrayList<>());
-					s.getEoscifguidelines().add(newInstance("EOSC::Jupyter Notebook", "EOSC::Jupyter Notebook", "", "compliesWith"));
+					addEIG(s.getEoscifguidelines(), "EOSC::Jupyter Notebook", "EOSC::Jupyter Notebook", "", "compliesWith");
+
 				}
 				if (containsCriteriaGalaxy(s)) {
 					if (!Optional.ofNullable(s.getEoscifguidelines()).isPresent())
 						s.setEoscifguidelines(new ArrayList<>());
 
-					s.getEoscifguidelines().add(newInstance("EOSC::Galaxy Workflow", "EOSC::Galaxy Workflow", "", "compliesWith"));
+					addEIG(s.getEoscifguidelines(),"EOSC::Galaxy Workflow", "EOSC::Galaxy Workflow", "", "compliesWith");
 				}
 				return s;
 			}, Encoders.bean(Software.class))
@@ -103,15 +104,15 @@ public class SparkEoscTag {
 
 		readPath(spark, inputPath + "/otherresearchproduct", OtherResearchProduct.class)
 			.map((MapFunction<OtherResearchProduct, OtherResearchProduct>) orp -> {
-				List<StructuredProperty> sbject;
+
 				if (!Optional.ofNullable(orp.getEoscifguidelines()).isPresent())
 					orp.setEoscifguidelines(new ArrayList<>());
 
 				if (containsCriteriaGalaxy(orp)) {
-					orp.getEoscifguidelines().add(newInstance("EOSC::Galaxy Workflow", "EOSC::Galaxy Workflow", "", "compliesWith"));
+					addEIG(orp.getEoscifguidelines(),"EOSC::Galaxy Workflow", "EOSC::Galaxy Workflow", "", "compliesWith");
 				}
 				if (containscriteriaTwitter(orp)) {
-					orp.getEoscifguidelines().add(newInstance("EOSC::Twitter Data", "EOSC::Twitter Data", "", "compliesWith"));
+					addEIG(orp.getEoscifguidelines(),"EOSC::Twitter Data", "EOSC::Twitter Data", "", "compliesWith");
 				}
 				return orp;
 			}, Encoders.bean(OtherResearchProduct.class))
@@ -128,11 +129,11 @@ public class SparkEoscTag {
 
 		readPath(spark, inputPath + "/dataset", Dataset.class)
 			.map((MapFunction<Dataset, Dataset>) d -> {
-				List<StructuredProperty> sbject;
+
 				if (!Optional.ofNullable(d.getEoscifguidelines()).isPresent())
 					d.setEoscifguidelines(new ArrayList<>());
 				if (containscriteriaTwitter(d)) {
-					d.getEoscifguidelines().add(newInstance("EOSC::Twitter Data", "EOSC::Twitter Data", "", "compliesWith"));
+					addEIG(d.getEoscifguidelines(),"EOSC::Twitter Data", "EOSC::Twitter Data", "", "compliesWith");
 				}
 				return d;
 			}, Encoders.bean(Dataset.class))
@@ -147,6 +148,12 @@ public class SparkEoscTag {
 			.option("compression", "gzip")
 			.json(inputPath + "/dataset");
 	}
+
+	private static void addEIG(List<EoscIfGuidelines> eoscifguidelines, String code, String label, String url, String sem) {
+		if (!eoscifguidelines.stream().anyMatch(eig -> eig.getCode().equals(code)))
+			eoscifguidelines.add(newInstance(code, label, url, sem));
+	}
+
 
 	private static boolean containscriteriaTwitter(Result r) {
 		Set<String> words = getWordsSP(r.getTitle());
