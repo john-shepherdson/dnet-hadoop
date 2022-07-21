@@ -29,7 +29,6 @@ public class SparkEoscTag {
 	private static final Logger log = LoggerFactory.getLogger(SparkEoscTag.class);
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
 			.toString(
@@ -63,15 +62,16 @@ public class SparkEoscTag {
 			});
 	}
 
-	public static EoscIfGuidelines newInstance(String code, String label, String url, String semantics){
+	public static EoscIfGuidelines newInstance(String code, String label, String url, String semantics) {
 		EoscIfGuidelines eig = new EoscIfGuidelines();
-		eig.setCode( code);
+		eig.setCode(code);
 		eig.setLabel(label);
 		eig.setUrl(url);
 		eig.setSemanticRelation(semantics);
 		return eig;
 
 	}
+
 	private static void execEoscTag(SparkSession spark, String inputPath, String workingPath) {
 
 		readPath(spark, inputPath + "/software", Software.class)
@@ -80,14 +80,17 @@ public class SparkEoscTag {
 				if (containsCriteriaNotebook(s)) {
 					if (!Optional.ofNullable(s.getEoscifguidelines()).isPresent())
 						s.setEoscifguidelines(new ArrayList<>());
-					addEIG(s.getEoscifguidelines(), "EOSC::Jupyter Notebook", "EOSC::Jupyter Notebook", "", "compliesWith");
+					addEIG(
+						s.getEoscifguidelines(), "EOSC::Jupyter Notebook", "EOSC::Jupyter Notebook", "",
+						"compliesWith");
 
 				}
 				if (containsCriteriaGalaxy(s)) {
 					if (!Optional.ofNullable(s.getEoscifguidelines()).isPresent())
 						s.setEoscifguidelines(new ArrayList<>());
 
-					addEIG(s.getEoscifguidelines(),"EOSC::Galaxy Workflow", "EOSC::Galaxy Workflow", "", "compliesWith");
+					addEIG(
+						s.getEoscifguidelines(), "EOSC::Galaxy Workflow", "EOSC::Galaxy Workflow", "", "compliesWith");
 				}
 				return s;
 			}, Encoders.bean(Software.class))
@@ -109,10 +112,12 @@ public class SparkEoscTag {
 					orp.setEoscifguidelines(new ArrayList<>());
 
 				if (containsCriteriaGalaxy(orp)) {
-					addEIG(orp.getEoscifguidelines(),"EOSC::Galaxy Workflow", "EOSC::Galaxy Workflow", "", "compliesWith");
+					addEIG(
+						orp.getEoscifguidelines(), "EOSC::Galaxy Workflow", "EOSC::Galaxy Workflow", "",
+						"compliesWith");
 				}
 				if (containscriteriaTwitter(orp)) {
-					addEIG(orp.getEoscifguidelines(),"EOSC::Twitter Data", "EOSC::Twitter Data", "", "compliesWith");
+					addEIG(orp.getEoscifguidelines(), "EOSC::Twitter Data", "EOSC::Twitter Data", "", "compliesWith");
 				}
 				return orp;
 			}, Encoders.bean(OtherResearchProduct.class))
@@ -133,7 +138,7 @@ public class SparkEoscTag {
 				if (!Optional.ofNullable(d.getEoscifguidelines()).isPresent())
 					d.setEoscifguidelines(new ArrayList<>());
 				if (containscriteriaTwitter(d)) {
-					addEIG(d.getEoscifguidelines(),"EOSC::Twitter Data", "EOSC::Twitter Data", "", "compliesWith");
+					addEIG(d.getEoscifguidelines(), "EOSC::Twitter Data", "EOSC::Twitter Data", "", "compliesWith");
 				}
 				return d;
 			}, Encoders.bean(Dataset.class))
@@ -149,11 +154,11 @@ public class SparkEoscTag {
 			.json(inputPath + "/dataset");
 	}
 
-	private static void addEIG(List<EoscIfGuidelines> eoscifguidelines, String code, String label, String url, String sem) {
+	private static void addEIG(List<EoscIfGuidelines> eoscifguidelines, String code, String label, String url,
+		String sem) {
 		if (!eoscifguidelines.stream().anyMatch(eig -> eig.getCode().equals(code)))
 			eoscifguidelines.add(newInstance(code, label, url, sem));
 	}
-
 
 	private static boolean containscriteriaTwitter(Result r) {
 		Set<String> words = getWordsSP(r.getTitle());
