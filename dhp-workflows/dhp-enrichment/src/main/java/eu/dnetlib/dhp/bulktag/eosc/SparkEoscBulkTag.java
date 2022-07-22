@@ -93,13 +93,9 @@ public class SparkEoscBulkTag implements Serializable {
 		String datasourceMapPath,
 		Class<R> resultClazz) {
 
-
 		List<String> hostedByList = readPath(spark, datasourceMapPath, DatasourceMaster.class)
 			.map((MapFunction<DatasourceMaster, String>) dm -> dm.getMaster(), Encoders.STRING())
-				.collectAsList();
-
-
-
+			.collectAsList();
 
 		readPath(spark, inputPath, resultClazz)
 			.map(patchResult(), Encoders.bean(resultClazz))
