@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.oa.graph.clean;
+package eu.dnetlib.dhp.oa.graph.clean.country;
 
 /**
  * @author miriam.baglioni
@@ -7,6 +7,7 @@ package eu.dnetlib.dhp.oa.graph.clean;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.graph.clean.CleanContextSparkJob;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import org.apache.commons.io.IOUtils;
@@ -21,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -54,10 +56,13 @@ public class CleanCountrySparkJob implements Serializable {
         String workingPath = parser.get("workingPath");
         log.info("workingPath: {}", workingPath);
 
+        String datasourcePath = parser.get("datasourcePath");
+        log.info("datasourcePath: {}", datasourcePath);
+
         String country = parser.get("country");
         log.info("country: {}", country);
 
-        String verifyParam = parser.get("verifyParam");
+        String[] verifyParam = parser.get("verifyParam").split(";");
         log.info("verifyParam: {}", verifyParam);
 
         String collectedfrom = parser.get("collectedfrom");
@@ -74,12 +79,17 @@ public class CleanCountrySparkJob implements Serializable {
                 isSparkSessionManaged,
                 spark -> {
 
-                    cleanCountry(spark, country, verifyParam, inputPath, entityClazz, workingPath,collectedfrom);
+                    cleanCountry(spark, country, verifyParam, inputPath, entityClazz, workingPath,collectedfrom, datasourcePath);
                 });
     }
 
-    private static <T extends Result> void cleanCountry(SparkSession spark, String country, String verifyParam,
-                                                        String inputPath, Class<T> entityClazz, String workingPath, String collectedfrom) {
+    private static <T extends Result> void cleanCountry(SparkSession spark, String country, String[] verifyParam,
+                                                        String inputPath, Class<T> entityClazz, String workingPath, String collectedfrom, String datasourcePath) {
+
+        List<String> hostedBy = spark.read().textFile(datasourcePath)
+               // .filter((FilterFunction<String>) ds -> !ds.equals(collectedfrom))
+                .collectAsList();
+
         Dataset<T> res = spark
                 .read()
                 .textFile(inputPath)
@@ -89,11 +99,14 @@ public class CleanCountrySparkJob implements Serializable {
                 ;
 
         res.map((MapFunction<T, T>) r -> {
-            for(StructuredProperty p: r.getPid()){
-                if (p.getQualifier().getClassid().equalsIgnoreCase("doi") &&
-                p.getValue().startsWith(verifyParam) && r.getCollectedfrom().stream().anyMatch(cf -> cf.getValue().equalsIgnoreCase(collectedfrom))) {
+            if(r.getInstance().stream().anyMatch(i -> hostedBy.contains(i.getHostedby().getKey())) ||
+            !r.getCollectedfrom().stream().anyMatch(cf -> cf.getValue().equals(collectedfrom))){
+                return r;
+            }
 
-                    r
+            if(r.getPid().stream().anyMatch(p -> p.getQualifier().getClassid().equals("doi") && pidInParam(p.getValue(), verifyParam))
+            && r.getCountry().stream().anyMatch(c -> c.getClassid().equals(country) && c.getDataInfo().getInferenceprovenance().equals("propagation")))
+            {     r
                             .setCountry(
                                     r
                                             .getCountry()
@@ -102,7 +115,7 @@ public class CleanCountrySparkJob implements Serializable {
                                                     c -> !c.getClassid()
                                                             .equalsIgnoreCase(country))
                                             .collect(Collectors.toList()));
-                }
+
             }
 
                     return r;
@@ -122,6 +135,13 @@ public class CleanCountrySparkJob implements Serializable {
                 .mode(SaveMode.Overwrite)
                 .option("compression", "gzip")
                 .json(inputPath);
+    }
+
+    private static boolean pidInParam(String value, String[] verifyParam) {
+        for (String s : verifyParam )
+            if (value.startsWith(s))
+                return true;
+        return false;
     }
 
 }

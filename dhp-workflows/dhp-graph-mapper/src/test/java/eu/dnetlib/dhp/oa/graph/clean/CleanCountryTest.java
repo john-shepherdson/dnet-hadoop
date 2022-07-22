@@ -5,9 +5,9 @@ package eu.dnetlib.dhp.oa.graph.clean;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob;
 import eu.dnetlib.dhp.oa.graph.dump.DumpJobTest;
 import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -25,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 
 public class CleanCountryTest {
