@@ -44,7 +44,7 @@
         </configuration>
     </global>
 
-    <start to="eosc_context_tag"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -254,7 +254,7 @@
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
         </java>
-        <ok to="End"/>
+        <ok to="fork_eosc_context_tag"/>
         <error to="Kill"/>
     </action>
 
