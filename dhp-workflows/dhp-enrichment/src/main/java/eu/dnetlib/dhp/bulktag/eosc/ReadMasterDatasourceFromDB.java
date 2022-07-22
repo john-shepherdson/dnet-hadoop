@@ -1,27 +1,6 @@
 
 package eu.dnetlib.dhp.bulktag.eosc;
 
-/**
- * @author miriam.baglioni
- * @Date 21/07/22
- */
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.DbClient;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.common.RelationInverse;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-
 import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.IOException;
@@ -34,6 +13,28 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+
+/**
+ * @author miriam.baglioni
+ * @Date 21/07/22
+ */
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.DbClient;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.common.RelationInverse;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+
 public class ReadMasterDatasourceFromDB implements Closeable {
 
 	private final DbClient dbClient;
@@ -43,18 +44,18 @@ public class ReadMasterDatasourceFromDB implements Closeable {
 	private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	private static final String QUERY = "SELECT dso.id datasource, d.id master FROM " +
-			"(SELECT id FROM dsm_services WHERE id like 'eosc%') dso " +
-			"FULL JOIN  " +
-			"(SELECT id, duplicate FROM dsm_dedup_services WHERE duplicate like 'eosc%')d " +
-			"ON dso.id = d.duplicate";
+		"(SELECT id FROM dsm_services WHERE id like 'eosc%') dso " +
+		"FULL JOIN  " +
+		"(SELECT id, duplicate FROM dsm_dedup_services WHERE duplicate like 'eosc%')d " +
+		"ON dso.id = d.duplicate";
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-						ReadMasterDatasourceFromDB.class
+					ReadMasterDatasourceFromDB.class
 						.getResourceAsStream(
-							"/eu/dnetlib/dhp/blacklist/blacklist_parameters.json")));
+							"/eu/dnetlib/dhp/bulktag/datasourcemaster_parameters.json")));
 
 		parser.parseArgument(args);
 
@@ -64,8 +65,9 @@ public class ReadMasterDatasourceFromDB implements Closeable {
 		final String hdfsPath = parser.get("hdfsPath") + "/datasourceMasters";
 		final String hdfsNameNode = parser.get("hdfsNameNode");
 
-		try (final ReadMasterDatasourceFromDB rmd = new ReadMasterDatasourceFromDB(hdfsPath, hdfsNameNode, dbUrl, dbUser,
-			dbPassword)) {
+		try (
+			final ReadMasterDatasourceFromDB rmd = new ReadMasterDatasourceFromDB(hdfsPath, hdfsNameNode, dbUrl, dbUser,
+				dbPassword)) {
 
 			log.info("Processing datasources...");
 			rmd.execute(QUERY, rmd::datasourceMasterMap);
@@ -75,7 +77,7 @@ public class ReadMasterDatasourceFromDB implements Closeable {
 
 	public void execute(final String sql, final Function<ResultSet, DatasourceMaster> producer) {
 
-		dbClient.processResults(sql,  rs -> writeMap(producer.apply(rs)));
+		dbClient.processResults(sql, rs -> writeMap(producer.apply(rs)));
 	}
 
 	public DatasourceMaster datasourceMasterMap(ResultSet rs) {
