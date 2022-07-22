@@ -38,7 +38,7 @@ public class GetDatasourceFromCountry implements Serializable {
                 .toString(
                         GetDatasourceFromCountry.class
                                 .getResourceAsStream(
-                                        "/eu/dnetlib/dhp/oa/graph/input_clean_country_parameters.json"));
+                                        "/eu/dnetlib/dhp/oa/graph/input_datasource_country_parameters.json"));
         final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
         parser.parseArgument(args);
 
