@@ -117,19 +117,28 @@ public class SparkEoscBulkTag implements Serializable {
 	}
 
 	private static <R extends Result> R enrich(R value, List<String> hostedByList) {
-		if (value.getInstance().stream().anyMatch(i -> (hostedByList.contains(i.getHostedby().getKey())) ||
-			(value.getEoscifguidelines() != null && value.getEoscifguidelines().size() > 0)) &&
-		!value.getContext().stream().anyMatch(c -> c.getId().equals("eosc"))) {
+		if (value
+			.getInstance()
+			.stream()
+			.anyMatch(
+				i -> (hostedByList.contains(i.getHostedby().getKey())) ||
+					(value.getEoscifguidelines() != null && value.getEoscifguidelines().size() > 0))
+			&&
+			!value.getContext().stream().anyMatch(c -> c.getId().equals("eosc"))) {
 			Context context = new Context();
 			context.setId("eosc");
-			context.setDataInfo(Arrays.asList(OafMapperUtils
-					.dataInfo(
-							false, BULKTAG_DATA_INFO_TYPE, true, false,
+			context
+				.setDataInfo(
+					Arrays
+						.asList(
 							OafMapperUtils
-									.qualifier(
+								.dataInfo(
+									false, BULKTAG_DATA_INFO_TYPE, true, false,
+									OafMapperUtils
+										.qualifier(
 											CLASS_ID_DATASOURCE, CLASS_NAME_BULKTAG_DATASOURCE,
 											DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS),
-							TAGGING_TRUST)));
+									TAGGING_TRUST)));
 			value.getContext().add(context);
 
 		}
