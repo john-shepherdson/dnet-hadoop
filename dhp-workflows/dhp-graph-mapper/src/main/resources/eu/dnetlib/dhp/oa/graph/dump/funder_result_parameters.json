@@ -17,10 +17,10 @@
 		"paramDescription": "true if the spark session is managed, false otherwise",
 		"paramRequired": false
 	},
-{
-	"paramName": "gp",
-	"paramLongName": "graphPath",
-	"paramDescription": "the relationPath",
-	"paramRequired": true
-}
+	{
+		"paramName": "gp",
+		"paramLongName": "graphPath",
+		"paramDescription": "the relationPath",
+		"paramRequired": false
+	}
 ]

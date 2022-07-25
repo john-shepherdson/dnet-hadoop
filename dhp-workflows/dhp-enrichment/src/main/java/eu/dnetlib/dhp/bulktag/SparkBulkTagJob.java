@@ -5,6 +5,7 @@ import static eu.dnetlib.dhp.PropagationConstant.removeOutputDir;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -102,6 +103,7 @@ public class SparkBulkTagJob {
 		ResultTagger resultTagger = new ResultTagger();
 		readPath(spark, inputPath, resultClazz)
 			.map(patchResult(), Encoders.bean(resultClazz))
+			.filter(Objects::nonNull)
 			.map(
 				(MapFunction<R, R>) value -> resultTagger
 					.enrichContextCriteria(

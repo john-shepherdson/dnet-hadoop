@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
@@ -81,8 +82,9 @@ public class SparkPrepareResultProject implements Serializable {
 		Dataset<Relation> relation = Utils
 			.readPath(spark, inputPath + "/relation", Relation.class)
 			.filter(
-				"dataInfo.deletedbyinference = false and lower(relClass) = '"
-					+ ModelConstants.IS_PRODUCED_BY.toLowerCase() + "'");
+				(FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference() &&
+					r.getRelClass().equalsIgnoreCase(ModelConstants.IS_PRODUCED_BY));
+
 		Dataset<eu.dnetlib.dhp.schema.oaf.Project> projects = Utils
 			.readPath(spark, inputPath + "/project", eu.dnetlib.dhp.schema.oaf.Project.class);
 
