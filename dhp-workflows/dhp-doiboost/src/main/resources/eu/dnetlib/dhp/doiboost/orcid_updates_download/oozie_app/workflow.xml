@@ -78,7 +78,7 @@
         </configuration>
     </global>
 
-    <start to="ResetLambda"/>
+    <start to="DownloadOrcidWorks"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -190,7 +190,7 @@
             <arg>-o</arg><arg>downloads/updated_works</arg>
             <arg>-t</arg><arg>${token}</arg>
         </spark>
-        <ok to="ResetNewAuthors"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 
