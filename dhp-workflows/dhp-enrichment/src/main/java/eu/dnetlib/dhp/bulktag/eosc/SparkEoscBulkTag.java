@@ -117,8 +117,9 @@ public class SparkEoscBulkTag implements Serializable {
 	}
 
 	private static <R extends Result> R enrich(R value, List<String> hostedByList) {
-		if (value.getInstance().stream().anyMatch(i -> hostedByList.contains(i.getHostedby().getKey())) ||
-			(value.getEoscifguidelines() != null && value.getEoscifguidelines().size() > 0)) {
+		if (value.getInstance().stream().anyMatch(i -> (hostedByList.contains(i.getHostedby().getKey())) ||
+			(value.getEoscifguidelines() != null && value.getEoscifguidelines().size() > 0)) &&
+		!value.getContext().stream().anyMatch(c -> c.getId().equals("eosc"))) {
 			Context context = new Context();
 			context.setId("eosc");
 			context.setDataInfo(Arrays.asList(OafMapperUtils
