@@ -62,7 +62,7 @@ public class ReadMasterDatasourceFromDB implements Closeable {
 		final String dbUrl = parser.get("postgresUrl");
 		final String dbUser = parser.get("postgresUser");
 		final String dbPassword = parser.get("postgresPassword");
-		final String hdfsPath = parser.get("hdfsPath") + "/datasourceMasters";
+		final String hdfsPath = parser.get("hdfsPath");
 		final String hdfsNameNode = parser.get("hdfsNameNode");
 
 		try (
