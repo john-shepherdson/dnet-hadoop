@@ -2,9 +2,10 @@ package eu.dnetlib.dhp.sx.bio
 
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
 import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest
-import eu.dnetlib.dhp.schema.oaf.{Oaf, Relation, Result}
+import eu.dnetlib.dhp.schema.oaf.utils.PidType
+import eu.dnetlib.dhp.schema.oaf.{Oaf, Publication, Relation, Result}
 import eu.dnetlib.dhp.sx.bio.BioDBToOAF.ScholixResolved
-import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMParser, PubMedToOaf}
+import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMParser, PMSubject, PubMedToOaf}
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.parse
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 import java.io.{BufferedReader, InputStream, InputStreamReader}
 import java.util.zip.GZIPInputStream
 import scala.collection.JavaConverters._
+import scala.collection.mutable.ListBuffer
 import scala.io.Source
 import scala.xml.pull.XMLEventReader
 
@@ -71,6 +73,102 @@ class BioScholixTest extends AbstractVocabularyTest {
         .exists(p => "0037".equalsIgnoreCase(p))
     )
     println(mapper.writeValueAsString(r.head))
+
+  }
+
+
+  private def checkPMArticle(article:PMArticle): Unit = {
+    assertNotNull(article.getPmid)
+    assertNotNull(article.getTitle)
+    assertNotNull(article.getAuthors)
+    article.getAuthors.asScala.foreach{a =>
+      assertNotNull(a)
+      assertNotNull(a.getFullName)
+    }
+
+  }
+
+  @Test
+  def  testParsingPubmedXML():Unit = {
+    val xml = new XMLEventReader(Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml")))
+    val parser = new PMParser(xml)
+    parser.foreach(checkPMArticle)
+  }
+
+
+  private def checkPubmedPublication(o:Oaf): Unit = {
+    assertTrue(o.isInstanceOf[Publication])
+    val p:Publication = o.asInstanceOf[Publication]
+    assertNotNull(p.getId)
+    assertNotNull(p.getTitle)
+    p.getTitle.asScala.foreach(t =>assertNotNull(t.getValue))
+    p.getAuthor.asScala.foreach(a =>assertNotNull(a.getFullname))
+    assertNotNull(p.getInstance())
+    p.getInstance().asScala.foreach { i =>
+      assertNotNull(i.getCollectedfrom)
+      assertNotNull(i.getPid)
+      assertNotNull(i.getInstancetype)
+    }
+    assertNotNull(p.getOriginalId)
+    p.getOriginalId.asScala.foreach(oId => assertNotNull(oId))
+
+
+    val hasPMC = p.getInstance().asScala.exists(i => i.getPid.asScala.exists(pid => pid.getQualifier.getClassid.equalsIgnoreCase(PidType.pmc.toString)))
+
+
+
+    if (hasPMC) {
+      assertTrue(p.getOriginalId.asScala.exists(oId => oId.startsWith("od_______267::")))
+    }
+  }
+
+
+  @Test
+  def testPubmedOriginalID():Unit = {
+    val article:PMArticle  = new PMArticle
+
+
+    article.setPmid("1234")
+
+    article.setTitle("a Title")
+
+    // VERIFY PUBLICATION IS NOT NULL
+    article.getPublicationTypes.add( new PMSubject("article",null, null))
+    var publication = PubMedToOaf.convert(article, vocabularies).asInstanceOf[Publication]
+    assertNotNull(publication)
+    assertEquals("50|pmid________::81dc9bdb52d04dc20036dbd8313ed055", publication.getId)
+
+    // VERIFY PUBLICATION ID DOES NOT CHANGE ALSO IF SETTING PMC IDENTIFIER
+    article.setPmcId("PMC1517292")
+    publication = PubMedToOaf.convert(article, vocabularies).asInstanceOf[Publication]
+    assertNotNull(publication)
+    assertEquals("50|pmid________::81dc9bdb52d04dc20036dbd8313ed055", publication.getId)
+
+    // VERIFY ORIGINAL ID GENERATE IN OLD WAY USING PMC IDENTIFIER EXISTS
+
+
+    val oldOpenaireID ="od_______267::0000072375bc0e68fa09d4e6b7658248"
+
+    val hasOldOpenAIREID = publication.getOriginalId.asScala.exists(o => o.equalsIgnoreCase(oldOpenaireID))
+
+    assertTrue(hasOldOpenAIREID)
+  }
+
+
+  @Test
+  def testPubmedMapping() :Unit = {
+
+    val xml = new XMLEventReader(Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml")))
+    val parser = new PMParser(xml)
+    val results = ListBuffer[Oaf]()
+    parser.foreach(x => results += PubMedToOaf.convert(x, vocabularies))
+
+
+
+
+    results.foreach(checkPubmedPublication)
+
+
 
   }
 

@@ -28,28 +28,6 @@ import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 public class SparkEoscTag {
 	private static final Logger log = LoggerFactory.getLogger(SparkEoscTag.class);
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-	public static final Qualifier EOSC_QUALIFIER = OafMapperUtils
-		.qualifier(
-			"EOSC",
-			"European Open Science Cloud",
-			ModelConstants.DNET_SUBJECT_TYPOLOGIES, ModelConstants.DNET_SUBJECT_TYPOLOGIES);
-	public static final DataInfo EOSC_DATAINFO = OafMapperUtils
-		.dataInfo(
-			false, "propagation", true, false,
-			OafMapperUtils
-				.qualifier(
-					"propagation:subject", "Inferred by OpenAIRE",
-					ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS),
-			"0.9");
-	public final static StructuredProperty EOSC_NOTEBOOK = OafMapperUtils
-		.structuredProperty(
-			"EOSC::Jupyter Notebook", EOSC_QUALIFIER, EOSC_DATAINFO);
-	public final static StructuredProperty EOSC_GALAXY = OafMapperUtils
-		.structuredProperty(
-			"EOSC::Galaxy Workflow", EOSC_QUALIFIER, EOSC_DATAINFO);
-	public final static StructuredProperty EOSC_TWITTER = OafMapperUtils
-		.structuredProperty(
-			"EOSC::Twitter Data", EOSC_QUALIFIER, EOSC_DATAINFO);
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
@@ -84,29 +62,35 @@ public class SparkEoscTag {
 			});
 	}
 
+	public static EoscIfGuidelines newInstance(String code, String label, String url, String semantics) {
+		EoscIfGuidelines eig = new EoscIfGuidelines();
+		eig.setCode(code);
+		eig.setLabel(label);
+		eig.setUrl(url);
+		eig.setSemanticRelation(semantics);
+		return eig;
+
+	}
+
 	private static void execEoscTag(SparkSession spark, String inputPath, String workingPath) {
 
 		readPath(spark, inputPath + "/software", Software.class)
 			.map((MapFunction<Software, Software>) s -> {
-				List<StructuredProperty> sbject;
-				if (!Optional.ofNullable(s.getSubject()).isPresent())
-					s.setSubject(new ArrayList<>());
-				sbject = s.getSubject();
 
 				if (containsCriteriaNotebook(s)) {
-					sbject.add(EOSC_NOTEBOOK);
-					if (sbject.stream().anyMatch(sb -> sb.getValue().equals("EOSC Jupyter Notebook"))) {
-						sbject = sbject.stream().map(sb -> {
-							if (sb.getValue().equals("EOSC Jupyter Notebook")) {
-								return null;
-							}
-							return sb;
-						}).filter(Objects::nonNull).collect(Collectors.toList());
-						s.setSubject(sbject);
-					}
+					if (!Optional.ofNullable(s.getEoscifguidelines()).isPresent())
+						s.setEoscifguidelines(new ArrayList<>());
+					addEIG(
+						s.getEoscifguidelines(), "EOSC::Jupyter Notebook", "EOSC::Jupyter Notebook", "",
+						"compliesWith");
+
 				}
 				if (containsCriteriaGalaxy(s)) {
-					sbject.add(EOSC_GALAXY);
+					if (!Optional.ofNullable(s.getEoscifguidelines()).isPresent())
+						s.setEoscifguidelines(new ArrayList<>());
+
+					addEIG(
+						s.getEoscifguidelines(), "EOSC::Galaxy Workflow", "EOSC::Galaxy Workflow", "", "compliesWith");
 				}
 				return s;
 			}, Encoders.bean(Software.class))
@@ -123,15 +107,17 @@ public class SparkEoscTag {
 
 		readPath(spark, inputPath + "/otherresearchproduct", OtherResearchProduct.class)
 			.map((MapFunction<OtherResearchProduct, OtherResearchProduct>) orp -> {
-				List<StructuredProperty> sbject;
-				if (!Optional.ofNullable(orp.getSubject()).isPresent())
-					orp.setSubject(new ArrayList<>());
-				sbject = orp.getSubject();
+
+				if (!Optional.ofNullable(orp.getEoscifguidelines()).isPresent())
+					orp.setEoscifguidelines(new ArrayList<>());
+
 				if (containsCriteriaGalaxy(orp)) {
-					sbject.add(EOSC_GALAXY);
+					addEIG(
+						orp.getEoscifguidelines(), "EOSC::Galaxy Workflow", "EOSC::Galaxy Workflow", "",
+						"compliesWith");
 				}
 				if (containscriteriaTwitter(orp)) {
-					sbject.add(EOSC_TWITTER);
+					addEIG(orp.getEoscifguidelines(), "EOSC::Twitter Data", "EOSC::Twitter Data", "", "compliesWith");
 				}
 				return orp;
 			}, Encoders.bean(OtherResearchProduct.class))
@@ -148,12 +134,11 @@ public class SparkEoscTag {
 
 		readPath(spark, inputPath + "/dataset", Dataset.class)
 			.map((MapFunction<Dataset, Dataset>) d -> {
-				List<StructuredProperty> sbject;
-				if (!Optional.ofNullable(d.getSubject()).isPresent())
-					d.setSubject(new ArrayList<>());
-				sbject = d.getSubject();
+
+				if (!Optional.ofNullable(d.getEoscifguidelines()).isPresent())
+					d.setEoscifguidelines(new ArrayList<>());
 				if (containscriteriaTwitter(d)) {
-					sbject.add(EOSC_TWITTER);
+					addEIG(d.getEoscifguidelines(), "EOSC::Twitter Data", "EOSC::Twitter Data", "", "compliesWith");
 				}
 				return d;
 			}, Encoders.bean(Dataset.class))
@@ -167,6 +152,12 @@ public class SparkEoscTag {
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(inputPath + "/dataset");
+	}
+
+	private static void addEIG(List<EoscIfGuidelines> eoscifguidelines, String code, String label, String url,
+		String sem) {
+		if (!eoscifguidelines.stream().anyMatch(eig -> eig.getCode().equals(code)))
+			eoscifguidelines.add(newInstance(code, label, url, sem));
 	}
 
 	private static boolean containscriteriaTwitter(Result r) {
@@ -212,13 +203,6 @@ public class SparkEoscTag {
 		return false;
 	}
 
-	private static Set<String> getSubjects(List<StructuredProperty> s) {
-		Set<String> subjects = new HashSet<>();
-		s.stream().forEach(sbj -> subjects.addAll(Arrays.asList(sbj.getValue().toLowerCase().split(" "))));
-		s.stream().forEach(sbj -> subjects.add(sbj.getValue().toLowerCase()));
-		return subjects;
-	}
-
 	private static Set<String> getWordsSP(List<StructuredProperty> elem) {
 		Set<String> words = new HashSet<>();
 		Optional
@@ -242,9 +226,7 @@ public class SparkEoscTag {
 						t -> words
 							.addAll(
 								Arrays.asList(t.getValue().toLowerCase().replaceAll("[^a-zA-Z ]", "").split(" ")))));
-//		elem
-//			.forEach(
-//				t -> words.addAll(Arrays.asList(t.getValue().toLowerCase().replaceAll("[^a-zA-Z ]", "").split(" "))));
+
 		return words;
 
 	}
