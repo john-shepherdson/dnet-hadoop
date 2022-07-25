@@ -121,14 +121,14 @@ public class SparkEoscBulkTag implements Serializable {
 			(value.getEoscifguidelines() != null && value.getEoscifguidelines().size() > 0)) {
 			Context context = new Context();
 			context.setId("eosc");
-			OafMapperUtils
-				.dataInfo(
-					false, BULKTAG_DATA_INFO_TYPE, true, false,
-					OafMapperUtils
-						.qualifier(
-							CLASS_ID_DATASOURCE, CLASS_NAME_BULKTAG_DATASOURCE,
-							DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS),
-					TAGGING_TRUST);
+			context.setDataInfo(Arrays.asList(OafMapperUtils
+					.dataInfo(
+							false, BULKTAG_DATA_INFO_TYPE, true, false,
+							OafMapperUtils
+									.qualifier(
+											CLASS_ID_DATASOURCE, CLASS_NAME_BULKTAG_DATASOURCE,
+											DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS),
+							TAGGING_TRUST)));
 			value.getContext().add(context);
 
 		}
