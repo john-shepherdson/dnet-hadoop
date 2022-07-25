@@ -226,7 +226,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>EOSC_tagging</name>
-            <class>eu.dnetlib.dhp.bulktag.SparkEoscTag</class>
+            <class>eu.dnetlib.dhp.bulktag.eosc.SparkEoscTag</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --num-executors=${sparkExecutorNumber}
