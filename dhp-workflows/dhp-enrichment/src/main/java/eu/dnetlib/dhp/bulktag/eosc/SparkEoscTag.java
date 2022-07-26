@@ -1,13 +1,10 @@
 
-package eu.dnetlib.dhp.bulktag;
+package eu.dnetlib.dhp.bulktag.eosc;
 
 import static eu.dnetlib.dhp.PropagationConstant.readPath;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -21,9 +18,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 public class SparkEoscTag {
 	private static final Logger log = LoggerFactory.getLogger(SparkEoscTag.class);
