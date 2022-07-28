@@ -6,6 +6,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -87,6 +88,8 @@ public class PrepareDatasourceCountryAssociation {
 		Dataset<Datasource> datasource = readPath(spark, inputPath + "/datasource", Datasource.class)
 			.filter(
 				(FilterFunction<Datasource>) ds -> !ds.getDataInfo().getDeletedbyinference() &&
+					Optional.ofNullable(ds.getDatasourcetype()).isPresent() &&
+					Optional.ofNullable(ds.getDatasourcetype().getClassid()).isPresent() &&
 					(allowedtypes.contains(ds.getDatasourcetype().getClassid()) ||
 						whitelist.contains(ds.getId())));
 

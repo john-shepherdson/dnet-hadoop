@@ -1233,3 +1233,267 @@ dnet:review_levels @=@ 0001 @=@ 印刷物/電子媒体-紀要論文（査読有�
 dnet:review_levels @=@ 0001 @=@ 印刷物/電子媒体-雑誌記事（査読有り）
 dnet:review_levels @=@ 0001 @=@ 原著論文（査読有り）
 dnet:review_levels @=@ 0001 @=@ 査読論文
+cnr:institutes @=@ https://ror.org/00brf2d87 @=@ CDS001
+cnr:institutes @=@ https://ror.org/00brf2d87 @=@ IDASC - Istituto di Acustica e Sensoristica \"Orso Mario Corbino\"
+cnr:institutes @=@ https://ror.org/006qkqr45 @=@ CDS002
+cnr:institutes @=@ https://ror.org/006qkqr45 @=@ IAMC - Istituto per l'ambiente marino costiero
+cnr:institutes @=@ https://ror.org/054ye0e45 @=@ CDS003
+cnr:institutes @=@ https://ror.org/054ye0e45 @=@ IASI - Istituto di analisi dei sistemi ed informatica \"Antonio Ruberti\"
+cnr:institutes @=@ https://ror.org/00ygy3d85 @=@ CDS004
+cnr:institutes @=@ https://ror.org/00ygy3d85 @=@ IAC - Istituto per le applicazioni del calcolo \"Mauro Picone\"
+cnr:institutes @=@ https://ror.org/000sy1f36 @=@ CDS005
+cnr:institutes @=@ https://ror.org/000sy1f36 @=@ IASF - Istituto di astrofisica spaziale e fisica cosmica
+cnr:institutes @=@ https://ror.org/00x5wpm25 @=@ CDS006
+cnr:institutes @=@ https://ror.org/00x5wpm25 @=@ IBAM - Istituto per i beni archeologici e monumentali
+cnr:institutes @=@ https://ror.org/03eqeqg74 @=@ CDS007
+cnr:institutes @=@ https://ror.org/03eqeqg74 @=@ IBP - Istituto di biochimica delle proteine
+cnr:institutes @=@ https://ror.org/041xzk838 @=@ CDS008
+cnr:institutes @=@ https://ror.org/041xzk838 @=@ IBF - Istituto di biofisica
+cnr:institutes @=@ https://ror.org/00s2j5046 @=@ CDS009
+cnr:institutes @=@ https://ror.org/00s2j5046 @=@ IBFM - Istituto di bioimmagini e fisiologia molecolare
+cnr:institutes @=@ __CDS010__ @=@ CDS010
+cnr:institutes @=@ __CDS010__ @=@ IBAF - Istituto di biologia agro-ambientale e forestale
+cnr:institutes @=@ __CDS011__ @=@ CDS011
+cnr:institutes @=@ __CDS011__ @=@ IBC - Istituto di biologia cellulare
+cnr:institutes @=@ https://ror.org/02e5sbe24 @=@ CDS012
+cnr:institutes @=@ https://ror.org/02e5sbe24 @=@ IBBA - Istituto di biologia e biotecnologia agraria
+cnr:institutes @=@ https://ror.org/01nyatq71 @=@ CDS013
+cnr:institutes @=@ https://ror.org/01nyatq71 @=@ IBPM - Istituto di biologia e patologia molecolari
+cnr:institutes @=@ https://ror.org/01dy2q607 @=@ CDS014
+cnr:institutes @=@ https://ror.org/01dy2q607 @=@ IBIM - Istituto di biomedicina e di immunologia molecolare \"Alberto Monroy\"
+cnr:institutes @=@ https://ror.org/05nzf7q96 @=@ CDS015
+cnr:institutes @=@ https://ror.org/05nzf7q96 @=@ IBIOM - Istituto di Biomembrane, Bioenergetica e Biotecnologie Molecolari
+cnr:institutes @=@ https://ror.org/05m1yqp60 @=@ CDS016
+cnr:institutes @=@ https://ror.org/05m1yqp60 @=@ IBIMET - Istituto di biometeorologia
+cnr:institutes @=@ https://ror.org/03rqtqb02 @=@ CDS017
+cnr:institutes @=@ https://ror.org/03rqtqb02 @=@ IBB - Istituto di biostrutture e bioimmagini
+cnr:institutes @=@ https://ror.org/04r5fge26 @=@ CDS018
+cnr:institutes @=@ https://ror.org/04r5fge26 @=@ ICAR - Istituto di calcolo e reti ad alte prestazioni
+cnr:institutes @=@ https://ror.org/03wyf0g15 @=@ CDS019
+cnr:institutes @=@ https://ror.org/03wyf0g15 @=@ ICB - Istituto di chimica biomolecolare
+cnr:institutes @=@ https://ror.org/02fkw1114 @=@ CDS020
+cnr:institutes @=@ https://ror.org/02fkw1114 @=@ ICCOM - Istituto di chimica dei composti organo metallici
+cnr:institutes @=@ https://ror.org/0141vn777 @=@ CDS021
+cnr:institutes @=@ https://ror.org/0141vn777 @=@ ICRM - Istituto di chimica del riconoscimento molecolare
+cnr:institutes @=@ __CDS022__ @=@ CDS022
+cnr:institutes @=@ __CDS022__ @=@ ICTP - Istituto di chimica e tecnologia dei polimeri
+cnr:institutes @=@ __CDS023__ @=@ CDS023
+cnr:institutes @=@ __CDS023__ @=@ ICIS - Istituto di chimica inorganica e delle superfici
+cnr:institutes @=@ https://ror.org/00be3zh53 @=@ CDS024
+cnr:institutes @=@ https://ror.org/00be3zh53 @=@ ISASI - Istituto di Scienze Applicate e Sistemi Intelligenti \"Eduardo Caianiello\"
+cnr:institutes @=@ __CDS025__ @=@ CDS025
+cnr:institutes @=@ __CDS025__ @=@ ICEVO - Istituto di Studi sulle Civiltà dell'Egeo e del Vicino Oriente
+cnr:institutes @=@ https://ror.org/02ynrme92 @=@ CDS026
+cnr:institutes @=@ https://ror.org/02ynrme92 @=@ ICVBC - Istituto per la conservazione e valorizzazione dei beni culturali
+cnr:institutes @=@ https://ror.org/05wba8r86 @=@ CDS027
+cnr:institutes @=@ https://ror.org/05wba8r86 @=@ IC - Istituto di cristallografia
+cnr:institutes @=@ https://ror.org/03z58xd74 @=@ CDS028
+cnr:institutes @=@ https://ror.org/03z58xd74 @=@ IDPA - Istituto per la dinamica dei processi ambientali
+cnr:institutes @=@ https://ror.org/00n4jbh84 @=@ CDS029
+cnr:institutes @=@ https://ror.org/00n4jbh84 @=@ IEIIT - Istituto di elettronica e di ingegneria dell'informazione e delle telecomunicazioni
+cnr:institutes @=@ https://ror.org/04sn06036 @=@ CDS030
+cnr:institutes @=@ https://ror.org/04sn06036 @=@ IEOS - Istituto per l'endocrinologia e l'oncologia \"Gaetano Salvatore\"
+cnr:institutes @=@ https://ror.org/01rg40y89 @=@ CDS031
+cnr:institutes @=@ https://ror.org/01rg40y89 @=@ ICMATE - Istituto di Chimica della Materia Condensata e di Tecnologie per l'Energia
+cnr:institutes @=@ https://ror.org/00dqega85 @=@ CDS032
+cnr:institutes @=@ https://ror.org/00dqega85 @=@ IFAC - Istituto di fisica applicata \"Nello Carrara\"
+cnr:institutes @=@ https://ror.org/02n2bgz18 @=@ CDS033
+cnr:institutes @=@ https://ror.org/02n2bgz18 @=@ IFP - Istituto di fisica del plasma \"Piero Caldirola\"
+cnr:institutes @=@ __CDS034__ @=@ CDS034
+cnr:institutes @=@ __CDS034__ @=@ IFSI - Istituto di fisica dello spazio interplanetario
+cnr:institutes @=@ https://ror.org/01kdj2848 @=@ CDS035
+cnr:institutes @=@ https://ror.org/01kdj2848 @=@ IFC - Istituto di fisiologia clinica
+cnr:institutes @=@ https://ror.org/049ebw417 @=@ CDS036
+cnr:institutes @=@ https://ror.org/049ebw417 @=@ IFN - Istituto di fotonica e nanotecnologie
+cnr:institutes @=@ https://ror.org/01f5tnx94 @=@ CDS037
+cnr:institutes @=@ https://ror.org/01f5tnx94 @=@ IGI - Istituto gas ionizzati
+cnr:institutes @=@ __CDS038__ @=@ CDS038
+cnr:institutes @=@ __CDS038__ @=@ IGP - Istituto di genetica delle popolazioni
+cnr:institutes @=@ https://ror.org/04hadk112 @=@ CDS039
+cnr:institutes @=@ https://ror.org/04hadk112 @=@ IGB - Istituto di genetica e biofisica \"Adriano Buzzati Traverso\"
+cnr:institutes @=@ https://ror.org/03qpd8w66 @=@ CDS040
+cnr:institutes @=@ https://ror.org/03qpd8w66 @=@ IGM - Istituto di genetica molecolare \"Luigi Luca Cavalli Sforza\"
+cnr:institutes @=@ https://ror.org/01gtsa866 @=@ CDS041
+cnr:institutes @=@ https://ror.org/01gtsa866 @=@ IBBR - Istituto di Bioscienze e Biorisorse
+cnr:institutes @=@ https://ror.org/00ytw6m58 @=@ CDS042
+cnr:institutes @=@ https://ror.org/00ytw6m58 @=@ IGAG - Istituto di geologia ambientale e geoingegneria
+cnr:institutes @=@ https://ror.org/015bmra78 @=@ CDS043
+cnr:institutes @=@ https://ror.org/015bmra78 @=@ IGG - Istituto di geoscienze e georisorse
+cnr:institutes @=@ https://ror.org/02gdcn153 @=@ CDS044
+cnr:institutes @=@ https://ror.org/02gdcn153 @=@ IIT - Istituto di informatica e telematica
+cnr:institutes @=@ __CDS045__ @=@ CDS045
+cnr:institutes @=@ __CDS045__ @=@ ISIB - Istituto di ingegneria biomedica
+cnr:institutes @=@ https://ror.org/05hky6p02 @=@ CDS046
+cnr:institutes @=@ https://ror.org/05hky6p02 @=@ IIA - Istituto sull'inquinamento atmosferico
+cnr:institutes @=@ https://ror.org/011n2hw53 @=@ CDS047
+cnr:institutes @=@ https://ror.org/011n2hw53 @=@ ILIESI - Istituto per il lessico intellettuale europeo e storia delle idee
+cnr:institutes @=@ https://ror.org/028g3pe33 @=@ CDS048
+cnr:institutes @=@ https://ror.org/028g3pe33 @=@ ILC - Istituto di linguistica computazionale \"Antonio Zampolli\"
+cnr:institutes @=@ __CDS049__ @=@ CDS049
+cnr:institutes @=@ __CDS049__ @=@ IMAMOTER - Istituto per le macchine agricole e movimento terra
+cnr:institutes @=@ https://ror.org/03m0n3c07 @=@ CDS050
+cnr:institutes @=@ https://ror.org/03m0n3c07 @=@ IMATI - Istituto di matematica applicata e tecnologie informatiche \"Enrico Magenes\"
+cnr:institutes @=@ __CDS051__ @=@ CDS051
+cnr:institutes @=@ __CDS051__ @=@ IMCB - Istituto per i materiali compositi e biomedici
+cnr:institutes @=@ https://ror.org/00z8ws214 @=@ CDS052
+cnr:institutes @=@ https://ror.org/00z8ws214 @=@ IMEM - Istituto dei materiali per l'elettronica ed il magnetismo
+cnr:institutes @=@ __CDS053__ @=@ CDS053
+cnr:institutes @=@ __CDS053__ @=@ ISB - Istituto per i Sistemi Biologici
+cnr:institutes @=@ https://ror.org/00bc51d88 @=@ CDS054
+cnr:institutes @=@ https://ror.org/00bc51d88 @=@ NANOTEC - Istituto di Nanotecnologia
+cnr:institutes @=@ https://ror.org/024ye7w89 @=@ CDS055
+cnr:institutes @=@ https://ror.org/024ye7w89 @=@ IMAA - Istituto di metodologie per l'analisi ambientale
+cnr:institutes @=@ __CDS056__ @=@ CDS056
+cnr:institutes @=@ __CDS056__ @=@ IMGC - Istituto di metrologia \"Gustavo Colonnetti\"
+cnr:institutes @=@ https://ror.org/05vk2g845 @=@ CDS057
+cnr:institutes @=@ https://ror.org/05vk2g845 @=@ IMM - Istituto per la microelettronica e microsistemi
+cnr:institutes @=@ https://ror.org/02qwy8e97 @=@ CDS058
+cnr:institutes @=@ https://ror.org/02qwy8e97 @=@ IM - Istituto motori
+cnr:institutes @=@ __CDS059__ @=@ CDS059
+cnr:institutes @=@ __CDS059__ @=@ INMM - Istituto di neurobiologia e medicina molecolare
+cnr:institutes @=@ https://ror.org/02dr63s31 @=@ CDS060
+cnr:institutes @=@ https://ror.org/02dr63s31 @=@ IRGB - Istituto di Ricerca Genetica e Biomedica
+cnr:institutes @=@ https://ror.org/0240rwx68 @=@ CDS061
+cnr:institutes @=@ https://ror.org/0240rwx68 @=@ IN - Istituto di neuroscienze
+cnr:institutes @=@ https://ror.org/02rzxrg25 @=@ CDS062
+cnr:institutes @=@ https://ror.org/02rzxrg25 @=@ OVI - Istituto opera del vocabolario italiano
+cnr:institutes @=@ https://ror.org/05patmk97 @=@ CDS063
+cnr:institutes @=@ https://ror.org/05patmk97 @=@ IPCF - Istituto per i processi chimico-fisici
+cnr:institutes @=@ __CDS064__ @=@ CDS064
+cnr:institutes @=@ __CDS064__ @=@ IPP - Istituto per la protezione delle piante
+cnr:institutes @=@ https://ror.org/029st3z03 @=@ CDS065
+cnr:institutes @=@ https://ror.org/029st3z03 @=@ IRA - Istituto di radioastronomia
+cnr:institutes @=@ https://ror.org/0040zx077 @=@ CDS066
+cnr:institutes @=@ https://ror.org/0040zx077 @=@ IRPI - Istituto di ricerca per la protezione idrogeologica
+cnr:institutes @=@ https://ror.org/044bfsy89 @=@ CDS067
+cnr:institutes @=@ https://ror.org/044bfsy89 @=@ IRCRES - Istituto di Ricerca sulla Crescita Economica Sostenibile
+cnr:institutes @=@ https://ror.org/01n1ayq61 @=@ CDS068
+cnr:institutes @=@ https://ror.org/01n1ayq61 @=@ IRPPS - Istituto di ricerche sulla popolazione e le politiche sociali
+cnr:institutes @=@ https://ror.org/02db0kh50 @=@ CDS069
+cnr:institutes @=@ https://ror.org/02db0kh50 @=@ IRSA - Istituto di ricerca sulle acque
+cnr:institutes @=@ https://ror.org/05813wx75 @=@ CDS070
+cnr:institutes @=@ https://ror.org/05813wx75 @=@ IRC - Istituto di ricerche sulla combustione
+cnr:institutes @=@ https://ror.org/04vnwke91 @=@ CDS071
+cnr:institutes @=@ https://ror.org/04vnwke91 @=@ IRISS - Istituto di Ricerca su Innovazione e Servizi per lo Sviluppo
+cnr:institutes @=@ https://ror.org/02wxw4x45 @=@ CDS072
+cnr:institutes @=@ https://ror.org/02wxw4x45 @=@ IREA - Istituto per il rilevamento elettromagnetico dell'ambiente
+cnr:institutes @=@ https://ror.org/01j6drw72 @=@ CDS073
+cnr:institutes @=@ https://ror.org/01j6drw72 @=@ ISTEC - Istituto di scienza e tecnologia dei materiali ceramici
+cnr:institutes @=@ https://ror.org/05kacka20 @=@ CDS074
+cnr:institutes @=@ https://ror.org/05kacka20 @=@ ISTI - Istituto di scienza e tecnologie dell'informazione \"Alessandro Faedo\"
+cnr:institutes @=@ https://ror.org/00n8ttd98 @=@ CDS075
+cnr:institutes @=@ https://ror.org/00n8ttd98 @=@ ISAC - Istituto di scienze dell'atmosfera e del clima
+cnr:institutes @=@ https://ror.org/0013zhk30 @=@ CDS076
+cnr:institutes @=@ https://ror.org/0013zhk30 @=@ ISA - Istituto di Scienze dell'Alimentazione
+cnr:institutes @=@ https://ror.org/03x7xkr71 @=@ CDS077
+cnr:institutes @=@ https://ror.org/03x7xkr71 @=@ ISPA - Istituto di scienze delle produzioni alimentari
+cnr:institutes @=@ https://ror.org/05w9g2j85 @=@ CDS078
+cnr:institutes @=@ https://ror.org/05w9g2j85 @=@ ISTC - Istituto di scienze e tecnologie della cognizione
+cnr:institutes @=@ https://ror.org/032tyv240 @=@ CDS079
+cnr:institutes @=@ https://ror.org/032tyv240 @=@ ISTM - Istituto di scienze e tecnologie molecolari
+cnr:institutes @=@ https://ror.org/02hdf6119 @=@ CDS080
+cnr:institutes @=@ https://ror.org/02hdf6119 @=@ ISMAR - Istituto di scienze marine
+cnr:institutes @=@ https://ror.org/01yg57d71 @=@ CDS081
+cnr:institutes @=@ https://ror.org/01yg57d71 @=@ ISN - Istituto di scienze neurologiche
+cnr:institutes @=@ https://ror.org/021z1mz76 @=@ CDS082
+cnr:institutes @=@ https://ror.org/021z1mz76 @=@ ISOF - Istituto per la sintesi organica e la fotoreattività
+cnr:institutes @=@ https://ror.org/01wqae691 @=@ CDS083
+cnr:institutes @=@ https://ror.org/01wqae691 @=@ ISPAAM - Istituto per il sistema produzione animale in ambiente Mediterraneo
+cnr:institutes @=@ __CDS084__ @=@ CDS084
+cnr:institutes @=@ __CDS084__ @=@ ISAFoM - Istituto per i sistemi agricoli e forestali del mediterraneo
+cnr:institutes @=@ https://ror.org/00awwz417 @=@ CDS085
+cnr:institutes @=@ https://ror.org/00awwz417 @=@ ISPF - Istituto per la storia del pensiero filosofico e scientifico moderno
+cnr:institutes @=@ https://ror.org/03a111314 @=@ CDS086
+cnr:institutes @=@ https://ror.org/03a111314 @=@ ISEM - Istituto di storia dell'Europa mediterranea
+cnr:institutes @=@ https://ror.org/01zz9wh30 @=@ CDS087
+cnr:institutes @=@ https://ror.org/01zz9wh30 @=@ ISM - Istituto di struttura della materia
+cnr:institutes @=@ https://ror.org/035y5td47 @=@ CDS088
+cnr:institutes @=@ https://ror.org/035y5td47 @=@ ISGI - Istituto di studi giuridici internazionali
+cnr:institutes @=@ __CDS089__ @=@ CDS089
+cnr:institutes @=@ __CDS089__ @=@ ISPRI - Istituto sperimentale di studi socio - economici sull'innovazione e le politiche della ricerca
+cnr:institutes @=@ https://ror.org/051t1q308 @=@ CDS090
+cnr:institutes @=@ https://ror.org/051t1q308 @=@ ISSIA - Istituto di studi sui sistemi intelligenti per l'automazione
+cnr:institutes @=@ https://ror.org/05k3cs357 @=@ CDS091
+cnr:institutes @=@ https://ror.org/05k3cs357 @=@ ISSIRFA - Istituto di studi sui sistemi regionali federali e sulle autonomie \"Massimo Severo Giannini\"
+cnr:institutes @=@ https://ror.org/02gcxw165 @=@ CDS092
+cnr:institutes @=@ https://ror.org/02gcxw165 @=@ ISMA - Istituto di Studi sul Mediterraneo Antico
+cnr:institutes @=@ https://ror.org/05db0es39 @=@ CDS093
+cnr:institutes @=@ https://ror.org/05db0es39 @=@ ISMed - Istituto di studi sul Mediterraneo
+cnr:institutes @=@ https://ror.org/029k6t707 @=@ CDS094
+cnr:institutes @=@ https://ror.org/029k6t707 @=@ ISE - Istituto per lo studio degli ecosistemi
+cnr:institutes @=@ https://ror.org/00w6r1881 @=@ CDS095
+cnr:institutes @=@ https://ror.org/00w6r1881 @=@ ISMN - Istituto per lo studio dei materiali nanostrutturati
+cnr:institutes @=@ https://ror.org/01mfmr054 @=@ CDS096
+cnr:institutes @=@ https://ror.org/01mfmr054 @=@ ISMAC - Istituto per lo studio delle macromolecole
+cnr:institutes @=@ https://ror.org/058nrs650 @=@ CDS097
+cnr:institutes @=@ https://ror.org/058nrs650 @=@ ITM - Istituto per la tecnologia delle membrane
+cnr:institutes @=@ https://ror.org/0331xj092 @=@ CDS098
+cnr:institutes @=@ https://ror.org/0331xj092 @=@ ITABC - Istituto per le tecnologie applicate ai beni culturali
+cnr:institutes @=@ https://ror.org/052q58629 @=@ CDS099
+cnr:institutes @=@ https://ror.org/052q58629 @=@ ITAE - Istituto di tecnologie avanzate per l'energia \"Nicola Giordano\"
+cnr:institutes @=@ https://ror.org/04ehykb85 @=@ CDS100
+cnr:institutes @=@ https://ror.org/04ehykb85 @=@ ITB - Istituto di tecnologie biomediche
+cnr:institutes @=@ https://ror.org/0221agg28 @=@ CDS101
+cnr:institutes @=@ https://ror.org/0221agg28 @=@ ITC - Istituto per le tecnologie della costruzione
+cnr:institutes @=@ https://ror.org/02xz4xc25 @=@ CDS102
+cnr:institutes @=@ https://ror.org/02xz4xc25 @=@ ITD - Istituto per le tecnologie didattiche
+cnr:institutes @=@ __CDS103__ @=@ CDS103
+cnr:institutes @=@ __CDS103__ @=@ STIIMA - Istituto di Sistemi e Tecnologie Industriali Intelligenti per il Manifatturiero Avanzato
+cnr:institutes @=@ https://ror.org/01as2bh37 @=@ CDS104
+cnr:institutes @=@ https://ror.org/01as2bh37 @=@ ITTIG - Istituto di teoria e tecniche dell'informazione giuridica
+cnr:institutes @=@ https://ror.org/01y5w6t76 @=@ CDS105
+cnr:institutes @=@ https://ror.org/01y5w6t76 @=@ ITOI - Istituto per i trapianti d'organo e immunocitologia
+cnr:institutes @=@ https://ror.org/04xy2mq71 @=@ CDS106
+cnr:institutes @=@ https://ror.org/04xy2mq71 @=@ IVALSA - Istituto per la valorizzazione del legno e delle specie arboree
+cnr:institutes @=@ __CDS107__ @=@ CDS107
+cnr:institutes @=@ __CDS107__ @=@ IVV - Istituto di virologia vegetale
+cnr:institutes @=@ https://ror.org/013nxtf56 @=@ CDS108
+cnr:institutes @=@ https://ror.org/013nxtf56 @=@ IRSIG - Istituto di ricerca sui sistemi giudiziari
+cnr:institutes @=@ https://ror.org/05rcgef49 @=@ CDS109
+cnr:institutes @=@ https://ror.org/05rcgef49 @=@ ISC - Istituto dei sistemi complessi
+cnr:institutes @=@ __CDS110__ @=@ CDS110
+cnr:institutes @=@ __CDS110__ @=@ INFM - Centro di responsabilità scientifica INFM
+cnr:institutes @=@ https://ror.org/02dp3a879 @=@ CDS111
+cnr:institutes @=@ https://ror.org/02dp3a879 @=@ INO - Istituto nazionale di ottica
+cnr:institutes @=@ __CDS112__ @=@ CDS112
+cnr:institutes @=@ __CDS112__ @=@ IDAIC - Centro di responsabilità di attività scientifica IDAIC
+cnr:institutes @=@ https://ror.org/00p03yg71 @=@ CDS113
+cnr:institutes @=@ https://ror.org/00p03yg71 @=@ SPIN - Istituto superconduttori, materiali innovativi e dispositivi
+cnr:institutes @=@ https://ror.org/00yfw2296 @=@ CDS114
+cnr:institutes @=@ https://ror.org/00yfw2296 @=@ IOM - Istituto officina dei materiali
+cnr:institutes @=@ https://ror.org/0042e5975 @=@ CDS115
+cnr:institutes @=@ https://ror.org/0042e5975 @=@ NANO - Istituto Nanoscienze
+cnr:institutes @=@ https://ror.org/03ta8pf33 @=@ CDS116
+cnr:institutes @=@ https://ror.org/03ta8pf33 @=@ IFT - Istituto di Farmacologia Traslazionale
+cnr:institutes @=@ https://ror.org/040xhth73 @=@ CDS117
+cnr:institutes @=@ https://ror.org/040xhth73 @=@ IBCN - Istituto di Biologia Cellulare e Neurobiologia
+cnr:institutes @=@ https://ror.org/02qnx8e75 @=@ CDS118
+cnr:institutes @=@ https://ror.org/02qnx8e75 @=@ INM - Istituto di iNgegneria del Mare
+cnr:institutes @=@ https://ror.org/05nr7xa08 @=@ CDS119
+cnr:institutes @=@ https://ror.org/05nr7xa08 @=@ IPCB - Istituto per i Polimeri, Compositi e Biomateriali
+cnr:institutes @=@ https://ror.org/008fjbg42 @=@ CDS121
+cnr:institutes @=@ https://ror.org/008fjbg42 @=@ IPSP - Istituto per la Protezione Sostenibile delle Piante
+cnr:institutes @=@ __CDS122__ @=@ CDS122
+cnr:institutes @=@ __CDS122__ @=@ IRBIM - Istituto per le Risorse Biologiche e le Biotecnologie Marine
+cnr:institutes @=@ __CDS123__ @=@ CDS123
+cnr:institutes @=@ __CDS123__ @=@ ISPC - Istituto di Scienze del Patrimonio Culturale
+cnr:institutes @=@ __CDS124__ @=@ CDS124
+cnr:institutes @=@ __CDS124__ @=@ IAS - Istituto per lo studio degli impatti Antropici e Sostenibilità in ambiente marino
+cnr:institutes @=@ __CDS125__ @=@ CDS125
+cnr:institutes @=@ __CDS125__ @=@ IRET - Istituto di Ricerca sugli Ecosistemi Terrestri
+cnr:institutes @=@ https://ror.org/03a0vt050 @=@ CDS126
+cnr:institutes @=@ https://ror.org/03a0vt050 @=@ ISTP - Istituto per la Scienza e Tecnologia dei Plasmi
+cnr:institutes @=@ __CDS127__ @=@ CDS127
+cnr:institutes @=@ __CDS127__ @=@ ISP - Istituto di Scienze Polari
+cnr:institutes @=@ https://ror.org/03byxpq91 @=@ CDS128
+cnr:institutes @=@ https://ror.org/03byxpq91 @=@ IRIB - Istituto per la Ricerca e l'Innovazione Biomedica
+cnr:institutes @=@ __CDS129__ @=@ CDS129
+cnr:institutes @=@ __CDS129__ @=@ IGSG - Istituto di Informatica Giuridica e Sistemi Giudiziari
+cnr:institutes @=@ __CDS130__ @=@ CDS130
+cnr:institutes @=@ __CDS130__ @=@ IBBC - Istituto di Biochimica e Biologia Cellulare
+cnr:institutes @=@ __CDS131__ @=@ CDS131
+cnr:institutes @=@ __CDS131__ @=@ IBE - Istituto per la BioEconomia
+cnr:institutes @=@ https://ror.org/0263zy895 @=@ CDS132
+cnr:institutes @=@ https://ror.org/0263zy895 @=@ SCITEC - Istituto di Scienze e Tecnologie Chimiche \"Giulio Natta\"
+cnr:institutes @=@ __CDS133__ @=@ CDS133
+cnr:institutes @=@ __CDS133__ @=@ STEMS - Istituto di Scienze e Tecnologie per l'Energia e la Mobilità Sostenibili

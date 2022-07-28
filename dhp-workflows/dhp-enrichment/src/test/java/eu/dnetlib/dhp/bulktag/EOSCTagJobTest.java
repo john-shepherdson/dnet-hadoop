@@ -1,21 +1,18 @@
 
 package eu.dnetlib.dhp.bulktag;
 
-import static eu.dnetlib.dhp.bulktag.community.TaggingConstants.ZENODO_COMMUNITY_INDICATOR;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import eu.dnetlib.dhp.bulktag.eosc.SparkEoscTag;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
@@ -126,9 +123,22 @@ public class EOSCTagJobTest {
 			.assertEquals(
 				4,
 				tmp
+					.filter(s -> s.getEoscifguidelines() != null)
 					.filter(
-						s -> s.getSubject().stream().anyMatch(sbj -> sbj.getValue().equals("EOSC::Jupyter Notebook")))
+						s -> s
+							.getEoscifguidelines()
+							.stream()
+							.anyMatch(eig -> eig.getCode().equals("EOSC::Jupyter Notebook")))
 					.count());
+
+		Assertions
+			.assertEquals(
+				1, tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.size());
 
 		Assertions
 			.assertEquals(
@@ -144,6 +154,16 @@ public class EOSCTagJobTest {
 					.filter(sw -> sw.getId().equals("50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4"))
 					.collect()
 					.get(0)
+					.getEoscifguidelines()
+					.stream()
+					.anyMatch(s -> s.getCode().equals("EOSC::Jupyter Notebook")));
+
+		Assertions
+			.assertFalse(
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4"))
+					.collect()
+					.get(0)
 					.getSubject()
 					.stream()
 					.anyMatch(s -> s.getValue().equals("EOSC::Jupyter Notebook")));
@@ -167,15 +187,23 @@ public class EOSCTagJobTest {
 					.anyMatch(s -> s.getValue().equals("EOSC::Jupyter Notebook")));
 
 		Assertions
+			.assertTrue(
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::501b25d420f808c8eddcd9b16e917f11"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines() == null);
+
+		Assertions
 			.assertEquals(
-				9, tmp
+				8, tmp
 					.filter(sw -> sw.getId().equals("50|od______1582::581621232a561b7e8b4952b18b8b0e56"))
 					.collect()
 					.get(0)
 					.getSubject()
 					.size());
 		Assertions
-			.assertTrue(
+			.assertFalse(
 				tmp
 					.filter(sw -> sw.getId().equals("50|od______1582::581621232a561b7e8b4952b18b8b0e56"))
 					.collect()
@@ -183,6 +211,23 @@ public class EOSCTagJobTest {
 					.getSubject()
 					.stream()
 					.anyMatch(s -> s.getValue().equals("EOSC::Jupyter Notebook")));
+		Assertions
+			.assertEquals(
+				1, tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::581621232a561b7e8b4952b18b8b0e56"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.size());
+		Assertions
+			.assertTrue(
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::581621232a561b7e8b4952b18b8b0e56"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.stream()
+					.anyMatch(s -> s.getCode().equals("EOSC::Jupyter Notebook")));
 
 		Assertions
 			.assertEquals(
@@ -201,17 +246,24 @@ public class EOSCTagJobTest {
 					.getSubject()
 					.stream()
 					.anyMatch(s -> s.getValue().equals("EOSC::Jupyter Notebook")));
+		Assertions
+			.assertTrue(
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::5aec1186054301b66c0c5dc35972a589"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines() == null);
 
 		Assertions
 			.assertEquals(
-				9, tmp
+				8, tmp
 					.filter(sw -> sw.getId().equals("50|od______1582::639909adfad9d708308f2aedb733e4a0"))
 					.collect()
 					.get(0)
 					.getSubject()
 					.size());
 		Assertions
-			.assertTrue(
+			.assertFalse(
 				tmp
 					.filter(sw -> sw.getId().equals("50|od______1582::639909adfad9d708308f2aedb733e4a0"))
 					.collect()
@@ -219,14 +271,31 @@ public class EOSCTagJobTest {
 					.getSubject()
 					.stream()
 					.anyMatch(s -> s.getValue().equals("EOSC::Jupyter Notebook")));
+		Assertions
+			.assertEquals(
+				1,
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::639909adfad9d708308f2aedb733e4a0"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.size());
+		Assertions
+			.assertTrue(
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::639909adfad9d708308f2aedb733e4a0"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.stream()
+					.anyMatch(s -> s.getCode().equals("EOSC::Jupyter Notebook")));
 
 		List<StructuredProperty> subjects = tmp
 			.filter(sw -> sw.getId().equals("50|od______1582::6e7a9b21a2feef45673890432af34244"))
 			.collect()
 			.get(0)
 			.getSubject();
-		Assertions.assertEquals(8, subjects.size());
-		Assertions.assertTrue(subjects.stream().anyMatch(s -> s.getValue().equals("EOSC::Jupyter Notebook")));
+		Assertions.assertEquals(7, subjects.size());
 		Assertions.assertTrue(subjects.stream().anyMatch(s -> s.getValue().equals("jupyter")));
 		Assertions.assertTrue(subjects.stream().anyMatch(s -> s.getValue().equals("Modeling and Simulation")));
 		Assertions.assertTrue(subjects.stream().anyMatch(s -> s.getValue().equals("structure granulaire")));
@@ -250,6 +319,17 @@ public class EOSCTagJobTest {
 					.filter(
 						ds -> ds.getSubject().stream().anyMatch(sbj -> sbj.getValue().equals("EOSC::Jupyter Notebook")))
 					.count());
+		Assertions
+			.assertEquals(
+				0, sc
+					.textFile(workingDir.toString() + "/input/dataset")
+					.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class))
+					.filter(
+						ds -> ds
+							.getEoscifguidelines()
+							.stream()
+							.anyMatch(eig -> eig.getCode().equals("EOSC::Jupyter Notebook")))
+					.count());
 
 		Assertions
 			.assertEquals(
@@ -264,7 +344,22 @@ public class EOSCTagJobTest {
 					.textFile(workingDir.toString() + "/input/otherresearchproduct")
 					.map(item -> OBJECT_MAPPER.readValue(item, OtherResearchProduct.class))
 					.filter(
-						ds -> ds.getSubject().stream().anyMatch(sbj -> sbj.getValue().equals("EOSC::Jupyter Notebook")))
+						orp -> orp
+							.getSubject()
+							.stream()
+							.anyMatch(sbj -> sbj.getValue().equals("EOSC::Jupyter Notebook")))
+					.count());
+
+		Assertions
+			.assertEquals(
+				0, sc
+					.textFile(workingDir.toString() + "/input/otherresearchproduct")
+					.map(item -> OBJECT_MAPPER.readValue(item, OtherResearchProduct.class))
+					.filter(
+						orp -> orp
+							.getSubject()
+							.stream()
+							.anyMatch(eig -> eig.getValue().equals("EOSC::Jupyter Notebook")))
 					.count());
 
 		// spark.stop();
@@ -326,22 +421,41 @@ public class EOSCTagJobTest {
 
 		Assertions
 			.assertEquals(
-				1,
+				0,
 				tmp
 					.filter(
 						s -> s.getSubject().stream().anyMatch(sbj -> sbj.getValue().equals("EOSC::Galaxy Workflow")))
 					.count());
+		Assertions
+			.assertEquals(
+				1,
+				tmp
+					.filter(
+						s -> s.getEoscifguidelines() != null)
+					.count());
+		Assertions
+			.assertEquals(
+				1,
+				tmp
+					.filter(
+						s -> s.getEoscifguidelines() != null)
+					.filter(
+						s -> s
+							.getEoscifguidelines()
+							.stream()
+							.anyMatch(eig -> eig.getCode().equals("EOSC::Galaxy Workflow")))
+					.count());
 
 		Assertions
 			.assertEquals(
-				2, tmp
+				1, tmp
 					.filter(sw -> sw.getId().equals("50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4"))
 					.collect()
 					.get(0)
 					.getSubject()
 					.size());
 		Assertions
-			.assertTrue(
+			.assertFalse(
 				tmp
 					.filter(sw -> sw.getId().equals("50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4"))
 					.collect()
@@ -349,6 +463,24 @@ public class EOSCTagJobTest {
 					.getSubject()
 					.stream()
 					.anyMatch(s -> s.getValue().equals("EOSC::Galaxy Workflow")));
+
+		Assertions
+			.assertEquals(
+				1, tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.size());
+		Assertions
+			.assertTrue(
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.stream()
+					.anyMatch(eig -> eig.getCode().equals("EOSC::Galaxy Workflow")));
 
 		Assertions
 			.assertEquals(
@@ -385,22 +517,34 @@ public class EOSCTagJobTest {
 
 		Assertions
 			.assertEquals(
-				1,
+				0,
 				orp
 					.filter(
 						s -> s.getSubject().stream().anyMatch(sbj -> sbj.getValue().equals("EOSC::Galaxy Workflow")))
 					.count());
+		orp.foreach(o -> System.out.println(OBJECT_MAPPER.writeValueAsString(o)));
 
 		Assertions
 			.assertEquals(
-				3, orp
+				1, orp
+					.filter(o -> o.getEoscifguidelines() != null)
+					.filter(
+						o -> o
+							.getEoscifguidelines()
+							.stream()
+							.anyMatch(eig -> eig.getCode().equals("EOSC::Galaxy Workflow")))
+					.count());
+
+		Assertions
+			.assertEquals(
+				2, orp
 					.filter(sw -> sw.getId().equals("50|od______2017::0750a4d0782265873d669520f5e33c07"))
 					.collect()
 					.get(0)
 					.getSubject()
 					.size());
 		Assertions
-			.assertTrue(
+			.assertFalse(
 				orp
 					.filter(sw -> sw.getId().equals("50|od______2017::0750a4d0782265873d669520f5e33c07"))
 					.collect()
@@ -408,6 +552,23 @@ public class EOSCTagJobTest {
 					.getSubject()
 					.stream()
 					.anyMatch(s -> s.getValue().equals("EOSC::Galaxy Workflow")));
+		Assertions
+			.assertEquals(
+				1, orp
+					.filter(sw -> sw.getId().equals("50|od______2017::0750a4d0782265873d669520f5e33c07"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.size());
+		Assertions
+			.assertTrue(
+				orp
+					.filter(sw -> sw.getId().equals("50|od______2017::0750a4d0782265873d669520f5e33c07"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.stream()
+					.anyMatch(s -> s.getCode().equals("EOSC::Galaxy Workflow")));
 
 		Assertions
 			.assertEquals(
@@ -516,9 +677,19 @@ public class EOSCTagJobTest {
 
 		Assertions
 			.assertEquals(
-				3,
+				0,
 				orp
 					.filter(s -> s.getSubject().stream().anyMatch(sbj -> sbj.getValue().equals("EOSC::Twitter Data")))
+					.count());
+		Assertions
+			.assertEquals(
+				3,
+				orp
+					.filter(
+						s -> s
+							.getEoscifguidelines()
+							.stream()
+							.anyMatch(eig -> eig.getCode().equals("EOSC::Twitter Data")))
 					.count());
 
 		JavaRDD<Dataset> dats = sc
@@ -531,7 +702,11 @@ public class EOSCTagJobTest {
 			.assertEquals(
 				3,
 				dats
-					.filter(s -> s.getSubject().stream().anyMatch(sbj -> sbj.getValue().equals("EOSC::Twitter Data")))
+					.filter(
+						s -> s
+							.getEoscifguidelines()
+							.stream()
+							.anyMatch(eig -> eig.getCode().equals("EOSC::Twitter Data")))
 					.count());
 
 	}
