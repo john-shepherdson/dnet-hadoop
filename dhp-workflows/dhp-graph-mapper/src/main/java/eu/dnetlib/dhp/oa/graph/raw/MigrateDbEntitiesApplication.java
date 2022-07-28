@@ -1,32 +1,7 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASET_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DATASOURCE_ORGANIZATION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PROVENANCE_ACTIONS;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.ENTITYREGISTRY_PROVENANCE_ACTION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.HAS_PARTICIPANT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_MERGED_IN;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PARTICIPANT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PRODUCED_BY;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PROVIDED_BY;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_RELATED_TO;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.MERGES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.ORG_ORG_RELTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.ORP_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.OUTCOME;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PARTICIPATION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PRODUCES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PROJECT_ORGANIZATION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVIDES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVISION;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PUBLICATION_DATASET;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PUBLICATION_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RELATIONSHIP;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_RESULT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.SOFTWARE_DEFAULT_RESULTTYPE;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.USER_CLAIM;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
 import java.io.Closeable;
@@ -44,6 +19,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.DbClient;
@@ -68,6 +45,7 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 
 public class MigrateDbEntitiesApplication extends AbstractMigrationApplication implements Closeable {
@@ -437,25 +415,14 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			final List<KeyValue> collectedFrom = listKeyValues(
 				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
 
-			final Relation r1 = new Relation();
-			r1.setRelType(DATASOURCE_ORGANIZATION);
-			r1.setSubRelType(PROVISION);
-			r1.setRelClass(IS_PROVIDED_BY);
-			r1.setSource(dsId);
-			r1.setTarget(orgId);
-			r1.setCollectedfrom(collectedFrom);
-			r1.setDataInfo(info);
-			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+			final Relation r1 = OafMapperUtils
+				.getRelation(
+					dsId, orgId, DATASOURCE_ORGANIZATION, PRODUCES, IS_PROVIDED_BY, collectedFrom, info,
+					lastUpdateTimestamp);
 
-			final Relation r2 = new Relation();
-			r2.setRelType(DATASOURCE_ORGANIZATION);
-			r2.setSubRelType(PROVISION);
-			r2.setRelClass(PROVIDES);
-			r2.setSource(orgId);
-			r2.setTarget(dsId);
-			r2.setCollectedfrom(collectedFrom);
-			r2.setDataInfo(info);
-			r2.setLastupdatetimestamp(lastUpdateTimestamp);
+			final Relation r2 = OafMapperUtils
+				.getRelation(
+					orgId, dsId, DATASOURCE_ORGANIZATION, PRODUCES, PROVIDES, collectedFrom, info, lastUpdateTimestamp);
 
 			return Arrays.asList(r1, r2);
 		} catch (final Exception e) {
@@ -471,25 +438,20 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			final List<KeyValue> collectedFrom = listKeyValues(
 				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
 
-			final Relation r1 = new Relation();
-			r1.setRelType(PROJECT_ORGANIZATION);
-			r1.setSubRelType(PARTICIPATION);
-			r1.setRelClass(HAS_PARTICIPANT);
-			r1.setSource(projectId);
-			r1.setTarget(orgId);
-			r1.setCollectedfrom(collectedFrom);
-			r1.setDataInfo(info);
-			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+			final List<KeyValue> properties = Lists
+				.newArrayList(
+					keyValue("contribution", String.valueOf(rs.getDouble("contribution"))),
+					keyValue("currency", rs.getString("currency")));
 
-			final Relation r2 = new Relation();
-			r2.setRelType(PROJECT_ORGANIZATION);
-			r2.setSubRelType(PARTICIPATION);
-			r2.setRelClass(IS_PARTICIPANT);
-			r2.setSource(orgId);
-			r2.setTarget(projectId);
-			r2.setCollectedfrom(collectedFrom);
-			r2.setDataInfo(info);
-			r2.setLastupdatetimestamp(lastUpdateTimestamp);
+			final Relation r1 = OafMapperUtils
+				.getRelation(
+					projectId, orgId, PROJECT_ORGANIZATION, PARTICIPATION, HAS_PARTICIPANT, collectedFrom, info,
+					lastUpdateTimestamp, null, properties);
+
+			final Relation r2 = OafMapperUtils
+				.getRelation(
+					orgId, projectId, PROJECT_ORGANIZATION, PARTICIPATION, IS_PARTICIPANT, collectedFrom, info,
+					lastUpdateTimestamp, null, properties);
 
 			return Arrays.asList(r1, r2);
 		} catch (final Exception e) {
@@ -703,25 +665,12 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			final List<KeyValue> collectedFrom = listKeyValues(
 				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
 
-			final Relation r1 = new Relation();
-			r1.setRelType(ORG_ORG_RELTYPE);
-			r1.setSubRelType(ModelConstants.DEDUP);
-			r1.setRelClass(MERGES);
-			r1.setSource(orgId1);
-			r1.setTarget(orgId2);
-			r1.setCollectedfrom(collectedFrom);
-			r1.setDataInfo(info);
-			r1.setLastupdatetimestamp(lastUpdateTimestamp);
+			final Relation r1 = OafMapperUtils
+				.getRelation(orgId1, orgId2, ORG_ORG_RELTYPE, DEDUP, MERGES, collectedFrom, info, lastUpdateTimestamp);
 
-			final Relation r2 = new Relation();
-			r2.setRelType(ORG_ORG_RELTYPE);
-			r2.setSubRelType(ModelConstants.DEDUP);
-			r2.setRelClass(IS_MERGED_IN);
-			r2.setSource(orgId2);
-			r2.setTarget(orgId1);
-			r2.setCollectedfrom(collectedFrom);
-			r2.setDataInfo(info);
-			r2.setLastupdatetimestamp(lastUpdateTimestamp);
+			final Relation r2 = OafMapperUtils
+				.getRelation(
+					orgId2, orgId1, ORG_ORG_RELTYPE, DEDUP, IS_MERGED_IN, collectedFrom, info, lastUpdateTimestamp);
 			return Arrays.asList(r1, r2);
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
@@ -738,17 +687,12 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			final List<KeyValue> collectedFrom = listKeyValues(
 				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
 
-			final Relation r = new Relation();
-			r.setRelType(ORG_ORG_RELTYPE);
-			r.setSubRelType(ModelConstants.RELATIONSHIP);
-			r.setRelClass(rs.getString("type"));
-			r.setSource(orgId1);
-			r.setTarget(orgId2);
-			r.setCollectedfrom(collectedFrom);
-			r.setDataInfo(info);
-			r.setLastupdatetimestamp(lastUpdateTimestamp);
-
-			return Arrays.asList(r);
+			return Arrays
+				.asList(
+					OafMapperUtils
+						.getRelation(
+							orgId1, orgId2, ORG_ORG_RELTYPE, RELATIONSHIP, rs.getString("type"), collectedFrom, info,
+							lastUpdateTimestamp));
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -765,29 +709,12 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			final List<KeyValue> collectedFrom = listKeyValues(
 				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
 
-			final Relation r1 = new Relation();
-			r1.setRelType(ORG_ORG_RELTYPE);
-			r1.setSubRelType(ModelConstants.DEDUP);
-			r1.setRelClass(relClass);
-			r1.setSource(orgId1);
-			r1.setTarget(orgId2);
-			r1.setCollectedfrom(collectedFrom);
-			r1.setDataInfo(info);
-			r1.setLastupdatetimestamp(lastUpdateTimestamp);
-
-			// removed because there's no difference between two sides //TODO
-			// final Relation r2 = new Relation();
-			// r2.setRelType(ORG_ORG_RELTYPE);
-			// r2.setSubRelType(ORG_ORG_SUBRELTYPE);
-			// r2.setRelClass(relClass);
-			// r2.setSource(orgId2);
-			// r2.setTarget(orgId1);
-			// r2.setCollectedfrom(collectedFrom);
-			// r2.setDataInfo(info);
-			// r2.setLastupdatetimestamp(lastUpdateTimestamp);
-			// return Arrays.asList(r1, r2);
-
-			return Arrays.asList(r1);
+			return Arrays
+				.asList(
+					OafMapperUtils
+						.getRelation(
+							orgId1, orgId2, ORG_ORG_RELTYPE, DEDUP, relClass, collectedFrom, info,
+							lastUpdateTimestamp));
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}

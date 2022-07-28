@@ -3,6 +3,7 @@ SELECT
 	po.resporganization                                                     AS resporganization,
 	po.participantnumber                                                    AS participantnumber,
 	po.contribution                                                         AS contribution,
+    po.currency                                                             AS currency,
 	NULL                                                                    AS startdate,
 	NULL                                                                    AS enddate,
 	false                                                                   AS inferred,
