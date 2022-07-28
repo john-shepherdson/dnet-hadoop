@@ -440,7 +440,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 			final List<KeyValue> properties = Lists
 				.newArrayList(
-					keyValue("contribution", String.valueOf(rs.getDouble("totalcost"))),
+					keyValue("contribution", String.valueOf(rs.getDouble("contribution"))),
 					keyValue("currency", rs.getString("currency")));
 
 			final Relation r1 = OafMapperUtils
