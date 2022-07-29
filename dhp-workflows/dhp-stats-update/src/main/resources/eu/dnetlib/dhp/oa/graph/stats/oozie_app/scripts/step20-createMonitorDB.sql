@@ -38,7 +38,14 @@ create table TARGET.result stored as parquet as
              'openorgs____::ec3665affa01aeafa28b7852c4176dbd', --Rudjer Boskovic Institute
              'openorgs____::5f31346d444a7f06a28c880fb170b0f6', --Ghent University
              'openorgs____::2dbe47117fd5409f9c61620813456632', --University of Luxembourg
-             'openorgs____::6445d7758d3a40c4d997953b6632a368' --National Institute of Informatics (NII)
+             'openorgs____::6445d7758d3a40c4d997953b6632a368', --National Institute of Informatics (NII)
+
+             'openorgs____::b77c01aa15de3675da34277d48de2ec1', -- Valencia Catholic University Saint Vincent Martyr
+             'openorgs____::7fe2f66cdc43983c6b24816bfe9cf6a0', -- Unviersity of Warsaw
+             'openorgs____::15e7921fc50d9aa1229a82a84429419e', -- University Of Thessaly
+             'openorgs____::11f7919dadc8f8a7251af54bba60c956', -- Technical University of Crete
+             'openorgs____::84f0c5f5dbb6daf42748485924efde4b', -- University of Piraeus
+             'openorgs____::4ac562f0376fce3539504567649cb373' -- University of Patras
         ) )) foo;
 compute stats TARGET.result;
 
@@ -106,6 +113,9 @@ compute stats TARGET.result_sources;
 
 create table TARGET.result_topics stored as parquet as select * from SOURCE.result_topics orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.result_topics;
+
+create table TARGET.result_fos stored as parquet as select * from SOURCE.result_fos orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.result_fos;
 
 create view TARGET.foo1 as select * from SOURCE.result_result rr where rr.source in (select id from TARGET.result);
 create view TARGET.foo2 as select * from SOURCE.result_result rr where rr.target in (select id from TARGET.result);
