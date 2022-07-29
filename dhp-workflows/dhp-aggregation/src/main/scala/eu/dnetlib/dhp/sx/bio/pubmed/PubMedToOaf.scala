@@ -56,13 +56,11 @@ object PubMedToOaf {
     null
   }
 
-
-  def createOriginalOpenaireId(article:PMArticle) :String =  {
+  def createOriginalOpenaireId(article: PMArticle): String = {
     if (StringUtils.isNotEmpty(article.getPmcId)) {
-      val md5 = DHPUtils.md5(s"$OAI_HEADER${article.getPmcId.replace("PMC","")}")
+      val md5 = DHPUtils.md5(s"$OAI_HEADER${article.getPmcId.replace("PMC", "")}")
       s"$OLD_PMC_PREFIX$md5"
-    }
-    else
+    } else
       null
 
   }
@@ -142,26 +140,24 @@ object PubMedToOaf {
     val pidList = ListBuffer[StructuredProperty]()
 
     pidList += OafMapperUtils.structuredProperty(
-        article.getPmid,
-        PidType.pmid.toString,
-        PidType.pmid.toString,
+      article.getPmid,
+      PidType.pmid.toString,
+      PidType.pmid.toString,
+      ModelConstants.DNET_PID_TYPES,
+      ModelConstants.DNET_PID_TYPES,
+      dataInfo
+    )
+
+    if (StringUtils.isNotBlank(article.getPmcId)) {
+      pidList += OafMapperUtils.structuredProperty(
+        article.getPmcId,
+        PidType.pmc.toString,
+        PidType.pmc.toString,
         ModelConstants.DNET_PID_TYPES,
         ModelConstants.DNET_PID_TYPES,
         dataInfo
       )
-
-
-    if (StringUtils.isNotBlank(article.getPmcId))
-      {
-        pidList += OafMapperUtils.structuredProperty(
-          article.getPmcId,
-          PidType.pmc.toString,
-          PidType.pmc.toString,
-          ModelConstants.DNET_PID_TYPES,
-          ModelConstants.DNET_PID_TYPES,
-          dataInfo
-        )
-      }
+    }
     if (pidList == null)
       return null
 
@@ -297,7 +293,7 @@ object PubMedToOaf {
     if (StringUtils.isNotEmpty(article.getPmcId)) {
       val originalIDS = ListBuffer[String]()
       originalIDS += createOriginalOpenaireId(article)
-      pidList.map(s => s.getValue).foreach(p =>originalIDS +=  p)
+      pidList.map(s => s.getValue).foreach(p => originalIDS += p)
       result.setOriginalId(originalIDS.asJava)
     } else
       result.setOriginalId(pidList.map(s => s.getValue).asJava)

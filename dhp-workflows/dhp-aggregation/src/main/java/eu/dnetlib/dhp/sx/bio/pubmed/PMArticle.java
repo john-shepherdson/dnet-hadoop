@@ -255,7 +255,6 @@ public class PMArticle implements Serializable {
 		return grants;
 	}
 
-
 	public String getPmcId() {
 		return pmcId;
 	}

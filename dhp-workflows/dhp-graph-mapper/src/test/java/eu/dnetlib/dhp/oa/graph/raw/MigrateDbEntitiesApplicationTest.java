@@ -162,7 +162,7 @@ class MigrateDbEntitiesApplicationTest {
 			.stream()
 			.map(Qualifier::getSchemeid)
 			.collect(Collectors.toCollection(HashSet::new));
-		assertEquals(1,cpSchemeId.size());
+		assertEquals(1, cpSchemeId.size());
 		assertTrue(cpSchemeId.contains("eosc:contentpolicies"));
 		HashSet<String> cpSchemeName = ds
 			.getContentpolicies()
@@ -289,16 +289,16 @@ class MigrateDbEntitiesApplicationTest {
 		checkProperty(r1, "contribution", "436754.0");
 		checkProperty(r2, "contribution", "436754.0");
 
-		checkProperty(r1, "currency","EUR");
+		checkProperty(r1, "currency", "EUR");
 		checkProperty(r2, "currency", "EUR");
 	}
 
 	private void checkProperty(Relation r, String property, String value) {
 		final List<KeyValue> p = r
-				.getProperties()
-				.stream()
-				.filter(kv -> kv.getKey().equals(property))
-				.collect(Collectors.toList());
+			.getProperties()
+			.stream()
+			.filter(kv -> kv.getKey().equals(property))
+			.collect(Collectors.toList());
 		assertFalse(p.isEmpty());
 		assertEquals(1, p.size());
 		assertEquals(value, p.get(0).getValue());

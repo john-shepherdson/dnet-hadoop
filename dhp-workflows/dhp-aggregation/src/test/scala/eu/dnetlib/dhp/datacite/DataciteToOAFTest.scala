@@ -48,9 +48,6 @@ class DataciteToOAFTest extends AbstractVocabularyTest {
 
   }
 
-
-
-
   @Test
   def testConvert(): Unit = {
 
@@ -76,11 +73,8 @@ class DataciteToOAFTest extends AbstractVocabularyTest {
 
     assertEquals(100, nativeSize)
 
-    val result: Dataset[String] = spark.read.text(targetPath).as[String].map(DataciteUtilityTest.convertToOAF)(Encoders.STRING)
-
-
-
-
+    val result: Dataset[String] =
+      spark.read.text(targetPath).as[String].map(DataciteUtilityTest.convertToOAF)(Encoders.STRING)
 
     result
       .groupBy(col("value").alias("class"))

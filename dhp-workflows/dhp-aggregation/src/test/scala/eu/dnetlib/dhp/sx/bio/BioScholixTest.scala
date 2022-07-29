@@ -76,12 +76,11 @@ class BioScholixTest extends AbstractVocabularyTest {
 
   }
 
-
-  private def checkPMArticle(article:PMArticle): Unit = {
+  private def checkPMArticle(article: PMArticle): Unit = {
     assertNotNull(article.getPmid)
     assertNotNull(article.getTitle)
     assertNotNull(article.getAuthors)
-    article.getAuthors.asScala.foreach{a =>
+    article.getAuthors.asScala.foreach { a =>
       assertNotNull(a)
       assertNotNull(a.getFullName)
     }
@@ -89,20 +88,21 @@ class BioScholixTest extends AbstractVocabularyTest {
   }
 
   @Test
-  def  testParsingPubmedXML():Unit = {
-    val xml = new XMLEventReader(Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml")))
+  def testParsingPubmedXML(): Unit = {
+    val xml = new XMLEventReader(
+      Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml"))
+    )
     val parser = new PMParser(xml)
     parser.foreach(checkPMArticle)
   }
 
-
-  private def checkPubmedPublication(o:Oaf): Unit = {
+  private def checkPubmedPublication(o: Oaf): Unit = {
     assertTrue(o.isInstanceOf[Publication])
-    val p:Publication = o.asInstanceOf[Publication]
+    val p: Publication = o.asInstanceOf[Publication]
     assertNotNull(p.getId)
     assertNotNull(p.getTitle)
-    p.getTitle.asScala.foreach(t =>assertNotNull(t.getValue))
-    p.getAuthor.asScala.foreach(a =>assertNotNull(a.getFullname))
+    p.getTitle.asScala.foreach(t => assertNotNull(t.getValue))
+    p.getAuthor.asScala.foreach(a => assertNotNull(a.getFullname))
     assertNotNull(p.getInstance())
     p.getInstance().asScala.foreach { i =>
       assertNotNull(i.getCollectedfrom)
@@ -112,28 +112,26 @@ class BioScholixTest extends AbstractVocabularyTest {
     assertNotNull(p.getOriginalId)
     p.getOriginalId.asScala.foreach(oId => assertNotNull(oId))
 
-
-    val hasPMC = p.getInstance().asScala.exists(i => i.getPid.asScala.exists(pid => pid.getQualifier.getClassid.equalsIgnoreCase(PidType.pmc.toString)))
-
-
+    val hasPMC = p
+      .getInstance()
+      .asScala
+      .exists(i => i.getPid.asScala.exists(pid => pid.getQualifier.getClassid.equalsIgnoreCase(PidType.pmc.toString)))
 
     if (hasPMC) {
       assertTrue(p.getOriginalId.asScala.exists(oId => oId.startsWith("od_______267::")))
     }
   }
 
-
   @Test
-  def testPubmedOriginalID():Unit = {
-    val article:PMArticle  = new PMArticle
-
+  def testPubmedOriginalID(): Unit = {
+    val article: PMArticle = new PMArticle
 
     article.setPmid("1234")
 
     article.setTitle("a Title")
 
     // VERIFY PUBLICATION IS NOT NULL
-    article.getPublicationTypes.add( new PMSubject("article",null, null))
+    article.getPublicationTypes.add(new PMSubject("article", null, null))
     var publication = PubMedToOaf.convert(article, vocabularies).asInstanceOf[Publication]
     assertNotNull(publication)
     assertEquals("50|pmid________::81dc9bdb52d04dc20036dbd8313ed055", publication.getId)
@@ -146,29 +144,24 @@ class BioScholixTest extends AbstractVocabularyTest {
 
     // VERIFY ORIGINAL ID GENERATE IN OLD WAY USING PMC IDENTIFIER EXISTS
 
-
-    val oldOpenaireID ="od_______267::0000072375bc0e68fa09d4e6b7658248"
+    val oldOpenaireID = "od_______267::0000072375bc0e68fa09d4e6b7658248"
 
     val hasOldOpenAIREID = publication.getOriginalId.asScala.exists(o => o.equalsIgnoreCase(oldOpenaireID))
 
     assertTrue(hasOldOpenAIREID)
   }
 
-
   @Test
-  def testPubmedMapping() :Unit = {
+  def testPubmedMapping(): Unit = {
 
-    val xml = new XMLEventReader(Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml")))
+    val xml = new XMLEventReader(
+      Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml"))
+    )
     val parser = new PMParser(xml)
     val results = ListBuffer[Oaf]()
     parser.foreach(x => results += PubMedToOaf.convert(x, vocabularies))
 
-
-
-
     results.foreach(checkPubmedPublication)
-
-
 
   }
 
