@@ -183,6 +183,8 @@ public class SparkEoscTag {
 	}
 
 	private static boolean containsCriteriaNotebook(Software s) {
+		if(!Optional.ofNullable(s.getSubject()).isPresent())
+			return false;
 		if (s.getSubject().stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("jupyter")))
 			return true;
 		if (s
