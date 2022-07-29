@@ -9,6 +9,8 @@ fi
 CONTEXT_API=$1
 TARGET_DB=$2
 
+export HIVE_OPTS="-hiveconf mapred.job.queue.name=analytics -hiveconf hive.spark.client.connect.timeout=120000ms -hiveconf hive.spark.client.server.connect.timeout=300000ms -hiveconf spark.executor.memory=4831838208 -hiveconf spark.yarn.executor.memoryOverhead=450"
+
 TMP=/tmp/stats-update-`tr -dc A-Za-z0-9 </dev/urandom | head -c 6`
 
 echo "Downloading context ids"
@@ -29,13 +31,16 @@ hdfs dfs -copyFromLocal categories.csv ${TMP}
 hdfs dfs -copyFromLocal concepts.csv ${TMP}
 hdfs dfs -chmod -R 777 ${TMP}
 
+export HADOOP_USER="antonis.lempesis"
+export HADOOP_USER_NAME="antonis.lempesis"
+
 echo "Creating and populating impala tables"
-hive -e "create table ${TARGET_DB}.context (id string, name string) row format delimited fields terminated by ','"
-hive -e "create table ${TARGET_DB}.category (context string, id string, name string) row format delimited fields terminated by ','"
-hive -e "create table ${TARGET_DB}.concept (category string, id string, name string) row format delimited fields terminated by ','"
-hive -e "load data inpath '${TMP}/contexts.csv' into table ${TARGET_DB}.context"
-hive -e "load data inpath '${TMP}/categories.csv' into table ${TARGET_DB}.category"
-hive -e "load data inpath '${TMP}/concepts.csv' into table ${TARGET_DB}.concept"
+hive $HIVE_OPTS -e "create table ${TARGET_DB}.context (id string, name string) row format delimited fields terminated by ','"
+hive $HIVE_OPTS -e "create table ${TARGET_DB}.category (context string, id string, name string) row format delimited fields terminated by ','"
+hive $HIVE_OPTS -e "create table ${TARGET_DB}.concept (category string, id string, name string) row format delimited fields terminated by ','"
+hive $HIVE_OPTS -e "load data inpath '${TMP}/contexts.csv' into table ${TARGET_DB}.context"
+hive $HIVE_OPTS -e "load data inpath '${TMP}/categories.csv' into table ${TARGET_DB}.category"
+hive $HIVE_OPTS -e "load data inpath '${TMP}/concepts.csv' into table ${TARGET_DB}.concept"
 
 echo "Cleaning up"
 rm concepts.csv

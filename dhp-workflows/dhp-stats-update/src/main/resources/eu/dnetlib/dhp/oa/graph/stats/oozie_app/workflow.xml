@@ -74,7 +74,7 @@
         </configuration>
     </global>
 
-    <start to="Step16-createIndicatorsTables"/>
+    <start to="Contexts"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -280,7 +280,7 @@
             <argument>${wf:appPath()}/scripts/step16-createIndicatorsTables.sql</argument>
             <file>indicators.sh</file>
         </shell>
-        <ok to="End"/>
+        <ok to="Step16_1-definitions"/>
         <error to="Kill"/>
     </action>
 
