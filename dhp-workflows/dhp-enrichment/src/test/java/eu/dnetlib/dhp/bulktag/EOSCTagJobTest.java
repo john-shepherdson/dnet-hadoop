@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import eu.dnetlib.dhp.bulktag.eosc.SparkEoscTag;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -24,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.bulktag.eosc.SparkEoscTag;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class EOSCTagJobTest {

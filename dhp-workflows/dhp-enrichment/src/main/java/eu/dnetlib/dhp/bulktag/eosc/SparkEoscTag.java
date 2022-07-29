@@ -23,6 +23,10 @@ import eu.dnetlib.dhp.schema.oaf.*;
 public class SparkEoscTag {
 	private static final Logger log = LoggerFactory.getLogger(SparkEoscTag.class);
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	public static final String EOSC_GALAXY_WORKFLOW = "EOSC::Galaxy Workflow";
+	public static final String EOSC_TWITTER_DATA = "EOSC::Twitter Data";
+	public static final String EOSC_JUPYTER_NOTEBOOK = "EOSC::Jupyter Notebook";
+	public static final String COMPLIES_WITH = "compliesWith";
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
@@ -76,8 +80,8 @@ public class SparkEoscTag {
 					if (!Optional.ofNullable(s.getEoscifguidelines()).isPresent())
 						s.setEoscifguidelines(new ArrayList<>());
 					addEIG(
-						s.getEoscifguidelines(), "EOSC::Jupyter Notebook", "EOSC::Jupyter Notebook", "",
-						"compliesWith");
+						s.getEoscifguidelines(), EOSC_JUPYTER_NOTEBOOK, EOSC_JUPYTER_NOTEBOOK, "",
+						COMPLIES_WITH);
 
 				}
 				if (containsCriteriaGalaxy(s)) {
@@ -85,7 +89,7 @@ public class SparkEoscTag {
 						s.setEoscifguidelines(new ArrayList<>());
 
 					addEIG(
-						s.getEoscifguidelines(), "EOSC::Galaxy Workflow", "EOSC::Galaxy Workflow", "", "compliesWith");
+						s.getEoscifguidelines(), EOSC_GALAXY_WORKFLOW, EOSC_GALAXY_WORKFLOW, "", COMPLIES_WITH);
 				}
 				return s;
 			}, Encoders.bean(Software.class))
@@ -108,11 +112,11 @@ public class SparkEoscTag {
 
 				if (containsCriteriaGalaxy(orp)) {
 					addEIG(
-						orp.getEoscifguidelines(), "EOSC::Galaxy Workflow", "EOSC::Galaxy Workflow", "",
-						"compliesWith");
+						orp.getEoscifguidelines(), EOSC_GALAXY_WORKFLOW, EOSC_GALAXY_WORKFLOW, "",
+						COMPLIES_WITH);
 				}
 				if (containscriteriaTwitter(orp)) {
-					addEIG(orp.getEoscifguidelines(), "EOSC::Twitter Data", "EOSC::Twitter Data", "", "compliesWith");
+					addEIG(orp.getEoscifguidelines(), EOSC_TWITTER_DATA, EOSC_TWITTER_DATA, "", COMPLIES_WITH);
 				}
 				return orp;
 			}, Encoders.bean(OtherResearchProduct.class))
@@ -133,7 +137,7 @@ public class SparkEoscTag {
 				if (!Optional.ofNullable(d.getEoscifguidelines()).isPresent())
 					d.setEoscifguidelines(new ArrayList<>());
 				if (containscriteriaTwitter(d)) {
-					addEIG(d.getEoscifguidelines(), "EOSC::Twitter Data", "EOSC::Twitter Data", "", "compliesWith");
+					addEIG(d.getEoscifguidelines(), EOSC_TWITTER_DATA, EOSC_TWITTER_DATA, "", COMPLIES_WITH);
 				}
 				return d;
 			}, Encoders.bean(Dataset.class))
@@ -163,10 +167,12 @@ public class SparkEoscTag {
 			(words.contains("data") || words.contains("dataset")))
 			return true;
 
-		if (r.getSubject().stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("twitter")) &&
-			r.getSubject().stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("data")))
-			return true;
-		return false;
+		return Optional
+			.ofNullable(r.getSubject())
+			.map(
+				s -> s.stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("twitter")) &&
+					s.stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("data")))
+			.orElse(false);
 	}
 
 	private static boolean containsCriteriaGalaxy(Result r) {
@@ -176,14 +182,16 @@ public class SparkEoscTag {
 			words.contains("workflow"))
 			return true;
 
-		if (r.getSubject().stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("galaxy")) &&
-			r.getSubject().stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("workflow")))
-			return true;
-		return false;
+		return Optional
+			.ofNullable(r.getSubject())
+			.map(
+				s -> s.stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("galaxy")) &&
+					s.stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("workflow")))
+			.orElse(false);
 	}
 
 	private static boolean containsCriteriaNotebook(Software s) {
-		if(!Optional.ofNullable(s.getSubject()).isPresent())
+		if (!Optional.ofNullable(s.getSubject()).isPresent())
 			return false;
 		if (s.getSubject().stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("jupyter")))
 			return true;
@@ -225,6 +233,5 @@ public class SparkEoscTag {
 								Arrays.asList(t.getValue().toLowerCase().replaceAll("[^a-zA-Z ]", "").split(" ")))));
 
 		return words;
-
 	}
 }
