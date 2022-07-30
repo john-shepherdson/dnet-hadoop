@@ -80,17 +80,10 @@ public class SparkDownloadOrcidWorks {
 				LongAccumulator parsedWorksAcc = spark.sparkContext().longAccumulator("parsed_works");
 				LongAccumulator modifiedWorksAcc = spark.sparkContext().longAccumulator("modified_works");
 				LongAccumulator errorCodeFoundAcc = spark.sparkContext().longAccumulator("error_code_found");
-				LongAccumulator errorLoadingJsonFoundAcc = spark
-					.sparkContext()
-					.longAccumulator("error_loading_json_found");
-				LongAccumulator errorLoadingXMLFoundAcc = spark
-					.sparkContext()
-					.longAccumulator("error_loading_xml_found");
 				LongAccumulator errorParsingXMLFoundAcc = spark
 					.sparkContext()
 					.longAccumulator("error_parsing_xml_found");
 				LongAccumulator downloadedRecordsAcc = spark.sparkContext().longAccumulator("downloaded_records");
-				LongAccumulator errorsAcc = spark.sparkContext().longAccumulator("errors");
 
 				JavaPairRDD<Text, Text> updatedAuthorsRDD = sc
 					.sequenceFile(workingPath + "downloads/updated_authors/*", Text.class, Text.class);
@@ -107,11 +100,10 @@ public class SparkDownloadOrcidWorks {
 					if (statusCode.equals("200")) {
 						String compressedData = getJsonValue(jElement, "compressedData");
 						if (StringUtils.isEmpty(compressedData)) {
-							errorLoadingJsonFoundAcc.add(1);
+
 						} else {
 							String authorSummary = ArgumentApplicationParser.decompressValue(compressedData);
 							if (StringUtils.isEmpty(authorSummary)) {
-								errorLoadingXMLFoundAcc.add(1);
 							} else {
 								try {
 									workIdLastModifiedDate = XMLRecordParser
@@ -184,7 +176,6 @@ public class SparkDownloadOrcidWorks {
 						} else {
 							downloaded.setStatusCode(-4);
 						}
-						errorsAcc.add(1);
 					}
 					long endReq = System.currentTimeMillis();
 					long reqTime = endReq - startReq;
@@ -193,7 +184,6 @@ public class SparkDownloadOrcidWorks {
 					}
 					if (downloadCompleted) {
 						downloaded.setStatusCode(200);
-						downloadedRecordsAcc.add(1);
 						downloaded
 							.setCompressedData(
 								ArgumentApplicationParser
@@ -214,9 +204,20 @@ public class SparkDownloadOrcidWorks {
 					String works = ArgumentApplicationParser.decompressValue(compressedData);
 
 					// split a single xml containing multiple works into multiple xml (a single work for each xml)
-					List<String> splittedWorks = XMLRecordParser
-						.splitWorks(orcidId, works.getBytes(StandardCharsets.UTF_8));
-
+					List<String> splittedWorks = null;
+					try {
+						splittedWorks = XMLRecordParser
+							.splitWorks(orcidId, works.getBytes(StandardCharsets.UTF_8));
+					} catch (Throwable t) {
+						final DownloadedRecordData errDownloaded = new DownloadedRecordData();
+						errDownloaded.setOrcidId(orcidId);
+						errDownloaded.setLastModifiedDate(lastModifiedDate);
+						errDownloaded.setStatusCode(-10);
+						errDownloaded.setErrorMessage(t.getMessage());
+						splittedDownloadedWorks.add(errDownloaded.toTuple2());
+						errorParsingXMLFoundAcc.add(1);
+						return splittedDownloadedWorks.iterator();
+					}
 					splittedWorks.forEach(w -> {
 						final DownloadedRecordData downloaded = new DownloadedRecordData();
 						downloaded.setOrcidId(orcidId);
@@ -228,10 +229,12 @@ public class SparkDownloadOrcidWorks {
 								.setCompressedData(
 									ArgumentApplicationParser
 										.compressArgument(w));
-						} catch (IOException e) {
-							throw new RuntimeException(e);
+						} catch (Throwable t) {
+							downloaded.setStatusCode(-11);
+							downloaded.setErrorMessage(t.getMessage());
 						}
 						splittedDownloadedWorks.add(downloaded.toTuple2());
+						downloadedRecordsAcc.add(1);
 					});
 
 					return splittedDownloadedWorks.iterator();
@@ -250,11 +253,8 @@ public class SparkDownloadOrcidWorks {
 				logger.info("parsedWorksAcc: {}", parsedWorksAcc.value());
 				logger.info("modifiedWorksAcc: {}", modifiedWorksAcc.value());
 				logger.info("errorCodeFoundAcc: {}", errorCodeFoundAcc.value());
-				logger.info("errorLoadingJsonFoundAcc: {}", errorLoadingJsonFoundAcc.value());
-				logger.info("errorLoadingXMLFoundAcc: {}", errorLoadingXMLFoundAcc.value());
 				logger.info("errorParsingXMLFoundAcc: {}", errorParsingXMLFoundAcc.value());
 				logger.info("downloadedRecordsAcc: {}", downloadedRecordsAcc.value());
-				logger.info("errorsAcc: {}", errorsAcc.value());
 			});
 
 	}
