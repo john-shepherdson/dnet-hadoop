@@ -587,7 +587,7 @@ object DataciteToOAFTransformation {
     val oid = result.getId
     result.setId(IdentifierFactory.createIdentifier(result))
     if (!result.getId.equalsIgnoreCase(oid)) {
-      result.getOriginalId.add(oid)
+      result.setOriginalId((oid::List(doi)).asJava)
     }
 
     var relations: List[Relation] =
