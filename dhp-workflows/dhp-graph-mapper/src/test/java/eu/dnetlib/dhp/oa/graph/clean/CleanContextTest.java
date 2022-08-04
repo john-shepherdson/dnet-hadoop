@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
@@ -21,19 +20,9 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.oa.graph.dump.Constants;
-import eu.dnetlib.dhp.oa.graph.dump.DumpJobTest;
-import eu.dnetlib.dhp.oa.graph.dump.DumpProducts;
-import eu.dnetlib.dhp.oa.graph.dump.community.CommunityMap;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.dump.oaf.Instance;
-import eu.dnetlib.dhp.schema.dump.oaf.OpenAccessRoute;
-import eu.dnetlib.dhp.schema.dump.oaf.graph.GraphResult;
 import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Software;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class CleanContextTest {
@@ -48,11 +37,11 @@ public class CleanContextTest {
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
-		workingDir = Files.createTempDirectory(DumpJobTest.class.getSimpleName());
+		workingDir = Files.createTempDirectory(CleanContextTest.class.getSimpleName());
 		log.info("using work dir {}", workingDir);
 
 		SparkConf conf = new SparkConf();
-		conf.setAppName(DumpJobTest.class.getSimpleName());
+		conf.setAppName(CleanContextTest.class.getSimpleName());
 
 		conf.setMaster("local[*]");
 		conf.set("spark.driver.host", "localhost");
@@ -63,7 +52,7 @@ public class CleanContextTest {
 
 		spark = SparkSession
 			.builder()
-			.appName(DumpJobTest.class.getSimpleName())
+			.appName(CleanContextTest.class.getSimpleName())
 			.config(conf)
 			.getOrCreate();
 	}

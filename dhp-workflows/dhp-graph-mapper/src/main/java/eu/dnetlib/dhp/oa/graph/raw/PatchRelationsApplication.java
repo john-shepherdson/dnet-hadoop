@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.graph.dump.Utils;
 import eu.dnetlib.dhp.oa.graph.raw.common.RelationIdMapping;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
@@ -78,8 +77,8 @@ public class PatchRelationsApplication {
 
 		final String relationPath = graphBasePath + "/relation";
 
-		final Dataset<Relation> rels = Utils.readPath(spark, relationPath, Relation.class);
-		final Dataset<RelationIdMapping> idMapping = Utils.readPath(spark, idMappingPath, RelationIdMapping.class);
+		final Dataset<Relation> rels = readPath(spark, relationPath, Relation.class);
+		final Dataset<RelationIdMapping> idMapping = readPath(spark, idMappingPath, RelationIdMapping.class);
 
 		log.info("relations: {}", rels.count());
 		log.info("idMapping: {}", idMapping.count());
@@ -120,6 +119,14 @@ public class PatchRelationsApplication {
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.text(relationPath);
+	}
+
+	public static <R> Dataset<R> readPath(
+		SparkSession spark, String inputPath, Class<R> clazz) {
+		return spark
+			.read()
+			.textFile(inputPath)
+			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
 	}
 
 }
