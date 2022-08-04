@@ -520,6 +520,11 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		return s;
 	}
 
+	protected static Subject cleanValue(Subject s) {
+		s.setValue(s.getValue().replaceAll(CLEANING_REGEX, " "));
+		return s;
+	}
+
 	protected static Field<String> cleanValue(Field<String> s) {
 		s.setValue(s.getValue().replaceAll(CLEANING_REGEX, " "));
 		return s;

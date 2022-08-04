@@ -189,6 +189,17 @@ public class OafMapperUtils {
 		return q;
 	}
 
+	public static Subject subject(
+		final String value,
+		final String classid,
+		final String classname,
+		final String schemeid,
+		final String schemename,
+		final DataInfo dataInfo) {
+
+		return subject(value, qualifier(classid, classname, schemeid, schemename), dataInfo);
+	}
+
 	public static StructuredProperty structuredProperty(
 		final String value,
 		final String classid,
@@ -198,6 +209,20 @@ public class OafMapperUtils {
 		final DataInfo dataInfo) {
 
 		return structuredProperty(value, qualifier(classid, classname, schemeid, schemename), dataInfo);
+	}
+
+	public static Subject subject(
+		final String value,
+		final Qualifier qualifier,
+		final DataInfo dataInfo) {
+		if (value == null) {
+			return null;
+		}
+		final Subject s = new Subject();
+		s.setValue(value);
+		s.setQualifier(qualifier);
+		s.setDataInfo(dataInfo);
+		return s;
 	}
 
 	public static StructuredProperty structuredProperty(

@@ -265,8 +265,8 @@ object PubMedToOaf {
         result.setLanguage(term)
     }
 
-    val subjects: List[StructuredProperty] = article.getSubjects.asScala.map(s =>
-      OafMapperUtils.structuredProperty(
+    val subjects: List[Subject] = article.getSubjects.asScala.map(s =>
+      OafMapperUtils.subject(
         s.getValue,
         SUBJ_CLASS,
         SUBJ_CLASS,

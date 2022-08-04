@@ -27,6 +27,7 @@ public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Obje
 		mapping.put(AccessRight.class, o -> cleanQualifier(vocabularies, (AccessRight) o));
 		mapping.put(Country.class, o -> cleanCountry(vocabularies, (Country) o));
 		mapping.put(Relation.class, o -> cleanRelation(vocabularies, (Relation) o));
+
 		return mapping;
 	}
 

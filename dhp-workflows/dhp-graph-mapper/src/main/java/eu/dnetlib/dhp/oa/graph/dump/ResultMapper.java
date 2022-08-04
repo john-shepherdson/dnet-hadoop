@@ -17,6 +17,7 @@ import eu.dnetlib.dhp.schema.dump.oaf.Instance;
 import eu.dnetlib.dhp.schema.dump.oaf.Measure;
 import eu.dnetlib.dhp.schema.dump.oaf.OpenAccessRoute;
 import eu.dnetlib.dhp.schema.dump.oaf.Result;
+import eu.dnetlib.dhp.schema.dump.oaf.Subject;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CfHbKeyValue;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityInstance;
 import eu.dnetlib.dhp.schema.dump.oaf.community.CommunityResult;
@@ -66,7 +67,7 @@ public class ResultMapper implements Serializable {
 				final List<String> contributorList = new ArrayList<>();
 				Optional
 					.ofNullable(input.getContributor())
-					.ifPresent(value -> value.stream().forEach(c -> contributorList.add(c.getValue())));
+					.ifPresent(value -> value.forEach(c -> contributorList.add(c.getValue())));
 				out.setContributor(contributorList);
 
 				Optional
@@ -103,7 +104,7 @@ public class ResultMapper implements Serializable {
 				final List<String> coverageList = new ArrayList<>();
 				Optional
 					.ofNullable(input.getCoverage())
-					.ifPresent(value -> value.stream().forEach(c -> coverageList.add(c.getValue())));
+					.ifPresent(value -> value.forEach(c -> coverageList.add(c.getValue())));
 				out.setCoverage(coverageList);
 
 				out.setDateofcollection(input.getDateofcollection());
@@ -114,14 +115,12 @@ public class ResultMapper implements Serializable {
 					.ifPresent(value -> value.forEach(d -> descriptionList.add(d.getValue())));
 				out.setDescription(descriptionList);
 				Optional<Field<String>> oStr = Optional.ofNullable(input.getEmbargoenddate());
-				if (oStr.isPresent()) {
-					out.setEmbargoenddate(oStr.get().getValue());
-				}
+				oStr.ifPresent(stringField -> out.setEmbargoenddate(stringField.getValue()));
 
 				final List<String> formatList = new ArrayList<>();
 				Optional
 					.ofNullable(input.getFormat())
-					.ifPresent(value -> value.stream().forEach(f -> formatList.add(f.getValue())));
+					.ifPresent(value -> value.forEach(f -> formatList.add(f.getValue())));
 				out.setFormat(formatList);
 				out.setId(input.getId());
 				out.setOriginalId(new ArrayList<>());

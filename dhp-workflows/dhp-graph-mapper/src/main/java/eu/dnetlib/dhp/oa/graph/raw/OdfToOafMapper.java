@@ -249,8 +249,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<StructuredProperty> prepareSubjects(final Document doc, final DataInfo info) {
-		return prepareListStructProps(doc, "//*[local-name()='subject']", info);
+	protected List<Subject> prepareSubjects(final Document doc, final DataInfo info) {
+		return prepareSubjectList(doc, "//*[local-name()='subject']", info);
 	}
 
 	@Override

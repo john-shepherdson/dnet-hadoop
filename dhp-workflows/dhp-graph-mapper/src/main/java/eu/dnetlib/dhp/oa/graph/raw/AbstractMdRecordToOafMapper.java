@@ -8,15 +8,7 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.PRODUCES;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.REPOSITORY_PROVENANCE_ACTIONS;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.UNKNOWN;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.dataInfo;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.field;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.journal;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.keyValue;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.listFields;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.oaiIProvenance;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.qualifier;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
 import java.util.*;
 
@@ -29,26 +21,7 @@ import com.google.common.collect.Sets;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.AccessRight;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.Context;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.GeoLocation;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.Journal;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.OAIProvenance;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.Software;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
@@ -411,7 +384,7 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected abstract List<StructuredProperty> prepareTitles(Document doc, DataInfo info);
 
-	protected abstract List<StructuredProperty> prepareSubjects(Document doc, DataInfo info);
+	protected abstract List<Subject> prepareSubjects(Document doc, DataInfo info);
 
 	protected abstract Qualifier prepareLanguages(Document doc);
 
@@ -553,6 +526,22 @@ public abstract class AbstractMdRecordToOafMapper {
 			res
 				.add(
 					structuredProperty(
+						n.getText(), n.valueOf("@classid"), n.valueOf("@classname"), n.valueOf("@schemeid"),
+						n.valueOf("@schemename"), info));
+		}
+		return res;
+	}
+
+	protected List<Subject> prepareSubjectList(
+		final Node node,
+		final String xpath,
+		final DataInfo info) {
+		final List<Subject> res = new ArrayList<>();
+		for (final Object o : node.selectNodes(xpath)) {
+			final Node n = (Node) o;
+			res
+				.add(
+					subject(
 						n.getText(), n.valueOf("@classid"), n.valueOf("@classname"), n.valueOf("@schemeid"),
 						n.valueOf("@schemename"), info));
 		}
