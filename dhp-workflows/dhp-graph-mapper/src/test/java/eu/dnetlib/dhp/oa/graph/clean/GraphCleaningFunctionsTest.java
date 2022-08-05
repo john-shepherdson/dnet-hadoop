@@ -262,6 +262,20 @@ public class GraphCleaningFunctionsTest {
 		assertNotNull(fos_subjects);
 		assertEquals(2, fos_subjects.size());
 
+		assertTrue(
+			fos_subjects
+				.stream()
+				.anyMatch(
+					s -> "0101 mathematics".equals(s.getValue()) &
+						ModelConstants.DNET_SUBJECT_FOS_CLASSID.equals(s.getQualifier().getClassid())));
+
+		assertTrue(
+			fos_subjects
+				.stream()
+				.anyMatch(
+					s -> "0102 computer and information sciences".equals(s.getValue()) &
+						ModelConstants.DNET_SUBJECT_FOS_CLASSID.equals(s.getQualifier().getClassid())));
+
 		// TODO add more assertions to verity the cleaned values
 		System.out.println(MAPPER.writeValueAsString(p_cleaned));
 	}
