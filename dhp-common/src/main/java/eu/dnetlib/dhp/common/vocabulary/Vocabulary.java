@@ -83,4 +83,10 @@ public class Vocabulary implements Serializable {
 			.orElse(null);
 	}
 
+	public Qualifier lookup(String id) {
+		return Optional
+				.ofNullable(getSynonymAsQualifier(id))
+				.orElse(getTermAsQualifier(id));
+	}
+
 }

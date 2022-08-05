@@ -4,15 +4,15 @@ package eu.dnetlib.dhp.oa.graph.clean;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import eu.dnetlib.dhp.common.vocabulary.Vocabulary;
+import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableConsumer;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.AccessRight;
-import eu.dnetlib.dhp.schema.oaf.Country;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+
+import javax.jws.WebParam;
 
 public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Object>> implements Serializable {
 
@@ -27,8 +27,27 @@ public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Obje
 		mapping.put(AccessRight.class, o -> cleanQualifier(vocabularies, (AccessRight) o));
 		mapping.put(Country.class, o -> cleanCountry(vocabularies, (Country) o));
 		mapping.put(Relation.class, o -> cleanRelation(vocabularies, (Relation) o));
-
+		mapping.put(Subject.class, o -> cleanSubject(vocabularies, (Subject) o));
 		return mapping;
+	}
+
+	private static void cleanSubject(VocabularyGroup vocabularies, Subject s) {
+		// TODO cleaning based on different subject vocabs can be added here
+		cleanSubjectForVocabulary(ModelConstants.DNET_SUBJECT_FOS_CLASSID, vocabularies, s);
+	}
+
+	private static void cleanSubjectForVocabulary(String vocabularyId, VocabularyGroup vocabularies, Subject s) {
+		vocabularies.find(vocabularyId).ifPresent(vocabulary -> {
+			if (!ModelConstants.DNET_SUBJECT_KEYWORD.equalsIgnoreCase(s.getQualifier().getClassid())) {
+				return;
+			}
+			Qualifier newValue = vocabulary.lookup(s.getValue());
+			if (!s.getValue().equals(newValue.getClassid())) {
+				s.setValue(newValue.getClassid());
+				s.getQualifier().setClassid(vocabularyId);
+				s.getQualifier().setClassname(vocabulary.getName());
+			}
+		});
 	}
 
 	private static void cleanRelation(VocabularyGroup vocabularies, Relation r) {
