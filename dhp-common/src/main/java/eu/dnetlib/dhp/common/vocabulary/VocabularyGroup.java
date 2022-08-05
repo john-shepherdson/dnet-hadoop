@@ -83,9 +83,9 @@ public class VocabularyGroup implements Serializable {
 
 	public Optional<Vocabulary> find(final String vocId) {
 		return Optional
-				.ofNullable(vocId)
-				.map(String::toLowerCase)
-				.map(vocs::get);
+			.ofNullable(vocId)
+			.map(String::toLowerCase)
+			.map(vocs::get);
 	}
 
 	public void addTerm(final String vocId, final String id, final String name) {

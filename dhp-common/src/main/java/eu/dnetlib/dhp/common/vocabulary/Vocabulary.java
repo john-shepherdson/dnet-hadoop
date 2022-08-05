@@ -85,8 +85,8 @@ public class Vocabulary implements Serializable {
 
 	public Qualifier lookup(String id) {
 		return Optional
-				.ofNullable(getSynonymAsQualifier(id))
-				.orElse(getTermAsQualifier(id));
+			.ofNullable(getSynonymAsQualifier(id))
+			.orElse(getTermAsQualifier(id));
 	}
 
 }

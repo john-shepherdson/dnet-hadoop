@@ -743,12 +743,12 @@
         "trust": "0.9"
       },
       "qualifier": {
-        "classid": "",
-        "classname": "",
-        "schemeid": "",
-        "schemename": ""
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
       },
-      "value": "infrared detectors"
+      "value": "FOS: Mathematics"
     },
     {
       "dataInfo": {
@@ -765,12 +765,12 @@
         "trust": "0.9"
       },
       "qualifier": {
-        "classid": "",
-        "classname": "",
-        "schemeid": "",
-        "schemename": ""
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
       },
-      "value": "lens antennas"
+      "value": "FOS: Computer and information sciences"
     },
     {
       "dataInfo": {

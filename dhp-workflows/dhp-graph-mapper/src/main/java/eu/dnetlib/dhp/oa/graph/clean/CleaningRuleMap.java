@@ -4,15 +4,15 @@ package eu.dnetlib.dhp.oa.graph.clean;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import eu.dnetlib.dhp.common.vocabulary.Vocabulary;
-import eu.dnetlib.dhp.schema.oaf.*;
+import javax.jws.WebParam;
+
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableConsumer;
+import eu.dnetlib.dhp.common.vocabulary.Vocabulary;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-
-import javax.jws.WebParam;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Object>> implements Serializable {
 

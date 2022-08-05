@@ -251,6 +251,17 @@ public class GraphCleaningFunctionsTest {
 							pid.getQualifier().getClassname()));
 		});
 
+		assertNotNull(p_cleaned.getSubject());
+
+		List<Subject> fos_subjects = p_cleaned
+			.getSubject()
+			.stream()
+			.filter(s -> ModelConstants.DNET_SUBJECT_FOS_CLASSID.equals(s.getQualifier().getClassid()))
+			.collect(Collectors.toList());
+
+		assertNotNull(fos_subjects);
+		assertEquals(2, fos_subjects.size());
+
 		// TODO add more assertions to verity the cleaned values
 		System.out.println(MAPPER.writeValueAsString(p_cleaned));
 	}
