@@ -260,7 +260,7 @@ public class GraphCleaningFunctionsTest {
 			.collect(Collectors.toList());
 
 		assertNotNull(fos_subjects);
-		assertEquals(2, fos_subjects.size());
+		assertEquals(3, fos_subjects.size());
 
 		assertTrue(
 			fos_subjects

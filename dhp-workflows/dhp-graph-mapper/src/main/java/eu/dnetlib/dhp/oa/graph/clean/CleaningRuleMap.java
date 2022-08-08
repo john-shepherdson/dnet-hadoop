@@ -46,7 +46,7 @@ public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Obje
 				return;
 			}
 			Qualifier newValue = vocabulary.lookup(subject.getValue());
-			if (!subject.getValue().equals(newValue.getClassid())) {
+			if (!ModelConstants.UNKNOWN.equals(newValue.getClassid())) {
 				subject.setValue(newValue.getClassid());
 				subject.getQualifier().setClassid(vocabularyId);
 				subject.getQualifier().setClassname(vocabulary.getName());

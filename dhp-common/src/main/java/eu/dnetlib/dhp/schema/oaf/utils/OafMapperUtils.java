@@ -11,6 +11,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.schema.common.AccessRightComparator;
@@ -141,7 +142,7 @@ public class OafMapperUtils {
 	}
 
 	public static Qualifier unknown(final String schemeid, final String schemename) {
-		return qualifier("UNKNOWN", "Unknown", schemeid, schemename);
+		return qualifier(UNKNOWN, "Unknown", schemeid, schemename);
 	}
 
 	public static AccessRight accessRight(
