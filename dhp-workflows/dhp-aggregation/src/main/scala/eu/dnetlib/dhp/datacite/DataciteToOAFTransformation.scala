@@ -584,7 +584,12 @@ object DataciteToOAFTransformation {
       JField("awardUri", JString(awardUri)) <- fundingReferences
     } yield awardUri
 
+    val oid = result.getId
     result.setId(IdentifierFactory.createIdentifier(result))
+    if (!result.getId.equalsIgnoreCase(oid)) {
+      result.setOriginalId((oid :: List(doi)).asJava)
+    }
+
     var relations: List[Relation] =
       awardUris.flatMap(a => get_projectRelation(a, result.getId)).filter(r => r != null)
 
