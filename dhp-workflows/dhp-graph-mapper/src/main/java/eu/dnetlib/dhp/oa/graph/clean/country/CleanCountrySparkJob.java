@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.text.html.Option;
 
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
@@ -94,7 +95,6 @@ public class CleanCountrySparkJob implements Serializable {
 		List<String> hostedBy = spark
 			.read()
 			.textFile(datasourcePath)
-			// .filter((FilterFunction<String>) ds -> !ds.equals(collectedfrom))
 			.collectAsList();
 
 		Dataset<T> res = spark
@@ -113,7 +113,8 @@ public class CleanCountrySparkJob implements Serializable {
 			if (r
 				.getPid()
 				.stream()
-				.anyMatch(p -> p.getQualifier().getClassid().equals("doi") && pidInParam(p.getValue(), verifyParam))) {
+				.anyMatch(p -> p.getQualifier().getClassid()
+						.equals(PidType.doi) && pidInParam(p.getValue(), verifyParam))) {
 				r
 					.setCountry(
 						r
