@@ -140,11 +140,21 @@
             <arg>--objectType</arg><arg>scholix</arg>
             <arg>--maxPidNumberFilter</arg><arg>maxNumberOfPid</arg>
         </spark>
+        <ok to="make_tar"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="make_tar">
+        <java>
+            <main-class>eu.dnetlib.dhp.common.MakeTarArchive</main-class>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
+            <arg>--hdfsPath</arg><arg>${targetPath}/tar</arg>
+            <arg>--sourcePath</arg><arg>${targetPath}/json</arg>
+        </java>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
 
-
-
     <end name="End"/>
+
 </workflow-app>
