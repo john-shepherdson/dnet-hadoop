@@ -260,14 +260,16 @@ public class GraphCleaningFunctionsTest {
 			.collect(Collectors.toList());
 
 		assertNotNull(fos_subjects);
-		assertEquals(3, fos_subjects.size());
+		assertEquals(2, fos_subjects.size());
 
 		assertTrue(
 			fos_subjects
 				.stream()
 				.anyMatch(
 					s -> "0101 mathematics".equals(s.getValue()) &
-						ModelConstants.DNET_SUBJECT_FOS_CLASSID.equals(s.getQualifier().getClassid())));
+						ModelConstants.DNET_SUBJECT_FOS_CLASSID.equals(s.getQualifier().getClassid()) &
+						"sysimport:crosswalk:datasetarchive".equals(s.getDataInfo().getProvenanceaction().getClassid())
+				));
 
 		assertTrue(
 			fos_subjects

@@ -11,10 +11,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.schema.common.AccessRightComparator;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 
@@ -502,5 +502,16 @@ public class OafMapperUtils {
 		rel.setValidationDate(StringUtils.isNotBlank(validationDate) ? validationDate : null);
 		rel.setProperties(properties);
 		return rel;
+	}
+
+	public static String getProvenance(DataInfo dataInfo) {
+		return Optional
+			.ofNullable(dataInfo)
+			.map(
+				d -> Optional
+					.ofNullable(d.getProvenanceaction())
+					.map(Qualifier::getClassid)
+					.orElse(""))
+			.orElse("");
 	}
 }

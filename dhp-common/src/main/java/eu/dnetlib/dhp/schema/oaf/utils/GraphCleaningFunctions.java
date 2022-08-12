@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.getProvenance;
+
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -16,7 +18,6 @@ import com.github.sisyphsu.dateparser.DateParserUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-import eu.dnetlib.dhp.common.vocabulary.Vocabulary;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
@@ -191,8 +192,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 						qualifier("und", "Undetermined", ModelConstants.DNET_LANGUAGES));
 			}
 			if (Objects.nonNull(r.getSubject())) {
-				r
-					.setSubject(
+				List<Subject> subjects = Lists
+					.newArrayList(
 						r
 							.getSubject()
 							.stream()
@@ -201,7 +202,18 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 							.filter(sp -> Objects.nonNull(sp.getQualifier()))
 							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
 							.map(GraphCleaningFunctions::cleanValue)
-							.collect(Collectors.toList()));
+							.collect(
+								Collectors
+									.toMap(
+										s -> Optional
+											.ofNullable(s.getQualifier())
+											.map(q -> q.getClassid() + s.getValue())
+											.orElse(s.getValue()),
+										Function.identity(),
+										(s1, s2) -> Collections
+											.min(Lists.newArrayList(s1, s1), new SubjectProvenanceComparator())))
+							.values());
+				r.setSubject(subjects);
 			}
 			if (Objects.nonNull(r.getTitle())) {
 				r
@@ -382,14 +394,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 									.filter(p -> StringUtils.isNotBlank(p.getValue()))
 									.map(p -> {
 										// hack to distinguish orcid from orcid_pending
-										String pidProvenance = Optional
-											.ofNullable(p.getDataInfo())
-											.map(
-												d -> Optional
-													.ofNullable(d.getProvenanceaction())
-													.map(Qualifier::getClassid)
-													.orElse(""))
-											.orElse("");
+										String pidProvenance = getProvenance(p.getDataInfo());
 										if (p
 											.getQualifier()
 											.getClassid()
