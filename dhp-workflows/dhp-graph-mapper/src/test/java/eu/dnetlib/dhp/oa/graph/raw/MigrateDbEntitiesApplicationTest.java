@@ -1,9 +1,7 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 
@@ -31,11 +29,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 @ExtendWith(MockitoExtension.class)
-public class MigrateDbEntitiesApplicationTest {
+class MigrateDbEntitiesApplicationTest {
 
 	private MigrateDbEntitiesApplication app;
 
@@ -61,7 +60,7 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessService() throws Exception {
+	void testProcessService() throws Exception {
 		final List<TypedField> fields = prepareMocks("services_resultset_entry.json");
 
 		final List<Oaf> list = app.processService(rs);
@@ -74,7 +73,7 @@ public class MigrateDbEntitiesApplicationTest {
 			.getCollectedfrom()
 			.stream()
 			.map(KeyValue::getKey)
-			.forEach(dsId -> assertValidId(dsId));
+			.forEach(this::assertValidId);
 
 		assertEquals(1, ds.getPid().size());
 		assertEquals("r3d100010218", ds.getPid().get(0).getValue());
@@ -163,14 +162,14 @@ public class MigrateDbEntitiesApplicationTest {
 			.stream()
 			.map(Qualifier::getSchemeid)
 			.collect(Collectors.toCollection(HashSet::new));
-		assertTrue(cpSchemeId.size() == 1);
+		assertEquals(1, cpSchemeId.size());
 		assertTrue(cpSchemeId.contains("eosc:contentpolicies"));
 		HashSet<String> cpSchemeName = ds
 			.getContentpolicies()
 			.stream()
 			.map(Qualifier::getSchemename)
 			.collect(Collectors.toCollection(HashSet::new));
-		assertTrue(cpSchemeName.size() == 1);
+		assertEquals(1, cpSchemeName.size());
 		assertTrue(cpSchemeName.contains("eosc:contentpolicies"));
 		assertEquals(2, ds.getContentpolicies().size());
 		assertEquals("Taxonomic classification", ds.getContentpolicies().get(0).getClassid());
@@ -193,7 +192,7 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessProject() throws Exception {
+	void testProcessProject() throws Exception {
 		final List<TypedField> fields = prepareMocks("projects_resultset_entry.json");
 
 		final List<Oaf> list = app.processProject(rs);
@@ -211,7 +210,7 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessOrganization() throws Exception {
+	void testProcessOrganization() throws Exception {
 		final List<TypedField> fields = prepareMocks("organizations_resultset_entry.json");
 
 		final List<Oaf> list = app.processOrganization(rs);
@@ -238,7 +237,7 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessDatasourceOrganization() throws Exception {
+	void testProcessDatasourceOrganization() throws Exception {
 		final List<TypedField> fields = prepareMocks("datasourceorganization_resultset_entry.json");
 
 		final List<Oaf> list = app.processServiceOrganization(rs);
@@ -255,7 +254,7 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessProjectOrganization() throws Exception {
+	void testProcessProjectOrganization() throws Exception {
 		final List<TypedField> fields = prepareMocks("projectorganization_resultset_entry.json");
 
 		final List<Oaf> list = app.processProjectOrganization(rs);
@@ -271,6 +270,38 @@ public class MigrateDbEntitiesApplicationTest {
 		assertEquals(r2.getSource(), r1.getTarget());
 		assertValidId(r1.getCollectedfrom().get(0).getKey());
 		assertValidId(r2.getCollectedfrom().get(0).getKey());
+
+		assertEquals(ModelConstants.PROJECT_ORGANIZATION, r1.getRelType());
+		assertEquals(ModelConstants.PROJECT_ORGANIZATION, r2.getRelType());
+
+		assertEquals(ModelConstants.PARTICIPATION, r1.getSubRelType());
+		assertEquals(ModelConstants.PARTICIPATION, r2.getSubRelType());
+
+		if (r1.getSource().startsWith("40")) {
+			assertEquals(ModelConstants.HAS_PARTICIPANT, r1.getRelClass());
+			assertEquals(ModelConstants.IS_PARTICIPANT, r2.getRelClass());
+		} else if (r1.getSource().startsWith("20")) {
+			assertEquals(ModelConstants.IS_PARTICIPANT, r1.getRelClass());
+			assertEquals(ModelConstants.HAS_PARTICIPANT, r2.getRelClass());
+		}
+
+		assertNotNull(r1.getProperties());
+		checkProperty(r1, "contribution", "436754.0");
+		checkProperty(r2, "contribution", "436754.0");
+
+		checkProperty(r1, "currency", "EUR");
+		checkProperty(r2, "currency", "EUR");
+	}
+
+	private void checkProperty(Relation r, String property, String value) {
+		final List<KeyValue> p = r
+			.getProperties()
+			.stream()
+			.filter(kv -> kv.getKey().equals(property))
+			.collect(Collectors.toList());
+		assertFalse(p.isEmpty());
+		assertEquals(1, p.size());
+		assertEquals(value, p.get(0).getValue());
 	}
 
 	@Test
@@ -289,7 +320,7 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessClaims_rels() throws Exception {
+	void testProcessClaims_rels() throws Exception {
 		final List<TypedField> fields = prepareMocks("claimsrel_resultset_entry.json");
 
 		final List<Oaf> list = app.processClaims(rs);
@@ -320,9 +351,6 @@ public class MigrateDbEntitiesApplicationTest {
 
 		assertValidId(r1.getCollectedfrom().get(0).getKey());
 		assertValidId(r2.getCollectedfrom().get(0).getKey());
-
-		// System.out.println(new ObjectMapper().writeValueAsString(r1));
-		// System.out.println(new ObjectMapper().writeValueAsString(r2));
 	}
 
 	private List<TypedField> prepareMocks(final String jsonFile) throws IOException, SQLException {
@@ -385,7 +413,7 @@ public class MigrateDbEntitiesApplicationTest {
 						final String[] values = ((List<?>) tf.getValue())
 							.stream()
 							.filter(Objects::nonNull)
-							.map(o -> o.toString())
+							.map(Object::toString)
 							.toArray(String[]::new);
 
 						Mockito.when(arr.getArray()).thenReturn(values);

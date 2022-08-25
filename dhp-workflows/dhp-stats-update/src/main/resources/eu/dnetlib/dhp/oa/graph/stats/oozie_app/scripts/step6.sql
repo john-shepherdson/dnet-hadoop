@@ -11,13 +11,13 @@ where p.datainfo.deletedbyinference=false  and p.datainfo.invisible=false;
 CREATE TABLE ${stats_db_name}.project_organizations STORED AS PARQUET AS
 SELECT substr(r.source, 4) AS id, substr(r.target, 4) AS organization
 from ${openaire_db_name}.relation r
-WHERE r.reltype = 'projectOrganization'
+WHERE r.reltype = 'projectOrganization' and r.source like '40|%'
   and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false;
 
 CREATE TABLE ${stats_db_name}.project_results STORED AS PARQUET AS
 SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS result, r.datainfo.provenanceaction.classname as provenance
 FROM ${openaire_db_name}.relation r
-WHERE r.reltype = 'resultProject'
+WHERE r.reltype = 'resultProject' and r.target like '40|%'
   and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false;
 
 create table ${stats_db_name}.project_classification STORED AS PARQUET as

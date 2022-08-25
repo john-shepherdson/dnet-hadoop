@@ -1,4 +1,12 @@
 {
+  "eoscifguidelines": [
+    {
+      "code" : "EOSC::Jupyter Notebook",
+      "label" : "EOSC::Jupyter Notebook",
+      "url" : "",
+      "semanticRelation" : "compliesWith"
+    }
+  ],
   "measures": [
     {
       "id": "influence",

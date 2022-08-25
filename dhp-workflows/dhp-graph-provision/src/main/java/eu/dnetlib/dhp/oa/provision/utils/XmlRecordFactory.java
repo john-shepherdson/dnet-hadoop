@@ -214,6 +214,17 @@ public class XmlRecordFactory implements Serializable {
 				metadata.addAll(measuresAsXml(r.getMeasures()));
 			}
 
+			if (r.getEoscifguidelines() != null) {
+				metadata
+					.addAll(
+						r
+							.getEoscifguidelines()
+							.stream()
+							.filter(Objects::nonNull)
+							.map(e -> XmlSerializationUtils.mapEoscIf(e))
+							.collect(Collectors.toList()));
+			}
+
 			if (r.getContext() != null) {
 				contexts.addAll(r.getContext().stream().map(c -> c.getId()).collect(Collectors.toList()));
 				/* FIXME: Workaround for CLARIN mining issue: #3670#note-29 */

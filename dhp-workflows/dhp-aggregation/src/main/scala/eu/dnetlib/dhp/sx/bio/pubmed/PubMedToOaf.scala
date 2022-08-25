@@ -4,15 +4,21 @@ import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactory, OafMapperUtils, PidType}
 import eu.dnetlib.dhp.schema.oaf._
-import collection.JavaConverters._
+import eu.dnetlib.dhp.utils.DHPUtils
+import org.apache.commons.lang3.StringUtils
 
+import collection.JavaConverters._
 import java.util.regex.Pattern
+import scala.collection.mutable.ListBuffer
 
 /**
   */
 object PubMedToOaf {
 
   val SUBJ_CLASS = "keywords"
+
+  val OAI_HEADER = "oai:pubmedcentral.nih.gov:"
+  val OLD_PMC_PREFIX = "od_______267::"
 
   val urlMap = Map(
     "pmid" -> "https://pubmed.ncbi.nlm.nih.gov/",
@@ -48,6 +54,15 @@ object PubMedToOaf {
       return matcher.group(0)
     }
     null
+  }
+
+  def createOriginalOpenaireId(article: PMArticle): String = {
+    if (StringUtils.isNotEmpty(article.getPmcId)) {
+      val md5 = DHPUtils.md5(s"$OAI_HEADER${article.getPmcId.replace("PMC", "")}")
+      s"$OLD_PMC_PREFIX$md5"
+    } else
+      null
+
   }
 
   /** Create an instance of class extends Result
@@ -122,16 +137,27 @@ object PubMedToOaf {
       return null
 
     // MAP PMID into  pid with  classid = classname = pmid
-    val pidList: List[StructuredProperty] = List(
-      OafMapperUtils.structuredProperty(
-        article.getPmid,
-        PidType.pmid.toString,
-        PidType.pmid.toString,
+    val pidList = ListBuffer[StructuredProperty]()
+
+    pidList += OafMapperUtils.structuredProperty(
+      article.getPmid,
+      PidType.pmid.toString,
+      PidType.pmid.toString,
+      ModelConstants.DNET_PID_TYPES,
+      ModelConstants.DNET_PID_TYPES,
+      dataInfo
+    )
+
+    if (StringUtils.isNotBlank(article.getPmcId)) {
+      pidList += OafMapperUtils.structuredProperty(
+        article.getPmcId,
+        PidType.pmc.toString,
+        PidType.pmc.toString,
         ModelConstants.DNET_PID_TYPES,
         ModelConstants.DNET_PID_TYPES,
         dataInfo
       )
-    )
+    }
     if (pidList == null)
       return null
 
@@ -186,6 +212,7 @@ object PubMedToOaf {
     val urlLists: List[String] = pidList
       .map(s => (urlMap.getOrElse(s.getQualifier.getClassid, ""), s.getValue))
       .filter(t => t._1.nonEmpty)
+      .toList
       .map(t => t._1 + t._2)
     if (urlLists != null)
       pubmedInstance.setUrl(urlLists.asJava)
@@ -262,7 +289,14 @@ object PubMedToOaf {
 
     if (authors != null && authors.nonEmpty)
       result.setAuthor(authors.asJava)
-    result.setOriginalId(pidList.map(s => s.getValue).asJava)
+
+    if (StringUtils.isNotEmpty(article.getPmcId)) {
+      val originalIDS = ListBuffer[String]()
+      originalIDS += createOriginalOpenaireId(article)
+      pidList.map(s => s.getValue).foreach(p => originalIDS += p)
+      result.setOriginalId(originalIDS.asJava)
+    } else
+      result.setOriginalId(pidList.map(s => s.getValue).asJava)
 
     result.setId(article.getPmid)
 

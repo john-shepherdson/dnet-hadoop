@@ -87,6 +87,8 @@ public class XmlRecordFactoryTest {
 		assertEquals(
 			"C", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity']/@class"));
 
+		assertEquals("EOSC::Jupyter Notebook", doc.valueOf("//*[local-name() = 'result']/eoscifguidelines/@code"));
+
 	}
 
 	@Test

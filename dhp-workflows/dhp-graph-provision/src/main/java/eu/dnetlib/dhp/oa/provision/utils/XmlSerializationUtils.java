@@ -7,6 +7,8 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
 
@@ -161,4 +163,15 @@ public class XmlSerializationUtils {
 		sb.append("/>");
 		return sb.toString();
 	}
+
+	public static String mapEoscIf(EoscIfGuidelines e) {
+		return asXmlElement(
+			"eoscifguidelines", Lists
+				.newArrayList(
+					new Tuple2<>("code", e.getCode()),
+					new Tuple2<>("label", e.getLabel()),
+					new Tuple2<>("url", e.getUrl()),
+					new Tuple2<>("semanticrelation", e.getSemanticRelation())));
+	}
+
 }
