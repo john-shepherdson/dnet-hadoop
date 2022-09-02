@@ -21,13 +21,13 @@
     </header>
     <metadata>
         <datacite:resource>
-            <datacite:identifier identifierType="URL">https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca</datacite:identifier>
+            <datacite:identifier identifierType="w3id">https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca</datacite:identifier>
             <datacite:alternateIdentifiers/>
             <datacite:relatedIdentifiers>
-                <datacite:relatedIdentifier relatedIdentifierType="" relationType="">
+                <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">
                     https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca/resources/24fae96f-f986-46e1-bfd0-a21ca20ff0ce
                 </datacite:relatedIdentifier>
-                <datacite:relatedIdentifier relatedIdentifierType="" relationType="">
+                <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">
                     https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca/resources/6d3427a8-352e-49f4-9796-f618c44dc16d
                 </datacite:relatedIdentifier>
             </datacite:relatedIdentifiers>
@@ -74,7 +74,7 @@
                 <subject>EOSC::RO-crate</subject>
             </subjects>
         </datacite:resource>
-        <oaf:identifier identifierType="URL">https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca</oaf:identifier>
+        <oaf:identifier identifierType="w3id">https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca</oaf:identifier>
         <dr:CobjCategory type="other research product">other research product</dr:CobjCategory>
         <oaf:dateAccepted/>
         <oaf:accessrights>OPEN</oaf:accessrights>
