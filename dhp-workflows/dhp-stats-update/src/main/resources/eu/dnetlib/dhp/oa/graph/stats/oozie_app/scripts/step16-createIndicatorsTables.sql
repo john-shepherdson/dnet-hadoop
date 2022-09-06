@@ -179,17 +179,17 @@ from publication_datasources pd
 
 compute stats indi_pub_diamond;
 
-create table indi_pub_hybrid stored as parquet as
-select distinct pd.id, coalesce(is_hybrid, 0) as is_hybrid
-from publication_datasources pd
-         left outer join (
-    select pd.id, 1 as is_hybrid from publication_datasources pd
-                                          join datasource d on d.id=pd.datasource
-                                          join stats_ext.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_online=d.issn_online)
-                                                                        and (ps.journal_is_in_doaj=false and ps.journal_is_oa=false)) tmp
-                         on pd.id=tmp.id;
-
-compute stats indi_pub_hybrid;
+--create table indi_pub_hybrid stored as parquet as
+--select distinct pd.id, coalesce(is_hybrid, 0) as is_hybrid
+--from publication_datasources pd
+--         left outer join (
+--    select pd.id, 1 as is_hybrid from publication_datasources pd
+--                                          join datasource d on d.id=pd.datasource
+--                                          join stats_ext.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_online=d.issn_online)
+--                                                                        and (ps.journal_is_in_doaj=false and ps.journal_is_oa=false)) tmp
+--                         on pd.id=tmp.id;
+--
+--compute stats indi_pub_hybrid;
 
 create table indi_pub_in_transformative stored as parquet as
 select distinct pd.id, coalesce(is_transformative, 0) as is_transformative
