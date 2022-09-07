@@ -935,6 +935,15 @@ class MappersTest {
 		System.out.println("***************");
 	}
 
+	@Test
+	void testRiunet() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("riunet.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+	}
+
 	private void assertValidId(final String id) {
 		// System.out.println(id);
 

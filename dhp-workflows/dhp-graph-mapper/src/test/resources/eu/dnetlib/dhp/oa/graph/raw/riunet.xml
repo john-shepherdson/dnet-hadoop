@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:oaire="http://namespace.openaire.eu/schema/oaire/"
+        xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+        xmlns:datacite="http://datacite.org/schema/kernel-4"
+        xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <header xmlns="HTTP://www.openarchives.org/OAI/2.0/">
+        <identifier xmlns="http://www.openarchives.org/OAI/2.0/">oai:riunet.upv.es:10251/178464</identifier>
+        <datestamp xmlns="http://www.openarchives.org/OAI/2.0/">2022-05-10T09:12:14Z</datestamp>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">com_10251_3822</setSpec>
+        <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">col_10251_169956</setSpec>
+        <dr:dateOfTransformation>2022-09-01T07:51:12.657Z</dr:dateOfTransformation>
+        <dri:objIdentifier>od______1560::8f7a139735f493882bb0f4abceb6e200</dri:objIdentifier>
+        <dri:recordIdentifier>od______1560::8f7a139735f493882bb0f4abceb6e200</dri:recordIdentifier>
+        <dri:dateOfCollection>2019-03-27T15:15:22.22Z</dri:dateOfCollection>
+        <oaf:datasourceprefix>riunet________</oaf:datasourceprefix>
+    </header>
+    <metadata>
+        <datacite:resource>
+            <datacite:identifier identifierType="DOI">10.4995/ijpme.2020.12944</datacite:identifier>
+            <datacite:alternateIdentifiers>
+                <datacite:alternateIdentifier alternateIdentifierType="Handle">10251/148537</datacite:alternateIdentifier>
+            </datacite:alternateIdentifiers>
+            <datacite:relatedIdentifiers/>
+            <datacite:resourceType xs:anyURI="http://purl.org/coar/resource_type/c_6501">journal article</datacite:resourceType>
+            <datacite:version>VoR</datacite:version>
+            <datacite:rightsList>
+                <datacite:rights rightsURI=" http://creativecommons.org/licenses/by-nc-nd/4.0/">http://creativecommons.org/licenses/by-nc-nd/4.0/</datacite:rights>
+                <datacite:rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</datacite:rights>
+            </datacite:rightsList>
+            <datacite:titles>
+                <datacite:title>Production planning in 3D printing factories</datacite:title>
+            </datacite:titles>
+            <datacite:descriptions>
+                <datacite:description descriptionType="Abstract">[EN] Production planning in 3D printing factories brings new challenges among which the scheduling of parts to be produced stands out. A main issue is to increase the efficiency of the plant and 3D printers productivity. Planning, scheduling, and nesting in 3D printing are recurrent problems in the search for new techniques to promote the development of this technology. In this work, we address the problem for the suppliers that have to schedule their daily production. This problem is part of the LONJA3D model, a managed 3D printing market where the parts ordered by the customers are reorganized into new batches so that suppliers can optimize their production capacity. In this paper, we propose a method derived from the design of combinatorial auctions to solve the nesting problem in 3D printing. First, we propose the use of a heuristic to create potential manufacturing batches. Then, we compute the expected return for each batch. The selected batch should generate the highest income. Several experiments have been tested to validate the process. This method is a first approach to the planning problem in 3D printing and further research is proposed to improve the procedure.</datacite:description>
+                <datacite:description descriptionType="Abstract">This research has been partially financed by the project: “Lonja de Impresión 3D para la Industria 4.0 y la Empresa Digital (LONJA3D)” funded by the Regional Government of Castile and Leon and the European Regional Development Fund (ERDF, FEDER) with grant VA049P17.</datacite:description>
+            </datacite:descriptions>
+            <datacite:language>eng</datacite:language>
+            <datacite:publisher>Universitat Politècnica de València</datacite:publisher>
+            <datacite:formats>
+                <datacite:format>application/pdf</datacite:format>
+                <datacite:format>716912</datacite:format>
+            </datacite:formats>
+            <datacite:fundingReferences>
+                <datacite:fundingReference>
+                    <datacite:funderName>Junta de Castilla y León</datacite:funderName>
+                    <datacite:funderIdentifier funderIdentifierType="Crossref Funder ID">http://dx.doi.org/10.13039/501100014180</datacite:funderIdentifier>
+                    <datacite:awardNumber>VA049P17</datacite:awardNumber>
+                </datacite:fundingReference>
+            </datacite:fundingReferences>
+            <datacite:creators>
+                <datacite:creator>
+                    <datacite:creatorName>De Antón, J.</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Senovilla, J.</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>González, J.M.</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Acebes, F.</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Pajares, J.</datacite:creatorName>
+                </datacite:creator>
+            </datacite:creators>
+            <datacite:contributors/>
+            <datacite:dates>
+                <datacite:date dateType="Issued">2020-07-18</datacite:date>
+            </datacite:dates>
+            <datacite:subjects>
+                <datacite:subject>Additive manufacturing</datacite:subject>
+                <datacite:subject>Production planning</datacite:subject>
+                <datacite:subject>Packing problem</datacite:subject>
+                <datacite:subject>Optimization</datacite:subject>
+                <datacite:subject>Nesting</datacite:subject>
+            </datacite:subjects>
+        </datacite:resource>
+        <oaf:identifier identifierType="DOI">10.4995/ijpme.2020.12944</oaf:identifier>
+        <oaf:identifier identifierType="Handle">10251/148537</oaf:identifier>
+        <dr:CobjCategory type="publication">0038</dr:CobjCategory>
+        <oaf:dateAccepted>2020-07-18</oaf:dateAccepted>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:language>eng</oaf:language>
+        <oaf:hostedBy name="RiuNet" id="opendoar____::1560"/>
+        <oaf:collectedFrom name="RiuNet" id="opendoar____::1560"/>
+    </metadata>
+</record>
