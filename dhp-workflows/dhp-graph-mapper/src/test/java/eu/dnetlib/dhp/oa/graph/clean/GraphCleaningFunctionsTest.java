@@ -268,8 +268,8 @@ public class GraphCleaningFunctionsTest {
 				.anyMatch(
 					s -> "0101 mathematics".equals(s.getValue()) &
 						ModelConstants.DNET_SUBJECT_FOS_CLASSID.equals(s.getQualifier().getClassid()) &
-						"sysimport:crosswalk:datasetarchive".equals(s.getDataInfo().getProvenanceaction().getClassid())
-				));
+						"sysimport:crosswalk:datasetarchive"
+							.equals(s.getDataInfo().getProvenanceaction().getClassid())));
 
 		assertTrue(
 			fos_subjects
