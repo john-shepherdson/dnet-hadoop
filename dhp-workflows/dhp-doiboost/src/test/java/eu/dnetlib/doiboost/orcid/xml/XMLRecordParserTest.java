@@ -108,4 +108,12 @@ public class XMLRecordParserTest {
 		work.setBase64CompressData(ArgumentApplicationParser.compressArgument(xml));
 		OrcidClientTest.logToFile(testPath, JsonWriter.create(work));
 	}
+
+	@Test
+	void testWorksSplit() throws Exception {
+		String xml = IOUtils
+			.toString(
+				this.getClass().getResourceAsStream("multiple_downloaded_works.xml"));
+		XMLRecordParser.splitWorks("0000-0001-7291-3210", xml.getBytes());
+	}
 }
