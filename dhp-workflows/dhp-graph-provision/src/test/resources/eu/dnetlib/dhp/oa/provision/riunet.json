@@ -1,0 +1,470 @@
+{
+    "collectedfrom": [
+      {
+        "key": "10|opendoar____::3a20f62a0af1aa152670bab3c602feed",
+        "value": "RiuNet",
+        "dataInfo": null
+      }
+    ],
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.9",
+      "inferenceprovenance": null,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:repository",
+        "classname": "sysimport:crosswalk:repository",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    },
+    "lastupdatetimestamp": 1662543204165,
+    "id": "50|od______1560::8f7a139735f493882bb0f4abceb6e200",
+    "originalId": [
+      "50|od______1560::8f7a139735f493882bb0f4abceb6e200",
+      "oai:riunet.upv.es:10251/178464"
+    ],
+    "pid": [
+      {
+        "value": "10251/178464",
+        "qualifier": {
+          "classid": "handle",
+          "classname": "Handle",
+          "schemeid": "dnet:pid_types",
+          "schemename": "dnet:pid_types"
+        },
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": null,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      }
+    ],
+    "dateofcollection": "2019-03-27T15:15:22.22Z",
+    "dateoftransformation": "2022-09-01T07:51:12.657Z",
+    "extraInfo": [],
+    "oaiprovenance": null,
+    "processingchargeamount": null,
+    "processingchargecurrency": null,
+    "measures": null,
+    "author": [
+      {
+        "fullname": "Nieto Nieto, Justo",
+        "name": "Justo",
+        "surname": "Nieto Nieto",
+        "rank": 1,
+        "pid": [],
+        "affiliation": []
+      }
+    ],
+    "resulttype": {
+      "classid": "publication",
+      "classname": "publication",
+      "schemeid": "dnet:result_typologies",
+      "schemename": "dnet:result_typologies"
+    },
+    "language": {
+      "classid": "spa",
+      "classname": "Spanish; Castilian",
+      "schemeid": "dnet:languages",
+      "schemename": "dnet:languages"
+    },
+    "country": [],
+    "subject": [
+      {
+        "value": "Justo Nieto Nieto (Discursos)",
+        "qualifier": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": null,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      },
+      {
+        "value": "Universitat Politècnica de València (UPV)",
+        "qualifier": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": null,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      },
+      {
+        "value": "Presentación inaugural",
+        "qualifier": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": null,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      },
+      {
+        "value": "Curso académico 1990-91",
+        "qualifier": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": null,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      },
+      {
+        "value": "Discurso inaugural",
+        "qualifier": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": null,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      },
+      {
+        "value": "Inaugural speech",
+        "qualifier": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": null,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      },
+      {
+        "value": "Inaugural presentation",
+        "qualifier": {
+          "classid": "",
+          "classname": "",
+          "schemeid": "",
+          "schemename": ""
+        },
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": null,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      }
+    ],
+    "title": [
+      {
+        "value": "Discurso de inauguración del curso academico 1990-1991 de la Universitat Politècnica de València",
+        "qualifier": {
+          "classid": "main title",
+          "classname": "main title",
+          "schemeid": "dnet:dataCite_title",
+          "schemename": "dnet:dataCite_title"
+        },
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": null,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      }
+    ],
+    "relevantdate": [
+      {
+        "value": "1991",
+        "qualifier": {
+          "classid": "Issued",
+          "classname": "Issued",
+          "schemeid": "dnet:dataCite_date",
+          "schemename": "dnet:dataCite_date"
+        },
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": null,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      }
+    ],
+    "description": [
+      {
+        "value": "[ES] Discurso de Justo Nieto en el acto de inauguración del curso académico 1990-1991",
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": null,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      },
+      {
+        "value": "[EN] Inaugural speech by Justo Nieto at the opening ceremony of the 1990-1991 academic year",
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": null,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      }
+    ],
+    "dateofacceptance": {
+      "value": "1991-01-01",
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.9",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:repository",
+          "classname": "sysimport:crosswalk:repository",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    "publisher": null,
+    "embargoenddate": null,
+    "source": [],
+    "fulltext": [],
+    "format": [
+      {
+        "value": "application/pdf",
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": null,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      },
+      {
+        "value": "5055377",
+        "dataInfo": {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": null,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "sysimport:crosswalk:repository",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      }
+    ],
+    "contributor": [],
+    "resourcetype": {
+      "classid": "lecture",
+      "classname": "lecture",
+      "schemeid": "dnet:dataCite_resource",
+      "schemename": "dnet:dataCite_resource"
+    },
+    "coverage": [],
+    "bestaccessright": {
+      "classid": "OPEN",
+      "classname": "Open Access",
+      "schemeid": "dnet:access_modes",
+      "schemename": "dnet:access_modes"
+    },
+    "context": [],
+    "externalReference": [],
+    "instance": [
+      {
+        "license": null,
+        "accessright": {
+          "classid": "OPEN",
+          "classname": "Open Access",
+          "schemeid": "dnet:access_modes",
+          "schemename": "dnet:access_modes",
+          "openAccessRoute": null
+        },
+        "instancetype": {
+          "classid": "0038",
+          "classname": "Other literature type",
+          "schemeid": "dnet:publication_resource",
+          "schemename": "dnet:publication_resource"
+        },
+        "hostedby": {
+          "key": "10|opendoar____::3a20f62a0af1aa152670bab3c602feed",
+          "value": "RiuNet",
+          "dataInfo": null
+        },
+        "url": null,
+        "distributionlocation": null,
+        "collectedfrom": {
+          "key": "10|opendoar____::3a20f62a0af1aa152670bab3c602feed",
+          "value": "RiuNet",
+          "dataInfo": null
+        },
+        "pid": [
+          {
+            "value": "10251/178464",
+            "qualifier": {
+              "classid": "handle",
+              "classname": "Handle",
+              "schemeid": "dnet:pid_types",
+              "schemename": "dnet:pid_types"
+            },
+            "dataInfo": {
+              "invisible": false,
+              "inferred": false,
+              "deletedbyinference": false,
+              "trust": "0.9",
+              "inferenceprovenance": null,
+              "provenanceaction": {
+                "classid": "sysimport:crosswalk:repository",
+                "classname": "sysimport:crosswalk:repository",
+                "schemeid": "dnet:provenanceActions",
+                "schemename": "dnet:provenanceActions"
+              }
+            }
+          }
+        ],
+        "alternateIdentifier": [],
+        "dateofacceptance": {
+          "value": "1991-01-01",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": false,
+            "deletedbyinference": false,
+            "trust": "0.9",
+            "inferenceprovenance": null,
+            "provenanceaction": {
+              "classid": "sysimport:crosswalk:repository",
+              "classname": "sysimport:crosswalk:repository",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        },
+        "processingchargeamount": null,
+        "processingchargecurrency": null,
+        "refereed": {
+          "classid": "UNKNOWN",
+          "classname": "Unknown",
+          "schemeid": "dnet:review_levels",
+          "schemename": "dnet:review_levels"
+        },
+        "measures": null
+      }
+]
+}
