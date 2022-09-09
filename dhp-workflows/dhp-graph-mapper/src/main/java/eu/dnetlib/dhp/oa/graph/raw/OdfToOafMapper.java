@@ -25,7 +25,8 @@ import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
-	public static final String HTTP_DX_DOI_PREIFX = "https://dx.doi.org/";
+	public static final String HTTP_DOI_PREIFX = "https://doi.org/";
+	public static final String HTTP_HANDLE_PREIFX = "https://hdl.handle.net/";
 
 	public OdfToOafMapper(final VocabularyGroup vocs, final boolean invisible, final boolean shouldHashId,
 		final boolean forceOrginalId) {
@@ -172,10 +173,17 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		}
 		for (final Object o : doc
 			.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='DOI']")) {
-			url.add(HTTP_DX_DOI_PREIFX + ((Node) o).getText().trim());
+			url.add(HTTP_DOI_PREIFX + ((Node) o).getText().trim());
 		}
 		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='DOI']")) {
-			url.add(HTTP_DX_DOI_PREIFX + ((Node) o).getText().trim());
+			url.add(HTTP_DOI_PREIFX + ((Node) o).getText().trim());
+		}
+		for (final Object o : doc
+				.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='Handle']")) {
+			url.add(HTTP_HANDLE_PREIFX + ((Node) o).getText().trim());
+		}
+		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='Handle']")) {
+			url.add(HTTP_HANDLE_PREIFX + ((Node) o).getText().trim());
 		}
 		if (!url.isEmpty()) {
 			instance.setUrl(new ArrayList<>());
