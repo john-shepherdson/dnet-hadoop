@@ -16,7 +16,11 @@
             <name>maxNumberOfPid</name>
             <description>filter relation with at least #maxNumberOfPid</description>
         </property>
-
+        <property>
+            <name>dumpCitations</name>
+            <value>false</value>
+            <description>should dump citation relations</description>
+        </property>
     </parameters>
 
     <start to="ImportDatasetEntities"/>
@@ -98,6 +102,7 @@
             <arg>--summaryPath</arg><arg>${targetPath}/provision/summaries</arg>
             <arg>--targetPath</arg><arg>${targetPath}/provision/scholix</arg>
             <arg>--relationPath</arg><arg>${targetPath}/relation</arg>
+            <arg>--dumpCitations</arg><arg>${dumpCitations}</arg>
         </spark>
         <ok to="DropJSONPath"/>
         <error to="Kill"/>
@@ -135,11 +140,21 @@
             <arg>--objectType</arg><arg>scholix</arg>
             <arg>--maxPidNumberFilter</arg><arg>maxNumberOfPid</arg>
         </spark>
+        <ok to="make_tar"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="make_tar">
+        <java>
+            <main-class>eu.dnetlib.dhp.common.MakeTarArchive</main-class>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
+            <arg>--hdfsPath</arg><arg>${targetPath}/tar</arg>
+            <arg>--sourcePath</arg><arg>${targetPath}/json</arg>
+        </java>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
 
-
-
     <end name="End"/>
+
 </workflow-app>

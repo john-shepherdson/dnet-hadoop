@@ -12,6 +12,8 @@ import org.apache.spark.sql.functions.count
 import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
 
+import scala.util.Try
+
 object SparkCreateScholix {
 
   def main(args: Array[String]): Unit = {
@@ -37,6 +39,8 @@ object SparkCreateScholix {
     log.info(s"summaryPath  -> $summaryPath")
     val targetPath = parser.get("targetPath")
     log.info(s"targetPath  -> $targetPath")
+    val dumpCitations = Try(parser.get("dumpCitations").toBoolean).getOrElse(false)
+    log.info(s"dumpCitations  -> $dumpCitations")
 
     implicit val relEncoder: Encoder[Relation] = Encoders.kryo[Relation]
     implicit val summaryEncoder: Encoder[ScholixSummary] = Encoders.kryo[ScholixSummary]
@@ -138,7 +142,7 @@ object SparkCreateScholix {
     val relatedEntitiesDS: Dataset[RelatedEntities] = spark.read
       .load(s"$targetPath/related_entities")
       .as[RelatedEntities]
-      .filter(r => r.relatedPublication > 0 || r.relatedDataset > 0)
+      .filter(r => dumpCitations || r.relatedPublication > 0 || r.relatedDataset > 0)
 
     relatedEntitiesDS
       .joinWith(summaryDS, relatedEntitiesDS("id").equalTo(summaryDS("_1")), "inner")
