@@ -281,7 +281,7 @@ object BioDBToOAF {
       d.setSubject(
         subjects
           .map(s =>
-            OafMapperUtils.structuredProperty(
+            OafMapperUtils.subject(
               s,
               SUBJ_CLASS,
               SUBJ_CLASS,

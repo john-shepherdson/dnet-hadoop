@@ -85,7 +85,7 @@ public class IndexRecordTransformerTest {
 	public void testRiunet() throws IOException, TransformerException {
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-				XmlConverterJob.schemaLocation);
+			XmlConverterJob.schemaLocation);
 
 		final Publication p = load("riunet.json", Publication.class);
 
@@ -94,7 +94,6 @@ public class IndexRecordTransformerTest {
 		assertNotNull(record);
 		testRecordTransformation(record);
 	}
-
 
 	@Test
 	public void testForEOSCFutureDataTransferPilot() throws IOException, TransformerException {
@@ -128,8 +127,6 @@ public class IndexRecordTransformerTest {
 			.toString(getClass().getResourceAsStream("eosc-future/b2share-plot-related-orp.xml"));
 		testRecordTransformation(record);
 	}
-
-
 
 	@Test
 	void testDoiUrlNormalization() throws MalformedURLException {

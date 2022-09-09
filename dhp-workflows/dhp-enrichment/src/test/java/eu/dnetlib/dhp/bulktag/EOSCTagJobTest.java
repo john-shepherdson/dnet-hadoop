@@ -290,7 +290,7 @@ public class EOSCTagJobTest {
 					.stream()
 					.anyMatch(s -> s.getCode().equals("EOSC::Jupyter Notebook")));
 
-		List<StructuredProperty> subjects = tmp
+		List<Subject> subjects = tmp
 			.filter(sw -> sw.getId().equals("50|od______1582::6e7a9b21a2feef45673890432af34244"))
 			.collect()
 			.get(0)

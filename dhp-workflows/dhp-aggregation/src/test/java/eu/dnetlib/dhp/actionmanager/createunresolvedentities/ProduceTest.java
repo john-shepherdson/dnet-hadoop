@@ -72,7 +72,7 @@ public class ProduceTest {
 
 		JavaRDD<Result> tmp = getResultJavaRDD();
 
-		List<StructuredProperty> sbjs = tmp
+		List<Subject> sbjs = tmp
 			.filter(row -> row.getSubject() != null && row.getSubject().size() > 0)
 			.flatMap(row -> row.getSubject().iterator())
 			.collect();
@@ -169,7 +169,7 @@ public class ProduceTest {
 					.getSubject()
 					.size());
 
-		List<StructuredProperty> sbjs = tmp
+		List<Subject> sbjs = tmp
 			.filter(row -> row.getId().equals(doi))
 			.flatMap(row -> row.getSubject().iterator())
 			.collect();
@@ -396,7 +396,7 @@ public class ProduceTest {
 					.getSubject()
 					.size());
 
-		List<StructuredProperty> sbjs = tmp
+		List<Subject> sbjs = tmp
 			.filter(row -> row.getId().equals(doi))
 			.flatMap(row -> row.getSubject().iterator())
 			.collect();
@@ -508,7 +508,7 @@ public class ProduceTest {
 					.getSubject()
 					.size());
 
-		List<StructuredProperty> sbjs = tmp
+		List<Subject> sbjs = tmp
 			.filter(row -> row.getId().equals(doi))
 			.flatMap(row -> row.getSubject().iterator())
 			.collect();
@@ -537,7 +537,7 @@ public class ProduceTest {
 
 		JavaRDD<Result> tmp = getResultJavaRDDPlusSDG();
 
-		List<StructuredProperty> sbjs_sdg = tmp
+		List<Subject> sbjs_sdg = tmp
 			.filter(row -> row.getSubject() != null && row.getSubject().size() > 0)
 			.flatMap(row -> row.getSubject().iterator())
 			.filter(sbj -> sbj.getQualifier().getClassid().equals(Constants.SDG_CLASS_ID))

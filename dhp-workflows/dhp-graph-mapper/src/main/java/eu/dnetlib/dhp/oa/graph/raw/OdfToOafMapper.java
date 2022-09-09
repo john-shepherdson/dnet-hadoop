@@ -179,7 +179,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 			url.add(HTTP_DOI_PREIFX + ((Node) o).getText().trim());
 		}
 		for (final Object o : doc
-				.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='Handle']")) {
+			.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='Handle']")) {
 			url.add(HTTP_HANDLE_PREIFX + ((Node) o).getText().trim());
 		}
 		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='Handle']")) {
@@ -257,8 +257,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<StructuredProperty> prepareSubjects(final Document doc, final DataInfo info) {
-		return prepareListStructProps(doc, "//*[local-name()='subject']", info);
+	protected List<Subject> prepareSubjects(final Document doc, final DataInfo info) {
+		return prepareSubjectList(doc, "//*[local-name()='subject']", info);
 	}
 
 	@Override

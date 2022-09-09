@@ -391,6 +391,28 @@ object DoiBoostMappingUtil {
     di
   }
 
+  def createSubject(value: String, classId: String, schemeId: String): Subject = {
+    val s = new Subject
+    s.setQualifier(OafMapperUtils.qualifier(classId, classId, schemeId, schemeId))
+    s.setValue(value)
+    s
+
+  }
+
+  def createSubject(
+    value: String,
+    classId: String,
+    className: String,
+    schemeId: String,
+    schemeName: String
+  ): Subject = {
+    val s = new Subject
+    s.setQualifier(OafMapperUtils.qualifier(classId, className, schemeId, schemeName))
+    s.setValue(value)
+    s
+
+  }
+
   def createSP(
     value: String,
     classId: String,

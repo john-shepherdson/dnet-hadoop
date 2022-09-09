@@ -3,16 +3,15 @@ package eu.dnetlib.dhp.oa.graph.clean;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableConsumer;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.AccessRight;
-import eu.dnetlib.dhp.schema.oaf.Country;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Object>> implements Serializable {
 
@@ -27,7 +26,34 @@ public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Obje
 		mapping.put(AccessRight.class, o -> cleanQualifier(vocabularies, (AccessRight) o));
 		mapping.put(Country.class, o -> cleanCountry(vocabularies, (Country) o));
 		mapping.put(Relation.class, o -> cleanRelation(vocabularies, (Relation) o));
+		mapping.put(Subject.class, o -> cleanSubject(vocabularies, (Subject) o));
 		return mapping;
+	}
+
+	private static void cleanSubject(VocabularyGroup vocabularies, Subject subject) {
+		if (cleanSubjectForVocabulary(ModelConstants.DNET_SUBJECT_FOS_CLASSID, vocabularies, subject)) {
+			return;
+		} else {
+			// TODO cleaning based on different subject vocabs can be added here
+		}
+	}
+
+	private static boolean cleanSubjectForVocabulary(String vocabularyId, VocabularyGroup vocabularies,
+		Subject subject) {
+		AtomicReference<Boolean> modified = new AtomicReference<>(false);
+		vocabularies.find(vocabularyId).ifPresent(vocabulary -> {
+			if (!ModelConstants.DNET_SUBJECT_KEYWORD.equalsIgnoreCase(subject.getQualifier().getClassid())) {
+				return;
+			}
+			Qualifier newValue = vocabulary.lookup(subject.getValue());
+			if (!ModelConstants.UNKNOWN.equals(newValue.getClassid())) {
+				subject.setValue(newValue.getClassid());
+				subject.getQualifier().setClassid(vocabularyId);
+				subject.getQualifier().setClassname(vocabulary.getName());
+				modified.set(true);
+			}
+		});
+		return modified.get();
 	}
 
 	private static void cleanRelation(VocabularyGroup vocabularies, Relation r) {
