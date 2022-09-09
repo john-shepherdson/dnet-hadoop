@@ -942,6 +942,9 @@ class MappersTest {
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");
+		final Publication p = (Publication) list.get(0);
+		assertNotNull(p.getInstance().get(0).getUrl().get(0));
+
 	}
 
 	private void assertValidId(final String id) {
