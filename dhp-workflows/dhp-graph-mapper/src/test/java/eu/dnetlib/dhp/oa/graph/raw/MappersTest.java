@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import kotlin.jvm.Throws;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.DocumentException;
@@ -924,6 +925,17 @@ class MappersTest {
 //		assertValidId(p.getCollectedfrom().get(0).getKey());
 //		System.out.println(p.getTitle().get(0).getValue());
 //		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+	}
+
+	@Test
+	void testNotWellFormed() throws IOException, DocumentException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_notwellformed.xml")));
+		final DocumentException generalEx = new DocumentException();
+
+		DocumentException exception = assertThrows(DocumentException.class, () -> {
+			new OafToOafMapper(vocs, false, true).processMdRecord(xml);
+		});
 	}
 
 	private void assertValidId(final String id) {
