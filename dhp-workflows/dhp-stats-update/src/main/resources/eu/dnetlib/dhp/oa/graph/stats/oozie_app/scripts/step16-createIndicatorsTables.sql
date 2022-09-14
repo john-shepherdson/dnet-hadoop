@@ -76,11 +76,11 @@ compute stats indi_result_with_orcid;
 
 ---- Sprint 3 ----
 create table indi_funded_result_with_fundref stored as parquet as
-select distinct r.id, coalesce(fundref, 0) as fundref
+select distinct r.result as id, coalesce(fundref, 0) as fundref
 from project_results r
-         left outer join (select distinct id, 1 as fundref from project_results
+         left outer join (select distinct result, 1 as fundref from project_results
                           where provenance='Harvested') tmp
-                         on r.id= tmp.id;
+                         on r.result= tmp.result;
 
 compute stats indi_funded_result_with_fundref;
 
