@@ -929,7 +929,7 @@ class MappersTest {
 	void testNotWellFormed() throws IOException, DocumentException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_notwellformed.xml")));
-		assertEquals(0, new OafToOafMapper(vocs, false, true).processMdRecord(xml).size());
+		assertEquals(null, new OafToOafMapper(vocs, false, true).processMdRecord(xml));
 
 	}
 
