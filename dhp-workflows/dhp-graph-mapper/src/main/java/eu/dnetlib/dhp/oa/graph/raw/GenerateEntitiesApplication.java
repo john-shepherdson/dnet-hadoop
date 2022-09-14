@@ -16,6 +16,9 @@ import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.rdd.RDD;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
@@ -76,6 +79,9 @@ public class GenerateEntitiesApplication {
 		final String targetPath = parser.get("targetPath");
 		log.info("targetPath: {}", targetPath);
 
+		final String invalidPath = parser.get("invalidPath");
+		log.info("invalidPath: {}", invalidPath);
+
 		final String isLookupUrl = parser.get("isLookupUrl");
 		log.info("isLookupUrl: {}", isLookupUrl);
 
@@ -97,7 +103,8 @@ public class GenerateEntitiesApplication {
 		final SparkConf conf = new SparkConf();
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 			HdfsSupport.remove(targetPath, spark.sparkContext().hadoopConfiguration());
-			generateEntities(spark, vocs, sourcePaths, targetPath, shouldHashId, mode);
+			HdfsSupport.remove(invalidPath, spark.sparkContext().hadoopConfiguration());
+			generateEntities(spark, vocs, sourcePaths, targetPath, invalidPath, shouldHashId, mode);
 		});
 	}
 
@@ -106,6 +113,7 @@ public class GenerateEntitiesApplication {
 		final VocabularyGroup vocs,
 		final String sourcePaths,
 		final String targetPath,
+		final String invalidPath,
 		final boolean shouldHashId,
 		final Mode mode) {
 
@@ -121,6 +129,19 @@ public class GenerateEntitiesApplication {
 		JavaRDD<Oaf> inputRdd = sc.emptyRDD();
 
 		for (final String sp : existingSourcePaths) {
+			RDD<String> invalidRecords = sc
+				.sequenceFile(sp, Text.class, Text.class)
+				.map(k -> new Tuple2<>(k._1().toString(), k._2().toString()))
+				.map(k -> tryApplyMapping(k._1(), k._2(), shouldHashId, vocs))
+				.filter(Objects::nonNull)
+				.rdd();
+			spark
+				.createDataset(invalidRecords, Encoders.STRING())
+				.write()
+				.mode(SaveMode.Append)
+				.option("compression", "gzip")
+				.text(invalidPath);
+
 			inputRdd = inputRdd
 				.union(
 					sc
@@ -159,7 +180,7 @@ public class GenerateEntitiesApplication {
 		final String id,
 		final String s,
 		final boolean shouldHashId,
-		final VocabularyGroup vocs) throws DocumentException {
+		final VocabularyGroup vocs) {
 		final String type = StringUtils.substringAfter(id, ":");
 
 		switch (type.toLowerCase()) {
@@ -194,6 +215,18 @@ public class GenerateEntitiesApplication {
 			default:
 				throw new IllegalArgumentException("type not managed: " + type.toLowerCase());
 		}
+	}
+
+	private static String tryApplyMapping(
+		final String id,
+		final String s,
+		final boolean shouldHashId,
+		final VocabularyGroup vocs) {
+
+		if (convertToListOaf(id, s, shouldHashId, vocs).isEmpty()) {
+			return s;
+		}
+		return null;
 	}
 
 	private static Oaf convertFromJson(final String s, final Class<? extends Oaf> clazz) {

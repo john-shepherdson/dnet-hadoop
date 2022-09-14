@@ -18,6 +18,12 @@
 		"paramRequired": true
 	},
 	{
+		"paramName": "i",
+		"paramLongName": "invalidPath",
+		"paramDescription": "the path of the invalid records file",
+		"paramRequired": false
+	},
+	{
 		"paramName": "isu",
 		"paramLongName": "isLookupUrl",
 		"paramDescription": "the url of the ISLookupService",

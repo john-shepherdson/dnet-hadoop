@@ -468,6 +468,7 @@
             </spark-opts>
             <arg>--sourcePaths</arg><arg>${contentPath}/db_claims,${contentPath}/oaf_claims,${contentPath}/odf_claims</arg>
             <arg>--targetPath</arg><arg>${workingDir}/entities_claim</arg>
+            <arg>--invalidPath</arg><arg>${workingDir}/invalid_records_claim</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--shouldHashId</arg><arg>${shouldHashId}</arg>
             <arg>--mode</arg><arg>claim</arg>
@@ -517,6 +518,7 @@
             </spark-opts>
             <arg>--sourcePaths</arg><arg>${contentPath}/db_openaire,${contentPath}/db_openorgs,${contentPath}/oaf_records,${contentPath}/odf_records,${contentPath}/oaf_records_hdfs,${contentPath}/odf_records_hdfs,${contentPath}/oaf_records_invisible</arg>
             <arg>--targetPath</arg><arg>${workingDir}/entities</arg>
+            <arg>--invalidPath</arg><arg>${workingDir}/invalid_records</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--shouldHashId</arg><arg>${shouldHashId}</arg>
         </spark>
