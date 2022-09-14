@@ -126,8 +126,6 @@ public class GenerateEntitiesApplication {
 		log.info("Generate entities from files:");
 		existingSourcePaths.forEach(log::info);
 
-		JavaRDD<Oaf> inputRdd = sc.emptyRDD();
-
 		for (final String sp : existingSourcePaths) {
 			RDD<String> invalidRecords = sc
 				.sequenceFile(sp, Text.class, Text.class)
@@ -141,7 +139,11 @@ public class GenerateEntitiesApplication {
 				.mode(SaveMode.Append)
 				.option("compression", "gzip")
 				.text(invalidPath);
+		}
 
+		JavaRDD<Oaf> inputRdd = sc.emptyRDD();
+
+		for (final String sp : existingSourcePaths) {
 			inputRdd = inputRdd
 				.union(
 					sc
@@ -223,7 +225,7 @@ public class GenerateEntitiesApplication {
 		final boolean shouldHashId,
 		final VocabularyGroup vocs) {
 
-		if (convertToListOaf(id, s, shouldHashId, vocs).isEmpty()) {
+		if (Objects.isNull(convertToListOaf(id, s, shouldHashId, vocs))) {
 			return s;
 		}
 		return null;
