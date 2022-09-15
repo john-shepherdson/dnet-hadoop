@@ -150,8 +150,8 @@ public class GenerateEntitiesApplication {
 						.sequenceFile(sp, Text.class, Text.class)
 						.map(k -> new Tuple2<>(k._1().toString(), k._2().toString()))
 						.map(k -> convertToListOaf(k._1(), k._2(), shouldHashId, vocs))
-						.filter(Objects::nonNull)
-						.flatMap(List::iterator));
+						.flatMap(List::iterator)
+						.filter(Objects::nonNull));
 		}
 
 		switch (mode) {
@@ -225,7 +225,8 @@ public class GenerateEntitiesApplication {
 		final boolean shouldHashId,
 		final VocabularyGroup vocs) {
 
-		if (Objects.isNull(convertToListOaf(id, s, shouldHashId, vocs))) {
+		final List<Oaf> oaf = convertToListOaf(id, s, shouldHashId, vocs);
+		if (Optional.ofNullable(oaf).map(List::isEmpty).orElse(false)) {
 			return s;
 		}
 		return null;
@@ -235,8 +236,7 @@ public class GenerateEntitiesApplication {
 		try {
 			return OBJECT_MAPPER.readValue(s, clazz);
 		} catch (final Exception e) {
-			log.error("Error parsing object of class: {}", clazz);
-			log.error(s);
+			log.error("Error parsing object of class: {}:\n{}", clazz, s);
 			throw new IllegalArgumentException(e);
 		}
 	}

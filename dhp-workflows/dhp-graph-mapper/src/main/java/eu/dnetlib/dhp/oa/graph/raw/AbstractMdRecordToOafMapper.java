@@ -143,7 +143,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			return createOafs(doc, type, instances, collectedFrom, info, lastUpdateTimestamp);
 		} catch (DocumentException e) {
 			log.error("Error with record:\n" + xml);
-			return null;
+			return Lists.newArrayList();
 		}
 	}
 

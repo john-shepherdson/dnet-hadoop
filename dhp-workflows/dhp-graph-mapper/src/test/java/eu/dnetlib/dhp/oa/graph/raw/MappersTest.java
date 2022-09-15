@@ -926,11 +926,12 @@ class MappersTest {
 	}
 
 	@Test
-	void testNotWellFormed() throws IOException, DocumentException {
+	void testNotWellFormed() throws IOException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_notwellformed.xml")));
-		assertEquals(null, new OafToOafMapper(vocs, false, true).processMdRecord(xml));
-
+		final List<Oaf> actual = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
+		assertNotNull(actual);
+		assertTrue(actual.isEmpty());
 	}
 
 	private void assertValidId(final String id) {
