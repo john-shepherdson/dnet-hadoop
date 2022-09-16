@@ -179,7 +179,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 			url.add(HTTP_DOI_PREIFX + ((Node) o).getText().trim());
 		}
 		for (final Object o : doc
-				.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='Handle']")) {
+			.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='Handle']")) {
 			url.add(HTTP_HANDLE_PREIFX + ((Node) o).getText().trim());
 		}
 		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='Handle']")) {
