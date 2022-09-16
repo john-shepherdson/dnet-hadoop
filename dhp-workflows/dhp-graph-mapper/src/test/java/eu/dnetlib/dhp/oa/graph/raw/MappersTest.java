@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import kotlin.jvm.Throws;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.DocumentException;
@@ -928,7 +927,16 @@ class MappersTest {
 	}
 
 	@Test
-	void testNotWellFormed() throws IOException, DocumentException {
+	void testROHub2() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("rohub-modified.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+	}
+
+	@Test
+	void testNotWellFormed() throws IOException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_notwellformed.xml")));
 		final DocumentException generalEx = new DocumentException();
