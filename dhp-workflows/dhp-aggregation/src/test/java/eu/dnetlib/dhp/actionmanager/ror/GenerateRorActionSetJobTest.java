@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.actionmanager.ror;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.FileInputStream;
 import java.util.List;
@@ -38,25 +39,20 @@ class GenerateRorActionSetJobTest {
 			.readValue(IOUtils.toString(getClass().getResourceAsStream("ror_org.json")), RorOrganization.class);
 		final List<AtomicAction<? extends Oaf>> aas = GenerateRorActionSetJob.convertRorOrg(r);
 
-		Assertions.assertEquals(3, aas.size());
+		Assertions.assertEquals(1, aas.size());
 		assertEquals(Organization.class, aas.get(0).getClazz());
-		assertEquals(Relation.class, aas.get(1).getClazz());
-		assertEquals(Relation.class, aas.get(2).getClazz());
 
 		final Organization o = (Organization) aas.get(0).getPayload();
-		final Relation r1 = (Relation) aas.get(1).getPayload();
-		final Relation r2 = (Relation) aas.get(2).getPayload();
 
-		assertEquals(o.getId(), r1.getSource());
-		assertEquals(r1.getSource(), r2.getTarget());
-		assertEquals(r2.getSource(), r1.getTarget());
-		assertEquals(ModelConstants.IS_PARENT_OF, r1.getRelClass());
-		assertEquals(ModelConstants.IS_CHILD_OF, r2.getRelClass());
+		assertNotNull(o);
+
+		assertNotNull(o.getCountry());
+		assertEquals("AU", o.getCountry().getClassid());
+
+		assertNotNull(o.getLegalname());
+		assertEquals("Mount Stromlo Observatory", o.getLegalname().getValue());
 
 		System.out.println(mapper.writeValueAsString(o));
-		System.out.println(mapper.writeValueAsString(r1));
-		System.out.println(mapper.writeValueAsString(r2));
-
 	}
 
 	@Test

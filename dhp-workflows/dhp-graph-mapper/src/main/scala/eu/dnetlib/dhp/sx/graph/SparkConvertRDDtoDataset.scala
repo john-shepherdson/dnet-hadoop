@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.oaf.{OtherResearchProduct, Publication, Relation, Result, Software, Dataset => OafDataset}
 import org.apache.commons.io.IOUtils
+import org.apache.commons.lang3.StringUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}
 import org.slf4j.{Logger, LoggerFactory}
+
 import scala.collection.JavaConverters._
 
 object SparkConvertRDDtoDataset {
@@ -33,6 +35,9 @@ object SparkConvertRDDtoDataset {
     log.info(s"sourcePath  -> $sourcePath")
     val t = parser.get("targetPath")
     log.info(s"targetPath  -> $t")
+
+    val filterRelation = parser.get("filterRelation")
+    log.info(s"filterRelation  -> $filterRelation")
 
     val entityPath = s"$t/entities"
     val relPath = s"$t/relation"
@@ -94,28 +99,44 @@ object SparkConvertRDDtoDataset {
 
     log.info("Converting Relation")
 
-    val relationSemanticFilter = List(
-//      "cites",
-//      "iscitedby",
-      "merges",
-      "ismergedin",
-      "HasAmongTopNSimilarDocuments",
-      "IsAmongTopNSimilarDocuments"
-    )
+    if (filterRelation != null && StringUtils.isNoneBlank(filterRelation)) {
 
-    val rddRelation = spark.sparkContext
-      .textFile(s"$sourcePath/relation")
-      .map(s => mapper.readValue(s, classOf[Relation]))
-      .filter(r => r.getDataInfo != null && r.getDataInfo.getDeletedbyinference == false)
-      .filter(r => r.getSource.startsWith("50") && r.getTarget.startsWith("50"))
-      //filter OpenCitations relations
-      .filter(r =>
-        r.getCollectedfrom != null && r.getCollectedfrom.size() > 0 && !r.getCollectedfrom.asScala.exists(k =>
-          "opencitations".equalsIgnoreCase(k.getValue)
+      val rddRelation = spark.sparkContext
+        .textFile(s"$sourcePath/relation")
+        .map(s => mapper.readValue(s, classOf[Relation]))
+        .filter(r => r.getDataInfo != null && r.getDataInfo.getDeletedbyinference == false)
+        .filter(r => r.getSource.startsWith("50") && r.getTarget.startsWith("50"))
+        //filter OpenCitations relations
+        .filter(r =>
+          r.getCollectedfrom != null && r.getCollectedfrom.size() > 0 && !r.getCollectedfrom.asScala.exists(k =>
+            "opencitations".equalsIgnoreCase(k.getValue)
+          )
         )
+        .filter(r => r.getSubRelType != null && r.getSubRelType.equalsIgnoreCase(filterRelation))
+      spark.createDataset(rddRelation).as[Relation].write.mode(SaveMode.Overwrite).save(s"$relPath")
+    } else {
+
+      val relationSemanticFilter = List(
+        "merges",
+        "ismergedin",
+        "HasAmongTopNSimilarDocuments",
+        "IsAmongTopNSimilarDocuments"
       )
-      .filter(r => !relationSemanticFilter.exists(k => k.equalsIgnoreCase(r.getRelClass)))
-    spark.createDataset(rddRelation).as[Relation].write.mode(SaveMode.Overwrite).save(s"$relPath")
+
+      val rddRelation = spark.sparkContext
+        .textFile(s"$sourcePath/relation")
+        .map(s => mapper.readValue(s, classOf[Relation]))
+        .filter(r => r.getDataInfo != null && r.getDataInfo.getDeletedbyinference == false)
+        .filter(r => r.getSource.startsWith("50") && r.getTarget.startsWith("50"))
+        //filter OpenCitations relations
+        .filter(r =>
+          r.getCollectedfrom != null && r.getCollectedfrom.size() > 0 && !r.getCollectedfrom.asScala.exists(k =>
+            "opencitations".equalsIgnoreCase(k.getValue)
+          )
+        )
+        .filter(r => !relationSemanticFilter.exists(k => k.equalsIgnoreCase(r.getRelClass)))
+      spark.createDataset(rddRelation).as[Relation].write.mode(SaveMode.Overwrite).save(s"$relPath")
+    }
 
   }
 }
