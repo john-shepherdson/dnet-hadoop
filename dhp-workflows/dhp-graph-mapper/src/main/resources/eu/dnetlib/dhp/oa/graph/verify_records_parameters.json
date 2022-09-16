@@ -12,27 +12,15 @@
 		"paramRequired": true
 	},
 	{
-		"paramName": "t",
-		"paramLongName": "targetPath",
-		"paramDescription": "the path of the target file",
-		"paramRequired": true
+		"paramName": "i",
+		"paramLongName": "invalidPath",
+		"paramDescription": "the path of the invalid records file",
+		"paramRequired": false
 	},
 	{
 		"paramName": "isu",
 		"paramLongName": "isLookupUrl",
 		"paramDescription": "the url of the ISLookupService",
 		"paramRequired": true
-	},
-	{
-		"paramName": "shi",
-		"paramLongName": "shouldHashId",
-		"paramDescription": "should ids be hashed?",
-		"paramRequired": false
-	},
-	{
-		"paramName": "m",
-		"paramLongName": "mode",
-		"paramDescription": "operation mode",
-		"paramRequired": false
 	}
 ]

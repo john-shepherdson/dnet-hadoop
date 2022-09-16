@@ -446,9 +446,33 @@
     <join name="wait_import" to="fork_generate_entities"/>
 
     <fork name="fork_generate_entities">
-        <path start="GenerateEntities_claim"/>
-        <path start="GenerateEntities"/>
+        <path start="VerifyRecords_claim"/>
+        <path start="VerifyRecords"/>
     </fork>
+
+    <action name="VerifyRecords_claim">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>VerifyRecords_claim</name>
+            <class>eu.dnetlib.dhp.oa.graph.raw.VerifyRecordsApplication</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePaths</arg><arg>${contentPath}/db_claims,${contentPath}/oaf_claims,${contentPath}/odf_claims</arg>
+            <arg>--invalidPath</arg><arg>${workingDir}/invalid_records_claim</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+        </spark>
+        <ok to="GenerateEntities_claim"/>
+        <error to="Kill"/>
+    </action>
 
     <action name="GenerateEntities_claim">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -468,7 +492,6 @@
             </spark-opts>
             <arg>--sourcePaths</arg><arg>${contentPath}/db_claims,${contentPath}/oaf_claims,${contentPath}/odf_claims</arg>
             <arg>--targetPath</arg><arg>${workingDir}/entities_claim</arg>
-            <arg>--invalidPath</arg><arg>${workingDir}/invalid_records_claim</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--shouldHashId</arg><arg>${shouldHashId}</arg>
             <arg>--mode</arg><arg>claim</arg>
@@ -500,6 +523,30 @@
         <error to="Kill"/>
     </action>
 
+    <action name="VerifyRecords">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>VerifyRecords</name>
+            <class>eu.dnetlib.dhp.oa.graph.raw.VerifyRecordsApplication</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePaths</arg><arg>${contentPath}/db_openaire,${contentPath}/db_openorgs,${contentPath}/oaf_records,${contentPath}/odf_records,${contentPath}/oaf_records_hdfs,${contentPath}/odf_records_hdfs,${contentPath}/oaf_records_invisible</arg>
+            <arg>--invalidPath</arg><arg>${workingDir}/invalid_records</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+        </spark>
+        <ok to="GenerateEntities"/>
+        <error to="Kill"/>
+    </action>
+
     <action name="GenerateEntities">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -518,7 +565,6 @@
             </spark-opts>
             <arg>--sourcePaths</arg><arg>${contentPath}/db_openaire,${contentPath}/db_openorgs,${contentPath}/oaf_records,${contentPath}/odf_records,${contentPath}/oaf_records_hdfs,${contentPath}/odf_records_hdfs,${contentPath}/oaf_records_invisible</arg>
             <arg>--targetPath</arg><arg>${workingDir}/entities</arg>
-            <arg>--invalidPath</arg><arg>${workingDir}/invalid_records</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--shouldHashId</arg><arg>${shouldHashId}</arg>
         </spark>

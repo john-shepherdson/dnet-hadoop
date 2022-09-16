@@ -79,9 +79,6 @@ public class GenerateEntitiesApplication {
 		final String targetPath = parser.get("targetPath");
 		log.info("targetPath: {}", targetPath);
 
-		final String invalidPath = parser.get("invalidPath");
-		log.info("invalidPath: {}", invalidPath);
-
 		final String isLookupUrl = parser.get("isLookupUrl");
 		log.info("isLookupUrl: {}", isLookupUrl);
 
@@ -103,8 +100,7 @@ public class GenerateEntitiesApplication {
 		final SparkConf conf = new SparkConf();
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 			HdfsSupport.remove(targetPath, spark.sparkContext().hadoopConfiguration());
-			HdfsSupport.remove(invalidPath, spark.sparkContext().hadoopConfiguration());
-			generateEntities(spark, vocs, sourcePaths, targetPath, invalidPath, shouldHashId, mode);
+			generateEntities(spark, vocs, sourcePaths, targetPath, shouldHashId, mode);
 		});
 	}
 
@@ -113,7 +109,6 @@ public class GenerateEntitiesApplication {
 		final VocabularyGroup vocs,
 		final String sourcePaths,
 		final String targetPath,
-		final String invalidPath,
 		final boolean shouldHashId,
 		final Mode mode) {
 
@@ -125,21 +120,6 @@ public class GenerateEntitiesApplication {
 
 		log.info("Generate entities from files:");
 		existingSourcePaths.forEach(log::info);
-
-		for (final String sp : existingSourcePaths) {
-			RDD<String> invalidRecords = sc
-				.sequenceFile(sp, Text.class, Text.class)
-				.map(k -> new Tuple2<>(k._1().toString(), k._2().toString()))
-				.map(k -> tryApplyMapping(k._1(), k._2(), shouldHashId, vocs))
-				.filter(Objects::nonNull)
-				.rdd();
-			spark
-				.createDataset(invalidRecords, Encoders.STRING())
-				.write()
-				.mode(SaveMode.Append)
-				.option("compression", "gzip")
-				.text(invalidPath);
-		}
 
 		JavaRDD<Oaf> inputRdd = sc.emptyRDD();
 
@@ -178,7 +158,7 @@ public class GenerateEntitiesApplication {
 			.saveAsTextFile(targetPath, GzipCodec.class);
 	}
 
-	private static List<Oaf> convertToListOaf(
+	public static List<Oaf> convertToListOaf(
 		final String id,
 		final String s,
 		final boolean shouldHashId,
@@ -217,19 +197,6 @@ public class GenerateEntitiesApplication {
 			default:
 				throw new IllegalArgumentException("type not managed: " + type.toLowerCase());
 		}
-	}
-
-	private static String tryApplyMapping(
-		final String id,
-		final String s,
-		final boolean shouldHashId,
-		final VocabularyGroup vocs) {
-
-		final List<Oaf> oaf = convertToListOaf(id, s, shouldHashId, vocs);
-		if (Optional.ofNullable(oaf).map(List::isEmpty).orElse(false)) {
-			return s;
-		}
-		return null;
 	}
 
 	private static Oaf convertFromJson(final String s, final Class<? extends Oaf> clazz) {
