@@ -84,87 +84,87 @@ from project_results r
 
 compute stats indi_funded_result_with_fundref;
 
-create table indi_result_org_collab stored as parquet as
-select o1.organization org1, o2.organization org2, count(distinct o1.id) as collaborations
-from result_organization as o1
-         join result_organization as o2 on o1.id=o2.id and o1.organization!=o2.organization
-group by o1.organization, o2.organization;
-
-compute stats indi_result_org_collab;
-
-create table indi_result_org_country_collab stored as parquet as
-    with tmp as
-        (select o.id as id, o.country , ro.id as result,r.type  from organization o
-        join result_organization ro on o.id=ro.organization
-        join result r on r.id=ro.id where o.country <> 'UNKNOWN')
-select o1.id org1,o2.country country2, o1.type, count(distinct o1.result) as collaborations
-from tmp as o1
-         join tmp as o2 on o1.result=o2.result
-where o1.id<>o2.id and o1.country<>o2.country
-group by o1.id, o1.type,o2.country;
-
-compute stats indi_result_org_country_collab;
-
-create table indi_result_org_collab stored as parquet as
-    with tmp as
-        (select o.id, ro.id as result,r.type  from organization o
-        join result_organization ro on o.id=ro.organization
-        join result r on r.id=ro.id)
-select o1.id org1,o2.id org2, o1.type, count(distinct o1.result) as collaborations
-from tmp as o1
-         join tmp as o2 on o1.result=o2.result
-where o1.id<>o2.id
-group by o1.id, o2.id, o1.type;
-
-compute stats indi_result_org_collab;
-
-create table indi_project_collab_org stored as parquet as
-select o1.id org1,o2.id org2, count(distinct o1.project) as collaborations
-from organization_projects as o1
-         join organization_projects as o2 on o1.project=o2.project
-where o1.id!=o2.id
-group by o1.id, o2.id;
-
-compute stats indi_project_collab_org;
-
-create table indi_project_collab_org_country stored as parquet as
-    with tmp as
-        (select o.id organization, o.country , ro.project as project  from organization o
-        join organization_projects ro on o.id=ro.id
-        and o.country <> 'UNKNOWN')
-select o1.organization org1,o2.country country2, count(distinct o1.project) as collaborations
-from tmp as o1
-         join tmp as o2 on o1.project=o2.project
-where o1.organization<>o2.organization and o1.country<>o2.country
-group by o1.organization, o2.country;
-
-compute stats indi_project_collab_org_country;
-
-create table indi_funder_country_collab stored as parquet as
-    with tmp as (select funder, project, country from organization_projects op
-        join organization o on o.id=op.id
-        join project p on p.id=op.project
-        where country <> 'UNKNOWN')
-select f1.funder, f1.country as country1, f2.country as country2, count(distinct f1.project) as collaborations
-from tmp as f1
-         join tmp as f2 on f1.project=f2.project
-where f1.country<>f2.country
-group by f1.funder, f2.country, f1.country;
-
-compute stats indi_funder_country_collab;
-
-create table indi_result_country_collab stored as parquet as
-    with tmp as
-        (select country, ro.id as result,r.type  from organization o
-        join result_organization ro on o.id=ro.organization
-        join result r on r.id=ro.id where country <> 'UNKNOWN')
-select o1.country country1, o2.country country2, o1.type, count(distinct o1.result) as collaborations
-from tmp as o1
-         join tmp as o2 on o1.result=o2.result
-where o1.country<>o2.country
-group by o1.country, o2.country, o1.type;
-
-compute stats indi_result_country_collab;
+-- create table indi_result_org_collab stored as parquet as
+-- select o1.organization org1, o2.organization org2, count(distinct o1.id) as collaborations
+-- from result_organization as o1
+--          join result_organization as o2 on o1.id=o2.id and o1.organization!=o2.organization
+-- group by o1.organization, o2.organization;
+--
+-- compute stats indi_result_org_collab;
+--
+-- create table indi_result_org_country_collab stored as parquet as
+--     with tmp as
+--         (select o.id as id, o.country , ro.id as result,r.type  from organization o
+--         join result_organization ro on o.id=ro.organization
+--         join result r on r.id=ro.id where o.country <> 'UNKNOWN')
+-- select o1.id org1,o2.country country2, o1.type, count(distinct o1.result) as collaborations
+-- from tmp as o1
+--          join tmp as o2 on o1.result=o2.result
+-- where o1.id<>o2.id and o1.country<>o2.country
+-- group by o1.id, o1.type,o2.country;
+--
+-- compute stats indi_result_org_country_collab;
+--
+-- create table indi_result_org_collab stored as parquet as
+--     with tmp as
+--         (select o.id, ro.id as result,r.type  from organization o
+--         join result_organization ro on o.id=ro.organization
+--         join result r on r.id=ro.id)
+-- select o1.id org1,o2.id org2, o1.type, count(distinct o1.result) as collaborations
+-- from tmp as o1
+--          join tmp as o2 on o1.result=o2.result
+-- where o1.id<>o2.id
+-- group by o1.id, o2.id, o1.type;
+--
+-- compute stats indi_result_org_collab;
+--
+-- create table indi_project_collab_org stored as parquet as
+-- select o1.id org1,o2.id org2, count(distinct o1.project) as collaborations
+-- from organization_projects as o1
+--          join organization_projects as o2 on o1.project=o2.project
+-- where o1.id!=o2.id
+-- group by o1.id, o2.id;
+--
+-- compute stats indi_project_collab_org;
+--
+-- create table indi_project_collab_org_country stored as parquet as
+--     with tmp as
+--         (select o.id organization, o.country , ro.project as project  from organization o
+--         join organization_projects ro on o.id=ro.id
+--         and o.country <> 'UNKNOWN')
+-- select o1.organization org1,o2.country country2, count(distinct o1.project) as collaborations
+-- from tmp as o1
+--          join tmp as o2 on o1.project=o2.project
+-- where o1.organization<>o2.organization and o1.country<>o2.country
+-- group by o1.organization, o2.country;
+--
+-- compute stats indi_project_collab_org_country;
+--
+-- create table indi_funder_country_collab stored as parquet as
+--     with tmp as (select funder, project, country from organization_projects op
+--         join organization o on o.id=op.id
+--         join project p on p.id=op.project
+--         where country <> 'UNKNOWN')
+-- select f1.funder, f1.country as country1, f2.country as country2, count(distinct f1.project) as collaborations
+-- from tmp as f1
+--          join tmp as f2 on f1.project=f2.project
+-- where f1.country<>f2.country
+-- group by f1.funder, f2.country, f1.country;
+--
+-- compute stats indi_funder_country_collab;
+--
+-- create table indi_result_country_collab stored as parquet as
+--     with tmp as
+--         (select country, ro.id as result,r.type  from organization o
+--         join result_organization ro on o.id=ro.organization
+--         join result r on r.id=ro.id where country <> 'UNKNOWN')
+-- select o1.country country1, o2.country country2, o1.type, count(distinct o1.result) as collaborations
+-- from tmp as o1
+--          join tmp as o2 on o1.result=o2.result
+-- where o1.country<>o2.country
+-- group by o1.country, o2.country, o1.type;
+--
+-- compute stats indi_result_country_collab;
 
 ---- Sprint 4 ----
 create table indi_pub_diamond stored as parquet as
