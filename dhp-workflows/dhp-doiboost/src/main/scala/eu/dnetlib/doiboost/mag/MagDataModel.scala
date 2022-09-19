@@ -2,7 +2,7 @@ package eu.dnetlib.doiboost.mag
 
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
-import eu.dnetlib.dhp.schema.oaf.{Instance, Journal, Publication, StructuredProperty}
+import eu.dnetlib.dhp.schema.oaf.{Instance, Journal, Publication, StructuredProperty, Subject}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.DoiBoostMappingUtil._
 import org.json4s
@@ -210,8 +210,8 @@ case object ConversionUtil {
       val className = "Microsoft Academic Graph classification"
       val classid = "MAG"
 
-      val p: List[StructuredProperty] = fieldOfStudy.subjects.flatMap(s => {
-        val s1 = createSP(
+      val p: List[Subject] = fieldOfStudy.subjects.flatMap(s => {
+        val s1 = createSubject(
           s.DisplayName,
           classid,
           className,
@@ -219,10 +219,10 @@ case object ConversionUtil {
           ModelConstants.DNET_SUBJECT_TYPOLOGIES
         )
         val di = DoiBoostMappingUtil.generateDataInfo(s.Score.toString)
-        var resList: List[StructuredProperty] = List(s1)
+        var resList: List[Subject] = List(s1)
         if (s.MainType.isDefined) {
           val maintp = s.MainType.get
-          val s2 = createSP(
+          val s2 = createSubject(
             s.MainType.get,
             classid,
             className,
@@ -232,7 +232,7 @@ case object ConversionUtil {
           s2.setDataInfo(di)
           resList = resList ::: List(s2)
           if (maintp.contains(".")) {
-            val s3 = createSP(
+            val s3 = createSubject(
               maintp.split("\\.").head,
               classid,
               className,

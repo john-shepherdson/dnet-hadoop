@@ -201,7 +201,7 @@ case object Crossref2Oaf {
 
     if (subjectList.nonEmpty) {
       result.setSubject(
-        subjectList.map(s => createSP(s, "keywords", ModelConstants.DNET_SUBJECT_TYPOLOGIES)).asJava
+        subjectList.map(s => createSubject(s, "keyword", ModelConstants.DNET_SUBJECT_TYPOLOGIES)).asJava
       )
     }
 

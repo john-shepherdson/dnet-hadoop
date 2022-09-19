@@ -743,12 +743,12 @@
         "trust": "0.9"
       },
       "qualifier": {
-        "classid": "",
-        "classname": "",
-        "schemeid": "",
-        "schemename": ""
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
       },
-      "value": "infrared detectors"
+      "value": "FOS: Mathematics"
     },
     {
       "dataInfo": {
@@ -765,12 +765,12 @@
         "trust": "0.9"
       },
       "qualifier": {
-        "classid": "",
-        "classname": "",
-        "schemeid": "",
-        "schemename": ""
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
       },
-      "value": "lens antennas"
+      "value": "FOS: Computer and information sciences"
     },
     {
       "dataInfo": {
@@ -787,12 +787,34 @@
         "trust": "0.9"
       },
       "qualifier": {
-        "classid": "",
-        "classname": "",
-        "schemeid": "",
-        "schemename": ""
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
       },
-      "value": "silicon"
+      "value": "0101 mathematics"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "subject:fos",
+          "classname": "subject:fos",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "0101 mathematics"
     },
     {
       "dataInfo": {

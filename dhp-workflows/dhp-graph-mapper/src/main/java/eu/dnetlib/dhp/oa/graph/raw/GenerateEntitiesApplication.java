@@ -16,6 +16,9 @@ import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.rdd.RDD;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
@@ -127,8 +130,8 @@ public class GenerateEntitiesApplication {
 						.sequenceFile(sp, Text.class, Text.class)
 						.map(k -> new Tuple2<>(k._1().toString(), k._2().toString()))
 						.map(k -> convertToListOaf(k._1(), k._2(), shouldHashId, vocs))
-						.filter(Objects::nonNull)
-						.flatMap(List::iterator));
+						.flatMap(List::iterator)
+						.filter(Objects::nonNull));
 		}
 
 		switch (mode) {
@@ -155,11 +158,11 @@ public class GenerateEntitiesApplication {
 			.saveAsTextFile(targetPath, GzipCodec.class);
 	}
 
-	private static List<Oaf> convertToListOaf(
+	public static List<Oaf> convertToListOaf(
 		final String id,
 		final String s,
 		final boolean shouldHashId,
-		final VocabularyGroup vocs) throws DocumentException {
+		final VocabularyGroup vocs) {
 		final String type = StringUtils.substringAfter(id, ":");
 
 		switch (type.toLowerCase()) {
@@ -200,8 +203,7 @@ public class GenerateEntitiesApplication {
 		try {
 			return OBJECT_MAPPER.readValue(s, clazz);
 		} catch (final Exception e) {
-			log.error("Error parsing object of class: {}", clazz);
-			log.error(s);
+			log.error("Error parsing object of class: {}:\n{}", clazz, s);
 			throw new IllegalArgumentException(e);
 		}
 	}

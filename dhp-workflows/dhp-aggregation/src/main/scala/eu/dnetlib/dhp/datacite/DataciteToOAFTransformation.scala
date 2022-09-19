@@ -19,7 +19,7 @@ import java.time.chrono.ThaiBuddhistDate
 import java.time.format.DateTimeFormatter
 import java.util.{Date, Locale}
 import scala.collection.JavaConverters._
-import scala.io.{Codec, Source}
+import scala.io.Source
 
 object DataciteToOAFTransformation {
 
@@ -252,7 +252,7 @@ object DataciteToOAFTransformation {
         .exists(i => i.getHostedby != null && "figshare".equalsIgnoreCase(i.getHostedby.getValue))
       if (hosted_by_figshare) {
         r.getInstance().asScala.foreach(i => i.setAccessright(ModelConstants.OPEN_ACCESS_RIGHT()))
-        val l: List[StructuredProperty] = List()
+        val l: List[Subject] = List()
         r.setSubject(l.asJava)
       }
     }
@@ -492,7 +492,7 @@ object DataciteToOAFTransformation {
       subjects
         .filter(s => s.subject.nonEmpty)
         .map(s =>
-          OafMapperUtils.structuredProperty(
+          OafMapperUtils.subject(
             s.subject.get,
             SUBJ_CLASS,
             SUBJ_CLASS,

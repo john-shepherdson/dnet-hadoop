@@ -6,11 +6,14 @@ import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
 
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
@@ -171,23 +174,31 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='landingPage']")) {
 			url.add(trimAndDecodeUrl(((Node) o).getText().trim()));
 		}
-		for (final Object o : doc
-			.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='DOI']")) {
-			url.add(HTTP_DOI_PREIFX + ((Node) o).getText().trim());
+
+		Set<String> validUrl = validateUrl(url);
+
+		if (validUrl.stream().noneMatch(s -> s.contains("doi.org"))) {
+			for (final Object o : doc
+				.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='DOI']")) {
+				validUrl.add(HTTP_DOI_PREIFX + ((Node) o).getText().trim());
+			}
+			for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='DOI']")) {
+				validUrl.add(HTTP_DOI_PREIFX + ((Node) o).getText().trim());
+			}
 		}
-		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='DOI']")) {
-			url.add(HTTP_DOI_PREIFX + ((Node) o).getText().trim());
-		}
-		for (final Object o : doc
+		if (validUrl.stream().noneMatch(s -> s.contains("hdl.handle.net"))) {
+			for (final Object o : doc
 				.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='Handle']")) {
-			url.add(HTTP_HANDLE_PREIFX + ((Node) o).getText().trim());
+				validUrl.add(HTTP_HANDLE_PREIFX + ((Node) o).getText().trim());
+			}
+			for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='Handle']")) {
+				validUrl.add(HTTP_HANDLE_PREIFX + ((Node) o).getText().trim());
+			}
 		}
-		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='Handle']")) {
-			url.add(HTTP_HANDLE_PREIFX + ((Node) o).getText().trim());
-		}
-		if (!url.isEmpty()) {
+
+		if (!validUrl.isEmpty()) {
 			instance.setUrl(new ArrayList<>());
-			instance.getUrl().addAll(url);
+			instance.getUrl().addAll(validUrl);
 		}
 		return Arrays.asList(instance);
 	}
@@ -257,8 +268,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<StructuredProperty> prepareSubjects(final Document doc, final DataInfo info) {
-		return prepareListStructProps(doc, "//*[local-name()='subject']", info);
+	protected List<Subject> prepareSubjects(final Document doc, final DataInfo info) {
+		return prepareSubjectList(doc, "//*[local-name()='subject']", info);
 	}
 
 	@Override
