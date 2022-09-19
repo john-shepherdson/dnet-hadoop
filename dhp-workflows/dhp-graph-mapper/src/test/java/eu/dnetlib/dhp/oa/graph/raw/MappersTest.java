@@ -21,7 +21,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
@@ -946,6 +945,15 @@ class MappersTest {
 		final Publication p = (Publication) list.get(0);
 		assertNotNull(p.getInstance().get(0).getUrl().get(0));
 
+	}
+
+	@Test
+	void testNotWellFormed() throws IOException {
+		final String xml = IOUtils
+				.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_notwellformed.xml")));
+		final List<Oaf> actual = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
+		assertNotNull(actual);
+		assertTrue(actual.isEmpty());
 	}
 
 	private void assertValidId(final String id) {
