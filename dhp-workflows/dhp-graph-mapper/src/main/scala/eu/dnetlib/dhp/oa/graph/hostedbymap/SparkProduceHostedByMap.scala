@@ -113,27 +113,15 @@ object SparkProduceHostedByMap {
   }
 
   def oaToHostedbyItemType(dats: Datasource): HostedByItemType = {
-    if (dats.getJournal != null) {
-
-      if(dats.getOfficialname != null) {
-        return getHostedByItemType(
-          dats.getId,
-          dats.getOfficialname.getValue,
-          dats.getJournal.getIssnPrinted,
-          dats.getJournal.getIssnOnline,
-          dats.getJournal.getIssnLinking,
-          false
-        )
-      }
+    if (dats.getJournal != null && dats.getOfficialname != null) {
       return getHostedByItemType(
         dats.getId,
-        "",
+        dats.getOfficialname.getValue,
         dats.getJournal.getIssnPrinted,
         dats.getJournal.getIssnOnline,
         dats.getJournal.getIssnLinking,
         false
       )
-
     }
     HostedByItemType("", "", "", "", "", false)
   }
