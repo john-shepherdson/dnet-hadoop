@@ -159,22 +159,25 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 			.setProcessingchargecurrency(field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
 
 		final List<Node> nodes = Lists.newArrayList(doc.selectNodes("//dc:identifier"));
-		instance
-			.setUrl(
-				nodes
-					.stream()
-					.filter(n -> StringUtils.isNotBlank(n.getText()))
-					.map(n -> n.getText().trim())
-					.filter(u -> u.startsWith("http"))
-					.map(s -> {
-						try {
-							return URLDecoder.decode(s, "UTF-8");
-						} catch (Throwable t) {
-							return s;
-						}
-					})
-					.distinct()
-					.collect(Collectors.toCollection(ArrayList::new)));
+		final List<String> url = nodes
+			.stream()
+			.filter(n -> StringUtils.isNotBlank(n.getText()))
+			.map(n -> n.getText().trim())
+			.filter(u -> u.startsWith("http"))
+			.map(s -> {
+				try {
+					return URLDecoder.decode(s, "UTF-8");
+				} catch (Throwable t) {
+					return s;
+				}
+			})
+			.distinct()
+			.collect(Collectors.toCollection(ArrayList::new));
+		final Set<String> validUrl = validateUrl(url);
+		if (!validUrl.isEmpty()) {
+			instance.setUrl(new ArrayList<>());
+			instance.getUrl().addAll(validUrl);
+		}
 
 		return Lists.newArrayList(instance);
 	}

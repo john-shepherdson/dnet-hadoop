@@ -10,9 +10,13 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.UNKNOWN;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.dom4j.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -615,6 +619,17 @@ public abstract class AbstractMdRecordToOafMapper {
 			}
 		}
 		return res;
+	}
+
+	protected Set<String> validateUrl(Collection<String> url) {
+		UrlValidator urlValidator = UrlValidator.getInstance();
+		if (Objects.isNull(url)) {
+			return new HashSet<>();
+		}
+		return url
+			.stream()
+			.filter(u -> urlValidator.isValid(u))
+			.collect(Collectors.toCollection(HashSet::new));
 	}
 
 }
