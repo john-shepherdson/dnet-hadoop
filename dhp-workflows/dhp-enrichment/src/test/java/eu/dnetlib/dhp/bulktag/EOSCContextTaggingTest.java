@@ -113,7 +113,7 @@ public class EOSCContextTaggingTest {
 
 		Assertions
 			.assertEquals(
-				4,
+				3,
 				tmp
 					.filter(
 						s -> s.getContext().stream().anyMatch(c -> c.getId().equals("eosc")))
@@ -143,14 +143,14 @@ public class EOSCContextTaggingTest {
 				1,
 				tmp
 					.filter(
-						d -> d.getId().equals("50|475c1990cbb2::3894c94123e96df8a21249957cf160cb")
+						d -> d.getId().equals("50|475c1990cbb2::449f28eefccf9f70c04ad70d61e041c7")
 							&&
 							d.getContext().stream().anyMatch(c -> c.getId().equals("eosc")))
 					.count());
 
 		Assertions
 			.assertEquals(
-				1,
+				0,
 				tmp
 					.filter(
 						d -> d.getId().equals("50|475c1990cbb2::3894c94123e96df8a21249957cf160cb")
