@@ -107,7 +107,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		this.forceOriginalId = false;
 	}
 
-	public List<Oaf> processMdRecord(final String xml) throws DocumentException {
+	public List<Oaf> processMdRecord(final String xml) {
 
 		DocumentFactory.getInstance().setXPathNamespaceURIs(nsContext);
 		try {
@@ -143,7 +143,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			return createOafs(doc, type, instances, collectedFrom, info, lastUpdateTimestamp);
 		} catch (DocumentException e) {
 			log.error("Error with record:\n" + xml);
-			throw e;
+			return Lists.newArrayList();
 		}
 	}
 
