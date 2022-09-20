@@ -97,25 +97,29 @@ public class SparkEoscBulkTag implements Serializable {
 			});
 	}
 
-	private static void selectCompliantDatasources(SparkSession spark, String inputPath, String workingPath, String datasourceMapPath) {
+	private static void selectCompliantDatasources(SparkSession spark, String inputPath, String workingPath,
+		String datasourceMapPath) {
 		Dataset<Datasource> datasources = readPath(spark, inputPath + "datasource", Datasource.class)
-				.filter((FilterFunction<Datasource>) ds -> {
-					final String compatibility = ds.getOpenairecompatibility().getClassid();
-					return compatibility.equalsIgnoreCase(OPENAIRE_3) ||
-							compatibility.equalsIgnoreCase(OPENAIRE_4) ||
-							compatibility.equalsIgnoreCase(OPENAIRE_CRIS) ||
-							compatibility.equalsIgnoreCase(OPENAIRE_DATA);
-				});
+			.filter((FilterFunction<Datasource>) ds -> {
+				final String compatibility = ds.getOpenairecompatibility().getClassid();
+				return compatibility.equalsIgnoreCase(OPENAIRE_3) ||
+					compatibility.equalsIgnoreCase(OPENAIRE_4) ||
+					compatibility.equalsIgnoreCase(OPENAIRE_CRIS) ||
+					compatibility.equalsIgnoreCase(OPENAIRE_DATA);
+			});
 
 		Dataset<DatasourceMaster> datasourceMaster = readPath(spark, datasourceMapPath, DatasourceMaster.class);
 
-		datasources.joinWith(datasourceMaster, datasources.col("id").equalTo(datasourceMaster.col("master")), "left")
-				.map((MapFunction<Tuple2<Datasource, DatasourceMaster>, DatasourceMaster>) t2 -> t2._2(), Encoders.bean(DatasourceMaster.class) )
-				.filter(Objects::nonNull)
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression", "gzip")
-				.json(workingPath + "datasource");
+		datasources
+			.joinWith(datasourceMaster, datasources.col("id").equalTo(datasourceMaster.col("master")), "left")
+			.map(
+				(MapFunction<Tuple2<Datasource, DatasourceMaster>, DatasourceMaster>) t2 -> t2._2(),
+				Encoders.bean(DatasourceMaster.class))
+			.filter(Objects::nonNull)
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(workingPath + "datasource");
 	}
 
 	private static <R extends Result> void execBulkTag(
@@ -130,7 +134,7 @@ public class SparkEoscBulkTag implements Serializable {
 			.collectAsList();
 
 		readPath(spark, inputPath + resultType, resultClazz)
-						.map(
+			.map(
 				(MapFunction<R, R>) value -> enrich(value, hostedByList),
 				Encoders.bean(resultClazz))
 			.write()
