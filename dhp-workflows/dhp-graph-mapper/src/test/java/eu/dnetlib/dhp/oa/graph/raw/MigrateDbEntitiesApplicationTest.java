@@ -251,6 +251,18 @@ class MigrateDbEntitiesApplicationTest {
 		assertValidId(r2.getSource());
 		assertEquals(r1.getSource(), r2.getTarget());
 		assertEquals(r2.getSource(), r1.getTarget());
+
+		assertTrue(r1.getSource().startsWith("10|"));
+		assertTrue(r1.getTarget().startsWith("20|"));
+
+		assertEquals(ModelConstants.DATASOURCE_ORGANIZATION, r1.getRelType());
+		assertEquals(ModelConstants.DATASOURCE_ORGANIZATION, r2.getRelType());
+
+		assertEquals(ModelConstants.PROVISION, r1.getSubRelType());
+		assertEquals(ModelConstants.PROVISION, r2.getSubRelType());
+
+		assertEquals(ModelConstants.IS_PROVIDED_BY, r1.getRelClass());
+		assertEquals(ModelConstants.PROVIDES, r2.getRelClass());
 	}
 
 	@Test

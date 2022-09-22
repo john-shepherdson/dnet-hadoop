@@ -201,6 +201,12 @@
 			</dependency>
 
 			<dependency>
+				<groupId>commons-validator</groupId>
+				<artifactId>commons-validator</artifactId>
+				<version>1.7</version>
+			</dependency>
+
+			<dependency>
 				<groupId>com.github.sisyphsu</groupId>
 				<artifactId>dateparser</artifactId>
 				<version>1.0.7</version>

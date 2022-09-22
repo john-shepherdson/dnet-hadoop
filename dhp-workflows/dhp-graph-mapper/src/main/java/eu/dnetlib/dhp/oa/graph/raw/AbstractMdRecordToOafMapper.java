@@ -10,10 +10,16 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.UNKNOWN;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.dom4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -50,6 +56,8 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected static final Map<String, String> nsContext = new HashMap<>();
 
+	private static final Logger log = LoggerFactory.getLogger(AbstractMdRecordToOafMapper.class);
+
 	static {
 		nsContext.put("dr", "http://www.driver-repository.eu/namespace/dr");
 		nsContext.put("dri", "http://www.driver-repository.eu/namespace/dri");
@@ -76,40 +84,44 @@ public abstract class AbstractMdRecordToOafMapper {
 		this.forceOriginalId = false;
 	}
 
-	public List<Oaf> processMdRecord(final String xml) throws DocumentException {
+	public List<Oaf> processMdRecord(final String xml) {
 
 		DocumentFactory.getInstance().setXPathNamespaceURIs(nsContext);
+		try {
+			final Document doc = DocumentHelper
+				.parseText(
+					xml
+						.replaceAll(DATACITE_SCHEMA_KERNEL_4, DATACITE_SCHEMA_KERNEL_3)
+						.replaceAll(DATACITE_SCHEMA_KERNEL_4_SLASH, DATACITE_SCHEMA_KERNEL_3)
+						.replaceAll(DATACITE_SCHEMA_KERNEL_3_SLASH, DATACITE_SCHEMA_KERNEL_3));
 
-		final Document doc = DocumentHelper
-			.parseText(
-				xml
-					.replaceAll(DATACITE_SCHEMA_KERNEL_4, DATACITE_SCHEMA_KERNEL_3)
-					.replaceAll(DATACITE_SCHEMA_KERNEL_4_SLASH, DATACITE_SCHEMA_KERNEL_3)
-					.replaceAll(DATACITE_SCHEMA_KERNEL_3_SLASH, DATACITE_SCHEMA_KERNEL_3));
+			final KeyValue collectedFrom = getProvenanceDatasource(
+				doc, "//oaf:collectedFrom/@id", "//oaf:collectedFrom/@name");
 
-		final KeyValue collectedFrom = getProvenanceDatasource(
-			doc, "//oaf:collectedFrom/@id", "//oaf:collectedFrom/@name");
+			if (collectedFrom == null) {
+				return Lists.newArrayList();
+			}
 
-		if (collectedFrom == null) {
+			final KeyValue hostedBy = StringUtils.isBlank(doc.valueOf("//oaf:hostedBy/@id"))
+				? collectedFrom
+				: getProvenanceDatasource(doc, "//oaf:hostedBy/@id", "//oaf:hostedBy/@name");
+
+			if (hostedBy == null) {
+				return Lists.newArrayList();
+			}
+
+			final DataInfo info = prepareDataInfo(doc, invisible);
+			final long lastUpdateTimestamp = new Date().getTime();
+
+			final List<Instance> instances = prepareInstances(doc, info, collectedFrom, hostedBy);
+
+			final String type = getResultType(doc, instances);
+
+			return createOafs(doc, type, instances, collectedFrom, info, lastUpdateTimestamp);
+		} catch (DocumentException e) {
+			log.error("Error with record:\n" + xml);
 			return Lists.newArrayList();
 		}
-
-		final KeyValue hostedBy = StringUtils.isBlank(doc.valueOf("//oaf:hostedBy/@id"))
-			? collectedFrom
-			: getProvenanceDatasource(doc, "//oaf:hostedBy/@id", "//oaf:hostedBy/@name");
-
-		if (hostedBy == null) {
-			return Lists.newArrayList();
-		}
-
-		final DataInfo info = prepareDataInfo(doc, invisible);
-		final long lastUpdateTimestamp = new Date().getTime();
-
-		final List<Instance> instances = prepareInstances(doc, info, collectedFrom, hostedBy);
-
-		final String type = getResultType(doc, instances);
-
-		return createOafs(doc, type, instances, collectedFrom, info, lastUpdateTimestamp);
 	}
 
 	protected String getResultType(final Document doc, final List<Instance> instances) {
@@ -607,6 +619,17 @@ public abstract class AbstractMdRecordToOafMapper {
 			}
 		}
 		return res;
+	}
+
+	protected Set<String> validateUrl(Collection<String> url) {
+		UrlValidator urlValidator = UrlValidator.getInstance();
+		if (Objects.isNull(url)) {
+			return new HashSet<>();
+		}
+		return url
+			.stream()
+			.filter(u -> urlValidator.isValid(u))
+			.collect(Collectors.toCollection(HashSet::new));
 	}
 
 }
