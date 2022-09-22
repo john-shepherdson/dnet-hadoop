@@ -76,11 +76,11 @@ compute stats indi_result_with_orcid;
 
 ---- Sprint 3 ----
 create table indi_funded_result_with_fundref stored as parquet as
-select distinct r.id, coalesce(fundref, 0) as fundref
+select distinct r.result as id, coalesce(fundref, 0) as fundref
 from project_results r
-         left outer join (select distinct id, 1 as fundref from project_results
+         left outer join (select distinct result, 1 as fundref from project_results
                           where provenance='Harvested') tmp
-                         on r.id= tmp.id;
+                         on r.result= tmp.result;
 
 compute stats indi_funded_result_with_fundref;
 
@@ -92,6 +92,17 @@ compute stats indi_funded_result_with_fundref;
 --
 -- compute stats indi_result_org_collab;
 --
+create table indi_result_org_collab stored as parquet as
+with tmp as (
+select distinct ro.organization organization, ro.id from result_organization ro
+join organization o on o.id=ro.organization where o.name is not null)
+select o1.organization org1, o2.organization org2, count(o1.id) as collaborations
+from tmp as o1
+join tmp as o2 on o1.id=o2.id and o1.organization!=o2.organization
+group by org1, org2;
+
+compute stats indi_result_org_collab;
+
 -- create table indi_result_org_country_collab stored as parquet as
 --     with tmp as
 --         (select o.id as id, o.country , ro.id as result,r.type  from organization o
@@ -105,6 +116,17 @@ compute stats indi_funded_result_with_fundref;
 --
 -- compute stats indi_result_org_country_collab;
 --
+create table indi_result_org_country_collab stored as parquet as
+with tmp as
+(select distinct ro.organization organization, ro.id, o.country from result_organization ro
+join organization o on o.id=ro.organization where country <> 'UNKNOWN'  and o.name is not null)
+select o1.organization org1,o2.country country2, count(o1.id) as collaborations
+from tmp as o1 join tmp as o2 on o1.id=o2.id
+where o1.id=o2.id and o1.country!=o2.country
+group by o1.organization, o1.id, o2.country;
+
+compute stats indi_result_org_country_collab;
+
 -- create table indi_result_org_collab stored as parquet as
 --     with tmp as
 --         (select o.id, ro.id as result,r.type  from organization o
@@ -165,6 +187,19 @@ compute stats indi_funder_country_collab;
 -- group by o1.country, o2.country, o1.type;
 --
 -- compute stats indi_result_country_collab;
+
+create table indi_result_country_collab stored as parquet as
+with tmp as
+        (select distinct country, ro.id as result  from organization o
+        join result_organization ro on o.id=ro.organization
+        where country <> 'UNKNOWN' and o.name is not null)
+select o1.country country1, o2.country country2, count(o1.result) as collaborations
+from tmp as o1
+         join tmp as o2 on o1.result=o2.result
+where o1.country<>o2.country
+group by o1.country, o2.country;
+
+compute stats indi_result_country_collab;
 
 ---- Sprint 4 ----
 create table indi_pub_diamond stored as parquet as
