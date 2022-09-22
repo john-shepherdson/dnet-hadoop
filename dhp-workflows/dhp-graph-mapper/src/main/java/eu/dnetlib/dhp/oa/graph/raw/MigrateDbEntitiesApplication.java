@@ -417,12 +417,12 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 			final Relation r1 = OafMapperUtils
 				.getRelation(
-					dsId, orgId, DATASOURCE_ORGANIZATION, PRODUCES, IS_PROVIDED_BY, collectedFrom, info,
+					dsId, orgId, DATASOURCE_ORGANIZATION, PROVISION, IS_PROVIDED_BY, collectedFrom, info,
 					lastUpdateTimestamp);
 
 			final Relation r2 = OafMapperUtils
 				.getRelation(
-					orgId, dsId, DATASOURCE_ORGANIZATION, PRODUCES, PROVIDES, collectedFrom, info, lastUpdateTimestamp);
+					orgId, dsId, DATASOURCE_ORGANIZATION, PROVISION, PROVIDES, collectedFrom, info, lastUpdateTimestamp);
 
 			return Arrays.asList(r1, r2);
 		} catch (final Exception e) {
