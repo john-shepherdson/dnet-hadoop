@@ -18,6 +18,8 @@ public class QueryInformationSystem {
 		+ "  let $datasources := $x//CONFIGURATION/context/category[./@id=concat($x//CONFIGURATION/context/@id,'::contentproviders')]/concept  "
 		+ "  let $organizations := $x//CONFIGURATION/context/category[./@id=concat($x//CONFIGURATION/context/@id,'::resultorganizations')]/concept  "
 		+ "  let $communities := $x//CONFIGURATION/context/category[./@id=concat($x//CONFIGURATION/context/@id,'::zenodocommunities')]/concept  "
+			+ "  let $fos := $x//CONFIGURATION/context/param[./@name='fos']/text() "
+			+ "  let $sdg := $x//CONFIGURATION/context/param[./@name='sdg']/text() "
 		+
 		"let $zenodo := $x//param[./@name='zenodoCommunity']/text() "
 		+ "  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] and $x//context/param[./@name = 'status']/text() != 'hidden'  "
@@ -28,6 +30,12 @@ public class QueryInformationSystem {
 		+ "  {for $y in tokenize($subj,',')  "
 		+ "  return  "
 		+ "  <subject>{$y}</subject>}  "
+			+ "  {for $y in tokenize($fos,',')  "
+			+ "  return  "
+			+ "  <subject>{$y}</subject>}  "
+			+ "  {for $y in tokenize($sdg,',')  "
+			+ "  return  "
+			+ "  <subject>{$y}</subject>}  "
 		+ "  </subjects>  "
 		+ "  <datasources>  "
 		+ "  {for $d in $datasources  "
@@ -62,7 +70,7 @@ public class QueryInformationSystem {
 		+ "  </zenodocommunity>} "
 		+ "  </zenodocommunities>  "
 			+ "<advancedConstraint>"
-			+"{$x//CONFIGURATION/context/param[./@name='advancedConstaint']/text()} "
+			+"{$x//CONFIGURATION/context/param[./@name='advancedConstraint']/text()} "
 			+ "</advancedConstraint>"
 		+ "  </community>";
 
