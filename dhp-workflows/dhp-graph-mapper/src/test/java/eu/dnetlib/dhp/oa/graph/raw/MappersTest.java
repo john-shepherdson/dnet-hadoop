@@ -912,13 +912,13 @@ class MappersTest {
 	}
 
 	@Test
-	void testROHub() throws IOException, DocumentException {
+	void testROHub() throws IOException {
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("rohub.xml")));
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");
-//		final Dataset p = (Dataset) list.get(0);
+//		final OtherResearchProduct p = (OtherResearchProduct) list.get(0);
 //		assertValidId(p.getId());
 //		assertValidId(p.getCollectedfrom().get(0).getKey());
 //		System.out.println(p.getTitle().get(0).getValue());
@@ -926,13 +926,20 @@ class MappersTest {
 	}
 
 	@Test
-	void testROHub2() throws IOException, DocumentException {
+	void testROHub2() throws IOException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("rohub-modified.xml")));
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");
+		final OtherResearchProduct p = (OtherResearchProduct) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		assertEquals("50|w3id________::afc7592914ae190a50570db90f55f9c2", p.getId());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+		assertEquals("w3id", (p.getPid().get(0).getQualifier().getClassid()));
+		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", (p.getPid().get(0).getValue()));
 	}
 
 	@Test

@@ -391,6 +391,39 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		final String docId = entity.getId();
 
 		final List<Oaf> res = new ArrayList<>();
+		/*
+		/*
+		<datacite:relatedIdentifiers>
+            <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">https://w3id.org/ro-id/13c54585-362e-4925-a785-08afb591fa0d/resources/b4be0f3e-41d7-471f-b34e-f0bd54ff5698</datacite:relatedIdentifier>
+            <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">https://w3id.org/ro-id/13c54585-362e-4925-a785-08afb591fa0d/resources/5d6e575b-ef84-417a-9d76-61c6702f7cb2</datacite:relatedIdentifier>
+            <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">https://w3id.org/ro-id/13c54585-362e-4925-a785-08afb591fa0d/resources/35e01545-8c6d-49bd-ab98-5c152df69934</datacite:relatedIdentifier>
+         </datacite:relatedIdentifiers>
+         We could extend it to create the relationships targeting w3id, dois, pmcids and other pid types for which we know how to build the target openaire identifier "blindly".
+
+
+
+		for (final Object o : doc
+				.selectNodes("//*[local-name()='relatedIdentifier']")) {
+
+			final String originalId = ((Node) o).getText();
+
+			if (StringUtils.isNotBlank(originalId)) {
+				final String otherId = createOpenaireId(50, originalId, false);
+				final String type = ((Node) o).valueOf("@relationType");
+				switch(type){
+					case IS_SUPPLEMENT_TO:
+						break;
+					case SUPPLEMENT:
+						break;
+					case IS_PART_OF:
+						break;
+					case HAS_PART:
+						break;
+
+
+				}
+
+		 */
 
 		for (final Object o : doc
 			.selectNodes("//*[local-name()='relatedIdentifier' and ./@relatedIdentifierType='OPENAIRE']")) {
