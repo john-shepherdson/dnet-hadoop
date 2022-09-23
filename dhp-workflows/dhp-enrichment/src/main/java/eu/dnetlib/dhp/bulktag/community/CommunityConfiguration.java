@@ -24,6 +24,8 @@ public class CommunityConfiguration implements Serializable {
 	private Map<String, List<Pair<String, SelectionConstraints>>> datasourceMap = new HashMap<>();
 	// map zenodocommunityid -> communityid
 	private Map<String, List<Pair<String, SelectionConstraints>>> zenodocommunityMap = new HashMap<>();
+	// map communityid -> selectionconstraints
+	private Map<String, SelectionConstraints> selectionConstraintsMap = new HashMap<>();
 
 	public Map<String, List<Pair<String, SelectionConstraints>>> getSubjectMap() {
 		return subjectMap;
@@ -51,6 +53,14 @@ public class CommunityConfiguration implements Serializable {
 		this.zenodocommunityMap = zenodocommunityMap;
 	}
 
+	public Map<String, SelectionConstraints> getSelectionConstraintsMap() {
+		return selectionConstraintsMap;
+	}
+
+	public void setSelectionConstraintsMap(Map<String, SelectionConstraints> selectionConstraintsMap) {
+		this.selectionConstraintsMap = selectionConstraintsMap;
+	}
+
 	CommunityConfiguration(final Map<String, Community> communities) {
 		this.communities = communities;
 		init();
@@ -66,6 +76,9 @@ public class CommunityConfiguration implements Serializable {
 		}
 		if (zenodocommunityMap == null) {
 			zenodocommunityMap = Maps.newHashMap();
+		}
+		if(selectionConstraintsMap == null){
+			selectionConstraintsMap = Maps.newHashMap();
 		}
 
 		for (Community c : getCommunities().values()) {
@@ -87,6 +100,7 @@ public class CommunityConfiguration implements Serializable {
 					new Pair<>(id, zc.getSelCriteria()),
 					zenodocommunityMap);
 			}
+			selectionConstraintsMap.put(id, c.getConstraints());
 		}
 	}
 

@@ -9,6 +9,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.gson.Gson;
@@ -95,13 +98,6 @@ public class ResultTagger implements Serializable {
 
 			}
 
-//			result
-//				.getInstance()
-//				.stream()
-//				.map(i -> new Pair<>(i.getCollectedfrom().getKey(), i.getHostedby().getKey()))
-//				.flatMap(p -> Stream.of(p.getFst(), p.getSnd()))
-//				.map(s -> StringUtils.substringAfter(s, "|"))
-//				.collect(Collectors.toCollection(HashSet::new))
 			tmp
 				.forEach(
 					dsId -> datasources
@@ -135,6 +131,19 @@ public class ResultTagger implements Serializable {
 
 		communities.addAll(czenodo);
 
+		/* Tagging for Advanced Constraints */
+		final Set<String> aconstraints = new HashSet<>();
+
+		conf.getSelectionConstraintsMap().keySet()
+						.forEach(communityId -> {
+							if(conf.getSelectionConstraintsMap().get(communityId) != null &&
+									conf.getSelectionConstraintsMap().get(communityId)
+									.getCriteria().stream().anyMatch(crit -> crit.verifyCriteria(param)))
+								aconstraints.add(communityId);
+						});
+
+		communities.addAll(aconstraints);
+
 		clearContext(result);
 
 		/* Verify if there is something to bulktag */
@@ -152,30 +161,24 @@ public class ResultTagger implements Serializable {
 					dataInfoList = new ArrayList<>();
 					c.setDataInfo(dataInfoList);
 				}
-				if (subjects.contains(c.getId()))
+				if (subjects.contains(c))
 					dataInfoList
-						.add(
-							getDataInfo(
-								BULKTAG_DATA_INFO_TYPE,
-								CLASS_ID_SUBJECT,
-								CLASS_NAME_BULKTAG_SUBJECT,
-								TAGGING_TRUST));
-				if (datasources.contains(c.getId()))
+							.add(OafMapperUtils.dataInfo(false, BULKTAG_DATA_INFO_TYPE, true, false,
+									OafMapperUtils.qualifier(CLASS_ID_SUBJECT, CLASS_NAME_BULKTAG_SUBJECT, DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS), TAGGING_TRUST));
+				if (datasources.contains(c))
 					dataInfoList
-						.add(
-							getDataInfo(
-								BULKTAG_DATA_INFO_TYPE,
-								CLASS_ID_DATASOURCE,
-								CLASS_NAME_BULKTAG_DATASOURCE,
-								TAGGING_TRUST));
-				if (czenodo.contains(c.getId()))
+							.add(OafMapperUtils.dataInfo(false, BULKTAG_DATA_INFO_TYPE, true, false,
+									OafMapperUtils.qualifier(CLASS_ID_DATASOURCE, CLASS_NAME_BULKTAG_DATASOURCE, DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS), TAGGING_TRUST));
+				if (czenodo.contains(c))
 					dataInfoList
-						.add(
-							getDataInfo(
-								BULKTAG_DATA_INFO_TYPE,
-								CLASS_ID_CZENODO,
-								CLASS_NAME_BULKTAG_ZENODO,
-								TAGGING_TRUST));
+							.add(OafMapperUtils.dataInfo(false, BULKTAG_DATA_INFO_TYPE, true, false,
+									OafMapperUtils.qualifier(CLASS_ID_CZENODO, CLASS_NAME_BULKTAG_ZENODO, DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS), TAGGING_TRUST));
+				if (aconstraints.contains(c))
+					dataInfoList
+							.add(
+									OafMapperUtils.dataInfo(false, BULKTAG_DATA_INFO_TYPE, true, false,
+											OafMapperUtils.qualifier(CLASS_ID_ADVANCED_CONSTRAINT, CLASS_NAME_BULKTAG_ADVANCED_CONSTRAINT, DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS), TAGGING_TRUST));
+
 			}
 		});
 
@@ -195,28 +198,22 @@ public class ResultTagger implements Serializable {
 					List<DataInfo> dataInfoList = new ArrayList<>();
 					if (subjects.contains(c))
 						dataInfoList
-							.add(
-								getDataInfo(
-									BULKTAG_DATA_INFO_TYPE,
-									CLASS_ID_SUBJECT,
-									CLASS_NAME_BULKTAG_SUBJECT,
-									TAGGING_TRUST));
+							.add(OafMapperUtils.dataInfo(false, BULKTAG_DATA_INFO_TYPE, true, false,
+									OafMapperUtils.qualifier(CLASS_ID_SUBJECT, CLASS_NAME_BULKTAG_SUBJECT, DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS), TAGGING_TRUST));
 					if (datasources.contains(c))
 						dataInfoList
-							.add(
-								getDataInfo(
-									BULKTAG_DATA_INFO_TYPE,
-									CLASS_ID_DATASOURCE,
-									CLASS_NAME_BULKTAG_DATASOURCE,
-									TAGGING_TRUST));
+							.add(OafMapperUtils.dataInfo(false, BULKTAG_DATA_INFO_TYPE, true, false,
+									OafMapperUtils.qualifier(CLASS_ID_DATASOURCE, CLASS_NAME_BULKTAG_DATASOURCE, DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS), TAGGING_TRUST));
 					if (czenodo.contains(c))
 						dataInfoList
-							.add(
-								getDataInfo(
-									BULKTAG_DATA_INFO_TYPE,
-									CLASS_ID_CZENODO,
-									CLASS_NAME_BULKTAG_ZENODO,
-									TAGGING_TRUST));
+							.add(OafMapperUtils.dataInfo(false, BULKTAG_DATA_INFO_TYPE, true, false,
+									OafMapperUtils.qualifier(CLASS_ID_CZENODO, CLASS_NAME_BULKTAG_ZENODO, DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS), TAGGING_TRUST));
+					if (aconstraints.contains(c))
+						dataInfoList
+								.add(
+										OafMapperUtils.dataInfo(false, BULKTAG_DATA_INFO_TYPE, true, false,
+												OafMapperUtils.qualifier(CLASS_ID_ADVANCED_CONSTRAINT, CLASS_NAME_BULKTAG_ADVANCED_CONSTRAINT, DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS), TAGGING_TRUST));
+
 					context.setDataInfo(dataInfoList);
 					return context;
 				})
@@ -226,22 +223,4 @@ public class ResultTagger implements Serializable {
 		return result;
 	}
 
-	public static DataInfo getDataInfo(
-		String inference_provenance, String inference_class_id, String inference_class_name, String trust) {
-		DataInfo di = new DataInfo();
-		di.setInferred(true);
-		di.setInferenceprovenance(inference_provenance);
-		di.setProvenanceaction(getQualifier(inference_class_id, inference_class_name));
-		di.setTrust(trust);
-		return di;
-	}
-
-	public static Qualifier getQualifier(String inference_class_id, String inference_class_name) {
-		Qualifier pa = new Qualifier();
-		pa.setClassid(inference_class_id);
-		pa.setClassname(inference_class_name);
-		pa.setSchemeid(DNET_PROVENANCE_ACTIONS);
-		pa.setSchemename(DNET_PROVENANCE_ACTIONS);
-		return pa;
-	}
 }

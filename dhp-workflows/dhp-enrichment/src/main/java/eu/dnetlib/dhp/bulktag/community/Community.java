@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.Gson;
+import org.apache.avro.generic.GenericData;
 
 /** Created by miriam on 01/08/2018. */
 public class Community implements Serializable {
@@ -14,6 +15,7 @@ public class Community implements Serializable {
 	private List<String> subjects = new ArrayList<>();
 	private List<Provider> providers = new ArrayList<>();
 	private List<ZenodoCommunity> zenodoCommunities = new ArrayList<>();
+	private SelectionConstraints constraints = new SelectionConstraints();
 
 	public String toJson() {
 		final Gson g = new Gson();
@@ -56,5 +58,13 @@ public class Community implements Serializable {
 
 	public void setZenodoCommunities(List<ZenodoCommunity> zenodoCommunities) {
 		this.zenodoCommunities = zenodoCommunities;
+	}
+
+	public SelectionConstraints getConstraints() {
+		return constraints;
+	}
+
+	public void setConstraints(SelectionConstraints constraints) {
+		this.constraints = constraints;
 	}
 }
