@@ -933,6 +933,7 @@ class MappersTest {
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");
+		assertEquals(3, list.size());
 		final OtherResearchProduct p = (OtherResearchProduct) list.get(0);
 		assertValidId(p.getId());
 		assertValidId(p.getCollectedfrom().get(0).getKey());

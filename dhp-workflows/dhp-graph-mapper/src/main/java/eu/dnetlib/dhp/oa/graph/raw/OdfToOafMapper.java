@@ -25,6 +25,7 @@ import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 
 public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -391,73 +392,75 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		final String docId = entity.getId();
 
 		final List<Oaf> res = new ArrayList<>();
-		/*
-		/*
-		<datacite:relatedIdentifiers>
-            <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">https://w3id.org/ro-id/13c54585-362e-4925-a785-08afb591fa0d/resources/b4be0f3e-41d7-471f-b34e-f0bd54ff5698</datacite:relatedIdentifier>
-            <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">https://w3id.org/ro-id/13c54585-362e-4925-a785-08afb591fa0d/resources/5d6e575b-ef84-417a-9d76-61c6702f7cb2</datacite:relatedIdentifier>
-            <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">https://w3id.org/ro-id/13c54585-362e-4925-a785-08afb591fa0d/resources/35e01545-8c6d-49bd-ab98-5c152df69934</datacite:relatedIdentifier>
-         </datacite:relatedIdentifiers>
-         We could extend it to create the relationships targeting w3id, dois, pmcids and other pid types for which we know how to build the target openaire identifier "blindly".
-
-
 
 		for (final Object o : doc
-				.selectNodes("//*[local-name()='relatedIdentifier']")) {
+			.selectNodes("//*[local-name()='relatedIdentifier']")) {
 
-			final String originalId = ((Node) o).getText();
-
-			if (StringUtils.isNotBlank(originalId)) {
-				final String otherId = createOpenaireId(50, originalId, false);
-				final String type = ((Node) o).valueOf("@relationType");
-				switch(type){
-					case IS_SUPPLEMENT_TO:
-						break;
-					case SUPPLEMENT:
-						break;
-					case IS_PART_OF:
-						break;
-					case HAS_PART:
-						break;
-
-
-				}
-
-		 */
-
-		for (final Object o : doc
-			.selectNodes("//*[local-name()='relatedIdentifier' and ./@relatedIdentifierType='OPENAIRE']")) {
-
-			final String originalId = ((Node) o).getText();
+			final String originalId = ((Node) o).getText().trim();
 
 			if (StringUtils.isNotBlank(originalId)) {
-				final String otherId = createOpenaireId(50, originalId, false);
-				final String type = ((Node) o).valueOf("@relationType");
+				final String idType = ((Node) o).valueOf("@relatedIdentifierType");
+				final String reltype = ((Node) o).valueOf("@relationType");
+				String otherId = guessRelatedIdentifier(idType, originalId);
+				if (StringUtils.isNotBlank(otherId)) {
+					if (reltype.equalsIgnoreCase(IS_SUPPLEMENT_TO)) {
+						res
+							.add(
+								getRelation(
+									docId, otherId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENT_TO, entity));
+						res
+							.add(
+								getRelation(
+									otherId, docId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENTED_BY, entity));
+					} else {
+						if (reltype.equalsIgnoreCase(IS_SUPPLEMENTED_BY)) {
+							res
+								.add(
+									getRelation(
+										otherId, docId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENT_TO, entity));
+							res
+								.add(
+									getRelation(
+										docId, otherId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENTED_BY, entity));
+						} else {
+							if (reltype.equalsIgnoreCase(IS_PART_OF)) {
+								res
+									.add(
+										getRelation(
+											docId, otherId, RESULT_RESULT, PART, IS_PART_OF, entity));
+								res
+									.add(
+										getRelation(
+											otherId, docId, RESULT_RESULT, PART, HAS_PART, entity));
+							} else {
+								if (reltype.equalsIgnoreCase(HAS_PART)) {
+									res
+										.add(
+											getRelation(
+												otherId, docId, RESULT_RESULT, PART, IS_PART_OF, entity));
+									res
+										.add(
+											getRelation(
+												docId, otherId, RESULT_RESULT, PART, HAS_PART, entity));
+								}
+								// else TODO catch more semantics
+							}
+						}
+					}
 
-				if (type.equalsIgnoreCase(IS_SUPPLEMENT_TO)) {
-					res
-						.add(
-							getRelation(
-								docId, otherId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENT_TO, entity));
-					res
-						.add(
-							getRelation(
-								otherId, docId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENTED_BY, entity));
-				} else if (type.equalsIgnoreCase(IS_PART_OF)) {
-					res
-						.add(
-							getRelation(
-								docId, otherId, RESULT_RESULT, PART, IS_PART_OF, entity));
-					res
-						.add(
-							getRelation(
-								otherId, docId, RESULT_RESULT, PART, HAS_PART, entity));
-				} else {
-					// TODO catch more semantics
 				}
 			}
 		}
 		return res;
+	}
+
+	protected String guessRelatedIdentifier(final String idType, final String value) {
+		if (StringUtils.isBlank(idType) || StringUtils.isBlank(value))
+			return null;
+		if (idType.equalsIgnoreCase("OPENAIRE")) {
+			return createOpenaireId(50, value, false);
+		} else
+			return null;
 	}
 
 	@Override
