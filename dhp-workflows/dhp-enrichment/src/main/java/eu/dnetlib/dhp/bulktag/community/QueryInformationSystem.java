@@ -61,6 +61,9 @@ public class QueryInformationSystem {
 		+ "  </selcriteria> "
 		+ "  </zenodocommunity>} "
 		+ "  </zenodocommunities>  "
+			+ "<advancedConstraint>"
+			+"{$x//CONFIGURATION/context/param[./@name='advancedConstaint']/text()} "
+			+ "</advancedConstraint>"
 		+ "  </community>";
 
 	public static CommunityConfiguration getCommunityConfiguration(final String isLookupUrl)
