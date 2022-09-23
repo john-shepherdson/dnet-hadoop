@@ -457,10 +457,12 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	protected String guessRelatedIdentifier(final String idType, final String value) {
 		if (StringUtils.isBlank(idType) || StringUtils.isBlank(value))
 			return null;
-		if (idType.equalsIgnoreCase("OPENAIRE")) {
-			return createOpenaireId(50, value, false);
-		} else
-			return null;
+		if (idType.equalsIgnoreCase("OPENAIRE"))  return createOpenaireId(50, value, false);
+		if(pidTypeWithAuthority.contains(idType.toLowerCase())){
+            return IdentifierFactory.idFromPid("50", idType, value, true);
+        }
+		return null;
+
 	}
 
 	@Override

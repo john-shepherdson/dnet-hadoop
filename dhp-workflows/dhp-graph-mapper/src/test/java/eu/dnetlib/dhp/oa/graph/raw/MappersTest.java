@@ -933,7 +933,7 @@ class MappersTest {
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");
-		assertEquals(3, list.size());
+		assertEquals(7, list.size());
 		final OtherResearchProduct p = (OtherResearchProduct) list.get(0);
 		assertValidId(p.getId());
 		assertValidId(p.getCollectedfrom().get(0).getKey());
@@ -941,6 +941,21 @@ class MappersTest {
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 		assertEquals("w3id", (p.getPid().get(0).getQualifier().getClassid()));
 		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", (p.getPid().get(0).getValue()));
+
+		assertEquals(1, list.stream().filter(o -> o instanceof OtherResearchProduct).count());
+		assertEquals(6, list.stream().filter(o -> o instanceof Relation).count());
+
+		for(Oaf oaf : list){
+			if(oaf instanceof Relation){
+				String source = ((Relation) oaf).getSource();
+				String target = ((Relation) oaf).getTarget();
+				assertNotEquals(source, target);
+				assertTrue(source.equals(p.getId()) || target.equals(p.getId()));
+				assertNotNull(((Relation) oaf).getSubRelType());
+				assertNotNull( ((Relation) oaf).getRelClass());
+				assertNotNull(((Relation) oaf).getRelType());
+			}
+		}
 	}
 
 	@Test
