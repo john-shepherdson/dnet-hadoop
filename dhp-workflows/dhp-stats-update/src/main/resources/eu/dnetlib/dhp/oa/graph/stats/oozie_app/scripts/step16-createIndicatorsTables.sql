@@ -214,17 +214,17 @@ from publication_datasources pd
 
 compute stats indi_pub_diamond;
 
-create table indi_pub_hybrid stored as parquet as
-select distinct pd.id, coalesce(is_hybrid, 0) as is_hybrid
-from publication_datasources pd
-         left outer join (
-    select pd.id, 1 as is_hybrid from publication_datasources pd
-                                          join datasource d on d.id=pd.datasource
-                                          join stats_ext.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_online=d.issn_online)
-                                                                        and (ps.journal_is_in_doaj=false and ps.journal_is_oa=false)) tmp
-                         on pd.id=tmp.id;
-
-compute stats indi_pub_hybrid;
+--create table indi_pub_hybrid stored as parquet as
+--select distinct pd.id, coalesce(is_hybrid, 0) as is_hybrid
+--from publication_datasources pd
+--         left outer join (
+--    select pd.id, 1 as is_hybrid from publication_datasources pd
+--                                          join datasource d on d.id=pd.datasource
+--                                          join stats_ext.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_online=d.issn_online)
+--                                                                        and (ps.journal_is_in_doaj=false and ps.journal_is_oa=false)) tmp
+--                         on pd.id=tmp.id;
+--
+--compute stats indi_pub_hybrid;
 
 create table indi_pub_in_transformative stored as parquet as
 select distinct pd.id, coalesce(is_transformative, 0) as is_transformative
@@ -599,12 +599,12 @@ create table indi_org_fairness stored as parquet as
         (select ro.organization organization, count(distinct ro.id) no_result_fair from result_organization ro
     join result r on r.id=ro.id
 --join result_pids rp on r.id=rp.id
-    where (title is not null) and (publisher is not null) and (abstract is true) and (year is not null) and (authors>0) and year>2003
+    where (title is not null) and (publisher is not null) and (abstract is true) and (year is not null) and (authors>0) and  cast(year as int)>2003
     group by ro.organization),
 --return all results group by organization
     allresults as (select organization, count(distinct ro.id) no_allresults from result_organization ro
     join result r on r.id=ro.id
-    where year>2003
+    where  cast(year as int)>2003
     group by organization)
 --return results_fair/all_results
 select allresults.organization, result_fair.no_result_fair/allresults.no_allresults org_fairness
@@ -673,11 +673,11 @@ create table indi_org_fairness_year stored as parquet as
         (select year, ro.organization organization, count(distinct ro.id) no_result_fair from result_organization ro
     join result r on r.id=ro.id
     join result_pids rp on r.id=rp.id
-    where (title is not null) and (publisher is not null) and (abstract is true) and (year is not null) and (authors>0) and year>2003
+    where (title is not null) and (publisher is not null) and (abstract is true) and (year is not null) and (authors>0) and  cast(year as int)>2003
     group by ro.organization, year),
     allresults as (select year, organization, count(distinct ro.id) no_allresults from result_organization ro
     join result r on r.id=ro.id
-    where year>2003
+    where  cast(year as int)>2003
     group by organization, year)
 --return results_fair/all_results
 select allresults.year, allresults.organization, result_fair.no_result_fair/allresults.no_allresults org_fairness
@@ -692,12 +692,12 @@ create table indi_org_findable_year stored as parquet as
         (select year, ro.organization organization, count(distinct rp.id) no_result_with_pid from result_organization ro
     join result_pids rp on rp.id=ro.id
     join result r on r.id=rp.id
-    where year >2003
+    where cast(year as int) >2003
     group by ro.organization, year),
 --return all results group by organization,year
     allresults as (select year, organization, count(distinct ro.id) no_allresults from result_organization ro
     join result r on r.id=ro.id
-    where year >2003
+    where cast(year as int) >2003
     group by organization, year)
 --return results_with_pid/all_results
 select allresults.year, allresults.organization, result_with_pid.no_result_with_pid/allresults.no_allresults org_findable
@@ -712,12 +712,12 @@ create table indi_org_findable stored as parquet as
         (select ro.organization organization, count(distinct rp.id) no_result_with_pid from result_organization ro
     join result_pids rp on rp.id=ro.id
     join result r on r.id=rp.id
-    where year >2003
+    where cast(year as int) >2003
     group by ro.organization),
 --return all results group by organization
     allresults as (select organization, count(distinct ro.id) no_allresults from result_organization ro
     join result r on r.id=ro.id
-    where year >2003
+    where cast(year as int) >2003
     group by organization)
 --return results_with_pid/all_results
 select allresults.organization, result_with_pid.no_result_with_pid/allresults.no_allresults org_findable
