@@ -579,8 +579,10 @@ class MappersTest {
 
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
-		assertEquals(1, list.size());
+		assertEquals(3, list.size());
 		assertTrue(list.get(0) instanceof Software);
+		assertTrue(list.get(1) instanceof Relation);
+		assertTrue(list.get(2) instanceof Relation);
 
 		final Software s = (Software) list.get(0);
 
@@ -590,6 +592,22 @@ class MappersTest {
 		assertTrue(s.getAuthor().size() > 0);
 		assertTrue(s.getSubject().size() > 0);
 		assertTrue(s.getInstance().size() > 0);
+
+		final Relation r1 = (Relation) list.get(1);
+		final Relation r2 = (Relation) list.get(2);
+
+		assertEquals(s.getId(), r1.getSource());
+		assertEquals("50|doi_________::b453e7b4b2130ace57ff0c3db470a982", r1.getTarget());
+		assertEquals(ModelConstants.RESULT_RESULT, r1.getRelType());
+		assertEquals(ModelConstants.RELATIONSHIP, r1.getSubRelType());
+		assertEquals(ModelConstants.IS_REFERENCED_BY, r1.getRelClass());
+
+		assertEquals(s.getId(), r2.getTarget());
+		assertEquals("50|doi_________::b453e7b4b2130ace57ff0c3db470a982", r2.getSource());
+		assertEquals(ModelConstants.RESULT_RESULT, r2.getRelType());
+		assertEquals(ModelConstants.RELATIONSHIP, r2.getSubRelType());
+		assertEquals(ModelConstants.REFERENCES, r2.getRelClass());
+
 	}
 
 	@Test
@@ -945,14 +963,14 @@ class MappersTest {
 		assertEquals(1, list.stream().filter(o -> o instanceof OtherResearchProduct).count());
 		assertEquals(6, list.stream().filter(o -> o instanceof Relation).count());
 
-		for(Oaf oaf : list){
-			if(oaf instanceof Relation){
+		for (Oaf oaf : list) {
+			if (oaf instanceof Relation) {
 				String source = ((Relation) oaf).getSource();
 				String target = ((Relation) oaf).getTarget();
 				assertNotEquals(source, target);
 				assertTrue(source.equals(p.getId()) || target.equals(p.getId()));
 				assertNotNull(((Relation) oaf).getSubRelType());
-				assertNotNull( ((Relation) oaf).getRelClass());
+				assertNotNull(((Relation) oaf).getRelClass());
 				assertNotNull(((Relation) oaf).getRelType());
 			}
 		}

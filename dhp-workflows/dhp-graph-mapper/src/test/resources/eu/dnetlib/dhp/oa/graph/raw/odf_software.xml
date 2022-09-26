@@ -20,7 +20,7 @@
       <datacite:publisher>bio.tools</datacite:publisher>
       <datacite:relatedIdentifiers>
         <datacite:relatedIdentifier relatedIdentifierType="URL" relationType="IsDocumentedBy">http://maplab.imppc.org/chainy/</datacite:relatedIdentifier>
-        <datacite:relatedIdentifier relatedIdentifierType="DOI" relationType="isReferencedBy">10.1093/bioinformatics/btw839</datacite:relatedIdentifier>
+        <datacite:relatedIdentifier relatedIdentifierType="DOI" relationType="isreferencedBy">10.1093/bioinformatics/btw839</datacite:relatedIdentifier>
       </datacite:relatedIdentifiers>
       <datacite:alternateIdentifiers>
         <datacite:alternateIdentifier alternateIdentifierType="LandingPage">https://bio.tools/</datacite:alternateIdentifier>
