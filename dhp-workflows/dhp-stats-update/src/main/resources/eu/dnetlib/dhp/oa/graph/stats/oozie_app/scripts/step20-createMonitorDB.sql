@@ -23,7 +23,7 @@ create table TARGET.result stored as parquet as
              'openorgs____::d2a09b9d5eabb10c95f9470e172d05d2', --??? Not exists ??
              'openorgs____::d169c7407dd417152596908d48c11460', --Masaryk University
              'openorgs____::1ec924b1759bb16d0a02f2dad8689b21', --University of Belgrade
-             'openorgs____::2fb1e47b4612688d9de9169d579939a7', --University of Helsinki
+             'openorgs____::0ae431b820e4c33db8967fbb2b919150', --University of Helsinki
              'openorgs____::759d59f05d77188faee99b7493b46805', --University of Minho
              'openorgs____::cad284878801b9465fa51a95b1d779db', --Universidad Politécnica de Madrid
              'openorgs____::eadc8da90a546e98c03f896661a2e4d4', --University of Göttingen
@@ -48,7 +48,8 @@ create table TARGET.result stored as parquet as
              'openorgs____::4ac562f0376fce3539504567649cb373', -- University of Patras
              'openorgs____::3e8d1f8c3f6cd7f418b09f1f58b4873b', -- Aristotle University of Thessaloniki
              'openorgs____::3fcef6e1c469c10f2a84b281372c9814', -- World Bank
-             'openorgs____::1698a2eb1885ef8adb5a4a969e745ad3' -- École des Ponts ParisTech
+             'openorgs____::1698a2eb1885ef8adb5a4a969e745ad3', -- École des Ponts ParisTech
+             'openorgs____::e15adb13c4dadd49de4d35c39b5da93a'  -- Nanyang Technological University
         ) )) foo;
 compute stats TARGET.result;
 
@@ -154,50 +155,44 @@ create table TARGET.project_results stored as parquet as select id as result, pr
 compute stats TARGET.project_results;
 
 -- indicators
+-- Sprint 1 ----
 create table TARGET.indi_pub_green_oa stored as parquet as select * from SOURCE.indi_pub_green_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_green_oa;
 create table TARGET.indi_pub_grey_lit stored as parquet as select * from SOURCE.indi_pub_grey_lit orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_grey_lit;
 create table TARGET.indi_pub_doi_from_crossref stored as parquet as select * from SOURCE.indi_pub_doi_from_crossref orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_doi_from_crossref;
-create table TARGET.indi_pub_gold_oa stored as parquet as select * from SOURCE.indi_pub_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
-compute stats TARGET.indi_pub_gold_oa;
---create table TARGET.indi_datasets_gold_oa stored as parquet as select * from SOURCE.indi_datasets_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
---compute stats TARGET.indi_datasets_gold_oa;
---create table TARGET.indi_software_gold_oa stored as parquet as select * from SOURCE.indi_software_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
---compute stats TARGET.indi_software_gold_oa;
-create table TARGET.indi_pub_has_abstract stored as parquet as select * from SOURCE.indi_pub_has_abstract orig where exists (select 1 from TARGET.result r where r.id=orig.id);
-compute stats TARGET.indi_pub_has_abstract;
+-- Sprint 2 ----
 create table TARGET.indi_result_has_cc_licence stored as parquet as select * from SOURCE.indi_result_has_cc_licence orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_result_has_cc_licence;
 create table TARGET.indi_result_has_cc_licence_url stored as parquet as select * from SOURCE.indi_result_has_cc_licence_url orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_result_has_cc_licence_url;
-
-create view TARGET.indi_funder_country_collab as select * from SOURCE.indi_funder_country_collab;
-create view TARGET.indi_project_collab_org as select * from SOURCE.indi_project_collab_org;
-create view TARGET.indi_project_collab_org_country as select * from SOURCE.indi_project_collab_org_country;
-
+create table TARGET.indi_pub_has_abstract stored as parquet as select * from SOURCE.indi_pub_has_abstract orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_pub_has_abstract;
 create table TARGET.indi_result_with_orcid stored as parquet as select * from SOURCE.indi_result_with_orcid orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_result_with_orcid;
+---- Sprint 3 ----
 create table TARGET.indi_funded_result_with_fundref stored as parquet as select * from SOURCE.indi_funded_result_with_fundref orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_funded_result_with_fundref;
+create view TARGET.indi_result_org_collab as select * from SOURCE.indi_result_org_collab;
+create view TARGET.indi_result_org_country_collab as select * from SOURCE.indi_result_org_country_collab;
+create view TARGET.indi_project_collab_org as select * from SOURCE.indi_project_collab_org;
+create view TARGET.indi_project_collab_org_country as select * from SOURCE.indi_project_collab_org_country;
+create view TARGET.indi_funder_country_collab as select * from SOURCE.indi_funder_country_collab;
+create view TARGET.indi_result_country_collab as select * from SOURCE.indi_result_country_collab;
+---- Sprint 4 ----
 create table TARGET.indi_pub_diamond stored as parquet as select * from SOURCE.indi_pub_diamond orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_diamond;
-create table TARGET.indi_pub_hybrid stored as parquet as select * from SOURCE.indi_pub_hybrid orig where exists (select 1 from TARGET.result r where r.id=orig.id);
-compute stats TARGET.indi_pub_hybrid;
 create table TARGET.indi_pub_in_transformative stored as parquet as select * from SOURCE.indi_pub_in_transformative orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_in_transformative;
 create table TARGET.indi_pub_closed_other_open stored as parquet as select * from SOURCE.indi_pub_closed_other_open orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_closed_other_open;
-
+---- Sprint 5 ----
 create table TARGET.indi_result_no_of_copies stored as parquet as select * from SOURCE.indi_result_no_of_copies orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_result_no_of_copies;
-
-create view TARGET.indi_org_findable as select * from SOURCE.indi_org_findable;
-create view TARGET.indi_org_openess as select * from SOURCE.indi_org_openess;
+---- Sprint 6 ----
 create table TARGET.indi_pub_hybrid_oa_with_cc stored as parquet as select * from SOURCE.indi_pub_hybrid_oa_with_cc orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 compute stats TARGET.indi_pub_hybrid_oa_with_cc;
-
 create table TARGET.indi_pub_downloads stored as parquet as select * from SOURCE.indi_pub_downloads orig where exists (select 1 from TARGET.result r where r.id=orig.result_id);
 compute stats TARGET.indi_pub_downloads;
 create table TARGET.indi_pub_downloads_datasource stored as parquet as select * from SOURCE.indi_pub_downloads_datasource orig where exists (select 1 from TARGET.result r where r.id=orig.result_id);
@@ -206,6 +201,28 @@ create table TARGET.indi_pub_downloads_year stored as parquet as select * from S
 compute stats TARGET.indi_pub_downloads_year;
 create table TARGET.indi_pub_downloads_datasource_year stored as parquet as select * from SOURCE.indi_pub_downloads_datasource_year orig where exists (select 1 from TARGET.result r where r.id=orig.result_id);
 compute stats TARGET.indi_pub_downloads_datasource_year;
+---- Sprint 7 ----
+create table TARGET.indi_pub_gold_oa stored as parquet as select * from SOURCE.indi_pub_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_pub_gold_oa;
+create table TARGET.indi_pub_hybrid stored as parquet as select * from SOURCE.indi_pub_hybrid orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+compute stats TARGET.indi_pub_hybrid;
+create view TARGET.indi_org_fairness as select * from SOURCE.indi_org_fairness;
+create view TARGET.indi_org_fairness_pub_pr as select * from SOURCE.indi_org_fairness_pub_pr;
+create view TARGET.indi_org_fairness_pub_year as select * from SOURCE.indi_org_fairness_pub_year;
+create view TARGET.indi_org_fairness_pub as select * from SOURCE.indi_org_fairness_pub;
+create view TARGET.indi_org_fairness_year as select * from SOURCE.indi_org_fairness_year;
+create view TARGET.indi_org_findable_year as select * from SOURCE.indi_org_findable_year;
+create view TARGET.indi_org_findable as select * from SOURCE.indi_org_findable;
+create view TARGET.indi_org_openess as select * from SOURCE.indi_org_openess;
+create view TARGET.indi_org_openess_year as select * from SOURCE.indi_org_openess_year;
+create table TARGET.indi_pub_has_preprint stored as parquet as select * from SOURCE.indi_pub_has_preprint orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.indi_pub_in_subscribed stored as parquet as select * from SOURCE.indi_pub_in_subscribed orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.indi_result_with_pid stored as parquet as select * from SOURCE.indi_result_with_pid orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+
+--create table TARGET.indi_datasets_gold_oa stored as parquet as select * from SOURCE.indi_datasets_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+--compute stats TARGET.indi_datasets_gold_oa;
+--create table TARGET.indi_software_gold_oa stored as parquet as select * from SOURCE.indi_software_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+--compute stats TARGET.indi_software_gold_oa;
 
 --denorm
 alter table TARGET.result rename to TARGET.res_tmp;
