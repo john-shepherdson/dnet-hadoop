@@ -14,8 +14,8 @@
             <description>the address of the lookUp service</description>
         </property>
         <property>
-            <name>shouldCleanContext</name>
-            <description>true if the context have to be cleaned</description>
+            <name>shouldClean</name>
+            <description>true if the operation of deletion of not needed values from the results have to be performed</description>
         </property>
         <property>
             <name>contextId</name>
@@ -29,6 +29,22 @@
             <value>gcube </value>
             <description>It is the constrint to be verified. This time is hardcoded as gcube and it is searched for in
             the title. If title starts with gcube than the context sobigdata will be removed by the result if present</description>
+        </property>
+        <property>
+            <name>verifyCountryParam</name>
+            <value>10.17632;10.5061</value>
+            <description>It is the constraints to be verified. This time is hardcoded as the starting doi from mendeley and dryad and it is searched for in
+                the pid value. If the pid value starts with one of the two prefixes, then the country may be removed</description>
+        </property>
+        <property>
+            <name>country</name>
+            <value>NL</value>
+            <description>It is the country to be removed from the set of countries if it is present with provenance propagation. The country will not be removed if in one of the isntances there is a datasource with country `country`</description>
+        </property>
+        <property>
+            <name>collectedfrom</name>
+            <value>NARCIS</value>
+            <description>the only datasource for which the country NL will be removed from the country list</description>
         </property>
 
         <property>
@@ -296,7 +312,7 @@
 
     <decision name="clean_context">
         <switch>
-            <case to="fork_clean_context">${wf:conf('shouldCleanContext') eq true}</case>
+            <case to="fork_clean_context">${wf:conf('shouldClean') eq true}</case>
             <default to="End"/>
         </switch>
     </decision>
@@ -416,7 +432,158 @@
         <error to="Kill"/>
     </action>
 
-    <join name="wait_clean_context" to="End"/>
+    <join name="wait_clean_context" to="getHostedby"/>
+
+
+    <action name="getHostedby">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Clean publications context</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.country.GetDatasourceFromCountry</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphOutputPath}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--country</arg><arg>${country}</arg>
+        </spark>
+        <ok to="fork_clean_country"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <fork name="fork_clean_country">
+        <path start="clean_publication_country"/>
+        <path start="clean_dataset_country"/>
+        <path start="clean_otherresearchproduct_country"/>
+        <path start="clean_software_country"/>
+    </fork>
+    <action name="clean_publication_country">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Clean publications counmtry</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphOutputPath}/publication</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/working/publication</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--datasourcePath</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+        </spark>
+        <ok to="wait_clean_context"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="clean_dataset_country">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Clean datasets Country</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphOutputPath}/dataset</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/working/dataset</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--datasourcePath</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+        </spark>
+        <ok to="wait_clean_context"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="clean_otherresearchproduct_country">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Clean otherresearchproducts country</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphOutputPath}/otherresearchproduct</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/working/otherresearchproduct</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--datasourcePath</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+        </spark>
+        <ok to="wait_clean_context"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="clean_software_country">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Clean softwares country</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphOutputPath}/software</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/working/software</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--datasourcePath</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+        </spark>
+        <ok to="wait_clean_country"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="wait_clean_country" to="End"/>
 
     <end name="End"/>
 </workflow-app>
