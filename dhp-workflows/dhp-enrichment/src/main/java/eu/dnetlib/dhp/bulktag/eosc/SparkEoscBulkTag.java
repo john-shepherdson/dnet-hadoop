@@ -121,8 +121,7 @@ public class SparkEoscBulkTag implements Serializable {
 			.getInstance()
 			.stream()
 			.anyMatch(
-				i -> (hostedByList.contains(i.getHostedby().getKey())) ||
-					(value.getEoscifguidelines() != null && value.getEoscifguidelines().size() > 0))
+				i -> (hostedByList.contains(i.getHostedby().getKey())))
 			&&
 			!value.getContext().stream().anyMatch(c -> c.getId().equals("eosc"))) {
 			Context context = new Context();

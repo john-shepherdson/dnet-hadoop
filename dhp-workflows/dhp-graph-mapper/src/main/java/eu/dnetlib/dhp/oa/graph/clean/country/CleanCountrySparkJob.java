@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import javax.swing.text.html.Option;
 
-import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
@@ -33,6 +32,7 @@ import eu.dnetlib.dhp.oa.graph.clean.CleanContextSparkJob;
 import eu.dnetlib.dhp.schema.oaf.Country;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 
 public class CleanCountrySparkJob implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(CleanCountrySparkJob.class);
@@ -113,7 +113,10 @@ public class CleanCountrySparkJob implements Serializable {
 			if (r
 				.getPid()
 				.stream()
-				.anyMatch(p -> p.getQualifier().getClassid()
+				.anyMatch(
+					p -> p
+						.getQualifier()
+						.getClassid()
 						.equals(PidType.doi) && pidInParam(p.getValue(), verifyParam))) {
 				r
 					.setCountry(
