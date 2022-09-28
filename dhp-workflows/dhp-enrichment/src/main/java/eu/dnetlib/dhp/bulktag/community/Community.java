@@ -5,8 +5,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gson.Gson;
 import org.apache.avro.generic.GenericData;
+
+import com.google.gson.Gson;
 
 /** Created by miriam on 01/08/2018. */
 public class Community implements Serializable {

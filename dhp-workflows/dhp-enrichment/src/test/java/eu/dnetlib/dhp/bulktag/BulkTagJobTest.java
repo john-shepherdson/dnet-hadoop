@@ -11,11 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gson.Gson;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import eu.dnetlib.dhp.bulktag.community.ProtoMap;
-import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -33,6 +28,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+
+import eu.dnetlib.dhp.bulktag.community.ProtoMap;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class BulkTagJobTest {
 
@@ -45,7 +46,7 @@ public class BulkTagJobTest {
 		+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
 		+ "  \"contributor\" : \"$['contributor'][*]['value']\","
 		+ "  \"description\" : \"$['description'][*]['value']\", "
-			+" \"subject\" :\"$['subject'][*]['value']\" }";
+		+ " \"subject\" :\"$['subject'][*]['value']\" }";
 
 	private static SparkSession spark;
 
@@ -775,8 +776,8 @@ public class BulkTagJobTest {
 			.assertEquals(
 				3, idExplodeCommunity.filter("provenance = 'community:datasource'").count());
 		Assertions
-				.assertEquals(
-						1, idExplodeCommunity.filter("provenance = 'community:advconstraint'").count());
+			.assertEquals(
+				1, idExplodeCommunity.filter("provenance = 'community:advconstraint'").count());
 	}
 
 }

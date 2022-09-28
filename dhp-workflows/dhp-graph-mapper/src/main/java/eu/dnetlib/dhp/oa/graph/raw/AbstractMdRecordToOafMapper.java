@@ -30,6 +30,7 @@ import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 
 public abstract class AbstractMdRecordToOafMapper {
 
@@ -66,6 +67,17 @@ public abstract class AbstractMdRecordToOafMapper {
 		nsContext.put("prov", "http://www.openarchives.org/OAI/2.0/provenance");
 		nsContext.put("dc", "http://purl.org/dc/elements/1.1/");
 		nsContext.put("datacite", DATACITE_SCHEMA_KERNEL_3);
+	}
+
+	// lowercase pidTypes as keys, normal casing for the values
+	protected static final Map<String, String> pidTypeWithAuthority = new HashMap<>();
+
+	static {
+		IdentifierFactory.PID_AUTHORITY
+			.keySet()
+			.stream()
+			.forEach(entry -> pidTypeWithAuthority.put(entry.toString().toLowerCase(), entry.toString()));
+
 	}
 
 	protected AbstractMdRecordToOafMapper(final VocabularyGroup vocs, final boolean invisible,

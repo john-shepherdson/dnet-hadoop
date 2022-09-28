@@ -77,7 +77,7 @@ public class CommunityConfiguration implements Serializable {
 		if (zenodocommunityMap == null) {
 			zenodocommunityMap = Maps.newHashMap();
 		}
-		if(selectionConstraintsMap == null){
+		if (selectionConstraintsMap == null) {
 			selectionConstraintsMap = Maps.newHashMap();
 		}
 
