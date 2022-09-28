@@ -158,7 +158,8 @@ public class ResultTagger implements Serializable {
 		}
 
 		result.getContext().forEach(c -> {
-			if (communities.contains(c.getId())) {
+			final String cId = c.getId();
+			if (communities.contains(cId)) {
 				Optional<List<DataInfo>> opt_dataInfoList = Optional.ofNullable(c.getDataInfo());
 				List<DataInfo> dataInfoList;
 				if (opt_dataInfoList.isPresent())
@@ -167,7 +168,7 @@ public class ResultTagger implements Serializable {
 					dataInfoList = new ArrayList<>();
 					c.setDataInfo(dataInfoList);
 				}
-				if (subjects.contains(c))
+				if (subjects.contains(cId))
 					dataInfoList
 						.add(
 							OafMapperUtils
@@ -178,7 +179,7 @@ public class ResultTagger implements Serializable {
 											CLASS_ID_SUBJECT, CLASS_NAME_BULKTAG_SUBJECT, DNET_PROVENANCE_ACTIONS,
 											DNET_PROVENANCE_ACTIONS),
 									TAGGING_TRUST));
-				if (datasources.contains(c))
+				if (datasources.contains(cId))
 					dataInfoList
 						.add(
 							OafMapperUtils
@@ -189,7 +190,7 @@ public class ResultTagger implements Serializable {
 											CLASS_ID_DATASOURCE, CLASS_NAME_BULKTAG_DATASOURCE, DNET_PROVENANCE_ACTIONS,
 											DNET_PROVENANCE_ACTIONS),
 									TAGGING_TRUST));
-				if (czenodo.contains(c))
+				if (czenodo.contains(cId))
 					dataInfoList
 						.add(
 							OafMapperUtils
@@ -200,7 +201,7 @@ public class ResultTagger implements Serializable {
 											CLASS_ID_CZENODO, CLASS_NAME_BULKTAG_ZENODO, DNET_PROVENANCE_ACTIONS,
 											DNET_PROVENANCE_ACTIONS),
 									TAGGING_TRUST));
-				if (aconstraints.contains(c))
+				if (aconstraints.contains(cId))
 					dataInfoList
 						.add(
 							OafMapperUtils
