@@ -5,6 +5,7 @@ import static eu.dnetlib.dhp.common.Constants.MDSTORE_DATA_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,6 +20,8 @@ import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.util.LongAccumulator;
+import org.dom4j.Document;
+import org.dom4j.io.SAXReader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,6 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest;
 import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.schema.mdstore.Provenance;
 import eu.dnetlib.dhp.transformation.xslt.DateCleaner;
@@ -83,9 +87,11 @@ class TransformationJobTest extends AbstractVocabularyTest {
 	@DisplayName("Test Transform Inst.&Them.v4 record XML with zenodo_tr")
 	void testTransformITGv4Zenodo() throws Exception {
 
+		final String dsName = "Zenodo";
+		final String dsId = "opendoar___::1234";
 		// We Set the input Record getting the XML from the classpath
 		final MetadataRecord mr = new MetadataRecord();
-		mr.setProvenance(new Provenance("DSID", "DSNAME", "PREFIX"));
+		mr.setProvenance(new Provenance(dsId, dsName, "PREFIX"));
 		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_itgv4.xml")));
 		// We Load the XSLT transformation Rule from the classpath
 		final XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/zenodo_tr.xslt");
@@ -94,7 +100,12 @@ class TransformationJobTest extends AbstractVocabularyTest {
 
 		// Print the record
 		System.out.println(result.getBody());
-		// TODO Create significant Assert
+
+		Document record = new SAXReader().read(new StringReader(result.getBody()));
+		assertEquals(dsName, record.valueOf("//*[local-name() = 'metadata']/*[local-name() = 'collectedFrom']/@name"));
+		assertEquals(dsId, record.valueOf("//*[local-name() = 'metadata']/*[local-name() = 'collectedFrom']/@id"));
+
+		// TODO Create more significant Asserts
 	}
 
 	@Test
@@ -282,7 +293,9 @@ class TransformationJobTest extends AbstractVocabularyTest {
 	private XSLTTransformationFunction loadTransformationRule(final String path) throws Exception {
 		final String trValue = IOUtils.toString(this.getClass().getResourceAsStream(path));
 		final LongAccumulator la = new LongAccumulator();
-		return new XSLTTransformationFunction(new AggregationCounter(la, la, la), trValue, 0, vocabularies);
+		final AggregationCounter counter = new AggregationCounter(la, la, la);
+		final AggregatorReport report = new AggregatorReport();
+		return new XSLTTransformationFunction(counter, report, trValue, 0, vocabularies);
 	}
 
 }

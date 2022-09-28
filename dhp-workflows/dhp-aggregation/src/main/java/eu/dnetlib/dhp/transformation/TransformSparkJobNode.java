@@ -110,9 +110,6 @@ public class TransformSparkJobNode {
 		final String workflowId = args.get("workflowId");
 		log.info("workflowId is {}", workflowId);
 
-		MapFunction<MetadataRecord, MetadataRecord> x = TransformationFactory
-			.getTransformationPlugin(args, ct, isLookUpService);
-
 		final Dataset<MetadataRecord> inputMDStore = spark
 			.read()
 			.format("parquet")
@@ -124,10 +121,13 @@ public class TransformSparkJobNode {
 		final MessageSender messageSender = new MessageSender(dnetMessageManagerURL, workflowId);
 		try (AggregatorReport report = new AggregatorReport(messageSender)) {
 			try {
+				final MapFunction<MetadataRecord, MetadataRecord> tr = TransformationFactory
+					.getTransformationPlugin(args, ct, report, isLookUpService);
+
 				JavaRDD<MetadataRecord> mdstore = inputMDStore
 					.javaRDD()
 					.repartition(getRepartitionNumber(totalInput, rpt))
-					.map((Function<MetadataRecord, MetadataRecord>) x::call)
+					.map((Function<MetadataRecord, MetadataRecord>) tr::call)
 					.filter((Function<MetadataRecord, Boolean>) Objects::nonNull);
 				saveDataset(spark.createDataset(mdstore.rdd(), encoder), outputBasePath + MDSTORE_DATA_PATH);
 
@@ -141,7 +141,7 @@ public class TransformSparkJobNode {
 					"" + mdStoreSize, outputBasePath + MDSTORE_SIZE_PATH);
 			} catch (Throwable e) {
 				log.error("error during record transformation", e);
-				report.put(TransformSparkJobNode.class.getSimpleName(), e.getMessage());
+				report.put(e.getClass().getName(), e.getMessage());
 				report.put(CONTENT_TOTALITEMS, ct.getTotalItems().value().toString());
 				report.put(CONTENT_INVALIDRECORDS, ct.getErrorItems().value().toString());
 				report.put(CONTENT_TRANSFORMEDRECORDS, ct.getProcessedItems().value().toString());

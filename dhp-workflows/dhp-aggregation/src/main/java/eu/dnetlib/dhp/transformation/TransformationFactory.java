@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
@@ -27,7 +28,8 @@ public class TransformationFactory {
 	}
 
 	public static MapFunction<MetadataRecord, MetadataRecord> getTransformationPlugin(
-		final Map<String, String> jobArgument, final AggregationCounter counters, final ISLookUpService isLookupService)
+		final Map<String, String> jobArgument, final AggregationCounter counters, final AggregatorReport report,
+		final ISLookUpService isLookupService)
 		throws DnetTransformationException {
 
 		try {
@@ -45,7 +47,7 @@ public class TransformationFactory {
 						transformationRuleId, isLookupService);
 
 					final long dateOfTransformation = Long.parseLong(jobArgument.get("dateOfTransformation"));
-					return new XSLTTransformationFunction(counters, transformationRule, dateOfTransformation,
+					return new XSLTTransformationFunction(counters, report, transformationRule, dateOfTransformation,
 						vocabularies);
 
 				}

@@ -7,10 +7,13 @@ import java.nio.charset.StandardCharsets;
 
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.avro.test.specialtypes.value;
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.yarn.server.api.protocolrecords.LogAggregationReport;
 import org.apache.spark.api.java.function.MapFunction;
 
 import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
 import net.sf.saxon.s9api.*;
@@ -25,9 +28,9 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 
 	private final AggregationCounter aggregationCounter;
 
-	private final String transformationRule;
+	private final AggregatorReport report;
 
-	private final Cleaner cleanFunction;
+	private final String transformationRule;
 
 	private final long dateOfTransformation;
 
@@ -35,55 +38,66 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 
 	public XSLTTransformationFunction(
 		final AggregationCounter aggregationCounter,
+		final AggregatorReport report,
 		final String transformationRule,
 		long dateOfTransformation,
 		final VocabularyGroup vocabularies) {
 		this.aggregationCounter = aggregationCounter;
+		this.report = report;
 		this.transformationRule = transformationRule;
 		this.vocabularies = vocabularies;
 		this.dateOfTransformation = dateOfTransformation;
-		cleanFunction = new Cleaner(vocabularies);
 	}
 
 	@Override
 	public MetadataRecord call(MetadataRecord value) {
 		aggregationCounter.getTotalItems().add(1);
+
+		final Processor xsltProcessor = new Processor(false);
+		xsltProcessor.registerExtensionFunction(new Cleaner(vocabularies));
+		xsltProcessor.registerExtensionFunction(new DateCleaner());
+		xsltProcessor.registerExtensionFunction(new PersonCleaner());
+
+		final StringWriter output = new StringWriter();
+		final Serializer out = xsltProcessor.newSerializer(output);
+		out.setOutputProperty(Serializer.Property.METHOD, "xml");
+		out.setOutputProperty(Serializer.Property.INDENT, "yes");
+
+		XsltTransformer transformer;
 		try {
-			Processor processor = new Processor(false);
+			transformer = xsltProcessor
+				.newXsltCompiler()
+				.compile(new StreamSource(IOUtils.toInputStream(transformationRule, StandardCharsets.UTF_8)))
+				.load();
+		} catch (SaxonApiException e) {
+			throw new RuntimeException(e);
+		}
 
-			processor.registerExtensionFunction(cleanFunction);
-			processor.registerExtensionFunction(new DateCleaner());
-			processor.registerExtensionFunction(new PersonCleaner());
+		transformer
+			.setParameter(new QName(DATASOURCE_ID_PARAM), new XdmAtomicValue(value.getProvenance().getDatasourceId()));
+		transformer
+			.setParameter(
+				new QName(DATASOURCE_NAME_PARAM), new XdmAtomicValue(value.getProvenance().getDatasourceName()));
 
-			final XsltCompiler comp = processor.newXsltCompiler();
-			QName datasourceIDParam = new QName(DATASOURCE_ID_PARAM);
-			comp.setParameter(datasourceIDParam, new XdmAtomicValue(value.getProvenance().getDatasourceId()));
-			QName datasourceNameParam = new QName(DATASOURCE_NAME_PARAM);
-			comp.setParameter(datasourceNameParam, new XdmAtomicValue(value.getProvenance().getDatasourceName()));
-			XsltExecutable xslt = comp
-				.compile(new StreamSource(IOUtils.toInputStream(transformationRule, StandardCharsets.UTF_8)));
-			XdmNode source = processor
+		try {
+			final XdmNode source = xsltProcessor
 				.newDocumentBuilder()
 				.build(new StreamSource(IOUtils.toInputStream(value.getBody(), StandardCharsets.UTF_8)));
-			XsltTransformer trans = xslt.load();
-			trans.setInitialContextNode(source);
-			final StringWriter output = new StringWriter();
-			Serializer out = processor.newSerializer(output);
-			out.setOutputProperty(Serializer.Property.METHOD, "xml");
-			out.setOutputProperty(Serializer.Property.INDENT, "yes");
 
-			trans.setDestination(out);
-			trans.transform();
-			final String xml = output.toString();
-			value.setBody(xml);
-			value.setDateOfTransformation(dateOfTransformation);
-			aggregationCounter.getProcessedItems().add(1);
-			return value;
-		} catch (Throwable e) {
+			transformer.setInitialContextNode(source);
+			transformer.setDestination(out);
+			transformer.transform();
+		} catch (SaxonApiException e) {
+			report.put(e.getClass().getName(), e.getMessage());
 			aggregationCounter.getErrorItems().add(1);
 			return null;
-//			throw new RuntimeException(e);
 		}
+
+		final String xml = output.toString();
+		value.setBody(xml);
+		value.setDateOfTransformation(dateOfTransformation);
+		aggregationCounter.getProcessedItems().add(1);
+		return value;
 	}
 
 	public AggregationCounter getAggregationCounter() {
@@ -92,10 +106,6 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 
 	public String getTransformationRule() {
 		return transformationRule;
-	}
-
-	public Cleaner getCleanFunction() {
-		return cleanFunction;
 	}
 
 	public long getDateOfTransformation() {
