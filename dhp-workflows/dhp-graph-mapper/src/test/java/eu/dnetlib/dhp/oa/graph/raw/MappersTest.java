@@ -936,11 +936,18 @@ class MappersTest {
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");
-//		final OtherResearchProduct p = (OtherResearchProduct) list.get(0);
-//		assertValidId(p.getId());
-//		assertValidId(p.getCollectedfrom().get(0).getKey());
-//		System.out.println(p.getTitle().get(0).getValue());
-//		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+		assertEquals(5, list.size());
+		final OtherResearchProduct p = (OtherResearchProduct) list.get(0);
+		assertValidId(p.getId());
+		assertTrue(p.getId().startsWith("50|w3id"));
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+		assertEquals(1, p.getInstance().size());
+		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", p.getPid().get(0).getValue());
+		Instance inst = p.getInstance().get(0);
+		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", inst.getPid().get(0).getValue());
+		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", inst.getUrl().get(0));
+
 	}
 
 	@Test

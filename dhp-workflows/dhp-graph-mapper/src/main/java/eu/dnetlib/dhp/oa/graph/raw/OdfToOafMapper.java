@@ -177,6 +177,9 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='landingPage']")) {
 			url.add(trimAndDecodeUrl(((Node) o).getText().trim()));
 		}
+		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='w3id']")) {
+			url.add(trimAndDecodeUrl(((Node) o).getText().trim()));
+		}
 
 		Set<String> validUrl = validateUrl(url);
 

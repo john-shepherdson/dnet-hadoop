@@ -117,7 +117,7 @@ public class CleanCountrySparkJob implements Serializable {
 					p -> p
 						.getQualifier()
 						.getClassid()
-						.equals(PidType.doi) && pidInParam(p.getValue(), verifyParam))) {
+						.equals(PidType.doi.toString()) && pidInParam(p.getValue(), verifyParam))) {
 				r
 					.setCountry(
 						r
