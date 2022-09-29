@@ -77,11 +77,11 @@ public class TransformSparkJobNode {
 			.ofNullable(parser.get("recordsPerTask"))
 			.map(Integer::valueOf)
 			.orElse(RECORDS_PER_TASK);
+		log.info("recordsPerTask: {}", rpt);
 
 		final ISLookUpService isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl);
 
 		final VocabularyGroup vocabularies = VocabularyGroup.loadVocsFromIS(isLookupService);
-
 		log.info("Retrieved {} vocabularies", vocabularies.vocabularyNames().size());
 
 		SparkConf conf = new SparkConf();
@@ -120,33 +120,24 @@ public class TransformSparkJobNode {
 
 		final MessageSender messageSender = new MessageSender(dnetMessageManagerURL, workflowId);
 		try (AggregatorReport report = new AggregatorReport(messageSender)) {
-			try {
-				final MapFunction<MetadataRecord, MetadataRecord> tr = TransformationFactory
-					.getTransformationPlugin(args, ct, report, isLookUpService);
+			final MapFunction<MetadataRecord, MetadataRecord> tr = TransformationFactory
+				.getTransformationPlugin(args, ct, report, isLookUpService);
 
-				JavaRDD<MetadataRecord> mdstore = inputMDStore
-					.javaRDD()
-					.repartition(getRepartitionNumber(totalInput, rpt))
-					.map((Function<MetadataRecord, MetadataRecord>) tr::call)
-					.filter((Function<MetadataRecord, Boolean>) Objects::nonNull);
-				saveDataset(spark.createDataset(mdstore.rdd(), encoder), outputBasePath + MDSTORE_DATA_PATH);
+			JavaRDD<MetadataRecord> mdstore = inputMDStore
+				.javaRDD()
+				.repartition(getRepartitionNumber(totalInput, rpt))
+				.map((Function<MetadataRecord, MetadataRecord>) tr::call)
+				.filter((Function<MetadataRecord, Boolean>) Objects::nonNull);
+			saveDataset(spark.createDataset(mdstore.rdd(), encoder), outputBasePath + MDSTORE_DATA_PATH);
 
-				log.info("Transformed item {}", ct.getProcessedItems().count());
-				log.info("Total item {}", ct.getTotalItems().count());
-				log.info("Transformation Error item {}", ct.getErrorItems().count());
+			log.info("Transformed item {}", ct.getProcessedItems().count());
+			log.info("Total item {}", ct.getTotalItems().count());
+			log.info("Transformation Error item {}", ct.getErrorItems().count());
 
-				final long mdStoreSize = spark.read().load(outputBasePath + MDSTORE_DATA_PATH).count();
-				writeHdfsFile(
-					spark.sparkContext().hadoopConfiguration(),
-					"" + mdStoreSize, outputBasePath + MDSTORE_SIZE_PATH);
-			} catch (Throwable e) {
-				log.error("error during record transformation", e);
-				report.put(e.getClass().getName(), e.getMessage());
-				report.put(CONTENT_TOTALITEMS, ct.getTotalItems().value().toString());
-				report.put(CONTENT_INVALIDRECORDS, ct.getErrorItems().value().toString());
-				report.put(CONTENT_TRANSFORMEDRECORDS, ct.getProcessedItems().value().toString());
-				throw e;
-			}
+			final long mdStoreSize = spark.read().load(outputBasePath + MDSTORE_DATA_PATH).count();
+			writeHdfsFile(
+				spark.sparkContext().hadoopConfiguration(),
+				"" + mdStoreSize, outputBasePath + MDSTORE_SIZE_PATH);
 		}
 	}
 

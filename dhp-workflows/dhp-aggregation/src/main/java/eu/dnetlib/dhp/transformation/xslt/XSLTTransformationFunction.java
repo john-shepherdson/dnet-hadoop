@@ -1,6 +1,9 @@
 
 package eu.dnetlib.dhp.transformation.xslt;
 
+import static eu.dnetlib.dhp.common.Constants.*;
+
+import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -70,7 +73,13 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 				.compile(new StreamSource(IOUtils.toInputStream(transformationRule, StandardCharsets.UTF_8)))
 				.load();
 		} catch (SaxonApiException e) {
-			throw new RuntimeException(e);
+			report.put(e.getClass().getName(), e.getMessage());
+			try {
+				report.close();
+			} catch (IOException ex) {
+				throw new IllegalArgumentException("error compiling the XSLT", e);
+			}
+			throw new IllegalArgumentException("error compiling the XSLT", e);
 		}
 
 		transformer
