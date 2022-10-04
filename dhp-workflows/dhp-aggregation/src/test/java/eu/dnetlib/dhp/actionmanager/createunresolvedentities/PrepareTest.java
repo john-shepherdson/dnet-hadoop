@@ -151,9 +151,8 @@ public class PrepareTest {
 		Assertions.assertEquals(1, tmp.filter(r -> r.getId().equals(doi2)).count());
 		Assertions.assertEquals(1, tmp.filter(r -> r.getId().equals(doi2)).collect().get(0).getInstance().size());
 
-		tmp
-			.filter(r -> r.getId().startsWith("unresolved::10.2111/1551-5028(2004)057"))
-			.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
+		tmp.filter(r -> r.getId().startsWith("unresolved::10.2111/1551-5028(2004)057"))
+				.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
 
 	}
 
