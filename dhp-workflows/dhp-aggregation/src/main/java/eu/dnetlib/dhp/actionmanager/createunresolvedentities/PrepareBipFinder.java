@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonParser;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -41,6 +40,7 @@ import eu.dnetlib.dhp.utils.DHPUtils;
 public class PrepareBipFinder implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(PrepareBipFinder.class);
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(String[] args) throws Exception {
 
@@ -82,11 +82,9 @@ public class PrepareBipFinder implements Serializable {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		ObjectMapper mapper = new ObjectMapper()
-				.configure(JsonParser.Feature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER, true);
 		JavaRDD<BipDeserialize> bipDeserializeJavaRDD = sc
 			.textFile(inputPath)
-			.map(item -> mapper.readValue(item, BipDeserialize.class));
+			.map(item -> OBJECT_MAPPER.readValue(item, BipDeserialize.class));
 
 		spark
 			.createDataset(bipDeserializeJavaRDD.flatMap(entry -> entry.keySet().stream().map(key -> {

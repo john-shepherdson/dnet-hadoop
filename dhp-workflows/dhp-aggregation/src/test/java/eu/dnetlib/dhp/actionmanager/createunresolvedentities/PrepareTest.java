@@ -88,7 +88,7 @@ public class PrepareTest {
 			.textFile(workingDir.toString() + "/work/bip")
 			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
 
-		Assertions.assertEquals(87, tmp.count());
+		Assertions.assertEquals(86, tmp.count());
 
 		String doi1 = "unresolved::10.0000/096020199389707::doi";
 
@@ -150,9 +150,6 @@ public class PrepareTest {
 
 		Assertions.assertEquals(1, tmp.filter(r -> r.getId().equals(doi2)).count());
 		Assertions.assertEquals(1, tmp.filter(r -> r.getId().equals(doi2)).collect().get(0).getInstance().size());
-
-		tmp.filter(r -> r.getId().startsWith("unresolved::10.2111/1551-5028(2004)057"))
-				.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
 
 	}
 
