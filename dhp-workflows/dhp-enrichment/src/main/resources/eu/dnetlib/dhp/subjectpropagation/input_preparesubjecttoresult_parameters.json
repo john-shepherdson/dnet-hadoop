@@ -1,0 +1,46 @@
+[
+
+
+  {
+    "paramName":"asr",
+    "paramLongName":"allowedSemRel",
+    "paramDescription": "the set of semantic relations between the results to be exploited to perform the propagation",
+    "paramRequired": true
+  },
+  {
+    "paramName":"sl",
+    "paramLongName":"subjectlist",
+    "paramDescription": "the list of classid for the subject we wanti to propagate",
+    "paramRequired": true
+  },
+  {
+    "paramName":"rt",
+    "paramLongName":"resultType",
+    "paramDescription": "the result type",
+    "paramRequired": true
+  },
+  {
+    "paramName":"sp",
+    "paramLongName":"sourcePath",
+    "paramDescription": "the path of the input graph",
+    "paramRequired": true
+  },
+  {
+    "paramName":"rtn",
+    "paramLongName":"resultTableName",
+    "paramDescription": "the class of the result",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ssm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "the path where prepared info have been stored",
+    "paramRequired": false
+  },
+  {
+    "paramName": "out",
+    "paramLongName": "outputPath",
+    "paramDescription": "the path used to store temporary output files",
+    "paramRequired": true
+  }
+]

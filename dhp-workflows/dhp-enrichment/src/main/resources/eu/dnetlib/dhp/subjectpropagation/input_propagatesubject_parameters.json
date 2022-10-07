@@ -1,0 +1,45 @@
+[
+
+  {
+    "paramName":"pp",
+    "paramLongName":"preparedPath",
+    "paramDescription": "the path to the prepared information",
+    "paramRequired": true
+  },
+  {
+    "paramName":"rt",
+    "paramLongName":"resultType",
+    "paramDescription": "the result type",
+    "paramRequired": true
+  },
+  {
+    "paramName":"ip",
+    "paramLongName":"inputPath",
+    "paramDescription": "the path of the input graph",
+    "paramRequired": true
+  },
+  {
+    "paramName":"rtn",
+    "paramLongName":"resultTableName",
+    "paramDescription": "the class of the result",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ssm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "the path where prepared info have been stored",
+    "paramRequired": false
+  },
+  {
+    "paramName": "out",
+    "paramLongName": "outputPath",
+    "paramDescription": "the path used to store output files",
+    "paramRequired": true
+  },
+  {
+  "paramName": "wp",
+  "paramLongName": "workingPath",
+  "paramDescription": "the path used to store temporary output files",
+  "paramRequired": true
+}
+]

@@ -50,6 +50,9 @@ public class PropagationConstant {
 
 	public static final String TRUE = "true";
 
+	public static final String PROPAGATION_SUBJECT_RESULT_SEMREL_CLASS_ID = "subject:remrel";
+	public static final String PROPAGATION_SUBJECT_RESULT_SEMREL_CLASS_NAME = "Propagation of subjects through semantic relation";
+
 	public static final String PROPAGATION_COUNTRY_INSTREPO_CLASS_ID = "country:instrepos";
 	public static final String PROPAGATION_COUNTRY_INSTREPO_CLASS_NAME = "Propagation of country to result collected from datasources of type institutional repositories";
 

@@ -1,0 +1,307 @@
+<workflow-app name="subject_to_result_propagation" xmlns="uri:oozie:workflow:0.5">
+
+
+<!--    {-->
+<!--    "paramName": "out",-->
+<!--    "paramLongName": "outputPath",-->
+<!--    "paramDescription": "the path used to store temporary output files",-->
+<!--    "paramRequired": true-->
+<!--    }-->
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>subjectlist</name>
+            <description>the list of subject classid to propagate (split by ;)</description>
+        </property>
+        <property>
+            <name>resultType</name>
+            <description>the result tapy</description>
+        </property>
+        <property>
+            <name>resultTableName</name>
+            <description>the class of the result</description>
+        </property>
+        <property>
+            <name>allowedsemrels</name>
+            <description>the allowed semantics </description>
+        </property>
+       <property>
+           <name>outputPath</name>
+           <description>the output path</description>
+       </property>
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to="reset_outputpath"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="reset_outputpath">
+        <fs>
+            <delete path="${outputPath}"/>
+            <mkdir path="${outputPath}"/>
+        </fs>
+        <ok to="prepare_subject_propagation"/>
+        <error to="Kill"/>
+    </action>
+
+    <fork name="prepare_subject_propagation">
+        <path start="prepare_subject_propagation_publication"/>
+        <path start="prepare_subject_propagation_dataset"/>
+        <path start="prepare_subject_propagation_software"/>
+        <path start="prepare_subject_propagation_otherresearchproduct"/>
+    </fork>
+
+    <action name="prepare_subject_propagation_publication">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>PrepareProjectResultsAssociation</name>
+            <class>eu.dnetlib.dhp.subjecttoresultfromsemrel.PrepareResultResultStep1</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
+            <arg>--subjectlist</arg><arg>${subjectlist}</arg>
+            <arg>--resultType</arg><arg>publication</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo</arg>
+        </spark>
+        <ok to="wait_prepare"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="prepare_subject_propagation_dataset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>PrepareProjectResultsAssociation</name>
+            <class>eu.dnetlib.dhp.subjecttoresultfromsemrel.PrepareResultResultStep1</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
+            <arg>--subjectlist</arg><arg>${subjectlist}</arg>
+            <arg>--resultType</arg><arg>dataset</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo</arg>
+        </spark>
+        <ok to="wait_prepare"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="prepare_subject_propagation_software">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>PrepareProjectResultsAssociation</name>
+            <class>eu.dnetlib.dhp.subjecttoresultfromsemrel.PrepareResultResultStep1</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
+            <arg>--subjectlist</arg><arg>${subjectlist}</arg>
+            <arg>--resultType</arg><arg>software</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo</arg>
+        </spark>
+        <ok to="wait_prepare"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="prepare_subject_propagation_orp">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>PrepareProjectResultsAssociation</name>
+            <class>eu.dnetlib.dhp.subjecttoresultfromsemrel.PrepareResultResultStep1</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
+            <arg>--subjectlist</arg><arg>${subjectlist}</arg>
+            <arg>--resultType</arg><arg>otherresearchproduct</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo</arg>
+        </spark>
+        <ok to="wait_prepare"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="wait_prepare" to="propagate_subject"/>
+
+    <fork name="propagate_subject">
+        <path start="propagate_subject_publication"/>
+        <path start="propagate_subject_dataset"/>
+        <path start="propagate_subject_software"/>
+        <path start="propagate_subject_otherresearchproduct"/>
+    </fork>
+
+    <action name="propagate_subject_publication">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>ProjectToResultPropagation</name>
+            <class>eu.dnetlib.dhp.projecttoresult.SparkResultToProjectThroughSemRelJob</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${sourcePath}</arg>
+            <arg>--outputPath</arg><arg>${outputPath}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/working</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--resultType</arg><arg>publication</arg>
+            <arg>--preparedPath</arg><arg>${workingDir}/preparedInfo</arg>
+        </spark>
+        <ok to="wait_propagation"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="propagate_subject_otherresearchproduct">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>ProjectToResultPropagation</name>
+            <class>eu.dnetlib.dhp.projecttoresult.SparkResultToProjectThroughSemRelJob</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${sourcePath}</arg>
+            <arg>--outputPath</arg><arg>${outputPath}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/working</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+            <arg>--resultType</arg><arg>otherresearchproduct</arg>
+            <arg>--preparedPath</arg><arg>${workingDir}/preparedInfo</arg>
+        </spark>
+        <ok to="wait_propagation"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="propagate_subject_dataset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>ProjectToResultPropagation</name>
+            <class>eu.dnetlib.dhp.projecttoresult.SparkResultToProjectThroughSemRelJob</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${sourcePath}</arg>
+            <arg>--outputPath</arg><arg>${outputPath}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/working</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
+            <arg>--resultType</arg><arg>dataset</arg>
+            <arg>--preparedPath</arg><arg>${workingDir}/preparedInfo</arg>
+        </spark>
+        <ok to="wait_propagation"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="propagate_subject_software">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>ProjectToResultPropagation</name>
+            <class>eu.dnetlib.dhp.projecttoresult.SparkResultToProjectThroughSemRelJob</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${sourcePath}</arg>
+            <arg>--outputPath</arg><arg>${outputPath}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/working</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+            <arg>--resultType</arg><arg>software</arg>
+            <arg>--preparedPath</arg><arg>${workingDir}/preparedInfo</arg>
+        </spark>
+        <ok to="wait_propagation"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="wait_prepare" to="End"/>
+
+    <end name="End"/>
+
+</workflow-app>

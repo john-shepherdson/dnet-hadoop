@@ -1,0 +1,2 @@
+{"resId":"50|06cdd3ff4700::93859bd27121c3ee7c6ee4bfb1790cba","subjectList":[{"classid":"FOS", "classname":"Field of Science","value":"fake_fos2"}]}
+{"resId":"50|06cdd3ff4700::cd7711c65d518859f1d87056e2c45d98","subjectList":[{"classid":"FOS", "classname":"Field of Science","value":"fake_fos"},{"classid":"SDG","classname":"Support and Development Goals","value":"fake_sdg"},{"classid":"FOS", "classname":"Field of Science","value":"fake_fos2"}]}
