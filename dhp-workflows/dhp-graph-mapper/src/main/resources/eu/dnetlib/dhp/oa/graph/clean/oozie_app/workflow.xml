@@ -492,7 +492,7 @@
             <arg>--datasourcePath</arg><arg>${workingDir}/working/hostedby</arg>
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
         </spark>
-        <ok to="wait_clean_context"/>
+        <ok to="wait_clean_country"/>
         <error to="Kill"/>
     </action>
 
@@ -521,7 +521,7 @@
             <arg>--datasourcePath</arg><arg>${workingDir}/working/hostedby</arg>
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
         </spark>
-        <ok to="wait_clean_context"/>
+        <ok to="wait_clean_country"/>
         <error to="Kill"/>
     </action>
 
@@ -550,7 +550,7 @@
             <arg>--datasourcePath</arg><arg>${workingDir}/working/hostedby</arg>
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
         </spark>
-        <ok to="wait_clean_context"/>
+        <ok to="wait_clean_country"/>
         <error to="Kill"/>
     </action>
 
