@@ -39,7 +39,6 @@ create table TARGET.result stored as parquet as
              'openorgs____::5f31346d444a7f06a28c880fb170b0f6', --Ghent University
              'openorgs____::2dbe47117fd5409f9c61620813456632', --University of Luxembourg
              'openorgs____::6445d7758d3a40c4d997953b6632a368', --National Institute of Informatics (NII)
-
              'openorgs____::b77c01aa15de3675da34277d48de2ec1', -- Valencia Catholic University Saint Vincent Martyr
              'openorgs____::7fe2f66cdc43983c6b24816bfe9cf6a0', -- Unviersity of Warsaw
              'openorgs____::15e7921fc50d9aa1229a82a84429419e', -- University Of Thessaly
@@ -224,18 +223,3 @@ create table TARGET.indi_result_with_pid stored as parquet as select * from SOUR
 --create table TARGET.indi_software_gold_oa stored as parquet as select * from SOURCE.indi_software_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 --compute stats TARGET.indi_software_gold_oa;
 
---denorm
-alter table TARGET.result rename to TARGET.res_tmp;
-
-create table TARGET.result_denorm stored as parquet as
-    select distinct r.*, rp.project, p.acronym as pacronym, p.title as ptitle, p.funder as pfunder, p.funding_lvl0 as pfunding_lvl0, rd.datasource, d.name as dname, d.type as dtype
-    from TARGET.res_tmp r
-    left outer join TARGET.result_projects rp on rp.id=r.id
-    left outer join TARGET.result_datasources rd on rd.id=r.id
-    left outer join TARGET.project p on p.id=rp.project
-    left outer join TARGET.datasource d on d.id=rd.datasource;
-compute stats TARGET.result_denorm;
-
-alter table TARGET.result_denorm rename to TARGET.result;
-drop table TARGET.res_tmp;
---- done!
