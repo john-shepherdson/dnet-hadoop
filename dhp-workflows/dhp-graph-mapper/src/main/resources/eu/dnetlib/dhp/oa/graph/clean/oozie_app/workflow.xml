@@ -471,7 +471,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Clean publications counmtry</name>
+            <name>Clean publication country</name>
             <class>eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
@@ -489,7 +489,7 @@
             <arg>--workingPath</arg><arg>${workingDir}/working/publication</arg>
             <arg>--country</arg><arg>${country}</arg>
             <arg>--verifyParam</arg><arg>${verifyCountryParam}</arg>
-            <arg>--datasourcePath</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
         </spark>
         <ok to="wait_clean_country"/>
@@ -500,7 +500,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Clean datasets Country</name>
+            <name>Clean dataset country</name>
             <class>eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
@@ -518,7 +518,7 @@
             <arg>--workingPath</arg><arg>${workingDir}/working/dataset</arg>
             <arg>--country</arg><arg>${country}</arg>
             <arg>--verifyParam</arg><arg>${verifyCountryParam}</arg>
-            <arg>--datasourcePath</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
         </spark>
         <ok to="wait_clean_country"/>
@@ -529,7 +529,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Clean otherresearchproducts country</name>
+            <name>Clean otherresearchproduct country</name>
             <class>eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
@@ -547,7 +547,7 @@
             <arg>--workingPath</arg><arg>${workingDir}/working/otherresearchproduct</arg>
             <arg>--country</arg><arg>${country}</arg>
             <arg>--verifyParam</arg><arg>${verifyCountryParam}</arg>
-            <arg>--datasourcePath</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
         </spark>
         <ok to="wait_clean_country"/>
@@ -558,7 +558,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Clean softwares country</name>
+            <name>Clean software country</name>
             <class>eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
@@ -576,7 +576,7 @@
             <arg>--workingPath</arg><arg>${workingDir}/working/software</arg>
             <arg>--country</arg><arg>${country}</arg>
             <arg>--verifyParam</arg><arg>${verifyCountryParam}</arg>
-            <arg>--datasourcePath</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
         </spark>
         <ok to="wait_clean_country"/>
