@@ -211,7 +211,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 											.orElse(s.getValue()),
 										Function.identity(),
 										(s1, s2) -> Collections
-											.min(Lists.newArrayList(s1, s1), new SubjectProvenanceComparator())))
+											.min(Lists.newArrayList(s1, s2), new SubjectProvenanceComparator())))
 							.values());
 				r.setSubject(subjects);
 			}

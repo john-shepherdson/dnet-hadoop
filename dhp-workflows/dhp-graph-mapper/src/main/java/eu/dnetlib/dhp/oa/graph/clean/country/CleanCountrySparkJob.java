@@ -43,7 +43,7 @@ public class CleanCountrySparkJob implements Serializable {
 
 		String jsonConfiguration = IOUtils
 			.toString(
-				CleanContextSparkJob.class
+				CleanCountrySparkJob.class
 					.getResourceAsStream(
 						"/eu/dnetlib/dhp/oa/graph/input_clean_country_parameters.json"));
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);

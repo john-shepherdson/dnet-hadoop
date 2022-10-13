@@ -708,6 +708,28 @@
   "subject": [
     {
       "dataInfo": {
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:repository",
+          "classname": "sysimport:crosswalk:repository",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "deletedbyinference": false,
+        "inferred": false,
+        "inferenceprovenance": "",
+        "invisible": false,
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "FOS",
+        "classname": "Fields of Science and Technology classification",
+        "schemeid": "dnet:result_subject",
+        "schemename": "dnet:result_subject"
+      },
+      "value": "In Situ Hybridization"
+    },
+    {
+      "dataInfo": {
         "deletedbyinference": false,
         "inferenceprovenance": "",
         "inferred": false,
