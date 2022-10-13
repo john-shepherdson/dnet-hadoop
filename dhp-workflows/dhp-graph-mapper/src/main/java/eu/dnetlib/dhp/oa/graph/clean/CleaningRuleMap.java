@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.graph.clean;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.lang3.SerializationUtils;
@@ -10,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableConsumer;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyTerm;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 
@@ -31,29 +33,30 @@ public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Obje
 	}
 
 	private static void cleanSubject(VocabularyGroup vocabularies, Subject subject) {
-		if (cleanSubjectForVocabulary(ModelConstants.DNET_SUBJECT_FOS_CLASSID, vocabularies, subject)) {
-			return;
-		} else {
-			// TODO cleaning based on different subject vocabs can be added here
-		}
+		cleanSubjectForVocabulary(ModelConstants.DNET_SUBJECT_FOS_CLASSID, vocabularies, subject);
+		// TODO cleaning based on different subject vocabs can be added here
 	}
 
-	private static boolean cleanSubjectForVocabulary(String vocabularyId, VocabularyGroup vocabularies,
+	private static void cleanSubjectForVocabulary(String vocabularyId, VocabularyGroup vocabularies,
 		Subject subject) {
-		AtomicReference<Boolean> modified = new AtomicReference<>(false);
+
 		vocabularies.find(vocabularyId).ifPresent(vocabulary -> {
-			if (!ModelConstants.DNET_SUBJECT_KEYWORD.equalsIgnoreCase(subject.getQualifier().getClassid())) {
-				return;
-			}
-			Qualifier newValue = vocabulary.lookup(subject.getValue());
-			if (!ModelConstants.UNKNOWN.equals(newValue.getClassid())) {
-				subject.setValue(newValue.getClassid());
-				subject.getQualifier().setClassid(vocabularyId);
-				subject.getQualifier().setClassname(vocabulary.getName());
-				modified.set(true);
+			if (ModelConstants.DNET_SUBJECT_KEYWORD.equalsIgnoreCase(subject.getQualifier().getClassid())) {
+				Qualifier newValue = vocabulary.lookup(subject.getValue());
+				if (!ModelConstants.UNKNOWN.equals(newValue.getClassid())) {
+					subject.setValue(newValue.getClassid());
+					subject.getQualifier().setClassid(vocabularyId);
+					subject.getQualifier().setClassname(vocabulary.getName());
+				}
+			} else if (vocabularyId.equals(subject.getQualifier().getClassid())) {
+				Qualifier syn = vocabulary.getSynonymAsQualifier(subject.getValue());
+				VocabularyTerm term = vocabulary.getTerm(subject.getValue());
+				if (Objects.isNull(syn) && Objects.isNull(term)) {
+					subject.getQualifier().setClassid(ModelConstants.DNET_SUBJECT_KEYWORD);
+					subject.getQualifier().setClassname(ModelConstants.DNET_SUBJECT_KEYWORD);
+				}
 			}
 		});
-		return modified.get();
 	}
 
 	private static void cleanRelation(VocabularyGroup vocabularies, Relation r) {

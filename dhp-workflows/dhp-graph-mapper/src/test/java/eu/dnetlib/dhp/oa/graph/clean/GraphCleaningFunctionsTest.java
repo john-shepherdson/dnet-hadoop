@@ -278,6 +278,16 @@ public class GraphCleaningFunctionsTest {
 					s -> "0102 computer and information sciences".equals(s.getValue()) &
 						ModelConstants.DNET_SUBJECT_FOS_CLASSID.equals(s.getQualifier().getClassid())));
 
+		List<Subject> s1 = p_cleaned
+			.getSubject()
+			.stream()
+			.filter(s -> s.getValue().equals("In Situ Hybridization"))
+			.collect(Collectors.toList());
+		assertNotNull(s1);
+		assertEquals(1, s1.size());
+		assertEquals(ModelConstants.DNET_SUBJECT_KEYWORD, s1.get(0).getQualifier().getClassid());
+		assertEquals(ModelConstants.DNET_SUBJECT_KEYWORD, s1.get(0).getQualifier().getClassname());
+
 		// TODO add more assertions to verity the cleaned values
 		System.out.println(MAPPER.writeValueAsString(p_cleaned));
 	}
