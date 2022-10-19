@@ -24,11 +24,11 @@ import scala.io.Source
 object DataciteToOAFTransformation {
 
   case class HostedByMapType(
-                              openaire_id: String,
-                              datacite_name: String,
-                              official_name: String,
-                              similarity: Option[Float]
-                            ) {}
+    openaire_id: String,
+    datacite_name: String,
+    official_name: String,
+    similarity: Option[Float]
+  ) {}
 
   val mapper = new ObjectMapper()
 
@@ -47,12 +47,12 @@ object DataciteToOAFTransformation {
   }
 
   /** This method should skip record if json contains invalid text
-   * defined in file datacite_filter
-   *
-   * @param record : not parsed Datacite record
-   * @param json : parsed record
-   * @return True if the record should be skipped
-   */
+    * defined in file datacite_filter
+    *
+    * @param record : not parsed Datacite record
+    * @param json : parsed record
+    * @return True if the record should be skipped
+    */
   def skip_record(record: String, json: org.json4s.JValue): Boolean = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     datacite_filter.exists(f => record.contains(f)) || (json \\ "publisher")
@@ -98,11 +98,10 @@ object DataciteToOAFTransformation {
 
   }
 
-  /**
-   * This utility method indicates whether the embargo date has been reached
-   * @param embargo_end_date
-   * @return True if the embargo date has been reached, false otherwise
-   */
+  /** This utility method indicates whether the embargo date has been reached
+    * @param embargo_end_date
+    * @return True if the embargo date has been reached, false otherwise
+    */
   def embargo_end(embargo_end_date: String): Boolean = {
     val dt = LocalDate.parse(embargo_end_date, DateTimeFormatter.ofPattern("[yyyy-MM-dd]"))
     val td = LocalDate.now()
@@ -147,27 +146,27 @@ object DataciteToOAFTransformation {
     }
   }
 
-  /***
-   * Use the vocabulary dnet:publication_resource to find a synonym to one of these terms and get the instance.type.
-   * Using the dnet:result_typologies vocabulary, we look up the instance.type synonym
-   * to generate one of the following main entities:
-   *  - publication
-   *  - dataset
-   *  - software
-   *  - otherresearchproduct
-
-   * @param resourceType
-   * @param resourceTypeGeneral
-   * @param schemaOrg
-   * @param vocabularies
-   * @return
-   */
+  /** *
+    * Use the vocabulary dnet:publication_resource to find a synonym to one of these terms and get the instance.type.
+    * Using the dnet:result_typologies vocabulary, we look up the instance.type synonym
+    * to generate one of the following main entities:
+    *  - publication
+    *  - dataset
+    *  - software
+    *  - otherresearchproduct
+    *
+    * @param resourceType
+    * @param resourceTypeGeneral
+    * @param schemaOrg
+    * @param vocabularies
+    * @return
+    */
   def getTypeQualifier(
-                        resourceType: String,
-                        resourceTypeGeneral: String,
-                        schemaOrg: String,
-                        vocabularies: VocabularyGroup
-                      ): (Qualifier, Qualifier) = {
+    resourceType: String,
+    resourceTypeGeneral: String,
+    schemaOrg: String,
+    vocabularies: VocabularyGroup
+  ): (Qualifier, Qualifier) = {
     if (resourceType != null && resourceType.nonEmpty) {
       val typeQualifier =
         vocabularies.getSynonymAsQualifier(ModelConstants.DNET_PUBLICATION_RESOURCE, resourceType)
@@ -212,11 +211,11 @@ object DataciteToOAFTransformation {
   }
 
   def getResult(
-                 resourceType: String,
-                 resourceTypeGeneral: String,
-                 schemaOrg: String,
-                 vocabularies: VocabularyGroup
-               ): Result = {
+    resourceType: String,
+    resourceTypeGeneral: String,
+    schemaOrg: String,
+    vocabularies: VocabularyGroup
+  ): Result = {
     val typeQualifiers: (Qualifier, Qualifier) =
       getTypeQualifier(resourceType, resourceTypeGeneral, schemaOrg, vocabularies)
     if (typeQualifiers == null)
@@ -258,11 +257,11 @@ object DataciteToOAFTransformation {
   }
 
   /** As describe in ticket #6377
-   * when the result come from figshare we need to remove subject
-   * and set Access rights OPEN.
-   *
-   * @param r
-   */
+    * when the result come from figshare we need to remove subject
+    * and set Access rights OPEN.
+    *
+    * @param r
+    */
   def fix_figshare(r: Result): Unit = {
 
     if (r.getInstance() != null) {
@@ -289,12 +288,12 @@ object DataciteToOAFTransformation {
   }
 
   def generateRelation(
-                        sourceId: String,
-                        targetId: String,
-                        relClass: String,
-                        cf: KeyValue,
-                        di: DataInfo
-                      ): Relation = {
+    sourceId: String,
+    targetId: String,
+    relClass: String,
+    cf: KeyValue,
+    di: DataInfo
+  ): Relation = {
 
     val r = new Relation
     r.setSource(sourceId)
@@ -323,12 +322,12 @@ object DataciteToOAFTransformation {
   }
 
   def generateOAF(
-                   input: String,
-                   ts: Long,
-                   dateOfCollection: Long,
-                   vocabularies: VocabularyGroup,
-                   exportLinks: Boolean
-                 ): List[Oaf] = {
+    input: String,
+    ts: Long,
+    dateOfCollection: Long,
+    vocabularies: VocabularyGroup,
+    exportLinks: Boolean
+  ): List[Oaf] = {
 
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json = parse(input)
@@ -413,7 +412,6 @@ object DataciteToOAFTransformation {
       return List()
     result.setAuthor(authors.asJava)
 
-
     val titles: List[TitleType] = (json \\ "titles").extractOrElse[List[TitleType]](List())
 
     result.setTitle(
@@ -436,8 +434,6 @@ object DataciteToOAFTransformation {
         })
         .asJava
     )
-
-
 
     val dates = (json \\ "dates").extract[List[DateType]]
     val publication_year = (json \\ "publicationYear").extractOrElse[String](null)
@@ -645,16 +641,16 @@ object DataciteToOAFTransformation {
   }
 
   private def generateRelations(
-                                 rels: List[RelatedIdentifierType],
-                                 id: String,
-                                 date: String
-                               ): List[Relation] = {
+    rels: List[RelatedIdentifierType],
+    id: String,
+    date: String
+  ): List[Relation] = {
     rels
       .filter(r =>
         subRelTypeMapping
           .contains(r.relationType) && (r.relatedIdentifierType.equalsIgnoreCase("doi") ||
-          r.relatedIdentifierType.equalsIgnoreCase("pmid") ||
-          r.relatedIdentifierType.equalsIgnoreCase("arxiv"))
+        r.relatedIdentifierType.equalsIgnoreCase("pmid") ||
+        r.relatedIdentifierType.equalsIgnoreCase("arxiv"))
       )
       .map(r => {
         val rel = new Relation
