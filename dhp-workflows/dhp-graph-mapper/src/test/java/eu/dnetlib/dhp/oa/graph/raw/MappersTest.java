@@ -947,6 +947,7 @@ class MappersTest {
 		Instance inst = p.getInstance().get(0);
 		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", inst.getPid().get(0).getValue());
 		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", inst.getUrl().get(0));
+		assertEquals(1, p.getEoscifguidelines().size());
 
 	}
 

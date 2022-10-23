@@ -366,6 +366,7 @@ public abstract class AbstractMdRecordToOafMapper {
 
 		r.setInstance(instances);
 		r.setBestaccessright(OafMapperUtils.createBestAccessRights(instances));
+		r.setEoscifguidelines(prepareEOSCIfGuidelines(doc, info));
 	}
 
 	protected abstract List<StructuredProperty> prepareResultPids(Document doc, DataInfo info);
@@ -382,6 +383,25 @@ public abstract class AbstractMdRecordToOafMapper {
 			}
 		}
 		return list;
+	}
+
+	private List<EoscIfGuidelines> prepareEOSCIfGuidelines(Document doc, DataInfo info){
+		final Set<EoscIfGuidelines> set = Sets.newHashSet();
+		for (final Object o : doc.selectNodes("//oaf:eoscifguidelines")) {
+			final String code = ((Node) o).valueOf("@code");
+			final String label = ((Node) o).valueOf("@label");
+			final String url = ((Node) o).valueOf("@url");
+			final String semrel = ((Node) o).valueOf("@semrel");
+			if (StringUtils.isNotBlank(code)) {
+				final EoscIfGuidelines eig = new EoscIfGuidelines();
+				eig.setCode(code);
+				eig.setLabel(label);
+				eig.setUrl(url);
+				eig.setSemanticRelation(semrel);
+				set.add(eig);
+			}
+		}
+		return Lists.newArrayList(set);
 	}
 
 	protected abstract Qualifier prepareResourceType(Document doc, DataInfo info);
