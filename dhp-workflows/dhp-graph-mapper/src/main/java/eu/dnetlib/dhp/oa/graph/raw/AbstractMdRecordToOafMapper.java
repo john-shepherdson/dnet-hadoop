@@ -385,7 +385,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		return list;
 	}
 
-	private List<EoscIfGuidelines> prepareEOSCIfGuidelines(Document doc, DataInfo info){
+	private List<EoscIfGuidelines> prepareEOSCIfGuidelines(Document doc, DataInfo info) {
 		final Set<EoscIfGuidelines> set = Sets.newHashSet();
 		for (final Object o : doc.selectNodes("//oaf:eoscifguidelines")) {
 			final String code = ((Node) o).valueOf("@code");
