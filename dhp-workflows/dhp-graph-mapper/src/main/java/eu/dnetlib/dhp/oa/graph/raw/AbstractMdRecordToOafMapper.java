@@ -391,7 +391,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			final String code = ((Node) o).valueOf("@code");
 			final String label = ((Node) o).valueOf("@label");
 			final String url = ((Node) o).valueOf("@url");
-			final String semrel = ((Node) o).valueOf("@semrel");
+			final String semrel = ((Node) o).valueOf("@semanticrelation");
 			if (StringUtils.isNotBlank(code)) {
 				final EoscIfGuidelines eig = new EoscIfGuidelines();
 				eig.setCode(code);
