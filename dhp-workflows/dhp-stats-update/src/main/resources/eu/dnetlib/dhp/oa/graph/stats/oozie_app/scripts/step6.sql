@@ -48,7 +48,9 @@ CREATE TABLE ${stats_db_name}.project_tmp
     delayedpubs    INT,
     callidentifier STRING,
     code           STRING,
-    totalcost       FLOAT
+    totalcost       FLOAT,
+    fundedamount    FLOAT,
+    currency        STRING
 ) CLUSTERED BY (id) INTO 100 buckets stored AS orc tblproperties ('transactional' = 'true');
 
 INSERT INTO ${stats_db_name}.project_tmp
@@ -72,7 +74,9 @@ SELECT substr(p.id, 4)                                                 AS id,
        0                                                               AS delayedpubs,
        p.callidentifier.value                                          AS callidentifier,
        p.code.value                                                    AS code,
-       p.totalcost                                                     AS totalcost
+       p.totalcost                                                     AS totalcost,
+       p.fundedamount                                                  AS fundedamount,
+       p.currency.value                                                AS currency
 FROM ${openaire_db_name}.project p
 WHERE p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
 
