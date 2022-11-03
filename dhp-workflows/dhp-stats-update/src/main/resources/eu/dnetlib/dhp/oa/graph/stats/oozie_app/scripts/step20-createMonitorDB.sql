@@ -49,7 +49,8 @@ create table TARGET.result stored as parquet as
              'openorgs____::3fcef6e1c469c10f2a84b281372c9814', -- World Bank
              'openorgs____::1698a2eb1885ef8adb5a4a969e745ad3', -- École des Ponts ParisTech
              'openorgs____::e15adb13c4dadd49de4d35c39b5da93a',  -- Nanyang Technological University
-             'openorgs____::4b34103bde246228fcd837f5f1bf4212'  -- Autonomous University of Barcelona
+             'openorgs____::4b34103bde246228fcd837f5f1bf4212',  -- Autonomous University of Barcelona
+             'openorgs____::72ec75fcfc4e0df1a76dc4c49007fceb'	-- McMaster University
         ) )) foo;
 compute stats TARGET.result;
 
