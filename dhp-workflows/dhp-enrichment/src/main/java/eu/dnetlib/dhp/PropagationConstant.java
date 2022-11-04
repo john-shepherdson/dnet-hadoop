@@ -12,14 +12,13 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Country;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class PropagationConstant {
 
@@ -235,6 +234,32 @@ public class PropagationConstant {
 			.read()
 			.textFile(inputPath)
 			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
+	}
+
+	public static <R extends Oaf> Dataset<R> readOafKryoPath(
+		SparkSession spark, String inputPath, Class<R> clazz) {
+		return spark
+			.read()
+			.textFile(inputPath)
+			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.kryo(clazz));
+	}
+
+	public static Class[] getModelClasses() {
+		List<Class<?>> modelClasses = Lists.newArrayList(ModelSupport.getOafModelClasses());
+		modelClasses
+			.addAll(
+				Lists
+					.newArrayList(
+						Result.class,
+						Qualifier.class,
+						DataInfo.class,
+						Publication.class,
+						eu.dnetlib.dhp.schema.oaf.Dataset.class,
+						Software.class,
+						OtherResearchProduct.class,
+						Subject.class,
+						AccessRight.class));
+		return modelClasses.toArray(new Class[] {});
 	}
 
 }

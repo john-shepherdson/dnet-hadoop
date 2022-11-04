@@ -76,7 +76,7 @@ public class SubjectPropagationJobTest {
 						.getResource("/eu/dnetlib/dhp/subjectpropagation/preparedInfo")
 						.getPath(),
 					"-resultType", "publication",
-					"-inputPath", getClass()
+					"-sourcePath", getClass()
 						.getResource("/eu/dnetlib/dhp/subjectpropagation")
 						.getPath(),
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),

@@ -3,7 +3,7 @@
 
   {
     "paramName":"asr",
-    "paramLongName":"allowedSemRel",
+    "paramLongName":"allowedsemrels",
     "paramDescription": "the set of semantic relations between the results to be exploited to perform the propagation",
     "paramRequired": true
   },

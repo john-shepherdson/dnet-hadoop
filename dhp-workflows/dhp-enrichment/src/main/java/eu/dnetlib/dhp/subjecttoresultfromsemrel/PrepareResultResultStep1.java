@@ -70,7 +70,7 @@ public class PrepareResultResultStep1 implements Serializable {
 
 		final List<String> allowedSemRel = Arrays
 			.asList(
-				parser.get("allowedSemRel").split(";"))
+				parser.get("allowedsemrels").split(";"))
 			.stream()
 			.map(s -> s.toLowerCase())
 			.collect(Collectors.toList());
@@ -98,7 +98,7 @@ public class PrepareResultResultStep1 implements Serializable {
 		Dataset<R> result = readPath(spark, inputPath + "/" + resultType, resultClazz)
 			.filter(
 				(FilterFunction<R>) r -> !r.getDataInfo().getDeletedbyinference() &&
-					!r.getDataInfo().getInvisible() &&
+					!r.getDataInfo().getInvisible() && Optional.ofNullable(r.getSubject()).isPresent() &&
 					r
 						.getSubject()
 						.stream()
@@ -116,22 +116,28 @@ public class PrepareResultResultStep1 implements Serializable {
 				(MapGroupsFunction<String, Tuple2<R, Relation>, ResultSubjectList>) (k,
 					it) -> getResultSubjectList(subjectClassList, k, it),
 				Encoders.bean(ResultSubjectList.class))
+			.filter(Objects::nonNull)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath + "/" + resultType);
 	}
 
-	@NotNull
 	private static <R extends Result> ResultSubjectList getResultSubjectList(List<String> subjectClassList, String k,
 		Iterator<Tuple2<R, Relation>> it) {
+		Tuple2<R, Relation> first = it.next();
+		if (!Optional.ofNullable(first._1()).isPresent()) {
+			return null;
+		}
 		ResultSubjectList rsl = new ResultSubjectList();
 		rsl.setResId(k);
-		Tuple2<R, Relation> first = it.next();
 		List<SubjectInfo> sbjInfo = new ArrayList<>();
 		Set<String> subjectSet = new HashSet<>();
 		extracted(subjectClassList, first._1().getSubject(), sbjInfo, subjectSet);
-		it.forEachRemaining(t2 -> extracted(subjectClassList, t2._1().getSubject(), sbjInfo, subjectSet));
+		it.forEachRemaining(t2 -> {
+			if (Optional.ofNullable(t2._1()).isPresent())
+				extracted(subjectClassList, t2._1().getSubject(), sbjInfo, subjectSet);
+		});
 		rsl.setSubjectList(sbjInfo);
 		return rsl;
 	}

@@ -81,7 +81,7 @@ public class SubjectPreparationJobTest {
 		PrepareResultResultStep1
 			.main(
 				new String[] {
-					"-allowedSemRel",
+					"-allowedsemrels",
 					"IsSupplementedBy;IsSupplementTo;IsPreviousVersionOf;IsNewVersionOf;IsIdenticalTo;Obsoletes;IsObsoletedBy;IsVersionOf",
 					"-subjectlist", "fos;sdg",
 					"-resultType", "publication",

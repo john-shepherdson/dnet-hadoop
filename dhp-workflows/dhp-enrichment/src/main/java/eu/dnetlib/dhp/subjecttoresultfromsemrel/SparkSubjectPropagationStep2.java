@@ -50,6 +50,7 @@ public class SparkSubjectPropagationStep2 implements Serializable {
 
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
+
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
@@ -58,14 +59,15 @@ public class SparkSubjectPropagationStep2 implements Serializable {
 		final String resultType = parser.get("resultType");
 		log.info("resultType: {}", resultType);
 
-		final String inputPath = parser.get("inputPath");
+		final String inputPath = parser.get("sourcePath");
 		log.info("inputPath: {}", inputPath);
 
 		final String workingPath = parser.get("workingPath");
 		log.info("workingPath: {}", workingPath);
 
 		SparkConf conf = new SparkConf();
-
+		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+		conf.registerKryoClasses(getModelClasses());
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
@@ -83,7 +85,11 @@ public class SparkSubjectPropagationStep2 implements Serializable {
 		Class<R> resultClazz,
 		String resultType) {
 
-		Dataset<R> results = readPath(spark, inputPath + "/" + resultType, resultClazz);
+		Dataset<Tuple2<String, R>> results = readOafKryoPath(spark, inputPath + "/" + resultType, resultClazz)
+			.map(
+				(MapFunction<R, Tuple2<String, R>>) r -> new Tuple2(r.getId(), r),
+				Encoders.tuple(Encoders.STRING(), Encoders.kryo(resultClazz)));
+
 		Dataset<ResultSubjectList> preparedResult = readPath(
 			spark, preparedPath + "/publication", ResultSubjectList.class)
 				.union(readPath(spark, preparedPath + "/dataset", ResultSubjectList.class))
@@ -93,20 +99,26 @@ public class SparkSubjectPropagationStep2 implements Serializable {
 		results
 			.joinWith(
 				preparedResult,
-				results.col("id").equalTo(preparedResult.col("resId")),
+				results.col("_1").equalTo(preparedResult.col("resId")),
 				"left")
-			.map((MapFunction<Tuple2<R, ResultSubjectList>, R>) t2 -> {
-				R res = t2._1();
+			.map((MapFunction<Tuple2<Tuple2<String, R>, ResultSubjectList>, String>) t2 -> {
+				R res = t2._1()._2();
+				// estraggo le tipologie di subject dal result
+				Map<String, List<String>> resultMap = new HashMap<>();
 				if (Optional.ofNullable(t2._2()).isPresent()) {
-					// estraggo le tipologie di subject dal result
-					Map<String, List<String>> resultMap = new HashMap<>();
-					res.getSubject().stream().forEach(s -> {
-						String cid = s.getQualifier().getClassid();
-						if (!resultMap.containsKey(cid)) {
-							resultMap.put(cid, new ArrayList<>());
-						}
-						resultMap.get(cid).add(s.getValue());
-					});
+					if(Optional.ofNullable(res.getSubject()).isPresent()){
+						res.getSubject().stream().forEach(s -> {
+							String cid = s.getQualifier().getClassid();
+							if(!cid.equals(ModelConstants.DNET_SUBJECT_KEYWORD)){
+								if (!resultMap.containsKey(cid)) {
+									resultMap.put(cid, new ArrayList<>());
+								}
+								resultMap.get(cid).add(s.getValue());
+							}
+						});
+					}else{
+						res.setSubject(new ArrayList<>());
+					}
 
 					// Remove from the list all the subjects with the same class already present in the result
 					List<String> distinctClassId = t2
@@ -142,12 +154,12 @@ public class SparkSubjectPropagationStep2 implements Serializable {
 					}
 
 				}
-				return res;
-			}, Encoders.bean(resultClazz))
+				return OBJECT_MAPPER.writeValueAsString(res);
+			}, Encoders.STRING())
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.json(workingPath + "/" + resultType);
+			.text(workingPath + "/" + resultType);
 
 		readPath(spark, workingPath + "/" + resultType, resultClazz)
 			.write()

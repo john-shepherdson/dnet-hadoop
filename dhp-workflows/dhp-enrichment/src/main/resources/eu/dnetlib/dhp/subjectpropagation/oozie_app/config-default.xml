@@ -48,7 +48,7 @@
     </property>
     <property>
         <name>sparkExecutorMemory</name>
-        <value>6G</value>
+        <value>10G</value>
     </property>
     <property>
         <name>sparkExecutorCores</name>

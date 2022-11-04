@@ -1,12 +1,4 @@
 <workflow-app name="subject_to_result_propagation" xmlns="uri:oozie:workflow:0.5">
-
-
-<!--    {-->
-<!--    "paramName": "out",-->
-<!--    "paramLongName": "outputPath",-->
-<!--    "paramDescription": "the path used to store temporary output files",-->
-<!--    "paramRequired": true-->
-<!--    }-->
     <parameters>
         <property>
             <name>sourcePath</name>
@@ -15,14 +7,6 @@
         <property>
             <name>subjectlist</name>
             <description>the list of subject classid to propagate (split by ;)</description>
-        </property>
-        <property>
-            <name>resultType</name>
-            <description>the result tapy</description>
-        </property>
-        <property>
-            <name>resultTableName</name>
-            <description>the class of the result</description>
         </property>
         <property>
             <name>allowedsemrels</name>
@@ -64,14 +48,14 @@
         <path start="prepare_subject_propagation_publication"/>
         <path start="prepare_subject_propagation_dataset"/>
         <path start="prepare_subject_propagation_software"/>
-        <path start="prepare_subject_propagation_otherresearchproduct"/>
+        <path start="prepare_subject_propagation_orp"/>
     </fork>
 
     <action name="prepare_subject_propagation_publication">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>PrepareProjectResultsAssociation</name>
+            <name>PrepareSubjectResultsAssociation</name>
             <class>eu.dnetlib.dhp.subjecttoresultfromsemrel.PrepareResultResultStep1</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
@@ -98,7 +82,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>PrepareProjectResultsAssociation</name>
+            <name>PrepareSubjectResultsAssociation</name>
             <class>eu.dnetlib.dhp.subjecttoresultfromsemrel.PrepareResultResultStep1</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
@@ -125,7 +109,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>PrepareProjectResultsAssociation</name>
+            <name>PrepareSubjectResultsAssociation</name>
             <class>eu.dnetlib.dhp.subjecttoresultfromsemrel.PrepareResultResultStep1</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
@@ -152,7 +136,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>PrepareProjectResultsAssociation</name>
+            <name>PrepareSubjectResultsAssociation</name>
             <class>eu.dnetlib.dhp.subjecttoresultfromsemrel.PrepareResultResultStep1</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
@@ -188,12 +172,12 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>ProjectToResultPropagation</name>
-            <class>eu.dnetlib.dhp.projecttoresult.SparkResultToProjectThroughSemRelJob</class>
+            <name>SubjectToResultPropagation</name>
+            <class>eu.dnetlib.dhp.subjecttoresultfromsemrel.SparkSubjectPropagationStep2</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
+                --executor-memory=8G
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -201,8 +185,9 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--inputPath</arg><arg>${sourcePath}</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
             <arg>--workingPath</arg><arg>${workingDir}/working</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
@@ -217,8 +202,8 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>ProjectToResultPropagation</name>
-            <class>eu.dnetlib.dhp.projecttoresult.SparkResultToProjectThroughSemRelJob</class>
+            <name>SubjectToResultPropagation</name>
+            <class>eu.dnetlib.dhp.subjecttoresultfromsemrel.SparkSubjectPropagationStep2</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -230,8 +215,9 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--inputPath</arg><arg>${sourcePath}</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
             <arg>--workingPath</arg><arg>${workingDir}/working</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
@@ -246,8 +232,8 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>ProjectToResultPropagation</name>
-            <class>eu.dnetlib.dhp.projecttoresult.SparkResultToProjectThroughSemRelJob</class>
+            <name>SubjectToResultPropagation</name>
+            <class>eu.dnetlib.dhp.subjecttoresultfromsemrel.SparkSubjectPropagationStep2</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -259,8 +245,9 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--inputPath</arg><arg>${sourcePath}</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
             <arg>--workingPath</arg><arg>${workingDir}/working</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
@@ -275,8 +262,8 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>ProjectToResultPropagation</name>
-            <class>eu.dnetlib.dhp.projecttoresult.SparkResultToProjectThroughSemRelJob</class>
+            <name>SubjectToResultPropagation</name>
+            <class>eu.dnetlib.dhp.subjecttoresultfromsemrel.SparkSubjectPropagationStep2</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -288,8 +275,9 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--inputPath</arg><arg>${sourcePath}</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
             <arg>--workingPath</arg><arg>${workingDir}/working</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
@@ -300,7 +288,7 @@
         <error to="Kill"/>
     </action>
 
-    <join name="wait_prepare" to="End"/>
+    <join name="wait_propagation" to="End"/>
 
     <end name="End"/>
 

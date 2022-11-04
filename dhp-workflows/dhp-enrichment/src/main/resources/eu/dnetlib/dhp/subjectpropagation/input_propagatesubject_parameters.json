@@ -13,8 +13,8 @@
     "paramRequired": true
   },
   {
-    "paramName":"ip",
-    "paramLongName":"inputPath",
+    "paramName":"sp",
+    "paramLongName":"sourcePath",
     "paramDescription": "the path of the input graph",
     "paramRequired": true
   },
