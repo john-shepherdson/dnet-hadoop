@@ -16,21 +16,20 @@ public class OrcidAuthorsDOIsDataGen extends OrcidDSManager {
 	private String activitiesFileNameTarGz;
 	private String outputAuthorsDOIsPath;
 
-	public static void main(String[] args) throws IOException, Exception {
+	public static void main(String[] args) throws Exception {
 		OrcidAuthorsDOIsDataGen orcidAuthorsDOIsDataGen = new OrcidAuthorsDOIsDataGen();
 		orcidAuthorsDOIsDataGen.loadArgs(args);
 		orcidAuthorsDOIsDataGen.generateAuthorsDOIsData();
 	}
 
-	public void generateAuthorsDOIsData() throws Exception {
+	public void generateAuthorsDOIsData() throws IOException {
 		Configuration conf = initConfigurationObject();
-		FileSystem fs = initFileSystemObject(conf);
-		String tarGzUri = hdfsServerUri.concat(hdfsOrcidDefaultPath).concat(activitiesFileNameTarGz);
-		Path outputPath = new Path(hdfsServerUri.concat(hdfsOrcidDefaultPath).concat(outputAuthorsDOIsPath));
+		String tarGzUri = hdfsServerUri.concat(workingPath).concat(activitiesFileNameTarGz);
+		Path outputPath = new Path(hdfsServerUri.concat(workingPath).concat(outputAuthorsDOIsPath));
 		ActivitiesDecompressor.parseGzActivities(conf, tarGzUri, outputPath);
 	}
 
-	private void loadArgs(String[] args) throws IOException, Exception {
+	private void loadArgs(String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
@@ -41,8 +40,8 @@ public class OrcidAuthorsDOIsDataGen extends OrcidDSManager {
 
 		hdfsServerUri = parser.get("hdfsServerUri");
 		Log.info("HDFS URI: " + hdfsServerUri);
-		hdfsOrcidDefaultPath = parser.get("hdfsOrcidDefaultPath");
-		Log.info("Default Path: " + hdfsOrcidDefaultPath);
+		workingPath = parser.get("workingPath");
+		Log.info("Default Path: " + workingPath);
 		activitiesFileNameTarGz = parser.get("activitiesFileNameTarGz");
 		Log.info("Activities File Name: " + activitiesFileNameTarGz);
 		outputAuthorsDOIsPath = parser.get("outputAuthorsDOIsPath");

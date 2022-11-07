@@ -11,36 +11,44 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.oa.dedup.DedupUtility;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.pace.util.PaceException;
 
 public class ConnectedComponent implements Serializable {
 
-	private Set<String> docIds;
 	private String ccId;
+	private Set<String> ids;
 
-	public ConnectedComponent(Set<String> docIds, final int cut) {
-		this.docIds = docIds;
-		createID();
-		if (cut > 0 && docIds.size() > cut) {
-			this.docIds = docIds
+	private static final String CONNECTED_COMPONENT_ID_PREFIX = "connect_comp";
+
+	public ConnectedComponent(Set<String> ids, final int cut) {
+		this.ids = ids;
+
+		this.ccId = createDefaultID();
+
+		if (cut > 0 && ids.size() > cut) {
+			this.ids = ids
 				.stream()
-				.filter(s -> !ccId.equalsIgnoreCase(s))
+				.filter(id -> !ccId.equalsIgnoreCase(id))
 				.limit(cut - 1)
 				.collect(Collectors.toSet());
-			this.docIds.add(ccId);
+//			this.ids.add(ccId); ??
 		}
 	}
 
-	public String createID() {
-		if (docIds.size() > 1) {
+	public ConnectedComponent(String ccId, Set<String> ids) {
+		this.ccId = ccId;
+		this.ids = ids;
+	}
+
+	public String createDefaultID() {
+		if (ids.size() > 1) {
 			final String s = getMin();
 			String prefix = s.split("\\|")[0];
-			ccId = prefix + "|dedup_wf_001::" + DHPUtils.md5(s);
+			ccId = prefix + "|" + CONNECTED_COMPONENT_ID_PREFIX + "::" + DHPUtils.md5(s);
 			return ccId;
 		} else {
-			return docIds.iterator().next();
+			return ids.iterator().next();
 		}
 	}
 
@@ -49,15 +57,15 @@ public class ConnectedComponent implements Serializable {
 
 		final StringBuilder min = new StringBuilder();
 
-		docIds
+		ids
 			.forEach(
-				i -> {
+				id -> {
 					if (StringUtils.isBlank(min.toString())) {
-						min.append(i);
+						min.append(id);
 					} else {
-						if (min.toString().compareTo(i) > 0) {
+						if (min.toString().compareTo(id) > 0) {
 							min.setLength(0);
-							min.append(i);
+							min.append(id);
 						}
 					}
 				});
@@ -74,12 +82,12 @@ public class ConnectedComponent implements Serializable {
 		}
 	}
 
-	public Set<String> getDocIds() {
-		return docIds;
+	public Set<String> getIds() {
+		return ids;
 	}
 
-	public void setDocIds(Set<String> docIds) {
-		this.docIds = docIds;
+	public void setIds(Set<String> ids) {
+		this.ids = ids;
 	}
 
 	public String getCcId() {

@@ -2,12 +2,14 @@
 package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.createOpenaireId;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.field;
-import static eu.dnetlib.dhp.schema.oaf.OafMapperUtils.structuredProperty;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -18,14 +20,21 @@ import org.dom4j.Node;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.PacePerson;
-import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
-	public OafToOafMapper(final VocabularyGroup vocs, final boolean invisible) {
-		super(vocs, invisible);
+	public OafToOafMapper(final VocabularyGroup vocs, final boolean invisible, final boolean shouldHashId,
+		final boolean forceOrginalId) {
+		super(vocs, invisible, shouldHashId, forceOrginalId);
+	}
+
+	public OafToOafMapper(final VocabularyGroup vocs, final boolean invisible, final boolean shouldHashId) {
+		super(vocs, invisible, shouldHashId);
 	}
 
 	@Override
@@ -48,13 +57,13 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 				.valueOf("./@nameIdentifierScheme")
 				.trim()
 				.toUpperCase()
-				.replaceAll(" ", "")
-				.replaceAll("_", "");
+				.replace(" ", "")
+				.replace("_", "");
 
 			author.setPid(new ArrayList<>());
 
 			if (StringUtils.isNotBlank(pid)) {
-				if (type.startsWith("ORCID")) {
+				if (type.toLowerCase().startsWith(ORCID)) {
 					final String cleanedId = pid
 						.replaceAll("http://orcid.org/", "")
 						.replaceAll("https://orcid.org/", "");
@@ -75,8 +84,8 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<StructuredProperty> prepareSubjects(final Document doc, final DataInfo info) {
-		return prepareListStructProps(doc, "//dc:subject", info);
+	protected List<Subject> prepareSubjects(final Document doc, final DataInfo info) {
+		return prepareSubjectList(doc, "//dc:subject", info);
 	}
 
 	@Override
@@ -127,10 +136,21 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 			.setInstancetype(prepareQualifier(doc, "//dr:CobjCategory", DNET_PUBLICATION_RESOURCE));
 		instance.setCollectedfrom(collectedfrom);
 		instance.setHostedby(hostedby);
+
+		final List<StructuredProperty> alternateIdentifier = prepareResultPids(doc, info);
+		final List<StructuredProperty> pid = IdentifierFactory.getPids(alternateIdentifier, collectedfrom);
+
+		final Set<StructuredProperty> pids = pid.stream().collect(Collectors.toCollection(HashSet::new));
+
+		instance
+			.setAlternateIdentifier(
+				alternateIdentifier.stream().filter(i -> !pids.contains(i)).collect(Collectors.toList()));
+		instance.setPid(pid);
+
 		instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
 		instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
 		instance
-			.setAccessright(prepareQualifier(doc, "//oaf:accessrights", DNET_ACCESS_MODES));
+			.setAccessright(prepareAccessRight(doc, "//oaf:accessrights", DNET_ACCESS_MODES));
 		instance.setLicense(field(doc.valueOf("//oaf:license"), info));
 		instance.setRefereed(prepareQualifier(doc, "//oaf:refereed", DNET_REVIEW_LEVELS));
 		instance
@@ -139,15 +159,25 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 			.setProcessingchargecurrency(field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
 
 		final List<Node> nodes = Lists.newArrayList(doc.selectNodes("//dc:identifier"));
-		instance
-			.setUrl(
-				nodes
-					.stream()
-					.filter(n -> StringUtils.isNotBlank(n.getText()))
-					.map(n -> n.getText().trim())
-					.filter(u -> u.startsWith("http"))
-					.distinct()
-					.collect(Collectors.toCollection(ArrayList::new)));
+		final List<String> url = nodes
+			.stream()
+			.filter(n -> StringUtils.isNotBlank(n.getText()))
+			.map(n -> n.getText().trim())
+			.filter(u -> u.startsWith("http"))
+			.map(s -> {
+				try {
+					return URLDecoder.decode(s, "UTF-8");
+				} catch (Throwable t) {
+					return s;
+				}
+			})
+			.distinct()
+			.collect(Collectors.toCollection(ArrayList::new));
+		final Set<String> validUrl = validateUrl(url);
+		if (!validUrl.isEmpty()) {
+			instance.setUrl(new ArrayList<>());
+			instance.getUrl().addAll(validUrl);
+		}
 
 		return Lists.newArrayList(instance);
 	}

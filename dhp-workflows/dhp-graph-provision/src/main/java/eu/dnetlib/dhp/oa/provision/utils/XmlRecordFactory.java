@@ -1,7 +1,8 @@
 
 package eu.dnetlib.dhp.oa.provision.utils;
 
-import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.*;
+import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.authorPidTypes;
+import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.getRelDescriptor;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 
@@ -9,14 +10,19 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -25,6 +31,7 @@ import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.json4s.Xml;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
@@ -35,19 +42,26 @@ import com.google.common.collect.Sets;
 import com.mycila.xmltool.XMLDoc;
 import com.mycila.xmltool.XMLTag;
 
-import eu.dnetlib.dhp.oa.provision.model.*;
-import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.common.MainEntityType;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
+import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
+import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
+import eu.dnetlib.dhp.oa.provision.model.XmlInstance;
+import eu.dnetlib.dhp.schema.common.*;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import scala.Tuple2;
 
 public class XmlRecordFactory implements Serializable {
 
-	private static final String REL_SUBTYPE_DEDUP = "dedup";
-	private final Map<String, LongAccumulator> accumulators;
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 2912912999272373172L;
+	public static final String DOI_ORG_AUTHORITY = "doi.org";
+	public static final String HTTPS = "https";
 
-	private final Set<String> specialDatasourceTypes;
+	private final Map<String, LongAccumulator> accumulators;
 
 	private final ContextMapper contextMapper;
 
@@ -60,23 +74,20 @@ public class XmlRecordFactory implements Serializable {
 	public XmlRecordFactory(
 		final ContextMapper contextMapper,
 		final boolean indent,
-		final String schemaLocation,
-		final String otherDatasourceTypesUForUI) {
+		final String schemaLocation) {
 
-		this(Maps.newHashMap(), contextMapper, indent, schemaLocation, otherDatasourceTypesUForUI);
+		this(Maps.newHashMap(), contextMapper, indent, schemaLocation);
 	}
 
 	public XmlRecordFactory(
 		final Map<String, LongAccumulator> accumulators,
 		final ContextMapper contextMapper,
 		final boolean indent,
-		final String schemaLocation,
-		final String otherDatasourceTypesUForUI) {
+		final String schemaLocation) {
 
 		this.accumulators = accumulators;
 		this.contextMapper = contextMapper;
 		this.schemaLocation = schemaLocation;
-		this.specialDatasourceTypes = Sets.newHashSet(Splitter.on(",").trimResults().split(otherDatasourceTypesUForUI));
 
 		this.indent = indent;
 	}
@@ -86,8 +97,8 @@ public class XmlRecordFactory implements Serializable {
 		final Set<String> contexts = Sets.newHashSet();
 
 		// final OafEntity entity = toOafEntity(je.getEntity());
-		OafEntity entity = je.getEntity();
-		TemplateFactory templateFactory = new TemplateFactory();
+		final OafEntity entity = je.getEntity();
+		final TemplateFactory templateFactory = new TemplateFactory();
 		try {
 
 			final EntityType type = EntityType.fromClass(entity.getClass());
@@ -109,11 +120,7 @@ public class XmlRecordFactory implements Serializable {
 
 			final String body = templateFactory
 				.buildBody(
-					mainType,
-					metadata,
-					relations,
-					listChildren(entity, je, templateFactory),
-					listExtraInfo(entity));
+					mainType, metadata, relations, listChildren(entity, je, templateFactory), listExtraInfo(entity));
 
 			return printXML(templateFactory.buildRecord(entity, schemaLocation, body), indent);
 		} catch (final Throwable e) {
@@ -141,19 +148,19 @@ public class XmlRecordFactory implements Serializable {
 				default:
 					throw new IllegalArgumentException("invalid type: " + type);
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			throw new IllegalArgumentException(e);
 		}
 	}
 
-	private String printXML(String xml, boolean indent) {
+	private String printXML(final String xml, final boolean indent) {
 		try {
 			final Document doc = new SAXReader().read(new StringReader(xml));
-			OutputFormat format = indent ? OutputFormat.createPrettyPrint() : OutputFormat.createCompactFormat();
+			final OutputFormat format = indent ? OutputFormat.createPrettyPrint() : OutputFormat.createCompactFormat();
 			format.setExpandEmptyElements(false);
 			format.setSuppressDeclaration(true);
-			StringWriter sw = new StringWriter();
-			XMLWriter writer = new XMLWriter(sw, format);
+			final StringWriter sw = new StringWriter();
+			final XMLWriter writer = new XMLWriter(sw, format);
 			writer.write(doc);
 			return sw.toString();
 		} catch (IOException | DocumentException e) {
@@ -162,7 +169,9 @@ public class XmlRecordFactory implements Serializable {
 	}
 
 	private List<String> metadata(
-		final EntityType type, final OafEntity entity, final Set<String> contexts) {
+		final EntityType type,
+		final OafEntity entity,
+		final Set<String> contexts) {
 
 		final List<String> metadata = Lists.newArrayList();
 
@@ -183,6 +192,7 @@ public class XmlRecordFactory implements Serializable {
 						.getOriginalId()
 						.stream()
 						.filter(Objects::nonNull)
+						.filter(id -> !id.matches("^\\d{2}" + IdentifierFactory.ID_PREFIX_SEPARATOR))
 						.map(s -> XmlSerializationUtils.asXmlElement("originalId", s))
 						.collect(Collectors.toList()));
 		}
@@ -199,6 +209,21 @@ public class XmlRecordFactory implements Serializable {
 
 		if (ModelSupport.isResult(type)) {
 			final Result r = (Result) entity;
+
+			if (r.getMeasures() != null) {
+				metadata.addAll(measuresAsXml(r.getMeasures()));
+			}
+
+			if (r.getEoscifguidelines() != null) {
+				metadata
+					.addAll(
+						r
+							.getEoscifguidelines()
+							.stream()
+							.filter(Objects::nonNull)
+							.map(e -> XmlSerializationUtils.mapEoscIf(e))
+							.collect(Collectors.toList()));
+			}
 
 			if (r.getContext() != null) {
 				contexts.addAll(r.getContext().stream().map(c -> c.getId()).collect(Collectors.toList()));
@@ -228,60 +253,63 @@ public class XmlRecordFactory implements Serializable {
 							.getAuthor()
 							.stream()
 							.filter(Objects::nonNull)
-							.map(
-								a -> {
-									final StringBuilder sb = new StringBuilder("<creator rank=\"" + a.getRank() + "\"");
-									if (isNotBlank(a.getName())) {
-										sb.append(" name=\"" + XmlSerializationUtils.escapeXml(a.getName()) + "\"");
-									}
-									if (isNotBlank(a.getSurname())) {
-										sb
-											.append(
-												" surname=\"" + XmlSerializationUtils.escapeXml(a.getSurname()) + "\"");
-									}
-									if (a.getPid() != null) {
-										a
-											.getPid()
-											.stream()
-											.filter(Objects::nonNull)
-											.filter(
-												sp -> isNotBlank(sp.getQualifier().getClassid())
-													&& isNotBlank(sp.getValue()))
-											.collect(
-												Collectors
-													.toMap(
-														p -> getAuthorPidType(p.getQualifier().getClassid()),
-														p -> p,
-														(p1, p2) -> p1))
-											.values()
-											.forEach(
-												sp -> {
-													String pidType = getAuthorPidType(sp.getQualifier().getClassid());
-													String pidValue = XmlSerializationUtils.escapeXml(sp.getValue());
-
-													// ugly hack: some records provide swapped pidtype and pidvalue
-													if (authorPidTypes.contains(pidValue.toLowerCase().trim())) {
-														sb.append(String.format(" %s=\"%s\"", pidValue, pidType));
-													} else {
-														if (isNotBlank(pidType)) {
-															sb
-																.append(
-																	String
-																		.format(
-																			" %s=\"%s\"",
-																			pidType,
-																			pidValue
-																				.toLowerCase()
-																				.replaceAll("^.*orcid\\.org\\/", "")));
-														}
-													}
-												});
-									}
+							.map(a -> {
+								final StringBuilder sb = new StringBuilder("<creator rank=\"" + a.getRank() + "\"");
+								if (isNotBlank(a.getName())) {
+									sb.append(" name=\"" + XmlSerializationUtils.escapeXml(a.getName()) + "\"");
+								}
+								if (isNotBlank(a.getSurname())) {
 									sb
-										.append(
-											">" + XmlSerializationUtils.escapeXml(a.getFullname()) + "</creator>");
-									return sb.toString();
-								})
+										.append(" surname=\"" + XmlSerializationUtils.escapeXml(a.getSurname()) + "\"");
+								}
+								if (a.getPid() != null) {
+									a
+										.getPid()
+										.stream()
+										.filter(Objects::nonNull)
+										.filter(
+											sp -> isNotBlank(sp.getQualifier().getClassid())
+												&& isNotBlank(sp.getValue()))
+										.collect(
+											Collectors
+												.toMap(
+													p -> getAuthorPidType(p.getQualifier().getClassid()), p -> p,
+													(p1, p2) -> p1))
+										.values()
+										.stream()
+										.collect(
+											Collectors
+												.groupingBy(
+													p -> p.getValue(), Collectors
+														.mapping(
+															p -> p, Collectors.minBy(new AuthorPidTypeComparator()))))
+										.values()
+										.stream()
+										.map(op -> op.get())
+										.forEach(sp -> {
+											final String pidType = getAuthorPidType(sp.getQualifier().getClassid());
+											final String pidValue = XmlSerializationUtils.escapeXml(sp.getValue());
+
+											// ugly hack: some records provide swapped pidtype and pidvalue
+											if (authorPidTypes.contains(pidValue.toLowerCase().trim())) {
+												sb.append(String.format(" %s=\"%s\"", pidValue, pidType));
+											} else {
+												if (isNotBlank(pidType)) {
+													sb
+														.append(
+															String
+																.format(
+																	" %s=\"%s\"", pidType, pidValue
+																		.toLowerCase()
+																		.replaceAll("^.*orcid\\.org\\/", "")));
+												}
+											}
+										});
+								}
+								sb
+									.append(">" + XmlSerializationUtils.escapeXml(a.getFullname()) + "</creator>");
+								return sb.toString();
+							})
 							.collect(Collectors.toList()));
 			}
 			if (r.getContributor() != null) {
@@ -318,8 +346,7 @@ public class XmlRecordFactory implements Serializable {
 				metadata
 					.add(
 						XmlSerializationUtils
-							.asXmlElement(
-								"dateofacceptance", r.getDateofacceptance().getValue()));
+							.asXmlElement("dateofacceptance", r.getDateofacceptance().getValue()));
 			}
 			if (r.getDescription() != null) {
 				metadata
@@ -333,8 +360,7 @@ public class XmlRecordFactory implements Serializable {
 			}
 			if (r.getEmbargoenddate() != null) {
 				metadata
-					.add(
-						XmlSerializationUtils.asXmlElement("embargoenddate", r.getEmbargoenddate().getValue()));
+					.add(XmlSerializationUtils.asXmlElement("embargoenddate", r.getEmbargoenddate().getValue()));
 			}
 			if (r.getSubject() != null) {
 				metadata
@@ -388,6 +414,16 @@ public class XmlRecordFactory implements Serializable {
 			if (r.getResourcetype() != null) {
 				metadata.add(XmlSerializationUtils.mapQualifier("resourcetype", r.getResourcetype()));
 			}
+			if (r.getProcessingchargeamount() != null) {
+				metadata
+					.add(
+						XmlSerializationUtils
+							.asXmlElement("processingchargeamount", r.getProcessingchargeamount().getValue()));
+				metadata
+					.add(
+						XmlSerializationUtils
+							.asXmlElement("processingchargecurrency", r.getProcessingchargecurrency().getValue()));
+			}
 		}
 
 		switch (type) {
@@ -409,23 +445,20 @@ public class XmlRecordFactory implements Serializable {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"lastmetadataupdate", d.getLastmetadataupdate().getValue()));
+								.asXmlElement("lastmetadataupdate", d.getLastmetadataupdate().getValue()));
 				}
 				if (d.getMetadataversionnumber() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"metadataversionnumber", d.getMetadataversionnumber().getValue()));
+								.asXmlElement("metadataversionnumber", d.getMetadataversionnumber().getValue()));
 				}
 				if (d.getSize() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("size", d.getSize().getValue()));
 				}
 				if (d.getStoragedate() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("storagedate", d.getStoragedate().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("storagedate", d.getStoragedate().getValue()));
 				}
 				if (d.getVersion() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("version", d.getVersion().getValue()));
@@ -495,98 +528,103 @@ public class XmlRecordFactory implements Serializable {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"codeRepositoryUrl", s.getCodeRepositoryUrl().getValue()));
+								.asXmlElement("codeRepositoryUrl", s.getCodeRepositoryUrl().getValue()));
 				}
 				if (s.getProgrammingLanguage() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.mapQualifier(
-									"programmingLanguage", s.getProgrammingLanguage()));
+								.mapQualifier("programmingLanguage", s.getProgrammingLanguage()));
 				}
 				break;
 			case datasource:
 				final Datasource ds = (Datasource) entity;
 
 				if (ds.getDatasourcetype() != null) {
-					mapDatasourceType(metadata, ds.getDatasourcetype());
+					metadata.add(XmlSerializationUtils.mapQualifier("datasourcetype", ds.getDatasourcetype()));
+				}
+				if (ds.getDatasourcetypeui() != null) {
+					metadata.add(XmlSerializationUtils.mapQualifier("datasourcetypeui", ds.getDatasourcetypeui()));
+				}
+				if (ds.getEosctype() != null) {
+					metadata.add(XmlSerializationUtils.mapQualifier("eosctype", ds.getEosctype()));
+				}
+				if (ds.getEoscdatasourcetype() != null) {
+					metadata.add(XmlSerializationUtils.mapQualifier("eoscdatasourcetype", ds.getEoscdatasourcetype()));
 				}
 				if (ds.getOpenairecompatibility() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.mapQualifier(
-									"openairecompatibility", ds.getOpenairecompatibility()));
+								.mapQualifier("openairecompatibility", ds.getOpenairecompatibility()));
 				}
 				if (ds.getOfficialname() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("officialname", ds.getOfficialname().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("officialname", ds.getOfficialname().getValue()));
 				}
 				if (ds.getEnglishname() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("englishname", ds.getEnglishname().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("englishname", ds.getEnglishname().getValue()));
 				}
 				if (ds.getWebsiteurl() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("websiteurl", ds.getWebsiteurl().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("websiteurl", ds.getWebsiteurl().getValue()));
 				}
 				if (ds.getLogourl() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("logourl", ds.getLogourl().getValue()));
 				}
 				if (ds.getContactemail() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("contactemail", ds.getContactemail().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("contactemail", ds.getContactemail().getValue()));
 				}
 				if (ds.getNamespaceprefix() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"namespaceprefix", ds.getNamespaceprefix().getValue()));
+								.asXmlElement("namespaceprefix", ds.getNamespaceprefix().getValue()));
 				}
 				if (ds.getLatitude() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("latitude", ds.getLatitude().getValue()));
 				}
 				if (ds.getLongitude() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("longitude", ds.getLongitude().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("longitude", ds.getLongitude().getValue()));
 				}
 				if (ds.getDateofvalidation() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"dateofvalidation", ds.getDateofvalidation().getValue()));
+								.asXmlElement("dateofvalidation", ds.getDateofvalidation().getValue()));
 				}
 				if (ds.getDescription() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("description", ds.getDescription().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("description", ds.getDescription().getValue()));
+				}
+				if (ds.getSubjects() != null) {
+					metadata
+						.addAll(
+							ds
+								.getSubjects()
+								.stream()
+								.filter(Objects::nonNull)
+								.map(sp -> XmlSerializationUtils.mapStructuredProperty("subjects", sp))
+								.collect(Collectors.toList()));
 				}
 				if (ds.getOdnumberofitems() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"odnumberofitems", ds.getOdnumberofitems().getValue()));
+								.asXmlElement("odnumberofitems", ds.getOdnumberofitems().getValue()));
 				}
 				if (ds.getOdnumberofitemsdate() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"odnumberofitemsdate", ds.getOdnumberofitemsdate().getValue()));
+								.asXmlElement("odnumberofitemsdate", ds.getOdnumberofitemsdate().getValue()));
 				}
 				if (ds.getOdpolicies() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("odpolicies", ds.getOdpolicies().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("odpolicies", ds.getOdpolicies().getValue()));
 				}
 				if (ds.getOdlanguages() != null) {
 					metadata
@@ -596,6 +634,16 @@ public class XmlRecordFactory implements Serializable {
 								.stream()
 								.filter(Objects::nonNull)
 								.map(c -> XmlSerializationUtils.asXmlElement("odlanguages", c.getValue()))
+								.collect(Collectors.toList()));
+				}
+				if (ds.getLanguages() != null) {
+					metadata
+						.addAll(
+							ds
+								.getLanguages()
+								.stream()
+								.filter(Objects::nonNull)
+								.map(c -> XmlSerializationUtils.asXmlElement("languages", c))
 								.collect(Collectors.toList()));
 				}
 				if (ds.getOdcontenttypes() != null) {
@@ -621,50 +669,43 @@ public class XmlRecordFactory implements Serializable {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"releasestartdate", ds.getReleaseenddate().getValue()));
+								.asXmlElement("releasestartdate", ds.getReleaseenddate().getValue()));
 				}
 				if (ds.getReleaseenddate() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"releaseenddate", ds.getReleaseenddate().getValue()));
+								.asXmlElement("releaseenddate", ds.getReleaseenddate().getValue()));
 				}
 				if (ds.getMissionstatementurl() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"missionstatementurl", ds.getMissionstatementurl().getValue()));
+								.asXmlElement("missionstatementurl", ds.getMissionstatementurl().getValue()));
 				}
 				if (ds.getDataprovider() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"dataprovider", ds.getDataprovider().getValue().toString()));
+								.asXmlElement("dataprovider", ds.getDataprovider().getValue().toString()));
 				}
 				if (ds.getServiceprovider() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"serviceprovider", ds.getServiceprovider().getValue().toString()));
+								.asXmlElement("serviceprovider", ds.getServiceprovider().getValue().toString()));
 				}
 				if (ds.getDatabaseaccesstype() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"databaseaccesstype", ds.getDatabaseaccesstype().getValue()));
+								.asXmlElement("databaseaccesstype", ds.getDatabaseaccesstype().getValue()));
 				}
 				if (ds.getDatauploadtype() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"datauploadtype", ds.getDatauploadtype().getValue()));
+								.asXmlElement("datauploadtype", ds.getDatauploadtype().getValue()));
 				}
 				if (ds.getDatabaseaccessrestriction() != null) {
 					metadata
@@ -677,39 +718,33 @@ public class XmlRecordFactory implements Serializable {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"datauploadrestriction", ds.getDatauploadrestriction().getValue()));
+								.asXmlElement("datauploadrestriction", ds.getDatauploadrestriction().getValue()));
 				}
 				if (ds.getVersioning() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"versioning", ds.getVersioning().getValue().toString()));
+								.asXmlElement("versioning", ds.getVersioning().getValue().toString()));
+				}
+				if (ds.getVersioncontrol() != null) {
+					metadata
+						.add(
+							XmlSerializationUtils
+								.asXmlElement("versioncontrol", ds.getVersioncontrol().toString()));
 				}
 				if (ds.getCitationguidelineurl() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"citationguidelineurl", ds.getCitationguidelineurl().getValue()));
-				}
-				if (ds.getQualitymanagementkind() != null) {
-					metadata
-						.add(
-							XmlSerializationUtils
-								.asXmlElement(
-									"qualitymanagementkind", ds.getQualitymanagementkind().getValue()));
+								.asXmlElement("citationguidelineurl", ds.getCitationguidelineurl().getValue()));
 				}
 				if (ds.getPidsystems() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("pidsystems", ds.getPidsystems().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("pidsystems", ds.getPidsystems().getValue()));
 				}
 				if (ds.getCertificates() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("certificates", ds.getCertificates().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("certificates", ds.getCertificates().getValue()));
 				}
 				if (ds.getPolicies() != null) {
 					metadata
@@ -724,17 +759,70 @@ public class XmlRecordFactory implements Serializable {
 				if (ds.getJournal() != null) {
 					metadata.add(XmlSerializationUtils.mapJournal(ds.getJournal()));
 				}
-				if (ds.getSubjects() != null) {
+				if (ds.getResearchentitytypes() != null) {
 					metadata
 						.addAll(
 							ds
-								.getSubjects()
+								.getResearchentitytypes()
 								.stream()
-								.filter(Objects::nonNull)
-								.map(sp -> XmlSerializationUtils.mapStructuredProperty("subjects", sp))
+								.map(c -> XmlSerializationUtils.asXmlElement("researchentitytypes", c))
 								.collect(Collectors.toList()));
 				}
+				if (ds.getProvidedproducttypes() != null) {
+					metadata
+						.addAll(
+							ds
+								.getProvidedproducttypes()
+								.stream()
+								.map(c -> XmlSerializationUtils.asXmlElement("providedproducttypes", c))
+								.collect(Collectors.toList()));
+				}
+				if (ds.getJurisdiction() != null) {
+					metadata.add(XmlSerializationUtils.mapQualifier("jurisdiction", ds.getJurisdiction()));
+				}
 
+				if (ds.getThematic() != null) {
+					metadata.add(XmlSerializationUtils.asXmlElement("thematic", ds.getThematic().toString()));
+				}
+
+				if (ds.getContentpolicies() != null) {
+					metadata
+						.addAll(
+							ds
+								.getContentpolicies()
+								.stream()
+								.filter(Objects::nonNull)
+								.map(q -> XmlSerializationUtils.mapQualifier("contentpolicy", q))
+								.collect(Collectors.toList()));
+				}
+				if (ds.getSubmissionpolicyurl() != null) {
+					metadata
+						.add(XmlSerializationUtils.asXmlElement("submissionpolicyurl", ds.getSubmissionpolicyurl()));
+				}
+				if (ds.getPreservationpolicyurl() != null) {
+					metadata
+						.add(
+							XmlSerializationUtils.asXmlElement("preservationpolicyurl", ds.getPreservationpolicyurl()));
+				}
+				if (ds.getResearchproductaccesspolicies() != null) {
+					metadata
+						.addAll(
+							ds
+								.getResearchproductaccesspolicies()
+								.stream()
+								.map(c -> XmlSerializationUtils.asXmlElement("researchproductaccesspolicies", c))
+								.collect(Collectors.toList()));
+				}
+				if (ds.getResearchproductmetadataaccesspolicies() != null) {
+					metadata
+						.addAll(
+							ds
+								.getResearchproductmetadataaccesspolicies()
+								.stream()
+								.map(
+									c -> XmlSerializationUtils.asXmlElement("researchproductmetadataaccesspolicies", c))
+								.collect(Collectors.toList()));
+				}
 				break;
 			case organization:
 				final Organization o = (Organization) entity;
@@ -743,13 +831,11 @@ public class XmlRecordFactory implements Serializable {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"legalshortname", o.getLegalshortname().getValue()));
+								.asXmlElement("legalshortname", o.getLegalshortname().getValue()));
 				}
 				if (o.getLegalname() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("legalname", o.getLegalname().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("legalname", o.getLegalname().getValue()));
 				}
 				if (o.getAlternativeNames() != null) {
 					metadata
@@ -763,8 +849,7 @@ public class XmlRecordFactory implements Serializable {
 				}
 				if (o.getWebsiteurl() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("websiteurl", o.getWebsiteurl().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("websiteurl", o.getWebsiteurl().getValue()));
 				}
 				if (o.getLogourl() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("logourl", o.getLogourl().getValue()));
@@ -772,32 +857,27 @@ public class XmlRecordFactory implements Serializable {
 
 				if (o.getEclegalbody() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("eclegalbody", o.getEclegalbody().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("eclegalbody", o.getEclegalbody().getValue()));
 				}
 				if (o.getEclegalperson() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("eclegalperson", o.getEclegalperson().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("eclegalperson", o.getEclegalperson().getValue()));
 				}
 				if (o.getEcnonprofit() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("ecnonprofit", o.getEcnonprofit().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("ecnonprofit", o.getEcnonprofit().getValue()));
 				}
 				if (o.getEcresearchorganization() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"ecresearchorganization", o.getEcresearchorganization().getValue()));
+								.asXmlElement("ecresearchorganization", o.getEcresearchorganization().getValue()));
 				}
 				if (o.getEchighereducation() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"echighereducation", o.getEchighereducation().getValue()));
+								.asXmlElement("echighereducation", o.getEchighereducation().getValue()));
 				}
 				if (o.getEcinternationalorganizationeurinterests() != null) {
 					metadata
@@ -816,20 +896,17 @@ public class XmlRecordFactory implements Serializable {
 				}
 				if (o.getEcenterprise() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("ecenterprise", o.getEcenterprise().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("ecenterprise", o.getEcenterprise().getValue()));
 				}
 				if (o.getEcsmevalidated() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"ecsmevalidated", o.getEcsmevalidated().getValue()));
+								.asXmlElement("ecsmevalidated", o.getEcsmevalidated().getValue()));
 				}
 				if (o.getEcnutscode() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("ecnutscode", o.getEcnutscode().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("ecnutscode", o.getEcnutscode().getValue()));
 				}
 				if (o.getCountry() != null) {
 					metadata.add(XmlSerializationUtils.mapQualifier("country", o.getCountry()));
@@ -841,8 +918,7 @@ public class XmlRecordFactory implements Serializable {
 
 				if (p.getWebsiteurl() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("websiteurl", p.getWebsiteurl().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("websiteurl", p.getWebsiteurl().getValue()));
 				}
 				if (p.getCode() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("code", p.getCode().getValue()));
@@ -855,8 +931,7 @@ public class XmlRecordFactory implements Serializable {
 				}
 				if (p.getStartdate() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("startdate", p.getStartdate().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("startdate", p.getStartdate().getValue()));
 				}
 				if (p.getEnddate() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("enddate", p.getEnddate().getValue()));
@@ -865,8 +940,7 @@ public class XmlRecordFactory implements Serializable {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.asXmlElement(
-									"callidentifier", p.getCallidentifier().getValue()));
+								.asXmlElement("callidentifier", p.getCallidentifier().getValue()));
 				}
 				if (p.getKeywords() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("keywords", p.getKeywords().getValue()));
@@ -876,8 +950,7 @@ public class XmlRecordFactory implements Serializable {
 				}
 				if (p.getEcarticle29_3() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("ecarticle29_3", p.getEcarticle29_3().getValue()));
+						.add(XmlSerializationUtils.asXmlElement("ecarticle29_3", p.getEcarticle29_3().getValue()));
 				}
 				if (p.getSubjects() != null) {
 					metadata
@@ -901,28 +974,6 @@ public class XmlRecordFactory implements Serializable {
 				if (p.getEcsc39() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("ecsc39", p.getEcsc39().getValue()));
 				}
-				if (p.getContactfullname() != null) {
-					metadata
-						.add(
-							XmlSerializationUtils
-								.asXmlElement(
-									"contactfullname", p.getContactfullname().getValue()));
-				}
-				if (p.getContactfax() != null) {
-					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("contactfax", p.getContactfax().getValue()));
-				}
-				if (p.getContactphone() != null) {
-					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("contactphone", p.getContactphone().getValue()));
-				}
-				if (p.getContactemail() != null) {
-					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("contactemail", p.getContactemail().getValue()));
-				}
 				if (p.getSummary() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("summary", p.getSummary().getValue()));
 				}
@@ -931,13 +982,11 @@ public class XmlRecordFactory implements Serializable {
 				}
 				if (p.getTotalcost() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("totalcost", p.getTotalcost().toString()));
+						.add(XmlSerializationUtils.asXmlElement("totalcost", p.getTotalcost().toString()));
 				}
 				if (p.getFundedamount() != null) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("fundedamount", p.getFundedamount().toString()));
+						.add(XmlSerializationUtils.asXmlElement("fundedamount", p.getFundedamount().toString()));
 				}
 				if (p.getFundingtree() != null) {
 					metadata
@@ -958,28 +1007,29 @@ public class XmlRecordFactory implements Serializable {
 		return metadata;
 	}
 
-	private String getAuthorPidType(String s) {
+	private List<String> measuresAsXml(List<Measure> measures) {
+		return measures
+			.stream()
+			.map(m -> {
+				List<Tuple2<String, String>> l = Lists.newArrayList(new Tuple2<>("id", m.getId()));
+				m.getUnit().forEach(kv -> l.add(new Tuple2<>(kv.getKey(), kv.getValue())));
+				return XmlSerializationUtils.asXmlElement("measure", l);
+			})
+			.collect(Collectors.toList());
+	}
+
+	private String getAuthorPidType(final String s) {
 		return XmlSerializationUtils
 			.escapeXml(s)
 			.replaceAll("\\W", "")
 			.replaceAll("\\d", "");
 	}
 
-	private static boolean kvNotBlank(KeyValue kv) {
+	private static boolean kvNotBlank(final KeyValue kv) {
 		return kv != null && StringUtils.isNotBlank(kv.getKey()) && StringUtils.isNotBlank(kv.getValue());
 	}
 
-	private void mapDatasourceType(List<String> metadata, final Qualifier dsType) {
-		metadata.add(XmlSerializationUtils.mapQualifier("datasourcetype", dsType));
-
-		if (specialDatasourceTypes.contains(dsType.getClassid())) {
-			dsType.setClassid("other");
-			dsType.setClassname("other");
-		}
-		metadata.add(XmlSerializationUtils.mapQualifier("datasourcetypeui", dsType));
-	}
-
-	private List<String> mapFields(RelatedEntityWrapper link, Set<String> contexts) {
+	private List<String> mapFields(final RelatedEntityWrapper link, final Set<String> contexts) {
 		final Relation rel = link.getRelation();
 		final RelatedEntity re = link.getTarget();
 		final String targetType = link.getTarget().getType();
@@ -995,16 +1045,14 @@ public class XmlRecordFactory implements Serializable {
 				}
 				if (isNotBlank(re.getDateofacceptance())) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("dateofacceptance", re.getDateofacceptance()));
+						.add(XmlSerializationUtils.asXmlElement("dateofacceptance", re.getDateofacceptance()));
 				}
 				if (isNotBlank(re.getPublisher())) {
 					metadata.add(XmlSerializationUtils.asXmlElement("publisher", re.getPublisher()));
 				}
 				if (isNotBlank(re.getCodeRepositoryUrl())) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("coderepositoryurl", re.getCodeRepositoryUrl()));
+						.add(XmlSerializationUtils.asXmlElement("coderepositoryurl", re.getCodeRepositoryUrl()));
 				}
 				if (re.getResulttype() != null && re.getResulttype().isBlank()) {
 					metadata.add(XmlSerializationUtils.mapQualifier("resulttype", re.getResulttype()));
@@ -1034,14 +1082,16 @@ public class XmlRecordFactory implements Serializable {
 					metadata.add(XmlSerializationUtils.asXmlElement("officialname", re.getOfficialname()));
 				}
 				if (re.getDatasourcetype() != null && !re.getDatasourcetype().isBlank()) {
-					mapDatasourceType(metadata, re.getDatasourcetype());
+					metadata.add(XmlSerializationUtils.mapQualifier("datasourcetype", re.getDatasourcetype()));
+				}
+				if (re.getDatasourcetypeui() != null && !re.getDatasourcetypeui().isBlank()) {
+					metadata.add(XmlSerializationUtils.mapQualifier("datasourcetypeui", re.getDatasourcetypeui()));
 				}
 				if (re.getOpenairecompatibility() != null && !re.getOpenairecompatibility().isBlank()) {
 					metadata
 						.add(
 							XmlSerializationUtils
-								.mapQualifier(
-									"openairecompatibility", re.getOpenairecompatibility()));
+								.mapQualifier("openairecompatibility", re.getOpenairecompatibility()));
 				}
 				break;
 			case organization:
@@ -1050,8 +1100,7 @@ public class XmlRecordFactory implements Serializable {
 				}
 				if (isNotBlank(re.getLegalshortname())) {
 					metadata
-						.add(
-							XmlSerializationUtils.asXmlElement("legalshortname", re.getLegalshortname()));
+						.add(XmlSerializationUtils.asXmlElement("legalshortname", re.getLegalshortname()));
 				}
 				if (re.getCountry() != null && !re.getCountry().isBlank()) {
 					metadata.add(XmlSerializationUtils.mapQualifier("country", re.getCountry()));
@@ -1093,29 +1142,37 @@ public class XmlRecordFactory implements Serializable {
 		return metadata;
 	}
 
-	private String mapRelation(Set<String> contexts, TemplateFactory templateFactory, EntityType type,
-		RelatedEntityWrapper link) {
+	private String mapRelation(final Set<String> contexts,
+		final TemplateFactory templateFactory,
+		final EntityType type,
+		final RelatedEntityWrapper link) {
 		final Relation rel = link.getRelation();
 		final String targetType = link.getTarget().getType();
 		final String scheme = ModelSupport.getScheme(type.toString(), targetType);
 
 		if (StringUtils.isBlank(scheme)) {
 			throw new IllegalArgumentException(
-				String.format("missing scheme for: <%s - %s>", type.toString(), targetType));
+				String.format("missing scheme for: <%s - %s>", type, targetType));
 		}
 		final HashSet<String> fields = Sets.newHashSet(mapFields(link, contexts));
+		if (rel.getValidated() == null) {
+			rel.setValidated(false);
+		}
 		return templateFactory
 			.getRel(
-				targetType, rel.getTarget(), fields, rel.getRelClass(), scheme, rel.getDataInfo());
+				targetType, rel.getTarget(), fields, rel.getRelClass(), scheme, rel.getDataInfo(), rel.getValidated(),
+				rel.getValidationDate());
 	}
 
 	private List<String> listChildren(
-		final OafEntity entity, JoinedEntity je, TemplateFactory templateFactory) {
+		final OafEntity entity,
+		final JoinedEntity je,
+		final TemplateFactory templateFactory) {
 
 		final EntityType entityType = EntityType.fromClass(je.getEntity().getClass());
 
 		final List<RelatedEntityWrapper> links = je.getLinks();
-		List<String> children = links
+		final List<String> children = links
 			.stream()
 			.filter(link -> isDuplicate(link))
 			.map(link -> {
@@ -1130,71 +1187,124 @@ public class XmlRecordFactory implements Serializable {
 		if (MainEntityType.result.toString().equals(ModelSupport.getMainType(entityType))) {
 			final List<Instance> instances = ((Result) entity).getInstance();
 			if (instances != null) {
-				for (final Instance instance : ((Result) entity).getInstance()) {
 
+				groupInstancesByUrl(((Result) entity).getInstance()).forEach(instance -> {
 					final List<String> fields = Lists.newArrayList();
 
 					if (instance.getAccessright() != null && !instance.getAccessright().isBlank()) {
 						fields
-							.add(
-								XmlSerializationUtils.mapQualifier("accessright", instance.getAccessright()));
+							.add(XmlSerializationUtils.mapQualifier("accessright", instance.getAccessright()));
 					}
-					if (instance.getCollectedfrom() != null && kvNotBlank(instance.getCollectedfrom())) {
+					if (instance.getCollectedfrom() != null) {
 						fields
-							.add(
-								XmlSerializationUtils.mapKeyValue("collectedfrom", instance.getCollectedfrom()));
+							.addAll(
+								instance
+									.getCollectedfrom()
+									.stream()
+									.filter(cf -> kvNotBlank(cf))
+									.map(cf -> XmlSerializationUtils.mapKeyValue("collectedfrom", cf))
+									.collect(Collectors.toList()));
 					}
-					if (instance.getHostedby() != null && kvNotBlank(instance.getHostedby())) {
-						fields.add(XmlSerializationUtils.mapKeyValue("hostedby", instance.getHostedby()));
-					}
-					if (instance.getDateofacceptance() != null
-						&& isNotBlank(instance.getDateofacceptance().getValue())) {
+
+					if (instance.getHostedby() != null) {
 						fields
-							.add(
-								XmlSerializationUtils
-									.asXmlElement(
-										"dateofacceptance", instance.getDateofacceptance().getValue()));
+							.addAll(
+								instance
+									.getHostedby()
+									.stream()
+									.filter(hb -> kvNotBlank(hb))
+									.map(hb -> XmlSerializationUtils.mapKeyValue("hostedby", hb))
+									.collect(Collectors.toList()));
 					}
-					if (instance.getInstancetype() != null && !instance.getInstancetype().isBlank()) {
+					if (instance.getDateofacceptance() != null) {
 						fields
-							.add(
-								XmlSerializationUtils.mapQualifier("instancetype", instance.getInstancetype()));
+							.addAll(
+								instance
+									.getDateofacceptance()
+									.stream()
+									.filter(d -> isNotBlank(d))
+									.map(d -> XmlSerializationUtils.asXmlElement("dateofacceptance", d))
+									.collect(Collectors.toList()));
 					}
-					if (isNotBlank(instance.getDistributionlocation())) {
+					if (instance.getInstancetype() != null) {
 						fields
-							.add(
-								XmlSerializationUtils
-									.asXmlElement(
-										"distributionlocation", instance.getDistributionlocation()));
+							.addAll(
+								instance
+									.getInstancetype()
+									.stream()
+									.filter(t -> !t.isBlank())
+									.map(t -> XmlSerializationUtils.mapQualifier("instancetype", t))
+									.collect(Collectors.toList()));
 					}
-					if (instance.getRefereed() != null && !instance.getRefereed().isBlank()) {
+					if (instance.getDistributionlocation() != null) {
+						fields
+							.addAll(
+								instance
+									.getDistributionlocation()
+									.stream()
+									.filter(d -> isNotBlank(d))
+									.map(d -> XmlSerializationUtils.asXmlElement("distributionlocation", d))
+									.collect(Collectors.toList()));
+					}
+					if (instance.getPid() != null) {
+						fields
+							.addAll(
+								instance
+									.getPid()
+									.stream()
+									.filter(Objects::nonNull)
+									.map(p -> XmlSerializationUtils.mapStructuredProperty("pid", p))
+									.collect(Collectors.toList()));
+					}
+					if (instance.getAlternateIdentifier() != null) {
+						fields
+							.addAll(
+								instance
+									.getAlternateIdentifier()
+									.stream()
+									.filter(Objects::nonNull)
+									.map(p -> XmlSerializationUtils.mapStructuredProperty("alternateidentifier", p))
+									.collect(Collectors.toList()));
+					}
+
+					if (instance.getRefereed() != null) {
 						fields
 							.add(
 								XmlSerializationUtils.mapQualifier("refereed", instance.getRefereed()));
 					}
 					if (instance.getProcessingchargeamount() != null
-						&& isNotBlank(instance.getProcessingchargeamount().getValue())) {
+						&& isNotBlank(instance.getProcessingchargeamount())) {
 						fields
 							.add(
 								XmlSerializationUtils
 									.asXmlElement(
-										"processingchargeamount", instance.getProcessingchargeamount().getValue()));
+										"processingchargeamount", instance.getProcessingchargeamount()));
 					}
 					if (instance.getProcessingchargecurrency() != null
-						&& isNotBlank(instance.getProcessingchargecurrency().getValue())) {
+						&& isNotBlank(instance.getProcessingchargecurrency())) {
 						fields
 							.add(
 								XmlSerializationUtils
 									.asXmlElement(
-										"processingchargecurrency", instance.getProcessingchargecurrency().getValue()));
+										"processingchargecurrency", instance.getProcessingchargecurrency()));
+					}
+
+					if (instance.getLicense() != null) {
+						fields
+							.addAll(
+								instance
+									.getLicense()
+									.stream()
+									.filter(d -> isNotBlank(d))
+									.map(d -> XmlSerializationUtils.asXmlElement("license", d))
+									.collect(Collectors.toList()));
 					}
 
 					children
 						.add(
 							templateFactory
-								.getInstance(
-									instance.getHostedby().getKey(), fields, instance.getUrl()));
-				}
+								.getInstance(fields, instance.getUrl()));
+				});
 			}
 			final List<ExternalReference> ext = ((Result) entity).getExternalReference();
 			if (ext != null) {
@@ -1208,11 +1318,17 @@ public class XmlRecordFactory implements Serializable {
 					if (isNotBlank(er.getLabel())) {
 						fields.add(XmlSerializationUtils.asXmlElement("label", er.getLabel()));
 					}
+					Optional
+						.ofNullable(er.getAlternateLabel())
+						.map(
+							altLabel -> altLabel
+								.stream()
+								.filter(StringUtils::isNotBlank)
+								.collect(Collectors.toList()))
+						.orElse(Lists.newArrayList())
+						.forEach(alt -> fields.add(XmlSerializationUtils.asXmlElement("alternatelabel", alt)));
 					if (isNotBlank(er.getUrl())) {
 						fields.add(XmlSerializationUtils.asXmlElement("url", er.getUrl()));
-					}
-					if (isNotBlank(er.getDescription())) {
-						fields.add(XmlSerializationUtils.asXmlElement("description", er.getDescription()));
 					}
 					if (isNotBlank(er.getUrl())) {
 						fields.add(XmlSerializationUtils.mapQualifier("qualifier", er.getQualifier()));
@@ -1232,11 +1348,122 @@ public class XmlRecordFactory implements Serializable {
 		return children;
 	}
 
-	private boolean isDuplicate(RelatedEntityWrapper link) {
-		return REL_SUBTYPE_DEDUP.equalsIgnoreCase(link.getRelation().getSubRelType());
+	private Stream<XmlInstance> groupInstancesByUrl(List<Instance> instance) {
+		return instance
+			.stream()
+			.filter(i -> Objects.nonNull(i.getUrl()))
+			.map(i -> {
+				i
+					.setUrl(
+						i
+							.getUrl()
+							.stream()
+							.filter(this::isValidUrl)
+							.map(XmlRecordFactory::normalizeDoiUrl)
+							.collect(Collectors.toList()));
+				return i;
+			})
+			.filter(
+				i -> Optional
+					.ofNullable(i.getUrl())
+					.map(u -> !u.isEmpty())
+					.orElse(false))
+			.map(this::pickByUrl)
+			.collect(Collectors.groupingBy(ImmutablePair::getLeft))
+			.values()
+			.stream()
+			.filter(Objects::nonNull)
+			.map(this::mergeInstances);
 	}
 
-	private List<String> listExtraInfo(OafEntity entity) {
+	public static String normalizeDoiUrl(String url) {
+		if (url.contains(DOI_ORG_AUTHORITY)) {
+			try {
+				URL u = new URL(url);
+				return new URL(HTTPS, DOI_ORG_AUTHORITY, u.getFile()).toString();
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			}
+		}
+		return url;
+	}
+
+	private boolean isValidUrl(String url) {
+		try {
+			new URL(url).toURI();
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	private ImmutablePair<String, Instance> pickByUrl(Instance i) {
+		return new ImmutablePair<>(i.getUrl().get(0), i);
+	}
+
+	private XmlInstance mergeInstances(List<ImmutablePair<String, Instance>> instances) {
+
+		final XmlInstance instance = new XmlInstance();
+
+		instance.setUrl(instances.get(0).getLeft());
+		instance
+			.setAccessright(
+				instances
+					.stream()
+					.map(Pair::getValue)
+					.map(Instance::getAccessright)
+					.min(new AccessRightComparator<AccessRight>())
+					.orElse(XmlInstance.UNKNOWN_ACCESS_RIGHT));
+		instance
+			.setRefereed(
+				instances
+					.stream()
+					.map(Pair::getValue)
+					.map(i -> Optional.ofNullable(i.getRefereed()).orElse(XmlInstance.UNKNOWN_REVIEW_LEVEL))
+					.min(new RefereedComparator())
+					.orElse(XmlInstance.UNKNOWN_REVIEW_LEVEL));
+
+		instances.forEach(p -> {
+			final Instance i = p.getRight();
+			instance.getCollectedfrom().add(i.getCollectedfrom());
+			instance.getHostedby().add(i.getHostedby());
+			instance.getInstancetype().add(i.getInstancetype());
+			instance
+				.setProcessingchargeamount(
+					Optional.ofNullable(i.getProcessingchargeamount()).map(apc -> apc.getValue()).orElse(null));
+			instance
+				.setProcessingchargecurrency(
+					Optional.ofNullable(i.getProcessingchargecurrency()).map(c -> c.getValue()).orElse(null));
+			Optional
+				.ofNullable(i.getPid())
+				.ifPresent(pid -> instance.getPid().addAll(pid));
+			Optional
+				.ofNullable(i.getAlternateIdentifier())
+				.ifPresent(altId -> instance.getAlternateIdentifier().addAll(altId));
+			Optional
+				.ofNullable(i.getDateofacceptance())
+				.ifPresent(d -> instance.getDateofacceptance().add(d.getValue()));
+			Optional
+				.ofNullable(i.getLicense())
+				.ifPresent(license -> instance.getLicense().add(license.getValue()));
+			Optional
+				.ofNullable(i.getDistributionlocation())
+				.ifPresent(dl -> instance.getDistributionlocation().add(dl));
+		});
+
+		if (instance.getHostedby().size() > 1
+			&& instance.getHostedby().stream().anyMatch(hb -> ModelConstants.UNKNOWN_REPOSITORY.equals(hb))) {
+			instance.getHostedby().remove(ModelConstants.UNKNOWN_REPOSITORY);
+		}
+
+		return instance;
+	}
+
+	private boolean isDuplicate(final RelatedEntityWrapper link) {
+		return ModelConstants.DEDUP.equalsIgnoreCase(link.getRelation().getSubRelType());
+	}
+
+	private List<String> listExtraInfo(final OafEntity entity) {
 		final List<ExtraInfo> extraInfo = entity.getExtraInfo();
 		return extraInfo != null
 			? extraInfo
@@ -1249,7 +1476,7 @@ public class XmlRecordFactory implements Serializable {
 	private List<String> buildContexts(final String type, final Set<String> contexts) {
 		final List<String> res = Lists.newArrayList();
 
-		if ((contextMapper != null)
+		if (contextMapper != null
 			&& !contextMapper.isEmpty()
 			&& MainEntityType.result.toString().equals(type)) {
 
@@ -1280,8 +1507,7 @@ public class XmlRecordFactory implements Serializable {
 					if (def.getName().equals("category")) {
 						final String rootId = substringBefore(def.getId(), "::");
 						document = addContextDef(
-							document.gotoRoot().gotoTag("//context[./@id='" + rootId + "']", new Object()),
-							def);
+							document.gotoRoot().gotoTag("//context[./@id='" + rootId + "']", new Object()), def);
 					}
 
 					if (def.getName().equals("concept")) {
@@ -1305,17 +1531,17 @@ public class XmlRecordFactory implements Serializable {
 
 	private Transformer getTransformer() {
 		try {
-			Transformer transformer = TransformerFactory.newInstance().newTransformer();
+			final Transformer transformer = TransformerFactory.newInstance().newTransformer();
 			transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 			return transformer;
-		} catch (TransformerConfigurationException e) {
+		} catch (final TransformerConfigurationException e) {
 			throw new IllegalStateException("unable to create javax.xml.transform.Transformer", e);
 		}
 	}
 
 	private XMLTag addContextDef(final XMLTag tag, final ContextDef def) {
 		tag.addTag(def.getName()).addAttribute("id", def.getId()).addAttribute("label", def.getLabel());
-		if ((def.getType() != null) && !def.getType().isEmpty()) {
+		if (def.getType() != null && !def.getType().isEmpty()) {
 			tag.addAttribute("type", def.getType());
 		}
 		return tag;
@@ -1352,16 +1578,14 @@ public class XmlRecordFactory implements Serializable {
 				if (level0 != null) {
 					final String level0Id = Joiner.on("::").join(funderShortName, level0.valueOf("./name"));
 					contextMapper
-						.put(
-							level0Id, new ContextDef(level0Id, level0.valueOf("./description"), "category", ""));
+						.put(level0Id, new ContextDef(level0Id, level0.valueOf("./description"), "category", ""));
 					final Node level1 = fundingPath.selectSingleNode("//funding_level_1");
 					if (level1 == null) {
 						contexts.add(level0Id);
 					} else {
 						final String level1Id = Joiner.on("::").join(level0Id, level1.valueOf("./name"));
 						contextMapper
-							.put(
-								level1Id, new ContextDef(level1Id, level1.valueOf("./description"), "concept", ""));
+							.put(level1Id, new ContextDef(level1Id, level1.valueOf("./description"), "concept", ""));
 						final Node level2 = fundingPath.selectSingleNode("//funding_level_2");
 						if (level2 == null) {
 							contexts.add(level1Id);
@@ -1369,8 +1593,7 @@ public class XmlRecordFactory implements Serializable {
 							final String level2Id = Joiner.on("::").join(level1Id, level2.valueOf("./name"));
 							contextMapper
 								.put(
-									level2Id,
-									new ContextDef(level2Id, level2.valueOf("./description"), "concept", ""));
+									level2Id, new ContextDef(level2Id, level2.valueOf("./description"), "concept", ""));
 							contexts.add(level2Id);
 						}
 					}
@@ -1391,8 +1614,7 @@ public class XmlRecordFactory implements Serializable {
 			funding += getFunderElement(ftree);
 
 			for (final Object o : Lists
-				.reverse(
-					ftree.selectNodes("//fundingtree//*[starts-with(local-name(),'funding_level_')]"))) {
+				.reverse(ftree.selectNodes("//fundingtree//*[starts-with(local-name(),'funding_level_')]"))) {
 				final Element e = (Element) o;
 				final String _id = e.valueOf("./id");
 				funding += "<"

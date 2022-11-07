@@ -1,0 +1,179 @@
+<workflow-app name="Resolve relation and entities" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>graphBasePath</name>
+            <description>the path of the graph</description>
+        </property>
+        <property>
+            <name>unresolvedPath</name>
+            <description>the path of the unresolved Entities</description>
+        </property>
+        <property>
+            <name>targetPath</name>
+            <description>the target path after resolution</description>
+        </property>
+        <property>
+            <name>shouldResolveEntities</name>
+            <value>true</value>
+            <description>allows to activate/deactivate the resolution process over the entities</description>
+        </property>
+    </parameters>
+
+    <start to="reset_outputpath"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="reset_outputpath">
+        <fs>
+            <delete path="${targetPath}"/>
+            <mkdir path="${targetPath}"/>
+        </fs>
+        <ok to="ResolveRelations"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="ResolveRelations">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Resolve Relations in raw graph</name>
+            <class>eu.dnetlib.dhp.oa.graph.resolution.SparkResolveRelation</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.shuffle.partitions=15000
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--master</arg><arg>yarn</arg>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}</arg>
+        </spark>
+        <ok to="decision_resolveEntities"/>
+        <error to="Kill"/>
+    </action>
+
+    <decision name="decision_resolveEntities">
+        <switch>
+            <case to="copy_result">${wf:conf('shouldResolveEntities') eq false}</case>
+            <case to="ResolveEntities">${wf:conf('shouldResolveEntities') eq true}</case>
+            <default to="ResolveEntities"/>
+        </switch>
+    </decision>
+
+    <action name="ResolveEntities">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Resolve Entities in raw graph</name>
+            <class>eu.dnetlib.dhp.oa.graph.resolution.SparkResolveEntities</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.shuffle.partitions=10000
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--master</arg><arg>yarn</arg>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--unresolvedPath</arg><arg>${unresolvedPath}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}</arg>
+        </spark>
+        <ok to="copy_entities"/>
+        <error to="Kill"/>
+    </action>
+
+    <fork name="copy_result">
+        <path start="copy_publication"/>
+        <path start="copy_dataset"/>
+        <path start="copy_otherresearchproduct"/>
+        <path start="copy_software"/>
+    </fork>
+
+    <action name="copy_publication">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/publication</arg>
+            <arg>${nameNode}/${targetPath}/publication</arg>
+        </distcp>
+        <ok to="copy_wait_result"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_dataset">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/dataset</arg>
+            <arg>${nameNode}/${targetPath}/dataset</arg>
+        </distcp>
+        <ok to="copy_wait_result"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_otherresearchproduct">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/otherresearchproduct</arg>
+            <arg>${nameNode}/${targetPath}/otherresearchproduct</arg>
+        </distcp>
+        <ok to="copy_wait_result"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_software">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/software</arg>
+            <arg>${nameNode}/${targetPath}/software</arg>
+        </distcp>
+        <ok to="copy_wait_result"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="copy_wait_result" to="copy_entities"/>
+
+    <fork name="copy_entities">
+        <path start="copy_organization"/>
+        <path start="copy_projects"/>
+        <path start="copy_datasource"/>
+    </fork>
+
+    <action name="copy_organization">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/organization</arg>
+            <arg>${nameNode}/${targetPath}/organization</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_projects">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/project</arg>
+            <arg>${nameNode}/${targetPath}/project</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_datasource">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/datasource</arg>
+            <arg>${nameNode}/${targetPath}/datasource</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="copy_wait" to="End"/>
+
+    <end name="End"/>
+</workflow-app>

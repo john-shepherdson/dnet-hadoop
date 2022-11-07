@@ -13,11 +13,16 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
-import eu.dnetlib.collector.worker.model.ApiDescriptor;
+import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
-import eu.dnetlib.dhp.collection.worker.DnetCollectorException;
+import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
+import eu.dnetlib.dhp.common.collection.CollectorException;
+import eu.dnetlib.dhp.common.collection.HttpClientParams;
 
 public class OaiCollectorPlugin implements CollectorPlugin {
+
+	public static final String DATE_REGEX = "\\d{4}-\\d{2}-\\d{2}";
+	public static final String UTC_DATETIME_REGEX = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z";
 
 	private static final String FORMAT_PARAM = "format";
 	private static final String OAI_SET_PARAM = "set";
@@ -26,8 +31,15 @@ public class OaiCollectorPlugin implements CollectorPlugin {
 
 	private OaiIteratorFactory oaiIteratorFactory;
 
+	private HttpClientParams clientParams;
+
+	public OaiCollectorPlugin(HttpClientParams clientParams) {
+		this.clientParams = clientParams;
+	}
+
 	@Override
-	public Stream<String> collect(final ApiDescriptor api) throws DnetCollectorException {
+	public Stream<String> collect(final ApiDescriptor api, final AggregatorReport report)
+		throws CollectorException {
 		final String baseUrl = api.getBaseUrl();
 		final String mdFormat = api.getParams().get(FORMAT_PARAM);
 		final String setParam = api.getParams().get(OAI_SET_PARAM);
@@ -46,26 +58,26 @@ public class OaiCollectorPlugin implements CollectorPlugin {
 		}
 
 		if (baseUrl == null || baseUrl.isEmpty()) {
-			throw new DnetCollectorException("Param 'baseurl' is null or empty");
+			throw new CollectorException("Param 'baseurl' is null or empty");
 		}
 
 		if (mdFormat == null || mdFormat.isEmpty()) {
-			throw new DnetCollectorException("Param 'mdFormat' is null or empty");
+			throw new CollectorException("Param 'mdFormat' is null or empty");
 		}
 
-		if (fromDate != null && !fromDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
-			throw new DnetCollectorException("Invalid date (YYYY-MM-DD): " + fromDate);
+		if (fromDate != null && !fromDate.matches(DATE_REGEX) && !fromDate.matches(UTC_DATETIME_REGEX)) {
+			throw new CollectorException("Invalid date (YYYY-MM-DD or YYYY-MM-DDT00:00:00Z): " + fromDate);
 		}
 
-		if (untilDate != null && !untilDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
-			throw new DnetCollectorException("Invalid date (YYYY-MM-DD): " + untilDate);
+		if (untilDate != null && !untilDate.matches(DATE_REGEX) && !untilDate.matches(UTC_DATETIME_REGEX)) {
+			throw new CollectorException("Invalid date (YYYY-MM-DD or YYYY-MM-DDT00:00:00Z): " + untilDate);
 		}
 
 		final Iterator<Iterator<String>> iters = sets
 			.stream()
 			.map(
 				set -> getOaiIteratorFactory()
-					.newIterator(baseUrl, mdFormat, set, fromDate, untilDate))
+					.newIterator(baseUrl, mdFormat, set, fromDate, untilDate, getClientParams(), report))
 			.iterator();
 
 		return StreamSupport
@@ -78,5 +90,13 @@ public class OaiCollectorPlugin implements CollectorPlugin {
 			oaiIteratorFactory = new OaiIteratorFactory();
 		}
 		return oaiIteratorFactory;
+	}
+
+	public HttpClientParams getClientParams() {
+		return clientParams;
+	}
+
+	public void setClientParams(HttpClientParams clientParams) {
+		this.clientParams = clientParams;
 	}
 }

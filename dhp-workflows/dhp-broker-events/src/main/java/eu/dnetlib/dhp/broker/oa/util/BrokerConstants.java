@@ -7,12 +7,16 @@ import java.util.Set;
 
 import eu.dnetlib.dhp.broker.model.Event;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultGroup;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 
 public class BrokerConstants {
 
+	private BrokerConstants() {
+	}
+
 	public static final String OPEN_ACCESS = "OPEN";
-	public static final String IS_MERGED_IN_CLASS = "isMergedIn";
+	public static final String IS_MERGED_IN_CLASS = ModelConstants.IS_MERGED_IN;
 
 	public static final String COLLECTED_FROM_REL = "collectedFrom";
 

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.dnetlib.dhp</groupId>
 	<artifactId>dhp</artifactId>
-	<version>1.2.4-SNAPSHOT</version>
+	<version>1.2.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<licenses>
@@ -19,14 +19,13 @@
 
 	<modules>
 		<module>dhp-build</module>
-		<module>dhp-schemas</module>
 		<module>dhp-common</module>
 		<module>dhp-workflows</module>
 	</modules>
 
 	<issueManagement>
 		<system>Redmine</system>
-		<url>https://issue.openaire.research-infrastructures.eu/projects/openaire</url>
+		<url>https://support.openaire.eu/projects/openaire</url>
 	</issueManagement>
 
 	<ciManagement>
@@ -50,7 +49,7 @@
 		<repository>
 			<id>dnet45-releases</id>
 			<name>D-Net 45 releases</name>
-			<url>http://maven.research-infrastructures.eu/nexus/content/repositories/dnet45-releases</url>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-releases</url>
 			<layout>default</layout>
 			<snapshots>
 				<enabled>false</enabled>
@@ -58,6 +57,42 @@
 			<releases>
 				<enabled>true</enabled>
 			</releases>
+		</repository>
+		<repository>
+			<id>dnet45-snapshots</id>
+			<name>D-Net 45 snapshots</name>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-snapshots</url>
+			<layout>default</layout>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>dnet45-bootstrap-snapshot</id>
+			<name>D-Net 45 Bootstrap Snapshot</name>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-bootstrap-snapshot/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<layout>default</layout>
+		</repository>
+		<repository>
+			<id>dnet45-bootstrap-release</id>
+			<name>D-Net 45 Bootstrap Release</name>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-bootstrap-release/</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<layout>default</layout>
 		</repository>
 		<repository>
 			<id>cloudera</id>
@@ -94,13 +129,15 @@
 			<scope>test</scope>
 		</dependency>
 
-
-
-
 	</dependencies>
 
 	<dependencyManagement>
 		<dependencies>
+			<dependency>
+				<groupId>eu.dnetlib.dhp</groupId>
+				<artifactId>dhp-schemas</artifactId>
+				<version>${dhp-schemas.version}</version>
+			</dependency>
 			<dependency>
 				<groupId>org.apache.hadoop</groupId>
 				<artifactId>hadoop-hdfs</artifactId>
@@ -161,6 +198,24 @@
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
 				<version>${dhp.commons.lang.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-validator</groupId>
+				<artifactId>commons-validator</artifactId>
+				<version>1.7</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.github.sisyphsu</groupId>
+				<artifactId>dateparser</artifactId>
+				<version>1.0.7</version>
+			</dependency>
+
+			<dependency>
+				<groupId>me.xuender</groupId>
+				<artifactId>unidecode</artifactId>
+				<version>0.0.7</version>
 			</dependency>
 
 			<dependency>
@@ -258,12 +313,12 @@
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpclient</artifactId>
-				<version>4.5.3</version>
+				<version>${org.apache.httpcomponents.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpmime</artifactId>
-				<version>4.5.3</version>
+				<version>${org.apache.httpcomponents.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.noggit</groupId>
@@ -306,7 +361,7 @@
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
 				<artifactId>dnet-actionmanager-common</artifactId>
-				<version>6.0.5</version>
+				<version>${dnet-actionmanager-common.version}</version>
 				<exclusions>
 					<exclusion>
 						<groupId>org.apache.hadoop</groupId>
@@ -317,32 +372,33 @@
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
 				<artifactId>dnet-actionmanager-api</artifactId>
-				<version>[4.0.1,5.0.0)</version>
+				<version>${dnet-actionmanager-api.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>eu.dnetlib</groupId>
+						<artifactId>cnr-misc-utils</artifactId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
-				<artifactId>dnet-openaire-data-protos</artifactId>
-				<version>3.9.8-proto250</version>
-			</dependency>
-			<dependency>
-				<groupId>eu.dnetlib</groupId>
 				<artifactId>dnet-pace-core</artifactId>
-				<version>4.0.5</version>
+				<version>${dnet-pace-core.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>eu.dnetlib</groupId>
 				<artifactId>cnr-rmi-api</artifactId>
-				<version>[2.0.0,3.0.0)</version>
+				<version>${cnr-rmi-api.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>eu.dnetlib.dhp</groupId>
 				<artifactId>dnet-openaire-broker-common</artifactId>
-				<version>${dnet.openaire.broker.common}</version>
+				<version>${dnet-openaire-broker-common.version}</version>
 			</dependency>
 
-            <dependency>
+			<dependency>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-rt-transports-http</artifactId>
 				<version>3.1.5</version>
@@ -354,11 +410,6 @@
 				<scope>provided</scope>
 			</dependency>
 
-			<dependency>
-				<groupId>com.rabbitmq</groupId>
-				<artifactId>amqp-client</artifactId>
-				<version>5.6.0</version>
-			</dependency>
 			<dependency>
 				<groupId>com.jayway.jsonpath</groupId>
 				<artifactId>json-path</artifactId>
@@ -380,6 +431,11 @@
 				<version>${mongodb.driver.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>io.fares.junit.mongodb</groupId>
+				<artifactId>mongodb-junit-test</artifactId>
+				<version>1.1.0</version>
+			</dependency>
+			<dependency>
 				<groupId>org.postgresql</groupId>
 				<artifactId>postgresql</artifactId>
 				<version>42.2.10</version>
@@ -391,20 +447,20 @@
 				<version>4.0</version>
 			</dependency>
 
-            <dependency>
-                <groupId>com.ximpleware</groupId>
-                <artifactId>vtd-xml</artifactId>
-                <version>${vtd.version}</version>
-            </dependency>
+			<dependency>
+				<groupId>com.ximpleware</groupId>
+				<artifactId>vtd-xml</artifactId>
+				<version>${vtd.version}</version>
+			</dependency>
 
-            <dependency>
-                <groupId>org.elasticsearch</groupId>
-                <artifactId>elasticsearch-hadoop</artifactId>
-                <version>7.6.0</version>
-            </dependency>
+			<dependency>
+				<groupId>org.elasticsearch</groupId>
+				<artifactId>elasticsearch-hadoop</artifactId>
+				<version>7.6.0</version>
+			</dependency>
 
 
-            <dependency>
+			<dependency>
 				<groupId>org.apache.oozie</groupId>
 				<artifactId>oozie-client</artifactId>
 				<version>${dhp.oozie.version}</version>
@@ -447,6 +503,12 @@
 			</dependency>
 
 			<dependency>
+				<groupId>org.json</groupId>
+				<artifactId>json</artifactId>
+				<version>20180813</version>
+			</dependency>
+
+			<dependency>
 				<groupId>org.json4s</groupId>
 				<artifactId>json4s-jackson_2.11</artifactId>
 				<version>${json4s.version}</version>
@@ -456,6 +518,23 @@
 				<groupId>com.github.victools</groupId>
 				<artifactId>jsonschema-generator</artifactId>
 				<version>${jsonschemagenerator.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-text</artifactId>
+				<version>${common.text.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.opencsv</groupId>
+				<artifactId>opencsv</artifactId>
+				<version>5.5</version>
+			</dependency>
+			<dependency>
+				<groupId>io.github.classgraph</groupId>
+				<artifactId>classgraph</artifactId>
+				<version>4.8.71</version>
 			</dependency>
 
 		</dependencies>
@@ -477,7 +556,10 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
-					<version>3.7.1</version>
+					<version>3.9.1</version>
+					<configuration>
+						<skip>${dhp.site.skip}</skip>
+					</configuration>
 				</plugin>
 
 				<plugin>
@@ -547,6 +629,18 @@
 						</dependency>
 					</dependencies>
 				</plugin>
+				<plugin>
+					<groupId>org.antipathy</groupId>
+					<artifactId>mvn-scalafmt_2.11</artifactId>
+					<version>1.0.1640073709.733712b</version>
+					<dependencies>
+						<dependency>
+							<groupId>eu.dnetlib.dhp</groupId>
+							<artifactId>dhp-code-style</artifactId>
+							<version>${project.version}</version>
+						</dependency>
+					</dependencies>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
@@ -588,6 +682,33 @@
 						<id>sort-imports</id>
 						<goals>
 							<goal>sort</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.antipathy</groupId>
+				<artifactId>mvn-scalafmt_2.11</artifactId>
+				<configuration>
+					<configLocation>https://code-repo.d4science.org/D-Net/dnet-hadoop/raw/branch/beta/dhp-build/dhp-code-style/src/main/resources/scalafmt/scalafmt.conf</configLocation>
+					<skipTestSources>false</skipTestSources>
+					<skipSources>false</skipSources>
+					<sourceDirectories>
+						<param>${project.basedir}/src/main/scala</param>
+					</sourceDirectories>
+					<testSourceDirectories>
+						<param>${project.basedir}/src/test/scala</param>
+					</testSourceDirectories>
+					<validateOnly>false</validateOnly>
+					<onlyChangedFiles>false</onlyChangedFiles>
+					<branch>: git rev-parse --abbrev-ref HEAD</branch>
+					<useSpecifiedRepositories>false</useSpecifiedRepositories>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>format</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -639,13 +760,17 @@
 		<snapshotRepository>
 			<id>dnet45-snapshots</id>
 			<name>DNet45 Snapshots</name>
-			<url>http://maven.research-infrastructures.eu/nexus/content/repositories/dnet45-snapshots</url>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-snapshots</url>
 			<layout>default</layout>
 		</snapshotRepository>
 		<repository>
 			<id>dnet45-releases</id>
-			<url>http://maven.research-infrastructures.eu/nexus/content/repositories/dnet45-releases</url>
+			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-releases</url>
 		</repository>
+		<site>
+			<id>DHPSite</id>
+			<url>${dhp.site.stage.path}/</url>
+		</site>
 	</distributionManagement>
 	<reporting>
 		<plugins>
@@ -661,9 +786,12 @@
 	</reporting>
 
 	<properties>
+		<dhp.site.stage.path>sftp://dnet-hadoop@static-web.d4science.org/dnet-hadoop</dhp.site.stage.path>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 		<maven.failsave.plugin.version>2.22.2</maven.failsave.plugin.version>
 		<properties.maven.plugin.version>2.0.1</properties.maven.plugin.version>
 		<dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
@@ -672,13 +800,19 @@
 		<dhp.spark.version>2.4.0.cloudera2</dhp.spark.version>
 		<dhp.jackson.version>2.9.6</dhp.jackson.version>
 		<dhp.commons.lang.version>3.5</dhp.commons.lang.version>
+		<dhp.site.skip>true</dhp.site.skip>
 		<dhp.guava.version>11.0.2</dhp.guava.version>
 		<scala.version>2.11.12</scala.version>
 		<junit-jupiter.version>5.6.1</junit-jupiter.version>
 		<mockito-core.version>3.3.3</mockito-core.version>
 		<mongodb.driver.version>3.4.2</mongodb.driver.version>
 		<vtd.version>[2.12,3.0)</vtd.version>
-		<dnet.openaire.broker.common>3.1.1</dnet.openaire.broker.common>
+		<dhp-schemas.version>[3.15.0]</dhp-schemas.version>
+		<dnet-actionmanager-api.version>[4.0.3]</dnet-actionmanager-api.version>
+		<dnet-actionmanager-common.version>[6.0.5]</dnet-actionmanager-common.version>
+		<dnet-openaire-broker-common.version>[3.1.6]</dnet-openaire-broker-common.version>
+		<dnet-pace-core.version>[4.1.12]</dnet-pace-core.version>
+		<cnr-rmi-api.version>[2.6.1]</cnr-rmi-api.version>
 		<solr.version>7.5.0</solr.version>
 		<okhttp.version>4.7.2</okhttp.version>
 		<common.compress.version>1.20</common.compress.version>
@@ -686,5 +820,8 @@
 		<jsonschemagenerator.version>4.13.0</jsonschemagenerator.version>
 		<common.csv.version>1.8</common.csv.version>
 		<apache.poi.version>4.1.2</apache.poi.version>
+		<common.text.version>1.8</common.text.version>
+		<org.apache.httpcomponents.version>4.5.3</org.apache.httpcomponents.version>
+		<net.alchim31.maven.version>4.0.1</net.alchim31.maven.version>
 	</properties>
 </project>

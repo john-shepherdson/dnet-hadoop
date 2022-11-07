@@ -3,10 +3,10 @@
 *.iws
 *.ipr
 *.iml
-*.ipr
-*.iws
 *~
 .vscode
+.metals
+.bloop
 .classpath
 /*/.classpath
 /*/*/.classpath
@@ -24,4 +24,5 @@
 spark-warehouse
 /**/job-override.properties
 /**/*.log
-
+/**/.factorypath
+/**/.scalafmt.conf

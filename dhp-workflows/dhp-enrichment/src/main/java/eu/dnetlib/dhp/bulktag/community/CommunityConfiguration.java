@@ -2,14 +2,8 @@
 package eu.dnetlib.dhp.bulktag.community;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -22,8 +16,6 @@ import eu.dnetlib.dhp.bulktag.criteria.Selection;
 /** Created by miriam on 02/08/2018. */
 public class CommunityConfiguration implements Serializable {
 
-	private static final Log log = LogFactory.getLog(CommunityConfiguration.class);
-
 	private Map<String, Community> communities;
 
 	// map subject -> communityid
@@ -32,6 +24,8 @@ public class CommunityConfiguration implements Serializable {
 	private Map<String, List<Pair<String, SelectionConstraints>>> datasourceMap = new HashMap<>();
 	// map zenodocommunityid -> communityid
 	private Map<String, List<Pair<String, SelectionConstraints>>> zenodocommunityMap = new HashMap<>();
+	// map communityid -> selectionconstraints
+	private Map<String, SelectionConstraints> selectionConstraintsMap = new HashMap<>();
 
 	public Map<String, List<Pair<String, SelectionConstraints>>> getSubjectMap() {
 		return subjectMap;
@@ -59,6 +53,14 @@ public class CommunityConfiguration implements Serializable {
 		this.zenodocommunityMap = zenodocommunityMap;
 	}
 
+	public Map<String, SelectionConstraints> getSelectionConstraintsMap() {
+		return selectionConstraintsMap;
+	}
+
+	public void setSelectionConstraintsMap(Map<String, SelectionConstraints> selectionConstraintsMap) {
+		this.selectionConstraintsMap = selectionConstraintsMap;
+	}
+
 	CommunityConfiguration(final Map<String, Community> communities) {
 		this.communities = communities;
 		init();
@@ -74,6 +76,9 @@ public class CommunityConfiguration implements Serializable {
 		}
 		if (zenodocommunityMap == null) {
 			zenodocommunityMap = Maps.newHashMap();
+		}
+		if (selectionConstraintsMap == null) {
+			selectionConstraintsMap = Maps.newHashMap();
 		}
 
 		for (Community c : getCommunities().values()) {
@@ -95,6 +100,7 @@ public class CommunityConfiguration implements Serializable {
 					new Pair<>(id, zc.getSelCriteria()),
 					zenodocommunityMap);
 			}
+			selectionConstraintsMap.put(id, c.getConstraints());
 		}
 	}
 
@@ -136,7 +142,7 @@ public class CommunityConfiguration implements Serializable {
 					else
 						return null;
 				})
-			.filter(st -> (st != null))
+			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
 	}
 
@@ -161,7 +167,7 @@ public class CommunityConfiguration implements Serializable {
 
 	private List<String> getContextIds(List<Pair<String, SelectionConstraints>> list) {
 		if (list != null) {
-			return list.stream().map(p -> p.getFst()).collect(Collectors.toList());
+			return list.stream().map(Pair::getFst).collect(Collectors.toList());
 		}
 		return Lists.newArrayList();
 	}

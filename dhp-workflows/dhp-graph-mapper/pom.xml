@@ -3,7 +3,7 @@
     <parent>
         <artifactId>dhp-workflows</artifactId>
         <groupId>eu.dnetlib.dhp</groupId>
-        <version>1.2.4-SNAPSHOT</version>
+        <version>1.2.5-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -33,6 +33,10 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <args>
+                        <arg>-Xmax-classfile-name</arg>
+                        <arg>200</arg>
+                    </args>
                     <scalaVersion>${scala.version}</scalaVersion>
                 </configuration>
             </plugin>
@@ -54,6 +58,11 @@
         </dependency>
 
         <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_2.11</artifactId>
         </dependency>
@@ -67,7 +76,7 @@
             <scope>test</scope>
             <exclusions>
                 <exclusion>
-                <groupId>org.apache.httpcomponents</groupId>
+                    <groupId>org.apache.httpcomponents</groupId>
                     <artifactId>httpclient</artifactId>
                 </exclusion>
             </exclusions>
@@ -78,11 +87,7 @@
             <artifactId>dhp-common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-schemas</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
             <artifactId>json-path</artifactId>
@@ -90,6 +95,11 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.fares.junit.mongodb</groupId>
+            <artifactId>mongodb-junit-test</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>dom4j</groupId>
@@ -117,6 +127,7 @@
             <groupId>org.json4s</groupId>
             <artifactId>json4s-jackson_2.11</artifactId>
         </dependency>
+
 
     </dependencies>
 

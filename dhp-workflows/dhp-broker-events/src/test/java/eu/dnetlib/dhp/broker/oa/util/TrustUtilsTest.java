@@ -14,62 +14,62 @@ public class TrustUtilsTest {
 	private static final double THRESHOLD = 0.95;
 
 	@Test
-	public void rescaleTest_1() {
+	void rescaleTest_1() {
 		verifyValue(-0.3, BrokerConstants.MIN_TRUST);
 	}
 
 	@Test
-	public void rescaleTest_2() {
+	void rescaleTest_2() {
 		verifyValue(0.0, BrokerConstants.MIN_TRUST);
 	}
 
 	@Test
-	public void rescaleTest_3() {
+	void rescaleTest_3() {
 		verifyValue(0.5, BrokerConstants.MIN_TRUST);
 	}
 
 	@Test
-	public void rescaleTest_4() {
+	void rescaleTest_4() {
 		verifyValue(0.95, BrokerConstants.MIN_TRUST);
 	}
 
 	@Test
-	public void rescaleTest_5() {
+	void rescaleTest_5() {
 		verifyValue(0.96, BrokerConstants.MIN_TRUST);
 	}
 
 	@Test
-	public void rescaleTest_6() {
+	void rescaleTest_6() {
 		verifyValue(0.97, 0.3f);
 	}
 
 	@Test
-	public void rescaleTest_7() {
+	void rescaleTest_7() {
 		verifyValue(0.98, 0.45f);
 	}
 
 	@Test
-	public void rescaleTest_8() {
+	void rescaleTest_8() {
 		verifyValue(0.99, 0.6f);
 	}
 
 	@Test
-	public void rescaleTest_9() {
+	void rescaleTest_9() {
 		verifyValue(1.00, BrokerConstants.MAX_TRUST);
 	}
 
 	@Test
-	public void rescaleTest_10() {
+	void rescaleTest_10() {
 		verifyValue(1.01, BrokerConstants.MAX_TRUST);
 	}
 
 	@Test
-	public void rescaleTest_11() {
+	void rescaleTest_11() {
 		verifyValue(2.00, BrokerConstants.MAX_TRUST);
 	}
 
 	@Test
-	public void test() throws Exception {
+	void test() {
 		final OaBrokerMainEntity r1 = new OaBrokerMainEntity();
 		r1.getTitles().add("D-NET Service Package: Data Import");
 		r1.getPids().add(new OaBrokerTypedValue("doi", "123"));

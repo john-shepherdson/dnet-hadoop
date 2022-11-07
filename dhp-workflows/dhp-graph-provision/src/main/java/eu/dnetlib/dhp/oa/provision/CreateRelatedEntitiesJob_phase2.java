@@ -27,33 +27,17 @@ import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
 import scala.Tuple2;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
 
 /**
- * Joins the graph nodes by resolving the links of distance = 1 to create an adjacency list of linked objects. The
- * operation considers all the entity types (publication, dataset, software, ORP, project, datasource, organization, and
- * all the possible relationships (similarity links produced by the Dedup process are excluded).
- * <p>
- * The operation is implemented by sequentially joining one entity type at time (E) with the relationships (R), and
- * again by E, finally grouped by E.id;
- * <p>
- * The workflow is organized in different parts aimed to to reduce the complexity of the operation 1)
- * PrepareRelationsJob: only consider relationships that are not virtually deleted ($.dataInfo.deletedbyinference ==
- * false), each entity can be linked at most to 100 other objects
- * <p>
- * 2) JoinRelationEntityByTargetJob: (phase 1): prepare tuples [relation - target entity] (R - T): for each entity type
- * E_i map E_i as RelatedEntity T_i to simplify the model and extracting only the necessary information join (R.target =
- * T_i.id) save the tuples (R_i, T_i) (phase 2): create the union of all the entity types E, hash by id read the tuples
+ * CreateRelatedEntitiesJob (phase 2): create the union of all the entity types E, hash by id read the tuples
  * (R, T), hash by R.source join E.id = (R, T).source, where E becomes the Source Entity S save the tuples (S, R, T)
- * <p>
- * 3) AdjacencyListBuilderJob: given the tuple (S - R - T) we need to group by S.id -> List [ R - T ], mapping the
- * result as JoinedEntity
- * <p>
- * 4) XmlConverterJob: convert the JoinedEntities as XML records
  */
 public class CreateRelatedEntitiesJob_phase2 {
 
@@ -65,9 +49,11 @@ public class CreateRelatedEntitiesJob_phase2 {
 
 		String jsonConfiguration = IOUtils
 			.toString(
-				PrepareRelationsJob.class
-					.getResourceAsStream(
-						"/eu/dnetlib/dhp/oa/provision/input_params_related_entities_pahase2.json"));
+				Objects
+					.requireNonNull(
+						CreateRelatedEntitiesJob_phase2.class
+							.getResourceAsStream(
+								"/eu/dnetlib/dhp/oa/provision/input_params_related_entities_pahase2.json")));
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
 
@@ -123,7 +109,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 		TypedColumn<JoinedEntity, JoinedEntity> aggregator = new AdjacencyListAggregator().toColumn();
 
 		entities
-			.joinWith(relatedEntities, entities.col("_1").equalTo(relatedEntities.col("_1")), "left_outer")
+			.joinWith(relatedEntities, entities.col("_1").equalTo(relatedEntities.col("_1")), "left")
 			.map((MapFunction<Tuple2<Tuple2<String, E>, Tuple2<String, RelatedEntityWrapper>>, JoinedEntity>) value -> {
 				JoinedEntity je = new JoinedEntity(value._1()._2());
 				Optional
@@ -132,7 +118,6 @@ public class CreateRelatedEntitiesJob_phase2 {
 					.ifPresent(r -> je.getLinks().add(r));
 				return je;
 			}, Encoders.kryo(JoinedEntity.class))
-			.filter(filterEmptyEntityFn())
 			.groupByKey(
 				(MapFunction<JoinedEntity, String>) value -> value.getEntity().getId(),
 				Encoders.STRING())
@@ -140,7 +125,6 @@ public class CreateRelatedEntitiesJob_phase2 {
 			.map(
 				(MapFunction<Tuple2<String, JoinedEntity>, JoinedEntity>) value -> value._2(),
 				Encoders.kryo(JoinedEntity.class))
-			.filter(filterEmptyEntityFn())
 			.write()
 			.mode(SaveMode.Overwrite)
 			.parquet(outputPath);
@@ -292,11 +276,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 			.filter(Objects::nonNull)
 			.map(Qualifier::getClassid)
 			.filter(StringUtils::isNotBlank)
-			.anyMatch(c -> "orcid".equals(c.toLowerCase()));
-	}
-
-	private static FilterFunction<JoinedEntity> filterEmptyEntityFn() {
-		return (FilterFunction<JoinedEntity>) v -> Objects.nonNull(v.getEntity());
+			.anyMatch(c -> c.toLowerCase().contains(ModelConstants.ORCID));
 	}
 
 	private static void removeOutputDir(SparkSession spark, String path) {

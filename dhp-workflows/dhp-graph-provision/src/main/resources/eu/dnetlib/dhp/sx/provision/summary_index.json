@@ -1,0 +1,132 @@
+{
+  "mappings": {
+    "properties": {
+      "abstract": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "author": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "datasources": {
+        "type": "nested",
+        "properties": {
+          "completionStatus": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "datasourceId": {
+            "type": "keyword"
+          },
+          "datasourceName": {
+            "type": "keyword"
+          }
+        }
+      },
+      "date": {
+        "type": "keyword"
+      },
+      "id": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "localIdentifier": {
+        "type": "nested",
+        "properties": {
+          "id": {
+            "type": "keyword"
+          },
+          "type": {
+            "type": "keyword"
+          }
+        }
+      },
+      "publisher": {
+        "type": "keyword"
+      },
+      "relatedDatasets": {
+        "type": "long"
+      },
+      "relatedPublications": {
+        "type": "long"
+      },
+      "relatedUnknown": {
+        "type": "long"
+      },
+      "subject": {
+        "properties": {
+          "scheme": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          },
+          "value": {
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword",
+                "ignore_above": 256
+              }
+            }
+          }
+        }
+      },
+      "title": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "typology": {
+        "type": "keyword"
+      }
+    }
+  },
+  "settings": {
+    "index": {
+      "refresh_interval": "600s",
+      "number_of_shards": "48",
+      "translog": {
+        "sync_interval": "15s",
+        "durability": "ASYNC"
+      },
+      "analysis": {
+        "analyzer": {
+          "analyzer_keyword": {
+            "filter": "lowercase",
+            "tokenizer": "keyword"
+          }
+        }
+      },
+      "number_of_replicas": "0"
+    }
+  }
+}

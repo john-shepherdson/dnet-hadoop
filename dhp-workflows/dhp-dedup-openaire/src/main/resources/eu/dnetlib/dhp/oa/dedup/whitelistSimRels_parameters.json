@@ -1,0 +1,38 @@
+[
+  {
+    "paramName": "la",
+    "paramLongName": "isLookUpUrl",
+    "paramDescription": "address for the LookUp",
+    "paramRequired": true
+  },
+  {
+    "paramName": "asi",
+    "paramLongName": "actionSetId",
+    "paramDescription": "action set identifier (name of the orchestrator)",
+    "paramRequired": true
+  },
+  {
+    "paramName": "i",
+    "paramLongName": "graphBasePath",
+    "paramDescription": "the base path of the raw graph",
+    "paramRequired": true
+  },
+  {
+    "paramName": "w",
+    "paramLongName": "workingPath",
+    "paramDescription": "path of the working directory",
+    "paramRequired": true
+  },
+  {
+    "paramName": "np",
+    "paramLongName": "numPartitions",
+    "paramDescription": "number of partitions for the similarity relations intermediate phases",
+    "paramRequired": false
+  },
+  {
+    "paramName": "wl",
+    "paramLongName": "whiteListPath",
+    "paramDescription": "whitelist file path for the addition of custom simrels",
+    "paramRequired": true
+  }
+]

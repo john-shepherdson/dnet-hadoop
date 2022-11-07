@@ -2,11 +2,11 @@
 
     <parameters>
         <property>
-            <name>betaInputGgraphPath</name>
+            <name>betaInputGraphPath</name>
             <description>the beta graph root path</description>
         </property>
         <property>
-            <name>prodInputGgraphPath</name>
+            <name>prodInputGraphPath</name>
             <description>the production graph root path</description>
         </property>
         <property>
@@ -76,7 +76,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Merge publications</name>
-            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphSparkJob</class>
+            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphTableSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -88,8 +88,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/publication</arg>
-            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/publication</arg>
+            <arg>--betaInputPath</arg><arg>${betaInputGraphPath}/publication</arg>
+            <arg>--prodInputPath</arg><arg>${prodInputGraphPath}/publication</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/publication</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--priority</arg><arg>${priority}</arg>
@@ -103,7 +103,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Merge datasets</name>
-            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphSparkJob</class>
+            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphTableSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -115,8 +115,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/dataset</arg>
-            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/dataset</arg>
+            <arg>--betaInputPath</arg><arg>${betaInputGraphPath}/dataset</arg>
+            <arg>--prodInputPath</arg><arg>${prodInputGraphPath}/dataset</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/dataset</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--priority</arg><arg>${priority}</arg>
@@ -130,7 +130,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Merge otherresearchproducts</name>
-            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphSparkJob</class>
+            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphTableSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -142,8 +142,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/otherresearchproduct</arg>
-            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/otherresearchproduct</arg>
+            <arg>--betaInputPath</arg><arg>${betaInputGraphPath}/otherresearchproduct</arg>
+            <arg>--prodInputPath</arg><arg>${prodInputGraphPath}/otherresearchproduct</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/otherresearchproduct</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--priority</arg><arg>${priority}</arg>
@@ -157,7 +157,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Merge softwares</name>
-            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphSparkJob</class>
+            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphTableSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -169,8 +169,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/software</arg>
-            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/software</arg>
+            <arg>--betaInputPath</arg><arg>${betaInputGraphPath}/software</arg>
+            <arg>--prodInputPath</arg><arg>${prodInputGraphPath}/software</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/software</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--priority</arg><arg>${priority}</arg>
@@ -184,7 +184,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Merge datasources</name>
-            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphSparkJob</class>
+            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphTableSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -196,8 +196,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/datasource</arg>
-            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/datasource</arg>
+            <arg>--betaInputPath</arg><arg>${betaInputGraphPath}/datasource</arg>
+            <arg>--prodInputPath</arg><arg>${prodInputGraphPath}/datasource</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/datasource</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
             <arg>--priority</arg><arg>${priority}</arg>
@@ -211,7 +211,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Merge organizations</name>
-            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphSparkJob</class>
+            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphTableSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -223,8 +223,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/organization</arg>
-            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/organization</arg>
+            <arg>--betaInputPath</arg><arg>${betaInputGraphPath}/organization</arg>
+            <arg>--prodInputPath</arg><arg>${prodInputGraphPath}/organization</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/organization</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
             <arg>--priority</arg><arg>${priority}</arg>
@@ -238,7 +238,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Merge projects</name>
-            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphSparkJob</class>
+            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphTableSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -250,8 +250,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/project</arg>
-            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/project</arg>
+            <arg>--betaInputPath</arg><arg>${betaInputGraphPath}/project</arg>
+            <arg>--prodInputPath</arg><arg>${prodInputGraphPath}/project</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/project</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
             <arg>--priority</arg><arg>${priority}</arg>
@@ -265,7 +265,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Merge relations</name>
-            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphSparkJob</class>
+            <class>eu.dnetlib.dhp.oa.graph.merge.MergeGraphTableSparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -277,8 +277,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
-            <arg>--betaInputPath</arg><arg>${betaInputGgraphPath}/relation</arg>
-            <arg>--prodInputPath</arg><arg>${prodInputGgraphPath}/relation</arg>
+            <arg>--betaInputPath</arg><arg>${betaInputGraphPath}/relation</arg>
+            <arg>--prodInputPath</arg><arg>${prodInputGraphPath}/relation</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/relation</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Relation</arg>
             <arg>--priority</arg><arg>${priority}</arg>

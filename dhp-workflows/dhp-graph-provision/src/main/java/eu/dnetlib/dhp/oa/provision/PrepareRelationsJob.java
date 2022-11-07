@@ -3,11 +3,14 @@ package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.util.*;
-import java.util.function.Supplier;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -15,8 +18,10 @@ import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.*;
+import org.apache.spark.sql.Encoder;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
+import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.expressions.Aggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -36,26 +40,8 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 
 /**
- * Joins the graph nodes by resolving the links of distance = 1 to create an adjacency list of linked objects. The
- * operation considers all the entity types (publication, dataset, software, ORP, project, datasource, organization, and
- * all the possible relationships (similarity links produced by the Dedup process are excluded).
- * <p>
- * The operation is implemented by sequentially joining one entity type at time (E) with the relationships (R), and
- * again by E, finally grouped by E.id;
- * <p>
- * The workflow is organized in different parts aimed to to reduce the complexity of the operation 1)
- * PrepareRelationsJob: only consider relationships that are not virtually deleted ($.dataInfo.deletedbyinference ==
- * false), each entity can be linked at most to 100 other objects
- * <p>
- * 2) JoinRelationEntityByTargetJob: (phase 1): prepare tuples [relation - target entity] (R - T): for each entity type
- * E_i map E_i as RelatedEntity T_i to simplify the model and extracting only the necessary information join (R.target =
- * T_i.id) save the tuples (R_i, T_i) (phase 2): create the union of all the entity types E, hash by id read the tuples
- * (R, T), hash by R.source join E.id = (R, T).source, where E becomes the Source Entity S save the tuples (S, R, T)
- * <p>
- * 3) AdjacencyListBuilderJob: given the tuple (S - R - T) we need to group by S.id -> List [ R - T ], mapping the
- * result as JoinedEntity
- * <p>
- * 4) XmlConverterJob: convert the JoinedEntities as XML records
+ * PrepareRelationsJob prunes the relationships: only consider relationships that are not virtually deleted
+ * ($.dataInfo.deletedbyinference == false), each entity can be linked at most to 100 other objects
  */
 public class PrepareRelationsJob {
 
@@ -96,6 +82,7 @@ public class PrepareRelationsJob {
 
 		Set<String> relationFilter = Optional
 			.ofNullable(parser.get("relationFilter"))
+			.map(String::toLowerCase)
 			.map(s -> Sets.newHashSet(Splitter.on(",").split(s)))
 			.orElse(new HashSet<>());
 		log.info("relationFilter: {}", relationFilter);
@@ -144,14 +131,15 @@ public class PrepareRelationsJob {
 		Set<String> relationFilter, int sourceMaxRelations, int targetMaxRelations, int relPartitions) {
 
 		JavaRDD<Relation> rels = readPathRelationRDD(spark, inputRelationsPath)
-			.filter(rel -> rel.getDataInfo().getDeletedbyinference() == false)
-			.filter(rel -> relationFilter.contains(rel.getRelClass()) == false);
+			.filter(rel -> !(rel.getSource().startsWith("unresolved") || rel.getTarget().startsWith("unresolved")))
+			.filter(rel -> !rel.getDataInfo().getDeletedbyinference())
+			.filter(rel -> !relationFilter.contains(StringUtils.lowerCase(rel.getRelClass())));
 
 		JavaRDD<Relation> pruned = pruneRels(
 			pruneRels(
 				rels,
-				sourceMaxRelations, relPartitions, (Function<Relation, String>) r -> r.getSource()),
-			targetMaxRelations, relPartitions, (Function<Relation, String>) r -> r.getTarget());
+				sourceMaxRelations, relPartitions, (Function<Relation, String>) Relation::getSource),
+			targetMaxRelations, relPartitions, (Function<Relation, String>) Relation::getTarget);
 		spark
 			.createDataset(pruned.rdd(), Encoders.bean(Relation.class))
 			.repartition(relPartitions)
@@ -183,8 +171,8 @@ public class PrepareRelationsJob {
 			.map(
 				(MapFunction<String, Relation>) s -> OBJECT_MAPPER.readValue(s, Relation.class),
 				Encoders.kryo(Relation.class))
-			.filter((FilterFunction<Relation>) rel -> rel.getDataInfo().getDeletedbyinference() == false)
-			.filter((FilterFunction<Relation>) rel -> relationFilter.contains(rel.getRelClass()) == false)
+			.filter((FilterFunction<Relation>) rel -> !rel.getDataInfo().getDeletedbyinference())
+			.filter((FilterFunction<Relation>) rel -> !relationFilter.contains(rel.getRelClass()))
 			.groupByKey(
 				(MapFunction<Relation, String>) Relation::getSource,
 				Encoders.STRING())
@@ -203,7 +191,7 @@ public class PrepareRelationsJob {
 	public static class RelationAggregator
 		extends Aggregator<Relation, RelationList, RelationList> {
 
-		private int maxRelations;
+		private final int maxRelations;
 
 		public RelationAggregator(int maxRelations) {
 			this.maxRelations = maxRelations;

@@ -1,0 +1,14 @@
+[
+	{
+		"paramName": "o",
+		"paramLongName": "outputDir",
+		"paramDescription": "the dir that contains the events folder",
+		"paramRequired": true
+	},
+	{
+		"paramName": "broker",
+		"paramLongName": "brokerApiBaseUrl",
+		"paramDescription": "the url of the broker service api",
+		"paramRequired": true
+	}
+]

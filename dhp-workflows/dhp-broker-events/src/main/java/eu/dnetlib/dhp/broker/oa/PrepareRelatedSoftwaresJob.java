@@ -7,7 +7,10 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
@@ -22,6 +25,7 @@ import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedSoftware;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Software;
+import scala.Tuple2;
 
 public class PrepareRelatedSoftwaresJob {
 
@@ -44,10 +48,10 @@ public class PrepareRelatedSoftwaresJob {
 		final String graphPath = parser.get("graphPath");
 		log.info("graphPath: {}", graphPath);
 
-		final String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		final String workingDir = parser.get("workingDir");
+		log.info("workingDir: {}", workingDir);
 
-		final String relsPath = workingPath + "/relatedSoftwares";
+		final String relsPath = workingDir + "/relatedSoftwares";
 		log.info("relsPath: {}", relsPath);
 
 		final SparkConf conf = new SparkConf();
@@ -58,22 +62,30 @@ public class PrepareRelatedSoftwaresJob {
 
 			final LongAccumulator total = spark.sparkContext().longAccumulator("total_rels");
 
+			final Encoder<OaBrokerRelatedSoftware> obrsEncoder = Encoders.bean(OaBrokerRelatedSoftware.class);
 			final Dataset<OaBrokerRelatedSoftware> softwares = ClusterUtils
 				.readPath(spark, graphPath + "/software", Software.class)
-				.filter(sw -> !ClusterUtils.isDedupRoot(sw.getId()))
-				.map(ConversionUtils::oafSoftwareToBrokerSoftware, Encoders.bean(OaBrokerRelatedSoftware.class));
+				.filter((FilterFunction<Software>) sw -> !ClusterUtils.isDedupRoot(sw.getId()))
+				.map(
+					(MapFunction<Software, OaBrokerRelatedSoftware>) ConversionUtils::oafSoftwareToBrokerSoftware,
+					obrsEncoder);
 
-			final Dataset<Relation> rels = ClusterUtils
-				.readPath(spark, graphPath + "/relation", Relation.class)
-				.filter(r -> r.getDataInfo().getDeletedbyinference())
-				.filter(r -> r.getRelType().equals(ModelConstants.RESULT_RESULT))
-				.filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
-				.filter(r -> !ClusterUtils.isDedupRoot(r.getSource()))
-				.filter(r -> !ClusterUtils.isDedupRoot(r.getTarget()));
+			final Dataset<Relation> rels;
+			rels = ClusterUtils
+				.loadRelations(graphPath, spark)
+				.filter((FilterFunction<Relation>) r -> r.getDataInfo().getDeletedbyinference())
+				.filter((FilterFunction<Relation>) r -> r.getRelType().equals(ModelConstants.RESULT_RESULT))
+				.filter((FilterFunction<Relation>) r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
+				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getSource()))
+				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getTarget()));
 
+			final Encoder<RelatedSoftware> rsEncoder = Encoders.bean(RelatedSoftware.class);
 			final Dataset<RelatedSoftware> dataset = rels
 				.joinWith(softwares, softwares.col("openaireId").equalTo(rels.col("target")), "inner")
-				.map(t -> new RelatedSoftware(t._1.getSource(), t._2), Encoders.bean(RelatedSoftware.class));
+				.map(
+					(MapFunction<Tuple2<Relation, OaBrokerRelatedSoftware>, RelatedSoftware>) t -> new RelatedSoftware(
+						t._1.getSource(), t._2),
+					rsEncoder);
 
 			ClusterUtils.save(dataset, relsPath, RelatedSoftware.class, total);
 

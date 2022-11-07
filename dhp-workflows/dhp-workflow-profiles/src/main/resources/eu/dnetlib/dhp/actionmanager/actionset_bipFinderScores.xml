@@ -1,0 +1,100 @@
+<RESOURCE_PROFILE>
+    <HEADER>
+        <RESOURCE_IDENTIFIER value="08433e63-56a5-4ca3-bde9-cddac11c4b15_V29ya2Zsb3dEU1Jlc291cmNlcy9Xb3JrZmxvd0RTUmVzb3VyY2VUeXBl"/>
+        <RESOURCE_TYPE value="WorkflowDSResourceType"/>
+        <RESOURCE_KIND value="WorkflowDSResources"/>
+        <RESOURCE_URI value=""/>
+        <DATE_OF_CREATION value="2021-05-14T15:17:19+00:00"/>
+    </HEADER>
+    <BODY>
+        <WORKFLOW_NAME>Import bipFinder scores</WORKFLOW_NAME>
+        <WORKFLOW_TYPE>Import bipFinder scores</WORKFLOW_TYPE>
+        <WORKFLOW_PRIORITY>30</WORKFLOW_PRIORITY>
+        <CONFIGURATION start="disabled">
+            <NODE isStart="true" name="setBipScorePath" type="SetEnvParameter">
+                <DESCRIPTION>declares the path holding the BIP SCORE data</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">bipScorePath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/data/bip/20201206</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="setLatestGraphPath"/>
+                </ARCS>
+            </NODE>
+            <NODE name="setLatestGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>declares the path holding the LATEST GRAPH dump</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">latestGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/stable_ids/graph/14_graph_blacklisted</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="prepareActionSets"/>
+                </ARCS>
+            </NODE>
+            <NODE name="prepareActionSets" type="PrepareActionSets">
+                <DESCRIPTION>prepare action sets</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="sets" required="true" type="string">
+                        [
+                        {
+                        'set' : 'bipfinder-scores',
+                        'jobProperty' : 'export_action_set_bipfinder-scores',
+                        'enablingProperty' : 'active_bipfinder-scores',
+                        'enabled' : 'true'
+                        }
+                        ]
+                    </PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="extractOutputPath"/>
+                </ARCS>
+            </NODE>
+            <NODE name="extractOutputPath" type="ExtractOutputPath">
+                <DESCRIPTION>extract the hdfs output path generated in the previous node</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hdfsOutputPathParam" required="true" type="string">outputPath</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="bipFinderScores"/>
+                </ARCS>
+            </NODE>
+            <NODE name="bipFinderScores" type="SubmitHadoopJob">
+                <DESCRIPTION>prepare AS for the bipFinder scores integration</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'bipScorePath':'bipScorePath',
+                        'inputPath':'latestGraphPath',
+                        'outputPath': 'outputPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/PROD/actionmanager/bipfinder/oozie_app',
+                        'workingDir' : '/tmp/beta_provision/working_dir/bipfinder'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="updateActionSets"/>
+                </ARCS>
+            </NODE>
+            <NODE name="updateActionSets" type="UpdateActionSets">
+                <DESCRIPTION>update action sets</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="success"/>
+                </ARCS>
+            </NODE>
+        </CONFIGURATION>
+        <STATUS>
+            <LAST_EXECUTION_ID/>
+            <LAST_EXECUTION_DATE/>
+            <LAST_EXECUTION_STATUS/>
+            <LAST_EXECUTION_ERROR/>
+        </STATUS>
+    </BODY>
+</RESOURCE_PROFILE>

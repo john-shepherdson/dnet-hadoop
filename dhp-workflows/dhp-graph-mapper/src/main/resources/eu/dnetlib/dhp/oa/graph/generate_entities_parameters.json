@@ -22,5 +22,17 @@
 		"paramLongName": "isLookupUrl",
 		"paramDescription": "the url of the ISLookupService",
 		"paramRequired": true
+	},
+	{
+		"paramName": "shi",
+		"paramLongName": "shouldHashId",
+		"paramDescription": "should ids be hashed?",
+		"paramRequired": false
+	},
+	{
+		"paramName": "m",
+		"paramLongName": "mode",
+		"paramDescription": "operation mode",
+		"paramRequired": false
 	}
 ]

@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.broker.oa.matchers.simple;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -10,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 
-class EnrichMissingPublicationDateTest {
+public class EnrichMissingPublicationDateTest {
 
 	final EnrichMissingPublicationDate matcher = new EnrichMissingPublicationDate();
 
@@ -32,7 +33,7 @@ class EnrichMissingPublicationDateTest {
 		final OaBrokerMainEntity target = new OaBrokerMainEntity();
 		source.setPublicationdate("2018");
 		final List<String> list = matcher.findDifferences(source, target);
-		assertTrue(list.size() == 1);
+		assertEquals(1, list.size());
 	}
 
 	@Test

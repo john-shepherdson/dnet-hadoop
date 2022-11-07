@@ -18,11 +18,11 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.PacePerson;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
@@ -104,10 +104,10 @@ public class SparkOrcidToResultFromSemRelJob {
 	}
 
 	private static <R extends Result> MapFunction<Tuple2<R, ResultOrcidList>, R> authorEnrichFn() {
-		return (MapFunction<Tuple2<R, ResultOrcidList>, R>) value -> {
+		return value -> {
 			R ret = value._1();
 			Optional<ResultOrcidList> rol = Optional.ofNullable(value._2());
-			if (rol.isPresent()) {
+			if (rol.isPresent() && Optional.ofNullable(ret.getAuthor()).isPresent()) {
 				List<Author> toenrich_author = ret.getAuthor();
 				List<AutoritativeAuthor> autoritativeAuthors = rol.get().getAuthorList();
 				for (Author author : toenrich_author) {
@@ -140,33 +140,30 @@ public class SparkOrcidToResultFromSemRelJob {
 				author_surname = author.getSurname();
 			}
 			if (StringUtils.isNotEmpty(author_surname)) {
+				// have the same surname. Check the name
 				if (autoritative_author
 					.getSurname()
 					.trim()
-					.equalsIgnoreCase(author_surname.trim())) {
-
-					// have the same surname. Check the name
-					if (StringUtils.isNotEmpty(autoritative_author.getName())) {
-						if (StringUtils.isNotEmpty(author.getName())) {
-							author_name = author.getName();
+					.equalsIgnoreCase(author_surname.trim()) && StringUtils.isNotEmpty(autoritative_author.getName())) {
+					if (StringUtils.isNotEmpty(author.getName())) {
+						author_name = author.getName();
+					}
+					if (StringUtils.isNotEmpty(author_name)) {
+						if (autoritative_author
+							.getName()
+							.trim()
+							.equalsIgnoreCase(author_name.trim())) {
+							toaddpid = true;
 						}
-						if (StringUtils.isNotEmpty(author_name)) {
+						// they could be differently written (i.e. only the initials of the name
+						// in one of the two
+						else {
 							if (autoritative_author
 								.getName()
 								.trim()
-								.equalsIgnoreCase(author_name.trim())) {
+								.substring(0, 0)
+								.equalsIgnoreCase(author_name.trim().substring(0, 0))) {
 								toaddpid = true;
-							}
-							// they could be differently written (i.e. only the initials of the name
-							// in one of the two
-							else {
-								if (autoritative_author
-									.getName()
-									.trim()
-									.substring(0, 0)
-									.equalsIgnoreCase(author_name.trim().substring(0, 0))) {
-									toaddpid = true;
-								}
 							}
 						}
 					}
@@ -176,13 +173,17 @@ public class SparkOrcidToResultFromSemRelJob {
 		if (toaddpid) {
 			StructuredProperty p = new StructuredProperty();
 			p.setValue(autoritative_author.getOrcid());
-			p.setQualifier(getQualifier(PROPAGATION_AUTHOR_PID, PROPAGATION_AUTHOR_PID));
+			p
+				.setQualifier(
+					getQualifier(
+						ModelConstants.ORCID_PENDING, ModelConstants.ORCID_CLASSNAME, ModelConstants.DNET_PID_TYPES));
 			p
 				.setDataInfo(
 					getDataInfo(
 						PROPAGATION_DATA_INFO_TYPE,
 						PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_ID,
-						PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME));
+						PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME,
+						ModelConstants.DNET_PROVENANCE_ACTIONS));
 
 			Optional<List<StructuredProperty>> authorPid = Optional.ofNullable(author.getPid());
 			if (authorPid.isPresent()) {
@@ -201,7 +202,8 @@ public class SparkOrcidToResultFromSemRelJob {
 			return false;
 		}
 		for (StructuredProperty pid : pids.get()) {
-			if (PROPAGATION_AUTHOR_PID.equals(pid.getQualifier().getClassid())) {
+			if (ModelConstants.ORCID_PENDING.equalsIgnoreCase(pid.getQualifier().getClassid()) ||
+				ModelConstants.ORCID.equalsIgnoreCase(pid.getQualifier().getClassid())) {
 				return true;
 			}
 		}

@@ -7,17 +7,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.MdstoreClient;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
-import eu.dnetlib.dhp.oa.graph.raw.common.MdstoreClient;
 
-public class MigrateMongoMdstoresApplication extends AbstractMigrationApplication
-	implements Closeable {
+public class MigrateMongoMdstoresApplication extends AbstractMigrationApplication implements Closeable {
 
-	private static final Log log = LogFactory.getLog(MigrateMongoMdstoresApplication.class);
+	private static final Logger log = LoggerFactory.getLogger(MigrateMongoMdstoresApplication.class);
 
 	private final MdstoreClient mdstoreClient;
 
@@ -52,10 +51,10 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 
 	public void execute(final String format, final String layout, final String interpretation) {
 		final Map<String, String> colls = mdstoreClient.validCollections(format, layout, interpretation);
-		log.info("Found " + colls.size() + " mdstores");
+		log.info("Found {} mdstores", colls.size());
 
 		for (final Entry<String, String> entry : colls.entrySet()) {
-			log.info("Processing mdstore " + entry.getKey() + " (collection: " + entry.getValue() + ")");
+			log.info("Processing mdstore {} (collection: {})", entry.getKey(), entry.getValue());
 			final String currentColl = entry.getValue();
 
 			for (final String xml : mdstoreClient.listRecords(currentColl)) {

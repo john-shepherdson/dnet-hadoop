@@ -16,9 +16,26 @@ public class EnrichMoreSubject extends UpdateMatcher<OaBrokerTypedValue> {
 
 	public EnrichMoreSubject() {
 		super(20,
-			s -> Topic.fromPath("ENRICH/MORE/SUBJECT/" + s.getType()),
+			s -> {
+				switch (s.getType().toLowerCase()) {
+					case "acm":
+						return Topic.ENRICH_MORE_SUBJECT_ACM;
+					case "arxiv":
+						return Topic.ENRICH_MORE_SUBJECT_ARXIV;
+					case "ddc":
+						return Topic.ENRICH_MORE_SUBJECT_DDC;
+					case "jel":
+						return Topic.ENRICH_MORE_SUBJECT_JEL;
+					case "mesh":
+						return Topic.ENRICH_MORE_SUBJECT_MESHEUROPMC;
+					case "rvk":
+						return Topic.ENRICH_MORE_SUBJECT_RVK;
+					default:
+						return null;
+				}
+			},
 			(p, s) -> p.getSubjects().add(s),
-			s -> subjectAsString(s));
+			EnrichMoreSubject::subjectAsString);
 	}
 
 	@Override
@@ -32,7 +49,7 @@ public class EnrichMoreSubject extends UpdateMatcher<OaBrokerTypedValue> {
 		final Set<String> existingSubjects = target
 			.getSubjects()
 			.stream()
-			.map(pid -> subjectAsString(pid))
+			.map(EnrichMoreSubject::subjectAsString)
 			.collect(Collectors.toSet());
 
 		return source

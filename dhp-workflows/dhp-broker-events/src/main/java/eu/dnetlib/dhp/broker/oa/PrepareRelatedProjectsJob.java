@@ -7,6 +7,8 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.util.LongAccumulator;
@@ -22,6 +24,7 @@ import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedProject;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import scala.Tuple2;
 
 public class PrepareRelatedProjectsJob {
 
@@ -44,10 +47,10 @@ public class PrepareRelatedProjectsJob {
 		final String graphPath = parser.get("graphPath");
 		log.info("graphPath: {}", graphPath);
 
-		final String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		final String workingDir = parser.get("workingDir");
+		log.info("workingDir: {}", workingDir);
 
-		final String relsPath = workingPath + "/relatedProjects";
+		final String relsPath = workingDir + "/relatedProjects";
 		log.info("relsPath: {}", relsPath);
 
 		final SparkConf conf = new SparkConf();
@@ -60,20 +63,25 @@ public class PrepareRelatedProjectsJob {
 
 			final Dataset<OaBrokerProject> projects = ClusterUtils
 				.readPath(spark, graphPath + "/project", Project.class)
-				.filter(p -> !ClusterUtils.isDedupRoot(p.getId()))
-				.map(ConversionUtils::oafProjectToBrokerProject, Encoders.bean(OaBrokerProject.class));
+				.filter((FilterFunction<Project>) p -> !ClusterUtils.isDedupRoot(p.getId()))
+				.map(
+					(MapFunction<Project, OaBrokerProject>) ConversionUtils::oafProjectToBrokerProject,
+					Encoders.bean(OaBrokerProject.class));
 
 			final Dataset<Relation> rels = ClusterUtils
-				.readPath(spark, graphPath + "/relation", Relation.class)
-				.filter(r -> r.getDataInfo().getDeletedbyinference())
-				.filter(r -> r.getRelType().equals(ModelConstants.RESULT_PROJECT))
-				.filter(r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
-				.filter(r -> !ClusterUtils.isDedupRoot(r.getSource()))
-				.filter(r -> !ClusterUtils.isDedupRoot(r.getTarget()));
+				.loadRelations(graphPath, spark)
+				.filter((FilterFunction<Relation>) r -> r.getDataInfo().getDeletedbyinference())
+				.filter((FilterFunction<Relation>) r -> r.getRelType().equals(ModelConstants.RESULT_PROJECT))
+				.filter((FilterFunction<Relation>) r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
+				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getSource()))
+				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getTarget()));
 
 			final Dataset<RelatedProject> dataset = rels
 				.joinWith(projects, projects.col("openaireId").equalTo(rels.col("target")), "inner")
-				.map(t -> new RelatedProject(t._1.getSource(), t._2), Encoders.bean(RelatedProject.class));
+				.map(
+					(MapFunction<Tuple2<Relation, OaBrokerProject>, RelatedProject>) t -> new RelatedProject(
+						t._1.getSource(), t._2),
+					Encoders.bean(RelatedProject.class));
 
 			ClusterUtils.save(dataset, relsPath, RelatedProject.class, total);
 

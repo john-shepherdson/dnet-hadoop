@@ -15,7 +15,10 @@ import com.google.gson.Gson;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 /** Created by miriam on 02/08/2018. */
 public class ResultTagger implements Serializable {
@@ -43,7 +46,6 @@ public class ResultTagger implements Serializable {
 				param.put(key, jsonContext.read(params.get(key)));
 			} catch (com.jayway.jsonpath.PathNotFoundException e) {
 				param.put(key, new ArrayList<>());
-				// throw e;
 			}
 		}
 		return param;
@@ -52,9 +54,6 @@ public class ResultTagger implements Serializable {
 	public <R extends Result> R enrichContextCriteria(
 		final R result, final CommunityConfiguration conf, final Map<String, String> criteria) {
 
-		// }
-		// public Result enrichContextCriteria(final Result result, final CommunityConfiguration
-		// conf, final Map<String,String> criteria) {
 		final Map<String, List<String>> param = getParamMap(result, criteria);
 
 		// Verify if the entity is deletedbyinference. In case verify if to clean the context list
@@ -74,7 +73,7 @@ public class ResultTagger implements Serializable {
 			result
 				.getSubject()
 				.stream()
-				.map(subject -> subject.getValue())
+				.map(StructuredProperty::getValue)
 				.filter(StringUtils::isNotBlank)
 				.map(String::toLowerCase)
 				.map(String::trim)
@@ -90,26 +89,16 @@ public class ResultTagger implements Serializable {
 
 		if (Objects.nonNull(result.getInstance())) {
 			for (Instance i : result.getInstance()) {
-				if (Objects.nonNull(i.getCollectedfrom())) {
-					if (Objects.nonNull(i.getCollectedfrom().getKey())) {
-						tmp.add(StringUtils.substringAfter(i.getCollectedfrom().getKey(), "|"));
-					}
+				if (Objects.nonNull(i.getCollectedfrom()) && Objects.nonNull(i.getCollectedfrom().getKey())) {
+					tmp.add(StringUtils.substringAfter(i.getCollectedfrom().getKey(), "|"));
 				}
-				if (Objects.nonNull(i.getHostedby())) {
-					if (Objects.nonNull(i.getHostedby().getKey())) {
-						tmp.add(StringUtils.substringAfter(i.getHostedby().getKey(), "|"));
-					}
+				if (Objects.nonNull(i.getHostedby()) && Objects.nonNull(i.getHostedby().getKey())) {
+					tmp.add(StringUtils.substringAfter(i.getHostedby().getKey(), "|"));
 				}
 
 			}
 
-			result
-				.getInstance()
-				.stream()
-				.map(i -> new Pair<>(i.getCollectedfrom().getKey(), i.getHostedby().getKey()))
-				.flatMap(p -> Stream.of(p.getFst(), p.getSnd()))
-				.map(s -> StringUtils.substringAfter(s, "|"))
-				.collect(Collectors.toCollection(HashSet::new))
+			tmp
 				.forEach(
 					dsId -> datasources
 						.addAll(
@@ -142,6 +131,25 @@ public class ResultTagger implements Serializable {
 
 		communities.addAll(czenodo);
 
+		/* Tagging for Advanced Constraints */
+		final Set<String> aconstraints = new HashSet<>();
+
+		conf
+			.getSelectionConstraintsMap()
+			.keySet()
+			.forEach(communityId -> {
+				if (conf.getSelectionConstraintsMap().get(communityId) != null &&
+					conf
+						.getSelectionConstraintsMap()
+						.get(communityId)
+						.getCriteria()
+						.stream()
+						.anyMatch(crit -> crit.verifyCriteria(param)))
+					aconstraints.add(communityId);
+			});
+
+		communities.addAll(aconstraints);
+
 		clearContext(result);
 
 		/* Verify if there is something to bulktag */
@@ -149,52 +157,68 @@ public class ResultTagger implements Serializable {
 			return result;
 		}
 
-		result
-			.getContext()
-			.stream()
-			.map(
-				c -> {
-					if (communities.contains(c.getId())) {
-						Optional<List<DataInfo>> opt_dataInfoList = Optional.ofNullable(c.getDataInfo());
-						List<DataInfo> dataInfoList;
-						if (opt_dataInfoList.isPresent())
-							dataInfoList = opt_dataInfoList.get();
-						else {
-							dataInfoList = new ArrayList<>();
-							c.setDataInfo(dataInfoList);
-						}
-						if (subjects.contains(c.getId()))
-							dataInfoList
-								.add(
-									getDataInfo(
-										BULKTAG_DATA_INFO_TYPE,
-										CLASS_ID_SUBJECT,
-										CLASS_NAME_BULKTAG_SUBJECT,
-										TAGGING_TRUST));
-						if (datasources.contains(c.getId()))
-							dataInfoList
-								.add(
-									getDataInfo(
-										BULKTAG_DATA_INFO_TYPE,
-										CLASS_ID_DATASOURCE,
-										CLASS_NAME_BULKTAG_DATASOURCE,
-										TAGGING_TRUST));
-						if (czenodo.contains(c.getId()))
-							dataInfoList
-								.add(
-									getDataInfo(
-										BULKTAG_DATA_INFO_TYPE,
-										CLASS_ID_CZENODO,
-										CLASS_NAME_BULKTAG_ZENODO,
-										TAGGING_TRUST));
-					}
-					return c;
-				})
-			.collect(Collectors.toList());
+		result.getContext().forEach(c -> {
+			final String cId = c.getId();
+			if (communities.contains(cId)) {
+				Optional<List<DataInfo>> opt_dataInfoList = Optional.ofNullable(c.getDataInfo());
+				List<DataInfo> dataInfoList;
+				if (opt_dataInfoList.isPresent())
+					dataInfoList = opt_dataInfoList.get();
+				else {
+					dataInfoList = new ArrayList<>();
+					c.setDataInfo(dataInfoList);
+				}
+				if (subjects.contains(cId))
+					dataInfoList
+						.add(
+							OafMapperUtils
+								.dataInfo(
+									false, BULKTAG_DATA_INFO_TYPE, true, false,
+									OafMapperUtils
+										.qualifier(
+											CLASS_ID_SUBJECT, CLASS_NAME_BULKTAG_SUBJECT, DNET_PROVENANCE_ACTIONS,
+											DNET_PROVENANCE_ACTIONS),
+									TAGGING_TRUST));
+				if (datasources.contains(cId))
+					dataInfoList
+						.add(
+							OafMapperUtils
+								.dataInfo(
+									false, BULKTAG_DATA_INFO_TYPE, true, false,
+									OafMapperUtils
+										.qualifier(
+											CLASS_ID_DATASOURCE, CLASS_NAME_BULKTAG_DATASOURCE, DNET_PROVENANCE_ACTIONS,
+											DNET_PROVENANCE_ACTIONS),
+									TAGGING_TRUST));
+				if (czenodo.contains(cId))
+					dataInfoList
+						.add(
+							OafMapperUtils
+								.dataInfo(
+									false, BULKTAG_DATA_INFO_TYPE, true, false,
+									OafMapperUtils
+										.qualifier(
+											CLASS_ID_CZENODO, CLASS_NAME_BULKTAG_ZENODO, DNET_PROVENANCE_ACTIONS,
+											DNET_PROVENANCE_ACTIONS),
+									TAGGING_TRUST));
+				if (aconstraints.contains(cId))
+					dataInfoList
+						.add(
+							OafMapperUtils
+								.dataInfo(
+									false, BULKTAG_DATA_INFO_TYPE, true, false,
+									OafMapperUtils
+										.qualifier(
+											CLASS_ID_ADVANCED_CONSTRAINT, CLASS_NAME_BULKTAG_ADVANCED_CONSTRAINT,
+											DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS),
+									TAGGING_TRUST));
+
+			}
+		});
 
 		communities
 			.removeAll(
-				result.getContext().stream().map(c -> c.getId()).collect(Collectors.toSet()));
+				result.getContext().stream().map(Context::getId).collect(Collectors.toSet()));
 
 		if (communities.isEmpty())
 			return result;
@@ -209,27 +233,48 @@ public class ResultTagger implements Serializable {
 					if (subjects.contains(c))
 						dataInfoList
 							.add(
-								getDataInfo(
-									BULKTAG_DATA_INFO_TYPE,
-									CLASS_ID_SUBJECT,
-									CLASS_NAME_BULKTAG_SUBJECT,
-									TAGGING_TRUST));
+								OafMapperUtils
+									.dataInfo(
+										false, BULKTAG_DATA_INFO_TYPE, true, false,
+										OafMapperUtils
+											.qualifier(
+												CLASS_ID_SUBJECT, CLASS_NAME_BULKTAG_SUBJECT, DNET_PROVENANCE_ACTIONS,
+												DNET_PROVENANCE_ACTIONS),
+										TAGGING_TRUST));
 					if (datasources.contains(c))
 						dataInfoList
 							.add(
-								getDataInfo(
-									BULKTAG_DATA_INFO_TYPE,
-									CLASS_ID_DATASOURCE,
-									CLASS_NAME_BULKTAG_DATASOURCE,
-									TAGGING_TRUST));
+								OafMapperUtils
+									.dataInfo(
+										false, BULKTAG_DATA_INFO_TYPE, true, false,
+										OafMapperUtils
+											.qualifier(
+												CLASS_ID_DATASOURCE, CLASS_NAME_BULKTAG_DATASOURCE,
+												DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS),
+										TAGGING_TRUST));
 					if (czenodo.contains(c))
 						dataInfoList
 							.add(
-								getDataInfo(
-									BULKTAG_DATA_INFO_TYPE,
-									CLASS_ID_CZENODO,
-									CLASS_NAME_BULKTAG_ZENODO,
-									TAGGING_TRUST));
+								OafMapperUtils
+									.dataInfo(
+										false, BULKTAG_DATA_INFO_TYPE, true, false,
+										OafMapperUtils
+											.qualifier(
+												CLASS_ID_CZENODO, CLASS_NAME_BULKTAG_ZENODO, DNET_PROVENANCE_ACTIONS,
+												DNET_PROVENANCE_ACTIONS),
+										TAGGING_TRUST));
+					if (aconstraints.contains(c))
+						dataInfoList
+							.add(
+								OafMapperUtils
+									.dataInfo(
+										false, BULKTAG_DATA_INFO_TYPE, true, false,
+										OafMapperUtils
+											.qualifier(
+												CLASS_ID_ADVANCED_CONSTRAINT, CLASS_NAME_BULKTAG_ADVANCED_CONSTRAINT,
+												DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS),
+										TAGGING_TRUST));
+
 					context.setDataInfo(dataInfoList);
 					return context;
 				})
@@ -239,22 +284,4 @@ public class ResultTagger implements Serializable {
 		return result;
 	}
 
-	public static DataInfo getDataInfo(
-		String inference_provenance, String inference_class_id, String inference_class_name, String trust) {
-		DataInfo di = new DataInfo();
-		di.setInferred(true);
-		di.setInferenceprovenance(inference_provenance);
-		di.setProvenanceaction(getQualifier(inference_class_id, inference_class_name));
-		di.setTrust(trust);
-		return di;
-	}
-
-	public static Qualifier getQualifier(String inference_class_id, String inference_class_name) {
-		Qualifier pa = new Qualifier();
-		pa.setClassid(inference_class_id);
-		pa.setClassname(inference_class_name);
-		pa.setSchemeid(DNET_PROVENANCE_ACTIONS);
-		pa.setSchemename(DNET_PROVENANCE_ACTIONS);
-		return pa;
-	}
 }

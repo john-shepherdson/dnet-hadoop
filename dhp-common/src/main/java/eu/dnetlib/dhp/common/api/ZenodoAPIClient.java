@@ -3,6 +3,10 @@ package eu.dnetlib.dhp.common.api;
 
 import java.io.*;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.http.HttpHeaders;
+import org.apache.http.entity.ContentType;
 
 import com.google.gson.Gson;
 
@@ -42,7 +46,7 @@ public class ZenodoAPIClient implements Serializable {
 		this.deposition_id = deposition_id;
 	}
 
-	public ZenodoAPIClient(String urlString, String access_token) throws IOException {
+	public ZenodoAPIClient(String urlString, String access_token) {
 
 		this.urlString = urlString;
 		this.access_token = access_token;
@@ -50,19 +54,20 @@ public class ZenodoAPIClient implements Serializable {
 
 	/**
 	 * Brand new deposition in Zenodo. It sets the deposition_id and the bucket where to store the files to upload
+	 *
 	 * @return response code
 	 * @throws IOException
 	 */
 	public int newDeposition() throws IOException {
 		String json = "{}";
-		OkHttpClient httpClient = new OkHttpClient();
+		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
 
-		RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, json);
+		RequestBody body = RequestBody.create(json, MEDIA_TYPE_JSON);
 
 		Request request = new Request.Builder()
 			.url(urlString)
-			.addHeader("Content-Type", "application/json") // add request headers
-			.addHeader("Authorization", "Bearer " + access_token)
+			.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString()) // add request headers
+			.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + access_token)
 			.post(body)
 			.build();
 
@@ -86,18 +91,23 @@ public class ZenodoAPIClient implements Serializable {
 
 	/**
 	 * Upload files in Zenodo.
+	 *
 	 * @param is the inputStream for the file to upload
 	 * @param file_name the name of the file as it will appear on Zenodo
 	 * @param len the size of the file
 	 * @return the response code
 	 */
 	public int uploadIS(InputStream is, String file_name, long len) throws IOException {
-		OkHttpClient httpClient = new OkHttpClient();
+		OkHttpClient httpClient = new OkHttpClient.Builder()
+			.writeTimeout(600, TimeUnit.SECONDS)
+			.readTimeout(600, TimeUnit.SECONDS)
+			.connectTimeout(600, TimeUnit.SECONDS)
+			.build();
 
 		Request request = new Request.Builder()
 			.url(bucket + "/" + file_name)
-			.addHeader("Content-Type", "application/zip") // add request headers
-			.addHeader("Authorization", "Bearer " + access_token)
+			.addHeader(HttpHeaders.CONTENT_TYPE, "application/zip") // add request headers
+			.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + access_token)
 			.put(InputStreamRequestBody.create(MEDIA_TYPE_ZIP, is, len))
 			.build();
 
@@ -110,20 +120,21 @@ public class ZenodoAPIClient implements Serializable {
 
 	/**
 	 * Associates metadata information to the current deposition
+	 *
 	 * @param metadata the metadata
 	 * @return response code
 	 * @throws IOException
 	 */
 	public int sendMretadata(String metadata) throws IOException {
 
-		OkHttpClient httpClient = new OkHttpClient();
+		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
 
-		RequestBody body = RequestBody.create(MEDIA_TYPE_JSON, metadata);
+		RequestBody body = RequestBody.create(metadata, MEDIA_TYPE_JSON);
 
 		Request request = new Request.Builder()
 			.url(urlString + "/" + deposition_id)
-			.addHeader("Content-Type", "application/json") // add request headers
-			.addHeader("Authorization", "Bearer " + access_token)
+			.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString()) // add request headers
+			.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + access_token)
 			.put(body)
 			.build();
 
@@ -140,6 +151,7 @@ public class ZenodoAPIClient implements Serializable {
 
 	/**
 	 * To publish the current deposition. It works for both new deposition or new version of an old deposition
+	 *
 	 * @return response code
 	 * @throws IOException
 	 */
@@ -147,12 +159,14 @@ public class ZenodoAPIClient implements Serializable {
 
 		String json = "{}";
 
-		OkHttpClient httpClient = new OkHttpClient();
+		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
+
+		RequestBody body = RequestBody.create(json, MEDIA_TYPE_JSON);
 
 		Request request = new Request.Builder()
 			.url(urlString + "/" + deposition_id + "/actions/publish")
 			.addHeader("Authorization", "Bearer " + access_token)
-			.post(RequestBody.create(MEDIA_TYPE_JSON, json))
+			.post(body)
 			.build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
@@ -166,25 +180,28 @@ public class ZenodoAPIClient implements Serializable {
 	}
 
 	/**
-	 * To create a new version of an already published deposition.
-	 * It sets the deposition_id and the bucket to be used for the new version.
-	 * @param concept_rec_id the concept record id of the deposition for which to create a new version. It is
-	 *                       the last part of the url for the DOI Zenodo suggests to use to cite all versions:
-	 *                       DOI: 10.xxx/zenodo.656930 concept_rec_id = 656930
+	 * To create a new version of an already published deposition. It sets the deposition_id and the bucket to be used
+	 * for the new version.
+	 *
+	 * @param concept_rec_id the concept record id of the deposition for which to create a new version. It is the last
+	 *            part of the url for the DOI Zenodo suggests to use to cite all versions: DOI: 10.xxx/zenodo.656930
+	 *            concept_rec_id = 656930
 	 * @return response code
 	 * @throws IOException
 	 * @throws MissingConceptDoiException
 	 */
 	public int newVersion(String concept_rec_id) throws IOException, MissingConceptDoiException {
-		setDepositionId(concept_rec_id);
+		setDepositionId(concept_rec_id, 1);
 		String json = "{}";
 
-		OkHttpClient httpClient = new OkHttpClient();
+		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
+
+		RequestBody body = RequestBody.create(json, MEDIA_TYPE_JSON);
 
 		Request request = new Request.Builder()
 			.url(urlString + "/" + deposition_id + "/actions/newversion")
-			.addHeader("Authorization", "Bearer " + access_token)
-			.post(RequestBody.create(MEDIA_TYPE_JSON, json))
+			.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + access_token)
+			.post(body)
 			.build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
@@ -201,9 +218,45 @@ public class ZenodoAPIClient implements Serializable {
 		}
 	}
 
-	private void setDepositionId(String concept_rec_id) throws IOException, MissingConceptDoiException {
+	/**
+	 * To finish uploading a version or new deposition not published
+	 * It sets the deposition_id and the bucket to be used
+	 *
+	 *
+	 * @param deposition_id the deposition id of the not yet published upload
+	 *            concept_rec_id = 656930
+	 * @return response code
+	 * @throws IOException
+	 * @throws MissingConceptDoiException
+	 */
+	public int uploadOpenDeposition(String deposition_id) throws IOException, MissingConceptDoiException {
 
-		ZenodoModelList zenodoModelList = new Gson().fromJson(getPrevDepositions(), ZenodoModelList.class);
+		this.deposition_id = deposition_id;
+
+		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
+
+		Request request = new Request.Builder()
+			.url(urlString + "/" + deposition_id)
+			.addHeader("Authorization", "Bearer " + access_token)
+			.build();
+
+		try (Response response = httpClient.newCall(request).execute()) {
+
+			if (!response.isSuccessful())
+				throw new IOException("Unexpected code " + response + response.body().string());
+
+			ZenodoModel zenodoModel = new Gson().fromJson(response.body().string(), ZenodoModel.class);
+			bucket = zenodoModel.getLinks().getBucket();
+			return response.code();
+
+		}
+
+	}
+
+	private void setDepositionId(String concept_rec_id, Integer page) throws IOException, MissingConceptDoiException {
+
+		ZenodoModelList zenodoModelList = new Gson()
+			.fromJson(getPrevDepositions(String.valueOf(page)), ZenodoModelList.class);
 
 		for (ZenodoModel zm : zenodoModelList) {
 			if (zm.getConceptrecid().equals(concept_rec_id)) {
@@ -211,18 +264,25 @@ public class ZenodoAPIClient implements Serializable {
 				return;
 			}
 		}
-
-		throw new MissingConceptDoiException("The concept record id specified was missing in the list of depositions");
+		if (zenodoModelList.size() == 0)
+			throw new MissingConceptDoiException(
+				"The concept record id specified was missing in the list of depositions");
+		setDepositionId(concept_rec_id, page + 1);
 
 	}
 
-	private String getPrevDepositions() throws IOException {
-		OkHttpClient httpClient = new OkHttpClient();
+	private String getPrevDepositions(String page) throws IOException {
+
+		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
+
+		HttpUrl.Builder urlBuilder = HttpUrl.parse(urlString).newBuilder();
+		urlBuilder.addQueryParameter("page", page);
+		String url = urlBuilder.build().toString();
 
 		Request request = new Request.Builder()
-			.url(urlString)
-			.addHeader("Content-Type", "application/json") // add request headers
-			.addHeader("Authorization", "Bearer " + access_token)
+			.url(url)
+			.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString()) // add request headers
+			.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + access_token)
 			.get()
 			.build();
 
@@ -238,12 +298,14 @@ public class ZenodoAPIClient implements Serializable {
 	}
 
 	private String getBucket(String url) throws IOException {
-		OkHttpClient httpClient = new OkHttpClient();
+		OkHttpClient httpClient = new OkHttpClient.Builder()
+			.connectTimeout(600, TimeUnit.SECONDS)
+			.build();
 
 		Request request = new Request.Builder()
 			.url(url)
-			.addHeader("Content-Type", "application/json") // add request headers
-			.addHeader("Authorization", "Bearer " + access_token)
+			.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString()) // add request headers
+			.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + access_token)
 			.get()
 			.build();
 

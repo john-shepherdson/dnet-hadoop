@@ -1,6 +1,6 @@
 [
 	{
-		"field": "datasource",
+		"field": "service",
 		"type": "string",
 		"value": "openaire____::revistasunicauca"
 	},
@@ -31,8 +31,8 @@
 	},
 	{
 		"field": "trust",
-		"type": "string",
-		"value": "0.9"
+		"type": "double",
+		"value": 0.9
 	},
 	{
 		"field": "inferenceprovenance",

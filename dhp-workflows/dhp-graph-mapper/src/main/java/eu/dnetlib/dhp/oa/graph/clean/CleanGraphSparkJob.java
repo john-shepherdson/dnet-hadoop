@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -19,8 +20,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.oa.graph.raw.common.VocabularyGroup;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
@@ -68,12 +71,12 @@ public class CleanGraphSparkJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				removeOutputDir(spark, outputPath);
-				fixGraphTable(spark, vocs, inputPath, entityClazz, outputPath);
+				HdfsSupport.remove(outputPath, spark.sparkContext().hadoopConfiguration());
+				cleanGraphTable(spark, vocs, inputPath, entityClazz, outputPath);
 			});
 	}
 
-	private static <T extends Oaf> void fixGraphTable(
+	private static <T extends Oaf> void cleanGraphTable(
 		SparkSession spark,
 		VocabularyGroup vocs,
 		String inputPath,
@@ -83,9 +86,10 @@ public class CleanGraphSparkJob {
 		final CleaningRuleMap mapping = CleaningRuleMap.create(vocs);
 
 		readTableFromPath(spark, inputPath, clazz)
-			.map((MapFunction<T, T>) value -> CleaningFunctions.fixVocabularyNames(value), Encoders.bean(clazz))
+			.map((MapFunction<T, T>) GraphCleaningFunctions::fixVocabularyNames, Encoders.bean(clazz))
 			.map((MapFunction<T, T>) value -> OafCleaner.apply(value, mapping), Encoders.bean(clazz))
-			.map((MapFunction<T, T>) value -> CleaningFunctions.fixDefaults(value), Encoders.bean(clazz))
+			.map((MapFunction<T, T>) value -> GraphCleaningFunctions.cleanup(value, vocs), Encoders.bean(clazz))
+			.filter((FilterFunction<T>) GraphCleaningFunctions::filter)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
@@ -102,10 +106,6 @@ public class CleanGraphSparkJob {
 			.map(
 				(MapFunction<String, T>) value -> OBJECT_MAPPER.readValue(value, clazz),
 				Encoders.bean(clazz));
-	}
-
-	private static void removeOutputDir(SparkSession spark, String path) {
-		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}
 
 }

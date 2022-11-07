@@ -13,6 +13,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
+import org.xml.sax.SAXException;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -29,13 +30,18 @@ public class CommunityConfigurationFactory {
 
 	private static final Log log = LogFactory.getLog(CommunityConfigurationFactory.class);
 
-	private static VerbResolver resolver = VerbResolverFactory.newInstance();
+	private static final VerbResolver resolver = VerbResolverFactory.newInstance();
 
-	public static CommunityConfiguration newInstance(final String xml) throws DocumentException {
+	private CommunityConfigurationFactory() {
+	}
+
+	public static CommunityConfiguration newInstance(final String xml) throws DocumentException, SAXException {
 
 		log.debug(String.format("parsing community configuration from:\n%s", xml));
 
-		final Document doc = new SAXReader().read(new StringReader(xml));
+		final SAXReader reader = new SAXReader();
+		reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		final Document doc = reader.read(new StringReader(xml));
 
 		final Map<String, Community> communities = Maps.newHashMap();
 
@@ -51,7 +57,7 @@ public class CommunityConfigurationFactory {
 		}
 
 		log.info(String.format("loaded %s community configuration profiles", communities.size()));
-		log.debug(String.format("loaded community configuration:\n%s", communities.toString()));
+		log.debug(String.format("loaded community configuration:\n%s", communities));
 
 		return new CommunityConfiguration(communities);
 	}
@@ -79,7 +85,20 @@ public class CommunityConfigurationFactory {
 		c.setSubjects(parseSubjects(node));
 		c.setProviders(parseDatasources(node));
 		c.setZenodoCommunities(parseZenodoCommunities(node));
+		c.setConstraints(parseConstrains(node));
 		return c;
+	}
+
+	private static SelectionConstraints parseConstrains(Node node) {
+		Node aconstraints = node.selectSingleNode("./advancedConstraints");
+		if (aconstraints == null) {
+			return null;
+		}
+		SelectionConstraints selectionConstraints = new Gson()
+			.fromJson(aconstraints.getText(), SelectionConstraints.class);
+
+		selectionConstraints.setSelection(resolver);
+		return selectionConstraints;
 	}
 
 	private static List<String> parseSubjects(final Node node) {

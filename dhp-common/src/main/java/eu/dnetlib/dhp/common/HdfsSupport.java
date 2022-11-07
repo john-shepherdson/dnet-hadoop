@@ -28,7 +28,7 @@ public class HdfsSupport {
 	 * @param configuration Configuration of hadoop env
 	 */
 	public static boolean exists(String path, Configuration configuration) {
-		logger.info("Removing path: {}", path);
+		logger.info("Checking existence for path: {}", path);
 		return rethrowAsRuntimeException(
 			() -> {
 				Path f = new Path(path);

@@ -6,7 +6,47 @@
             <description>the target path to store raw graph</description>
         </property>
         <property>
-            <name>reuseContent</name>
+            <name>reuseDBClaims</name>
+            <value>false</value>
+            <description>should import content from the aggregator or reuse a previous version</description>
+        </property>
+        <property>
+            <name>reuseODFClaims</name>
+            <value>false</value>
+            <description>should import content from the aggregator or reuse a previous version</description>
+        </property>
+        <property>
+            <name>reuseOAFClaims</name>
+            <value>false</value>
+            <description>should import content from the aggregator or reuse a previous version</description>
+        </property>
+        <property>
+            <name>reuseDB</name>
+            <value>false</value>
+            <description>should import content from the aggregator or reuse a previous version</description>
+        </property>
+        <property>
+            <name>reuseDBOpenorgs</name>
+            <value>false</value>
+            <description>should import content from the aggregator or reuse a previous version</description>
+        </property>
+        <property>
+            <name>reuseODF</name>
+            <value>false</value>
+            <description>should import content from the aggregator or reuse a previous version</description>
+        </property>
+        <property>
+            <name>reuseOAF</name>
+            <value>false</value>
+            <description>should import content from the aggregator or reuse a previous version</description>
+        </property>
+        <property>
+            <name>reuseODF_hdfs</name>
+            <value>false</value>
+            <description>should import content from the aggregator or reuse a previous version</description>
+        </property>
+        <property>
+            <name>reuseOAF_hdfs</name>
             <value>false</value>
             <description>should import content from the aggregator or reuse a previous version</description>
         </property>
@@ -25,6 +65,18 @@
         <property>
             <name>postgresPassword</name>
             <description>the password postgres</description>
+        </property>
+        <property>
+            <name>postgresOpenOrgsURL</name>
+            <description>the postgres URL to access to the OpenOrgs database</description>
+        </property>
+        <property>
+            <name>postgresOpenOrgsUser</name>
+            <description>the user of OpenOrgs database</description>
+        </property>
+        <property>
+            <name>postgresOpenOrgsPassword</name>
+            <description>the password of OpenOrgs database</description>
         </property>
 		<property>
             <name>dbSchema</name>
@@ -47,6 +99,16 @@
             <name>nsPrefixBlacklist</name>
             <value></value>
             <description>a blacklist of nsprefixes (comma separeted)</description>
+        </property>
+        <property>
+            <name>shouldPatchRelations</name>
+            <value>false</value>
+            <description>activates the relation patching phase, driven by the content in ${idMappingPath}</description>
+        </property>
+        <property>
+            <name>idMappingPath</name>
+            <value></value>
+            <description>path pointing to the relations identifiers mapping dataset</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>
@@ -103,24 +165,25 @@
         </configuration>
     </global>
 
-    <start to="reuse_aggregator_content"/>
+    <start to="start_import"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <decision name="reuse_aggregator_content">
+    <fork name="start_import">
+        <path start="reuse_db"/>
+        <path start="reuse_db_claims"/>
+        <path start="reuse_db_openorgs"/>
+    </fork>
+
+    <decision name="reuse_db_claims">
         <switch>
-            <case to="start_import">${wf:conf('reuseContent') eq false}</case>
-            <case to="fork_generate_entities">${wf:conf('reuseContent') eq true}</case>
-            <default to="start_import"/>
+            <case to="ImportDB_claims">${wf:conf('reuseDBClaims') eq false}</case>
+            <case to="reuse_odf_claims">${wf:conf('reuseDBClaims') eq true}</case>
+            <default to="ImportDB_claims"/>
         </switch>
     </decision>
-
-    <fork name="start_import">
-        <path start="ImportDB"/>
-        <path start="ImportDB_claims"/>
-    </fork>
 
     <action name="ImportDB_claims">
         <java>
@@ -137,9 +200,17 @@
             <arg>--dbschema</arg><arg>${dbSchema}</arg>
             <arg>--nsPrefixBlacklist</arg><arg>${nsPrefixBlacklist}</arg>
         </java>
-        <ok to="ImportODF_claims"/>
+        <ok to="reuse_odf_claims"/>
         <error to="Kill"/>
     </action>
+
+    <decision name="reuse_odf_claims">
+        <switch>
+            <case to="ImportODF_claims">${wf:conf('reuseODFClaims') eq false}</case>
+            <case to="reuse_oaf_claims">${wf:conf('reuseODFClaims') eq true}</case>
+            <default to="ImportODF_claims"/>
+        </switch>
+    </decision>
 
     <action name="ImportODF_claims">
         <java>
@@ -154,9 +225,17 @@
             <arg>-l</arg><arg>store</arg>
             <arg>-i</arg><arg>claim</arg>
         </java>
-        <ok to="ImportOAF_claims"/>
+        <ok to="reuse_oaf_claims"/>
         <error to="Kill"/>
     </action>
+
+    <decision name="reuse_oaf_claims">
+        <switch>
+            <case to="ImportOAF_claims">${wf:conf('reuseOAFClaims') eq false}</case>
+            <case to="wait_import">${wf:conf('reuseOAFClaims') eq true}</case>
+            <default to="ImportOAF_claims"/>
+        </switch>
+    </decision>
 
     <action name="ImportOAF_claims">
         <java>
@@ -175,23 +254,40 @@
         <error to="Kill"/>
     </action>
 
+    <decision name="reuse_db">
+        <switch>
+            <case to="ImportDB">${wf:conf('reuseDB') eq false}</case>
+            <case to="reuse_odf">${wf:conf('reuseDB') eq true}</case>
+            <default to="ImportDB"/>
+        </switch>
+    </decision>
+
     <action name="ImportDB">
         <java>
             <prepare>
-                <delete path="${contentPath}/db_records"/>
+                <delete path="${contentPath}/db_openaire"/>
             </prepare>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateDbEntitiesApplication</main-class>
-            <arg>--hdfsPath</arg><arg>${contentPath}/db_records</arg>
+            <arg>--hdfsPath</arg><arg>${contentPath}/db_openaire</arg>
             <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--action</arg><arg>openaire</arg>
             <arg>--dbschema</arg><arg>${dbSchema}</arg>
             <arg>--nsPrefixBlacklist</arg><arg>${nsPrefixBlacklist}</arg>
         </java>
-        <ok to="ImportODF"/>
+        <ok to="reuse_odf"/>
         <error to="Kill"/>
     </action>
+
+    <decision name="reuse_odf">
+        <switch>
+            <case to="ImportODF">${wf:conf('reuseODF') eq false}</case>
+            <case to="reuse_oaf">${wf:conf('reuseODF') eq true}</case>
+            <default to="ImportODF"/>
+        </switch>
+    </decision>
 
     <action name="ImportODF">
         <java>
@@ -206,9 +302,17 @@
             <arg>--mdLayout</arg><arg>store</arg>
             <arg>--mdInterpretation</arg><arg>cleaned</arg>
         </java>
-        <ok to="ImportOAF"/>
+        <ok to="reuse_oaf"/>
         <error to="Kill"/>
     </action>
+
+    <decision name="reuse_oaf">
+        <switch>
+            <case to="ImportOAF">${wf:conf('reuseOAF') eq false}</case>
+            <case to="reuse_odf_hdfs">${wf:conf('reuseOAF') eq true}</case>
+            <default to="ImportOAF"/>
+        </switch>
+    </decision>
 
     <action name="ImportOAF">
         <java>
@@ -240,6 +344,101 @@
             <arg>--mdLayout</arg><arg>store</arg>
             <arg>--mdInterpretation</arg><arg>intersection</arg>
         </java>
+        <ok to="ImportODF_hdfs"/>
+        <error to="Kill"/>
+    </action>
+    
+    <decision name="reuse_odf_hdfs">
+        <switch>
+            <case to="ImportODF_hdfs">${wf:conf('reuseODF_hdfs') eq false}</case>
+            <case to="reuse_oaf_hdfs">${wf:conf('reuseODF_hdfs') eq true}</case>
+            <default to="ImportODF_hdfs"/>
+        </switch>
+    </decision>
+
+    <action name="ImportODF_hdfs">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>ImportODF_hdfs</name>
+            <class>eu.dnetlib.dhp.oa.graph.raw.MigrateHdfsMdstoresApplication</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--hdfsPath</arg><arg>${contentPath}/odf_records_hdfs</arg>
+            <arg>--mdstoreManagerUrl</arg><arg>${mdstoreManagerUrl}</arg>
+            <arg>--mdFormat</arg><arg>ODF</arg>
+            <arg>--mdLayout</arg><arg>store</arg>
+            <arg>--mdInterpretation</arg><arg>cleaned</arg>
+        </spark>
+        <ok to="reuse_oaf_hdfs"/>
+        <error to="Kill"/>
+    </action>
+    
+    <decision name="reuse_oaf_hdfs">
+        <switch>
+            <case to="ImportOAF_hdfs">${wf:conf('reuseOAF_hdfs') eq false}</case>
+            <case to="wait_import">${wf:conf('reuseOAF_hdfs') eq true}</case>
+            <default to="ImportOAF_hdfs"/>
+        </switch>
+    </decision>
+
+    <action name="ImportOAF_hdfs">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>ImportOAF_hdfs</name>
+            <class>eu.dnetlib.dhp.oa.graph.raw.MigrateHdfsMdstoresApplication</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--hdfsPath</arg><arg>${contentPath}/oaf_records_hdfs</arg>
+            <arg>--mdstoreManagerUrl</arg><arg>${mdstoreManagerUrl}</arg>
+            <arg>--mdFormat</arg><arg>OAF</arg>
+            <arg>--mdLayout</arg><arg>store</arg>
+            <arg>--mdInterpretation</arg><arg>cleaned</arg>
+        </spark>
+        <ok to="wait_import"/>
+        <error to="Kill"/>
+    </action>    
+    
+    <decision name="reuse_db_openorgs">
+        <switch>
+            <case to="ImportDB_openorgs">${wf:conf('reuseDBOpenorgs') eq false}</case>
+            <case to="wait_import">${wf:conf('reuseDBOpenorgs') eq true}</case>
+            <default to="ImportDB_openorgs"/>
+        </switch>
+    </decision>
+
+    <action name="ImportDB_openorgs">
+        <java>
+            <prepare>
+                <delete path="${contentPath}/db_openorgs"/>
+            </prepare>
+            <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateDbEntitiesApplication</main-class>
+            <arg>--hdfsPath</arg><arg>${contentPath}/db_openorgs</arg>
+            <arg>--postgresUrl</arg><arg>${postgresOpenOrgsURL}</arg>
+            <arg>--postgresUser</arg><arg>${postgresOpenOrgsUser}</arg>
+            <arg>--postgresPassword</arg><arg>${postgresOpenOrgsPassword}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--action</arg><arg>openorgs</arg>
+            <arg>--dbschema</arg><arg>${dbSchema}</arg>
+            <arg>--nsPrefixBlacklist</arg><arg>${nsPrefixBlacklist}</arg>
+        </java>
         <ok to="wait_import"/>
         <error to="Kill"/>
     </action>
@@ -247,9 +446,33 @@
     <join name="wait_import" to="fork_generate_entities"/>
 
     <fork name="fork_generate_entities">
-        <path start="GenerateEntities_claim"/>
-        <path start="GenerateEntities"/>
+        <path start="VerifyRecords_claim"/>
+        <path start="VerifyRecords"/>
     </fork>
+
+    <action name="VerifyRecords_claim">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>VerifyRecords_claim</name>
+            <class>eu.dnetlib.dhp.oa.graph.raw.VerifyRecordsApplication</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePaths</arg><arg>${contentPath}/db_claims,${contentPath}/oaf_claims,${contentPath}/odf_claims</arg>
+            <arg>--invalidPath</arg><arg>${workingDir}/invalid_records_claim</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+        </spark>
+        <ok to="GenerateEntities_claim"/>
+        <error to="Kill"/>
+    </action>
 
     <action name="GenerateEntities_claim">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -267,9 +490,11 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--sourcePaths</arg><arg>${contentPath}/db_claims,${contentPath}/oaf_claims,${contentPath}/odf_claims,${contentPath}/oaf_records_invisible</arg>
+            <arg>--sourcePaths</arg><arg>${contentPath}/db_claims,${contentPath}/oaf_claims,${contentPath}/odf_claims</arg>
             <arg>--targetPath</arg><arg>${workingDir}/entities_claim</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--shouldHashId</arg><arg>${shouldHashId}</arg>
+            <arg>--mode</arg><arg>claim</arg>
         </spark>
         <ok to="GenerateGraph_claims"/>
         <error to="Kill"/>
@@ -298,6 +523,30 @@
         <error to="Kill"/>
     </action>
 
+    <action name="VerifyRecords">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>VerifyRecords</name>
+            <class>eu.dnetlib.dhp.oa.graph.raw.VerifyRecordsApplication</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePaths</arg><arg>${contentPath}/db_openaire,${contentPath}/db_openorgs,${contentPath}/oaf_records,${contentPath}/odf_records,${contentPath}/oaf_records_hdfs,${contentPath}/odf_records_hdfs,${contentPath}/oaf_records_invisible</arg>
+            <arg>--invalidPath</arg><arg>${workingDir}/invalid_records</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+        </spark>
+        <ok to="GenerateEntities"/>
+        <error to="Kill"/>
+    </action>
+
     <action name="GenerateEntities">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -314,9 +563,10 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--sourcePaths</arg><arg>${contentPath}/db_records,${contentPath}/oaf_records,${contentPath}/odf_records</arg>
+            <arg>--sourcePaths</arg><arg>${contentPath}/db_openaire,${contentPath}/db_openorgs,${contentPath}/oaf_records,${contentPath}/odf_records,${contentPath}/oaf_records_hdfs,${contentPath}/odf_records_hdfs,${contentPath}/oaf_records_invisible</arg>
             <arg>--targetPath</arg><arg>${workingDir}/entities</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--shouldHashId</arg><arg>${shouldHashId}</arg>
         </spark>
         <ok to="GenerateGraph"/>
         <error to="Kill"/>
@@ -342,6 +592,33 @@
             <arg>--sourcePath</arg><arg>${workingDir}/entities</arg>
             <arg>--graphRawPath</arg><arg>${workingDir}/graph_raw</arg>
         </spark>
+        <ok to="Import_oaf_store_graph"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Import_oaf_store_graph">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>ImportOAF_hdfs_graph</name>
+            <class>eu.dnetlib.dhp.oa.graph.raw.CopyHdfsOafSparkApplication</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--hdfsPath</arg><arg>${workingDir}/graph_raw</arg>
+            <arg>--mdstoreManagerUrl</arg><arg>${mdstoreManagerUrl}</arg>
+            <arg>--mdFormat</arg><arg>OAF</arg>
+            <arg>--mdLayout</arg><arg>store</arg>
+            <arg>--master</arg><arg>yarn</arg>
+            <arg>--mdInterpretation</arg><arg>graph</arg>
+        </spark>
         <ok to="wait_graphs"/>
         <error to="Kill"/>
     </action>
@@ -358,7 +635,6 @@
         <path start="merge_claims_project"/>
         <path start="merge_claims_relation"/>
     </fork>
-
 
     <action name="merge_claims_publication">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -568,7 +844,42 @@
         <error to="Kill"/>
     </action>
 
-    <join name="wait_merge" to="End"/>
+    <join name="wait_merge" to="decisionPatchRelations"/>
+
+    <decision name="decisionPatchRelations">
+        <switch>
+            <case to="patchRelations">
+                ${(shouldPatchRelations eq "true") and
+                (fs:exists(concat(concat(wf:conf('nameNode'),'/'),wf:conf('idMappingPath'))) eq "true")}
+            </case>
+            <default to="End"/>
+        </switch>
+    </decision>
+
+    <action name="patchRelations">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>PatchRelations</name>
+            <class>eu.dnetlib.dhp.oa.graph.raw.PatchRelationsApplication</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--graphBasePath</arg><arg>${graphOutputPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}/patch_relations</arg>
+            <arg>--idMappingPath</arg><arg>${idMappingPath}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
 
     <end name="End"/>
 </workflow-app>

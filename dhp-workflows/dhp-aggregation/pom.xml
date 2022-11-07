@@ -4,12 +4,53 @@
     <parent>
         <groupId>eu.dnetlib.dhp</groupId>
         <artifactId>dhp-workflows</artifactId>
-        <version>1.2.4-SNAPSHOT</version>
+        <version>1.2.5-SNAPSHOT</version>
     </parent>
     <artifactId>dhp-aggregation</artifactId>
-    
-  
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>${net.alchim31.maven.version}</version>
+                <executions>
+                    <execution>
+                        <id>scala-compile-first</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>scala-test-compile</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>scala-doc</id>
+                        <phase>process-resources</phase> <!-- or wherever -->
+                        <goals>
+                            <goal>doc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <scalaVersion>${scala.version}</scalaVersion>
+                </configuration>
+            </plugin>
+        </plugins>
+
+    </build>
+
     <dependencies>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.apache.spark</groupId>
@@ -24,20 +65,7 @@
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-common</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.sun.xml.bind</groupId>
-                    <artifactId>jaxb-core</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
-        
-         <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-schemas</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
 
         <dependency>
             <groupId>net.sf.saxon</groupId>
@@ -58,13 +86,10 @@
             <artifactId>jaxen</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-csv</artifactId>
-            <version>1.8</version>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
         </dependency>
-
 
         <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
         <dependency>
@@ -78,7 +103,10 @@
             <artifactId>commons-compress</artifactId>
         </dependency>
 
-
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongo-java-driver</artifactId>
+        </dependency>
 
     </dependencies>
 

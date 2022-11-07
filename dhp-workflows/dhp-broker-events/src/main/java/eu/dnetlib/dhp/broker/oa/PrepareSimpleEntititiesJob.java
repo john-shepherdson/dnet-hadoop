@@ -7,7 +7,10 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.util.LongAccumulator;
@@ -44,10 +47,10 @@ public class PrepareSimpleEntititiesJob {
 		final String graphPath = parser.get("graphPath");
 		log.info("graphPath: {}", graphPath);
 
-		final String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		final String workingDir = parser.get("workingDir");
+		log.info("workingDir: {}", workingDir);
 
-		final String simpleEntitiesPath = workingPath + "/simpleEntities";
+		final String simpleEntitiesPath = workingDir + "/simpleEntities";
 		log.info("simpleEntitiesPath: {}", simpleEntitiesPath);
 
 		final SparkConf conf = new SparkConf();
@@ -73,11 +76,12 @@ public class PrepareSimpleEntititiesJob {
 		final String graphPath,
 		final Class<SRC> sourceClass) {
 
+		final Encoder<OaBrokerMainEntity> encoder = Encoders.bean(OaBrokerMainEntity.class);
 		return ClusterUtils
 			.readPath(spark, graphPath + "/" + sourceClass.getSimpleName().toLowerCase(), sourceClass)
-			.filter(r -> !ClusterUtils.isDedupRoot(r.getId()))
-			.filter(r -> r.getDataInfo().getDeletedbyinference())
-			.map(ConversionUtils::oafResultToBrokerResult, Encoders.bean(OaBrokerMainEntity.class));
+			.filter((FilterFunction<SRC>) r -> !ClusterUtils.isDedupRoot(r.getId()))
+			.filter((FilterFunction<SRC>) r -> r.getDataInfo().getDeletedbyinference())
+			.map((MapFunction<SRC, OaBrokerMainEntity>) ConversionUtils::oafResultToBrokerResult, encoder);
 	}
 
 }

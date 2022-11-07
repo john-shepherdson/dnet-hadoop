@@ -1,0 +1,9 @@
+{
+  "id":"md-cleaned",
+  "mdstore":"md-cleaned",
+  "writing":false,
+  "readCount":1,
+  "lastUpdate":1612187563099,
+  "size":71,
+  "hdfsPath":"%s/mdstore/md-cleaned"
+}

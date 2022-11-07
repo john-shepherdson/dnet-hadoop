@@ -11,28 +11,29 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.httpconnector.HttpConnector;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.collection.CollectorException;
+import eu.dnetlib.dhp.common.collection.HttpConnector2;
 
 /**
  * Applies the parsing of an excel file and writes the Serialization of it in hdfs
  */
-
 public class ReadExcel implements Closeable {
-	private static final Log log = LogFactory.getLog(ReadCSV.class);
-	private final Configuration conf;
+	private static final Log log = LogFactory.getLog(ReadExcel.class);
+
 	private final BufferedWriter writer;
 	private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-	private InputStream excelFile;
+	private final InputStream excelFile;
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					ReadCSV.class
+					ReadExcel.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/actionmanager/project/parameters.json")));
 
@@ -42,22 +43,25 @@ public class ReadExcel implements Closeable {
 		final String hdfsPath = parser.get("hdfsPath");
 		final String hdfsNameNode = parser.get("hdfsNameNode");
 		final String classForName = parser.get("classForName");
+		final String sheetName = parser.get("sheetName");
 
 		try (final ReadExcel readExcel = new ReadExcel(hdfsPath, hdfsNameNode, fileURL)) {
 
 			log.info("Getting Excel file...");
-			readExcel.execute(classForName);
+			readExcel.execute(classForName, sheetName);
 
 		}
 	}
 
-	public void execute(final String classForName) throws Exception {
+	public void execute(final String classForName, final String sheetName)
+		throws IOException, ClassNotFoundException, InvalidFormatException, IllegalAccessException,
+		InstantiationException {
+
 		EXCELParser excelParser = new EXCELParser();
 		excelParser
-			.parse(excelFile, classForName)
+			.parse(excelFile, classForName, sheetName)
 			.stream()
-			.forEach(p -> write(p));
-
+			.forEach(this::write);
 	}
 
 	@Override
@@ -68,22 +72,21 @@ public class ReadExcel implements Closeable {
 	public ReadExcel(
 		final String hdfsPath,
 		final String hdfsNameNode,
-		final String fileURL)
-		throws Exception {
-		this.conf = new Configuration();
-		this.conf.set("fs.defaultFS", hdfsNameNode);
-		HttpConnector httpConnector = new HttpConnector();
-		FileSystem fileSystem = FileSystem.get(this.conf);
+		final String fileURL) throws CollectorException, IOException {
+
+		final Configuration conf = new Configuration();
+		conf.set("fs.defaultFS", hdfsNameNode);
+		HttpConnector2 httpConnector = new HttpConnector2();
+		FileSystem fileSystem = FileSystem.get(conf);
 		Path hdfsWritePath = new Path(hdfsPath);
-		FSDataOutputStream fsDataOutputStream = null;
+
 		if (fileSystem.exists(hdfsWritePath)) {
 			fileSystem.delete(hdfsWritePath, false);
 		}
-		fsDataOutputStream = fileSystem.create(hdfsWritePath);
+		FSDataOutputStream fos = fileSystem.create(hdfsWritePath);
 
-		this.writer = new BufferedWriter(new OutputStreamWriter(fsDataOutputStream, StandardCharsets.UTF_8));
+		this.writer = new BufferedWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8));
 		this.excelFile = httpConnector.getInputSourceAsStream(fileURL);
-		;
 	}
 
 	protected void write(final Object p) {

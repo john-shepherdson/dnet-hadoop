@@ -18,6 +18,9 @@ public class AuthorMerger {
 
 	private static final Double THRESHOLD = 0.95;
 
+	private AuthorMerger() {
+	}
+
 	public static List<Author> merge(List<List<Author>> authors) {
 
 		authors.sort((o1, o2) -> -Integer.compare(countAuthorsPids(o1), countAuthorsPids(o2)));
@@ -32,44 +35,54 @@ public class AuthorMerger {
 
 	}
 
-	public static List<Author> mergeAuthor(final List<Author> a, final List<Author> b) {
+	public static List<Author> mergeAuthor(final List<Author> a, final List<Author> b, Double threshold) {
 		int pa = countAuthorsPids(a);
 		int pb = countAuthorsPids(b);
-		List<Author> base, enrich;
+		List<Author> base;
+		List<Author> enrich;
 		int sa = authorsSize(a);
 		int sb = authorsSize(b);
 
-		if (pa == pb) {
-			base = sa > sb ? a : b;
-			enrich = sa > sb ? b : a;
-		} else {
+		if (sa == sb) {
 			base = pa > pb ? a : b;
 			enrich = pa > pb ? b : a;
+		} else {
+			base = sa > sb ? a : b;
+			enrich = sa > sb ? b : a;
 		}
-		enrichPidFromList(base, enrich);
+		enrichPidFromList(base, enrich, threshold);
 		return base;
 	}
 
-	private static void enrichPidFromList(List<Author> base, List<Author> enrich) {
+	public static List<Author> mergeAuthor(final List<Author> a, final List<Author> b) {
+		return mergeAuthor(a, b, THRESHOLD);
+	}
+
+	private static void enrichPidFromList(List<Author> base, List<Author> enrich, Double threshold) {
 		if (base == null || enrich == null)
 			return;
+
+		// <pidComparableString, Author> (if an Author has more than 1 pid, it appears 2 times in the list)
 		final Map<String, Author> basePidAuthorMap = base
 			.stream()
-			.filter(a -> a.getPid() != null && a.getPid().size() > 0)
+			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
 			.flatMap(
 				a -> a
 					.getPid()
 					.stream()
+					.filter(Objects::nonNull)
 					.map(p -> new Tuple2<>(pidToComparableString(p), a)))
 			.collect(Collectors.toMap(Tuple2::_1, Tuple2::_2, (x1, x2) -> x1));
 
+		// <pid, Author> (list of pid that are missing in the other list)
 		final List<Tuple2<StructuredProperty, Author>> pidToEnrich = enrich
 			.stream()
-			.filter(a -> a.getPid() != null && a.getPid().size() > 0)
+			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
 			.flatMap(
 				a -> a
 					.getPid()
 					.stream()
+					.filter(Objects::nonNull)
 					.filter(p -> !basePidAuthorMap.containsKey(pidToComparableString(p)))
 					.map(p -> new Tuple2<>(p, a)))
 			.collect(Collectors.toList());
@@ -83,10 +96,10 @@ public class AuthorMerger {
 						.max(Comparator.comparing(Tuple2::_1));
 
 					if (simAuthor.isPresent()) {
-						double th = THRESHOLD;
+						double th = threshold;
 						// increase the threshold if the surname is too short
 						if (simAuthor.get()._2().getSurname() != null
-							&& simAuthor.get()._2().getSurname().length() <= 3)
+							&& simAuthor.get()._2().getSurname().length() <= 3 && threshold > 0.0)
 							th = 0.99;
 
 						if (simAuthor.get()._1() > th) {
@@ -107,9 +120,9 @@ public class AuthorMerger {
 	}
 
 	public static String pidToComparableString(StructuredProperty pid) {
-		return (pid.getQualifier() != null
-			? pid.getQualifier().getClassid() != null ? pid.getQualifier().getClassid().toLowerCase() : ""
-			: "")
+		final String classid = pid.getQualifier().getClassid() != null ? pid.getQualifier().getClassid().toLowerCase()
+			: "";
+		return (pid.getQualifier() != null ? classid : "")
 			+ (pid.getValue() != null ? pid.getValue().toLowerCase() : "");
 	}
 
@@ -142,7 +155,7 @@ public class AuthorMerger {
 	}
 
 	private static boolean hasPid(Author a) {
-		if (a == null || a.getPid() == null || a.getPid().size() == 0)
+		if (a == null || a.getPid() == null || a.getPid().isEmpty())
 			return false;
 		return a.getPid().stream().anyMatch(p -> p != null && StringUtils.isNotBlank(p.getValue()));
 	}
@@ -151,12 +164,15 @@ public class AuthorMerger {
 		if (StringUtils.isNotBlank(author.getSurname())) {
 			return new Person(author.getSurname() + ", " + author.getName(), false);
 		} else {
-			return new Person(author.getFullname(), false);
+			if (StringUtils.isNotBlank(author.getFullname()))
+				return new Person(author.getFullname(), false);
+			else
+				return new Person("", false);
 		}
 	}
 
 	private static String normalize(final String s) {
-		return nfd(s)
+		String[] normalized = nfd(s)
 			.toLowerCase()
 			// do not compact the regexes in a single expression, would cause StackOverflowError
 			// in case
@@ -166,7 +182,12 @@ public class AuthorMerger {
 			.replaceAll("(\\p{Punct})+", " ")
 			.replaceAll("(\\d)+", " ")
 			.replaceAll("(\\n)+", " ")
-			.trim();
+			.trim()
+			.split(" ");
+
+		Arrays.sort(normalized);
+
+		return String.join(" ", normalized);
 	}
 
 	private static String nfd(final String s) {

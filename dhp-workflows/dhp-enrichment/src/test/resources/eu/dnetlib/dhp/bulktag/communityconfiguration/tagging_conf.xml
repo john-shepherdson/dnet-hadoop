@@ -1193,6 +1193,9 @@
     <organizations/>
 </community>
     <community id="science-innovation-policy">
+        <advancedConstraints>{"criteria":[{"constraint":[{"verb":"equals_ignorecase","field":"subject","value":"ciencias de la comunicación"},
+            {"verb":"equals","field":"subject","value":"Miriam"}]},
+            {"constraint":[{"verb":"equals","field":"subject","value":"miriam"}]}]}</advancedConstraints>
     <subjects>
         <subject>Sustainability-oriented science policy</subject>
         <subject> STI policies</subject>
@@ -1316,7 +1319,7 @@
             <openaireId>opendoar____::358aee4cc897452c00244351e4d91f69</openaireId>
             <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"COVID-19"}]},
                 {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"SARS-CoV-2"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"2019-nCoV"}]}]}
+                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"2019-nCoV"}}]}
             </selcriteria>
         </datasource>
         <datasource>

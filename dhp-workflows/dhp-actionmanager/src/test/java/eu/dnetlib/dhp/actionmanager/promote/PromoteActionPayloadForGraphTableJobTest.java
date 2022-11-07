@@ -77,7 +77,7 @@ public class PromoteActionPayloadForGraphTableJobTest {
 	class Main {
 
 		@Test
-		public void shouldThrowWhenGraphTableClassIsNotASubClassOfActionPayloadClass() {
+		void shouldThrowWhenGraphTableClassIsNotASubClassOfActionPayloadClass() {
 			// given
 			Class<Relation> rowClazz = Relation.class;
 			Class<OafEntity> actionPayloadClazz = OafEntity.class;
@@ -101,7 +101,9 @@ public class PromoteActionPayloadForGraphTableJobTest {
 							"-outputGraphTablePath",
 							"",
 							"-mergeAndGetStrategy",
-							MergeAndGet.Strategy.SELECT_NEWER_AND_GET.name()
+							MergeAndGet.Strategy.SELECT_NEWER_AND_GET.name(),
+							"--shouldGroupById",
+							"true"
 						}));
 
 			// then
@@ -114,7 +116,7 @@ public class PromoteActionPayloadForGraphTableJobTest {
 
 		@ParameterizedTest(name = "strategy: {0}, graph table: {1}, action payload: {2}")
 		@MethodSource("eu.dnetlib.dhp.actionmanager.promote.PromoteActionPayloadForGraphTableJobTest#promoteJobTestParams")
-		public void shouldPromoteActionPayloadForGraphTable(
+		void shouldPromoteActionPayloadForGraphTable(
 			MergeAndGet.Strategy strategy,
 			Class<? extends Oaf> rowClazz,
 			Class<? extends Oaf> actionPayloadClazz)
@@ -141,7 +143,9 @@ public class PromoteActionPayloadForGraphTableJobTest {
 						"-outputGraphTablePath",
 						outputGraphTableDir.toString(),
 						"-mergeAndGetStrategy",
-						strategy.name()
+						strategy.name(),
+						"--shouldGroupById",
+						"true"
 					});
 
 			// then
@@ -166,6 +170,61 @@ public class PromoteActionPayloadForGraphTableJobTest {
 					.collect(Collectors.toList());
 			assertIterableEquals(expectedOutputRows, actualOutputRows);
 		}
+	}
+
+	@Test
+	void shouldPromoteActionPayload_custom() throws Exception {
+
+		Class<? extends Oaf> rowClazz = Publication.class;
+		Class<? extends Oaf> actionPayloadClazz = Result.class;
+		MergeAndGet.Strategy strategy = MergeAndGet.Strategy.MERGE_FROM_AND_GET;
+
+		// given
+		Path inputGraphTableDir = createGraphTable(inputGraphRootDir, rowClazz);
+		Path inputActionPayloadDir = createActionPayload(inputActionPayloadRootDir, rowClazz, actionPayloadClazz);
+		Path outputGraphTableDir = outputDir.resolve("graph").resolve(rowClazz.getSimpleName().toLowerCase());
+
+		// when
+		PromoteActionPayloadForGraphTableJob
+			.main(
+				new String[] {
+					"-isSparkSessionManaged",
+					Boolean.FALSE.toString(),
+					"-inputGraphTablePath",
+					inputGraphTableDir.toString(),
+					"-graphTableClassName",
+					rowClazz.getCanonicalName(),
+					"-inputActionPayloadPath",
+					inputActionPayloadDir.toString(),
+					"-actionPayloadClassName",
+					actionPayloadClazz.getCanonicalName(),
+					"-outputGraphTablePath",
+					outputGraphTableDir.toString(),
+					"-mergeAndGetStrategy",
+					strategy.name(),
+					"--shouldGroupById",
+					"true"
+				});
+
+		// then
+		assertTrue(Files.exists(outputGraphTableDir));
+
+		List<? extends Oaf> actualOutputRows = readGraphTableFromJobOutput(outputGraphTableDir.toString(), rowClazz)
+			.collectAsList()
+			.stream()
+			.sorted(Comparator.comparingInt(Object::hashCode))
+			.collect(Collectors.toList());
+
+		Publication p = actualOutputRows
+			.stream()
+			.map(o -> (Publication) o)
+			.filter(o -> "50|4ScienceCRIS::6a67ed3daba1c380bf9de3c13ed9c879".equals(o.getId()))
+			.findFirst()
+			.get();
+
+		assertNotNull(p.getMeasures());
+		assertTrue(p.getMeasures().size() > 0);
+
 	}
 
 	public static Stream<Arguments> promoteJobTestParams() {

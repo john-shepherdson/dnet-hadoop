@@ -96,8 +96,8 @@
 	},
 	{
 		"field": "trust",
-		"type": "string",
-		"value": "0.9"
+		"type": "double",
+		"value": 0.9
 	},
 	{
 		"field": "inferenceprovenance",
@@ -123,5 +123,12 @@
 		"field": "provenanceaction",
 		"type": "not_used",
 		"value": "sysimport:crosswalk:entityregistry@@@dnet:provenance_actions"
+	},
+	{
+		"field": "alternativenames",
+		"type": "array",
+		"value": [
+			"Pippo", "Foo"
+		]
 	}
 ]

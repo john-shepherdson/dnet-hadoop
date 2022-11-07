@@ -1,165 +1,288 @@
 
 package eu.dnetlib.dhp.transformation;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static eu.dnetlib.dhp.common.Constants.MDSTORE_DATA_PATH;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.StringWriter;
-import java.nio.file.Files;
+import java.io.IOException;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
-
-import javax.xml.transform.stream.StreamSource;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoder;
+import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.util.LongAccumulator;
-import org.dom4j.Document;
-import org.dom4j.Node;
-import org.dom4j.io.SAXReader;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import eu.dnetlib.dhp.collection.CollectionJobTest;
-import eu.dnetlib.dhp.model.mdstore.MetadataRecord;
-import eu.dnetlib.dhp.transformation.functions.Cleaner;
-import eu.dnetlib.dhp.transformation.vocabulary.Vocabulary;
-import eu.dnetlib.dhp.transformation.vocabulary.VocabularyHelper;
-import eu.dnetlib.dhp.utils.DHPUtils;
-import net.sf.saxon.s9api.*;
+import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest;
+import eu.dnetlib.dhp.aggregation.common.AggregationCounter;
+import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
+import eu.dnetlib.dhp.schema.mdstore.Provenance;
+import eu.dnetlib.dhp.transformation.xslt.DateCleaner;
+import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
 @ExtendWith(MockitoExtension.class)
-public class TransformationJobTest {
+class TransformationJobTest extends AbstractVocabularyTest {
 
-	private static SparkSession spark;
+	private SparkConf sparkConf;
 
-	@BeforeAll
-	public static void beforeAll() {
-		SparkConf conf = new SparkConf();
-		conf.setAppName(CollectionJobTest.class.getSimpleName());
-		conf.setMaster("local");
-		spark = SparkSession.builder().config(conf).getOrCreate();
-	}
+	@BeforeEach
+	public void setUp() throws IOException, ISLookUpException {
+		setUpVocabulary();
 
-	@AfterAll
-	public static void afterAll() {
-		spark.stop();
-	}
-
-	@Mock
-	private LongAccumulator accumulator;
-
-	@Test
-	public void testTransformSaxonHE() throws Exception {
-
-		Map<String, Vocabulary> vocabularies = new HashMap<>();
-		vocabularies.put("dnet:languages", VocabularyHelper.getVocabularyFromAPI("dnet:languages"));
-		Cleaner cleanFunction = new Cleaner(vocabularies);
-		Processor proc = new Processor(false);
-		proc.registerExtensionFunction(cleanFunction);
-		final XsltCompiler comp = proc.newXsltCompiler();
-		XsltExecutable exp = comp
-			.compile(
-				new StreamSource(
-					this.getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/ext_simple.xsl")));
-		XdmNode source = proc
-			.newDocumentBuilder()
-			.build(
-				new StreamSource(
-					this.getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input.xml")));
-		XsltTransformer trans = exp.load();
-		trans.setInitialContextNode(source);
-		final StringWriter output = new StringWriter();
-		Serializer out = proc.newSerializer(output);
-		out.setOutputProperty(Serializer.Property.METHOD, "xml");
-		out.setOutputProperty(Serializer.Property.INDENT, "yes");
-		trans.setDestination(out);
-		trans.transform();
-		System.out.println(output.toString());
-	}
-
-	@DisplayName("Test TransformSparkJobNode.main")
-	@Test
-	public void transformTest(@TempDir Path testDir) throws Exception {
-		final String mdstore_input = this.getClass().getResource("/eu/dnetlib/dhp/transform/mdstorenative").getFile();
-		final String mdstore_output = testDir.toString() + "/version";
-		final String xslt = DHPUtils
-			.compressString(
-				IOUtils
-					.toString(
-						this.getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/tr.xml")));
-		TransformSparkJobNode
-			.main(
-				new String[] {
-					"-issm", "true",
-					"-i", mdstore_input,
-					"-o", mdstore_output,
-					"-d", "1",
-					"-w", "1",
-					"-tr", xslt,
-					"-t", "true",
-					"-ru", "",
-					"-rp", "",
-					"-rh", "",
-					"-ro", "",
-					"-rr", ""
-				});
-
-		// TODO introduce useful assertions
+		sparkConf = new SparkConf();
+		sparkConf.setMaster("local[*]");
+		sparkConf.set("spark.driver.host", "localhost");
+		sparkConf.set("spark.ui.enabled", "false");
 	}
 
 	@Test
-	public void tryLoadFolderOnCP() throws Exception {
-		final String path = this.getClass().getResource("/eu/dnetlib/dhp/transform/mdstorenative").getFile();
-		System.out.println("path = " + path);
-
-		Path tempDirWithPrefix = Files.createTempDirectory("mdstore_output");
-
-		System.out.println(tempDirWithPrefix.toFile().getAbsolutePath());
-
-		Files.deleteIfExists(tempDirWithPrefix);
+	@DisplayName("Test Date cleaner")
+	void testDateCleaner() throws Exception {
+		final DateCleaner dc = new DateCleaner();
+		assertEquals("1982-09-20", dc.clean("20/09/1982"));
+		assertEquals("2002-09-20", dc.clean("20-09-2002"));
+		assertEquals("2002-09-20", dc.clean("2002-09-20"));
+		assertEquals("2002-09-01", dc.clean("2002-9"));
+		assertEquals("2021-01-01", dc.clean("2021"));
 	}
 
 	@Test
-	public void testTransformFunction() throws Exception {
-		SAXReader reader = new SAXReader();
-		Document document = reader.read(this.getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/tr.xml"));
-		Node node = document.selectSingleNode("//CODE/*[local-name()='stylesheet']");
-		final String xslt = node.asXML();
-		Map<String, Vocabulary> vocabularies = new HashMap<>();
-		vocabularies.put("dnet:languages", VocabularyHelper.getVocabularyFromAPI("dnet:languages"));
+	@DisplayName("Test Transform Single XML using zenodo_tr XSLTTransformator")
+	void testTransformSaxonHE() throws Exception {
 
-		TransformFunction tf = new TransformFunction(accumulator, accumulator, accumulator, xslt, 1, vocabularies);
+		// We Set the input Record getting the XML from the classpath
+		final MetadataRecord mr = new MetadataRecord();
 
-		MetadataRecord record = new MetadataRecord();
-		record
-			.setBody(
-				IOUtils
-					.toString(
-						this.getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input.xml")));
+		mr.setProvenance(new Provenance("DSID", "DSNAME", "PREFIX"));
+		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_zenodo.xml")));
+		// We Load the XSLT transformation Rule from the classpath
+		final XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/zenodo_tr.xslt");
 
-		final MetadataRecord result = tf.call(record);
-		assertNotNull(result.getBody());
+		final MetadataRecord result = tr.call(mr);
 
+		// Print the record
 		System.out.println(result.getBody());
+		// TODO Create significant Assert
 	}
 
 	@Test
-	public void extractTr() throws Exception {
+	@DisplayName("Test Transform Inst.&Them.v4 record XML with zenodo_tr")
+	void testTransformITGv4Zenodo() throws Exception {
 
-		final String xmlTr = IOUtils.toString(this.getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/tr.xml"));
+		// We Set the input Record getting the XML from the classpath
+		final MetadataRecord mr = new MetadataRecord();
+		mr.setProvenance(new Provenance("DSID", "DSNAME", "PREFIX"));
+		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_itgv4.xml")));
+		// We Load the XSLT transformation Rule from the classpath
+		final XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/zenodo_tr.xslt");
 
-		SAXReader reader = new SAXReader();
-		Document document = reader.read(this.getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/tr.xml"));
-		Node node = document.selectSingleNode("//CODE/*[local-name()='stylesheet']");
+		final MetadataRecord result = tr.call(mr);
 
-		System.out.println(node.asXML());
+		// Print the record
+		System.out.println(result.getBody());
+		// TODO Create significant Assert
 	}
+
+	@Test
+	@DisplayName("Test Transform record XML with xslt_cleaning_datarepo_datacite/oaiOpenAIRE")
+	void testTransformMostlyUsedScript() throws Exception {
+
+		String xslTransformationScript = "";
+		xslTransformationScript = "/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_datarepo_datacite.xsl";
+		xslTransformationScript = "/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_oaiOpenaire_datacite_ExchangeLandingpagePid.xsl";
+
+		// We Set the input Record getting the XML from the classpath
+		final MetadataRecord mr = new MetadataRecord();
+		mr.setProvenance(new Provenance("DSID", "DSNAME", "PREFIX"));
+		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_itgv4.xml")));
+		// We Load the XSLT transformation Rule from the classpath
+		final XSLTTransformationFunction tr = loadTransformationRule(xslTransformationScript);
+
+		final MetadataRecord result = tr.call(mr);
+
+		// Print the record
+		System.out.println(result.getBody());
+		// TODO Create significant Assert
+	}
+
+	@Test
+	@DisplayName("Test Transform record XML with xslt_cleaning_REST_OmicsDI")
+	void testTransformRestScript() throws Exception {
+
+		String xslTransformationScript = "";
+		xslTransformationScript = "/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_REST_OmicsDI.xsl";
+
+		// We Set the input Record getting the XML from the classpath
+		final MetadataRecord mr = new MetadataRecord();
+		mr.setProvenance(new Provenance("DSID", "DSNAME", "PREFIX"));
+		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_omicsdi.xml")));
+		// We Load the XSLT transformation Rule from the classpath
+		final XSLTTransformationFunction tr = loadTransformationRule(xslTransformationScript);
+
+		final MetadataRecord result = tr.call(mr);
+
+		// Print the record
+		System.out.println(result.getBody());
+		// TODO Create significant Assert
+	}
+
+	@Test
+	@DisplayName("Test TransformSparkJobNode.main with oaiOpenaire_datacite (v4)")
+	void transformTestITGv4OAIdatacite(@TempDir
+	final Path testDir) throws Exception {
+
+		try (SparkSession spark = SparkSession.builder().config(sparkConf).getOrCreate()) {
+
+			final String mdstore_input = this
+				.getClass()
+				.getResource("/eu/dnetlib/dhp/transform/mdstorenative")
+				.getFile();
+			final String mdstore_output = testDir.toString() + "/version";
+
+			mockupTrasformationRule(
+				"simpleTRule",
+				"/eu/dnetlib/dhp/transform/scripts/xslt_cleaning_oaiOpenaire_datacite_ExchangeLandingpagePid.xsl");
+
+			final Map<String, String> parameters = Stream.of(new String[][] {
+				{
+					"dateOfTransformation", "1234"
+				},
+				{
+					"varOfficialName", "Publications at Bielefeld University"
+				},
+				{
+					"varOfficialId", "opendoar____::2294"
+				},
+				{
+					"transformationPlugin", "XSLT_TRANSFORM"
+				},
+				{
+					"transformationRuleId", "simpleTRule"
+				},
+
+			}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
+
+			TransformSparkJobNode
+				.transformRecords(parameters, isLookUpService, spark, mdstore_input, mdstore_output, 200);
+
+			// TODO introduce useful assertions
+
+			final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
+			final Dataset<MetadataRecord> mOutput = spark
+				.read()
+				.format("parquet")
+				.load(mdstore_output + MDSTORE_DATA_PATH)
+				.as(encoder);
+
+			final Long total = mOutput.count();
+
+			final long recordTs = mOutput
+				.filter((FilterFunction<MetadataRecord>) p -> p.getDateOfTransformation() == 1234)
+				.count();
+
+			final long recordNotEmpty = mOutput
+				.filter((FilterFunction<MetadataRecord>) p -> !StringUtils.isBlank(p.getBody()))
+				.count();
+
+			assertEquals(total, recordTs);
+
+			assertEquals(total, recordNotEmpty);
+		}
+	}
+
+	@Test
+	@DisplayName("Test TransformSparkJobNode.main")
+	void transformTest(@TempDir
+	final Path testDir) throws Exception {
+
+		try (SparkSession spark = SparkSession.builder().config(sparkConf).getOrCreate()) {
+
+			final String mdstore_input = this
+				.getClass()
+				.getResource("/eu/dnetlib/dhp/transform/mdstorenative")
+				.getFile();
+			final String mdstore_output = testDir.toString() + "/version";
+
+			mockupTrasformationRule("simpleTRule", "/eu/dnetlib/dhp/transform/ext_simple.xsl");
+
+			final Map<String, String> parameters = Stream.of(new String[][] {
+				{
+					"dateOfTransformation", "1234"
+				},
+				{
+					"transformationPlugin", "XSLT_TRANSFORM"
+				},
+				{
+					"transformationRuleId", "simpleTRule"
+				},
+
+			}).collect(Collectors.toMap(data -> data[0], data -> data[1]));
+
+			TransformSparkJobNode
+				.transformRecords(parameters, isLookUpService, spark, mdstore_input, mdstore_output, 200);
+
+			// TODO introduce useful assertions
+
+			final Encoder<MetadataRecord> encoder = Encoders.bean(MetadataRecord.class);
+			final Dataset<MetadataRecord> mOutput = spark
+				.read()
+				.format("parquet")
+				.load(mdstore_output + MDSTORE_DATA_PATH)
+				.as(encoder);
+
+			final Long total = mOutput.count();
+
+			final long recordTs = mOutput
+				.filter((FilterFunction<MetadataRecord>) p -> p.getDateOfTransformation() == 1234)
+				.count();
+
+			final long recordNotEmpty = mOutput
+				.filter((FilterFunction<MetadataRecord>) p -> !StringUtils.isBlank(p.getBody()))
+				.count();
+
+			assertEquals(total, recordTs);
+
+			assertEquals(total, recordNotEmpty);
+		}
+	}
+
+	@Test
+	@DisplayName("Test Transform Single XML using cnr_explora_tr XSLTTransformator")
+	void testCnrExploraTransformSaxonHE() throws Exception {
+
+		// We Set the input Record getting the XML from the classpath
+		final MetadataRecord mr = new MetadataRecord();
+
+		mr.setProvenance(new Provenance("openaire____::cnr_explora", "CNR ExploRA", "cnr_________"));
+		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_cnr_explora.xml")));
+		// We Load the XSLT transformation Rule from the classpath
+		final XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/cnr_explora_tr.xslt");
+
+		final MetadataRecord result = tr.call(mr);
+
+		// Print the record
+		System.out.println(result.getBody());
+		// TODO Create significant Assert
+	}
+
+	private XSLTTransformationFunction loadTransformationRule(final String path) throws Exception {
+		final String trValue = IOUtils.toString(this.getClass().getResourceAsStream(path));
+		final LongAccumulator la = new LongAccumulator();
+		return new XSLTTransformationFunction(new AggregationCounter(la, la, la), trValue, 0, vocabularies);
+	}
+
 }

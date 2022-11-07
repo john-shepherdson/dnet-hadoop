@@ -18,8 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.utils.CSVProgramme;
-import eu.dnetlib.dhp.actionmanager.project.utils.CSVProject;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProject;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import scala.Tuple2;
@@ -30,9 +29,8 @@ import scala.Tuple2;
  */
 public class PrepareProjects {
 
-	private static final Logger log = LoggerFactory.getLogger(PrepareProgramme.class);
+	private static final Logger log = LoggerFactory.getLogger(PrepareProjects.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-	private static final HashMap<String, CSVProgramme> programmeMap = new HashMap<>();
 
 	public static void main(String[] args) throws Exception {
 
@@ -93,7 +91,7 @@ public class PrepareProjects {
 	}
 
 	private static FlatMapFunction<Tuple2<ProjectSubset, CSVProject>, CSVProject> getTuple2CSVProjectFlatMapFunction() {
-		return (FlatMapFunction<Tuple2<ProjectSubset, CSVProject>, CSVProject>) value -> {
+		return value -> {
 			Optional<CSVProject> csvProject = Optional.ofNullable(value._2());
 			List<CSVProject> csvProjectList = new ArrayList<>();
 			if (csvProject.isPresent()) {

@@ -8,10 +8,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.swing.text.html.Option;
 
 import org.apache.commons.lang3.StringUtils;
 import org.stringtemplate.v4.ST;
+
+import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
@@ -50,7 +55,7 @@ public class TemplateFactory {
 	public String getChild(final String name, final String id, final List<String> metadata) {
 		return getTemplate(resources.getChild())
 			.add("name", name)
-			.add("hasId", !(id == null))
+			.add("hasId", id != null)
 			.add("id", id != null ? escapeXml(removePrefix(id)) : "")
 			.add("metadata", metadata)
 			.render();
@@ -73,7 +78,9 @@ public class TemplateFactory {
 		final Collection<String> fields,
 		final String semanticclass,
 		final String semantischeme,
-		final DataInfo info) {
+		final DataInfo info,
+		final boolean validated,
+		final String validationDate) {
 		return getTemplate(resources.getRel())
 			.add("type", type)
 			.add("objIdentifier", escapeXml(removePrefix(objIdentifier)))
@@ -86,20 +93,24 @@ public class TemplateFactory {
 			.add(
 				"provenanceaction",
 				info.getProvenanceaction() != null ? info.getProvenanceaction().getClassid() : "")
+			.add("validated", validated)
+			.add("validationdate", validationDate)
 			.render();
 	}
 
 	public String getInstance(
-		final String resultId, final List<String> instancemetadata, final List<String> webresources) {
+		final List<String> instancemetadata, final String url) {
 		return getTemplate(resources.getInstance())
-			.add("instanceId", escapeXml(removePrefix(resultId)))
 			.add("metadata", instancemetadata)
 			.add(
 				"webresources",
-				(webresources != null ? webresources : new ArrayList<String>())
+				Optional
+					.ofNullable(url)
+					.map(u -> Lists.newArrayList(url))
+					.orElse(Lists.newArrayList())
 					.stream()
 					.filter(StringUtils::isNotBlank)
-					.map(w -> getWebResource(w))
+					.map(this::getWebResource)
 					.collect(Collectors.toList()))
 			.render();
 	}

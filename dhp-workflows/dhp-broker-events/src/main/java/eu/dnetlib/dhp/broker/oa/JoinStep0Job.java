@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.TypedColumn;
@@ -42,10 +43,10 @@ public class JoinStep0Job {
 		final String graphPath = parser.get("graphPath");
 		log.info("graphPath: {}", graphPath);
 
-		final String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		final String workingDir = parser.get("workingDir");
+		log.info("workingDir: {}", workingDir);
 
-		final String joinedEntitiesPath = workingPath + "/joinedEntities_step0";
+		final String joinedEntitiesPath = workingDir + "/joinedEntities_step0";
 		log.info("joinedEntitiesPath: {}", joinedEntitiesPath);
 
 		final SparkConf conf = new SparkConf();
@@ -57,19 +58,23 @@ public class JoinStep0Job {
 			final LongAccumulator total = spark.sparkContext().longAccumulator("total_entities");
 
 			final Dataset<OaBrokerMainEntity> sources = ClusterUtils
-				.readPath(spark, workingPath + "/simpleEntities", OaBrokerMainEntity.class);
+				.readPath(spark, workingDir + "/simpleEntities", OaBrokerMainEntity.class);
 
 			final Dataset<RelatedDatasource> typedRels = ClusterUtils
-				.readPath(spark, workingPath + "/relatedDatasources", RelatedDatasource.class);
+				.readPath(spark, workingDir + "/relatedDatasources", RelatedDatasource.class);
 
 			final TypedColumn<Tuple2<OaBrokerMainEntity, RelatedDatasource>, OaBrokerMainEntity> aggr = new RelatedDatasourceAggregator()
 				.toColumn();
 
 			final Dataset<OaBrokerMainEntity> dataset = sources
 				.joinWith(typedRels, sources.col("openaireId").equalTo(typedRels.col("source")), "left_outer")
-				.groupByKey(t -> t._1.getOpenaireId(), Encoders.STRING())
+				.groupByKey(
+					(MapFunction<Tuple2<OaBrokerMainEntity, RelatedDatasource>, String>) t -> t._1.getOpenaireId(),
+					Encoders.STRING())
 				.agg(aggr)
-				.map(t -> t._2, Encoders.bean(OaBrokerMainEntity.class));
+				.map(
+					(MapFunction<Tuple2<String, OaBrokerMainEntity>, OaBrokerMainEntity>) t -> t._2,
+					Encoders.bean(OaBrokerMainEntity.class));
 
 			ClusterUtils.save(dataset, joinedEntitiesPath, OaBrokerMainEntity.class, total);
 

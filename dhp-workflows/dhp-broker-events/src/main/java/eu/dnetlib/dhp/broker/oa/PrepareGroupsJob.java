@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -45,10 +46,10 @@ public class PrepareGroupsJob {
 		final String graphPath = parser.get("graphPath");
 		log.info("graphPath: {}", graphPath);
 
-		final String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		final String workingDir = parser.get("workingDir");
+		log.info("workingDir: {}", workingDir);
 
-		final String groupsPath = workingPath + "/duplicates";
+		final String groupsPath = workingDir + "/duplicates";
 		log.info("groupsPath: {}", groupsPath);
 
 		final SparkConf conf = new SparkConf();
@@ -60,11 +61,11 @@ public class PrepareGroupsJob {
 			final LongAccumulator total = spark.sparkContext().longAccumulator("total_groups");
 
 			final Dataset<OaBrokerMainEntity> results = ClusterUtils
-				.readPath(spark, workingPath + "/joinedEntities_step4", OaBrokerMainEntity.class);
+				.readPath(spark, workingDir + "/joinedEntities_step4", OaBrokerMainEntity.class);
 
 			final Dataset<Relation> mergedRels = ClusterUtils
-				.readPath(spark, graphPath + "/relation", Relation.class)
-				.filter(r -> r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS));
+				.loadRelations(graphPath, spark)
+				.filter((FilterFunction<Relation>) r -> r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS));
 
 			final TypedColumn<Tuple2<OaBrokerMainEntity, Relation>, ResultGroup> aggr = new ResultAggregator()
 				.toColumn();
@@ -75,8 +76,9 @@ public class PrepareGroupsJob {
 					(MapFunction<Tuple2<OaBrokerMainEntity, Relation>, String>) t -> t._2.getTarget(),
 					Encoders.STRING())
 				.agg(aggr)
-				.map(t -> t._2, Encoders.bean(ResultGroup.class))
-				.filter(rg -> rg.getData().size() > 1);
+				.map(
+					(MapFunction<Tuple2<String, ResultGroup>, ResultGroup>) t -> t._2, Encoders.bean(ResultGroup.class))
+				.filter((FilterFunction<ResultGroup>) rg -> rg.getData().size() > 1);
 
 			ClusterUtils.save(dataset, groupsPath, ResultGroup.class, total);
 

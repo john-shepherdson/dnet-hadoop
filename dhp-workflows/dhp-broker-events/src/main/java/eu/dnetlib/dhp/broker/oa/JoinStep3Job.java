@@ -40,10 +40,10 @@ public class JoinStep3Job {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		final String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		final String workingDir = parser.get("workingDir");
+		log.info("workingDir: {}", workingDir);
 
-		final String joinedEntitiesPath = workingPath + "/joinedEntities_step3";
+		final String joinedEntitiesPath = workingDir + "/joinedEntities_step3";
 		log.info("joinedEntitiesPath: {}", joinedEntitiesPath);
 
 		final SparkConf conf = new SparkConf();
@@ -55,10 +55,10 @@ public class JoinStep3Job {
 			final LongAccumulator total = spark.sparkContext().longAccumulator("total_entities");
 
 			final Dataset<OaBrokerMainEntity> sources = ClusterUtils
-				.readPath(spark, workingPath + "/joinedEntities_step2", OaBrokerMainEntity.class);
+				.readPath(spark, workingDir + "/joinedEntities_step2", OaBrokerMainEntity.class);
 
 			final Dataset<RelatedDataset> typedRels = ClusterUtils
-				.readPath(spark, workingPath + "/relatedDatasets", RelatedDataset.class);
+				.readPath(spark, workingDir + "/relatedDatasets", RelatedDataset.class);
 
 			final TypedColumn<Tuple2<OaBrokerMainEntity, RelatedDataset>, OaBrokerMainEntity> aggr = new RelatedDatasetAggregator()
 				.toColumn();
@@ -69,7 +69,9 @@ public class JoinStep3Job {
 					(MapFunction<Tuple2<OaBrokerMainEntity, RelatedDataset>, String>) t -> t._1.getOpenaireId(),
 					Encoders.STRING())
 				.agg(aggr)
-				.map(t -> t._2, Encoders.bean(OaBrokerMainEntity.class));
+				.map(
+					(MapFunction<Tuple2<String, OaBrokerMainEntity>, OaBrokerMainEntity>) t -> t._2,
+					Encoders.bean(OaBrokerMainEntity.class));
 
 			ClusterUtils.save(dataset, joinedEntitiesPath, OaBrokerMainEntity.class, total);
 

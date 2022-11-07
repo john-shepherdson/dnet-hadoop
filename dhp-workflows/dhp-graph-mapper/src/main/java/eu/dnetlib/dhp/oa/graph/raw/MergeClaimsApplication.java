@@ -3,8 +3,12 @@ package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -36,9 +40,11 @@ public class MergeClaimsApplication {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					MigrateMongoMdstoresApplication.class
-						.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/graph/merge_claims_parameters.json")));
+					Objects
+						.requireNonNull(
+							MergeClaimsApplication.class
+								.getResourceAsStream(
+									"/eu/dnetlib/dhp/oa/graph/merge_claims_parameters.json"))));
 		parser.parseArgument(args);
 
 		Boolean isSparkSessionManaged = Optional
@@ -98,14 +104,9 @@ public class MergeClaimsApplication {
 		raw
 			.joinWith(claim, raw.col("_1").equalTo(claim.col("_1")), "full_outer")
 			.map(
-				(MapFunction<Tuple2<Tuple2<String, T>, Tuple2<String, T>>, T>) value -> {
-					Optional<Tuple2<String, T>> opRaw = Optional.ofNullable(value._1());
-					Optional<Tuple2<String, T>> opClaim = Optional.ofNullable(value._2());
-
-					return opRaw.isPresent()
-						? opRaw.get()._2()
-						: opClaim.isPresent() ? opClaim.get()._2() : null;
-				},
+				(MapFunction<Tuple2<Tuple2<String, T>, Tuple2<String, T>>, T>) value -> processClaims(
+					Optional.ofNullable(value._1()),
+					Optional.ofNullable(value._2())),
 				Encoders.bean(clazz))
 			.filter(Objects::nonNull)
 			.map(
@@ -115,6 +116,78 @@ public class MergeClaimsApplication {
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.text(outPath);
+	}
+
+	private static <T extends Oaf> T processClaims(Optional<Tuple2<String, T>> opRaw,
+		Optional<Tuple2<String, T>> opClaim) {
+
+		// when both are present
+		if (opClaim.isPresent() && opRaw.isPresent()) {
+			T oafClaim = opClaim.get()._2();
+			if (oafClaim instanceof Result) {
+				T oafRaw = opRaw.get()._2();
+
+				// merge the context lists from both oaf objects ...
+				final List<Context> context = mergeContexts((Result) oafClaim, (Result) oafRaw);
+
+				// ... and set it on the result from the aggregator
+				((Result) oafRaw).setContext(context);
+				return oafRaw;
+			}
+		}
+
+		// otherwise prefer the result from the aggregator
+		return opRaw.isPresent()
+			? opRaw.get()._2()
+			: opClaim.map(Tuple2::_2).orElse(null);
+	}
+
+	private static List<Context> mergeContexts(Result oafClaim, Result oafRaw) {
+		return new ArrayList<>(
+			Stream
+				.concat(
+					Optional
+						.ofNullable(oafClaim.getContext())
+						.map(List::stream)
+						.orElse(Stream.empty()),
+					Optional
+						.ofNullable(oafRaw.getContext())
+						.map(List::stream)
+						.orElse(Stream.empty()))
+				.collect(
+					Collectors
+						.toMap(
+							Context::getId,
+							c -> c,
+							(c1, c2) -> {
+								Context c = new Context();
+								c.setId(c1.getId());
+								c
+									.setDataInfo(
+										new ArrayList<>(
+											Stream
+												.concat(
+													Optional
+														.ofNullable(c1.getDataInfo())
+														.map(List::stream)
+														.orElse(Stream.empty()),
+													Optional
+														.ofNullable(c2.getDataInfo())
+														.map(List::stream)
+														.orElse(Stream.empty()))
+												.collect(
+													Collectors
+														.toMap(
+															d -> Optional
+																.ofNullable(d.getProvenanceaction())
+																.map(Qualifier::getClassid)
+																.orElse(""),
+															d -> d,
+															(d1, d2) -> d1))
+												.values()));
+								return c;
+							}))
+				.values());
 	}
 
 	private static <T extends Oaf> Dataset<T> readFromPath(

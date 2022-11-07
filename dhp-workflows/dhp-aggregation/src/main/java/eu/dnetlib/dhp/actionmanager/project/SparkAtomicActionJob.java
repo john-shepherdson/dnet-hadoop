@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.actionmanager.project;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -22,15 +21,16 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.utils.CSVProgramme;
-import eu.dnetlib.dhp.actionmanager.project.utils.CSVProject;
-import eu.dnetlib.dhp.actionmanager.project.utils.EXCELTopic;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProgramme;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProject;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.EXCELTopic;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.H2020Classification;
 import eu.dnetlib.dhp.schema.oaf.H2020Programme;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
@@ -47,13 +47,10 @@ import scala.Tuple2;
  *
  * To produce one single entry for each project code a step of groupoing is needed: each project can be associated to more
  * than one programme.
- *
- *
  */
 public class SparkAtomicActionJob {
 	private static final Logger log = LoggerFactory.getLogger(SparkAtomicActionJob.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-	private static final HashMap<String, String> programmeMap = new HashMap<>();
 
 	public static void main(String[] args) throws Exception {
 
@@ -120,7 +117,6 @@ public class SparkAtomicActionJob {
 			.map((MapFunction<Tuple2<CSVProject, CSVProgramme>, Project>) c -> {
 
 				CSVProject csvProject = c._1();
-				Optional<CSVProgramme> ocsvProgramme = Optional.ofNullable(c._2());
 
 				return Optional
 					.ofNullable(c._2())
@@ -135,37 +131,33 @@ public class SparkAtomicActionJob {
 						H2020Programme pm = new H2020Programme();
 						H2020Classification h2020classification = new H2020Classification();
 						pm.setCode(csvProject.getProgramme());
-						h2020classification.setClassification(ocsvProgramme.get().getClassification());
+						h2020classification.setClassification(csvProgramme.getClassification());
 						h2020classification.setH2020Programme(pm);
-						setLevelsandProgramme(h2020classification, ocsvProgramme.get().getClassification_short());
-						// setProgramme(h2020classification, ocsvProgramme.get().getClassification());
+						setLevelsandProgramme(h2020classification, csvProgramme.getClassification_short());
 						pp.setH2020classification(Arrays.asList(h2020classification));
 
 						return pp;
 					})
 					.orElse(null);
 
-			}, Encoders.bean(Project.class));
+			}, Encoders.bean(Project.class))
+			.filter(Objects::nonNull);
 
 		aaproject
-			.joinWith(topic, aaproject.col("h2020topiccode").equalTo(topic.col("code")))
+			.joinWith(topic, aaproject.col("h2020topiccode").equalTo(topic.col("code")), "left")
 			.map((MapFunction<Tuple2<Project, EXCELTopic>, Project>) p -> {
 				Optional<EXCELTopic> op = Optional.ofNullable(p._2());
 				Project rp = p._1();
-				if (op.isPresent()) {
-					rp.setH2020topicdescription(op.get().getTitle());
-				}
+				op.ifPresent(excelTopic -> rp.setH2020topicdescription(excelTopic.getTitle()));
 				return rp;
 			}, Encoders.bean(Project.class))
 			.filter(Objects::nonNull)
 			.groupByKey(
-				(MapFunction<Project, String>) p -> p.getId(),
+				(MapFunction<Project, String>) OafEntity::getId,
 				Encoders.STRING())
 			.mapGroups((MapGroupsFunction<String, Project, Project>) (s, it) -> {
 				Project first = it.next();
-				it.forEachRemaining(p -> {
-					first.mergeFrom(p);
-				});
+				it.forEachRemaining(first::mergeFrom);
 				return first;
 			}, Encoders.bean(Project.class))
 			.toJavaRDD()
@@ -188,12 +180,6 @@ public class SparkAtomicActionJob {
 		}
 		h2020Classification.getH2020Programme().setDescription(tmp[tmp.length - 1]);
 	}
-
-//	private static void setProgramme(H2020Classification h2020Classification, String classification) {
-//		String[] tmp = classification.split(" \\| ");
-//
-//		h2020Classification.getH2020Programme().setDescription(tmp[tmp.length - 1]);
-//	}
 
 	public static <R> Dataset<R> readPath(
 		SparkSession spark, String inputPath, Class<R> clazz) {

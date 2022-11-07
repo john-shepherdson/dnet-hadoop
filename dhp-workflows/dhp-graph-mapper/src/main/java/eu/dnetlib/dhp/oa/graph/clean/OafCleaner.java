@@ -16,7 +16,7 @@ public class OafCleaner implements Serializable {
 		try {
 			navigate(oaf, mapping);
 		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
+			throw new IllegalStateException(e);
 		}
 		return oaf;
 	}
@@ -30,6 +30,11 @@ public class OafCleaner implements Serializable {
 			}
 		} else if (hasMapping(o, mapping)) {
 			mapping.get(o.getClass()).accept(o);
+			for (final Field f : getAllFields(o.getClass())) {
+				f.setAccessible(true);
+				final Object val = f.get(o);
+				navigate(val, mapping);
+			}
 		} else {
 			for (final Field f : getAllFields(o.getClass())) {
 				f.setAccessible(true);

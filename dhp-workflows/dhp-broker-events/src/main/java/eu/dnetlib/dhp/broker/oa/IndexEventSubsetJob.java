@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.broker.oa;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
@@ -30,6 +33,7 @@ import eu.dnetlib.dhp.broker.model.Event;
 import eu.dnetlib.dhp.broker.oa.util.ClusterUtils;
 import eu.dnetlib.dhp.broker.oa.util.EventGroup;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.subset.EventSubsetAggregator;
+import scala.Tuple2;
 
 public class IndexEventSubsetJob {
 
@@ -46,7 +50,7 @@ public class IndexEventSubsetJob {
 
 		final SparkConf conf = new SparkConf();
 
-		final String eventsPath = parser.get("workingPath") + "/events";
+		final String eventsPath = parser.get("outputDir") + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
 		final String index = parser.get("index");
@@ -54,6 +58,18 @@ public class IndexEventSubsetJob {
 
 		final String indexHost = parser.get("esHost");
 		log.info("indexHost: {}", indexHost);
+
+		final String esBatchWriteRetryCount = parser.get("esBatchWriteRetryCount");
+		log.info("esBatchWriteRetryCount: {}", esBatchWriteRetryCount);
+
+		final String esBatchWriteRetryWait = parser.get("esBatchWriteRetryWait");
+		log.info("esBatchWriteRetryWait: {}", esBatchWriteRetryWait);
+
+		final String esBatchSizeEntries = parser.get("esBatchSizeEntries");
+		log.info("esBatchSizeEntries: {}", esBatchSizeEntries);
+
+		final String esNodesWanOnly = parser.get("esNodesWanOnly");
+		log.info("esNodesWanOnly: {}", esNodesWanOnly);
 
 		final int maxEventsForTopic = NumberUtils.toInt(parser.get("maxEventsForTopic"));
 		log.info("maxEventsForTopic: {}", maxEventsForTopic);
@@ -71,25 +87,26 @@ public class IndexEventSubsetJob {
 
 		final Dataset<Event> subset = ClusterUtils
 			.readPath(spark, eventsPath, Event.class)
-			.groupByKey(e -> e.getTopic() + '@' + e.getMap().getTargetDatasourceId(), Encoders.STRING())
+			.groupByKey(
+				(MapFunction<Event, String>) e -> e.getTopic() + '@' + e.getMap().getTargetDatasourceId(),
+				Encoders.STRING())
 			.agg(aggr)
-			.map(t -> t._2, Encoders.bean(EventGroup.class))
-			.flatMap(g -> g.getData().iterator(), Encoders.bean(Event.class));
+			.map((MapFunction<Tuple2<String, EventGroup>, EventGroup>) t -> t._2, Encoders.bean(EventGroup.class))
+			.flatMap((FlatMapFunction<EventGroup, Event>) g -> g.getData().iterator(), Encoders.bean(Event.class));
 
 		final JavaRDD<String> inputRdd = subset
-			.map(e -> prepareEventForIndexing(e, now, total), Encoders.STRING())
+			.map((MapFunction<Event, String>) e -> prepareEventForIndexing(e, now, total), Encoders.STRING())
 			.javaRDD();
 
 		final Map<String, String> esCfg = new HashMap<>();
-		// esCfg.put("es.nodes", "10.19.65.51, 10.19.65.52, 10.19.65.53, 10.19.65.54");
 
 		esCfg.put("es.index.auto.create", "false");
 		esCfg.put("es.nodes", indexHost);
 		esCfg.put("es.mapping.id", "eventId"); // THE PRIMARY KEY
-		esCfg.put("es.batch.write.retry.count", "8");
-		esCfg.put("es.batch.write.retry.wait", "60s");
-		esCfg.put("es.batch.size.entries", "200");
-		esCfg.put("es.nodes.wan.only", "true");
+		esCfg.put("es.batch.write.retry.count", esBatchWriteRetryCount);
+		esCfg.put("es.batch.write.retry.wait", esBatchWriteRetryWait);
+		esCfg.put("es.batch.size.entries", esBatchSizeEntries);
+		esCfg.put("es.nodes.wan.only", esNodesWanOnly);
 
 		log.info("*** Start indexing");
 		JavaEsSpark.saveJsonToEs(inputRdd, index, esCfg);
@@ -97,11 +114,11 @@ public class IndexEventSubsetJob {
 
 		log.info("*** Deleting old events");
 		final String message = deleteOldEvents(brokerApiBaseUrl, now - 1000);
-		log.info("*** Deleted events: " + message);
+		log.info("*** Deleted events: {}", message);
 
 	}
 
-	private static String deleteOldEvents(final String brokerApiBaseUrl, final long l) throws Exception {
+	private static String deleteOldEvents(final String brokerApiBaseUrl, final long l) throws IOException {
 		final String url = brokerApiBaseUrl + "/api/events/byCreationDate/0/" + l;
 		final HttpDelete req = new HttpDelete(url);
 

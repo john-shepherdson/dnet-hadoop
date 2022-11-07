@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import eu.dnetlib.dhp.schema.oaf.Instance;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import scala.Tuple3;
 
@@ -39,7 +41,7 @@ public class DatasourceRelationsAccumulator implements Serializable {
 		final Set<String> collectedFromSet = r
 			.getCollectedfrom()
 			.stream()
-			.map(kv -> kv.getKey())
+			.map(KeyValue::getKey)
 			.filter(StringUtils::isNotBlank)
 			.distinct()
 			.collect(Collectors.toSet());
@@ -47,10 +49,10 @@ public class DatasourceRelationsAccumulator implements Serializable {
 		final Set<String> hostedBySet = r
 			.getInstance()
 			.stream()
-			.map(i -> i.getHostedby())
+			.map(Instance::getHostedby)
 			.filter(Objects::nonNull)
 			.filter(kv -> !StringUtils.equalsIgnoreCase(kv.getValue(), "Unknown Repository"))
-			.map(kv -> kv.getKey())
+			.map(KeyValue::getKey)
 			.filter(StringUtils::isNotBlank)
 			.distinct()
 			.filter(id -> !collectedFromSet.contains(id))
@@ -59,9 +61,18 @@ public class DatasourceRelationsAccumulator implements Serializable {
 		final DatasourceRelationsAccumulator res = new DatasourceRelationsAccumulator();
 		collectedFromSet
 			.stream()
-			.map(s -> new Tuple3<>(r.getId(), s, BrokerConstants.COLLECTED_FROM_REL))
+			.map(
+				s -> new Tuple3<>(ConversionUtils.cleanOpenaireId(r.getId()), ConversionUtils.cleanOpenaireId(s),
+					BrokerConstants.COLLECTED_FROM_REL))
 			.forEach(res::addTuple);
-		hostedBySet.stream().map(s -> new Tuple3<>(r.getId(), s, BrokerConstants.HOSTED_BY_REL)).forEach(res::addTuple);
+
+		hostedBySet
+			.stream()
+			.map(
+				s -> new Tuple3<>(ConversionUtils.cleanOpenaireId(r.getId()), ConversionUtils.cleanOpenaireId(s),
+					BrokerConstants.HOSTED_BY_REL))
+			.forEach(res::addTuple);
+
 		return res;
 	}
 

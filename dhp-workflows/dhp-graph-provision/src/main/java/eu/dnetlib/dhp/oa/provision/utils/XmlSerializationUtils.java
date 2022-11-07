@@ -5,14 +5,22 @@ import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.removePrefix;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import eu.dnetlib.dhp.schema.oaf.*;
+import scala.Tuple2;
 
 public class XmlSerializationUtils {
 
 	// XML 1.0
 	// #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
-	private static final String xml10pattern = "[^" + "\u0009\r\n" + "\u0020-\uD7FF" + "\uE000-\uFFFD"
+	private static final String XML_10_PATTERN = "[^" + "\u0009\r\n" + "\u0020-\uD7FF" + "\uE000-\uFFFD"
 		+ "\ud800\udc00-\udbff\udfff" + "]";
+
+	private XmlSerializationUtils() {
+	}
 
 	public static String mapJournal(Journal j) {
 		final String attrs = new StringBuilder()
@@ -50,12 +58,12 @@ public class XmlSerializationUtils {
 
 	public static String escapeXml(final String value) {
 		return value
-			.replaceAll("&", "&amp;")
-			.replaceAll("<", "&lt;")
-			.replaceAll(">", "&gt;")
-			.replaceAll("\"", "&quot;")
-			.replaceAll("'", "&apos;")
-			.replaceAll(xml10pattern, "");
+			.replace("&", "&amp;")
+			.replace("<", "&lt;")
+			.replace(">", "&gt;")
+			.replace("\"", "&quot;")
+			.replace("'", "&apos;")
+			.replaceAll(XML_10_PATTERN, "");
 	}
 
 	public static String parseDataInfo(final DataInfo dataInfo) {
@@ -68,18 +76,6 @@ public class XmlSerializationUtils {
 			.append(asXmlElement("provenanceaction", null, dataInfo.getProvenanceaction(), null))
 			.append("</datainfo>")
 			.toString();
-	}
-
-	private static StringBuilder dataInfoAsAttributes(final StringBuilder sb, final DataInfo info) {
-		return sb
-			.append(
-				attr("inferred", info.getInferred() != null ? info.getInferred().toString() : ""))
-			.append(attr("inferenceprovenance", info.getInferenceprovenance()))
-			.append(
-				attr(
-					"provenanceaction",
-					info.getProvenanceaction() != null ? info.getProvenanceaction().getClassid() : ""))
-			.append(attr("trust", info.getTrust()));
 	}
 
 	public static String mapKeyValue(final String name, final KeyValue kv) {
@@ -156,4 +152,26 @@ public class XmlSerializationUtils {
 			.append(attr("schemename", q.getSchemename()))
 			.toString();
 	}
+
+	public static String asXmlElement(String name, List<Tuple2<String, String>> attributes) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<");
+		sb.append(name);
+		for (Tuple2<String, String> attr : attributes) {
+			sb.append(" ").append(attr(attr._1(), attr._2()));
+		}
+		sb.append("/>");
+		return sb.toString();
+	}
+
+	public static String mapEoscIf(EoscIfGuidelines e) {
+		return asXmlElement(
+			"eoscifguidelines", Lists
+				.newArrayList(
+					new Tuple2<>("code", e.getCode()),
+					new Tuple2<>("label", e.getLabel()),
+					new Tuple2<>("url", e.getUrl()),
+					new Tuple2<>("semanticrelation", e.getSemanticRelation())));
+	}
+
 }

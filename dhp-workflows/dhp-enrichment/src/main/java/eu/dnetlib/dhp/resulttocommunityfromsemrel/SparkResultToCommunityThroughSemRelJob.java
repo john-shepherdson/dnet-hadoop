@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.resulttocommunityfromorganization.ResultCommunityList;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
 
@@ -62,6 +63,7 @@ public class SparkResultToCommunityThroughSemRelJob {
 			.orElse(Boolean.TRUE);
 		log.info("saveGraph: {}", saveGraph);
 
+		@SuppressWarnings("unchecked")
 		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		runWithSparkHiveSession(
@@ -101,19 +103,19 @@ public class SparkResultToCommunityThroughSemRelJob {
 	}
 
 	private static <R extends Result> MapFunction<Tuple2<R, ResultCommunityList>, R> contextUpdaterFn() {
-		return (MapFunction<Tuple2<R, ResultCommunityList>, R>) value -> {
+		return value -> {
 			R ret = value._1();
 			Optional<ResultCommunityList> rcl = Optional.ofNullable(value._2());
 			if (rcl.isPresent()) {
-				Set<String> context_set = new HashSet<>();
-				ret.getContext().stream().forEach(c -> context_set.add(c.getId()));
+				Set<String> contexts = new HashSet<>();
+				ret.getContext().forEach(c -> contexts.add(c.getId()));
 				List<Context> contextList = rcl
 					.get()
 					.getCommunityList()
 					.stream()
 					.map(
 						c -> {
-							if (!context_set.contains(c)) {
+							if (!contexts.contains(c)) {
 								Context newContext = new Context();
 								newContext.setId(c);
 								newContext
@@ -123,14 +125,18 @@ public class SparkResultToCommunityThroughSemRelJob {
 												getDataInfo(
 													PROPAGATION_DATA_INFO_TYPE,
 													PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID,
-													PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME)));
+													PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME,
+													ModelConstants.DNET_PROVENANCE_ACTIONS)));
 								return newContext;
 							}
 							return null;
 						})
 					.filter(Objects::nonNull)
 					.collect(Collectors.toList());
-				Result r = new Result();
+
+				@SuppressWarnings("unchecked")
+				R r = (R) ret.getClass().newInstance();
+
 				r.setId(ret.getId());
 				r.setContext(contextList);
 				ret.mergeFrom(r);

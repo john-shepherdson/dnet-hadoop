@@ -19,8 +19,11 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.cloudera.org.codehaus.jackson.map.jsontype.impl.ClassNameIdResolver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.PropagationConstant;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 
 public class OrcidPropagationJobTest {
@@ -62,7 +65,7 @@ public class OrcidPropagationJobTest {
 	}
 
 	@Test
-	public void noUpdateTest() throws Exception {
+	void noUpdateTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/noupdate")
 			.getPath();
@@ -108,7 +111,7 @@ public class OrcidPropagationJobTest {
 	}
 
 	@Test
-	public void oneUpdateTest() throws Exception {
+	void oneUpdateTest() throws Exception {
 		SparkOrcidToResultFromSemRelJob
 			.main(
 				new String[] {
@@ -166,14 +169,16 @@ public class OrcidPropagationJobTest {
 				propagatedAuthors
 					.filter(
 						"id = '50|dedup_wf_001::95b033c0c3961f6a1cdcd41a99a9632e' "
-							+ "and name = 'Vajinder' and surname = 'Kumar' and pidType = 'ORCID'")
+							+ "and name = 'Vajinder' and surname = 'Kumar' and pidType = '" +
+
+							ModelConstants.ORCID_PENDING + "'")
 					.count());
 
 		Assertions.assertEquals(1, propagatedAuthors.filter("pid = '0000-0002-8825-3517'").count());
 	}
 
 	@Test
-	public void twoUpdatesTest() throws Exception {
+	void twoUpdatesTest() throws Exception {
 		SparkOrcidToResultFromSemRelJob
 			.main(
 				new String[] {

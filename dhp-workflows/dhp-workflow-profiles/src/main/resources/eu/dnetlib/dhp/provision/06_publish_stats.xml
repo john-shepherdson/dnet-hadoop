@@ -1,0 +1,87 @@
+<RESOURCE_PROFILE xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <HEADER>
+        <RESOURCE_IDENTIFIER value="546f8ba1-2ca2-4e29-86ea-c9489ab9b859_V29ya2Zsb3dEU1Jlc291cmNlcy9Xb3JrZmxvd0RTUmVzb3VyY2VUeXBl"/>
+        <RESOURCE_TYPE value="WorkflowDSResourceType"/>
+        <RESOURCE_KIND value="WorkflowDSResources"/>
+        <RESOURCE_URI value=""/>
+        <DATE_OF_CREATION value="2021-07-27T16:07:05+00:00"/>
+    </HEADER>
+    <BODY>
+        <WORKFLOW_NAME>Publish Stats [PROD]</WORKFLOW_NAME>
+        <WORKFLOW_TYPE>Content Publishing</WORKFLOW_TYPE>
+        <WORKFLOW_PRIORITY>35</WORKFLOW_PRIORITY>
+        <CONFIGURATION start="manual">
+            <NODE isStart="true" name="setStatsDbName" type="SetEnvParameter">
+                <DESCRIPTION>Set the STATS DB name</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">stats_db_name</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">openaire_prod_stats_yyyyMMdd</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="statsMonitorDbName" type="SetEnvParameter">
+                <DESCRIPTION>Set the STATS MONITOR DB name</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">monitor_db_name</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">openaire_prod_stats_monitor_yyyyMMdd</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isStart="true" name="statsObservatoryDbName" type="SetEnvParameter">
+                <DESCRIPTION>Set the STATS OBSERVATORY DB name</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">observatory_db_name</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">openaire_prod_stats_observatory_yyyyMMdd</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
+            <NODE isJoin="true" name="waitConfig">
+                <DESCRIPTION>wait configurations</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="publishStatsDB"/>
+                </ARCS>
+            </NODE>
+            <NODE name="publishStatsDB" type="SubmitHadoopJob">
+                <DESCRIPTION>publishes the stats DB to the public schema</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'stats_db_name' : 'stats_db_name',
+                        'monitor_db_name' : 'monitor_db_name',
+                        'observatory_db_name' : 'observatory_db_name'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/PROD/oa/graph/stats_promote/oozie_app',
+                        'hive_timeout' : '150000',
+                        'stats_tool_api_url' : 'https://services.openaire.eu/stats-tool',
+                        'stats_db_production_name' : 'openaire_prod_stats',
+                        'monitor_db_production_name' : 'openaire_prod_stats_monitor',
+                        'observatory_db_production_name' : 'openaire_prod_stats_observatory'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="success"/>
+                </ARCS>
+            </NODE>
+        </CONFIGURATION>
+        <STATUS>
+            <LAST_EXECUTION_ID>wf_20210727_160728_625</LAST_EXECUTION_ID>
+            <LAST_EXECUTION_DATE>2021-07-27T16:53:01+00:00</LAST_EXECUTION_DATE>
+            <LAST_EXECUTION_STATUS>SUCCESS</LAST_EXECUTION_STATUS>
+            <LAST_EXECUTION_ERROR/>
+        </STATUS>
+    </BODY>
+</RESOURCE_PROFILE>

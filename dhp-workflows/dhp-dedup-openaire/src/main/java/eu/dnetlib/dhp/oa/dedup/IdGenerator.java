@@ -15,13 +15,13 @@ public class IdGenerator implements Serializable {
 
 	// pick the best pid from the list (consider date and pidtype)
 	public static <T extends OafEntity> String generate(List<Identifier<T>> pids, String defaultID) {
-		if (pids == null || pids.size() == 0)
+		if (pids == null || pids.isEmpty())
 			return defaultID;
 
 		Identifier<T> bp = pids
 			.stream()
 			.min(Identifier::compareTo)
-			.get();
+			.orElseThrow(() -> new IllegalStateException("unable to generate id"));
 
 		String prefix = substringBefore(bp.getOriginalID(), "|");
 		String ns = substringBefore(substringAfter(bp.getOriginalID(), "|"), "::");
@@ -36,7 +36,14 @@ public class IdGenerator implements Serializable {
 	}
 
 	private static String dedupify(String ns) {
-		StringBuilder prefix = new StringBuilder(substringBefore(ns, "_")).append("_dedup");
+
+		StringBuilder prefix;
+		if (PidType.valueOf(substringBefore(ns, "_")) == PidType.openorgs) {
+			prefix = new StringBuilder(substringBefore(ns, "_"));
+		} else {
+			prefix = new StringBuilder(substringBefore(ns, "_")).append("_dedup");
+		}
+
 		while (prefix.length() < 12) {
 			prefix.append("_");
 		}

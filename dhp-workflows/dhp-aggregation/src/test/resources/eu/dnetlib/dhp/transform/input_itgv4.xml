@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<records>
+    <oai:record xmlns="http://namespace.openaire.eu/"
+                xmlns:dc="http://purl.org/dc/elements/1.1/"
+                xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+                xmlns:oaf="http://namespace.openaire.eu/oaf"
+                xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+                xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <oai:header>
+            <dri:objIdentifier>od______2294::0000955eab68583ba0e07e973dd48708</dri:objIdentifier>
+            <dri:recordIdentifier>oai:pub.uni-bielefeld.de:1997560</dri:recordIdentifier>
+            <dri:dateOfCollection>2021-02-23T13:14:00.839Z</dri:dateOfCollection>
+            <oaf:datasourceprefix>od______2294</oaf:datasourceprefix>
+            <identifier xmlns="http://www.openarchives.org/OAI/2.0/">oai:pub.uni-bielefeld.de:1997560</identifier>
+            <datestamp xmlns="http://www.openarchives.org/OAI/2.0/">2018-07-24T12:58:03Z</datestamp>
+            <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">journal_article</setSpec>
+            <setSpec xmlns="http://www.openarchives.org/OAI/2.0/">doc-type:article</setSpec>
+        </oai:header>
+        <metadata xmlns="http://www.openarchives.org/OAI/2.0/">
+            <resource xmlns="http://namespace.openaire.eu/schema/oaire/"
+                      xmlns:datacite="http://datacite.org/schema/kernel-4"
+                      xmlns:dcterms="http://purl.org/dc/terms/"
+                      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xsi:schemaLocation="http://namespace.openaire.eu/schema/oaire/ https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd">
+                <datacite:title xml:lang="ger">Die antiken Grundlagen der europäischen Expansion. Eine epochenübergreifende kulturhistorische Unterrichtseinheit</datacite:title>
+                <datacite:creators>
+                    <datacite:creator>
+                        <datacite:creatorName nameType="Personal">Schulz, Raimund</datacite:creatorName>
+                    </datacite:creator>
+                </datacite:creators>
+                <datacite:relatedIdentifiers>
+                    <datacite:relatedIdentifier relatedIdentifierType="URL" relationType="HasMetadata">https://pub.uni-bielefeld.de/record/1997560.json</datacite:relatedIdentifier>
+                </datacite:relatedIdentifiers>
+                <datacite:alternateIdentifiers>
+                    <datacite:alternateIdentifier alternateIdentifierType="ISSN">0016-9056</datacite:alternateIdentifier>
+                </datacite:alternateIdentifiers>
+                <dc:language>ger</dc:language>
+                <dc:publisher>Friedrich</dc:publisher>
+                <datacite:date dateType="Issued">2002</datacite:date>
+                <resourceType resourceTypeGeneral="literature" uri="http://purl.org/coar/resource_type/c_6501">journal article</resourceType>
+                <datacite:identifier identifierType="URL">https://pub.uni-bielefeld.de/record/1997560</datacite:identifier>
+                <datacite:rights rightsURI="http://purl.org/coar/access_right/c_14cb">metadata only access</datacite:rights>
+                <dc:source>Schulz R. Die antiken Grundlagen der europäischen Expansion. Eine epochenübergreifende kulturhistorische Unterrichtseinheit. <em>GWU</em>. 2002;53(5-/6):340-360.</dc:source>
+                <datacite:subjects/>
+                <licenseCondition uri="https://rightsstatements.org/page/InC/1.0/">In Copyright</licenseCondition>
+                <citationTitle>GWU</citationTitle>
+                <citationVolume>53</citationVolume>
+                <citationIssue>5-/6</citationIssue>
+            </resource>
+        </metadata>
+        <about xmlns="">
+            <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+                <originDescription altered="true" harvestDate="2021-02-23T13:14:00.839Z">
+                    <baseURL>http%3A%2F%2Fpub.uni-bielefeld.de%2Foai</baseURL>
+                    <identifier>oai:pub.uni-bielefeld.de:1997560</identifier>
+                    <datestamp>2018-07-24T12:58:03Z</datestamp>
+                    <metadataNamespace/>
+                </originDescription>
+            </provenance>
+            <oaf:datainfo>
+                <oaf:inferred>false</oaf:inferred>
+                <oaf:deletedbyinference>false</oaf:deletedbyinference>
+                <oaf:trust>0.9</oaf:trust>
+                <oaf:inferenceprovenance/>
+                <oaf:provenanceaction classid="sysimport:crosswalk:datasetarchive"
+                                      classname="sysimport:crosswalk:datasetarchive"
+                                      schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+            </oaf:datainfo>
+        </about>
+    </oai:record>
+</records>

@@ -19,20 +19,12 @@ public class Provider implements Serializable {
 
 	private SelectionConstraints selectionConstraints;
 
-	public SelectionConstraints getSelCriteria() {
-		return selectionConstraints;
-	}
-
 	public SelectionConstraints getSelectionConstraints() {
 		return selectionConstraints;
 	}
 
 	public void setSelectionConstraints(SelectionConstraints selectionConstraints) {
 		this.selectionConstraints = selectionConstraints;
-	}
-
-	public void setSelCriteria(SelectionConstraints selCriteria) {
-		this.selectionConstraints = selCriteria;
 	}
 
 	public String getOpenaireId() {

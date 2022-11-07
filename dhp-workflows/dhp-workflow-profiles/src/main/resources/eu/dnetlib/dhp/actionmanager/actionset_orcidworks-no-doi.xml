@@ -1,0 +1,101 @@
+<RESOURCE_PROFILE>
+    <HEADER>
+        <RESOURCE_IDENTIFIER value="7c8765af-1253-4bd7-8806-315b73bf7319_V29ya2Zsb3dEU1Jlc291cmNlcy9Xb3JrZmxvd0RTUmVzb3VyY2VUeXBl"/>
+        <RESOURCE_TYPE value="WorkflowDSResourceType"/>
+        <RESOURCE_KIND value="WorkflowDSResources"/>
+        <RESOURCE_URI value=""/>
+        <DATE_OF_CREATION value="2021-07-15T16:06:50+00:00"/>
+    </HEADER>
+    <BODY>
+        <WORKFLOW_NAME>Import Orcid</WORKFLOW_NAME>
+        <WORKFLOW_TYPE>Import InfoSpace</WORKFLOW_TYPE>
+        <WORKFLOW_PRIORITY>30</WORKFLOW_PRIORITY>
+        <CONFIGURATION start="manual">
+            <NODE isStart="true" name="setInputPath" type="SetEnvParameter">
+                <DESCRIPTION>set the hdfs input path</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">inputPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/data/orcid_activities_2020</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="setProcessOutputPath"/>
+                </ARCS>
+            </NODE>
+            <NODE name="setProcessOutputPath" type="SetEnvParameter">
+                <DESCRIPTION>set the temporary path where to store the action set</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">processOutputPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/working_path_orcid_activities</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="prepareActionSets"/>
+                </ARCS>
+            </NODE>
+            <NODE name="prepareActionSets" type="PrepareActionSets">
+                <DESCRIPTION>prepare action sets</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="sets" required="true" type="string">
+                        [
+                        {
+                        'set' : 'orcidworks-no-doi',
+                        'jobProperty' : 'export_action_set_orcidworks_no_doi',
+                        'enablingProperty' : 'active_orcidworks_no_doi',
+                        'enabled' : 'true'
+                        }
+                        ]
+                    </PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="extractOutputPath"/>
+                </ARCS>
+            </NODE>
+            <NODE name="extractOutputPath" type="ExtractOutputPath">
+                <DESCRIPTION>extract the hdfs output path generated in the previous node</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hdfsOutputPathParam" required="true" type="string">outputPath</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="orcidNoDoiUpdate"/>
+                </ARCS>
+            </NODE>
+            <NODE name="orcidNoDoiUpdate" type="SubmitHadoopJob">
+                <DESCRIPTION>prepare updates for the Orcid No Doi</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'workingPath' : 'inputPath',
+                        'processOutputPath' : 'processOutputPath',
+                        'outputPath': 'outputPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/PROD/actionmanager/orcidnodoi_actionset/oozie_app',
+                        'spark2GenNoDoiDatasetMaxExecutors' : '200',
+                        'spark2GenNoDoiDatasetExecutorMemory' : '2G'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="updateActionSets"/>
+                </ARCS>
+            </NODE>
+            <NODE name="updateActionSets" type="UpdateActionSets">
+                <DESCRIPTION>update action sets</DESCRIPTION>
+                <PARAMETERS/>
+                <ARCS>
+                    <ARC to="success"/>
+                </ARCS>
+            </NODE>
+        </CONFIGURATION>
+        <STATUS>
+            <LAST_EXECUTION_ID>wf_20210713_170819_470</LAST_EXECUTION_ID>
+            <LAST_EXECUTION_DATE>2021-07-13T17:28:26+00:00</LAST_EXECUTION_DATE>
+            <LAST_EXECUTION_STATUS>SUCCESS</LAST_EXECUTION_STATUS>
+            <LAST_EXECUTION_ERROR/>
+        </STATUS>
+    </BODY>
+</RESOURCE_PROFILE>

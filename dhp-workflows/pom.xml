@@ -6,14 +6,21 @@
     <parent>
         <groupId>eu.dnetlib.dhp</groupId>
         <artifactId>dhp</artifactId>
-        <version>1.2.4-SNAPSHOT</version>
-        <relativePath>../</relativePath>
+        <version>1.2.5-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>dhp-workflows</artifactId>
     <packaging>pom</packaging>
 
     <description>This module is the container for the oozie workflow definitions in dnet-hadoop project</description>
+
+    <distributionManagement>
+        <site>
+            <id>DHPSite</id>
+            <url>${dhp.site.stage.path}/dhp-workflows</url>
+        </site>
+    </distributionManagement>
 
     <modules>
         <module>dhp-workflow-profiles</module>
@@ -24,10 +31,11 @@
         <module>dhp-dedup-openaire</module>
         <module>dhp-enrichment</module>
         <module>dhp-graph-provision</module>
-        <module>dhp-dedup-scholexplorer</module>
-        <module>dhp-graph-provision-scholexplorer</module>
         <module>dhp-blacklist</module>
         <module>dhp-stats-update</module>
+        <module>dhp-stats-promote</module>
+        <module>dhp-usage-stats-build</module>
+        <module>dhp-usage-raw-data-update</module>
         <module>dhp-broker-events</module>
         <module>dhp-doiboost</module>
     </modules>
@@ -36,7 +44,7 @@
         <pluginRepository>
             <id>iis-releases</id>
             <name>iis releases plugin repository</name>
-            <url>http://maven.ceon.pl/artifactory/iis-releases</url>
+            <url>https://maven.ceon.pl/artifactory/iis-releases</url>
             <layout>default</layout>
         </pluginRepository>
     </pluginRepositories>

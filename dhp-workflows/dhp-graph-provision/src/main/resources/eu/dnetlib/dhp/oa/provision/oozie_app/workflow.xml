@@ -26,10 +26,6 @@
             <description>maximum number of relations allowed for a each entity grouping by target</description>
         </property>
         <property>
-            <name>otherDsTypeId</name>
-            <description>mapping used to populate datasourceTypeUi field</description>
-        </property>
-        <property>
             <name>format</name>
             <description>metadata format name (DMF|TMF)</description>
         </property>
@@ -42,6 +38,7 @@
             <value>*:*</value>
             <description>query used in the deleted by query operation</description>
         </property>
+
         <property>
             <name>sparkDriverMemoryForJoining</name>
             <description>memory for driver process</description>
@@ -581,7 +578,6 @@
             <arg>--inputPath</arg><arg>${workingDir}/join_entities</arg>
             <arg>--outputPath</arg><arg>${workingDir}/xml</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--otherDsTypeId</arg><arg>${otherDsTypeId}</arg>
         </spark>
         <ok to="should_index"/>
         <error to="Kill"/>
@@ -638,6 +634,8 @@
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--format</arg><arg>${format}</arg>
             <arg>--batchSize</arg><arg>${batchSize}</arg>
+            <arg>--outputFormat</arg><arg>${outputFormat}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/solr_documents</arg>
         </spark>
         <ok to="commit_solr_collection"/>
         <error to="Kill"/>

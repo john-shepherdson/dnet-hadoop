@@ -46,6 +46,7 @@
         <oaf:collectedFrom id="openaire____::crossref" name="Crossref"/>
         <oaf:identifier identifierType="doi">10.1080/23744235.2020.1774644</oaf:identifier>
         <oaf:journal eissn="2374-4243" ep="3" iss="" issn="2374-4235" sp="1" vol="">Infectious Diseases</oaf:journal>
+        <oaf:projectid validationDate="2020-12-07T11:15:59.627Z">corda__h2020::814530</oaf:projectid>
     </metadata>
     <about xmlns:oai="http://www.openarchives.org/OAI/2.0/">
         <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">

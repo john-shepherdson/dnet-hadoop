@@ -12,6 +12,9 @@ public class SubscriptionUtils {
 
 	private static final long ONE_DAY = 86_400_000;
 
+	private SubscriptionUtils() {
+	}
+
 	public static boolean verifyListSimilar(final List<String> list, final String value) {
 		return list.stream().anyMatch(s -> verifySimilar(s, value));
 	}

@@ -2,36 +2,35 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.text.Normalizer;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkContext;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.xml.sax.SAXException;
 
 import com.google.common.collect.Sets;
-import com.wcohen.ss.JaroWinkler;
 
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.clustering.BlacklistAwareClusteringCombiner;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.model.MapDocument;
-import eu.dnetlib.pace.model.Person;
-import scala.Tuple2;
 
 public class DedupUtility {
+
+	public static final String OPENORGS_ID_PREFIX = "openorgs____";
+	public static final String CORDA_ID_PREFIX = "corda";
+
+	private DedupUtility() {
+	}
 
 	public static Map<String, LongAccumulator> constructAccumulator(
 		final DedupConfig dedupConf, final SparkContext context) {
@@ -84,6 +83,11 @@ public class DedupUtility {
 		return String.format("%s/%s/%s_simrel", basePath, actionSetId, entityType);
 	}
 
+	public static String createOpenorgsMergeRelsPath(
+		final String basePath, final String actionSetId, final String entityType) {
+		return String.format("%s/%s/%s_openorgs_mergerels", basePath, actionSetId, entityType);
+	}
+
 	public static String createMergeRelPath(
 		final String basePath, final String actionSetId, final String entityType) {
 		return String.format("%s/%s/%s_mergerel", basePath, actionSetId, entityType);
@@ -95,14 +99,16 @@ public class DedupUtility {
 	}
 
 	public static List<DedupConfig> getConfigurations(String isLookUpUrl, String orchestrator)
-		throws ISLookUpException, DocumentException {
+		throws ISLookUpException, DocumentException, SAXException {
 		final ISLookUpService isLookUpService = ISLookupClientFactory.getLookUpService(isLookUpUrl);
 
 		final String xquery = String.format("/RESOURCE_PROFILE[.//DEDUPLICATION/ACTION_SET/@id = '%s']", orchestrator);
 
 		String orchestratorProfile = isLookUpService.getResourceProfileByQuery(xquery);
 
-		final Document doc = new SAXReader().read(new StringReader(orchestratorProfile));
+		final SAXReader reader = new SAXReader();
+		reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		final Document doc = reader.read(new StringReader(orchestratorProfile));
 
 		final String actionSetId = doc.valueOf("//DEDUPLICATION/ACTION_SET/@id");
 		final List<DedupConfig> configurations = new ArrayList<>();
@@ -129,4 +135,45 @@ public class DedupUtility {
 		dedupConfig.getWf().setConfigurationId(actionSetId);
 		return dedupConfig;
 	}
+
+	public static int compareOpenOrgIds(String o1, String o2) {
+		if (o1.contains(OPENORGS_ID_PREFIX) && o2.contains(OPENORGS_ID_PREFIX))
+			return o1.compareTo(o2);
+		if (o1.contains(CORDA_ID_PREFIX) && o2.contains(CORDA_ID_PREFIX))
+			return o1.compareTo(o2);
+
+		if (o1.contains(OPENORGS_ID_PREFIX))
+			return -1;
+		if (o2.contains(OPENORGS_ID_PREFIX))
+			return 1;
+
+		if (o1.contains(CORDA_ID_PREFIX))
+			return -1;
+		if (o2.contains(CORDA_ID_PREFIX))
+			return 1;
+
+		return o1.compareTo(o2);
+	}
+
+	public static Relation createSimRel(String source, String target, String entity) {
+		final Relation r = new Relation();
+		r.setSource(source);
+		r.setTarget(target);
+		r.setSubRelType("dedupSimilarity");
+		r.setRelClass(ModelConstants.IS_SIMILAR_TO);
+		r.setDataInfo(new DataInfo());
+
+		switch (entity) {
+			case "result":
+				r.setRelType(ModelConstants.RESULT_RESULT);
+				break;
+			case "organization":
+				r.setRelType(ModelConstants.ORG_ORG_RELTYPE);
+				break;
+			default:
+				throw new IllegalArgumentException("unmanaged entity type: " + entity);
+		}
+		return r;
+	}
+
 }

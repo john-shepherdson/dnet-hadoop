@@ -18,16 +18,20 @@ import eu.dnetlib.dhp.schema.oaf.Field;
 
 public class DatePicker {
 
-	public static final String DATE_PATTERN = "\\d{4}-\\d{2}-\\d{2}";
+	public static final String DATE_PATTERN = "^(\\d{4})-(\\d{2})-(\\d{2})";
 	private static final String DATE_DEFAULT_SUFFIX = "01-01";
 	private static final int YEAR_LB = 1300;
 	private static final int YEAR_UB = Year.now().getValue() + 5;
+
+	private DatePicker() {
+	}
 
 	public static Field<String> pick(final Collection<String> dateofacceptance) {
 
 		final Map<String, Integer> frequencies = dateofacceptance
 			.parallelStream()
 			.filter(StringUtils::isNotBlank)
+			.map(d -> substringBefore(d, "T"))
 			.collect(Collectors.toConcurrentMap(w -> w, w -> 1, Integer::sum));
 
 		if (frequencies.isEmpty()) {
@@ -60,7 +64,7 @@ public class DatePicker {
 				.entrySet()
 				.stream()
 				.filter(e -> e.getValue() >= acceptThreshold)
-				.map(e -> e.getKey())
+				.map(Map.Entry::getKey)
 				.collect(Collectors.toList());
 
 			// cannot find strong majority

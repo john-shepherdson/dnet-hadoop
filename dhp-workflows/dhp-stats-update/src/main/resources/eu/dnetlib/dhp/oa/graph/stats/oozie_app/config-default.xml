@@ -21,10 +21,14 @@
     </property>
     <property>
         <name>hive_jdbc_url</name>
-        <value>jdbc:hive2://iis-cdh5-test-m3.ocean.icm.edu.pl:10000</value>
+        <value>jdbc:hive2://iis-cdh5-test-m3.ocean.icm.edu.pl:10000/;UseNativeQuery=1;?spark.executor.memory=19166291558;spark.yarn.executor.memoryOverhead=3225;spark.driver.memory=11596411699;spark.yarn.driver.memoryOverhead=1228</value>
     </property>
 	<property>
 		<name>oozie.wf.workflow.notification.url</name>
 		<value>{serviceUrl}/v1/oozieNotification/jobUpdate?jobId=$jobId%26status=$status</value>
 	</property>
+    <property>
+        <name>stats_tool_api_url</name>
+        <value>${stats_tool_api_url}</value>
+    </property>
 </configuration>

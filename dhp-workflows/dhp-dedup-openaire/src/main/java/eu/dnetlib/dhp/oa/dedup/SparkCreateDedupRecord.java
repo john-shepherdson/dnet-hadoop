@@ -1,6 +1,9 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PROVENANCE_ACTIONS;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVENANCE_DEDUP;
+
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
@@ -10,6 +13,7 @@ import org.apache.spark.sql.SparkSession;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.EntityType;
@@ -27,8 +31,6 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
 	private static final Logger log = LoggerFactory.getLogger(SparkCreateDedupRecord.class);
 
 	public static final String ROOT_TRUST = "0.8";
-	public static final String PROVENANCE_ACTION_CLASS = "sysimport:dedup";
-	public static final String PROVENANCE_ACTIONS = "dnet:provenanceActions";
 
 	public SparkCreateDedupRecord(ArgumentApplicationParser parser, SparkSession spark) {
 		super(parser, spark);
@@ -53,7 +55,7 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
 
 	@Override
 	public void run(ISLookUpService isLookUpService)
-		throws ISLookUpException, DocumentException, IOException {
+		throws ISLookUpException, DocumentException, IOException, SAXException {
 
 		final String graphBasePath = parser.get("graphBasePath");
 		final String isLookUpUrl = parser.get("isLookUpUrl");
@@ -94,10 +96,10 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
 		info.setTrust(ROOT_TRUST);
 		info.setInferenceprovenance(dedupConf.getWf().getConfigurationId());
 		Qualifier provenance = new Qualifier();
-		provenance.setClassid(PROVENANCE_ACTION_CLASS);
-		provenance.setClassname(PROVENANCE_ACTION_CLASS);
-		provenance.setSchemeid(PROVENANCE_ACTIONS);
-		provenance.setSchemename(PROVENANCE_ACTIONS);
+		provenance.setClassid(PROVENANCE_DEDUP);
+		provenance.setClassname(PROVENANCE_DEDUP);
+		provenance.setSchemeid(DNET_PROVENANCE_ACTIONS);
+		provenance.setSchemename(DNET_PROVENANCE_ACTIONS);
 		info.setProvenanceaction(provenance);
 		return info;
 	}

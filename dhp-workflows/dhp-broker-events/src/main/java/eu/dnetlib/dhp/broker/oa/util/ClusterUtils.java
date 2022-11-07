@@ -17,10 +17,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class ClusterUtils {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+	private ClusterUtils() {
+	}
 
 	public static void createDirIfMissing(final SparkSession spark, final String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
@@ -28,6 +33,16 @@ public class ClusterUtils {
 
 	public static void removeDir(final SparkSession spark, final String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
+	}
+
+	public static Dataset<Relation> loadRelations(final String graphPath, final SparkSession spark) {
+		return ClusterUtils
+			.readPath(spark, graphPath + "/relation", Relation.class)
+			.map((MapFunction<Relation, Relation>) r -> {
+				r.setSource(ConversionUtils.cleanOpenaireId(r.getSource()));
+				r.setTarget(ConversionUtils.cleanOpenaireId(r.getTarget()));
+				return r;
+			}, Encoders.bean(Relation.class));
 	}
 
 	public static <R> Dataset<R> readPath(
@@ -41,15 +56,15 @@ public class ClusterUtils {
 	}
 
 	public static boolean isDedupRoot(final String id) {
-		return id.contains("dedup_wf_");
+		return id.contains("dedup");
 	}
 
 	public static final boolean isValidResultResultClass(final String s) {
-		return s.equals("isReferencedBy")
-			|| s.equals("isRelatedTo")
-			|| s.equals("references")
-			|| s.equals("isSupplementedBy")
-			|| s.equals("isSupplementedTo");
+		return s.equals(ModelConstants.IS_REFERENCED_BY)
+			|| s.equals(ModelConstants.IS_RELATED_TO)
+			|| s.equals(ModelConstants.REFERENCES)
+			|| s.equals(ModelConstants.IS_SUPPLEMENTED_BY)
+			|| s.equals(ModelConstants.IS_SUPPLEMENT_TO);
 	}
 
 	public static <T> T incrementAccumulator(final T o, final LongAccumulator acc) {
@@ -64,9 +79,10 @@ public class ClusterUtils {
 		final Class<T> clazz,
 		final LongAccumulator acc) {
 		dataset
-			.map(o -> ClusterUtils.incrementAccumulator(o, acc), Encoders.bean(clazz))
+			.map((MapFunction<T, T>) o -> ClusterUtils.incrementAccumulator(o, acc), Encoders.bean(clazz))
 			.write()
 			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
 			.json(path);
 	}
 

@@ -1,0 +1,27 @@
+<RESOURCE_PROFILE>
+    <HEADER>
+        <RESOURCE_IDENTIFIER value="19e7fb88-8c85-4eb4-9644-de6bba5534ef_RGVkdXBPcmNoZXN0cmF0aW9uRFNSZXNvdXJjZXMvRGVkdXBPcmNoZXN0cmF0aW9uRFNSZXNvdXJjZVR5cGU="/>
+        <RESOURCE_TYPE value="DedupOrchestrationDSResourceType"/>
+        <RESOURCE_KIND value="DedupOrchestrationDSResources"/>
+        <RESOURCE_URI value=""/>
+        <DATE_OF_CREATION value="2020-04-25T08:15:01+00:00"/>
+    </HEADER>
+    <BODY>
+        <CONFIGURATION enabled="true">
+            <DEDUPLICATION>
+                <ENTITY code="20" label="Dedup decisiontree" name="Dedup decisiontree"/>
+                <ACTION_SET id="dedup-similarity-result-decisiontree-v2"/>
+                <SCAN_SEQUENCE>
+                    <SCAN id="fabcfb5d-f01d-4e98-ba18-4b36c27f49e8_RGVkdXBDb25maWd1cmF0aW9uRFNSZXNvdXJjZXMvRGVkdXBDb25maWd1cmF0aW9uRFNSZXNvdXJjZVR5cGU="/>
+                    <SCAN id="845d98da-eeb4-4d32-823c-1d79d30981f6_RGVkdXBDb25maWd1cmF0aW9uRFNSZXNvdXJjZXMvRGVkdXBDb25maWd1cmF0aW9uRFNSZXNvdXJjZVR5cGU="/>
+                    <SCAN id="87f57680-b136-4dcc-9260-6a82355efb01_RGVkdXBDb25maWd1cmF0aW9uRFNSZXNvdXJjZXMvRGVkdXBDb25maWd1cmF0aW9uRFNSZXNvdXJjZVR5cGU="/>
+                    <SCAN id="923fe17a-c697-41f2-beb5-f2d72c17334c_RGVkdXBDb25maWd1cmF0aW9uRFNSZXNvdXJjZXMvRGVkdXBDb25maWd1cmF0aW9uRFNSZXNvdXJjZVR5cGU="/>
+                </SCAN_SEQUENCE>
+            </DEDUPLICATION>
+        </CONFIGURATION>
+        <STATUS>
+            <LAST_UPDATE value="2001-12-31T12:00:00"/>
+        </STATUS>
+        <SECURITY_PARAMETERS>SECURITY_PARAMETERS</SECURITY_PARAMETERS>
+    </BODY>
+</RESOURCE_PROFILE>

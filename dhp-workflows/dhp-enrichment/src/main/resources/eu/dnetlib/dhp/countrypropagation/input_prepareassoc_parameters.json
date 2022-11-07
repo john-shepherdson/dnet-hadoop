@@ -6,12 +6,6 @@
     "paramRequired": true
   },
   {
-    "paramName":"h",
-    "paramLongName":"hive_metastore_uris",
-    "paramDescription": "the hive metastore uris",
-    "paramRequired": true
-  },
-  {
     "paramName": "out",
     "paramLongName": "outputPath",
     "paramDescription": "the path used to store temporary output files",

@@ -4,6 +4,12 @@ package eu.dnetlib.dhp.resulttoorganizationfrominstrepo;
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
@@ -16,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.KeyValueSet;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
@@ -51,6 +58,11 @@ public class PrepareResultInstRepoAssociation {
 		final String alreadyLinkedPath = parser.get("alreadyLinkedPath");
 		log.info("alreadyLinkedPath {}: ", alreadyLinkedPath);
 
+		List<String> blacklist = Optional
+			.ofNullable(parser.get("blacklist"))
+			.map(v -> Arrays.asList(v.split(";")))
+			.orElse(new ArrayList<>());
+
 		SparkConf conf = new SparkConf();
 		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
@@ -61,7 +73,7 @@ public class PrepareResultInstRepoAssociation {
 				readNeededResources(spark, inputPath);
 
 				removeOutputDir(spark, datasourceOrganizationPath);
-				prepareDatasourceOrganization(spark, datasourceOrganizationPath);
+				prepareDatasourceOrganization(spark, datasourceOrganizationPath, blacklist);
 
 				removeOutputDir(spark, alreadyLinkedPath);
 				prepareAlreadyLinkedAssociation(spark, alreadyLinkedPath);
@@ -80,7 +92,12 @@ public class PrepareResultInstRepoAssociation {
 	}
 
 	private static void prepareDatasourceOrganization(
-		SparkSession spark, String datasourceOrganizationPath) {
+		SparkSession spark, String datasourceOrganizationPath, List<String> blacklist) {
+
+		final String blacklisted = blacklist
+			.stream()
+			.map(s -> " AND id != '" + s + "'")
+			.collect(Collectors.joining());
 
 		String query = "SELECT source datasourceId, target organizationId "
 			+ "FROM ( SELECT id "
@@ -88,7 +105,7 @@ public class PrepareResultInstRepoAssociation {
 			+ "WHERE datasourcetype.classid = '"
 			+ INSTITUTIONAL_REPO_TYPE
 			+ "' "
-			+ "AND datainfo.deletedbyinference = false  ) d "
+			+ "AND datainfo.deletedbyinference = false  " + blacklisted + " ) d "
 			+ "JOIN ( SELECT source, target "
 			+ "FROM relation "
 			+ "WHERE lower(relclass) = '"
@@ -108,7 +125,7 @@ public class PrepareResultInstRepoAssociation {
 
 	private static void prepareAlreadyLinkedAssociation(
 		SparkSession spark, String alreadyLinkedPath) {
-		String query = "Select source resultId, collect_set(target) organizationSet "
+		String query = "Select source key, collect_set(target) valueSet "
 			+ "from relation "
 			+ "where datainfo.deletedbyinference = false "
 			+ "and lower(relClass) = '"
@@ -118,7 +135,7 @@ public class PrepareResultInstRepoAssociation {
 
 		spark
 			.sql(query)
-			.as(Encoders.bean(ResultOrganizationSet.class))
+			.as(Encoders.bean(KeyValueSet.class))
 			// TODO retry to stick with datasets
 			.toJavaRDD()
 			.map(r -> OBJECT_MAPPER.writeValueAsString(r))

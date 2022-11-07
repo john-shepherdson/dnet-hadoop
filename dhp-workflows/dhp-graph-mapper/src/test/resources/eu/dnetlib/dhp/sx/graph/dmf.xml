@@ -1,51 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <oai:record xmlns:oai="http://www.openarchives.org/OAI/2.0/"
-			xmlns:oaf="http://namespace.openaire.eu/oaf"
-			xmlns:dri="http://www.driver-repository.eu/namespace/dri"
-			xmlns:dc="http://purl.org/dc/elements/1.1/">
-	<oai:header>
-		<dri:repositoryId>aaadf8b3-01a8-4cc2-9964-63cfb19df3b4_UmVwb3NpdG9yeVNlcnZpY2VSZXNvdXJjZXMvUmVwb3NpdG9yeVNlcnZpY2VSZXNvdXJjZVR5cGU=</dri:repositoryId>
-		<dri:recordIdentifier>oai:pangaea.de:doi:10.1594/PANGAEA.432865</dri:recordIdentifier>
-		<dri:datasourceprefix>r3d100010134</dri:datasourceprefix>
-		<dri:objIdentifier>r3d100010134::00002f60593fd1f758fb838fafb46795</dri:objIdentifier>
-		<dri:dateOfCollection>2020-02-18T03:05:02.534Z</dri:dateOfCollection>
-		<oaf:datasourceprefix/>
-		<identifier>oai:pangaea.de:doi:10.1594/PANGAEA.432865</identifier>
-		<setSpec>citable topicOceans</setSpec>
+			xmlns="http://namespace.openaire.eu/">
+	<oai:header xmlns="">
+		<dri:objIdentifier xmlns:dri="http://www.driver-repository.eu/namespace/dri">r3d100010464::0002882a9d38c4f4612e7666ad768ccd</dri:objIdentifier>
+		<dri:recordIdentifier xmlns:dri="http://www.driver-repository.eu/namespace/dri">https://research.jcu.edu.au/researchdata/published/detail/9079e05370d830eb8d416c77c0b761ce::url</dri:recordIdentifier>
+		<dri:dateOfCollection xmlns:dri="http://www.driver-repository.eu/namespace/dri">2020-11-02T16:14:07.831Z</dri:dateOfCollection>
+		<dri:repositoryId xmlns:dri="http://www.driver-repository.eu/namespace/dri">ands_UmVwb3NpdG9yeVNlcnZpY2VSZXNvdXJjZXMvUmVwb3NpdG9yeVNlcnZpY2VSZXNvdXJjZVR5cGU=</dri:repositoryId>
+		<dri:datasourceprefix xmlns:dri="http://www.driver-repository.eu/namespace/dri">r3d100010464</dri:datasourceprefix>
 	</oai:header>
-	<oai:metadata>
-		<resource xmlns="http://datacite.org/schema/kernel-3">
-			<identifier identifierType="doi">10.1594/pangaea.432865</identifier>
-			<titles xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-				<title>Daily sea level from coastal tide gauge station Woods_Hole in 1978 (Research quality database)</title>
+	<metadata xmlns="">
+		<resource xmlns="http://datacite.org/schema/kernel-3"
+				  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				  xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
+			<identifier xmlns="" identifierType="url">https://research.jcu.edu.au/researchdata/published/detail/9079e05370d830eb8d416c77c0b761ce</identifier>
+			<titles xmlns="">
+				<title>Vertebrate monitoring in the Australian Wet Tropics rainforest at CU6A1 (145.30367623, -16.57767628, 600.0m above MSL) collected by Reptile Surveys</title>
 			</titles>
-			<publisher xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">PANGAEA - Data Publisher for Earth &amp; Environmental Science</publisher>
-			<publicationYear xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">2006</publicationYear>
-			<dates xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-				<date dateType="Collected">1978-01-01T12:00:00/1978-12-31T12:00:00</date>
+			<publisher xmlns="">James Cook University</publisher>
+			<dates xmlns="">
+				<date dateType="Collected">2013-05-07</date>
 			</dates>
-			<creators xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-				<creator>
-					<creatorName>WOCE Sea Level, WSL</creatorName>
-				</creator>
-			</creators>
-			<subjects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-				<subject subjectScheme="Parameter">DATE/TIME</subject>
-				<subject subjectScheme="Parameter">Sea level</subject>
-				<subject subjectScheme="Method">Tide gauge station</subject>
-				<subject subjectScheme="Campaign">SeaLevel</subject>
-				<subject subjectScheme="Project">World Ocean Circulation Experiment (WOCE)</subject>
-			</subjects>
-			<resourceType resourceTypeGeneral="Dataset"/>
-			<relatedIdentifiers>
-				<relatedIdentifier relatedIdentifierType="URL" relationType="isDocumentedBy"
-								   inverseRelationType="documents">http://store.pangaea.de/Projects/WOCE/SeaLevel_rqds/Woods_Hole.txt</relatedIdentifier>
+			<creators xmlns=""/>
+			<resourceType xmlns="" resourceTypeGeneral="Dataset">Dataset</resourceType>
+			<relatedIdentifiers xmlns="">
+				<relatedIdentifier entityType="publication" inverseRelationType="related"
+								   relatedIdentifierType="dnet"
+								   relationType="IsRelatedTo">r3d100010464::57793c5aa995172db237d9da17353f8b</relatedIdentifier>
 			</relatedIdentifiers>
 		</resource>
-	</oai:metadata>
-	<oaf:about>
+	</metadata>
+	<oaf:about xmlns:oaf="http://namespace.dnet.eu/oaf" xmlns="">
 		<oaf:datainfo>
-			<oaf:collectedFrom completionStatus="complete" id="dli_________::r3d100010134" name="Pangaea"/>
+			<oaf:collectedFrom completionStatus="complete" id="dli_________::r3d100010464"
+							   name="Australian National Data Service"/>
 			<oaf:completionStatus>complete</oaf:completionStatus>
 			<oaf:provisionMode>collected</oaf:provisionMode>
 		</oaf:datainfo>

@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.utils.CSVProgramme;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProgramme;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import scala.Tuple2;
@@ -143,24 +143,8 @@ public class PrepareProgramme {
 
 		JavaRDD<CSVProgramme> h2020Programmes = programme
 			.toJavaRDD()
-			.filter(p -> p.getFrameworkProgramme().trim().equalsIgnoreCase("H2020"))
 			.mapToPair(csvProgramme -> new Tuple2<>(csvProgramme.getCode(), csvProgramme))
-			.reduceByKey((a, b) -> {
-				if (!a.getLanguage().equals("en")) {
-					if (b.getLanguage().equalsIgnoreCase("en")) {
-						a.setTitle(b.getTitle());
-						a.setLanguage(b.getLanguage());
-					}
-				}
-				if (StringUtils.isEmpty(a.getShortTitle())) {
-					if (!StringUtils.isEmpty(b.getShortTitle())) {
-						a.setShortTitle(b.getShortTitle());
-					}
-				}
-
-				return a;
-
-			})
+			.reduceByKey(PrepareProgramme::groupProgrammeByCode)
 			.map(p -> {
 				CSVProgramme csvProgramme = p._2();
 				String programmeTitle = csvProgramme.getTitle().trim();
@@ -177,25 +161,33 @@ public class PrepareProgramme {
 				return csvProgramme;
 			});
 
-		// prepareClassification(h2020Programmes);
-
-		JavaSparkContext jsc = new JavaSparkContext(spark.sparkContext());
+		final JavaSparkContext jsc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<CSVProgramme> rdd = jsc.parallelize(prepareClassification(h2020Programmes), 1);
 		rdd
-			.map(csvProgramme -> {
-				String tmp = OBJECT_MAPPER.writeValueAsString(csvProgramme);
-				return tmp;
-			})
+			.map(OBJECT_MAPPER::writeValueAsString)
 			.saveAsTextFile(outputPath);
 
 	}
 
+	private static CSVProgramme groupProgrammeByCode(CSVProgramme a, CSVProgramme b) {
+		if (!a.getLanguage().equals("en") && b.getLanguage().equalsIgnoreCase("en")) {
+			a.setTitle(b.getTitle());
+			a.setLanguage(b.getLanguage());
+		}
+		if (StringUtils.isEmpty(a.getShortTitle()) && !StringUtils.isEmpty(b.getShortTitle())) {
+			a.setShortTitle(b.getShortTitle());
+		}
+
+		return a;
+	}
+
+	@SuppressWarnings("unchecked")
 	private static List<CSVProgramme> prepareClassification(JavaRDD<CSVProgramme> h2020Programmes) {
 		Object[] codedescription = h2020Programmes
 			.map(
 				value -> new Tuple2<>(value.getCode(),
-					new Tuple2<String, String>(value.getTitle(), value.getShortTitle())))
+					new Tuple2<>(value.getTitle(), value.getShortTitle())))
 			.collect()
 			.toArray();
 
@@ -221,7 +213,7 @@ public class PrepareProgramme {
 			String[] tmp = ent.split("\\.");
 			if (tmp.length <= 2) {
 				if (StringUtils.isEmpty(entry._2()._2())) {
-					map.put(entry._1(), new Tuple2<String, String>(entry._2()._1(), entry._2()._1()));
+					map.put(entry._1(), new Tuple2<>(entry._2()._1(), entry._2()._1()));
 				} else {
 					map.put(entry._1(), entry._2());
 				}
@@ -241,15 +233,15 @@ public class PrepareProgramme {
 				if (!ent.contains("Euratom")) {
 
 					String parent;
-					String tmp_key = tmp[0] + ".";
+					String tmpKey = tmp[0] + ".";
 					for (int i = 1; i < tmp.length - 1; i++) {
-						tmp_key += tmp[i] + ".";
-						parent = map.get(tmp_key)._1().toLowerCase().trim();
+						tmpKey += tmp[i] + ".";
+						parent = map.get(tmpKey)._1().toLowerCase().trim();
 						if (parent.contains("|")) {
 							parent = parent.substring(parent.lastIndexOf("|") + 1).trim();
 						}
 						if (current.trim().length() > parent.length()
-							&& current.toLowerCase().trim().substring(0, parent.length()).equals(parent)) {
+							&& current.toLowerCase().trim().startsWith(parent)) {
 							current = current.substring(parent.length() + 1);
 							if (current.trim().charAt(0) == '-' || current.trim().charAt(0) == '–') {
 								current = current.trim().substring(1).trim();

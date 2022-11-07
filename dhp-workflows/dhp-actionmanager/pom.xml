@@ -4,7 +4,7 @@
     <parent>
         <groupId>eu.dnetlib.dhp</groupId>
         <artifactId>dhp-workflows</artifactId>
-        <version>1.2.4-SNAPSHOT</version>
+        <version>1.2.5-SNAPSHOT</version>
     </parent>
     <artifactId>dhp-actionmanager</artifactId>
 
@@ -49,17 +49,6 @@
         <dependency>
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-distcp</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>eu.dnetlib</groupId>
-            <artifactId>dnet-openaire-data-protos</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-schemas</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>

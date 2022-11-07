@@ -5,6 +5,7 @@ import static eu.dnetlib.dhp.PropagationConstant.removeOutputDir;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -102,6 +103,7 @@ public class SparkBulkTagJob {
 		ResultTagger resultTagger = new ResultTagger();
 		readPath(spark, inputPath, resultClazz)
 			.map(patchResult(), Encoders.bean(resultClazz))
+			.filter(Objects::nonNull)
 			.map(
 				(MapFunction<R, R>) value -> resultTagger
 					.enrichContextCriteria(
@@ -123,7 +125,7 @@ public class SparkBulkTagJob {
 
 	// TODO remove this hack as soon as the values fixed by this method will be provided as NON null
 	private static <R extends Result> MapFunction<R, R> patchResult() {
-		return (MapFunction<R, R>) r -> {
+		return r -> {
 			if (r.getDataInfo().getDeletedbyinference() == null) {
 				r.getDataInfo().setDeletedbyinference(false);
 			}

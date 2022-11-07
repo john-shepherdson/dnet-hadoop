@@ -7,6 +7,8 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.util.LongAccumulator;
@@ -20,6 +22,7 @@ import eu.dnetlib.dhp.broker.oa.util.ConversionUtils;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.withRels.RelatedDataset;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import scala.Tuple2;
 
 public class PrepareRelatedDatasetsJob {
 
@@ -42,10 +45,10 @@ public class PrepareRelatedDatasetsJob {
 		final String graphPath = parser.get("graphPath");
 		log.info("graphPath: {}", graphPath);
 
-		final String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		final String workingDir = parser.get("workingDir");
+		log.info("workingDir: {}", workingDir);
 
-		final String relsPath = workingPath + "/relatedDatasets";
+		final String relsPath = workingDir + "/relatedDatasets";
 		log.info("relsPath: {}", relsPath);
 
 		final SparkConf conf = new SparkConf();
@@ -58,21 +61,24 @@ public class PrepareRelatedDatasetsJob {
 
 			final Dataset<OaBrokerRelatedDataset> datasets = ClusterUtils
 				.readPath(spark, graphPath + "/dataset", eu.dnetlib.dhp.schema.oaf.Dataset.class)
-				.filter(d -> !ClusterUtils.isDedupRoot(d.getId()))
-				.map(ConversionUtils::oafDatasetToBrokerDataset, Encoders.bean(OaBrokerRelatedDataset.class));
+				.filter((FilterFunction<eu.dnetlib.dhp.schema.oaf.Dataset>) d -> !ClusterUtils.isDedupRoot(d.getId()))
+				.map(
+					(MapFunction<eu.dnetlib.dhp.schema.oaf.Dataset, OaBrokerRelatedDataset>) ConversionUtils::oafDatasetToBrokerDataset,
+					Encoders.bean(OaBrokerRelatedDataset.class));
 
 			final Dataset<Relation> rels = ClusterUtils
-				.readPath(spark, graphPath + "/relation", Relation.class)
-				.filter(r -> r.getDataInfo().getDeletedbyinference())
-				.filter(r -> r.getRelType().equals(ModelConstants.RESULT_RESULT))
-				.filter(r -> ClusterUtils.isValidResultResultClass(r.getRelClass()))
-				.filter(r -> !ClusterUtils.isDedupRoot(r.getSource()))
-				.filter(r -> !ClusterUtils.isDedupRoot(r.getTarget()));
+				.loadRelations(graphPath, spark)
+				.filter((FilterFunction<Relation>) r -> r.getDataInfo().getDeletedbyinference())
+				.filter((FilterFunction<Relation>) r -> r.getRelType().equals(ModelConstants.RESULT_RESULT))
+				.filter((FilterFunction<Relation>) r -> ClusterUtils.isValidResultResultClass(r.getRelClass()))
+				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getSource()))
+				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getTarget()));
 
 			final Dataset<RelatedDataset> dataset = rels
 				.joinWith(datasets, datasets.col("openaireId").equalTo(rels.col("target")), "inner")
-				.map(t -> {
-					final RelatedDataset rel = new RelatedDataset(t._1.getSource(), t._2);
+				.map((MapFunction<Tuple2<Relation, OaBrokerRelatedDataset>, RelatedDataset>) t -> {
+					final RelatedDataset rel = new RelatedDataset(t._1.getSource(),
+						t._2);
 					rel.getRelDataset().setRelType(t._1.getRelClass());
 					return rel;
 				}, Encoders.bean(RelatedDataset.class));

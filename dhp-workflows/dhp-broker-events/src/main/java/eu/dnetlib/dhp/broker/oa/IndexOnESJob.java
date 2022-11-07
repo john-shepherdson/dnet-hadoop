@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.elasticsearch.spark.rdd.api.java.JavaEsSpark;
@@ -36,7 +37,7 @@ public class IndexOnESJob {
 
 		final SparkConf conf = new SparkConf();
 
-		final String eventsPath = parser.get("workingPath") + "/events";
+		final String eventsPath = parser.get("outputDir") + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
 		final String index = parser.get("index");
@@ -45,23 +46,33 @@ public class IndexOnESJob {
 		final String indexHost = parser.get("esHost");
 		log.info("indexHost: {}", indexHost);
 
+		final String esBatchWriteRetryCount = parser.get("esBatchWriteRetryCount");
+		log.info("esBatchWriteRetryCount: {}", esBatchWriteRetryCount);
+
+		final String esBatchWriteRetryWait = parser.get("esBatchWriteRetryWait");
+		log.info("esBatchWriteRetryWait: {}", esBatchWriteRetryWait);
+
+		final String esBatchSizeEntries = parser.get("esBatchSizeEntries");
+		log.info("esBatchSizeEntries: {}", esBatchSizeEntries);
+
+		final String esNodesWanOnly = parser.get("esNodesWanOnly");
+		log.info("esNodesWanOnly: {}", esNodesWanOnly);
+
 		final SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
 
 		final JavaRDD<String> inputRdd = ClusterUtils
 			.readPath(spark, eventsPath, Event.class)
-			.map(IndexOnESJob::eventAsJsonString, Encoders.STRING())
+			.map((MapFunction<Event, String>) IndexOnESJob::eventAsJsonString, Encoders.STRING())
 			.javaRDD();
 
 		final Map<String, String> esCfg = new HashMap<>();
-		// esCfg.put("es.nodes", "10.19.65.51, 10.19.65.52, 10.19.65.53, 10.19.65.54");
-
 		esCfg.put("es.index.auto.create", "false");
 		esCfg.put("es.nodes", indexHost);
 		esCfg.put("es.mapping.id", "eventId"); // THE PRIMARY KEY
-		esCfg.put("es.batch.write.retry.count", "8");
-		esCfg.put("es.batch.write.retry.wait", "60s");
-		esCfg.put("es.batch.size.entries", "200");
-		esCfg.put("es.nodes.wan.only", "true");
+		esCfg.put("es.batch.write.retry.count", esBatchWriteRetryCount);
+		esCfg.put("es.batch.write.retry.wait", esBatchWriteRetryWait);
+		esCfg.put("es.batch.size.entries", esBatchSizeEntries);
+		esCfg.put("es.nodes.wan.only", esNodesWanOnly);
 
 		JavaEsSpark.saveJsonToEs(inputRdd, index, esCfg);
 	}

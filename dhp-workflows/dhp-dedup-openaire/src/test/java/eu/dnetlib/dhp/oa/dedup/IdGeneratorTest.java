@@ -23,18 +23,21 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.oa.dedup.model.Identifier;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 import scala.Tuple2;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class IdGeneratorTest {
 
-	private static ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	private static List<Identifier<Publication>> bestIds;
 	private static List<Identifier<Publication>> bestIds2;
 	private static List<Identifier<Publication>> bestIds3;
+
+	private static List<Identifier<Organization>> bestIdsOrg;
 
 	private static String testEntityBasePath;
 
@@ -48,10 +51,12 @@ public class IdGeneratorTest {
 		bestIds = createBestIds(testEntityBasePath + "/publication_idgeneration.json", Publication.class);
 		bestIds2 = createBestIds(testEntityBasePath + "/publication_idgeneration2.json", Publication.class);
 		bestIds3 = createBestIds(testEntityBasePath + "/publication_idgeneration3.json", Publication.class);
+
+		bestIdsOrg = createBestIds(testEntityBasePath + "/organization_idgeneration.json", Organization.class);
 	}
 
 	@Test
-	public void generateIdTest1() {
+	void generateIdTest1() {
 		String id1 = IdGenerator.generate(bestIds, "50|defaultID");
 
 		System.out
@@ -61,7 +66,7 @@ public class IdGeneratorTest {
 	}
 
 	@Test
-	public void generateIdTest2() {
+	void generateIdTest2() {
 		String id1 = IdGenerator.generate(bestIds2, "50|defaultID");
 		String id2 = IdGenerator.generate(bestIds3, "50|defaultID");
 
@@ -74,6 +79,13 @@ public class IdGeneratorTest {
 
 		assertEquals("50|doi_dedup___::1a77a3bba737f8b669dcf330ad3b37e2", id1);
 		assertEquals("50|dedup_wf_001::0829b5191605bdbea36d6502b8c1ce1g", id2);
+	}
+
+	@Test
+	void generateIdOrganizationTest() {
+		String id1 = IdGenerator.generate(bestIdsOrg, "20|defaultID");
+
+		assertEquals("20|openorgs____::599c15a70fcb03be6ba08f75f14d6076", id1);
 	}
 
 	protected static <T extends OafEntity> List<Identifier<T>> createBestIds(String path, Class<T> clazz) {

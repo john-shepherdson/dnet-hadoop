@@ -1,0 +1,117 @@
+<workflow-app name="Graph Stats" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>stats_db_name</name>
+            <description>the target stats database name</description>
+        </property>
+        <property>
+            <name>stats_db_production_name</name>
+            <description>the name of the public production schema</description>
+        </property>
+        <property>
+            <name>monitor_db_name</name>
+            <description>the monitor database name</description>
+        </property>
+        <property>
+            <name>monitor_db_production_name</name>
+            <description>the name of the monitor public database</description>
+        </property>
+        <property>
+            <name>observatory_db_name</name>
+            <description>the monitor database name</description>
+        </property>
+        <property>
+            <name>observatory_db_production_name</name>
+            <description>the name of the monitor public database</description>
+        </property>
+        <property>
+            <name>stats_tool_api_url</name>
+            <description>The url of the API of the stats tool. Is used to trigger the cache promote.</description>
+        </property>
+        <property>
+            <name>hive_metastore_uris</name>
+            <description>hive server metastore URIs</description>
+        </property>
+        <property>
+            <name>hive_jdbc_url</name>
+            <description>hive server jdbc url</description>
+        </property>
+        <property>
+            <name>hive_timeout</name>
+            <description>the time period, in seconds, after which Hive fails a transaction if a Hive client has not sent a hearbeat. The default value is 300 seconds.</description>
+        </property>
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>hive.metastore.uris</name>
+                <value>${hive_metastore_uris}</value>
+            </property>
+            <property>
+            	<name>hive.txn.timeout</name>
+            	<value>${hive_timeout}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to="updateProductionViews"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="updateProductionViews">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>updateProductionViews.sh</exec>
+            <argument>${stats_db_name}</argument>
+            <argument>${stats_db_production_name}</argument>
+            <file>updateProductionViews.sh</file>
+        </shell>
+        <ok to="updateMonitorViews"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="updateMonitorViews">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>updateProductionViews.sh</exec>
+            <argument>${monitor_db_name}</argument>
+            <argument>${monitor_db_production_name}</argument>
+            <file>updateProductionViews.sh</file>
+        </shell>
+        <ok to="updateObservatoryViews"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="updateObservatoryViews">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>updateProductionViews.sh</exec>
+            <argument>${observatory_db_name}</argument>
+            <argument>${observatory_db_production_name}</argument>
+            <file>updateProductionViews.sh</file>
+        </shell>
+        <ok to="promoteCache"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="promoteCache">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>promoteCache.sh</exec>
+            <argument>${stats_tool_api_url}</argument>
+            <file>promoteCache.sh</file>
+        </shell>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    <end name="End"/>
+</workflow-app>

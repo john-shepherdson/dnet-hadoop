@@ -1,0 +1,94 @@
+ {
+	"ip_addresses": [],
+	"aliases": [],
+	"acronyms": [
+		"MSO"
+	],
+	"links": [
+		"https://rsaa.anu.edu.au/observatories/mount-stromlo-observatory"
+	],
+	"country": {
+		"country_code": "AU",
+		"country_name": "Australia"
+	},
+	"name": "Mount Stromlo Observatory",
+	"wikipedia_url": "https://en.wikipedia.org/wiki/Mount_Stromlo_Observatory",
+	"addresses": [
+		{
+			"lat": -35.320278,
+			"state_code": "AU-ACT",
+			"country_geonames_id": 2077456,
+			"lng": 149.006944,
+			"state": "Australian Capital Territory",
+			"city": "Canberra",
+			"geonames_city": {
+				"nuts_level2": {
+					"name": null,
+					"code": null
+				},
+				"geonames_admin2": {
+					"ascii_name": null,
+					"id": null,
+					"name": null,
+					"code": null
+				},
+				"geonames_admin1": {
+					"ascii_name": "ACT",
+					"id": 2177478,
+					"name": "ACT",
+					"code": "AU.01"
+				},
+				"city": "Canberra",
+				"id": 2172517,
+				"nuts_level1": {
+					"name": null,
+					"code": null
+				},
+				"nuts_level3": {
+					"name": null,
+					"code": null
+				},
+				"license": {
+					"attribution": "Data from geonames.org under a CC-BY 3.0 license",
+					"license": "http://creativecommons.org/licenses/by/3.0/"
+				}
+			},
+			"postcode": null,
+			"primary": false,
+			"line": null
+		}
+	],
+	"types": [
+		"Education"
+	],
+	"established": 1924,
+	"relationships": [
+		{
+			"type": "Parent",
+			"id": "https://ror.org/019wvm592",
+			"label": "Australian National University"
+		}
+	],
+	"email_address": null,
+	"external_ids": {
+		"ISNI": {
+			"all": [
+				"0000 0004 0459 2816"
+			],
+			"preferred": null
+		},
+		"Wikidata": {
+			"all": [
+				"Q1310548"
+			],
+			"preferred": null
+		},
+		"GRID": {
+			"all": "grid.440325.4",
+			"preferred": "grid.440325.4"
+		}
+	},
+	"id": "https://ror.org/006a4jj40",
+	"labels": [],
+	"status": "active"
+}

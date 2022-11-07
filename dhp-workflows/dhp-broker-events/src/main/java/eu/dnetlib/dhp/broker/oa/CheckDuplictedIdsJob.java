@@ -4,18 +4,16 @@ package eu.dnetlib.dhp.broker.oa;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.TypedColumn;
 import org.apache.spark.sql.expressions.Aggregator;
 import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.broker.model.Event;
@@ -32,40 +30,37 @@ public class CheckDuplictedIdsJob {
 			IOUtils
 				.toString(
 					CheckDuplictedIdsJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
+						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/check_duplicates.json")));
 		parser.parseArgument(args);
 
 		final SparkConf conf = new SparkConf();
 
-		final String eventsPath = parser.get("workingPath") + "/events";
+		final String eventsPath = parser.get("outputDir") + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
-		final String countPath = parser.get("workingPath") + "/counts";
+		final String countPath = parser.get("outputDir") + "/counts";
 		log.info("countPath: {}", countPath);
 
 		final SparkSession spark = SparkSession.builder().config(conf).getOrCreate();
 
 		final LongAccumulator total = spark.sparkContext().longAccumulator("invaild_event_id");
 
-		final TypedColumn<Tuple2<String, Long>, Tuple2<String, Long>> agg = new CountAggregator().toColumn();
-
+		final Encoder<Tuple2<String, Long>> encoder = Encoders.tuple(Encoders.STRING(), Encoders.LONG());
 		ClusterUtils
 			.readPath(spark, eventsPath, Event.class)
-			.map(e -> new Tuple2<>(e.getEventId(), 1l), Encoders.tuple(Encoders.STRING(), Encoders.LONG()))
-			.groupByKey(t -> t._1, Encoders.STRING())
-			.agg(agg)
-			.map(t -> t._2, Encoders.tuple(Encoders.STRING(), Encoders.LONG()))
-			.filter(t -> t._2 > 1)
-			.map(o -> ClusterUtils.incrementAccumulator(o, total), Encoders.tuple(Encoders.STRING(), Encoders.LONG()))
+			.map((MapFunction<Event, Tuple2<String, Long>>) e -> new Tuple2<>(e.getEventId(), 1l), encoder)
+			.groupByKey((MapFunction<Tuple2<String, Long>, String>) t -> t._1, Encoders.STRING())
+			.agg(new CountAggregator().toColumn())
+			.map((MapFunction<Tuple2<String, Tuple2<String, Long>>, Tuple2<String, Long>>) t -> t._2, encoder)
+			.filter((FilterFunction<Tuple2<String, Long>>) t -> t._2 > 1)
+			.map(
+				(MapFunction<Tuple2<String, Long>, Tuple2<String, Long>>) o -> ClusterUtils
+					.incrementAccumulator(o, total),
+				encoder)
 			.write()
 			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
 			.json(countPath);
-		;
-
-	}
-
-	private static String eventAsJsonString(final Event f) throws JsonProcessingException {
-		return new ObjectMapper().writeValueAsString(f);
 	}
 
 }
@@ -89,8 +84,7 @@ class CountAggregator extends Aggregator<Tuple2<String, Long>, Tuple2<String, Lo
 
 	@Override
 	public Tuple2<String, Long> merge(final Tuple2<String, Long> arg0, final Tuple2<String, Long> arg1) {
-		final String s = StringUtils.defaultIfBlank(arg0._1, arg1._1);
-		return new Tuple2<>(s, arg0._2 + arg1._2);
+		return doMerge(arg0, arg1);
 	}
 
 	@Override
@@ -100,6 +94,10 @@ class CountAggregator extends Aggregator<Tuple2<String, Long>, Tuple2<String, Lo
 
 	@Override
 	public Tuple2<String, Long> reduce(final Tuple2<String, Long> arg0, final Tuple2<String, Long> arg1) {
+		return doMerge(arg0, arg1);
+	}
+
+	private Tuple2<String, Long> doMerge(final Tuple2<String, Long> arg0, final Tuple2<String, Long> arg1) {
 		final String s = StringUtils.defaultIfBlank(arg0._1, arg1._1);
 		return new Tuple2<>(s, arg0._2 + arg1._2);
 	}

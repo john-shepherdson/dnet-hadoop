@@ -16,9 +16,26 @@ public class EnrichMissingSubject extends UpdateMatcher<OaBrokerTypedValue> {
 
 	public EnrichMissingSubject() {
 		super(20,
-			s -> Topic.fromPath("ENRICH/MISSING/SUBJECT/" + s.getType()),
+			s -> {
+				switch (s.getType().toLowerCase()) {
+					case "acm":
+						return Topic.ENRICH_MISSING_SUBJECT_ACM;
+					case "arxiv":
+						return Topic.ENRICH_MISSING_SUBJECT_ARXIV;
+					case "ddc":
+						return Topic.ENRICH_MISSING_SUBJECT_DDC;
+					case "jel":
+						return Topic.ENRICH_MISSING_SUBJECT_JEL;
+					case "mesh":
+						return Topic.ENRICH_MISSING_SUBJECT_MESHEUROPMC;
+					case "rvk":
+						return Topic.ENRICH_MISSING_SUBJECT_RVK;
+					default:
+						return null;
+				}
+			},
 			(p, s) -> p.getSubjects().add(s),
-			s -> subjectAsString(s));
+			EnrichMissingSubject::subjectAsString);
 	}
 
 	@Override
@@ -32,7 +49,7 @@ public class EnrichMissingSubject extends UpdateMatcher<OaBrokerTypedValue> {
 		final Set<String> existingSubject = target
 			.getSubjects()
 			.stream()
-			.map(s -> subjectAsString(s))
+			.map(EnrichMissingSubject::subjectAsString)
 			.collect(Collectors.toSet());
 
 		return source

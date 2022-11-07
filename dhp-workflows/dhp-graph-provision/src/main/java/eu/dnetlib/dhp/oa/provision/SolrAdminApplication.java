@@ -14,11 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.provision.utils.ISLookupClient;
 import eu.dnetlib.dhp.oa.provision.utils.ZkServers;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
-public class SolrAdminApplication extends SolrApplication implements Closeable {
+public class SolrAdminApplication implements Closeable {
 
 	private static final Logger log = LoggerFactory.getLogger(SolrAdminApplication.class);
 
@@ -26,7 +26,7 @@ public class SolrAdminApplication extends SolrApplication implements Closeable {
 		DELETE_BY_QUERY, COMMIT
 	}
 
-	private CloudSolrClient solrClient;
+	private final CloudSolrClient solrClient;
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -54,12 +54,12 @@ public class SolrAdminApplication extends SolrApplication implements Closeable {
 			.orElse(false);
 		log.info("commit: {}", commit);
 
-		final ISLookUpService isLookup = ISLookupClientFactory.getLookUpService(isLookupUrl);
+		final ISLookupClient isLookup = new ISLookupClient(ISLookupClientFactory.getLookUpService(isLookupUrl));
 
-		final String zkHost = getZkHost(isLookup);
+		final String zkHost = isLookup.getZkHost();
 		log.info("zkHost: {}", zkHost);
 
-		final String collection = format + SEPARATOR + LAYOUT + SEPARATOR + INTERPRETATION;
+		final String collection = ProvisionConstants.getCollectionName(format);
 		log.info("collection: {}", collection);
 
 		try (SolrAdminApplication app = new SolrAdminApplication(zkHost)) {
@@ -89,7 +89,7 @@ public class SolrAdminApplication extends SolrApplication implements Closeable {
 			case COMMIT:
 				return solrClient.commit(collection);
 			default:
-				throw new IllegalArgumentException("action not managed: " + action.toString());
+				throw new IllegalArgumentException("action not managed: " + action);
 		}
 	}
 

@@ -41,8 +41,6 @@ import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultGroup;
 
 public class EventFinder {
 
-	private static final Logger log = LoggerFactory.getLogger(EventFinder.class);
-
 	private static final List<UpdateMatcher<?>> matchers = new ArrayList<>();
 	static {
 		matchers.add(new EnrichMissingAbstract());
@@ -72,10 +70,14 @@ public class EventFinder {
 		matchers.add(new EnrichMissingDatasetIsSupplementedBy());
 	}
 
+	private EventFinder() {
+	}
+
 	public static EventGroup generateEvents(final ResultGroup results,
 		final Set<String> dsIdWhitelist,
 		final Set<String> dsIdBlacklist,
 		final Set<String> dsTypeWhitelist,
+		final Set<String> topicWhitelist,
 		final Map<String, LongAccumulator> accumulators) {
 
 		final List<UpdateInfo<?>> list = new ArrayList<>();
@@ -84,7 +86,13 @@ public class EventFinder {
 			for (final OaBrokerRelatedDatasource targetDs : target.getDatasources()) {
 				if (verifyTarget(targetDs, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist)) {
 					for (final UpdateMatcher<?> matcher : matchers) {
-						list.addAll(matcher.searchUpdatesForRecord(target, targetDs, results.getData(), accumulators));
+						for (final UpdateInfo<?> info : matcher
+							.searchUpdatesForRecord(target, targetDs, results.getData(), accumulators)) {
+							if (topicWhitelist == null || topicWhitelist.isEmpty()
+								|| topicWhitelist.contains(info.getTopic().getPath())) {
+								list.add(info);
+							}
+						}
 					}
 				}
 			}

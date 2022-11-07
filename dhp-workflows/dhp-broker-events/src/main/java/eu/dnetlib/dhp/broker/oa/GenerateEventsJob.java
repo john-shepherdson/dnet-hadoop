@@ -12,6 +12,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.util.LongAccumulator;
@@ -44,10 +46,10 @@ public class GenerateEventsJob {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		final String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		final String workingDir = parser.get("workingDir");
+		log.info("workingDir: {}", workingDir);
 
-		final String eventsPath = workingPath + "/events";
+		final String eventsPath = parser.get("outputDir") + "/events";
 		log.info("eventsPath: {}", eventsPath);
 
 		final Set<String> dsIdWhitelist = ClusterUtils.parseParamAsList(parser, "datasourceIdWhitelist");
@@ -58,6 +60,9 @@ public class GenerateEventsJob {
 
 		final Set<String> dsIdBlacklist = ClusterUtils.parseParamAsList(parser, "datasourceIdBlacklist");
 		log.info("datasourceIdBlacklist: {}", StringUtils.join(dsIdBlacklist, ","));
+
+		final Set<String> topicWhitelist = ClusterUtils.parseParamAsList(parser, "topicWhitelist");
+		log.info("topicWhitelist: {}", StringUtils.join(topicWhitelist, ","));
 
 		final SparkConf conf = new SparkConf();
 
@@ -70,15 +75,15 @@ public class GenerateEventsJob {
 			final LongAccumulator total = spark.sparkContext().longAccumulator("total_events");
 
 			final Dataset<ResultGroup> groups = ClusterUtils
-				.readPath(spark, workingPath + "/duplicates", ResultGroup.class);
+				.readPath(spark, workingDir + "/duplicates", ResultGroup.class);
 
 			final Dataset<Event> dataset = groups
 				.map(
-					g -> EventFinder
-						.generateEvents(g, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist, accumulators),
+					(MapFunction<ResultGroup, EventGroup>) g -> EventFinder
+						.generateEvents(g, dsIdWhitelist, dsIdBlacklist, dsTypeWhitelist, topicWhitelist, accumulators),
 					Encoders
 						.bean(EventGroup.class))
-				.flatMap(g -> g.getData().iterator(), Encoders.bean(Event.class));
+				.flatMap((FlatMapFunction<EventGroup, Event>) g -> g.getData().iterator(), Encoders.bean(Event.class));
 
 			ClusterUtils.save(dataset, eventsPath, Event.class, total);
 

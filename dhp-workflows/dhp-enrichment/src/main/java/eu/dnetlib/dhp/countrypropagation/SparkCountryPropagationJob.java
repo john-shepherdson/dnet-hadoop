@@ -4,7 +4,9 @@ package eu.dnetlib.dhp.countrypropagation;
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -17,18 +19,15 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Country;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import scala.Tuple2;
 
 public class SparkCountryPropagationJob {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkCountryPropagationJob.class);
-
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(String[] args) throws Exception {
 
@@ -57,12 +56,6 @@ public class SparkCountryPropagationJob {
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
-		final Boolean saveGraph = Optional
-			.ofNullable(parser.get("saveGraph"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.TRUE);
-		log.info("saveGraph: {}", saveGraph);
-
 		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		SparkConf conf = new SparkConf();
@@ -76,8 +69,7 @@ public class SparkCountryPropagationJob {
 					sourcePath,
 					preparedInfoPath,
 					outputPath,
-					resultClazz,
-					saveGraph);
+					resultClazz);
 			});
 	}
 
@@ -86,48 +78,52 @@ public class SparkCountryPropagationJob {
 		String sourcePath,
 		String preparedInfoPath,
 		String outputPath,
-		Class<R> resultClazz,
-		boolean saveGraph) {
+		Class<R> resultClazz) {
 
-		if (saveGraph) {
-			// updateResultTable(spark, potentialUpdates, inputPath, resultClazz, outputPath);
-			log.info("Reading Graph table from: {}", sourcePath);
-			Dataset<R> res = readPath(spark, sourcePath, resultClazz);
+		log.info("Reading Graph table from: {}", sourcePath);
+		Dataset<R> res = readPath(spark, sourcePath, resultClazz);
 
-			log.info("Reading prepared info: {}", preparedInfoPath);
-			Dataset<ResultCountrySet> prepared = spark
-				.read()
-				.json(preparedInfoPath)
-				.as(Encoders.bean(ResultCountrySet.class));
+		log.info("Reading prepared info: {}", preparedInfoPath);
+		Dataset<ResultCountrySet> prepared = spark
+			.read()
+			.json(preparedInfoPath)
+			.as(Encoders.bean(ResultCountrySet.class));
 
-			res
-				.joinWith(prepared, res.col("id").equalTo(prepared.col("resultId")), "left_outer")
-				.map(getCountryMergeFn(), Encoders.bean(resultClazz))
-				.write()
-				.option("compression", "gzip")
-				.mode(SaveMode.Overwrite)
-				.json(outputPath);
-		}
+		res
+			.joinWith(prepared, res.col("id").equalTo(prepared.col("resultId")), "left_outer")
+			.map(getCountryMergeFn(), Encoders.bean(resultClazz))
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Overwrite)
+			.json(outputPath);
+
 	}
 
 	private static <R extends Result> MapFunction<Tuple2<R, ResultCountrySet>, R> getCountryMergeFn() {
-		return (MapFunction<Tuple2<R, ResultCountrySet>, R>) t -> {
+		return t -> {
 			Optional.ofNullable(t._2()).ifPresent(r -> {
-				t._1().getCountry().addAll(merge(t._1().getCountry(), r.getCountrySet()));
+				if (Optional.ofNullable(t._1().getCountry()).isPresent())
+					t._1().getCountry().addAll(merge(t._1().getCountry(), r.getCountrySet()));
+				else
+					t._1().setCountry(merge(null, t._2().getCountrySet()));
 			});
 			return t._1();
 		};
 	}
 
 	private static List<Country> merge(List<Country> c1, List<CountrySbs> c2) {
-		HashSet<String> countries = c1
-			.stream()
-			.map(c -> c.getClassid())
-			.collect(Collectors.toCollection(HashSet::new));
+		HashSet<String> countries = new HashSet<>();
+		if (Optional.ofNullable(c1).isPresent()) {
+			countries = c1
+				.stream()
+				.map(Qualifier::getClassid)
+				.collect(Collectors.toCollection(HashSet::new));
+		}
 
+		HashSet<String> finalCountries = countries;
 		return c2
 			.stream()
-			.filter(c -> !countries.contains(c.getClassid()))
+			.filter(c -> !finalCountries.contains(c.getClassid()))
 			.map(c -> getCountry(c.getClassid(), c.getClassname()))
 			.collect(Collectors.toList());
 	}

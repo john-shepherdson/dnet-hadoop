@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.broker.oa.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -12,8 +13,6 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.base.Function;
 
 import eu.dnetlib.broker.objects.OaBrokerAuthor;
 import eu.dnetlib.broker.objects.OaBrokerExternalReference;
@@ -26,24 +25,15 @@ import eu.dnetlib.broker.objects.OaBrokerRelatedDatasource;
 import eu.dnetlib.broker.objects.OaBrokerRelatedPublication;
 import eu.dnetlib.broker.objects.OaBrokerRelatedSoftware;
 import eu.dnetlib.broker.objects.OaBrokerTypedValue;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.ExternalReference;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.Journal;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.Software;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class ConversionUtils {
 
 	private static final Logger log = LoggerFactory.getLogger(ConversionUtils.class);
+
+	private ConversionUtils() {
+	}
 
 	public static List<OaBrokerInstance> oafInstanceToBrokerInstances(final Instance i) {
 		if (i == null) {
@@ -68,13 +58,17 @@ public class ConversionUtils {
 		return sp != null ? new OaBrokerTypedValue(classId(sp.getQualifier()), sp.getValue()) : null;
 	}
 
-	public static final OaBrokerRelatedDataset oafDatasetToBrokerDataset(final Dataset d) {
+	public static OaBrokerTypedValue oafSubjectToBrokerTypedValue(final Subject sp) {
+		return sp != null ? new OaBrokerTypedValue(classId(sp.getQualifier()), sp.getValue()) : null;
+	}
+
+	public static OaBrokerRelatedDataset oafDatasetToBrokerDataset(final Dataset d) {
 		if (d == null) {
 			return null;
 		}
 
 		final OaBrokerRelatedDataset res = new OaBrokerRelatedDataset();
-		res.setOpenaireId(d.getId());
+		res.setOpenaireId(cleanOpenaireId(d.getId()));
 		res.setOriginalId(first(d.getOriginalId()));
 		res.setTitle(structPropValue(d.getTitle()));
 		res.setPids(mappedList(d.getPid(), ConversionUtils::oafPidToBrokerPid));
@@ -89,7 +83,7 @@ public class ConversionUtils {
 		}
 
 		final OaBrokerRelatedPublication res = new OaBrokerRelatedPublication();
-		res.setOpenaireId(p.getId());
+		res.setOpenaireId(cleanOpenaireId(p.getId()));
 		res.setOriginalId(first(p.getOriginalId()));
 		res.setTitle(structPropValue(p.getTitle()));
 		res.setPids(mappedList(p.getPid(), ConversionUtils::oafPidToBrokerPid));
@@ -99,20 +93,20 @@ public class ConversionUtils {
 		return res;
 	}
 
-	public static final OaBrokerMainEntity oafResultToBrokerResult(final Result result) {
+	public static OaBrokerMainEntity oafResultToBrokerResult(final Result result) {
 		if (result == null) {
 			return null;
 		}
 
 		final OaBrokerMainEntity res = new OaBrokerMainEntity();
 
-		res.setOpenaireId(result.getId());
+		res.setOpenaireId(cleanOpenaireId(result.getId()));
 		res.setOriginalId(first(result.getOriginalId()));
 		res.setTypology(classId(result.getResulttype()));
 		res.setTitles(structPropList(result.getTitle()));
 		res.setAbstracts(fieldList(result.getDescription()));
 		res.setLanguage(classId(result.getLanguage()));
-		res.setSubjects(structPropTypedList(result.getSubject()));
+		res.setSubjects(subjectList(result.getSubject()));
 		res.setCreators(mappedList(result.getAuthor(), ConversionUtils::oafAuthorToBrokerAuthor));
 		res.setPublicationdate(fieldValue(result.getDateofacceptance()));
 		res.setPublisher(fieldValue(result.getPublisher()));
@@ -129,6 +123,10 @@ public class ConversionUtils {
 		return res;
 	}
 
+	public static String cleanOpenaireId(final String id) {
+		return id.contains("|") ? StringUtils.substringAfter(id, "|") : id;
+	}
+
 	private static OaBrokerAuthor oafAuthorToBrokerAuthor(final Author author) {
 		if (author == null) {
 			return null;
@@ -137,12 +135,12 @@ public class ConversionUtils {
 		final String pids = author.getPid() != null ? author
 			.getPid()
 			.stream()
-			.filter(pid -> pid != null)
+			.filter(Objects::nonNull)
 			.filter(pid -> pid.getQualifier() != null)
 			.filter(pid -> pid.getQualifier().getClassid() != null)
-			.filter(pid -> pid.getQualifier().getClassid().equalsIgnoreCase("orcid"))
-			.map(pid -> pid.getValue())
-			.map(pid -> cleanOrcid(pid))
+			.filter(pid -> pid.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID))
+			.map(StructuredProperty::getValue)
+			.map(ConversionUtils::cleanOrcid)
 			.filter(StringUtils::isNotBlank)
 			.findFirst()
 			.orElse(null) : null;
@@ -182,13 +180,13 @@ public class ConversionUtils {
 		return res;
 	}
 
-	public static final OaBrokerProject oafProjectToBrokerProject(final Project p) {
+	public static OaBrokerProject oafProjectToBrokerProject(final Project p) {
 		if (p == null) {
 			return null;
 		}
 
 		final OaBrokerProject res = new OaBrokerProject();
-		res.setOpenaireId(p.getId());
+		res.setOpenaireId(cleanOpenaireId(p.getId()));
 		res.setTitle(fieldValue(p.getTitle()));
 		res.setAcronym(fieldValue(p.getAcronym()));
 		res.setCode(fieldValue(p.getCode()));
@@ -201,20 +199,20 @@ public class ConversionUtils {
 				res.setJurisdiction(fdoc.valueOf("/fundingtree/funder/jurisdiction"));
 				res.setFundingProgram(fdoc.valueOf("//funding_level_0/name"));
 			} catch (final DocumentException e) {
-				log.error("Error in record " + p.getId() + ": invalid fundingtree: " + ftree);
+				log.error("Error in record {}: invalid fundingtree: {}", p.getId(), ftree);
 			}
 		}
 
 		return res;
 	}
 
-	public static final OaBrokerRelatedSoftware oafSoftwareToBrokerSoftware(final Software sw) {
+	public static OaBrokerRelatedSoftware oafSoftwareToBrokerSoftware(final Software sw) {
 		if (sw == null) {
 			return null;
 		}
 
 		final OaBrokerRelatedSoftware res = new OaBrokerRelatedSoftware();
-		res.setOpenaireId(sw.getId());
+		res.setOpenaireId(cleanOpenaireId(sw.getId()));
 		res.setName(structPropValue(sw.getTitle()));
 		res.setDescription(fieldValue(sw.getDescription()));
 		res.setRepository(fieldValue(sw.getCodeRepositoryUrl()));
@@ -223,20 +221,20 @@ public class ConversionUtils {
 		return res;
 	}
 
-	public static final OaBrokerRelatedDatasource oafDatasourceToBrokerDatasource(final Datasource ds) {
+	public static OaBrokerRelatedDatasource oafDatasourceToBrokerDatasource(final Datasource ds) {
 		if (ds == null) {
 			return null;
 		}
 
 		final OaBrokerRelatedDatasource res = new OaBrokerRelatedDatasource();
 		res.setName(StringUtils.defaultIfBlank(fieldValue(ds.getOfficialname()), fieldValue(ds.getEnglishname())));
-		res.setOpenaireId(ds.getId());
+		res.setOpenaireId(cleanOpenaireId(ds.getId()));
 		res.setType(classId(ds.getDatasourcetype()));
 		return res;
 	}
 
 	private static String first(final List<String> list) {
-		return list != null && list.size() > 0 ? list.get(0) : null;
+		return list != null && !list.isEmpty() ? list.get(0) : null;
 	}
 
 	private static String kvValue(final KeyValue kv) {
@@ -293,6 +291,18 @@ public class ConversionUtils {
 		return list
 			.stream()
 			.map(ConversionUtils::oafStructPropToBrokerTypedValue)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
+	}
+
+	private static List<OaBrokerTypedValue> subjectList(final List<Subject> list) {
+		if (list == null) {
+			return new ArrayList<>();
+		}
+
+		return list
+			.stream()
+			.map(ConversionUtils::oafSubjectToBrokerTypedValue)
 			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
 	}
