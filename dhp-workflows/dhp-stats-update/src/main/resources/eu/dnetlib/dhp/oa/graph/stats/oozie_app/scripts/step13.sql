@@ -59,7 +59,7 @@ UNION ALL
 SELECT * FROM ${stats_db_name}.otherresearchproduct_sources;
 
 
-create table ${stats_db_name}.result_orcid STORED AS PARQUET as
+CREATE TABLE IF NOT EXISTS ${stats_db_name}.result_orcid STORED AS PARQUET as
 select distinct res.id, regexp_replace(res.orcid, 'http://orcid.org/' ,'') as orcid
 from (
     SELECT substr(res.id, 4) as id, auth_pid.value as orcid
@@ -69,7 +69,7 @@ from (
     LATERAL VIEW explode(auth.pid.qualifier.classid) apt as author_pid_type
     WHERE res.datainfo.deletedbyinference = FALSE and res.datainfo.invisible = FALSE and author_pid_type = 'orcid') as res;
 
-create table ${stats_db_name}.result_result stored as parquet as
+CREATE TABLE IF NOT EXISTS ${stats_db_name}.result_result stored as parquet as
 select substr(rel.source, 4) as source, substr(rel.target, 4) as target, relclass, subreltype
 from ${openaire_db_name}.relation rel
 join ${openaire_db_name}.result r1 on rel.source=r1.id
@@ -82,7 +82,7 @@ where reltype='resultResult'
     and r2.resulttype.classname != 'other'
     and rel.datainfo.deletedbyinference=false and rel.datainfo.invisible = FALSE;
 
-create table ${stats_db_name}.result_citations_oc stored as parquet as
+CREATE TABLE IF NOT EXISTS ${stats_db_name}.result_citations_oc stored as parquet as
 select substr(target, 4) as id, count(distinct substr(source, 4)) as citations
 from ${openaire_db_name}.relation rel
 join ${openaire_db_name}.result r1 on rel.source=r1.id
@@ -97,7 +97,7 @@ where relClass='Cites' and rel.datainfo.provenanceaction.classid = 'sysimport:cr
     and rel.datainfo.deletedbyinference=false and rel.datainfo.invisible = FALSE
 group by substr(target, 4);
 
-create table ${stats_db_name}.result_references_oc stored as parquet as
+CREATE TABLE IF NOT EXISTS ${stats_db_name}.result_references_oc stored as parquet as
 select substr(source, 4) as id, count(distinct substr(target, 4)) as references
 from ${openaire_db_name}.relation rel
          join ${openaire_db_name}.result r1 on rel.source=r1.id
