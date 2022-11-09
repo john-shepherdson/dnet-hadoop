@@ -2,8 +2,10 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
@@ -13,11 +15,14 @@ import org.apache.spark.sql.SparkSession;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
+import eu.dnetlib.dhp.oa.dedup.model.Identifier;
 import eu.dnetlib.dhp.oa.merge.AuthorMerger;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import scala.Tuple2;
 
 public class DedupRecordFactory {
@@ -82,11 +87,19 @@ public class DedupRecordFactory {
 		final Collection<String> dates = Lists.newArrayList();
 		final List<List<Author>> authors = Lists.newArrayList();
 
-		entities
-			.forEachRemaining(
-				t -> {
-					T duplicate = t._2();
+		final Comparator<Identifier<T>> idComparator = new IdentifierComparator<T>().reversed();
 
+		final List<T> entityList = Lists
+			.newArrayList(entities)
+			.stream()
+			.map(t -> Identifier.newInstance(t._2()))
+			.sorted(idComparator)
+			.map(Identifier::getEntity)
+			.collect(Collectors.toList());
+
+		entityList
+			.forEach(
+				duplicate -> {
 					entity.mergeFrom(duplicate);
 					if (ModelSupport.isSubClass(duplicate, Result.class)) {
 						Result r1 = (Result) duplicate;
