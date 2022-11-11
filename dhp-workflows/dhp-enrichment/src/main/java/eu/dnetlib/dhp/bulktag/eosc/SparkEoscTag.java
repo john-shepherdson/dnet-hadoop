@@ -199,13 +199,6 @@ public class SparkEoscTag {
 			return false;
 		if (s.getSubject().stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("jupyter")))
 			return true;
-		if (s
-			.getSubject()
-			.stream()
-			.anyMatch(
-				sbj -> sbj.getValue().toLowerCase().contains("python") &&
-					sbj.getValue().toLowerCase().contains("notebook")))
-			return true;
 		if (s.getSubject().stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("python")) &&
 			s.getSubject().stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("notebook")))
 			return true;
