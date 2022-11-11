@@ -1,12 +1,12 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
@@ -15,14 +15,12 @@ import org.apache.spark.sql.SparkSession;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.oa.dedup.model.Identifier;
 import eu.dnetlib.dhp.oa.merge.AuthorMerger;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import scala.Tuple2;
 
 public class DedupRecordFactory {
@@ -79,23 +77,25 @@ public class DedupRecordFactory {
 
 	public static <T extends OafEntity> T entityMerger(
 		String id, Iterator<Tuple2<String, T>> entities, long ts, DataInfo dataInfo, Class<T> clazz)
-		throws IllegalAccessException, InstantiationException {
+		throws IllegalAccessException, InstantiationException, InvocationTargetException {
 
-		T entity = clazz.newInstance();
-		entity.setDataInfo(dataInfo);
+		final Comparator<Identifier<T>> idComparator = new IdentifierComparator<>();
 
-		final Collection<String> dates = Lists.newArrayList();
-		final List<List<Author>> authors = Lists.newArrayList();
-
-		final Comparator<Identifier<T>> idComparator = new IdentifierComparator<T>().reversed();
-
-		final List<T> entityList = Lists
+		final LinkedList<T> entityList = Lists
 			.newArrayList(entities)
 			.stream()
 			.map(t -> Identifier.newInstance(t._2()))
 			.sorted(idComparator)
 			.map(Identifier::getEntity)
-			.collect(Collectors.toList());
+			.collect(Collectors.toCollection(LinkedList::new));
+
+		final T entity = clazz.newInstance();
+		final T first = entityList.removeFirst();
+
+		BeanUtils.copyProperties(entity, first);
+
+		final Collection<String> dates = Lists.newArrayList();
+		final List<List<Author>> authors = Lists.newArrayList();
 
 		entityList
 			.forEach(
@@ -103,12 +103,11 @@ public class DedupRecordFactory {
 					entity.mergeFrom(duplicate);
 					if (ModelSupport.isSubClass(duplicate, Result.class)) {
 						Result r1 = (Result) duplicate;
-						if (r1.getAuthor() != null && !r1.getAuthor().isEmpty())
+						if (r1.getAuthor() != null && StringUtils.isNotBlank(r1.getDateofacceptance().getValue()))
 							authors.add(r1.getAuthor());
 						if (r1.getDateofacceptance() != null)
 							dates.add(r1.getDateofacceptance().getValue());
 					}
-
 				});
 
 		// set authors and date
