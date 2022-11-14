@@ -912,27 +912,62 @@ class MappersTest {
 	}
 
 	@Test
-	void testROHub() throws IOException, DocumentException {
+	void testROHub() throws IOException {
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("rohub.xml")));
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");
-//		final Dataset p = (Dataset) list.get(0);
-//		assertValidId(p.getId());
-//		assertValidId(p.getCollectedfrom().get(0).getKey());
-//		System.out.println(p.getTitle().get(0).getValue());
-//		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+		assertEquals(1, list.size());
+		final OtherResearchProduct p = (OtherResearchProduct) list.get(0);
+		assertValidId(p.getId());
+		assertTrue(p.getId().startsWith("50|w3id"));
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+		assertEquals(1, p.getInstance().size());
+		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", p.getPid().get(0).getValue());
+		Instance inst = p.getInstance().get(0);
+		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", inst.getPid().get(0).getValue());
+		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", inst.getUrl().get(0));
+		assertEquals(1, p.getEoscifguidelines().size());
+		assertEquals("EOSC::RO-crate", p.getEoscifguidelines().get(0).getCode());
+		assertEquals("EOSC::RO-crate", p.getEoscifguidelines().get(0).getLabel());
+		assertEquals("", p.getEoscifguidelines().get(0).getUrl());
+		assertEquals("compliesWith", p.getEoscifguidelines().get(0).getSemanticRelation());
+
 	}
 
 	@Test
-	void testROHub2() throws IOException, DocumentException {
+	void testROHub2() throws IOException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("rohub-modified.xml")));
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");
+		assertEquals(1, list.size());
+		final OtherResearchProduct p = (OtherResearchProduct) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		assertEquals("50|w3id________::afc7592914ae190a50570db90f55f9c2", p.getId());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+		assertEquals("w3id", (p.getPid().get(0).getQualifier().getClassid()));
+		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", (p.getPid().get(0).getValue()));
+
+		assertEquals(1, list.stream().filter(o -> o instanceof OtherResearchProduct).count());
+		assertEquals(0, list.stream().filter(o -> o instanceof Relation).count());
+
+		for (Oaf oaf : list) {
+			if (oaf instanceof Relation) {
+				String source = ((Relation) oaf).getSource();
+				String target = ((Relation) oaf).getTarget();
+				assertNotEquals(source, target);
+				assertTrue(source.equals(p.getId()) || target.equals(p.getId()));
+				assertNotNull(((Relation) oaf).getSubRelType());
+				assertNotNull(((Relation) oaf).getRelClass());
+				assertNotNull(((Relation) oaf).getRelType());
+			}
+		}
 	}
 
 	@Test
