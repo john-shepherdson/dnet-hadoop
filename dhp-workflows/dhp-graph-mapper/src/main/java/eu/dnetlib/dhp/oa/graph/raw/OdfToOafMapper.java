@@ -10,6 +10,8 @@ import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.common.RelationInverse;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -377,44 +379,57 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<Oaf> addOtherResultRels(
-		final Document doc,
-		final OafEntity entity) {
+			final Document doc,
+			final OafEntity entity) {
 
 		final String docId = entity.getId();
 
 		final List<Oaf> res = new ArrayList<>();
 
 		for (final Object o : doc
-			.selectNodes("//*[local-name()='relatedIdentifier' and ./@relatedIdentifierType='OPENAIRE']")) {
+				.selectNodes("//*[local-name()='relatedIdentifier']")) {
 
-			final String originalId = ((Node) o).getText();
+			final String originalId = ((Node) o).getText().trim();
 
 			if (StringUtils.isNotBlank(originalId)) {
-				final String otherId = createOpenaireId(50, originalId, false);
-				final String type = ((Node) o).valueOf("@relationType");
-
-				if (type.equalsIgnoreCase(IS_SUPPLEMENT_TO)) {
-					res
-						.add(
-							getRelation(
-								docId, otherId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENT_TO, entity));
-					res
-						.add(
-							getRelation(
-								otherId, docId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENTED_BY, entity));
-				} else if (type.equalsIgnoreCase(IS_PART_OF)) {
-					res
-						.add(
-							getRelation(
-								docId, otherId, RESULT_RESULT, PART, IS_PART_OF, entity));
-					res
-						.add(
-							getRelation(
-								otherId, docId, RESULT_RESULT, PART, HAS_PART, entity));
-				} else {
-					// TODO catch more semantics
+				final String idType = ((Node) o).valueOf("@relatedIdentifierType");
+				final String relType = ((Node) o).valueOf("@relationType");
+				String otherId = guessRelatedIdentifier(idType, originalId);
+				if (StringUtils.isNotBlank(otherId)) {
+					res.addAll(getRelations(relType, docId, otherId, entity));
 				}
+
 			}
+		}
+		return res;
+	}
+
+	protected String guessRelatedIdentifier(final String idType, final String value) {
+		if (StringUtils.isBlank(idType) || StringUtils.isBlank(value))
+			return null;
+		if (idType.equalsIgnoreCase("OPENAIRE"))
+			return createOpenaireId(50, value, false);
+		if (pidTypeWithAuthority.containsKey(idType.toLowerCase())) {
+			return IdentifierFactory.idFromPid("50", pidTypeWithAuthority.get(idType.toLowerCase()), value, true);
+		}
+		return null;
+
+	}
+
+	protected List<Oaf> getRelations(final String reltype, final String entityId, final String otherId,
+									 final OafEntity entity) {
+		final List<Oaf> res = new ArrayList<>();
+		RelationInverse rel = ModelSupport.findRelation(reltype);
+		if (rel != null) {
+			res
+					.add(
+							getRelation(
+									entityId, otherId, rel.getRelType(), rel.getSubReltype(), rel.getRelClass(), entity));
+			res
+					.add(
+							getRelation(
+									otherId, entityId, rel.getRelType(), rel.getSubReltype(), rel.getInverseRelClass(), entity));
+
 		}
 		return res;
 	}

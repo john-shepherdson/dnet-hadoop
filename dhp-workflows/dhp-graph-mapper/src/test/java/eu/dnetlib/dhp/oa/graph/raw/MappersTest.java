@@ -579,7 +579,7 @@ class MappersTest {
 
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
-		assertEquals(1, list.size());
+		assertEquals(3, list.size());
 		assertTrue(list.get(0) instanceof Software);
 
 		final Software s = (Software) list.get(0);
@@ -918,7 +918,7 @@ class MappersTest {
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");
-		assertEquals(1, list.size());
+		assertEquals(5, list.size());
 		final OtherResearchProduct p = (OtherResearchProduct) list.get(0);
 		assertValidId(p.getId());
 		assertTrue(p.getId().startsWith("50|w3id"));
@@ -945,7 +945,7 @@ class MappersTest {
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");
-		assertEquals(1, list.size());
+		assertEquals(7, list.size());
 		final OtherResearchProduct p = (OtherResearchProduct) list.get(0);
 		assertValidId(p.getId());
 		assertValidId(p.getCollectedfrom().get(0).getKey());
@@ -955,7 +955,7 @@ class MappersTest {
 		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", (p.getPid().get(0).getValue()));
 
 		assertEquals(1, list.stream().filter(o -> o instanceof OtherResearchProduct).count());
-		assertEquals(0, list.stream().filter(o -> o instanceof Relation).count());
+		assertEquals(6, list.stream().filter(o -> o instanceof Relation).count());
 
 		for (Oaf oaf : list) {
 			if (oaf instanceof Relation) {

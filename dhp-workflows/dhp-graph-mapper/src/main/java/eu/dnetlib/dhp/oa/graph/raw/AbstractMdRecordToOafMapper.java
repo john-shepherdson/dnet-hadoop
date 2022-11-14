@@ -72,6 +72,17 @@ public abstract class AbstractMdRecordToOafMapper {
 		nsContext.put("datacite", DATACITE_SCHEMA_KERNEL_3);
 	}
 
+	// lowercase pidTypes as keys, normal casing for the values
+	protected static final Map<String, String> pidTypeWithAuthority = new HashMap<>();
+
+	static {
+		IdentifierFactory.PID_AUTHORITY
+				.keySet()
+				.stream()
+				.forEach(entry -> pidTypeWithAuthority.put(entry.toString().toLowerCase(), entry.toString()));
+
+	}
+
 	protected AbstractMdRecordToOafMapper(final VocabularyGroup vocs, final boolean invisible,
 		final boolean shouldHashId, final boolean forceOriginalId) {
 		this.vocs = vocs;
