@@ -77,9 +77,9 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	static {
 		IdentifierFactory.PID_AUTHORITY
-				.keySet()
-				.stream()
-				.forEach(entry -> pidTypeWithAuthority.put(entry.toString().toLowerCase(), entry.toString()));
+			.keySet()
+			.stream()
+			.forEach(entry -> pidTypeWithAuthority.put(entry.toString().toLowerCase(), entry.toString()));
 
 	}
 

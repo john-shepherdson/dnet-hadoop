@@ -10,8 +10,6 @@ import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.common.RelationInverse;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -21,6 +19,8 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.common.RelationInverse;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
@@ -379,15 +379,15 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<Oaf> addOtherResultRels(
-			final Document doc,
-			final OafEntity entity) {
+		final Document doc,
+		final OafEntity entity) {
 
 		final String docId = entity.getId();
 
 		final List<Oaf> res = new ArrayList<>();
 
 		for (final Object o : doc
-				.selectNodes("//*[local-name()='relatedIdentifier']")) {
+			.selectNodes("//*[local-name()='relatedIdentifier']")) {
 
 			final String originalId = ((Node) o).getText().trim();
 
@@ -417,18 +417,18 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	protected List<Oaf> getRelations(final String reltype, final String entityId, final String otherId,
-									 final OafEntity entity) {
+		final OafEntity entity) {
 		final List<Oaf> res = new ArrayList<>();
 		RelationInverse rel = ModelSupport.findRelation(reltype);
 		if (rel != null) {
 			res
-					.add(
-							getRelation(
-									entityId, otherId, rel.getRelType(), rel.getSubReltype(), rel.getRelClass(), entity));
+				.add(
+					getRelation(
+						entityId, otherId, rel.getRelType(), rel.getSubReltype(), rel.getRelClass(), entity));
 			res
-					.add(
-							getRelation(
-									otherId, entityId, rel.getRelType(), rel.getSubReltype(), rel.getInverseRelClass(), entity));
+				.add(
+					getRelation(
+						otherId, entityId, rel.getRelType(), rel.getSubReltype(), rel.getInverseRelClass(), entity));
 
 		}
 		return res;

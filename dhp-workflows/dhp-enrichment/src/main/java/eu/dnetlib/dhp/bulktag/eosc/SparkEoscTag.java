@@ -119,8 +119,9 @@ public class SparkEoscTag {
 					addEIG(orp.getEoscifguidelines(), EOSC_TWITTER_DATA, EOSC_TWITTER_DATA, "", COMPLIES_WITH);
 				}
 				if (containsCriteriaNotebook(orp)) {
-					addEIG(orp.getEoscifguidelines(), EOSC_JUPYTER_NOTEBOOK, EOSC_JUPYTER_NOTEBOOK, "",
-							COMPLIES_WITH);
+					addEIG(
+						orp.getEoscifguidelines(), EOSC_JUPYTER_NOTEBOOK, EOSC_JUPYTER_NOTEBOOK, "",
+						COMPLIES_WITH);
 				}
 				return orp;
 			}, Encoders.bean(OtherResearchProduct.class))
