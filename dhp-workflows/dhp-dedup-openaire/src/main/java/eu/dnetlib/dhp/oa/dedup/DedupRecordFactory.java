@@ -112,7 +112,7 @@ public class DedupRecordFactory {
 
 		// set authors and date
 		if (ModelSupport.isSubClass(entity, Result.class)) {
-			((Result) entity).setDateofacceptance(DatePicker.pick(dates));
+			// ((Result) entity).setDateofacceptance(DatePicker.pick(dates));
 			((Result) entity).setAuthor(AuthorMerger.merge(authors));
 		}
 
