@@ -15,7 +15,6 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -32,6 +31,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
@@ -299,17 +299,18 @@ public class SparkDedupPublicationTest implements Serializable {
 		assertEquals("Article", instance_cr.get().getInstancetype().getClassname());
 	}
 
-	private void verifyRoot_case_2(Dataset<Publication> roots, Dataset<Publication> pubs) throws JsonProcessingException {
+	private void verifyRoot_case_2(Dataset<Publication> roots, Dataset<Publication> pubs)
+		throws JsonProcessingException {
 		Publication root = roots
 			.filter("id = '50|doi_dedup___::18aff3b55fb6876466a5d4bd82434885'")
 			.first();
 		assertNotNull(root);
 
 		Publication crossref_duplicate = pubs
-				.filter("id = '50|doi_________::18aff3b55fb6876466a5d4bd82434885'")
-				.first();
+			.filter("id = '50|doi_________::18aff3b55fb6876466a5d4bd82434885'")
+			.first();
 
-		//System.err.println(new ObjectMapper().writeValueAsString(root));
+		// System.err.println(new ObjectMapper().writeValueAsString(root));
 
 		assertEquals(crossref_duplicate.getJournal().getName(), root.getJournal().getName());
 		assertEquals(crossref_duplicate.getJournal().getIssnOnline(), root.getJournal().getIssnOnline());
@@ -325,10 +326,10 @@ public class SparkDedupPublicationTest implements Serializable {
 			.collect(Collectors.toCollection(HashSet::new));
 
 		Set<String> root_cf = root
-				.getCollectedfrom()
-				.stream()
-				.map(KeyValue::getValue)
-				.collect(Collectors.toCollection(HashSet::new));
+			.getCollectedfrom()
+			.stream()
+			.map(KeyValue::getValue)
+			.collect(Collectors.toCollection(HashSet::new));
 
 		assertTrue(Sets.difference(root_cf, dups_cf).isEmpty());
 	}
