@@ -30,6 +30,9 @@
                 <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">
                     https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca/resources/6d3427a8-352e-49f4-9796-f618c44dc16d
                 </datacite:relatedIdentifier>
+                <datacite:relatedIdentifier relatedIdentifierType="OPENAIRE" relationType="isSupplementedBy">
+                    fsh_____4119::afc7592914ae190a50570db90f55f9c3
+                </datacite:relatedIdentifier>
             </datacite:relatedIdentifiers>
             <datacite:resourceType xs:anyURI="http://purl.org/coar/resource_type/c_1843">RO-crate</datacite:resourceType>
             <datacite:rightsList>

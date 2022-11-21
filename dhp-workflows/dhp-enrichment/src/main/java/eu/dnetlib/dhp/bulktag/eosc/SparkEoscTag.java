@@ -119,8 +119,9 @@ public class SparkEoscTag {
 					addEIG(orp.getEoscifguidelines(), EOSC_TWITTER_DATA, EOSC_TWITTER_DATA, "", COMPLIES_WITH);
 				}
 				if (containsCriteriaNotebook(orp)) {
-					addEIG(orp.getEoscifguidelines(), EOSC_JUPYTER_NOTEBOOK, EOSC_JUPYTER_NOTEBOOK, "",
-							COMPLIES_WITH);
+					addEIG(
+						orp.getEoscifguidelines(), EOSC_JUPYTER_NOTEBOOK, EOSC_JUPYTER_NOTEBOOK, "",
+						COMPLIES_WITH);
 				}
 				return orp;
 			}, Encoders.bean(OtherResearchProduct.class))
@@ -198,6 +199,13 @@ public class SparkEoscTag {
 		if (!Optional.ofNullable(s.getSubject()).isPresent())
 			return false;
 		if (s.getSubject().stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("jupyter")))
+			return true;
+		if (s
+			.getSubject()
+			.stream()
+			.anyMatch(
+				sbj -> sbj.getValue().toLowerCase().contains("python") &&
+					sbj.getValue().toLowerCase().contains("notebook")))
 			return true;
 		if (s.getSubject().stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("python")) &&
 			s.getSubject().stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("notebook")))

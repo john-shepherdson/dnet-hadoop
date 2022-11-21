@@ -31,26 +31,7 @@ import com.google.common.collect.Sets;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.AccessRight;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.Context;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.GeoLocation;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.Journal;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.OAIProvenance;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.Software;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
@@ -89,6 +70,17 @@ public abstract class AbstractMdRecordToOafMapper {
 		nsContext.put("prov", "http://www.openarchives.org/OAI/2.0/provenance");
 		nsContext.put("dc", "http://purl.org/dc/elements/1.1/");
 		nsContext.put("datacite", DATACITE_SCHEMA_KERNEL_3);
+	}
+
+	// lowercase pidTypes as keys, normal casing for the values
+	protected static final Map<String, String> pidTypeWithAuthority = new HashMap<>();
+
+	static {
+		IdentifierFactory.PID_AUTHORITY
+			.keySet()
+			.stream()
+			.forEach(entry -> pidTypeWithAuthority.put(entry.toString().toLowerCase(), entry.toString()));
+
 	}
 
 	protected AbstractMdRecordToOafMapper(final VocabularyGroup vocs, final boolean invisible,
@@ -377,9 +369,29 @@ public abstract class AbstractMdRecordToOafMapper {
 
 		r.setInstance(instances);
 		r.setBestaccessright(OafMapperUtils.createBestAccessRights(instances));
+		r.setEoscifguidelines(prepareEOSCIfGuidelines(doc, info));
 	}
 
 	protected abstract List<StructuredProperty> prepareResultPids(Document doc, DataInfo info);
+
+	private List<EoscIfGuidelines> prepareEOSCIfGuidelines(Document doc, DataInfo info) {
+		final Set<EoscIfGuidelines> set = Sets.newHashSet();
+		for (final Object o : doc.selectNodes("//oaf:eoscifguidelines")) {
+			final String code = ((Node) o).valueOf("@code");
+			final String label = ((Node) o).valueOf("@label");
+			final String url = ((Node) o).valueOf("@url");
+			final String semrel = ((Node) o).valueOf("@semanticrelation");
+			if (StringUtils.isNotBlank(code)) {
+				final EoscIfGuidelines eig = new EoscIfGuidelines();
+				eig.setCode(code);
+				eig.setLabel(label);
+				eig.setUrl(url);
+				eig.setSemanticRelation(semrel);
+				set.add(eig);
+			}
+		}
+		return Lists.newArrayList(set);
+	}
 
 	private List<Context> prepareContexts(final Document doc, final DataInfo info) {
 		final List<Context> list = new ArrayList<>();
