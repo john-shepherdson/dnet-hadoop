@@ -272,5 +272,17 @@ public class ComparatorTest extends AbstractPaceTest {
 		assertEquals(1.0, result);
 	}
 
+	@Test
+	public void domainExactMatch() {
+
+		DomainExactMatch domainExactMatch = new DomainExactMatch(params);
+		Field a = url("http://www.flowrepository.org");
+		Field b = url("http://flowrepository.org/");
+
+		double compare = domainExactMatch.compare(a, b, conf);
+		System.out.println("compare = " + compare);
+
+	}
+
 
 }

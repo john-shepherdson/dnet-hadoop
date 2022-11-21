@@ -103,6 +103,11 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 		final String s = "Search for the Standard Model Higgs Boson";
 		System.out.println(s);
 		System.out.println(sp.apply(conf, Lists.newArrayList(title(s))));
+
+		params.put("len", 3);
+		params.put("max", 1);
+
+		System.out.println(sp.apply(conf, Lists.newArrayList(title("Framework for general-purpose deduplication"))));
 	}
 
 	@Test

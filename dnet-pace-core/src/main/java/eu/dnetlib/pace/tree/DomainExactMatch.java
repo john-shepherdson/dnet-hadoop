@@ -16,6 +16,7 @@ public class DomainExactMatch extends ExactMatchIgnoreCase {
 
     @Override
     protected String getValue(final Field f) {
+
         try {
             return asUrl(super.getValue(f)).getHost();
         } catch (MalformedURLException e) {

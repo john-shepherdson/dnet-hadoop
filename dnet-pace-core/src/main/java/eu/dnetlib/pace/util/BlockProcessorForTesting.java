@@ -161,11 +161,14 @@ public class BlockProcessorForTesting {
                             }
                             else {
                                 //use the decision tree implementation or the "normal" implementation of the similarity score (valid only for publications)
-                                if(useTree)
+                                if (useTree)
                                     emitOutput(new TreeProcessor(dedupConf).compare(pivot, curr), idPivot, idCurr, context);
                                 else
                                     emitOutput(publicationCompare(pivot, curr, dedupConf), idPivot, idCurr, context);
                             }
+//                            if(new TreeProcessor(dedupConf).compare(pivot, curr) != publicationCompare(pivot, curr, dedupConf)) {
+//                                emitOutput(true, idPivot, idCurr, context);
+//                            }
 
                         }
                     }
@@ -180,43 +183,44 @@ public class BlockProcessorForTesting {
         return compare>=1.0;
     }
 
-        private boolean publicationCompare(MapDocument a, MapDocument b, DedupConfig config) {
+    private boolean publicationCompare(MapDocument a, MapDocument b, DedupConfig config) {
+        //if the score gives 1, the publications are equivalent
+        Map<String, String> params = new HashMap<>();
+        params.put("jpath_value", "$.value");
+        params.put("jpath_classid", "$.qualifier.classid");
+        params.put("mode", "count");
 
-            boolean startLayer = false;
-            boolean hardcheck1Layer = false;
+        double score = 0.0;
 
-            //START - comparison of the PIDs json lists
-            Map<String, String> params = new HashMap<>();
-            params.put("jpath_value", "$.value");
-            params.put("jpath_classid", "$.qualifier.classid");
-            JsonListMatch jsonListMatch = new JsonListMatch(params);
-            double result = jsonListMatch.compare(a.getFieldMap().get("pid"), b.getFieldMap().get("pid"), config);
-            if (result >= 0.5) //if the result of the comparison is greater than the threshold
-                startLayer = true;
-
-            //HARDCHECK1 - comparison of title versions and authors size
-            TitleVersionMatch titleVersionMatch = new TitleVersionMatch(params);
-            double result1 = titleVersionMatch.compare(a.getFieldMap().get("title"), b.getFieldMap().get("title"), config);
-            SizeMatch sizeMatch = new SizeMatch(params);
-            double result2 = sizeMatch.compare(a.getFieldMap().get("authors"), b.getFieldMap().get("authors"), config);
-            if (Math.min(result1, result2) != 0)
-                hardcheck1Layer = true;
-
-            //SOFTCHECK and HARDCHECK2 - comparison of the titles
-            LevensteinTitle levensteinTitle = new LevensteinTitle(params);
-            double result3 = levensteinTitle.compare(a.getFieldMap().get("title"), b.getFieldMap().get("title"), config);
-            double titleScore = Double.isNaN(result3)?0.0:result3;
-
-            if (startLayer) {
-                return titleScore >= 0.90;
-            }
-            else {
-                if (hardcheck1Layer) {
-                    return titleScore >= 0.99;
-                }
-            }
-            return false;
+        //levenstein title
+        LevensteinTitle levensteinTitle = new LevensteinTitle(params);
+        if(levensteinTitle.compare(a.getFieldMap().get("title"), b.getFieldMap().get("title"), config) >= 0.9) {
+            score += 0.2;
         }
+
+        //pid
+        JsonListMatch jsonListMatch = new JsonListMatch(params);
+        if (jsonListMatch.compare(a.getFieldMap().get("pid"), b.getFieldMap().get("pid"), config) >= 1.0) {
+            score += 0.5;
+        }
+
+        //title version
+        TitleVersionMatch titleVersionMatch = new TitleVersionMatch(params);
+        double result1 = titleVersionMatch.compare(a.getFieldMap().get("title"), b.getFieldMap().get("title"), config);
+        if(result1<0 || result1>=1.0) {
+            score += 0.1;
+        }
+
+        //authors match
+        params.remove("mode");
+        AuthorsMatch authorsMatch = new AuthorsMatch(params);
+        double result2 = authorsMatch.compare(a.getFieldMap().get("authors"), b.getFieldMap().get("authors"), config);
+        if(result2 <0|| result2>=0.6) {
+            score += 0.2;
+        }
+
+        return score>=0.5;
+    }
 
         private void emitOutput(final boolean result, final String idPivot, final String idCurr, final Reporter context)  {
 
