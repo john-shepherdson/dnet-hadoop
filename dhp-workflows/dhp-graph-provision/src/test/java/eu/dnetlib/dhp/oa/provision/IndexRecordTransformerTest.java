@@ -82,6 +82,20 @@ public class IndexRecordTransformerTest {
 	}
 
 	@Test
+	public void testRiunet() throws IOException, TransformerException {
+
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+			XmlConverterJob.schemaLocation);
+
+		final Publication p = load("riunet.json", Publication.class);
+
+		final JoinedEntity je = new JoinedEntity<>(p);
+		final String record = xmlRecordFactory.build(je);
+		assertNotNull(record);
+		testRecordTransformation(record);
+	}
+
+	@Test
 	public void testForEOSCFutureDataTransferPilot() throws IOException, TransformerException {
 		final String record = IOUtils.toString(getClass().getResourceAsStream("eosc-future/data-transfer-pilot.xml"));
 		testRecordTransformation(record);

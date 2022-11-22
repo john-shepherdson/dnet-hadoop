@@ -24,6 +24,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.Subject;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
@@ -73,7 +74,7 @@ public class PrepareSDGSparkJob implements Serializable {
 				Result r = new Result();
 				r.setId(DHPUtils.generateUnresolvedIdentifier(k, DOI));
 				SDGDataModel first = it.next();
-				List<StructuredProperty> sbjs = new ArrayList<>();
+				List<Subject> sbjs = new ArrayList<>();
 				sbjs.add(getSubject(first.getSbj(), SDG_CLASS_ID, SDG_CLASS_NAME, UPDATE_SUBJECT_SDG_CLASS_ID));
 				it
 					.forEachRemaining(

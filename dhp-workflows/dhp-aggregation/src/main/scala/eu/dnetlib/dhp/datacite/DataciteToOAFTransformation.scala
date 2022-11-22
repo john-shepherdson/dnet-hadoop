@@ -19,7 +19,7 @@ import java.time.chrono.ThaiBuddhistDate
 import java.time.format.DateTimeFormatter
 import java.util.{Date, Locale}
 import scala.collection.JavaConverters._
-import scala.io.{Codec, Source}
+import scala.io.Source
 
 object DataciteToOAFTransformation {
 
@@ -47,13 +47,18 @@ object DataciteToOAFTransformation {
   }
 
   /** This method should skip record if json contains invalid text
-    * defined in gile datacite_filter
+    * defined in file datacite_filter
     *
-    * @param json
+    * @param record : not parsed Datacite record
+    * @param json : parsed record
     * @return True if the record should be skipped
     */
-  def skip_record(json: String): Boolean = {
-    datacite_filter.exists(f => json.contains(f))
+  def skip_record(record: String, json: org.json4s.JValue): Boolean = {
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+    datacite_filter.exists(f => record.contains(f)) || (json \\ "publisher")
+      .extractOrElse[String]("")
+      .equalsIgnoreCase("FAIRsharing")
+
   }
 
   @deprecated("this method will be removed", "dhp")
@@ -93,6 +98,10 @@ object DataciteToOAFTransformation {
 
   }
 
+  /** This utility method indicates whether the embargo date has been reached
+    * @param embargo_end_date
+    * @return True if the embargo date has been reached, false otherwise
+    */
   def embargo_end(embargo_end_date: String): Boolean = {
     val dt = LocalDate.parse(embargo_end_date, DateTimeFormatter.ofPattern("[yyyy-MM-dd]"))
     val td = LocalDate.now()
@@ -137,6 +146,21 @@ object DataciteToOAFTransformation {
     }
   }
 
+  /** *
+    * Use the vocabulary dnet:publication_resource to find a synonym to one of these terms and get the instance.type.
+    * Using the dnet:result_typologies vocabulary, we look up the instance.type synonym
+    * to generate one of the following main entities:
+    *  - publication
+    *  - dataset
+    *  - software
+    *  - otherresearchproduct
+    *
+    * @param resourceType
+    * @param resourceTypeGeneral
+    * @param schemaOrg
+    * @param vocabularies
+    * @return
+    */
   def getTypeQualifier(
     resourceType: String,
     resourceTypeGeneral: String,
@@ -247,7 +271,7 @@ object DataciteToOAFTransformation {
         .exists(i => i.getHostedby != null && "figshare".equalsIgnoreCase(i.getHostedby.getValue))
       if (hosted_by_figshare) {
         r.getInstance().asScala.foreach(i => i.setAccessright(ModelConstants.OPEN_ACCESS_RIGHT()))
-        val l: List[StructuredProperty] = List()
+        val l: List[Subject] = List()
         r.setSubject(l.asJava)
       }
     }
@@ -304,11 +328,12 @@ object DataciteToOAFTransformation {
     vocabularies: VocabularyGroup,
     exportLinks: Boolean
   ): List[Oaf] = {
-    if (skip_record(input))
-      return List()
 
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json = parse(input)
+
+    if (skip_record(input, json))
+      return List()
 
     val resourceType = (json \ "attributes" \ "types" \ "resourceType").extractOrElse[String](null)
     val resourceTypeGeneral =
@@ -324,6 +349,7 @@ object DataciteToOAFTransformation {
     if (result == null)
       return List()
 
+    // DOI is mapped on a PID inside a Instance object
     val doi_q = OafMapperUtils.qualifier(
       "doi",
       "doi",
@@ -332,6 +358,8 @@ object DataciteToOAFTransformation {
     )
     val pid = OafMapperUtils.structuredProperty(doi, doi_q, dataInfo)
     result.setPid(List(pid).asJava)
+
+    // This identifiere will be replaced in a second moment using the PID logic generation
     result.setId(OafMapperUtils.createOpenaireId(50, s"datacite____::$doi", true))
     result.setOriginalId(List(doi).asJava)
 
@@ -380,6 +408,10 @@ object DataciteToOAFTransformation {
       a
     }
 
+    if (authors == null || authors.isEmpty || !authors.exists(a => a != null))
+      return List()
+    result.setAuthor(authors.asJava)
+
     val titles: List[TitleType] = (json \\ "titles").extractOrElse[List[TitleType]](List())
 
     result.setTitle(
@@ -402,10 +434,6 @@ object DataciteToOAFTransformation {
         })
         .asJava
     )
-
-    if (authors == null || authors.isEmpty || !authors.exists(a => a != null))
-      return List()
-    result.setAuthor(authors.asJava)
 
     val dates = (json \\ "dates").extract[List[DateType]]
     val publication_year = (json \\ "publicationYear").extractOrElse[String](null)
@@ -486,7 +514,7 @@ object DataciteToOAFTransformation {
       subjects
         .filter(s => s.subject.nonEmpty)
         .map(s =>
-          OafMapperUtils.structuredProperty(
+          OafMapperUtils.subject(
             s.subject.get,
             SUBJ_CLASS,
             SUBJ_CLASS,
@@ -578,7 +606,12 @@ object DataciteToOAFTransformation {
       JField("awardUri", JString(awardUri)) <- fundingReferences
     } yield awardUri
 
+    val oid = result.getId
     result.setId(IdentifierFactory.createIdentifier(result))
+    if (!result.getId.equalsIgnoreCase(oid)) {
+      result.setOriginalId((oid :: List(doi)).asJava)
+    }
+
     var relations: List[Relation] =
       awardUris.flatMap(a => get_projectRelation(a, result.getId)).filter(r => r != null)
 

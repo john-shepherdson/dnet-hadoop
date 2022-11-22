@@ -6,6 +6,10 @@ import static eu.dnetlib.dhp.bulktag.community.TaggingConstants.ZENODO_COMMUNITY
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -23,11 +27,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
 
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.bulktag.community.ProtoMap;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class BulkTagJobTest {
 
@@ -39,7 +44,8 @@ public class BulkTagJobTest {
 		+ "  \"title\" : \"$['title'][*]['value']\","
 		+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
 		+ "  \"contributor\" : \"$['contributor'][*]['value']\","
-		+ "  \"description\" : \"$['description'][*]['value']\"}";
+		+ "  \"description\" : \"$['description'][*]['value']\", "
+		+ " \"subject\" :\"$['subject'][*]['value']\" }";
 
 	private static SparkSession spark;
 
@@ -763,10 +769,28 @@ public class BulkTagJobTest {
 		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
 
 		idExplodeCommunity.show(false);
-		Assertions.assertEquals(3, idExplodeCommunity.count());
+		Assertions.assertEquals(4, idExplodeCommunity.count());
 
 		Assertions
 			.assertEquals(
 				3, idExplodeCommunity.filter("provenance = 'community:datasource'").count());
+		Assertions
+			.assertEquals(
+				1, idExplodeCommunity.filter("provenance = 'community:advconstraint'").count());
 	}
+
+//	@Test
+//	void test1(){
+//		ProtoMap params = new Gson().fromJson(pathMap, ProtoMap.class);
+//		HashMap<String, String> param = new HashMap<>();
+//			for (String key : params.keySet()) {
+//				try {
+//					param.put(key, jsonContext.read(params.get(key)));
+//				} catch (com.jayway.jsonpath.PathNotFoundException e) {
+//					param.put(key, new ArrayList<>());
+//				}
+//			}
+//			return param;
+//		}
+//	}
 }

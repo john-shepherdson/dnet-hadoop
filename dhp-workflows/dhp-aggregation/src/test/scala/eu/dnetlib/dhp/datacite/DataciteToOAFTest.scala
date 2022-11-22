@@ -2,11 +2,14 @@ package eu.dnetlib.dhp.datacite
 
 import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
 import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest
-import eu.dnetlib.dhp.schema.oaf.Oaf
+import eu.dnetlib.dhp.schema.oaf.{Dataset => OafDataset, _}
 import org.apache.commons.io.FileUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql.functions.{col, count}
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
+import org.json4s.DefaultFormats
+import org.json4s.JsonAST.{JField, JObject, JString}
+import org.json4s.jackson.JsonMethods.parse
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.{AfterEach, BeforeEach, Test}
@@ -51,6 +54,9 @@ class DataciteToOAFTest extends AbstractVocabularyTest {
     val path = getClass.getResource("/eu/dnetlib/dhp/actionmanager/datacite/dataset").getPath
 
     val conf = new SparkConf()
+    conf.set("spark.driver.host", "localhost")
+    conf.set("spark.ui.enabled", "false")
+
     val spark: SparkSession = SparkSession
       .builder()
       .config(conf)
@@ -70,17 +76,15 @@ class DataciteToOAFTest extends AbstractVocabularyTest {
 
     assertEquals(100, nativeSize)
 
-    spark.read.load(targetPath).printSchema();
-
-    val result: Dataset[Oaf] = spark.read.load(targetPath).as[Oaf]
+    val result: Dataset[String] =
+      spark.read.text(targetPath).as[String].map(DataciteUtilityTest.convertToOAF)(Encoders.STRING)
 
     result
-      .map(s => s.getClass.getSimpleName)
       .groupBy(col("value").alias("class"))
       .agg(count("value").alias("Total"))
       .show(false)
 
-    val t = spark.read.load(targetPath).count()
+    val t = spark.read.text(targetPath).as[String].count()
 
     assertTrue(t > 0)
 
@@ -104,6 +108,21 @@ class DataciteToOAFTest extends AbstractVocabularyTest {
       println("----------------------------")
 
     })
+
+  }
+
+  @Test
+  def testFilter(): Unit = {
+    val record = Source
+      .fromInputStream(
+        getClass.getResourceAsStream("/eu/dnetlib/dhp/actionmanager/datacite/record_fairsharing.json")
+      )
+      .mkString
+
+    val mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
+    val res: List[Oaf] = DataciteToOAFTransformation.generateOAF(record, 0L, 0L, vocabularies, true)
+
+    assertTrue(res.isEmpty)
 
   }
 

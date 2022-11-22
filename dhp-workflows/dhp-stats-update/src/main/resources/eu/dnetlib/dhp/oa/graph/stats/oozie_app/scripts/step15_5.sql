@@ -42,7 +42,7 @@ join ${stats_db_name}.result res on res.id=r.id;
 create table ${stats_db_name}.result_apc as
 select r.id, r.amount, r.currency
 from (
-         select substr(r.id, 4) as id, inst.processingchargeamount.value as amount, inst.processingchargecurrency.value as currency
+         select substr(r.id, 4) as id, cast(inst.processingchargeamount.value as float) as amount, inst.processingchargecurrency.value as currency
          from ${openaire_db_name}.result r lateral view explode(r.instance) instances as inst) r
 join ${stats_db_name}.result res on res.id=r.id
 where r.amount is not null;

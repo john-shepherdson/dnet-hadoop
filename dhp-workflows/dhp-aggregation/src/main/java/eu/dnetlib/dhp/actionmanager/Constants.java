@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.Subject;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 public class Constants {
@@ -27,6 +28,8 @@ public class Constants {
 	public static final String UPDATE_CLASS_NAME = "Inferred by OpenAIRE";
 	public static final String UPDATE_MEASURE_BIP_CLASS_ID = "measure:bip";
 	public static final String UPDATE_SUBJECT_SDG_CLASS_ID = "subject:sdg";
+	public static final String UPDATE_MEASURE_USAGE_COUNTS_CLASS_ID = "measure:usage_counts";
+	public static final String UPDATE_KEY_USAGE_COUNTS = "count";
 
 	public static final String FOS_CLASS_ID = "FOS";
 	public static final String FOS_CLASS_NAME = "Fields of Science and Technology classification";
@@ -56,13 +59,13 @@ public class Constants {
 			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
 	}
 
-	public static StructuredProperty getSubject(String sbj, String classid, String classname,
+	public static Subject getSubject(String sbj, String classid, String classname,
 		String diqualifierclassid) {
 		if (sbj.equals(NULL))
 			return null;
-		StructuredProperty sp = new StructuredProperty();
-		sp.setValue(sbj);
-		sp
+		Subject s = new Subject();
+		s.setValue(sbj);
+		s
 			.setQualifier(
 				OafMapperUtils
 					.qualifier(
@@ -70,7 +73,7 @@ public class Constants {
 						classname,
 						ModelConstants.DNET_SUBJECT_TYPOLOGIES,
 						ModelConstants.DNET_SUBJECT_TYPOLOGIES));
-		sp
+		s
 			.setDataInfo(
 				OafMapperUtils
 					.dataInfo(
@@ -86,7 +89,7 @@ public class Constants {
 								ModelConstants.DNET_PROVENANCE_ACTIONS),
 						""));
 
-		return sp;
+		return s;
 
 	}
 }

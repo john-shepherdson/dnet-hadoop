@@ -164,6 +164,7 @@ dnet:publication_resource @=@ dnet:publication_resource @=@ 0030 @=@ Sound
 dnet:publication_resource @=@ dnet:publication_resource @=@ 0044 @=@ Thesis
 dnet:publication_resource @=@ dnet:publication_resource @=@ 0000 @=@ Unknown
 dnet:publication_resource @=@ dnet:publication_resource @=@ 0042 @=@ Virtual Appliance
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0048 @=@ Research Object
 ec:funding_typologies @=@ ec:funding_typologies @=@ ec:frameworkprogram @=@ frameworkprogram
 ec:funding_typologies @=@ ec:funding_typologies @=@ ec:program @=@ program
 ec:funding_typologies @=@ ec:funding_typologies @=@ ec:specificprogram @=@ specificprogram
@@ -1048,6 +1049,7 @@ dnet:pid_types @=@ dnet:pid_types @=@ who @=@ WHO Identifier
 dnet:pid_types @=@ dnet:pid_types @=@ drks @=@ DRKS Identifier
 dnet:pid_types @=@ dnet:pid_types @=@ handle @=@ Handle
 dnet:pid_types @=@ dnet:pid_types @=@ data.europa.eu @=@ EU Persistent URL
+dnet:pid_types @=@ dnet:pid_types @=@ w3id @=@ w3id.org
 dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/SUBJECT/ACM @=@ An ACM classification term that can be associated to your publications
 dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/SUBJECT/ARXIV @=@ An ARXIV classification term that can be associated to your publications
 dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/SUBJECT/DDC @=@ A Dewey Decimal classification term (DDC) that can be associated to your publications
@@ -1117,3 +1119,6 @@ dnet:relation_subRelType @=@ dnet:relation_subRelType @=@ review @=@ review
 dnet:relation_subRelType @=@ dnet:relation_subRelType @=@ similarity @=@ similarity
 dnet:relation_subRelType @=@ dnet:relation_subRelType @=@ supplement @=@ supplement
 dnet:relation_subRelType @=@ dnet:relation_subRelType @=@ version @=@ version
+FOS @=@ Fields of Science and Technology classification @=@ 0101 mathematics @=@ 0101 mathematics
+FOS @=@ Fields of Science and Technology classification @=@ 0102 computer and information sciences @=@ 0102 computer and information sciences
+FOS @=@ Fields of Science and Technology classification @=@ 0103 physical sciences @=@ 0103 physical sciences

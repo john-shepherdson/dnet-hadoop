@@ -26,20 +26,7 @@ import eu.dnetlib.broker.objects.OaBrokerRelatedPublication;
 import eu.dnetlib.broker.objects.OaBrokerRelatedSoftware;
 import eu.dnetlib.broker.objects.OaBrokerTypedValue;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.ExternalReference;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.Journal;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.Software;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class ConversionUtils {
 
@@ -68,6 +55,10 @@ public class ConversionUtils {
 	}
 
 	public static OaBrokerTypedValue oafStructPropToBrokerTypedValue(final StructuredProperty sp) {
+		return sp != null ? new OaBrokerTypedValue(classId(sp.getQualifier()), sp.getValue()) : null;
+	}
+
+	public static OaBrokerTypedValue oafSubjectToBrokerTypedValue(final Subject sp) {
 		return sp != null ? new OaBrokerTypedValue(classId(sp.getQualifier()), sp.getValue()) : null;
 	}
 
@@ -115,7 +106,7 @@ public class ConversionUtils {
 		res.setTitles(structPropList(result.getTitle()));
 		res.setAbstracts(fieldList(result.getDescription()));
 		res.setLanguage(classId(result.getLanguage()));
-		res.setSubjects(structPropTypedList(result.getSubject()));
+		res.setSubjects(subjectList(result.getSubject()));
 		res.setCreators(mappedList(result.getAuthor(), ConversionUtils::oafAuthorToBrokerAuthor));
 		res.setPublicationdate(fieldValue(result.getDateofacceptance()));
 		res.setPublisher(fieldValue(result.getPublisher()));
@@ -300,6 +291,18 @@ public class ConversionUtils {
 		return list
 			.stream()
 			.map(ConversionUtils::oafStructPropToBrokerTypedValue)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
+	}
+
+	private static List<OaBrokerTypedValue> subjectList(final List<Subject> list) {
+		if (list == null) {
+			return new ArrayList<>();
+		}
+
+		return list
+			.stream()
+			.map(ConversionUtils::oafSubjectToBrokerTypedValue)
 			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
 	}

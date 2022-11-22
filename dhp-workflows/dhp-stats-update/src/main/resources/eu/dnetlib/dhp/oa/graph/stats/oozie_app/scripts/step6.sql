@@ -11,13 +11,13 @@ where p.datainfo.deletedbyinference=false  and p.datainfo.invisible=false;
 CREATE TABLE ${stats_db_name}.project_organizations STORED AS PARQUET AS
 SELECT substr(r.source, 4) AS id, substr(r.target, 4) AS organization
 from ${openaire_db_name}.relation r
-WHERE r.reltype = 'projectOrganization'
+WHERE r.reltype = 'projectOrganization' and r.source like '40|%'
   and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false;
 
 CREATE TABLE ${stats_db_name}.project_results STORED AS PARQUET AS
 SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS result, r.datainfo.provenanceaction.classname as provenance
 FROM ${openaire_db_name}.relation r
-WHERE r.reltype = 'resultProject'
+WHERE r.reltype = 'resultProject' and r.target like '40|%'
   and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false;
 
 create table ${stats_db_name}.project_classification STORED AS PARQUET as
@@ -48,7 +48,9 @@ CREATE TABLE ${stats_db_name}.project_tmp
     delayedpubs    INT,
     callidentifier STRING,
     code           STRING,
-    totalcost       FLOAT
+    totalcost       FLOAT,
+    fundedamount    FLOAT,
+    currency        STRING
 ) CLUSTERED BY (id) INTO 100 buckets stored AS orc tblproperties ('transactional' = 'true');
 
 INSERT INTO ${stats_db_name}.project_tmp
@@ -72,7 +74,9 @@ SELECT substr(p.id, 4)                                                 AS id,
        0                                                               AS delayedpubs,
        p.callidentifier.value                                          AS callidentifier,
        p.code.value                                                    AS code,
-       p.totalcost                                                     AS totalcost
+       p.totalcost                                                     AS totalcost,
+       p.fundedamount                                                  AS fundedamount,
+       p.currency.value                                                AS currency
 FROM ${openaire_db_name}.project p
 WHERE p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
 

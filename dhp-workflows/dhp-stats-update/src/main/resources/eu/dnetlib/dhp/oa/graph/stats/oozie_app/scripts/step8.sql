@@ -93,7 +93,7 @@ where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false;
 CREATE TABLE ${stats_db_name}.datasource_organizations STORED AS PARQUET AS
 SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS organization
 FROM ${openaire_db_name}.relation r
-WHERE r.reltype = 'datasourceOrganization' and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false;
+WHERE r.reltype = 'datasourceOrganization' and r.datainfo.deletedbyinference = false and r.source like '20|%' and r.datainfo.invisible=false;
 
 -- datasource sources:
 -- where the datasource info have been collected from.
