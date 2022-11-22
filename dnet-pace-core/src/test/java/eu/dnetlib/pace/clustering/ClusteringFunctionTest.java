@@ -153,6 +153,10 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 		System.out.println(s);
 		System.out.println(sp.apply(conf, Lists.newArrayList(title(s))));
 
+		s = "niivue/niivue: 0.21.1";
+		System.out.println(s);
+		System.out.println(sp.apply(conf, Lists.newArrayList(title(s))));
+
 	}
 
 	@Test
