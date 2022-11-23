@@ -95,13 +95,7 @@ public class ResultTagger implements Serializable {
 
 			}
 
-//			result
-//				.getInstance()
-//				.stream()
-//				.map(i -> new Pair<>(i.getCollectedfrom().getKey(), i.getHostedby().getKey()))
-//				.flatMap(p -> Stream.of(p.getFst(), p.getSnd()))
-//				.map(s -> StringUtils.substringAfter(s, "|"))
-//				.collect(Collectors.toCollection(HashSet::new))
+
 			tmp
 				.forEach(
 					dsId -> datasources
