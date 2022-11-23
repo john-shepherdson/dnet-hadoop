@@ -554,7 +554,7 @@ public class PublicationToOaf implements Serializable {
 	private KeyValue createCollectedFrom() {
 		KeyValue cf = new KeyValue();
 		cf.setValue(ModelConstants.ORCID.toUpperCase());
-		cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + "806360c771262b4d6770e7cdf04b5c5a");
+		cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + "cd0f74b5955dc87fd0605745c4b49ee8");
 		return cf;
 	}
 

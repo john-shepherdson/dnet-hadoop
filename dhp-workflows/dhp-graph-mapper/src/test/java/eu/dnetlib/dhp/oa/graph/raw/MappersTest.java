@@ -1001,6 +1001,17 @@ class MappersTest {
 	}
 
 	@Test
+	void testEOSCFuture_ROHub() throws IOException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("photic-zone-transformed.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		final OtherResearchProduct rocrate = (OtherResearchProduct) list.get(0);
+		assertNotNull(rocrate.getEoscifguidelines());
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(rocrate));
+		System.out.println("***************");
+	}
+
+	@Test
 	void testNotWellFormed() throws IOException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_notwellformed.xml")));
