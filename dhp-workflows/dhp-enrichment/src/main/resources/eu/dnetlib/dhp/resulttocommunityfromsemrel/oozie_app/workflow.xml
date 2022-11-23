@@ -260,6 +260,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.sql.shuffle.partitions=10000
             </spark-opts>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/mergedCommunityAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
@@ -289,6 +290,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.sql.shuffle.partitions=5000
             </spark-opts>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/mergedCommunityAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
@@ -318,6 +320,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.sql.shuffle.partitions=2000
             </spark-opts>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/mergedCommunityAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
@@ -347,6 +350,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/mergedCommunityAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
