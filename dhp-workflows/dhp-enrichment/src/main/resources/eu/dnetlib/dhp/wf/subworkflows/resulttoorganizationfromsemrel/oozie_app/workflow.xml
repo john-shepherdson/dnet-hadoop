@@ -4,10 +4,7 @@
             <name>sourcePath</name>
             <description>the source path</description>
         </property>
-<!--        <property>-->
-<!--            <name>outputPath</name>-->
-<!--            <description>sets the outputPath</description>-->
-<!--        </property>-->
+
     </parameters>
 
     <global>
@@ -26,23 +23,6 @@
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
-
-<!--    <decision name="resume_from">-->
-<!--        <switch>-->
-<!--            <case to="prepare_info">${wf:conf('resumeFrom') eq 'PrepareInfo'}</case>-->
-<!--            <default to="reset_outputpath"/> &lt;!&ndash; first action to be done when downloadDump is to be performed &ndash;&gt;-->
-<!--        </switch>-->
-<!--    </decision>-->
-
-<!--    <action name="reset_outputpath">-->
-<!--        <fs>-->
-<!--            <delete path="${outputPath}"/>-->
-<!--            <mkdir path="${outputPath}"/>-->
-<!--        </fs>-->
-<!--        <ok to="prepare_info"/>-->
-<!--        <error to="Kill"/>-->
-<!--    </action>-->
-
 
     <action name="prepare_info">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -99,11 +79,18 @@
             <arg>--workingDir</arg><arg>${workingDir}/affiliationSemanticRelation/working</arg>
             <arg>--iterations</arg><arg>${iterations}</arg>
         </spark>
-        <ok to="End"/>
+        <ok to="reset_workingDir"/>
         <error to="Kill"/>
     </action>
 
-
+    <action name="reset_workingDir">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
 
     <end name="End"/>
 

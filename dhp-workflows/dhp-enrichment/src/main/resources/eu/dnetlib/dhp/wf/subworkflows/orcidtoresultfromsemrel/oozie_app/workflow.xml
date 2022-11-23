@@ -390,7 +390,16 @@
         <error to="Kill"/>
     </action>
     
-    <join name="wait2" to="End"/>
+    <join name="wait2" to="reset_workingDir"/>
+
+    <action name="reset_workingDir">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
     
     <end name="End"/>
     

@@ -8,10 +8,7 @@
             <name>allowedsemrels</name>
             <description>the allowed semantics </description>
         </property>
-       <property>
-           <name>outputPath</name>
-           <description>the output path</description>
-       </property>
+
     </parameters>
 
     <global>
@@ -76,16 +73,22 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/relation</arg>
+            <arg>--outputPath</arg><arg>${sourcePath}/relation</arg>
             <arg>--potentialUpdatePath</arg><arg>${workingDir}/resultproject/preparedInfo/potentialUpdates</arg>
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/resultproject/preparedInfo/alreadyLinked</arg>
         </spark>
+        <ok to="reset_workingDir"/>
+        <error to="Kill"/>
+    </action>
+    <action name="reset_workingDir">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-
     <end name="End"/>
 
 </workflow-app>

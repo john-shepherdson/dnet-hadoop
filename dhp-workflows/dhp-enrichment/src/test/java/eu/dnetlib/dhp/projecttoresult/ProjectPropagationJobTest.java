@@ -33,32 +33,32 @@ public class ProjectPropagationJobTest {
 	private static SparkSession spark;
 
 	private static Path workingDir;
+	private static final SparkConf conf = new SparkConf();
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
-		workingDir = Files.createTempDirectory(ProjectPropagationJobTest.class.getSimpleName());
+
 		log.info("using work dir {}", workingDir);
 
-		SparkConf conf = new SparkConf();
+
 		conf.setAppName(ProjectPropagationJobTest.class.getSimpleName());
 
 		conf.setMaster("local[*]");
 		conf.set("spark.driver.host", "localhost");
 		conf.set("hive.metastore.local", "true");
 		conf.set("spark.ui.enabled", "false");
-		conf.set("spark.sql.warehouse.dir", workingDir.toString());
-		conf.set("hive.metastore.warehouse.dir", workingDir.resolve("warehouse").toString());
+
 
 		spark = SparkSession
-			.builder()
-			.appName(ProjectPropagationJobTest.class.getSimpleName())
-			.config(conf)
-			.getOrCreate();
+				.builder()
+				.appName(ProjectPropagationJobTest.class.getSimpleName())
+				.config(conf)
+				.getOrCreate();
 	}
 
 	@AfterAll
 	public static void afterAll() throws IOException {
-		FileUtils.deleteDirectory(workingDir.toFile());
+
 		spark.stop();
 	}
 
@@ -71,6 +71,7 @@ public class ProjectPropagationJobTest {
 	@Test
 	void NoUpdateTest() throws Exception {
 
+		workingDir = Files.createTempDirectory(ProjectPropagationJobTest.class.getSimpleName());
 		final String potentialUpdateDate = getClass()
 			.getResource(
 				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/noupdates/potentialUpdates")
@@ -82,10 +83,10 @@ public class ProjectPropagationJobTest {
 		SparkResultToProjectThroughSemRelJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-hive_metastore_uris", "",
-					"-saveGraph", "true",
+					
 					"-outputPath", workingDir.toString() + "/relation",
 					"-potentialUpdatePath", potentialUpdateDate,
 					"-alreadyLinkedPath", alreadyLinkedPath,
@@ -98,6 +99,10 @@ public class ProjectPropagationJobTest {
 			.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
 
 		Assertions.assertEquals(0, tmp.count());
+
+		FileUtils.deleteDirectory(workingDir.toFile());
+
+
 	}
 
 	/**
@@ -107,6 +112,12 @@ public class ProjectPropagationJobTest {
 	 */
 	@Test
 	void UpdateTenTest() throws Exception {
+		workingDir = Files.createTempDirectory(ProjectPropagationJobTest.class.getSimpleName());
+		spark = SparkSession
+				.builder()
+				.appName(ProjectPropagationJobTest.class.getSimpleName())
+				.config(conf)
+				.getOrCreate();
 		final String potentialUpdatePath = getClass()
 			.getResource(
 				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/tenupdates/potentialUpdates")
@@ -118,10 +129,10 @@ public class ProjectPropagationJobTest {
 		SparkResultToProjectThroughSemRelJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-hive_metastore_uris", "",
-					"-saveGraph", "true",
+
 					"-outputPath", workingDir.toString() + "/relation",
 					"-potentialUpdatePath", potentialUpdatePath,
 					"-alreadyLinkedPath", alreadyLinkedPath,
@@ -169,6 +180,9 @@ public class ProjectPropagationJobTest {
 					.sql(
 						"Select * from temporary where datainfo.inferenceprovenance = 'propagation'")
 					.count());
+
+		FileUtils.deleteDirectory(workingDir.toFile());
+
 	}
 
 	/**
@@ -179,6 +193,12 @@ public class ProjectPropagationJobTest {
 	 */
 	@Test
 	void UpdateMixTest() throws Exception {
+		workingDir = Files.createTempDirectory(ProjectPropagationJobTest.class.getSimpleName());
+		spark = SparkSession
+				.builder()
+				.appName(ProjectPropagationJobTest.class.getSimpleName())
+				.config(conf)
+				.getOrCreate();
 		final String potentialUpdatepath = getClass()
 			.getResource(
 				"/eu/dnetlib/dhp/projecttoresult/preparedInfo/updatesmixed/potentialUpdates")
@@ -190,10 +210,10 @@ public class ProjectPropagationJobTest {
 		SparkResultToProjectThroughSemRelJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-hive_metastore_uris", "",
-					"-saveGraph", "true",
+
 					"-outputPath", workingDir.toString() + "/relation",
 					"-potentialUpdatePath", potentialUpdatepath,
 					"-alreadyLinkedPath", alreadyLinkedPath,
@@ -244,5 +264,7 @@ public class ProjectPropagationJobTest {
 					.sql(
 						"Select * from temporary where datainfo.inferenceprovenance = 'propagation'")
 					.count());
+
+		FileUtils.deleteDirectory(workingDir.toFile());
 	}
 }

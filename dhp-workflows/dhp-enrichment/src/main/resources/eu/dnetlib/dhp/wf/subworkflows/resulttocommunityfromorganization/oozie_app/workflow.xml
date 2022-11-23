@@ -8,10 +8,7 @@
             <name>organizationtoresultcommunitymap</name>
             <description>organization community map</description>
         </property>
-        <property>
-            <name>outputPath</name>
-            <description>the output path</description>
-        </property>
+
     </parameters>
 
     <global>
@@ -25,20 +22,11 @@
         </configuration>
     </global>
 
-    <start to="reset_outputpath"/>
+    <start to="prepare_result_communitylist"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
-
-    <action name="reset_outputpath">
-        <fs>
-            <delete path="${outputPath}"/>
-            <mkdir path="${outputPath}"/>
-        </fs>
-        <ok to="prepare_result_communitylist"/>
-        <error to="Kill"/>
-    </action>
 
     <action name="prepare_result_communitylist">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -97,7 +85,7 @@
             <arg>--outputPath</arg><arg>${workingDir}/communityorganization/publication</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -126,7 +114,7 @@
             <arg>--outputPath</arg><arg>${workingDir}/communityorganization/dataset</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -155,7 +143,7 @@
             <arg>--outputPath</arg><arg>${workingDir}/communityorganization/otherresearchproduct</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -184,14 +172,22 @@
             <arg>--outputPath</arg><arg>${workingDir}/communityorganization/software</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
     </action>
 
-    <join name="wait2" to="End"/>
+    <join name="wait2" to="reset_workingDir"/>
 
+    <action name="reset_workingDir">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
     <end name="End"/>
 
 </workflow-app>

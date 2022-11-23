@@ -18,20 +18,11 @@
         </property>
     </parameters>
 
-    <start to="reset_outputpath"/>
+    <start to="fork_prepare_assoc_step1"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
-
-    <action name="reset_outputpath">
-        <fs>
-            <delete path="${outputPath}"/>
-            <mkdir path="${outputPath}"/>
-        </fs>
-        <ok to="fork_prepare_assoc_step1"/>
-        <error to="Kill"/>
-    </action>
 
 
 
@@ -214,8 +205,8 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/publication</arg>
+
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -243,8 +234,8 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/dataset</arg>
+
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -272,8 +263,8 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/otherresearchproduct</arg>
+
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -301,15 +292,22 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/software</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/software</arg>
+
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
     </action>
 
-    <join name="wait2" to="End"/>
-
+    <join name="wait2" to="reset_workingDir"/>
+    <action name="reset_workingDir">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
     <end name="End"/>
 
 </workflow-app>

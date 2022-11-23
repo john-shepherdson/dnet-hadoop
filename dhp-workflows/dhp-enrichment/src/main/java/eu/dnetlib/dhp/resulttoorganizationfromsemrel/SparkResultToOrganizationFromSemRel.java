@@ -98,13 +98,13 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 		String leavesPath,
 		String childParentPath,
 		String resultOrganizationPath,
-		String graphPath,
+		String relationPath,
 		String workingPath,
 		String outputPath,
 		int iterations) {
 		if (iterations == 1) {
 			doPropagateOnce(
-				spark, leavesPath, childParentPath, resultOrganizationPath, graphPath,
+				spark, leavesPath, childParentPath, resultOrganizationPath, relationPath,
 				workingPath, outputPath);
 		} else {
 
@@ -123,26 +123,26 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 				notReachedFirstParent);
 
 			doPropagate(
-				spark, leavesPath, childParentPath, resultOrganizationPath, graphPath,
+				spark, leavesPath, childParentPath, resultOrganizationPath, relationPath,
 				workingPath, outputPath, propagationCounter);
 		}
 
 	}
 
 	private static void doPropagateOnce(SparkSession spark, String leavesPath, String childParentPath,
-		String resultOrganizationPath, String graphPath, String workingPath,
+		String resultOrganizationPath, String relationPath, String workingPath,
 		String outputPath) {
 
 		StepActions
 			.execStep(
-				spark, graphPath, workingPath + NEW_RELATION_PATH,
+				spark, relationPath, workingPath + NEW_RELATION_PATH,
 				leavesPath, childParentPath, resultOrganizationPath);
 
 		addNewRelations(spark, workingPath + NEW_RELATION_PATH, outputPath);
 	}
 
 	private static void doPropagate(SparkSession spark, String leavesPath, String childParentPath,
-		String resultOrganizationPath, String graphPath, String workingPath, String outputPath,
+		String resultOrganizationPath, String relationPath, String workingPath, String outputPath,
 		PropagationCounter propagationCounter) {
 		int iteration = 0;
 		long leavesCount;
@@ -151,7 +151,7 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 			iteration++;
 			StepActions
 				.execStep(
-					spark, graphPath, workingPath + NEW_RELATION_PATH,
+					spark, relationPath, workingPath + NEW_RELATION_PATH,
 					leavesPath, childParentPath, resultOrganizationPath);
 			StepActions
 				.prepareForNextStep(

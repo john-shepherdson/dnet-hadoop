@@ -7,12 +7,12 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.countrypropagation.pojo.CountrySbs;
+import eu.dnetlib.dhp.countrypropagation.pojo.DatasourceCountry;
+import eu.dnetlib.dhp.countrypropagation.pojo.ResultCountrySet;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.FilterFunction;
-import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.*;

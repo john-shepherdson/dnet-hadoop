@@ -56,11 +56,7 @@ public class SparkResultToCommunityFromOrganizationJob {
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
-		final Boolean saveGraph = Optional
-			.ofNullable(parser.get("saveGraph"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.TRUE);
-		log.info("saveGraph: {}", saveGraph);
+
 
 		@SuppressWarnings("unchecked")
 		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
@@ -72,10 +68,9 @@ public class SparkResultToCommunityFromOrganizationJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				removeOutputDir(spark, outputPath);
-				if (saveGraph) {
+
 					execPropagation(spark, inputPath, outputPath, resultClazz, possibleupdatespath);
-				}
+
 			});
 	}
 

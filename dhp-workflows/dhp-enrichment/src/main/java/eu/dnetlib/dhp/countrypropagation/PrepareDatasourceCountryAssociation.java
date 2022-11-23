@@ -8,6 +8,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import eu.dnetlib.dhp.countrypropagation.pojo.CountrySbs;
+import eu.dnetlib.dhp.countrypropagation.pojo.DatasourceCountry;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;

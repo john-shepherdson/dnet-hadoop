@@ -70,13 +70,10 @@ public class SparkResultToCommunityThroughSemRelJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				if (isTest(parser)) {
-					removeOutputDir(spark, outputPath);
-				}
-				if (saveGraph) {
+
 					execPropagation(
 						spark, inputPath, outputPath, preparedInfoPath, resultClazz);
-				}
+
 			});
 	}
 

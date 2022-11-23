@@ -186,7 +186,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${outputPath}</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/eoscTag</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/bulktag</arg>
         </spark>
         <ok to="eosc_get_datasource_master"/>
         <error to="Kill"/>
@@ -230,7 +230,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${outputPath}/publication</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/eoscContextTag/publication</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/bulktag/publication</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--datasourceMapPath</arg><arg>${workingDir}/datasourcemaster</arg>
         </spark>
@@ -256,7 +256,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${outputPath}/dataset</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/eoscContextTag/dataset</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/bulktag/dataset</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--datasourceMapPath</arg><arg>${workingDir}/datasourcemaster</arg>
         </spark>
@@ -281,7 +281,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${outputPath}/software</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/eoscContextTag/software</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/bulktag/software</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--datasourceMapPath</arg><arg>${workingDir}/datasourcemaster</arg>
         </spark>
@@ -306,14 +306,24 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${outputPath}/otherresearchproduct</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/eoscContextTag/otherresearchproduct</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/bulktag/otherresearchproduct</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--datasourceMapPath</arg><arg>${workingDir}/datasourcemaster</arg>
         </spark>
         <ok to="wait_eosc_context_tag"/>
         <error to="Kill"/>
     </action>
-    <join name="wait_eosc_context_tag" to="End"/>
+    <join name="wait_eosc_context_tag" to="reset_workingDir"/>
+
+    <action name="reset_workingDir">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
     <end name="End"/>
 
 </workflow-app>

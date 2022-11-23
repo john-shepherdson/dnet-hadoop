@@ -27,10 +27,10 @@ import scala.Tuple2;
 public class StepActions implements Serializable {
 
 	public static void execStep(SparkSession spark,
-		String graphPath, String newRelationPath,
+		String relationPath, String newRelationPath,
 		String leavesPath, String chldParentOrgPath, String resultOrgPath) {
 
-		Dataset<Relation> relationGraph = readPath(spark, graphPath, Relation.class);
+		Dataset<Relation> relationGraph = readPath(spark, relationPath, Relation.class);
 		// select only the relation source target among those proposed by propagation that are not already existent
 		getNewRels(
 			newRelationPath, relationGraph,

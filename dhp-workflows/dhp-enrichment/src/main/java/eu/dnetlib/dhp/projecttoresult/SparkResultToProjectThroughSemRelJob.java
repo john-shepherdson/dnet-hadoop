@@ -51,8 +51,7 @@ public class SparkResultToProjectThroughSemRelJob {
 		final String alreadyLinkedPath = parser.get("alreadyLinkedPath");
 		log.info("alreadyLinkedPath {}: ", alreadyLinkedPath);
 
-		final Boolean saveGraph = Boolean.valueOf(parser.get("saveGraph"));
-		log.info("saveGraph: {}", saveGraph);
+
 
 		SparkConf conf = new SparkConf();
 
@@ -60,11 +59,9 @@ public class SparkResultToProjectThroughSemRelJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				if (isTest(parser)) {
-					removeOutputDir(spark, outputPath);
-				}
+
 				execPropagation(
-					spark, outputPath, alreadyLinkedPath, potentialUpdatePath, saveGraph);
+					spark, outputPath, alreadyLinkedPath, potentialUpdatePath);
 			});
 	}
 
@@ -72,13 +69,12 @@ public class SparkResultToProjectThroughSemRelJob {
 		SparkSession spark,
 		String outputPath,
 		String alreadyLinkedPath,
-		String potentialUpdatePath,
-		Boolean saveGraph) {
+		String potentialUpdatePath) {
 
 		Dataset<ResultProjectSet> toaddrelations = readPath(spark, potentialUpdatePath, ResultProjectSet.class);
 		Dataset<ResultProjectSet> alreadyLinked = readPath(spark, alreadyLinkedPath, ResultProjectSet.class);
 
-		if (saveGraph) {
+
 			toaddrelations
 				.joinWith(
 					alreadyLinked,
@@ -89,7 +85,7 @@ public class SparkResultToProjectThroughSemRelJob {
 				.mode(SaveMode.Append)
 				.option("compression", "gzip")
 				.json(outputPath);
-		}
+
 	}
 
 	private static FlatMapFunction<Tuple2<ResultProjectSet, ResultProjectSet>, Relation> mapRelationRn() {

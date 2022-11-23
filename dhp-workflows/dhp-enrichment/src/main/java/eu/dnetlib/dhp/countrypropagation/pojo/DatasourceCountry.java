@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.countrypropagation;
+package eu.dnetlib.dhp.countrypropagation.pojo;
 
 import java.io.Serializable;
 

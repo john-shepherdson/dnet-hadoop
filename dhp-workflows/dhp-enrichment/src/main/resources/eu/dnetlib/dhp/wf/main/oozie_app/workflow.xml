@@ -176,10 +176,6 @@
                     <name>pathMap</name>
                     <value>${pathMap}</value>
                 </property>
-                <property>
-                    <name>outputPath</name>
-                    <value>${workingDir}/results</value>
-                </property>
             </configuration>
         </sub-workflow>
         <ok to="affiliation_inst_repo" />
@@ -220,10 +216,6 @@
                     <name>sourcePath</name>
                     <value>${outputPath}</value>
                 </property>
-<!--                <property>-->
-<!--                    <name>outputPath</name>-->
-<!--                    <value>${outputPath}</value>-->
-<!--                </property>-->
             </configuration>
         </sub-workflow>
         <ok to="community_organization" />
@@ -238,10 +230,6 @@
             <configuration>
                 <property>
                     <name>sourcePath</name>
-                    <value>${outputPath}</value>
-                </property>
-                <property>
-                    <name>outputPath</name>
                     <value>${outputPath}</value>
                 </property>
                 <property>
@@ -265,10 +253,6 @@
                     <value>${outputPath}</value>
                 </property>
                 <property>
-                    <name>outputPath</name>
-                    <value>${outputPath}</value>
-                </property>
-                <property>
                     <name>allowedsemrels</name>
                     <value>${allowedsemrelsresultproject}</value>
                 </property>
@@ -280,7 +264,7 @@
 
     <action name="community_sem_rel">
         <sub-workflow>
-            <app-path>${wf:appPath()}/result_project
+            <app-path>${wf:appPath()}/community_sem_rel
             </app-path>
             <propagate-configuration/>
             <configuration>
@@ -288,10 +272,7 @@
                     <name>sourcePath</name>
                     <value>${outputPath}</value>
                 </property>
-                <property>
-                    <name>outputPath</name>
-                    <value>${workingDir}/communitysemrel</value>
-                </property>
+              
                 <property>
                     <name>allowedsemrels</name>
                     <value>${allowedsemrelscommunitysemrel}</value>

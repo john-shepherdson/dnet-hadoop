@@ -1,12 +1,11 @@
 
 package eu.dnetlib.dhp.countrypropagation;
 
-import static eu.dnetlib.dhp.PropagationConstant.isSparkSessionManaged;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import eu.dnetlib.dhp.countrypropagation.pojo.ResultCountrySet;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
