@@ -60,25 +60,25 @@ public class ResultCountryPreparationTest {
 			.getResource("/eu/dnetlib/dhp/countrypropagation/graph/publication")
 			.getPath();
 
-		final String preparedInfoPath = getClass()
-			.getResource("/eu/dnetlib/dhp/countrypropagation/datasourcecountry")
-			.getPath();
-
-		PrepareResultCountrySet
-			.main(
-				new String[] {
-					"--isSparkSessionManaged", Boolean.FALSE.toString(),
-					"--workingPath", workingDir.toString() + "/working",
-					"--sourcePath", sourcePath,
-					"--outputPath", workingDir.toString() + "/resultCountry",
-					"--preparedInfoPath", preparedInfoPath,
-					"--resultTableName", Publication.class.getCanonicalName()
-				});
-
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
+		sc.textFile(getClass()
+			.getResource("/eu/dnetlib/dhp/countrypropagation/datasourcecountry")
+			.getPath()).saveAsTextFile(workingDir+"/country/datasourceCountry"); ;
+
+		PrepareResultCountrySet
+				.main(
+						new String[] {
+								"--isSparkSessionManaged", Boolean.FALSE.toString(),
+								"--workingPath", workingDir.toString() + "/country",
+								"--sourcePath", sourcePath,
+								"--resultTableName", Publication.class.getCanonicalName()
+						});
+
+
+
 		JavaRDD<ResultCountrySet> tmp = sc
-			.textFile(workingDir.toString() + "/resultCountry")
+			.textFile(workingDir.toString() + "/country/preparedInfo/publication")
 			.map(item -> OBJECT_MAPPER.readValue(item, ResultCountrySet.class));
 
 		Assertions.assertEquals(5, tmp.count());

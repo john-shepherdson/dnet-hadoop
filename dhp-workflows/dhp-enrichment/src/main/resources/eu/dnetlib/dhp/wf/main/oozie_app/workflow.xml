@@ -294,10 +294,6 @@
                     <value>${outputPath}</value>
                 </property>
                 <property>
-                    <name>outputPath</name>
-                    <value>${workingDir}/country/result</value>
-                </property>
-                <property>
                     <name>whitelist</name>
                     <value>${datasourceWhitelistForCountryPropagation}</value>
                 </property>

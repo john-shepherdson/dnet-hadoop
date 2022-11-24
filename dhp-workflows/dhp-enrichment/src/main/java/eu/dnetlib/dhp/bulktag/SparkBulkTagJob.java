@@ -80,10 +80,9 @@ public class SparkBulkTagJob {
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
-			spark -> {
-				removeOutputDir(spark, outputPath);
-				execBulkTag(spark, inputPath, outputPath, protoMappingParams, resultClazz, cc);
-			});
+			spark ->
+				execBulkTag(spark, inputPath, outputPath, protoMappingParams, resultClazz, cc)
+			);
 	}
 
 	private static <R extends Result> void execBulkTag(

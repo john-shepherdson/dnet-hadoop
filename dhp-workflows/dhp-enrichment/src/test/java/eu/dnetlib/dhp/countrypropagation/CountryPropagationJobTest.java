@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.antlr.v4.runtime.misc.Utils;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -69,26 +70,35 @@ public class CountryPropagationJobTest {
 
 	@Test
 	void testCountryPropagationSoftware() throws Exception {
-		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/countrypropagation/graph/software")
-			.getPath();
-		final String preparedInfoPath = getClass()
-			.getResource("/eu/dnetlib/dhp/countrypropagation/preparedInfo/software")
-			.getPath();
-		SparkCountryPropagationJob
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+		sc
+				.textFile(
+						getClass()
+								.getResource("/eu/dnetlib/dhp/countrypropagation/graph/software")
+								.getPath()).saveAsTextFile(workingDir.toString() + "/source/software");
+
+
+		sc
+				.textFile(
+						getClass()
+								.getResource("/eu/dnetlib/dhp/countrypropagation/preparedInfo/software")
+								.getPath()).saveAsTextFile(workingDir.toString() + "/preparedInfo/software");
+
+	SparkCountryPropagationJob
 			.main(
 				new String[] {
 					"--isSparkSessionManaged", Boolean.FALSE.toString(),
-					"--sourcePath", sourcePath,
+					"--sourcePath",workingDir.toString() + "/source/software",
 					"-resultTableName", Software.class.getCanonicalName(),
-					"-outputPath", workingDir.toString() + "/software",
-					"-preparedInfoPath", preparedInfoPath
+					"-workingPath", workingDir.toString(),
+						"-resultType", "software"
 				});
 
-		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
 
 		JavaRDD<Software> tmp = sc
-			.textFile(workingDir.toString() + "/software")
+			.textFile(workingDir.toString() + "/source/software")
 			.map(item -> OBJECT_MAPPER.readValue(item, Software.class));
 
 		Assertions.assertEquals(10, tmp.count());
@@ -130,7 +140,7 @@ public class CountryPropagationJobTest {
 
 		Assertions.assertEquals(9, countryExplodedWithCountryclassid.count());
 
-		countryExplodedWithCountryclassid.show(false);
+		//countryExplodedWithCountryclassid.show(false);
 		Assertions
 			.assertEquals(
 				1,
@@ -190,7 +200,7 @@ public class CountryPropagationJobTest {
 				},
 				Encoders.tuple(Encoders.STRING(), Encoders.STRING()));
 
-		countryExplodedWithCountryclassname.show(false);
+		//countryExplodedWithCountryclassname.show(false);
 		Assertions
 			.assertEquals(
 				1,
@@ -259,23 +269,31 @@ public class CountryPropagationJobTest {
 
 	@Test
 	void testCountryPropagationPublication() throws Exception {
-		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/countrypropagation/graph/publication")
-			.getPath();
-		final String preparedInfoPath = getClass()
-			.getResource("/eu/dnetlib/dhp/countrypropagation/preparedInfo/publication")
-			.getPath();
-		SparkCountryPropagationJob
-			.main(
-				new String[] {
-					"--isSparkSessionManaged", Boolean.FALSE.toString(),
-					"--sourcePath", sourcePath,
-					"-resultTableName", Publication.class.getCanonicalName(),
-					"-outputPath", workingDir.toString() + "/publication",
-					"-preparedInfoPath", preparedInfoPath
-				});
-
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+		sc
+				.textFile(
+						getClass()
+								.getResource("/eu/dnetlib/dhp/countrypropagation/graph/publication")
+								.getPath()).saveAsTextFile(workingDir.toString() + "/source/publication");
+
+
+		sc
+				.textFile(
+						getClass()
+								.getResource("/eu/dnetlib/dhp/countrypropagation/preparedInfo/publication")
+								.getPath()).saveAsTextFile(workingDir.toString() + "/preparedInfo/publication");
+
+		SparkCountryPropagationJob
+				.main(
+						new String[] {
+								"--isSparkSessionManaged", Boolean.FALSE.toString(),
+								"--sourcePath",workingDir.toString() + "/source/publication",
+								"-resultTableName", Publication.class.getCanonicalName(),
+								"-workingPath", workingDir.toString(),
+								"-resultType", "publication"
+						});
+
+
 
 		JavaRDD<Publication> tmp = sc
 			.textFile(workingDir.toString() + "/publication")

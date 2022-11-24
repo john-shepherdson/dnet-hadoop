@@ -8,11 +8,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.countrypropagation.pojo.CountrySbs;
 import eu.dnetlib.dhp.countrypropagation.pojo.DatasourceCountry;
 import eu.dnetlib.dhp.countrypropagation.pojo.ResultCountrySet;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.*;
@@ -44,6 +46,7 @@ public class PrepareResultCountrySet {
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		String workingPath = parser.get("workingPath");
+		log.info("workingPath: {}", workingPath);
 
 		String inputPath = parser.get("sourcePath");
 		log.info("inputPath: {}", inputPath);
@@ -54,11 +57,6 @@ public class PrepareResultCountrySet {
 		final String resultType = resultClassName.substring(resultClassName.lastIndexOf(".") + 1).toLowerCase();
 		log.info("resultType: {}", resultType);
 
-		String outputPath = workingPath + "/" + resultType; // parser.get("outputPath");
-		log.info("outputPath: {}", outputPath);
-
-		final String datasourcecountrypath = workingPath + "/datasourceCountry";// parser.get("preparedInfoPath");
-		log.info("preparedInfoPath: {}", datasourcecountrypath);
 
 		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
@@ -68,30 +66,31 @@ public class PrepareResultCountrySet {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				removeOutputDir(spark, outputPath);
+				removeOutputDir(spark, workingPath + "/preparedInfo/" + resultType);
 				getPotentialResultToUpdate(
 					spark,
 					inputPath,
-					outputPath,
-					datasourcecountrypath,
-					workingPath + "/resultCfHb/" + resultType,
-					resultClazz);
+					workingPath,
+					resultType,
+						resultClazz);
 			});
 	}
 
 	private static <R extends Result> void getPotentialResultToUpdate(
 		SparkSession spark,
 		String inputPath,
-		String outputPath,
-		String datasourcecountrypath,
 		String workingPath,
+		String resultType,
 		Class<R> resultClazz) {
 
-		PropagationConstant.createCfHbforResult(spark, inputPath, workingPath, resultClazz);
+		final String datasourcecountrypath = workingPath + "/datasourceCountry";
+		final String cfhbpath = workingPath + "/resultCfHb/" + resultType;
+		final String outputPath = workingPath + "/preparedInfo/" + resultType;
+
+		PropagationConstant.createCfHbforResult(spark, inputPath, cfhbpath, resultClazz);
 
 		Dataset<DatasourceCountry> datasource_country = readPath(spark, datasourcecountrypath, DatasourceCountry.class);
-
-		Dataset<EntityEntityRel> cfhb = readPath(spark, workingPath, EntityEntityRel.class);
+		Dataset<EntityEntityRel> cfhb = readPath(spark, cfhbpath, EntityEntityRel.class);
 
 		datasource_country
 			.joinWith(

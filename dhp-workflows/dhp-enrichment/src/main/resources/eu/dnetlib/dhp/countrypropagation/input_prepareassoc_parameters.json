@@ -6,8 +6,8 @@
     "paramRequired": true
   },
   {
-    "paramName": "out",
-    "paramLongName": "outputPath",
+    "paramName": "wp",
+    "paramLongName": "workingPath",
     "paramDescription": "the path used to store temporary output files",
     "paramRequired": true
   },

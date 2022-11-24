@@ -12,11 +12,6 @@
             <name>allowedtypes</name>
             <description>the allowed types</description>
         </property>
-        <property>
-            <name>outputPath</name>
-            <description>the output path</description>
-        </property>
-
     </parameters>
 
     <global>
@@ -60,18 +55,18 @@
             <arg>--allowedtypes</arg><arg>${allowedtypes}</arg>
             <arg>--workingPath</arg><arg>${workingDir}/country</arg>
         </spark>
-        <ok to="fork_join_prepare_result_country"/>
+        <ok to="fork_prepare_result_country"/>
         <error to="Kill"/>
     </action>
 
-    <fork name="fork_join_prepare_result_country">
-        <path start="join_prepareresult_publication"/>
-        <path start="join_prepareresult_dataset"/>
-        <path start="join_prepareresult_otherresearchproduct"/>
-        <path start="join_prepareresult_software"/>
+    <fork name="fork_prepare_result_country">
+        <path start="prepareresult_publication"/>
+        <path start="prepareresult_dataset"/>
+        <path start="prepareresult_otherresearchproduct"/>
+        <path start="prepareresult_software"/>
     </fork>
 
-    <action name="join_prepareresult_publication">
+    <action name="prepareresult_publication">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -99,7 +94,7 @@
         <error to="Kill"/>
     </action>
 
-    <action name="join_prepareresult_dataset">
+    <action name="prepareresult_dataset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -127,7 +122,7 @@
         <error to="Kill"/>
     </action>
 
-    <action name="join_prepareresult_otherresearchproduct">
+    <action name="prepareresult_otherresearchproduct">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -155,7 +150,7 @@
         <error to="Kill"/>
     </action>
 
-    <action name="join_prepareresult_software">
+    <action name="prepareresult_software">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -185,14 +180,14 @@
 
     <join name="wait_prepare" to="fork_join_apply_country_propagation"/>
 
-    <fork name="fork_join_apply_country_propagation">
-        <path start="join_propagation_publication"/>
-        <path start="join_propagation_dataset"/>
-        <path start="join_propagation_otherresearchproduct"/>
-        <path start="join_propagation_software"/>
+    <fork name="fork_apply_country_propagation">
+        <path start="propagation_publication"/>
+        <path start="propagation_dataset"/>
+        <path start="propagation_otherresearchproduct"/>
+        <path start="propagation_software"/>
     </fork>
 
-    <action name="join_propagation_publication">
+    <action name="propagation_publication">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -213,15 +208,15 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/country/publication</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/country</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/country/result/publication</arg>
+
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
     </action>
 
-    <action name="join_propagation_dataset">
+    <action name="propagation_dataset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -242,15 +237,15 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/country/dataset</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/country</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/country/result/dataset</arg>
+
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
     </action>
 
-    <action name="join_propagation_otherresearchproduct">
+    <action name="propagation_otherresearchproduct">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -271,15 +266,15 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/country/otherresearchproduct</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/country</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/country/result/otherresearchproduct</arg>
+
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
     </action>
 
-    <action name="join_propagation_software">
+    <action name="propagation_software">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -300,10 +295,9 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/country/software</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/country</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/country/result/software</arg>
-        </spark>
+                    </spark>
         <ok to="wait"/>
         <error to="Kill"/>
     </action>

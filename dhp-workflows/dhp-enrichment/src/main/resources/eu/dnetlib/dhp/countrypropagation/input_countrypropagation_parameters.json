@@ -11,17 +11,12 @@
     "paramDescription": "the name of the result table we are currently working on",
     "paramRequired": true
   },
-  {
-    "paramName": "out",
-    "paramLongName": "outputPath",
-    "paramDescription": "the path used to store temporary output files",
-    "paramRequired": true
-  },
+
   {
     "paramName": "wp",
     "paramLongName": "workingPath",
     "paramDescription": "the path where prepared info have been stored",
-    "paramRequired": false
+    "paramRequired": true
   },
   {
     "paramName": "ssm",

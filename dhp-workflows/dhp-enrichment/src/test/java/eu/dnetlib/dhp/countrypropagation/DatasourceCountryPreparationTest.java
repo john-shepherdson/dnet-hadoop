@@ -64,7 +64,7 @@ public class DatasourceCountryPreparationTest {
 				new String[] {
 					"--isSparkSessionManaged", Boolean.FALSE.toString(),
 					"--sourcePath", sourcePath,
-					"--outputPath", workingDir.toString() + "/datasourceCountry",
+					"--workingPath", workingDir.toString() + "/country",
 					"--allowedtypes", "pubsrepository::institutional",
 					"--whitelist",
 					"10|openaire____::3795d6478e30e2c9f787d427ff160944;10|opendoar____::16e6a3326dd7d868cbc926602a61e4d0;10|eurocrisdris::fe4903425d9040f680d8610d9079ea14;10|openaire____::5b76240cc27a58c6f7ceef7d8c36660e;10|openaire____::172bbccecf8fca44ab6a6653e84cb92a;10|openaire____::149c6590f8a06b46314eed77bfca693f;10|eurocrisdris::a6026877c1a174d60f81fd71f62df1c1;10|openaire____::4692342f0992d91f9e705c26959f09e0;10|openaire____::8d529dbb05ec0284662b391789e8ae2a;10|openaire____::345c9d171ef3c5d706d08041d506428c;10|opendoar____::1c1d4df596d01da60385f0bb17a4a9e0;10|opendoar____::7a614fd06c325499f1680b9896beedeb;10|opendoar____::1ee3dfcd8a0645a25a35977997223d22;10|opendoar____::d296c101daa88a51f6ca8cfc1ac79b50;10|opendoar____::798ed7d4ee7138d49b8828958048130a;10|openaire____::c9d2209ecc4d45ba7b4ca7597acb88a2;10|eurocrisdris::c49e0fe4b9ba7b7fab717d1f0f0a674d;10|eurocrisdris::9ae43d14471c4b33661fedda6f06b539;10|eurocrisdris::432ca599953ff50cd4eeffe22faf3e48"
@@ -73,7 +73,7 @@ public class DatasourceCountryPreparationTest {
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<DatasourceCountry> tmp = sc
-			.textFile(workingDir.toString() + "/datasourceCountry")
+			.textFile(workingDir.toString() + "/country/datasourceCountry")
 			.map(item -> OBJECT_MAPPER.readValue(item, DatasourceCountry.class));
 
 		Assertions.assertEquals(3, tmp.count());

@@ -52,11 +52,13 @@ public class SparkCountryPropagationJob {
 		String workingPath = parser.get("workingPath");
 		log.info("workingPath: {}", workingPath);
 
-		final String outputPath = parser.get("outputPath");
-		log.info("outputPath: {}", outputPath);
-
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
+
+		final String resultType = resultClassName.substring(resultClassName.lastIndexOf(".") + 1).toLowerCase();
+		log.info("resultType: {}", resultType);
+
+
 
 		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
@@ -65,12 +67,12 @@ public class SparkCountryPropagationJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				removeOutputDir(spark, outputPath);
+				removeOutputDir(spark, workingPath + "/" + resultType);
 				execPropagation(
 					spark,
 					sourcePath,
 					workingPath,
-					outputPath,
+					resultType,
 					resultClazz);
 			});
 	}
@@ -78,18 +80,15 @@ public class SparkCountryPropagationJob {
 	private static <R extends Result> void execPropagation(
 		SparkSession spark,
 		String sourcePath,
-		String preparedInfoPath,
-		String outputPath,
+		String workingPath,
+		String resultType,
 		Class<R> resultClazz) {
 
 		log.info("Reading Graph table from: {}", sourcePath);
 		Dataset<R> res = readPath(spark, sourcePath, resultClazz);
 
-		log.info("Reading prepared info: {}", preparedInfoPath);
-		Dataset<ResultCountrySet> prepared = spark
-			.read()
-			.json(preparedInfoPath)
-			.as(Encoders.bean(ResultCountrySet.class));
+		log.info("Reading prepared info: {}", workingPath + "/preparedInfo/" + resultType);
+		Dataset<ResultCountrySet> prepared = readPath(spark, workingPath + "/preparedInfo/" + resultType, ResultCountrySet.class);
 
 		res
 			.joinWith(prepared, res.col("id").equalTo(prepared.col("resultId")), "left_outer")
@@ -97,9 +96,9 @@ public class SparkCountryPropagationJob {
 			.write()
 			.option("compression", "gzip")
 			.mode(SaveMode.Overwrite)
-			.json(outputPath);
+			.json(workingPath + "/" + resultType);
 
-		readPath(spark, outputPath, resultClazz)
+		readPath(spark, workingPath + "/" + resultType, resultClazz)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
