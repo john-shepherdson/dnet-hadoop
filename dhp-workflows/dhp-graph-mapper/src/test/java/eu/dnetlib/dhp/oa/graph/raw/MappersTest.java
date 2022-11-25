@@ -12,6 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.DocumentException;
@@ -989,6 +990,21 @@ class MappersTest {
 		final List<Oaf> actual = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 		assertNotNull(actual);
 		assertTrue(actual.isEmpty());
+	}
+
+	@Test
+	void testEoscFutureHackZenodo() throws IOException {
+		final String xml = IOUtils
+				.toString(Objects.requireNonNull(getClass().getResourceAsStream("zenodo7351221.xml")));
+
+		final List<Oaf> actual = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		actual.forEach(a -> {
+			try {
+				System.out.println(new ObjectMapper().writeValueAsString(a));
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
 	private void assertValidId(final String id) {
