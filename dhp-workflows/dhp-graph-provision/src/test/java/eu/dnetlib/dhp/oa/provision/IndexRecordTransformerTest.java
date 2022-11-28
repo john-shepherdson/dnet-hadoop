@@ -129,6 +129,20 @@ public class IndexRecordTransformerTest {
 	}
 
 	@Test
+	public void testForEOSCFutureSoftwareNotebook() throws IOException, TransformerException {
+		final String record = IOUtils
+				.toString(getClass().getResourceAsStream("eosc-future/software-justthink.xml"));
+		testRecordTransformation(record);
+	}
+
+	@Test
+	public void testForEOSCFutureSoftwareNotebookClaim() throws IOException, TransformerException {
+		final String record = IOUtils
+				.toString(getClass().getResourceAsStream("eosc-future/software-justthink-claim.xml"));
+		testRecordTransformation(record);
+	}
+
+	@Test
 	void testDoiUrlNormalization() throws MalformedURLException {
 
 		// TODO add more test examples when needed
