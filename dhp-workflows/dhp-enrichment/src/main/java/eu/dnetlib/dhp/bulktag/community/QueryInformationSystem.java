@@ -26,6 +26,9 @@ public class QueryInformationSystem {
 		+ "  return  "
 		+ "  <community>  "
 		+ "  { $x//CONFIGURATION/context/@id}  "
+			+ " <advancedConstraints>" +
+			"{$x//CONFIGURATION/context/param[./@name='advancedConstraints']/text() }" +
+			"</advancedConstraints>"
 		+ "  <subjects>  "
 		+ "  {for $y in tokenize($subj,',')  "
 		+ "  return  "

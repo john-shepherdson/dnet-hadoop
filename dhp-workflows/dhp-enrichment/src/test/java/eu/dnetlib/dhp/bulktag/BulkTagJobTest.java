@@ -46,7 +46,9 @@ public class BulkTagJobTest {
 		+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
 		+ "  \"contributor\" : \"$['contributor'][*]['value']\","
 		+ "  \"description\" : \"$['description'][*]['value']\", "
-		+ " \"subject\" :\"$['subject'][*]['value']\" }";
+		+ " \"subject\" :\"$['subject'][*]['value']\" , " +
+
+			"\"fos\" : \"$['subject'][?(@['qualifier']['classid']=='subject:fos')].value\"} ";
 
 	private static SparkSession spark;
 
@@ -770,14 +772,14 @@ public class BulkTagJobTest {
 		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
 
 		idExplodeCommunity.show(false);
-		Assertions.assertEquals(4, idExplodeCommunity.count());
+		Assertions.assertEquals(5, idExplodeCommunity.count());
 
 		Assertions
 			.assertEquals(
 				3, idExplodeCommunity.filter("provenance = 'community:datasource'").count());
 		Assertions
 			.assertEquals(
-				1, idExplodeCommunity.filter("provenance = 'community:advconstraint'").count());
+				2, idExplodeCommunity.filter("provenance = 'community:advconstraint'").count());
 	}
 
 }
