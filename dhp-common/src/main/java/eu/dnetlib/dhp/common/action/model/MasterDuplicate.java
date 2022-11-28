@@ -8,22 +8,31 @@ import java.io.Serializable;
  * @Date 21/07/22
  */
 public class MasterDuplicate implements Serializable {
-	private String duplicate;
-	private String master;
+	private String duplicateId;
+	private String masterId;
+	private String masterName;
 
-	public String getDuplicate() {
-		return duplicate;
+	public String getDuplicateId() {
+		return duplicateId;
 	}
 
-	public void setDuplicate(String duplicate) {
-		this.duplicate = duplicate;
+	public void setDuplicateId(String duplicateId) {
+		this.duplicateId = duplicateId;
 	}
 
-	public String getMaster() {
-		return master;
+	public String getMasterId() {
+		return masterId;
 	}
 
-	public void setMaster(String master) {
-		this.master = master;
+	public void setMasterId(String masterId) {
+		this.masterId = masterId;
+	}
+
+	public String getMasterName() {
+		return masterName;
+	}
+
+	public void setMasterName(String masterName) {
+		this.masterName = masterName;
 	}
 }

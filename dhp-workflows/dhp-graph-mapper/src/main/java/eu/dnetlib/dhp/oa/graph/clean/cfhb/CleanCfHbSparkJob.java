@@ -78,6 +78,7 @@ public class CleanCfHbSparkJob {
 
 	private static <T extends Result> void cleanCfHb(SparkSession spark, String inputPath, Class<T> entityClazz,
 		String workingPath, String masterDuplicatePath, String outputPath) {
+
 		// read the master-duplicate tuples
 		Dataset<MasterDuplicate> md = spark
 			.read()
@@ -111,7 +112,7 @@ public class CleanCfHbSparkJob {
 		resolved
 			.joinWith(md, resolved.col("cfhb").equalTo(md.col("duplicate")))
 			.map((MapFunction<Tuple2<IdCfHbMapping, MasterDuplicate>, IdCfHbMapping>) t -> {
-				t._1().setMaster(t._2().getMaster());
+				t._1().setMasterId(t._2().getMasterId());
 				return t._1();
 			}, Encoders.bean(IdCfHbMapping.class))
 			.write()
@@ -154,13 +155,13 @@ public class CleanCfHbSparkJob {
 
 		@Override
 		public T reduce(T r, IdCfHbMapping a) {
-			if (Objects.isNull(a) && StringUtils.isBlank(a.getMaster())) {
+			if (Objects.isNull(a) && StringUtils.isBlank(a.getMasterId())) {
 				return r;
 			}
-			r.getCollectedfrom().forEach(kv -> updateKey(kv, a));
+			r.getCollectedfrom().forEach(kv -> updateKeyValue(kv, a));
 			r.getInstance().forEach(i -> {
-				updateKey(i.getHostedby(), a);
-				updateKey(i.getCollectedfrom(), a);
+				updateKeyValue(i.getHostedby(), a);
+				updateKeyValue(i.getCollectedfrom(), a);
 			});
 			return r;
 		}
@@ -178,9 +179,10 @@ public class CleanCfHbSparkJob {
 			return r;
 		}
 
-		private void updateKey(final KeyValue kv, final IdCfHbMapping a) {
+		private void updateKeyValue(final KeyValue kv, final IdCfHbMapping a) {
 			if (kv.getKey().equals(a.getCfhb())) {
-				kv.setKey(a.getMaster());
+				kv.setKey(a.getMasterId());
+				kv.setValue(a.getMasterName());
 			}
 		}
 

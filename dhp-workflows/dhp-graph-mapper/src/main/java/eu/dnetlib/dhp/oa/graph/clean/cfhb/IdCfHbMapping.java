@@ -9,7 +9,9 @@ public class IdCfHbMapping implements Serializable {
 
 	private String cfhb;
 
-	private String master;
+	private String masterId;
+
+	private String masterName;
 
 	public IdCfHbMapping() {
 	}
@@ -34,11 +36,19 @@ public class IdCfHbMapping implements Serializable {
 		this.cfhb = cfhb;
 	}
 
-	public String getMaster() {
-		return master;
+	public String getMasterId() {
+		return masterId;
 	}
 
-	public void setMaster(String master) {
-		this.master = master;
+	public void setMasterId(String masterId) {
+		this.masterId = masterId;
+	}
+
+	public String getMasterName() {
+		return masterName;
+	}
+
+	public void setMasterName(String masterName) {
+		this.masterName = masterName;
 	}
 }

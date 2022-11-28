@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -28,7 +27,9 @@ public class ReadDatasourceMasterDuplicateFromDB {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	private static final String QUERY = "SELECT id as master, duplicate FROM dsm_dedup_services;";
+	private static final String QUERY = "SELECT distinct dd.id as masterId, d.officialname as masterName, dd.duplicate as duplicateId "
+		+
+		"FROM dsm_dedup_services dd join dsm_services d on (dd.id = d.id);";
 
 	public static int execute(String dbUrl, String dbUser, String dbPassword, String hdfsPath, String hdfsNameNode)
 		throws IOException {
@@ -52,11 +53,15 @@ public class ReadDatasourceMasterDuplicateFromDB {
 
 	private static MasterDuplicate datasourceMasterMap(ResultSet rs) {
 		try {
-			MasterDuplicate md = new MasterDuplicate();
-			final String master = rs.getString("master");
-			final String duplicate = rs.getString("duplicate");
-			md.setMaster(OafMapperUtils.createOpenaireId(10, master, true));
-			md.setDuplicate(OafMapperUtils.createOpenaireId(10, duplicate, true));
+			final MasterDuplicate md = new MasterDuplicate();
+
+			final String duplicateId = rs.getString("duplicateId");
+			final String masterId = rs.getString("masterId");
+			final String masterName = rs.getString("masterName");
+
+			md.setDuplicateId(OafMapperUtils.createOpenaireId(10, duplicateId, true));
+			md.setMasterId(OafMapperUtils.createOpenaireId(10, masterId, true));
+			md.setMasterName(masterName);
 
 			return md;
 		} catch (final SQLException e) {
