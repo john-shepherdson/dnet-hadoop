@@ -25,11 +25,13 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.common.action.model.MasterDuplicate;
 import eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob;
 import eu.dnetlib.dhp.schema.oaf.Instance;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
 public class CleanCfHbSparkJob {
@@ -76,6 +78,8 @@ public class CleanCfHbSparkJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
+				HdfsSupport.remove(outputPath, spark.sparkContext().hadoopConfiguration());
+				HdfsSupport.remove(resolvedPath, spark.sparkContext().hadoopConfiguration());
 				cleanCfHb(
 					spark, inputPath, entityClazz, resolvedPath, dsMasterDuplicatePath, outputPath);
 			});
@@ -92,33 +96,15 @@ public class CleanCfHbSparkJob {
 
 		// prepare the resolved CF|HB references with the corresponding EMPTY master ID
 		Dataset<IdCfHbMapping> resolved = spark
-				.read()
-				.textFile(inputPath)
-				.map(as(entityClazz), Encoders.bean(entityClazz))
-				.flatMap(
-				(FlatMapFunction<T, IdCfHbMapping>) r -> {
-					final List<IdCfHbMapping> list = Stream
-							.concat(
-									r.getCollectedfrom().stream().map(KeyValue::getKey),
-									Stream
-											.concat(
-													r.getInstance().stream().map(Instance::getHostedby).map(KeyValue::getKey),
-													r.getInstance().stream().map(Instance::getCollectedfrom).map(KeyValue::getKey)))
-							.distinct()
-							.map(s -> asIdCfHbMapping(r.getId(), s))
-							.collect(Collectors.toList());
-					return list.iterator();
-				},
-				Encoders.bean(IdCfHbMapping.class));
+			.read()
+			.textFile(inputPath)
+			.map(as(entityClazz), Encoders.bean(entityClazz))
+			.flatMap(flattenCfHbFn(), Encoders.bean(IdCfHbMapping.class));
 
 		// set the EMPTY master ID/NAME and save it
 		resolved
 			.joinWith(md, resolved.col("cfhb").equalTo(md.col("duplicateId")))
-			.map((MapFunction<Tuple2<IdCfHbMapping, MasterDuplicate>, IdCfHbMapping>) t -> {
-				t._1().setMasterId(t._2().getMasterId());
-				t._1().setMasterName(t._2().getMasterName());
-				return t._1();
-			}, Encoders.bean(IdCfHbMapping.class))
+			.map(asIdCfHbMapping(), Encoders.bean(IdCfHbMapping.class))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.json(resolvedPath);
@@ -131,27 +117,46 @@ public class CleanCfHbSparkJob {
 
 		// read the result table
 		Dataset<T> res = spark
-				.read()
-				.textFile(inputPath)
-				.map(as(entityClazz), Encoders.bean(entityClazz));
+			.read()
+			.textFile(inputPath)
+			.map(as(entityClazz), Encoders.bean(entityClazz));
 
 		// Join the results with the resolved CF|HB mapping, apply the mapping and save it
 		res
 			.joinWith(resolvedDS, res.col("id").equalTo(resolvedDS.col("resultId")), "left")
 			.groupByKey((MapFunction<Tuple2<T, IdCfHbMapping>, String>) t -> t._1().getId(), Encoders.STRING())
 			.mapGroups(getMapGroupsFunction(), Encoders.bean(entityClazz))
-			//.agg(new IdCfHbMappingAggregator(entityClazz).toColumn())
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
 	}
 
-	@NotNull
+	private static MapFunction<Tuple2<IdCfHbMapping, MasterDuplicate>, IdCfHbMapping> asIdCfHbMapping() {
+		return t -> {
+			t._1().setMasterId(t._2().getMasterId());
+			t._1().setMasterName(t._2().getMasterName());
+			return t._1();
+		};
+	}
+
+	private static <T extends Result> FlatMapFunction<T, IdCfHbMapping> flattenCfHbFn() {
+		return r -> Stream
+			.concat(
+				r.getCollectedfrom().stream().map(KeyValue::getKey),
+				Stream
+					.concat(
+						r.getInstance().stream().map(Instance::getHostedby).map(KeyValue::getKey),
+						r.getInstance().stream().map(Instance::getCollectedfrom).map(KeyValue::getKey)))
+			.distinct()
+			.map(s -> asIdCfHbMapping(r.getId(), s))
+			.iterator();
+	}
+
 	private static <T extends Result> MapGroupsFunction<String, Tuple2<T, IdCfHbMapping>, T> getMapGroupsFunction() {
 		return new MapGroupsFunction<String, Tuple2<T, IdCfHbMapping>, T>() {
 			@Override
-			public T call(String key, Iterator<Tuple2<T, IdCfHbMapping>> values) throws Exception {
+			public T call(String key, Iterator<Tuple2<T, IdCfHbMapping>> values) {
 				final Tuple2<T, IdCfHbMapping> first = values.next();
 				final T res = first._1();
 
