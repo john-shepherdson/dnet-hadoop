@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 public class IdCfHbMapping implements Serializable {
 
-	private String resultid;
+	private String resultId;
 
 	private String cfhb;
 
@@ -17,15 +17,15 @@ public class IdCfHbMapping implements Serializable {
 	}
 
 	public IdCfHbMapping(String id) {
-		this.resultid = id;
+		this.resultId = id;
 	}
 
-	public String getResultid() {
-		return resultid;
+	public String getResultId() {
+		return resultId;
 	}
 
-	public void setResultid(String resultid) {
-		this.resultid = resultid;
+	public void setResultId(String resultId) {
+		this.resultId = resultId;
 	}
 
 	public String getCfhb() {

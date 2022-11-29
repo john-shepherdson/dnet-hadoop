@@ -12,6 +12,12 @@
     "paramRequired": true
   },
   {
+    "paramName": "rp",
+    "paramLongName": "resolvedPath",
+    "paramDescription": "the path to store the resolved records",
+    "paramRequired": true
+  },
+  {
     "paramName": "out",
     "paramLongName": "outputPath",
     "paramDescription": "the path to store the output graph",

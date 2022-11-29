@@ -3,8 +3,11 @@ package eu.dnetlib.dhp.oa.graph.clean.cfhb;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
@@ -12,8 +15,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.expressions.Aggregator;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,14 +57,14 @@ public class CleanCfHbSparkJob {
 		String inputPath = parser.get("inputPath");
 		log.info("inputPath: {}", inputPath);
 
-		String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		String resolvedPath = parser.get("resolvedPath");
+		log.info("resolvedPath: {}", resolvedPath);
 
 		String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		String masterDuplicatePath = parser.get("masterDuplicatePath");
-		log.info("masterDuplicatePath: {}", masterDuplicatePath);
+		String dsMasterDuplicatePath = parser.get("datasourceMasterDuplicate");
+		log.info("datasourceMasterDuplicate: {}", dsMasterDuplicatePath);
 
 		String graphTableClassName = parser.get("graphTableClassName");
 		log.info("graphTableClassName: {}", graphTableClassName);
@@ -72,12 +77,12 @@ public class CleanCfHbSparkJob {
 			isSparkSessionManaged,
 			spark -> {
 				cleanCfHb(
-					spark, inputPath, entityClazz, workingPath, masterDuplicatePath, outputPath);
+					spark, inputPath, entityClazz, resolvedPath, dsMasterDuplicatePath, outputPath);
 			});
 	}
 
 	private static <T extends Result> void cleanCfHb(SparkSession spark, String inputPath, Class<T> entityClazz,
-		String workingPath, String masterDuplicatePath, String outputPath) {
+		String resolvedPath, String masterDuplicatePath, String outputPath) {
 
 		// read the master-duplicate tuples
 		Dataset<MasterDuplicate> md = spark
@@ -85,116 +90,94 @@ public class CleanCfHbSparkJob {
 			.textFile(masterDuplicatePath)
 			.map(as(MasterDuplicate.class), Encoders.bean(MasterDuplicate.class));
 
-		// read the result table
-		Dataset<T> res = spark
-			.read()
-			.textFile(inputPath)
-			.map(as(entityClazz), Encoders.bean(entityClazz));
-
 		// prepare the resolved CF|HB references with the corresponding EMPTY master ID
-		Dataset<IdCfHbMapping> resolved = res
-			.flatMap(
-				(FlatMapFunction<T, IdCfHbMapping>) r -> Stream
-					.concat(
-						r.getCollectedfrom().stream().map(KeyValue::getKey),
-						Stream
+		Dataset<IdCfHbMapping> resolved = spark
+				.read()
+				.textFile(inputPath)
+				.map(as(entityClazz), Encoders.bean(entityClazz))
+				.flatMap(
+				(FlatMapFunction<T, IdCfHbMapping>) r -> {
+					final List<IdCfHbMapping> list = Stream
 							.concat(
-								r.getInstance().stream().map(Instance::getHostedby).map(KeyValue::getKey),
-								r.getInstance().stream().map(Instance::getCollectedfrom).map(KeyValue::getKey)))
-					.distinct()
-					.map(s -> asIdCfHbMapping(r.getId(), s))
-					.iterator(),
+									r.getCollectedfrom().stream().map(KeyValue::getKey),
+									Stream
+											.concat(
+													r.getInstance().stream().map(Instance::getHostedby).map(KeyValue::getKey),
+													r.getInstance().stream().map(Instance::getCollectedfrom).map(KeyValue::getKey)))
+							.distinct()
+							.map(s -> asIdCfHbMapping(r.getId(), s))
+							.collect(Collectors.toList());
+					return list.iterator();
+				},
 				Encoders.bean(IdCfHbMapping.class));
 
-		final String resolvedPath = workingPath + "/cfHbResolved";
-
-		// set the EMPTY master ID and save it aside
+		// set the EMPTY master ID/NAME and save it
 		resolved
-			.joinWith(md, resolved.col("cfhb").equalTo(md.col("duplicate")))
+			.joinWith(md, resolved.col("cfhb").equalTo(md.col("duplicateId")))
 			.map((MapFunction<Tuple2<IdCfHbMapping, MasterDuplicate>, IdCfHbMapping>) t -> {
 				t._1().setMasterId(t._2().getMasterId());
+				t._1().setMasterName(t._2().getMasterName());
 				return t._1();
 			}, Encoders.bean(IdCfHbMapping.class))
 			.write()
 			.mode(SaveMode.Overwrite)
-			.parquet(resolvedPath);
+			.json(resolvedPath);
 
 		// read again the resolved CF|HB mapping
 		Dataset<IdCfHbMapping> resolvedDS = spark
 			.read()
-			.load(resolvedPath)
-			.as(Encoders.bean(IdCfHbMapping.class));
+			.textFile(resolvedPath)
+			.map(as(IdCfHbMapping.class), Encoders.bean(IdCfHbMapping.class));
+
+		// read the result table
+		Dataset<T> res = spark
+				.read()
+				.textFile(inputPath)
+				.map(as(entityClazz), Encoders.bean(entityClazz));
 
 		// Join the results with the resolved CF|HB mapping, apply the mapping and save it
 		res
-			.joinWith(resolvedDS, res.col("id").equalTo(resolved.col("resultId")), "left")
+			.joinWith(resolvedDS, res.col("id").equalTo(resolvedDS.col("resultId")), "left")
 			.groupByKey((MapFunction<Tuple2<T, IdCfHbMapping>, String>) t -> t._1().getId(), Encoders.STRING())
-			.agg(new IdCfHbMappingAggregator(entityClazz).toColumn())
+			.mapGroups(getMapGroupsFunction(), Encoders.bean(entityClazz))
+			//.agg(new IdCfHbMappingAggregator(entityClazz).toColumn())
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
 	}
 
-	public static class IdCfHbMappingAggregator<T extends Result> extends Aggregator<IdCfHbMapping, T, T> {
+	@NotNull
+	private static <T extends Result> MapGroupsFunction<String, Tuple2<T, IdCfHbMapping>, T> getMapGroupsFunction() {
+		return new MapGroupsFunction<String, Tuple2<T, IdCfHbMapping>, T>() {
+			@Override
+			public T call(String key, Iterator<Tuple2<T, IdCfHbMapping>> values) throws Exception {
+				final Tuple2<T, IdCfHbMapping> first = values.next();
+				final T res = first._1();
 
-		private final Class<T> entityClazz;
-
-		public IdCfHbMappingAggregator(Class<T> entityClazz) {
-			this.entityClazz = entityClazz;
-		}
-
-		@Override
-		public T zero() {
-			try {
-				return entityClazz.newInstance();
-			} catch (InstantiationException | IllegalAccessException e) {
-				throw new RuntimeException(e);
+				updateResult(res, first._2());
+				values.forEachRemaining(t -> updateResult(res, t._2()));
+				return res;
 			}
-		}
 
-		@Override
-		public T reduce(T r, IdCfHbMapping a) {
-			if (Objects.isNull(a) && StringUtils.isBlank(a.getMasterId())) {
-				return r;
+			private void updateResult(T res, IdCfHbMapping m) {
+				if (Objects.nonNull(m)) {
+					res.getCollectedfrom().forEach(kv -> updateKeyValue(kv, m));
+					res.getInstance().forEach(i -> {
+						updateKeyValue(i.getHostedby(), m);
+						updateKeyValue(i.getCollectedfrom(), m);
+					});
+				}
 			}
-			r.getCollectedfrom().forEach(kv -> updateKeyValue(kv, a));
-			r.getInstance().forEach(i -> {
-				updateKeyValue(i.getHostedby(), a);
-				updateKeyValue(i.getCollectedfrom(), a);
-			});
-			return r;
-		}
 
-		@Override
-		public T merge(T b1, T b2) {
-			if (Objects.isNull(b1.getId())) {
-				return b2;
+			private void updateKeyValue(final KeyValue kv, final IdCfHbMapping a) {
+				if (kv.getKey().equals(a.getCfhb())) {
+					kv.setKey(a.getMasterId());
+					kv.setValue(a.getMasterName());
+				}
 			}
-			return b1;
-		}
 
-		@Override
-		public T finish(T r) {
-			return r;
-		}
-
-		private void updateKeyValue(final KeyValue kv, final IdCfHbMapping a) {
-			if (kv.getKey().equals(a.getCfhb())) {
-				kv.setKey(a.getMasterId());
-				kv.setValue(a.getMasterName());
-			}
-		}
-
-		@Override
-		public Encoder<T> bufferEncoder() {
-			return Encoders.bean(entityClazz);
-		}
-
-		@Override
-		public Encoder<T> outputEncoder() {
-			return Encoders.bean(entityClazz);
-		}
+		};
 	}
 
 	private static IdCfHbMapping asIdCfHbMapping(String resultId, String cfHb) {
