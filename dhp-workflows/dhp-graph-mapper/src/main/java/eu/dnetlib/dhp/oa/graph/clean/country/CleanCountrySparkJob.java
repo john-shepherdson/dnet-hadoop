@@ -58,8 +58,8 @@ public class CleanCountrySparkJob implements Serializable {
 		String inputPath = parser.get("inputPath");
 		log.info("inputPath: {}", inputPath);
 
-		String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		String workingDir = parser.get("workingDir");
+		log.info("workingDir: {}", workingDir);
 
 		String datasourcePath = parser.get("hostedBy");
 		log.info("datasourcePath: {}", datasourcePath);
@@ -85,12 +85,12 @@ public class CleanCountrySparkJob implements Serializable {
 			spark -> {
 
 				cleanCountry(
-					spark, country, verifyParam, inputPath, entityClazz, workingPath, collectedfrom, datasourcePath);
+					spark, country, verifyParam, inputPath, entityClazz, workingDir, collectedfrom, datasourcePath);
 			});
 	}
 
 	private static <T extends Result> void cleanCountry(SparkSession spark, String country, String[] verifyParam,
-		String inputPath, Class<T> entityClazz, String workingPath, String collectedfrom, String datasourcePath) {
+		String inputPath, Class<T> entityClazz, String workingDir, String collectedfrom, String datasourcePath) {
 
 		List<String> hostedBy = spark
 			.read()
@@ -134,11 +134,11 @@ public class CleanCountrySparkJob implements Serializable {
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.json(workingPath);
+			.json(workingDir);
 
 		spark
 			.read()
-			.textFile(workingPath)
+			.textFile(workingDir)
 			.map(
 				(MapFunction<String, T>) value -> OBJECT_MAPPER.readValue(value, entityClazz),
 				Encoders.bean(entityClazz))

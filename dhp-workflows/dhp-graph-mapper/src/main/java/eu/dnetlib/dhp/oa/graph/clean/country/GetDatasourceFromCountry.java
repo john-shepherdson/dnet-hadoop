@@ -54,8 +54,8 @@ public class GetDatasourceFromCountry implements Serializable {
 		String inputPath = parser.get("inputPath");
 		log.info("inputPath: {}", inputPath);
 
-		String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		String workingPath = parser.get("workingDir");
+		log.info("workingDir: {}", workingPath);
 
 		String country = parser.get("country");
 		log.info("country: {}", country);
@@ -70,7 +70,7 @@ public class GetDatasourceFromCountry implements Serializable {
 	}
 
 	private static void getDatasourceFromCountry(SparkSession spark, String country, String inputPath,
-		String workingPath) {
+		String workingDir) {
 
 		Dataset<Organization> organization = spark
 			.read()
@@ -100,7 +100,7 @@ public class GetDatasourceFromCountry implements Serializable {
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.json(workingPath);
+			.json(workingDir);
 
 	}
 }
