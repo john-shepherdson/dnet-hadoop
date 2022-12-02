@@ -1,0 +1,24 @@
+<RESOURCE_PROFILE>
+    <HEADER>
+        <RESOURCE_IDENTIFIER value=""/>
+        <RESOURCE_TYPE value="DedupOrchestrationDSResourceType"/>
+        <RESOURCE_KIND value="DedupOrchestrationDSResources"/>
+        <RESOURCE_URI value=""/>
+        <DATE_OF_CREATION value="2001-12-31T12:00:00"/>
+    </HEADER>
+    <BODY>
+        <CONFIGURATION enabled="true">
+            <DEDUPLICATION>
+                <ENTITY code="20" label="Organization" name="organization"/>
+                <ACTION_SET id="test-orchestrator"/>
+                <SCAN_SEQUENCE>
+                    <SCAN id="publication"/>
+                </SCAN_SEQUENCE>
+            </DEDUPLICATION>
+        </CONFIGURATION>
+        <STATUS>
+            <LAST_UPDATE value="2001-12-31T12:00:00"/>
+        </STATUS>
+        <SECURITY_PARAMETERS>SECURITY_PARAMETERS</SECURITY_PARAMETERS>
+    </BODY>
+</RESOURCE_PROFILE>
