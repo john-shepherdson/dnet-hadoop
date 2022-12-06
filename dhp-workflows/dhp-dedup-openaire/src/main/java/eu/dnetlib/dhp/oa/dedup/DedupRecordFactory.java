@@ -94,7 +94,6 @@ public class DedupRecordFactory {
 
 		BeanUtils.copyProperties(entity, first);
 
-		final Collection<String> dates = Lists.newArrayList();
 		final List<List<Author>> authors = Lists.newArrayList();
 
 		entityList
@@ -103,16 +102,14 @@ public class DedupRecordFactory {
 					entity.mergeFrom(duplicate);
 					if (ModelSupport.isSubClass(duplicate, Result.class)) {
 						Result r1 = (Result) duplicate;
-						if (r1.getAuthor() != null && StringUtils.isNotBlank(r1.getDateofacceptance().getValue()))
-							authors.add(r1.getAuthor());
-						if (r1.getDateofacceptance() != null)
-							dates.add(r1.getDateofacceptance().getValue());
+						Optional
+							.ofNullable(r1.getAuthor())
+							.ifPresent(a -> authors.add(a));
 					}
 				});
 
 		// set authors and date
 		if (ModelSupport.isSubClass(entity, Result.class)) {
-			// ((Result) entity).setDateofacceptance(DatePicker.pick(dates));
 			((Result) entity).setAuthor(AuthorMerger.merge(authors));
 		}
 
