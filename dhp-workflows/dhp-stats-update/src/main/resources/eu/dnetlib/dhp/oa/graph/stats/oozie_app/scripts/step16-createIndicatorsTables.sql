@@ -454,16 +454,16 @@ FROM publication_datasources pd
 compute stats indi_pub_hybrid_oa_with_cc;
 
 create table indi_pub_downloads stored as parquet as
-SELECT result_id, sum(downloads) no_dowloads from openaire_prod_usage_stats.usage_stats
+SELECT result_id, sum(downloads) no_downloads from openaire_prod_usage_stats.usage_stats
                                                       join publication on result_id=id
 where downloads>0
 GROUP BY result_id
-order by no_dowloads desc;
+order by no_downloads desc;
 
 compute stats indi_pub_downloads;
 
 create table indi_pub_downloads_datasource stored as parquet as
-SELECT result_id, repository_id, sum(downloads) no_dowloads from openaire_prod_usage_stats.usage_stats
+SELECT result_id, repository_id, sum(downloads) no_downloads from openaire_prod_usage_stats.usage_stats
                                                                      join publication on result_id=id
 where downloads>0
 GROUP BY result_id, repository_id
@@ -472,7 +472,7 @@ order by result_id;
 compute stats indi_pub_downloads_datasource;
 
 create table indi_pub_downloads_year stored as parquet as
-SELECT result_id, substring(us.`date`, 1,4) as `year`, sum(downloads) no_dowloads from openaire_prod_usage_stats.usage_stats us
+SELECT result_id, substring(us.`date`, 1,4) as `year`, sum(downloads) no_downloads from openaire_prod_usage_stats.usage_stats us
                                                                                            join publication on result_id=id where downloads>0
 GROUP BY result_id, `year`
 order by `year` asc;
@@ -480,7 +480,7 @@ order by `year` asc;
 compute stats indi_pub_downloads_year;
 
 create table indi_pub_downloads_datasource_year stored as parquet as
-SELECT result_id, substring(us.`date`, 1,4) as `year`, repository_id, sum(downloads) no_dowloads from openaire_prod_usage_stats.usage_stats us
+SELECT result_id, substring(us.`date`, 1,4) as `year`, repository_id, sum(downloads) no_downloads from openaire_prod_usage_stats.usage_stats us
                                                                                                           join publication on result_id=id
 where downloads>0
 GROUP BY result_id, repository_id, `year`
