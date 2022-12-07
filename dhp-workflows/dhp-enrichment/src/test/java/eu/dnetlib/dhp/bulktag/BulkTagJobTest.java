@@ -48,7 +48,7 @@ public class BulkTagJobTest {
 		+ "  \"description\" : \"$['description'][*]['value']\", "
 		+ " \"subject\" :\"$['subject'][*]['value']\" , " +
 
-			"\"fos\" : \"$['subject'][?(@['qualifier']['classid']=='subject:fos')].value\"} ";
+		"\"fos\" : \"$['subject'][?(@['qualifier']['classid']=='subject:fos')].value\"} ";
 
 	private static SparkSession spark;
 
