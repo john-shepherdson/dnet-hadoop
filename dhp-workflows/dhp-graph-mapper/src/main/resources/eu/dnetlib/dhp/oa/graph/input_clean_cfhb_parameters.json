@@ -31,7 +31,7 @@
   },
   {
     "paramName": "md",
-    "paramLongName": "datasourceMasterDuplicate",
+    "paramLongName": "masterDuplicatePath",
     "paramDescription": "path to the file on HDFS holding the datasource id tuples [master, duplicate]",
     "paramRequired": true
   }
