@@ -65,8 +65,8 @@ public class CleanCfHbSparkJob {
 		String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		String dsMasterDuplicatePath = parser.get("datasourceMasterDuplicate");
-		log.info("datasourceMasterDuplicate: {}", dsMasterDuplicatePath);
+		String dsMasterDuplicatePath = parser.get("masterDuplicatePath");
+		log.info("masterDuplicatePath: {}", dsMasterDuplicatePath);
 
 		String graphTableClassName = parser.get("graphTableClassName");
 		log.info("graphTableClassName: {}", graphTableClassName);
