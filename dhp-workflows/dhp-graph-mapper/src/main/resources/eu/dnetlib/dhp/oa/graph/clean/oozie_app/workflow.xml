@@ -630,7 +630,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphOutputPath}/publication</arg>
             <arg>--resolvedPath</arg><arg>${workingDir}/cfHbResolved/publication</arg>
-            <arg>--outputPath</arg><arg>${workingPath}/cfHbPatched/publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/cfHbPatched/publication</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
         </spark>
@@ -657,7 +657,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphOutputPath}/dataset</arg>
             <arg>--resolvedPath</arg><arg>${workingDir}/cfHbResolved/dataset</arg>
-            <arg>--outputPath</arg><arg>${workingPath}/cfHbPatched/dataset</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/cfHbPatched/dataset</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
         </spark>
@@ -684,7 +684,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphOutputPath}/otherresearchproduct</arg>
             <arg>--resolvedPath</arg><arg>${workingDir}/cfHbResolved/otherresearchproduct</arg>
-            <arg>--outputPath</arg><arg>${workingPath}/cfHbPatched/otherresearchproduct</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/cfHbPatched/otherresearchproduct</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
         </spark>
@@ -711,7 +711,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphOutputPath}/software</arg>
             <arg>--resolvedPath</arg><arg>${workingDir}/cfHbResolved/software</arg>
-            <arg>--outputPath</arg><arg>${workingPath}/cfHbPatched/software</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/cfHbPatched/software</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
         </spark>
