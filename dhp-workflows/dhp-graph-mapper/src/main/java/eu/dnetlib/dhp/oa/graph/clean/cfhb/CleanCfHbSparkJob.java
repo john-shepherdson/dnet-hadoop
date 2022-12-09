@@ -157,7 +157,8 @@ public class CleanCfHbSparkJob {
 						r.getInstance().stream().map(Instance::getHostedby).map(KeyValue::getKey),
 						r.getInstance().stream().map(Instance::getCollectedfrom).map(KeyValue::getKey)))
 			.distinct()
-			.map(s -> asIdCfHbMapping(r.getId(), s))
+			.filter(StringUtils::isNotBlank)
+			.map(cfHb -> asIdCfHbMapping(r.getId(), cfHb))
 			.iterator();
 	}
 
