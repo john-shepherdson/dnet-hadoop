@@ -108,6 +108,9 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 			.forEach(
 				consumeMDStore(
 					mdFormat, mdLayout, mdInterpretation, hdfsPath, fileSystem, mongoBaseUrl, mongoDb, hdfsMDStores));
+
+		// TODO: DELETE MDStORE FOLDER NOT PRESENT IN MONGO
+
 	}
 
 	/**
