@@ -333,7 +333,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 					if (Objects.isNull(i.getHostedby()) || StringUtils.isBlank(i.getHostedby().getKey())) {
 						i.setHostedby(ModelConstants.UNKNOWN_REPOSITORY);
 					}
-					if (Objects.isNull(i.getRefereed())) {
+					if (Objects.isNull(i.getRefereed()) || StringUtils.isBlank(i.getRefereed().getClassid())) {
 						i.setRefereed(qualifier("0000", "Unknown", ModelConstants.DNET_REVIEW_LEVELS));
 					}
 					if (Objects.nonNull(i.getDateofacceptance())) {

@@ -42,7 +42,7 @@ public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Obje
 
 		vocabularies.find(vocabularyId).ifPresent(vocabulary -> {
 			if (ModelConstants.DNET_SUBJECT_KEYWORD.equalsIgnoreCase(subject.getQualifier().getClassid())) {
-				Qualifier newValue = vocabulary.lookup(subject.getValue());
+				Qualifier newValue = vocabulary.lookup(subject.getValue(), true);
 				if (!ModelConstants.UNKNOWN.equals(newValue.getClassid())) {
 					subject.setValue(newValue.getClassid());
 					subject.getQualifier().setClassid(vocabularyId);

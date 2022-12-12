@@ -83,12 +83,12 @@ public class CleanCountryTest {
 		CleanCountrySparkJob.main(new String[] {
 			"--isSparkSessionManaged", Boolean.FALSE.toString(),
 			"--inputPath", workingDir.toString() + "/publication",
-			"-graphTableClassName", Publication.class.getCanonicalName(),
-			"-workingPath", workingDir.toString() + "/working",
-			"-country", "NL",
-			"-verifyParam", "10.17632",
-			"-collectedfrom", "NARCIS",
-			"-hostedBy", getClass()
+			"--graphTableClassName", Publication.class.getCanonicalName(),
+			"--workingDir", workingDir.toString() + "/working",
+			"--country", "NL",
+			"--verifyParam", "10.17632",
+			"--collectedfrom", "NARCIS",
+			"--hostedBy", getClass()
 				.getResource("/eu/dnetlib/dhp/oa/graph/clean/hostedBy")
 				.getPath()
 		});
