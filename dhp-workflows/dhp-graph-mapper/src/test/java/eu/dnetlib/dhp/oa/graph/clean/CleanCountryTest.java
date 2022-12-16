@@ -167,7 +167,7 @@ public class CleanCountryTest {
 				"--isSparkSessionManaged", Boolean.FALSE.toString(),
 				"--inputPath", workingDir.toString() + "/dataset",
 				"-graphTableClassName", Dataset.class.getCanonicalName(),
-				"-workingPath", workingDir.toString() + "/working",
+				"-workingDir", workingDir.toString() + "/working",
 				"-country", "NL",
 				"-verifyParam", "10.17632",
 				"-collectedfrom", "NARCIS",
@@ -182,6 +182,8 @@ public class CleanCountryTest {
 				.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
 
 		Assertions.assertEquals(1, tmp.count());
+
+		Assertions.assertEquals(0, tmp.first().getCountry().size());
 
 
 	}
