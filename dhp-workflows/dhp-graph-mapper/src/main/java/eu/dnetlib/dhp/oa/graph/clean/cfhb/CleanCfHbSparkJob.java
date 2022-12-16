@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
@@ -105,6 +106,7 @@ public class CleanCfHbSparkJob {
 		resolved
 			.joinWith(md, resolved.col("cfhb").equalTo(md.col("duplicateId")))
 			.map(asIdCfHbMapping(), Encoders.bean(IdCfHbMapping.class))
+			.filter((FilterFunction<IdCfHbMapping>) m -> Objects.nonNull(m.getMasterId()))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.json(resolvedPath);
@@ -134,22 +136,50 @@ public class CleanCfHbSparkJob {
 
 	private static MapFunction<Tuple2<IdCfHbMapping, MasterDuplicate>, IdCfHbMapping> asIdCfHbMapping() {
 		return t -> {
-			t._1().setMasterId(t._2().getMasterId());
-			t._1().setMasterName(t._2().getMasterName());
-			return t._1();
+			final IdCfHbMapping mapping = t._1();
+			Optional
+				.ofNullable(t._2())
+				.ifPresent(t2 -> {
+					mapping.setMasterId(t2.getMasterId());
+					mapping.setMasterName(t2.getMasterName());
+
+				});
+			return mapping;
 		};
 	}
 
 	private static <T extends Result> FlatMapFunction<T, IdCfHbMapping> flattenCfHbFn() {
 		return r -> Stream
 			.concat(
-				r.getCollectedfrom().stream().map(KeyValue::getKey),
+				Optional
+					.ofNullable(r.getCollectedfrom())
+					.map(cf -> cf.stream().map(KeyValue::getKey))
+					.orElse(Stream.empty()),
 				Stream
 					.concat(
-						r.getInstance().stream().map(Instance::getHostedby).map(KeyValue::getKey),
-						r.getInstance().stream().map(Instance::getCollectedfrom).map(KeyValue::getKey)))
+						Optional
+							.ofNullable(r.getInstance())
+							.map(
+								instances -> instances
+									.stream()
+									.map(i -> Optional.ofNullable(i.getHostedby()).map(KeyValue::getKey).orElse("")))
+							.orElse(Stream.empty())
+							.filter(StringUtils::isNotBlank),
+						Optional
+							.ofNullable(r.getInstance())
+							.map(
+								instances -> instances
+									.stream()
+									.map(
+										i -> Optional
+											.ofNullable(i.getCollectedfrom())
+											.map(KeyValue::getKey)
+											.orElse("")))
+							.orElse(Stream.empty())
+							.filter(StringUtils::isNotBlank)))
 			.distinct()
-			.map(s -> asIdCfHbMapping(r.getId(), s))
+			.filter(StringUtils::isNotBlank)
+			.map(cfHb -> asIdCfHbMapping(r.getId(), cfHb))
 			.iterator();
 	}
 

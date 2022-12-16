@@ -143,7 +143,7 @@ public class CleanCfHbSparkJobTest {
 					"--outputPath", outputPath,
 					"--resolvedPath", resolvedPath + "/dataset",
 					"--graphTableClassName", Dataset.class.getCanonicalName(),
-					"--datasourceMasterDuplicate", dsMasterDuplicatePath
+					"--masterDuplicatePath", dsMasterDuplicatePath
 				});
 
 		assertTrue(Files.exists(Paths.get(graphOutputPath, "dataset")));
