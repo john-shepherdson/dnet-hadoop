@@ -12,7 +12,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.DocumentException;
@@ -22,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
@@ -995,7 +995,7 @@ class MappersTest {
 	@Test
 	void testEoscFutureHackZenodo() throws IOException {
 		final String xml = IOUtils
-				.toString(Objects.requireNonNull(getClass().getResourceAsStream("zenodo7351221.xml")));
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("zenodo7351221.xml")));
 
 		final List<Oaf> actual = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 		actual.forEach(a -> {

@@ -774,47 +774,47 @@ public class BulkTagJobTest {
 	void bulktagPublicationwithConstraintsTest() throws Exception {
 
 		final String sourcePath = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/bulktag/sample/publication/orcidbulktagfordatasource")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/bulktag/sample/publication/orcidbulktagfordatasource")
+			.getPath();
 		SparkBulkTagJob
-				.main(
-						new String[] {
-								"-isTest", Boolean.TRUE.toString(),
-								"-isSparkSessionManaged", Boolean.FALSE.toString(),
-								"-sourcePath", sourcePath,
-								"-taggingConf", IOUtils
-								.toString(
-								BulkTagJobTest.class
-										.getResourceAsStream(
-												"/eu/dnetlib/dhp/bulktag/communityconfiguration/tagging_conf_neanias.xml")),
-								"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
-								"-outputPath", workingDir.toString() + "/publication",
-								"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
-								"-pathMap", pathMap
-						});
+			.main(
+				new String[] {
+					"-isTest", Boolean.TRUE.toString(),
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath", sourcePath,
+					"-taggingConf", IOUtils
+						.toString(
+							BulkTagJobTest.class
+								.getResourceAsStream(
+									"/eu/dnetlib/dhp/bulktag/communityconfiguration/tagging_conf_neanias.xml")),
+					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
+					"-outputPath", workingDir.toString() + "/publication",
+					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+					"-pathMap", pathMap
+				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Publication> tmp = sc
-				.textFile(workingDir.toString() + "/publication")
-				.map(item -> OBJECT_MAPPER.readValue(item, Publication.class));
+			.textFile(workingDir.toString() + "/publication")
+			.map(item -> OBJECT_MAPPER.readValue(item, Publication.class));
 
 		Assertions.assertEquals(2, tmp.count());
 		org.apache.spark.sql.Dataset<Publication> verificationDataset = spark
-				.createDataset(tmp.rdd(), Encoders.bean(Publication.class));
+			.createDataset(tmp.rdd(), Encoders.bean(Publication.class));
 
 		verificationDataset.createOrReplaceTempView("dataset");
 		String query = "select id, MyT.id community, MyD.provenanceaction.classid provenance, MyD.provenanceaction.classname name "
-				+ "from dataset "
-				+ "lateral view explode(context) c as MyT "
-				+ "lateral view explode(MyT.datainfo) d as MyD "
-				+ "where MyD.inferenceprovenance = 'bulktagging'";
+			+ "from dataset "
+			+ "lateral view explode(context) c as MyT "
+			+ "lateral view explode(MyT.datainfo) d as MyD "
+			+ "where MyD.inferenceprovenance = 'bulktagging'";
 
 		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
 
 		idExplodeCommunity.show(false);
 		Assertions.assertEquals(0, idExplodeCommunity.count());
 
-			}
+	}
 }

@@ -31,76 +31,76 @@ import scala.Tuple2;
  * @Date 22/07/22
  */
 public class GetDatasourceFromCountry implements Serializable {
-    private static final Logger log = LoggerFactory.getLogger(GetDatasourceFromCountry.class);
+	private static final Logger log = LoggerFactory.getLogger(GetDatasourceFromCountry.class);
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
 
-        String jsonConfiguration = IOUtils
-                .toString(
-                        GetDatasourceFromCountry.class
-                                .getResourceAsStream(
-                                        "/eu/dnetlib/dhp/oa/graph/input_datasource_country_parameters.json"));
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
-        parser.parseArgument(args);
+		String jsonConfiguration = IOUtils
+			.toString(
+				GetDatasourceFromCountry.class
+					.getResourceAsStream(
+						"/eu/dnetlib/dhp/oa/graph/input_datasource_country_parameters.json"));
+		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
+		parser.parseArgument(args);
 
-        Boolean isSparkSessionManaged = Optional
-                .ofNullable(parser.get("isSparkSessionManaged"))
-                .map(Boolean::valueOf)
-                .orElse(Boolean.TRUE);
-        log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
+		Boolean isSparkSessionManaged = Optional
+			.ofNullable(parser.get("isSparkSessionManaged"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.TRUE);
+		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-        String inputPath = parser.get("inputPath");
-        log.info("inputPath: {}", inputPath);
+		String inputPath = parser.get("inputPath");
+		log.info("inputPath: {}", inputPath);
 
-        String workingPath = parser.get("workingDir");
-        log.info("workingDir: {}", workingPath);
+		String workingPath = parser.get("workingDir");
+		log.info("workingDir: {}", workingPath);
 
-        String country = parser.get("country");
-        log.info("country: {}", country);
+		String country = parser.get("country");
+		log.info("country: {}", country);
 
-        SparkConf conf = new SparkConf();
-        runWithSparkSession(
-                conf,
-                isSparkSessionManaged,
-                spark -> {
-                    getDatasourceFromCountry(spark, country, inputPath, workingPath);
-                });
-    }
+		SparkConf conf = new SparkConf();
+		runWithSparkSession(
+			conf,
+			isSparkSessionManaged,
+			spark -> {
+				getDatasourceFromCountry(spark, country, inputPath, workingPath);
+			});
+	}
 
-    private static void getDatasourceFromCountry(SparkSession spark, String country, String inputPath,
-                                                 String workingDir) {
+	private static void getDatasourceFromCountry(SparkSession spark, String country, String inputPath,
+		String workingDir) {
 
-        Dataset<Organization> organization = spark
-                .read()
-                .textFile(inputPath + "/organization")
-                .map(
-                        (MapFunction<String, Organization>) value -> OBJECT_MAPPER.readValue(value, Organization.class),
-                        Encoders.bean(Organization.class))
-                .filter(
-                        (FilterFunction<Organization>) o -> !o.getDataInfo().getDeletedbyinference() &&
-                                o.getCountry().getClassid().length() > 0 &&
-                                o.getCountry().getClassid().equals(country));
+		Dataset<Organization> organization = spark
+			.read()
+			.textFile(inputPath + "/organization")
+			.map(
+				(MapFunction<String, Organization>) value -> OBJECT_MAPPER.readValue(value, Organization.class),
+				Encoders.bean(Organization.class))
+			.filter(
+				(FilterFunction<Organization>) o -> !o.getDataInfo().getDeletedbyinference() &&
+					o.getCountry().getClassid().length() > 0 &&
+					o.getCountry().getClassid().equals(country));
 
-        // filtering of the relations taking the non deleted by inference and those with IsProvidedBy as relclass
-        Dataset<Relation> relation = spark
-                .read()
-                .textFile(inputPath + "/relation")
-                .map(
-                        (MapFunction<String, Relation>) value -> OBJECT_MAPPER.readValue(value, Relation.class),
-                        Encoders.bean(Relation.class))
-                .filter(
-                        (FilterFunction<Relation>) rel -> rel.getRelClass().equalsIgnoreCase(ModelConstants.IS_PROVIDED_BY) &&
-                                !rel.getDataInfo().getDeletedbyinference());
+		// filtering of the relations taking the non deleted by inference and those with IsProvidedBy as relclass
+		Dataset<Relation> relation = spark
+			.read()
+			.textFile(inputPath + "/relation")
+			.map(
+				(MapFunction<String, Relation>) value -> OBJECT_MAPPER.readValue(value, Relation.class),
+				Encoders.bean(Relation.class))
+			.filter(
+				(FilterFunction<Relation>) rel -> rel.getRelClass().equalsIgnoreCase(ModelConstants.IS_PROVIDED_BY) &&
+					!rel.getDataInfo().getDeletedbyinference());
 
-        organization
-                .joinWith(relation, organization.col("id").equalTo(relation.col("target")))
-                .map((MapFunction<Tuple2<Organization, Relation>, String>) t2 -> t2._2().getSource(), Encoders.STRING())
-                .write()
-                .mode(SaveMode.Overwrite)
-                .option("compression", "gzip")
-                .json(workingDir);
+		organization
+			.joinWith(relation, organization.col("id").equalTo(relation.col("target")))
+			.map((MapFunction<Tuple2<Organization, Relation>, String>) t2 -> t2._2().getSource(), Encoders.STRING())
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(workingDir);
 
-    }
+	}
 }

@@ -39,173 +39,173 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 
 public class CleanCountrySparkJob implements Serializable {
-    private static final Logger log = LoggerFactory.getLogger(CleanCountrySparkJob.class);
+	private static final Logger log = LoggerFactory.getLogger(CleanCountrySparkJob.class);
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {
 
-        String jsonConfiguration = IOUtils
-                .toString(
-                        CleanCountrySparkJob.class
-                                .getResourceAsStream(
-                                        "/eu/dnetlib/dhp/oa/graph/input_clean_country_parameters.json"));
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
-        parser.parseArgument(args);
+		String jsonConfiguration = IOUtils
+			.toString(
+				CleanCountrySparkJob.class
+					.getResourceAsStream(
+						"/eu/dnetlib/dhp/oa/graph/input_clean_country_parameters.json"));
+		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
+		parser.parseArgument(args);
 
-        Boolean isSparkSessionManaged = Optional
-                .ofNullable(parser.get("isSparkSessionManaged"))
-                .map(Boolean::valueOf)
-                .orElse(Boolean.TRUE);
-        log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
+		Boolean isSparkSessionManaged = Optional
+			.ofNullable(parser.get("isSparkSessionManaged"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.TRUE);
+		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-        String inputPath = parser.get("inputPath");
-        log.info("inputPath: {}", inputPath);
+		String inputPath = parser.get("inputPath");
+		log.info("inputPath: {}", inputPath);
 
-        String workingDir = parser.get("workingDir");
-        log.info("workingDir: {}", workingDir);
+		String workingDir = parser.get("workingDir");
+		log.info("workingDir: {}", workingDir);
 
-        String datasourcePath = parser.get("hostedBy");
-        log.info("datasourcePath: {}", datasourcePath);
+		String datasourcePath = parser.get("hostedBy");
+		log.info("datasourcePath: {}", datasourcePath);
 
-        String country = parser.get("country");
-        log.info("country: {}", country);
+		String country = parser.get("country");
+		log.info("country: {}", country);
 
-        String[] verifyParam = parser.get("verifyParam").split(";");
-        log.info("verifyParam: {}", verifyParam);
+		String[] verifyParam = parser.get("verifyParam").split(";");
+		log.info("verifyParam: {}", verifyParam);
 
-        String collectedfrom = parser.get("collectedfrom");
-        log.info("collectedfrom: {}", collectedfrom);
+		String collectedfrom = parser.get("collectedfrom");
+		log.info("collectedfrom: {}", collectedfrom);
 
-        String graphTableClassName = parser.get("graphTableClassName");
-        log.info("graphTableClassName: {}", graphTableClassName);
+		String graphTableClassName = parser.get("graphTableClassName");
+		log.info("graphTableClassName: {}", graphTableClassName);
 
-        Class<? extends Result> entityClazz = (Class<? extends Result>) Class.forName(graphTableClassName);
+		Class<? extends Result> entityClazz = (Class<? extends Result>) Class.forName(graphTableClassName);
 
-        SparkConf conf = new SparkConf();
-        runWithSparkSession(
-                conf,
-                isSparkSessionManaged,
-                spark -> {
+		SparkConf conf = new SparkConf();
+		runWithSparkSession(
+			conf,
+			isSparkSessionManaged,
+			spark -> {
 
-                    cleanCountry(
-                            spark, country, verifyParam, inputPath, entityClazz, workingDir, collectedfrom, datasourcePath);
-                });
-    }
+				cleanCountry(
+					spark, country, verifyParam, inputPath, entityClazz, workingDir, collectedfrom, datasourcePath);
+			});
+	}
 
-    private static <T extends Result> void cleanCountry(SparkSession spark, String country, String[] verifyParam,
-                                                        String inputPath, Class<T> entityClazz, String workingDir, String collectedfrom, String datasourcePath) {
+	private static <T extends Result> void cleanCountry(SparkSession spark, String country, String[] verifyParam,
+		String inputPath, Class<T> entityClazz, String workingDir, String collectedfrom, String datasourcePath) {
 
-        List<String> hostedBy = spark
-                .read()
-                .textFile(datasourcePath)
-                .collectAsList();
+		List<String> hostedBy = spark
+			.read()
+			.textFile(datasourcePath)
+			.collectAsList();
 
-        Dataset<T> res = spark
-                .read()
-                .textFile(inputPath)
-                .map(
-                        (MapFunction<String, T>) value -> OBJECT_MAPPER.readValue(value, entityClazz),
-                        Encoders.bean(entityClazz));
+		Dataset<T> res = spark
+			.read()
+			.textFile(inputPath)
+			.map(
+				(MapFunction<String, T>) value -> OBJECT_MAPPER.readValue(value, entityClazz),
+				Encoders.bean(entityClazz));
 
-        res.map((MapFunction<T, T>) r -> {
-                    if (r.getInstance().stream().anyMatch(i -> hostedBy.contains(i.getHostedby().getKey())) ||
-                            !r.getCollectedfrom().stream().anyMatch(cf -> cf.getValue().equals(collectedfrom))) {
-                        return r;
-                    }
+		res.map((MapFunction<T, T>) r -> {
+			if (r.getInstance().stream().anyMatch(i -> hostedBy.contains(i.getHostedby().getKey())) ||
+				!r.getCollectedfrom().stream().anyMatch(cf -> cf.getValue().equals(collectedfrom))) {
+				return r;
+			}
 
-                    List<StructuredProperty> ids = getPidsAndAltIds(r).collect(Collectors.toList());
-                    if (ids
-                            .stream()
-                            .anyMatch(
-                                    p -> p
-                                            .getQualifier()
-                                            .getClassid()
-                                            .equals(PidType.doi.toString()) && pidInParam(p.getValue(), verifyParam))) {
-                        r
-                                .setCountry(
-                                        r
-                                                .getCountry()
-                                                .stream()
-                                                .filter(
-                                                        c -> toTakeCountry(c, country))
-                                                .collect(Collectors.toList()));
+			List<StructuredProperty> ids = getPidsAndAltIds(r).collect(Collectors.toList());
+			if (ids
+				.stream()
+				.anyMatch(
+					p -> p
+						.getQualifier()
+						.getClassid()
+						.equals(PidType.doi.toString()) && pidInParam(p.getValue(), verifyParam))) {
+				r
+					.setCountry(
+						r
+							.getCountry()
+							.stream()
+							.filter(
+								c -> toTakeCountry(c, country))
+							.collect(Collectors.toList()));
 
-                    }
+			}
 
-                    return r;
-                }, Encoders.bean(entityClazz))
-                .write()
-                .mode(SaveMode.Overwrite)
-                .option("compression", "gzip")
-                .json(workingDir);
+			return r;
+		}, Encoders.bean(entityClazz))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(workingDir);
 
-        spark
-                .read()
-                .textFile(workingDir)
-                .map(
-                        (MapFunction<String, T>) value -> OBJECT_MAPPER.readValue(value, entityClazz),
-                        Encoders.bean(entityClazz))
-                .write()
-                .mode(SaveMode.Overwrite)
-                .option("compression", "gzip")
-                .json(inputPath);
-    }
+		spark
+			.read()
+			.textFile(workingDir)
+			.map(
+				(MapFunction<String, T>) value -> OBJECT_MAPPER.readValue(value, entityClazz),
+				Encoders.bean(entityClazz))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(inputPath);
+	}
 
-    private static <T extends Result> Stream<StructuredProperty> getPidsAndAltIds(T r) {
-        final Stream<StructuredProperty> resultPids = Optional
-                .ofNullable(r.getPid())
-                .map(Collection::stream)
-                .orElse(Stream.empty());
+	private static <T extends Result> Stream<StructuredProperty> getPidsAndAltIds(T r) {
+		final Stream<StructuredProperty> resultPids = Optional
+			.ofNullable(r.getPid())
+			.map(Collection::stream)
+			.orElse(Stream.empty());
 
-        final Stream<StructuredProperty> instancePids = Optional
-                .ofNullable(r.getInstance())
-                .map(
-                        instance -> instance
-                                .stream()
-                                .flatMap(
-                                        i -> Optional
-                                                .ofNullable(i.getPid())
-                                                .map(Collection::stream)
-                                                .orElse(Stream.empty())))
-                .orElse(Stream.empty());
+		final Stream<StructuredProperty> instancePids = Optional
+			.ofNullable(r.getInstance())
+			.map(
+				instance -> instance
+					.stream()
+					.flatMap(
+						i -> Optional
+							.ofNullable(i.getPid())
+							.map(Collection::stream)
+							.orElse(Stream.empty())))
+			.orElse(Stream.empty());
 
-        final Stream<StructuredProperty> instanceAltIds = Optional
-                .ofNullable(r.getInstance())
-                .map(
-                        instance -> instance
-                                .stream()
-                                .flatMap(
-                                        i -> Optional
-                                                .ofNullable(i.getAlternateIdentifier())
-                                                .map(Collection::stream)
-                                                .orElse(Stream.empty())))
-                .orElse(Stream.empty());
+		final Stream<StructuredProperty> instanceAltIds = Optional
+			.ofNullable(r.getInstance())
+			.map(
+				instance -> instance
+					.stream()
+					.flatMap(
+						i -> Optional
+							.ofNullable(i.getAlternateIdentifier())
+							.map(Collection::stream)
+							.orElse(Stream.empty())))
+			.orElse(Stream.empty());
 
-        return Stream
-                .concat(
-                        Stream.concat(resultPids, instancePids),
-                        instanceAltIds);
-    }
+		return Stream
+			.concat(
+				Stream.concat(resultPids, instancePids),
+				instanceAltIds);
+	}
 
-    private static boolean pidInParam(String value, String[] verifyParam) {
-        for (String s : verifyParam)
-            if (value.startsWith(s))
-                return true;
-        return false;
-    }
+	private static boolean pidInParam(String value, String[] verifyParam) {
+		for (String s : verifyParam)
+			if (value.startsWith(s))
+				return true;
+		return false;
+	}
 
-    private static boolean toTakeCountry(Country c, String country) {
-        // If dataInfo is not set, or dataInfo.inferenceprovenance is not set or not present then it cannot be
-        // inserted via propagation
-        if (!Optional.ofNullable(c.getDataInfo()).isPresent())
-            return true;
-        if (!Optional.ofNullable(c.getDataInfo().getInferenceprovenance()).isPresent())
-            return true;
-        return !(c
-                .getClassid()
-                .equalsIgnoreCase(country) &&
-                c.getDataInfo().getInferenceprovenance().equals("propagation"));
-    }
+	private static boolean toTakeCountry(Country c, String country) {
+		// If dataInfo is not set, or dataInfo.inferenceprovenance is not set or not present then it cannot be
+		// inserted via propagation
+		if (!Optional.ofNullable(c.getDataInfo()).isPresent())
+			return true;
+		if (!Optional.ofNullable(c.getDataInfo().getInferenceprovenance()).isPresent())
+			return true;
+		return !(c
+			.getClassid()
+			.equalsIgnoreCase(country) &&
+			c.getDataInfo().getInferenceprovenance().equals("propagation"));
+	}
 
 }
