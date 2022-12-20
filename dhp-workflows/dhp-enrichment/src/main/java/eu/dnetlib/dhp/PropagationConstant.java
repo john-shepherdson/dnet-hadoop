@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.hadoop.conf.Configuration;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -228,10 +229,15 @@ public class PropagationConstant {
 
 	public static <R> Dataset<R> readPath(
 		SparkSession spark, String inputPath, Class<R> clazz) {
-		return spark
-			.read()
-			.textFile(inputPath)
-			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
+
+		if (HdfsSupport.exists(inputPath, spark.sparkContext().hadoopConfiguration())) {
+			return spark
+					.read()
+					.textFile(inputPath)
+					.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
+		} else {
+			return spark.emptyDataset(Encoders.bean(clazz));
+		}
 	}
 
 }
