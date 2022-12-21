@@ -25,7 +25,7 @@ class MappingORCIDToOAFTest {
       .mkString
     assertNotNull(json)
     assertFalse(json.isEmpty)
-    json.lines.foreach(s => {
+    json.linesWithSeparators.map(l =>l.stripLineEnd).foreach(s => {
       assertNotNull(ORCIDToOAF.extractValueFromInputString(s))
     })
   }
