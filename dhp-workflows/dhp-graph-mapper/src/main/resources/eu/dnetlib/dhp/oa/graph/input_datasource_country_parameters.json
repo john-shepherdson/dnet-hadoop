@@ -18,20 +18,9 @@
     "paramRequired": true
   },
   {
-    "paramName": "ci",
-    "paramLongName": "contextId",
+    "paramName": "c",
+    "paramLongName": "country",
     "paramDescription": "the id of the context to be removed",
     "paramRequired": true
-  },
-  {
-    "paramName": "class",
-    "paramLongName": "graphTableClassName",
-    "paramDescription": "class name moelling the graph table",
-    "paramRequired": true
-  },{
-  "paramName": "vf",
-  "paramLongName": "verifyParam",
-  "paramDescription": "the parameter to be verified to remove the context",
-  "paramRequired": true
-}
+  }
 ]
