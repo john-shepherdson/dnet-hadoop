@@ -70,7 +70,18 @@
         </configuration>
     </global>
 
-    <start to="Step1"/>
+    <start to="resume_from"/>
+
+    <decision name="resume_from">
+        <switch>
+            <case to="Step1">${wf:conf('resumeFrom') eq 'Step1'}</case>
+            <case to="step20-createMonitorDB">${wf:conf('resumeFrom') eq 'step20-createMonitorDB'}</case>
+            <case to="step21-createObservatoryDB-pre">${wf:conf('resumeFrom') eq 'step21-createObservatoryDB-pre'}</case>
+            <case to="step21-createObservatoryDB">${wf:conf('resumeFrom') eq 'step21-createObservatoryDB'}</case>
+            <default to="Step1"/>
+        </switch>
+    </decision>
+
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>

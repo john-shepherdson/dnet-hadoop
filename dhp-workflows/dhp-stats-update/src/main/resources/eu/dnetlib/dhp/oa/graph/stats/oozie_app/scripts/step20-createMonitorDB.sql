@@ -10,6 +10,11 @@ create view if not exists TARGET.creation_date as select * from SOURCE.creation_
 create view if not exists TARGET.funder as select * from SOURCE.funder;
 create view if not exists TARGET.fundref as select * from SOURCE.fundref;
 create view if not exists TARGET.rndexpenditure as select * from SOURCE.rndexpediture;
+create view if not exists TARGET.rndgdpexpenditure as select * from SOURCE.rndgdpexpenditure;
+create view if not exists TARGET.doctoratestudents as select * from SOURCE.doctoratestudents;
+create view if not exists TARGET.totalresearchers as select * from SOURCE.totalresearchers;
+create view if not exists TARGET.totalresearchersft as select * from SOURCE.totalresearchersft;
+create view if not exists TARGET.hrrst as select * from SOURCE.hrrst;
 
 create table TARGET.result stored as parquet as
     select distinct * from (
@@ -54,7 +59,8 @@ create table TARGET.result stored as parquet as
              'openorgs____::51c7fc556e46381734a25a6fbc3fd398',	-- University of Modena and Reggio Emilia
              'openorgs____::235d7f9ad18ecd7e6dc62ea4990cb9db',	-- Bilkent University
              'openorgs____::31f2fa9e05b49d4cf40a19c3fed8eb06',	-- Saints Cyril and Methodius University of Skopje
-              'openorgs____::db7686f30f22cbe73a4fde872ce812a6' -- University of Milan
+             'openorgs____::db7686f30f22cbe73a4fde872ce812a6', -- University of Milan
+             'openorgs____::b8b8ca674452579f3f593d9f5e557483'   -- University College Cork
         ) )) foo;
 compute stats TARGET.result;
 
