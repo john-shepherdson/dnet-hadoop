@@ -48,12 +48,10 @@ WHERE d1.datainfo.deletedbyinference = FALSE and d1.datainfo.invisible=false;
 
 -- Updating temporary table with everything that is not based on results -> This is done with the following "dual" table.
 -- Creating a temporary dual table that will be removed after the following insert
-CREATE TABLE ${stats_db_name}.dual
-(
-    dummy CHAR(1)
-);
-INSERT INTO ${stats_db_name}.dual
-VALUES ('X');
+CREATE TABLE ${stats_db_name}.dual ( dummy CHAR(1));
+
+INSERT INTO ${stats_db_name}.dual VALUES ('X');
+
 INSERT INTO ${stats_db_name}.datasource_tmp (`id`, `name`, `type`, `dateofvalidation`, `yearofvalidation`, `harvested`,
                                              `piwik_id`, `latitude`, `longitude`, `websiteurl`, `compatibility`, `issn_printed`, `issn_online`)
 SELECT 'other',
@@ -73,12 +71,8 @@ FROM ${stats_db_name}.dual
 WHERE 'other' not in (SELECT id FROM ${stats_db_name}.datasource_tmp WHERE name = 'Unknown Repository');
 DROP TABLE ${stats_db_name}.dual;
 
-UPDATE ${stats_db_name}.datasource_tmp
-SET name='Other'
-WHERE name = 'Unknown Repository';
-UPDATE ${stats_db_name}.datasource_tmp
-SET yearofvalidation=null
-WHERE yearofvalidation = '-1';
+UPDATE ${stats_db_name}.datasource_tmp SET name='Other' WHERE name = 'Unknown Repository';
+UPDATE ${stats_db_name}.datasource_tmp SET yearofvalidation=null WHERE yearofvalidation = '-1';
 
 CREATE TABLE ${stats_db_name}.datasource_languages STORED AS PARQUET AS
 SELECT substr(d.id, 4) AS id, langs.languages AS language
