@@ -12,4 +12,4 @@ export SHADOW=$3
 
 hive --database ${TARGET} -e "show tables" | grep -v WARN | sed "s/\(.*\)/analyze table ${TARGET}.\1 compute statistics;/" > foo
 hive -f foo
-echo "Impala shell finished"
+echo "Hive shell finished"

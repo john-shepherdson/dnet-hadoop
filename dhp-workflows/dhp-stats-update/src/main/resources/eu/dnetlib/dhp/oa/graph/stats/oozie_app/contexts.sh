@@ -31,8 +31,8 @@ hdfs dfs -copyFromLocal categories.csv ${TMP}
 hdfs dfs -copyFromLocal concepts.csv ${TMP}
 hdfs dfs -chmod -R 777 ${TMP}
 
-export HADOOP_USER="antonis.lempesis"
-export HADOOP_USER_NAME="antonis.lempesis"
+export HADOOP_USER="dimitris.pierrakos"
+export HADOOP_USER_NAME="dimitris.pierrakos"
 
 echo "Creating and populating impala tables"
 hive $HIVE_OPTS -e "create table ${TARGET_DB}.context (id string, name string) row format delimited fields terminated by ','"

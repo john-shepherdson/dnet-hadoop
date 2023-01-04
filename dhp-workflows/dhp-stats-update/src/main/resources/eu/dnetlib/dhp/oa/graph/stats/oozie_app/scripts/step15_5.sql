@@ -29,6 +29,13 @@ select rcount.pid, sum(case when rcount.type='publication' then rcount.count els
 from rcount
 group by rcount.pid;
 
+create view ${stats_db_name}.rndexpenditure as select * from stats_ext.rndexpediture;
+create view ${stats_db_name}.rndgdpexpenditure as select * from stats_ext.rndgdpexpenditure;
+create view ${stats_db_name}.doctoratestudents as select * from stats_ext.doctoratestudents;
+create view ${stats_db_name}.totalresearchers as select * from stats_ext.totalresearchers;
+create view ${stats_db_name}.totalresearchersft as select * from stats_ext.totalresearchersft;
+create view ${stats_db_name}.hrrst as select * from stats_ext.hrrst;
+
 create table ${stats_db_name}.result_instance stored as parquet as
 select distinct r.*
 from (
@@ -44,3 +51,5 @@ from (
          from ${openaire_db_name}.result r lateral view explode(r.instance) instances as inst) r
 join ${stats_db_name}.result res on res.id=r.id
 where r.amount is not null;
+
+create view ${stats_db_name}.issn_gold_oa_dataset as select * from stats_ext.issn_gold_oa_dataset;

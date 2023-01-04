@@ -96,6 +96,6 @@ select substr(d.id, 4) as id, substr(cf.key, 4) as datasource
 from ${openaire_db_name}.datasource d lateral view explode(d.collectedfrom) cfrom as cf
 where d.datainfo.deletedbyinference = false and d.datainfo.invisible=false;
 
-CREATE OR REPLACE VIEW ${stats_db_name}.datasource_results STORED AS PARQUET AS
+CREATE OR REPLACE VIEW ${stats_db_name}.datasource_results AS
 SELECT datasource AS id, id AS result
 FROM ${stats_db_name}.result_datasources;
