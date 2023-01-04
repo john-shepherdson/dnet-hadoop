@@ -1,0 +1,105 @@
+<workflow-app name="Monitor DB" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>stats_db_name</name>
+            <description>the target stats database name</description>
+        </property>
+        <property>
+            <name>stats_db_shadow_name</name>
+            <description>the name of the shadow schema</description>
+        </property>
+        <property>
+            <name>monitor_db_name</name>
+            <description>the target monitor db name</description>
+        </property>
+        <property>
+            <name>monitor_db_shadow_name</name>
+            <description>the name of the shadow monitor db</description>
+        </property>
+        <property>
+            <name>stats_tool_api_url</name>
+            <description>The url of the API of the stats tool. Is used to trigger the cache update.</description>
+        </property>
+        <property>
+            <name>hive_metastore_uris</name>
+            <description>hive server metastore URIs</description>
+        </property>
+        <property>
+            <name>hive_jdbc_url</name>
+            <description>hive server jdbc url</description>
+        </property>
+        <property>
+            <name>hive_timeout</name>
+            <description>the time period, in seconds, after which Hive fails a transaction if a Hive client has not sent a hearbeat. The default value is 300 seconds.</description>
+        </property>
+        <property>
+            <name>context_api_url</name>
+            <description>the base url of the context api (https://services.openaire.eu/openaire)</description>
+        </property>
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>hive.metastore.uris</name>
+                <value>${hive_metastore_uris}</value>
+            </property>
+            <property>
+            	<name>hive.txn.timeout</name>
+            	<value>${hive_timeout}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to="Step1-createMonitorDB"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="Step1-createMonitorDB">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>monitor.sh</exec>
+            <argument>${stats_db_name}</argument>
+            <argument>${monitor_db_name}</argument>
+            <argument>${monitor_db_shadow_name}</argument>
+            <argument>${wf:appPath()}/scripts/createMonitorDB.sql</argument>
+            <file>monitor.sh</file>
+        </shell>
+        <ok to="Step2-createMonitorDB-post"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="Step2-createMonitorDB-post">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>monitor-post.sh</exec>
+            <argument>${stats_db_name}</argument>
+            <argument>${monitor_db_name}</argument>
+            <argument>${monitor_db_shadow_name}</argument>
+            <file>monitor-post.sh</file>
+        </shell>
+        <ok to="Step3-updateCache"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step3-updateCache">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>updateCache.sh</exec>
+            <argument>${stats_tool_api_url}</argument>
+            <file>updateCache.sh</file>
+        </shell>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>
