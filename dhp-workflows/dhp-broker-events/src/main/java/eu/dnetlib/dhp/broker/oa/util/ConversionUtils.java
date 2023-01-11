@@ -2,7 +2,10 @@
 package eu.dnetlib.dhp.broker.oa.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -45,13 +48,10 @@ public class ConversionUtils {
 
 	private static final Logger log = LoggerFactory.getLogger(ConversionUtils.class);
 
-	private ConversionUtils() {
-	}
+	private ConversionUtils() {}
 
 	public static List<OaBrokerInstance> oafInstanceToBrokerInstances(final Instance i) {
-		if (i == null) {
-			return new ArrayList<>();
-		}
+		if (i == null) { return new ArrayList<>(); }
 
 		return mappedList(i.getUrl(), url -> {
 			final OaBrokerInstance res = new OaBrokerInstance();
@@ -72,30 +72,26 @@ public class ConversionUtils {
 	}
 
 	public static OaBrokerRelatedDataset oafDatasetToBrokerDataset(final Dataset d) {
-		if (d == null) {
-			return null;
-		}
+		if (d == null) { return null; }
 
 		final OaBrokerRelatedDataset res = new OaBrokerRelatedDataset();
 		res.setOpenaireId(cleanOpenaireId(d.getId()));
 		res.setOriginalId(first(d.getOriginalId()));
 		res.setTitle(structPropValue(d.getTitle()));
-		res.setPids(mappedList(d.getPid(), ConversionUtils::oafPidToBrokerPid));
+		res.setPids(allResultPids(d));
 		res.setInstances(flatMappedList(d.getInstance(), ConversionUtils::oafInstanceToBrokerInstances));
 		res.setCollectedFrom(mappedFirst(d.getCollectedfrom(), KeyValue::getValue));
 		return res;
 	}
 
 	public static OaBrokerRelatedPublication oafPublicationToBrokerPublication(final Publication p) {
-		if (p == null) {
-			return null;
-		}
+		if (p == null) { return null; }
 
 		final OaBrokerRelatedPublication res = new OaBrokerRelatedPublication();
 		res.setOpenaireId(cleanOpenaireId(p.getId()));
 		res.setOriginalId(first(p.getOriginalId()));
 		res.setTitle(structPropValue(p.getTitle()));
-		res.setPids(mappedList(p.getPid(), ConversionUtils::oafPidToBrokerPid));
+		res.setPids(allResultPids(p));
 		res.setInstances(flatMappedList(p.getInstance(), ConversionUtils::oafInstanceToBrokerInstances));
 		res.setCollectedFrom(mappedFirst(p.getCollectedfrom(), KeyValue::getValue));
 
@@ -103,9 +99,7 @@ public class ConversionUtils {
 	}
 
 	public static OaBrokerMainEntity oafResultToBrokerResult(final Result result) {
-		if (result == null) {
-			return null;
-		}
+		if (result == null) { return null; }
 
 		final OaBrokerMainEntity res = new OaBrokerMainEntity();
 
@@ -122,9 +116,8 @@ public class ConversionUtils {
 		res.setEmbargoenddate(fieldValue(result.getEmbargoenddate()));
 		res.setContributor(fieldList(result.getContributor()));
 		res
-			.setJournal(
-				result instanceof Publication ? oafJournalToBrokerJournal(((Publication) result).getJournal()) : null);
-		res.setPids(mappedList(result.getPid(), ConversionUtils::oafPidToBrokerPid));
+			.setJournal(result instanceof Publication ? oafJournalToBrokerJournal(((Publication) result).getJournal()) : null);
+		res.setPids(allResultPids(result));
 		res.setInstances(flatMappedList(result.getInstance(), ConversionUtils::oafInstanceToBrokerInstances));
 		res
 			.setExternalReferences(mappedList(result.getExternalReference(), ConversionUtils::oafExtRefToBrokerExtRef));
@@ -132,14 +125,23 @@ public class ConversionUtils {
 		return res;
 	}
 
+	protected static List<OaBrokerTypedValue> allResultPids(final Result result) {
+		final Map<String, StructuredProperty> map = new HashMap<>();
+		result.getPid().forEach(sp -> map.put(sp.getValue(), sp));
+		result.getInstance().forEach(i -> {
+			i.getPid().forEach(sp -> map.put(sp.getValue(), sp));
+			i.getAlternateIdentifier().forEach(sp -> map.put(sp.getValue(), sp));
+		});
+		final List<OaBrokerTypedValue> pids = mappedList(map.values(), ConversionUtils::oafPidToBrokerPid);
+		return pids;
+	}
+
 	public static String cleanOpenaireId(final String id) {
 		return id.contains("|") ? StringUtils.substringAfter(id, "|") : id;
 	}
 
 	private static OaBrokerAuthor oafAuthorToBrokerAuthor(final Author author) {
-		if (author == null) {
-			return null;
-		}
+		if (author == null) { return null; }
 
 		final String pids = author.getPid() != null ? author
 			.getPid()
@@ -163,9 +165,7 @@ public class ConversionUtils {
 	}
 
 	private static OaBrokerJournal oafJournalToBrokerJournal(final Journal journal) {
-		if (journal == null) {
-			return null;
-		}
+		if (journal == null) { return null; }
 
 		final OaBrokerJournal res = new OaBrokerJournal();
 		res.setName(journal.getName());
@@ -177,9 +177,7 @@ public class ConversionUtils {
 	}
 
 	private static OaBrokerExternalReference oafExtRefToBrokerExtRef(final ExternalReference ref) {
-		if (ref == null) {
-			return null;
-		}
+		if (ref == null) { return null; }
 
 		final OaBrokerExternalReference res = new OaBrokerExternalReference();
 		res.setRefidentifier(ref.getRefidentifier());
@@ -190,9 +188,7 @@ public class ConversionUtils {
 	}
 
 	public static OaBrokerProject oafProjectToBrokerProject(final Project p) {
-		if (p == null) {
-			return null;
-		}
+		if (p == null) { return null; }
 
 		final OaBrokerProject res = new OaBrokerProject();
 		res.setOpenaireId(cleanOpenaireId(p.getId()));
@@ -216,9 +212,7 @@ public class ConversionUtils {
 	}
 
 	public static OaBrokerRelatedSoftware oafSoftwareToBrokerSoftware(final Software sw) {
-		if (sw == null) {
-			return null;
-		}
+		if (sw == null) { return null; }
 
 		final OaBrokerRelatedSoftware res = new OaBrokerRelatedSoftware();
 		res.setOpenaireId(cleanOpenaireId(sw.getId()));
@@ -231,9 +225,7 @@ public class ConversionUtils {
 	}
 
 	public static OaBrokerRelatedDatasource oafDatasourceToBrokerDatasource(final Datasource ds) {
-		if (ds == null) {
-			return null;
-		}
+		if (ds == null) { return null; }
 
 		final OaBrokerRelatedDatasource res = new OaBrokerRelatedDatasource();
 		res.setName(StringUtils.defaultIfBlank(fieldValue(ds.getOfficialname()), fieldValue(ds.getEnglishname())));
@@ -293,9 +285,7 @@ public class ConversionUtils {
 	}
 
 	private static List<OaBrokerTypedValue> structPropTypedList(final List<StructuredProperty> list) {
-		if (list == null) {
-			return new ArrayList<>();
-		}
+		if (list == null) { return new ArrayList<>(); }
 
 		return list
 			.stream()
@@ -304,10 +294,8 @@ public class ConversionUtils {
 			.collect(Collectors.toList());
 	}
 
-	private static <F, T> List<T> mappedList(final List<F> list, final Function<F, T> func) {
-		if (list == null) {
-			return new ArrayList<>();
-		}
+	private static <F, T> List<T> mappedList(final Collection<F> list, final Function<F, T> func) {
+		if (list == null) { return new ArrayList<>(); }
 
 		return list
 			.stream()
@@ -318,9 +306,7 @@ public class ConversionUtils {
 	}
 
 	private static <F, T> List<T> flatMappedList(final List<F> list, final Function<F, List<T>> func) {
-		if (list == null) {
-			return new ArrayList<>();
-		}
+		if (list == null) { return new ArrayList<>(); }
 
 		return list
 			.stream()
@@ -332,9 +318,7 @@ public class ConversionUtils {
 	}
 
 	private static <F, T> T mappedFirst(final List<F> list, final Function<F, T> func) {
-		if (list == null) {
-			return null;
-		}
+		if (list == null) { return null; }
 
 		return list
 			.stream()
