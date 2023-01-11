@@ -130,7 +130,7 @@
 				</xsl:if>
 				
 				<oaf:hostedBy name="{$varOfficialName}" id="{$varDataSourceId}" />
-				<oaf:collectedFrom name="{$varOfficialName}" id="{$varDataSourceId}ß" />
+				<oaf:collectedFrom name="{$varOfficialName}" id="{$varDataSourceId}" />
 
 				<xsl:variable name="varKnownFileEndings" select="('.bmp', '.doc', '.docx', '.epub', '.flv', '.jpeg', '.jpg', '.m4v', '.mp4', '.mpg', '.odp', '.pdf', '.png', '.ppt', '.tiv', '.txt', '.xls', '.xlsx', '.zip')" />
 				<xsl:variable name="varIdDoi" select="distinct-values((//dc:identifier[starts-with(., '10.')][matches(., '(10[.][0-9]{4,}[^\s/&gt;]*/[^\s&gt;]+)')], //dc:identifier[starts-with(., 'http') and (contains(., '://dx.doi.org/10.') or contains(., '://doi.org/10.'))]/substring-after(., 'doi.org/'), //dc:identifier[starts-with(lower-case(.), 'doi:10.')]/substring-after(lower-case(.), 'doi:')))" />
