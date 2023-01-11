@@ -54,8 +54,8 @@ public class GetDatasourceFromCountry implements Serializable {
 		String inputPath = parser.get("inputPath");
 		log.info("inputPath: {}", inputPath);
 
-		String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		String workingPath = parser.get("workingDir");
+		log.info("workingDir: {}", workingPath);
 
 		String country = parser.get("country");
 		log.info("country: {}", country);
@@ -65,13 +65,12 @@ public class GetDatasourceFromCountry implements Serializable {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-
 				getDatasourceFromCountry(spark, country, inputPath, workingPath);
 			});
 	}
 
 	private static void getDatasourceFromCountry(SparkSession spark, String country, String inputPath,
-		String workingPath) {
+		String workingDir) {
 
 		Dataset<Organization> organization = spark
 			.read()
@@ -83,7 +82,6 @@ public class GetDatasourceFromCountry implements Serializable {
 				(FilterFunction<Organization>) o -> !o.getDataInfo().getDeletedbyinference() &&
 					o.getCountry().getClassid().length() > 0 &&
 					o.getCountry().getClassid().equals(country));
-		;
 
 		// filtering of the relations taking the non deleted by inference and those with IsProvidedBy as relclass
 		Dataset<Relation> relation = spark
@@ -97,12 +95,12 @@ public class GetDatasourceFromCountry implements Serializable {
 					!rel.getDataInfo().getDeletedbyinference());
 
 		organization
-			.joinWith(relation, organization.col("id").equalTo(relation.col("target")), "left")
+			.joinWith(relation, organization.col("id").equalTo(relation.col("target")))
 			.map((MapFunction<Tuple2<Organization, Relation>, String>) t2 -> t2._2().getSource(), Encoders.STRING())
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.json(workingPath);
+			.json(workingDir);
 
 	}
 }

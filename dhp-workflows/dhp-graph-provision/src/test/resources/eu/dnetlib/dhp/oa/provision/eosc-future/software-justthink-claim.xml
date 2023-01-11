@@ -1,0 +1,305 @@
+<record>
+    <result xmlns:dri="http://www.driver-repository.eu/namespace/dri">
+        <header xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <dri:objIdentifier>od______2659::3801993ea8f970cfc991277160edf277</dri:objIdentifier>
+            <dri:dateOfCollection>2022-08-08T03:06:13Z</dri:dateOfCollection>
+            <status>under curation</status>
+            <counters/>
+        </header>
+        <metadata>
+            <oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
+                <oaf:result>
+                    <title classid="main title" classname="main title"
+                           schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title">JUSThink
+                        Alignment Analysis</title>
+                    <creator rank="1" name="" surname="">Norman, Utku</creator>
+                    <creator rank="2" name="" surname="">Dinkar, Tanvi</creator>
+                    <creator rank="3" name="" surname="">Bruno, Barbara</creator>
+                    <creator rank="4" name="" surname="">Clavel, Chloé</creator>
+                    <dateofacceptance/>
+                    <resulttype classid="software" classname="software"
+                                schemeid="dnet:result_typologies" schemename="dnet:result_typologies"/>
+                    <language classid="eng" classname="English" schemeid="dnet:languages"
+                              schemename="dnet:languages"/>
+                    <description>
+                        <p>
+                            <strong>1. Description</strong>
+                        </p>
+                        <p>This repository contains<strong> tools to automatically analyse how
+                            participants align their use of task-specific referents in their
+                            dialogue and actions for a collaborative learning activity, and how
+                            it relates to the task success</strong> (i.e. their learning
+                            outcomes and task performance).</p>
+                        <p>As a use case, it processes data from a collaborative problem solving
+                            activity named JUSThink <a
+                                    href="https://zenodo.org/record/4675070#references">[1, 2]</a>, i.e.
+                            JUSThink Dialogue and Actions Corpus data set that is available from the
+                            Zenodo Repository, DOI: <a href="http://doi.org/10.5281/zenodo.4627104"
+                            >10.5281/zenodo.4627104</a>, and reproduces the results and figures
+                            in <a href="https://zenodo.org/record/4675070#references">[3]</a>.</p>
+                        <p>In brief: </p>
+                        <ol>
+                            <li><strong>JUSThink Dialogue and Actions Corpus</strong> contains
+                                transcripts, event logs, and test responses of children aged 9
+                                through 12, as they participate in the JUSThink activity <a
+                                        href="https://zenodo.org/record/4675070#references">[1, 2]</a>
+                                in pairs of two, to solve a problem on graphs together. </li>
+                            <li><strong>The JUSThink activity and its study</strong> is first
+                                described in <a href="https://zenodo.org/record/4675070#references"
+                                >[1]</a>, and elaborated with findings concerning the link
+                                between children&#39;s learning, performance in the activity, and
+                                perception of self, the other and the robot in <a
+                                        href="https://zenodo.org/record/4675070#references">[2]</a>. </li>
+                            <li><strong>Alignment analysis in our work <a
+                                    href="https://zenodo.org/record/4675070#references"
+                            >[3]</a></strong> studies the participants&#39; use of
+                                expressions that are related to the task at hand, their follow up
+                                actions of these expressions, and how it links to task success.</li>
+                        </ol>
+                        <p>
+                            <strong>2. Publications</strong>
+                        </p>
+                        <p>If you use this work in an academic context, please cite the following
+                            publications:</p>
+                        <ul>
+                            <li>
+                                <p>Norman*, U., Dinkar*, T., Bruno, B., &amp; Clavel, C. (2022).
+                                    Studying Alignment in a Collaborative Learning Activity via
+                                    Automatic Methods: The Link Between What We Say and Do. Dialogue
+                                    &amp; Discourse, 13(2), 1 - ;48. *Contributed equally to this
+                                    work. <a href="https://doi.org/10.5210/dad.2022.201"
+                                    >https://doi.org/10.5210/dad.2022.201</a></p>
+                            </li>
+                            <li>
+                                <p>Norman, U., Dinkar, T., Bruno, B., &amp; Clavel, C. (2021).
+                                    JUSThink Alignment Analysis. In Dialogue &amp; Discourse
+                                    (v1.0.0, Vol. 13, Number 2, pp. 1 - ;48). Zenodo. <a
+                                            href="https://doi.org/10.5281/zenodo.4675070"
+                                    >https://doi.org/10.5281/zenodo.4675070</a></p>
+                            </li>
+                        </ul>
+                        <p>
+                            <strong>3. Content</strong>
+                        </p>
+                        <p>The tools provided in this repository consists of 7 Jupyter Notebooks
+                            written in Python 3, and two additional external tools utilised by the
+                            notebooks.</p>
+                        <p>
+                            <strong>3.1. Jupyter Notebooks</strong>
+                        </p>
+                        <p>We highlight that the notebooks up until the last (i.e. to test the
+                            hypotheses (tools/7_test_the_hypotheses.ipynb)) present a general
+                            pipeline to process event logs, test responses and transcripts to
+                            extract measures of task performance, learning outcomes, and measures of
+                            alignment.</p>
+                        <ol>
+                            <li><strong>Extract task performance (and other features) from the logs
+                            </strong>(tools/1_extract_performance_and_other_features_from_logs.ipynb):
+                                Extracts various measures of task behaviour from the logs, at
+                                varying granularities of the activity (i.e. the whole corpus, task,
+                                attempt, and turn levels). In later notebooks, we focus on one of
+                                the features to estimate the task performance of a team: (minimum)
+                                error.</li>
+                            <li><strong>Extract learning outcomes from the test responses</strong>
+                                (tools/2_extract_learning_gain_from_test_responses.ipynb): Extracts
+                                measures of learning outcomes from the responses to the pre-test and
+                                the post-test. In later notebooks, we focus on one of the features
+                                to estimate the learning outcome of a team: relative learning gain
+                                <a href="https://sandbox.zenodo.org/record/742549#references"
+                                >[4]</a></li>
+                            <li><strong>Select and visualise a subset of teams for
+                                transcription</strong>
+                                (tools/3_visualise_transcribed_teams.ipynb): Visualises the
+                                transcribed teams among the other teams in the feature space spanned
+                                by task performance and learning outcome, as well as the
+                                distribution of their number of attempts and turns.</li>
+                            <li><strong>Extract routines from transcripts</strong>
+                                (tools/4_extract_routines_from_transcripts.ipynb) (uses <a
+                                        href="https://github.com/GuillaumeDD/dialign">dialign</a> to
+                                extract routines): Extracts routines of referring expressions that
+                                are &quot;fixed&quot;, i.e. become shared or established amongst
+                                interlocutors.</li>
+                            <li><strong>Combine transcripts with logs</strong>
+                                (tools/5_construct_the_corpus_by_combining_transcripts_with_logs.ipynb):
+                                Merges transcripts with event logs to have a combined dialogue and
+                                actions corpus, to be processed e.g. to detect follow-up
+                                actions.</li>
+                            <li><strong>Recognise instructions and detect follow-up actions</strong>
+                                (tools/6_recognise_instructions_detect_follow-up_actions.ipynb):
+                                Extracts verbalised instruction such as &quot;connect Mount Basel to
+                                Montreux&quot;, and pairs them with the follow-up action that may
+                                <em>match</em> (e.g. if the other connects Basel to Montreux) or
+                                <em>mismatch</em> (e.g. if the other connects Basel to
+                                Neuchatel) with the instruction.</li>
+                            <li><strong>Test the hypotheses </strong>in <a
+                                    href="https://sandbox.zenodo.org/record/742549#references"
+                            >[3]</a> (tools/7_test_the_hypotheses.ipynb) (uses
+                                <strong>effsize</strong> to estimate effect size, specifically
+                                Cliff&#39;s Delta): Considers each research questions and hypotheses
+                                studied in <a
+                                        href="https://sandbox.zenodo.org/record/742549#references"
+                                >[3]</a> and generates the results in <a
+                                        href="https://sandbox.zenodo.org/record/742549#references"
+                                >[3]</a>.</li>
+                        </ol>
+                        <p>
+                            <strong>3.2. External Tools</strong>
+                        </p>
+                        <ol>
+                            <li><strong><a href="https://github.com/GuillaumeDD/dialign">dialign</a>
+                                tool</strong> to extract routines, specifically <a
+                                    href="https://github.com/GuillaumeDD/dialign/releases/tag/v1.0"
+                            >Release 1.0</a> from <a
+                                    href="https://github.com/GuillaumeDD/dialign/releases/download/v1.0/dialign-1.0.zip"
+                            >dialign-1.0.zip</a>:\n It extracts routine expressions that are
+                                &quot;shared&quot; among the participants from transcripts. \n It is
+                                used as an external module (in accordance with its CeCILL-B License,
+                                see <strong>License</strong>).</li>
+                            <li><strong>effsize tool</strong> to compute estimators of effect
+                                size.\n We specifically use it to compute Cliff&#39;s Delta, which
+                                quantifies the amount difference between two groups of observations,
+                                by computing the Cliff&#39;s Delta statistic.\n It is taken from
+                                project <a
+                                        href="https://acclab.github.io/DABEST-python-docs/index.html"
+                                >DABEST</a> (see <strong>License</strong>).</li>
+                        </ol>
+                        <p>
+                            <strong>4. Research Questions and Hypotheses in <a
+                                    href="https://sandbox.zenodo.org/record/742549#references"
+                            >[3]</a></strong>
+                        </p>
+                        <ul>
+                            <li><strong>RQ1 Lexical alignment</strong>: How do the interlocutors
+                                <em>use</em> expressions related to the task? Is this associated
+                                with task success? <ul>
+                                    <li><strong>H1.1</strong>: Task-specific referents become
+                                        routine early for more successful teams.</li>
+                                    <li><strong>H1.2</strong>: Hesitation phenomena are more likely
+                                        to occur in the vicinity of priming and establishment of
+                                        task-specific referents for more successful teams.</li>
+                                </ul>
+                            </li>
+                            <li><strong>RQ2 Behavioural alignment</strong>: How do the interlocutors
+                                <em>follow up</em> these expressions with actions? Is this
+                                associated with task success? <ul>
+                                    <li><strong>H2.1</strong>: Instructions are more likely to be
+                                        followed by a corresponding action early in the dialogue for
+                                        more successful teams.</li>
+                                    <li><strong>H2.2</strong>: When instructions are followed by a
+                                        corresponding or a different action, the action is more
+                                        likely to be in the vicinity of information management
+                                        phenomena for more successful teams.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        <p>The RQs and Hs are addressed in the notebook for testing the hypotheses
+                            (i.e. tools/7_test_the_hypotheses.ipynb).</p>
+                        <p>
+                            <strong>Acknowledgements</strong>
+                        </p>
+                        <p>This project has received funding from the European Union&#39;s Horizon
+                            2020 research and innovation programme under grant agreement No 765955.
+                            Namely, the <a href="https://www.animatas.eu/">ANIMATAS Project</a>.</p>
+                        <p>
+                            <strong>License</strong>
+                        </p>
+                        <p>The whole package is under MIT License, see the <strong>LICENSE</strong>
+                            file.</p>
+                        <p>Classes under the <strong>tools/effsize</strong> package were taken from
+                            project <a href="https://acclab.github.io/DABEST-python-docs/index.html"
+                            ><strong>DABEST</strong></a>, Copyright 2016-2020 Joses W. Ho.
+                            These classes are licensed under the BSD 3-Clause Clear License. See
+                            <strong>tools/effsize/LICENSE</strong> file for additional
+                            details.</p>
+                        <p>Classes under the <strong>tools/dialign-1.0</strong> package were taken
+                            from project <strong><a href="https://github.com/GuillaumeDD/dialign"
+                            >dialign</a></strong>. These classes are licensed under the
+                            CeCILL-B License. This package is used as an &quot;external
+                            module&quot;, see<strong> tools/dialign-1.0/LICENSE.txt</strong> for
+                            additional details.</p>
+                    </description>
+                    <country classid="" classname="" schemeid="" schemename=""/>
+                    <subject classid="" classname="" schemeid="" schemename=""/>
+                    <relevantdate classid="" classname="" schemeid="" schemename=""/>
+                    <publisher>Zenodo</publisher>
+                    <embargoenddate/>
+                    <journal issn="" eissn="" lissn="" ep="" iss="" sp="" vol=""/>
+                    <source/>
+                    <fulltext/>
+                    <format/>
+                    <storagedate/>
+                    <resourcetype classid="" classname="" schemeid="" schemename=""/>
+                    <device/>
+                    <size/>
+                    <version/>
+                    <lastmetadataupdate/>
+                    <metadataversionnumber/>
+                    <documentationUrl/>
+                    <codeRepositoryUrl/>
+                    <programmingLanguage classid="" classname="" schemeid="" schemename=""/>
+                    <contactperson/>
+                    <contactgroup/>
+                    <tool/>
+                    <originalId>oai:zenodo.org:4675070</originalId>
+                    <collectedfrom name="ZENODO" id="opendoar____::358aee4cc897452c00244351e4d91f69"/>
+                    <pid classid="oai" classname="Open Archives Initiative"
+                         schemeid="dnet:pid_types" schemename="dnet:pid_types"
+                    >oai:zenodo.org:4675070</pid>
+                    <pid classid="doi" classname="Digital Object Identifier"
+                         schemeid="dnet:pid_types" schemename="dnet:pid_types"
+                    >10.5281/zenodo.4675070</pid>
+                    <bestaccessright classid="OPEN" classname="Open Access"
+                                     schemeid="dnet:access_modes" schemename="dnet:access_modes"/>
+                    <eoscifguidelines code="EOSC::Jupyter Notebook" label="EOSC::Jupyter Notebook"
+                                      url="" semanticrelation="compliesWith"/>
+                    <datainfo>
+                        <inferred>false</inferred>
+                        <deletedbyinference>false</deletedbyinference>
+                        <trust>0.9</trust>
+                        <inferenceprovenance/>
+                        <provenanceaction classid="user:insert" classname="user:insert"
+                                          schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+                    </datainfo>
+                    <rels>
+                        <rel inferred="false" trust="0.9" inferenceprovenance=""
+                             provenanceaction="user:claim">
+                            <to class="isProducedBy" scheme="dnet:result_project_relations"
+                                type="project">corda__h2020::c4515ebef538a734cf11f795347f5dac</to>
+                            <code>765955</code>
+                            <acronym>ANIMATAS</acronym>
+                            <title>Advancing intuitive human-machine interaction with human-like
+                                social capabilities for education in schools</title>
+                            <contracttype classid="" classname="" schemeid="" schemename=""/>
+                            <funding>
+                                <funder id="ec__________::EC" shortname="EC"
+                                        name="European Commission" jurisdiction=""/>
+                                <funding_level_0 name="H2020"
+                                >ec__________::EC::H2020</funding_level_0>
+                            </funding>
+                            <websiteurl/>
+                        </rel>
+                    </rels>
+                    <children>
+                        <instance id="od______2659::3801993ea8f970cfc991277160edf277">
+                            <instancetype classid="0029" classname="Software"
+                                          schemeid="dnet:publication_resource"
+                                          schemename="dnet:publication_resource"/>
+                            <collectedfrom name="ZENODO"
+                                           id="opendoar____::358aee4cc897452c00244351e4d91f69"/>
+                            <hostedby name="ZENODO"
+                                      id="opendoar____::358aee4cc897452c00244351e4d91f69"/>
+                            <accessright classid="OPEN" classname="Open Access"
+                                         schemeid="dnet:access_modes" schemename="dnet:access_modes"/>
+                            <dateofacceptance/>
+                            <webresource>
+                                <url>https://zenodo.org/record/4675070</url>
+                            </webresource>
+                        </instance>
+                    </children>
+                </oaf:result>
+            </oaf:entity>
+        </metadata>
+    </result>
+</record>

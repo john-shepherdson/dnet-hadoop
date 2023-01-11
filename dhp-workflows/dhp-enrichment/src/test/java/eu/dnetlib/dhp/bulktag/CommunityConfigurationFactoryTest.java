@@ -83,4 +83,36 @@ class CommunityConfigurationFactoryTest {
 		Assertions.assertEquals("dariah", comm.get(0));
 	}
 
+	@Test
+	void loadSelCriteriaTest2() throws DocumentException, IOException, SAXException {
+		String xml = IOUtils
+			.toString(
+				getClass()
+					.getResourceAsStream(
+						"/eu/dnetlib/dhp/bulktag/communityconfiguration/community_configuration_selcrit2.xml"));
+		final CommunityConfiguration cc = CommunityConfigurationFactory.newInstance(xml);
+		Map<String, List<String>> param = new HashMap<>();
+		param.put("author", new ArrayList<>(Collections.singletonList("Pippo Pippi")));
+		param
+			.put(
+				"description",
+				new ArrayList<>(
+					Collections
+						.singletonList(
+							"This work has been partially supported by DARIAH-EU infrastructure")));
+		param
+			.put(
+				"contributor",
+				new ArrayList<>(
+					Collections
+						.singletonList(
+							"Author X helped to write the paper. X works for DARIAH")));
+		List<String> comm = cc
+			.getCommunityForDatasource(
+				"openaire____::1cfdb2e14977f31a98e0118283401f32", param);
+
+		// TODO add more assertions
+		Assertions.assertEquals(0, comm.size());
+	}
+
 }

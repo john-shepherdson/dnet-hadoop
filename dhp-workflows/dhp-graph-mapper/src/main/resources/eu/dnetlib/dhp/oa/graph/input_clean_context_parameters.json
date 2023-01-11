@@ -12,8 +12,8 @@
     "paramRequired": true
   },
   {
-    "paramName": "wp",
-    "paramLongName": "workingPath",
+    "paramName": "wd",
+    "paramLongName": "workingDir",
     "paramDescription": "the path to store the output graph",
     "paramRequired": true
   },

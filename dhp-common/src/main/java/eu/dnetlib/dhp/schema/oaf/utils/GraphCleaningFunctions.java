@@ -23,6 +23,8 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import me.xuender.unidecode.Unidecode;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Encoders;
 
 public class GraphCleaningFunctions extends CleaningFunctions {
 
@@ -201,6 +203,13 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
 							.filter(sp -> Objects.nonNull(sp.getQualifier()))
 							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
+							.map(s -> {
+								if ("dnet:result_subject".equals(s.getQualifier().getClassid())) {
+									s.getQualifier().setClassid(ModelConstants.DNET_SUBJECT_TYPOLOGIES);
+									s.getQualifier().setClassname(ModelConstants.DNET_SUBJECT_TYPOLOGIES);
+								}
+								return s;
+							})
 							.map(GraphCleaningFunctions::cleanValue)
 							.collect(
 								Collectors
@@ -211,7 +220,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 											.orElse(s.getValue()),
 										Function.identity(),
 										(s1, s2) -> Collections
-											.min(Lists.newArrayList(s1, s1), new SubjectProvenanceComparator())))
+											.min(Lists.newArrayList(s1, s2), new SubjectProvenanceComparator())))
 							.values());
 				r.setSubject(subjects);
 			}
@@ -333,7 +342,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 					if (Objects.isNull(i.getHostedby()) || StringUtils.isBlank(i.getHostedby().getKey())) {
 						i.setHostedby(ModelConstants.UNKNOWN_REPOSITORY);
 					}
-					if (Objects.isNull(i.getRefereed())) {
+					if (Objects.isNull(i.getRefereed()) || StringUtils.isBlank(i.getRefereed().getClassid())) {
 						i.setRefereed(qualifier("0000", "Unknown", ModelConstants.DNET_REVIEW_LEVELS));
 					}
 					if (Objects.nonNull(i.getDateofacceptance())) {

@@ -7,6 +7,7 @@ import static org.mockito.Mockito.lenient;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -278,8 +279,23 @@ public class GraphCleaningFunctionsTest {
 					s -> "0102 computer and information sciences".equals(s.getValue()) &
 						ModelConstants.DNET_SUBJECT_FOS_CLASSID.equals(s.getQualifier().getClassid())));
 
+		verify_keyword(p_cleaned, "In Situ Hybridization");
+		verify_keyword(p_cleaned, "Avicennia");
+
 		// TODO add more assertions to verity the cleaned values
 		System.out.println(MAPPER.writeValueAsString(p_cleaned));
+	}
+
+	private static void verify_keyword(Publication p_cleaned, String subject) {
+		Optional<Subject> s1 = p_cleaned
+			.getSubject()
+			.stream()
+			.filter(s -> s.getValue().equals(subject))
+			.findFirst();
+
+		assertTrue(s1.isPresent());
+		assertEquals(ModelConstants.DNET_SUBJECT_KEYWORD, s1.get().getQualifier().getClassid());
+		assertEquals(ModelConstants.DNET_SUBJECT_KEYWORD, s1.get().getQualifier().getClassname());
 	}
 
 	private Stream<Qualifier> getAuthorPidTypes(Result pub) {

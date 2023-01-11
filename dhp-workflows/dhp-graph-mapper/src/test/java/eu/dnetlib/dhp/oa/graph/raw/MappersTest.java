@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -238,7 +239,11 @@ class MappersTest {
 				assertNotNull(i.getAccessright());
 				assertEquals("OPEN", i.getAccessright().getClassid());
 			});
-		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
+
+		Publication p_cleaned = cleanup(p, vocs);
+		assertEquals("0000", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("Unknown", p_cleaned.getInstance().get(0).getRefereed().getClassname());
+
 		assertNotNull(p.getInstance().get(0).getPid());
 		assertEquals(2, p.getInstance().get(0).getPid().size());
 
@@ -453,7 +458,10 @@ class MappersTest {
 				assertNotNull(i.getAccessright());
 				assertEquals("OPEN", i.getAccessright().getClassid());
 			});
-		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
+
+		Publication p_cleaned = cleanup(p, vocs);
+		assertEquals("0000", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("Unknown", p_cleaned.getInstance().get(0).getRefereed().getClassname());
 	}
 
 	@Test
@@ -570,7 +578,9 @@ class MappersTest {
 		assertTrue(i.getUrl().contains("http://apps.who.int/trialsearch/Trial3.aspx?trialid=NCT02321059"));
 		assertTrue(i.getUrl().contains("https://clinicaltrials.gov/ct2/show/NCT02321059"));
 
-		assertEquals("UNKNOWN", i.getRefereed().getClassid());
+		Dataset d_cleaned = cleanup(d, vocs);
+		assertEquals("0000", d_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("Unknown", d_cleaned.getInstance().get(0).getRefereed().getClassname());
 	}
 
 	@Test
@@ -871,7 +881,10 @@ class MappersTest {
 				assertNotNull(i.getAccessright());
 				assertEquals("UNKNOWN", i.getAccessright().getClassid());
 			});
-		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
+
+		Dataset p_cleaned = cleanup(p, vocs);
+		assertEquals("0000", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("Unknown", p_cleaned.getInstance().get(0).getRefereed().getClassname());
 	}
 
 	@Test
@@ -947,6 +960,11 @@ class MappersTest {
 		Instance inst = p.getInstance().get(0);
 		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", inst.getPid().get(0).getValue());
 		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", inst.getUrl().get(0));
+		assertEquals(1, p.getEoscifguidelines().size());
+		assertEquals("EOSC::RO-crate", p.getEoscifguidelines().get(0).getCode());
+		assertEquals("EOSC::RO-crate", p.getEoscifguidelines().get(0).getLabel());
+		assertEquals("", p.getEoscifguidelines().get(0).getUrl());
+		assertEquals("compliesWith", p.getEoscifguidelines().get(0).getSemanticRelation());
 
 	}
 
@@ -993,6 +1011,18 @@ class MappersTest {
 		final Publication p = (Publication) list.get(0);
 		assertNotNull(p.getInstance().get(0).getUrl().get(0));
 
+	}
+
+	@Test
+	void testEOSCFuture_ROHub() throws IOException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("photic-zone-transformed.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		final OtherResearchProduct rocrate = (OtherResearchProduct) list.get(0);
+		assertNotNull(rocrate.getEoscifguidelines());
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(rocrate));
+		System.out.println("***************");
 	}
 
 	@Test

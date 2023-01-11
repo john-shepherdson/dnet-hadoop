@@ -38,13 +38,13 @@
   {
     "paramName": "test",
     "paramLongName": "isTest",
-    "paramDescription": "true if the spark session is managed, false otherwise",
+    "paramDescription": "Parameter intended for testing purposes only. True if the reun is relatesd to a test and so the taggingConf parameter should be loaded",
     "paramRequired": false
   },
   {
     "paramName": "tg",
     "paramLongName": "taggingConf",
-    "paramDescription": "true if the spark session is managed, false otherwise",
+    "paramDescription": "this parameter is intended for testing purposes only. It is a possible tagging configuration obtained via the XQUERY. Intended to be removed",
     "paramRequired": false
   }
 

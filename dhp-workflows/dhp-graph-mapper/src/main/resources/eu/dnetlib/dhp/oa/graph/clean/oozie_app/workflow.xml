@@ -317,13 +317,13 @@
         </switch>
     </decision>
 
-
     <fork name="fork_clean_context">
         <path start="clean_publication_context"/>
         <path start="clean_dataset_context"/>
         <path start="clean_otherresearchproduct_context"/>
         <path start="clean_software_context"/>
     </fork>
+
     <action name="clean_publication_context">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -343,7 +343,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphOutputPath}/publication</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/working/publication</arg>
+            <arg>--workingDir</arg><arg>${workingDir}/working/publication</arg>
             <arg>--contextId</arg><arg>${contextId}</arg>
             <arg>--verifyParam</arg><arg>${verifyParam}</arg>
         </spark>
@@ -370,7 +370,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphOutputPath}/dataset</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/working/dataset</arg>
+            <arg>--workingDir</arg><arg>${workingDir}/working/dataset</arg>
             <arg>--contextId</arg><arg>${contextId}</arg>
             <arg>--verifyParam</arg><arg>${verifyParam}</arg>
         </spark>
@@ -397,7 +397,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphOutputPath}/otherresearchproduct</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/working/otherresearchproduct</arg>
+            <arg>--workingDir</arg><arg>${workingDir}/working/otherresearchproduct</arg>
             <arg>--contextId</arg><arg>${contextId}</arg>
             <arg>--verifyParam</arg><arg>${verifyParam}</arg>
         </spark>
@@ -424,7 +424,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphOutputPath}/software</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/working/software</arg>
+            <arg>--workingDir</arg><arg>${workingDir}/working/software</arg>
             <arg>--contextId</arg><arg>${contextId}</arg>
             <arg>--verifyParam</arg><arg>${verifyParam}</arg>
         </spark>
@@ -432,14 +432,13 @@
         <error to="Kill"/>
     </action>
 
-    <join name="wait_clean_context" to="getHostedby"/>
+    <join name="wait_clean_context" to="select_datasourceId_from_country"/>
 
-
-    <action name="getHostedby">
+    <action name="select_datasourceId_from_country">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Clean publications context</name>
+            <name>Select datasource ID from country</name>
             <class>eu.dnetlib.dhp.oa.graph.clean.country.GetDatasourceFromCountry</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
@@ -453,13 +452,12 @@
                 --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphOutputPath}</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--workingDir</arg><arg>${workingDir}/working/hostedby</arg>
             <arg>--country</arg><arg>${country}</arg>
         </spark>
         <ok to="fork_clean_country"/>
         <error to="Kill"/>
     </action>
-
 
     <fork name="fork_clean_country">
         <path start="clean_publication_country"/>
@@ -467,11 +465,12 @@
         <path start="clean_otherresearchproduct_country"/>
         <path start="clean_software_country"/>
     </fork>
+
     <action name="clean_publication_country">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Clean publications counmtry</name>
+            <name>Clean publication country</name>
             <class>eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
@@ -486,13 +485,13 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphOutputPath}/publication</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/working/publication</arg>
+            <arg>--workingDir</arg><arg>${workingDir}/working/publication</arg>
             <arg>--country</arg><arg>${country}</arg>
             <arg>--verifyParam</arg><arg>${verifyCountryParam}</arg>
-            <arg>--datasourcePath</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
         </spark>
-        <ok to="wait_clean_context"/>
+        <ok to="wait_clean_country"/>
         <error to="Kill"/>
     </action>
 
@@ -500,7 +499,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Clean datasets Country</name>
+            <name>Clean dataset country</name>
             <class>eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
@@ -515,13 +514,13 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphOutputPath}/dataset</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/working/dataset</arg>
+            <arg>--workingDir</arg><arg>${workingDir}/working/dataset</arg>
             <arg>--country</arg><arg>${country}</arg>
             <arg>--verifyParam</arg><arg>${verifyCountryParam}</arg>
-            <arg>--datasourcePath</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
         </spark>
-        <ok to="wait_clean_context"/>
+        <ok to="wait_clean_country"/>
         <error to="Kill"/>
     </action>
 
@@ -529,7 +528,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Clean otherresearchproducts country</name>
+            <name>Clean otherresearchproduct country</name>
             <class>eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
@@ -544,13 +543,13 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphOutputPath}/otherresearchproduct</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/working/otherresearchproduct</arg>
+            <arg>--workingDir</arg><arg>${workingDir}/working/otherresearchproduct</arg>
             <arg>--country</arg><arg>${country}</arg>
             <arg>--verifyParam</arg><arg>${verifyCountryParam}</arg>
-            <arg>--datasourcePath</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
         </spark>
-        <ok to="wait_clean_context"/>
+        <ok to="wait_clean_country"/>
         <error to="Kill"/>
     </action>
 
@@ -558,7 +557,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Clean softwares country</name>
+            <name>Clean software country</name>
             <class>eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
@@ -573,17 +572,212 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphOutputPath}/software</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/working/software</arg>
+            <arg>--workingDir</arg><arg>${workingDir}/working/software</arg>
             <arg>--country</arg><arg>${country}</arg>
             <arg>--verifyParam</arg><arg>${verifyCountryParam}</arg>
-            <arg>--datasourcePath</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
             <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
         </spark>
         <ok to="wait_clean_country"/>
         <error to="Kill"/>
     </action>
 
-    <join name="wait_clean_country" to="End"/>
+    <join name="wait_clean_country" to="should_patch_datasource_ids"/>
+
+    <decision name="should_patch_datasource_ids">
+        <switch>
+            <case to="get_ds_master_duplicate">${wf:conf('shouldClean') eq true}</case>
+            <default to="End"/>
+        </switch>
+    </decision>
+
+    <action name="get_ds_master_duplicate">
+        <java>
+            <main-class>eu.dnetlib.dhp.oa.graph.clean.MasterDuplicateAction</main-class>
+            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
+            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
+            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
+            <arg>--hdfsPath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+        </java>
+        <ok to="fork_patch_cfhb"/>
+        <error to="Kill"/>
+    </action>
+
+    <fork name="fork_patch_cfhb">
+        <path start="patch_publication_cfhb"/>
+        <path start="patch_dataset_cfhb"/>
+        <path start="patch_otherresearchproduct_cfhb"/>
+        <path start="patch_software_cfhb"/>
+    </fork>
+
+    <action name="patch_publication_cfhb">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>patch publication cfhb</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.cfhb.CleanCfHbSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphOutputPath}/publication</arg>
+            <arg>--resolvedPath</arg><arg>${workingDir}/cfHbResolved/publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/cfHbPatched/publication</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+        </spark>
+        <ok to="wait_clean_cfhb"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="patch_dataset_cfhb">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>patch dataset cfhb</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.cfhb.CleanCfHbSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphOutputPath}/dataset</arg>
+            <arg>--resolvedPath</arg><arg>${workingDir}/cfHbResolved/dataset</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/cfHbPatched/dataset</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+        </spark>
+        <ok to="wait_clean_cfhb"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="patch_otherresearchproduct_cfhb">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>patch otherresearchproduct cfhb</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.cfhb.CleanCfHbSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphOutputPath}/otherresearchproduct</arg>
+            <arg>--resolvedPath</arg><arg>${workingDir}/cfHbResolved/otherresearchproduct</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/cfHbPatched/otherresearchproduct</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+        </spark>
+        <ok to="wait_clean_cfhb"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="patch_software_cfhb">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>patch software cfhb</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.cfhb.CleanCfHbSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphOutputPath}/software</arg>
+            <arg>--resolvedPath</arg><arg>${workingDir}/cfHbResolved/software</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/cfHbPatched/software</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+        </spark>
+        <ok to="wait_clean_cfhb"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="wait_clean_cfhb" to="fork_copy_cfhb_patched_results"/>
+
+    <fork name="fork_copy_cfhb_patched_results">
+        <path start="copy_cfhb_patched_publication"/>
+        <path start="copy_cfhb_patched_dataset"/>
+        <path start="copy_cfhb_patched_otherresearchproduct"/>
+        <path start="copy_cfhb_patched_software"/>
+    </fork>
+
+    <action name="copy_cfhb_patched_publication">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${graphOutputPath}/publication"/>
+            </prepare>
+            <arg>${workingDir}/cfHbPatched/publication</arg>
+            <arg>${graphOutputPath}/publication</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_cfhb_patched_dataset">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${graphOutputPath}/dataset"/>
+            </prepare>
+            <arg>${workingDir}/cfHbPatched/dataset</arg>
+            <arg>${graphOutputPath}/dataset</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_cfhb_patched_otherresearchproduct">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${graphOutputPath}/otherresearchproduct"/>
+            </prepare>
+            <arg>${workingDir}/cfHbPatched/otherresearchproduct</arg>
+            <arg>${graphOutputPath}/otherresearchproduct</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_cfhb_patched_software">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${graphOutputPath}/software"/>
+            </prepare>
+            <arg>${workingDir}/cfHbPatched/software</arg>
+            <arg>${graphOutputPath}/software</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="copy_wait" to="End"/>
 
     <end name="End"/>
+
 </workflow-app>
