@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.broker.oa.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,7 +18,8 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 class ConversionUtilsTest {
 
 	@BeforeEach
-	void setUp() throws Exception {}
+	void setUp() throws Exception {
+	}
 
 	@Test
 	void testAllResultPids() {
