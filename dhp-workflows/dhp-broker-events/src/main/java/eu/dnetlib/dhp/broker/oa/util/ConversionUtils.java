@@ -137,13 +137,22 @@ public class ConversionUtils {
 
 	protected static List<OaBrokerTypedValue> allResultPids(final Result result) {
 		final Map<String, StructuredProperty> map = new HashMap<>();
-		result.getPid().forEach(sp -> map.put(sp.getValue(), sp));
-		result.getInstance().forEach(i -> {
-			i.getPid().forEach(sp -> map.put(sp.getValue(), sp));
-			i.getAlternateIdentifier().forEach(sp -> map.put(sp.getValue(), sp));
-		});
-		final List<OaBrokerTypedValue> pids = mappedList(map.values(), ConversionUtils::oafPidToBrokerPid);
-		return pids;
+
+		if (result.getPid() != null) {
+			result.getPid().forEach(sp -> map.put(sp.getValue(), sp));
+		}
+
+		if (result.getInstance() != null) {
+			result.getInstance().forEach(i -> {
+				if (i.getPid() != null) {
+					i.getPid().forEach(sp -> map.put(sp.getValue(), sp));
+				}
+				if (i.getAlternateIdentifier() != null) {
+					i.getAlternateIdentifier().forEach(sp -> map.put(sp.getValue(), sp));
+				}
+			});
+		}
+		return mappedList(map.values(), ConversionUtils::oafPidToBrokerPid);
 	}
 
 	public static String cleanOpenaireId(final String id) {
