@@ -89,17 +89,5 @@
         <error to="Kill"/>
     </action>
 
-    <action name="Step3-updateCache">
-        <shell xmlns="uri:oozie:shell-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <exec>updateCache.sh</exec>
-            <argument>${stats_tool_api_url}</argument>
-            <file>updateCache.sh</file>
-        </shell>
-        <ok to="End"/>
-        <error to="Kill"/>
-    </action>
-
     <end name="End"/>
 </workflow-app>
