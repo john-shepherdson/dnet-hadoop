@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS TARGET.result_new;
 
 create table TARGET.result_new stored as parquet as
     select distinct * from (
-        select * from result r where exists (select 1 from result_organization ro where ro.id=r.id and ro.organization in (
+        select * from SOURCE.result r where exists (select 1 from SOURCE.result_organization ro where ro.id=r.id and ro.organization in (
 --              'openorgs____::b8b8ca674452579f3f593d9f5e557483',  -- University College Cork
              'openorgs____::38d7097854736583dde879d12dacafca'	-- Brown University
         ) )) foo;
