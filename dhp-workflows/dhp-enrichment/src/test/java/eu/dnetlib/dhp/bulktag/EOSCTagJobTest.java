@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -23,10 +24,12 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.bulktag.eosc.SparkEoscTag;
+import eu.dnetlib.dhp.bulktag.eosc.EoscTagFunctions;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class EOSCTagJobTest {
+
+	private static final Logger log = LoggerFactory.getLogger(EOSCTagJobTest.class);
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -34,7 +37,30 @@ public class EOSCTagJobTest {
 
 	private static Path workingDir;
 
-	private static final Logger log = LoggerFactory.getLogger(EOSCTagJobTest.class);
+	public static final String pathMap = "{ \"author\" : \"$['author'][*]['fullname']\","
+			+ "  \"title\" : \"$['title'][*]['value']\","
+			+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
+			+ "  \"contributor\" : \"$['contributor'][*]['value']\","
+			+ "  \"description\" : \"$['description'][*]['value']\", "
+			+ " \"subject\" :\"$['subject'][*]['value']\" , " +
+
+			"\"fos\" : \"$['subject'][?(@['qualifier']['classid']=='subject:fos')].value\"} ";
+
+	public static final String MOCK_IS_LOOK_UP_URL = "BASEURL:8280/is/services/isLookUp";
+
+	private static String taggingConf = "";
+
+	static {
+		try {
+			taggingConf = IOUtils
+					.toString(
+							BulkTagJobTest.class
+									.getResourceAsStream(
+											"/eu/dnetlib/dhp/bulktag/communityconfiguration/tagging_conf.xml"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
@@ -101,14 +127,21 @@ public class EOSCTagJobTest {
 			.option("compression", "gzip")
 			.json(workingDir.toString() + "/input/otherresearchproduct");
 
-		SparkEoscTag
+		SparkBulkTagJob
 			.main(
 				new String[] {
+					"-isTest", Boolean.TRUE.toString(),
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
-					"-sourcePath",
-					workingDir.toString() + "/input",
-					"-workingPath", workingDir.toString() + "/working"
-
+					"-sourcePath", workingDir.toString() + "/input",
+					"-taggingConf", taggingConf,
+					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Software",
+					"-outputPath", workingDir.toString() + "/software",
+					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+					"-pathMap", pathMap,
+					"-datasourceMapPath",
+						getClass()
+								.getResource("/eu/dnetlib/dhp/bulktag/eosc/datasourceMasterAssociation/datasourceMaster")
+								.getPath()
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -401,13 +434,14 @@ public class EOSCTagJobTest {
 			.option("compression", "gzip")
 			.json(workingDir.toString() + "/input/otherresearchproduct");
 
-		SparkEoscTag
+		SparkBulkTagJob
 			.main(
 				new String[] {
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath",
 					workingDir.toString() + "/input",
-					"-workingPath", workingDir.toString() + "/working"
+					"-workingPath", workingDir.toString() + "/working",
+
 
 				});
 
@@ -644,14 +678,21 @@ public class EOSCTagJobTest {
 			.option("compression", "gzip")
 			.json(workingDir.toString() + "/input/otherresearchproduct");
 
-		SparkEoscTag
+		SparkBulkTagJob
 			.main(
 				new String[] {
+					"-isTest", Boolean.TRUE.toString(),
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
-					"-sourcePath",
-					workingDir.toString() + "/input",
-					"-workingPath", workingDir.toString() + "/working"
-
+					"-sourcePath", workingDir.toString() + "/input",
+					"-taggingConf", taggingConf,
+					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Software",
+					"-outputPath", workingDir.toString() + "/software",
+					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+					"-pathMap", pathMap,
+					"-datasourceMapPath",
+						getClass()
+								.getResource("/eu/dnetlib/dhp/bulktag/eosc/datasourceMasterAssociation/datasourceMaster")
+								.getPath()
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());

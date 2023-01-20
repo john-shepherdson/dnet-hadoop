@@ -46,6 +46,11 @@
     "paramLongName": "taggingConf",
     "paramDescription": "true if the spark session is managed, false otherwise",
     "paramRequired": false
+  },
+  {
+    "paramName": "dmp",
+    "paramLongName": "datasourceMapPath",
+    "paramDescription": "mapping between the datasource duplicates and the corresponding master",
+    "paramRequired": true
   }
-
 ]

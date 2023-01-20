@@ -112,7 +112,11 @@ public class BulkTagJobTest {
 					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
 					"-outputPath", workingDir.toString() + "/dataset",
 					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+					"-datasourceMapPath",
+						getClass()
+								.getResource("/eu/dnetlib/dhp/bulktag/eosc/datasourceMasterAssociation/datasourceMaster")
+								.getPath(),
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -152,7 +156,11 @@ public class BulkTagJobTest {
 					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
 					"-outputPath", workingDir.toString() + "/dataset",
 					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+					"-datasourceMapPath",
+						getClass()
+								.getResource("/eu/dnetlib/dhp/bulktag/eosc/datasourceMasterAssociation/datasourceMaster")
+								.getPath(),
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -249,7 +257,11 @@ public class BulkTagJobTest {
 					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
 					"-outputPath", workingDir.toString() + "/dataset",
 					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+					"-datasourceMapPath",
+						getClass()
+								.getResource("/eu/dnetlib/dhp/bulktag/eosc/datasourceMasterAssociation/datasourceMaster")
+								.getPath(),
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
@@ -329,7 +341,11 @@ public class BulkTagJobTest {
 					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
 					"-outputPath", workingDir.toString() + "/publication",
 					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+					"-datasourceMapPath",
+						getClass()
+								.getResource("/eu/dnetlib/dhp/bulktag/eosc/datasourceMasterAssociation/datasourceMaster")
+								.getPath(),
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -402,7 +418,11 @@ public class BulkTagJobTest {
 					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.OtherResearchProduct",
 					"-outputPath", workingDir.toString() + "/orp",
 					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+					"-datasourceMapPath",
+						getClass()
+								.getResource("/eu/dnetlib/dhp/bulktag/eosc/datasourceMasterAssociation/datasourceMaster")
+								.getPath(),
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -523,7 +543,11 @@ public class BulkTagJobTest {
 					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
 					"-outputPath", workingDir.toString() + "/dataset",
 					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+					"-datasourceMapPath",
+						getClass()
+								.getResource("/eu/dnetlib/dhp/bulktag/eosc/datasourceMasterAssociation/datasourceMaster")
+								.getPath(),
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -649,7 +673,11 @@ public class BulkTagJobTest {
 					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Software",
 					"-outputPath", workingDir.toString() + "/software",
 					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+					"-datasourceMapPath",
+						getClass()
+								.getResource("/eu/dnetlib/dhp/bulktag/eosc/datasourceMasterAssociation/datasourceMaster")
+								.getPath(),
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -749,7 +777,11 @@ public class BulkTagJobTest {
 					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
 					"-outputPath", workingDir.toString() + "/dataset",
 					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+					"-datasourceMapPath",
+						getClass()
+								.getResource("/eu/dnetlib/dhp/bulktag/eosc/datasourceMasterAssociation/datasourceMaster")
+								.getPath(),
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());

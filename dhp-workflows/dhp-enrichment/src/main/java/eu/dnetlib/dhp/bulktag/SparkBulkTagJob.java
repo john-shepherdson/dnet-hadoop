@@ -5,9 +5,12 @@ import static eu.dnetlib.dhp.PropagationConstant.removeOutputDir;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import eu.dnetlib.dhp.bulktag.eosc.DatasourceMaster;
+import eu.dnetlib.dhp.bulktag.eosc.EoscTagFunctions;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -64,6 +67,9 @@ public class SparkBulkTagJob {
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
+		final String datasourceMapPath = parser.get("datasourceMapPath");
+		log.info("datasourceMapPath: {}", datasourceMapPath);
+
 		final Boolean saveGraph = Optional
 			.ofNullable(parser.get("saveGraph"))
 			.map(Boolean::valueOf)
@@ -88,7 +94,7 @@ public class SparkBulkTagJob {
 			isSparkSessionManaged,
 			spark -> {
 				removeOutputDir(spark, outputPath);
-				execBulkTag(spark, inputPath, outputPath, protoMappingParams, resultClazz, cc);
+				execBulkTag(spark, inputPath, outputPath, protoMappingParams, datasourceMapPath, resultClazz, cc);
 			});
 	}
 
@@ -97,8 +103,13 @@ public class SparkBulkTagJob {
 		String inputPath,
 		String outputPath,
 		ProtoMap protoMappingParams,
+		String datasourceMapPath,
 		Class<R> resultClazz,
 		CommunityConfiguration communityConfiguration) {
+
+		List<String> hostedByList = readPath(spark, datasourceMapPath, DatasourceMaster.class)
+				.map((MapFunction<DatasourceMaster, String>) dm -> dm.getMaster(), Encoders.STRING())
+				.collectAsList();
 
 		ResultTagger resultTagger = new ResultTagger();
 		readPath(spark, inputPath, resultClazz)
@@ -108,6 +119,10 @@ public class SparkBulkTagJob {
 				(MapFunction<R, R>) value -> resultTagger
 					.enrichContextCriteria(
 						value, communityConfiguration, protoMappingParams),
+				Encoders.bean(resultClazz))
+			.map((MapFunction<R, R>) EoscTagFunctions::execEoscTagResult, Encoders.bean(resultClazz))
+			.map(
+				(MapFunction<R, R>) value -> EoscTagFunctions.enrich(value, hostedByList),
 				Encoders.bean(resultClazz))
 			.write()
 			.mode(SaveMode.Overwrite)

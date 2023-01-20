@@ -1,12 +1,10 @@
 
 package eu.dnetlib.dhp.bulktag;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -21,17 +19,9 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author miriam.baglioni
- * @Date 22/07/22
- */
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.dnetlib.dhp.bulktag.eosc.SparkEoscBulkTag;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
-import eu.dnetlib.dhp.schema.oaf.Software;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 //"50|475c1990cbb2::0fecfb874d9395aa69d2f4d7cd1acbea" has instance hostedby eosc
 //"50|475c1990cbb2::3185cd5d8a2b0a06bb9b23ef11748eb1" has instance hostedby eosc
@@ -39,13 +29,39 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 //"50|475c1990cbb2::3894c94123e96df8a21249957cf160cb" has EoscTag
 
 public class EOSCContextTaggingTest {
+
+	private static final Logger log = LoggerFactory.getLogger(EOSCContextTaggingTest.class);
+
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	private static SparkSession spark;
 
 	private static Path workingDir;
 
-	private static final Logger log = LoggerFactory.getLogger(EOSCContextTaggingTest.class);
+	public static final String MOCK_IS_LOOK_UP_URL = "BASEURL:8280/is/services/isLookUp";
+
+	public static final String pathMap = "{ \"author\" : \"$['author'][*]['fullname']\","
+			+ "  \"title\" : \"$['title'][*]['value']\","
+			+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
+			+ "  \"contributor\" : \"$['contributor'][*]['value']\","
+			+ "  \"description\" : \"$['description'][*]['value']\", "
+			+ " \"subject\" :\"$['subject'][*]['value']\" , " +
+
+			"\"fos\" : \"$['subject'][?(@['qualifier']['classid']=='subject:fos')].value\"} ";
+
+	private static String taggingConf = "";
+
+	static {
+		try {
+			taggingConf = IOUtils
+					.toString(
+							BulkTagJobTest.class
+									.getResourceAsStream(
+											"/eu/dnetlib/dhp/bulktag/communityconfiguration/tagging_conf.xml"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
@@ -89,18 +105,22 @@ public class EOSCContextTaggingTest {
 			.option("compression", "gzip")
 			.json(workingDir.toString() + "/input/dataset");
 
-		SparkEoscBulkTag
+
+		SparkBulkTagJob
 			.main(
 				new String[] {
+					"-isTest", Boolean.TRUE.toString(),
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
-					"-sourcePath",
-					workingDir.toString() + "/input/dataset",
-					"-workingPath", workingDir.toString() + "/working/dataset",
+					"-sourcePath", workingDir.toString() + "/input/dataset",
+					"-taggingConf", taggingConf,
+					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
+					"-outputPath", workingDir.toString() + "/dataset",
+					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+					"-pathMap", pathMap,
 					"-datasourceMapPath",
 					getClass()
 						.getResource("/eu/dnetlib/dhp/bulktag/eosc/datasourceMasterAssociation/datasourceMaster")
 						.getPath(),
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());

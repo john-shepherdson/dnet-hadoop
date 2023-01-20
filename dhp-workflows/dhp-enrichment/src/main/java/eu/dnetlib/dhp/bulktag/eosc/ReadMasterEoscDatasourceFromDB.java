@@ -1,18 +1,10 @@
 
 package eu.dnetlib.dhp.bulktag.eosc;
 
-import java.io.BufferedWriter;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.StandardCharsets;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.DbClient;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -22,23 +14,19 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
-/**
- * @author miriam.baglioni
- * @Date 21/07/22
- */
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.BufferedWriter;
+import java.io.Closeable;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.function.Function;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.DbClient;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.common.RelationInverse;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
-
-public class ReadMasterDatasourceFromDB implements Closeable {
+public class ReadMasterEoscDatasourceFromDB implements Closeable {
 
 	private final DbClient dbClient;
-	private static final Log log = LogFactory.getLog(ReadMasterDatasourceFromDB.class);
+	private static final Log log = LogFactory.getLog(ReadMasterEoscDatasourceFromDB.class);
 
 	private final BufferedWriter writer;
 	private final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -53,7 +41,7 @@ public class ReadMasterDatasourceFromDB implements Closeable {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					ReadMasterDatasourceFromDB.class
+					ReadMasterEoscDatasourceFromDB.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/bulktag/datasourcemaster_parameters.json")));
 
@@ -66,12 +54,11 @@ public class ReadMasterDatasourceFromDB implements Closeable {
 		final String hdfsNameNode = parser.get("hdfsNameNode");
 
 		try (
-			final ReadMasterDatasourceFromDB rmd = new ReadMasterDatasourceFromDB(hdfsPath, hdfsNameNode, dbUrl, dbUser,
+			final ReadMasterEoscDatasourceFromDB rmd = new ReadMasterEoscDatasourceFromDB(hdfsPath, hdfsNameNode, dbUrl, dbUser,
 				dbPassword)) {
 
 			log.info("Processing datasources...");
 			rmd.execute(QUERY, rmd::datasourceMasterMap);
-
 		}
 	}
 
@@ -103,7 +90,7 @@ public class ReadMasterDatasourceFromDB implements Closeable {
 		writer.close();
 	}
 
-	public ReadMasterDatasourceFromDB(
+	public ReadMasterEoscDatasourceFromDB(
 		final String hdfsPath, String hdfsNameNode, final String dbUrl, final String dbUser, final String dbPassword)
 		throws IOException {
 
