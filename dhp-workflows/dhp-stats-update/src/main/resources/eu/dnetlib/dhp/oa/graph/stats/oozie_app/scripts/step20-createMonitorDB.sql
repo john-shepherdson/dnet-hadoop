@@ -61,7 +61,8 @@ create table TARGET.result stored as parquet as
              'openorgs____::31f2fa9e05b49d4cf40a19c3fed8eb06',	-- Saints Cyril and Methodius University of Skopje
              'openorgs____::db7686f30f22cbe73a4fde872ce812a6', -- University of Milan
              'openorgs____::b8b8ca674452579f3f593d9f5e557483',  -- University College Cork
-             'openorgs____::38d7097854736583dde879d12dacafca'	-- Brown University
+             'openorgs____::38d7097854736583dde879d12dacafca',	-- Brown University
+             'openorgs____::57784c9e047e826fefdb1ef816120d92' --Arts et Métiers ParisTech
         ) )) foo;
 compute stats TARGET.result;
 

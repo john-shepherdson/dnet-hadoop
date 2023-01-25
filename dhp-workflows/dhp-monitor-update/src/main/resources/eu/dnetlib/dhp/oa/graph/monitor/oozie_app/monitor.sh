@@ -13,6 +13,6 @@ export SCRIPT_PATH=$3
 echo "Getting file from " $3
 hdfs dfs -copyToLocal $3
 
-echo "Creating monitor database"
+echo "Updating monitor database"
 cat createMonitorDB.sql | sed s/SOURCE/$1/g | sed s/TARGET/$2/g1 | impala-shell -f -
 echo "Impala shell finished"

@@ -1,15 +1,17 @@
 DROP TABLE IF EXISTS TARGET.result_new;
 
-create table TARGET.result_new stored as parquet as
+create table TARGET.result_new as
     select distinct * from (
         select * from SOURCE.result r where exists (select 1 from SOURCE.result_organization ro where ro.id=r.id and ro.organization in (
 --              'openorgs____::b8b8ca674452579f3f593d9f5e557483',  -- University College Cork
-             'openorgs____::38d7097854736583dde879d12dacafca'	-- Brown University
+--             'openorgs____::38d7097854736583dde879d12dacafca'	-- Brown University
+                'openorgs____::57784c9e047e826fefdb1ef816120d92' --Arts et Métiers ParisTech
         ) )) foo;
 
 COMPUTE STATS TARGET.result_new;
 
 INSERT INTO TARGET.result select * from TARGET.result_new;
+COMPUTE STATS TARGET.result;
 
 INSERT INTO TARGET.result_citations select * from TARGET.result_citations orig where exists (select 1 from TARGET.result_new r where r.id=orig.id);
 COMPUTE STATS TARGET.result_citations;
