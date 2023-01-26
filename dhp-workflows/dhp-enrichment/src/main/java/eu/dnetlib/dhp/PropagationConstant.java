@@ -44,7 +44,7 @@ public class PropagationConstant {
 
 	public final static String NULL = "NULL";
 
-	public static final String INSTITUTIONAL_REPO_TYPE = "pubsrepository::institutional";
+	public static final String INSTITUTIONAL_REPO_TYPE = "institutional";
 
 	public static final String PROPAGATION_DATA_INFO_TYPE = "propagation";
 
