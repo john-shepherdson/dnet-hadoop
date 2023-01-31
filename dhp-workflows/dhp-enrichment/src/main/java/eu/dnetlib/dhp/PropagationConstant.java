@@ -43,7 +43,7 @@ public class PropagationConstant {
 
 	public final static String NULL = "NULL";
 
-	public static final String INSTITUTIONAL_REPO_TYPE = "pubsrepository::institutional";
+	public static final String INSTITUTIONAL_REPO_TYPE = "institutional";
 
 	public static final String PROPAGATION_DATA_INFO_TYPE = "propagation";
 
@@ -233,9 +233,9 @@ public class PropagationConstant {
 
 		if (HdfsSupport.exists(inputPath, spark.sparkContext().hadoopConfiguration())) {
 			return spark
-					.read()
-					.textFile(inputPath)
-					.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
+				.read()
+				.textFile(inputPath)
+				.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
 		} else {
 			return spark.emptyDataset(Encoders.bean(clazz));
 		}
