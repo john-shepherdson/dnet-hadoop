@@ -6,10 +6,12 @@
         </property>
         <property>
             <name>subjectlist</name>
+            <value>fos;sdg</value>
             <description>the list of subject classid to propagate (split by ;)</description>
         </property>
         <property>
             <name>allowedsemrels</name>
+            <value>IsSupplementedBy;IsSupplementTo;IsPreviousVersionOf;IsNewVersionOf;IsIdenticalTo;Obsoletes;IsObsoletedBy;IsVersionOf</value>
             <description>the allowed semantics </description>
         </property>
        <property>
