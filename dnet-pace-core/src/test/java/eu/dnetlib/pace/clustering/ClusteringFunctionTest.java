@@ -237,4 +237,13 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 
 	}
 
+	@Test
+	public void testLastNameFirstInitial(){
+
+		final ClusteringFunction cf = new LastNameFirstInitial(params);
+		final String s = "LI Yonghong";
+		System.out.println("s = " + s);
+		System.out.println(cf.apply(conf, Lists.newArrayList(title(s))));
+	}
+
 }

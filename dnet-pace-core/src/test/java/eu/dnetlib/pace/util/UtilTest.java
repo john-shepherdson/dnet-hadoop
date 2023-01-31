@@ -30,6 +30,11 @@ public class UtilTest {
 
         assertEquals("kennedy", p.getSurnameString());
         assertEquals("j f", p.getNameString());
+
+        p = new Person("Guan-Hua Du", false);
+
+        System.out.println("surname = " + p.getSurnameString());
+        System.out.println("name = " + p.getNameString());
     }
 
 }
