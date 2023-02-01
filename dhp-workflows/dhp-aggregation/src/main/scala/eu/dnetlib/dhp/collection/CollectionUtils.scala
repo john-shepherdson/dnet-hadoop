@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.collection
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.common.ModelSupport
-import eu.dnetlib.dhp.schema.oaf.{Oaf, OafEntity, Relation}
+import eu.dnetlib.dhp.schema.oaf.{Entity, Oaf, Entity, Relation}
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode}
 
 object CollectionUtils {
@@ -17,7 +17,7 @@ object CollectionUtils {
     */
 
   def fixRelations(i: Oaf): List[Oaf] = {
-    if (i.isInstanceOf[OafEntity])
+    if (i.isInstanceOf[Entity])
       return List(i)
     else {
       val r: Relation = i.asInstanceOf[Relation]
@@ -34,10 +34,9 @@ object CollectionUtils {
         inverse.setRelType(currentRel.getRelType)
         inverse.setSubRelType(currentRel.getSubReltype)
         inverse.setRelClass(currentRel.getInverseRelClass)
-        inverse.setCollectedfrom(r.getCollectedfrom)
+        inverse.setProvenance(r.getProvenance)
         inverse.setDataInfo(r.getDataInfo)
         inverse.setProperties(r.getProperties)
-        inverse.setLastupdatetimestamp(r.getLastupdatetimestamp)
         inverse.setValidated(r.getValidated)
         inverse.setValidationDate(r.getValidationDate)
         return List(r, inverse)

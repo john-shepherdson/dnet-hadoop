@@ -21,8 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.schema.oaf.Entity;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
 
 public class DispatchEntitiesSparkJob {
 
@@ -58,7 +58,7 @@ public class DispatchEntitiesSparkJob {
 		log.info("graphTableClassName: {}", graphTableClassName);
 
 		@SuppressWarnings("unchecked")
-		Class<? extends OafEntity> entityClazz = (Class<? extends OafEntity>) Class.forName(graphTableClassName);
+		Class<? extends Entity> entityClazz = (Class<? extends Entity>) Class.forName(graphTableClassName);
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(

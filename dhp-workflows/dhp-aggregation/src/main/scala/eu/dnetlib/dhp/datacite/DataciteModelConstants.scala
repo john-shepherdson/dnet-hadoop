@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.datacite
 
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils
-import eu.dnetlib.dhp.schema.oaf.{DataInfo, KeyValue}
+import eu.dnetlib.dhp.schema.oaf.{DataInfo, EntityDataInfo, KeyValue}
 
 import java.io.InputStream
 import java.time.format.DateTimeFormatter
@@ -72,7 +72,7 @@ object DataciteModelConstants {
   val DOI_CLASS = "doi"
   val SUBJ_CLASS = "keywords"
   val DATACITE_NAME = "Datacite"
-  val dataInfo: DataInfo = dataciteDataInfo("0.9")
+  val dataInfo: EntityDataInfo = dataciteDataInfo(0.9f)
 
   val DATACITE_COLLECTED_FROM: KeyValue =
     OafMapperUtils.keyValue(ModelConstants.DATACITE_ID, DATACITE_NAME)
@@ -221,13 +221,13 @@ object DataciteModelConstants {
     Source.fromInputStream(stream).getLines().toList
   }
 
-  def dataciteDataInfo(trust: String): DataInfo = OafMapperUtils.dataInfo(
+  def dataciteDataInfo(trust: Float): EntityDataInfo = OafMapperUtils.dataInfo(
     false,
+    false,
+    trust,
     null,
     false,
-    false,
-    ModelConstants.PROVENANCE_ACTION_SET_QUALIFIER,
-    trust
+    ModelConstants.PROVENANCE_ACTION_SET_QUALIFIER
   )
 
   val df_en: DateTimeFormatter = DateTimeFormatter.ofPattern(

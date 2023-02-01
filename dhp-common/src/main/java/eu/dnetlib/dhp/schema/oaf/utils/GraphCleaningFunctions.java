@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Encoders;
 
 import com.github.sisyphsu.dateparser.DateParserUtils;
 import com.google.common.collect.Lists;
@@ -23,8 +25,6 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import me.xuender.unidecode.Unidecode;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Encoders;
 
 public class GraphCleaningFunctions extends CleaningFunctions {
 
@@ -91,48 +91,31 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	}
 
 	public static <T extends Oaf> boolean filter(T value) {
-		if (Boolean.TRUE
-			.equals(
-				Optional
-					.ofNullable(value)
-					.map(
-						o -> Optional
-							.ofNullable(o.getDataInfo())
-							.map(
-								d -> Optional
-									.ofNullable(d.getInvisible())
-									.orElse(true))
-							.orElse(true))
-					.orElse(true))) {
-			return true;
-		}
+		if (value instanceof Entity) {
+			Entity entity = (Entity) value;
+			if (Boolean.TRUE
+				.equals(
+					Optional
+						.ofNullable(entity)
+						.map(
+							o -> Optional
+								.ofNullable(o.getDataInfo())
+								.map(
+									d -> Optional
+										.ofNullable(d.getInvisible())
+										.orElse(true))
+								.orElse(true))
+						.orElse(true))) {
+				return true;
+			} else if (value instanceof Result) {
+				Result r = (Result) value;
 
-		if (value instanceof Datasource) {
-			// nothing to evaluate here
-		} else if (value instanceof Project) {
-			// nothing to evaluate here
-		} else if (value instanceof Organization) {
-			// nothing to evaluate here
-		} else if (value instanceof Relation) {
-			// nothing to clean here
-		} else if (value instanceof Result) {
-
-			Result r = (Result) value;
-
-			if (Objects.isNull(r.getTitle()) || r.getTitle().isEmpty()) {
-				return false;
-			}
-
-			if (value instanceof Publication) {
-
-			} else if (value instanceof Dataset) {
-
-			} else if (value instanceof OtherResearchProduct) {
-
-			} else if (value instanceof Software) {
-
+				if (Objects.isNull(r.getTitle()) || r.getTitle().isEmpty()) {
+					return false;
+				}
 			}
 		}
+
 		return true;
 	}
 
@@ -164,7 +147,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 			if (Objects.nonNull(r.getDateofacceptance())) {
 				Optional<String> date = cleanDateField(r.getDateofacceptance());
 				if (date.isPresent()) {
-					r.getDateofacceptance().setValue(date.get());
+					r.setDateofacceptance(date.get());
 				} else {
 					r.setDateofacceptance(null);
 				}
@@ -185,7 +168,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
 							.collect(Collectors.toList()));
 			}
-			if (Objects.nonNull(r.getPublisher()) && StringUtils.isBlank(r.getPublisher().getValue())) {
+			if (Objects.nonNull(r.getPublisher()) && StringUtils.isBlank(r.getPublisher().getName())) {
 				r.setPublisher(null);
 			}
 			if (Objects.isNull(r.getLanguage()) || StringUtils.isBlank(r.getLanguage().getClassid())) {
@@ -267,7 +250,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 							.getDescription()
 							.stream()
 							.filter(Objects::nonNull)
-							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
+							.filter(s -> StringUtils.isNotBlank(s))
 							.map(GraphCleaningFunctions::cleanValue)
 							.collect(Collectors.toList()));
 			}
@@ -288,29 +271,25 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 								.setInstancetype(
 									OafMapperUtils
 										.qualifier(
-											"0038", "Other literature type", ModelConstants.DNET_PUBLICATION_RESOURCE,
-											ModelConstants.DNET_PUBLICATION_RESOURCE));
+											"0038", "Other literature type", ModelConstants.DNET_PUBLICATION_RESOURCE));
 						} else if (r instanceof Dataset) {
 							i
 								.setInstancetype(
 									OafMapperUtils
 										.qualifier(
-											"0039", "Other dataset type", ModelConstants.DNET_PUBLICATION_RESOURCE,
-											ModelConstants.DNET_PUBLICATION_RESOURCE));
+											"0039", "Other dataset type", ModelConstants.DNET_PUBLICATION_RESOURCE));
 						} else if (r instanceof Software) {
 							i
 								.setInstancetype(
 									OafMapperUtils
 										.qualifier(
-											"0040", "Other software type", ModelConstants.DNET_PUBLICATION_RESOURCE,
-											ModelConstants.DNET_PUBLICATION_RESOURCE));
+											"0040", "Other software type", ModelConstants.DNET_PUBLICATION_RESOURCE));
 						} else if (r instanceof OtherResearchProduct) {
 							i
 								.setInstancetype(
 									OafMapperUtils
 										.qualifier(
-											"0020", "Other ORP type", ModelConstants.DNET_PUBLICATION_RESOURCE,
-											ModelConstants.DNET_PUBLICATION_RESOURCE));
+											"0020", "Other ORP type", ModelConstants.DNET_PUBLICATION_RESOURCE));
 						}
 					}
 
@@ -348,7 +327,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 					if (Objects.nonNull(i.getDateofacceptance())) {
 						Optional<String> date = cleanDateField(i.getDateofacceptance());
 						if (date.isPresent()) {
-							i.getDateofacceptance().setValue(date.get());
+							i.setDateofacceptance(date.get());
 						} else {
 							i.setDateofacceptance(null);
 						}
@@ -456,10 +435,9 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		return value;
 	}
 
-	private static Optional<String> cleanDateField(Field<String> dateofacceptance) {
+	private static Optional<String> cleanDateField(String dateofacceptance) {
 		return Optional
 			.ofNullable(dateofacceptance)
-			.map(Field::getValue)
 			.map(GraphCleaningFunctions::cleanDate)
 			.filter(Objects::nonNull);
 	}
@@ -513,7 +491,6 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	private static void fixVocabName(Qualifier q, String vocabularyName) {
 		if (Objects.nonNull(q) && StringUtils.isBlank(q.getSchemeid())) {
 			q.setSchemeid(vocabularyName);
-			q.setSchemename(vocabularyName);
 		}
 	}
 
@@ -524,9 +501,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	}
 
 	private static Qualifier qualifier(String classid, String classname, String scheme) {
-		return OafMapperUtils
-			.qualifier(
-				classid, classname, scheme, scheme);
+		return OafMapperUtils.qualifier(classid, classname, scheme);
 	}
 
 	protected static StructuredProperty cleanValue(StructuredProperty s) {
@@ -539,9 +514,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		return s;
 	}
 
-	protected static Field<String> cleanValue(Field<String> s) {
-		s.setValue(s.getValue().replaceAll(CLEANING_REGEX, " "));
-		return s;
+	protected static String cleanValue(String s) {
+		return s.replaceAll(CLEANING_REGEX, " ");
 	}
 
 }

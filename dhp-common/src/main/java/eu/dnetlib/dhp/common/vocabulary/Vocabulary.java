@@ -73,11 +73,11 @@ public class Vocabulary implements Serializable {
 	public Qualifier getTermAsQualifier(final String termId, boolean strict) {
 		final VocabularyTerm term = getTerm(termId);
 		if (Objects.nonNull(term)) {
-			return OafMapperUtils.qualifier(term.getId(), term.getName(), getId(), getName());
+			return OafMapperUtils.qualifier(term.getId(), term.getName(), getId());
 		} else if (Objects.isNull(term) && strict) {
-			return OafMapperUtils.unknown(getId(), getName());
+			return OafMapperUtils.unknown(getId());
 		} else {
-			return OafMapperUtils.qualifier(termId, termId, getId(), getName());
+			return OafMapperUtils.qualifier(termId, termId, getId());
 		}
 	}
 

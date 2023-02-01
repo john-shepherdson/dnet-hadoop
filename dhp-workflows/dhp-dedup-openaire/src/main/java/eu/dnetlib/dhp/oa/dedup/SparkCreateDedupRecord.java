@@ -6,6 +6,9 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVENANCE_DEDUP;
 
 import java.io.IOException;
 
+import eu.dnetlib.dhp.schema.oaf.Entity;
+import eu.dnetlib.dhp.schema.oaf.common.EntityType;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.SaveMode;
@@ -77,7 +80,7 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
 			final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, subEntity);
 			final String entityPath = DedupUtility.createEntityPath(graphBasePath, subEntity);
 
-			final Class<OafEntity> clazz = ModelSupport.entityTypes.get(EntityType.valueOf(subEntity));
+			final Class<Entity> clazz = ModelSupport.entityTypes.get(EntityType.valueOf(subEntity));
 			final DataInfo dataInfo = getDataInfo(dedupConf);
 			DedupRecordFactory
 				.createDedupRecord(spark, dataInfo, mergeRelPath, entityPath, clazz)

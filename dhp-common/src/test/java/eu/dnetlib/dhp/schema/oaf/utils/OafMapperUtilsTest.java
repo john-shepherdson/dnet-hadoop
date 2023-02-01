@@ -164,24 +164,38 @@ class OafMapperUtilsTest {
 		assertEquals(1, d2.getCollectedfrom().size());
 		assertFalse(cfId(d2.getCollectedfrom()).contains(ModelConstants.CROSSREF_ID));
 
-		assertEquals(
-			ModelConstants.PUBLICATION_RESULTTYPE_CLASSID,
-			OafMapperUtils
-				.mergeResults(p1, d2)
-				.getResulttype()
-				.getClassid());
-
 		assertEquals(1, p2.getCollectedfrom().size());
 		assertFalse(cfId(p2.getCollectedfrom()).contains(ModelConstants.CROSSREF_ID));
 		assertEquals(1, d1.getCollectedfrom().size());
 		assertTrue(cfId(d1.getCollectedfrom()).contains(ModelConstants.CROSSREF_ID));
 
-		assertEquals(
-			ModelConstants.DATASET_RESULTTYPE_CLASSID,
-			OafMapperUtils
-				.mergeResults(p2, d1)
-				.getResulttype()
-				.getClassid());
+		final Result p1d2 = OafMapperUtils.mergeResults(p1, d2);
+		assertEquals(ModelConstants.PUBLICATION_RESULTTYPE_CLASSID, p1d2.getResulttype());
+		assertTrue(p1d2 instanceof Publication);
+		assertEquals(p1.getId(), p1d2.getId());
+	}
+
+	@Test
+	void testMergePubs_1() throws IOException {
+		Publication p2 = read("publication_2.json", Publication.class);
+		Dataset d1 = read("dataset_1.json", Dataset.class);
+
+		final Result p2d1 = OafMapperUtils.mergeResults(p2, d1);
+		assertEquals(ModelConstants.DATASET_RESULTTYPE_CLASSID, p2d1.getResulttype());
+		assertTrue(p2d1 instanceof Dataset);
+		assertEquals(d1.getId(), p2d1.getId());
+		assertEquals(2, p2d1.getCollectedfrom().size());
+	}
+
+	@Test
+	void testMergePubs_2() throws IOException {
+		Publication p1 = read("publication_1.json", Publication.class);
+		Publication p2 = read("publication_2.json", Publication.class);
+
+		Result p1p2 = OafMapperUtils.mergeResults(p1, p2);
+		assertTrue(p1p2 instanceof Publication);
+		assertEquals(p1.getId(), p1p2.getId());
+		assertEquals(2, p1p2.getCollectedfrom().size());
 	}
 
 	@Test

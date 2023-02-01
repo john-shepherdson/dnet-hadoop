@@ -125,12 +125,12 @@ public class VocabularyGroup implements Serializable {
 		if (vocabularyExists(vocId)) {
 			return vocs.get(vocId.toLowerCase()).getTermAsQualifier(id);
 		}
-		return OafMapperUtils.qualifier(id, id, "", "");
+		return OafMapperUtils.qualifier(id, id, "");
 	}
 
 	public Qualifier getSynonymAsQualifier(final String vocId, final String syn) {
 		if (StringUtils.isBlank(vocId)) {
-			return OafMapperUtils.unknown("", "");
+			return OafMapperUtils.unknown("");
 		}
 		return vocs.get(vocId.toLowerCase()).getSynonymAsQualifier(syn);
 	}
@@ -142,7 +142,7 @@ public class VocabularyGroup implements Serializable {
 	 */
 	public Qualifier getSynonymAsQualifierCaseSensitive(final String vocId, final String syn) {
 		if (StringUtils.isBlank(vocId)) {
-			return OafMapperUtils.unknown("", "");
+			return OafMapperUtils.unknown("");
 		}
 		return vocs.get(vocId).getSynonymAsQualifier(syn);
 	}

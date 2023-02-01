@@ -87,17 +87,17 @@ public class GroupEntitiesSparkJob {
 		String inputPath,
 		String outputPath) {
 
-		final TypedColumn<OafEntity, OafEntity> aggregator = new GroupingAggregator().toColumn();
+		final TypedColumn<Entity, Entity> aggregator = new GroupingAggregator().toColumn();
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 		spark
 			.read()
 			.textFile(toSeq(listEntityPaths(inputPath, sc)))
-			.map((MapFunction<String, OafEntity>) GroupEntitiesSparkJob::parseOaf, Encoders.kryo(OafEntity.class))
-			.filter((FilterFunction<OafEntity>) e -> StringUtils.isNotBlank(ModelSupport.idFn().apply(e)))
-			.groupByKey((MapFunction<OafEntity, String>) oaf -> ModelSupport.idFn().apply(oaf), Encoders.STRING())
+			.map((MapFunction<String, Entity>) GroupEntitiesSparkJob::parseOaf, Encoders.kryo(Entity.class))
+			.filter((FilterFunction<Entity>) e -> StringUtils.isNotBlank(ModelSupport.idFn().apply(e)))
+			.groupByKey((MapFunction<Entity, String>) oaf -> ModelSupport.idFn().apply(oaf), Encoders.STRING())
 			.agg(aggregator)
 			.map(
-				(MapFunction<Tuple2<String, OafEntity>, String>) t -> t._2().getClass().getName() +
+				(MapFunction<Tuple2<String, Entity>, String>) t -> t._2().getClass().getName() +
 					"|" + OBJECT_MAPPER.writeValueAsString(t._2()),
 				Encoders.STRING())
 			.write()
@@ -106,19 +106,19 @@ public class GroupEntitiesSparkJob {
 			.text(outputPath);
 	}
 
-	public static class GroupingAggregator extends Aggregator<OafEntity, OafEntity, OafEntity> {
+	public static class GroupingAggregator extends Aggregator<Entity, Entity, Entity> {
 
 		@Override
-		public OafEntity zero() {
+		public Entity zero() {
 			return null;
 		}
 
 		@Override
-		public OafEntity reduce(OafEntity b, OafEntity a) {
+		public Entity reduce(Entity b, Entity a) {
 			return mergeAndGet(b, a);
 		}
 
-		private OafEntity mergeAndGet(OafEntity b, OafEntity a) {
+		private Entity mergeAndGet(Entity b, Entity a) {
 			if (Objects.nonNull(a) && Objects.nonNull(b)) {
 				return OafMapperUtils.mergeEntities(b, a);
 			}
@@ -126,28 +126,28 @@ public class GroupEntitiesSparkJob {
 		}
 
 		@Override
-		public OafEntity merge(OafEntity b, OafEntity a) {
+		public Entity merge(Entity b, Entity a) {
 			return mergeAndGet(b, a);
 		}
 
 		@Override
-		public OafEntity finish(OafEntity j) {
+		public Entity finish(Entity j) {
 			return j;
 		}
 
 		@Override
-		public Encoder<OafEntity> bufferEncoder() {
-			return Encoders.kryo(OafEntity.class);
+		public Encoder<Entity> bufferEncoder() {
+			return Encoders.kryo(Entity.class);
 		}
 
 		@Override
-		public Encoder<OafEntity> outputEncoder() {
-			return Encoders.kryo(OafEntity.class);
+		public Encoder<Entity> outputEncoder() {
+			return Encoders.kryo(Entity.class);
 		}
 
 	}
 
-	private static OafEntity parseOaf(String s) {
+	private static Entity parseOaf(String s) {
 
 		DocumentContext dc = JsonPath
 			.parse(s, Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS));
@@ -184,7 +184,7 @@ public class GroupEntitiesSparkJob {
 		}
 	}
 
-	private static <T extends OafEntity> OafEntity parse(String s, Class<T> clazz) {
+	private static <T extends Entity> Entity parse(String s, Class<T> clazz) {
 		try {
 			return OBJECT_MAPPER.readValue(s, clazz);
 		} catch (IOException e) {

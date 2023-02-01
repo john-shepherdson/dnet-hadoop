@@ -1,0 +1,21 @@
+{
+  "id":"50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1f",
+  "instance": [
+    {
+      "collectedfrom": {
+        "key": "10|opendoar____::8b6dd7db9af49e67306feb59a8bdc52c",
+        "value": "Europe PubMed Central"
+      },
+      "pid": [
+        {
+          "qualifier": {"classid": "doi"},
+          "value": "10.1016/j.cmet.2010.03.013"
+        },
+        {
+          "qualifier":{"classid":"pmc"},
+          "value":"21459329"
+        }
+      ]
+    }
+  ]
+}

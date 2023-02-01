@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.datacite
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.common.collect.Lists
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.datacite.DataciteModelConstants._
 import eu.dnetlib.dhp.schema.action.AtomicAction
@@ -284,27 +285,24 @@ object DataciteToOAFTransformation {
   }
 
   def generateOAFDate(dt: String, q: Qualifier): StructuredProperty = {
-    OafMapperUtils.structuredProperty(dt, q, null)
+    OafMapperUtils.structuredProperty(dt, q)
   }
 
   def generateRelation(
-    sourceId: String,
-    targetId: String,
-    relClass: String,
-    cf: KeyValue,
-    di: DataInfo
+                        sourceId: String,
+                        targetId: String,
+                        relClass: String,
+                        collectedFrom: KeyValue,
+                        di: DataInfo
   ): Relation = {
-
     val r = new Relation
     r.setSource(sourceId)
     r.setTarget(targetId)
     r.setRelType(ModelConstants.RESULT_PROJECT)
     r.setRelClass(relClass)
     r.setSubRelType(ModelConstants.OUTCOME)
-    r.setCollectedfrom(List(cf).asJava)
-    r.setDataInfo(di)
+    r.setProvenance(Lists.newArrayList(OafMapperUtils.getProvenance(collectedFrom, di)))
     r
-
   }
 
   def get_projectRelation(awardUri: String, sourceId: String): List[Relation] = {
@@ -353,10 +351,9 @@ object DataciteToOAFTransformation {
     val doi_q = OafMapperUtils.qualifier(
       "doi",
       "doi",
-      ModelConstants.DNET_PID_TYPES,
       ModelConstants.DNET_PID_TYPES
     )
-    val pid = OafMapperUtils.structuredProperty(doi, doi_q, dataInfo)
+    val pid = OafMapperUtils.structuredProperty(doi, doi_q)
     result.setPid(List(pid).asJava)
 
     // This identifiere will be replaced in a second moment using the PID logic generation
@@ -389,7 +386,7 @@ object DataciteToOAFTransformation {
                   )
                 else null
               if (ni.nameIdentifier != null && ni.nameIdentifier.isDefined) {
-                OafMapperUtils.structuredProperty(ni.nameIdentifier.get, q, dataInfo)
+                OafMapperUtils.authorPid(ni.nameIdentifier.get, q, dataInfo)
               } else
                 null
 
@@ -397,13 +394,6 @@ object DataciteToOAFTransformation {
             .asJava
         )
       }
-      if (c.affiliation.isDefined)
-        a.setAffiliation(
-          c.affiliation.get
-            .filter(af => af.nonEmpty)
-            .map(af => OafMapperUtils.field(af, dataInfo))
-            .asJava
-        )
       a.setRank(idx + 1)
       a
     }
@@ -420,15 +410,13 @@ object DataciteToOAFTransformation {
         .map(t => {
           if (t.titleType.isEmpty) {
             OafMapperUtils
-              .structuredProperty(t.title.get, ModelConstants.MAIN_TITLE_QUALIFIER, null)
+              .structuredProperty(t.title.get, ModelConstants.MAIN_TITLE_QUALIFIER)
           } else {
             OafMapperUtils.structuredProperty(
               t.title.get,
               t.titleType.get,
               t.titleType.get,
-              ModelConstants.DNET_DATACITE_TITLE,
-              ModelConstants.DNET_DATACITE_TITLE,
-              null
+              ModelConstants.DNET_DATACITE_TITLE
             )
           }
         })
@@ -449,46 +437,40 @@ object DataciteToOAFTransformation {
       .map(d => d.get)
 
     if (a_date.isDefined) {
-      if (doi.startsWith("10.14457"))
-        result.setEmbargoenddate(
-          OafMapperUtils.field(fix_thai_date(a_date.get, "[yyyy-MM-dd]"), null)
-        )
-      else
-        result.setEmbargoenddate(OafMapperUtils.field(a_date.get, null))
+      if (doi.startsWith("10.14457")) {
+        val date = fix_thai_date(a_date.get, "[yyyy-MM-dd]")
+        result.setEmbargoenddate(date)
+      } else {
+        result.setEmbargoenddate(a_date.get)
+      }
     }
     if (i_date.isDefined && i_date.get.isDefined) {
       if (doi.startsWith("10.14457")) {
-        result.setDateofacceptance(
-          OafMapperUtils.field(fix_thai_date(i_date.get.get, "[yyyy-MM-dd]"), null)
-        )
+        val date = fix_thai_date(i_date.get.get, "[yyyy-MM-dd]")
+        result.setDateofacceptance(date)
         result
           .getInstance()
           .get(0)
-          .setDateofacceptance(
-            OafMapperUtils.field(fix_thai_date(i_date.get.get, "[yyyy-MM-dd]"), null)
-          )
+          .setDateofacceptance(date)
       } else {
-        result.setDateofacceptance(OafMapperUtils.field(i_date.get.get, null))
-        result.getInstance().get(0).setDateofacceptance(OafMapperUtils.field(i_date.get.get, null))
+        result.setDateofacceptance(i_date.get.get)
+        result.getInstance().get(0).setDateofacceptance(i_date.get.get)
       }
     } else if (publication_year != null) {
+      val date = s"01-01-$publication_year"
       if (doi.startsWith("10.14457")) {
-        result.setDateofacceptance(
-          OafMapperUtils.field(fix_thai_date(s"01-01-$publication_year", "[dd-MM-yyyy]"), null)
-        )
+        val date = fix_thai_date(date, "[dd-MM-yyyy]")
+        result.setDateofacceptance(date)
         result
           .getInstance()
           .get(0)
-          .setDateofacceptance(
-            OafMapperUtils.field(fix_thai_date(s"01-01-$publication_year", "[dd-MM-yyyy]"), null)
-          )
-
+          .setDateofacceptance(date)
       } else {
-        result.setDateofacceptance(OafMapperUtils.field(s"01-01-$publication_year", null))
+        result.setDateofacceptance(date)
         result
           .getInstance()
           .get(0)
-          .setDateofacceptance(OafMapperUtils.field(s"01-01-$publication_year", null))
+          .setDateofacceptance(date)
       }
     }
 
@@ -519,8 +501,7 @@ object DataciteToOAFTransformation {
             SUBJ_CLASS,
             SUBJ_CLASS,
             ModelConstants.DNET_SUBJECT_TYPOLOGIES,
-            ModelConstants.DNET_SUBJECT_TYPOLOGIES,
-            null
+            dataInfo
           )
         )
         .asJava
@@ -533,14 +514,14 @@ object DataciteToOAFTransformation {
     result.setDescription(
       descriptions
         .filter(d => d.description.isDefined)
-        .map(d => OafMapperUtils.field(d.description.get, null))
+        .map(d => d.description.get)
         .filter(s => s != null)
         .asJava
     )
 
     val publisher = (json \\ "publisher").extractOrElse[String](null)
     if (publisher != null)
-      result.setPublisher(OafMapperUtils.field(publisher, null))
+      result.setPublisher(OafMapperUtils.publisher(publisher))
 
     val language: String = (json \\ "language").extractOrElse[String](null)
 
@@ -568,7 +549,6 @@ object DataciteToOAFTransformation {
         a.setClassid(q.getClassid)
         a.setClassname(q.getClassname)
         a.setSchemeid(q.getSchemeid)
-        a.setSchemename(q.getSchemename)
         a
       })
 
@@ -598,7 +578,7 @@ object DataciteToOAFTransformation {
           )
         )
       if (license.isDefined)
-        instance.setLicense(OafMapperUtils.field(license.get, null))
+        instance.setLicense(OafMapperUtils.license(license.get))
     }
 
     val awardUris: List[String] = for {
@@ -654,7 +634,8 @@ object DataciteToOAFTransformation {
       )
       .map(r => {
         val rel = new Relation
-        rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
+
+        rel.setProvenance(Lists.newArrayList(OafMapperUtils.getProvenance(DATACITE_COLLECTED_FROM, dataInfo)))
         rel.setDataInfo(dataInfo)
 
         val subRelType = subRelTypeMapping(r.relationType).relType
@@ -670,8 +651,7 @@ object DataciteToOAFTransformation {
         rel.setTarget(
           DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
         )
-        rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
-        rel.getCollectedfrom.asScala.map(c => c.getValue).toList
+
         rel
       })
   }

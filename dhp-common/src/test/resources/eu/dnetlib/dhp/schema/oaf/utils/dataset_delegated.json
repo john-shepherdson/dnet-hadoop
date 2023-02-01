@@ -1,6 +1,6 @@
 {
   "id": "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1g",
-  "resuttype": {"classid": "dataset"},
+  "resuttype": "dataset",
   "pid": [
     {
       "qualifier": {"classid": "doi"},
@@ -30,8 +30,7 @@
       "refereed": {
         "classid": "0000",
         "classname": "UNKNOWN",
-        "schemeid": "dnet:review_levels",
-        "schemename": "dnet:review_levels"
+        "schemeid": "dnet:review_levels"
       },
       "hostedby": {
         "key": "10|opendoar____::358aee4cc897452c00244351e4d91f69",
@@ -40,45 +39,15 @@
       "accessright": {
         "classid": "OPEN",
         "classname": "Open Access",
-        "schemeid": "dnet:access_modes",
-        "schemename": "dnet:access_modes"
+        "schemeid": "dnet:access_modes"
       },
-      "processingchargecurrency": {
-        "dataInfo": {
-          "provenanceaction": {
-            "classid": "sysimport:crosswalk:datasetarchive",
-            "classname": "Harvested",
-            "schemeid": "dnet:provenanceActions",
-            "schemename": "dnet:provenanceActions"
-          },
-          "deletedbyinference": false,
-          "inferred": false,
-          "inferenceprovenance": "",
-          "invisible": true,
-          "trust": "0.9"
-        },
-        "value": "EUR"
-      },
+      "processingchargecurrency": "EUR",
       "pid": [
         {
-          "dataInfo": {
-            "provenanceaction": {
-              "classid": "sysimport:crosswalk:datasetarchive",
-              "classname": "Harvested",
-              "schemeid": "dnet:provenanceActions",
-              "schemename": "dnet:provenanceActions"
-            },
-            "deletedbyinference": false,
-            "inferred": false,
-            "inferenceprovenance": "",
-            "invisible": true,
-            "trust": "0.9"
-          },
           "qualifier": {
             "classid": "doi",
             "classname": "Digital Object Identifier",
-            "schemeid": "dnet:pid_types",
-            "schemename": "dnet:pid_types"
+            "schemeid": "dnet:pid_types"
           },
           "value": "10.1371/journal.pone.0085605"
         }
@@ -87,24 +56,10 @@
       "url": ["https://doi.org/10.1371/journal.pone.0085605"],
       "alternateIdentifier": [
         {
-          "dataInfo": {
-            "provenanceaction": {
-              "classid": "sysimport:crosswalk:datasetarchive",
-              "classname": "Harvested",
-              "schemeid": "dnet:provenanceActions",
-              "schemename": "dnet:provenanceActions"
-            },
-            "deletedbyinference": false,
-            "inferred": false,
-            "inferenceprovenance": "",
-            "invisible": true,
-            "trust": "0.9"
-          },
           "qualifier": {
             "classid": "pmid",
             "classname": "PubMed ID",
-            "schemeid": "dnet:pid_types",
-            "schemename": "dnet:pid_types"
+            "schemeid": "dnet:pid_types"
           },
           "value": "24454899.0"
         }
@@ -113,27 +68,11 @@
         "key": "10|opendoar____::358aee4cc897452c00244351e4d91f69",
         "value": "Zenodo"
       },
-      "processingchargeamount": {
-        "dataInfo": {
-          "provenanceaction": {
-            "classid": "sysimport:crosswalk:datasetarchive",
-            "classname": "Harvested",
-            "schemeid": "dnet:provenanceActions",
-            "schemename": "dnet:provenanceActions"
-          },
-          "deletedbyinference": false,
-          "inferred": false,
-          "inferenceprovenance": "",
-          "invisible": true,
-          "trust": "0.9"
-        },
-        "value": "1022.02"
-      },
+      "processingchargeamount": "1022.02",
       "instancetype": {
         "classid": "0004",
         "classname": "Conference object",
-        "schemeid": "dnet:publication_resource",
-        "schemename": "dnet:publication_resource"
+        "schemeid": "dnet:publication_resource"
       }
     }
   ]

@@ -11,11 +11,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.oaf.common.AccessRightComparator;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.lang3.StringUtils;
 
-import eu.dnetlib.dhp.schema.common.AccessRightComparator;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class OafMapperUtils {
@@ -24,29 +23,25 @@ public class OafMapperUtils {
 	}
 
 	public static Oaf merge(final Oaf left, final Oaf right) {
-		if (ModelSupport.isSubClass(left, OafEntity.class)) {
-			return mergeEntities((OafEntity) left, (OafEntity) right);
+		if (ModelSupport.isSubClass(left, Entity.class)) {
+			return mergeEntities((Entity) left, (Entity) right);
 		} else if (ModelSupport.isSubClass(left, Relation.class)) {
-			((Relation) left).mergeFrom((Relation) right);
+			return MergeUtils.mergeRelation((Relation) left, (Relation) right);
 		} else {
 			throw new IllegalArgumentException("invalid Oaf type:" + left.getClass().getCanonicalName());
 		}
-		return left;
 	}
 
-	public static OafEntity mergeEntities(OafEntity left, OafEntity right) {
+	public static Entity mergeEntities(Entity left, Entity right) {
 		if (ModelSupport.isSubClass(left, Result.class)) {
 			return mergeResults((Result) left, (Result) right);
-		} else if (ModelSupport.isSubClass(left, Datasource.class)) {
-			left.mergeFrom(right);
-		} else if (ModelSupport.isSubClass(left, Organization.class)) {
-			left.mergeFrom(right);
-		} else if (ModelSupport.isSubClass(left, Project.class)) {
-			left.mergeFrom(right);
+		} else if (ModelSupport.isSubClass(left, Datasource.class) ||
+			ModelSupport.isSubClass(left, Organization.class) ||
+			ModelSupport.isSubClass(left, Project.class)) {
+			return (Entity) merge(left, right);
 		} else {
-			throw new IllegalArgumentException("invalid OafEntity subtype:" + left.getClass().getCanonicalName());
+			throw new IllegalArgumentException("invalid Entity subtype:" + left.getClass().getCanonicalName());
 		}
-		return left;
 	}
 
 	public static Result mergeResults(Result left, Result right) {
@@ -60,13 +55,10 @@ public class OafMapperUtils {
 		if (!leftFromDelegatedAuthority && rightFromDelegatedAuthority) {
 			return right;
 		}
-
 		if (new ResultTypeComparator().compare(left, right) < 0) {
-			left.mergeFrom(right);
-			return left;
+			return MergeUtils.mergeResult(left, right);
 		} else {
-			right.mergeFrom(left);
-			return right;
+			return MergeUtils.mergeResult(right, left);
 		}
 	}
 
@@ -101,26 +93,6 @@ public class OafMapperUtils {
 		return list;
 	}
 
-	public static <T> Field<T> field(final T value, final DataInfo info) {
-		if (value == null || StringUtils.isBlank(value.toString())) {
-			return null;
-		}
-
-		final Field<T> field = new Field<>();
-		field.setValue(value);
-		field.setDataInfo(info);
-		return field;
-	}
-
-	public static List<Field<String>> listFields(final DataInfo info, final String... values) {
-		return Arrays
-			.stream(values)
-			.map(v -> field(v, info))
-			.filter(Objects::nonNull)
-			.filter(distinctByKey(Field::getValue))
-			.collect(Collectors.toList());
-	}
-
 	public static <T> List<T> listValues(Array values) throws SQLException {
 		if (Objects.isNull(values)) {
 			return null;
@@ -132,17 +104,8 @@ public class OafMapperUtils {
 			.collect(Collectors.toList());
 	}
 
-	public static List<Field<String>> listFields(final DataInfo info, final List<String> values) {
-		return values
-			.stream()
-			.map(v -> field(v, info))
-			.filter(Objects::nonNull)
-			.filter(distinctByKey(Field::getValue))
-			.collect(Collectors.toList());
-	}
-
-	public static Qualifier unknown(final String schemeid, final String schemename) {
-		return qualifier(UNKNOWN, "Unknown", schemeid, schemename);
+	public static Qualifier unknown(final String schemeid) {
+		return qualifier(UNKNOWN, "Unknown", schemeid);
 	}
 
 	public static AccessRight accessRight(
@@ -163,7 +126,6 @@ public class OafMapperUtils {
 		accessRight.setClassid(classid);
 		accessRight.setClassname(classname);
 		accessRight.setSchemeid(schemeid);
-		accessRight.setSchemename(schemename);
 		accessRight.setOpenAccessRoute(openAccessRoute);
 		return accessRight;
 	}
@@ -171,13 +133,11 @@ public class OafMapperUtils {
 	public static Qualifier qualifier(
 		final String classid,
 		final String classname,
-		final String schemeid,
-		final String schemename) {
+		final String schemeid) {
 		final Qualifier q = new Qualifier();
 		q.setClassid(classid);
 		q.setClassname(classname);
 		q.setSchemeid(schemeid);
-		q.setSchemename(schemename);
 		return q;
 	}
 
@@ -186,7 +146,6 @@ public class OafMapperUtils {
 		q.setClassid(qualifier.getClassid());
 		q.setClassname(qualifier.getClassname());
 		q.setSchemeid(qualifier.getSchemeid());
-		q.setSchemename(qualifier.getSchemename());
 		return q;
 	}
 
@@ -195,21 +154,18 @@ public class OafMapperUtils {
 		final String classid,
 		final String classname,
 		final String schemeid,
-		final String schemename,
 		final DataInfo dataInfo) {
 
-		return subject(value, qualifier(classid, classname, schemeid, schemename), dataInfo);
+		return subject(value, qualifier(classid, classname, schemeid), dataInfo);
 	}
 
 	public static StructuredProperty structuredProperty(
 		final String value,
 		final String classid,
 		final String classname,
-		final String schemeid,
-		final String schemename,
-		final DataInfo dataInfo) {
+		final String schemeid) {
 
-		return structuredProperty(value, qualifier(classid, classname, schemeid, schemename), dataInfo);
+		return structuredProperty(value, qualifier(classid, classname, schemeid));
 	}
 
 	public static Subject subject(
@@ -228,16 +184,40 @@ public class OafMapperUtils {
 
 	public static StructuredProperty structuredProperty(
 		final String value,
-		final Qualifier qualifier,
-		final DataInfo dataInfo) {
+		final Qualifier qualifier) {
 		if (value == null) {
 			return null;
 		}
 		final StructuredProperty sp = new StructuredProperty();
 		sp.setValue(value);
 		sp.setQualifier(qualifier);
-		sp.setDataInfo(dataInfo);
 		return sp;
+	}
+
+	public static Publisher publisher(final String name) {
+		final Publisher p = new Publisher();
+		p.setName(name);
+		return p;
+	}
+
+	public static License license(final String url) {
+		final License l = new License();
+		l.setUrl(url);
+		return l;
+	}
+
+	public static AuthorPid authorPid(
+		final String value,
+		final Qualifier qualifier,
+		final DataInfo dataInfo) {
+		if (value == null) {
+			return null;
+		}
+		final AuthorPid ap = new AuthorPid();
+		ap.setValue(value);
+		ap.setQualifier(qualifier);
+		ap.setDataInfo(dataInfo);
+		return ap;
 	}
 
 	public static ExtraInfo extraInfo(
@@ -340,19 +320,32 @@ public class OafMapperUtils {
 	}
 
 	public static DataInfo dataInfo(
-		final Boolean deletedbyinference,
+		final float trust,
 		final String inferenceprovenance,
-		final Boolean inferred,
-		final Boolean invisible,
-		final Qualifier provenanceaction,
-		final String trust) {
+		final boolean inferred,
+		final Qualifier provenanceaction) {
 		final DataInfo d = new DataInfo();
+		d.setTrust(trust);
+		d.setInferenceprovenance(inferenceprovenance);
+		d.setInferred(inferred);
+		d.setProvenanceaction(provenanceaction);
+		return d;
+	}
+
+	public static EntityDataInfo dataInfo(
+		final boolean invisible,
+		final boolean deletedbyinference,
+		final float trust,
+		final String inferenceprovenance,
+		final boolean inferred,
+		final Qualifier provenanceaction) {
+		final EntityDataInfo d = new EntityDataInfo();
+		d.setTrust(trust);
+		d.setInvisible(invisible);
 		d.setDeletedbyinference(deletedbyinference);
 		d.setInferenceprovenance(inferenceprovenance);
 		d.setInferred(inferred);
-		d.setInvisible(invisible);
 		d.setProvenanceaction(provenanceaction);
-		d.setTrust(trust);
 		return d;
 	}
 
@@ -422,9 +415,6 @@ public class OafMapperUtils {
 			if (StringUtils.isBlank(rights.getSchemeid())) {
 				rights.setSchemeid(DNET_ACCESS_MODES);
 			}
-			if (StringUtils.isBlank(rights.getSchemename())) {
-				rights.setSchemename(DNET_ACCESS_MODES);
-			}
 
 			return rights;
 		}
@@ -433,7 +423,6 @@ public class OafMapperUtils {
 
 	public static KeyValue newKeyValueInstance(String key, String value, DataInfo dataInfo) {
 		KeyValue kv = new KeyValue();
-		kv.setDataInfo(dataInfo);
 		kv.setKey(key);
 		kv.setValue(value);
 		return kv;
@@ -451,7 +440,7 @@ public class OafMapperUtils {
 		final String relType,
 		final String subRelType,
 		final String relClass,
-		final OafEntity entity) {
+		final Entity entity) {
 		return getRelation(source, target, relType, subRelType, relClass, entity, null);
 	}
 
@@ -460,11 +449,12 @@ public class OafMapperUtils {
 		final String relType,
 		final String subRelType,
 		final String relClass,
-		final OafEntity entity,
+		final Entity entity,
 		final String validationDate) {
+
+		final List<Provenance> provenance = getProvenance(entity.getCollectedfrom(), entity.getDataInfo());
 		return getRelation(
-			source, target, relType, subRelType, relClass, entity.getCollectedfrom(), entity.getDataInfo(),
-			entity.getLastupdatetimestamp(), validationDate, null);
+			source, target, relType, subRelType, relClass, provenance, validationDate, null);
 	}
 
 	public static Relation getRelation(final String source,
@@ -472,11 +462,9 @@ public class OafMapperUtils {
 		final String relType,
 		final String subRelType,
 		final String relClass,
-		final List<KeyValue> collectedfrom,
-		final DataInfo dataInfo,
-		final Long lastupdatetimestamp) {
+		final List<Provenance> provenance) {
 		return getRelation(
-			source, target, relType, subRelType, relClass, collectedfrom, dataInfo, lastupdatetimestamp, null, null);
+			source, target, relType, subRelType, relClass, provenance, null, null);
 	}
 
 	public static Relation getRelation(final String source,
@@ -484,9 +472,7 @@ public class OafMapperUtils {
 		final String relType,
 		final String subRelType,
 		final String relClass,
-		final List<KeyValue> collectedfrom,
-		final DataInfo dataInfo,
-		final Long lastupdatetimestamp,
+		final List<Provenance> provenance,
 		final String validationDate,
 		final List<KeyValue> properties) {
 		final Relation rel = new Relation();
@@ -495,13 +481,25 @@ public class OafMapperUtils {
 		rel.setRelClass(relClass);
 		rel.setSource(source);
 		rel.setTarget(target);
-		rel.setCollectedfrom(collectedfrom);
-		rel.setDataInfo(dataInfo);
-		rel.setLastupdatetimestamp(lastupdatetimestamp);
+		rel.setProvenance(provenance);
 		rel.setValidated(StringUtils.isNotBlank(validationDate));
 		rel.setValidationDate(StringUtils.isNotBlank(validationDate) ? validationDate : null);
 		rel.setProperties(properties);
 		return rel;
+	}
+
+	public static List<Provenance> getProvenance(final List<KeyValue> collectedfrom, final DataInfo dataInfo) {
+		return collectedfrom
+			.stream()
+			.map(cf -> getProvenance(cf, dataInfo))
+			.collect(Collectors.toList());
+	}
+
+	public static Provenance getProvenance(final KeyValue collectedfrom, final DataInfo dataInfo) {
+		final Provenance prov = new Provenance();
+		prov.setCollectedfrom(collectedfrom);
+		prov.setDataInfo(dataInfo);
+		return prov;
 	}
 
 	public static String getProvenance(DataInfo dataInfo) {

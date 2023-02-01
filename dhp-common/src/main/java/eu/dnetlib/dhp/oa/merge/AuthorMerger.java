@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.wcohen.ss.JaroWinkler;
 
 import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.AuthorPid;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.pace.model.Person;
 import scala.Tuple2;
@@ -75,7 +76,7 @@ public class AuthorMerger {
 			.collect(Collectors.toMap(Tuple2::_1, Tuple2::_2, (x1, x2) -> x1));
 
 		// <pid, Author> (list of pid that are missing in the other list)
-		final List<Tuple2<StructuredProperty, Author>> pidToEnrich = enrich
+		final List<Tuple2<AuthorPid, Author>> pidToEnrich = enrich
 			.stream()
 			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
 			.flatMap(
@@ -111,7 +112,7 @@ public class AuthorMerger {
 							// TERRIBLE HACK but for some reason when we create and Array with Arrays.asList,
 							// it creates of fixed size, and the add method raise UnsupportedOperationException at
 							// java.util.AbstractList.add
-							final List<StructuredProperty> tmp = new ArrayList<>(r.getPid());
+							final List<AuthorPid> tmp = new ArrayList<>(r.getPid());
 							tmp.add(a._1());
 							r.setPid(tmp);
 						}

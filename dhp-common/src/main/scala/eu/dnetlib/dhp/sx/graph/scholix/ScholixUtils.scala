@@ -175,12 +175,11 @@ object ScholixUtils extends Serializable {
   }
 
   def extractCollectedFrom(relation: Relation): List[ScholixEntityId] = {
-    if (relation.getCollectedfrom != null && !relation.getCollectedfrom.isEmpty) {
-
-      val l: List[ScholixEntityId] = relation.getCollectedfrom.asScala.map { c =>
+    if (relation.getProvenance != null && !relation.getProvenance.isEmpty) {
+      val l: List[ScholixEntityId] = relation.getProvenance.asScala.map { p =>
         new ScholixEntityId(
-          c.getValue,
-          List(new ScholixIdentifier(c.getKey, DNET_IDENTIFIER_SCHEMA, null)).asJava
+          p.getCollectedfrom.getValue,
+          List(new ScholixIdentifier(p.getCollectedfrom.getKey, DNET_IDENTIFIER_SCHEMA, null)).asJava
         )
       }.toList
       l
@@ -402,15 +401,15 @@ object ScholixUtils extends Serializable {
         .getInstance()
         .asScala
         .filter(i => i.getDateofacceptance != null)
-        .map(i => i.getDateofacceptance.getValue)
+        .map(i => i.getDateofacceptance)
         .toList
       if (dt.nonEmpty)
         s.setDate(dt.distinct.asJava)
     }
     if (r.getDescription != null && !r.getDescription.isEmpty) {
-      val d = r.getDescription.asScala.find(f => f != null && f.getValue != null)
+      val d = r.getDescription.asScala.find(f => f != null)
       if (d.isDefined)
-        s.setDescription(d.get.getValue)
+        s.setDescription(d.get)
     }
 
     if (r.getSubject != null && !r.getSubject.isEmpty) {
@@ -422,7 +421,7 @@ object ScholixUtils extends Serializable {
     }
 
     if (r.getPublisher != null)
-      s.setPublisher(List(r.getPublisher.getValue).asJava)
+      s.setPublisher(List(r.getPublisher.getName).asJava)
 
     if (r.getCollectedfrom != null && !r.getCollectedfrom.isEmpty) {
       val cf: List[CollectedFromType] = r.getCollectedfrom.asScala
