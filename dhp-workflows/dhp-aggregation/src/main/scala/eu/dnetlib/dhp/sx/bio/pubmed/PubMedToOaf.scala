@@ -25,13 +25,13 @@ object PubMedToOaf {
     "doi"  -> "https://dx.doi.org/"
   )
 
-  val dataInfo: DataInfo = OafMapperUtils.dataInfo(
+  val ENTITY_DATAINFO: EntityDataInfo = OafMapperUtils.dataInfo(
     false,
+    false,
+    0.9f,
     null,
     false,
-    false,
-    ModelConstants.PROVENANCE_ACTION_SET_QUALIFIER,
-    "0.9"
+    ModelConstants.PROVENANCE_ACTION_SET_QUALIFIER
   )
 
   val collectedFrom: KeyValue =
@@ -98,14 +98,12 @@ object PubMedToOaf {
       return null
     val journal = new Journal
 
-    journal.setDataInfo(dataInfo)
     journal.setName(j.getTitle)
     journal.setConferencedate(j.getDate)
     journal.setVol(j.getVolume)
     journal.setIssnPrinted(j.getIssn)
     journal.setIss(j.getIssue)
     journal
-
   }
 
   /** Find vocabulary term into synonyms and term in the vocabulary
@@ -143,9 +141,7 @@ object PubMedToOaf {
       article.getPmid,
       PidType.pmid.toString,
       PidType.pmid.toString,
-      ModelConstants.DNET_PID_TYPES,
-      ModelConstants.DNET_PID_TYPES,
-      dataInfo
+      ModelConstants.DNET_PID_TYPES
     )
 
     if (StringUtils.isNotBlank(article.getPmcId)) {
@@ -153,9 +149,7 @@ object PubMedToOaf {
         article.getPmcId,
         PidType.pmc.toString,
         PidType.pmc.toString,
-        ModelConstants.DNET_PID_TYPES,
-        ModelConstants.DNET_PID_TYPES,
-        dataInfo
+        ModelConstants.DNET_PID_TYPES
       )
     }
     if (pidList == null)
@@ -170,9 +164,7 @@ object PubMedToOaf {
           normalizedPid,
           PidType.doi.toString,
           PidType.doi.toString,
-          ModelConstants.DNET_PID_TYPES,
-          ModelConstants.DNET_PID_TYPES,
-          dataInfo
+          ModelConstants.DNET_PID_TYPES
         )
     }
 
@@ -200,7 +192,7 @@ object PubMedToOaf {
     val result = createResult(pubmedInstance.getInstancetype, vocabularies)
     if (result == null)
       return result
-    result.setDataInfo(dataInfo)
+    result.setDataInfo(ENTITY_DATAINFO)
     pubmedInstance.setPid(pidList.asJava)
     if (alternateIdentifier != null)
       pubmedInstance.setAlternateIdentifier(List(alternateIdentifier).asJava)
@@ -218,9 +210,8 @@ object PubMedToOaf {
       pubmedInstance.setUrl(urlLists.asJava)
 
     //ASSIGN DateofAcceptance
-    pubmedInstance.setDateofacceptance(
-      OafMapperUtils.field(GraphCleaningFunctions.cleanDate(article.getDate), dataInfo)
-    )
+    pubmedInstance.setDateofacceptance(GraphCleaningFunctions.cleanDate(article.getDate))
+
     //ASSIGN COLLECTEDFROM
     pubmedInstance.setCollectedfrom(collectedFrom)
     result.setPid(pidList.asJava)
@@ -238,9 +229,7 @@ object PubMedToOaf {
 
     // RESULT MAPPING
     //--------------------------------------------------------------------------------------
-    result.setDateofacceptance(
-      OafMapperUtils.field(GraphCleaningFunctions.cleanDate(article.getDate), dataInfo)
-    )
+    result.setDateofacceptance(GraphCleaningFunctions.cleanDate(article.getDate))
 
     if (article.getTitle == null || article.getTitle.isEmpty)
       return null
@@ -248,14 +237,13 @@ object PubMedToOaf {
       List(
         OafMapperUtils.structuredProperty(
           article.getTitle,
-          ModelConstants.MAIN_TITLE_QUALIFIER,
-          dataInfo
+          ModelConstants.MAIN_TITLE_QUALIFIER
         )
       ).asJava
     )
 
     if (article.getDescription != null && article.getDescription.nonEmpty)
-      result.setDescription(List(OafMapperUtils.field(article.getDescription, dataInfo)).asJava)
+      result.setDescription(List(article.getDescription).asJava)
 
     if (article.getLanguage != null) {
 
@@ -271,8 +259,7 @@ object PubMedToOaf {
         SUBJ_CLASS,
         SUBJ_CLASS,
         ModelConstants.DNET_SUBJECT_TYPOLOGIES,
-        ModelConstants.DNET_SUBJECT_TYPOLOGIES,
-        dataInfo
+        ENTITY_DATAINFO
       )
     )(collection.breakOut)
     if (subjects != null)

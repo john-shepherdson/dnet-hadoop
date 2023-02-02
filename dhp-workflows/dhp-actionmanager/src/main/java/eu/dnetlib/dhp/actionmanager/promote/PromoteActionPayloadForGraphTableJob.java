@@ -2,13 +2,13 @@
 package eu.dnetlib.dhp.actionmanager.promote;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static eu.dnetlib.dhp.schema.common.ModelSupport.isSubClass;
 
 import java.io.IOException;
 import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -26,7 +26,7 @@ import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableSupplier;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
+
 import eu.dnetlib.dhp.schema.oaf.*;
 
 /** Applies a given action payload file to graph table of compatible type. */
@@ -104,7 +104,7 @@ public class PromoteActionPayloadForGraphTableJob {
 
 	private static void throwIfGraphTableClassIsNotSubClassOfActionPayloadClass(
 		Class<? extends Oaf> rowClazz, Class<? extends Oaf> actionPayloadClazz) {
-		if (!isSubClass(rowClazz, actionPayloadClazz)) {
+		if (!ModelSupport.isSubClass(rowClazz, actionPayloadClazz)) {
 			String msg = String
 				.format(
 					"graph table class is not a subclass of action payload class: graph=%s, action=%s",
@@ -242,11 +242,11 @@ public class PromoteActionPayloadForGraphTableJob {
 
 	private static <T extends Oaf> Function<T, Boolean> isNotZeroFnUsingIdOrSourceAndTarget() {
 		return t -> {
-			if (isSubClass(t, Relation.class)) {
+			if (ModelSupport.isSubClass(t, Relation.class)) {
 				final Relation rel = (Relation) t;
 				return StringUtils.isNotBlank(rel.getSource()) && StringUtils.isNotBlank(rel.getTarget());
 			}
-			return StringUtils.isNotBlank(((OafEntity) t).getId());
+			return StringUtils.isNotBlank(((Entity) t).getId());
 		};
 	}
 

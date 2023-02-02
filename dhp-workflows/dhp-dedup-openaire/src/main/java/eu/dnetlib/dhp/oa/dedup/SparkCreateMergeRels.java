@@ -1,13 +1,22 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PROVENANCE_ACTIONS;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVENANCE_DEDUP;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
-
+import com.google.common.collect.Lists;
+import com.google.common.hash.Hashing;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.oa.dedup.graph.ConnectedComponent;
+import eu.dnetlib.dhp.oa.dedup.graph.GraphProcessor;
+import eu.dnetlib.dhp.oa.dedup.model.Identifier;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.common.EntityType;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import eu.dnetlib.pace.config.DedupConfig;
+import eu.dnetlib.pace.util.MapDocumentUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -25,27 +34,14 @@ import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-
-import com.google.common.collect.Lists;
-import com.google.common.hash.Hashing;
-
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.dedup.graph.ConnectedComponent;
-import eu.dnetlib.dhp.oa.dedup.graph.GraphProcessor;
-import eu.dnetlib.dhp.oa.dedup.model.Identifier;
-import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.util.MapDocumentUtil;
 import scala.Tuple2;
+
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PROVENANCE_ACTIONS;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVENANCE_DEDUP;
 
 public class SparkCreateMergeRels extends AbstractSparkAction {
 
@@ -97,7 +93,7 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 
 		for (DedupConfig dedupConf : getConfigurations(isLookUpService, actionSetId)) {
 			final String subEntity = dedupConf.getWf().getSubEntityValue();
-			final Class<OafEntity> clazz = ModelSupport.entityTypes.get(EntityType.valueOf(subEntity));
+			final Class<Entity> clazz = ModelSupport.entityTypes.get(EntityType.valueOf(subEntity));
 
 			log.info("Creating mergerels for: '{}'", subEntity);
 
@@ -127,12 +123,12 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 						.rdd(),
 					Encoders.tuple(Encoders.STRING(), Encoders.STRING()));
 
-			Dataset<Tuple2<String, OafEntity>> entities = spark
+			Dataset<Tuple2<String, Entity>> entities = spark
 				.read()
 				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
 				.map(
-					(MapFunction<String, Tuple2<String, OafEntity>>) it -> {
-						OafEntity entity = OBJECT_MAPPER.readValue(it, clazz);
+					(MapFunction<String, Tuple2<String, Entity>>) it -> {
+						Entity entity = OBJECT_MAPPER.readValue(it, clazz);
 						return new Tuple2<>(entity.getId(), entity);
 					},
 					Encoders.tuple(Encoders.STRING(), Encoders.kryo(clazz)));
@@ -141,14 +137,14 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 				.joinWith(entities, rawMergeRels.col("_2").equalTo(entities.col("_1")), "inner")
 				// <tmp_source,target>,<target,entity>
 				.map(
-					(MapFunction<Tuple2<Tuple2<String, String>, Tuple2<String, OafEntity>>, Tuple2<String, OafEntity>>) value -> new Tuple2<>(
+					(MapFunction<Tuple2<Tuple2<String, String>, Tuple2<String, Entity>>, Tuple2<String, Entity>>) value -> new Tuple2<>(
 						value._1()._1(), value._2()._2()),
 					Encoders.tuple(Encoders.STRING(), Encoders.kryo(clazz)))
 				// <tmp_source,entity>
 				.groupByKey(
-					(MapFunction<Tuple2<String, OafEntity>, String>) Tuple2::_1, Encoders.STRING())
+					(MapFunction<Tuple2<String, Entity>, String>) Tuple2::_1, Encoders.STRING())
 				.mapGroups(
-					(MapGroupsFunction<String, Tuple2<String, OafEntity>, ConnectedComponent>) this::generateID,
+					(MapGroupsFunction<String, Tuple2<String, Entity>, ConnectedComponent>) this::generateID,
 					Encoders.bean(ConnectedComponent.class))
 				// <root_id, list(target)>
 				.flatMap(
@@ -160,7 +156,7 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 		}
 	}
 
-	private <T extends OafEntity> ConnectedComponent generateID(String key, Iterator<Tuple2<String, T>> values) {
+	private <T extends Entity> ConnectedComponent generateID(String key, Iterator<Tuple2<String, T>> values) {
 
 		List<Identifier<T>> identifiers = Lists
 			.newArrayList(values)
@@ -224,20 +220,20 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 		r.setSubRelType(ModelConstants.DEDUP);
 
 		DataInfo info = new DataInfo();
-		info.setDeletedbyinference(false);
+
 		info.setInferred(true);
-		info.setInvisible(false);
+
 		info.setInferenceprovenance(dedupConf.getWf().getConfigurationId());
 		Qualifier provenanceAction = new Qualifier();
 		provenanceAction.setClassid(PROVENANCE_DEDUP);
 		provenanceAction.setClassname(PROVENANCE_DEDUP);
 		provenanceAction.setSchemeid(DNET_PROVENANCE_ACTIONS);
-		provenanceAction.setSchemename(DNET_PROVENANCE_ACTIONS);
+
 		info.setProvenanceaction(provenanceAction);
 
 		// TODO calculate the trust value based on the similarity score of the elements in the CC
 
-		r.setDataInfo(info);
+		r.setProvenance(Arrays.asList(OafMapperUtils.getProvenance(new KeyValue(), info)));
 		return r;
 	}
 

@@ -14,8 +14,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 
-import eu.dnetlib.dhp.schema.oaf.Field;
-
 public class DatePicker {
 
 	public static final String DATE_PATTERN = "^(\\d{4})-(\\d{2})-(\\d{2})";
@@ -26,7 +24,7 @@ public class DatePicker {
 	private DatePicker() {
 	}
 
-	public static Field<String> pick(final Collection<String> dateofacceptance) {
+	public static String pick(final Collection<String> dateofacceptance) {
 
 		final Map<String, Integer> frequencies = dateofacceptance
 			.parallelStream()
@@ -35,11 +33,10 @@ public class DatePicker {
 			.collect(Collectors.toConcurrentMap(w -> w, w -> 1, Integer::sum));
 
 		if (frequencies.isEmpty()) {
-			return new Field<>();
+			return null;
 		}
 
-		final Field<String> date = new Field<>();
-		date.setValue(frequencies.keySet().iterator().next());
+		String date = frequencies.keySet().iterator().next();
 
 		// let's sort this map by values first, filtering out invalid dates
 		final Map<String, Integer> sorted = frequencies
@@ -77,25 +74,22 @@ public class DatePicker {
 					.map(Map.Entry::getKey)
 					.findFirst();
 				if (first.isPresent()) {
-					date.setValue(first.get());
+					date = first.get();
 					return date;
 				}
 
-				date.setValue(sorted.keySet().iterator().next());
-				return date;
+				return sorted.keySet().iterator().next();
 			}
 
 			if (accepted.size() == 1) {
-				date.setValue(accepted.get(0));
-				return date;
+				return accepted.get(0);
 			} else {
 				final Optional<String> first = accepted
 					.stream()
 					.filter(d -> !endsWith(d, DATE_DEFAULT_SUFFIX))
 					.findFirst();
 				if (first.isPresent()) {
-					date.setValue(first.get());
-					return date;
+					return first.get();
 				}
 
 				return date;
@@ -106,15 +100,13 @@ public class DatePicker {
 			if (sorted.size() == 2) {
 				for (Map.Entry<String, Integer> e : sorted.entrySet()) {
 					if (!endsWith(e.getKey(), DATE_DEFAULT_SUFFIX)) {
-						date.setValue(e.getKey());
-						return date;
+						return e.getKey();
 					}
 				}
 			}
 
 			// none of the dates seems good enough, return the 1st one
-			date.setValue(sorted.keySet().iterator().next());
-			return date;
+			return sorted.keySet().iterator().next();
 		}
 	}
 

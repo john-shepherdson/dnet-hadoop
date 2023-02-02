@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
@@ -164,8 +165,8 @@ public class CreateOpenCitationsASTest {
 			.map(aa -> ((Relation) aa.getPayload()));
 
 		tmp.foreach(r -> {
-			assertEquals(ModelConstants.OPENOCITATIONS_NAME, r.getCollectedfrom().get(0).getValue());
-			assertEquals(ModelConstants.OPENOCITATIONS_ID, r.getCollectedfrom().get(0).getKey());
+			assertEquals(ModelConstants.OPENOCITATIONS_NAME, r.getProvenance().get(0).getCollectedfrom().getValue());
+			assertEquals(ModelConstants.OPENOCITATIONS_ID, r.getProvenance().get(0).getCollectedfrom().getKey());
 		});
 
 	}
@@ -197,15 +198,14 @@ public class CreateOpenCitationsASTest {
 			.map(aa -> ((Relation) aa.getPayload()));
 
 		tmp.foreach(r -> {
-			assertEquals(false, r.getDataInfo().getInferred());
-			assertEquals(false, r.getDataInfo().getDeletedbyinference());
-			assertEquals("0.91", r.getDataInfo().getTrust());
+			final DataInfo dataInfo = r.getProvenance().get(0).getDataInfo();
+			assertEquals(false, dataInfo.getInferred());
+			assertEquals("0.91", dataInfo.getTrust());
 			assertEquals(
-				CreateActionSetSparkJob.OPENCITATIONS_CLASSID, r.getDataInfo().getProvenanceaction().getClassid());
+				CreateActionSetSparkJob.OPENCITATIONS_CLASSID, dataInfo.getProvenanceaction().getClassid());
 			assertEquals(
-				CreateActionSetSparkJob.OPENCITATIONS_CLASSNAME, r.getDataInfo().getProvenanceaction().getClassname());
-			assertEquals(ModelConstants.DNET_PROVENANCE_ACTIONS, r.getDataInfo().getProvenanceaction().getSchemeid());
-			assertEquals(ModelConstants.DNET_PROVENANCE_ACTIONS, r.getDataInfo().getProvenanceaction().getSchemename());
+				CreateActionSetSparkJob.OPENCITATIONS_CLASSNAME, dataInfo.getProvenanceaction().getClassname());
+			assertEquals(ModelConstants.DNET_PROVENANCE_ACTIONS, dataInfo.getProvenanceaction().getSchemeid());
 		});
 
 	}

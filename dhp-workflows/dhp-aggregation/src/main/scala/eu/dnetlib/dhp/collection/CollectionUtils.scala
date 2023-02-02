@@ -1,8 +1,8 @@
 package eu.dnetlib.dhp.collection
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import eu.dnetlib.dhp.schema.common.ModelSupport
-import eu.dnetlib.dhp.schema.oaf.{Entity, Oaf, Entity, Relation}
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport
+import eu.dnetlib.dhp.schema.oaf.{Entity, Oaf, Relation}
 import org.apache.spark.sql.{Dataset, Encoder, Encoders, SaveMode}
 
 object CollectionUtils {
@@ -35,7 +35,6 @@ object CollectionUtils {
         inverse.setSubRelType(currentRel.getSubReltype)
         inverse.setRelClass(currentRel.getInverseRelClass)
         inverse.setProvenance(r.getProvenance)
-        inverse.setDataInfo(r.getDataInfo)
         inverse.setProperties(r.getProperties)
         inverse.setValidated(r.getValidated)
         inverse.setValidationDate(r.getValidationDate)

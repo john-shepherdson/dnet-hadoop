@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.actionmanager.ror;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.ENTITYREGISTRY_PROVENANCE_ACTION;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.dataInfo;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.field;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.listKeyValues;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.qualifier;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
@@ -21,6 +20,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -43,13 +43,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
@@ -64,11 +57,11 @@ public class GenerateRorActionSetJob {
 	private static final List<KeyValue> ROR_COLLECTED_FROM = listKeyValues(
 		"10|openaire____::993a7ae7a863813cf95028b50708e222", "ROR");
 
-	private static final DataInfo ROR_DATA_INFO = dataInfo(
-		false, "", false, false, ENTITYREGISTRY_PROVENANCE_ACTION, "0.92");
+	private static final EntityDataInfo ROR_DATA_INFO = dataInfo(
+		false, false, 0.92f, null, false, ENTITYREGISTRY_PROVENANCE_ACTION);
 
 	private static final Qualifier ROR_PID_TYPE = qualifier(
-		"ROR", "ROR", ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES);
+		"ROR", "ROR", ModelConstants.DNET_PID_TYPES);
 
 	public static void main(final String[] args) throws Exception {
 
@@ -132,11 +125,10 @@ public class GenerateRorActionSetJob {
 		o.setDateofcollection(now.toString());
 		o.setDateoftransformation(now.toString());
 		o.setExtraInfo(new ArrayList<>()); // Values not present in the file
-		o.setOaiprovenance(null); // Values not present in the file
-		o.setLegalshortname(field(r.getAcronyms().stream().findFirst().orElse(r.getName()), ROR_DATA_INFO));
-		o.setLegalname(field(r.getName(), ROR_DATA_INFO));
+		o.setLegalshortname(r.getAcronyms().stream().findFirst().orElse(r.getName()));
+		o.setLegalname(r.getName());
 		o.setAlternativeNames(alternativeNames(r));
-		o.setWebsiteurl(field(r.getLinks().stream().findFirst().orElse(null), ROR_DATA_INFO));
+		o.setWebsiteurl(r.getLinks().stream().findFirst().orElse(null));
 		o.setLogourl(null);
 		o.setEclegalbody(null);
 		o.setEclegalperson(null);
@@ -155,7 +147,7 @@ public class GenerateRorActionSetJob {
 						r.getCountry().getCountryCode(), r
 							.getCountry()
 							.getCountryName(),
-						ModelConstants.DNET_COUNTRY_TYPE, ModelConstants.DNET_COUNTRY_TYPE));
+						ModelConstants.DNET_COUNTRY_TYPE));
 		} else {
 			o.setCountry(null);
 		}
@@ -175,17 +167,17 @@ public class GenerateRorActionSetJob {
 
 	private static List<StructuredProperty> pids(final RorOrganization r) {
 		final List<StructuredProperty> pids = new ArrayList<>();
-		pids.add(structuredProperty(r.getId(), ROR_PID_TYPE, ROR_DATA_INFO));
+		pids.add(structuredProperty(r.getId(), ROR_PID_TYPE));
 
 		for (final Map.Entry<String, ExternalIdType> e : r.getExternalIds().entrySet()) {
 			final String type = e.getKey();
 			final List<String> all = e.getValue().getAll();
 			if (all != null) {
 				final Qualifier qualifier = qualifier(
-					type, type, ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES);
+					type, type, ModelConstants.DNET_PID_TYPES);
 				for (final String pid : all) {
 					pids
-						.add(structuredProperty(pid, qualifier, ROR_DATA_INFO));
+						.add(structuredProperty(pid, qualifier));
 				}
 			}
 		}
@@ -193,7 +185,7 @@ public class GenerateRorActionSetJob {
 		return pids;
 	}
 
-	private static List<Field<String>> alternativeNames(final RorOrganization r) {
+	private static List<String> alternativeNames(final RorOrganization r) {
 		final Set<String> names = new LinkedHashSet<>();
 		names.addAll(r.getAliases());
 		names.addAll(r.getAcronyms());
@@ -202,7 +194,6 @@ public class GenerateRorActionSetJob {
 		return names
 			.stream()
 			.filter(StringUtils::isNotBlank)
-			.map(s -> field(s, ROR_DATA_INFO))
 			.collect(Collectors.toList());
 	}
 

@@ -8,20 +8,20 @@ import java.io.Serializable;
 import java.util.List;
 
 import eu.dnetlib.dhp.oa.dedup.model.Identifier;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.Entity;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 
 public class IdGenerator implements Serializable {
 
 	// pick the best pid from the list (consider date and pidtype)
-	public static <T extends OafEntity> String generate(List<Identifier<T>> pids, String defaultID) {
+	public static <T extends Entity> String generate(List<Identifier<T>> pids, String defaultID) {
 		if (pids == null || pids.isEmpty())
 			return defaultID;
 
 		return generateId(pids);
 	}
 
-	private static <T extends OafEntity> String generateId(List<Identifier<T>> pids) {
+	private static <T extends Entity> String generateId(List<Identifier<T>> pids) {
 		Identifier<T> bp = pids
 			.stream()
 			.min(Identifier::compareTo)

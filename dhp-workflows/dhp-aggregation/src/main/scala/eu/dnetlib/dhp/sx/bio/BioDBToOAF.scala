@@ -1,11 +1,13 @@
 package eu.dnetlib.dhp.sx.bio
 
+import com.google.common.collect.Lists
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, OafMapperUtils}
 import eu.dnetlib.dhp.schema.oaf._
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.{compact, parse, render}
+
 import collection.JavaConverters._
 
 object BioDBToOAF {
@@ -34,13 +36,20 @@ object BioDBToOAF {
     authors: List[String]
   ) {}
 
-  val DATA_INFO: DataInfo = OafMapperUtils.dataInfo(
-    false,
+  val REL_DATA_INFO: DataInfo = OafMapperUtils.dataInfo(
+    0.9f,
     null,
     false,
+    ModelConstants.PROVENANCE_ACTION_SET_QUALIFIER
+  )
+
+  val DATA_INFO: EntityDataInfo = OafMapperUtils.dataInfo(
     false,
-    ModelConstants.PROVENANCE_ACTION_SET_QUALIFIER,
-    "0.9"
+    false,
+    0.9f,
+    null,
+    false,
+    ModelConstants.PROVENANCE_ACTION_SET_QUALIFIER
   )
   val SUBJ_CLASS = "Keywords"
 
@@ -87,15 +96,6 @@ object BioDBToOAF {
     )
     val pubmedCollectedFrom: KeyValue =
       OafMapperUtils.keyValue(ModelConstants.EUROPE_PUBMED_CENTRAL_ID, "Europe PubMed Central")
-
-    UNIPROTCollectedFrom.setDataInfo(DATA_INFO)
-    PDBCollectedFrom.setDataInfo(DATA_INFO)
-    ElsevierCollectedFrom.setDataInfo(DATA_INFO)
-    EBICollectedFrom.setDataInfo(DATA_INFO)
-    pubmedCollectedFrom.setDataInfo(DATA_INFO)
-    enaCollectedFrom.setDataInfo(DATA_INFO)
-    ncbiCollectedFrom.setDataInfo(DATA_INFO)
-    springerNatureCollectedFrom.setDataInfo(DATA_INFO)
 
     Map(
       "uniprot"                     -> UNIPROTCollectedFrom,
@@ -144,9 +144,7 @@ object BioDBToOAF {
           input.pid.toLowerCase,
           input.pidType.toLowerCase,
           input.pidType.toLowerCase,
-          ModelConstants.DNET_PID_TYPES,
-          ModelConstants.DNET_PID_TYPES,
-          DATA_INFO
+          ModelConstants.DNET_PID_TYPES
         )
       ).asJava
     )
@@ -161,8 +159,7 @@ object BioDBToOAF {
         List(
           OafMapperUtils.structuredProperty(
             input.tilte.head,
-            ModelConstants.MAIN_TITLE_QUALIFIER,
-            DATA_INFO
+            ModelConstants.MAIN_TITLE_QUALIFIER
           )
         ).asJava
       )
@@ -181,7 +178,6 @@ object BioDBToOAF {
         OafMapperUtils.qualifier(
           "0037",
           "Clinical Trial",
-          ModelConstants.DNET_PUBLICATION_RESOURCE,
           ModelConstants.DNET_PUBLICATION_RESOURCE
         )
       )
@@ -190,7 +186,6 @@ object BioDBToOAF {
         OafMapperUtils.qualifier(
           "0046",
           "Bioentity",
-          ModelConstants.DNET_PUBLICATION_RESOURCE,
           ModelConstants.DNET_PUBLICATION_RESOURCE
         )
       )
@@ -213,8 +208,8 @@ object BioDBToOAF {
     }
     if (input.date != null && input.date.nonEmpty) {
       val dt = input.date.head
-      i.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(dt), DATA_INFO))
-      d.setDateofacceptance(OafMapperUtils.field(GraphCleaningFunctions.cleanDate(dt), DATA_INFO))
+      i.setDateofacceptance(GraphCleaningFunctions.cleanDate(dt))
+      d.setDateofacceptance(GraphCleaningFunctions.cleanDate(dt))
     }
     d
   }
@@ -232,9 +227,7 @@ object BioDBToOAF {
           pid,
           "uniprot",
           "uniprot",
-          ModelConstants.DNET_PID_TYPES,
-          ModelConstants.DNET_PID_TYPES,
-          DATA_INFO
+          ModelConstants.DNET_PID_TYPES
         )
       ).asJava
     )
@@ -248,7 +241,7 @@ object BioDBToOAF {
     if (title != null)
       d.setTitle(
         List(
-          OafMapperUtils.structuredProperty(title, ModelConstants.MAIN_TITLE_QUALIFIER, DATA_INFO)
+          OafMapperUtils.structuredProperty(title, ModelConstants.MAIN_TITLE_QUALIFIER)
         ).asJava
       )
 
@@ -261,7 +254,6 @@ object BioDBToOAF {
       OafMapperUtils.qualifier(
         "0046",
         "Bioentity",
-        ModelConstants.DNET_PUBLICATION_RESOURCE,
         ModelConstants.DNET_PUBLICATION_RESOURCE
       )
     )
@@ -286,7 +278,6 @@ object BioDBToOAF {
               SUBJ_CLASS,
               SUBJ_CLASS,
               ModelConstants.DNET_SUBJECT_TYPOLOGIES,
-              ModelConstants.DNET_SUBJECT_TYPOLOGIES,
               null
             )
           )
@@ -298,8 +289,8 @@ object BioDBToOAF {
     if (dates.nonEmpty) {
       i_date = dates.find(d => d.date_info.contains("entry version"))
       if (i_date.isDefined) {
-        i.setDateofacceptance(OafMapperUtils.field(i_date.get.date, DATA_INFO))
-        d.setDateofacceptance(OafMapperUtils.field(i_date.get.date, DATA_INFO))
+        i.setDateofacceptance(i_date.get.date)
+        d.setDateofacceptance(i_date.get.date)
       }
       val relevant_dates: List[StructuredProperty] = dates
         .filter(d => !d.date_info.contains("entry version"))
@@ -308,14 +299,12 @@ object BioDBToOAF {
             date.date,
             ModelConstants.UNKNOWN,
             ModelConstants.UNKNOWN,
-            ModelConstants.DNET_DATACITE_DATE,
-            ModelConstants.DNET_DATACITE_DATE,
-            DATA_INFO
+            ModelConstants.DNET_DATACITE_DATE
           )
         )
       if (relevant_dates != null && relevant_dates.nonEmpty)
         d.setRelevantdate(relevant_dates.asJava)
-      d.setDateofacceptance(OafMapperUtils.field(i_date.get.date, DATA_INFO))
+      d.setDateofacceptance(i_date.get.date)
     }
 
     val references_pmid: List[String] = for {
@@ -338,7 +327,7 @@ object BioDBToOAF {
         ModelConstants.IS_RELATED_TO,
         if (i_date.isDefined) i_date.get.date else null
       )
-      rel.getCollectedfrom
+      rel.getProvenance.asScala.map(p => p.getCollectedfrom)
       List(d, rel)
     } else if (references_doi != null && references_doi.nonEmpty) {
       val rel = createRelation(
@@ -370,8 +359,13 @@ object BioDBToOAF {
   ): Relation = {
 
     val rel = new Relation
-    rel.setCollectedfrom(List(collectedFromMap("pdb")).asJava)
-    rel.setDataInfo(DATA_INFO)
+
+    val provenance = OafMapperUtils.getProvenance(Lists.newArrayList(
+      collectedFrom,
+      collectedFromMap("pdb")
+    ), REL_DATA_INFO)
+
+    rel.setProvenance(provenance)
 
     rel.setRelType(ModelConstants.RESULT_RESULT)
     rel.setSubRelType(subRelType)
@@ -383,9 +377,8 @@ object BioDBToOAF {
     val dateProps: KeyValue = OafMapperUtils.keyValue(DATE_RELATION_KEY, date)
 
     rel.setProperties(List(dateProps).asJava)
-
     rel.getTarget.startsWith("unresolved")
-    rel.setCollectedfrom(List(collectedFrom).asJava)
+
     rel
 
   }
@@ -424,9 +417,7 @@ object BioDBToOAF {
           pdb,
           "pdb",
           "Protein Data Bank Identifier",
-          ModelConstants.DNET_PID_TYPES,
-          ModelConstants.DNET_PID_TYPES,
-          DATA_INFO
+          ModelConstants.DNET_PID_TYPES
         )
       ).asJava
     )
@@ -442,7 +433,7 @@ object BioDBToOAF {
       return List()
     d.setTitle(
       List(
-        OafMapperUtils.structuredProperty(title, ModelConstants.MAIN_TITLE_QUALIFIER, DATA_INFO)
+        OafMapperUtils.structuredProperty(title, ModelConstants.MAIN_TITLE_QUALIFIER)
       ).asJava
     )
 
@@ -467,7 +458,6 @@ object BioDBToOAF {
       OafMapperUtils.qualifier(
         "0046",
         "Bioentity",
-        ModelConstants.DNET_PUBLICATION_RESOURCE,
         ModelConstants.DNET_PUBLICATION_RESOURCE
       )
     )
@@ -535,8 +525,7 @@ object BioDBToOAF {
       List(
         OafMapperUtils.structuredProperty(
           input.title,
-          ModelConstants.MAIN_TITLE_QUALIFIER,
-          DATA_INFO
+          ModelConstants.MAIN_TITLE_QUALIFIER
         )
       ).asJava
     )
@@ -552,9 +541,7 @@ object BioDBToOAF {
           input.targetPid.toLowerCase,
           input.targetPidType.toLowerCase,
           "Protein Data Bank Identifier",
-          ModelConstants.DNET_PID_TYPES,
-          ModelConstants.DNET_PID_TYPES,
-          DATA_INFO
+          ModelConstants.DNET_PID_TYPES
         )
       ).asJava
     )
@@ -567,19 +554,14 @@ object BioDBToOAF {
       OafMapperUtils.qualifier(
         "0046",
         "Bioentity",
-        ModelConstants.DNET_PUBLICATION_RESOURCE,
         ModelConstants.DNET_PUBLICATION_RESOURCE
       )
     )
 
     i.setCollectedfrom(collectedFromMap("ebi"))
     d.setInstance(List(i).asJava)
-    i.setDateofacceptance(
-      OafMapperUtils.field(GraphCleaningFunctions.cleanDate(input.date), DATA_INFO)
-    )
-    d.setDateofacceptance(
-      OafMapperUtils.field(GraphCleaningFunctions.cleanDate(input.date), DATA_INFO)
-    )
+    i.setDateofacceptance(GraphCleaningFunctions.cleanDate(input.date))
+    d.setDateofacceptance(GraphCleaningFunctions.cleanDate(input.date))
 
     List(
       d,

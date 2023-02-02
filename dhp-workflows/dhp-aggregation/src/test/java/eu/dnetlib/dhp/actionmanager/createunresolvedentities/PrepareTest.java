@@ -94,57 +94,6 @@ public class PrepareTest {
 
 		Assertions.assertEquals(1, tmp.filter(r -> r.getId().equals(doi1)).count());
 		Assertions.assertEquals(1, tmp.filter(r -> r.getId().equals(doi1)).collect().get(0).getInstance().size());
-		Assertions
-			.assertEquals(
-				3, tmp.filter(r -> r.getId().equals(doi1)).collect().get(0).getInstance().get(0).getMeasures().size());
-		Assertions
-			.assertEquals(
-				"6.34596412687e-09", tmp
-					.filter(r -> r.getId().equals(doi1))
-					.collect()
-					.get(0)
-					.getInstance()
-					.get(0)
-					.getMeasures()
-					.stream()
-					.filter(sl -> sl.getId().equals("influence"))
-					.collect(Collectors.toList())
-					.get(0)
-					.getUnit()
-					.get(0)
-					.getValue());
-		Assertions
-			.assertEquals(
-				"0.641151896994", tmp
-					.filter(r -> r.getId().equals(doi1))
-					.collect()
-					.get(0)
-					.getInstance()
-					.get(0)
-					.getMeasures()
-					.stream()
-					.filter(sl -> sl.getId().equals("popularity_alt"))
-					.collect(Collectors.toList())
-					.get(0)
-					.getUnit()
-					.get(0)
-					.getValue());
-		Assertions
-			.assertEquals(
-				"2.33375102921e-09", tmp
-					.filter(r -> r.getId().equals(doi1))
-					.collect()
-					.get(0)
-					.getInstance()
-					.get(0)
-					.getMeasures()
-					.stream()
-					.filter(sl -> sl.getId().equals("popularity"))
-					.collect(Collectors.toList())
-					.get(0)
-					.getUnit()
-					.get(0)
-					.getValue());
 
 		final String doi2 = "unresolved::10.3390/s18072310::doi";
 

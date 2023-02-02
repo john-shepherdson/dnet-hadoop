@@ -8,6 +8,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.dnetlib.dhp.schema.oaf.EntityDataInfo;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -60,7 +62,6 @@ public class PrepareSDGSparkJob implements Serializable {
 				doPrepare(
 					spark,
 					sourcePath,
-
 					outputPath);
 			});
 	}
@@ -72,7 +73,7 @@ public class PrepareSDGSparkJob implements Serializable {
 			.groupByKey((MapFunction<SDGDataModel, String>) r -> r.getDoi().toLowerCase(), Encoders.STRING())
 			.mapGroups((MapGroupsFunction<String, SDGDataModel, Result>) (k, it) -> {
 				Result r = new Result();
-				r.setId(DHPUtils.generateUnresolvedIdentifier(k, DOI));
+				r.setId(DHPUtils.generateUnresolvedIdentifier(k, PidType.doi.toString()));
 				SDGDataModel first = it.next();
 				List<Subject> sbjs = new ArrayList<>();
 				sbjs.add(getSubject(first.getSbj(), SDG_CLASS_ID, SDG_CLASS_NAME, UPDATE_SUBJECT_SDG_CLASS_ID));
@@ -81,19 +82,7 @@ public class PrepareSDGSparkJob implements Serializable {
 						s -> sbjs
 							.add(getSubject(s.getSbj(), SDG_CLASS_ID, SDG_CLASS_NAME, UPDATE_SUBJECT_SDG_CLASS_ID)));
 				r.setSubject(sbjs);
-				r
-					.setDataInfo(
-						OafMapperUtils
-							.dataInfo(
-								false, null, true,
-								false,
-								OafMapperUtils
-									.qualifier(
-										ModelConstants.PROVENANCE_ENRICH,
-										null,
-										ModelConstants.DNET_PROVENANCE_ACTIONS,
-										ModelConstants.DNET_PROVENANCE_ACTIONS),
-								null));
+				r.setDataInfo(SciNoBo_DATA_INFO);
 				return r;
 			}, Encoders.bean(Result.class))
 			.write()

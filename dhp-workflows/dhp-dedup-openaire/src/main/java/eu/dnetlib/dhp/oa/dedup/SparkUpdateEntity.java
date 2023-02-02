@@ -4,6 +4,9 @@ package eu.dnetlib.dhp.oa.dedup;
 import java.io.IOException;
 import java.util.Map;
 
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.common.EntityType;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileStatus;
@@ -24,12 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.util.MapDocumentUtil;
@@ -146,13 +144,13 @@ public class SparkUpdateEntity extends AbstractSparkAction {
 		return result;
 	}
 
-	private static <T extends OafEntity> String updateDeletedByInference(
+	private static <T extends Entity> String updateDeletedByInference(
 		final String json, final Class<T> clazz) {
 		try {
 			Oaf entity = OBJECT_MAPPER.readValue(json, clazz);
-			if (entity.getDataInfo() == null)
-				entity.setDataInfo(new DataInfo());
-			entity.getDataInfo().setDeletedbyinference(true);
+			if (((Entity) entity).getDataInfo() == null)
+				((Entity) entity).setDataInfo(new EntityDataInfo());
+			((Entity) entity).getDataInfo().setDeletedbyinference(true);
 			return OBJECT_MAPPER.writeValueAsString(entity);
 		} catch (IOException e) {
 			throw new RuntimeException("Unable to convert json", e);

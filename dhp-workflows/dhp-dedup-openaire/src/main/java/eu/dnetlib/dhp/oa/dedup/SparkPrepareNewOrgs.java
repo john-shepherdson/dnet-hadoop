@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.Properties;
 
+import eu.dnetlib.dhp.schema.oaf.common.EntityType;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -19,9 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
-import eu.dnetlib.dhp.schema.common.EntityType;
+
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
@@ -165,10 +166,10 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 				(MapFunction<Tuple2<Tuple2<String, Organization>, Tuple2<String, String>>, OrgSimRel>) r -> new OrgSimRel(
 					"",
 					r._1()._2().getOriginalId().get(0),
-					r._1()._2().getLegalname() != null ? r._1()._2().getLegalname().getValue() : "",
-					r._1()._2().getLegalshortname() != null ? r._1()._2().getLegalshortname().getValue() : "",
+					r._1()._2().getLegalname() != null ? r._1()._2().getLegalname() : "",
+					r._1()._2().getLegalshortname() != null ? r._1()._2().getLegalshortname() : "",
 					r._1()._2().getCountry() != null ? r._1()._2().getCountry().getClassid() : "",
-					r._1()._2().getWebsiteurl() != null ? r._1()._2().getWebsiteurl().getValue() : "",
+					r._1()._2().getWebsiteurl() != null ? r._1()._2().getWebsiteurl() : "",
 					r._1()._2().getCollectedfrom().get(0).getValue(),
 					"",
 					structuredPropertyListToString(r._1()._2().getPid()),

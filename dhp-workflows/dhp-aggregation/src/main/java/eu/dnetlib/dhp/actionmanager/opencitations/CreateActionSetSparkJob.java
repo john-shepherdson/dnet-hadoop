@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
+import com.google.common.collect.Lists;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
@@ -26,7 +28,6 @@ import eu.dnetlib.dhp.actionmanager.opencitations.model.COCI;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
@@ -36,7 +37,7 @@ public class CreateActionSetSparkJob implements Serializable {
 	public static final String OPENCITATIONS_CLASSID = "sysimport:crosswalk:opencitations";
 	public static final String OPENCITATIONS_CLASSNAME = "Imported from OpenCitations";
 	private static final String ID_PREFIX = "50|doi_________::";
-	private static final String TRUST = "0.91";
+	private static final Float TRUST = 0.91f;
 
 	private static final Logger log = LoggerFactory.getLogger(CreateActionSetSparkJob.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -145,46 +146,31 @@ public class CreateActionSetSparkJob implements Serializable {
 		String target,
 		String relclass) {
 		Relation r = new Relation();
-		r.setCollectedfrom(getCollectedFrom());
+		r.setProvenance(getProvenance());
 		r.setSource(source);
 		r.setTarget(target);
 		r.setRelClass(relclass);
 		r.setRelType(ModelConstants.RESULT_RESULT);
 		r.setSubRelType(ModelConstants.CITATION);
-		r
-			.setDataInfo(
-				getDataInfo());
 		return r;
 	}
 
-	public static List<KeyValue> getCollectedFrom() {
+	private static List<Provenance> getProvenance() {
+		return Arrays.asList(OafMapperUtils.getProvenance(getCollectedFrom(), getDataInfo()));
+	}
+
+	public static KeyValue getCollectedFrom() {
 		KeyValue kv = new KeyValue();
 		kv.setKey(ModelConstants.OPENOCITATIONS_ID);
 		kv.setValue(ModelConstants.OPENOCITATIONS_NAME);
 
-		return Arrays.asList(kv);
+		return kv;
 	}
 
 	public static DataInfo getDataInfo() {
-		DataInfo di = new DataInfo();
-		di.setInferred(false);
-		di.setDeletedbyinference(false);
-		di.setTrust(TRUST);
-
-		di
-			.setProvenanceaction(
-				getQualifier(OPENCITATIONS_CLASSID, OPENCITATIONS_CLASSNAME, ModelConstants.DNET_PROVENANCE_ACTIONS));
-		return di;
+		return OafMapperUtils.dataInfo(TRUST, null, false,
+				OafMapperUtils.qualifier(OPENCITATIONS_CLASSID, OPENCITATIONS_CLASSNAME, ModelConstants.DNET_PROVENANCE_ACTIONS));
 	}
 
-	public static Qualifier getQualifier(String class_id, String class_name,
-		String qualifierSchema) {
-		Qualifier pa = new Qualifier();
-		pa.setClassid(class_id);
-		pa.setClassname(class_name);
-		pa.setSchemeid(qualifierSchema);
-		pa.setSchemename(qualifierSchema);
-		return pa;
-	}
 
 }

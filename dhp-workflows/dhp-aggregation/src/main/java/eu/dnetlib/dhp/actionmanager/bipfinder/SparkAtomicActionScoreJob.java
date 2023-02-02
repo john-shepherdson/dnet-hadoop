@@ -40,7 +40,6 @@ import scala.Tuple2;
  */
 public class SparkAtomicActionScoreJob implements Serializable {
 
-	private static final String DOI = "doi";
 	private static final Logger log = LoggerFactory.getLogger(SparkAtomicActionScoreJob.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -97,7 +96,6 @@ public class SparkAtomicActionScoreJob implements Serializable {
 			}).collect(Collectors.toList()).iterator()).rdd(), Encoders.bean(BipScore.class));
 
 		bipScores
-
 			.map((MapFunction<BipScore, Result>) bs -> {
 				Result ret = new Result();
 
@@ -129,25 +127,11 @@ public class SparkAtomicActionScoreJob implements Serializable {
 							.getUnit()
 							.stream()
 							.map(unit -> {
-								KeyValue kv = new KeyValue();
-								kv.setValue(unit.getValue());
-								kv.setKey(unit.getKey());
-								kv
-									.setDataInfo(
-										OafMapperUtils
-											.dataInfo(
-												false,
-												UPDATE_DATA_INFO_TYPE,
-												true,
-												false,
-												OafMapperUtils
-													.qualifier(
-														UPDATE_MEASURE_BIP_CLASS_ID,
-														UPDATE_CLASS_NAME,
-														ModelConstants.DNET_PROVENANCE_ACTIONS,
-														ModelConstants.DNET_PROVENANCE_ACTIONS),
-												""));
-								return kv;
+								MeasureUnit u = new MeasureUnit();
+								u.setValue(unit.getValue());
+								u.setKey(unit.getKey());
+								u.setDataInfo(Bip_DATA_INFO3);
+								return u;
 							})
 							.collect(Collectors.toList()));
 				return m;

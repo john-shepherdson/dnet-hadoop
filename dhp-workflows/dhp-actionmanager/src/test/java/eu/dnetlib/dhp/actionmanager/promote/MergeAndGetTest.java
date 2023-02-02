@@ -8,6 +8,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.function.BiFunction;
 
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -49,7 +50,7 @@ public class MergeAndGetTest {
 		void shouldThrowForOafAndOafEntity() {
 			// given
 			Oaf a = mock(Oaf.class);
-			OafEntity b = mock(OafEntity.class);
+			Entity b = mock(Entity.class);
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(Strategy.MERGE_FROM_AND_GET);
@@ -75,7 +76,7 @@ public class MergeAndGetTest {
 		void shouldThrowForRelationAndOafEntity() {
 			// given
 			Relation a = mock(Relation.class);
-			OafEntity b = mock(OafEntity.class);
+			Entity b = mock(Entity.class);
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(Strategy.MERGE_FROM_AND_GET);
@@ -96,14 +97,15 @@ public class MergeAndGetTest {
 			// then
 			Oaf x = fn.get().apply(a, b);
 			assertTrue(Relation.class.isAssignableFrom(x.getClass()));
-			verify(a).mergeFrom(b);
+			//verify(a).mergeFrom(b);
+			a = MergeUtils.mergeRelation(verify(a), b);
 			assertEquals(a, x);
 		}
 
 		@Test
 		void shouldThrowForOafEntityAndOaf() {
 			// given
-			OafEntity a = mock(OafEntity.class);
+			Entity a = mock(Entity.class);
 			Oaf b = mock(Oaf.class);
 
 			// when
@@ -116,7 +118,7 @@ public class MergeAndGetTest {
 		@Test
 		void shouldThrowForOafEntityAndRelation() {
 			// given
-			OafEntity a = mock(OafEntity.class);
+			Entity a = mock(Entity.class);
 			Relation b = mock(Relation.class);
 
 			// when
@@ -129,9 +131,9 @@ public class MergeAndGetTest {
 		@Test
 		void shouldThrowForOafEntityAndOafEntityButNotSubclasses() {
 			// given
-			class OafEntitySub1 extends OafEntity {
+			class OafEntitySub1 extends Entity {
 			}
-			class OafEntitySub2 extends OafEntity {
+			class OafEntitySub2 extends Entity {
 			}
 
 			OafEntitySub1 a = mock(OafEntitySub1.class);
@@ -147,16 +149,16 @@ public class MergeAndGetTest {
 		@Test
 		void shouldBehaveProperlyForOafEntityAndOafEntity() {
 			// given
-			OafEntity a = mock(OafEntity.class);
-			OafEntity b = mock(OafEntity.class);
+			Entity a = mock(Entity.class);
+			Entity b = mock(Entity.class);
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(Strategy.MERGE_FROM_AND_GET);
 
 			// then
 			Oaf x = fn.get().apply(a, b);
-			assertTrue(OafEntity.class.isAssignableFrom(x.getClass()));
-			verify(a).mergeFrom(b);
+			assertTrue(Entity.class.isAssignableFrom(x.getClass()));
+			a = MergeUtils.mergeEntity(verify(a), b);
 			assertEquals(a, x);
 		}
 	}
@@ -167,7 +169,7 @@ public class MergeAndGetTest {
 		@Test
 		void shouldThrowForOafEntityAndRelation() {
 			// given
-			OafEntity a = mock(OafEntity.class);
+			Entity a = mock(Entity.class);
 			Relation b = mock(Relation.class);
 
 			// when
@@ -181,7 +183,7 @@ public class MergeAndGetTest {
 		void shouldThrowForRelationAndOafEntity() {
 			// given
 			Relation a = mock(Relation.class);
-			OafEntity b = mock(OafEntity.class);
+			Entity b = mock(Entity.class);
 
 			// when
 			SerializableSupplier<BiFunction<Oaf, Oaf, Oaf>> fn = functionFor(Strategy.SELECT_NEWER_AND_GET);
@@ -193,7 +195,7 @@ public class MergeAndGetTest {
 		@Test
 		void shouldThrowForOafEntityAndResult() {
 			// given
-			OafEntity a = mock(OafEntity.class);
+			Entity a = mock(Entity.class);
 			Result b = mock(Result.class);
 
 			// when
@@ -223,9 +225,9 @@ public class MergeAndGetTest {
 		@Test
 		void shouldShouldReturnLeftForOafEntityAndOafEntity() {
 			// given
-			OafEntity a = mock(OafEntity.class);
+			Entity a = mock(Entity.class);
 			when(a.getLastupdatetimestamp()).thenReturn(1L);
-			OafEntity b = mock(OafEntity.class);
+			Entity b = mock(Entity.class);
 			when(b.getLastupdatetimestamp()).thenReturn(2L);
 
 			// when
@@ -233,16 +235,16 @@ public class MergeAndGetTest {
 
 			// then
 			Oaf x = fn.get().apply(a, b);
-			assertTrue(OafEntity.class.isAssignableFrom(x.getClass()));
+			assertTrue(Entity.class.isAssignableFrom(x.getClass()));
 			assertEquals(b, x);
 		}
 
 		@Test
 		void shouldShouldReturnRightForOafEntityAndOafEntity() {
 			// given
-			OafEntity a = mock(OafEntity.class);
+			Entity a = mock(Entity.class);
 			when(a.getLastupdatetimestamp()).thenReturn(2L);
-			OafEntity b = mock(OafEntity.class);
+			Entity b = mock(Entity.class);
 			when(b.getLastupdatetimestamp()).thenReturn(1L);
 
 			// when
@@ -250,7 +252,7 @@ public class MergeAndGetTest {
 
 			// then
 			Oaf x = fn.get().apply(a, b);
-			assertTrue(OafEntity.class.isAssignableFrom(x.getClass()));
+			assertTrue(Entity.class.isAssignableFrom(x.getClass()));
 			assertEquals(a, x);
 		}
 	}

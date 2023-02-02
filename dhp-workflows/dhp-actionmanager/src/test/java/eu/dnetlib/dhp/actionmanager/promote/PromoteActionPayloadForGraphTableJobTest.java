@@ -14,6 +14,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -27,7 +28,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.schema.common.ModelSupport;
+
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class PromoteActionPayloadForGraphTableJobTest {
@@ -80,7 +81,7 @@ public class PromoteActionPayloadForGraphTableJobTest {
 		void shouldThrowWhenGraphTableClassIsNotASubClassOfActionPayloadClass() {
 			// given
 			Class<Relation> rowClazz = Relation.class;
-			Class<OafEntity> actionPayloadClazz = OafEntity.class;
+			Class<Entity> actionPayloadClazz = Entity.class;
 
 			// when
 			RuntimeException exception = assertThrows(

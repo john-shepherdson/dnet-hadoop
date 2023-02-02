@@ -121,17 +121,14 @@ public class SparkAtomicActionUsageJob implements Serializable {
 	private static List<Measure> getMeasure(Long downloads, Long views) {
 		DataInfo dataInfo = OafMapperUtils
 			.dataInfo(
-				false,
+				0.0f, //TODO check
 				UPDATE_DATA_INFO_TYPE,
-				true,
 				false,
 				OafMapperUtils
 					.qualifier(
 						UPDATE_MEASURE_USAGE_COUNTS_CLASS_ID,
 						UPDATE_CLASS_NAME,
-						ModelConstants.DNET_PROVENANCE_ACTIONS,
-						ModelConstants.DNET_PROVENANCE_ACTIONS),
-				"");
+						ModelConstants.DNET_PROVENANCE_ACTIONS));
 
 		return Arrays
 			.asList(

@@ -1,26 +1,23 @@
 
 package eu.dnetlib.dhp.oa.dedup.model;
 
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.google.common.collect.Sets;
-
 import eu.dnetlib.dhp.oa.dedup.DatePicker;
 import eu.dnetlib.dhp.oa.dedup.IdentifierComparator;
-import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
-import eu.dnetlib.dhp.schema.oaf.utils.PidComparator;
+import eu.dnetlib.dhp.schema.oaf.Entity;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.common.EntityType;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
+import org.apache.commons.lang3.StringUtils;
 
-public class Identifier<T extends OafEntity> implements Serializable, Comparable<Identifier<T>> {
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+
+public class Identifier<T extends Entity> implements Serializable, Comparable<Identifier<T>> {
 
 	public static final String DATE_FORMAT = "yyyy-MM-dd";
 	public static final String BASE_DATE = "2000-01-01";
@@ -30,7 +27,7 @@ public class Identifier<T extends OafEntity> implements Serializable, Comparable
 	// cached date value
 	private Date date = null;
 
-	public static <T extends OafEntity> Identifier<T> newInstance(T entity) {
+	public static <T extends Entity> Identifier<T> newInstance(T entity) {
 		return new Identifier<>(entity);
 	}
 
@@ -54,7 +51,7 @@ public class Identifier<T extends OafEntity> implements Serializable, Comparable
 			if (ModelSupport.isSubClass(getEntity(), Result.class)) {
 				Result result = (Result) getEntity();
 				if (isWellformed(result.getDateofacceptance())) {
-					sDate = result.getDateofacceptance().getValue();
+					sDate = result.getDateofacceptance();
 				}
 			}
 			try {
@@ -67,9 +64,9 @@ public class Identifier<T extends OafEntity> implements Serializable, Comparable
 		}
 	}
 
-	private static boolean isWellformed(Field<String> date) {
-		return date != null && StringUtils.isNotBlank(date.getValue())
-			&& date.getValue().matches(DatePicker.DATE_PATTERN) && DatePicker.inRange(date.getValue());
+	private static boolean isWellformed(String date) {
+		return StringUtils.isNotBlank(date)
+			&& date.matches(DatePicker.DATE_PATTERN) && DatePicker.inRange(date);
 	}
 
 	public List<KeyValue> getCollectedFrom() {

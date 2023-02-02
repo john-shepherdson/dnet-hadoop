@@ -1,7 +1,16 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.getProvenance;
+import com.github.sisyphsu.dateparser.DateParserUtils;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
+import me.xuender.unidecode.Unidecode;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -12,19 +21,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Encoders;
-
-import com.github.sisyphsu.dateparser.DateParserUtils;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
-import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.*;
-import me.xuender.unidecode.Unidecode;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.getProvenance;
 
 public class GraphCleaningFunctions extends CleaningFunctions {
 

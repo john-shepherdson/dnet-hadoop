@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -88,7 +89,7 @@ public class IdGeneratorTest {
 		assertEquals("20|openorgs____::599c15a70fcb03be6ba08f75f14d6076", id1);
 	}
 
-	protected static <T extends OafEntity> List<Identifier<T>> createBestIds(String path, Class<T> clazz) {
+	protected static <T extends Entity> List<Identifier<T>> createBestIds(String path, Class<T> clazz) {
 		final Stream<Identifier<T>> ids = readSample(path, clazz)
 			.stream()
 			.map(Tuple2::_2)
@@ -120,10 +121,7 @@ public class IdGeneratorTest {
 	}
 
 	public static StructuredProperty pid(String pid, String classid, String classname) {
-		return OafMapperUtils.structuredProperty(pid, classid, classname, "", "", new DataInfo());
+		return OafMapperUtils.structuredProperty(pid, classid, classname, ModelConstants.DNET_PID_TYPES);
 	}
 
-	public static List<KeyValue> keyValue(String key, String value) {
-		return Lists.newArrayList(OafMapperUtils.keyValue(key, value));
-	}
 }

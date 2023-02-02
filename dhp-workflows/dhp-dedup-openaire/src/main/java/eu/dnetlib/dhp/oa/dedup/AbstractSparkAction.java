@@ -16,6 +16,7 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
+import org.apache.zookeeper.Op;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -129,8 +130,10 @@ abstract class AbstractSparkAction implements Serializable {
 	protected static MapFunction<String, Relation> patchRelFn() {
 		return value -> {
 			final Relation rel = OBJECT_MAPPER.readValue(value, Relation.class);
-			if (rel.getDataInfo() == null) {
-				rel.setDataInfo(new DataInfo());
+			for(Provenance prov : rel.getProvenance()) {
+				if (prov.getDataInfo() == null) {
+					prov.setDataInfo(new DataInfo());
+				}
 			}
 			return rel;
 		};
@@ -138,20 +141,17 @@ abstract class AbstractSparkAction implements Serializable {
 
 	protected boolean isOpenorgs(Relation rel) {
 		return Optional
-			.ofNullable(rel.getCollectedfrom())
-			.map(c -> isCollectedFromOpenOrgs(c))
-			.orElse(false);
+				.ofNullable(rel.getProvenance())
+				.map(prov -> prov.stream().anyMatch(p -> isCollectedFromOpenOrgs(p.getCollectedfrom())))
+				.orElse(false);
 	}
 
 	protected boolean isOpenorgsDedupRel(Relation rel) {
 		return isOpenorgs(rel) && isOpenOrgsDedupMergeRelation(rel);
 	}
 
-	private boolean isCollectedFromOpenOrgs(List<KeyValue> c) {
-		return c
-			.stream()
-			.filter(Objects::nonNull)
-			.anyMatch(kv -> ModelConstants.OPENORGS_NAME.equals(kv.getValue()));
+	private boolean isCollectedFromOpenOrgs(KeyValue kv) {
+		return ModelConstants.OPENORGS_NAME.equals(kv.getValue());
 	}
 
 	private boolean isOpenOrgsDedupMergeRelation(Relation rel) {
@@ -161,11 +161,11 @@ abstract class AbstractSparkAction implements Serializable {
 				ModelConstants.MERGES.equals(rel.getRelClass()));
 	}
 
-	protected static Boolean parseECField(Field<String> field) {
+	protected static Boolean parseECField(String field) {
 		if (field == null)
 			return null;
-		if (StringUtils.isBlank(field.getValue()) || field.getValue().equalsIgnoreCase("null"))
+		if (StringUtils.isBlank(field) || field.equalsIgnoreCase("null"))
 			return null;
-		return field.getValue().equalsIgnoreCase("true");
+		return field.equalsIgnoreCase("true");
 	}
 }

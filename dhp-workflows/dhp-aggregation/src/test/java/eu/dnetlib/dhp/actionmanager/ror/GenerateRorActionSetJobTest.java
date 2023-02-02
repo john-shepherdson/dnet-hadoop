@@ -50,7 +50,7 @@ class GenerateRorActionSetJobTest {
 		assertEquals("AU", o.getCountry().getClassid());
 
 		assertNotNull(o.getLegalname());
-		assertEquals("Mount Stromlo Observatory", o.getLegalname().getValue());
+		assertEquals("Mount Stromlo Observatory", o.getLegalname());
 
 		System.out.println(mapper.writeValueAsString(o));
 	}

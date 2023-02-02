@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.IntWritable;
@@ -216,7 +217,8 @@ public class GenerateNativeStoreSparkJob {
 					invalidRecords.add(1);
 				return null;
 			}
-			return new MetadataRecord(originalIdentifier, encoding, provenance, document.asXML(), dateOfCollection);
+			final String id = ModelSupport.generateIdentifier(originalIdentifier, provenance.getNsPrefix());
+			return new MetadataRecord(id, originalIdentifier, encoding, provenance, document.asXML(), dateOfCollection);
 		} catch (Throwable e) {
 			invalidRecords.add(1);
 			return null;

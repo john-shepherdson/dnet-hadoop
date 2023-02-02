@@ -30,7 +30,7 @@ class EntityMergerTest implements Serializable {
 	private List<Tuple2<String, Publication>> publications5;
 
 	private String testEntityBasePath;
-	private DataInfo dataInfo;
+	private EntityDataInfo dataInfo;
 	private final String dedupId = "00|dedup_id::1";
 	private Publication pub_top;
 
@@ -119,7 +119,7 @@ class EntityMergerTest implements Serializable {
 		assertEquals(dataInfo, pub_merged.getDataInfo());
 
 		// verify datepicker
-		assertEquals("2018-09-30", pub_merged.getDateofacceptance().getValue());
+		assertEquals("2018-09-30", pub_merged.getDateofacceptance());
 
 		// verify authors
 		assertEquals(13, pub_merged.getAuthor().size());
@@ -185,9 +185,9 @@ class EntityMergerTest implements Serializable {
 		assertEquals(dedupId, pub_merged.getId());
 	}
 
-	public DataInfo setDI() {
-		DataInfo dataInfo = new DataInfo();
-		dataInfo.setTrust("0.9");
+	public EntityDataInfo setDI() {
+		EntityDataInfo dataInfo = new EntityDataInfo();
+		dataInfo.setTrust(0.9f);
 		dataInfo.setDeletedbyinference(false);
 		dataInfo.setInferenceprovenance("testing");
 		dataInfo.setInferred(true);
@@ -196,10 +196,10 @@ class EntityMergerTest implements Serializable {
 
 	public Publication getTopPub(List<Tuple2<String, Publication>> publications) {
 
-		Double maxTrust = 0.0;
+		Float maxTrust = 0.0f;
 		Publication maxPub = new Publication();
 		for (Tuple2<String, Publication> publication : publications) {
-			Double pubTrust = Double.parseDouble(publication._2().getDataInfo().getTrust());
+			Float pubTrust = publication._2().getDataInfo().getTrust();
 			if (pubTrust > maxTrust) {
 				maxTrust = pubTrust;
 				maxPub = publication._2();

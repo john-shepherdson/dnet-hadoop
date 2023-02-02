@@ -8,6 +8,8 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.oaf.EntityDataInfo;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -60,7 +62,6 @@ public class PrepareFOSSparkJob implements Serializable {
 				distributeFOSdois(
 					spark,
 					sourcePath,
-
 					outputPath);
 			});
 	}
@@ -73,7 +74,7 @@ public class PrepareFOSSparkJob implements Serializable {
 			.mapGroups((MapGroupsFunction<String, FOSDataModel, Result>) (k, it) -> {
 				Result r = new Result();
 				FOSDataModel first = it.next();
-				r.setId(DHPUtils.generateUnresolvedIdentifier(k, DOI));
+				r.setId(DHPUtils.generateUnresolvedIdentifier(k, PidType.doi.toString()));
 
 				HashSet<String> level1 = new HashSet<>();
 				HashSet<String> level2 = new HashSet<>();
@@ -85,19 +86,7 @@ public class PrepareFOSSparkJob implements Serializable {
 				level2.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID)));
 				level3.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID)));
 				r.setSubject(sbjs);
-				r
-					.setDataInfo(
-						OafMapperUtils
-							.dataInfo(
-								false, null, true,
-								false,
-								OafMapperUtils
-									.qualifier(
-										ModelConstants.PROVENANCE_ENRICH,
-										null,
-										ModelConstants.DNET_PROVENANCE_ACTIONS,
-										ModelConstants.DNET_PROVENANCE_ACTIONS),
-								null));
+				r.setDataInfo(SciNoBo_DATA_INFO);
 				return r;
 			}, Encoders.bean(Result.class))
 			.write()

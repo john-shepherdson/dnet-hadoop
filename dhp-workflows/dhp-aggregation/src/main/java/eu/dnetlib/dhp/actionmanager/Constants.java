@@ -3,6 +3,8 @@ package eu.dnetlib.dhp.actionmanager;
 
 import java.util.Optional;
 
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.EntityDataInfo;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -18,7 +20,6 @@ import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 public class Constants {
 
-	public static final String DOI = "doi";
 	public static final String DOI_CLASSNAME = "Digital Object Identifier";
 
 	public static final String DEFAULT_DELIMITER = ",";
@@ -40,6 +41,58 @@ public class Constants {
 	public static final String NULL = "NULL";
 
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+	public static final EntityDataInfo SciNoBo_DATA_INFO = OafMapperUtils
+			.dataInfo(
+					false,
+					false,
+					0.8f, //TODO check
+					"SciNoBo",
+					true,
+					OafMapperUtils
+							.qualifier(
+									ModelConstants.PROVENANCE_ENRICH,
+									null,
+									ModelConstants.DNET_PROVENANCE_ACTIONS));
+
+
+	public static final DataInfo Bip_DATA_INFO3 = OafMapperUtils
+			.dataInfo(
+					false,
+					false,
+					0.8f,
+					UPDATE_DATA_INFO_TYPE,
+					false,
+					OafMapperUtils
+							.qualifier(
+									UPDATE_MEASURE_BIP_CLASS_ID,
+									UPDATE_CLASS_NAME,
+									ModelConstants.DNET_PROVENANCE_ACTIONS));
+	public static final EntityDataInfo Bip_DATA_INFO2 = OafMapperUtils
+			.dataInfo(
+					false,
+					false,
+					0.8f,
+					UPDATE_DATA_INFO_TYPE,
+					true,
+					OafMapperUtils
+							.qualifier(
+									UPDATE_MEASURE_BIP_CLASS_ID,
+									UPDATE_CLASS_NAME,
+									ModelConstants.DNET_PROVENANCE_ACTIONS));
+
+	public static final EntityDataInfo Bip_DATA_INFO = OafMapperUtils
+			.dataInfo(
+					false,
+					false,
+					0.8f, //TODO check
+					UPDATE_DATA_INFO_TYPE,
+					true,
+					OafMapperUtils
+							.qualifier(
+									ModelConstants.PROVENANCE_ENRICH,
+									null,
+									ModelConstants.DNET_PROVENANCE_ACTIONS));
 
 	private Constants() {
 	}
@@ -71,23 +124,19 @@ public class Constants {
 					.qualifier(
 						classid,
 						classname,
-						ModelConstants.DNET_SUBJECT_TYPOLOGIES,
 						ModelConstants.DNET_SUBJECT_TYPOLOGIES));
 		s
 			.setDataInfo(
 				OafMapperUtils
 					.dataInfo(
-						false,
+						0.0f, //TODO check
 						UPDATE_DATA_INFO_TYPE,
 						true,
-						false,
 						OafMapperUtils
 							.qualifier(
 								diqualifierclassid,
 								UPDATE_CLASS_NAME,
-								ModelConstants.DNET_PROVENANCE_ACTIONS,
-								ModelConstants.DNET_PROVENANCE_ACTIONS),
-						""));
+								ModelConstants.DNET_PROVENANCE_ACTIONS)));
 
 		return s;
 

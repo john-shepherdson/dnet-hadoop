@@ -89,28 +89,7 @@ public class SparkAtomicActionCountJobTest {
 					.getMeasures()
 					.stream()
 					.forEach(
-						m -> m
-							.getUnit()
-							.stream()
-							.forEach(u -> Assertions.assertFalse(u.getDataInfo().getDeletedbyinference()))));
-		tmp
-			.foreach(
-				r -> r
-					.getMeasures()
-					.stream()
-					.forEach(
 						m -> m.getUnit().stream().forEach(u -> Assertions.assertTrue(u.getDataInfo().getInferred()))));
-		tmp
-			.foreach(
-				r -> r
-					.getMeasures()
-					.stream()
-					.forEach(
-						m -> m
-							.getUnit()
-							.stream()
-							.forEach(u -> Assertions.assertFalse(u.getDataInfo().getInvisible()))));
-
 		tmp
 			.foreach(
 				r -> r

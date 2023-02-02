@@ -1,10 +1,12 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
-import static org.apache.spark.sql.functions.col;
-
-import java.util.Objects;
-
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -13,16 +15,12 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
 import scala.Tuple3;
+
+import java.util.Objects;
+
+import static org.apache.spark.sql.functions.col;
 
 public class SparkPropagateRelation extends AbstractSparkAction {
 
@@ -186,11 +184,6 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 			String newSource = value._1()._2() != null ? value._1()._2()._2() : null;
 			String newTarget = value._2() != null ? value._2()._2() : null;
 
-			if (r.getDataInfo() == null) {
-				r.setDataInfo(new DataInfo());
-			}
-			r.getDataInfo().setDeletedbyinference(false);
-
 			if (newSource != null)
 				r.setSource(newSource);
 
@@ -202,13 +195,18 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 	}
 
 	private static MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, String>>, Relation> getDeletedFn() {
+
+		//TODO the model does not include anymore the possibility to mark relations as deleted. We should therefore
+		//TODO delete them for good in this spark action.
 		return value -> {
 			if (value._2() != null) {
 				Relation r = value._1()._2();
+				/*
 				if (r.getDataInfo() == null) {
 					r.setDataInfo(new DataInfo());
 				}
 				r.getDataInfo().setDeletedbyinference(true);
+				 */
 				return r;
 			}
 			return value._1()._2();

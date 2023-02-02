@@ -253,7 +253,7 @@ public class SparkPublicationRootsTest implements Serializable {
 
 		assertEquals(crossref_duplicate.getJournal().getName(), root.getJournal().getName());
 		assertEquals(crossref_duplicate.getJournal().getIssnPrinted(), root.getJournal().getIssnPrinted());
-		assertEquals(crossref_duplicate.getPublisher().getValue(), root.getPublisher().getValue());
+		assertEquals(crossref_duplicate.getPublisher().getName(), root.getPublisher().getName());
 
 		Set<String> rootPids = root
 			.getPid()
@@ -300,7 +300,7 @@ public class SparkPublicationRootsTest implements Serializable {
 		assertEquals(crossref_duplicate.getJournal().getIssnOnline(), root.getJournal().getIssnOnline());
 		assertEquals(crossref_duplicate.getJournal().getVol(), root.getJournal().getVol());
 
-		assertEquals(crossref_duplicate.getPublisher().getValue(), root.getPublisher().getValue());
+		assertEquals(crossref_duplicate.getPublisher().getName(), root.getPublisher().getName());
 
 		Set<String> dups_cf = pubs
 			.collectAsList()
@@ -328,7 +328,7 @@ public class SparkPublicationRootsTest implements Serializable {
 			.filter("id = '50|od_______166::31ca734cc22181b704c4aa8fd050062a'")
 			.first();
 
-		assertEquals(pivot_duplicate.getPublisher().getValue(), root.getPublisher().getValue());
+		assertEquals(pivot_duplicate.getPublisher().getName(), root.getPublisher().getName());
 
 		Set<String> dups_cf = pubs
 			.collectAsList()
@@ -376,7 +376,7 @@ public class SparkPublicationRootsTest implements Serializable {
 			.textFile(graphOutputPath + "/publication")
 			.map(asEntity(Publication.class), Encoders.bean(Publication.class))
 			.filter("datainfo.deletedbyinference == true")
-			.map((MapFunction<Publication, String>) OafEntity::getId, Encoders.STRING())
+			.map((MapFunction<Publication, String>) Entity::getId, Encoders.STRING())
 			.distinct()
 			.count();
 
@@ -390,7 +390,7 @@ public class SparkPublicationRootsTest implements Serializable {
 					.getResourceAsStream(path));
 	}
 
-	private static <T extends OafEntity> MapFunction<String, T> asEntity(Class<T> clazz) {
+	private static <T extends Entity> MapFunction<String, T> asEntity(Class<T> clazz) {
 		return value -> MAPPER.readValue(value, clazz);
 	}
 

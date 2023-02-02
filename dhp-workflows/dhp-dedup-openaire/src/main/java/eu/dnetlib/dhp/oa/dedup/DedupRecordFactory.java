@@ -1,27 +1,25 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+import eu.dnetlib.dhp.oa.dedup.model.Identifier;
+import eu.dnetlib.dhp.oa.merge.AuthorMerger;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
-
-import eu.dnetlib.dhp.oa.dedup.model.Identifier;
-import eu.dnetlib.dhp.oa.merge.AuthorMerger;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DedupRecordFactory {
 
@@ -31,9 +29,9 @@ public class DedupRecordFactory {
 	private DedupRecordFactory() {
 	}
 
-	public static <T extends OafEntity> Dataset<T> createDedupRecord(
+	public static <T extends Entity> Dataset<T> createDedupRecord(
 		final SparkSession spark,
-		final DataInfo dataInfo,
+		final EntityDataInfo dataInfo,
 		final String mergeRelsInputPath,
 		final String entitiesInputPath,
 		final Class<T> clazz) {
@@ -75,8 +73,8 @@ public class DedupRecordFactory {
 				Encoders.bean(clazz));
 	}
 
-	public static <T extends OafEntity> T entityMerger(
-		String id, Iterator<Tuple2<String, T>> entities, long ts, DataInfo dataInfo, Class<T> clazz)
+	public static <T extends Entity> T entityMerger(
+		String id, Iterator<Tuple2<String, T>> entities, long ts, EntityDataInfo dataInfo, Class<T> clazz)
 		throws IllegalAccessException, InstantiationException, InvocationTargetException {
 
 		final Comparator<Identifier<T>> idComparator = new IdentifierComparator<>();
@@ -89,24 +87,22 @@ public class DedupRecordFactory {
 			.map(Identifier::getEntity)
 			.collect(Collectors.toCollection(LinkedList::new));
 
-		final T entity = clazz.newInstance();
-		final T first = entityList.removeFirst();
+		T entity = clazz.newInstance();
+		T first = entityList.removeFirst();
 
 		BeanUtils.copyProperties(entity, first);
 
 		final List<List<Author>> authors = Lists.newArrayList();
+		for(Entity duplicate : entityList) {
+			entity = (T) MergeUtils.mergeEntities(entity, duplicate);
 
-		entityList
-			.forEach(
-				duplicate -> {
-					entity.mergeFrom(duplicate);
-					if (ModelSupport.isSubClass(duplicate, Result.class)) {
-						Result r1 = (Result) duplicate;
-						Optional
-							.ofNullable(r1.getAuthor())
-							.ifPresent(a -> authors.add(a));
-					}
-				});
+			if (ModelSupport.isSubClass(duplicate, Result.class)) {
+				Result r1 = (Result) duplicate;
+				Optional
+						.ofNullable(r1.getAuthor())
+						.ifPresent(a -> authors.add(a));
+			}
+		}
 
 		// set authors and date
 		if (ModelSupport.isSubClass(entity, Result.class)) {

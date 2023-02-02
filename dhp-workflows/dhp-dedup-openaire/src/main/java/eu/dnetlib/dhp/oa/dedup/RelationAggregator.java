@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.dedup;
 
 import java.util.Objects;
 
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.expressions.Aggregator;
@@ -41,8 +42,7 @@ public class RelationAggregator extends Aggregator<Relation, Relation, Relation>
 			return b;
 		}
 
-		b.mergeFrom(a);
-		return b;
+		return MergeUtils.mergeRelation(b, a);
 	}
 
 	@Override

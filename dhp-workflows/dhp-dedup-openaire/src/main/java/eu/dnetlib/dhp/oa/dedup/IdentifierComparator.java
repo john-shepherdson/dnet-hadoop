@@ -1,26 +1,25 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
+import com.google.common.collect.Sets;
+import eu.dnetlib.dhp.oa.dedup.model.Identifier;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Entity;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.common.EntityType;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.schema.oaf.utils.PidComparator;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Sets;
-
-import eu.dnetlib.dhp.oa.dedup.model.Identifier;
-import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
-import eu.dnetlib.dhp.schema.oaf.utils.PidComparator;
-import eu.dnetlib.dhp.schema.oaf.utils.PidType;
-
-public class IdentifierComparator<T extends OafEntity> implements Comparator<Identifier<T>> {
+public class IdentifierComparator<T extends Entity> implements Comparator<Identifier<T>> {
 
 	public static int compareIdentifiers(Identifier left, Identifier right) {
 		return new IdentifierComparator<>().compare(left, right);
@@ -75,7 +74,7 @@ public class IdentifierComparator<T extends OafEntity> implements Comparator<Ide
 	}
 
 	private StructuredProperty toSP(PidType pidType) {
-		return OafMapperUtils.structuredProperty("", pidType.toString(), pidType.toString(), "", "", new DataInfo());
+		return OafMapperUtils.structuredProperty("", pidType.toString(), pidType.toString(), ModelConstants.DNET_PID_TYPES);
 	}
 
 }

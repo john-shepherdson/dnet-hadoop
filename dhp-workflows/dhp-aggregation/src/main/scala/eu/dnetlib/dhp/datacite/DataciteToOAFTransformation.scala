@@ -459,12 +459,12 @@ object DataciteToOAFTransformation {
     } else if (publication_year != null) {
       val date = s"01-01-$publication_year"
       if (doi.startsWith("10.14457")) {
-        val date = fix_thai_date(date, "[dd-MM-yyyy]")
-        result.setDateofacceptance(date)
+        val fdate = fix_thai_date(date, "[dd-MM-yyyy]")
+        result.setDateofacceptance(fdate)
         result
           .getInstance()
           .get(0)
-          .setDateofacceptance(date)
+          .setDateofacceptance(fdate)
       } else {
         result.setDateofacceptance(date)
         result
@@ -636,7 +636,6 @@ object DataciteToOAFTransformation {
         val rel = new Relation
 
         rel.setProvenance(Lists.newArrayList(OafMapperUtils.getProvenance(DATACITE_COLLECTED_FROM, dataInfo)))
-        rel.setDataInfo(dataInfo)
 
         val subRelType = subRelTypeMapping(r.relationType).relType
         rel.setRelType(REL_TYPE_VALUE)

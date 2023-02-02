@@ -7,6 +7,7 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.PROVENANCE_DEDUP;
 import java.io.IOException;
 
 import eu.dnetlib.dhp.schema.oaf.Entity;
+import eu.dnetlib.dhp.schema.oaf.EntityDataInfo;
 import eu.dnetlib.dhp.schema.oaf.common.EntityType;
 import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.io.IOUtils;
@@ -19,10 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
@@ -33,7 +30,7 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkCreateDedupRecord.class);
 
-	public static final String ROOT_TRUST = "0.8";
+	public static final float ROOT_TRUST = 0.8f;
 
 	public SparkCreateDedupRecord(ArgumentApplicationParser parser, SparkSession spark) {
 		super(parser, spark);
@@ -81,7 +78,7 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
 			final String entityPath = DedupUtility.createEntityPath(graphBasePath, subEntity);
 
 			final Class<Entity> clazz = ModelSupport.entityTypes.get(EntityType.valueOf(subEntity));
-			final DataInfo dataInfo = getDataInfo(dedupConf);
+			final EntityDataInfo dataInfo = getDataInfo(dedupConf);
 			DedupRecordFactory
 				.createDedupRecord(spark, dataInfo, mergeRelPath, entityPath, clazz)
 				.write()
@@ -91,8 +88,8 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
 		}
 	}
 
-	private static DataInfo getDataInfo(DedupConfig dedupConf) {
-		DataInfo info = new DataInfo();
+	private static EntityDataInfo getDataInfo(DedupConfig dedupConf) {
+		EntityDataInfo info = new EntityDataInfo();
 		info.setDeletedbyinference(false);
 		info.setInferred(true);
 		info.setInvisible(false);
@@ -102,7 +99,6 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
 		provenance.setClassid(PROVENANCE_DEDUP);
 		provenance.setClassname(PROVENANCE_DEDUP);
 		provenance.setSchemeid(DNET_PROVENANCE_ACTIONS);
-		provenance.setSchemename(DNET_PROVENANCE_ACTIONS);
 		info.setProvenanceaction(provenance);
 		return info;
 	}

@@ -6,6 +6,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import eu.dnetlib.dhp.schema.oaf.common.EntityType;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -21,9 +23,7 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
-import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -218,10 +218,10 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 					return new OrgSimRel(
 						r._1()._1(),
 						o.getOriginalId().get(0),
-						Optional.ofNullable(o.getLegalname()).map(Field::getValue).orElse(""),
-						Optional.ofNullable(o.getLegalshortname()).map(Field::getValue).orElse(""),
+						Optional.ofNullable(o.getLegalname()).orElse(""),
+						Optional.ofNullable(o.getLegalshortname()).orElse(""),
 						Optional.ofNullable(o.getCountry()).map(Qualifier::getClassid).orElse(""),
-						Optional.ofNullable(o.getWebsiteurl()).map(Field::getValue).orElse(""),
+						Optional.ofNullable(o.getWebsiteurl()).orElse(""),
 						Optional
 							.ofNullable(o.getCollectedfrom())
 							.map(c -> Optional.ofNullable(c.get(0)).map(KeyValue::getValue).orElse(""))
@@ -309,10 +309,10 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 				(MapFunction<Tuple2<Tuple2<String, String>, Tuple2<String, Organization>>, OrgSimRel>) r -> new OrgSimRel(
 					r._1()._1(),
 					r._2()._2().getOriginalId().get(0),
-					r._2()._2().getLegalname() != null ? r._2()._2().getLegalname().getValue() : "",
-					r._2()._2().getLegalshortname() != null ? r._2()._2().getLegalshortname().getValue() : "",
+					r._2()._2().getLegalname() != null ? r._2()._2().getLegalname() : "",
+					r._2()._2().getLegalshortname() != null ? r._2()._2().getLegalshortname() : "",
 					r._2()._2().getCountry() != null ? r._2()._2().getCountry().getClassid() : "",
-					r._2()._2().getWebsiteurl() != null ? r._2()._2().getWebsiteurl().getValue() : "",
+					r._2()._2().getWebsiteurl() != null ? r._2()._2().getWebsiteurl() : "",
 					r._2()._2().getCollectedfrom().get(0).getValue(),
 					GROUP_PREFIX + r._1()._1(),
 					structuredPropertyListToString(r._2()._2().getPid()),

@@ -17,6 +17,49 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 public class MergeUtils {
 
+    public static Oaf merge(final Oaf left, final Oaf right) {
+        if (ModelSupport.isSubClass(left, Entity.class)) {
+            return mergeEntities((Entity) left, (Entity) right);
+        } else if (ModelSupport.isSubClass(left, Relation.class)) {
+            return MergeUtils.mergeRelation((Relation) left, (Relation) right);
+        } else {
+            throw new IllegalArgumentException("invalid Oaf type:" + left.getClass().getCanonicalName());
+        }
+    }
+
+    public static Entity mergeEntities(Entity original, Entity enrich) {
+        if (ModelSupport.isSubClass(original, Result.class)) {
+            return mergeResults((Result) original, (Result) enrich);
+        } else if (ModelSupport.isSubClass(original, Datasource.class)) {
+            //TODO
+            return original;
+        } else if (ModelSupport.isSubClass(original, Organization.class)) {
+            return mergeOrganization((Organization) original, (Organization) enrich);
+        } else if (ModelSupport.isSubClass(original, Project.class)) {
+            return mergeProject((Project) original, (Project) enrich);
+        } else {
+            throw new IllegalArgumentException("invalid Entity subtype:" + original.getClass().getCanonicalName());
+        }
+    }
+
+    public static Result mergeResults(Result original, Result enrich) {
+
+        final boolean leftFromDelegatedAuthority = isFromDelegatedAuthority(original);
+        final boolean rightFromDelegatedAuthority = isFromDelegatedAuthority(enrich);
+
+        if (leftFromDelegatedAuthority && !rightFromDelegatedAuthority) {
+            return original;
+        }
+        if (!leftFromDelegatedAuthority && rightFromDelegatedAuthority) {
+            return enrich;
+        }
+        if (new ResultTypeComparator().compare(original, enrich) < 0) {
+            return MergeUtils.mergeResult(original, enrich);
+        } else {
+            return MergeUtils.mergeResult(enrich, original);
+        }
+    }
+
     public static Result mergeResult(Result original, Result enrich) {
 
         final Result mergedResult = (Result) mergeEntity(original, enrich);
@@ -191,7 +234,7 @@ public class MergeUtils {
         return mergedPublication;
     }
 
-    public static Oaf mergeOrganization(Organization original, Organization enrich) {
+    public static Organization mergeOrganization(Organization original, Organization enrich) {
 
         final Organization mergedOrganization = (Organization) mergeEntity(original, enrich);
 
@@ -264,7 +307,7 @@ public class MergeUtils {
         return mergedOrganization;
     }
 
-    public static Oaf mergeOAFProject(Project original, Project enrich) {
+    public static Project mergeProject(Project original, Project enrich) {
 
         final Project mergedProject = (Project) mergeEntity(original, enrich);
 
@@ -364,7 +407,7 @@ public class MergeUtils {
         return mergedProject;
     }
 
-    private static Entity mergeEntity(Entity original, Entity enrich) {
+    public static Entity mergeEntity(Entity original, Entity enrich) {
 
         final Entity mergedEntity = original;
 
@@ -529,6 +572,18 @@ public class MergeUtils {
                         Pair::getRight,
                         (a, b) -> a
                 ));
+    }
+
+    private static boolean isFromDelegatedAuthority(Result r) {
+        return Optional
+                .ofNullable(r.getInstance())
+                .map(
+                        instance -> instance
+                                .stream()
+                                .filter(i -> Objects.nonNull(i.getCollectedfrom()))
+                                .map(i -> i.getCollectedfrom().getKey())
+                                .anyMatch(cfId -> IdentifierFactory.delegatedAuthorityDatasourceIds().contains(cfId)))
+                .orElse(false);
     }
 
     /**

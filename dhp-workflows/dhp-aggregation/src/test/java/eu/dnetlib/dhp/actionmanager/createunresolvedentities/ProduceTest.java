@@ -87,14 +87,8 @@ public class ProduceTest {
 			.forEach(
 				sbj -> Assertions
 					.assertEquals(ModelConstants.DNET_SUBJECT_TYPOLOGIES, sbj.getQualifier().getSchemeid()));
-		sbjs
-			.forEach(
-				sbj -> Assertions
-					.assertEquals(ModelConstants.DNET_SUBJECT_TYPOLOGIES, sbj.getQualifier().getSchemename()));
 
-		sbjs.forEach(sbj -> Assertions.assertEquals(false, sbj.getDataInfo().getDeletedbyinference()));
 		sbjs.forEach(sbj -> Assertions.assertEquals(true, sbj.getDataInfo().getInferred()));
-		sbjs.forEach(sbj -> Assertions.assertEquals(false, sbj.getDataInfo().getInvisible()));
 		sbjs.forEach(sbj -> Assertions.assertEquals("", sbj.getDataInfo().getTrust()));
 		sbjs.forEach(sbj -> Assertions.assertEquals("update", sbj.getDataInfo().getInferenceprovenance()));
 		sbjs
@@ -109,49 +103,6 @@ public class ProduceTest {
 				sbj -> Assertions
 					.assertEquals(
 						ModelConstants.DNET_PROVENANCE_ACTIONS, sbj.getDataInfo().getProvenanceaction().getSchemeid()));
-		sbjs
-			.forEach(
-				sbj -> Assertions
-					.assertEquals(
-						ModelConstants.DNET_PROVENANCE_ACTIONS,
-						sbj.getDataInfo().getProvenanceaction().getSchemename()));
-	}
-
-	@Test
-	void produceTestMeasuress() throws Exception {
-
-		JavaRDD<Result> tmp = getResultJavaRDD();
-
-		List<KeyValue> mes = tmp
-			.filter(row -> row.getInstance() != null && row.getInstance().size() > 0)
-			.flatMap(row -> row.getInstance().iterator())
-			.flatMap(i -> i.getMeasures().iterator())
-			.flatMap(m -> m.getUnit().iterator())
-			.collect();
-
-		mes.forEach(sbj -> Assertions.assertEquals(false, sbj.getDataInfo().getDeletedbyinference()));
-		mes.forEach(sbj -> Assertions.assertEquals(true, sbj.getDataInfo().getInferred()));
-		mes.forEach(sbj -> Assertions.assertEquals(false, sbj.getDataInfo().getInvisible()));
-		mes.forEach(sbj -> Assertions.assertEquals("", sbj.getDataInfo().getTrust()));
-		mes.forEach(sbj -> Assertions.assertEquals("update", sbj.getDataInfo().getInferenceprovenance()));
-		mes
-			.forEach(
-				sbj -> Assertions.assertEquals("measure:bip", sbj.getDataInfo().getProvenanceaction().getClassid()));
-		mes
-			.forEach(
-				sbj -> Assertions
-					.assertEquals("Inferred by OpenAIRE", sbj.getDataInfo().getProvenanceaction().getClassname()));
-		mes
-			.forEach(
-				sbj -> Assertions
-					.assertEquals(
-						ModelConstants.DNET_PROVENANCE_ACTIONS, sbj.getDataInfo().getProvenanceaction().getSchemeid()));
-		mes
-			.forEach(
-				sbj -> Assertions
-					.assertEquals(
-						ModelConstants.DNET_PROVENANCE_ACTIONS,
-						sbj.getDataInfo().getProvenanceaction().getSchemename()));
 	}
 
 	@Test
@@ -188,107 +139,6 @@ public class ProduceTest {
 		Assertions.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("0303 health sciences")));
 		Assertions
 			.assertEquals(true, sbjs.stream().anyMatch(sbj -> sbj.getValue().equals("030309 nutrition & dietetics")));
-
-	}
-
-	@Test
-	void produceTest3Measures() throws Exception {
-		final String doi = "unresolved::10.3390/s18072310::doi";
-		JavaRDD<Result> tmp = getResultJavaRDD();
-
-		tmp
-			.filter(row -> row.getId().equals(doi))
-			.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
-		Assertions
-			.assertEquals(
-				3, tmp
-					.filter(row -> row.getId().equals(doi))
-					.collect()
-					.get(0)
-					.getInstance()
-					.get(0)
-					.getMeasures()
-					.size());
-
-		List<Measure> measures = tmp
-			.filter(row -> row.getId().equals(doi))
-			.flatMap(row -> row.getInstance().iterator())
-			.flatMap(inst -> inst.getMeasures().iterator())
-			.collect();
-		Assertions
-			.assertEquals(
-				"7.5597134689e-09", measures
-					.stream()
-					.filter(mes -> mes.getId().equals("influence"))
-					.collect(Collectors.toList())
-					.get(0)
-					.getUnit()
-					.get(0)
-					.getValue());
-
-		Assertions
-			.assertEquals(
-				"4.903880192", measures
-					.stream()
-					.filter(mes -> mes.getId().equals("popularity_alt"))
-					.collect(Collectors.toList())
-					.get(0)
-					.getUnit()
-					.get(0)
-					.getValue());
-
-		Assertions
-			.assertEquals(
-				"1.17977512835e-08", measures
-					.stream()
-					.filter(mes -> mes.getId().equals("popularity"))
-					.collect(Collectors.toList())
-					.get(0)
-					.getUnit()
-					.get(0)
-					.getValue());
-
-		Assertions
-			.assertEquals(
-				"10.3390/s18072310",
-				tmp
-					.filter(row -> row.getId().equals(doi))
-					.collect()
-					.get(0)
-					.getInstance()
-					.get(0)
-					.getPid()
-					.get(0)
-					.getValue()
-					.toLowerCase());
-
-		Assertions
-			.assertEquals(
-				"doi",
-				tmp
-					.filter(row -> row.getId().equals(doi))
-					.collect()
-					.get(0)
-					.getInstance()
-					.get(0)
-					.getPid()
-					.get(0)
-					.getQualifier()
-					.getClassid());
-
-		Assertions
-			.assertEquals(
-				"Digital Object Identifier",
-				tmp
-					.filter(row -> row.getId().equals(doi))
-					.collect()
-					.get(0)
-					.getInstance()
-					.get(0)
-					.getPid()
-					.get(0)
-					.getQualifier()
-					.getClassname());
 
 	}
 
@@ -553,14 +403,8 @@ public class ProduceTest {
 			.forEach(
 				sbj -> Assertions
 					.assertEquals(ModelConstants.DNET_SUBJECT_TYPOLOGIES, sbj.getQualifier().getSchemeid()));
-		sbjs_sdg
-			.forEach(
-				sbj -> Assertions
-					.assertEquals(ModelConstants.DNET_SUBJECT_TYPOLOGIES, sbj.getQualifier().getSchemename()));
 
-		sbjs_sdg.forEach(sbj -> Assertions.assertEquals(false, sbj.getDataInfo().getDeletedbyinference()));
 		sbjs_sdg.forEach(sbj -> Assertions.assertEquals(true, sbj.getDataInfo().getInferred()));
-		sbjs_sdg.forEach(sbj -> Assertions.assertEquals(false, sbj.getDataInfo().getInvisible()));
 		sbjs_sdg.forEach(sbj -> Assertions.assertEquals("", sbj.getDataInfo().getTrust()));
 		sbjs_sdg.forEach(sbj -> Assertions.assertEquals("update", sbj.getDataInfo().getInferenceprovenance()));
 		sbjs_sdg
@@ -575,12 +419,6 @@ public class ProduceTest {
 				sbj -> Assertions
 					.assertEquals(
 						ModelConstants.DNET_PROVENANCE_ACTIONS, sbj.getDataInfo().getProvenanceaction().getSchemeid()));
-		sbjs_sdg
-			.forEach(
-				sbj -> Assertions
-					.assertEquals(
-						ModelConstants.DNET_PROVENANCE_ACTIONS,
-						sbj.getDataInfo().getProvenanceaction().getSchemename()));
 	}
 
 }

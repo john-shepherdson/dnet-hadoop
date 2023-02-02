@@ -522,7 +522,7 @@ public class SparkDedupTest implements Serializable {
 
 		assertEquals(crossref_duplicate.getJournal().getName(), root.getJournal().getName());
 		assertEquals(crossref_duplicate.getJournal().getIssnPrinted(), root.getJournal().getIssnPrinted());
-		assertEquals(crossref_duplicate.getPublisher().getValue(), root.getPublisher().getValue());
+		assertEquals(crossref_duplicate.getPublisher().getName(), root.getPublisher().getName());
 
 		Set<String> rootPids = root
 			.getPid()

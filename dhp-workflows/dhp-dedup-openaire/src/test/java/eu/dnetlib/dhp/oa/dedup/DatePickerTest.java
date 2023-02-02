@@ -20,7 +20,7 @@ class DatePickerTest {
 		dates.add("2016-06-16T12:00:00Z");
 		dates.add("2020-01-01T12:00:00Z");
 		dates.add("2020-10-01T12:00:00Z");
-		assertEquals("2020-10-01", DatePicker.pick(dates).getValue());
+		assertEquals("2020-10-01", DatePicker.pick(dates));
 	}
 
 	@Test
@@ -29,7 +29,7 @@ class DatePickerTest {
 		dates.add("2016-06-16");
 		dates.add("2020-01-01");
 		dates.add("2020-10-01");
-		assertEquals("2020-10-01", DatePicker.pick(dates).getValue());
+		assertEquals("2020-10-01", DatePicker.pick(dates));
 	}
 
 	@Test
@@ -38,7 +38,7 @@ class DatePickerTest {
 		dates.add("2016-02-01");
 		dates.add("2016-02-01");
 		dates.add("2020-10-01");
-		assertEquals("2016-02-01", DatePicker.pick(dates).getValue());
+		assertEquals("2016-02-01", DatePicker.pick(dates));
 	}
 
 }

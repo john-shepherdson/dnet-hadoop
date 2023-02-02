@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.actionmanager.promote;
 
-import static eu.dnetlib.dhp.schema.common.ModelSupport.isSubClass;
+import static eu.dnetlib.dhp.schema.oaf.common.ModelSupport.isSubClass;
 
 import java.util.Objects;
 import java.util.Optional;

@@ -195,10 +195,10 @@ public class SparkPublicationRootsTest2 implements Serializable {
 			.collectAsList()
 			.get(0);
 
-		assertEquals(crossref_duplicate.getDateofacceptance().getValue(), root.getDateofacceptance().getValue());
+		assertEquals(crossref_duplicate.getDateofacceptance(), root.getDateofacceptance());
 		assertEquals(crossref_duplicate.getJournal().getName(), root.getJournal().getName());
 		assertEquals(crossref_duplicate.getJournal().getIssnPrinted(), root.getJournal().getIssnPrinted());
-		assertEquals(crossref_duplicate.getPublisher().getValue(), root.getPublisher().getValue());
+		assertEquals(crossref_duplicate.getPublisher().getName(), root.getPublisher().getName());
 
 		Set<String> rootPids = root
 			.getPid()
@@ -238,7 +238,7 @@ public class SparkPublicationRootsTest2 implements Serializable {
 					.getResourceAsStream(path));
 	}
 
-	private static <T extends OafEntity> MapFunction<String, T> asEntity(Class<T> clazz) {
+	private static <T extends Entity> MapFunction<String, T> asEntity(Class<T> clazz) {
 		return value -> MAPPER.readValue(value, clazz);
 	}
 

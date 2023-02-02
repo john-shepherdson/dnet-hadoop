@@ -161,7 +161,6 @@ public class DedupUtility {
 		r.setTarget(target);
 		r.setSubRelType("dedupSimilarity");
 		r.setRelClass(ModelConstants.IS_SIMILAR_TO);
-		r.setDataInfo(new DataInfo());
 
 		switch (entity) {
 			case "result":
