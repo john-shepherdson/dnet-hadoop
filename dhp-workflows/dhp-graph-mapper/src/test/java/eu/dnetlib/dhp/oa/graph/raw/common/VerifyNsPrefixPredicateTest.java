@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
@@ -39,22 +38,17 @@ class VerifyNsPrefixPredicateTest {
 
 	@Test
 	void testTest_ds_true() {
-		final Field<String> prefix = new Field<>();
-		prefix.setValue("xxxxxx______");
 
 		final Datasource ds = new Datasource();
-		ds.setNamespaceprefix(prefix);
+		ds.setNamespaceprefix("xxxxxx______");
 
 		assertTrue(predicate.test(ds));
 	}
 
 	@Test
 	void testTest_ds_false() {
-		final Field<String> prefix = new Field<>();
-		prefix.setValue("corda__2020");
-
 		final Datasource ds = new Datasource();
-		ds.setNamespaceprefix(prefix);
+		ds.setNamespaceprefix("corda__2020");
 
 		assertFalse(predicate.test(ds));
 	}

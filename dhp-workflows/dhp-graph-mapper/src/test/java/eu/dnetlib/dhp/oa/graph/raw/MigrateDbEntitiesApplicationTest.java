@@ -51,8 +51,7 @@ class MigrateDbEntitiesApplicationTest {
 			.thenAnswer(
 				invocation -> OafMapperUtils
 					.qualifier(
-						invocation.getArgument(1), invocation.getArgument(1), invocation.getArgument(0),
-						invocation.getArgument(0)));
+						invocation.getArgument(1), invocation.getArgument(1), invocation.getArgument(0)));
 
 		lenient().when(vocs.termExists(anyString(), anyString())).thenReturn(true);
 
@@ -80,12 +79,12 @@ class MigrateDbEntitiesApplicationTest {
 		assertEquals("re3data", ds.getPid().get(0).getQualifier().getClassid());
 		assertEquals("dnet:pid_types", ds.getPid().get(0).getQualifier().getSchemeid());
 
-		assertEquals(getValueAsString("officialname", fields), ds.getOfficialname().getValue());
-		assertEquals(getValueAsString("englishname", fields), ds.getEnglishname().getValue());
-		assertEquals(getValueAsString("websiteurl", fields), ds.getWebsiteurl().getValue());
+		assertEquals(getValueAsString("officialname", fields), ds.getOfficialname());
+		assertEquals(getValueAsString("englishname", fields), ds.getEnglishname());
+		assertEquals(getValueAsString("websiteurl", fields), ds.getWebsiteurl());
 		assertEquals(getValueAsString("logourl", fields), ds.getLogourl());
-		assertEquals(getValueAsString("contactemail", fields), ds.getContactemail().getValue());
-		assertEquals(getValueAsString("namespaceprefix", fields), ds.getNamespaceprefix().getValue());
+		assertEquals(getValueAsString("contactemail", fields), ds.getContactemail());
+		assertEquals(getValueAsString("namespaceprefix", fields), ds.getNamespaceprefix());
 		assertEquals(getValueAsString("officialname", fields), ds.getJournal().getName());
 		assertEquals(getValueAsString("issnPrinted", fields), ds.getJournal().getIssnPrinted());
 		assertEquals(getValueAsString("issnOnline", fields), ds.getJournal().getIssnOnline());
@@ -100,37 +99,34 @@ class MigrateDbEntitiesApplicationTest {
 		assertEquals("Data Source", ds.getEosctype().getClassid());
 		assertEquals("Data Source", ds.getEosctype().getClassname());
 		assertEquals("dnet:eosc_types", ds.getEosctype().getSchemeid());
-		assertEquals("dnet:eosc_types", ds.getEosctype().getSchemename());
 
 		assertEquals("Journal archive", ds.getEoscdatasourcetype().getClassid());
 		assertEquals("Journal archive", ds.getEoscdatasourcetype().getClassname());
 		assertEquals("dnet:eosc_datasource_types", ds.getEoscdatasourcetype().getSchemeid());
-		assertEquals("dnet:eosc_datasource_types", ds.getEoscdatasourcetype().getSchemename());
 
 		assertEquals("openaire4.0", ds.getOpenairecompatibility().getClassid());
 		assertEquals("openaire4.0", ds.getOpenairecompatibility().getClassname());
 		assertEquals("dnet:datasourceCompatibilityLevel", ds.getOpenairecompatibility().getSchemeid());
-		assertEquals("dnet:datasourceCompatibilityLevel", ds.getOpenairecompatibility().getSchemename());
 
-		assertEquals(getValueAsDouble("latitude", fields).toString(), ds.getLatitude().getValue());
-		assertEquals(getValueAsDouble("longitude", fields).toString(), ds.getLongitude().getValue());
+		assertEquals(getValueAsDouble("latitude", fields).toString(), ds.getLatitude());
+		assertEquals(getValueAsDouble("longitude", fields).toString(), ds.getLongitude());
 		assertEquals(getValueAsString("dateofvalidation", fields), ds.getDateofvalidation());
 
-		assertEquals(getValueAsString("description", fields), ds.getDescription().getValue());
+		assertEquals(getValueAsString("description", fields), ds.getDescription());
 
 		// TODO assertEquals(getValueAsString("subjects", fields), ds.getSubjects());
 
-		assertEquals("0.0", ds.getOdnumberofitems().getValue());
+		assertEquals("0.0", ds.getOdnumberofitems());
 		assertEquals(getValueAsString("odnumberofitemsdate", fields), ds.getOdnumberofitemsdate());
 		assertEquals(getValueAsString("odpolicies", fields), ds.getOdpolicies());
 
 		assertEquals(
 			getValueAsList("odlanguages", fields),
-			ds.getOdlanguages().stream().map(Field::getValue).collect(Collectors.toList()));
+			ds.getOdlanguages().stream().collect(Collectors.toList()));
 		assertEquals(getValueAsList("languages", fields), ds.getLanguages());
 		assertEquals(
 			getValueAsList("accessinfopackage", fields),
-			ds.getAccessinfopackage().stream().map(Field::getValue).collect(Collectors.toList()));
+			ds.getAccessinfopackage().stream().collect(Collectors.toList()));
 		assertEquals(getValueAsString("releasestartdate", fields), ds.getReleasestartdate());
 		assertEquals(getValueAsString("releaseenddate", fields), ds.getReleasestartdate());
 		assertEquals(getValueAsString("missionstatementurl", fields), ds.getMissionstatementurl());
@@ -143,7 +139,7 @@ class MigrateDbEntitiesApplicationTest {
 		assertEquals(getValueAsString("databaseaccessrestriction", fields), ds.getDatabaseaccessrestriction());
 		assertEquals(getValueAsString("datauploadrestriction", fields), ds.getDatauploadrestriction());
 
-		assertEquals(false, ds.getVersioning().getValue());
+		assertEquals(false, ds.getVersioning());
 		assertEquals(false, ds.getVersioncontrol());
 
 		assertEquals(getValueAsString("citationguidelineurl", fields), ds.getCitationguidelineurl());
@@ -164,13 +160,6 @@ class MigrateDbEntitiesApplicationTest {
 			.collect(Collectors.toCollection(HashSet::new));
 		assertEquals(1, cpSchemeId.size());
 		assertTrue(cpSchemeId.contains("eosc:contentpolicies"));
-		HashSet<String> cpSchemeName = ds
-			.getContentpolicies()
-			.stream()
-			.map(Qualifier::getSchemename)
-			.collect(Collectors.toCollection(HashSet::new));
-		assertEquals(1, cpSchemeName.size());
-		assertTrue(cpSchemeName.contains("eosc:contentpolicies"));
 		assertEquals(2, ds.getContentpolicies().size());
 		assertEquals("Taxonomic classification", ds.getContentpolicies().get(0).getClassid());
 		assertEquals("Resource collection", ds.getContentpolicies().get(1).getClassid());
@@ -202,8 +191,8 @@ class MigrateDbEntitiesApplicationTest {
 		final Project p = (Project) list.get(0);
 		assertValidId(p.getId());
 		assertValidId(p.getCollectedfrom().get(0).getKey());
-		assertEquals(getValueAsString("acronym", fields), p.getAcronym().getValue());
-		assertEquals(getValueAsString("title", fields), p.getTitle().getValue());
+		assertEquals(getValueAsString("acronym", fields), p.getAcronym());
+		assertEquals(getValueAsString("title", fields), p.getTitle());
 		assertEquals(getValueAsString("collectedfromname", fields), p.getCollectedfrom().get(0).getValue());
 		assertEquals(getValueAsFloat("fundedamount", fields), p.getFundedamount());
 		assertEquals(getValueAsFloat("totalcost", fields), p.getTotalcost());
@@ -222,13 +211,12 @@ class MigrateDbEntitiesApplicationTest {
 		final Organization o = (Organization) list.get(0);
 		assertValidId(o.getId());
 		assertValidId(o.getCollectedfrom().get(0).getKey());
-		assertEquals(getValueAsString("legalshortname", fields), o.getLegalshortname().getValue());
-		assertEquals(getValueAsString("legalname", fields), o.getLegalname().getValue());
-		assertEquals(getValueAsString("websiteurl", fields), o.getWebsiteurl().getValue());
+		assertEquals(getValueAsString("legalshortname", fields), o.getLegalshortname());
+		assertEquals(getValueAsString("legalname", fields), o.getLegalname());
+		assertEquals(getValueAsString("websiteurl", fields), o.getWebsiteurl());
 		assertEquals(getValueAsString("country", fields).split("@@@")[0], o.getCountry().getClassid());
 		assertEquals(getValueAsString("country", fields).split("@@@")[0], o.getCountry().getClassname());
 		assertEquals(getValueAsString("country", fields).split("@@@")[1], o.getCountry().getSchemeid());
-		assertEquals(getValueAsString("country", fields).split("@@@")[1], o.getCountry().getSchemename());
 		assertEquals(getValueAsString("collectedfromname", fields), o.getCollectedfrom().get(0).getValue());
 		final List<String> alternativenames = getValueAsList("alternativenames", fields);
 		assertEquals(2, alternativenames.size());
@@ -280,8 +268,12 @@ class MigrateDbEntitiesApplicationTest {
 		assertValidId(r2.getSource());
 		assertEquals(r1.getSource(), r2.getTarget());
 		assertEquals(r2.getSource(), r1.getTarget());
-		assertValidId(r1.getCollectedfrom().get(0).getKey());
-		assertValidId(r2.getCollectedfrom().get(0).getKey());
+		assertNotNull(r1.getProvenance());
+		assertFalse(r1.getProvenance().isEmpty());
+		assertValidId(r1.getProvenance().get(0).getCollectedfrom().getKey());
+		assertNotNull(r2.getProvenance());
+		assertFalse(r2.getProvenance().isEmpty());
+		assertValidId(r2.getProvenance().get(0).getCollectedfrom().getKey());
 
 		assertEquals(ModelConstants.PROJECT_ORGANIZATION, r1.getRelType());
 		assertEquals(ModelConstants.PROJECT_ORGANIZATION, r2.getRelType());
@@ -350,10 +342,17 @@ class MigrateDbEntitiesApplicationTest {
 		assertValidId(r1.getTarget());
 		assertValidId(r2.getSource());
 		assertValidId(r2.getTarget());
-		assertNotNull(r1.getDataInfo());
-		assertNotNull(r2.getDataInfo());
-		assertNotNull(r1.getDataInfo().getTrust());
-		assertNotNull(r2.getDataInfo().getTrust());
+
+		assertNotNull(r1.getProvenance());
+		assertFalse(r1.getProvenance().isEmpty());
+		assertNotNull(r1.getProvenance().get(0).getDataInfo());
+		assertNotNull(r1.getProvenance().get(0).getDataInfo().getTrust());
+
+		assertNotNull(r2.getProvenance());
+		assertFalse(r2.getProvenance().isEmpty());
+		assertNotNull(r2.getProvenance().get(0).getDataInfo());
+		assertNotNull(r2.getProvenance().get(0).getDataInfo().getTrust());
+
 		assertEquals(r1.getSource(), r2.getTarget());
 		assertEquals(r2.getSource(), r1.getTarget());
 		assertTrue(StringUtils.isNotBlank(r1.getRelClass()));
@@ -361,8 +360,8 @@ class MigrateDbEntitiesApplicationTest {
 		assertTrue(StringUtils.isNotBlank(r1.getRelType()));
 		assertTrue(StringUtils.isNotBlank(r2.getRelType()));
 
-		assertValidId(r1.getCollectedfrom().get(0).getKey());
-		assertValidId(r2.getCollectedfrom().get(0).getKey());
+		assertValidId(r1.getProvenance().get(0).getCollectedfrom().getKey());
+		assertValidId(r2.getProvenance().get(0).getCollectedfrom().getKey());
 	}
 
 	private List<TypedField> prepareMocks(final String jsonFile) throws IOException, SQLException {

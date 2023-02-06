@@ -25,7 +25,6 @@
     <modules>
         <module>dhp-workflow-profiles</module>
         <module>dhp-aggregation</module>
-        <module>dhp-distcp</module>
         <module>dhp-actionmanager</module>
         <module>dhp-graph-mapper</module>
         <module>dhp-dedup-openaire</module>

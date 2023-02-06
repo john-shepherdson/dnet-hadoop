@@ -26,7 +26,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -92,7 +91,6 @@ class MappersTest {
 		assertEquals(ModelConstants.ORCID_PENDING, pid.getQualifier().getClassid());
 		assertEquals(ModelConstants.ORCID_CLASSNAME, pid.getQualifier().getClassname());
 		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemeid());
-		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemename());
 		assertEquals("Votsi,Nefta", author.get().getFullname());
 		assertEquals("Votsi", author.get().getSurname());
 		assertEquals("Nefta", author.get().getName());
@@ -124,7 +122,7 @@ class MappersTest {
 
 		assertNotNull(p.getFulltext());
 		assertEquals(1, p.getFulltext().size());
-		assertEquals("https://oneecosystem.pensoft.net/article/13718/", p.getFulltext().get(0).getValue());
+		assertEquals("https://oneecosystem.pensoft.net/article/13718/", p.getFulltext().get(0));
 
 		// RESULT PROJECT
 		List<Relation> resultProject = list
@@ -171,9 +169,11 @@ class MappersTest {
 	private void verifyRelation(Relation r) {
 		assertValidId(r.getSource());
 		assertValidId(r.getTarget());
-		assertValidId(r.getCollectedfrom().get(0).getKey());
-		assertNotNull(r.getDataInfo());
-		assertNotNull(r.getDataInfo().getTrust());
+		for(Provenance p : r.getProvenance()) {
+			assertValidId(p.getCollectedfrom().getKey());
+			assertNotNull(p.getDataInfo());
+			assertNotNull(p.getDataInfo().getTrust());
+		}
 		assertTrue(StringUtils.isNotBlank(r.getRelClass()));
 		assertTrue(StringUtils.isNotBlank(r.getRelType()));
 
@@ -221,7 +221,6 @@ class MappersTest {
 		assertEquals(ModelConstants.ORCID_PENDING, pid.getQualifier().getClassid());
 		assertEquals(ModelConstants.ORCID_CLASSNAME, pid.getQualifier().getClassname());
 		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemeid());
-		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemename());
 		assertEquals("Votsi,Nefta", author.get().getFullname());
 		assertEquals("Votsi", author.get().getSurname());
 		assertEquals("Nefta", author.get().getName());
@@ -326,7 +325,7 @@ class MappersTest {
 			.filter(a -> a.getPid() != null && !a.getPid().isEmpty())
 			.findFirst();
 		assertTrue(author.isPresent());
-		final Optional<StructuredProperty> oPid = author
+		final Optional<AuthorPid> oPid = author
 			.get()
 			.getPid()
 			.stream()
@@ -337,20 +336,9 @@ class MappersTest {
 		assertEquals(ModelConstants.ORCID_PENDING, pid.getQualifier().getClassid());
 		assertEquals(ModelConstants.ORCID_CLASSNAME, pid.getQualifier().getClassname());
 		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemeid());
-		assertEquals(ModelConstants.DNET_PID_TYPES, pid.getQualifier().getSchemename());
 		assertEquals("Baracchini, Theo", author.get().getFullname());
 		assertEquals("Baracchini", author.get().getSurname());
 		assertEquals("Theo", author.get().getName());
-
-		assertEquals(1, author.get().getAffiliation().size());
-		final Optional<Field<String>> opAff = author
-			.get()
-			.getAffiliation()
-			.stream()
-			.findFirst();
-		assertTrue(opAff.isPresent());
-		final Field<String> affiliation = opAff.get();
-		assertEquals("ISTI-CNR", affiliation.getValue());
 
 		assertTrue(d.getSubject().size() > 0);
 		assertTrue(d.getInstance().size() > 0);
@@ -378,10 +366,13 @@ class MappersTest {
 		assertValidId(r1.getTarget());
 		assertValidId(r2.getSource());
 		assertValidId(r2.getTarget());
-		assertNotNull(r1.getDataInfo());
-		assertNotNull(r2.getDataInfo());
-		assertNotNull(r1.getDataInfo().getTrust());
-		assertNotNull(r2.getDataInfo().getTrust());
+
+		assertNotNull(r1.getProvenance());
+		assertFalse(r1.getProvenance().isEmpty());
+		assertNotNull(r1.getProvenance().get(0).getDataInfo());
+		assertNotNull(r2.getProvenance().get(0).getDataInfo());
+		assertNotNull(r1.getProvenance().get(0).getDataInfo().getTrust());
+		assertNotNull(r2.getProvenance().get(0).getDataInfo().getTrust());
 		assertEquals(r1.getSource(), r2.getTarget());
 		assertEquals(r2.getSource(), r1.getTarget());
 		assertTrue(StringUtils.isNotBlank(r1.getRelClass()));
@@ -491,7 +482,6 @@ class MappersTest {
 		assertEquals("sysimport:crosswalk:datasetarchive", d.getDataInfo().getProvenanceaction().getClassid());
 		assertEquals("sysimport:crosswalk:datasetarchive", d.getDataInfo().getProvenanceaction().getClassname());
 		assertEquals(ModelConstants.DNET_PROVENANCE_ACTIONS, d.getDataInfo().getProvenanceaction().getSchemeid());
-		assertEquals(ModelConstants.DNET_PROVENANCE_ACTIONS, d.getDataInfo().getProvenanceaction().getSchemename());
 
 		assertValidId(d.getId());
 		assertEquals(2, d.getOriginalId().size());
@@ -510,7 +500,7 @@ class MappersTest {
 
 		assertNotNull(d.getDescription());
 		assertEquals(1, d.getDescription().size());
-		assertTrue(StringUtils.isNotBlank(d.getDescription().get(0).getValue()));
+		assertTrue(StringUtils.isNotBlank(d.getDescription().get(0)));
 
 		assertEquals(1, d.getAuthor().size());
 		assertEquals("Jensen, Kristian K", d.getAuthor().get(0).getFullname());
@@ -524,7 +514,7 @@ class MappersTest {
 		assertEquals(0, d.getPid().size());
 
 		assertNotNull(d.getPublisher());
-		assertEquals("nct", d.getPublisher().getValue());
+		assertEquals("nct", d.getPublisher().getName());
 
 		assertTrue(d.getSubject().isEmpty());
 		assertTrue(d.getContext().isEmpty());
@@ -536,7 +526,7 @@ class MappersTest {
 
 		assertNotNull(i.getAccessright());
 		assertEquals(ModelConstants.DNET_ACCESS_MODES, i.getAccessright().getSchemeid());
-		assertEquals(ModelConstants.DNET_ACCESS_MODES, i.getAccessright().getSchemename());
+		assertEquals(ModelConstants.DNET_ACCESS_MODES, i.getAccessright());
 		assertEquals("OPEN", i.getAccessright().getClassid());
 		assertEquals("Open Access", i.getAccessright().getClassname());
 
@@ -552,11 +542,10 @@ class MappersTest {
 		assertEquals("0037", i.getInstancetype().getClassid());
 		assertEquals("Clinical Trial", i.getInstancetype().getClassname());
 		assertEquals(ModelConstants.DNET_PUBLICATION_RESOURCE, i.getInstancetype().getSchemeid());
-		assertEquals(ModelConstants.DNET_PUBLICATION_RESOURCE, i.getInstancetype().getSchemename());
 
 		assertNull(i.getLicense());
 		assertNotNull(i.getDateofacceptance());
-		assertEquals("2014-11-11", i.getDateofacceptance().getValue());
+		assertEquals("2014-11-11", i.getDateofacceptance());
 
 		assertNull(i.getDistributionlocation());
 		assertNull(i.getProcessingchargeamount());
@@ -571,7 +560,7 @@ class MappersTest {
 		assertEquals("nct", i.getAlternateIdentifier().get(0).getQualifier().getClassid());
 		assertEquals("ClinicalTrials.gov Identifier", i.getAlternateIdentifier().get(0).getQualifier().getClassname());
 		assertEquals(ModelConstants.DNET_PID_TYPES, i.getAlternateIdentifier().get(0).getQualifier().getSchemeid());
-		assertEquals(ModelConstants.DNET_PID_TYPES, i.getAlternateIdentifier().get(0).getQualifier().getSchemename());
+		assertEquals(ModelConstants.DNET_PID_TYPES, i.getAlternateIdentifier().get(0).getQualifier());
 
 		assertNotNull(i.getUrl());
 		assertEquals(2, i.getUrl().size());
@@ -738,13 +727,13 @@ class MappersTest {
 		assertTrue(PidType.isValid(p.getPid().get(0).getQualifier().getClassid()));
 		assertEquals(PidType.handle, PidType.valueOf(p.getPid().get(0).getQualifier().getClassid()));
 		assertEquals("hdl:11858/00-1734-0000-0003-EE73-2", p.getPid().get(0).getValue());
-		assertEquals("dataset", p.getResulttype().getClassname());
+		assertEquals("dataset", p.getResulttype());
 		assertEquals(1, p.getInstance().size());
 		assertEquals("OPEN", p.getInstance().get(0).getAccessright().getClassid());
 		assertValidId(p.getInstance().get(0).getCollectedfrom().getKey());
 		assertValidId(p.getInstance().get(0).getHostedby().getKey());
 		assertEquals(
-			"http://creativecommons.org/licenses/by/3.0/de/legalcode", p.getInstance().get(0).getLicense().getValue());
+			"http://creativecommons.org/licenses/by/3.0/de/legalcode", p.getInstance().get(0).getLicense().getUrl());
 
 		assertEquals(1, p.getInstance().size());
 		assertNotNull(p.getInstance().get(0).getAlternateIdentifier());
@@ -938,8 +927,8 @@ class MappersTest {
 		assertTrue(p.getProcessingchargeamount() != null);
 		assertTrue(p.getProcessingchargecurrency() != null);
 
-		assertEquals("1721.47", p.getProcessingchargeamount().getValue());
-		assertEquals("EUR", p.getProcessingchargecurrency().getValue());
+		assertEquals("1721.47", p.getProcessingchargeamount());
+		assertEquals("EUR", p.getProcessingchargecurrency());
 	}
 
 	@Test

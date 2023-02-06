@@ -4,11 +4,10 @@ package eu.dnetlib.dhp.blacklist;
 import java.util.Arrays;
 import java.util.List;
 
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.common.RelationInverse;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.common.RelationInverse;
 
 public class BlacklistRelationTest {
 

@@ -10,6 +10,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.schema.oaf.*;
+import org.apache.commons.lang3.StringUtils;
 import scala.Tuple2;
 
 public class XmlSerializationUtils {
@@ -49,7 +50,7 @@ public class XmlSerializationUtils {
 
 	public static String mapStructuredProperty(String name, StructuredProperty t) {
 		return asXmlElement(
-			name, t.getValue(), t.getQualifier(), t.getDataInfo());
+			name, t.getValue(), t.getQualifier());
 	}
 
 	public static String mapQualifier(String name, Qualifier q) {
@@ -66,7 +67,7 @@ public class XmlSerializationUtils {
 			.replaceAll(XML_10_PATTERN, "");
 	}
 
-	public static String parseDataInfo(final DataInfo dataInfo) {
+	public static String parseDataInfo(final EntityDataInfo dataInfo) {
 		return new StringBuilder()
 			.append("<datainfo>")
 			.append(asXmlElement("inferred", dataInfo.getInferred() + ""))
@@ -107,6 +108,12 @@ public class XmlSerializationUtils {
 	}
 
 	public static String asXmlElement(
+			final String name, final String value, final Qualifier q) {
+
+		return asXmlElement(name, value, q, null);
+	}
+
+	public static String asXmlElement(
 		final String name, final String value, final Qualifier q, final DataInfo info) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<");
@@ -125,7 +132,7 @@ public class XmlSerializationUtils {
 						info.getProvenanceaction() != null
 							? info.getProvenanceaction().getClassid()
 							: ""))
-				.append(attr("trust", info.getTrust()));
+				.append(attr("trust", Float.toString(info.getTrust())));
 		}
 		if (isBlank(value)) {
 			sb.append("/>");
@@ -142,14 +149,13 @@ public class XmlSerializationUtils {
 	}
 
 	public static String getAttributes(final Qualifier q) {
-		if (q == null || q.isBlank())
+		if (q == null || StringUtils.isBlank(q.getClassid()))
 			return "";
 
 		return new StringBuilder(" ")
 			.append(attr("classid", q.getClassid()))
 			.append(attr("classname", q.getClassname()))
 			.append(attr("schemeid", q.getSchemeid()))
-			.append(attr("schemename", q.getSchemename()))
 			.toString();
 	}
 

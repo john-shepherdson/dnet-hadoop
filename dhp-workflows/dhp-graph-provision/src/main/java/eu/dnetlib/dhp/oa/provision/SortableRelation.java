@@ -43,9 +43,7 @@ public class SortableRelation extends Relation implements Comparable<SortableRel
 		sr.setRelType(r.getRelType());
 		sr.setSubRelType(r.getSubRelType());
 		sr.setRelClass(r.getRelClass());
-		sr.setDataInfo(r.getDataInfo());
-		sr.setCollectedfrom(r.getCollectedfrom());
-		sr.setLastupdatetimestamp(r.getLastupdatetimestamp());
+		sr.setProvenance(r.getProvenance());
 		sr.setProperties(r.getProperties());
 		sr.setValidated(r.getValidated());
 		sr.setValidationDate(r.getValidationDate());

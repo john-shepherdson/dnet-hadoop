@@ -3,8 +3,8 @@ package eu.dnetlib.dhp.oa.graph.raw
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.common.HdfsSupport
-import eu.dnetlib.dhp.schema.common.ModelSupport
 import eu.dnetlib.dhp.schema.oaf.Oaf
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}

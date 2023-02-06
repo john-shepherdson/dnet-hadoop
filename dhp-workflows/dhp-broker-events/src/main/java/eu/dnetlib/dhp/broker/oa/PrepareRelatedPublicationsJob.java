@@ -69,7 +69,6 @@ public class PrepareRelatedPublicationsJob {
 
 			final Dataset<Relation> rels = ClusterUtils
 				.loadRelations(graphPath, spark)
-				.filter((FilterFunction<Relation>) r -> r.getDataInfo().getDeletedbyinference())
 				.filter((FilterFunction<Relation>) r -> r.getRelType().equals(ModelConstants.RESULT_RESULT))
 				.filter((FilterFunction<Relation>) r -> ClusterUtils.isValidResultResultClass(r.getRelClass()))
 				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getSource()))

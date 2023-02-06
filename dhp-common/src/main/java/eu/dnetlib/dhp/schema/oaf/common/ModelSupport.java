@@ -320,7 +320,7 @@ public class ModelSupport {
 		return String.format("%s.%s", dbName, tableName);
 	}
 
-	public static <T extends Entity> String tableIdentifier(String dbName, Class<T> clazz) {
+	public static <T extends Oaf> String tableIdentifier(String dbName, Class<T> clazz) {
 
 		checkArgument(Objects.nonNull(clazz), "clazz is needed to derive the table name, thus cannot be null");
 

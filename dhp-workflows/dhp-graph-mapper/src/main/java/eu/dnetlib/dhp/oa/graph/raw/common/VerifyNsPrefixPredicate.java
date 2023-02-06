@@ -12,7 +12,7 @@ import com.google.common.base.Splitter;
 
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.Entity;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
 /**
@@ -38,9 +38,9 @@ public class VerifyNsPrefixPredicate implements Predicate<Oaf> {
 	@Override
 	public boolean test(final Oaf oaf) {
 		if (oaf instanceof Datasource) {
-			return testValue(((Datasource) oaf).getNamespaceprefix().getValue());
-		} else if (oaf instanceof OafEntity) {
-			return testValue(((OafEntity) oaf).getId());
+			return testValue(((Datasource) oaf).getNamespaceprefix());
+		} else if (oaf instanceof Entity) {
+			return testValue(((Entity) oaf).getId());
 		} else if (oaf instanceof Relation) {
 			return testValue(((Relation) oaf).getSource()) && testValue(((Relation) oaf).getTarget());
 		} else {

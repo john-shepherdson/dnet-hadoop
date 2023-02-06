@@ -19,13 +19,11 @@ public class XmlInstance implements Serializable {
 		UNKNOWN_ACCESS_RIGHT.setClassid(ModelConstants.UNKNOWN);
 		UNKNOWN_ACCESS_RIGHT.setClassname(ModelConstants.UNKNOWN);
 		UNKNOWN_ACCESS_RIGHT.setSchemeid(ModelConstants.DNET_ACCESS_MODES);
-		UNKNOWN_ACCESS_RIGHT.setSchemename(ModelConstants.DNET_ACCESS_MODES);
 
 		UNKNOWN_REVIEW_LEVEL = new Qualifier();
 		UNKNOWN_REVIEW_LEVEL.setClassid("0000");
 		UNKNOWN_REVIEW_LEVEL.setClassname(ModelConstants.UNKNOWN);
 		UNKNOWN_ACCESS_RIGHT.setSchemeid(ModelConstants.DNET_REVIEW_LEVELS);
-		UNKNOWN_REVIEW_LEVEL.setSchemename(ModelConstants.DNET_REVIEW_LEVELS);
 	}
 
 	private String url;

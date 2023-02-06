@@ -74,7 +74,6 @@ public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Obje
 		final Country c = o;
 		if (StringUtils.isBlank(c.getSchemeid())) {
 			c.setSchemeid(ModelConstants.DNET_COUNTRY_TYPE);
-			c.setSchemename(ModelConstants.DNET_COUNTRY_TYPE);
 		}
 		cleanQualifier(vocabularies, c);
 	}

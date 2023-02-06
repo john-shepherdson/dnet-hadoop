@@ -3,11 +3,14 @@ package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.common.EntityType;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -26,15 +29,6 @@ import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
-import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
 import scala.Tuple2;
 
@@ -79,7 +73,7 @@ public class CreateRelatedEntitiesJob_phase1 {
 		log.info("graphTableClassName: {}", graphTableClassName);
 
 		@SuppressWarnings("unchecked")
-		final Class<? extends OafEntity> entityClazz = (Class<? extends OafEntity>) Class.forName(graphTableClassName);
+		final Class<? extends Entity> entityClazz = (Class<? extends Entity>) Class.forName(graphTableClassName);
 
 		final SparkConf conf = new SparkConf();
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
@@ -91,7 +85,7 @@ public class CreateRelatedEntitiesJob_phase1 {
 		});
 	}
 
-	private static <E extends OafEntity> void joinRelationEntity(
+	private static <E extends Entity> void joinRelationEntity(
 		final SparkSession spark,
 		final String inputRelationsPath,
 		final String inputEntityPath,
@@ -123,7 +117,7 @@ public class CreateRelatedEntitiesJob_phase1 {
 			.parquet(outputPath);
 	}
 
-	private static <E extends OafEntity> Dataset<E> readPathEntity(
+	private static <E extends Entity> Dataset<E> readPathEntity(
 		final SparkSession spark,
 		final String inputEntityPath,
 		final Class<E> entityClazz) {
@@ -137,7 +131,7 @@ public class CreateRelatedEntitiesJob_phase1 {
 				Encoders.bean(entityClazz));
 	}
 
-	public static <E extends OafEntity> RelatedEntity asRelatedEntity(final E entity, final Class<E> clazz) {
+	public static <E extends Entity> RelatedEntity asRelatedEntity(final E entity, final Class<E> clazz) {
 
 		final RelatedEntity re = new RelatedEntity();
 		re.setId(entity.getId());
@@ -162,8 +156,8 @@ public class CreateRelatedEntitiesJob_phase1 {
 					re.setTitle(title);
 				}
 
-				re.setDateofacceptance(getValue(result.getDateofacceptance()));
-				re.setPublisher(getValue(result.getPublisher()));
+				re.setDateofacceptance(result.getDateofacceptance());
+				re.setPublisher(Optional.ofNullable(result.getPublisher()).map(p -> p.getName()).orElse(null));
 				re.setResulttype(result.getResulttype());
 				if (Objects.nonNull(result.getInstance())) {
 					re
@@ -206,24 +200,23 @@ public class CreateRelatedEntitiesJob_phase1 {
 				re.setAcronym(getValue(p.getAcronym()));
 				re.setContracttype(p.getContracttype());
 
-				final List<Field<String>> f = p.getFundingtree();
+				final List<String> f = p.getFundingtree();
 				if (!f.isEmpty()) {
-					re.setFundingtree(f.stream().map(Field::getValue).collect(Collectors.toList()));
+					re.setFundingtree(f);
 				}
 				break;
 		}
 		return re;
 	}
 
-	private static String getValue(final Field<String> field) {
-		return getFieldValueWithDefault(field, "");
+	private static String getValue(final String s) {
+		return getFieldValueWithDefault(s, "");
 	}
 
-	private static <T> T getFieldValueWithDefault(final Field<T> f, final T defaultValue) {
+	private static <T> T getFieldValueWithDefault(final T f, final T defaultValue) {
 		return Optional
 			.ofNullable(f)
 			.filter(Objects::nonNull)
-			.map(Field::getValue)
 			.orElse(defaultValue);
 	}
 

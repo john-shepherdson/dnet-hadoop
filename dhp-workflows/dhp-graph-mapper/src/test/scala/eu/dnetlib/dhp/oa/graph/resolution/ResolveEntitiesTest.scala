@@ -1,8 +1,8 @@
 package eu.dnetlib.dhp.oa.graph.resolution
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import eu.dnetlib.dhp.schema.common.EntityType
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils
+import eu.dnetlib.dhp.schema.oaf.common.EntityType
+import eu.dnetlib.dhp.schema.oaf.utils.{MergeUtils, OafMapperUtils}
 import eu.dnetlib.dhp.schema.oaf.{Publication, Result, StructuredProperty}
 import org.apache.commons.io.FileUtils
 import org.apache.spark.SparkConf
@@ -61,7 +61,7 @@ class ResolveEntitiesTest extends Serializable {
           List(
             OafMapperUtils.subject(
               FAKE_SUBJECT,
-              OafMapperUtils.qualifier("fos", "fosCS", "fossSchema", "fossiFIgo"),
+              OafMapperUtils.qualifier("fos", "fosCS", "fossSchema"),
               null
             )
           ).asJava
@@ -70,8 +70,7 @@ class ResolveEntitiesTest extends Serializable {
           List(
             OafMapperUtils.structuredProperty(
               FAKE_TITLE,
-              OafMapperUtils.qualifier("fos", "fosCS", "fossSchema", "fossiFIgo"),
-              null
+              OafMapperUtils.qualifier("fos", "fosCS", "fossSchema")
             )
           ).asJava
         )
@@ -247,12 +246,12 @@ class ResolveEntitiesTest extends Serializable {
   @Test
   def testMerge(): Unit = {
 
-    val r = new Result
+    var r = new Result
     r.setSubject(
       List(
         OafMapperUtils.subject(
           FAKE_SUBJECT,
-          OafMapperUtils.qualifier("fos", "fosCS", "fossSchema", "fossiFIgo"),
+          OafMapperUtils.qualifier("fos", "fosCS", "fossSchema"),
           null
         )
       ).asJava
@@ -269,7 +268,7 @@ class ResolveEntitiesTest extends Serializable {
       classOf[Publication]
     )
 
-    r.mergeFrom(p)
+    r = MergeUtils.mergeResult(r, p);
 
     println(mapper.writeValueAsString(r))
 

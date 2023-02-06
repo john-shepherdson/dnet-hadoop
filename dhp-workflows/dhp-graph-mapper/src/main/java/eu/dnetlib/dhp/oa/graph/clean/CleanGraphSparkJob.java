@@ -22,7 +22,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.Entity;
 import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -61,7 +61,7 @@ public class CleanGraphSparkJob {
 		String graphTableClassName = parser.get("graphTableClassName");
 		log.info("graphTableClassName: {}", graphTableClassName);
 
-		Class<? extends OafEntity> entityClazz = (Class<? extends OafEntity>) Class.forName(graphTableClassName);
+		Class<? extends Entity> entityClazz = (Class<? extends Entity>) Class.forName(graphTableClassName);
 
 		final ISLookUpService isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl);
 		final VocabularyGroup vocs = VocabularyGroup.loadVocsFromIS(isLookupService);

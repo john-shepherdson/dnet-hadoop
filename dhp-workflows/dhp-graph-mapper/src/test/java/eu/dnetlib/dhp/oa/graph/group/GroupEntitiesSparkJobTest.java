@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -26,7 +27,6 @@ import com.google.common.collect.Lists;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.merge.DispatchEntitiesSparkJob;
 import eu.dnetlib.dhp.oa.merge.GroupEntitiesSparkJob;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.utils.DHPUtils;
@@ -130,13 +130,13 @@ public class GroupEntitiesSparkJobTest {
 		assertEquals(
 			2,
 			output
-				.map((MapFunction<Result, String>) r -> r.getResulttype().getClassid(), Encoders.STRING())
+				.map((MapFunction<Result, String>) r -> r.getResulttype(), Encoders.STRING())
 				.filter((FilterFunction<String>) s -> s.equals("publication"))
 				.count());
 		assertEquals(
 			1,
 			output
-				.map((MapFunction<Result, String>) r -> r.getResulttype().getClassid(), Encoders.STRING())
+				.map((MapFunction<Result, String>) r -> r.getResulttype(), Encoders.STRING())
 				.filter((FilterFunction<String>) s -> s.equals("dataset"))
 				.count());
 	}

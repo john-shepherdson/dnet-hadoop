@@ -132,7 +132,6 @@ public class PrepareRelationsJob {
 
 		JavaRDD<Relation> rels = readPathRelationRDD(spark, inputRelationsPath)
 			.filter(rel -> !(rel.getSource().startsWith("unresolved") || rel.getTarget().startsWith("unresolved")))
-			.filter(rel -> !rel.getDataInfo().getDeletedbyinference())
 			.filter(rel -> !relationFilter.contains(StringUtils.lowerCase(rel.getRelClass())));
 
 		JavaRDD<Relation> pruned = pruneRels(
@@ -171,7 +170,6 @@ public class PrepareRelationsJob {
 			.map(
 				(MapFunction<String, Relation>) s -> OBJECT_MAPPER.readValue(s, Relation.class),
 				Encoders.kryo(Relation.class))
-			.filter((FilterFunction<Relation>) rel -> !rel.getDataInfo().getDeletedbyinference())
 			.filter((FilterFunction<Relation>) rel -> !relationFilter.contains(rel.getRelClass()))
 			.groupByKey(
 				(MapFunction<Relation, String>) Relation::getSource,

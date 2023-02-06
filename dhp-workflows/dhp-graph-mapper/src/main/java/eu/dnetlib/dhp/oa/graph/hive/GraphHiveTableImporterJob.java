@@ -2,7 +2,7 @@
 package eu.dnetlib.dhp.oa.graph.hive;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
-import static eu.dnetlib.dhp.schema.common.ModelSupport.tableIdentifier;
+import static eu.dnetlib.dhp.schema.oaf.common.ModelSupport.tableIdentifier;
 
 import java.util.Optional;
 

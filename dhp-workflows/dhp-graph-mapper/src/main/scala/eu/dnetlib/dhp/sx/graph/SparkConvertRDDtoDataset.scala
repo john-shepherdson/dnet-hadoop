@@ -114,7 +114,6 @@ object SparkConvertRDDtoDataset {
     val rddRelation = spark.sparkContext
       .textFile(s"$sourcePath/relation")
       .map(s => mapper.readValue(s, classOf[Relation]))
-      .filter(r => r.getDataInfo != null && !r.getDataInfo.getDeletedbyinference)
       .filter(r => r.getSource.startsWith("50") && r.getTarget.startsWith("50"))
       .filter(r => filterRelations(r))
     //filter OpenCitations relations
@@ -142,13 +141,13 @@ object SparkConvertRDDtoDataset {
     if (relClassFilter.exists(k => k.equalsIgnoreCase(r.getRelClass)))
       false
     else {
-      if (r.getCollectedfrom == null || r.getCollectedfrom.size() == 0)
+      if (r.getProvenance == null || r.getProvenance.isEmpty)
         false
-      else if (r.getCollectedfrom.size() > 1)
+      else if (r.getProvenance.size() > 1)
         true
       else if (
-        r.getCollectedfrom.size() == 1 && r.getCollectedfrom.get(0) != null && "OpenCitations".equalsIgnoreCase(
-          r.getCollectedfrom.get(0).getValue
+        r.getProvenance.size() == 1 && r.getProvenance.get(0) != null && "OpenCitations".equalsIgnoreCase(
+          r.getProvenance.get(0).getCollectedfrom.getValue
         )
       )
         false

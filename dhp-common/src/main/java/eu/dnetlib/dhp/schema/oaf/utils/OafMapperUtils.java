@@ -416,6 +416,17 @@ public class OafMapperUtils {
 	}
 
 	public static Relation getRelation(final String source,
+									   final String target,
+									   final String relType,
+									   final String subRelType,
+									   final String relClass,
+									   final List<Provenance> provenance,
+									   final List<KeyValue> properties) {
+		return getRelation(
+				source, target, relType, subRelType, relClass, provenance, null, properties);
+	}
+
+	public static Relation getRelation(final String source,
 		final String target,
 		final String relType,
 		final String subRelType,

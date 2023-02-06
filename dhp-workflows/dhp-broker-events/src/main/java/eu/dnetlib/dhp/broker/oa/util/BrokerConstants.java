@@ -8,7 +8,7 @@ import java.util.Set;
 import eu.dnetlib.dhp.broker.model.Event;
 import eu.dnetlib.dhp.broker.oa.util.aggregators.simple.ResultGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 
 public class BrokerConstants {
 

@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -28,7 +29,6 @@ import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
 import scala.Tuple2;
@@ -78,7 +78,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 		String graphTableClassName = parser.get("graphTableClassName");
 		log.info("graphTableClassName: {}", graphTableClassName);
 
-		Class<? extends OafEntity> entityClazz = (Class<? extends OafEntity>) Class.forName(graphTableClassName);
+		Class<? extends Entity> entityClazz = (Class<? extends Entity>) Class.forName(graphTableClassName);
 
 		SparkConf conf = new SparkConf();
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
@@ -94,7 +94,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 			});
 	}
 
-	private static <E extends OafEntity> void joinEntityWithRelatedEntities(
+	private static <E extends Entity> void joinEntityWithRelatedEntities(
 		SparkSession spark,
 		String relatedEntitiesPath,
 		String entityPath,
@@ -177,7 +177,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 
 	}
 
-	private static <E extends OafEntity> Dataset<Tuple2<String, RelatedEntityWrapper>> readRelatedEntities(
+	private static <E extends Entity> Dataset<Tuple2<String, RelatedEntityWrapper>> readRelatedEntities(
 		SparkSession spark, String inputRelatedEntitiesPath, Class<E> entityClazz) {
 
 		log.info("Reading related entities from: {}", inputRelatedEntitiesPath);
@@ -200,7 +200,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 				Encoders.tuple(Encoders.STRING(), Encoders.kryo(RelatedEntityWrapper.class)));
 	}
 
-	private static <E extends OafEntity> Dataset<Tuple2<String, E>> readPathEntity(
+	private static <E extends Entity> Dataset<Tuple2<String, E>> readPathEntity(
 		SparkSession spark, String inputEntityPath, Class<E> entityClazz) {
 
 		log.info("Reading Graph table from: {}", inputEntityPath);
@@ -217,7 +217,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 				Encoders.tuple(Encoders.STRING(), Encoders.kryo(entityClazz)));
 	}
 
-	private static <E extends OafEntity> E pruneOutliers(Class<E> entityClazz, E e) {
+	private static <E extends Entity> E pruneOutliers(Class<E> entityClazz, E e) {
 		if (ModelSupport.isSubClass(entityClazz, Result.class)) {
 			Result r = (Result) e;
 			if (r.getExternalReference() != null) {
@@ -239,14 +239,11 @@ public class CreateRelatedEntitiesJob_phase2 {
 				r.setAuthor(authors);
 			}
 			if (r.getDescription() != null) {
-				List<Field<String>> desc = r
+				List<String> desc = r
 					.getDescription()
 					.stream()
 					.filter(Objects::nonNull)
-					.map(d -> {
-						d.setValue(StringUtils.left(d.getValue(), ModelHardLimits.MAX_ABSTRACT_LENGTH));
-						return d;
-					})
+					.map(d -> StringUtils.left(d, ModelHardLimits.MAX_ABSTRACT_LENGTH))
 					.collect(Collectors.toList());
 				r.setDescription(desc);
 			}

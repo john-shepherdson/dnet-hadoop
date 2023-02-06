@@ -117,7 +117,7 @@ object SparkProduceHostedByMap {
 
       return getHostedByItemType(
         dats.getId,
-        dats.getOfficialname.getValue,
+        dats.getOfficialname,
         dats.getJournal.getIssnPrinted,
         dats.getJournal.getIssnOnline,
         dats.getJournal.getIssnLinking,

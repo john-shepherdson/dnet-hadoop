@@ -5,9 +5,9 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.Entity;
 
-public class JoinedEntity<E extends OafEntity> implements Serializable {
+public class JoinedEntity<E extends Entity> implements Serializable {
 
 	private E entity;
 

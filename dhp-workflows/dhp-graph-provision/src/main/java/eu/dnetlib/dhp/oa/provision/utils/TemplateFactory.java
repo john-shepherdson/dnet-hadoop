@@ -1,25 +1,21 @@
 
 package eu.dnetlib.dhp.oa.provision.utils;
 
-import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.removePrefix;
-import static eu.dnetlib.dhp.oa.provision.utils.XmlSerializationUtils.escapeXml;
+import com.google.common.collect.Lists;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Entity;
+import org.apache.commons.lang3.StringUtils;
+import org.stringtemplate.v4.ST;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.swing.text.html.Option;
+import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.removePrefix;
+import static eu.dnetlib.dhp.oa.provision.utils.XmlSerializationUtils.escapeXml;
 
-import org.apache.commons.lang3.StringUtils;
-import org.stringtemplate.v4.ST;
-
-import com.google.common.collect.Lists;
-
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
 
 public class TemplateFactory {
 
@@ -62,7 +58,7 @@ public class TemplateFactory {
 	}
 
 	public String buildRecord(
-		final OafEntity entity, final String schemaLocation, final String body) {
+			final Entity entity, final String schemaLocation, final String body) {
 		return getTemplate(resources.getRecord())
 			.add("id", escapeXml(removePrefix(entity.getId())))
 			.add("dateofcollection", entity.getDateofcollection())

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.lenient;
 import java.io.IOException;
 import java.util.List;
 
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.DocumentException;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +21,6 @@ import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.oa.graph.clean.GraphCleaningFunctionsTest;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
@@ -72,9 +72,9 @@ class GenerateEntitiesApplicationTest {
 
 	protected <T extends Result> void verifyMerge(Result publication, Result dataset, Class<T> clazz,
 		String resultType) {
-		final Result merge = OafMapperUtils.mergeResults(publication, dataset);
+		final Result merge = MergeUtils.mergeResults(publication, dataset);
 		assertTrue(clazz.isAssignableFrom(merge.getClass()));
-		assertEquals(resultType, merge.getResulttype().getClassid());
+		assertEquals(resultType, merge.getResulttype());
 	}
 
 	protected <T extends Result> Result getResult(String xmlFileName, Class<T> clazz)

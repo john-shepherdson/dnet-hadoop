@@ -67,9 +67,9 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 					final String cleanedId = pid
 						.replaceAll("http://orcid.org/", "")
 						.replaceAll("https://orcid.org/", "");
-					author.getPid().add(structuredProperty(cleanedId, ORCID_PID_TYPE, info));
+					author.getPid().add(authorPid(cleanedId, ORCID_PID_TYPE, info));
 				} else if (type.startsWith("MAGID")) {
-					author.getPid().add(structuredProperty(pid, MAG_PID_TYPE, info));
+					author.getPid().add(authorPid(pid, MAG_PID_TYPE, info));
 				}
 			}
 
@@ -89,39 +89,36 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<StructuredProperty> prepareTitles(final Document doc, final DataInfo info) {
-		return prepareListStructProps(doc, "//dc:title", MAIN_TITLE_QUALIFIER, info);
+	protected List<StructuredProperty> prepareTitles(final Document doc) {
+		return prepareListStructProps(doc, "//dc:title", MAIN_TITLE_QUALIFIER);
 	}
 
 	@Override
-	protected List<Field<String>> prepareDescriptions(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//dc:description", info)
+	protected List<String> prepareDescriptions(final Document doc) {
+		return prepareListFields(doc, "//dc:description")
 			.stream()
-			.map(d -> {
-				d.setValue(StringUtils.left(d.getValue(), ModelHardLimits.MAX_ABSTRACT_LENGTH));
-				return d;
-			})
+			.map(d -> StringUtils.left(d, ModelHardLimits.MAX_ABSTRACT_LENGTH))
 			.collect(Collectors.toList());
 	}
 
 	@Override
-	protected Field<String> preparePublisher(final Document doc, final DataInfo info) {
-		return prepareField(doc, "//dc:publisher", info);
+	protected Publisher preparePublisher(final Document doc) {
+		return publisher(doc.valueOf("//dc:publisher"));
 	}
 
 	@Override
-	protected List<Field<String>> prepareFormats(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//dc:format", info);
+	protected List<String> prepareFormats(final Document doc) {
+		return prepareListFields(doc, "//dc:format");
 	}
 
 	@Override
-	protected List<Field<String>> prepareContributors(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//dc:contributor", info);
+	protected List<String> prepareContributors(final Document doc) {
+		return prepareListFields(doc, "//dc:contributor");
 	}
 
 	@Override
-	protected List<Field<String>> prepareCoverages(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//dc:coverage", info);
+	protected List<String> prepareCoverages(final Document doc) {
+		return prepareListFields(doc, "//dc:coverage");
 	}
 
 	@Override
@@ -147,16 +144,16 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 				alternateIdentifier.stream().filter(i -> !pids.contains(i)).collect(Collectors.toList()));
 		instance.setPid(pid);
 
-		instance.setDateofacceptance(field(doc.valueOf("//oaf:dateAccepted"), info));
+		instance.setDateofacceptance(doc.valueOf("//oaf:dateAccepted"));
 		instance.setDistributionlocation(doc.valueOf("//oaf:distributionlocation"));
 		instance
 			.setAccessright(prepareAccessRight(doc, "//oaf:accessrights", DNET_ACCESS_MODES));
-		instance.setLicense(field(doc.valueOf("//oaf:license"), info));
+		instance.setLicense(license(doc.valueOf("//oaf:license")));
 		instance.setRefereed(prepareQualifier(doc, "//oaf:refereed", DNET_REVIEW_LEVELS));
 		instance
-			.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
+			.setProcessingchargeamount(doc.valueOf("//oaf:processingchargeamount"));
 		instance
-			.setProcessingchargecurrency(field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
+			.setProcessingchargecurrency(doc.valueOf("//oaf:processingchargeamount/@currency"));
 
 		final List<Node> nodes = Lists.newArrayList(doc.selectNodes("//dc:identifier"));
 		final List<String> url = nodes
@@ -183,110 +180,90 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<Field<String>> prepareSources(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//dc:source", info);
+	protected List<String> prepareSources(final Document doc) {
+		return prepareListFields(doc, "//dc:source");
 	}
 
 	@Override
-	protected List<StructuredProperty> prepareRelevantDates(final Document doc, final DataInfo info) {
+	protected List<StructuredProperty> prepareRelevantDates(final Document doc) {
 		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	// SOFTWARES
 
 	@Override
-	protected Qualifier prepareSoftwareProgrammingLanguage(final Document doc, final DataInfo info) {
+	protected Qualifier prepareSoftwareProgrammingLanguage(final Document doc) {
 		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
-	protected Field<String> prepareSoftwareCodeRepositoryUrl(
-		final Document doc,
-		final DataInfo info) {
+	protected String prepareSoftwareCodeRepositoryUrl(
+		final Document doc) {
 		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
-	protected List<StructuredProperty> prepareSoftwareLicenses(
-		final Document doc,
-		final DataInfo info) {
-		return new ArrayList<>(); // NOT PRESENT IN OAF
-	}
-
-	@Override
-	protected List<Field<String>> prepareSoftwareDocumentationUrls(
-		final Document doc,
-		final DataInfo info) {
+	protected List<String> prepareSoftwareDocumentationUrls(final Document doc) {
 		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	// DATASETS
 	@Override
-	protected List<GeoLocation> prepareDatasetGeoLocations(final Document doc, final DataInfo info) {
+	protected List<GeoLocation> prepareDatasetGeoLocations(final Document doc) {
 		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	@Override
-	protected Field<String> prepareDatasetMetadataVersionNumber(
-		final Document doc,
-		final DataInfo info) {
+	protected String prepareDatasetMetadataVersionNumber(final Document doc) {
 		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
-	protected Field<String> prepareDatasetLastMetadataUpdate(
-		final Document doc,
-		final DataInfo info) {
+	protected String prepareDatasetLastMetadataUpdate(final Document doc) {
 		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
-	protected Field<String> prepareDatasetVersion(final Document doc, final DataInfo info) {
+	protected String prepareDatasetVersion(final Document doc) {
 		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
-	protected Field<String> prepareDatasetSize(final Document doc, final DataInfo info) {
+	protected String prepareDatasetSize(final Document doc) {
 		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
-	protected Field<String> prepareDatasetDevice(final Document doc, final DataInfo info) {
+	protected String prepareDatasetDevice(final Document doc) {
 		return null; // NOT PRESENT IN OAF
 	}
 
 	@Override
-	protected Field<String> prepareDatasetStorageDate(final Document doc, final DataInfo info) {
+	protected String prepareDatasetStorageDate(final Document doc) {
 		return null; // NOT PRESENT IN OAF
 	}
 
 	// OTHER PRODUCTS
 
 	@Override
-	protected List<Field<String>> prepareOtherResearchProductTools(
-		final Document doc,
-		final DataInfo info) {
+	protected List<String> prepareOtherResearchProductTools(final Document doc) {
 		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	@Override
-	protected List<Field<String>> prepareOtherResearchProductContactGroups(
-		final Document doc,
-		final DataInfo info) {
+	protected List<String> prepareOtherResearchProductContactGroups(final Document doc) {
 		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	@Override
-	protected List<Field<String>> prepareOtherResearchProductContactPersons(
-		final Document doc,
-		final DataInfo info) {
+	protected List<String> prepareOtherResearchProductContactPersons(final Document doc) {
 		return new ArrayList<>(); // NOT PRESENT IN OAF
 	}
 
 	@Override
 	protected List<Oaf> addOtherResultRels(
 		final Document doc,
-		final OafEntity entity) {
+		final Entity entity) {
 
 		final String docId = entity.getId();
 		final List<Oaf> res = new ArrayList<>();
@@ -313,7 +290,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected Qualifier prepareResourceType(final Document doc, final DataInfo info) {
+	protected Qualifier prepareResourceType(final Document doc) {
 		return null; // NOT PRESENT IN OAF
 	}
 

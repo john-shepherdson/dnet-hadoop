@@ -27,7 +27,6 @@ class ConversionUtilsTest {
 		qf.setClassid("test");
 		qf.setClassname("test");
 		qf.setSchemeid("test");
-		qf.setSchemename("test");
 
 		final StructuredProperty sp1 = new StructuredProperty();
 		sp1.setValue("1");

@@ -1,12 +1,7 @@
 
 package eu.dnetlib.dhp.broker.oa.util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -105,16 +100,16 @@ public class ConversionUtils {
 
 		res.setOpenaireId(cleanOpenaireId(result.getId()));
 		res.setOriginalId(first(result.getOriginalId()));
-		res.setTypology(classId(result.getResulttype()));
+		res.setTypology(result.getResulttype());
 		res.setTitles(structPropList(result.getTitle()));
-		res.setAbstracts(fieldList(result.getDescription()));
+		res.setAbstracts(result.getDescription());
 		res.setLanguage(classId(result.getLanguage()));
 		res.setSubjects(subjectList(result.getSubject()));
 		res.setCreators(mappedList(result.getAuthor(), ConversionUtils::oafAuthorToBrokerAuthor));
-		res.setPublicationdate(fieldValue(result.getDateofacceptance()));
-		res.setPublisher(fieldValue(result.getPublisher()));
-		res.setEmbargoenddate(fieldValue(result.getEmbargoenddate()));
-		res.setContributor(fieldList(result.getContributor()));
+		res.setPublicationdate(result.getDateofacceptance());
+		res.setPublisher(result.getPublisher().getName());
+		res.setEmbargoenddate(result.getEmbargoenddate());
+		res.setContributor(result.getContributor());
 		res
 			.setJournal(
 				result instanceof Publication ? oafJournalToBrokerJournal(((Publication) result).getJournal()) : null);
@@ -210,10 +205,9 @@ public class ConversionUtils {
 
 		final OaBrokerProject res = new OaBrokerProject();
 		res.setOpenaireId(cleanOpenaireId(p.getId()));
-		res.setTitle(fieldValue(p.getTitle()));
-		res.setAcronym(fieldValue(p.getAcronym()));
-		res.setCode(fieldValue(p.getCode()));
-
+		res.setTitle(p.getTitle());
+		res.setAcronym(p.getAcronym());
+		res.setCode(p.getCode());
 		final String ftree = fieldValue(p.getFundingtree());
 		if (StringUtils.isNotBlank(ftree)) {
 			try {
@@ -238,7 +232,7 @@ public class ConversionUtils {
 		res.setOpenaireId(cleanOpenaireId(sw.getId()));
 		res.setName(structPropValue(sw.getTitle()));
 		res.setDescription(fieldValue(sw.getDescription()));
-		res.setRepository(fieldValue(sw.getCodeRepositoryUrl()));
+		res.setRepository(sw.getCodeRepositoryUrl());
 		res.setLandingPage(fieldValue(sw.getDocumentationUrl()));
 
 		return res;
@@ -250,7 +244,7 @@ public class ConversionUtils {
 		}
 
 		final OaBrokerRelatedDatasource res = new OaBrokerRelatedDatasource();
-		res.setName(StringUtils.defaultIfBlank(fieldValue(ds.getOfficialname()), fieldValue(ds.getEnglishname())));
+		res.setName(StringUtils.defaultIfBlank(ds.getOfficialname(), ds.getEnglishname()));
 		res.setOpenaireId(cleanOpenaireId(ds.getId()));
 		res.setType(classId(ds.getDatasourcetype()));
 		return res;
@@ -264,13 +258,14 @@ public class ConversionUtils {
 		return kv != null ? kv.getValue() : null;
 	}
 
-	private static String fieldValue(final Field<String> f) {
-		return f != null ? f.getValue() : null;
-	}
-
-	private static String fieldValue(final List<Field<String>> fl) {
-		return fl != null ? fl.stream().map(Field::getValue).filter(StringUtils::isNotBlank).findFirst().orElse(null)
-			: null;
+	private static String fieldValue(final List<String> fl) {
+		return Optional
+				.ofNullable(fl)
+				.map(f -> fl.stream()
+						.filter(StringUtils::isNotBlank)
+						.findFirst()
+						.orElse(null))
+				.orElse(null);
 	}
 
 	private static String classId(final Qualifier q) {
@@ -281,18 +276,6 @@ public class ConversionUtils {
 		return props != null
 			? props.stream().map(StructuredProperty::getValue).filter(StringUtils::isNotBlank).findFirst().orElse(null)
 			: null;
-	}
-
-	private static List<String> fieldList(final List<Field<String>> fl) {
-		return fl != null
-			? fl
-				.stream()
-				.map(Field::getValue)
-				.map(s -> StringUtils.abbreviate(s, BrokerConstants.MAX_STRING_SIZE))
-				.filter(StringUtils::isNotBlank)
-				.limit(BrokerConstants.MAX_LIST_SIZE)
-				.collect(Collectors.toList())
-			: new ArrayList<>();
 	}
 
 	private static List<String> structPropList(final List<StructuredProperty> props) {

@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.common.RelationInverse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,8 +27,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.DbClient;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.common.RelationInverse;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class ReadBlacklistFromDB implements Closeable {

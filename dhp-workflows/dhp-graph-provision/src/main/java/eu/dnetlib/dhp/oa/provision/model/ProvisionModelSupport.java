@@ -7,7 +7,7 @@ import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.oa.provision.RelationList;
 import eu.dnetlib.dhp.oa.provision.SortableRelation;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 
 public class ProvisionModelSupport {
 

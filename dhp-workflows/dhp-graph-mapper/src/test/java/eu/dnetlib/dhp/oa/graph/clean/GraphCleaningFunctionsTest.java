@@ -70,8 +70,8 @@ public class GraphCleaningFunctionsTest {
 			assertTrue(vocabularies.getTerms(ModelConstants.DNET_RELATION_RELCLASS).contains(r_out.getRelClass()));
 			assertTrue(vocabularies.getTerms(ModelConstants.DNET_RELATION_SUBRELTYPE).contains(r_out.getSubRelType()));
 
-			assertEquals("iis", r_out.getDataInfo().getProvenanceaction().getClassid());
-			assertEquals("Inferred by OpenAIRE", r_out.getDataInfo().getProvenanceaction().getClassname());
+			assertTrue(r_out.getProvenance().stream().anyMatch(p -> "iis".equals(p.getDataInfo().getProvenanceaction().getClassid())));
+			assertTrue(r_out.getProvenance().stream().anyMatch(p -> "Inferred by OpenAIRE".equals(p.getDataInfo().getProvenanceaction().getClassname())));
 		}
 	}
 
@@ -141,7 +141,7 @@ public class GraphCleaningFunctionsTest {
 		assertNotNull(p_out);
 
 		assertNotNull(p_out.getPublisher());
-		assertNull(p_out.getPublisher().getValue());
+		assertNull(p_out.getPublisher().getName());
 
 		assertEquals("und", p_out.getLanguage().getClassid());
 		assertEquals("Undetermined", p_out.getLanguage().getClassname());
@@ -216,7 +216,7 @@ public class GraphCleaningFunctionsTest {
 		assertEquals("CLOSED", p_cleaned.getBestaccessright().getClassid());
 		assertNull(p_out.getPublisher());
 
-		assertEquals("1970-10-07", p_cleaned.getDateofacceptance().getValue());
+		assertEquals("1970-10-07", p_cleaned.getDateofacceptance());
 
 		assertEquals("0038", p_cleaned.getInstance().get(2).getInstancetype().getClassid());
 		assertEquals("Other literature type", p_cleaned.getInstance().get(2).getInstancetype().getClassname());

@@ -25,7 +25,7 @@ public class RelatedEntity implements Serializable {
 	private String publisher;
 	private List<StructuredProperty> pid;
 	private String codeRepositoryUrl;
-	private Qualifier resulttype;
+	private String resulttype;
 	private List<KeyValue> collectedfrom;
 	private List<Instance> instances;
 
@@ -111,11 +111,11 @@ public class RelatedEntity implements Serializable {
 		this.codeRepositoryUrl = codeRepositoryUrl;
 	}
 
-	public Qualifier getResulttype() {
+	public String getResulttype() {
 		return resulttype;
 	}
 
-	public void setResulttype(Qualifier resulttype) {
+	public void setResulttype(String resulttype) {
 		this.resulttype = resulttype;
 	}
 
