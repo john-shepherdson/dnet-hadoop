@@ -12,5 +12,8 @@ export HIVE_OPTS="-hiveconf mapred.job.queue.name=analytics -hiveconf hive.spark
 export HADOOP_USER_NAME="oozie"
 
 echo "Updating shadow database"
-hive $HIVE_OPTS --database ${SOURCE} -e "show tables" | grep -v WARN | sed "s/^\(.*\)/analyze table ${SOURCE}.\1 compute statistics;/" > foo
-hive $HIVE_OPTS -f foo
+hive -e "drop database if exists ${SHADOW} cascade"
+hive -e "create database if not exists ${SHADOW}"
+hive $HIVE_OPTS --database ${SOURCE} -e "show tables" | grep -v WARN | sed "s/\(.*\)/create view ${SHADOW}.\1 as select * from ${SOURCE}.\1;/" > foo
+hive -f foo
+echo "Updated shadow database"

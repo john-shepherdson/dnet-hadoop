@@ -6,13 +6,16 @@ then
     ln -sfn ${PYTHON_EGG_CACHE}${link_folder} ${link_folder}
 fi
 
+#export HADOOP_USER_NAME="dimitris.pierrakos"
+export HADOOP_USER_NAME=$4
+
 function copydb() {
   db=$1
 
   # copy the databases from ocean to impala
 
   #echo "copying $db"
-  hadoop distcp -Dmapreduce.map.memory.mb=6144 -pb hdfs://nameservice1/user/hive/warehouse/${db}.db hdfs://impala-cluster-mn2.openaire.eu:8020/tmp
+  hadoop distcp -Dmapreduce.map.memory.mb=6144 -pb hdfs://nameservice1/user/hive/warehouse/${db}.db hdfs://impala-cluster-mn1.openaire.eu:8020/tmp
 
   # change ownership to impala
   hdfs dfs -conf /etc/impala_cluster/hdfs-site.xml -chmod -R 777 /tmp/${db}.db
@@ -48,9 +51,10 @@ function copydb() {
 STATS_DB=$1
 MONITOR_DB=$2
 OBSERVATORY_DB=$3
-EXT_DB=$4
+HADOOP_USER_NAME=$4
+#EXT_DB=$4
 
-copydb $EXT_DB
+#copydb $EXT_DB
 copydb $STATS_DB
 copydb $MONITOR_DB
 copydb $OBSERVATORY_DB

@@ -1,4 +1,4 @@
-<workflow-app name="Graph Stats" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Graph Stats Hive" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>stats_db_name</name>
@@ -53,6 +53,10 @@
             <name>context_api_url</name>
             <description>the base url of the context api (https://services.openaire.eu/openaire)</description>
         </property>
+        <property>
+            <name>hadoop_user_name</name>
+            <description>user name of the wf owner</description>
+        </property>
     </parameters>
 
     <global>
@@ -74,7 +78,40 @@
         </configuration>
     </global>
 
-    <start to="Step1"/>
+    <start to="resume_from"/>
+
+    <decision name="resume_from">
+        <switch>
+            <case to="Step1">${wf:conf('resumeFrom') eq 'Step1'}</case>
+            <case to="Step2">${wf:conf('resumeFrom') eq 'Step2'}</case>
+            <case to="Step3">${wf:conf('resumeFrom') eq 'Step3'}</case>
+            <case to="Step4">${wf:conf('resumeFrom') eq 'Step4'}</case>
+            <case to="Step5">${wf:conf('resumeFrom') eq 'Step5'}</case>
+            <case to="Step6">${wf:conf('resumeFrom') eq 'Step6'}</case>
+            <case to="Step7">${wf:conf('resumeFrom') eq 'Step7'}</case>
+            <case to="Step8">${wf:conf('resumeFrom') eq 'Step8'}</case>
+            <case to="Step9">${wf:conf('resumeFrom') eq 'Step9'}</case>
+            <case to="Step10">${wf:conf('resumeFrom') eq 'Step10'}</case>
+            <case to="Step11">${wf:conf('resumeFrom') eq 'Step11'}</case>
+            <case to="Step12">${wf:conf('resumeFrom') eq 'Step12'}</case>
+            <case to="Step13">${wf:conf('resumeFrom') eq 'Step13'}</case>
+            <case to="Step14">${wf:conf('resumeFrom') eq 'Step14'}</case>
+            <case to="Step15">${wf:conf('resumeFrom') eq 'Step15'}</case>
+            <case to="Step15_5">${wf:conf('resumeFrom') eq 'Step15_5'}</case>
+            <case to="Contexts">${wf:conf('resumeFrom') eq 'Contexts'}</case>
+            <case to="Step16-createIndicatorsTables">${wf:conf('resumeFrom') eq 'Step16-createIndicatorsTables'}</case>
+            <case to="Step16_1-definitions">${wf:conf('resumeFrom') eq 'Step16_1-definitions'}</case>
+            <case to="Step16_5">${wf:conf('resumeFrom') eq 'Step16_5'}</case>
+            <case to="Step19-finalize">${wf:conf('resumeFrom') eq 'Step19-finalize'}</case>
+            <case to="step20-createMonitorDB">${wf:conf('resumeFrom') eq 'step20-createMonitorDB'}</case>
+            <case to="step21-createObservatoryDB-pre">${wf:conf('resumeFrom') eq 'step21-createObservatoryDB-pre'}</case>
+            <case to="step21-createObservatoryDB">${wf:conf('resumeFrom') eq 'step21-createObservatoryDB'}</case>
+            <case to="step21-createObservatoryDB-post">${wf:conf('resumeFrom') eq 'step21-createObservatoryDB-post'}</case>
+            <case to="step22-copyDataToImpalaCluster">${wf:conf('resumeFrom') eq 'step22-copyDataToImpalaCluster'}</case>
+            <case to="step23-finalizeImpalaCluster">${wf:conf('resumeFrom') eq 'step23-finalizeImpalaCluster'}</case>
+            <default to="Step1"/>
+        </switch>
+    </decision>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -302,22 +339,22 @@
             <param>stats_db_name=${stats_db_name}</param>
             <param>openaire_db_name=${openaire_db_name}</param>
         </hive2>
+        <ok to="Step19-finalize"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step19-finalize">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>finalizedb.sh</exec>
+            <argument>${stats_db_name}</argument>
+            <argument>${stats_db_shadow_name}</argument>
+            <file>finalizedb.sh</file>
+        </shell>
         <ok to="step20-createMonitorDB"/>
         <error to="Kill"/>
     </action>
-        
-<!--    <action name="Step19-finalize">-->
-<!--        <shell xmlns="uri:oozie:shell-action:0.1">-->
-<!--            <job-tracker>${jobTracker}</job-tracker>-->
-<!--            <name-node>${nameNode}</name-node>-->
-<!--            <exec>finalizedb.sh</exec>-->
-<!--            <argument>${stats_db_name}</argument>-->
-<!--            <argument>${stats_db_shadow_name}</argument>-->
-<!--            <file>finalizedb.sh</file>-->
-<!--        </shell>-->
-<!--        <ok to="step20-createMonitorDB"/>-->
-<!--        <error to="Kill"/>-->
-<!--    </action>-->
 
     <action name="step20-createMonitorDB">
         <shell xmlns="uri:oozie:shell-action:0.1">
@@ -355,55 +392,57 @@
             <param>stats_db_name=${stats_db_name}</param>
             <param>observatory_db_name=${observatory_db_name}</param>
         </hive2>
-        <ok to="End"/>
+        <ok to="step21-createObservatoryDB-post"/>
         <error to="Kill"/>
     </action>
 
-<!--    <action name="step21-createObservatoryDB-post">-->
-<!--        <shell xmlns="uri:oozie:shell-action:0.1">-->
-<!--            <job-tracker>${jobTracker}</job-tracker>-->
-<!--            <name-node>${nameNode}</name-node>-->
-<!--            <exec>observatory-post.sh</exec>-->
-<!--            <argument>${stats_db_name}</argument>-->
-<!--            <argument>${observatory_db_name}</argument>-->
-<!--            <argument>${observatory_db_shadow_name}</argument>-->
-<!--            <file>observatory-post.sh</file>-->
-<!--        </shell>-->
-<!--        <ok to="step22-copyDataToImpalaCluster"/>-->
-<!--        <error to="Kill"/>-->
-<!--    </action>-->
+    <action name="step21-createObservatoryDB-post">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>observatory-post.sh</exec>
+            <argument>${stats_db_name}</argument>
+            <argument>${observatory_db_name}</argument>
+            <argument>${observatory_db_shadow_name}</argument>
+            <file>observatory-post.sh</file>
+        </shell>
+        <ok to="step22-copyDataToImpalaCluster"/>
+        <error to="Kill"/>
+    </action>
 
-<!--    <action name="step22-copyDataToImpalaCluster">-->
-<!--        <shell xmlns="uri:oozie:shell-action:0.1">-->
-<!--            <job-tracker>${jobTracker}</job-tracker>-->
-<!--            <name-node>${nameNode}</name-node>-->
-<!--            <exec>copyDataToImpalaCluster.sh</exec>-->
+    <action name="step22-copyDataToImpalaCluster">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>copyDataToImpalaCluster.sh</exec>
+<!--            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>-->
 <!--            <argument>${external_stats_db_name}</argument>-->
-<!--            <argument>${stats_db_name}</argument>-->
-<!--            <argument>${monitor_db_name}</argument>-->
-<!--            <argument>${observatory_db_name}</argument>-->
-<!--            <file>copyDataToImpalaCluster.sh</file>-->
-<!--        </shell>-->
-<!--        <ok to="step23-finalizeImpalaCluster"/>-->
-<!--        <error to="Kill"/>-->
-<!--    </action>-->
+            <argument>${stats_db_name}</argument>
+            <argument>${monitor_db_name}</argument>
+            <argument>${observatory_db_name}</argument>
+            <argument>${hadoop_user_name}</argument>
+            <file>copyDataToImpalaCluster.sh</file>
+        </shell>
+        <ok to="step23-finalizeImpalaCluster"/>
+        <error to="Kill"/>
+    </action>
 
-<!--    <action name="step23-finalizeImpalaCluster">-->
-<!--        <shell xmlns="uri:oozie:shell-action:0.1">-->
-<!--            <job-tracker>${jobTracker}</job-tracker>-->
-<!--            <name-node>${nameNode}</name-node>-->
-<!--            <exec>finalizeImpalaCluster.sh</exec>-->
-<!--            <argument>${stats_db_name}</argument>-->
-<!--            <argument>${stats_db_shadow_name}</argument>-->
-<!--            <argument>${monitor_db_name}</argument>-->
-<!--            <argument>${monitor_db_shadow_name}</argument>-->
-<!--            <argument>${observatory_db_name}</argument>-->
-<!--            <argument>${observatory_db_shadow_name}</argument>-->
-<!--            <file>finalizeImpalaCluster.sh</file>-->
-<!--        </shell>-->
-<!--        <ok to="End"/>-->
-<!--        <error to="Kill"/>-->
-<!--    </action>-->
+    <action name="step23-finalizeImpalaCluster">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>finalizeImpalaCluster.sh</exec>
+            <argument>${stats_db_name}</argument>
+            <argument>${stats_db_shadow_name}</argument>
+            <argument>${monitor_db_name}</argument>
+            <argument>${monitor_db_shadow_name}</argument>
+            <argument>${observatory_db_name}</argument>
+            <argument>${observatory_db_shadow_name}</argument>
+            <file>finalizeImpalaCluster.sh</file>
+        </shell>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
 
 <!--    <action name="Step24-updateCache">-->
 <!--        <shell xmlns="uri:oozie:shell-action:0.1">-->
