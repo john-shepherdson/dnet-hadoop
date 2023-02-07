@@ -79,7 +79,6 @@
     </global>
 
     <start to="resume_from"/>
-
     <decision name="resume_from">
         <switch>
             <case to="Step1">${wf:conf('resumeFrom') eq 'Step1'}</case>
