@@ -138,12 +138,11 @@ object DoiBoostMappingUtil {
     result
   }
 
-  def decideAccessRight(lic: Field[String], date: String): AccessRight = {
-    if (lic == null) {
+  def decideAccessRight(license: String, date: String): AccessRight = {
+    if (license == null || license.isEmpty) {
       //Default value Unknown
       return getUnknownQualifier()
     }
-    val license: String = lic.getValue
     //CC licenses
     if (
       license.startsWith("cc") ||
@@ -305,7 +304,7 @@ object DoiBoostMappingUtil {
   }
 
   def generateDataInfo(): DataInfo = {
-    generateDataInfo("0.9")
+    generateDataInfo(0.9F)
   }
 
   def filterPublication(publication: Publication): Boolean = {
@@ -330,7 +329,7 @@ object DoiBoostMappingUtil {
 
     // fixes #4360 (test publisher)
     val publisher =
-      if (publication.getPublisher != null) publication.getPublisher.getValue else null
+      if (publication.getPublisher != null) publication.getPublisher.getName else null
 
     if (
       publisher != null && (publisher.equalsIgnoreCase("Test accounts") || publisher
@@ -358,7 +357,7 @@ object DoiBoostMappingUtil {
     // fixes #4368
     if (
       authors.count(s => s.equalsIgnoreCase("Addie Jackson")) > 0 && "Elsevier BV".equalsIgnoreCase(
-        publication.getPublisher.getValue
+        publication.getPublisher.getName
       )
     )
       return false
@@ -374,8 +373,8 @@ object DoiBoostMappingUtil {
     true
   }
 
-  def generateDataInfo(trust: String): DataInfo = {
-    val di = new DataInfo
+  def generateDataInfo(trust: Float): DataInfo = {
+    val di = new EntityDataInfo
     di.setDeletedbyinference(false)
     di.setInferred(false)
     di.setInvisible(false)
@@ -384,8 +383,8 @@ object DoiBoostMappingUtil {
       OafMapperUtils.qualifier(
         ModelConstants.SYSIMPORT_ACTIONSET,
         ModelConstants.SYSIMPORT_ACTIONSET,
-        ModelConstants.DNET_PROVENANCE_ACTIONS,
         ModelConstants.DNET_PROVENANCE_ACTIONS
+
       )
     )
     di
@@ -393,7 +392,7 @@ object DoiBoostMappingUtil {
 
   def createSubject(value: String, classId: String, schemeId: String): Subject = {
     val s = new Subject
-    s.setQualifier(OafMapperUtils.qualifier(classId, classId, schemeId, schemeId))
+    s.setQualifier(OafMapperUtils.qualifier(classId, classId, schemeId))
     s.setValue(value)
     s
 
@@ -403,67 +402,37 @@ object DoiBoostMappingUtil {
     value: String,
     classId: String,
     className: String,
-    schemeId: String,
-    schemeName: String
+    schemeId: String
+
   ): Subject = {
     val s = new Subject
-    s.setQualifier(OafMapperUtils.qualifier(classId, className, schemeId, schemeName))
+    s.setQualifier(OafMapperUtils.qualifier(classId, className, schemeId))
     s.setValue(value)
     s
 
   }
 
-  def createSP(
-    value: String,
-    classId: String,
-    className: String,
-    schemeId: String,
-    schemeName: String
-  ): StructuredProperty = {
-    val sp = new StructuredProperty
-    sp.setQualifier(OafMapperUtils.qualifier(classId, className, schemeId, schemeName))
-    sp.setValue(value)
-    sp
-
-  }
 
   def createSP(
     value: String,
     classId: String,
     className: String,
-    schemeId: String,
-    schemeName: String,
-    dataInfo: DataInfo
+    schemeId: String
   ): StructuredProperty = {
     val sp = new StructuredProperty
-    sp.setQualifier(OafMapperUtils.qualifier(classId, className, schemeId, schemeName))
+    sp.setQualifier(OafMapperUtils.qualifier(classId, className, schemeId))
     sp.setValue(value)
-    sp.setDataInfo(dataInfo)
     sp
 
   }
 
   def createSP(value: String, classId: String, schemeId: String): StructuredProperty = {
     val sp = new StructuredProperty
-    sp.setQualifier(OafMapperUtils.qualifier(classId, classId, schemeId, schemeId))
+    sp.setQualifier(OafMapperUtils.qualifier(classId, classId, schemeId))
     sp.setValue(value)
     sp
-
   }
 
-  def createSP(
-    value: String,
-    classId: String,
-    schemeId: String,
-    dataInfo: DataInfo
-  ): StructuredProperty = {
-    val sp = new StructuredProperty
-    sp.setQualifier(OafMapperUtils.qualifier(classId, classId, schemeId, schemeId))
-    sp.setValue(value)
-    sp.setDataInfo(dataInfo)
-    sp
-
-  }
 
   def createCrossrefCollectedFrom(): KeyValue = {
 
@@ -503,13 +472,6 @@ object DoiBoostMappingUtil {
     cf.setValue(MAG_NAME)
     cf.setKey("10|" + OPENAIRE_PREFIX + SEPARATOR + DHPUtils.md5(MAG))
     cf
-
-  }
-
-  def asField[T](value: T): Field[T] = {
-    val tmp = new Field[T]
-    tmp.setValue(value)
-    tmp
 
   }
 
