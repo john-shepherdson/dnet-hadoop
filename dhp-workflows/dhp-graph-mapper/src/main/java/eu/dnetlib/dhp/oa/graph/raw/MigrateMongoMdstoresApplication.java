@@ -114,7 +114,7 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 	}
 
 	/**
-	 * This method is responsible to synch only the mongoMDStore that changed since last time
+	 * This method is responsible to sync only the stores that have been changed since last time
 	 * @param mdFormat the MDStore's format
 	 * @param mdLayout the MDStore'slayout
 	 * @param mdInterpretation the MDStore's interpretation
@@ -164,7 +164,7 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 	}
 
 	/**
-	 *This methos store into hdfs all the mongo record of a single mdstore
+	 *This method store into hdfs all the MONGO record of a single mdstore into the HDFS File
 	 *
 	 * @param mdFormat the MDStore's format
 	 * @param mdLayout the MDStore'slayout
