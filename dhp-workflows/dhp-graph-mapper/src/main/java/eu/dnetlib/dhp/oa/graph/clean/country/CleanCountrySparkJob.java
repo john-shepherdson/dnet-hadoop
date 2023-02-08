@@ -4,9 +4,12 @@ package eu.dnetlib.dhp.oa.graph.clean.country;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.text.html.Option;
 
@@ -30,6 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.graph.clean.CleanContextSparkJob;
 import eu.dnetlib.dhp.schema.oaf.Country;
+import eu.dnetlib.dhp.schema.oaf.Instance;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
@@ -58,8 +62,8 @@ public class CleanCountrySparkJob implements Serializable {
 		String inputPath = parser.get("inputPath");
 		log.info("inputPath: {}", inputPath);
 
-		String workingPath = parser.get("workingPath");
-		log.info("workingPath: {}", workingPath);
+		String workingDir = parser.get("workingDir");
+		log.info("workingDir: {}", workingDir);
 
 		String datasourcePath = parser.get("hostedBy");
 		log.info("datasourcePath: {}", datasourcePath);
@@ -85,12 +89,12 @@ public class CleanCountrySparkJob implements Serializable {
 			spark -> {
 
 				cleanCountry(
-					spark, country, verifyParam, inputPath, entityClazz, workingPath, collectedfrom, datasourcePath);
+					spark, country, verifyParam, inputPath, entityClazz, workingDir, collectedfrom, datasourcePath);
 			});
 	}
 
 	private static <T extends Result> void cleanCountry(SparkSession spark, String country, String[] verifyParam,
-		String inputPath, Class<T> entityClazz, String workingPath, String collectedfrom, String datasourcePath) {
+		String inputPath, Class<T> entityClazz, String workingDir, String collectedfrom, String datasourcePath) {
 
 		List<String> hostedBy = spark
 			.read()
@@ -110,8 +114,8 @@ public class CleanCountrySparkJob implements Serializable {
 				return r;
 			}
 
-			if (r
-				.getPid()
+			List<StructuredProperty> ids = getPidsAndAltIds(r).collect(Collectors.toList());
+			if (ids
 				.stream()
 				.anyMatch(
 					p -> p
@@ -134,11 +138,11 @@ public class CleanCountrySparkJob implements Serializable {
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.json(workingPath);
+			.json(workingDir);
 
 		spark
 			.read()
-			.textFile(workingPath)
+			.textFile(workingDir)
 			.map(
 				(MapFunction<String, T>) value -> OBJECT_MAPPER.readValue(value, entityClazz),
 				Encoders.bean(entityClazz))
@@ -146,6 +150,42 @@ public class CleanCountrySparkJob implements Serializable {
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(inputPath);
+	}
+
+	private static <T extends Result> Stream<StructuredProperty> getPidsAndAltIds(T r) {
+		final Stream<StructuredProperty> resultPids = Optional
+			.ofNullable(r.getPid())
+			.map(Collection::stream)
+			.orElse(Stream.empty());
+
+		final Stream<StructuredProperty> instancePids = Optional
+			.ofNullable(r.getInstance())
+			.map(
+				instance -> instance
+					.stream()
+					.flatMap(
+						i -> Optional
+							.ofNullable(i.getPid())
+							.map(Collection::stream)
+							.orElse(Stream.empty())))
+			.orElse(Stream.empty());
+
+		final Stream<StructuredProperty> instanceAltIds = Optional
+			.ofNullable(r.getInstance())
+			.map(
+				instance -> instance
+					.stream()
+					.flatMap(
+						i -> Optional
+							.ofNullable(i.getAlternateIdentifier())
+							.map(Collection::stream)
+							.orElse(Stream.empty())))
+			.orElse(Stream.empty());
+
+		return Stream
+			.concat(
+				Stream.concat(resultPids, instancePids),
+				instanceAltIds);
 	}
 
 	private static boolean pidInParam(String value, String[] verifyParam) {

@@ -18,6 +18,10 @@ public class IdGenerator implements Serializable {
 		if (pids == null || pids.isEmpty())
 			return defaultID;
 
+		return generateId(pids);
+	}
+
+	private static <T extends OafEntity> String generateId(List<Identifier<T>> pids) {
 		Identifier<T> bp = pids
 			.stream()
 			.min(Identifier::compareTo)

@@ -907,24 +907,23 @@
     {
       "dataInfo": {
         "deletedbyinference": false,
-        "inferenceprovenance": "",
         "inferred": false,
         "invisible": false,
         "provenanceaction": {
-          "classid": "sysimport:crosswalk:datasetarchive",
-          "classname": "sysimport:crosswalk:datasetarchive",
+          "classid": "sysimport:actionset",
+          "classname": "Harvested",
           "schemeid": "dnet:provenanceActions",
           "schemename": "dnet:provenanceActions"
         },
         "trust": "0.9"
       },
       "qualifier": {
-        "classid": "",
-        "classname": "",
-        "schemeid": "",
-        "schemename": ""
+        "classid": "FOS",
+        "classname": "Fields of Science and Technology classification",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
       },
-      "value": "doped silicon"
+      "value": "Avicennia"
     },
     {
       "dataInfo": {
