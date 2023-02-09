@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
@@ -100,7 +101,7 @@ public class CreateOpenCitationsASTest {
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
-		assertEquals(62, tmp.count());
+		assertEquals(31, tmp.count());
 
 		// tmp.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
 
@@ -132,10 +133,7 @@ public class CreateOpenCitationsASTest {
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
-		assertEquals(46, tmp.count());
-
-		// tmp.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
-
+		assertEquals(23, tmp.count());
 	}
 
 	@Test
@@ -200,7 +198,7 @@ public class CreateOpenCitationsASTest {
 		tmp.foreach(r -> {
 			final DataInfo dataInfo = r.getProvenance().get(0).getDataInfo();
 			assertEquals(false, dataInfo.getInferred());
-			assertEquals("0.91", dataInfo.getTrust());
+			assertEquals(0.91f, dataInfo.getTrust());
 			assertEquals(
 				CreateActionSetSparkJob.OPENCITATIONS_CLASSID, dataInfo.getProvenanceaction().getClassid());
 			assertEquals(
@@ -240,9 +238,8 @@ public class CreateOpenCitationsASTest {
 			assertEquals("citation", r.getSubRelType());
 			assertEquals("resultResult", r.getRelType());
 		});
+		assertEquals(23, tmp.count());
 		assertEquals(23, tmp.filter(r -> r.getRelClass().equals("Cites")).count());
-		assertEquals(23, tmp.filter(r -> r.getRelClass().equals("IsCitedBy")).count());
-
 	}
 
 	@Test
@@ -281,17 +278,17 @@ public class CreateOpenCitationsASTest {
 	@Test
 	void testRelationsSourceTargetCouple() throws Exception {
 		final String doi1 = "50|doi_________::"
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1007/s10854-015-3684-x"));
+			+ ModelSupport.md5(CleaningFunctions.normalizePidValue("doi", "10.1007/s10854-015-3684-x"));
 		final String doi2 = "50|doi_________::"
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1111/j.1551-2916.2008.02408.x"));
+			+ ModelSupport.md5(CleaningFunctions.normalizePidValue("doi", "10.1111/j.1551-2916.2008.02408.x"));
 		final String doi3 = "50|doi_________::"
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1007/s10854-014-2114-9"));
+			+ ModelSupport.md5(CleaningFunctions.normalizePidValue("doi", "10.1007/s10854-014-2114-9"));
 		final String doi4 = "50|doi_________::"
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1016/j.ceramint.2013.09.069"));
+			+ ModelSupport.md5(CleaningFunctions.normalizePidValue("doi", "10.1016/j.ceramint.2013.09.069"));
 		final String doi5 = "50|doi_________::"
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1007/s10854-009-9913-4"));
+			+ ModelSupport.md5(CleaningFunctions.normalizePidValue("doi", "10.1007/s10854-009-9913-4"));
 		final String doi6 = "50|doi_________::"
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1016/0038-1098(72)90370-5"));
+			+ ModelSupport.md5(CleaningFunctions.normalizePidValue("doi", "10.1016/0038-1098(72)90370-5"));
 
 		String inputPath = getClass()
 			.getResource(
@@ -318,7 +315,7 @@ public class CreateOpenCitationsASTest {
 
 		JavaRDD<Relation> check = tmp.filter(r -> r.getSource().equals(doi1) || r.getTarget().equals(doi1));
 
-		assertEquals(10, check.count());
+		assertEquals(5, check.count());
 
 		check.foreach(r -> {
 			if (r.getSource().equals(doi2) || r.getSource().equals(doi3) || r.getSource().equals(doi4) ||

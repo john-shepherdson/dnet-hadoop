@@ -279,11 +279,6 @@ object DataciteToOAFTransformation {
 
   }
 
-  def createDNetTargetIdentifier(pid: String, pidType: String, idPrefix: String): String = {
-    val f_part = s"$idPrefix|${pidType.toLowerCase}".padTo(15, '_')
-    s"$f_part::${IdentifierFactory.md5(pid.toLowerCase)}"
-  }
-
   def generateOAFDate(dt: String, q: Qualifier): StructuredProperty = {
     OafMapperUtils.structuredProperty(dt, q)
   }
@@ -313,7 +308,7 @@ object DataciteToOAFTransformation {
       val p = match_pattern.get._2
       val grantId = m.matcher(awardUri).replaceAll("$2")
       val targetId = s"$p${DHPUtils.md5(grantId)}"
-      List(generateRelation(sourceId, targetId, "isProducedBy", DATACITE_COLLECTED_FROM, dataInfo))
+      List(generateRelation(sourceId, targetId, "isProducedBy", DATACITE_COLLECTED_FROM, relDataInfo))
     } else
       List()
 
@@ -357,7 +352,7 @@ object DataciteToOAFTransformation {
     result.setPid(List(pid).asJava)
 
     // This identifiere will be replaced in a second moment using the PID logic generation
-    result.setId(OafMapperUtils.createOpenaireId(50, s"datacite____::$doi", true))
+    result.setId(IdentifierFactory.createOpenaireId(50, s"datacite____::$doi", true))
     result.setOriginalId(List(doi).asJava)
 
     val d = new Date(dateOfCollection * 1000)
@@ -386,7 +381,7 @@ object DataciteToOAFTransformation {
                   )
                 else null
               if (ni.nameIdentifier != null && ni.nameIdentifier.isDefined) {
-                OafMapperUtils.authorPid(ni.nameIdentifier.get, q, dataInfo)
+                OafMapperUtils.authorPid(ni.nameIdentifier.get, q, relDataInfo)
               } else
                 null
 
@@ -501,7 +496,7 @@ object DataciteToOAFTransformation {
             SUBJ_CLASS,
             SUBJ_CLASS,
             ModelConstants.DNET_SUBJECT_TYPOLOGIES,
-            dataInfo
+            relDataInfo
           )
         )
         .asJava
@@ -635,7 +630,7 @@ object DataciteToOAFTransformation {
       .map(r => {
         val rel = new Relation
 
-        rel.setProvenance(Lists.newArrayList(OafMapperUtils.getProvenance(DATACITE_COLLECTED_FROM, dataInfo)))
+        rel.setProvenance(Lists.newArrayList(OafMapperUtils.getProvenance(DATACITE_COLLECTED_FROM, relDataInfo)))
 
         val subRelType = subRelTypeMapping(r.relationType).relType
         rel.setRelType(REL_TYPE_VALUE)

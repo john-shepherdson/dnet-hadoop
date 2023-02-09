@@ -304,7 +304,6 @@ public class ProduceTest {
 		SparkSaveUnresolved.main(new String[] {
 			"--isSparkSessionManaged", Boolean.FALSE.toString(),
 			"--sourcePath", workingDir.toString() + "/work",
-
 			"-outputPath", workingDir.toString() + "/unresolved"
 
 		});

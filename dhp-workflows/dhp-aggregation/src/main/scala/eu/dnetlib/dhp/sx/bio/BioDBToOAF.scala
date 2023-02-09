@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.sx.bio
 
 import com.google.common.collect.Lists
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, OafMapperUtils}
+import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactory, OafMapperUtils}
 import eu.dnetlib.dhp.schema.oaf._
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
@@ -152,7 +152,7 @@ object BioDBToOAF {
     d.setDataInfo(DATA_INFO)
 
     val nsPrefix = input.pidType.toLowerCase.padTo(12, '_')
-    d.setId(OafMapperUtils.createOpenaireId(50, s"$nsPrefix::${input.pid.toLowerCase}", true))
+    d.setId(IdentifierFactory.createOpenaireId(50, s"$nsPrefix::${input.pid.toLowerCase}", true))
 
     if (input.tilte != null && input.tilte.nonEmpty)
       d.setTitle(
@@ -233,7 +233,7 @@ object BioDBToOAF {
     )
 
     d.setDataInfo(DATA_INFO)
-    d.setId(OafMapperUtils.createOpenaireId(50, s"uniprot_____::$pid", true))
+    d.setId(IdentifierFactory.createOpenaireId(50, s"uniprot_____::$pid", true))
     d.setCollectedfrom(List(collectedFromMap("uniprot")).asJava)
 
     val title: String = (json \ "title").extractOrElse[String](null)
@@ -424,7 +424,7 @@ object BioDBToOAF {
 
     d.setCollectedfrom(List(collectedFromMap("pdb")).asJava)
     d.setDataInfo(DATA_INFO)
-    d.setId(OafMapperUtils.createOpenaireId(50, s"pdb_________::$pdb", true))
+    d.setId(IdentifierFactory.createOpenaireId(50, s"pdb_________::$pdb", true))
     d.setOriginalId(List(pdb).asJava)
 
     val title = (json \ "title").extractOrElse[String](null)
@@ -532,7 +532,7 @@ object BioDBToOAF {
 
     val nsPrefix = input.targetPidType.toLowerCase.padTo(12, '_')
 
-    d.setId(OafMapperUtils.createOpenaireId(50, s"$nsPrefix::${input.targetPid.toLowerCase}", true))
+    d.setId(IdentifierFactory.createOpenaireId(50, s"$nsPrefix::${input.targetPid.toLowerCase}", true))
     d.setOriginalId(List(input.targetPid.toLowerCase).asJava)
 
     d.setPid(

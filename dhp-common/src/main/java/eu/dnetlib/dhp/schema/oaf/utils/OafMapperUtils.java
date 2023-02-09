@@ -363,7 +363,7 @@ public class OafMapperUtils {
 		final Entity entity,
 		final String validationDate) {
 
-		final List<Provenance> provenance = getProvenance(entity.getCollectedfrom(), entity.getDataInfo());
+		final List<Provenance> provenance = getProvenance(entity.getCollectedfrom(), fromEntityDataInfo(entity.getDataInfo()));
 		return getRelation(
 			source, target, relType, subRelType, relClass, provenance, validationDate, null);
 	}
@@ -433,5 +433,14 @@ public class OafMapperUtils {
 					.map(Qualifier::getClassid)
 					.orElse(""))
 			.orElse("");
+	}
+
+	public static DataInfo fromEntityDataInfo(EntityDataInfo entityDataInfo) {
+		DataInfo dataInfo = new DataInfo();
+		dataInfo.setTrust(entityDataInfo.getTrust());
+		dataInfo.setInferenceprovenance(entityDataInfo.getInferenceprovenance());
+		dataInfo.setInferred(entityDataInfo.getInferred());
+		dataInfo.setProvenanceaction(entityDataInfo.getProvenanceaction());
+		return dataInfo;
 	}
 }

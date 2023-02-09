@@ -73,6 +73,7 @@ object DataciteModelConstants {
   val SUBJ_CLASS = "keywords"
   val DATACITE_NAME = "Datacite"
   val dataInfo: EntityDataInfo = dataciteDataInfo(0.9f)
+  val relDataInfo = OafMapperUtils.fromEntityDataInfo(dataInfo);
 
   val DATACITE_COLLECTED_FROM: KeyValue =
     OafMapperUtils.keyValue(ModelConstants.DATACITE_ID, DATACITE_NAME)

@@ -78,17 +78,12 @@ public class SparkAtomicActionScoreJobTest {
 		SparkAtomicActionScoreJob
 			.main(
 				new String[] {
-					"-isSparkSessionManaged",
-					Boolean.FALSE.toString(),
-					"-inputPath",
-
-					bipScoresPath,
-
-					"-outputPath",
-					workingDir.toString() + "/actionSet"
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-inputPath", bipScoresPath,
+					"-outputPath", workingDir.toString() + "/actionSet"
 				});
 
-		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Result> tmp = sc
 			.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)

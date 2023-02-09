@@ -34,6 +34,8 @@ object PubMedToOaf {
     ModelConstants.PROVENANCE_ACTION_SET_QUALIFIER
   )
 
+  val REL_DATAINFO = OafMapperUtils.fromEntityDataInfo(ENTITY_DATAINFO)
+
   val collectedFrom: KeyValue =
     OafMapperUtils.keyValue(ModelConstants.EUROPE_PUBMED_CENTRAL_ID, "Europe PubMed Central")
 
@@ -259,7 +261,7 @@ object PubMedToOaf {
         SUBJ_CLASS,
         SUBJ_CLASS,
         ModelConstants.DNET_SUBJECT_TYPOLOGIES,
-        ENTITY_DATAINFO
+        REL_DATAINFO
       )
     )(collection.breakOut)
     if (subjects != null)

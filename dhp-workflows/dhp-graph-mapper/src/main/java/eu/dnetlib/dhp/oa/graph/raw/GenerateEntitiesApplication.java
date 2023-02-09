@@ -18,6 +18,7 @@ import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,7 +136,7 @@ public class GenerateEntitiesApplication {
 				save(
 					inputRdd
 						.mapToPair(oaf -> new Tuple2<>(ModelSupport.idFn().apply(oaf), oaf))
-						.reduceByKey(MergeUtils::merge)
+						.reduceByKey((Function2<Oaf, Oaf, Oaf>) (v1, v2) -> MergeUtils.merge(v1, v2, true))
 						.map(Tuple2::_2),
 					targetPath);
 				break;

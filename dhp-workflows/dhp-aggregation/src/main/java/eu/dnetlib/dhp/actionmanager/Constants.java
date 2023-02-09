@@ -55,11 +55,8 @@ public class Constants {
 									null,
 									ModelConstants.DNET_PROVENANCE_ACTIONS));
 
-
 	public static final DataInfo Bip_DATA_INFO3 = OafMapperUtils
 			.dataInfo(
-					false,
-					false,
 					0.8f,
 					UPDATE_DATA_INFO_TYPE,
 					false,
@@ -67,31 +64,6 @@ public class Constants {
 							.qualifier(
 									UPDATE_MEASURE_BIP_CLASS_ID,
 									UPDATE_CLASS_NAME,
-									ModelConstants.DNET_PROVENANCE_ACTIONS));
-	public static final EntityDataInfo Bip_DATA_INFO2 = OafMapperUtils
-			.dataInfo(
-					false,
-					false,
-					0.8f,
-					UPDATE_DATA_INFO_TYPE,
-					true,
-					OafMapperUtils
-							.qualifier(
-									UPDATE_MEASURE_BIP_CLASS_ID,
-									UPDATE_CLASS_NAME,
-									ModelConstants.DNET_PROVENANCE_ACTIONS));
-
-	public static final EntityDataInfo Bip_DATA_INFO = OafMapperUtils
-			.dataInfo(
-					false,
-					false,
-					0.8f, //TODO check
-					UPDATE_DATA_INFO_TYPE,
-					true,
-					OafMapperUtils
-							.qualifier(
-									ModelConstants.PROVENANCE_ENRICH,
-									null,
 									ModelConstants.DNET_PROVENANCE_ACTIONS));
 
 	private Constants() {

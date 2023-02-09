@@ -120,7 +120,7 @@ public class GroupEntitiesSparkJob {
 
 		private Entity mergeAndGet(Entity b, Entity a) {
 			if (Objects.nonNull(a) && Objects.nonNull(b)) {
-				return MergeUtils.merge(b, a);
+				return MergeUtils.merge(b, a, true);
 			}
 			return Objects.isNull(a) ? b : a;
 		}

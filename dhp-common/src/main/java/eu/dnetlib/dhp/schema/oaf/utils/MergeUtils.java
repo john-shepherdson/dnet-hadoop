@@ -21,8 +21,12 @@ import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 public class MergeUtils {
 
 	public static <T extends Oaf> T merge(final T left, final T right) {
+		return merge(left, right, false);
+	}
+
+	public static <T extends Oaf> T merge(final T left, final T right, boolean checkDelegatedAuthority) {
 		if (sameClass(left, right, Entity.class)) {
-			return mergeEntities(left, right);
+			return mergeEntities(left, right, checkDelegatedAuthority);
 		} else if (sameClass(left, right, Relation.class)) {
 			return mergeRelation(left, right);
 		} else {
@@ -34,9 +38,9 @@ public class MergeUtils {
 		}
 	}
 
-	private static <T extends Oaf> T mergeEntities(T left, T right) {
+	private static <T extends Oaf> T mergeEntities(T left, T right, boolean checkDelegatedAuthority) {
 		if (sameClass(left, right, Result.class)) {
-			if (!left.getClass().equals(right.getClass())) {
+			if (!left.getClass().equals(right.getClass()) || checkDelegatedAuthority) {
 				return mergeResultsOfDifferentTypes(left, right);
 			}
 			return mergeResult(left, right);
@@ -265,16 +269,16 @@ public class MergeUtils {
 		if (enrich.getOaiprovenance() != null && trustCompareResult < 0)
 			mergedResult.setOaiprovenance(enrich.getOaiprovenance());
 
-		if (isSubClass(mergedResult, Publication.class)) {
+		if (sameClass(mergedResult, enrich, Publication.class)) {
 			return (T) mergePublication(mergedResult, enrich);
 		}
-		if (isSubClass(mergedResult, Dataset.class)) {
+		if (sameClass(mergedResult, enrich, Dataset.class)) {
 			return (T) mergeDataset(mergedResult, enrich);
 		}
-		if (isSubClass(mergedResult, OtherResearchProduct.class)) {
+		if (sameClass(mergedResult, enrich, OtherResearchProduct.class)) {
 			return (T) mergeORP(mergedResult, enrich);
 		}
-		if (isSubClass(mergedResult, Software.class)) {
+		if (sameClass(mergedResult, enrich, Software.class)) {
 			return (T) mergeSoftware(mergedResult, enrich);
 		}
 
@@ -888,11 +892,11 @@ public class MergeUtils {
 			.compare(
 				Optional
 					.ofNullable(a.getDataInfo())
-					.map(DataInfo::getTrust)
+					.map(EntityDataInfo::getTrust)
 					.orElse(0f),
 				Optional
 					.ofNullable(b.getDataInfo())
-					.map(DataInfo::getTrust)
+					.map(EntityDataInfo::getTrust)
 					.orElse(0f));
 	}
 

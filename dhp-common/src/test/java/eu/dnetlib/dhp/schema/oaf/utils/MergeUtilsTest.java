@@ -80,7 +80,7 @@ public class MergeUtilsTest {
 		assertEquals(1, d2.getCollectedfrom().size());
 		assertTrue(cfId(d2.getCollectedfrom()).contains(ModelConstants.ZENODO_OD_ID));
 
-		Result res = MergeUtils.merge(d1, d2);
+		Result res = MergeUtils.merge(d1, d2, true);
 
 		assertEquals(d2, res);
 	}
@@ -93,7 +93,7 @@ public class MergeUtilsTest {
 		assertEquals(1, d2.getCollectedfrom().size());
 		assertTrue(cfId(d2.getCollectedfrom()).contains(ModelConstants.ZENODO_OD_ID));
 
-		Result res = MergeUtils.merge(p1, d2);
+		Result res = MergeUtils.merge(p1, d2, true);
 
 		assertEquals(d2, res);
 	}
