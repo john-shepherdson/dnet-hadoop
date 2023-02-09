@@ -28,13 +28,13 @@ function copydb() {
   for i in `impala-shell -d ${db} --delimited  -q "show tables"`;
     do
       impala-shell -d ${db} --delimited  -q "show create table $i";
-    done |  sed 's/"$/;/' | sed 's/^"//' | impala-shell -i impala-cluster-dn1.openaire.eu -c -f -
+    done |  sed 's/"$/;/' | sed 's/^"//' | sed 's/[[:space:]]\date[[:space:]]/`date`/g' | impala-shell -i impala-cluster-dn1.openaire.eu -c -f -
 
   # run the same command twice because we may have failures in the first run (due to views pointing to the same db)
   for i in `impala-shell -d ${db} --delimited  -q "show tables"`;
     do
       impala-shell -d ${db} --delimited  -q "show create table $i";
-    done |  sed 's/"$/;/' | sed 's/^"//' | impala-shell -i impala-cluster-dn1.openaire.eu -c -f -
+    done |  sed 's/"$/;/' | sed 's/^"//' | sed 's/[[:space:]]\date[[:space:]]/`date`/g' | impala-shell -i impala-cluster-dn1.openaire.eu -c -f -
 
   # load the data from /tmp in the respective tables
   echo "copying data in tables and computing stats"
