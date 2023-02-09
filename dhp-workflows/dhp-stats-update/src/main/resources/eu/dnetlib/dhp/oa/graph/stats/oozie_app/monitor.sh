@@ -22,3 +22,4 @@ echo "Creating monitor database"
 cat step20-createMonitorDB.sql | sed "s/TARGET/${TARGET}/g" | sed "s/SOURCE/${SOURCE}/g1" > foo
 hive $HIVE_OPTS -f foo
 echo "Hive shell finished"
+
