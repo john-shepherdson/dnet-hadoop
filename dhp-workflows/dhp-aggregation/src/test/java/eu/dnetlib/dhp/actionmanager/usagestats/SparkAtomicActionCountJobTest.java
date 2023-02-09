@@ -260,6 +260,206 @@ public class SparkAtomicActionCountJobTest {
 					.getUnit()
 					.get(0)
 					.getValue());
+
+
+		Assertions
+				.assertEquals(
+						"0",
+						tmp
+								.map(r -> ((OafEntity)r.getPayload()))
+								.filter(r -> r.getId().equals("40|f1__________::53575dc69e9ace947e02d47ecd54a7a6"))
+								.collect()
+								.get(0)
+								.getMeasures()
+								.stream()
+								.filter(m -> m.getId().equals("downloads"))
+								.collect(Collectors.toList())
+								.get(0)
+								.getUnit()
+								.get(0)
+								.getValue());
+		Assertions
+				.assertEquals(
+						"5",
+						tmp
+								.map(r -> ((OafEntity)r.getPayload()))
+								.filter(r -> r.getId().equals("40|f1__________::53575dc69e9ace947e02d47ecd54a7a6"))
+								.collect()
+								.get(0)
+								.getMeasures()
+								.stream()
+								.filter(m -> m.getId().equals("views"))
+								.collect(Collectors.toList())
+								.get(0)
+								.getUnit()
+								.get(0)
+								.getValue());
+
+		Assertions
+				.assertEquals(
+						"0",
+						tmp
+								.map(r -> ((OafEntity)r.getPayload()))
+								.filter(r -> r.getId().equals("40|f11_________::17eda2ff77407538fbe5d3d719b9d1c0"))
+								.collect()
+								.get(0)
+								.getMeasures()
+								.stream()
+								.filter(m -> m.getId().equals("downloads"))
+								.collect(Collectors.toList())
+								.get(0)
+								.getUnit()
+								.get(0)
+								.getValue());
+		Assertions
+				.assertEquals(
+						"1",
+						tmp
+								.map(r -> ((OafEntity)r.getPayload()))
+								.filter(r -> r.getId().equals("40|f11_________::17eda2ff77407538fbe5d3d719b9d1c0"))
+								.collect()
+								.get(0)
+								.getMeasures()
+								.stream()
+								.filter(m -> m.getId().equals("views"))
+								.collect(Collectors.toList())
+								.get(0)
+								.getUnit()
+								.get(0)
+								.getValue());
+
+		Assertions
+				.assertEquals(
+						"2",
+						tmp
+								.map(r -> ((OafEntity)r.getPayload()))
+								.filter(r -> r.getId().equals("40|f12_________::3085e4c6e051378ca6157fe7f0430c1f"))
+								.collect()
+								.get(0)
+								.getMeasures()
+								.stream()
+								.filter(m -> m.getId().equals("downloads"))
+								.collect(Collectors.toList())
+								.get(0)
+								.getUnit()
+								.get(0)
+								.getValue());
+		Assertions
+				.assertEquals(
+						"6",
+						tmp
+								.map(r -> ((OafEntity)r.getPayload()))
+								.filter(r -> r.getId().equals("40|f12_________::3085e4c6e051378ca6157fe7f0430c1f"))
+								.collect()
+								.get(0)
+								.getMeasures()
+								.stream()
+								.filter(m -> m.getId().equals("views"))
+								.collect(Collectors.toList())
+								.get(0)
+								.getUnit()
+								.get(0)
+								.getValue());
+
+
+		Assertions
+				.assertEquals(
+						"0",
+						tmp
+								.map(r -> ((OafEntity)r.getPayload()))
+								.filter(r -> r.getId().equals("10|d1__________::53575dc69e9ace947e02d47ecd54a7a6"))
+								.collect()
+								.get(0)
+								.getMeasures()
+								.stream()
+								.filter(m -> m.getId().equals("downloads"))
+								.collect(Collectors.toList())
+								.get(0)
+								.getUnit()
+								.get(0)
+								.getValue());
+		Assertions
+				.assertEquals(
+						"5",
+						tmp
+								.map(r -> ((OafEntity)r.getPayload()))
+								.filter(r -> r.getId().equals("10|d1__________::53575dc69e9ace947e02d47ecd54a7a6"))
+								.collect()
+								.get(0)
+								.getMeasures()
+								.stream()
+								.filter(m -> m.getId().equals("views"))
+								.collect(Collectors.toList())
+								.get(0)
+								.getUnit()
+								.get(0)
+								.getValue());
+
+		Assertions
+				.assertEquals(
+						"0",
+						tmp
+								.map(r -> ((OafEntity)r.getPayload()))
+								.filter(r -> r.getId().equals("10|d11_________::17eda2ff77407538fbe5d3d719b9d1c0"))
+								.collect()
+								.get(0)
+								.getMeasures()
+								.stream()
+								.filter(m -> m.getId().equals("downloads"))
+								.collect(Collectors.toList())
+								.get(0)
+								.getUnit()
+								.get(0)
+								.getValue());
+		Assertions
+				.assertEquals(
+						"1",
+						tmp
+								.map(r -> ((OafEntity)r.getPayload()))
+								.filter(r -> r.getId().equals("10|d11_________::17eda2ff77407538fbe5d3d719b9d1c0"))
+								.collect()
+								.get(0)
+								.getMeasures()
+								.stream()
+								.filter(m -> m.getId().equals("views"))
+								.collect(Collectors.toList())
+								.get(0)
+								.getUnit()
+								.get(0)
+								.getValue());
+
+		Assertions
+				.assertEquals(
+						"2",
+						tmp
+								.map(r -> ((OafEntity)r.getPayload()))
+								.filter(r -> r.getId().equals("10|d12_________::3085e4c6e051378ca6157fe7f0430c1f"))
+								.collect()
+								.get(0)
+								.getMeasures()
+								.stream()
+								.filter(m -> m.getId().equals("downloads"))
+								.collect(Collectors.toList())
+								.get(0)
+								.getUnit()
+								.get(0)
+								.getValue());
+		Assertions
+				.assertEquals(
+						"6",
+						tmp
+								.map(r -> ((OafEntity)r.getPayload()))
+								.filter(r -> r.getId().equals("10|d12_________::3085e4c6e051378ca6157fe7f0430c1f"))
+								.collect()
+								.get(0)
+								.getMeasures()
+								.stream()
+								.filter(m -> m.getId().equals("views"))
+								.collect(Collectors.toList())
+								.get(0)
+								.getUnit()
+								.get(0)
+								.getValue());
 	}
 
 }
