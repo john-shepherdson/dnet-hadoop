@@ -81,9 +81,9 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 		log.info("table:         '{}'", dbTable);
 		log.info("dbPwd:         '{}'", "xxx");
 
-		final String organizazion = ModelSupport.getMainType(EntityType.organization);
-		final String entityPath = DedupUtility.createEntityPath(graphBasePath, organizazion);
-		final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, organizazion);
+		final String organization = ModelSupport.getMainType(EntityType.organization);
+		final String entityPath = DedupUtility.createEntityPath(graphBasePath, organization);
+		final String mergeRelPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, organization);
 		final String relationPath = DedupUtility.createEntityPath(graphBasePath, "relation");
 
 		Dataset<OrgSimRel> newOrgs = createNewOrgs(spark, mergeRelPath, relationPath, entityPath);
@@ -111,7 +111,7 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 		JavaPairRDD<String, String> diffRels = spark
 			.read()
 			.textFile(relationPath)
-			.map(patchRelFn(), Encoders.bean(Relation.class))
+			.map(parseRelFn(), Encoders.bean(Relation.class))
 			.toJavaRDD()
 			.filter(r -> filterRels(r, ModelSupport.getMainType(EntityType.organization)))
 			// take the worst id of the diffrel: <other id, "diffRel">

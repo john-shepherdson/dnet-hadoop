@@ -46,20 +46,24 @@ public class SparkCopyRelationsNoOpenorgs extends AbstractSparkAction {
 	public void run(ISLookUpService isLookUpService) throws IOException {
 
 		final String graphBasePath = parser.get("graphBasePath");
-		final String workingPath = parser.get("workingPath");
-		final String dedupGraphPath = parser.get("dedupGraphPath");
-
 		log.info("graphBasePath:  '{}'", graphBasePath);
+
+		final String workingPath = parser.get("workingPath");
 		log.info("workingPath:    '{}'", workingPath);
+
+		final String dedupGraphPath = parser.get("dedupGraphPath");
 		log.info("dedupGraphPath: '{}'", dedupGraphPath);
 
 		final String relationPath = DedupUtility.createEntityPath(graphBasePath, "relation");
+		log.info("relationPath: '{}'", relationPath);
+
 		final String outputPath = DedupUtility.createEntityPath(dedupGraphPath, "relation");
+		log.info("outputPath: '{}'", outputPath);
 
 		JavaRDD<Relation> simRels = spark
 			.read()
 			.textFile(relationPath)
-			.map(patchRelFn(), Encoders.bean(Relation.class))
+			.map(parseRelFn(), Encoders.bean(Relation.class))
 			.toJavaRDD()
 			.filter(x -> !isOpenorgsDedupRel(x));
 

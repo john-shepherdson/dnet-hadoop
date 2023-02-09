@@ -1,15 +1,16 @@
 
 package eu.dnetlib.dhp.schema.oaf.common;
 
-import eu.dnetlib.dhp.schema.oaf.Entity;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+import eu.dnetlib.dhp.schema.oaf.Entity;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class ModelSupportTest {
 
@@ -35,18 +36,15 @@ public class ModelSupportTest {
 		}
 	}
 
-
 	@Nested
 	class InverseRelation {
 
 		@Test
-		void findRelations() throws IOException {
+		void findRelations() {
 			assertNotNull(ModelSupport.findRelation("isMetadataFor"));
 			assertNotNull(ModelSupport.findRelation("ismetadatafor"));
 			assertNotNull(ModelSupport.findRelation("ISMETADATAFOR"));
 			assertNotNull(ModelSupport.findRelation("isRelatedTo"));
-
-
 		}
 	}
 }

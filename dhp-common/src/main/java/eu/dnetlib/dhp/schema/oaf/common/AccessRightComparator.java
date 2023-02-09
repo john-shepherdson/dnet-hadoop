@@ -1,9 +1,9 @@
 
 package eu.dnetlib.dhp.schema.oaf.common;
 
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-
 import java.util.Comparator;
+
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
 
 public class AccessRightComparator<T extends Qualifier> implements Comparator<T> {
 

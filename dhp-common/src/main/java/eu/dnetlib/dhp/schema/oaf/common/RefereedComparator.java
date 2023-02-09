@@ -1,10 +1,10 @@
 
 package eu.dnetlib.dhp.schema.oaf.common;
 
+import java.util.Comparator;
+
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
-
-import java.util.Comparator;
 
 public class RefereedComparator implements Comparator<Qualifier> {
 

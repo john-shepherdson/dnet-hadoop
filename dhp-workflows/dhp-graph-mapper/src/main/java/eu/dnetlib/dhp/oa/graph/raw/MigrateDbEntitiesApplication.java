@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
+import static eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory.*;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -253,7 +254,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				.setJournal(
 					journal(
 						rs.getString("officialname"), rs.getString("issnPrinted"), rs.getString("issnOnline"),
-						rs.getString("issnLinking"), info)); // Journal
+						rs.getString("issnLinking"))); // Journal
 
 			ds.setResearchentitytypes(listValues(rs.getArray("researchentitytypes")));
 			ds.setJurisdiction(prepareQualifierSplitting(rs.getString("jurisdiction")));
@@ -402,16 +403,9 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
 
 			final List<Provenance> provenance = getProvenance(collectedFrom, info);
-
-			final Relation r1 = OafMapperUtils
-				.getRelation(
-					dsId, orgId, DATASOURCE_ORGANIZATION, PROVISION, IS_PROVIDED_BY, provenance);
-
-			final Relation r2 = OafMapperUtils
-				.getRelation(
-					orgId, dsId, DATASOURCE_ORGANIZATION, PROVISION, PROVIDES, provenance);
-
-			return Arrays.asList(r1, r2);
+			return Arrays.asList(OafMapperUtils
+					.getRelation(
+							orgId, dsId, DATASOURCE_ORGANIZATION, PROVISION, PROVIDES, provenance));
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -432,15 +426,10 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 					keyValue("contribution", String.valueOf(rs.getDouble("contribution"))),
 					keyValue("currency", rs.getString("currency")));
 
-			final Relation r1 = OafMapperUtils
-				.getRelation(
-					projectId, orgId, PROJECT_ORGANIZATION, PARTICIPATION, HAS_PARTICIPANT, provenance, properties);
+			return Arrays.asList(
+					OafMapperUtils.getRelation(
+					orgId, projectId, PROJECT_ORGANIZATION, PARTICIPATION, IS_PARTICIPANT, provenance, properties));
 
-			final Relation r2 = OafMapperUtils
-				.getRelation(
-					orgId, projectId, PROJECT_ORGANIZATION, PARTICIPATION, IS_PARTICIPANT, provenance, properties);
-
-			return Arrays.asList(r1, r2);
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -479,15 +468,13 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				final String sourceId = createOpenaireId(sourceType, rs.getString("source_id"), false);
 				final String targetId = createOpenaireId(targetType, rs.getString("target_id"), false);
 
-				Relation r1 = prepareRelation(sourceId, targetId, PROVENANCE_CLAIM, validationDate);
-				Relation r2 = prepareRelation(targetId, sourceId, PROVENANCE_CLAIM, validationDate);
+				Relation rel = prepareRelation(sourceId, targetId, PROVENANCE_CLAIM, validationDate);
 
 				final String semantics = rs.getString("semantics");
 
 				switch (semantics) {
 					case "resultResult_relationship_isRelatedTo":
-						r1 = setRelationSemantic(r1, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO);
-						r2 = setRelationSemantic(r2, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO);
+						rel = setRelationSemantic(rel, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO);
 						break;
 					case "resultProject_outcome_produces":
 						if (!"project".equals(sourceType)) {
@@ -497,18 +484,16 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 										"invalid claim, sourceId: %s, targetId: %s, semantics: %s", sourceId, targetId,
 										semantics));
 						}
-						r1 = setRelationSemantic(r1, RESULT_PROJECT, OUTCOME, PRODUCES);
-						r2 = setRelationSemantic(r2, RESULT_PROJECT, OUTCOME, IS_PRODUCED_BY);
+						rel = setRelationSemantic(rel, RESULT_PROJECT, OUTCOME, PRODUCES);
 						break;
 					case "resultResult_publicationDataset_isRelatedTo":
-						r1 = setRelationSemantic(r1, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO);
-						r2 = setRelationSemantic(r2, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO);
+						rel = setRelationSemantic(rel, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO);
 						break;
 					default:
 						throw new IllegalArgumentException("claim semantics not managed: " + semantics);
 				}
 
-				return Arrays.asList(r1, r2);
+				return Arrays.asList(rel);
 			}
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
@@ -656,11 +641,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
 
 			final List<Provenance> provenance = getProvenance(collectedFrom, info);
-
-			final Relation r1 = getRelation(orgId1, orgId2, ORG_ORG_RELTYPE, DEDUP, MERGES, provenance);
-
-			final Relation r2 = getRelation(orgId2, orgId1, ORG_ORG_RELTYPE, DEDUP, IS_MERGED_IN, provenance);
-			return Arrays.asList(r1, r2);
+			return Arrays.asList(getRelation(orgId1, orgId2, ORG_ORG_RELTYPE, DEDUP, MERGES, provenance));
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}

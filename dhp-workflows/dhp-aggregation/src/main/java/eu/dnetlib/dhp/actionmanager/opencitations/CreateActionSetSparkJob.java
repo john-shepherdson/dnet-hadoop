@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
-import com.google.common.collect.Lists;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
@@ -38,6 +38,27 @@ public class CreateActionSetSparkJob implements Serializable {
 	public static final String OPENCITATIONS_CLASSNAME = "Imported from OpenCitations";
 	private static final String ID_PREFIX = "50|doi_________::";
 	private static final Float TRUST = 0.91f;
+	private static final KeyValue COLLECTED_FROM;
+
+	public static final DataInfo DATA_INFO;
+
+	static {
+		COLLECTED_FROM = new KeyValue();
+		COLLECTED_FROM.setKey(ModelConstants.OPENOCITATIONS_ID);
+		COLLECTED_FROM.setValue(ModelConstants.OPENOCITATIONS_NAME);
+
+		DATA_INFO = OafMapperUtils.dataInfo(
+				TRUST,
+				null,
+				false,
+				OafMapperUtils.qualifier(
+						OPENCITATIONS_CLASSID,
+						OPENCITATIONS_CLASSNAME,
+						ModelConstants.DNET_PROVENANCE_ACTIONS));
+	}
+
+	private static final List<Provenance> PROVENANCE = Arrays.asList(
+			OafMapperUtils.getProvenance(COLLECTED_FROM, DATA_INFO));
 
 	private static final Logger log = LoggerFactory.getLogger(CreateActionSetSparkJob.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -109,16 +130,12 @@ public class CreateActionSetSparkJob implements Serializable {
 		List<Relation> relationList = new ArrayList<>();
 
 		String citing = ID_PREFIX
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", value.getCiting()));
+			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue(PidType.doi.toString(), value.getCiting()));
 		final String cited = ID_PREFIX
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", value.getCited()));
+			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue(PidType.doi.toString(), value.getCited()));
 
 		if (!citing.equals(cited)) {
-			relationList
-				.addAll(
-					getRelations(
-						citing,
-						cited));
+			relationList.add(getRelation(citing, cited));
 
 			if (duplicate && value.getCiting().endsWith(".refs")) {
 				citing = ID_PREFIX + IdentifierFactory
@@ -126,51 +143,24 @@ public class CreateActionSetSparkJob implements Serializable {
 						CleaningFunctions
 							.normalizePidValue(
 								"doi", value.getCiting().substring(0, value.getCiting().indexOf(".refs"))));
-				relationList.addAll(getRelations(citing, cited));
+				relationList.add(getRelation(citing, cited));
 			}
 		}
 
 		return relationList;
 	}
 
-	private static Collection<Relation> getRelations(String citing, String cited) {
-
-		return Arrays
-			.asList(
-				getRelation(citing, cited, ModelConstants.CITES),
-				getRelation(cited, citing, ModelConstants.IS_CITED_BY));
-	}
-
 	public static Relation getRelation(
 		String source,
-		String target,
-		String relclass) {
+		String target) {
 		Relation r = new Relation();
-		r.setProvenance(getProvenance());
+		r.setProvenance(PROVENANCE);
 		r.setSource(source);
 		r.setTarget(target);
-		r.setRelClass(relclass);
 		r.setRelType(ModelConstants.RESULT_RESULT);
 		r.setSubRelType(ModelConstants.CITATION);
+		r.setRelClass(ModelConstants.CITES);
 		return r;
 	}
-
-	private static List<Provenance> getProvenance() {
-		return Arrays.asList(OafMapperUtils.getProvenance(getCollectedFrom(), getDataInfo()));
-	}
-
-	public static KeyValue getCollectedFrom() {
-		KeyValue kv = new KeyValue();
-		kv.setKey(ModelConstants.OPENOCITATIONS_ID);
-		kv.setValue(ModelConstants.OPENOCITATIONS_NAME);
-
-		return kv;
-	}
-
-	public static DataInfo getDataInfo() {
-		return OafMapperUtils.dataInfo(TRUST, null, false,
-				OafMapperUtils.qualifier(OPENCITATIONS_CLASSID, OPENCITATIONS_CLASSNAME, ModelConstants.DNET_PROVENANCE_ACTIONS));
-	}
-
 
 }

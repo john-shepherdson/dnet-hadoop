@@ -78,10 +78,7 @@ class IdentifierFactoryTest {
 		final String json = IOUtils.toString(getClass().getResourceAsStream(filename));
 		final Publication pub = OBJECT_MAPPER.readValue(json, Publication.class);
 
-		String id = IdentifierFactory.createIdentifier(pub, md5);
-		System.out.println(id);
-		assertNotNull(id);
-		assertEquals(expectedID, id);
+		assertEquals(expectedID, IdentifierFactory.createIdentifier(pub, md5));
 	}
 
 }

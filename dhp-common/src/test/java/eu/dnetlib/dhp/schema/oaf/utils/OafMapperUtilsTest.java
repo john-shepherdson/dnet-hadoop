@@ -142,14 +142,13 @@ class OafMapperUtilsTest {
 		assertEquals("2013-11-12", GraphCleaningFunctions.cleanDate("1384216367189"));
 		assertEquals("2013-11-12", GraphCleaningFunctions.cleanDate("1384216367111222"));
 		assertEquals("2013-11-12", GraphCleaningFunctions.cleanDate("1384216367111222333"));
-
 	}
 
 	@Test
 	void testDate() {
 		final String date = GraphCleaningFunctions.cleanDate("23-FEB-1998");
 		assertNotNull(date);
-		System.out.println(date);
+		assertEquals("1998-02-23", date);
 	}
 
 	protected <T extends Result> T read(String filename, Class<T> clazz) throws IOException {

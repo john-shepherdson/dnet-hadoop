@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import static java.nio.file.Files.createTempDirectory;
+import static eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.lenient;
@@ -300,9 +301,8 @@ public class SparkOpenorgsDedupTest implements Serializable {
 			.prepareStatement("SELECT local_id, oa_original_id FROM " + dbTable)
 			.executeQuery();
 		while (resultSet3.next()) {
-			String source = OafMapperUtils.createOpenaireId("organization", resultSet3.getString("local_id"), true);
-			String target = OafMapperUtils
-				.createOpenaireId("organization", resultSet3.getString("oa_original_id"), true);
+			String source = createOpenaireId("organization", resultSet3.getString("local_id"), true);
+			String target = createOpenaireId("organization", resultSet3.getString("oa_original_id"), true);
 			dbRels.add(source + "@@@" + target);
 		}
 		resultSet3.close();
@@ -370,7 +370,7 @@ public class SparkOpenorgsDedupTest implements Serializable {
 		while (resultSet0.next())
 			System.out
 				.println(
-					"dborgs = " + OafMapperUtils.createOpenaireId(20, resultSet0.getString("oa_original_id"), true));
+					"dborgs = " + createOpenaireId(20, resultSet0.getString("oa_original_id"), true));
 		resultSet0.close();
 
 		ResultSet resultSet = connection

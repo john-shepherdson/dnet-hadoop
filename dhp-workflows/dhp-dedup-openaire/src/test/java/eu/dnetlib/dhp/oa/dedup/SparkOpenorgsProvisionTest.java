@@ -119,14 +119,10 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 		parser
 			.parseArgument(
 				new String[] {
-					"-i",
-					testGraphBasePath,
-					"-asi",
-					testActionSetId,
-					"-la",
-					"lookupurl",
-					"-w",
-					testOutputBasePath
+					"-i", testGraphBasePath,
+					"-asi", testActionSetId,
+					"-la", "lookupurl",
+					"-w", testOutputBasePath
 				});
 
 		new SparkCopyOpenorgsMergeRels(parser, spark).run(isLookUpService);
@@ -152,14 +148,10 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 		parser
 			.parseArgument(
 				new String[] {
-					"-i",
-					testGraphBasePath,
-					"-asi",
-					testActionSetId,
-					"-la",
-					"lookupurl",
-					"-w",
-					testOutputBasePath
+					"-i", testGraphBasePath,
+					"-asi", testActionSetId,
+					"-la", "lookupurl",
+					"-w", testOutputBasePath
 				});
 
 		new SparkCreateOrgsDedupRecord(parser, spark).run(isLookUpService);

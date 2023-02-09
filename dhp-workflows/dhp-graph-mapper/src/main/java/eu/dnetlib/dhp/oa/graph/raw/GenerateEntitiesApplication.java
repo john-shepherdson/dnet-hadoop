@@ -28,7 +28,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;

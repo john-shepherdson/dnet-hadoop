@@ -257,44 +257,27 @@ class MigrateDbEntitiesApplicationTest {
 	void testProcessProjectOrganization() throws Exception {
 		final List<TypedField> fields = prepareMocks("projectorganization_resultset_entry.json");
 
-		final List<Oaf> list = app.processProjectOrganization(rs);
+		final List<Oaf> oaf = app.processProjectOrganization(rs);
 
-		assertEquals(2, list.size());
+		assertNotNull(oaf);
+		assertFalse(oaf.isEmpty());
+		assertEquals(1, oaf.size());
 		verifyMocks(fields);
 
-		final Relation r1 = (Relation) list.get(0);
-		final Relation r2 = (Relation) list.get(1);
-		assertValidId(r1.getSource());
-		assertValidId(r2.getSource());
-		assertEquals(r1.getSource(), r2.getTarget());
-		assertEquals(r2.getSource(), r1.getTarget());
-		assertNotNull(r1.getProvenance());
-		assertFalse(r1.getProvenance().isEmpty());
-		assertValidId(r1.getProvenance().get(0).getCollectedfrom().getKey());
-		assertNotNull(r2.getProvenance());
-		assertFalse(r2.getProvenance().isEmpty());
-		assertValidId(r2.getProvenance().get(0).getCollectedfrom().getKey());
+		final Relation rel = (Relation) oaf.get(0);
 
-		assertEquals(ModelConstants.PROJECT_ORGANIZATION, r1.getRelType());
-		assertEquals(ModelConstants.PROJECT_ORGANIZATION, r2.getRelType());
+		assertValidId(rel.getSource());
+		assertNotNull(rel.getProvenance());
+		assertFalse(rel.getProvenance().isEmpty());
+		assertValidId(rel.getProvenance().get(0).getCollectedfrom().getKey());
 
-		assertEquals(ModelConstants.PARTICIPATION, r1.getSubRelType());
-		assertEquals(ModelConstants.PARTICIPATION, r2.getSubRelType());
+		assertEquals(ModelConstants.PROJECT_ORGANIZATION, rel.getRelType());
+		assertEquals(ModelConstants.PARTICIPATION, rel.getSubRelType());
+		assertEquals(ModelConstants.IS_PARTICIPANT, rel.getRelClass());
 
-		if (r1.getSource().startsWith("40")) {
-			assertEquals(ModelConstants.HAS_PARTICIPANT, r1.getRelClass());
-			assertEquals(ModelConstants.IS_PARTICIPANT, r2.getRelClass());
-		} else if (r1.getSource().startsWith("20")) {
-			assertEquals(ModelConstants.IS_PARTICIPANT, r1.getRelClass());
-			assertEquals(ModelConstants.HAS_PARTICIPANT, r2.getRelClass());
-		}
-
-		assertNotNull(r1.getProperties());
-		checkProperty(r1, "contribution", "436754.0");
-		checkProperty(r2, "contribution", "436754.0");
-
-		checkProperty(r1, "currency", "EUR");
-		checkProperty(r2, "currency", "EUR");
+		assertNotNull(rel.getProperties());
+		checkProperty(rel, "contribution", "436754.0");
+		checkProperty(rel, "currency", "EUR");
 	}
 
 	private void checkProperty(Relation r, String property, String value) {

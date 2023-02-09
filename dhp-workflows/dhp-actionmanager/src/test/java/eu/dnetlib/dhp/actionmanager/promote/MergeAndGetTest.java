@@ -98,7 +98,7 @@ public class MergeAndGetTest {
 			Oaf x = fn.get().apply(a, b);
 			assertTrue(Relation.class.isAssignableFrom(x.getClass()));
 			//verify(a).mergeFrom(b);
-			a = MergeUtils.mergeRelation(verify(a), b);
+			a = MergeUtils.merge(verify(a), b);
 			assertEquals(a, x);
 		}
 
@@ -158,7 +158,7 @@ public class MergeAndGetTest {
 			// then
 			Oaf x = fn.get().apply(a, b);
 			assertTrue(Entity.class.isAssignableFrom(x.getClass()));
-			a = MergeUtils.mergeEntity(verify(a), b);
+			a = MergeUtils.merge(verify(a), b);
 			assertEquals(a, x);
 		}
 	}

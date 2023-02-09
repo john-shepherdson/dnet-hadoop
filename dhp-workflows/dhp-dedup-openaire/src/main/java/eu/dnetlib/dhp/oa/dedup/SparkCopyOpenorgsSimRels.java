@@ -49,17 +49,19 @@ public class SparkCopyOpenorgsSimRels extends AbstractSparkAction {
 
 		// read oozie parameters
 		final String graphBasePath = parser.get("graphBasePath");
+		log.info("graphBasePath: '{}'", graphBasePath);
+
 		final String actionSetId = parser.get("actionSetId");
+		log.info("actionSetId:   '{}'", actionSetId);
+
 		final String workingPath = parser.get("workingPath");
+		log.info("workingPath:   '{}'", workingPath);
+
 		final int numPartitions = Optional
 			.ofNullable(parser.get("numPartitions"))
 			.map(Integer::valueOf)
 			.orElse(NUM_PARTITIONS);
-
 		log.info("numPartitions: '{}'", numPartitions);
-		log.info("graphBasePath: '{}'", graphBasePath);
-		log.info("actionSetId:   '{}'", actionSetId);
-		log.info("workingPath:   '{}'", workingPath);
 
 		log.info("Copying OpenOrgs SimRels");
 
@@ -70,7 +72,7 @@ public class SparkCopyOpenorgsSimRels extends AbstractSparkAction {
 		Dataset<Relation> rawRels = spark
 			.read()
 			.textFile(relationPath)
-			.map(patchRelFn(), Encoders.bean(Relation.class))
+			.map(parseRelFn(), Encoders.bean(Relation.class))
 			.filter(this::filterOpenorgsRels);
 
 		saveParquet(rawRels, outputPath, SaveMode.Append);

@@ -152,7 +152,6 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 					Encoders.bean(Relation.class));
 
 			mergeRels.write().mode(SaveMode.Overwrite).parquet(mergeRelPath);
-
 		}
 	}
 
@@ -198,12 +197,11 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 			.stream()
 			.flatMap(
 				id -> {
-					List<Relation> tmp = new ArrayList<>();
+					List<Relation> rels = new ArrayList<>();
 
-					tmp.add(rel(cc.getCcId(), id, ModelConstants.MERGES, dedupConf));
-					tmp.add(rel(id, cc.getCcId(), ModelConstants.IS_MERGED_IN, dedupConf));
+					rels.add(rel(cc.getCcId(), id, ModelConstants.MERGES, dedupConf));
 
-					return tmp.stream();
+					return rels.stream();
 				})
 			.iterator();
 	}

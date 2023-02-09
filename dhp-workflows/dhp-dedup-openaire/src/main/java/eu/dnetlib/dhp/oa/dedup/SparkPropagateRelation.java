@@ -19,6 +19,7 @@ import scala.Tuple2;
 import scala.Tuple3;
 
 import java.util.Objects;
+import java.util.logging.Filter;
 
 import static org.apache.spark.sql.functions.col;
 
@@ -83,23 +84,25 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 
 		final String relationPath = DedupUtility.createEntityPath(graphBasePath, "relation");
 
-		Dataset<Relation> rels = spark.read().textFile(relationPath).map(patchRelFn(), Encoders.bean(Relation.class));
+		Dataset<Relation> rels = spark.read().textFile(relationPath).map(parseRelFn(), Encoders.bean(Relation.class));
 
 		Dataset<Relation> newRels = createNewRels(rels, mergedIds, getFixRelFn());
 
-		Dataset<Relation> updated = processDataset(
-			processDataset(rels, mergedIds, FieldType.SOURCE, getDeletedFn()),
-			mergedIds,
-			FieldType.TARGET,
-			getDeletedFn());
+		Dataset<Relation> relFiltered = rels
+				.joinWith(mergedIds, rels.col("source").equalTo(mergedIds.col("_1")), "left_outer")
+				.filter((FilterFunction<Tuple2<Relation, Tuple2<String, String>>>) value -> value._2() != null)
+				.map((MapFunction<Tuple2<Relation, Tuple2<String, String>>, Relation>) Tuple2::_1, Encoders.bean(Relation.class))
+				.joinWith(mergedIds, rels.col("target").equalTo(mergedIds.col("_1")), "left_outer")
+				.filter((FilterFunction<Tuple2<Relation, Tuple2<String, String>>>) value -> value._2() != null)
+				.map((MapFunction<Tuple2<Relation, Tuple2<String, String>>, Relation>) Tuple2::_1, Encoders.bean(Relation.class));
 
 		save(
 			distinctRelations(
 				newRels
-					.union(updated)
+					.union(relFiltered)
 					.union(mergeRels)
 					.map((MapFunction<Relation, Relation>) r -> r, Encoders.kryo(Relation.class)))
-						.filter((FilterFunction<Relation>) r -> !Objects.equals(r.getSource(), r.getTarget())),
+					.filter((FilterFunction<Relation>) r -> !Objects.equals(r.getSource(), r.getTarget())),
 			outputRelationPath, SaveMode.Overwrite);
 	}
 
@@ -144,20 +147,6 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 			.distinct();
 	}
 
-	private static Dataset<Relation> processDataset(
-		Dataset<Relation> rels,
-		Dataset<Tuple2<String, String>> mergedIds,
-		FieldType type,
-		MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, String>>, Relation> mapFn) {
-		final Dataset<Tuple2<String, Relation>> mapped = rels
-			.map(
-				(MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(getId(r, type), r),
-				Encoders.tuple(Encoders.STRING(), Encoders.kryo(Relation.class)));
-		return mapped
-			.joinWith(mergedIds, mapped.col("_1").equalTo(mergedIds.col("_1")), "left_outer")
-			.map(mapFn, Encoders.bean(Relation.class));
-	}
-
 	private FilterFunction<Relation> getRelationFilterFunction() {
 		return r -> StringUtils.isNotBlank(r.getSource()) ||
 			StringUtils.isNotBlank(r.getTarget()) ||
@@ -191,25 +180,6 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 				r.setTarget(newTarget);
 
 			return r;
-		};
-	}
-
-	private static MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, String>>, Relation> getDeletedFn() {
-
-		//TODO the model does not include anymore the possibility to mark relations as deleted. We should therefore
-		//TODO delete them for good in this spark action.
-		return value -> {
-			if (value._2() != null) {
-				Relation r = value._1()._2();
-				/*
-				if (r.getDataInfo() == null) {
-					r.setDataInfo(new DataInfo());
-				}
-				r.getDataInfo().setDeletedbyinference(true);
-				 */
-				return r;
-			}
-			return value._1()._2();
 		};
 	}
 

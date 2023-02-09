@@ -1,16 +1,7 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
-import com.github.sisyphsu.dateparser.DateParserUtils;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
-import me.xuender.unidecode.Unidecode;
-import org.apache.commons.lang3.StringUtils;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.getProvenance;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -21,7 +12,17 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.getProvenance;
+import org.apache.commons.lang3.StringUtils;
+
+import com.github.sisyphsu.dateparser.DateParserUtils;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
+import me.xuender.unidecode.Unidecode;
 
 public class GraphCleaningFunctions extends CleaningFunctions {
 

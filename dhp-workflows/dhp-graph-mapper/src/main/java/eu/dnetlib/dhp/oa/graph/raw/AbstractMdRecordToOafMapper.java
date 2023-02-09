@@ -2,19 +2,18 @@
 package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PID_TYPES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PRODUCED_BY;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.OUTCOME;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.PRODUCES;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.REPOSITORY_PROVENANCE_ACTIONS;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.UNKNOWN;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
+import static eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import eu.dnetlib.dhp.schema.oaf.Entity;
-import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.dom4j.*;
@@ -210,7 +209,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			case "publication":
 				final Publication p = new Publication();
 				populateResultFields(p, doc, instances, collectedFrom, info, lastUpdateTimestamp);
-				p.setJournal(prepareJournal(doc, info));
+				p.setJournal(prepareJournal(doc));
 				return p;
 			case "dataset":
 				final Dataset d = new Dataset();
@@ -262,11 +261,6 @@ public abstract class AbstractMdRecordToOafMapper {
 				res
 					.add(
 						OafMapperUtils
-							.getRelation(
-								docId, projectId, RESULT_PROJECT, OUTCOME, IS_PRODUCED_BY, entity, validationdDate));
-				res
-					.add(
-						OafMapperUtils
 							.getRelation(projectId, docId, RESULT_PROJECT, OUTCOME, PRODUCES, entity, validationdDate));
 			}
 		}
@@ -289,9 +283,6 @@ public abstract class AbstractMdRecordToOafMapper {
 			if (StringUtils.isNotBlank(target) && StringUtils.isNotBlank(relType) && StringUtils.isNotBlank(subRelType)
 				&& StringUtils.isNotBlank(relClass)) {
 
-				final String relClassInverse = ModelSupport
-					.findInverse(ModelSupport.rel(relType, subRelType, relClass))
-					.getInverseRelClass();
 				final String validationdDate = ((Node) o).valueOf("@validationDate");
 
 				if (StringUtils.isNotBlank(target)) {
@@ -303,12 +294,6 @@ public abstract class AbstractMdRecordToOafMapper {
 								OafMapperUtils
 									.getRelation(
 										entity.getId(), targetId, relType, subRelType, relClass, entity,
-										validationdDate));
-						rels
-							.add(
-								OafMapperUtils
-									.getRelation(
-										targetId, entity.getId(), relType, subRelType, relClassInverse, entity,
 										validationdDate));
 					}
 				}
@@ -457,7 +442,7 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected abstract String prepareDatasetStorageDate(Document doc);
 
-	private Journal prepareJournal(final Document doc, final DataInfo info) {
+	private Journal prepareJournal(final Document doc) {
 		final Node n = doc.selectSingleNode("//oaf:journal");
 		if (n != null) {
 			final String name = n.getText();
@@ -470,7 +455,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			final String vol = n.valueOf("@vol");
 			final String edition = n.valueOf("@edition");
 			if (StringUtils.isNotBlank(name)) {
-				return journal(name, issnPrinted, issnOnline, issnLinking, ep, iss, sp, vol, edition, null, null, info);
+				return journal(name, issnPrinted, issnOnline, issnLinking, ep, iss, sp, vol, edition, null, null);
 			}
 		}
 		return null;

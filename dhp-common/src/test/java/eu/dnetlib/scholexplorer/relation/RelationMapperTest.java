@@ -1,6 +1,8 @@
 
 package eu.dnetlib.scholexplorer.relation;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 import org.junit.jupiter.api.Test;
 
 class RelationMapperTest {
@@ -9,6 +11,6 @@ class RelationMapperTest {
 	void testLoadRels() throws Exception {
 
 		RelationMapper relationMapper = RelationMapper.load();
-		relationMapper.keySet().forEach(System.out::println);
+		assertFalse(relationMapper.isEmpty());
 	}
 }

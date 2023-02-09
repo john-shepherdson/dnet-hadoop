@@ -46,30 +46,7 @@ public class MergeAndGet {
 	}
 
 	private static <G extends Oaf, A extends Oaf> G mergeFromAndGet(G x, A y) {
-		if (isSubClass(x, Relation.class) && isSubClass(y, Relation.class)) {
-			return (G) MergeUtils.mergeRelation((Relation) x, (Relation) y);
-		} else if (isSubClass(x, Result.class)
-			&& isSubClass(y, Result.class)
-			&& isSubClass(x, y)) {
-			return (G) MergeUtils.mergeResult((Result) x, (Result) y);
-		} else if (isSubClass(x, Datasource.class)
-				&& isSubClass(y, Datasource.class)
-				&& isSubClass(x, y)) {
-			throw new RuntimeException("MERGE_FROM_AND_GET should not deal with Datasource types");
-		} else if (isSubClass(x, Organization.class)
-				&& isSubClass(y, Organization.class)
-				&& isSubClass(x, y)) {
-			return (G) MergeUtils.mergeOrganization((Organization) x, (Organization) y);
-		} else if (isSubClass(x, Project.class)
-				&& isSubClass(y, Project.class)
-				&& isSubClass(x, y)) {
-			return (G) MergeUtils.mergeProject((Project) x, (Project) y);
-		}
-		throw new RuntimeException(
-			String
-				.format(
-					"MERGE_FROM_AND_GET incompatible types: %s, %s",
-					x.getClass().getCanonicalName(), y.getClass().getCanonicalName()));
+		return (G) MergeUtils.merge(x, y);
 	}
 
 	@SuppressWarnings("unchecked")

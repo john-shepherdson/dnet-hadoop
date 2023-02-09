@@ -121,10 +121,12 @@ public class AuthorMerger {
 	}
 
 	public static String pidToComparableString(StructuredProperty pid) {
-		final String classid = pid.getQualifier().getClassid() != null ? pid.getQualifier().getClassid().toLowerCase()
-			: "";
-		return (pid.getQualifier() != null ? classid : "")
-			+ (pid.getValue() != null ? pid.getValue().toLowerCase() : "");
+		return pid.toComparableString();
+		/*
+		 * final String classid = pid.getQualifier().getClassid() != null ?
+		 * pid.getQualifier().getClassid().toLowerCase() : ""; return (pid.getQualifier() != null ? classid : "") +
+		 * (pid.getValue() != null ? pid.getValue().toLowerCase() : "");
+		 */
 	}
 
 	public static int countAuthorsPids(List<Author> authors) {

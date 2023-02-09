@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.common.action;
 
+import static eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory.*;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -19,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.common.action.model.MasterDuplicate;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 public class ReadDatasourceMasterDuplicateFromDB {
 
@@ -59,8 +60,8 @@ public class ReadDatasourceMasterDuplicateFromDB {
 			final String masterId = rs.getString("masterId");
 			final String masterName = rs.getString("masterName");
 
-			md.setDuplicateId(OafMapperUtils.createOpenaireId(10, duplicateId, true));
-			md.setMasterId(OafMapperUtils.createOpenaireId(10, masterId, true));
+			md.setDuplicateId(createOpenaireId(10, duplicateId, true));
+			md.setMasterId(createOpenaireId(10, masterId, true));
 			md.setMasterName(masterName);
 
 			return md;

@@ -3,8 +3,8 @@ package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
+import static eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory.*;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -273,17 +273,11 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 			final String originalId = ((Node) o).getText();
 
 			if (StringUtils.isNotBlank(originalId)) {
-
 				final String otherId = createOpenaireId(50, originalId, false);
-
 				res
 					.add(
 						getRelation(
 							docId, otherId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, entity));
-				res
-					.add(
-						getRelation(
-							otherId, docId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, entity));
 			}
 		}
 		return res;

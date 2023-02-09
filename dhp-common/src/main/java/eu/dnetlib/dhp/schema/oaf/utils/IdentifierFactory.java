@@ -12,7 +12,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,6 +19,7 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Maps;
 
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 
 /**
  * Factory class for OpenAIRE identifiers in the Graph
@@ -268,7 +268,7 @@ public class IdentifierFactory implements Serializable {
 			.append(ID_PREFIX_SEPARATOR)
 			.append(createPrefix(pidType))
 			.append(ID_SEPARATOR)
-			.append(md5 ? md5(pidValue) : pidValue)
+			.append(md5 ? ModelSupport.md5(pidValue) : pidValue)
 			.toString();
 	}
 
@@ -281,13 +281,36 @@ public class IdentifierFactory implements Serializable {
 		return prefix.substring(0, ID_PREFIX_LEN);
 	}
 
-	public static String md5(final String s) {
-		try {
-			final MessageDigest md = MessageDigest.getInstance("MD5");
-			md.update(s.getBytes(StandardCharsets.UTF_8));
-			return new String(Hex.encodeHex(md.digest()));
-		} catch (final Exception e) {
+	public static String createOpenaireId(
+		final int prefix,
+		final String originalId,
+		final boolean to_md5) {
+		if (StringUtils.isBlank(originalId)) {
 			return null;
+		} else if (to_md5) {
+			final String nsPrefix = StringUtils.substringBefore(originalId, "::");
+			final String rest = StringUtils.substringAfter(originalId, "::");
+			return String.format("%s|%s::%s", prefix, nsPrefix, ModelSupport.md5(rest));
+		} else {
+			return String.format("%s|%s", prefix, originalId);
+		}
+	}
+
+	public static String createOpenaireId(
+		final String type,
+		final String originalId,
+		final boolean to_md5) {
+		switch (type) {
+			case "datasource":
+				return createOpenaireId(10, originalId, to_md5);
+			case "organization":
+				return createOpenaireId(20, originalId, to_md5);
+			case "person":
+				return createOpenaireId(30, originalId, to_md5);
+			case "project":
+				return createOpenaireId(40, originalId, to_md5);
+			default:
+				return createOpenaireId(50, originalId, to_md5);
 		}
 	}
 

@@ -1,12 +1,8 @@
 
 package eu.dnetlib.dhp.schema.oaf.common;
 
-import com.github.sisyphsu.dateparser.DateParserUtils;
-import com.google.common.collect.Maps;
-
-import eu.dnetlib.dhp.schema.oaf.*;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.StringUtils;
+import static com.google.common.base.Preconditions.checkArgument;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -18,8 +14,13 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
+
+import com.github.sisyphsu.dateparser.DateParserUtils;
+import com.google.common.collect.Maps;
+
+import eu.dnetlib.dhp.schema.oaf.*;
 
 /** Oaf model utility methods. */
 public class ModelSupport {
@@ -129,7 +130,6 @@ public class ModelSupport {
 		set(relationInverseMap, RESULT_RESULT, RELATIONSHIP, HAS_ASSOCIATION_WITH, HAS_ASSOCIATION_WITH);
 		set(relationInverseMap, RESULT_RESULT, RELATIONSHIP, IS_REQUIRED_BY, REQUIRES);
 
-
 		set(relationInverseMap, RESULT_RESULT, VERSION, IS_PREVIOUS_VERSION_OF, IS_NEW_VERSION_OF);
 		set(relationInverseMap, RESULT_RESULT, VERSION, IS_VARIANT_FORM_OF, IS_ORIGINAL_FORM_OF);
 		set(relationInverseMap, RESULT_RESULT, VERSION, IS_OBSOLETED_BY, OBSOLETES);
@@ -138,22 +138,23 @@ public class ModelSupport {
 		set(relationInverseMap, RESULT_RESULT, REVIEW, IS_REVIEWED_BY, REVIEWS);
 	}
 
-	private static void set(Map<String, RelationInverse> relationInverseMap, String relType, String subRelType, String relClass, String inverseRelClass) {
+	private static void set(Map<String, RelationInverse> relationInverseMap, String relType, String subRelType,
+		String relClass, String inverseRelClass) {
 		relationInverseMap
-				.put(
-						rel(relType, subRelType, relClass), new RelationInverse()
-								.setInverseRelClass(inverseRelClass)
-								.setRelClass(relClass)
-								.setRelType(relType)
-								.setSubReltype(subRelType));
+			.put(
+				rel(relType, subRelType, relClass), new RelationInverse()
+					.setInverseRelClass(inverseRelClass)
+					.setRelClass(relClass)
+					.setRelType(relType)
+					.setSubReltype(subRelType));
 		if (!relClass.equals(inverseRelClass)) {
 			relationInverseMap
-					.put(
-							rel(relType, subRelType, inverseRelClass), new RelationInverse()
-									.setInverseRelClass(relClass)
-									.setRelClass(inverseRelClass)
-									.setRelType(relType)
-									.setSubReltype(subRelType));
+				.put(
+					rel(relType, subRelType, inverseRelClass), new RelationInverse()
+						.setInverseRelClass(relClass)
+						.setRelClass(inverseRelClass)
+						.setRelType(relType)
+						.setSubReltype(subRelType));
 		}
 	}
 
@@ -164,25 +165,26 @@ public class ModelSupport {
 	 */
 	public static RelationInverse findInverse(String encoding) {
 		return ModelSupport.relationInverseMap
-				.entrySet()
-				.stream()
-				.filter(r -> encoding.equalsIgnoreCase(r.getKey()))
-				.findFirst()
-				.map(r -> r.getValue())
-				.orElseThrow(() -> new IllegalArgumentException("invalid relationship: " + encoding));
+			.entrySet()
+			.stream()
+			.filter(r -> encoding.equalsIgnoreCase(r.getKey()))
+			.findFirst()
+			.map(r -> r.getValue())
+			.orElseThrow(() -> new IllegalArgumentException("invalid relationship: " + encoding));
 	}
 
 	/**
 	 * Helper method: fina a relation filtering by a relation name
- 	 * @param relationName
+	 * @param relationName
 	 * @return
 	 */
 	public static RelationInverse findRelation(final String relationName) {
-		return relationInverseMap.values()
-				.stream()
-				.filter(r -> relationName.equalsIgnoreCase(r.getRelClass()))
-				.findFirst()
-				.orElse(null);
+		return relationInverseMap
+			.values()
+			.stream()
+			.filter(r -> relationName.equalsIgnoreCase(r.getRelClass()))
+			.findFirst()
+			.orElse(null);
 	}
 
 	/**
@@ -205,6 +207,10 @@ public class ModelSupport {
 
 	public static <E extends Entity> String getIdPrefix(Class<E> clazz) {
 		return idPrefixMap.get(clazz);
+	}
+
+	public static <X extends Oaf, Y extends Oaf, Z extends Oaf> Boolean sameClass(X left, Y right, Class<Z> superClazz) {
+		return isSubClass(left, superClazz) && isSubClass(right, superClazz);
 	}
 
 	/**

@@ -11,10 +11,10 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.oaf.common.AccessRightComparator;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.common.AccessRightComparator;
 
 public class OafMapperUtils {
 
@@ -208,8 +208,7 @@ public class OafMapperUtils {
 		final String name,
 		final String issnPrinted,
 		final String issnOnline,
-		final String issnLinking,
-		final DataInfo dataInfo) {
+		final String issnLinking) {
 
 		return hasIssn(issnPrinted, issnOnline, issnLinking) ? journal(
 			name,
@@ -222,8 +221,7 @@ public class OafMapperUtils {
 			null,
 			null,
 			null,
-			null,
-			dataInfo) : null;
+			null) : null;
 	}
 
 	public static Journal journal(
@@ -237,8 +235,7 @@ public class OafMapperUtils {
 		final String vol,
 		final String edition,
 		final String conferenceplace,
-		final String conferencedate,
-		final DataInfo dataInfo) {
+		final String conferencedate) {
 
 		if (StringUtils.isNotBlank(name) || hasIssn(issnPrinted, issnOnline, issnLinking)) {
 			final Journal j = new Journal();
@@ -253,7 +250,6 @@ public class OafMapperUtils {
 			j.setEdition(edition);
 			j.setConferenceplace(conferenceplace);
 			j.setConferencedate(conferencedate);
-			j.setDataInfo(dataInfo);
 			return j;
 		} else {
 			return null;
@@ -294,39 +290,6 @@ public class OafMapperUtils {
 		d.setInferred(inferred);
 		d.setProvenanceaction(provenanceaction);
 		return d;
-	}
-
-	public static String createOpenaireId(
-		final int prefix,
-		final String originalId,
-		final boolean to_md5) {
-		if (StringUtils.isBlank(originalId)) {
-			return null;
-		} else if (to_md5) {
-			final String nsPrefix = StringUtils.substringBefore(originalId, "::");
-			final String rest = StringUtils.substringAfter(originalId, "::");
-			return String.format("%s|%s::%s", prefix, nsPrefix, IdentifierFactory.md5(rest));
-		} else {
-			return String.format("%s|%s", prefix, originalId);
-		}
-	}
-
-	public static String createOpenaireId(
-		final String type,
-		final String originalId,
-		final boolean to_md5) {
-		switch (type) {
-			case "datasource":
-				return createOpenaireId(10, originalId, to_md5);
-			case "organization":
-				return createOpenaireId(20, originalId, to_md5);
-			case "person":
-				return createOpenaireId(30, originalId, to_md5);
-			case "project":
-				return createOpenaireId(40, originalId, to_md5);
-			default:
-				return createOpenaireId(50, originalId, to_md5);
-		}
 	}
 
 	public static String asString(final Object o) {
@@ -416,14 +379,14 @@ public class OafMapperUtils {
 	}
 
 	public static Relation getRelation(final String source,
-									   final String target,
-									   final String relType,
-									   final String subRelType,
-									   final String relClass,
-									   final List<Provenance> provenance,
-									   final List<KeyValue> properties) {
+		final String target,
+		final String relType,
+		final String subRelType,
+		final String relClass,
+		final List<Provenance> provenance,
+		final List<KeyValue> properties) {
 		return getRelation(
-				source, target, relType, subRelType, relClass, provenance, null, properties);
+			source, target, relType, subRelType, relClass, provenance, null, properties);
 	}
 
 	public static Relation getRelation(final String source,

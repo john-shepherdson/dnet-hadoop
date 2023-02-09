@@ -94,7 +94,7 @@ public class DedupRecordFactory {
 
 		final List<List<Author>> authors = Lists.newArrayList();
 		for(Entity duplicate : entityList) {
-			entity = (T) MergeUtils.mergeEntities(entity, duplicate);
+			entity = (T) MergeUtils.merge(entity, duplicate);
 
 			if (ModelSupport.isSubClass(duplicate, Result.class)) {
 				Result r1 = (Result) duplicate;

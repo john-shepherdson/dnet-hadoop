@@ -10,8 +10,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -33,6 +31,8 @@ import com.jayway.jsonpath.Option;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import scala.Tuple2;
 
 /**
@@ -120,7 +120,7 @@ public class GroupEntitiesSparkJob {
 
 		private Entity mergeAndGet(Entity b, Entity a) {
 			if (Objects.nonNull(a) && Objects.nonNull(b)) {
-				return MergeUtils.mergeEntities(b, a);
+				return MergeUtils.merge(b, a);
 			}
 			return Objects.isNull(a) ? b : a;
 		}

@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.bulktag.eosc;
 
+import static eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory.*;
+
 import java.io.BufferedWriter;
 import java.io.Closeable;
 import java.io.IOException;
@@ -8,9 +10,6 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
@@ -22,18 +21,10 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
-/**
- * @author miriam.baglioni
- * @Date 21/07/22
- */
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.DbClient;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.common.RelationInverse;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 public class ReadMasterDatasourceFromDB implements Closeable {
 
@@ -87,9 +78,9 @@ public class ReadMasterDatasourceFromDB implements Closeable {
 			dm.setDatasource(datasource);
 			String master = rs.getString("master");
 			if (StringUtils.isNotBlank(master))
-				dm.setMaster(OafMapperUtils.createOpenaireId(10, master, true));
+				dm.setMaster(createOpenaireId(10, master, true));
 			else
-				dm.setMaster(OafMapperUtils.createOpenaireId(10, datasource, true));
+				dm.setMaster(createOpenaireId(10, datasource, true));
 			return dm;
 
 		} catch (final SQLException e) {

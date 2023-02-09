@@ -6,7 +6,6 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -16,7 +15,6 @@ import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
-import org.apache.zookeeper.Op;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -127,10 +125,10 @@ abstract class AbstractSparkAction implements Serializable {
 			.collect(Collectors.joining(SP_SEPARATOR));
 	}
 
-	protected static MapFunction<String, Relation> patchRelFn() {
+	protected static MapFunction<String, Relation> parseRelFn() {
 		return value -> {
 			final Relation rel = OBJECT_MAPPER.readValue(value, Relation.class);
-			for(Provenance prov : rel.getProvenance()) {
+			for(Provenance prov : Optional.ofNullable(rel.getProvenance()).orElse(new ArrayList<>())) {
 				if (prov.getDataInfo() == null) {
 					prov.setDataInfo(new DataInfo());
 				}

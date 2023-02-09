@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
+import static eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory.*;
 
 import java.net.URLDecoder;
 import java.util.*;
@@ -407,11 +408,6 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 				.add(
 					getRelation(
 						entityId, otherId, rel.getRelType(), rel.getSubReltype(), rel.getRelClass(), entity));
-			res
-				.add(
-					getRelation(
-						otherId, entityId, rel.getRelType(), rel.getSubReltype(), rel.getInverseRelClass(), entity));
-
 		}
 		return res;
 	}
