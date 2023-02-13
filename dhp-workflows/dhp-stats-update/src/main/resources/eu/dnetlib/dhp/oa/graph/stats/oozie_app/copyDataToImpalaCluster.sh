@@ -7,7 +7,7 @@ then
 fi
 
 #export HADOOP_USER_NAME="dimitris.pierrakos"
-export HADOOP_USER_NAME=$4
+export HADOOP_USER_NAME=$5
 
 function copydb() {
   db=$1
@@ -52,10 +52,10 @@ function copydb() {
 STATS_DB=$1
 MONITOR_DB=$2
 OBSERVATORY_DB=$3
-HADOOP_USER_NAME=$4
-#EXT_DB=$4
+EXT_DB=$4
+HADOOP_USER_NAME=$5
 
-#copydb $EXT_DB
+copydb $EXT_DB
 copydb $STATS_DB
 copydb $MONITOR_DB
 copydb $OBSERVATORY_DB
