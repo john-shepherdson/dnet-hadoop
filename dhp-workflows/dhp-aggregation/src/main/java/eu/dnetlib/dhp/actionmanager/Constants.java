@@ -62,7 +62,7 @@ public class Constants {
 
 	public static Subject getSubject(String sbj, String classid, String classname,
 		String diqualifierclassid) {
-		if (sbj.equals(NULL))
+		if (sbj == null || sbj.equals(NULL))
 			return null;
 		Subject s = new Subject();
 		s.setValue(sbj);
