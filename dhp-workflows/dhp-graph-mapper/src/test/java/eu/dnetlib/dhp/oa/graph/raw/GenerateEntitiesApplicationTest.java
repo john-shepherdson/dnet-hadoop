@@ -72,7 +72,7 @@ class GenerateEntitiesApplicationTest {
 
 	protected <T extends Result> void verifyMerge(Result publication, Result dataset, Class<T> clazz,
 		String resultType) {
-		final Result merge = MergeUtils.mergeResult(publication, dataset);
+		final Result merge = MergeUtils.merge(publication, dataset);
 		assertTrue(clazz.isAssignableFrom(merge.getClass()));
 		assertEquals(resultType, merge.getResulttype());
 	}
