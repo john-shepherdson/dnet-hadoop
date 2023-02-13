@@ -1,0 +1,18 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] -------------------< eu.dnetlib.dhp:dhp-enrichment >--------------------
+[INFO] Building dhp-enrichment 2.0.0-SNAPSHOT
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.737 s
+[INFO] Finished at: 2023-02-10T17:53:31+01:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal on project dhp-enrichment: Could not resolve dependencies for project eu.dnetlib.dhp:dhp-enrichment:jar:2.0.0-SNAPSHOT: Failed to collect dependencies at eu.dnetlib.dhp:dhp-common:jar:2.0.0-SNAPSHOT: Failed to read artifact descriptor for eu.dnetlib.dhp:dhp-common:jar:2.0.0-SNAPSHOT: Failure to find eu.dnetlib.dhp:dhp:pom:2.0.0-SNAPSHOT in https://maven.d4science.org/nexus/content/repositories/dnet45-bootstrap-snapshot/ was cached in the local repository, resolution will not be reattempted until the update interval of dnet45-bootstrap-snapshot has elapsed or updates are forced -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/DependencyResolutionException

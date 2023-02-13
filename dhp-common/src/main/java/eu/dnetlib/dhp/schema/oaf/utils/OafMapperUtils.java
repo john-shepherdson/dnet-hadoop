@@ -363,7 +363,8 @@ public class OafMapperUtils {
 		final Entity entity,
 		final String validationDate) {
 
-		final List<Provenance> provenance = getProvenance(entity.getCollectedfrom(), fromEntityDataInfo(entity.getDataInfo()));
+		final List<Provenance> provenance = getProvenance(
+			entity.getCollectedfrom(), fromEntityDataInfo(entity.getDataInfo()));
 		return getRelation(
 			source, target, relType, subRelType, relClass, provenance, validationDate, null);
 	}

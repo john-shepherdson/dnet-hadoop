@@ -31,10 +31,10 @@ public class MergeUtils {
 			return mergeRelation(left, right);
 		} else {
 			throw new RuntimeException(
-					String
-							.format(
-									"MERGE_FROM_AND_GET incompatible types: %s, %s",
-									left.getClass().getCanonicalName(), right.getClass().getCanonicalName()));
+				String
+					.format(
+						"MERGE_FROM_AND_GET incompatible types: %s, %s",
+						left.getClass().getCanonicalName(), right.getClass().getCanonicalName()));
 		}
 	}
 
@@ -53,10 +53,10 @@ public class MergeUtils {
 			return mergeProject(left, right);
 		} else {
 			throw new RuntimeException(
-					String
-							.format(
-									"MERGE_FROM_AND_GET incompatible types: %s, %s",
-									left.getClass().getCanonicalName(), right.getClass().getCanonicalName()));
+				String
+					.format(
+						"MERGE_FROM_AND_GET incompatible types: %s, %s",
+						left.getClass().getCanonicalName(), right.getClass().getCanonicalName()));
 		}
 	}
 
@@ -110,8 +110,8 @@ public class MergeUtils {
 			mergedEntity.setLastupdatetimestamp(enrich.getLastupdatetimestamp());
 		} else if (mergedEntity.getLastupdatetimestamp() != null && enrich.getLastupdatetimestamp() != null) {
 			mergedEntity
-					.setLastupdatetimestamp(
-							Long.max(mergedEntity.getLastupdatetimestamp(), enrich.getLastupdatetimestamp()));
+				.setLastupdatetimestamp(
+					Long.max(mergedEntity.getLastupdatetimestamp(), enrich.getLastupdatetimestamp()));
 		}
 
 		mergedEntity.setPid(mergeLists(mergedEntity.getPid(), enrich.getPid()));
@@ -138,7 +138,7 @@ public class MergeUtils {
 		checkArgument(Objects.equals(original.getTarget(), enrich.getTarget()), "target ids must be equal");
 		checkArgument(Objects.equals(original.getRelType(), enrich.getRelType()), "relType(s) must be equal");
 		checkArgument(
-				Objects.equals(original.getSubRelType(), enrich.getSubRelType()), "subRelType(s) must be equal");
+			Objects.equals(original.getSubRelType(), enrich.getSubRelType()), "subRelType(s) must be equal");
 		checkArgument(Objects.equals(original.getRelClass(), enrich.getRelClass()), "relClass(es) must be equal");
 
 		original.setProvenance(mergeLists(original.getProvenance(), enrich.getProvenance()));
@@ -148,10 +148,10 @@ public class MergeUtils {
 			original.setValidationDate(ModelSupport.oldest(original.getValidationDate(), enrich.getValidationDate()));
 		} catch (ParseException e) {
 			throw new IllegalArgumentException(String
-					.format(
-							"invalid validation date format in relation [s:%s, t:%s]: %s", original.getSource(),
-							original.getTarget(),
-							original.getValidationDate()));
+				.format(
+					"invalid validation date format in relation [s:%s, t:%s]: %s", original.getSource(),
+					original.getTarget(),
+					original.getValidationDate()));
 		}
 
 		return (T) original;
@@ -370,7 +370,7 @@ public class MergeUtils {
 
 	private static <T extends Oaf> T mergePublication(T original, T enrich) {
 
-		//add publication specific fields.
+		// add publication specific fields.
 
 		mergeEntityDataInfo(original, enrich);
 

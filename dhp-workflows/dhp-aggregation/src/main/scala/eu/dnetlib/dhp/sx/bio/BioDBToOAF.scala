@@ -360,10 +360,13 @@ object BioDBToOAF {
 
     val rel = new Relation
 
-    val provenance = OafMapperUtils.getProvenance(Lists.newArrayList(
-      collectedFrom,
-      collectedFromMap("pdb")
-    ), REL_DATA_INFO)
+    val provenance = OafMapperUtils.getProvenance(
+      Lists.newArrayList(
+        collectedFrom,
+        collectedFromMap("pdb")
+      ),
+      REL_DATA_INFO
+    )
 
     rel.setProvenance(provenance)
 
