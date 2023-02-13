@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
-
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
