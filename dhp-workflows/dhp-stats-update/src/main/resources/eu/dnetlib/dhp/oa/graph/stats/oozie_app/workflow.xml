@@ -103,6 +103,7 @@
             <case to="Step16_5">${wf:conf('resumeFrom') eq 'Step16_5'}</case>
             <case to="Step19-finalize">${wf:conf('resumeFrom') eq 'Step19-finalize'}</case>
             <case to="step20-createMonitorDB">${wf:conf('resumeFrom') eq 'step20-createMonitorDB'}</case>
+            <case to="step20-createMonitorDB-post">${wf:conf('resumeFrom') eq 'step20-createMonitorDB-post'}</case>
             <case to="step21-createObservatoryDB-pre">${wf:conf('resumeFrom') eq 'step21-createObservatoryDB-pre'}</case>
             <case to="step21-createObservatoryDB">${wf:conf('resumeFrom') eq 'step21-createObservatoryDB'}</case>
             <case to="step21-createObservatoryDB-post">${wf:conf('resumeFrom') eq 'step21-createObservatoryDB-post'}</case>
@@ -377,8 +378,7 @@
             <exec>monitor-post.sh</exec>
             <argument>${monitor_db_name}</argument>
             <argument>${monitor_db_shadow_name}</argument>
-            <argument>${wf:appPath()}/scripts/step20-createMonitorDB.sql</argument>
-            <file>monitor.sh</file>
+            <file>monitor-post.sh</file>
         </shell>
         <ok to="step21-createObservatoryDB-pre"/>
         <error to="Kill"/>

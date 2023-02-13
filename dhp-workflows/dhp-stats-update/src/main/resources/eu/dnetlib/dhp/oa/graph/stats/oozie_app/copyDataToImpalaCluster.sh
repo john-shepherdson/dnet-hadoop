@@ -24,6 +24,7 @@ function copydb() {
   impala-shell -i impala-cluster-dn1.openaire.eu -q "drop database if exists ${db} cascade";
   impala-shell -i impala-cluster-dn1.openaire.eu -q "create database ${db}";
 
+  impala-shell -q "INVALIDATE METADATA"
   echo "creating schema for ${db}"
   for i in `impala-shell -d ${db} --delimited  -q "show tables"`;
     do
