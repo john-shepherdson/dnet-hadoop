@@ -47,7 +47,7 @@ class ScholixGraphTest extends AbstractVocabularyTest {
     val inputRelations = Source
       .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/oaf_to_summary"))
       .mkString
-    val items = inputRelations.linesWithSeparators.map(l =>l.stripLineEnd).toList
+    val items = inputRelations.linesWithSeparators.map(l => l.stripLineEnd).toList
     assertNotNull(items)
     items.foreach(i => assertTrue(i.nonEmpty))
     val result =
@@ -69,7 +69,8 @@ class ScholixGraphTest extends AbstractVocabularyTest {
         getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/merge_result_scholix")
       )
       .mkString
-    val result: List[(Relation, ScholixSummary)] = inputRelations.linesWithSeparators.map(l =>l.stripLineEnd)
+    val result: List[(Relation, ScholixSummary)] = inputRelations.linesWithSeparators
+      .map(l => l.stripLineEnd)
       .sliding(2)
       .map(s => (s.head, s(1)))
       .map(p => (mapper.readValue(p._1, classOf[Relation]), mapper.readValue(p._2, classOf[ScholixSummary])))
