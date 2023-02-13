@@ -61,7 +61,7 @@ public class Constants {
 
 	public static StructuredProperty getSubject(String sbj, String classid, String classname,
 		String diqualifierclassid) {
-		if (sbj.equals(NULL))
+		if (sbj == null || sbj.equals(NULL))
 			return null;
 		StructuredProperty sp = new StructuredProperty();
 		sp.setValue(sbj);
