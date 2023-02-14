@@ -284,11 +284,11 @@ object DataciteToOAFTransformation {
   }
 
   def generateRelation(
-                        sourceId: String,
-                        targetId: String,
-                        relClass: String,
-                        collectedFrom: KeyValue,
-                        di: DataInfo
+    sourceId: String,
+    targetId: String,
+    relClass: String,
+    collectedFrom: KeyValue,
+    di: DataInfo
   ): Relation = {
     val r = new Relation
     r.setSource(sourceId)

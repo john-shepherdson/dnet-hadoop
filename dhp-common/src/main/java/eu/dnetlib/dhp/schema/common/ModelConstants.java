@@ -7,7 +7,8 @@ import eu.dnetlib.dhp.schema.oaf.Qualifier;
 
 public class ModelConstants {
 
-	private ModelConstants() {}
+	private ModelConstants() {
+	}
 
 	public static final String ORCID = "orcid";
 	public static final String ORCID_PENDING = "orcid_pending";
@@ -80,7 +81,6 @@ public class ModelConstants {
 	public static final String PROVENANCE_DEDUP = "sysimport:dedup";
 	public static final String PROVENANCE_ENRICH = "sysimport:enrich";
 
-
 	public static final Qualifier PROVENANCE_ACTION_SET_QUALIFIER = qualifier(
 		SYSIMPORT_ACTIONSET, SYSIMPORT_ACTIONSET, DNET_PROVENANCE_ACTIONS);
 
@@ -126,8 +126,6 @@ public class ModelConstants {
 	public static final String HAS_ASSOCIATION_WITH = "HasAssociationWith";
 	public static final String IS_REQUIRED_BY = "IsRequiredBy";
 	public static final String REQUIRES = "Requires";
-
-
 
 	public static final String CITATION = "citation"; // subreltype
 	public static final String CITES = "Cites";
@@ -219,7 +217,7 @@ public class ModelConstants {
 		"main title", "main title", DNET_DATACITE_TITLE);
 
 	public static final Qualifier ALTERNATIVE_TITLE_QUALIFIER = qualifier(
-			"alternative title", "alternative title", DNET_DATACITE_TITLE);
+		"alternative title", "alternative title", DNET_DATACITE_TITLE);
 
 	private static final Qualifier SUBTITLE_QUALIFIER = qualifier("subtitle", "subtitle", DNET_DATACITE_TITLE);
 
