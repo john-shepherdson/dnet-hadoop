@@ -6,13 +6,17 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import lombok.val;
 
 public class CleaningFunctions {
 
 	public static final String DOI_PREFIX_REGEX = "(^10\\.|\\/10\\.)";
+
+	private static final String ALL_SPACES_REGEX = "(?:\\n|\\r|\\t|\\s)";
 	public static final String DOI_PREFIX = "10.";
 
 	public static final Set<String> PID_BLACKLIST = new HashSet<>();
@@ -58,6 +62,27 @@ public class CleaningFunctions {
 		return pid;
 	}
 
+	/**
+	 * This utility was moved from DOIBoost,
+	 * it implements a better cleaning of DOI.
+	 * In case of wrong DOI it raises an illegalArgumentException
+	 * @param input DOI
+	 * @return normalized DOI
+	 */
+	private static String normalizeDOI(final String input) {
+		if (input == null)
+			throw new IllegalArgumentException("PID value cannot be empty");
+		final String replaced = input
+			.replaceAll(ALL_SPACES_REGEX, "")
+			.toLowerCase()
+			.replaceFirst(DOI_PREFIX_REGEX, DOI_PREFIX);
+		if (StringUtils.isEmpty(replaced.trim()))
+			throw new IllegalArgumentException("PID value normalized return empty string");
+		if (!replaced.contains("10."))
+			throw new IllegalArgumentException("DOI Must starts with 10.");
+		return replaced.substring(replaced.indexOf("10."));
+	}
+
 	public static String normalizePidValue(String pidType, String pidValue) {
 		String value = Optional
 			.ofNullable(pidValue)
@@ -67,8 +92,8 @@ public class CleaningFunctions {
 		switch (pidType) {
 
 			// TODO add cleaning for more PID types as needed
-			case "doi":
-				return value.toLowerCase().replaceFirst(DOI_PREFIX_REGEX, DOI_PREFIX);
+			case ModelConstants.DOI:
+				return normalizeDOI(value.toLowerCase());
 		}
 		return value;
 	}

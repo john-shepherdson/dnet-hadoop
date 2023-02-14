@@ -4,12 +4,14 @@ package eu.dnetlib.dhp.schema.common;
 import eu.dnetlib.dhp.schema.oaf.AccessRight;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 public class ModelConstants {
 
 	private ModelConstants() {
 	}
 
+	public static final String DOI = "doi";
 	public static final String ORCID = "orcid";
 	public static final String ORCID_PENDING = "orcid_pending";
 	public static final String ORCID_CLASSNAME = "Open Researcher and Contributor ID";
@@ -219,7 +221,7 @@ public class ModelConstants {
 	public static final Qualifier ALTERNATIVE_TITLE_QUALIFIER = qualifier(
 		"alternative title", "alternative title", DNET_DATACITE_TITLE);
 
-	private static final Qualifier SUBTITLE_QUALIFIER = qualifier("subtitle", "subtitle", DNET_DATACITE_TITLE);
+	public static final Qualifier SUBTITLE_QUALIFIER = qualifier("subtitle", "subtitle", DNET_DATACITE_TITLE);
 
 	public static final AccessRight OPEN_ACCESS_RIGHT() {
 
@@ -228,6 +230,38 @@ public class ModelConstants {
 		result.setClassid(ACCESS_RIGHT_OPEN);
 		result.setSchemeid(ModelConstants.DNET_ACCESS_MODES);
 		return result;
+	}
+
+	public static final AccessRight RESTRICTED_ACCESS_RIGHT() {
+		final AccessRight result = new AccessRight();
+		result.setClassid("RESTRICTED");
+		result.setClassname("Restricted");
+		result.setSchemeid(ModelConstants.DNET_ACCESS_MODES);
+		return result;
+	}
+
+	public static final AccessRight UNKNOWN_ACCESS_RIGHT() {
+		return OafMapperUtils.accessRight(
+				ModelConstants.UNKNOWN,
+				ModelConstants.NOT_AVAILABLE,
+				ModelConstants.DNET_ACCESS_MODES
+		);
+	}
+
+	public static final AccessRight EMBARGOED_ACCESS_RIGHT() {
+		return OafMapperUtils.accessRight(
+				ACCESS_RIGHT_EMBARGO,
+				ACCESS_RIGHT_EMBARGO,
+				DNET_ACCESS_MODES
+		);
+	}
+
+	public static final AccessRight CLOSED_ACCESS_RIGHT() {
+		return OafMapperUtils.accessRight(
+				ACCESS_RIGHT_CLOSED,
+				"Closed Access",
+				ModelConstants.DNET_ACCESS_MODES
+		);
 	}
 
 	private static Qualifier qualifier(
