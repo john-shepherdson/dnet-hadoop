@@ -13,8 +13,8 @@ import org.json4s.jackson.JsonMethods.parse
 
 import scala.collection.JavaConverters._
 
-
 case class CrossrefDT(doi: String, json: String, timestamp: Long) {}
+
 object CrossrefUtility {
   val DOI_PREFIX_REGEX = "(^10\\.|\\/10.)"
   val DOI_PREFIX = "10."
@@ -36,7 +36,6 @@ object CrossrefUtility {
       return null
     ret
   }
-
 
   def extractDate(dt: String, datePart: List[List[Int]]): String = {
     if (StringUtils.isNotBlank(dt))
@@ -60,36 +59,35 @@ object CrossrefUtility {
   }
 
   private def generateDate(
-                    dt: String,
-                    datePart: List[List[Int]],
-                    classId: String,
-                    schemeId: String
-                  ): StructuredProperty = {
+    dt: String,
+    datePart: List[List[Int]],
+    classId: String,
+    schemeId: String
+  ): StructuredProperty = {
     val dp = extractDate(dt, datePart)
     if (StringUtils.isNotBlank(dp))
-      structuredProperty(dp, classId, classId,schemeId)
+      structuredProperty(dp, classId, classId, schemeId)
     else
       null
   }
 
-
-  private def generateItemFromType(objectType: String, vocabularies:VocabularyGroup): (Result, String) = {
+  private def generateItemFromType(objectType: String, vocabularies: VocabularyGroup): (Result, String) = {
     val term = vocabularies.getSynonymAsQualifier(ModelConstants.DNET_PUBLICATION_RESOURCE, objectType)
     if (term != null) {
-      val resourceType = vocabularies.getSynonymAsQualifier(ModelConstants.DNET_RESULT_TYPOLOGIES, term.getClassid).getClassname
+      val resourceType =
+        vocabularies.getSynonymAsQualifier(ModelConstants.DNET_RESULT_TYPOLOGIES, term.getClassid).getClassname
 
       resourceType match {
-        case "publication" =>(new Publication, resourceType)
-        case "dataset" =>(new Dataset, resourceType)
-        case "software" => (new Software, resourceType)
-        case "otherresearchproduct" =>(new OtherResearchProduct, resourceType)
+        case "publication"          => (new Publication, resourceType)
+        case "dataset"              => (new Dataset, resourceType)
+        case "software"             => (new Software, resourceType)
+        case "otherresearchproduct" => (new OtherResearchProduct, resourceType)
       }
     } else
       null
   }
 
-
-  def convert(input: String, vocabularies:VocabularyGroup): List[Oaf] = {
+  def convert(input: String, vocabularies: VocabularyGroup): List[Oaf] = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(input)
 
@@ -124,13 +122,12 @@ object CrossrefUtility {
 
     result match {
       case publication: Publication => convertPublication(publication, json, cOBJCategory)
-      case dataset: Dataset => convertDataset(dataset)
+      case dataset: Dataset         => convertDataset(dataset)
     }
 
     resultList = resultList ::: List(result)
     resultList
   }
-
 
   def mappingResult(result: Result, json: JValue, cobjCategory: String): Result = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
@@ -140,8 +137,9 @@ object CrossrefUtility {
 
     result.setPid(
       List(
-        structuredProperty(doi, PidType.doi.toString, PidType.doi.toString,   ModelConstants.DNET_PID_TYPES)
-      ).asJava)
+        structuredProperty(doi, PidType.doi.toString, PidType.doi.toString, ModelConstants.DNET_PID_TYPES)
+      ).asJava
+    )
 
     //MAPPING Crossref DOI into OriginalId
     //and Other Original Identifier of dataset like clinical-trial-number
@@ -149,11 +147,10 @@ object CrossrefUtility {
     val alternativeIds: List[String] = for (JString(ids) <- json \ "alternative-id") yield ids
     val tmp = clinicalTrialNumbers ::: alternativeIds ::: List(doi)
 
-
     result.setOriginalId(tmp.filter(id => id != null).asJava)
 
     // Add DataInfo
-    result.setDataInfo(dataInfo(false, false,0.9F,null, false,ModelConstants.REPOSITORY_PROVENANCE_ACTIONS))
+    result.setDataInfo(dataInfo(false, false, 0.9f, null, false, ModelConstants.REPOSITORY_PROVENANCE_ACTIONS))
 
     result.setLastupdatetimestamp((json \ "indexed" \ "timestamp").extract[Long])
     result.setDateofcollection((json \ "indexed" \ "date-time").extract[String])
@@ -167,23 +164,26 @@ object CrossrefUtility {
 
     // TITLE
     val mainTitles =
-      for {JString(title) <- json \ "title" if title.nonEmpty}
-        yield
-          structuredProperty(title, ModelConstants.MAIN_TITLE_QUALIFIER)
+      for { JString(title) <- json \ "title" if title.nonEmpty } yield structuredProperty(
+        title,
+        ModelConstants.MAIN_TITLE_QUALIFIER
+      )
     val originalTitles = for {
       JString(title) <- json \ "original-title" if title.nonEmpty
     } yield structuredProperty(title, ModelConstants.ALTERNATIVE_TITLE_QUALIFIER)
     val shortTitles = for {
       JString(title) <- json \ "short-title" if title.nonEmpty
-    }  yield structuredProperty(title, ModelConstants.ALTERNATIVE_TITLE_QUALIFIER)
+    } yield structuredProperty(title, ModelConstants.ALTERNATIVE_TITLE_QUALIFIER)
     val subtitles =
-      for {JString(title) <- json \ "subtitle" if title.nonEmpty}
-        yield structuredProperty(title, ModelConstants.SUBTITLE_QUALIFIER)
+      for { JString(title) <- json \ "subtitle" if title.nonEmpty } yield structuredProperty(
+        title,
+        ModelConstants.SUBTITLE_QUALIFIER
+      )
     result.setTitle((mainTitles ::: originalTitles ::: shortTitles ::: subtitles).asJava)
 
     // DESCRIPTION
     val descriptionList =
-      for {JString(description) <- json \ "abstract"} yield description
+      for { JString(description) <- json \ "abstract" } yield description
     result.setDescription(descriptionList.asJava)
 
     // Source
@@ -242,11 +242,9 @@ object CrossrefUtility {
     //Mapping Subject
     val subjectList: List[String] = (json \ "subject").extractOrElse[List[String]](List())
 
-
-
     if (subjectList.nonEmpty) {
       result.setSubject(
-        subjectList.map(s =>  createSubject(s, "keyword", ModelConstants.DNET_SUBJECT_TYPOLOGIES)).asJava
+        subjectList.map(s => createSubject(s, "keyword", ModelConstants.DNET_SUBJECT_TYPOLOGIES)).asJava
       )
     }
 
@@ -265,8 +263,8 @@ object CrossrefUtility {
     // Mapping instance
     val instance = new Instance()
     val license = for {
-      JObject(license) <- json \ "license"
-      JField("URL", JString(lic)) <- license
+      JObject(license)                                    <- json \ "license"
+      JField("URL", JString(lic))                         <- license
       JField("content-version", JString(content_version)) <- license
     } yield (asField(lic), content_version)
     val l = license.filter(d => StringUtils.isNotBlank(d._1.getValue))

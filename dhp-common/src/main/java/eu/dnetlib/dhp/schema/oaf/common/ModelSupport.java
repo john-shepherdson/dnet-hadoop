@@ -209,7 +209,8 @@ public class ModelSupport {
 		return idPrefixMap.get(clazz);
 	}
 
-	public static <X extends Oaf, Y extends Oaf, Z extends Oaf> Boolean sameClass(X left, Y right, Class<Z> superClazz) {
+	public static <X extends Oaf, Y extends Oaf, Z extends Oaf> Boolean sameClass(X left, Y right,
+		Class<Z> superClazz) {
 		return isSubClass(left, superClazz) && isSubClass(right, superClazz);
 	}
 
