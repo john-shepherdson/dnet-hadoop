@@ -36,13 +36,13 @@ class CrossrefMappingTest {
       .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/doiboost/crossref/funder_doi"))
       .mkString
 
-    for (line <- funder_doi.linesWithSeparators.map(l =>l.stripLineEnd)) {
+    for (line <- funder_doi.linesWithSeparators.map(l => l.stripLineEnd)) {
       val json = template.replace("%s", line)
       val resultList: List[Oaf] = Crossref2Oaf.convert(json)
       assertTrue(resultList.nonEmpty)
       checkRelation(resultList)
     }
-    for (line <- funder_name.linesWithSeparators.map(l =>l.stripLineEnd)) {
+    for (line <- funder_name.linesWithSeparators.map(l => l.stripLineEnd)) {
       val json = template.replace("%s", line)
       val resultList: List[Oaf] = Crossref2Oaf.convert(json)
       assertTrue(resultList.nonEmpty)
