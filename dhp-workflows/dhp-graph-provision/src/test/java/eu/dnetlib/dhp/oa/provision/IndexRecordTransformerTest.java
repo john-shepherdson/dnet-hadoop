@@ -39,9 +39,6 @@ import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
  */
 public class IndexRecordTransformerTest {
 
-	public static final String VERSION = "2021-04-15T10:05:53Z";
-	public static final String DSID = "b9ee796a-c49f-4473-a708-e7d67b84c16d_SW5kZXhEU1Jlc291cmNlcy9JbmRleERTUmVzb3VyY2VUeXBl";
-
 	private ContextMapper contextMapper;
 
 	@BeforeEach
@@ -162,8 +159,7 @@ public class IndexRecordTransformerTest {
 
 		final String indexRecordXML = XmlIndexingJob.toIndexRecord(tr, record);
 
-		final SolrInputDocument solrDoc = new StreamingInputDocumentFactory(VERSION, DSID)
-			.parseDocument(indexRecordXML);
+		final SolrInputDocument solrDoc = new StreamingInputDocumentFactory().parseDocument(indexRecordXML);
 
 		final String xmlDoc = ClientUtils.toXML(solrDoc);
 

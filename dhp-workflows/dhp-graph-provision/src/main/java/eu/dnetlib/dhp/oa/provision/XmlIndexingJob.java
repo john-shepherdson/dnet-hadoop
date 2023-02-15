@@ -133,9 +133,7 @@ public class XmlIndexingJob {
 		log.info("fields: {}", fields);
 
 		final String xslt = isLookup.getLayoutTransformer();
-
-		final String dsId = isLookup.getDsId(format);
-		log.info("dsId: {}", dsId);
+		log.info("layoutTransformer: {}", xslt);
 
 		final String zkHost = isLookup.getZkHost();
 		log.info("zkHost: {}", zkHost);
@@ -151,7 +149,7 @@ public class XmlIndexingJob {
 			.sequenceFile(inputPath, Text.class, Text.class)
 			.map(t -> t._2().toString())
 			.map(s -> toIndexRecord(SaxonTransformerFactory.newInstance(indexRecordXslt), s))
-			.map(s -> new StreamingInputDocumentFactory(version, dsId).parseDocument(s));
+			.map(s -> new StreamingInputDocumentFactory().parseDocument(s));
 
 		switch (outputFormat) {
 			case SOLR:
