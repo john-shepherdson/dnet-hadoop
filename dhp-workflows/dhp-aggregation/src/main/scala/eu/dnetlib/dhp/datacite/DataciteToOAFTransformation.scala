@@ -553,7 +553,6 @@ object DataciteToOAFTransformation {
         OafMapperUtils.accessRight(
           ModelConstants.UNKNOWN,
           ModelConstants.NOT_AVAILABLE,
-          ModelConstants.DNET_ACCESS_MODES,
           ModelConstants.DNET_ACCESS_MODES
         )
 
