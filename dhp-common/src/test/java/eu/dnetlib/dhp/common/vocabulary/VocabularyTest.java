@@ -67,7 +67,7 @@ public class VocabularyTest {
 			if (t1 == null) {
 				System.err.println(s1 + " Missing");
 			} else {
-				System.out.println("syn=" + s1 + " term = " + t1.getClassid()+"   "+t1.getClassname());
+				System.out.println("syn=" + s1 + " term = " + t1.getClassid() + "   " + t1.getClassname());
 
 				System.out
 					.println(

@@ -14,7 +14,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -28,8 +27,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 
 public class PromoteActionPayloadForGraphTableJobTest {
 	private static final ClassLoader cl = PromoteActionPayloadForGraphTableJobTest.class.getClassLoader();

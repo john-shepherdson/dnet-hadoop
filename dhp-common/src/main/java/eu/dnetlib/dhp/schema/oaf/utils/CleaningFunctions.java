@@ -6,9 +6,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.lang3.StringUtils;
 
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import lombok.val;
 

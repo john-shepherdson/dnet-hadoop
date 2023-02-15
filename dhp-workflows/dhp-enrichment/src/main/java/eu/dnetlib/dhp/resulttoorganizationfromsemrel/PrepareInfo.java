@@ -115,8 +115,7 @@ public class PrepareInfo implements Serializable {
 
 		relation
 			.filter(
-				(FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference() &&
-					r.getRelClass().equals(ModelConstants.HAS_AUTHOR_INSTITUTION))
+				(FilterFunction<Relation>) r -> r.getRelClass().equals(ModelConstants.HAS_AUTHOR_INSTITUTION))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")

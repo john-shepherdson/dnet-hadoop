@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -31,8 +29,10 @@ import eu.dnetlib.dhp.actionmanager.bipmodel.BipScore;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class PrepareBipFinder implements Serializable {
@@ -100,38 +100,16 @@ public class PrepareBipFinder implements Serializable {
 				Instance inst = new Instance();
 
 				/*
-				inst
-					.setPid(
-						Arrays
-							.asList(
-								OafMapperUtils
-									.structuredProperty(
-										cleanedPid,
-										OafMapperUtils
-											.qualifier(
-												PidType.doi.toString(), DOI_CLASSNAME,
-												ModelConstants.DNET_PID_TYPES,
-												ModelConstants.DNET_PID_TYPES),
-										null)));
-
+				 * inst .setPid( Arrays .asList( OafMapperUtils .structuredProperty( cleanedPid, OafMapperUtils
+				 * .qualifier( PidType.doi.toString(), DOI_CLASSNAME, ModelConstants.DNET_PID_TYPES,
+				 * ModelConstants.DNET_PID_TYPES), null)));
 				 */
 				r.setInstance(Arrays.asList(inst));
 
 				/*
-				r
-					.setDataInfo(
-						OafMapperUtils
-							.dataInfo(
-								false, null, true,
-								false,
-								OafMapperUtils
-									.qualifier(
-										ModelConstants.PROVENANCE_ENRICH,
-										null,
-										ModelConstants.DNET_PROVENANCE_ACTIONS,
-										ModelConstants.DNET_PROVENANCE_ACTIONS),
-								null));
-
+				 * r .setDataInfo( OafMapperUtils .dataInfo( false, null, true, false, OafMapperUtils .qualifier(
+				 * ModelConstants.PROVENANCE_ENRICH, null, ModelConstants.DNET_PROVENANCE_ACTIONS,
+				 * ModelConstants.DNET_PROVENANCE_ACTIONS), null));
 				 */
 				return r;
 			}, Encoders.bean(Result.class))
@@ -158,22 +136,10 @@ public class PrepareBipFinder implements Serializable {
 								u.setValue(u.getValue());
 								u.setKey(u.getKey());
 								/*
-								kv
-									.setDataInfo(
-										OafMapperUtils
-											.dataInfo(
-												false,
-												UPDATE_DATA_INFO_TYPE,
-												true,
-												false,
-												OafMapperUtils
-													.qualifier(
-														UPDATE_MEASURE_BIP_CLASS_ID,
-														UPDATE_CLASS_NAME,
-														ModelConstants.DNET_PROVENANCE_ACTIONS,
-														ModelConstants.DNET_PROVENANCE_ACTIONS),
-												""));
-
+								 * kv .setDataInfo( OafMapperUtils .dataInfo( false, UPDATE_DATA_INFO_TYPE, true, false,
+								 * OafMapperUtils .qualifier( UPDATE_MEASURE_BIP_CLASS_ID, UPDATE_CLASS_NAME,
+								 * ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS),
+								 * ""));
 								 */
 								return u;
 							})

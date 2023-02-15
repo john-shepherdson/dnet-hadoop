@@ -221,7 +221,7 @@ public class SparkEoscTag {
 		return words;
 	}
 
-	private static Set<String> getWordsF(List<Field<String>> elem) {
+	private static Set<String> getWordsF(List<String> elem) {
 		Set<String> words = new HashSet<>();
 		Optional
 			.ofNullable(elem)
@@ -230,7 +230,7 @@ public class SparkEoscTag {
 					.forEach(
 						t -> words
 							.addAll(
-								Arrays.asList(t.getValue().toLowerCase().replaceAll("[^a-zA-Z ]", "").split(" ")))));
+								Arrays.asList(t.toLowerCase().replaceAll("[^a-zA-Z ]", "").split(" ")))));
 
 		return words;
 	}

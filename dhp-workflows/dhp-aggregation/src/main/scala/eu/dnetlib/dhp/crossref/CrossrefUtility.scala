@@ -21,7 +21,7 @@ import scala.util.matching.Regex
 
 case class CrossrefDT(doi: String, json: String, timestamp: Long) {}
 
-case class CrossrefAuthor(givenName:String, familyName:String,ORCID:String, sequence:String, rank:Int ){}
+case class CrossrefAuthor(givenName: String, familyName: String, ORCID: String, sequence: String, rank: Int) {}
 
 case class mappingFunder(name: String, DOI: Option[String], award: Option[List[String]]) {}
 
@@ -29,7 +29,6 @@ object CrossrefUtility {
   val CROSSREF_COLLECTED_FROM = keyValue(ModelConstants.CROSSREF_ID, ModelConstants.CROSSREF_NAME)
 
   val logger: Logger = LoggerFactory.getLogger(getClass)
-
 
   def convert(input: String, vocabularies: VocabularyGroup): List[Oaf] = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
@@ -56,7 +55,7 @@ object CrossrefUtility {
       (json \ "funder").extractOrElse[List[mappingFunder]](List())
 
     if (funderList.nonEmpty) {
-      resultList = resultList ::: mappingFunderToRelations(funderList, result )
+      resultList = resultList ::: mappingFunderToRelations(funderList, result)
     }
     resultList = resultList ::: List(result)
     resultList
@@ -73,19 +72,18 @@ object CrossrefUtility {
     r
   }
 
-
   private def generateSimpleRelationFromAward(
-                                               funder: mappingFunder,
-                                               nsPrefix: String,
-                                               extractField: String => String,
-                                               source:Result
-                                             ): List[Relation] = {
+    funder: mappingFunder,
+    nsPrefix: String,
+    extractField: String => String,
+    source: Result
+  ): List[Relation] = {
     if (funder.award.isDefined && funder.award.get.nonEmpty)
       funder.award.get
         .map(extractField)
         .filter(a => a != null && a.nonEmpty)
         .map(award => {
-          val targetId = IdentifierFactory.createOpenaireId("project",s"$nsPrefix::$award", true)
+          val targetId = IdentifierFactory.createOpenaireId("project", s"$nsPrefix::$award", true)
           createRelation(targetId, source.getId, ModelConstants.PRODUCES)
         })
     else List()
@@ -106,56 +104,74 @@ object CrossrefUtility {
   }
 
   private def mappingFunderToRelations(funders: List[mappingFunder], result: Result): List[Relation] = {
-    var  relList:List[Relation] = List()
+    var relList: List[Relation] = List()
 
     if (funders != null)
       funders.foreach(funder => {
         if (funder.DOI.isDefined && funder.DOI.get.nonEmpty) {
           funder.DOI.get match {
             case "10.13039/100010663" | "10.13039/100010661" | "10.13039/501100007601" | "10.13039/501100000780" |
-                 "10.13039/100010665" =>
-              relList =relList ::: generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward, result)
+                "10.13039/100010665" =>
+              relList = relList ::: generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward, result)
             case "10.13039/100011199" | "10.13039/100004431" | "10.13039/501100004963" | "10.13039/501100000780" =>
-              relList =relList ::: generateSimpleRelationFromAward(funder, "corda_______", extractECAward, result)
+              relList = relList ::: generateSimpleRelationFromAward(funder, "corda_______", extractECAward, result)
             case "10.13039/501100000781" =>
-              relList =relList ::: generateSimpleRelationFromAward(funder, "corda_______", extractECAward, result)
-              relList =relList ::: generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward, result)
-            case "10.13039/100000001" => relList =relList ::: generateSimpleRelationFromAward(funder, "nsf_________", a => a,  result)
-            case "10.13039/501100001665" => relList =relList ::: generateSimpleRelationFromAward(funder, "anr_________", a => a, result)
-            case "10.13039/501100002341" => relList =relList ::: generateSimpleRelationFromAward(funder, "aka_________", a => a, result)
+              relList = relList ::: generateSimpleRelationFromAward(funder, "corda_______", extractECAward, result)
+              relList = relList ::: generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward, result)
+            case "10.13039/100000001" =>
+              relList = relList ::: generateSimpleRelationFromAward(funder, "nsf_________", a => a, result)
+            case "10.13039/501100001665" =>
+              relList = relList ::: generateSimpleRelationFromAward(funder, "anr_________", a => a, result)
+            case "10.13039/501100002341" =>
+              relList = relList ::: generateSimpleRelationFromAward(funder, "aka_________", a => a, result)
             case "10.13039/501100001602" =>
-              relList =relList ::: generateSimpleRelationFromAward(funder, "sfi_________", a => a.replace("SFI", ""), result)
-            case "10.13039/501100000923" => relList =relList ::: generateSimpleRelationFromAward(funder, "arc_________", a => a, result)
+              relList =
+                relList ::: generateSimpleRelationFromAward(funder, "sfi_________", a => a.replace("SFI", ""), result)
+            case "10.13039/501100000923" =>
+              relList = relList ::: generateSimpleRelationFromAward(funder, "arc_________", a => a, result)
             case "10.13039/501100000038" =>
-              val targetId = IdentifierFactory.createOpenaireId("project", "nserc_______::1e5e62235d094afd01cd56e65112fc63", false)
-              relList =relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
+              val targetId =
+                IdentifierFactory.createOpenaireId("project", "nserc_______::1e5e62235d094afd01cd56e65112fc63", false)
+              relList = relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
             case "10.13039/501100000155" =>
-              val targetId = IdentifierFactory.createOpenaireId("project", "sshrc_______::1e5e62235d094afd01cd56e65112fc63", false)
-              relList =relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
+              val targetId =
+                IdentifierFactory.createOpenaireId("project", "sshrc_______::1e5e62235d094afd01cd56e65112fc63", false)
+              relList = relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
             case "10.13039/501100000024" =>
-              val targetId = IdentifierFactory.createOpenaireId("project", "cihr________::1e5e62235d094afd01cd56e65112fc63", false)
-              relList =relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
-            case "10.13039/501100002848" => relList =relList ::: generateSimpleRelationFromAward(funder, "conicytf____", a => a, result)
-            case "10.13039/501100003448" => relList =relList ::: generateSimpleRelationFromAward(funder, "gsrt________", extractECAward, result)
-            case "10.13039/501100010198" => relList =relList ::: generateSimpleRelationFromAward(funder, "sgov________", a => a, result)
-            case "10.13039/501100004564" => relList =relList ::: generateSimpleRelationFromAward(funder, "mestd_______", extractECAward, result)
+              val targetId =
+                IdentifierFactory.createOpenaireId("project", "cihr________::1e5e62235d094afd01cd56e65112fc63", false)
+              relList = relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
+            case "10.13039/501100002848" =>
+              relList = relList ::: generateSimpleRelationFromAward(funder, "conicytf____", a => a, result)
+            case "10.13039/501100003448" =>
+              relList = relList ::: generateSimpleRelationFromAward(funder, "gsrt________", extractECAward, result)
+            case "10.13039/501100010198" =>
+              relList = relList ::: generateSimpleRelationFromAward(funder, "sgov________", a => a, result)
+            case "10.13039/501100004564" =>
+              relList = relList ::: generateSimpleRelationFromAward(funder, "mestd_______", extractECAward, result)
             case "10.13039/501100003407" =>
-              relList =relList ::: generateSimpleRelationFromAward(funder, "miur________", a => a, result)
-              val targetId = IdentifierFactory.createOpenaireId("project", "miur________::1e5e62235d094afd01cd56e65112fc63", false)
-              relList =relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
+              relList = relList ::: generateSimpleRelationFromAward(funder, "miur________", a => a, result)
+              val targetId =
+                IdentifierFactory.createOpenaireId("project", "miur________::1e5e62235d094afd01cd56e65112fc63", false)
+              relList = relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
             case "10.13039/501100006588" | "10.13039/501100004488" =>
-              relList =relList ::: generateSimpleRelationFromAward(
+              relList = relList ::: generateSimpleRelationFromAward(
                 funder,
                 "irb_hr______",
-                a => a.replaceAll("Project No.", "").replaceAll("HRZZ-", ""), result
+                a => a.replaceAll("Project No.", "").replaceAll("HRZZ-", ""),
+                result
               )
-            case "10.13039/501100006769" => relList =relList ::: generateSimpleRelationFromAward(funder, "rsf_________", a => a, result)
-            case "10.13039/501100001711" => relList =relList ::: generateSimpleRelationFromAward(funder, "snsf________", snsfRule, result)
-            case "10.13039/501100004410" => relList =relList ::: generateSimpleRelationFromAward(funder, "tubitakf____", a => a, result)
+            case "10.13039/501100006769" =>
+              relList = relList ::: generateSimpleRelationFromAward(funder, "rsf_________", a => a, result)
+            case "10.13039/501100001711" =>
+              relList = relList ::: generateSimpleRelationFromAward(funder, "snsf________", snsfRule, result)
+            case "10.13039/501100004410" =>
+              relList = relList ::: generateSimpleRelationFromAward(funder, "tubitakf____", a => a, result)
             case "10.13039/100004440" =>
-              relList =relList ::: generateSimpleRelationFromAward(funder, "wt__________", a => a, result)
-              val targetId = IdentifierFactory.createOpenaireId("project", "wt__________::1e5e62235d094afd01cd56e65112fc63", false)
-              relList =relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
+              relList = relList ::: generateSimpleRelationFromAward(funder, "wt__________", a => a, result)
+              val targetId =
+                IdentifierFactory.createOpenaireId("project", "wt__________::1e5e62235d094afd01cd56e65112fc63", false)
+              relList = relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
             case _ => logger.debug("no match for " + funder.DOI.get)
 
           }
@@ -163,18 +179,19 @@ object CrossrefUtility {
         } else {
           funder.name match {
             case "European Union’s Horizon 2020 research and innovation program" =>
-              relList =relList ::: generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward, result)
+              relList = relList ::: generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward, result)
             case "European Union's" =>
-              relList =relList ::: generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward, result)
-              relList =relList ::: generateSimpleRelationFromAward(funder, "corda_______", extractECAward, result)
+              relList = relList ::: generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward, result)
+              relList = relList ::: generateSimpleRelationFromAward(funder, "corda_______", extractECAward, result)
             case "The French National Research Agency (ANR)" | "The French National Research Agency" =>
-              relList =relList ::: generateSimpleRelationFromAward(funder, "anr_________", a => a, result)
+              relList = relList ::: generateSimpleRelationFromAward(funder, "anr_________", a => a, result)
             case "CONICYT, Programa de Formación de Capital Humano Avanzado" =>
-              relList =relList ::: generateSimpleRelationFromAward(funder, "conicytf____", extractECAward, result)
+              relList = relList ::: generateSimpleRelationFromAward(funder, "conicytf____", extractECAward, result)
             case "Wellcome Trust Masters Fellowship" =>
-              relList =relList ::: generateSimpleRelationFromAward(funder, "wt__________", a => a, result)
-              val targetId = IdentifierFactory.createOpenaireId("project", "wt__________::1e5e62235d094afd01cd56e65112fc63", false)
-              relList =relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
+              relList = relList ::: generateSimpleRelationFromAward(funder, "wt__________", a => a, result)
+              val targetId =
+                IdentifierFactory.createOpenaireId("project", "wt__________::1e5e62235d094afd01cd56e65112fc63", false)
+              relList = relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
             case _ => logger.debug("no match for " + funder.name)
 
           }
@@ -185,11 +202,7 @@ object CrossrefUtility {
 
   }
 
-
-
-
-
-  private def mappingResult(result: Result, json: JValue, cobjCategory: String, className:String): Result = {
+  private def mappingResult(result: Result, json: JValue, cobjCategory: String, className: String): Result = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
     //MAPPING Crossref DOI into PID
@@ -236,7 +249,9 @@ object CrossrefUtility {
     } yield structuredProperty(title, ModelConstants.ALTERNATIVE_TITLE_QUALIFIER)
     val subtitles =
       for { JString(title) <- json \ "subtitle" if title.nonEmpty } yield structuredProperty(
-        title,  ModelConstants.SUBTITLE_QUALIFIER)
+        title,
+        ModelConstants.SUBTITLE_QUALIFIER
+      )
     result.setTitle((mainTitles ::: originalTitles ::: shortTitles ::: subtitles).asJava)
 
     // DESCRIPTION
@@ -302,28 +317,52 @@ object CrossrefUtility {
 
     if (subjectList.nonEmpty) {
       result.setSubject(
-        subjectList.map(s =>
-          OafMapperUtils.subject(s, OafMapperUtils.qualifier(ModelConstants.DNET_SUBJECT_KEYWORD,ModelConstants.DNET_SUBJECT_KEYWORD,ModelConstants.DNET_SUBJECT_TYPOLOGIES), null)
-      ).asJava)
+        subjectList
+          .map(s =>
+            OafMapperUtils.subject(
+              s,
+              OafMapperUtils.qualifier(
+                ModelConstants.DNET_SUBJECT_KEYWORD,
+                ModelConstants.DNET_SUBJECT_KEYWORD,
+                ModelConstants.DNET_SUBJECT_TYPOLOGIES
+              ),
+              null
+            )
+          )
+          .asJava
+      )
     }
 
     //Mapping Author
-    val authorList:List[CrossrefAuthor] =
+    val authorList: List[CrossrefAuthor] =
       for {
-              JObject(author)     <- json \ "author"
-              JField("ORCID", JString(orcid))     <- author
-              JField("given", JString(givenName))     <- author
-              JField("family", JString(familyName))     <- author
-              JField("sequence", JString(sequence))     <- author
-      } yield CrossrefAuthor(givenName = givenName, familyName = familyName, ORCID = orcid, sequence = sequence, rank = 0)
+        JObject(author)                       <- json \ "author"
+        JField("ORCID", JString(orcid))       <- author
+        JField("given", JString(givenName))   <- author
+        JField("family", JString(familyName)) <- author
+        JField("sequence", JString(sequence)) <- author
+      } yield CrossrefAuthor(
+        givenName = givenName,
+        familyName = familyName,
+        ORCID = orcid,
+        sequence = sequence,
+        rank = 0
+      )
 
-    result.setAuthor(authorList.sortWith((a,b) =>{
-      if (a.sequence.equalsIgnoreCase("first"))
-        true
-        else  if  (b.sequence.equalsIgnoreCase("first"))
-        false
-      else a.familyName< b.familyName
-    }).zipWithIndex.map(k=> k._1.copy(rank = k._2)).map(k => generateAuthor(k)).asJava)
+    result.setAuthor(
+      authorList
+        .sortWith((a, b) => {
+          if (a.sequence.equalsIgnoreCase("first"))
+            true
+          else if (b.sequence.equalsIgnoreCase("first"))
+            false
+          else a.familyName < b.familyName
+        })
+        .zipWithIndex
+        .map(k => k._1.copy(rank = k._2))
+        .map(k => generateAuthor(k))
+        .asJava
+    )
 
     // Mapping instance
     val instance = new Instance()
@@ -360,7 +399,7 @@ object CrossrefUtility {
       )
     }
 
-    if (instance.getLicense!= null)
+    if (instance.getLicense != null)
       instance.setAccessright(
         decideAccessRight(instance.getLicense.getUrl, result.getDateofacceptance)
       )
@@ -392,7 +431,7 @@ object CrossrefUtility {
     val containerTitles = for { JString(ct) <- json \ "container-title" } yield ct
     //Mapping book
     if (className.toLowerCase.contains("book")) {
-      val ISBN = for {JString(isbn) <- json \ "ISBN"} yield isbn
+      val ISBN = for { JString(isbn) <- json \ "ISBN" } yield isbn
       if (ISBN.nonEmpty && containerTitles.nonEmpty) {
         val source = s"${containerTitles.head} ISBN: ${ISBN.head}"
         if (result.getSource != null) {
@@ -404,8 +443,8 @@ object CrossrefUtility {
     } else {
       // Mapping Journal
       val issnInfos = for {
-        JObject(issn_type) <- json \ "issn-type"
-        JField("type", JString(tp)) <- issn_type
+        JObject(issn_type)           <- json \ "issn-type"
+        JField("type", JString(tp))  <- issn_type
         JField("value", JString(vl)) <- issn_type
       } yield Tuple2(tp, vl)
 
@@ -418,7 +457,7 @@ object CrossrefUtility {
           issnInfos.foreach(tp => {
             tp._1 match {
               case "electronic" => journal.setIssnOnline(tp._2)
-              case "print" => journal.setIssnPrinted(tp._2)
+              case "print"      => journal.setIssnPrinted(tp._2)
             }
           })
         }
@@ -434,7 +473,6 @@ object CrossrefUtility {
         result.setJournal(journal)
       }
     }
-
 
     result.setInstance(List(instance).asJava)
     result.setId("ID")
@@ -453,16 +491,16 @@ object CrossrefUtility {
     //CC licenses
     if (
       license.startsWith("cc") ||
-        license.startsWith("http://creativecommons.org/licenses") ||
-        license.startsWith("https://creativecommons.org/licenses") ||
+      license.startsWith("http://creativecommons.org/licenses") ||
+      license.startsWith("https://creativecommons.org/licenses") ||
 
-        //ACS Publications Author choice licenses (considered OPEN also by Unpaywall)
-        license.equals("http://pubs.acs.org/page/policy/authorchoice_ccby_termsofuse.html") ||
-        license.equals("http://pubs.acs.org/page/policy/authorchoice_termsofuse.html") ||
-        license.equals("http://pubs.acs.org/page/policy/authorchoice_ccbyncnd_termsofuse.html") ||
+      //ACS Publications Author choice licenses (considered OPEN also by Unpaywall)
+      license.equals("http://pubs.acs.org/page/policy/authorchoice_ccby_termsofuse.html") ||
+      license.equals("http://pubs.acs.org/page/policy/authorchoice_termsofuse.html") ||
+      license.equals("http://pubs.acs.org/page/policy/authorchoice_ccbyncnd_termsofuse.html") ||
 
-        //APA (considered OPEN also by Unpaywall)
-        license.equals("http://www.apa.org/pubs/journals/resources/open-access.aspx")
+      //APA (considered OPEN also by Unpaywall)
+      license.equals("http://www.apa.org/pubs/journals/resources/open-access.aspx")
     ) {
 
       val oaq: AccessRight = ModelConstants.OPEN_ACCESS_RIGHT()
@@ -481,11 +519,11 @@ object CrossrefUtility {
       try {
         val pub_date = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         if (((now.toEpochDay - pub_date.toEpochDay) / 365.0) > 1) {
-          val oaq: AccessRight =  ModelConstants.OPEN_ACCESS_RIGHT()
+          val oaq: AccessRight = ModelConstants.OPEN_ACCESS_RIGHT()
           oaq.setOpenAccessRoute(OpenAccessRoute.hybrid)
           return oaq
         } else {
-          return  ModelConstants.EMBARGOED_ACCESS_RIGHT()
+          return ModelConstants.EMBARGOED_ACCESS_RIGHT()
         }
       } catch {
         case _: Exception => {
@@ -511,7 +549,6 @@ object CrossrefUtility {
     ModelConstants.CLOSED_ACCESS_RIGHT()
   }
 
-
   private def extractDate(dt: String, datePart: List[List[Int]]): String = {
     if (StringUtils.isNotBlank(dt))
       return GraphCleaningFunctions.cleanDate(dt)
@@ -533,11 +570,11 @@ object CrossrefUtility {
   }
 
   private def generateDate(
-                            dt: String,
-                            datePart: List[List[Int]],
-                            classId: String,
-                            schemeId: String
-                          ): StructuredProperty = {
+    dt: String,
+    datePart: List[List[Int]],
+    classId: String,
+    schemeId: String
+  ): StructuredProperty = {
     val dp = extractDate(dt, datePart)
     if (StringUtils.isNotBlank(dp))
       structuredProperty(dp, classId, classId, schemeId)
@@ -552,9 +589,9 @@ object CrossrefUtility {
         vocabularies.getSynonymAsQualifier(ModelConstants.DNET_RESULT_TYPOLOGIES, term.getClassid).getClassname
 
       resourceType match {
-        case "publication" => (new Publication, resourceType, term.getClassname)
-        case "dataset" => (new Dataset, resourceType, term.getClassname)
-        case "software" => (new Software, resourceType, term.getClassname)
+        case "publication"          => (new Publication, resourceType, term.getClassname)
+        case "dataset"              => (new Dataset, resourceType, term.getClassname)
+        case "software"             => (new Software, resourceType, term.getClassname)
         case "otherresearchproduct" => (new OtherResearchProduct, resourceType, term.getClassname)
       }
     } else
@@ -570,7 +607,15 @@ object CrossrefUtility {
     if (StringUtils.isNotBlank(ca.ORCID))
       a.setPid(
         List(
-          OafMapperUtils.authorPid(ca.ORCID, OafMapperUtils.qualifier(ModelConstants.ORCID_PENDING, ModelConstants.ORCID_PENDING, ModelConstants.DNET_PID_TYPES), null)
+          OafMapperUtils.authorPid(
+            ca.ORCID,
+            OafMapperUtils.qualifier(
+              ModelConstants.ORCID_PENDING,
+              ModelConstants.ORCID_PENDING,
+              ModelConstants.DNET_PID_TYPES
+            ),
+            null
+          )
         ).asJava
       )
     a

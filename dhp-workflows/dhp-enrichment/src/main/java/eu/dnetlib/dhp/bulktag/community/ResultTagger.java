@@ -7,7 +7,6 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -15,8 +14,6 @@ import com.google.gson.Gson;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
@@ -173,45 +170,39 @@ public class ResultTagger implements Serializable {
 						.add(
 							OafMapperUtils
 								.dataInfo(
-									false, BULKTAG_DATA_INFO_TYPE, true, false,
+									TAGGING_TRUST, BULKTAG_DATA_INFO_TYPE, true,
 									OafMapperUtils
 										.qualifier(
-											CLASS_ID_SUBJECT, CLASS_NAME_BULKTAG_SUBJECT, DNET_PROVENANCE_ACTIONS,
-											DNET_PROVENANCE_ACTIONS),
-									TAGGING_TRUST));
+											CLASS_ID_SUBJECT, CLASS_NAME_BULKTAG_SUBJECT, DNET_PROVENANCE_ACTIONS)));
 				if (datasources.contains(cId))
 					dataInfoList
 						.add(
 							OafMapperUtils
 								.dataInfo(
-									false, BULKTAG_DATA_INFO_TYPE, true, false,
+									TAGGING_TRUST, BULKTAG_DATA_INFO_TYPE, true,
 									OafMapperUtils
 										.qualifier(
-											CLASS_ID_DATASOURCE, CLASS_NAME_BULKTAG_DATASOURCE, DNET_PROVENANCE_ACTIONS,
-											DNET_PROVENANCE_ACTIONS),
-									TAGGING_TRUST));
+											CLASS_ID_DATASOURCE, CLASS_NAME_BULKTAG_DATASOURCE,
+											DNET_PROVENANCE_ACTIONS)));
 				if (czenodo.contains(cId))
 					dataInfoList
 						.add(
 							OafMapperUtils
 								.dataInfo(
-									false, BULKTAG_DATA_INFO_TYPE, true, false,
+									TAGGING_TRUST, BULKTAG_DATA_INFO_TYPE, true,
 									OafMapperUtils
 										.qualifier(
-											CLASS_ID_CZENODO, CLASS_NAME_BULKTAG_ZENODO, DNET_PROVENANCE_ACTIONS,
-											DNET_PROVENANCE_ACTIONS),
-									TAGGING_TRUST));
+											CLASS_ID_CZENODO, CLASS_NAME_BULKTAG_ZENODO, DNET_PROVENANCE_ACTIONS)));
 				if (aconstraints.contains(cId))
 					dataInfoList
 						.add(
 							OafMapperUtils
 								.dataInfo(
-									false, BULKTAG_DATA_INFO_TYPE, true, false,
+									TAGGING_TRUST, BULKTAG_DATA_INFO_TYPE, true,
 									OafMapperUtils
 										.qualifier(
 											CLASS_ID_ADVANCED_CONSTRAINT, CLASS_NAME_BULKTAG_ADVANCED_CONSTRAINT,
-											DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS),
-									TAGGING_TRUST));
+											DNET_PROVENANCE_ACTIONS)));
 
 			}
 		});
@@ -235,45 +226,40 @@ public class ResultTagger implements Serializable {
 							.add(
 								OafMapperUtils
 									.dataInfo(
-										false, BULKTAG_DATA_INFO_TYPE, true, false,
+										TAGGING_TRUST, BULKTAG_DATA_INFO_TYPE, true,
 										OafMapperUtils
 											.qualifier(
-												CLASS_ID_SUBJECT, CLASS_NAME_BULKTAG_SUBJECT, DNET_PROVENANCE_ACTIONS,
-												DNET_PROVENANCE_ACTIONS),
-										TAGGING_TRUST));
+												CLASS_ID_SUBJECT, CLASS_NAME_BULKTAG_SUBJECT,
+												DNET_PROVENANCE_ACTIONS)));
 					if (datasources.contains(c))
 						dataInfoList
 							.add(
 								OafMapperUtils
 									.dataInfo(
-										false, BULKTAG_DATA_INFO_TYPE, true, false,
+										TAGGING_TRUST, BULKTAG_DATA_INFO_TYPE, true,
 										OafMapperUtils
 											.qualifier(
 												CLASS_ID_DATASOURCE, CLASS_NAME_BULKTAG_DATASOURCE,
-												DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS),
-										TAGGING_TRUST));
+												DNET_PROVENANCE_ACTIONS)));
 					if (czenodo.contains(c))
 						dataInfoList
 							.add(
 								OafMapperUtils
 									.dataInfo(
-										false, BULKTAG_DATA_INFO_TYPE, true, false,
+										TAGGING_TRUST, BULKTAG_DATA_INFO_TYPE, true,
 										OafMapperUtils
 											.qualifier(
-												CLASS_ID_CZENODO, CLASS_NAME_BULKTAG_ZENODO, DNET_PROVENANCE_ACTIONS,
-												DNET_PROVENANCE_ACTIONS),
-										TAGGING_TRUST));
+												CLASS_ID_CZENODO, CLASS_NAME_BULKTAG_ZENODO, DNET_PROVENANCE_ACTIONS)));
 					if (aconstraints.contains(c))
 						dataInfoList
 							.add(
 								OafMapperUtils
 									.dataInfo(
-										false, BULKTAG_DATA_INFO_TYPE, true, false,
+										TAGGING_TRUST, BULKTAG_DATA_INFO_TYPE, true,
 										OafMapperUtils
 											.qualifier(
 												CLASS_ID_ADVANCED_CONSTRAINT, CLASS_NAME_BULKTAG_ADVANCED_CONSTRAINT,
-												DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS),
-										TAGGING_TRUST));
+												DNET_PROVENANCE_ACTIONS)));
 
 					context.setDataInfo(dataInfoList);
 					return context;

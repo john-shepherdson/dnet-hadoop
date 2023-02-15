@@ -241,27 +241,27 @@ public class ModelConstants {
 	}
 
 	public static final AccessRight UNKNOWN_ACCESS_RIGHT() {
-		return OafMapperUtils.accessRight(
+		return OafMapperUtils
+			.accessRight(
 				ModelConstants.UNKNOWN,
 				ModelConstants.NOT_AVAILABLE,
-				ModelConstants.DNET_ACCESS_MODES
-		);
+				ModelConstants.DNET_ACCESS_MODES);
 	}
 
 	public static final AccessRight EMBARGOED_ACCESS_RIGHT() {
-		return OafMapperUtils.accessRight(
+		return OafMapperUtils
+			.accessRight(
 				ACCESS_RIGHT_EMBARGO,
 				ACCESS_RIGHT_EMBARGO,
-				DNET_ACCESS_MODES
-		);
+				DNET_ACCESS_MODES);
 	}
 
 	public static final AccessRight CLOSED_ACCESS_RIGHT() {
-		return OafMapperUtils.accessRight(
+		return OafMapperUtils
+			.accessRight(
 				ACCESS_RIGHT_CLOSED,
 				"Closed Access",
-				ModelConstants.DNET_ACCESS_MODES
-		);
+				ModelConstants.DNET_ACCESS_MODES);
 	}
 
 	private static Qualifier qualifier(

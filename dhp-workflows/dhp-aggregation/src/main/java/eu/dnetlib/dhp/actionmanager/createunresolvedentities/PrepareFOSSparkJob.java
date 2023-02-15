@@ -8,8 +8,6 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.oaf.EntityDataInfo;
-import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -24,10 +22,12 @@ import org.slf4j.LoggerFactory;
 import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.FOSDataModel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.EntityDataInfo;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.schema.oaf.Subject;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class PrepareFOSSparkJob implements Serializable {

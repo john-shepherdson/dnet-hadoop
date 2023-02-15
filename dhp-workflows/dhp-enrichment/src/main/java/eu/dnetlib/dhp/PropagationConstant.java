@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,10 +17,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Country;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 public class PropagationConstant {
 
@@ -44,6 +43,7 @@ public class PropagationConstant {
 
 	public final static String NULL = "NULL";
 
+	public final static float PROPAGATION_TRUST = 0.85f;
 	public static final String INSTITUTIONAL_REPO_TYPE = "institutional";
 
 	public static final String PROPAGATION_DATA_INFO_TYPE = "propagation";
@@ -90,52 +90,20 @@ public class PropagationConstant {
 		Country nc = new Country();
 		nc.setClassid(classid);
 		nc.setClassname(classname);
-		nc.setSchemename(ModelConstants.DNET_COUNTRY_TYPE);
 		nc.setSchemeid(ModelConstants.DNET_COUNTRY_TYPE);
 		nc
 			.setDataInfo(
-				getDataInfo(
-					PROPAGATION_DATA_INFO_TYPE,
-					PROPAGATION_COUNTRY_INSTREPO_CLASS_ID,
-					PROPAGATION_COUNTRY_INSTREPO_CLASS_NAME,
-					ModelConstants.DNET_PROVENANCE_ACTIONS));
+				OafMapperUtils
+					.dataInfo(
+						PROPAGATION_TRUST,
+						PROPAGATION_DATA_INFO_TYPE,
+						true,
+						OafMapperUtils
+							.qualifier(
+								PROPAGATION_COUNTRY_INSTREPO_CLASS_ID,
+								PROPAGATION_COUNTRY_INSTREPO_CLASS_NAME,
+								ModelConstants.DNET_PROVENANCE_ACTIONS)));
 		return nc;
-	}
-
-	public static DataInfo getDataInfo(
-		String inference_provenance, String inference_class_id, String inference_class_name, String qualifierSchema) {
-
-		return getDataInfo(inference_provenance, inference_class_id, inference_class_name, qualifierSchema, "0.85");
-	}
-
-	public static DataInfo getDataInfo(
-		String inference_provenance, String inference_class_id, String inference_class_name, String qualifierSchema,
-		String trust) {
-		return getDataInfo(
-			inference_provenance, inference_class_id, inference_class_name, qualifierSchema, trust, true);
-
-	}
-
-	public static DataInfo getDataInfo(
-		String inference_provenance, String inference_class_id, String inference_class_name, String qualifierSchema,
-		String trust, boolean inferred) {
-		DataInfo di = new DataInfo();
-		di.setInferred(inferred);
-		di.setDeletedbyinference(false);
-		di.setTrust(trust);
-		di.setInferenceprovenance(inference_provenance);
-		di.setProvenanceaction(getQualifier(inference_class_id, inference_class_name, qualifierSchema));
-		return di;
-	}
-
-	public static Qualifier getQualifier(String inference_class_id, String inference_class_name,
-		String qualifierSchema) {
-		Qualifier pa = new Qualifier();
-		pa.setClassid(inference_class_id);
-		pa.setClassname(inference_class_name);
-		pa.setSchemeid(qualifierSchema);
-		pa.setSchemename(qualifierSchema);
-		return pa;
 	}
 
 	public static ArrayList<Relation> getOrganizationRelationPair(String orgId,
@@ -186,11 +154,18 @@ public class PropagationConstant {
 		r.setRelClass(rel_class);
 		r.setRelType(rel_type);
 		r.setSubRelType(subrel_type);
-		r
+		Provenance p = new Provenance();
+		p
 			.setDataInfo(
-				getDataInfo(
-					inference_provenance, inference_class_id, inference_class_name,
-					ModelConstants.DNET_PROVENANCE_ACTIONS));
+				OafMapperUtils
+					.dataInfo(
+						PROPAGATION_TRUST, inference_provenance, true,
+						OafMapperUtils
+							.qualifier(
+								inference_class_id, inference_class_name,
+								ModelConstants.DNET_PROVENANCE_ACTIONS)));
+		r.setProvenance(Arrays.asList(p));
+
 		return r;
 	}
 
