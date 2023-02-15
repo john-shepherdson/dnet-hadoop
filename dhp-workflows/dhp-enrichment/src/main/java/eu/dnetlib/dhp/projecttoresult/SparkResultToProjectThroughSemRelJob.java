@@ -107,30 +107,17 @@ public class SparkResultToProjectThroughSemRelJob {
 			potentialUpdate
 				.getProjectSet()
 				.forEach(
-					projectId -> {
-						newRelations
-							.add(
-								getRelation(
-									resId,
-									projectId,
-									ModelConstants.IS_PRODUCED_BY,
-									ModelConstants.RESULT_PROJECT,
-									ModelConstants.OUTCOME,
-									PROPAGATION_DATA_INFO_TYPE,
-									PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID,
-									PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_NAME));
-						newRelations
-							.add(
-								getRelation(
-									projectId,
-									resId,
-									ModelConstants.PRODUCES,
-									ModelConstants.RESULT_PROJECT,
-									ModelConstants.OUTCOME,
-									PROPAGATION_DATA_INFO_TYPE,
-									PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID,
-									PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_NAME));
-					});
+					projectId -> newRelations
+						.add(
+							getRelation(
+								projectId,
+								resId,
+								ModelConstants.PRODUCES,
+								ModelConstants.RESULT_PROJECT,
+								ModelConstants.OUTCOME,
+								PROPAGATION_DATA_INFO_TYPE,
+								PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID,
+								PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_NAME)));
 			return newRelations.iterator();
 		};
 	}
