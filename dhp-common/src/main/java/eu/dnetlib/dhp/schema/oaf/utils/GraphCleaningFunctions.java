@@ -495,7 +495,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	private static AccessRight accessRight(String classid, String classname, String scheme) {
 		return OafMapperUtils
 			.accessRight(
-				classid, classname, scheme, scheme);
+				classid, classname, scheme);
 	}
 
 	private static Qualifier qualifier(String classid, String classname, String scheme) {

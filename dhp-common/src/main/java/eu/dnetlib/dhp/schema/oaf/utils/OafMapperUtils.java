@@ -55,19 +55,19 @@ public class OafMapperUtils {
 		return qualifier(UNKNOWN, "Unknown", schemeid);
 	}
 
+
+
 	public static AccessRight accessRight(
 		final String classid,
 		final String classname,
-		final String schemeid,
-		final String schemename) {
-		return accessRight(classid, classname, schemeid, schemename, null);
+		final String schemeid) {
+		return accessRight(classid, classname, schemeid,  null);
 	}
 
 	public static AccessRight accessRight(
 		final String classid,
 		final String classname,
 		final String schemeid,
-		final String schemename,
 		final OpenAccessRoute openAccessRoute) {
 		final AccessRight accessRight = new AccessRight();
 		accessRight.setClassid(classid);

@@ -1,12 +1,12 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -79,6 +79,25 @@ class IdentifierFactoryTest {
 		final Publication pub = OBJECT_MAPPER.readValue(json, Publication.class);
 
 		assertEquals(expectedID, IdentifierFactory.createIdentifier(pub, md5));
+	}
+
+	@Test
+	void testNormalizeDOI() throws Exception {
+
+		final String doi = "10.1042/BCJ20160876";
+
+		assertEquals(CleaningFunctions.normalizePidValue("doi", doi), doi.toLowerCase());
+		final String doi2 = "0.1042/BCJ20160876";
+		assertThrows(IllegalArgumentException.class, () -> CleaningFunctions.normalizePidValue("doi", doi2));
+
+		final String doi3 = "https://doi.org/0.1042/BCJ20160876";
+		assertThrows(IllegalArgumentException.class, () -> CleaningFunctions.normalizePidValue("doi", doi3));
+
+		final String doi4 = "https://doi.org/10.1042/BCJ20160876";
+		assertEquals(CleaningFunctions.normalizePidValue("doi", doi4), "10.1042/BCJ20160876".toLowerCase());
+
+		final String doi5 = "https://doi.org/10.1042/ BCJ20160876";
+		assertEquals(CleaningFunctions.normalizePidValue("doi", doi5), "10.1042/BCJ20160876".toLowerCase());
 	}
 
 }
