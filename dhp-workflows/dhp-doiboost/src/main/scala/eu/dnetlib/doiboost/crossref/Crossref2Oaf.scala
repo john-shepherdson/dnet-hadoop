@@ -309,6 +309,8 @@ case object Crossref2Oaf {
       result
   }
 
+
+
   def generateAuhtor(given: String, family: String, orcid: String, index: Int): Author = {
     val a = new Author
     a.setName(given)
@@ -370,8 +372,55 @@ case object Crossref2Oaf {
       case dataset: Dataset         => convertDataset(dataset)
     }
 
+
+    val doisReference:List[String] = for {
+      JObject(reference_json) <- json \ "reference"
+      JField("DOI", JString(doi_json)) <- reference_json
+    } yield doi_json
+
+
+
+    if (doisReference!= null && doisReference.nonEmpty) {
+      val citation_relations:List[Relation] = generateCitationRelations(doisReference, result)
+      resultList = resultList ::: citation_relations
+    }
     resultList = resultList ::: List(result)
     resultList
+  }
+
+
+
+  private def createCiteRelation(source:Result, targetPid:String, targetPidType:String) :List[Relation] = {
+
+
+    val targetId = IdentifierFactory.idFromPid("50",targetPidType, targetPid, true)
+
+    val from = new Relation
+    from.setSource(source.getId)
+    from.setTarget(targetId)
+    from.setRelType(ModelConstants.RESULT_RESULT)
+    from.setRelClass(ModelConstants.CITES)
+    from.setSubRelType(ModelConstants.CITATION)
+    from.setCollectedfrom(source.getCollectedfrom)
+    from.setDataInfo(source.getDataInfo)
+    from.setLastupdatetimestamp(source.getLastupdatetimestamp)
+
+
+    val to = new Relation
+    to.setTarget(source.getId)
+    to.setSource(targetId)
+    to.setRelType(ModelConstants.RESULT_RESULT)
+    to.setRelClass(ModelConstants.IS_CITED_BY)
+    to.setSubRelType(ModelConstants.CITATION)
+    to.setCollectedfrom(source.getCollectedfrom)
+    to.setDataInfo(source.getDataInfo)
+    to.setLastupdatetimestamp(source.getLastupdatetimestamp)
+
+    List(from,to)
+  }
+
+  def generateCitationRelations(dois:List[String], result:Result):List[Relation] = {
+    dois.flatMap(d => createCiteRelation(result, d, "doi"))
   }
 
   def mappingFunderToRelations(

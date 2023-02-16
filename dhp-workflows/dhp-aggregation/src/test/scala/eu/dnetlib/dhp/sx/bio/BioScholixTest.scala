@@ -63,7 +63,9 @@ class BioScholixTest extends AbstractVocabularyTest {
     val records: String = Source
       .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed_dump"))
       .mkString
-    val r: List[Oaf] = records.linesWithSeparators.map(l =>l.stripLineEnd).toList
+    val r: List[Oaf] = records.linesWithSeparators
+      .map(l => l.stripLineEnd)
+      .toList
       .map(s => mapper.readValue(s, classOf[PMArticle]))
       .map(a => PubMedToOaf.convert(a, vocabularies))
     assertEquals(10, r.size)
@@ -173,9 +175,10 @@ class BioScholixTest extends AbstractVocabularyTest {
     val records: String = Source
       .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pdb_dump"))
       .mkString
-    records.linesWithSeparators.map(l =>l.stripLineEnd).foreach(s => assertTrue(s.nonEmpty))
+    records.linesWithSeparators.map(l => l.stripLineEnd).foreach(s => assertTrue(s.nonEmpty))
 
-    val result: List[Oaf] = records.linesWithSeparators.map(l =>l.stripLineEnd).toList.flatMap(o => BioDBToOAF.pdbTOOaf(o))
+    val result: List[Oaf] =
+      records.linesWithSeparators.map(l => l.stripLineEnd).toList.flatMap(o => BioDBToOAF.pdbTOOaf(o))
 
     assertTrue(result.nonEmpty)
     result.foreach(r => assertNotNull(r))
@@ -194,9 +197,10 @@ class BioScholixTest extends AbstractVocabularyTest {
     val records: String = Source
       .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/uniprot_dump"))
       .mkString
-    records.linesWithSeparators.map(l =>l.stripLineEnd).foreach(s => assertTrue(s.nonEmpty))
+    records.linesWithSeparators.map(l => l.stripLineEnd).foreach(s => assertTrue(s.nonEmpty))
 
-    val result: List[Oaf] = records.linesWithSeparators.map(l =>l.stripLineEnd).toList.flatMap(o => BioDBToOAF.uniprotToOAF(o))
+    val result: List[Oaf] =
+      records.linesWithSeparators.map(l => l.stripLineEnd).toList.flatMap(o => BioDBToOAF.uniprotToOAF(o))
 
     assertTrue(result.nonEmpty)
     result.foreach(r => assertNotNull(r))
@@ -239,9 +243,10 @@ class BioScholixTest extends AbstractVocabularyTest {
     val records: String = Source
       .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/crossref_links"))
       .mkString
-    records.linesWithSeparators.map(l =>l.stripLineEnd).foreach(s => assertTrue(s.nonEmpty))
+    records.linesWithSeparators.map(l => l.stripLineEnd).foreach(s => assertTrue(s.nonEmpty))
 
-    val result: List[Oaf] = records.linesWithSeparators.map(l =>l.stripLineEnd).map(s => BioDBToOAF.crossrefLinksToOaf(s)).toList
+    val result: List[Oaf] =
+      records.linesWithSeparators.map(l => l.stripLineEnd).map(s => BioDBToOAF.crossrefLinksToOaf(s)).toList
 
     assertNotNull(result)
     assertTrue(result.nonEmpty)
@@ -276,14 +281,17 @@ class BioScholixTest extends AbstractVocabularyTest {
         getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/scholix_resolved")
       )
       .mkString
-    records.linesWithSeparators.map(l =>l.stripLineEnd).foreach(s => assertTrue(s.nonEmpty))
+    records.linesWithSeparators.map(l => l.stripLineEnd).foreach(s => assertTrue(s.nonEmpty))
 
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
-    val l: List[ScholixResolved] = records.linesWithSeparators.map(l =>l.stripLineEnd).map { input =>
-      lazy val json = parse(input)
-      json.extract[ScholixResolved]
-    }.toList
+    val l: List[ScholixResolved] = records.linesWithSeparators
+      .map(l => l.stripLineEnd)
+      .map { input =>
+        lazy val json = parse(input)
+        json.extract[ScholixResolved]
+      }
+      .toList
 
     val result: List[Oaf] = l.map(s => BioDBToOAF.scholixResolvedToOAF(s))
 
