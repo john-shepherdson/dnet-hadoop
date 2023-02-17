@@ -121,7 +121,7 @@ public class SparkAtomicActionUsageJob implements Serializable {
 	private static List<Measure> getMeasure(Long downloads, Long views) {
 		DataInfo dataInfo = OafMapperUtils
 			.dataInfo(
-				0.0f, //TODO check
+				0.0f, // TODO check
 				UPDATE_DATA_INFO_TYPE,
 				false,
 				OafMapperUtils

@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
@@ -29,10 +27,12 @@ import eu.dnetlib.dhp.actionmanager.project.utils.model.EXCELTopic;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
+import eu.dnetlib.dhp.schema.oaf.Entity;
 import eu.dnetlib.dhp.schema.oaf.H2020Classification;
 import eu.dnetlib.dhp.schema.oaf.H2020Programme;
-import eu.dnetlib.dhp.schema.oaf.Entity;
 import eu.dnetlib.dhp.schema.oaf.Project;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 

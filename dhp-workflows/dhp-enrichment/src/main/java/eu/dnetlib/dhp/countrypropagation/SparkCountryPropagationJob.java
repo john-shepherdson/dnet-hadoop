@@ -23,6 +23,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Country;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import scala.Tuple2;
 
 public class SparkCountryPropagationJob {
@@ -126,6 +127,7 @@ public class SparkCountryPropagationJob {
 			.filter(c -> !finalCountries.contains(c.getClassid()))
 			.map(c -> getCountry(c.getClassid(), c.getClassname()))
 			.collect(Collectors.toList());
+
 	}
 
 }

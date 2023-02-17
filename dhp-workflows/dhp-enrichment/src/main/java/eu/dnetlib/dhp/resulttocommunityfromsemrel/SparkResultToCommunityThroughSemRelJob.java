@@ -21,6 +21,8 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.resulttocommunityfromorganization.ResultCommunityList;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import scala.Tuple2;
 
 public class SparkResultToCommunityThroughSemRelJob {
@@ -122,11 +124,14 @@ public class SparkResultToCommunityThroughSemRelJob {
 									.setDataInfo(
 										Arrays
 											.asList(
-												getDataInfo(
-													PROPAGATION_DATA_INFO_TYPE,
-													PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID,
-													PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME,
-													ModelConstants.DNET_PROVENANCE_ACTIONS)));
+												OafMapperUtils
+													.dataInfo(
+														PROPAGATION_TRUST, PROPAGATION_DATA_INFO_TYPE, true,
+														OafMapperUtils
+															.qualifier(
+																PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID,
+																PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME,
+																ModelConstants.DNET_PROVENANCE_ACTIONS))));
 								return newContext;
 							}
 							return null;
@@ -139,7 +144,7 @@ public class SparkResultToCommunityThroughSemRelJob {
 
 				r.setId(ret.getId());
 				r.setContext(contextList);
-				ret.mergeFrom(r);
+				ret = MergeUtils.merge(ret, r);
 			}
 
 			return ret;

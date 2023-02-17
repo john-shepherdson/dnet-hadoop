@@ -139,10 +139,12 @@ public class SparkResultToOrganizationFromIstRepoJob {
 			organizations
 				.forEach(
 					orgId -> newRelations
-						.addAll(
-							getOrganizationRelationPair(
-								orgId,
-								resultId,
+						.add(
+							getRelation(
+								resultId, orgId,
+								ModelConstants.HAS_AUTHOR_INSTITUTION,
+								ModelConstants.RESULT_ORGANIZATION,
+								ModelConstants.AFFILIATION, PROPAGATION_DATA_INFO_TYPE,
 								PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_ID,
 								PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME))
 

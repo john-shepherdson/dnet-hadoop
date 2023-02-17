@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
-import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
@@ -31,6 +29,8 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import scala.Tuple2;
 
 public class CreateActionSetSparkJob implements Serializable {
@@ -47,17 +47,20 @@ public class CreateActionSetSparkJob implements Serializable {
 		COLLECTED_FROM.setKey(ModelConstants.OPENOCITATIONS_ID);
 		COLLECTED_FROM.setValue(ModelConstants.OPENOCITATIONS_NAME);
 
-		DATA_INFO = OafMapperUtils.dataInfo(
+		DATA_INFO = OafMapperUtils
+			.dataInfo(
 				TRUST,
 				null,
 				false,
-				OafMapperUtils.qualifier(
+				OafMapperUtils
+					.qualifier(
 						OPENCITATIONS_CLASSID,
 						OPENCITATIONS_CLASSNAME,
 						ModelConstants.DNET_PROVENANCE_ACTIONS));
 	}
 
-	private static final List<Provenance> PROVENANCE = Arrays.asList(
+	private static final List<Provenance> PROVENANCE = Arrays
+		.asList(
 			OafMapperUtils.getProvenance(COLLECTED_FROM, DATA_INFO));
 
 	private static final Logger log = LoggerFactory.getLogger(CreateActionSetSparkJob.class);
@@ -144,7 +147,8 @@ public class CreateActionSetSparkJob implements Serializable {
 	}
 
 	private static String asOpenAireId(String value) {
-		return IdentifierFactory.idFromPid(
+		return IdentifierFactory
+			.idFromPid(
 				"50", PidType.doi.toString(),
 				CleaningFunctions.normalizePidValue(PidType.doi.toString(), value),
 				true);

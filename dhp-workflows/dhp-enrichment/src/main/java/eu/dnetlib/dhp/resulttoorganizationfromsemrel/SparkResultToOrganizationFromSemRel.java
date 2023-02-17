@@ -211,19 +211,6 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 			.groupByKey((MapFunction<Relation, String>) r -> r.getSource() + r.getTarget(), Encoders.STRING())
 			.mapGroups(
 				(MapGroupsFunction<String, Relation, Relation>) (k, it) -> it.next(), Encoders.bean(Relation.class))
-			.flatMap(
-				(FlatMapFunction<Relation, Relation>) r -> Arrays
-					.asList(
-						r, getRelation(
-							r.getTarget(), r.getSource(), ModelConstants.IS_AUTHOR_INSTITUTION_OF,
-							ModelConstants.RESULT_ORGANIZATION,
-							ModelConstants.AFFILIATION,
-							PROPAGATION_DATA_INFO_TYPE,
-							PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_ID,
-							PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_NAME))
-					.iterator()
-
-				, Encoders.bean(Relation.class))
 			.write()
 
 			.mode(SaveMode.Append)

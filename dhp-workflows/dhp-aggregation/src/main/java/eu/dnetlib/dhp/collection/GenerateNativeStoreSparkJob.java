@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.IntWritable;
@@ -33,6 +32,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion;
 import eu.dnetlib.dhp.schema.mdstore.MetadataRecord;
 import eu.dnetlib.dhp.schema.mdstore.Provenance;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import scala.Tuple2;
 
 public class GenerateNativeStoreSparkJob {

@@ -24,6 +24,8 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import scala.Tuple2;
 
 public class SparkResultToCommunityFromOrganizationJob {
@@ -126,16 +128,20 @@ public class SparkResultToCommunityFromOrganizationJob {
 							.setDataInfo(
 								Arrays
 									.asList(
-										getDataInfo(
-											PROPAGATION_DATA_INFO_TYPE,
-											PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_ID,
-											PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_NAME,
-											ModelConstants.DNET_PROVENANCE_ACTIONS)));
+										OafMapperUtils
+											.dataInfo(
+												PROPAGATION_TRUST,
+												PROPAGATION_DATA_INFO_TYPE, true,
+												OafMapperUtils
+													.qualifier(
+														PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_ID,
+														PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_NAME,
+														ModelConstants.DNET_PROVENANCE_ACTIONS))));
 						propagatedContexts.add(newContext);
 					}
 				}
 				res.setContext(propagatedContexts);
-				ret.mergeFrom(res);
+				ret = MergeUtils.merge(ret, res);
 			}
 			return ret;
 		};

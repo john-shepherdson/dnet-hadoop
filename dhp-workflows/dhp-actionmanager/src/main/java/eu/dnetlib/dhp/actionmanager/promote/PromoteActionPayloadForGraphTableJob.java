@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -26,8 +25,8 @@ import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableSupplier;
 import eu.dnetlib.dhp.common.HdfsSupport;
-
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 
 /** Applies a given action payload file to graph table of compatible type. */
 public class PromoteActionPayloadForGraphTableJob {

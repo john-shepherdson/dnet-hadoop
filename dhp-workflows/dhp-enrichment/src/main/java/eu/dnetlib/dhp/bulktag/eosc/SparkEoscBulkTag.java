@@ -29,9 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.bulktag.SparkBulkTagJob;
 import eu.dnetlib.dhp.bulktag.community.*;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
@@ -132,12 +130,13 @@ public class SparkEoscBulkTag implements Serializable {
 						.asList(
 							OafMapperUtils
 								.dataInfo(
-									false, BULKTAG_DATA_INFO_TYPE, true, false,
+									TAGGING_TRUST,
+									BULKTAG_DATA_INFO_TYPE,
+									true,
 									OafMapperUtils
 										.qualifier(
 											CLASS_ID_DATASOURCE, CLASS_NAME_BULKTAG_DATASOURCE,
-											DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS),
-									TAGGING_TRUST)));
+											DNET_PROVENANCE_ACTIONS))));
 			value.getContext().add(context);
 
 		}

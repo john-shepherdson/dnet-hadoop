@@ -7,7 +7,6 @@ import java.util.function.BiFunction;
 
 import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableSupplier;
 import eu.dnetlib.dhp.schema.oaf.*;
-
 import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 
 /** OAF model merging support. */
@@ -56,19 +55,19 @@ public class MergeAndGet {
 			Entity yE = (Entity) y;
 
 			if (xE.getClass().equals(yE.getClass())
-					&& xE.getLastupdatetimestamp() > yE.getLastupdatetimestamp()) {
+				&& xE.getLastupdatetimestamp() > yE.getLastupdatetimestamp()) {
 				return x;
 			} else if (xE.getClass().equals(yE.getClass())
-					&& xE.getLastupdatetimestamp() < yE.getLastupdatetimestamp()) {
+				&& xE.getLastupdatetimestamp() < yE.getLastupdatetimestamp()) {
 				return (G) y;
 			} else if (isSubClass(xE, yE) && xE.getLastupdatetimestamp() > yE.getLastupdatetimestamp()) {
 				return x;
 			} else if (isSubClass(xE, yE) && xE.getLastupdatetimestamp() < yE.getLastupdatetimestamp()) {
 				throw new RuntimeException(
-						String
-								.format(
-										"SELECT_NEWER_AND_GET cannot return right type when it is not the same as left type: %s, %s",
-										x.getClass().getCanonicalName(), y.getClass().getCanonicalName()));
+					String
+						.format(
+							"SELECT_NEWER_AND_GET cannot return right type when it is not the same as left type: %s, %s",
+							x.getClass().getCanonicalName(), y.getClass().getCanonicalName()));
 			}
 
 		}

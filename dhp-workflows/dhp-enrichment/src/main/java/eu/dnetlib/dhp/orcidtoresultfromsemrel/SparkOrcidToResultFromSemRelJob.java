@@ -24,8 +24,10 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.AuthorPid;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import scala.Tuple2;
 
 public class SparkOrcidToResultFromSemRelJob {
@@ -171,21 +173,26 @@ public class SparkOrcidToResultFromSemRelJob {
 			}
 		}
 		if (toaddpid) {
-			StructuredProperty p = new StructuredProperty();
+			AuthorPid p = new AuthorPid();
 			p.setValue(autoritative_author.getOrcid());
 			p
 				.setQualifier(
-					getQualifier(
-						ModelConstants.ORCID_PENDING, ModelConstants.ORCID_CLASSNAME, ModelConstants.DNET_PID_TYPES));
+					OafMapperUtils
+						.qualifier(
+							ModelConstants.ORCID_PENDING, ModelConstants.ORCID_CLASSNAME,
+							ModelConstants.DNET_PID_TYPES));
 			p
 				.setDataInfo(
-					getDataInfo(
-						PROPAGATION_DATA_INFO_TYPE,
-						PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_ID,
-						PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME,
-						ModelConstants.DNET_PROVENANCE_ACTIONS));
+					OafMapperUtils
+						.dataInfo(
+							PROPAGATION_TRUST,
+							PROPAGATION_DATA_INFO_TYPE, true, OafMapperUtils
+								.qualifier(
+									PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_ID,
+									PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME,
+									ModelConstants.DNET_PROVENANCE_ACTIONS)));
 
-			Optional<List<StructuredProperty>> authorPid = Optional.ofNullable(author.getPid());
+			Optional<List<AuthorPid>> authorPid = Optional.ofNullable(author.getPid());
 			if (authorPid.isPresent()) {
 				authorPid.get().add(p);
 			} else {
@@ -197,7 +204,7 @@ public class SparkOrcidToResultFromSemRelJob {
 	}
 
 	private static boolean containsAllowedPid(Author a) {
-		Optional<List<StructuredProperty>> pids = Optional.ofNullable(a.getPid());
+		Optional<List<AuthorPid>> pids = Optional.ofNullable(a.getPid());
 		if (!pids.isPresent()) {
 			return false;
 		}

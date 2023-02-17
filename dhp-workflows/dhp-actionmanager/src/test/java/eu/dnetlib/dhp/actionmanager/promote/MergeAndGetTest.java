@@ -8,12 +8,12 @@ import static org.mockito.Mockito.*;
 
 import java.util.function.BiFunction;
 
-import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableSupplier;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 
 public class MergeAndGetTest {
 
@@ -97,7 +97,7 @@ public class MergeAndGetTest {
 			// then
 			Oaf x = fn.get().apply(a, b);
 			assertTrue(Relation.class.isAssignableFrom(x.getClass()));
-			//verify(a).mergeFrom(b);
+			// verify(a).mergeFrom(b);
 			a = MergeUtils.merge(verify(a), b);
 			assertEquals(a, x);
 		}

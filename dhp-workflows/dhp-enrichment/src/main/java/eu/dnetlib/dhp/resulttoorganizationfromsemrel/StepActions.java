@@ -126,10 +126,14 @@ public class StepActions implements Serializable {
 					.stream()
 					.filter(
 						rel -> !rel
-							.getDataInfo()
-							.getProvenanceaction()
-							.getClassid()
-							.equals(PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_ID))
+							.getProvenance()
+							.stream()
+							.anyMatch(
+								p -> p
+									.getDataInfo()
+									.getProvenanceaction()
+									.getClassid()
+									.equals(PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_ID)))
 					.count() > 0) {
 					return null;
 				}

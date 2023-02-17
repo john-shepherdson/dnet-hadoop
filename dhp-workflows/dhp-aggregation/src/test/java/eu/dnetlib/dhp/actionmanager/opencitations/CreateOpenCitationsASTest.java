@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
@@ -29,8 +27,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 

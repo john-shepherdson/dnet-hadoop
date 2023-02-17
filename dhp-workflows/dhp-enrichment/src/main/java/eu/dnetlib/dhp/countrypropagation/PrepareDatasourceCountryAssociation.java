@@ -96,8 +96,7 @@ public class PrepareDatasourceCountryAssociation {
 		// filtering of the relations taking the non deleted by inference and those with IsProvidedBy as relclass
 		Dataset<Relation> relation = readPath(spark, inputPath + "/relation", Relation.class)
 			.filter(
-				(FilterFunction<Relation>) rel -> rel.getRelClass().equalsIgnoreCase(ModelConstants.IS_PROVIDED_BY) &&
-					!rel.getDataInfo().getDeletedbyinference());
+				(FilterFunction<Relation>) rel -> rel.getRelClass().equalsIgnoreCase(ModelConstants.IS_PROVIDED_BY));
 
 		// filtering of the organization taking only the non deleted by inference and those with information about the
 		// country

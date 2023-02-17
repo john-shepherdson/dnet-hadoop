@@ -3,8 +3,6 @@ package eu.dnetlib.dhp.actionmanager;
 
 import java.util.Optional;
 
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.EntityDataInfo;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -14,6 +12,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.EntityDataInfo;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.schema.oaf.Subject;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
@@ -43,28 +43,28 @@ public class Constants {
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static final EntityDataInfo SciNoBo_DATA_INFO = OafMapperUtils
-			.dataInfo(
-					false,
-					false,
-					0.8f, //TODO check
-					"SciNoBo",
-					true,
-					OafMapperUtils
-							.qualifier(
-									ModelConstants.PROVENANCE_ENRICH,
-									null,
-									ModelConstants.DNET_PROVENANCE_ACTIONS));
+		.dataInfo(
+			false,
+			false,
+			0.8f, // TODO check
+			"SciNoBo",
+			true,
+			OafMapperUtils
+				.qualifier(
+					ModelConstants.PROVENANCE_ENRICH,
+					null,
+					ModelConstants.DNET_PROVENANCE_ACTIONS));
 
 	public static final DataInfo Bip_DATA_INFO3 = OafMapperUtils
-			.dataInfo(
-					0.8f,
-					UPDATE_DATA_INFO_TYPE,
-					false,
-					OafMapperUtils
-							.qualifier(
-									UPDATE_MEASURE_BIP_CLASS_ID,
-									UPDATE_CLASS_NAME,
-									ModelConstants.DNET_PROVENANCE_ACTIONS));
+		.dataInfo(
+			0.8f,
+			UPDATE_DATA_INFO_TYPE,
+			false,
+			OafMapperUtils
+				.qualifier(
+					UPDATE_MEASURE_BIP_CLASS_ID,
+					UPDATE_CLASS_NAME,
+					ModelConstants.DNET_PROVENANCE_ACTIONS));
 
 	private Constants() {
 	}
@@ -101,7 +101,7 @@ public class Constants {
 			.setDataInfo(
 				OafMapperUtils
 					.dataInfo(
-						0.0f, //TODO check
+						0.0f, // TODO check
 						UPDATE_DATA_INFO_TYPE,
 						true,
 						OafMapperUtils
