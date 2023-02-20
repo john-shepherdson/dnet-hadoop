@@ -66,7 +66,6 @@
             <exec>monitor.sh</exec>
             <argument>${stats_db_name}</argument>
             <argument>${monitor_db_name}</argument>
-            <argument>${monitor_db_shadow_name}</argument>
             <argument>${wf:appPath()}/scripts/createMonitorDB.sql</argument>
             <file>monitor.sh</file>
         </shell>
@@ -85,9 +84,48 @@
             <argument>${monitor_db_shadow_name}</argument>
             <file>monitor-post.sh</file>
         </shell>
-        <ok to="End"/>
+        <ok to="Step3-copyDataToImpalaCluster"/>
         <error to="Kill"/>
     </action>
 
+    <action name="Step3-copyDataToImpalaCluster">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>copyDataToImpalaCluster.sh</exec>
+            <!--            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>-->
+            <!--            <argument>${external_stats_db_name}</argument>-->
+            <argument>${monitor_db_name}</argument>
+            <argument>${hadoop_user_name}</argument>
+            <file>copyDataToImpalaCluster.sh</file>
+        </shell>
+        <ok to="Step4-finalizeImpalaCluster"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step4-finalizeImpalaCluster">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>finalizeImpalaCluster.sh</exec>
+            <argument>${monitor_db_name}</argument>
+            <argument>${monitor_db_shadow_name}</argument>
+            <file>finalizeImpalaCluster.sh</file>
+        </shell>
+        <ok to="Step5-updateCache"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step5-updateCache">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>updateCache.sh</exec>
+            <argument>${stats_tool_api_url}</argument>
+            <file>updateCache.sh</file>
+        </shell>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
     <end name="End"/>
 </workflow-app>

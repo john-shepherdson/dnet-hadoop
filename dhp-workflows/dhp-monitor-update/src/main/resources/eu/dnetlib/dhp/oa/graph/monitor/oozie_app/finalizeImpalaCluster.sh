@@ -16,13 +16,7 @@ function createShadowDB() {
   impala-shell -i impala-cluster-dn1.openaire.eu -d ${SOURCE} -q "show tables" --delimited | sed "s/\(.*\)/create view ${SHADOW}.\1 as select * from ${SOURCE}.\1;/" | impala-shell -i impala-cluster-dn1.openaire.eu -f -
 }
 
-STATS_DB=$1
-STATS_DB_SHADOW=$2
 MONITOR_DB=$3
 MONITOR_DB_SHADOW=$4
-OBSERVATORY_DB=$5
-OBSERVATORY_DB_SHADOW=$6
 
-createShadowDB $STATS_DB $STATS_DB_SHADOW
 createShadowDB $MONITOR_DB $MONITOR_DB_SHADOW
-createShadowDB $OBSERVATORY_DB $OBSERVATORY_DB_SHADOW

@@ -7,7 +7,7 @@ then
 fi
 
 #export HADOOP_USER_NAME="dimitris.pierrakos"
-export HADOOP_USER_NAME=$5
+export HADOOP_USER_NAME=$2
 
 function copydb() {
   db=$1
@@ -49,14 +49,8 @@ function copydb() {
   hdfs dfs -conf /etc/impala_cluster/hdfs-site.xml -rm -R /tmp/${db}.db
 }
 
-STATS_DB=$1
-MONITOR_DB=$2
-OBSERVATORY_DB=$3
-EXT_DB=$4
-HADOOP_USER_NAME=$5
+MONITOR_DB=$1
+HADOOP_USER_NAME=$2
 
-copydb $EXT_DB
-copydb $STATS_DB
 copydb $MONITOR_DB
-copydb $OBSERVATORY_DB
 
