@@ -14,7 +14,7 @@ function copydb() {
 
   # copy the databases from ocean to impala
 
-  #echo "copying $db"
+  echo "copying $db"
   hadoop distcp -Dmapreduce.map.memory.mb=6144 -pb hdfs://nameservice1/user/hive/warehouse/${db}.db hdfs://impala-cluster-mn1.openaire.eu:8020/tmp
 
   # change ownership to impala

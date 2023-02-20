@@ -180,7 +180,7 @@ from publication_datasources pd
          left outer join (
     select pd.id, 1 as in_diamond_journal from publication_datasources pd
                                                    join datasource d on d.id=pd.datasource
-                                                   join stats_ext.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_online=d.issn_online)
+                                                   join STATS_EXT.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_online=d.issn_online)
                                                                                  and (ps.journal_is_in_doaj=true or ps.journal_is_oa=true) and ps.has_apc=false) tmp
                          on pd.id=tmp.id;
 
@@ -192,7 +192,7 @@ from publication pd
          left outer join (
     select  pd.id, 1 as is_transformative from publication_datasources pd
                                                    join datasource d on d.id=pd.datasource
-                                                   join stats_ext.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_online=d.issn_online)
+                                                   join STATS_EXT.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_online=d.issn_online)
                                                                                  and ps.is_transformative_journal=true) tmp
                          on pd.id=tmp.id;
 
@@ -220,11 +220,11 @@ ANALYZE TABLE indi_result_no_of_copies COMPUTE STATISTICS;
 create table if not exists indi_pub_hybrid_oa_with_cc stored as parquet as
     WITH hybrid_oa AS (
         SELECT issn_l, journal_is_in_doaj, journal_is_oa, issn_print as issn
-        FROM stats_ext.plan_s_jn
+        FROM STATS_EXT.plan_s_jn
         WHERE issn_print != ""
         UNION ALL
         SELECT issn_l, journal_is_in_doaj, journal_is_oa, issn_online as issn
-        FROM stats_ext.plan_s_jn
+        FROM STATS_EXT.plan_s_jn
         WHERE issn_online != "" and (journal_is_in_doaj = FALSE OR journal_is_oa = FALSE)),
     issn AS (
                 SELECT *
@@ -291,7 +291,7 @@ create table if not exists indi_pub_gold_oa stored as parquet as
         journal_is_oa,
         issn_1 as issn
         FROM
-        stats_ext.oa_journals
+        STATS_EXT.oa_journals
         WHERE
         issn_1 != ""
         UNION
@@ -301,7 +301,7 @@ create table if not exists indi_pub_gold_oa stored as parquet as
         journal_is_oa,
         issn_2 as issn
         FROM
-        stats_ext.oa_journals
+        STATS_EXT.oa_journals
         WHERE
         issn_2 != "" ),  issn AS ( SELECT
                                    *
@@ -343,7 +343,7 @@ create table if not exists indi_pub_hybrid stored as parquet as
         issn_1 as issn,
         has_apc
         FROM
-        stats_ext.oa_journals
+        STATS_EXT.oa_journals
         WHERE
         issn_1 != ""
         UNION
@@ -354,7 +354,7 @@ create table if not exists indi_pub_hybrid stored as parquet as
         issn_2 as issn,
         has_apc
         FROM
-        stats_ext.oa_journals
+        STATS_EXT.oa_journals
         WHERE
         issn_2 != "" ),  issn AS ( SELECT
                                    *

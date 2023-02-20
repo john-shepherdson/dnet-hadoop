@@ -108,6 +108,7 @@
             <case to="step21-createObservatoryDB-post">${wf:conf('resumeFrom') eq 'step21-createObservatoryDB-post'}</case>
             <case to="step22-copyDataToImpalaCluster">${wf:conf('resumeFrom') eq 'step22-copyDataToImpalaCluster'}</case>
             <case to="step23-finalizeImpalaCluster">${wf:conf('resumeFrom') eq 'step23-finalizeImpalaCluster'}</case>
+            <case to="Step24-updateCache">${wf:conf('resumeFrom') eq 'Step24-updateCache'}</case>
             <default to="Step1"/>
         </switch>
     </decision>
@@ -289,6 +290,7 @@
             <script>scripts/step15_5.sql</script>
             <param>stats_db_name=${stats_db_name}</param>
             <param>openaire_db_name=${openaire_db_name}</param>
+            <param>external_stats_db_name=${external_stats_db_name}</param>
         </hive2>
         <ok to="Contexts"/>
         <error to="Kill"/>
@@ -313,6 +315,7 @@
             <name-node>${nameNode}</name-node>
             <exec>indicators.sh</exec>
             <argument>${stats_db_name}</argument>
+            <argument>${external_stats_db_name}</argument>
             <argument>${wf:appPath()}/scripts/step16-createIndicatorsTables.sql</argument>
             <file>indicators.sh</file>
         </shell>
@@ -452,21 +455,21 @@
             <argument>${observatory_db_shadow_name}</argument>
             <file>finalizeImpalaCluster.sh</file>
         </shell>
-        <ok to="End"/>
+        <ok to="Step24-updateCache"/>
         <error to="Kill"/>
     </action>
 
-<!--    <action name="Step24-updateCache">-->
-<!--        <shell xmlns="uri:oozie:shell-action:0.1">-->
-<!--            <job-tracker>${jobTracker}</job-tracker>-->
-<!--            <name-node>${nameNode}</name-node>-->
-<!--            <exec>updateCache.sh</exec>-->
-<!--            <argument>${stats_tool_api_url}</argument>-->
-<!--            <file>updateCache.sh</file>-->
-<!--        </shell>-->
-<!--        <ok to="End"/>-->
-<!--        <error to="Kill"/>-->
-<!--    </action>-->
+    <action name="Step24-updateCache">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>updateCache.sh</exec>
+            <argument>${stats_tool_api_url}</argument>
+            <file>updateCache.sh</file>
+        </shell>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
 
     <end name="End"/>
 </workflow-app>
