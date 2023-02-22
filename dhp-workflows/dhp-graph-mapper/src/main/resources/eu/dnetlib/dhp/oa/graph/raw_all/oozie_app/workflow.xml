@@ -301,6 +301,7 @@
             <arg>--mdFormat</arg><arg>ODF</arg>
             <arg>--mdLayout</arg><arg>store</arg>
             <arg>--mdInterpretation</arg><arg>cleaned</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
         </java>
         <ok to="reuse_oaf"/>
         <error to="Kill"/>
@@ -326,6 +327,7 @@
             <arg>--mdFormat</arg><arg>OAF</arg>
             <arg>--mdLayout</arg><arg>store</arg>
             <arg>--mdInterpretation</arg><arg>cleaned</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
         </java>
         <ok to="ImportOAF_invisible"/>
         <error to="Kill"/>
@@ -343,6 +345,7 @@
             <arg>--mdFormat</arg><arg>OAF</arg>
             <arg>--mdLayout</arg><arg>store</arg>
             <arg>--mdInterpretation</arg><arg>intersection</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
         </java>
         <ok to="ImportODF_hdfs"/>
         <error to="Kill"/>
