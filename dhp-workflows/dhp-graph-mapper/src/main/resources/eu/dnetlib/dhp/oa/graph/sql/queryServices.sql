@@ -12,21 +12,21 @@ SELECT
 		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility):: TEXT) @> ARRAY ['openaire4.0'])
                 THEN
                      'openaire4.0@@@dnet:datasourceCompatibilityLevel'
-		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility):: TEXT) @> ARRAY ['driver', 'openaire2.0'])
-			THEN
-				'driver-openaire2.0@@@dnet:datasourceCompatibilityLevel'
-		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility) :: TEXT) @> ARRAY ['driver'])
-			THEN
-				'driver@@@dnet:datasourceCompatibilityLevel'
-		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility) :: TEXT) @> ARRAY ['openaire2.0'])
-			THEN
-				'openaire2.0@@@dnet:datasourceCompatibilityLevel'
 		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility) :: TEXT) @> ARRAY ['openaire3.0'])
 			THEN
 				'openaire3.0@@@dnet:datasourceCompatibilityLevel'
 		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility) :: TEXT) @> ARRAY ['openaire2.0_data'])
 			THEN
 				'openaire2.0_data@@@dnet:datasourceCompatibilityLevel'
+		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility):: TEXT) @> ARRAY ['driver', 'openaire2.0'])
+			THEN
+				'driver-openaire2.0@@@dnet:datasourceCompatibilityLevel'
+		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility) :: TEXT) @> ARRAY ['openaire2.0'])
+			THEN
+				'openaire2.0@@@dnet:datasourceCompatibilityLevel'
+		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility) :: TEXT) @> ARRAY ['driver'])
+			THEN
+				'driver@@@dnet:datasourceCompatibilityLevel'
 		WHEN (array_agg(DISTINCT COALESCE (a.compatibility_override, a.compatibility) :: TEXT) @> ARRAY ['native'])
 			THEN
 				'native@@@dnet:datasourceCompatibilityLevel'
@@ -38,7 +38,7 @@ SELECT
 			'notCompatible@@@dnet:datasourceCompatibilityLevel'
 	ELSE
 		'UNKNOWN@@@dnet:datasourceCompatibilityLevel'
-	END                                                                                                        AS openairecompatibility,
+	END 	                                                                                                      AS openairecompatibility,
 	d.websiteurl                                                                                               AS websiteurl,
 	d.logourl                                                                                                  AS logourl,
 	array_remove(array_agg(DISTINCT CASE WHEN a.protocol = 'oai' and last_aggregation_date is not null THEN a.baseurl ELSE NULL END), NULL)  AS accessinfopackage,
