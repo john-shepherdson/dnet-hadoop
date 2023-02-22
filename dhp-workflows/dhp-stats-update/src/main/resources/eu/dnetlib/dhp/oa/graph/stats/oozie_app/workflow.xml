@@ -70,7 +70,40 @@
         </configuration>
     </global>
 
-    <start to="Step1"/>
+    <start to="resume_from"/>
+
+    <decision name="resume_from">
+        <switch>
+            <case to="Step1">${wf:conf('resumeFrom') eq 'Step1'}</case>
+            <case to="Step2">${wf:conf('resumeFrom') eq 'Step2'}</case>
+            <case to="Step3">${wf:conf('resumeFrom') eq 'Step3'}</case>
+            <case to="Step4">${wf:conf('resumeFrom') eq 'Step4'}</case>
+            <case to="Step5">${wf:conf('resumeFrom') eq 'Step5'}</case>
+            <case to="Step6">${wf:conf('resumeFrom') eq 'Step6'}</case>
+            <case to="Step7">${wf:conf('resumeFrom') eq 'Step7'}</case>
+            <case to="Step8">${wf:conf('resumeFrom') eq 'Step8'}</case>
+            <case to="Step9">${wf:conf('resumeFrom') eq 'Step9'}</case>
+            <case to="Step10">${wf:conf('resumeFrom') eq 'Step10'}</case>
+            <case to="Step11">${wf:conf('resumeFrom') eq 'Step11'}</case>
+            <case to="Step12">${wf:conf('resumeFrom') eq 'Step12'}</case>
+            <case to="Step13">${wf:conf('resumeFrom') eq 'Step13'}</case>
+            <case to="Step14">${wf:conf('resumeFrom') eq 'Step14'}</case>
+            <case to="Step15">${wf:conf('resumeFrom') eq 'Step15'}</case>
+            <case to="Step15_5">${wf:conf('resumeFrom') eq 'Step15_5'}</case>
+            <case to="Contexts">${wf:conf('resumeFrom') eq 'Contexts'}</case>
+            <case to="Step16-createIndicatorsTables">${wf:conf('resumeFrom') eq 'Step16-createIndicatorsTables'}</case>
+            <case to="Step16_1-definitions">${wf:conf('resumeFrom') eq 'Step16_1-definitions'}</case>
+            <case to="Step16_5">${wf:conf('resumeFrom') eq 'Step16_5'}</case>
+            <case to="Step19-finalize">${wf:conf('resumeFrom') eq 'Step19-finalize'}</case>
+            <case to="step20-createMonitorDB">${wf:conf('resumeFrom') eq 'step20-createMonitorDB'}</case>
+            <case to="step21-createObservatoryDB-pre">${wf:conf('resumeFrom') eq 'step21-createObservatoryDB-pre'}</case>
+            <case to="step21-createObservatoryDB">${wf:conf('resumeFrom') eq 'step21-createObservatoryDB'}</case>
+            <case to="step21-createObservatoryDB-post">${wf:conf('resumeFrom') eq 'step21-createObservatoryDB-post'}</case>
+            <case to="Step22">${wf:conf('resumeFrom') eq 'Step22'}</case>
+            <default to="Step1"/>
+        </switch>
+    </decision>
+
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>

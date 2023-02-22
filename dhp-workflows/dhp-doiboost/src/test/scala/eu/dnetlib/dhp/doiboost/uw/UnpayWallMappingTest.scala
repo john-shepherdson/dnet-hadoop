@@ -22,7 +22,7 @@ class UnpayWallMappingTest {
       .mkString
 
     var i: Int = 0
-    for (line <- Ilist.linesWithSeparators.map(l =>l.stripLineEnd)) {
+    for (line <- Ilist.linesWithSeparators.map(l => l.stripLineEnd)) {
       val p = UnpayWallToOAF.convertToOAF(line)
 
       if (p != null) {
@@ -43,7 +43,7 @@ class UnpayWallMappingTest {
       i = i + 1
     }
 
-    val l = Ilist.linesWithSeparators.map(l =>l.stripLineEnd).next()
+    val l = Ilist.linesWithSeparators.map(l => l.stripLineEnd).next()
 
     val item = UnpayWallToOAF.convertToOAF(l)
 
