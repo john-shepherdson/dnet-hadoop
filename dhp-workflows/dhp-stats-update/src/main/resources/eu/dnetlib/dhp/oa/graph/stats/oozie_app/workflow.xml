@@ -102,7 +102,6 @@
             <case to="Step16_5">${wf:conf('resumeFrom') eq 'Step16_5'}</case>
             <case to="Step19-finalize">${wf:conf('resumeFrom') eq 'Step19-finalize'}</case>
             <case to="step20-createMonitorDB">${wf:conf('resumeFrom') eq 'step20-createMonitorDB'}</case>
-            <case to="step20-createMonitorDB-post">${wf:conf('resumeFrom') eq 'step20-createMonitorDB-post'}</case>
             <case to="step21-createObservatoryDB-pre">${wf:conf('resumeFrom') eq 'step21-createObservatoryDB-pre'}</case>
             <case to="step21-createObservatoryDB">${wf:conf('resumeFrom') eq 'step21-createObservatoryDB'}</case>
             <case to="step21-createObservatoryDB-post">${wf:conf('resumeFrom') eq 'step21-createObservatoryDB-post'}</case>
