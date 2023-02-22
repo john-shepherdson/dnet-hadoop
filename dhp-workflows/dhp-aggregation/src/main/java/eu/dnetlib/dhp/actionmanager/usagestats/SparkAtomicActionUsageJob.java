@@ -8,13 +8,13 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
+import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.api.java.function.MapGroupsFunction;
+
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -28,9 +28,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Measure;
-import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import scala.Tuple2;
 
@@ -76,47 +73,79 @@ public class SparkAtomicActionUsageJob implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				removeOutputDir(spark, outputPath);
-				prepareResults(dbname, spark, workingPath);
+				prepareData(dbname, spark, workingPath + "/usageDb", "usage_stats", "result_id");
+				prepareData(dbname, spark, workingPath + "/projectDb", "project_stats", "id");
+				prepareData(dbname, spark, workingPath + "/datasourceDb", "datasource_stats", "repositor_id");
 				writeActionSet(spark, workingPath, outputPath);
 			});
 	}
 
-	public static void prepareResults(String db, SparkSession spark, String workingPath) {
+	private static void prepareData(String dbname, SparkSession spark, String workingPath, String tableName, String attribute_name) {
 		spark
-			.sql(
-				"Select result_id, downloads, views " +
-					"from " + db + ".usage_stats")
-			.as(Encoders.bean(UsageStatsModel.class))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(workingPath);
+				.sql(
+						"Select " + attribute_name + " as id, sum(downloads) as downloads, sum(views) as views " +
+								"from " + dbname + "." + tableName +
+						"group by " + attribute_name)
+				.as(Encoders.bean(UsageStatsModel.class))
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression", "gzip")
+				.json(workingPath);
 	}
 
+
+
 	public static void writeActionSet(SparkSession spark, String inputPath, String outputPath) {
-		readPath(spark, inputPath, UsageStatsModel.class)
-			.groupByKey((MapFunction<UsageStatsModel, String>) us -> us.getResult_id(), Encoders.STRING())
-			.mapGroups((MapGroupsFunction<String, UsageStatsModel, Result>) (k, it) -> {
-				UsageStatsModel first = it.next();
-				it.forEachRemaining(us -> {
-					first.setDownloads(first.getDownloads() + us.getDownloads());
-					first.setViews(first.getViews() + us.getViews());
-				});
-
-				Result res = new Result();
-				res.setId("50|" + k);
-
-				res.setMeasures(getMeasure(first.getDownloads(), first.getViews()));
-				return res;
-			}, Encoders.bean(Result.class))
-			.toJavaRDD()
-			.map(p -> new AtomicAction(p.getClass(), p))
+		getFinalIndicatorsResult(spark, inputPath+ "/usageDb").
+		toJavaRDD().
+				map(p -> new AtomicAction(p.getClass(),p))
+						.union(getFinalIndicatorsProject(spark, inputPath + "/projectDb")
+								.toJavaRDD()
+								.map(p -> new AtomicAction(p.getClass(), p )))
+								.union(getFinalIndicatorsDatasource(spark, inputPath + "/datasourceDb")
+										.toJavaRDD()
+										.map(p -> new AtomicAction(p.getClass(), p)))
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
 			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
 
 	}
+
+	private static Dataset<Result> getFinalIndicatorsResult(SparkSession spark, String inputPath) {
+
+		return readPath(spark, inputPath, UsageStatsModel.class)
+				.map((MapFunction<UsageStatsModel, Result>) usm -> {
+					Result r = new Result();
+					r.setId("50|" + usm.getId());
+					r.setMeasures(getMeasure(usm.getDownloads(), usm.getViews()));
+					return r;
+				}, Encoders.bean(Result.class));
+	}
+
+	private static Dataset<Project> getFinalIndicatorsProject(SparkSession spark, String inputPath) {
+
+		return readPath(spark, inputPath, UsageStatsModel.class)
+				.map((MapFunction<UsageStatsModel, Project>) usm -> {
+					Project r = new Project();
+					r.setId("40|" + usm.getId());
+					r.setMeasures(getMeasure(usm.getDownloads(), usm.getViews()));
+					return r;
+				}, Encoders.bean(Project.class));
+	}
+
+	private static Dataset<Datasource> getFinalIndicatorsDatasource(SparkSession spark, String inputPath) {
+
+		return readPath(spark, inputPath, UsageStatsModel.class)
+				.map((MapFunction<UsageStatsModel, Datasource>) usm -> {
+					Datasource r = new Datasource();
+					r.setId("10|" + usm.getId());
+					r.setMeasures(getMeasure(usm.getDownloads(), usm.getViews()));
+					return r;
+				}, Encoders.bean(Datasource.class));
+	}
+
+
 
 	private static List<Measure> getMeasure(Long downloads, Long views) {
 		DataInfo dataInfo = OafMapperUtils
