@@ -8,15 +8,13 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import eu.dnetlib.dhp.schema.common.MainEntityType;
 import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.api.java.function.MapGroupsFunction;
+
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -75,18 +73,19 @@ public class SparkAtomicActionUsageJob implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				removeOutputDir(spark, outputPath);
-				prepareData(dbname, spark, workingPath + "/usageDb", "usage_stats");
-				prepareData(dbname, spark, workingPath + "/projectDb", "project_stats");
-				prepareData(dbname, spark, workingPath + "/datasourceDb", "datasource_stats");
+				prepareData(dbname, spark, workingPath + "/usageDb", "usage_stats", "result_id");
+				prepareData(dbname, spark, workingPath + "/projectDb", "project_stats", "id");
+				prepareData(dbname, spark, workingPath + "/datasourceDb", "datasource_stats", "repositor_id");
 				writeActionSet(spark, workingPath, outputPath);
 			});
 	}
 
-	private static void prepareData(String dbname, SparkSession spark, String workingPath, String tableName) {
+	private static void prepareData(String dbname, SparkSession spark, String workingPath, String tableName, String attribute_name) {
 		spark
 				.sql(
-						"Select result_id, downloads, views " +
-								"from " + dbname + "." + tableName)
+						"Select " + attribute_name + " as id, sum(downloads) as downloads, sum(views) as views " +
+								"from " + dbname + "." + tableName +
+						"group by " + attribute_name)
 				.as(Encoders.bean(UsageStatsModel.class))
 				.write()
 				.mode(SaveMode.Overwrite)
@@ -115,7 +114,7 @@ public class SparkAtomicActionUsageJob implements Serializable {
 
 	private static Dataset<Result> getFinalIndicatorsResult(SparkSession spark, String inputPath) {
 
-		return getUsageStatsModelDataset(spark, inputPath)
+		return readPath(spark, inputPath, UsageStatsModel.class)
 				.map((MapFunction<UsageStatsModel, Result>) usm -> {
 					Result r = new Result();
 					r.setId("50|" + usm.getId());
@@ -126,7 +125,7 @@ public class SparkAtomicActionUsageJob implements Serializable {
 
 	private static Dataset<Project> getFinalIndicatorsProject(SparkSession spark, String inputPath) {
 
-		return getUsageStatsModelDataset(spark, inputPath)
+		return readPath(spark, inputPath, UsageStatsModel.class)
 				.map((MapFunction<UsageStatsModel, Project>) usm -> {
 					Project r = new Project();
 					r.setId("40|" + usm.getId());
@@ -137,7 +136,7 @@ public class SparkAtomicActionUsageJob implements Serializable {
 
 	private static Dataset<Datasource> getFinalIndicatorsDatasource(SparkSession spark, String inputPath) {
 
-		return getUsageStatsModelDataset(spark, inputPath)
+		return readPath(spark, inputPath, UsageStatsModel.class)
 				.map((MapFunction<UsageStatsModel, Datasource>) usm -> {
 					Datasource r = new Datasource();
 					r.setId("10|" + usm.getId());
@@ -146,20 +145,7 @@ public class SparkAtomicActionUsageJob implements Serializable {
 				}, Encoders.bean(Datasource.class));
 	}
 
-	private static Dataset<UsageStatsModel> getUsageStatsModelDataset(SparkSession spark, String inputPath) {
-		return readPath(spark, inputPath, UsageStatsModel.class)
-				.groupByKey((MapFunction<UsageStatsModel, String>) us -> us.getId(), Encoders.STRING())
-				.mapGroups((MapGroupsFunction<String, UsageStatsModel, UsageStatsModel>) (k, it) -> {
-					UsageStatsModel first = it.next();
-					it.forEachRemaining(us -> {
-						first.setDownloads(first.getDownloads() + us.getDownloads());
-						first.setViews(first.getViews() + us.getViews());
-					});
-					first.setId(k);
-					return first;
 
-				}, Encoders.bean(UsageStatsModel.class));
-	}
 
 	private static List<Measure> getMeasure(Long downloads, Long views) {
 		DataInfo dataInfo = OafMapperUtils
