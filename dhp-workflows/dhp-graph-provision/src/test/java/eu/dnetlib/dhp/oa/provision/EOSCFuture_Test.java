@@ -79,8 +79,7 @@ public class EOSCFuture_Test {
 
 		final String indexRecordXML = XmlIndexingJob.toIndexRecord(tr, record);
 
-		final SolrInputDocument solrDoc = new StreamingInputDocumentFactory(VERSION, DSID)
-			.parseDocument(indexRecordXML);
+		final SolrInputDocument solrDoc = new StreamingInputDocumentFactory().parseDocument(indexRecordXML);
 
 		final String xmlDoc = ClientUtils.toXML(solrDoc);
 
