@@ -397,17 +397,7 @@ case object Crossref2Oaf {
     from.setDataInfo(source.getDataInfo)
     from.setLastupdatetimestamp(source.getLastupdatetimestamp)
 
-    val to = new Relation
-    to.setTarget(source.getId)
-    to.setSource(targetId)
-    to.setRelType(ModelConstants.RESULT_RESULT)
-    to.setRelClass(ModelConstants.IS_CITED_BY)
-    to.setSubRelType(ModelConstants.CITATION)
-    to.setCollectedfrom(source.getCollectedfrom)
-    to.setDataInfo(source.getDataInfo)
-    to.setLastupdatetimestamp(source.getLastupdatetimestamp)
-
-    List(from, to)
+    List(from)
   }
 
   def generateCitationRelations(dois: List[String], result: Result): List[Relation] = {

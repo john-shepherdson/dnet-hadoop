@@ -645,7 +645,7 @@ object DataciteToOAFTransformation {
     id: String,
     date: String
   ): List[Relation] = {
-    rels
+    val bidirectionalRels: List[Relation] = rels
       .filter(r =>
         subRelTypeMapping
           .contains(r.relationType) && (r.relatedIdentifierType.equalsIgnoreCase("doi") ||
@@ -653,27 +653,48 @@ object DataciteToOAFTransformation {
         r.relatedIdentifierType.equalsIgnoreCase("arxiv"))
       )
       .map(r => {
-        val rel = new Relation
-        rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
-        rel.setDataInfo(dataInfo)
-
         val subRelType = subRelTypeMapping(r.relationType).relType
-        rel.setRelType(REL_TYPE_VALUE)
-        rel.setSubRelType(subRelType)
-        rel.setRelClass(r.relationType)
-
-        val dateProps: KeyValue = OafMapperUtils.keyValue(DATE_RELATION_KEY, date)
-
-        rel.setProperties(List(dateProps).asJava)
-
-        rel.setSource(id)
-        rel.setTarget(
-          DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
-        )
-        rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
-        rel.getCollectedfrom.asScala.map(c => c.getValue).toList
-        rel
+        val target = DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
+        relation(id, target, subRelType, r.relationType, date)
       })
+    val citationRels:List[Relation] = rels
+      .filter(r =>
+        (r.relatedIdentifierType.equalsIgnoreCase("doi") ||
+        r.relatedIdentifierType.equalsIgnoreCase("pmid") ||
+        r.relatedIdentifierType.equalsIgnoreCase("arxiv")) &&
+        (r.relationType.toLowerCase.contains("cite") || r.relationType.toLowerCase.contains("reference")))
+      .map(r => {
+        r.relationType match {
+          case ModelConstants.CITES | ModelConstants.REFERENCES =>
+            val target = DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
+            relation(id, target, ModelConstants.CITATION, ModelConstants.CITES, date)
+          case ModelConstants.IS_CITED_BY | ModelConstants.IS_REFERENCED_BY =>
+            val source = DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
+            relation(source, id, ModelConstants.CITATION, ModelConstants.CITES, date)
+        }
+      })
+
+    citationRels ::: bidirectionalRels
+  }
+
+  def relation(source:String, target:String, subRelType:String, relClass:String, date:String): Relation = {
+    val rel = new Relation
+    rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
+    rel.setDataInfo(dataInfo)
+
+    rel.setRelType(REL_TYPE_VALUE)
+    rel.setSubRelType(subRelType)
+    rel.setRelClass(relClass)
+
+    val dateProps: KeyValue = OafMapperUtils.keyValue(DATE_RELATION_KEY, date)
+
+    rel.setProperties(List(dateProps).asJava)
+
+    rel.setSource(source)
+    rel.setTarget(target)
+    rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
+    rel.getCollectedfrom.asScala.map(c => c.getValue).toList
+    rel
   }
 
   def generateDSId(input: String): String = {
