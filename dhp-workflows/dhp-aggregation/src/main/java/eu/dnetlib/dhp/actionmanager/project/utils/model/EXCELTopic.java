@@ -17,9 +17,27 @@ public class EXCELTopic implements Serializable {
 	private String title;
 	private String shortTitle;
 	private String objective;
-	private String subjects;
+	private String keywords;
 	private String legalBasis;
 	private String call;
+	private String id;
+	private String contentUpdateDate;
+
+	public String getContentUpdateDate() {
+		return contentUpdateDate;
+	}
+
+	public void setContentUpdateDate(String contentUpdateDate) {
+		this.contentUpdateDate = contentUpdateDate;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public String getRcn() {
 		return rcn;
@@ -101,12 +119,12 @@ public class EXCELTopic implements Serializable {
 		this.objective = objective;
 	}
 
-	public String getSubjects() {
-		return subjects;
+	public String getKeywords() {
+		return keywords;
 	}
 
-	public void setSubjects(String subjects) {
-		this.subjects = subjects;
+	public void setKeywords(String keywords) {
+		this.keywords = keywords;
 	}
 
 	public String getLegalBasis() {

@@ -4,12 +4,14 @@ package eu.dnetlib.dhp.actionmanager.project;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
@@ -20,9 +22,12 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProject;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.Project;
 
 public class PrepareProjectTest {
 
@@ -74,7 +79,7 @@ public class PrepareProjectTest {
 					"-isSparkSessionManaged",
 					Boolean.FALSE.toString(),
 					"-projectPath",
-					getClass().getResource("/eu/dnetlib/dhp/actionmanager/project/projects_subset.json").getPath(),
+					getClass().getResource("/eu/dnetlib/dhp/actionmanager/project/projects.json").getPath(),
 					"-outputPath",
 					workingDir.toString() + "/preparedProjects",
 					"-dbProjectPath",
@@ -94,6 +99,43 @@ public class PrepareProjectTest {
 
 		Assertions.assertEquals(0, verificationDataset.filter("length(id) = 0").count());
 		Assertions.assertEquals(0, verificationDataset.filter("length(programme) = 0").count());
+	}
+
+	@Test
+	void readJsonNotMultiline() throws IOException {
+
+		String projects = IOUtils
+			.toString(
+				PrepareProjectTest.class
+					.getResourceAsStream(("/eu/dnetlib/dhp/actionmanager/project/projects.json")));
+		ArrayList<Project> a = OBJECT_MAPPER.readValue(projects, new TypeReference<List<Project>>() {
+		});
+
+		a.forEach(p -> {
+			try {
+				OBJECT_MAPPER.writeValueAsString(p);
+			} catch (JsonProcessingException e) {
+				e.printStackTrace();
+			}
+		});
+		JavaRDD<Project> b = new JavaSparkContext(spark.sparkContext()).parallelize(a);
+
+//		System.out.println("pr");
+//		Dataset<Project> prova = spark
+//				.read()
+//				.textFile(inputPath)
+//				.map((MapFunction<String, Project>) value -> OBJECT_MAPPER.readValue(value, new TypeReference<List<Project>>() {
+//				}), Encoders.bean(Project.class));
+
+//		prova.foreach(
+//				(ForeachFunction<Project>) p -> System.out.println(OBJECT_MAPPER.writeValueAsString(p)));
+
+//		objectMapper.readValue(jsonArray, new TypeReference<List<Student>>() {})
+//		Dataset<Project> p = readPath(spark, inputPath, Projects.class)
+//				.flatMap((FlatMapFunction<Projects, Project>) ps -> ps.getProjects().iterator(), Encoders.bean(Project.class
+//				));
+//import com.fasterxml.jackson.core.type.TypeReference;
+//		System.out.println(p.count());
 	}
 
 }

@@ -83,9 +83,12 @@ public class SparkAtomicActionUsageJob implements Serializable {
 	private static void prepareData(String dbname, SparkSession spark, String workingPath, String tableName,
 		String attribute_name) {
 		spark
-			.sql(String.format(
-					"select %s as id, sum(downloads) as downloads, sum(views) as views " +
-					"from %s.%s group by %s", attribute_name, dbname, tableName, attribute_name))
+			.sql(
+				String
+					.format(
+						"select %s as id, sum(downloads) as downloads, sum(views) as views " +
+							"from %s.%s group by %s",
+						attribute_name, dbname, tableName, attribute_name))
 			.as(Encoders.bean(UsageStatsModel.class))
 			.write()
 			.mode(SaveMode.Overwrite)

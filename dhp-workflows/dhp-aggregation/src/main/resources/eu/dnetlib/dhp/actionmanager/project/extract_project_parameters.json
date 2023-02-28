@@ -1,0 +1,23 @@
+[
+
+{
+"paramName": "pjp",
+"paramLongName": "projectPath",
+"paramDescription": "the path where the projects are stored ",
+"paramRequired": true
+},
+
+
+  {
+"paramName": "wp",
+"paramLongName": "workingPath",
+"paramDescription": "the path for the extracted folder",
+"paramRequired": true
+},
+  {
+    "paramName": "hnn",
+    "paramLongName": "hdfsNameNode",
+    "paramDescription": "the hdfs namenode",
+    "paramRequired": true
+  }
+]

@@ -1,25 +1,25 @@
 <workflow-app name="H2020Classification" xmlns="uri:oozie:workflow:0.5">
     <parameters>
-        <property>
-            <name>projectFileURL</name>
-            <description>the url where to get the projects file</description>
-        </property>
 
         <property>
             <name>programmeFileURL</name>
+            <value>noneed</value>
             <description>the url where to get the programme file</description>
         </property>
 
         <property>
             <name>topicFileURL</name>
+            <value>noneed</value>
             <description>the url where to get the topic file</description>
         </property>
         <property>
             <name>outputPath</name>
+            <value>noneed</value>
             <description>path where to store the action set</description>
         </property>
         <property>
             <name>sheetName</name>
+            <value>noneed</value>
             <description>the name of the sheet to read</description>
         </property>
     </parameters>
@@ -35,7 +35,7 @@
             <delete path='${workingDir}'/>
             <mkdir path='${workingDir}'/>
         </fs>
-        <ok to="fork_get_info"/>
+        <ok to="fork_get_projects"/>
         <error to="Kill"/>
     </action>
 
@@ -48,19 +48,21 @@
     </fork>
 
     <fork name="fork_get_projects">
-        <path start="get_project_file"/>
+        <path start="extract_projects"/>
         <path start="read_projects"/>
     </fork>
 
-    <action name="get_project_file">
+    <action name="extract_projects">
         <java>
-            <main-class>eu.dnetlib.dhp.actionmanager.project.utils.ReadCSV</main-class>
+            <main-class>eu.dnetlib.dhp.actionmanager.project.utils.ExtractProjects</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
-            <arg>--fileURL</arg><arg>${projectFileURL}</arg>
-            <arg>--hdfsPath</arg><arg>${workingDir}/projects</arg>
-            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProject</arg>
+            <arg>--projectPath</arg><arg>/tmp/miriam/cordis-h2020projects-json_.zip</arg>
+<!--            <arg>&#45;&#45;workingPath</arg><arg>/tmp/miriam/cordis_h2020/</arg>-->
+<!--            <arg>&#45;&#45;projectPath</arg><arg>${projectPath}</arg>-->
+            <arg>--workingPath</arg><arg>${workingDir}/</arg>
         </java>
         <ok to="wait_projects"/>
+<!--        <ok to="End"/>-->
         <error to="Kill"/>
     </action>
 
@@ -152,7 +154,8 @@
             <arg>--outputPath</arg><arg>${workingDir}/preparedProjects</arg>
             <arg>--dbProjectPath</arg><arg>${workingDir}/dbProjects</arg>
         </spark>
-        <ok to="wait"/>
+<!--        <ok to="wait"/>-->
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 
