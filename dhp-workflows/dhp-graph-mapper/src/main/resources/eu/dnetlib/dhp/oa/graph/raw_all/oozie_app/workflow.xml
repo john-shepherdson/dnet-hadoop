@@ -224,6 +224,7 @@
             <arg>-f</arg><arg>ODF</arg>
             <arg>-l</arg><arg>store</arg>
             <arg>-i</arg><arg>claim</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
         </java>
         <ok to="reuse_oaf_claims"/>
         <error to="Kill"/>
@@ -249,6 +250,7 @@
             <arg>-f</arg><arg>OAF</arg>
             <arg>-l</arg><arg>store</arg>
             <arg>-i</arg><arg>claim</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
         </java>
         <ok to="wait_import"/>
         <error to="Kill"/>
