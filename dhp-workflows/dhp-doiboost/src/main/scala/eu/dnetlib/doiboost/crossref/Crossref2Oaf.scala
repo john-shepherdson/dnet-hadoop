@@ -513,15 +513,6 @@ case object Crossref2Oaf {
 
 
             case "10.13039/501100005416" => generateSimpleRelationFromAward(funder, "rcn_________", a => a)
-            case "10.13039/501100004744" =>  INNOVIRIS
-
-
-
-
-
-
-
-
             case "10.13039/501100002848" => generateSimpleRelationFromAward(funder, "conicytf____", a => a)
             case "10.13039/501100003448" => generateSimpleRelationFromAward(funder, "gsrt________", extractECAward)
             case "10.13039/501100010198" => generateSimpleRelationFromAward(funder, "sgov________", a => a)
