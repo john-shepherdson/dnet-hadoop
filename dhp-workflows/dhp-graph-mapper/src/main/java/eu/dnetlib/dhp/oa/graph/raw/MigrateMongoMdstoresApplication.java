@@ -131,7 +131,7 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 			// that is the hdfs path basePath/MDSTOREID/timestamp is missing
 			// So we have to synch it
 			if (!hdfsMDStores.containsKey(currentMDStore.getMdstore())) {
-				log.info("Adding store " + currentMDStore.getMdstore());
+				log.info("Adding store {}", currentMDStore.getMdstore());
 				try {
 					synchMDStoreIntoHDFS(
 						mdFormat, mdLayout, mdInterpretation, hdfsPath, fileSystem, mongoBaseUrl, mongoDb,
@@ -145,14 +145,14 @@ public class MigrateMongoMdstoresApplication extends AbstractMigrationApplicatio
 				// basePath/MDSTOREID/timestamp but the timestamp on hdfs is older that the
 				// new one in mongo so we have to synch the new mdstore and delete the old one
 				if (currentMDStore.getLatestTimestamp() > current.getLatestTimestamp()) {
-					log.info("Updating MDStore " + currentMDStore.getMdstore());
+					log.info("Updating MDStore {}", currentMDStore.getMdstore());
 					final String mdstoreDir = createMDStoreDir(hdfsPath, currentMDStore.getMdstore());
 					final String rmPath = createMDStoreDir(mdstoreDir, current.getLatestTimestamp().toString());
 					try {
 						synchMDStoreIntoHDFS(
 							mdFormat, mdLayout, mdInterpretation, hdfsPath, fileSystem, mongoBaseUrl, mongoDb,
 							currentMDStore);
-						log.info("deleting " + rmPath);
+						log.info("deleting {}", rmPath);
 						// DELETE THE OLD MDSTORE
 						fileSystem.delete(new Path(rmPath), true);
 					} catch (IOException e) {
