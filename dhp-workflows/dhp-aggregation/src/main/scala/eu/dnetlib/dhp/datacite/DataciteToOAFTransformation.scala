@@ -657,12 +657,13 @@ object DataciteToOAFTransformation {
         val target = DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
         relation(id, target, subRelType, r.relationType, date)
       })
-    val citationRels:List[Relation] = rels
+    val citationRels: List[Relation] = rels
       .filter(r =>
         (r.relatedIdentifierType.equalsIgnoreCase("doi") ||
         r.relatedIdentifierType.equalsIgnoreCase("pmid") ||
         r.relatedIdentifierType.equalsIgnoreCase("arxiv")) &&
-        (r.relationType.toLowerCase.contains("cite") || r.relationType.toLowerCase.contains("reference")))
+        (r.relationType.toLowerCase.contains("cite") || r.relationType.toLowerCase.contains("reference"))
+      )
       .map(r => {
         r.relationType match {
           case ModelConstants.CITES | ModelConstants.REFERENCES =>
@@ -677,7 +678,7 @@ object DataciteToOAFTransformation {
     citationRels ::: bidirectionalRels
   }
 
-  def relation(source:String, target:String, subRelType:String, relClass:String, date:String): Relation = {
+  def relation(source: String, target: String, subRelType: String, relClass: String, date: String): Relation = {
     val rel = new Relation
     rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
     rel.setDataInfo(dataInfo)
