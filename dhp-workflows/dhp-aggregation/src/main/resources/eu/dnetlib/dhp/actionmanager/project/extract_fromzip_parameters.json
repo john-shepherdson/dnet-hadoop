@@ -1,16 +1,16 @@
 [
 
 {
-"paramName": "pjp",
-"paramLongName": "projectPath",
+"paramName": "ip",
+"paramLongName": "inputPath",
 "paramDescription": "the path where the projects are stored ",
 "paramRequired": true
 },
 
 
   {
-"paramName": "wp",
-"paramLongName": "workingPath",
+"paramName": "op",
+"paramLongName": "outputPath",
 "paramDescription": "the path for the extracted folder",
 "paramRequired": true
 },

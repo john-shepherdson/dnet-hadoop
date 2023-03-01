@@ -6,7 +6,9 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.collection.GetCSV;
@@ -40,8 +42,11 @@ public class ReadCSV {
 		conf.set("fs.defaultFS", hdfsNameNode);
 
 		FileSystem fileSystem = FileSystem.get(conf);
+
+		FSDataInputStream inputStream = fileSystem.open(new Path(fileURL));
+
 		BufferedReader reader = new BufferedReader(
-			new InputStreamReader(new HttpConnector2().getInputSourceAsStream(fileURL)));
+			new InputStreamReader(inputStream));
 
 		GetCSV.getCsv(fileSystem, reader, hdfsPath, classForName, del);
 

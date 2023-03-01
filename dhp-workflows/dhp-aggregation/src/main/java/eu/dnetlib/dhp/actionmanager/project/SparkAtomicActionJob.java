@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProgramme;
 import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProject;
 import eu.dnetlib.dhp.actionmanager.project.utils.model.EXCELTopic;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.JsonTopic;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
@@ -110,7 +111,7 @@ public class SparkAtomicActionJob {
 
 		Dataset<CSVProject> project = readPath(spark, projectPatH, CSVProject.class);
 		Dataset<CSVProgramme> programme = readPath(spark, programmePath, CSVProgramme.class);
-		Dataset<EXCELTopic> topic = readPath(spark, topicPath, EXCELTopic.class);
+		Dataset<JsonTopic> topic = readPath(spark, topicPath, JsonTopic.class);
 
 		Dataset<Project> aaproject = project
 			.joinWith(programme, project.col("programme").equalTo(programme.col("code")), "left")
@@ -144,9 +145,9 @@ public class SparkAtomicActionJob {
 			.filter(Objects::nonNull);
 
 		aaproject
-			.joinWith(topic, aaproject.col("h2020topiccode").equalTo(topic.col("code")), "left")
-			.map((MapFunction<Tuple2<Project, EXCELTopic>, Project>) p -> {
-				Optional<EXCELTopic> op = Optional.ofNullable(p._2());
+			.joinWith(topic, aaproject.col("id").equalTo(topic.col("projectId")), "left")
+			.map((MapFunction<Tuple2<Project, JsonTopic>, Project>) p -> {
+				Optional<JsonTopic> op = Optional.ofNullable(p._2());
 				Project rp = p._1();
 				op.ifPresent(excelTopic -> rp.setH2020topicdescription(excelTopic.getTitle()));
 				return rp;
