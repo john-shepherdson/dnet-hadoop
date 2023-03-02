@@ -63,7 +63,7 @@ public class ReadTopics implements Serializable {
 		readTopics(inputPath, outputPath, fs);
 	}
 
-	private static void readTopics(String inputFile, String workingPath, FileSystem fs) throws IOException {
+	public static void readTopics(String inputFile, String workingPath, FileSystem fs) throws IOException {
 		Path hdfsreadpath = new Path(inputFile);
 
 		FSDataInputStream inputStream = fs.open(hdfsreadpath);

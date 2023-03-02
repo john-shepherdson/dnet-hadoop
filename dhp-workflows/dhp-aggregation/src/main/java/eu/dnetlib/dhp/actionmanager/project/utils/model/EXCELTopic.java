@@ -6,6 +6,7 @@ import java.io.Serializable;
 /**
  * the model class for the topic excel file
  */
+@Deprecated
 public class EXCELTopic implements Serializable {
 	private String rcn;
 	private String language;

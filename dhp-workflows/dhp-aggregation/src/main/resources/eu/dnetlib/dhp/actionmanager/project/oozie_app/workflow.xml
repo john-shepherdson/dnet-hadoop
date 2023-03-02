@@ -1,25 +1,8 @@
 <workflow-app name="H2020Classification" xmlns="uri:oozie:workflow:0.5">
     <parameters>
-
-        <property>
-            <name>programmeFileURL</name>
-            <value>noneed</value>
-            <description>the url where to get the programme file</description>
-        </property>
-
-        <property>
-            <name>topicFileURL</name>
-            <value>noneed</value>
-            <description>the url where to get the topic file</description>
-        </property>
         <property>
             <name>outputPath</name>
             <description>path where to store the action set</description>
-        </property>
-        <property>
-            <name>sheetName</name>
-            <value>noneed</value>
-            <description>the name of the sheet to read</description>
         </property>
     </parameters>
 
@@ -41,7 +24,6 @@
     <fork name="fork_download_info">
         <path start="fork_get_projects"/>
         <path start="download_programme_file"/>
-<!--        <path start="read_topic_file"/>-->
     </fork>
 
     <fork name="fork_get_projects">

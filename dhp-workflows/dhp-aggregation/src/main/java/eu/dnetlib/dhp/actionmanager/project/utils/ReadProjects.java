@@ -61,7 +61,7 @@ public class ReadProjects implements Serializable {
 		readProjects(inputPath, outputPath, fs);
 	}
 
-	private static void readProjects(String inputFile, String workingPath, FileSystem fs) throws IOException {
+	public static void readProjects(String inputFile, String workingPath, FileSystem fs) throws IOException {
 		Path hdfsreadpath = new Path(inputFile);
 
 		FSDataInputStream inputStream = fs.open(hdfsreadpath);

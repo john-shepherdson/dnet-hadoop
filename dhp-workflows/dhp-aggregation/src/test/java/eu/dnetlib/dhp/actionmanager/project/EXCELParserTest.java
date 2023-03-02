@@ -18,6 +18,7 @@ import eu.dnetlib.dhp.actionmanager.project.utils.EXCELParser;
 import eu.dnetlib.dhp.common.collection.CollectorException;
 import eu.dnetlib.dhp.common.collection.HttpConnector2;
 
+@Deprecated
 @Disabled
 public class EXCELParserTest {
 

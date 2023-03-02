@@ -125,9 +125,7 @@ public class SparkAtomicActionJob {
 						Project pp = new Project();
 						pp
 							.setId(
-								createOpenaireId(
-									ModelSupport.entityIdPrefix.get("project"),
-									"corda__h2020", csvProject.getId()));
+								csvProject.getId());
 						pp.setH2020topiccode(csvProject.getTopics());
 						H2020Programme pm = new H2020Programme();
 						H2020Classification h2020classification = new H2020Classification();
@@ -145,10 +143,15 @@ public class SparkAtomicActionJob {
 			.filter(Objects::nonNull);
 
 		aaproject
-			.joinWith(topic, aaproject.col("id").equalTo(topic.col("projectId")), "left")
+			.joinWith(topic, aaproject.col("id").equalTo(topic.col("projectID")), "left")
 			.map((MapFunction<Tuple2<Project, JsonTopic>, Project>) p -> {
 				Optional<JsonTopic> op = Optional.ofNullable(p._2());
 				Project rp = p._1();
+				rp
+					.setId(
+						createOpenaireId(
+							ModelSupport.entityIdPrefix.get("project"),
+							"corda__h2020", rp.getId()));
 				op.ifPresent(excelTopic -> rp.setH2020topicdescription(excelTopic.getTitle()));
 				return rp;
 			}, Encoders.bean(Project.class))
