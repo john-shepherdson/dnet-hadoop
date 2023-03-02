@@ -115,16 +115,8 @@ public class SolrConfigTest extends SolrTest {
 			for (SolrDocument doc : rsp.getResults()) {
 				System.out
 					.println(
-						doc.get("score") + "\t" +
-							doc.get("__indexrecordidentifier") + "\t" +
-							doc.get("resultidentifier") + "\t" +
-							doc.get("resultauthor") + "\t" +
-							doc.get("resultacceptanceyear") + "\t" +
-							doc.get("resultsubject") + "\t" +
-							doc.get("resulttitle") + "\t" +
-							doc.get("relprojectname") + "\t" +
-							doc.get("resultdescription") + "\t" +
-							doc.get("__all") + "\t");
+						doc.get("__indexrecordidentifier") + "\t" +
+							doc.get("__result") + "\t");
 			}
 		}
 	}
