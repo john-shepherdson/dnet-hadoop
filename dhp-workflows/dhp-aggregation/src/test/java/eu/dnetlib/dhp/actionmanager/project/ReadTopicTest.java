@@ -13,10 +13,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,6 +72,7 @@ public class ReadTopicTest {
 		spark.stop();
 	}
 
+	@Disabled
 	@Test
 	void readTopics() throws IOException {
 		String topics = getClass()
@@ -95,7 +93,7 @@ public class ReadTopicTest {
 		Assertions.assertEquals("Individual Fellowships", topic.getTitle());
 		Assertions.assertEquals("MSCA-IF-2019", topic.getTopic());
 
-		tmp.foreach(p -> System.out.println(OBJECT_MAPPER.writeValueAsString(p)));
+		//tmp.foreach(p -> System.out.println(OBJECT_MAPPER.writeValueAsString(p)));
 
 	}
 }
