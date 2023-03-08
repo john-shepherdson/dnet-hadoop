@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.common.HdfsSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,14 +16,15 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.SparkSession;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.utils.DHPUtils;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.SparkSession;
 
 public class AbstractMigrationApplication implements Closeable {
 
@@ -104,10 +104,10 @@ public class AbstractMigrationApplication implements Closeable {
 	protected static List<String> listEntityPaths(final SparkSession spark, final String paths) {
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 		return Arrays
-				.stream(paths.split(","))
-				.filter(StringUtils::isNotBlank)
-				.filter(p -> HdfsSupport.exists(p, sc.hadoopConfiguration()) || p.contains("/*"))
-				.collect(Collectors.toList());
+			.stream(paths.split(","))
+			.filter(StringUtils::isNotBlank)
+			.filter(p -> HdfsSupport.exists(p, sc.hadoopConfiguration()) || p.contains("/*"))
+			.collect(Collectors.toList());
 	}
 
 	public ObjectMapper getObjectMapper() {
