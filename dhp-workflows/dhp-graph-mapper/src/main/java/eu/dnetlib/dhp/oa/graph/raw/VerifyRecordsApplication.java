@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
@@ -28,7 +29,7 @@ import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
 
-public class VerifyRecordsApplication {
+public class VerifyRecordsApplication extends AbstractMigrationApplication {
 
 	private static final Logger log = LoggerFactory.getLogger(VerifyRecordsApplication.class);
 
@@ -69,14 +70,12 @@ public class VerifyRecordsApplication {
 	private static void validateRecords(SparkSession spark, String sourcePaths, String invalidPath,
 		VocabularyGroup vocs) {
 
-		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-		final List<String> existingSourcePaths = Arrays
-			.stream(sourcePaths.split(","))
-			.filter(p -> HdfsSupport.exists(p, sc.hadoopConfiguration()))
-			.collect(Collectors.toList());
+		final List<String> existingSourcePaths = listEntityPaths(spark, sourcePaths);
 
 		log.info("Verify records in files:");
 		existingSourcePaths.forEach(log::info);
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		for (final String sp : existingSourcePaths) {
 			RDD<String> invalidRecords = sc
