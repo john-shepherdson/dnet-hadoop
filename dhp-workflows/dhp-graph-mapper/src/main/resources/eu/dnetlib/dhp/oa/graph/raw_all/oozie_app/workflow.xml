@@ -215,7 +215,7 @@
     <action name="ImportODF_claims">
         <java>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateMongoMdstoresApplication</main-class>
-            <arg>--hdfsPath</arg><arg>${contentPath}/mdstore</arg>
+            <arg>--hdfsPath</arg><arg>${contentPath}/odf_claims</arg>
             <arg>--mongoBaseUrl</arg><arg>${mongoURL}</arg>
             <arg>--mongoDb</arg><arg>${mongoDb}</arg>
             <arg>--mdFormat</arg><arg>ODF</arg>
@@ -238,7 +238,7 @@
     <action name="ImportOAF_claims">
         <java>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateMongoMdstoresApplication</main-class>
-            <arg>--hdfsPath</arg><arg>${contentPath}/mdstore</arg>
+            <arg>--hdfsPath</arg><arg>${contentPath}/oaf_claims</arg>
             <arg>--mongoBaseUrl</arg><arg>${mongoURL}</arg>
             <arg>--mongoDb</arg><arg>${mongoDb}</arg>
             <arg>--mdFormat</arg><arg>OAF</arg>
