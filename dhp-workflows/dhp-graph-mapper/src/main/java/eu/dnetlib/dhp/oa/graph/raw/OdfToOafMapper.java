@@ -127,7 +127,6 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected List<Instance> prepareInstances(
 		final Document doc,
-		final DataInfo info,
 		final KeyValue collectedfrom,
 		final KeyValue hostedby) {
 
@@ -137,7 +136,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		instance.setCollectedfrom(collectedfrom);
 		instance.setHostedby(hostedby);
 
-		final List<StructuredProperty> alternateIdentifier = prepareResultPids(doc, info);
+		final List<StructuredProperty> alternateIdentifier = prepareResultPids(doc);
 		final List<StructuredProperty> pid = IdentifierFactory.getPids(alternateIdentifier, collectedfrom);
 
 		final Set<StructuredProperty> pids = pid.stream().collect(Collectors.toCollection(HashSet::new));
@@ -419,24 +418,24 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<StructuredProperty> prepareResultPids(final Document doc, final DataInfo info) {
+	protected List<StructuredProperty> prepareResultPids(final Document doc) {
 		final Set<StructuredProperty> res = new HashSet<>();
 		res
 			.addAll(
 				prepareListStructPropsWithValidQualifier(
-					doc, "//oaf:identifier", "@identifierType", DNET_PID_TYPES, info));
+					doc, "//oaf:identifier", "@identifierType", DNET_PID_TYPES));
 		res
 			.addAll(
 				prepareListStructPropsWithValidQualifier(
 					doc,
 					"//*[local-name()='identifier' and ./@identifierType != 'URL' and ./@identifierType != 'landingPage']",
-					"@identifierType", DNET_PID_TYPES, info));
+					"@identifierType", DNET_PID_TYPES));
 		res
 			.addAll(
 				prepareListStructPropsWithValidQualifier(
 					doc,
 					"//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType != 'URL' and ./@alternateIdentifierType != 'landingPage']",
-					"@alternateIdentifierType", DNET_PID_TYPES, info));
+					"@alternateIdentifierType", DNET_PID_TYPES));
 
 		return res
 			.stream()

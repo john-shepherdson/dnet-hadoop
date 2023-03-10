@@ -24,6 +24,8 @@ import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.doiboost.orcidnodoi.util.DumpToActionsUtility;
 import eu.dnetlib.doiboost.orcidnodoi.util.Pair;
 
+import javax.jws.WebParam;
+
 /**
  * This class converts an orcid publication from json format to oaf
  */
@@ -128,16 +130,15 @@ public class PublicationToOaf implements Serializable {
 
 		Publication publication = new Publication();
 
-		final DataInfo dataInfo = new DataInfo();
+		final EntityDataInfo dataInfo = new EntityDataInfo();
 		dataInfo.setDeletedbyinference(false);
 		dataInfo.setInferred(false);
-		dataInfo.setTrust("0.9");
+		dataInfo.setTrust(.9f);
 		dataInfo
 			.setProvenanceaction(
-				mapQualifier(
+				OafMapperUtils.qualifier(
 					ModelConstants.SYSIMPORT_ORCID_NO_DOI,
 					ModelConstants.SYSIMPORT_ORCID_NO_DOI,
-					ModelConstants.DNET_PROVENANCE_ACTIONS,
 					ModelConstants.DNET_PROVENANCE_ACTIONS));
 		publication.setDataInfo(dataInfo);
 
@@ -159,20 +160,14 @@ public class PublicationToOaf implements Serializable {
 						.getExternalReference()
 						.add(
 							convertExtRef(
-								extId, classid, classname, ModelConstants.DNET_PID_TYPES,
-								ModelConstants.DNET_PID_TYPES));
+								extId, classid, classname, ModelConstants.DNET_PID_TYPES));
 				}
 			});
 
 		// Adding source
 		final String source = getStringValue(rootElement, "sourceName");
 		if (StringUtils.isNotBlank(source)) {
-			Field<String> sourceField = mapStringField(source, null);
-			if (sourceField == null) {
-				publication.setSource(null);
-			} else {
-				publication.setSource(Arrays.asList(sourceField));
-			}
+			publication.setSource(Arrays.asList(source));
 		}
 
 		// Adding titles
@@ -193,7 +188,7 @@ public class PublicationToOaf implements Serializable {
 			.setTitle(
 				titles
 					.stream()
-					.map(t -> mapStructuredProperty(t, ModelConstants.MAIN_TITLE_QUALIFIER, null))
+					.map(t -> mapStructuredProperty(t, ModelConstants.MAIN_TITLE_QUALIFIER))
 					.filter(Objects::nonNull)
 					.collect(Collectors.toList()));
 		// Adding identifier
@@ -220,8 +215,8 @@ public class PublicationToOaf implements Serializable {
 		if (StringUtils.isNotBlank(type)) {
 			publication
 				.setResourcetype(
-					mapQualifier(
-						type, type, ModelConstants.DNET_DATA_CITE_RESOURCE, ModelConstants.DNET_DATA_CITE_RESOURCE));
+					OafMapperUtils.qualifier(
+						type, type, ModelConstants.DNET_DATA_CITE_RESOURCE));
 
 			Map<String, String> publicationType = typologiesMapping.get(type);
 			if ((publicationType == null || publicationType.isEmpty()) && errorsInvalidType != null) {
@@ -260,7 +255,7 @@ public class PublicationToOaf implements Serializable {
 
 			final String pubDate = getPublicationDate(rootElement, "publicationDates");
 			if (StringUtils.isNotBlank(pubDate)) {
-				instance.setDateofacceptance(mapStringField(pubDate, null));
+				instance.setDateofacceptance(pubDate);
 			}
 
 			instance.setCollectedfrom(createCollectedFrom());
@@ -270,15 +265,13 @@ public class PublicationToOaf implements Serializable {
 				.setAccessright(
 					OafMapperUtils
 						.accessRight(
-							ModelConstants.UNKNOWN, "Unknown", ModelConstants.DNET_ACCESS_MODES,
-							ModelConstants.DNET_ACCESS_MODES));
+							ModelConstants.UNKNOWN, "Unknown", ModelConstants.DNET_ACCESS_MODES));
 
 			// Adding type
 			instance
 				.setInstancetype(
-					mapQualifier(
-						cobjValue, typeValue, ModelConstants.DNET_PUBLICATION_RESOURCE,
-						ModelConstants.DNET_PUBLICATION_RESOURCE));
+					OafMapperUtils.qualifier(
+						cobjValue, typeValue, ModelConstants.DNET_PUBLICATION_RESOURCE));
 
 			publication.setInstance(Arrays.asList(instance));
 		} else {
@@ -313,12 +306,7 @@ public class PublicationToOaf implements Serializable {
 				return null;
 			}
 		}
-		String classValue = getDefaultResulttype(cobjValue);
-		publication
-			.setResulttype(
-				mapQualifier(
-					classValue, classValue, ModelConstants.DNET_RESULT_TYPOLOGIES,
-					ModelConstants.DNET_RESULT_TYPOLOGIES));
+		publication.setResulttype(getDefaultResulttype(cobjValue));
 		if (enrichedPublications != null) {
 			enrichedPublications.add(1);
 		}
@@ -422,16 +410,15 @@ public class PublicationToOaf implements Serializable {
 		final String pubDate = getPublicationDate(rootElement, "publication_date");
 		if (StringUtils.isNotBlank(pubDate)) {
 			if (addToDateOfAcceptance) {
-				publication.setDateofacceptance(mapStringField(pubDate, null));
+				publication.setDateofacceptance(pubDate);
 			}
-			Qualifier q = mapQualifier(
-				dictionaryKey, dictionaryKey, ModelConstants.DNET_DATACITE_DATE, ModelConstants.DNET_DATACITE_DATE);
+			Qualifier q = OafMapperUtils.qualifier(dictionaryKey, dictionaryKey, ModelConstants.DNET_DATACITE_DATE);
 			publication
 				.setRelevantdate(
 					Arrays
 						.asList(pubDate)
 						.stream()
-						.map(r -> mapStructuredProperty(r, q, null))
+						.map(r -> mapStructuredProperty(r, q))
 						.filter(Objects::nonNull)
 						.collect(Collectors.toList()));
 		}
@@ -511,44 +498,22 @@ public class PublicationToOaf implements Serializable {
 		return true;
 	}
 
-	private Qualifier mapQualifier(String classId, String className, String schemeId, String schemeName) {
-		final Qualifier qualifier = new Qualifier();
-		qualifier.setClassid(classId);
-		qualifier.setClassname(className);
-		qualifier.setSchemeid(schemeId);
-		qualifier.setSchemename(schemeName);
-		return qualifier;
-	}
-
-	private ExternalReference convertExtRef(String extId, String classId, String className, String schemeId,
-		String schemeName) {
+	private ExternalReference convertExtRef(String extId, String classId, String className, String schemeId) {
 		ExternalReference ex = new ExternalReference();
 		ex.setRefidentifier(extId);
-		ex.setQualifier(mapQualifier(classId, className, schemeId, schemeName));
+		ex.setQualifier(OafMapperUtils.qualifier(classId, className, schemeId));
 		return ex;
 	}
 
-	private StructuredProperty mapStructuredProperty(String value, Qualifier qualifier, DataInfo dataInfo) {
+	private StructuredProperty mapStructuredProperty(String value, Qualifier qualifier) {
 		if (value == null || StringUtils.isBlank(value)) {
 			return null;
 		}
 
-		final StructuredProperty structuredProperty = new StructuredProperty();
-		structuredProperty.setValue(value);
-		structuredProperty.setQualifier(qualifier);
-		structuredProperty.setDataInfo(dataInfo);
-		return structuredProperty;
-	}
-
-	private Field<String> mapStringField(String value, DataInfo dataInfo) {
-		if (value == null || StringUtils.isBlank(value)) {
-			return null;
-		}
-
-		final Field<String> stringField = new Field<>();
-		stringField.setValue(value);
-		stringField.setDataInfo(dataInfo);
-		return stringField;
+		final StructuredProperty sp = new StructuredProperty();
+		sp.setValue(value);
+		sp.setQualifier(qualifier);
+		return sp;
 	}
 
 	private KeyValue createCollectedFrom() {
@@ -562,27 +527,19 @@ public class PublicationToOaf implements Serializable {
 		return ModelConstants.UNKNOWN_REPOSITORY;
 	}
 
-	private StructuredProperty mapAuthorId(String orcidId) {
-		final StructuredProperty sp = new StructuredProperty();
-		sp.setValue(orcidId);
-		final Qualifier q = new Qualifier();
-		q.setClassid(ModelConstants.ORCID);
-		q.setClassname(ModelConstants.ORCID_CLASSNAME);
-		q.setSchemeid(ModelConstants.DNET_PID_TYPES);
-		q.setSchemename(ModelConstants.DNET_PID_TYPES);
-		sp.setQualifier(q);
-		final DataInfo dataInfo = new DataInfo();
-		dataInfo.setDeletedbyinference(false);
-		dataInfo.setInferred(false);
-		dataInfo.setTrust("0.91");
-		dataInfo
-			.setProvenanceaction(
-				mapQualifier(
-					ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY,
-					ModelConstants.HARVESTED,
-					ModelConstants.DNET_PROVENANCE_ACTIONS,
-					ModelConstants.DNET_PROVENANCE_ACTIONS));
-		sp.setDataInfo(dataInfo);
-		return sp;
+	private AuthorPid mapAuthorId(String orcidId) {
+		return OafMapperUtils.authorPid(
+				orcidId,
+				OafMapperUtils.qualifier(
+						ModelConstants.ORCID,
+						ModelConstants.ORCID_CLASSNAME,
+						ModelConstants.DNET_PID_TYPES),
+				OafMapperUtils.dataInfo(.91f,
+						null,
+						false,
+						OafMapperUtils.qualifier(
+							ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY,
+							ModelConstants.HARVESTED,
+							ModelConstants.DNET_PROVENANCE_ACTIONS)));
 	}
 }

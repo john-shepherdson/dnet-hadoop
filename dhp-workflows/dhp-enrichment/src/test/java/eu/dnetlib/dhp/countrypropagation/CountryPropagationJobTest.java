@@ -288,19 +288,6 @@ public class CountryPropagationJobTest {
 		tmp
 			.foreach(
 				r -> r.getCountry().stream().forEach(c -> Assertions.assertEquals("dnet:countries", c.getSchemeid())));
-		tmp
-			.foreach(
-				r -> r
-					.getCountry()
-					.stream()
-					.forEach(c -> Assertions.assertEquals("dnet:countries", c.getSchemename())));
-		tmp
-			.foreach(
-				r -> r
-					.getCountry()
-					.stream()
-					.forEach(c -> Assertions.assertFalse(c.getDataInfo().getDeletedbyinference())));
-		tmp.foreach(r -> r.getCountry().stream().forEach(c -> Assertions.assertFalse(c.getDataInfo().getInvisible())));
 		tmp.foreach(r -> r.getCountry().stream().forEach(c -> Assertions.assertTrue(c.getDataInfo().getInferred())));
 		tmp
 			.foreach(
@@ -328,16 +315,6 @@ public class CountryPropagationJobTest {
 						c -> Assertions
 							.assertEquals(
 								"dnet:provenanceActions", c.getDataInfo().getProvenanceaction().getSchemeid())));
-		tmp
-			.foreach(
-				r -> r
-					.getCountry()
-					.stream()
-					.forEach(
-						c -> Assertions
-							.assertEquals(
-								"dnet:provenanceActions", c.getDataInfo().getProvenanceaction().getSchemename())));
-
 		List<Country> countries = tmp
 			.filter(r -> r.getId().equals("50|06cdd3ff4700::49ec404cee4e1452808aabeaffbd3072"))
 			.collect()

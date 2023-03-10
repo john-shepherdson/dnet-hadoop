@@ -1,9 +1,14 @@
 package eu.dnetlib.dhp.doiboost.crossref
 
+import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf._
 import eu.dnetlib.dhp.utils.DHPUtils
 import eu.dnetlib.doiboost.crossref.Crossref2Oaf
 import org.codehaus.jackson.map.{ObjectMapper, SerializationConfig}
+import org.json4s
+import org.json4s.JsonAST.{JField, JObject, JString}
+import org.json4s.{DefaultFormats, JValue}
+import org.json4s.jackson.JsonMethods
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 import org.slf4j.{Logger, LoggerFactory}
@@ -31,13 +36,13 @@ class CrossrefMappingTest {
       .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/doiboost/crossref/funder_doi"))
       .mkString
 
-    for (line <- funder_doi.linesWithSeparators.map(l =>l.stripLineEnd)) {
+    for (line <- funder_doi.linesWithSeparators.map(l => l.stripLineEnd)) {
       val json = template.replace("%s", line)
       val resultList: List[Oaf] = Crossref2Oaf.convert(json)
       assertTrue(resultList.nonEmpty)
       checkRelation(resultList)
     }
-    for (line <- funder_name.linesWithSeparators.map(l =>l.stripLineEnd)) {
+    for (line <- funder_name.linesWithSeparators.map(l => l.stripLineEnd)) {
       val json = template.replace("%s", line)
       val resultList: List[Oaf] = Crossref2Oaf.convert(json)
       assertTrue(resultList.nonEmpty)
@@ -107,6 +112,47 @@ class CrossrefMappingTest {
     mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
     items.foreach(p => println(mapper.writeValueAsString(p)))
 
+  }
+
+  private def parseJson(input: String): JValue = {
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+    lazy val json: json4s.JValue = JsonMethods.parse(input)
+
+    json
+  }
+
+  @Test
+  def testCitationRelations(): Unit = {
+    val json = Source
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/doiboost/crossref/publication_license_embargo.json"))
+      .mkString
+
+    assertNotNull(json)
+    assertFalse(json.isEmpty)
+
+    val result: List[Oaf] = Crossref2Oaf.convert(json)
+
+    assertTrue(result.nonEmpty)
+
+    val j = parseJson(json)
+
+    val doisReference: List[String] = for {
+      JObject(reference_json)          <- j \ "reference"
+      JField("DOI", JString(doi_json)) <- reference_json
+    } yield doi_json
+
+    val relationList: List[Relation] = result
+      .filter(s => s.isInstanceOf[Relation])
+      .map(r => r.asInstanceOf[Relation])
+      .filter(r => r.getSubRelType.equalsIgnoreCase(ModelConstants.CITATION))
+
+    assertNotNull(relationList)
+    assertFalse(relationList.isEmpty)
+
+    assertEquals(doisReference.size * 2, relationList.size)
+
+    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
+    relationList.foreach(p => println(mapper.writeValueAsString(p)))
   }
 
   @Test
@@ -227,10 +273,6 @@ class CrossrefMappingTest {
       result.getDataInfo.getProvenanceaction.getSchemeid.isEmpty,
       "DataInfo/Provenance/SchemeId test not null Failed"
     );
-    assertFalse(
-      result.getDataInfo.getProvenanceaction.getSchemename.isEmpty,
-      "DataInfo/Provenance/SchemeName test not null Failed"
-    );
 
     assertNotNull(result.getCollectedfrom, "CollectedFrom test not null Failed");
     assertFalse(result.getCollectedfrom.isEmpty);
@@ -302,10 +344,6 @@ class CrossrefMappingTest {
     assertFalse(
       result.getDataInfo.getProvenanceaction.getSchemeid.isEmpty,
       "DataInfo/Provenance/SchemeId test not null Failed"
-    );
-    assertFalse(
-      result.getDataInfo.getProvenanceaction.getSchemename.isEmpty,
-      "DataInfo/Provenance/SchemeName test not null Failed"
     );
 
     assertNotNull(result.getCollectedfrom, "CollectedFrom test not null Failed");
@@ -387,10 +425,6 @@ class CrossrefMappingTest {
       result.getDataInfo.getProvenanceaction.getSchemeid.isEmpty,
       "DataInfo/Provenance/SchemeId test not null Failed"
     );
-    assertFalse(
-      result.getDataInfo.getProvenanceaction.getSchemename.isEmpty,
-      "DataInfo/Provenance/SchemeName test not null Failed"
-    );
 
     assertNotNull(result.getCollectedfrom, "CollectedFrom test not null Failed");
     assertFalse(result.getCollectedfrom.isEmpty);
@@ -434,10 +468,6 @@ class CrossrefMappingTest {
     assertFalse(
       result.getDataInfo.getProvenanceaction.getSchemeid.isEmpty,
       "DataInfo/Provenance/SchemeId test not null Failed"
-    );
-    assertFalse(
-      result.getDataInfo.getProvenanceaction.getSchemename.isEmpty,
-      "DataInfo/Provenance/SchemeName test not null Failed"
     );
 
     assertNotNull(result.getCollectedfrom, "CollectedFrom test not null Failed");
@@ -586,7 +616,7 @@ class CrossrefMappingTest {
     println(mapper.writeValueAsString(item))
 
     assertTrue(
-      item.getInstance().asScala exists (i => i.getLicense.getValue.equals("https://www.springer.com/vor"))
+      item.getInstance().asScala exists (i => i.getLicense.getUrl.equals("https://www.springer.com/vor"))
     )
     assertTrue(
       item.getInstance().asScala exists (i => i.getAccessright.getClassid.equals("CLOSED"))
@@ -614,7 +644,7 @@ class CrossrefMappingTest {
 
     assertTrue(
       item.getInstance().asScala exists (i =>
-        i.getLicense.getValue.equals(
+        i.getLicense.getUrl.equals(
           "http://pubs.acs.org/page/policy/authorchoice_ccby_termsofuse.html"
         )
       )
@@ -649,7 +679,7 @@ class CrossrefMappingTest {
 
     assertTrue(
       item.getInstance().asScala exists (i =>
-        i.getLicense.getValue.equals(
+        i.getLicense.getUrl.equals(
           "https://academic.oup.com/journals/pages/open_access/funder_policies/chorus/standard_publication_model"
         )
       )
@@ -684,7 +714,7 @@ class CrossrefMappingTest {
 
     assertTrue(
       item.getInstance().asScala exists (i =>
-        i.getLicense.getValue.equals(
+        i.getLicense.getUrl.equals(
           "https://academic.oup.com/journals/pages/open_access/funder_policies/chorus/standard_publication_model"
         )
       )
@@ -719,7 +749,7 @@ class CrossrefMappingTest {
 
     assertTrue(
       item.getInstance().asScala exists (i =>
-        i.getLicense.getValue.equals(
+        i.getLicense.getUrl.equals(
           "https://academic.oup.com/journals/pages/open_access/funder_policies/chorus/standard_publication_model"
         )
       )

@@ -1,16 +1,16 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Text;
@@ -18,22 +18,19 @@ import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
 
-public class GenerateEntitiesApplication {
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+
+public class GenerateEntitiesApplication extends AbstractMigrationApplication {
 
 	private static final Logger log = LoggerFactory.getLogger(GenerateEntitiesApplication.class);
 
@@ -109,15 +106,12 @@ public class GenerateEntitiesApplication {
 		final boolean shouldHashId,
 		final Mode mode) {
 
-		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-		final List<String> existingSourcePaths = Arrays
-			.stream(sourcePaths.split(","))
-			.filter(p -> HdfsSupport.exists(p, sc.hadoopConfiguration()))
-			.collect(Collectors.toList());
+		final List<String> existingSourcePaths = listEntityPaths(spark, sourcePaths);
 
 		log.info("Generate entities from files:");
 		existingSourcePaths.forEach(log::info);
 
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 		JavaRDD<Oaf> inputRdd = sc.emptyRDD();
 
 		for (final String sp : existingSourcePaths) {
@@ -136,7 +130,7 @@ public class GenerateEntitiesApplication {
 				save(
 					inputRdd
 						.mapToPair(oaf -> new Tuple2<>(ModelSupport.idFn().apply(oaf), oaf))
-						.reduceByKey((Function2<Oaf, Oaf, Oaf>) (v1, v2) -> MergeUtils.merge(v1, v2, true))
+						.reduceByKey(MergeUtils::merge)
 						.map(Tuple2::_2),
 					targetPath);
 				break;

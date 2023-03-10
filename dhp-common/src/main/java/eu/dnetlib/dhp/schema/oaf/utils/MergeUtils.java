@@ -129,7 +129,7 @@ public class MergeUtils {
 		return (T) mergedEntity;
 	}
 
-	private static <T extends Oaf> T mergeRelation(T left, T right) {
+	public static <T extends Oaf> T mergeRelation(T left, T right) {
 
 		Relation original = (Relation) left;
 		Relation enrich = (Relation) right;

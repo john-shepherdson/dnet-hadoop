@@ -1,7 +1,7 @@
 package eu.dnetlib.doiboost.mag
 
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
+import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, MergeUtils, OafMapperUtils}
 import eu.dnetlib.dhp.schema.oaf.{Instance, Journal, Publication, StructuredProperty, Subject}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.DoiBoostMappingUtil._
@@ -142,8 +142,7 @@ case object ConversionUtil {
 
   def mergePublication(a: Publication, b: Publication): Publication = {
     if ((a != null) && (b != null)) {
-      a.mergeFrom(b)
-      a
+      MergeUtils.merge(a, b)
     } else {
       if (a == null) b else a
     }
@@ -172,7 +171,7 @@ case object ConversionUtil {
     val pub = inputItem._1._2
     val abst = inputItem._2
     if (abst != null) {
-      pub.setDescription(List(asField(abst.IndexedAbstract)).asJava)
+      pub.setDescription(List(abst.IndexedAbstract).asJava)
     }
     pub
 
@@ -215,10 +214,8 @@ case object ConversionUtil {
           s.DisplayName,
           classid,
           className,
-          ModelConstants.DNET_SUBJECT_TYPOLOGIES,
           ModelConstants.DNET_SUBJECT_TYPOLOGIES
         )
-        val di = DoiBoostMappingUtil.generateDataInfo(s.Score.toString)
         var resList: List[Subject] = List(s1)
         if (s.MainType.isDefined) {
           val maintp = s.MainType.get
@@ -226,20 +223,18 @@ case object ConversionUtil {
             s.MainType.get,
             classid,
             className,
-            ModelConstants.DNET_SUBJECT_TYPOLOGIES,
             ModelConstants.DNET_SUBJECT_TYPOLOGIES
           )
-          s2.setDataInfo(di)
+          s2.setDataInfo(dataInfo)
           resList = resList ::: List(s2)
           if (maintp.contains(".")) {
             val s3 = createSubject(
               maintp.split("\\.").head,
               classid,
               className,
-              ModelConstants.DNET_SUBJECT_TYPOLOGIES,
               ModelConstants.DNET_SUBJECT_TYPOLOGIES
             )
-            s3.setDataInfo(di)
+            s3.setDataInfo(dataInfo)
             resList = resList ::: List(s3)
           }
         }
@@ -248,36 +243,6 @@ case object ConversionUtil {
       publication.setSubject(p.asJava)
     }
     publication
-  }
-
-  def addInstances(a: (Publication, MagUrl)): Publication = {
-    val pub = a._1
-    val urls = a._2
-
-    val i = new Instance
-
-    if (urls != null) {
-
-      val l: List[String] = urls.instances
-        .filter(k => k.SourceUrl.nonEmpty)
-        .map(k => k.SourceUrl) ::: List(
-        s"https://academic.microsoft.com/#/detail/${extractMagIdentifier(pub.getOriginalId.asScala)}"
-      )
-
-      i.setUrl(l.asJava)
-    } else
-      i.setUrl(
-        List(
-          s"https://academic.microsoft.com/#/detail/${extractMagIdentifier(pub.getOriginalId.asScala)}"
-        ).asJava
-      )
-
-    // Ticket #6281 added pid to Instance
-    i.setPid(pub.getPid)
-
-    i.setCollectedfrom(createMAGCollectedFrom())
-    pub.setInstance(List(i).asJava)
-    pub
   }
 
   def transformPaperAbstract(input: MagPaperAbstract): MagPaperAbstract = {
@@ -306,21 +271,23 @@ case object ConversionUtil {
       createSP(paper.OriginalTitle, "alternative title", ModelConstants.DNET_DATACITE_TITLE)
     pub.setTitle(List(mainTitles, originalTitles).asJava)
 
-    pub.setSource(List(asField(paper.BookTitle)).asJava)
+    pub.setSource(List(paper.BookTitle).asJava)
 
     val authorsOAF = authors.authors.map { f: MagAuthorAffiliation =>
       val a: eu.dnetlib.dhp.schema.oaf.Author = new eu.dnetlib.dhp.schema.oaf.Author
       a.setRank(f.sequenceNumber)
       if (f.author.DisplayName.isDefined)
         a.setFullname(f.author.DisplayName.get)
-      if (f.affiliation != null)
-        a.setAffiliation(List(asField(f.affiliation)).asJava)
       a.setPid(
         List(
-          createSP(
+          OafMapperUtils.authorPid(
             s"https://academic.microsoft.com/#/detail/${f.author.AuthorId}",
-            "URL",
-            ModelConstants.DNET_PID_TYPES
+            OafMapperUtils.qualifier(
+              "URL",
+              "URL",
+              ModelConstants.DNET_PID_TYPES
+            ),
+            dataInfo
           )
         ).asJava
       )
@@ -329,9 +296,10 @@ case object ConversionUtil {
     pub.setAuthor(authorsOAF.asJava)
 
     if (paper.Date != null && paper.Date.isDefined) {
-      pub.setDateofacceptance(asField(paper.Date.get.toString.substring(0, 10)))
+      pub.setDateofacceptance(paper.Date.get.toString.substring(0, 10))
     }
-    pub.setPublisher(asField(paper.Publisher))
+
+    pub.setPublisher(OafMapperUtils.publisher(paper.Publisher))
 
     if (journal != null && journal.DisplayName.isDefined) {
       val j = new Journal
@@ -340,7 +308,7 @@ case object ConversionUtil {
       j.setSp(paper.FirstPage)
       j.setEp(paper.LastPage)
       if (journal.Publisher.isDefined)
-        pub.setPublisher(asField(journal.Publisher.get))
+        pub.setPublisher(OafMapperUtils.publisher(journal.Publisher.get))
       if (journal.Issn.isDefined)
         j.setIssnPrinted(journal.Issn.get)
       j.setVol(paper.Volume)
@@ -348,69 +316,8 @@ case object ConversionUtil {
       pub.setJournal(j)
     }
     pub.setCollectedfrom(List(createMAGCollectedFrom()).asJava)
-    pub.setDataInfo(generateDataInfo())
+    pub.setDataInfo(generateEntityDataInfo())
     pub
-  }
-
-  def createOAF(
-    inputParams: ((MagPapers, MagPaperWithAuthorList), MagPaperAbstract)
-  ): Publication = {
-
-    val paper = inputParams._1._1
-    val authors = inputParams._1._2
-    val description = inputParams._2
-
-    val pub = new Publication
-    pub.setPid(List(createSP(paper.Doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
-    pub.setOriginalId(List(paper.PaperId.toString, paper.Doi).asJava)
-
-    //IMPORTANT
-    //The old method result.setId(generateIdentifier(result, doi))
-    //will be replaced using IdentifierFactory
-
-    pub.setId(IdentifierFactory.createDOIBoostIdentifier(pub))
-
-    val mainTitles = createSP(paper.PaperTitle, "main title", ModelConstants.DNET_DATACITE_TITLE)
-    val originalTitles =
-      createSP(paper.OriginalTitle, "alternative title", ModelConstants.DNET_DATACITE_TITLE)
-    pub.setTitle(List(mainTitles, originalTitles).asJava)
-
-    pub.setSource(List(asField(paper.BookTitle)).asJava)
-
-    if (description != null) {
-      pub.setDescription(List(asField(description.IndexedAbstract)).asJava)
-    }
-
-    val authorsOAF = authors.authors.map { f: MagAuthorAffiliation =>
-      val a: eu.dnetlib.dhp.schema.oaf.Author = new eu.dnetlib.dhp.schema.oaf.Author
-
-      a.setFullname(f.author.DisplayName.get)
-
-      if (f.affiliation != null)
-        a.setAffiliation(List(asField(f.affiliation)).asJava)
-
-      a.setPid(
-        List(
-          createSP(
-            s"https://academic.microsoft.com/#/detail/${f.author.AuthorId}",
-            "URL",
-            ModelConstants.DNET_PID_TYPES
-          )
-        ).asJava
-      )
-
-      a
-
-    }
-
-    if (paper.Date != null) {
-      pub.setDateofacceptance(asField(paper.Date.toString.substring(0, 10)))
-    }
-
-    pub.setAuthor(authorsOAF.asJava)
-
-    pub
-
   }
 
   def convertInvertedIndexString(json_input: String): String = {

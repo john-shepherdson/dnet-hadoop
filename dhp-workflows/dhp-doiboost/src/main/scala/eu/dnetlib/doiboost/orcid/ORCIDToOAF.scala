@@ -2,10 +2,10 @@ package eu.dnetlib.doiboost.orcid
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
-import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Publication}
+import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils}
+import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, EntityDataInfo, Publication}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
-import eu.dnetlib.doiboost.DoiBoostMappingUtil.{createSP, generateDataInfo}
+import eu.dnetlib.doiboost.DoiBoostMappingUtil.{createSP, generateEntityDataInfo}
 import org.apache.commons.lang.StringUtils
 import org.json4s
 import org.json4s.DefaultFormats
@@ -104,7 +104,7 @@ object ORCIDToOAF {
     val doi = input.doi
     val pub: Publication = new Publication
     pub.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
-    pub.setDataInfo(generateDataInfo())
+    pub.setDataInfo(generateEntityDataInfo())
 
     pub.setId(IdentifierFactory.createDOIBoostIdentifier(pub))
     if (pub.getId == null)
@@ -118,7 +118,7 @@ object ORCIDToOAF {
 
       pub.setAuthor(l.asJava)
       pub.setCollectedfrom(List(DoiBoostMappingUtil.createORIDCollectedFrom()).asJava)
-      pub.setDataInfo(DoiBoostMappingUtil.generateDataInfo())
+      pub.setDataInfo(DoiBoostMappingUtil.generateEntityDataInfo())
       pub
     } catch {
       case e: Throwable =>
@@ -127,8 +127,10 @@ object ORCIDToOAF {
     }
   }
 
+  val orcidPidDataInfo = generateOricPIDDatainfo()
   def generateOricPIDDatainfo(): DataInfo = {
-    val di = DoiBoostMappingUtil.generateDataInfo("0.91")
+    val di = DoiBoostMappingUtil.generateDataInfo()
+    di.setTrust(.91f)
     di.getProvenanceaction.setClassid(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)
     di.getProvenanceaction.setClassname(ModelConstants.HARVESTED)
     di
@@ -149,11 +151,11 @@ object ORCIDToOAF {
     if (StringUtils.isNotBlank(o.oid))
       a.setPid(
         List(
-          createSP(
+          OafMapperUtils.authorPid(
             o.oid,
             ModelConstants.ORCID,
             ModelConstants.DNET_PID_TYPES,
-            generateOricPIDDatainfo()
+            orcidPidDataInfo
           )
         ).asJava
       )

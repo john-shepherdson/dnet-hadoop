@@ -1,7 +1,7 @@
 package eu.dnetlib.doiboost.uw
 
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
+import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils, PidType}
 import eu.dnetlib.dhp.schema.oaf.{AccessRight, Instance, OpenAccessRoute, Publication}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.DoiBoostMappingUtil._
@@ -90,7 +90,7 @@ object UnpayWallToOAF {
     val colour = get_unpaywall_color((json \ "oa_status").extractOrElse[String](null))
 
     pub.setCollectedfrom(List(createUnpayWallCollectedFrom()).asJava)
-    pub.setDataInfo(generateDataInfo())
+    pub.setDataInfo(generateEntityDataInfo())
 
     if (!is_oa)
       return null
@@ -104,7 +104,7 @@ object UnpayWallToOAF {
     i.setUrl(List(oaLocation.url.get).asJava)
 
     if (oaLocation.license.isDefined)
-      i.setLicense(asField(oaLocation.license.get))
+      i.setLicense(OafMapperUtils.license(oaLocation.license.get))
     pub.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
 
     // Ticket #6282 Adding open Access Colour
@@ -113,10 +113,9 @@ object UnpayWallToOAF {
       a.setClassid(ModelConstants.ACCESS_RIGHT_OPEN)
       a.setClassname(ModelConstants.ACCESS_RIGHT_OPEN)
       a.setSchemeid(ModelConstants.DNET_ACCESS_MODES)
-      a.setSchemename(ModelConstants.DNET_ACCESS_MODES)
       a.setOpenAccessRoute(colour.get)
       i.setAccessright(a)
-      i.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
+      i.setPid(List(createSP(doi, PidType.doi.toString, ModelConstants.DNET_PID_TYPES)).asJava)
     }
     pub.setInstance(List(i).asJava)
 

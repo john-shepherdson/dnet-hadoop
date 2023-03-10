@@ -122,7 +122,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			final EntityDataInfo info = prepareDataInfo(doc, invisible);
 			final long lastUpdateTimestamp = new Date().getTime();
 
-			final List<Instance> instances = prepareInstances(doc, info, collectedFrom, hostedBy);
+			final List<Instance> instances = prepareInstances(doc, collectedFrom, hostedBy);
 
 			final String type = getResultType(doc, instances);
 
@@ -311,14 +311,16 @@ public abstract class AbstractMdRecordToOafMapper {
 		final Document doc,
 		final List<Instance> instances,
 		final KeyValue collectedFrom,
-		final EntityDataInfo info,
+		final EntityDataInfo entityDataInfo,
 		final long lastUpdateTimestamp) {
-		r.setDataInfo(info);
+
+		final DataInfo info = OafMapperUtils.fromEntityDataInfo(entityDataInfo);
+		r.setDataInfo(entityDataInfo);
 		r.setLastupdatetimestamp(lastUpdateTimestamp);
 		r.setId(createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false));
 		r.setOriginalId(findOriginalId(doc));
 		r.setCollectedfrom(Arrays.asList(collectedFrom));
-		r.setPid(IdentifierFactory.getPids(prepareResultPids(doc, info), collectedFrom));
+		r.setPid(IdentifierFactory.getPids(prepareResultPids(doc), collectedFrom));
 		r.setDateofcollection(doc.valueOf("//dr:dateOfCollection/text()|//dri:dateOfCollection/text()"));
 		r.setDateoftransformation(doc.valueOf("//dr:dateOfTransformation/text()|//dri:dateOfTransformation/text()"));
 		r.setExtraInfo(new ArrayList<>()); // NOT PRESENT IN MDSTORES
@@ -351,7 +353,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		r.setEoscifguidelines(prepareEOSCIfGuidelines(doc, info));
 	}
 
-	protected abstract List<StructuredProperty> prepareResultPids(Document doc, DataInfo info);
+	protected abstract List<StructuredProperty> prepareResultPids(Document doc);
 
 	private List<Context> prepareContexts(final Document doc, final DataInfo info) {
 		final List<Context> list = new ArrayList<>();
@@ -390,7 +392,6 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected abstract List<Instance> prepareInstances(
 		Document doc,
-		DataInfo info,
 		KeyValue collectedfrom,
 		KeyValue hostedby);
 
@@ -504,8 +505,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		final Node node,
 		final String xpath,
 		final String xpathClassId,
-		final String schemeId,
-		final DataInfo info) {
+		final String schemeId) {
 		final List<StructuredProperty> res = new ArrayList<>();
 
 		for (final Object o : node.selectNodes(xpath)) {

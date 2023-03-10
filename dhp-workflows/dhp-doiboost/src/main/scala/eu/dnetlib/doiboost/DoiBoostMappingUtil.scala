@@ -210,7 +210,6 @@ object DoiBoostMappingUtil {
     OafMapperUtils.accessRight(
       ModelConstants.ACCESS_RIGHT_OPEN,
       "Open Access",
-      ModelConstants.DNET_ACCESS_MODES,
       ModelConstants.DNET_ACCESS_MODES
     )
   }
@@ -219,7 +218,6 @@ object DoiBoostMappingUtil {
     OafMapperUtils.accessRight(
       "RESTRICTED",
       "Restricted",
-      ModelConstants.DNET_ACCESS_MODES,
       ModelConstants.DNET_ACCESS_MODES
     )
   }
@@ -228,7 +226,6 @@ object DoiBoostMappingUtil {
     OafMapperUtils.accessRight(
       ModelConstants.UNKNOWN,
       ModelConstants.NOT_AVAILABLE,
-      ModelConstants.DNET_ACCESS_MODES,
       ModelConstants.DNET_ACCESS_MODES
     )
   }
@@ -237,7 +234,6 @@ object DoiBoostMappingUtil {
     OafMapperUtils.accessRight(
       "EMBARGO",
       "Embargo",
-      ModelConstants.DNET_ACCESS_MODES,
       ModelConstants.DNET_ACCESS_MODES
     )
   }
@@ -246,9 +242,37 @@ object DoiBoostMappingUtil {
     OafMapperUtils.accessRight(
       "CLOSED",
       "Closed Access",
-      ModelConstants.DNET_ACCESS_MODES,
       ModelConstants.DNET_ACCESS_MODES
     )
+  }
+
+  val entityDataInfo = generateEntityDataInfo()
+
+  def generateEntityDataInfo(): EntityDataInfo = {
+    OafMapperUtils.dataInfo(
+      false,
+      false,
+      .9f,
+      null,
+      false,
+      OafMapperUtils.qualifier(
+        ModelConstants.SYSIMPORT_ACTIONSET,
+        ModelConstants.SYSIMPORT_ACTIONSET,
+        ModelConstants.DNET_PROVENANCE_ACTIONS
+      ))
+  }
+
+  val dataInfo = generateDataInfo()
+  def generateDataInfo(): DataInfo = {
+    OafMapperUtils.dataInfo(
+      .9f,
+      null,
+      false,
+      OafMapperUtils.qualifier(
+        ModelConstants.SYSIMPORT_ACTIONSET,
+        ModelConstants.SYSIMPORT_ACTIONSET,
+        ModelConstants.DNET_PROVENANCE_ACTIONS
+      ))
   }
 
   def extractInstance(r: Result): Option[Instance] = {
@@ -301,10 +325,6 @@ object DoiBoostMappingUtil {
     val b = StringUtils.substringBefore(input, "::")
     val a = StringUtils.substringAfter(input, "::")
     s"10|${b}::${DHPUtils.md5(a)}"
-  }
-
-  def generateDataInfo(): DataInfo = {
-    generateDataInfo(0.9F)
   }
 
   def filterPublication(publication: Publication): Boolean = {
@@ -373,23 +393,6 @@ object DoiBoostMappingUtil {
     true
   }
 
-  def generateDataInfo(trust: Float): DataInfo = {
-    val di = new EntityDataInfo
-    di.setDeletedbyinference(false)
-    di.setInferred(false)
-    di.setInvisible(false)
-    di.setTrust(trust)
-    di.setProvenanceaction(
-      OafMapperUtils.qualifier(
-        ModelConstants.SYSIMPORT_ACTIONSET,
-        ModelConstants.SYSIMPORT_ACTIONSET,
-        ModelConstants.DNET_PROVENANCE_ACTIONS
-
-      )
-    )
-    di
-  }
-
   def createSubject(value: String, classId: String, schemeId: String): Subject = {
     val s = new Subject
     s.setQualifier(OafMapperUtils.qualifier(classId, classId, schemeId))
@@ -433,7 +436,7 @@ object DoiBoostMappingUtil {
     sp
   }
 
-
+  val collectedFrom = createCrossrefCollectedFrom()
   def createCrossrefCollectedFrom(): KeyValue = {
 
     val cf = new KeyValue

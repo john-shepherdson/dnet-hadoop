@@ -102,10 +102,11 @@ public class StepActionsTest {
 		verificationDs
 			.foreach(
 				(ForeachFunction<Relation>) r -> Assertions
-					.assertEquals("propagation", r.getDataInfo().getInferenceprovenance()));
+					.assertEquals("propagation", r.getProvenance().get(0).getDataInfo().getInferenceprovenance()));
 
 		verificationDs
-			.foreach((ForeachFunction<Relation>) r -> Assertions.assertEquals("0.85", r.getDataInfo().getTrust()));
+			.foreach((ForeachFunction<Relation>) r -> Assertions
+					.assertEquals("0.85", r.getProvenance().get(0).getDataInfo().getTrust()));
 
 		verificationDs
 			.foreach((ForeachFunction<Relation>) r -> Assertions.assertEquals("50|", r.getSource().substring(0, 3)));
@@ -133,14 +134,14 @@ public class StepActionsTest {
 				(ForeachFunction<Relation>) r -> Assertions
 					.assertEquals(
 						PropagationConstant.PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_ID,
-						r.getDataInfo().getProvenanceaction().getClassid()));
+						r.getProvenance().get(0).getDataInfo().getProvenanceaction().getClassid()));
 
 		verificationDs
 			.foreach(
 				(ForeachFunction<Relation>) r -> Assertions
 					.assertEquals(
 						PropagationConstant.PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_NAME,
-						r.getDataInfo().getProvenanceaction().getClassname()));
+						r.getProvenance().get(0).getDataInfo().getProvenanceaction().getClassname()));
 
 		verificationDs
 			.filter(

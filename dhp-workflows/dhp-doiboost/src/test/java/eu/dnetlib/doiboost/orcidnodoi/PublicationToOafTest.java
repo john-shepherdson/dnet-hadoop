@@ -60,7 +60,7 @@ class PublicationToOafTest {
 		});
 		assertNotNull(oafPublication.getCollectedfrom());
 		if (oafPublication.getSource() != null) {
-			logger.info((oafPublication.getSource().get(0).getValue()));
+			logger.info((oafPublication.getSource().get(0)));
 		}
 		if (oafPublication.getExternalReference() != null) {
 			oafPublication.getExternalReference().forEach(e -> {

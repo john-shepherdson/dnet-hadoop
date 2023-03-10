@@ -125,25 +125,25 @@ public class SparkJobTest {
 			.foreach(
 				r -> Assertions
 					.assertEquals(
-						PropagationConstant.PROPAGATION_DATA_INFO_TYPE, r.getDataInfo().getInferenceprovenance()));
+						PropagationConstant.PROPAGATION_DATA_INFO_TYPE, r.getProvenance().get(0).getDataInfo().getInferenceprovenance()));
 		tmp
 			.foreach(
 				r -> Assertions
 					.assertEquals(
 						PropagationConstant.PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_ID,
-						r.getDataInfo().getProvenanceaction().getClassid()));
+						r.getProvenance().get(0).getDataInfo().getProvenanceaction().getClassid()));
 		tmp
 			.foreach(
 				r -> Assertions
 					.assertEquals(
 						PropagationConstant.PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_NAME,
-						r.getDataInfo().getProvenanceaction().getClassname()));
+						r.getProvenance().get(0).getDataInfo().getProvenanceaction().getClassname()));
 		tmp
 			.foreach(
 				r -> Assertions
 					.assertEquals(
 						"0.85",
-						r.getDataInfo().getTrust()));
+						r.getProvenance().get(0).getDataInfo().getTrust()));
 
 		Assertions.assertEquals(9, tmp.filter(r -> r.getSource().substring(0, 3).equals("50|")).count());
 		tmp

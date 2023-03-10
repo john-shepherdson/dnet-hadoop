@@ -125,8 +125,7 @@ object SparkResolveEntities {
             if (b == null)
               a._2
             else {
-              MergeUtils.mergeResult(a._2, b._2)
-              a._2
+              MergeUtils.merge(a._2, b._2)
             }
           })
           .map(r => mapper.writeValueAsString(r))(Encoders.STRING)

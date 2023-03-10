@@ -270,7 +270,7 @@ class ResolveEntitiesTest extends Serializable {
       classOf[Publication]
     )
 
-    r = MergeUtils.mergeResult(r, p);
+    r = MergeUtils.merge(r, p);
 
     println(mapper.writeValueAsString(r))
 

@@ -47,7 +47,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 	private static final List<KeyValue> COLLECTED_FROM_CLAIM = listKeyValues(
 			createOpenaireId(10, "infrastruct_::openaire", true), "OpenAIRE");
 
-	private final static List<Provenance> PROVENANCE_CLAIM = getProvenance(COLLECTED_FROM_CLAIM, ENTITY_DATA_INFO_CLAIM);
+	private final static List<Provenance> PROVENANCE_CLAIM = getProvenance(COLLECTED_FROM_CLAIM, REL_DATA_INFO_CLAIM);
 
 	public static final String SOURCE_TYPE = "source_type";
 	public static final String TARGET_TYPE = "target_type";
@@ -457,7 +457,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				}
 				r.setId(createOpenaireId(50, rs.getString("target_id"), false));
 				r.setLastupdatetimestamp(lastUpdateTimestamp);
-				r.setContext(prepareContext(rs.getString("source_id"), ENTITY_DATA_INFO_CLAIM));
+				r.setContext(prepareContext(rs.getString("source_id"), REL_DATA_INFO_CLAIM));
 				r.setDataInfo(ENTITY_DATA_INFO_CLAIM);
 				r.setCollectedfrom(COLLECTED_FROM_CLAIM);
 
@@ -632,7 +632,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 	public List<Oaf> processOrgOrgMergeRels(final ResultSet rs) {
 		try {
-			final DataInfo info = prepareDataInfo(rs); // TODO
+			final DataInfo info = OafMapperUtils.fromEntityDataInfo(prepareDataInfo(rs)); // TODO
 
 			final String orgId1 = createOpenaireId(20, rs.getString("id1"), true);
 			final String orgId2 = createOpenaireId(20, rs.getString("id2"), true);
@@ -649,7 +649,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 	public List<Oaf> processOrgOrgParentChildRels(final ResultSet rs) {
 		try {
-			final DataInfo info = prepareDataInfo(rs); // TODO
+			final DataInfo info = OafMapperUtils.fromEntityDataInfo(prepareDataInfo(rs)); // TODO
 
 			final String orgId1 = createOpenaireId(20, rs.getString("source"), true);
 			final String orgId2 = createOpenaireId(20, rs.getString("target"), true);
@@ -668,7 +668,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 	public List<Oaf> processOrgOrgSimRels(final ResultSet rs) {
 		try {
-			final DataInfo info = prepareDataInfo(rs); // TODO
+			final DataInfo info = OafMapperUtils.fromEntityDataInfo(prepareDataInfo(rs)); // TODO
 
 			final String orgId1 = createOpenaireId(20, rs.getString("id1"), true);
 			final String orgId2 = createOpenaireId(20, rs.getString("id2"), true);

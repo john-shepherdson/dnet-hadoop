@@ -1,12 +1,10 @@
 
 package eu.dnetlib.dhp.actionmanager.project;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Files;
 
 import org.apache.commons.io.FileUtils;
@@ -24,7 +22,7 @@ import eu.dnetlib.dhp.common.collection.CollectorException;
 import eu.dnetlib.dhp.common.collection.GetCSV;
 import eu.dnetlib.dhp.common.collection.HttpConnector2;
 
-public class DownloadCsvTest {
+public class ReadProgrammeTest {
 
 	private static String workingDir;
 
@@ -33,22 +31,25 @@ public class DownloadCsvTest {
 	@BeforeAll
 	public static void beforeAll() throws IOException {
 		workingDir = Files
-			.createTempDirectory(DownloadCsvTest.class.getSimpleName())
+			.createTempDirectory(ReadProgrammeTest.class.getSimpleName())
 			.toString();
 
 		fs = FileSystem.getLocal(new Configuration());
 	}
 
-	@Disabled
-	@Test
-	void getProgrammeFileTest() throws Exception {
+	@AfterAll
+	public static void cleanup() {
+		FileUtils.deleteQuietly(new File(workingDir));
+	}
 
-		String fileURL = "https://cordis.europa.eu/data/reference/cordisref-h2020programmes.csv";
+	@Test
+	void getLocalProgrammeFileTest() throws Exception {
 
 		GetCSV
 			.getCsv(
 				fs, new BufferedReader(
-					new InputStreamReader(new HttpConnector2().getInputSourceAsStream(fileURL))),
+					new FileReader(
+						getClass().getResource("/eu/dnetlib/dhp/actionmanager/project/h2020_programme.csv").getPath())),
 				workingDir + "/programme",
 				CSVProgramme.class.getName(), ';');
 
@@ -56,10 +57,11 @@ public class DownloadCsvTest {
 
 		String line;
 		int count = 0;
+		ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 		while ((line = in.readLine()) != null) {
-			CSVProgramme csvp = new ObjectMapper().readValue(line, CSVProgramme.class);
-			if (count == 0) {
-				assertTrue(csvp.getCode().equals("H2020-EU.5.f."));
+			CSVProgramme csvp = OBJECT_MAPPER.readValue(line, CSVProgramme.class);
+			if (count == 528) {
+				assertEquals("H2020-EU.5.f.", csvp.getCode());
 				assertTrue(
 					csvp
 						.getTitle()
@@ -69,8 +71,8 @@ public class DownloadCsvTest {
 				assertTrue(csvp.getShortTitle().equals(""));
 				assertTrue(csvp.getLanguage().equals("en"));
 			}
-			if (count == 28) {
-				assertTrue(csvp.getCode().equals("H2020-EU.3.5.4."));
+			if (count == 11) {
+				assertEquals("H2020-EU.3.5.4.", csvp.getCode());
 				assertTrue(
 					csvp
 						.getTitle()
@@ -79,7 +81,7 @@ public class DownloadCsvTest {
 				assertTrue(csvp.getShortTitle().equals("A green economy and society through eco-innovation"));
 				assertTrue(csvp.getLanguage().equals("de"));
 			}
-			if (count == 229) {
+			if (count == 34) {
 				assertTrue(csvp.getCode().equals("H2020-EU.3.2."));
 				assertTrue(
 					csvp
@@ -95,54 +97,7 @@ public class DownloadCsvTest {
 			count += 1;
 		}
 
-		Assertions.assertEquals(767, count);
-	}
-
-	@Disabled
-	@Test
-	void getProjectFileTest() throws IOException, CollectorException, ClassNotFoundException {
-		String fileURL = "https://cordis.europa.eu/data/cordis-h2020projects.csv";
-
-		GetCSV
-			.getCsv(
-				fs,
-				new BufferedReader(new InputStreamReader(new HttpConnector2().getInputSourceAsStream(fileURL))),
-				workingDir + "/projects",
-				CSVProject.class.getName(), ';');
-
-		BufferedReader in = new BufferedReader(new InputStreamReader(fs.open(new Path(workingDir + "/projects"))));
-
-		String line;
-		int count = 0;
-		while ((line = in.readLine()) != null) {
-			CSVProject csvp = new ObjectMapper().readValue(line, CSVProject.class);
-			if (count == 0) {
-				assertTrue(csvp.getId().equals("771736"));
-				assertTrue(csvp.getProgramme().equals("H2020-EU.1.1."));
-				assertTrue(csvp.getTopics().equals("ERC-2017-COG"));
-
-			}
-			if (count == 22882) {
-				assertTrue(csvp.getId().equals("752903"));
-				assertTrue(csvp.getProgramme().equals("H2020-EU.1.3.2."));
-				assertTrue(csvp.getTopics().equals("MSCA-IF-2016"));
-			}
-			if (count == 223023) {
-				assertTrue(csvp.getId().equals("861952"));
-				assertTrue(csvp.getProgramme().equals("H2020-EU.4.e."));
-				assertTrue(csvp.getTopics().equals("SGA-SEWP-COST-2019"));
-			}
-			assertTrue(csvp.getId() != null);
-			assertTrue(csvp.getProgramme().startsWith("H2020"));
-			count += 1;
-		}
-
-		Assertions.assertEquals(34957, count);
-	}
-
-	@AfterAll
-	public static void cleanup() {
-		FileUtils.deleteQuietly(new File(workingDir));
+		assertEquals(769, count);
 	}
 
 }

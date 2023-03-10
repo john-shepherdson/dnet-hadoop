@@ -165,6 +165,21 @@ public class OafMapperUtils {
 		return ap;
 	}
 
+	public static AuthorPid authorPid(
+			final String value,
+			final String classid,
+			final String schemeid,
+			final DataInfo dataInfo) {
+		if (value == null) {
+			return null;
+		}
+		final AuthorPid ap = new AuthorPid();
+		ap.setValue(value);
+		ap.setQualifier(qualifier(classid, classid, schemeid));
+		ap.setDataInfo(dataInfo);
+		return ap;
+	}
+
 	public static ExtraInfo extraInfo(
 		final String name,
 		final String value,

@@ -151,7 +151,7 @@ public class XmlIndexingJob {
 			.sequenceFile(inputPath, Text.class, Text.class)
 			.map(t -> t._2().toString())
 			.map(s -> toIndexRecord(SaxonTransformerFactory.newInstance(indexRecordXslt), s))
-			.map(s -> new StreamingInputDocumentFactory(version, dsId).parseDocument(s));
+			.map(s -> new StreamingInputDocumentFactory().parseDocument(s));
 
 		switch (outputFormat) {
 			case SOLR:

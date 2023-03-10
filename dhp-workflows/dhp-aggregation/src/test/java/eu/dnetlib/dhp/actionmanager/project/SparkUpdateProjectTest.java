@@ -11,6 +11,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
@@ -78,12 +79,12 @@ public class SparkUpdateProjectTest {
 					"-programmePath",
 					getClass()
 						.getResource(
-							"/eu/dnetlib/dhp/actionmanager/project/preparedProgramme_whole.json")
+							"/eu/dnetlib/dhp/actionmanager/project/prepared_h2020_programme.json.gz")
 						.getPath(),
 					"-projectPath",
-					getClass().getResource("/eu/dnetlib/dhp/actionmanager/project/prepared_projects.json").getPath(),
+					getClass().getResource("/eu/dnetlib/dhp/actionmanager/project/prepared_projects.json.gz").getPath(),
 					"-topicPath",
-					getClass().getResource("/eu/dnetlib/dhp/actionmanager/project/topic.json.gz").getPath(),
+					getClass().getResource("/eu/dnetlib/dhp/actionmanager/project/topics_nld.json.gz").getPath(),
 					"-outputPath",
 					workingDir.toString() + "/actionSet"
 				});
@@ -266,6 +267,7 @@ public class SparkUpdateProjectTest {
 						.get(1)
 						.getString(0)
 						.equals("H2020-EU.2.1.4."));
+
 		Assertions
 			.assertTrue(
 				execverification

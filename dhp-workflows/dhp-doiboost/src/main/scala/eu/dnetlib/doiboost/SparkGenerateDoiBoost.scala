@@ -3,17 +3,19 @@ package eu.dnetlib.doiboost
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.oa.merge.AuthorMerger
 import eu.dnetlib.dhp.schema.common.ModelConstants
+import eu.dnetlib.dhp.schema.oaf.utils.{MergeUtils, OafMapperUtils}
 import eu.dnetlib.dhp.schema.oaf.{Organization, Publication, Relation, Dataset => OafDataset}
 import eu.dnetlib.doiboost.mag.ConversionUtil
+import eu.dnetlib.doiboost.DoiBoostMappingUtil._
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql._
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.parse
 import org.slf4j.{Logger, LoggerFactory}
+
 import scala.collection.JavaConverters._
 
 object SparkGenerateDoiBoost {
@@ -74,11 +76,11 @@ object SparkGenerateDoiBoost {
       spark.read.load(s"$workingDirPath/uwPublication").as[Publication].map(p => (p.getId, p))
 
     def applyMerge(item: ((String, Publication), (String, Publication))): Publication = {
-      val crossrefPub = item._1._2
+      var crossrefPub = item._1._2
       if (item._2 != null) {
         val otherPub = item._2._2
         if (otherPub != null) {
-          crossrefPub.mergeFrom(otherPub)
+          crossrefPub = MergeUtils.merge(crossrefPub, otherPub)
           crossrefPub.setAuthor(AuthorMerger.mergeAuthor(crossrefPub.getAuthor, otherPub.getAuthor))
         }
       }
@@ -117,16 +119,16 @@ object SparkGenerateDoiBoost {
     val doiBoostPublication: Dataset[(String, Publication)] = spark.read
       .load(s"$workingDirPath/doiBoostPublication")
       .as[Publication]
-      .filter(p => DoiBoostMappingUtil.filterPublication(p))
-      .map(DoiBoostMappingUtil.toISSNPair)(tupleForJoinEncoder)
+      .filter(p => filterPublication(p))
+      .map(toISSNPair)(tupleForJoinEncoder)
 
     val hostedByDataset: Dataset[(String, HostedByItemType)] = spark.createDataset(
-      spark.sparkContext.textFile(hostedByMapPath).map(DoiBoostMappingUtil.toHostedByItem)
+      spark.sparkContext.textFile(hostedByMapPath).map(toHostedByItem)
     )
 
     doiBoostPublication
       .joinWith(hostedByDataset, doiBoostPublication("_1").equalTo(hostedByDataset("_1")), "left")
-      .map(DoiBoostMappingUtil.fixPublication)
+      .map(fixPublication)
       .map(p => (p.getId, p))
       .groupByKey(_._1)
       .reduceGroups((left, right) => {
@@ -138,10 +140,9 @@ object SparkGenerateDoiBoost {
           else {
             // Here Left and Right are not null
             // So we have to merge
-            val b1 = left._2
+            var b1 = left._2
             val b2 = right._2
-            b1.mergeFrom(b2)
-            b1.mergeOAFDataInfo(b2)
+            b1 = MergeUtils.mergeProject(b1, b2)
             val authors = AuthorMerger.mergeAuthor(b1.getAuthor, b2.getAuthor)
             b1.setAuthor(authors)
             if (b2.getId != null && b2.getId.nonEmpty)
@@ -198,24 +199,16 @@ object SparkGenerateDoiBoost {
         val affId: String =
           if (affiliation.GridId.isDefined)
             s"unresolved::grid::${affiliation.GridId.get.toLowerCase}"
-          else DoiBoostMappingUtil.generateMAGAffiliationId(affiliation.AffiliationId.toString)
+          else generateMAGAffiliationId(affiliation.AffiliationId.toString)
         val r: Relation = new Relation
         r.setSource(pub.getId)
         r.setTarget(affId)
         r.setRelType(ModelConstants.RESULT_ORGANIZATION)
         r.setRelClass(ModelConstants.HAS_AUTHOR_INSTITUTION)
         r.setSubRelType(ModelConstants.AFFILIATION)
-        r.setDataInfo(pub.getDataInfo)
-        r.setCollectedfrom(List(DoiBoostMappingUtil.createMAGCollectedFrom()).asJava)
-        val r1: Relation = new Relation
-        r1.setTarget(pub.getId)
-        r1.setSource(affId)
-        r1.setRelType(ModelConstants.RESULT_ORGANIZATION)
-        r1.setRelClass(ModelConstants.IS_AUTHOR_INSTITUTION_OF)
-        r1.setSubRelType(ModelConstants.AFFILIATION)
-        r1.setDataInfo(pub.getDataInfo)
-        r1.setCollectedfrom(List(DoiBoostMappingUtil.createMAGCollectedFrom()).asJava)
-        List(r, r1)
+        r.setProvenance(OafMapperUtils.getProvenance(pub.getCollectedfrom, dataInfo))
+
+        List(r)
       })(mapEncoderRel)
       .write
       .mode(SaveMode.Overwrite)
@@ -265,14 +258,14 @@ object SparkGenerateDoiBoost {
         val affiliation = item._2
         if (affiliation.GridId.isEmpty) {
           val o = new Organization
-          o.setCollectedfrom(List(DoiBoostMappingUtil.createMAGCollectedFrom()).asJava)
-          o.setDataInfo(DoiBoostMappingUtil.generateDataInfo())
-          o.setId(DoiBoostMappingUtil.generateMAGAffiliationId(affiliation.AffiliationId.toString))
+          o.setCollectedfrom(List(createMAGCollectedFrom()).asJava)
+          o.setDataInfo(entityDataInfo)
+          o.setId(generateMAGAffiliationId(affiliation.AffiliationId.toString))
           o.setOriginalId(List(affiliation.AffiliationId.toString).asJava)
           if (affiliation.DisplayName.nonEmpty)
-            o.setLegalname(DoiBoostMappingUtil.asField(affiliation.DisplayName.get))
+            o.setLegalname(affiliation.DisplayName.get)
           if (affiliation.OfficialPage.isDefined)
-            o.setWebsiteurl(DoiBoostMappingUtil.asField(affiliation.OfficialPage.get))
+            o.setWebsiteurl(affiliation.OfficialPage.get)
           o.setCountry(ModelConstants.UNKNOWN_COUNTRY)
           o
         } else

@@ -42,7 +42,7 @@ public class RelationAggregator extends Aggregator<Relation, Relation, Relation>
 			return b;
 		}
 
-		return MergeUtils.mergeRelation(b, a);
+		return MergeUtils.merge(b, a);
 	}
 
 	@Override

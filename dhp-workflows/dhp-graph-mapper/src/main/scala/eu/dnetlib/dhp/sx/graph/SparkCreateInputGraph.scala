@@ -131,10 +131,7 @@ object SparkCreateInputGraph {
     val ds: Dataset[T] = spark.read.load(sourcePath).as[T]
 
     ds.groupByKey(_.getId)
-      .reduceGroups { (x, y) =>
-        MergeUtils.mergeResult(x, y)
-        x
-      }
+      .reduceGroups { (x, y) => MergeUtils.merge(x, y) }
       .map(_._2)
       .write
       .mode(SaveMode.Overwrite)

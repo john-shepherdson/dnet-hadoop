@@ -1,8 +1,9 @@
 package eu.dnetlib.doiboost.crossref
 
+import com.google.common.collect.Lists
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf._
-import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactory, OafMapperUtils}
+import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactory, OafMapperUtils, PidType}
 import eu.dnetlib.dhp.utils.DHPUtils
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.DoiBoostMappingUtil._
@@ -105,17 +106,17 @@ case object Crossref2Oaf {
     result.setOriginalId(originalIds)
 
     // Add DataInfo
-    result.setDataInfo(generateDataInfo())
+    result.setDataInfo(entityDataInfo)
 
     result.setLastupdatetimestamp((json \ "indexed" \ "timestamp").extract[Long])
     result.setDateofcollection((json \ "indexed" \ "date-time").extract[String])
 
-    result.setCollectedfrom(List(createCrossrefCollectedFrom()).asJava)
+    result.setCollectedfrom(List(collectedFrom).asJava)
 
     // Publisher ( Name of work's publisher mapped into  Result/Publisher)
     val publisher = (json \ "publisher").extractOrElse[String](null)
     if (publisher != null && publisher.nonEmpty)
-      result.setPublisher(asField(publisher))
+      result.setPublisher(OafMapperUtils.publisher(publisher))
 
     // TITLE
     val mainTitles =
@@ -140,13 +141,13 @@ case object Crossref2Oaf {
 
     // DESCRIPTION
     val descriptionList =
-      for { JString(description) <- json \ "abstract" } yield asField(description)
+      for { JString(description) <- json \ "abstract" } yield description
     result.setDescription(descriptionList.asJava)
 
     // Source
     val sourceList = for {
       JString(source) <- json \ "source" if source != null && source.nonEmpty
-    } yield asField(source)
+    } yield source
     result.setSource(sourceList.asJava)
 
     //RELEVANT DATE Mapping
@@ -186,9 +187,9 @@ case object Crossref2Oaf {
       (json \ "issued" \ "date-parts").extract[List[List[Int]]]
     )
     if (StringUtils.isNotBlank(issuedDate)) {
-      result.setDateofacceptance(asField(issuedDate))
+      result.setDateofacceptance(issuedDate)
     } else {
-      result.setDateofacceptance(asField(createdDate.getValue))
+      result.setDateofacceptance(createdDate.getValue)
     }
     result.setRelevantdate(
       List(createdDate, postedDate, acceptedDate, publishedOnlineDate, publishedPrintDate)
@@ -223,8 +224,8 @@ case object Crossref2Oaf {
       JObject(license)                                    <- json \ "license"
       JField("URL", JString(lic))                         <- license
       JField("content-version", JString(content_version)) <- license
-    } yield (asField(lic), content_version)
-    val l = license.filter(d => StringUtils.isNotBlank(d._1.getValue))
+    } yield (OafMapperUtils.license(lic), content_version)
+    val l = license.filter(d => StringUtils.isNotBlank(d._1.getUrl))
     if (l.nonEmpty) {
       if (l exists (d => d._2.equals("vor"))) {
         for (d <- l) {
@@ -247,20 +248,18 @@ case object Crossref2Oaf {
         OafMapperUtils.qualifier(
           "0001",
           "peerReviewed",
-          ModelConstants.DNET_REVIEW_LEVELS,
           ModelConstants.DNET_REVIEW_LEVELS
         )
       )
     }
 
     instance.setAccessright(
-      decideAccessRight(instance.getLicense, result.getDateofacceptance.getValue)
+      decideAccessRight(instance.getLicense.getUrl, result.getDateofacceptance)
     )
     instance.setInstancetype(
       OafMapperUtils.qualifier(
         cobjCategory.substring(0, 4),
         cobjCategory.substring(5),
-        ModelConstants.DNET_PUBLICATION_RESOURCE,
         ModelConstants.DNET_PUBLICATION_RESOURCE
       )
     )
@@ -268,16 +267,15 @@ case object Crossref2Oaf {
       OafMapperUtils.qualifier(
         cobjCategory.substring(0, 4),
         cobjCategory.substring(5),
-        ModelConstants.DNET_PUBLICATION_RESOURCE,
         ModelConstants.DNET_PUBLICATION_RESOURCE
       )
     )
 
-    instance.setCollectedfrom(createCrossrefCollectedFrom())
+    instance.setCollectedfrom(collectedFrom)
     if (StringUtils.isNotBlank(issuedDate)) {
-      instance.setDateofacceptance(asField(issuedDate))
+      instance.setDateofacceptance(issuedDate)
     } else {
-      instance.setDateofacceptance(asField(createdDate.getValue))
+      instance.setDateofacceptance(createdDate.getValue)
     }
     val s: List[String] = List("https://doi.org/" + doi)
     //    val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null && p.toLowerCase().contains(doi.toLowerCase())).distinct
@@ -318,11 +316,10 @@ case object Crossref2Oaf {
     if (StringUtils.isNotBlank(orcid))
       a.setPid(
         List(
-          createSP(
+          OafMapperUtils.authorPid(
             orcid,
-            ModelConstants.ORCID_PENDING,
-            ModelConstants.DNET_PID_TYPES,
-            generateDataInfo()
+            OafMapperUtils.qualifier(ModelConstants.ORCID_PENDING, ModelConstants.ORCID_PENDING, ModelConstants.DNET_PID_TYPES),
+            dataInfo
           )
         ).asJava
       )
@@ -358,10 +355,7 @@ case object Crossref2Oaf {
     if (funderList.nonEmpty) {
       resultList = resultList ::: mappingFunderToRelations(
         funderList,
-        result.getId,
-        createCrossrefCollectedFrom(),
-        result.getDataInfo,
-        result.getLastupdatetimestamp
+        result.getId
       )
     }
 
@@ -370,16 +364,41 @@ case object Crossref2Oaf {
       case dataset: Dataset         => convertDataset(dataset)
     }
 
+    val doisReference: List[String] = for {
+      JObject(reference_json)          <- json \ "reference"
+      JField("DOI", JString(doi_json)) <- reference_json
+    } yield doi_json
+
+    if (doisReference != null && doisReference.nonEmpty) {
+      val citation_relations: List[Relation] = generateCitationRelations(doisReference, result)
+      resultList = resultList ::: citation_relations
+    }
     resultList = resultList ::: List(result)
     resultList
   }
 
+  private def createCiteRelation(sourceId: String, targetPid: String, targetPidType: String): List[Relation] = {
+
+    val targetId = IdentifierFactory.idFromPid("50", targetPidType, targetPid, true)
+
+    val rel = new Relation
+    rel.setSource(sourceId)
+    rel.setTarget(targetId)
+    rel.setRelType(ModelConstants.RESULT_RESULT)
+    rel.setRelClass(ModelConstants.CITES)
+    rel.setSubRelType(ModelConstants.CITATION)
+    rel.setProvenance(Lists.newArrayList(OafMapperUtils.getProvenance(collectedFrom, dataInfo)))
+
+    List(rel)
+  }
+
+  def generateCitationRelations(dois: List[String], result: Result): List[Relation] = {
+    dois.flatMap(doi => createCiteRelation(result.getId, doi, PidType.doi.toString))
+  }
+
   def mappingFunderToRelations(
     funders: List[mappingFunder],
-    sourceId: String,
-    cf: KeyValue,
-    di: DataInfo,
-    ts: Long
+    sourceId: String
   ): List[Relation] = {
 
     val queue = new mutable.Queue[Relation]
@@ -389,7 +408,6 @@ case object Crossref2Oaf {
       val tmp2 = StringUtils.substringBefore(tmp1, "/")
       logger.debug(s"From $award to $tmp2")
       tmp2
-
     }
 
     def extractECAward(award: String): String = {
@@ -407,11 +425,9 @@ case object Crossref2Oaf {
       r.setRelType(ModelConstants.RESULT_PROJECT)
       r.setRelClass(relClass)
       r.setSubRelType(ModelConstants.OUTCOME)
-      r.setCollectedfrom(List(cf).asJava)
-      r.setDataInfo(di)
-      r.setLastupdatetimestamp(ts)
-      r
 
+      r.setProvenance(Lists.newArrayList(OafMapperUtils.getProvenance(collectedFrom, dataInfo)))
+      r
     }
 
     def generateSimpleRelationFromAward(
@@ -446,6 +462,7 @@ case object Crossref2Oaf {
             case "10.13039/501100000781" =>
               generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
               generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
+              generateSimpleRelationFromAward(funder, "corda_____he", extractECAward)
             case "10.13039/100000001"    => generateSimpleRelationFromAward(funder, "nsf_________", a => a)
             case "10.13039/501100001665" => generateSimpleRelationFromAward(funder, "anr_________", a => a)
             case "10.13039/501100002341" => generateSimpleRelationFromAward(funder, "aka_________", a => a)
@@ -464,6 +481,13 @@ case object Crossref2Oaf {
               val targetId = getProjectId("cihr________", "1e5e62235d094afd01cd56e65112fc63")
               queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
               queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+
+            case "10.13039/100020031" =>
+              val targetId = getProjectId("tara________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+
+            case "10.13039/501100005416" => generateSimpleRelationFromAward(funder, "rcn_________", a => a)
             case "10.13039/501100002848" => generateSimpleRelationFromAward(funder, "conicytf____", a => a)
             case "10.13039/501100003448" => generateSimpleRelationFromAward(funder, "gsrt________", extractECAward)
             case "10.13039/501100010198" => generateSimpleRelationFromAward(funder, "sgov________", a => a)
@@ -487,6 +511,34 @@ case object Crossref2Oaf {
               val targetId = getProjectId("wt__________", "1e5e62235d094afd01cd56e65112fc63")
               queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
               queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            //ASAP
+            case "10.13039/100018231" => generateSimpleRelationFromAward(funder, "asap________", a => a)
+            //CHIST-ERA
+            case "10.13039/501100001942" =>
+              val targetId = getProjectId("chistera____", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            //HE
+            case "10.13039/100018693" | "10.13039/100018694" | "10.13039/100019188" | "10.13039/100019180" |
+                "10.13039/100018695" | "10.13039/100019185" | "10.13039/100019186" | "10.13039/100019187" =>
+              generateSimpleRelationFromAward(funder, "corda_____he", extractECAward)
+            //FCT
+            case "10.13039/501100001871" =>
+              generateSimpleRelationFromAward(funder, "fct_________", a => a)
+            //NHMRC
+            case "10.13039/501100000925" =>
+              generateSimpleRelationFromAward(funder, "nhmrc_______", a => a)
+            //NIH
+            case "10.13039/100000002" =>
+              generateSimpleRelationFromAward(funder, "nih_________", a => a)
+            //NWO
+            case "10.13039/501100003246" =>
+              generateSimpleRelationFromAward(funder, "nwo_________", a => a)
+            //UKRI
+            case "10.13039/100014013" | "10.13039/501100000267" | "10.13039/501100000268" | "10.13039/501100000269" |
+                "10.13039/501100000266" | "10.13039/501100006041" | "10.13039/501100000265" | "10.13039/501100000270" |
+                "10.13039/501100013589" | "10.13039/501100000271" =>
+              generateSimpleRelationFromAward(funder, "ukri________", a => a)
 
             case _ => logger.debug("no match for " + funder.DOI.get)
 
@@ -499,10 +551,11 @@ case object Crossref2Oaf {
             case "European Union's" =>
               generateSimpleRelationFromAward(funder, "corda__h2020", extractECAward)
               generateSimpleRelationFromAward(funder, "corda_______", extractECAward)
+              generateSimpleRelationFromAward(funder, "corda_____he", extractECAward)
             case "The French National Research Agency (ANR)" | "The French National Research Agency" =>
               generateSimpleRelationFromAward(funder, "anr_________", a => a)
             case "CONICYT, Programa de Formación de Capital Humano Avanzado" =>
-              generateSimpleRelationFromAward(funder, "conicytf____", extractECAward)
+              generateSimpleRelationFromAward(funder, "conicytf____", a => a)
             case "Wellcome Trust Masters Fellowship" =>
               generateSimpleRelationFromAward(funder, "wt__________", a => a)
               val targetId = getProjectId("wt__________", "1e5e62235d094afd01cd56e65112fc63")
@@ -531,11 +584,11 @@ case object Crossref2Oaf {
       if (ISBN.nonEmpty && containerTitles.nonEmpty) {
         val source = s"${containerTitles.head} ISBN: ${ISBN.head}"
         if (publication.getSource != null) {
-          val l: List[Field[String]] = publication.getSource.asScala.toList
-          val ll: List[Field[String]] = l ::: List(asField(source))
+          val l: List[String] = publication.getSource.asScala.toList
+          val ll: List[String] = l ::: List(source)
           publication.setSource(ll.asJava)
         } else
-          publication.setSource(List(asField(source)).asJava)
+          publication.setSource(List(source).asJava)
       }
     } else {
       // Mapping Journal
