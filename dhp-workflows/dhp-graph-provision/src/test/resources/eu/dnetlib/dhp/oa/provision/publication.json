@@ -621,7 +621,7 @@
           "trust": ""
         },
         "key": "10|CSC_________::a2b9ce8435390bcbfc05f3cae3948747",
-        "value": "VIRTA"
+        "value": "Bulletin of the National Technical University \"KhPI\" A series of \"Information and Modeling\""
       },
       "instancetype": {
         "classid": "0001",
@@ -1488,7 +1488,7 @@
     "issnLinking": "",
     "issnOnline": "",
     "issnPrinted": "0018-9383",
-    "name": "IEEE Transactions on Electron Devices",
+    "name": "IEEE Transactions on \"Electron Devices\"",
     "sp": "3884",
     "vol": "65"
   },
@@ -1557,7 +1557,7 @@
     "schemeid": "dnet:result_typologies",
     "schemename": "dnet:result_typologies"
   },
-  "source": [],
+  "source": [ { "value" : "Bulletin of the National Technical University \"KhPI\" A series of \"Information and Modeling\"; № 1 (3) (2020):" } ],
   "subject": [
     {
       "dataInfo": {

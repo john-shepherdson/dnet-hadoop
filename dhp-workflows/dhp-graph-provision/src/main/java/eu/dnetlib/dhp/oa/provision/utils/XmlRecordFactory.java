@@ -122,7 +122,8 @@ public class XmlRecordFactory implements Serializable {
 				.buildBody(
 					mainType, metadata, relations, listChildren(entity, je, templateFactory), listExtraInfo(entity));
 
-			return printXML(templateFactory.buildRecord(entity, schemaLocation, body), indent);
+			return templateFactory.buildRecord(entity, schemaLocation, body);
+			// return printXML(templateFactory.buildRecord(entity, schemaLocation, body), indent);
 		} catch (final Throwable e) {
 			throw new RuntimeException(String.format("error building record '%s'", entity.getId()), e);
 		}
