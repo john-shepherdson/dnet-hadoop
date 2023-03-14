@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import eu.dnetlib.dhp.common.Constants;
 import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableConsumer;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyTerm;
@@ -48,7 +49,9 @@ public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Obje
 					subject.getQualifier().setClassid(vocabularyId);
 					subject.getQualifier().setClassname(vocabulary.getName());
 				}
-			} else if (vocabularyId.equals(subject.getQualifier().getClassid())) {
+			} else if (vocabularyId.equals(subject.getQualifier().getClassid()) &&
+				Objects.nonNull(subject.getDataInfo()) &&
+				!"subject:fos".equals(subject.getDataInfo().getProvenanceaction())) {
 				Qualifier syn = vocabulary.getSynonymAsQualifier(subject.getValue());
 				VocabularyTerm term = vocabulary.getTerm(subject.getValue());
 				if (Objects.isNull(syn) && Objects.isNull(term)) {
