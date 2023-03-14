@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>eu.dnetlib.dhp</groupId>
+        <artifactId>dhp</artifactId>
+        <version>1.2.5-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>dhp-impact-indicators</artifactId>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <scm>
+        <url>https://github.com/athenarc/Bip-Ranker</url>
+        <connection>https://github.com/athenarc/Bip-Ranker.git</connection>
+    </scm>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-plugin</artifactId>
+                <version>1.8.1</version>
+                <configuration>
+                    <connectionType>connection</connectionType>
+                    <scmVersion>2</scmVersion>
+                    <scmVersionType>tag</scmVersionType>
+                    <checkoutDirectory>${project.build.directory}/../src/main/bip-ranker</checkoutDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
