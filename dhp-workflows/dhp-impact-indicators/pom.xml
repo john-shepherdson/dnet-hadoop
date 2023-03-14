@@ -20,7 +20,7 @@
 
     <scm>
         <url>https://github.com/athenarc/Bip-Ranker</url>
-        <connection>https://github.com/athenarc/Bip-Ranker.git</connection>
+        <connection>scm:git:https://github.com/athenarc/Bip-Ranker.git</connection>
     </scm>
 
     <build>
@@ -31,8 +31,8 @@
                 <version>1.8.1</version>
                 <configuration>
                     <connectionType>connection</connectionType>
-                    <scmVersion>2</scmVersion>
-                    <scmVersionType>tag</scmVersionType>
+                    <scmVersionType>tag</scmVersionType><!-- 'branch' can also be provided here -->
+                    <scmVersion>v1.0.0</scmVersion><!-- in case of scmVersionType == 'branch', this field points to the branch name -->
                     <checkoutDirectory>${project.build.directory}/../src/main/bip-ranker</checkoutDirectory>
                 </configuration>
             </plugin>
