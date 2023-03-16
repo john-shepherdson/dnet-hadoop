@@ -3,7 +3,10 @@ package eu.dnetlib.dhp.oa.graph.clean;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -17,12 +20,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -61,6 +68,24 @@ public class CleanGraphSparkJob {
 		String graphTableClassName = parser.get("graphTableClassName");
 		log.info("graphTableClassName: {}", graphTableClassName);
 
+		String contextId = parser.get("contextId");
+		log.info("contextId: {}", contextId);
+
+		String verifyParam = parser.get("verifyParam");
+		log.info("verifyParam: {}", verifyParam);
+
+		String datasourcePath = parser.get("hostedBy");
+		log.info("datasourcePath: {}", datasourcePath);
+
+		String country = parser.get("country");
+		log.info("country: {}", country);
+
+		String[] verifyCountryParam = parser.get("verifyCountryParam").split(";");
+		log.info("verifyCountryParam: {}", verifyCountryParam);
+
+		String collectedfrom = parser.get("collectedfrom");
+		log.info("collectedfrom: {}", collectedfrom);
+
 		Class<? extends OafEntity> entityClazz = (Class<? extends OafEntity>) Class.forName(graphTableClassName);
 
 		final ISLookUpService isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl);
@@ -72,7 +97,9 @@ public class CleanGraphSparkJob {
 			isSparkSessionManaged,
 			spark -> {
 				HdfsSupport.remove(outputPath, spark.sparkContext().hadoopConfiguration());
-				cleanGraphTable(spark, vocs, inputPath, entityClazz, outputPath);
+				cleanGraphTable(
+					spark, vocs, inputPath, entityClazz, outputPath, contextId, verifyParam, datasourcePath, country,
+					verifyCountryParam, collectedfrom);
 			});
 	}
 
@@ -81,7 +108,15 @@ public class CleanGraphSparkJob {
 		VocabularyGroup vocs,
 		String inputPath,
 		Class<T> clazz,
-		String outputPath) {
+		String outputPath, String contextId, String verifyParam, String datasourcePath, String country,
+		String[] verifyCountryParam, String collectedfrom) {
+
+		Set<String> hostedBy = Sets
+			.newHashSet(
+				spark
+					.read()
+					.textFile(datasourcePath)
+					.collectAsList());
 
 		final CleaningRuleMap mapping = CleaningRuleMap.create(vocs);
 
@@ -90,6 +125,13 @@ public class CleanGraphSparkJob {
 			.map((MapFunction<T, T>) value -> OafCleaner.apply(value, mapping), Encoders.bean(clazz))
 			.map((MapFunction<T, T>) value -> GraphCleaningFunctions.cleanup(value, vocs), Encoders.bean(clazz))
 			.filter((FilterFunction<T>) GraphCleaningFunctions::filter)
+			.map(
+				(MapFunction<T, T>) value -> GraphCleaningFunctions.cleanContext(value, contextId, verifyParam),
+				Encoders.bean(clazz))
+			.map(
+				(MapFunction<T, T>) value -> GraphCleaningFunctions
+					.cleanCountry(value, verifyCountryParam, hostedBy, collectedfrom, country),
+				Encoders.bean(clazz))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")

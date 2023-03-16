@@ -56,7 +56,7 @@ public class XmlRecordFactoryTest {
 
 		assertNotNull(doc);
 
-		//System.out.println(doc.asXML());
+		// System.out.println(doc.asXML());
 
 		assertEquals("0000-0001-9613-6638", doc.valueOf("//creator[@rank = '1']/@orcid"));
 		assertEquals("0000-0001-9613-6639", doc.valueOf("//creator[@rank = '1']/@orcid_pending"));
