@@ -49,4 +49,14 @@
             </plugin>
         </plugins>
     </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>dhp-aggregation</artifactId>
+            <version>${projectVersion}</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
 </project>
