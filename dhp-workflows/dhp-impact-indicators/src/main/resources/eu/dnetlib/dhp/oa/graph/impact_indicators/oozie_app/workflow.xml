@@ -552,11 +552,50 @@
 		</spark>
 		
 		<!-- Do this after finishing okay -->
-		<ok to="end" />
+		<ok to="deleteOutputPathForActionSet" />
 		<!-- Go there if we have an error -->
 		<error to="map-scores-fail" />
 		
-	</action>		
+	</action>	
+
+	    <action name="deleteOutputPathForActionSet">
+        <fs>
+            <delete path="${actionSetOutputPath}"/>
+            <mkdir path="${actionSetOutputPath}"/>
+            <!--
+			<delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+			--> 
+        </fs>
+        <ok to="createActionSet"/>
+        <error to="actionset-delete-fail"/>
+    </action>
+
+
+    <action name="createActionSet">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Produces the atomic action with the bip finder scores for publications</name>
+            <class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${bipScorePath}</arg>
+            <arg>--outputPath</arg><arg>${actionSetOutputPath}</arg>
+        </spark>
+        <ok to="end"/>
+        <error to="actionset-creation-fail"/>
+    </action>
+	
 	
 
 	<!-- TODO: end the workflow-->
@@ -596,5 +635,13 @@
 	<kill name="map-scores-fail">
 		<message>Mapping scores to DOIs failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
 	</kill>	
+
+	<kill name="actionset-delete-fail">
+		<message>Deleting output path for actionsets failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>	
+
+	<kill name="actionset-creation-fail">
+		<message>ActionSet creation failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>		
 
 </workflow-app>
