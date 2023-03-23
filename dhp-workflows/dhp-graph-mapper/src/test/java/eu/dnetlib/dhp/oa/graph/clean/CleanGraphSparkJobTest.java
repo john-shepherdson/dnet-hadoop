@@ -237,7 +237,7 @@ public class CleanGraphSparkJobTest {
 
         final String id = "50|CSC_________::2250a70c903c6ac6e4c01438259e9375";
 
-        Publication p_in = read(spark, graphOutputPath.toString() + "/publication", Publication.class)
+        Publication p_in = read(spark, graphInputPath.toString() + "/publication", Publication.class)
                 .filter(String.format("id = '%s'", id))
                 .first();
 
@@ -437,7 +437,7 @@ public class CleanGraphSparkJobTest {
         Dataset<Publication> pubs = read(spark, graphOutputPath.toString() + "/publication", Publication.class)
                 .filter((FilterFunction<Publication>) p1 -> StringUtils.endsWith(p1.getId(), "_ctx"));
 
-        Assertions.assertEquals(7, pubs.count());
+        assertEquals(7, pubs.count());
 
         // original result with sobigdata context and gcube as starting string in the main title for the publication
         assertEquals(
@@ -730,7 +730,7 @@ public class CleanGraphSparkJobTest {
         final Dataset<Publication> pubs_out = read(spark, graphOutputPath.toString() + "/publication", Publication.class)
                 .filter((FilterFunction<Publication>) p -> StringUtils.endsWith(p.getId(), "_country"));
 
-        Assertions.assertEquals(7, pubs_out.count());
+        assertEquals(8, pubs_out.count());
 
         // original result with NL country and doi starting with Mendely prefix, but not collectedfrom NARCIS
         assertEquals(
@@ -765,7 +765,7 @@ public class CleanGraphSparkJobTest {
         assertEquals(
                 0,
                 pubs_out
-                                .filter((FilterFunction<Publication>) p -> p.getId().equals("50|DansKnawCris::3c81248c335f0aa07e06817e_country"))
+                                .filter((FilterFunction<Publication>) p -> p.getId().equals("50|DansKnawCris::3c81248c335f0aa07e06817d_country"))
                                 .first()
                                 .getCountry()
                                 .size());
