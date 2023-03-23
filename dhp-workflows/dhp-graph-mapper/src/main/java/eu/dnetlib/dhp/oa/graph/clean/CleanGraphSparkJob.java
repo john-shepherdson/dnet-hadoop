@@ -292,7 +292,7 @@ public class CleanGraphSparkJob {
 
 			private void updateResult(T res, IdCfHbMapping m) {
 				if (Objects.nonNull(m)) {
-					res.getCollectedfrom().forEach(kv -> updateKeyValue(kv, m));
+					filter(res.getCollectedfrom()).forEach(kv -> updateKeyValue(kv, m));
 					((Result) res).getInstance().forEach(i -> {
 						updateKeyValue(i.getHostedby(), m);
 						updateKeyValue(i.getCollectedfrom(), m);
@@ -300,8 +300,14 @@ public class CleanGraphSparkJob {
 				}
 			}
 
+			private Stream<KeyValue> filter(List<KeyValue> kvs) {
+				return kvs
+						.stream()
+						.filter(kv -> StringUtils.isNotBlank(kv.getKey()) && StringUtils.isNotBlank(kv.getValue()));
+			}
+
 			private void updateKeyValue(final KeyValue kv, final IdCfHbMapping a) {
-				if (kv.getKey().equals(a.getCfhb())) {
+				if (Objects.nonNull(kv) && Objects.nonNull(kv.getKey()) && kv.getKey().equals(a.getCfhb())) {
 					kv.setKey(a.getMasterId());
 					kv.setValue(a.getMasterName());
 				}
