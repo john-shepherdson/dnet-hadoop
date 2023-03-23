@@ -4,10 +4,8 @@ package eu.dnetlib.dhp.oa.graph.clean;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -29,8 +27,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.common.action.model.MasterDuplicate;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.oa.graph.clean.cfhb.IdCfHbMapping;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
@@ -38,6 +34,7 @@ import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
 
@@ -55,17 +52,17 @@ public class CleanGraphSparkJob {
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
-				.toString(
-						CleanGraphSparkJob.class
-								.getResourceAsStream(
-										"/eu/dnetlib/dhp/oa/graph/input_clean_graph_parameters.json"));
+			.toString(
+				CleanGraphSparkJob.class
+					.getResourceAsStream(
+						"/eu/dnetlib/dhp/oa/graph/input_clean_graph_parameters.json"));
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
 
 		Boolean isSparkSessionManaged = Optional
-				.ofNullable(parser.get("isSparkSessionManaged"))
-				.map(Boolean::valueOf)
-				.orElse(Boolean.TRUE);
+			.ofNullable(parser.get("isSparkSessionManaged"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		String isLookupUrl = parser.get("isLookupUrl");
@@ -76,7 +73,8 @@ public class CleanGraphSparkJob {
 		new CleanGraphSparkJob(parser).run(isSparkSessionManaged, isLookup);
 	}
 
-	public void run(Boolean isSparkSessionManaged, ISLookUpService isLookUpService) throws ISLookUpException, ClassNotFoundException {
+	public void run(Boolean isSparkSessionManaged, ISLookUpService isLookUpService)
+		throws ISLookUpException, ClassNotFoundException {
 
 		String inputPath = parser.get("inputPath");
 		log.info("inputPath: {}", inputPath);
@@ -99,9 +97,10 @@ public class CleanGraphSparkJob {
 		String country = parser.get("country");
 		log.info("country: {}", country);
 
-		String[] verifyCountryParam = Optional.ofNullable(parser.get("verifyCountryParam"))
-				.map(s -> s.split(";"))
-				.orElse(new String[]{});
+		String[] verifyCountryParam = Optional
+			.ofNullable(parser.get("verifyCountryParam"))
+			.map(s -> s.split(";"))
+			.orElse(new String[] {});
 		log.info("verifyCountryParam: {}", verifyCountryParam);
 
 		String collectedfrom = parser.get("collectedfrom");
@@ -111,9 +110,9 @@ public class CleanGraphSparkJob {
 		log.info("masterDuplicatePath: {}", dsMasterDuplicatePath);
 
 		Boolean deepClean = Optional
-				.ofNullable(parser.get("deepClean"))
-				.map(Boolean::valueOf)
-				.orElse(Boolean.FALSE);
+			.ofNullable(parser.get("deepClean"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.FALSE);
 		log.info("deepClean: {}", deepClean);
 
 		Class<? extends OafEntity> entityClazz = (Class<? extends OafEntity>) Class.forName(graphTableClassName);
@@ -123,14 +122,14 @@ public class CleanGraphSparkJob {
 		SparkConf conf = new SparkConf();
 		conf.setAppName(CleanGraphSparkJob.class.getSimpleName() + "#" + entityClazz.getSimpleName());
 		runWithSparkSession(
-				conf,
-				isSparkSessionManaged,
-				spark -> {
-					HdfsSupport.remove(outputPath, spark.sparkContext().hadoopConfiguration());
-					cleanGraphTable(
-							spark, vocs, inputPath, entityClazz, outputPath, contextId, verifyParam, datasourcePath, country,
-							verifyCountryParam, collectedfrom, dsMasterDuplicatePath, deepClean);
-				});
+			conf,
+			isSparkSessionManaged,
+			spark -> {
+				HdfsSupport.remove(outputPath, spark.sparkContext().hadoopConfiguration());
+				cleanGraphTable(
+					spark, vocs, inputPath, entityClazz, outputPath, contextId, verifyParam, datasourcePath, country,
+					verifyCountryParam, collectedfrom, dsMasterDuplicatePath, deepClean);
+			});
 	}
 
 	private static <T extends Oaf> void cleanGraphTable(
@@ -172,33 +171,33 @@ public class CleanGraphSparkJob {
 				.map(as(clazz), Encoders.bean(clazz))
 				.flatMap(flattenCfHbFn(), Encoders.bean(IdCfHbMapping.class));
 
-			// set the EMPTY master ID/NAME and save it
-			resolved
+			// set the EMPTY master ID/NAME
+			Dataset<IdCfHbMapping> resolvedDs = resolved
 				.joinWith(md, resolved.col("cfhb").equalTo(md.col("duplicateId")))
 				.map(asIdCfHbMapping(), Encoders.bean(IdCfHbMapping.class))
 				.filter((FilterFunction<IdCfHbMapping>) m -> Objects.nonNull(m.getMasterId()));
 
 			// load the hostedby mapping
 			Set<String> hostedBy = Sets
-					.newHashSet(
-							spark
-									.read()
-									.textFile(datasourcePath)
-									.collectAsList());
+				.newHashSet(
+					spark
+						.read()
+						.textFile(datasourcePath)
+						.collectAsList());
 
 			// perform the deep cleaning steps
 			final Dataset<T> cleaned_deep = cleaned_basic
-					.map(
-							(MapFunction<T, T>) value -> GraphCleaningFunctions.cleanContext(value, contextId, verifyParam),
-							Encoders.bean(clazz))
-					.map(
-							(MapFunction<T, T>) value -> GraphCleaningFunctions
-									.cleanCountry(value, verifyCountryParam, hostedBy, collectedfrom, country),
-							Encoders.bean(clazz));
+				.map(
+					(MapFunction<T, T>) value -> GraphCleaningFunctions.cleanContext(value, contextId, verifyParam),
+					Encoders.bean(clazz))
+				.map(
+					(MapFunction<T, T>) value -> GraphCleaningFunctions
+						.cleanCountry(value, verifyCountryParam, hostedBy, collectedfrom, country),
+					Encoders.bean(clazz));
 
 			// Join the results with the resolved CF|HB mapping, apply the mapping and save it
 			cleaned_deep
-				.joinWith(resolved, cleaned_deep.col("id").equalTo(resolved.col("resultId")), "left")
+				.joinWith(resolvedDs, cleaned_deep.col("id").equalTo(resolvedDs.col("resultId")), "left")
 				.groupByKey(
 					(MapFunction<Tuple2<T, IdCfHbMapping>, String>) t -> ((Result) t._1()).getId(), Encoders.STRING())
 				.mapGroups(getMapGroupsFunction(), Encoders.bean(clazz))
@@ -302,8 +301,8 @@ public class CleanGraphSparkJob {
 
 			private Stream<KeyValue> filter(List<KeyValue> kvs) {
 				return kvs
-						.stream()
-						.filter(kv -> StringUtils.isNotBlank(kv.getKey()) && StringUtils.isNotBlank(kv.getValue()));
+					.stream()
+					.filter(kv -> StringUtils.isNotBlank(kv.getKey()) && StringUtils.isNotBlank(kv.getValue()));
 			}
 
 			private void updateKeyValue(final KeyValue kv, final IdCfHbMapping a) {
