@@ -1,12 +1,12 @@
 
 package eu.dnetlib.dhp.common;
 
+import static com.mongodb.client.model.Sorts.descending;
+
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +38,26 @@ public class MdstoreClient implements Closeable {
 		this.db = getDb(client, dbName);
 	}
 
+	private Long parseTimestamp(Document f) {
+		if (f == null || !f.containsKey("timestamp"))
+			return null;
+
+		Object ts = f.get("timestamp");
+
+		return Long.parseLong(ts.toString());
+	}
+
+	public Long getLatestTimestamp(final String collectionId) {
+		MongoCollection<Document> collection = db.getCollection(collectionId);
+		FindIterable<Document> result = collection.find().sort(descending("timestamp")).limit(1);
+		if (result == null) {
+			return null;
+		}
+
+		Document f = result.first();
+		return parseTimestamp(f);
+	}
+
 	public MongoCollection<Document> mdStore(final String mdId) {
 		BasicDBObject query = (BasicDBObject) QueryBuilder.start("mdId").is(mdId).get();
 
@@ -52,6 +72,16 @@ public class MdstoreClient implements Closeable {
 		log.info("currentId: {}", currentId);
 
 		return getColl(db, currentId, true);
+	}
+
+	public List<MDStoreInfo> mdStoreWithTimestamp(final String mdFormat, final String mdLayout,
+		final String mdInterpretation) {
+		Map<String, String> res = validCollections(mdFormat, mdLayout, mdInterpretation);
+		return res
+			.entrySet()
+			.stream()
+			.map(e -> new MDStoreInfo(e.getKey(), e.getValue(), getLatestTimestamp(e.getValue())))
+			.collect(Collectors.toList());
 	}
 
 	public Map<String, String> validCollections(

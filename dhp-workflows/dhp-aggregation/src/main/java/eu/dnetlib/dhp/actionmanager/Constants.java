@@ -22,6 +22,7 @@ public class Constants {
 	public static final String DOI_CLASSNAME = "Digital Object Identifier";
 
 	public static final String DEFAULT_DELIMITER = ",";
+	public static final String DEFAULT_FOS_DELIMITER = "\t";
 
 	public static final String UPDATE_DATA_INFO_TYPE = "update";
 	public static final String UPDATE_SUBJECT_FOS_CLASS_ID = "subject:fos";
@@ -61,7 +62,7 @@ public class Constants {
 
 	public static Subject getSubject(String sbj, String classid, String classname,
 		String diqualifierclassid) {
-		if (sbj.equals(NULL))
+		if (sbj == null || sbj.equals(NULL))
 			return null;
 		Subject s = new Subject();
 		s.setValue(sbj);

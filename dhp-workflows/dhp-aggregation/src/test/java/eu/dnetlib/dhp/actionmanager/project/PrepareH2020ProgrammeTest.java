@@ -73,7 +73,7 @@ public class PrepareH2020ProgrammeTest {
 					"-isSparkSessionManaged",
 					Boolean.FALSE.toString(),
 					"-programmePath",
-					getClass().getResource("/eu/dnetlib/dhp/actionmanager/project/whole_programme.json.gz").getPath(),
+					getClass().getResource("/eu/dnetlib/dhp/actionmanager/project/h2020_programme.json.gz").getPath(),
 					"-outputPath",
 					workingDir.toString() + "/preparedProgramme"
 				});
@@ -84,7 +84,7 @@ public class PrepareH2020ProgrammeTest {
 			.textFile(workingDir.toString() + "/preparedProgramme")
 			.map(item -> OBJECT_MAPPER.readValue(item, CSVProgramme.class));
 
-		Assertions.assertEquals(277, tmp.count());
+		Assertions.assertEquals(279, tmp.count());
 
 		Dataset<CSVProgramme> verificationDataset = spark.createDataset(tmp.rdd(), Encoders.bean(CSVProgramme.class));
 

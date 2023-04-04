@@ -122,7 +122,8 @@ public class XmlRecordFactory implements Serializable {
 				.buildBody(
 					mainType, metadata, relations, listChildren(entity, je, templateFactory), listExtraInfo(entity));
 
-			return printXML(templateFactory.buildRecord(entity, schemaLocation, body), indent);
+			return templateFactory.buildRecord(entity, schemaLocation, body);
+			// return printXML(templateFactory.buildRecord(entity, schemaLocation, body), indent);
 		} catch (final Throwable e) {
 			throw new RuntimeException(String.format("error building record '%s'", entity.getId()), e);
 		}
@@ -206,12 +207,22 @@ public class XmlRecordFactory implements Serializable {
 						.map(p -> XmlSerializationUtils.mapStructuredProperty("pid", p))
 						.collect(Collectors.toList()));
 		}
+		if (entity.getMeasures() != null) {
+			metadata.addAll(measuresAsXml(entity.getMeasures()));
+		}
 
 		if (ModelSupport.isResult(type)) {
 			final Result r = (Result) entity;
 
-			if (r.getMeasures() != null) {
-				metadata.addAll(measuresAsXml(r.getMeasures()));
+			if (r.getFulltext() != null) {
+				metadata
+					.addAll(
+						r
+							.getFulltext()
+							.stream()
+							.filter(Objects::nonNull)
+							.map(c -> XmlSerializationUtils.asXmlElement("fulltext", c.getValue()))
+							.collect(Collectors.toList()));
 			}
 
 			if (r.getEoscifguidelines() != null) {

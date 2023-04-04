@@ -47,13 +47,16 @@ public class XmlRecordFactoryTest {
 
 		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
 
+		System.out.println(xml);
+
 		assertNotNull(xml);
 
 		final Document doc = new SAXReader().read(new StringReader(xml));
+		doc.normalize();
 
 		assertNotNull(doc);
 
-		System.out.println(doc.asXML());
+		//System.out.println(doc.asXML());
 
 		assertEquals("0000-0001-9613-6638", doc.valueOf("//creator[@rank = '1']/@orcid"));
 		assertEquals("0000-0001-9613-6639", doc.valueOf("//creator[@rank = '1']/@orcid_pending"));
