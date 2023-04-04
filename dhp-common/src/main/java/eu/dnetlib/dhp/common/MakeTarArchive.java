@@ -45,16 +45,24 @@ public class MakeTarArchive implements Serializable {
 			.map(Integer::valueOf)
 			.orElse(10);
 
+		final boolean rename = Optional
+			.ofNullable(parser.get("rename"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.FALSE);
+
 		Configuration conf = new Configuration();
 		conf.set("fs.defaultFS", hdfsNameNode);
 
 		FileSystem fileSystem = FileSystem.get(conf);
 
-		makeTArArchive(fileSystem, inputPath, outputPath, gBperSplit);
+		makeTArArchive(fileSystem, inputPath, outputPath, gBperSplit, rename);
 
 	}
-
-	public static void makeTArArchive(FileSystem fileSystem, String inputPath, String outputPath, int gBperSplit)
+	public static void makeTArArchive(FileSystem fileSystem, String inputPath, String outputPath, int gBperSplit) throws IOException{
+		makeTArArchive(fileSystem,inputPath,outputPath,gBperSplit,false);
+	}
+	public static void makeTArArchive(FileSystem fileSystem, String inputPath, String outputPath, int gBperSplit,
+		boolean rename)
 		throws IOException {
 
 		RemoteIterator<LocatedFileStatus> dirIterator = fileSystem.listLocatedStatus(new Path(inputPath));
@@ -66,7 +74,7 @@ public class MakeTarArchive implements Serializable {
 			String pathString = p.toString();
 			String entity = pathString.substring(pathString.lastIndexOf("/") + 1);
 
-			MakeTarArchive.tarMaxSize(fileSystem, pathString, outputPath + "/" + entity, entity, gBperSplit);
+			MakeTarArchive.tarMaxSize(fileSystem, pathString, outputPath + "/" + entity, entity, gBperSplit, rename);
 		}
 	}
 
@@ -79,7 +87,8 @@ public class MakeTarArchive implements Serializable {
 		return new TarArchiveOutputStream(fileSystem.create(hdfsWritePath).getWrappedStream());
 	}
 
-	private static void write(FileSystem fileSystem, String inputPath, String outputPath, String dirName)
+	private static void write(FileSystem fileSystem, String inputPath, String outputPath, String dirName,
+		boolean rename)
 		throws IOException {
 
 		Path hdfsWritePath = new Path(outputPath);
@@ -95,20 +104,20 @@ public class MakeTarArchive implements Serializable {
 					new Path(inputPath), true);
 
 			while (iterator.hasNext()) {
-				writeCurrentFile(fileSystem, dirName, iterator, ar, 0);
+				writeCurrentFile(fileSystem, dirName, iterator, ar, 0, rename);
 			}
 
 		}
 	}
 
 	public static void tarMaxSize(FileSystem fileSystem, String inputPath, String outputPath, String dir_name,
-		int gBperSplit) throws IOException {
+		int gBperSplit, boolean rename) throws IOException {
 		final long bytesPerSplit = 1024L * 1024L * 1024L * gBperSplit;
 
 		long sourceSize = fileSystem.getContentSummary(new Path(inputPath)).getSpaceConsumed();
 
 		if (sourceSize < bytesPerSplit) {
-			write(fileSystem, inputPath, outputPath + ".tar", dir_name);
+			write(fileSystem, inputPath, outputPath + ".tar", dir_name, rename);
 		} else {
 			int partNum = 0;
 
@@ -121,7 +130,8 @@ public class MakeTarArchive implements Serializable {
 
 					long currentSize = 0;
 					while (next && currentSize < bytesPerSplit) {
-						currentSize = writeCurrentFile(fileSystem, dir_name, fileStatusListIterator, ar, currentSize);
+						currentSize = writeCurrentFile(
+							fileSystem, dir_name, fileStatusListIterator, ar, currentSize, rename);
 						next = fileStatusListIterator.hasNext();
 
 					}
@@ -134,7 +144,7 @@ public class MakeTarArchive implements Serializable {
 
 	private static long writeCurrentFile(FileSystem fileSystem, String dirName,
 		RemoteIterator<LocatedFileStatus> fileStatusListIterator,
-		TarArchiveOutputStream ar, long currentSize) throws IOException {
+		TarArchiveOutputStream ar, long currentSize, boolean rename) throws IOException {
 		LocatedFileStatus fileStatus = fileStatusListIterator.next();
 
 		Path p = fileStatus.getPath();
@@ -148,6 +158,11 @@ public class MakeTarArchive implements Serializable {
 				}
 				name = tmp;
 			}
+			if (rename) {
+				if (name.endsWith(".txt.gz"))
+					name = name.replace(".txt.gz", ".json.gz");
+			}
+
 			TarArchiveEntry entry = new TarArchiveEntry(dirName + "/" + name);
 			entry.setSize(fileStatus.getLen());
 			currentSize += fileStatus.getLen();
