@@ -26,6 +26,7 @@ public class AuthorsMatch extends AbstractComparator {
     private double FULLNAME_THRESHOLD;
     private String MODE; //full or surname
     private int SIZE_THRESHOLD;
+    private String TYPE; //count or percentage
     private int common;
 
     public AuthorsMatch(Map<String, String> params){
@@ -37,6 +38,7 @@ public class AuthorsMatch extends AbstractComparator {
         NAME_THRESHOLD = Double.parseDouble(params.getOrDefault("name_th", "0.95"));
         FULLNAME_THRESHOLD = Double.parseDouble(params.getOrDefault("fullname_th", "0.9"));
         SIZE_THRESHOLD = Integer.parseInt(params.getOrDefault("size_th", "20"));
+        TYPE = params.getOrDefault("type", "percentage");
         common = 0;
     }
 
@@ -123,7 +125,12 @@ public class AuthorsMatch extends AbstractComparator {
         //normalization factor to compute the score
         int normFactor = aList.size() == bList.size() ? aList.size() : (aList.size() + bList.size() - common);
 
-        return (double)common / normFactor;
+        if(TYPE.equals("percentage")) {
+            return (double) common / normFactor;
+        }
+        else {
+            return (double) common;
+        }
     }
 
     public boolean compareSurname(Person p1, Person p2) {
