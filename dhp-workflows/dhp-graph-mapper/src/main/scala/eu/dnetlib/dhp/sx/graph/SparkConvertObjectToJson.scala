@@ -58,7 +58,7 @@ object SparkConvertObjectToJson {
       case "scholix" =>
         log.info("Serialize Scholix")
         val d: Dataset[Scholix] = spark.read.load(sourcePath).as[Scholix]
-//        val u: Dataset[Scholix] = spark.read.load(s"$scholixUpdatePath/scholix").as[Scholix]
+        val u: Dataset[Scholix] = spark.read.load(s"$scholixUpdatePath/scholix").as[Scholix]
         if (maxPidNumberFilter != null && toInt(maxPidNumberFilter).isDefined) {
           val mp = toInt(maxPidNumberFilter).get
           d

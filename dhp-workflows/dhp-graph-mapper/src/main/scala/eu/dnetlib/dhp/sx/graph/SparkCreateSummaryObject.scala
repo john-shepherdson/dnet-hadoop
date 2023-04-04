@@ -34,7 +34,6 @@ object SparkCreateSummaryObject {
     log.info(s"targetPath  -> $targetPath")
 
     implicit val resultEncoder: Encoder[Result] = Encoders.kryo[Result]
-    implicit val oafEncoder: Encoder[Oaf] = Encoders.kryo[Oaf]
 
     implicit val summaryEncoder: Encoder[ScholixSummary] = Encoders.kryo[ScholixSummary]
 
