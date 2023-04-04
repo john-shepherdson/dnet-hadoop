@@ -149,33 +149,28 @@ public class CleanGraphSparkJob {
 			.map((MapFunction<T, T>) value -> GraphCleaningFunctions.cleanup(value, vocs), Encoders.bean(clazz))
 			.filter((FilterFunction<T>) GraphCleaningFunctions::filter);
 
+		// read the master-duplicate tuples
+		Dataset<MasterDuplicate> md = spark
+			.read()
+			.textFile(dsMasterDuplicatePath)
+			.map(as(MasterDuplicate.class), Encoders.bean(MasterDuplicate.class));
+
+		// prepare the resolved CF|HB references with the corresponding EMPTY master ID
+		Dataset<IdCfHbMapping> resolved = spark
+			.read()
+			.textFile(inputPath)
+			.map(as(clazz), Encoders.bean(clazz))
+			.flatMap(flattenCfHbFn(), Encoders.bean(IdCfHbMapping.class));
+
 		if (Boolean.FALSE.equals(deepClean)) {
-			cleaned_basic
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression", "gzip")
-				.json(outputPath);
+
+			if (Boolean.TRUE.equals(ModelSupport.isSubClass(clazz, Result.class))) {
+				save(fixCFHB(clazz, cleaned_basic, md, resolved), outputPath);
+			} else {
+				save(cleaned_basic, outputPath);
+			}
 
 		} else if (Boolean.TRUE.equals(ModelSupport.isSubClass(clazz, Result.class))) {
-
-			// read the master-duplicate tuples
-			Dataset<MasterDuplicate> md = spark
-				.read()
-				.textFile(dsMasterDuplicatePath)
-				.map(as(MasterDuplicate.class), Encoders.bean(MasterDuplicate.class));
-
-			// prepare the resolved CF|HB references with the corresponding EMPTY master ID
-			Dataset<IdCfHbMapping> resolved = spark
-				.read()
-				.textFile(inputPath)
-				.map(as(clazz), Encoders.bean(clazz))
-				.flatMap(flattenCfHbFn(), Encoders.bean(IdCfHbMapping.class));
-
-			// set the EMPTY master ID/NAME
-			Dataset<IdCfHbMapping> resolvedDs = resolved
-				.joinWith(md, resolved.col("cfhb").equalTo(md.col("duplicateId")))
-				.map(asIdCfHbMapping(), Encoders.bean(IdCfHbMapping.class))
-				.filter((FilterFunction<IdCfHbMapping>) m -> Objects.nonNull(m.getMasterId()));
 
 			// load the hostedby mapping
 			Set<String> hostedBy = Sets
@@ -186,7 +181,7 @@ public class CleanGraphSparkJob {
 						.collectAsList());
 
 			// perform the deep cleaning steps
-			final Dataset<T> cleaned_deep = cleaned_basic
+			final Dataset<T> cleaned_deep = fixCFHB(clazz, cleaned_basic, md, resolved)
 				.map(
 					(MapFunction<T, T>) value -> GraphCleaningFunctions.cleanContext(value, contextId, verifyParam),
 					Encoders.bean(clazz))
@@ -195,17 +190,32 @@ public class CleanGraphSparkJob {
 						.cleanCountry(value, verifyCountryParam, hostedBy, collectedfrom, country),
 					Encoders.bean(clazz));
 
-			// Join the results with the resolved CF|HB mapping, apply the mapping and save it
-			cleaned_deep
-				.joinWith(resolvedDs, cleaned_deep.col("id").equalTo(resolvedDs.col("resultId")), "left")
-				.groupByKey(
-					(MapFunction<Tuple2<T, IdCfHbMapping>, String>) t -> ((Result) t._1()).getId(), Encoders.STRING())
-				.mapGroups(getMapGroupsFunction(), Encoders.bean(clazz))
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression", "gzip")
-				.json(outputPath);
+			save(cleaned_deep, outputPath);
 		}
+	}
+
+	private static <T extends Oaf> void save(final Dataset<T> dataset, final String outputPath) {
+		dataset
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(outputPath);
+	}
+
+	private static <T extends Oaf> Dataset<T> fixCFHB(Class<T> clazz, Dataset<T> results, Dataset<MasterDuplicate> md,
+		Dataset<IdCfHbMapping> resolved) {
+
+		// set the EMPTY master ID/NAME
+		Dataset<IdCfHbMapping> resolvedDs = resolved
+			.joinWith(md, resolved.col("cfhb").equalTo(md.col("duplicateId")))
+			.map(asIdCfHbMapping(), Encoders.bean(IdCfHbMapping.class))
+			.filter((FilterFunction<IdCfHbMapping>) m -> Objects.nonNull(m.getMasterId()));
+
+		return results
+			.joinWith(resolvedDs, results.col("id").equalTo(resolvedDs.col("resultId")), "left")
+			.groupByKey(
+				(MapFunction<Tuple2<T, IdCfHbMapping>, String>) t -> ((Result) t._1()).getId(), Encoders.STRING())
+			.mapGroups(getMapGroupsFunction(), Encoders.bean(clazz));
 	}
 
 	private static <T extends Oaf> Dataset<T> readTableFromPath(

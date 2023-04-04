@@ -165,7 +165,8 @@ public class CleanGraphSparkJobTest {
 					"--outputPath", graphOutputPath + "/relation",
 					"--isLookupUrl", "lookupurl",
 					"--graphTableClassName", Relation.class.getCanonicalName(),
-					"--deepClean", "false"
+					"--deepClean", "false",
+					"--masterDuplicatePath", dsMasterDuplicatePath,
 				})).run(false, isLookUpService);
 
 		spark
@@ -262,7 +263,8 @@ public class CleanGraphSparkJobTest {
 					"--outputPath", graphOutputPath + "/publication",
 					"--isLookupUrl", "lookupurl",
 					"--graphTableClassName", Publication.class.getCanonicalName(),
-					"--deepClean", "false"
+					"--deepClean", "false",
+					"--masterDuplicatePath", dsMasterDuplicatePath,
 				})).run(false, isLookUpService);
 
 		Publication p = read(spark, graphOutputPath + "/publication", Publication.class)
@@ -413,7 +415,8 @@ public class CleanGraphSparkJobTest {
 					"--outputPath", graphOutputPath + "/publication",
 					"--isLookupUrl", "lookupurl",
 					"--graphTableClassName", Publication.class.getCanonicalName(),
-					"--deepClean", "false"
+					"--deepClean", "false",
+					"--masterDuplicatePath", dsMasterDuplicatePath,
 				})).run(false, isLookUpService);
 
 		Dataset<Publication> p = read(spark, graphOutputPath + "/publication", Publication.class)

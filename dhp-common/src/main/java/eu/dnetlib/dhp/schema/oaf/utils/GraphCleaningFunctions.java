@@ -16,6 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.sisyphsu.dateparser.DateParserUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -41,30 +43,33 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	public static <T extends Oaf> T cleanContext(T value, String contextId, String verifyParam) {
 		if (ModelSupport.isSubClass(value, Result.class)) {
 			final Result res = (Result) value;
-			if (res
-				.getTitle()
-				.stream()
-				.filter(
-					t -> t
-						.getQualifier()
-						.getClassid()
-						.equalsIgnoreCase(ModelConstants.MAIN_TITLE_QUALIFIER.getClassid()))
-				.noneMatch(t -> t.getValue().toLowerCase().startsWith(verifyParam.toLowerCase()))) {
-				return (T) res;
+			if (shouldCleanContext(res, verifyParam)) {
+				res
+					.setContext(
+						res
+							.getContext()
+							.stream()
+							.filter(c -> !StringUtils.startsWith(c.getId().toLowerCase(), contextId))
+							.collect(Collectors.toList()));
 			}
-			res
-				.setContext(
-					res
-						.getContext()
-						.stream()
-						.filter(
-							c -> !c.getId().split("::")[0]
-								.equalsIgnoreCase(contextId))
-						.collect(Collectors.toList()));
 			return (T) res;
 		} else {
 			return value;
 		}
+	}
+
+	private static boolean shouldCleanContext(Result res, String verifyParam) {
+		boolean titleMatch = res
+			.getTitle()
+			.stream()
+			.filter(
+				t -> t
+					.getQualifier()
+					.getClassid()
+					.equalsIgnoreCase(ModelConstants.MAIN_TITLE_QUALIFIER.getClassid()))
+			.anyMatch(t -> t.getValue().toLowerCase().startsWith(verifyParam.toLowerCase()));
+
+		return titleMatch && Objects.nonNull(res.getContext());
 	}
 
 	public static <T extends Oaf> T cleanCountry(T value, String[] verifyParam, Set<String> hostedBy,
