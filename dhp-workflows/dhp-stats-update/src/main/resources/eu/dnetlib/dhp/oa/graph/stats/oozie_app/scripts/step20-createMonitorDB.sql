@@ -165,6 +165,7 @@ create view if not exists TARGET.project_oids as select * from SOURCE.project_oi
 create view if not exists TARGET.project_organizations as select * from SOURCE.project_organizations;
 create view if not exists TARGET.project_resultcount as select * from SOURCE.project_resultcount;
 create view if not exists TARGET.project_classification as select * from SOURCE.project_classification;
+create view if not exists TARGET.project_organization_contribution as select * from SOURCE.project_organization_contribution;
 
 create table TARGET.project_results stored as parquet as select id as result, project as id from TARGET.result_projects;
 compute stats TARGET.project_results;
