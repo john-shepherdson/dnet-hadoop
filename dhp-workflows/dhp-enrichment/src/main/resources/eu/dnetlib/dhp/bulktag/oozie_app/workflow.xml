@@ -219,7 +219,7 @@
         <error to="Kill"/>
     </action>
 
-    <join name="wait" to="End"/>
+    <join name="wait" to="eosc_tag"/>
 
     <action name="eosc_tag">
         <spark xmlns="uri:oozie:spark-action:0.2">

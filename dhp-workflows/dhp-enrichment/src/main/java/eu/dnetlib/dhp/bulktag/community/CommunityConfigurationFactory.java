@@ -37,7 +37,7 @@ public class CommunityConfigurationFactory {
 
 	public static CommunityConfiguration newInstance(final String xml) throws DocumentException, SAXException {
 
-		log.debug(String.format("parsing community configuration from:\n%s", xml));
+		log.info(String.format("parsing community configuration from:\n%s", xml));
 
 		final SAXReader reader = new SAXReader();
 		reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
@@ -98,6 +98,7 @@ public class CommunityConfigurationFactory {
 			.fromJson(advConstsNode.getText(), SelectionConstraints.class);
 
 		selectionConstraints.setSelection(resolver);
+		log.info("number of selection constraints set " + selectionConstraints.getCriteria().size());
 		return selectionConstraints;
 	}
 
