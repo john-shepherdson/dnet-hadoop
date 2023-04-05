@@ -169,7 +169,6 @@ public class CleanGraphSparkJob {
 			} else {
 				save(cleaned_basic, outputPath);
 			}
-
 		} else if (Boolean.TRUE.equals(ModelSupport.isSubClass(clazz, Result.class))) {
 
 			// load the hostedby mapping
@@ -191,6 +190,8 @@ public class CleanGraphSparkJob {
 					Encoders.bean(clazz));
 
 			save(cleaned_deep, outputPath);
+		} else {
+			save(cleaned_basic, outputPath);
 		}
 	}
 
