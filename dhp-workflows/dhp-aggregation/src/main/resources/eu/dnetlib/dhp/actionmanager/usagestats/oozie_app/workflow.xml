@@ -89,7 +89,7 @@
             <arg>--hive_metastore_uris</arg><arg>${hiveMetastoreUris}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
             <arg>--usagestatsdb</arg><arg>${usagestatsdb}</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/usageDb</arg>
+            <arg>--workingPath</arg><arg>${workingDir}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

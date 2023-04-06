@@ -10,11 +10,14 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
+import eu.dnetlib.dhp.bulktag.SparkBulkTagJob;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -22,6 +25,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 /** Created by miriam on 02/08/2018. */
 public class ResultTagger implements Serializable {
+	private static final Logger log = LoggerFactory.getLogger(ResultTagger.class);
 
 	private boolean clearContext(Result result) {
 		int tmp = result.getContext().size();
@@ -149,6 +153,8 @@ public class ResultTagger implements Serializable {
 			});
 
 		communities.addAll(aconstraints);
+		if (aconstraints.size() > 0)
+			log.info("Found {} for advancedConstraints ", aconstraints.size());
 
 		clearContext(result);
 

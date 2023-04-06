@@ -37,12 +37,24 @@ public class SubscriptionUtils {
 	}
 
 	public static boolean verifyDateRange(final long date, final String min, final String max) {
+
+		long from = 0;
+		long to = Long.MAX_VALUE;
+
 		try {
-			return date >= DateUtils.parseDate(min, "yyyy-MM-dd").getTime()
-				&& date < DateUtils.parseDate(max, "yyyy-MM-dd").getTime() + ONE_DAY;
+			from = min != null ? DateUtils.parseDate(min, "yyyy-MM-dd").getTime() : 0;
 		} catch (final ParseException e) {
-			return false;
+			from = 0;
 		}
+
+		try {
+			to = max != null ? DateUtils.parseDate(max, "yyyy-MM-dd").getTime() + ONE_DAY : Long.MAX_VALUE;
+		} catch (final ParseException e) {
+			to = Long.MAX_VALUE;
+		}
+
+		return date >= from && date < to;
+
 	}
 
 	public static boolean verifyExact(final String s1, final String s2) {

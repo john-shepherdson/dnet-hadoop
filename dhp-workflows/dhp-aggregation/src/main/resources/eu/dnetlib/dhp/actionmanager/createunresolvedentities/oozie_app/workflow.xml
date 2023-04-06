@@ -86,7 +86,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Produces the unresolved from bip finder!</name>
+            <name>Produces the unresolved from BIP! Finder</name>
             <class>eu.dnetlib.dhp.actionmanager.createunresolvedentities.PrepareBipFinder</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
@@ -135,7 +135,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Produces the unresolved from FOS!</name>
+            <name>Produces the unresolved from FOS</name>
             <class>eu.dnetlib.dhp.actionmanager.createunresolvedentities.PrepareFOSSparkJob</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
@@ -185,7 +185,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Produces the unresolved from FOS!</name>
+            <name>Produces the unresolved from FOS</name>
             <class>eu.dnetlib.dhp.actionmanager.createunresolvedentities.PrepareSDGSparkJob</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>

@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.actionmanager.createunresolvedentities;
 
-import static eu.dnetlib.dhp.actionmanager.Constants.DEFAULT_DELIMITER;
+import static eu.dnetlib.dhp.actionmanager.Constants.DEFAULT_FOS_DELIMITER;
 import static eu.dnetlib.dhp.actionmanager.Constants.isSparkSessionManaged;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
@@ -9,8 +9,6 @@ import java.io.Serializable;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
@@ -49,7 +47,7 @@ public class GetFOSSparkJob implements Serializable {
 
 		final String delimiter = Optional
 			.ofNullable(parser.get("delimiter"))
-			.orElse(DEFAULT_DELIMITER);
+			.orElse(DEFAULT_FOS_DELIMITER);
 
 		SparkConf sconf = new SparkConf();
 		runWithSparkSession(

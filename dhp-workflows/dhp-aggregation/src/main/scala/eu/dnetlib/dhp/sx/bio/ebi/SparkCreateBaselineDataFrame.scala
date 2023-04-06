@@ -27,7 +27,8 @@ object SparkCreateBaselineDataFrame {
   def requestBaseLineUpdatePage(maxFile: String): List[(String, String)] = {
     val data = requestPage("https://ftp.ncbi.nlm.nih.gov/pubmed/updatefiles/")
 
-    val result = data.linesWithSeparators.map(l =>l.stripLineEnd)
+    val result = data.linesWithSeparators
+      .map(l => l.stripLineEnd)
       .filter(l => l.startsWith("<a href="))
       .map { l =>
         val end = l.lastIndexOf("\">")
