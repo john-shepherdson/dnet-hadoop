@@ -139,7 +139,7 @@ public class ResultTagger implements Serializable {
 			.getSelectionConstraintsMap()
 			.keySet()
 			.forEach(communityId -> {
-				if (conf.getSelectionConstraintsMap().get(communityId) != null &&
+				if (conf.getSelectionConstraintsMap().get(communityId).getCriteria() != null &&
 					conf
 						.getSelectionConstraintsMap()
 						.get(communityId)
