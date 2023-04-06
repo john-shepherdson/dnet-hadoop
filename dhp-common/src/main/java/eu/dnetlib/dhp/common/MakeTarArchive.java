@@ -58,9 +58,12 @@ public class MakeTarArchive implements Serializable {
 		makeTArArchive(fileSystem, inputPath, outputPath, gBperSplit, rename);
 
 	}
-	public static void makeTArArchive(FileSystem fileSystem, String inputPath, String outputPath, int gBperSplit) throws IOException{
-		makeTArArchive(fileSystem,inputPath,outputPath,gBperSplit,false);
+
+	public static void makeTArArchive(FileSystem fileSystem, String inputPath, String outputPath, int gBperSplit)
+		throws IOException {
+		makeTArArchive(fileSystem, inputPath, outputPath, gBperSplit, false);
 	}
+
 	public static void makeTArArchive(FileSystem fileSystem, String inputPath, String outputPath, int gBperSplit,
 		boolean rename)
 		throws IOException {

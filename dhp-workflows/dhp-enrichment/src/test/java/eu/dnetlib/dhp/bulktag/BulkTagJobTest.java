@@ -39,7 +39,10 @@ public class BulkTagJobTest {
 		+ "  \"title\" : \"$['title'][*]['value']\","
 		+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
 		+ "  \"contributor\" : \"$['contributor'][*]['value']\","
-		+ "  \"description\" : \"$['description'][*]['value']\"}";
+		+ "  \"description\" : \"$['description'][*]['value']\", "
+		+ " \"subject\" :\"$['subject'][*]['value']\" , " +
+		"\"fos\" : \"$['subject'][?(@['qualifier']['classid']=='FOS')].value\"" +
+		"} ";
 
 	private static SparkSession spark;
 
@@ -763,7 +766,7 @@ public class BulkTagJobTest {
 		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
 
 		idExplodeCommunity.show(false);
-		Assertions.assertEquals(3, idExplodeCommunity.count());
+		Assertions.assertEquals(4, idExplodeCommunity.count());
 
 		Assertions
 			.assertEquals(
