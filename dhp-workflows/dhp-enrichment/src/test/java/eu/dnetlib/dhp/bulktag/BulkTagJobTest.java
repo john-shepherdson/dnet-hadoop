@@ -47,8 +47,8 @@ public class BulkTagJobTest {
 		+ "  \"contributor\" : \"$['contributor'][*]['value']\","
 		+ "  \"description\" : \"$['description'][*]['value']\", "
 		+ " \"subject\" :\"$['subject'][*]['value']\" , " +
-
-		"\"fos\" : \"$['subject'][?(@['qualifier']['classid']=='subject:fos')].value\"} ";
+		"\"fos\" : \"$['subject'][?(@['qualifier']['classid']=='FOS')].value\"" +
+		"} ";
 
 	private static SparkSession spark;
 
@@ -64,7 +64,7 @@ public class BulkTagJobTest {
 				.toString(
 					BulkTagJobTest.class
 						.getResourceAsStream(
-							"/eu/dnetlib/dhp/bulktag/communityconfiguration/tagging_conf.xml"));
+							"/eu/dnetlib/dhp/bulktag/communityconfiguration/tagging_conf_dth.xml"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

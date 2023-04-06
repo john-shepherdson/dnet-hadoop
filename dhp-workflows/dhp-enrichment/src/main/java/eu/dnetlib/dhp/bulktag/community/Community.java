@@ -26,7 +26,8 @@ public class Community implements Serializable {
 	public boolean isValid() {
 		return !getSubjects().isEmpty()
 			|| !getProviders().isEmpty()
-			|| !getZenodoCommunities().isEmpty();
+			|| !getZenodoCommunities().isEmpty()
+				|| constraints != null;
 	}
 
 	public String getId() {
