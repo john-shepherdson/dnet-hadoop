@@ -282,8 +282,9 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${outputPath}/publication</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/eoscContextTag/publication</arg>
+            <arg>--sourcePath</arg><arg>${outputPath}/</arg>
+            <arg>--resultType</arg><arg>publication</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/eoscContextTag/</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--datasourceMapPath</arg><arg>${workingDir}/datasourcemaster</arg>
         </spark>
@@ -308,8 +309,9 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${outputPath}/dataset</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/eoscContextTag/dataset</arg>
+            <arg>--sourcePath</arg><arg>${outputPath}/</arg>
+            <arg>--resultType</arg><arg>dataset</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/eoscContextTag/</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--datasourceMapPath</arg><arg>${workingDir}/datasourcemaster</arg>
         </spark>
@@ -333,8 +335,9 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${outputPath}/software</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/eoscContextTag/software</arg>
+            <arg>--sourcePath</arg><arg>${outputPath}/</arg>
+            <arg>--resultType</arg><arg>software</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/eoscContextTag/</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--datasourceMapPath</arg><arg>${workingDir}/datasourcemaster</arg>
         </spark>
@@ -358,8 +361,9 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${outputPath}/otherresearchproduct</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/eoscContextTag/otherresearchproduct</arg>
+            <arg>--sourcePath</arg><arg>${outputPath}/</arg>
+            <arg>--resultType</arg><arg>otherresearchproduct</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/eoscContextTag/</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--datasourceMapPath</arg><arg>${workingDir}/datasourcemaster</arg>
         </spark>
