@@ -85,7 +85,21 @@ public class CommunityConfigurationFactory {
 		c.setSubjects(parseSubjects(node));
 		c.setProviders(parseDatasources(node));
 		c.setZenodoCommunities(parseZenodoCommunities(node));
+		c.setConstraints(parseConstrains(node));
 		return c;
+	}
+
+	private static SelectionConstraints parseConstrains(Node node) {
+		Node advConstsNode = node.selectSingleNode("./advancedConstraints");
+		if (advConstsNode == null || StringUtils.isBlank(StringUtils.trim(advConstsNode.getText()))) {
+			return new SelectionConstraints();
+		}
+		SelectionConstraints selectionConstraints = new Gson()
+			.fromJson(advConstsNode.getText(), SelectionConstraints.class);
+
+		selectionConstraints.setSelection(resolver);
+		log.info("number of selection constraints set " + selectionConstraints.getCriteria().size());
+		return selectionConstraints;
 	}
 
 	private static List<String> parseSubjects(final Node node) {

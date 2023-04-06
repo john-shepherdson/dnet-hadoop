@@ -844,6 +844,88 @@
     <organizations/>
 </community>
     <community id="dariah">
+        <advancedConstraints>
+                        {
+                        "criteria": [
+                        {
+                        "constraint": [
+                        {
+                        "verb": "equals_caseinsensitive",
+                        "field": "subject",
+                        "value": "North America"
+                        },
+                        {
+                        "verb": "contains",
+                        "field": "fos",
+                        "value": "05"
+                        }
+                        ]
+                        },
+                        {
+                        "constraint": [
+                        {
+                        "verb": "equals_caseinsensitive",
+                        "field": "subject",
+                        "value": "North America"
+                        },
+                        {
+                        "verb": "contains",
+                        "field": "fos",
+                        "value": "06"
+                        }
+                        ]
+                        },
+                        {
+                        "constraint": [
+                        {
+                        "verb": "equals_caseinsensitive",
+                        "field": "subject",
+                        "value": "Mexico"
+                        },
+                        {
+                        "verb": "equals_caseinsensitive",
+                        "field": "subject",
+                        "value": "United States"
+                        },
+                        {
+                        "verb": "equals_caseinsensitive",
+                        "field": "subject",
+                        "value": "Canada"
+                        },
+                        {
+                        "verb": "contains",
+                        "field": "fos",
+                        "value": "05"
+                        }
+                        ]
+                        },
+                        {
+                        "constraint": [
+                        {
+                        "verb": "equals_caseinsensitive",
+                        "field": "subject",
+                        "value": "Mexico"
+                        },
+                        {
+                        "verb": "equals_caseinsensitive",
+                        "field": "subject",
+                        "value": "United States"
+                        },
+                        {
+                        "verb": "equals_caseinsensitive",
+                        "field": "subject",
+                        "value": "Canada"
+                        },
+                        {
+                        "verb": "contains",
+                        "field": "fos",
+                        "value": "06"
+                        }
+                        ]
+                        }
+                        ]
+                        }
+        </advancedConstraints>
     <subjects/>
     <datasources>
         <datasource>
