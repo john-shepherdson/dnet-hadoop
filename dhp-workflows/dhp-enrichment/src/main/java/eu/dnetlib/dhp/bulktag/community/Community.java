@@ -16,7 +16,7 @@ public class Community implements Serializable {
 	private List<String> subjects = new ArrayList<>();
 	private List<Provider> providers = new ArrayList<>();
 	private List<ZenodoCommunity> zenodoCommunities = new ArrayList<>();
-	private SelectionConstraints constraints = new SelectionConstraints();
+	private SelectionConstraints constraints;
 
 	public String toJson() {
 		final Gson g = new Gson();
@@ -27,7 +27,7 @@ public class Community implements Serializable {
 		return !getSubjects().isEmpty()
 			|| !getProviders().isEmpty()
 			|| !getZenodoCommunities().isEmpty()
-				|| constraints != null;
+				|| !getConstraints().getCriteria().isEmpty();
 	}
 
 	public String getId() {

@@ -92,7 +92,7 @@ public class CommunityConfigurationFactory {
 	private static SelectionConstraints parseConstrains(Node node) {
 		Node advConstsNode = node.selectSingleNode("./advancedConstraints");
 		if (advConstsNode == null || StringUtils.isBlank(StringUtils.trim(advConstsNode.getText()))) {
-			return null;
+			return new SelectionConstraints();
 		}
 		SelectionConstraints selectionConstraints = new Gson()
 			.fromJson(advConstsNode.getText(), SelectionConstraints.class);
