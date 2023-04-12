@@ -1,14 +1,15 @@
 package eu.dnetlib.dhp.sx.graph.scholix
 
-import eu.dnetlib.dhp.schema.oaf.{Publication, Relation, Result, StructuredProperty}
+import eu.dnetlib.dhp.schema.oaf.{Dataset, OtherResearchProduct, Publication, Relation, Result, Software, StructuredProperty}
 import eu.dnetlib.dhp.schema.sx.scholix._
-import eu.dnetlib.dhp.schema.sx.summary.{CollectedFromType, SchemeValue, ScholixSummary, Typology}
+import eu.dnetlib.dhp.schema.sx.summary.{AuthorPid, CollectedFromType, SchemeValue, ScholixSummary, Typology}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql.{Encoder, Encoders}
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
+
 import scala.collection.JavaConverters._
 import scala.io.Source
 
@@ -57,6 +58,36 @@ object ScholixUtils extends Serializable {
     else {
       summary.getDate.get(0)
     }
+  }
+
+  def flattenizeScholix(input: Scholix, json: String): ScholixFlat = {
+
+    val flat: ScholixFlat = new ScholixFlat
+    flat.setIdentifier(input.getIdentifier)
+    flat.setRelationType(input.getRelationship.getName)
+    if (input.getSource != null && input.getSource.getIdentifier != null) {
+      flat.setSourceId(input.getSource.getDnetIdentifier)
+      flat.setSourcePid(input.getSource.getIdentifier.asScala.map(p => p.getIdentifier).distinct.toList.asJava)
+      flat.setSourcePidType(input.getSource.getIdentifier.asScala.map(p => p.getSchema).distinct.toList.asJava)
+      flat.setSourceType(input.getSource.getObjectType)
+      flat.setSourceSubType(input.getSource.getObjectSubType)
+    } else return null
+    if (input.getSource.getPublisher != null)
+      flat.setSourcePublisher(input.getSource.getPublisher.asScala.map(p => p.getName).toList.asJava)
+    if (input.getTarget != null && input.getTarget.getIdentifier != null) {
+      flat.setTargetId(input.getTarget.getDnetIdentifier)
+      flat.setTargetPid(input.getTarget.getIdentifier.asScala.map(p => p.getIdentifier).distinct.toList.asJava)
+      flat.setTargetPidType(input.getTarget.getIdentifier.asScala.map(p => p.getSchema).distinct.toList.asJava)
+      flat.setTargetType(input.getTarget.getObjectType)
+      flat.setTargetSubType(input.getTarget.getObjectSubType)
+    } else return null
+    if (input.getTarget.getPublisher != null)
+      flat.setTargetPublisher(input.getTarget.getPublisher.asScala.map(p => p.getName).distinct.toList.asJava)
+    flat.setPublicationDate(input.getPublicationDate)
+    if (input.getLinkprovider != null)
+      flat.setLinkProviders(input.getLinkprovider.asScala.map(l => l.getName).distinct.toList.asJava)
+    flat.setBlob(json);
+    flat
   }
 
   def inverseRelationShip(rel: ScholixRelationship): ScholixRelationship = {
@@ -232,7 +263,14 @@ object ScholixUtils extends Serializable {
 
     if (summaryObject.getAuthor != null && !summaryObject.getAuthor.isEmpty) {
       val l: List[ScholixEntityId] =
-        summaryObject.getAuthor.asScala.map(a => new ScholixEntityId(a, null)).toList
+        summaryObject.getAuthor.asScala.map(a => {
+          if (a.getORCID != null)
+            new ScholixEntityId(
+              a.getFullname,
+              List(new ScholixIdentifier(a.getORCID, "ORCID", s"https://orcid.org/${a.getORCID}")).asJava
+            )
+          else new ScholixEntityId(a.getFullname, null)
+        }).toList
       if (l.nonEmpty)
         r.setCreator(l.asJava)
     }
@@ -377,10 +415,13 @@ object ScholixUtils extends Serializable {
     if (persistentIdentifiers.isEmpty)
       return null
     s.setLocalIdentifier(persistentIdentifiers.asJava)
-    if (r.isInstanceOf[Publication])
-      s.setTypology(Typology.publication)
-    else
-      s.setTypology(Typology.dataset)
+    r match {
+      case _: Publication => s.setTypology(Typology.publication)
+      case _: Dataset => s.setTypology(Typology.dataset)
+      case _: Software => s.setTypology(Typology.software)
+      case _: OtherResearchProduct => s.setTypology(Typology.otherresearchproduct)
+      case _ =>
+    }
 
     s.setSubType(r.getInstance().get(0).getInstancetype.getClassname)
 
@@ -393,7 +434,20 @@ object ScholixUtils extends Serializable {
     }
 
     if (r.getAuthor != null && !r.getAuthor.isEmpty) {
-      val authors: List[String] = r.getAuthor.asScala.map(a => a.getFullname).toList
+      val authors: List[AuthorPid] = r.getAuthor.asScala
+        .map(a => {
+          var ORCID: String = null
+          if (a.getPid != null) {
+            val result = a.getPid.asScala.find(p =>
+              p.getQualifier != null && p.getQualifier.getClassid != null && p.getQualifier.getClassid.toLowerCase
+                .contains("orcid")
+            )
+            if (result.isDefined)
+              ORCID = result.get.getValue
+          }
+          new AuthorPid(a.getFullname, ORCID)
+        })
+        .toList
       if (authors.nonEmpty)
         s.setAuthor(authors.asJava)
     }
