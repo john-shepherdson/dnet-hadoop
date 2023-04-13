@@ -50,7 +50,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--master</arg><arg>yarn</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}/summaries_json</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/index/summaries_json</arg>
             <arg>--index</arg><arg>${index}_object</arg>
             <arg>--idPath</arg><arg>id</arg>
             <arg>--cluster</arg><arg>${esCluster}</arg>
@@ -76,7 +76,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--master</arg><arg>yarn</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}/scholix_json</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/index/scholix_json</arg>
             <arg>--index</arg><arg>${index}_scholix</arg>
             <arg>--idPath</arg><arg>identifier</arg>
             <arg>--cluster</arg><arg>${esCluster}</arg>

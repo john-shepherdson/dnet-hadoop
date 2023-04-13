@@ -11,9 +11,13 @@
         }
       },
       "author": {
-        "type": "text",
-        "fields": {
-          "keyword": {
+        "type": "nested",
+        "properties": {
+          "fullname": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "orcid": {
             "type": "keyword",
             "ignore_above": 256
           }
