@@ -52,7 +52,7 @@ public class AuthorsMatch extends AbstractComparator {
         if (a.isEmpty() || b.isEmpty())
             return -1;
 
-        if (((FieldList) a).size() > SIZE_THRESHOLD || ((FieldList) a).size() > SIZE_THRESHOLD)
+        if (((FieldList) a).size() > SIZE_THRESHOLD || ((FieldList) b).size() > SIZE_THRESHOLD)
             return 1.0;
 
         List<Person> aList = ((FieldList) a).stringList().stream().map(author -> new Person(author, false)).collect(Collectors.toList());

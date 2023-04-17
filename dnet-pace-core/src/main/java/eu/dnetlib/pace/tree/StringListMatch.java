@@ -19,9 +19,13 @@ public class StringListMatch extends AbstractComparator {
     private static final Log log = LogFactory.getLog(StringListMatch.class);
     private Map<String, String> params;
 
+    final private String TYPE; //percentage or count
+
     public StringListMatch(final Map<String, String> params) {
         super(params);
         this.params = params;
+
+        TYPE = params.getOrDefault("type", "percentage");
     }
 
     @Override
@@ -31,7 +35,7 @@ public class StringListMatch extends AbstractComparator {
         final Set<String> pb = new HashSet<>(((FieldList) b).stringList());
 
         if (pa.isEmpty() || pb.isEmpty()) {
-            return -1;  //return undefined if one of the two lists of pids is empty
+            return -1;  //return undefined if one of the two lists is empty
         }
 
         int incommon = Sets.intersection(pa, pb).size();
@@ -41,7 +45,10 @@ public class StringListMatch extends AbstractComparator {
             return 0.0;
         }
 
-        return (double)incommon / (incommon + simDiff);
+        if(TYPE.equals("percentage"))
+            return (double)incommon / (incommon + simDiff);
+        else
+            return incommon;
 
     }
 }

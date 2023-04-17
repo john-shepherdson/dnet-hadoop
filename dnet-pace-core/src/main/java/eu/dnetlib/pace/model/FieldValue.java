@@ -20,4 +20,6 @@ public interface FieldValue extends Field {
 	 */
 	public void setValue(final Object value);
 
+	public double[] doubleArrayValue();
+
 }

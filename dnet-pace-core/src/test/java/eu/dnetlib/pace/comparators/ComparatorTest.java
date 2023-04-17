@@ -2,7 +2,9 @@ package eu.dnetlib.pace.comparators;
 
 import eu.dnetlib.pace.AbstractPaceTest;
 import eu.dnetlib.pace.clustering.NGramUtils;
+import eu.dnetlib.pace.config.Type;
 import eu.dnetlib.pace.model.Field;
+import eu.dnetlib.pace.model.FieldValueImpl;
 import eu.dnetlib.pace.tree.*;
 import eu.dnetlib.pace.config.DedupConfig;
 
@@ -282,6 +284,19 @@ public class ComparatorTest extends AbstractPaceTest {
 		double compare = domainExactMatch.compare(a, b, conf);
 		System.out.println("compare = " + compare);
 
+	}
+
+	@Test
+	public void cosineSimilarity() {
+
+		CosineSimilarity cosineSimilarity = new CosineSimilarity(params);
+
+		Field a = new FieldValueImpl(Type.DoubleArray, "array", new double[]{1,2,3});
+		Field b = new FieldValueImpl(Type.DoubleArray, "array", new double[]{1,2,3});
+
+		double compare = cosineSimilarity.compare(a, b, conf);
+
+		System.out.println("compare = " + compare);
 	}
 
 

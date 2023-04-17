@@ -36,6 +36,10 @@ public abstract class AbstractPaceTest extends AbstractPaceFunctions {
 		return new FieldValueImpl(Type.URL, "url", s);
 	}
 
+	protected Field array(final double[] a) {
+		return new FieldValueImpl(Type.DoubleArray, "array", a);
+	}
+
 	protected Field createFieldList(List<String> strings, String fieldName){
 
 		List<FieldValueImpl> fieldValueStream = strings.stream().map(s -> new FieldValueImpl(Type.String, fieldName, s)).collect(Collectors.toList());

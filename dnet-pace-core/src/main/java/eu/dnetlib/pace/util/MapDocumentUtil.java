@@ -7,12 +7,10 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.config.Type;
-import eu.dnetlib.pace.model.Field;
-import eu.dnetlib.pace.model.FieldListImpl;
-import eu.dnetlib.pace.model.FieldValueImpl;
-import eu.dnetlib.pace.model.MapDocument;
+import eu.dnetlib.pace.model.*;
 import net.minidev.json.JSONArray;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -45,6 +43,14 @@ public class MapDocumentUtil {
                             .map(item -> new FieldValueImpl(Type.String, fdef.getName(), item))
                             .forEach(fi::add);
                     stringField.put(fdef.getName(), fi);
+                    break;
+                case DoubleArray:
+                    stringField.put(
+                            fdef.getName(),
+                            new FieldValueImpl(Type.DoubleArray,
+                                    fdef.getName(),
+                                    getJPathArray(fdef.getPath(), json))
+                    );
                     break;
                 case StringConcat:
                     String[] jpaths = fdef.getPath().split("\\|\\|\\|");
@@ -112,6 +118,30 @@ public class MapDocumentUtil {
             return "";
         } catch (Exception e) {
             return "";
+        }
+    }
+
+    public static double[] getJPathArray(final String jsonPath, final String json) {
+        try {
+            Object o = JsonPath.read(json, jsonPath);
+            if (o instanceof double[])
+                return (double[]) o;
+            if (o instanceof JSONArray) {
+                Object[] objects = ((JSONArray) o).toArray();
+                double[] array = new double[objects.length];
+                for (int i = 0; i < objects.length; i++) {
+                    if (objects[i] instanceof BigDecimal)
+                        array[i] = ((BigDecimal)objects[i]).doubleValue();
+                    else
+                        array[i] = (double) objects[i];
+                }
+                return array;
+            }
+            return new double[0];
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return new double[0];
         }
     }
 

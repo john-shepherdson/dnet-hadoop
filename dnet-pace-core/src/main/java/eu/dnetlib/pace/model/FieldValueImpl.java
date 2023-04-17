@@ -58,8 +58,10 @@ public class FieldValueImpl extends AbstractField implements FieldValue {
 					throw new RuntimeException(value.toString());
 				}
 			case URL:
-			String str = value.toString();
-			return StringUtils.isBlank(str) || !isValidURL(str);
+				String str = value.toString();
+				return StringUtils.isBlank(str) || !isValidURL(str);
+			case DoubleArray:
+				return doubleArrayValue().length==0;
 		default:
 			return true;
 		}
@@ -114,6 +116,10 @@ public class FieldValueImpl extends AbstractField implements FieldValue {
 		// default:
 		// throw new IllegalArgumentException("Unknown type: " + getType().toString());
 		// }
+	}
+
+	public double[] doubleArrayValue() {
+		return (double[])getValue();
 	}
 
 	/*

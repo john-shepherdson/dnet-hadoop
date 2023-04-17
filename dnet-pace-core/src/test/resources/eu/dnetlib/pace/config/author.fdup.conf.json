@@ -1,0 +1,134 @@
+{
+  "wf": {
+    "threshold": "0.99",
+    "dedupRun": "001",
+    "entityType": "author",
+    "subEntityType": "author",
+    "subEntityValue": "author",
+    "orderField": "fullname",
+    "queueMaxSize": "200",
+    "groupMaxSize": "100",
+    "maxChildren": "100",
+    "slidingWindowSize": "50",
+    "rootBuilder": [
+      "result",
+      "resultProject_outcome_isProducedBy",
+      "resultResult_publicationDataset_isRelatedTo",
+      "resultResult_similarity_isAmongTopNSimilarDocuments",
+      "resultResult_similarity_hasAmongTopNSimilarDocuments",
+      "resultOrganization_affiliation_isAffiliatedWith",
+      "resultResult_part_hasPart",
+      "resultResult_part_isPartOf",
+      "resultResult_supplement_isSupplementTo",
+      "resultResult_supplement_isSupplementedBy",
+      "resultResult_version_isVersionOf"
+    ],
+    "includeChildren": "true",
+    "maxIterations": 20,
+    "idPath": "$.id"
+  },
+  "pace": {
+    "clustering" : [
+      { "name" : "lnfi", "fields" : [ "fullname" ], "params" : {} }
+    ],
+    "decisionTree": {
+      "start": {
+        "fields": [
+          {
+            "field": "orcid",
+            "comparator": "exactMatch",
+            "weight": 1.0,
+            "countIfUndefined": "true",
+            "params": {}
+          }
+        ],
+        "threshold": 1.0,
+        "aggregation": "MAX",
+        "positive": "MATCH",
+        "negative": "NO_MATCH",
+        "undefined": "orcids",
+        "ignoreUndefined": "true"
+      },
+      "orcids": {
+        "fields": [
+          {
+            "field": "orcids",
+            "comparator": "stringListMatch",
+            "weight": 1.0,
+            "countIfUndefined": "true",
+            "params": {"type": "count"}
+          }
+        ],
+        "threshold": 3.0,
+        "aggregation": "MAX",
+        "positive": "MATCH",
+        "negative": "coauthors",
+        "undefined": "coauthors",
+        "ignoreUndefined": "true"
+      },
+      "coauthors": {
+        "fields": [
+          {
+            "field": "coauthors",
+            "comparator": "authorsMatch",
+            "weight": 1.0,
+            "countIfUndefined": "true",
+            "params": {"type": "count"}
+          }
+        ],
+        "threshold": 1.0,
+        "aggregation": "MAX",
+        "positive": "topicsMatch",
+        "negative": "NO_MATCH",
+        "undefined": "topicsMatch",
+        "ignoreUndefined": "true"
+      },
+      "topicsMatch": {
+        "fields": [
+          {
+            "field": "topics",
+            "comparator": "cosineSimilarity",
+            "weight": 1.0,
+            "countIfUndefined": "true",
+            "params": {}
+          }
+        ],
+        "threshold": 1.0,
+        "aggregation": "MAX",
+        "positive": "MATCH",
+        "negative": "NO_MATCH",
+        "undefined": "NO_MATCH",
+        "ignoreUndefined": "false"
+      }
+    },
+    "model": [
+      {
+        "name": "topics",
+        "type": "DoubleArray",
+        "path": "$.topics"
+      },
+      {
+        "name": "fullname",
+        "type": "String",
+        "path": "$.fullname"
+      },
+      {
+        "name": "orcid",
+        "type": "String",
+        "path": "$.orcid"
+      },
+      {
+        "name": "coauthors",
+        "type": "List",
+        "path": "$.coAuthors[*].fullname"
+      },
+      {
+        "name": "orcids",
+        "type": "List",
+        "path": "$.coAuthors[*].orcid"
+      }
+    ],
+    "blacklists": {},
+    "synonyms": {}
+  }
+}

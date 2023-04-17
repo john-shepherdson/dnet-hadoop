@@ -7,6 +7,7 @@ import eu.dnetlib.pace.clustering.ClusteringClass;
 import eu.dnetlib.pace.clustering.ClusteringCombiner;
 import eu.dnetlib.pace.model.Field;
 import eu.dnetlib.pace.model.FieldList;
+import eu.dnetlib.pace.model.FieldValue;
 import eu.dnetlib.pace.model.MapDocument;
 import eu.dnetlib.pace.tree.JsonListMatch;
 import eu.dnetlib.pace.tree.support.AggType;
@@ -20,10 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -104,15 +102,15 @@ public class ConfigTest extends AbstractPaceTest {
     }
 
 	@Test
-	public void asMapDocumentTest2() {
+	public void authorAsMapDocument() {
 
-		DedupConfig dedupConf = DedupConfig.load(readFromClasspath("author.test.conf.json"));
+		DedupConfig dedupConf = DedupConfig.load(readFromClasspath("author.fdup.conf.json"));
 
 		final String json = readFromClasspath("author.json");
 
 		final MapDocument mapDocument = MapDocumentUtil.asMapDocumentWithJPath(dedupConf, json);
 
-		System.out.println("mapDocument = " + mapDocument.getFieldMap().get("coauthors").stringValue());
+		System.out.println("mapDocument = " + Arrays.toString(((FieldValue) mapDocument.getFieldMap().get("topics")).doubleArrayValue()));
 
 	}
 
