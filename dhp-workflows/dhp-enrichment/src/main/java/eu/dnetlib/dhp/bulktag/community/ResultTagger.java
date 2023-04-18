@@ -7,7 +7,6 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -17,9 +16,7 @@ import com.google.gson.Gson;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 
-import eu.dnetlib.dhp.bulktag.SparkBulkTagJob;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.bulktag.eosc.EoscIFTag;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
@@ -67,15 +64,18 @@ public class ResultTagger implements Serializable {
 			return result;
 		}
 
-		//Execute the EOSCTag for the services
-		switch (result.getResulttype().getClassid()){
+		// Execute the EOSCTag for the services
+		switch (result.getResulttype().getClassid()) {
 			case PUBLICATION_RESULTTYPE_CLASSID:
 				break;
 			case SOFTWARE_RESULTTYPE_CLASSID:
+				EoscIFTag.tagForSoftware(result);
 				break;
 			case DATASET_RESULTTYPE_CLASSID:
+				EoscIFTag.tagForDataset(result);
 				break;
 			case ORP_RESULTTYPE_CLASSID:
+				EoscIFTag.tagForOther(result);
 				break;
 		}
 
@@ -101,24 +101,34 @@ public class ResultTagger implements Serializable {
 
 		// Tagging for datasource
 		final Set<String> datasources = new HashSet<>();
-		final Set<String> tmp = new HashSet<>();
+		final Set<String> collfrom = new HashSet<>();
+		final Set<String> hostdby = new HashSet<>();
 
 		if (Objects.nonNull(result.getInstance())) {
 			for (Instance i : result.getInstance()) {
 				if (Objects.nonNull(i.getCollectedfrom()) && Objects.nonNull(i.getCollectedfrom().getKey())) {
-					tmp.add(StringUtils.substringAfter(i.getCollectedfrom().getKey(), "|"));
+					collfrom.add(StringUtils.substringAfter(i.getCollectedfrom().getKey(), "|"));
 				}
 				if (Objects.nonNull(i.getHostedby()) && Objects.nonNull(i.getHostedby().getKey())) {
-					tmp.add(StringUtils.substringAfter(i.getHostedby().getKey(), "|"));
+					hostdby.add(StringUtils.substringAfter(i.getHostedby().getKey(), "|"));
 				}
 
 			}
 
-			tmp
+			collfrom
 				.forEach(
 					dsId -> datasources
 						.addAll(
 							conf.getCommunityForDatasource(dsId, param)));
+			hostdby.forEach(dsId -> {
+				datasources
+					.addAll(
+						conf.getCommunityForDatasource(dsId, param));
+				if (conf.isEoscDatasource(dsId)) {
+					datasources.add("eosc");
+				}
+
+			});
 		}
 
 		communities.addAll(datasources);
@@ -154,7 +164,7 @@ public class ResultTagger implements Serializable {
 			.getSelectionConstraintsMap()
 			.keySet()
 			.forEach(communityId -> {
-				if (conf.getSelectionConstraintsMap().get(communityId) != null &&
+				if (conf.getSelectionConstraintsMap().get(communityId).getCriteria() != null &&
 					conf
 						.getSelectionConstraintsMap()
 						.get(communityId)
