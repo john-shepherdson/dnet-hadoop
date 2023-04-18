@@ -71,6 +71,25 @@ public class SparkEoscTag {
 
 	}
 
+	public static <R extends Result> R tagForSoftware(Result s){
+		if (containsCriteriaNotebook(s)) {
+			if (!Optional.ofNullable(s.getEoscifguidelines()).isPresent())
+				s.setEoscifguidelines(new ArrayList<>());
+			addEIG(
+					s.getEoscifguidelines(), EOSC_JUPYTER_NOTEBOOK, EOSC_JUPYTER_NOTEBOOK, "",
+					COMPLIES_WITH);
+
+		}
+		if (containsCriteriaGalaxy(s)) {
+			if (!Optional.ofNullable(s.getEoscifguidelines()).isPresent())
+				s.setEoscifguidelines(new ArrayList<>());
+
+			addEIG(
+					s.getEoscifguidelines(), EOSC_GALAXY_WORKFLOW, EOSC_GALAXY_WORKFLOW, "", COMPLIES_WITH);
+		}
+		return s;
+	}
+
 	private static void execEoscTag(SparkSession spark, String inputPath, String workingPath) {
 
 		readPath(spark, inputPath + "/software", Software.class)
@@ -190,7 +209,7 @@ public class SparkEoscTag {
 			.orElse(false);
 	}
 
-	private static boolean containsCriteriaNotebook(Software s) {
+	private static <R extends Result> boolean containsCriteriaNotebook(R s) {
 		if (!Optional.ofNullable(s.getSubject()).isPresent())
 			return false;
 		if (s.getSubject().stream().anyMatch(sbj -> sbj.getValue().toLowerCase().contains("jupyter")))

@@ -67,6 +67,18 @@ public class ResultTagger implements Serializable {
 			return result;
 		}
 
+		//Execute the EOSCTag for the services
+		switch (result.getResulttype().getClassid()){
+			case PUBLICATION_RESULTTYPE_CLASSID:
+				break;
+			case SOFTWARE_RESULTTYPE_CLASSID:
+				break;
+			case DATASET_RESULTTYPE_CLASSID:
+				break;
+			case ORP_RESULTTYPE_CLASSID:
+				break;
+		}
+
 		// communities contains all the communities to be added as context for the result
 		final Set<String> communities = new HashSet<>();
 
