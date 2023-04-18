@@ -611,9 +611,9 @@
 			<mode>cluster</mode>
 
 			<!-- This is the name of our job -->
-			<name>Spark Pagerank</name>
+			<name>Project Impact Indicators</name>
 			<!-- Script name goes here -->
-			<jar>PageRank.py</jar>
+			<jar>projects_impact.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
 			<spark-opts>--executor-memory 18G --executor-cores 4 --driver-memory 10G
 				--master yarn
