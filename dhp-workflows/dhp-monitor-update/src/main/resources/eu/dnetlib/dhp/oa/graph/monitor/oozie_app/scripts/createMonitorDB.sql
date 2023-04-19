@@ -1,6 +1,5 @@
 DROP TABLE IF EXISTS TARGET.result_new;
 
-<<<<<<< HEAD
 create table TARGET.result_new stored as parquet as
     select distinct * from (
         select * from SOURCE.result r where exists (select 1 from SOURCE.result_organization ro where ro.id=r.id and ro.organization in (
@@ -77,16 +76,6 @@ ANALYZE TABLE TARGET.result_topics COMPUTE STATISTICS;
 
 INSERT INTO TARGET.result_fos select * from TARGET.result_fos orig where exists (select 1 from TARGET.result_new r where r.id=orig.id);
 ANALYZE TABLE TARGET.result_fos COMPUTE STATISTICS;
-=======
-create table TARGET.result_new as
-    select distinct * from (
-        select * from SOURCE.result r where exists (select 1 from SOURCE.result_organization ro where ro.id=r.id and ro.organization in (
---              'openorgs____::b8b8ca674452579f3f593d9f5e557483',  -- University College Cork
---             'openorgs____::38d7097854736583dde879d12dacafca'	-- Brown University
-                'openorgs____::57784c9e047e826fefdb1ef816120d92' --Arts et Métiers ParisTech
-        ) )) foo;
-
-COMPUTE STATS TARGET.result_new;
 
 INSERT INTO TARGET.result select * from TARGET.result_new;
 COMPUTE STATS TARGET.result;
@@ -155,26 +144,21 @@ INSERT INTO TARGET.result_topics select * from TARGET.result_topics orig where e
 COMPUTE STATS TARGET.result_topics;
 
 INSERT INTO TARGET.result_fos select * from TARGET.result_fos orig where exists (select 1 from TARGET.result_new r where r.id=orig.id);
-COMPUTE STATS TARGET.result_fos;
->>>>>>> beta
 
 create view TARGET.foo1 as select * from TARGET.result_result rr where rr.source in (select id from TARGET.result_new);
 create view TARGET.foo2 as select * from TARGET.result_result rr where rr.target in (select id from TARGET.result_new);
 INSERT INTO TARGET.result_result select distinct * from (select * from TARGET.foo1 union all select * from TARGET.foo2) foufou;
 drop view TARGET.foo1;
 drop view TARGET.foo2;
-<<<<<<< HEAD
+
 ANALYZE TABLE TARGET.result_result COMPUTE STATISTICS;
 
-=======
-COMPUTE STATS TARGET.result_result;
->>>>>>> beta
 
 -- indicators
 -- Sprint 1 ----
 INSERT INTO TARGET.indi_pub_green_oa select * from TARGET.indi_pub_green_oa orig where exists (select 1 from TARGET.result_new r where r.id=orig.id);
-<<<<<<< HEAD
 ANALYZE TABLE TARGET.indi_pub_green_oa COMPUTE STATISTICS;
+
 INSERT INTO TARGET.indi_pub_grey_lit select * from TARGET.indi_pub_grey_lit orig where exists (select 1 from TARGET.result_new r where r.id=orig.id);
 ANALYZE TABLE TARGET.indi_pub_grey_lit COMPUTE STATISTICS;
 INSERT INTO TARGET.indi_pub_doi_from_crossref select * from TARGET.indi_pub_doi_from_crossref orig where exists (select 1 from TARGET.result_new r where r.id=orig.id);
@@ -275,7 +259,7 @@ INSERT INTO TARGET.indi_pub_in_subscribed select * from TARGET.indi_pub_in_subsc
 COMPUTE STATS TARGET.indi_pub_in_subscribed;
 INSERT INTO TARGET.indi_result_with_pid select * from TARGET.indi_result_with_pid orig where exists (select 1 from TARGET.result_new r where r.id=orig.id);
 COMPUTE STATS TARGET.indi_result_with_pid;
->>>>>>> beta
+
 --create table TARGET.indi_datasets_gold_oa stored as parquet as select * from SOURCE.indi_datasets_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 --compute stats TARGET.indi_datasets_gold_oa;
 --create table TARGET.indi_software_gold_oa stored as parquet as select * from SOURCE.indi_software_gold_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
