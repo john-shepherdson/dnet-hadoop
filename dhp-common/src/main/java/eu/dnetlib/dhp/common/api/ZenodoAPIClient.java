@@ -9,13 +9,13 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
+import org.jetbrains.annotations.NotNull;
 
 import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.common.api.zenodo.ZenodoModel;
 import eu.dnetlib.dhp.common.api.zenodo.ZenodoModelList;
 import okhttp3.*;
-import org.jetbrains.annotations.NotNull;
 
 public class ZenodoAPIClient implements Serializable {
 
@@ -80,7 +80,7 @@ public class ZenodoAPIClient implements Serializable {
 		int responseCode = conn.getResponseCode();
 		conn.disconnect();
 
-		if(!checkOKStatus(responseCode))
+		if (!checkOKStatus(responseCode))
 			throw new IOException("Unexpected code " + responseCode + body);
 
 		ZenodoModel newSubmission = new Gson().fromJson(body, ZenodoModel.class);
@@ -115,7 +115,7 @@ public class ZenodoAPIClient implements Serializable {
 
 		}
 		int responseCode = conn.getResponseCode();
-		if(! checkOKStatus(responseCode)){
+		if (!checkOKStatus(responseCode)) {
 			throw new IOException("Unexpected code " + responseCode + getBody(conn));
 		}
 
@@ -126,7 +126,7 @@ public class ZenodoAPIClient implements Serializable {
 	private String getBody(HttpURLConnection conn) throws IOException {
 		String body = "{}";
 		try (BufferedReader br = new BufferedReader(
-				new InputStreamReader(conn.getInputStream(), "utf-8"))) {
+			new InputStreamReader(conn.getInputStream(), "utf-8"))) {
 			StringBuilder response = new StringBuilder();
 			String responseLine = null;
 			while ((responseLine = br.readLine()) != null) {
@@ -155,7 +155,6 @@ public class ZenodoAPIClient implements Serializable {
 		conn.setDoOutput(true);
 		conn.setRequestMethod("PUT");
 
-
 		try (OutputStream os = conn.getOutputStream()) {
 			byte[] input = metadata.getBytes("utf-8");
 			os.write(input, 0, input.length);
@@ -164,19 +163,18 @@ public class ZenodoAPIClient implements Serializable {
 
 		final int responseCode = conn.getResponseCode();
 		conn.disconnect();
-		if(!checkOKStatus(responseCode))
+		if (!checkOKStatus(responseCode))
 			throw new IOException("Unexpected code " + responseCode + getBody(conn));
 
 		return responseCode;
 
-
 	}
 
-	private boolean checkOKStatus(int responseCode)  {
+	private boolean checkOKStatus(int responseCode) {
 
-		if(HttpURLConnection.HTTP_OK != responseCode ||
-				HttpURLConnection.HTTP_CREATED != responseCode)
-			return true ;
+		if (HttpURLConnection.HTTP_OK != responseCode ||
+			HttpURLConnection.HTTP_CREATED != responseCode)
+			return true;
 		return false;
 	}
 
@@ -233,7 +231,6 @@ public class ZenodoAPIClient implements Serializable {
 		conn.setDoOutput(true);
 		conn.setRequestMethod("POST");
 
-
 		try (OutputStream os = conn.getOutputStream()) {
 			byte[] input = json.getBytes("utf-8");
 			os.write(input, 0, input.length);
@@ -245,7 +242,7 @@ public class ZenodoAPIClient implements Serializable {
 		int responseCode = conn.getResponseCode();
 
 		conn.disconnect();
-		if(!checkOKStatus(responseCode))
+		if (!checkOKStatus(responseCode))
 			throw new IOException("Unexpected code " + responseCode + body);
 
 		ZenodoModel zenodoModel = new Gson().fromJson(body, ZenodoModel.class);
@@ -290,12 +287,11 @@ public class ZenodoAPIClient implements Serializable {
 		int responseCode = conn.getResponseCode();
 		conn.disconnect();
 
-		if(!checkOKStatus(responseCode))
+		if (!checkOKStatus(responseCode))
 			throw new IOException("Unexpected code " + responseCode + body);
 
 		ZenodoModel zenodoModel = new Gson().fromJson(body, ZenodoModel.class);
 		bucket = zenodoModel.getLinks().getBucket();
-
 
 		return responseCode;
 
@@ -331,21 +327,15 @@ public class ZenodoAPIClient implements Serializable {
 		conn.setDoOutput(true);
 		conn.setRequestMethod("GET");
 
-
-
 		String body = getBody(conn);
 
 		int responseCode = conn.getResponseCode();
 
 		conn.disconnect();
-		if(!checkOKStatus(responseCode))
+		if (!checkOKStatus(responseCode))
 			throw new IOException("Unexpected code " + responseCode + body);
 
-
-
 		return body;
-
-
 
 	}
 
@@ -363,14 +353,12 @@ public class ZenodoAPIClient implements Serializable {
 		int responseCode = conn.getResponseCode();
 
 		conn.disconnect();
-		if(!checkOKStatus(responseCode))
+		if (!checkOKStatus(responseCode))
 			throw new IOException("Unexpected code " + responseCode + body);
 
 		ZenodoModel zenodoModel = new Gson().fromJson(body, ZenodoModel.class);
 
 		return zenodoModel.getLinks().getBucket();
-
-
 
 	}
 
