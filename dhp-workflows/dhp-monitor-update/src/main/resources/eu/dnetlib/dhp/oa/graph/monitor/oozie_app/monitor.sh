@@ -17,7 +17,6 @@ echo "Getting file from " $SCRIPT_PATH
 hdfs dfs -copyToLocal $SCRIPT_PATH
 
 echo "Creating monitor database"
-#cat step20-createMonitorDB.sql | sed s/SOURCE/$1/g | sed s/TARGET/$2/g1 > foo
 cat createMonitorDB.sql | sed "s/TARGET/${TARGET}/g" | sed "s/SOURCE/${SOURCE}/g" > foo
 hive $HIVE_OPTS -f foo
 echo "Hive shell finished"

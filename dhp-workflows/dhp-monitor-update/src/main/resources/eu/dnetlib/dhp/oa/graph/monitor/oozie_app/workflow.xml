@@ -93,8 +93,6 @@
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
             <exec>copyDataToImpalaCluster.sh</exec>
-            <!--            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>-->
-            <!--            <argument>${external_stats_db_name}</argument>-->
             <argument>${monitor_db_name}</argument>
             <argument>${hadoop_user_name}</argument>
             <file>copyDataToImpalaCluster.sh</file>
