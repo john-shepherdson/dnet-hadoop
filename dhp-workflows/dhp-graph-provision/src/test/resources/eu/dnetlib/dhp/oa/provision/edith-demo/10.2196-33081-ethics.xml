@@ -102,26 +102,7 @@
                              schemename="dnet:subject_classification_typologies" inferred="true"
                              inferenceprovenance="update" provenanceaction="subject:fos">Health care/Health care quality
                     </subject>
-                    <subject classid="FOS" classname="Fields of Science and Technology classification"
-                             schemeid="dnet:subject_classification_typologies"
-                             schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">medication ---- alert ---- drug ---- error ---- patient ---- clinical ---- order ---- pharmacist ---- result ---- interaction
-                    </subject>
-                    <subject classid="FOS" classname="Fields of Science and Technology classification"
-                             schemeid="dnet:subject_classification_typologies"
-                             schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">nurse ---- patient ---- nursing ---- hospital ---- staff ---- staffing ---- care ---- mortality ---- level ---- outcome
-                    </subject>
-                    <subject classid="FOS" classname="Fields of Science and Technology classification"
-                             schemeid="dnet:subject_classification_typologies"
-                             schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">health ---- public ---- service ---- care ---- healthcare ---- decision ---- policy ---- health care ---- engagement ---- make
-                    </subject>
-                    <subject classid="FOS" classname="Fields of Science and Technology classification"
-                             schemeid="dnet:subject_classification_typologies"
-                             schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">structure ---- protein ---- structural ---- pdb ---- bind ---- data ---- crystal ---- datum ---- base ---- bank
-                    </subject>
+
                     <subject classid="FOS" classname="Fields of Science and Technology classification"
                              schemeid="dnet:subject_classification_typologies"
                              schemename="dnet:subject_classification_typologies" inferred="true"
@@ -177,17 +158,6 @@
                              schemename="dnet:subject_classification_typologies" inferred="true"
                              inferenceprovenance="update" provenanceaction="subject:fos">Bioethics/Coordinates on Wikidata
                     </subject>
-                    <subject classid="FOS" classname="Fields of Science and Technology classification"
-                             schemeid="dnet:subject_classification_typologies"
-                             schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">ai ---- moral ---- technology ---- human ---- artificial ---- responsibility ---- value ---- intelligence ---- ethical ---- artificial intelligence
-                    </subject>
-                    <subject classid="FOS" classname="Fields of Science and Technology classification"
-                             schemeid="dnet:subject_classification_typologies"
-                             schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">genomic ---- africa ---- biobanking ---- datum ---- ethical ---- country ---- researcher ---- health ---- biobank ---- sample
-                    </subject>
-
                     <language classid="eng" classname="English" schemeid="dnet:languages" schemename="dnet:languages" />
                     <relevantdate classid="created" classname="created" schemeid="dnet:dataCite_date" schemename="dnet:dataCite_date">2021-11-17</relevantdate>
                     <relevantdate classid="published-online" classname="published-online" schemeid="dnet:dataCite_date" schemename="dnet:dataCite_date">2022-01-31</relevantdate>

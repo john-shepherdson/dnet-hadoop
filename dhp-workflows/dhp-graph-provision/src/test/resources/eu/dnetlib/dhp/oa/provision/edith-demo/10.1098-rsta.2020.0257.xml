@@ -185,13 +185,6 @@
                     <subject classid="FOS" classname="Fields of Science and Technology classification"
                              schemeid="dnet:subject_classification_typologies"
                              schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">medical ---- image ----
-                        learning ---- deep ---- medical image ---- deep learning ---- learn ---- datum ---- imaging ----
-                        ai
-                    </subject>
-                    <subject classid="FOS" classname="Fields of Science and Technology classification"
-                             schemeid="dnet:subject_classification_typologies"
-                             schemename="dnet:subject_classification_typologies" inferred="true"
                              inferenceprovenance="update" provenanceaction="subject:fos">deep learning
                     </subject>
                     <subject classid="FOS" classname="Fields of Science and Technology classification"
