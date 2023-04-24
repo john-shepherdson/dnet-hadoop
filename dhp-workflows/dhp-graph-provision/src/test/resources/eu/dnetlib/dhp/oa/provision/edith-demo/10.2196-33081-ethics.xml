@@ -80,6 +80,16 @@
                     <subject classid="FOS" classname="Fields of Science and Technology classification"
                              schemeid="dnet:subject_classification_typologies"
                              schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">03021201 Health care/Health care quality - datum/health care
+                    </subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">03021201 Health care/Health care quality - datum/electronic health
+                    </subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
                              inferenceprovenance="update" provenanceaction="subject:fos">0301 basic medicine
                     </subject>
                     <subject classid="FOS" classname="Fields of Science and Technology classification"
@@ -100,45 +110,8 @@
                     <subject classid="FOS" classname="Fields of Science and Technology classification"
                              schemeid="dnet:subject_classification_typologies"
                              schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">Health care/Health care quality
+                             inferenceprovenance="update" provenanceaction="subject:fos">030304 Developmental Biology - datum/datum management/ethical
                     </subject>
-
-                    <subject classid="FOS" classname="Fields of Science and Technology classification"
-                             schemeid="dnet:subject_classification_typologies"
-                             schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">datum
-                    </subject>
-                    <subject classid="FOS" classname="Fields of Science and Technology classification"
-                             schemeid="dnet:subject_classification_typologies"
-                             schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">health care
-                    </subject>
-                    <subject classid="FOS" classname="Fields of Science and Technology classification"
-                             schemeid="dnet:subject_classification_typologies"
-                             schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">electronic health
-                    </subject>
-                    <subject classid="FOS" classname="Fields of Science and Technology classification"
-                             schemeid="dnet:subject_classification_typologies"
-                             schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">intelligence
-                    </subject>
-                    <subject classid="FOS" classname="Fields of Science and Technology classification"
-                             schemeid="dnet:subject_classification_typologies"
-                             schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">artificial intelligence
-                    </subject>
-                    <subject classid="FOS" classname="Fields of Science and Technology classification"
-                             schemeid="dnet:subject_classification_typologies"
-                             schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">ethical
-                    </subject>
-                    <subject classid="FOS" classname="Fields of Science and Technology classification"
-                             schemeid="dnet:subject_classification_typologies"
-                             schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">datum management
-                    </subject>
-
                     <subject classid="FOS" classname="Fields of Science and Technology classification"
                              schemeid="dnet:subject_classification_typologies"
                              schemename="dnet:subject_classification_typologies" inferred="true"
@@ -156,8 +129,14 @@
                     <subject classid="FOS" classname="Fields of Science and Technology classification"
                              schemeid="dnet:subject_classification_typologies"
                              schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">Bioethics/Coordinates on Wikidata
+                             inferenceprovenance="update" provenanceaction="subject:fos">06030101 Bioethics/Coordinates on Wikidata - intelligence/artificial intelligence/ethical
                     </subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">06030101 Bioethics/Coordinates on Wikidata - datum/ethical
+                    </subject>
+
                     <language classid="eng" classname="English" schemeid="dnet:languages" schemename="dnet:languages" />
                     <relevantdate classid="created" classname="created" schemeid="dnet:dataCite_date" schemename="dnet:dataCite_date">2021-11-17</relevantdate>
                     <relevantdate classid="published-online" classname="published-online" schemeid="dnet:dataCite_date" schemename="dnet:dataCite_date">2022-01-31</relevantdate>

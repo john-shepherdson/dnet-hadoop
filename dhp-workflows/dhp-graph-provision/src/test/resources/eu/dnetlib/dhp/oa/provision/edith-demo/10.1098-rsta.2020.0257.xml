@@ -185,12 +185,8 @@
                     <subject classid="FOS" classname="Fields of Science and Technology classification"
                              schemeid="dnet:subject_classification_typologies"
                              schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">deep learning
-                    </subject>
-                    <subject classid="FOS" classname="Fields of Science and Technology classification"
-                             schemeid="dnet:subject_classification_typologies"
-                             schemename="dnet:subject_classification_typologies" inferred="true"
-                             inferenceprovenance="update" provenanceaction="subject:fos">datum
+                             inferenceprovenance="update" provenanceaction="subject:fos">03021801 Radiology/Image
+                        segmentation - deep learning/datum
                     </subject>
                     <subject classid="FOS" classname="Fields of Science and Technology classification"
                              schemeid="dnet:subject_classification_typologies"
@@ -215,6 +211,7 @@
                              schemename="dnet:subject_classification_typologies" inferred="true"
                              inferenceprovenance="update" provenanceaction="subject:fos">03021701 Brain/Neural circuits
                     </subject>
+
                     <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies"
                              schemename="dnet:subject_classification_typologies" inferred="false"
                              provenanceaction="sysimport:crosswalk:repository" trust="0.9">Articles
