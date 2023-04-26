@@ -44,7 +44,7 @@ public class MergeUtilsTest {
 		assertTrue(cfId(d1.getCollectedfrom()).contains(ModelConstants.CROSSREF_ID));
 
 		final Result p1d2 = MergeUtils.merge(p1, d2);
-		assertEquals(ModelConstants.PUBLICATION_RESULTTYPE_CLASSID, p1d2.getResulttype());
+		assertEquals(Result.RESULTTYPE.publication, p1d2.getResulttype());
 		assertTrue(p1d2 instanceof Publication);
 		assertEquals(p1.getId(), p1d2.getId());
 	}
@@ -55,7 +55,7 @@ public class MergeUtilsTest {
 		Dataset d1 = read("dataset_1.json", Dataset.class);
 
 		final Result p2d1 = MergeUtils.merge(p2, d1);
-		assertEquals(ModelConstants.DATASET_RESULTTYPE_CLASSID, p2d1.getResulttype());
+		assertEquals(Result.RESULTTYPE.dataset, p2d1.getResulttype());
 		assertTrue(p2d1 instanceof Dataset);
 		assertEquals(d1.getId(), p2d1.getId());
 		assertEquals(2, p2d1.getCollectedfrom().size());

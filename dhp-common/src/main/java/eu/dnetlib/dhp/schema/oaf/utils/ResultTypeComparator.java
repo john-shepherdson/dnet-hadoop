@@ -34,34 +34,34 @@ public class ResultTypeComparator implements Comparator<Result> {
 			return 1;
 		}
 
-		String lClass = left.getResulttype();
-		String rClass = right.getResulttype();
+		Result.RESULTTYPE lType = left.getResulttype();
+		Result.RESULTTYPE rType = right.getResulttype();
 
-		if (lClass.equals(rClass))
+		if (lType.equals(rType))
 			return 0;
 
-		if (lClass.equals(ModelConstants.PUBLICATION_RESULTTYPE_CLASSID))
+		if (lType.equals(Result.RESULTTYPE.publication))
 			return -1;
-		if (rClass.equals(ModelConstants.PUBLICATION_RESULTTYPE_CLASSID))
+		if (rType.equals(Result.RESULTTYPE.publication))
 			return 1;
 
-		if (lClass.equals(ModelConstants.DATASET_RESULTTYPE_CLASSID))
+		if (lType.equals(Result.RESULTTYPE.dataset))
 			return -1;
-		if (rClass.equals(ModelConstants.DATASET_RESULTTYPE_CLASSID))
+		if (rType.equals(Result.RESULTTYPE.dataset))
 			return 1;
 
-		if (lClass.equals(ModelConstants.SOFTWARE_RESULTTYPE_CLASSID))
+		if (lType.equals(Result.RESULTTYPE.software))
 			return -1;
-		if (rClass.equals(ModelConstants.SOFTWARE_RESULTTYPE_CLASSID))
+		if (rType.equals(Result.RESULTTYPE.software))
 			return 1;
 
-		if (lClass.equals(ModelConstants.ORP_RESULTTYPE_CLASSID))
+		if (lType.equals(Result.RESULTTYPE.otherresearchproduct))
 			return -1;
-		if (rClass.equals(ModelConstants.ORP_RESULTTYPE_CLASSID))
+		if (rType.equals(Result.RESULTTYPE.otherresearchproduct))
 			return 1;
 
 		// Else (but unlikely), lexicographical ordering will do.
-		return lClass.compareTo(rClass);
+		return lType.compareTo(rType);
 	}
 
 	protected HashSet<String> getCollectedFromIds(Result left) {

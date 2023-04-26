@@ -22,19 +22,6 @@ object ScholixUtils extends Serializable {
 
   case class RelatedEntities(id: String, relatedDataset: Long, relatedPublication: Long) {}
 
-  val relations: Map[String, RelationVocabulary] = {
-    val input = Source
-      .fromInputStream(
-        getClass.getResourceAsStream("/eu/dnetlib/scholexplorer/relation/relations.json")
-      )
-      .mkString
-    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
-
-    lazy val json: json4s.JValue = parse(input)
-
-    json.extract[Map[String, RelationVocabulary]]
-  }
-
   def extractRelationDate(relation: Relation): String = {
 
     if (relation.getProperties == null || !relation.getProperties.isEmpty)
@@ -288,11 +275,8 @@ object ScholixUtils extends Serializable {
       s.setPublisher(source.getPublisher)
     }
 
-    val semanticRelation = relations.getOrElse(relation.getRelClass.toLowerCase, null)
-    if (semanticRelation == null)
-      return null
     s.setRelationship(
-      new ScholixRelationship(semanticRelation.original, "datacite", semanticRelation.inverse)
+      new ScholixRelationship(relation.getRelClass.toString, "datacite", relation.getRelClass.getInverse.toString)
     )
     s.setSource(source)
 
@@ -330,12 +314,10 @@ object ScholixUtils extends Serializable {
         s.setPublisher(l.asJava)
     }
 
-    val semanticRelation = relations.getOrElse(relation.getRelClass.toLowerCase, null)
-    if (semanticRelation == null)
-      return null
     s.setRelationship(
-      new ScholixRelationship(semanticRelation.original, "datacite", semanticRelation.inverse)
+      new ScholixRelationship(relation.getRelClass.toString, "datacite", relation.getRelClass.getInverse.toString)
     )
+
     s.setSource(generateScholixResourceFromSummary(source))
 
     s

@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.MappableBlock;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,7 +58,7 @@ public class GraphCleaningFunctionsTest {
 	void testCleanRelations() throws Exception {
 
 		List<String> lines = IOUtils
-			.readLines(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/relation.json"));
+			.readLines(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/graph/relation/relation.json"));
 		for (String json : lines) {
 			Relation r_in = MAPPER.readValue(json, Relation.class);
 			assertNotNull(r_in);

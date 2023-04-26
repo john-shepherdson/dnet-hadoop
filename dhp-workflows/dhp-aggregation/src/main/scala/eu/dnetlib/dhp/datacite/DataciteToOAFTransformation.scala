@@ -286,7 +286,7 @@ object DataciteToOAFTransformation {
   def generateRelation(
     sourceId: String,
     targetId: String,
-    relClass: String,
+    relClass: Relation.RELCLASS,
     collectedFrom: KeyValue,
     di: DataInfo
   ): Relation = {
@@ -294,9 +294,9 @@ object DataciteToOAFTransformation {
     val r = new Relation
     r.setSource(sourceId)
     r.setTarget(targetId)
-    r.setRelType(ModelConstants.RESULT_PROJECT)
+    r.setRelType(Relation.RELTYPE.resultProject)
     r.setRelClass(relClass)
-    r.setSubRelType(ModelConstants.OUTCOME)
+    r.setSubRelType(Relation.SUBRELTYPE.outcome)
     r.setProvenance(Lists.newArrayList(OafMapperUtils.getProvenance(collectedFrom, di)))
     r
   }
@@ -309,7 +309,7 @@ object DataciteToOAFTransformation {
       val p = match_pattern.get._2
       val grantId = m.matcher(awardUri).replaceAll("$2")
       val targetId = s"$p${DHPUtils.md5(grantId)}"
-      List(generateRelation(sourceId, targetId, "isProducedBy", DATACITE_COLLECTED_FROM, relDataInfo))
+      List(generateRelation(sourceId, targetId, Relation.RELCLASS.isProducedBy, DATACITE_COLLECTED_FROM, relDataInfo))
     } else
       List()
 
@@ -622,8 +622,7 @@ object DataciteToOAFTransformation {
   ): List[Relation] = {
     val bidirectionalRels: List[Relation] = rels
       .filter(r =>
-        subRelTypeMapping
-          .contains(r.relationType) && (r.relatedIdentifierType.equalsIgnoreCase("doi") ||
+        Relation.RELCLASS.exists(r.relationType) && (r.relatedIdentifierType.equalsIgnoreCase("doi") ||
         r.relatedIdentifierType.equalsIgnoreCase("pmid") ||
         r.relatedIdentifierType.equalsIgnoreCase("arxiv"))
       )

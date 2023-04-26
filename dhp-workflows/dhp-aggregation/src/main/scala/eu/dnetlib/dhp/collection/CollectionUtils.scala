@@ -18,30 +18,21 @@ object CollectionUtils {
 
   def fixRelations(i: Oaf): List[Oaf] = {
     if (i.isInstanceOf[Entity])
-      return List(i)
+      List(i)
     else {
       val r: Relation = i.asInstanceOf[Relation]
-      val currentRel = ModelSupport.findRelation(r.getRelClass)
-      if (currentRel != null) {
-
-        // Cleaning relation
-        r.setRelType(currentRel.getRelType)
-        r.setSubRelType(currentRel.getSubReltype)
-        r.setRelClass(currentRel.getRelClass)
-        val inverse = new Relation
-        inverse.setSource(r.getTarget)
-        inverse.setTarget(r.getSource)
-        inverse.setRelType(currentRel.getRelType)
-        inverse.setSubRelType(currentRel.getSubReltype)
-        inverse.setRelClass(currentRel.getInverseRelClass)
-        inverse.setProvenance(r.getProvenance)
-        inverse.setProperties(r.getProperties)
-        inverse.setValidated(r.getValidated)
-        inverse.setValidationDate(r.getValidationDate)
-        return List(r, inverse)
-      }
+      val inverse = new Relation
+      inverse.setSource(r.getTarget)
+      inverse.setTarget(r.getSource)
+      inverse.setRelType(r.getRelType)
+      inverse.setSubRelType(r.getSubRelType)
+      inverse.setRelClass(r.getRelClass.getInverse)
+      inverse.setProvenance(r.getProvenance)
+      inverse.setProperties(r.getProperties)
+      inverse.setValidated(r.getValidated)
+      inverse.setValidationDate(r.getValidationDate)
+      List(r, inverse)
     }
-    List()
   }
 
   def saveDataset(dataset: Dataset[Oaf], targetPath: String): Unit = {

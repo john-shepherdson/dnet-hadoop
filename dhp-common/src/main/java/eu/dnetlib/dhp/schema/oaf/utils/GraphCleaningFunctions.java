@@ -16,6 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.sisyphsu.dateparser.DateParserUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -37,6 +39,127 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	public static final String TITLE_FILTER_REGEX = String.format("(%s)|\\W|\\d", TITLE_TEST);
 
 	public static final int TITLE_FILTER_RESIDUAL_LENGTH = 5;
+
+	public static <T extends Oaf> T cleanContext(T value, String contextId, String verifyParam) {
+		if (ModelSupport.isSubClass(value, Result.class)) {
+			final Result res = (Result) value;
+			if (shouldCleanContext(res, verifyParam)) {
+				res
+					.setContext(
+						res
+							.getContext()
+							.stream()
+							.filter(c -> !StringUtils.startsWith(c.getId().toLowerCase(), contextId))
+							.collect(Collectors.toList()));
+			}
+			return (T) res;
+		} else {
+			return value;
+		}
+	}
+
+	private static boolean shouldCleanContext(Result res, String verifyParam) {
+		boolean titleMatch = res
+			.getTitle()
+			.stream()
+			.filter(
+				t -> t
+					.getQualifier()
+					.getClassid()
+					.equalsIgnoreCase(ModelConstants.MAIN_TITLE_QUALIFIER.getClassid()))
+			.anyMatch(t -> t.getValue().toLowerCase().startsWith(verifyParam.toLowerCase()));
+
+		return titleMatch && Objects.nonNull(res.getContext());
+	}
+
+	public static <T extends Oaf> T cleanCountry(T value, String[] verifyParam, Set<String> hostedBy,
+		String collectedfrom, String country) {
+		if (ModelSupport.isSubClass(value, Result.class)) {
+			final Result res = (Result) value;
+			if (res.getInstance().stream().anyMatch(i -> hostedBy.contains(i.getHostedby().getKey())) ||
+				!res.getCollectedfrom().stream().anyMatch(cf -> cf.getValue().equals(collectedfrom))) {
+				return (T) res;
+			}
+
+			List<StructuredProperty> ids = getPidsAndAltIds(res).collect(Collectors.toList());
+			if (ids
+				.stream()
+				.anyMatch(
+					p -> p
+						.getQualifier()
+						.getClassid()
+						.equals(PidType.doi.toString()) && pidInParam(p.getValue(), verifyParam))) {
+				res
+					.setCountry(
+						res
+							.getCountry()
+							.stream()
+							.filter(
+								c -> toTakeCountry(c, country))
+							.collect(Collectors.toList()));
+			}
+
+			return (T) res;
+		} else {
+			return value;
+		}
+	}
+
+	private static <T extends Result> Stream<StructuredProperty> getPidsAndAltIds(T r) {
+		final Stream<StructuredProperty> resultPids = Optional
+			.ofNullable(r.getPid())
+			.map(Collection::stream)
+			.orElse(Stream.empty());
+
+		final Stream<StructuredProperty> instancePids = Optional
+			.ofNullable(r.getInstance())
+			.map(
+				instance -> instance
+					.stream()
+					.flatMap(
+						i -> Optional
+							.ofNullable(i.getPid())
+							.map(Collection::stream)
+							.orElse(Stream.empty())))
+			.orElse(Stream.empty());
+
+		final Stream<StructuredProperty> instanceAltIds = Optional
+			.ofNullable(r.getInstance())
+			.map(
+				instance -> instance
+					.stream()
+					.flatMap(
+						i -> Optional
+							.ofNullable(i.getAlternateIdentifier())
+							.map(Collection::stream)
+							.orElse(Stream.empty())))
+			.orElse(Stream.empty());
+
+		return Stream
+			.concat(
+				Stream.concat(resultPids, instancePids),
+				instanceAltIds);
+	}
+
+	private static boolean pidInParam(String value, String[] verifyParam) {
+		for (String s : verifyParam)
+			if (value.startsWith(s))
+				return true;
+		return false;
+	}
+
+	private static boolean toTakeCountry(Country c, String country) {
+		// If dataInfo is not set, or dataInfo.inferenceprovenance is not set or not present then it cannot be
+		// inserted via propagation
+		if (!Optional.ofNullable(c.getDataInfo()).isPresent())
+			return true;
+		if (!Optional.ofNullable(c.getDataInfo().getInferenceprovenance()).isPresent())
+			return true;
+		return !(c
+			.getClassid()
+			.equalsIgnoreCase(country) &&
+			c.getDataInfo().getInferenceprovenance().equals("propagation"));
+	}
 
 	public static <T extends Oaf> T fixVocabularyNames(T value) {
 		if (value instanceof Datasource) {

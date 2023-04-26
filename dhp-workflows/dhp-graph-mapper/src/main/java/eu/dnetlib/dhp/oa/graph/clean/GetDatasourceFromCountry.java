@@ -1,10 +1,9 @@
 
-package eu.dnetlib.dhp.oa.graph.clean.country;
+package eu.dnetlib.dhp.oa.graph.clean;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -21,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.graph.clean.CleanContextSparkJob;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import scala.Tuple2;

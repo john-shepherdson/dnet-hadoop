@@ -96,48 +96,6 @@ public class ModelSupport {
 		idPrefixEntity.put("50", "result");
 	}
 
-	public static final Map<String, RelationInverse> relationInverseMap = Maps.newHashMap();
-
-	static {
-		set(relationInverseMap, PROJECT_ORGANIZATION, PARTICIPATION, IS_PARTICIPANT, HAS_PARTICIPANT);
-
-		set(relationInverseMap, RESULT_ORGANIZATION, AFFILIATION, IS_AUTHOR_INSTITUTION_OF, HAS_AUTHOR_INSTITUTION);
-
-		set(relationInverseMap, ORG_ORG_RELTYPE, DEDUP, IS_MERGED_IN, MERGES);
-		set(relationInverseMap, ORG_ORG_RELTYPE, DEDUP, IS_SIMILAR_TO, IS_SIMILAR_TO);
-
-		set(relationInverseMap, RESULT_PROJECT, OUTCOME, IS_PRODUCED_BY, PRODUCES);
-
-		set(relationInverseMap, DATASOURCE_ORGANIZATION, PROVISION, IS_PROVIDED_BY, PROVIDES);
-
-		set(relationInverseMap, RESULT_RESULT, SIMILARITY, IS_AMONG_TOP_N_SIMILAR_DOCS, HAS_AMONG_TOP_N_SIMILAR_DOCS);
-		set(relationInverseMap, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENT_TO, IS_SUPPLEMENTED_BY);
-		set(relationInverseMap, RESULT_RESULT, PART, IS_PART_OF, HAS_PART);
-		set(relationInverseMap, RESULT_RESULT, DEDUP, IS_MERGED_IN, MERGES);
-		set(relationInverseMap, RESULT_RESULT, DEDUP, IS_SIMILAR_TO, IS_SIMILAR_TO);
-		set(relationInverseMap, RESULT_RESULT, CITATION, IS_CITED_BY, CITES);
-
-		set(relationInverseMap, RESULT_RESULT, RELATIONSHIP, IS_IDENTICAL_TO, IS_IDENTICAL_TO);
-		set(relationInverseMap, RESULT_RESULT, RELATIONSHIP, IS_REFERENCED_BY, REFERENCES);
-		set(relationInverseMap, RESULT_RESULT, RELATIONSHIP, IS_CONTINUED_BY, CONTINUES);
-		set(relationInverseMap, RESULT_RESULT, RELATIONSHIP, IS_DOCUMENTED_BY, DOCUMENTS);
-		set(relationInverseMap, RESULT_RESULT, RELATIONSHIP, IS_DERIVED_FROM, IS_SOURCE_OF);
-		set(relationInverseMap, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, IS_RELATED_TO);
-		set(relationInverseMap, RESULT_RESULT, RELATIONSHIP, IS_COMPILED_BY, COMPILES);
-
-		set(relationInverseMap, RESULT_RESULT, RELATIONSHIP, IS_DESCRIBED_BY, DESCRIBES);
-		set(relationInverseMap, RESULT_RESULT, RELATIONSHIP, IS_METADATA_FOR, IS_METADATA_OF);
-		set(relationInverseMap, RESULT_RESULT, RELATIONSHIP, HAS_ASSOCIATION_WITH, HAS_ASSOCIATION_WITH);
-		set(relationInverseMap, RESULT_RESULT, RELATIONSHIP, IS_REQUIRED_BY, REQUIRES);
-
-		set(relationInverseMap, RESULT_RESULT, VERSION, IS_PREVIOUS_VERSION_OF, IS_NEW_VERSION_OF);
-		set(relationInverseMap, RESULT_RESULT, VERSION, IS_VARIANT_FORM_OF, IS_ORIGINAL_FORM_OF);
-		set(relationInverseMap, RESULT_RESULT, VERSION, IS_OBSOLETED_BY, OBSOLETES);
-		set(relationInverseMap, RESULT_RESULT, VERSION, IS_VERSION_OF, HAS_VERSION);
-
-		set(relationInverseMap, RESULT_RESULT, REVIEW, IS_REVIEWED_BY, REVIEWS);
-	}
-
 	private static void set(Map<String, RelationInverse> relationInverseMap, String relType, String subRelType,
 		String relClass, String inverseRelClass) {
 		relationInverseMap
@@ -156,35 +114,6 @@ public class ModelSupport {
 						.setRelType(relType)
 						.setSubReltype(subRelType));
 		}
-	}
-
-	/**
-	 * Helper method: lookup relation inverse, given the direct relation encoding (case insensitive)
-	 * @param encoding
-	 * @return the relation inverse descriptor, throws @IllegalArgumentException when not found.
-	 */
-	public static RelationInverse findInverse(String encoding) {
-		return ModelSupport.relationInverseMap
-			.entrySet()
-			.stream()
-			.filter(r -> encoding.equalsIgnoreCase(r.getKey()))
-			.findFirst()
-			.map(r -> r.getValue())
-			.orElseThrow(() -> new IllegalArgumentException("invalid relationship: " + encoding));
-	}
-
-	/**
-	 * Helper method: fina a relation filtering by a relation name
-	 * @param relationName
-	 * @return
-	 */
-	public static RelationInverse findRelation(final String relationName) {
-		return relationInverseMap
-			.values()
-			.stream()
-			.filter(r -> relationName.equalsIgnoreCase(r.getRelClass()))
-			.findFirst()
-			.orElse(null);
 	}
 
 	/**
@@ -364,17 +293,17 @@ public class ModelSupport {
 													.join(
 														source,
 														target,
-														relType,
-														subRelType,
-														relClass))
+														relType.toString(),
+														subRelType.toString(),
+														relClass.toString()))
 											.orElse(
 												String
 													.join(
 														source,
 														target,
-														relType,
-														subRelType)))
-									.orElse(String.join(source, target, relType)))
+														relType.toString(),
+														subRelType.toString())))
+									.orElse(String.join(source, target, relType.toString())))
 							.orElse(String.join(source, target)))
 					.orElse(source))
 			.orElse(null);

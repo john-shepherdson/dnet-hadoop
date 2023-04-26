@@ -61,13 +61,15 @@ object CrossrefUtility {
     resultList
   }
 
-  private def createRelation(sourceId: String, targetId: String, relClass: String): Relation = {
+  private def createRelation(sourceId: String, targetId: String, relClass: Relation.RELCLASS): Relation = {
     val r = new Relation
+
+    //TODO further inspect
     r.setSource(sourceId)
     r.setTarget(targetId)
-    r.setRelType(ModelConstants.RESULT_PROJECT)
+    r.setRelType(Relation.RELTYPE.resultProject)
     r.setRelClass(relClass)
-    r.setSubRelType(ModelConstants.OUTCOME)
+    r.setSubRelType(Relation.SUBRELTYPE.outcome)
     r.setProvenance(List(OafMapperUtils.getProvenance(CROSSREF_COLLECTED_FROM, null)).asJava)
     r
   }
@@ -84,7 +86,7 @@ object CrossrefUtility {
         .filter(a => a != null && a.nonEmpty)
         .map(award => {
           val targetId = IdentifierFactory.createOpenaireId("project", s"$nsPrefix::$award", true)
-          createRelation(targetId, source.getId, ModelConstants.PRODUCES)
+          createRelation(targetId, source.getId, Relation.RELCLASS.produces)
         })
     else List()
   }
@@ -132,15 +134,15 @@ object CrossrefUtility {
             case "10.13039/501100000038" =>
               val targetId =
                 IdentifierFactory.createOpenaireId("project", "nserc_______::1e5e62235d094afd01cd56e65112fc63", false)
-              relList = relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
+              relList = relList ::: List(createRelation(targetId, result.getId, Relation.RELCLASS.produces))
             case "10.13039/501100000155" =>
               val targetId =
                 IdentifierFactory.createOpenaireId("project", "sshrc_______::1e5e62235d094afd01cd56e65112fc63", false)
-              relList = relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
+              relList = relList ::: List(createRelation(targetId, result.getId, Relation.RELCLASS.produces))
             case "10.13039/501100000024" =>
               val targetId =
                 IdentifierFactory.createOpenaireId("project", "cihr________::1e5e62235d094afd01cd56e65112fc63", false)
-              relList = relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
+              relList = relList ::: List(createRelation(targetId, result.getId, Relation.RELCLASS.produces))
             case "10.13039/501100002848" =>
               relList = relList ::: generateSimpleRelationFromAward(funder, "conicytf____", a => a, result)
             case "10.13039/501100003448" =>
@@ -153,7 +155,7 @@ object CrossrefUtility {
               relList = relList ::: generateSimpleRelationFromAward(funder, "miur________", a => a, result)
               val targetId =
                 IdentifierFactory.createOpenaireId("project", "miur________::1e5e62235d094afd01cd56e65112fc63", false)
-              relList = relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
+              relList = relList ::: List(createRelation(targetId, result.getId, Relation.RELCLASS.produces))
             case "10.13039/501100006588" | "10.13039/501100004488" =>
               relList = relList ::: generateSimpleRelationFromAward(
                 funder,
@@ -171,7 +173,7 @@ object CrossrefUtility {
               relList = relList ::: generateSimpleRelationFromAward(funder, "wt__________", a => a, result)
               val targetId =
                 IdentifierFactory.createOpenaireId("project", "wt__________::1e5e62235d094afd01cd56e65112fc63", false)
-              relList = relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
+              relList = relList ::: List(createRelation(targetId, result.getId, Relation.RELCLASS.produces))
             case _ => logger.debug("no match for " + funder.DOI.get)
 
           }
@@ -191,7 +193,7 @@ object CrossrefUtility {
               relList = relList ::: generateSimpleRelationFromAward(funder, "wt__________", a => a, result)
               val targetId =
                 IdentifierFactory.createOpenaireId("project", "wt__________::1e5e62235d094afd01cd56e65112fc63", false)
-              relList = relList ::: List(createRelation(targetId, result.getId, ModelConstants.PRODUCES))
+              relList = relList ::: List(createRelation(targetId, result.getId, Relation.RELCLASS.produces))
             case _ => logger.debug("no match for " + funder.name)
 
           }
