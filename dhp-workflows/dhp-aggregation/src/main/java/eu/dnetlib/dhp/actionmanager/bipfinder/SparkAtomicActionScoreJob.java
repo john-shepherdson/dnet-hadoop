@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.actionmanager.bipmodel.score.deserializers.BipProjectModel;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
@@ -24,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.bipmodel.BipDeserialize;
+import eu.dnetlib.dhp.actionmanager.bipmodel.score.deserializers.BipResultModel;
 import eu.dnetlib.dhp.actionmanager.bipmodel.BipScore;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
@@ -56,18 +57,17 @@ public class SparkAtomicActionScoreJob implements Serializable {
 
 		parser.parseArgument(args);
 
-		Boolean isSparkSessionManaged = Optional
-			.ofNullable(parser.get("isSparkSessionManaged"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.TRUE);
-
+		Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		final String inputPath = parser.get("inputPath");
-		log.info("inputPath {}: ", inputPath);
+		log.info("inputPath: {}", inputPath);
 
 		final String outputPath = parser.get("outputPath");
-		log.info("outputPath {}: ", outputPath);
+		log.info("outputPath: {}", outputPath);
+
+		final String targetEntity = parser.get("targetEntity");
+		log.info("targetEntity: {}", targetEntity);
 
 		SparkConf conf = new SparkConf();
 
@@ -76,17 +76,48 @@ public class SparkAtomicActionScoreJob implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				removeOutputDir(spark, outputPath);
-				prepareResults(spark, inputPath, outputPath);
-			});
+
+				// follow different procedures for different target entities
+				switch (targetEntity) {
+					case "result":
+						prepareResults(spark, inputPath, outputPath);
+						break;
+					case "project":
+						prepareProjects(spark, inputPath, outputPath);
+						break;
+					default:
+						throw new RuntimeException("Unknown target entity: " + targetEntity);
+				}
+			}
+		);
+	}
+
+	private static <I extends Project> void prepareProjects(SparkSession spark, String inputPath, String outputPath) {
+
+		// read input bip project scores
+		Dataset<BipProjectModel> projectScores = readPath(spark, inputPath, BipProjectModel.class);
+
+		projectScores.map( (MapFunction<BipProjectModel, Project>) bipProjectScores -> {
+			Project project = new Project();
+			project.setId(bipProjectScores.getProjectId());
+			project.setMeasures(bipProjectScores.toMeasures());
+			return project;
+		}, Encoders.bean(Project.class))
+		.toJavaRDD()
+		.map(p -> new AtomicAction(Project.class, p))
+		.mapToPair( aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
+				new Text(OBJECT_MAPPER.writeValueAsString(aa))))
+		.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
+
 	}
 
 	private static <I extends Result> void prepareResults(SparkSession spark, String bipScorePath, String outputPath) {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		JavaRDD<BipDeserialize> bipDeserializeJavaRDD = sc
+		JavaRDD<BipResultModel> bipDeserializeJavaRDD = sc
 			.textFile(bipScorePath)
-			.map(item -> OBJECT_MAPPER.readValue(item, BipDeserialize.class));
+			.map(item -> OBJECT_MAPPER.readValue(item, BipResultModel.class));
 
 		Dataset<BipScore> bipScores = spark
 			.createDataset(bipDeserializeJavaRDD.flatMap(entry -> entry.keySet().stream().map(key -> {
@@ -157,14 +188,6 @@ public class SparkAtomicActionScoreJob implements Serializable {
 
 	private static void removeOutputDir(SparkSession spark, String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
-	}
-
-	public static <R> Dataset<R> readPath(
-		SparkSession spark, String inputPath, Class<R> clazz) {
-		return spark
-			.read()
-			.textFile(inputPath)
-			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
 	}
 
 }

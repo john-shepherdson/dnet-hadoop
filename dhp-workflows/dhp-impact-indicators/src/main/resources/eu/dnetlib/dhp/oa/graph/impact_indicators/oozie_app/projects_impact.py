@@ -96,14 +96,13 @@ for indicator_name, fd, column_name in impact_indicators:
 #     print("Counting non null values for {}".format(indicator_name))
 #     print(relations.filter(F.col(indicator_name).isNotNull()).count())
 
-sum the impact indicator values for each project
+# sum the impact indicator values for each project
 relations.groupBy('projectId')\
     .agg(\
-        F.sum('influence').alias('influence'),\
-        F.sum('popularity').alias('popularity'),\
-        F.sum('impulse').alias('impulse'),\
-        F.sum('citation_count').alias('citation_count')\
+        F.sum('influence').alias('numOfInfluentialResults'),\
+        F.sum('popularity').alias('numOfPopularResults'),\
+        F.sum('impulse').alias('totalImpulse'),\
+        F.sum('citation_count').alias('totalCitationCount')\
     )\
     .write.mode("overwrite")\
-    .option("delimiter", "\t")\
-    .csv(output_dir, compression="gzip")
+    .json(output_dir, compression="gzip")
