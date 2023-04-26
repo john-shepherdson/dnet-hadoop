@@ -41,7 +41,8 @@ import scala.Tuple2;
  */
 public class SparkAtomicActionScoreJob implements Serializable {
 
-	private static final String DOI = "doi";
+	private static final String RESULT = "result";
+	private static final String PROJECT = "project";
 	private static final Logger log = LoggerFactory.getLogger(SparkAtomicActionScoreJob.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -79,10 +80,10 @@ public class SparkAtomicActionScoreJob implements Serializable {
 
 				// follow different procedures for different target entities
 				switch (targetEntity) {
-					case "result":
+					case RESULT:
 						prepareResults(spark, inputPath, outputPath);
 						break;
-					case "project":
+					case PROJECT:
 						prepareProjects(spark, inputPath, outputPath);
 						break;
 					default:
