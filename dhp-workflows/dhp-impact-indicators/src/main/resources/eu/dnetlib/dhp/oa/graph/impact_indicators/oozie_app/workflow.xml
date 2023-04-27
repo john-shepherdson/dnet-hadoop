@@ -556,9 +556,12 @@
 
 	<action name="deleteOutputPathForActionSet">
         <fs>
-            <delete path="${actionSetOutputPath}"/>
-            <mkdir path="${actionSetOutputPath}"/>
-        </fs>
+            <delete path="${actionSetOutputPath}/results/"/>
+			<delete path="${actionSetOutputPath}/projects/"/>
+
+			<mkdir path="${actionSetOutputPath}/results/"/>
+			<mkdir path="${actionSetOutputPath}/projects/"/>
+		</fs>
         <ok to="createActionSetForResults"/>
         <error to="actionset-delete-fail"/>
     </action>
@@ -581,7 +584,7 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--inputPath</arg><arg>${bipScorePath}</arg>
-            <arg>--outputPath</arg><arg>${actionSetOutputPath}</arg>
+            <arg>--outputPath</arg><arg>${actionSetOutputPath}/results/</arg>
 			<arg>--targetEntity</arg><arg>result</arg>
 		</spark>
         <ok to="project-impact-indicators"/>
@@ -659,7 +662,7 @@
 				--conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
 			</spark-opts>
 			<arg>--inputPath</arg><arg>${projectImpactIndicatorsOutput}</arg>
-			<arg>--outputPath</arg><arg>${actionSetOutputPath}</arg>
+			<arg>--outputPath</arg><arg>${actionSetOutputPath}/projects/</arg>
 			<arg>--targetEntity</arg><arg>project</arg>
 		</spark>
 		<ok to="end"/>
