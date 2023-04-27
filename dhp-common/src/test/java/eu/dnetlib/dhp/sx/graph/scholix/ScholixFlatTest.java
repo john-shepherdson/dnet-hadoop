@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.sx.scholix.Scholix;
+import eu.dnetlib.dhp.schema.sx.scholix.ScholixFlat;
 
 public class ScholixFlatTest {
 

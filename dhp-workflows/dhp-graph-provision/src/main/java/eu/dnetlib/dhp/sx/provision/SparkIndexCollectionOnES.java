@@ -42,7 +42,8 @@ public class SparkIndexCollectionOnES {
 			.toString(
 				Objects
 					.requireNonNull(
-						DropAndCreateESIndex.class.getResourceAsStream("/eu/dnetlib/dhp/sx/provision/cluster.json")));
+						SparkIndexCollectionOnES.class
+							.getResourceAsStream("/eu/dnetlib/dhp/sx/provision/cluster.json")));
 
 		@SuppressWarnings("unchecked")
 		final Map<String, String> clusterMap = new ObjectMapper().readValue(clusterJson, Map.class);

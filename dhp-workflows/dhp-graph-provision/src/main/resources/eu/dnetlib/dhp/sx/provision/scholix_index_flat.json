@@ -1,0 +1,77 @@
+{
+  "mappings": {
+    "properties": {
+      "blob": {
+        "type": "binary",
+        "index": false
+      },
+      "identifier": {
+        "type": "keyword"
+      },
+      "linkProviders": {
+        "type": "keyword"
+      },
+      "publicationDate": {
+        "type": "date"
+      },
+      "relationType": {
+        "type": "keyword"
+      },
+      "sourceId": {
+        "type": "keyword"
+      },
+      "sourcePid": {
+        "type": "keyword"
+      },
+      "sourcePidType": {
+        "type": "keyword"
+      },
+      "sourcePublisher": {
+        "type": "keyword"
+      },
+      "sourceSubType": {
+        "type": "keyword"
+      },
+      "sourceType": {
+        "type": "keyword"
+      },
+      "targetId": {
+        "type": "keyword"
+      },
+      "targetPid": {
+        "type": "keyword"
+      },
+      "targetPidType": {
+        "type": "keyword"
+      },
+      "targetPublisher": {
+        "type": "keyword"
+      },
+      "targetSubType": {
+        "type": "keyword"
+      },
+      "targetType": {
+        "type": "keyword"
+      }
+    }
+  },
+  "settings": {
+    "index": {
+      "refresh_interval": "600s",
+      "number_of_shards": "48",
+      "translog": {
+        "sync_interval": "15s",
+        "durability": "ASYNC"
+      },
+      "analysis": {
+        "analyzer": {
+          "analyzer_keyword": {
+            "filter": "lowercase",
+            "tokenizer": "keyword"
+          }
+        }
+      },
+      "number_of_replicas": "0"
+    }
+  }
+}

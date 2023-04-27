@@ -103,7 +103,7 @@ public class DropAndCreateESIndex {
 					Objects
 						.requireNonNull(
 							DropAndCreateESIndex.class
-								.getResourceAsStream("/eu/dnetlib/dhp/sx/provision/scholix_index.json")));
+								.getResourceAsStream("/eu/dnetlib/dhp/sx/provision/scholix_index_flat.json")));
 
 			log.info("creating Index SCHOLIX");
 			final HttpPut put = new HttpPut(String.format(url, ip, index, "scholix"));
