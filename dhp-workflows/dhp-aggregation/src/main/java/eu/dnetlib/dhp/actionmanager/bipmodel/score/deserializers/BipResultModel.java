@@ -1,5 +1,7 @@
 
-package eu.dnetlib.dhp.actionmanager.bipmodel;
+package eu.dnetlib.dhp.actionmanager.bipmodel.score.deserializers;
+
+import eu.dnetlib.dhp.actionmanager.bipmodel.Score;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,9 +13,9 @@ import java.util.List;
  * Only needed for deserialization purposes
  */
 
-public class BipDeserialize extends HashMap<String, List<Score>> implements Serializable {
+public class BipResultModel extends HashMap<String, List<Score>> implements Serializable {
 
-	public BipDeserialize() {
+	public BipResultModel() {
 		super();
 	}
 

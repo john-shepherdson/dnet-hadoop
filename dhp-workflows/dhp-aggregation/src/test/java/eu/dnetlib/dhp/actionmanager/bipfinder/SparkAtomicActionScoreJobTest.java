@@ -6,8 +6,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.Project;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
@@ -27,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.action.AtomicAction;
-import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class SparkAtomicActionScoreJobTest {
@@ -37,8 +37,11 @@ public class SparkAtomicActionScoreJobTest {
 	private static SparkSession spark;
 
 	private static Path workingDir;
-	private static final Logger log = LoggerFactory
-		.getLogger(SparkAtomicActionScoreJobTest.class);
+
+	private final static String RESULT = "result";
+	private final static String PROJECT = "project";
+
+	private static final Logger log = LoggerFactory.getLogger(SparkAtomicActionScoreJobTest.class);
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
@@ -69,29 +72,31 @@ public class SparkAtomicActionScoreJobTest {
 		spark.stop();
 	}
 
+	private void runJob(String inputPath, String outputPath, String targetEntity) throws Exception {
+		SparkAtomicActionScoreJob.main(
+			new String[] {
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-inputPath", inputPath,
+					"-outputPath", outputPath,
+					"-targetEntity", targetEntity,
+			}
+		);
+	}
 	@Test
-	void testMatch() throws Exception {
-		String bipScoresPath = getClass()
-			.getResource("/eu/dnetlib/dhp/actionmanager/bipfinder/bip_scores_oid.json")
+	void testResultScores() throws Exception {
+		final String targetEntity = RESULT;
+		String inputResultScores = getClass()
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipfinder/result_bip_scores.json")
 			.getPath();
+		String outputPath = workingDir.toString() + "/" + targetEntity + "/actionSet";
 
-		SparkAtomicActionScoreJob
-			.main(
-				new String[] {
-					"-isSparkSessionManaged",
-					Boolean.FALSE.toString(),
-					"-inputPath",
-
-					bipScoresPath,
-
-					"-outputPath",
-					workingDir.toString() + "/actionSet"
-				});
+		// execute the job to generate the action sets for result scores
+		runJob(inputResultScores, outputPath, targetEntity);
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<Result> tmp = sc
-			.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)
+			.sequenceFile(outputPath, Text.class, Text.class)
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Result) aa.getPayload()));
 
@@ -140,4 +145,61 @@ public class SparkAtomicActionScoreJobTest {
 
 	}
 
+	@Test
+	void testProjectScores() throws Exception {
+		String targetEntity = PROJECT;
+		String inputResultScores = getClass()
+				.getResource("/eu/dnetlib/dhp/actionmanager/bipfinder/project_bip_scores.json")
+				.getPath();
+		String outputPath = workingDir.toString() + "/" + targetEntity + "/actionSet";
+
+		// execute the job to generate the action sets for project scores
+		runJob(inputResultScores, outputPath, PROJECT);
+
+		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
+
+		JavaRDD<Project> projects = sc
+				.sequenceFile(outputPath, Text.class, Text.class)
+				.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
+				.map(aa -> ((Project) aa.getPayload()));
+
+		// test the number of projects
+		assertEquals(4, projects.count());
+
+		String testProjectId = "40|nih_________::c02a8233e9b60f05bb418f0c9b714833";
+
+		// count that the project with id testProjectId is present
+		assertEquals(1, projects.filter(row -> row.getId().equals(testProjectId)).count());
+
+		projects.filter(row -> row.getId().equals(testProjectId))
+			.flatMap(r -> r.getMeasures().iterator())
+			.foreach(m -> {
+				log.info(m.getId() + " " + m.getUnit());
+
+				// ensure that only one score is present for each bip impact measure
+				assertEquals(1, m.getUnit().size());
+
+				KeyValue kv = m.getUnit().get(0);
+
+				// ensure that the correct key is provided, i.e. score
+				assertEquals("score", kv.getKey());
+
+				switch(m.getId()) {
+					case "numOfInfluentialResults":
+						assertEquals("0", kv.getValue());
+						break;
+					case "numOfPopularResults":
+						assertEquals("1", kv.getValue());
+						break;
+					case "totalImpulse":
+						assertEquals("25", kv.getValue());
+						break;
+					case "totalCitationCount":
+						assertEquals("43", kv.getValue());
+						break;
+					default:
+						fail("Unknown measure id in the context of projects");
+				}
+			});
+	}
 }

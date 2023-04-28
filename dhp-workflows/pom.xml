@@ -38,6 +38,7 @@
         <module>dhp-usage-raw-data-update</module>
         <module>dhp-broker-events</module>
         <module>dhp-doiboost</module>
+        <module>dhp-impact-indicators</module>
     </modules>
 
     <pluginRepositories>

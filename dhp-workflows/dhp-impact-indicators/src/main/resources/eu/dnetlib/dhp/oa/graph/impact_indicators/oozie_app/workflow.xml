@@ -15,6 +15,8 @@
 			<case to="map-openaire-to-doi">${resume eq "map-ids"}</case> 
 			<case to="map-scores-to-dois">${resume eq "map-scores"}</case> 
 			<case to="create-openaire-ranking-graph">${resume eq "start"}</case>
+			<case to="project-impact-indicators">${resume eq "projects-impact"}</case>
+
 			<!-- TODO: add action set creation here -->
 			<default to="create-openaire-ranking-graph" />
 		</switch>
@@ -32,7 +34,6 @@
 			<prepare>
 				<delete path="${synonymFolder}"/>
 			</prepare>
-
             		
             <!-- using configs from an example on openaire --> 
             <master>yarn-cluster</master>
@@ -88,9 +89,8 @@
 			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
 			<name-node>${nameNode}</name-node>
 
-            		
-            		<!-- using configs from an example on openaire --> 
-            		<master>yarn-cluster</master>
+			<!-- using configs from an example on openaire -->
+			<master>yarn-cluster</master>
 			<mode>cluster</mode>
             		
 			<!-- This is the name of our job -->
@@ -129,7 +129,6 @@
 			<job-tracker>${jobTracker}</job-tracker>
 			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
 			<name-node>${nameNode}</name-node>
-
             		
             <!-- using configs from an example on openaire --> 
             <master>yarn-cluster</master>
@@ -179,9 +178,8 @@
 			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
 			<name-node>${nameNode}</name-node>
 
-            		
-            		<!-- using configs from an example on openaire --> 
-            		<master>yarn-cluster</master>
+			<!-- using configs from an example on openaire -->
+			<master>yarn-cluster</master>
 			<mode>cluster</mode>
             		
 			<!-- This is the name of our job -->
@@ -233,7 +231,7 @@
 			<!-- Reference says: The master element indicates the url of the Spark Master. Ex: spark://host:port, mesos://host:port, yarn-cluster, yarn-master, or local. -->
 			<!-- <master>local[*]</master> -->
 			<!-- Reference says: The mode element if present indicates the mode of spark, where to run spark driver program. Ex: client,cluster. | In my case I always have a client -->
-            		<!-- <mode>client</mode> --> 
+			<!-- <mode>client</mode> -->
             		
             <!-- using configs from an example on openaire --> 
             <master>yarn-cluster</master>
@@ -334,12 +332,12 @@
 			<!-- This should give the machine/root of the hdfs -->
 			<name-node>${nameNode}</name-node>
             		
-            		<!-- Exec is needed foor shell comands - points to type of shell command -->
-            		<exec>/usr/bin/bash</exec>
-            		<!-- name of script to run -->
-            		<argument>get_ranking_files.sh</argument>
-            		<!-- We only pass the directory where we expect to find the rankings -->
-            		<argument>/${workflowDataDir}</argument>
+			<!-- Exec is needed for shell commands - points to type of shell command -->
+			<exec>/usr/bin/bash</exec>
+			<!-- name of script to run -->
+			<argument>get_ranking_files.sh</argument>
+			<!-- We only pass the directory where we expect to find the rankings -->
+			<argument>/${workflowDataDir}</argument>
             		
 			<!-- the name of the file run -->
 			<file>${wfAppPath}/get_ranking_files.sh#get_ranking_files.sh</file>
@@ -372,8 +370,8 @@
 			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
 			<name-node>${nameNode}</name-node>
             		
-            		<!-- using configs from an example on openaire --> 
-            		<master>yarn-cluster</master>
+			<!-- using configs from an example on openaire -->
+			<master>yarn-cluster</master>
 			<mode>cluster</mode>
             		
 			<!-- This is the name of our job -->
@@ -420,8 +418,8 @@
 			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
 			<name-node>${nameNode}</name-node>
             		
-            		<!-- using configs from an example on openaire --> 
-            		<master>yarn-cluster</master>
+			<!-- using configs from an example on openaire -->
+			<master>yarn-cluster</master>
 			<mode>cluster</mode>
             		
 			<!-- This is the name of our job -->
@@ -474,7 +472,6 @@
 			<prepare>
 				<delete path="${synonymFolder}"/>
 			</prepare>
-
             		
             <!-- using configs from an example on openaire --> 
             <master>yarn-cluster</master>
@@ -518,7 +515,6 @@
 			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
 			<name-node>${nameNode}</name-node>
 
-            		
             <!-- using configs from an example on openaire --> 
             <master>yarn-cluster</master>
 			<mode>cluster</mode>
@@ -558,21 +554,19 @@
 		
 	</action>	
 
-	    <action name="deleteOutputPathForActionSet">
+	<action name="deleteOutputPathForActionSet">
         <fs>
-            <delete path="${actionSetOutputPath}"/>
-            <mkdir path="${actionSetOutputPath}"/>
-            <!--
-			<delete path="${workingDir}"/>
-            <mkdir path="${workingDir}"/>
-			--> 
-        </fs>
-        <ok to="createActionSet"/>
+            <delete path="${actionSetOutputPath}/results/"/>
+			<delete path="${actionSetOutputPath}/projects/"/>
+
+			<mkdir path="${actionSetOutputPath}/results/"/>
+			<mkdir path="${actionSetOutputPath}/projects/"/>
+		</fs>
+        <ok to="createActionSetForResults"/>
         <error to="actionset-delete-fail"/>
     </action>
 
-
-    <action name="createActionSet">
+    <action name="createActionSetForResults">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -590,13 +584,90 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--inputPath</arg><arg>${bipScorePath}</arg>
-            <arg>--outputPath</arg><arg>${actionSetOutputPath}</arg>
-        </spark>
-        <ok to="end"/>
+            <arg>--outputPath</arg><arg>${actionSetOutputPath}/results/</arg>
+			<arg>--targetEntity</arg><arg>result</arg>
+		</spark>
+        <ok to="project-impact-indicators"/>
         <error to="actionset-creation-fail"/>
     </action>
-	
-	
+
+	<action name="project-impact-indicators">
+		<!-- This is required as a tag for spark jobs, regardless of programming language -->
+		<spark xmlns="uri:oozie:spark-action:0.2">
+			<!-- Is this yarn? Probably the answers are at the link serafeim sent me -->
+			<job-tracker>${jobTracker}</job-tracker>
+			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
+			<name-node>${nameNode}</name-node>
+			<!-- using configs from an example on openaire -->
+			<master>yarn-cluster</master>
+			<mode>cluster</mode>
+
+			<!-- This is the name of our job -->
+			<name>Project Impact Indicators</name>
+			<!-- Script name goes here -->
+			<jar>projects_impact.py</jar>
+			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
+			<spark-opts>--executor-memory 18G --executor-cores 4 --driver-memory 10G
+				--master yarn
+				--deploy-mode cluster
+				--conf spark.sql.shuffle.partitions=7680
+				--conf spark.extraListeners=${spark2ExtraListeners}
+				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
+
+			<!-- Script arguments here -->
+
+			<!-- graph data folder from which to read relations -->
+			<arg>${openaireDataInput}/relations</arg>
+
+			<!-- input files with impact indicators for results	-->
+			<arg>${nameNode}/${workflowDataDir}/${wf:actionData('get-file-names')['pr_file']}</arg>
+			<arg>${nameNode}/${workflowDataDir}/${wf:actionData('get-file-names')['attrank_file']}</arg>
+			<arg>${nameNode}/${workflowDataDir}/${wf:actionData('get-file-names')['cc_file']}</arg>
+			<arg>${nameNode}/${workflowDataDir}/${wf:actionData('get-file-names')['impulse_file']}</arg>
+
+			<!-- number of partitions to be used on joins -->
+			<arg>7680</arg>
+
+			<arg>${projectImpactIndicatorsOutput}</arg>
+
+			<!-- This needs to point to the file on the hdfs i think -->
+			<file>${wfAppPath}/projects_impact.py#projects_impact.py</file>
+		</spark>
+
+		<!-- Do this after finishing okay -->
+		<ok to="createActionSetForProjects" />
+
+		<!-- Go there if we have an error -->
+		<error to="project-impact-indicators-fail" />
+
+	</action>
+
+	<action name="createActionSetForProjects">
+		<spark xmlns="uri:oozie:spark-action:0.2">
+			<master>yarn</master>
+			<mode>cluster</mode>
+			<name>Produces the atomic action with the bip finder scores for projects</name>
+			<class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
+			<jar>dhp-aggregation-${projectVersion}.jar</jar>
+			<spark-opts>
+				--executor-memory=${sparkExecutorMemory}
+				--executor-cores=${sparkExecutorCores}
+				--driver-memory=${sparkDriverMemory}
+				--conf spark.extraListeners=${spark2ExtraListeners}
+				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+				--conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+			</spark-opts>
+			<arg>--inputPath</arg><arg>${projectImpactIndicatorsOutput}</arg>
+			<arg>--outputPath</arg><arg>${actionSetOutputPath}/projects/</arg>
+			<arg>--targetEntity</arg><arg>project</arg>
+		</spark>
+		<ok to="end"/>
+		<error to="actionset-project-creation-fail"/>
+	</action>
 
 	<!-- TODO: end the workflow-->
 		
@@ -641,7 +712,14 @@
 	</kill>	
 
 	<kill name="actionset-creation-fail">
-		<message>ActionSet creation failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-	</kill>		
+		<message>ActionSet creation for results failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
 
+	<kill name="project-impact-indicators-fail">
+		<message>Calculating project impact indicators failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="actionset-project-creation-fail">
+		<message>ActionSet creation for projects failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
 </workflow-app>
