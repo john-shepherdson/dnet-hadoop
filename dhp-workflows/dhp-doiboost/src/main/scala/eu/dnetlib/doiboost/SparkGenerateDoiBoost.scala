@@ -203,9 +203,9 @@ object SparkGenerateDoiBoost {
         val r: Relation = new Relation
         r.setSource(pub.getId)
         r.setTarget(affId)
-        r.setRelType(ModelConstants.RESULT_ORGANIZATION)
-        r.setRelClass(ModelConstants.HAS_AUTHOR_INSTITUTION)
-        r.setSubRelType(ModelConstants.AFFILIATION)
+        r.setRelType(Relation.RELTYPE.resultOrganization)
+        r.setRelClass(Relation.RELCLASS.hasAuthorInstitution)
+        r.setSubRelType(Relation.SUBRELTYPE.affiliation)
         r.setProvenance(OafMapperUtils.getProvenance(pub.getCollectedfrom, dataInfo))
 
         List(r)

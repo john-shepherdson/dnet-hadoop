@@ -36,15 +36,4 @@ public class ModelSupportTest {
 		}
 	}
 
-	@Nested
-	class InverseRelation {
-
-		@Test
-		void findRelations() {
-			assertNotNull(ModelSupport.findRelation("isMetadataFor"));
-			assertNotNull(ModelSupport.findRelation("ismetadatafor"));
-			assertNotNull(ModelSupport.findRelation("ISMETADATAFOR"));
-			assertNotNull(ModelSupport.findRelation("isRelatedTo"));
-		}
-	}
 }

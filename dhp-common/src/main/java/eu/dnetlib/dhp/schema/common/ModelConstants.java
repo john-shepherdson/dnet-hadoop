@@ -86,7 +86,6 @@ public class ModelConstants {
 	public static final Qualifier PROVENANCE_ACTION_SET_QUALIFIER = qualifier(
 		SYSIMPORT_ACTIONSET, SYSIMPORT_ACTIONSET, DNET_PROVENANCE_ACTIONS);
 
-
 	public static final String UNKNOWN = "UNKNOWN";
 	public static final String NOT_AVAILABLE = "not available";
 

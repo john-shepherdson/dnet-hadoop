@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.common.RelationInverse;
+import eu.dnetlib.dhp.schema.oaf.common.RelationLabel;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -401,7 +401,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	protected List<Oaf> getRelations(final String reltype, final String entityId, final String otherId,
 		final Entity entity) {
 		final List<Oaf> res = new ArrayList<>();
-		RelationInverse rel = ModelSupport.findRelation(reltype);
+		RelationLabel rel = ModelSupport.findRelation(reltype);
 		if (rel != null) {
 			res
 				.add(

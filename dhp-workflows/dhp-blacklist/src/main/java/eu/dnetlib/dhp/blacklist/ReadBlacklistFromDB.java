@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.common.RelationInverse;
+import eu.dnetlib.dhp.schema.oaf.common.RelationLabel;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -76,30 +76,22 @@ public class ReadBlacklistFromDB implements Closeable {
 	public List<Relation> processBlacklistEntry(ResultSet rs) {
 		try {
 			Relation direct = new Relation();
-			Relation inverse = new Relation();
+
 
 			String source_prefix = ModelSupport.entityIdPrefix.get(rs.getString("source_type"));
 			String target_prefix = ModelSupport.entityIdPrefix.get(rs.getString("target_type"));
 
 			String source_direct = source_prefix + "|" + rs.getString("source");
 			direct.setSource(source_direct);
-			inverse.setTarget(source_direct);
 
 			String target_direct = target_prefix + "|" + rs.getString("target");
 			direct.setTarget(target_direct);
-			inverse.setSource(target_direct);
-
 			String encoding = rs.getString("relationship");
-			RelationInverse ri = ModelSupport.findInverse(encoding);
-			direct.setRelClass(ri.getRelClass());
-			inverse.setRelClass(ri.getInverseRelClass());
-			direct.setRelType(ri.getRelType());
-			inverse.setRelType(ri.getRelType());
-			direct.setSubRelType(ri.getSubReltype());
-			inverse.setSubRelType(ri.getSubReltype());
-
-			return Arrays.asList(direct, inverse);
-
+			final RelationLabel directLabel = ModelSupport.unRel(encoding);
+			direct.setRelClass(directLabel.getRelClass());
+			direct.setRelType(directLabel.getRelType());
+			direct.setSubRelType(directLabel.getSubReltype());
+			return Arrays.asList(direct, direct.inverse());
 		} catch (final SQLException e) {
 			throw new RuntimeException(e);
 		}

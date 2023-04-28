@@ -100,7 +100,7 @@ object DataciteToOAFTransformation {
   }
 
   /** This utility method indicates whether the embargo date has been reached
-    * @param embargo_end_date
+    * @param embargo_end_date the end date of embargo
     * @return True if the embargo date has been reached, false otherwise
     */
   def embargo_end(embargo_end_date: String): Boolean = {
@@ -345,8 +345,8 @@ object DataciteToOAFTransformation {
 
     // DOI is mapped on a PID inside a Instance object
     val doi_q = OafMapperUtils.qualifier(
-      "doi",
-      "doi",
+      ModelConstants.DOI,
+      ModelConstants.DOI,
       ModelConstants.DNET_PID_TYPES
     )
     val pid = OafMapperUtils.structuredProperty(doi, doi_q)
@@ -615,44 +615,52 @@ object DataciteToOAFTransformation {
       List(result)
   }
 
+
+  //TODO @CLAUDIO we need to define relation in which verse
+
+  /**
+   * This function generate unresolved relation from the original Datacite document
+   * @param rels the related identifier section on the document
+   * @param id the source record Identifier
+   * @param date the date of collection
+   * @return a List of OAF relation
+   */
   private def generateRelations(
     rels: List[RelatedIdentifierType],
     id: String,
     date: String
   ): List[Relation] = {
+
+    // TODO We need to check how to generate realtions
+    // in the previous implementation we create all Bidirection Relations
+    // related to a DOI pid or arxiv,
     val bidirectionalRels: List[Relation] = rels
       .filter(r =>
-        Relation.RELCLASS.exists(r.relationType) && (r.relatedIdentifierType.equalsIgnoreCase("doi") ||
-        r.relatedIdentifierType.equalsIgnoreCase("pmid") ||
-        r.relatedIdentifierType.equalsIgnoreCase("arxiv"))
+        Relation.RELCLASS.exists(r.relationType) && validIdentifiersInRelation(r.relatedIdentifierType)
       )
       .map(r => {
-        val subRelType = subRelTypeMapping(r.relationType).relType
+        val subRelType = Relation.SUBRELTYPE.valueOf(r.relationType)
         val target = DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
-        relation(id, target, subRelType, r.relationType, date)
+        relation(id, target, subRelType, Relation.RELCLASS.valueOf(r.relationType), date)
       })
     val citationRels: List[Relation] = rels
-      .filter(r =>
-        (r.relatedIdentifierType.equalsIgnoreCase("doi") ||
-        r.relatedIdentifierType.equalsIgnoreCase("pmid") ||
-        r.relatedIdentifierType.equalsIgnoreCase("arxiv")) &&
+      .filter(r =>validIdentifiersInRelation(r.relatedIdentifierType) &&
         (r.relationType.toLowerCase.contains("cite") || r.relationType.toLowerCase.contains("reference"))
       )
       .map(r => {
         r.relationType match {
-          case ModelConstants.CITES | ModelConstants.REFERENCES =>
+          case  Relation.RELCLASS.Cites.toString | Relation.RELCLASS.References.toString =>
             val target = DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
-            relation(id, target, ModelConstants.CITATION, ModelConstants.CITES, date)
-          case ModelConstants.IS_CITED_BY | ModelConstants.IS_REFERENCED_BY =>
+            relation(id, target, Relation.SUBRELTYPE.citation, Relation.RELCLASS.Cites, date)
+          case Relation.RELCLASS.IsCitedBy.toString | Relation.RELCLASS.IsReferencedBy.toString =>
             val source = DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
-            relation(source, id, ModelConstants.CITATION, ModelConstants.CITES, date)
+            relation(source, id, Relation.SUBRELTYPE.citation, Relation.RELCLASS.Cites, date)
         }
       })
-
     citationRels ::: bidirectionalRels
   }
 
-  def relation(source: String, target: String, subRelType: String, relClass: String, date: String): Relation = {
+  def relation(source: String, target: String, subRelType: Relation.SUBRELTYPE, relClass: Relation.RELCLASS, date: String): Relation = {
     val rel = new Relation
     rel.setProvenance(Lists.newArrayList(OafMapperUtils.getProvenance(DATACITE_COLLECTED_FROM, relDataInfo)))
 

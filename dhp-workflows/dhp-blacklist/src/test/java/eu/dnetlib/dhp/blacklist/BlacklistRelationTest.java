@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import eu.dnetlib.dhp.schema.oaf.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.common.RelationInverse;
+import eu.dnetlib.dhp.schema.oaf.common.RelationLabel;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,7 @@ public class BlacklistRelationTest {
 				"resultProject_outcome_isProducedBy");
 
 		rels.forEach(r -> {
-			RelationInverse inverse = ModelSupport.relationInverseMap.get(r);
+			RelationLabel inverse = ModelSupport.relationInverseMap.get(r);
 			Assertions.assertNotNull(inverse);
 			Assertions.assertNotNull(inverse.getRelType());
 			Assertions.assertNotNull(inverse.getSubReltype());

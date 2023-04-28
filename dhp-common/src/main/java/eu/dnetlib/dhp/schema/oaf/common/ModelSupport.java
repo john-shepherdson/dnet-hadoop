@@ -2,16 +2,12 @@
 package eu.dnetlib.dhp.schema.oaf.common;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 import org.apache.commons.codec.binary.Hex;
@@ -96,26 +92,6 @@ public class ModelSupport {
 		idPrefixEntity.put("50", "result");
 	}
 
-	private static void set(Map<String, RelationInverse> relationInverseMap, String relType, String subRelType,
-		String relClass, String inverseRelClass) {
-		relationInverseMap
-			.put(
-				rel(relType, subRelType, relClass), new RelationInverse()
-					.setInverseRelClass(inverseRelClass)
-					.setRelClass(relClass)
-					.setRelType(relType)
-					.setSubReltype(subRelType));
-		if (!relClass.equals(inverseRelClass)) {
-			relationInverseMap
-				.put(
-					rel(relType, subRelType, inverseRelClass), new RelationInverse()
-						.setInverseRelClass(relClass)
-						.setRelClass(inverseRelClass)
-						.setRelType(relType)
-						.setSubReltype(subRelType));
-		}
-	}
-
 	/**
 	 * Helper method: combines the relation attributes
 	 * @param relType
@@ -125,6 +101,24 @@ public class ModelSupport {
 	 */
 	public static String rel(String relType, String subRelType, String relClass) {
 		return String.format("%s_%s_%s", relType, subRelType, relClass);
+	}
+
+	/**
+	 * Helper method: deserialize the relation attributes serialized with rel
+	 * @param relType
+	 * @param subRelType
+	 * @param relClass
+	 * @return
+	 */
+	public static RelationLabel unRel(String deserialization) {
+		final String[] s = deserialization.split("_");
+		if (s!= null && s.length==3) {
+			final Relation.RELTYPE currentRelType = Relation.RELTYPE.valueOf(s[0]);
+			final Relation.SUBRELTYPE currentSubRelType = Relation.SUBRELTYPE.valueOf(s[1]);
+			final Relation.RELCLASS currentRelClass = Relation.RELCLASS.valueOf(s[2]);
+			return new RelationLabel(currentRelClass, currentRelType, currentSubRelType);
+		}
+		throw new IllegalArgumentException("Invalid relationship format for "+ deserialization);
 	}
 
 	private static final String schemeTemplate = "dnet:%s_%s_relations";

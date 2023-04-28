@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.datacite
 
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils
-import eu.dnetlib.dhp.schema.oaf.{DataInfo, EntityDataInfo, KeyValue}
+import eu.dnetlib.dhp.schema.oaf.{DataInfo, EntityDataInfo, KeyValue, Relation}
 
 import java.io.InputStream
 import java.time.format.DateTimeFormatter
@@ -66,12 +66,13 @@ class DataciteModelConstants extends Serializable {}
 
 object DataciteModelConstants {
 
-  val REL_TYPE_VALUE: String = "resultResult"
+  val REL_TYPE_VALUE =Relation.RELTYPE.resultResult
   val DATE_RELATION_KEY = "RelationDate"
   val DATACITE_FILTER_PATH = "/eu/dnetlib/dhp/datacite/datacite_filter"
-  val DOI_CLASS = "doi"
   val SUBJ_CLASS = "keywords"
   val DATACITE_NAME = "Datacite"
+  val PMID = "pmid"
+  val ARXIV = "arxiv"
   val dataInfo: EntityDataInfo = dataciteDataInfo(0.9f)
   val relDataInfo = OafMapperUtils.fromEntityDataInfo(dataInfo);
 
@@ -138,4 +139,8 @@ object DataciteModelConstants {
     Pattern.compile("(19|20)\\d\\d", Pattern.MULTILINE)
   )
 
+  def validIdentifiersInRelation(relatedIdentifierType:String):Boolean = {
+    relatedIdentifierType.equalsIgnoreCase(ModelConstants.DOI) || relatedIdentifierType.equalsIgnoreCase(PMID) ||
+      relatedIdentifierType.equalsIgnoreCase(ARXIV)
+  }
 }
