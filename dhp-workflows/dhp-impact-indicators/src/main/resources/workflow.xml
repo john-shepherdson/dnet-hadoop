@@ -65,7 +65,7 @@
 		</spark>
 		
 		<!-- Do this after finishing okay -->
-		<ok to="non-iterative-rankings" />
+		<ok to="end" />
 		<!-- Go there if we have an error -->
 		<error to="openaire-graph-error" />
 		
@@ -155,7 +155,7 @@
 			<arg>RAM</arg>
 			<!-- number of partitions to be used on joins -->
 			<arg>7680</arg>
-			<arg>${γιτ α}</arg>
+			<arg>${checkpointDir}</arg>
 			<!-- This needs to point to the file on the hdfs i think -->
 			<file>${wfAppPath}/TAR.py#TAR.py</file>
 		</spark>
