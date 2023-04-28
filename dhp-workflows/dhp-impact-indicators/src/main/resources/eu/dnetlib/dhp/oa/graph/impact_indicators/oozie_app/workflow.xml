@@ -31,9 +31,11 @@
 			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
 			<name-node>${nameNode}</name-node>
 			<!-- Delete previously created doi synonym folder -->
+			<!-- I think we don't need this given we don't have synonyms anymore
 			<prepare>
 				<delete path="${synonymFolder}"/>
 			</prepare>
+			--> 
             		
             <!-- using configs from an example on openaire --> 
             <master>yarn-cluster</master>
