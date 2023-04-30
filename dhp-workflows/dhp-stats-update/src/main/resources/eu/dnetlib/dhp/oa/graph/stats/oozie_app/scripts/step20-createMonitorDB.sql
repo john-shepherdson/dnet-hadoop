@@ -65,7 +65,8 @@ create table TARGET.result stored as parquet as
              'openorgs____::57784c9e047e826fefdb1ef816120d92', --Arts et Métiers ParisTech
              'openorgs____::2530baca8a15936ba2e3297f2bce2e7e',	-- University of Cape Town
              'openorgs____::d11f981828c485cd23d93f7f24f24db1',   -- Technological University Dublin
-             'openorgs____::5e6bf8962665cdd040341171e5c631d8'   -- Delft University of Technology
+             'openorgs____::5e6bf8962665cdd040341171e5c631d8',   -- Delft University of Technology
+             'openorgs____::846cb428d3f52a445f7275561a7beb5d'    -- University of Manitoba
         ) )) foo;
 
 ANALYZE TABLE TARGET.result COMPUTE STATISTICS;
