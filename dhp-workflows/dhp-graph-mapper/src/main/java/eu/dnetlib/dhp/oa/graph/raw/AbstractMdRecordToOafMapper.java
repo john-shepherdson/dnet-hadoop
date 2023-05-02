@@ -1,14 +1,9 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PID_TYPES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.IS_PRODUCED_BY;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.OUTCOME;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PRODUCES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.REPOSITORY_PROVENANCE_ACTIONS;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.UNKNOWN;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.createOpenaireId;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -22,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
@@ -195,6 +191,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			rels.addAll(addProjectRels(doc, entity));
 			rels.addAll(addOtherResultRels(doc, entity));
 			rels.addAll(addRelations(doc, entity));
+			rels.addAll(addAffiliations(doc, entity));
 
 			oafs.addAll(rels);
 		}
@@ -295,7 +292,7 @@ public abstract class AbstractMdRecordToOafMapper {
 				final String relClassInverse = ModelSupport
 					.findInverse(ModelSupport.rel(relType, subRelType, relClass))
 					.getInverseRelClass();
-				final String validationdDate = ((Node) o).valueOf("@validationDate");
+				final String validationDate = ((Node) o).valueOf("@validationDate");
 
 				if (StringUtils.isNotBlank(target)) {
 					final String targetType = element.attributeValue("targetType");
@@ -306,15 +303,56 @@ public abstract class AbstractMdRecordToOafMapper {
 								OafMapperUtils
 									.getRelation(
 										entity.getId(), targetId, relType, subRelType, relClass, entity,
-										validationdDate));
+										validationDate));
 						rels
 							.add(
 								OafMapperUtils
 									.getRelation(
 										targetId, entity.getId(), relType, subRelType, relClassInverse, entity,
-										validationdDate));
+										validationDate));
 					}
 				}
+			}
+		}
+		return rels;
+	}
+
+	private List<Oaf> addAffiliations(Document doc, OafEntity entity) {
+		final List<Oaf> rels = Lists.newArrayList();
+
+		for (Object o : doc.selectNodes("//datacite:affiliation[@affiliationIdentifierScheme='ROR']")) {
+			Element element = (Element) o;
+
+			String rorId = element.attributeValue("affiliationIdentifier");
+			if (StringUtils.isNotBlank(rorId)) {
+
+				String resultId = entity.getId();
+				String orgId = createOpenaireId("organization", rorId, true);
+
+				List<KeyValue> properties = Lists.newArrayList();
+
+				String apcAmount = doc.valueOf("//oaf:processingchargeamount");
+				String apcCurrency = doc.valueOf("//oaf:processingchargeamount/@currency");
+
+				if (StringUtils.isNotBlank(apcAmount) && StringUtils.isNotBlank(apcCurrency)) {
+					properties.add(OafMapperUtils.keyValue("apc_amount", apcAmount));
+					properties.add(OafMapperUtils.keyValue("apc_currency", apcCurrency));
+				}
+
+				rels
+					.add(
+						OafMapperUtils
+							.getRelation(
+								resultId, orgId, RESULT_ORGANIZATION, AFFILIATION, HAS_AUTHOR_INSTITUTION,
+								entity.getCollectedfrom(), entity.getDataInfo(), entity.getLastupdatetimestamp(), null,
+								properties));
+				rels
+					.add(
+						OafMapperUtils
+							.getRelation(
+								orgId, resultId, RESULT_ORGANIZATION, AFFILIATION, IS_AUTHOR_INSTITUTION_OF,
+								entity.getCollectedfrom(), entity.getDataInfo(), entity.getLastupdatetimestamp(), null,
+								properties));
 			}
 		}
 		return rels;
