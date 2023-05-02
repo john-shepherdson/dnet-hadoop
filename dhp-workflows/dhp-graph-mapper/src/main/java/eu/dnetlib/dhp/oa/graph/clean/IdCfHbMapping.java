@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.oa.graph.clean.cfhb;
+package eu.dnetlib.dhp.oa.graph.clean;
 
 import java.io.Serializable;
 
