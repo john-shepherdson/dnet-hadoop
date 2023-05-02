@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -54,7 +55,7 @@ class EntityMergerTest implements Serializable {
 	}
 
 	@Test
-	void softwareMergerTest() throws InstantiationException, IllegalAccessException {
+	void softwareMergerTest() throws InstantiationException, IllegalAccessException, InvocationTargetException {
 
 		List<Tuple2<String, Software>> softwares = readSample(
 			testEntityBasePath + "/software_merge.json", Software.class);
@@ -69,7 +70,7 @@ class EntityMergerTest implements Serializable {
 	}
 
 	@Test
-	void publicationMergerTest() throws InstantiationException, IllegalAccessException {
+	void publicationMergerTest() throws InstantiationException, IllegalAccessException, InvocationTargetException {
 
 		Publication pub_merged = DedupRecordFactory
 			.entityMerger(dedupId, publications.iterator(), 0, dataInfo, Publication.class);
@@ -134,7 +135,7 @@ class EntityMergerTest implements Serializable {
 	}
 
 	@Test
-	void publicationMergerTest2() throws InstantiationException, IllegalAccessException {
+	void publicationMergerTest2() throws InstantiationException, IllegalAccessException, InvocationTargetException {
 
 		Publication pub_merged = DedupRecordFactory
 			.entityMerger(dedupId, publications2.iterator(), 0, dataInfo, Publication.class);
@@ -146,7 +147,7 @@ class EntityMergerTest implements Serializable {
 	}
 
 	@Test
-	void publicationMergerTest3() throws InstantiationException, IllegalAccessException {
+	void publicationMergerTest3() throws InstantiationException, IllegalAccessException, InvocationTargetException {
 
 		Publication pub_merged = DedupRecordFactory
 			.entityMerger(dedupId, publications3.iterator(), 0, dataInfo, Publication.class);
@@ -156,7 +157,8 @@ class EntityMergerTest implements Serializable {
 	}
 
 	@Test
-	void publicationMergerTest4() throws InstantiationException, IllegalStateException, IllegalAccessException {
+	void publicationMergerTest4()
+		throws InstantiationException, IllegalStateException, IllegalAccessException, InvocationTargetException {
 
 		Publication pub_merged = DedupRecordFactory
 			.entityMerger(dedupId, publications4.iterator(), 0, dataInfo, Publication.class);
@@ -166,7 +168,8 @@ class EntityMergerTest implements Serializable {
 	}
 
 	@Test
-	void publicationMergerTest5() throws InstantiationException, IllegalStateException, IllegalAccessException {
+	void publicationMergerTest5()
+		throws InstantiationException, IllegalStateException, IllegalAccessException, InvocationTargetException {
 
 		System.out
 			.println(

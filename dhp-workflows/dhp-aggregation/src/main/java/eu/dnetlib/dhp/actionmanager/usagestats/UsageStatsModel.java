@@ -4,16 +4,16 @@ package eu.dnetlib.dhp.actionmanager.usagestats;
 import java.io.Serializable;
 
 public class UsageStatsModel implements Serializable {
-	private String result_id;
+	private String id;
 	private Long downloads;
 	private Long views;
 
-	public String getResult_id() {
-		return result_id;
+	public String getId() {
+		return id;
 	}
 
-	public void setResult_id(String result_id) {
-		this.result_id = result_id;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public Long getDownloads() {

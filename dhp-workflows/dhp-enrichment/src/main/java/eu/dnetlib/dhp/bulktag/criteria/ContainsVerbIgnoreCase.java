@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.bulktag.criteria;
 
 import java.io.Serializable;
 
-@VerbClass("contains_ignorecase")
+@VerbClass("contains_caseinsensitive")
 public class ContainsVerbIgnoreCase implements Selection, Serializable {
 
 	private String param;

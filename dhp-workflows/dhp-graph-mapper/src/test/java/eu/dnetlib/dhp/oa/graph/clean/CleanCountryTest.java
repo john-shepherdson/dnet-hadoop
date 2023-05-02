@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 
 public class CleanCountryTest {
@@ -83,12 +84,12 @@ public class CleanCountryTest {
 		CleanCountrySparkJob.main(new String[] {
 			"--isSparkSessionManaged", Boolean.FALSE.toString(),
 			"--inputPath", workingDir.toString() + "/publication",
-			"-graphTableClassName", Publication.class.getCanonicalName(),
-			"-workingPath", workingDir.toString() + "/working",
-			"-country", "NL",
-			"-verifyParam", "10.17632",
-			"-collectedfrom", "NARCIS",
-			"-hostedBy", getClass()
+			"--graphTableClassName", Publication.class.getCanonicalName(),
+			"--workingDir", workingDir.toString() + "/working",
+			"--country", "NL",
+			"--verifyParam", "10.17632",
+			"--collectedfrom", "NARCIS",
+			"--hostedBy", getClass()
 				.getResource("/eu/dnetlib/dhp/oa/graph/clean/hostedBy")
 				.getPath()
 		});
@@ -145,6 +146,45 @@ public class CleanCountryTest {
 					.get(0)
 					.getCountry()
 					.size());
+	}
+
+	@Test
+	public void testDatasetClean() throws Exception {
+		final String sourcePath = getClass()
+			.getResource("/eu/dnetlib/dhp/oa/graph/clean/dataset_clean_country.json")
+			.getPath();
+
+		spark
+			.read()
+			.textFile(sourcePath)
+			.map(
+				(MapFunction<String, Dataset>) r -> OBJECT_MAPPER.readValue(r, Dataset.class),
+				Encoders.bean(Dataset.class))
+			.write()
+			.json(workingDir.toString() + "/dataset");
+
+		CleanCountrySparkJob.main(new String[] {
+			"--isSparkSessionManaged", Boolean.FALSE.toString(),
+			"--inputPath", workingDir.toString() + "/dataset",
+			"-graphTableClassName", Dataset.class.getCanonicalName(),
+			"-workingDir", workingDir.toString() + "/working",
+			"-country", "NL",
+			"-verifyParam", "10.17632",
+			"-collectedfrom", "NARCIS",
+			"-hostedBy", getClass()
+				.getResource("/eu/dnetlib/dhp/oa/graph/clean/hostedBy")
+				.getPath()
+		});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+		JavaRDD<Dataset> tmp = sc
+			.textFile(workingDir.toString() + "/dataset")
+			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
+
+		Assertions.assertEquals(1, tmp.count());
+
+		Assertions.assertEquals(0, tmp.first().getCountry().size());
+
 	}
 
 }

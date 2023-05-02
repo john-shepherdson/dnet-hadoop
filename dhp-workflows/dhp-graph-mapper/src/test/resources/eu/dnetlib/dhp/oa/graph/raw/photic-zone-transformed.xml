@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:oaire="http://namespace.openaire.eu/schema/oaire/"
+        xmlns:datacite="http://datacite.org/schema/kernel-4"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+        xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <header xmlns="http://www.openarchives.org/OAI/2.0/">
+        <dri:objIdentifier>fsh_____4119::68126da991bd76d8be494bddfbf7a1bb</dri:objIdentifier>
+        <dri:recordIdentifier>https://w3id.org/ro-id/28499bdf-a0c6-46aa-a96f-50bd9490b8be</dri:recordIdentifier>
+        <dri:dateOfCollection/>
+        <dri:mdFormat/>
+        <dri:mdFormatInterpretation/>
+        <dri:repositoryId/>
+        <dr:objectIdentifier/>
+        <dr:dateOfCollection>2022-11-15T12:29:19Z</dr:dateOfCollection>
+        <dr:dateOfTransformation>2022-11-15T12:29:19Z</dr:dateOfTransformation>
+        <oaf:datasourceprefix>fsh_____4119</oaf:datasourceprefix>
+        <identifier>https://w3id.org/ro-id/28499bdf-a0c6-46aa-a96f-50bd9490b8be</identifier>
+        <datestamp>2022-11-15T12:29:19Z</datestamp>
+        <setSpec>rohub_data</setSpec>
+        <setSpec>ro-crate_data</setSpec>
+    </header>
+    <metadata>
+        <datacite:resource>
+            <datacite:identifier identifierType="w3id">https://w3id.org/ro-id/28499bdf-a0c6-46aa-a96f-50bd9490b8be</datacite:identifier>
+            <datacite:alternateIdentifiers>
+                <datacite:alternateIdentifier alternateIdentifierType="w3id">https://w3id.org/ro-id/28499bdf-a0c6-46aa-a96f-50bd9490b8be</datacite:alternateIdentifier>
+            </datacite:alternateIdentifiers>
+            <datacite:relatedIdentifiers>
+                <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">https://w3id.org/ro-id/28499bdf-a0c6-46aa-a96f-50bd9490b8be/resources/b1b617b2-6b79-4bae-9fa6-b76945645626</datacite:relatedIdentifier>
+                <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">https://w3id.org/ro-id/28499bdf-a0c6-46aa-a96f-50bd9490b8be/resources/78103994-30be-4875-bf89-5acd752b5c3d</datacite:relatedIdentifier>
+                <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">https://w3id.org/ro-id/28499bdf-a0c6-46aa-a96f-50bd9490b8be/resources/18fd1c70-249b-4c67-80ee-539f801a0da7</datacite:relatedIdentifier>
+                <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">https://w3id.org/ro-id/28499bdf-a0c6-46aa-a96f-50bd9490b8be/resources/32faa2eb-4cc8-401f-ac5c-bec2849b70e1</datacite:relatedIdentifier>
+                <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">https://w3id.org/ro-id/28499bdf-a0c6-46aa-a96f-50bd9490b8be/resources/4c253f5a-d427-40c2-9e9f-6063ae087239</datacite:relatedIdentifier>
+                <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">https://w3id.org/ro-id/28499bdf-a0c6-46aa-a96f-50bd9490b8be/resources/371b1957-078c-472b-a195-af7bce152c10</datacite:relatedIdentifier>
+                <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">https://w3id.org/ro-id/28499bdf-a0c6-46aa-a96f-50bd9490b8be/resources/82f9e4b8-01b4-4e50-9e27-ec9d337c8d74</datacite:relatedIdentifier>
+            </datacite:relatedIdentifiers>
+            <datacite:resourceType xs:anyURI="http://purl.org/coar/resource_type/c_1843">RO-crate</datacite:resourceType>
+            <datacite:rightsList>
+                <datacite:rights rightsURI="https://creativecommons.org/licenses/by/4.0/legalcode">Creative Commons Attribution 4.0 International</datacite:rights>
+                <datacite:rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</datacite:rights>
+            </datacite:rightsList>
+            <datacite:titles>
+                <datacite:title>Mapping the photic zone of the Mediterranean Sea</datacite:title>
+            </datacite:titles>
+            <datacite:descriptions>
+                <datacite:description descriptionType="Abstract">Estimating the penetration of light along the water column from satellite data to map the photic zone in the Mediterranean Sea</datacite:description>
+            </datacite:descriptions>
+            <datacite:publisher>CNR-ISMAR</datacite:publisher>
+            <creators xmlns="http://datacite.org/schema/kernel-4">
+                <creator>
+                    <creatorName>Giorgio Castellan</creatorName>
+                </creator>
+                <creator>
+                    <creatorName>Lorenzo Angeletti</creatorName>
+                </creator>
+                <creator>
+                    <creatorName>Paolo Montagna</creatorName>
+                </creator>
+                <creator>
+                    <creatorName>Marco Taviani</creatorName>
+                </creator>
+            </creators>
+            <dates xmlns="http://datacite.org/schema/kernel-4">
+                <date dateType="Issued">2022-11-14T16:32:45Z</date>
+            </dates>
+            <dc:descriptions>
+                <dc:description descriptionType="Abstract">Estimating the penetration of light along the water column from satellite data to map the photic zone in the Mediterranean Sea</dc:description>
+            </dc:descriptions>
+            <dc:publicationYear>2022</dc:publicationYear>
+            <rightsList xmlns="http://datacite.org/schema/kernel-4">
+                <rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</rights>
+            </rightsList>
+            <sizes xmlns="http://datacite.org/schema/kernel-4">
+                <size>813.478 KB</size>
+            </sizes>
+            <subjects xmlns="http://datacite.org/schema/kernel-4">
+                <subject>Earth sciences</subject>
+                <subject>Ecology</subject>
+                <subject>Optics</subject>
+            </subjects>
+        </datacite:resource>
+        <oaf:identifier identifierType="w3id">https://w3id.org/ro-id/28499bdf-a0c6-46aa-a96f-50bd9490b8be</oaf:identifier>
+        <dr:CobjCategory type="other">0048</dr:CobjCategory>
+        <oaf:dateAccepted>2022-11-14</oaf:dateAccepted>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:license>https://creativecommons.org/licenses/by/4.0/legalcode</oaf:license>
+        <oaf:language/>
+        <oaf:hostedBy name="ROHub" id="fairsharing_::4119"/>
+        <oaf:collectedFrom name="ROHub" id="fairsharing_::4119"/>
+        <oaf:eoscifguidelines code="EOSC::RO-crate"
+                              label="EOSC::RO-crate"
+                              url=""
+                              semanticrelation="compliesWith"/>
+        <oaf:eoscifguidelines code="EOSC::Jupyter Notebook"
+                              label="EOSC::Jupyter Notebook"
+                              url=""
+                              semanticrelation="compliesWith"/>
+        <oaf:eoscifguidelines code="EOSC::Data Cube"
+                              label="EOSC::Data Cube"
+                              url=""
+                              semanticrelation="compliesWith"/>
+    </metadata>
+</record>

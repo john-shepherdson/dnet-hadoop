@@ -53,7 +53,8 @@ class ResolveEntitiesTest extends Serializable {
   def generateUpdates(spark: SparkSession): Unit = {
     val template = Source.fromInputStream(this.getClass.getResourceAsStream("updates")).mkString
 
-    val pids: List[String] = template.lines
+    val pids: List[String] = template.linesWithSeparators
+      .map(l => l.stripLineEnd)
       .map { id =>
         val r = new Result
         r.setId(id.toLowerCase.trim)
@@ -127,7 +128,7 @@ class ResolveEntitiesTest extends Serializable {
     entities.foreach { e =>
       val template = Source.fromInputStream(this.getClass.getResourceAsStream(s"$e")).mkString
       spark
-        .createDataset(spark.sparkContext.parallelize(template.lines.toList))
+        .createDataset(spark.sparkContext.parallelize(template.linesWithSeparators.map(l => l.stripLineEnd).toList))
         .as[String]
         .write
         .option("compression", "gzip")
@@ -264,7 +265,8 @@ class ResolveEntitiesTest extends Serializable {
       Source
         .fromInputStream(this.getClass.getResourceAsStream(s"publication"))
         .mkString
-        .lines
+        .linesWithSeparators
+        .map(l => l.stripLineEnd)
         .next(),
       classOf[Publication]
     )

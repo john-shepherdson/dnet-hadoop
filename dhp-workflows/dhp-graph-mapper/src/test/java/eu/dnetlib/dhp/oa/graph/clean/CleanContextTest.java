@@ -82,10 +82,10 @@ public class CleanContextTest {
 		CleanContextSparkJob.main(new String[] {
 			"--isSparkSessionManaged", Boolean.FALSE.toString(),
 			"--inputPath", workingDir.toString() + "/publication",
-			"-graphTableClassName", Publication.class.getCanonicalName(),
-			"-workingPath", workingDir.toString() + "/working",
-			"-contextId", "sobigdata",
-			"-verifyParam", "gCube "
+			"--graphTableClassName", Publication.class.getCanonicalName(),
+			"--workingDir", workingDir.toString() + "/working",
+			"--contextId", "sobigdata",
+			"--verifyParam", "gCube "
 		});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());

@@ -16,6 +16,7 @@ import javax.print.attribute.DocAttributeSet;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -34,6 +35,7 @@ import eu.dnetlib.dhp.bulktag.community.*;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import scala.Tuple2;
 
 /**
  * @author miriam.baglioni
@@ -43,6 +45,11 @@ public class SparkEoscBulkTag implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkEoscBulkTag.class);
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
+	private static String OPENAIRE_3 = "openaire3.0";
+	private static String OPENAIRE_4 = "openaire-pub_4.0";
+	private static String OPENAIRE_CRIS = "openaire-cris_1.1";
+	private static String OPENAIRE_DATA = "openaire2.0_data";
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
@@ -72,6 +79,9 @@ public class SparkEoscBulkTag implements Serializable {
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
+		final String resultType = parser.get("resultType");
+		log.info("resultType: {}", resultType);
+
 		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		SparkConf conf = new SparkConf();
@@ -82,41 +92,71 @@ public class SparkEoscBulkTag implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				removeOutputDir(spark, workingPath);
-				execBulkTag(spark, inputPath, workingPath, datasourceMapPath, resultClazz);
+				selectCompliantDatasources(spark, inputPath, workingPath, datasourceMapPath);
+				execBulkTag(spark, inputPath, workingPath, resultType, resultClazz);
 			});
+	}
+
+	private static void selectCompliantDatasources(SparkSession spark, String inputPath, String workingPath,
+		String datasourceMapPath) {
+		Dataset<Datasource> datasources = readPath(spark, inputPath + "datasource", Datasource.class)
+			.filter((FilterFunction<Datasource>) ds -> {
+				final String compatibility = ds.getOpenairecompatibility().getClassid();
+				return compatibility.equalsIgnoreCase(OPENAIRE_3) ||
+					compatibility.equalsIgnoreCase(OPENAIRE_4) ||
+					compatibility.equalsIgnoreCase(OPENAIRE_CRIS) ||
+					compatibility.equalsIgnoreCase(OPENAIRE_DATA);
+			});
+
+		Dataset<DatasourceMaster> datasourceMaster = readPath(spark, datasourceMapPath, DatasourceMaster.class);
+
+		datasources
+			.joinWith(datasourceMaster, datasources.col("id").equalTo(datasourceMaster.col("master")), "left")
+			.map(
+				(MapFunction<Tuple2<Datasource, DatasourceMaster>, DatasourceMaster>) t2 -> t2._2(),
+				Encoders.bean(DatasourceMaster.class))
+			.filter(Objects::nonNull)
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(workingPath + "datasource");
 	}
 
 	private static <R extends Result> void execBulkTag(
 		SparkSession spark,
 		String inputPath,
 		String workingPath,
-		String datasourceMapPath,
+		String resultType,
 		Class<R> resultClazz) {
 
-		List<String> hostedByList = readPath(spark, datasourceMapPath, DatasourceMaster.class)
+		List<String> hostedByList = readPath(spark, workingPath + "datasource", DatasourceMaster.class)
 			.map((MapFunction<DatasourceMaster, String>) dm -> dm.getMaster(), Encoders.STRING())
 			.collectAsList();
 
-		readPath(spark, inputPath, resultClazz)
-			.map(patchResult(), Encoders.bean(resultClazz))
-			.filter(Objects::nonNull)
+		readPath(spark, inputPath + resultType, resultClazz)
 			.map(
 				(MapFunction<R, R>) value -> enrich(value, hostedByList),
 				Encoders.bean(resultClazz))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.json(workingPath);
+			.json(workingPath + resultType);
 
-		readPath(spark, workingPath, resultClazz)
+		readPath(spark, workingPath + resultType, resultClazz)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.json(inputPath);
+			.json(inputPath + resultType);
 
 	}
 
 	private static <R extends Result> R enrich(R value, List<String> hostedByList) {
+		if (value.getDataInfo().getDeletedbyinference() == null) {
+			value.getDataInfo().setDeletedbyinference(false);
+		}
+		if (value.getContext() == null) {
+			value.setContext(new ArrayList<>());
+		}
 		if (value
 			.getInstance()
 			.stream()

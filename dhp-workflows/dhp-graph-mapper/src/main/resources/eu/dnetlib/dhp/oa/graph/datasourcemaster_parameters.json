@@ -1,0 +1,32 @@
+[
+  {
+    "paramName": "pu",
+    "paramLongName": "postgresUrl",
+    "paramDescription": "the jdbc url to the postgres",
+    "paramRequired": true
+  },
+  {
+    "paramName": "uid",
+    "paramLongName": "postgresUser",
+    "paramDescription": "the postgres user",
+    "paramRequired": true
+  },
+  {
+    "paramName": "pwd",
+    "paramLongName": "postgresPassword",
+    "paramDescription": "the postgres password=",
+    "paramRequired": true
+  },
+  {
+    "paramName": "p",
+    "paramLongName": "hdfsPath",
+    "paramDescription": "the target path on HDFS",
+    "paramRequired": true
+  },
+  {
+    "paramName": "nn",
+    "paramLongName": "hdfsNameNode",
+    "paramDescription": "the HDFS nameNode",
+    "paramRequired": true
+  }
+]

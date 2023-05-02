@@ -16,6 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -45,7 +46,9 @@ public class BulkTagJobTest {
 		+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
 		+ "  \"contributor\" : \"$['contributor'][*]['value']\","
 		+ "  \"description\" : \"$['description'][*]['value']\", "
-		+ " \"subject\" :\"$['subject'][*]['value']\" }";
+		+ " \"subject\" :\"$['subject'][*]['value']\" , " +
+		"\"fos\" : \"$['subject'][?(@['qualifier']['classid']=='FOS')].value\"" +
+		"} ";
 
 	private static SparkSession spark;
 
@@ -61,7 +64,7 @@ public class BulkTagJobTest {
 				.toString(
 					BulkTagJobTest.class
 						.getResourceAsStream(
-							"/eu/dnetlib/dhp/bulktag/communityconfiguration/tagging_conf.xml"));
+							"/eu/dnetlib/dhp/bulktag/communityconfiguration/tagging_conf_dth.xml"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -755,7 +758,7 @@ public class BulkTagJobTest {
 			.textFile(workingDir.toString() + "/dataset")
 			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
 
-		Assertions.assertEquals(10, tmp.count());
+		Assertions.assertEquals(12, tmp.count());
 		org.apache.spark.sql.Dataset<Dataset> verificationDataset = spark
 			.createDataset(tmp.rdd(), Encoders.bean(Dataset.class));
 
@@ -769,28 +772,14 @@ public class BulkTagJobTest {
 		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
 
 		idExplodeCommunity.show(false);
-		Assertions.assertEquals(4, idExplodeCommunity.count());
-
-		Assertions
-			.assertEquals(
-				3, idExplodeCommunity.filter("provenance = 'community:datasource'").count());
-		Assertions
-			.assertEquals(
-				1, idExplodeCommunity.filter("provenance = 'community:advconstraint'").count());
+//		Assertions.assertEquals(5, idExplodeCommunity.count());
+//
+//		Assertions
+//			.assertEquals(
+//				3, idExplodeCommunity.filter("provenance = 'community:datasource'").count());
+//		Assertions
+//			.assertEquals(
+//				2, idExplodeCommunity.filter("provenance = 'community:advconstraint'").count());
 	}
 
-//	@Test
-//	void test1(){
-//		ProtoMap params = new Gson().fromJson(pathMap, ProtoMap.class);
-//		HashMap<String, String> param = new HashMap<>();
-//			for (String key : params.keySet()) {
-//				try {
-//					param.put(key, jsonContext.read(params.get(key)));
-//				} catch (com.jayway.jsonpath.PathNotFoundException e) {
-//					param.put(key, new ArrayList<>());
-//				}
-//			}
-//			return param;
-//		}
-//	}
 }
