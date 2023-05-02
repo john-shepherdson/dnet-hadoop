@@ -843,136 +843,88 @@
     </zenodocommunities>
     <organizations/>
 </community>
-    <community id="dth">
+    <community id="dariah">
         <advancedConstraints>
-            {"criteria":[
-            {"constraint":[
-            {"verb":"equals_caseinsensitive","field":"subject","value":"digital twins"},
-            {"verb":"contains_caseinsensitive","field":"subject","value":"health"},
-            {"verb":"not_contains_caseinsensitive","field":"subject","value":"structural"},
-            {"verb":"not_contains_caseinsensitive","field":"subject","value":"marine"},
-            {"verb":"not_contains_caseinsensitive","field":"subject","value":"avionics"},
-            {"verb":"not_contains_caseinsensitive","field":"subject","value":"battery"}
-            ]},
-            {"constraint":[
-            {"verb":"contains_caseinsensitive","field":"title","value":"Human Digital Twins"}
-            ]},
-            {"constraint":[
-            {"verb":"contains_caseinsensitive","field":"description","value":"Human Digital Twins"}
-            ]},
-            {"constraint":[
-            {"verb":"equals_caseinsensitive","field":"subject","value":"Human Digital Twins"}
-            ]},
-            {"constraint":[
-            {"verb":"contains_caseinsensitive","field":"title","value":"Virtual Human Twin"}
-            ]},
-            {"constraint":[
-            {"verb":"contains_caseinsensitive","field":"description","value":"Virtual Human Twin"}
-            ]},
-            {"constraint":[
-            {"verb":"equals_caseinsensitive","field":"subject","value":"Virtual Human Twin"}
-            ]},
-            {"constraint":[
-            {"verb":"equals_caseinsensitive","field":"subject","value":"digital twin"},
-            {"verb":"contains_caseinsensitive","field":"subject","value":"health"},
-            {"verb":"not_contains_caseinsensitive","field":"subject","value":"structural"},
-            {"verb":"not_contains_caseinsensitive","field":"subject","value":"marine"},
-            {"verb":"not_contains_caseinsensitive","field":"subject","value":"avionics"},
-            {"verb":"not_contains_caseinsensitive","field":"subject","value":"battery"}
-            ]},
-            {"constraint":[
-            {"verb":"contains_caseinsensitive","field":"title","value":"digital twin health"},
-            {"verb":"not_contains_caseinsensitive","field":"subject","value":"Acoustic"},
-            {"verb":"not_contains_caseinsensitive","field":"subject","value":"Health Monitoring"},
-            {"verb":"not_contains_caseinsensitive","field":"title","value":"Health Monitoring"},
-            {"verb":"not_contains_caseinsensitive","field":"title","value":"Health Management"},
-            {"verb":"not_contains_caseinsensitive","field":"subject","value":"Health Assessment"},
-            {"verb":"not_contains_caseinsensitive","field":"title","value":"Health Assessment"},
-            {"verb":"not_contains_caseinsensitive","field":"title","value":"Health status"},
-            {"verb":"not_contains_caseinsensitive","field":"subject","value":"ELECTRICAL ENGINEERING"},
-            {"verb":"not_contains_caseinsensitive","field":"subject","value":"Control and Systems Engineering"}
-            ]}
-            ]}
-<!--            {-->
-<!--            "criteria": [-->
-<!--            {-->
-<!--            "constraint": [-->
-<!--            {-->
-<!--            "verb": "equals_caseinsensitive",-->
-<!--            "field": "subject",-->
-<!--            "value": "North America"-->
-<!--            },-->
-<!--            {-->
-<!--            "verb": "contains",-->
-<!--            "field": "fos",-->
-<!--            "value": "05"-->
-<!--            }-->
-<!--            ]-->
-<!--            },-->
-<!--            {-->
-<!--            "constraint": [-->
-<!--            {-->
-<!--            "verb": "equals_caseinsensitive",-->
-<!--            "field": "subject",-->
-<!--            "value": "North America"-->
-<!--            },-->
-<!--            {-->
-<!--            "verb": "contains",-->
-<!--            "field": "fos",-->
-<!--            "value": "06"-->
-<!--            }-->
-<!--            ]-->
-<!--            },-->
-<!--            {-->
-<!--            "constraint": [-->
-<!--            {-->
-<!--            "verb": "equals_caseinsensitive",-->
-<!--            "field": "subject",-->
-<!--            "value": "Mexico"-->
-<!--            },-->
-<!--            {-->
-<!--            "verb": "equals_caseinsensitive",-->
-<!--            "field": "subject",-->
-<!--            "value": "United States"-->
-<!--            },-->
-<!--            {-->
-<!--            "verb": "equals_caseinsensitive",-->
-<!--            "field": "subject",-->
-<!--            "value": "Canada"-->
-<!--            },-->
-<!--            {-->
-<!--            "verb": "contains",-->
-<!--            "field": "fos",-->
-<!--            "value": "05"-->
-<!--            }-->
-<!--            ]-->
-<!--            },-->
-<!--            {-->
-<!--            "constraint": [-->
-<!--            {-->
-<!--            "verb": "equals_caseinsensitive",-->
-<!--            "field": "subject",-->
-<!--            "value": "Mexico"-->
-<!--            },-->
-<!--            {-->
-<!--            "verb": "equals_caseinsensitive",-->
-<!--            "field": "subject",-->
-<!--            "value": "United States"-->
-<!--            },-->
-<!--            {-->
-<!--            "verb": "equals_caseinsensitive",-->
-<!--            "field": "subject",-->
-<!--            "value": "Canada"-->
-<!--            },-->
-<!--            {-->
-<!--            "verb": "contains",-->
-<!--            "field": "fos",-->
-<!--            "value": "06"-->
-<!--            }-->
-<!--            ]-->
-<!--            }-->
-<!--            ]-->
-<!--            }-->
+            {
+            "criteria": [
+            {
+            "constraint": [
+            {
+            "verb": "equals_caseinsensitive",
+            "field": "subject",
+            "value": "North America"
+            },
+            {
+            "verb": "contains",
+            "field": "fos",
+            "value": "05"
+            }
+            ]
+            },
+            {
+            "constraint": [
+            {
+            "verb": "equals_caseinsensitive",
+            "field": "subject",
+            "value": "North America"
+            },
+            {
+            "verb": "contains",
+            "field": "fos",
+            "value": "06"
+            }
+            ]
+            },
+            {
+            "constraint": [
+            {
+            "verb": "equals_caseinsensitive",
+            "field": "subject",
+            "value": "Mexico"
+            },
+            {
+            "verb": "equals_caseinsensitive",
+            "field": "subject",
+            "value": "United States"
+            },
+            {
+            "verb": "equals_caseinsensitive",
+            "field": "subject",
+            "value": "Canada"
+            },
+            {
+            "verb": "contains",
+            "field": "fos",
+            "value": "05"
+            }
+            ]
+            },
+            {
+            "constraint": [
+            {
+            "verb": "equals_caseinsensitive",
+            "field": "subject",
+            "value": "Mexico"
+            },
+            {
+            "verb": "equals_caseinsensitive",
+            "field": "subject",
+            "value": "United States"
+            },
+            {
+            "verb": "equals_caseinsensitive",
+            "field": "subject",
+            "value": "Canada"
+            },
+            {
+            "verb": "contains",
+            "field": "fos",
+            "value": "06"
+            }
+            ]
+            }
+            ]
+            }
 
         </advancedConstraints>
     <subjects/>
@@ -1547,4 +1499,21 @@
     </zenodocommunities>
     <organizations/>
 </community>
+    <community id="dth">
+        <advancedConstraints>
+            {"criteria":[
+            {"constraint":[
+            {"verb":"equals_caseinsensitive","field":"fos","value":"03 medical and health sciences"},
+            {"verb":"contains_caseinsensitive","field":"description","value":"digital twin"}
+            ]},
+            {"constraint":[
+            {"verb":"equals_caseinsensitive","field":"fos","value":"03 medical and health sciences"},
+            {"verb":"contains_caseinsensitive","field":"description","value":"virtual twin"}
+            ]}
+            ]}
+        </advancedConstraints>
+        <subjects/>
+        <datasources/>
+        <zenodocommunities/>
+    </community>
 </communities>

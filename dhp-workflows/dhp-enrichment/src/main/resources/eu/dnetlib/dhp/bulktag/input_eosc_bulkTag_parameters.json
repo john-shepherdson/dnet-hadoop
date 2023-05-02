@@ -29,6 +29,13 @@
     "paramLongName": "isSparkSessionManaged",
     "paramDescription": "true if the spark session is managed, false otherwise",
     "paramRequired": false
+  },
+  {
+
+    "paramName": "rt",
+    "paramLongName": "resultType",
+    "paramDescription": "the result type",
+    "paramRequired": true
   }
 
 ]
