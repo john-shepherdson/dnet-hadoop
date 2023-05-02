@@ -930,16 +930,52 @@ class MappersTest {
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");
 
-		final Publication p = (Publication) list.get(0);
+		final Optional<Oaf> o = list.stream().filter(r -> r instanceof Publication).findFirst();
+		assertTrue(o.isPresent());
+
+		Publication p = (Publication) o.get();
 		assertTrue(p.getInstance().size() > 0);
 
 		assertEquals("https://doi.org/10.1155/2015/439379", p.getInstance().get(0).getUrl().get(0));
 
-		assertTrue(p.getProcessingchargeamount() != null);
-		assertTrue(p.getProcessingchargecurrency() != null);
+		assertNotNull(p.getProcessingchargeamount());
+		assertNotNull(p.getProcessingchargecurrency());
 
 		assertEquals("1721.47", p.getProcessingchargeamount().getValue());
 		assertEquals("EUR", p.getProcessingchargecurrency().getValue());
+
+		List<Oaf> affiliations = list.stream().filter(r -> r instanceof Relation).collect(Collectors.toList());
+		assertEquals(2, affiliations.size());
+
+		for (Oaf aff : affiliations) {
+			Relation r = (Relation) aff;
+			assertEquals(ModelConstants.AFFILIATION, r.getSubRelType());
+			assertEquals(ModelConstants.RESULT_ORGANIZATION, r.getRelType());
+			String source = r.getSource();
+			if (StringUtils.startsWith(source, "50")) {
+				assertEquals(ModelConstants.HAS_AUTHOR_INSTITUTION, r.getRelClass());
+			} else if (StringUtils.startsWith(source, "20")) {
+				assertEquals(ModelConstants.IS_AUTHOR_INSTITUTION_OF, r.getRelClass());
+			} else {
+				throw new IllegalArgumentException("invalid source / target prefixes for affiliation relations");
+			}
+
+			List<KeyValue> apcInfo = r.getProperties();
+			assertEquals(
+				"EUR", apcInfo
+					.stream()
+					.filter(kv -> "apc_currency".equals(kv.getKey()))
+					.map(KeyValue::getValue)
+					.findFirst()
+					.orElse(""));
+			assertEquals(
+				"1721.47", apcInfo
+					.stream()
+					.filter(kv -> "apc_amount".equals(kv.getKey()))
+					.map(KeyValue::getValue)
+					.findFirst()
+					.orElse(""));
+		}
 	}
 
 	@Test
