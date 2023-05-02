@@ -26,6 +26,16 @@ public class CommunityConfiguration implements Serializable {
 	private Map<String, List<Pair<String, SelectionConstraints>>> zenodocommunityMap = new HashMap<>();
 	// map communityid -> selectionconstraints
 	private Map<String, SelectionConstraints> selectionConstraintsMap = new HashMap<>();
+	// map eosc datasource -> communityid
+	private Map<String, List<Pair<String, SelectionConstraints>>> eoscDatasourceMap = new HashMap<>();
+
+	public Map<String, List<Pair<String, SelectionConstraints>>> getEoscDatasourceMap() {
+		return eoscDatasourceMap;
+	}
+
+	public void setEoscDatasourceMap(Map<String, List<Pair<String, SelectionConstraints>>> eoscDatasourceMap) {
+		this.eoscDatasourceMap = eoscDatasourceMap;
+	}
 
 	public Map<String, List<Pair<String, SelectionConstraints>>> getSubjectMap() {
 		return subjectMap;
@@ -144,6 +154,10 @@ public class CommunityConfiguration implements Serializable {
 				})
 			.filter(Objects::nonNull)
 			.collect(Collectors.toList());
+	}
+
+	public boolean isEoscDatasource(final String dts) {
+		return eoscDatasourceMap.containsKey(dts);
 	}
 
 	public List<Pair<String, SelectionConstraints>> getCommunityForZenodoCommunity(String zc) {

@@ -2,7 +2,6 @@
 package eu.dnetlib.dhp.bulktag.criteria;
 
 import java.io.Serializable;
-import java.util.Locale;
 
 @VerbClass("starts_with_caseinsensitive")
 public class StartsWithVerbIgnoreCase implements Selection, Serializable {
