@@ -117,17 +117,17 @@ public class StepActionsTest {
 		verificationDs
 			.foreach(
 				(ForeachFunction<Relation>) r -> Assertions
-					.assertEquals(ModelConstants.HAS_AUTHOR_INSTITUTION, r.getRelClass()));
+					.assertEquals(Relation.RELCLASS.hasAuthorInstitution, r.getRelClass()));
 
 		verificationDs
 			.foreach(
 				(ForeachFunction<Relation>) r -> Assertions
-					.assertEquals(ModelConstants.RESULT_ORGANIZATION, r.getRelType()));
+					.assertEquals(Relation.RELTYPE.resultOrganization, r.getRelType()));
 
 		verificationDs
 			.foreach(
 				(ForeachFunction<Relation>) r -> Assertions
-					.assertEquals(ModelConstants.AFFILIATION, r.getSubRelType()));
+					.assertEquals(Relation.SUBRELTYPE.affiliation, r.getSubRelType()));
 
 		verificationDs
 			.foreach(

@@ -14,23 +14,24 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class SortableRelation extends Relation implements Comparable<SortableRelation>, Serializable {
 
-	private static final Map<String, Integer> weights = Maps.newHashMap();
+	private static final Map<Relation.SUBRELTYPE, Integer> weights = Maps.newHashMap();
+
+	//TODO version and part missing why publication is there?
 
 	static {
-		weights.put(ModelConstants.OUTCOME, 0);
-		weights.put(ModelConstants.SUPPLEMENT, 1);
-		weights.put(ModelConstants.REVIEW, 2);
-		weights.put(ModelConstants.CITATION, 3);
-		weights.put(ModelConstants.AFFILIATION, 4);
-		weights.put(ModelConstants.RELATIONSHIP, 5);
-		weights.put(ModelConstants.PUBLICATION_RESULTTYPE_CLASSID, 6);
-		weights.put(ModelConstants.SIMILARITY, 7);
+		weights.put(Relation.SUBRELTYPE.outcome, 0);
+		weights.put(Relation.SUBRELTYPE.supplement, 1);
+		weights.put(Relation.SUBRELTYPE.review, 2);
+		weights.put(Relation.SUBRELTYPE.citation, 3);
+		weights.put(Relation.SUBRELTYPE.affiliation, 4);
+		weights.put(Relation.SUBRELTYPE.relationship, 5);
+		//weights.put(ModelConstants.PUBLICATION_RESULTTYPE_CLASSID, 6);
+		weights.put(Relation.SUBRELTYPE.similarity, 7);
 
-		weights.put(ModelConstants.PROVISION, 8);
-		weights.put(ModelConstants.PARTICIPATION, 9);
-		weights.put(ModelConstants.DEDUP, 10);
+		weights.put(Relation.SUBRELTYPE.provision, 8);
+		weights.put(Relation.SUBRELTYPE.participation, 9);
+		weights.put(Relation.SUBRELTYPE.dedup, 10);
 	}
-
 	private static final long serialVersionUID = 34753984579L;
 
 	private String groupingKey;

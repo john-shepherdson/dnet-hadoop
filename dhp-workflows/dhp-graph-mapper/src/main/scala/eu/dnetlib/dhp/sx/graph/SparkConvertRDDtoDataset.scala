@@ -104,24 +104,12 @@ object SparkConvertRDDtoDataset {
 
     log.info("Converting Relation")
 
-    val relClassFilter = List(
-      ModelConstants.MERGES,
-      ModelConstants.IS_MERGED_IN,
-      ModelConstants.HAS_AMONG_TOP_N_SIMILAR_DOCS,
-      ModelConstants.IS_AMONG_TOP_N_SIMILAR_DOCS
-    )
 
     val rddRelation = spark.sparkContext
       .textFile(s"$sourcePath/relation")
       .map(s => mapper.readValue(s, classOf[Relation]))
       .filter(r => r.getSource.startsWith("50") && r.getTarget.startsWith("50"))
       .filter(r => filterRelations(r))
-    //filter OpenCitations relations
-//      .filter(r =>
-//        r.getDataInfo.getProvenanceaction != null &&
-//        !"sysimport:crosswalk:opencitations".equals(r.getDataInfo.getProvenanceaction.getClassid)
-//      )
-
     spark.createDataset(rddRelation).as[Relation].write.mode(SaveMode.Overwrite).save(s"$relPath")
   }
 
@@ -133,12 +121,12 @@ object SparkConvertRDDtoDataset {
       */
 
     val relClassFilter = List(
-      ModelConstants.MERGES,
-      ModelConstants.IS_MERGED_IN,
-      ModelConstants.HAS_AMONG_TOP_N_SIMILAR_DOCS,
-      ModelConstants.IS_AMONG_TOP_N_SIMILAR_DOCS
+      Relation.RELCLASS.merges,
+      Relation.RELCLASS.isMergedIn,
+      Relation.RELCLASS.HasAmongTopNSimilarDocuments,
+      Relation.RELCLASS.IsAmongTopNSimilarDocuments
     )
-    if (relClassFilter.exists(k => k.equalsIgnoreCase(r.getRelClass)))
+    if (relClassFilter.contains(r.getRelClass))
       false
     else {
       if (r.getProvenance == null || r.getProvenance.isEmpty)

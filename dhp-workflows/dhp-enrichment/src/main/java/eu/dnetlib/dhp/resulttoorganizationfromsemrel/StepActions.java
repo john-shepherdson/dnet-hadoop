@@ -193,9 +193,9 @@ public class StepActions implements Serializable {
 						orgId -> getRelation(
 							v.getKey(),
 							orgId,
-							ModelConstants.HAS_AUTHOR_INSTITUTION,
-							ModelConstants.RESULT_ORGANIZATION,
-							ModelConstants.AFFILIATION,
+							Relation.RELCLASS.hasAuthorInstitution,
+							Relation.RELTYPE.resultOrganization,
+							Relation.SUBRELTYPE.affiliation,
 							PROPAGATION_DATA_INFO_TYPE,
 							PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_ID,
 							PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_NAME))

@@ -90,6 +90,8 @@ object SparkResolveEntities {
       case EntityType.dataset              => mapper.readValue(input, classOf[OafDataset])
       case EntityType.software             => mapper.readValue(input, classOf[Software])
       case EntityType.otherresearchproduct => mapper.readValue(input, classOf[OtherResearchProduct])
+      case _ => throw new IllegalArgumentException(s"Unexpected entity type $entity")
+
     }
   }
 

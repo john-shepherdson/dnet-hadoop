@@ -65,7 +65,7 @@ public class PrepareGroupsJob {
 
 			final Dataset<Relation> mergedRels = ClusterUtils
 				.loadRelations(graphPath, spark)
-				.filter((FilterFunction<Relation>) r -> r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS));
+				.filter((FilterFunction<Relation>) r -> r.getRelClass().equals(Relation.RELCLASS.isMergedIn));
 
 			final TypedColumn<Tuple2<OaBrokerMainEntity, Relation>, ResultGroup> aggr = new ResultAggregator()
 				.toColumn();

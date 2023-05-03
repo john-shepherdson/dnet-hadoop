@@ -1459,7 +1459,7 @@ public class XmlRecordFactory implements Serializable {
 	}
 
 	private boolean isDuplicate(final RelatedEntityWrapper link) {
-		return ModelConstants.DEDUP.equalsIgnoreCase(link.getRelation().getSubRelType());
+		return Relation.SUBRELTYPE.dedup.equalsIgnoreCase(link.getRelation().getSubRelType());
 	}
 
 	private List<String> listExtraInfo(final Entity entity) {

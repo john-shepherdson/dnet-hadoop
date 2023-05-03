@@ -112,7 +112,6 @@ object SparkCreateInputGraph {
     log.info(s"Extract ${clazz.getSimpleName}")
     oafDs
       .filter(o => o.isInstanceOf[T])
-      .map(p => p.asInstanceOf[T])
       .write
       .mode(SaveMode.Overwrite)
       .save(targetPath)

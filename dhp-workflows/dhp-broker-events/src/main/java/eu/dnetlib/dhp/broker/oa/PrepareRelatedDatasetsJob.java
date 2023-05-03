@@ -65,10 +65,10 @@ public class PrepareRelatedDatasetsJob {
 				.map(
 					(MapFunction<eu.dnetlib.dhp.schema.oaf.Dataset, OaBrokerRelatedDataset>) ConversionUtils::oafDatasetToBrokerDataset,
 					Encoders.bean(OaBrokerRelatedDataset.class));
-
+			
 			final Dataset<Relation> rels = ClusterUtils
 				.loadRelations(graphPath, spark)
-				.filter((FilterFunction<Relation>) r -> r.getRelType().equals(ModelConstants.RESULT_RESULT))
+				.filter((FilterFunction<Relation>) r -> r.getRelType().equals(Relation.RELTYPE.resultResult))
 				.filter((FilterFunction<Relation>) r -> ClusterUtils.isValidResultResultClass(r.getRelClass()))
 				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getSource()))
 				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getTarget()));
@@ -78,7 +78,7 @@ public class PrepareRelatedDatasetsJob {
 				.map((MapFunction<Tuple2<Relation, OaBrokerRelatedDataset>, RelatedDataset>) t -> {
 					final RelatedDataset rel = new RelatedDataset(t._1.getSource(),
 						t._2);
-					rel.getRelDataset().setRelType(t._1.getRelClass());
+					rel.getRelDataset().setRelType(t._1.getRelClass().toString());
 					return rel;
 				}, Encoders.bean(RelatedDataset.class));
 

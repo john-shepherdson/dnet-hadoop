@@ -153,10 +153,12 @@ abstract class AbstractSparkAction implements Serializable {
 	}
 
 	private boolean isOpenOrgsDedupMergeRelation(Relation rel) {
-		return ModelConstants.ORG_ORG_RELTYPE.equals(rel.getRelType()) &&
-			ModelConstants.DEDUP.equals(rel.getSubRelType())
-			&& (ModelConstants.IS_MERGED_IN.equals(rel.getRelClass()) ||
-				ModelConstants.MERGES.equals(rel.getRelClass()));
+
+		
+		return Relation.RELTYPE.organizationOrganization.equals(rel.getRelType()) &&
+			Relation.SUBRELTYPE.dedup.equals(rel.getSubRelType())
+			&& (Relation.RELCLASS.isMergedIn.equals(rel.getRelClass()) ||
+				Relation.RELCLASS.merges.equals(rel.getRelClass()));
 	}
 
 	protected static Boolean parseECField(String field) {

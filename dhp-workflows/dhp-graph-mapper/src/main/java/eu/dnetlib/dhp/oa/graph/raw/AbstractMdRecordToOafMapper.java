@@ -1,33 +1,26 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.schema.common.ModelConstants.DNET_PID_TYPES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.OUTCOME;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.PRODUCES;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.REPOSITORY_PROVENANCE_ACTIONS;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.RESULT_PROJECT;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.UNKNOWN;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
-import static eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory.*;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Entity;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.dom4j.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import static eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory.createOpenaireId;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
 public abstract class AbstractMdRecordToOafMapper {
 
@@ -261,7 +254,7 @@ public abstract class AbstractMdRecordToOafMapper {
 				res
 					.add(
 						OafMapperUtils
-							.getRelation(projectId, docId, RESULT_PROJECT, OUTCOME, PRODUCES, entity, validationdDate));
+							.getRelation(projectId, docId, Relation.RELTYPE.resultProject, Relation.SUBRELTYPE.outcome, Relation.RELCLASS.produces, entity, validationdDate));
 			}
 		}
 
@@ -276,12 +269,11 @@ public abstract class AbstractMdRecordToOafMapper {
 			Element element = (Element) o;
 
 			final String target = StringUtils.trim(element.getText());
-			final String relType = element.attributeValue("relType");
-			final String subRelType = element.attributeValue("subRelType");
-			final String relClass = element.attributeValue("relClass");
+			final Relation.RELTYPE relType = Relation.RELTYPE.valueOf(element.attributeValue("relType"));
+			final Relation.SUBRELTYPE subRelType = Relation.SUBRELTYPE.valueOf(element.attributeValue("subRelType"));
+			final Relation.RELCLASS relClass = Relation.RELCLASS.lookUp(element.attributeValue("relClass"));
 
-			if (StringUtils.isNotBlank(target) && StringUtils.isNotBlank(relType) && StringUtils.isNotBlank(subRelType)
-				&& StringUtils.isNotBlank(relClass)) {
+			if (StringUtils.isNotBlank(target)) {
 
 				final String validationdDate = ((Node) o).valueOf("@validationDate");
 

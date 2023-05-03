@@ -110,7 +110,7 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 				.load(DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity))
 				.as(Encoders.bean(Relation.class))
 				.javaRDD()
-				.map(it -> new Edge<>(hash(it.getSource()), hash(it.getTarget()), it.getRelClass()))
+				.map(it -> new Edge<>(hash(it.getSource()), hash(it.getTarget()), it.getRelClass().toString()))
 				.rdd();
 
 			Dataset<Tuple2<String, String>> rawMergeRels = spark
@@ -199,14 +199,15 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 				id -> {
 					List<Relation> rels = new ArrayList<>();
 
-					rels.add(rel(cc.getCcId(), id, ModelConstants.MERGES, dedupConf));
+					rels.add(rel(cc.getCcId(), id, Relation.RELCLASS.merges, dedupConf));
 
 					return rels.stream();
 				})
 			.iterator();
 	}
 
-	private Relation rel(String source, String target, String relClass, DedupConfig dedupConf) {
+	// TODO NEED to REVIEW THIS FUNCTION, THE UTILITY FUNCTION SHOULD BE MOVED ON SOME SUPPORT CLASS OR REUSE OTHER FUNCTION
+	private Relation rel(String source, String target, Relation.RELCLASS relClass, DedupConfig dedupConf) {
 
 		String entityType = dedupConf.getWf().getEntityType();
 
@@ -214,8 +215,8 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 		r.setSource(source);
 		r.setTarget(target);
 		r.setRelClass(relClass);
-		r.setRelType(entityType + entityType.substring(0, 1).toUpperCase() + entityType.substring(1));
-		r.setSubRelType(ModelConstants.DEDUP);
+		r.setRelType(Relation.RELTYPE.valueOf(entityType + entityType.substring(0, 1).toUpperCase() + entityType.substring(1)));
+		r.setSubRelType(Relation.SUBRELTYPE.dedup);
 
 		DataInfo info = new DataInfo();
 

@@ -78,13 +78,13 @@ public class PrepareResultCommunitySet {
 			+ "      FROM relation "
 			+ "      WHERE datainfo.deletedbyinference = false "
 			+ "      AND lower(relClass) = '"
-			+ ModelConstants.HAS_AUTHOR_INSTITUTION.toLowerCase()
+			+ Relation.RELCLASS.hasAuthorInstitution.toString().toLowerCase()
 			+ "') result_organization "
 			+ "LEFT JOIN (SELECT source, collect_set(target) org_set "
 			+ "      FROM relation "
 			+ "      WHERE datainfo.deletedbyinference = false "
 			+ "      AND lower(relClass) = '"
-			+ ModelConstants.MERGES.toLowerCase()
+			+ Relation.RELCLASS.merges.toString().toLowerCase()
 			+ "' "
 			+ "      GROUP BY source) organization_organization "
 			+ "ON result_organization.target = organization_organization.source ";

@@ -81,7 +81,7 @@ public class PrepareProjectResultsAssociation {
 			+ "       FROM relation "
 			+ "       WHERE datainfo.deletedbyinference = false "
 			+ "       AND lower(relClass) = '"
-			+ ModelConstants.IS_PRODUCED_BY.toLowerCase()
+			+ Relation.RELCLASS.isProducedBy.toString().toLowerCase()
 			+ "'";
 
 		Dataset<Row> resproj_relation = spark.sql(resproj_relation_query);

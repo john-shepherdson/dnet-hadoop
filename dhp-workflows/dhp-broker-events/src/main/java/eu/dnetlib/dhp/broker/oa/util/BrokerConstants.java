@@ -16,7 +16,6 @@ public class BrokerConstants {
 	}
 
 	public static final String OPEN_ACCESS = "OPEN";
-	public static final String IS_MERGED_IN_CLASS = ModelConstants.IS_MERGED_IN;
 
 	public static final String COLLECTED_FROM_REL = "collectedFrom";
 

@@ -648,11 +648,11 @@ object DataciteToOAFTransformation {
         (r.relationType.toLowerCase.contains("cite") || r.relationType.toLowerCase.contains("reference"))
       )
       .map(r => {
-        r.relationType match {
-          case  Relation.RELCLASS.Cites.toString | Relation.RELCLASS.References.toString =>
+        Relation.RELCLASS.valueOf(r.relationType) match {
+          case  Relation.RELCLASS.Cites | Relation.RELCLASS.References =>
             val target = DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
             relation(id, target, Relation.SUBRELTYPE.citation, Relation.RELCLASS.Cites, date)
-          case Relation.RELCLASS.IsCitedBy.toString | Relation.RELCLASS.IsReferencedBy.toString =>
+          case Relation.RELCLASS.IsCitedBy | Relation.RELCLASS.IsReferencedBy =>
             val source = DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
             relation(source, id, Relation.SUBRELTYPE.citation, Relation.RELCLASS.Cites, date)
         }

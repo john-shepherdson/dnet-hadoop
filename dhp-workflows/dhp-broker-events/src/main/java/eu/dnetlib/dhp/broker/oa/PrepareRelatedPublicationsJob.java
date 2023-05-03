@@ -69,7 +69,7 @@ public class PrepareRelatedPublicationsJob {
 
 			final Dataset<Relation> rels = ClusterUtils
 				.loadRelations(graphPath, spark)
-				.filter((FilterFunction<Relation>) r -> r.getRelType().equals(ModelConstants.RESULT_RESULT))
+				.filter((FilterFunction<Relation>) r -> r.getRelType().equals(Relation.RELTYPE.resultResult))
 				.filter((FilterFunction<Relation>) r -> ClusterUtils.isValidResultResultClass(r.getRelClass()))
 				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getSource()))
 				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getTarget()));
@@ -79,7 +79,7 @@ public class PrepareRelatedPublicationsJob {
 				.map((MapFunction<Tuple2<Relation, OaBrokerRelatedPublication>, RelatedPublication>) t -> {
 					final RelatedPublication rel = new RelatedPublication(
 						t._1.getSource(), t._2);
-					rel.getRelPublication().setRelType(t._1.getRelClass());
+					rel.getRelPublication().setRelType(t._1.getRelClass().toString());
 					return rel;
 				}, Encoders.bean(RelatedPublication.class));
 

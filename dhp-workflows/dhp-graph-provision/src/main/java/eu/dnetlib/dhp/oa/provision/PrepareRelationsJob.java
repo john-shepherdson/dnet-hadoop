@@ -3,11 +3,9 @@ package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.PriorityQueue;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -80,10 +78,15 @@ public class PrepareRelationsJob {
 			.orElse(DEFAULT_NUM_PARTITIONS);
 		log.info("relPartitions: {}", relPartitions);
 
-		Set<String> relationFilter = Optional
+		Set<Relation.RELCLASS> relationFilter = Optional
 			.ofNullable(parser.get("relationFilter"))
 			.map(String::toLowerCase)
-			.map(s -> Sets.newHashSet(Splitter.on(",").split(s)))
+			.map(s -> Sets.newHashSet(
+					StreamSupport.stream(
+					Splitter.on(",").split(s).spliterator(), false)
+							.map(Relation.RELCLASS::valueOf)
+							.collect(Collectors.toList())
+			)			)
 			.orElse(new HashSet<>());
 		log.info("relationFilter: {}", relationFilter);
 
@@ -128,11 +131,11 @@ public class PrepareRelationsJob {
 	 * @param relPartitions number of partitions for the output RDD
 	 */
 	private static void prepareRelationsRDD(SparkSession spark, String inputRelationsPath, String outputPath,
-		Set<String> relationFilter, int sourceMaxRelations, int targetMaxRelations, int relPartitions) {
+		Set<Relation.RELCLASS> relationFilter, int sourceMaxRelations, int targetMaxRelations, int relPartitions) {
 
 		JavaRDD<Relation> rels = readPathRelationRDD(spark, inputRelationsPath)
 			.filter(rel -> !(rel.getSource().startsWith("unresolved") || rel.getTarget().startsWith("unresolved")))
-			.filter(rel -> !relationFilter.contains(StringUtils.lowerCase(rel.getRelClass())));
+			.filter(rel -> !relationFilter.contains(rel.getRelClass()));
 
 		JavaRDD<Relation> pruned = pruneRels(
 			pruneRels(

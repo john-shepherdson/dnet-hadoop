@@ -326,7 +326,7 @@ public class CreateOpenCitationsASTest {
 		});
 
 		assertEquals(5, check.filter(r -> r.getSource().equals(doi1)).count());
-		check.filter(r -> r.getSource().equals(doi1)).foreach(r -> assertEquals(ModelConstants.CITES, r.getRelClass()));
+		check.filter(r -> r.getSource().equals(doi1)).foreach(r -> assertEquals(Relation.RELCLASS.Cites, r.getRelClass()));
 
 	}
 }

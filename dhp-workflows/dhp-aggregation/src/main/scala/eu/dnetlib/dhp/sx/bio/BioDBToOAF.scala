@@ -2,13 +2,13 @@ package eu.dnetlib.dhp.sx.bio
 
 import com.google.common.collect.Lists
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactory, OafMapperUtils}
 import eu.dnetlib.dhp.schema.oaf._
+import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactory, OafMapperUtils}
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.{compact, parse, render}
 
-import collection.JavaConverters._
+import scala.collection.JavaConverters._
 
 object BioDBToOAF {
 
@@ -127,8 +127,8 @@ object BioDBToOAF {
       target_pid_type,
       generate_unresolved_id(source_pid, source_pid_type),
       collectedFromMap("elsevier"),
-      "relationship",
-      relation_semantic,
+      Relation.SUBRELTYPE.relationship,
+      Relation.RELCLASS.lookUp(relation_semantic),
       date
     )
 
@@ -323,8 +323,8 @@ object BioDBToOAF {
         "pmid",
         d.getId,
         collectedFromMap("uniprot"),
-        ModelConstants.RELATIONSHIP,
-        ModelConstants.IS_RELATED_TO,
+        Relation.SUBRELTYPE.relationship,
+        Relation.RELCLASS.IsRelatedTo,
         if (i_date.isDefined) i_date.get.date else null
       )
       rel.getProvenance.asScala.map(p => p.getCollectedfrom)
@@ -335,8 +335,8 @@ object BioDBToOAF {
         "doi",
         d.getId,
         collectedFromMap("uniprot"),
-        ModelConstants.RELATIONSHIP,
-        ModelConstants.IS_RELATED_TO,
+        Relation.SUBRELTYPE.relationship,
+        Relation.RELCLASS.IsRelatedTo,
         if (i_date.isDefined) i_date.get.date else null
       )
       List(d, rel)
@@ -353,8 +353,8 @@ object BioDBToOAF {
     pidType: String,
     sourceId: String,
     collectedFrom: KeyValue,
-    subRelType: String,
-    relClass: String,
+    subRelType: Relation.SUBRELTYPE,
+    relClass: Relation.RELCLASS,
     date: String
   ): Relation = {
 
@@ -370,7 +370,7 @@ object BioDBToOAF {
 
     rel.setProvenance(provenance)
 
-    rel.setRelType(ModelConstants.RESULT_RESULT)
+    rel.setRelType(Relation.RELTYPE.resultResult)
     rel.setSubRelType(subRelType)
     rel.setRelClass(relClass)
 
@@ -398,10 +398,11 @@ object BioDBToOAF {
       pidType,
       sourceId,
       collectedFrom,
-      ModelConstants.SUPPLEMENT,
-      ModelConstants.IS_SUPPLEMENT_TO,
+      Relation.SUBRELTYPE.supplement,
+      Relation.RELCLASS.IsSupplementTo,
       date
     )
+
   }
 
   def pdbTOOaf(input: String): List[Oaf] = {
@@ -573,8 +574,8 @@ object BioDBToOAF {
         "pmid",
         d.getId,
         collectedFromMap("ebi"),
-        ModelConstants.RELATIONSHIP,
-        ModelConstants.IS_RELATED_TO,
+        Relation.SUBRELTYPE.relationship,
+        Relation.RELCLASS.IsRelatedTo,
         GraphCleaningFunctions.cleanDate(input.date)
       )
     )

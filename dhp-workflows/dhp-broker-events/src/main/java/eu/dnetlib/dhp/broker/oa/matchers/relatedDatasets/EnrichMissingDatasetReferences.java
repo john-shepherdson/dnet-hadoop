@@ -2,7 +2,7 @@
 package eu.dnetlib.dhp.broker.oa.matchers.relatedDatasets;
 
 import eu.dnetlib.dhp.broker.model.Topic;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class EnrichMissingDatasetReferences extends AbstractEnrichMissingDataset {
 
@@ -12,7 +12,9 @@ public class EnrichMissingDatasetReferences extends AbstractEnrichMissingDataset
 
 	@Override
 	protected boolean filterByType(final String relType) {
-		return relType.equals(ModelConstants.REFERENCES);
+
+		
+		return relType.equals(Relation.RELCLASS.References);
 	}
 
 }

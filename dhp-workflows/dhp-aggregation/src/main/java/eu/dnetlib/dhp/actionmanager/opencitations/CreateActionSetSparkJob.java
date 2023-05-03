@@ -161,9 +161,9 @@ public class CreateActionSetSparkJob implements Serializable {
 		r.setProvenance(PROVENANCE);
 		r.setSource(source);
 		r.setTarget(target);
-		r.setRelType(ModelConstants.RESULT_RESULT);
-		r.setSubRelType(ModelConstants.CITATION);
-		r.setRelClass(ModelConstants.CITES);
+		r.setRelType(Relation.RELTYPE.resultResult);
+		r.setSubRelType(Relation.SUBRELTYPE.citation);
+		r.setRelClass(Relation.RELCLASS.Cites);
 		return r;
 	}
 

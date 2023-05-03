@@ -73,8 +73,8 @@ public class PrepareRelatedSoftwaresJob {
 			final Dataset<Relation> rels;
 			rels = ClusterUtils
 				.loadRelations(graphPath, spark)
-				.filter((FilterFunction<Relation>) r -> r.getRelType().equals(ModelConstants.RESULT_RESULT))
-				.filter((FilterFunction<Relation>) r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
+				.filter((FilterFunction<Relation>) r -> r.getRelType().equals(Relation.RELTYPE.resultResult))
+				.filter((FilterFunction<Relation>) r -> !r.getRelClass().equals(Relation.RELCLASS.isMergedIn))
 				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getSource()))
 				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getTarget()));
 

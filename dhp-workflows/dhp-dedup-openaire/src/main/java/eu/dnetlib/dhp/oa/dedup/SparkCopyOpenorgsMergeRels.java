@@ -90,9 +90,9 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 	}
 
 	private boolean isMergeRel(Relation rel) {
-		return (rel.getRelClass().equals(ModelConstants.MERGES)
-			|| rel.getRelClass().equals(ModelConstants.IS_MERGED_IN))
-			&& rel.getRelType().equals(ModelConstants.ORG_ORG_RELTYPE)
-			&& rel.getSubRelType().equals(ModelConstants.DEDUP);
+		return (rel.getRelClass().equals(Relation.RELCLASS.merges)
+			|| rel.getRelClass().equals(Relation.RELCLASS.isMergedIn))
+			&& rel.getRelType().equals(Relation.RELTYPE.organizationOrganization)
+			&& rel.getSubRelType().equals(Relation.SUBRELTYPE.dedup);
 	}
 }

@@ -2,7 +2,7 @@
 package eu.dnetlib.dhp.broker.oa.matchers.relatedDatasets;
 
 import eu.dnetlib.dhp.broker.model.Topic;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class EnrichMissingDatasetIsSupplementedBy extends AbstractEnrichMissingDataset {
 
@@ -12,7 +12,7 @@ public class EnrichMissingDatasetIsSupplementedBy extends AbstractEnrichMissingD
 
 	@Override
 	protected boolean filterByType(final String relType) {
-		return relType.equals(ModelConstants.IS_SUPPLEMENTED_BY);
+		return relType.equals(Relation.RELCLASS.IsSupplementedBy);
 	}
 
 }

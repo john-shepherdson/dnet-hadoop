@@ -100,7 +100,7 @@ public class ConversionUtils {
 
 		res.setOpenaireId(cleanOpenaireId(result.getId()));
 		res.setOriginalId(first(result.getOriginalId()));
-		res.setTypology(result.getResulttype());
+		res.setTypology(result.getResulttype().toString());
 		res.setTitles(structPropList(result.getTitle()));
 		res.setAbstracts(result.getDescription());
 		res.setLanguage(classId(result.getLanguage()));
@@ -112,7 +112,7 @@ public class ConversionUtils {
 		res.setContributor(result.getContributor());
 		res
 			.setJournal(
-				result instanceof Publication ? oafJournalToBrokerJournal(((Publication) result).getJournal()) : null);
+				result instanceof Publication ? oafJournalToBrokerJournal(result.getJournal()) : null);
 		res.setPids(allResultPids(result));
 		res.setInstances(flatMappedList(result.getInstance(), ConversionUtils::oafInstanceToBrokerInstances));
 		res

@@ -1,17 +1,13 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions.cleanup;
-import static eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions.fixVocabularyNames;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.lenient;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.DocumentException;
@@ -21,14 +17,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
-import eu.dnetlib.dhp.schema.oaf.utils.PidType;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import static eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions.cleanup;
+import static eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions.fixVocabularyNames;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class MappersTest {
@@ -129,7 +127,7 @@ class MappersTest {
 			.stream()
 			.filter(o -> o instanceof Relation)
 			.map(o -> (Relation) o)
-			.filter(r -> ModelConstants.RESULT_PROJECT.equals(r.getRelType()))
+			.filter(r -> Relation.RELTYPE.resultProject.equals(r.getRelType()))
 			.collect(Collectors.toList());
 
 		assertEquals(2, resultProject.size());
@@ -152,7 +150,7 @@ class MappersTest {
 			.stream()
 			.filter(o -> o instanceof Relation)
 			.map(o -> (Relation) o)
-			.filter(r -> ModelConstants.RESULT_ORGANIZATION.equals(r.getRelType()))
+			.filter(r -> Relation.RELTYPE.resultOrganization.equals(r.getRelType()))
 			.collect(Collectors.toList());
 
 		assertEquals(2, affiliation.size());
@@ -297,17 +295,17 @@ class MappersTest {
 
 		assertEquals(d.getId(), r1.getSource());
 		assertEquals("40|corda_______::e06332dee33bec6c2ba4c98601053229", r1.getTarget());
-		assertEquals(ModelConstants.RESULT_PROJECT, r1.getRelType());
-		assertEquals(ModelConstants.OUTCOME, r1.getSubRelType());
-		assertEquals(ModelConstants.IS_PRODUCED_BY, r1.getRelClass());
+		assertEquals(Relation.RELTYPE.resultProject, r1.getRelType());
+		assertEquals(Relation.SUBRELTYPE.outcome, r1.getSubRelType());
+		assertEquals(Relation.RELCLASS.isProducedBy, r1.getRelClass());
 		assertTrue(r1.getValidated());
 		assertEquals("2020-01-01", r1.getValidationDate());
 
 		assertEquals(d.getId(), r2.getTarget());
 		assertEquals("40|corda_______::e06332dee33bec6c2ba4c98601053229", r2.getSource());
-		assertEquals(ModelConstants.RESULT_PROJECT, r2.getRelType());
-		assertEquals(ModelConstants.OUTCOME, r2.getSubRelType());
-		assertEquals(ModelConstants.PRODUCES, r2.getRelClass());
+		assertEquals(Relation.RELTYPE.resultProject, r2.getRelType());
+		assertEquals(Relation.SUBRELTYPE.outcome, r2.getSubRelType());
+		assertEquals(Relation.RELCLASS.produces, r2.getRelClass());
 		assertTrue(r2.getValidated());
 		assertEquals("2020-01-01", r2.getValidationDate());
 
@@ -597,15 +595,15 @@ class MappersTest {
 
 		assertEquals(s.getId(), r1.getSource());
 		assertEquals("50|doi_________::b453e7b4b2130ace57ff0c3db470a982", r1.getTarget());
-		assertEquals(ModelConstants.RESULT_RESULT, r1.getRelType());
-		assertEquals(ModelConstants.RELATIONSHIP, r1.getSubRelType());
-		assertEquals(ModelConstants.IS_REFERENCED_BY, r1.getRelClass());
+		assertEquals(Relation.RELTYPE.resultResult, r1.getRelType());
+		assertEquals(Relation.SUBRELTYPE.relationship, r1.getSubRelType());
+		assertEquals(Relation.RELCLASS.IsReferencedBy, r1.getRelClass());
 
 		assertEquals(s.getId(), r2.getTarget());
 		assertEquals("50|doi_________::b453e7b4b2130ace57ff0c3db470a982", r2.getSource());
-		assertEquals(ModelConstants.RESULT_RESULT, r2.getRelType());
-		assertEquals(ModelConstants.RELATIONSHIP, r2.getSubRelType());
-		assertEquals(ModelConstants.REFERENCES, r2.getRelClass());
+		assertEquals(Relation.RELTYPE.resultResult, r2.getRelType());
+		assertEquals(Relation.SUBRELTYPE.relationship, r2.getSubRelType());
+		assertEquals(Relation.RELCLASS.References, r2.getRelClass());
 
 	}
 

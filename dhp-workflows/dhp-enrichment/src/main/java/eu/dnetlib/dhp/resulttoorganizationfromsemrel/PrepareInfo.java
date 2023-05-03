@@ -31,24 +31,24 @@ import scala.Tuple2;
 public class PrepareInfo implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(PrepareInfo.class);
-
+	
 	// associate orgs with all their parent
 	private static final String ORGANIZATION_ORGANIZATION_QUERY = "SELECT target key, collect_set(source) as valueSet "
 		+
 		"FROM relation " +
-		"WHERE lower(relclass) = '" + ModelConstants.IS_PARENT_OF.toLowerCase() +
+		"WHERE lower(relclass) = '" + Relation.RELCLASS.IsParentOf.toString().toLowerCase() +
 		"' and datainfo.deletedbyinference = false " +
 		"GROUP BY target";
 
 	// associates results with all the orgs they are affiliated to
 	private static final String RESULT_ORGANIZATION_QUERY = "SELECT source key, collect_set(target) as valueSet " +
 		"FROM relation " +
-		"WHERE lower(relclass) = '" + ModelConstants.HAS_AUTHOR_INSTITUTION.toLowerCase() +
+		"WHERE lower(relclass) = '" + Relation.RELCLASS.hasAuthorInstitution.toString().toLowerCase() +
 		"' and datainfo.deletedbyinference = false " +
 		"GROUP BY source";
 
 	public static void main(String[] args) throws Exception {
-
+		
 		String jsonConfiguration = IOUtils
 			.toString(
 				SparkResultToOrganizationFromIstRepoJob.class
@@ -115,7 +115,7 @@ public class PrepareInfo implements Serializable {
 
 		relation
 			.filter(
-				(FilterFunction<Relation>) r -> r.getRelClass().equals(ModelConstants.HAS_AUTHOR_INSTITUTION))
+				(FilterFunction<Relation>) r -> r.getRelClass().equals(Relation.RELCLASS.hasAuthorInstitution))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
@@ -124,14 +124,14 @@ public class PrepareInfo implements Serializable {
 		Dataset<String> children = spark
 			.sql(
 				"Select distinct target as child from relation where " +
-					"lower(relclass)='" + ModelConstants.IS_PARENT_OF.toLowerCase() +
+					"lower(relclass)='" + Relation.RELCLASS.IsParentOf.toString().toLowerCase() +
 					"' and datainfo.deletedbyinference = false")
 			.as(Encoders.STRING());
 
 		Dataset<String> parent = spark
 			.sql(
 				"Select distinct source as parent from relation " +
-					"where lower(relclass)='" + ModelConstants.IS_PARENT_OF.toLowerCase() +
+					"where lower(relclass)='" + Relation.RELCLASS.IsParentOf.toString().toLowerCase() +
 					"' and datainfo.deletedbyinference = false")
 			.as(Encoders.STRING());
 

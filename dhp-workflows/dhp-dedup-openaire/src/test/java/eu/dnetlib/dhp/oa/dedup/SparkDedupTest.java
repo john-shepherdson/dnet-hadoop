@@ -415,9 +415,9 @@ public class SparkDedupTest implements Serializable {
 				"50|doi_________::d5021b53204e4fdeab6ff5d5bc468032",
 				"50|arXiv_______::c93aeb433eb90ed7a86e29be00791b7c");
 		merges.forEach(r -> {
-			assertEquals(ModelConstants.RESULT_RESULT, r.getRelType());
-			assertEquals(ModelConstants.DEDUP, r.getSubRelType());
-			assertEquals(ModelConstants.MERGES, r.getRelClass());
+			assertEquals(Relation.RELTYPE.resultResult, r.getRelType());
+			assertEquals(Relation.SUBRELTYPE.dedup, r.getSubRelType());
+			assertEquals(Relation.RELCLASS.merges, r.getRelClass());
 			assertTrue(dups.contains(r.getTarget()));
 		});
 
@@ -426,9 +426,9 @@ public class SparkDedupTest implements Serializable {
 			.collectAsList();
 		assertEquals(3, mergedIn.size());
 		mergedIn.forEach(r -> {
-			assertEquals(ModelConstants.RESULT_RESULT, r.getRelType());
-			assertEquals(ModelConstants.DEDUP, r.getSubRelType());
-			assertEquals(ModelConstants.IS_MERGED_IN, r.getRelClass());
+			assertEquals(Relation.RELTYPE.resultResult, r.getRelType());
+			assertEquals(Relation.SUBRELTYPE.dedup, r.getSubRelType());
+			assertEquals(Relation.RELCLASS.isMergedIn, r.getRelClass());
 			assertTrue(dups.contains(r.getSource()));
 		});
 

@@ -51,7 +51,7 @@ object SparkCreateScholix {
     val relationDS: Dataset[(String, Relation)] = spark.read
       .load(relationPath)
       .as[Relation]
-      .filter(r => !r.getRelClass.toLowerCase.contains("merge"))
+      .filter(r => !r.getRelClass.toString.toLowerCase.contains("merge"))
       .map(r => (r.getSource, r))(Encoders.tuple(Encoders.STRING, relEncoder))
 
     val summaryDS: Dataset[(String, ScholixSummary)] = spark.read

@@ -1,10 +1,10 @@
 
 package eu.dnetlib.dhp.broker.oa.util;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -13,12 +13,9 @@ import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.util.LongAccumulator;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ClusterUtils {
 
@@ -59,12 +56,12 @@ public class ClusterUtils {
 		return id.contains("dedup");
 	}
 
-	public static final boolean isValidResultResultClass(final String s) {
-		return s.equals(ModelConstants.IS_REFERENCED_BY)
-			|| s.equals(ModelConstants.IS_RELATED_TO)
-			|| s.equals(ModelConstants.REFERENCES)
-			|| s.equals(ModelConstants.IS_SUPPLEMENTED_BY)
-			|| s.equals(ModelConstants.IS_SUPPLEMENT_TO);
+	public static final boolean isValidResultResultClass(final Relation.RELCLASS r) {
+		return r.equals(Relation.RELCLASS.IsReferencedBy)
+			|| r.equals(Relation.RELCLASS.References)
+			|| r.equals(Relation.RELCLASS.IsRelatedTo)
+			|| r.equals(Relation.RELCLASS.IsSupplementTo)
+			|| r.equals(Relation.RELCLASS.IsSupplementedBy);
 	}
 
 	public static <T> T incrementAccumulator(final T o, final LongAccumulator acc) {

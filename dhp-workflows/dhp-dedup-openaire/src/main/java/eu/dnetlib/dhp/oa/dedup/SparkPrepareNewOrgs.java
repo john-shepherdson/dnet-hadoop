@@ -188,18 +188,18 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 	}
 
 	private static boolean filterRels(Relation rel, String entityType) {
-
+		
 		switch (entityType) {
 			case "result":
-				if (rel.getRelClass().equals(ModelConstants.IS_DIFFERENT_FROM)
-					&& rel.getRelType().equals(ModelConstants.RESULT_RESULT)
-					&& rel.getSubRelType().equals(ModelConstants.DEDUP))
+				if (rel.getRelClass().equals(Relation.RELCLASS.isDifferentFrom)
+					&& rel.getRelType().equals(Relation.RELTYPE.resultResult)
+					&& rel.getSubRelType().equals(Relation.SUBRELTYPE.dedup))
 					return true;
 				break;
 			case "organization":
-				if (rel.getRelClass().equals(ModelConstants.IS_DIFFERENT_FROM)
-					&& rel.getRelType().equals(ModelConstants.ORG_ORG_RELTYPE)
-					&& rel.getSubRelType().equals(ModelConstants.DEDUP))
+				if (rel.getRelClass().equals(Relation.RELCLASS.isDifferentFrom)
+					&& rel.getRelType().equals(Relation.RELTYPE.organizationOrganization)
+					&& rel.getSubRelType().equals(Relation.SUBRELTYPE.dedup))
 					return true;
 				break;
 			default:

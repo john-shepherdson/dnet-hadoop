@@ -157,17 +157,18 @@ public class DedupUtility {
 
 	public static Relation createSimRel(String source, String target, String entity) {
 		final Relation r = new Relation();
+		
 		r.setSource(source);
 		r.setTarget(target);
-		r.setSubRelType("dedupSimilarity");
-		r.setRelClass(ModelConstants.IS_SIMILAR_TO);
+		r.setSubRelType(Relation.SUBRELTYPE.dedup);
+		r.setRelClass(Relation.RELCLASS.isSimilarTo);
 
 		switch (entity) {
 			case "result":
-				r.setRelType(ModelConstants.RESULT_RESULT);
+				r.setRelType(Relation.RELTYPE.resultResult);
 				break;
 			case "organization":
-				r.setRelType(ModelConstants.ORG_ORG_RELTYPE);
+				r.setRelType(Relation.RELTYPE.organizationOrganization);
 				break;
 			default:
 				throw new IllegalArgumentException("unmanaged entity type: " + entity);

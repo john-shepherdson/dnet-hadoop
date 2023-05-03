@@ -2,7 +2,7 @@
 package eu.dnetlib.dhp.broker.oa.matchers.relatedPublications;
 
 import eu.dnetlib.dhp.broker.model.Topic;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class EnrichMissingPublicationReferences extends AbstractEnrichMissingPublication {
 
@@ -12,7 +12,7 @@ public class EnrichMissingPublicationReferences extends AbstractEnrichMissingPub
 
 	@Override
 	protected boolean filterByType(final String relType) {
-		return relType.equals(ModelConstants.REFERENCES);
+		return relType.equals(Relation.RELCLASS.References);
 	}
 
 }

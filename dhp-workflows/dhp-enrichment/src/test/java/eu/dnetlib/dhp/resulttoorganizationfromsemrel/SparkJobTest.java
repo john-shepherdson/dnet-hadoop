@@ -119,8 +119,8 @@ public class SparkJobTest {
 		tmp.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
 
 		Assertions.assertEquals(18, tmp.count());
-		tmp.foreach(r -> Assertions.assertEquals(ModelConstants.AFFILIATION, r.getSubRelType()));
-		tmp.foreach(r -> Assertions.assertEquals(ModelConstants.RESULT_ORGANIZATION, r.getRelType()));
+		tmp.foreach(r -> Assertions.assertEquals(Relation.SUBRELTYPE.affiliation, r.getSubRelType()));
+		tmp.foreach(r -> Assertions.assertEquals(Relation.RELTYPE.resultOrganization, r.getRelType()));
 		tmp
 			.foreach(
 				r -> Assertions
@@ -148,7 +148,7 @@ public class SparkJobTest {
 		Assertions.assertEquals(9, tmp.filter(r -> r.getSource().substring(0, 3).equals("50|")).count());
 		tmp
 			.filter(r -> r.getSource().substring(0, 3).equals("50|"))
-			.foreach(r -> Assertions.assertEquals(ModelConstants.HAS_AUTHOR_INSTITUTION, r.getRelClass()));
+			.foreach(r -> Assertions.assertEquals(Relation.RELCLASS.hasAuthorInstitution, r.getRelClass()));
 		Assertions
 			.assertEquals(
 				2, tmp.filter(r -> r.getSource().equals("50|doajarticles::1cae0b82b56ccd97c2db1f698def7074")).count());
@@ -168,7 +168,7 @@ public class SparkJobTest {
 		Assertions.assertEquals(9, tmp.filter(r -> r.getSource().substring(0, 3).equals("20|")).count());
 		tmp
 			.filter(r -> r.getSource().substring(0, 3).equals("20|"))
-			.foreach(r -> Assertions.assertEquals(ModelConstants.IS_AUTHOR_INSTITUTION_OF, r.getRelClass()));
+			.foreach(r -> Assertions.assertEquals(Relation.RELCLASS.isAuthorInstitutionOf, r.getRelClass()));
 		Assertions
 			.assertEquals(
 				1, tmp.filter(r -> r.getSource().equals("20|doajarticles::1cae0b82b56ccd97c2db1f698def7074")).count());

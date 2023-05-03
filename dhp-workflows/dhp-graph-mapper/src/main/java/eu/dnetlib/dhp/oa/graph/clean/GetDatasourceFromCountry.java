@@ -89,7 +89,7 @@ public class GetDatasourceFromCountry implements Serializable {
 				(MapFunction<String, Relation>) value -> OBJECT_MAPPER.readValue(value, Relation.class),
 				Encoders.bean(Relation.class))
 			.filter(
-				(FilterFunction<Relation>) rel -> rel.getRelClass().equalsIgnoreCase(ModelConstants.IS_PROVIDED_BY));
+				(FilterFunction<Relation>) rel -> rel.getRelClass().equalsIgnoreCase(Relation.RELCLASS.isProvidedBy));
 
 		organization
 			.joinWith(relation, organization.col("id").equalTo(relation.col("target")))

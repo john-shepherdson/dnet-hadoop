@@ -246,10 +246,10 @@ class MigrateDbEntitiesApplicationTest {
 		assertEquals(ModelConstants.DATASOURCE_ORGANIZATION, r1.getRelType());
 		assertEquals(ModelConstants.DATASOURCE_ORGANIZATION, r2.getRelType());
 
-		assertEquals(ModelConstants.PROVISION, r1.getSubRelType());
-		assertEquals(ModelConstants.PROVISION, r2.getSubRelType());
+		assertEquals(Relation.SUBRELTYPE.provision, r1.getSubRelType());
+		assertEquals(Relation.SUBRELTYPE.provision, r2.getSubRelType());
 
-		assertEquals(ModelConstants.IS_PROVIDED_BY, r1.getRelClass());
+		assertEquals(Relation.RELCLASS.isProvidedBy, r1.getRelClass());
 		assertEquals(ModelConstants.PROVIDES, r2.getRelClass());
 	}
 
@@ -272,7 +272,7 @@ class MigrateDbEntitiesApplicationTest {
 		assertValidId(rel.getProvenance().get(0).getCollectedfrom().getKey());
 
 		assertEquals(ModelConstants.PROJECT_ORGANIZATION, rel.getRelType());
-		assertEquals(ModelConstants.PARTICIPATION, rel.getSubRelType());
+		assertEquals(Relation.SUBRELTYPE.participation, rel.getSubRelType());
 		assertEquals(ModelConstants.IS_PARTICIPANT, rel.getRelClass());
 
 		assertNotNull(rel.getProperties());

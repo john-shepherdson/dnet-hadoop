@@ -74,7 +74,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 
 		// <mergedObjectID, dedupID>
 		Dataset<Tuple2<String, String>> mergedIds = mergeRels
-			.where(col("relClass").equalTo(ModelConstants.MERGES))
+			.where(col("relClass").equalTo(Relation.RELCLASS.merges))
 			.select(col("source"), col("target"))
 			.distinct()
 			.map(
@@ -111,7 +111,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 			.filter(getRelationFilterFunction())
 			.groupByKey(
 				(MapFunction<Relation, String>) r -> String
-					.join(r.getSource(), r.getTarget(), r.getRelType(), r.getSubRelType(), r.getRelClass()),
+					.join(r.getSource(), r.getTarget(), r.getRelType().toString(), r.getSubRelType().toString(), r.getRelClass().toString()),
 				Encoders.STRING())
 			.agg(new RelationAggregator().toColumn())
 			.map((MapFunction<Tuple2<String, Relation>, Relation>) Tuple2::_2, Encoders.bean(Relation.class));
@@ -150,9 +150,9 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 	private FilterFunction<Relation> getRelationFilterFunction() {
 		return r -> StringUtils.isNotBlank(r.getSource()) ||
 			StringUtils.isNotBlank(r.getTarget()) ||
-			StringUtils.isNotBlank(r.getRelType()) ||
-			StringUtils.isNotBlank(r.getSubRelType()) ||
-			StringUtils.isNotBlank(r.getRelClass());
+				r.getRelType() != null ||
+			r.getSubRelType()!=null ||
+			r.getRelClass()!=null;
 	}
 
 	private static String getId(Relation r, FieldType type) {

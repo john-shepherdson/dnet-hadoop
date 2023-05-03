@@ -144,7 +144,7 @@ class CrossrefMappingTest {
     val relationList: List[Relation] = result
       .filter(s => s.isInstanceOf[Relation])
       .map(r => r.asInstanceOf[Relation])
-      .filter(r => r.getSubRelType.equalsIgnoreCase(ModelConstants.CITATION))
+      .filter(r => r.getSubRelType.equalsIgnoreCase(Relation.SUBRELTYPE.citation))
 
     assertNotNull(relationList)
     assertFalse(relationList.isEmpty)

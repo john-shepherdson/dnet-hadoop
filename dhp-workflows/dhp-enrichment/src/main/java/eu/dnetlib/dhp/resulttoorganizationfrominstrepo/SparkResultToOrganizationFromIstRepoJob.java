@@ -142,9 +142,9 @@ public class SparkResultToOrganizationFromIstRepoJob {
 						.add(
 							getRelation(
 								resultId, orgId,
-								ModelConstants.HAS_AUTHOR_INSTITUTION,
-								ModelConstants.RESULT_ORGANIZATION,
-								ModelConstants.AFFILIATION, PROPAGATION_DATA_INFO_TYPE,
+								Relation.RELCLASS.hasAuthorInstitution,
+								Relation.RELTYPE.resultOrganization,
+								Relation.SUBRELTYPE.affiliation, PROPAGATION_DATA_INFO_TYPE,
 								PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_ID,
 								PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME))
 

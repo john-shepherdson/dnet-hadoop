@@ -112,15 +112,16 @@ public class PropagationConstant {
 		String className
 
 	) {
+		
 		ArrayList<Relation> newRelations = new ArrayList();
 		newRelations
 			.add(
 				getRelation(
 					orgId,
 					resultId,
-					ModelConstants.IS_AUTHOR_INSTITUTION_OF,
-					ModelConstants.RESULT_ORGANIZATION,
-					ModelConstants.AFFILIATION,
+					Relation.RELCLASS.isAuthorInstitutionOf,
+					Relation.RELTYPE.resultOrganization,
+					Relation.SUBRELTYPE.affiliation,
 					PROPAGATION_DATA_INFO_TYPE,
 					classID,
 					className));
@@ -129,9 +130,9 @@ public class PropagationConstant {
 				getRelation(
 					resultId,
 					orgId,
-					ModelConstants.HAS_AUTHOR_INSTITUTION,
-					ModelConstants.RESULT_ORGANIZATION,
-					ModelConstants.AFFILIATION,
+					Relation.RELCLASS.hasAuthorInstitution,
+					Relation.RELTYPE.resultOrganization,
+					Relation.SUBRELTYPE.affiliation,
 					PROPAGATION_DATA_INFO_TYPE,
 					classID,
 					className));
@@ -142,9 +143,9 @@ public class PropagationConstant {
 	public static Relation getRelation(
 		String source,
 		String target,
-		String rel_class,
-		String rel_type,
-		String subrel_type,
+		Relation.RELCLASS rel_class,
+		Relation.RELTYPE rel_type,
+		Relation.SUBRELTYPE subrel_type,
 		String inference_provenance,
 		String inference_class_id,
 		String inference_class_name) {

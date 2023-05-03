@@ -112,9 +112,9 @@ public class SparkResultToProjectThroughSemRelJob {
 							getRelation(
 								projectId,
 								resId,
-								ModelConstants.PRODUCES,
-								ModelConstants.RESULT_PROJECT,
-								ModelConstants.OUTCOME,
+								Relation.RELCLASS.produces,
+								Relation.RELTYPE.resultProject,
+								Relation.SUBRELTYPE.outcome,
 								PROPAGATION_DATA_INFO_TYPE,
 								PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID,
 								PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_NAME)));

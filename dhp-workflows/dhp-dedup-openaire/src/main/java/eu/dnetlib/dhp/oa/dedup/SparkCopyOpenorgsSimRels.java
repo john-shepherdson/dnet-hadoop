@@ -81,9 +81,9 @@ public class SparkCopyOpenorgsSimRels extends AbstractSparkAction {
 	}
 
 	private boolean filterOpenorgsRels(Relation rel) {
-		return rel.getRelClass().equals(ModelConstants.IS_SIMILAR_TO)
-			&& rel.getRelType().equals(ModelConstants.ORG_ORG_RELTYPE)
-			&& rel.getSubRelType().equals(ModelConstants.DEDUP) && isOpenorgs(rel);
+		return rel.getRelClass().equals(Relation.RELCLASS.isSimilarTo)
+			&& rel.getRelType().equals(Relation.RELTYPE.organizationOrganization)
+			&& rel.getSubRelType().equals(Relation.SUBRELTYPE.dedup) && isOpenorgs(rel);
 	}
 
 }

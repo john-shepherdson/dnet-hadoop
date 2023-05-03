@@ -384,9 +384,9 @@ case object Crossref2Oaf {
     val rel = new Relation
     rel.setSource(sourceId)
     rel.setTarget(targetId)
-    rel.setRelType(ModelConstants.RESULT_RESULT)
-    rel.setRelClass(ModelConstants.CITES)
-    rel.setSubRelType(ModelConstants.CITATION)
+    rel.setRelType(Relation.RELTYPE.resultResult)
+    rel.setRelClass(Relation.RELCLASS.Cites)
+    rel.setSubRelType(Relation.SUBRELTYPE.citation)
     rel.setProvenance(Lists.newArrayList(OafMapperUtils.getProvenance(collectedFrom, dataInfo)))
 
     List(rel)
@@ -417,14 +417,14 @@ case object Crossref2Oaf {
       null
     }
 
-    def generateRelation(sourceId: String, targetId: String, relClass: String): Relation = {
+    def generateRelation(sourceId: String, targetId: String, relClass: Relation.RELCLASS): Relation = {
 
       val r = new Relation
       r.setSource(sourceId)
       r.setTarget(targetId)
-      r.setRelType(ModelConstants.RESULT_PROJECT)
+      r.setRelType(Relation.RELTYPE.resultProject)
       r.setRelClass(relClass)
-      r.setSubRelType(ModelConstants.OUTCOME)
+      r.setSubRelType(Relation.SUBRELTYPE.outcome)
 
       r.setProvenance(Lists.newArrayList(OafMapperUtils.getProvenance(collectedFrom, dataInfo)))
       r
@@ -435,14 +435,15 @@ case object Crossref2Oaf {
       nsPrefix: String,
       extractField: String => String
     ): Unit = {
+
       if (funder.award.isDefined && funder.award.get.nonEmpty)
         funder.award.get
           .map(extractField)
           .filter(a => a != null && a.nonEmpty)
           .foreach(award => {
             val targetId = getProjectId(nsPrefix, DHPUtils.md5(award))
-            queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
-            queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            queue += generateRelation(sourceId, targetId, Relation.RELCLASS.isProducedBy)
+            queue += generateRelation(targetId, sourceId, Relation.RELCLASS.produces)
           })
     }
 
@@ -471,21 +472,21 @@ case object Crossref2Oaf {
             case "10.13039/501100000923" => generateSimpleRelationFromAward(funder, "arc_________", a => a)
             case "10.13039/501100000038" =>
               val targetId = getProjectId("nserc_______", "1e5e62235d094afd01cd56e65112fc63")
-              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
-              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+              queue += generateRelation(sourceId, targetId, Relation.RELCLASS.isProducedBy)
+              queue += generateRelation(targetId, sourceId, Relation.RELCLASS.produces)
             case "10.13039/501100000155" =>
               val targetId = getProjectId("sshrc_______", "1e5e62235d094afd01cd56e65112fc63")
-              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
-              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+              queue += generateRelation(sourceId, targetId, Relation.RELCLASS.isProducedBy)
+              queue += generateRelation(targetId, sourceId, Relation.RELCLASS.produces)
             case "10.13039/501100000024" =>
               val targetId = getProjectId("cihr________", "1e5e62235d094afd01cd56e65112fc63")
-              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
-              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+              queue += generateRelation(sourceId, targetId, Relation.RELCLASS.isProducedBy)
+              queue += generateRelation(targetId, sourceId, Relation.RELCLASS.produces)
 
             case "10.13039/100020031" =>
               val targetId = getProjectId("tara________", "1e5e62235d094afd01cd56e65112fc63")
-              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
-              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+              queue += generateRelation(sourceId, targetId, Relation.RELCLASS.isProducedBy)
+              queue += generateRelation(targetId, sourceId, Relation.RELCLASS.produces)
 
             case "10.13039/501100005416" => generateSimpleRelationFromAward(funder, "rcn_________", a => a)
             case "10.13039/501100002848" => generateSimpleRelationFromAward(funder, "conicytf____", a => a)
@@ -495,8 +496,8 @@ case object Crossref2Oaf {
             case "10.13039/501100003407" =>
               generateSimpleRelationFromAward(funder, "miur________", a => a)
               val targetId = getProjectId("miur________", "1e5e62235d094afd01cd56e65112fc63")
-              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
-              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+              queue += generateRelation(sourceId, targetId, Relation.RELCLASS.isProducedBy)
+              queue += generateRelation(targetId, sourceId, Relation.RELCLASS.produces)
             case "10.13039/501100006588" | "10.13039/501100004488" =>
               generateSimpleRelationFromAward(
                 funder,
@@ -509,15 +510,15 @@ case object Crossref2Oaf {
             case "10.13039/100004440" =>
               generateSimpleRelationFromAward(funder, "wt__________", a => a)
               val targetId = getProjectId("wt__________", "1e5e62235d094afd01cd56e65112fc63")
-              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
-              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+              queue += generateRelation(sourceId, targetId, Relation.RELCLASS.isProducedBy)
+              queue += generateRelation(targetId, sourceId, Relation.RELCLASS.produces)
             //ASAP
             case "10.13039/100018231" => generateSimpleRelationFromAward(funder, "asap________", a => a)
             //CHIST-ERA
             case "10.13039/501100001942" =>
               val targetId = getProjectId("chistera____", "1e5e62235d094afd01cd56e65112fc63")
-              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
-              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+              queue += generateRelation(sourceId, targetId, Relation.RELCLASS.isProducedBy)
+              queue += generateRelation(targetId, sourceId, Relation.RELCLASS.produces)
             //HE
             case "10.13039/100018693" | "10.13039/100018694" | "10.13039/100019188" | "10.13039/100019180" |
                 "10.13039/100018695" | "10.13039/100019185" | "10.13039/100019186" | "10.13039/100019187" =>
@@ -559,8 +560,8 @@ case object Crossref2Oaf {
             case "Wellcome Trust Masters Fellowship" =>
               generateSimpleRelationFromAward(funder, "wt__________", a => a)
               val targetId = getProjectId("wt__________", "1e5e62235d094afd01cd56e65112fc63")
-              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
-              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+              queue += generateRelation(sourceId, targetId, Relation.RELCLASS.isProducedBy)
+              queue += generateRelation(targetId, sourceId, Relation.RELCLASS.produces)
             case _ => logger.debug("no match for " + funder.name)
 
           }

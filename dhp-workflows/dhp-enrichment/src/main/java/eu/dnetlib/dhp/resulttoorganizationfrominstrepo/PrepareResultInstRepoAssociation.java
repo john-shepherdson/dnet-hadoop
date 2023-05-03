@@ -98,7 +98,7 @@ public class PrepareResultInstRepoAssociation {
 			.stream()
 			.map(s -> " AND id != '" + s + "'")
 			.collect(Collectors.joining());
-
+		
 		String query = "SELECT source datasourceId, target organizationId "
 			+ "FROM ( SELECT id "
 			+ "FROM datasource "
@@ -109,7 +109,7 @@ public class PrepareResultInstRepoAssociation {
 			+ "JOIN ( SELECT source, target "
 			+ "FROM relation "
 			+ "WHERE lower(relclass) = '"
-			+ ModelConstants.IS_PROVIDED_BY.toLowerCase()
+			+ Relation.RELCLASS.isProvidedBy.toString().toLowerCase()
 			+ "' "
 			+ "AND datainfo.deletedbyinference = false ) rel "
 			+ "ON d.id = rel.source ";
@@ -129,7 +129,7 @@ public class PrepareResultInstRepoAssociation {
 			+ "from relation "
 			+ "where datainfo.deletedbyinference = false "
 			+ "and lower(relClass) = '"
-			+ ModelConstants.HAS_AUTHOR_INSTITUTION.toLowerCase()
+			+ Relation.RELCLASS.hasAuthorInstitution.toString().toLowerCase()
 			+ "' "
 			+ "group by source";
 
