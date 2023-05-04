@@ -78,6 +78,8 @@ public class GetDatasourceFromCountry implements Serializable {
 				Encoders.bean(Organization.class))
 			.filter(
 				(FilterFunction<Organization>) o -> !o.getDataInfo().getDeletedbyinference() &&
+					o.getCountry() != null &&
+					o.getCountry().getClassid() != null &&
 					o.getCountry().getClassid().length() > 0 &&
 					o.getCountry().getClassid().equals(country));
 
