@@ -405,7 +405,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			final List<Provenance> provenance = getProvenance(collectedFrom, info);
 			return Arrays.asList(OafMapperUtils
 					.getRelation(
-							orgId, dsId, DATASOURCE_ORGANIZATION, PROVISION, PROVIDES, provenance));
+							orgId, dsId, Relation.RELTYPE.datasourceOrganization, Relation.SUBRELTYPE.provision, Relation.RELCLASS.provides, provenance));
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -428,7 +428,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 			return Arrays.asList(
 					OafMapperUtils.getRelation(
-					orgId, projectId, PROJECT_ORGANIZATION, PARTICIPATION, IS_PARTICIPANT, provenance, properties));
+					orgId, projectId, Relation.RELTYPE.projectOrganization, Relation.SUBRELTYPE.participation, Relation.RELCLASS.isParticipant, provenance, properties));
 
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
@@ -444,16 +444,16 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 				if (targetType.equals("dataset")) {
 					r = new Dataset();
-					r.setResulttype(DATASET_DEFAULT_RESULTTYPE.getClassid());
+					r.setResulttype(Result.RESULTTYPE.dataset);
 				} else if (targetType.equals("software")) {
 					r = new Software();
-					r.setResulttype(SOFTWARE_DEFAULT_RESULTTYPE.getClassid());
+					r.setResulttype(Result.RESULTTYPE.software);
 				} else if (targetType.equals("other")) {
 					r = new OtherResearchProduct();
-					r.setResulttype(ORP_DEFAULT_RESULTTYPE.getClassid());
+					r.setResulttype(Result.RESULTTYPE.otherresearchproduct);
 				} else {
 					r = new Publication();
-					r.setResulttype(PUBLICATION_DEFAULT_RESULTTYPE.getClassid());
+					r.setResulttype(Result.RESULTTYPE.publication);
 				}
 				r.setId(createOpenaireId(50, rs.getString("target_id"), false));
 				r.setLastupdatetimestamp(lastUpdateTimestamp);
@@ -473,8 +473,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				final String semantics = rs.getString("semantics");
 
 				switch (semantics) {
-					case "resultResult_relationship_isRelatedTo":
-						rel = setRelationSemantic(rel, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO);
+					case "resultResult_Relation.SUBRELTYPE.relationship_isRelatedTo":
+						rel = setRelationSemantic(rel, Relation.RELTYPE.resultResult, Relation.SUBRELTYPE.relationship, Relation.RELCLASS.IsRelatedTo);
 						break;
 					case "resultProject_outcome_produces":
 						if (!"project".equals(sourceType)) {
@@ -484,10 +484,10 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 										"invalid claim, sourceId: %s, targetId: %s, semantics: %s", sourceId, targetId,
 										semantics));
 						}
-						rel = setRelationSemantic(rel, RESULT_PROJECT, OUTCOME, PRODUCES);
+						rel = setRelationSemantic(rel, Relation.RELTYPE.resultProject, Relation.SUBRELTYPE.outcome, Relation.RELCLASS.produces);
 						break;
 					case "resultResult_publicationDataset_isRelatedTo":
-						rel = setRelationSemantic(rel, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO);
+						rel = setRelationSemantic(rel, Relation.RELTYPE.resultResult,  PUBLICATION_DATASET, IS_RELATED_TO);
 						break;
 					default:
 						throw new IllegalArgumentException("claim semantics not managed: " + semantics);
@@ -512,8 +512,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 		return r;
 	}
 
-	private Relation setRelationSemantic(final Relation r, final String relType, final String subRelType,
-		final String relClass) {
+	private Relation setRelationSemantic(final Relation r, final Relation.RELTYPE relType, final Relation.SUBRELTYPE subRelType,
+		final Relation.RELCLASS relClass) {
 		r.setRelType(relType);
 		r.setSubRelType(subRelType);
 		r.setRelClass(relClass);
@@ -641,7 +641,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
 
 			final List<Provenance> provenance = getProvenance(collectedFrom, info);
-			return Arrays.asList(getRelation(orgId1, orgId2, ORG_ORG_RELTYPE, DEDUP, MERGES, provenance));
+			return Arrays.asList(getRelation(orgId1, orgId2, Relation.RELTYPE.organizationOrganization, Relation.SUBRELTYPE.dedup, Relation.RELCLASS.merges, provenance));
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -659,8 +659,8 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 			final List<Provenance> provenance = getProvenance(collectedFrom, info);
 
-			final String relClass = rs.getString("type");
-			return Arrays.asList(getRelation(orgId1, orgId2, ORG_ORG_RELTYPE, RELATIONSHIP, relClass, provenance));
+			final Relation.RELCLASS relClass = Relation.RELCLASS.lookUp(rs.getString("type"));
+			return Arrays.asList(getRelation(orgId1, orgId2, Relation.RELTYPE.organizationOrganization, Relation.SUBRELTYPE.relationship, relClass, provenance));
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -672,14 +672,14 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 
 			final String orgId1 = createOpenaireId(20, rs.getString("id1"), true);
 			final String orgId2 = createOpenaireId(20, rs.getString("id2"), true);
-			final String relClass = rs.getString("relclass");
+			final Relation.RELCLASS relClass = Relation.RELCLASS.lookUp(rs.getString("relclass"));
 
 			final List<KeyValue> collectedFrom = listKeyValues(
 				createOpenaireId(10, rs.getString("collectedfromid"), true), rs.getString("collectedfromname"));
 
 			final List<Provenance> provenance = getProvenance(collectedFrom, info);
 
-			return Arrays.asList(getRelation(orgId1, orgId2, ORG_ORG_RELTYPE, DEDUP, relClass, provenance));
+			return Arrays.asList(getRelation(orgId1, orgId2, Relation.RELTYPE.organizationOrganization, Relation.SUBRELTYPE.dedup, relClass, provenance));
 		} catch (final Exception e) {
 			throw new RuntimeException(e);
 		}

@@ -222,7 +222,7 @@ public class XmlRecordFactory implements Serializable {
 							.getFulltext()
 							.stream()
 							.filter(Objects::nonNull)
-							.map(c -> XmlSerializationUtils.asXmlElement("fulltext", c.getValue()))
+							.map(c -> XmlSerializationUtils.asXmlElement("fulltext", c))
 							.collect(Collectors.toList()));
 			}
 
@@ -421,7 +421,7 @@ public class XmlRecordFactory implements Serializable {
 							.collect(Collectors.toList()));
 			}
 			if (r.getResulttype() != null) {
-				metadata.add(XmlSerializationUtils.asXmlElement("resulttype", r.getResulttype()));
+				metadata.add(XmlSerializationUtils.asXmlElement("resulttype", r.getResulttype().toString()));
 			}
 			if (r.getResourcetype() != null) {
 				metadata.add(XmlSerializationUtils.mapQualifier("resourcetype", r.getResourcetype()));
@@ -1132,7 +1132,7 @@ public class XmlRecordFactory implements Serializable {
 				throw new IllegalArgumentException("invalid target type: " + targetType);
 		}
 
-		final String accumulatorName = getRelDescriptor(rel.getRelType(), rel.getSubRelType(), rel.getRelClass());
+		final String accumulatorName = getRelDescriptor(rel.getRelType().toString(), rel.getSubRelType().toString(), rel.getRelClass().toString());
 		if (accumulators.containsKey(accumulatorName)) {
 			accumulators.get(accumulatorName).add(1);
 		}
@@ -1159,7 +1159,7 @@ public class XmlRecordFactory implements Serializable {
 		final DataInfo dataInfo = Optional.ofNullable(rel.getProvenance()).map(p -> p.get(0).getDataInfo()).orElse(null);
 		return templateFactory
 			.getRel(
-				targetType, rel.getTarget(), fields, rel.getRelClass(), scheme, dataInfo, rel.getValidated(),
+				targetType, rel.getTarget(), fields, rel.getRelClass().toString(), scheme, dataInfo, rel.getValidated(),
 				rel.getValidationDate());
 	}
 
@@ -1459,7 +1459,7 @@ public class XmlRecordFactory implements Serializable {
 	}
 
 	private boolean isDuplicate(final RelatedEntityWrapper link) {
-		return Relation.SUBRELTYPE.dedup.equalsIgnoreCase(link.getRelation().getSubRelType());
+		return Relation.SUBRELTYPE.dedup== link.getRelation().getSubRelType();
 	}
 
 	private List<String> listExtraInfo(final Entity entity) {

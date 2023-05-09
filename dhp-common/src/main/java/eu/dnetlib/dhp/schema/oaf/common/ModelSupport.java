@@ -92,6 +92,13 @@ public class ModelSupport {
 		idPrefixEntity.put("50", "result");
 	}
 
+	public static String getEntityTypeFromId(final String id) {
+		//TODO We should create a class which define the identifier and parse it
+		if (StringUtils.isBlank(id))
+			return null;
+		return idPrefixEntity.get(id.substring(0,2));
+	}
+
 	/**
 	 * Helper method: combines the relation attributes
 	 * @param relType
@@ -105,9 +112,7 @@ public class ModelSupport {
 
 	/**
 	 * Helper method: deserialize the relation attributes serialized with rel
-	 * @param relType
-	 * @param subRelType
-	 * @param relClass
+	 * @param deserialization
 	 * @return
 	 */
 	public static RelationLabel unRel(String deserialization) {

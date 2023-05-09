@@ -4,6 +4,7 @@ package eu.dnetlib.doiboost.orcidnodoi.util;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import eu.dnetlib.dhp.schema.oaf.Result;
 import org.apache.commons.lang3.StringUtils;
 
 import com.google.gson.JsonArray;
@@ -66,15 +67,16 @@ public class DumpToActionsUtility {
 		return result.substring(0, result.length() - 2) + ":" + result.substring(result.length() - 2);
 	}
 
-	public static String getDefaultResulttype(final String cobjcategory) {
+	//TODO CHECK IF WE CAN USE VOCABULARYGROUP
+	public static Result.RESULTTYPE getDefaultResulttype(final String cobjcategory) {
 		switch (cobjcategory) {
 			case "0029":
-				return "software";
+				return Result.RESULTTYPE.software;
 			case "0021":
 			case "0024":
 			case "0025":
 			case "0030":
-				return "dataset";
+				return Result.RESULTTYPE.dataset;
 			case "0000":
 			case "0010":
 			case "0018":
@@ -85,7 +87,7 @@ public class DumpToActionsUtility {
 			case "0027":
 			case "0028":
 			case "0037":
-				return "other";
+				return Result.RESULTTYPE.otherresearchproduct;
 			case "0001":
 			case "0002":
 			case "0004":
@@ -104,9 +106,10 @@ public class DumpToActionsUtility {
 			case "0019":
 			case "0031":
 			case "0032":
-				return "publication";
+				return Result.RESULTTYPE.publication;
 			default:
-				return "publication";
+				//TODO is it correct??
+				return Result.RESULTTYPE.publication;
 		}
 	}
 

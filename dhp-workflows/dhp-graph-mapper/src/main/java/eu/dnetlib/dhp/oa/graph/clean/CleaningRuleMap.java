@@ -64,12 +64,12 @@ public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Obje
 
 	private static void cleanRelation(VocabularyGroup vocabularies, Relation r) {
 		if (vocabularies.vocabularyExists(ModelConstants.DNET_RELATION_SUBRELTYPE)) {
-			Qualifier newValue = vocabularies.lookup(ModelConstants.DNET_RELATION_SUBRELTYPE, r.getSubRelType());
-			r.setSubRelType(newValue.getClassid());
+			Qualifier newValue = vocabularies.lookup(ModelConstants.DNET_RELATION_SUBRELTYPE, r.getSubRelType().toString());
+			r.setSubRelType(Relation.SUBRELTYPE.valueOf(newValue.getClassid()));
 		}
 		if (vocabularies.vocabularyExists(ModelConstants.DNET_RELATION_RELCLASS)) {
-			Qualifier newValue = vocabularies.lookup(ModelConstants.DNET_RELATION_RELCLASS, r.getRelClass());
-			r.setRelClass(newValue.getClassid());
+			Qualifier newValue = vocabularies.lookup(ModelConstants.DNET_RELATION_RELCLASS, r.getRelClass().toString());
+			r.setRelClass(Relation.RELCLASS.valueOf(newValue.getClassid()));
 		}
 	}
 

@@ -6,10 +6,7 @@ import java.util.List;
 
 import com.google.common.base.Objects;
 
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class RelatedEntity implements Serializable {
 
@@ -25,7 +22,7 @@ public class RelatedEntity implements Serializable {
 	private String publisher;
 	private List<StructuredProperty> pid;
 	private String codeRepositoryUrl;
-	private String resulttype;
+	private Result.RESULTTYPE resulttype;
 	private List<KeyValue> collectedfrom;
 	private List<Instance> instances;
 
@@ -111,11 +108,11 @@ public class RelatedEntity implements Serializable {
 		this.codeRepositoryUrl = codeRepositoryUrl;
 	}
 
-	public String getResulttype() {
+	public Result.RESULTTYPE getResulttype() {
 		return resulttype;
 	}
 
-	public void setResulttype(String resulttype) {
+	public void setResulttype(Result.RESULTTYPE resulttype) {
 		this.resulttype = resulttype;
 	}
 

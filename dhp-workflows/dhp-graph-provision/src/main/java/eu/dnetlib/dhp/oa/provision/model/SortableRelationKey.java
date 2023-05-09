@@ -14,9 +14,10 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class SortableRelationKey implements Comparable<SortableRelationKey>, Serializable {
 
-	private static final Map<String, Integer> weights = Maps.newHashMap();
+	private static final Map<Relation.SUBRELTYPE, Integer> weights = Maps.newHashMap();
 
 	static {
+		//TODO Claudio check why we need to have SUBRELTYPE AND RELTYPE
 		weights.put(Relation.SUBRELTYPE.participation, 0);
 		weights.put(Relation.SUBRELTYPE.outcome, 1);
 		weights.put(Relation.SUBRELTYPE.affiliation, 2);
@@ -25,9 +26,9 @@ public class SortableRelationKey implements Comparable<SortableRelationKey>, Ser
 		weights.put(Relation.SUBRELTYPE.supplement, 5);
 		weights.put(Relation.SUBRELTYPE.review, 6);
 		weights.put(Relation.SUBRELTYPE.relationship, 7);
-		weights.put(ModelConstants.PART, 8);
+		weights.put(Relation.SUBRELTYPE.part, 8);
 		weights.put(Relation.SUBRELTYPE.provision, 9);
-		weights.put(ModelConstants.VERSION, 10);
+		weights.put(Relation.SUBRELTYPE.version, 10);
 		weights.put(Relation.SUBRELTYPE.similarity, 11);
 		weights.put(Relation.SUBRELTYPE.citation, 12);
 	}

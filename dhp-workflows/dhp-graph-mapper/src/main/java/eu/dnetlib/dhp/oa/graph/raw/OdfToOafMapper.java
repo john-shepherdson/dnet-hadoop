@@ -401,13 +401,14 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	protected List<Oaf> getRelations(final String reltype, final String entityId, final String otherId,
 		final Entity entity) {
 		final List<Oaf> res = new ArrayList<>();
-		RelationLabel rel = ModelSupport.findRelation(reltype);
-		if (rel != null) {
+		Relation.RELCLASS rel = Relation.RELCLASS.lookUp(reltype);
+		Relation.SUBRELTYPE subrelType = rel.getSubRel();
+		Relation.RELTYPE rt = subrelType.getRelType(ModelSupport.getEntityTypeFromId(entityId));
 			res
 				.add(
 					getRelation(
-						entityId, otherId, rel.getRelType(), rel.getSubReltype(), rel.getRelClass(), entity));
-		}
+						entityId, otherId, rt, subrelType, rel, entity));
+
 		return res;
 	}
 

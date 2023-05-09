@@ -276,7 +276,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 				res
 					.add(
 						getRelation(
-							docId, otherId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, entity));
+							docId, otherId, Relation.RELTYPE.resultResult, Relation.SUBRELTYPE.relationship, Relation.RELCLASS.IsRelatedTo, entity));
 			}
 		}
 		return res;
