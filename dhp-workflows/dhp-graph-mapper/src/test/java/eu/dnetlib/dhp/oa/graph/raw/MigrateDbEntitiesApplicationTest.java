@@ -243,14 +243,15 @@ class MigrateDbEntitiesApplicationTest {
 		assertTrue(r1.getSource().startsWith("10|"));
 		assertTrue(r1.getTarget().startsWith("20|"));
 
-		assertEquals(ModelConstants.DATASOURCE_ORGANIZATION, r1.getRelType());
-		assertEquals(ModelConstants.DATASOURCE_ORGANIZATION, r2.getRelType());
+		
+		assertEquals(Relation.RELTYPE.datasourceOrganization, r1.getRelType());
+		assertEquals(Relation.RELTYPE.datasourceOrganization, r2.getRelType());
 
 		assertEquals(Relation.SUBRELTYPE.provision, r1.getSubRelType());
 		assertEquals(Relation.SUBRELTYPE.provision, r2.getSubRelType());
 
 		assertEquals(Relation.RELCLASS.isProvidedBy, r1.getRelClass());
-		assertEquals(ModelConstants.PROVIDES, r2.getRelClass());
+		assertEquals(Relation.RELCLASS.provides, r2.getRelClass());
 	}
 
 	@Test
@@ -271,9 +272,9 @@ class MigrateDbEntitiesApplicationTest {
 		assertFalse(rel.getProvenance().isEmpty());
 		assertValidId(rel.getProvenance().get(0).getCollectedfrom().getKey());
 
-		assertEquals(ModelConstants.PROJECT_ORGANIZATION, rel.getRelType());
+		assertEquals(Relation.RELTYPE.projectOrganization, rel.getRelType());
 		assertEquals(Relation.SUBRELTYPE.participation, rel.getSubRelType());
-		assertEquals(ModelConstants.IS_PARTICIPANT, rel.getRelClass());
+		assertEquals(Relation.RELCLASS.isParticipant, rel.getRelClass());
 
 		assertNotNull(rel.getProperties());
 		checkProperty(rel, "contribution", "436754.0");
@@ -338,10 +339,10 @@ class MigrateDbEntitiesApplicationTest {
 
 		assertEquals(r1.getSource(), r2.getTarget());
 		assertEquals(r2.getSource(), r1.getTarget());
-		assertTrue(StringUtils.isNotBlank(r1.getRelClass()));
-		assertTrue(StringUtils.isNotBlank(r2.getRelClass()));
-		assertTrue(StringUtils.isNotBlank(r1.getRelType()));
-		assertTrue(StringUtils.isNotBlank(r2.getRelType()));
+		assertNotNull(r1.getRelClass());
+		assertNotNull(r2.getRelClass());
+		assertNotNull(r1.getRelType());
+		assertNotNull(r2.getRelType());
 
 		assertValidId(r1.getProvenance().get(0).getCollectedfrom().getKey());
 		assertValidId(r2.getProvenance().get(0).getCollectedfrom().getKey());

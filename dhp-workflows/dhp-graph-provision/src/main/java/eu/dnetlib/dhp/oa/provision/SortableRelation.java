@@ -25,7 +25,7 @@ public class SortableRelation extends Relation implements Comparable<SortableRel
 		weights.put(Relation.SUBRELTYPE.citation, 3);
 		weights.put(Relation.SUBRELTYPE.affiliation, 4);
 		weights.put(Relation.SUBRELTYPE.relationship, 5);
-		//weights.put(ModelConstants.PUBLICATION_RESULTTYPE_CLASSID, 6);
+		//weights.put(Result.RESULTTYPE.publication, 6);
 		weights.put(Relation.SUBRELTYPE.similarity, 7);
 
 		weights.put(Relation.SUBRELTYPE.provision, 8);

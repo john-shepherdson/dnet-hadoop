@@ -150,7 +150,7 @@ public class SparkPublicationRootsTest implements Serializable {
 			.read()
 			.load(workingPath + "/" + testActionSetId + "/publication_mergerel")
 			.as(Encoders.bean(Relation.class))
-			.filter((FilterFunction<Relation>) r -> r.getRelClass().equalsIgnoreCase("merges"))
+			.filter((FilterFunction<Relation>) r -> Relation.RELCLASS.merges == r.getRelClass())
 			.groupBy("source")
 			.agg(count("target").alias("cnt"))
 			.select("source", "cnt")

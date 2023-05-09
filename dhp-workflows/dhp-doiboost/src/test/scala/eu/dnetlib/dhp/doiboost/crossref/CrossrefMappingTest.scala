@@ -61,9 +61,9 @@ class CrossrefMappingTest {
       assertNotNull(relation.getSource, s"Source of relation null $relJson")
       assertNotNull(relation.getTarget, s"Target of relation null $relJson")
       assertFalse(relation.getTarget.isEmpty, s"Target is empty: $relJson")
-      assertFalse(relation.getRelClass.isEmpty, s"RelClass is empty: $relJson")
-      assertFalse(relation.getRelType.isEmpty, s"RelType is empty: $relJson")
-      assertFalse(relation.getSubRelType.isEmpty, s"SubRelType is empty: $relJson")
+      assertNotNull(relation.getRelClass, s"RelClass is empty: $relJson")
+      assertNotNull(relation.getRelType, s"RelType is empty: $relJson")
+      assertNotNull(relation.getSubRelType, s"SubRelType is empty: $relJson")
 
     })
 
@@ -144,7 +144,7 @@ class CrossrefMappingTest {
     val relationList: List[Relation] = result
       .filter(s => s.isInstanceOf[Relation])
       .map(r => r.asInstanceOf[Relation])
-      .filter(r => r.getSubRelType.equalsIgnoreCase(Relation.SUBRELTYPE.citation))
+      .filter(r => Relation.SUBRELTYPE.citation.equals(r.getSubRelType))
 
     assertNotNull(relationList)
     assertFalse(relationList.isEmpty)
@@ -497,9 +497,9 @@ class CrossrefMappingTest {
       assertNotNull(relation)
       assertFalse(relation.getSource.isEmpty)
       assertFalse(relation.getTarget.isEmpty)
-      assertFalse(relation.getRelClass.isEmpty)
-      assertFalse(relation.getRelType.isEmpty)
-      assertFalse(relation.getSubRelType.isEmpty)
+      assertNotNull(relation.getRelClass)
+      assertNotNull(relation.getRelType)
+      assertNotNull(relation.getSubRelType)
 
     })
 

@@ -22,7 +22,8 @@ public class SortableRelationKey implements Comparable<SortableRelationKey>, Ser
 		weights.put(Relation.SUBRELTYPE.outcome, 1);
 		weights.put(Relation.SUBRELTYPE.affiliation, 2);
 		weights.put(Relation.SUBRELTYPE.dedup, 3);
-		weights.put(ModelConstants.PUBLICATION_DATASET, 4);
+		//TODO COMMENTED BUT SHOULD BE REPLACED WITH RELATIONSHIPS??
+//		weights.put(ModelConstants.PUBLICATION_DATASET, 4);
 		weights.put(Relation.SUBRELTYPE.supplement, 5);
 		weights.put(Relation.SUBRELTYPE.review, 6);
 		weights.put(Relation.SUBRELTYPE.relationship, 7);
@@ -37,7 +38,7 @@ public class SortableRelationKey implements Comparable<SortableRelationKey>, Ser
 
 	private String groupingKey;
 
-	private String subRelType;
+	private Relation.SUBRELTYPE subRelType;
 
 	public static SortableRelationKey create(Relation r, String groupingKey) {
 		SortableRelationKey sr = new SortableRelationKey();
@@ -74,11 +75,11 @@ public class SortableRelationKey implements Comparable<SortableRelationKey>, Ser
 		return Optional.ofNullable(weights.get(o.getSubRelType())).orElse(Integer.MAX_VALUE);
 	}
 
-	public String getSubRelType() {
+	public Relation.SUBRELTYPE getSubRelType() {
 		return subRelType;
 	}
 
-	public void setSubRelType(String subRelType) {
+	public void setSubRelType(Relation.SUBRELTYPE subRelType) {
 		this.subRelType = subRelType;
 	}
 

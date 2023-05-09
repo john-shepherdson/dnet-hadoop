@@ -51,27 +51,28 @@ class GenerateEntitiesApplicationTest {
 		Result software = getResult("odf_software.xml", Software.class);
 		Result orp = getResult("oaf_orp.xml", OtherResearchProduct.class);
 
-		verifyMerge(publication, dataset, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
-		verifyMerge(dataset, publication, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
+		
+		verifyMerge(publication, dataset, Dataset.class, Result.RESULTTYPE.dataset);
+		verifyMerge(dataset, publication, Dataset.class, Result.RESULTTYPE.dataset);
 
-		verifyMerge(publication, software, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
-		verifyMerge(software, publication, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
+		verifyMerge(publication, software, Publication.class, Result.RESULTTYPE.publication);
+		verifyMerge(software, publication, Publication.class, Result.RESULTTYPE.publication);
 
-		verifyMerge(publication, orp, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
-		verifyMerge(orp, publication, Publication.class, ModelConstants.PUBLICATION_RESULTTYPE_CLASSID);
+		verifyMerge(publication, orp, Publication.class, Result.RESULTTYPE.publication);
+		verifyMerge(orp, publication, Publication.class, Result.RESULTTYPE.publication);
 
-		verifyMerge(dataset, software, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
-		verifyMerge(software, dataset, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
+		verifyMerge(dataset, software, Dataset.class, Result.RESULTTYPE.dataset);
+		verifyMerge(software, dataset, Dataset.class, Result.RESULTTYPE.dataset);
 
-		verifyMerge(dataset, orp, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
-		verifyMerge(orp, dataset, Dataset.class, ModelConstants.DATASET_RESULTTYPE_CLASSID);
+		verifyMerge(dataset, orp, Dataset.class, Result.RESULTTYPE.dataset);
+		verifyMerge(orp, dataset, Dataset.class, Result.RESULTTYPE.dataset);
 
-		verifyMerge(software, orp, Software.class, ModelConstants.SOFTWARE_RESULTTYPE_CLASSID);
-		verifyMerge(orp, software, Software.class, ModelConstants.SOFTWARE_RESULTTYPE_CLASSID);
+		verifyMerge(software, orp, Software.class, Result.RESULTTYPE.software);
+		verifyMerge(orp, software, Software.class, Result.RESULTTYPE.software);
 	}
 
 	protected <T extends Result> void verifyMerge(Result publication, Result dataset, Class<T> clazz,
-		String resultType) {
+		Result.RESULTTYPE resultType) {
 		final Result merge = MergeUtils.merge(publication, dataset);
 		assertTrue(clazz.isAssignableFrom(merge.getClass()));
 		assertEquals(resultType, merge.getResulttype());

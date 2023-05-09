@@ -130,13 +130,13 @@ public class GroupEntitiesSparkJobTest {
 		assertEquals(
 			2,
 			output
-				.map((MapFunction<Result, String>) r -> r.getResulttype(), Encoders.STRING())
+				.map((MapFunction<Result, String>) r -> r.getResulttype().toString(), Encoders.STRING())
 				.filter((FilterFunction<String>) s -> s.equals("publication"))
 				.count());
 		assertEquals(
 			1,
 			output
-				.map((MapFunction<Result, String>) r -> r.getResulttype(), Encoders.STRING())
+				.map((MapFunction<Result, String>) r -> r.getResulttype().toString(), Encoders.STRING())
 				.filter((FilterFunction<String>) s -> s.equals("dataset"))
 				.count());
 	}

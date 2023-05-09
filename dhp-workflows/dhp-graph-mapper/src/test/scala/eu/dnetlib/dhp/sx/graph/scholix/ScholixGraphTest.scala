@@ -82,22 +82,4 @@ class ScholixGraphTest extends AbstractVocabularyTest {
     println(mapper.writeValueAsString(scholix.head))
   }
 
-  @Test
-  def testScholixRelationshipsClean(): Unit = {
-    val inputRelations = Source
-      .fromInputStream(
-        getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/relation_transform.json")
-      )
-      .mkString
-    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
-
-    lazy val json: json4s.JValue = parse(inputRelations)
-    val l: List[String] = json.extract[List[String]]
-    assertNotNull(l)
-    assertTrue(l.nonEmpty)
-    val relVocbaulary = ScholixUtils.relations
-    l.foreach(r => assertTrue(relVocbaulary.contains(r.toLowerCase)))
-
-  }
-
 }

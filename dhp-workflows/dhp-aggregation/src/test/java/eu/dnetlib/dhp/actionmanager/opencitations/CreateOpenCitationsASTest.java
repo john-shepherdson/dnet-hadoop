@@ -320,7 +320,7 @@ public class CreateOpenCitationsASTest {
 		check.foreach(r -> {
 			if (r.getSource().equals(doi2) || r.getSource().equals(doi3) || r.getSource().equals(doi4) ||
 				r.getSource().equals(doi5) || r.getSource().equals(doi6)) {
-				assertEquals(ModelConstants.IS_CITED_BY, r.getRelClass());
+				assertEquals(Relation.RELCLASS.IsCitedBy, r.getRelClass());
 				assertEquals(doi1, r.getTarget());
 			}
 		});

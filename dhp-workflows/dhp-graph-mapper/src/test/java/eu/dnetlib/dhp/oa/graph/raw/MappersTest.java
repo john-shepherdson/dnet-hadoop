@@ -172,8 +172,8 @@ class MappersTest {
 			assertNotNull(p.getDataInfo());
 			assertNotNull(p.getDataInfo().getTrust());
 		}
-		assertTrue(StringUtils.isNotBlank(r.getRelClass()));
-		assertTrue(StringUtils.isNotBlank(r.getRelType()));
+		assertNotNull(r.getRelClass());
+		assertNotNull(r.getRelType());
 
 	}
 
@@ -373,10 +373,10 @@ class MappersTest {
 		assertNotNull(r2.getProvenance().get(0).getDataInfo().getTrust());
 		assertEquals(r1.getSource(), r2.getTarget());
 		assertEquals(r2.getSource(), r1.getTarget());
-		assertTrue(StringUtils.isNotBlank(r1.getRelClass()));
-		assertTrue(StringUtils.isNotBlank(r2.getRelClass()));
-		assertTrue(StringUtils.isNotBlank(r1.getRelType()));
-		assertTrue(StringUtils.isNotBlank(r2.getRelType()));
+		assertNotNull(r1.getRelClass());
+		assertNotNull(r2.getRelClass());
+		assertNotNull(r1.getRelType());
+		assertNotNull(r2.getRelType());
 		assertTrue(r1.getValidated());
 		assertTrue(r2.getValidated());
 		assertEquals("2020-01-01", r1.getValidationDate());

@@ -25,7 +25,9 @@ public class BlacklistRelationTest {
 				"resultProject_outcome_isProducedBy");
 
 		rels.forEach(r -> {
-			RelationLabel inverse = ModelSupport.relationInverseMap.get(r);
+			RelationLabel inverse =
+
+					ModelSupport.unRel(r);
 			Assertions.assertNotNull(inverse);
 			Assertions.assertNotNull(inverse.getRelType());
 			Assertions.assertNotNull(inverse.getSubReltype());
