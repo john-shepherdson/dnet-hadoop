@@ -1,25 +1,21 @@
 
 package eu.dnetlib.dhp.common.vocabulary;
 
-import static org.mockito.Mockito.lenient;
-
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 public class VocabularyTest {
@@ -69,11 +65,12 @@ public class VocabularyTest {
 			} else {
 				System.out.println("syn=" + s1 + " term = " + t1.getClassid() + "   " + t1.getClassname());
 
+				Qualifier synonymAsQualifier = vocabularies.getSynonymAsQualifier("dnet:result_typologies", t1.getClassid());
+				if (synonymAsQualifier!= null)
 				System.out
 					.println(
-						vocabularies.getSynonymAsQualifier("dnet:result_typologies", t1.getClassid()).getClassname());
+						synonymAsQualifier.getClassname());
 			}
 		}
-
 	}
 }

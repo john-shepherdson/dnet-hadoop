@@ -639,9 +639,9 @@ object DataciteToOAFTransformation {
         Relation.RELCLASS.exists(r.relationType) && validIdentifiersInRelation(r.relatedIdentifierType)
       )
       .map(r => {
-        val subRelType = Relation.SUBRELTYPE.valueOf(r.relationType)
+        val rc = Relation.RELCLASS.valueOf(r.relationType)
         val target = DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
-        relation(id, target, subRelType, Relation.RELCLASS.valueOf(r.relationType), date)
+        relation(id, target, rc.getSubRel, rc, date)
       })
     val citationRels: List[Relation] = rels
       .filter(r =>validIdentifiersInRelation(r.relatedIdentifierType) &&
