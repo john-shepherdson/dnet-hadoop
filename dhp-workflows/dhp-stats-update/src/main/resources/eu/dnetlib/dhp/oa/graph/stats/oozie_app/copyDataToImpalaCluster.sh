@@ -11,14 +11,15 @@ export HADOOP_USER_NAME=$5
 
 function copydb() {
   db=$1
-
+  FILE=("hive_wf_tmp_"$RANDOM)
+  hdfs dfs -mkdir hdfs://impala-cluster-mn1.openaire.eu:8020/tmp/$FILE/
   # copy the databases from ocean to impala
 
   echo "copying $db"
-  hadoop distcp -Dmapreduce.map.memory.mb=6144 -pb hdfs://nameservice1/user/hive/warehouse/${db}.db hdfs://impala-cluster-mn1.openaire.eu:8020/tmp
+  hadoop distcp -Dmapreduce.map.memory.mb=6144 -pb hdfs://nameservice1/user/hive/warehouse/${db}.db hdfs://impala-cluster-mn1.openaire.eu:8020/tmp/$FILE/
 
   # change ownership to impala
-  hdfs dfs -conf /etc/impala_cluster/hdfs-site.xml -chmod -R 777 /tmp/${db}.db
+  hdfs dfs -conf /etc/impala_cluster/hdfs-site.xml -chmod -R 777 /tmp/$FILE/${db}.db
 
   # create the databases
   impala-shell -i impala-cluster-dn1.openaire.eu -q "drop database if exists ${db} cascade";
@@ -41,12 +42,12 @@ function copydb() {
   echo "copying data in tables and computing stats"
   for i in `impala-shell -i impala-cluster-dn1.openaire.eu -d ${db} --delimited  -q "show tables"`;
       do
-        impala-shell -i impala-cluster-dn1.openaire.eu -d ${db} -q "load data inpath '/tmp/${db}.db/$i' into table $i";
+        impala-shell -i impala-cluster-dn1.openaire.eu -d ${db} -q "load data inpath '/tmp/$FILE/${db}.db/$i' into table $i";
         impala-shell -i impala-cluster-dn1.openaire.eu -d ${db} -q "compute stats $i";
       done
 
   # deleting the remaining directory from hdfs
-  hdfs dfs -conf /etc/impala_cluster/hdfs-site.xml -rm -R /tmp/${db}.db
+hdfs dfs -conf /etc/impala_cluster/hdfs-site.xml -rm -R /tmp/$FILE/${db}.db
 }
 
 STATS_DB=$1
