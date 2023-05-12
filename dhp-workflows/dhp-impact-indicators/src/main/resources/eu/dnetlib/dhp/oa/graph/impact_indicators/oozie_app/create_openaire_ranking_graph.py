@@ -137,7 +137,7 @@ cites_df  = spark.read.json(graph_folder + "/relation")\
 				.where(
 					(F.array_contains(F.col('collected_lower'), "opencitations"))
             | 		(F.array_contains(F.col('collected_lower'), "crossref"))
-            | 		(F.array_contains(F.col('collected_lower'), "mag"))
+            | 		(F.array_contains(F.col('collected_lower'), "microsoft academic graph"))
 				).drop('collected_lower')
 # print ("Cited df has: " + str(cites_df.count()) + " entries")	 
 
