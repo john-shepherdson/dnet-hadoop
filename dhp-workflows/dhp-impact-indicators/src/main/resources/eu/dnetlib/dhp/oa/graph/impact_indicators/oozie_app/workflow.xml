@@ -1,5 +1,17 @@
 <workflow-app xmlns="uri:oozie:workflow:0.5" name="ranking-wf">
 
+	<!-- Global params	-->
+	<global>
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<configuration>
+			<property>
+				<name>oozie.action.sharelib.for.spark</name>
+				<value>${oozieActionShareLibForSpark2}</value>
+			</property>
+		</configuration>
+	</global>
+
 	<!-- start using a decision node, so as to determine from which point onwards a job will continue -->
 	<!-- <start to="get-doi-synonyms" /> -->
 	<start to="entry-point-decision" />
@@ -8,14 +20,14 @@
 		<switch>
 			<!-- The default will be set as the normal start, a.k.a. get-doi-synonyms -->
 			<!-- If any different condition is set, go to the corresponding start -->
-			<case to="non-iterative-rankings">${resume eq "rankings-start"}</case>
-			<case to="spark-impulse">${resume eq "impulse"}</case>
-			<case to="iterative-rankings">${resume eq "rankings-iterative"}</case>
-			<case to="get-file-names">${resume eq "format-results"}</case>
-			<case to="map-openaire-to-doi">${resume eq "map-ids"}</case> 
-			<case to="map-scores-to-dois">${resume eq "map-scores"}</case> 
-			<case to="create-openaire-ranking-graph">${resume eq "start"}</case>
-			<case to="project-impact-indicators">${resume eq "projects-impact"}</case>
+			<case to="non-iterative-rankings">${wf:conf('resume') eq "rankings-start"}</case>
+			<case to="spark-impulse">${wf:conf('resume') eq "impulse"}</case>
+			<case to="iterative-rankings">${wf:conf('resume') eq "rankings-iterative"}</case>
+			<case to="get-file-names">${wf:conf('resume') eq "format-results"}</case>
+			<case to="map-openaire-to-doi">${wf:conf('resume') eq "map-ids"}</case>
+			<case to="map-scores-to-dois">${wf:conf('resume') eq "map-scores"}</case>
+			<case to="create-openaire-ranking-graph">${wf:conf('resume') eq "start"}</case>
+			<case to="project-impact-indicators">${wf:conf('resume') eq "projects-impact"}</case>
 
 			<!-- TODO: add action set creation here -->
 			<default to="create-openaire-ranking-graph" />
@@ -26,10 +38,7 @@
 	<action name="create-openaire-ranking-graph">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
-			<!-- Is this yarn? Probably the answers are at the link serafeim sent me -->
-			<job-tracker>${jobTracker}</job-tracker>
-			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
-			<name-node>${nameNode}</name-node>
+
 			<!-- Delete previously created doi synonym folder -->
 			<!-- I think we don't need this given we don't have synonyms anymore
 			<prepare>
@@ -90,10 +99,6 @@
 	<action name="spark-cc">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
-			<!-- Is this yarn? Probably the answers are at the link serafeim sent me -->
-			<job-tracker>${jobTracker}</job-tracker>
-			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
-			<name-node>${nameNode}</name-node>
 
 			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
@@ -135,10 +140,6 @@
 	<action name="spark-ram">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
-			<!-- Is this yarn? Probably the answers are at the link serafeim sent me -->
-			<job-tracker>${jobTracker}</job-tracker>
-			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
-			<name-node>${nameNode}</name-node>
 
             <!-- using configs from an example on openaire -->
             <master>yarn-cluster</master>
@@ -187,10 +188,6 @@
 	<action name="spark-impulse">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
-			<!-- Is this yarn? Probably the answers are at the link serafeim sent me -->
-			<job-tracker>${jobTracker}</job-tracker>
-			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
-			<name-node>${nameNode}</name-node>
 
 			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
@@ -238,10 +235,6 @@
 	<action name="spark-pagerank">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
-			<!-- Is this yarn? Probably the answers are at the link serafeim sent me -->
-			<job-tracker>${jobTracker}</job-tracker>
-			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
-			<name-node>${nameNode}</name-node>
 
 			<!-- we could add map-reduce configs here, but I don't know if we need them -->
 			<!-- This is the type of master-client configuration for running spark -->
@@ -295,10 +288,6 @@
 	<action name="spark-attrank">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
-			<!-- Is this yarn? Probably the answers are at the link serafeim sent me -->
-			<job-tracker>${jobTracker}</job-tracker>
-			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
-			<name-node>${nameNode}</name-node>
 
             <!-- using configs from an example on openaire -->
             <master>yarn-cluster</master>
@@ -353,10 +342,6 @@
 	<action name="get-file-names">
 		<!-- This is required as a tag for shell jobs -->
 		<shell xmlns="uri:oozie:shell-action:0.3">
-			<!-- Same for all -->
-			<job-tracker>${jobTracker}</job-tracker>
-			<!-- This should give the machine/root of the hdfs -->
-			<name-node>${nameNode}</name-node>
 
 			<!-- Exec is needed for shell commands - points to type of shell command -->
 			<exec>/usr/bin/bash</exec>
@@ -378,7 +363,6 @@
 
 	</action>
 
-
 	<!-- Now we will run in parallel the formatting of ranking files for BiP! DB and openaire (json files) -->
 	<fork name="format-result-files">
 		<path start="format-bip-files"/>
@@ -391,10 +375,6 @@
 	<action name="format-json-files">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
-			<!-- Is this yarn? Probably the answers are at the link serafeim sent me -->
-			<job-tracker>${jobTracker}</job-tracker>
-			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
-			<name-node>${nameNode}</name-node>
 
 			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
@@ -443,10 +423,6 @@
 	<action name="format-bip-files">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
-			<!-- Is this yarn? Probably the answers are at the link serafeim sent me -->
-			<job-tracker>${jobTracker}</job-tracker>
-			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
-			<name-node>${nameNode}</name-node>
 
 			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
@@ -498,10 +474,7 @@
 	<action name="map-openaire-to-doi">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
-			<!-- Is this yarn? Probably the answers are at the link serafeim sent me -->
-			<job-tracker>${jobTracker}</job-tracker>
-			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
-			<name-node>${nameNode}</name-node>
+
 			<!-- Delete previously created doi synonym folder -->
 			<prepare>
 				<delete path="${synonymFolder}"/>
@@ -548,10 +521,6 @@
 	<action name="map-scores-to-dois">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
-			<!-- Is this yarn? Probably the answers are at the link serafeim sent me -->
-			<job-tracker>${jobTracker}</job-tracker>
-			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
-			<name-node>${nameNode}</name-node>
 
             <!-- using configs from an example on openaire -->
             <master>yarn-cluster</master>
@@ -636,10 +605,7 @@
 	<action name="project-impact-indicators">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
-			<!-- Is this yarn? Probably the answers are at the link serafeim sent me -->
-			<job-tracker>${jobTracker}</job-tracker>
-			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
-			<name-node>${nameNode}</name-node>
+
 			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
