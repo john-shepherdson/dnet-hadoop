@@ -114,10 +114,10 @@ public class CreateActionSetSparkJob implements Serializable {
 
 		if (!citing.equals(cited)) {
 			relationList
-				.addAll(
-					getRelations(
+				.add(
+					getRelation(
 						citing,
-						cited));
+						cited, ModelConstants.CITES));
 
 			if (duplicate && value.getCiting().endsWith(".refs")) {
 				citing = ID_PREFIX + IdentifierFactory
@@ -125,7 +125,7 @@ public class CreateActionSetSparkJob implements Serializable {
 						CleaningFunctions
 							.normalizePidValue(
 								"doi", value.getCiting().substring(0, value.getCiting().indexOf(".refs"))));
-				relationList.addAll(getRelations(citing, cited));
+				relationList.add(getRelation(citing, cited, ModelConstants.CITES));
 			}
 		}
 

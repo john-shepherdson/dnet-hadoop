@@ -7,15 +7,13 @@ then
 fi
 
 export SOURCE=$1
-export TARGET=$2
-export SHADOW=$3
+export SHADOW=$2
+export HIVE_OPTS="-hiveconf mapred.job.queue.name=analytics -hiveconf hive.spark.client.connect.timeout=120000ms -hiveconf hive.spark.client.server.connect.timeout=300000ms -hiveconf spark.executor.memory=19166291558 -hiveconf spark.yarn.executor.memoryOverhead=3225 -hiveconf spark.driver.memory=11596411699 -hiveconf spark.yarn.driver.memoryOverhead=1228"
+export HADOOP_USER_NAME="oozie"
 
-impala-shell -q "invalidate metadata;"
-impala-shell -d ${TARGET} -q "show tables" --delimited | sed "s/\(.*\)/compute stats ${TARGET}.\1;/" | impala-shell -f -
-echo "Impala shell finished"
-
-echo "Updating shadow observatory database"
-impala-shell -q "create database if not exists ${SHADOW}"
-impala-shell -d ${SHADOW} -q "show tables" --delimited | sed "s/^/drop view if exists ${SHADOW}./" | sed "s/$/;/" | impala-shell -f -
-impala-shell -d ${TARGET} -q "show tables" --delimited | sed "s/\(.*\)/create view ${SHADOW}.\1 as select * from ${TARGET}.\1;/" | impala-shell -f -
-echo "Shadow db ready!"
+echo "Updating shadow database"
+hive -e "drop database if exists ${SHADOW} cascade"
+hive -e "create database if not exists ${SHADOW}"
+hive $HIVE_OPTS --database ${SOURCE} -e "show tables" | grep -v WARN | sed "s/\(.*\)/create view ${SHADOW}.\1 as select * from ${SOURCE}.\1;/" > foo
+hive -f foo
+echo "Updated shadow database"
