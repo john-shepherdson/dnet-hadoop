@@ -46,7 +46,7 @@
 			<!-- Script name goes here -->
 			<jar>create_openaire_ranking_graph.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-<<<<<<< HEAD
+
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -57,16 +57,7 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
-=======
-			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkHighDriverMemory}
-					--master yarn
-					--deploy-mode cluster
-					--conf spark.sql.shuffle.partitions=7680
-					--conf spark.extraListeners=${spark2ExtraListeners}
-                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
->>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
+
 			<!-- Script arguments here -->
 			<!-- The openaire graph data from which to read relations and objects -->
 			<arg>${openaireDataInput}</arg>
@@ -113,7 +104,7 @@
 			<!-- Script name goes here -->
 			<jar>CC.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-<<<<<<< HEAD
+
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -124,16 +115,7 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
-=======
-			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}
-					--master yarn
-					--deploy-mode cluster
-					--conf spark.sql.shuffle.partitions=7680
-					--conf spark.extraListeners=${spark2ExtraListeners}
-                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
->>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
+
 			<!-- Script arguments here -->
 			<arg>${openaireGraphInputPath}</arg>
 			<!-- number of partitions to be used on joins -->
@@ -167,7 +149,7 @@
 			<!-- Script name goes here -->
 			<jar>TAR.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-<<<<<<< HEAD
+
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -178,16 +160,7 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
-=======
-			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}
-					--master yarn
-					--deploy-mode cluster
-					--conf spark.sql.shuffle.partitions=7680
-					--conf spark.extraListeners=${spark2ExtraListeners}
-                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
->>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
+
 			<!-- Script arguments here -->
 			<arg>${openaireGraphInputPath}</arg>
 			<arg>${ramGamma}</arg>
@@ -228,7 +201,7 @@
 			<!-- Script name goes here -->
 			<jar>CC.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-<<<<<<< HEAD
+
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -239,16 +212,7 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
-=======
-			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}
-					--master yarn
-					--deploy-mode cluster
-					--conf spark.sql.shuffle.partitions=7680
-					--conf spark.extraListeners=${spark2ExtraListeners}
-                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
->>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
+
 			<!-- Script arguments here -->
 			<arg>${openaireGraphInputPath}</arg>
 			<!-- number of partitions to be used on joins -->
@@ -296,7 +260,7 @@
 			<!-- Script name goes here -->
 			<jar>PageRank.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-<<<<<<< HEAD
+
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -307,16 +271,7 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
-=======
-			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}
-					--master yarn
-					--deploy-mode cluster
-					--conf spark.sql.shuffle.partitions=7680
-					--conf spark.extraListeners=${spark2ExtraListeners}
-                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
->>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
+
 			<!-- Script arguments here -->
 			<arg>${openaireGraphInputPath}</arg>
 			<arg>${pageRankAlpha}</arg>
@@ -354,7 +309,7 @@
 			<!-- Script name goes here -->
 			<jar>AttRank.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-<<<<<<< HEAD
+
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -365,16 +320,7 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
-=======
-			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}
-					--master yarn
-					--deploy-mode cluster
-					--conf spark.sql.shuffle.partitions=7680
-					--conf spark.extraListeners=${spark2ExtraListeners}
-                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
->>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
+
 			<!-- Script arguments here -->
 			<arg>${openaireGraphInputPath}</arg>
 			<arg>${attrankAlpha}</arg>
@@ -459,7 +405,7 @@
 			<!-- Script name goes here -->
 			<jar>format_ranking_results.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-<<<<<<< HEAD
+
 			<spark-opts>
 				--executor-memory=${sparkNormalExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -470,16 +416,7 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
-=======
-			<spark-opts>--executor-memory ${sparkNormalExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}
-					--master yarn
-					--deploy-mode cluster
-					--conf spark.sql.shuffle.partitions=7680
-					--conf spark.extraListeners=${spark2ExtraListeners}
-                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
->>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
+
 			<!-- Script arguments here -->
 			<arg>json-5-way</arg>
 			<!-- Input files must be identified dynamically -->
@@ -520,7 +457,7 @@
 			<!-- Script name goes here -->
 			<jar>format_ranking_results.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-<<<<<<< HEAD
+
 			<spark-opts>
 				--executor-memory=${sparkNormalExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -531,16 +468,7 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
-=======
-			<spark-opts>--executor-memory ${sparkNormalExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}
-					--master yarn
-					--deploy-mode cluster
-					--conf spark.sql.shuffle.partitions=7680
-					--conf spark.extraListeners=${spark2ExtraListeners}
-                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
->>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
+
 			<!-- Script arguments here -->
 			<arg>zenodo</arg>
 			<!-- Input files must be identified dynamically -->
@@ -588,7 +516,7 @@
 			<!-- Script name goes here -->
 			<jar>map_openaire_ids_to_dois.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-<<<<<<< HEAD
+
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -599,16 +527,7 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
-=======
-			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkHighDriverMemory}
-					--master yarn
-					--deploy-mode cluster
-					--conf spark.sql.shuffle.partitions=7680
-					--conf spark.extraListeners=${spark2ExtraListeners}
-                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
->>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
+
 			<!-- Script arguments here -->
 			<arg>${openaireDataInput}</arg>
 			<!-- number of partitions to be used on joins -->
@@ -643,7 +562,7 @@
 			<!-- Script name goes here -->
 			<jar>map_scores_to_dois.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-<<<<<<< HEAD
+
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -654,16 +573,7 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
-=======
-			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkHighDriverMemory}
-					--master yarn
-					--deploy-mode cluster
-					--conf spark.sql.shuffle.partitions=7680
-					--conf spark.extraListeners=${spark2ExtraListeners}
-                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
->>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
+
 			<!-- Script arguments here -->
 			<arg>${synonymFolder}</arg>
 			<!-- Number of partitions -->
@@ -739,18 +649,12 @@
 			<!-- Script name goes here -->
 			<jar>projects_impact.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-<<<<<<< HEAD
+
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
 				--driver-memory=${sparkNormalDriverMemory}
 				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
-=======
-			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}
-				--master yarn
-				--deploy-mode cluster
-				--conf spark.sql.shuffle.partitions=7680
->>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
 				--conf spark.extraListeners=${spark2ExtraListeners}
 				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
