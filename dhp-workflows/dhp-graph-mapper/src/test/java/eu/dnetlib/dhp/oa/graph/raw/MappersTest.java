@@ -23,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.common.Constants;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -922,7 +923,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testOpenAPC() throws IOException, DocumentException {
+	void testOpenAPC() throws IOException {
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_openapc.xml")));
 		final List<Oaf> list = new OafToOafMapper(vocs, true, true).processMdRecord(xml);
 
@@ -955,6 +956,8 @@ class MappersTest {
 			if (StringUtils.startsWith(source, "50")) {
 				assertEquals(ModelConstants.HAS_AUTHOR_INSTITUTION, r.getRelClass());
 			} else if (StringUtils.startsWith(source, "20")) {
+				assertTrue(StringUtils.contains(source, "::"));
+				assertEquals("20|" + Constants.ROR_NS_PREFIX, StringUtils.substringBefore(source, "::"));
 				assertEquals(ModelConstants.IS_AUTHOR_INSTITUTION_OF, r.getRelClass());
 			} else {
 				throw new IllegalArgumentException("invalid source / target prefixes for affiliation relations");

@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
+import eu.dnetlib.dhp.common.Constants;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
@@ -326,8 +327,10 @@ public abstract class AbstractMdRecordToOafMapper {
 			String rorId = element.attributeValue("affiliationIdentifier");
 			if (StringUtils.isNotBlank(rorId)) {
 
+				String fullRorId = Constants.ROR_NS_PREFIX + "::" + rorId;
+
 				String resultId = entity.getId();
-				String orgId = createOpenaireId("organization", rorId, true);
+				String orgId = createOpenaireId("organization", fullRorId, true);
 
 				List<KeyValue> properties = Lists.newArrayList();
 
