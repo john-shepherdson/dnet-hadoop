@@ -715,6 +715,22 @@
 	</action>
 
 	<!-- Definitions of failure messages -->
+	<kill name="openaire-graph-error">
+		<message>Creation of openaire-graph failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="cc-fail">
+		<message>CC failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="ram-fail">
+		<message>RAM failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="impulse-fail">
+		<message>Impulse failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
 	<kill name="pagerank-fail">
 		<message>PageRank failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
 	</kill>
@@ -723,20 +739,16 @@
 		<message>AttRank failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
 	</kill>
 
-	<kill name="cc-fail">
-		<message>CC failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	<kill name="filename-getting-error">
+		<message>Error getting key-value pairs for output files, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
 	</kill>
 
-	<kill name="impulse-fail">
-		<message>Impulse failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	<kill name="json-formatting-fail">
+		<message>Error formatting json files, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
 	</kill>
 
-	<kill name="ram-fail">
-		<message>RAM failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-	</kill>
-
-	<kill name="openaire-graph-error">
-		<message>Creation of openaire-graph failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	<kill name="bip-formatting-fail">
+		<message>Error formatting BIP files, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
 	</kill>
 
 	<kill name="synonym-collection-fail">
