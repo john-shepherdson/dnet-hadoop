@@ -3,7 +3,7 @@
 	<!-- start using a decision node, so as to determine from which point onwards a job will continue -->
 	<!-- <start to="get-doi-synonyms" /> -->
 	<start to="entry-point-decision" />
-	
+
 	<decision name="entry-point-decision">
 		<switch>
 			<!-- The default will be set as the normal start, a.k.a. get-doi-synonyms -->
@@ -714,47 +714,42 @@
 		<error to="actionset-project-creation-fail"/>
 	</action>
 
-	<!-- TODO: end the workflow-->
-		
-	<!-- Define ending node -->
-	<end name="end" />
-	
-	<!-- Definitions of failure messages -->	
+	<!-- Definitions of failure messages -->
 	<kill name="pagerank-fail">
 		<message>PageRank failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
 	</kill>
-	
+
 	<kill name="attrank-fail">
 		<message>AttRank failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-	</kill>	
-	
+	</kill>
+
 	<kill name="cc-fail">
 		<message>CC failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
 	</kill>
-	
+
 	<kill name="impulse-fail">
 		<message>Impulse failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-	</kill>	
-	
+	</kill>
+
 	<kill name="ram-fail">
 		<message>RAM failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-	</kill>	
+	</kill>
 
 	<kill name="openaire-graph-error">
 		<message>Creation of openaire-graph failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-	</kill>		
+	</kill>
 
 	<kill name="synonym-collection-fail">
 		<message>Synonym collection failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-	</kill>		
+	</kill>
 
 	<kill name="map-scores-fail">
 		<message>Mapping scores to DOIs failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-	</kill>	
+	</kill>
 
 	<kill name="actionset-delete-fail">
 		<message>Deleting output path for actionsets failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-	</kill>	
+	</kill>
 
 	<kill name="actionset-creation-fail">
 		<message>ActionSet creation for results failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -767,4 +762,8 @@
 	<kill name="actionset-project-creation-fail">
 		<message>ActionSet creation for projects failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
 	</kill>
+
+	<!-- Define ending node -->
+	<end name="end" />
+
 </workflow-app>
