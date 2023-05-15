@@ -46,6 +46,7 @@
 			<!-- Script name goes here -->
 			<jar>create_openaire_ranking_graph.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
+<<<<<<< HEAD
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -56,10 +57,20 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
+=======
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkHighDriverMemory}
+					--master yarn
+					--deploy-mode cluster
+					--conf spark.sql.shuffle.partitions=7680
+					--conf spark.extraListeners=${spark2ExtraListeners}
+                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
+>>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
 			<!-- Script arguments here -->
 			<!-- The openaire graph data from which to read relations and objects -->
 			<arg>${openaireDataInput}</arg>
-			<!-- Year for filtering entries w/ larger values / empty --> 
+			<!-- Year for filtering entries w/ larger values / empty -->
 			<arg>${currentYear}</arg>
 			<!-- number of partitions to be used on joins -->
 			<arg>${sparkShufflePartitions}</arg>
@@ -68,14 +79,14 @@
 			<!-- This needs to point to the file on the hdfs i think -->
 			<file>${wfAppPath}/create_openaire_ranking_graph.py#create_openaire_ranking_graph.py</file>
 		</spark>
-		
+
 		<!-- Do this after finishing okay -->
 		<ok to="end" />
 		<!-- Go there if we have an error -->
 		<error to="openaire-graph-error" />
-		
-	</action>	
-	
+
+	</action>
+
 	<!-- Citation Count and RAM are calculated in parallel-->
 	<!-- Impulse Requires resources and will be run after-->
 	<fork name="non-iterative-rankings">
@@ -83,7 +94,7 @@
 		<!-- <path start="spark-impulse"/> -->
 		<path start="spark-ram"/>
 	</fork>
-	
+
 	<!-- CC here -->
 	<action name="spark-cc">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
@@ -96,12 +107,13 @@
 			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
-            		
+
 			<!-- This is the name of our job -->
 			<name>Spark CC</name>
 			<!-- Script name goes here -->
 			<jar>CC.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
+<<<<<<< HEAD
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -112,6 +124,16 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
+=======
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}
+					--master yarn
+					--deploy-mode cluster
+					--conf spark.sql.shuffle.partitions=7680
+					--conf spark.extraListeners=${spark2ExtraListeners}
+                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
+>>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
 			<!-- Script arguments here -->
 			<arg>${openaireGraphInputPath}</arg>
 			<!-- number of partitions to be used on joins -->
@@ -119,13 +141,13 @@
 			<!-- This needs to point to the file on the hdfs i think -->
 			<file>${wfAppPath}/CC.py#CC.py</file>
 		</spark>
-		
+
 		<!-- Do this after finishing okay -->
 		<ok to="join-non-iterative-rankings" />
 		<!-- Go there if we have an error -->
 		<error to="cc-fail" />
-		
-	</action>	
+
+	</action>
 
 	<!-- IMPULSE here -->
 	<action name="spark-ram">
@@ -135,16 +157,17 @@
 			<job-tracker>${jobTracker}</job-tracker>
 			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
 			<name-node>${nameNode}</name-node>
-            		
-            <!-- using configs from an example on openaire --> 
+
+            <!-- using configs from an example on openaire -->
             <master>yarn-cluster</master>
 			<mode>cluster</mode>
-            		
+
 			<!-- This is the name of our job -->
 			<name>Spark RAM</name>
 			<!-- Script name goes here -->
 			<jar>TAR.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
+<<<<<<< HEAD
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -155,6 +178,16 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
+=======
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}
+					--master yarn
+					--deploy-mode cluster
+					--conf spark.sql.shuffle.partitions=7680
+					--conf spark.extraListeners=${spark2ExtraListeners}
+                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
+>>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
 			<!-- Script arguments here -->
 			<arg>${openaireGraphInputPath}</arg>
 			<arg>${ramGamma}</arg>
@@ -166,17 +199,17 @@
 			<!-- This needs to point to the file on the hdfs i think -->
 			<file>${wfAppPath}/TAR.py#TAR.py</file>
 		</spark>
-		
+
 		<!-- Do this after finishing okay -->
 		<ok to="join-non-iterative-rankings" />
 		<!-- Go there if we have an error -->
 		<error to="ram-fail" />
-		
-	</action>		
-	
+
+	</action>
+
 	<!-- JOIN NON-ITERATIVE METHODS AND THEN CONTINUE TO ITERATIVE ONES -->
 	<join name="join-non-iterative-rankings" to="spark-impulse"/>
-	
+
 	<!-- IMPULSE here -->
 	<action name="spark-impulse">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
@@ -189,12 +222,13 @@
 			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
-            		
+
 			<!-- This is the name of our job -->
 			<name>Spark Impulse</name>
 			<!-- Script name goes here -->
 			<jar>CC.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
+<<<<<<< HEAD
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -205,6 +239,16 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
+=======
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}
+					--master yarn
+					--deploy-mode cluster
+					--conf spark.sql.shuffle.partitions=7680
+					--conf spark.extraListeners=${spark2ExtraListeners}
+                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
+>>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
 			<!-- Script arguments here -->
 			<arg>${openaireGraphInputPath}</arg>
 			<!-- number of partitions to be used on joins -->
@@ -213,13 +257,13 @@
 			<!-- This needs to point to the file on the hdfs i think -->
 			<file>${wfAppPath}/CC.py#CC.py</file>
 		</spark>
-		
+
 		<!-- Do this after finishing okay -->
 		<ok to="iterative-rankings" />
 		<!-- Go there if we have an error -->
 		<error to="impulse-fail" />
-		
-	</action>	
+
+	</action>
 
 	<fork name="iterative-rankings">
 		<path start="spark-pagerank"/>
@@ -234,7 +278,7 @@
 			<job-tracker>${jobTracker}</job-tracker>
 			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
 			<name-node>${nameNode}</name-node>
-			
+
 			<!-- we could add map-reduce configs here, but I don't know if we need them -->
 			<!-- This is the type of master-client configuration for running spark -->
 			<!-- <master>yarn-client</master> -->
@@ -242,16 +286,17 @@
 			<!-- <master>local[*]</master> -->
 			<!-- Reference says: The mode element if present indicates the mode of spark, where to run spark driver program. Ex: client,cluster. | In my case I always have a client -->
 			<!-- <mode>client</mode> -->
-            		
-            <!-- using configs from an example on openaire --> 
+
+            <!-- using configs from an example on openaire -->
             <master>yarn-cluster</master>
 			<mode>cluster</mode>
-            		
+
 			<!-- This is the name of our job -->
 			<name>Spark Pagerank</name>
 			<!-- Script name goes here -->
 			<jar>PageRank.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
+<<<<<<< HEAD
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -262,6 +307,16 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
+=======
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}
+					--master yarn
+					--deploy-mode cluster
+					--conf spark.sql.shuffle.partitions=7680
+					--conf spark.extraListeners=${spark2ExtraListeners}
+                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
+>>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
 			<!-- Script arguments here -->
 			<arg>${openaireGraphInputPath}</arg>
 			<arg>${pageRankAlpha}</arg>
@@ -273,14 +328,14 @@
 			<!-- This needs to point to the file on the hdfs i think -->
 			<file>${wfAppPath}/PageRank.py#PageRank.py</file>
 		</spark>
-		
+
 		<!-- Do this after finishing okay -->
 		<ok to="join-iterative-rankings" />
 		<!-- Go there if we have an error -->
 		<error to="pagerank-fail" />
-		
+
 	</action>
-	
+
 	<!-- ATTRANK here -->
 	<action name="spark-attrank">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
@@ -289,16 +344,17 @@
 			<job-tracker>${jobTracker}</job-tracker>
 			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
 			<name-node>${nameNode}</name-node>
-            		
-            <!-- using configs from an example on openaire --> 
+
+            <!-- using configs from an example on openaire -->
             <master>yarn-cluster</master>
 			<mode>cluster</mode>
-            		
+
 			<!-- This is the name of our job -->
 			<name>Spark AttRank</name>
 			<!-- Script name goes here -->
 			<jar>AttRank.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
+<<<<<<< HEAD
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -309,6 +365,16 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
+=======
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}
+					--master yarn
+					--deploy-mode cluster
+					--conf spark.sql.shuffle.partitions=7680
+					--conf spark.extraListeners=${spark2ExtraListeners}
+                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
+>>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
 			<!-- Script arguments here -->
 			<arg>${openaireGraphInputPath}</arg>
 			<arg>${attrankAlpha}</arg>
@@ -325,17 +391,17 @@
 			<!-- This needs to point to the file on the hdfs i think -->
 			<file>${wfAppPath}/AttRank.py#AttRank.py</file>
 		</spark>
-		
+
 		<!-- Do this after finishing okay -->
 		<ok to="join-iterative-rankings" />
 		<!-- Go there if we have an error -->
 		<error to="attrank-fail" />
-		
-	</action>	
-	
+
+	</action>
+
 	<!-- JOIN ITERATIVE METHODS AND THEN END -->
 	<join name="join-iterative-rankings" to="get-file-names"/>
-	
+
 
 	<!-- This will be a shell action that will output key-value pairs for output files -->
 	<action name="get-file-names">
@@ -345,35 +411,35 @@
 			<job-tracker>${jobTracker}</job-tracker>
 			<!-- This should give the machine/root of the hdfs -->
 			<name-node>${nameNode}</name-node>
-            		
+
 			<!-- Exec is needed for shell commands - points to type of shell command -->
 			<exec>/usr/bin/bash</exec>
 			<!-- name of script to run -->
 			<argument>get_ranking_files.sh</argument>
 			<!-- We only pass the directory where we expect to find the rankings -->
 			<argument>/${workingDir}</argument>
-            		
+
 			<!-- the name of the file run -->
 			<file>${wfAppPath}/get_ranking_files.sh#get_ranking_files.sh</file>
 			<!-- Get the output in order to be usable by following actions -->
 			<capture-output/>
 		</shell>
-		
+
 		<!-- Do this after finishing okay -->
 		<ok to="format-result-files" />
 		<!-- Go there if we have an error -->
 		<error to="filename-getting-error" />
-		
+
 	</action>
-	
-	
+
+
 	<!-- Now we will run in parallel the formatting of ranking files for BiP! DB and openaire (json files) -->
 	<fork name="format-result-files">
 		<path start="format-bip-files"/>
 		<path start="format-json-files"/>
 	</fork>
-	
-	
+
+
 	<!-- Format json files -->
 	<!-- Two parts: a) format files b) make the file endings .json.gz -->
 	<action name="format-json-files">
@@ -383,16 +449,17 @@
 			<job-tracker>${jobTracker}</job-tracker>
 			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
 			<name-node>${nameNode}</name-node>
-            		
+
 			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
-            		
+
 			<!-- This is the name of our job -->
 			<name>Format Ranking Results JSON</name>
 			<!-- Script name goes here -->
 			<jar>format_ranking_results.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
+<<<<<<< HEAD
 			<spark-opts>
 				--executor-memory=${sparkNormalExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -403,6 +470,16 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
+=======
+			<spark-opts>--executor-memory ${sparkNormalExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}
+					--master yarn
+					--deploy-mode cluster
+					--conf spark.sql.shuffle.partitions=7680
+					--conf spark.extraListeners=${spark2ExtraListeners}
+                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
+>>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
 			<!-- Script arguments here -->
 			<arg>json-5-way</arg>
 			<!-- Input files must be identified dynamically -->
@@ -417,14 +494,14 @@
 			<arg>openaire</arg>
 			<!-- This needs to point to the file on the hdfs i think -->
 			<file>${wfAppPath}/format_ranking_results.py#format_ranking_results.py</file>
-		</spark>		
-		
+		</spark>
+
 		<!-- Do this after finishing okay -->
 		<ok to="join-file-formatting" />
 		<!-- Go there if we have an error -->
 		<error to="json-formatting-fail" />
-	</action> 
-	
+	</action>
+
 	<!-- This is the second line of parallel workflow execution where we create the BiP! DB files -->
 	<action name="format-bip-files">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
@@ -433,16 +510,17 @@
 			<job-tracker>${jobTracker}</job-tracker>
 			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
 			<name-node>${nameNode}</name-node>
-            		
+
 			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
-            		
+
 			<!-- This is the name of our job -->
 			<name>Format Ranking Results BiP! DB</name>
 			<!-- Script name goes here -->
 			<jar>format_ranking_results.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
+<<<<<<< HEAD
 			<spark-opts>
 				--executor-memory=${sparkNormalExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -453,6 +531,16 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
+=======
+			<spark-opts>--executor-memory ${sparkNormalExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}
+					--master yarn
+					--deploy-mode cluster
+					--conf spark.sql.shuffle.partitions=7680
+					--conf spark.extraListeners=${spark2ExtraListeners}
+                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
+>>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
 			<!-- Script arguments here -->
 			<arg>zenodo</arg>
 			<!-- Input files must be identified dynamically -->
@@ -467,16 +555,16 @@
 			<arg>openaire</arg>
 			<!-- This needs to point to the file on the hdfs i think -->
 			<file>${wfAppPath}/format_ranking_results.py#format_ranking_results.py</file>
-		</spark>		
-		
+		</spark>
+
 		<!-- Do this after finishing okay -->
 		<ok to="join-file-formatting" />
 		<!-- Go there if we have an error -->
 		<error to="bip-formatting-fail" />
-	</action> 	
-	
-	<!-- Finish formatting data and end --> 
-	<join name="join-file-formatting" to="map-openaire-to-doi"/>	
+	</action>
+
+	<!-- Finish formatting data and end -->
+	<join name="join-file-formatting" to="map-openaire-to-doi"/>
 
 	<!-- Script here written by Serafeim: maps openaire ids to their synonyms -->
 	<action name="map-openaire-to-doi">
@@ -490,16 +578,17 @@
 			<prepare>
 				<delete path="${synonymFolder}"/>
 			</prepare>
-            		
-            <!-- using configs from an example on openaire --> 
+
+            <!-- using configs from an example on openaire -->
             <master>yarn-cluster</master>
 			<mode>cluster</mode>
-            		
+
 			<!-- This is the name of our job -->
 			<name>Openaire-DOI synonym collection</name>
 			<!-- Script name goes here -->
 			<jar>map_openaire_ids_to_dois.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
+<<<<<<< HEAD
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -510,6 +599,16 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
+=======
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkHighDriverMemory}
+					--master yarn
+					--deploy-mode cluster
+					--conf spark.sql.shuffle.partitions=7680
+					--conf spark.extraListeners=${spark2ExtraListeners}
+                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
+>>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
 			<!-- Script arguments here -->
 			<arg>${openaireDataInput}</arg>
 			<!-- number of partitions to be used on joins -->
@@ -517,13 +616,13 @@
 			<!-- This needs to point to the file on the hdfs i think -->
 			<file>${wfAppPath}/map_openaire_ids_to_dois.py#map_openaire_ids_to_dois.py</file>
 		</spark>
-		
+
 		<!-- Do this after finishing okay -->
 		<ok to="map-scores-to-dois" />
 		<!-- Go there if we have an error -->
 		<error to="synonym-collection-fail" />
-		
-	</action>	
+
+	</action>
 
 
 	<!-- Script here written by Serafeim: maps openaire ids to their synonyms -->
@@ -535,15 +634,16 @@
 			<!-- This should give the machine/root of the hdfs, serafeim has provided a link with the required job properties -->
 			<name-node>${nameNode}</name-node>
 
-            <!-- using configs from an example on openaire --> 
+            <!-- using configs from an example on openaire -->
             <master>yarn-cluster</master>
 			<mode>cluster</mode>
-            		
+
 			<!-- This is the name of our job -->
 			<name>Mapping Openaire Scores to DOIs</name>
 			<!-- Script name goes here -->
 			<jar>map_scores_to_dois.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
+<<<<<<< HEAD
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -554,6 +654,16 @@
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 			</spark-opts>
+=======
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkHighDriverMemory}
+					--master yarn
+					--deploy-mode cluster
+					--conf spark.sql.shuffle.partitions=7680
+					--conf spark.extraListeners=${spark2ExtraListeners}
+                			--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                			--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                			--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}</spark-opts>
+>>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
 			<!-- Script arguments here -->
 			<arg>${synonymFolder}</arg>
 			<!-- Number of partitions -->
@@ -568,13 +678,13 @@
 			<!-- This needs to point to the file on the hdfs i think -->
 			<file>${wfAppPath}/map_scores_to_dois.py#map_scores_to_dois.py</file>
 		</spark>
-		
+
 		<!-- Do this after finishing okay -->
 		<ok to="deleteOutputPathForActionSet" />
 		<!-- Go there if we have an error -->
 		<error to="map-scores-fail" />
-		
-	</action>	
+
+	</action>
 
 	<action name="deleteOutputPathForActionSet">
         <fs>
@@ -629,11 +739,18 @@
 			<!-- Script name goes here -->
 			<jar>projects_impact.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
+<<<<<<< HEAD
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
 				--driver-memory=${sparkNormalDriverMemory}
 				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
+=======
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}
+				--master yarn
+				--deploy-mode cluster
+				--conf spark.sql.shuffle.partitions=7680
+>>>>>>> 4a905932a3db36c61570c24b9aa54283cd30abba
 				--conf spark.extraListeners=${spark2ExtraListeners}
 				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
