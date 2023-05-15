@@ -46,7 +46,7 @@
 			<!-- Script name goes here -->
 			<jar>create_openaire_ranking_graph.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-			<spark-opts>--executor-memory 20G --executor-cores 4 --driver-memory 20G  
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkHighDriverMemory}  
 					--master yarn
 					--deploy-mode cluster
 					--conf spark.sql.shuffle.partitions=7680
@@ -100,7 +100,7 @@
 			<!-- Script name goes here -->
 			<jar>CC.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-			<spark-opts>--executor-memory 18G --executor-cores 4 --driver-memory 10G  
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}  
 					--master yarn
 					--deploy-mode cluster
 					--conf spark.sql.shuffle.partitions=7680
@@ -141,7 +141,7 @@
 			<!-- Script name goes here -->
 			<jar>TAR.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-			<spark-opts>--executor-memory 18G --executor-cores 4 --driver-memory 10G  
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}  
 					--master yarn
 					--deploy-mode cluster
 					--conf spark.sql.shuffle.partitions=7680
@@ -189,7 +189,7 @@
 			<!-- Script name goes here -->
 			<jar>CC.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-			<spark-opts>--executor-memory 18G --executor-cores 4 --driver-memory 10G  
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}  
 					--master yarn
 					--deploy-mode cluster
 					--conf spark.sql.shuffle.partitions=7680
@@ -244,7 +244,7 @@
 			<!-- Script name goes here -->
 			<jar>PageRank.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-			<spark-opts>--executor-memory 18G --executor-cores 4 --driver-memory 10G  
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}  
 					--master yarn
 					--deploy-mode cluster
 					--conf spark.sql.shuffle.partitions=7680
@@ -289,7 +289,7 @@
 			<!-- Script name goes here -->
 			<jar>AttRank.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-			<spark-opts>--executor-memory 18G --executor-cores 4 --driver-memory 10G  
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory} 
 					--master yarn
 					--deploy-mode cluster
 					--conf spark.sql.shuffle.partitions=7680
@@ -381,7 +381,7 @@
 			<!-- Script name goes here -->
 			<jar>format_ranking_results.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-			<spark-opts>--executor-memory 10G --executor-cores 4 --driver-memory 10G  
+			<spark-opts>--executor-memory ${sparkNormalExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}  
 					--master yarn
 					--deploy-mode cluster
 					--conf spark.sql.shuffle.partitions=7680
@@ -429,7 +429,7 @@
 			<!-- Script name goes here -->
 			<jar>format_ranking_results.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-			<spark-opts>--executor-memory 10G --executor-cores 4 --driver-memory 10G  
+			<spark-opts>--executor-memory ${sparkNormalExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}  
 					--master yarn
 					--deploy-mode cluster
 					--conf spark.sql.shuffle.partitions=7680
@@ -484,7 +484,7 @@
 			<!-- Script name goes here -->
 			<jar>map_openaire_ids_to_dois.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-			<spark-opts>--executor-memory 18G --executor-cores 4 --driver-memory 15G  
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkHighDriverMemory}  
 					--master yarn
 					--deploy-mode cluster
 					--conf spark.sql.shuffle.partitions=7680
@@ -526,7 +526,7 @@
 			<!-- Script name goes here -->
 			<jar>map_scores_to_dois.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-			<spark-opts>--executor-memory 18G --executor-cores 4 --driver-memory 15G  
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkHighDriverMemory}  
 					--master yarn
 					--deploy-mode cluster
 					--conf spark.sql.shuffle.partitions=7680
@@ -609,7 +609,7 @@
 			<!-- Script name goes here -->
 			<jar>projects_impact.py</jar>
 			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
-			<spark-opts>--executor-memory 18G --executor-cores 4 --driver-memory 10G
+			<spark-opts>--executor-memory ${sparkHighExecutorMemory} --executor-cores ${sparkExecutorCores} --driver-memory ${sparkNormalDriverMemory}
 				--master yarn
 				--deploy-mode cluster
 				--conf spark.sql.shuffle.partitions=7680
