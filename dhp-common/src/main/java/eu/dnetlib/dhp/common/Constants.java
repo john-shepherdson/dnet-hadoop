@@ -10,6 +10,12 @@ public class Constants {
 	public static final Map<String, String> accessRightsCoarMap = Maps.newHashMap();
 	public static final Map<String, String> coarCodeLabelMap = Maps.newHashMap();
 
+	public static final String ROR_NS_PREFIX = "ror_________";
+
+	public static final String ROR_OPENAIRE_ID = "10|openaire____::993a7ae7a863813cf95028b50708e222";
+
+	public static final String ROR_DATASOURCE_NAME = "Research Organization Registry (ROR)";
+
 	public static String COAR_ACCESS_RIGHT_SCHEMA = "http://vocabularies.coar-repositories.org/documentation/access_rights/";
 
 	private Constants() {
