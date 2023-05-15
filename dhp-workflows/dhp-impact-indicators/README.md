@@ -15,7 +15,12 @@ You can check out a specific tag/release of BIP! Ranker using maven, as describe
 Use the following command for packaging:
 
 ```
-mvn package  -Poozie-package -Dworkflow.source.dir=eu/dnetlib/dhp/oa/graph/impact_indicators -DskipTests
+mvn package -Poozie-package -Dworkflow.source.dir=eu/dnetlib/dhp/oa/graph/impact_indicators -DskipTests
+```
+
+Deploy and run:
+```
+mvn package -Poozie-package,deploy,run -Dworkflow.source.dir=eu/dnetlib/dhp/oa/graph/impact_indicators -DskipTests
 ```
 
 Note: edit the property `bip.ranker.tag` of the `pom.xml` file to specify the tag of [BIP-Ranker](https://github.com/athenarc/Bip-Ranker) that you want to use.
