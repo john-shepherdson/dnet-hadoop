@@ -131,8 +131,10 @@ cites_df  = spark.read.json(graph_folder + "/relation")\
 				& (F.col('dataInfo.deletedbyinference') == "false")\
                 & (F.col('dataInfo.invisible') == "false"))\
 				.drop('dataInfo.deletedbyinference').drop('dataInfo.invisible')\
+				.drop('deletedbyinference').drop('invisible')\
 				.repartition(num_partitions, 'citing').drop('relClass')\
 				.withColumn('collected_lower', F.expr('transform(value, x -> lower(x))'))\
+				.drop('collectedfrom.value')\
 				.drop('value')\
 				.where(
 					(F.array_contains(F.col('collected_lower'), "opencitations"))
