@@ -24,3 +24,13 @@ mvn package -Poozie-package,deploy,run -Dworkflow.source.dir=eu/dnetlib/dhp/oa/g
 ```
 
 Note: edit the property `bip.ranker.tag` of the `pom.xml` file to specify the tag of [BIP-Ranker](https://github.com/athenarc/Bip-Ranker) that you want to use.
+
+
+Job info and logs: 
+```
+export OOZIE_URL=http://iis-cdh5-test-m3:11000/oozie
+oozie job -info <jobId>
+oozie job -log <jobId>
+```
+
+where `jobId` is the id of the job returned by the `run_workflow.sh` script.

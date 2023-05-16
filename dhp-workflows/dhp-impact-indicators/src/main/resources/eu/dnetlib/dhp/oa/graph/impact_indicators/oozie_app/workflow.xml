@@ -126,7 +126,7 @@
 			<!-- number of partitions to be used on joins -->
 			<arg>${sparkShufflePartitions}</arg>
 			<!-- This needs to point to the file on the hdfs i think -->
-			<file>${wfAppPath}/CC.py#CC.py</file>
+			<file>${wfAppPath}/bip-ranker/CC.py#CC.py</file>
 		</spark>
 
 		<!-- Do this after finishing okay -->
@@ -171,7 +171,7 @@
 			<arg>${sparkShufflePartitions}</arg>
 			<arg>${checkpointDir}</arg>
 			<!-- This needs to point to the file on the hdfs i think -->
-			<file>${wfAppPath}/TAR.py#TAR.py</file>
+			<file>${wfAppPath}/bip-ranker/TAR.py#TAR.py</file>
 		</spark>
 
 		<!-- Do this after finishing okay -->
@@ -216,7 +216,7 @@
 			<arg>${sparkShufflePartitions}</arg>
 			<arg>3</arg>
 			<!-- This needs to point to the file on the hdfs i think -->
-			<file>${wfAppPath}/CC.py#CC.py</file>
+			<file>${wfAppPath}/bip-ranker/CC.py#CC.py</file>
 		</spark>
 
 		<!-- Do this after finishing okay -->
@@ -274,7 +274,7 @@
 			<arg>${sparkShufflePartitions}</arg>
 			<arg>dfs</arg>
 			<!-- This needs to point to the file on the hdfs i think -->
-			<file>${wfAppPath}/PageRank.py#PageRank.py</file>
+			<file>${wfAppPath}/bip-ranker/PageRank.py#PageRank.py</file>
 		</spark>
 
 		<!-- Do this after finishing okay -->
@@ -324,7 +324,7 @@
 			<arg>${sparkShufflePartitions}</arg>
 			<arg>dfs</arg>
 			<!-- This needs to point to the file on the hdfs i think -->
-			<file>${wfAppPath}/AttRank.py#AttRank.py</file>
+			<file>${wfAppPath}/bip-ranker/AttRank.py#AttRank.py</file>
 		</spark>
 
 		<!-- Do this after finishing okay -->
