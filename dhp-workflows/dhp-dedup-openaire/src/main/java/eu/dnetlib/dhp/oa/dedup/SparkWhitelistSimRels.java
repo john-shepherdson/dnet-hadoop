@@ -31,7 +31,7 @@ import scala.Tuple2;
 
 public class SparkWhitelistSimRels extends AbstractSparkAction {
 
-	private static final Logger log = LoggerFactory.getLogger(SparkCreateSimRels.class);
+	private static final Logger log = LoggerFactory.getLogger(SparkWhitelistSimRels.class);
 
 	private static final String WHITELIST_SEPARATOR = "####";
 
@@ -43,7 +43,7 @@ public class SparkWhitelistSimRels extends AbstractSparkAction {
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					SparkCreateSimRels.class
+					SparkWhitelistSimRels.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/oa/dedup/whitelistSimRels_parameters.json")));
 		parser.parseArgument(args);
