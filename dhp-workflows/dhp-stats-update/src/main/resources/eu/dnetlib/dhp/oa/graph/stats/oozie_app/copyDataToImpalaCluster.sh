@@ -8,7 +8,7 @@ fi
 
 #export HADOOP_USER_NAME="dimitris.pierrakos"
 export HADOOP_USER_NAME=$5
-
+export PROD_USAGE_STATS_DB="openaire_prod_usage_stats"
 function copydb() {
   db=$1
   FILE=("hive_wf_tmp_"$RANDOM)
@@ -27,16 +27,23 @@ function copydb() {
 
   impala-shell --user $HADOOP_USER_NAME -q "INVALIDATE METADATA"
   echo "creating schema for ${db}"
+  for ((  k  = 0;  k  < 5;  k ++ )); do
   for i in `impala-shell --user $HADOOP_USER_NAME -d ${db} --delimited  -q "show tables"`;
     do
       impala-shell --user $HADOOP_USER_NAME -d ${db} --delimited  -q "show create table $i";
     done |  sed 's/"$/;/' | sed 's/^"//' | sed 's/[[:space:]]\date[[:space:]]/`date`/g' | impala-shell --user $HADOOP_USER_NAME -i impala-cluster-dn1.openaire.eu -c -f -
+  done
 
-  # run the same command twice because we may have failures in the first run (due to views pointing to the same db)
-  for i in `impala-shell --user $HADOOP_USER_NAME -d ${db} --delimited  -q "show tables"`;
-    do
-      impala-shell --user $HADOOP_USER_NAME -d ${db} --delimited  -q "show create table $i";
-    done |  sed 's/"$/;/' | sed 's/^"//' | sed 's/[[:space:]]\date[[:space:]]/`date`/g' | impala-shell --user $HADOOP_USER_NAME -i impala-cluster-dn1.openaire.eu -c -f -
+#  for i in `impala-shell --user $HADOOP_USER_NAME -d ${db} --delimited  -q "show tables"`;
+#    do
+#      impala-shell --user $HADOOP_USER_NAME -d ${db} --delimited  -q "show create table $i";
+#    done |  sed 's/"$/;/' | sed 's/^"//' | sed 's/[[:space:]]\date[[:space:]]/`date`/g' | impala-shell --user $HADOOP_USER_NAME -i impala-cluster-dn1.openaire.eu -c -f -
+#
+#  # run the same command twice because we may have failures in the first run (due to views pointing to the same db)
+#  for i in `impala-shell --user $HADOOP_USER_NAME -d ${db} --delimited  -q "show tables"`;
+#    do
+#      impala-shell --user $HADOOP_USER_NAME -d ${db} --delimited  -q "show create table $i";
+#    done |  sed 's/"$/;/' | sed 's/^"//' | sed 's/[[:space:]]\date[[:space:]]/`date`/g' | impala-shell --user $HADOOP_USER_NAME -i impala-cluster-dn1.openaire.eu -c -f -
 
   # load the data from /tmp in the respective tables
   echo "copying data in tables and computing stats"
@@ -54,8 +61,11 @@ STATS_DB=$1
 MONITOR_DB=$2
 OBSERVATORY_DB=$3
 EXT_DB=$4
-HADOOP_USER_NAME=$5
+USAGE_STATS_DB=$5
+HADOOP_USER_NAME=$6
 
+copydb $USAGE_STATS_DB
+copydb $PROD_USAGE_STATS_DB
 copydb $EXT_DB
 copydb $STATS_DB
 copydb $MONITOR_DB
