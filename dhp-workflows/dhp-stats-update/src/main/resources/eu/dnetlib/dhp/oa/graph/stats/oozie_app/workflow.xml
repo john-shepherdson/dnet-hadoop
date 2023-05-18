@@ -13,6 +13,10 @@
             <description>the external stats that should be added since they are not included in the graph database</description>
         </property>
         <property>
+            <name>usage_stats_db_name</name>
+            <description>the usage statistics database name</description>
+        </property>
+        <property>
             <name>stats_db_shadow_name</name>
             <description>the name of the shadow schema</description>
         </property>
@@ -31,6 +35,10 @@
         <property>
             <name>observatory_db_shadow_name</name>
             <description>the name of the shadow monitor db</description>
+        </property>
+        <property>
+            <name>usage_stats_db_shadow_name</name>
+            <description>the name of the shadow usage stats db</description>
         </property>
         <property>
             <name>stats_tool_api_url</name>
@@ -434,6 +442,7 @@
             <argument>${monitor_db_name}</argument>
             <argument>${observatory_db_name}</argument>
             <argument>${external_stats_db_name}</argument>
+            <argument>${usage_stats_db_name}</argument>
             <argument>${hadoop_user_name}</argument>
             <file>copyDataToImpalaCluster.sh</file>
         </shell>
@@ -452,6 +461,8 @@
             <argument>${monitor_db_shadow_name}</argument>
             <argument>${observatory_db_name}</argument>
             <argument>${observatory_db_shadow_name}</argument>
+            <argument>${usage_stats_db_name}</argument>
+            <argument>${usage_stats_db_shadow_name}</argument>
             <file>finalizeImpalaCluster.sh</file>
         </shell>
         <ok to="Step24-updateCache"/>
