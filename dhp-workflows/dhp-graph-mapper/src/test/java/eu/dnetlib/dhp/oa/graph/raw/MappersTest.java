@@ -1007,6 +1007,23 @@ class MappersTest {
 		});
 	}
 
+	@Test
+	void testD4Science() throws IOException {
+		final String xml = IOUtils
+				.toString(Objects.requireNonNull(getClass().getResourceAsStream("d4science.xml")));
+		final List<Oaf> actual = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		assertNotNull(actual);
+		assertFalse(actual.isEmpty());
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(actual));
+		System.out.println("***************");
+		final Dataset d = (Dataset) actual.get(0);
+		assertValidId(d.getId());
+		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
+
+	}
+
+
 	private void assertValidId(final String id) {
 		// System.out.println(id);
 
