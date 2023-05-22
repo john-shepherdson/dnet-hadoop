@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Dataset;
@@ -73,6 +74,8 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 		log.info("actionSetId:   '{}'", actionSetId);
 		log.info("workingPath:   '{}'", workingPath);
 
+		spark.sparkContext().setCheckpointDir(workingPath + "/checkpoint");
+
 		// for each dedup configuration
 		for (DedupConfig dedupConf : getConfigurations(isLookUpService, actionSetId)) {
 
@@ -85,8 +88,10 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 
 			JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-			JavaPairRDD<String, MapDocument> mapDocuments = sc
-				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
+			final JavaRDD<String> rdd = sc.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity));
+			rdd.checkpoint();
+
+			JavaPairRDD<String, MapDocument> mapDocuments = rdd
 				.repartition(numPartitions)
 				.mapToPair(
 					(PairFunction<String, String, MapDocument>) s -> {
@@ -95,15 +100,18 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 					});
 
 			// create blocks for deduplication
-			JavaPairRDD<String, Block> blocks = Deduper
-				.createSortedBlocks(mapDocuments, dedupConf)
-				.repartition(numPartitions);
+			final JavaPairRDD<String, Block> sortedBlocks = Deduper.createSortedBlocks(mapDocuments, dedupConf);
+			sortedBlocks.checkpoint();
+			JavaPairRDD<String, Block> blocks = sortedBlocks.repartition(numPartitions);
+
+			final JavaRDD<Relation> simRelsRdd = Deduper
+				.computeRelations(sc, blocks, dedupConf)
+				.map(t -> DedupUtility.createSimRel(t._1(), t._2(), entity));
+			simRelsRdd.checkpoint();
 
 			Dataset<Relation> simRels = spark
 				.createDataset(
-					Deduper
-						.computeRelations(sc, blocks, dedupConf)
-						.map(t -> DedupUtility.createSimRel(t._1(), t._2(), entity))
+					simRelsRdd
 						.repartition(numPartitions)
 						.rdd(),
 					Encoders.bean(Relation.class));
