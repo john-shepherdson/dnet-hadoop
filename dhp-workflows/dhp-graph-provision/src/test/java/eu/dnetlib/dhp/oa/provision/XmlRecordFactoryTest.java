@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +24,7 @@ import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
+import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -45,13 +47,16 @@ public class XmlRecordFactoryTest {
 
 		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
 
+		System.out.println(xml);
+
 		assertNotNull(xml);
 
 		final Document doc = new SAXReader().read(new StringReader(xml));
+		doc.normalize();
 
 		assertNotNull(doc);
 
-		System.out.println(doc.asXML());
+		// System.out.println(doc.asXML());
 
 		assertEquals("0000-0001-9613-6638", doc.valueOf("//creator[@rank = '1']/@orcid"));
 		assertEquals("0000-0001-9613-6639", doc.valueOf("//creator[@rank = '1']/@orcid_pending"));
@@ -65,7 +70,28 @@ public class XmlRecordFactoryTest {
 		assertEquals("doi", doc.valueOf("//instance/alternateidentifier/@classid"));
 		assertEquals("10.5689/LIB.2018.2853550", doc.valueOf("//instance/alternateidentifier/text()"));
 
-		assertEquals(3, doc.selectNodes("//instance").size());
+		assertEquals(2, doc.selectNodes("//instance").size());
+
+		assertEquals("1721.47", doc.valueOf("//processingchargeamount/text()"));
+		assertEquals("EUR", doc.valueOf("//processingchargecurrency/text()"));
+
+		assertEquals(
+			"5.06690394631e-09", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'influence']/@score"));
+		assertEquals(
+			"C", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'influence']/@class"));
+
+		assertEquals(
+			"0.0", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity_alt']/@score"));
+		assertEquals(
+			"C", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity_alt']/@class"));
+
+		assertEquals(
+			"3.11855618382e-09", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity']/@score"));
+		assertEquals(
+			"C", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity']/@class"));
+
+		assertEquals("EOSC::Jupyter Notebook", doc.valueOf("//*[local-name() = 'result']/eoscifguidelines/@code"));
+
 	}
 
 	@Test
@@ -128,5 +154,42 @@ public class XmlRecordFactoryTest {
 		assertNotNull(doc);
 		System.out.println(doc.asXML());
 		assertEquals("", doc.valueOf("//rel/validated"));
+	}
+
+	@Test
+	public void testService() throws IOException, DocumentException {
+		final ContextMapper contextMapper = new ContextMapper();
+
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+			XmlConverterJob.schemaLocation);
+
+		final Datasource d = OBJECT_MAPPER
+			.readValue(IOUtils.toString(getClass().getResourceAsStream("datasource.json")), Datasource.class);
+
+		final String xml = xmlRecordFactory.build(new JoinedEntity<>(d));
+
+		assertNotNull(xml);
+
+		final Document doc = new SAXReader().read(new StringReader(xml));
+
+		assertNotNull(doc);
+
+		System.out.println(doc.asXML());
+
+		// TODO add assertions based of values extracted from the XML record
+
+		assertEquals("National", doc.valueOf("//jurisdiction/@classname"));
+		assertEquals("true", doc.valueOf("//thematic"));
+		assertEquals("Journal article", doc.valueOf("//contentpolicy/@classname"));
+		assertEquals("Journal archive", doc.valueOf("//datasourcetypeui/@classname"));
+		assertEquals("Data Source", doc.valueOf("//eosctype/@classname"));
+
+		final List pids = doc.selectNodes("//pid");
+		assertEquals(1, pids.size());
+		assertEquals("re3data", ((Element) pids.get(0)).attribute("classid").getValue());
+		assertEquals(
+			"Registry of research data repositories", ((Element) pids.get(0)).attribute("classname").getValue());
+		assertEquals("dnet:pid_types", ((Element) pids.get(0)).attribute("schemeid").getValue());
+		assertEquals("dnet:pid_types", ((Element) pids.get(0)).attribute("schemename").getValue());
 	}
 }

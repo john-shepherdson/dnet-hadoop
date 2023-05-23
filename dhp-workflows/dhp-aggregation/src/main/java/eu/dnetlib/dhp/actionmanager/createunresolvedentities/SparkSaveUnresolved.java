@@ -5,6 +5,7 @@ import static eu.dnetlib.dhp.actionmanager.Constants.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -67,7 +68,19 @@ public class SparkSaveUnresolved implements Serializable {
 			.groupByKey((MapFunction<Result, String>) Result::getId, Encoders.STRING())
 			.mapGroups((MapGroupsFunction<String, Result, Result>) (k, it) -> {
 				Result ret = it.next();
-				it.forEachRemaining(r -> ret.mergeFrom(r));
+				it.forEachRemaining(r -> {
+					if (r.getInstance() != null) {
+						ret.setInstance(r.getInstance());
+					}
+					if (r.getSubject() != null) {
+						if (ret.getSubject() != null)
+							ret.getSubject().addAll(r.getSubject());
+						else
+							ret.setSubject(r.getSubject());
+					}
+
+					// ret.mergeFrom(r)
+				});
 				return ret;
 			}, Encoders.bean(Result.class))
 			.write()

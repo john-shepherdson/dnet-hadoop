@@ -59,7 +59,7 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					SparkCreateSimRels.class
+					SparkCreateMergeRels.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/oa/dedup/createCC_parameters.json")));
 		parser.parseArgument(args);
@@ -99,7 +99,7 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 			final String subEntity = dedupConf.getWf().getSubEntityValue();
 			final Class<OafEntity> clazz = ModelSupport.entityTypes.get(EntityType.valueOf(subEntity));
 
-			log.info("Creating mergerels for: '{}'", subEntity);
+			log.info("Creating merge rels for: '{}'", subEntity);
 
 			final int maxIterations = dedupConf.getWf().getMaxIterations();
 			log.info("Max iterations {}", maxIterations);

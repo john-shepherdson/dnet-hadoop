@@ -1,7 +1,11 @@
 
 package eu.dnetlib.dhp.actionmanager.ror;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.io.FileInputStream;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -13,9 +17,12 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.actionmanager.ror.model.RorOrganization;
+import eu.dnetlib.dhp.schema.action.AtomicAction;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Organization;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 
-@Disabled
 class GenerateRorActionSetJobTest {
 
 	private static final ObjectMapper mapper = new ObjectMapper();
@@ -30,21 +37,35 @@ class GenerateRorActionSetJobTest {
 	void testConvertRorOrg() throws Exception {
 		final RorOrganization r = mapper
 			.readValue(IOUtils.toString(getClass().getResourceAsStream("ror_org.json")), RorOrganization.class);
-		final Organization org = GenerateRorActionSetJob.convertRorOrg(r);
+		final List<AtomicAction<? extends Oaf>> aas = GenerateRorActionSetJob.convertRorOrg(r);
 
-		final String s = mapper.writeValueAsString(org);
-		Assertions.assertTrue(StringUtils.isNotBlank(s));
-		System.out.println(s);
+		Assertions.assertEquals(1, aas.size());
+		assertEquals(Organization.class, aas.get(0).getClazz());
+
+		final Organization o = (Organization) aas.get(0).getPayload();
+
+		assertNotNull(o);
+
+		assertNotNull(o.getCountry());
+		assertEquals("AU", o.getCountry().getClassid());
+
+		assertNotNull(o.getLegalname());
+		assertEquals("Mount Stromlo Observatory", o.getLegalname().getValue());
+
+		System.out.println(mapper.writeValueAsString(o));
 	}
 
 	@Test
+	@Disabled
 	void testConvertAllRorOrg() throws Exception {
 		final RorOrganization[] arr = mapper
 			.readValue(IOUtils.toString(new FileInputStream(local_file_path)), RorOrganization[].class);
 
 		for (final RorOrganization r : arr) {
-			Organization o = GenerateRorActionSetJob.convertRorOrg(r);
-			Assertions.assertNotNull(o);
+			final List<AtomicAction<? extends Oaf>> aas = GenerateRorActionSetJob.convertRorOrg(r);
+			Assertions.assertFalse(aas.isEmpty());
+			Assertions.assertNotNull(aas.get(0));
+			final Organization o = (Organization) aas.get(0).getPayload();
 			Assertions.assertTrue(StringUtils.isNotBlank(o.getId()));
 		}
 	}

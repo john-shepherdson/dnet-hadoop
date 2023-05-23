@@ -6,15 +6,11 @@ import org.junit.jupiter.api.Test
 class DoiBoostHostedByMapTest {
 
   @Test
-  def idDSGeneration():Unit = {
-    val s ="doajarticles::0066-782X"
-
-
+  def idDSGeneration(): Unit = {
+    val s = "doajarticles::0066-782X"
 
     println(DoiBoostMappingUtil.generateDSId(s))
 
-
   }
-
 
 }

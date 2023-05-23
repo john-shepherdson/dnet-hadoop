@@ -5,7 +5,12 @@ import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.removePrefix;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
 import eu.dnetlib.dhp.schema.oaf.*;
+import scala.Tuple2;
 
 public class XmlSerializationUtils {
 
@@ -147,4 +152,26 @@ public class XmlSerializationUtils {
 			.append(attr("schemename", q.getSchemename()))
 			.toString();
 	}
+
+	public static String asXmlElement(String name, List<Tuple2<String, String>> attributes) {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<");
+		sb.append(name);
+		for (Tuple2<String, String> attr : attributes) {
+			sb.append(" ").append(attr(attr._1(), attr._2()));
+		}
+		sb.append("/>");
+		return sb.toString();
+	}
+
+	public static String mapEoscIf(EoscIfGuidelines e) {
+		return asXmlElement(
+			"eoscifguidelines", Lists
+				.newArrayList(
+					new Tuple2<>("code", e.getCode()),
+					new Tuple2<>("label", e.getLabel()),
+					new Tuple2<>("url", e.getUrl()),
+					new Tuple2<>("semanticrelation", e.getSemanticRelation())));
+	}
+
 }

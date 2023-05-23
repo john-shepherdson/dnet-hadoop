@@ -3,6 +3,8 @@ package eu.dnetlib.doiboost.orcid;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -13,6 +15,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.Function;
@@ -20,6 +23,7 @@ import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 
@@ -42,6 +46,7 @@ public class SparkDownloadOrcidWorks {
 	public static final String ORCID_XML_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
 	public static final DateTimeFormatter ORCID_XML_DATETIMEFORMATTER = DateTimeFormatter
 		.ofPattern(ORCID_XML_DATETIME_FORMAT);
+	public static final String DOWNLOAD_WORKS_REQUEST_SEPARATOR = ",";
 
 	public static void main(String[] args) throws Exception {
 
@@ -56,7 +61,6 @@ public class SparkDownloadOrcidWorks {
 			.ofNullable(parser.get("isSparkSessionManaged"))
 			.map(Boolean::valueOf)
 			.orElse(Boolean.TRUE);
-		logger.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 		final String workingPath = parser.get("workingPath");
 		logger.info("workingPath: {}", workingPath);
 		final String outputPath = parser.get("outputPath");
@@ -69,32 +73,22 @@ public class SparkDownloadOrcidWorks {
 			isSparkSessionManaged,
 			spark -> {
 				final String lastUpdateValue = HDFSUtil.readFromTextFile(hdfsServerUri, workingPath, "last_update.txt");
-				logger.info("lastUpdateValue: ", lastUpdateValue);
 
 				JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 				LongAccumulator updatedAuthorsAcc = spark.sparkContext().longAccumulator("updated_authors");
 				LongAccumulator parsedAuthorsAcc = spark.sparkContext().longAccumulator("parsed_authors");
 				LongAccumulator parsedWorksAcc = spark.sparkContext().longAccumulator("parsed_works");
 				LongAccumulator modifiedWorksAcc = spark.sparkContext().longAccumulator("modified_works");
-				LongAccumulator maxModifiedWorksLimitAcc = spark
-					.sparkContext()
-					.longAccumulator("max_modified_works_limit");
 				LongAccumulator errorCodeFoundAcc = spark.sparkContext().longAccumulator("error_code_found");
-				LongAccumulator errorLoadingJsonFoundAcc = spark
-					.sparkContext()
-					.longAccumulator("error_loading_json_found");
-				LongAccumulator errorLoadingXMLFoundAcc = spark
-					.sparkContext()
-					.longAccumulator("error_loading_xml_found");
 				LongAccumulator errorParsingXMLFoundAcc = spark
 					.sparkContext()
 					.longAccumulator("error_parsing_xml_found");
 				LongAccumulator downloadedRecordsAcc = spark.sparkContext().longAccumulator("downloaded_records");
-				LongAccumulator errorsAcc = spark.sparkContext().longAccumulator("errors");
 
 				JavaPairRDD<Text, Text> updatedAuthorsRDD = sc
 					.sequenceFile(workingPath + "downloads/updated_authors/*", Text.class, Text.class);
-				updatedAuthorsAcc.setValue(updatedAuthorsRDD.count());
+				long authorsCount = updatedAuthorsRDD.count();
+				updatedAuthorsAcc.setValue(authorsCount);
 
 				FlatMapFunction<Tuple2<Text, Text>, String> retrieveWorkUrlFunction = data -> {
 					String orcidId = data._1().toString();
@@ -106,11 +100,10 @@ public class SparkDownloadOrcidWorks {
 					if (statusCode.equals("200")) {
 						String compressedData = getJsonValue(jElement, "compressedData");
 						if (StringUtils.isEmpty(compressedData)) {
-							errorLoadingJsonFoundAcc.add(1);
+
 						} else {
 							String authorSummary = ArgumentApplicationParser.decompressValue(compressedData);
 							if (StringUtils.isEmpty(authorSummary)) {
-								errorLoadingXMLFoundAcc.add(1);
 							} else {
 								try {
 									workIdLastModifiedDate = XMLRecordParser
@@ -125,22 +118,38 @@ public class SparkDownloadOrcidWorks {
 						errorCodeFoundAcc.add(1);
 					}
 					parsedAuthorsAcc.add(1);
+
 					workIdLastModifiedDate.forEach((k, v) -> {
 						parsedWorksAcc.add(1);
 						if (isModified(orcidId, v, lastUpdateValue)) {
 							modifiedWorksAcc.add(1);
-							workIds.add(orcidId.concat("/work/").concat(k));
+							workIds.add(k);
 						}
 					});
-					if (workIdLastModifiedDate.size() > 50) {
-						maxModifiedWorksLimitAcc.add(1);
+					if (workIds.isEmpty()) {
+						return new ArrayList<String>().iterator();
 					}
-					return workIds.iterator();
+					List<String> worksDownloadUrls = new ArrayList<>();
+
+					// Creation of url for reading multiple works (up to 100) with ORCID API
+					// see this https://github.com/ORCID/ORCID-Source/blob/development/orcid-api-web/tutorial/works.md
+
+					List<List<String>> partitionedWorks = Lists.partition(workIds, 100);
+					partitionedWorks.stream().forEach(p -> {
+						String worksDownloadUrl = orcidId.concat("/works/");
+						final StringBuffer buffer = new StringBuffer(worksDownloadUrl);
+						p.forEach(id -> {
+							buffer.append(id).append(DOWNLOAD_WORKS_REQUEST_SEPARATOR);
+						});
+						String finalUrl = buffer.substring(0, buffer.lastIndexOf(DOWNLOAD_WORKS_REQUEST_SEPARATOR));
+						worksDownloadUrls.add(finalUrl);
+					});
+					return worksDownloadUrls.iterator();
 				};
 
-				Function<String, Tuple2<String, String>> downloadWorkFunction = data -> {
-					String relativeWorkUrl = data;
-					String orcidId = relativeWorkUrl.split("/")[0];
+				Function<String, Tuple2<String, String>> downloadWorksFunction = data -> {
+					String relativeWorksUrl = data;
+					String orcidId = relativeWorksUrl.split("/")[0];
 					final DownloadedRecordData downloaded = new DownloadedRecordData();
 					downloaded.setOrcidId(orcidId);
 					downloaded.setLastModifiedDate(lastUpdateValue);
@@ -149,7 +158,7 @@ public class SparkDownloadOrcidWorks {
 					httpConnector.setAuthMethod(MultiAttemptsHttpConnector.BEARER);
 					httpConnector.setAcceptHeaderValue("application/vnd.orcid+xml");
 					httpConnector.setAuthToken(token);
-					String apiUrl = "https://api.orcid.org/v3.0/" + relativeWorkUrl;
+					String apiUrl = "https://api.orcid.org/v3.0/" + relativeWorksUrl;
 					DownloadsReport report = new DownloadsReport();
 					long startReq = System.currentTimeMillis();
 					boolean downloadCompleted = false;
@@ -167,7 +176,6 @@ public class SparkDownloadOrcidWorks {
 						} else {
 							downloaded.setStatusCode(-4);
 						}
-						errorsAcc.add(1);
 					}
 					long endReq = System.currentTimeMillis();
 					long reqTime = endReq - startReq;
@@ -176,7 +184,6 @@ public class SparkDownloadOrcidWorks {
 					}
 					if (downloadCompleted) {
 						downloaded.setStatusCode(200);
-						downloadedRecordsAcc.add(1);
 						downloaded
 							.setCompressedData(
 								ArgumentApplicationParser
@@ -185,24 +192,69 @@ public class SparkDownloadOrcidWorks {
 					return downloaded.toTuple2();
 				};
 
+				FlatMapFunction<Tuple2<String, String>, Tuple2<String, String>> splitWorksFunction = data -> {
+					List<Tuple2<String, String>> splittedDownloadedWorks = new ArrayList<>();
+					String jsonData = data._2().toString();
+					JsonElement jElement = new JsonParser().parse(jsonData);
+					String orcidId = data._1().toString();
+					String statusCode = getJsonValue(jElement, "statusCode");
+					String lastModifiedDate = getJsonValue(jElement, "lastModifiedDate");
+					String compressedData = getJsonValue(jElement, "compressedData");
+					String errorMessage = getJsonValue(jElement, "errorMessage");
+					String works = ArgumentApplicationParser.decompressValue(compressedData);
+
+					// split a single xml containing multiple works into multiple xml (a single work for each xml)
+					List<String> splittedWorks = null;
+					try {
+						splittedWorks = XMLRecordParser
+							.splitWorks(orcidId, works.getBytes(StandardCharsets.UTF_8));
+					} catch (Throwable t) {
+						final DownloadedRecordData errDownloaded = new DownloadedRecordData();
+						errDownloaded.setOrcidId(orcidId);
+						errDownloaded.setLastModifiedDate(lastModifiedDate);
+						errDownloaded.setStatusCode(-10);
+						errDownloaded.setErrorMessage(t.getMessage());
+						splittedDownloadedWorks.add(errDownloaded.toTuple2());
+						errorParsingXMLFoundAcc.add(1);
+						return splittedDownloadedWorks.iterator();
+					}
+					splittedWorks.forEach(w -> {
+						final DownloadedRecordData downloaded = new DownloadedRecordData();
+						downloaded.setOrcidId(orcidId);
+						downloaded.setLastModifiedDate(lastModifiedDate);
+						downloaded.setStatusCode(Integer.parseInt(statusCode));
+						downloaded.setErrorMessage(errorMessage);
+						try {
+							downloaded
+								.setCompressedData(
+									ArgumentApplicationParser
+										.compressArgument(w));
+						} catch (Throwable t) {
+							downloaded.setStatusCode(-11);
+							downloaded.setErrorMessage(t.getMessage());
+						}
+						splittedDownloadedWorks.add(downloaded.toTuple2());
+						downloadedRecordsAcc.add(1);
+					});
+
+					return splittedDownloadedWorks.iterator();
+				};
+
 				updatedAuthorsRDD
 					.flatMap(retrieveWorkUrlFunction)
 					.repartition(100)
-					.map(downloadWorkFunction)
-					.mapToPair(t -> new Tuple2<>(new Text(t._1()), new Text(t._2())))
+					.map(downloadWorksFunction)
+					.flatMap(splitWorksFunction)
+					.mapToPair(w -> new Tuple2<>(new Text(w._1()), new Text(w._2())))
 					.saveAsTextFile(workingPath.concat(outputPath), GzipCodec.class);
 
 				logger.info("updatedAuthorsAcc: {}", updatedAuthorsAcc.value());
 				logger.info("parsedAuthorsAcc: {}", parsedAuthorsAcc.value());
 				logger.info("parsedWorksAcc: {}", parsedWorksAcc.value());
 				logger.info("modifiedWorksAcc: {}", modifiedWorksAcc.value());
-				logger.info("maxModifiedWorksLimitAcc: {}", maxModifiedWorksLimitAcc.value());
 				logger.info("errorCodeFoundAcc: {}", errorCodeFoundAcc.value());
-				logger.info("errorLoadingJsonFoundAcc: {}", errorLoadingJsonFoundAcc.value());
-				logger.info("errorLoadingXMLFoundAcc: {}", errorLoadingXMLFoundAcc.value());
 				logger.info("errorParsingXMLFoundAcc: {}", errorParsingXMLFoundAcc.value());
 				logger.info("downloadedRecordsAcc: {}", downloadedRecordsAcc.value());
-				logger.info("errorsAcc: {}", errorsAcc.value());
 			});
 
 	}

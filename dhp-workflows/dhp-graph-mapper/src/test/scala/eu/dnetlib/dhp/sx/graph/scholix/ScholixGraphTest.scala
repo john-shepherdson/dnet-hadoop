@@ -18,37 +18,40 @@ import scala.collection.JavaConverters._
 import scala.io.Source
 
 @ExtendWith(Array(classOf[MockitoExtension]))
-class ScholixGraphTest extends AbstractVocabularyTest{
-
+class ScholixGraphTest extends AbstractVocabularyTest {
 
   val mapper: ObjectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT)
-  mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false)
+  mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
   @BeforeEach
-  def setUp() :Unit = {
+  def setUp(): Unit = {
 
     super.setUpVocabulary()
   }
 
-
   @Test
-  def testExtractPids():Unit = {
+  def testExtractPids(): Unit = {
 
-    val input = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/scholix/result.json")).mkString
-    val res =SparkResolveRelation.extractPidsFromRecord(input)
+    val input = Source
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/scholix/result.json"))
+      .mkString
+    val res = SparkResolveRelation.extractPidsFromRecord(input)
     assertNotNull(res)
 
-    assertEquals(1,res._2.size)
+    assertEquals(1, res._2.size)
 
   }
 
   @Test
-  def testOAFToSummary():Unit= {
-    val inputRelations = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/oaf_to_summary")).mkString
-    val items = inputRelations.lines.toList
+  def testOAFToSummary(): Unit = {
+    val inputRelations = Source
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/oaf_to_summary"))
+      .mkString
+    val items = inputRelations.linesWithSeparators.map(l => l.stripLineEnd).toList
     assertNotNull(items)
-    items.foreach(i =>assertTrue(i.nonEmpty))
-    val result = items.map(r => mapper.readValue(r, classOf[Result])).map(i => ScholixUtils.resultToSummary(i))
+    items.foreach(i => assertTrue(i.nonEmpty))
+    val result =
+      items.map(r => mapper.readValue(r, classOf[Result])).map(i => ScholixUtils.resultToSummary(i))
 
     assertNotNull(result)
 
@@ -59,37 +62,42 @@ class ScholixGraphTest extends AbstractVocabularyTest{
 
   }
 
-
-
   @Test
-  def testScholixMergeOnSource():Unit = {
-    val inputRelations = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/merge_result_scholix")).mkString
-    val result:List[(Relation,ScholixSummary)] =inputRelations.lines.sliding(2).map(s => (s.head, s(1))).map(p => (mapper.readValue(p._1, classOf[Relation]),mapper.readValue(p._2, classOf[ScholixSummary]) )).toList
+  def testScholixMergeOnSource(): Unit = {
+    val inputRelations = Source
+      .fromInputStream(
+        getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/merge_result_scholix")
+      )
+      .mkString
+    val result: List[(Relation, ScholixSummary)] = inputRelations.linesWithSeparators
+      .map(l => l.stripLineEnd)
+      .sliding(2)
+      .map(s => (s.head, s(1)))
+      .map(p => (mapper.readValue(p._1, classOf[Relation]), mapper.readValue(p._2, classOf[ScholixSummary])))
+      .toList
     assertNotNull(result)
     assertTrue(result.nonEmpty)
     result.foreach(r => assertEquals(r._1.getSource, r._2.getId))
-    val scholix:List[Scholix] = result.map(r => ScholixUtils.scholixFromSource(r._1, r._2))
+    val scholix: List[Scholix] = result.map(r => ScholixUtils.scholixFromSource(r._1, r._2))
     println(mapper.writeValueAsString(scholix.head))
   }
 
-
-
-
   @Test
   def testScholixRelationshipsClean(): Unit = {
-    val inputRelations = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/relation_transform.json")).mkString
+    val inputRelations = Source
+      .fromInputStream(
+        getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/relation_transform.json")
+      )
+      .mkString
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
     lazy val json: json4s.JValue = parse(inputRelations)
-    val l:List[String] =json.extract[List[String]]
+    val l: List[String] = json.extract[List[String]]
     assertNotNull(l)
     assertTrue(l.nonEmpty)
-    val relVocbaulary =ScholixUtils.relations
-    l.foreach(r =>  assertTrue(relVocbaulary.contains(r.toLowerCase)))
+    val relVocbaulary = ScholixUtils.relations
+    l.foreach(r => assertTrue(relVocbaulary.contains(r.toLowerCase)))
 
   }
-
-
-
 
 }

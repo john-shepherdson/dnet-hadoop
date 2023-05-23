@@ -3,26 +3,28 @@
 -- Project table/view and Project related tables/views
 ------------------------------------------------------
 ------------------------------------------------------
-CREATE TABLE ${stats_db_name}.project_oids AS
+CREATE TABLE ${stats_db_name}.project_oids STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, oids.ids AS oid
-FROM ${openaire_db_name}.project p LATERAL VIEW explode(p.originalid) oids AS ids;
-CREATE TABLE ${stats_db_name}.project_organizations AS
+FROM ${openaire_db_name}.project p LATERAL VIEW explode(p.originalid) oids AS ids
+where p.datainfo.deletedbyinference=false  and p.datainfo.invisible=false;
+
+CREATE TABLE ${stats_db_name}.project_organizations STORED AS PARQUET AS
 SELECT substr(r.source, 4) AS id, substr(r.target, 4) AS organization
 from ${openaire_db_name}.relation r
-WHERE r.reltype = 'projectOrganization'
-  and r.datainfo.deletedbyinference = false;
+WHERE r.reltype = 'projectOrganization' and r.source like '40|%'
+  and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false;
 
-CREATE TABLE ${stats_db_name}.project_results AS
+CREATE TABLE ${stats_db_name}.project_results STORED AS PARQUET AS
 SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS result, r.datainfo.provenanceaction.classname as provenance
 FROM ${openaire_db_name}.relation r
-WHERE r.reltype = 'resultProject'
-  and r.datainfo.deletedbyinference = false;
+WHERE r.reltype = 'resultProject' and r.target like '40|%'
+  and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false;
 
-create table ${stats_db_name}.project_classification as
+create table ${stats_db_name}.project_classification STORED AS PARQUET as
 select substr(p.id, 4) as id, class.h2020programme.code, class.level1, class.level2, class.level3
 from ${openaire_db_name}.project p
     lateral view explode(p.h2020classification) classifs as class
-where p.datainfo.deletedbyinference=false and class.h2020programme is not null;
+where p.datainfo.deletedbyinference=false and p.datainfo.invisible=false and class.h2020programme is not null;
 
 CREATE TABLE ${stats_db_name}.project_tmp
 (
@@ -46,7 +48,9 @@ CREATE TABLE ${stats_db_name}.project_tmp
     delayedpubs    INT,
     callidentifier STRING,
     code           STRING,
-    totalcost       FLOAT
+    totalcost       FLOAT,
+    fundedamount    FLOAT,
+    currency        STRING
 ) CLUSTERED BY (id) INTO 100 buckets stored AS orc tblproperties ('transactional' = 'true');
 
 INSERT INTO ${stats_db_name}.project_tmp
@@ -70,12 +74,22 @@ SELECT substr(p.id, 4)                                                 AS id,
        0                                                               AS delayedpubs,
        p.callidentifier.value                                          AS callidentifier,
        p.code.value                                                    AS code,
-       p.totalcost                                                     AS totalcost
+       p.totalcost                                                     AS totalcost,
+       p.fundedamount                                                  AS fundedamount,
+       p.currency.value                                                AS currency
 FROM ${openaire_db_name}.project p
-WHERE p.datainfo.deletedbyinference = false;
+WHERE p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
 
-create table ${stats_db_name}.funder as
+create table ${stats_db_name}.funder STORED AS PARQUET as
 select distinct xpath_string(fund, '//funder/id')        as id,
                 xpath_string(fund, '//funder/name')      as name,
                 xpath_string(fund, '//funder/shortname') as shortname
 from ${openaire_db_name}.project p lateral view explode(p.fundingtree.value) fundingtree as fund;
+
+CREATE TABLE ${stats_db_name}.project_organization_contribution STORED AS PARQUET AS
+SELECT distinct substr(r.source, 4) AS project, substr(r.target, 4) AS organization,
+properties[0].value contribution, properties[1].value currency
+from ${openaire_db_name}.relation r
+LATERAL VIEW explode (r.properties) properties
+where properties[0].key='contribution' and r.reltype = 'projectOrganization' and r.source like '40|%'
+and properties[0].value>0.0 and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false;

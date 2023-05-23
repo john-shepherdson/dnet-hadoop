@@ -15,15 +15,20 @@ import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.JavaConverters._
 
+case class ORCIDItem(doi: String, authors: List[OrcidAuthor]) {}
 
-case class ORCIDItem(doi:String, authors:List[OrcidAuthor]){}
-case class OrcidAuthor(oid:String, name:Option[String], surname:Option[String], creditName:Option[String], otherNames:Option[List[String]], errorCode:Option[String]){}
-case class OrcidWork(oid:String, doi:String)
+case class OrcidAuthor(
+  oid: String,
+  name: Option[String],
+  surname: Option[String],
+  creditName: Option[String],
+  otherNames: Option[List[String]],
+  errorCode: Option[String]
+) {}
+case class OrcidWork(oid: String, doi: String)
 
+case class ORCIDElement(doi: String, authors: List[ORCIDItem]) {}
 
-
-
-case class ORCIDElement(doi:String, authors:List[ORCIDItem]) {}
 object ORCIDToOAF {
   val logger: Logger = LoggerFactory.getLogger(ORCIDToOAF.getClass)
   val mapper = new ObjectMapper()
@@ -41,7 +46,7 @@ object ORCIDToOAF {
 
   def extractValueFromInputString(input: String): (String, String) = {
     val i = input.indexOf('[')
-    if (i <5) {
+    if (i < 5) {
       return null
     }
     val orcidList = input.substring(i, input.length - 1)
@@ -51,17 +56,16 @@ object ORCIDToOAF {
     } else null
   }
 
-
-  def strValid(s:Option[String]) : Boolean = {
+  def strValid(s: Option[String]): Boolean = {
     s.isDefined && s.get.nonEmpty
   }
 
-  def authorValid(author:OrcidAuthor): Boolean ={
+  def authorValid(author: OrcidAuthor): Boolean = {
     if (strValid(author.name) && strValid(author.surname)) {
       return true
     }
     if (strValid(author.surname)) {
-      return  true
+      return true
     }
     if (strValid(author.creditName)) {
       return true
@@ -70,37 +74,35 @@ object ORCIDToOAF {
     false
   }
 
-
-  def extractDOIWorks(input:String): List[OrcidWork] = {
+  def extractDOIWorks(input: String): List[OrcidWork] = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(input)
 
-    val oid = (json \ "workDetail" \"oid").extractOrElse[String](null)
+    val oid = (json \ "workDetail" \ "oid").extractOrElse[String](null)
     if (oid == null)
       return List()
-    val doi:List[(String, String)] = for {
-      JObject(extIds) <-  json \ "workDetail" \"extIds"
+    val doi: List[(String, String)] = for {
+      JObject(extIds)                    <- json \ "workDetail" \ "extIds"
       JField("type", JString(typeValue)) <- extIds
-      JField("value", JString(value)) <- extIds
+      JField("value", JString(value))    <- extIds
       if "doi".equalsIgnoreCase(typeValue)
     } yield (typeValue, DoiBoostMappingUtil.normalizeDoi(value))
     if (doi.nonEmpty) {
-      return doi.map(l =>OrcidWork(oid, l._2))
+      return doi.map(l => OrcidWork(oid, l._2))
     }
     List()
   }
 
-  def convertORCIDAuthor(input:String): OrcidAuthor = {
+  def convertORCIDAuthor(input: String): OrcidAuthor = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(input)
 
-    (json \"authorData" ).extractOrElse[OrcidAuthor](null)
-   }
+    (json \ "authorData").extractOrElse[OrcidAuthor](null)
+  }
 
-
-  def convertTOOAF(input:ORCIDItem) :Publication = {
+  def convertTOOAF(input: ORCIDItem): Publication = {
     val doi = input.doi
-    val pub:Publication = new Publication
+    val pub: Publication = new Publication
     pub.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
     pub.setDataInfo(generateDataInfo())
 
@@ -108,9 +110,9 @@ object ORCIDToOAF {
     if (pub.getId == null)
       return null
 
-    try{
+    try {
 
-      val l:List[Author]= input.authors.map(a=> {
+      val l: List[Author] = input.authors.map(a => {
         generateAuthor(a)
       })(collection.breakOut)
 
@@ -125,30 +127,38 @@ object ORCIDToOAF {
     }
   }
 
-  def generateOricPIDDatainfo():DataInfo = {
-    val di =DoiBoostMappingUtil.generateDataInfo("0.91")
+  def generateOricPIDDatainfo(): DataInfo = {
+    val di = DoiBoostMappingUtil.generateDataInfo("0.91")
     di.getProvenanceaction.setClassid(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)
     di.getProvenanceaction.setClassname(ModelConstants.HARVESTED)
     di
   }
 
-  def generateAuthor(o : OrcidAuthor): Author = {
+  def generateAuthor(o: OrcidAuthor): Author = {
     val a = new Author
     if (strValid(o.name)) {
-    a.setName(o.name.get.capitalize)
+      a.setName(o.name.get.capitalize)
     }
     if (strValid(o.surname)) {
       a.setSurname(o.surname.get.capitalize)
     }
-    if(strValid(o.name) && strValid(o.surname))
+    if (strValid(o.name) && strValid(o.surname))
       a.setFullname(s"${o.name.get.capitalize} ${o.surname.get.capitalize}")
     else if (strValid(o.creditName))
       a.setFullname(o.creditName.get)
     if (StringUtils.isNotBlank(o.oid))
-      a.setPid(List(createSP(o.oid, ModelConstants.ORCID, ModelConstants.DNET_PID_TYPES, generateOricPIDDatainfo())).asJava)
+      a.setPid(
+        List(
+          createSP(
+            o.oid,
+            ModelConstants.ORCID,
+            ModelConstants.DNET_PID_TYPES,
+            generateOricPIDDatainfo()
+          )
+        ).asJava
+      )
 
     a
   }
-
 
 }

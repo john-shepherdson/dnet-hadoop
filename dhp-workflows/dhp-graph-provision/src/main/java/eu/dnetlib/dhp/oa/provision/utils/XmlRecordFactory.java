@@ -23,7 +23,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.http.protocol.HTTP;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -32,6 +31,7 @@ import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.json4s.Xml;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
@@ -50,6 +50,7 @@ import eu.dnetlib.dhp.schema.common.*;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import scala.Tuple2;
 
 public class XmlRecordFactory implements Serializable {
 
@@ -121,7 +122,8 @@ public class XmlRecordFactory implements Serializable {
 				.buildBody(
 					mainType, metadata, relations, listChildren(entity, je, templateFactory), listExtraInfo(entity));
 
-			return printXML(templateFactory.buildRecord(entity, schemaLocation, body), indent);
+			return templateFactory.buildRecord(entity, schemaLocation, body);
+			// return printXML(templateFactory.buildRecord(entity, schemaLocation, body), indent);
 		} catch (final Throwable e) {
 			throw new RuntimeException(String.format("error building record '%s'", entity.getId()), e);
 		}
@@ -205,9 +207,34 @@ public class XmlRecordFactory implements Serializable {
 						.map(p -> XmlSerializationUtils.mapStructuredProperty("pid", p))
 						.collect(Collectors.toList()));
 		}
+		if (entity.getMeasures() != null) {
+			metadata.addAll(measuresAsXml(entity.getMeasures()));
+		}
 
 		if (ModelSupport.isResult(type)) {
 			final Result r = (Result) entity;
+
+			if (r.getFulltext() != null) {
+				metadata
+					.addAll(
+						r
+							.getFulltext()
+							.stream()
+							.filter(Objects::nonNull)
+							.map(c -> XmlSerializationUtils.asXmlElement("fulltext", c.getValue()))
+							.collect(Collectors.toList()));
+			}
+
+			if (r.getEoscifguidelines() != null) {
+				metadata
+					.addAll(
+						r
+							.getEoscifguidelines()
+							.stream()
+							.filter(Objects::nonNull)
+							.map(e -> XmlSerializationUtils.mapEoscIf(e))
+							.collect(Collectors.toList()));
+			}
 
 			if (r.getContext() != null) {
 				contexts.addAll(r.getContext().stream().map(c -> c.getId()).collect(Collectors.toList()));
@@ -398,6 +425,16 @@ public class XmlRecordFactory implements Serializable {
 			if (r.getResourcetype() != null) {
 				metadata.add(XmlSerializationUtils.mapQualifier("resourcetype", r.getResourcetype()));
 			}
+			if (r.getProcessingchargeamount() != null) {
+				metadata
+					.add(
+						XmlSerializationUtils
+							.asXmlElement("processingchargeamount", r.getProcessingchargeamount().getValue()));
+				metadata
+					.add(
+						XmlSerializationUtils
+							.asXmlElement("processingchargecurrency", r.getProcessingchargecurrency().getValue()));
+			}
 		}
 
 		switch (type) {
@@ -520,6 +557,12 @@ public class XmlRecordFactory implements Serializable {
 				if (ds.getDatasourcetypeui() != null) {
 					metadata.add(XmlSerializationUtils.mapQualifier("datasourcetypeui", ds.getDatasourcetypeui()));
 				}
+				if (ds.getEosctype() != null) {
+					metadata.add(XmlSerializationUtils.mapQualifier("eosctype", ds.getEosctype()));
+				}
+				if (ds.getEoscdatasourcetype() != null) {
+					metadata.add(XmlSerializationUtils.mapQualifier("eoscdatasourcetype", ds.getEoscdatasourcetype()));
+				}
 				if (ds.getOpenairecompatibility() != null) {
 					metadata
 						.add(
@@ -568,6 +611,16 @@ public class XmlRecordFactory implements Serializable {
 					metadata
 						.add(XmlSerializationUtils.asXmlElement("description", ds.getDescription().getValue()));
 				}
+				if (ds.getSubjects() != null) {
+					metadata
+						.addAll(
+							ds
+								.getSubjects()
+								.stream()
+								.filter(Objects::nonNull)
+								.map(sp -> XmlSerializationUtils.mapStructuredProperty("subjects", sp))
+								.collect(Collectors.toList()));
+				}
 				if (ds.getOdnumberofitems() != null) {
 					metadata
 						.add(
@@ -592,6 +645,16 @@ public class XmlRecordFactory implements Serializable {
 								.stream()
 								.filter(Objects::nonNull)
 								.map(c -> XmlSerializationUtils.asXmlElement("odlanguages", c.getValue()))
+								.collect(Collectors.toList()));
+				}
+				if (ds.getLanguages() != null) {
+					metadata
+						.addAll(
+							ds
+								.getLanguages()
+								.stream()
+								.filter(Objects::nonNull)
+								.map(c -> XmlSerializationUtils.asXmlElement("languages", c))
 								.collect(Collectors.toList()));
 				}
 				if (ds.getOdcontenttypes() != null) {
@@ -674,17 +737,17 @@ public class XmlRecordFactory implements Serializable {
 							XmlSerializationUtils
 								.asXmlElement("versioning", ds.getVersioning().getValue().toString()));
 				}
+				if (ds.getVersioncontrol() != null) {
+					metadata
+						.add(
+							XmlSerializationUtils
+								.asXmlElement("versioncontrol", ds.getVersioncontrol().toString()));
+				}
 				if (ds.getCitationguidelineurl() != null) {
 					metadata
 						.add(
 							XmlSerializationUtils
 								.asXmlElement("citationguidelineurl", ds.getCitationguidelineurl().getValue()));
-				}
-				if (ds.getQualitymanagementkind() != null) {
-					metadata
-						.add(
-							XmlSerializationUtils
-								.asXmlElement("qualitymanagementkind", ds.getQualitymanagementkind().getValue()));
 				}
 				if (ds.getPidsystems() != null) {
 					metadata
@@ -707,28 +770,30 @@ public class XmlRecordFactory implements Serializable {
 				if (ds.getJournal() != null) {
 					metadata.add(XmlSerializationUtils.mapJournal(ds.getJournal()));
 				}
-				if (ds.getSubjects() != null) {
+				if (ds.getResearchentitytypes() != null) {
 					metadata
 						.addAll(
 							ds
-								.getSubjects()
+								.getResearchentitytypes()
 								.stream()
-								.filter(Objects::nonNull)
-								.map(sp -> XmlSerializationUtils.mapStructuredProperty("subjects", sp))
+								.map(c -> XmlSerializationUtils.asXmlElement("researchentitytypes", c))
 								.collect(Collectors.toList()));
 				}
-
+				if (ds.getProvidedproducttypes() != null) {
+					metadata
+						.addAll(
+							ds
+								.getProvidedproducttypes()
+								.stream()
+								.map(c -> XmlSerializationUtils.asXmlElement("providedproducttypes", c))
+								.collect(Collectors.toList()));
+				}
 				if (ds.getJurisdiction() != null) {
 					metadata.add(XmlSerializationUtils.mapQualifier("jurisdiction", ds.getJurisdiction()));
 				}
 
 				if (ds.getThematic() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("thematic", ds.getThematic().toString()));
-				}
-
-				if (ds.getKnowledgegraph() != null) {
-					metadata
-						.add(XmlSerializationUtils.asXmlElement("knowledgegraph", ds.getKnowledgegraph().toString()));
 				}
 
 				if (ds.getContentpolicies() != null) {
@@ -741,7 +806,34 @@ public class XmlRecordFactory implements Serializable {
 								.map(q -> XmlSerializationUtils.mapQualifier("contentpolicy", q))
 								.collect(Collectors.toList()));
 				}
-
+				if (ds.getSubmissionpolicyurl() != null) {
+					metadata
+						.add(XmlSerializationUtils.asXmlElement("submissionpolicyurl", ds.getSubmissionpolicyurl()));
+				}
+				if (ds.getPreservationpolicyurl() != null) {
+					metadata
+						.add(
+							XmlSerializationUtils.asXmlElement("preservationpolicyurl", ds.getPreservationpolicyurl()));
+				}
+				if (ds.getResearchproductaccesspolicies() != null) {
+					metadata
+						.addAll(
+							ds
+								.getResearchproductaccesspolicies()
+								.stream()
+								.map(c -> XmlSerializationUtils.asXmlElement("researchproductaccesspolicies", c))
+								.collect(Collectors.toList()));
+				}
+				if (ds.getResearchproductmetadataaccesspolicies() != null) {
+					metadata
+						.addAll(
+							ds
+								.getResearchproductmetadataaccesspolicies()
+								.stream()
+								.map(
+									c -> XmlSerializationUtils.asXmlElement("researchproductmetadataaccesspolicies", c))
+								.collect(Collectors.toList()));
+				}
 				break;
 			case organization:
 				final Organization o = (Organization) entity;
@@ -924,6 +1016,17 @@ public class XmlRecordFactory implements Serializable {
 		}
 
 		return metadata;
+	}
+
+	private List<String> measuresAsXml(List<Measure> measures) {
+		return measures
+			.stream()
+			.map(m -> {
+				List<Tuple2<String, String>> l = Lists.newArrayList(new Tuple2<>("id", m.getId()));
+				m.getUnit().forEach(kv -> l.add(new Tuple2<>(kv.getKey(), kv.getValue())));
+				return XmlSerializationUtils.asXmlElement("measure", l);
+			})
+			.collect(Collectors.toList());
 	}
 
 	private String getAuthorPidType(final String s) {
@@ -1177,14 +1280,8 @@ public class XmlRecordFactory implements Serializable {
 
 					if (instance.getRefereed() != null) {
 						fields
-							.addAll(
-								instance
-									.getRefereed()
-									.stream()
-									.filter(Objects::nonNull)
-									.filter(r -> !r.isBlank())
-									.map(r -> XmlSerializationUtils.mapQualifier("refereed", r))
-									.collect(Collectors.toList()));
+							.add(
+								XmlSerializationUtils.mapQualifier("refereed", instance.getRefereed()));
 					}
 					if (instance.getProcessingchargeamount() != null
 						&& isNotBlank(instance.getProcessingchargeamount())) {
@@ -1328,13 +1425,20 @@ public class XmlRecordFactory implements Serializable {
 					.map(Instance::getAccessright)
 					.min(new AccessRightComparator<AccessRight>())
 					.orElse(XmlInstance.UNKNOWN_ACCESS_RIGHT));
+		instance
+			.setRefereed(
+				instances
+					.stream()
+					.map(Pair::getValue)
+					.map(i -> Optional.ofNullable(i.getRefereed()).orElse(XmlInstance.UNKNOWN_REVIEW_LEVEL))
+					.min(new RefereedComparator())
+					.orElse(XmlInstance.UNKNOWN_REVIEW_LEVEL));
 
 		instances.forEach(p -> {
 			final Instance i = p.getRight();
 			instance.getCollectedfrom().add(i.getCollectedfrom());
 			instance.getHostedby().add(i.getHostedby());
 			instance.getInstancetype().add(i.getInstancetype());
-			instance.getRefereed().add(i.getRefereed());
 			instance
 				.setProcessingchargeamount(
 					Optional.ofNullable(i.getProcessingchargeamount()).map(apc -> apc.getValue()).orElse(null));

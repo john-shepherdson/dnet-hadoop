@@ -33,6 +33,7 @@ import eu.dnetlib.dhp.schema.oaf.Instance;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Measure;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
@@ -95,11 +96,39 @@ public class PrepareBipFinder implements Serializable {
 			}).collect(Collectors.toList()).iterator()).rdd(), Encoders.bean(BipScore.class))
 			.map((MapFunction<BipScore, Result>) v -> {
 				Result r = new Result();
+				final String cleanedPid = CleaningFunctions.normalizePidValue(DOI, v.getId());
 
 				r.setId(DHPUtils.generateUnresolvedIdentifier(v.getId(), DOI));
 				Instance inst = new Instance();
 				inst.setMeasures(getMeasure(v));
+
+				inst
+					.setPid(
+						Arrays
+							.asList(
+								OafMapperUtils
+									.structuredProperty(
+										cleanedPid,
+										OafMapperUtils
+											.qualifier(
+												DOI, DOI_CLASSNAME,
+												ModelConstants.DNET_PID_TYPES,
+												ModelConstants.DNET_PID_TYPES),
+										null)));
 				r.setInstance(Arrays.asList(inst));
+				r
+					.setDataInfo(
+						OafMapperUtils
+							.dataInfo(
+								false, null, true,
+								false,
+								OafMapperUtils
+									.qualifier(
+										ModelConstants.PROVENANCE_ENRICH,
+										null,
+										ModelConstants.DNET_PROVENANCE_ACTIONS,
+										ModelConstants.DNET_PROVENANCE_ACTIONS),
+								null));
 				return r;
 			}, Encoders.bean(Result.class))
 			.write()

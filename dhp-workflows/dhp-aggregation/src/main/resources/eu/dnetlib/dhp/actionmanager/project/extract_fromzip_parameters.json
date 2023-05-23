@@ -1,0 +1,23 @@
+[
+
+{
+"paramName": "ip",
+"paramLongName": "inputPath",
+"paramDescription": "the path where the projects are stored ",
+"paramRequired": true
+},
+
+
+  {
+"paramName": "op",
+"paramLongName": "outputPath",
+"paramDescription": "the path for the extracted folder",
+"paramRequired": true
+},
+  {
+    "paramName": "hnn",
+    "paramLongName": "hdfsNameNode",
+    "paramDescription": "the hdfs namenode",
+    "paramRequired": true
+  }
+]

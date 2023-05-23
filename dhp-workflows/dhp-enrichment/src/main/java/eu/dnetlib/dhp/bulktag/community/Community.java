@@ -14,6 +14,7 @@ public class Community implements Serializable {
 	private List<String> subjects = new ArrayList<>();
 	private List<Provider> providers = new ArrayList<>();
 	private List<ZenodoCommunity> zenodoCommunities = new ArrayList<>();
+	private SelectionConstraints constraints = new SelectionConstraints();
 
 	public String toJson() {
 		final Gson g = new Gson();
@@ -23,7 +24,8 @@ public class Community implements Serializable {
 	public boolean isValid() {
 		return !getSubjects().isEmpty()
 			|| !getProviders().isEmpty()
-			|| !getZenodoCommunities().isEmpty();
+			|| !getZenodoCommunities().isEmpty()
+			|| getConstraints().getCriteria() != null;
 	}
 
 	public String getId() {
@@ -56,5 +58,13 @@ public class Community implements Serializable {
 
 	public void setZenodoCommunities(List<ZenodoCommunity> zenodoCommunities) {
 		this.zenodoCommunities = zenodoCommunities;
+	}
+
+	public SelectionConstraints getConstraints() {
+		return constraints;
+	}
+
+	public void setConstraints(SelectionConstraints constraints) {
+		this.constraints = constraints;
 	}
 }

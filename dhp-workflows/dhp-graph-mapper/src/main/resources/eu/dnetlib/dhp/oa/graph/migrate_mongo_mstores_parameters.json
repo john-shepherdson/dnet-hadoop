@@ -6,6 +6,12 @@
 		"paramRequired": true
 	},
 	{
+	    "paramName": "n",
+    	"paramLongName": "nameNode",
+    	"paramDescription": "the hdfs Name node url",
+    	"paramRequired": true
+	},
+	{
 		"paramName": "mongourl",
 		"paramLongName": "mongoBaseUrl",
 		"paramDescription": "mongoDB url, example: mongodb://[username:password@]host[:port]",

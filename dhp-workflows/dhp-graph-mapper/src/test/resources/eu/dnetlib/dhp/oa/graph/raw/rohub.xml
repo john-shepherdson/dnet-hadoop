@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:oaire="http://namespace.openaire.eu/schema/oaire/"
+        xmlns:datacite="http://datacite.org/schema/kernel-4"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+        xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <header xmlns="http://www.openarchives.org/OAI/2.0/">
+        <identifier>https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca</identifier>
+        <datestamp>2022-09-02T09:55:35Z</datestamp>
+        <setSpec>rohub_data</setSpec>
+        <setSpec>ro-crate_data</setSpec>
+        <dri:objIdentifier>fsh_____4119::afc7592914ae190a50570db90f55f9c2</dri:objIdentifier>
+        <dri:recordIdentifier>https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca</dri:recordIdentifier>
+        <dri:dateOfCollection>2019-03-27T15:15:22.22Z</dri:dateOfCollection>
+        <oaf:datasourceprefix>fsh_____4119</oaf:datasourceprefix>
+        <dr:dateOfTransformation>2019-04-17T16:04:20.586Z</dr:dateOfTransformation>
+    </header>
+    <metadata>
+        <datacite:resource>
+            <datacite:identifier identifierType="w3id">https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca</datacite:identifier>
+            <datacite:alternateIdentifiers>
+                <datacite:alternateIdentifier alternateIdentifierType="w3id">https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca</datacite:alternateIdentifier>
+            </datacite:alternateIdentifiers>
+            <datacite:relatedIdentifiers>
+                <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca/resources/24fae96f-f986-46e1-bfd0-a21ca20ff0ce</datacite:relatedIdentifier>
+                <datacite:relatedIdentifier relatedIdentifierType="w3id" relationType="HasPart">https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca/resources/6d3427a8-352e-49f4-9796-f618c44dc16d</datacite:relatedIdentifier>
+            </datacite:relatedIdentifiers>
+            <datacite:resourceType xs:anyURI="http://purl.org/coar/resource_type/c_1843">RO-crate</datacite:resourceType>
+            <datacite:rightsList>
+                <datacite:rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</datacite:rights>
+            </datacite:rightsList>
+            <datacite:titles>
+                <datacite:title>Using biological effects tools to define Good Environmental Status under the European Union Marine Strategy Framework Directive</datacite:title>
+            </datacite:titles>
+            <datacite:descriptions>
+                <datacite:description descriptionType="Abstract">The use of biological effects tools offer enormous potential to meet the challenges outlined by the European Union Marine Strategy Framework Directive (MSFD) whereby Member States are required to develop a robust set of tools for defining 11 qualitative descriptors of Good Environmental Status (GES), such as demonstrating that "Concentrations of contaminants are at levels not giving rise to pollution effects" (GES Descriptor 8). This paper discusses the combined approach of monitoring chemical contaminant levels, along side biological effect measurements relating to the effect of pollutants, for undertaking assessments of GES across European marine regions. We outline the minimum standards that biological effects tools should meet if they are to be used for defining GES in relation to Descriptor 8 and describe the current international initiatives underway to develop assessment criteria for these biological effects techniques. Crown Copyright (C) 2010 Published by Elsevier Ltd. All rights reserved.</datacite:description>
+            </datacite:descriptions>
+            <datacite:publisher>Poznań Supercomputing and Networking Center</datacite:publisher>
+            <contributors xmlns="http://datacite.org/schema/kernel-4">
+                <contributor contributorType="Researcher">
+                    <contributorName>Generation Service</contributorName>
+                </contributor>
+            </contributors>
+            <creators xmlns="http://datacite.org/schema/kernel-4">
+                <creator>
+                    <creatorName>CNR-ISMAR</creatorName>
+                </creator>
+            </creators>
+            <dates xmlns="http://datacite.org/schema/kernel-4">
+                <date dateType="Issued">2018-06-20T11:21:46Z</date>
+            </dates>
+            <dc:descriptions>
+                <dc:description descriptionType="Abstract">The use of biological effects tools offer enormous potential to meet the challenges outlined by the European Union Marine Strategy Framework Directive (MSFD) whereby Member States are required to develop a robust set of tools for defining 11 qualitative descriptors of Good Environmental Status (GES), such as demonstrating that "Concentrations of contaminants are at levels not giving rise to pollution effects" (GES Descriptor 8). This paper discusses the combined approach of monitoring chemical contaminant levels, along side biological effect measurements relating to the effect of pollutants, for undertaking assessments of GES across European marine regions. We outline the minimum standards that biological effects tools should meet if they are to be used for defining GES in relation to Descriptor 8 and describe the current international initiatives underway to develop assessment criteria for these biological effects techniques. Crown Copyright (C) 2010 Published by Elsevier Ltd. All rights reserved.</dc:description>
+            </dc:descriptions>
+            <dc:publicationYear>2018</dc:publicationYear>
+            <rightsList xmlns="http://datacite.org/schema/kernel-4">
+                <rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</rights>
+            </rightsList>
+            <sizes xmlns="http://datacite.org/schema/kernel-4">
+                <size>3.866 KB</size>
+            </sizes>
+            <subjects xmlns="http://datacite.org/schema/kernel-4">
+                <subject>Ecology</subject>
+            </subjects>
+        </datacite:resource>
+        <oaf:identifier identifierType="w3id">https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca</oaf:identifier>
+        <dr:CobjCategory type="other research product">other research product</dr:CobjCategory>
+        <oaf:dateAccepted>2018-06-20</oaf:dateAccepted>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:language/>
+        <oaf:hostedBy name="ROHub" id="fairsharing_::4119"/>
+        <oaf:collectedFrom name="ROHub" id="fairsharing_::4119"/>
+        <oaf:eoscifguidelines code="EOSC::RO-crate"
+                              label="EOSC::RO-crate"
+                              url=""
+                              semanticrelation="compliesWith"/>
+    </metadata>
+</record>

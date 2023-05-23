@@ -16,6 +16,21 @@
             <name>outputPath</name>
             <description>the output path</description>
         </property>
+
+
+        <property>
+            <name>postgresURL</name>
+            <description>the url of the postgress server to query</description>
+        </property>
+        <property>
+            <name>postgresUser</name>
+            <description>the username to access the postgres db</description>
+        </property>
+        <property>
+            <name>postgresPassword</name>
+            <description>the postgres password</description>
+        </property>
+
     </parameters>
 
     <global>
@@ -90,13 +105,13 @@
     <join name="copy_wait" to="fork_exec_bulktag"/>
 
     <fork name="fork_exec_bulktag">
-        <path start="join_bulktag_publication"/>
-        <path start="join_bulktag_dataset"/>
-        <path start="join_bulktag_otherresearchproduct"/>
-        <path start="join_bulktag_software"/>
+        <path start="bulktag_publication"/>
+        <path start="bulktag_dataset"/>
+        <path start="bulktag_otherresearchproduct"/>
+        <path start="bulktag_software"/>
     </fork>
 
-    <action name="join_bulktag_publication">
+    <action name="bulktag_publication">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn-cluster</master>
             <mode>cluster</mode>
@@ -123,7 +138,7 @@
         <error to="Kill"/>
     </action>
 
-    <action name="join_bulktag_dataset">
+    <action name="bulktag_dataset">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn-cluster</master>
             <mode>cluster</mode>
@@ -150,7 +165,7 @@
         <error to="Kill"/>
     </action>
 
-    <action name="join_bulktag_otherresearchproduct">
+    <action name="bulktag_otherresearchproduct">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn-cluster</master>
             <mode>cluster</mode>
@@ -177,7 +192,7 @@
         <error to="Kill"/>
     </action>
 
-    <action name="join_bulktag_software">
+    <action name="bulktag_software">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn-cluster</master>
             <mode>cluster</mode>
@@ -205,6 +220,7 @@
     </action>
 
     <join name="wait" to="End"/>
+
 
     <end name="End"/>
 

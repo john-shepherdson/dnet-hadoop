@@ -42,7 +42,9 @@ SELECT p.id,
        CASE WHEN prr2.id IS NULL THEN 0 ELSE prr2.dp END             AS delayedpubs,
        p.callidentifier,
        p.code,
-       p.totalcost
+       p.totalcost,
+       p.fundedamount,
+       p.currency
 FROM ${stats_db_name}.project_tmp p
          LEFT JOIN (SELECT pr.id, count(distinct pr.result) AS np
                     FROM ${stats_db_name}.project_results pr
@@ -114,6 +116,3 @@ FROM ${stats_db_name}.result_projects,
 WHERE result_projects.id = result.id
   AND result.type = 'publication'
   AND project.id = result_projects.project;
-
--- ANALYZE TABLE ${stats_db_name}.project COMPUTE STATISTICS;
--- ANALYZE TABLE ${stats_db_name}.project COMPUTE STATISTICS FOR COLUMNS;

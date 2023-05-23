@@ -25,10 +25,12 @@ object SparkDownloadEBILinks {
   def requestPage(url: String): String = {
     val r = new HttpGet(url)
     val timeout = 60; // seconds
-    val config = RequestConfig.custom()
+    val config = RequestConfig
+      .custom()
       .setConnectTimeout(timeout * 1000)
       .setConnectionRequestTimeout(timeout * 1000)
-      .setSocketTimeout(timeout * 1000).build()
+      .setSocketTimeout(timeout * 1000)
+      .build()
     val client = HttpClientBuilder.create().setDefaultRequestConfig(config).build()
     try {
       var tries = 4
@@ -39,8 +41,7 @@ object SparkDownloadEBILinks {
           println(s"get response with status${response.getStatusLine.getStatusCode}")
           if (response.getStatusLine.getStatusCode > 400) {
             tries -= 1
-          }
-          else
+          } else
             return IOUtils.toString(response.getEntity.getContent)
         } catch {
           case e: Throwable =>
@@ -66,14 +67,19 @@ object SparkDownloadEBILinks {
     val log: Logger = LoggerFactory.getLogger(getClass)
     val MAX_ITEM_PER_PARTITION = 20000
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/ebi/ebi_download_update.json")))
+    val parser = new ArgumentApplicationParser(
+      IOUtils.toString(
+        getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/bio/ebi/ebi_download_update.json")
+      )
+    )
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession
         .builder()
         .config(conf)
         .appName(SparkEBILinksToOaf.getClass.getSimpleName)
-        .master(parser.get("master")).getOrCreate()
+        .master(parser.get("master"))
+        .getOrCreate()
 
     import spark.implicits._
 
@@ -87,22 +93,40 @@ object SparkDownloadEBILinks {
     log.info(s"workingPath  -> $workingPath")
 
     log.info("Getting max pubmedId where the links have already requested")
-    val links: Dataset[EBILinkItem] = spark.read.load(s"$sourcePath/ebi_links_dataset").as[EBILinkItem]
+    val links: Dataset[EBILinkItem] =
+      spark.read.load(s"$sourcePath/ebi_links_dataset").as[EBILinkItem]
     val lastPMIDRequested = links.map(l => l.id).select(max("value")).first.getLong(0)
 
     log.info("Retrieving PMID to request links")
     val pubmed = spark.read.load(s"$sourcePath/baseline_dataset").as[PMArticle]
-    pubmed.map(p => p.getPmid.toLong).where(s"value > $lastPMIDRequested").write.mode(SaveMode.Overwrite).save(s"$workingPath/id_to_request")
+    pubmed
+      .map(p => p.getPmid.toLong)
+      .where(s"value > $lastPMIDRequested")
+      .write
+      .mode(SaveMode.Overwrite)
+      .save(s"$workingPath/id_to_request")
 
     val pmidToReq: Dataset[Long] = spark.read.load(s"$workingPath/id_to_request").as[Long]
 
     val total = pmidToReq.count()
 
-    spark.createDataset(pmidToReq.rdd.repartition((total / MAX_ITEM_PER_PARTITION).toInt).map(pmid => createEBILinks(pmid)).filter(l => l != null)).write.mode(SaveMode.Overwrite).save(s"$workingPath/links_update")
+    spark
+      .createDataset(
+        pmidToReq.rdd
+          .repartition((total / MAX_ITEM_PER_PARTITION).toInt)
+          .map(pmid => createEBILinks(pmid))
+          .filter(l => l != null)
+      )
+      .write
+      .mode(SaveMode.Overwrite)
+      .save(s"$workingPath/links_update")
 
-    val updates: Dataset[EBILinkItem] = spark.read.load(s"$workingPath/links_update").as[EBILinkItem]
+    val updates: Dataset[EBILinkItem] =
+      spark.read.load(s"$workingPath/links_update").as[EBILinkItem]
 
-    links.union(updates).groupByKey(_.id)
+    links
+      .union(updates)
+      .groupByKey(_.id)
       .reduceGroups { (x, y) =>
         if (x == null || x.links == null)
           y
@@ -112,6 +136,10 @@ object SparkDownloadEBILinks {
           x
         else
           y
-      }.map(_._2).write.mode(SaveMode.Overwrite).save(s"$workingPath/links_final")
+      }
+      .map(_._2)
+      .write
+      .mode(SaveMode.Overwrite)
+      .save(s"$workingPath/links_final")
   }
 }

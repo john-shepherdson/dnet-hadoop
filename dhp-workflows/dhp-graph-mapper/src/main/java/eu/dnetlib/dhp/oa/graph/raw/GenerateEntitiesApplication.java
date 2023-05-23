@@ -16,6 +16,9 @@ import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.rdd.RDD;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
@@ -26,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
@@ -33,7 +37,7 @@ import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
 
-public class GenerateEntitiesApplication {
+public class GenerateEntitiesApplication extends AbstractMigrationApplication {
 
 	private static final Logger log = LoggerFactory.getLogger(GenerateEntitiesApplication.class);
 
@@ -109,15 +113,12 @@ public class GenerateEntitiesApplication {
 		final boolean shouldHashId,
 		final Mode mode) {
 
-		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-		final List<String> existingSourcePaths = Arrays
-			.stream(sourcePaths.split(","))
-			.filter(p -> HdfsSupport.exists(p, sc.hadoopConfiguration()))
-			.collect(Collectors.toList());
+		final List<String> existingSourcePaths = listEntityPaths(spark, sourcePaths);
 
 		log.info("Generate entities from files:");
 		existingSourcePaths.forEach(log::info);
 
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 		JavaRDD<Oaf> inputRdd = sc.emptyRDD();
 
 		for (final String sp : existingSourcePaths) {
@@ -127,8 +128,8 @@ public class GenerateEntitiesApplication {
 						.sequenceFile(sp, Text.class, Text.class)
 						.map(k -> new Tuple2<>(k._1().toString(), k._2().toString()))
 						.map(k -> convertToListOaf(k._1(), k._2(), shouldHashId, vocs))
-						.filter(Objects::nonNull)
-						.flatMap(List::iterator));
+						.flatMap(List::iterator)
+						.filter(Objects::nonNull));
 		}
 
 		switch (mode) {
@@ -155,11 +156,11 @@ public class GenerateEntitiesApplication {
 			.saveAsTextFile(targetPath, GzipCodec.class);
 	}
 
-	private static List<Oaf> convertToListOaf(
+	public static List<Oaf> convertToListOaf(
 		final String id,
 		final String s,
 		final boolean shouldHashId,
-		final VocabularyGroup vocs) throws DocumentException {
+		final VocabularyGroup vocs) {
 		final String type = StringUtils.substringAfter(id, ":");
 
 		switch (type.toLowerCase()) {
@@ -200,8 +201,7 @@ public class GenerateEntitiesApplication {
 		try {
 			return OBJECT_MAPPER.readValue(s, clazz);
 		} catch (final Exception e) {
-			log.error("Error parsing object of class: {}", clazz);
-			log.error(s);
+			log.error("Error parsing object of class: {}:\n{}", clazz, s);
 			throw new IllegalArgumentException(e);
 		}
 	}

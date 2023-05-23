@@ -21,8 +21,11 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.actionmanager.createunresolvedentities.model.FOSDataModel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.Subject;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class PrepareFOSSparkJob implements Serializable {
@@ -71,16 +74,30 @@ public class PrepareFOSSparkJob implements Serializable {
 				Result r = new Result();
 				FOSDataModel first = it.next();
 				r.setId(DHPUtils.generateUnresolvedIdentifier(k, DOI));
+
 				HashSet<String> level1 = new HashSet<>();
 				HashSet<String> level2 = new HashSet<>();
 				HashSet<String> level3 = new HashSet<>();
 				addLevels(level1, level2, level3, first);
 				it.forEachRemaining(v -> addLevels(level1, level2, level3, v));
-				List<StructuredProperty> sbjs = new ArrayList<>();
+				List<Subject> sbjs = new ArrayList<>();
 				level1.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID)));
 				level2.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID)));
 				level3.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID)));
 				r.setSubject(sbjs);
+				r
+					.setDataInfo(
+						OafMapperUtils
+							.dataInfo(
+								false, null, true,
+								false,
+								OafMapperUtils
+									.qualifier(
+										ModelConstants.PROVENANCE_ENRICH,
+										null,
+										ModelConstants.DNET_PROVENANCE_ACTIONS,
+										ModelConstants.DNET_PROVENANCE_ACTIONS),
+								null));
 				return r;
 			}, Encoders.bean(Result.class))
 			.write()

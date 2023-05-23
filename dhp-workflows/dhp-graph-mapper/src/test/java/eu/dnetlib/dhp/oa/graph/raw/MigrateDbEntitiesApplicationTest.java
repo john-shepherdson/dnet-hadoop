@@ -1,9 +1,7 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 
@@ -12,8 +10,11 @@ import java.sql.Array;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,16 +29,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 @ExtendWith(MockitoExtension.class)
-public class MigrateDbEntitiesApplicationTest {
+class MigrateDbEntitiesApplicationTest {
 
 	private MigrateDbEntitiesApplication app;
 
@@ -63,22 +60,32 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessDatasource() throws Exception {
-		final List<TypedField> fields = prepareMocks("datasources_resultset_entry.json");
+	void testProcessService() throws Exception {
+		final List<TypedField> fields = prepareMocks("services_resultset_entry.json");
 
-		final List<Oaf> list = app.processDatasource(rs);
+		final List<Oaf> list = app.processService(rs);
 		assertEquals(1, list.size());
 		verifyMocks(fields);
 
 		final Datasource ds = (Datasource) list.get(0);
 		assertValidId(ds.getId());
-		assertValidId(ds.getCollectedfrom().get(0).getKey());
+		ds
+			.getCollectedfrom()
+			.stream()
+			.map(KeyValue::getKey)
+			.forEach(this::assertValidId);
+
+		assertEquals(1, ds.getPid().size());
+		assertEquals("r3d100010218", ds.getPid().get(0).getValue());
+		assertEquals("re3data", ds.getPid().get(0).getQualifier().getClassid());
+		assertEquals("dnet:pid_types", ds.getPid().get(0).getQualifier().getSchemeid());
+
 		assertEquals(getValueAsString("officialname", fields), ds.getOfficialname().getValue());
 		assertEquals(getValueAsString("englishname", fields), ds.getEnglishname().getValue());
-		assertEquals(getValueAsString("contactemail", fields), ds.getContactemail().getValue());
 		assertEquals(getValueAsString("websiteurl", fields), ds.getWebsiteurl().getValue());
+		assertEquals(getValueAsString("logourl", fields), ds.getLogourl());
+		assertEquals(getValueAsString("contactemail", fields), ds.getContactemail().getValue());
 		assertEquals(getValueAsString("namespaceprefix", fields), ds.getNamespaceprefix().getValue());
-		assertEquals(getValueAsString("collectedfromname", fields), ds.getCollectedfrom().get(0).getValue());
 		assertEquals(getValueAsString("officialname", fields), ds.getJournal().getName());
 		assertEquals(getValueAsString("issnPrinted", fields), ds.getJournal().getIssnPrinted());
 		assertEquals(getValueAsString("issnOnline", fields), ds.getJournal().getIssnOnline());
@@ -90,20 +97,102 @@ public class MigrateDbEntitiesApplicationTest {
 		assertEquals("pubsrepository::journal", ds.getDatasourcetypeui().getClassid());
 		assertEquals("dnet:datasource_typologies_ui", ds.getDatasourcetypeui().getSchemeid());
 
+		assertEquals("Data Source", ds.getEosctype().getClassid());
+		assertEquals("Data Source", ds.getEosctype().getClassname());
+		assertEquals("dnet:eosc_types", ds.getEosctype().getSchemeid());
+		assertEquals("dnet:eosc_types", ds.getEosctype().getSchemename());
+
+		assertEquals("Journal archive", ds.getEoscdatasourcetype().getClassid());
+		assertEquals("Journal archive", ds.getEoscdatasourcetype().getClassname());
+		assertEquals("dnet:eosc_datasource_types", ds.getEoscdatasourcetype().getSchemeid());
+		assertEquals("dnet:eosc_datasource_types", ds.getEoscdatasourcetype().getSchemename());
+
+		assertEquals("openaire4.0", ds.getOpenairecompatibility().getClassid());
+		assertEquals("openaire4.0", ds.getOpenairecompatibility().getClassname());
+		assertEquals("dnet:datasourceCompatibilityLevel", ds.getOpenairecompatibility().getSchemeid());
+		assertEquals("dnet:datasourceCompatibilityLevel", ds.getOpenairecompatibility().getSchemename());
+
+		assertEquals(getValueAsDouble("latitude", fields).toString(), ds.getLatitude().getValue());
+		assertEquals(getValueAsDouble("longitude", fields).toString(), ds.getLongitude().getValue());
+		assertEquals(getValueAsString("dateofvalidation", fields), ds.getDateofvalidation());
+
+		assertEquals(getValueAsString("description", fields), ds.getDescription().getValue());
+
+		// TODO assertEquals(getValueAsString("subjects", fields), ds.getSubjects());
+
+		assertEquals("0.0", ds.getOdnumberofitems().getValue());
+		assertEquals(getValueAsString("odnumberofitemsdate", fields), ds.getOdnumberofitemsdate());
+		assertEquals(getValueAsString("odpolicies", fields), ds.getOdpolicies());
+
+		assertEquals(
+			getValueAsList("odlanguages", fields),
+			ds.getOdlanguages().stream().map(Field::getValue).collect(Collectors.toList()));
+		assertEquals(getValueAsList("languages", fields), ds.getLanguages());
+		assertEquals(
+			getValueAsList("accessinfopackage", fields),
+			ds.getAccessinfopackage().stream().map(Field::getValue).collect(Collectors.toList()));
+		assertEquals(getValueAsString("releasestartdate", fields), ds.getReleasestartdate());
+		assertEquals(getValueAsString("releaseenddate", fields), ds.getReleasestartdate());
+		assertEquals(getValueAsString("missionstatementurl", fields), ds.getMissionstatementurl());
+
+		assertEquals(null, ds.getDataprovider());
+		assertEquals(null, ds.getServiceprovider());
+
+		assertEquals(getValueAsString("databaseaccesstype", fields), ds.getDatabaseaccesstype());
+		assertEquals(getValueAsString("datauploadtype", fields), ds.getDatauploadtype());
+		assertEquals(getValueAsString("databaseaccessrestriction", fields), ds.getDatabaseaccessrestriction());
+		assertEquals(getValueAsString("datauploadrestriction", fields), ds.getDatauploadrestriction());
+
+		assertEquals(false, ds.getVersioning().getValue());
+		assertEquals(false, ds.getVersioncontrol());
+
+		assertEquals(getValueAsString("citationguidelineurl", fields), ds.getCitationguidelineurl());
+		assertEquals(getValueAsString("pidsystems", fields), ds.getPidsystems());
+		assertEquals(getValueAsString("certificates", fields), ds.getCertificates());
+
+		assertEquals(getValueAsList("researchentitytypes", fields), ds.getResearchentitytypes());
+
 		assertEquals("National", ds.getJurisdiction().getClassid());
 		assertEquals("eosc:jurisdictions", ds.getJurisdiction().getSchemeid());
 
 		assertTrue(ds.getThematic());
-		assertTrue(ds.getKnowledgegraph());
 
-		assertEquals(1, ds.getContentpolicies().size());
-		assertEquals("Journal article", ds.getContentpolicies().get(0).getClassid());
-		assertEquals("eosc:contentpolicies", ds.getContentpolicies().get(0).getSchemeid());
+		HashSet<String> cpSchemeId = ds
+			.getContentpolicies()
+			.stream()
+			.map(Qualifier::getSchemeid)
+			.collect(Collectors.toCollection(HashSet::new));
+		assertEquals(1, cpSchemeId.size());
+		assertTrue(cpSchemeId.contains("eosc:contentpolicies"));
+		HashSet<String> cpSchemeName = ds
+			.getContentpolicies()
+			.stream()
+			.map(Qualifier::getSchemename)
+			.collect(Collectors.toCollection(HashSet::new));
+		assertEquals(1, cpSchemeName.size());
+		assertTrue(cpSchemeName.contains("eosc:contentpolicies"));
+		assertEquals(2, ds.getContentpolicies().size());
+		assertEquals("Taxonomic classification", ds.getContentpolicies().get(0).getClassid());
+		assertEquals("Resource collection", ds.getContentpolicies().get(1).getClassid());
 
+		assertEquals(getValueAsString("submissionpolicyurl", fields), ds.getSubmissionpolicyurl());
+		assertEquals(getValueAsString("preservationpolicyurl", fields), ds.getPreservationpolicyurl());
+
+		assertEquals(
+			getValueAsList("researchproductaccesspolicies", fields),
+			ds.getResearchproductaccesspolicies());
+		assertEquals(
+			getValueAsList("researchproductmetadataaccesspolicies", fields),
+			ds.getResearchproductmetadataaccesspolicies());
+
+		assertEquals(true, ds.getConsenttermsofuse());
+		assertEquals(true, ds.getFulltextdownload());
+		assertEquals("2022-03-11", ds.getConsenttermsofusedate());
+		assertEquals("2022-03-11", ds.getLastconsenttermsofusedate());
 	}
 
 	@Test
-	public void testProcessProject() throws Exception {
+	void testProcessProject() throws Exception {
 		final List<TypedField> fields = prepareMocks("projects_resultset_entry.json");
 
 		final List<Oaf> list = app.processProject(rs);
@@ -121,7 +210,7 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessOrganization() throws Exception {
+	void testProcessOrganization() throws Exception {
 		final List<TypedField> fields = prepareMocks("organizations_resultset_entry.json");
 
 		final List<Oaf> list = app.processOrganization(rs);
@@ -148,10 +237,10 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessDatasourceOrganization() throws Exception {
+	void testProcessDatasourceOrganization() throws Exception {
 		final List<TypedField> fields = prepareMocks("datasourceorganization_resultset_entry.json");
 
-		final List<Oaf> list = app.processDatasourceOrganization(rs);
+		final List<Oaf> list = app.processServiceOrganization(rs);
 
 		assertEquals(2, list.size());
 		verifyMocks(fields);
@@ -162,10 +251,22 @@ public class MigrateDbEntitiesApplicationTest {
 		assertValidId(r2.getSource());
 		assertEquals(r1.getSource(), r2.getTarget());
 		assertEquals(r2.getSource(), r1.getTarget());
+
+		assertTrue(r1.getSource().startsWith("10|"));
+		assertTrue(r1.getTarget().startsWith("20|"));
+
+		assertEquals(ModelConstants.DATASOURCE_ORGANIZATION, r1.getRelType());
+		assertEquals(ModelConstants.DATASOURCE_ORGANIZATION, r2.getRelType());
+
+		assertEquals(ModelConstants.PROVISION, r1.getSubRelType());
+		assertEquals(ModelConstants.PROVISION, r2.getSubRelType());
+
+		assertEquals(ModelConstants.IS_PROVIDED_BY, r1.getRelClass());
+		assertEquals(ModelConstants.PROVIDES, r2.getRelClass());
 	}
 
 	@Test
-	public void testProcessProjectOrganization() throws Exception {
+	void testProcessProjectOrganization() throws Exception {
 		final List<TypedField> fields = prepareMocks("projectorganization_resultset_entry.json");
 
 		final List<Oaf> list = app.processProjectOrganization(rs);
@@ -181,6 +282,38 @@ public class MigrateDbEntitiesApplicationTest {
 		assertEquals(r2.getSource(), r1.getTarget());
 		assertValidId(r1.getCollectedfrom().get(0).getKey());
 		assertValidId(r2.getCollectedfrom().get(0).getKey());
+
+		assertEquals(ModelConstants.PROJECT_ORGANIZATION, r1.getRelType());
+		assertEquals(ModelConstants.PROJECT_ORGANIZATION, r2.getRelType());
+
+		assertEquals(ModelConstants.PARTICIPATION, r1.getSubRelType());
+		assertEquals(ModelConstants.PARTICIPATION, r2.getSubRelType());
+
+		if (r1.getSource().startsWith("40")) {
+			assertEquals(ModelConstants.HAS_PARTICIPANT, r1.getRelClass());
+			assertEquals(ModelConstants.IS_PARTICIPANT, r2.getRelClass());
+		} else if (r1.getSource().startsWith("20")) {
+			assertEquals(ModelConstants.IS_PARTICIPANT, r1.getRelClass());
+			assertEquals(ModelConstants.HAS_PARTICIPANT, r2.getRelClass());
+		}
+
+		assertNotNull(r1.getProperties());
+		checkProperty(r1, "contribution", "436754.0");
+		checkProperty(r2, "contribution", "436754.0");
+
+		checkProperty(r1, "currency", "EUR");
+		checkProperty(r2, "currency", "EUR");
+	}
+
+	private void checkProperty(Relation r, String property, String value) {
+		final List<KeyValue> p = r
+			.getProperties()
+			.stream()
+			.filter(kv -> kv.getKey().equals(property))
+			.collect(Collectors.toList());
+		assertFalse(p.isEmpty());
+		assertEquals(1, p.size());
+		assertEquals(value, p.get(0).getValue());
 	}
 
 	@Test
@@ -199,7 +332,7 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	@Test
-	public void testProcessClaims_rels() throws Exception {
+	void testProcessClaims_rels() throws Exception {
 		final List<TypedField> fields = prepareMocks("claimsrel_resultset_entry.json");
 
 		final List<Oaf> list = app.processClaims(rs);
@@ -230,9 +363,6 @@ public class MigrateDbEntitiesApplicationTest {
 
 		assertValidId(r1.getCollectedfrom().get(0).getKey());
 		assertValidId(r2.getCollectedfrom().get(0).getKey());
-
-		// System.out.println(new ObjectMapper().writeValueAsString(r1));
-		// System.out.println(new ObjectMapper().writeValueAsString(r2));
 	}
 
 	private List<TypedField> prepareMocks(final String jsonFile) throws IOException, SQLException {
@@ -295,7 +425,7 @@ public class MigrateDbEntitiesApplicationTest {
 						final String[] values = ((List<?>) tf.getValue())
 							.stream()
 							.filter(Objects::nonNull)
-							.map(o -> o.toString())
+							.map(Object::toString)
 							.toArray(String[]::new);
 
 						Mockito.when(arr.getArray()).thenReturn(values);
@@ -353,18 +483,31 @@ public class MigrateDbEntitiesApplicationTest {
 	}
 
 	private Float getValueAsFloat(final String name, final List<TypedField> fields) {
-		return new Float(getValueAs(name, fields).toString());
+		final Object value = getValueAs(name, fields);
+		return value != null ? new Float(value.toString()) : null;
+	}
+
+	private Double getValueAsDouble(final String name, final List<TypedField> fields) {
+		final Object value = getValueAs(name, fields);
+		return value != null ? new Double(value.toString()) : null;
+	}
+
+	private Integer getValueAsInt(final String name, final List<TypedField> fields) {
+		final Object value = getValueAs(name, fields);
+		return value != null ? new Integer(value.toString()) : null;
 	}
 
 	private <T> T getValueAs(final String name, final List<TypedField> fields) {
-		return fields
+		final Optional<T> field = fields
 			.stream()
 			.filter(f -> f.getField().equals(name))
-			.map(TypedField::getValue)
-			.filter(Objects::nonNull)
-			.map(o -> (T) o)
 			.findFirst()
-			.get();
+			.map(TypedField::getValue)
+			.map(o -> (T) o);
+		if (!field.isPresent()) {
+			return null;
+		}
+		return field.get();
 	}
 
 	private List<String> getValueAsList(final String name, final List<TypedField> fields) {

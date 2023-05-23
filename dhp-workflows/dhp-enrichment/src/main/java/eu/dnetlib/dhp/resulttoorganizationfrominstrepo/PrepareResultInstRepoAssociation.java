@@ -102,7 +102,7 @@ public class PrepareResultInstRepoAssociation {
 		String query = "SELECT source datasourceId, target organizationId "
 			+ "FROM ( SELECT id "
 			+ "FROM datasource "
-			+ "WHERE datasourcetype.classid = '"
+			+ "WHERE lower(jurisdiction.classid) = '"
 			+ INSTITUTIONAL_REPO_TYPE
 			+ "' "
 			+ "AND datainfo.deletedbyinference = false  " + blacklisted + " ) d "

@@ -146,6 +146,11 @@ public class PrepareTest {
 					.get(0)
 					.getValue());
 
+		final String doi2 = "unresolved::10.3390/s18072310::doi";
+
+		Assertions.assertEquals(1, tmp.filter(r -> r.getId().equals(doi2)).count());
+		Assertions.assertEquals(1, tmp.filter(r -> r.getId().equals(doi2)).collect().get(0).getInstance().size());
+
 	}
 
 	@Test
@@ -259,59 +264,61 @@ public class PrepareTest {
 				.collect()
 				.contains("8. Economic growth"));
 
-	}
-
-	@Test
-	void test3() throws Exception {
-		final String sourcePath = "/Users/miriam.baglioni/Downloads/doi_fos_results_20_12_2021.csv.gz";
-
-		final String outputPath = workingDir.toString() + "/fos.json";
-		GetFOSSparkJob
-			.main(
-				new String[] {
-					"--isSparkSessionManaged", Boolean.FALSE.toString(),
-					"--sourcePath", sourcePath,
-
-					"-outputPath", outputPath
-
-				});
-
-		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-
-		JavaRDD<FOSDataModel> tmp = sc
-			.textFile(outputPath)
-			.map(item -> OBJECT_MAPPER.readValue(item, FOSDataModel.class));
-
-		tmp.foreach(t -> Assertions.assertTrue(t.getDoi() != null));
-		tmp.foreach(t -> Assertions.assertTrue(t.getLevel1() != null));
-		tmp.foreach(t -> Assertions.assertTrue(t.getLevel2() != null));
-		tmp.foreach(t -> Assertions.assertTrue(t.getLevel3() != null));
+		Assertions.assertEquals(32, tmp.filter(row -> row.getDataInfo() != null).count());
 
 	}
 
-	@Test
-	void test4() throws Exception {
-		final String sourcePath = "/Users/miriam.baglioni/Downloads/doi_sdg_results_20_12_21.csv.gz";
-
-		final String outputPath = workingDir.toString() + "/sdg.json";
-		GetSDGSparkJob
-			.main(
-				new String[] {
-					"--isSparkSessionManaged", Boolean.FALSE.toString(),
-					"--sourcePath", sourcePath,
-
-					"-outputPath", outputPath
-
-				});
-
-		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-
-		JavaRDD<SDGDataModel> tmp = sc
-			.textFile(outputPath)
-			.map(item -> OBJECT_MAPPER.readValue(item, SDGDataModel.class));
-
-		tmp.foreach(t -> Assertions.assertTrue(t.getDoi() != null));
-		tmp.foreach(t -> Assertions.assertTrue(t.getSbj() != null));
-
-	}
+//	@Test
+//	void test3() throws Exception {
+//		final String sourcePath = "/Users/miriam.baglioni/Downloads/doi_fos_results_20_12_2021.csv.gz";
+//
+//		final String outputPath = workingDir.toString() + "/fos.json";
+//		GetFOSSparkJob
+//			.main(
+//				new String[] {
+//					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+//					"--sourcePath", sourcePath,
+//
+//					"-outputPath", outputPath
+//
+//				});
+//
+//		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+//
+//		JavaRDD<FOSDataModel> tmp = sc
+//			.textFile(outputPath)
+//			.map(item -> OBJECT_MAPPER.readValue(item, FOSDataModel.class));
+//
+//		tmp.foreach(t -> Assertions.assertTrue(t.getDoi() != null));
+//		tmp.foreach(t -> Assertions.assertTrue(t.getLevel1() != null));
+//		tmp.foreach(t -> Assertions.assertTrue(t.getLevel2() != null));
+//		tmp.foreach(t -> Assertions.assertTrue(t.getLevel3() != null));
+//
+//	}
+//
+//	@Test
+//	void test4() throws Exception {
+//		final String sourcePath = "/Users/miriam.baglioni/Downloads/doi_sdg_results_20_12_21.csv.gz";
+//
+//		final String outputPath = workingDir.toString() + "/sdg.json";
+//		GetSDGSparkJob
+//			.main(
+//				new String[] {
+//					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+//					"--sourcePath", sourcePath,
+//
+//					"-outputPath", outputPath
+//
+//				});
+//
+//		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+//
+//		JavaRDD<SDGDataModel> tmp = sc
+//			.textFile(outputPath)
+//			.map(item -> OBJECT_MAPPER.readValue(item, SDGDataModel.class));
+//
+//		tmp.foreach(t -> Assertions.assertTrue(t.getDoi() != null));
+//		tmp.foreach(t -> Assertions.assertTrue(t.getSbj() != null));
+//
+//	}
 }

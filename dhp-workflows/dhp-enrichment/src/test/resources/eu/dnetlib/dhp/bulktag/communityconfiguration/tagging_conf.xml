@@ -843,7 +843,138 @@
     </zenodocommunities>
     <organizations/>
 </community>
-    <community id="dariah">
+    <community id="dth">
+        <advancedConstraints>
+            {"criteria":[
+            {"constraint":[
+            {"verb":"equals_caseinsensitive","field":"subject","value":"digital twins"},
+            {"verb":"contains_caseinsensitive","field":"subject","value":"health"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"structural"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"marine"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"avionics"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"battery"}
+            ]},
+            {"constraint":[
+            {"verb":"contains_caseinsensitive","field":"title","value":"Human Digital Twins"}
+            ]},
+            {"constraint":[
+            {"verb":"contains_caseinsensitive","field":"description","value":"Human Digital Twins"}
+            ]},
+            {"constraint":[
+            {"verb":"equals_caseinsensitive","field":"subject","value":"Human Digital Twins"}
+            ]},
+            {"constraint":[
+            {"verb":"contains_caseinsensitive","field":"title","value":"Virtual Human Twin"}
+            ]},
+            {"constraint":[
+            {"verb":"contains_caseinsensitive","field":"description","value":"Virtual Human Twin"}
+            ]},
+            {"constraint":[
+            {"verb":"equals_caseinsensitive","field":"subject","value":"Virtual Human Twin"}
+            ]},
+            {"constraint":[
+            {"verb":"equals_caseinsensitive","field":"subject","value":"digital twin"},
+            {"verb":"contains_caseinsensitive","field":"subject","value":"health"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"structural"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"marine"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"avionics"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"battery"}
+            ]},
+            {"constraint":[
+            {"verb":"contains_caseinsensitive","field":"title","value":"digital twin health"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"Acoustic"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"Health Monitoring"},
+            {"verb":"not_contains_caseinsensitive","field":"title","value":"Health Monitoring"},
+            {"verb":"not_contains_caseinsensitive","field":"title","value":"Health Management"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"Health Assessment"},
+            {"verb":"not_contains_caseinsensitive","field":"title","value":"Health Assessment"},
+            {"verb":"not_contains_caseinsensitive","field":"title","value":"Health status"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"ELECTRICAL ENGINEERING"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"Control and Systems Engineering"}
+            ]}
+            ]}
+<!--            {-->
+<!--            "criteria": [-->
+<!--            {-->
+<!--            "constraint": [-->
+<!--            {-->
+<!--            "verb": "equals_caseinsensitive",-->
+<!--            "field": "subject",-->
+<!--            "value": "North America"-->
+<!--            },-->
+<!--            {-->
+<!--            "verb": "contains",-->
+<!--            "field": "fos",-->
+<!--            "value": "05"-->
+<!--            }-->
+<!--            ]-->
+<!--            },-->
+<!--            {-->
+<!--            "constraint": [-->
+<!--            {-->
+<!--            "verb": "equals_caseinsensitive",-->
+<!--            "field": "subject",-->
+<!--            "value": "North America"-->
+<!--            },-->
+<!--            {-->
+<!--            "verb": "contains",-->
+<!--            "field": "fos",-->
+<!--            "value": "06"-->
+<!--            }-->
+<!--            ]-->
+<!--            },-->
+<!--            {-->
+<!--            "constraint": [-->
+<!--            {-->
+<!--            "verb": "equals_caseinsensitive",-->
+<!--            "field": "subject",-->
+<!--            "value": "Mexico"-->
+<!--            },-->
+<!--            {-->
+<!--            "verb": "equals_caseinsensitive",-->
+<!--            "field": "subject",-->
+<!--            "value": "United States"-->
+<!--            },-->
+<!--            {-->
+<!--            "verb": "equals_caseinsensitive",-->
+<!--            "field": "subject",-->
+<!--            "value": "Canada"-->
+<!--            },-->
+<!--            {-->
+<!--            "verb": "contains",-->
+<!--            "field": "fos",-->
+<!--            "value": "05"-->
+<!--            }-->
+<!--            ]-->
+<!--            },-->
+<!--            {-->
+<!--            "constraint": [-->
+<!--            {-->
+<!--            "verb": "equals_caseinsensitive",-->
+<!--            "field": "subject",-->
+<!--            "value": "Mexico"-->
+<!--            },-->
+<!--            {-->
+<!--            "verb": "equals_caseinsensitive",-->
+<!--            "field": "subject",-->
+<!--            "value": "United States"-->
+<!--            },-->
+<!--            {-->
+<!--            "verb": "equals_caseinsensitive",-->
+<!--            "field": "subject",-->
+<!--            "value": "Canada"-->
+<!--            },-->
+<!--            {-->
+<!--            "verb": "contains",-->
+<!--            "field": "fos",-->
+<!--            "value": "06"-->
+<!--            }-->
+<!--            ]-->
+<!--            }-->
+<!--            ]-->
+<!--            }-->
+
+        </advancedConstraints>
     <subjects/>
     <datasources>
         <datasource>
@@ -1174,7 +1305,9 @@
     </zenodocommunities>
     <organizations/>
 </community>
+
     <community id="euromarine">
+
     <subjects/>
     <datasources/>
     <zenodocommunities/>
@@ -1193,6 +1326,9 @@
     <organizations/>
 </community>
     <community id="science-innovation-policy">
+        <advancedConstraints>{"criteria":[{"constraint":[{"verb":"equals_caseinsensitive","field":"subject","value":"ciencias de la comunicación"},
+            {"verb":"equals","field":"subject","value":"Miriam"}]},
+            {"constraint":[{"verb":"equals","field":"subject","value":"miriam"}]}]}</advancedConstraints>
     <subjects>
         <subject>Sustainability-oriented science policy</subject>
         <subject> STI policies</subject>
@@ -1314,81 +1450,81 @@
     <datasources>
         <datasource>
             <openaireId>opendoar____::358aee4cc897452c00244351e4d91f69</openaireId>
-            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"COVID-19"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"SARS-CoV-2"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"2019-nCoV"}]}]}
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}}]}
             </selcriteria>
         </datasource>
         <datasource>
             <openaireId>re3data_____::7b0ad08687b2c960d5aeef06f811d5e6</openaireId>
-            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"COVID-19"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"SARS-CoV-2"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"2019-nCoV"}]}]}
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
             </selcriteria>
         </datasource>
         <datasource>
             <openaireId>driver______::bee53aa31dc2cbb538c10c2b65fa5824</openaireId>
-            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"COVID-19"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"SARS-CoV-2"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"2019-nCoV"}]}]}
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
             </selcriteria>
         </datasource>
         <datasource>
             <openaireId>openaire____::437f4b072b1aa198adcbc35910ff3b98</openaireId>
-            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"COVID-19"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"SARS-CoV-2"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"2019-nCoV"}]}]}
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
             </selcriteria>
         </datasource>
         <datasource>
             <openaireId>openaire____::081b82f96300b6a6e3d282bad31cb6e2</openaireId>
-            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"COVID-19"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"SARS-CoV-2"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"2019-nCoV"}]}]}
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
             </selcriteria>
         </datasource>
         <datasource>
             <openaireId>openaire____::9e3be59865b2c1c335d32dae2fe7b254</openaireId>
-            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"COVID-19"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"SARS-CoV-2"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"2019-nCoV"}]}]}
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
             </selcriteria>
         </datasource>
         <datasource>
             <openaireId>opendoar____::8b6dd7db9af49e67306feb59a8bdc52c</openaireId>
-            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"COVID-19"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"SARS-CoV-2"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"2019-nCoV"}]}]}
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
             </selcriteria>
         </datasource>
         <datasource>
             <openaireId>share_______::4719356ec8d7d55d3feb384ce879ad6c</openaireId>
-            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"COVID-19"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"SARS-CoV-2"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"2019-nCoV"}]}]}
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
             </selcriteria>
         </datasource>
         <datasource>
             <openaireId>share_______::bbd802baad85d1fd440f32a7a3a2c2b1</openaireId>
-            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"COVID-19"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"SARS-CoV-2"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"2019-nCoV"}]}]}
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
             </selcriteria>
         </datasource>
         <datasource>
             <openaireId>opendoar____::6f4922f45568161a8cdf4ad2299f6d23</openaireId>
-            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"COVID-19"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"SARS-CoV-2"}]},
-                {"constraint":[{"verb":"contains_ignorecase","field":"title","value":"2019-nCoV"}]}]}
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
             </selcriteria>
         </datasource>
         <datasource>
             <openaireId>re3data_____::7980778c78fb4cf0fab13ce2159030dc</openaireId>
-            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"SARS-CoV-2"}]},{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"COVID-19"}]},{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"2019-nCov"}]}]}</selcriteria>
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCov"}]}]}</selcriteria>
         </datasource>
         <datasource>
             <openaireId>re3data_____::978378def740bbf2bfb420de868c460b</openaireId>
-            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"SARS-CoV-2"}]},{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"COVID-19"}]},{"constraint":[{"verb":"contains_ignorecase","field":"title","value":"2019-nCov"}]}]}</selcriteria>
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCov"}]}]}</selcriteria>
         </datasource>
     </datasources>
     <zenodocommunities>

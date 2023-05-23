@@ -497,6 +497,7 @@ dnet:publication_resource @=@ 0044 @=@ Graduate diploma
 dnet:publication_resource @=@ 0044 @=@ Undergraduate diploma
 dnet:publication_resource @=@ 0000 @=@ UNKNOWN
 dnet:publication_resource @=@ 0042 @=@ EGI Virtual Appliance
+dnet:publication_resource @=@ 0048 @=@ RO-crate
 dnet:languages @=@ abk @=@ ab
 dnet:languages @=@ aar @=@ aa
 dnet:languages @=@ afr @=@ af
@@ -1243,3 +1244,5 @@ dnet:relation_relClass @=@ IsSupplementedBy @=@ isSupplementedBy
 dnet:relation_relClass @=@ IsRelatedTo @=@ isRelatedTo
 dnet:relation_subRelType @=@ relationship @=@ publicationDataset
 dnet:provenanceActions @=@ iis @=@ erroneous label to be cleaned
+FOS @=@ 0101 mathematics @=@ FOS: Mathematics
+FOS @=@ 0102 computer and information sciences @=@ FOS: Computer and information sciences

@@ -126,13 +126,13 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--actionSetId</arg><arg>${actionSetId}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--numPartitions</arg><arg>8000</arg>
+            <arg>--numPartitions</arg><arg>15000</arg>
         </spark>
         <ok to="WhitelistSimRels"/>
         <error to="Kill"/>
@@ -153,14 +153,14 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--actionSetId</arg><arg>${actionSetId}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--whiteListPath</arg><arg>${whiteListPath}</arg>
-            <arg>--numPartitions</arg><arg>8000</arg>
+            <arg>--numPartitions</arg><arg>15000</arg>
         </spark>
         <ok to="CreateMergeRel"/>
         <error to="Kill"/>
@@ -181,7 +181,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
@@ -208,7 +208,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
@@ -235,13 +235,13 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
-            <arg>--numPartitions</arg><arg>8000</arg>
+            <arg>--numPartitions</arg><arg>15000</arg>
         </spark>
         <ok to="CreateOrgsDedupRecord"/>
         <error to="Kill"/>
@@ -288,7 +288,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=10000
             </spark-opts>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
@@ -314,7 +314,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=10000
             </spark-opts>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>

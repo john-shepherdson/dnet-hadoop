@@ -14,7 +14,8 @@ import org.slf4j.{Logger, LoggerFactory}
 object SparkApplyHostedByMapToDatasource {
 
   def applyHBtoDats(join: Dataset[EntityInfo], dats: Dataset[Datasource]): Dataset[Datasource] = {
-    dats.joinWith(join, dats.col("id").equalTo(join.col("hostedById")), "left")
+    dats
+      .joinWith(join, dats.col("id").equalTo(join.col("hostedById")), "left")
       .map(t2 => {
         val d: Datasource = t2._1
         if (t2._2 != null) {
@@ -31,14 +32,21 @@ object SparkApplyHostedByMapToDatasource {
 
     val logger: Logger = LoggerFactory.getLogger(getClass)
     val conf: SparkConf = new SparkConf()
-    val parser = new ArgumentApplicationParser(IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/hostedbymap/hostedby_apply_params.json")))
+    val parser = new ArgumentApplicationParser(
+      IOUtils.toString(
+        getClass.getResourceAsStream(
+          "/eu/dnetlib/dhp/oa/graph/hostedbymap/hostedby_apply_params.json"
+        )
+      )
+    )
     parser.parseArgument(args)
     val spark: SparkSession =
       SparkSession
         .builder()
         .config(conf)
         .appName(getClass.getSimpleName)
-        .master(parser.get("master")).getOrCreate()
+        .master(parser.get("master"))
+        .getOrCreate()
 
     val graphPath = parser.get("graphPath")
     val outputPath = parser.get("outputPath")
@@ -51,20 +59,27 @@ object SparkApplyHostedByMapToDatasource {
 
     val mapper = new ObjectMapper()
 
-    val dats: Dataset[Datasource] = spark.read.textFile(graphPath + "/datasource")
+    val dats: Dataset[Datasource] = spark.read
+      .textFile(graphPath + "/datasource")
       .map(r => mapper.readValue(r, classOf[Datasource]))
 
-    val pinfo: Dataset[EntityInfo] = Aggregators.datasourceToSingleId(spark.read.textFile(preparedInfoPath)
-      .map(ei => mapper.readValue(ei, classOf[EntityInfo])))
+    val pinfo: Dataset[EntityInfo] = Aggregators.datasourceToSingleId(
+      spark.read
+        .textFile(preparedInfoPath)
+        .map(ei => mapper.readValue(ei, classOf[EntityInfo]))
+    )
 
-    applyHBtoDats(pinfo, dats).write.mode(SaveMode.Overwrite).option("compression", "gzip").json(outputPath)
+    applyHBtoDats(pinfo, dats).write
+      .mode(SaveMode.Overwrite)
+      .option("compression", "gzip")
+      .json(outputPath)
 
-    spark.read.textFile(outputPath)
+    spark.read
+      .textFile(outputPath)
       .write
       .mode(SaveMode.Overwrite)
       .option("compression", "gzip")
       .text(graphPath + "/datasource")
   }
-
 
 }

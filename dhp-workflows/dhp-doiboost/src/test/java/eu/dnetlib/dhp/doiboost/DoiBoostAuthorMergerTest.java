@@ -495,4 +495,39 @@ public class DoiBoostAuthorMergerTest {
 									&& pid.getQualifier().getClassid().equals(ModelConstants.ORCID_PENDING))));
 
 	}
+
+	@Test
+	public void mergeTestMatchOneill() {
+
+		authors = readSample(publicationsBasePath + "/matching_authors_Oneill.json", Publication.class)
+			.stream()
+			.map(p -> p._2().getAuthor())
+			.collect(Collectors.toList());
+
+		for (List<Author> authors1 : authors) {
+			System.out.println("List " + (authors.indexOf(authors1) + 1));
+			for (Author author : authors1) {
+				System.out.println(authorToString(author));
+			}
+		}
+
+		List<Author> merge = DoiBoostAuthorMerger.merge(authors, true);
+
+		System.out.println("Merge ");
+		for (Author author : merge) {
+			System.out.println(authorToString(author));
+		}
+
+		Assertions.assertEquals(10, merge.size());
+
+		Assertions.assertEquals(3, merge.stream().filter(a -> a.getPid() != null).count());
+
+		merge.stream().filter(a -> a.getPid() != null)
+				.forEach(a -> Assertions.assertTrue(a.getPid().stream().allMatch(p -> p.getQualifier().getClassid().equals("orcid"))));
+
+		Assertions.assertEquals("0000-0002-4333-2748", merge.stream().filter(a -> a.getSurname().equalsIgnoreCase("o'neill")).collect(Collectors.toList()).get(0).getPid().get(0).getValue());
+
+		
+
+	}
 }

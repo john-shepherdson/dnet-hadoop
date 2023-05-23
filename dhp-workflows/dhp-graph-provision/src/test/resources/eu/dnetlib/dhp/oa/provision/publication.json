@@ -1,4 +1,209 @@
 {
+  "eoscifguidelines": [
+    {
+      "code" : "EOSC::Jupyter Notebook",
+      "label" : "EOSC::Jupyter Notebook",
+      "url" : "",
+      "semanticRelation" : "compliesWith"
+    }
+  ],
+  "measures": [
+    {
+      "id": "influence",
+      "unit": [
+        {
+          "key": "score",
+          "value": "5.06690394631e-09",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        },
+        {
+          "key": "class",
+          "value": "C",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "popularity_alt",
+      "unit": [
+        {
+          "key": "score",
+          "value": "0.0",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        },
+        {
+          "key": "class",
+          "value": "C",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "popularity",
+      "unit": [
+        {
+          "key": "score",
+          "value": "3.11855618382e-09",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        },
+        {
+          "key": "class",
+          "value": "C",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "influence_alt",
+      "unit": [
+        {
+          "key": "score",
+          "value": "0.0",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        },
+        {
+          "key": "class",
+          "value": "C",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "impulse",
+      "unit": [
+        {
+          "key": "score",
+          "value": "0.0",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        },
+        {
+          "key": "class",
+          "value": "C",
+          "dataInfo": {
+            "invisible": false,
+            "inferred": true,
+            "deletedbyinference": false,
+            "trust": "",
+            "inferenceprovenance": "update",
+            "provenanceaction": {
+              "classid": "measure:bip",
+              "classname": "Inferred by OpenAIRE",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            }
+          }
+        }
+      ]
+    }
+  ],
   "author": [
     {
       "affiliation": [],
@@ -284,6 +489,35 @@
   "id": "50|CSC_________::0000ec4dd9df012feaafa77e71a0fb4c",
   "instance": [
     {
+      "measures": [
+        {
+          "id": "influence",
+          "unit": [
+            {
+              "key": "score",
+              "value": "1.00889953098e-08"
+            }
+          ]
+        },
+        {
+          "id": "popularity_alt",
+          "unit": [
+            {
+              "key": "score",
+              "value": "30.6576853333"
+            }
+          ]
+        },
+        {
+          "id": "popularity",
+          "unit": [
+            {
+              "key": "score",
+              "value": "4.62970429725e-08"
+            }
+          ]
+        }
+      ],
       "pid": [
         {
           "dataInfo": {
@@ -387,13 +621,19 @@
           "trust": ""
         },
         "key": "10|CSC_________::a2b9ce8435390bcbfc05f3cae3948747",
-        "value": "VIRTA"
+        "value": "Bulletin of the National Technical University \"KhPI\" A series of \"Information and Modeling\""
       },
       "instancetype": {
         "classid": "0001",
         "classname": "Article",
         "schemeid": "dnet:dataCite_resource",
         "schemename": "dnet:dataCite_resource"
+      },
+      "refereed": {
+        "classid": "0001",
+        "classname": "peerReviewed",
+        "schemeid": "dnet:review_levels",
+        "schemename": "dnet:review_levels"
       },
       "license": {
         "dataInfo": {
@@ -527,6 +767,12 @@
         "schemeid": "dnet:dataCite_resource",
         "schemename": "dnet:dataCite_resource"
       },
+      "refereed": {
+        "classid": "0000",
+        "classname": "UNKNOWN",
+        "schemeid": "dnet:review_levels",
+        "schemename": "dnet:review_levels"
+      },
       "license": {
         "dataInfo": {
           "deletedbyinference": false,
@@ -658,6 +904,12 @@
         "classname": "Article",
         "schemeid": "dnet:dataCite_resource",
         "schemename": "dnet:dataCite_resource"
+      },
+      "refereed": {
+        "classid": "0002",
+        "classname": "nonPeerReviewed",
+        "schemeid": "dnet:review_levels",
+        "schemename": "dnet:review_levels"
       },
       "license": {
         "dataInfo": {
@@ -791,6 +1043,12 @@
         "schemeid": "dnet:dataCite_resource",
         "schemename": "dnet:dataCite_resource"
       },
+      "refereed": {
+        "classid": "0001",
+        "classname": "peerReviewed",
+        "schemeid": "dnet:review_levels",
+        "schemename": "dnet:review_levels"
+      },
       "license": {
         "dataInfo": {
           "deletedbyinference": false,
@@ -808,7 +1066,7 @@
         "value": ""
       },
       "url": [
-        "http://dx.doi.org/10.1109/TED.2018.2853552",
+        "http://dx.doi.org/10.1109/TED.2018.2853551",
         "http://dx.doi.org/10.1109/TED.2018.2853554"
       ]
     },
@@ -1230,7 +1488,7 @@
     "issnLinking": "",
     "issnOnline": "",
     "issnPrinted": "0018-9383",
-    "name": "IEEE Transactions on Electron Devices",
+    "name": "IEEE Transactions on \"Electron Devices\"",
     "sp": "3884",
     "vol": "65"
   },
@@ -1299,7 +1557,7 @@
     "schemeid": "dnet:result_typologies",
     "schemename": "dnet:result_typologies"
   },
-  "source": [],
+  "source": [ { "value" : "Bulletin of the National Technical University \"KhPI\" A series of \"Information and Modeling\"; № 1 (3) (2020):" } ],
   "subject": [
     {
       "dataInfo": {
@@ -1655,5 +1913,37 @@
       },
       "value": "Understanding Electromigration in Cu-CNT Composite Interconnects A Multiscale Electrothermal Simulation Study"
     }
-  ]
+  ],
+  "processingchargeamount": {
+    "value": "1721.47",
+    "dataInfo": {
+      "invisible": true,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.9",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:datasetarchive",
+        "classname": "sysimport:crosswalk:datasetarchive",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "processingchargecurrency": {
+    "value": "EUR",
+    "dataInfo": {
+      "invisible": true,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.9",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:datasetarchive",
+        "classname": "sysimport:crosswalk:datasetarchive",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  }
 }

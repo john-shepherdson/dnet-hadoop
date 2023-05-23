@@ -1,0 +1,100 @@
+<record>
+    <result xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <header>
+            <dri:objIdentifier>doi_________::07fdccabd77830e3caccf0b33c083f1b</dri:objIdentifier>
+            <dri:dateOfCollection>2022-11-25T01:08:31Z</dri:dateOfCollection>
+            <dri:status>under curation</dri:status>
+            <counters />
+        </header>
+        <metadata>
+            <oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf http://namespace.openaire.eu/oaf http://www.openaire.eu/schema/0.2/oaf-0.2.xsd">
+                <oaf:result>
+                    <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title">Monkeypox Knowledge Graph: A semantic resource embedding biological and chemical entities</title>
+                    <creator rank="1" name="" surname="">Karki, Reagon</creator>
+                    <creator rank="2" name="" surname="">Andrea, Zaliani</creator>
+                    <creator rank="3" name="" surname="">Gadiya, Yojana</creator>
+                    <creator rank="4" name="" surname="">Gribbon, Philip</creator>
+                    <dateofacceptance />
+                    <resulttype classid="software" classname="software" schemeid="dnet:result_typologies" schemename="dnet:result_typologies" />
+                    <language classid="" classname="" schemeid="dnet:languages" schemename="dnet:languages" />
+                    <description><p>The Monkeypox KG is built using viral and human proteins reported in different resources. Additionally, the KG represents chemicals tested against Monkeypox and their targets, associated biological processes, molecular functions, diseases and side effects.</p> <p><strong>KG status</strong></p> <p>Version 1 stats:</p> <ul> <li>Number of Nodes: 8235</li> <li>Number of Edges: 40422</li> </ul> <p>Version 2 stats (2nd September) :</p> <ul> <li>Number of Nodes: 9129</li> <li>Number of Edges: 44568</li> </ul> <p>Please check the graph.ipynb for understanding step wise process of KG generation and KG statistics. The KG has been exported to formats such as graphml, sif and so on for visualizations in other platforms. For example, the graphml file can be imported to Cytoscape directly. These files are located in &#39;data\export&#39; folder.</p> <p></p></description>
+                    <country classid="" classname="" schemeid="" schemename="" />
+                    <subject classid="" classname="" schemeid="" schemename="" />
+                    <relevantdate classid="" classname="" schemeid="" schemename="" />
+                    <publisher>Zenodo</publisher>
+                    <embargoenddate />
+                    <journal issn="" eissn="" lissn="" ep="" iss="" sp="" vol="" />
+                    <source />
+                    <fulltext />
+                    <format />
+                    <storagedate />
+                    <resourcetype classid="" classname="" schemeid="" schemename="" />
+                    <device />
+                    <size />
+                    <version />
+                    <lastmetadataupdate />
+                    <metadataversionnumber />
+                    <documentationUrl />
+                    <codeRepositoryUrl />
+                    <programmingLanguage classid="" classname="" schemeid="" schemename="" />
+                    <contactperson />
+                    <contactgroup />
+                    <tool />
+                    <originalId>oai:zenodo.org:7351393</originalId>
+                    <collectedfrom name="ZENODO" id="opendoar____::358aee4cc897452c00244351e4d91f69" />
+                    <pid classid="oai" classname="Open Archives Initiative" schemeid="dnet:pid_types" schemename="dnet:pid_types">oai:zenodo.org:7351393</pid>
+                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types">10.5281/zenodo.7351393</pid>
+                    <bestaccessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                    <datainfo>
+                        <inferred>false</inferred>
+                        <deletedbyinference>false</deletedbyinference>
+                        <trust>0.9</trust>
+                        <inferenceprovenance />
+                        <provenanceaction classid="user:insert" classname="user:insert" schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions" />
+                    </datainfo>
+                    <rels>
+                        <rel inferred="false" trust="0.9" inferenceprovenance="" provenanceaction="user:claim">
+                            <to class="isProducedBy" scheme="dnet:result_project_relations" type="project">corda__h2020::256485716fdb9f5ca69007b7ca5a072b</to>
+                            <code>101017536</code>
+                            <acronym>EOSC Future</acronym>
+                            <title>EOSC Future</title>
+                            <contracttype classid="" classname="" schemeid="" schemename="" />
+                            <funding>
+                                <funder id="ec__________::EC" shortname="EC" name="European Commission" jurisdiction="" />
+                                <funding_level_0 name="H2020">ec__________::EC::H2020</funding_level_0>
+                            </funding>
+                            <websiteurl />
+                        </rel>
+                        <rel inferred="false" trust="0.9" inferenceprovenance="" provenanceaction="user:claim">
+                            <to class="isProducedBy" scheme="dnet:result_project_relations" type="project">corda__h2020::4a3254eac2997eee0a9dcb7a7daedb81</to>
+                            <code>101046203</code>
+                            <acronym>BY-COVID</acronym>
+                            <title>Beyond COVID</title>
+                            <contracttype classid="" classname="" schemeid="" schemename="" />
+                            <funding>
+                                <funder id="ec__________::EC" shortname="EC" name="European Commission" jurisdiction="" />
+                                <funding_level_0 name="Horizon Europe Framework Programme - HORIZON-RIA\HORIZON Action Grant Budget-Based">ec__________::EC::Horizon Europe Framework Programme - HORIZON-RIA\HORIZON Action Grant Budget-Based</funding_level_0>
+                            </funding>
+                            <websiteurl />
+                        </rel>
+                    </rels>
+                    <children>
+                        <instance id="od______2659::db2bc6381545f80dc9feec808a173ec0">
+                            <instancetype classid="0029" classname="Software" schemeid="dnet:publication_resource" schemename="dnet:publication_resource" />
+                            <collectedfrom name="ZENODO" id="opendoar____::358aee4cc897452c00244351e4d91f69" />
+                            <hostedby name="ZENODO" id="opendoar____::358aee4cc897452c00244351e4d91f69" />
+                            <accessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                            <dateofacceptance />
+                            <webresource>
+                                <url>https://zenodo.org/record/7351393</url>
+                            </webresource>
+                        </instance>
+                    </children>
+                </oaf:result>
+            </oaf:entity>
+        </metadata>
+    </result>
+</record>

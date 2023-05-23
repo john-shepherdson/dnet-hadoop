@@ -72,7 +72,7 @@ public class ProduceTest {
 
 		JavaRDD<Result> tmp = getResultJavaRDD();
 
-		List<StructuredProperty> sbjs = tmp
+		List<Subject> sbjs = tmp
 			.filter(row -> row.getSubject() != null && row.getSubject().size() > 0)
 			.flatMap(row -> row.getSubject().iterator())
 			.collect();
@@ -169,7 +169,7 @@ public class ProduceTest {
 					.getSubject()
 					.size());
 
-		List<StructuredProperty> sbjs = tmp
+		List<Subject> sbjs = tmp
 			.filter(row -> row.getId().equals(doi))
 			.flatMap(row -> row.getSubject().iterator())
 			.collect();
@@ -196,6 +196,9 @@ public class ProduceTest {
 		final String doi = "unresolved::10.3390/s18072310::doi";
 		JavaRDD<Result> tmp = getResultJavaRDD();
 
+		tmp
+			.filter(row -> row.getId().equals(doi))
+			.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
 		Assertions
 			.assertEquals(
 				3, tmp
@@ -244,6 +247,68 @@ public class ProduceTest {
 					.getUnit()
 					.get(0)
 					.getValue());
+
+		Assertions
+			.assertEquals(
+				"10.3390/s18072310",
+				tmp
+					.filter(row -> row.getId().equals(doi))
+					.collect()
+					.get(0)
+					.getInstance()
+					.get(0)
+					.getPid()
+					.get(0)
+					.getValue()
+					.toLowerCase());
+
+		Assertions
+			.assertEquals(
+				"doi",
+				tmp
+					.filter(row -> row.getId().equals(doi))
+					.collect()
+					.get(0)
+					.getInstance()
+					.get(0)
+					.getPid()
+					.get(0)
+					.getQualifier()
+					.getClassid());
+
+		Assertions
+			.assertEquals(
+				"Digital Object Identifier",
+				tmp
+					.filter(row -> row.getId().equals(doi))
+					.collect()
+					.get(0)
+					.getInstance()
+					.get(0)
+					.getPid()
+					.get(0)
+					.getQualifier()
+					.getClassname());
+
+	}
+
+	@Test
+	void produceTestMeasures() throws Exception {
+		final String doi = "unresolved::10.3390/s18072310::doi";
+		JavaRDD<Result> tmp = getResultJavaRDD();
+
+		List<StructuredProperty> mes = tmp
+			.filter(row -> row.getInstance() != null && row.getInstance().size() > 0)
+			.flatMap(row -> row.getInstance().iterator())
+			.flatMap(i -> i.getPid().iterator())
+			.collect();
+
+		Assertions.assertEquals(86, mes.size());
+
+		tmp
+			.filter(row -> row.getInstance() != null && row.getInstance().size() > 0)
+			.foreach(
+				e -> Assertions.assertEquals("sysimport:enrich", e.getDataInfo().getProvenanceaction().getClassid()));
 
 	}
 
@@ -331,7 +396,7 @@ public class ProduceTest {
 					.getSubject()
 					.size());
 
-		List<StructuredProperty> sbjs = tmp
+		List<Subject> sbjs = tmp
 			.filter(row -> row.getId().equals(doi))
 			.flatMap(row -> row.getSubject().iterator())
 			.collect();
@@ -443,7 +508,7 @@ public class ProduceTest {
 					.getSubject()
 					.size());
 
-		List<StructuredProperty> sbjs = tmp
+		List<Subject> sbjs = tmp
 			.filter(row -> row.getId().equals(doi))
 			.flatMap(row -> row.getSubject().iterator())
 			.collect();
@@ -472,7 +537,7 @@ public class ProduceTest {
 
 		JavaRDD<Result> tmp = getResultJavaRDDPlusSDG();
 
-		List<StructuredProperty> sbjs_sdg = tmp
+		List<Subject> sbjs_sdg = tmp
 			.filter(row -> row.getSubject() != null && row.getSubject().size() > 0)
 			.flatMap(row -> row.getSubject().iterator())
 			.filter(sbj -> sbj.getQualifier().getClassid().equals(Constants.SDG_CLASS_ID))
