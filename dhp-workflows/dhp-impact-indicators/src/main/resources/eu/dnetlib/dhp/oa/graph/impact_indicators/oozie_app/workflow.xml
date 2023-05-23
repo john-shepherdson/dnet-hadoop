@@ -81,7 +81,7 @@
 		</spark>
 
 		<!-- Do this after finishing okay -->
-		<ok to="end" />
+		<ok to="non-iterative-rankings" />
 		<!-- Go there if we have an error -->
 		<error to="openaire-graph-error" />
 
@@ -335,7 +335,8 @@
 	</action>
 
 	<!-- JOIN ITERATIVE METHODS AND THEN END -->
-	<join name="join-iterative-rankings" to="get-file-names"/>
+	<join name="join-iterative-rankings" to="end">
+	<!-- to="get-file-names"/> --> 
 
 
 	<!-- This will be a shell action that will output key-value pairs for output files -->
