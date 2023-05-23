@@ -335,7 +335,7 @@
 	</action>
 
 	<!-- JOIN ITERATIVE METHODS AND THEN END -->
-	<join name="join-iterative-rankings" to="end">
+	<join name="join-iterative-rankings" to="end" />
 	<!-- to="get-file-names"/> --> 
 
 
