@@ -196,15 +196,19 @@ oa_objects_df.printSchema()
 # cited_by_df.unpersist(True)
 
 # Show total num of unique citations
+'''
 num_unique_citations = citations_df.count()
 print ("Total unique citations: " + str(num_unique_citations))
+'''
 ############################################################################################################################
 # 3. Get any potentially missing 'citing' papers from references (these are dangling nodes w/o any outgoing references)
 dangling_nodes = oa_objects_df.join(citations_df.select('citing').distinct(), citations_df.citing == oa_objects_df.id, 'left_anti')\
 			      .select(F.col('id').alias('citing')).withColumn('cited', F.array([F.lit("0")])).repartition(num_partitions, 'citing')
 # Count dangling nodes
+'''
 dangling_num = dangling_nodes.count()
 print ("Number of dangling nodes: " + str(dangling_num))
+'''
 # print ("Dangling nodes sample:")
 # dangling_nodes.show(10, False)
 ############################################################################################################################
@@ -213,8 +217,10 @@ graph = citations_df.groupBy('citing').agg(F.collect_set('cited').alias('cited')
 # Free space
 citations_df.unpersist(True)
 
+'''
 num_nodes = graph.count()
 print ("Entries in graph before dangling nodes:"  + str(num_nodes))
+'''
 # print ("Sample in graph: ")
 # graph.show(10, False)
 
