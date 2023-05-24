@@ -109,7 +109,7 @@ public class CommunityConfigurationFactory {
 			return new SelectionConstraints();
 		}
 		SelectionConstraints selectionConstraints = new Gson()
-				.fromJson(constsNode.getText(), SelectionConstraints.class);
+			.fromJson(constsNode.getText(), SelectionConstraints.class);
 
 		selectionConstraints.setSelection(resolver);
 		log.info("number of selection constraints set " + selectionConstraints.getCriteria().size());

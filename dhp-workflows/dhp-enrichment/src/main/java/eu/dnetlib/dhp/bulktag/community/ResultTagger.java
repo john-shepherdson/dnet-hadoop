@@ -83,18 +83,18 @@ public class ResultTagger implements Serializable {
 		final Set<String> removeCommunities = new HashSet<>();
 
 		conf
-				.getRemoveConstraintsMap()
-				.keySet()
-				.forEach(communityId -> {
-					if (conf.getRemoveConstraintsMap().get(communityId).getCriteria() != null &&
-							conf
-									.getRemoveConstraintsMap()
-									.get(communityId)
-									.getCriteria()
-									.stream()
-									.anyMatch(crit -> crit.verifyCriteria(param)))
-						removeCommunities.add(communityId);
-				});
+			.getRemoveConstraintsMap()
+			.keySet()
+			.forEach(communityId -> {
+				if (conf.getRemoveConstraintsMap().get(communityId).getCriteria() != null &&
+					conf
+						.getRemoveConstraintsMap()
+						.get(communityId)
+						.getCriteria()
+						.stream()
+						.anyMatch(crit -> crit.verifyCriteria(param)))
+					removeCommunities.add(communityId);
+			});
 
 		// communities contains all the communities to be added as context for the result
 		final Set<String> communities = new HashSet<>();
@@ -182,7 +182,7 @@ public class ResultTagger implements Serializable {
 			.keySet()
 			.forEach(communityId -> {
 				if (!removeCommunities.contains(communityId) &&
-						conf.getSelectionConstraintsMap().get(communityId).getCriteria() != null &&
+					conf.getSelectionConstraintsMap().get(communityId).getCriteria() != null &&
 					conf
 						.getSelectionConstraintsMap()
 						.get(communityId)

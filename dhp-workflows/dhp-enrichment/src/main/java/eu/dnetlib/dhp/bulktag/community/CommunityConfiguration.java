@@ -28,7 +28,7 @@ public class CommunityConfiguration implements Serializable {
 	private Map<String, SelectionConstraints> selectionConstraintsMap = new HashMap<>();
 	// map eosc datasource -> communityid
 	private Map<String, List<Pair<String, SelectionConstraints>>> eoscDatasourceMap = new HashMap<>();
-    //map communityid -> remove constraints
+	// map communityid -> remove constraints
 	private Map<String, SelectionConstraints> removeConstraintsMap = new HashMap<>();
 
 	public Map<String, List<Pair<String, SelectionConstraints>>> getEoscDatasourceMap() {
