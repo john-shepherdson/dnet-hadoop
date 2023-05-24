@@ -129,6 +129,23 @@ public class IndexRecordTransformerTest {
 	}
 
 	@Test
+	public void testForEdithDemo() throws IOException, TransformerException {
+		final String record = IOUtils.toString(getClass().getResourceAsStream("edith-demo/10.1098-rsta.2020.0257.xml"));
+		testRecordTransformation(record);
+	}
+
+	@Test
+	public void testForEdithDemoCovid() throws IOException, TransformerException {
+		final String record = IOUtils.toString(getClass().getResourceAsStream("edith-demo/10.3390-pr9111967-covid.xml"));
+		testRecordTransformation(record);
+	}
+	@Test
+	public void testForEdithDemoEthics() throws IOException, TransformerException {
+		final String record = IOUtils.toString(getClass().getResourceAsStream("edith-demo/10.2196-33081-ethics.xml"));
+		testRecordTransformation(record);
+	}
+
+	@Test
 	void testDoiUrlNormalization() throws MalformedURLException {
 
 		// TODO add more test examples when needed

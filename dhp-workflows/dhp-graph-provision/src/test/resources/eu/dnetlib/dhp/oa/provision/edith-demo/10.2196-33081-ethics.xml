@@ -1,0 +1,238 @@
+<record>
+    <result xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <header>
+            <dri:objIdentifier>doi_dedup___::88a9861b26cdda1c3dd162d11f0bedbe</dri:objIdentifier>
+            <dri:dateOfCollection>2023-03-13T00:12:27+0000</dri:dateOfCollection>
+            <dri:dateOfTransformation>2023-03-13T04:39:52.807Z</dri:dateOfTransformation>
+        </header>
+        <metadata>
+            <oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf http://namespace.openaire.eu/oaf http://www.openaire.eu/schema/0.2/oaf-0.2.xsd">
+
+                <oaf:result>
+                    <collectedfrom name="NARCIS" id="openaire____::fdb035c8b3e0540a8d9a561a6c44f4de" />
+                    <collectedfrom name="Crossref" id="openaire____::081b82f96300b6a6e3d282bad31cb6e2" />
+                    <collectedfrom name="UnpayWall" id="openaire____::8ac8380272269217cb09a928c8caa993" />
+                    <collectedfrom name="ORCID" id="openaire____::806360c771262b4d6770e7cdf04b5c5a" />
+                    <collectedfrom name="Microsoft Academic Graph" id="openaire____::5f532a3fc4f1ea403f37070f59a7a53a" />
+                    <collectedfrom name="Europe PubMed Central" id="opendoar____::8b6dd7db9af49e67306feb59a8bdc52c" />
+                    <collectedfrom name="NARCIS" id="eurocrisdris::fe4903425d9040f680d8610d9079ea14" />
+                    <originalId>oai:pure.eur.nl:publications/70bf9bd0-5ea6-45fd-bb62-8d79b48cd69f</originalId>
+                    <originalId>50|narcis______::3df5b8b060b819af0d439dd6751c8a77</originalId>
+                    <originalId>10.2196/33081</originalId>
+                    <originalId>50|doiboost____::88a9861b26cdda1c3dd162d11f0bedbe</originalId>
+                    <originalId>3212148341</originalId>
+                    <originalId>od_______267::276eb3ebee07cf1f3e8bfc43926fd0c2</originalId>
+                    <originalId>35099399</originalId>
+                    <originalId>PMC8844982</originalId>
+                    <originalId>oai:services.nod.dans.knaw.nl:Publications/eur:oai:pure.eur.nl:publications/70bf9bd0-5ea6-45fd-bb62-8d79b48cd69f</originalId>
+                    <originalId>50|dris___00893::107e97e645cbb06fb7b454ce2569d6c2</originalId>
+                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types">10.2196/33081</pid>
+                    <pid classid="pmid" classname="PubMed ID" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">35099399</pid>
+                    <pid classid="pmc" classname="PubMed Central ID" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">PMC8844982</pid>
+                    <measure id="influence" score="4.9560573E-9" class="C" />
+                    <measure id="popularity" score="1.6705286E-8" class="C" />
+                    <measure id="influence_alt" score="6" class="C" />
+                    <measure id="popularity_alt" score="2.16" class="C" />
+                    <measure id="impulse" score="6" class="C" />
+                    <title classid="alternative title" classname="alternative title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title">Mapping the Ethical Issues of Digital Twins for Personalised Healthcare Service (Preprint)</title>
+                    <title classid="subtitle" classname="subtitle" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title" inferred="false" provenanceaction="sysimport:crosswalk:datasetarchive" trust="0.9">Preliminary Mapping Study</title>
+                    <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title" inferred="false" provenanceaction="sysimport:crosswalk:repository" trust="0.9">Ethical Issues of Digital Twins for Personalized Health Care Service: Preliminary Mapping Study</title>
+                    <bestaccessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                    <creator rank="2" URL="https://academic.microsoft.com/#/detail/3211925536" orcid="0000-0001-9882-0389">Ki-hun Kim</creator>
+                    <creator rank="1" URL="https://academic.microsoft.com/#/detail/3214669734" orcid="0000-0001-5334-8615">Pei-hua Huang</creator>
+                    <creator rank="3" URL="https://academic.microsoft.com/#/detail/3214611946" orcid="0000-0003-4283-9659">Maartje Schermer</creator>
+                    <contributor>Public Health</contributor>
+                    <country classid="NL" classname="Netherlands" schemeid="dnet:countries" schemename="dnet:countries" />
+                    <dateofacceptance>2022-01-01</dateofacceptance>
+                    <description>Background: The concept of digital twins has great potential for transforming the existing health care system by making it more personalized. As a convergence of health care, artificial intelligence, and information and communication technologies, personalized health care services that are developed under the concept of digital twins raise a myriad of ethical issues. Although some of the ethical issues are known to researchers working on digital health and personalized medicine, currently, there is no comprehensive review that maps the major ethical risks of digital twins for personalized health care services.   Objective This study aims to fill the research gap by identifying the major ethical risks of digital twins for personalized health care services. We first propose a working definition for digital twins for personalized health care services to facilitate future discussions on the ethical issues related to these emerging digital health services. We then develop a process-oriented ethical map to identify the major ethical risks in each of the different data processing phases.   MethodsWe resorted to the literature on eHealth, personalized medicine, precision medicine, and information engineering to identify potential issues and developed a process-oriented ethical map to structure the inquiry in a more systematic way. The ethical map allows us to see how each of the major ethical concerns emerges during the process of transforming raw data into valuable information. Developers of a digital twin for personalized health care service may use this map to identify ethical risks during the development stage in a more systematic way and can proactively address them.   ResultsThis paper provides a working definition of digital twins for personalized health care services by identifying 3 features that distinguish the new application from other eHealth services. On the basis of the working definition, this paper further layouts 10 major operational problems and the corresponding ethical risks.   ConclusionsIt is challenging to address all the major ethical risks that a digital twin for a personalized health care service might encounter proactively without a conceptual map at hand. The process-oriented ethical map we propose here can assist the developers of digital twins for personalized health care services in analyzing ethical risks in a more systematic manner. </description>
+                    <subject classid="mesh" classname="Medical Subject Headings" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies" inferred="true" inferenceprovenance="iis::document_classes" provenanceaction="iis" trust="0.891">education</subject>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">Health Informatics</subject>
+                    <subject classid="MAG" classname="Microsoft Academic Graph classification" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">Ethical issues</subject>
+                    <subject classid="MAG" classname="Microsoft Academic Graph classification" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">Healthcare service</subject>
+                    <subject classid="MAG" classname="Microsoft Academic Graph classification" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">Psychology</subject>
+                    <subject classid="MAG" classname="Microsoft Academic Graph classification" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">Internet privacy</subject>
+                    <subject classid="MAG" classname="Microsoft Academic Graph classification" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies" inferred="false" provenanceaction="sysimport:actionset" trust="0.4395309">business.industry</subject>
+                    <subject classid="MAG" classname="Microsoft Academic Graph classification" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies" inferred="false" provenanceaction="sysimport:actionset" trust="0.4395309">business</subject>
+                    <subject classid="MAG" classname="Microsoft Academic Graph classification" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">Preprint</subject>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">Artificial Intelligence</subject>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">Delivery of Health Care</subject>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">Health Services</subject>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">Humans</subject>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">Precision Medicine</subject>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">Telemedicine</subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">03 medical and health sciences</subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">0302 clinical medicine
+                    </subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">030212 General &amp; Internal Medicine
+                    </subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">03021201 Health care/Health care quality - datum/health care
+                    </subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">03021201 Health care/Health care quality - datum/electronic health
+                    </subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">0301 basic medicine
+                    </subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">030104 Developmental Biology
+                    </subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">0303 health sciences
+                    </subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">030304 Developmental Biology
+                    </subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">030304 Developmental Biology - datum/datum management/ethical
+                    </subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">06 humanities and the arts</subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">0603 philosophy, ethics and religion
+                    </subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">060301 Applied Ethics
+                    </subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">06030101 Bioethics/Coordinates on Wikidata - intelligence/artificial intelligence/ethical
+                    </subject>
+                    <subject classid="FOS" classname="Fields of Science and Technology classification"
+                             schemeid="dnet:subject_classification_typologies"
+                             schemename="dnet:subject_classification_typologies" inferred="true"
+                             inferenceprovenance="update" provenanceaction="subject:fos">06030101 Bioethics/Coordinates on Wikidata - datum/ethical
+                    </subject>
+
+                    <language classid="eng" classname="English" schemeid="dnet:languages" schemename="dnet:languages" />
+                    <relevantdate classid="created" classname="created" schemeid="dnet:dataCite_date" schemename="dnet:dataCite_date">2021-11-17</relevantdate>
+                    <relevantdate classid="published-online" classname="published-online" schemeid="dnet:dataCite_date" schemename="dnet:dataCite_date">2022-01-31</relevantdate>
+                    <relevantdate classid="issued" classname="issued" schemeid="dnet:dataCite_date" schemename="dnet:dataCite_date" inferred="false" provenanceaction="sysimport:crosswalk:datasetarchive" trust="0.9">2022-01-01</relevantdate>
+                    <source>Crossref</source>
+                    <source />
+                    <source>Journal of Medical Internet Research, 24(1):e33081. Journal of medical Internet Research</source>
+                    <source>urn:issn:1439-4456</source>
+                    <source>VOLUME=24;ISSUE=1;ISSN=1439-4456;TITLE=Journal of Medical Internet Research</source>
+                    <format>application/pdf</format>
+                    <resulttype classid="publication" classname="publication" schemeid="dnet:result_typologies" schemename="dnet:result_typologies" />
+                    <resourcetype classid="0001" classname="0001" schemeid="dnet:dataCite_resource" schemename="dnet:dataCite_resource" />
+                    <context id="knowmad" label="Knowmad Institut" type="community" />
+                    <context id="dth" label="Digital Twins in Health" type="community"/>
+                    <datainfo>
+                        <inferred>true</inferred>
+                        <deletedbyinference>false</deletedbyinference>
+                        <trust>0.8</trust>
+                        <inferenceprovenance>dedup-result-decisiontree-v3</inferenceprovenance>
+                        <provenanceaction classid="sysimport:dedup" classname="Inferred by OpenAIRE" schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions" />
+                    </datainfo>
+                    <rels />
+                    <children>
+                        <result objidentifier="narcis______::3df5b8b060b819af0d439dd6751c8a77">
+                            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title" inferred="false" provenanceaction="sysimport:crosswalk:repository" trust="0.9">Ethical Issues of Digital Twins for Personalized Health Care Service: Preliminary Mapping Study</title>
+                            <collectedfrom name="NARCIS" id="openaire____::fdb035c8b3e0540a8d9a561a6c44f4de" />
+                            <dateofacceptance>2022-01-01</dateofacceptance>
+                        </result>
+                        <result objidentifier="pmid________::70f4213809e44f787bf9f6ffa50ff98f">
+                            <pid classid="pmc" classname="PubMed Central ID" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">PMC8844982</pid>
+                            <collectedfrom name="Europe PubMed Central" id="opendoar____::8b6dd7db9af49e67306feb59a8bdc52c" />
+                            <dateofacceptance>2021-08-23</dateofacceptance>
+                            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">Ethical Issues of Digital Twins for Personalized Health Care Service: Preliminary Mapping Study.</title>
+                            <pid classid="pmid" classname="PubMed ID" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">35099399</pid>
+                        </result>
+                        <result objidentifier="dris___00893::107e97e645cbb06fb7b454ce2569d6c2">
+                            <title classid="subtitle" classname="subtitle" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title" inferred="false" provenanceaction="sysimport:crosswalk:datasetarchive" trust="0.9">Preliminary Mapping Study</title>
+                            <dateofacceptance>2022-01-01</dateofacceptance>
+                            <collectedfrom name="NARCIS" id="eurocrisdris::fe4903425d9040f680d8610d9079ea14" />
+                        </result>
+                        <result objidentifier="doi_________::88a9861b26cdda1c3dd162d11f0bedbe">
+                            <dateofacceptance>2022-01-31</dateofacceptance>
+                            <title classid="alternative title" classname="alternative title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title">Mapping the Ethical Issues of Digital Twins for Personalised Healthcare Service (Preprint)</title>
+                            <collectedfrom name="Crossref" id="openaire____::081b82f96300b6a6e3d282bad31cb6e2" />
+                            <collectedfrom name="UnpayWall" id="openaire____::8ac8380272269217cb09a928c8caa993" />
+                            <collectedfrom name="ORCID" id="openaire____::806360c771262b4d6770e7cdf04b5c5a" />
+                            <collectedfrom name="Microsoft Academic Graph" id="openaire____::5f532a3fc4f1ea403f37070f59a7a53a" />
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types">10.2196/33081</pid>
+                            <publisher>JMIR Publications Inc.</publisher>
+                        </result>
+                        <instance>
+                            <accessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                            <collectedfrom name="Europe PubMed Central" id="opendoar____::8b6dd7db9af49e67306feb59a8bdc52c" />
+                            <hostedby name="Journal of Medical Internet Research" id="doajarticles::972bc6f95b43b5ad42f75695b1d8e948" />
+                            <dateofacceptance>2021-08-23</dateofacceptance>
+                            <instancetype classid="0001" classname="Article" schemeid="dnet:publication_resource" schemename="dnet:publication_resource" />
+                            <pid classid="pmid" classname="PubMed ID" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">35099399</pid>
+                            <pid classid="pmc" classname="PubMed Central ID" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">PMC8844982</pid>
+                            <alternateidentifier classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.2196/33081</alternateidentifier>
+                            <refereed classid="0000" classname="UNKNOWN" schemeid="dnet:review_levels" schemename="dnet:review_levels" />
+                            <webresource>
+                                <url>https://pubmed.ncbi.nlm.nih.gov/35099399</url>
+                            </webresource>
+                        </instance>
+                        <instance>
+                            <accessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                            <collectedfrom name="Crossref" id="openaire____::081b82f96300b6a6e3d282bad31cb6e2" />
+                            <collectedfrom name="NARCIS" id="eurocrisdris::fe4903425d9040f680d8610d9079ea14" />
+                            <hostedby name="Journal of Medical Internet Research" id="doajarticles::972bc6f95b43b5ad42f75695b1d8e948" />
+                            <dateofacceptance>2022-01-01</dateofacceptance>
+                            <dateofacceptance>2022-01-31</dateofacceptance>
+                            <instancetype classid="0001" classname="Article" schemeid="dnet:publication_resource" schemename="dnet:publication_resource" />
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types">10.2196/33081</pid>
+                            <alternateidentifier classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:crosswalk:datasetarchive" trust="0.9">10.2196/33081</alternateidentifier>
+                            <alternateidentifier classid="urn" classname="urn" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:crosswalk:datasetarchive" trust="0.9">urn:nbn:nl:ui:15-70bf9bd0-5ea6-45fd-bb62-8d79b48cd69f</alternateidentifier>
+                            <refereed classid="0000" classname="UNKNOWN" schemeid="dnet:review_levels" schemename="dnet:review_levels" />
+                            <webresource>
+                                <url>https://doi.org/10.2196/33081</url>
+                            </webresource>
+                        </instance>
+                        <instance>
+                            <accessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                            <collectedfrom name="NARCIS" id="openaire____::fdb035c8b3e0540a8d9a561a6c44f4de" />
+                            <hostedby name="NARCIS" id="openaire____::fdb035c8b3e0540a8d9a561a6c44f4de" />
+                            <dateofacceptance>2022-01-01</dateofacceptance>
+                            <instancetype classid="0001" classname="Article" schemeid="dnet:publication_resource" schemename="dnet:publication_resource" />
+                            <alternateidentifier classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:crosswalk:repository" trust="0.9">10.2196/33081</alternateidentifier>
+                            <alternateidentifier classid="urn" classname="urn" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:crosswalk:repository" trust="0.9">urn:nbn:nl:ui:15-70bf9bd0-5ea6-45fd-bb62-8d79b48cd69f</alternateidentifier>
+                            <refereed classid="0000" classname="UNKNOWN" schemeid="dnet:review_levels" schemename="dnet:review_levels" />
+                            <webresource>
+                                <url>https://pure.eur.nl/en/publications/70bf9bd0-5ea6-45fd-bb62-8d79b48cd69f</url>
+                            </webresource>
+                        </instance>
+                    </children>
+                </oaf:result>
+            </oaf:entity>
+        </metadata>
+    </result>
+</record>
