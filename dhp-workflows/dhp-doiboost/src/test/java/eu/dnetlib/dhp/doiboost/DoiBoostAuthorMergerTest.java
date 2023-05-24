@@ -522,12 +522,24 @@ public class DoiBoostAuthorMergerTest {
 
 		Assertions.assertEquals(3, merge.stream().filter(a -> a.getPid() != null).count());
 
-		merge.stream().filter(a -> a.getPid() != null)
-				.forEach(a -> Assertions.assertTrue(a.getPid().stream().allMatch(p -> p.getQualifier().getClassid().equals("orcid"))));
+		merge
+			.stream()
+			.filter(a -> a.getPid() != null)
+			.forEach(
+				a -> Assertions
+					.assertTrue(a.getPid().stream().allMatch(p -> p.getQualifier().getClassid().equals("orcid"))));
 
-		Assertions.assertEquals("0000-0002-4333-2748", merge.stream().filter(a -> a.getSurname().equalsIgnoreCase("o'neill")).collect(Collectors.toList()).get(0).getPid().get(0).getValue());
-
-		
+		Assertions
+			.assertEquals(
+				"0000-0002-4333-2748",
+				merge
+					.stream()
+					.filter(a -> a.getSurname().equalsIgnoreCase("o'neill"))
+					.collect(Collectors.toList())
+					.get(0)
+					.getPid()
+					.get(0)
+					.getValue());
 
 	}
 }
