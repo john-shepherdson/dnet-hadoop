@@ -5,8 +5,6 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.createOpenaireId;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -17,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.common.Constants;
@@ -27,11 +24,12 @@ import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
-import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 
 public abstract class AbstractMdRecordToOafMapper {
 
 	protected final VocabularyGroup vocs;
+
+	protected static final UrlValidator URL_VALIDATOR = UrlValidator.getInstance();
 
 	private final boolean invisible;
 
@@ -393,7 +391,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		r.setPublisher(preparePublisher(doc, info));
 		r.setEmbargoenddate(prepareField(doc, "//oaf:embargoenddate", info));
 		r.setSource(prepareSources(doc, info));
-		r.setFulltext(prepareListFields(doc, "//oaf:fulltext", info));
+		r.setFulltext(prepareListURL(doc, "//oaf:fulltext", info));
 		r.setFormat(prepareFormats(doc, info));
 		r.setContributor(prepareContributors(doc, info));
 		r.setResourcetype(prepareResourceType(doc, info));
@@ -672,6 +670,14 @@ public abstract class AbstractMdRecordToOafMapper {
 			qualifier(paClassId, paClassName, paSchemeId, paSchemeName), trust);
 	}
 
+	protected List<Field<String>> prepareListURL(final Node node, final String xpath, final DataInfo info) {
+		return listFields(
+			info, prepareListString(node, xpath)
+				.stream()
+				.filter(URL_VALIDATOR::isValid)
+				.collect(Collectors.toList()));
+	}
+
 	protected Field<String> prepareField(final Node node, final String xpath, final DataInfo info) {
 		return field(node.valueOf(xpath), info);
 	}
@@ -695,13 +701,13 @@ public abstract class AbstractMdRecordToOafMapper {
 	}
 
 	protected Set<String> validateUrl(Collection<String> url) {
-		UrlValidator urlValidator = UrlValidator.getInstance();
+
 		if (Objects.isNull(url)) {
 			return new HashSet<>();
 		}
 		return url
 			.stream()
-			.filter(u -> urlValidator.isValid(u))
+			.filter(URL_VALIDATOR::isValid)
 			.collect(Collectors.toCollection(HashSet::new));
 	}
 
