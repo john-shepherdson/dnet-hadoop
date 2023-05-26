@@ -772,3 +772,11 @@ from result p
                          on p.id= tmp.id;
 
 ANALYZE TABLE indi_result_with_pid COMPUTE STATISTICS;
+
+create table if not exists indi_impact_measures as
+select distinct substr(id, 4), measures_ids.id impactmetric, measures_ids.unit.value[0] score,
+cast(measures_ids.unit.value[0] as decimal(6,3)) score_dec, measures_ids.unit.value[1] class
+from result lateral view explode(measures) measures as measures_ids
+where measures_ids.id!='views' and measures_ids.id!='downloads';
+
+ANALYZE TABLE indi_impact_measures COMPUTE STATISTICS;

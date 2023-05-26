@@ -64,9 +64,12 @@ create table TARGET.result stored as parquet as
              'openorgs____::38d7097854736583dde879d12dacafca'	-- Brown University
              'openorgs____::57784c9e047e826fefdb1ef816120d92', --Arts et Métiers ParisTech
              'openorgs____::2530baca8a15936ba2e3297f2bce2e7e',	-- University of Cape Town
-             'openorgs____::d11f981828c485cd23d93f7f24f24db1',   -- Technological University Dublin
-             'openorgs____::5e6bf8962665cdd040341171e5c631d8',   -- Delft University of Technology
-             'openorgs____::846cb428d3f52a445f7275561a7beb5d'    -- University of Manitoba
+             'openorgs____::d11f981828c485cd23d93f7f24f24db1',  -- Technological University Dublin
+             'openorgs____::5e6bf8962665cdd040341171e5c631d8',  -- Delft University of Technology
+             'openorgs____::846cb428d3f52a445f7275561a7beb5d',  -- University of Manitoba
+             'openorgs____::eb391317ed0dc684aa81ac16265de041',	-- Universitat Rovira i Virgili
+             'openorgs____::66aa9fc2fceb271423dfabcc38752dc0',  -- Lund University
+             'openorgs____::3cff625a4370d51e08624cc586138b2f'	-- IMT Atlantique
         ) )) foo;
 
 ANALYZE TABLE TARGET.result COMPUTE STATISTICS;
@@ -139,6 +142,9 @@ ANALYZE TABLE TARGET.result_topics COMPUTE STATISTICS;
 
 create table TARGET.result_fos stored as parquet as select * from SOURCE.result_fos orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 ANALYZE TABLE TARGET.result_fos COMPUTE STATISTICS;
+
+create table TARGET.result_accessroute stored as parquet as select * from SOURCE.result_accessroute orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+ANALYZE TABLE TARGET.result_accessroute COMPUTE STATISTICS;
 
 create view TARGET.foo1 as select * from SOURCE.result_result rr where rr.source in (select id from TARGET.result);
 create view TARGET.foo2 as select * from SOURCE.result_result rr where rr.target in (select id from TARGET.result);
@@ -213,6 +219,8 @@ ANALYZE TABLE TARGET.indi_result_no_of_copies COMPUTE STATISTICS;
 ---- Sprint 6 ----
 create table TARGET.indi_pub_hybrid_oa_with_cc stored as parquet as select * from SOURCE.indi_pub_hybrid_oa_with_cc orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 ANALYZE TABLE TARGET.indi_pub_hybrid_oa_with_cc COMPUTE STATISTICS;
+create table TARGET.indi_pub_bronze_oa stored as parquet as select * from SOURCE.indi_pub_bronze_oa orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+ANALYZE TABLE TARGET.indi_pub_bronze_oa COMPUTE STATISTICS;
 create table TARGET.indi_pub_downloads stored as parquet as select * from SOURCE.indi_pub_downloads orig where exists (select 1 from TARGET.result r where r.id=orig.result_id);
 ANALYZE TABLE TARGET.indi_pub_downloads COMPUTE STATISTICS;
 create table TARGET.indi_pub_downloads_datasource stored as parquet as select * from SOURCE.indi_pub_downloads_datasource orig where exists (select 1 from TARGET.result r where r.id=orig.result_id);
@@ -241,3 +249,5 @@ create table TARGET.indi_pub_in_subscribed stored as parquet as select * from SO
 ANALYZE TABLE TARGET.indi_pub_in_subscribed COMPUTE STATISTICS;
 create table TARGET.indi_result_with_pid stored as parquet as select * from SOURCE.indi_result_with_pid orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 ANALYZE TABLE TARGET.indi_result_with_pid COMPUTE STATISTICS;
+create table TARGET.indi_impact_measures stored as parquet as select * from SOURCE.indi_impact_measures orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+ANALYZE TABLE TARGET.indi_impact_measures COMPUTE STATISTICS;
