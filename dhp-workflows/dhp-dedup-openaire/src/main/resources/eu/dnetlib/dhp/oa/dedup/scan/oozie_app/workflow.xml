@@ -132,7 +132,7 @@
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--actionSetId</arg><arg>${actionSetId}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--numPartitions</arg><arg>8000</arg>
+            <arg>--numPartitions</arg><arg>5000</arg>
         </spark>
         <ok to="WhitelistSimRels"/>
         <error to="Kill"/>
@@ -160,7 +160,7 @@
             <arg>--actionSetId</arg><arg>${actionSetId}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--whiteListPath</arg><arg>${whiteListPath}</arg>
-            <arg>--numPartitions</arg><arg>8000</arg>
+            <arg>--numPartitions</arg><arg>5000</arg>
         </spark>
         <ok to="CreateMergeRel"/>
         <error to="Kill"/>
@@ -241,7 +241,7 @@
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--actionSetId</arg><arg>${actionSetIdOpenorgs}</arg>
-            <arg>--numPartitions</arg><arg>8000</arg>
+            <arg>--numPartitions</arg><arg>5000</arg>
         </spark>
         <ok to="CreateOrgsDedupRecord"/>
         <error to="Kill"/>
