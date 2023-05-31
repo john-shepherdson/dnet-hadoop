@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.resulttoorganizationfromsemrel;
+package eu.dnetlib.dhp.entitytoorganizationfromsemrel;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.PropagationConstant.readPath;
@@ -14,8 +14,6 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -28,13 +26,13 @@ public class StepActions implements Serializable {
 
 	public static void execStep(SparkSession spark,
 		String graphPath, String newRelationPath,
-		String leavesPath, String chldParentOrgPath, String resultOrgPath) {
+		String leavesPath, String chldParentOrgPath, String entityOrgPath) {
 
 		Dataset<Relation> relationGraph = readPath(spark, graphPath, Relation.class);
 		// select only the relation source target among those proposed by propagation that are not already existent
 		getNewRels(
 			newRelationPath, relationGraph,
-			getPropagationRelation(spark, leavesPath, chldParentOrgPath, resultOrgPath));
+			getPropagationRelation(spark, leavesPath, chldParentOrgPath, entityOrgPath, ModelConstants.HAS_AUTHOR_INSTITUTION));
 
 	}
 
@@ -152,19 +150,20 @@ public class StepActions implements Serializable {
 	private static Dataset<Relation> getPropagationRelation(SparkSession spark,
 		String leavesPath,
 		String chldParentOrgPath,
-		String resultOrgPath) {
+		String entityOrgPath,
+															String semantics) {
 
 		Dataset<KeyValueSet> childParent = readPath(spark, chldParentOrgPath, KeyValueSet.class);
-		Dataset<KeyValueSet> resultOrg = readPath(spark, resultOrgPath, KeyValueSet.class);
+		Dataset<KeyValueSet> entityOrg = readPath(spark, entityOrgPath, KeyValueSet.class);
 		Dataset<Leaves> leaves = readPath(spark, leavesPath, Leaves.class);
 
 		childParent.createOrReplaceTempView("childParent");
-		resultOrg.createOrReplaceTempView("resultOrg");
+		entityOrg.createOrReplaceTempView("entityOrg");
 		leaves.createOrReplaceTempView("leaves");
 
 		Dataset<KeyValueSet> resultParent = spark
 			.sql(
-				"SELECT  resId as key, " +
+				"SELECT  entityId as key, " +
 					"collect_set(parent) valueSet " +
 					"FROM (SELECT key as child, parent " +
 					"      FROM childParent  " +
@@ -172,7 +171,7 @@ public class StepActions implements Serializable {
 					"JOIN leaves " +
 					"ON leaves.value = cp.child " +
 					"JOIN (" +
-					"SELECT key as resId, org " +
+					"SELECT key as entityId, org " +
 					"FROM resultOrg " +
 					"LATERAL VIEW explode (valueSet) ks as org ) as ro " +
 					"ON  leaves.value = ro.org " +
@@ -186,19 +185,16 @@ public class StepActions implements Serializable {
 					.getValueSet()
 					.stream()
 					.map(
-						orgId -> getRelation(
+						orgId -> getAffiliationRelation(
 							v.getKey(),
 							orgId,
-							ModelConstants.HAS_AUTHOR_INSTITUTION,
-							ModelConstants.RESULT_ORGANIZATION,
-							ModelConstants.AFFILIATION,
-							PROPAGATION_DATA_INFO_TYPE,
-							PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_ID,
-							PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_NAME))
+								semantics))
 					.collect(Collectors.toList())
 					.iterator(),
 				Encoders.bean(Relation.class));
 
 	}
+
+
 
 }

@@ -134,7 +134,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>PrepareResultOrganizationAssociation</name>
-            <class>eu.dnetlib.dhp.resulttoorganizationfromsemrel.PrepareInfo</class>
+            <class>eu.dnetlib.dhp.entitytoorganizationfromsemrel.PrepareInfo</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -150,6 +150,7 @@
             <arg>--leavesPath</arg><arg>${workingDir}/preparedInfo/leavesPath</arg>
             <arg>--childParentPath</arg><arg>${workingDir}/preparedInfo/childParentPath</arg>
             <arg>--resultOrgPath</arg><arg>${workingDir}/preparedInfo/resultOrgPath</arg>
+            <arg>--projectOrganizationPath</arg><arg>${workingDir}/preparedInfo/projectOrganizationPath</arg>
             <arg>--relationPath</arg><arg>${workingDir}/preparedInfo/relation</arg>
         </spark>
         <ok to="apply_resulttoorganization_propagation"/>
@@ -161,7 +162,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>resultToOrganizationFromSemRel</name>
-            <class>eu.dnetlib.dhp.resulttoorganizationfromsemrel.SparkResultToOrganizationFromSemRel</class>
+            <class>eu.dnetlib.dhp.entitytoorganizationfromsemrel.SparkResultToOrganizationFromSemRel</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
