@@ -174,6 +174,13 @@ public class PropagationConstant {
 		return newRelations;
 	}
 
+	public static Relation getRelation(String source, String target, String rel_class){
+		if (ModelConstants.HAS_PARTICIPANT.equals(rel_class)){
+			return getParticipantRelation(source, target, rel_class);
+		}else
+			return getAffiliationRelation(source, target, rel_class);
+	}
+
 	public static Relation getParticipantRelation(
 			String source,
 			String target,

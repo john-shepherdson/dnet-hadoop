@@ -362,6 +362,37 @@ public class PrepareInfoJobTest {
 	}
 
 	@Test
+	public void relationProjectTest() throws Exception {
+
+		PrepareInfo
+				.main(
+						new String[] {
+								"-isSparkSessionManaged", Boolean.FALSE.toString(),
+								"-graphPath", getClass()
+								.getResource(
+										"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/projectorganizationtest")
+								.getPath(),
+								"-hive_metastore_uris", "",
+								"-leavesPath", workingDir.toString() + "/currentIteration/",
+								"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
+								"-projectOrganizationPath", workingDir.toString() + "/projectOrganization/",
+								"-childParentPath", workingDir.toString() + "/childParentOrg/",
+								"-relationPath", workingDir.toString() + "/relation"
+
+						});
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Relation> tmp = sc
+				.textFile(workingDir.toString() + "/relation/project")
+				.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
+
+		Dataset<Relation> verificationDs = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
+
+		Assertions.assertEquals(7, verificationDs.count());
+
+	}
+
+	@Test
 	public void resultOrganizationTest1() throws Exception {
 
 		PrepareInfo
@@ -493,6 +524,141 @@ public class PrepareInfoJobTest {
 
 		verificationDs
 			.foreach((ForeachFunction<KeyValueSet>) v -> System.out.println(OBJECT_MAPPER.writeValueAsString(v)));
+
+	}
+
+	@Test
+	public void projectOrganizationTest1() throws Exception {
+
+		PrepareInfo
+				.main(
+						new String[] {
+								"-isSparkSessionManaged", Boolean.FALSE.toString(),
+								"-graphPath", getClass()
+								.getResource(
+										"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/projectorganizationtest")
+								.getPath(),
+								"-hive_metastore_uris", "",
+								"-leavesPath", workingDir.toString() + "/currentIteration/",
+								"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
+								"-projectOrganizationPath", workingDir.toString() + "/projectOrganization/",
+								"-childParentPath", workingDir.toString() + "/childParentOrg/",
+								"-relationPath", workingDir.toString() + "/relation"
+
+						});
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<KeyValueSet> tmp = sc
+				.textFile(workingDir.toString() + "/projectOrganization/")
+				.map(item -> OBJECT_MAPPER.readValue(item, KeyValueSet.class));
+
+		Dataset<KeyValueSet> verificationDs = spark.createDataset(tmp.rdd(), Encoders.bean(KeyValueSet.class));
+
+		Assertions.assertEquals(5, verificationDs.count());
+
+		Assertions
+				.assertEquals(
+						2, verificationDs
+								.filter("key = '40|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
+								.collectAsList()
+								.get(0)
+								.getValueSet()
+								.size());
+		Assertions
+				.assertTrue(
+						verificationDs
+								.filter("key = '40|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
+								.collectAsList()
+								.get(0)
+								.getValueSet()
+								.contains("20|dedup_wf_001::2899e571609779168222fdeb59cb916d"));
+		Assertions
+				.assertTrue(
+						verificationDs
+								.filter("key = '40|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
+								.collectAsList()
+								.get(0)
+								.getValueSet()
+								.contains("20|pippo_wf_001::2899e571609779168222fdeb59cb916d"));
+
+		Assertions
+				.assertEquals(
+						2, verificationDs
+								.filter("key = '40|dedup_wf_001::2899e571609779168222fdeb59cb916d'")
+								.collectAsList()
+								.get(0)
+								.getValueSet()
+								.size());
+		Assertions
+				.assertTrue(
+						verificationDs
+								.filter("key = '40|dedup_wf_001::2899e571609779168222fdeb59cb916d'")
+								.collectAsList()
+								.get(0)
+								.getValueSet()
+								.contains("20|doajarticles::396262ee936f3d3e26ff0e60bea6cae0"));
+		Assertions
+				.assertTrue(
+						verificationDs
+								.filter("key = '40|dedup_wf_001::2899e571609779168222fdeb59cb916d'")
+								.collectAsList()
+								.get(0)
+								.getValueSet()
+								.contains("20|pippo_wf_001::2899e571609779168222fdeb59cb916d"));
+
+		Assertions
+				.assertEquals(
+						1, verificationDs
+								.filter("key = '40|doajarticles::03748bcb5d754c951efec9700e18a56d'")
+								.collectAsList()
+								.get(0)
+								.getValueSet()
+								.size());
+		Assertions
+				.assertTrue(
+						verificationDs
+								.filter("key = '40|doajarticles::03748bcb5d754c951efec9700e18a56d'")
+								.collectAsList()
+								.get(0)
+								.getValueSet()
+								.contains("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"));
+
+		Assertions
+				.assertEquals(
+						1, verificationDs
+								.filter("key = '40|openaire____::ec653e804967133b9436fdd30d3ff51d'")
+								.collectAsList()
+								.get(0)
+								.getValueSet()
+								.size());
+		Assertions
+				.assertTrue(
+						verificationDs
+								.filter("key = '40|openaire____::ec653e804967133b9436fdd30d3ff51d'")
+								.collectAsList()
+								.get(0)
+								.getValueSet()
+								.contains("20|doajarticles::1cae0b82b56ccd97c2db1f698def7074"));
+
+		Assertions
+				.assertEquals(
+						1, verificationDs
+								.filter("key = '40|doajarticles::1cae0b82b56ccd97c2db1f698def7074'")
+								.collectAsList()
+								.get(0)
+								.getValueSet()
+								.size());
+		Assertions
+				.assertTrue(
+						verificationDs
+								.filter("key = '40|doajarticles::1cae0b82b56ccd97c2db1f698def7074'")
+								.collectAsList()
+								.get(0)
+								.getValueSet()
+								.contains("20|opendoar____::a5fcb8eb25ebd6f7cd219e0fa1e6ddc1"));
+
+		verificationDs
+				.foreach((ForeachFunction<KeyValueSet>) v -> System.out.println(OBJECT_MAPPER.writeValueAsString(v)));
 
 	}
 

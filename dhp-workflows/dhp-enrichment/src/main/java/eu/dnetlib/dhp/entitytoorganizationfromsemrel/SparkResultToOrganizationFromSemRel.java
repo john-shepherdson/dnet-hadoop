@@ -39,7 +39,7 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 			.toString(
 				SparkResultToOrganizationFromIstRepoJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/input_propagation_parameter.json"));
+						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/input_propagation_parameter.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -129,7 +129,7 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 				notReachedFirstParent);
 
 			doPropagate(
-				spark, leavesPath, childParentPath, resultOrganizationPath, graphPath,
+				spark, leavesPath, childParentPath, resultOrganizationPath, projectOrganizationPath, graphPath,
 				workingPath, outputPath, propagationCounter);
 		}
 
@@ -142,20 +142,20 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 		StepActions
 			.execStep(
 				spark, graphPath + "/result", workingPath + NEW_RESULT_RELATION_PATH,
-				leavesPath, childParentPath, resultOrganizationPath);
+				leavesPath, childParentPath, resultOrganizationPath, ModelConstants.HAS_AUTHOR_INSTITUTION);
 
 		addNewRelations(spark, workingPath + NEW_RESULT_RELATION_PATH, outputPath);
 
 		StepActions
 				.execStep(
 						spark, graphPath + "/project", workingPath + NEW_PROJECT_RELATION_PATH,
-						leavesPath, childParentPath, projectOrganizationPath);
+						leavesPath, childParentPath, projectOrganizationPath, ModelConstants.HAS_PARTICIPANT);
 
 		addNewRelations(spark, workingPath + NEW_PROJECT_RELATION_PATH, outputPath);
 	}
 
 	private static void doPropagate(SparkSession spark, String leavesPath, String childParentPath,
-		String resultOrganizationPath, String graphPath, String workingPath, String outputPath,
+		String resultOrganizationPath, String projectOrganizationPath, String graphPath, String workingPath, String outputPath,
 		PropagationCounter propagationCounter) {
 		int iteration = 0;
 		long leavesCount;
@@ -164,13 +164,18 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 			iteration++;
 			StepActions
 				.execStep(
-					spark, graphPath, workingPath + NEW_RESULT_RELATION_PATH,
-					leavesPath, childParentPath, resultOrganizationPath);
+					spark, graphPath + "/result", workingPath + NEW_RESULT_RELATION_PATH,
+					leavesPath, childParentPath, resultOrganizationPath, ModelConstants.HAS_AUTHOR_INSTITUTION);
+			StepActions
+					.execStep(
+							spark, graphPath + "/project", workingPath + NEW_PROJECT_RELATION_PATH,
+							leavesPath, childParentPath, projectOrganizationPath, ModelConstants.HAS_PARTICIPANT);
+
 			StepActions
 				.prepareForNextStep(
-					spark, workingPath + NEW_RESULT_RELATION_PATH, resultOrganizationPath, leavesPath,
-					childParentPath, workingPath + "/leaves", workingPath + "/resOrg");
-			moveOutput(spark, workingPath, leavesPath, resultOrganizationPath);
+					spark, workingPath , resultOrganizationPath, projectOrganizationPath, leavesPath,
+					childParentPath, workingPath + "/leaves", workingPath + "/resOrg", workingPath + "/projOrg");
+			moveOutput(spark, workingPath, leavesPath, resultOrganizationPath, projectOrganizationPath);
 			leavesCount = readPath(spark, leavesPath, Leaves.class).count();
 		} while (leavesCount > 0 && iteration < MAX_ITERATION);
 
@@ -199,6 +204,7 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 		}
 
 		addNewRelations(spark, workingPath + NEW_RESULT_RELATION_PATH, outputPath);
+		addNewRelations(spark, workingPath + NEW_PROJECT_RELATION_PATH, outputPath);
 	}
 
 	private static void moveOutput(SparkSession spark, String workingPath, String leavesPath,
@@ -214,6 +220,28 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(resultOrganizationPath);
+
+	}
+
+	private static void moveOutput(SparkSession spark, String workingPath, String leavesPath,
+								   String resultOrganizationPath, String projectOrganizationPath) {
+		readPath(spark, workingPath + "/leaves", Leaves.class)
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression", "gzip")
+				.json(leavesPath);
+
+		readPath(spark, workingPath + "/resOrg", KeyValueSet.class)
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression", "gzip")
+				.json(resultOrganizationPath);
+
+		readPath(spark, workingPath + "/projOrg", KeyValueSet.class)
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression", "gzip")
+				.json(projectOrganizationPath);
 
 	}
 
@@ -237,7 +265,7 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 						return Arrays
 								.asList(
 										r, getParticipantRelation(
-												r.getTarget(), r.getSource(), ModelConstants.HAS_PARTICIPANT))
+												r.getTarget(), r.getSource(), ModelConstants.IS_PARTICIPANT))
 								.iterator();
 					}
 				}

@@ -3,6 +3,8 @@ package eu.dnetlib.dhp.entitytoorganizationfromsemrel;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.PropagationConstant.readPath;
+import static eu.dnetlib.dhp.entitytoorganizationfromsemrel.SparkResultToOrganizationFromSemRel.NEW_PROJECT_RELATION_PATH;
+import static eu.dnetlib.dhp.entitytoorganizationfromsemrel.SparkResultToOrganizationFromSemRel.NEW_RESULT_RELATION_PATH;
 
 import java.io.Serializable;
 import java.util.*;
@@ -26,13 +28,14 @@ public class StepActions implements Serializable {
 
 	public static void execStep(SparkSession spark,
 		String graphPath, String newRelationPath,
-		String leavesPath, String chldParentOrgPath, String entityOrgPath) {
+		String leavesPath, String chldParentOrgPath, String entityOrgPath, String rel_class) {
 
 		Dataset<Relation> relationGraph = readPath(spark, graphPath, Relation.class);
 		// select only the relation source target among those proposed by propagation that are not already existent
+
 		getNewRels(
 			newRelationPath, relationGraph,
-			getPropagationRelation(spark, leavesPath, chldParentOrgPath, entityOrgPath, ModelConstants.HAS_AUTHOR_INSTITUTION));
+			getPropagationRelation(spark, leavesPath, chldParentOrgPath, entityOrgPath, rel_class));
 
 	}
 
@@ -43,16 +46,30 @@ public class StepActions implements Serializable {
 		changeLeavesSet(spark, leavesPath, chldParentOrgPath, leavesOutputPath);
 
 		// add the new relations obtained from propagation to the keyvalueset result organization
-		updateResultOrganization(
+		updateEntityOrganization(
 			spark, resultOrgPath, readPath(spark, selectedRelsPath, Relation.class), orgOutputPath);
 	}
 
-	private static void updateResultOrganization(SparkSession spark, String resultOrgPath,
-		Dataset<Relation> selectedRels, String outputPath) {
-		Dataset<KeyValueSet> resultOrg = readPath(spark, resultOrgPath, KeyValueSet.class);
-		resultOrg
+	public static void prepareForNextStep(SparkSession spark, String selectedRelsPath, String resultOrgPath, String projectOrgPath,
+										  String leavesPath, String chldParentOrgPath, String leavesOutputPath,
+										  String orgOutputPath, String outputProjectPath) {
+		// use of the parents as new leaves set
+		changeLeavesSet(spark, leavesPath, chldParentOrgPath, leavesOutputPath);
+
+		// add the new relations obtained from propagation to the keyvalueset result organization
+		updateEntityOrganization(
+				spark, resultOrgPath, readPath(spark, selectedRelsPath + NEW_RESULT_RELATION_PATH, Relation.class), orgOutputPath);
+
+		updateEntityOrganization(
+				spark, projectOrgPath, readPath(spark, selectedRelsPath + NEW_PROJECT_RELATION_PATH, Relation.class), outputProjectPath);
+	}
+
+	private static void updateEntityOrganization(SparkSession spark, String entityOrgPath,
+												 Dataset<Relation> selectedRels, String outputPath) {
+		Dataset<KeyValueSet> entityOrg = readPath(spark, entityOrgPath, KeyValueSet.class);
+		entityOrg
 			.joinWith(
-				selectedRels, resultOrg
+				selectedRels, entityOrg
 					.col("key")
 					.equalTo(selectedRels.col("source")),
 				"left")
@@ -111,38 +128,45 @@ public class StepActions implements Serializable {
 		// construction of the set)
 		// if at least one relation in the set was not produced by propagation no new relation will be returned
 
+
 		relationDataset
-			.union(newRels)
-			.groupByKey((MapFunction<Relation, String>) r -> r.getSource() + r.getTarget(), Encoders.STRING())
-			.mapGroups((MapGroupsFunction<String, Relation, String>) (k, it) -> {
+				.union(newRels)
+				.groupByKey((MapFunction<Relation, String>) r -> r.getSource() + r.getTarget(), Encoders.STRING())
+				.mapGroups((MapGroupsFunction<String, Relation, String>) (k, it) -> {
 
-				ArrayList<Relation> relationList = new ArrayList<>();
-				relationList.add(it.next());
-				it.forEachRemaining(rel -> relationList.add(rel));
+					ArrayList<Relation> relationList = new ArrayList<>();
+					relationList.add(it.next());
+					it.forEachRemaining(rel -> relationList.add(rel));
 
-				if (relationList
-					.stream()
-					.filter(
-						rel -> !rel
-							.getDataInfo()
-							.getProvenanceaction()
-							.getClassid()
-							.equals(PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_ID))
-					.count() > 0) {
-					return null;
-				}
+					if (relationList
+							.stream()
+							.filter(
+									rel -> !rel
+											.getDataInfo()
+											.getProvenanceaction()
+											.getClassid()
+											.equals(PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_ID) && !rel
+											.getDataInfo()
+											.getProvenanceaction()
+											.getClassid()
+											.equals(PROPAGATION_RELATION_PROJECT_ORGANIZATION_SEM_REL_CLASS_ID))
+							.count() > 0) {
+						return null;
+					}
 
-				return new ObjectMapper().writeValueAsString(relationList.get(0));
+					return new ObjectMapper().writeValueAsString(relationList.get(0));
 
-			}, Encoders.STRING())
-			.filter(Objects::nonNull)
-			.map(
-				(MapFunction<String, Relation>) r -> new ObjectMapper().readValue(r, Relation.class),
-				Encoders.bean(Relation.class))
-			.write()
-			.mode(SaveMode.Append)
-			.option("compression", "gzip")
-			.json(newRelationPath);
+				}, Encoders.STRING())
+				.filter(Objects::nonNull)
+				.map(
+						(MapFunction<String, Relation>) r -> new ObjectMapper().readValue(r, Relation.class),
+						Encoders.bean(Relation.class))
+				.write()
+				.mode(SaveMode.Append)
+				.option("compression", "gzip")
+				.json(newRelationPath);
+
+
 
 	}
 
@@ -172,20 +196,21 @@ public class StepActions implements Serializable {
 					"ON leaves.value = cp.child " +
 					"JOIN (" +
 					"SELECT key as entityId, org " +
-					"FROM resultOrg " +
+					"FROM entityOrg " +
 					"LATERAL VIEW explode (valueSet) ks as org ) as ro " +
 					"ON  leaves.value = ro.org " +
-					"GROUP BY resId")
+					"GROUP BY entityId")
 			.as(Encoders.bean(KeyValueSet.class));
 
-		// create new relations from result to organization for each result linked to a leaf
+
+		// create new relations from entity to organization for each entity linked to a leaf
 		return resultParent
 			.flatMap(
 				(FlatMapFunction<KeyValueSet, Relation>) v -> v
 					.getValueSet()
 					.stream()
 					.map(
-						orgId -> getAffiliationRelation(
+						orgId -> getRelation(
 							v.getKey(),
 							orgId,
 								semantics))

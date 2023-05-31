@@ -49,7 +49,7 @@ public class PrepareInfo implements Serializable {
 	// associate projects to all the participant orgs
 	private static final String PROJECT_ORGANIZATION_QUERY = "SELECT source key, collect_set(target) as valueSet " +
 			"FROM relation " +
-			"WHERE lower(relclass) = '" + ModelConstants.IS_PARTICIPANT.toLowerCase() +
+			"WHERE lower(relclass) = '" + ModelConstants.HAS_PARTICIPANT.toLowerCase() +
 			"' and datainfo.deletedbyinference = false " +
 			"GROUP BY source";
 
@@ -103,7 +103,7 @@ public class PrepareInfo implements Serializable {
 	}
 
 	private static void prepareInfo(SparkSession spark, String inputPath, String childParentOrganizationPath,
-		String currentIterationPath, String resultOrganizationPath, String resultProjectPath, String relationPath) {
+		String currentIterationPath, String resultOrganizationPath, String projectOrganizationPath, String relationPath) {
 		Dataset<Relation> relation = readPath(spark, inputPath + "/relation", Relation.class);
 		relation.createOrReplaceTempView("relation");
 
@@ -129,7 +129,7 @@ public class PrepareInfo implements Serializable {
 				.write()
 				.mode(SaveMode.Overwrite)
 				.option("compression", "gzip")
-				.json(resultProjectPath);
+				.json(projectOrganizationPath);
 
 		relation
 				.filter(
@@ -143,7 +143,7 @@ public class PrepareInfo implements Serializable {
 		relation
 				.filter(
 						(FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference() &&
-								r.getRelClass().equals(ModelConstants.IS_PARTICIPANT))
+								r.getRelClass().equals(ModelConstants.HAS_PARTICIPANT))
 				.write()
 				.mode(SaveMode.Overwrite)
 				.option("compression", "gzip")
