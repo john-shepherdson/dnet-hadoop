@@ -7,13 +7,14 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import java.io.Serializable;
 import java.util.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.*;
 import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.KeyValueSet;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -48,10 +49,10 @@ public class PrepareInfo implements Serializable {
 
 	// associate projects to all the participant orgs
 	private static final String PROJECT_ORGANIZATION_QUERY = "SELECT source key, collect_set(target) as valueSet " +
-			"FROM relation " +
-			"WHERE lower(relclass) = '" + ModelConstants.HAS_PARTICIPANT.toLowerCase() +
-			"' and datainfo.deletedbyinference = false " +
-			"GROUP BY source";
+		"FROM relation " +
+		"WHERE lower(relclass) = '" + ModelConstants.HAS_PARTICIPANT.toLowerCase() +
+		"' and datainfo.deletedbyinference = false " +
+		"GROUP BY source";
 
 	public static void main(String[] args) throws Exception {
 
@@ -98,12 +99,13 @@ public class PrepareInfo implements Serializable {
 				childParentPath,
 				leavesPath,
 				resultOrganizationPath,
-					projectOrgPath,
+				projectOrgPath,
 				relationPath));
 	}
 
 	private static void prepareInfo(SparkSession spark, String inputPath, String childParentOrganizationPath,
-		String currentIterationPath, String resultOrganizationPath, String projectOrganizationPath, String relationPath) {
+		String currentIterationPath, String resultOrganizationPath, String projectOrganizationPath,
+		String relationPath) {
 		Dataset<Relation> relation = readPath(spark, inputPath + "/relation", Relation.class);
 		relation.createOrReplaceTempView("relation");
 
@@ -124,30 +126,30 @@ public class PrepareInfo implements Serializable {
 			.json(resultOrganizationPath);
 
 		spark
-				.sql(PROJECT_ORGANIZATION_QUERY)
-				.as(Encoders.bean(KeyValueSet.class))
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression", "gzip")
-				.json(projectOrganizationPath);
+			.sql(PROJECT_ORGANIZATION_QUERY)
+			.as(Encoders.bean(KeyValueSet.class))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(projectOrganizationPath);
 
 		relation
-				.filter(
-						(FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference() &&
-								r.getRelClass().equals(ModelConstants.HAS_AUTHOR_INSTITUTION))
-				.write()
+			.filter(
+				(FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference() &&
+					r.getRelClass().equals(ModelConstants.HAS_AUTHOR_INSTITUTION))
+			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(relationPath + "/result");
 
 		relation
-				.filter(
-						(FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference() &&
-								r.getRelClass().equals(ModelConstants.HAS_PARTICIPANT))
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression", "gzip")
-				.json(relationPath + "/project");
+			.filter(
+				(FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference() &&
+					r.getRelClass().equals(ModelConstants.HAS_PARTICIPANT))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(relationPath + "/project");
 
 		Dataset<String> children = spark
 			.sql(

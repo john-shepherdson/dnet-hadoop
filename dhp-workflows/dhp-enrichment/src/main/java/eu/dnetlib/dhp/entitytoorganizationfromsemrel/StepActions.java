@@ -50,22 +50,25 @@ public class StepActions implements Serializable {
 			spark, resultOrgPath, readPath(spark, selectedRelsPath, Relation.class), orgOutputPath);
 	}
 
-	public static void prepareForNextStep(SparkSession spark, String selectedRelsPath, String resultOrgPath, String projectOrgPath,
-										  String leavesPath, String chldParentOrgPath, String leavesOutputPath,
-										  String orgOutputPath, String outputProjectPath) {
+	public static void prepareForNextStep(SparkSession spark, String selectedRelsPath, String resultOrgPath,
+		String projectOrgPath,
+		String leavesPath, String chldParentOrgPath, String leavesOutputPath,
+		String orgOutputPath, String outputProjectPath) {
 		// use of the parents as new leaves set
 		changeLeavesSet(spark, leavesPath, chldParentOrgPath, leavesOutputPath);
 
 		// add the new relations obtained from propagation to the keyvalueset result organization
 		updateEntityOrganization(
-				spark, resultOrgPath, readPath(spark, selectedRelsPath + NEW_RESULT_RELATION_PATH, Relation.class), orgOutputPath);
+			spark, resultOrgPath, readPath(spark, selectedRelsPath + NEW_RESULT_RELATION_PATH, Relation.class),
+			orgOutputPath);
 
 		updateEntityOrganization(
-				spark, projectOrgPath, readPath(spark, selectedRelsPath + NEW_PROJECT_RELATION_PATH, Relation.class), outputProjectPath);
+			spark, projectOrgPath, readPath(spark, selectedRelsPath + NEW_PROJECT_RELATION_PATH, Relation.class),
+			outputProjectPath);
 	}
 
 	private static void updateEntityOrganization(SparkSession spark, String entityOrgPath,
-												 Dataset<Relation> selectedRels, String outputPath) {
+		Dataset<Relation> selectedRels, String outputPath) {
 		Dataset<KeyValueSet> entityOrg = readPath(spark, entityOrgPath, KeyValueSet.class);
 		entityOrg
 			.joinWith(
@@ -128,45 +131,43 @@ public class StepActions implements Serializable {
 		// construction of the set)
 		// if at least one relation in the set was not produced by propagation no new relation will be returned
 
-
 		relationDataset
-				.union(newRels)
-				.groupByKey((MapFunction<Relation, String>) r -> r.getSource() + r.getTarget(), Encoders.STRING())
-				.mapGroups((MapGroupsFunction<String, Relation, String>) (k, it) -> {
+			.union(newRels)
+			.groupByKey((MapFunction<Relation, String>) r -> r.getSource() + r.getTarget(), Encoders.STRING())
+			.mapGroups((MapGroupsFunction<String, Relation, String>) (k, it) -> {
 
-					ArrayList<Relation> relationList = new ArrayList<>();
-					relationList.add(it.next());
-					it.forEachRemaining(rel -> relationList.add(rel));
+				ArrayList<Relation> relationList = new ArrayList<>();
+				relationList.add(it.next());
+				it.forEachRemaining(rel -> relationList.add(rel));
 
-					if (relationList
-							.stream()
-							.filter(
-									rel -> !rel
-											.getDataInfo()
-											.getProvenanceaction()
-											.getClassid()
-											.equals(PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_ID) && !rel
-											.getDataInfo()
-											.getProvenanceaction()
-											.getClassid()
-											.equals(PROPAGATION_RELATION_PROJECT_ORGANIZATION_SEM_REL_CLASS_ID))
-							.count() > 0) {
-						return null;
-					}
+				if (relationList
+					.stream()
+					.filter(
+						rel -> !rel
+							.getDataInfo()
+							.getProvenanceaction()
+							.getClassid()
+							.equals(PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_ID)
+							&& !rel
+								.getDataInfo()
+								.getProvenanceaction()
+								.getClassid()
+								.equals(PROPAGATION_RELATION_PROJECT_ORGANIZATION_SEM_REL_CLASS_ID))
+					.count() > 0) {
+					return null;
+				}
 
-					return new ObjectMapper().writeValueAsString(relationList.get(0));
+				return new ObjectMapper().writeValueAsString(relationList.get(0));
 
-				}, Encoders.STRING())
-				.filter(Objects::nonNull)
-				.map(
-						(MapFunction<String, Relation>) r -> new ObjectMapper().readValue(r, Relation.class),
-						Encoders.bean(Relation.class))
-				.write()
-				.mode(SaveMode.Append)
-				.option("compression", "gzip")
-				.json(newRelationPath);
-
-
+			}, Encoders.STRING())
+			.filter(Objects::nonNull)
+			.map(
+				(MapFunction<String, Relation>) r -> new ObjectMapper().readValue(r, Relation.class),
+				Encoders.bean(Relation.class))
+			.write()
+			.mode(SaveMode.Append)
+			.option("compression", "gzip")
+			.json(newRelationPath);
 
 	}
 
@@ -175,7 +176,7 @@ public class StepActions implements Serializable {
 		String leavesPath,
 		String chldParentOrgPath,
 		String entityOrgPath,
-															String semantics) {
+		String semantics) {
 
 		Dataset<KeyValueSet> childParent = readPath(spark, chldParentOrgPath, KeyValueSet.class);
 		Dataset<KeyValueSet> entityOrg = readPath(spark, entityOrgPath, KeyValueSet.class);
@@ -202,7 +203,6 @@ public class StepActions implements Serializable {
 					"GROUP BY entityId")
 			.as(Encoders.bean(KeyValueSet.class));
 
-
 		// create new relations from entity to organization for each entity linked to a leaf
 		return resultParent
 			.flatMap(
@@ -213,13 +213,11 @@ public class StepActions implements Serializable {
 						orgId -> getRelation(
 							v.getKey(),
 							orgId,
-								semantics))
+							semantics))
 					.collect(Collectors.toList())
 					.iterator(),
 				Encoders.bean(Relation.class));
 
 	}
-
-
 
 }

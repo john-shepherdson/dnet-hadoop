@@ -92,7 +92,7 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 				leavesPath,
 				childParentPath,
 				resultOrganizationPath,
-					projectOrganizationPath,
+				projectOrganizationPath,
 				relationPath,
 				workingPath,
 				outputPath,
@@ -147,15 +147,16 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 		addNewRelations(spark, workingPath + NEW_RESULT_RELATION_PATH, outputPath);
 
 		StepActions
-				.execStep(
-						spark, graphPath + "/project", workingPath + NEW_PROJECT_RELATION_PATH,
-						leavesPath, childParentPath, projectOrganizationPath, ModelConstants.HAS_PARTICIPANT);
+			.execStep(
+				spark, graphPath + "/project", workingPath + NEW_PROJECT_RELATION_PATH,
+				leavesPath, childParentPath, projectOrganizationPath, ModelConstants.HAS_PARTICIPANT);
 
 		addNewRelations(spark, workingPath + NEW_PROJECT_RELATION_PATH, outputPath);
 	}
 
 	private static void doPropagate(SparkSession spark, String leavesPath, String childParentPath,
-		String resultOrganizationPath, String projectOrganizationPath, String graphPath, String workingPath, String outputPath,
+		String resultOrganizationPath, String projectOrganizationPath, String graphPath, String workingPath,
+		String outputPath,
 		PropagationCounter propagationCounter) {
 		int iteration = 0;
 		long leavesCount;
@@ -167,13 +168,13 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 					spark, graphPath + "/result", workingPath + NEW_RESULT_RELATION_PATH,
 					leavesPath, childParentPath, resultOrganizationPath, ModelConstants.HAS_AUTHOR_INSTITUTION);
 			StepActions
-					.execStep(
-							spark, graphPath + "/project", workingPath + NEW_PROJECT_RELATION_PATH,
-							leavesPath, childParentPath, projectOrganizationPath, ModelConstants.HAS_PARTICIPANT);
+				.execStep(
+					spark, graphPath + "/project", workingPath + NEW_PROJECT_RELATION_PATH,
+					leavesPath, childParentPath, projectOrganizationPath, ModelConstants.HAS_PARTICIPANT);
 
 			StepActions
 				.prepareForNextStep(
-					spark, workingPath , resultOrganizationPath, projectOrganizationPath, leavesPath,
+					spark, workingPath, resultOrganizationPath, projectOrganizationPath, leavesPath,
 					childParentPath, workingPath + "/leaves", workingPath + "/resOrg", workingPath + "/projOrg");
 			moveOutput(spark, workingPath, leavesPath, resultOrganizationPath, projectOrganizationPath);
 			leavesCount = readPath(spark, leavesPath, Leaves.class).count();
@@ -224,24 +225,24 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 	}
 
 	private static void moveOutput(SparkSession spark, String workingPath, String leavesPath,
-								   String resultOrganizationPath, String projectOrganizationPath) {
+		String resultOrganizationPath, String projectOrganizationPath) {
 		readPath(spark, workingPath + "/leaves", Leaves.class)
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression", "gzip")
-				.json(leavesPath);
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(leavesPath);
 
 		readPath(spark, workingPath + "/resOrg", KeyValueSet.class)
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression", "gzip")
-				.json(resultOrganizationPath);
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(resultOrganizationPath);
 
 		readPath(spark, workingPath + "/projOrg", KeyValueSet.class)
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression", "gzip")
-				.json(projectOrganizationPath);
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(projectOrganizationPath);
 
 	}
 
@@ -253,24 +254,21 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 			.mapGroups(
 				(MapGroupsFunction<String, Relation, Relation>) (k, it) -> it.next(), Encoders.bean(Relation.class))
 			.flatMap(
-				(FlatMapFunction<Relation, Relation>) r ->
-				{
-					if(r.getSource().startsWith("50|")){
+				(FlatMapFunction<Relation, Relation>) r -> {
+					if (r.getSource().startsWith("50|")) {
 						return Arrays
-								.asList(
-										r, getAffiliationRelation(
-												r.getTarget(), r.getSource(), ModelConstants.IS_AUTHOR_INSTITUTION_OF))
-								.iterator();
-					}else{
+							.asList(
+								r, getAffiliationRelation(
+									r.getTarget(), r.getSource(), ModelConstants.IS_AUTHOR_INSTITUTION_OF))
+							.iterator();
+					} else {
 						return Arrays
-								.asList(
-										r, getParticipantRelation(
-												r.getTarget(), r.getSource(), ModelConstants.IS_PARTICIPANT))
-								.iterator();
+							.asList(
+								r, getParticipantRelation(
+									r.getTarget(), r.getSource(), ModelConstants.IS_PARTICIPANT))
+							.iterator();
 					}
 				}
-
-
 
 				, Encoders.bean(Relation.class))
 			.write()

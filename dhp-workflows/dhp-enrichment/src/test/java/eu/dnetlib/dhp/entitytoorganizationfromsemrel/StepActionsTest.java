@@ -87,7 +87,8 @@ public class StepActionsTest {
 				getClass()
 					.getResource(
 						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/resultOrganization/")
-					.getPath(), ModelConstants.HAS_AUTHOR_INSTITUTION);
+					.getPath(),
+				ModelConstants.HAS_AUTHOR_INSTITUTION);
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 

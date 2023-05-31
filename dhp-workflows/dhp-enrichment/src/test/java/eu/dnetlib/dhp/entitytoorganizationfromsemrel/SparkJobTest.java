@@ -85,9 +85,9 @@ public class SparkJobTest {
 			.getPath();
 
 		final String projectOrgPath = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/projectOrganization/")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/projectOrganization/")
+			.getPath();
 
 		readPath(spark, leavesPath, Leaves.class)
 			.write()
@@ -100,9 +100,9 @@ public class SparkJobTest {
 			.json(workingDir.toString() + "/orgsInput");
 
 		readPath(spark, projectOrgPath, KeyValueSet.class)
-				.write()
-				.option("compression", "gzip")
-				.json(workingDir.toString() + "/projectInput");
+			.write()
+			.option("compression", "gzip")
+			.json(workingDir.toString() + "/projectInput");
 
 		SparkResultToOrganizationFromSemRel
 
@@ -114,7 +114,7 @@ public class SparkJobTest {
 					"-outputPath", workingDir.toString() + "/finalrelation",
 					"-leavesPath", workingDir.toString() + "/leavesInput",
 					"-resultOrgPath", workingDir.toString() + "/orgsInput",
-						"-projectOrganizationPath", workingDir.toString() + "/projectInput",
+					"-projectOrganizationPath", workingDir.toString() + "/projectInput",
 					"-childParentPath", childParentPath,
 					"-workingDir", workingDir.toString()
 				});
@@ -161,19 +161,24 @@ public class SparkJobTest {
 			.foreach(r -> Assertions.assertEquals(ModelConstants.HAS_AUTHOR_INSTITUTION, r.getRelClass()));
 		Assertions
 			.assertEquals(
-				2, result.filter(r -> r.getSource().equals("50|doajarticles::1cae0b82b56ccd97c2db1f698def7074")).count());
+				2,
+				result.filter(r -> r.getSource().equals("50|doajarticles::1cae0b82b56ccd97c2db1f698def7074")).count());
 		Assertions
 			.assertEquals(
-				3, result.filter(r -> r.getSource().equals("50|dedup_wf_001::2899e571609779168222fdeb59cb916d")).count());
+				3,
+				result.filter(r -> r.getSource().equals("50|dedup_wf_001::2899e571609779168222fdeb59cb916d")).count());
 		Assertions
 			.assertEquals(
-				2, result.filter(r -> r.getSource().equals("50|doajarticles::2baa9032dc058d3c8ff780c426b0c19f")).count());
+				2,
+				result.filter(r -> r.getSource().equals("50|doajarticles::2baa9032dc058d3c8ff780c426b0c19f")).count());
 		Assertions
 			.assertEquals(
-				1, result.filter(r -> r.getSource().equals("50|openaire____::ec653e804967133b9436fdd30d3ff51d")).count());
+				1,
+				result.filter(r -> r.getSource().equals("50|openaire____::ec653e804967133b9436fdd30d3ff51d")).count());
 		Assertions
 			.assertEquals(
-				1, result.filter(r -> r.getSource().equals("50|doajarticles::03748bcb5d754c951efec9700e18a56d")).count());
+				1,
+				result.filter(r -> r.getSource().equals("50|doajarticles::03748bcb5d754c951efec9700e18a56d")).count());
 
 		Assertions.assertEquals(9, result.filter(r -> r.getSource().substring(0, 3).equals("20|")).count());
 		result
@@ -181,19 +186,24 @@ public class SparkJobTest {
 			.foreach(r -> Assertions.assertEquals(ModelConstants.IS_AUTHOR_INSTITUTION_OF, r.getRelClass()));
 		Assertions
 			.assertEquals(
-				1, result.filter(r -> r.getSource().equals("20|doajarticles::1cae0b82b56ccd97c2db1f698def7074")).count());
+				1,
+				result.filter(r -> r.getSource().equals("20|doajarticles::1cae0b82b56ccd97c2db1f698def7074")).count());
 		Assertions
 			.assertEquals(
-				1, result.filter(r -> r.getSource().equals("20|dedup_wf_001::2899e571609779168222fdeb59cb916d")).count());
+				1,
+				result.filter(r -> r.getSource().equals("20|dedup_wf_001::2899e571609779168222fdeb59cb916d")).count());
 		Assertions
 			.assertEquals(
-				2, result.filter(r -> r.getSource().equals("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f")).count());
+				2,
+				result.filter(r -> r.getSource().equals("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f")).count());
 		Assertions
 			.assertEquals(
-				2, result.filter(r -> r.getSource().equals("20|openaire____::ec653e804967133b9436fdd30d3ff51d")).count());
+				2,
+				result.filter(r -> r.getSource().equals("20|openaire____::ec653e804967133b9436fdd30d3ff51d")).count());
 		Assertions
 			.assertEquals(
-				3, result.filter(r -> r.getSource().equals("20|doajarticles::03748bcb5d754c951efec9700e18a56d")).count());
+				3,
+				result.filter(r -> r.getSource().equals("20|doajarticles::03748bcb5d754c951efec9700e18a56d")).count());
 
 		Assertions
 			.assertTrue(
@@ -336,332 +346,343 @@ public class SparkJobTest {
 	public void completeProjectExecution() throws Exception {
 
 		final String graphPath = getClass()
-				.getResource("/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/graph")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/graph")
+			.getPath();
 		final String leavesPath = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/currentIteration/")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/currentIteration/")
+			.getPath();
 		final String childParentPath = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/childParentOrg/")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/childParentOrg/")
+			.getPath();
 
 		final String resultOrgPath = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/resultOrganization/")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/resultOrganization/")
+			.getPath();
 
 		final String projectOrgPath = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/projectOrganization/")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/projectOrganization/")
+			.getPath();
 
 		readPath(spark, leavesPath, Leaves.class)
-				.write()
-				.option("compression", "gzip")
-				.json(workingDir.toString() + "/leavesInput");
+			.write()
+			.option("compression", "gzip")
+			.json(workingDir.toString() + "/leavesInput");
 
 		readPath(spark, resultOrgPath, KeyValueSet.class)
-				.write()
-				.option("compression", "gzip")
-				.json(workingDir.toString() + "/orgsInput");
+			.write()
+			.option("compression", "gzip")
+			.json(workingDir.toString() + "/orgsInput");
 
 		readPath(spark, projectOrgPath, KeyValueSet.class)
-				.write()
-				.option("compression", "gzip")
-				.json(workingDir.toString() + "/projectInput");
+			.write()
+			.option("compression", "gzip")
+			.json(workingDir.toString() + "/projectInput");
 
 		SparkResultToOrganizationFromSemRel
 
-				.main(
-						new String[] {
-								"-isSparkSessionManaged", Boolean.FALSE.toString(),
-								"-relationPath", graphPath,
-								"-hive_metastore_uris", "",
-								"-outputPath", workingDir.toString() + "/finalrelation",
-								"-leavesPath", workingDir.toString() + "/leavesInput",
-								"-resultOrgPath", workingDir.toString() + "/orgsInput",
-								"-projectOrganizationPath", workingDir.toString() + "/projectInput",
-								"-childParentPath", childParentPath,
-								"-workingDir", workingDir.toString()
-						});
+			.main(
+				new String[] {
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-relationPath", graphPath,
+					"-hive_metastore_uris", "",
+					"-outputPath", workingDir.toString() + "/finalrelation",
+					"-leavesPath", workingDir.toString() + "/leavesInput",
+					"-resultOrgPath", workingDir.toString() + "/orgsInput",
+					"-projectOrganizationPath", workingDir.toString() + "/projectInput",
+					"-childParentPath", childParentPath,
+					"-workingDir", workingDir.toString()
+				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> temp = sc
-				.textFile(workingDir.toString() + "/finalrelation")
-				.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
+			.textFile(workingDir.toString() + "/finalrelation")
+			.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
 
 		Assertions.assertEquals(36, temp.count());
 
-		JavaRDD<Relation> project = temp.filter(r -> r.getSource().startsWith("40|") || r.getTarget().startsWith("40|"));
+		JavaRDD<Relation> project = temp
+			.filter(r -> r.getSource().startsWith("40|") || r.getTarget().startsWith("40|"));
 		Assertions.assertEquals(18, project.count());
 
 		project.foreach(r -> Assertions.assertEquals(ModelConstants.PARTICIPATION, r.getSubRelType()));
 		project.foreach(r -> Assertions.assertEquals(ModelConstants.PROJECT_ORGANIZATION, r.getRelType()));
 		project
-				.foreach(
-						r -> Assertions
-								.assertEquals(
-										PropagationConstant.PROPAGATION_DATA_INFO_TYPE, r.getDataInfo().getInferenceprovenance()));
+			.foreach(
+				r -> Assertions
+					.assertEquals(
+						PropagationConstant.PROPAGATION_DATA_INFO_TYPE, r.getDataInfo().getInferenceprovenance()));
 		project
-				.foreach(
-						r -> Assertions
-								.assertEquals(
-										PropagationConstant.PROPAGATION_RELATION_PROJECT_ORGANIZATION_SEM_REL_CLASS_ID,
-										r.getDataInfo().getProvenanceaction().getClassid()));
+			.foreach(
+				r -> Assertions
+					.assertEquals(
+						PropagationConstant.PROPAGATION_RELATION_PROJECT_ORGANIZATION_SEM_REL_CLASS_ID,
+						r.getDataInfo().getProvenanceaction().getClassid()));
 		project
-				.foreach(
-						r -> Assertions
-								.assertEquals(
-										PropagationConstant.PROPAGATION_RELATION_PROJECT_ORGANIZATION_SEM_REL_CLASS_NAME,
-										r.getDataInfo().getProvenanceaction().getClassname()));
+			.foreach(
+				r -> Assertions
+					.assertEquals(
+						PropagationConstant.PROPAGATION_RELATION_PROJECT_ORGANIZATION_SEM_REL_CLASS_NAME,
+						r.getDataInfo().getProvenanceaction().getClassname()));
 		project
-				.foreach(
-						r -> Assertions
-								.assertEquals(
-										"0.85",
-										r.getDataInfo().getTrust()));
+			.foreach(
+				r -> Assertions
+					.assertEquals(
+						"0.85",
+						r.getDataInfo().getTrust()));
 
 		Assertions.assertEquals(9, project.filter(r -> r.getSource().substring(0, 3).equals("40|")).count());
 		project
-				.filter(r -> r.getSource().substring(0, 3).equals("40|"))
-				.foreach(r -> Assertions.assertEquals(ModelConstants.HAS_PARTICIPANT, r.getRelClass()));
+			.filter(r -> r.getSource().substring(0, 3).equals("40|"))
+			.foreach(r -> Assertions.assertEquals(ModelConstants.HAS_PARTICIPANT, r.getRelClass()));
 		Assertions
-				.assertEquals(
-						2, project.filter(r -> r.getSource().equals("40|doajarticles::1cae0b82b56ccd97c2db1f698def7074")).count());
+			.assertEquals(
+				2,
+				project.filter(r -> r.getSource().equals("40|doajarticles::1cae0b82b56ccd97c2db1f698def7074")).count());
 		Assertions
-				.assertEquals(
-						3, project.filter(r -> r.getSource().equals("40|dedup_wf_001::2899e571609779168222fdeb59cb916d")).count());
+			.assertEquals(
+				3,
+				project.filter(r -> r.getSource().equals("40|dedup_wf_001::2899e571609779168222fdeb59cb916d")).count());
 		Assertions
-				.assertEquals(
-						2, project.filter(r -> r.getSource().equals("40|doajarticles::2baa9032dc058d3c8ff780c426b0c19f")).count());
+			.assertEquals(
+				2,
+				project.filter(r -> r.getSource().equals("40|doajarticles::2baa9032dc058d3c8ff780c426b0c19f")).count());
 		Assertions
-				.assertEquals(
-						1, project.filter(r -> r.getSource().equals("40|openaire____::ec653e804967133b9436fdd30d3ff51d")).count());
+			.assertEquals(
+				1,
+				project.filter(r -> r.getSource().equals("40|openaire____::ec653e804967133b9436fdd30d3ff51d")).count());
 		Assertions
-				.assertEquals(
-						1, project.filter(r -> r.getSource().equals("40|doajarticles::03748bcb5d754c951efec9700e18a56d")).count());
+			.assertEquals(
+				1,
+				project.filter(r -> r.getSource().equals("40|doajarticles::03748bcb5d754c951efec9700e18a56d")).count());
 
 		Assertions.assertEquals(9, project.filter(r -> r.getSource().substring(0, 3).equals("20|")).count());
 		project
-				.filter(r -> r.getSource().substring(0, 3).equals("20|"))
-				.foreach(r -> Assertions.assertEquals(ModelConstants.IS_PARTICIPANT, r.getRelClass()));
+			.filter(r -> r.getSource().substring(0, 3).equals("20|"))
+			.foreach(r -> Assertions.assertEquals(ModelConstants.IS_PARTICIPANT, r.getRelClass()));
 		Assertions
-				.assertEquals(
-						1, project.filter(r -> r.getSource().equals("20|doajarticles::1cae0b82b56ccd97c2db1f698def7074")).count());
+			.assertEquals(
+				1,
+				project.filter(r -> r.getSource().equals("20|doajarticles::1cae0b82b56ccd97c2db1f698def7074")).count());
 		Assertions
-				.assertEquals(
-						1, project.filter(r -> r.getSource().equals("20|dedup_wf_001::2899e571609779168222fdeb59cb916d")).count());
+			.assertEquals(
+				1,
+				project.filter(r -> r.getSource().equals("20|dedup_wf_001::2899e571609779168222fdeb59cb916d")).count());
 		Assertions
-				.assertEquals(
-						2, project.filter(r -> r.getSource().equals("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f")).count());
+			.assertEquals(
+				2,
+				project.filter(r -> r.getSource().equals("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f")).count());
 		Assertions
-				.assertEquals(
-						2, project.filter(r -> r.getSource().equals("20|openaire____::ec653e804967133b9436fdd30d3ff51d")).count());
+			.assertEquals(
+				2,
+				project.filter(r -> r.getSource().equals("20|openaire____::ec653e804967133b9436fdd30d3ff51d")).count());
 		Assertions
-				.assertEquals(
-						3, project.filter(r -> r.getSource().equals("20|doajarticles::03748bcb5d754c951efec9700e18a56d")).count());
+			.assertEquals(
+				3,
+				project.filter(r -> r.getSource().equals("20|doajarticles::03748bcb5d754c951efec9700e18a56d")).count());
 
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("40|doajarticles::1cae0b82b56ccd97c2db1f698def7074"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("20|doajarticles::1cae0b82b56ccd97c2db1f698def7074"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("40|doajarticles::1cae0b82b56ccd97c2db1f698def7074"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("20|doajarticles::1cae0b82b56ccd97c2db1f698def7074"));
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("40|doajarticles::1cae0b82b56ccd97c2db1f698def7074"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("20|openaire____::ec653e804967133b9436fdd30d3ff51d"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("40|doajarticles::1cae0b82b56ccd97c2db1f698def7074"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("20|openaire____::ec653e804967133b9436fdd30d3ff51d"));
 
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("40|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("40|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"));
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("40|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("20|doajarticles::03748bcb5d754c951efec9700e18a56d"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("40|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("20|doajarticles::03748bcb5d754c951efec9700e18a56d"));
 
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("40|dedup_wf_001::2899e571609779168222fdeb59cb916d"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("20|dedup_wf_001::2899e571609779168222fdeb59cb916d"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("40|dedup_wf_001::2899e571609779168222fdeb59cb916d"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("20|dedup_wf_001::2899e571609779168222fdeb59cb916d"));
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("40|dedup_wf_001::2899e571609779168222fdeb59cb916d"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("40|dedup_wf_001::2899e571609779168222fdeb59cb916d"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"));
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("40|dedup_wf_001::2899e571609779168222fdeb59cb916d"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("20|doajarticles::03748bcb5d754c951efec9700e18a56d"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("40|dedup_wf_001::2899e571609779168222fdeb59cb916d"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("20|doajarticles::03748bcb5d754c951efec9700e18a56d"));
 
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("40|openaire____::ec653e804967133b9436fdd30d3ff51d"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("20|openaire____::ec653e804967133b9436fdd30d3ff51d"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("40|openaire____::ec653e804967133b9436fdd30d3ff51d"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("20|openaire____::ec653e804967133b9436fdd30d3ff51d"));
 
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("40|doajarticles::03748bcb5d754c951efec9700e18a56d"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("20|doajarticles::03748bcb5d754c951efec9700e18a56d"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("40|doajarticles::03748bcb5d754c951efec9700e18a56d"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("20|doajarticles::03748bcb5d754c951efec9700e18a56d"));
 
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("20|openaire____::ec653e804967133b9436fdd30d3ff51d"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("40|doajarticles::1cae0b82b56ccd97c2db1f698def7074"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("20|openaire____::ec653e804967133b9436fdd30d3ff51d"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("40|doajarticles::1cae0b82b56ccd97c2db1f698def7074"));
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("20|openaire____::ec653e804967133b9436fdd30d3ff51d"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("40|openaire____::ec653e804967133b9436fdd30d3ff51d"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("20|openaire____::ec653e804967133b9436fdd30d3ff51d"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("40|openaire____::ec653e804967133b9436fdd30d3ff51d"));
 
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("40|dedup_wf_001::2899e571609779168222fdeb59cb916d"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("40|dedup_wf_001::2899e571609779168222fdeb59cb916d"));
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("40|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("40|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"));
 
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("20|doajarticles::03748bcb5d754c951efec9700e18a56d"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("40|dedup_wf_001::2899e571609779168222fdeb59cb916d"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("20|doajarticles::03748bcb5d754c951efec9700e18a56d"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("40|dedup_wf_001::2899e571609779168222fdeb59cb916d"));
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("20|doajarticles::03748bcb5d754c951efec9700e18a56d"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("40|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("20|doajarticles::03748bcb5d754c951efec9700e18a56d"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("40|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"));
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("20|doajarticles::03748bcb5d754c951efec9700e18a56d"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("40|doajarticles::03748bcb5d754c951efec9700e18a56d"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("20|doajarticles::03748bcb5d754c951efec9700e18a56d"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("40|doajarticles::03748bcb5d754c951efec9700e18a56d"));
 
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("20|dedup_wf_001::2899e571609779168222fdeb59cb916d"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("40|dedup_wf_001::2899e571609779168222fdeb59cb916d"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("20|dedup_wf_001::2899e571609779168222fdeb59cb916d"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("40|dedup_wf_001::2899e571609779168222fdeb59cb916d"));
 
 		Assertions
-				.assertTrue(
-						project
-								.filter(r -> r.getSource().equals("20|doajarticles::1cae0b82b56ccd97c2db1f698def7074"))
-								.map(r -> r.getTarget())
-								.collect()
-								.contains("40|doajarticles::1cae0b82b56ccd97c2db1f698def7074"));
+			.assertTrue(
+				project
+					.filter(r -> r.getSource().equals("20|doajarticles::1cae0b82b56ccd97c2db1f698def7074"))
+					.map(r -> r.getTarget())
+					.collect()
+					.contains("40|doajarticles::1cae0b82b56ccd97c2db1f698def7074"));
 	}
 
 	@Test
 	public void singleIterationExecution() throws Exception {
 
 		final String graphPath = getClass()
-				.getResource("/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/graph")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/graph")
+			.getPath();
 		final String leavesPath = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/currentIteration/")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/currentIteration/")
+			.getPath();
 		final String childParentPath = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/childParentOrg/")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/childParentOrg/")
+			.getPath();
 
 		final String resultOrgPath = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/resultOrganization/")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/resultOrganization/")
+			.getPath();
 
 		final String projectOrgPath = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/projectOrganization/")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/projectOrganization/")
+			.getPath();
 
 		readPath(spark, leavesPath, Leaves.class)
-				.write()
-				.option("compression", "gzip")
-				.json(workingDir.toString() + "/leavesInput");
+			.write()
+			.option("compression", "gzip")
+			.json(workingDir.toString() + "/leavesInput");
 
 		readPath(spark, resultOrgPath, KeyValueSet.class)
-				.write()
-				.option("compression", "gzip")
-				.json(workingDir.toString() + "/orgsInput");
+			.write()
+			.option("compression", "gzip")
+			.json(workingDir.toString() + "/orgsInput");
 
 		readPath(spark, projectOrgPath, KeyValueSet.class)
-				.write()
-				.option("compression", "gzip")
-				.json(workingDir.toString() + "/projectInput");
+			.write()
+			.option("compression", "gzip")
+			.json(workingDir.toString() + "/projectInput");
 
 		SparkResultToOrganizationFromSemRel
 
-				.main(
-						new String[] {
-								"-isSparkSessionManaged", Boolean.FALSE.toString(),
-								"-relationPath", graphPath,
-								"-hive_metastore_uris", "",
-								"-outputPath", workingDir.toString() + "/finalrelation",
-								"-leavesPath", workingDir.toString() + "/leavesInput",
-								"-resultOrgPath", workingDir.toString() + "/orgsInput",
-								"-projectOrganizationPath", workingDir.toString() + "/projectInput",
-								"-childParentPath", childParentPath,
-								"-workingDir", workingDir.toString(),
-								"-iterations", "1"
-						});
+			.main(
+				new String[] {
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-relationPath", graphPath,
+					"-hive_metastore_uris", "",
+					"-outputPath", workingDir.toString() + "/finalrelation",
+					"-leavesPath", workingDir.toString() + "/leavesInput",
+					"-resultOrgPath", workingDir.toString() + "/orgsInput",
+					"-projectOrganizationPath", workingDir.toString() + "/projectInput",
+					"-childParentPath", childParentPath,
+					"-workingDir", workingDir.toString(),
+					"-iterations", "1"
+				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> temp = sc
-				.textFile(workingDir.toString() + "/finalrelation")
-				.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
+			.textFile(workingDir.toString() + "/finalrelation")
+			.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
 
 		Assertions.assertEquals(16, temp.count());
 
