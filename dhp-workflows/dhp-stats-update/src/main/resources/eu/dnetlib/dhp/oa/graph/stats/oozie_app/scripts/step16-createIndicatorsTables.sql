@@ -92,28 +92,28 @@ ANALYZE TABLE indi_funded_result_with_fundref COMPUTE STATISTICS;
 --
 -- compute stats indi_result_org_collab;
 --
-create TEMPORARY TABLE tmp AS SELECT ro.organization organization, ro.id from result_organization ro
+create TEMPORARY TABLE tmp AS SELECT ro.organization organization, ro.id, o.name from result_organization ro
 join organization o on o.id=ro.organization where o.name is not null;
 
 create table if not exists indi_result_org_collab stored as parquet as
-select o1.organization org1, o2.organization org2, count(o1.id) as collaborations
+select o1.organization org1, o1.name org1name1, o2.organization org2, o2.name org2name2, count(o1.id) as collaborations
 from tmp as o1
-join tmp as o2 where o1.id=o2.id and o1.organization!=o2.organization
-group by o1.organization, o2.organization;
+join tmp as o2 where o1.id=o2.id and o1.organization!=o2.organization and o1.name!=o2.name
+group by o1.organization, o2.organization, o1.name, o2.name;
 
 drop table tmp purge;
 
 ANALYZE TABLE indi_result_org_collab COMPUTE STATISTICS;
 
 create TEMPORARY TABLE tmp AS
-select distinct ro.organization organization, ro.id, o.country from result_organization ro
+select distinct ro.organization organization, ro.id, o.name, o.country from result_organization ro
 join organization o on o.id=ro.organization where country <> 'UNKNOWN'  and o.name is not null;
 
 create table if not exists indi_result_org_country_collab stored as parquet as
-select o1.organization org1,o2.country country2, count(o1.id) as collaborations
+select o1.organization org1,o1.name org1name1, o2.country country2, count(o1.id) as collaborations
 from tmp as o1 join tmp as o2 on o1.id=o2.id
 where o1.id=o2.id and o1.country!=o2.country
-group by o1.organization, o1.id, o2.country;
+group by o1.organization, o1.id, o1.name, o2.country;
 
 drop table tmp purge;
 
@@ -121,7 +121,7 @@ ANALYZE TABLE indi_result_org_country_collab COMPUTE STATISTICS;
 
 create TEMPORARY TABLE AS
 select o.id organization, o.name, ro.project as project  from organization o
-        join organization_projects ro on o.id=ro.id;
+        join organization_projects ro on o.id=ro.id  where o.name is not null;
 
 create table if not exists indi_project_collab_org stored as parquet as
 select o1.organization org1,o1.name orgname1, o2.organization org2, o2.name orgname2, count(distinct o1.project) as collaborations
@@ -133,16 +133,16 @@ group by o1.name,o2.name, o1.organization, o2.organization;
 ANALYZE TABLE indi_project_collab_org COMPUTE STATISTICS;
 
 create TEMPORARY TABLE tmp AS
-select o.id organization, o.country , ro.project as project  from organization o
+select o.id organization, o.name, o.country , ro.project as project  from organization o
         join organization_projects ro on o.id=ro.id
-        and o.country <> 'UNKNOWN';
+        and o.country <> 'UNKNOWN' and o.name is not null;
 
 create table if not exists indi_project_collab_org_country stored as parquet as
-select o1.organization org1,o2.country country2, count(distinct o1.project) as collaborations
+select o1.organization org1,o1.name org1name, o2.country country2, count(distinct o1.project) as collaborations
 from tmp as o1
          join tmp as o2 on o1.project=o2.project
 where o1.organization<>o2.organization and o1.country<>o2.country
-group by o1.organization, o2.country;
+group by o1.organization, o2.country, o1.name;
 
 drop table tmp purge;
 
@@ -792,5 +792,7 @@ from pub_fos_totals p
 left outer join (
 select pub_fos_totals.id, 1 as indi_pub_is_interdisciplinary from pub_fos_totals
 where totals>10) tmp on p.id=tmp.id;
+
+drop table pub_fos_totals purge;
 
 ANALYZE TABLE indi_pub_interdisciplinarity COMPUTE STATISTICS;
