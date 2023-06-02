@@ -780,3 +780,17 @@ from result lateral view explode(measures) measures as measures_ids
 where measures_ids.id!='views' and measures_ids.id!='downloads';
 
 ANALYZE TABLE indi_impact_measures COMPUTE STATISTICS;
+
+CREATE TEMPORARY TABLE pub_fos_totals as
+select rf.id, count(distinct lvl3) totals from result_fos rf
+group by rf.id;
+
+create table if not exists indi_pub_interdisciplinarity as
+select distinct p.id, coalesce(indi_pub_is_interdisciplinary, 0)
+as indi_pub_is_interdisciplinary
+from pub_fos_totals p
+left outer join (
+select pub_fos_totals.id, 1 as indi_pub_is_interdisciplinary from pub_fos_totals
+where totals>10) tmp on p.id=tmp.id;
+
+ANALYZE TABLE indi_pub_interdisciplinarity COMPUTE STATISTICS;
