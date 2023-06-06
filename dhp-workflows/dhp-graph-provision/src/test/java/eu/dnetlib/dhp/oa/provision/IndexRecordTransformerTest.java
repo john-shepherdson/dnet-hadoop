@@ -129,6 +129,12 @@ public class IndexRecordTransformerTest {
 	}
 
 	@Test
+	public void testForEOSCFutureSentinel() throws IOException, TransformerException {
+		final String record = IOUtils.toString(getClass().getResourceAsStream("eosc-future/sentinel.xml"));
+		testRecordTransformation(record);
+	}
+
+	@Test
 	public void testForEdithDemo() throws IOException, TransformerException {
 		final String record = IOUtils.toString(getClass().getResourceAsStream("edith-demo/10.1098-rsta.2020.0257.xml"));
 		testRecordTransformation(record);

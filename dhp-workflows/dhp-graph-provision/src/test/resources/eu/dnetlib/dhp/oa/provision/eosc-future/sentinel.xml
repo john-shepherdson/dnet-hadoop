@@ -1,0 +1,138 @@
+<record>
+    <result xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <header>
+            <dri:objIdentifier>doi_dedup___::10a910f4a66b7f4bce8407d7a486a80a</dri:objIdentifier>
+            <dri:dateOfCollection>2023-04-05T00:36:27+0000</dri:dateOfCollection>
+            <dri:dateOfTransformation>2023-04-05T07:33:52.185Z</dri:dateOfTransformation>
+        </header>
+        <metadata>
+            <oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf http://namespace.openaire.eu/oaf http://www.openaire.eu/schema/0.2/oaf-0.2.xsd">
+
+                <oaf:result>
+                    <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254" />
+                    <originalId>50|datacite____::10a910f4a66b7f4bce8407d7a486a80a</originalId>
+                    <originalId>10.5281/zenodo.6967373</originalId>
+                    <originalId>50|datacite____::172969c66c312a9656fc745f0ec62ce5</originalId>
+                    <originalId>10.5281/zenodo.6969999</originalId>
+                    <originalId>50|datacite____::4fa8f1c89ff11e8e99f9ded870ade80d</originalId>
+                    <originalId>10.5281/zenodo.6967372</originalId>
+                    <originalId>50|datacite____::a466b6173773d742b7a5881682748a8c</originalId>
+                    <originalId>10.5281/zenodo.6970067</originalId>
+                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.6967373</pid>
+                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.6969999</pid>
+                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.6967372</pid>
+                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.6970067</pid>
+                    <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title">Sentinel-3 NDVI ARD and Long Term Statistics (1999-2019) from the Copernicus Global Land Service over Lombardia</title>
+                    <bestaccessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                    <creator rank="1">Marasco Pier Lorenzo</creator>
+                    <dateofacceptance>2022-08-05</dateofacceptance>
+                    <description>Sentinel-3 NDVI Analysis Ready Data (ARD) (C_GLS_NDVI_20220101_20220701_Lombardia_S3_2.nc) product provided by the Copernicus Global Land Service [3]. The file C_GLS_NDVI_20220101_20220701_Lombardia_S3_2_masked.nc is derived from C_GLS_NDVI_20220101_20220701_Lombardia_S3_2.nc but values have been scaled (raw_value * ( 1/250) - 0.08) and values lower then -0.08 and greater than 0.92 have been removed (set to missing values). The original dataset can also be discovered through the OpenEO API[5] from the CGLS distributor VITO [4]. Access is free of charge but an EGI registration is needed. The file called Italy.geojson has been created using the Global Administrative Unit Layers GAUL G2015_2014 provided by FAO-UN (see Documentation). It only contains information related to Italy. Further info about drought indexes can be found in the Integrated Drought Management Programme [5] [1] Application of vegetation index and brightness temperature for drought detection [2] NDVI [3] Copernicus Global Land Service [4] Vito [5] OpenEO [5] Integrated Drought Management</description>
+                    <description>These datasets are used for training purposes. See https://pangeo-data.github.io/foss4g-2022/intro.html</description>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">NDVI</subject>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">vegetaion</subject>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">Copernicus Global Land Service</subject>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">pangeo</subject>
+                    <language classid="eng" classname="English" schemeid="dnet:languages" schemename="dnet:languages" />
+                    <relevantdate classid="issued" classname="issued" schemeid="dnet:dataCite_date" schemename="dnet:dataCite_date">2022-08-05</relevantdate>
+                    <publisher>Zenodo</publisher>
+                    <resulttype classid="dataset" classname="dataset" schemeid="dnet:result_typologies" schemename="dnet:result_typologies" />
+                    <resourcetype classid="UNKNOWN" classname="Unknown" schemeid="dnet:dataCite_resource" schemename="dnet:dataCite_resource" />
+                    <eoscifguidelines code="EOSC::Jupyter Notebook" label="EOSC::Jupyter Notebook" semanticrelation="compliesWith" />
+                    <datainfo>
+                        <inferred>true</inferred>
+                        <deletedbyinference>false</deletedbyinference>
+                        <trust>0.8</trust>
+                        <inferenceprovenance>dedup-result-decisiontree-v3</inferenceprovenance>
+                        <provenanceaction classid="sysimport:dedup" classname="Inferred by OpenAIRE" schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions" />
+                    </datainfo>
+                    <rels></rels>
+                    <children>
+                        <result objidentifier="doi_________::4fa8f1c89ff11e8e99f9ded870ade80d">
+                            <publisher>Zenodo</publisher>
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.6967372</pid>
+                            <dateofacceptance>2022-08-05</dateofacceptance>
+                            <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254" />
+                            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title">Sentinel-3 NDVI ARD and Long Term Statistics (1999-2019) from the Copernicus Global Land Service over Lombardia</title>
+                        </result>
+                        <result objidentifier="doi_________::a466b6173773d742b7a5881682748a8c">
+                            <publisher>Zenodo</publisher>
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.6970067</pid>
+                            <dateofacceptance>2022-08-05</dateofacceptance>
+                            <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254" />
+                            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title">Sentinel-3 NDVI ARD and Long Term Statistics (1999-2019) from the Copernicus Global Land Service over Lombardia</title>
+                        </result>
+                        <result objidentifier="doi_________::172969c66c312a9656fc745f0ec62ce5">
+                            <publisher>Zenodo</publisher>
+                            <dateofacceptance>2022-08-05</dateofacceptance>
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.6969999</pid>
+                            <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254" />
+                            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title">Sentinel-3 NDVI ARD and Long Term Statistics (1999-2019) from the Copernicus Global Land Service over Lombardia</title>
+                        </result>
+                        <result objidentifier="doi_________::10a910f4a66b7f4bce8407d7a486a80a">
+                            <publisher>Zenodo</publisher>
+                            <dateofacceptance>2022-08-05</dateofacceptance>
+                            <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254" />
+                            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title">Sentinel-3 NDVI ARD and Long Term Statistics (1999-2019) from the Copernicus Global Land Service over Lombardia</title>
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.6967373</pid>
+                        </result>
+                        <instance>
+                            <accessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                            <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254" />
+                            <hostedby name="ZENODO" id="opendoar____::358aee4cc897452c00244351e4d91f69" />
+                            <dateofacceptance>2022-08-05</dateofacceptance>
+                            <instancetype classid="0021" classname="Dataset" schemeid="dnet:publication_resource" schemename="dnet:publication_resource" />
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.6967373</pid>
+                            <refereed classid="0000" classname="UNKNOWN" schemeid="dnet:review_levels" schemename="dnet:review_levels" />
+                            <license>https://creativecommons.org/licenses/by/4.0/legalcode</license>
+                            <webresource>
+                                <url>https://doi.org/10.5281/zenodo.6967373</url>
+                            </webresource>
+                        </instance>
+                        <instance>
+                            <accessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                            <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254" />
+                            <hostedby name="ZENODO" id="opendoar____::358aee4cc897452c00244351e4d91f69" />
+                            <dateofacceptance>2022-08-05</dateofacceptance>
+                            <instancetype classid="0021" classname="Dataset" schemeid="dnet:publication_resource" schemename="dnet:publication_resource" />
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.6970067</pid>
+                            <refereed classid="0000" classname="UNKNOWN" schemeid="dnet:review_levels" schemename="dnet:review_levels" />
+                            <license>https://creativecommons.org/licenses/by/4.0/legalcode</license>
+                            <webresource>
+                                <url>https://doi.org/10.5281/zenodo.6970067</url>
+                            </webresource>
+                        </instance>
+                        <instance>
+                            <accessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                            <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254" />
+                            <hostedby name="ZENODO" id="opendoar____::358aee4cc897452c00244351e4d91f69" />
+                            <dateofacceptance>2022-08-05</dateofacceptance>
+                            <instancetype classid="0021" classname="Dataset" schemeid="dnet:publication_resource" schemename="dnet:publication_resource" />
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.6969999</pid>
+                            <refereed classid="0000" classname="UNKNOWN" schemeid="dnet:review_levels" schemename="dnet:review_levels" />
+                            <license>https://creativecommons.org/licenses/by/4.0/legalcode</license>
+                            <webresource>
+                                <url>https://doi.org/10.5281/zenodo.6969999</url>
+                            </webresource>
+                        </instance>
+                        <instance>
+                            <accessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                            <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254" />
+                            <hostedby name="ZENODO" id="opendoar____::358aee4cc897452c00244351e4d91f69" />
+                            <dateofacceptance>2022-08-05</dateofacceptance>
+                            <instancetype classid="0021" classname="Dataset" schemeid="dnet:publication_resource" schemename="dnet:publication_resource" />
+                            <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.6967372</pid>
+                            <refereed classid="0000" classname="UNKNOWN" schemeid="dnet:review_levels" schemename="dnet:review_levels" />
+                            <license>https://creativecommons.org/licenses/by/4.0/legalcode</license>
+                            <webresource>
+                                <url>https://doi.org/10.5281/zenodo.6967372</url>
+                            </webresource>
+                        </instance>
+                    </children>
+                </oaf:result>
+            </oaf:entity>
+        </metadata>
+    </result>
+</record>
