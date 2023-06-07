@@ -119,7 +119,7 @@ drop table tmp purge;
 
 ANALYZE TABLE indi_result_org_country_collab COMPUTE STATISTICS;
 
-create TEMPORARY TABLE AS
+create TEMPORARY TABLE tmp AS
 select o.id organization, o.name, ro.project as project  from organization o
         join organization_projects ro on o.id=ro.id  where o.name is not null;
 
@@ -129,6 +129,8 @@ from tmp as o1
          join tmp as o2 on o1.project=o2.project
 where o1.organization<>o2.organization and o1.name<>o2.name
 group by o1.name,o2.name, o1.organization, o2.organization;
+
+drop table tmp purge;
 
 ANALYZE TABLE indi_project_collab_org COMPUTE STATISTICS;
 
