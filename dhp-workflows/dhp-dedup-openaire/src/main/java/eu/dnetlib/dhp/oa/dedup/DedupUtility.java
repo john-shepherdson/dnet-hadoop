@@ -1,9 +1,13 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
-import java.io.StringReader;
-import java.util.*;
-
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import eu.dnetlib.pace.config.DedupConfig;
 import org.apache.spark.SparkContext;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
@@ -12,17 +16,11 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.xml.sax.SAXException;
 
-import com.google.common.collect.Sets;
-
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import eu.dnetlib.pace.clustering.BlacklistAwareClusteringCombiner;
-import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.model.MapDocument;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DedupUtility {
 
@@ -63,10 +61,6 @@ public class DedupUtility {
 		accumulators.put(acc6, context.longAccumulator(acc6));
 
 		return accumulators;
-	}
-
-	static Set<String> getGroupingKeys(DedupConfig conf, MapDocument doc) {
-		return Sets.newHashSet(BlacklistAwareClusteringCombiner.filterAndCombine(doc, conf));
 	}
 
 	public static String createDedupRecordPath(

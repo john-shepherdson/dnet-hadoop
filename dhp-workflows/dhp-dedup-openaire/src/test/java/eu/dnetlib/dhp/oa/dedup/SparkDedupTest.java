@@ -133,7 +133,11 @@ public class SparkDedupTest implements Serializable {
 			.when(isLookUpService.getResourceProfileByQuery(Mockito.contains("otherresearchproduct")))
 			.thenReturn(classPathResourceAsString("/eu/dnetlib/dhp/dedup/conf/orp.curr.conf.json"));
 	}
-
+	@Test
+	@Order(1)
+	void createSimRelsTestTwice() throws Exception {
+		createSimRelsTest();
+	}
 	@Test
 	@Order(1)
 	void createSimRelsTest() throws Exception {
@@ -178,16 +182,19 @@ public class SparkDedupTest implements Serializable {
 			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "otherresearchproduct"))
 			.count();
 
+
+		System.out.println("orgs_simrel = " + orgs_simrel);
+		System.out.println("pubs_simrel = " + pubs_simrel);
+		System.out.println("sw_simrel = " + sw_simrel);
+		System.out.println("ds_simrel = " + ds_simrel);
+		System.out.println("orp_simrel = " + orp_simrel);
+
 		assertEquals(3076, orgs_simrel);
 		assertEquals(7046, pubs_simrel);
 		assertEquals(336, sw_simrel);
 		assertEquals(442, ds_simrel);
 		assertEquals(6784, orp_simrel);
-//		System.out.println("orgs_simrel = " + orgs_simrel);
-//		System.out.println("pubs_simrel = " + pubs_simrel);
-//		System.out.println("sw_simrel = " + sw_simrel);
-//		System.out.println("ds_simrel = " + ds_simrel);
-//		System.out.println("orp_simrel = " + orp_simrel);
+
 	}
 
 	@Test
