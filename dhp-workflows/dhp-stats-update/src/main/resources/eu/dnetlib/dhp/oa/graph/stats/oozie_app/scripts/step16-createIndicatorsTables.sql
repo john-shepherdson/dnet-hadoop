@@ -223,73 +223,6 @@ select id, count(id) as number_of_copies from result_instance group by id;
 ANALYZE TABLE indi_result_no_of_copies COMPUTE STATISTICS;
 
 ---- Sprint 6 ----
-create table if not exists indi_pub_hybrid_oa_with_cc stored as parquet as
-    WITH hybrid_oa AS (
-        SELECT issn_l, journal_is_in_doaj, journal_is_oa, issn_print as issn
-        FROM STATS_EXT.plan_s_jn
-        WHERE issn_print != ""
-        UNION ALL
-        SELECT issn_l, journal_is_in_doaj, journal_is_oa, issn_online as issn
-        FROM STATS_EXT.plan_s_jn
-        WHERE issn_online != "" and (journal_is_in_doaj = FALSE OR journal_is_oa = FALSE)),
-    issn AS (
-                SELECT *
-                FROM (
-                SELECT id, issn_printed as issn
-                FROM datasource
-                WHERE issn_printed IS NOT NULL
-                UNION ALL
-                SELECT id,issn_online as issn
-                FROM datasource
-                WHERE issn_online IS NOT NULL ) as issn
-    WHERE LENGTH(issn) > 7)
-SELECT DISTINCT pd.id, coalesce(is_hybrid_oa, 0) as is_hybrid_oa
-FROM publication_datasources pd
-         LEFT OUTER JOIN (
-    SELECT pd.id, 1 as is_hybrid_oa from publication_datasources pd
-                                             JOIN datasource d on d.id=pd.datasource
-                                             JOIN issn on issn.id=pd.datasource
-                                             JOIN hybrid_oa ON issn.issn = hybrid_oa.issn
-                                             JOIN indi_result_has_cc_licence cc on pd.id=cc.id
-                                             JOIN indi_pub_gold_oa ga on pd.id=ga.id
-    where cc.has_cc_license=1 and ga.is_gold=0) tmp on pd.id=tmp.id;
-
-ANALYZE TABLE indi_pub_hybrid_oa_with_cc COMPUTE STATISTICS;
-
- create table if not exists indi_pub_bronze_oa stored as parquet as
-    WITH hybrid_oa AS (
-        SELECT issn_l, journal_is_in_doaj, journal_is_oa, issn_print as issn
-        FROM STATS_EXT.plan_s_jn
-        WHERE issn_print != ""
-        UNION ALL
-        SELECT issn_l, journal_is_in_doaj, journal_is_oa, issn_online as issn
-        FROM STATS_EXT.plan_s_jn
-        WHERE issn_online != "" and (journal_is_in_doaj = FALSE OR journal_is_oa = FALSE)),
-    issn AS (
-                SELECT *
-                FROM (
-                SELECT id, issn_printed as issn
-                FROM datasource
-                WHERE issn_printed IS NOT NULL
-                UNION ALL
-                SELECT id,issn_online as issn
-                FROM datasource
-                WHERE issn_online IS NOT NULL ) as issn
-    WHERE LENGTH(issn) > 7)
-SELECT DISTINCT pd.id, coalesce(is_bronze_oa, 0) as is_hybrid_oa
-FROM publication_datasources pd
-         LEFT OUTER JOIN (
-    SELECT pd.id, 1 as is_bronze_oa from publication_datasources pd
-                                             JOIN datasource d on d.id=pd.datasource
-                                             JOIN issn on issn.id=pd.datasource
-                                             JOIN hybrid_oa ON issn.issn = hybrid_oa.issn
-                                             JOIN indi_result_has_cc_licence cc on pd.id=cc.id
-                                             JOIN indi_pub_gold_oa ga on pd.id=ga.id
-                                             JOIN indi_pub_hybrid_oa_with_cc hy on hy.id=pd.id
-    where cc.has_cc_license=0 and ga.is_gold=0 and hy.is_hybrid_oa=0) tmp on pd.id=tmp.id;
-
-ANALYZE TABLE indi_pub_bronze_oa COMPUTE STATISTICS;
-
 create table if not exists indi_pub_downloads stored as parquet as
 SELECT result_id, sum(downloads) no_downloads from openaire_prod_usage_stats.usage_stats
                                                       join publication on result_id=id
@@ -375,6 +308,73 @@ FROM
                        on pd.id=tmp.id;
 
 ANALYZE TABLE indi_pub_gold_oa COMPUTE STATISTICS;
+
+create table if not exists indi_pub_hybrid_oa_with_cc stored as parquet as
+    WITH hybrid_oa AS (
+        SELECT issn_l, journal_is_in_doaj, journal_is_oa, issn_print as issn
+        FROM STATS_EXT.plan_s_jn
+        WHERE issn_print != ""
+        UNION ALL
+        SELECT issn_l, journal_is_in_doaj, journal_is_oa, issn_online as issn
+        FROM STATS_EXT.plan_s_jn
+        WHERE issn_online != "" and (journal_is_in_doaj = FALSE OR journal_is_oa = FALSE)),
+    issn AS (
+                SELECT *
+                FROM (
+                SELECT id, issn_printed as issn
+                FROM datasource
+                WHERE issn_printed IS NOT NULL
+                UNION ALL
+                SELECT id,issn_online as issn
+                FROM datasource
+                WHERE issn_online IS NOT NULL ) as issn
+    WHERE LENGTH(issn) > 7)
+SELECT DISTINCT pd.id, coalesce(is_hybrid_oa, 0) as is_hybrid_oa
+FROM publication_datasources pd
+         LEFT OUTER JOIN (
+    SELECT pd.id, 1 as is_hybrid_oa from publication_datasources pd
+                                             JOIN datasource d on d.id=pd.datasource
+                                             JOIN issn on issn.id=pd.datasource
+                                             JOIN hybrid_oa ON issn.issn = hybrid_oa.issn
+                                             JOIN indi_result_has_cc_licence cc on pd.id=cc.id
+                                             JOIN indi_pub_gold_oa ga on pd.id=ga.id
+    where cc.has_cc_license=1 and ga.is_gold=0) tmp on pd.id=tmp.id;
+
+ANALYZE TABLE indi_pub_hybrid_oa_with_cc COMPUTE STATISTICS;
+
+ create table if not exists indi_pub_bronze_oa stored as parquet as
+    WITH hybrid_oa AS (
+        SELECT issn_l, journal_is_in_doaj, journal_is_oa, issn_print as issn
+        FROM STATS_EXT.plan_s_jn
+        WHERE issn_print != ""
+        UNION ALL
+        SELECT issn_l, journal_is_in_doaj, journal_is_oa, issn_online as issn
+        FROM STATS_EXT.plan_s_jn
+        WHERE issn_online != "" and (journal_is_in_doaj = FALSE OR journal_is_oa = FALSE)),
+    issn AS (
+                SELECT *
+                FROM (
+                SELECT id, issn_printed as issn
+                FROM datasource
+                WHERE issn_printed IS NOT NULL
+                UNION ALL
+                SELECT id,issn_online as issn
+                FROM datasource
+                WHERE issn_online IS NOT NULL ) as issn
+    WHERE LENGTH(issn) > 7)
+SELECT DISTINCT pd.id, coalesce(is_bronze_oa, 0) as is_hybrid_oa
+FROM publication_datasources pd
+         LEFT OUTER JOIN (
+    SELECT pd.id, 1 as is_bronze_oa from publication_datasources pd
+                                             JOIN datasource d on d.id=pd.datasource
+                                             JOIN issn on issn.id=pd.datasource
+                                             JOIN hybrid_oa ON issn.issn = hybrid_oa.issn
+                                             JOIN indi_result_has_cc_licence cc on pd.id=cc.id
+                                             JOIN indi_pub_gold_oa ga on pd.id=ga.id
+                                             JOIN indi_pub_hybrid_oa_with_cc hy on hy.id=pd.id
+    where cc.has_cc_license=0 and ga.is_gold=0 and hy.is_hybrid_oa=0) tmp on pd.id=tmp.id;
+
+ANALYZE TABLE indi_pub_bronze_oa COMPUTE STATISTICS;
 
 create table if not exists indi_pub_hybrid stored as parquet as
     WITH gold_oa AS ( SELECT
