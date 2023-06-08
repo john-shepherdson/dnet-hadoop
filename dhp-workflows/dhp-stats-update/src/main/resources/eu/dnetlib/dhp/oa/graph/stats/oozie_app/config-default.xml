@@ -21,7 +21,7 @@
     </property>
     <property>
         <name>hive_jdbc_url</name>
-        <value>jdbc:hive2://iis-cdh5-test-m3.ocean.icm.edu.pl:10000/;UseNativeQuery=1;?spark.executor.memory=19166291558;spark.yarn.executor.memoryOverhead=3225;spark.driver.memory=11596411699;spark.yarn.driver.memoryOverhead=1228</value>
+        <value>jdbc:hive2://iis-cdh5-test-m3.ocean.icm.edu.pl:10000/;UseNativeQuery=1;?spark.executor.memory=22166291558;spark.yarn.executor.memoryOverhead=3225;spark.driver.memory=15596411699;spark.yarn.driver.memoryOverhead=1228</value>
     </property>
 	<property>
 		<name>oozie.wf.workflow.notification.url</name>
