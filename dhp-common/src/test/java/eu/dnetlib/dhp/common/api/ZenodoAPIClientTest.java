@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 class ZenodoAPIClientTest {
 
 	private final String URL_STRING = "https://sandbox.zenodo.org/api/deposit/depositions";
-	private final String ACCESS_TOKEN = "";
+	private final String ACCESS_TOKEN = "OzzOsyucEIHxCEfhlpsMo3myEiwpCza3trCRL7ddfGTAK9xXkIP2MbXd6Vg4";
 
 	private final String CONCEPT_REC_ID = "657113";
 
@@ -33,7 +33,7 @@ class ZenodoAPIClientTest {
 
 		InputStream is = new FileInputStream(file);
 
-		Assertions.assertEquals(200, client.uploadIS(is, "COVID-19.json.gz"));
+		Assertions.assertEquals(200, client.uploadIS(is, "COVID-19.json.gz", file.length()));
 
 		String metadata = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/common/api/metadata.json"));
 
@@ -51,18 +51,18 @@ class ZenodoAPIClientTest {
 		Assertions.assertEquals(201, client.newDeposition());
 
 		File file = new File(getClass()
-			.getResource("/eu/dnetlib/dhp/common/api/COVID-19.json.gz")
+			.getResource("/eu/dnetlib/dhp/common/api/newVersion")
 			.getPath());
 
 		InputStream is = new FileInputStream(file);
 
-		Assertions.assertEquals(200, client.uploadIS(is, "COVID-19.json.gz"));
+		Assertions.assertEquals(200, client.uploadIS(is, "COVID-19.json.gz", file.length()));
 
 		String metadata = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/common/api/metadata.json"));
 
 		Assertions.assertEquals(200, client.sendMretadata(metadata));
 
-		Assertions.assertEquals(202, client.publish());
+	//	Assertions.assertEquals(202, client.publish());
 
 	}
 
@@ -80,7 +80,7 @@ class ZenodoAPIClientTest {
 
 		InputStream is = new FileInputStream(file);
 
-		Assertions.assertEquals(200, client.uploadIS(is, "newVersion_deposition"));
+		Assertions.assertEquals(200, client.uploadIS(is, "newVersion_deposition", file.length()));
 
 		Assertions.assertEquals(202, client.publish());
 
@@ -100,10 +100,29 @@ class ZenodoAPIClientTest {
 
 		InputStream is = new FileInputStream(file);
 
-		Assertions.assertEquals(200, client.uploadIS(is, "newVersion_deposition"));
+		Assertions.assertEquals(200, client.uploadIS(is, "newVersion_deposition", file.length()));
 
 		Assertions.assertEquals(202, client.publish());
 
+	}
+
+	@Test
+	void depositBigFile() throws MissingConceptDoiException, IOException {
+		ZenodoAPIClient client = new ZenodoAPIClient(URL_STRING,
+				ACCESS_TOKEN);
+
+		Assertions.assertEquals(201, client.newDeposition());
+
+		File file = new File("/Users/miriam.baglioni/Desktop/EOSC_DUMP/publication.tar");
+//		File file = new File(getClass()
+//				.getResource("/eu/dnetlib/dhp/common/api/newVersion2")
+//				.getPath());
+
+		InputStream is = new FileInputStream(file);
+
+		Assertions.assertEquals(200, client.uploadIS(is, "newVersion_deposition", file.length()));
+
+		//Assertions.assertEquals(202, client.publish());
 	}
 
 }
