@@ -162,52 +162,66 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	}
 
 	public static <T extends Oaf> T fixVocabularyNames(T value) {
-		if (value instanceof Datasource) {
-			// nothing to clean here
-		} else if (value instanceof Project) {
-			// nothing to clean here
-		} else if (value instanceof Organization) {
-			Organization o = (Organization) value;
-			if (Objects.nonNull(o.getCountry())) {
-				fixVocabName(o.getCountry(), ModelConstants.DNET_COUNTRY_TYPE);
+		if (value instanceof OafEntity) {
+
+			OafEntity e = (OafEntity) value;
+
+			Optional
+				.ofNullable(e.getPid())
+				.ifPresent(pid -> pid.forEach(p -> fixVocabName(p.getQualifier(), ModelConstants.DNET_PID_TYPES)));
+
+			if (value instanceof Result) {
+				Result r = (Result) value;
+
+				fixVocabName(r.getLanguage(), ModelConstants.DNET_LANGUAGES);
+				fixVocabName(r.getResourcetype(), ModelConstants.DNET_DATA_CITE_RESOURCE);
+				fixVocabName(r.getBestaccessright(), ModelConstants.DNET_ACCESS_MODES);
+
+				if (Objects.nonNull(r.getSubject())) {
+					r.getSubject().forEach(s -> fixVocabName(s.getQualifier(), ModelConstants.DNET_SUBJECT_TYPOLOGIES));
+				}
+				if (Objects.nonNull(r.getInstance())) {
+					for (Instance i : r.getInstance()) {
+						fixVocabName(i.getAccessright(), ModelConstants.DNET_ACCESS_MODES);
+						fixVocabName(i.getRefereed(), ModelConstants.DNET_REVIEW_LEVELS);
+						Optional
+							.ofNullable(i.getPid())
+							.ifPresent(
+								pid -> pid.forEach(p -> fixVocabName(p.getQualifier(), ModelConstants.DNET_PID_TYPES)));
+
+					}
+				}
+				if (Objects.nonNull(r.getAuthor())) {
+					r.getAuthor().stream().filter(Objects::nonNull).forEach(a -> {
+						if (Objects.nonNull(a.getPid())) {
+							a.getPid().stream().filter(Objects::nonNull).forEach(p -> {
+								fixVocabName(p.getQualifier(), ModelConstants.DNET_PID_TYPES);
+							});
+						}
+					});
+				}
+				if (value instanceof Publication) {
+
+				} else if (value instanceof Dataset) {
+
+				} else if (value instanceof OtherResearchProduct) {
+
+				} else if (value instanceof Software) {
+
+				}
+			} else if (value instanceof Datasource) {
+				// nothing to clean here
+			} else if (value instanceof Project) {
+				// nothing to clean here
+			} else if (value instanceof Organization) {
+				Organization o = (Organization) value;
+				if (Objects.nonNull(o.getCountry())) {
+					fixVocabName(o.getCountry(), ModelConstants.DNET_COUNTRY_TYPE);
+				}
+
 			}
 		} else if (value instanceof Relation) {
 			// nothing to clean here
-		} else if (value instanceof Result) {
-
-			Result r = (Result) value;
-
-			fixVocabName(r.getLanguage(), ModelConstants.DNET_LANGUAGES);
-			fixVocabName(r.getResourcetype(), ModelConstants.DNET_DATA_CITE_RESOURCE);
-			fixVocabName(r.getBestaccessright(), ModelConstants.DNET_ACCESS_MODES);
-
-			if (Objects.nonNull(r.getSubject())) {
-				r.getSubject().forEach(s -> fixVocabName(s.getQualifier(), ModelConstants.DNET_SUBJECT_TYPOLOGIES));
-			}
-			if (Objects.nonNull(r.getInstance())) {
-				for (Instance i : r.getInstance()) {
-					fixVocabName(i.getAccessright(), ModelConstants.DNET_ACCESS_MODES);
-					fixVocabName(i.getRefereed(), ModelConstants.DNET_REVIEW_LEVELS);
-				}
-			}
-			if (Objects.nonNull(r.getAuthor())) {
-				r.getAuthor().stream().filter(Objects::nonNull).forEach(a -> {
-					if (Objects.nonNull(a.getPid())) {
-						a.getPid().stream().filter(Objects::nonNull).forEach(p -> {
-							fixVocabName(p.getQualifier(), ModelConstants.DNET_PID_TYPES);
-						});
-					}
-				});
-			}
-			if (value instanceof Publication) {
-
-			} else if (value instanceof Dataset) {
-
-			} else if (value instanceof OtherResearchProduct) {
-
-			} else if (value instanceof Software) {
-
-			}
 		}
 
 		return value;
@@ -260,15 +274,320 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	}
 
 	public static <T extends Oaf> T cleanup(T value, VocabularyGroup vocs) {
-		if (value instanceof Datasource) {
-			// nothing to clean here
-		} else if (value instanceof Project) {
-			// nothing to clean here
-		} else if (value instanceof Organization) {
-			Organization o = (Organization) value;
-			if (Objects.isNull(o.getCountry()) || StringUtils.isBlank(o.getCountry().getClassid())) {
-				o.setCountry(ModelConstants.UNKNOWN_COUNTRY);
+
+		if (value instanceof OafEntity) {
+
+			OafEntity e = (OafEntity) value;
+			if (Objects.nonNull(e.getPid())) {
+				e.setPid(processPidCleaning(e.getPid()));
 			}
+
+			if (value instanceof Datasource) {
+				// nothing to clean here
+			} else if (value instanceof Project) {
+				// nothing to clean here
+			} else if (value instanceof Organization) {
+				Organization o = (Organization) value;
+				if (Objects.isNull(o.getCountry()) || StringUtils.isBlank(o.getCountry().getClassid())) {
+					o.setCountry(ModelConstants.UNKNOWN_COUNTRY);
+				}
+			} else if (value instanceof Result) {
+				Result r = (Result) value;
+
+				if (Objects.nonNull(r.getDateofacceptance())) {
+					Optional<String> date = cleanDateField(r.getDateofacceptance());
+					if (date.isPresent()) {
+						r.getDateofacceptance().setValue(date.get());
+					} else {
+						r.setDateofacceptance(null);
+					}
+				}
+				if (Objects.nonNull(r.getRelevantdate())) {
+					r
+						.setRelevantdate(
+							r
+								.getRelevantdate()
+								.stream()
+								.filter(Objects::nonNull)
+								.filter(sp -> Objects.nonNull(sp.getQualifier()))
+								.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
+								.map(sp -> {
+									sp.setValue(GraphCleaningFunctions.cleanDate(sp.getValue()));
+									return sp;
+								})
+								.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
+								.collect(Collectors.toList()));
+				}
+				if (Objects.nonNull(r.getPublisher()) && StringUtils.isBlank(r.getPublisher().getValue())) {
+					r.setPublisher(null);
+				}
+				if (Objects.isNull(r.getLanguage()) || StringUtils.isBlank(r.getLanguage().getClassid())) {
+					r
+						.setLanguage(
+							qualifier("und", "Undetermined", ModelConstants.DNET_LANGUAGES));
+				}
+				if (Objects.nonNull(r.getSubject())) {
+					List<Subject> subjects = Lists
+						.newArrayList(
+							r
+								.getSubject()
+								.stream()
+								.filter(Objects::nonNull)
+								.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
+								.filter(sp -> Objects.nonNull(sp.getQualifier()))
+								.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
+								.map(s -> {
+									if ("dnet:result_subject".equals(s.getQualifier().getClassid())) {
+										s.getQualifier().setClassid(ModelConstants.DNET_SUBJECT_TYPOLOGIES);
+										s.getQualifier().setClassname(ModelConstants.DNET_SUBJECT_TYPOLOGIES);
+									}
+									return s;
+								})
+								.map(GraphCleaningFunctions::cleanValue)
+								.collect(
+									Collectors
+										.toMap(
+											s -> Optional
+												.ofNullable(s.getQualifier())
+												.map(q -> q.getClassid() + s.getValue())
+												.orElse(s.getValue()),
+											Function.identity(),
+											(s1, s2) -> Collections
+												.min(Lists.newArrayList(s1, s2), new SubjectProvenanceComparator())))
+								.values());
+					r.setSubject(subjects);
+				}
+				if (Objects.nonNull(r.getTitle())) {
+					r
+						.setTitle(
+							r
+								.getTitle()
+								.stream()
+								.filter(Objects::nonNull)
+								.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
+								.filter(
+									sp -> {
+										final String title = sp
+											.getValue()
+											.toLowerCase();
+										final String decoded = Unidecode.decode(title);
+
+										if (StringUtils.contains(decoded, TITLE_TEST)) {
+											return decoded
+												.replaceAll(TITLE_FILTER_REGEX, "")
+												.length() > TITLE_FILTER_RESIDUAL_LENGTH;
+										}
+										return !decoded
+											.replaceAll("\\W|\\d", "")
+											.isEmpty();
+									})
+								.map(GraphCleaningFunctions::cleanValue)
+								.collect(Collectors.toList()));
+				}
+				if (Objects.nonNull(r.getFormat())) {
+					r
+						.setFormat(
+							r
+								.getFormat()
+								.stream()
+								.map(GraphCleaningFunctions::cleanValue)
+								.collect(Collectors.toList()));
+				}
+				if (Objects.nonNull(r.getDescription())) {
+					r
+						.setDescription(
+							r
+								.getDescription()
+								.stream()
+								.filter(Objects::nonNull)
+								.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
+								.map(GraphCleaningFunctions::cleanValue)
+								.collect(Collectors.toList()));
+				}
+				if (Objects.isNull(r.getResourcetype()) || StringUtils.isBlank(r.getResourcetype().getClassid())) {
+					r
+						.setResourcetype(
+							qualifier(ModelConstants.UNKNOWN, "Unknown", ModelConstants.DNET_DATA_CITE_RESOURCE));
+				}
+				if (Objects.nonNull(r.getInstance())) {
+
+					for (Instance i : r.getInstance()) {
+						if (!vocs
+							.termExists(ModelConstants.DNET_PUBLICATION_RESOURCE, i.getInstancetype().getClassid())) {
+							if (r instanceof Publication) {
+								i
+									.setInstancetype(
+										OafMapperUtils
+											.qualifier(
+												"0038", "Other literature type",
+												ModelConstants.DNET_PUBLICATION_RESOURCE,
+												ModelConstants.DNET_PUBLICATION_RESOURCE));
+							} else if (r instanceof Dataset) {
+								i
+									.setInstancetype(
+										OafMapperUtils
+											.qualifier(
+												"0039", "Other dataset type", ModelConstants.DNET_PUBLICATION_RESOURCE,
+												ModelConstants.DNET_PUBLICATION_RESOURCE));
+							} else if (r instanceof Software) {
+								i
+									.setInstancetype(
+										OafMapperUtils
+											.qualifier(
+												"0040", "Other software type", ModelConstants.DNET_PUBLICATION_RESOURCE,
+												ModelConstants.DNET_PUBLICATION_RESOURCE));
+							} else if (r instanceof OtherResearchProduct) {
+								i
+									.setInstancetype(
+										OafMapperUtils
+											.qualifier(
+												"0020", "Other ORP type", ModelConstants.DNET_PUBLICATION_RESOURCE,
+												ModelConstants.DNET_PUBLICATION_RESOURCE));
+							}
+						}
+
+						if (Objects.nonNull(i.getPid())) {
+							i.setPid(processPidCleaning(i.getPid()));
+						}
+						if (Objects.nonNull(i.getAlternateIdentifier())) {
+							i.setAlternateIdentifier(processPidCleaning(i.getAlternateIdentifier()));
+						}
+						Optional
+							.ofNullable(i.getPid())
+							.ifPresent(pid -> {
+								final Set<StructuredProperty> pids = Sets.newHashSet(pid);
+								Optional
+									.ofNullable(i.getAlternateIdentifier())
+									.ifPresent(altId -> {
+										final Set<StructuredProperty> altIds = Sets.newHashSet(altId);
+										i.setAlternateIdentifier(Lists.newArrayList(Sets.difference(altIds, pids)));
+									});
+							});
+
+						if (Objects.isNull(i.getAccessright())
+							|| StringUtils.isBlank(i.getAccessright().getClassid())) {
+							i
+								.setAccessright(
+									accessRight(
+										ModelConstants.UNKNOWN, ModelConstants.NOT_AVAILABLE,
+										ModelConstants.DNET_ACCESS_MODES));
+						}
+						if (Objects.isNull(i.getHostedby()) || StringUtils.isBlank(i.getHostedby().getKey())) {
+							i.setHostedby(ModelConstants.UNKNOWN_REPOSITORY);
+						}
+						if (Objects.isNull(i.getRefereed()) || StringUtils.isBlank(i.getRefereed().getClassid())) {
+							i.setRefereed(qualifier("0000", "Unknown", ModelConstants.DNET_REVIEW_LEVELS));
+						}
+						if (Objects.nonNull(i.getDateofacceptance())) {
+							Optional<String> date = cleanDateField(i.getDateofacceptance());
+							if (date.isPresent()) {
+								i.getDateofacceptance().setValue(date.get());
+							} else {
+								i.setDateofacceptance(null);
+							}
+						}
+					}
+				}
+				if (Objects.isNull(r.getBestaccessright())
+					|| StringUtils.isBlank(r.getBestaccessright().getClassid())) {
+					Qualifier bestaccessrights = OafMapperUtils.createBestAccessRights(r.getInstance());
+					if (Objects.isNull(bestaccessrights)) {
+						r
+							.setBestaccessright(
+								qualifier(
+									ModelConstants.UNKNOWN, ModelConstants.NOT_AVAILABLE,
+									ModelConstants.DNET_ACCESS_MODES));
+					} else {
+						r.setBestaccessright(bestaccessrights);
+					}
+				}
+				if (Objects.nonNull(r.getAuthor())) {
+					r
+						.setAuthor(
+							r
+								.getAuthor()
+								.stream()
+								.filter(Objects::nonNull)
+								.filter(a -> StringUtils.isNotBlank(a.getFullname()))
+								.filter(a -> StringUtils.isNotBlank(a.getFullname().replaceAll("[\\W]", "")))
+								.collect(Collectors.toList()));
+
+					boolean nullRank = r
+						.getAuthor()
+						.stream()
+						.anyMatch(a -> Objects.isNull(a.getRank()));
+					if (nullRank) {
+						int i = 1;
+						for (Author author : r.getAuthor()) {
+							author.setRank(i++);
+						}
+					}
+
+					for (Author a : r.getAuthor()) {
+						if (Objects.isNull(a.getPid())) {
+							a.setPid(Lists.newArrayList());
+						} else {
+							a
+								.setPid(
+									a
+										.getPid()
+										.stream()
+										.filter(Objects::nonNull)
+										.filter(p -> Objects.nonNull(p.getQualifier()))
+										.filter(p -> StringUtils.isNotBlank(p.getValue()))
+										.map(p -> {
+											// hack to distinguish orcid from orcid_pending
+											String pidProvenance = getProvenance(p.getDataInfo());
+											if (p
+												.getQualifier()
+												.getClassid()
+												.toLowerCase()
+												.contains(ModelConstants.ORCID)) {
+												if (pidProvenance
+													.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)) {
+													p.getQualifier().setClassid(ModelConstants.ORCID);
+												} else {
+													p.getQualifier().setClassid(ModelConstants.ORCID_PENDING);
+												}
+												final String orcid = p
+													.getValue()
+													.trim()
+													.toLowerCase()
+													.replaceAll(ORCID_CLEANING_REGEX, "$1-$2-$3-$4");
+												if (orcid.length() == ORCID_LEN) {
+													p.setValue(orcid);
+												} else {
+													p.setValue("");
+												}
+											}
+											return p;
+										})
+										.filter(p -> StringUtils.isNotBlank(p.getValue()))
+										.collect(
+											Collectors
+												.toMap(
+													p -> p.getQualifier().getClassid() + p.getValue(),
+													Function.identity(),
+													(p1, p2) -> p1,
+													LinkedHashMap::new))
+										.values()
+										.stream()
+										.collect(Collectors.toList()));
+						}
+					}
+				}
+				if (value instanceof Publication) {
+
+				} else if (value instanceof Dataset) {
+
+				} else if (value instanceof OtherResearchProduct) {
+
+				} else if (value instanceof Software) {
+
+				}
+
+			}
+
 		} else if (value instanceof Relation) {
 			Relation r = (Relation) value;
 
@@ -279,300 +598,6 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 			} else {
 				r.setValidationDate(null);
 				r.setValidated(false);
-			}
-		} else if (value instanceof Result) {
-
-			Result r = (Result) value;
-
-			if (Objects.nonNull(r.getDateofacceptance())) {
-				Optional<String> date = cleanDateField(r.getDateofacceptance());
-				if (date.isPresent()) {
-					r.getDateofacceptance().setValue(date.get());
-				} else {
-					r.setDateofacceptance(null);
-				}
-			}
-			if (Objects.nonNull(r.getRelevantdate())) {
-				r
-					.setRelevantdate(
-						r
-							.getRelevantdate()
-							.stream()
-							.filter(Objects::nonNull)
-							.filter(sp -> Objects.nonNull(sp.getQualifier()))
-							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
-							.map(sp -> {
-								sp.setValue(GraphCleaningFunctions.cleanDate(sp.getValue()));
-								return sp;
-							})
-							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
-							.collect(Collectors.toList()));
-			}
-			if (Objects.nonNull(r.getPublisher()) && StringUtils.isBlank(r.getPublisher().getValue())) {
-				r.setPublisher(null);
-			}
-			if (Objects.isNull(r.getLanguage()) || StringUtils.isBlank(r.getLanguage().getClassid())) {
-				r
-					.setLanguage(
-						qualifier("und", "Undetermined", ModelConstants.DNET_LANGUAGES));
-			}
-			if (Objects.nonNull(r.getSubject())) {
-				List<Subject> subjects = Lists
-					.newArrayList(
-						r
-							.getSubject()
-							.stream()
-							.filter(Objects::nonNull)
-							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
-							.filter(sp -> Objects.nonNull(sp.getQualifier()))
-							.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
-							.map(s -> {
-								if ("dnet:result_subject".equals(s.getQualifier().getClassid())) {
-									s.getQualifier().setClassid(ModelConstants.DNET_SUBJECT_TYPOLOGIES);
-									s.getQualifier().setClassname(ModelConstants.DNET_SUBJECT_TYPOLOGIES);
-								}
-								return s;
-							})
-							.map(GraphCleaningFunctions::cleanValue)
-							.collect(
-								Collectors
-									.toMap(
-										s -> Optional
-											.ofNullable(s.getQualifier())
-											.map(q -> q.getClassid() + s.getValue())
-											.orElse(s.getValue()),
-										Function.identity(),
-										(s1, s2) -> Collections
-											.min(Lists.newArrayList(s1, s2), new SubjectProvenanceComparator())))
-							.values());
-				r.setSubject(subjects);
-			}
-			if (Objects.nonNull(r.getTitle())) {
-				r
-					.setTitle(
-						r
-							.getTitle()
-							.stream()
-							.filter(Objects::nonNull)
-							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
-							.filter(
-								sp -> {
-									final String title = sp
-										.getValue()
-										.toLowerCase();
-									final String decoded = Unidecode.decode(title);
-
-									if (StringUtils.contains(decoded, TITLE_TEST)) {
-										return decoded
-											.replaceAll(TITLE_FILTER_REGEX, "")
-											.length() > TITLE_FILTER_RESIDUAL_LENGTH;
-									}
-									return !decoded
-										.replaceAll("\\W|\\d", "")
-										.isEmpty();
-								})
-							.map(GraphCleaningFunctions::cleanValue)
-							.collect(Collectors.toList()));
-			}
-			if (Objects.nonNull(r.getFormat())) {
-				r
-					.setFormat(
-						r
-							.getFormat()
-							.stream()
-							.map(GraphCleaningFunctions::cleanValue)
-							.collect(Collectors.toList()));
-			}
-			if (Objects.nonNull(r.getDescription())) {
-				r
-					.setDescription(
-						r
-							.getDescription()
-							.stream()
-							.filter(Objects::nonNull)
-							.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
-							.map(GraphCleaningFunctions::cleanValue)
-							.collect(Collectors.toList()));
-			}
-			if (Objects.nonNull(r.getPid())) {
-				r.setPid(processPidCleaning(r.getPid()));
-			}
-			if (Objects.isNull(r.getResourcetype()) || StringUtils.isBlank(r.getResourcetype().getClassid())) {
-				r
-					.setResourcetype(
-						qualifier(ModelConstants.UNKNOWN, "Unknown", ModelConstants.DNET_DATA_CITE_RESOURCE));
-			}
-			if (Objects.nonNull(r.getInstance())) {
-
-				for (Instance i : r.getInstance()) {
-					if (!vocs.termExists(ModelConstants.DNET_PUBLICATION_RESOURCE, i.getInstancetype().getClassid())) {
-						if (r instanceof Publication) {
-							i
-								.setInstancetype(
-									OafMapperUtils
-										.qualifier(
-											"0038", "Other literature type", ModelConstants.DNET_PUBLICATION_RESOURCE,
-											ModelConstants.DNET_PUBLICATION_RESOURCE));
-						} else if (r instanceof Dataset) {
-							i
-								.setInstancetype(
-									OafMapperUtils
-										.qualifier(
-											"0039", "Other dataset type", ModelConstants.DNET_PUBLICATION_RESOURCE,
-											ModelConstants.DNET_PUBLICATION_RESOURCE));
-						} else if (r instanceof Software) {
-							i
-								.setInstancetype(
-									OafMapperUtils
-										.qualifier(
-											"0040", "Other software type", ModelConstants.DNET_PUBLICATION_RESOURCE,
-											ModelConstants.DNET_PUBLICATION_RESOURCE));
-						} else if (r instanceof OtherResearchProduct) {
-							i
-								.setInstancetype(
-									OafMapperUtils
-										.qualifier(
-											"0020", "Other ORP type", ModelConstants.DNET_PUBLICATION_RESOURCE,
-											ModelConstants.DNET_PUBLICATION_RESOURCE));
-						}
-					}
-
-					if (Objects.nonNull(i.getPid())) {
-						i.setPid(processPidCleaning(i.getPid()));
-					}
-					if (Objects.nonNull(i.getAlternateIdentifier())) {
-						i.setAlternateIdentifier(processPidCleaning(i.getAlternateIdentifier()));
-					}
-					Optional
-						.ofNullable(i.getPid())
-						.ifPresent(pid -> {
-							final Set<StructuredProperty> pids = Sets.newHashSet(pid);
-							Optional
-								.ofNullable(i.getAlternateIdentifier())
-								.ifPresent(altId -> {
-									final Set<StructuredProperty> altIds = Sets.newHashSet(altId);
-									i.setAlternateIdentifier(Lists.newArrayList(Sets.difference(altIds, pids)));
-								});
-						});
-
-					if (Objects.isNull(i.getAccessright()) || StringUtils.isBlank(i.getAccessright().getClassid())) {
-						i
-							.setAccessright(
-								accessRight(
-									ModelConstants.UNKNOWN, ModelConstants.NOT_AVAILABLE,
-									ModelConstants.DNET_ACCESS_MODES));
-					}
-					if (Objects.isNull(i.getHostedby()) || StringUtils.isBlank(i.getHostedby().getKey())) {
-						i.setHostedby(ModelConstants.UNKNOWN_REPOSITORY);
-					}
-					if (Objects.isNull(i.getRefereed()) || StringUtils.isBlank(i.getRefereed().getClassid())) {
-						i.setRefereed(qualifier("0000", "Unknown", ModelConstants.DNET_REVIEW_LEVELS));
-					}
-					if (Objects.nonNull(i.getDateofacceptance())) {
-						Optional<String> date = cleanDateField(i.getDateofacceptance());
-						if (date.isPresent()) {
-							i.getDateofacceptance().setValue(date.get());
-						} else {
-							i.setDateofacceptance(null);
-						}
-					}
-				}
-			}
-			if (Objects.isNull(r.getBestaccessright()) || StringUtils.isBlank(r.getBestaccessright().getClassid())) {
-				Qualifier bestaccessrights = OafMapperUtils.createBestAccessRights(r.getInstance());
-				if (Objects.isNull(bestaccessrights)) {
-					r
-						.setBestaccessright(
-							qualifier(
-								ModelConstants.UNKNOWN, ModelConstants.NOT_AVAILABLE,
-								ModelConstants.DNET_ACCESS_MODES));
-				} else {
-					r.setBestaccessright(bestaccessrights);
-				}
-			}
-			if (Objects.nonNull(r.getAuthor())) {
-				r
-					.setAuthor(
-						r
-							.getAuthor()
-							.stream()
-							.filter(Objects::nonNull)
-							.filter(a -> StringUtils.isNotBlank(a.getFullname()))
-							.filter(a -> StringUtils.isNotBlank(a.getFullname().replaceAll("[\\W]", "")))
-							.collect(Collectors.toList()));
-
-				boolean nullRank = r
-					.getAuthor()
-					.stream()
-					.anyMatch(a -> Objects.isNull(a.getRank()));
-				if (nullRank) {
-					int i = 1;
-					for (Author author : r.getAuthor()) {
-						author.setRank(i++);
-					}
-				}
-
-				for (Author a : r.getAuthor()) {
-					if (Objects.isNull(a.getPid())) {
-						a.setPid(Lists.newArrayList());
-					} else {
-						a
-							.setPid(
-								a
-									.getPid()
-									.stream()
-									.filter(Objects::nonNull)
-									.filter(p -> Objects.nonNull(p.getQualifier()))
-									.filter(p -> StringUtils.isNotBlank(p.getValue()))
-									.map(p -> {
-										// hack to distinguish orcid from orcid_pending
-										String pidProvenance = getProvenance(p.getDataInfo());
-										if (p
-											.getQualifier()
-											.getClassid()
-											.toLowerCase()
-											.contains(ModelConstants.ORCID)) {
-											if (pidProvenance
-												.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)) {
-												p.getQualifier().setClassid(ModelConstants.ORCID);
-											} else {
-												p.getQualifier().setClassid(ModelConstants.ORCID_PENDING);
-											}
-											final String orcid = p
-												.getValue()
-												.trim()
-												.toLowerCase()
-												.replaceAll(ORCID_CLEANING_REGEX, "$1-$2-$3-$4");
-											if (orcid.length() == ORCID_LEN) {
-												p.setValue(orcid);
-											} else {
-												p.setValue("");
-											}
-										}
-										return p;
-									})
-									.filter(p -> StringUtils.isNotBlank(p.getValue()))
-									.collect(
-										Collectors
-											.toMap(
-												p -> p.getQualifier().getClassid() + p.getValue(),
-												Function.identity(),
-												(p1, p2) -> p1,
-												LinkedHashMap::new))
-									.values()
-									.stream()
-									.collect(Collectors.toList()));
-					}
-				}
-			}
-			if (value instanceof Publication) {
-
-			} else if (value instanceof Dataset) {
-
-			} else if (value instanceof OtherResearchProduct) {
-
-			} else if (value instanceof Software) {
-
 			}
 		}
 
@@ -628,7 +653,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 			.filter(sp -> !PID_BLACKLIST.contains(sp.getValue().trim().toLowerCase()))
 			.filter(sp -> Objects.nonNull(sp.getQualifier()))
 			.filter(sp -> StringUtils.isNotBlank(sp.getQualifier().getClassid()))
-			.map(CleaningFunctions::normalizePidValue)
+			.map(PidCleaner::normalizePidValue)
 			.filter(CleaningFunctions::pidFilter)
 			.collect(Collectors.toList());
 	}
