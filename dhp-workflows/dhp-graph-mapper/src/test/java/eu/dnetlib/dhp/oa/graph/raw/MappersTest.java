@@ -27,7 +27,6 @@ import eu.dnetlib.dhp.common.Constants;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -52,7 +51,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testPublication() throws IOException, DocumentException {
+	void testPublication() throws IOException {
 
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_record.xml")));
 
@@ -112,13 +111,17 @@ class MappersTest {
 				assertNotNull(i.getAccessright());
 				assertEquals("OPEN", i.getAccessright().getClassid());
 			});
-		assertEquals("0001", p.getInstance().get(0).getRefereed().getClassid());
-		assertNotNull(p.getInstance().get(0).getPid());
-		assertTrue(p.getInstance().get(0).getPid().isEmpty());
+		final Instance instance = p.getInstance().get(0);
+		assertEquals("0001", instance.getRefereed().getClassid());
+		assertNotNull(instance.getPid());
+		assertTrue(instance.getPid().isEmpty());
 
-		assertTrue(!p.getInstance().get(0).getAlternateIdentifier().isEmpty());
-		assertEquals("doi", p.getInstance().get(0).getAlternateIdentifier().get(0).getQualifier().getClassid());
-		assertEquals("10.3897/oneeco.2.e13718", p.getInstance().get(0).getAlternateIdentifier().get(0).getValue());
+		assertFalse(instance.getAlternateIdentifier().isEmpty());
+		assertEquals("doi", instance.getAlternateIdentifier().get(0).getQualifier().getClassid());
+		assertEquals("10.3897/oneeco.2.e13718", instance.getAlternateIdentifier().get(0).getValue());
+
+		assertNotNull(instance.getFulltext());
+		assertEquals("https://oneecosystem.pensoft.net/article/13718/", instance.getFulltext());
 
 		assertNotNull(p.getBestaccessright());
 		assertEquals("OPEN", p.getBestaccessright().getClassid());

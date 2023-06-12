@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.resulttoorganizationfromsemrel;
+package eu.dnetlib.dhp.entitytoorganizationfromsemrel;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
@@ -30,7 +30,8 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 public class SparkResultToOrganizationFromSemRel implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(SparkResultToOrganizationFromSemRel.class);
 	private static final int MAX_ITERATION = 5;
-	public static final String NEW_RELATION_PATH = "/newRelation";
+	public static final String NEW_RESULT_RELATION_PATH = "/newResultRelation";
+	public static final String NEW_PROJECT_RELATION_PATH = "/newProjectRelation";
 
 	public static void main(String[] args) throws Exception {
 
@@ -38,7 +39,7 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 			.toString(
 				SparkResultToOrganizationFromIstRepoJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/input_propagation_parameter.json"));
+						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/input_propagation_parameter.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -61,6 +62,9 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 
 		final String resultOrganizationPath = parser.get("resultOrgPath");
 		log.info("resultOrganizationPath: {}", resultOrganizationPath);
+
+		final String projectOrganizationPath = parser.get("projectOrganizationPath");
+		log.info("projectOrganizationPath: {}", projectOrganizationPath);
 
 		final String workingPath = parser.get("workingDir");
 		log.info("workingPath: {}", workingPath);
@@ -88,6 +92,7 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 				leavesPath,
 				childParentPath,
 				resultOrganizationPath,
+				projectOrganizationPath,
 				relationPath,
 				workingPath,
 				outputPath,
@@ -98,13 +103,14 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 		String leavesPath,
 		String childParentPath,
 		String resultOrganizationPath,
+		String projectOrganizationPath,
 		String graphPath,
 		String workingPath,
 		String outputPath,
 		int iterations) {
 		if (iterations == 1) {
 			doPropagateOnce(
-				spark, leavesPath, childParentPath, resultOrganizationPath, graphPath,
+				spark, leavesPath, childParentPath, resultOrganizationPath, projectOrganizationPath, graphPath,
 				workingPath, outputPath);
 		} else {
 
@@ -123,26 +129,34 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 				notReachedFirstParent);
 
 			doPropagate(
-				spark, leavesPath, childParentPath, resultOrganizationPath, graphPath,
+				spark, leavesPath, childParentPath, resultOrganizationPath, projectOrganizationPath, graphPath,
 				workingPath, outputPath, propagationCounter);
 		}
 
 	}
 
 	private static void doPropagateOnce(SparkSession spark, String leavesPath, String childParentPath,
-		String resultOrganizationPath, String graphPath, String workingPath,
+		String resultOrganizationPath, String projectOrganizationPath, String graphPath, String workingPath,
 		String outputPath) {
 
 		StepActions
 			.execStep(
-				spark, graphPath, workingPath + NEW_RELATION_PATH,
-				leavesPath, childParentPath, resultOrganizationPath);
+				spark, graphPath + "/result", workingPath + NEW_RESULT_RELATION_PATH,
+				leavesPath, childParentPath, resultOrganizationPath, ModelConstants.HAS_AUTHOR_INSTITUTION);
 
-		addNewRelations(spark, workingPath + NEW_RELATION_PATH, outputPath);
+		addNewRelations(spark, workingPath + NEW_RESULT_RELATION_PATH, outputPath);
+
+		StepActions
+			.execStep(
+				spark, graphPath + "/project", workingPath + NEW_PROJECT_RELATION_PATH,
+				leavesPath, childParentPath, projectOrganizationPath, ModelConstants.HAS_PARTICIPANT);
+
+		addNewRelations(spark, workingPath + NEW_PROJECT_RELATION_PATH, outputPath);
 	}
 
 	private static void doPropagate(SparkSession spark, String leavesPath, String childParentPath,
-		String resultOrganizationPath, String graphPath, String workingPath, String outputPath,
+		String resultOrganizationPath, String projectOrganizationPath, String graphPath, String workingPath,
+		String outputPath,
 		PropagationCounter propagationCounter) {
 		int iteration = 0;
 		long leavesCount;
@@ -151,13 +165,18 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 			iteration++;
 			StepActions
 				.execStep(
-					spark, graphPath, workingPath + NEW_RELATION_PATH,
-					leavesPath, childParentPath, resultOrganizationPath);
+					spark, graphPath + "/result", workingPath + NEW_RESULT_RELATION_PATH,
+					leavesPath, childParentPath, resultOrganizationPath, ModelConstants.HAS_AUTHOR_INSTITUTION);
+			StepActions
+				.execStep(
+					spark, graphPath + "/project", workingPath + NEW_PROJECT_RELATION_PATH,
+					leavesPath, childParentPath, projectOrganizationPath, ModelConstants.HAS_PARTICIPANT);
+
 			StepActions
 				.prepareForNextStep(
-					spark, workingPath + NEW_RELATION_PATH, resultOrganizationPath, leavesPath,
-					childParentPath, workingPath + "/leaves", workingPath + "/resOrg");
-			moveOutput(spark, workingPath, leavesPath, resultOrganizationPath);
+					spark, workingPath, resultOrganizationPath, projectOrganizationPath, leavesPath,
+					childParentPath, workingPath + "/leaves", workingPath + "/resOrg", workingPath + "/projOrg");
+			moveOutput(spark, workingPath, leavesPath, resultOrganizationPath, projectOrganizationPath);
 			leavesCount = readPath(spark, leavesPath, Leaves.class).count();
 		} while (leavesCount > 0 && iteration < MAX_ITERATION);
 
@@ -185,7 +204,8 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 			propagationCounter.getNotReachedFirstParent().add(1);
 		}
 
-		addNewRelations(spark, workingPath + NEW_RELATION_PATH, outputPath);
+		addNewRelations(spark, workingPath + NEW_RESULT_RELATION_PATH, outputPath);
+		addNewRelations(spark, workingPath + NEW_PROJECT_RELATION_PATH, outputPath);
 	}
 
 	private static void moveOutput(SparkSession spark, String workingPath, String leavesPath,
@@ -204,6 +224,28 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 
 	}
 
+	private static void moveOutput(SparkSession spark, String workingPath, String leavesPath,
+		String resultOrganizationPath, String projectOrganizationPath) {
+		readPath(spark, workingPath + "/leaves", Leaves.class)
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(leavesPath);
+
+		readPath(spark, workingPath + "/resOrg", KeyValueSet.class)
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(resultOrganizationPath);
+
+		readPath(spark, workingPath + "/projOrg", KeyValueSet.class)
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(projectOrganizationPath);
+
+	}
+
 	private static void addNewRelations(SparkSession spark, String newRelationPath, String outputPath) {
 		Dataset<Relation> relation = readPath(spark, newRelationPath, Relation.class);
 
@@ -212,16 +254,21 @@ public class SparkResultToOrganizationFromSemRel implements Serializable {
 			.mapGroups(
 				(MapGroupsFunction<String, Relation, Relation>) (k, it) -> it.next(), Encoders.bean(Relation.class))
 			.flatMap(
-				(FlatMapFunction<Relation, Relation>) r -> Arrays
-					.asList(
-						r, getRelation(
-							r.getTarget(), r.getSource(), ModelConstants.IS_AUTHOR_INSTITUTION_OF,
-							ModelConstants.RESULT_ORGANIZATION,
-							ModelConstants.AFFILIATION,
-							PROPAGATION_DATA_INFO_TYPE,
-							PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_ID,
-							PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_NAME))
-					.iterator()
+				(FlatMapFunction<Relation, Relation>) r -> {
+					if (r.getSource().startsWith("50|")) {
+						return Arrays
+							.asList(
+								r, getAffiliationRelation(
+									r.getTarget(), r.getSource(), ModelConstants.IS_AUTHOR_INSTITUTION_OF))
+							.iterator();
+					} else {
+						return Arrays
+							.asList(
+								r, getParticipantRelation(
+									r.getTarget(), r.getSource(), ModelConstants.IS_PARTICIPANT))
+							.iterator();
+					}
+				}
 
 				, Encoders.bean(Relation.class))
 			.write()

@@ -39,8 +39,10 @@ public class BulkTagJobTest {
 		+ "  \"contributor\" : \"$['contributor'][*]['value']\","
 		+ "  \"description\" : \"$['description'][*]['value']\", "
 		+ " \"subject\" :\"$['subject'][*]['value']\" , " +
-		"\"fos\" : \"$['subject'][?(@['qualifier']['classid']=='FOS')].value\"" +
-		"} ";
+		"\"fos\" : \"$['subject'][?(@['qualifier']['classid']=='FOS')].value\"," +
+		"\"sdg\" : \"$['subject'][?(@['qualifier']['classid']=='SDG')].value\"," +
+		"\"hostedby\" : \"$['instance'][*]['hostedby']['key']\" , " +
+		"\"collectedfrom\" : \"$['instance'][*]['collectedfrom']['key']\"} ";
 
 	private static SparkSession spark;
 
@@ -56,7 +58,7 @@ public class BulkTagJobTest {
 				.toString(
 					BulkTagJobTest.class
 						.getResourceAsStream(
-							"/eu/dnetlib/dhp/bulktag/communityconfiguration/tagging_conf_dth.xml"));
+							"/eu/dnetlib/dhp/bulktag/communityconfiguration/tagging_conf_remove.xml"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -1523,6 +1525,47 @@ public class BulkTagJobTest {
 							&&
 							d.getContext().stream().anyMatch(c -> c.getId().equals("eosc")))
 					.count());
+	}
+
+	@Test
+	void removeTest() throws Exception {
+		final String pathMap = BulkTagJobTest.pathMap;
+		SparkBulkTagJob
+			.main(
+				new String[] {
+					"-isTest", Boolean.TRUE.toString(),
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath",
+					getClass()
+						.getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/update_datasourcewithconstraints")
+						.getPath(),
+					"-taggingConf", taggingConf,
+					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
+					"-outputPath", workingDir.toString() + "/dataset",
+					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+					"-pathMap", pathMap
+				});
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Dataset> tmp = sc
+			.textFile(workingDir.toString() + "/dataset")
+			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
+
+		Assertions.assertEquals(12, tmp.count());
+		org.apache.spark.sql.Dataset<Dataset> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(Dataset.class));
+
+		verificationDataset.createOrReplaceTempView("dataset");
+		String query = "select id, MyT.id community, MyD.provenanceaction.classid provenance, MyD.provenanceaction.classname name "
+			+ "from dataset "
+			+ "lateral view explode(context) c as MyT "
+			+ "lateral view explode(MyT.datainfo) d as MyD "
+			+ "where MyD.inferenceprovenance = 'bulktagging'";
+
+		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
+
+		Assertions.assertEquals(3, idExplodeCommunity.filter("community = 'dth'").count());
+
 	}
 
 }

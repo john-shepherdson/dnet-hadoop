@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.resulttoorganizationfromsemrel;
+package eu.dnetlib.dhp.entitytoorganizationfromsemrel;
 
 import java.io.Serializable;
 
