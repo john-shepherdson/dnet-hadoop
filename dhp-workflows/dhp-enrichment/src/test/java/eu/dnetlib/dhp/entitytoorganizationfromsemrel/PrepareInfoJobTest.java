@@ -1,22 +1,17 @@
 
-package eu.dnetlib.dhp.resulttoorganizationfromsemrel;
-
-import static eu.dnetlib.dhp.PropagationConstant.readPath;
+package eu.dnetlib.dhp.entitytoorganizationfromsemrel;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -28,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.KeyValueSet;
-import eu.dnetlib.dhp.projecttoresult.SparkResultToProjectThroughSemRelJob;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class PrepareInfoJobTest {
@@ -78,11 +72,12 @@ public class PrepareInfoJobTest {
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-graphPath", getClass()
 						.getResource(
-							"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/childparenttest1")
+							"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/childparenttest1")
 						.getPath(),
 					"-hive_metastore_uris", "",
 					"-leavesPath", workingDir.toString() + "/currentIteration/",
 					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
+					"-projectOrganizationPath", workingDir.toString() + "/projectOrganization/",
 					"-childParentPath", workingDir.toString() + "/childParentOrg/",
 					"-relationPath", workingDir.toString() + "/relation"
 
@@ -223,11 +218,12 @@ public class PrepareInfoJobTest {
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-graphPath", getClass()
 						.getResource(
-							"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/childparenttest2")
+							"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/childparenttest2")
 						.getPath(),
 					"-hive_metastore_uris", "",
 					"-leavesPath", workingDir.toString() + "/currentIteration/",
 					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
+					"-projectOrganizationPath", workingDir.toString() + "/projectOrganization/",
 					"-childParentPath", workingDir.toString() + "/childParentOrg/",
 					"-relationPath", workingDir.toString() + "/relation"
 
@@ -343,11 +339,12 @@ public class PrepareInfoJobTest {
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-graphPath", getClass()
 						.getResource(
-							"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/resultorganizationtest")
+							"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/resultorganizationtest")
 						.getPath(),
 					"-hive_metastore_uris", "",
 					"-leavesPath", workingDir.toString() + "/currentIteration/",
 					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
+					"-projectOrganizationPath", workingDir.toString() + "/projectOrganization/",
 					"-childParentPath", workingDir.toString() + "/childParentOrg/",
 					"-relationPath", workingDir.toString() + "/relation"
 
@@ -355,7 +352,38 @@ public class PrepareInfoJobTest {
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Relation> tmp = sc
-			.textFile(workingDir.toString() + "/relation")
+			.textFile(workingDir.toString() + "/relation/result")
+			.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
+
+		Dataset<Relation> verificationDs = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
+
+		Assertions.assertEquals(7, verificationDs.count());
+
+	}
+
+	@Test
+	public void relationProjectTest() throws Exception {
+
+		PrepareInfo
+			.main(
+				new String[] {
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-graphPath", getClass()
+						.getResource(
+							"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/projectorganizationtest")
+						.getPath(),
+					"-hive_metastore_uris", "",
+					"-leavesPath", workingDir.toString() + "/currentIteration/",
+					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
+					"-projectOrganizationPath", workingDir.toString() + "/projectOrganization/",
+					"-childParentPath", workingDir.toString() + "/childParentOrg/",
+					"-relationPath", workingDir.toString() + "/relation"
+
+				});
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Relation> tmp = sc
+			.textFile(workingDir.toString() + "/relation/project")
 			.map(item -> OBJECT_MAPPER.readValue(item, Relation.class));
 
 		Dataset<Relation> verificationDs = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
@@ -373,11 +401,12 @@ public class PrepareInfoJobTest {
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-graphPath", getClass()
 						.getResource(
-							"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/resultorganizationtest")
+							"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/resultorganizationtest")
 						.getPath(),
 					"-hive_metastore_uris", "",
 					"-leavesPath", workingDir.toString() + "/currentIteration/",
 					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
+					"-projectOrganizationPath", workingDir.toString() + "/projectOrganization/",
 					"-childParentPath", workingDir.toString() + "/childParentOrg/",
 					"-relationPath", workingDir.toString() + "/relation"
 
@@ -499,6 +528,141 @@ public class PrepareInfoJobTest {
 	}
 
 	@Test
+	public void projectOrganizationTest1() throws Exception {
+
+		PrepareInfo
+			.main(
+				new String[] {
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-graphPath", getClass()
+						.getResource(
+							"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/projectorganizationtest")
+						.getPath(),
+					"-hive_metastore_uris", "",
+					"-leavesPath", workingDir.toString() + "/currentIteration/",
+					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
+					"-projectOrganizationPath", workingDir.toString() + "/projectOrganization/",
+					"-childParentPath", workingDir.toString() + "/childParentOrg/",
+					"-relationPath", workingDir.toString() + "/relation"
+
+				});
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<KeyValueSet> tmp = sc
+			.textFile(workingDir.toString() + "/projectOrganization/")
+			.map(item -> OBJECT_MAPPER.readValue(item, KeyValueSet.class));
+
+		Dataset<KeyValueSet> verificationDs = spark.createDataset(tmp.rdd(), Encoders.bean(KeyValueSet.class));
+
+		Assertions.assertEquals(5, verificationDs.count());
+
+		Assertions
+			.assertEquals(
+				2, verificationDs
+					.filter("key = '40|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '40|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|dedup_wf_001::2899e571609779168222fdeb59cb916d"));
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '40|doajarticles::2baa9032dc058d3c8ff780c426b0c19f'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|pippo_wf_001::2899e571609779168222fdeb59cb916d"));
+
+		Assertions
+			.assertEquals(
+				2, verificationDs
+					.filter("key = '40|dedup_wf_001::2899e571609779168222fdeb59cb916d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '40|dedup_wf_001::2899e571609779168222fdeb59cb916d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|doajarticles::396262ee936f3d3e26ff0e60bea6cae0"));
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '40|dedup_wf_001::2899e571609779168222fdeb59cb916d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|pippo_wf_001::2899e571609779168222fdeb59cb916d"));
+
+		Assertions
+			.assertEquals(
+				1, verificationDs
+					.filter("key = '40|doajarticles::03748bcb5d754c951efec9700e18a56d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '40|doajarticles::03748bcb5d754c951efec9700e18a56d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|doajarticles::2baa9032dc058d3c8ff780c426b0c19f"));
+
+		Assertions
+			.assertEquals(
+				1, verificationDs
+					.filter("key = '40|openaire____::ec653e804967133b9436fdd30d3ff51d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '40|openaire____::ec653e804967133b9436fdd30d3ff51d'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|doajarticles::1cae0b82b56ccd97c2db1f698def7074"));
+
+		Assertions
+			.assertEquals(
+				1, verificationDs
+					.filter("key = '40|doajarticles::1cae0b82b56ccd97c2db1f698def7074'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.size());
+		Assertions
+			.assertTrue(
+				verificationDs
+					.filter("key = '40|doajarticles::1cae0b82b56ccd97c2db1f698def7074'")
+					.collectAsList()
+					.get(0)
+					.getValueSet()
+					.contains("20|opendoar____::a5fcb8eb25ebd6f7cd219e0fa1e6ddc1"));
+
+		verificationDs
+			.foreach((ForeachFunction<KeyValueSet>) v -> System.out.println(OBJECT_MAPPER.writeValueAsString(v)));
+
+	}
+
+	@Test
 	public void foundLeavesTest1() throws Exception {
 
 		PrepareInfo
@@ -507,11 +671,12 @@ public class PrepareInfoJobTest {
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-graphPath", getClass()
 						.getResource(
-							"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/resultorganizationtest")
+							"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/resultorganizationtest")
 						.getPath(),
 					"-hive_metastore_uris", "",
 					"-leavesPath", workingDir.toString() + "/currentIteration/",
 					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
+					"-projectOrganizationPath", workingDir.toString() + "/projectOrganization/",
 					"-childParentPath", workingDir.toString() + "/childParentOrg/",
 					"-relationPath", workingDir.toString() + "/relation"
 
@@ -534,11 +699,12 @@ public class PrepareInfoJobTest {
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-graphPath", getClass()
 						.getResource(
-							"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/childparenttest1")
+							"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/childparenttest1")
 						.getPath(),
 					"-hive_metastore_uris", "",
 					"-leavesPath", workingDir.toString() + "/currentIteration/",
 					"-resultOrgPath", workingDir.toString() + "/resultOrganization/",
+					"-projectOrganizationPath", workingDir.toString() + "/projectOrganization/",
 					"-childParentPath", workingDir.toString() + "/childParentOrg/",
 					"-relationPath", workingDir.toString() + "/relation"
 

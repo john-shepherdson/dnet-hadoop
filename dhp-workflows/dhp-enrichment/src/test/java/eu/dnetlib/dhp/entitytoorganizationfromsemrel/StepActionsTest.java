@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.resulttoorganizationfromsemrel;
+package eu.dnetlib.dhp.entitytoorganizationfromsemrel;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -73,21 +73,22 @@ public class StepActionsTest {
 			.execStep(
 				spark, getClass()
 					.getResource(
-						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/execstep/")
+						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/graph/result")
 					.getPath(),
 				workingDir.toString() + "/newRelationPath",
 				getClass()
 					.getResource(
-						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/execstep/currentIteration/")
+						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/currentIteration/")
 					.getPath(),
 				getClass()
 					.getResource(
-						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/execstep/childParentOrg/")
+						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/childParentOrg/")
 					.getPath(),
 				getClass()
 					.getResource(
-						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/execstep/resultOrganization/")
-					.getPath());
+						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/resultOrganization/")
+					.getPath(),
+				ModelConstants.HAS_AUTHOR_INSTITUTION);
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -203,19 +204,19 @@ public class StepActionsTest {
 				spark,
 				getClass()
 					.getResource(
-						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/execstep/relsforiteration1/")
+						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/relsforiteration1/")
 					.getPath(),
 				getClass()
 					.getResource(
-						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/execstep/resultOrganization/")
+						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/resultOrganization/")
 					.getPath(),
 				getClass()
 					.getResource(
-						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/execstep/currentIteration/")
+						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/currentIteration/")
 					.getPath(),
 				getClass()
 					.getResource(
-						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/execstep/childParentOrg/")
+						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/childParentOrg/")
 					.getPath(),
 				workingDir.toString() + "/tempLeaves", workingDir.toString() + "/tempOrgs");
 
@@ -248,19 +249,19 @@ public class StepActionsTest {
 				spark,
 				getClass()
 					.getResource(
-						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/execstep/relsforiteration1/")
+						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/relsforiteration1/")
 					.getPath(),
 				getClass()
 					.getResource(
-						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/execstep/resultOrganization/")
+						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/resultOrganization/")
 					.getPath(),
 				getClass()
 					.getResource(
-						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/execstep/currentIteration/")
+						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/currentIteration/")
 					.getPath(),
 				getClass()
 					.getResource(
-						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/execstep/childParentOrg/")
+						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/execstep/childParentOrg/")
 					.getPath(),
 				workingDir.toString() + "/tempLeaves", workingDir.toString() + "/tempOrgs");
 

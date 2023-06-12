@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.resulttoorganizationfromsemrel;
+package eu.dnetlib.dhp.entitytoorganizationfromsemrel;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
@@ -47,13 +47,20 @@ public class PrepareInfo implements Serializable {
 		"' and datainfo.deletedbyinference = false " +
 		"GROUP BY source";
 
+	// associate projects to all the participant orgs
+	private static final String PROJECT_ORGANIZATION_QUERY = "SELECT source key, collect_set(target) as valueSet " +
+		"FROM relation " +
+		"WHERE lower(relclass) = '" + ModelConstants.HAS_PARTICIPANT.toLowerCase() +
+		"' and datainfo.deletedbyinference = false " +
+		"GROUP BY source";
+
 	public static void main(String[] args) throws Exception {
 
 		String jsonConfiguration = IOUtils
 			.toString(
 				SparkResultToOrganizationFromIstRepoJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttoorganizationfromsemrel/input_preparation_parameter.json"));
+						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/input_preparation_parameter.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -74,6 +81,9 @@ public class PrepareInfo implements Serializable {
 		final String resultOrganizationPath = parser.get("resultOrgPath");
 		log.info("resultOrganizationPath: {}", resultOrganizationPath);
 
+		final String projectOrgPath = parser.get("projectOrganizationPath");
+		log.info("projectOrgPath: {}", projectOrgPath);
+
 		final String relationPath = parser.get("relationPath");
 		log.info("relationPath: {}", relationPath);
 
@@ -89,11 +99,13 @@ public class PrepareInfo implements Serializable {
 				childParentPath,
 				leavesPath,
 				resultOrganizationPath,
+				projectOrgPath,
 				relationPath));
 	}
 
 	private static void prepareInfo(SparkSession spark, String inputPath, String childParentOrganizationPath,
-		String currentIterationPath, String resultOrganizationPath, String relationPath) {
+		String currentIterationPath, String resultOrganizationPath, String projectOrganizationPath,
+		String relationPath) {
 		Dataset<Relation> relation = readPath(spark, inputPath + "/relation", Relation.class);
 		relation.createOrReplaceTempView("relation");
 
@@ -113,6 +125,14 @@ public class PrepareInfo implements Serializable {
 			.option("compression", "gzip")
 			.json(resultOrganizationPath);
 
+		spark
+			.sql(PROJECT_ORGANIZATION_QUERY)
+			.as(Encoders.bean(KeyValueSet.class))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(projectOrganizationPath);
+
 		relation
 			.filter(
 				(FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference() &&
@@ -120,7 +140,16 @@ public class PrepareInfo implements Serializable {
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.json(relationPath);
+			.json(relationPath + "/result");
+
+		relation
+			.filter(
+				(FilterFunction<Relation>) r -> !r.getDataInfo().getDeletedbyinference() &&
+					r.getRelClass().equals(ModelConstants.HAS_PARTICIPANT))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(relationPath + "/project");
 
 		Dataset<String> children = spark
 			.sql(
