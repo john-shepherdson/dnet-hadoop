@@ -68,6 +68,16 @@ copydb $USAGE_STATS_DB
 copydb $PROD_USAGE_STATS_DB
 copydb $EXT_DB
 copydb $STATS_DB
-copydb $MONITOR_DB
+#copydb $MONITOR_DB
 copydb $OBSERVATORY_DB
 
+copydb $MONITOR_DB'_funded'
+copydb $MONITOR_DB'_institutions'
+copydb $MONITOR_DB'_RIs_tail'
+
+contexts="knowmad::other dh-ch::other enermaps::other gotriple::other neanias-atmospheric::other rural-digital-europe::other covid-19::other aurora::other neanias-space::other north-america-studies::other north-american-studies::other eutopia::other"
+for i in ${contexts}
+do
+   tmp=`echo "$i"  | sed 's/'-'/'_'/g' | sed 's/'::'/'_'/g'`
+  copydb ${MONITOR_DB}'_'${tmp}
+done

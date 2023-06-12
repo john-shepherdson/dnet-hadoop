@@ -15,6 +15,7 @@ public class Community implements Serializable {
 	private List<Provider> providers = new ArrayList<>();
 	private List<ZenodoCommunity> zenodoCommunities = new ArrayList<>();
 	private SelectionConstraints constraints = new SelectionConstraints();
+	private SelectionConstraints removeConstraints = new SelectionConstraints();
 
 	public String toJson() {
 		final Gson g = new Gson();
@@ -66,5 +67,13 @@ public class Community implements Serializable {
 
 	public void setConstraints(SelectionConstraints constraints) {
 		this.constraints = constraints;
+	}
+
+	public SelectionConstraints getRemoveConstraints() {
+		return removeConstraints;
+	}
+
+	public void setRemoveConstraints(SelectionConstraints removeConstraints) {
+		this.removeConstraints = removeConstraints;
 	}
 }
