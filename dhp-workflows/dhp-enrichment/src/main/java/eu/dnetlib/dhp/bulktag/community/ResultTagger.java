@@ -79,6 +79,23 @@ public class ResultTagger implements Serializable {
 				break;
 		}
 
+		// communities contains all the communities to be not added to the context
+		final Set<String> removeCommunities = new HashSet<>();
+
+		conf
+			.getRemoveConstraintsMap()
+			.keySet()
+			.forEach(communityId -> {
+				if (conf.getRemoveConstraintsMap().get(communityId).getCriteria() != null &&
+					conf
+						.getRemoveConstraintsMap()
+						.get(communityId)
+						.getCriteria()
+						.stream()
+						.anyMatch(crit -> crit.verifyCriteria(param)))
+					removeCommunities.add(communityId);
+			});
+
 		// communities contains all the communities to be added as context for the result
 		final Set<String> communities = new HashSet<>();
 
@@ -164,7 +181,8 @@ public class ResultTagger implements Serializable {
 			.getSelectionConstraintsMap()
 			.keySet()
 			.forEach(communityId -> {
-				if (conf.getSelectionConstraintsMap().get(communityId).getCriteria() != null &&
+				if (!removeCommunities.contains(communityId) &&
+					conf.getSelectionConstraintsMap().get(communityId).getCriteria() != null &&
 					conf
 						.getSelectionConstraintsMap()
 						.get(communityId)
@@ -175,6 +193,9 @@ public class ResultTagger implements Serializable {
 			});
 
 		communities.addAll(aconstraints);
+
+		communities.removeAll(removeCommunities);
+
 		if (aconstraints.size() > 0)
 			log.info("Found {} for advancedConstraints ", aconstraints.size());
 

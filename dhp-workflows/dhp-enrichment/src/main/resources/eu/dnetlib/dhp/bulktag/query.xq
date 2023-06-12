@@ -10,6 +10,9 @@ where $x//CONFIGURATION/context[./@type='community' or ./@type='ri'] and $x//con
 return
 <community>
 { $x//CONFIGURATION/context/@id}
+<removeConstraints>
+{$x//CONFIGURATION/context/param[./@name='removeConstraints']/text() }
+</removeConstraints>
 <advancedConstraints>
 {$x//CONFIGURATION/context/param[./@name='advancedConstraints']/text() }
 </advancedConstraints>
