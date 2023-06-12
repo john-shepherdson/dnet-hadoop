@@ -140,7 +140,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 		final List<StructuredProperty> alternateIdentifier = prepareResultPids(doc, info);
 		final List<StructuredProperty> pid = IdentifierFactory.getPids(alternateIdentifier, collectedfrom);
 
-		final Set<StructuredProperty> pids = pid.stream().collect(Collectors.toCollection(HashSet::new));
+		final Set<StructuredProperty> pids = new HashSet<>(pid);
 
 		instance
 			.setAlternateIdentifier(
@@ -157,6 +157,12 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 			.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
 		instance
 			.setProcessingchargecurrency(field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
+
+		prepareListURL(doc, "//oaf:fulltext", info)
+			.stream()
+			.findFirst()
+			.map(Field::getValue)
+			.ifPresent(instance::setFulltext);
 
 		final List<Node> nodes = Lists.newArrayList(doc.selectNodes("//dc:identifier"));
 		final List<String> url = nodes
