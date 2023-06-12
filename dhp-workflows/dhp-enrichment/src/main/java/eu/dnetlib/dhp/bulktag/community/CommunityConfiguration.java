@@ -28,6 +28,8 @@ public class CommunityConfiguration implements Serializable {
 	private Map<String, SelectionConstraints> selectionConstraintsMap = new HashMap<>();
 	// map eosc datasource -> communityid
 	private Map<String, List<Pair<String, SelectionConstraints>>> eoscDatasourceMap = new HashMap<>();
+	// map communityid -> remove constraints
+	private Map<String, SelectionConstraints> removeConstraintsMap = new HashMap<>();
 
 	public Map<String, List<Pair<String, SelectionConstraints>>> getEoscDatasourceMap() {
 		return eoscDatasourceMap;
@@ -71,6 +73,14 @@ public class CommunityConfiguration implements Serializable {
 		this.selectionConstraintsMap = selectionConstraintsMap;
 	}
 
+	public Map<String, SelectionConstraints> getRemoveConstraintsMap() {
+		return removeConstraintsMap;
+	}
+
+	public void setRemoveConstraintsMap(Map<String, SelectionConstraints> removeConstraintsMap) {
+		this.removeConstraintsMap = removeConstraintsMap;
+	}
+
 	CommunityConfiguration(final Map<String, Community> communities) {
 		this.communities = communities;
 		init();
@@ -89,6 +99,9 @@ public class CommunityConfiguration implements Serializable {
 		}
 		if (selectionConstraintsMap == null) {
 			selectionConstraintsMap = Maps.newHashMap();
+		}
+		if (removeConstraintsMap == null) {
+			removeConstraintsMap = Maps.newHashMap();
 		}
 
 		for (Community c : getCommunities().values()) {
@@ -111,6 +124,8 @@ public class CommunityConfiguration implements Serializable {
 					zenodocommunityMap);
 			}
 			selectionConstraintsMap.put(id, c.getConstraints());
+
+			removeConstraintsMap.put(id, c.getRemoveConstraints());
 		}
 	}
 
