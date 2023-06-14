@@ -22,13 +22,13 @@ function copydb() {
   hdfs dfs -conf /etc/impala_cluster/hdfs-site.xml -chmod -R 777 /tmp/$FILE/${db}.db
 
   # drop tables from db
-  for i in `impala-shell --user $HADOOP_USER_NAME-i impala-cluster-dn1.openaire.eu -d ${db} --delimited  -q "show tables"`;
+  for i in `impala-shell --user $HADOOP_USER_NAME -i impala-cluster-dn1.openaire.eu -d ${db} --delimited  -q "show tables"`;
     do
         `impala-shell  -i impala-cluster-dn1.openaire.eu -d -d ${db} -q "drop table $i;"`;
     done
 
   # drop views from db
-  for i in `impala-shell --user $HADOOP_USER_NAME-i impala-cluster-dn1.openaire.eu -d ${db} --delimited  -q "show tables"`;
+  for i in `impala-shell --user $HADOOP_USER_NAME -i impala-cluster-dn1.openaire.eu -d ${db} --delimited  -q "show tables"`;
     do
         `impala-shell  -i impala-cluster-dn1.openaire.eu -d -d ${db} -q "drop view $i;"`;
     done
