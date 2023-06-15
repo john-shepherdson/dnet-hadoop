@@ -10,6 +10,12 @@ function createShadowDB() {
   SOURCE=$1
   SHADOW=$2
 
+  # drop views from db
+  for i in `impala-shell -i impala-cluster-dn1.openaire.eu -d ${SHADOW} --delimited  -q "show tables"`;
+    do
+        `impala-shell  -i impala-cluster-dn1.openaire.eu -d -d ${SHADOW} -q "drop view $i;"`;
+    done
+
   impala-shell -i impala-cluster-dn1.openaire.eu -q "drop database ${SHADOW} CASCADE";
   impala-shell -i impala-cluster-dn1.openaire.eu -q "create database if not exists ${SHADOW}";
 #  impala-shell -i impala-cluster-dn1.openaire.eu -d ${SHADOW} -q "show tables" | sed "s/^/drop view if exists ${SHADOW}./" | sed "s/$/;/" | impala-shell -i impala-cluster-dn1.openaire.eu -f -
