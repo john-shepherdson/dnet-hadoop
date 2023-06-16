@@ -9,6 +9,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,7 +18,7 @@ public abstract class AbstractPaceTest extends AbstractPaceFunctions {
 	protected String readFromClasspath(final String filename) {
 		final StringWriter sw = new StringWriter();
 		try {
-			IOUtils.copy(getClass().getResourceAsStream(filename), sw);
+			IOUtils.copy(getClass().getResourceAsStream(filename), sw, StandardCharsets.UTF_8);
 			return sw.toString();
 		} catch (final IOException e) {
 			throw new RuntimeException("cannot load resource from classpath: " + filename);

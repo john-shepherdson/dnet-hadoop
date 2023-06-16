@@ -42,22 +42,25 @@ public class StringContainsMatch extends AbstractComparator {
             STRING = STRING.toLowerCase();
         }
 
-        switch(AGGREGATOR) {
-            case "AND":
-                if(ca.contains(STRING) && cb.contains(STRING))
-                    return 1.0;
-                break;
-            case "OR":
-                if(ca.contains(STRING) || cb.contains(STRING))
-                    return 1.0;
-                break;
-            case "XOR":
-                if(ca.contains(STRING) ^ cb.contains(STRING))
-                    return 1.0;
-                break;
-            default:
-                return 0.0;
+        if (AGGREGATOR != null) {
+            switch (AGGREGATOR) {
+                case "AND":
+                    if (ca.contains(STRING) && cb.contains(STRING))
+                        return 1.0;
+                    break;
+                case "OR":
+                    if (ca.contains(STRING) || cb.contains(STRING))
+                        return 1.0;
+                    break;
+                case "XOR":
+                    if (ca.contains(STRING) ^ cb.contains(STRING))
+                        return 1.0;
+                    break;
+                default:
+                    return 0.0;
+            }
         }
+
         return 0.0;
     }
 }

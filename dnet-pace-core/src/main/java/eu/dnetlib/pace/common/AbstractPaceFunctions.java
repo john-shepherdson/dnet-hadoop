@@ -3,28 +3,23 @@ package eu.dnetlib.pace.common;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.ibm.icu.text.Transliterator;
 import eu.dnetlib.pace.clustering.NGramUtils;
-import eu.dnetlib.pace.config.Type;
 import eu.dnetlib.pace.model.Field;
 import eu.dnetlib.pace.model.FieldList;
 import eu.dnetlib.pace.model.FieldListImpl;
-import eu.dnetlib.pace.model.FieldValueImpl;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.util.*;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import com.ibm.icu.text.Transliterator;
 
 /**
  * Set of common functions for the framework
@@ -133,10 +128,12 @@ public abstract class AbstractPaceFunctions {
 
     protected static String fixAliases(final String s) {
         final StringBuilder sb = new StringBuilder();
-        for (final char ch : Lists.charactersOf(s)) {
+
+        s.chars().forEach(ch -> {
             final int i = StringUtils.indexOf(aliases_from, ch);
-            sb.append(i >= 0 ? aliases_to.charAt(i) : ch);
-        }
+            sb.append(i >= 0 ? aliases_to.charAt(i) : (char)ch);
+        });
+
         return sb.toString();
     }
 
@@ -152,9 +149,10 @@ public abstract class AbstractPaceFunctions {
     protected String removeSymbols(final String s) {
         final StringBuilder sb = new StringBuilder();
 
-        for (final char ch : Lists.charactersOf(s)) {
-            sb.append(StringUtils.contains(alpha, ch) ? ch : " ");
-        }
+        s.chars().forEach(ch -> {
+            sb.append(StringUtils.contains(alpha, ch) ? (char)ch : ' ');
+        });
+
         return sb.toString().replaceAll("\\s+", " ");
     }
 
@@ -241,7 +239,7 @@ public abstract class AbstractPaceFunctions {
 
         final Set<String> h = Sets.newHashSet();
         try {
-            for (final String s : IOUtils.readLines(NGramUtils.class.getResourceAsStream(classpath))) {
+            for (final String s : IOUtils.readLines(NGramUtils.class.getResourceAsStream(classpath), StandardCharsets.UTF_8)) {
                 h.add(fixAliases(transliterator.transliterate(s))); //transliteration of the stopwords
             }
         } catch (final Throwable e) {
@@ -256,7 +254,7 @@ public abstract class AbstractPaceFunctions {
 
         final Map<String, String> m = new HashMap<>();
         try {
-            for (final String s : IOUtils.readLines(AbstractPaceFunctions.class.getResourceAsStream(classpath))) {
+            for (final String s : IOUtils.readLines(AbstractPaceFunctions.class.getResourceAsStream(classpath), StandardCharsets.UTF_8)) {
                 //string is like this: code;word1;word2;word3
                 String[] line = s.split(";");
                 String value = line[0];
@@ -349,7 +347,7 @@ public abstract class AbstractPaceFunctions {
     public static <T> String readFromClasspath(final String filename, final Class<T> clazz) {
         final StringWriter sw = new StringWriter();
         try {
-            IOUtils.copy(clazz.getResourceAsStream(filename), sw);
+            IOUtils.copy(clazz.getResourceAsStream(filename), sw, StandardCharsets.UTF_8);
             return sw.toString();
         } catch (final IOException e) {
             throw new RuntimeException("cannot load resource from classpath: " + filename);

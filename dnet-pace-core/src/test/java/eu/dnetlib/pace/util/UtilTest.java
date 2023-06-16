@@ -1,7 +1,6 @@
 package eu.dnetlib.pace.util;
 
 import eu.dnetlib.pace.model.Person;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.jupiter.api.*;
 
 import java.util.HashMap;
@@ -18,7 +17,6 @@ public class UtilTest {
     }
 
     @Test
-    @Ignore
     public void paceResolverTest() {
         PaceResolver paceResolver = new PaceResolver();
         paceResolver.getComparator("keywordMatch", params);

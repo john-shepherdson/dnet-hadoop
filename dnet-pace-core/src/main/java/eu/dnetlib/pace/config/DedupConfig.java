@@ -1,5 +1,6 @@
 package eu.dnetlib.pace.config;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 import eu.dnetlib.pace.model.ClusteringDef;
@@ -7,15 +8,19 @@ import eu.dnetlib.pace.model.FieldDef;
 import eu.dnetlib.pace.util.PaceException;
 import org.antlr.stringtemplate.StringTemplate;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 import eu.dnetlib.pace.tree.support.TreeNodeDef;
@@ -30,6 +35,9 @@ public class DedupConfig implements Config, Serializable {
 	private PaceConfig pace;
 
 	private WfConfig wf;
+
+	@JsonIgnore
+	private Map<String, List<Pattern>> blacklists;
 
 	private static Map<String, String> defaults = Maps.newHashMap();
 
@@ -57,6 +65,12 @@ public class DedupConfig implements Config, Serializable {
 			config = new ObjectMapper().readValue(json, DedupConfig.class);
 			config.getPace().initModel();
 			config.getPace().initTranslationMap();
+
+			config.blacklists = config.getPace().getBlacklists().entrySet()
+					.stream()
+					.collect(Collectors.toMap(e -> e.getKey(),
+							e ->e.getValue().stream().filter(s -> !StringUtils.isBlank(s)).map(Pattern::compile).collect(Collectors.toList()) ));
+
 			return config;
 		} catch (IOException e) {
 			throw new PaceException("Error in parsing configuration json", e);
@@ -88,7 +102,7 @@ public class DedupConfig implements Config, Serializable {
 	}
 
 	private String readFromClasspath(final String resource) throws IOException {
-		return IOUtils.toString(getClass().getResource(resource));
+		return IOUtils.toString(getClass().getResource(resource), StandardCharsets.UTF_8);
 	}
 
 	public PaceConfig getPace() {
@@ -137,8 +151,8 @@ public class DedupConfig implements Config, Serializable {
 	}
 
 	@Override
-	public Map<String, List<String>> blacklists() {
-		return getPace().getBlacklists();
+	public Map<String, List<Pattern>> blacklists() {
+		return blacklists;
 	}
 
 	@Override

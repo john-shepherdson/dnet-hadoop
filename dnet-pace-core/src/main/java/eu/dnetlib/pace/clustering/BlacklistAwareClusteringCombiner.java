@@ -1,59 +1,59 @@
 package eu.dnetlib.pace.clustering;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import eu.dnetlib.pace.config.Config;
 import eu.dnetlib.pace.model.Document;
 import eu.dnetlib.pace.model.Field;
 import eu.dnetlib.pace.model.FieldListImpl;
 import eu.dnetlib.pace.model.MapDocument;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 public class BlacklistAwareClusteringCombiner extends ClusteringCombiner {
 
-	private static final Log log = LogFactory.getLog(BlacklistAwareClusteringCombiner.class);
+    public static Collection<String> filterAndCombine(final MapDocument a, final Config conf) {
+        Document filtered = filter(a, conf.blacklists());
+        return combine(filtered, conf);
+    }
 
-	public static Collection<String> filterAndCombine(final MapDocument a, final Config conf) {
+    private static MapDocument filter(final MapDocument a, final Map<String, List<Pattern>> blacklists) {
+        if (blacklists == null || blacklists.isEmpty()) {
+            return a;
+        }
 
-		final Document filtered = new BlacklistAwareClusteringCombiner().filter(a, conf.blacklists());
-		return combine(filtered, conf);
-	}
+        final Map<String, Field> filtered = Maps.newHashMap(a.getFieldMap());
 
-	private MapDocument filter(final MapDocument a, final Map<String, List<String>> blacklists) {
-		final Map<String, Field> filtered = Maps.newHashMap(a.getFieldMap());
-		if (blacklists != null) {
-			for (final Entry<String, Field> e : filtered.entrySet()) {
+        for (final Entry<String, List<Pattern>> e : blacklists.entrySet()) {
+            Field fields = a.getFieldMap().get(e.getKey());
+            if (fields != null) {
+                final FieldListImpl fl = new FieldListImpl();
 
-				final FieldListImpl fl = new FieldListImpl();
-				fl.addAll(Lists.newArrayList(Iterables.filter(e.getValue(), new FieldFilter(e.getKey(), blacklists))));
-				filtered.put(e.getKey(), fl);
-			}
-		}
-		return new MapDocument(a.getIdentifier(), filtered);
-	}
+                for (Field f : fields) {
+                    if (!isBlackListed(f.stringValue(), e.getValue())) {
+                        fl.add(f);
+                    }
+                }
 
-	/**
-	 * Tries to match the fields in the regex blacklist.
-	 *
-	 * @param fieldName
-	 * @param value
-	 * @return true if the field matches, false otherwise
-	 */
-	protected boolean regexMatches(final String fieldName, final String value, final Map<String, Set<String>> blacklists) {
-		if (blacklists.containsKey(fieldName)) {
-			for (final String regex : blacklists.get(fieldName)) {
-				if (value.matches(regex)) return true;
-			}
-		}
-		return false;
-	}
+                filtered.put(e.getKey(), fl);
+            }
+        }
+
+        return new MapDocument(a.getIdentifier(), filtered);
+    }
+
+    private static boolean isBlackListed(String value, List<Pattern> blacklist) {
+        for (Pattern pattern : blacklist) {
+            if (pattern.matcher(value).matches()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }
+
