@@ -88,7 +88,9 @@ abstract class AbstractSparkAction implements Serializable {
 						"for $x in /RESOURCE_PROFILE[.//RESOURCE_IDENTIFIER/@value = '%s'] return $x//DEDUPLICATION/text()",
 						configProfileId));
 
-		DedupConfig dedupConfig = DedupConfig.load(conf);
+		DedupConfig dedupConfig = new ObjectMapper().readValue(conf, DedupConfig.class);
+		dedupConfig.getPace().initModel();
+		dedupConfig.getPace().initTranslationMap();
 		dedupConfig.getWf().setConfigurationId(actionSetId);
 
 		return dedupConfig;
