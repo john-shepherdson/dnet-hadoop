@@ -20,10 +20,6 @@ public class ClusteringCombiner {
 	private static String COLLAPSE_ON= "collapseOn";
 
 	public static Collection<String> combine(final Document a, final Config conf) {
-		return new ClusteringCombiner().doCombine(a, conf);
-	}
-
-	private Collection<String> doCombine(final Document a, final Config conf) {
 		final Collection<String> res = Sets.newLinkedHashSet();
 		for (final ClusteringDef cd : conf.clusterings()) {
 			for (final String fieldName : cd.getFields()) {
@@ -51,7 +47,7 @@ public class ClusteringCombiner {
 		return res;
 	}
 
-	private String getPrefix(ClusteringDef cd, String fieldName) {
+	private static String getPrefix(ClusteringDef cd, String fieldName) {
 		return cd.getName()+ SEPARATOR +
 				cd.getParams().keySet()
 						.stream()

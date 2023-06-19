@@ -2,6 +2,7 @@ package eu.dnetlib.pace.config;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import eu.dnetlib.pace.model.ClusteringDef;
 import eu.dnetlib.pace.model.FieldDef;
@@ -47,7 +48,7 @@ public interface Config {
 	 *
 	 * @return the map
 	 */
-	public Map<String, List<String>> blacklists();
+	public Map<String, List<Pattern>> blacklists();
 
 
 	/**
