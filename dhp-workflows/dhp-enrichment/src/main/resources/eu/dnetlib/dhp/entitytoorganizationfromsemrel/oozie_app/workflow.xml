@@ -181,6 +181,7 @@
             <arg>--leavesPath</arg><arg>${workingDir}/preparedInfo/leavesPath</arg>
             <arg>--childParentPath</arg><arg>${workingDir}/preparedInfo/childParentPath</arg>
             <arg>--resultOrgPath</arg><arg>${workingDir}/preparedInfo/resultOrgPath</arg>
+            <arg>--projectOrganizationPath</arg><arg>${workingDir}/preparedInfo/projectOrganizationPath</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--workingDir</arg><arg>${workingDir}/working</arg>
             <arg>--iterations</arg><arg>${iterations}</arg>
