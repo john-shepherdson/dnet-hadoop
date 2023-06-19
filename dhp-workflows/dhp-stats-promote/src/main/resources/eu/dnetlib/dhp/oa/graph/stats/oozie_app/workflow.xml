@@ -80,10 +80,10 @@
         <shell xmlns="uri:oozie:shell-action:0.1">
             <job-tracker>${jobTracker}</job-tracker>
             <name-node>${nameNode}</name-node>
-            <exec>updateProductionViews.sh</exec>
+            <exec>updateProductionViewsMonitor.sh</exec>
             <argument>${monitor_db_name}</argument>
             <argument>${monitor_db_production_name}</argument>
-            <file>updateProductionViews.sh</file>
+            <file>updateProductionViewsMonitor.sh</file>
         </shell>
         <ok to="updateObservatoryViews"/>
         <error to="Kill"/>
