@@ -135,17 +135,17 @@ public class ZenodoAPIClient implements Serializable {
 	 */
 	public int uploadIS(InputStream is, String file_name, long len) throws IOException {
 		OkHttpClient httpClient = new OkHttpClient.Builder()
-				.writeTimeout(600, TimeUnit.SECONDS)
-				.readTimeout(600, TimeUnit.SECONDS)
-				.connectTimeout(600, TimeUnit.SECONDS)
-				.build();
+			.writeTimeout(600, TimeUnit.SECONDS)
+			.readTimeout(600, TimeUnit.SECONDS)
+			.connectTimeout(600, TimeUnit.SECONDS)
+			.build();
 
 		Request request = new Request.Builder()
-				.url(bucket + "/" + file_name)
-				.addHeader(HttpHeaders.CONTENT_TYPE, "application/zip") // add request headers
-				.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + access_token)
-				.put(InputStreamRequestBody.create(MEDIA_TYPE_ZIP, is, len))
-				.build();
+			.url(bucket + "/" + file_name)
+			.addHeader(HttpHeaders.CONTENT_TYPE, "application/zip") // add request headers
+			.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + access_token)
+			.put(InputStreamRequestBody.create(MEDIA_TYPE_ZIP, is, len))
+			.build();
 
 		try (Response response = httpClient.newCall(request).execute()) {
 			if (!response.isSuccessful())

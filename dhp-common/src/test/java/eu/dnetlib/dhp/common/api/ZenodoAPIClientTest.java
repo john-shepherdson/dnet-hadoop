@@ -62,7 +62,7 @@ class ZenodoAPIClientTest {
 
 		Assertions.assertEquals(200, client.sendMretadata(metadata));
 
-	//	Assertions.assertEquals(202, client.publish());
+		// Assertions.assertEquals(202, client.publish());
 
 	}
 
@@ -109,7 +109,7 @@ class ZenodoAPIClientTest {
 	@Test
 	void depositBigFile() throws MissingConceptDoiException, IOException {
 		ZenodoAPIClient client = new ZenodoAPIClient(URL_STRING,
-				ACCESS_TOKEN);
+			ACCESS_TOKEN);
 
 		Assertions.assertEquals(201, client.newDeposition());
 
@@ -122,7 +122,7 @@ class ZenodoAPIClientTest {
 
 		Assertions.assertEquals(200, client.uploadIS(is, "newVersion_deposition", file.length()));
 
-		//Assertions.assertEquals(202, client.publish());
+		// Assertions.assertEquals(202, client.publish());
 	}
 
 }
