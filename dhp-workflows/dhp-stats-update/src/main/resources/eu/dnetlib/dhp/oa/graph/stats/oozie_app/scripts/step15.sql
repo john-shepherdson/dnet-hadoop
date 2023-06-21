@@ -35,7 +35,7 @@ select * from ${stats_db_name}.software_refereed
 union all
 select * from ${stats_db_name}.otherresearchproduct_refereed;
 
-create table if not exists indi_impact_measures STORED AS PARQUET as
+create table if not exists ${stats_db_name}.indi_impact_measures STORED AS PARQUET as
 select substr(id, 4) as id, measures_ids.id impactmetric, measures_ids.unit.value[0] score,
 cast(measures_ids.unit.value[0] as decimal(6,3)) score_dec, measures_ids.unit.value[1] class
 from ${openaire_db_name}.result lateral view explode(measures) measures as measures_ids
