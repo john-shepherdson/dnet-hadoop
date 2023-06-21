@@ -1,7 +1,7 @@
 -------------------------------------------
 --- Extra tables, mostly used by indicators
 
-create table ${stats_db_name}.result_projectcount STORED AS PARQUET as
+create table if not exists ${stats_db_name}.result_projectcount STORED AS PARQUET as
 select r.id, count(distinct p.id) as count
 from ${stats_db_name}.result r
 left outer join ${stats_db_name}.result_projects rp on rp.id=r.id
