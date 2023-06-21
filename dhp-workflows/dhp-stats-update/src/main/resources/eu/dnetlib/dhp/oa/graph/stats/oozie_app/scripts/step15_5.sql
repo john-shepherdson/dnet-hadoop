@@ -8,14 +8,14 @@ left outer join ${stats_db_name}.result_projects rp on rp.id=r.id
 left outer join ${stats_db_name}.project p on p.id=rp.project
 group by r.id;
 
-create table ${stats_db_name}.result_fundercount STORED AS PARQUET as
+create table if not exists ${stats_db_name}.result_fundercount STORED AS PARQUET as
 select r.id, count(distinct p.funder) as count
 from ${stats_db_name}.result r
 left outer join ${stats_db_name}.result_projects rp on rp.id=r.id
 left outer join ${stats_db_name}.project p on p.id=rp.project
 group by r.id;
 
-create table ${stats_db_name}.project_resultcount STORED AS PARQUET as
+create table if not exists ${stats_db_name}.project_resultcount STORED AS PARQUET as
 with rcount as (
     select p.id as pid, count(distinct r.id) as `count`, r.type as type
     from ${stats_db_name}.project p
@@ -29,14 +29,14 @@ select rcount.pid, sum(case when rcount.type='publication' then rcount.count els
 from rcount
 group by rcount.pid;
 
-create view ${stats_db_name}.rndexpenditure as select * from stats_ext.rndexpediture;
-create view ${stats_db_name}.rndgdpexpenditure as select * from stats_ext.rndgdpexpenditure;
-create view ${stats_db_name}.doctoratestudents as select * from stats_ext.doctoratestudents;
-create view ${stats_db_name}.totalresearchers as select * from stats_ext.totalresearchers;
-create view ${stats_db_name}.totalresearchersft as select * from stats_ext.totalresearchersft;
-create view ${stats_db_name}.hrrst as select * from stats_ext.hrrst;
+create or replace view ${stats_db_name}.rndexpenditure as select * from stats_ext.rndexpediture;
+create or replace view ${stats_db_name}.rndgdpexpenditure as select * from stats_ext.rndgdpexpenditure;
+create or replace view ${stats_db_name}.doctoratestudents as select * from stats_ext.doctoratestudents;
+create or replace view ${stats_db_name}.totalresearchers as select * from stats_ext.totalresearchers;
+create or replace view ${stats_db_name}.totalresearchersft as select * from stats_ext.totalresearchersft;
+create or replace view ${stats_db_name}.hrrst as select * from stats_ext.hrrst;
 
-create table ${stats_db_name}.result_instance stored as parquet as
+create table if not exists ${stats_db_name}.result_instance stored as parquet as
 select distinct r.*
 from (
          select substr(r.id, 4) as id, inst.accessright.classname as accessright, inst.accessright.openaccessroute as accessright_uw, substr(inst.collectedfrom.key, 4) as collectedfrom,
@@ -44,7 +44,7 @@ from (
          from ${openaire_db_name}.result r lateral view explode(r.instance) instances as inst lateral view explode(inst.pid) pids as p) r
 join ${stats_db_name}.result res on res.id=r.id;
 
-create table ${stats_db_name}.result_apc STORED AS PARQUET as
+create table if not exists ${stats_db_name}.result_apc STORED AS PARQUET as
 select r.id, r.amount, r.currency
 from (
          select substr(r.id, 4) as id, cast(inst.processingchargeamount.value as float) as amount, inst.processingchargecurrency.value as currency
@@ -52,4 +52,4 @@ from (
 join ${stats_db_name}.result res on res.id=r.id
 where r.amount is not null;
 
-create view ${stats_db_name}.issn_gold_oa_dataset as select * from ${external_stats_db_name}.issn_gold_oa_dataset;
+create or replace view ${stats_db_name}.issn_gold_oa_dataset as select * from ${external_stats_db_name}.issn_gold_oa_dataset;
