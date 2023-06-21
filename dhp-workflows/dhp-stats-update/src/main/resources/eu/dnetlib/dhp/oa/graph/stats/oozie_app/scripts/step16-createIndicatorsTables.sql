@@ -746,11 +746,11 @@ select rf.id, count(distinct lvl3) totals from result_fos rf
 group by rf.id;
 
 create table if not exists indi_pub_interdisciplinarity as
-select distinct p.id as id, coalesce(indi_pub_is_interdisciplinary, 0)
-as indi_pub_is_interdisciplinary
+select distinct p.id as id, coalesce(is_interdisciplinary, 0)
+as is_interdisciplinary
 from pub_fos_totals p
 left outer join (
-select pub_fos_totals.id, 1 as indi_pub_is_interdisciplinary from pub_fos_totals
+select pub_fos_totals.id, 1 as is_interdisciplinary from pub_fos_totals
 where totals>1) tmp on p.id=tmp.id;
 
 drop table pub_fos_totals purge;
