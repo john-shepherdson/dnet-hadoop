@@ -1,13 +1,15 @@
+
 package eu.dnetlib.pace.model;
+
+import java.io.Serializable;
+import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import eu.dnetlib.pace.config.Type;
 
-import java.io.Serializable;
-import java.util.List;
+import eu.dnetlib.pace.config.Type;
 
 /**
  * The schema is composed by field definitions (FieldDef). Each field has a type, a name, and an associated compare algorithm.
@@ -34,7 +36,8 @@ public class FieldDef implements Serializable {
 	 */
 	private int length = -1;
 
-	public FieldDef() {}
+	public FieldDef() {
+	}
 
 	public String getName() {
 		return name;

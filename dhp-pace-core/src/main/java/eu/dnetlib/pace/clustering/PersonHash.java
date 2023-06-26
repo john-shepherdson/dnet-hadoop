@@ -1,3 +1,4 @@
+
 package eu.dnetlib.pace.clustering;
 
 import java.util.Collection;
@@ -22,7 +23,8 @@ public class PersonHash extends AbstractClusteringFunction {
 	protected Collection<String> doApply(final Config conf, final String s) {
 		final List<String> res = Lists.newArrayList();
 
-		final boolean aggressive = (Boolean) (getParams().containsKey("aggressive") ? getParams().get("aggressive") : DEFAULT_AGGRESSIVE);
+		final boolean aggressive = (Boolean) (getParams().containsKey("aggressive") ? getParams().get("aggressive")
+			: DEFAULT_AGGRESSIVE);
 
 		res.add(new Person(s, aggressive).hash());
 

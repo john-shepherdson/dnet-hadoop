@@ -1,3 +1,4 @@
+
 package eu.dnetlib.pace.config;
 
 public enum Type {

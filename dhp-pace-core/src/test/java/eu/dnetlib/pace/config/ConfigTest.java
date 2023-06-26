@@ -1,17 +1,17 @@
+
 package eu.dnetlib.pace.config;
-
-
-import eu.dnetlib.pace.AbstractPaceTest;
-import eu.dnetlib.pace.util.MapDocumentUtil;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import eu.dnetlib.pace.AbstractPaceTest;
+import eu.dnetlib.pace.util.MapDocumentUtil;
 
 public class ConfigTest extends AbstractPaceTest {
 
@@ -56,7 +56,7 @@ public class ConfigTest extends AbstractPaceTest {
 
 		System.out.println("translationMap = " + translationMap.size());
 
-		for (String key: translationMap.keySet()) {
+		for (String key : translationMap.keySet()) {
 			if (translationMap.get(key).equals("key::1"))
 				System.out.println("key = " + key);
 		}
@@ -70,13 +70,13 @@ public class ConfigTest extends AbstractPaceTest {
 		assertEquals(0, load.getPace().translationMap().keySet().size());
 	}
 
-    @Test
-    public  void testJPath()  {
-        final String json = readFromClasspath("organization.json");
+	@Test
+	public void testJPath() {
+		final String json = readFromClasspath("organization.json");
 
-        final String jpath ="$.id";
+		final String jpath = "$.id";
 
-        System.out.println("result = " + MapDocumentUtil.getJPathString(jpath, json));
-    }
+		System.out.println("result = " + MapDocumentUtil.getJPathString(jpath, json));
+	}
 
 }

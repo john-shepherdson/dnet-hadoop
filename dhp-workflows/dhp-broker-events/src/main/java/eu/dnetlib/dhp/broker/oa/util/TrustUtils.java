@@ -1,16 +1,18 @@
 
 package eu.dnetlib.dhp.broker.oa.util;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.broker.objects.OaBrokerMainEntity;
-import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.tree.support.TreeProcessor;
-import eu.dnetlib.pace.util.MapDocumentUtil;
+import java.io.IOException;
+
 import org.apache.spark.sql.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
+import eu.dnetlib.pace.config.DedupConfig;
+import eu.dnetlib.pace.model.SparkDedupConfig;
+import eu.dnetlib.pace.tree.support.TreeProcessor;
 
 public class TrustUtils {
 
@@ -18,13 +20,18 @@ public class TrustUtils {
 
 	private static DedupConfig dedupConfig;
 
+	private static SparkDedupConfig sparkDedupConfig;
+
+	private static final ObjectMapper mapper;
+
 	static {
-		final ObjectMapper mapper = new ObjectMapper();
+		mapper = new ObjectMapper();
 		try {
 			dedupConfig = mapper
 				.readValue(
 					DedupConfig.class.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/dedupConfig/dedupConfig.json"),
 					DedupConfig.class);
+			sparkDedupConfig = new SparkDedupConfig(dedupConfig, 1);
 		} catch (final IOException e) {
 			log.error("Error loading dedupConfig, e");
 		}
@@ -40,11 +47,8 @@ public class TrustUtils {
 		}
 
 		try {
-			final ObjectMapper objectMapper = new ObjectMapper();
-			final Row doc1 = MapDocumentUtil
-				.asMapDocumentWithJPath(dedupConfig, objectMapper.writeValueAsString(r1));
-			final Row doc2 = MapDocumentUtil
-				.asMapDocumentWithJPath(dedupConfig, objectMapper.writeValueAsString(r2));
+			final Row doc1 = sparkDedupConfig.rowFromJson().apply(mapper.writeValueAsString(r1));
+			final Row doc2 = sparkDedupConfig.rowFromJson().apply(mapper.writeValueAsString(r2));
 
 			final double score = new TreeProcessor(dedupConfig).computeScore(doc1, doc2);
 

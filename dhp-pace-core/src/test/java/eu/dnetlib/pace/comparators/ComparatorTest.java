@@ -1,16 +1,18 @@
+
 package eu.dnetlib.pace.comparators;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.*;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import eu.dnetlib.pace.AbstractPaceTest;
 import eu.dnetlib.pace.clustering.NGramUtils;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.tree.*;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ComparatorTest extends AbstractPaceTest {
@@ -26,7 +28,8 @@ public class ComparatorTest extends AbstractPaceTest {
 		params.put("name_th", "0.95");
 		params.put("jpath_value", "$.value");
 		params.put("jpath_classid", "$.qualifier.classid");
-		conf = DedupConfig.load(readFromClasspath("/eu/dnetlib/pace/config/organization.current.conf.json", ComparatorTest.class));
+		conf = DedupConfig
+			.load(readFromClasspath("/eu/dnetlib/pace/config/organization.current.conf.json", ComparatorTest.class));
 	}
 
 	@Test
@@ -39,32 +42,38 @@ public class ComparatorTest extends AbstractPaceTest {
 	public void cityMatchTest() {
 		final CityMatch cityMatch = new CityMatch(params);
 
-		//both names with no cities
+		// both names with no cities
 		assertEquals(1.0, cityMatch.distance("Università", "Centro di ricerca", conf));
 
-		//one of the two names with no cities
+		// one of the two names with no cities
 		assertEquals(-1.0, cityMatch.distance("Università di Bologna", "Centro di ricerca", conf));
 
-		//both names with cities (same)
+		// both names with cities (same)
 		assertEquals(1.0, cityMatch.distance("Universita di Bologna", "Biblioteca di Bologna", conf));
 
-		//both names with cities (different)
+		// both names with cities (different)
 		assertEquals(0.0, cityMatch.distance("Universita di Bologna", "Universita di Torino", conf));
 		assertEquals(0.0, cityMatch.distance("Franklin College", "Concordia College", conf));
 
-		//particular cases
+		// particular cases
 		assertEquals(1.0, cityMatch.distance("Free University of Bozen-Bolzano", "Università di Bolzano", conf));
-		assertEquals(1.0, cityMatch.distance("Politechniki Warszawskiej (Warsaw University of Technology)", "Warsaw University of Technology", conf));
+		assertEquals(
+			1.0,
+			cityMatch
+				.distance(
+					"Politechniki Warszawskiej (Warsaw University of Technology)", "Warsaw University of Technology",
+					conf));
 		assertEquals(-1.0, cityMatch.distance("Allen (United States)", "United States Military Academy", conf));
 	}
 
 	@Test
-	public void keywordMatchTest(){
+	public void keywordMatchTest() {
 		params.put("threshold", "0.5");
 
 		final KeywordMatch keywordMatch = new KeywordMatch(params);
 
-		assertEquals(0.5, keywordMatch.distance("Biblioteca dell'Universita di Bologna", "Università di Bologna", conf));
+		assertEquals(
+			0.5, keywordMatch.distance("Biblioteca dell'Universita di Bologna", "Università di Bologna", conf));
 		assertEquals(1.0, keywordMatch.distance("Universita degli studi di Pisa", "Universita di Pisa", conf));
 		assertEquals(1.0, keywordMatch.distance("Polytechnic University of Turin", "POLITECNICO DI TORINO", conf));
 		assertEquals(1.0, keywordMatch.distance("Istanbul Commerce University", "İstanbul Ticarət Universiteti", conf));
@@ -77,7 +86,7 @@ public class ComparatorTest extends AbstractPaceTest {
 	}
 
 	@Test
-	public void listContainsMatchTest(){
+	public void listContainsMatchTest() {
 
 		List<String> a = createFieldList(Arrays.asList("Article", "Publication", "ORP"), "instanceType");
 		List<String> b = createFieldList(Arrays.asList("Publication", "Article", "ORP"), "instanceType");
@@ -100,7 +109,7 @@ public class ComparatorTest extends AbstractPaceTest {
 	}
 
 	@Test
-	public void stringContainsMatchTest(){
+	public void stringContainsMatchTest() {
 
 		params.put("string", "openorgs");
 		params.put("bool", "XOR");
@@ -120,7 +129,7 @@ public class ComparatorTest extends AbstractPaceTest {
 	}
 
 	@Test
-	public void numbersMatchTest(){
+	public void numbersMatchTest() {
 		final NumbersMatch numbersMatch = new NumbersMatch(params);
 
 		assertEquals(0.0, numbersMatch.distance("University of Rennes 2", "Universita di Rennes 7", conf));
@@ -128,7 +137,7 @@ public class ComparatorTest extends AbstractPaceTest {
 	}
 
 	@Test
-	public void romansMatchTest(){
+	public void romansMatchTest() {
 
 		final RomansMatch romansMatch = new RomansMatch(params);
 
@@ -142,8 +151,9 @@ public class ComparatorTest extends AbstractPaceTest {
 
 		final JaroWinklerNormalizedName jaroWinklerNormalizedName = new JaroWinklerNormalizedName(params);
 
-        double result = jaroWinklerNormalizedName.distance("AT&T (United States)", "United States Military Academy", conf);
-        System.out.println("result = " + result);
+		double result = jaroWinklerNormalizedName
+			.distance("AT&T (United States)", "United States Military Academy", conf);
+		System.out.println("result = " + result);
 
 		result = jaroWinklerNormalizedName.distance("NOAA - Servicio Meteorol\\u00f3gico Nacional", "NOAA - NWS", conf);
 		System.out.println("result = " + result);
@@ -171,7 +181,11 @@ public class ComparatorTest extends AbstractPaceTest {
 
 		final LevensteinTitle levensteinTitle = new LevensteinTitle(params);
 
-		double result = levensteinTitle.distance("Degradation of lignin β‐aryl ether units in Arabidopsis thaliana expressing LigD, LigF and LigG from Sphingomonas paucimobilis SYK‐6", "Degradation of lignin β-aryl ether units in <i>Arabidopsis thaliana</i> expressing <i>LigD</i>, <i>LigF</i> and <i>LigG</i> from <i>Sphingomonas paucimobilis</i> SYK-6", conf);
+		double result = levensteinTitle
+			.distance(
+				"Degradation of lignin β‐aryl ether units in Arabidopsis thaliana expressing LigD, LigF and LigG from Sphingomonas paucimobilis SYK‐6",
+				"Degradation of lignin β-aryl ether units in <i>Arabidopsis thaliana</i> expressing <i>LigD</i>, <i>LigF</i> and <i>LigG</i> from <i>Sphingomonas paucimobilis</i> SYK-6",
+				conf);
 
 		System.out.println("result = " + result);
 	}
@@ -195,13 +209,16 @@ public class ComparatorTest extends AbstractPaceTest {
 
 		assertEquals(1.0, result);
 
-		List<String> c = createFieldList(Arrays.asList("Conference object", "Conference object", "Conference object"), "instanceType");
+		List<String> c = createFieldList(
+			Arrays.asList("Conference object", "Conference object", "Conference object"), "instanceType");
 		result = instanceTypeMatch.compare(c, b, conf);
 
 		assertEquals(1.0, result);
 
-		List<String> d = createFieldList(Arrays.asList("Master thesis", "Master thesis", "Master thesis"), "instanceType");
-		List<String> e = createFieldList(Arrays.asList("Bachelor thesis", "Bachelor thesis", "Bachelor thesis"), "instanceType");
+		List<String> d = createFieldList(
+			Arrays.asList("Master thesis", "Master thesis", "Master thesis"), "instanceType");
+		List<String> e = createFieldList(
+			Arrays.asList("Bachelor thesis", "Bachelor thesis", "Bachelor thesis"), "instanceType");
 		result = instanceTypeMatch.compare(d, e, conf);
 
 		assertEquals(1.0, result);
@@ -222,7 +239,8 @@ public class ComparatorTest extends AbstractPaceTest {
 
 		AuthorsMatch authorsMatch = new AuthorsMatch(params);
 
-		List<String> a = createFieldList(Arrays.asList("La Bruzzo, Sandro", "Atzori, Claudio", "De Bonis, Michele"), "authors");
+		List<String> a = createFieldList(
+			Arrays.asList("La Bruzzo, Sandro", "Atzori, Claudio", "De Bonis, Michele"), "authors");
 		List<String> b = createFieldList(Arrays.asList("Atzori, C.", "La Bruzzo, S.", "De Bonis, M."), "authors");
 		double result = authorsMatch.compare(a, b, conf);
 
@@ -232,7 +250,7 @@ public class ComparatorTest extends AbstractPaceTest {
 		List<String> d = createFieldList(Arrays.asList("Manghi, Pasquale"), "authors");
 		result = authorsMatch.compare(c, d, conf);
 
-		assertEquals(0.0, result) ;
+		assertEquals(0.0, result);
 
 		params.put("mode", "surname");
 		authorsMatch = new AuthorsMatch(params);
@@ -246,7 +264,7 @@ public class ComparatorTest extends AbstractPaceTest {
 		assertEquals(0.25, result);
 
 		List<String> f = createFieldList(new ArrayList<>(), "authors");
-		result = authorsMatch.compare(f,f, conf);
+		result = authorsMatch.compare(f, f, conf);
 		System.out.println("result = " + result);
 
 	}
@@ -256,8 +274,19 @@ public class ComparatorTest extends AbstractPaceTest {
 
 		JsonListMatch jsonListMatch = new JsonListMatch(params);
 
-		List<String> a = createFieldList(Arrays.asList("{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":null,\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:actionset\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"doi\",\"classname\":\"Digital Object Identifier\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"10.1111/pbi.12655\"}"), "authors");
-		List<String> b = createFieldList(Arrays.asList("{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:crosswalk:repository\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"pmc\",\"classname\":\"PubMed Central ID\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"PMC5399005\"}","{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:crosswalk:repository\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"pmid\",\"classname\":\"PubMed ID\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"27775869\"}","{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"user:claim\",\"classname\":\"Linked by user\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"doi\",\"classname\":\"Digital Object Identifier\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"10.1111/pbi.12655\"}","{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:crosswalk:repository\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"handle\",\"classname\":\"Handle\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"1854/LU-8523529\"}"), "authors");
+		List<String> a = createFieldList(
+			Arrays
+				.asList(
+					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":null,\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:actionset\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"doi\",\"classname\":\"Digital Object Identifier\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"10.1111/pbi.12655\"}"),
+			"authors");
+		List<String> b = createFieldList(
+			Arrays
+				.asList(
+					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:crosswalk:repository\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"pmc\",\"classname\":\"PubMed Central ID\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"PMC5399005\"}",
+					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:crosswalk:repository\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"pmid\",\"classname\":\"PubMed ID\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"27775869\"}",
+					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"user:claim\",\"classname\":\"Linked by user\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"doi\",\"classname\":\"Digital Object Identifier\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"10.1111/pbi.12655\"}",
+					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:crosswalk:repository\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"handle\",\"classname\":\"Handle\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"1854/LU-8523529\"}"),
+			"authors");
 
 		double result = jsonListMatch.compare(a, b, conf);
 
@@ -287,13 +316,16 @@ public class ComparatorTest extends AbstractPaceTest {
 
 		CosineSimilarity cosineSimilarity = new CosineSimilarity(params);
 
-		double[] a = new double[]{1,2,3};
-		double[] b = new double[]{1,2,3};
+		double[] a = new double[] {
+			1, 2, 3
+		};
+		double[] b = new double[] {
+			1, 2, 3
+		};
 
 		double compare = cosineSimilarity.compare(a, b, conf);
 
 		System.out.println("compare = " + compare);
 	}
-
 
 }

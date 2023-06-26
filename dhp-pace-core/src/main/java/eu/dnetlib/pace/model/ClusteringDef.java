@@ -1,15 +1,16 @@
-package eu.dnetlib.pace.model;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.pace.clustering.ClusteringFunction;
-import eu.dnetlib.pace.config.PaceConfig;
-import eu.dnetlib.pace.util.PaceException;
+package eu.dnetlib.pace.model;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.pace.clustering.ClusteringFunction;
+import eu.dnetlib.pace.config.PaceConfig;
+import eu.dnetlib.pace.util.PaceException;
 
 public class ClusteringDef implements Serializable {
 
@@ -19,7 +20,8 @@ public class ClusteringDef implements Serializable {
 
 	private Map<String, Integer> params;
 
-	public ClusteringDef() {}
+	public ClusteringDef() {
+	}
 
 	public String getName() {
 		return name;

@@ -1,12 +1,9 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import eu.dnetlib.pace.config.DedupConfig;
+import java.io.IOException;
+import java.util.Optional;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -17,8 +14,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import java.io.IOException;
-import java.util.Optional;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import eu.dnetlib.pace.config.DedupConfig;
 
 public class SparkWhitelistSimRels extends AbstractSparkAction {
 
@@ -69,11 +70,14 @@ public class SparkWhitelistSimRels extends AbstractSparkAction {
 		JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		// file format: source####target
-		Dataset<Row> whiteListRels = spark.read()
-				.textFile(whiteListPath)
-				.withColumn("pairs", functions.split(new Column("value"), WHITELIST_SEPARATOR))
-				.filter(functions.size(new Column("pairs")).equalTo(2))
-				.select(functions.element_at(new Column("pairs"), 1).as("from"), functions.element_at(new Column("pairs"), 2).as("to"));
+		Dataset<Row> whiteListRels = spark
+			.read()
+			.textFile(whiteListPath)
+			.withColumn("pairs", functions.split(new Column("value"), WHITELIST_SEPARATOR))
+			.filter(functions.size(new Column("pairs")).equalTo(2))
+			.select(
+				functions.element_at(new Column("pairs"), 1).as("from"),
+				functions.element_at(new Column("pairs"), 2).as("to"));
 
 		// for each dedup configuration
 		for (DedupConfig dedupConf : getConfigurations(isLookUpService, actionSetId)) {
@@ -84,15 +88,21 @@ public class SparkWhitelistSimRels extends AbstractSparkAction {
 
 			final String outputPath = DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity);
 
-			//DFMapDocumentUtils.registerUDFs(spark, dedupConf);
+			// DFMapDocumentUtils.registerUDFs(spark, dedupConf);
 
-			Dataset<Row> entities = spark.read().textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
-					.repartition(numPartitions)
-					.withColumn("id", functions.get_json_object(new Column("value"), dedupConf.getWf().getIdPath()));
+			Dataset<Row> entities = spark
+				.read()
+				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
+				.repartition(numPartitions)
+				.withColumn("id", functions.get_json_object(new Column("value"), dedupConf.getWf().getIdPath()));
 
-			Dataset<Row> whiteListRels1 = whiteListRels.join(entities, entities.col("id").equalTo(whiteListRels.col("from")), "inner").select("from", "to");
+			Dataset<Row> whiteListRels1 = whiteListRels
+				.join(entities, entities.col("id").equalTo(whiteListRels.col("from")), "inner")
+				.select("from", "to");
 
-			Dataset<Row> whiteListRels2 = whiteListRels1.join(entities, whiteListRels1.col("to").equalTo(entities.col("id")), "inner").select("from", "to");
+			Dataset<Row> whiteListRels2 = whiteListRels1
+				.join(entities, whiteListRels1.col("to").equalTo(entities.col("id")), "inner")
+				.select("from", "to");
 
 //			Dataset<Tuple2<String, String>> whiteListRels1 = whiteListRels
 //				.joinWith(entities, whiteListRels.col("_1").equalTo(entities.col("_1")), "inner")

@@ -1,44 +1,46 @@
-package eu.dnetlib.pace.tree.support;
 
-import com.wcohen.ss.AbstractStringDistance;
-import eu.dnetlib.pace.config.Config;
+package eu.dnetlib.pace.tree.support;
 
 import java.util.Map;
 
-public abstract class AbstractStringComparator extends AbstractComparator<String>{
-    protected AbstractStringComparator(Map<String, String> params) {
-        super(params);
-    }
+import com.wcohen.ss.AbstractStringDistance;
 
-    protected AbstractStringComparator(Map<String, String> params, AbstractStringDistance ssalgo) {
-        super(params, ssalgo);
-    }
+import eu.dnetlib.pace.config.Config;
 
-    protected AbstractStringComparator(double weight, AbstractStringDistance ssalgo) {
-        super(weight, ssalgo);
-    }
+public abstract class AbstractStringComparator extends AbstractComparator<String> {
+	protected AbstractStringComparator(Map<String, String> params) {
+		super(params);
+	}
 
-    protected AbstractStringComparator(AbstractStringDistance ssalgo) {
-        super(ssalgo);
-    }
+	protected AbstractStringComparator(Map<String, String> params, AbstractStringDistance ssalgo) {
+		super(params, ssalgo);
+	}
 
-    public double distance(final String a, final String b, final Config conf) {
-        if (a.isEmpty() || b.isEmpty()) {
-            return -1;  //return -1 if a field is missing
-        }
-        double score = ssalgo.score(a, b);
-        return normalize(score);
-    }
+	protected AbstractStringComparator(double weight, AbstractStringDistance ssalgo) {
+		super(weight, ssalgo);
+	}
 
-    @Override
-    public double compare(Object a, Object b, Config conf) {
-        return compare(toString(a), toString(b), conf);
-    }
+	protected AbstractStringComparator(AbstractStringDistance ssalgo) {
+		super(ssalgo);
+	}
 
-    public double compare(final String a, final String b, final Config conf) {
-        if (a.isEmpty() || b.isEmpty())
-            return -1;
-        return distance(a, b, conf);
-    }
+	public double distance(final String a, final String b, final Config conf) {
+		if (a.isEmpty() || b.isEmpty()) {
+			return -1; // return -1 if a field is missing
+		}
+		double score = ssalgo.score(a, b);
+		return normalize(score);
+	}
+
+	@Override
+	public double compare(Object a, Object b, Config conf) {
+		return compare(toString(a), toString(b), conf);
+	}
+
+	public double compare(final String a, final String b, final Config conf) {
+		if (a.isEmpty() || b.isEmpty())
+			return -1;
+		return distance(a, b, conf);
+	}
 
 }

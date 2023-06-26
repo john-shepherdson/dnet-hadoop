@@ -1,39 +1,41 @@
-package eu.dnetlib.pace.tree.support;
 
-import com.google.common.collect.Lists;
-import com.wcohen.ss.AbstractStringDistance;
-import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.config.Type;
+package eu.dnetlib.pace.tree.support;
 
 import java.util.List;
 import java.util.Map;
 
-abstract public class AbstractListComparator extends AbstractComparator<List<String>>{
-    protected AbstractListComparator(Map<String, String> params) {
-        super(params);
-    }
+import com.google.common.collect.Lists;
+import com.wcohen.ss.AbstractStringDistance;
 
-    protected AbstractListComparator(Map<String, String> params, AbstractStringDistance ssalgo) {
-        super(params, ssalgo);
-    }
+import eu.dnetlib.pace.config.Config;
+import eu.dnetlib.pace.config.Type;
 
-    protected AbstractListComparator(double weight, AbstractStringDistance ssalgo) {
-        super(weight, ssalgo);
-    }
+abstract public class AbstractListComparator extends AbstractComparator<List<String>> {
+	protected AbstractListComparator(Map<String, String> params) {
+		super(params);
+	}
 
-    protected AbstractListComparator(AbstractStringDistance ssalgo) {
-        super(ssalgo);
-    }
+	protected AbstractListComparator(Map<String, String> params, AbstractStringDistance ssalgo) {
+		super(params, ssalgo);
+	}
 
-    @Override
-    public double compare(Object a, Object b, Config conf) {
-        return compare(toList(a), toList(b), conf);
-    }
+	protected AbstractListComparator(double weight, AbstractStringDistance ssalgo) {
+		super(weight, ssalgo);
+	}
 
-    public double compare(final List<String> a, final List<String> b, final Config conf) {
-        if (a.isEmpty() || b.isEmpty())
-            return -1;
+	protected AbstractListComparator(AbstractStringDistance ssalgo) {
+		super(ssalgo);
+	}
 
-        return distance(concat(a), concat(b), conf);
-    }
+	@Override
+	public double compare(Object a, Object b, Config conf) {
+		return compare(toList(a), toList(b), conf);
+	}
+
+	public double compare(final List<String> a, final List<String> b, final Config conf) {
+		if (a.isEmpty() || b.isEmpty())
+			return -1;
+
+		return distance(concat(a), concat(b), conf);
+	}
 }

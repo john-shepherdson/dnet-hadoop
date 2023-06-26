@@ -1,10 +1,5 @@
-package eu.dnetlib.pace.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import eu.dnetlib.pace.util.PaceException;
-import org.apache.commons.lang3.StringUtils;
+package eu.dnetlib.pace.config;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -12,6 +7,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+
+import eu.dnetlib.pace.util.PaceException;
 
 public class WfConfig implements Serializable {
 
@@ -76,7 +78,6 @@ public class WfConfig implements Serializable {
 	/** Maximum number of allowed children. */
 	private int maxChildren = MAX_CHILDREN;
 
-
 	/** Default maximum number of iterations. */
 	private final static int MAX_ITERATIONS = 20;
 
@@ -84,9 +85,10 @@ public class WfConfig implements Serializable {
 	private int maxIterations = MAX_ITERATIONS;
 
 	/** The Jquery path to retrieve the identifier */
-	private String  idPath = "$.id";
+	private String idPath = "$.id";
 
-	public WfConfig() {}
+	public WfConfig() {
+	}
 
 	/**
 	 * Instantiates a new dedup config.
@@ -114,8 +116,10 @@ public class WfConfig implements Serializable {
 	 * @param idPath
 	 * 			  the path for the id of the entity
 	 */
-	public WfConfig(final String entityType, final String orderField, final List<String> rootBuilder, final String dedupRun,
-			final Set<String> skipList, final int queueMaxSize, final int groupMaxSize, final int slidingWindowSize, final boolean includeChildren, final int maxIterations, final String idPath) {
+	public WfConfig(final String entityType, final String orderField, final List<String> rootBuilder,
+		final String dedupRun,
+		final Set<String> skipList, final int queueMaxSize, final int groupMaxSize, final int slidingWindowSize,
+		final boolean includeChildren, final int maxIterations, final String idPath) {
 		super();
 		this.entityType = entityType;
 		this.orderField = orderField;
@@ -257,7 +261,6 @@ public class WfConfig implements Serializable {
 		this.maxChildren = maxChildren;
 	}
 
-
 	public int getMaxIterations() {
 		return maxIterations;
 	}
@@ -277,7 +280,6 @@ public class WfConfig implements Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override

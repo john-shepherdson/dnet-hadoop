@@ -1,9 +1,11 @@
+
 package eu.dnetlib.pace.model;
 
-import eu.dnetlib.pace.clustering.NGramUtils;
+import java.util.Comparator;
+
 import org.apache.spark.sql.Row;
 
-import java.util.Comparator;
+import eu.dnetlib.pace.clustering.NGramUtils;
 
 /**
  * The Class MapDocumentComparator.
@@ -25,13 +27,12 @@ public class RowDataOrderingComparator implements Comparator<Row> {
 
 	/*
 	 * (non-Javadoc)
-	 *
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 	 */
 	@Override
 	public int compare(final Row d1, final Row d2) {
 		if (d1 == null)
-			return d2==null ? 0: -1;
+			return d2 == null ? 0 : -1;
 		else if (d2 == null) {
 			return 1;
 		}
@@ -40,7 +41,7 @@ public class RowDataOrderingComparator implements Comparator<Row> {
 		final String o2 = d2.getString(comparatorField);
 
 		if (o1 == null)
-			return o2==null ? 0: -1;
+			return o2 == null ? 0 : -1;
 		else if (o2 == null) {
 			return 1;
 		}

@@ -1,18 +1,19 @@
+
 package eu.dnetlib.pace.config;
 
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.Maps;
 import com.ibm.icu.text.Transliterator;
+
 import eu.dnetlib.pace.common.AbstractPaceFunctions;
 import eu.dnetlib.pace.model.ClusteringDef;
 import eu.dnetlib.pace.model.FieldDef;
 import eu.dnetlib.pace.tree.support.TreeNodeDef;
 import eu.dnetlib.pace.util.PaceResolver;
-
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
 
 public class PaceConfig extends AbstractPaceFunctions implements Serializable {
 
@@ -37,7 +38,8 @@ public class PaceConfig extends AbstractPaceFunctions implements Serializable {
 	@JsonIgnore
 	public static PaceResolver resolver = new PaceResolver();
 
-	public PaceConfig() {}
+	public PaceConfig() {
+	}
 
 	public void initModel() {
 		modelMap = Maps.newHashMap();
@@ -46,20 +48,21 @@ public class PaceConfig extends AbstractPaceFunctions implements Serializable {
 		}
 	}
 
-	public void initTranslationMap(){
+	public void initTranslationMap() {
 		translationMap = Maps.newHashMap();
 
 		Transliterator transliterator = Transliterator.getInstance("Any-Eng");
 		for (String key : synonyms.keySet()) {
-			for (String term : synonyms.get(key)){
-				translationMap.put(
+			for (String term : synonyms.get(key)) {
+				translationMap
+					.put(
 						fixAliases(transliterator.transliterate(term.toLowerCase())),
-				key);
+						key);
 			}
 		}
 	}
 
-	public Map<String, String> translationMap(){
+	public Map<String, String> translationMap() {
 		return translationMap;
 	}
 

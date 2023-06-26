@@ -1,9 +1,10 @@
-package eu.dnetlib.pace.clustering;
 
-import eu.dnetlib.pace.config.Config;
+package eu.dnetlib.pace.clustering;
 
 import java.util.Collection;
 import java.util.Map;
+
+import eu.dnetlib.pace.config.Config;
 
 public class RandomClusteringFunction extends AbstractClusteringFunction {
 

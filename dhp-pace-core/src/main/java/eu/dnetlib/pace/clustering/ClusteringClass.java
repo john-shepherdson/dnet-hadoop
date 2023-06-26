@@ -1,3 +1,4 @@
+
 package eu.dnetlib.pace.clustering;
 
 import java.lang.annotation.ElementType;
@@ -9,5 +10,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface ClusteringClass {
 
-    public String value();
+	public String value();
 }

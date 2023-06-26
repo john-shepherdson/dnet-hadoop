@@ -1,8 +1,9 @@
+
 package eu.dnetlib.pace.clustering;
 
-import eu.dnetlib.pace.config.Config;
-
 import java.util.*;
+
+import eu.dnetlib.pace.config.Config;
 
 @ClusteringClass("ngrams")
 public class Ngrams extends AbstractClusteringFunction {
@@ -44,7 +45,7 @@ public class Ngrams extends AbstractClusteringFunction {
 				}
 			}
 		}
-		//System.out.println(ngrams + " n: " + ngrams.size());
+		// System.out.println(ngrams + " n: " + ngrams.size());
 		return ngrams;
 	}
 

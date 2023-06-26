@@ -133,11 +133,13 @@ public class SparkDedupTest implements Serializable {
 			.when(isLookUpService.getResourceProfileByQuery(Mockito.contains("otherresearchproduct")))
 			.thenReturn(classPathResourceAsString("/eu/dnetlib/dhp/dedup/conf/orp.curr.conf.json"));
 	}
+
 	@Test
 	@Order(1)
 	void createSimRelsTestTwice() throws Exception {
 		createSimRelsTest();
 	}
+
 	@Test
 	@Order(1)
 	void createSimRelsTest() throws Exception {
@@ -181,7 +183,6 @@ public class SparkDedupTest implements Serializable {
 			.read()
 			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "otherresearchproduct"))
 			.count();
-
 
 		System.out.println("orgs_simrel = " + orgs_simrel);
 		System.out.println("pubs_simrel = " + pubs_simrel);

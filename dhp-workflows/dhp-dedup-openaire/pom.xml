@@ -53,13 +53,17 @@
     </dependencyManagement>
 
     <dependencies>
+
         <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-api</artifactId>
+            <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>dhp-common</artifactId>
+            <version>${project.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-sdk</artifactId>
+            <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>dhp-pace-core</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -84,30 +88,20 @@
         </dependency>
 
         <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>com.arakelian</groupId>
             <artifactId>java-jq</artifactId>
         </dependency>
+
         <dependency>
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
         </dependency>
+
         <dependency>
             <groupId>jaxen</groupId>
             <artifactId>jaxen</artifactId>
         </dependency>
 
-
-        <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-pace-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-graphx_2.11</artifactId>
@@ -141,12 +135,7 @@
             <version>1.4.200</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-catalyst_2.11</artifactId>
-            <version>2.4.0.cloudera2</version>
-            <scope>compile</scope>
-        </dependency>
+
     </dependencies>
 
 

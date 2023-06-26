@@ -1,3 +1,4 @@
+
 package eu.dnetlib.pace.clustering;
 
 import java.util.Collection;
@@ -5,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Lists;
+
 import eu.dnetlib.pace.config.Config;
 
 @ClusteringClass("immutablefieldvalue")

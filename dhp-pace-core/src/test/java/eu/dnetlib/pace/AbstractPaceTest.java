@@ -1,11 +1,13 @@
-package eu.dnetlib.pace;
 
-import eu.dnetlib.pace.common.AbstractPaceFunctions;
-import org.apache.commons.io.IOUtils;
+package eu.dnetlib.pace;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
+
+import org.apache.commons.io.IOUtils;
+
+import eu.dnetlib.pace.common.AbstractPaceFunctions;
 
 public abstract class AbstractPaceTest extends AbstractPaceFunctions {
 
@@ -35,7 +37,7 @@ public abstract class AbstractPaceTest extends AbstractPaceFunctions {
 		return a;
 	}
 
-	protected List<String> createFieldList(List<String> strings, String fieldName){
+	protected List<String> createFieldList(List<String> strings, String fieldName) {
 		return strings;
 
 	}

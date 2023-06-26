@@ -1,32 +1,30 @@
-package eu.dnetlib.dhp.oa.dedup.model
+package eu.dnetlib.pace.model
 
 import com.jayway.jsonpath.{Configuration, JsonPath, Option}
-import eu.dnetlib.dhp.oa.dedup.{DedupUtility, SparkReporter}
 import eu.dnetlib.pace.config.{DedupConfig, Type}
-import eu.dnetlib.pace.model.{ClusteringDef, FieldDef}
 import eu.dnetlib.pace.tree.support.TreeProcessor
 import eu.dnetlib.pace.util.MapDocumentUtil.truncateValue
-import eu.dnetlib.pace.util.{BlockProcessor, MapDocumentUtil}
+import eu.dnetlib.pace.util.{BlockProcessor, MapDocumentUtil, SparkReporter}
 import org.apache.spark.SparkContext
+import org.apache.spark.sql.{Column, Dataset, Row, functions}
 import org.apache.spark.sql.catalyst.expressions.{GenericRowWithSchema, Literal}
 import org.apache.spark.sql.expressions.{UserDefinedFunction, Window}
-import org.apache.spark.sql.functions.{col, lit, udf}
 import org.apache.spark.sql.types.{DataTypes, Metadata, StructField, StructType}
-import org.apache.spark.sql.{Column, Dataset, Row, functions}
 
 import java.util
 import java.util.function.Predicate
 import java.util.regex.Pattern
 import scala.collection.JavaConverters._
 import scala.collection.mutable
+import org.apache.spark.sql.functions.{col, lit, udf}
 
-class SparkDedupConfig(conf: DedupConfig, numPartitions: Int) extends Serializable {
+case class SparkDedupConfig(conf: DedupConfig, numPartitions: Int) extends Serializable {
 
   private val URL_REGEX: Pattern = Pattern.compile("^\\s*(http|https|ftp)\\://.*")
 
   private val CONCAT_REGEX: Pattern = Pattern.compile("\\|\\|\\|")
 
-  private var urlFilter = (s: String) => URL_REGEX.matcher(s).matches
+  private val urlFilter = (s: String) => URL_REGEX.matcher(s).matches
 
   val modelExtractor: (Dataset[String] => Dataset[Row]) = df => {
     df.withColumn("mapDocument", rowFromJsonUDF.apply(df.col(df.columns(0))))
@@ -226,60 +224,59 @@ class SparkDedupConfig(conf: DedupConfig, numPartitions: Int) extends Serializab
 
   val orderingFieldPosition: Int = rowDataType.fieldIndex(conf.getWf.getOrderField)
 
-  val rowFromJsonUDF = udf(
-    (json: String) => {
-      val documentContext =
-        JsonPath.using(Configuration.defaultConfiguration.addOptions(Option.SUPPRESS_EXCEPTIONS)).parse(json)
-      val values = new Array[Any](rowDataType.size)
+  val rowFromJson = (json: String) => {
+    val documentContext =
+      JsonPath.using(Configuration.defaultConfiguration.addOptions(Option.SUPPRESS_EXCEPTIONS)).parse(json)
+    val values = new Array[Any](rowDataType.size)
 
-      values(identityFieldPosition) = DFMapDocumentUtils.getJPathString(conf.getWf.getIdPath, documentContext)
+    values(identityFieldPosition) = MapDocumentUtil.getJPathString(conf.getWf.getIdPath, documentContext)
 
-      rowDataType.fieldNames.zipWithIndex.foldLeft(values) {
-        case ((res, (fname, index))) => {
-          val fdef = conf.getPace.getModelMap.get(fname)
+    rowDataType.fieldNames.zipWithIndex.foldLeft(values) {
+      case ((res, (fname, index))) => {
+        val fdef = conf.getPace.getModelMap.get(fname)
 
-          if (fdef != null) {
-            res(index) = fdef.getType match {
-              case Type.String | Type.Int =>
-                MapDocumentUtil.truncateValue(
-                  DFMapDocumentUtils.getJPathString(fdef.getPath, documentContext),
-                  fdef.getLength
-                )
+        if (fdef != null) {
+          res(index) = fdef.getType match {
+            case Type.String | Type.Int =>
+              MapDocumentUtil.truncateValue(
+                MapDocumentUtil.getJPathString(fdef.getPath, documentContext),
+                fdef.getLength
+              )
 
-              case Type.URL =>
-                var uv = DFMapDocumentUtils.getJPathString(fdef.getPath, documentContext)
-                if (!urlFilter(uv)) uv = ""
-                uv
+            case Type.URL =>
+              var uv = MapDocumentUtil.getJPathString(fdef.getPath, documentContext)
+              if (!urlFilter(uv)) uv = ""
+              uv
 
-              case Type.List | Type.JSON =>
-                MapDocumentUtil.truncateList(
-                  DFMapDocumentUtils.getJPathList(fdef.getPath, documentContext, fdef.getType),
-                  fdef.getSize
-                )
+            case Type.List | Type.JSON =>
+              MapDocumentUtil.truncateList(
+                MapDocumentUtil.getJPathList(fdef.getPath, documentContext, fdef.getType),
+                fdef.getSize
+              )
 
-              case Type.StringConcat =>
-                val jpaths = CONCAT_REGEX.split(fdef.getPath)
+            case Type.StringConcat =>
+              val jpaths = CONCAT_REGEX.split(fdef.getPath)
 
-                truncateValue(
-                  jpaths
-                    .map(jpath => DFMapDocumentUtils.getJPathString(jpath, documentContext))
-                    .mkString(" "),
-                  fdef.getLength
-                )
+              truncateValue(
+                jpaths
+                  .map(jpath => MapDocumentUtil.getJPathString(jpath, documentContext))
+                  .mkString(" "),
+                fdef.getLength
+              )
 
-              case Type.DoubleArray =>
-                MapDocumentUtil.getJPathArray(fdef.getPath, json)
-            }
+            case Type.DoubleArray =>
+              MapDocumentUtil.getJPathArray(fdef.getPath, json)
           }
-
-          res
         }
-      }
 
-      new GenericRowWithSchema(values, rowDataType)
-    },
-    rowDataType
-  )
+        res
+      }
+    }
+
+    new GenericRowWithSchema(values, rowDataType)
+  }
+
+  val rowFromJsonUDF = udf(rowFromJson, rowDataType)
 
   def filterColumnUDF(fdef: FieldDef): UserDefinedFunction = {
 
@@ -310,7 +307,7 @@ class SparkDedupConfig(conf: DedupConfig, numPartitions: Int) extends Serializab
   }
 
   def processBlock(implicit sc: SparkContext) = {
-    val accumulators = DedupUtility.constructAccumulator(conf, sc)
+    val accumulators = SparkReporter.constructAccumulator(conf, sc)
 
     udf[Array[Tuple2[String, String]], mutable.WrappedArray[Row]](block => {
       val reporter = new SparkReporter(accumulators)

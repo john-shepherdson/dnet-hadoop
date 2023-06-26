@@ -3,29 +3,20 @@ package eu.dnetlib.dhp.oa.dedup
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.oa.dedup.dsl.{Clustering, Deduper}
 import eu.dnetlib.dhp.oa.dedup.model.BlockStats
-import eu.dnetlib.dhp.oa.dedup.model.SparkDedupConfig
-import eu.dnetlib.dhp.schema.oaf.Relation
 import eu.dnetlib.dhp.utils.ISLookupClientFactory
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService
-import eu.dnetlib.pace.config.DedupConfig
-import eu.dnetlib.pace.model.RowDataOrderingComparator
+import eu.dnetlib.enabling.is.lookup.rmi.{ISLookUpException, ISLookUpService}
+import eu.dnetlib.pace.model.{RowDataOrderingComparator, SparkDedupConfig}
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
-import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.sql._
 import org.apache.spark.sql.catalyst.expressions.Literal
 import org.apache.spark.sql.types.DataTypes
 import org.dom4j.DocumentException
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.xml.sax.SAXException
 
 import java.io.IOException
-import java.util
-import java.util.Optional
 import java.util.stream.Collectors
-import scala.collection.Seq
 
 object DSLExample {
   private val log = LoggerFactory.getLogger(classOf[DSLExample])
@@ -64,15 +55,15 @@ class DSLExample(parser: ArgumentApplicationParser, spark: SparkSession) extends
     DSLExample.log.info("isLookUpUrl:   '{}'", isLookUpUrl)
     DSLExample.log.info("actionSetId:   '{}'", actionSetId)
     DSLExample.log.info("workingPath:   '{}'", workingPath)
-// for each dedup configuration
+    // for each dedup configuration
     import scala.collection.JavaConversions._
     for (dedupConf <- getConfigurations(isLookUpService, actionSetId).subList(0, 1)) {
       val subEntity = dedupConf.getWf.getSubEntityValue
       DSLExample.log.info("Creating blockstats for: '{}'", subEntity)
       val outputPath = DedupUtility.createBlockStatsPath(workingPath, actionSetId, subEntity)
       AbstractSparkAction.removeOutputDir(spark, outputPath)
-      val sc = JavaSparkContext.fromSparkContext(spark.sparkContext)
-      val sparkConfig = new SparkDedupConfig(dedupConf, numPartitions)
+
+      val sparkConfig = SparkDedupConfig(dedupConf, numPartitions)
 
       val inputDF = spark.read
         .textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
@@ -87,8 +78,7 @@ class DSLExample(parser: ArgumentApplicationParser, spark: SparkSession) extends
           Clustering("suffixprefix", Seq("legalname"), Map("max" -> 1, "len" -> 3)),
           Clustering("urlclustering", Seq("websiteurl")),
           Clustering("keywordsclustering", Seq("fields"),  Map("max" -> 2, "windowSize" -> 4))
-        );
-
+        )
 
       simRels
         .map[BlockStats](

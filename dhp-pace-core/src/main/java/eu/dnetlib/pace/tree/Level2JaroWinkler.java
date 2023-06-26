@@ -1,16 +1,18 @@
+
 package eu.dnetlib.pace.tree;
 
+import java.util.Map;
+
 import com.wcohen.ss.AbstractStringDistance;
+
 import eu.dnetlib.pace.tree.support.AbstractComparator;
 import eu.dnetlib.pace.tree.support.AbstractStringComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
-import java.util.Map;
-
 @ComparatorClass("level2JaroWinkler")
 public class Level2JaroWinkler extends AbstractStringComparator {
 
-	public Level2JaroWinkler(Map<String, String> params){
+	public Level2JaroWinkler(Map<String, String> params) {
 		super(params, new com.wcohen.ss.Level2JaroWinkler());
 	}
 

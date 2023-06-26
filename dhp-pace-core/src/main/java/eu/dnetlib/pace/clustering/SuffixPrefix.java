@@ -1,3 +1,4 @@
+
 package eu.dnetlib.pace.clustering;
 
 import java.util.Collection;
@@ -5,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
+
 import eu.dnetlib.pace.config.Config;
 
 @ClusteringClass("suffixprefix")
@@ -18,7 +20,7 @@ public class SuffixPrefix extends AbstractClusteringFunction {
 	protected Collection<String> doApply(Config conf, String s) {
 		return suffixPrefix(s, param("len"), param("max"));
 	}
-	
+
 	private Collection<String> suffixPrefix(String s, int len, int max) {
 		final Set<String> bigrams = Sets.newLinkedHashSet();
 		int i = 0;
