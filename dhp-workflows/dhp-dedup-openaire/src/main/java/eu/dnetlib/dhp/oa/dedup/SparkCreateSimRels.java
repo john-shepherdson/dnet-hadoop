@@ -81,8 +81,6 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 			final String outputPath = DedupUtility.createSimRelPath(workingPath, actionSetId, subEntity);
 			removeOutputDir(spark, outputPath);
 
-			JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-
 			SparkDedupConfig sparkConfig = new SparkDedupConfig(dedupConf, numPartitions);
 
 			Dataset<?> simRels = spark

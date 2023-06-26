@@ -145,7 +145,6 @@ public class BlockProcessor {
 		final String type = dedupConf.getWf().getEntityType();
 
 		context.emit(type, from, to);
-		context.emit(type, to, from);
 	}
 
 }

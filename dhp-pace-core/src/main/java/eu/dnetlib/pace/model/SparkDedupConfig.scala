@@ -29,7 +29,7 @@ case class SparkDedupConfig(conf: DedupConfig, numPartitions: Int) extends Seria
   val modelExtractor: (Dataset[String] => Dataset[Row]) = df => {
     df.withColumn("mapDocument", rowFromJsonUDF.apply(df.col(df.columns(0))))
       .withColumn("identifier", new Column("mapDocument.identifier"))
-      .repartition(numPartitions, new Column("identifier"))
+      .repartition(new Column("identifier"))
       .dropDuplicates("identifier")
       .select("mapDocument.*")
   }
@@ -178,12 +178,11 @@ case class SparkDedupConfig(conf: DedupConfig, numPartitions: Int) extends Seria
 
     val res = relBlocks.filter(col("match").equalTo(true))
       .select(col("l.identifier").as("from"), col("r.identifier").as("to"))
-      .repartition(numPartitions)
+      .repartition()
       .dropDuplicates()
 
    // res.show(false)
-    res.union(res.select(col("to").as("from"), col("from").as("to")))
-      .select(functions.struct("from", "to"))
+    res.select(functions.struct("from", "to"))
   }
 
   val processClusters: (Dataset[Row] => Dataset[Row]) = df => {
@@ -193,7 +192,7 @@ case class SparkDedupConfig(conf: DedupConfig, numPartitions: Int) extends Seria
     df.filter(functions.size(new Column("block")).geq(new Literal(2, DataTypes.IntegerType)))
       .withColumn("relations", processBlock(df.sqlContext.sparkContext).apply(new Column("block")))
       .select(functions.explode(new Column("relations")).as("relation"))
-      .repartition(numPartitions, new Column("relation"))
+      .repartition(new Column("relation"))
       .dropDuplicates("relation")
   }
 

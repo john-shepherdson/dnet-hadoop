@@ -190,11 +190,11 @@ public class SparkDedupTest implements Serializable {
 		System.out.println("ds_simrel = " + ds_simrel);
 		System.out.println("orp_simrel = " + orp_simrel);
 
-		assertEquals(3076, orgs_simrel);
-		assertEquals(7046, pubs_simrel);
-		assertEquals(336, sw_simrel);
-		assertEquals(442, ds_simrel);
-		assertEquals(6784, orp_simrel);
+		assertEquals(1538, orgs_simrel);
+		assertEquals(3523, pubs_simrel);
+		assertEquals(168, sw_simrel);
+		assertEquals(221, ds_simrel);
+		assertEquals(3392, orp_simrel);
 
 	}
 
@@ -239,10 +239,10 @@ public class SparkDedupTest implements Serializable {
 			.count();
 
 		// entities simrels supposed to be equal to the number of previous step (no rels in whitelist)
-		assertEquals(3076, orgs_simrel);
-		assertEquals(7046, pubs_simrel);
-		assertEquals(442, ds_simrel);
-		assertEquals(6784, orp_simrel);
+		assertEquals(1538, orgs_simrel);
+		assertEquals(3523, pubs_simrel);
+		assertEquals(221, ds_simrel);
+		assertEquals(3392, orp_simrel);
 //		System.out.println("orgs_simrel = " + orgs_simrel);
 //		System.out.println("pubs_simrel = " + pubs_simrel);
 //		System.out.println("ds_simrel = " + ds_simrel);
@@ -272,7 +272,7 @@ public class SparkDedupTest implements Serializable {
 						&& rel.getTarget().equalsIgnoreCase(whiteList.get(1).split(WHITELIST_SEPARATOR)[1]))
 				.count() > 0);
 
-		assertEquals(338, sw_simrel.count());
+		assertEquals(170, sw_simrel.count());
 //		System.out.println("sw_simrel = " + sw_simrel.count());
 
 	}
