@@ -451,7 +451,13 @@
 			<dependency>
 				<groupId>org.antlr</groupId>
 				<artifactId>stringtemplate</artifactId>
-				<version>4.0</version>
+				<version>3.2.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.antlr</groupId>
+				<artifactId>ST4</artifactId>
+				<version>4.3.4</version>
 			</dependency>
 
 			<dependency>
@@ -544,170 +550,61 @@
 				<version>4.8.71</version>
 			</dependency>
 
-					<dependency>
-						<groupId>edu.cmu</groupId>
-						<artifactId>secondstring</artifactId>
-						<version>1.0.0</version>
-					</dependency>
-					<dependency>
-						<groupId>org.antlr</groupId>
-						<artifactId>stringtemplate</artifactId>
-						<version>3.2</version>
-					</dependency>
-
-					<dependency>
-						<groupId>com.fasterxml.jackson.core</groupId>
-						<artifactId>jackson-databind</artifactId>
-						<version>${jackson.version}</version>
-						<scope>provided</scope>
-					</dependency>
-					<dependency>
-						<groupId>com.fasterxml.jackson.dataformat</groupId>
-						<artifactId>jackson-dataformat-xml</artifactId>
-						<version>${jackson.version}</version>
-						<scope>provided</scope>
-					</dependency>
-					<dependency>
-						<groupId>com.fasterxml.jackson.module</groupId>
-						<artifactId>jackson-module-jsonSchema</artifactId>
-						<version>${jackson.version}</version>
-						<scope>provided</scope>
-					</dependency>
-					<dependency>
-						<groupId>com.fasterxml.jackson.core</groupId>
-						<artifactId>jackson-core</artifactId>
-						<version>${jackson.version}</version>
-						<scope>provided</scope>
-					</dependency>
-					<dependency>
-						<groupId>com.fasterxml.jackson.core</groupId>
-						<artifactId>jackson-annotations</artifactId>
-						<version>${jackson.version}</version>
-						<scope>provided</scope>
-					</dependency>
-
-					<dependency>
-						<groupId>org.mockito</groupId>
-						<artifactId>mockito-core</artifactId>
-						<version>${mockito-core.version}</version>
-						<scope>test</scope>
-					</dependency>
-
-					<dependency>
-						<groupId>org.mockito</groupId>
-						<artifactId>mockito-junit-jupiter</artifactId>
-						<version>${mockito-core.version}</version>
-						<scope>test</scope>
-					</dependency>
-
-					<dependency>
-						<groupId>org.apache.commons</groupId>
-						<artifactId>commons-math3</artifactId>
-						<version>3.6.1</version>
-					</dependency>
-
-					<dependency>
-						<groupId>com.google.guava</groupId>
-						<artifactId>guava</artifactId>
-						<version>${google.guava.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>com.google.code.gson</groupId>
-						<artifactId>gson</artifactId>
-						<version>${google.gson.version}</version>
-					</dependency>
-
-					<dependency>
-						<groupId>org.apache.commons</groupId>
-						<artifactId>commons-lang3</artifactId>
-						<version>${commons.lang.version}</version>
-					</dependency>
-
-					<dependency>
-						<groupId>commons-io</groupId>
-						<artifactId>commons-io</artifactId>
-						<version>${commons.io.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>commons-collections</groupId>
-						<artifactId>commons-collections</artifactId>
-						<version>${commons.collections.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>commons-logging</groupId>
-						<artifactId>commons-logging</artifactId>
-						<version>${commons.logging.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>org.apache.spark</groupId>
-						<artifactId>spark-core_2.11</artifactId>
-						<version>${spark.version}</version>
-						<scope>provided</scope>
-					</dependency>
-					<dependency>
-						<groupId>org.apache.spark</groupId>
-						<artifactId>spark-graphx_2.11</artifactId>
-						<version>${spark.version}</version>
-						<scope>provided</scope>
-					</dependency>
-					<dependency>
-						<groupId>org.apache.spark</groupId>
-						<artifactId>spark-sql_2.11</artifactId>
-						<version>${spark.version}</version>
-						<scope>provided</scope>
-					</dependency>
-
-					<dependency>
-						<groupId>org.junit.jupiter</groupId>
-						<artifactId>junit-jupiter</artifactId>
-						<version>${junit-jupiter.version}</version>
-						<scope>test</scope>
-					</dependency>
-
-					<dependency>
-						<groupId>org.reflections</groupId>
-						<artifactId>reflections</artifactId>
-						<version>0.9.10</version>
-					</dependency>
-
-					<dependency>
-						<groupId>org.scala-lang</groupId>
-						<artifactId>scala-library</artifactId>
-						<version>${scala.version}</version>
-					</dependency>
-
-					<dependency>
-						<groupId>org.apache.oozie</groupId>
-						<artifactId>oozie-client</artifactId>
-						<version>5.1.0</version>
-					</dependency>
-					<dependency>
-						<groupId>com.jayway.jsonpath</groupId>
-						<artifactId>json-path</artifactId>
-						<version>2.4.0</version>
-					</dependency>
-
-					<dependency>
-						<groupId>org.mockito</groupId>
-						<artifactId>mockito-core</artifactId>
-						<version>3.3.3</version>
-						<scope>test</scope>
-					</dependency>
-
-					<dependency>
-						<groupId>org.mockito</groupId>
-						<artifactId>mockito-junit-jupiter</artifactId>
-						<version>3.3.3</version>
-						<scope>test</scope>
-					</dependency>
-
-					<dependency>
-						<groupId>com.ibm.icu</groupId>
-						<artifactId>icu4j</artifactId>
-						<version>70.1</version>
-					</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.dataformat</groupId>
+				<artifactId>jackson-dataformat-xml</artifactId>
+				<version>${jackson.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson.module</groupId>
+				<artifactId>jackson-module-jsonSchema</artifactId>
+				<version>${jackson.version}</version>
+				<scope>provided</scope>
+			</dependency>
 
 
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-math3</artifactId>
+				<version>3.6.1</version>
+			</dependency>
+
+
+			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+				<version>${google.gson.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>commons-collections</groupId>
+				<artifactId>commons-collections</artifactId>
+				<version>${commons.collections.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>commons-logging</groupId>
+				<artifactId>commons-logging</artifactId>
+				<version>${commons.logging.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.reflections</groupId>
+				<artifactId>reflections</artifactId>
+				<version>0.9.10</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.scala-lang</groupId>
+				<artifactId>scala-library</artifactId>
+				<version>${scala.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.ibm.icu</groupId>
+				<artifactId>icu4j</artifactId>
+				<version>70.1</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
