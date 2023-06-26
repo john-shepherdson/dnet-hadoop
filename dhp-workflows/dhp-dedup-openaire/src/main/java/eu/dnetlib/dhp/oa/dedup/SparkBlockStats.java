@@ -20,12 +20,12 @@ import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.dedup.model.BlockStats;
-import eu.dnetlib.pace.model.SparkDedupConfig;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.model.RowDataOrderingComparator;
+import eu.dnetlib.pace.model.SparkDedupConfig;
 
 public class SparkBlockStats extends AbstractSparkAction {
 
