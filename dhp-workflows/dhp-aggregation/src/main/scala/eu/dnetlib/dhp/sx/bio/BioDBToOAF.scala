@@ -82,7 +82,7 @@ object BioDBToOAF {
       "Springer Nature"
     )
     val EBICollectedFrom: KeyValue = OafMapperUtils.keyValue(
-      "10|opendoar____::83e60e09c222f206c725385f53d7e567c",
+      "10|opendoar____::3e60e09c222f206c725385f53d7e567c",
       "EMBL-EBIs Protein Data Bank in Europe (PDBe)"
     )
     val pubmedCollectedFrom: KeyValue =
