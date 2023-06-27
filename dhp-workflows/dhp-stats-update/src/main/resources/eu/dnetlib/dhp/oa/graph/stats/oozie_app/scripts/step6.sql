@@ -85,3 +85,11 @@ select distinct xpath_string(fund, '//funder/id')        as id,
                 xpath_string(fund, '//funder/name')      as name,
                 xpath_string(fund, '//funder/shortname') as shortname
 from ${openaire_db_name}.project p lateral view explode(p.fundingtree.value) fundingtree as fund;
+
+CREATE TABLE ${stats_db_name}.project_organization_contribution STORED AS PARQUET AS
+SELECT distinct substr(r.source, 4) AS project, substr(r.target, 4) AS organization,
+properties[0].value contribution, properties[1].value currency
+from ${openaire_db_name}.relation r
+LATERAL VIEW explode (r.properties) properties
+where properties[0].key='contribution' and r.reltype = 'projectOrganization' and r.source like '40|%'
+and properties[0].value>0.0 and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false;

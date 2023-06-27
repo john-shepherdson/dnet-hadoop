@@ -47,3 +47,7 @@ FROM (
         SELECT substr(d.id, 4) id 
         from ${openaire_db_name}.datasource d 
         WHERE d.datainfo.deletedbyinference=false and d.datainfo.invisible = FALSE) d on o.datasource = d.id;
+
+CREATE TABLE IF NOT EXISTS ${stats_db_name}.result_accessroute STORED AS PARQUET as
+select distinct substr(id,4) as id, accessroute from ${openaire_db_name}.result
+lateral view explode (instance.accessright.openaccessroute) openaccessroute as accessroute;
