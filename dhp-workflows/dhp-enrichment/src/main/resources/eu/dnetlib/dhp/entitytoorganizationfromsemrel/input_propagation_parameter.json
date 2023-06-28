@@ -52,10 +52,11 @@
     "paramLongName": "iterations",
     "paramDescription": "the number of iterations to be computed",
     "paramRequired": false
-  },{
-  "paramName": "pop",
-  "paramLongName": "projectOrganizationPath",
-  "paramDescription": "the number of iterations to be computed",
-  "paramRequired": true
-}
+  },
+  {
+    "paramName": "pop",
+    "paramLongName": "projectOrganizationPath",
+    "paramDescription": "the number of iterations to be computed",
+    "paramRequired": true
+  }
 ]

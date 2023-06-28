@@ -7,7 +7,7 @@ then
 fi
 
 #export HADOOP_USER_NAME="dimitris.pierrakos"
-export HADOOP_USER_NAME=$5
+export HADOOP_USER_NAME=$6
 export PROD_USAGE_STATS_DB="openaire_prod_usage_stats"
 function copydb() {
   db=$1
@@ -21,8 +21,22 @@ function copydb() {
   # change ownership to impala
   hdfs dfs -conf /etc/impala_cluster/hdfs-site.xml -chmod -R 777 /tmp/$FILE/${db}.db
 
-  # create the databases
+  # drop tables from db
+  for i in `impala-shell --user $HADOOP_USER_NAME -i impala-cluster-dn1.openaire.eu -d ${db} --delimited  -q "show tables"`;
+    do
+        `impala-shell  -i impala-cluster-dn1.openaire.eu -d -d ${db} -q "drop table $i;"`;
+    done
+
+  # drop views from db
+  for i in `impala-shell --user $HADOOP_USER_NAME -i impala-cluster-dn1.openaire.eu -d ${db} --delimited  -q "show tables"`;
+    do
+        `impala-shell  -i impala-cluster-dn1.openaire.eu -d -d ${db} -q "drop view $i;"`;
+    done
+
+  # delete the database
   impala-shell --user $HADOOP_USER_NAME -i impala-cluster-dn1.openaire.eu -q "drop database if exists ${db} cascade";
+
+  # create the databases
   impala-shell --user $HADOOP_USER_NAME -i impala-cluster-dn1.openaire.eu -q "create database ${db}";
 
   impala-shell --user $HADOOP_USER_NAME -q "INVALIDATE METADATA"

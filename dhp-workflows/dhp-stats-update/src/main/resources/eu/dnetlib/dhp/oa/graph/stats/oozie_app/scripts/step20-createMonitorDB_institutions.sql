@@ -50,7 +50,9 @@ create table TARGET.result stored as parquet as
              'openorgs____::846cb428d3f52a445f7275561a7beb5d',  -- University of Manitoba
              'openorgs____::eb391317ed0dc684aa81ac16265de041',	-- Universitat Rovira i Virgili
              'openorgs____::66aa9fc2fceb271423dfabcc38752dc0',  -- Lund University
-             'openorgs____::3cff625a4370d51e08624cc586138b2f'	-- IMT Atlantique
+             'openorgs____::3cff625a4370d51e08624cc586138b2f',	-- IMT Atlantique
+             'openorgs____::c0b262bd6eab819e4c994914f9c010e2',   -- National Institute of Geophysics and Volcanology
+             'openorgs____::1624ff7c01bb641b91f4518539a0c28a'     -- Vrije Universiteit Amsterdam
         )))  foo;
 
 ANALYZE TABLE TARGET.result COMPUTE STATISTICS;
