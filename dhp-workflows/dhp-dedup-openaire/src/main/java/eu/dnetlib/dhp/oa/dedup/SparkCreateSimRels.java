@@ -117,7 +117,7 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 			saveParquet(simRels, outputPath, SaveMode.Overwrite);
 			final long end = System.currentTimeMillis();
 			if (StringUtils.isNotBlank(dfLogPath)) {
-				final DedupLogModel model = new DedupLogModel(runTag, dedupConf.toString(), entity, start, end,
+				final DedupLogModel model = new DedupLogModel(runTag, dedupConf.toString(), subEntity, start, end,
 					end - start);
 				new DedupLogWriter(dfLogPath).appendLog(model, spark);
 
