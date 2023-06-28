@@ -843,88 +843,137 @@
     </zenodocommunities>
     <organizations/>
 </community>
-    <community id="dariah">
+    <community id="dth">
         <advancedConstraints>
-                        {
-                        "criteria": [
-                        {
-                        "constraint": [
-                        {
-                        "verb": "equals_caseinsensitive",
-                        "field": "subject",
-                        "value": "North America"
-                        },
-                        {
-                        "verb": "contains",
-                        "field": "fos",
-                        "value": "05"
-                        }
-                        ]
-                        },
-                        {
-                        "constraint": [
-                        {
-                        "verb": "equals_caseinsensitive",
-                        "field": "subject",
-                        "value": "North America"
-                        },
-                        {
-                        "verb": "contains",
-                        "field": "fos",
-                        "value": "06"
-                        }
-                        ]
-                        },
-                        {
-                        "constraint": [
-                        {
-                        "verb": "equals_caseinsensitive",
-                        "field": "subject",
-                        "value": "Mexico"
-                        },
-                        {
-                        "verb": "equals_caseinsensitive",
-                        "field": "subject",
-                        "value": "United States"
-                        },
-                        {
-                        "verb": "equals_caseinsensitive",
-                        "field": "subject",
-                        "value": "Canada"
-                        },
-                        {
-                        "verb": "contains",
-                        "field": "fos",
-                        "value": "05"
-                        }
-                        ]
-                        },
-                        {
-                        "constraint": [
-                        {
-                        "verb": "equals_caseinsensitive",
-                        "field": "subject",
-                        "value": "Mexico"
-                        },
-                        {
-                        "verb": "equals_caseinsensitive",
-                        "field": "subject",
-                        "value": "United States"
-                        },
-                        {
-                        "verb": "equals_caseinsensitive",
-                        "field": "subject",
-                        "value": "Canada"
-                        },
-                        {
-                        "verb": "contains",
-                        "field": "fos",
-                        "value": "06"
-                        }
-                        ]
-                        }
-                        ]
-                        }
+            {"criteria":[
+            {"constraint":[
+            {"verb":"equals_caseinsensitive","field":"subject","value":"digital twins"},
+            {"verb":"contains_caseinsensitive","field":"subject","value":"health"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"structural"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"marine"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"avionics"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"battery"}
+            ]},
+            {"constraint":[
+            {"verb":"contains_caseinsensitive","field":"title","value":"Human Digital Twins"}
+            ]},
+            {"constraint":[
+            {"verb":"contains_caseinsensitive","field":"description","value":"Human Digital Twins"}
+            ]},
+            {"constraint":[
+            {"verb":"equals_caseinsensitive","field":"subject","value":"Human Digital Twins"}
+            ]},
+            {"constraint":[
+            {"verb":"contains_caseinsensitive","field":"title","value":"Virtual Human Twin"}
+            ]},
+            {"constraint":[
+            {"verb":"contains_caseinsensitive","field":"description","value":"Virtual Human Twin"}
+            ]},
+            {"constraint":[
+            {"verb":"equals_caseinsensitive","field":"subject","value":"Virtual Human Twin"}
+            ]},
+            {"constraint":[
+            {"verb":"equals_caseinsensitive","field":"subject","value":"digital twin"},
+            {"verb":"contains_caseinsensitive","field":"subject","value":"health"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"structural"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"marine"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"avionics"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"battery"}
+            ]},
+            {"constraint":[
+            {"verb":"contains_caseinsensitive","field":"title","value":"digital twin health"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"Acoustic"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"Health Monitoring"},
+            {"verb":"not_contains_caseinsensitive","field":"title","value":"Health Monitoring"},
+            {"verb":"not_contains_caseinsensitive","field":"title","value":"Health Management"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"Health Assessment"},
+            {"verb":"not_contains_caseinsensitive","field":"title","value":"Health Assessment"},
+            {"verb":"not_contains_caseinsensitive","field":"title","value":"Health status"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"ELECTRICAL ENGINEERING"},
+            {"verb":"not_contains_caseinsensitive","field":"subject","value":"Control and Systems Engineering"}
+            ]}
+            ]}
+<!--            {-->
+<!--            "criteria": [-->
+<!--            {-->
+<!--            "constraint": [-->
+<!--            {-->
+<!--            "verb": "equals_caseinsensitive",-->
+<!--            "field": "subject",-->
+<!--            "value": "North America"-->
+<!--            },-->
+<!--            {-->
+<!--            "verb": "contains",-->
+<!--            "field": "fos",-->
+<!--            "value": "05"-->
+<!--            }-->
+<!--            ]-->
+<!--            },-->
+<!--            {-->
+<!--            "constraint": [-->
+<!--            {-->
+<!--            "verb": "equals_caseinsensitive",-->
+<!--            "field": "subject",-->
+<!--            "value": "North America"-->
+<!--            },-->
+<!--            {-->
+<!--            "verb": "contains",-->
+<!--            "field": "fos",-->
+<!--            "value": "06"-->
+<!--            }-->
+<!--            ]-->
+<!--            },-->
+<!--            {-->
+<!--            "constraint": [-->
+<!--            {-->
+<!--            "verb": "equals_caseinsensitive",-->
+<!--            "field": "subject",-->
+<!--            "value": "Mexico"-->
+<!--            },-->
+<!--            {-->
+<!--            "verb": "equals_caseinsensitive",-->
+<!--            "field": "subject",-->
+<!--            "value": "United States"-->
+<!--            },-->
+<!--            {-->
+<!--            "verb": "equals_caseinsensitive",-->
+<!--            "field": "subject",-->
+<!--            "value": "Canada"-->
+<!--            },-->
+<!--            {-->
+<!--            "verb": "contains",-->
+<!--            "field": "fos",-->
+<!--            "value": "05"-->
+<!--            }-->
+<!--            ]-->
+<!--            },-->
+<!--            {-->
+<!--            "constraint": [-->
+<!--            {-->
+<!--            "verb": "equals_caseinsensitive",-->
+<!--            "field": "subject",-->
+<!--            "value": "Mexico"-->
+<!--            },-->
+<!--            {-->
+<!--            "verb": "equals_caseinsensitive",-->
+<!--            "field": "subject",-->
+<!--            "value": "United States"-->
+<!--            },-->
+<!--            {-->
+<!--            "verb": "equals_caseinsensitive",-->
+<!--            "field": "subject",-->
+<!--            "value": "Canada"-->
+<!--            },-->
+<!--            {-->
+<!--            "verb": "contains",-->
+<!--            "field": "fos",-->
+<!--            "value": "06"-->
+<!--            }-->
+<!--            ]-->
+<!--            }-->
+<!--            ]-->
+<!--            }-->
+
         </advancedConstraints>
     <subjects/>
     <datasources>
@@ -1256,7 +1305,9 @@
     </zenodocommunities>
     <organizations/>
 </community>
+
     <community id="euromarine">
+
     <subjects/>
     <datasources/>
     <zenodocommunities/>
@@ -1275,6 +1326,9 @@
     <organizations/>
 </community>
     <community id="science-innovation-policy">
+        <advancedConstraints>{"criteria":[{"constraint":[{"verb":"equals_caseinsensitive","field":"subject","value":"ciencias de la comunicación"},
+            {"verb":"equals","field":"subject","value":"Miriam"}]},
+            {"constraint":[{"verb":"equals","field":"subject","value":"miriam"}]}]}</advancedConstraints>
     <subjects>
         <subject>Sustainability-oriented science policy</subject>
         <subject> STI policies</subject>
@@ -1398,7 +1452,7 @@
             <openaireId>opendoar____::358aee4cc897452c00244351e4d91f69</openaireId>
             <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
                 {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
-                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}}]}
             </selcriteria>
         </datasource>
         <datasource>

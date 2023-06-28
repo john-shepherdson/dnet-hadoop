@@ -81,6 +81,13 @@ public class VocabularyGroup implements Serializable {
 		vocs.put(id.toLowerCase(), new Vocabulary(id, name));
 	}
 
+	public Optional<Vocabulary> find(final String vocId) {
+		return Optional
+			.ofNullable(vocId)
+			.map(String::toLowerCase)
+			.map(vocs::get);
+	}
+
 	public void addTerm(final String vocId, final String id, final String name) {
 		if (vocabularyExists(vocId)) {
 			vocs.get(vocId.toLowerCase()).addTerm(id, name);

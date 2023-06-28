@@ -1244,3 +1244,5 @@ dnet:relation_relClass @=@ IsSupplementedBy @=@ isSupplementedBy
 dnet:relation_relClass @=@ IsRelatedTo @=@ isRelatedTo
 dnet:relation_subRelType @=@ relationship @=@ publicationDataset
 dnet:provenanceActions @=@ iis @=@ erroneous label to be cleaned
+FOS @=@ 0101 mathematics @=@ FOS: Mathematics
+FOS @=@ 0102 computer and information sciences @=@ FOS: Computer and information sciences

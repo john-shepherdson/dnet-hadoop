@@ -3,12 +3,23 @@ package eu.dnetlib.dhp.actionmanager.project;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.io.BufferedOutputStream;
+import java.io.IOException;
 import java.util.*;
+import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.rdd.RDD;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
@@ -19,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProject;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.Project;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import scala.Tuple2;
@@ -54,6 +66,9 @@ public class PrepareProjects {
 		final String projectPath = parser.get("projectPath");
 		log.info("projectPath {}: ", projectPath);
 
+		final String workingPath = parser.get("workingPath");
+		log.info("workingPath {}: ", workingPath);
+
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath {}: ", outputPath);
 
@@ -76,7 +91,7 @@ public class PrepareProjects {
 	}
 
 	private static void exec(SparkSession spark, String projectPath, String dbProjectPath, String outputPath) {
-		Dataset<CSVProject> project = readPath(spark, projectPath, CSVProject.class);
+		Dataset<Project> project = readPath(spark, projectPath, Project.class);
 		Dataset<ProjectSubset> dbProjects = readPath(spark, dbProjectPath, ProjectSubset.class);
 
 		dbProjects
@@ -90,14 +105,14 @@ public class PrepareProjects {
 
 	}
 
-	private static FlatMapFunction<Tuple2<ProjectSubset, CSVProject>, CSVProject> getTuple2CSVProjectFlatMapFunction() {
+	private static FlatMapFunction<Tuple2<ProjectSubset, Project>, CSVProject> getTuple2CSVProjectFlatMapFunction() {
 		return value -> {
-			Optional<CSVProject> csvProject = Optional.ofNullable(value._2());
 			List<CSVProject> csvProjectList = new ArrayList<>();
-			if (csvProject.isPresent()) {
+			if (Optional.ofNullable(value._2()).isPresent()) {
+				Project project = value._2();
 
-				String[] programme = csvProject.get().getProgramme().split(";");
-				String topic = csvProject.get().getTopics();
+				String[] programme = project.getLegalBasis().split(";");
+				String topic = project.getTopics();
 
 				Arrays
 					.stream(programme)
@@ -106,7 +121,7 @@ public class PrepareProjects {
 						proj.setTopics(topic);
 
 						proj.setProgramme(p);
-						proj.setId(csvProject.get().getId());
+						proj.setId(project.getId());
 						csvProjectList.add(proj);
 					});
 			}

@@ -708,6 +708,28 @@
   "subject": [
     {
       "dataInfo": {
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:repository",
+          "classname": "sysimport:crosswalk:repository",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "deletedbyinference": false,
+        "inferred": false,
+        "inferenceprovenance": "",
+        "invisible": false,
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "FOS",
+        "classname": "Fields of Science and Technology classification",
+        "schemeid": "dnet:result_subject",
+        "schemename": "dnet:result_subject"
+      },
+      "value": "In Situ Hybridization"
+    },
+    {
+      "dataInfo": {
         "deletedbyinference": false,
         "inferenceprovenance": "",
         "inferred": false,
@@ -743,12 +765,12 @@
         "trust": "0.9"
       },
       "qualifier": {
-        "classid": "",
-        "classname": "",
-        "schemeid": "",
-        "schemename": ""
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
       },
-      "value": "infrared detectors"
+      "value": "FOS: Mathematics"
     },
     {
       "dataInfo": {
@@ -765,12 +787,12 @@
         "trust": "0.9"
       },
       "qualifier": {
-        "classid": "",
-        "classname": "",
-        "schemeid": "",
-        "schemename": ""
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
       },
-      "value": "lens antennas"
+      "value": "FOS: Computer and information sciences"
     },
     {
       "dataInfo": {
@@ -787,12 +809,34 @@
         "trust": "0.9"
       },
       "qualifier": {
-        "classid": "",
-        "classname": "",
-        "schemeid": "",
-        "schemename": ""
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
       },
-      "value": "silicon"
+      "value": "0101 mathematics"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "subject:fos",
+          "classname": "subject:fos",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "0101 mathematics"
     },
     {
       "dataInfo": {
@@ -863,24 +907,23 @@
     {
       "dataInfo": {
         "deletedbyinference": false,
-        "inferenceprovenance": "",
         "inferred": false,
         "invisible": false,
         "provenanceaction": {
-          "classid": "sysimport:crosswalk:datasetarchive",
-          "classname": "sysimport:crosswalk:datasetarchive",
+          "classid": "sysimport:actionset",
+          "classname": "Harvested",
           "schemeid": "dnet:provenanceActions",
           "schemename": "dnet:provenanceActions"
         },
         "trust": "0.9"
       },
       "qualifier": {
-        "classid": "",
-        "classname": "",
-        "schemeid": "",
-        "schemename": ""
+        "classid": "FOS",
+        "classname": "Fields of Science and Technology classification",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
       },
-      "value": "doped silicon"
+      "value": "Avicennia"
     },
     {
       "dataInfo": {

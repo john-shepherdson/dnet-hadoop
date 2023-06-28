@@ -7,12 +7,12 @@ import static org.mockito.Mockito.lenient;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.hdfs.server.datanode.fsdataset.impl.MappableBlock;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,7 +58,7 @@ public class GraphCleaningFunctionsTest {
 	void testCleanRelations() throws Exception {
 
 		List<String> lines = IOUtils
-			.readLines(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/relation.json"));
+			.readLines(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/graph/relation/relation.json"));
 		for (String json : lines) {
 			Relation r_in = MAPPER.readValue(json, Relation.class);
 			assertNotNull(r_in);
@@ -251,8 +251,50 @@ public class GraphCleaningFunctionsTest {
 							pid.getQualifier().getClassname()));
 		});
 
+		assertNotNull(p_cleaned.getSubject());
+
+		List<Subject> fos_subjects = p_cleaned
+			.getSubject()
+			.stream()
+			.filter(s -> ModelConstants.DNET_SUBJECT_FOS_CLASSID.equals(s.getQualifier().getClassid()))
+			.collect(Collectors.toList());
+
+		assertNotNull(fos_subjects);
+		assertEquals(2, fos_subjects.size());
+
+		assertTrue(
+			fos_subjects
+				.stream()
+				.anyMatch(
+					s -> "0101 mathematics".equals(s.getValue()) &
+						ModelConstants.DNET_SUBJECT_FOS_CLASSID.equals(s.getQualifier().getClassid()) &
+						"sysimport:crosswalk:datasetarchive"
+							.equals(s.getDataInfo().getProvenanceaction().getClassid())));
+
+		assertTrue(
+			fos_subjects
+				.stream()
+				.anyMatch(
+					s -> "0102 computer and information sciences".equals(s.getValue()) &
+						ModelConstants.DNET_SUBJECT_FOS_CLASSID.equals(s.getQualifier().getClassid())));
+
+		verify_keyword(p_cleaned, "In Situ Hybridization");
+		verify_keyword(p_cleaned, "Avicennia");
+
 		// TODO add more assertions to verity the cleaned values
 		System.out.println(MAPPER.writeValueAsString(p_cleaned));
+	}
+
+	private static void verify_keyword(Publication p_cleaned, String subject) {
+		Optional<Subject> s1 = p_cleaned
+			.getSubject()
+			.stream()
+			.filter(s -> s.getValue().equals(subject))
+			.findFirst();
+
+		assertTrue(s1.isPresent());
+		assertEquals(ModelConstants.DNET_SUBJECT_KEYWORD, s1.get().getQualifier().getClassid());
+		assertEquals(ModelConstants.DNET_SUBJECT_KEYWORD, s1.get().getQualifier().getClassname());
 	}
 
 	private Stream<Qualifier> getAuthorPidTypes(Result pub) {

@@ -168,11 +168,11 @@ public class SparkStatsTest implements Serializable {
 			.textFile(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_blockstats")
 			.count();
 
-		assertEquals(477, orgs_blocks);
+		assertEquals(480, orgs_blocks);
 		assertEquals(295, pubs_blocks);
 		assertEquals(122, sw_blocks);
 		assertEquals(191, ds_blocks);
-		assertEquals(171, orp_blocks);
+		assertEquals(178, orp_blocks);
 	}
 
 	@AfterAll

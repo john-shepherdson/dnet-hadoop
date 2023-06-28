@@ -37,7 +37,7 @@ public class CommunityConfigurationFactory {
 
 	public static CommunityConfiguration newInstance(final String xml) throws DocumentException, SAXException {
 
-		log.debug(String.format("parsing community configuration from:\n%s", xml));
+		log.info(String.format("parsing community configuration from:\n%s", xml));
 
 		final SAXReader reader = new SAXReader();
 		reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
@@ -86,6 +86,7 @@ public class CommunityConfigurationFactory {
 		c.setProviders(parseDatasources(node));
 		c.setZenodoCommunities(parseZenodoCommunities(node));
 		c.setConstraints(parseConstrains(node));
+		c.setRemoveConstraints(parseRemoveConstrains(node));
 		return c;
 	}
 
@@ -96,6 +97,19 @@ public class CommunityConfigurationFactory {
 		}
 		SelectionConstraints selectionConstraints = new Gson()
 			.fromJson(advConstsNode.getText(), SelectionConstraints.class);
+
+		selectionConstraints.setSelection(resolver);
+		log.info("number of selection constraints set " + selectionConstraints.getCriteria().size());
+		return selectionConstraints;
+	}
+
+	private static SelectionConstraints parseRemoveConstrains(Node node) {
+		Node constsNode = node.selectSingleNode("./removeConstraints");
+		if (constsNode == null || StringUtils.isBlank(StringUtils.trim(constsNode.getText()))) {
+			return new SelectionConstraints();
+		}
+		SelectionConstraints selectionConstraints = new Gson()
+			.fromJson(constsNode.getText(), SelectionConstraints.class);
 
 		selectionConstraints.setSelection(resolver);
 		log.info("number of selection constraints set " + selectionConstraints.getCriteria().size());

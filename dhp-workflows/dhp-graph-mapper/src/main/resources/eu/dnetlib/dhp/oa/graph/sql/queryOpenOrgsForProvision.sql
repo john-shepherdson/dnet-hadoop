@@ -16,9 +16,9 @@ SELECT
 	o.country || '@@@dnet:countries'                                                       AS country,
 	'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions' AS provenanceaction,
 	ARRAY(SELECT DISTINCT pid FROM unnest(array_cat(
-		array_agg(DISTINCT i.otherid    || '###' || i.type    || '@@@dnet:pid_types'), 
+		array_agg(DISTINCT i.otherid    || '###' || i.type    || '@@@dnet:pid_types'),
 		array_agg(DISTINCT idup.otherid || '###' || idup.type || '@@@dnet:pid_types')
-	)) as t(pid) where pid IS NOT NULL) AS pid,
+	)) as t(pid) where pid IS NOT NULL)                                                                        AS pid,
     (array_remove(array_cat(ARRAY[o.ec_legalbody], array_agg(od.ec_legalbody)), NULL))[1]                      AS eclegalbody,
     (array_remove(array_cat(ARRAY[o.ec_legalperson], array_agg(od.ec_legalperson)), NULL))[1]                     AS eclegalperson,
     (array_remove(array_cat(ARRAY[o.ec_nonprofit], array_agg(od.ec_nonprofit)), NULL))[1]                      AS ecnonprofit,

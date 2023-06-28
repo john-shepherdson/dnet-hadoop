@@ -29,11 +29,11 @@
     "paramDescription": "class name moelling the graph table",
     "paramRequired": true
   },{
-    "paramName": "vf",
-    "paramLongName": "verifyParam",
-    "paramDescription": "the parameter to be verified to remove the country",
-    "paramRequired": true
-  },
+  "paramName": "vf",
+  "paramLongName": "verifyParam",
+  "paramDescription": "the parameter to be verified to remove the country",
+  "paramRequired": true
+},
   {
     "paramName": "cf",
     "paramLongName": "collectedfrom",
