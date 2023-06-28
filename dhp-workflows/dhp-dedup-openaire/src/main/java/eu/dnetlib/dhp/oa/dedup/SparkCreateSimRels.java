@@ -4,8 +4,6 @@ package eu.dnetlib.dhp.oa.dedup;
 import java.io.IOException;
 import java.util.Optional;
 
-import eu.dnetlib.dhp.application.dedup.log.DedupLogModel;
-import eu.dnetlib.dhp.application.dedup.log.DedupLogWriter;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -22,6 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.application.dedup.log.DedupLogModel;
+import eu.dnetlib.dhp.application.dedup.log.DedupLogWriter;
 import eu.dnetlib.dhp.oa.dedup.model.Block;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
@@ -74,10 +74,8 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 		log.info("actionSetId:   '{}'", actionSetId);
 		log.info("workingPath:   '{}'", workingPath);
 
-
 		final String dfLogPath = parser.get("dataframeLog");
 		final String runTag = Optional.ofNullable(parser.get("runTAG")).orElse("UNKNOWN");
-
 
 		// for each dedup configuration
 		for (DedupConfig dedupConf : getConfigurations(isLookUpService, actionSetId)) {
@@ -92,7 +90,6 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 			removeOutputDir(spark, outputPath);
 
 			JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-
 
 			JavaPairRDD<String, MapDocument> mapDocuments = sc
 				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
@@ -120,7 +117,8 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 			saveParquet(simRels, outputPath, SaveMode.Overwrite);
 			final long end = System.currentTimeMillis();
 			if (StringUtils.isNotBlank(dfLogPath)) {
-				final DedupLogModel model = new DedupLogModel(runTag, dedupConf.toString(),entity, start, end, end-start);
+				final DedupLogModel model = new DedupLogModel(runTag, dedupConf.toString(), entity, start, end,
+					end - start);
 				new DedupLogWriter(dfLogPath).appendLog(model, spark);
 
 			}

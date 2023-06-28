@@ -134,7 +134,8 @@
             <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--numPartitions</arg><arg>15000</arg>
         </spark>
-        <ok to="WhitelistSimRels"/>
+        <!--        <ok to="WhitelistSimRels"/>-->
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 
