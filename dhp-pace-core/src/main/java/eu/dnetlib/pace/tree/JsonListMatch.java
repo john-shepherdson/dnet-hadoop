@@ -6,6 +6,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.Option;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -15,6 +18,7 @@ import eu.dnetlib.pace.config.Config;
 import eu.dnetlib.pace.tree.support.AbstractListComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 import eu.dnetlib.pace.util.MapDocumentUtil;
+import com.jayway.jsonpath.JsonPath;
 
 @ComparatorClass("jsonListMatch")
 public class JsonListMatch extends AbstractListComparator {
@@ -59,11 +63,11 @@ public class JsonListMatch extends AbstractListComparator {
 
 		StringBuilder st = new StringBuilder(); // to build the string used for comparisons basing on the jpath into
 												// parameters
-
+		final DocumentContext documentContext = JsonPath.using(Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS)).parse(json);
 		// for each path in the param list
 		for (String key : params.keySet().stream().filter(k -> k.contains("jpath")).collect(Collectors.toList())) {
 			String path = params.get(key);
-			String value = MapDocumentUtil.getJPathString(path, json);
+			String value = MapDocumentUtil.getJPathString(path, documentContext);
 			if (value == null || value.isEmpty())
 				value = "";
 			st.append(value);

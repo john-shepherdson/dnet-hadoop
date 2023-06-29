@@ -49,14 +49,14 @@ public abstract class AbstractPaceFunctions {
 	protected static Set<String> ngramBlacklist = loadFromClasspath("/eu/dnetlib/pace/config/ngram_blacklist.txt");
 
 	// html regex for normalization
-	public final String HTML_REGEX = "<[^>]*>";
+	public final Pattern HTML_REGEX = Pattern.compile("<[^>]*>");
 
 	private static final String alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
 	private static final String aliases_from = "⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎àáâäæãåāèéêëēėęəîïíīįìôöòóœøōõûüùúūßśšłžźżçćčñń";
 	private static final String aliases_to = "0123456789+-=()n0123456789+-=()aaaaaaaaeeeeeeeeiiiiiioooooooouuuuussslzzzcccnn";
 
 	// doi prefix for normalization
-	public final String DOI_PREFIX = "(https?:\\/\\/dx\\.doi\\.org\\/)|(doi:)";
+	public final Pattern DOI_PREFIX = Pattern.compile("(https?:\\/\\/dx\\.doi\\.org\\/)|(doi:)");
 
 	private Pattern numberPattern = Pattern.compile("-?\\d+(\\.\\d+)?");
 
@@ -67,8 +67,7 @@ public abstract class AbstractPaceFunctions {
 	}
 
 	protected String cleanup(final String s) {
-
-		final String s1 = s.replaceAll(HTML_REGEX, "");
+		final String s1 = HTML_REGEX.matcher(s).replaceAll( "");
 		final String s2 = unicodeNormalization(s1.toLowerCase());
 		final String s3 = nfd(s2);
 		final String s4 = fixXML(s3);
@@ -302,7 +301,7 @@ public abstract class AbstractPaceFunctions {
 	}
 
 	public String normalizePid(String pid) {
-		return pid.toLowerCase().replaceAll(DOI_PREFIX, "");
+		return DOI_PREFIX.matcher(pid.toLowerCase()).replaceAll("");
 	}
 
 	// get the list of keywords into the input string
