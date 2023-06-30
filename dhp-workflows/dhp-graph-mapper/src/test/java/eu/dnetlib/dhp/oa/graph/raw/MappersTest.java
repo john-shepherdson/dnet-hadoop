@@ -1010,7 +1010,7 @@ class MappersTest {
 	@Test
 	void testD4Science() throws IOException {
 		final String xml = IOUtils
-			.toString(Objects.requireNonNull(getClass().getResourceAsStream("d4science.xml")));
+				.toString(Objects.requireNonNull(getClass().getResourceAsStream("d4science.xml")));
 		final List<Oaf> actual = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 		assertNotNull(actual);
 		assertFalse(actual.isEmpty());
@@ -1022,6 +1022,24 @@ class MappersTest {
 		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
 
 	}
+
+	@Test
+	void testLeiden() throws IOException {
+		final String xml = IOUtils
+				.toString(Objects.requireNonNull(getClass().getResourceAsStream("leiden.xml")));
+		final List<Oaf> actual = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		assertNotNull(actual);
+		assertFalse(actual.isEmpty());
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(actual));
+		System.out.println("***************");
+		final Publication d = (Publication) actual.get(0);
+		assertValidId(d.getId());
+		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
+		assertTrue(StringUtils.isNotBlank(d.getInstance().get(0).getUrl().get(0)));
+
+	}
+
 
 	private void assertValidId(final String id) {
 		// System.out.println(id);
