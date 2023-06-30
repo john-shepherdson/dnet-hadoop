@@ -82,19 +82,21 @@ public class SparkAtomicActionUsageJob implements Serializable {
 			});
 	}
 
-	private static void prepareResultData(String dbname, SparkSession spark, String workingPath, String tableName, String resultAttributeName, String datasourceAttributeName) {
+	private static void prepareResultData(String dbname, SparkSession spark, String workingPath, String tableName,
+		String resultAttributeName, String datasourceAttributeName) {
 		spark
-				.sql(
-						String
-								.format(
-										"select %s as id, %s as datasourceId, sum(downloads) as downloads, sum(views) as views " +
-												"from %s.%s group by %s, %s",
-										resultAttributeName, datasourceAttributeName, dbname, tableName, resultAttributeName, datasourceAttributeName))
-				.as(Encoders.bean(UsageStatsResultModel.class))
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression", "gzip")
-				.json(workingPath);
+			.sql(
+				String
+					.format(
+						"select %s as id, %s as datasourceId, sum(downloads) as downloads, sum(views) as views " +
+							"from %s.%s group by %s, %s",
+						resultAttributeName, datasourceAttributeName, dbname, tableName, resultAttributeName,
+						datasourceAttributeName))
+			.as(Encoders.bean(UsageStatsResultModel.class))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(workingPath);
 	}
 
 	private static void prepareData(String dbname, SparkSession spark, String workingPath, String tableName,
@@ -131,30 +133,32 @@ public class SparkAtomicActionUsageJob implements Serializable {
 			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
 
 	}
+
 	public static Measure newMeasureInstance(String id) {
 		Measure m = new Measure();
 		m.setId(id);
 		m.setUnit(new ArrayList<>());
 		return m;
 	}
+
 	private static Dataset<Result> getFinalIndicatorsResult(SparkSession spark, String inputPath) {
 
 		return readPath(spark, inputPath, UsageStatsResultModel.class)
-				.groupByKey((MapFunction<UsageStatsResultModel, String>) usm -> usm.getId(), Encoders.STRING())
-				.mapGroups((MapGroupsFunction<String, UsageStatsResultModel, Result>) (k,it) -> {
-					Result r = new Result();
-					r.setId("50|" + k);
-					//id = download or view and unit = list of key value pairs
-					Measure download = newMeasureInstance("downloads");
-					Measure view = newMeasureInstance("views");
-					UsageStatsResultModel first = it.next();
-					addCountForDatasource(download, first, view);
-					it.forEachRemaining(usm -> {
-						addCountForDatasource(download, usm, view);
-					});
-					r.setMeasures(Arrays.asList(download, view));
-					return r;
-				}, Encoders.bean(Result.class))
+			.groupByKey((MapFunction<UsageStatsResultModel, String>) usm -> usm.getId(), Encoders.STRING())
+			.mapGroups((MapGroupsFunction<String, UsageStatsResultModel, Result>) (k, it) -> {
+				Result r = new Result();
+				r.setId("50|" + k);
+				// id = download or view and unit = list of key value pairs
+				Measure download = newMeasureInstance("downloads");
+				Measure view = newMeasureInstance("views");
+				UsageStatsResultModel first = it.next();
+				addCountForDatasource(download, first, view);
+				it.forEachRemaining(usm -> {
+					addCountForDatasource(download, usm, view);
+				});
+				r.setMeasures(Arrays.asList(download, view));
+				return r;
+			}, Encoders.bean(Result.class))
 //			.map((MapFunction<UsageStatsResultModel, Result>) usm -> {
 //				Result r = new Result();
 //				r.setId("50|" + usm.getId());
@@ -166,20 +170,26 @@ public class SparkAtomicActionUsageJob implements Serializable {
 
 	private static void addCountForDatasource(Measure download, UsageStatsResultModel usm, Measure view) {
 		DataInfo dataInfo = OafMapperUtils
-				.dataInfo(
-						false,
-						UPDATE_DATA_INFO_TYPE,
-						true,
-						false,
-						OafMapperUtils
-								.qualifier(
-										UPDATE_MEASURE_USAGE_COUNTS_CLASS_ID,
-										UPDATE_CLASS_NAME,
-										ModelConstants.DNET_PROVENANCE_ACTIONS,
-										ModelConstants.DNET_PROVENANCE_ACTIONS),
-						"");
-		download.getUnit().add(OafMapperUtils.newKeyValueInstance(usm.getDatasourceId(), String.valueOf(usm.getDownloads()), dataInfo));
-		view.getUnit().add(OafMapperUtils.newKeyValueInstance(usm.getDatasourceId(), String.valueOf(usm.getViews()), dataInfo));
+			.dataInfo(
+				false,
+				UPDATE_DATA_INFO_TYPE,
+				true,
+				false,
+				OafMapperUtils
+					.qualifier(
+						UPDATE_MEASURE_USAGE_COUNTS_CLASS_ID,
+						UPDATE_CLASS_NAME,
+						ModelConstants.DNET_PROVENANCE_ACTIONS,
+						ModelConstants.DNET_PROVENANCE_ACTIONS),
+				"");
+		download
+			.getUnit()
+			.add(
+				OafMapperUtils
+					.newKeyValueInstance(usm.getDatasourceId(), String.valueOf(usm.getDownloads()), dataInfo));
+		view
+			.getUnit()
+			.add(OafMapperUtils.newKeyValueInstance(usm.getDatasourceId(), String.valueOf(usm.getViews()), dataInfo));
 	}
 
 	private static Dataset<Project> getFinalIndicatorsProject(SparkSession spark, String inputPath) {
