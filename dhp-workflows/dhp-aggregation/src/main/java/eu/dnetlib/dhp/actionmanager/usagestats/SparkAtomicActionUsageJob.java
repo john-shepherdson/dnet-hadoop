@@ -75,7 +75,7 @@ public class SparkAtomicActionUsageJob implements Serializable {
 				removeOutputDir(spark, outputPath);
 				prepareData(dbname, spark, workingPath + "/usageDb", "usage_stats", "result_id");
 				prepareData(dbname, spark, workingPath + "/projectDb", "project_stats", "id");
-				prepareData(dbname, spark, workingPath + "/datasourceDb", "datasource_stats", "repositor_id");
+				prepareData(dbname, spark, workingPath + "/datasourceDb", "datasource_stats", "repository_id");
 				writeActionSet(spark, workingPath, outputPath);
 			});
 	}
