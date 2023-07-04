@@ -67,7 +67,7 @@ public abstract class AbstractPaceFunctions {
 	}
 
 	protected String cleanup(final String s) {
-		final String s1 = HTML_REGEX.matcher(s).replaceAll( "");
+		final String s1 = HTML_REGEX.matcher(s).replaceAll("");
 		final String s2 = unicodeNormalization(s1.toLowerCase());
 		final String s3 = nfd(s2);
 		final String s4 = fixXML(s3);

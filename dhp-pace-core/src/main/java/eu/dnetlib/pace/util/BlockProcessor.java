@@ -89,7 +89,7 @@ public class BlockProcessor {
 						break;
 					}
 
-					if (i > wf.getSlidingWindowSize()) {
+					if (++i > wf.getSlidingWindowSize()) {
 						break;
 					}
 

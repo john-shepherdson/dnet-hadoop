@@ -91,7 +91,7 @@ case class SparkDedupConfig(conf: DedupConfig, numPartitions: Int) extends Seria
       } else {
         res
       }
-    })
+    }).checkpoint()
 
     var relBlocks: Dataset[Row] = null
 
@@ -178,8 +178,8 @@ case class SparkDedupConfig(conf: DedupConfig, numPartitions: Int) extends Seria
 
     val res = relBlocks.filter(col("match").equalTo(true))
       .select(col("l.identifier").as("from"), col("r.identifier").as("to"))
-      .repartition()
-      .dropDuplicates()
+      //.repartition()
+      .distinct()
 
    // res.show(false)
     res.select(functions.struct("from", "to"))
