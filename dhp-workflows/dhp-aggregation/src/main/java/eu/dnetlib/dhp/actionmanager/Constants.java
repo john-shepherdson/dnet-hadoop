@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.actionmanager;
 
 import java.util.Optional;
 
+import eu.dnetlib.dhp.common.HdfsSupport;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -93,4 +94,8 @@ public class Constants {
 		return s;
 
 	}
+	public static void removeOutputDir(SparkSession spark, String path) {
+		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
+	}
+
 }
