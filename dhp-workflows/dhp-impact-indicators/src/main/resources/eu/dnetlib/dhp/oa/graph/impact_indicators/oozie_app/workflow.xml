@@ -36,7 +36,7 @@
 			<default to="create-openaire-ranking-graph" />
 		</switch>
 	</decision>
-	
+
 	<!-- Script here written by Serafeim: maps openaire ids to their synonyms -->
 	<action name="create-openaire-ranking-graph">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
@@ -47,12 +47,12 @@
 			<prepare>
 				<delete path="${synonymFolder}"/>
 			</prepare>
-			--> 
-            		
-            <!-- using configs from an example on openaire --> 
-            <master>yarn-cluster</master>
+			-->
+
+			<!-- using configs from an example on openaire -->
+			<master>yarn-cluster</master>
 			<mode>cluster</mode>
-            		
+
 			<!-- This is the name of our job -->
 			<name>Openaire Ranking Graph Creation</name>
 			<!-- Script name goes here -->
@@ -144,8 +144,8 @@
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-            <!-- using configs from an example on openaire -->
-            <master>yarn-cluster</master>
+			<!-- using configs from an example on openaire -->
+			<master>yarn-cluster</master>
 			<mode>cluster</mode>
 
 			<!-- This is the name of our job -->
@@ -250,8 +250,8 @@
 			<!-- Reference says: The mode element if present indicates the mode of spark, where to run spark driver program. Ex: client,cluster. | In my case I always have a client -->
 			<!-- <mode>client</mode> -->
 
-            <!-- using configs from an example on openaire -->
-            <master>yarn-cluster</master>
+			<!-- using configs from an example on openaire -->
+			<master>yarn-cluster</master>
 			<mode>cluster</mode>
 
 			<!-- This is the name of our job -->
@@ -295,8 +295,8 @@
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-            <!-- using configs from an example on openaire -->
-            <master>yarn-cluster</master>
+			<!-- using configs from an example on openaire -->
+			<master>yarn-cluster</master>
 			<mode>cluster</mode>
 
 			<!-- This is the name of our job -->
@@ -340,12 +340,18 @@
 
 	</action>
 
+<<<<<<< HEAD
 	<!-- Removed for ser -->
 	<!--
 	 JOIN ITERATIVE METHODS AND THEN END =
 	<join name="join-iterative-rankings" to="end" />
 	to="get-file-names"/>  
 	-->
+=======
+	<!-- JOIN ITERATIVE METHODS AND THEN END -->
+	<join name="join-iterative-rankings" to="get-file-names" />
+	<!-- to="get-file-names"/> -->
+>>>>>>> 60f25b780de1c456762003cbb8b0011c9c82f93d
 
 
 	<!-- This will be a shell action that will output key-value pairs for output files -->
@@ -358,7 +364,7 @@
 			<!-- name of script to run -->
 			<argument>get_ranking_files.sh</argument>
 			<!-- We only pass the directory where we expect to find the rankings -->
-			<argument>/${workingDir}</argument>
+			<argument>${workingDir}</argument>
 
 			<!-- the name of the file run -->
 			<file>${wfAppPath}/get_ranking_files.sh#get_ranking_files.sh</file>
@@ -490,8 +496,8 @@
 				<delete path="${synonymFolder}"/>
 			</prepare>
 
-            <!-- using configs from an example on openaire -->
-            <master>yarn-cluster</master>
+			<!-- using configs from an example on openaire -->
+			<master>yarn-cluster</master>
 			<mode>cluster</mode>
 
 			<!-- This is the name of our job -->
@@ -512,7 +518,7 @@
 			</spark-opts>
 
 			<!-- Script arguments here -->
-			<arg>${openaireDataInput}</arg>
+			<arg>${openaireDataInput}/</arg>
 			<!-- number of partitions to be used on joins -->
 			<arg>${synonymFolder}</arg>
 			<!-- This needs to point to the file on the hdfs i think -->
@@ -532,8 +538,8 @@
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-            <!-- using configs from an example on openaire -->
-            <master>yarn-cluster</master>
+			<!-- using configs from an example on openaire -->
+			<master>yarn-cluster</master>
 			<mode>cluster</mode>
 
 			<!-- This is the name of our job -->
@@ -570,47 +576,48 @@
 
 		<!-- Do this after finishing okay -->
 		<ok to="deleteOutputPathForActionSet" />
+		<!-- This is the initial code <ok to="deleteOutputPathForActionSet" /> -->
 		<!-- Go there if we have an error -->
 		<error to="map-scores-fail" />
 
 	</action>
 
 	<action name="deleteOutputPathForActionSet">
-        <fs>
-            <delete path="${actionSetOutputPath}/results/"/>
+		<fs>
+			<delete path="${actionSetOutputPath}/results/"/>
 			<delete path="${actionSetOutputPath}/projects/"/>
 
 			<mkdir path="${actionSetOutputPath}/results/"/>
 			<mkdir path="${actionSetOutputPath}/projects/"/>
 		</fs>
-        <ok to="createActionSetForResults"/>
-        <error to="actionset-delete-fail"/>
-    </action>
+		<ok to="createActionSetForResults"/>
+		<error to="actionset-delete-fail"/>
+	</action>
 
-    <action name="createActionSetForResults">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Produces the atomic action with the bip finder scores for publications</name>
-            <class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
-            <jar>dhp-aggregation-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-memory=${sparkNormalExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkNormalDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
-            </spark-opts>
-            <arg>--inputPath</arg><arg>${bipScorePath}</arg>
-            <arg>--outputPath</arg><arg>${actionSetOutputPath}/results/</arg>
+	<action name="createActionSetForResults">
+		<spark xmlns="uri:oozie:spark-action:0.2">
+			<master>yarn</master>
+			<mode>cluster</mode>
+			<name>Produces the atomic action with the bip finder scores for publications</name>
+			<class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
+			<jar>dhp-aggregation-${projectVersion}.jar</jar>
+			<spark-opts>
+				--executor-memory=${sparkNormalExecutorMemory}
+				--executor-cores=${sparkExecutorCores}
+				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.extraListeners=${spark2ExtraListeners}
+				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+				--conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+			</spark-opts>
+			<arg>--inputPath</arg><arg>${bipScorePath}</arg>
+			<arg>--outputPath</arg><arg>${actionSetOutputPath}/results/</arg>
 			<arg>--targetEntity</arg><arg>result</arg>
 		</spark>
-        <ok to="project-impact-indicators"/>
-        <error to="actionset-creation-fail"/>
-    </action>
+		<ok to="project-impact-indicators"/>
+		<error to="actionset-creation-fail"/>
+	</action>
 
 	<action name="project-impact-indicators">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
