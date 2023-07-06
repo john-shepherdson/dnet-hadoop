@@ -22,7 +22,10 @@
 			<!-- If any different condition is set, go to the corresponding start -->
 			<case to="non-iterative-rankings">${wf:conf('resume') eq "rankings-start"}</case>
 			<case to="spark-impulse">${wf:conf('resume') eq "impulse"}</case>
-			<case to="iterative-rankings">${wf:conf('resume') eq "rankings-iterative"}</case>
+			<case to="spark-pagerank">${wf:conf('resume') eq "pagerank"}</case>
+			<case to="spark-attrank">${wf:conf('resume') eq "attrank"}</case>
+			<!-- Removed for serafeim -->
+			<!-- <case to="iterative-rankings">${wf:conf('resume') eq "rankings-iterative"}</case> -->
 			<case to="get-file-names">${wf:conf('resume') eq "format-results"}</case>
 			<case to="map-openaire-to-doi">${wf:conf('resume') eq "map-ids"}</case>
 			<case to="map-scores-to-dois">${wf:conf('resume') eq "map-scores"}</case>
@@ -220,16 +223,19 @@
 		</spark>
 
 		<!-- Do this after finishing okay -->
-		<ok to="iterative-rankings" />
+		<ok to="spark-pagerank" />
 		<!-- Go there if we have an error -->
 		<error to="impulse-fail" />
 
 	</action>
 
+	<!-- Removed for ser to make pagerank & attrank serial -->
+	<!-- 
 	<fork name="iterative-rankings">
 		<path start="spark-pagerank"/>
 		<path start="spark-attrank"/>
 	</fork>
+	-->
 
 	<!-- PAGERANK here -->
 	<action name="spark-pagerank">
@@ -278,7 +284,7 @@
 		</spark>
 
 		<!-- Do this after finishing okay -->
-		<ok to="join-iterative-rankings" />
+		<ok to="spark-attrank" />
 		<!-- Go there if we have an error -->
 		<error to="pagerank-fail" />
 
@@ -328,15 +334,18 @@
 		</spark>
 
 		<!-- Do this after finishing okay -->
-		<ok to="join-iterative-rankings" />
+		<ok to="get-file-names" />
 		<!-- Go there if we have an error -->
 		<error to="attrank-fail" />
 
 	</action>
 
-	<!-- JOIN ITERATIVE METHODS AND THEN END -->
+	<!-- Removed for ser -->
+	<!--
+	 JOIN ITERATIVE METHODS AND THEN END =
 	<join name="join-iterative-rankings" to="end" />
-	<!-- to="get-file-names"/> --> 
+	to="get-file-names"/>  
+	-->
 
 
 	<!-- This will be a shell action that will output key-value pairs for output files -->
