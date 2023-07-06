@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # This program reads the openaire to doi mapping from the ${synonymFolder} of the workflow
 # and uses this mapping to create doi-based score files in the format required by BiP! DB.
 # This is done by reading each openaire-id based ranking file and joining the openaire based
@@ -17,28 +18,35 @@ import pyspark.sql.functions as F
 # from pyspark.sql.functions import udf
 #################################################################################################
 #################################################################################################
-# Clean up directory name
+# Clean up directory name - no longer needed in final workflow version
+'''
 def clean_directory_name(dir_name):
     # We have a name with the form *_bip_universe<digits>_* or *_graph_universe<digits>_* 
     # and we need to keep the parts in *	
+
+    
     dir_name_parts = dir_name.split('_')
     dir_name_parts = [part for part in dir_name_parts if ('bip' not in part and 'graph' not in part and 'universe' not in part and 'from' not in part)]
-	
-    clean_name = '_'.join(dir_name_parts)
+    
+    dir_name = dir_name.replace("openaire_id_graph", "openaire_ids")
+    clean_name = dir_name + ".txt.gz"
 
-    if '_ids' not in clean_name:
-        clean_name = clean_name.replace('id_', 'ids_')
+    # clean_name = '_'.join(dir_name_parts)
+
+    # if '_ids' not in clean_name:
+    #     clean_name = clean_name.replace('id_', 'ids_')
         	
     # clean_name = clean_name.replace('.txt', '')
     # clean_name = clean_name.replace('.gz', '')
 
-    if 'openaire_ids_' in clean_name:
-        clean_name = clean_name.replace('openaire_ids_', '')
+    # if 'openaire_ids_' in clean_name:
+    #     clean_name = clean_name.replace('openaire_ids_', '')
         # clean_name = clean_name + '.txt.gz'
     # else:
         # clean_name = clean_name + '.txt.gz'
 	
     return clean_name
+'''
 #################################################################################################
 if len(sys.argv) < 3:
     print ("Usage: ./map_scores_to_dois.py <synonym_folder> <num_partitions> <score_file_1> <score_file_2> <...etc...>")
@@ -47,12 +55,12 @@ if len(sys.argv) < 3:
 # Read arguments
 synonyms_folder = sys.argv[1]
 num_partitions = int(sys.argv[2])
-input_file_list = [argument for argument in sys.argv[3:]]
-input_file_list = [clean_directory_name(item) for item in input_file_list]
+input_file_list = [argument.replace("_openaire_id_graph", "").replace("_openaire_id_graph_", "") + "_openaire_ids.txt.gz" for argument in sys.argv[3:]]
+# input_file_list = [clean_directory_name(item) for item in input_file_list]
 
 # Prepare output specific variables
 output_file_list = [item.replace("_openaire_ids", "") for item in input_file_list]
-output_file_list = [item + ".gz" if not item.endswith(".gz") else item for item in output_file_list]
+output_file_list = [item + ".txt.gz" if not item.endswith(".txt.gz") else item for item in output_file_list]
 
 # --- INFO MESSAGES --- #
 print ("\n\n----------------------------")
