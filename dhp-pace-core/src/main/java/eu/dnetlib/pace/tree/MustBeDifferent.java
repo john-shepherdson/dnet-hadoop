@@ -1,16 +1,18 @@
+
 package eu.dnetlib.pace.tree;
 
+import java.util.Map;
+
 import com.wcohen.ss.AbstractStringDistance;
+
+import eu.dnetlib.pace.config.Config;
 import eu.dnetlib.pace.tree.support.AbstractComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
-import eu.dnetlib.pace.config.Config;
-
-import java.util.Map;
 
 @ComparatorClass("mustBeDifferent")
 public class MustBeDifferent extends AbstractComparator {
 
-	public MustBeDifferent(Map<String,String> params){
+	public MustBeDifferent(Map<String, String> params) {
 		super(params, new com.wcohen.ss.Levenstein());
 	}
 

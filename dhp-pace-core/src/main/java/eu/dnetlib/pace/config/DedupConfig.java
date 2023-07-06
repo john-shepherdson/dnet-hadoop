@@ -1,16 +1,5 @@
-package eu.dnetlib.pace.config;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
-import eu.dnetlib.pace.model.ClusteringDef;
-import eu.dnetlib.pace.model.FieldDef;
-import eu.dnetlib.pace.util.PaceException;
-import org.antlr.stringtemplate.StringTemplate;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+package eu.dnetlib.pace.config;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -22,9 +11,20 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.antlr.stringtemplate.StringTemplate;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
+
+import eu.dnetlib.pace.model.ClusteringDef;
+import eu.dnetlib.pace.model.FieldDef;
 import eu.dnetlib.pace.tree.support.TreeNodeDef;
-
+import eu.dnetlib.pace.util.PaceException;
 
 public class DedupConfig implements Config, Serializable {
 
@@ -56,7 +56,8 @@ public class DedupConfig implements Config, Serializable {
 		defaults.put("idPath", "$.id");
 	}
 
-	public DedupConfig() {}
+	public DedupConfig() {
+	}
 
 	public static DedupConfig load(final String json) {
 
@@ -66,10 +67,21 @@ public class DedupConfig implements Config, Serializable {
 			config.getPace().initModel();
 			config.getPace().initTranslationMap();
 
-			config.blacklists = config.getPace().getBlacklists().entrySet()
-					.stream()
-					.collect(Collectors.toMap(e -> e.getKey(),
-							e ->e.getValue().stream().filter(s -> !StringUtils.isBlank(s)).map(Pattern::compile).collect(Collectors.toList()) ));
+			config.blacklists = config
+				.getPace()
+				.getBlacklists()
+				.entrySet()
+				.stream()
+				.collect(
+					Collectors
+						.toMap(
+							e -> e.getKey(),
+							e -> e
+								.getValue()
+								.stream()
+								.filter(s -> !StringUtils.isBlank(s))
+								.map(Pattern::compile)
+								.collect(Collectors.toList())));
 
 			return config;
 		} catch (IOException e) {
@@ -131,7 +143,7 @@ public class DedupConfig implements Config, Serializable {
 	}
 
 	@Override
-	public Map<String, TreeNodeDef> decisionTree(){
+	public Map<String, TreeNodeDef> decisionTree() {
 		return getPace().getDecisionTree();
 	}
 

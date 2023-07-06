@@ -1,5 +1,14 @@
+
 package eu.dnetlib.pace.config;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.*;
 
 import eu.dnetlib.pace.AbstractPaceTest;
 import eu.dnetlib.pace.clustering.BlacklistAwareClusteringCombiner;
@@ -15,15 +24,6 @@ import eu.dnetlib.pace.tree.support.FieldConf;
 import eu.dnetlib.pace.tree.support.TreeNodeDef;
 import eu.dnetlib.pace.tree.support.TreeNodeStats;
 import eu.dnetlib.pace.util.MapDocumentUtil;
-import org.junit.jupiter.api.*;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
 
 public class ConfigTest extends AbstractPaceTest {
 
@@ -68,7 +68,7 @@ public class ConfigTest extends AbstractPaceTest {
 
 		System.out.println("translationMap = " + translationMap.size());
 
-		for (String key: translationMap.keySet()) {
+		for (String key : translationMap.keySet()) {
 			if (translationMap.get(key).equals("key::1"))
 				System.out.println("key = " + key);
 		}
@@ -99,7 +99,7 @@ public class ConfigTest extends AbstractPaceTest {
 
 		System.out.println("mapDocument = " + mapDocument.getFieldMap().get("title").stringValue());
 
-    }
+	}
 
 	@Test
 	public void authorAsMapDocument() {
@@ -110,20 +110,23 @@ public class ConfigTest extends AbstractPaceTest {
 
 		final MapDocument mapDocument = MapDocumentUtil.asMapDocumentWithJPath(dedupConf, json);
 
-		System.out.println("mapDocument = " + Arrays.toString(((FieldValue) mapDocument.getFieldMap().get("topics")).doubleArrayValue()));
+		System.out
+			.println(
+				"mapDocument = "
+					+ Arrays.toString(((FieldValue) mapDocument.getFieldMap().get("topics")).doubleArrayValue()));
 
 	}
 
-    @Test
-    public  void testJPath()  {
-        final String json = readFromClasspath("organization.json");
+	@Test
+	public void testJPath() {
+		final String json = readFromClasspath("organization.json");
 
-        final String jpath ="$.id";
+		final String jpath = "$.id";
 
-        System.out.println("result = " + MapDocumentUtil.getJPathString(jpath, json));
-    }
+		System.out.println("result = " + MapDocumentUtil.getJPathString(jpath, json));
+	}
 
-    @Test
+	@Test
 	public void clusteringCombinerTest() {
 
 		DedupConfig dedupConf = DedupConfig.load(readFromClasspath("publication.current.conf.json"));
@@ -150,7 +153,7 @@ public class ConfigTest extends AbstractPaceTest {
 
 		Collection<String> strings = BlacklistAwareClusteringCombiner.filterAndCombine(mapDocument, dedupConf);
 
-		for (String s: strings) {
+		for (String s : strings) {
 			System.out.println("s = " + s);
 		}
 
@@ -169,7 +172,7 @@ public class ConfigTest extends AbstractPaceTest {
 
 		TreeNodeStats nodeStats = treeNode.evaluate(doc, doc, dedupConf);
 
-		assertTrue(nodeStats.getFinalScore(AggType.MAX)>0.7);
+		assertTrue(nodeStats.getFinalScore(AggType.MAX) > 0.7);
 
 	}
 }

@@ -1,16 +1,19 @@
-package eu.dnetlib.pace.clustering;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import eu.dnetlib.pace.AbstractPaceTest;
-import eu.dnetlib.pace.common.AbstractPaceFunctions;
-import eu.dnetlib.pace.config.DedupConfig;
-import org.junit.jupiter.api.*;
+package eu.dnetlib.pace.clustering;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.junit.jupiter.api.*;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+
+import eu.dnetlib.pace.AbstractPaceTest;
+import eu.dnetlib.pace.common.AbstractPaceFunctions;
+import eu.dnetlib.pace.config.DedupConfig;
 
 public class ClusteringFunctionTest extends AbstractPaceTest {
 
@@ -20,7 +23,11 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 	@BeforeAll
 	public static void setUp() throws Exception {
 		params = Maps.newHashMap();
-        conf = DedupConfig.load(AbstractPaceFunctions.readFromClasspath("/eu/dnetlib/pace/config/organization.current.conf.json", ClusteringFunctionTest.class));
+		conf = DedupConfig
+			.load(
+				AbstractPaceFunctions
+					.readFromClasspath(
+						"/eu/dnetlib/pace/config/organization.current.conf.json", ClusteringFunctionTest.class));
 	}
 
 	@Test
@@ -210,7 +217,7 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 	}
 
 	@Test
-	public void testPersonClustering(){
+	public void testPersonClustering() {
 
 		final ClusteringFunction cf = new PersonClustering(params);
 		final String s = "Abd-Alla, Abo-el-nour N.";
@@ -224,7 +231,7 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 	}
 
 	@Test
-	public void testPersonHash(){
+	public void testPersonHash() {
 
 		final ClusteringFunction cf = new PersonHash(params);
 		final String s = "Manghi, Paolo";
@@ -238,7 +245,7 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 	}
 
 	@Test
-	public void testLastNameFirstInitial(){
+	public void testLastNameFirstInitial() {
 
 		final ClusteringFunction cf = new LastNameFirstInitial(params);
 		final String s = "LI Yonghong";

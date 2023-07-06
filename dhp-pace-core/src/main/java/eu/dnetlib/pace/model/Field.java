@@ -1,8 +1,9 @@
+
 package eu.dnetlib.pace.model;
 
-import eu.dnetlib.pace.config.Type;
-
 import java.io.Serializable;
+
+import eu.dnetlib.pace.config.Type;
 
 /**
  * The Interface Field.

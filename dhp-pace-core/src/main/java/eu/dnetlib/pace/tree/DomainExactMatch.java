@@ -1,30 +1,31 @@
-package eu.dnetlib.pace.tree;
 
-import eu.dnetlib.pace.model.Field;
-import eu.dnetlib.pace.tree.support.ComparatorClass;
+package eu.dnetlib.pace.tree;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
+import eu.dnetlib.pace.model.Field;
+import eu.dnetlib.pace.tree.support.ComparatorClass;
+
 @ComparatorClass("domainExactMatch")
 public class DomainExactMatch extends ExactMatchIgnoreCase {
 
-    public DomainExactMatch(final Map<String, String> params) {
-        super(params);
-    }
+	public DomainExactMatch(final Map<String, String> params) {
+		super(params);
+	}
 
-    @Override
-    protected String getValue(final Field f) {
+	@Override
+	protected String getValue(final Field f) {
 
-        try {
-            return asUrl(super.getValue(f)).getHost();
-        } catch (MalformedURLException e) {
-            return "";
-        }
-    }
+		try {
+			return asUrl(super.getValue(f)).getHost();
+		} catch (MalformedURLException e) {
+			return "";
+		}
+	}
 
-    private URL asUrl(final String value) throws MalformedURLException {
-        return new URL(value);
-    }
+	private URL asUrl(final String value) throws MalformedURLException {
+		return new URL(value);
+	}
 }

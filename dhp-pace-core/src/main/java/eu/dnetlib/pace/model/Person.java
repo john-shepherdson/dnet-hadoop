@@ -1,3 +1,4 @@
+
 package eu.dnetlib.pace.model;
 
 import java.nio.charset.Charset;
@@ -43,7 +44,7 @@ public class Person {
 			// s = s.replaceAll("[\\W&&[^,-]]", "");
 		}
 
-		if (s.contains(",")) {	//if the name contains a comma it is easy derivable the name and the surname
+		if (s.contains(",")) { // if the name contains a comma it is easy derivable the name and the surname
 			final String[] arr = s.split(",");
 			if (arr.length == 1) {
 				fullname = splitTerms(arr[0]);

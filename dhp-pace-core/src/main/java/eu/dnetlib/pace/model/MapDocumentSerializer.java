@@ -1,3 +1,4 @@
+
 package eu.dnetlib.pace.model;
 
 import java.lang.reflect.Type;
@@ -33,7 +34,8 @@ public class MapDocumentSerializer implements InstanceCreator<MapDocument> {
 		gson.registerTypeAdapter(Field.class, new JsonDeserializer<Field>() {
 
 			@Override
-			public Field deserialize(final JsonElement json, final Type typeOfT, final JsonDeserializationContext context) throws JsonParseException {
+			public Field deserialize(final JsonElement json, final Type typeOfT,
+				final JsonDeserializationContext context) throws JsonParseException {
 				final FieldListImpl fl = new FieldListImpl();
 				if (json.isJsonObject()) {
 

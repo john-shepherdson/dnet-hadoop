@@ -1,3 +1,4 @@
+
 package eu.dnetlib.pace.model;
 
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class PersonComparatorUtils {
 
 	private static boolean verifyNames(List<String> list1, List<String> list2) {
 		return verifySimilarity(extractExtendedNames(list1), extractExtendedNames(list2))
-				&& verifySimilarity(extractInitials(list1), extractInitials(list2));
+			&& verifySimilarity(extractInitials(list1), extractInitials(list2));
 	}
 
 	private static boolean verifySurnames(List<String> list1, List<String> list2) {
@@ -76,7 +77,7 @@ public class PersonComparatorUtils {
 		Collections.sort(list1);
 		Collections.sort(list2);
 		return verifySimilarity(extractExtendedNames(list1), extractExtendedNames(list2))
-				&& verifySimilarity(extractInitials(list1), extractInitials(list2));
+			&& verifySimilarity(extractInitials(list1), extractInitials(list2));
 	}
 
 	private static List<String> extractExtendedNames(List<String> list) {
@@ -107,7 +108,7 @@ public class PersonComparatorUtils {
 		for (String s : list1) {
 			int curr = list2.indexOf(s);
 			if (curr > pos) {
-				list2.set(curr, "*"); // I invalidate the found element, example: "amm - amm" 
+				list2.set(curr, "*"); // I invalidate the found element, example: "amm - amm"
 				pos = curr;
 			} else {
 				return false;

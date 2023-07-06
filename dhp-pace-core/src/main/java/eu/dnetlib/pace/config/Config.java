@@ -1,3 +1,4 @@
+
 package eu.dnetlib.pace.config;
 
 import java.util.List;
@@ -49,7 +50,6 @@ public interface Config {
 	 * @return the map
 	 */
 	public Map<String, List<Pattern>> blacklists();
-
 
 	/**
 	 * Translation map.

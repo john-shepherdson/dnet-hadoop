@@ -1,17 +1,19 @@
-package eu.dnetlib.pace;
 
-import eu.dnetlib.pace.common.AbstractPaceFunctions;
-import eu.dnetlib.pace.config.Type;
-import eu.dnetlib.pace.model.Field;
-import eu.dnetlib.pace.model.FieldListImpl;
-import eu.dnetlib.pace.model.FieldValueImpl;
-import org.apache.commons.io.IOUtils;
+package eu.dnetlib.pace;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.apache.commons.io.IOUtils;
+
+import eu.dnetlib.pace.common.AbstractPaceFunctions;
+import eu.dnetlib.pace.config.Type;
+import eu.dnetlib.pace.model.Field;
+import eu.dnetlib.pace.model.FieldListImpl;
+import eu.dnetlib.pace.model.FieldValueImpl;
 
 public abstract class AbstractPaceTest extends AbstractPaceFunctions {
 
@@ -41,9 +43,12 @@ public abstract class AbstractPaceTest extends AbstractPaceFunctions {
 		return new FieldValueImpl(Type.DoubleArray, "array", a);
 	}
 
-	protected Field createFieldList(List<String> strings, String fieldName){
+	protected Field createFieldList(List<String> strings, String fieldName) {
 
-		List<FieldValueImpl> fieldValueStream = strings.stream().map(s -> new FieldValueImpl(Type.String, fieldName, s)).collect(Collectors.toList());
+		List<FieldValueImpl> fieldValueStream = strings
+			.stream()
+			.map(s -> new FieldValueImpl(Type.String, fieldName, s))
+			.collect(Collectors.toList());
 
 		FieldListImpl a = new FieldListImpl();
 		a.addAll(fieldValueStream);

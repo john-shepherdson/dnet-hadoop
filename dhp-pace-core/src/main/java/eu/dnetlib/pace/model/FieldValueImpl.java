@@ -1,3 +1,4 @@
+
 package eu.dnetlib.pace.model;
 
 import java.net.MalformedURLException;
@@ -6,8 +7,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import eu.dnetlib.pace.config.Type;
 import org.apache.commons.lang3.StringUtils;
+
+import eu.dnetlib.pace.config.Type;
 
 /**
  * The Class FieldValueImpl.
@@ -20,7 +22,8 @@ public class FieldValueImpl extends AbstractField implements FieldValue {
 	/**
 	 * Instantiates a new field value impl.
 	 */
-	public FieldValueImpl() {}
+	public FieldValueImpl() {
+	}
 
 	/**
 	 * Instantiates a new field value impl.
@@ -39,17 +42,17 @@ public class FieldValueImpl extends AbstractField implements FieldValue {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.model.Field#isEmpty()
 	 */
 	@Override
 	public boolean isEmpty() {
-		if (value == null) return false;
+		if (value == null)
+			return false;
 
 		switch (type) {
 			case String:
 			case JSON:
-			return value.toString().isEmpty();
+				return value.toString().isEmpty();
 			case List:
 				try {
 					List<?> list = (List<?>) value;
@@ -61,9 +64,9 @@ public class FieldValueImpl extends AbstractField implements FieldValue {
 				String str = value.toString();
 				return StringUtils.isBlank(str) || !isValidURL(str);
 			case DoubleArray:
-				return doubleArrayValue().length==0;
-		default:
-			return true;
+				return doubleArrayValue().length == 0;
+			default:
+				return true;
 		}
 	}
 
@@ -78,7 +81,6 @@ public class FieldValueImpl extends AbstractField implements FieldValue {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.model.FieldValue#getValue()
 	 */
 	@Override
@@ -88,7 +90,6 @@ public class FieldValueImpl extends AbstractField implements FieldValue {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.model.FieldValue#setValue(java.lang.Object)
 	 */
 	@Override
@@ -98,7 +99,6 @@ public class FieldValueImpl extends AbstractField implements FieldValue {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.model.Field#stringValue()
 	 */
 	@Override
@@ -119,12 +119,11 @@ public class FieldValueImpl extends AbstractField implements FieldValue {
 	}
 
 	public double[] doubleArrayValue() {
-		return (double[])getValue();
+		return (double[]) getValue();
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Iterable#iterator()
 	 */
 	@Override

@@ -1,10 +1,12 @@
+
 package eu.dnetlib.pace.tree;
 
+import java.util.Map;
+
 import com.wcohen.ss.AbstractStringDistance;
+
 import eu.dnetlib.pace.tree.support.AbstractSortedComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
-
-import java.util.Map;
 
 /**
  * The Class SortedJaroWinkler.
@@ -12,7 +14,7 @@ import java.util.Map;
 @ComparatorClass("sortedJaroWinkler")
 public class SortedJaroWinkler extends AbstractSortedComparator {
 
-	public SortedJaroWinkler(Map<String,String> params){
+	public SortedJaroWinkler(Map<String, String> params) {
 		super(params, new com.wcohen.ss.Levenstein());
 	}
 
@@ -40,7 +42,6 @@ public class SortedJaroWinkler extends AbstractSortedComparator {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.compare.DistanceAlgo#getWeight()
 	 */
 	@Override
@@ -50,7 +51,6 @@ public class SortedJaroWinkler extends AbstractSortedComparator {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.compare.SecondStringDistanceAlgo#normalize(double)
 	 */
 	@Override

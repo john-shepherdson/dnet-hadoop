@@ -1,4 +1,10 @@
+
 package eu.dnetlib.pace.model;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,12 +12,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import eu.dnetlib.pace.config.Type;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
+import eu.dnetlib.pace.config.Type;
 
 /**
  * The Class FieldListImpl.
@@ -41,7 +43,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#add(java.lang.Object)
 	 */
 	@Override
@@ -51,7 +52,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#add(int, java.lang.Object)
 	 */
 	@Override
@@ -61,7 +61,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#addAll(java.util.Collection)
 	 */
 	@Override
@@ -71,7 +70,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#addAll(int, java.util.Collection)
 	 */
 	@Override
@@ -81,7 +79,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#clear()
 	 */
 	@Override
@@ -91,7 +88,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#contains(java.lang.Object)
 	 */
 	@Override
@@ -101,7 +97,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#containsAll(java.util.Collection)
 	 */
 	@Override
@@ -111,7 +106,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#get(int)
 	 */
 	@Override
@@ -121,7 +115,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#indexOf(java.lang.Object)
 	 */
 	@Override
@@ -131,7 +124,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.model.Field#isEmpty()
 	 */
 	@Override
@@ -141,7 +133,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Iterable#iterator()
 	 */
 	@Override
@@ -151,7 +142,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#lastIndexOf(java.lang.Object)
 	 */
 	@Override
@@ -161,7 +151,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#listIterator()
 	 */
 	@Override
@@ -171,7 +160,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#listIterator(int)
 	 */
 	@Override
@@ -181,7 +169,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#remove(java.lang.Object)
 	 */
 	@Override
@@ -191,7 +178,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#remove(int)
 	 */
 	@Override
@@ -201,7 +187,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#removeAll(java.util.Collection)
 	 */
 	@Override
@@ -211,7 +196,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#retainAll(java.util.Collection)
 	 */
 	@Override
@@ -221,7 +205,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#set(int, java.lang.Object)
 	 */
 	@Override
@@ -231,7 +214,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#size()
 	 */
 	@Override
@@ -241,7 +223,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#subList(int, int)
 	 */
 	@Override
@@ -251,7 +232,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#toArray()
 	 */
 	@Override
@@ -261,7 +241,6 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.util.List#toArray(java.lang.Object[])
 	 */
 	@Override
@@ -271,33 +250,31 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.model.Field#stringValue()
 	 */
 	@Override
 	public String stringValue() {
 		switch (getType()) {
 
-		case List:
-		case Int:
-		case String:
-			return Joiner.on(" ").join(stringList());
-		case JSON:
-			String json;
-			try {
-				json = new ObjectMapper().writeValueAsString(this);
-			} catch (JsonProcessingException e) {
-				json = null;
-			}
-			return json;
-		default:
-			throw new IllegalArgumentException("Unknown type: " + getType().toString());
+			case List:
+			case Int:
+			case String:
+				return Joiner.on(" ").join(stringList());
+			case JSON:
+				String json;
+				try {
+					json = new ObjectMapper().writeValueAsString(this);
+				} catch (JsonProcessingException e) {
+					json = null;
+				}
+				return json;
+			default:
+				throw new IllegalArgumentException("Unknown type: " + getType().toString());
 		}
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.model.FieldList#stringList()
 	 */
 	@Override
@@ -317,10 +294,10 @@ public class FieldListImpl extends AbstractField implements FieldList {
 
 	@Override
 	public double[] doubleArray() {
-		return Lists.newArrayList(Iterables.transform(fields, getDouble())).stream().mapToDouble(d-> d).toArray();
+		return Lists.newArrayList(Iterables.transform(fields, getDouble())).stream().mapToDouble(d -> d).toArray();
 	}
 
-	private Function<Field,Double> getDouble() {
+	private Function<Field, Double> getDouble() {
 
 		return new Function<Field, Double>() {
 			@Override

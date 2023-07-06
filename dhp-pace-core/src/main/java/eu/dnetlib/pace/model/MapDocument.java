@@ -1,3 +1,4 @@
+
 package eu.dnetlib.pace.model;
 
 import java.io.Serializable;
@@ -57,7 +58,6 @@ public class MapDocument implements Document, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.model.document.Document#fields()
 	 */
 	@Override
@@ -67,7 +67,6 @@ public class MapDocument implements Document, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.model.document.Document#values(java.lang.String)
 	 */
 	@Override
@@ -77,7 +76,6 @@ public class MapDocument implements Document, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.model.document.Document#fieldNames()
 	 */
 	@Override
@@ -87,7 +85,6 @@ public class MapDocument implements Document, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -107,7 +104,6 @@ public class MapDocument implements Document, Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.model.document.Document#getIdentifier()
 	 */
 	@Override

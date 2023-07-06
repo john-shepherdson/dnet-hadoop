@@ -1,3 +1,4 @@
+
 package eu.dnetlib.pace.model;
 
 import java.util.Comparator;
@@ -28,18 +29,19 @@ public class MapDocumentComparator implements Comparator<Document> {
 
 	/*
 	 * (non-Javadoc)
-	 *
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 	 */
 	@Override
 	public int compare(final Document d1, final Document d2) {
 
-		if (d1.values(comparatorField).isEmpty() || d2.values(comparatorField).isEmpty()) return 0;
+		if (d1.values(comparatorField).isEmpty() || d2.values(comparatorField).isEmpty())
+			return 0;
 
 		final String o1 = Iterables.getFirst(d1.values(comparatorField), emptyField).stringValue();
 		final String o2 = Iterables.getFirst(d2.values(comparatorField), emptyField).stringValue();
 
-		if ((o1 == null) || (o2 == null)) return 0;
+		if ((o1 == null) || (o2 == null))
+			return 0;
 
 		final String to1 = NGramUtils.cleanupForOrdering(o1);
 		final String to2 = NGramUtils.cleanupForOrdering(o2);

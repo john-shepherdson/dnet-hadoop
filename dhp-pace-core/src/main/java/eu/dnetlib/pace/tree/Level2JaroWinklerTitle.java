@@ -1,16 +1,18 @@
+
 package eu.dnetlib.pace.tree;
 
+import java.util.Map;
+
 import com.wcohen.ss.AbstractStringDistance;
+
+import eu.dnetlib.pace.config.Config;
 import eu.dnetlib.pace.tree.support.AbstractComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
-import eu.dnetlib.pace.config.Config;
-
-import java.util.Map;
 
 @ComparatorClass("level2JaroWinklerTitle")
 public class Level2JaroWinklerTitle extends AbstractComparator {
 
-	public Level2JaroWinklerTitle(Map<String,String> params){
+	public Level2JaroWinklerTitle(Map<String, String> params) {
 		super(params, new com.wcohen.ss.Level2JaroWinkler());
 	}
 
@@ -29,7 +31,8 @@ public class Level2JaroWinklerTitle extends AbstractComparator {
 
 		final boolean check = checkNumbers(ca, cb);
 
-		if (check) return 0.5;
+		if (check)
+			return 0.5;
 
 		return ssalgo.score(ca, cb);
 	}

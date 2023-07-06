@@ -1,3 +1,4 @@
+
 package eu.dnetlib.pace.model;
 
 import eu.dnetlib.pace.config.Type;
@@ -16,7 +17,8 @@ public abstract class AbstractField implements Field {
 	/**
 	 * Instantiates a new abstract field.
 	 */
-	protected AbstractField() {}
+	protected AbstractField() {
+	}
 
 	/**
 	 * Instantiates a new abstract field.
@@ -33,7 +35,6 @@ public abstract class AbstractField implements Field {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.model.Field#getName()
 	 */
 	@Override
@@ -43,7 +44,6 @@ public abstract class AbstractField implements Field {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.model.Field#getType()
 	 */
 	@Override
@@ -53,7 +53,6 @@ public abstract class AbstractField implements Field {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.model.Field#setName(java.lang.String)
 	 */
 	@Override
@@ -63,7 +62,6 @@ public abstract class AbstractField implements Field {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.model.Field#setType(eu.dnetlib.pace.config.Type)
 	 */
 	@Override

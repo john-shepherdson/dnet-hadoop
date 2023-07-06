@@ -1,16 +1,17 @@
+
 package eu.dnetlib.pace.tree;
 
-import eu.dnetlib.pace.config.Config;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 
 import com.wcohen.ss.AbstractStringDistance;
+
+import eu.dnetlib.pace.config.Config;
 import eu.dnetlib.pace.config.Type;
 import eu.dnetlib.pace.model.Field;
 import eu.dnetlib.pace.tree.support.AbstractComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
-
-
-import java.util.Map;
 
 /**
  * The Class SubStringLevenstein.
@@ -31,7 +32,7 @@ public class SubStringLevenstein extends AbstractComparator {
 		super(w, new com.wcohen.ss.Levenstein());
 	}
 
-	public SubStringLevenstein(Map<String, String> params){
+	public SubStringLevenstein(Map<String, String> params) {
 		super(params, new com.wcohen.ss.Levenstein());
 		this.limit = Integer.parseInt(params.getOrDefault("limit", "1"));
 	}
@@ -66,8 +67,8 @@ public class SubStringLevenstein extends AbstractComparator {
 
 	/*
 	 * (non-Javadoc)
-	 * 
-	 * @see eu.dnetlib.pace.compare.SecondStringDistanceAlgo#compare(eu.dnetlib.pace.model.Field, eu.dnetlib.pace.model.Field)
+	 * @see eu.dnetlib.pace.compare.SecondStringDistanceAlgo#compare(eu.dnetlib.pace.model.Field,
+	 * eu.dnetlib.pace.model.Field)
 	 */
 	@Override
 	public double distance(final Field a, final Field b, final Config conf) {
@@ -79,7 +80,6 @@ public class SubStringLevenstein extends AbstractComparator {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.compare.DistanceAlgo#getWeight()
 	 */
 	@Override
@@ -89,7 +89,6 @@ public class SubStringLevenstein extends AbstractComparator {
 
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see eu.dnetlib.pace.compare.SecondStringDistanceAlgo#normalize(double)
 	 */
 	@Override

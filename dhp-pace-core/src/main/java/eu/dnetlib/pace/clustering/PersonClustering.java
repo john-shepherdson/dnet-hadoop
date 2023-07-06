@@ -1,16 +1,19 @@
-package eu.dnetlib.pace.clustering;
 
-import com.google.common.collect.Sets;
-import eu.dnetlib.pace.common.AbstractPaceFunctions;
-import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Field;
-import eu.dnetlib.pace.model.Person;
-import org.apache.commons.lang3.StringUtils;
+package eu.dnetlib.pace.clustering;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.collect.Sets;
+
+import eu.dnetlib.pace.common.AbstractPaceFunctions;
+import eu.dnetlib.pace.config.Config;
+import eu.dnetlib.pace.model.Field;
+import eu.dnetlib.pace.model.Person;
 
 @ClusteringClass("personClustering")
 public class PersonClustering extends AbstractPaceFunctions implements ClusteringFunction {
@@ -31,7 +34,8 @@ public class PersonClustering extends AbstractPaceFunctions implements Clusterin
 
 			final Person person = new Person(f.stringValue(), false);
 
-			if (StringUtils.isNotBlank(person.getNormalisedFirstName()) && StringUtils.isNotBlank(person.getNormalisedSurname())) {
+			if (StringUtils.isNotBlank(person.getNormalisedFirstName())
+				&& StringUtils.isNotBlank(person.getNormalisedSurname())) {
 				hashes.add(firstLC(person.getNormalisedFirstName()) + person.getNormalisedSurname().toLowerCase());
 			} else {
 				for (final String token1 : tokens(f.stringValue(), MAX_TOKENS)) {

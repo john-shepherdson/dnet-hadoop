@@ -1,3 +1,4 @@
+
 package eu.dnetlib.pace.tree;
 
 import java.util.List;
@@ -17,24 +18,24 @@ import eu.dnetlib.pace.tree.support.ComparatorClass;
 @ComparatorClass("titleVersionMatch")
 public class TitleVersionMatch extends AbstractComparator {
 
-    public TitleVersionMatch(final Map<String, String> params) {
-        super(params);
-    }
+	public TitleVersionMatch(final Map<String, String> params) {
+		super(params);
+	}
 
-    @Override
-    public double compare(final Field a, final Field b, final Config conf) {
-        final String valueA = getFirstValue(a);
-        final String valueB = getFirstValue(b);
+	@Override
+	public double compare(final Field a, final Field b, final Config conf) {
+		final String valueA = getFirstValue(a);
+		final String valueB = getFirstValue(b);
 
-        if (valueA.isEmpty() || valueB.isEmpty())
-            return -1;
+		if (valueA.isEmpty() || valueB.isEmpty())
+			return -1;
 
-        return notNull(valueA) && notNull(valueB) && !checkNumbers(valueA, valueB) ? 1 : 0;
-    }
+		return notNull(valueA) && notNull(valueB) && !checkNumbers(valueA, valueB) ? 1 : 0;
+	}
 
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + ":" + super.toString();
-    }
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + ":" + super.toString();
+	}
 
 }
