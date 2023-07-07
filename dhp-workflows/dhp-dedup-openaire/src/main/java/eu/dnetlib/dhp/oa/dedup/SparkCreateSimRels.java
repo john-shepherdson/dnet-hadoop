@@ -86,15 +86,17 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 
 			SparkDedupConfig sparkConfig = new SparkDedupConfig(dedupConf, numPartitions);
 
+			spark.udf().register("collect_sort_slice", sparkConfig.collectSortSliceUDAF());
+
 			Dataset<?> simRels = spark
 				.read()
 				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
 				.transform(sparkConfig.modelExtractor()) // Extract fields from input json column according to model
 				// definition
-				.transform(sparkConfig.generateAndProcessClustersWithJoins()) // generate <key,block> pairs according to
+				.transform(sparkConfig.generateClustersWithDFAPIMerged()) // generate <key,block> pairs according to
 				// filters, clusters, and model
 				// definition
-				// .transform(sparkConfig.processClusters()) // process blocks and emits <from,to> pairs of found
+				.transform(sparkConfig.processClusters()) // process blocks and emits <from,to> pairs of found
 				// similarities
 				.map(
 					(MapFunction<Row, Relation>) t -> DedupUtility
