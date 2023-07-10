@@ -93,7 +93,7 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
 				.transform(sparkConfig.modelExtractor()) // Extract fields from input json column according to model
 				// definition
-				.transform(sparkConfig.generateClustersWithDFAPIMerged()) // generate <key,block> pairs according to
+				.transform(sparkConfig.generateClustersWithWindows()) // generate <key,block> pairs according to
 				// filters, clusters, and model
 				// definition
 				.transform(sparkConfig.processClusters()) // process blocks and emits <from,to> pairs of found

@@ -22,7 +22,7 @@ class JsonPathTest {
 
 		final String org = IOUtils.toString(getClass().getResourceAsStream("organization.json"));
 
-		Row row = SparkDedupConfig.apply(conf, 1).rowFromJson().apply(org);
+		Row row = SparkDedupConfig.apply(conf, 1).rowFromJson(org);
 
 		Assertions.assertNotNull(row);
 		Assertions.assertTrue(StringUtils.isNotBlank(row.getAs("identifier")));

@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.catalyst.expressions.Literal;
 import org.apache.spark.sql.types.DataTypes;
@@ -99,7 +100,7 @@ public class SparkBlockStats extends AbstractSparkAction {
 				.transform(sparkConfig.generateClusters())
 				.filter(functions.size(new Column("block")).geq(new Literal(1, DataTypes.IntegerType)));
 
-			simRels.map(b -> {
+			simRels.map((MapFunction<Row, BlockStats>) b -> {
 				Collection<Row> documents = b.getList(1);
 
 				List<Row> mapDocuments = documents

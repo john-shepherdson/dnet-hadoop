@@ -49,7 +49,12 @@ public class RowDataOrderingComparator implements Comparator<Row> {
 		final String to1 = NGramUtils.cleanupForOrdering(o1);
 		final String to2 = NGramUtils.cleanupForOrdering(o2);
 
-		return to1.compareTo(to2);
+		int res = to1.compareTo(to2);
+		if (res == 0) {
+			return o1.compareTo(o2);
+		}
+
+		return res;
 	}
 
 }
