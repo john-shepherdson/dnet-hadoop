@@ -13,6 +13,6 @@
     </property>
     <property>
         <name>oozie.action.sharelib.for.spark</name>
-        <value>spark2</value>
+        <value>spark342</value>
     </property>
 </configuration>

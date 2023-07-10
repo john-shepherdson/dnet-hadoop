@@ -95,6 +95,7 @@ public class SparkDedupTest implements Serializable {
 
 		final SparkConf conf = new SparkConf();
 		conf.set("spark.sql.shuffle.partitions", "200");
+		conf.set("spark.sql.legacy.allowUntypedScalaUDF", "true");
 		spark = SparkSession
 			.builder()
 			.appName(SparkDedupTest.class.getSimpleName())

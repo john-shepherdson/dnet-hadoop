@@ -126,15 +126,25 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=15000
+                --conf spark.sql.shuffle.partitions=5000
+                --conf spark.driver.extraJavaOptions="-Xss256k"
+                --conf spark.executor.extraJavaOptions="-Dlog4j.configuration=spark-log4j.properties -Xss256k"
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
+                --conf spark.dynamicAllocation.enabled=true --conf spark.dynamicAllocation.minExecutors=100 --conf spark.dynamicAllocation.shuffleTracking.enabled=true
+                --conf spark.network.io.preferDirectBufs=true --conf spark.memory.fraction=0.4 --conf spark.sql.adaptive.coalescePartitions.minPartitionNum=5000
+                --conf spark.shuffle.useOldFetchProtocol=true --conf spark.shuffle.service.enabled=true  --conf spark.eventLog.enabled=true
+                --conf spark.executor.heartbeatInterval=60s
+                --conf spark.network.timeout=640s
+                --conf spark.sql.legacy.allowUntypedScalaUDF=true
             </spark-opts>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--actionSetId</arg><arg>${actionSetId}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
-            <arg>--numPartitions</arg><arg>15000</arg>
+            <arg>--numPartitions</arg><arg>5000</arg>
         </spark>
-        <ok to="WhitelistSimRels"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 
