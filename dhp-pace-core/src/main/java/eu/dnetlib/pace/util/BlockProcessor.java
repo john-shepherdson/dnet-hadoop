@@ -121,7 +121,11 @@ public class BlockProcessor {
 	private void emitOutput(final boolean result, final String idPivot, final String idCurr, final Reporter context) {
 
 		if (result) {
-			writeSimilarity(context, idPivot, idCurr);
+			if (idPivot.compareTo(idCurr) <= 0) {
+				writeSimilarity(context, idPivot, idCurr);
+			} else {
+				writeSimilarity(context, idCurr, idPivot);
+			}
 			context.incrementCounter(dedupConf.getWf().getEntityType(), "dedupSimilarity (x2)", 1);
 		} else {
 			context.incrementCounter(dedupConf.getWf().getEntityType(), "d < " + dedupConf.getWf().getThreshold(), 1);
