@@ -77,6 +77,11 @@
             <groupId>dom4j</groupId>
             <artifactId>dom4j</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.scala-lang.modules</groupId>
+            <artifactId>scala-xml_2.12</artifactId>
+            <version>2.1.0</version>
+        </dependency>
 
         <dependency>
             <groupId>xml-apis</groupId>

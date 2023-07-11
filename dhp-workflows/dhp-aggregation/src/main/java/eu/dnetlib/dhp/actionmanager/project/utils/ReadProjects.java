@@ -1,13 +1,11 @@
 
 package eu.dnetlib.dhp.actionmanager.project.utils;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.actionmanager.project.PrepareProjects;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.Project;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -17,12 +15,13 @@ import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.dnetlib.dhp.actionmanager.project.PrepareProjects;
-import eu.dnetlib.dhp.actionmanager.project.utils.model.Project;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author miriam.baglioni
@@ -66,7 +65,7 @@ public class ReadProjects implements Serializable {
 
 		FSDataInputStream inputStream = fs.open(hdfsreadpath);
 
-		ArrayList<Project> projects = OBJECT_MAPPER
+		List<Project> projects = OBJECT_MAPPER
 			.readValue(
 				IOUtils.toString(inputStream, "UTF-8"),
 				new TypeReference<List<Project>>() {

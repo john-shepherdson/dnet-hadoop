@@ -47,8 +47,8 @@ public class TrustUtils {
 		}
 
 		try {
-			final Row doc1 = sparkDedupConfig.rowFromJson().apply(mapper.writeValueAsString(r1));
-			final Row doc2 = sparkDedupConfig.rowFromJson().apply(mapper.writeValueAsString(r2));
+			final Row doc1 = sparkDedupConfig.rowFromJson(mapper.writeValueAsString(r2));
+			final Row doc2 = sparkDedupConfig.rowFromJson(mapper.writeValueAsString(r2));
 
 			final double score = new TreeProcessor(dedupConfig).computeScore(doc1, doc2);
 

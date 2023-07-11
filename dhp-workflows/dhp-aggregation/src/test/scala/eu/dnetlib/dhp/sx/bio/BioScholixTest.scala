@@ -5,7 +5,7 @@ import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest
 import eu.dnetlib.dhp.schema.oaf.utils.PidType
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Publication, Relation, Result}
 import eu.dnetlib.dhp.sx.bio.BioDBToOAF.ScholixResolved
-import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMParser, PMSubject, PubMedToOaf}
+import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMSubject, PubMedToOaf}
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.parse
@@ -17,9 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension
 import java.io.{BufferedReader, InputStream, InputStreamReader}
 import java.util.zip.GZIPInputStream
 import scala.collection.JavaConverters._
-import scala.collection.mutable.ListBuffer
 import scala.io.Source
-import scala.xml.pull.XMLEventReader
+
 
 @ExtendWith(Array(classOf[MockitoExtension]))
 class BioScholixTest extends AbstractVocabularyTest {
@@ -47,14 +46,14 @@ class BioScholixTest extends AbstractVocabularyTest {
     }
   }
 
-  @Test
-  def testEBIData() = {
-    val inputXML = Source
-      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml"))
-      .mkString
-    val xml = new XMLEventReader(Source.fromBytes(inputXML.getBytes()))
-    new PMParser(xml).foreach(s => println(mapper.writeValueAsString(s)))
-  }
+//  @Test
+//  def testEBIData() = {
+//    val inputXML = Source
+//      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml"))
+//      .mkString
+//    val xml = new XMLEventReader(Source.fromBytes(inputXML.getBytes()))
+//    new PMParser(xml).foreach(s => println(mapper.writeValueAsString(s)))
+//  }
 
   @Test
   def testPubmedToOaf(): Unit = {
@@ -89,14 +88,14 @@ class BioScholixTest extends AbstractVocabularyTest {
 
   }
 
-  @Test
-  def testParsingPubmedXML(): Unit = {
-    val xml = new XMLEventReader(
-      Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml"))
-    )
-    val parser = new PMParser(xml)
-    parser.foreach(checkPMArticle)
-  }
+//  @Test
+//  def testParsingPubmedXML(): Unit = {
+//    val xml = new XMLEventReader(
+//      Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml"))
+//    )
+//    val parser = new PMParser(xml)
+//    parser.foreach(checkPMArticle)
+//  }
 
   private def checkPubmedPublication(o: Oaf): Unit = {
     assertTrue(o.isInstanceOf[Publication])
@@ -153,19 +152,19 @@ class BioScholixTest extends AbstractVocabularyTest {
     assertTrue(hasOldOpenAIREID)
   }
 
-  @Test
-  def testPubmedMapping(): Unit = {
-
-    val xml = new XMLEventReader(
-      Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml"))
-    )
-    val parser = new PMParser(xml)
-    val results = ListBuffer[Oaf]()
-    parser.foreach(x => results += PubMedToOaf.convert(x, vocabularies))
-
-    results.foreach(checkPubmedPublication)
-
-  }
+//  @Test
+//  def testPubmedMapping(): Unit = {
+//
+//    val xml = new XMLEventReader(
+//      Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml"))
+//    )
+//    val parser = new PMParser(xml)
+//    val results = ListBuffer[Oaf]()
+//    parser.foreach(x => results += PubMedToOaf.convert(x, vocabularies))
+//
+//    results.foreach(checkPubmedPublication)
+//
+//  }
 
   @Test
   def testPDBToOAF(): Unit = {

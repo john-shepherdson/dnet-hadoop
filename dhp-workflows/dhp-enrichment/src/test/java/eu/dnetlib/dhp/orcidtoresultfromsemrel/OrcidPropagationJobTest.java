@@ -1,10 +1,9 @@
 
 package eu.dnetlib.dhp.orcidtoresultfromsemrel;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Dataset;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -19,12 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.cloudera.org.codehaus.jackson.map.jsontype.impl.ClassNameIdResolver;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.dnetlib.dhp.PropagationConstant;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class OrcidPropagationJobTest {
 

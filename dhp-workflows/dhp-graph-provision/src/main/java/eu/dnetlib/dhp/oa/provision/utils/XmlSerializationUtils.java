@@ -142,7 +142,7 @@ public class XmlSerializationUtils {
 	}
 
 	public static String getAttributes(final Qualifier q) {
-		if (q == null || q.isBlank())
+		if (q == null || q.hasBlankValues())
 			return "";
 
 		return new StringBuilder(" ")

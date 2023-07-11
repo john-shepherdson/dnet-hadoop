@@ -68,7 +68,7 @@ public class ReadTopics implements Serializable {
 
 		FSDataInputStream inputStream = fs.open(hdfsreadpath);
 
-		ArrayList<JsonTopic> topics = OBJECT_MAPPER
+		List<JsonTopic> topics = OBJECT_MAPPER
 			.readValue(
 				IOUtils.toString(inputStream, "UTF-8"),
 				new TypeReference<List<JsonTopic>>() {

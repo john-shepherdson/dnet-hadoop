@@ -14,6 +14,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import com.lucidworks.spark.BatchSizeType;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.Text;
@@ -156,7 +157,8 @@ public class XmlIndexingJob {
 		switch (outputFormat) {
 			case SOLR:
 				final String collection = ProvisionConstants.getCollectionName(format);
-				SolrSupport.indexDocs(zkHost, collection, batchSize, docs.rdd());
+				BatchSizeType bt = BatchSizeType.NUM_DOCS;
+				SolrSupport.indexDocs(zkHost, collection, batchSize, bt,docs.rdd());
 				break;
 			case HDFS:
 				spark

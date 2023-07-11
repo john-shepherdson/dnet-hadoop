@@ -18,9 +18,9 @@ import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
 
-import java.io.InputStream
+import java.io.{ByteArrayInputStream, InputStream}
 import scala.io.Source
-import scala.xml.pull.XMLEventReader
+//import scala.xml.pull.XMLEventReader
 
 object SparkCreateBaselineDataFrame {
 
@@ -197,8 +197,8 @@ object SparkCreateBaselineDataFrame {
       val ds: Dataset[PMArticle] = spark.createDataset(
         k.filter(i => i._1.endsWith(".gz"))
           .flatMap(i => {
-            val xml = new XMLEventReader(Source.fromBytes(i._2.getBytes()))
-            new PMParser(xml)
+//            val xml = new XMLEventReader(Source.fromBytes(i._2.getBytes()))
+            new PMParser(new ByteArrayInputStream(i._2.getBytes()))
           })
       )
       ds.map(p => (p.getPmid, p))(Encoders.tuple(Encoders.STRING, PMEncoder))

@@ -31,7 +31,7 @@ import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
-import org.json4s.Xml;
+
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
@@ -1065,7 +1065,7 @@ public class XmlRecordFactory implements Serializable {
 					metadata
 						.add(XmlSerializationUtils.asXmlElement("coderepositoryurl", re.getCodeRepositoryUrl()));
 				}
-				if (re.getResulttype() != null && re.getResulttype().isBlank()) {
+				if (re.getResulttype() != null && re.getResulttype().hasBlankValues()) {
 					metadata.add(XmlSerializationUtils.mapQualifier("resulttype", re.getResulttype()));
 				}
 				if (re.getCollectedfrom() != null) {
@@ -1092,13 +1092,13 @@ public class XmlRecordFactory implements Serializable {
 				if (isNotBlank(re.getOfficialname())) {
 					metadata.add(XmlSerializationUtils.asXmlElement("officialname", re.getOfficialname()));
 				}
-				if (re.getDatasourcetype() != null && !re.getDatasourcetype().isBlank()) {
+				if (re.getDatasourcetype() != null && !re.getDatasourcetype().hasBlankValues()) {
 					metadata.add(XmlSerializationUtils.mapQualifier("datasourcetype", re.getDatasourcetype()));
 				}
-				if (re.getDatasourcetypeui() != null && !re.getDatasourcetypeui().isBlank()) {
+				if (re.getDatasourcetypeui() != null && !re.getDatasourcetypeui().hasBlankValues()) {
 					metadata.add(XmlSerializationUtils.mapQualifier("datasourcetypeui", re.getDatasourcetypeui()));
 				}
-				if (re.getOpenairecompatibility() != null && !re.getOpenairecompatibility().isBlank()) {
+				if (re.getOpenairecompatibility() != null && !re.getOpenairecompatibility().hasBlankValues()) {
 					metadata
 						.add(
 							XmlSerializationUtils
@@ -1113,7 +1113,7 @@ public class XmlRecordFactory implements Serializable {
 					metadata
 						.add(XmlSerializationUtils.asXmlElement("legalshortname", re.getLegalshortname()));
 				}
-				if (re.getCountry() != null && !re.getCountry().isBlank()) {
+				if (re.getCountry() != null && !re.getCountry().hasBlankValues()) {
 					metadata.add(XmlSerializationUtils.mapQualifier("country", re.getCountry()));
 				}
 				break;
@@ -1127,7 +1127,7 @@ public class XmlRecordFactory implements Serializable {
 				if (isNotBlank(re.getAcronym())) {
 					metadata.add(XmlSerializationUtils.asXmlElement("acronym", re.getAcronym()));
 				}
-				if (re.getContracttype() != null && !re.getContracttype().isBlank()) {
+				if (re.getContracttype() != null && !re.getContracttype().hasBlankValues()) {
 					metadata.add(XmlSerializationUtils.mapQualifier("contracttype", re.getContracttype()));
 				}
 				if (re.getFundingtree() != null && contexts != null) {
@@ -1202,7 +1202,7 @@ public class XmlRecordFactory implements Serializable {
 				groupInstancesByUrl(((Result) entity).getInstance()).forEach(instance -> {
 					final List<String> fields = Lists.newArrayList();
 
-					if (instance.getAccessright() != null && !instance.getAccessright().isBlank()) {
+					if (instance.getAccessright() != null && !instance.getAccessright().hasBlankValues()) {
 						fields
 							.add(XmlSerializationUtils.mapQualifier("accessright", instance.getAccessright()));
 					}
@@ -1243,7 +1243,7 @@ public class XmlRecordFactory implements Serializable {
 								instance
 									.getInstancetype()
 									.stream()
-									.filter(t -> !t.isBlank())
+									.filter(t -> !t.hasBlankValues())
 									.map(t -> XmlSerializationUtils.mapQualifier("instancetype", t))
 									.collect(Collectors.toList()));
 					}
