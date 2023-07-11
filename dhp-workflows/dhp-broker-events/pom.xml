@@ -41,8 +41,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>eu.dnetlib</groupId>
-			<artifactId>dnet-pace-core</artifactId>
+			<groupId>eu.dnetlib.dhp</groupId>
+			<artifactId>dhp-pace-core</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>
