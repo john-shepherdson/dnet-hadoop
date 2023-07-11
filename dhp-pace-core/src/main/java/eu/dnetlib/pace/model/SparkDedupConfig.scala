@@ -531,7 +531,7 @@ case class SparkDedupConfig(conf: DedupConfig, numPartitions: Int) extends Seria
     new GenericRowWithSchema(values, rowDataType)
   }
 
-  val rowFromJsonUDF = udf(rowFromJson(_), rowDataType)
+  val rowFromJsonUDF = udf((json: String) => rowFromJson(json), rowDataType)
 
   def filterColumnUDF(fdef: FieldDef): UserDefinedFunction = {
 
