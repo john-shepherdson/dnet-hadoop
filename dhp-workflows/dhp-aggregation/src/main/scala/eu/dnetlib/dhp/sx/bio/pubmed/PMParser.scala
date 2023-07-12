@@ -1,12 +1,20 @@
 package eu.dnetlib.dhp.sx.bio.pubmed
 
-import javax.xml.stream.{ XMLInputFactory, XMLEventReader, XMLStreamConstants }
+import javax.xml.stream.{XMLEventReader, XMLInputFactory, XMLStreamConstants}
+import scala.language.postfixOps
 import scala.xml.MetaData
 //import scala.xml.pull.{EvElemEnd, EvElemStart, EvText, XMLEventReader}
 
 /** @param xml
   */
 class PMParser(stream: java.io.InputStream) extends Iterator[PMArticle] {
+
+  private val reader: XMLEventReader = {
+    println("INSTANTIATE READER")
+    val factory = XMLInputFactory.newInstance()
+    factory.createXMLEventReader(stream)
+
+  }
 
   var currentArticle: PMArticle = generateNextArticle()
 
@@ -18,11 +26,7 @@ class PMParser(stream: java.io.InputStream) extends Iterator[PMArticle] {
     tmp
   }
 
-  private val reader: XMLEventReader = {
-    val factory = XMLInputFactory.newInstance()
-    factory.createXMLEventReader(stream)
 
-  }
 
   def extractAttributes(attrs: MetaData, key: String): String = {
 
@@ -56,13 +60,63 @@ class PMParser(stream: java.io.InputStream) extends Iterator[PMArticle] {
     var currentMonth = "01"
     var currentDay = "01"
     var currentArticleType: String = null
-
-    while (reader.hasNext) {
+    var sb = new StringBuilder()
+    var insideChar = false
+    var complete = false
+    while (reader.hasNext && !complete) {
 
       val next = reader.nextEvent()
 
+      if (next.isStartElement) {
+        if(insideChar) {
+          if (sb.nonEmpty)
+            println(s"got data ${sb.toString.trim}")
+          insideChar = false
+        }
+        val name = next.asStartElement().getName.getLocalPart
+        println(s"Start Element $name")
+        next.asStartElement().getAttributes.forEachRemaining(e => print(e.toString))
+        
+      } else  if (next.isEndElement) {
+        if (insideChar) {
+          if (sb.nonEmpty)
+            println(s"got data ${sb.toString.trim}")
+          insideChar = false
+        }
+        val name = next.asEndElement().getName.getLocalPart
+        println(s"End Element $name")
+        if (name.equalsIgnoreCase("PubmedArticle")) {
+          complete = true
+          println("Condizione di uscita")
+        }
 
+       } else if (next.isCharacters) {
+        if (!insideChar) {
+          insideChar = true
+          sb.clear()
+        }
+        val d = next.asCharacters().getData
+        if (d.trim.nonEmpty)
+            sb.append(d.trim)
+      }
+
+
+
+//      next match {
+//        case _ if (next.isStartElement) =>
+//          val name = next.asStartElement().getName.getLocalPart
+//          println(s"Start Element $name")
+//        case _ if (next.isEndElement) =>
+//          val name = next.asStartElement().getName.getLocalPart
+//          println(s"End Element $name")
+//        case _ if (next.isCharacters) =>
+//          val c = next.asCharacters()
+//          val data = c.getData
+//          println(s"Text value $data")
 //
+//      }
+
+        //
 //
 //      reader.next match {
 //

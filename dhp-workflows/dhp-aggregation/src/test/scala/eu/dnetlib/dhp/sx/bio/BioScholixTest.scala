@@ -5,7 +5,7 @@ import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest
 import eu.dnetlib.dhp.schema.oaf.utils.PidType
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Publication, Relation, Result}
 import eu.dnetlib.dhp.sx.bio.BioDBToOAF.ScholixResolved
-import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMSubject, PubMedToOaf}
+import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMParser, PMSubject, PubMedToOaf, PubmedParser}
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.parse
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.{BeforeEach, Test}
 import org.mockito.junit.jupiter.MockitoExtension
 
-import java.io.{BufferedReader, InputStream, InputStreamReader}
+import java.io.{BufferedReader, FileInputStream, InputStream, InputStreamReader}
 import java.util.zip.GZIPInputStream
 import scala.collection.JavaConverters._
 import scala.io.Source
@@ -46,14 +46,15 @@ class BioScholixTest extends AbstractVocabularyTest {
     }
   }
 
-//  @Test
-//  def testEBIData() = {
-//    val inputXML = Source
-//      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml"))
-//      .mkString
-//    val xml = new XMLEventReader(Source.fromBytes(inputXML.getBytes()))
-//    new PMParser(xml).foreach(s => println(mapper.writeValueAsString(s)))
-//  }
+  @Test
+  def testEBIData() = {
+    val inputXML = getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml")
+
+
+   // new PubmedParser(new GZIPInputStream(new FileInputStream("/Users/sandro/Downloads/pubmed23n1078.xml.gz")))
+    new PMParser(new GZIPInputStream(new FileInputStream("/Users/sandro/Downloads/pubmed23n1078.xml.gz")))
+    print("DONE")
+  }
 
   @Test
   def testPubmedToOaf(): Unit = {
