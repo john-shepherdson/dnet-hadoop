@@ -14,6 +14,7 @@ export SCRIPT_PATH2=$5
 export SCRIPT_PATH3=$6
 export SCRIPT_PATH4=$7
 export SCRIPT_PATH5=$8
+export SCRIPT_PATH6=$9
 
 export HIVE_OPTS="-hiveconf mapred.job.queue.name=analytics -hiveconf hive.spark.client.connect.timeout=120000ms -hiveconf hive.spark.client.server.connect.timeout=300000ms -hiveconf spark.executor.memory=19166291558 -hiveconf spark.yarn.executor.memoryOverhead=3225 -hiveconf spark.driver.memory=11596411699 -hiveconf spark.yarn.driver.memoryOverhead=1228"
 export HADOOP_USER_NAME="oozie"
@@ -33,12 +34,19 @@ hdfs dfs -copyToLocal $7
 echo "Getting file from " $8
 hdfs dfs -copyToLocal $8
 
+echo "Getting file from " $9
+hdfs dfs -copyToLocal $9
+
+
 echo "Creating monitor database"
+cat step20-createMonitorDBAll.sql | sed "s/SOURCE/openaire_prod_stats_20230707/g" | sed "s/TARGET/openaire_prod_stats_monitor_20230707/g1" > foo
+hive $HIVE_OPTS -f foo
+
 cat step20-createMonitorDB_funded.sql | sed "s/SOURCE/$1/g" | sed "s/TARGET/$2_funded/g1" > foo
 hive $HIVE_OPTS -f foo
 cat step20-createMonitorDB.sql | sed "s/SOURCE/$1/g" | sed "s/TARGET/$2_funded/g1" > foo
 hive $HIVE_OPTS -f foo
-#
+
 cat step20-createMonitorDB_institutions.sql | sed "s/SOURCE/$1/g" | sed "s/TARGET/$2_institutions/g1" > foo
 hive $HIVE_OPTS -f foo
 cat step20-createMonitorDB.sql | sed "s/SOURCE/$1/g" | sed "s/TARGET/$2_institutions/g1" > foo
@@ -56,13 +64,19 @@ do
   hive $HIVE_OPTS -f foo
 done
 
-
-cat step20-createMonitorDB_RIs_tail.sql | sed "s/SOURCE/$1/g" | sed "s/TARGET/$2_RIs_tail/g1" | sed "s/CONTEXTS/\"'knowmad::other','dh-ch::other', 'enermaps::other', 'gotriple::other', 'neanias-atmospheric::other', 'rural-digital-europe::other', 'covid-19::other', 'aurora::other', 'neanias-space::other', 'north-america-studies::other', 'north-american-studies::other', 'eutopia::other'\"/g" > foo
+cat step20-createMonitorDB_RIs_tail.sql | sed "s/SOURCE/$1/g" | sed "s/TARGET/$2_ris_tail/g1" | sed "s/CONTEXTS/\"'knowmad::other','dh-ch::other', 'enermaps::other', 'gotriple::other', 'neanias-atmospheric::other', 'rural-digital-europe::other', 'covid-19::other', 'aurora::other', 'neanias-space::other', 'north-america-studies::other', 'north-american-studies::other', 'eutopia::other'\"/g" > foo
 hive $HIVE_OPTS -f foo
-cat step20-createMonitorDB.sql | sed "s/SOURCE/$1/g" | sed "s/TARGET/$2_RIs_tail/g1" > foo
+cat step20-createMonitorDB.sql | sed "s/SOURCE/$1/g" | sed "s/TARGET/$2_ris_tail/g1" > foo
 hive $HIVE_OPTS -f foo
 
 echo "Hive shell finished"
+
+echo "Updating shadow monitor all database"
+hive -e "drop database if exists ${SHADOW} cascade"
+hive -e "create database if not exists ${SHADOW}"
+hive $HIVE_OPTS --database ${2} -e "show tables" | grep -v WARN | sed "s/\(.*\)/create view ${SHADOW}.\1 as select * from ${2}.\1;/" > foo
+hive -f foo
+echo "Updated shadow monitor all database"
 
 echo "Updating shadow monitor funded database"
 hive -e "drop database if exists ${SHADOW}_funded cascade"

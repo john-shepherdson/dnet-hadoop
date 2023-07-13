@@ -317,15 +317,12 @@
     </action>
 
     <action name="Step16-createIndicatorsTables">
-        <shell xmlns="uri:oozie:shell-action:0.1">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <exec>indicators.sh</exec>
-            <argument>${stats_db_name}</argument>
-            <argument>${external_stats_db_name}</argument>
-            <argument>${wf:appPath()}/scripts/step16-createIndicatorsTables.sql</argument>
-            <file>indicators.sh</file>
-        </shell>
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
+            <jdbc-url>${hive_jdbc_url}</jdbc-url>
+            <script>scripts/step16-createIndicatorsTables.sql</script>
+            <param>stats_db_name=${stats_db_name}</param>
+            <param>external_stats_db_name=${external_stats_db_name}</param>
+        </hive2>
         <ok to="Step16_1-definitions"/>
         <error to="Kill"/>
     </action>
@@ -378,6 +375,7 @@
             <argument>${wf:appPath()}/scripts/step20-createMonitorDB_institutions.sql</argument>
             <argument>${wf:appPath()}/scripts/step20-createMonitorDB_RIs.sql</argument>
             <argument>${wf:appPath()}/scripts/step20-createMonitorDB_RIs_tail.sql</argument>
+            <argument>${wf:appPath()}/scripts/step20-createMonitorDBAll.sql</argument>
             <file>monitor.sh</file>
         </shell>
         <ok to="step21-createObservatoryDB-pre"/>
@@ -469,7 +467,7 @@
             <argument>${usage_stats_db_shadow_name}</argument>
             <file>finalizeImpalaCluster.sh</file>
         </shell>
-        <ok to="Step24-updateCache"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 

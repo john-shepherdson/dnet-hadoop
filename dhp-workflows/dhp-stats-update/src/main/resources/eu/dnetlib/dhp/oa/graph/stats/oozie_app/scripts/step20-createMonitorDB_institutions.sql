@@ -42,7 +42,7 @@ create table TARGET.result stored as parquet as
              'openorgs____::31f2fa9e05b49d4cf40a19c3fed8eb06',	-- Saints Cyril and Methodius University of Skopje
              'openorgs____::db7686f30f22cbe73a4fde872ce812a6', -- University of Milan
              'openorgs____::b8b8ca674452579f3f593d9f5e557483',   -- University College Cork
-             'openorgs____::38d7097854736583dde879d12dacafca'	-- Brown University
+             'openorgs____::38d7097854736583dde879d12dacafca',	-- Brown University
              'openorgs____::57784c9e047e826fefdb1ef816120d92', --Arts et Métiers ParisTech
              'openorgs____::2530baca8a15936ba2e3297f2bce2e7e',	-- University of Cape Town
              'openorgs____::d11f981828c485cd23d93f7f24f24db1',  -- Technological University Dublin
@@ -52,7 +52,10 @@ create table TARGET.result stored as parquet as
              'openorgs____::66aa9fc2fceb271423dfabcc38752dc0',  -- Lund University
              'openorgs____::3cff625a4370d51e08624cc586138b2f',	-- IMT Atlantique
              'openorgs____::c0b262bd6eab819e4c994914f9c010e2',   -- National Institute of Geophysics and Volcanology
-             'openorgs____::1624ff7c01bb641b91f4518539a0c28a'     -- Vrije Universiteit Amsterdam
+             'openorgs____::1624ff7c01bb641b91f4518539a0c28a',     -- Vrije Universiteit Amsterdam
+             'openorgs____::4d4051b56708688235252f1d8fddb8c1',	 --Iscte - Instituto Universitário de Lisboa
+             'openorgs____::ab4ac74c35fa5dada770cf08e5110fab'	-- Universidade Católica Portuguesa
+
         )))  foo;
 
-ANALYZE TABLE TARGET.result COMPUTE STATISTICS;
+--ANALYZE TABLE TARGET.result COMPUTE STATISTICS;
