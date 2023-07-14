@@ -13,7 +13,8 @@ import eu.dnetlib.pace.clustering.NGramUtils;
 public class RowDataOrderingComparator implements Comparator<Row> {
 
 	/** The comparator field. */
-	private int comparatorField;
+	private final int comparatorField;
+	private final int identityFieldPosition;
 
 	/**
 	 * Instantiates a new map document comparator.
@@ -21,8 +22,9 @@ public class RowDataOrderingComparator implements Comparator<Row> {
 	 * @param comparatorField
 	 *            the comparator field
 	 */
-	public RowDataOrderingComparator(final int comparatorField) {
+	public RowDataOrderingComparator(final int comparatorField, int identityFieldPosition) {
 		this.comparatorField = comparatorField;
+		this.identityFieldPosition = identityFieldPosition;
 	}
 
 	/*
@@ -51,7 +53,10 @@ public class RowDataOrderingComparator implements Comparator<Row> {
 
 		int res = to1.compareTo(to2);
 		if (res == 0) {
-			return o1.compareTo(o2);
+			res = o1.compareTo(o2);
+			if (res == 0) {
+				return d1.getString(identityFieldPosition).compareTo(d2.getString(identityFieldPosition));
+			}
 		}
 
 		return res;

@@ -85,7 +85,7 @@ class DSLExample(parser: ArgumentApplicationParser, spark: SparkSession) extends
           (b:Row) => {
             val documents = b.getList(1)
             val mapDocuments = documents.stream
-              .sorted(new RowDataOrderingComparator(sparkConfig.orderingFieldPosition))
+              .sorted(new RowDataOrderingComparator(sparkConfig.orderingFieldPosition, sparkConfig.identityFieldPosition))
               .limit(dedupConf.getWf.getQueueMaxSize)
               .collect(Collectors.toList)
             new BlockStats(

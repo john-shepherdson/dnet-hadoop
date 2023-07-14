@@ -105,7 +105,9 @@ public class SparkBlockStats extends AbstractSparkAction {
 
 				List<Row> mapDocuments = documents
 					.stream()
-					.sorted(new RowDataOrderingComparator(sparkConfig.orderingFieldPosition()))
+					.sorted(
+						new RowDataOrderingComparator(sparkConfig.orderingFieldPosition(),
+							sparkConfig.identityFieldPosition()))
 					.limit(dedupConf.getWf().getQueueMaxSize())
 					.collect(Collectors.toList());
 
