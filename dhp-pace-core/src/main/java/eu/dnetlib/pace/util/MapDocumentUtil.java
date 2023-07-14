@@ -3,6 +3,7 @@ package eu.dnetlib.pace.util;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -12,6 +13,8 @@ import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.spi.cache.Cache;
+import com.jayway.jsonpath.spi.cache.CacheProvider;
 
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.config.Type;
@@ -23,47 +26,20 @@ public class MapDocumentUtil {
 	public static final String URL_REGEX = "^(http|https|ftp)\\://.*";
 	public static Predicate<String> urlFilter = s -> s.trim().matches(URL_REGEX);
 
-	public static List<String> getJPathList(String path, String json, Type type) {
-		if (type == Type.List)
-			return JsonPath
-				.using(
-					Configuration
-						.defaultConfiguration()
-						.addOptions(Option.ALWAYS_RETURN_LIST, Option.SUPPRESS_EXCEPTIONS))
-				.parse(json)
-				.read(path);
-		Object jresult;
-		List<String> result = new ArrayList<>();
-		try {
-			jresult = JsonPath.read(json, path);
-		} catch (Throwable e) {
-			return result;
-		}
-		if (jresult instanceof JSONArray) {
+	static {
+		CacheProvider.setCache(new Cache() {
+			private final ConcurrentHashMap<String, JsonPath> jsonPathCache = new ConcurrentHashMap();
 
-			((JSONArray) jresult).forEach(it -> {
-
-				try {
-					result.add(new ObjectMapper().writeValueAsString(it));
-				} catch (JsonProcessingException e) {
-
-				}
-			});
-			return result;
-		}
-
-		if (jresult instanceof LinkedHashMap) {
-			try {
-				result.add(new ObjectMapper().writeValueAsString(jresult));
-			} catch (JsonProcessingException e) {
-
+			@Override
+			public JsonPath get(String key) {
+				return jsonPathCache.get(key);
 			}
-			return result;
-		}
-		if (jresult instanceof String) {
-			result.add((String) jresult);
-		}
-		return result;
+
+			@Override
+			public void put(String key, JsonPath value) {
+				jsonPathCache.put(key, value);
+			}
+		});
 	}
 
 	public static String getJPathString(final String jsonPath, final String json) {
