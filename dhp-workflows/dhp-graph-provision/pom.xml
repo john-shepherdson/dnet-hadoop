@@ -14,7 +14,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>4.0.1</version>
+                <version>${net.alchim31.maven.version}</version>
                 <executions>
                     <execution>
                         <id>scala-compile-first</id>
@@ -37,6 +37,8 @@
                         <arg>-Xmax-classfile-name</arg>
                         <arg>200</arg>
                     </args>
+                    <failOnMultipleScalaVersions>true</failOnMultipleScalaVersions>
+                    <scalaCompatVersion>${scala.binary.version}</scalaCompatVersion>
                     <scalaVersion>${scala.version}</scalaVersion>
                 </configuration>
             </plugin>
@@ -48,11 +50,11 @@
 
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.11</artifactId>
+            <artifactId>spark-core_${scala.binary.version}</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_2.11</artifactId>
+            <artifactId>spark-sql_${scala.binary.version}</artifactId>
         </dependency>
         <dependency>
             <groupId>com.jayway.jsonpath</groupId>
