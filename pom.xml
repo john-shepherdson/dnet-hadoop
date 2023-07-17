@@ -867,7 +867,7 @@
 		<dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>
 		<dhp.spark.version>3.4.1</dhp.spark.version>
 		<dhp.jackson.version>2.14.2</dhp.jackson.version>
-		<dhp.commons.lang.version>3.5</dhp.commons.lang.version>
+		<dhp.commons.lang.version>3.12.0</dhp.commons.lang.version>
 		<dhp.site.skip>true</dhp.site.skip>
 		<dhp.guava.version>11.0.2</dhp.guava.version>
 		<scala.version>2.12.18</scala.version>
