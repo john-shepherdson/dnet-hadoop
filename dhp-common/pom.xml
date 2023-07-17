@@ -60,6 +60,11 @@
 	</build>
 
 	<dependencies>
+		<dependency>
+			<groupId>eu.dnetlib.dhp</groupId>
+			<artifactId>dhp-pace-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
@@ -140,11 +145,6 @@
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>eu.dnetlib.dhp</groupId>
-			<artifactId>dhp-pace-core</artifactId>
 		</dependency>
 
 		<dependency>

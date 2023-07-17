@@ -1,16 +1,15 @@
 
 package eu.dnetlib.dhp.oa.dedup.jpath;
 
-import java.io.IOException;
-
+import eu.dnetlib.pace.config.DedupConfig;
+import eu.dnetlib.pace.model.SparkModel;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.sql.Row;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.StringUtils;
 
-import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.model.SparkDedupConfig;
+import java.io.IOException;
 
 class JsonPathTest {
 
@@ -22,7 +21,7 @@ class JsonPathTest {
 
 		final String org = IOUtils.toString(getClass().getResourceAsStream("organization.json"));
 
-		Row row = SparkDedupConfig.apply(conf, 1).rowFromJson(org);
+		Row row = SparkModel.apply(conf).rowFromJson(org);
 
 		Assertions.assertNotNull(row);
 		Assertions.assertTrue(StringUtils.isNotBlank(row.getAs("identifier")));

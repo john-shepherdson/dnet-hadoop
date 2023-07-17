@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.oa.dedup.dsl
+package eu.dnetlib.pace.dsl
 
 case class Clustering(name: String = "",
                  fields: Seq[String] = Seq(),

@@ -389,11 +389,6 @@
 			</dependency>
 
 			<dependency>
-				<groupId>eu.dnetlib.dhp</groupId>
-				<artifactId>dhp-pace-core</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>eu.dnetlib</groupId>
 				<artifactId>cnr-rmi-api</artifactId>
 				<version>${cnr-rmi-api.version}</version>

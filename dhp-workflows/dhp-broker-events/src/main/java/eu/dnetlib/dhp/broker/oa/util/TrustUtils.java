@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.model.SparkDedupConfig;
+import eu.dnetlib.pace.model.SparkDeduper;
 import eu.dnetlib.pace.tree.support.TreeProcessor;
 
 public class TrustUtils {
@@ -20,7 +20,7 @@ public class TrustUtils {
 
 	private static DedupConfig dedupConfig;
 
-	private static SparkDedupConfig sparkDedupConfig;
+	private static SparkDeduper deduper;
 
 	private static final ObjectMapper mapper;
 
@@ -31,7 +31,7 @@ public class TrustUtils {
 				.readValue(
 					DedupConfig.class.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/dedupConfig/dedupConfig.json"),
 					DedupConfig.class);
-			sparkDedupConfig = new SparkDedupConfig(dedupConfig, 1);
+			deduper = new SparkDeduper(dedupConfig);
 		} catch (final IOException e) {
 			log.error("Error loading dedupConfig, e");
 		}
@@ -47,8 +47,8 @@ public class TrustUtils {
 		}
 
 		try {
-			final Row doc1 = sparkDedupConfig.rowFromJson().apply(mapper.writeValueAsString(r1));
-			final Row doc2 = sparkDedupConfig.rowFromJson().apply(mapper.writeValueAsString(r2));
+			final Row doc1 = deduper.model().rowFromJson(mapper.writeValueAsString(r1));
+			final Row doc2 = deduper.model().rowFromJson(mapper.writeValueAsString(r2));
 
 			final double score = new TreeProcessor(dedupConfig).computeScore(doc1, doc2);
 

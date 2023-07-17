@@ -64,10 +64,6 @@
                     <artifactId>dnet-openaireplus-mapping-utils</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>eu.dnetlib</groupId>
-                    <artifactId>dnet-index-solr-common</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>saxonica</groupId>
                     <artifactId>saxon</artifactId>
                 </exclusion>

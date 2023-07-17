@@ -1,9 +1,15 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
-import java.io.IOException;
-import java.util.Optional;
-
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.application.dedup.log.DedupLogModel;
+import eu.dnetlib.dhp.application.dedup.log.DedupLogWriter;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import eu.dnetlib.pace.config.DedupConfig;
+import eu.dnetlib.pace.model.SparkDeduper;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
@@ -15,15 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.application.dedup.log.DedupLogModel;
-import eu.dnetlib.dhp.application.dedup.log.DedupLogWriter;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.utils.ISLookupClientFactory;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.model.SparkDedupConfig;
+import java.io.IOException;
+import java.util.Optional;
 
 public class SparkCreateSimRels extends AbstractSparkAction {
 
@@ -84,20 +83,15 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 
 			JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-			SparkDedupConfig sparkConfig = new SparkDedupConfig(dedupConf, numPartitions);
+			SparkDeduper deduper = new SparkDeduper(dedupConf);
 
-			spark.udf().register("collect_sort_slice", sparkConfig.collectSortSliceUDAF());
-
-			Dataset<?> simRels = spark
-				.read()
-				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
-				.transform(sparkConfig.modelExtractor()) // Extract fields from input json column according to model
-				// definition
-				.transform(sparkConfig.generateClustersWithWindows()) // generate <key,block> pairs according to
-				// filters, clusters, and model
-				// definition
-				.transform(sparkConfig.processClusters()) // process blocks and emits <from,to> pairs of found
-				// similarities
+			Dataset<?> simRels =
+					spark
+							.read()
+							.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
+							.transform(deduper.model().parseJsonDataset())
+							.transform(deduper.dedup())
+							.distinct()
 				.map(
 					(MapFunction<Row, Relation>) t -> DedupUtility
 						.createSimRel(t.getStruct(0).getString(0), t.getStruct(0).getString(1), entity),

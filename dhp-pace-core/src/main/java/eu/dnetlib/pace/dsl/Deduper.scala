@@ -1,4 +1,4 @@
-package eu.dnetlib.dhp.oa.dedup.dsl
+package eu.dnetlib.pace.dsl
 
 import org.apache.spark.sql.types.StructType
 

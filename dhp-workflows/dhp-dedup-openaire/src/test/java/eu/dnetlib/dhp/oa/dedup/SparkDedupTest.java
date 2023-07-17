@@ -136,12 +136,6 @@ public class SparkDedupTest implements Serializable {
 
 	@Test
 	@Order(1)
-	void createSimRelsTestTwice() throws Exception {
-		createSimRelsTest();
-	}
-
-	@Test
-	@Order(1)
 	void createSimRelsTest() throws Exception {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(

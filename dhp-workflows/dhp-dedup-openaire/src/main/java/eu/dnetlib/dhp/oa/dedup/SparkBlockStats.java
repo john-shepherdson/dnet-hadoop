@@ -26,7 +26,7 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.model.RowDataOrderingComparator;
-import eu.dnetlib.pace.model.SparkDedupConfig;
+import eu.dnetlib.pace.model.SparkDeduper;
 
 public class SparkBlockStats extends AbstractSparkAction {
 
@@ -90,14 +90,14 @@ public class SparkBlockStats extends AbstractSparkAction {
 
 			JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-			SparkDedupConfig sparkConfig = new SparkDedupConfig(dedupConf, numPartitions);
+			SparkDeduper deduper = new SparkDeduper(dedupConf);
 
-			Dataset<Row> inputDF = spark
+			Dataset<Row> simRels = spark
 				.read()
 				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
-				.transform(sparkConfig.modelExtractor());
-			Dataset<Row> simRels = inputDF
-				.transform(sparkConfig.generateClusters())
+				.transform(deduper.model().parseJsonDataset())
+				.transform(deduper.filterAndCleanup())
+				.transform(deduper.generateClustersWithCollect())
 				.filter(functions.size(new Column("block")).geq(new Literal(1, DataTypes.IntegerType)));
 
 			simRels.map((MapFunction<Row, BlockStats>) b -> {
@@ -106,8 +106,8 @@ public class SparkBlockStats extends AbstractSparkAction {
 				List<Row> mapDocuments = documents
 					.stream()
 					.sorted(
-						new RowDataOrderingComparator(sparkConfig.orderingFieldPosition(),
-							sparkConfig.identityFieldPosition()))
+						new RowDataOrderingComparator(deduper.model().orderingFieldPosition(),
+							deduper.model().identityFieldPosition()))
 					.limit(dedupConf.getWf().getQueueMaxSize())
 					.collect(Collectors.toList());
 
