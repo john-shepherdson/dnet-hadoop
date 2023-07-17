@@ -3,7 +3,6 @@ package eu.dnetlib.dhp.actionmanager;
 
 import java.util.Optional;
 
-import eu.dnetlib.dhp.common.HdfsSupport;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -12,6 +11,7 @@ import org.apache.spark.sql.SparkSession;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.schema.oaf.Subject;
@@ -94,6 +94,7 @@ public class Constants {
 		return s;
 
 	}
+
 	public static void removeOutputDir(SparkSession spark, String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}
