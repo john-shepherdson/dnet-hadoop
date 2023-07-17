@@ -79,7 +79,6 @@
         <error to="Kill"/>
     </action>
 
-
     <action name="atomicactions">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>

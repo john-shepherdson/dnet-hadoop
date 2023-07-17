@@ -46,7 +46,7 @@ public class PrepareAffiliationRelations implements Serializable {
     private static final String ID_PREFIX = "50|doi_________::";
     public static final String BIP_AFFILIATIONS_CLASSID = "result:organization:bipinference";
     public static final String BIP_AFFILIATIONS_CLASSNAME = "Affiliation relation inferred by BIP!";
-    public static final String BIP_INFERENCE_PROVENANCE = "bip_affiliation";
+    public static final String BIP_INFERENCE_PROVENANCE = "bip:affiliation:crossref";
 
     public static <I extends Result> void main(String[] args) throws Exception {
 

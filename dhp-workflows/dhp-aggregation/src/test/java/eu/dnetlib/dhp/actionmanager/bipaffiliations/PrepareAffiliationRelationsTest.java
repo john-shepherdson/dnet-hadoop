@@ -94,11 +94,11 @@ public class PrepareAffiliationRelationsTest {
             .map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
             .map(aa -> ((Relation) aa.getPayload()));
 
-        for (Relation r : tmp.collect()) {
-            System.out.println(
-                    r.getSource() + "\t" + r.getTarget() + "\t" + r.getRelType() + "\t" + r.getRelClass() + "\t" + r.getSubRelType() + "\t" + r.getValidationDate() + "\t" + r.getDataInfo().getTrust() + "\t" + r.getDataInfo().getInferred()
-            );
-        }
+//        for (Relation r : tmp.collect()) {
+//            System.out.println(
+//                    r.getSource() + "\t" + r.getTarget() + "\t" + r.getRelType() + "\t" + r.getRelClass() + "\t" + r.getSubRelType() + "\t" + r.getValidationDate() + "\t" + r.getDataInfo().getTrust() + "\t" + r.getDataInfo().getInferred()
+//            );
+//        }
         // count the number of relations
         assertEquals(16, tmp.count());
 
