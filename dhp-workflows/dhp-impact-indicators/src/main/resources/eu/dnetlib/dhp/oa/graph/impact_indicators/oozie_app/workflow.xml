@@ -340,19 +340,12 @@
 
 	</action>
 
-<<<<<<< HEAD
 	<!-- Removed for ser -->
 	<!--
 	 JOIN ITERATIVE METHODS AND THEN END =
 	<join name="join-iterative-rankings" to="end" />
 	to="get-file-names"/>  
 	-->
-=======
-	<!-- JOIN ITERATIVE METHODS AND THEN END -->
-	<join name="join-iterative-rankings" to="get-file-names" />
-	<!-- to="get-file-names"/> -->
->>>>>>> 60f25b780de1c456762003cbb8b0011c9c82f93d
-
 
 	<!-- This will be a shell action that will output key-value pairs for output files -->
 	<action name="get-file-names">
