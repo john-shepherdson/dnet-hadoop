@@ -6,12 +6,12 @@ import java.util.Map;
 import com.wcohen.ss.AbstractStringDistance;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractStringComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 //case class JaroWinkler(w: Double) extends SecondStringDistanceAlgo(w, new com.wcohen.ss.JaroWinkler())
 @ComparatorClass("jaroWinklerTitle")
-public class JaroWinklerTitle extends AbstractComparator {
+public class JaroWinklerTitle extends AbstractStringComparator {
 
 	public JaroWinklerTitle(Map<String, String> params) {
 		super(params, new com.wcohen.ss.JaroWinkler());

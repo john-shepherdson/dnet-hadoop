@@ -28,6 +28,10 @@ public class PaceConfig extends AbstractPaceFunctions implements Serializable {
 	@JsonIgnore
 	private Map<String, String> translationMap;
 
+	public Map<String, FieldDef> getModelMap() {
+		return modelMap;
+	}
+
 	@JsonIgnore
 	private Map<String, FieldDef> modelMap;
 
@@ -101,13 +105,4 @@ public class PaceConfig extends AbstractPaceFunctions implements Serializable {
 	public void setSynonyms(Map<String, List<String>> synonyms) {
 		this.synonyms = synonyms;
 	}
-
-	public Map<String, FieldDef> getModelMap() {
-		return modelMap;
-	}
-
-	public void setModelMap(final Map<String, FieldDef> modelMap) {
-		this.modelMap = modelMap;
-	}
-
 }

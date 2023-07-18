@@ -3,9 +3,9 @@ package eu.dnetlib.pace.tree.support;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.spark.sql.Row;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.MapDocument;
 import eu.dnetlib.pace.util.PaceException;
 
 /**
@@ -21,72 +21,72 @@ public class TreeProcessor {
 		this.config = config;
 	}
 
-	public boolean compare(final MapDocument a, final MapDocument b) {
+	// row based copies
+
+	public boolean compare(final Row a, final Row b) {
 		// evaluate the decision tree
 		return evaluateTree(a, b).getResult() == MatchType.MATCH;
 	}
 
-	public TreeStats evaluateTree(final MapDocument doc1, final MapDocument doc2) {
+	public TreeStats evaluateTree(final Row doc1, final Row doc2) {
 
 		TreeStats treeStats = new TreeStats();
 
-		String current = "start";
+		String nextNodeName = "start";
 
-		while (MatchType.parse(current) == MatchType.UNDEFINED) {
+		do {
 
-			TreeNodeDef currentNode = config.decisionTree().get(current);
+			TreeNodeDef currentNode = config.decisionTree().get(nextNodeName);
 			// throw an exception if the node doesn't exist
 			if (currentNode == null)
-				throw new PaceException("Missing tree node: " + current);
+				throw new PaceException("Missing tree node: " + nextNodeName);
 
 			TreeNodeStats stats = currentNode.evaluate(doc1, doc2, config);
-			treeStats.addNodeStats(current, stats);
+			treeStats.addNodeStats(nextNodeName, stats);
 
 			// if ignoreUndefined=false the miss is considered as undefined
 			if (!currentNode.isIgnoreUndefined() && stats.undefinedCount() > 0) {
-				current = currentNode.getUndefined();
+				nextNodeName = currentNode.getUndefined();
 			}
 			// if ignoreUndefined=true the miss is ignored and the score computed anyway
 			else if (stats.getFinalScore(currentNode.getAggregation()) >= currentNode.getThreshold()) {
-				current = currentNode.getPositive();
+				nextNodeName = currentNode.getPositive();
 			} else {
-				current = currentNode.getNegative();
+				nextNodeName = currentNode.getNegative();
 			}
 
-		}
+		} while (MatchType.parse(nextNodeName) == MatchType.UNDEFINED);
 
-		treeStats.setResult(MatchType.parse(current));
+		treeStats.setResult(MatchType.parse(nextNodeName));
 		return treeStats;
 	}
 
-	public double computeScore(final MapDocument doc1, final MapDocument doc2) {
-		String current = "start";
+	public double computeScore(final Row doc1, final Row doc2) {
+		String nextNodeName = "start";
 		double score = 0.0;
 
-		while (MatchType.parse(current) == MatchType.UNDEFINED) {
+		do {
 
-			TreeNodeDef currentNode = config.decisionTree().get(current);
+			TreeNodeDef currentNode = config.decisionTree().get(nextNodeName);
 			// throw an exception if the node doesn't exist
 			if (currentNode == null)
-				throw new PaceException("The Tree Node doesn't exist: " + current);
+				throw new PaceException("The Tree Node doesn't exist: " + nextNodeName);
 
 			TreeNodeStats stats = currentNode.evaluate(doc1, doc2, config);
 
 			score = stats.getFinalScore(currentNode.getAggregation());
 			// if ignoreUndefined=false the miss is considered as undefined
 			if (!currentNode.isIgnoreUndefined() && stats.undefinedCount() > 0) {
-				current = currentNode.getUndefined();
+				nextNodeName = currentNode.getUndefined();
 			}
 			// if ignoreUndefined=true the miss is ignored and the score computed anyway
 			else if (stats.getFinalScore(currentNode.getAggregation()) >= currentNode.getThreshold()) {
-				current = currentNode.getPositive();
+				nextNodeName = currentNode.getPositive();
 			} else {
-				current = currentNode.getNegative();
+				nextNodeName = currentNode.getNegative();
 			}
-
-		}
+		} while (MatchType.parse(nextNodeName) == MatchType.UNDEFINED);
 
 		return score;
 	}
-
 }

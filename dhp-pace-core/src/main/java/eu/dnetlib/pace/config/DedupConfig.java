@@ -4,18 +4,19 @@ package eu.dnetlib.pace.config;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import org.antlr.stringtemplate.StringTemplate;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,9 +28,6 @@ import eu.dnetlib.pace.tree.support.TreeNodeDef;
 import eu.dnetlib.pace.util.PaceException;
 
 public class DedupConfig implements Config, Serializable {
-
-	private static final Log log = LogFactory.getLog(DedupConfig.class);
-
 	private static String CONFIG_TEMPLATE = "dedupConfig.st";
 
 	private PaceConfig pace;
@@ -37,7 +35,7 @@ public class DedupConfig implements Config, Serializable {
 	private WfConfig wf;
 
 	@JsonIgnore
-	private Map<String, List<Pattern>> blacklists;
+	private Map<String, Predicate<String>> blacklists;
 
 	private static Map<String, String> defaults = Maps.newHashMap();
 
@@ -72,19 +70,29 @@ public class DedupConfig implements Config, Serializable {
 				.getBlacklists()
 				.entrySet()
 				.stream()
+				.map(
+					e -> new AbstractMap.SimpleEntry<String, List<Pattern>>(e.getKey(),
+						e
+							.getValue()
+							.stream()
+							.filter(s -> !StringUtils.isBlank(s))
+							.map(Pattern::compile)
+							.collect(Collectors.toList())))
 				.collect(
 					Collectors
 						.toMap(
 							e -> e.getKey(),
-							e -> e
+							e -> (Predicate<String> & Serializable) s -> e
 								.getValue()
 								.stream()
-								.filter(s -> !StringUtils.isBlank(s))
-								.map(Pattern::compile)
-								.collect(Collectors.toList())));
+								.filter(p -> p.matcher(s).matches())
+								.findFirst()
+								.isPresent()))
+
+			;
 
 			return config;
-		} catch (IOException e) {
+		} catch (IOException | PatternSyntaxException e) {
 			throw new PaceException("Error in parsing configuration json", e);
 		}
 
@@ -153,17 +161,12 @@ public class DedupConfig implements Config, Serializable {
 	}
 
 	@Override
-	public Map<String, FieldDef> modelMap() {
-		return getPace().getModelMap();
-	}
-
-	@Override
 	public List<ClusteringDef> clusterings() {
 		return getPace().getClustering();
 	}
 
 	@Override
-	public Map<String, List<Pattern>> blacklists() {
+	public Map<String, Predicate<String>> blacklists() {
 		return blacklists;
 	}
 

@@ -2,14 +2,12 @@
 package eu.dnetlib.pace.clustering;
 
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import eu.dnetlib.pace.AbstractPaceTest;
 import eu.dnetlib.pace.common.AbstractPaceFunctions;
@@ -37,7 +35,7 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 
 		final String s = "http://www.test.it/path/to/resource";
 		System.out.println(s);
-		System.out.println(urlClustering.apply(conf, Lists.newArrayList(url(s))));
+		System.out.println(urlClustering.apply(conf, Lists.newArrayList(s)));
 	}
 
 	@Test
@@ -51,7 +49,7 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 
 		final String s = "Search for the Standard Model Higgs Boson";
 		System.out.println(s);
-		System.out.println(ngram.apply(conf, Lists.newArrayList(title(s))));
+		System.out.println(ngram.apply(conf, Lists.newArrayList(s)));
 	}
 
 	@Test
@@ -63,7 +61,7 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 
 		final String s = "Search for the Standard Model Higgs Boson";
 		System.out.println(s);
-		System.out.println(np.apply(conf, Lists.newArrayList(title(s))));
+		System.out.println(np.apply(conf, Lists.newArrayList(s)));
 	}
 
 	@Test
@@ -75,15 +73,15 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 
 		final String s1 = "University of Pisa";
 		System.out.println(s1);
-		System.out.println(np.apply(conf, Lists.newArrayList(title(s1))));
+		System.out.println(np.apply(conf, Lists.newArrayList(s1)));
 
 		final String s2 = "Pisa University";
 		System.out.println(s2);
-		System.out.println(np.apply(conf, Lists.newArrayList(title(s2))));
+		System.out.println(np.apply(conf, Lists.newArrayList(s2)));
 
 		final String s3 = "Parco Tecnologico Agroalimentare Umbria";
 		System.out.println(s3);
-		System.out.println(np.apply(conf, Lists.newArrayList(title(s3))));
+		System.out.println(np.apply(conf, Lists.newArrayList(s3)));
 
 	}
 
@@ -97,7 +95,7 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 
 		final String s = "Search for the Standard Model Higgs Boson";
 		System.out.println(s);
-		System.out.println(acro.apply(conf, Lists.newArrayList(title(s))));
+		System.out.println(acro.apply(conf, Lists.newArrayList(s)));
 	}
 
 	@Test
@@ -109,12 +107,12 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 
 		final String s = "Search for the Standard Model Higgs Boson";
 		System.out.println(s);
-		System.out.println(sp.apply(conf, Lists.newArrayList(title(s))));
+		System.out.println(sp.apply(conf, Lists.newArrayList(s)));
 
 		params.put("len", 3);
 		params.put("max", 1);
 
-		System.out.println(sp.apply(conf, Lists.newArrayList(title("Framework for general-purpose deduplication"))));
+		System.out.println(sp.apply(conf, Lists.newArrayList("Framework for general-purpose deduplication")));
 	}
 
 	@Test
@@ -127,7 +125,7 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 
 		final String s = "Search for the Standard Model Higgs Boson";
 		System.out.println(s);
-		System.out.println(sp.apply(conf, Lists.newArrayList(title(s))));
+		System.out.println(sp.apply(conf, Lists.newArrayList(s)));
 	}
 
 	@Test
@@ -138,31 +136,31 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 
 		String s = "Search for the Standard Model Higgs Boson";
 		System.out.println(s);
-		System.out.println(sp.apply(conf, Lists.newArrayList(title(s))));
+		System.out.println(sp.apply(conf, Lists.newArrayList(s)));
 
 		s = "A Physical Education Teacher Is Like...: Examining Turkish Students  Perceptions of Physical Education Teachers Through Metaphor Analysis";
 		System.out.println(s);
-		System.out.println(sp.apply(conf, Lists.newArrayList(title(s))));
+		System.out.println(sp.apply(conf, Lists.newArrayList(s)));
 
 		s = "Structure of a Eukaryotic Nonribosomal Peptide Synthetase Adenylation Domain That Activates a Large Hydroxamate Amino Acid in Siderophore Biosynthesis";
 		System.out.println(s);
-		System.out.println(sp.apply(conf, Lists.newArrayList(title(s))));
+		System.out.println(sp.apply(conf, Lists.newArrayList(s)));
 
 		s = "Performance Evaluation";
 		System.out.println(s);
-		System.out.println(sp.apply(conf, Lists.newArrayList(title(s))));
+		System.out.println(sp.apply(conf, Lists.newArrayList(s)));
 
 		s = "JRC Open Power Plants Database (JRC-PPDB-OPEN)";
 		System.out.println(s);
-		System.out.println(sp.apply(conf, Lists.newArrayList(title(s))));
+		System.out.println(sp.apply(conf, Lists.newArrayList(s)));
 
 		s = "JRC Open Power Plants Database";
 		System.out.println(s);
-		System.out.println(sp.apply(conf, Lists.newArrayList(title(s))));
+		System.out.println(sp.apply(conf, Lists.newArrayList(s)));
 
 		s = "niivue/niivue: 0.21.1";
 		System.out.println(s);
-		System.out.println(sp.apply(conf, Lists.newArrayList(title(s))));
+		System.out.println(sp.apply(conf, Lists.newArrayList(s)));
 
 	}
 
@@ -175,7 +173,7 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 
 		final String s = "Search for the Standard Model Higgs Boson";
 		System.out.println(s);
-		System.out.println(sp.apply(conf, Lists.newArrayList(title(s))));
+		System.out.println(sp.apply(conf, Lists.newArrayList(s)));
 	}
 
 	@Test
@@ -184,35 +182,35 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 		final ClusteringFunction cf = new KeywordsClustering(params);
 		final String s = "Polytechnic University of Turin";
 		System.out.println(s);
-		System.out.println(cf.apply(conf, Lists.newArrayList(title(s))));
+		System.out.println(cf.apply(conf, Lists.newArrayList(s)));
 
 		final String s1 = "POLITECNICO DI TORINO";
 		System.out.println(s1);
-		System.out.println(cf.apply(conf, Lists.newArrayList(title(s1))));
+		System.out.println(cf.apply(conf, Lists.newArrayList(s1)));
 
 		final String s2 = "Universita farmaceutica culturale di milano bergamo";
 		System.out.println("s2 = " + s2);
-		System.out.println(cf.apply(conf, Lists.newArrayList(title(s2))));
+		System.out.println(cf.apply(conf, Lists.newArrayList(s2)));
 
 		final String s3 = "universita universita milano milano";
 		System.out.println("s3 = " + s3);
-		System.out.println(cf.apply(conf, Lists.newArrayList(title(s3))));
+		System.out.println(cf.apply(conf, Lists.newArrayList(s3)));
 
 		final String s4 = "Politechniki Warszawskiej (Warsaw University of Technology)";
 		System.out.println("s4 = " + s4);
-		System.out.println(cf.apply(conf, Lists.newArrayList(title(s4))));
+		System.out.println(cf.apply(conf, Lists.newArrayList(s4)));
 
 		final String s5 = "İstanbul Ticarət Universiteti";
 		System.out.println("s5 = " + s5);
-		System.out.println(cf.apply(conf, Lists.newArrayList(title(s5))));
+		System.out.println(cf.apply(conf, Lists.newArrayList(s5)));
 
 		final String s6 = "National and Kapodistrian University of Athens";
 		System.out.println("s6 = " + s6);
-		System.out.println(cf.apply(conf, Lists.newArrayList(title(s6))));
+		System.out.println(cf.apply(conf, Lists.newArrayList(s6)));
 
 		final String s7 = "Εθνικό και Καποδιστριακό Πανεπιστήμιο Αθηνών";
 		System.out.println("s7 = " + s7);
-		System.out.println(cf.apply(conf, Lists.newArrayList(title(s7))));
+		System.out.println(cf.apply(conf, Lists.newArrayList(s7)));
 
 	}
 
@@ -222,11 +220,11 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 		final ClusteringFunction cf = new PersonClustering(params);
 		final String s = "Abd-Alla, Abo-el-nour N.";
 		System.out.println("s = " + s);
-		System.out.println(cf.apply(conf, Lists.newArrayList(title(s))));
+		System.out.println(cf.apply(conf, Lists.newArrayList(s)));
 
 		final String s1 = "Manghi, Paolo";
 		System.out.println("s1 = " + s1);
-		System.out.println(cf.apply(conf, Lists.newArrayList(title(s1))));
+		System.out.println(cf.apply(conf, Lists.newArrayList(s1)));
 
 	}
 
@@ -236,11 +234,11 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 		final ClusteringFunction cf = new PersonHash(params);
 		final String s = "Manghi, Paolo";
 		System.out.println("s = " + s);
-		System.out.println(cf.apply(conf, Lists.newArrayList(title(s))));
+		System.out.println(cf.apply(conf, Lists.newArrayList(s)));
 
 		final String s1 = "Manghi, P.";
 		System.out.println("s = " + s1);
-		System.out.println(cf.apply(conf, Lists.newArrayList(title(s1))));
+		System.out.println(cf.apply(conf, Lists.newArrayList(s1)));
 
 	}
 
@@ -250,7 +248,7 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 		final ClusteringFunction cf = new LastNameFirstInitial(params);
 		final String s = "LI Yonghong";
 		System.out.println("s = " + s);
-		System.out.println(cf.apply(conf, Lists.newArrayList(title(s))));
+		System.out.println(cf.apply(conf, Lists.newArrayList(s)));
 	}
 
 }

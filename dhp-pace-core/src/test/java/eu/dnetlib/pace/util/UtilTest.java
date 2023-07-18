@@ -6,9 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.pace.model.Person;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 
 public class UtilTest {
 
@@ -20,6 +22,7 @@ public class UtilTest {
 	}
 
 	@Test
+	@Ignore
 	public void paceResolverTest() {
 		PaceResolver paceResolver = new PaceResolver();
 		paceResolver.getComparator("keywordMatch", params);

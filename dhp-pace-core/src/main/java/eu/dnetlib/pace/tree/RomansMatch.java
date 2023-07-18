@@ -4,11 +4,11 @@ package eu.dnetlib.pace.tree;
 import java.util.Map;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractStringComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 @ComparatorClass("romansMatch")
-public class RomansMatch extends AbstractComparator {
+public class RomansMatch extends AbstractStringComparator {
 
 	public RomansMatch(Map<String, String> params) {
 		super(params);

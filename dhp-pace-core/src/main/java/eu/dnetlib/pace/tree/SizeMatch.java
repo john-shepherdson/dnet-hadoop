@@ -4,11 +4,8 @@ package eu.dnetlib.pace.tree;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Iterables;
-
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Field;
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractListComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 /**
@@ -17,7 +14,7 @@ import eu.dnetlib.pace.tree.support.ComparatorClass;
  * @author claudio
  */
 @ComparatorClass("sizeMatch")
-public class SizeMatch extends AbstractComparator {
+public class SizeMatch extends AbstractListComparator {
 
 	/**
 	 * Instantiates a new size match.
@@ -30,23 +27,12 @@ public class SizeMatch extends AbstractComparator {
 	}
 
 	@Override
-	public double compare(final Field a, final Field b, final Config conf) {
+	public double compare(final List<String> a, final List<String> b, final Config conf) {
 
 		if (a.isEmpty() || b.isEmpty())
-			return -1;
+			return -1.0;
 
-		return Iterables.size(a) == Iterables.size(b) ? 1 : 0;
-	}
-
-	/**
-	 * Checks if is empty.
-	 *
-	 * @param a
-	 *            the a
-	 * @return true, if is empty
-	 */
-	protected boolean isEmpty(final Iterable<?> a) {
-		return (a == null) || Iterables.isEmpty(a);
+		return a.size() == b.size() ? 1.0 : 0.0;
 	}
 
 }

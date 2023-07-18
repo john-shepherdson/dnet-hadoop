@@ -10,13 +10,11 @@ import java.util.stream.Collectors;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Field;
-import eu.dnetlib.pace.model.FieldList;
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractListComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 @ComparatorClass("instanceTypeMatch")
-public class InstanceTypeMatch extends AbstractComparator {
+public class InstanceTypeMatch extends AbstractListComparator {
 
 	final Map<String, String> translationMap = new HashMap<>();
 
@@ -42,21 +40,18 @@ public class InstanceTypeMatch extends AbstractComparator {
 	}
 
 	@Override
-	public double compare(final Field a, final Field b, final Config conf) {
+	public double compare(final List<String> a, final List<String> b, final Config conf) {
 
 		if (a == null || b == null) {
 			return -1;
 		}
 
-		final List<String> sa = ((FieldList) a).stringList();
-		final List<String> sb = ((FieldList) b).stringList();
-
-		if (sa.isEmpty() || sb.isEmpty()) {
+		if (a.isEmpty() || b.isEmpty()) {
 			return -1;
 		}
 
-		final Set<String> ca = sa.stream().map(this::translate).collect(Collectors.toSet());
-		final Set<String> cb = sb.stream().map(this::translate).collect(Collectors.toSet());
+		final Set<String> ca = a.stream().map(this::translate).collect(Collectors.toSet());
+		final Set<String> cb = b.stream().map(this::translate).collect(Collectors.toSet());
 
 		// if at least one is a jolly type, it must produce a match
 		if (ca.contains("*") || cb.contains("*"))

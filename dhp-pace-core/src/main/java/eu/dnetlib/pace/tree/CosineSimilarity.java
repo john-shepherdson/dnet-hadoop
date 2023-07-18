@@ -1,21 +1,14 @@
 
 package eu.dnetlib.pace.tree;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Field;
-import eu.dnetlib.pace.model.FieldList;
-import eu.dnetlib.pace.model.FieldValueImpl;
-import eu.dnetlib.pace.model.Person;
 import eu.dnetlib.pace.tree.support.AbstractComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 @ComparatorClass("cosineSimilarity")
-public class CosineSimilarity extends AbstractComparator {
+public class CosineSimilarity extends AbstractComparator<double[]> {
 
 	Map<String, String> params;
 
@@ -24,15 +17,16 @@ public class CosineSimilarity extends AbstractComparator {
 	}
 
 	@Override
-	public double compare(final Field a, final Field b, final Config conf) {
+	public double compare(Object a, Object b, Config config) {
+		return compare((double[]) a, (double[]) b, config);
+	}
 
-		if (a.isEmpty() || b.isEmpty())
+	public double compare(final double[] a, final double[] b, final Config conf) {
+
+		if (a.length == 0 || b.length == 0)
 			return -1;
 
-		double[] aVector = ((FieldValueImpl) a).doubleArrayValue();
-		double[] bVector = ((FieldValueImpl) b).doubleArrayValue();
-
-		return cosineSimilarity(aVector, bVector);
+		return cosineSimilarity(a, b);
 	}
 
 	double cosineSimilarity(double[] a, double[] b) {

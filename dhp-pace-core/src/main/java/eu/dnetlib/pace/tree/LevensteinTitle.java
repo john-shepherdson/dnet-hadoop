@@ -9,11 +9,11 @@ import org.apache.commons.logging.LogFactory;
 import com.wcohen.ss.AbstractStringDistance;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractStringComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 @ComparatorClass("levensteinTitle")
-public class LevensteinTitle extends AbstractComparator {
+public class LevensteinTitle extends AbstractStringComparator {
 
 	private static final Log log = LogFactory.getLog(LevensteinTitle.class);
 

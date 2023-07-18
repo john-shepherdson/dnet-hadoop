@@ -4,15 +4,14 @@ package eu.dnetlib.pace.tree.support;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.wcohen.ss.AbstractStringDistance;
 
 import eu.dnetlib.pace.common.AbstractPaceFunctions;
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.config.Type;
-import eu.dnetlib.pace.model.Field;
-import eu.dnetlib.pace.model.FieldList;
 
-public abstract class AbstractComparator extends AbstractPaceFunctions implements Comparator {
+public abstract class AbstractComparator<T> extends AbstractPaceFunctions implements Comparator<T> {
 
 	/** The ssalgo. */
 	protected AbstractStringDistance ssalgo;
@@ -69,8 +68,8 @@ public abstract class AbstractComparator extends AbstractPaceFunctions implement
 	 *            the b
 	 * @return the double
 	 */
-	public double distance(final String a, final String b, final Config conf) {
 
+	protected double distance(final String a, final String b, final Config conf) {
 		if (a.isEmpty() || b.isEmpty()) {
 			return -1; // return -1 if a field is missing
 		}
@@ -78,49 +77,50 @@ public abstract class AbstractComparator extends AbstractPaceFunctions implement
 		return normalize(score);
 	}
 
-	/**
-	 * Distance.
-	 *
-	 * @param a
-	 *            the a
-	 * @param b
-	 *            the b
-	 * @return the double
-	 */
-	protected double distance(final List<String> a, final List<String> b, final Config conf) {
-		return distance(concat(a), concat(b), conf);
-	}
-
-	public double distance(final Field a, final Field b, final Config conf) {
-		if (a.getType().equals(Type.String) && b.getType().equals(Type.String))
-			return distance(a.stringValue(), b.stringValue(), conf);
-		if (a.getType().equals(Type.List) && b.getType().equals(Type.List))
-			return distance(toList(a), toList(b), conf);
-
-		throw new IllegalArgumentException("invalid types\n- A: " + a.toString() + "\n- B: " + b.toString());
-	}
-
-	@Override
-	public double compare(final Field a, final Field b, final Config conf) {
+	protected double compare(final String a, final String b, final Config conf) {
 		if (a.isEmpty() || b.isEmpty())
 			return -1;
-		if (a.getType().equals(Type.String) && b.getType().equals(Type.String))
-			return distance(a.stringValue(), b.stringValue(), conf);
-		if (a.getType().equals(Type.List) && b.getType().equals(Type.List))
-			return distance(toList(a), toList(b), conf);
-
-		throw new IllegalArgumentException("invalid types\n- A: " + a.toString() + "\n- B: " + b.toString());
+		return distance(a, b, conf);
 	}
 
 	/**
-	 * To list.
+	 * Convert the given argument to a List of Strings
 	 *
-	 * @param list
-	 *            the list
+	 * @param object
+	 *            function argument
 	 * @return the list
 	 */
-	protected List<String> toList(final Field list) {
-		return ((FieldList) list).stringList();
+	protected List<String> toList(final Object object) {
+		if (object instanceof List) {
+			return (List<String>) object;
+		}
+
+		return Lists.newArrayList(object.toString());
+	}
+
+	/**
+	 * Convert the given argument to a String
+	 *
+	 * @param object
+	 *            function argument
+	 * @return the list
+	 */
+	protected String toString(final Object object) {
+		if (object instanceof List) {
+			List<String> l = (List<String>) object;
+			return Joiner.on(" ").join(l);
+		}
+
+		return object.toString();
+	}
+
+	protected String toFirstString(final Object object) {
+		if (object instanceof List) {
+			List<String> l = (List<String>) object;
+			return l.isEmpty() ? "" : l.get(0);
+		}
+
+		return object.toString();
 	}
 
 	public double getWeight() {

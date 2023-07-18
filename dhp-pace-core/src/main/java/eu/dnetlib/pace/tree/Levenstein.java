@@ -5,11 +5,11 @@ import java.util.Map;
 
 import com.wcohen.ss.AbstractStringDistance;
 
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractStringComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 @ComparatorClass("levenstein")
-public class Levenstein extends AbstractComparator {
+public class Levenstein extends AbstractStringComparator {
 
 	public Levenstein(Map<String, String> params) {
 		super(params, new com.wcohen.ss.Levenstein());

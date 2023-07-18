@@ -6,9 +6,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import eu.dnetlib.pace.common.AbstractPaceFunctions;
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Field;
 
 @ClusteringClass("keywordsclustering")
 public class KeywordsClustering extends AbstractClusteringFunction {
@@ -40,11 +38,10 @@ public class KeywordsClustering extends AbstractClusteringFunction {
 	}
 
 	@Override
-	public Collection<String> apply(final Config conf, List<Field> fields) {
+	public Collection<String> apply(final Config conf, List<String> fields) {
 		return fields
 			.stream()
 			.filter(f -> !f.isEmpty())
-			.map(Field::stringValue)
 			.map(this::cleanup)
 			.map(this::normalize)
 			.map(s -> filterAllStopWords(s))

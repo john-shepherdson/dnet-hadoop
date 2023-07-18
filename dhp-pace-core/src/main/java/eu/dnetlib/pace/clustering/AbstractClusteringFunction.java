@@ -11,7 +11,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.pace.common.AbstractPaceFunctions;
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Field;
 
 public abstract class AbstractClusteringFunction extends AbstractPaceFunctions implements ClusteringFunction {
 
@@ -24,11 +23,10 @@ public abstract class AbstractClusteringFunction extends AbstractPaceFunctions i
 	protected abstract Collection<String> doApply(Config conf, String s);
 
 	@Override
-	public Collection<String> apply(Config conf, List<Field> fields) {
+	public Collection<String> apply(Config conf, List<String> fields) {
 		return fields
 			.stream()
 			.filter(f -> !f.isEmpty())
-			.map(Field::stringValue)
 			.map(this::normalize)
 			.map(s -> filterAllStopWords(s))
 			.map(s -> doApply(conf, s))

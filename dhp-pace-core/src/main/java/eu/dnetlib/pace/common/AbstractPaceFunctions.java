@@ -16,13 +16,11 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.ibm.icu.text.Transliterator;
 
 import eu.dnetlib.pace.clustering.NGramUtils;
-import eu.dnetlib.pace.model.Field;
-import eu.dnetlib.pace.model.FieldList;
-import eu.dnetlib.pace.model.FieldListImpl;
 
 /**
  * Set of common functions for the framework
@@ -51,28 +49,25 @@ public abstract class AbstractPaceFunctions {
 	protected static Set<String> ngramBlacklist = loadFromClasspath("/eu/dnetlib/pace/config/ngram_blacklist.txt");
 
 	// html regex for normalization
-	public final String HTML_REGEX = "<[^>]*>";
+	public static final Pattern HTML_REGEX = Pattern.compile("<[^>]*>");
 
 	private static final String alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
 	private static final String aliases_from = "⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎àáâäæãåāèéêëēėęəîïíīįìôöòóœøōõûüùúūßśšłžźżçćčñń";
 	private static final String aliases_to = "0123456789+-=()n0123456789+-=()aaaaaaaaeeeeeeeeiiiiiioooooooouuuuussslzzzcccnn";
 
 	// doi prefix for normalization
-	public final String DOI_PREFIX = "(https?:\\/\\/dx\\.doi\\.org\\/)|(doi:)";
+	public static final Pattern DOI_PREFIX = Pattern.compile("(https?:\\/\\/dx\\.doi\\.org\\/)|(doi:)");
 
-	private Pattern numberPattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+	private static Pattern numberPattern = Pattern.compile("-?\\d+(\\.\\d+)?");
 
-	private Pattern hexUnicodePattern = Pattern.compile("\\\\u(\\p{XDigit}{4})");
-
-	protected final static FieldList EMPTY_FIELD = new FieldListImpl();
+	private static Pattern hexUnicodePattern = Pattern.compile("\\\\u(\\p{XDigit}{4})");
 
 	protected String concat(final List<String> l) {
 		return Joiner.on(" ").skipNulls().join(l);
 	}
 
 	protected String cleanup(final String s) {
-
-		final String s1 = s.replaceAll(HTML_REGEX, "");
+		final String s1 = HTML_REGEX.matcher(s).replaceAll("");
 		final String s2 = unicodeNormalization(s1.toLowerCase());
 		final String s3 = nfd(s2);
 		final String s4 = fixXML(s3);
@@ -160,11 +155,6 @@ public abstract class AbstractPaceFunctions {
 		});
 
 		return sb.toString().replaceAll("\\s+", " ");
-	}
-
-	protected String getFirstValue(final Field values) {
-		return (values != null) && !Iterables.isEmpty(values) ? Iterables.getFirst(values, EMPTY_FIELD).stringValue()
-			: "";
 	}
 
 	protected boolean notNull(final String s) {
@@ -316,7 +306,7 @@ public abstract class AbstractPaceFunctions {
 	}
 
 	public String normalizePid(String pid) {
-		return pid.toLowerCase().replaceAll(DOI_PREFIX, "");
+		return DOI_PREFIX.matcher(pid.toLowerCase()).replaceAll("");
 	}
 
 	// get the list of keywords into the input string

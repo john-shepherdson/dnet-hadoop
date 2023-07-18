@@ -8,10 +8,7 @@ import java.util.Map;
 import com.google.common.collect.Lists;
 import com.wcohen.ss.AbstractStringDistance;
 
-import eu.dnetlib.pace.model.Field;
-import eu.dnetlib.pace.model.FieldList;
-
-public abstract class AbstractSortedComparator extends AbstractComparator {
+public abstract class AbstractSortedComparator extends AbstractListComparator {
 
 	/**
 	 * Instantiates a new sorted second string compare algo.
@@ -30,11 +27,14 @@ public abstract class AbstractSortedComparator extends AbstractComparator {
 	}
 
 	@Override
-	protected List<String> toList(final Field list) {
-		FieldList fl = (FieldList) list;
-		List<String> values = Lists.newArrayList(fl.stringList());
-		Collections.sort(values);
-		return values;
-	}
+	protected List<String> toList(final Object object) {
+		if (object instanceof List) {
+			List<String> fl = (List<String>) object;
+			List<String> values = Lists.newArrayList(fl);
+			Collections.sort(values);
+			return values;
+		}
 
+		return Lists.newArrayList(object.toString());
+	}
 }

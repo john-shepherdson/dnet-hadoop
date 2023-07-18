@@ -3,7 +3,7 @@ package eu.dnetlib.pace.config;
 
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
+import java.util.function.Predicate;
 
 import eu.dnetlib.pace.model.ClusteringDef;
 import eu.dnetlib.pace.model.FieldDef;
@@ -31,13 +31,6 @@ public interface Config {
 	public Map<String, TreeNodeDef> decisionTree();
 
 	/**
-	 * Field configuration definitions.
-	 *
-	 * @return the list of definitions
-	 */
-	public Map<String, FieldDef> modelMap();
-
-	/**
 	 * Clusterings.
 	 *
 	 * @return the list
@@ -49,7 +42,7 @@ public interface Config {
 	 *
 	 * @return the map
 	 */
-	public Map<String, List<Pattern>> blacklists();
+	public Map<String, Predicate<String>> blacklists();
 
 	/**
 	 * Translation map.
