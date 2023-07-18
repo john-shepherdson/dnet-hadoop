@@ -21,9 +21,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.common.Constants;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -51,7 +51,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testPublication() throws IOException, DocumentException {
+	void testPublication() throws IOException {
 
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_record.xml")));
 
@@ -111,13 +111,17 @@ class MappersTest {
 				assertNotNull(i.getAccessright());
 				assertEquals("OPEN", i.getAccessright().getClassid());
 			});
-		assertEquals("0001", p.getInstance().get(0).getRefereed().getClassid());
-		assertNotNull(p.getInstance().get(0).getPid());
-		assertTrue(p.getInstance().get(0).getPid().isEmpty());
+		final Instance instance = p.getInstance().get(0);
+		assertEquals("0001", instance.getRefereed().getClassid());
+		assertNotNull(instance.getPid());
+		assertTrue(instance.getPid().isEmpty());
 
-		assertTrue(!p.getInstance().get(0).getAlternateIdentifier().isEmpty());
-		assertEquals("doi", p.getInstance().get(0).getAlternateIdentifier().get(0).getQualifier().getClassid());
-		assertEquals("10.3897/oneeco.2.e13718", p.getInstance().get(0).getAlternateIdentifier().get(0).getValue());
+		assertFalse(instance.getAlternateIdentifier().isEmpty());
+		assertEquals("doi", instance.getAlternateIdentifier().get(0).getQualifier().getClassid());
+		assertEquals("10.3897/oneeco.2.e13718", instance.getAlternateIdentifier().get(0).getValue());
+
+		assertNotNull(instance.getFulltext());
+		assertEquals("https://oneecosystem.pensoft.net/article/13718/", instance.getFulltext());
 
 		assertNotNull(p.getBestaccessright());
 		assertEquals("OPEN", p.getBestaccessright().getClassid());
@@ -239,7 +243,11 @@ class MappersTest {
 				assertNotNull(i.getAccessright());
 				assertEquals("OPEN", i.getAccessright().getClassid());
 			});
-		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
+
+		Publication p_cleaned = cleanup(p, vocs);
+		assertEquals("0000", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("Unknown", p_cleaned.getInstance().get(0).getRefereed().getClassname());
+
 		assertNotNull(p.getInstance().get(0).getPid());
 		assertEquals(2, p.getInstance().get(0).getPid().size());
 
@@ -454,7 +462,10 @@ class MappersTest {
 				assertNotNull(i.getAccessright());
 				assertEquals("OPEN", i.getAccessright().getClassid());
 			});
-		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
+
+		Publication p_cleaned = cleanup(p, vocs);
+		assertEquals("0000", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("Unknown", p_cleaned.getInstance().get(0).getRefereed().getClassname());
 	}
 
 	@Test
@@ -571,7 +582,9 @@ class MappersTest {
 		assertTrue(i.getUrl().contains("http://apps.who.int/trialsearch/Trial3.aspx?trialid=NCT02321059"));
 		assertTrue(i.getUrl().contains("https://clinicaltrials.gov/ct2/show/NCT02321059"));
 
-		assertEquals("UNKNOWN", i.getRefereed().getClassid());
+		Dataset d_cleaned = cleanup(d, vocs);
+		assertEquals("0000", d_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("Unknown", d_cleaned.getInstance().get(0).getRefereed().getClassname());
 	}
 
 	@Test
@@ -582,6 +595,8 @@ class MappersTest {
 
 		assertEquals(3, list.size());
 		assertTrue(list.get(0) instanceof Software);
+		assertTrue(list.get(1) instanceof Relation);
+		assertTrue(list.get(2) instanceof Relation);
 
 		final Software s = (Software) list.get(0);
 
@@ -591,6 +606,22 @@ class MappersTest {
 		assertTrue(s.getAuthor().size() > 0);
 		assertTrue(s.getSubject().size() > 0);
 		assertTrue(s.getInstance().size() > 0);
+
+		final Relation r1 = (Relation) list.get(1);
+		final Relation r2 = (Relation) list.get(2);
+
+		assertEquals(s.getId(), r1.getSource());
+		assertEquals("50|doi_________::b453e7b4b2130ace57ff0c3db470a982", r1.getTarget());
+		assertEquals(ModelConstants.RESULT_RESULT, r1.getRelType());
+		assertEquals(ModelConstants.RELATIONSHIP, r1.getSubRelType());
+		assertEquals(ModelConstants.IS_REFERENCED_BY, r1.getRelClass());
+
+		assertEquals(s.getId(), r2.getTarget());
+		assertEquals("50|doi_________::b453e7b4b2130ace57ff0c3db470a982", r2.getSource());
+		assertEquals(ModelConstants.RESULT_RESULT, r2.getRelType());
+		assertEquals(ModelConstants.RELATIONSHIP, r2.getSubRelType());
+		assertEquals(ModelConstants.REFERENCES, r2.getRelClass());
+
 	}
 
 	@Test
@@ -722,7 +753,7 @@ class MappersTest {
 		assertEquals(1, p.getInstance().size());
 		assertNotNull(p.getInstance().get(0).getAlternateIdentifier());
 		assertEquals(0, p.getInstance().get(0).getAlternateIdentifier().size());
-		assertEquals(2, p.getInstance().get(0).getUrl().size());
+		assertEquals(1, p.getInstance().get(0).getUrl().size());
 	}
 
 	@Test
@@ -854,7 +885,10 @@ class MappersTest {
 				assertNotNull(i.getAccessright());
 				assertEquals("UNKNOWN", i.getAccessright().getClassid());
 			});
-		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
+
+		Dataset p_cleaned = cleanup(p, vocs);
+		assertEquals("0000", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("Unknown", p_cleaned.getInstance().get(0).getRefereed().getClassname());
 	}
 
 	@Test
@@ -892,7 +926,7 @@ class MappersTest {
 	}
 
 	@Test
-	void testOpenAPC() throws IOException, DocumentException {
+	void testOpenAPC() throws IOException {
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_openapc.xml")));
 		final List<Oaf> list = new OafToOafMapper(vocs, true, true).processMdRecord(xml);
 
@@ -900,16 +934,54 @@ class MappersTest {
 		System.out.println(new ObjectMapper().writeValueAsString(list));
 		System.out.println("***************");
 
-		final Publication p = (Publication) list.get(0);
+		final Optional<Oaf> o = list.stream().filter(r -> r instanceof Publication).findFirst();
+		assertTrue(o.isPresent());
+
+		Publication p = (Publication) o.get();
 		assertTrue(p.getInstance().size() > 0);
 
 		assertEquals("https://doi.org/10.1155/2015/439379", p.getInstance().get(0).getUrl().get(0));
 
-		assertTrue(p.getProcessingchargeamount() != null);
-		assertTrue(p.getProcessingchargecurrency() != null);
+		assertNotNull(p.getProcessingchargeamount());
+		assertNotNull(p.getProcessingchargecurrency());
 
 		assertEquals("1721.47", p.getProcessingchargeamount().getValue());
 		assertEquals("EUR", p.getProcessingchargecurrency().getValue());
+
+		List<Oaf> affiliations = list.stream().filter(r -> r instanceof Relation).collect(Collectors.toList());
+		assertEquals(2, affiliations.size());
+
+		for (Oaf aff : affiliations) {
+			Relation r = (Relation) aff;
+			assertEquals(ModelConstants.AFFILIATION, r.getSubRelType());
+			assertEquals(ModelConstants.RESULT_ORGANIZATION, r.getRelType());
+			String source = r.getSource();
+			if (StringUtils.startsWith(source, "50")) {
+				assertEquals(ModelConstants.HAS_AUTHOR_INSTITUTION, r.getRelClass());
+			} else if (StringUtils.startsWith(source, "20")) {
+				assertTrue(StringUtils.contains(source, "::"));
+				assertEquals("20|" + Constants.ROR_NS_PREFIX, StringUtils.substringBefore(source, "::"));
+				assertEquals(ModelConstants.IS_AUTHOR_INSTITUTION_OF, r.getRelClass());
+			} else {
+				throw new IllegalArgumentException("invalid source / target prefixes for affiliation relations");
+			}
+
+			List<KeyValue> apcInfo = r.getProperties();
+			assertEquals(
+				"EUR", apcInfo
+					.stream()
+					.filter(kv -> "apc_currency".equals(kv.getKey()))
+					.map(KeyValue::getValue)
+					.findFirst()
+					.orElse(""));
+			assertEquals(
+				"1721.47", apcInfo
+					.stream()
+					.filter(kv -> "apc_amount".equals(kv.getKey()))
+					.map(KeyValue::getValue)
+					.findFirst()
+					.orElse(""));
+		}
 	}
 
 	@Test
@@ -984,6 +1056,18 @@ class MappersTest {
 	}
 
 	@Test
+	void testEOSCFuture_ROHub() throws IOException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("photic-zone-transformed.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		final OtherResearchProduct rocrate = (OtherResearchProduct) list.get(0);
+		assertNotNull(rocrate.getEoscifguidelines());
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(rocrate));
+		System.out.println("***************");
+	}
+
+	@Test
 	void testNotWellFormed() throws IOException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_notwellformed.xml")));
@@ -991,55 +1075,6 @@ class MappersTest {
 		assertNotNull(actual);
 		assertTrue(actual.isEmpty());
 	}
-
-	@Test
-	void testEoscFutureHackZenodo() throws IOException {
-		final String xml = IOUtils
-			.toString(Objects.requireNonNull(getClass().getResourceAsStream("zenodo7351221.xml")));
-
-		final List<Oaf> actual = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
-		actual.forEach(a -> {
-			try {
-				System.out.println(new ObjectMapper().writeValueAsString(a));
-			} catch (JsonProcessingException e) {
-				e.printStackTrace();
-			}
-		});
-	}
-
-	@Test
-	void testD4Science() throws IOException {
-		final String xml = IOUtils
-				.toString(Objects.requireNonNull(getClass().getResourceAsStream("d4science.xml")));
-		final List<Oaf> actual = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
-		assertNotNull(actual);
-		assertFalse(actual.isEmpty());
-		System.out.println("***************");
-		System.out.println(new ObjectMapper().writeValueAsString(actual));
-		System.out.println("***************");
-		final Dataset d = (Dataset) actual.get(0);
-		assertValidId(d.getId());
-		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
-
-	}
-
-	@Test
-	void testLeiden() throws IOException {
-		final String xml = IOUtils
-				.toString(Objects.requireNonNull(getClass().getResourceAsStream("leiden.xml")));
-		final List<Oaf> actual = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
-		assertNotNull(actual);
-		assertFalse(actual.isEmpty());
-		System.out.println("***************");
-		System.out.println(new ObjectMapper().writeValueAsString(actual));
-		System.out.println("***************");
-		final Publication d = (Publication) actual.get(0);
-		assertValidId(d.getId());
-		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
-		assertTrue(StringUtils.isNotBlank(d.getInstance().get(0).getUrl().get(0)));
-
-	}
-
 
 	private void assertValidId(final String id) {
 		// System.out.println(id);

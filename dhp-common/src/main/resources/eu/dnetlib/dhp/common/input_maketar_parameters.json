@@ -23,12 +23,6 @@
 		"paramLongName":"splitSize",
 		"paramDescription": "the maximum size of the archive",
 		"paramRequired": false
-	},
-	{
-		"paramName":"rn",
-		"paramLongName":"rename",
-		"paramDescription": "if the file has to be renamed",
-		"paramRequired": false
 	}
 ]
 

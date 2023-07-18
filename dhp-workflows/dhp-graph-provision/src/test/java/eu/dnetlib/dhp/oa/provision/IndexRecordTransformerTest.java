@@ -142,9 +142,11 @@ public class IndexRecordTransformerTest {
 
 	@Test
 	public void testForEdithDemoCovid() throws IOException, TransformerException {
-		final String record = IOUtils.toString(getClass().getResourceAsStream("edith-demo/10.3390-pr9111967-covid.xml"));
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("edith-demo/10.3390-pr9111967-covid.xml"));
 		testRecordTransformation(record);
 	}
+
 	@Test
 	public void testForEdithDemoEthics() throws IOException, TransformerException {
 		final String record = IOUtils.toString(getClass().getResourceAsStream("edith-demo/10.2196-33081-ethics.xml"));

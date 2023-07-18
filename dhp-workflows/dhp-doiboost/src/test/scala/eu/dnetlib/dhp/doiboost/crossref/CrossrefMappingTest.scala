@@ -1,9 +1,14 @@
 package eu.dnetlib.dhp.doiboost.crossref
 
+import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf._
 import eu.dnetlib.dhp.utils.DHPUtils
 import eu.dnetlib.doiboost.crossref.Crossref2Oaf
 import org.codehaus.jackson.map.{ObjectMapper, SerializationConfig}
+import org.json4s
+import org.json4s.JsonAST.{JField, JObject, JString}
+import org.json4s.{DefaultFormats, JValue}
+import org.json4s.jackson.JsonMethods
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 import org.slf4j.{Logger, LoggerFactory}
@@ -107,6 +112,47 @@ class CrossrefMappingTest {
     mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
     items.foreach(p => println(mapper.writeValueAsString(p)))
 
+  }
+
+  private def parseJson(input: String): JValue = {
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+    lazy val json: json4s.JValue = JsonMethods.parse(input)
+
+    json
+  }
+
+  @Test
+  def testCitationRelations(): Unit = {
+    val json = Source
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/doiboost/crossref/publication_license_embargo.json"))
+      .mkString
+
+    assertNotNull(json)
+    assertFalse(json.isEmpty)
+
+    val result: List[Oaf] = Crossref2Oaf.convert(json)
+
+    assertTrue(result.nonEmpty)
+
+    val j = parseJson(json)
+
+    val doisReference: List[String] = for {
+      JObject(reference_json)          <- j \ "reference"
+      JField("DOI", JString(doi_json)) <- reference_json
+    } yield doi_json
+
+    val relationList: List[Relation] = result
+      .filter(s => s.isInstanceOf[Relation])
+      .map(r => r.asInstanceOf[Relation])
+      .filter(r => r.getSubRelType.equalsIgnoreCase(ModelConstants.CITATION))
+
+    assertNotNull(relationList)
+    assertFalse(relationList.isEmpty)
+
+    assertEquals(doisReference.size, relationList.size)
+
+    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
+    relationList.foreach(p => println(mapper.writeValueAsString(p)))
   }
 
   @Test

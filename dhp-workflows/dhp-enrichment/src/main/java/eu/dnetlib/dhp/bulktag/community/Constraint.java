@@ -11,6 +11,7 @@ public class Constraint implements Serializable {
 	private String verb;
 	private String field;
 	private String value;
+//	private String element;
 	private Selection selection;
 
 	public String getVerb() {
@@ -50,4 +51,12 @@ public class Constraint implements Serializable {
 	public boolean verifyCriteria(String metadata) {
 		return selection.apply(metadata);
 	}
+
+//	public String getElement() {
+//		return element;
+//	}
+//
+//	public void setElement(String element) {
+//		this.element = element;
+//	}
 }

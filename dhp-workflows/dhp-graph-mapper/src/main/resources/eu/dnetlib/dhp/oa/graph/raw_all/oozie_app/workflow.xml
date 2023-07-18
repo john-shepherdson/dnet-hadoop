@@ -214,16 +214,14 @@
 
     <action name="ImportODF_claims">
         <java>
-            <prepare>
-                <delete path="${contentPath}/odf_claims"/>
-            </prepare>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateMongoMdstoresApplication</main-class>
-            <arg>-p</arg><arg>${contentPath}/odf_claims</arg>
-            <arg>-mongourl</arg><arg>${mongoURL}</arg>
-            <arg>-mongodb</arg><arg>${mongoDb}</arg>
-            <arg>-f</arg><arg>ODF</arg>
-            <arg>-l</arg><arg>store</arg>
-            <arg>-i</arg><arg>claim</arg>
+            <arg>--hdfsPath</arg><arg>${contentPath}/odf_claims</arg>
+            <arg>--mongoBaseUrl</arg><arg>${mongoURL}</arg>
+            <arg>--mongoDb</arg><arg>${mongoDb}</arg>
+            <arg>--mdFormat</arg><arg>ODF</arg>
+            <arg>--mdLayout</arg><arg>store</arg>
+            <arg>--mdInterpretation</arg><arg>claim</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
         </java>
         <ok to="reuse_oaf_claims"/>
         <error to="Kill"/>
@@ -239,16 +237,14 @@
 
     <action name="ImportOAF_claims">
         <java>
-            <prepare>
-                <delete path="${contentPath}/oaf_claims"/>
-            </prepare>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateMongoMdstoresApplication</main-class>
-            <arg>-p</arg><arg>${contentPath}/oaf_claims</arg>
-            <arg>-mongourl</arg><arg>${mongoURL}</arg>
-            <arg>-mongodb</arg><arg>${mongoDb}</arg>
-            <arg>-f</arg><arg>OAF</arg>
-            <arg>-l</arg><arg>store</arg>
-            <arg>-i</arg><arg>claim</arg>
+            <arg>--hdfsPath</arg><arg>${contentPath}/oaf_claims</arg>
+            <arg>--mongoBaseUrl</arg><arg>${mongoURL}</arg>
+            <arg>--mongoDb</arg><arg>${mongoDb}</arg>
+            <arg>--mdFormat</arg><arg>OAF</arg>
+            <arg>--mdLayout</arg><arg>store</arg>
+            <arg>--mdInterpretation</arg><arg>claim</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
         </java>
         <ok to="wait_import"/>
         <error to="Kill"/>
@@ -291,16 +287,14 @@
 
     <action name="ImportODF">
         <java>
-            <prepare>
-                <delete path="${contentPath}/odf_records"/>
-            </prepare>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateMongoMdstoresApplication</main-class>
-            <arg>--hdfsPath</arg><arg>${contentPath}/odf_records</arg>
+            <arg>--hdfsPath</arg><arg>${contentPath}/mdstore</arg>
             <arg>--mongoBaseUrl</arg><arg>${mongoURL}</arg>
             <arg>--mongoDb</arg><arg>${mongoDb}</arg>
             <arg>--mdFormat</arg><arg>ODF</arg>
             <arg>--mdLayout</arg><arg>store</arg>
             <arg>--mdInterpretation</arg><arg>cleaned</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
         </java>
         <ok to="reuse_oaf"/>
         <error to="Kill"/>
@@ -316,16 +310,14 @@
 
     <action name="ImportOAF">
         <java>
-            <prepare>
-                <delete path="${contentPath}/oaf_records"/>
-            </prepare>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateMongoMdstoresApplication</main-class>
-            <arg>--hdfsPath</arg><arg>${contentPath}/oaf_records</arg>
+            <arg>--hdfsPath</arg><arg>${contentPath}/mdstore</arg>
             <arg>--mongoBaseUrl</arg><arg>${mongoURL}</arg>
             <arg>--mongoDb</arg><arg>${mongoDb}</arg>
             <arg>--mdFormat</arg><arg>OAF</arg>
             <arg>--mdLayout</arg><arg>store</arg>
             <arg>--mdInterpretation</arg><arg>cleaned</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
         </java>
         <ok to="ImportOAF_invisible"/>
         <error to="Kill"/>
@@ -333,16 +325,14 @@
     
     <action name="ImportOAF_invisible">
         <java>
-            <prepare>
-                <delete path="${contentPath}/oaf_records_invisible"/>
-            </prepare>
             <main-class>eu.dnetlib.dhp.oa.graph.raw.MigrateMongoMdstoresApplication</main-class>
-            <arg>--hdfsPath</arg><arg>${contentPath}/oaf_records_invisible</arg>
+            <arg>--hdfsPath</arg><arg>${contentPath}/mdstore</arg>
             <arg>--mongoBaseUrl</arg><arg>${mongoURL}</arg>
             <arg>--mongoDb</arg><arg>${mongoDb}</arg>
             <arg>--mdFormat</arg><arg>OAF</arg>
             <arg>--mdLayout</arg><arg>store</arg>
             <arg>--mdInterpretation</arg><arg>intersection</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
         </java>
         <ok to="ImportODF_hdfs"/>
         <error to="Kill"/>
@@ -372,7 +362,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--hdfsPath</arg><arg>${contentPath}/odf_records_hdfs</arg>
+            <arg>--hdfsPath</arg><arg>${contentPath}/odf_mdstore_hdfs</arg>
             <arg>--mdstoreManagerUrl</arg><arg>${mdstoreManagerUrl}</arg>
             <arg>--mdFormat</arg><arg>ODF</arg>
             <arg>--mdLayout</arg><arg>store</arg>
@@ -406,7 +396,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--hdfsPath</arg><arg>${contentPath}/oaf_records_hdfs</arg>
+            <arg>--hdfsPath</arg><arg>${contentPath}/oaf_mdstore_hdfs</arg>
             <arg>--mdstoreManagerUrl</arg><arg>${mdstoreManagerUrl}</arg>
             <arg>--mdFormat</arg><arg>OAF</arg>
             <arg>--mdLayout</arg><arg>store</arg>
@@ -466,7 +456,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--sourcePaths</arg><arg>${contentPath}/db_claims,${contentPath}/oaf_claims,${contentPath}/odf_claims</arg>
+            <arg>--sourcePaths</arg><arg>${contentPath}/db_claims,${contentPath}/oaf_claims/*/*,${contentPath}/odf_claims/*/*</arg>
             <arg>--invalidPath</arg><arg>${workingDir}/invalid_records_claim</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
@@ -490,7 +480,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--sourcePaths</arg><arg>${contentPath}/db_claims,${contentPath}/oaf_claims,${contentPath}/odf_claims</arg>
+            <arg>--sourcePaths</arg><arg>${contentPath}/db_claims,${contentPath}/oaf_claims/*/*,${contentPath}/odf_claims/*/*</arg>
             <arg>--targetPath</arg><arg>${workingDir}/entities_claim</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--shouldHashId</arg><arg>${shouldHashId}</arg>
@@ -539,7 +529,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--sourcePaths</arg><arg>${contentPath}/db_openaire,${contentPath}/db_openorgs,${contentPath}/oaf_records,${contentPath}/odf_records,${contentPath}/oaf_records_hdfs,${contentPath}/odf_records_hdfs,${contentPath}/oaf_records_invisible</arg>
+            <arg>--sourcePaths</arg><arg>${contentPath}/db_openaire,${contentPath}/db_openorgs,${contentPath}/oaf_mdstore_hdfs,${contentPath}/odf_mdstore_hdfs,${contentPath}/mdstore/*/*</arg>
             <arg>--invalidPath</arg><arg>${workingDir}/invalid_records</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
@@ -563,7 +553,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--sourcePaths</arg><arg>${contentPath}/db_openaire,${contentPath}/db_openorgs,${contentPath}/oaf_records,${contentPath}/odf_records,${contentPath}/oaf_records_hdfs,${contentPath}/odf_records_hdfs,${contentPath}/oaf_records_invisible</arg>
+            <arg>--sourcePaths</arg><arg>${contentPath}/db_openaire,${contentPath}/db_openorgs,${contentPath}/oaf_mdstore_hdfs,${contentPath}/odf_mdstore_hdfs,${contentPath}/mdstore/*/*</arg>
             <arg>--targetPath</arg><arg>${workingDir}/entities</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--shouldHashId</arg><arg>${shouldHashId}</arg>

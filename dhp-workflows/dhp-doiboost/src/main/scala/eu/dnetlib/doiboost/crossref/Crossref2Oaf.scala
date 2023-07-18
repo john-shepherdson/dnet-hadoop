@@ -201,7 +201,7 @@ case object Crossref2Oaf {
 
     if (subjectList.nonEmpty) {
       result.setSubject(
-        subjectList.map(s => createSP(s, "keywords", ModelConstants.DNET_SUBJECT_TYPOLOGIES)).asJava
+        subjectList.map(s => createSubject(s, "keyword", ModelConstants.DNET_SUBJECT_TYPOLOGIES)).asJava
       )
     }
 
@@ -370,8 +370,38 @@ case object Crossref2Oaf {
       case dataset: Dataset         => convertDataset(dataset)
     }
 
+    val doisReference: List[String] = for {
+      JObject(reference_json)          <- json \ "reference"
+      JField("DOI", JString(doi_json)) <- reference_json
+    } yield doi_json
+
+    if (doisReference != null && doisReference.nonEmpty) {
+      val citation_relations: List[Relation] = generateCitationRelations(doisReference, result)
+      resultList = resultList ::: citation_relations
+    }
     resultList = resultList ::: List(result)
     resultList
+  }
+
+  private def createCiteRelation(source: Result, targetPid: String, targetPidType: String): List[Relation] = {
+
+    val targetId = IdentifierFactory.idFromPid("50", targetPidType, targetPid, true)
+
+    val from = new Relation
+    from.setSource(source.getId)
+    from.setTarget(targetId)
+    from.setRelType(ModelConstants.RESULT_RESULT)
+    from.setRelClass(ModelConstants.CITES)
+    from.setSubRelType(ModelConstants.CITATION)
+    from.setCollectedfrom(source.getCollectedfrom)
+    from.setDataInfo(source.getDataInfo)
+    from.setLastupdatetimestamp(source.getLastupdatetimestamp)
+
+    List(from)
+  }
+
+  def generateCitationRelations(dois: List[String], result: Result): List[Relation] = {
+    dois.flatMap(d => createCiteRelation(result, d, "doi"))
   }
 
   def mappingFunderToRelations(

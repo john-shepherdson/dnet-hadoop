@@ -99,7 +99,7 @@ public class CreateOpenCitationsASTest {
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
-		assertEquals(62, tmp.count());
+		assertEquals(31, tmp.count());
 
 		// tmp.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
 
@@ -131,7 +131,7 @@ public class CreateOpenCitationsASTest {
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
-		assertEquals(46, tmp.count());
+		assertEquals(23, tmp.count());
 
 		// tmp.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
 
@@ -241,7 +241,7 @@ public class CreateOpenCitationsASTest {
 			assertEquals("resultResult", r.getRelType());
 		});
 		assertEquals(23, tmp.filter(r -> r.getRelClass().equals("Cites")).count());
-		assertEquals(23, tmp.filter(r -> r.getRelClass().equals("IsCitedBy")).count());
+		assertEquals(0, tmp.filter(r -> r.getRelClass().equals("IsCitedBy")).count());
 
 	}
 
@@ -318,15 +318,15 @@ public class CreateOpenCitationsASTest {
 
 		JavaRDD<Relation> check = tmp.filter(r -> r.getSource().equals(doi1) || r.getTarget().equals(doi1));
 
-		assertEquals(10, check.count());
+		assertEquals(5, check.count());
 
-		check.foreach(r -> {
-			if (r.getSource().equals(doi2) || r.getSource().equals(doi3) || r.getSource().equals(doi4) ||
-				r.getSource().equals(doi5) || r.getSource().equals(doi6)) {
-				assertEquals(ModelConstants.IS_CITED_BY, r.getRelClass());
-				assertEquals(doi1, r.getTarget());
-			}
-		});
+//		check.foreach(r -> {
+//			if (r.getSource().equals(doi2) || r.getSource().equals(doi3) || r.getSource().equals(doi4) ||
+//				r.getSource().equals(doi5) || r.getSource().equals(doi6)) {
+//				assertEquals(ModelConstants.IS_CITED_BY, r.getRelClass());
+//				assertEquals(doi1, r.getTarget());
+//			}
+//		});
 
 		assertEquals(5, check.filter(r -> r.getSource().equals(doi1)).count());
 		check.filter(r -> r.getSource().equals(doi1)).foreach(r -> assertEquals(ModelConstants.CITES, r.getRelClass()));

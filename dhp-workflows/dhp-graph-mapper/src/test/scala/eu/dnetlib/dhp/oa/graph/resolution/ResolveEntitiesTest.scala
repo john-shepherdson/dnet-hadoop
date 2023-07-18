@@ -60,7 +60,7 @@ class ResolveEntitiesTest extends Serializable {
         r.setId(id.toLowerCase.trim)
         r.setSubject(
           List(
-            OafMapperUtils.structuredProperty(
+            OafMapperUtils.subject(
               FAKE_SUBJECT,
               OafMapperUtils.qualifier("fos", "fosCS", "fossSchema", "fossiFIgo"),
               null
@@ -251,7 +251,7 @@ class ResolveEntitiesTest extends Serializable {
     val r = new Result
     r.setSubject(
       List(
-        OafMapperUtils.structuredProperty(
+        OafMapperUtils.subject(
           FAKE_SUBJECT,
           OafMapperUtils.qualifier("fos", "fosCS", "fossSchema", "fossiFIgo"),
           null
