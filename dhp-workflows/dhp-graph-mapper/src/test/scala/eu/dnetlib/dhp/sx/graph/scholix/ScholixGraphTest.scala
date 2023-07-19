@@ -3,7 +3,7 @@ package eu.dnetlib.dhp.sx.graph.scholix
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper, SerializationFeature}
 import eu.dnetlib.dhp.oa.graph.resolution.SparkResolveRelation
 import eu.dnetlib.dhp.schema.oaf.{Relation, Result}
-import eu.dnetlib.dhp.schema.sx.scholix.Scholix
+import eu.dnetlib.dhp.schema.sx.scholix.{Scholix, ScholixResource}
 import eu.dnetlib.dhp.schema.sx.summary.ScholixSummary
 import eu.dnetlib.dhp.sx.graph.bio.pubmed.AbstractVocabularyTest
 import org.json4s
@@ -69,15 +69,20 @@ class ScholixGraphTest extends AbstractVocabularyTest {
         getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/merge_result_scholix")
       )
       .mkString
-    val result: List[(Relation, ScholixSummary)] = inputRelations.linesWithSeparators
+    val result: List[(Relation, ScholixResource)] = inputRelations.linesWithSeparators
       .map(l => l.stripLineEnd)
-      .sliding(2)
+      .sliding(2, 2)
       .map(s => (s.head, s(1)))
-      .map(p => (mapper.readValue(p._1, classOf[Relation]), mapper.readValue(p._2, classOf[ScholixSummary])))
+      .map(p =>
+        (
+          mapper.readValue(p._1, classOf[Relation]),
+          ScholixUtils.generateScholixResourceFromSummary(mapper.readValue(p._2, classOf[ScholixSummary]))
+        )
+      )
       .toList
     assertNotNull(result)
     assertTrue(result.nonEmpty)
-    result.foreach(r => assertEquals(r._1.getSource, r._2.getId))
+    result.foreach(r => assertEquals(r._1.getSource, r._2.getDnetIdentifier))
     val scholix: List[Scholix] = result.map(r => ScholixUtils.scholixFromSource(r._1, r._2))
     println(mapper.writeValueAsString(scholix.head))
   }

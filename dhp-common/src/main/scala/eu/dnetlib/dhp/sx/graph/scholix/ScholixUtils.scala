@@ -50,13 +50,10 @@ object ScholixUtils extends Serializable {
     }
   }
 
-  def extractRelationDate(summary: ScholixSummary): String = {
+  def extractRelationDate(summary: ScholixResource): String = {
 
-    if (summary.getDate == null || summary.getDate.isEmpty)
-      null
-    else {
-      summary.getDate.get(0)
-    }
+    summary.getPublicationDate
+
   }
 
   def inverseRelationShip(rel: ScholixRelationship): ScholixRelationship = {
@@ -232,7 +229,7 @@ object ScholixUtils extends Serializable {
 
     if (summaryObject.getAuthor != null && !summaryObject.getAuthor.isEmpty) {
       val l: List[ScholixEntityId] =
-        summaryObject.getAuthor.asScala.map(a => new ScholixEntityId(a, null)).toList
+        summaryObject.getAuthor.asScala.map(a => new ScholixEntityId(a, null)).take(100).toList
       if (l.nonEmpty)
         r.setCreator(l.asJava)
     }
@@ -241,7 +238,7 @@ object ScholixUtils extends Serializable {
       r.setPublicationDate(summaryObject.getDate.get(0))
     if (summaryObject.getPublisher != null && !summaryObject.getPublisher.isEmpty) {
       val plist: List[ScholixEntityId] =
-        summaryObject.getPublisher.asScala.map(p => new ScholixEntityId(p, null)).toList
+        summaryObject.getPublisher.asScala.map(p => new ScholixEntityId(p, null)).take(100).toList
 
       if (plist.nonEmpty)
         r.setPublisher(plist.asJava)
@@ -260,6 +257,7 @@ object ScholixUtils extends Serializable {
             "complete"
           )
         )
+        .take(100)
         .toList
 
       if (l.nonEmpty)
@@ -269,38 +267,38 @@ object ScholixUtils extends Serializable {
     r
   }
 
+//  def scholixFromSource(relation: Relation, source: ScholixResource): Scholix = {
+//    if (relation == null || source == null)
+//      return null
+//    val s = new Scholix
+//    var l: List[ScholixEntityId] = extractCollectedFrom(relation)
+//    if (l.isEmpty)
+//      l = extractCollectedFrom(source)
+//    if (l.isEmpty)
+//      return null
+//    s.setLinkprovider(l.asJava)
+//    var d = extractRelationDate(relation)
+//    if (d == null)
+//      d = source.getPublicationDate
+//
+//    s.setPublicationDate(d)
+//
+//    if (source.getPublisher != null && !source.getPublisher.isEmpty) {
+//      s.setPublisher(source.getPublisher)
+//    }
+//
+//    val semanticRelation = relations.getOrElse(relation.getRelClass.toLowerCase, null)
+//    if (semanticRelation == null)
+//      return null
+//    s.setRelationship(
+//      new ScholixRelationship(semanticRelation.original, "datacite", semanticRelation.inverse)
+//    )
+//    s.setSource(source)
+//
+//    s
+//  }
+
   def scholixFromSource(relation: Relation, source: ScholixResource): Scholix = {
-    if (relation == null || source == null)
-      return null
-    val s = new Scholix
-    var l: List[ScholixEntityId] = extractCollectedFrom(relation)
-    if (l.isEmpty)
-      l = extractCollectedFrom(source)
-    if (l.isEmpty)
-      return null
-    s.setLinkprovider(l.asJava)
-    var d = extractRelationDate(relation)
-    if (d == null)
-      d = source.getPublicationDate
-
-    s.setPublicationDate(d)
-
-    if (source.getPublisher != null && !source.getPublisher.isEmpty) {
-      s.setPublisher(source.getPublisher)
-    }
-
-    val semanticRelation = relations.getOrElse(relation.getRelClass.toLowerCase, null)
-    if (semanticRelation == null)
-      return null
-    s.setRelationship(
-      new ScholixRelationship(semanticRelation.original, "datacite", semanticRelation.inverse)
-    )
-    s.setSource(source)
-
-    s
-  }
-
-  def scholixFromSource(relation: Relation, source: ScholixSummary): Scholix = {
 
     if (relation == null || source == null)
       return null
@@ -322,11 +320,8 @@ object ScholixUtils extends Serializable {
     s.setPublicationDate(d)
 
     if (source.getPublisher != null && !source.getPublisher.isEmpty) {
-      val l: List[ScholixEntityId] = source.getPublisher.asScala
-        .map { p =>
-          new ScholixEntityId(p, null)
-        }(collection.breakOut)
-
+      source.getPublisher
+      val l: List[ScholixEntityId] = source.getPublisher.asScala.toList
       if (l.nonEmpty)
         s.setPublisher(l.asJava)
     }
@@ -337,7 +332,7 @@ object ScholixUtils extends Serializable {
     s.setRelationship(
       new ScholixRelationship(semanticRelation.original, "datacite", semanticRelation.inverse)
     )
-    s.setSource(generateScholixResourceFromSummary(source))
+    s.setSource(source)
 
     s
   }

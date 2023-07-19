@@ -2,13 +2,13 @@ package eu.dnetlib.dhp.sx.graph
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.oaf.Relation
-import eu.dnetlib.dhp.schema.sx.scholix.Scholix
+import eu.dnetlib.dhp.schema.sx.scholix.{Scholix, ScholixResource}
 import eu.dnetlib.dhp.schema.sx.summary.ScholixSummary
 import eu.dnetlib.dhp.sx.graph.scholix.ScholixUtils
 import eu.dnetlib.dhp.sx.graph.scholix.ScholixUtils.RelatedEntities
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.functions.count
+import org.apache.spark.sql.functions.{col, count}
 import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -42,57 +42,63 @@ object SparkCreateScholix {
     val dumpCitations = Try(parser.get("dumpCitations").toBoolean).getOrElse(false)
     log.info(s"dumpCitations  -> $dumpCitations")
 
-    implicit val relEncoder: Encoder[Relation] = Encoders.kryo[Relation]
-    implicit val summaryEncoder: Encoder[ScholixSummary] = Encoders.kryo[ScholixSummary]
-    implicit val scholixEncoder: Encoder[Scholix] = Encoders.kryo[Scholix]
-
+    implicit val relEncoder: Encoder[Relation] = Encoders.bean(classOf[Relation])
+    implicit val summaryEncoder: Encoder[ScholixSummary] = Encoders.bean(classOf[ScholixSummary])
+    implicit val resourceEncoder: Encoder[ScholixResource] = Encoders.bean(classOf[ScholixResource])
+    implicit val scholixEncoder: Encoder[Scholix] = Encoders.bean(classOf[Scholix])
     import spark.implicits._
+    spark.sparkContext.setLogLevel("WARN")
 
-    val relationDS: Dataset[(String, Relation)] = spark.read
-      .load(relationPath)
+    val relationDS: Dataset[Relation] = spark.read
+      .schema(relEncoder.schema)
+      .json(relationPath)
       .as[Relation]
       .filter(r =>
         (r.getDataInfo == null || r.getDataInfo.getDeletedbyinference == false) && !r.getRelClass.toLowerCase
           .contains("merge")
       )
-      .map(r => (r.getSource, r))(Encoders.tuple(Encoders.STRING, relEncoder))
 
-    val summaryDS: Dataset[(String, ScholixSummary)] = spark.read
-      .load(summaryPath)
+    val summaryDS: Dataset[ScholixResource] = spark.read
+      .schema(summaryEncoder.schema)
+      .json(summaryPath)
       .as[ScholixSummary]
-      .map(r => (r.getId, r))(Encoders.tuple(Encoders.STRING, summaryEncoder))
+      .map(s => ScholixUtils.generateScholixResourceFromSummary(s))
 
     relationDS
-      .joinWith(summaryDS, relationDS("_1").equalTo(summaryDS("_1")), "left")
-      .map { input: ((String, Relation), (String, ScholixSummary)) =>
+      .joinWith(summaryDS, relationDS("source").equalTo(summaryDS("dnetIdentifier")), "left")
+      .map { input: (Relation, ScholixResource) =>
         if (input._1 != null && input._2 != null) {
-          val rel: Relation = input._1._2
-          val source: ScholixSummary = input._2._2
-          (rel.getTarget, ScholixUtils.scholixFromSource(rel, source))
+          val rel: Relation = input._1
+          val source: ScholixResource = input._2
+          val s = ScholixUtils.scholixFromSource(rel, source)
+          s.setIdentifier(rel.getTarget)
+          s
         } else null
-      }(Encoders.tuple(Encoders.STRING, scholixEncoder))
+      }(scholixEncoder)
       .filter(r => r != null)
       .write
+      .option("compression", "lz4")
       .mode(SaveMode.Overwrite)
       .save(s"$targetPath/scholix_from_source")
 
-    val scholixSource: Dataset[(String, Scholix)] = spark.read
+    val scholixSource: Dataset[Scholix] = spark.read
       .load(s"$targetPath/scholix_from_source")
-      .as[(String, Scholix)](Encoders.tuple(Encoders.STRING, scholixEncoder))
+      .as[Scholix]
 
     scholixSource
-      .joinWith(summaryDS, scholixSource("_1").equalTo(summaryDS("_1")), "left")
-      .map { input: ((String, Scholix), (String, ScholixSummary)) =>
+      .joinWith(summaryDS, scholixSource("identifier").equalTo(summaryDS("dnetIdentifier")), "left")
+      .map { input: (Scholix, ScholixResource) =>
         if (input._2 == null) {
           null
         } else {
-          val s: Scholix = input._1._2
-          val target: ScholixSummary = input._2._2
+          val s: Scholix = input._1
+          val target: ScholixResource = input._2
           ScholixUtils.generateCompleteScholix(s, target)
         }
       }
       .filter(s => s != null)
       .write
+      .option("compression", "lz4")
       .mode(SaveMode.Overwrite)
       .save(s"$targetPath/scholix_one_verse")
 
@@ -102,11 +108,10 @@ object SparkCreateScholix {
     scholix_o_v
       .flatMap(s => List(s, ScholixUtils.createInverseScholixRelation(s)))
       .as[Scholix]
-      .map(s => (s.getIdentifier, s))(Encoders.tuple(Encoders.STRING, scholixEncoder))
-      .groupByKey(_._1)
-      .agg(ScholixUtils.scholixAggregator.toColumn)
-      .map(s => s._2)
+      .map(s => (s.getIdentifier, s))
+      .dropDuplicates("identifier")
       .write
+      .option("compression", "lz4")
       .mode(SaveMode.Overwrite)
       .save(s"$targetPath/scholix")
 
@@ -136,6 +141,7 @@ object SparkCreateScholix {
       )
       .map(_._2)
       .write
+      .option("compression", "lz4")
       .mode(SaveMode.Overwrite)
       .save(s"$targetPath/related_entities")
 
@@ -144,19 +150,23 @@ object SparkCreateScholix {
       .as[RelatedEntities]
       .filter(r => dumpCitations || r.relatedPublication > 0 || r.relatedDataset > 0)
 
+    val summaryDS2: Dataset[ScholixSummary] = spark.read
+      .schema(summaryEncoder.schema)
+      .json(summaryPath)
+      .as[ScholixSummary]
+
     relatedEntitiesDS
-      .joinWith(summaryDS, relatedEntitiesDS("id").equalTo(summaryDS("_1")), "inner")
+      .joinWith(summaryDS2, relatedEntitiesDS("id").equalTo(summaryDS("id")), "inner")
       .map { i =>
         val re = i._1
-        val sum = i._2._2
-
+        val sum = i._2
         sum.setRelatedDatasets(re.relatedDataset)
         sum.setRelatedPublications(re.relatedPublication)
         sum
       }
       .write
       .mode(SaveMode.Overwrite)
+      .option("compression", "lz4")
       .save(s"${summaryPath}_filtered")
-
   }
 }
