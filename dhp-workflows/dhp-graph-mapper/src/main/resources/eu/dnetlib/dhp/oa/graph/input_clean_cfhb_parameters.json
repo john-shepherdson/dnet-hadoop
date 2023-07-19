@@ -1,0 +1,38 @@
+[
+  {
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "when true will stop SparkSession after job execution",
+    "paramRequired": false
+  },
+  {
+    "paramName": "in",
+    "paramLongName": "inputPath",
+    "paramDescription": "the path to the graph data dump to read",
+    "paramRequired": true
+  },
+  {
+    "paramName": "rp",
+    "paramLongName": "resolvedPath",
+    "paramDescription": "the path to store the resolved records",
+    "paramRequired": true
+  },
+  {
+    "paramName": "out",
+    "paramLongName": "outputPath",
+    "paramDescription": "the path to store the output graph",
+    "paramRequired": true
+  },
+  {
+    "paramName": "class",
+    "paramLongName": "graphTableClassName",
+    "paramDescription": "class name moelling the graph table",
+    "paramRequired": true
+  },
+  {
+    "paramName": "md",
+    "paramLongName": "masterDuplicatePath",
+    "paramDescription": "path to the file on HDFS holding the datasource id tuples [master, duplicate]",
+    "paramRequired": true
+  }
+]

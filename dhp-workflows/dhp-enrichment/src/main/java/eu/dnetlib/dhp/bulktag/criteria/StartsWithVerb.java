@@ -3,13 +3,9 @@ package eu.dnetlib.dhp.bulktag.criteria;
 
 import java.io.Serializable;
 
-/**
- * @author miriam.baglioni
- * @Date 06/04/23
- */
-
 @VerbClass("starts_with")
 public class StartsWithVerb implements Selection, Serializable {
+
 	private String param;
 
 	public StartsWithVerb() {

@@ -84,8 +84,8 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<StructuredProperty> prepareSubjects(final Document doc, final DataInfo info) {
-		return prepareListStructProps(doc, "//dc:subject", info);
+	protected List<Subject> prepareSubjects(final Document doc, final DataInfo info) {
+		return prepareSubjectList(doc, "//dc:subject", info);
 	}
 
 	@Override
@@ -140,7 +140,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 		final List<StructuredProperty> alternateIdentifier = prepareResultPids(doc, info);
 		final List<StructuredProperty> pid = IdentifierFactory.getPids(alternateIdentifier, collectedfrom);
 
-		final Set<StructuredProperty> pids = pid.stream().collect(Collectors.toCollection(HashSet::new));
+		final Set<StructuredProperty> pids = new HashSet<>(pid);
 
 		instance
 			.setAlternateIdentifier(
@@ -158,23 +158,32 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 		instance
 			.setProcessingchargecurrency(field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
 
+		prepareListURL(doc, "//oaf:fulltext", info)
+			.stream()
+			.findFirst()
+			.map(Field::getValue)
+			.ifPresent(instance::setFulltext);
+
 		final List<Node> nodes = Lists.newArrayList(doc.selectNodes("//dc:identifier"));
-		instance
-			.setUrl(
-				nodes
-					.stream()
-					.filter(n -> StringUtils.isNotBlank(n.getText()))
-					.map(n -> n.getText().trim())
-					.filter(u -> u.startsWith("http"))
-					.map(s -> {
-						try {
-							return URLDecoder.decode(s, "UTF-8");
-						} catch (Throwable t) {
-							return s;
-						}
-					})
-					.distinct()
-					.collect(Collectors.toCollection(ArrayList::new)));
+		final List<String> url = nodes
+			.stream()
+			.filter(n -> StringUtils.isNotBlank(n.getText()))
+			.map(n -> n.getText().trim())
+			.filter(u -> u.startsWith("http"))
+			.map(s -> {
+				try {
+					return URLDecoder.decode(s, "UTF-8");
+				} catch (Throwable t) {
+					return s;
+				}
+			})
+			.distinct()
+			.collect(Collectors.toCollection(ArrayList::new));
+		final Set<String> validUrl = validateUrl(url);
+		if (!validUrl.isEmpty()) {
+			instance.setUrl(new ArrayList<>());
+			instance.getUrl().addAll(validUrl);
+		}
 
 		return Lists.newArrayList(instance);
 	}

@@ -22,6 +22,7 @@ import eu.dnetlib.dhp.actionmanager.project.utils.model.EXCELTopic;
 /**
  * Reads a generic excel file and maps it into classes that mirror its schema
  */
+@Deprecated
 public class EXCELParser {
 
 	public <R> List<R> parse(InputStream file, String classForName, String sheetName)

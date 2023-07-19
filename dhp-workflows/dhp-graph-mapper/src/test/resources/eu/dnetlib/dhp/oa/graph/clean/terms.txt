@@ -1119,3 +1119,6 @@ dnet:relation_subRelType @=@ dnet:relation_subRelType @=@ review @=@ review
 dnet:relation_subRelType @=@ dnet:relation_subRelType @=@ similarity @=@ similarity
 dnet:relation_subRelType @=@ dnet:relation_subRelType @=@ supplement @=@ supplement
 dnet:relation_subRelType @=@ dnet:relation_subRelType @=@ version @=@ version
+FOS @=@ Fields of Science and Technology classification @=@ 0101 mathematics @=@ 0101 mathematics
+FOS @=@ Fields of Science and Technology classification @=@ 0102 computer and information sciences @=@ 0102 computer and information sciences
+FOS @=@ Fields of Science and Technology classification @=@ 0103 physical sciences @=@ 0103 physical sciences

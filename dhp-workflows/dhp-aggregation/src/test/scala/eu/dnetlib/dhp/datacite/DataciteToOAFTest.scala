@@ -54,6 +54,9 @@ class DataciteToOAFTest extends AbstractVocabularyTest {
     val path = getClass.getResource("/eu/dnetlib/dhp/actionmanager/datacite/dataset").getPath
 
     val conf = new SparkConf()
+    conf.set("spark.driver.host", "localhost")
+    conf.set("spark.ui.enabled", "false")
+
     val spark: SparkSession = SparkSession
       .builder()
       .config(conf)

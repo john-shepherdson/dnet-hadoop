@@ -90,68 +90,36 @@ public class ZenodoAPIClient implements Serializable {
 		return responseCode;
 	}
 
-//	/**
-//	 * Upload files in Zenodo.
-//	 *
-//	 * @param is the inputStream for the file to upload
-//	 * @param file_name the name of the file as it will appear on Zenodo
-//	 * @return the response code
-//	 */
-//	public int uploadIS(InputStream is, String file_name) throws IOException {
-//
-//		URL url = new URL(bucket + "/" + file_name);
-//		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//		conn.setChunkedStreamingMode(8192);
-//		conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, "application/zip");
-//		conn.setRequestProperty(HttpHeaders.AUTHORIZATION, "Bearer " + access_token);
-//		conn.setDoOutput(true);
-//		conn.setRequestMethod("PUT");
-//		conn.setRequestProperty("connection", "close");
-//
-//		byte[] buf = new byte[8192];
-//		int length;
-//		try (OutputStream os = conn.getOutputStream()) {
-//
-//			while ((length = is.read(buf)) != -1) {
-//				os.write(buf, 0, length);
-//			}
-//
-//		}
-//		int responseCode = conn.getResponseCode();
-//		if (!checkOKStatus(responseCode)) {
-//			throw new IOException("Unexpected code " + responseCode + getBody(conn));
-//		}
-//
-//		return responseCode;
-//	}
-
 	/**
 	 * Upload files in Zenodo.
 	 *
 	 * @param is the inputStream for the file to upload
 	 * @param file_name the name of the file as it will appear on Zenodo
-	 * @param len the size of the file
 	 * @return the response code
 	 */
-	public int uploadIS(InputStream is, String file_name, long len) throws IOException {
-		OkHttpClient httpClient = new OkHttpClient.Builder()
-			.writeTimeout(600, TimeUnit.SECONDS)
-			.readTimeout(600, TimeUnit.SECONDS)
-			.connectTimeout(600, TimeUnit.SECONDS)
-			.build();
+	public int uploadIS(InputStream is, String file_name) throws IOException {
 
-		Request request = new Request.Builder()
-			.url(bucket + "/" + file_name)
-			.addHeader(HttpHeaders.CONTENT_TYPE, "application/zip") // add request headers
-			.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + access_token)
-			.put(InputStreamRequestBody.create(MEDIA_TYPE_ZIP, is, len))
-			.build();
+		URL url = new URL(bucket + "/" + file_name);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, "application/zip");
+		conn.setRequestProperty(HttpHeaders.AUTHORIZATION, "Bearer " + access_token);
+		conn.setDoOutput(true);
+		conn.setRequestMethod("PUT");
 
-		try (Response response = httpClient.newCall(request).execute()) {
-			if (!response.isSuccessful())
-				throw new IOException("Unexpected code " + response + response.body().string());
-			return response.code();
+		byte[] buf = new byte[8192];
+		int length;
+		try (OutputStream os = conn.getOutputStream()) {
+			while ((length = is.read(buf)) != -1) {
+				os.write(buf, 0, length);
+			}
+
 		}
+		int responseCode = conn.getResponseCode();
+		if (!checkOKStatus(responseCode)) {
+			throw new IOException("Unexpected code " + responseCode + getBody(conn));
+		}
+
+		return responseCode;
 	}
 
 	@NotNull
@@ -204,8 +172,8 @@ public class ZenodoAPIClient implements Serializable {
 
 	private boolean checkOKStatus(int responseCode) {
 
-		if (HttpURLConnection.HTTP_OK == responseCode ||
-			HttpURLConnection.HTTP_CREATED == responseCode)
+		if (HttpURLConnection.HTTP_OK != responseCode ||
+			HttpURLConnection.HTTP_CREATED != responseCode)
 			return true;
 		return false;
 	}

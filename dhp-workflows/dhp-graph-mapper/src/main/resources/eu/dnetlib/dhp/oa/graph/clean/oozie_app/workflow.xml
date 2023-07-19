@@ -83,11 +83,56 @@
         </property>
     </parameters>
 
-    <start to="fork_clean_graph"/>
+    <start to="prepare_info"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
+    <fork name="prepare_info">
+        <path start="select_datasourceId_from_country"/>
+        <path start="get_ds_master_duplicate"/>
+    </fork>
+
+    <action name="select_datasourceId_from_country">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Select datasource ID from country</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.GetDatasourceFromCountry</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=10000
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphInputPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--country</arg><arg>${country}</arg>
+        </spark>
+        <ok to="wait_prepare"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="get_ds_master_duplicate">
+        <java>
+            <main-class>eu.dnetlib.dhp.oa.graph.clean.MasterDuplicateAction</main-class>
+            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
+            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
+            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
+            <arg>--hdfsPath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+        </java>
+        <ok to="wait_prepare"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="wait_prepare" to="fork_clean_graph"/>
 
     <fork name="fork_clean_graph">
         <path start="clean_publication"/>
@@ -115,12 +160,20 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/publication</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/publication</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -141,12 +194,20 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/dataset</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/dataset</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -167,12 +228,20 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=5000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/otherresearchproduct</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/otherresearchproduct</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -193,12 +262,20 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=2000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/software</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/software</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -219,12 +296,20 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/datasource</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/datasource</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -245,12 +330,20 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/organization</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/organization</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -271,12 +364,20 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=2000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/project</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/project</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -297,292 +398,26 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=20000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/relation</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/relation</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Relation</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
     </action>
 
-    <join name="wait_clean" to="clean_context"/>
-
-    <decision name="clean_context">
-        <switch>
-            <case to="fork_clean_context">${wf:conf('shouldClean') eq true}</case>
-            <default to="End"/>
-        </switch>
-    </decision>
-
-    <fork name="fork_clean_context">
-        <path start="clean_publication_context"/>
-        <path start="clean_dataset_context"/>
-        <path start="clean_otherresearchproduct_context"/>
-        <path start="clean_software_context"/>
-    </fork>
-
-    <action name="clean_publication_context">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Clean publications context</name>
-            <class>eu.dnetlib.dhp.oa.graph.clean.CleanContextSparkJob</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
-            </spark-opts>
-            <arg>--inputPath</arg><arg>${graphOutputPath}/publication</arg>
-            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--workingDir</arg><arg>${workingDir}/working/publication</arg>
-            <arg>--contextId</arg><arg>${contextId}</arg>
-            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
-        </spark>
-        <ok to="wait_clean_context"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="clean_dataset_context">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Clean datasets Context</name>
-            <class>eu.dnetlib.dhp.oa.graph.clean.CleanContextSparkJob</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
-            </spark-opts>
-            <arg>--inputPath</arg><arg>${graphOutputPath}/dataset</arg>
-            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--workingDir</arg><arg>${workingDir}/working/dataset</arg>
-            <arg>--contextId</arg><arg>${contextId}</arg>
-            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
-        </spark>
-        <ok to="wait_clean_context"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="clean_otherresearchproduct_context">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Clean otherresearchproducts context</name>
-            <class>eu.dnetlib.dhp.oa.graph.clean.CleanContextSparkJob</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
-            </spark-opts>
-            <arg>--inputPath</arg><arg>${graphOutputPath}/otherresearchproduct</arg>
-            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--workingDir</arg><arg>${workingDir}/working/otherresearchproduct</arg>
-            <arg>--contextId</arg><arg>${contextId}</arg>
-            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
-        </spark>
-        <ok to="wait_clean_context"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="clean_software_context">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Clean softwares context</name>
-            <class>eu.dnetlib.dhp.oa.graph.clean.CleanContextSparkJob</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
-            </spark-opts>
-            <arg>--inputPath</arg><arg>${graphOutputPath}/software</arg>
-            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--workingDir</arg><arg>${workingDir}/working/software</arg>
-            <arg>--contextId</arg><arg>${contextId}</arg>
-            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
-        </spark>
-        <ok to="wait_clean_context"/>
-        <error to="Kill"/>
-    </action>
-
-    <join name="wait_clean_context" to="select_datasourceId_from_country"/>
-
-    <action name="select_datasourceId_from_country">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Select datasource ID from country</name>
-            <class>eu.dnetlib.dhp.oa.graph.clean.country.GetDatasourceFromCountry</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
-            </spark-opts>
-            <arg>--inputPath</arg><arg>${graphOutputPath}</arg>
-            <arg>--workingDir</arg><arg>${workingDir}/working/hostedby</arg>
-            <arg>--country</arg><arg>${country}</arg>
-        </spark>
-        <ok to="fork_clean_country"/>
-        <error to="Kill"/>
-    </action>
-
-    <fork name="fork_clean_country">
-        <path start="clean_publication_country"/>
-        <path start="clean_dataset_country"/>
-        <path start="clean_otherresearchproduct_country"/>
-        <path start="clean_software_country"/>
-    </fork>
-
-    <action name="clean_publication_country">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Clean publication country</name>
-            <class>eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
-            </spark-opts>
-            <arg>--inputPath</arg><arg>${graphOutputPath}/publication</arg>
-            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--workingDir</arg><arg>${workingDir}/working/publication</arg>
-            <arg>--country</arg><arg>${country}</arg>
-            <arg>--verifyParam</arg><arg>${verifyCountryParam}</arg>
-            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
-            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
-        </spark>
-        <ok to="wait_clean_country"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="clean_dataset_country">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Clean dataset country</name>
-            <class>eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
-            </spark-opts>
-            <arg>--inputPath</arg><arg>${graphOutputPath}/dataset</arg>
-            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--workingDir</arg><arg>${workingDir}/working/dataset</arg>
-            <arg>--country</arg><arg>${country}</arg>
-            <arg>--verifyParam</arg><arg>${verifyCountryParam}</arg>
-            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
-            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
-        </spark>
-        <ok to="wait_clean_country"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="clean_otherresearchproduct_country">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Clean otherresearchproduct country</name>
-            <class>eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
-            </spark-opts>
-            <arg>--inputPath</arg><arg>${graphOutputPath}/otherresearchproduct</arg>
-            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--workingDir</arg><arg>${workingDir}/working/otherresearchproduct</arg>
-            <arg>--country</arg><arg>${country}</arg>
-            <arg>--verifyParam</arg><arg>${verifyCountryParam}</arg>
-            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
-            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
-        </spark>
-        <ok to="wait_clean_country"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="clean_software_country">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Clean software country</name>
-            <class>eu.dnetlib.dhp.oa.graph.clean.country.CleanCountrySparkJob</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
-            </spark-opts>
-            <arg>--inputPath</arg><arg>${graphOutputPath}/software</arg>
-            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--workingDir</arg><arg>${workingDir}/working/software</arg>
-            <arg>--country</arg><arg>${country}</arg>
-            <arg>--verifyParam</arg><arg>${verifyCountryParam}</arg>
-            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
-            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
-        </spark>
-        <ok to="wait_clean_country"/>
-        <error to="Kill"/>
-    </action>
-
-    <join name="wait_clean_country" to="End"/>
+    <join name="wait_clean" to="End"/>
 
     <end name="End"/>
 

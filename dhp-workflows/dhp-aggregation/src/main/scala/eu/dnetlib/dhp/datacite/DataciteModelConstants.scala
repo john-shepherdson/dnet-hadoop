@@ -78,16 +78,6 @@ object DataciteModelConstants {
     OafMapperUtils.keyValue(ModelConstants.DATACITE_ID, DATACITE_NAME)
 
   val subRelTypeMapping: Map[String, OAFRelations] = Map(
-    ModelConstants.REFERENCES -> OAFRelations(
-      ModelConstants.REFERENCES,
-      ModelConstants.IS_REFERENCED_BY,
-      ModelConstants.RELATIONSHIP
-    ),
-    ModelConstants.IS_REFERENCED_BY -> OAFRelations(
-      ModelConstants.IS_REFERENCED_BY,
-      ModelConstants.REFERENCES,
-      ModelConstants.RELATIONSHIP
-    ),
     ModelConstants.IS_SUPPLEMENTED_BY -> OAFRelations(
       ModelConstants.IS_SUPPLEMENTED_BY,
       ModelConstants.IS_SUPPLEMENT_TO,
@@ -162,16 +152,6 @@ object DataciteModelConstants {
       ModelConstants.IS_DERIVED_FROM,
       ModelConstants.IS_SOURCE_OF,
       ModelConstants.VERSION
-    ),
-    ModelConstants.CITES -> OAFRelations(
-      ModelConstants.CITES,
-      ModelConstants.IS_CITED_BY,
-      ModelConstants.CITATION
-    ),
-    ModelConstants.IS_CITED_BY -> OAFRelations(
-      ModelConstants.IS_CITED_BY,
-      ModelConstants.CITES,
-      ModelConstants.CITATION
     ),
     ModelConstants.IS_VARIANT_FORM_OF -> OAFRelations(
       ModelConstants.IS_VARIANT_FORM_OF,

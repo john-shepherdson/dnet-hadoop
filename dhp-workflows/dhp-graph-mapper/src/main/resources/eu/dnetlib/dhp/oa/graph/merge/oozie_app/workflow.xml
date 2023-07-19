@@ -275,7 +275,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=10000
             </spark-opts>
             <arg>--betaInputPath</arg><arg>${betaInputGraphPath}/relation</arg>
             <arg>--prodInputPath</arg><arg>${prodInputGraphPath}/relation</arg>
