@@ -156,6 +156,10 @@ public class PromoteActionPayloadForGraphTableJobTest {
 			List<? extends Oaf> actualOutputRows = readGraphTableFromJobOutput(outputGraphTableDir.toString(), rowClazz)
 				.collectAsList()
 				.stream()
+				.map(s -> {
+					s.setLastupdatetimestamp(0L);
+					return s;
+				})
 				.sorted(Comparator.comparingInt(Object::hashCode))
 				.collect(Collectors.toList());
 			String expectedOutputGraphTableJsonDumpPath = resultFileLocation(strategy, rowClazz, actionPayloadClazz);
@@ -168,6 +172,10 @@ public class PromoteActionPayloadForGraphTableJobTest {
 				expectedOutputGraphTableJsonDumpFile.toString(), rowClazz)
 					.collectAsList()
 					.stream()
+					.map(s -> {
+						s.setLastupdatetimestamp(0L);
+						return s;
+					})
 					.sorted(Comparator.comparingInt(Object::hashCode))
 					.collect(Collectors.toList());
 			assertIterableEquals(expectedOutputRows, actualOutputRows);
