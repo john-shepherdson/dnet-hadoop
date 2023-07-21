@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.bipmodel.score.deserializers.BipResultModel;
 import eu.dnetlib.dhp.actionmanager.bipmodel.BipScore;
+import eu.dnetlib.dhp.actionmanager.bipmodel.score.deserializers.BipResultModel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelConstants;

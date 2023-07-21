@@ -98,7 +98,7 @@ public class ReadProjectsTest {
 		Assertions.assertEquals("H2020-EU.1.3.", project.getLegalBasis());
 		Assertions.assertEquals("MSCA-IF-2019", project.getTopics());
 
-		//tmp.foreach(p -> System.out.println(OBJECT_MAPPER.writeValueAsString(p)));
+		// tmp.foreach(p -> System.out.println(OBJECT_MAPPER.writeValueAsString(p)));
 
 	}
 }

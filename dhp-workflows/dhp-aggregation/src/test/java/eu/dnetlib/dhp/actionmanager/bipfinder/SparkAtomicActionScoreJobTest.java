@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Project;
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
@@ -28,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.action.AtomicAction;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class SparkAtomicActionScoreJobTest {
@@ -73,15 +73,16 @@ public class SparkAtomicActionScoreJobTest {
 	}
 
 	private void runJob(String inputPath, String outputPath, String targetEntity) throws Exception {
-		SparkAtomicActionScoreJob.main(
-			new String[] {
+		SparkAtomicActionScoreJob
+			.main(
+				new String[] {
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-inputPath", inputPath,
 					"-outputPath", outputPath,
 					"-targetEntity", targetEntity,
-			}
-		);
+				});
 	}
+
 	@Test
 	void testResultScores() throws Exception {
 		final String targetEntity = RESULT;
@@ -149,8 +150,8 @@ public class SparkAtomicActionScoreJobTest {
 	void testProjectScores() throws Exception {
 		String targetEntity = PROJECT;
 		String inputResultScores = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/bipfinder/project_bip_scores.json")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipfinder/project_bip_scores.json")
+			.getPath();
 		String outputPath = workingDir.toString() + "/" + targetEntity + "/actionSet";
 
 		// execute the job to generate the action sets for project scores
@@ -159,9 +160,9 @@ public class SparkAtomicActionScoreJobTest {
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<Project> projects = sc
-				.sequenceFile(outputPath, Text.class, Text.class)
-				.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
-				.map(aa -> ((Project) aa.getPayload()));
+			.sequenceFile(outputPath, Text.class, Text.class)
+			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
+			.map(aa -> ((Project) aa.getPayload()));
 
 		// test the number of projects
 		assertEquals(4, projects.count());
@@ -171,7 +172,8 @@ public class SparkAtomicActionScoreJobTest {
 		// count that the project with id testProjectId is present
 		assertEquals(1, projects.filter(row -> row.getId().equals(testProjectId)).count());
 
-		projects.filter(row -> row.getId().equals(testProjectId))
+		projects
+			.filter(row -> row.getId().equals(testProjectId))
 			.flatMap(r -> r.getMeasures().iterator())
 			.foreach(m -> {
 				log.info(m.getId() + " " + m.getUnit());
@@ -184,7 +186,7 @@ public class SparkAtomicActionScoreJobTest {
 				// ensure that the correct key is provided, i.e. score
 				assertEquals("score", kv.getKey());
 
-				switch(m.getId()) {
+				switch (m.getId()) {
 					case "numOfInfluentialResults":
 						assertEquals("0", kv.getValue());
 						break;

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.actionmanager.bipmodel.score.deserializers.BipProjectModel;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
@@ -25,8 +24,9 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.bipmodel.score.deserializers.BipResultModel;
 import eu.dnetlib.dhp.actionmanager.bipmodel.BipScore;
+import eu.dnetlib.dhp.actionmanager.bipmodel.score.deserializers.BipProjectModel;
+import eu.dnetlib.dhp.actionmanager.bipmodel.score.deserializers.BipResultModel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
@@ -89,8 +89,7 @@ public class SparkAtomicActionScoreJob implements Serializable {
 					default:
 						throw new RuntimeException("Unknown target entity: " + targetEntity);
 				}
-			}
-		);
+			});
 	}
 
 	private static <I extends Project> void prepareProjects(SparkSession spark, String inputPath, String outputPath) {
@@ -98,17 +97,18 @@ public class SparkAtomicActionScoreJob implements Serializable {
 		// read input bip project scores
 		Dataset<BipProjectModel> projectScores = readPath(spark, inputPath, BipProjectModel.class);
 
-		projectScores.map( (MapFunction<BipProjectModel, Project>) bipProjectScores -> {
+		projectScores.map((MapFunction<BipProjectModel, Project>) bipProjectScores -> {
 			Project project = new Project();
 			project.setId(bipProjectScores.getProjectId());
 			project.setMeasures(bipProjectScores.toMeasures());
 			return project;
 		}, Encoders.bean(Project.class))
-		.toJavaRDD()
-		.map(p -> new AtomicAction(Project.class, p))
-		.mapToPair( aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
-				new Text(OBJECT_MAPPER.writeValueAsString(aa))))
-		.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
+			.toJavaRDD()
+			.map(p -> new AtomicAction(Project.class, p))
+			.mapToPair(
+				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
+					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
+			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
 
 	}
 
