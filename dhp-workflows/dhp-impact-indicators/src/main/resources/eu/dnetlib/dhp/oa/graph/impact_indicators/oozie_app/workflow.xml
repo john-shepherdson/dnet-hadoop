@@ -24,20 +24,21 @@
 			<case to="spark-impulse">${wf:conf('resume') eq "impulse"}</case>
 			<case to="spark-pagerank">${wf:conf('resume') eq "pagerank"}</case>
 			<case to="spark-attrank">${wf:conf('resume') eq "attrank"}</case>
-			<!-- Removed for serafeim -->
 			<!-- <case to="iterative-rankings">${wf:conf('resume') eq "rankings-iterative"}</case> -->
 			<case to="get-file-names">${wf:conf('resume') eq "format-results"}</case>
 			<case to="map-openaire-to-doi">${wf:conf('resume') eq "map-ids"}</case>
 			<case to="map-scores-to-dois">${wf:conf('resume') eq "map-scores"}</case>
 			<case to="create-openaire-ranking-graph">${wf:conf('resume') eq "start"}</case>
-			<case to="project-impact-indicators">${wf:conf('resume') eq "projects-impact"}</case>
 
-			<!-- TODO: add action set creation here -->
+			<!-- Aggregation of impact scores on the project level		-->
+			<case to="project-impact-indicators">${wf:conf('resume') eq "projects-impact"}</case>
+			<case to="create-actionset-for-projects">${wf:conf('resume') eq "projects-impact-actionsets"}</case>
+
 			<default to="create-openaire-ranking-graph" />
 		</switch>
 	</decision>
 
-	<!-- Script here written by Serafeim: maps openaire ids to their synonyms -->
+	<!-- maps openaire ids to their synonyms -->
 	<action name="create-openaire-ranking-graph">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
@@ -479,7 +480,7 @@
 	<!-- Finish formatting data and end -->
 	<join name="join-file-formatting" to="map-openaire-to-doi"/>
 
-	<!-- Script here written by Serafeim: maps openaire ids to their synonyms -->
+	<!-- maps openaire ids to their synonyms -->
 	<action name="map-openaire-to-doi">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
@@ -526,7 +527,7 @@
 	</action>
 
 
-	<!-- Script here written by Serafeim: maps openaire ids to their synonyms -->
+	<!-- maps openaire ids to their synonyms -->
 	<action name="map-scores-to-dois">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
@@ -568,14 +569,14 @@
 		</spark>
 
 		<!-- Do this after finishing okay -->
-		<ok to="deleteOutputPathForActionSet" />
-		<!-- This is the initial code <ok to="deleteOutputPathForActionSet" /> -->
+		<ok to="delete-output-path-for-actionset" />
+		<!-- This is the initial code <ok to="delete-output-path-for-actionset" /> -->
 		<!-- Go there if we have an error -->
 		<error to="map-scores-fail" />
 
 	</action>
 
-	<action name="deleteOutputPathForActionSet">
+	<action name="delete-output-path-for-actionset">
 		<fs>
 			<delete path="${actionSetOutputPath}/results/"/>
 			<delete path="${actionSetOutputPath}/projects/"/>
@@ -583,13 +584,13 @@
 			<mkdir path="${actionSetOutputPath}/results/"/>
 			<mkdir path="${actionSetOutputPath}/projects/"/>
 		</fs>
-		<ok to="createActionSetForResults"/>
+		<ok to="create-actionset-for-results"/>
 		<error to="actionset-delete-fail"/>
 	</action>
 
-	<action name="createActionSetForResults">
+	<action name="create-actionset-for-results">
 		<spark xmlns="uri:oozie:spark-action:0.2">
-			<master>yarn</master>
+			<master>yarn-cluster</master>
 			<mode>cluster</mode>
 			<name>Produces the atomic action with the bip finder scores for publications</name>
 			<class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
@@ -640,7 +641,7 @@
 			<!-- Script arguments here -->
 
 			<!-- graph data folder from which to read relations -->
-			<arg>${openaireDataInput}/relations</arg>
+			<arg>${openaireDataInput}/relation</arg>
 
 			<!-- input files with impact indicators for results	-->
 			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['pr_file']}</arg>
@@ -658,16 +659,16 @@
 		</spark>
 
 		<!-- Do this after finishing okay -->
-		<ok to="createActionSetForProjects" />
+		<ok to="create-actionset-for-projects" />
 
 		<!-- Go there if we have an error -->
 		<error to="project-impact-indicators-fail" />
 
 	</action>
 
-	<action name="createActionSetForProjects">
+	<action name="create-actionset-for-projects">
 		<spark xmlns="uri:oozie:spark-action:0.2">
-			<master>yarn</master>
+			<master>yarn-cluster</master>
 			<mode>cluster</mode>
 			<name>Produces the atomic action with the bip finder scores for projects</name>
 			<class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
