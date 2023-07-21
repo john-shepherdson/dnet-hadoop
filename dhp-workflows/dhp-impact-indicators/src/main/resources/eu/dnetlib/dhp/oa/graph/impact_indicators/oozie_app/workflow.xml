@@ -13,7 +13,6 @@
 	</global>
 
 	<!-- start using a decision node, so as to determine from which point onwards a job will continue -->
-	<!-- <start to="get-doi-synonyms" /> -->
 	<start to="entry-point-decision" />
 
 	<decision name="entry-point-decision">
@@ -38,27 +37,14 @@
 		</switch>
 	</decision>
 
-	<!-- maps openaire ids to their synonyms -->
+	<!-- initial step: create citation network -->
 	<action name="create-openaire-ranking-graph">
-		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-			<!-- Delete previously created doi synonym folder -->
-			<!-- I think we don't need this given we don't have synonyms anymore
-			<prepare>
-				<delete path="${synonymFolder}"/>
-			</prepare>
-			-->
-
-			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
-
-			<!-- This is the name of our job -->
-			<name>Openaire Ranking Graph Creation</name>
-			<!-- Script name goes here -->
+			<name>OpenAIRE Ranking Graph Creation</name>
 			<jar>create_openaire_ranking_graph.py</jar>
-			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
 
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
@@ -80,39 +66,30 @@
 			<arg>${sparkShufflePartitions}</arg>
 			<!-- The output of the graph should be the openaire input graph for ranking-->
 			<arg>${openaireGraphInputPath}</arg>
-			<!-- This needs to point to the file on the hdfs i think -->
+
 			<file>${wfAppPath}/create_openaire_ranking_graph.py#create_openaire_ranking_graph.py</file>
 		</spark>
 
-		<!-- Do this after finishing okay -->
 		<ok to="non-iterative-rankings" />
-		<!-- Go there if we have an error -->
 		<error to="openaire-graph-error" />
 
 	</action>
 
 	<!-- Citation Count and RAM are calculated in parallel-->
-	<!-- Impulse Requires resources and will be run after-->
 	<fork name="non-iterative-rankings">
 		<path start="spark-cc"/>
 		<!-- <path start="spark-impulse"/> -->
 		<path start="spark-ram"/>
 	</fork>
 
-	<!-- CC here -->
+	<!-- Run Citation Count calculation -->
 	<action name="spark-cc">
-		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
-
-			<!-- This is the name of our job -->
-			<name>Spark CC</name>
-			<!-- Script name goes here -->
+			<name>Citation Count calculation</name>
 			<jar>CC.py</jar>
-			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
 
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
@@ -129,31 +106,23 @@
 			<arg>${openaireGraphInputPath}</arg>
 			<!-- number of partitions to be used on joins -->
 			<arg>${sparkShufflePartitions}</arg>
-			<!-- This needs to point to the file on the hdfs i think -->
+
 			<file>${wfAppPath}/bip-ranker/CC.py#CC.py</file>
 		</spark>
 
-		<!-- Do this after finishing okay -->
 		<ok to="join-non-iterative-rankings" />
-		<!-- Go there if we have an error -->
 		<error to="cc-fail" />
 
 	</action>
 
-	<!-- IMPULSE here -->
+	<!-- RAM calculation -->
 	<action name="spark-ram">
-		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
-
-			<!-- This is the name of our job -->
-			<name>Spark RAM</name>
-			<!-- Script name goes here -->
+			<name>RAM calculation</name>
 			<jar>TAR.py</jar>
-			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
 
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
@@ -171,37 +140,27 @@
 			<arg>${ramGamma}</arg>
 			<arg>${currentYear}</arg>
 			<arg>RAM</arg>
-			<!-- number of partitions to be used on joins -->
 			<arg>${sparkShufflePartitions}</arg>
 			<arg>${checkpointDir}</arg>
-			<!-- This needs to point to the file on the hdfs i think -->
+
 			<file>${wfAppPath}/bip-ranker/TAR.py#TAR.py</file>
 		</spark>
 
-		<!-- Do this after finishing okay -->
 		<ok to="join-non-iterative-rankings" />
-		<!-- Go there if we have an error -->
 		<error to="ram-fail" />
 
 	</action>
 
-	<!-- JOIN NON-ITERATIVE METHODS AND THEN CONTINUE TO ITERATIVE ONES -->
+	<!-- Join non-iterative methods -->
 	<join name="join-non-iterative-rankings" to="spark-impulse"/>
 
-	<!-- IMPULSE here -->
 	<action name="spark-impulse">
-		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
-
-			<!-- This is the name of our job -->
-			<name>Spark Impulse</name>
-			<!-- Script name goes here -->
+			<name>Impulse calculation</name>
 			<jar>CC.py</jar>
-			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
 
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
@@ -219,47 +178,22 @@
 			<!-- number of partitions to be used on joins -->
 			<arg>${sparkShufflePartitions}</arg>
 			<arg>3</arg>
-			<!-- This needs to point to the file on the hdfs i think -->
+
 			<file>${wfAppPath}/bip-ranker/CC.py#CC.py</file>
 		</spark>
 
-		<!-- Do this after finishing okay -->
 		<ok to="spark-pagerank" />
-		<!-- Go there if we have an error -->
 		<error to="impulse-fail" />
 
 	</action>
 
-	<!-- Removed for ser to make pagerank & attrank serial -->
-	<!-- 
-	<fork name="iterative-rankings">
-		<path start="spark-pagerank"/>
-		<path start="spark-attrank"/>
-	</fork>
-	-->
-
-	<!-- PAGERANK here -->
 	<action name="spark-pagerank">
-		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-			<!-- we could add map-reduce configs here, but I don't know if we need them -->
-			<!-- This is the type of master-client configuration for running spark -->
-			<!-- <master>yarn-client</master> -->
-			<!-- Reference says: The master element indicates the url of the Spark Master. Ex: spark://host:port, mesos://host:port, yarn-cluster, yarn-master, or local. -->
-			<!-- <master>local[*]</master> -->
-			<!-- Reference says: The mode element if present indicates the mode of spark, where to run spark driver program. Ex: client,cluster. | In my case I always have a client -->
-			<!-- <mode>client</mode> -->
-
-			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
-
-			<!-- This is the name of our job -->
-			<name>Spark Pagerank</name>
-			<!-- Script name goes here -->
+			<name>Pagerank calculation</name>
 			<jar>PageRank.py</jar>
-			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
 
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
@@ -280,31 +214,22 @@
 			<!-- number of partitions to be used on joins -->
 			<arg>${sparkShufflePartitions}</arg>
 			<arg>dfs</arg>
-			<!-- This needs to point to the file on the hdfs i think -->
+
 			<file>${wfAppPath}/bip-ranker/PageRank.py#PageRank.py</file>
 		</spark>
 
-		<!-- Do this after finishing okay -->
 		<ok to="spark-attrank" />
-		<!-- Go there if we have an error -->
 		<error to="pagerank-fail" />
 
 	</action>
 
-	<!-- ATTRANK here -->
 	<action name="spark-attrank">
-		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
-
-			<!-- This is the name of our job -->
-			<name>Spark AttRank</name>
-			<!-- Script name goes here -->
+			<name>AttRank calculation</name>
 			<jar>AttRank.py</jar>
-			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
 
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
@@ -330,27 +255,16 @@
 			<!-- number of partitions to be used on joins -->
 			<arg>${sparkShufflePartitions}</arg>
 			<arg>dfs</arg>
-			<!-- This needs to point to the file on the hdfs i think -->
+
 			<file>${wfAppPath}/bip-ranker/AttRank.py#AttRank.py</file>
 		</spark>
 
-		<!-- Do this after finishing okay -->
 		<ok to="get-file-names" />
-		<!-- Go there if we have an error -->
 		<error to="attrank-fail" />
 
 	</action>
 
-	<!-- Removed for ser -->
-	<!--
-	 JOIN ITERATIVE METHODS AND THEN END =
-	<join name="join-iterative-rankings" to="end" />
-	to="get-file-names"/>  
-	-->
-
-	<!-- This will be a shell action that will output key-value pairs for output files -->
 	<action name="get-file-names">
-		<!-- This is required as a tag for shell jobs -->
 		<shell xmlns="uri:oozie:shell-action:0.3">
 
 			<!-- Exec is needed for shell commands - points to type of shell command -->
@@ -360,15 +274,12 @@
 			<!-- We only pass the directory where we expect to find the rankings -->
 			<argument>${workingDir}</argument>
 
-			<!-- the name of the file run -->
 			<file>${wfAppPath}/get_ranking_files.sh#get_ranking_files.sh</file>
 			<!-- Get the output in order to be usable by following actions -->
 			<capture-output/>
 		</shell>
 
-		<!-- Do this after finishing okay -->
 		<ok to="format-result-files" />
-		<!-- Go there if we have an error -->
 		<error to="filename-getting-error" />
 
 	</action>
@@ -383,18 +294,12 @@
 	<!-- Format json files -->
 	<!-- Two parts: a) format files b) make the file endings .json.gz -->
 	<action name="format-json-files">
-		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
-
-			<!-- This is the name of our job -->
 			<name>Format Ranking Results JSON</name>
-			<!-- Script name goes here -->
 			<jar>format_ranking_results.py</jar>
-			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
 
 			<spark-opts>
 				--executor-memory=${sparkNormalExecutorMemory}
@@ -419,13 +324,11 @@
 			<arg>${sparkShufflePartitions}</arg>
 			<!-- Type of data to be produced [bip (dois) / openaire (openaire-ids) ] -->
 			<arg>openaire</arg>
-			<!-- This needs to point to the file on the hdfs i think -->
+
 			<file>${wfAppPath}/format_ranking_results.py#format_ranking_results.py</file>
 		</spark>
 
-		<!-- Do this after finishing okay -->
 		<ok to="join-file-formatting" />
-		<!-- Go there if we have an error -->
 		<error to="json-formatting-fail" />
 	</action>
 
@@ -471,18 +374,15 @@
 			<file>${wfAppPath}/format_ranking_results.py#format_ranking_results.py</file>
 		</spark>
 
-		<!-- Do this after finishing okay -->
 		<ok to="join-file-formatting" />
-		<!-- Go there if we have an error -->
 		<error to="bip-formatting-fail" />
 	</action>
 
-	<!-- Finish formatting data and end -->
+	<!-- Finish formatting jobs -->
 	<join name="join-file-formatting" to="map-openaire-to-doi"/>
 
-	<!-- maps openaire ids to their synonyms -->
+	<!-- maps openaire ids to DOIs -->
 	<action name="map-openaire-to-doi">
-		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
 			<!-- Delete previously created doi synonym folder -->
@@ -490,15 +390,10 @@
 				<delete path="${synonymFolder}"/>
 			</prepare>
 
-			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
-
-			<!-- This is the name of our job -->
 			<name>Openaire-DOI synonym collection</name>
-			<!-- Script name goes here -->
 			<jar>map_openaire_ids_to_dois.py</jar>
-			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
 
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
@@ -515,19 +410,16 @@
 			<arg>${openaireDataInput}/</arg>
 			<!-- number of partitions to be used on joins -->
 			<arg>${synonymFolder}</arg>
-			<!-- This needs to point to the file on the hdfs i think -->
+
 			<file>${wfAppPath}/map_openaire_ids_to_dois.py#map_openaire_ids_to_dois.py</file>
 		</spark>
 
-		<!-- Do this after finishing okay -->
 		<ok to="map-scores-to-dois" />
-		<!-- Go there if we have an error -->
 		<error to="synonym-collection-fail" />
 
 	</action>
 
-
-	<!-- maps openaire ids to their synonyms -->
+	<!-- mapping openaire scores to DOIs -->
 	<action name="map-scores-to-dois">
 		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
@@ -535,12 +427,8 @@
 			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
-
-			<!-- This is the name of our job -->
 			<name>Mapping Openaire Scores to DOIs</name>
-			<!-- Script name goes here -->
 			<jar>map_scores_to_dois.py</jar>
-			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
 
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
@@ -564,18 +452,15 @@
 			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['impulse_file']}</arg>
 			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['ram_file']}</arg>
 
-			<!-- This needs to point to the file on the hdfs i think -->
 			<file>${wfAppPath}/map_scores_to_dois.py#map_scores_to_dois.py</file>
 		</spark>
 
-		<!-- Do this after finishing okay -->
 		<ok to="delete-output-path-for-actionset" />
-		<!-- This is the initial code <ok to="delete-output-path-for-actionset" /> -->
-		<!-- Go there if we have an error -->
 		<error to="map-scores-fail" />
 
 	</action>
 
+	<!-- Re-create folder for result and project actionsets -->
 	<action name="delete-output-path-for-actionset">
 		<fs>
 			<delete path="${actionSetOutputPath}/results/"/>
@@ -590,11 +475,13 @@
 
 	<action name="create-actionset-for-results">
 		<spark xmlns="uri:oozie:spark-action:0.2">
+
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
 			<name>Produces the atomic action with the bip finder scores for publications</name>
 			<class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
 			<jar>dhp-aggregation-${projectVersion}.jar</jar>
+
 			<spark-opts>
 				--executor-memory=${sparkNormalExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -609,23 +496,19 @@
 			<arg>--outputPath</arg><arg>${actionSetOutputPath}/results/</arg>
 			<arg>--targetEntity</arg><arg>result</arg>
 		</spark>
+
 		<ok to="project-impact-indicators"/>
 		<error to="actionset-creation-fail"/>
+
 	</action>
 
 	<action name="project-impact-indicators">
-		<!-- This is required as a tag for spark jobs, regardless of programming language -->
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
-			<!-- using configs from an example on openaire -->
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
-
-			<!-- This is the name of our job -->
-			<name>Project Impact Indicators</name>
-			<!-- Script name goes here -->
+			<name>Project Impact Indicators calculation</name>
 			<jar>projects_impact.py</jar>
-			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
 
 			<spark-opts>
 				--executor-memory=${sparkHighExecutorMemory}
@@ -639,7 +522,6 @@
 			</spark-opts>
 
 			<!-- Script arguments here -->
-
 			<!-- graph data folder from which to read relations -->
 			<arg>${openaireDataInput}/relation</arg>
 
@@ -653,26 +535,23 @@
 			<arg>${sparkShufflePartitions}</arg>
 
 			<arg>${projectImpactIndicatorsOutput}</arg>
-
-			<!-- This needs to point to the file on the hdfs i think -->
 			<file>${wfAppPath}/projects_impact.py#projects_impact.py</file>
 		</spark>
 
-		<!-- Do this after finishing okay -->
 		<ok to="create-actionset-for-projects" />
-
-		<!-- Go there if we have an error -->
 		<error to="project-impact-indicators-fail" />
 
 	</action>
 
 	<action name="create-actionset-for-projects">
 		<spark xmlns="uri:oozie:spark-action:0.2">
+
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
 			<name>Produces the atomic action with the bip finder scores for projects</name>
 			<class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
 			<jar>dhp-aggregation-${projectVersion}.jar</jar>
+
 			<spark-opts>
 				--executor-memory=${sparkNormalExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
@@ -683,12 +562,15 @@
 				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
 				--conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
 			</spark-opts>
+
 			<arg>--inputPath</arg><arg>${projectImpactIndicatorsOutput}</arg>
 			<arg>--outputPath</arg><arg>${actionSetOutputPath}/projects/</arg>
 			<arg>--targetEntity</arg><arg>project</arg>
 		</spark>
+
 		<ok to="end"/>
 		<error to="actionset-project-creation-fail"/>
+
 	</action>
 
 	<!-- Definitions of failure messages -->
