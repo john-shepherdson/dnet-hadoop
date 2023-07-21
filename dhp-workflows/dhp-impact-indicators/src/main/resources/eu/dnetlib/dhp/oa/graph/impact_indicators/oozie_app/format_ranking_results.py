@@ -213,7 +213,10 @@ if mode == 'bip':
 	cc_dir		= sys.argv[4]
 	impulse_dir	= sys.argv[5]
 	ram_dir		= sys.argv[6]
-	refs_dir	= sys.argv[7]	
+
+	# NOTE: This was used initial, but @Serafeim told me to remove it since we don't get doi-doi referencew anymore
+	# In case of emergency, bring this back
+	# refs_dir	= sys.argv[7]	
 		
 	# Score-specific dataframe
 	pagerank_df = spark.read.schema(float_schema).option('delimiter', '\t').option('header',True).csv(pagerank_dir).repartition(num_partitions, 'id')
@@ -221,7 +224,7 @@ if mode == 'bip':
 	cc_df	    = spark.read.schema(int_schema).option('delimiter', '\t').option('header',True).csv(cc_dir).repartition(num_partitions, 'id')
 	impulse_df   = spark.read.schema(int_schema).option('delimiter', '\t').option('header',True).csv(impulse_dir).repartition(num_partitions, 'id')
 	ram_df      = spark.read.schema(float_schema).option('delimiter', '\t').option('header', True).csv(ram_dir).repartition(num_partitions, 'id')
-	refs_df     = spark.read.schema(refs_schema).option('delimiter', '\t').option('header',True).csv(refs_dir).repartition(num_partitions, 'id')
+	# refs_df     = spark.read.schema(refs_schema).option('delimiter', '\t').option('header',True).csv(refs_dir).repartition(num_partitions, 'id')
 	
 	# ----------- TESTING CODE --------------- #
 	# pagerank_entries = pagerank_df.count()
@@ -258,9 +261,10 @@ if mode == 'bip':
 				.select(results_df.id, 'pagerank', 'pagerank_normalized', 'attrank', 'attrank_normalized', 'cc', 'cc_normalized',\
 					'3-cc', '3-cc_normalized', F.col('score').alias('ram'))
 	
-	# Add references
-	results_df  = results_df.join(refs_df, ['id']).select(results_df.id, 'pagerank', 'pagerank_normalized', 'attrank', 'attrank_normalized', \
-							      'cc', 'cc_normalized', '3-cc', '3-cc_normalized', 'ram', 'num_refs')
+	# Add references - THIS WAS REMOVED SINCE WE DON't GET DOI REFERENCES
+	# In case of emergency bring back
+	# results_df  = results_df.join(refs_df, ['id']).select(results_df.id, 'pagerank', 'pagerank_normalized', 'attrank', 'attrank_normalized', \
+	#						      'cc', 'cc_normalized', '3-cc', '3-cc_normalized', 'ram', 'num_refs')
 	
 	# Write resulting dataframe to file
 	output_dir = "/".join(pagerank_dir.split('/')[:-1])
