@@ -11,8 +11,10 @@ import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -58,6 +60,11 @@ public class SparkJobTest {
 			.getOrCreate();
 	}
 
+	@AfterEach
+	public void afterEach() throws IOException {
+		FileUtils.deleteDirectory(workingDir.toFile());
+	}
+
 	@AfterAll
 	public static void afterAll() throws IOException {
 		FileUtils.deleteDirectory(workingDir.toFile());
@@ -91,16 +98,19 @@ public class SparkJobTest {
 
 		readPath(spark, leavesPath, Leaves.class)
 			.write()
+			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(workingDir.toString() + "/leavesInput");
 
 		readPath(spark, resultOrgPath, KeyValueSet.class)
 			.write()
+			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(workingDir.toString() + "/orgsInput");
 
 		readPath(spark, projectOrgPath, KeyValueSet.class)
 			.write()
+			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(workingDir.toString() + "/projectInput");
 
@@ -369,16 +379,19 @@ public class SparkJobTest {
 
 		readPath(spark, leavesPath, Leaves.class)
 			.write()
+			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(workingDir.toString() + "/leavesInput");
 
 		readPath(spark, resultOrgPath, KeyValueSet.class)
 			.write()
+			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(workingDir.toString() + "/orgsInput");
 
 		readPath(spark, projectOrgPath, KeyValueSet.class)
 			.write()
+			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(workingDir.toString() + "/projectInput");
 
@@ -649,16 +662,19 @@ public class SparkJobTest {
 
 		readPath(spark, leavesPath, Leaves.class)
 			.write()
+			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(workingDir.toString() + "/leavesInput");
 
 		readPath(spark, resultOrgPath, KeyValueSet.class)
 			.write()
+			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(workingDir.toString() + "/orgsInput");
 
 		readPath(spark, projectOrgPath, KeyValueSet.class)
 			.write()
+			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(workingDir.toString() + "/projectInput");
 

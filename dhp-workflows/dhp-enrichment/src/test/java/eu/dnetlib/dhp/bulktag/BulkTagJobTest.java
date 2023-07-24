@@ -682,7 +682,7 @@ public class BulkTagJobTest {
 		Assertions.assertEquals(3, idExplodeCommunity.filter("community = 'covid-19'").count());
 		Assertions.assertEquals(1, idExplodeCommunity.filter("community = 'dh-ch'").count());
 		Assertions.assertEquals(4, idExplodeCommunity.filter("community = 'aginfra'").count());
-		Assertions.assertEquals(1, idExplodeCommunity.filter("community = 'dariah'").count());
+		Assertions.assertEquals(1, idExplodeCommunity.filter("community = 'dth'").count());
 		Assertions.assertEquals(1, idExplodeCommunity.filter("community = 'fam'").count());
 
 		Assertions
@@ -692,7 +692,7 @@ public class BulkTagJobTest {
 					.filter(
 						"provenance = 'community:zenodocommunity' and "
 							+ "id = '50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4' and ("
-							+ "community = 'dh-ch' or community = 'dariah')")
+							+ "community = 'dh-ch' or community = 'dth')")
 					.count());
 
 		query = "select id, MyT.id community, size(MyT.datainfo) datainfosize "
