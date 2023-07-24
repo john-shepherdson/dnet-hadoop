@@ -6,14 +6,16 @@ import java.util.regex.Pattern;
 
 public class FundRefCleaningRule {
 
-	public static String clean(final String fundrefId) {
+	public static final Pattern PATTERN = Pattern.compile("\\d+");
 
-		String s = fundrefId
+	public static String clean(final String fundRefId) {
+
+		String s = fundRefId
 			.toLowerCase()
 			.replaceAll("\\s", "");
 
-		Matcher m = Pattern.compile("\\d+").matcher(s);
-		if (m.matches()) {
+		Matcher m = PATTERN.matcher(s);
+		if (m.find()) {
 			return m.group();
 		} else {
 			return "";
