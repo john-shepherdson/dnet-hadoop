@@ -245,7 +245,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 			// nothing to evaluate here
 		} else if (value instanceof Project) {
 			final Project p = (Project) value;
-			return Objects.isNull(p.getCode()) || StringUtils.isBlank(p.getCode().getValue());
+			return Objects.nonNull(p.getCode()) && StringUtils.isNotBlank(p.getCode().getValue());
 		} else if (value instanceof Organization) {
 			// nothing to evaluate here
 		} else if (value instanceof Relation) {
