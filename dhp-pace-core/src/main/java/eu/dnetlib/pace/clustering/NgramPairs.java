@@ -2,7 +2,6 @@
 package eu.dnetlib.pace.clustering;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +13,11 @@ import eu.dnetlib.pace.config.Config;
 public class NgramPairs extends Ngrams {
 
 	public NgramPairs(Map<String, Integer> params) {
-		super(params);
+		super(params, false);
+	}
+
+	public NgramPairs(Map<String, Integer> params, boolean sorted) {
+		super(params, sorted);
 	}
 
 	@Override

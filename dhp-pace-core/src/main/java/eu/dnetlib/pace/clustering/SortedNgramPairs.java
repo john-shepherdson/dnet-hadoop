@@ -13,7 +13,7 @@ import eu.dnetlib.pace.config.Config;
 public class SortedNgramPairs extends NgramPairs {
 
 	public SortedNgramPairs(Map<String, Integer> params) {
-		super(params);
+		super(params, false);
 	}
 
 	@Override

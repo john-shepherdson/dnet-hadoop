@@ -4,7 +4,6 @@ package eu.dnetlib.pace.tree;
 import java.util.Map;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Field;
 import eu.dnetlib.pace.tree.support.Comparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
@@ -13,13 +12,13 @@ import eu.dnetlib.pace.tree.support.ComparatorClass;
  * NullDistanceAlgo.
  */
 @ComparatorClass("null")
-public class NullDistanceAlgo implements Comparator {
+public class NullDistanceAlgo<T> implements Comparator<T> {
 
 	public NullDistanceAlgo(Map<String, String> params) {
 	}
 
 	@Override
-	public double compare(Field a, Field b, Config config) {
+	public double compare(Object a, Object b, Config config) {
 		return 0;
 	}
 }

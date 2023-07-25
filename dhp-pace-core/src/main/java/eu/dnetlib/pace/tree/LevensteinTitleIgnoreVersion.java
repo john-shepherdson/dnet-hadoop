@@ -6,14 +6,14 @@ import java.util.Map;
 import com.wcohen.ss.AbstractStringDistance;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractStringComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 /**
  * Compared compare between two titles, ignoring version numbers. Suitable for Software entities.
  */
 @ComparatorClass("levensteinTitleIgnoreVersion")
-public class LevensteinTitleIgnoreVersion extends AbstractComparator {
+public class LevensteinTitleIgnoreVersion extends AbstractStringComparator {
 
 	public LevensteinTitleIgnoreVersion(Map<String, String> params) {
 		super(params, new com.wcohen.ss.Levenstein());

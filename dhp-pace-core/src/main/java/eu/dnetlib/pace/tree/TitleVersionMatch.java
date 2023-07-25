@@ -1,12 +1,10 @@
 
 package eu.dnetlib.pace.tree;
 
-import java.util.List;
 import java.util.Map;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Field;
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractStringComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 /**
@@ -16,17 +14,14 @@ import eu.dnetlib.pace.tree.support.ComparatorClass;
  *
  */
 @ComparatorClass("titleVersionMatch")
-public class TitleVersionMatch extends AbstractComparator {
+public class TitleVersionMatch extends AbstractStringComparator {
 
 	public TitleVersionMatch(final Map<String, String> params) {
 		super(params);
 	}
 
 	@Override
-	public double compare(final Field a, final Field b, final Config conf) {
-		final String valueA = getFirstValue(a);
-		final String valueB = getFirstValue(b);
-
+	public double compare(final String valueA, final String valueB, final Config conf) {
 		if (valueA.isEmpty() || valueB.isEmpty())
 			return -1;
 
@@ -38,4 +33,7 @@ public class TitleVersionMatch extends AbstractComparator {
 		return getClass().getSimpleName() + ":" + super.toString();
 	}
 
+	protected String toString(final Object object) {
+		return toFirstString(object);
+	}
 }

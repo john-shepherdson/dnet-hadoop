@@ -12,7 +12,6 @@ import com.google.common.collect.Sets;
 
 import eu.dnetlib.pace.common.AbstractPaceFunctions;
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Field;
 import eu.dnetlib.pace.model.Person;
 
 @ClusteringClass("personClustering")
@@ -27,19 +26,19 @@ public class PersonClustering extends AbstractPaceFunctions implements Clusterin
 	}
 
 	@Override
-	public Collection<String> apply(final Config conf, final List<Field> fields) {
+	public Collection<String> apply(final Config conf, final List<String> fields) {
 		final Set<String> hashes = Sets.newHashSet();
 
-		for (final Field f : fields) {
+		for (final String f : fields) {
 
-			final Person person = new Person(f.stringValue(), false);
+			final Person person = new Person(f, false);
 
 			if (StringUtils.isNotBlank(person.getNormalisedFirstName())
 				&& StringUtils.isNotBlank(person.getNormalisedSurname())) {
 				hashes.add(firstLC(person.getNormalisedFirstName()) + person.getNormalisedSurname().toLowerCase());
 			} else {
-				for (final String token1 : tokens(f.stringValue(), MAX_TOKENS)) {
-					for (final String token2 : tokens(f.stringValue(), MAX_TOKENS)) {
+				for (final String token1 : tokens(f, MAX_TOKENS)) {
+					for (final String token2 : tokens(f, MAX_TOKENS)) {
 						if (!token1.equals(token2)) {
 							hashes.add(firstLC(token1) + token2);
 						}

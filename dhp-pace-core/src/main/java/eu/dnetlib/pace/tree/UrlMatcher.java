@@ -8,7 +8,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Field;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 @ComparatorClass("urlMatcher")
@@ -31,9 +30,9 @@ public class UrlMatcher extends Levenstein {
 	}
 
 	@Override
-	public double distance(Field a, Field b, final Config conf) {
-		final URL urlA = asUrl(getFirstValue(a));
-		final URL urlB = asUrl(getFirstValue(b));
+	public double distance(String a, String b, final Config conf) {
+		final URL urlA = asUrl(a);
+		final URL urlB = asUrl(b);
 
 		if (!urlA.getHost().equalsIgnoreCase(urlB.getHost())) {
 			return 0.0;
@@ -58,4 +57,7 @@ public class UrlMatcher extends Levenstein {
 		}
 	}
 
+	protected String toString(final Object object) {
+		return toFirstString(object);
+	}
 }

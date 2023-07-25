@@ -10,16 +10,18 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.google.common.collect.Sets;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Field;
-import eu.dnetlib.pace.model.FieldList;
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractListComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 import eu.dnetlib.pace.util.MapDocumentUtil;
 
 @ComparatorClass("jsonListMatch")
-public class JsonListMatch extends AbstractComparator {
+public class JsonListMatch extends AbstractListComparator {
 
 	private static final Log log = LogFactory.getLog(JsonListMatch.class);
 	private Map<String, String> params;
@@ -34,11 +36,7 @@ public class JsonListMatch extends AbstractComparator {
 	}
 
 	@Override
-	public double compare(final Field a, final Field b, final Config conf) {
-
-		final List<String> sa = ((FieldList) a).stringList();
-		final List<String> sb = ((FieldList) b).stringList();
-
+	public double compare(final List<String> sa, final List<String> sb, final Config conf) {
 		if (sa.isEmpty() || sb.isEmpty()) {
 			return -1;
 		}
@@ -65,14 +63,17 @@ public class JsonListMatch extends AbstractComparator {
 
 		StringBuilder st = new StringBuilder(); // to build the string used for comparisons basing on the jpath into
 												// parameters
-
+		final DocumentContext documentContext = JsonPath
+			.using(Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS))
+			.parse(json);
 		// for each path in the param list
 		for (String key : params.keySet().stream().filter(k -> k.contains("jpath")).collect(Collectors.toList())) {
 			String path = params.get(key);
-			String value = MapDocumentUtil.getJPathString(path, json);
+			String value = MapDocumentUtil.getJPathString(path, documentContext);
 			if (value == null || value.isEmpty())
 				value = "";
-			st.append(value + "::");
+			st.append(value);
+			st.append("::");
 		}
 
 		st.setLength(st.length() - 2);

@@ -7,11 +7,11 @@ import java.util.Set;
 import com.wcohen.ss.AbstractStringDistance;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractStringComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 @ComparatorClass("jaroWinklerNormalizedName")
-public class JaroWinklerNormalizedName extends AbstractComparator {
+public class JaroWinklerNormalizedName extends AbstractStringComparator {
 
 	private Map<String, String> params;
 

@@ -5,11 +5,11 @@ import java.util.Map;
 import java.util.Set;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractStringComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 @ComparatorClass("cityMatch")
-public class CityMatch extends AbstractComparator {
+public class CityMatch extends AbstractStringComparator {
 
 	private Map<String, String> params;
 

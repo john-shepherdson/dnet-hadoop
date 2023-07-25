@@ -4,11 +4,11 @@ package eu.dnetlib.pace.tree;
 import java.util.Map;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractStringComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 @ComparatorClass("numbersMatch")
-public class NumbersMatch extends AbstractComparator {
+public class NumbersMatch extends AbstractStringComparator {
 
 	public NumbersMatch(Map<String, String> params) {
 		super(params);

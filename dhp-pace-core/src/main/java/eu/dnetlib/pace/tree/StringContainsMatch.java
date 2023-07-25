@@ -4,7 +4,7 @@ package eu.dnetlib.pace.tree;
 import java.util.Map;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractStringComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 /**
@@ -13,7 +13,7 @@ import eu.dnetlib.pace.tree.support.ComparatorClass;
  * @author miconis
  * */
 @ComparatorClass("stringContainsMatch")
-public class StringContainsMatch extends AbstractComparator {
+public class StringContainsMatch extends AbstractStringComparator {
 
 	private Map<String, String> params;
 

@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Field;
 import eu.dnetlib.pace.model.Person;
 
 @ClusteringClass("lnfi")
@@ -22,11 +21,10 @@ public class LastNameFirstInitial extends AbstractClusteringFunction {
 	}
 
 	@Override
-	public Collection<String> apply(Config conf, List<Field> fields) {
+	public Collection<String> apply(Config conf, List<String> fields) {
 		return fields
 			.stream()
 			.filter(f -> !f.isEmpty())
-			.map(Field::stringValue)
 			.map(this::normalize)
 			.map(s -> doApply(conf, s))
 			.map(c -> filterBlacklisted(c, ngramBlacklist))

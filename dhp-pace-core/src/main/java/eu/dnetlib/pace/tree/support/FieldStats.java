@@ -6,7 +6,6 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.pace.model.Field;
 import eu.dnetlib.pace.util.PaceException;
 
 /**
@@ -17,12 +16,12 @@ public class FieldStats implements Serializable {
 	private double weight; // weight for the field (to be used in the aggregation)
 	private double threshold; // threshold for the field (to be used in some kind of aggregations)
 	private double result; // the result of the comparison
-	private Field a;
-	private Field b;
+	private Object a;
+	private Object b;
 
 	private boolean countIfUndefined;
 
-	public FieldStats(double weight, double threshold, double result, boolean countIfUndefined, Field a, Field b) {
+	public FieldStats(double weight, double threshold, double result, boolean countIfUndefined, Object a, Object b) {
 		this.weight = weight;
 		this.threshold = threshold;
 		this.result = result;
@@ -63,19 +62,19 @@ public class FieldStats implements Serializable {
 		this.countIfUndefined = countIfUndefined;
 	}
 
-	public Field getA() {
+	public Object getA() {
 		return a;
 	}
 
-	public void setA(Field a) {
+	public void setA(Object a) {
 		this.a = a;
 	}
 
-	public Field getB() {
+	public Object getB() {
 		return b;
 	}
 
-	public void setB(Field b) {
+	public void setB(Object b) {
 		this.b = b;
 	}
 

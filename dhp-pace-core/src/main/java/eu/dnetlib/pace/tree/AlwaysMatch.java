@@ -6,12 +6,11 @@ import java.util.Map;
 import com.wcohen.ss.AbstractStringDistance;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Field;
 import eu.dnetlib.pace.tree.support.AbstractComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 @ComparatorClass("alwaysMatch")
-public class AlwaysMatch extends AbstractComparator {
+public class AlwaysMatch<T> extends AbstractComparator<T> {
 
 	public AlwaysMatch(final Map<String, String> params) {
 		super(params, new com.wcohen.ss.JaroWinkler());
@@ -26,7 +25,7 @@ public class AlwaysMatch extends AbstractComparator {
 	}
 
 	@Override
-	public double compare(final Field a, final Field b, final Config conf) {
+	public double compare(final Object a, final Object b, final Config conf) {
 		return 1.0;
 	}
 

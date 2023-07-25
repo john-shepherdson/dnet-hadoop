@@ -5,7 +5,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-import eu.dnetlib.pace.model.Field;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 @ComparatorClass("domainExactMatch")
@@ -16,10 +15,10 @@ public class DomainExactMatch extends ExactMatchIgnoreCase {
 	}
 
 	@Override
-	protected String getValue(final Field f) {
+	protected String toString(final Object f) {
 
 		try {
-			return asUrl(super.getValue(f)).getHost();
+			return asUrl(super.toString(f)).getHost();
 		} catch (MalformedURLException e) {
 			return "";
 		}

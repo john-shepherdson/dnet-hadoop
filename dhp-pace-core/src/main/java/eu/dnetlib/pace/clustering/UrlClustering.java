@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import eu.dnetlib.pace.common.AbstractPaceFunctions;
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Field;
 
 @ClusteringClass("urlclustering")
 public class UrlClustering extends AbstractPaceFunctions implements ClusteringFunction {
@@ -23,12 +22,11 @@ public class UrlClustering extends AbstractPaceFunctions implements ClusteringFu
 	}
 
 	@Override
-	public Collection<String> apply(final Config conf, List<Field> fields) {
+	public Collection<String> apply(final Config conf, List<String> fields) {
 		try {
 			return fields
 				.stream()
 				.filter(f -> !f.isEmpty())
-				.map(Field::stringValue)
 				.map(this::asUrl)
 				.map(URL::getHost)
 				.collect(Collectors.toCollection(HashSet::new));

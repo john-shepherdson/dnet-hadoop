@@ -6,11 +6,11 @@ import java.util.Map;
 import com.wcohen.ss.AbstractStringDistance;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractStringComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 @ComparatorClass("level2JaroWinklerTitle")
-public class Level2JaroWinklerTitle extends AbstractComparator {
+public class Level2JaroWinklerTitle extends AbstractStringComparator {
 
 	public Level2JaroWinklerTitle(Map<String, String> params) {
 		super(params, new com.wcohen.ss.Level2JaroWinkler());

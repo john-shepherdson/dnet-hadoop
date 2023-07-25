@@ -6,8 +6,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Field;
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractStringComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 /**
@@ -16,7 +15,7 @@ import eu.dnetlib.pace.tree.support.ComparatorClass;
  * @author claudio
  */
 @ComparatorClass("yearMatch")
-public class YearMatch extends AbstractComparator {
+public class YearMatch extends AbstractStringComparator {
 
 	private int limit = 4;
 
@@ -25,7 +24,7 @@ public class YearMatch extends AbstractComparator {
 	}
 
 	@Override
-	public double compare(final Field a, final Field b, final Config conf) {
+	public double compare(final String a, final String b, final Config conf) {
 		final String valueA = getNumbers(getFirstValue(a));
 		final String valueB = getNumbers(getFirstValue(b));
 
@@ -42,8 +41,8 @@ public class YearMatch extends AbstractComparator {
 		return s.length() == limit;
 	}
 
-	protected String getFirstValue(final Field value) {
-		return (value != null) && !value.isEmpty() ? StringUtils.left(value.stringValue(), limit) : "";
+	protected String getFirstValue(final String value) {
+		return (value != null) && !value.isEmpty() ? StringUtils.left(value, limit) : "";
 	}
 
 	@Override

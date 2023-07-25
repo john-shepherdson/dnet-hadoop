@@ -3,17 +3,17 @@ package eu.dnetlib.pace.tree.support;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.types.ArrayType;
+import org.apache.spark.sql.types.DataType;
+import org.apache.spark.sql.types.StringType;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.pace.config.Config;
 import eu.dnetlib.pace.config.PaceConfig;
-import eu.dnetlib.pace.model.MapDocument;
 import eu.dnetlib.pace.util.PaceException;
 
 public class TreeNodeDef implements Serializable {
@@ -46,31 +46,27 @@ public class TreeNodeDef implements Serializable {
 	}
 
 	// function for the evaluation of the node
-	public TreeNodeStats evaluate(MapDocument doc1, MapDocument doc2, Config conf) {
+	public TreeNodeStats evaluate(Row doc1, Row doc2, Config conf) {
 
 		TreeNodeStats stats = new TreeNodeStats();
 
 		// for each field in the node, it computes the
 		for (FieldConf fieldConf : fields) {
-
 			double weight = fieldConf.getWeight();
-
 			double result;
+
+			Object value1 = getJavaValue(doc1, fieldConf.getField());
+			Object value2 = getJavaValue(doc2, fieldConf.getField());
 
 			// if the param specifies a cross comparison (i.e. compare elements from different fields), compute the
 			// result for both sides and return the maximum
-			if (fieldConf.getParams().keySet().stream().anyMatch(k -> k.contains(CROSS_COMPARE))) {
-				String crossField = fieldConf.getParams().get(CROSS_COMPARE);
-				double result1 = comparator(fieldConf)
-					.compare(doc1.getFieldMap().get(fieldConf.getField()), doc2.getFieldMap().get(crossField), conf);
-				double result2 = comparator(fieldConf)
-					.compare(doc1.getFieldMap().get(crossField), doc2.getFieldMap().get(fieldConf.getField()), conf);
+			String crossField = fieldConf.getParams().get(CROSS_COMPARE);
+			if (crossField != null) {
+				double result1 = comparator(fieldConf).compare(value1, getJavaValue(doc2, crossField), conf);
+				double result2 = comparator(fieldConf).compare(getJavaValue(doc1, crossField), value2, conf);
 				result = Math.max(result1, result2);
 			} else {
-				result = comparator(fieldConf)
-					.compare(
-						doc1.getFieldMap().get(fieldConf.getField()), doc2.getFieldMap().get(fieldConf.getField()),
-						conf);
+				result = comparator(fieldConf).compare(value1, value2, conf);
 			}
 
 			stats
@@ -81,11 +77,25 @@ public class TreeNodeDef implements Serializable {
 						Double.parseDouble(fieldConf.getParams().getOrDefault("threshold", "1.0")),
 						result,
 						fieldConf.isCountIfUndefined(),
-						doc1.getFieldMap().get(fieldConf.getField()),
-						doc2.getFieldMap().get(fieldConf.getField())));
+						value1,
+						value2));
 		}
 
 		return stats;
+	}
+
+	public Object getJavaValue(Row row, String name) {
+		int pos = row.fieldIndex(name);
+		if (pos >= 0) {
+			DataType dt = row.schema().fields()[pos].dataType();
+			if (dt instanceof StringType) {
+				return row.getString(pos);
+			} else if (dt instanceof ArrayType) {
+				return row.getList(pos);
+			}
+		}
+
+		return null;
 	}
 
 	private Comparator comparator(final FieldConf field) {

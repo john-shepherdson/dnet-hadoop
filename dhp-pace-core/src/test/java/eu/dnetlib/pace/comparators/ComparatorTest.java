@@ -3,19 +3,16 @@ package eu.dnetlib.pace.comparators;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
 import eu.dnetlib.pace.AbstractPaceTest;
 import eu.dnetlib.pace.clustering.NGramUtils;
 import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.config.Type;
-import eu.dnetlib.pace.model.Field;
-import eu.dnetlib.pace.model.FieldValueImpl;
 import eu.dnetlib.pace.tree.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -99,8 +96,8 @@ public class ComparatorTest extends AbstractPaceTest {
 	@Test
 	public void listContainsMatchTest() {
 
-		Field a = createFieldList(Arrays.asList("Article", "Publication", "ORP"), "instanceType");
-		Field b = createFieldList(Arrays.asList("Publication", "Article", "ORP"), "instanceType");
+		List<String> a = createFieldList(Arrays.asList("Article", "Publication", "ORP"), "instanceType");
+		List<String> b = createFieldList(Arrays.asList("Publication", "Article", "ORP"), "instanceType");
 
 		params.put("string", "Article");
 		params.put("bool", "XOR");
@@ -214,31 +211,32 @@ public class ComparatorTest extends AbstractPaceTest {
 
 		final InstanceTypeMatch instanceTypeMatch = new InstanceTypeMatch(params);
 
-		Field a = createFieldList(Arrays.asList("Article", "Article", "Article"), "instanceType");
-		Field b = createFieldList(Arrays.asList("Article", "Article", "Article"), "instanceType");
+		List<String> a = createFieldList(Arrays.asList("Article", "Article", "Article"), "instanceType");
+		List<String> b = createFieldList(Arrays.asList("Article", "Article", "Article"), "instanceType");
 		double result = instanceTypeMatch.compare(a, b, conf);
 
 		assertEquals(1.0, result);
 
-		Field c = createFieldList(
+		List<String> c = createFieldList(
 			Arrays.asList("Conference object", "Conference object", "Conference object"), "instanceType");
 		result = instanceTypeMatch.compare(c, b, conf);
 
 		assertEquals(1.0, result);
 
-		Field d = createFieldList(Arrays.asList("Master thesis", "Master thesis", "Master thesis"), "instanceType");
-		Field e = createFieldList(
+		List<String> d = createFieldList(
+			Arrays.asList("Master thesis", "Master thesis", "Master thesis"), "instanceType");
+		List<String> e = createFieldList(
 			Arrays.asList("Bachelor thesis", "Bachelor thesis", "Bachelor thesis"), "instanceType");
 		result = instanceTypeMatch.compare(d, e, conf);
 
 		assertEquals(1.0, result);
 
-		Field g = createFieldList(Arrays.asList("Software Paper", "Software Paper"), "instanceType");
+		List<String> g = createFieldList(Arrays.asList("Software Paper", "Software Paper"), "instanceType");
 		result = instanceTypeMatch.compare(e, g, conf);
 
 		assertEquals(0.0, result);
 
-		Field h = createFieldList(Arrays.asList("Other literature type", "Article"), "instanceType");
+		List<String> h = createFieldList(Arrays.asList("Other literature type", "Article"), "instanceType");
 		result = instanceTypeMatch.compare(a, h, conf);
 
 		assertEquals(1.0, result);
@@ -249,15 +247,15 @@ public class ComparatorTest extends AbstractPaceTest {
 
 		AuthorsMatch authorsMatch = new AuthorsMatch(params);
 
-		Field a = createFieldList(
+		List<String> a = createFieldList(
 			Arrays.asList("La Bruzzo, Sandro", "Atzori, Claudio", "De Bonis, Michele"), "authors");
-		Field b = createFieldList(Arrays.asList("Atzori, C.", "La Bruzzo, S.", "De Bonis, M."), "authors");
+		List<String> b = createFieldList(Arrays.asList("Atzori, C.", "La Bruzzo, S.", "De Bonis, M."), "authors");
 		double result = authorsMatch.compare(a, b, conf);
 
 		assertEquals(1.0, result);
 
-		Field c = createFieldList(Arrays.asList("Manghi, Paolo"), "authors");
-		Field d = createFieldList(Arrays.asList("Manghi, Pasquale"), "authors");
+		List<String> c = createFieldList(Arrays.asList("Manghi, Paolo"), "authors");
+		List<String> d = createFieldList(Arrays.asList("Manghi, Pasquale"), "authors");
 		result = authorsMatch.compare(c, d, conf);
 
 		assertEquals(0.0, result);
@@ -268,12 +266,12 @@ public class ComparatorTest extends AbstractPaceTest {
 
 		assertEquals(1.0, result);
 
-		Field e = createFieldList(Arrays.asList("Manghi, Paolo", "Atzori, Claudio"), "authors");
+		List<String> e = createFieldList(Arrays.asList("Manghi, Paolo", "Atzori, Claudio"), "authors");
 		result = authorsMatch.compare(a, e, conf);
 
 		assertEquals(0.25, result);
 
-		Field f = createFieldList(new ArrayList<>(), "authors");
+		List<String> f = createFieldList(new ArrayList<>(), "authors");
 		result = authorsMatch.compare(f, f, conf);
 		System.out.println("result = " + result);
 
@@ -284,12 +282,12 @@ public class ComparatorTest extends AbstractPaceTest {
 
 		JsonListMatch jsonListMatch = new JsonListMatch(params);
 
-		Field a = createFieldList(
+		List<String> a = createFieldList(
 			Arrays
 				.asList(
 					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":null,\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:actionset\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"doi\",\"classname\":\"Digital Object Identifier\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"10.1111/pbi.12655\"}"),
 			"authors");
-		Field b = createFieldList(
+		List<String> b = createFieldList(
 			Arrays
 				.asList(
 					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:crosswalk:repository\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"pmc\",\"classname\":\"PubMed Central ID\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"PMC5399005\"}",
@@ -313,8 +311,8 @@ public class ComparatorTest extends AbstractPaceTest {
 	public void domainExactMatch() {
 
 		DomainExactMatch domainExactMatch = new DomainExactMatch(params);
-		Field a = url("http://www.flowrepository.org");
-		Field b = url("http://flowrepository.org/");
+		String a = url("http://www.flowrepository.org");
+		String b = url("http://flowrepository.org/");
 
 		double compare = domainExactMatch.compare(a, b, conf);
 		System.out.println("compare = " + compare);
@@ -326,12 +324,12 @@ public class ComparatorTest extends AbstractPaceTest {
 
 		CosineSimilarity cosineSimilarity = new CosineSimilarity(params);
 
-		Field a = new FieldValueImpl(Type.DoubleArray, "array", new double[] {
+		double[] a = new double[] {
 			1, 2, 3
-		});
-		Field b = new FieldValueImpl(Type.DoubleArray, "array", new double[] {
+		};
+		double[] b = new double[] {
 			1, 2, 3
-		});
+		};
 
 		double compare = cosineSimilarity.compare(a, b, conf);
 

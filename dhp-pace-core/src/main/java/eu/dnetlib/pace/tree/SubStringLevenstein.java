@@ -8,25 +8,24 @@ import org.apache.commons.lang3.StringUtils;
 import com.wcohen.ss.AbstractStringDistance;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.config.Type;
-import eu.dnetlib.pace.model.Field;
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractStringComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 /**
  * The Class SubStringLevenstein.
  */
 @ComparatorClass("subStringLevenstein")
-public class SubStringLevenstein extends AbstractComparator {
+public class SubStringLevenstein extends AbstractStringComparator {
 
-	/** The limit. */
+	/**
+	 * The limit.
+	 */
 	protected int limit;
 
 	/**
 	 * Instantiates a new sub string levenstein.
-	 * 
-	 * @param w
-	 *            the w
+	 *
+	 * @param w the w
 	 */
 	public SubStringLevenstein(final double w) {
 		super(w, new com.wcohen.ss.Levenstein());
@@ -39,11 +38,9 @@ public class SubStringLevenstein extends AbstractComparator {
 
 	/**
 	 * Instantiates a new sub string levenstein.
-	 * 
-	 * @param w
-	 *            the w
-	 * @param limit
-	 *            the limit
+	 *
+	 * @param w     the w
+	 * @param limit the limit
 	 */
 	public SubStringLevenstein(final double w, final int limit) {
 		super(w, new com.wcohen.ss.Levenstein());
@@ -52,13 +49,10 @@ public class SubStringLevenstein extends AbstractComparator {
 
 	/**
 	 * Instantiates a new sub string levenstein.
-	 * 
-	 * @param w
-	 *            the w
-	 * @param limit
-	 *            the limit
-	 * @param ssalgo
-	 *            the ssalgo
+	 *
+	 * @param w      the w
+	 * @param limit  the limit
+	 * @param ssalgo the ssalgo
 	 */
 	protected SubStringLevenstein(final double w, final int limit, final AbstractStringDistance ssalgo) {
 		super(w, ssalgo);
@@ -71,11 +65,8 @@ public class SubStringLevenstein extends AbstractComparator {
 	 * eu.dnetlib.pace.model.Field)
 	 */
 	@Override
-	public double distance(final Field a, final Field b, final Config conf) {
-		if (a.getType().equals(Type.String) && b.getType().equals(Type.String))
-			return distance(StringUtils.left(a.stringValue(), limit), StringUtils.left(b.stringValue(), limit), conf);
-
-		throw new IllegalArgumentException("invalid types\n- A: " + a.toString() + "\n- B: " + b.toString());
+	public double distance(final String a, final String b, final Config conf) {
+		return distance(StringUtils.left(a, limit), StringUtils.left(b, limit), conf);
 	}
 
 	/*

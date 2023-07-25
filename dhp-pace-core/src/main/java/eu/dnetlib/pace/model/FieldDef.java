@@ -39,20 +39,6 @@ public class FieldDef implements Serializable {
 	public FieldDef() {
 	}
 
-	// def apply(s: String): Field[A]
-	public Field apply(final Type type, final String s) {
-		switch (type) {
-			case Int:
-				return new FieldValueImpl(type, name, Integer.parseInt(s));
-			case String:
-				return new FieldValueImpl(type, name, s);
-			case List:
-				return new FieldListImpl(name, type);
-			default:
-				throw new IllegalArgumentException("Casting not implemented for type " + type);
-		}
-	}
-
 	public String getName() {
 		return name;
 	}

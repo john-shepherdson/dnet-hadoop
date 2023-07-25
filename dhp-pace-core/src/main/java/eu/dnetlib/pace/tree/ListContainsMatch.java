@@ -3,15 +3,10 @@ package eu.dnetlib.pace.tree;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Sets;
-
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Field;
-import eu.dnetlib.pace.model.FieldList;
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractListComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 /**
@@ -20,7 +15,7 @@ import eu.dnetlib.pace.tree.support.ComparatorClass;
  * @author miconis
  * */
 @ComparatorClass("listContainsMatch")
-public class ListContainsMatch extends AbstractComparator {
+public class ListContainsMatch extends AbstractListComparator {
 
 	private Map<String, String> params;
 	private boolean CASE_SENSITIVE;
@@ -38,11 +33,7 @@ public class ListContainsMatch extends AbstractComparator {
 	}
 
 	@Override
-	public double compare(final Field a, final Field b, final Config conf) {
-
-		List<String> sa = ((FieldList) a).stringList();
-		List<String> sb = ((FieldList) b).stringList();
-
+	public double compare(List<String> sa, List<String> sb, Config conf) {
 		if (sa.isEmpty() || sb.isEmpty()) {
 			return -1;
 		}

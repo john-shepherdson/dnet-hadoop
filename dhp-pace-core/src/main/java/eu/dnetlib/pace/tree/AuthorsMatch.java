@@ -1,25 +1,19 @@
 
 package eu.dnetlib.pace.tree;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import com.google.common.collect.Iterables;
 import com.wcohen.ss.AbstractStringDistance;
 
 import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Field;
-import eu.dnetlib.pace.model.FieldList;
 import eu.dnetlib.pace.model.Person;
-import eu.dnetlib.pace.tree.support.AbstractComparator;
+import eu.dnetlib.pace.tree.support.AbstractListComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
 
 @ComparatorClass("authorsMatch")
-public class AuthorsMatch extends AbstractComparator {
+public class AuthorsMatch extends AbstractListComparator {
 
 	Map<String, String> params;
 
@@ -49,24 +43,16 @@ public class AuthorsMatch extends AbstractComparator {
 	}
 
 	@Override
-	public double compare(final Field a, final Field b, final Config conf) {
+	public double compare(final List<String> a, final List<String> b, final Config conf) {
 
 		if (a.isEmpty() || b.isEmpty())
 			return -1;
 
-		if (((FieldList) a).size() > SIZE_THRESHOLD || ((FieldList) b).size() > SIZE_THRESHOLD)
+		if (a.size() > SIZE_THRESHOLD || b.size() > SIZE_THRESHOLD)
 			return 1.0;
 
-		List<Person> aList = ((FieldList) a)
-			.stringList()
-			.stream()
-			.map(author -> new Person(author, false))
-			.collect(Collectors.toList());
-		List<Person> bList = ((FieldList) b)
-			.stringList()
-			.stream()
-			.map(author -> new Person(author, false))
-			.collect(Collectors.toList());
+		List<Person> aList = a.stream().map(author -> new Person(author, false)).collect(Collectors.toList());
+		List<Person> bList = b.stream().map(author -> new Person(author, false)).collect(Collectors.toList());
 
 		common = 0;
 		// compare each element of List1 with each element of List2
