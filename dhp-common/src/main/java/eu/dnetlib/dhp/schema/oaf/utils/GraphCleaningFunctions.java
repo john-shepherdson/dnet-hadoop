@@ -292,9 +292,10 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 			} else if (value instanceof Result) {
 				Result r = (Result) value;
 
-				if (Objects.nonNull(r.getFulltext()) && (ModelConstants.SOFTWARE_RESULTTYPE_CLASSID.equals(r.getResulttype().getClassid()) ||
-							ModelConstants.DATASET_RESULTTYPE_CLASSID.equals(r.getResulttype().getClassid()))) {
-						r.setFulltext(null);
+				if (Objects.nonNull(r.getFulltext())
+					&& (ModelConstants.SOFTWARE_RESULTTYPE_CLASSID.equals(r.getResulttype().getClassid()) ||
+						ModelConstants.DATASET_RESULTTYPE_CLASSID.equals(r.getResulttype().getClassid()))) {
+					r.setFulltext(null);
 
 				}
 
@@ -326,10 +327,13 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 					if (StringUtils.isBlank(r.getPublisher().getValue())) {
 						r.setPublisher(null);
 					} else {
-						r.getPublisher().setValue(
-								r.getPublisher().getValue()
-										.replaceAll(NAME_CLEANING_REGEX, " ")
-						);
+						r
+							.getPublisher()
+							.setValue(
+								r
+									.getPublisher()
+									.getValue()
+									.replaceAll(NAME_CLEANING_REGEX, " "));
 					}
 				}
 				if (Objects.isNull(r.getLanguage()) || StringUtils.isBlank(r.getLanguage().getClassid())) {
@@ -498,8 +502,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 							}
 						}
 						if (StringUtils.isNotBlank(i.getFulltext()) &&
-								(ModelConstants.SOFTWARE_RESULTTYPE_CLASSID.equals(r.getResulttype().getClassid()) ||
-									ModelConstants.DATASET_RESULTTYPE_CLASSID.equals(r.getResulttype().getClassid()))) {
+							(ModelConstants.SOFTWARE_RESULTTYPE_CLASSID.equals(r.getResulttype().getClassid()) ||
+								ModelConstants.DATASET_RESULTTYPE_CLASSID.equals(r.getResulttype().getClassid()))) {
 							i.setFulltext(null);
 						}
 					}
@@ -623,25 +627,28 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 
 	private static Author cleanupAuthor(Author author) {
 		if (StringUtils.isNotBlank(author.getFullname())) {
-			author.setFullname(
-					author.getFullname()
-							.replaceAll(NAME_CLEANING_REGEX, " ")
-							.replace("\"", "\\\"")
-			);
+			author
+				.setFullname(
+					author
+						.getFullname()
+						.replaceAll(NAME_CLEANING_REGEX, " ")
+						.replace("\"", "\\\""));
 		}
 		if (StringUtils.isNotBlank(author.getName())) {
-			author.setName(
-					author.getName()
-							.replaceAll(NAME_CLEANING_REGEX, " ")
-							.replace("\"", "\\\"")
-			);
+			author
+				.setName(
+					author
+						.getName()
+						.replaceAll(NAME_CLEANING_REGEX, " ")
+						.replace("\"", "\\\""));
 		}
 		if (StringUtils.isNotBlank(author.getSurname())) {
-			author.setSurname(
-					author.getSurname()
-							.replaceAll(NAME_CLEANING_REGEX, " ")
-							.replace("\"", "\\\"")
-			);
+			author
+				.setSurname(
+					author
+						.getSurname()
+						.replaceAll(NAME_CLEANING_REGEX, " ")
+						.replace("\"", "\\\""));
 		}
 
 		return author;
