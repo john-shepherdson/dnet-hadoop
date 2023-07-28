@@ -485,10 +485,14 @@
   },
   "extraInfo": [],
   "format": [],
-  "fulltext": [],
+  "fulltext": [
+    { "value" : "https://osf.io/preprints/socarxiv/7vgtu/download" },
+    { "value" : "https://osf.io/preprints/socarxiv/7vgtu/download2" }
+  ],
   "id": "50|CSC_________::0000ec4dd9df012feaafa77e71a0fb4c",
   "instance": [
     {
+      "fulltext" :  "https://osf.io/preprints/socarxiv/7vgtu/download",
       "measures": [
         {
           "id": "influence",

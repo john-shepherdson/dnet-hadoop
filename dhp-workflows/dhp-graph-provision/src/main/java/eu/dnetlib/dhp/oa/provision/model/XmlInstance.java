@@ -57,6 +57,8 @@ public class XmlInstance implements Serializable {
 	// typed results
 	private String processingchargecurrency;
 
+	private String fulltext;
+
 	private Qualifier refereed; // peer-review status
 
 	public String getUrl() {
@@ -161,5 +163,13 @@ public class XmlInstance implements Serializable {
 
 	public void setRefereed(Qualifier refereed) {
 		this.refereed = refereed;
+	}
+
+	public String getFulltext() {
+		return fulltext;
+	}
+
+	public void setFulltext(String fulltext) {
+		this.fulltext = fulltext;
 	}
 }

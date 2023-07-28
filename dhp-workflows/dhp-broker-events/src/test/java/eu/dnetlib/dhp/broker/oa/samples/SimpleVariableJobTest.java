@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
@@ -82,8 +83,8 @@ public class SimpleVariableJobTest {
 
 		final long n = spark
 			.createDataset(inputList, Encoders.STRING())
-			.filter(s -> filter(map.get(s)))
-			.map((MapFunction<String, String>) s -> s.toLowerCase(), Encoders.STRING())
+			.filter((FilterFunction<String>) s -> filter(map.get(s)))
+			.map((MapFunction<String, String>) String::toLowerCase, Encoders.STRING())
 			.count();
 
 		System.out.println(n);
@@ -96,8 +97,8 @@ public class SimpleVariableJobTest {
 
 		final long n = spark
 			.createDataset(inputList, Encoders.STRING())
-			.filter(s -> filter(staticMap.get(s)))
-			.map((MapFunction<String, String>) s -> s.toLowerCase(), Encoders.STRING())
+			.filter((FilterFunction<String>) s -> filter(staticMap.get(s)))
+			.map((MapFunction<String, String>) String::toLowerCase, Encoders.STRING())
 			.count();
 
 		System.out.println(n);

@@ -1,12 +1,13 @@
 
 package eu.dnetlib.dhp.actionmanager.project.utils;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -66,7 +67,7 @@ public class ReadProjects implements Serializable {
 
 		FSDataInputStream inputStream = fs.open(hdfsreadpath);
 
-		ArrayList<Project> projects = OBJECT_MAPPER
+		List<Project> projects = OBJECT_MAPPER
 			.readValue(
 				IOUtils.toString(inputStream, "UTF-8"),
 				new TypeReference<List<Project>>() {

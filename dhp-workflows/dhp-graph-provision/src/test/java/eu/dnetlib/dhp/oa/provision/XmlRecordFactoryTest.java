@@ -47,8 +47,6 @@ public class XmlRecordFactoryTest {
 
 		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
 
-		System.out.println(xml);
-
 		assertNotNull(xml);
 
 		final Document doc = new SAXReader().read(new StringReader(xml));
@@ -91,6 +89,12 @@ public class XmlRecordFactoryTest {
 			"C", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity']/@class"));
 
 		assertEquals("EOSC::Jupyter Notebook", doc.valueOf("//*[local-name() = 'result']/eoscifguidelines/@code"));
+
+		assertEquals(2, Integer.parseInt(doc.valueOf("count(//*[local-name() = 'result']/fulltext)")));
+
+		assertEquals(
+			"https://osf.io/preprints/socarxiv/7vgtu/download",
+			doc.valueOf("//*[local-name() = 'result']/fulltext[1]"));
 
 	}
 
