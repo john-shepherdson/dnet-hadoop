@@ -20,6 +20,7 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 
@@ -33,7 +34,8 @@ import eu.dnetlib.dhp.schema.oaf.*;
 public class PromoteActionPayloadForGraphTableJob {
 	private static final Logger logger = LoggerFactory.getLogger(PromoteActionPayloadForGraphTableJob.class);
 
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils

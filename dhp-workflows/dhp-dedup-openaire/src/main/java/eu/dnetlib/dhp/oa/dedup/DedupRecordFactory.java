@@ -110,6 +110,10 @@ public class DedupRecordFactory {
 
 		// set authors and date
 		if (ModelSupport.isSubClass(entity, Result.class)) {
+			Optional
+				.ofNullable(((Result) entity).getAuthor())
+				.ifPresent(a -> authors.add(a));
+
 			((Result) entity).setAuthor(AuthorMerger.merge(authors));
 		}
 

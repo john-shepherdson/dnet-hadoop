@@ -149,7 +149,7 @@ class CrossrefMappingTest {
     assertNotNull(relationList)
     assertFalse(relationList.isEmpty)
 
-    assertEquals(doisReference.size * 2, relationList.size)
+    assertEquals(doisReference.size, relationList.size)
 
     mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
     relationList.foreach(p => println(mapper.writeValueAsString(p)))

@@ -31,7 +31,6 @@ import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
-import org.json4s.Xml;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
@@ -1310,6 +1309,9 @@ public class XmlRecordFactory implements Serializable {
 									.map(d -> XmlSerializationUtils.asXmlElement("license", d))
 									.collect(Collectors.toList()));
 					}
+					if (StringUtils.isNotBlank(instance.getFulltext())) {
+						fields.add(XmlSerializationUtils.asXmlElement("fulltext", instance.getFulltext()));
+					}
 
 					children
 						.add(
@@ -1460,6 +1462,9 @@ public class XmlRecordFactory implements Serializable {
 			Optional
 				.ofNullable(i.getDistributionlocation())
 				.ifPresent(dl -> instance.getDistributionlocation().add(dl));
+			Optional
+				.ofNullable(i.getFulltext())
+				.ifPresent(instance::setFulltext);
 		});
 
 		if (instance.getHostedby().size() > 1
