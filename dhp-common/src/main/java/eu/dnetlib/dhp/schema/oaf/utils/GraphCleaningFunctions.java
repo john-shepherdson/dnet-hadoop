@@ -236,7 +236,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 								d -> Optional
 									.ofNullable(d.getInvisible())
 									.orElse(true))
-							.orElse(true))
+							.orElse(false))
 					.orElse(true))) {
 			return true;
 		}
