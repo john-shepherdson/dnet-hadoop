@@ -206,8 +206,15 @@
 
 			<dependency>
 				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${org.slf4j.version}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
 				<artifactId>jcl-over-slf4j</artifactId>
-				<version>1.7.25</version>
+				<version>${org.slf4j.version}</version>
 				<scope>provided</scope>
 			</dependency>
 
@@ -218,21 +225,28 @@
 			</dependency>
 
 			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-beanutils</artifactId>
+				<version>${commons-beanutils.version}</version>
+			</dependency>
+
+
+			<dependency>
 				<groupId>commons-validator</groupId>
 				<artifactId>commons-validator</artifactId>
-				<version>1.7</version>
+				<version>${commons-validator.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.github.sisyphsu</groupId>
 				<artifactId>dateparser</artifactId>
-				<version>1.0.7</version>
+				<version>${dateparser.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>me.xuender</groupId>
 				<artifactId>unidecode</artifactId>
-				<version>0.0.7</version>
+				<version>${unidecode.version}</version>
 			</dependency>
 
 			<dependency>
@@ -245,13 +259,13 @@
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
-				<version>1.9</version>
+				<version>${commons-codec.version}</version>
 			</dependency>
 
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>2.4</version>
+				<version>${commons-io.version}</version>
 			</dependency>
 
 			<dependency>
@@ -415,6 +429,7 @@
 				<artifactId>cxf-rt-transports-http</artifactId>
 				<version>3.1.5</version>
 			</dependency>
+
 			<dependency>
 				<groupId>javax.persistence</groupId>
 				<artifactId>javax.persistence-api</artifactId>
@@ -504,16 +519,11 @@
 				<artifactId>commons-compress</artifactId>
 				<version>${common.compress.version}</version>
 			</dependency>
-
-			<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-csv</artifactId>
 				<version>${common.csv.version}</version>
 			</dependency>
-
-
-			<!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
 			<dependency>
 				<groupId>org.apache.poi</groupId>
 				<artifactId>poi-ooxml</artifactId>
@@ -568,13 +578,11 @@
 				<scope>provided</scope>
 			</dependency>
 
-
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-math3</artifactId>
 				<version>3.6.1</version>
 			</dependency>
-
 
 			<dependency>
 				<groupId>com.google.code.gson</groupId>
@@ -596,7 +604,7 @@
 			<dependency>
 				<groupId>org.reflections</groupId>
 				<artifactId>reflections</artifactId>
-				<version>0.9.10</version>
+				<version>${reflections.version}</version>
 			</dependency>
 
 			<dependency>
@@ -609,6 +617,12 @@
 				<groupId>com.ibm.icu</groupId>
 				<artifactId>icu4j</artifactId>
 				<version>70.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.javassist</groupId>
+				<artifactId>javassist</artifactId>
+				<version>${javassist.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -866,46 +880,62 @@
 		<dhp.site.stage.path>sftp://dnet-hadoop@static-web.d4science.org/dnet-hadoop</dhp.site.stage.path>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<maven.failsave.plugin.version>2.22.2</maven.failsave.plugin.version>
-		<properties.maven.plugin.version>2.0.1</properties.maven.plugin.version>
-		<dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
-		<dhp.hadoop.version>2.6.0-${dhp.cdh.version}</dhp.hadoop.version>
-		<dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>
-		<dhp-schemas.artifact>dhp-schemas</dhp-schemas.artifact>
-		<sparksolr.version>3.6.0</sparksolr.version>
-		<dhp.spark.version>2.4.0.cloudera2</dhp.spark.version>
-		<dhp.jackson.version>2.9.6</dhp.jackson.version>
-		<dhp.commons.lang.version>3.5</dhp.commons.lang.version>
-		<dhp.site.skip>true</dhp.site.skip>
-		<dhp.guava.version>11.0.2</dhp.guava.version>
+
+		<!-- scala version -->
 		<scala.version>2.11.12</scala.version>
 		<scala.binary.version>2.11</scala.binary.version>
-		<scala-xml.version>1.3.0</scala-xml.version>
-		<junit-jupiter.version>5.6.1</junit-jupiter.version>
-		<mockito-core.version>3.3.3</mockito-core.version>
-		<mongodb.driver.version>3.4.2</mongodb.driver.version>
-		<vtd.version>[2.12,3.0)</vtd.version>
-		<dhp-schemas.version>[4.17.2]</dhp-schemas.version>
+
+		<!-- plugin versions -->
+		<maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
+		<maven.failsave.plugin.version>2.22.2</maven.failsave.plugin.version>
+		<properties.maven.plugin.version>2.0.1</properties.maven.plugin.version>
+		<net.alchim31.maven.version>4.0.1</net.alchim31.maven.version>
+
+		<!-- dependency versions -->
+		<dhp-schemas.artifact>dhp-schemas</dhp-schemas.artifact>
+
+		<apache.poi.version>4.1.2</apache.poi.version>
+		<cnr-rmi-api.version>[2.6.1]</cnr-rmi-api.version>
+		<common.compress.version>1.20</common.compress.version>
+		<common.csv.version>1.8</common.csv.version>
+		<common.text.version>1.8</common.text.version>
+		<commons-beanutils.version>1.9.4</commons-beanutils.version>
+		<commons-codec.version>1.9</commons-codec.version>
+		<commons.collections.version>3.2.1</commons.collections.version>
+		<commons-io.version>2.4</commons-io.version>
+		<commons.logging.version>1.1.3</commons.logging.version>
+		<commons-validator.version>1.7</commons-validator.version>
+		<dateparser.version>1.0.7</dateparser.version>
+		<dhp-schemas.version>[3.17.1]</dhp-schemas.version>
+		<dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
+		<dhp.commons.lang.version>3.5</dhp.commons.lang.version>
+		<dhp.guava.version>11.0.2</dhp.guava.version>
+		<dhp.hadoop.version>2.6.0-${dhp.cdh.version}</dhp.hadoop.version>
+		<dhp.jackson.version>2.9.6</dhp.jackson.version>
+		<dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>
+		<dhp.site.skip>true</dhp.site.skip>
+		<dhp.spark.version>2.4.0.cloudera2</dhp.spark.version>
 		<dnet-actionmanager-api.version>[4.0.3]</dnet-actionmanager-api.version>
 		<dnet-actionmanager-common.version>[6.0.5]</dnet-actionmanager-common.version>
 		<dnet-openaire-broker-common.version>[3.1.6]</dnet-openaire-broker-common.version>
-		<cnr-rmi-api.version>[2.6.1]</cnr-rmi-api.version>
-		<solr.version>7.5.0</solr.version>
-		<okhttp.version>4.7.2</okhttp.version>
-		<common.compress.version>1.20</common.compress.version>
+		<google.gson.version>2.2.2</google.gson.version>
+		<javassist.version>3.19.0-GA</javassist.version>
 		<json4s.version>3.5.3</json4s.version>
 		<jsonschemagenerator.version>4.13.0</jsonschemagenerator.version>
-		<common.csv.version>1.8</common.csv.version>
-		<apache.poi.version>4.1.2</apache.poi.version>
-		<common.text.version>1.8</common.text.version>
+		<junit-jupiter.version>5.6.1</junit-jupiter.version>
+		<mockito-core.version>3.3.3</mockito-core.version>
+		<mongodb.driver.version>3.4.2</mongodb.driver.version>
+		<okhttp.version>4.7.2</okhttp.version>
 		<org.apache.httpcomponents.version>4.5.3</org.apache.httpcomponents.version>
-		<net.alchim31.maven.version>4.0.1</net.alchim31.maven.version>
-		<google.gson.version>2.2.2</google.gson.version>
-		<commons.logging.version>1.1.3</commons.logging.version>
-		<commons.collections.version>3.2.1</commons.collections.version>
+		<org.slf4j.version>1.7.25</org.slf4j.version>
+		<reflections.version>0.9.10</reflections.version>
+		<scala-xml.version>1.3.0</scala-xml.version>
+		<solr.version>7.5.0</solr.version>
+		<sparksolr.version>3.6.0</sparksolr.version>
+		<unidecode.version>0.0.7</unidecode.version>
+		<vtd.version>[2.12,3.0)</vtd.version>
 	</properties>
 
 	<!-- Build with scala 12 and Spark 3.4 -->
@@ -915,21 +945,40 @@
 			<properties>
 				<scala.binary.version>2.12</scala.binary.version>
 				<scala.version>2.12.18</scala.version>
-				<!-- scala-xml.version>2.1.0</scala-xml.version -->
+				<scala-xml.version>1.3.0</scala-xml.version>
 
+				<!-- plugin versions -->
+				<net.alchim31.maven.version>4.8.1</net.alchim31.maven.version>
 
+				<!-- dependencies -->
+				<common.compress.version>1.22</common.compress.version>
+				<common.csv.version>1.8</common.csv.version>
+				<common.text.version>1.10.0</common.text.version>
+				<commons-beanutils.version>1.9.4</commons-beanutils.version>
+				<commons-codec.version>1.15</commons-codec.version>
+				<commons.collections.version>3.2.2</commons.collections.version>
+				<commons-io.version>2.11.0</commons-io.version>
+				<commons.logging.version>1.1.3</commons.logging.version>
+				<commons-validator.version>1.7</commons-validator.version>
+
+				<dhp.guava.version>14.0.1</dhp.guava.version>
+				<solr.version>8.11.0</solr.version>
 				<sparksolr.version>4.0.2</sparksolr.version>
 				<dhp.spark.version>3.4.1</dhp.spark.version>
 				<dhp.jackson.version>2.14.2</dhp.jackson.version>
 				<dhp.commons.lang.version>3.12.0</dhp.commons.lang.version>
 				<json4s.version>3.7.0-M11</json4s.version>
-				<net.alchim31.maven.version>4.8.1</net.alchim31.maven.version>
-
+				<javassist.version>3.25.0-GA</javassist.version>
+				<okhttp.version>4.10.0</okhttp.version>
+				<org.slf4j.version>2.0.6</org.slf4j.version>
+				<reflections.version>0.10.2</reflections.version>
 				<!--
 				<dhp-schemas.artifact>dhp-schemas_${scala.binary.version}</dhp-schemas.artifact>
 				<dhp-schemas.version>3.17.2-SNAPSHOT</dhp-schemas.version>
 				 -->
 			</properties>
+
+
 		</profile>
 	</profiles>
 </project>

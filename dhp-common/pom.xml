@@ -63,15 +63,16 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>edu.cmu</groupId>
+			<artifactId>secondstring</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>eu.dnetlib.dhp</groupId>
 			<artifactId>dhp-pace-core</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-common</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>com.github.sisyphsu</groupId>
 			<artifactId>dateparser</artifactId>
@@ -119,16 +120,18 @@
 			<artifactId>Saxon-HE</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-transports-http</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>eu.dnetlib</groupId>
 			<artifactId>cnr-rmi-api</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>log4j</artifactId>
+					<groupId>log4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
