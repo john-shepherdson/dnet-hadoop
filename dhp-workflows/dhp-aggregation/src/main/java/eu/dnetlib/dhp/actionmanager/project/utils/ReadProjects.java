@@ -1,11 +1,14 @@
 
 package eu.dnetlib.dhp.actionmanager.project.utils;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.actionmanager.project.PrepareProjects;
-import eu.dnetlib.dhp.actionmanager.project.utils.model.Project;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -15,13 +18,12 @@ import org.apache.hadoop.fs.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.actionmanager.project.PrepareProjects;
+import eu.dnetlib.dhp.actionmanager.project.utils.model.Project;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
 /**
  * @author miriam.baglioni

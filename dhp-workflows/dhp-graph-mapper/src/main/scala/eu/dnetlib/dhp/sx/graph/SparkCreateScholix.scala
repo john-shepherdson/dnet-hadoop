@@ -64,7 +64,7 @@ object SparkCreateScholix {
       .as[ScholixSummary]
       .map(s => ScholixUtils.generateScholixResourceFromSummary(s))
 
-    relationDS
+    val scholixSource: Dataset[Scholix] = relationDS
       .joinWith(summaryDS, relationDS("source").equalTo(summaryDS("dnetIdentifier")), "left")
       .map { input: (Relation, ScholixResource) =>
         if (input._1 != null && input._2 != null) {
@@ -76,14 +76,6 @@ object SparkCreateScholix {
         } else null
       }(scholixEncoder)
       .filter(r => r != null)
-      .write
-      .option("compression", "lz4")
-      .mode(SaveMode.Overwrite)
-      .save(s"$targetPath/scholix_from_source")
-
-    val scholixSource: Dataset[Scholix] = spark.read
-      .load(s"$targetPath/scholix_from_source")
-      .as[Scholix]
 
     scholixSource
       .joinWith(summaryDS, scholixSource("identifier").equalTo(summaryDS("dnetIdentifier")), "left")
@@ -105,17 +97,32 @@ object SparkCreateScholix {
     val scholix_o_v: Dataset[Scholix] =
       spark.read.load(s"$targetPath/scholix_one_verse").as[Scholix]
 
-    scholix_o_v
-      .flatMap(s => List(s, ScholixUtils.createInverseScholixRelation(s)))
-      .as[Scholix]
-      .map(s => (s.getIdentifier, s))
-      .dropDuplicates("identifier")
-      .write
-      .option("compression", "lz4")
-      .mode(SaveMode.Overwrite)
-      .save(s"$targetPath/scholix")
+    def scholix_complete(s: Scholix): Boolean = {
+      if (s == null || s.getIdentifier == null) {
+        false
+      } else if (s.getSource == null || s.getTarget == null) {
+        false
+      } else if (s.getLinkprovider == null || s.getLinkprovider.isEmpty)
+        false
+      else
+        true
+    }
 
-    val scholix_final: Dataset[Scholix] = spark.read.load(s"$targetPath/scholix").as[Scholix]
+    val scholix_final: Dataset[Scholix] = scholix_o_v
+      .filter(s => scholix_complete(s))
+      .groupByKey(s =>
+        scala.Ordering.String
+          .min(s.getSource.getDnetIdentifier, s.getTarget.getDnetIdentifier)
+          .concat(s.getRelationship.getName)
+          .concat(scala.Ordering.String.max(s.getSource.getDnetIdentifier, s.getTarget.getDnetIdentifier))
+      )
+      .flatMapGroups((id, scholixes) => {
+        val s = scholixes.toList
+        if (s.size == 1) Seq(s(0), ScholixUtils.createInverseScholixRelation(s(0)))
+        else s
+      })
+
+    scholix_final.write.mode(SaveMode.Overwrite).save(s"$targetPath/scholix")
 
     val stats: Dataset[(String, String, Long)] = scholix_final
       .map(s => (s.getSource.getDnetIdentifier, s.getTarget.getObjectType))

@@ -26,8 +26,6 @@ class PMParser(stream: java.io.InputStream) extends Iterator[PMArticle] {
     tmp
   }
 
-
-
   def extractAttributes(attrs: MetaData, key: String): String = {
 
     val res = attrs.get(key)
@@ -68,7 +66,7 @@ class PMParser(stream: java.io.InputStream) extends Iterator[PMArticle] {
       val next = reader.nextEvent()
 
       if (next.isStartElement) {
-        if(insideChar) {
+        if (insideChar) {
           if (sb.nonEmpty)
             println(s"got data ${sb.toString.trim}")
           insideChar = false
@@ -76,8 +74,8 @@ class PMParser(stream: java.io.InputStream) extends Iterator[PMArticle] {
         val name = next.asStartElement().getName.getLocalPart
         println(s"Start Element $name")
         next.asStartElement().getAttributes.forEachRemaining(e => print(e.toString))
-        
-      } else  if (next.isEndElement) {
+
+      } else if (next.isEndElement) {
         if (insideChar) {
           if (sb.nonEmpty)
             println(s"got data ${sb.toString.trim}")
@@ -90,17 +88,15 @@ class PMParser(stream: java.io.InputStream) extends Iterator[PMArticle] {
           println("Condizione di uscita")
         }
 
-       } else if (next.isCharacters) {
+      } else if (next.isCharacters) {
         if (!insideChar) {
           insideChar = true
           sb.clear()
         }
         val d = next.asCharacters().getData
         if (d.trim.nonEmpty)
-            sb.append(d.trim)
+          sb.append(d.trim)
       }
-
-
 
 //      next match {
 //        case _ if (next.isStartElement) =>
@@ -116,7 +112,7 @@ class PMParser(stream: java.io.InputStream) extends Iterator[PMArticle] {
 //
 //      }
 
-        //
+      //
 //
 //      reader.next match {
 //

@@ -141,11 +141,7 @@ object ScholixUtils extends Serializable {
     s.setRelationship(inverseRelationShip(scholix.getRelationship))
     s.setSource(scholix.getTarget)
     s.setTarget(scholix.getSource)
-    s.setIdentifier(
-      DHPUtils.md5(
-        s"${s.getSource.getIdentifier}::${s.getRelationship.getName}::${s.getTarget.getIdentifier}"
-      )
-    )
+    updateId(s)
     s
 
   }
@@ -184,6 +180,21 @@ object ScholixUtils extends Serializable {
     } else List()
   }
 
+  def updateId(scholix: Scholix): Scholix = {
+    scholix.setIdentifier(
+      generateIdentifier(
+        scholix.getSource.getDnetIdentifier,
+        scholix.getTarget.getDnetIdentifier,
+        scholix.getRelationship.getName
+      )
+    )
+    scholix
+  }
+
+  def generateIdentifier(sourceId: String, targetId: String, relation: String): String = {
+    DHPUtils.md5(s"$sourceId::$relation::$targetId")
+  }
+
   def generateCompleteScholix(scholix: Scholix, target: ScholixSummary): Scholix = {
     val s = new Scholix
     s.setPublicationDate(scholix.getPublicationDate)
@@ -192,11 +203,7 @@ object ScholixUtils extends Serializable {
     s.setRelationship(scholix.getRelationship)
     s.setSource(scholix.getSource)
     s.setTarget(generateScholixResourceFromSummary(target))
-    s.setIdentifier(
-      DHPUtils.md5(
-        s"${s.getSource.getIdentifier}::${s.getRelationship.getName}::${s.getTarget.getIdentifier}"
-      )
-    )
+    updateId(s)
     s
   }
 
@@ -208,11 +215,7 @@ object ScholixUtils extends Serializable {
     s.setRelationship(scholix.getRelationship)
     s.setSource(scholix.getSource)
     s.setTarget(target)
-    s.setIdentifier(
-      DHPUtils.md5(
-        s"${s.getSource.getIdentifier}::${s.getRelationship.getName}::${s.getTarget.getIdentifier}"
-      )
-    )
+    updateId(s)
     s
   }
 
