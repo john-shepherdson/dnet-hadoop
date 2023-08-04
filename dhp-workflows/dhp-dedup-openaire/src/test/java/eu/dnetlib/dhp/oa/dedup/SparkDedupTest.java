@@ -1,11 +1,32 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
-import static java.nio.file.Files.createTempDirectory;
-
-import static org.apache.spark.sql.functions.count;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.lenient;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import eu.dnetlib.pace.util.MapDocumentUtil;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.sql.*;
+import org.apache.spark.sql.Dataset;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import scala.Tuple2;
 
 import java.io.File;
 import java.io.FileReader;
@@ -19,36 +40,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.FilterFunction;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SparkSession;
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Sets;
-
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import eu.dnetlib.pace.util.MapDocumentUtil;
-import scala.Tuple2;
+import static java.nio.file.Files.createTempDirectory;
+import static org.apache.spark.sql.functions.col;
+import static org.apache.spark.sql.functions.count;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -681,15 +677,16 @@ public class SparkDedupTest implements Serializable {
 
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			classPathResourceAsString("/eu/dnetlib/dhp/oa/dedup/propagateRelation_parameters.json"));
+		String outputRelPath = testDedupGraphBasePath + "/propagaterelation";
 		parser
 			.parseArgument(
 				new String[] {
-					"-i", testGraphBasePath, "-w", testOutputBasePath, "-o", testDedupGraphBasePath
+					"-i", testGraphBasePath, "-w", testOutputBasePath, "-o", outputRelPath
 				});
 
 		new SparkPropagateRelation(parser, spark).run(isLookUpService);
 
-		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
+		long relations = jsc.textFile(outputRelPath + "/relation").count();
 
 //		assertEquals(4860, relations);
 		System.out.println("relations = " + relations);
@@ -708,7 +705,7 @@ public class SparkDedupTest implements Serializable {
 				(PairFunction<Row, String, String>) r -> new Tuple2<String, String>(r.getString(0), "d"));
 
 		JavaRDD<String> toCheck = jsc
-			.textFile(testDedupGraphBasePath + "/relation")
+			.textFile(outputRelPath + "/relation")
 			.mapToPair(json -> new Tuple2<>(MapDocumentUtil.getJPathString("$.source", json), json))
 			.join(mergedIds)
 			.map(t -> t._2()._1())
@@ -724,6 +721,65 @@ public class SparkDedupTest implements Serializable {
 
 	@Test
 	@Order(8)
+	void testCleanBaseRelations() throws Exception {
+		ArgumentApplicationParser parser = new ArgumentApplicationParser(
+				classPathResourceAsString("/eu/dnetlib/dhp/oa/dedup/cleanRelation_parameters.json"));
+
+		// append dangling relations to be cleaned up
+		Dataset<Row> df_before = spark.read().schema(Encoders.bean(Relation.class).schema()).json(testGraphBasePath + "/relation");
+		Dataset<Row> df_input =df_before
+				.unionByName(df_before.drop("source").withColumn("source", functions.lit("n/a")))
+				.unionByName(df_before.drop("target").withColumn("target", functions.lit("n/a")));
+		df_input.write().mode(SaveMode.Overwrite).json(testOutputBasePath + "_tmp");
+
+		parser
+				.parseArgument(
+						new String[]{
+								"--graphBasePath", testGraphBasePath,
+								"--inputPath", testGraphBasePath + "/relation",
+								"--outputPath", testDedupGraphBasePath + "/relation"
+						});
+
+		new SparkCleanRelation(parser, spark).run(isLookUpService);
+
+		Dataset<Row> df_after = spark.read().schema(Encoders.bean(Relation.class).schema()).json(testDedupGraphBasePath + "/relation");
+
+		assertNotEquals(df_before.count(), df_input.count());
+		assertNotEquals(df_input.count(), df_after.count());
+		assertEquals(5, df_after.count());
+	}
+
+	@Test
+	@Order(9)
+	void testCleanDedupedRelations() throws Exception {
+		ArgumentApplicationParser parser = new ArgumentApplicationParser(
+				classPathResourceAsString("/eu/dnetlib/dhp/oa/dedup/cleanRelation_parameters.json"));
+
+		String inputRelPath = testDedupGraphBasePath + "/propagaterelation/relation";
+
+		// append dangling relations to be cleaned up
+		Dataset<Row> df_before = spark.read().schema(Encoders.bean(Relation.class).schema()).json(inputRelPath);
+
+		df_before.filter(col("dataInfo.deletedbyinference").notEqual(true)).show(50, false);
+
+		parser
+				.parseArgument(
+						new String[]{
+								"--graphBasePath", testGraphBasePath,
+								"--inputPath", inputRelPath,
+								"--outputPath", testDedupGraphBasePath + "/relation"
+						});
+
+		new SparkCleanRelation(parser, spark).run(isLookUpService);
+
+		Dataset<Row> df_after = spark.read().schema(Encoders.bean(Relation.class).schema()).json(testDedupGraphBasePath + "/relation");
+
+		assertNotEquals(df_before.count(), df_after.count());
+		assertEquals(0, df_after.count());
+	}
+
+	@Test
+	@Order(10)
 	void testRelations() throws Exception {
 		testUniqueness("/eu/dnetlib/dhp/dedup/test/relation_1.json", 12, 10);
 		testUniqueness("/eu/dnetlib/dhp/dedup/test/relation_2.json", 10, 2);
