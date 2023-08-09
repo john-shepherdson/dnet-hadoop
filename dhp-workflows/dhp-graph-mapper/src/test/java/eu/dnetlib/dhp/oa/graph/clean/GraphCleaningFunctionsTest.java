@@ -251,6 +251,12 @@ public class GraphCleaningFunctionsTest {
 							pid.getQualifier().getClassname()));
 		});
 
+		assertTrue(
+			p_cleaned
+				.getAuthor()
+				.stream()
+				.anyMatch(a -> "Brien, Tom".equals(a.getFullname())));
+
 		assertNotNull(p_cleaned.getSubject());
 
 		List<Subject> fos_subjects = p_cleaned
@@ -283,6 +289,31 @@ public class GraphCleaningFunctionsTest {
 
 		// TODO add more assertions to verity the cleaned values
 		System.out.println(MAPPER.writeValueAsString(p_cleaned));
+	}
+
+	@Test
+	void testCleaning_dataset() throws Exception {
+
+		assertNotNull(vocabularies);
+		assertNotNull(mapping);
+
+		String json = IOUtils
+			.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/result_dataset.json"));
+		Dataset p_in = MAPPER.readValue(json, Dataset.class);
+
+		assertTrue(p_in instanceof Result);
+		assertTrue(p_in instanceof Dataset);
+
+		Dataset p_out = OafCleaner.apply(GraphCleaningFunctions.fixVocabularyNames(p_in), mapping);
+
+		assertNotNull(p_out);
+
+		assertNotNull(p_out.getPublisher());
+		assertNotNull(p_out.getPublisher().getValue());
+
+		Dataset p_cleaned = GraphCleaningFunctions.cleanup(p_out, vocabularies);
+
+		assertEquals("Best publisher in the world", p_cleaned.getPublisher().getValue());
 	}
 
 	private static void verify_keyword(Publication p_cleaned, String subject) {
@@ -335,6 +366,15 @@ public class GraphCleaningFunctionsTest {
 		Publication cleaned = GraphCleaningFunctions.cleanup(p_out, vocabularies);
 
 		Assertions.assertEquals(true, GraphCleaningFunctions.filter(cleaned));
+	}
+
+	@Test
+	public void testFilterProject() throws IOException {
+		String json = IOUtils
+			.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/project.json"));
+		Project p_in = MAPPER.readValue(json, Project.class);
+
+		Assertions.assertEquals(false, GraphCleaningFunctions.filter(p_in));
 	}
 
 	@Test

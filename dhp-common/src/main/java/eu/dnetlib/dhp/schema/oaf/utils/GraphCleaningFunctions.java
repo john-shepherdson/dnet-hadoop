@@ -13,11 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Encoders;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.sisyphsu.dateparser.DateParserUtils;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -39,6 +35,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	public static final String TITLE_FILTER_REGEX = String.format("(%s)|\\W|\\d", TITLE_TEST);
 
 	public static final int TITLE_FILTER_RESIDUAL_LENGTH = 5;
+	private static final String NAME_CLEANING_REGEX = "[\\r\\n\\t\\s]+";
 
 	public static <T extends Oaf> T cleanContext(T value, String contextId, String verifyParam) {
 		if (ModelSupport.isSubClass(value, Result.class)) {
@@ -228,7 +225,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	}
 
 	public static <T extends Oaf> boolean filter(T value) {
-		if (Boolean.TRUE
+		if (!(value instanceof Relation) && (Boolean.TRUE
 			.equals(
 				Optional
 					.ofNullable(value)
@@ -239,15 +236,16 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 								d -> Optional
 									.ofNullable(d.getInvisible())
 									.orElse(true))
-							.orElse(true))
-					.orElse(true))) {
+							.orElse(false))
+					.orElse(true)))) {
 			return true;
 		}
 
 		if (value instanceof Datasource) {
 			// nothing to evaluate here
 		} else if (value instanceof Project) {
-			// nothing to evaluate here
+			final Project p = (Project) value;
+			return Objects.nonNull(p.getCode()) && StringUtils.isNotBlank(p.getCode().getValue());
 		} else if (value instanceof Organization) {
 			// nothing to evaluate here
 		} else if (value instanceof Relation) {
@@ -294,6 +292,13 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 			} else if (value instanceof Result) {
 				Result r = (Result) value;
 
+				if (Objects.nonNull(r.getFulltext())
+					&& (ModelConstants.SOFTWARE_RESULTTYPE_CLASSID.equals(r.getResulttype().getClassid()) ||
+						ModelConstants.DATASET_RESULTTYPE_CLASSID.equals(r.getResulttype().getClassid()))) {
+					r.setFulltext(null);
+
+				}
+
 				if (Objects.nonNull(r.getDateofacceptance())) {
 					Optional<String> date = cleanDateField(r.getDateofacceptance());
 					if (date.isPresent()) {
@@ -318,8 +323,18 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 								.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
 								.collect(Collectors.toList()));
 				}
-				if (Objects.nonNull(r.getPublisher()) && StringUtils.isBlank(r.getPublisher().getValue())) {
-					r.setPublisher(null);
+				if (Objects.nonNull(r.getPublisher())) {
+					if (StringUtils.isBlank(r.getPublisher().getValue())) {
+						r.setPublisher(null);
+					} else {
+						r
+							.getPublisher()
+							.setValue(
+								r
+									.getPublisher()
+									.getValue()
+									.replaceAll(NAME_CLEANING_REGEX, " "));
+					}
 				}
 				if (Objects.isNull(r.getLanguage()) || StringUtils.isBlank(r.getLanguage().getClassid())) {
 					r
@@ -486,6 +501,11 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 								i.setDateofacceptance(null);
 							}
 						}
+						if (StringUtils.isNotBlank(i.getFulltext()) &&
+							(ModelConstants.SOFTWARE_RESULTTYPE_CLASSID.equals(r.getResulttype().getClassid()) ||
+								ModelConstants.DATASET_RESULTTYPE_CLASSID.equals(r.getResulttype().getClassid()))) {
+							i.setFulltext(null);
+						}
 					}
 				}
 				if (Objects.isNull(r.getBestaccessright())
@@ -510,6 +530,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 								.filter(Objects::nonNull)
 								.filter(a -> StringUtils.isNotBlank(a.getFullname()))
 								.filter(a -> StringUtils.isNotBlank(a.getFullname().replaceAll("[\\W]", "")))
+								.map(GraphCleaningFunctions::cleanupAuthor)
 								.collect(Collectors.toList()));
 
 					boolean nullRank = r
@@ -602,6 +623,35 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		}
 
 		return value;
+	}
+
+	private static Author cleanupAuthor(Author author) {
+		if (StringUtils.isNotBlank(author.getFullname())) {
+			author
+				.setFullname(
+					author
+						.getFullname()
+						.replaceAll(NAME_CLEANING_REGEX, " ")
+						.replace("\"", "\\\""));
+		}
+		if (StringUtils.isNotBlank(author.getName())) {
+			author
+				.setName(
+					author
+						.getName()
+						.replaceAll(NAME_CLEANING_REGEX, " ")
+						.replace("\"", "\\\""));
+		}
+		if (StringUtils.isNotBlank(author.getSurname())) {
+			author
+				.setSurname(
+					author
+						.getSurname()
+						.replaceAll(NAME_CLEANING_REGEX, " ")
+						.replace("\"", "\\\""));
+		}
+
+		return author;
 	}
 
 	private static Optional<String> cleanDateField(Field<String> dateofacceptance) {
