@@ -13,6 +13,10 @@
             <description>path of the output graph</description>
         </property>
         <property>
+            <name>filterInvisible</name>
+            <description>whether filter out invisible entities after merge</description>
+        </property>
+        <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
         </property>
@@ -24,7 +28,6 @@
             <name>sparkExecutorCores</name>
             <description>number of cores used by single executor</description>
         </property>
-
         <property>
             <name>oozieActionShareLibForSpark2</name>
             <description>oozie action sharelib for spark 2.*</description>
@@ -167,7 +170,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${workingPath}/grouped_entities</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}</arg>
-            <arg>--filterInvisible</arg><arg>true</arg>
+            <arg>--filterInvisible</arg><arg>${filterInvisible}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

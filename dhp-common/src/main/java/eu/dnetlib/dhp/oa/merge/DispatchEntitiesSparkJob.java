@@ -47,11 +47,7 @@ public class DispatchEntitiesSparkJob {
 		String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		boolean filterInvisible = Optional
-			.ofNullable(parser.get("filterInvisible"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.FALSE);
-
+		boolean filterInvisible = Boolean.valueOf(parser.get("filterInvisible"));
 		log.info("filterInvisible: {}", filterInvisible);
 
 		SparkConf conf = new SparkConf();

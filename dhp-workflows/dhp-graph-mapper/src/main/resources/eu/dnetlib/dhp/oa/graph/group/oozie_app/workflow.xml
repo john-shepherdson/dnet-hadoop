@@ -13,6 +13,10 @@
             <description>path of the output graph</description>
         </property>
         <property>
+            <name>filterInvisible</name>
+            <description>whether filter out invisible entities after merge</description>
+        </property>
+        <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
         </property>
@@ -117,7 +121,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${workingPath}/grouped_entities</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}</arg>
-            <arg>--filterInvisible</arg><arg>false</arg>
+            <arg>--filterInvisible</arg><arg>${filterInvisible}</arg>
         </spark>
         <ok to="delete_target_relation"/>
         <error to="Kill"/>
