@@ -1,15 +1,25 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Sets;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
-import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import eu.dnetlib.pace.util.MapDocumentUtil;
+import static java.nio.file.Files.createTempDirectory;
+
+import static org.apache.spark.sql.functions.col;
+import static org.apache.spark.sql.functions.count;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.lenient;
+
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -26,25 +36,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import eu.dnetlib.pace.util.MapDocumentUtil;
 import scala.Tuple2;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Serializable;
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static java.nio.file.Files.createTempDirectory;
-import static org.apache.spark.sql.functions.col;
-import static org.apache.spark.sql.functions.count;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -723,26 +726,32 @@ public class SparkDedupTest implements Serializable {
 	@Order(8)
 	void testCleanBaseRelations() throws Exception {
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
-				classPathResourceAsString("/eu/dnetlib/dhp/oa/dedup/cleanRelation_parameters.json"));
+			classPathResourceAsString("/eu/dnetlib/dhp/oa/dedup/cleanRelation_parameters.json"));
 
 		// append dangling relations to be cleaned up
-		Dataset<Row> df_before = spark.read().schema(Encoders.bean(Relation.class).schema()).json(testGraphBasePath + "/relation");
-		Dataset<Row> df_input =df_before
-				.unionByName(df_before.drop("source").withColumn("source", functions.lit("n/a")))
-				.unionByName(df_before.drop("target").withColumn("target", functions.lit("n/a")));
+		Dataset<Row> df_before = spark
+			.read()
+			.schema(Encoders.bean(Relation.class).schema())
+			.json(testGraphBasePath + "/relation");
+		Dataset<Row> df_input = df_before
+			.unionByName(df_before.drop("source").withColumn("source", functions.lit("n/a")))
+			.unionByName(df_before.drop("target").withColumn("target", functions.lit("n/a")));
 		df_input.write().mode(SaveMode.Overwrite).json(testOutputBasePath + "_tmp");
 
 		parser
-				.parseArgument(
-						new String[]{
-								"--graphBasePath", testGraphBasePath,
-								"--inputPath", testGraphBasePath + "/relation",
-								"--outputPath", testDedupGraphBasePath + "/relation"
-						});
+			.parseArgument(
+				new String[] {
+					"--graphBasePath", testGraphBasePath,
+					"--inputPath", testGraphBasePath + "/relation",
+					"--outputPath", testDedupGraphBasePath + "/relation"
+				});
 
 		new SparkCleanRelation(parser, spark).run(isLookUpService);
 
-		Dataset<Row> df_after = spark.read().schema(Encoders.bean(Relation.class).schema()).json(testDedupGraphBasePath + "/relation");
+		Dataset<Row> df_after = spark
+			.read()
+			.schema(Encoders.bean(Relation.class).schema())
+			.json(testDedupGraphBasePath + "/relation");
 
 		assertNotEquals(df_before.count(), df_input.count());
 		assertNotEquals(df_input.count(), df_after.count());
@@ -753,7 +762,7 @@ public class SparkDedupTest implements Serializable {
 	@Order(9)
 	void testCleanDedupedRelations() throws Exception {
 		ArgumentApplicationParser parser = new ArgumentApplicationParser(
-				classPathResourceAsString("/eu/dnetlib/dhp/oa/dedup/cleanRelation_parameters.json"));
+			classPathResourceAsString("/eu/dnetlib/dhp/oa/dedup/cleanRelation_parameters.json"));
 
 		String inputRelPath = testDedupGraphBasePath + "/propagaterelation/relation";
 
@@ -763,16 +772,19 @@ public class SparkDedupTest implements Serializable {
 		df_before.filter(col("dataInfo.deletedbyinference").notEqual(true)).show(50, false);
 
 		parser
-				.parseArgument(
-						new String[]{
-								"--graphBasePath", testGraphBasePath,
-								"--inputPath", inputRelPath,
-								"--outputPath", testDedupGraphBasePath + "/relation"
-						});
+			.parseArgument(
+				new String[] {
+					"--graphBasePath", testGraphBasePath,
+					"--inputPath", inputRelPath,
+					"--outputPath", testDedupGraphBasePath + "/relation"
+				});
 
 		new SparkCleanRelation(parser, spark).run(isLookUpService);
 
-		Dataset<Row> df_after = spark.read().schema(Encoders.bean(Relation.class).schema()).json(testDedupGraphBasePath + "/relation");
+		Dataset<Row> df_after = spark
+			.read()
+			.schema(Encoders.bean(Relation.class).schema())
+			.json(testDedupGraphBasePath + "/relation");
 
 		assertNotEquals(df_before.count(), df_after.count());
 		assertEquals(0, df_after.count());
