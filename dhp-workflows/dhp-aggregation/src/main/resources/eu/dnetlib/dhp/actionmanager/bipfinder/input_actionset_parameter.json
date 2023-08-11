@@ -6,21 +6,21 @@
     "paramRequired": false
   },
   {
-    "paramName": "ip",
-    "paramLongName": "inputPath",
-    "paramDescription": "the URL from where to get the programme file",
+    "paramName": "rip",
+    "paramLongName": "resultsInputPath",
+    "paramDescription": "the URL from where to get the input file for results",
+    "paramRequired": true
+  },
+  {
+    "paramName": "pip",
+    "paramLongName": "projectsInputPath",
+    "paramDescription": "the URL from where to get the input file for projects",
     "paramRequired": true
   },
   {
     "paramName": "o",
     "paramLongName": "outputPath",
     "paramDescription": "the path of the new ActionSet",
-    "paramRequired": true
-  },
-  {
-    "paramName": "te",
-    "paramLongName": "targetEntity",
-    "paramDescription": "the type of target entity to be enriched; currently supported one of { 'result', 'project' }",
     "paramRequired": true
   }
 ]

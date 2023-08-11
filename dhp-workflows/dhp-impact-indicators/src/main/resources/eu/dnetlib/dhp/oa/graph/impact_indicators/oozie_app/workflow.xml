@@ -31,7 +31,7 @@
 
 			<!-- Aggregation of impact scores on the project level		-->
 			<case to="project-impact-indicators">${wf:conf('resume') eq "projects-impact"}</case>
-			<case to="create-actionset-for-projects">${wf:conf('resume') eq "projects-impact-actionsets"}</case>
+			<case to="create-actionset">${wf:conf('resume') eq "create-actionset"}</case>
 
 			<default to="create-openaire-ranking-graph" />
 		</switch>
@@ -455,50 +455,8 @@
 			<file>${wfAppPath}/map_scores_to_dois.py#map_scores_to_dois.py</file>
 		</spark>
 
-		<ok to="delete-output-path-for-actionset" />
+		<ok to="project-impact-indicators" />
 		<error to="map-scores-fail" />
-
-	</action>
-
-	<!-- Re-create folder for result and project actionsets -->
-	<action name="delete-output-path-for-actionset">
-		<fs>
-			<delete path="${actionSetOutputPath}/results/"/>
-			<delete path="${actionSetOutputPath}/projects/"/>
-
-			<mkdir path="${actionSetOutputPath}/results/"/>
-			<mkdir path="${actionSetOutputPath}/projects/"/>
-		</fs>
-		<ok to="create-actionset-for-results"/>
-		<error to="actionset-delete-fail"/>
-	</action>
-
-	<action name="create-actionset-for-results">
-		<spark xmlns="uri:oozie:spark-action:0.2">
-
-			<master>yarn-cluster</master>
-			<mode>cluster</mode>
-			<name>Produces the atomic action with the bip finder scores for publications</name>
-			<class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
-			<jar>dhp-aggregation-${projectVersion}.jar</jar>
-
-			<spark-opts>
-				--executor-memory=${sparkNormalExecutorMemory}
-				--executor-cores=${sparkExecutorCores}
-				--driver-memory=${sparkNormalDriverMemory}
-				--conf spark.extraListeners=${spark2ExtraListeners}
-				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-				--conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
-			</spark-opts>
-			<arg>--inputPath</arg><arg>${bipScorePath}</arg>
-			<arg>--outputPath</arg><arg>${actionSetOutputPath}/results/</arg>
-			<arg>--targetEntity</arg><arg>result</arg>
-		</spark>
-
-		<ok to="project-impact-indicators"/>
-		<error to="actionset-creation-fail"/>
 
 	</action>
 
@@ -538,17 +496,26 @@
 			<file>${wfAppPath}/projects_impact.py#projects_impact.py</file>
 		</spark>
 
-		<ok to="create-actionset-for-projects" />
+		<ok to="delete-output-path-for-actionset" />
 		<error to="project-impact-indicators-fail" />
-
 	</action>
 
-	<action name="create-actionset-for-projects">
+	<!-- Re-create folder for actionsets -->
+	<action name="delete-output-path-for-actionset">
+		<fs>
+			<delete path="${actionSetOutputPath}"/>
+			<mkdir path="${actionSetOutputPath}"/>
+		</fs>
+		<ok to="create-actionset"/>
+		<error to="actionset-delete-fail"/>
+	</action>
+
+	<action name="create-actionset">
 		<spark xmlns="uri:oozie:spark-action:0.2">
 
 			<master>yarn-cluster</master>
 			<mode>cluster</mode>
-			<name>Produces the atomic action with the bip finder scores for projects</name>
+			<name>Produces the atomic action with the bip finder scores</name>
 			<class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
 			<jar>dhp-aggregation-${projectVersion}.jar</jar>
 
@@ -563,14 +530,13 @@
 				--conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
 			</spark-opts>
 
-			<arg>--inputPath</arg><arg>${projectImpactIndicatorsOutput}</arg>
-			<arg>--outputPath</arg><arg>${actionSetOutputPath}/projects/</arg>
-			<arg>--targetEntity</arg><arg>project</arg>
+			<arg>--resultsInputPath</arg><arg>${bipScorePath}</arg>
+			<arg>--projectsInputPath</arg><arg>${projectImpactIndicatorsOutput}</arg>
+			<arg>--outputPath</arg><arg>${actionSetOutputPath}</arg>
 		</spark>
 
 		<ok to="end"/>
-		<error to="actionset-project-creation-fail"/>
-
+		<error to="actionset-creation-fail"/>
 	</action>
 
 	<!-- Definitions of failure messages -->
@@ -628,10 +594,6 @@
 
 	<kill name="project-impact-indicators-fail">
 		<message>Calculating project impact indicators failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-	</kill>
-
-	<kill name="actionset-project-creation-fail">
-		<message>ActionSet creation for projects failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
 	</kill>
 
 	<!-- Define ending node -->

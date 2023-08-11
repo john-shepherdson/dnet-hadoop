@@ -6,13 +6,14 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.MapFunction;
@@ -41,8 +42,6 @@ import scala.Tuple2;
  */
 public class SparkAtomicActionScoreJob implements Serializable {
 
-	private static final String RESULT = "result";
-	private static final String PROJECT = "project";
 	private static final Logger log = LoggerFactory.getLogger(SparkAtomicActionScoreJob.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -61,14 +60,14 @@ public class SparkAtomicActionScoreJob implements Serializable {
 		Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		final String inputPath = parser.get("inputPath");
-		log.info("inputPath: {}", inputPath);
+		final String resultsInputPath = parser.get("resultsInputPath");
+		log.info("resultsInputPath: {}", resultsInputPath);
+
+		final String projectsInputPath = parser.get("projectsInputPath");
+		log.info("projectsInputPath: {}", projectsInputPath);
 
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
-
-		final String targetEntity = parser.get("targetEntity");
-		log.info("targetEntity: {}", targetEntity);
 
 		SparkConf conf = new SparkConf();
 
@@ -78,26 +77,23 @@ public class SparkAtomicActionScoreJob implements Serializable {
 			spark -> {
 				removeOutputDir(spark, outputPath);
 
-				// follow different procedures for different target entities
-				switch (targetEntity) {
-					case RESULT:
-						prepareResults(spark, inputPath, outputPath);
-						break;
-					case PROJECT:
-						prepareProjects(spark, inputPath, outputPath);
-						break;
-					default:
-						throw new RuntimeException("Unknown target entity: " + targetEntity);
-				}
+				JavaPairRDD<Text, Text> resultsRDD = prepareResults(spark, resultsInputPath, outputPath);
+				JavaPairRDD<Text, Text> projectsRDD = prepareProjects(spark, projectsInputPath, outputPath);
+
+				resultsRDD
+					.union(projectsRDD)
+					.saveAsHadoopFile(
+						outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
 			});
 	}
 
-	private static <I extends Project> void prepareProjects(SparkSession spark, String inputPath, String outputPath) {
+	private static <I extends Project> JavaPairRDD<Text, Text> prepareProjects(SparkSession spark, String inputPath,
+		String outputPath) {
 
 		// read input bip project scores
 		Dataset<BipProjectModel> projectScores = readPath(spark, inputPath, BipProjectModel.class);
 
-		projectScores.map((MapFunction<BipProjectModel, Project>) bipProjectScores -> {
+		return projectScores.map((MapFunction<BipProjectModel, Project>) bipProjectScores -> {
 			Project project = new Project();
 			project.setId(bipProjectScores.getProjectId());
 			project.setMeasures(bipProjectScores.toMeasures());
@@ -107,12 +103,12 @@ public class SparkAtomicActionScoreJob implements Serializable {
 			.map(p -> new AtomicAction(Project.class, p))
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
-					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
-			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
+					new Text(OBJECT_MAPPER.writeValueAsString(aa))));
 
 	}
 
-	private static <I extends Result> void prepareResults(SparkSession spark, String bipScorePath, String outputPath) {
+	private static <I extends Result> JavaPairRDD<Text, Text> prepareResults(SparkSession spark, String bipScorePath,
+		String outputPath) {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -128,24 +124,20 @@ public class SparkAtomicActionScoreJob implements Serializable {
 				return bs;
 			}).collect(Collectors.toList()).iterator()).rdd(), Encoders.bean(BipScore.class));
 
-		bipScores
+		return bipScores.map((MapFunction<BipScore, Result>) bs -> {
+			Result ret = new Result();
 
-			.map((MapFunction<BipScore, Result>) bs -> {
-				Result ret = new Result();
+			ret.setId(bs.getId());
 
-				ret.setId(bs.getId());
+			ret.setMeasures(getMeasure(bs));
 
-				ret.setMeasures(getMeasure(bs));
-
-				return ret;
-			}, Encoders.bean(Result.class))
+			return ret;
+		}, Encoders.bean(Result.class))
 			.toJavaRDD()
 			.map(p -> new AtomicAction(Result.class, p))
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
-					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
-			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
-
+					new Text(OBJECT_MAPPER.writeValueAsString(aa))));
 	}
 
 	private static List<Measure> getMeasure(BipScore value) {
