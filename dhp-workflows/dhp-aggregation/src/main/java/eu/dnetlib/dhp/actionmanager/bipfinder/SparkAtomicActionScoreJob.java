@@ -6,13 +6,14 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.MapFunction;
@@ -24,8 +25,9 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.bipmodel.BipDeserialize;
 import eu.dnetlib.dhp.actionmanager.bipmodel.BipScore;
+import eu.dnetlib.dhp.actionmanager.bipmodel.score.deserializers.BipProjectModel;
+import eu.dnetlib.dhp.actionmanager.bipmodel.score.deserializers.BipResultModel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
@@ -40,7 +42,6 @@ import scala.Tuple2;
  */
 public class SparkAtomicActionScoreJob implements Serializable {
 
-	private static final String DOI = "doi";
 	private static final Logger log = LoggerFactory.getLogger(SparkAtomicActionScoreJob.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -56,18 +57,17 @@ public class SparkAtomicActionScoreJob implements Serializable {
 
 		parser.parseArgument(args);
 
-		Boolean isSparkSessionManaged = Optional
-			.ofNullable(parser.get("isSparkSessionManaged"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.TRUE);
-
+		Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		final String inputPath = parser.get("inputPath");
-		log.info("inputPath {}: ", inputPath);
+		final String resultsInputPath = parser.get("resultsInputPath");
+		log.info("resultsInputPath: {}", resultsInputPath);
+
+		final String projectsInputPath = parser.get("projectsInputPath");
+		log.info("projectsInputPath: {}", projectsInputPath);
 
 		final String outputPath = parser.get("outputPath");
-		log.info("outputPath {}: ", outputPath);
+		log.info("outputPath: {}", outputPath);
 
 		SparkConf conf = new SparkConf();
 
@@ -76,17 +76,45 @@ public class SparkAtomicActionScoreJob implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				removeOutputDir(spark, outputPath);
-				prepareResults(spark, inputPath, outputPath);
+
+				JavaPairRDD<Text, Text> resultsRDD = prepareResults(spark, resultsInputPath, outputPath);
+				JavaPairRDD<Text, Text> projectsRDD = prepareProjects(spark, projectsInputPath, outputPath);
+
+				resultsRDD
+					.union(projectsRDD)
+					.saveAsHadoopFile(
+						outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
 			});
 	}
 
-	private static <I extends Result> void prepareResults(SparkSession spark, String bipScorePath, String outputPath) {
+	private static <I extends Project> JavaPairRDD<Text, Text> prepareProjects(SparkSession spark, String inputPath,
+		String outputPath) {
+
+		// read input bip project scores
+		Dataset<BipProjectModel> projectScores = readPath(spark, inputPath, BipProjectModel.class);
+
+		return projectScores.map((MapFunction<BipProjectModel, Project>) bipProjectScores -> {
+			Project project = new Project();
+			project.setId(bipProjectScores.getProjectId());
+			project.setMeasures(bipProjectScores.toMeasures());
+			return project;
+		}, Encoders.bean(Project.class))
+			.toJavaRDD()
+			.map(p -> new AtomicAction(Project.class, p))
+			.mapToPair(
+				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
+					new Text(OBJECT_MAPPER.writeValueAsString(aa))));
+
+	}
+
+	private static <I extends Result> JavaPairRDD<Text, Text> prepareResults(SparkSession spark, String bipScorePath,
+		String outputPath) {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		JavaRDD<BipDeserialize> bipDeserializeJavaRDD = sc
+		JavaRDD<BipResultModel> bipDeserializeJavaRDD = sc
 			.textFile(bipScorePath)
-			.map(item -> OBJECT_MAPPER.readValue(item, BipDeserialize.class));
+			.map(item -> OBJECT_MAPPER.readValue(item, BipResultModel.class));
 
 		Dataset<BipScore> bipScores = spark
 			.createDataset(bipDeserializeJavaRDD.flatMap(entry -> entry.keySet().stream().map(key -> {
@@ -96,24 +124,20 @@ public class SparkAtomicActionScoreJob implements Serializable {
 				return bs;
 			}).collect(Collectors.toList()).iterator()).rdd(), Encoders.bean(BipScore.class));
 
-		bipScores
+		return bipScores.map((MapFunction<BipScore, Result>) bs -> {
+			Result ret = new Result();
 
-			.map((MapFunction<BipScore, Result>) bs -> {
-				Result ret = new Result();
+			ret.setId(bs.getId());
 
-				ret.setId(bs.getId());
+			ret.setMeasures(getMeasure(bs));
 
-				ret.setMeasures(getMeasure(bs));
-
-				return ret;
-			}, Encoders.bean(Result.class))
+			return ret;
+		}, Encoders.bean(Result.class))
 			.toJavaRDD()
 			.map(p -> new AtomicAction(Result.class, p))
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
-					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
-			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
-
+					new Text(OBJECT_MAPPER.writeValueAsString(aa))));
 	}
 
 	private static List<Measure> getMeasure(BipScore value) {
@@ -157,14 +181,6 @@ public class SparkAtomicActionScoreJob implements Serializable {
 
 	private static void removeOutputDir(SparkSession spark, String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
-	}
-
-	public static <R> Dataset<R> readPath(
-		SparkSession spark, String inputPath, Class<R> clazz) {
-		return spark
-			.read()
-			.textFile(inputPath)
-			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
 	}
 
 }

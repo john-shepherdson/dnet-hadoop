@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.bipmodel.BipDeserialize;
 import eu.dnetlib.dhp.actionmanager.bipmodel.BipScore;
+import eu.dnetlib.dhp.actionmanager.bipmodel.score.deserializers.BipResultModel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -82,9 +82,9 @@ public class PrepareBipFinder implements Serializable {
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-		JavaRDD<BipDeserialize> bipDeserializeJavaRDD = sc
+		JavaRDD<BipResultModel> bipDeserializeJavaRDD = sc
 			.textFile(inputPath)
-			.map(item -> OBJECT_MAPPER.readValue(item, BipDeserialize.class));
+			.map(item -> OBJECT_MAPPER.readValue(item, BipResultModel.class));
 
 		spark
 			.createDataset(bipDeserializeJavaRDD.flatMap(entry -> entry.keySet().stream().map(key -> {
