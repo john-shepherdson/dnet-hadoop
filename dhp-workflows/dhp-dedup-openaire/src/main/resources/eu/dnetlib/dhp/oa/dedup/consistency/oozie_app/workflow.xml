@@ -95,7 +95,7 @@
                 --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
-            <arg>--outputPath</arg><arg>${workingPath}/propagaterelation/</arg>
+            <arg>--graphOutputPath</arg><arg>${workingPath}/propagaterelation/</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
         </spark>
         <ok to="CleanRelation"/>
