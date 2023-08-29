@@ -9,6 +9,26 @@
 				<name>oozie.action.sharelib.for.spark</name>
 				<value>${oozieActionShareLibForSpark2}</value>
 			</property>
+			<property>
+				<name>projectImpactIndicatorsOutput</name>
+				<value>${nameNode}${workingDir}/project_indicators</value>
+			</property>
+			<property>
+				<name>openaireGraphInputPath</name>
+				<value>${nameNode}/${workingDir}/openaire_id_graph</value>
+			</property>
+			<property>
+				<name>synonymFolder</name>
+				<value>${nameNode}/${workingDir}/openaireid_to_dois/</value>
+			</property>
+			<property>
+				<name>checkpointDir</name>
+				<value>${nameNode}/${workingDir}/check/</value>
+			</property>
+			<property>
+				<name>bipScorePath</name>
+				<value>${nameNode}${workingDir}/openaire_universe_scores/</value>
+			</property>
 		</configuration>
 	</global>
 
@@ -65,9 +85,8 @@
 			<!-- number of partitions to be used on joins -->
 			<arg>${sparkShufflePartitions}</arg>
 			<!-- The output of the graph should be the openaire input graph for ranking-->
-			<arg>${openaireGraphInputPath}</arg>
-
-			<file>${wfAppPath}/create_openaire_ranking_graph.py#create_openaire_ranking_graph.py</file>
+			<arg>${nameNode}${workingDir}/openaire_id_graph</arg>
+			<file>${nameNode}${wfAppPath}/create_openaire_ranking_graph.py#create_openaire_ranking_graph.py</file>
 		</spark>
 
 		<ok to="non-iterative-rankings" />
@@ -103,7 +122,7 @@
 			</spark-opts>
 
 			<!-- Script arguments here -->
-			<arg>${openaireGraphInputPath}</arg>
+			<arg>${nameNode}/${workingDir}/openaire_id_graph</arg>
 			<!-- number of partitions to be used on joins -->
 			<arg>${sparkShufflePartitions}</arg>
 
@@ -136,7 +155,7 @@
 			</spark-opts>
 
 			<!-- Script arguments here -->
-			<arg>${openaireGraphInputPath}</arg>
+			<arg>${nameNode}/${workingDir}/openaire_id_graph</arg>
 			<arg>${ramGamma}</arg>
 			<arg>${currentYear}</arg>
 			<arg>RAM</arg>
@@ -174,7 +193,7 @@
 			</spark-opts>
 
 			<!-- Script arguments here -->
-			<arg>${openaireGraphInputPath}</arg>
+			<arg>${nameNode}/${workingDir}/openaire_id_graph</arg>
 			<!-- number of partitions to be used on joins -->
 			<arg>${sparkShufflePartitions}</arg>
 			<arg>3</arg>
@@ -207,7 +226,7 @@
 			</spark-opts>
 
 			<!-- Script arguments here -->
-			<arg>${openaireGraphInputPath}</arg>
+			<arg>${nameNode}/${workingDir}/openaire_id_graph</arg>
 			<arg>${pageRankAlpha}</arg>
 			<arg>${convergenceError}</arg>
 			<arg>${checkpointDir}</arg>
@@ -243,7 +262,7 @@
 			</spark-opts>
 
 			<!-- Script arguments here -->
-			<arg>${openaireGraphInputPath}</arg>
+			<arg>${nameNode}/${workingDir}/openaire_id_graph</arg>
 			<arg>${attrankAlpha}</arg>
 			<arg>${attrankBeta}</arg>
 			<arg>${attrankGamma}</arg>
