@@ -18,11 +18,15 @@
         </property>
         <property>
             <name>sparkDriverMemory</name>
-            <description>memory for driver process</description>
+            <description>heap memory for driver process</description>
         </property>
         <property>
             <name>sparkExecutorMemory</name>
-            <description>memory for individual executor</description>
+            <description>heap memory for individual executor</description>
+        </property>
+        <property>
+            <name>sparkExecutorMemoryOverhead</name>
+            <description>off-heap memory for individual executor</description>
         </property>
         <property>
             <name>sparkExecutorCores</name>
@@ -86,6 +90,7 @@
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemoryOverhead}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
@@ -111,6 +116,7 @@
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemoryOverhead}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
@@ -135,8 +141,9 @@
             <class>eu.dnetlib.dhp.oa.merge.GroupEntitiesSparkJob</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemoryOverhead}
+                --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -159,8 +166,9 @@
             <class>eu.dnetlib.dhp.oa.merge.DispatchEntitiesSparkJob</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemoryOverhead}
+                --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
