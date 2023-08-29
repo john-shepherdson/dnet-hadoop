@@ -371,7 +371,7 @@ public class GraphCleaningFunctionsTest {
 	@Test
 	public void testFilterProject() throws IOException {
 		String json = IOUtils
-				.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/project.json"));
+			.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/project.json"));
 		Project p_in = MAPPER.readValue(json, Project.class);
 
 		Assertions.assertEquals(false, GraphCleaningFunctions.filter(p_in));
