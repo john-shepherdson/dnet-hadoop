@@ -48,4 +48,4 @@ rel.properties[1].value apc_currency
 from ${openaire_db_name}.relation rel
 join ${openaire_db_name}.organization o on o.id=rel.source
 join ${openaire_db_name}.result r on r.id=rel.target
-where rel.subreltype = 'affiliation' and rel.datainfo.deletedbyinference = false and size(rel.properties) > 0;
+where rel.subreltype = 'affiliation' and rel.datainfo.deletedbyinference = false and size(rel.properties)>0;

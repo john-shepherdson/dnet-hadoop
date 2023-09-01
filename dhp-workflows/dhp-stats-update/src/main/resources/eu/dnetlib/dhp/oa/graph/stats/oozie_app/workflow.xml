@@ -467,7 +467,7 @@
             <argument>${usage_stats_db_shadow_name}</argument>
             <file>finalizeImpalaCluster.sh</file>
         </shell>
-        <ok to="End"/>
+        <ok to="Step24-updateCache"/>
         <error to="Kill"/>
     </action>
 

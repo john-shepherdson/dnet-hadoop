@@ -39,7 +39,7 @@ hdfs dfs -copyToLocal $9
 
 
 echo "Creating monitor database"
-cat step20-createMonitorDBAll.sql | sed "s/SOURCE/openaire_prod_stats_20230707/g" | sed "s/TARGET/openaire_prod_stats_monitor_20230707/g1" > foo
+cat step20-createMonitorDBAll.sql | sed "s/SOURCE/$1/g" | sed "s/TARGET/$2/g1" > foo
 hive $HIVE_OPTS -f foo
 
 cat step20-createMonitorDB_funded.sql | sed "s/SOURCE/$1/g" | sed "s/TARGET/$2_funded/g1" > foo

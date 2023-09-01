@@ -88,6 +88,7 @@ create view if not exists TARGET.doctoratestudents as select * from SOURCE.docto
 create view if not exists TARGET.totalresearchers as select * from SOURCE.totalresearchers;
 create view if not exists TARGET.totalresearchersft as select * from SOURCE.totalresearchersft;
 create view if not exists TARGET.hrrst as select * from SOURCE.hrrst;
+create view if not exists TARGET.graduatedoctorates as select * from SOURCE.graduatedoctorates;
 
 create table TARGET.result_citations stored as parquet as select * from SOURCE.result_citations orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 --ANALYZE TABLE TARGET.result_citations COMPUTE STATISTICS;
@@ -270,3 +271,11 @@ create table TARGET.indi_pub_interdisciplinarity stored as parquet as select * f
 --ANALYZE TABLE TARGET.indi_pub_interdisciplinarity COMPUTE STATISTICS;
 create table TARGET.result_apc_affiliations stored as parquet as select * from SOURCE.result_apc_affiliations orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 --ANALYZE TABLE TARGET.result_apc_affiliations COMPUTE STATISTICS;
+create table TARGET.indi_is_project_result_after stored as parquet as select * from SOURCE.indi_is_project_result_after orig where exists (select 1 from TARGET.result r where r.id=orig.result_id);
+create table TARGET.indi_is_funder_plan_s stored as parquet as select * from SOURCE.indi_is_funder_plan_s orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create view TARGET.indi_funder_fairness as select * from SOURCE.indi_funder_fairness;
+create view TARGET.indi_funder_openess as select * from SOURCE.indi_funder_openess;
+create view TARGET.indi_funder_findable as select * from SOURCE.indi_funder_findable;
+create view TARGET.indi_ris_fairness as select * from SOURCE.indi_ris_fairness;
+create view TARGET.indi_ris_openess as select * from SOURCE.indi_ris_openess;
+create view TARGET.indi_ris_findable as select * from SOURCE.indi_ris_findable;
