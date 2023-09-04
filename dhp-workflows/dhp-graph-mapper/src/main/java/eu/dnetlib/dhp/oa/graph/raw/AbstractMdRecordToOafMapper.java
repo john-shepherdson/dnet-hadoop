@@ -117,14 +117,14 @@ public abstract class AbstractMdRecordToOafMapper {
 				return Lists.newArrayList();
 			}
 
-			final DataInfo info = prepareDataInfo(doc, invisible);
+			final DataInfo entityInfo = prepareDataInfo(doc, invisible);
 			final long lastUpdateTimestamp = new Date().getTime();
 
-			final List<Instance> instances = prepareInstances(doc, info, collectedFrom, hostedBy);
+			final List<Instance> instances = prepareInstances(doc, entityInfo, collectedFrom, hostedBy);
 
 			final String type = getResultType(doc, instances);
 
-			return createOafs(doc, type, instances, collectedFrom, info, lastUpdateTimestamp);
+			return createOafs(doc, type, instances, collectedFrom, entityInfo, lastUpdateTimestamp);
 		} catch (DocumentException e) {
 			log.error("Error with record:\n" + xml);
 			return Lists.newArrayList();
@@ -184,13 +184,15 @@ public abstract class AbstractMdRecordToOafMapper {
 
 		final List<Oaf> oafs = Lists.newArrayList(entity);
 
+		final DataInfo relationInfo = prepareDataInfo(doc, false);
+
 		if (!oafs.isEmpty()) {
 			Set<Oaf> rels = Sets.newHashSet();
 
-			rels.addAll(addProjectRels(doc, entity));
-			rels.addAll(addOtherResultRels(doc, entity));
-			rels.addAll(addRelations(doc, entity));
-			rels.addAll(addAffiliations(doc, entity));
+			rels.addAll(addProjectRels(doc, entity, relationInfo));
+			rels.addAll(addOtherResultRels(doc, entity, relationInfo));
+			rels.addAll(addRelations(doc, entity, relationInfo));
+			rels.addAll(addAffiliations(doc, entity, relationInfo));
 
 			oafs.addAll(rels);
 		}
@@ -243,7 +245,7 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	private List<Oaf> addProjectRels(
 		final Document doc,
-		final OafEntity entity) {
+		final OafEntity entity, DataInfo info) {
 
 		final List<Oaf> res = new ArrayList<>();
 
@@ -262,18 +264,21 @@ public abstract class AbstractMdRecordToOafMapper {
 					.add(
 						OafMapperUtils
 							.getRelation(
-								docId, projectId, RESULT_PROJECT, OUTCOME, IS_PRODUCED_BY, entity, validationdDate));
+								docId, projectId, RESULT_PROJECT, OUTCOME, IS_PRODUCED_BY, entity.getCollectedfrom(),
+								info, entity.getLastupdatetimestamp(), validationdDate, null));
 				res
 					.add(
 						OafMapperUtils
-							.getRelation(projectId, docId, RESULT_PROJECT, OUTCOME, PRODUCES, entity, validationdDate));
+							.getRelation(
+								projectId, docId, RESULT_PROJECT, OUTCOME, PRODUCES, entity.getCollectedfrom(), info,
+								entity.getLastupdatetimestamp(), validationdDate, null));
 			}
 		}
 
 		return res;
 	}
 
-	private List<Oaf> addRelations(Document doc, OafEntity entity) {
+	private List<Oaf> addRelations(Document doc, OafEntity entity, DataInfo info) {
 
 		final List<Oaf> rels = Lists.newArrayList();
 
@@ -301,14 +306,16 @@ public abstract class AbstractMdRecordToOafMapper {
 							.add(
 								OafMapperUtils
 									.getRelation(
-										entity.getId(), targetId, relType, subRelType, relClass, entity,
-										validationDate));
+										entity.getId(), targetId, relType, subRelType, relClass,
+										entity.getCollectedfrom(), info,
+										entity.getLastupdatetimestamp(), validationDate, null));
 						rels
 							.add(
 								OafMapperUtils
 									.getRelation(
-										targetId, entity.getId(), relType, subRelType, relClassInverse, entity,
-										validationDate));
+										targetId, entity.getId(), relType, subRelType, relClassInverse,
+										entity.getCollectedfrom(), info,
+										entity.getLastupdatetimestamp(), validationDate, null));
 					}
 				}
 			}
@@ -316,7 +323,7 @@ public abstract class AbstractMdRecordToOafMapper {
 		return rels;
 	}
 
-	private List<Oaf> addAffiliations(Document doc, OafEntity entity) {
+	private List<Oaf> addAffiliations(Document doc, OafEntity entity, DataInfo info) {
 		final List<Oaf> rels = Lists.newArrayList();
 
 		for (Object o : doc.selectNodes("//datacite:affiliation[@affiliationIdentifierScheme='ROR']")) {
@@ -345,14 +352,14 @@ public abstract class AbstractMdRecordToOafMapper {
 						OafMapperUtils
 							.getRelation(
 								resultId, orgId, RESULT_ORGANIZATION, AFFILIATION, HAS_AUTHOR_INSTITUTION,
-								entity.getCollectedfrom(), entity.getDataInfo(), entity.getLastupdatetimestamp(), null,
+								entity.getCollectedfrom(), info, entity.getLastupdatetimestamp(), null,
 								properties));
 				rels
 					.add(
 						OafMapperUtils
 							.getRelation(
 								orgId, resultId, RESULT_ORGANIZATION, AFFILIATION, IS_AUTHOR_INSTITUTION_OF,
-								entity.getCollectedfrom(), entity.getDataInfo(), entity.getLastupdatetimestamp(), null,
+								entity.getCollectedfrom(), info, entity.getLastupdatetimestamp(), null,
 								properties));
 			}
 		}
@@ -361,7 +368,7 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected abstract List<Oaf> addOtherResultRels(
 		final Document doc,
-		final OafEntity entity);
+		final OafEntity entity, DataInfo info);
 
 	private void populateResultFields(
 		final Result r,
