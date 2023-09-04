@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -292,7 +291,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected List<Oaf> addOtherResultRels(
 		final Document doc,
-		final OafEntity entity) {
+		final OafEntity entity, DataInfo info) {
 
 		final String docId = entity.getId();
 		final List<Oaf> res = new ArrayList<>();
@@ -308,11 +307,13 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 				res
 					.add(
 						getRelation(
-							docId, otherId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, entity));
+							docId, otherId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, entity.getCollectedfrom(), info,
+							entity.getLastupdatetimestamp(), null, null));
 				res
 					.add(
 						getRelation(
-							otherId, docId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, entity));
+							otherId, docId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, entity.getCollectedfrom(), info,
+							entity.getLastupdatetimestamp(), null, null));
 			}
 		}
 		return res;
