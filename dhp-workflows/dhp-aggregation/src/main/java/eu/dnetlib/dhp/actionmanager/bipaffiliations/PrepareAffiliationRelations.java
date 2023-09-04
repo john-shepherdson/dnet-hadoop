@@ -120,8 +120,10 @@ public class PrepareAffiliationRelations implements Serializable {
 						qualifier,
 						Double.toString(row.getAs("confidence")));
 
+				List<KeyValue> collectedfrom = OafMapperUtils.listKeyValues(ModelConstants.CROSSREF_ID, "Crossref");
+
 				// return bi-directional relations
-				return getAffiliationRelationPair(paperId, affId, dataInfo).iterator();
+				return getAffiliationRelationPair(paperId, affId, collectedfrom, dataInfo).iterator();
 
 			})
 			.map(p -> new AtomicAction(Relation.class, p))
@@ -132,7 +134,8 @@ public class PrepareAffiliationRelations implements Serializable {
 
 	}
 
-	private static List<Relation> getAffiliationRelationPair(String paperId, String affId, DataInfo dataInfo) {
+	private static List<Relation> getAffiliationRelationPair(String paperId, String affId, List<KeyValue> collectedfrom,
+		DataInfo dataInfo) {
 		return Arrays
 			.asList(
 				OafMapperUtils
@@ -142,7 +145,7 @@ public class PrepareAffiliationRelations implements Serializable {
 						ModelConstants.RESULT_ORGANIZATION,
 						ModelConstants.AFFILIATION,
 						ModelConstants.HAS_AUTHOR_INSTITUTION,
-						null,
+						collectedfrom,
 						dataInfo,
 						null),
 				OafMapperUtils
@@ -152,7 +155,7 @@ public class PrepareAffiliationRelations implements Serializable {
 						ModelConstants.RESULT_ORGANIZATION,
 						ModelConstants.AFFILIATION,
 						ModelConstants.IS_AUTHOR_INSTITUTION_OF,
-						null,
+						collectedfrom,
 						dataInfo,
 						null));
 	}
