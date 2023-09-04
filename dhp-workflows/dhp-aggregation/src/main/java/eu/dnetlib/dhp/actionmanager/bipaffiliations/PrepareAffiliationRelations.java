@@ -80,16 +80,15 @@ public class PrepareAffiliationRelations implements Serializable {
 		// load and parse affiliation relations from HDFS
 		Dataset<Row> df = spark
 			.read()
-			.schema("`DOI` STRING, `Matchings` ARRAY<STRUCT<`RORid`:ARRAY<STRING>,`Confidence`:DOUBLE>>")
+			.schema("`DOI` STRING, `Matchings` ARRAY<STRUCT<`RORid`:STRING,`Confidence`:DOUBLE>>")
 			.json(inputPath);
 
 		// unroll nested arrays
 		df = df
 			.withColumn("matching", functions.explode(new Column("Matchings")))
-			.withColumn("rorid", functions.explode(new Column("matching.RORid")))
 			.select(
 				new Column("DOI").as("doi"),
-				new Column("rorid"),
+				new Column("matching.RORid").as("rorid"),
 				new Column("matching.Confidence").as("confidence"));
 
 		// prepare action sets for affiliation relations
