@@ -696,7 +696,11 @@ left outer join
 (select p.id, 1 as is_bronze_oa from ${stats_db_name}.publication p
 join ${stats_db_name}.indi_result_has_cc_licence cc on cc.id=p.id
 join ${stats_db_name}.indi_pub_gold_oa ga on ga.id=p.id
-where cc.has_cc_license=0 and ga.is_gold=0) tmp on tmp.id=p.id;
+join ${stats_db_name}.result_instance ri on ri.id=p.id
+join ${stats_db_name}.datasource d on d.id=ri.hostedby
+where cc.has_cc_license=0 and ga.is_gold=0
+and (d.type='Journal' or d.type='Journal Aggregator/Publisher')
+and ri.accessright='Open Access') tmp on tmp.id=p.id;
 
 CREATE TEMPORARY TABLE ${stats_db_name}.project_year_result_year as
 select p.id project_id, acronym, r.id result_id, r.year, p.end_year
