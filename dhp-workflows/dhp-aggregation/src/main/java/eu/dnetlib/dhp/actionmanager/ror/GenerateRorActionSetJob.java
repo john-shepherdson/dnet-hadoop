@@ -168,7 +168,7 @@ public class GenerateRorActionSetJob {
 
 	}
 
-	private static String calculateOpenaireId(final String rorId) {
+	public static String calculateOpenaireId(final String rorId) {
 		return String.format("20|%s::%s", Constants.ROR_NS_PREFIX, DHPUtils.md5(rorId));
 	}
 

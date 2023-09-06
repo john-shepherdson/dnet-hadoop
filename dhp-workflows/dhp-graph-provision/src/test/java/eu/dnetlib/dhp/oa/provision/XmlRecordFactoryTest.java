@@ -50,10 +50,11 @@ public class XmlRecordFactoryTest {
 		assertNotNull(xml);
 
 		final Document doc = new SAXReader().read(new StringReader(xml));
+		doc.normalize();
 
 		assertNotNull(doc);
 
-		System.out.println(doc.asXML());
+		// System.out.println(doc.asXML());
 
 		assertEquals("0000-0001-9613-6638", doc.valueOf("//creator[@rank = '1']/@orcid"));
 		assertEquals("0000-0001-9613-6639", doc.valueOf("//creator[@rank = '1']/@orcid_pending"));
@@ -88,6 +89,12 @@ public class XmlRecordFactoryTest {
 			"C", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity']/@class"));
 
 		assertEquals("EOSC::Jupyter Notebook", doc.valueOf("//*[local-name() = 'result']/eoscifguidelines/@code"));
+
+		assertEquals(2, Integer.parseInt(doc.valueOf("count(//*[local-name() = 'result']/fulltext)")));
+
+		assertEquals(
+			"https://osf.io/preprints/socarxiv/7vgtu/download",
+			doc.valueOf("//*[local-name() = 'result']/fulltext[1]"));
 
 	}
 

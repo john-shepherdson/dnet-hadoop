@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -23,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.actionmanager.project.PrepareProjects;
 import eu.dnetlib.dhp.actionmanager.project.utils.model.JsonTopic;
-import eu.dnetlib.dhp.actionmanager.project.utils.model.Project;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
 /**
@@ -68,7 +66,7 @@ public class ReadTopics implements Serializable {
 
 		FSDataInputStream inputStream = fs.open(hdfsreadpath);
 
-		ArrayList<JsonTopic> topics = OBJECT_MAPPER
+		List<JsonTopic> topics = OBJECT_MAPPER
 			.readValue(
 				IOUtils.toString(inputStream, "UTF-8"),
 				new TypeReference<List<JsonTopic>>() {

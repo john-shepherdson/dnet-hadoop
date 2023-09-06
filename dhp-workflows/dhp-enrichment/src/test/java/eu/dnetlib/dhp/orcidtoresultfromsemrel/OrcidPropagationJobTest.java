@@ -19,10 +19,8 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.cloudera.org.codehaus.jackson.map.jsontype.impl.ClassNameIdResolver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.PropagationConstant;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 

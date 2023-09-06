@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>eu.dnetlib.dhp</groupId>
+        <artifactId>dhp-workflows</artifactId>
+        <version>1.2.5-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>dhp-impact-indicators</artifactId>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!--   Use this property to fetch a specific tag      -->
+        <bip.ranker.tag>v1.0.0</bip.ranker.tag>
+    </properties>
+
+    <scm>
+        <url>https://github.com/athenarc/Bip-Ranker</url>
+        <connection>scm:git:https://github.com/athenarc/Bip-Ranker.git</connection>
+    </scm>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-plugin</artifactId>
+                <version>1.8.1</version>
+                <configuration>
+                    <connectionType>connection</connectionType>
+                    <scmVersionType>tag</scmVersionType><!-- 'branch' can also be provided here -->
+                    <scmVersion>${bip.ranker.tag}</scmVersion><!-- in case of scmVersionType == 'branch', this field points to the branch name -->
+                    <checkoutDirectory>${project.build.directory}/${oozie.package.file.name}/${oozieAppDir}/bip-ranker</checkoutDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>checkout-bip-ranker</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>checkout</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>dhp-aggregation</artifactId>
+            <version>${projectVersion}</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
+</project>

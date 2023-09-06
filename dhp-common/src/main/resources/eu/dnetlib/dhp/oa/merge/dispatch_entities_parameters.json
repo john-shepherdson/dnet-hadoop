@@ -18,9 +18,9 @@
     "paramRequired": true
   },
   {
-    "paramName": "c",
-    "paramLongName": "graphTableClassName",
-    "paramDescription": "the graph entity class name",
+    "paramName": "fi",
+    "paramLongName": "filterInvisible",
+    "paramDescription": "if true filters out invisible entities",
     "paramRequired": true
   }
 ]

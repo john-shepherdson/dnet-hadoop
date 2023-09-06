@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.broker.oa.util.aggregators.stats;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.expressions.Aggregator;

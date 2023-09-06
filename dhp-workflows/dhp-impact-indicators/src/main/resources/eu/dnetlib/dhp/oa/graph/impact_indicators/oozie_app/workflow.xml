@@ -1,0 +1,621 @@
+<workflow-app xmlns="uri:oozie:workflow:0.5" name="ranking-wf">
+
+	<!-- Global params	-->
+	<global>
+		<job-tracker>${jobTracker}</job-tracker>
+		<name-node>${nameNode}</name-node>
+		<configuration>
+			<property>
+				<name>oozie.action.sharelib.for.spark</name>
+				<value>${oozieActionShareLibForSpark2}</value>
+			</property>
+			<property>
+				<name>projectImpactIndicatorsOutput</name>
+				<value>${nameNode}${workingDir}/project_indicators</value>
+			</property>
+			<property>
+				<name>openaireGraphInputPath</name>
+				<value>${nameNode}/${workingDir}/openaire_id_graph</value>
+			</property>
+			<property>
+				<name>synonymFolder</name>
+				<value>${nameNode}/${workingDir}/openaireid_to_dois/</value>
+			</property>
+			<property>
+				<name>checkpointDir</name>
+				<value>${nameNode}/${workingDir}/check/</value>
+			</property>
+			<property>
+				<name>bipScorePath</name>
+				<value>${nameNode}${workingDir}/openaire_universe_scores/</value>
+			</property>
+		</configuration>
+	</global>
+
+	<!-- start using a decision node, so as to determine from which point onwards a job will continue -->
+	<start to="entry-point-decision" />
+
+	<decision name="entry-point-decision">
+		<switch>
+			<!-- The default will be set as the normal start, a.k.a. get-doi-synonyms -->
+			<!-- If any different condition is set, go to the corresponding start -->
+			<case to="non-iterative-rankings">${wf:conf('resume') eq "rankings-start"}</case>
+			<case to="spark-impulse">${wf:conf('resume') eq "impulse"}</case>
+			<case to="spark-pagerank">${wf:conf('resume') eq "pagerank"}</case>
+			<case to="spark-attrank">${wf:conf('resume') eq "attrank"}</case>
+			<!-- <case to="iterative-rankings">${wf:conf('resume') eq "rankings-iterative"}</case> -->
+			<case to="get-file-names">${wf:conf('resume') eq "format-results"}</case>
+			<case to="map-openaire-to-doi">${wf:conf('resume') eq "map-ids"}</case>
+			<case to="map-scores-to-dois">${wf:conf('resume') eq "map-scores"}</case>
+			<case to="create-openaire-ranking-graph">${wf:conf('resume') eq "start"}</case>
+
+			<!-- Aggregation of impact scores on the project level		-->
+			<case to="project-impact-indicators">${wf:conf('resume') eq "projects-impact"}</case>
+			<case to="create-actionset">${wf:conf('resume') eq "create-actionset"}</case>
+
+			<default to="create-openaire-ranking-graph" />
+		</switch>
+	</decision>
+
+	<!-- initial step: create citation network -->
+	<action name="create-openaire-ranking-graph">
+		<spark xmlns="uri:oozie:spark-action:0.2">
+
+			<master>yarn-cluster</master>
+			<mode>cluster</mode>
+			<name>OpenAIRE Ranking Graph Creation</name>
+			<jar>create_openaire_ranking_graph.py</jar>
+
+			<spark-opts>
+				--executor-memory=${sparkHighExecutorMemory}
+				--executor-cores=${sparkExecutorCores}
+				--driver-memory=${sparkHighDriverMemory}
+				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
+				--conf spark.extraListeners=${spark2ExtraListeners}
+				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+			</spark-opts>
+
+			<!-- Script arguments here -->
+			<!-- The openaire graph data from which to read relations and objects -->
+			<arg>${openaireDataInput}</arg>
+			<!-- Year for filtering entries w/ larger values / empty -->
+			<arg>${currentYear}</arg>
+			<!-- number of partitions to be used on joins -->
+			<arg>${sparkShufflePartitions}</arg>
+			<!-- The output of the graph should be the openaire input graph for ranking-->
+			<arg>${nameNode}${workingDir}/openaire_id_graph</arg>
+			<file>${nameNode}${wfAppPath}/create_openaire_ranking_graph.py#create_openaire_ranking_graph.py</file>
+		</spark>
+
+		<ok to="non-iterative-rankings" />
+		<error to="openaire-graph-error" />
+
+	</action>
+
+	<!-- Citation Count and RAM are calculated in parallel-->
+	<fork name="non-iterative-rankings">
+		<path start="spark-cc"/>
+		<!-- <path start="spark-impulse"/> -->
+		<path start="spark-ram"/>
+	</fork>
+
+	<!-- Run Citation Count calculation -->
+	<action name="spark-cc">
+		<spark xmlns="uri:oozie:spark-action:0.2">
+
+			<master>yarn-cluster</master>
+			<mode>cluster</mode>
+			<name>Citation Count calculation</name>
+			<jar>CC.py</jar>
+
+			<spark-opts>
+				--executor-memory=${sparkHighExecutorMemory}
+				--executor-cores=${sparkExecutorCores}
+				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
+				--conf spark.extraListeners=${spark2ExtraListeners}
+				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+			</spark-opts>
+
+			<!-- Script arguments here -->
+			<arg>${nameNode}/${workingDir}/openaire_id_graph</arg>
+			<!-- number of partitions to be used on joins -->
+			<arg>${sparkShufflePartitions}</arg>
+
+			<file>${wfAppPath}/bip-ranker/CC.py#CC.py</file>
+		</spark>
+
+		<ok to="join-non-iterative-rankings" />
+		<error to="cc-fail" />
+
+	</action>
+
+	<!-- RAM calculation -->
+	<action name="spark-ram">
+		<spark xmlns="uri:oozie:spark-action:0.2">
+
+			<master>yarn-cluster</master>
+			<mode>cluster</mode>
+			<name>RAM calculation</name>
+			<jar>TAR.py</jar>
+
+			<spark-opts>
+				--executor-memory=${sparkHighExecutorMemory}
+				--executor-cores=${sparkExecutorCores}
+				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
+				--conf spark.extraListeners=${spark2ExtraListeners}
+				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+			</spark-opts>
+
+			<!-- Script arguments here -->
+			<arg>${nameNode}/${workingDir}/openaire_id_graph</arg>
+			<arg>${ramGamma}</arg>
+			<arg>${currentYear}</arg>
+			<arg>RAM</arg>
+			<arg>${sparkShufflePartitions}</arg>
+			<arg>${checkpointDir}</arg>
+
+			<file>${wfAppPath}/bip-ranker/TAR.py#TAR.py</file>
+		</spark>
+
+		<ok to="join-non-iterative-rankings" />
+		<error to="ram-fail" />
+
+	</action>
+
+	<!-- Join non-iterative methods -->
+	<join name="join-non-iterative-rankings" to="spark-impulse"/>
+
+	<action name="spark-impulse">
+		<spark xmlns="uri:oozie:spark-action:0.2">
+
+			<master>yarn-cluster</master>
+			<mode>cluster</mode>
+			<name>Impulse calculation</name>
+			<jar>CC.py</jar>
+
+			<spark-opts>
+				--executor-memory=${sparkHighExecutorMemory}
+				--executor-cores=${sparkExecutorCores}
+				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
+				--conf spark.extraListeners=${spark2ExtraListeners}
+				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+			</spark-opts>
+
+			<!-- Script arguments here -->
+			<arg>${nameNode}/${workingDir}/openaire_id_graph</arg>
+			<!-- number of partitions to be used on joins -->
+			<arg>${sparkShufflePartitions}</arg>
+			<arg>3</arg>
+
+			<file>${wfAppPath}/bip-ranker/CC.py#CC.py</file>
+		</spark>
+
+		<ok to="spark-pagerank" />
+		<error to="impulse-fail" />
+
+	</action>
+
+	<action name="spark-pagerank">
+		<spark xmlns="uri:oozie:spark-action:0.2">
+
+			<master>yarn-cluster</master>
+			<mode>cluster</mode>
+			<name>Pagerank calculation</name>
+			<jar>PageRank.py</jar>
+
+			<spark-opts>
+				--executor-memory=${sparkHighExecutorMemory}
+				--executor-cores=${sparkExecutorCores}
+				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
+				--conf spark.extraListeners=${spark2ExtraListeners}
+				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+			</spark-opts>
+
+			<!-- Script arguments here -->
+			<arg>${nameNode}/${workingDir}/openaire_id_graph</arg>
+			<arg>${pageRankAlpha}</arg>
+			<arg>${convergenceError}</arg>
+			<arg>${checkpointDir}</arg>
+			<!-- number of partitions to be used on joins -->
+			<arg>${sparkShufflePartitions}</arg>
+			<arg>dfs</arg>
+
+			<file>${wfAppPath}/bip-ranker/PageRank.py#PageRank.py</file>
+		</spark>
+
+		<ok to="spark-attrank" />
+		<error to="pagerank-fail" />
+
+	</action>
+
+	<action name="spark-attrank">
+		<spark xmlns="uri:oozie:spark-action:0.2">
+
+			<master>yarn-cluster</master>
+			<mode>cluster</mode>
+			<name>AttRank calculation</name>
+			<jar>AttRank.py</jar>
+
+			<spark-opts>
+				--executor-memory=${sparkHighExecutorMemory}
+				--executor-cores=${sparkExecutorCores}
+				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
+				--conf spark.extraListeners=${spark2ExtraListeners}
+				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+			</spark-opts>
+
+			<!-- Script arguments here -->
+			<arg>${nameNode}/${workingDir}/openaire_id_graph</arg>
+			<arg>${attrankAlpha}</arg>
+			<arg>${attrankBeta}</arg>
+			<arg>${attrankGamma}</arg>
+			<arg>${attrankRho}</arg>
+			<arg>${currentYear}</arg>
+			<arg>${attrankStartYear}</arg>
+			<arg>${convergenceError}</arg>
+			<arg>${checkpointDir}</arg>
+			<!-- number of partitions to be used on joins -->
+			<arg>${sparkShufflePartitions}</arg>
+			<arg>dfs</arg>
+
+			<file>${wfAppPath}/bip-ranker/AttRank.py#AttRank.py</file>
+		</spark>
+
+		<ok to="get-file-names" />
+		<error to="attrank-fail" />
+
+	</action>
+
+	<action name="get-file-names">
+		<shell xmlns="uri:oozie:shell-action:0.3">
+
+			<!-- Exec is needed for shell commands - points to type of shell command -->
+			<exec>/usr/bin/bash</exec>
+			<!-- name of script to run -->
+			<argument>get_ranking_files.sh</argument>
+			<!-- We only pass the directory where we expect to find the rankings -->
+			<argument>${workingDir}</argument>
+
+			<file>${wfAppPath}/get_ranking_files.sh#get_ranking_files.sh</file>
+			<!-- Get the output in order to be usable by following actions -->
+			<capture-output/>
+		</shell>
+
+		<ok to="format-result-files" />
+		<error to="filename-getting-error" />
+
+	</action>
+
+	<!-- Now we will run in parallel the formatting of ranking files for BiP! DB and openaire (json files) -->
+	<fork name="format-result-files">
+		<path start="format-bip-files"/>
+		<path start="format-json-files"/>
+	</fork>
+
+
+	<!-- Format json files -->
+	<!-- Two parts: a) format files b) make the file endings .json.gz -->
+	<action name="format-json-files">
+		<spark xmlns="uri:oozie:spark-action:0.2">
+
+			<master>yarn-cluster</master>
+			<mode>cluster</mode>
+			<name>Format Ranking Results JSON</name>
+			<jar>format_ranking_results.py</jar>
+
+			<spark-opts>
+				--executor-memory=${sparkNormalExecutorMemory}
+				--executor-cores=${sparkExecutorCores}
+				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
+				--conf spark.extraListeners=${spark2ExtraListeners}
+				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+			</spark-opts>
+
+			<!-- Script arguments here -->
+			<arg>json-5-way</arg>
+			<!-- Input files must be identified dynamically -->
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['pr_file']}</arg>
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['attrank_file']}</arg>
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['cc_file']}</arg>
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['impulse_file']}</arg>
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['ram_file']}</arg>
+			<!-- Num partitions -->
+			<arg>${sparkShufflePartitions}</arg>
+			<!-- Type of data to be produced [bip (dois) / openaire (openaire-ids) ] -->
+			<arg>openaire</arg>
+
+			<file>${wfAppPath}/format_ranking_results.py#format_ranking_results.py</file>
+		</spark>
+
+		<ok to="join-file-formatting" />
+		<error to="json-formatting-fail" />
+	</action>
+
+	<!-- This is the second line of parallel workflow execution where we create the BiP! DB files -->
+	<action name="format-bip-files">
+		<!-- This is required as a tag for spark jobs, regardless of programming language -->
+		<spark xmlns="uri:oozie:spark-action:0.2">
+
+			<!-- using configs from an example on openaire -->
+			<master>yarn-cluster</master>
+			<mode>cluster</mode>
+
+			<!-- This is the name of our job -->
+			<name>Format Ranking Results BiP! DB</name>
+			<!-- Script name goes here -->
+			<jar>format_ranking_results.py</jar>
+			<!-- spark configuration options: I've taken most of them from an example from dhp workflows / Master value stolen from sandro -->
+
+			<spark-opts>
+				--executor-memory=${sparkNormalExecutorMemory}
+				--executor-cores=${sparkExecutorCores}
+				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
+				--conf spark.extraListeners=${spark2ExtraListeners}
+				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+			</spark-opts>
+
+			<!-- Script arguments here -->
+			<arg>zenodo</arg>
+			<!-- Input files must be identified dynamically -->
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['pr_file']}</arg>
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['attrank_file']}</arg>
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['cc_file']}</arg>
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['impulse_file']}</arg>
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['ram_file']}</arg>
+			<!-- Num partitions -->
+			<arg>${sparkShufflePartitions}</arg>
+			<!-- Type of data to be produced [bip (dois) / openaire (openaire-ids) ] -->
+			<arg>openaire</arg>
+			<!-- This needs to point to the file on the hdfs i think -->
+			<file>${wfAppPath}/format_ranking_results.py#format_ranking_results.py</file>
+		</spark>
+
+		<ok to="join-file-formatting" />
+		<error to="bip-formatting-fail" />
+	</action>
+
+	<!-- Finish formatting jobs -->
+	<join name="join-file-formatting" to="map-openaire-to-doi"/>
+
+	<!-- maps openaire ids to DOIs -->
+	<action name="map-openaire-to-doi">
+		<spark xmlns="uri:oozie:spark-action:0.2">
+
+			<!-- Delete previously created doi synonym folder -->
+			<prepare>
+				<delete path="${synonymFolder}"/>
+			</prepare>
+
+			<master>yarn-cluster</master>
+			<mode>cluster</mode>
+			<name>Openaire-DOI synonym collection</name>
+			<jar>map_openaire_ids_to_dois.py</jar>
+
+			<spark-opts>
+				--executor-memory=${sparkHighExecutorMemory}
+				--executor-cores=${sparkExecutorCores}
+				--driver-memory=${sparkHighDriverMemory}
+				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
+				--conf spark.extraListeners=${spark2ExtraListeners}
+				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+			</spark-opts>
+
+			<!-- Script arguments here -->
+			<arg>${openaireDataInput}/</arg>
+			<!-- number of partitions to be used on joins -->
+			<arg>${synonymFolder}</arg>
+
+			<file>${wfAppPath}/map_openaire_ids_to_dois.py#map_openaire_ids_to_dois.py</file>
+		</spark>
+
+		<ok to="map-scores-to-dois" />
+		<error to="synonym-collection-fail" />
+
+	</action>
+
+	<!-- mapping openaire scores to DOIs -->
+	<action name="map-scores-to-dois">
+		<!-- This is required as a tag for spark jobs, regardless of programming language -->
+		<spark xmlns="uri:oozie:spark-action:0.2">
+
+			<!-- using configs from an example on openaire -->
+			<master>yarn-cluster</master>
+			<mode>cluster</mode>
+			<name>Mapping Openaire Scores to DOIs</name>
+			<jar>map_scores_to_dois.py</jar>
+
+			<spark-opts>
+				--executor-memory=${sparkHighExecutorMemory}
+				--executor-cores=${sparkExecutorCores}
+				--driver-memory=${sparkHighDriverMemory}
+				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
+				--conf spark.extraListeners=${spark2ExtraListeners}
+				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+			</spark-opts>
+
+			<!-- Script arguments here -->
+			<arg>${synonymFolder}</arg>
+			<!-- Number of partitions -->
+			<arg>${sparkShufflePartitions}</arg>
+			<!-- The remaining input are the ranking files fproduced for bip db-->
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['pr_file']}</arg>
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['attrank_file']}</arg>
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['cc_file']}</arg>
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['impulse_file']}</arg>
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['ram_file']}</arg>
+
+			<file>${wfAppPath}/map_scores_to_dois.py#map_scores_to_dois.py</file>
+		</spark>
+
+		<ok to="project-impact-indicators" />
+		<error to="map-scores-fail" />
+
+	</action>
+
+	<action name="project-impact-indicators">
+		<spark xmlns="uri:oozie:spark-action:0.2">
+
+			<master>yarn-cluster</master>
+			<mode>cluster</mode>
+			<name>Project Impact Indicators calculation</name>
+			<jar>projects_impact.py</jar>
+
+			<spark-opts>
+				--executor-memory=${sparkHighExecutorMemory}
+				--executor-cores=${sparkExecutorCores}
+				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
+				--conf spark.extraListeners=${spark2ExtraListeners}
+				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+			</spark-opts>
+
+			<!-- Script arguments here -->
+			<!-- graph data folder from which to read relations -->
+			<arg>${openaireDataInput}/relation</arg>
+
+			<!-- input files with impact indicators for results	-->
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['pr_file']}</arg>
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['attrank_file']}</arg>
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['cc_file']}</arg>
+			<arg>${nameNode}/${workingDir}/${wf:actionData('get-file-names')['impulse_file']}</arg>
+
+			<!-- number of partitions to be used on joins -->
+			<arg>${sparkShufflePartitions}</arg>
+
+			<arg>${projectImpactIndicatorsOutput}</arg>
+			<file>${wfAppPath}/projects_impact.py#projects_impact.py</file>
+		</spark>
+
+		<ok to="delete-output-path-for-actionset" />
+		<error to="project-impact-indicators-fail" />
+	</action>
+
+	<!-- Re-create folder for actionsets -->
+	<action name="delete-output-path-for-actionset">
+		<fs>
+			<delete path="${actionSetOutputPath}"/>
+			<mkdir path="${actionSetOutputPath}"/>
+		</fs>
+		<ok to="create-actionset"/>
+		<error to="actionset-delete-fail"/>
+	</action>
+
+	<action name="create-actionset">
+		<spark xmlns="uri:oozie:spark-action:0.2">
+
+			<master>yarn-cluster</master>
+			<mode>cluster</mode>
+			<name>Produces the atomic action with the bip finder scores</name>
+			<class>eu.dnetlib.dhp.actionmanager.bipfinder.SparkAtomicActionScoreJob</class>
+			<jar>dhp-aggregation-${projectVersion}.jar</jar>
+
+			<spark-opts>
+				--executor-memory=${sparkNormalExecutorMemory}
+				--executor-cores=${sparkExecutorCores}
+				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.extraListeners=${spark2ExtraListeners}
+				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+				--conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+				--conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+			</spark-opts>
+
+			<arg>--resultsInputPath</arg><arg>${bipScorePath}</arg>
+			<arg>--projectsInputPath</arg><arg>${projectImpactIndicatorsOutput}</arg>
+			<arg>--outputPath</arg><arg>${actionSetOutputPath}</arg>
+		</spark>
+
+		<ok to="end"/>
+		<error to="actionset-creation-fail"/>
+	</action>
+
+	<!-- Definitions of failure messages -->
+	<kill name="openaire-graph-error">
+		<message>Creation of openaire-graph failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="cc-fail">
+		<message>CC failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="ram-fail">
+		<message>RAM failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="impulse-fail">
+		<message>Impulse failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="pagerank-fail">
+		<message>PageRank failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="attrank-fail">
+		<message>AttRank failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="filename-getting-error">
+		<message>Error getting key-value pairs for output files, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="json-formatting-fail">
+		<message>Error formatting json files, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="bip-formatting-fail">
+		<message>Error formatting BIP files, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="synonym-collection-fail">
+		<message>Synonym collection failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="map-scores-fail">
+		<message>Mapping scores to DOIs failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="actionset-delete-fail">
+		<message>Deleting output path for actionsets failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="actionset-creation-fail">
+		<message>ActionSet creation for results failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="project-impact-indicators-fail">
+		<message>Calculating project impact indicators failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<!-- Define ending node -->
+	<end name="end" />
+
+</workflow-app>
