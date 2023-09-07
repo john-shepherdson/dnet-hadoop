@@ -3,6 +3,9 @@ package eu.dnetlib.dhp.oa.dedup.graph;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -16,14 +19,16 @@ import eu.dnetlib.pace.util.PaceException;
 
 public class ConnectedComponent implements Serializable {
 
-	private String ccId;
-	private Set<String> ids;
+	private String ccId = "";
+	private List<String> ids = Collections.EMPTY_LIST;
 
 	private static final String CONNECTED_COMPONENT_ID_PREFIX = "connect_comp";
 
-	public ConnectedComponent(Set<String> ids, final int cut) {
-		this.ids = ids;
+	public ConnectedComponent() {
+	}
 
+	public ConnectedComponent(Set<String> ids, final int cut) {
+		this.ids = new ArrayList<>(ids);
 		this.ccId = createDefaultID();
 
 		if (cut > 0 && ids.size() > cut) {
@@ -31,14 +36,15 @@ public class ConnectedComponent implements Serializable {
 				.stream()
 				.filter(id -> !ccId.equalsIgnoreCase(id))
 				.limit(cut - 1)
-				.collect(Collectors.toSet());
+				.distinct()
+				.collect(Collectors.toList());
 //			this.ids.add(ccId); ??
 		}
 	}
 
 	public ConnectedComponent(String ccId, Set<String> ids) {
 		this.ccId = ccId;
-		this.ids = ids;
+		this.ids = new ArrayList<>(ids);
 	}
 
 	public String createDefaultID() {
@@ -82,12 +88,12 @@ public class ConnectedComponent implements Serializable {
 		}
 	}
 
-	public Set<String> getIds() {
+	public List<String> getIds() {
 		return ids;
 	}
 
-	public void setIds(Set<String> ids) {
-		this.ids = ids;
+	public void setIds(List<String> ids) {
+		this.ids =ids;
 	}
 
 	public String getCcId() {

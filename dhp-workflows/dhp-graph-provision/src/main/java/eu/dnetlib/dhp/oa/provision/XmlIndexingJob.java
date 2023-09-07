@@ -27,12 +27,11 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.lucidworks.spark.util.SolrSupport;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.provision.model.SerializableSolrInputDocument;
 import eu.dnetlib.dhp.oa.provision.utils.ISLookupClient;
 import eu.dnetlib.dhp.oa.provision.utils.StreamingInputDocumentFactory;
+import eu.dnetlib.dhp.sparksolr.DHPSolrSupport;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
@@ -156,12 +155,7 @@ public class XmlIndexingJob {
 		switch (outputFormat) {
 			case SOLR:
 				final String collection = ProvisionConstants.getCollectionName(format);
-
-				// SparkSolr >= 4
-				// com.lucidworks.spark.BatchSizeType bt = com.lucidworks.spark.BatchSizeType.NUM_DOCS;
-				// SolrSupport.indexDocs(zkHost, collection, batchSize, bt, docs.rdd());
-				// SparkSolr < 4
-				SolrSupport.indexDocs(zkHost, collection, batchSize, docs.rdd());
+				DHPSolrSupport.indexDocs(zkHost, collection, batchSize, docs.rdd());
 				break;
 			case HDFS:
 				spark

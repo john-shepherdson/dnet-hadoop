@@ -120,11 +120,18 @@
 		<repository>
 			<id>conjars</id>
 			<name>conjars</name>
-			<url>https://conjars.wensel.net/repo/</url>
+			<url>https://conjars.wensel.net/repo/ </url>
 		</repository>
 	</repositories>
 
 	<dependencies>
+		<!-- Quick FIX not to remove lombok everywhere -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.28</version>
+			<scope>provided</scope>
+		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
@@ -812,7 +819,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.9</version>
+				<version>0.8.10</version>
 				<configuration>
 					<excludes>
 						<exclude>**/schemas/*</exclude>
@@ -963,8 +970,8 @@
 
 				<dhp.guava.version>14.0.1</dhp.guava.version>
 				<solr.version>8.11.0</solr.version>
-				<sparksolr.version>4.0.2</sparksolr.version>
-				<dhp.spark.version>3.4.1</dhp.spark.version>
+                <sparksolr.version>4.0.4</sparksolr.version>
+                <dhp.spark.version>3.4.2-SNAPSHOT</dhp.spark.version>
 				<dhp.jackson.version>2.14.2</dhp.jackson.version>
 				<dhp.commons.lang.version>3.12.0</dhp.commons.lang.version>
 				<json4s.version>3.7.0-M11</json4s.version>
@@ -977,8 +984,29 @@
 				<dhp-schemas.version>3.17.2-SNAPSHOT</dhp-schemas.version>
 				 -->
 			</properties>
+		</profile>
 
-
+		<profile>
+			<id>java17</id>
+			<activation>
+				<jdk>17</jdk>
+			</activation>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-surefire-plugin</artifactId>
+							<version>3.0.0-M4</version>
+							<configuration>
+								<!-- only for java 11+ to run spark in tests -->
+								<argLine>--add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/sun.nio.cs=ALL-UNNAMED --add-opens=java.base/sun.security.action=ALL-UNNAMED --add-opens=java.base/sun.util.calendar=ALL-UNNAMED</argLine>
+								<redirectTestOutputToFile>true</redirectTestOutputToFile>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
 		</profile>
 	</profiles>
 </project>
