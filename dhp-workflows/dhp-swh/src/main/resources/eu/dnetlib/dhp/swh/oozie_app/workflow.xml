@@ -1,0 +1,101 @@
+<workflow-app name="Software-Heritage-Integration-Workflow" xmlns="uri:oozie:workflow:0.5">
+<!--    <parameters>-->
+<!--        <property>-->
+<!--            <name>apiDescription</name>-->
+<!--            <description>A json encoding of the API Description class</description>-->
+<!--        </property>-->
+<!--        <property>-->
+<!--            <name>dataSourceInfo</name>-->
+<!--            <description>A json encoding of the Datasource Info</description>-->
+<!--        </property>-->
+<!--        <property>-->
+<!--            <name>identifierPath</name>-->
+<!--            <description>An xpath to retrieve the metadata identifier for the generation of DNet Identifier </description>-->
+<!--        </property>-->
+<!--        <property>-->
+<!--            <name>metadataEncoding</name>-->
+<!--            <description> The type of the metadata XML/JSON</description>-->
+<!--        </property>-->
+<!--        <property>-->
+<!--            <name>timestamp</name>-->
+<!--            <description>The timestamp of the collection date</description>-->
+<!--        </property>-->
+<!--        <property>-->
+<!--            <name>workflowId</name>-->
+<!--            <description>The identifier of the workflow</description>-->
+<!--        </property>-->
+<!--        <property>-->
+<!--            <name>mdStoreID</name>-->
+<!--            <description>The identifier of the mdStore</description>-->
+<!--        </property>-->
+<!--        <property>-->
+<!--            <name>mdStoreManagerURI</name>-->
+<!--            <description>The URI of the MDStore Manager</description>-->
+<!--        </property>-->
+
+<!--        <property>-->
+<!--            <name>dnetMessageManagerURL</name>-->
+<!--            <description>The URI of the Dnet Message Manager</description>-->
+<!--        </property>-->
+<!--        <property>-->
+<!--            <name>collectionMode</name>-->
+<!--            <description>Should be REFRESH or INCREMENTAL</description>-->
+<!--        </property>-->
+
+<!--        <property>-->
+<!--            <name>collection_java_xmx</name>-->
+<!--            <value>-Xmx200m</value>-->
+<!--            <description>Used to configure the heap size for the map JVM process. Should be 80% of mapreduce.map.memory.mb.</description>-->
+<!--        </property>-->
+
+
+<!--    </parameters>-->
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+    </global>
+
+    <start to="startFrom"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <decision name="startFrom">
+        <switch>
+            <case to="collect-software-repository-urls">${wf:conf('startFrom') eq 'collect-software-repository-urls'}</case>
+            <default to="collect-software-repository-urls"/>
+        </switch>
+    </decision>
+
+    <action name="collect-software-repository-urls">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Collect software repository URLs</name>
+            <class>eu.dnetlib.dhp.swh.CollectSoftwareRepositoryURLs</class>
+            <jar>dhp-swh-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+
+            <arg>--softwareCodeRepositoryURLs</arg><arg>${softwareCodeRepositoryURLs}</arg>
+            <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
+
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+
+</workflow-app>
