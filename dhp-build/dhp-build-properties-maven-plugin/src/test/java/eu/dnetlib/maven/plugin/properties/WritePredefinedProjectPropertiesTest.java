@@ -88,7 +88,7 @@ class WritePredefinedProjectPropertiesTest {
 				.assertTrue(
 					MojoExecutionException.class.isAssignableFrom(e.getClass()) ||
 						IllegalArgumentException.class.isAssignableFrom(e.getClass()));
-        }
+		}
 	}
 
 	@Test

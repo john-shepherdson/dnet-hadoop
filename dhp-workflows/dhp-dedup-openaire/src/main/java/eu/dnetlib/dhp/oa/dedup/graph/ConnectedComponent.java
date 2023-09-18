@@ -93,7 +93,7 @@ public class ConnectedComponent implements Serializable {
 	}
 
 	public void setIds(List<String> ids) {
-		this.ids =ids;
+		this.ids = ids;
 	}
 
 	public String getCcId() {
