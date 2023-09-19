@@ -444,9 +444,9 @@ CREATE TEMPORARY TABLE ${stats_db_name}.allresults as
     group by ro.organization, year;
 
 create table if not exists ${stats_db_name}.indi_org_fairness_year stored as parquet as
-    select allresults.year, allresults.organization, result_fair.no_result_fair/allresults.no_allresults org_fairness
+    select cast(allresults.year as int) year, allresults.organization, result_fair.no_result_fair/allresults.no_allresults org_fairness
     from ${stats_db_name}.allresults
-    join ${stats_db_name}.result_fair on result_fair.organization=allresults.organization and result_fair.year=allresults.year;
+    join ${stats_db_name}.result_fair on result_fair.organization=allresults.organization and cast(result_fair.year as int)=cast(allresults.year as int);
 
 DROP table ${stats_db_name}.result_fair purge;
 DROP table ${stats_db_name}.allresults purge;
@@ -465,9 +465,9 @@ CREATE TEMPORARY TABLE ${stats_db_name}.allresults as
     group by ro.organization, year;
 
 create table if not exists ${stats_db_name}.indi_org_findable_year stored as parquet as
-select allresults.year, allresults.organization, result_with_pid.no_result_with_pid/allresults.no_allresults org_findable
+select cast(allresults.year as int) year, allresults.organization, result_with_pid.no_result_with_pid/allresults.no_allresults org_findable
 from ${stats_db_name}.allresults
-         join ${stats_db_name}.result_with_pid on result_with_pid.organization=allresults.organization and result_with_pid.year=allresults.year;
+         join ${stats_db_name}.result_with_pid on result_with_pid.organization=allresults.organization and cast(result_with_pid.year as int)=cast(allresults.year as int);
 
 DROP table ${stats_db_name}.result_with_pid purge;
 DROP table ${stats_db_name}.allresults purge;
@@ -626,16 +626,16 @@ select allsoftware.year, software_oa.organization, software_oa.no_oasoftware/all
 
 
 create table if not exists ${stats_db_name}.indi_org_openess_year stored as parquet as
-select cast(allpubsshare.year as int), allpubsshare.organization,
+select cast(allpubsshare.year as int) year, allpubsshare.organization,
        (p+if(isnull(s),0,s)+if(isnull(d),0,d))/(1+(case when s is null then 0 else 1 end)
            +(case when d is null then 0 else 1 end))
            org_openess FROM ${stats_db_name}.allpubsshare
-                                left outer join (select year, organization,d from
+                                left outer join (select cast(year as int), organization,d from
     ${stats_db_name}.alldatasetssshare) tmp1
                                                 on tmp1.organization=allpubsshare.organization and tmp1.year=allpubsshare.year
-                                left outer join (select year, organization,s from
+                                left outer join (select cast(year as int), organization,s from
     ${stats_db_name}.allsoftwaresshare) tmp2
-                                                on tmp2.organization=allpubsshare.organization and tmp2.year=allpubsshare.year;
+                                                on tmp2.organization=allpubsshare.organization and cast(tmp2.year as int)=cast(allpubsshare.year as int);
 
 DROP TABLE ${stats_db_name}.pubs_oa purge;
 DROP TABLE ${stats_db_name}.datasets_oa purge;
