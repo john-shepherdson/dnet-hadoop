@@ -1068,6 +1068,28 @@ class MappersTest {
 	}
 
 	@Test
+	public void testD4ScienceTraining() throws IOException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("d4science-1-training.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		final OtherResearchProduct trainingMaterial = (OtherResearchProduct) list.get(0);
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(trainingMaterial));
+		System.out.println("***************");
+	}
+
+	@Test
+	public void testD4ScienceDataset() throws IOException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("d4science-2-dataset.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		final Dataset trainingMaterial = (Dataset) list.get(0);
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(trainingMaterial));
+		System.out.println("***************");
+	}
+
+	@Test
 	void testNotWellFormed() throws IOException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_notwellformed.xml")));
