@@ -1,18 +1,18 @@
 
 package eu.dnetlib.dhp.broker.oa.util;
 
-import java.io.IOException;
-
-import org.apache.spark.sql.Row;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.model.SparkDeduper;
 import eu.dnetlib.pace.tree.support.TreeProcessor;
+import org.apache.commons.io.IOUtils;
+import org.apache.spark.sql.Row;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class TrustUtils {
 
@@ -27,10 +27,8 @@ public class TrustUtils {
 	static {
 		mapper = new ObjectMapper();
 		try {
-			dedupConfig = mapper
-				.readValue(
-					DedupConfig.class.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/dedupConfig/dedupConfig.json"),
-					DedupConfig.class);
+			dedupConfig = DedupConfig.load(IOUtils.toString(DedupConfig.class.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/dedupConfig/dedupConfig.json"), StandardCharsets.UTF_8));
+
 			deduper = new SparkDeduper(dedupConfig);
 		} catch (final IOException e) {
 			log.error("Error loading dedupConfig, e");
@@ -57,7 +55,7 @@ public class TrustUtils {
 			return TrustUtils.rescale(score, threshold);
 		} catch (final Exception e) {
 			log.error("Error computing score between results", e);
-			return BrokerConstants.MIN_TRUST;
+			throw new RuntimeException(e);
 		}
 	}
 
