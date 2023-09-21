@@ -155,7 +155,8 @@ object SparkCreateBaselineDataFrame {
       IOUtils.toString(
         SparkEBILinksToOaf.getClass.getResourceAsStream(
           "/eu/dnetlib/dhp/sx/bio/ebi/baseline_to_oaf_params.json"
-        ),Charset.defaultCharset()
+        ),
+        Charset.defaultCharset()
       )
     )
     parser.parseArgument(args)
@@ -198,7 +199,7 @@ object SparkCreateBaselineDataFrame {
       val ds: Dataset[PMArticle] = spark.createDataset(
         k.filter(i => i._1.endsWith(".gz"))
           .flatMap(i => {
-            val xml =inputFactory.createXMLEventReader(new ByteArrayInputStream(i._2.getBytes()))
+            val xml = inputFactory.createXMLEventReader(new ByteArrayInputStream(i._2.getBytes()))
             new PMParser(xml)
           })
       )

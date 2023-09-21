@@ -18,7 +18,6 @@ package eu.dnetlib.pace.util;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 /*
  * Diff Match and Patch
  * Copyright 2018 The diff-match-patch Authors.
