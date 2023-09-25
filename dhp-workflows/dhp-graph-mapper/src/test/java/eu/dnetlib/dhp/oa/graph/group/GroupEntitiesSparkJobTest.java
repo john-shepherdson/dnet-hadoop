@@ -1,7 +1,7 @@
 
 package eu.dnetlib.dhp.oa.graph.group;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -21,13 +21,11 @@ import org.junit.jupiter.api.*;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.oa.merge.DispatchEntitiesSparkJob;
 import eu.dnetlib.dhp.oa.merge.GroupEntitiesSparkJob;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
@@ -101,21 +99,16 @@ public class GroupEntitiesSparkJobTest {
 	@Test
 	@Order(2)
 	void testDispatchEntities() throws Exception {
-		for (String type : Lists
-			.newArrayList(
-				Publication.class.getCanonicalName(), eu.dnetlib.dhp.schema.oaf.Dataset.class.getCanonicalName())) {
-			String directory = StringUtils.substringAfterLast(type, ".").toLowerCase();
-			DispatchEntitiesSparkJob.main(new String[] {
-				"-isSparkSessionManaged",
-				Boolean.FALSE.toString(),
-				"-inputPath",
-				groupEntityPath.toString(),
-				"-outputPath",
-				dispatchEntityPath.resolve(directory).toString(),
-				"-graphTableClassName",
-				type
-			});
-		}
+		DispatchEntitiesSparkJob.main(new String[] {
+			"-isSparkSessionManaged",
+			Boolean.FALSE.toString(),
+			"-inputPath",
+			groupEntityPath.toString(),
+			"-outputPath",
+			dispatchEntityPath.resolve(".").toString(),
+			"-filterInvisible",
+			Boolean.TRUE.toString()
+		});
 
 		Dataset<Result> output = spark
 			.read()
@@ -140,5 +133,4 @@ public class GroupEntitiesSparkJobTest {
 				.filter((FilterFunction<String>) s -> s.equals("dataset"))
 				.count());
 	}
-
 }

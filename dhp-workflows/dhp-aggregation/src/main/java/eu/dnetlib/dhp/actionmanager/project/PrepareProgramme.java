@@ -266,11 +266,15 @@ public class PrepareProgramme {
 
 			String code = csvProgramme.getCode();
 			if (!code.endsWith(".") && !code.contains("Euratom")
-				&& !code.equals("H2020-EC"))
+				&& !code.equals("H2020-EC") && !code.equals("H2020") &&
+				!code.equals("H2020-Topics"))
 				code += ".";
 
-			csvProgramme.setClassification(map.get(code)._1());
-			csvProgramme.setClassification_short(map.get(code)._2());
+			if (map.containsKey(code)) {
+				csvProgramme.setClassification(map.get(code)._1());
+				csvProgramme.setClassification_short(map.get(code)._2());
+			} else
+				log.info("WARNING: No entry in map for code " + code);
 
 			return csvProgramme;
 		}).collect();

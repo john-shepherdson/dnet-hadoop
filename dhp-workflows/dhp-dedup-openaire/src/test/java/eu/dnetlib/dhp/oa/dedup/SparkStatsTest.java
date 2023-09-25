@@ -145,34 +145,34 @@ public class SparkStatsTest implements Serializable {
 
 		long orgs_blocks = spark
 			.read()
-			.textFile(testOutputBasePath + "/" + testActionSetId + "/organization_blockstats")
+			.load(testOutputBasePath + "/" + testActionSetId + "/organization_blockstats")
 			.count();
 
 		long pubs_blocks = spark
 			.read()
-			.textFile(testOutputBasePath + "/" + testActionSetId + "/publication_blockstats")
+			.load(testOutputBasePath + "/" + testActionSetId + "/publication_blockstats")
 			.count();
 
 		long sw_blocks = spark
 			.read()
-			.textFile(testOutputBasePath + "/" + testActionSetId + "/software_blockstats")
+			.load(testOutputBasePath + "/" + testActionSetId + "/software_blockstats")
 			.count();
 
 		long ds_blocks = spark
 			.read()
-			.textFile(testOutputBasePath + "/" + testActionSetId + "/dataset_blockstats")
+			.load(testOutputBasePath + "/" + testActionSetId + "/dataset_blockstats")
 			.count();
 
 		long orp_blocks = spark
 			.read()
-			.textFile(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_blockstats")
+			.load(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_blockstats")
 			.count();
 
-		assertEquals(477, orgs_blocks);
-		assertEquals(295, pubs_blocks);
-		assertEquals(122, sw_blocks);
-		assertEquals(191, ds_blocks);
-		assertEquals(171, orp_blocks);
+		assertEquals(414, orgs_blocks);
+		assertEquals(187, pubs_blocks);
+		assertEquals(128, sw_blocks);
+		assertEquals(192, ds_blocks);
+		assertEquals(194, orp_blocks);
 	}
 
 	@AfterAll

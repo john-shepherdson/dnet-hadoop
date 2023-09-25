@@ -40,6 +40,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.actionmanager.ror.model.ExternalIdType;
 import eu.dnetlib.dhp.actionmanager.ror.model.RorOrganization;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.Constants;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -59,10 +60,8 @@ public class GenerateRorActionSetJob {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	private static final String ROR_NS_PREFIX = "ror_________";
-
 	private static final List<KeyValue> ROR_COLLECTED_FROM = listKeyValues(
-		"10|openaire____::993a7ae7a863813cf95028b50708e222", "ROR");
+		Constants.ROR_OPENAIRE_ID, Constants.ROR_DATASOURCE_NAME);
 
 	private static final DataInfo ROR_DATA_INFO = dataInfo(
 		false, "", false, false, ENTITYREGISTRY_PROVENANCE_ACTION, "0.92");
@@ -126,7 +125,7 @@ public class GenerateRorActionSetJob {
 		final Organization o = new Organization();
 
 		o.setId(calculateOpenaireId(r.getId()));
-		o.setOriginalId(Arrays.asList(String.format("%s::%s", ROR_NS_PREFIX, r.getId())));
+		o.setOriginalId(Arrays.asList(String.format("%s::%s", Constants.ROR_NS_PREFIX, r.getId())));
 		o.setCollectedfrom(ROR_COLLECTED_FROM);
 		o.setPid(pids(r));
 		o.setDateofcollection(now.toString());
@@ -169,8 +168,8 @@ public class GenerateRorActionSetJob {
 
 	}
 
-	private static String calculateOpenaireId(final String rorId) {
-		return String.format("20|%s::%s", ROR_NS_PREFIX, DHPUtils.md5(rorId));
+	public static String calculateOpenaireId(final String rorId) {
+		return String.format("20|%s::%s", Constants.ROR_NS_PREFIX, DHPUtils.md5(rorId));
 	}
 
 	private static List<StructuredProperty> pids(final RorOrganization r) {

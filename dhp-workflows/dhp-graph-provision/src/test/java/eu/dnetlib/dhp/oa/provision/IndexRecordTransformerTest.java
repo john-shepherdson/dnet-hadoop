@@ -39,9 +39,6 @@ import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
  */
 public class IndexRecordTransformerTest {
 
-	public static final String VERSION = "2021-04-15T10:05:53Z";
-	public static final String DSID = "b9ee796a-c49f-4473-a708-e7d67b84c16d_SW5kZXhEU1Jlc291cmNlcy9JbmRleERTUmVzb3VyY2VUeXBl";
-
 	private ContextMapper contextMapper;
 
 	@BeforeEach
@@ -129,25 +126,37 @@ public class IndexRecordTransformerTest {
 	}
 
 	@Test
-	public void testForEOSCFutureSentinel() throws IOException, TransformerException {
-		final String record = IOUtils.toString(getClass().getResourceAsStream("eosc-future/sentinel.xml"));
+	public void testForEOSCFutureSoftwareNotebook() throws IOException, TransformerException {
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/software-justthink.xml"));
 		testRecordTransformation(record);
 	}
 
 	@Test
-	public void testForEdithDemo() throws IOException, TransformerException {
-		final String record = IOUtils.toString(getClass().getResourceAsStream("edith-demo/10.1098-rsta.2020.0257.xml"));
+	public void testForEOSCFutureSoftwareNotebookClaim() throws IOException, TransformerException {
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/software-justthink-claim.xml"));
 		testRecordTransformation(record);
 	}
 
 	@Test
-	public void testForEdithDemoCovid() throws IOException, TransformerException {
-		final String record = IOUtils.toString(getClass().getResourceAsStream("edith-demo/10.3390-pr9111967-covid.xml"));
+	public void testForEOSCFutureZenodo7353841() throws IOException, TransformerException {
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/zenodo7353841.xml"));
 		testRecordTransformation(record);
 	}
+
 	@Test
-	public void testForEdithDemoEthics() throws IOException, TransformerException {
-		final String record = IOUtils.toString(getClass().getResourceAsStream("edith-demo/10.2196-33081-ethics.xml"));
+	public void testForEOSCFutureZenodo7351393() throws IOException, TransformerException {
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/zenodo7351393.xml"));
+		testRecordTransformation(record);
+	}
+
+	@Test
+	public void testForEOSCFutureZenodo7351221() throws IOException, TransformerException {
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/zenodo7351221.xml"));
 		testRecordTransformation(record);
 	}
 
@@ -185,8 +194,7 @@ public class IndexRecordTransformerTest {
 
 		final String indexRecordXML = XmlIndexingJob.toIndexRecord(tr, record);
 
-		final SolrInputDocument solrDoc = new StreamingInputDocumentFactory(VERSION, DSID)
-			.parseDocument(indexRecordXML);
+		final SolrInputDocument solrDoc = new StreamingInputDocumentFactory().parseDocument(indexRecordXML);
 
 		final String xmlDoc = ClientUtils.toXML(solrDoc);
 

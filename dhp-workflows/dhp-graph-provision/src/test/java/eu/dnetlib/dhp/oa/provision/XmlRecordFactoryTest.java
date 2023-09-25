@@ -24,10 +24,7 @@ import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class XmlRecordFactoryTest {
 
@@ -50,10 +47,11 @@ public class XmlRecordFactoryTest {
 		assertNotNull(xml);
 
 		final Document doc = new SAXReader().read(new StringReader(xml));
+		doc.normalize();
 
 		assertNotNull(doc);
 
-		System.out.println(doc.asXML());
+		// System.out.println(doc.asXML());
 
 		assertEquals("0000-0001-9613-6638", doc.valueOf("//creator[@rank = '1']/@orcid"));
 		assertEquals("0000-0001-9613-6639", doc.valueOf("//creator[@rank = '1']/@orcid_pending"));
@@ -88,6 +86,12 @@ public class XmlRecordFactoryTest {
 			"C", doc.valueOf("//*[local-name() = 'result']/measure[./@id = 'popularity']/@class"));
 
 		assertEquals("EOSC::Jupyter Notebook", doc.valueOf("//*[local-name() = 'result']/eoscifguidelines/@code"));
+
+		assertEquals(2, Integer.parseInt(doc.valueOf("count(//*[local-name() = 'result']/fulltext)")));
+
+		assertEquals(
+			"https://osf.io/preprints/socarxiv/7vgtu/download",
+			doc.valueOf("//*[local-name() = 'result']/fulltext[1]"));
 
 	}
 
@@ -189,4 +193,51 @@ public class XmlRecordFactoryTest {
 		assertEquals("dnet:pid_types", ((Element) pids.get(0)).attribute("schemeid").getValue());
 		assertEquals("dnet:pid_types", ((Element) pids.get(0)).attribute("schemename").getValue());
 	}
+
+	@Test
+	public void testD4ScienceTraining() throws DocumentException, IOException {
+		final ContextMapper contextMapper = new ContextMapper();
+
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+			XmlConverterJob.schemaLocation);
+
+		final OtherResearchProduct p = OBJECT_MAPPER
+			.readValue(
+				IOUtils.toString(getClass().getResourceAsStream("d4science-1-training.json")),
+				OtherResearchProduct.class);
+
+		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
+
+		assertNotNull(xml);
+
+		final Document doc = new SAXReader().read(new StringReader(xml));
+
+		assertNotNull(doc);
+		System.out.println(doc.asXML());
+
+	}
+
+	@Test
+	public void testD4ScienceDataset() throws DocumentException, IOException {
+		final ContextMapper contextMapper = new ContextMapper();
+
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+			XmlConverterJob.schemaLocation);
+
+		final OtherResearchProduct p = OBJECT_MAPPER
+			.readValue(
+				IOUtils.toString(getClass().getResourceAsStream("d4science-2-dataset.json")),
+				OtherResearchProduct.class);
+
+		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
+
+		assertNotNull(xml);
+
+		final Document doc = new SAXReader().read(new StringReader(xml));
+
+		assertNotNull(doc);
+		System.out.println(doc.asXML());
+
+	}
+
 }

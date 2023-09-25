@@ -6,7 +6,6 @@ import eu.dnetlib.dhp.common.HdfsSupport
 import eu.dnetlib.dhp.oa.graph.hostedbymap.model.{DOAJModel, UnibiGoldModel}
 import eu.dnetlib.dhp.schema.oaf.Datasource
 import org.apache.commons.io.{FileUtils, IOUtils}
-import org.apache.commons.lang3.StringUtils
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.hadoop.io.compress.GzipCodec
@@ -114,10 +113,7 @@ object SparkProduceHostedByMap {
   }
 
   def oaToHostedbyItemType(dats: Datasource): HostedByItemType = {
-    if (
-      dats.getJournal != null && dats.getOfficialname != null &&
-      StringUtils.isNotBlank(dats.getOfficialname.getValue)
-    ) {
+    if (dats.getJournal != null) {
 
       return getHostedByItemType(
         dats.getId,

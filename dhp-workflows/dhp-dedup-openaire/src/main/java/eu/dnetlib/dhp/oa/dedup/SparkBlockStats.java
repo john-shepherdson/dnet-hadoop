@@ -2,32 +2,26 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.*;
 import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.dedup.model.Block;
 import eu.dnetlib.dhp.oa.dedup.model.BlockStats;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.model.MapDocument;
-import eu.dnetlib.pace.util.MapDocumentUtil;
-import scala.Tuple2;
+import eu.dnetlib.pace.model.SparkDeduper;
 
 public class SparkBlockStats extends AbstractSparkAction {
 
@@ -91,36 +85,35 @@ public class SparkBlockStats extends AbstractSparkAction {
 
 			JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
-			JavaPairRDD<String, MapDocument> mapDocuments = sc
+			SparkDeduper deduper = new SparkDeduper(dedupConf);
+
+			Dataset<Row> simRels = spark
+				.read()
 				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
-				.repartition(numPartitions)
-				.mapToPair(
-					(PairFunction<String, String, MapDocument>) s -> {
-						MapDocument d = MapDocumentUtil.asMapDocumentWithJPath(dedupConf, s);
-						return new Tuple2<>(d.getIdentifier(), d);
-					});
+				.transform(deduper.model().parseJsonDataset())
+				.transform(deduper.filterAndCleanup())
+				.transform(deduper.generateClustersWithCollect())
+				.filter(functions.size(new Column("block")).geq(1));
 
-			// create blocks for deduplication
-			JavaRDD<BlockStats> blockStats = Deduper
-				.createSortedBlocks(mapDocuments, dedupConf)
-				.repartition(numPartitions)
-				.map(b -> asBlockStats(dedupConf, b));
+			simRels.map((MapFunction<Row, BlockStats>) row -> {
+				Collection<Row> mapDocuments = row.getList(row.fieldIndex("block"));
 
-			// save the blockstats in the workingdir
-			spark
-				.createDataset(blockStats.rdd(), Encoders.bean(BlockStats.class))
+				/*
+				 * List<Row> mapDocuments = documents .stream() .sorted( new
+				 * RowDataOrderingComparator(deduper.model().orderingFieldPosition(),
+				 * deduper.model().identityFieldPosition())) .limit(dedupConf.getWf().getQueueMaxSize())
+				 * .collect(Collectors.toList());
+				 */
+
+				return new BlockStats(
+					row.getString(row.fieldIndex("key")),
+					(long) mapDocuments.size(),
+					computeComparisons(
+						(long) mapDocuments.size(), (long) dedupConf.getWf().getSlidingWindowSize()));
+			}, Encoders.bean(BlockStats.class))
 				.write()
 				.mode(SaveMode.Overwrite)
 				.save(outputPath);
 		}
 	}
-
-	private BlockStats asBlockStats(DedupConfig dedupConf, Tuple2<String, Block> b) {
-		return new BlockStats(
-			b._1(),
-			(long) b._2().getDocuments().size(),
-			computeComparisons(
-				(long) b._2().getDocuments().size(), (long) dedupConf.getWf().getSlidingWindowSize()));
-	}
-
 }

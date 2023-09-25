@@ -19,7 +19,7 @@ import java.time.chrono.ThaiBuddhistDate
 import java.time.format.DateTimeFormatter
 import java.util.{Date, Locale}
 import scala.collection.JavaConverters._
-import scala.io.{Codec, Source}
+import scala.io.Source
 
 object DataciteToOAFTransformation {
 
@@ -49,7 +49,7 @@ object DataciteToOAFTransformation {
   /** This method should skip record if json contains invalid text
     * defined in file datacite_filter
     *
-    * @param record : unparsed datacite record
+    * @param record : not parsed Datacite record
     * @param json : parsed record
     * @return True if the record should be skipped
     */
@@ -98,6 +98,10 @@ object DataciteToOAFTransformation {
 
   }
 
+  /** This utility method indicates whether the embargo date has been reached
+    * @param embargo_end_date
+    * @return True if the embargo date has been reached, false otherwise
+    */
   def embargo_end(embargo_end_date: String): Boolean = {
     val dt = LocalDate.parse(embargo_end_date, DateTimeFormatter.ofPattern("[yyyy-MM-dd]"))
     val td = LocalDate.now()
@@ -142,6 +146,21 @@ object DataciteToOAFTransformation {
     }
   }
 
+  /** *
+    * Use the vocabulary dnet:publication_resource to find a synonym to one of these terms and get the instance.type.
+    * Using the dnet:result_typologies vocabulary, we look up the instance.type synonym
+    * to generate one of the following main entities:
+    *  - publication
+    *  - dataset
+    *  - software
+    *  - otherresearchproduct
+    *
+    * @param resourceType
+    * @param resourceTypeGeneral
+    * @param schemaOrg
+    * @param vocabularies
+    * @return
+    */
   def getTypeQualifier(
     resourceType: String,
     resourceTypeGeneral: String,
@@ -252,7 +271,7 @@ object DataciteToOAFTransformation {
         .exists(i => i.getHostedby != null && "figshare".equalsIgnoreCase(i.getHostedby.getValue))
       if (hosted_by_figshare) {
         r.getInstance().asScala.foreach(i => i.setAccessright(ModelConstants.OPEN_ACCESS_RIGHT()))
-        val l: List[StructuredProperty] = List()
+        val l: List[Subject] = List()
         r.setSubject(l.asJava)
       }
     }
@@ -330,6 +349,7 @@ object DataciteToOAFTransformation {
     if (result == null)
       return List()
 
+    // DOI is mapped on a PID inside a Instance object
     val doi_q = OafMapperUtils.qualifier(
       "doi",
       "doi",
@@ -338,6 +358,8 @@ object DataciteToOAFTransformation {
     )
     val pid = OafMapperUtils.structuredProperty(doi, doi_q, dataInfo)
     result.setPid(List(pid).asJava)
+
+    // This identifiere will be replaced in a second moment using the PID logic generation
     result.setId(OafMapperUtils.createOpenaireId(50, s"datacite____::$doi", true))
     result.setOriginalId(List(doi).asJava)
 
@@ -386,6 +408,10 @@ object DataciteToOAFTransformation {
       a
     }
 
+    if (authors == null || authors.isEmpty || !authors.exists(a => a != null))
+      return List()
+    result.setAuthor(authors.asJava)
+
     val titles: List[TitleType] = (json \\ "titles").extractOrElse[List[TitleType]](List())
 
     result.setTitle(
@@ -408,10 +434,6 @@ object DataciteToOAFTransformation {
         })
         .asJava
     )
-
-    if (authors == null || authors.isEmpty || !authors.exists(a => a != null))
-      return List()
-    result.setAuthor(authors.asJava)
 
     val dates = (json \\ "dates").extract[List[DateType]]
     val publication_year = (json \\ "publicationYear").extractOrElse[String](null)
@@ -492,7 +514,7 @@ object DataciteToOAFTransformation {
       subjects
         .filter(s => s.subject.nonEmpty)
         .map(s =>
-          OafMapperUtils.structuredProperty(
+          OafMapperUtils.subject(
             s.subject.get,
             SUBJ_CLASS,
             SUBJ_CLASS,
@@ -623,7 +645,7 @@ object DataciteToOAFTransformation {
     id: String,
     date: String
   ): List[Relation] = {
-    rels
+    val bidirectionalRels: List[Relation] = rels
       .filter(r =>
         subRelTypeMapping
           .contains(r.relationType) && (r.relatedIdentifierType.equalsIgnoreCase("doi") ||
@@ -631,27 +653,49 @@ object DataciteToOAFTransformation {
         r.relatedIdentifierType.equalsIgnoreCase("arxiv"))
       )
       .map(r => {
-        val rel = new Relation
-        rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
-        rel.setDataInfo(dataInfo)
-
         val subRelType = subRelTypeMapping(r.relationType).relType
-        rel.setRelType(REL_TYPE_VALUE)
-        rel.setSubRelType(subRelType)
-        rel.setRelClass(r.relationType)
-
-        val dateProps: KeyValue = OafMapperUtils.keyValue(DATE_RELATION_KEY, date)
-
-        rel.setProperties(List(dateProps).asJava)
-
-        rel.setSource(id)
-        rel.setTarget(
-          DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
-        )
-        rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
-        rel.getCollectedfrom.asScala.map(c => c.getValue).toList
-        rel
+        val target = DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
+        relation(id, target, subRelType, r.relationType, date)
       })
+    val citationRels: List[Relation] = rels
+      .filter(r =>
+        (r.relatedIdentifierType.equalsIgnoreCase("doi") ||
+        r.relatedIdentifierType.equalsIgnoreCase("pmid") ||
+        r.relatedIdentifierType.equalsIgnoreCase("arxiv")) &&
+        (r.relationType.toLowerCase.contains("cite") || r.relationType.toLowerCase.contains("reference"))
+      )
+      .map(r => {
+        r.relationType match {
+          case ModelConstants.CITES | ModelConstants.REFERENCES =>
+            val target = DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
+            relation(id, target, ModelConstants.CITATION, ModelConstants.CITES, date)
+          case ModelConstants.IS_CITED_BY | ModelConstants.IS_REFERENCED_BY =>
+            val source = DHPUtils.generateUnresolvedIdentifier(r.relatedIdentifier, r.relatedIdentifierType)
+            relation(source, id, ModelConstants.CITATION, ModelConstants.CITES, date)
+        }
+      })
+
+    citationRels ::: bidirectionalRels
+  }
+
+  def relation(source: String, target: String, subRelType: String, relClass: String, date: String): Relation = {
+    val rel = new Relation
+    rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
+    rel.setDataInfo(dataInfo)
+
+    rel.setRelType(REL_TYPE_VALUE)
+    rel.setSubRelType(subRelType)
+    rel.setRelClass(relClass)
+
+    val dateProps: KeyValue = OafMapperUtils.keyValue(DATE_RELATION_KEY, date)
+
+    rel.setProperties(List(dateProps).asJava)
+
+    rel.setSource(source)
+    rel.setTarget(target)
+    rel.setCollectedfrom(List(DATACITE_COLLECTED_FROM).asJava)
+    rel.getCollectedfrom.asScala.map(c => c.getValue).toList
+    rel
   }
 
   def generateDSId(input: String): String = {

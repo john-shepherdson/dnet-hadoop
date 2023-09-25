@@ -28,5 +28,53 @@
     "paramLongName": "graphTableClassName",
     "paramDescription": "class name moelling the graph table",
     "paramRequired": true
+  },
+  {
+    "paramName": "ci",
+    "paramLongName": "contextId",
+    "paramDescription": "the id of the context to be removed",
+    "paramRequired": false
+  },
+  {
+    "paramName": "vf",
+    "paramLongName": "verifyParam",
+    "paramDescription": "the parameter to be verified to remove the context",
+    "paramRequired": false
+  },
+  {
+    "paramName": "c",
+    "paramLongName": "country",
+    "paramDescription": "the id of the context to be removed",
+    "paramRequired": false
+  },
+  {
+    "paramName": "vfc",
+    "paramLongName": "verifyCountryParam",
+    "paramDescription": "the parameter to be verified to remove the country",
+    "paramRequired": false
+  },
+  {
+    "paramName": "cf",
+    "paramLongName": "collectedfrom",
+    "paramDescription": "the collectedfrom value for which we should apply the cleaning",
+    "paramRequired": false
+  },
+  {
+    "paramName": "hb",
+    "paramLongName": "hostedBy",
+    "paramDescription": "the set of datasources having the specified country in the graph searched for in the hostedby of the results",
+    "paramRequired": false
+  },
+  {
+    "paramName": "md",
+    "paramLongName": "masterDuplicatePath",
+    "paramDescription": "path to the file on HDFS holding the datasource id tuples [master, duplicate]",
+    "paramRequired": false
+  },
+  {
+    "paramName": "dc",
+    "paramLongName": "deepClean",
+    "paramDescription": "flag to activate further cleaning steps",
+    "paramRequired": true
   }
 ]

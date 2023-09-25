@@ -151,11 +151,16 @@ public class XmlIndexingJob {
 			.sequenceFile(inputPath, Text.class, Text.class)
 			.map(t -> t._2().toString())
 			.map(s -> toIndexRecord(SaxonTransformerFactory.newInstance(indexRecordXslt), s))
-			.map(s -> new StreamingInputDocumentFactory(version, dsId).parseDocument(s));
+			.map(s -> new StreamingInputDocumentFactory().parseDocument(s));
 
 		switch (outputFormat) {
 			case SOLR:
 				final String collection = ProvisionConstants.getCollectionName(format);
+
+				// SparkSolr >= 4
+				// com.lucidworks.spark.BatchSizeType bt = com.lucidworks.spark.BatchSizeType.NUM_DOCS;
+				// SolrSupport.indexDocs(zkHost, collection, batchSize, bt, docs.rdd());
+				// SparkSolr < 4
 				SolrSupport.indexDocs(zkHost, collection, batchSize, docs.rdd());
 				break;
 			case HDFS:

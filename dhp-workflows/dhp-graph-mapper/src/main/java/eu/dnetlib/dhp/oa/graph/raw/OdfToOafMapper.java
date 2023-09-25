@@ -5,7 +5,6 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -140,7 +139,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		final List<StructuredProperty> alternateIdentifier = prepareResultPids(doc, info);
 		final List<StructuredProperty> pid = IdentifierFactory.getPids(alternateIdentifier, collectedfrom);
 
-		final Set<StructuredProperty> pids = pid.stream().collect(Collectors.toCollection(HashSet::new));
+		final Set<StructuredProperty> pids = new HashSet<>(pid);
 
 		instance
 			.setAlternateIdentifier(
@@ -157,6 +156,11 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		instance.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
 		instance
 			.setProcessingchargecurrency(field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
+		prepareListURL(doc, "//oaf:fulltext", info)
+			.stream()
+			.findFirst()
+			.map(Field::getValue)
+			.ifPresent(instance::setFulltext);
 
 		final Set<String> url = new HashSet<>();
 		for (final Object o : doc
@@ -176,23 +180,31 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='w3id']")) {
 			url.add(trimAndDecodeUrl(((Node) o).getText().trim()));
 		}
-		for (final Object o : doc
-			.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='DOI']")) {
-			url.add(HTTP_DOI_PREIFX + ((Node) o).getText().trim());
+
+		Set<String> validUrl = validateUrl(url);
+
+		if (validUrl.stream().noneMatch(s -> s.contains("doi.org"))) {
+			for (final Object o : doc
+				.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='DOI']")) {
+				validUrl.add(HTTP_DOI_PREIFX + ((Node) o).getText().trim());
+			}
+			for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='DOI']")) {
+				validUrl.add(HTTP_DOI_PREIFX + ((Node) o).getText().trim());
+			}
 		}
-		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='DOI']")) {
-			url.add(HTTP_DOI_PREIFX + ((Node) o).getText().trim());
+		if (validUrl.stream().noneMatch(s -> s.contains("hdl.handle.net"))) {
+			for (final Object o : doc
+				.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='Handle']")) {
+				validUrl.add(HTTP_HANDLE_PREIFX + ((Node) o).getText().trim());
+			}
+			for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='Handle']")) {
+				validUrl.add(HTTP_HANDLE_PREIFX + ((Node) o).getText().trim());
+			}
 		}
-		for (final Object o : doc
-			.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='Handle']")) {
-			url.add(HTTP_HANDLE_PREIFX + ((Node) o).getText().trim());
-		}
-		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='Handle']")) {
-			url.add(HTTP_HANDLE_PREIFX + ((Node) o).getText().trim());
-		}
-		if (!url.isEmpty()) {
+
+		if (!validUrl.isEmpty()) {
 			instance.setUrl(new ArrayList<>());
-			instance.getUrl().addAll(url);
+			instance.getUrl().addAll(validUrl);
 		}
 		return Arrays.asList(instance);
 	}
@@ -262,8 +274,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<StructuredProperty> prepareSubjects(final Document doc, final DataInfo info) {
-		return prepareListStructProps(doc, "//*[local-name()='subject']", info);
+	protected List<Subject> prepareSubjects(final Document doc, final DataInfo info) {
+		return prepareSubjectList(doc, "//*[local-name()='subject']", info);
 	}
 
 	@Override
@@ -380,7 +392,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected List<Oaf> addOtherResultRels(
 		final Document doc,
-		final OafEntity entity) {
+		final OafEntity entity, DataInfo info) {
 
 		final String docId = entity.getId();
 
@@ -396,7 +408,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 				final String relType = ((Node) o).valueOf("@relationType");
 				String otherId = guessRelatedIdentifier(idType, originalId);
 				if (StringUtils.isNotBlank(otherId)) {
-					res.addAll(getRelations(relType, docId, otherId, entity));
+					res.addAll(getRelations(relType, docId, otherId, entity, info));
 				}
 
 			}
@@ -417,18 +429,20 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	protected List<Oaf> getRelations(final String reltype, final String entityId, final String otherId,
-		final OafEntity entity) {
+		final OafEntity entity, DataInfo info) {
 		final List<Oaf> res = new ArrayList<>();
 		RelationInverse rel = ModelSupport.findRelation(reltype);
 		if (rel != null) {
 			res
 				.add(
 					getRelation(
-						entityId, otherId, rel.getRelType(), rel.getSubReltype(), rel.getRelClass(), entity));
+						entityId, otherId, rel.getRelType(), rel.getSubReltype(), rel.getRelClass(),
+						entity.getCollectedfrom(), info, entity.getLastupdatetimestamp(), null, null));
 			res
 				.add(
 					getRelation(
-						otherId, entityId, rel.getRelType(), rel.getSubReltype(), rel.getInverseRelClass(), entity));
+						otherId, entityId, rel.getRelType(), rel.getSubReltype(), rel.getInverseRelClass(),
+						entity.getCollectedfrom(), info, entity.getLastupdatetimestamp(), null, null));
 
 		}
 		return res;

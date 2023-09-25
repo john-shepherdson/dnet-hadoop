@@ -45,7 +45,7 @@ public class PropagationConstant {
 
 	public final static String NULL = "NULL";
 
-	public static final String INSTITUTIONAL_REPO_TYPE = "pubsrepository::institutional";
+	public static final String INSTITUTIONAL_REPO_TYPE = "institutional";
 
 	public static final String PROPAGATION_DATA_INFO_TYPE = "propagation";
 
@@ -58,7 +58,10 @@ public class PropagationConstant {
 	public static final String PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME = "Propagation of affiliation to result collected from datasources of type institutional repository";
 
 	public static final String PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_ID = "result:organization:semrel";
-	public static final String PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_NAME = "Propagation of affiliation to result through sematic relations";
+	public static final String PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_NAME = "Propagation of affiliation to result through semantic relations";
+
+	public static final String PROPAGATION_RELATION_PROJECT_ORGANIZATION_SEM_REL_CLASS_ID = "project:organization:semrel";
+	public static final String PROPAGATION_RELATION_PROJECT_ORGANIZATION_SEM_REL_CLASS_NAME = "Propagation of participation to project through semantic relations";
 
 	public static final String PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID = "result:project:semrel";
 	public static final String PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_NAME = "Propagation of result to project through semantic relation";
@@ -170,6 +173,41 @@ public class PropagationConstant {
 					className));
 
 		return newRelations;
+	}
+
+	public static Relation getRelation(String source, String target, String rel_class) {
+		if (ModelConstants.HAS_PARTICIPANT.equals(rel_class)) {
+			return getParticipantRelation(source, target, rel_class);
+		} else
+			return getAffiliationRelation(source, target, rel_class);
+	}
+
+	public static Relation getParticipantRelation(
+		String source,
+		String target,
+		String rel_class) {
+		return getRelation(
+			source, target,
+			rel_class,
+			ModelConstants.PROJECT_ORGANIZATION,
+			ModelConstants.PARTICIPATION,
+			PROPAGATION_DATA_INFO_TYPE,
+			PROPAGATION_RELATION_PROJECT_ORGANIZATION_SEM_REL_CLASS_ID,
+			PROPAGATION_RELATION_PROJECT_ORGANIZATION_SEM_REL_CLASS_NAME);
+	}
+
+	public static Relation getAffiliationRelation(
+		String source,
+		String target,
+		String rel_class) {
+		return getRelation(
+			source, target,
+			rel_class,
+			ModelConstants.RESULT_ORGANIZATION,
+			ModelConstants.AFFILIATION,
+			PROPAGATION_DATA_INFO_TYPE,
+			PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_ID,
+			PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_NAME);
 	}
 
 	public static Relation getRelation(

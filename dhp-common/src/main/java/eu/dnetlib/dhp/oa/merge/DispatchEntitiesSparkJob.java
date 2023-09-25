@@ -11,24 +11,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 
 public class DispatchEntitiesSparkJob {
 
 	private static final Logger log = LoggerFactory.getLogger(DispatchEntitiesSparkJob.class);
-
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(String[] args) throws Exception {
 
@@ -54,44 +47,51 @@ public class DispatchEntitiesSparkJob {
 		String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		String graphTableClassName = parser.get("graphTableClassName");
-		log.info("graphTableClassName: {}", graphTableClassName);
-
-		@SuppressWarnings("unchecked")
-		Class<? extends OafEntity> entityClazz = (Class<? extends OafEntity>) Class.forName(graphTableClassName);
+		boolean filterInvisible = Boolean.parseBoolean(parser.get("filterInvisible"));
+		log.info("filterInvisible: {}", filterInvisible);
 
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
-			spark -> {
-				HdfsSupport.remove(outputPath, spark.sparkContext().hadoopConfiguration());
-				dispatchEntities(spark, inputPath, entityClazz, outputPath);
-			});
+			spark -> dispatchEntities(spark, inputPath, outputPath, filterInvisible));
 	}
 
-	private static <T extends Oaf> void dispatchEntities(
+	private static void dispatchEntities(
 		SparkSession spark,
 		String inputPath,
-		Class<T> clazz,
-		String outputPath) {
+		String outputPath,
+		boolean filterInvisible) {
 
-		spark
-			.read()
-			.textFile(inputPath)
-			.filter((FilterFunction<String>) s -> isEntityType(s, clazz))
-			.map((MapFunction<String, String>) s -> StringUtils.substringAfter(s, "|"), Encoders.STRING())
-			.map(
-				(MapFunction<String, T>) value -> OBJECT_MAPPER.readValue(value, clazz),
-				Encoders.bean(clazz))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(outputPath);
+		Dataset<String> df = spark.read().textFile(inputPath);
+
+		ModelSupport.oafTypes.entrySet().parallelStream().forEach(entry -> {
+			String entityType = entry.getKey();
+			Class<?> clazz = entry.getValue();
+
+			final String entityPath = outputPath + "/" + entityType;
+			if (!entityType.equalsIgnoreCase("relation")) {
+				HdfsSupport.remove(entityPath, spark.sparkContext().hadoopConfiguration());
+				Dataset<Row> entityDF = spark
+					.read()
+					.schema(Encoders.bean(clazz).schema())
+					.json(
+						df
+							.filter((FilterFunction<String>) s -> s.startsWith(clazz.getName()))
+							.map(
+								(MapFunction<String, String>) s -> StringUtils.substringAfter(s, "|"),
+								Encoders.STRING()));
+
+				if (filterInvisible) {
+					entityDF = entityDF.filter("dataInfo.invisible != true");
+				}
+
+				entityDF
+					.write()
+					.mode(SaveMode.Overwrite)
+					.option("compression", "gzip")
+					.json(entityPath);
+			}
+		});
 	}
-
-	private static <T extends Oaf> boolean isEntityType(final String s, final Class<T> clazz) {
-		return StringUtils.substringBefore(s, "|").equals(clazz.getName());
-	}
-
 }
