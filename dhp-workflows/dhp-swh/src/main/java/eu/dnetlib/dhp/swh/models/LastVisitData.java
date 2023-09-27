@@ -4,12 +4,14 @@ package eu.dnetlib.dhp.swh.models;
 import com.cloudera.com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.Date;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LastVisitResponse {
+public class LastVisitData {
 
 	private String type;
 
-	private String date;
+	private Date date;
 
 	@JsonProperty("snapshot")
 	private String snapshotId;
@@ -22,11 +24,11 @@ public class LastVisitResponse {
 		this.type = type;
 	}
 
-	public String getDate() {
+	public Date getDate() {
 		return date;
 	}
 
-	public void setDate(String date) {
+	public void setDate(Date date) {
 		this.date = date;
 	}
 

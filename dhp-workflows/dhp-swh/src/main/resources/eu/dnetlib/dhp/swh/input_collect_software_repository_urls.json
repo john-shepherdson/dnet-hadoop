@@ -6,7 +6,7 @@
     "paramRequired": false
   },
   {
-    "paramName": "ip",
+    "paramName": "scr",
     "paramLongName": "softwareCodeRepositoryURLs",
     "paramDescription": "the URL where to store software repository URLs",
     "paramRequired": true

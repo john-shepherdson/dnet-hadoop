@@ -1,59 +1,31 @@
 <workflow-app name="Software-Heritage-Integration-Workflow" xmlns="uri:oozie:workflow:0.5">
-<!--    <parameters>-->
-<!--        <property>-->
-<!--            <name>apiDescription</name>-->
-<!--            <description>A json encoding of the API Description class</description>-->
-<!--        </property>-->
-<!--        <property>-->
-<!--            <name>dataSourceInfo</name>-->
-<!--            <description>A json encoding of the Datasource Info</description>-->
-<!--        </property>-->
-<!--        <property>-->
-<!--            <name>identifierPath</name>-->
-<!--            <description>An xpath to retrieve the metadata identifier for the generation of DNet Identifier </description>-->
-<!--        </property>-->
-<!--        <property>-->
-<!--            <name>metadataEncoding</name>-->
-<!--            <description> The type of the metadata XML/JSON</description>-->
-<!--        </property>-->
-<!--        <property>-->
-<!--            <name>timestamp</name>-->
-<!--            <description>The timestamp of the collection date</description>-->
-<!--        </property>-->
-<!--        <property>-->
-<!--            <name>workflowId</name>-->
-<!--            <description>The identifier of the workflow</description>-->
-<!--        </property>-->
-<!--        <property>-->
-<!--            <name>mdStoreID</name>-->
-<!--            <description>The identifier of the mdStore</description>-->
-<!--        </property>-->
-<!--        <property>-->
-<!--            <name>mdStoreManagerURI</name>-->
-<!--            <description>The URI of the MDStore Manager</description>-->
-<!--        </property>-->
 
-<!--        <property>-->
-<!--            <name>dnetMessageManagerURL</name>-->
-<!--            <description>The URI of the Dnet Message Manager</description>-->
-<!--        </property>-->
-<!--        <property>-->
-<!--            <name>collectionMode</name>-->
-<!--            <description>Should be REFRESH or INCREMENTAL</description>-->
-<!--        </property>-->
+    <!-- Custom parameters   -->
+    <parameters>
+        <property>
+            <name>hiveDbName</name>
+            <description>The name of the Hive DB to be used</description>
+        </property>
+        <property>
+            <name>softwareCodeRepositoryURLs</name>
+            <description>The path in the HDSF to save the software repository URLs</description>
+        </property>
+        <property>
+            <name>resume</name>
+            <description>Variable that indicates the step to start from</description>
+        </property>
+    </parameters>
 
-<!--        <property>-->
-<!--            <name>collection_java_xmx</name>-->
-<!--            <value>-Xmx200m</value>-->
-<!--            <description>Used to configure the heap size for the map JVM process. Should be 80% of mapreduce.map.memory.mb.</description>-->
-<!--        </property>-->
-
-
-<!--    </parameters>-->
-
+    <!-- Global variables  -->
     <global>
         <job-tracker>${jobTracker}</job-tracker>
         <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+        </configuration>
     </global>
 
     <start to="startFrom"/>
@@ -90,8 +62,43 @@
             <arg>--softwareCodeRepositoryURLs</arg><arg>${softwareCodeRepositoryURLs}</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-
         </spark>
+        <ok to="collect-repository-last-visit-data"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="collect-repository-last-visit-data">
+        <java>
+            <main-class>eu.dnetlib.dhp.swh.CollectLastVisitRepositoryData</main-class>
+
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--softwareCodeRepositoryURLs</arg><arg>${softwareCodeRepositoryURLs}</arg>
+            <arg>--lastVisitsPath</arg><arg>${lastVisitsPath}</arg>
+
+            <arg>--maxNumberOfRetry</arg><arg>2</arg>
+            <arg>--requestDelay</arg><arg>0</arg>
+            <arg>--retryDelay</arg><arg>1</arg>
+            <arg>--requestMethod</arg><arg>GET</arg>
+
+        </java>
+        <ok to="archive-repository-urls"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="archive-repository-urls">
+        <java>
+            <main-class>eu.dnetlib.dhp.swh.ArchiveRepositoryURLs</main-class>
+
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--lastVisitsPath</arg><arg>${lastVisitsPath}</arg>
+            <arg>--archiveThresholdInDays</arg><arg>365</arg>
+
+            <arg>--maxNumberOfRetry</arg><arg>2</arg>
+            <arg>--requestDelay</arg><arg>0</arg>
+            <arg>--retryDelay</arg><arg>1</arg>
+            <arg>--requestMethod</arg><arg>POST</arg>
+
+        </java>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
