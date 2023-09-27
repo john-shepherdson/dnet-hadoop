@@ -117,6 +117,11 @@ public class MapDocumentUtil {
 			return result;
 		}
 
+		if (type == Type.List && jresult instanceof List) {
+			((List<?>) jresult).forEach(x -> result.add(x.toString()));
+			return result;
+		}
+
 		if (jresult instanceof JSONArray) {
 			((JSONArray) jresult).forEach(it -> {
 				try {
