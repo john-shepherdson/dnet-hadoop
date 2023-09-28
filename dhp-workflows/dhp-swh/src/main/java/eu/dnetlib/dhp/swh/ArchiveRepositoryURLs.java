@@ -1,14 +1,16 @@
 
 package eu.dnetlib.dhp.swh;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.collection.CollectorException;
-import eu.dnetlib.dhp.common.collection.HttpClientParams;
-import eu.dnetlib.dhp.swh.models.LastVisitData;
-import eu.dnetlib.dhp.swh.utils.SWHConnection;
-import eu.dnetlib.dhp.swh.utils.SWHConstants;
-import eu.dnetlib.dhp.swh.utils.SWHUtils;
+import static eu.dnetlib.dhp.common.Constants.REQUEST_METHOD;
+import static eu.dnetlib.dhp.utils.DHPUtils.getHadoopConfiguration;
+
+import java.io.IOException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.FileSystem;
@@ -17,14 +19,17 @@ import org.apache.hadoop.io.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.Date;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static eu.dnetlib.dhp.common.Constants.REQUEST_METHOD;
-import static eu.dnetlib.dhp.utils.DHPUtils.getHadoopConfiguration;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.collection.CollectorException;
+import eu.dnetlib.dhp.common.collection.HttpClientParams;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
+import eu.dnetlib.dhp.swh.models.LastVisitData;
+import eu.dnetlib.dhp.swh.utils.SWHConnection;
+import eu.dnetlib.dhp.swh.utils.SWHConstants;
+import eu.dnetlib.dhp.swh.utils.SWHUtils;
 
 /**
  * Sends archive requests to the SWH API for those software repository URLs that are missing from them
@@ -69,7 +74,8 @@ public class ArchiveRepositoryURLs {
 
 	}
 
-	private static void archive(FileSystem fs, String inputPath, String outputPath, Integer archiveThresholdInDays) throws IOException {
+	private static void archive(FileSystem fs, String inputPath, String outputPath, Integer archiveThresholdInDays)
+		throws IOException {
 
 		SequenceFile.Reader fr = SWHUtils.getSequenceFileReader(fs, inputPath);
 		SequenceFile.Writer fw = SWHUtils.getSequenceFileWriter(fs, outputPath);
@@ -81,7 +87,13 @@ public class ArchiveRepositoryURLs {
 		// Read key-value pairs from the SequenceFile and handle appropriately
 		while (fr.next(repoUrl, lastVisitData)) {
 
-			String response = handleRecord(repoUrl.toString(), lastVisitData.toString(), archiveThresholdInDays);
+			String response = null;
+			try {
+				response = handleRecord(repoUrl.toString(), lastVisitData.toString(), archiveThresholdInDays);
+			} catch (java.text.ParseException e) {
+				log.error("Could not handle record with repo Url: {}", repoUrl.toString());
+				throw new RuntimeException(e);
+			}
 
 			// response is equal to null when no need for request
 			if (response != null) {
@@ -95,43 +107,68 @@ public class ArchiveRepositoryURLs {
 		fr.close();
 	}
 
-	public static String handleRecord(String repoUrl, String lastVisitData, Integer archiveThresholdInDays) throws IOException {
-		System.out.println("Key: " + repoUrl + ", Value: " + lastVisitData);
+	public static String handleRecord(String repoUrl, String lastVisitData, Integer archiveThresholdInDays)
+		throws IOException, java.text.ParseException {
+
+		log.info("{ Key: {}, Value: {} }", repoUrl, lastVisitData);
 
 		LastVisitData lastVisit = OBJECT_MAPPER.readValue(lastVisitData, LastVisitData.class);
 
-		// perform an archive request when no repoUrl was not found in previous step
+		// a previous attempt for archival has been made, and repository URL was not found
+		// avoid performing the same archive request again
+		if (lastVisit.getType() != null &&
+			lastVisit.getType().equals(SWHConstants.VISIT_STATUS_NOT_FOUND)) {
+
+			log.info("Avoid request -- previous archive request returned NOT_FOUND");
+			return null;
+		}
+
+		// if we have last visit data
 		if (lastVisit.getSnapshot() != null) {
 
-			// OR last visit was before (now() - archiveThresholdInDays)
-			long diffInMillies = Math.abs((new Date()).getTime() - lastVisit.getDate().getTime());
-			long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+			String cleanDate = GraphCleaningFunctions.cleanDate(lastVisit.getDate());
 
-			if (archiveThresholdInDays >= diffInDays) {
-				return null;
+			// and the last visit date can be parsed
+			if (cleanDate != null) {
+
+				SimpleDateFormat formatter = new SimpleDateFormat(ModelSupport.DATE_FORMAT);
+				Date lastVisitDate = formatter.parse(cleanDate);
+
+				// OR last visit time < (now() - archiveThresholdInDays)
+				long diffInMillies = Math.abs((new Date()).getTime() - lastVisitDate.getTime());
+				long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+				log.info("Date diff from now (in days): {}", diffInDays);
+
+				// do not perform a request, if the last visit date is no older than $archiveThresholdInDays
+				if (archiveThresholdInDays >= diffInDays) {
+					log.info("Avoid request -- no older than {} days", archiveThresholdInDays);
+					return null;
+				}
 			}
 		}
 
-		// if last visit data are available, re-use version control type, else use the default one (i.e., git)
+		// ELSE perform an archive request
+		log.info("Perform archive request for: {}", repoUrl);
+
+		// if last visit data are available, re-use version control type,
+		// else use the default one (i.e., git)
 		String visitType = Optional
 			.ofNullable(lastVisit.getType())
 			.orElse(SWHConstants.DEFAULT_VISIT_TYPE);
 
 		URL url = new URL(String.format(SWHConstants.SWH_ARCHIVE_URL, visitType, repoUrl.trim()));
-		System.out.println(url.toString());
+
+		log.info("Sending archive request: {}", url);
 
 		String response;
 		try {
 			response = swhConnection.call(url.toString());
 		} catch (CollectorException e) {
-			log.info("Error in request: {}", url);
+			log.error("Error in request: {}", url);
 			response = "{}";
 		}
 
 		return response;
-
 	}
-
-
 
 }

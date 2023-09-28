@@ -1,8 +1,11 @@
 
 package eu.dnetlib.dhp.swh;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
+
+import java.io.Serializable;
+import java.util.Optional;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Dataset;
@@ -12,10 +15,8 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
-import java.util.Optional;
-
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.schema.oaf.Result;
 
 /**
  *  Collects unique software repository URLs in the Graph using Hive
@@ -69,7 +70,7 @@ public class CollectSoftwareRepositoryURLs implements Serializable {
 			"WHERE coderepositoryurl.value IS NOT NULL " +
 			"AND datainfo.deletedbyinference = FALSE " +
 			"AND datainfo.invisible = FALSE " +
-			"LIMIT 1000"; // TODO remove
+			"LIMIT 1000";
 		String query = String.format(queryTemplate, hiveDbName);
 
 		log.info("Hive query to fetch software code URLs: {}", query);

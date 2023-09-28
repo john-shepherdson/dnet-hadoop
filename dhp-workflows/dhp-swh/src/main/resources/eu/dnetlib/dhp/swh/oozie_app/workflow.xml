@@ -8,7 +8,27 @@
         </property>
         <property>
             <name>softwareCodeRepositoryURLs</name>
-            <description>The path in the HDSF to save the software repository URLs</description>
+            <description>The path in the HDFS to save the software repository URLs</description>
+        </property>
+        <property>
+            <name>lastVisitsPath</name>
+            <description>The path in the HDFS to save the responses of the last visit requests</description>
+        </property>
+        <property>
+            <name>archiveRequestsPath</name>
+            <description>The path in the HDFS to save the responses of the archive requests</description>
+        </property>
+        <property>
+            <name>maxNumberOfRetry</name>
+            <description>Max number of retries for failed API calls</description>
+        </property>
+        <property>
+            <name>retryDelay</name>
+            <description>Retry delay for failed requests (in sec)</description>
+        </property>
+        <property>
+            <name>requestDelay</name>
+            <description>Delay between API requests (in ms)</description>
         </property>
         <property>
             <name>resume</name>
@@ -75,9 +95,9 @@
             <arg>--softwareCodeRepositoryURLs</arg><arg>${softwareCodeRepositoryURLs}</arg>
             <arg>--lastVisitsPath</arg><arg>${lastVisitsPath}</arg>
 
-            <arg>--maxNumberOfRetry</arg><arg>2</arg>
-            <arg>--requestDelay</arg><arg>0</arg>
-            <arg>--retryDelay</arg><arg>1</arg>
+            <arg>--maxNumberOfRetry</arg><arg>${maxNumberOfRetry}</arg>
+            <arg>--requestDelay</arg><arg>${requestDelay}</arg>
+            <arg>--retryDelay</arg><arg>${retryDelay}</arg>
             <arg>--requestMethod</arg><arg>GET</arg>
 
         </java>
@@ -91,11 +111,12 @@
 
             <arg>--namenode</arg><arg>${nameNode}</arg>
             <arg>--lastVisitsPath</arg><arg>${lastVisitsPath}</arg>
+            <arg>--archiveRequestsPath</arg><arg>${archiveRequestsPath}</arg>
             <arg>--archiveThresholdInDays</arg><arg>365</arg>
 
-            <arg>--maxNumberOfRetry</arg><arg>2</arg>
-            <arg>--requestDelay</arg><arg>0</arg>
-            <arg>--retryDelay</arg><arg>1</arg>
+            <arg>--maxNumberOfRetry</arg><arg>${maxNumberOfRetry}</arg>
+            <arg>--requestDelay</arg><arg>${requestDelay}</arg>
+            <arg>--retryDelay</arg><arg>${retryDelay}</arg>
             <arg>--requestMethod</arg><arg>POST</arg>
 
         </java>

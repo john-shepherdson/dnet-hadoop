@@ -53,9 +53,9 @@ public class HttpClientParams {
 	 */
 	private String requestMethod;
 
-
 	public HttpClientParams() {
-		this(_maxNumberOfRetry, _requestDelay, _retryDelay, _connectTimeOut, _readTimeOut, new HashMap<>(), _requestMethod);
+		this(_maxNumberOfRetry, _requestDelay, _retryDelay, _connectTimeOut, _readTimeOut, new HashMap<>(),
+			_requestMethod);
 	}
 
 	public HttpClientParams(int maxNumberOfRetry, int requestDelay, int retryDelay, int connectTimeOut,

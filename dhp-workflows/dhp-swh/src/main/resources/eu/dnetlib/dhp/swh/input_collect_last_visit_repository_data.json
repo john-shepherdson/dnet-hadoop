@@ -34,5 +34,11 @@
     "paramLongName": "retryDelay",
     "paramDescription": "the delay (ms) between retries",
     "paramRequired": false
+  },
+  {
+    "paramName": "rm",
+    "paramLongName": "requestMethod",
+    "paramDescription": "the method of the requests to perform",
+    "paramRequired": false
   }
 ]

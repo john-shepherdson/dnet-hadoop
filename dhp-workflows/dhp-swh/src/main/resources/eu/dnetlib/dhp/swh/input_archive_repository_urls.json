@@ -12,9 +12,33 @@
     "paramRequired": true
   },
   {
+    "paramName": "arp",
+    "paramLongName": "archiveRequestsPath",
+    "paramDescription": "the URL where to store the responses of the archive requests",
+    "paramRequired": true
+  },
+  {
+    "paramName": "mnr",
+    "paramLongName": "maxNumberOfRetry",
+    "paramDescription": "the maximum number of admitted connection retries",
+    "paramRequired": false
+  },
+  {
     "paramName": "rqd",
     "paramLongName": "requestDelay",
     "paramDescription": "the delay (ms) between requests",
+    "paramRequired": false
+  },
+  {
+    "paramName": "rtd",
+    "paramLongName": "retryDelay",
+    "paramDescription": "the delay (ms) between retries",
+    "paramRequired": false
+  },
+  {
+    "paramName": "rm",
+    "paramLongName": "requestMethod",
+    "paramDescription": "the method of the requests to perform",
     "paramRequired": false
   },
   {

@@ -1,8 +1,14 @@
 
 package eu.dnetlib.dhp.swh.utils;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.collection.HttpClientParams;
+import static eu.dnetlib.dhp.common.Constants.*;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -11,13 +17,8 @@ import org.apache.hadoop.io.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
-
-import static eu.dnetlib.dhp.common.Constants.*;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.collection.HttpClientParams;
 
 public class SWHUtils {
 
@@ -51,10 +52,10 @@ public class SWHUtils {
 		log.info("retryDelay is {}", clientParams.getRetryDelay());
 
 		clientParams
-				.setRequestMethod(
-						Optional
-								.ofNullable(argumentParser.get(REQUEST_METHOD))
-								.orElse(HttpClientParams._requestMethod));
+			.setRequestMethod(
+				Optional
+					.ofNullable(argumentParser.get(REQUEST_METHOD))
+					.orElse(HttpClientParams._requestMethod));
 		log.info("requestMethod is {}", clientParams.getRequestMethod());
 
 		return clientParams;
@@ -63,16 +64,16 @@ public class SWHUtils {
 	public static BufferedReader getFileReader(FileSystem fs, Path inputPath) throws IOException {
 		FSDataInputStream inputStream = fs.open(inputPath);
 		return new BufferedReader(
-				new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+			new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 	}
 
 	public static SequenceFile.Writer getSequenceFileWriter(FileSystem fs, String outputPath) throws IOException {
 		return SequenceFile
-				.createWriter(
-						fs.getConf(),
-						SequenceFile.Writer.file(new Path(outputPath)),
-						SequenceFile.Writer.keyClass(Text.class),
-						SequenceFile.Writer.valueClass(Text.class));
+			.createWriter(
+				fs.getConf(),
+				SequenceFile.Writer.file(new Path(outputPath)),
+				SequenceFile.Writer.keyClass(Text.class),
+				SequenceFile.Writer.valueClass(Text.class));
 	}
 
 	public static SequenceFile.Reader getSequenceFileReader(FileSystem fs, String inputPath) throws IOException {
