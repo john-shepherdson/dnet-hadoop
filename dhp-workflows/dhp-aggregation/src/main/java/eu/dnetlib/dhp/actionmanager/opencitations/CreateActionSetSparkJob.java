@@ -12,6 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
@@ -26,9 +27,12 @@ import eu.dnetlib.dhp.actionmanager.opencitations.model.COCI;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
 public class CreateActionSetSparkJob implements Serializable {
@@ -68,9 +72,6 @@ public class CreateActionSetSparkJob implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath {}", outputPath);
 
-		final String prefix = parser.get("prefix");
-		log.info("prefix {}", prefix);
-
 		final boolean shouldDuplicateRels = Optional
 			.ofNullable(parser.get("shouldDuplicateRels"))
 			.map(Boolean::valueOf)
@@ -81,47 +82,62 @@ public class CreateActionSetSparkJob implements Serializable {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				extractContent(spark, inputPath, outputPath, shouldDuplicateRels, prefix);
+				extractContent(spark, inputPath, outputPath, shouldDuplicateRels);
 			});
 
 	}
 
 	private static void extractContent(SparkSession spark, String inputPath, String outputPath,
+		boolean shouldDuplicateRels) {
+
+		getTextTextJavaPairRDD(spark, inputPath, shouldDuplicateRels, "COCI")
+			.union(getTextTextJavaPairRDD(spark, inputPath, shouldDuplicateRels, "POCI"))
+			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
+
+	}
+
+	private static JavaPairRDD<Text, Text> getTextTextJavaPairRDD(SparkSession spark, String inputPath,
 		boolean shouldDuplicateRels, String prefix) {
-		spark
+		return spark
 			.read()
-			.textFile(inputPath + "/*")
+			.textFile(inputPath + "/" + prefix + "/" + prefix + "_JSON/*")
 			.map(
 				(MapFunction<String, COCI>) value -> OBJECT_MAPPER.readValue(value, COCI.class),
 				Encoders.bean(COCI.class))
 			.flatMap(
-				(FlatMapFunction<COCI, Relation>) value -> createRelation(value, shouldDuplicateRels, prefix)
-					.iterator(),
+				(FlatMapFunction<COCI, Relation>) value -> createRelation(
+					value, shouldDuplicateRels, prefix)
+						.iterator(),
 				Encoders.bean(Relation.class))
 			.filter((FilterFunction<Relation>) value -> value != null)
 			.toJavaRDD()
 			.map(p -> new AtomicAction(p.getClass(), p))
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
-					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
-			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
-
+					new Text(OBJECT_MAPPER.writeValueAsString(aa))));
 	}
 
 	private static List<Relation> createRelation(COCI value, boolean duplicate, String p) {
 
 		List<Relation> relationList = new ArrayList<>();
 		String prefix;
+		String citing;
+		String cited;
 		if (p.equals("COCI")) {
 			prefix = DOI_PREFIX;
+			citing = prefix
+				+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", value.getCiting()));
+			cited = prefix
+				+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", value.getCited()));
+
 		} else {
 			prefix = PMID_PREFIX;
-		}
+			citing = prefix
+				+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("pmid", value.getCiting()));
+			cited = prefix
+				+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("pmid", value.getCited()));
 
-		String citing = prefix
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", value.getCiting()));
-		final String cited = prefix
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", value.getCited()));
+		}
 
 		if (!citing.equals(cited)) {
 			relationList
@@ -143,59 +159,30 @@ public class CreateActionSetSparkJob implements Serializable {
 		return relationList;
 	}
 
-	private static Collection<Relation> getRelations(String citing, String cited) {
-
-		return Arrays
-			.asList(
-				getRelation(citing, cited, ModelConstants.CITES),
-				getRelation(cited, citing, ModelConstants.IS_CITED_BY));
-	}
-
 	public static Relation getRelation(
 		String source,
 		String target,
 		String relclass) {
-		Relation r = new Relation();
-		r.setCollectedfrom(getCollectedFrom());
-		r.setSource(source);
-		r.setTarget(target);
-		r.setRelClass(relclass);
-		r.setRelType(ModelConstants.RESULT_RESULT);
-		r.setSubRelType(ModelConstants.CITATION);
-		r
-			.setDataInfo(
-				getDataInfo());
-		return r;
+
+		return OafMapperUtils
+			.getRelation(
+				source,
+				target,
+				ModelConstants.RESULT_RESULT,
+				ModelConstants.CITATION,
+				relclass,
+				Arrays
+					.asList(
+						OafMapperUtils.keyValue(ModelConstants.OPENOCITATIONS_ID, ModelConstants.OPENOCITATIONS_NAME)),
+				OafMapperUtils
+					.dataInfo(
+						false, null, false, false,
+						OafMapperUtils
+							.qualifier(
+								OPENCITATIONS_CLASSID, OPENCITATIONS_CLASSNAME,
+								ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS),
+						TRUST),
+				null);
+
 	}
-
-	public static List<KeyValue> getCollectedFrom() {
-		KeyValue kv = new KeyValue();
-		kv.setKey(ModelConstants.OPENOCITATIONS_ID);
-		kv.setValue(ModelConstants.OPENOCITATIONS_NAME);
-
-		return Arrays.asList(kv);
-	}
-
-	public static DataInfo getDataInfo() {
-		DataInfo di = new DataInfo();
-		di.setInferred(false);
-		di.setDeletedbyinference(false);
-		di.setTrust(TRUST);
-
-		di
-			.setProvenanceaction(
-				getQualifier(OPENCITATIONS_CLASSID, OPENCITATIONS_CLASSNAME, ModelConstants.DNET_PROVENANCE_ACTIONS));
-		return di;
-	}
-
-	public static Qualifier getQualifier(String class_id, String class_name,
-		String qualifierSchema) {
-		Qualifier pa = new Qualifier();
-		pa.setClassid(class_id);
-		pa.setClassname(class_name);
-		pa.setSchemeid(qualifierSchema);
-		pa.setSchemename(qualifierSchema);
-		return pa;
-	}
-
 }

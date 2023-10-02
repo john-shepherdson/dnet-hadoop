@@ -110,7 +110,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--inputPath</arg><arg>${workingPath}/${prefix}_JSON</arg>
+            <arg>--inputPath</arg><arg>${workingPath}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
             <arg>--prefix</arg><arg>${prefix}</arg>
         </spark>
