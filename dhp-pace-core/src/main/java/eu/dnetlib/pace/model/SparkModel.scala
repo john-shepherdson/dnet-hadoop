@@ -81,7 +81,7 @@ case class SparkModel(conf: DedupConfig) {
               MapDocumentUtil.truncateList(
                 MapDocumentUtil.getJPathList(fdef.getPath, documentContext, fdef.getType),
                 fdef.getSize
-              ).toArray
+              ).asScala
 
             case Type.StringConcat =>
               val jpaths = CONCAT_REGEX.split(fdef.getPath)

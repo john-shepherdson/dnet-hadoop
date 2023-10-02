@@ -126,31 +126,7 @@
                 --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--graphInputPath</arg><arg>${graphBasePath}</arg>
-            <arg>--outputPath</arg><arg>${workingPath}/grouped_entities</arg>
-        </spark>
-        <ok to="dispatch_entities"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="dispatch_entities">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Dispatch grouped entitities</name>
-            <class>eu.dnetlib.dhp.oa.merge.DispatchEntitiesSparkJob</class>
-            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemoryOverhead}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
-            </spark-opts>
-            <arg>--inputPath</arg><arg>${workingPath}/grouped_entities</arg>
+            <arg>--checkpointPath</arg><arg>${workingPath}/grouped_entities</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}</arg>
             <arg>--filterInvisible</arg><arg>${filterInvisible}</arg>
         </spark>

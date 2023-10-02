@@ -112,6 +112,16 @@
 			<url>https://maven.d4science.org/nexus/content/repositories/dnet-deps</url>
 			<layout>default</layout>
 		</repository>
+		<repository>
+			<id>maven-restlet</id>
+			<name>Restlet repository</name>
+			<url>https://maven.restlet.talend.com</url>
+		</repository>
+		<repository>
+			<id>conjars</id>
+			<name>conjars</name>
+			<url>https://conjars.wensel.net/repo/</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
