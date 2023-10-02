@@ -46,7 +46,7 @@
             </configuration>
             <exec>download.sh</exec>
             <argument>${filelist}</argument>
-            <argument>${workingPath}/Original</argument>
+            <argument>${workingPath}/${prefix}/Original</argument>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>download.sh</file>
             <capture-output/>
@@ -59,7 +59,7 @@
             <main-class>eu.dnetlib.dhp.actionmanager.opencitations.GetOpenCitationsRefs</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--inputFile</arg><arg>${inputFile}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}/${prefix}</arg>
             <arg>--prefix</arg><arg>${prefix}</arg>
         </java>
         <ok to="read"/>
@@ -83,8 +83,8 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--workingPath</arg><arg>${workingPath}/${prefix}</arg>
-            <arg>--outputPath</arg><arg>${workingPath}/${prefix}_JSON/</arg>
+            <arg>--workingPath</arg><arg>${workingPath}/${prefix}/${prefix}</arg>
+            <arg>--outputPath</arg><arg>${workingPath}/${prefix}/${prefix}_JSON/</arg>
             <arg>--delimiter</arg><arg>${delimiter}</arg>
             <arg>--inputFile</arg><arg>${inputFileCoci}</arg>
             <arg>--format</arg><arg>${prefix}</arg>
