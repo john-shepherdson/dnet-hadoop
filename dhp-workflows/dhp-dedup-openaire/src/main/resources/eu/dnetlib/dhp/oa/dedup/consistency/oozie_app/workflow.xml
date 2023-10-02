@@ -100,34 +100,8 @@
                 --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
-            <arg>--graphOutputPath</arg><arg>${workingPath}/propagaterelation/</arg>
+            <arg>--graphOutputPath</arg><arg>${graphOutputPath}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
-        </spark>
-        <ok to="CleanRelation"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="CleanRelation">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Clean Relations</name>
-            <class>eu.dnetlib.dhp.oa.dedup.SparkCleanRelation</class>
-            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --conf spark.executor.memoryOverhead=${sparkExecutorMemoryOverhead}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=15000
-            </spark-opts>
-            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
-            <arg>--inputPath</arg><arg>${workingPath}/propagaterelation/relation</arg>
-            <arg>--outputPath</arg><arg>${graphOutputPath}/relation</arg>
         </spark>
         <ok to="group_entities"/>
         <error to="Kill"/>
