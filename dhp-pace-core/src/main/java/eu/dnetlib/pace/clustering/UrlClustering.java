@@ -15,10 +15,15 @@ import eu.dnetlib.pace.config.Config;
 @ClusteringClass("urlclustering")
 public class UrlClustering extends AbstractPaceFunctions implements ClusteringFunction {
 
-	protected Map<String, Integer> params;
+	protected Map<String, Object> params;
 
-	public UrlClustering(final Map<String, Integer> params) {
+	public UrlClustering(final Map<String, Object> params) {
 		this.params = params;
+	}
+
+	@Override
+	public Map<String, Object> getParams() {
+		return params;
 	}
 
 	@Override
@@ -33,11 +38,6 @@ public class UrlClustering extends AbstractPaceFunctions implements ClusteringFu
 		} catch (IllegalStateException e) {
 			return new HashSet<>();
 		}
-	}
-
-	@Override
-	public Map<String, Integer> getParams() {
-		return null;
 	}
 
 	private URL asUrl(String value) {

@@ -11,7 +11,7 @@ import eu.dnetlib.pace.config.Config;
 @ClusteringClass("keywordsclustering")
 public class KeywordsClustering extends AbstractClusteringFunction {
 
-	public KeywordsClustering(Map<String, Integer> params) {
+	public KeywordsClustering(Map<String, Object> params) {
 		super(params);
 	}
 
@@ -19,8 +19,8 @@ public class KeywordsClustering extends AbstractClusteringFunction {
 	protected Collection<String> doApply(final Config conf, String s) {
 
 		// takes city codes and keywords codes without duplicates
-		Set<String> keywords = getKeywords(s, conf.translationMap(), params.getOrDefault("windowSize", 4));
-		Set<String> cities = getCities(s, params.getOrDefault("windowSize", 4));
+		Set<String> keywords = getKeywords(s, conf.translationMap(), paramOrDefault("windowSize", 4));
+		Set<String> cities = getCities(s, paramOrDefault("windowSize", 4));
 
 		// list of combination to return as result
 		final Collection<String> combinations = new LinkedHashSet<String>();
@@ -28,7 +28,7 @@ public class KeywordsClustering extends AbstractClusteringFunction {
 		for (String keyword : keywordsToCodes(keywords, conf.translationMap())) {
 			for (String city : citiesToCodes(cities)) {
 				combinations.add(keyword + "-" + city);
-				if (combinations.size() >= params.getOrDefault("max", 2)) {
+				if (combinations.size() >= paramOrDefault("max", 2)) {
 					return combinations;
 				}
 			}
@@ -42,8 +42,8 @@ public class KeywordsClustering extends AbstractClusteringFunction {
 		return fields
 			.stream()
 			.filter(f -> !f.isEmpty())
-			.map(this::cleanup)
-			.map(this::normalize)
+			.map(KeywordsClustering::cleanup)
+			.map(KeywordsClustering::normalize)
 			.map(s -> filterAllStopWords(s))
 			.map(s -> doApply(conf, s))
 			.map(c -> filterBlacklisted(c, ngramBlacklist))

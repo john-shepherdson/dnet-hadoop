@@ -2,20 +2,19 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.api.java.function.MapGroupsFunction;
+import org.apache.spark.api.java.function.ReduceFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.oa.dedup.model.Identifier;
 import eu.dnetlib.dhp.oa.merge.AuthorMerger;
@@ -41,88 +40,91 @@ public class DedupRecordFactory {
 		long ts = System.currentTimeMillis();
 
 		// <id, json_entity>
-		Dataset<Tuple2<String, T>> entities = spark
+		Dataset<Row> entities = spark
 			.read()
-			.textFile(entitiesInputPath)
+			.schema(Encoders.bean(clazz).schema())
+			.json(entitiesInputPath)
+			.as(Encoders.bean(clazz))
 			.map(
-				(MapFunction<String, Tuple2<String, T>>) it -> {
-					T entity = OBJECT_MAPPER.readValue(it, clazz);
+				(MapFunction<T, Tuple2<String, T>>) entity -> {
 					return new Tuple2<>(entity.getId(), entity);
 				},
-				Encoders.tuple(Encoders.STRING(), Encoders.kryo(clazz)));
+				Encoders.tuple(Encoders.STRING(), Encoders.kryo(clazz)))
+			.selectExpr("_1 AS id", "_2 AS kryoObject");
 
 		// <source, target>: source is the dedup_id, target is the id of the mergedIn
-		Dataset<Tuple2<String, String>> mergeRels = spark
+		Dataset<Row> mergeRels = spark
 			.read()
 			.load(mergeRelsInputPath)
-			.as(Encoders.bean(Relation.class))
 			.where("relClass == 'merges'")
-			.map(
-				(MapFunction<Relation, Tuple2<String, String>>) r -> new Tuple2<>(r.getSource(), r.getTarget()),
-				Encoders.tuple(Encoders.STRING(), Encoders.STRING()));
+			.selectExpr("source as dedupId", "target as id");
 
 		return mergeRels
-			.joinWith(entities, mergeRels.col("_2").equalTo(entities.col("_1")), "inner")
+			.join(entities, "id")
+			.select("dedupId", "kryoObject")
+			.as(Encoders.tuple(Encoders.STRING(), Encoders.kryo(clazz)))
+			.groupByKey((MapFunction<Tuple2<String, T>, String>) Tuple2::_1, Encoders.STRING())
+			.reduceGroups(
+				(ReduceFunction<Tuple2<String, T>>) (t1, t2) -> new Tuple2<>(t1._1(),
+					reduceEntity(t1._1(), t1._2(), t2._2(), clazz)))
 			.map(
-				(MapFunction<Tuple2<Tuple2<String, String>, Tuple2<String, T>>, Tuple2<String, T>>) value -> new Tuple2<>(
-					value._1()._1(), value._2()._2()),
-				Encoders.tuple(Encoders.STRING(), Encoders.kryo(clazz)))
-			.groupByKey(
-				(MapFunction<Tuple2<String, T>, String>) Tuple2::_1, Encoders.STRING())
-			.mapGroups(
-				(MapGroupsFunction<String, Tuple2<String, T>, T>) (key,
-					values) -> entityMerger(key, values, ts, dataInfo, clazz),
+				(MapFunction<Tuple2<String, Tuple2<String, T>>, T>) t -> {
+					T res = t._2()._2();
+					res.setDataInfo(dataInfo);
+					res.setLastupdatetimestamp(ts);
+					return res;
+				},
 				Encoders.bean(clazz));
+	}
+
+	public static <T extends OafEntity> T reduceEntity(
+		String id, T entity, T duplicate, Class<T> clazz) {
+
+		int compare = new IdentifierComparator()
+			.compare(Identifier.newInstance(entity), Identifier.newInstance(duplicate));
+
+		if (compare > 0) {
+			T swap = duplicate;
+			duplicate = entity;
+			entity = swap;
+		}
+
+		entity.mergeFrom(duplicate);
+		entity.setId(id);
+
+		if (ModelSupport.isSubClass(duplicate, Result.class)) {
+			Result re = (Result) entity;
+			Result rd = (Result) duplicate;
+
+			List<List<Author>> authors = new ArrayList<>();
+			if (re.getAuthor() != null) {
+				authors.add(re.getAuthor());
+			}
+			if (rd.getAuthor() != null) {
+				authors.add(rd.getAuthor());
+			}
+
+			re.setAuthor(AuthorMerger.merge(authors));
+		}
+
+		return entity;
 	}
 
 	public static <T extends OafEntity> T entityMerger(
 		String id, Iterator<Tuple2<String, T>> entities, long ts, DataInfo dataInfo, Class<T> clazz)
 		throws IllegalAccessException, InstantiationException, InvocationTargetException {
+		T base = entities.next()._2();
 
-		final Comparator<Identifier<T>> idComparator = new IdentifierComparator<>();
-
-		final LinkedList<T> entityList = Lists
-			.newArrayList(entities)
-			.stream()
-			.map(t -> Identifier.newInstance(t._2()))
-			.sorted(idComparator)
-			.map(Identifier::getEntity)
-			.collect(Collectors.toCollection(LinkedList::new));
-
-		final T entity = clazz.newInstance();
-		final T first = entityList.removeFirst();
-
-		BeanUtils.copyProperties(entity, first);
-
-		final List<List<Author>> authors = Lists.newArrayList();
-
-		entityList
-			.forEach(
-				duplicate -> {
-					entity.mergeFrom(duplicate);
-					if (ModelSupport.isSubClass(duplicate, Result.class)) {
-						Result r1 = (Result) duplicate;
-						Optional
-							.ofNullable(r1.getAuthor())
-							.ifPresent(a -> authors.add(a));
-					}
-				});
-
-		// set authors and date
-		if (ModelSupport.isSubClass(entity, Result.class)) {
-			Optional
-				.ofNullable(((Result) entity).getAuthor())
-				.ifPresent(a -> authors.add(a));
-
-			((Result) entity).setAuthor(AuthorMerger.merge(authors));
+		while (entities.hasNext()) {
+			T duplicate = entities.next()._2();
+			if (duplicate != null)
+				base = reduceEntity(id, base, duplicate, clazz);
 		}
 
-		entity.setId(id);
+		base.setDataInfo(dataInfo);
+		base.setLastupdatetimestamp(ts);
 
-		entity.setLastupdatetimestamp(ts);
-		entity.setDataInfo(dataInfo);
-
-		return entity;
+		return base;
 	}
 
 }

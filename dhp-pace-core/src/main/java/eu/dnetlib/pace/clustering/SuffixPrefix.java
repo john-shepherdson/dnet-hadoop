@@ -12,7 +12,7 @@ import eu.dnetlib.pace.config.Config;
 @ClusteringClass("suffixprefix")
 public class SuffixPrefix extends AbstractClusteringFunction {
 
-	public SuffixPrefix(Map<String, Integer> params) {
+	public SuffixPrefix(Map<String, Object> params) {
 		super(params);
 	}
 

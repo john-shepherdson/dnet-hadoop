@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
+import static eu.dnetlib.dhp.utils.DHPUtils.md5;
 import static org.apache.commons.lang3.StringUtils.substringAfter;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 
@@ -14,33 +15,36 @@ import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 public class IdGenerator implements Serializable {
 
 	// pick the best pid from the list (consider date and pidtype)
-	public static <T extends OafEntity> String generate(List<Identifier<T>> pids, String defaultID) {
+	public static <T extends OafEntity> String generate(List<? extends Identifier> pids, String defaultID) {
 		if (pids == null || pids.isEmpty())
 			return defaultID;
 
 		return generateId(pids);
 	}
 
-	private static <T extends OafEntity> String generateId(List<Identifier<T>> pids) {
-		Identifier<T> bp = pids
+	private static String generateId(List<? extends Identifier> pids) {
+		Identifier bp = pids
 			.stream()
 			.min(Identifier::compareTo)
 			.orElseThrow(() -> new IllegalStateException("unable to generate id"));
 
-		String prefix = substringBefore(bp.getOriginalID(), "|");
-		String ns = substringBefore(substringAfter(bp.getOriginalID(), "|"), "::");
-		String suffix = substringAfter(bp.getOriginalID(), "::");
+		return generate(bp.getOriginalID());
+	}
+
+	public static String generate(String originalId) {
+		String prefix = substringBefore(originalId, "|");
+		String ns = substringBefore(substringAfter(originalId, "|"), "::");
+		String suffix = substringAfter(originalId, "::");
 
 		final String pidType = substringBefore(ns, "_");
 		if (PidType.isValid(pidType)) {
 			return prefix + "|" + dedupify(ns) + "::" + suffix;
 		} else {
-			return prefix + "|dedup_wf_001::" + suffix;
+			return prefix + "|dedup_wf_001::" + md5(originalId); // hash the whole originalId to avoid collisions
 		}
 	}
 
 	private static String dedupify(String ns) {
-
 		StringBuilder prefix;
 		if (PidType.valueOf(substringBefore(ns, "_")) == PidType.openorgs) {
 			prefix = new StringBuilder(substringBefore(ns, "_"));
@@ -53,5 +57,4 @@ public class IdGenerator implements Serializable {
 		}
 		return prefix.substring(0, 12);
 	}
-
 }
