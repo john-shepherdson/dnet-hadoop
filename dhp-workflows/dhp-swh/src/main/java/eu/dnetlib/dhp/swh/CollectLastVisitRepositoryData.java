@@ -40,7 +40,7 @@ public class CollectLastVisitRepositoryData {
 	private static SWHConnection swhConnection = null;
 
 	public static void main(final String[] args)
-		throws IOException, ParseException, InterruptedException, URISyntaxException, CollectorException {
+		throws IOException, ParseException {
 		final ArgumentApplicationParser argumentParser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(

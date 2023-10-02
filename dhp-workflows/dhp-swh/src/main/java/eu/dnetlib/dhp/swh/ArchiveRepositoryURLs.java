@@ -1,7 +1,6 @@
 
 package eu.dnetlib.dhp.swh;
 
-import static eu.dnetlib.dhp.common.Constants.REQUEST_METHOD;
 import static eu.dnetlib.dhp.utils.DHPUtils.getHadoopConfiguration;
 
 import java.io.IOException;
@@ -116,8 +115,8 @@ public class ArchiveRepositoryURLs {
 
 		// a previous attempt for archival has been made, and repository URL was not found
 		// avoid performing the same archive request again
-		if (lastVisit.getType() != null &&
-			lastVisit.getType().equals(SWHConstants.VISIT_STATUS_NOT_FOUND)) {
+		if (lastVisit.getStatus() != null &&
+			lastVisit.getStatus().equals(SWHConstants.VISIT_STATUS_NOT_FOUND)) {
 
 			log.info("Avoid request -- previous archive request returned NOT_FOUND");
 			return null;

@@ -3,7 +3,6 @@ package eu.dnetlib.dhp.swh;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
-import java.io.Serializable;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -23,7 +22,7 @@ import eu.dnetlib.dhp.schema.oaf.Result;
  *
  * @author Serafeim Chatzopoulos
  */
-public class CollectSoftwareRepositoryURLs implements Serializable {
+public class CollectSoftwareRepositoryURLs {
 
 	private static final Logger log = LoggerFactory.getLogger(CollectSoftwareRepositoryURLs.class);
 
@@ -44,10 +43,10 @@ public class CollectSoftwareRepositoryURLs implements Serializable {
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		final String hiveDbName = parser.get("hiveDbName");
-		log.info("hiveDbName {}: ", hiveDbName);
+		log.info("hiveDbName: {}", hiveDbName);
 
 		final String outputPath = parser.get("softwareCodeRepositoryURLs");
-		log.info("softwareCodeRepositoryURLs {}: ", outputPath);
+		log.info("softwareCodeRepositoryURLs: {}", outputPath);
 
 		final String hiveMetastoreUris = parser.get("hiveMetastoreUris");
 		log.info("hiveMetastoreUris: {}", hiveMetastoreUris);
@@ -70,7 +69,7 @@ public class CollectSoftwareRepositoryURLs implements Serializable {
 			"WHERE coderepositoryurl.value IS NOT NULL " +
 			"AND datainfo.deletedbyinference = FALSE " +
 			"AND datainfo.invisible = FALSE " +
-			"LIMIT 1000";
+			"LIMIT 5000";
 		String query = String.format(queryTemplate, hiveDbName);
 
 		log.info("Hive query to fetch software code URLs: {}", query);

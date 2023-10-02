@@ -57,6 +57,7 @@
     <decision name="startFrom">
         <switch>
             <case to="collect-software-repository-urls">${wf:conf('startFrom') eq 'collect-software-repository-urls'}</case>
+            <case to="create-swh-actionsets">${wf:conf('startFrom') eq 'create-swh-actionsets'}</case>
             <default to="collect-software-repository-urls"/>
         </switch>
     </decision>
@@ -120,6 +121,32 @@
             <arg>--requestMethod</arg><arg>POST</arg>
 
         </java>
+        <ok to="create-swh-actionsets"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="create-swh-actionsets">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Create actionsets for SWH data</name>
+            <class>eu.dnetlib.dhp.swh.PrepareSWHActionsets</class>
+            <jar>dhp-swh-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+
+            <arg>--lastVisitsPath</arg><arg>${lastVisitsPath}</arg>
+            <arg>--actionsetsPath</arg><arg>${actionsetsPath}</arg>
+            <arg>--softwareInputPath</arg><arg>${graphPath}/software</arg>
+        </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>

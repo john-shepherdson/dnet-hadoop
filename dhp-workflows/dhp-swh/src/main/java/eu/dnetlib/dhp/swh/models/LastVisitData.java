@@ -1,15 +1,15 @@
 
 package eu.dnetlib.dhp.swh.models;
 
-import java.util.Date;
+import java.io.Serializable;
 
-import com.cloudera.com.fasterxml.jackson.annotation.JsonFormat;
 import com.cloudera.com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class LastVisitData {
+public class LastVisitData implements Serializable {
 
+	private String origin;
 	private String type;
 	private String date;
 
@@ -48,5 +48,24 @@ public class LastVisitData {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public String getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
+
+	@Override
+	public String toString() {
+		return "LastVisitData{" +
+			"origin='" + origin + '\'' +
+			", type='" + type + '\'' +
+			", date='" + date + '\'' +
+			", snapshotId='" + snapshotId + '\'' +
+			", status='" + status + '\'' +
+			'}';
 	}
 }

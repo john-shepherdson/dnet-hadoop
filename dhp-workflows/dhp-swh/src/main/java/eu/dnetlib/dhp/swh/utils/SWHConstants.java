@@ -12,4 +12,8 @@ public class SWHConstants {
 
 	public static final String VISIT_STATUS_NOT_FOUND = "not_found";
 
+	public static final String SWHID = "swhid";
+
+	public static final String SWHID_CLASSNAME = "Software Heritage Identifier";
+
 }
