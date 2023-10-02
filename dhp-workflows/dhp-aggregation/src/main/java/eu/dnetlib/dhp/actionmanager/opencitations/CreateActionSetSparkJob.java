@@ -26,7 +26,6 @@ import eu.dnetlib.dhp.actionmanager.opencitations.model.COCI;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
@@ -35,7 +34,9 @@ import scala.Tuple2;
 public class CreateActionSetSparkJob implements Serializable {
 	public static final String OPENCITATIONS_CLASSID = "sysimport:crosswalk:opencitations";
 	public static final String OPENCITATIONS_CLASSNAME = "Imported from OpenCitations";
-	private static final String ID_PREFIX = "50|doi_________::";
+	private static final String DOI_PREFIX = "50|doi_________::";
+
+	private static final String PMID_PREFIX = "50|pmid________::";
 	private static final String TRUST = "0.91";
 
 	private static final Logger log = LoggerFactory.getLogger(CreateActionSetSparkJob.class);
@@ -67,6 +68,9 @@ public class CreateActionSetSparkJob implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath {}", outputPath);
 
+		final String prefix = parser.get("prefix");
+		log.info("prefix {}", prefix);
+
 		final boolean shouldDuplicateRels = Optional
 			.ofNullable(parser.get("shouldDuplicateRels"))
 			.map(Boolean::valueOf)
@@ -77,13 +81,13 @@ public class CreateActionSetSparkJob implements Serializable {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				extractContent(spark, inputPath, outputPath, shouldDuplicateRels);
+				extractContent(spark, inputPath, outputPath, shouldDuplicateRels, prefix);
 			});
 
 	}
 
 	private static void extractContent(SparkSession spark, String inputPath, String outputPath,
-		boolean shouldDuplicateRels) {
+		boolean shouldDuplicateRels, String prefix) {
 		spark
 			.read()
 			.textFile(inputPath + "/*")
@@ -91,7 +95,8 @@ public class CreateActionSetSparkJob implements Serializable {
 				(MapFunction<String, COCI>) value -> OBJECT_MAPPER.readValue(value, COCI.class),
 				Encoders.bean(COCI.class))
 			.flatMap(
-				(FlatMapFunction<COCI, Relation>) value -> createRelation(value, shouldDuplicateRels).iterator(),
+				(FlatMapFunction<COCI, Relation>) value -> createRelation(value, shouldDuplicateRels, prefix)
+					.iterator(),
 				Encoders.bean(Relation.class))
 			.filter((FilterFunction<Relation>) value -> value != null)
 			.toJavaRDD()
@@ -103,13 +108,19 @@ public class CreateActionSetSparkJob implements Serializable {
 
 	}
 
-	private static List<Relation> createRelation(COCI value, boolean duplicate) {
+	private static List<Relation> createRelation(COCI value, boolean duplicate, String p) {
 
 		List<Relation> relationList = new ArrayList<>();
+		String prefix;
+		if (p.equals("COCI")) {
+			prefix = DOI_PREFIX;
+		} else {
+			prefix = PMID_PREFIX;
+		}
 
-		String citing = ID_PREFIX
+		String citing = prefix
 			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", value.getCiting()));
-		final String cited = ID_PREFIX
+		final String cited = prefix
 			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", value.getCited()));
 
 		if (!citing.equals(cited)) {
@@ -120,7 +131,7 @@ public class CreateActionSetSparkJob implements Serializable {
 						cited, ModelConstants.CITES));
 
 			if (duplicate && value.getCiting().endsWith(".refs")) {
-				citing = ID_PREFIX + IdentifierFactory
+				citing = prefix + IdentifierFactory
 					.md5(
 						CleaningFunctions
 							.normalizePidValue(

@@ -60,6 +60,7 @@
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--inputFile</arg><arg>${inputFile}</arg>
             <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--prefix</arg><arg>${prefix}</arg>
         </java>
         <ok to="read"/>
         <error to="Kill"/>
@@ -82,10 +83,11 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--workingPath</arg><arg>${workingPath}/COCI</arg>
-            <arg>--outputPath</arg><arg>${workingPath}/COCI_JSON/</arg>
+            <arg>--workingPath</arg><arg>${workingPath}/${prefix}</arg>
+            <arg>--outputPath</arg><arg>${workingPath}/${prefix}_JSON/</arg>
             <arg>--delimiter</arg><arg>${delimiter}</arg>
             <arg>--inputFile</arg><arg>${inputFileCoci}</arg>
+            <arg>--format</arg><arg>${prefix}</arg>
         </spark>
         <ok to="create_actionset"/>
         <error to="Kill"/>
@@ -108,8 +110,9 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--inputPath</arg><arg>${workingPath}/COCI_JSON</arg>
+            <arg>--inputPath</arg><arg>${workingPath}/${prefix}_JSON</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
+            <arg>--prefix</arg><arg>${prefix}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
