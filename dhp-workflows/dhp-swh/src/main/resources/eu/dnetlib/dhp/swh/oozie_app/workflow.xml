@@ -39,6 +39,10 @@
             <description>Delay between API requests (in ms)</description>
         </property>
         <property>
+            <name>apiAccessToken</name>
+            <description>The API Key of the SWH API</description>
+        </property>
+        <property>
             <name>softwareLimit</name>
             <description>Limit on the number of repo URLs to use (Optional); for debug purposes</description>
         </property>
@@ -60,6 +64,10 @@
             <property>
                 <name>actionsetsPath</name>
                 <value>${actionsetsPath}</value>
+            </property>
+            <property>
+                <name>apiAccessToken</name>
+                <value>${apiAccessToken}</value>
             </property>
         </configuration>
     </global>
@@ -117,6 +125,7 @@
             <arg>--requestDelay</arg><arg>${requestDelay}</arg>
             <arg>--retryDelay</arg><arg>${retryDelay}</arg>
             <arg>--requestMethod</arg><arg>GET</arg>
+            <arg>--apiAccessToken</arg><arg>${apiAccessToken}</arg>
 
         </java>
         <ok to="archive-repository-urls"/>
@@ -136,6 +145,7 @@
             <arg>--requestDelay</arg><arg>${requestDelay}</arg>
             <arg>--retryDelay</arg><arg>${retryDelay}</arg>
             <arg>--requestMethod</arg><arg>POST</arg>
+            <arg>--apiAccessToken</arg><arg>${apiAccessToken}</arg>
 
         </java>
         <ok to="create-swh-actionsets"/>

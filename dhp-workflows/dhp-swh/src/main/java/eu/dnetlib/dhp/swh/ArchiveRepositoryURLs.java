@@ -63,9 +63,12 @@ public class ArchiveRepositoryURLs {
 		final Integer archiveThresholdInDays = Integer.parseInt(argumentParser.get("archiveThresholdInDays"));
 		log.info("archiveThresholdInDays: {}", archiveThresholdInDays);
 
+		final String apiAccessToken = argumentParser.get("apiAccessToken");
+		log.info("apiAccessToken: {}", apiAccessToken);
+
 		final HttpClientParams clientParams = SWHUtils.getClientParams(argumentParser);
 
-		swhConnection = new SWHConnection(clientParams);
+		swhConnection = new SWHConnection(clientParams, apiAccessToken);
 
 		final FileSystem fs = FileSystem.get(getHadoopConfiguration(hdfsuri));
 

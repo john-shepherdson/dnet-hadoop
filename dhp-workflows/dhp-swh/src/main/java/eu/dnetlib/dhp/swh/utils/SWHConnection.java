@@ -14,13 +14,15 @@ public class SWHConnection {
 
 	HttpConnector2 conn;
 
-	public SWHConnection(HttpClientParams clientParams) {
+	public SWHConnection(HttpClientParams clientParams, String accessToken) {
 
 		// set custom headers
 		Map<String, String> headers = new HashMap<String, String>() {
 			{
 				put(HttpHeaders.ACCEPT, "application/json");
-				put(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", SWHConstants.ACCESS_TOKEN));
+				if (accessToken != null) {
+					put(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", accessToken));
+				}
 			}
 		};
 

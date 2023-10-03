@@ -40,5 +40,11 @@
     "paramLongName": "requestMethod",
     "paramDescription": "the method of the requests to perform",
     "paramRequired": false
+  },
+  {
+    "paramName": "aat",
+    "paramLongName": "apiAccessToken",
+    "paramDescription": "the API access token of the SWH API",
+    "paramRequired": false
   }
 ]

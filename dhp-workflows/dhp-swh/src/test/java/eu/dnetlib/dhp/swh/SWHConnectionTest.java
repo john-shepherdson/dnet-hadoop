@@ -25,7 +25,7 @@ public class SWHConnectionTest {
 		HttpClientParams clientParams = new HttpClientParams();
 		clientParams.setRequestMethod("GET");
 
-		SWHConnection swhConnection = new SWHConnection(clientParams);
+		SWHConnection swhConnection = new SWHConnection(clientParams, null);
 
 		String repoUrl = "https://github.com/stanford-futuredata/FAST";
 		URL url = new URL(String.format(SWHConstants.SWH_LATEST_VISIT_URL, repoUrl));
@@ -43,7 +43,7 @@ public class SWHConnectionTest {
 		HttpClientParams clientParams = new HttpClientParams();
 		clientParams.setRequestMethod("POST");
 
-		SWHConnection swhConnection = new SWHConnection(clientParams);
+		SWHConnection swhConnection = new SWHConnection(clientParams, null);
 
 		String repoUrl = "https://github.com/stanford-futuredata/FAST";
 		URL url = new URL(String.format(SWHConstants.SWH_ARCHIVE_URL, SWHConstants.DEFAULT_VISIT_TYPE, repoUrl));

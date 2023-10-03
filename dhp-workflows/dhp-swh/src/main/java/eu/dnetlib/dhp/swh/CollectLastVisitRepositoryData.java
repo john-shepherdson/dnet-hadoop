@@ -55,9 +55,12 @@ public class CollectLastVisitRepositoryData {
 		final String outputPath = argumentParser.get("lastVisitsPath");
 		log.info("outputPath: {}", outputPath);
 
+		final String apiAccessToken = argumentParser.get("apiAccessToken");
+		log.info("apiAccessToken: {}", apiAccessToken);
+
 		final HttpClientParams clientParams = SWHUtils.getClientParams(argumentParser);
 
-		swhConnection = new SWHConnection(clientParams);
+		swhConnection = new SWHConnection(clientParams, apiAccessToken);
 
 		final FileSystem fs = FileSystem.get(getHadoopConfiguration(hdfsuri));
 

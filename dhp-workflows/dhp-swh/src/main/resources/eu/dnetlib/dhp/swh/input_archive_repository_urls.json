@@ -46,5 +46,11 @@
     "paramLongName": "archiveThresholdInDays",
     "paramDescription": "the thershold (in days) required to issue an archive request",
     "paramRequired": false
+  },
+  {
+    "paramName": "aat",
+    "paramLongName": "apiAccessToken",
+    "paramDescription": "the API access token of the SWH API",
+    "paramRequired": false
   }
 ]
