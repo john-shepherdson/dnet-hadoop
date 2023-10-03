@@ -19,6 +19,14 @@
             <description>The path in the HDFS to save the responses of the archive requests</description>
         </property>
         <property>
+            <name>actionsetsPath</name>
+            <description>The path in the HDFS to save the action sets</description>
+        </property>
+        <property>
+            <name>graphPath</name>
+            <description>The path in the HDFS to the base folder of the graph</description>
+        </property>
+        <property>
             <name>maxNumberOfRetry</name>
             <description>Max number of retries for failed API calls</description>
         </property>
@@ -29,6 +37,10 @@
         <property>
             <name>requestDelay</name>
             <description>Delay between API requests (in ms)</description>
+        </property>
+        <property>
+            <name>softwareLimit</name>
+            <description>Limit on the number of repo URLs to use (Optional); for debug purposes</description>
         </property>
         <property>
             <name>resume</name>

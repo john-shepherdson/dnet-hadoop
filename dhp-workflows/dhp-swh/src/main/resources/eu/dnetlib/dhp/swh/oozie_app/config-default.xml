@@ -47,4 +47,8 @@
         <name>oozie.launcher.mapreduce.user.classpath.first</name>
         <value>true</value>
     </property>
+    <property>
+        <name>sparkSqlWarehouseDir</name>
+        <value>/user/hive/warehouse</value>
+    </property>
 </configuration>
