@@ -165,6 +165,14 @@ public class PrepareSWHActionsets {
 									row.getString(row.fieldIndex("swhid")),
 									qualifier,
 									dataInfo)));
+
+			// add SWH in the `collectedFrom` field
+			KeyValue kv = new KeyValue();
+			kv.setKey(SWHConstants.SWH_ID);
+			kv.setValue(SWHConstants.SWH_NAME);
+
+			s.setCollectedfrom(Arrays.asList(kv));
+
 			return s;
 		}, Encoders.bean(Software.class))
 			.toJavaRDD()

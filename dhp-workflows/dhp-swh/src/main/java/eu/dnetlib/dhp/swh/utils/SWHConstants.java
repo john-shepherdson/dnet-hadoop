@@ -16,4 +16,8 @@ public class SWHConstants {
 
 	public static final String SWHID_CLASSNAME = "Software Heritage Identifier";
 
+	public static final String SWH_ID = "10|openaire____::dbfd07503aaa1ed31beed7dec942f3f4";
+
+	public static final String SWH_NAME = "Software Heritage";
+
 }
