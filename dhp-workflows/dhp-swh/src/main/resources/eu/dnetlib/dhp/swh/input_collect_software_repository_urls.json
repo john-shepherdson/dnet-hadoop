@@ -22,5 +22,11 @@
     "paramLongName": "hiveMetastoreUris",
     "paramDescription": "the hive metastore uris",
     "paramRequired": true
+  },
+  {
+    "paramName": "slim",
+    "paramLongName": "softwareLimit",
+    "paramDescription": "limit on the number of software repo URL to fetch",
+    "paramRequired": false
   }
 ]

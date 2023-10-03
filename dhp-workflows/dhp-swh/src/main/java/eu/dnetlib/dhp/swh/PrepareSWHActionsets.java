@@ -82,7 +82,6 @@ public class PrepareSWHActionsets {
 				softwareRDD
 					.saveAsHadoopFile(
 						outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
-//								, GzipCodec.class);
 			});
 	}
 

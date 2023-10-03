@@ -83,6 +83,7 @@
             <arg>--softwareCodeRepositoryURLs</arg><arg>${softwareCodeRepositoryURLs}</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
+            <arg>--softwareLimit</arg><arg>${softwareLimit}</arg>
         </spark>
         <ok to="collect-repository-last-visit-data"/>
         <error to="Kill"/>

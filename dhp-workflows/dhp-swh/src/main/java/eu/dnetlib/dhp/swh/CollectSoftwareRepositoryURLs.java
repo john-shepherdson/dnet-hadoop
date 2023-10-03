@@ -51,6 +51,9 @@ public class CollectSoftwareRepositoryURLs {
 		final String hiveMetastoreUris = parser.get("hiveMetastoreUris");
 		log.info("hiveMetastoreUris: {}", hiveMetastoreUris);
 
+		final Integer softwareLimit = Integer.parseInt(parser.get("softwareLimit"));
+		log.info("softwareLimit: {}", softwareLimit);
+
 		SparkConf conf = new SparkConf();
 		conf.set("hive.metastore.uris", hiveMetastoreUris);
 
@@ -58,18 +61,23 @@ public class CollectSoftwareRepositoryURLs {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				doRun(spark, hiveDbName, outputPath);
+				doRun(spark, hiveDbName, softwareLimit, outputPath);
 			});
 	}
 
-	private static <I extends Result> void doRun(SparkSession spark, String hiveDbName, String outputPath) {
+	private static <I extends Result> void doRun(SparkSession spark, String hiveDbName, Integer limit,
+		String outputPath) {
 
 		String queryTemplate = "SELECT distinct coderepositoryurl.value " +
 			"FROM %s.software " +
 			"WHERE coderepositoryurl.value IS NOT NULL " +
 			"AND datainfo.deletedbyinference = FALSE " +
-			"AND datainfo.invisible = FALSE " +
-			"LIMIT 5000";
+			"AND datainfo.invisible = FALSE ";
+
+		if (limit != null) {
+			queryTemplate += String.format("LIMIT %s", limit);
+		}
+
 		String query = String.format(queryTemplate, hiveDbName);
 
 		log.info("Hive query to fetch software code URLs: {}", query);
