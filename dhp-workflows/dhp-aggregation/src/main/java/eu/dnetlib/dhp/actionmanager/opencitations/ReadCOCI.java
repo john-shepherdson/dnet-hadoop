@@ -49,6 +49,9 @@ public class ReadCOCI implements Serializable {
 		final String workingPath = parser.get("workingPath");
 		log.info("workingPath {}", workingPath);
 
+		final String format = parser.get("format");
+		log.info("format {}", format);
+
 		SparkConf sconf = new SparkConf();
 
 		final String delimiter = Optional
@@ -64,13 +67,14 @@ public class ReadCOCI implements Serializable {
 					workingPath,
 					inputFile,
 					outputPath,
-					delimiter);
+					delimiter,
+					format);
 			});
 	}
 
 	private static void doRead(SparkSession spark, String workingPath, String[] inputFiles,
 		String outputPath,
-		String delimiter) throws IOException {
+		String delimiter, String format) throws IOException {
 
 		for (String inputFile : inputFiles) {
 			String p_string = workingPath + "/" + inputFile + ".gz";
@@ -87,9 +91,15 @@ public class ReadCOCI implements Serializable {
 
 			cociData.map((MapFunction<Row, COCI>) row -> {
 				COCI coci = new COCI();
+				if (format.equals("COCI")) {
+					coci.setCiting(row.getString(1));
+					coci.setCited(row.getString(2));
+				} else {
+					coci.setCiting(String.valueOf(row.getInt(1)));
+					coci.setCited(String.valueOf(row.getInt(2)));
+				}
 				coci.setOci(row.getString(0));
-				coci.setCiting(row.getString(1));
-				coci.setCited(row.getString(2));
+
 				return coci;
 			}, Encoders.bean(COCI.class))
 				.write()
