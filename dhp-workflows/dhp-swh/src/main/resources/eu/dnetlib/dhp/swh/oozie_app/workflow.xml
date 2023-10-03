@@ -57,6 +57,10 @@
                 <name>oozie.action.sharelib.for.spark</name>
                 <value>${oozieActionShareLibForSpark2}</value>
             </property>
+            <property>
+                <name>actionsetsPath</name>
+                <value>${actionsetsPath}</value>
+            </property>
         </configuration>
     </global>
 

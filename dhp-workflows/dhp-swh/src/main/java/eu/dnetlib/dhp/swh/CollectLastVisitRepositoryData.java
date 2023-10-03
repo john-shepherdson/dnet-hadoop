@@ -1,12 +1,12 @@
 
 package eu.dnetlib.dhp.swh;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.collection.CollectorException;
-import eu.dnetlib.dhp.common.collection.HttpClientParams;
-import eu.dnetlib.dhp.swh.utils.SWHConnection;
-import eu.dnetlib.dhp.swh.utils.SWHConstants;
-import eu.dnetlib.dhp.swh.utils.SWHUtils;
+import static eu.dnetlib.dhp.utils.DHPUtils.getHadoopConfiguration;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.net.URL;
+
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.FileStatus;
@@ -16,11 +16,12 @@ import org.apache.hadoop.io.SequenceFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.net.URL;
-
-import static eu.dnetlib.dhp.utils.DHPUtils.getHadoopConfiguration;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.collection.CollectorException;
+import eu.dnetlib.dhp.common.collection.HttpClientParams;
+import eu.dnetlib.dhp.swh.utils.SWHConnection;
+import eu.dnetlib.dhp.swh.utils.SWHConstants;
+import eu.dnetlib.dhp.swh.utils.SWHUtils;
 
 /**
  * Given a file with software repository URLs, this class
