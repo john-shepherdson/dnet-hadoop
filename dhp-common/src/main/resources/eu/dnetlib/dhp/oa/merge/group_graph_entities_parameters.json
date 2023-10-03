@@ -8,13 +8,25 @@
   {
     "paramName": "gin",
     "paramLongName": "graphInputPath",
-    "paramDescription": "the graph root path",
+    "paramDescription": "the input graph root path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "cp",
+    "paramLongName": "checkpointPath",
+    "paramDescription": "checkpoint directory",
     "paramRequired": true
   },
   {
     "paramName": "out",
     "paramLongName": "outputPath",
-    "paramDescription": "the output merged graph root path",
+    "paramDescription": "the output graph root path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "fi",
+    "paramLongName": "filterInvisible",
+    "paramDescription": "if true filters out invisible entities",
     "paramRequired": true
   }
 ]
