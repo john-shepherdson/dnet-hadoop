@@ -162,7 +162,7 @@ public class PrepareSWHActionsets {
 						.asList(
 							OafMapperUtils
 								.structuredProperty(
-									row.getString(row.fieldIndex("swhid")),
+									String.format("swh:1:snp:%s", row.getString(row.fieldIndex("swhid"))),
 									qualifier,
 									dataInfo)));
 
