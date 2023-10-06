@@ -67,60 +67,60 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 		log.info("graphOutputPath: '{}'", graphOutputPath);
 
 		Dataset<Relation> mergeRels = spark
-				.read()
-				.load(DedupUtility.createMergeRelPath(workingPath, "*", "*"))
-				.as(REL_BEAN_ENC);
+			.read()
+			.load(DedupUtility.createMergeRelPath(workingPath, "*", "*"))
+			.as(REL_BEAN_ENC);
 
 		// <mergedObjectID, dedupID>
 		Dataset<Row> idsToMerge = mergeRels
-				.where(col("relClass").equalTo(ModelConstants.MERGES))
-				.select(col("source").as("dedupID"), col("target").as("mergedObjectID"))
-				.distinct();
+			.where(col("relClass").equalTo(ModelConstants.MERGES))
+			.select(col("source").as("dedupID"), col("target").as("mergedObjectID"))
+			.distinct();
 
 		Dataset<Row> allRels = spark
-				.read()
-				.schema(REL_BEAN_ENC.schema())
-				.json(graphBasePath + "/relation");
+			.read()
+			.schema(REL_BEAN_ENC.schema())
+			.json(graphBasePath + "/relation");
 
 		Dataset<Relation> dedupedRels = allRels
-				.joinWith(idsToMerge, allRels.col("source").equalTo(idsToMerge.col("mergedObjectID")), "left_outer")
-				.joinWith(idsToMerge, col("_1.target").equalTo(idsToMerge.col("mergedObjectID")), "left_outer")
-				.select("_1._1", "_1._2.dedupID", "_2.dedupID")
-				.as(Encoders.tuple(REL_BEAN_ENC, Encoders.STRING(), Encoders.STRING()))
-				.map((MapFunction<Tuple3<Relation, String, String>, Relation>) t -> {
-					Relation rel = t._1();
-					String newSource = t._2();
-					String newTarget = t._3();
+			.joinWith(idsToMerge, allRels.col("source").equalTo(idsToMerge.col("mergedObjectID")), "left_outer")
+			.joinWith(idsToMerge, col("_1.target").equalTo(idsToMerge.col("mergedObjectID")), "left_outer")
+			.select("_1._1", "_1._2.dedupID", "_2.dedupID")
+			.as(Encoders.tuple(REL_BEAN_ENC, Encoders.STRING(), Encoders.STRING()))
+			.map((MapFunction<Tuple3<Relation, String, String>, Relation>) t -> {
+				Relation rel = t._1();
+				String newSource = t._2();
+				String newTarget = t._3();
 
-					if (rel.getDataInfo() == null) {
-						rel.setDataInfo(new DataInfo());
-					}
+				if (rel.getDataInfo() == null) {
+					rel.setDataInfo(new DataInfo());
+				}
 
-					if (newSource != null || newTarget != null) {
-						rel.getDataInfo().setDeletedbyinference(false);
+				if (newSource != null || newTarget != null) {
+					rel.getDataInfo().setDeletedbyinference(false);
 
-						if (newSource != null)
-							rel.setSource(newSource);
+					if (newSource != null)
+						rel.setSource(newSource);
 
-						if (newTarget != null)
-							rel.setTarget(newTarget);
-					}
+					if (newTarget != null)
+						rel.setTarget(newTarget);
+				}
 
-					return rel;
-				}, REL_BEAN_ENC);
+				return rel;
+			}, REL_BEAN_ENC);
 
 		// ids of records that are both not deletedbyinference and not invisible
 		Dataset<Row> ids = validIds(spark, graphBasePath);
 
 		// filter relations that point to valid records, can force them to be visible
 		Dataset<Relation> cleanedRels = dedupedRels
-				.join(ids, col("source").equalTo(ids.col("id")), "leftsemi")
-				.join(ids, col("target").equalTo(ids.col("id")), "leftsemi")
-				.as(REL_BEAN_ENC)
-				.map((MapFunction<Relation, Relation>) r -> {
-					r.getDataInfo().setInvisible(false);
-					return r;
-				}, REL_KRYO_ENC);
+			.join(ids, col("source").equalTo(ids.col("id")), "leftsemi")
+			.join(ids, col("target").equalTo(ids.col("id")), "leftsemi")
+			.as(REL_BEAN_ENC)
+			.map((MapFunction<Relation, Relation>) r -> {
+				r.getDataInfo().setInvisible(false);
+				return r;
+			}, REL_KRYO_ENC);
 
 		Dataset<Relation> distinctRels = cleanedRels
 			.groupByKey(

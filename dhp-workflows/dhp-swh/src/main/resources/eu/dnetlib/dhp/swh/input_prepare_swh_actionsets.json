@@ -1,0 +1,26 @@
+[
+  {
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "when true will stop SparkSession after job execution",
+    "paramRequired": false
+  },
+  {
+    "paramName": "lv",
+    "paramLongName": "lastVisitsPath",
+    "paramDescription": "the URL where to store last visits data",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ap",
+    "paramLongName": "actionsetsPath",
+    "paramDescription": "the URL path where to store actionsets",
+    "paramRequired": true
+  },
+  {
+    "paramName": "sip",
+    "paramLongName": "softwareInputPath",
+    "paramDescription": "the URL path of the software in the graph",
+    "paramRequired": true
+  }
+]
