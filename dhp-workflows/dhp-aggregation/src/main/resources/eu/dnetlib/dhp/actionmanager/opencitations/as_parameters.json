@@ -16,15 +16,11 @@
     "paramLongName": "isSparkSessionManaged",
     "paramDescription": "the hdfs name node",
     "paramRequired": false
-  },  {
-  "paramName": "sdr",
-  "paramLongName": "shouldDuplicateRels",
-  "paramDescription": "the hdfs name node",
-  "paramRequired": false
-},{
-  "paramName": "p",
-  "paramLongName": "prefix",
-  "paramDescription": "the hdfs name node",
-  "paramRequired": true
-}
+  },
+  {
+    "paramName": "sdr",
+    "paramLongName": "shouldDuplicateRels",
+    "paramDescription": "activates/deactivates the construction of bidirectional relations Cites/IsCitedBy",
+    "paramRequired": false
+  }
 ]

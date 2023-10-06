@@ -7,6 +7,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -42,7 +43,7 @@ public class ReadCOCI implements Serializable {
 		log.info("outputPath: {}", outputPath);
 
 		final String[] inputFile = parser.get("inputFile").split(";");
-		log.info("inputFile {}", inputFile.toString());
+		log.info("inputFile {}", Arrays.asList(inputFile));
 		Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
@@ -74,10 +75,10 @@ public class ReadCOCI implements Serializable {
 
 	private static void doRead(SparkSession spark, String workingPath, String[] inputFiles,
 		String outputPath,
-		String delimiter, String format) throws IOException {
+		String delimiter, String format) {
 
 		for (String inputFile : inputFiles) {
-			String p_string = workingPath + "/" + inputFile + ".gz";
+			String pString = workingPath + "/" + inputFile + ".gz";
 
 			Dataset<Row> cociData = spark
 				.read()
@@ -86,7 +87,7 @@ public class ReadCOCI implements Serializable {
 				.option("inferSchema", "true")
 				.option("header", "true")
 				.option("quotes", "\"")
-				.load(p_string)
+				.load(pString)
 				.repartition(100);
 
 			cociData.map((MapFunction<Row, COCI>) row -> {

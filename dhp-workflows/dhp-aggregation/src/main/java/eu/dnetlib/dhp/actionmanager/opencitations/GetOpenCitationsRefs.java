@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.actionmanager.opencitations;
 
 import java.io.*;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
@@ -37,7 +38,7 @@ public class GetOpenCitationsRefs implements Serializable {
 		parser.parseArgument(args);
 
 		final String[] inputFile = parser.get("inputFile").split(";");
-		log.info("inputFile {}", inputFile.toString());
+		log.info("inputFile {}", Arrays.asList(inputFile));
 
 		final String workingPath = parser.get("workingPath");
 		log.info("workingPath {}", workingPath);

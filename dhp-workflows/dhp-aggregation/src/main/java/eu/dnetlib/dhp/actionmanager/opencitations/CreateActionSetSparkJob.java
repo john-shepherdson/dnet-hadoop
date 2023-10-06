@@ -32,18 +32,28 @@ import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
 public class CreateActionSetSparkJob implements Serializable {
 	public static final String OPENCITATIONS_CLASSID = "sysimport:crosswalk:opencitations";
 	public static final String OPENCITATIONS_CLASSNAME = "Imported from OpenCitations";
+
+	// DOI-to-DOI citations
+	public static final String COCI = "COCI";
+
+	// PMID-to-PMID citations
+	public static final String POCI = "POCI";
+
 	private static final String DOI_PREFIX = "50|doi_________::";
 
 	private static final String PMID_PREFIX = "50|pmid________::";
+
 	private static final String TRUST = "0.91";
 
 	private static final Logger log = LoggerFactory.getLogger(CreateActionSetSparkJob.class);
+
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(final String[] args) throws IOException, ParseException {
@@ -67,7 +77,7 @@ public class CreateActionSetSparkJob implements Serializable {
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		final String inputPath = parser.get("inputPath");
-		log.info("inputPath {}", inputPath.toString());
+		log.info("inputPath {}", inputPath);
 
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath {}", outputPath);
@@ -81,19 +91,16 @@ public class CreateActionSetSparkJob implements Serializable {
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
-			spark -> {
-				extractContent(spark, inputPath, outputPath, shouldDuplicateRels);
-			});
+			spark -> extractContent(spark, inputPath, outputPath, shouldDuplicateRels));
 
 	}
 
 	private static void extractContent(SparkSession spark, String inputPath, String outputPath,
 		boolean shouldDuplicateRels) {
 
-		getTextTextJavaPairRDD(spark, inputPath, shouldDuplicateRels, "COCI")
-			.union(getTextTextJavaPairRDD(spark, inputPath, shouldDuplicateRels, "POCI"))
+		getTextTextJavaPairRDD(spark, inputPath, shouldDuplicateRels, COCI)
+			.union(getTextTextJavaPairRDD(spark, inputPath, shouldDuplicateRels, POCI))
 			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
-
 	}
 
 	private static JavaPairRDD<Text, Text> getTextTextJavaPairRDD(SparkSession spark, String inputPath,
@@ -109,7 +116,7 @@ public class CreateActionSetSparkJob implements Serializable {
 					value, shouldDuplicateRels, prefix)
 						.iterator(),
 				Encoders.bean(Relation.class))
-			.filter((FilterFunction<Relation>) value -> value != null)
+			.filter((FilterFunction<Relation>) Objects::nonNull)
 			.toJavaRDD()
 			.map(p -> new AtomicAction(p.getClass(), p))
 			.mapToPair(
@@ -123,20 +130,28 @@ public class CreateActionSetSparkJob implements Serializable {
 		String prefix;
 		String citing;
 		String cited;
-		if (p.equals("COCI")) {
-			prefix = DOI_PREFIX;
-			citing = prefix
-				+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", value.getCiting()));
-			cited = prefix
-				+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", value.getCited()));
 
-		} else {
-			prefix = PMID_PREFIX;
-			citing = prefix
-				+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("pmid", value.getCiting()));
-			cited = prefix
-				+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("pmid", value.getCited()));
-
+		switch (p) {
+			case COCI:
+				prefix = DOI_PREFIX;
+				citing = prefix
+					+ IdentifierFactory
+						.md5(CleaningFunctions.normalizePidValue(PidType.doi.toString(), value.getCiting()));
+				cited = prefix
+					+ IdentifierFactory
+						.md5(CleaningFunctions.normalizePidValue(PidType.doi.toString(), value.getCited()));
+				break;
+			case POCI:
+				prefix = PMID_PREFIX;
+				citing = prefix
+					+ IdentifierFactory
+						.md5(CleaningFunctions.normalizePidValue(PidType.pmid.toString(), value.getCiting()));
+				cited = prefix
+					+ IdentifierFactory
+						.md5(CleaningFunctions.normalizePidValue(PidType.pmid.toString(), value.getCited()));
+				break;
+			default:
+				throw new IllegalStateException("Invalid prefix: " + p);
 		}
 
 		if (!citing.equals(cited)) {
@@ -162,7 +177,7 @@ public class CreateActionSetSparkJob implements Serializable {
 	public static Relation getRelation(
 		String source,
 		String target,
-		String relclass) {
+		String relClass) {
 
 		return OafMapperUtils
 			.getRelation(
@@ -170,7 +185,7 @@ public class CreateActionSetSparkJob implements Serializable {
 				target,
 				ModelConstants.RESULT_RESULT,
 				ModelConstants.CITATION,
-				relclass,
+				relClass,
 				Arrays
 					.asList(
 						OafMapperUtils.keyValue(ModelConstants.OPENOCITATIONS_ID, ModelConstants.OPENOCITATIONS_NAME)),
@@ -183,6 +198,6 @@ public class CreateActionSetSparkJob implements Serializable {
 								ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS),
 						TRUST),
 				null);
-
 	}
+
 }
