@@ -39,7 +39,8 @@
 		<switch>
 			<!-- The default will be set as the normal start, a.k.a. get-doi-synonyms -->
 			<!-- If any different condition is set, go to the corresponding start -->
-			<case to="non-iterative-rankings">${wf:conf('resume') eq "rankings-start"}</case>
+			<case to="spark-cc">${wf:conf('resume') eq "cc"}</case>
+			<case to="spark-ram">${wf:conf('resume') eq "ram"}</case>
 			<case to="spark-impulse">${wf:conf('resume') eq "impulse"}</case>
 			<case to="spark-pagerank">${wf:conf('resume') eq "pagerank"}</case>
 			<case to="spark-attrank">${wf:conf('resume') eq "attrank"}</case>
@@ -89,17 +90,10 @@
 			<file>${nameNode}${wfAppPath}/create_openaire_ranking_graph.py#create_openaire_ranking_graph.py</file>
 		</spark>
 
-		<ok to="non-iterative-rankings" />
+		<ok to="spark-cc"/>
 		<error to="openaire-graph-error" />
 
 	</action>
-
-	<!-- Citation Count and RAM are calculated in parallel-->
-	<fork name="non-iterative-rankings">
-		<path start="spark-cc"/>
-		<!-- <path start="spark-impulse"/> -->
-		<path start="spark-ram"/>
-	</fork>
 
 	<!-- Run Citation Count calculation -->
 	<action name="spark-cc">
@@ -129,7 +123,7 @@
 			<file>${wfAppPath}/bip-ranker/CC.py#CC.py</file>
 		</spark>
 
-		<ok to="join-non-iterative-rankings" />
+		<ok to="spark-ram" />
 		<error to="cc-fail" />
 
 	</action>
@@ -165,13 +159,10 @@
 			<file>${wfAppPath}/bip-ranker/TAR.py#TAR.py</file>
 		</spark>
 
-		<ok to="join-non-iterative-rankings" />
+		<ok to="spark-impulse" />
 		<error to="ram-fail" />
 
 	</action>
-
-	<!-- Join non-iterative methods -->
-	<join name="join-non-iterative-rankings" to="spark-impulse"/>
 
 	<action name="spark-impulse">
 		<spark xmlns="uri:oozie:spark-action:0.2">

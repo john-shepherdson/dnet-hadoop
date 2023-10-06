@@ -45,6 +45,9 @@ public class GetOpenCitationsRefs implements Serializable {
 		final String hdfsNameNode = parser.get("hdfsNameNode");
 		log.info("hdfsNameNode {}", hdfsNameNode);
 
+		final String prefix = parser.get("prefix");
+		log.info("prefix {}", prefix);
+
 		Configuration conf = new Configuration();
 		conf.set("fs.defaultFS", hdfsNameNode);
 
@@ -53,30 +56,31 @@ public class GetOpenCitationsRefs implements Serializable {
 		GetOpenCitationsRefs ocr = new GetOpenCitationsRefs();
 
 		for (String file : inputFile) {
-			ocr.doExtract(workingPath + "/Original/" + file, workingPath, fileSystem);
+			ocr.doExtract(workingPath + "/Original/" + file, workingPath, fileSystem, prefix);
 		}
 
 	}
 
-	private void doExtract(String inputFile, String workingPath, FileSystem fileSystem)
+	private void doExtract(String inputFile, String workingPath, FileSystem fileSystem, String prefix)
 		throws IOException {
 
 		final Path path = new Path(inputFile);
 
 		FSDataInputStream oc_zip = fileSystem.open(path);
 
-		int count = 1;
+		// int count = 1;
 		try (ZipInputStream zis = new ZipInputStream(oc_zip)) {
 			ZipEntry entry = null;
 			while ((entry = zis.getNextEntry()) != null) {
 
 				if (!entry.isDirectory()) {
 					String fileName = entry.getName();
-					fileName = fileName.substring(0, fileName.indexOf("T")) + "_" + count;
-					count++;
+					// fileName = fileName.substring(0, fileName.indexOf("T")) + "_" + count;
+					fileName = fileName.substring(0, fileName.lastIndexOf("."));
+					// count++;
 					try (
 						FSDataOutputStream out = fileSystem
-							.create(new Path(workingPath + "/COCI/" + fileName + ".gz"));
+							.create(new Path(workingPath + "/" + prefix + "/" + fileName + ".gz"));
 						GZIPOutputStream gzipOs = new GZIPOutputStream(new BufferedOutputStream(out))) {
 
 						IOUtils.copy(zis, gzipOs);

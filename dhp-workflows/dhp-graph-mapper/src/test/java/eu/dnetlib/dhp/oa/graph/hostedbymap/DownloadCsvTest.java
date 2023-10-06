@@ -49,7 +49,7 @@ public class DownloadCsvTest {
 	@Test
 	void getUnibiFileTest() throws CollectorException, IOException, ClassNotFoundException {
 
-		String fileURL = "https://pub.uni-bielefeld.de/download/2944717/2944718/issn_gold_oa_version_4.csv";
+		String fileURL = "https://pub.uni-bielefeld.de/download/2944717/2944718/issn_gold_oa_version_5.csv";
 
 		final String outputFile = workingDir + "/unibi_gold.json";
 		new DownloadCSV()

@@ -21,5 +21,10 @@
   "paramLongName": "shouldDuplicateRels",
   "paramDescription": "the hdfs name node",
   "paramRequired": false
+},{
+  "paramName": "p",
+  "paramLongName": "prefix",
+  "paramDescription": "the hdfs name node",
+  "paramRequired": true
 }
 ]

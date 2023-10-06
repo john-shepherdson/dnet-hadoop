@@ -16,5 +16,11 @@
     "paramLongName": "hdfsNameNode",
     "paramDescription": "the hdfs name node",
     "paramRequired": true
+  },
+  {
+    "paramName": "p",
+    "paramLongName": "prefix",
+    "paramDescription": "COCI or POCI",
+    "paramRequired": true
   }
 ]
