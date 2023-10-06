@@ -107,7 +107,14 @@ public class HttpConnector2 {
 			urlConn.setReadTimeout(getClientParams().getReadTimeOut() * 1000);
 			urlConn.setConnectTimeout(getClientParams().getConnectTimeOut() * 1000);
 			urlConn.addRequestProperty(HttpHeaders.USER_AGENT, userAgent);
+			urlConn.setRequestMethod(getClientParams().getRequestMethod());
 
+			// if provided, add custom headers
+			if (!getClientParams().getHeaders().isEmpty()) {
+				for (Map.Entry<String, String> headerEntry : getClientParams().getHeaders().entrySet()) {
+					urlConn.addRequestProperty(headerEntry.getKey(), headerEntry.getValue());
+				}
+			}
 			if (log.isDebugEnabled()) {
 				logHeaderFields(urlConn);
 			}
