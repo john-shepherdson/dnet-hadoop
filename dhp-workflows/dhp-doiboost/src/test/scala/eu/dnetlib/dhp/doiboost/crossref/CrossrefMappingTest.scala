@@ -50,7 +50,7 @@ class CrossrefMappingTest {
     }
   }
 
-  def checkRelation(generatedOAF: List[Oaf]): Unit = {
+    def checkRelation(generatedOAF: List[Oaf]): Unit = {
 
     val rels: List[Relation] =
       generatedOAF.filter(p => p.isInstanceOf[Relation]).asInstanceOf[List[Relation]]
