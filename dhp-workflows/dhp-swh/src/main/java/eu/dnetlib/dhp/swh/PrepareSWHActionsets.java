@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -81,7 +82,7 @@ public class PrepareSWHActionsets {
 				JavaPairRDD<Text, Text> softwareRDD = prepareActionsets(spark, inputPath, softwareInputPath);
 				softwareRDD
 					.saveAsHadoopFile(
-						outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
+						outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
 			});
 	}
 
