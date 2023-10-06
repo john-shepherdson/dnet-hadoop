@@ -47,7 +47,7 @@
             <description>Limit on the number of repo URLs to use (Optional); for debug purposes</description>
         </property>
         <property>
-            <name>resume</name>
+            <name>resumeFrom</name>
             <description>Variable that indicates the step to start from</description>
         </property>
     </parameters>
@@ -80,8 +80,8 @@
 
     <decision name="startFrom">
         <switch>
-            <case to="collect-software-repository-urls">${wf:conf('startFrom') eq 'collect-software-repository-urls'}</case>
-            <case to="create-swh-actionsets">${wf:conf('startFrom') eq 'create-swh-actionsets'}</case>
+            <case to="collect-software-repository-urls">${wf:conf('resumeFrom') eq 'collect-software-repository-urls'}</case>
+            <case to="create-swh-actionsets">${wf:conf('resumeFrom') eq 'create-swh-actionsets'}</case>
             <default to="collect-software-repository-urls"/>
         </switch>
     </decision>
