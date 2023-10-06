@@ -34,6 +34,7 @@
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
     <action name="download">
         <shell xmlns="uri:oozie:shell-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
@@ -54,6 +55,7 @@
         <ok to="extract"/>
         <error to="Kill"/>
     </action>
+
     <action name="extract">
         <java>
             <main-class>eu.dnetlib.dhp.actionmanager.opencitations.GetOpenCitationsRefs</main-class>
@@ -112,7 +114,6 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${workingPath}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
-            <arg>--prefix</arg><arg>${prefix}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
