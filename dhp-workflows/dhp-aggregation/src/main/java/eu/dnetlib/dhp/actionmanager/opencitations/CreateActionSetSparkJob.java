@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
 
+import eu.dnetlib.dhp.schema.oaf.utils.*;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
@@ -29,10 +30,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
-import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
@@ -136,19 +133,19 @@ public class CreateActionSetSparkJob implements Serializable {
 				prefix = DOI_PREFIX;
 				citing = prefix
 					+ IdentifierFactory
-						.md5(CleaningFunctions.normalizePidValue(PidType.doi.toString(), value.getCiting()));
+						.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), value.getCiting()));
 				cited = prefix
 					+ IdentifierFactory
-						.md5(CleaningFunctions.normalizePidValue(PidType.doi.toString(), value.getCited()));
+						.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), value.getCited()));
 				break;
 			case POCI:
 				prefix = PMID_PREFIX;
 				citing = prefix
 					+ IdentifierFactory
-						.md5(CleaningFunctions.normalizePidValue(PidType.pmid.toString(), value.getCiting()));
+						.md5(PidCleaner.normalizePidValue(PidType.pmid.toString(), value.getCiting()));
 				cited = prefix
 					+ IdentifierFactory
-						.md5(CleaningFunctions.normalizePidValue(PidType.pmid.toString(), value.getCited()));
+						.md5(PidCleaner.normalizePidValue(PidType.pmid.toString(), value.getCited()));
 				break;
 			default:
 				throw new IllegalStateException("Invalid prefix: " + p);
