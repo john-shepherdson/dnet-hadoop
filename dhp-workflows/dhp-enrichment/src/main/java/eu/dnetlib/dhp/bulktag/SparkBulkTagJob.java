@@ -6,7 +6,6 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.*;
 
-import eu.dnetlib.dhp.api.Utils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
@@ -21,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
+import eu.dnetlib.dhp.api.Utils;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.bulktag.community.*;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
@@ -87,7 +87,7 @@ public class SparkBulkTagJob {
 		if (isTest) {
 			cc = CommunityConfigurationFactory.newInstance(taggingConf);
 		} else {
-			cc = Utils.getCommunityConfiguration();//QueryInformationSystem.getCommunityConfiguration(parser.get("isLookUpUrl"));
+			cc = Utils.getCommunityConfiguration();// QueryInformationSystem.getCommunityConfiguration(parser.get("isLookUpUrl"));
 		}
 
 		runWithSparkSession(

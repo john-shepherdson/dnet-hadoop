@@ -1,8 +1,9 @@
+
 package eu.dnetlib.dhp.api.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * @author miriam.baglioni
@@ -11,13 +12,13 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProjectModel implements Serializable {
 
-   private String openaireId;
+	private String openaireId;
 
-    public String getOpenaireId() {
-        return openaireId;
-    }
+	public String getOpenaireId() {
+		return openaireId;
+	}
 
-    public void setOpenaireId(String openaireId) {
-        this.openaireId = openaireId;
-    }
+	public void setOpenaireId(String openaireId) {
+		this.openaireId = openaireId;
+	}
 }

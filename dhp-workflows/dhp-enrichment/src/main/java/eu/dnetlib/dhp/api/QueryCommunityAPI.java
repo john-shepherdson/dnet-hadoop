@@ -21,7 +21,7 @@ import com.google.gson.Gson;
 public class QueryCommunityAPI {
 	private static final String baseUrl = "https://services.openaire.eu/openaire/";
 
-	private static String get(String geturl) throws IOException{
+	private static String get(String geturl) throws IOException {
 		URL url = new URL(geturl);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		conn.setDoOutput(true);
@@ -44,7 +44,7 @@ public class QueryCommunityAPI {
 		return get(baseUrl + "community/" + id);
 	}
 
-	public static String communityDatasource(String id)throws IOException{
+	public static String communityDatasource(String id) throws IOException {
 		return get(baseUrl + "community/" + id + "/contentproviders");
 
 	}
@@ -53,8 +53,8 @@ public class QueryCommunityAPI {
 		return get(baseUrl + "community/" + id + "/propagationOrganizations");
 	}
 
-	public static String communityProjects(String id, String page, String size) throws IOException{
-		return get(baseUrl + "community/" + id +"/projects/" + page + "/" + size);
+	public static String communityProjects(String id, String page, String size) throws IOException {
+		return get(baseUrl + "community/" + id + "/projects/" + page + "/" + size);
 	}
 
 	@NotNull
@@ -73,6 +73,5 @@ public class QueryCommunityAPI {
 		}
 		return body;
 	}
-
 
 }

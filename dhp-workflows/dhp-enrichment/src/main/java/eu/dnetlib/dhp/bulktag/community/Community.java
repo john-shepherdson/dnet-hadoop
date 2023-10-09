@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import com.google.gson.Gson;
 
-
 /** Created by miriam on 01/08/2018. */
 public class Community implements Serializable {
 

@@ -1,10 +1,11 @@
+
 package eu.dnetlib.dhp.api.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.google.gson.Gson;
-import eu.dnetlib.dhp.bulktag.community.SelectionConstraints;
 
+import eu.dnetlib.dhp.bulktag.community.SelectionConstraints;
 
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -30,10 +31,9 @@ public class CommunityContentprovider {
 		this.openaireId = openaireId;
 	}
 
-
 	public SelectionConstraints getSelectioncriteria() {
 
-		return  this.selectioncriteria;
+		return this.selectioncriteria;
 	}
 
 	public void setSelectioncriteria(SelectionConstraints selectioncriteria) {

@@ -6,8 +6,6 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
 import java.util.*;
 
-import eu.dnetlib.dhp.api.Utils;
-import eu.dnetlib.dhp.api.model.CommunityEntityMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
@@ -20,6 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
+import eu.dnetlib.dhp.api.Utils;
+import eu.dnetlib.dhp.api.model.CommunityEntityMap;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;

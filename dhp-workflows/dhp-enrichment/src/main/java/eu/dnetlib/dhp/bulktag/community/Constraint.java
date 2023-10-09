@@ -4,9 +4,10 @@ package eu.dnetlib.dhp.bulktag.community;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 
+import org.apache.htrace.fasterxml.jackson.annotation.JsonIgnore;
+
 import eu.dnetlib.dhp.bulktag.criteria.Selection;
 import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
-import org.apache.htrace.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Constraint implements Serializable {
 	private String verb;
@@ -39,11 +40,12 @@ public class Constraint implements Serializable {
 	public void setValue(String value) {
 		this.value = value;
 	}
+
 //@JsonIgnore
-	//public void setSelection(Selection sel) {
+	// public void setSelection(Selection sel) {
 //		selection = sel;
 //	}
-@JsonIgnore
+	@JsonIgnore
 	public void setSelection(VerbResolver resolver)
 		throws InvocationTargetException, NoSuchMethodException, InstantiationException,
 		IllegalAccessException {
@@ -53,6 +55,5 @@ public class Constraint implements Serializable {
 	public boolean verifyCriteria(String metadata) {
 		return selection.apply(metadata);
 	}
-
 
 }

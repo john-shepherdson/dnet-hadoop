@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.api.model;
 
 import java.io.Serializable;
@@ -9,7 +10,7 @@ import java.util.ArrayList;
  */
 public class OrganizationList extends ArrayList<String> implements Serializable {
 
-    public OrganizationList(){
-        super();
-    }
+	public OrganizationList() {
+		super();
+	}
 }

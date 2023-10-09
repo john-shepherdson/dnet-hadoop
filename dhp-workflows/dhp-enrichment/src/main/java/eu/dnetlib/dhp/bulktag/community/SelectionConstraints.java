@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
+
 @JsonAutoDetect
 public class SelectionConstraints implements Serializable {
 	private List<Constraints> criteria;

@@ -31,9 +31,7 @@ case class mappingAuthor(
   affiliation: Option[mappingAffiliation]
 ) {}
 
-case class funderInfo(id:String,uri:String,  name:String,synonym:List[String] ) {}
-
-
+case class funderInfo(id: String, uri: String, name: String, synonym: List[String]) {}
 
 case class mappingFunder(name: String, DOI: Option[String], award: Option[List[String]]) {}
 
@@ -41,7 +39,9 @@ case object Crossref2Oaf {
   val logger: Logger = LoggerFactory.getLogger(Crossref2Oaf.getClass)
 
   val irishFunder: List[funderInfo] = {
-    val s = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/crossref/irish_funder.json")).mkString
+    val s = Source
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/crossref/irish_funder.json"))
+      .mkString
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: org.json4s.JValue = parse(s)
     json.extract[List[funderInfo]]
@@ -100,9 +100,11 @@ case object Crossref2Oaf {
     "report"              -> "0017 Report"
   )
 
-  def getIrishId(doi:String):Option[String] = {
-    val id =doi.split("/").last
-    irishFunder.find(f => id.equalsIgnoreCase(f.id) || (f.synonym.nonEmpty && f.synonym.exists(s => s.equalsIgnoreCase(id)))).map(f => f.id)
+  def getIrishId(doi: String): Option[String] = {
+    val id = doi.split("/").last
+    irishFunder
+      .find(f => id.equalsIgnoreCase(f.id) || (f.synonym.nonEmpty && f.synonym.exists(s => s.equalsIgnoreCase(id))))
+      .map(f => f.id)
   }
 
   def mappingResult(result: Result, json: JValue, cobjCategory: String): Result = {
