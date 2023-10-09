@@ -33,7 +33,7 @@ import scala.Tuple2;
 public class GroupEntitiesSparkJob {
 	private static final Logger log = LoggerFactory.getLogger(GroupEntitiesSparkJob.class);
 
-	private static final Encoder<OafEntity> OAFENTITY_KRYO_ENC =  Encoders.kryo(OafEntity.class);
+	private static final Encoder<OafEntity> OAFENTITY_KRYO_ENC = Encoders.kryo(OafEntity.class);
 
 	public static void main(String[] args) throws Exception {
 
@@ -114,7 +114,7 @@ public class GroupEntitiesSparkJob {
 				Encoders.tuple(Encoders.STRING(), OAFENTITY_KRYO_ENC));
 
 		// pivot on "_1" (classname of the entity)
-		// created columns  containing only entities of the same class
+		// created columns containing only entities of the same class
 		for (Map.Entry<EntityType, Class> e : ModelSupport.entityTypes.entrySet()) {
 			String entity = e.getKey().name();
 			Class<? extends OafEntity> entityClass = e.getValue();
