@@ -1568,4 +1568,42 @@ public class BulkTagJobTest {
 
 	}
 
+	@Test
+	void newConfTest() throws Exception {
+		final String pathMap = BulkTagJobTest.pathMap;
+		SparkBulkTagJob
+				.main(
+						new String[] {
+								"-isTest", Boolean.TRUE.toString(),
+								"-isSparkSessionManaged", Boolean.FALSE.toString(),
+								"-sourcePath",
+								getClass().getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/no_updates").getPath(),
+								"-taggingConf", taggingConf,
+								"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
+								"-outputPath", workingDir.toString() + "/dataset",
+								"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+								"-pathMap", pathMap
+						});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Dataset> tmp = sc
+				.textFile(workingDir.toString() + "/dataset")
+				.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
+
+		Assertions.assertEquals(10, tmp.count());
+		org.apache.spark.sql.Dataset<Dataset> verificationDataset = spark
+				.createDataset(tmp.rdd(), Encoders.bean(Dataset.class));
+
+		verificationDataset.createOrReplaceTempView("dataset");
+
+		String query = "select id, MyT.id community "
+				+ "from dataset "
+				+ "lateral view explode(context) c as MyT "
+				+ "lateral view explode(MyT.datainfo) d as MyD "
+				+ "where MyD.inferenceprovenance = 'bulktagging'";
+
+		Assertions.assertEquals(0, spark.sql(query).count());
+	}
+
 }

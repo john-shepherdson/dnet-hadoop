@@ -4,10 +4,10 @@
             <name>sourcePath</name>
             <description>the source path</description>
         </property>
-        <property>
-            <name>organizationtoresultcommunitymap</name>
-            <description>organization community map</description>
-        </property>
+<!--        <property>-->
+<!--            <name>organizationtoresultcommunitymap</name>-->
+<!--            <description>organization community map</description>-->
+<!--        </property>-->
         <property>
             <name>outputPath</name>
             <description>the output path</description>

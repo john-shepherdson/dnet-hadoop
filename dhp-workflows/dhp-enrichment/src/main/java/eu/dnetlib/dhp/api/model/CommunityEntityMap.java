@@ -1,13 +1,13 @@
 
-package eu.dnetlib.dhp.resulttocommunityfromorganization;
+package eu.dnetlib.dhp.api.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class OrganizationMap extends HashMap<String, List<String>> {
+public class CommunityEntityMap extends HashMap<String, List<String>> {
 
-	public OrganizationMap() {
+	public CommunityEntityMap() {
 		super();
 	}
 

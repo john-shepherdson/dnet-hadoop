@@ -5,7 +5,6 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -143,16 +142,16 @@ public class CommunityConfigurationFactory {
 		return providerList;
 	}
 
-	private static List<ZenodoCommunity> parseZenodoCommunities(final Node node) {
+	private static List<String> parseZenodoCommunities(final Node node) {
 
 		final List<Node> list = node.selectNodes("./zenodocommunities/zenodocommunity");
-		final List<ZenodoCommunity> zenodoCommunityList = new ArrayList<>();
+		final List<String> zenodoCommunityList = new ArrayList<>();
 		for (Node n : list) {
-			ZenodoCommunity zc = new ZenodoCommunity();
-			zc.setZenodoCommunityId(n.selectSingleNode("./zenodoid").getText());
-			zc.setSelCriteria(n.selectSingleNode("./selcriteria"));
+//			ZenodoCommunity zc = new ZenodoCommunity();
+//			zc.setZenodoCommunityId(n.selectSingleNode("./zenodoid").getText());
+//			zc.setSelCriteria(n.selectSingleNode("./selcriteria"));
 
-			zenodoCommunityList.add(zc);
+			zenodoCommunityList.add(n.selectSingleNode("./zenodoid").getText());
 		}
 
 		log.info("size of the zenodo community list " + zenodoCommunityList.size());

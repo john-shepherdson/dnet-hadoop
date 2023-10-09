@@ -4,8 +4,10 @@ package eu.dnetlib.dhp.bulktag.community;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.google.gson.Gson;
+
 
 /** Created by miriam on 01/08/2018. */
 public class Community implements Serializable {
@@ -13,7 +15,7 @@ public class Community implements Serializable {
 	private String id;
 	private List<String> subjects = new ArrayList<>();
 	private List<Provider> providers = new ArrayList<>();
-	private List<ZenodoCommunity> zenodoCommunities = new ArrayList<>();
+	private List<String> zenodoCommunities = new ArrayList<>();
 	private SelectionConstraints constraints = new SelectionConstraints();
 	private SelectionConstraints removeConstraints = new SelectionConstraints();
 
@@ -26,7 +28,7 @@ public class Community implements Serializable {
 		return !getSubjects().isEmpty()
 			|| !getProviders().isEmpty()
 			|| !getZenodoCommunities().isEmpty()
-			|| getConstraints().getCriteria() != null;
+			|| (Optional.ofNullable(getConstraints()).isPresent() && getConstraints().getCriteria() != null);
 	}
 
 	public String getId() {
@@ -53,11 +55,11 @@ public class Community implements Serializable {
 		this.providers = providers;
 	}
 
-	public List<ZenodoCommunity> getZenodoCommunities() {
+	public List<String> getZenodoCommunities() {
 		return zenodoCommunities;
 	}
 
-	public void setZenodoCommunities(List<ZenodoCommunity> zenodoCommunities) {
+	public void setZenodoCommunities(List<String> zenodoCommunities) {
 		this.zenodoCommunities = zenodoCommunities;
 	}
 

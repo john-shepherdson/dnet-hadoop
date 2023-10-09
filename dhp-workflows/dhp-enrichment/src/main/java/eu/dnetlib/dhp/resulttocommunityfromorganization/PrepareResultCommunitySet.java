@@ -6,12 +6,12 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
 import java.util.*;
 
+import eu.dnetlib.dhp.api.Utils;
+import eu.dnetlib.dhp.api.model.CommunityEntityMap;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
@@ -48,10 +48,11 @@ public class PrepareResultCommunitySet {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		final OrganizationMap organizationMap = new Gson()
-			.fromJson(
-				parser.get("organizationtoresultcommunitymap"),
-				OrganizationMap.class);
+//		final CommunityEntityMap organizationMap = new Gson()
+//			.fromJson(
+//				parser.get("organizationtoresultcommunitymap"),
+//				CommunityEntityMap.class);
+		final CommunityEntityMap organizationMap = Utils.getCommunityOrganization();
 		log.info("organizationMap: {}", new Gson().toJson(organizationMap));
 
 		SparkConf conf = new SparkConf();
@@ -70,7 +71,7 @@ public class PrepareResultCommunitySet {
 		SparkSession spark,
 		String inputPath,
 		String outputPath,
-		OrganizationMap organizationMap) {
+		CommunityEntityMap organizationMap) {
 
 		Dataset<Relation> relation = readPath(spark, inputPath, Relation.class);
 		relation.createOrReplaceTempView("relation");
@@ -115,7 +116,7 @@ public class PrepareResultCommunitySet {
 	}
 
 	private static MapFunction<ResultOrganizations, ResultCommunityList> mapResultCommunityFn(
-		OrganizationMap organizationMap) {
+		CommunityEntityMap organizationMap) {
 		return value -> {
 			String rId = value.getResultId();
 			Optional<List<String>> orgs = Optional.ofNullable(value.getMerges());

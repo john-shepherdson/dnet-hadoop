@@ -6,10 +6,10 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.*;
 
+import eu.dnetlib.dhp.api.Utils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
-import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -87,7 +87,7 @@ public class SparkBulkTagJob {
 		if (isTest) {
 			cc = CommunityConfigurationFactory.newInstance(taggingConf);
 		} else {
-			cc = QueryInformationSystem.getCommunityConfiguration(parser.get("isLookUpUrl"));
+			cc = Utils.getCommunityConfiguration();//QueryInformationSystem.getCommunityConfiguration(parser.get("isLookUpUrl"));
 		}
 
 		runWithSparkSession(
