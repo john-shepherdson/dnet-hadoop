@@ -184,7 +184,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Saves the result produced for bip and fos by grouping results with the same id</name>
+            <name>Save the unresolved entities grouping results with the same id</name>
             <class>eu.dnetlib.dhp.actionmanager.createunresolvedentities.SparkSaveUnresolved</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
