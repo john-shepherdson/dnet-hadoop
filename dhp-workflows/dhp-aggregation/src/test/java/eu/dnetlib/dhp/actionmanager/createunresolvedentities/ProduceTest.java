@@ -380,6 +380,40 @@ public class ProduceTest {
 	}
 
 	@Test
+	public JavaRDD<Result> getResultFosJavaRDD() throws Exception {
+
+		final String fosPath = getClass()
+			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/fos/fos_sbs_2.json")
+			.getPath();
+
+		PrepareFOSSparkJob
+			.main(
+				new String[] {
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--sourcePath", fosPath,
+					"-outputPath", workingDir.toString() + "/work"
+				});
+
+		SparkSaveUnresolved.main(new String[] {
+			"--isSparkSessionManaged", Boolean.FALSE.toString(),
+			"--sourcePath", workingDir.toString() + "/work",
+
+			"-outputPath", workingDir.toString() + "/unresolved"
+
+		});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Result> tmp = sc
+			.textFile(workingDir.toString() + "/unresolved")
+			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
+		tmp.foreach(r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+
+		return tmp;
+
+	}
+
+	@Test
 	void prepareTest5Subjects() throws Exception {
 		final String doi = "unresolved::10.1063/5.0032658::doi";
 

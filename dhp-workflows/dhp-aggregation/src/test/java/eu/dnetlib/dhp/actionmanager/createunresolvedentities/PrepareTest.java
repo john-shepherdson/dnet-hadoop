@@ -223,6 +223,76 @@ public class PrepareTest {
 	}
 
 	@Test
+	void fosPrepareTest2() throws Exception {
+		final String sourcePath = getClass()
+			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/fos/fos_sbs_2.json")
+			.getPath();
+
+		PrepareFOSSparkJob
+			.main(
+				new String[] {
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--sourcePath", sourcePath,
+
+					"-outputPath", workingDir.toString() + "/work"
+
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Result> tmp = sc
+			.textFile(workingDir.toString() + "/work/fos")
+			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
+
+		String doi1 = "unresolved::10.1016/j.revmed.2006.07.012::doi";
+
+		assertEquals(13, tmp.count());
+		assertEquals(1, tmp.filter(row -> row.getId().equals(doi1)).count());
+
+		Result result = tmp
+			.filter(r -> r.getId().equals(doi1))
+			.first();
+
+		result.getSubject().forEach(s -> System.out.println(s.getValue() + " trust = " + s.getDataInfo().getTrust()));
+		Assertions.assertEquals(6, result.getSubject().size());
+
+		assertTrue(
+			result
+				.getSubject()
+				.stream()
+				.anyMatch(
+					s -> s.getValue().contains("03 medical and health sciences")
+						&& s.getDataInfo().getTrust().equals("")));
+
+		assertTrue(
+			result
+				.getSubject()
+				.stream()
+				.anyMatch(
+					s -> s.getValue().contains("0302 clinical medicine") && s.getDataInfo().getTrust().equals("")));
+
+		assertTrue(
+			result
+				.getSubject()
+				.stream()
+				.anyMatch(
+					s -> s
+						.getValue()
+						.contains("030204 cardiovascular system & hematology")
+						&& s.getDataInfo().getTrust().equals("0.5101401805877686")));
+		assertTrue(
+			result
+				.getSubject()
+				.stream()
+				.anyMatch(
+					s -> s
+						.getValue()
+						.contains("03020409 Hematology/Coagulopathies")
+						&& s.getDataInfo().getTrust().equals("0.0546871414174914")));
+
+	}
+
+	@Test
 	void sdgPrepareTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/sdg/sdg.json")

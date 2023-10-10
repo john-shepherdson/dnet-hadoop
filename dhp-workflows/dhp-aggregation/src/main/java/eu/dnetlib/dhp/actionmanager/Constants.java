@@ -40,6 +40,7 @@ public class Constants {
 	public static final String SDG_CLASS_NAME = "Sustainable Development Goals";
 
 	public static final String NULL = "NULL";
+	public static final String NA = "N/A";
 
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -61,10 +62,16 @@ public class Constants {
 			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
 	}
 
-	public static Subject getSubject(String sbj, String classid, String classname,
-		String diqualifierclassid) {
-		if (sbj == null || sbj.equals(NULL))
+	public static Subject getSubject(String sbj, String classid, String classname, String diqualifierclassid,
+		Boolean split) {
+		if (sbj == null || sbj.equals(NULL) || sbj.startsWith(NA))
 			return null;
+		String trust = "";
+		String subject = sbj;
+		if (split) {
+			sbj = subject.split("@@")[0];
+			trust = subject.split("@@")[1];
+		}
 		Subject s = new Subject();
 		s.setValue(sbj);
 		s
@@ -89,9 +96,14 @@ public class Constants {
 								UPDATE_CLASS_NAME,
 								ModelConstants.DNET_PROVENANCE_ACTIONS,
 								ModelConstants.DNET_PROVENANCE_ACTIONS),
-						""));
+						trust));
 
 		return s;
+	}
+
+	public static Subject getSubject(String sbj, String classid, String classname,
+		String diqualifierclassid) {
+		return getSubject(sbj, classid, classname, diqualifierclassid, false);
 
 	}
 
