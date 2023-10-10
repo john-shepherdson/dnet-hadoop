@@ -78,12 +78,20 @@ public class PrepareFOSSparkJob implements Serializable {
 				HashSet<String> level1 = new HashSet<>();
 				HashSet<String> level2 = new HashSet<>();
 				HashSet<String> level3 = new HashSet<>();
-				addLevels(level1, level2, level3, first);
-				it.forEachRemaining(v -> addLevels(level1, level2, level3, v));
+				HashSet<String> level4 = new HashSet<>();
+				addLevels(level1, level2, level3, level4, first);
+				it.forEachRemaining(v -> addLevels(level1, level2, level3, level4, v));
 				List<Subject> sbjs = new ArrayList<>();
-				level1.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID)));
-				level2.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID)));
-				level3.forEach(l -> sbjs.add(getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID)));
+				level1
+					.forEach(l -> add(sbjs, getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID)));
+				level2
+					.forEach(l -> add(sbjs, getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID)));
+				level3
+					.forEach(
+						l -> add(sbjs, getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID, true)));
+				level4
+					.forEach(
+						l -> add(sbjs, getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID, true)));
 				r.setSubject(sbjs);
 				r
 					.setDataInfo(
@@ -106,11 +114,18 @@ public class PrepareFOSSparkJob implements Serializable {
 			.json(outputPath + "/fos");
 	}
 
+	private static void add(List<Subject> sbsjs, Subject sbj) {
+		if (sbj != null)
+			sbsjs.add(sbj);
+	}
+
 	private static void addLevels(HashSet<String> level1, HashSet<String> level2, HashSet<String> level3,
+		HashSet<String> level4,
 		FOSDataModel first) {
 		level1.add(first.getLevel1());
 		level2.add(first.getLevel2());
-		level3.add(first.getLevel3());
+		level3.add(first.getLevel3() + "@@" + first.getScoreL3());
+		level4.add(first.getLevel4() + "@@" + first.getScoreL4());
 	}
 
 }
