@@ -8,7 +8,7 @@ from ${stats_db_name}.result r
     group by rl.id
 ) rln on rln.id=r.id;
 
-ANALYZE TABLE ${observatory_db_name}.result_cc_licence COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_cc_licence COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_affiliated_country stored as parquet as
 select
@@ -39,7 +39,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, c.code, c.name;
 
-ANALYZE TABLE ${observatory_db_name}.result_affiliated_country COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_affiliated_country COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_affiliated_year stored as parquet as
 select
@@ -70,7 +70,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, r.year;
 
-ANALYZE TABLE ${observatory_db_name}.result_affiliated_year COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_affiliated_year COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_affiliated_year_country stored as parquet as
 select
@@ -101,7 +101,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, r.year, c.code, c.name;
 
-ANALYZE TABLE ${observatory_db_name}.result_affiliated_year_country COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_affiliated_year_country COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_affiliated_datasource stored as parquet as
 select
@@ -134,7 +134,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, d.name;
 
-ANALYZE TABLE ${observatory_db_name}.result_affiliated_datasource COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_affiliated_datasource COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_affiliated_datasource_country stored as parquet as
 select
@@ -167,7 +167,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, d.name, c.code, c.name;
 
-ANALYZE TABLE ${observatory_db_name}.result_affiliated_datasource_country COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_affiliated_datasource_country COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_affiliated_organization stored as parquet as
 select
@@ -198,7 +198,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, o.name;
 
-ANALYZE TABLE ${observatory_db_name}.result_affiliated_organization COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_affiliated_organization COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_affiliated_organization_country stored as parquet as
 select
@@ -229,7 +229,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, o.name, c.code, c.name;
 
-ANALYZE TABLE ${observatory_db_name}.result_affiliated_organization_country COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_affiliated_organization_country COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_affiliated_funder stored as parquet as
 select
@@ -262,7 +262,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, p.funder;
 
-ANALYZE TABLE ${observatory_db_name}.result_affiliated_funder COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_affiliated_funder COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_affiliated_funder_country stored as parquet as
 select
@@ -295,7 +295,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, p.funder, c.code, c.name;
 
-ANALYZE TABLE ${observatory_db_name}.result_affiliated_funder_country COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_affiliated_funder_country COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_deposited_country stored as parquet as
 select
@@ -328,7 +328,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, c.code, c.name;
 
-ANALYZE TABLE ${observatory_db_name}.result_deposited_country COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_deposited_country COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_deposited_year stored as parquet as
 select
@@ -361,7 +361,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, r.year;
 
-ANALYZE TABLE ${observatory_db_name}.result_deposited_year COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_deposited_year COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_deposited_year_country stored as parquet as
 select
@@ -394,7 +394,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, r.year, c.code, c.name;
 
-ANALYZE TABLE ${observatory_db_name}.result_deposited_year_country COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_deposited_year_country COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_deposited_datasource stored as parquet as
 select
@@ -427,7 +427,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, d.name;
 
-ANALYZE TABLE ${observatory_db_name}.result_deposited_datasource COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_deposited_datasource COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_deposited_datasource_country stored as parquet as
 select
@@ -460,7 +460,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, d.name, c.code, c.name;
 
-ANALYZE TABLE ${observatory_db_name}.result_deposited_datasource_country COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_deposited_datasource_country COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_deposited_organization stored as parquet as
 select
@@ -493,7 +493,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, o.name;
 
-ANALYZE TABLE ${observatory_db_name}.result_deposited_organization COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_deposited_organization COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_deposited_organization_country stored as parquet as
 select
@@ -526,7 +526,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, o.name, c.code, c.name;
 
-ANALYZE TABLE ${observatory_db_name}.result_deposited_organization_country COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_deposited_organization_country COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_deposited_funder stored as parquet as
 select
@@ -561,7 +561,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, p.funder;
 
-ANALYZE TABLE ${observatory_db_name}.result_deposited_funder COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_deposited_funder COMPUTE STATISTICS;
 
 create table ${observatory_db_name}.result_deposited_funder_country stored as parquet as
 select
@@ -596,4 +596,4 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          case when r.access_mode in ('Open Access', 'Open Source') then true else false end, r.peer_reviewed, r.type, abstract,
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, p.funder, c.code, c.name;
 
-ANALYZE TABLE ${observatory_db_name}.result_deposited_funder_country COMPUTE STATISTICS;
+--ANALYZE TABLE ${observatory_db_name}.result_deposited_funder_country COMPUTE STATISTICS;
