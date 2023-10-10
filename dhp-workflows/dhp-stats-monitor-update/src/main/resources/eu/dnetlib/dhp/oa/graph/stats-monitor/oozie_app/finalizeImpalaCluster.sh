@@ -22,27 +22,8 @@ function createShadowDB() {
   impala-shell -i impala-cluster-dn1.openaire.eu -d ${SOURCE} -q "show tables" --delimited | sed "s/\(.*\)/create view ${SHADOW}.\1 as select * from ${SOURCE}.\1;/" | impala-shell -i impala-cluster-dn1.openaire.eu -f -
 }
 
-STATS_DB=$1
-STATS_DB_SHADOW=$2
-MONITOR_DB=$3
-MONITOR_DB_SHADOW=$4
-OBSERVATORY_DB=$5
-OBSERVATORY_DB_SHADOW=$6
-USAGE_STATS_DB=$7
-USAGE_STATS_DB_SHADOW=$8
+MONITOR_DB=$1
+MONITOR_DB_SHADOW=$2
 
-createShadowDB $STATS_DB $STATS_DB_SHADOW
-createShadowDB $MONITOR_DB $MONITOR_DB_SHADOW
-createShadowDB $OBSERVATORY_DB $OBSERVATORY_DB_SHADOW
-createShadowDB USAGE_STATS_DB USAGE_STATS_DB_SHADOW
-
-createShadowDB $MONITOR_DB'_funded' $MONITOR_DB_SHADOW'_shadow_funded'
-createShadowDB $MONITOR_DB'_institutions' $MONITOR_DB_SHADOW'_shadow_institutions'
-createShadowDB $MONITOR_DB'_ris_tail' $MONITOR_DB_SHADOW'_shadow_ris_tail'
-
-contexts="knowmad::other dh-ch::other enermaps::other gotriple::other neanias-atmospheric::other rural-digital-europe::other covid-19::other aurora::other neanias-space::other north-america-studies::other north-american-studies::other eutopia::other"
-for i in ${contexts}
-do
-   tmp=`echo "$i"  | sed 's/'-'/'_'/g' | sed 's/'::'/'_'/g'`
-  createShadowDB ${MONITOR_DB}'_'${tmp} ${MONITOR_DB_SHADOW}'_shadow_'${tmp}
-done
+createShadowDB $MONITOR_DB'_institutions' $MONITOR_DB'_institutions_shadow'
+createShadowDB $MONITOR_DB $MONITOR_DB'_shadow'

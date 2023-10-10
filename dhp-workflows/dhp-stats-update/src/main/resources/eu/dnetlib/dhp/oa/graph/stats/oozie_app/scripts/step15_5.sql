@@ -35,6 +35,7 @@ create or replace view ${stats_db_name}.doctoratestudents as select * from stats
 create or replace view ${stats_db_name}.totalresearchers as select * from stats_ext.totalresearchers;
 create or replace view ${stats_db_name}.totalresearchersft as select * from stats_ext.totalresearchersft;
 create or replace view ${stats_db_name}.hrrst as select * from stats_ext.hrrst;
+create or replace view ${stats_db_name}.graduatedoctorates as select * from stats_ext.graduatedoctorates;
 
 create table if not exists ${stats_db_name}.result_instance stored as parquet as
 select distinct r.*
