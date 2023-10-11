@@ -69,9 +69,9 @@ public class SparkSaveUnresolved implements Serializable {
 			.mapGroups((MapGroupsFunction<String, Result, Result>) (k, it) -> {
 				Result ret = it.next();
 				it.forEachRemaining(r -> {
-					if (r.getInstance() != null) {
-						ret.setInstance(r.getInstance());
-					}
+//					if (r.getInstance() != null) {
+//						ret.setInstance(r.getInstance());
+//					}
 					if (r.getSubject() != null) {
 						if (ret.getSubject() != null)
 							ret.getSubject().addAll(r.getSubject());

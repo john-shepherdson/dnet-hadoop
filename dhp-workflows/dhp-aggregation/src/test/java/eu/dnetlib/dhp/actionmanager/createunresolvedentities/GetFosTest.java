@@ -13,10 +13,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,6 +65,7 @@ public class GetFosTest {
 	}
 
 	@Test
+	@Disabled
 	void test3() throws Exception {
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/fos/fos_sbs.tsv")
@@ -94,6 +92,39 @@ public class GetFosTest {
 		tmp.foreach(t -> Assertions.assertTrue(t.getLevel1() != null));
 		tmp.foreach(t -> Assertions.assertTrue(t.getLevel2() != null));
 		tmp.foreach(t -> Assertions.assertTrue(t.getLevel3() != null));
+
+	}
+
+	@Test
+	void test4() throws Exception {
+		final String sourcePath = getClass()
+			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/fos/fos_sbs2.csv")
+			.getPath();
+
+		final String outputPath = workingDir.toString() + "/fos.json";
+		GetFOSSparkJob
+			.main(
+				new String[] {
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--sourcePath", sourcePath,
+					"--delimiter", ",",
+					"-outputPath", outputPath
+
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<FOSDataModel> tmp = sc
+			.textFile(outputPath)
+			.map(item -> OBJECT_MAPPER.readValue(item, FOSDataModel.class));
+
+		tmp.foreach(t -> Assertions.assertTrue(t.getDoi() != null));
+		tmp.foreach(t -> Assertions.assertTrue(t.getLevel1() != null));
+		tmp.foreach(t -> Assertions.assertTrue(t.getLevel2() != null));
+		tmp.foreach(t -> Assertions.assertTrue(t.getLevel3() != null));
+		tmp.foreach(t -> Assertions.assertTrue(t.getLevel4() != null));
+		tmp.foreach(t -> Assertions.assertTrue(t.getScoreL3() != null));
+		tmp.foreach(t -> Assertions.assertTrue(t.getScoreL4() != null));
 
 	}
 }

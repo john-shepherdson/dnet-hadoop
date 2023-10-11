@@ -5,11 +5,6 @@
             <name>fosPath</name>
             <description>the input path of the resources to be extended</description>
         </property>
-
-        <property>
-            <name>bipScorePath</name>
-            <description>the path where to find the bipFinder scores</description>
-        </property>
         <property>
             <name>outputPath</name>
             <description>the path where to store the actionset</description>
@@ -77,34 +72,9 @@
 
 
     <fork name="prepareInfo">
-        <path start="prepareBip"/>
         <path start="getFOS"/>
         <path start="getSDG"/>
     </fork>
-
-    <action name="prepareBip">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Produces the unresolved from BIP! Finder</name>
-            <class>eu.dnetlib.dhp.actionmanager.createunresolvedentities.PrepareBipFinder</class>
-            <jar>dhp-aggregation-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
-            </spark-opts>
-            <arg>--sourcePath</arg><arg>${bipScorePath}</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/prepared</arg>
-        </spark>
-        <ok to="join"/>
-        <error to="Kill"/>
-    </action>
 
     <action name="getFOS">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -125,6 +95,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${fosPath}</arg>
             <arg>--outputPath</arg><arg>${workingDir}/input/fos</arg>
+            <arg>--delimiter</arg><arg>${delimiter}</arg>
         </spark>
         <ok to="prepareFos"/>
         <error to="Kill"/>
@@ -213,7 +184,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Saves the result produced for bip and fos by grouping results with the same id</name>
+            <name>Save the unresolved entities grouping results with the same id</name>
             <class>eu.dnetlib.dhp.actionmanager.createunresolvedentities.SparkSaveUnresolved</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
