@@ -6,6 +6,7 @@ import static eu.dnetlib.dhp.bulktag.community.TaggingConstants.ZENODO_COMMUNITY
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -98,14 +99,11 @@ public class BulkTagJobTest {
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath",
-					getClass().getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/no_updates").getPath(),
+					getClass().getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/no_updates/").getPath(),
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+					"-outputPath", workingDir.toString() + "/",
 					"-pathMap", pathMap
 				});
 
@@ -133,19 +131,16 @@ public class BulkTagJobTest {
 	@Test
 	void bulktagBySubjectNoPreviousContextTest() throws Exception {
 		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject/nocontext")
+			.getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject/nocontext/")
 			.getPath();
 		final String pathMap = BulkTagJobTest.pathMap;
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+					"-outputPath", workingDir.toString() + "/",
 					"-pathMap", pathMap
 				});
 
@@ -230,19 +225,19 @@ public class BulkTagJobTest {
 	void bulktagBySubjectPreviousContextNoProvenanceTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject/contextnoprovenance")
+				"/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject/contextnoprovenance/")
 			.getPath();
 		final String pathMap = BulkTagJobTest.pathMap;
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -311,18 +306,18 @@ public class BulkTagJobTest {
 	@Test
 	void bulktagByDatasourceTest() throws Exception {
 		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/bulktag/sample/publication/update_datasource")
+			.getResource("/eu/dnetlib/dhp/bulktag/sample/publication/update_datasource/")
 			.getPath();
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
-					"-outputPath", workingDir.toString() + "/publication",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -384,25 +379,25 @@ public class BulkTagJobTest {
 	void bulktagByZenodoCommunityTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/bulktag/sample/otherresearchproduct/update_zenodocommunity")
+				"/eu/dnetlib/dhp/bulktag/sample/otherresearchproduct/update_zenodocommunity/")
 			.getPath();
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.OtherResearchProduct",
-					"-outputPath", workingDir.toString() + "/orp",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<OtherResearchProduct> tmp = sc
-			.textFile(workingDir.toString() + "/orp")
+			.textFile(workingDir.toString() + "/otherresearchproduct")
 			.map(item -> OBJECT_MAPPER.readValue(item, OtherResearchProduct.class));
 
 		Assertions.assertEquals(10, tmp.count());
@@ -505,18 +500,18 @@ public class BulkTagJobTest {
 	@Test
 	void bulktagBySubjectDatasourceTest() throws Exception {
 		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject_datasource")
+			.getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject_datasource/")
 			.getPath();
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -636,14 +631,14 @@ public class BulkTagJobTest {
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath",
-					getClass().getResource("/eu/dnetlib/dhp/bulktag/sample/software/software_10.json.gz").getPath(),
+					getClass().getResource("/eu/dnetlib/dhp/bulktag/sample/software/").getPath(),
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Software",
-					"-outputPath", workingDir.toString() + "/software",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -732,18 +727,18 @@ public class BulkTagJobTest {
 
 		final String sourcePath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/bulktag/sample/dataset/update_datasourcewithconstraints")
+				"/eu/dnetlib/dhp/bulktag/sample/dataset/update_datasourcewithconstraints/")
 			.getPath();
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -774,19 +769,19 @@ public class BulkTagJobTest {
 	void bulkTagOtherJupyter() throws Exception {
 		final String sourcePath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/eosctag/jupyter/otherresearchproduct")
+				"/eu/dnetlib/dhp/eosctag/jupyter/")
 			.getPath();
 
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.OtherResearchProduct",
-					"-outputPath", workingDir.toString() + "/otherresearchproduct",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -829,18 +824,18 @@ public class BulkTagJobTest {
 	public void bulkTagDatasetJupyter() throws Exception {
 		final String sourcePath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/eosctag/jupyter/dataset")
+				"/eu/dnetlib/dhp/eosctag/jupyter/")
 			.getPath();
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -878,18 +873,18 @@ public class BulkTagJobTest {
 
 		final String sourcePath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/eosctag/jupyter/software")
+				"/eu/dnetlib/dhp/eosctag/jupyter/")
 			.getPath();
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Software",
-					"-outputPath", workingDir.toString() + "/software",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -1096,18 +1091,18 @@ public class BulkTagJobTest {
 	void galaxyOtherTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/eosctag/galaxy/otherresearchproduct")
+				"/eu/dnetlib/dhp/eosctag/galaxy/")
 			.getPath();
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.OtherResearchProduct",
-					"-outputPath", workingDir.toString() + "/otherresearchproduct",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -1214,18 +1209,18 @@ public class BulkTagJobTest {
 	void galaxySoftwareTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/eosctag/galaxy/software")
+				"/eu/dnetlib/dhp/eosctag/galaxy/")
 			.getPath();
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Software",
-					"-outputPath", workingDir.toString() + "/software",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -1333,19 +1328,19 @@ public class BulkTagJobTest {
 	void twitterDatasetTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/eosctag/twitter/dataset")
+				"/eu/dnetlib/dhp/eosctag/twitter/")
 			.getPath();
 
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -1373,19 +1368,19 @@ public class BulkTagJobTest {
 	void twitterOtherTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/eosctag/twitter/otherresearchproduct")
+				"/eu/dnetlib/dhp/eosctag/twitter/")
 			.getPath();
 
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.OtherResearchProduct",
-					"-outputPath", workingDir.toString() + "/otherresearchproduct",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -1418,19 +1413,19 @@ public class BulkTagJobTest {
 	void twitterSoftwareTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/eosctag/twitter/software")
+				"/eu/dnetlib/dhp/eosctag/twitter/")
 			.getPath();
 
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Software",
-					"-outputPath", workingDir.toString() + "/software",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -1455,19 +1450,19 @@ public class BulkTagJobTest {
 	void EoscContextTagTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/bulktag/eosc/dataset/dataset_10.json")
+				"/eu/dnetlib/dhp/bulktag/eosc/dataset/")
 			.getPath();
 
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -1533,16 +1528,16 @@ public class BulkTagJobTest {
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath",
 					getClass()
-						.getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/update_datasourcewithconstraints")
+						.getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/update_datasourcewithconstraints/")
 						.getPath(),
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -1574,14 +1569,14 @@ public class BulkTagJobTest {
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath",
-					getClass().getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/no_updates").getPath(),
+					getClass().getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/no_updates/").getPath(),
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+					"-production", Boolean.TRUE.toString(),
 					"-pathMap", pathMap
 				});
 

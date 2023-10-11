@@ -26,7 +26,7 @@ public class QueryCommunityAPITest {
 
 	@Test
 	void communityList() throws Exception {
-		String body = QueryCommunityAPI.communities();
+		String body = QueryCommunityAPI.communities(true);
 		new ObjectMapper()
 			.readValue(body, CommunitySummary.class)
 			.forEach(p -> {
@@ -41,7 +41,7 @@ public class QueryCommunityAPITest {
 	@Test
 	void community() throws Exception {
 		String id = "dh-ch";
-		String body = QueryCommunityAPI.community(id);
+		String body = QueryCommunityAPI.community(id, true);
 		System.out
 			.println(
 				new ObjectMapper()
@@ -53,7 +53,7 @@ public class QueryCommunityAPITest {
 	@Test
 	void communityDatasource() throws Exception {
 		String id = "dh-ch";
-		String body = QueryCommunityAPI.communityDatasource(id);
+		String body = QueryCommunityAPI.communityDatasource(id, true);
 		new ObjectMapper()
 			.readValue(body, DatasourceList.class)
 			.forEach(ds -> {
@@ -68,7 +68,7 @@ public class QueryCommunityAPITest {
 
 	@Test
 	void validCommunities() throws Exception {
-		CommunityConfiguration cc = Utils.getCommunityConfiguration();
+		CommunityConfiguration cc = Utils.getCommunityConfiguration(true);
 		System.out.println(cc.getCommunities().keySet());
 		Community community = cc.getCommunities().get("aurora");
 		Assertions.assertEquals(0, community.getSubjects().size());
@@ -84,11 +84,20 @@ public class QueryCommunityAPITest {
 		Assertions
 			.assertEquals(
 				35, community.getProviders().stream().filter(p -> p.getSelectionConstraints() == null).count());
+
+	}
+
+	@Test
+	void eutopiaCommunityConfiguration() throws Exception {
+		CommunityConfiguration cc = Utils.getCommunityConfiguration(true);
+		System.out.println(cc.getCommunities().keySet());
+		Community community = cc.getCommunities().get("eutopia");
+		community.getProviders().forEach(p -> System.out.println(p.getOpenaireId()));
 	}
 
 	@Test
 	void getCommunityProjects() throws Exception {
-		CommunityEntityMap projectMap = Utils.getCommunityProjects();
+		CommunityEntityMap projectMap = Utils.getCommunityProjects(true);
 		Assertions.assertFalse(projectMap.containsKey("mes"));
 		Assertions.assertEquals(33, projectMap.size());
 		Assertions

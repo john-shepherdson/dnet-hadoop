@@ -4,22 +4,18 @@ package eu.dnetlib.dhp.api;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.http.HttpHeaders;
 import org.jetbrains.annotations.NotNull;
-
-import com.google.gson.Gson;
 
 /**
  * @author miriam.baglioni
  * @Date 06/10/23
  */
 public class QueryCommunityAPI {
-	private static final String baseUrl = "https://services.openaire.eu/openaire/";
+	private static final String PRODUCTION_BASE_URL = "https://services.openaire.eu/openaire/";
+	private static final String BETA_BASE_URL = "https://beta.services.openaire.eu/openaire/";
 
 	private static String get(String geturl) throws IOException {
 		URL url = new URL(geturl);
@@ -36,25 +32,35 @@ public class QueryCommunityAPI {
 		return body;
 	}
 
-	public static String communities() throws IOException {
-		return get(baseUrl + "community/communities");
+	public static String communities(boolean production) throws IOException {
+		if (production)
+			return get(PRODUCTION_BASE_URL + "community/communities");
+		return get(BETA_BASE_URL + "community/communities");
 	}
 
-	public static String community(String id) throws IOException {
-		return get(baseUrl + "community/" + id);
+	public static String community(String id, boolean production) throws IOException {
+		if (production)
+			return get(PRODUCTION_BASE_URL + "community/" + id);
+		return get(BETA_BASE_URL + "community/" + id);
 	}
 
-	public static String communityDatasource(String id) throws IOException {
-		return get(baseUrl + "community/" + id + "/contentproviders");
+	public static String communityDatasource(String id, boolean production) throws IOException {
+		if (production)
+			return get(PRODUCTION_BASE_URL + "community/" + id + "/contentproviders");
+		return (BETA_BASE_URL + "community/" + id + "/contentproviders");
 
 	}
 
-	public static String communityPropagationOrganization(String id) throws IOException {
-		return get(baseUrl + "community/" + id + "/propagationOrganizations");
+	public static String communityPropagationOrganization(String id, boolean production) throws IOException {
+		if (production)
+			return get(PRODUCTION_BASE_URL + "community/" + id + "/propagationOrganizations");
+		return get(BETA_BASE_URL + "community/" + id + "/propagationOrganizations");
 	}
 
-	public static String communityProjects(String id, String page, String size) throws IOException {
-		return get(baseUrl + "community/" + id + "/projects/" + page + "/" + size);
+	public static String communityProjects(String id, String page, String size, boolean production) throws IOException {
+		if (production)
+			return get(PRODUCTION_BASE_URL + "community/" + id + "/projects/" + page + "/" + size);
+		return get(BETA_BASE_URL + "community/" + id + "/projects/" + page + "/" + size);
 	}
 
 	@NotNull

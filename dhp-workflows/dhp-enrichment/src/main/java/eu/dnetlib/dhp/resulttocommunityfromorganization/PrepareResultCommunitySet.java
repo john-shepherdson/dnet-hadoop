@@ -48,11 +48,10 @@ public class PrepareResultCommunitySet {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-//		final CommunityEntityMap organizationMap = new Gson()
-//			.fromJson(
-//				parser.get("organizationtoresultcommunitymap"),
-//				CommunityEntityMap.class);
-		final CommunityEntityMap organizationMap = Utils.getCommunityOrganization();
+		final boolean production = Boolean.valueOf(parser.get("production"));
+		log.info("production: {}", production);
+
+		final CommunityEntityMap organizationMap = Utils.getCommunityOrganization(production);
 		log.info("organizationMap: {}", new Gson().toJson(organizationMap));
 
 		SparkConf conf = new SparkConf();

@@ -78,7 +78,7 @@ public class ResultToCommunityJobTest {
 						.getResource("/eu/dnetlib/dhp/resulttocommunityfromorganization/sample")
 						.getPath(),
 					"-hive_metastore_uris", "",
-					"-saveGraph", "true",
+
 					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
 					"-outputPath", workingDir.toString() + "/dataset",
 					"-preparedInfoPath", preparedInfoPath

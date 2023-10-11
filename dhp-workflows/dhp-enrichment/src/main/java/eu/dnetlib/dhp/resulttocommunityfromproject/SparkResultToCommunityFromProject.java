@@ -1,9 +1,11 @@
 
-package eu.dnetlib.dhp.resulttocommunityfromorganization;
+package eu.dnetlib.dhp.resulttocommunityfromproject;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
+import static eu.dnetlib.dhp.PropagationConstant.PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_NAME;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,21 +23,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.resulttocommunityfromorganization.ResultCommunityList;
+import eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import scala.Tuple2;
 
-public class SparkResultToCommunityFromOrganizationJob {
-
-	private static final Logger log = LoggerFactory.getLogger(SparkResultToCommunityFromOrganizationJob.class);
+/**
+ * @author miriam.baglioni
+ * @Date 11/10/23
+ */
+public class SparkResultToCommunityFromProject implements Serializable {
+	private static final Logger log = LoggerFactory.getLogger(SparkResultToCommunityFromProject.class);
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
 			.toString(
-				SparkResultToCommunityFromOrganizationJob.class
+				SparkResultToCommunityFromProject.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttocommunityfromorganization/input_communitytoresult_parameters.json"));
+						"/eu/dnetlib/dhp/resulttocommunityfromproject/input_communitytoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -66,9 +74,9 @@ public class SparkResultToCommunityFromOrganizationJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				removeOutputDir(spark, outputPath);
+//                    removeOutputDir(spark, outputPath);
 
-				execPropagation(spark, inputPath, outputPath, resultClazz, possibleupdatespath);
+				execPropagation(spark, inputPath, outputPath, possibleupdatespath);
 
 			});
 	}
@@ -77,28 +85,39 @@ public class SparkResultToCommunityFromOrganizationJob {
 		SparkSession spark,
 		String inputPath,
 		String outputPath,
-		Class<R> resultClazz,
+
 		String possibleUpdatesPath) {
 
-		Dataset<ResultCommunityList> possibleUpdates = readPath(spark, possibleUpdatesPath, ResultCommunityList.class);
-		Dataset<R> result = readPath(spark, inputPath, resultClazz);
+		Dataset<ResultProjectList> possibleUpdates = readPath(spark, possibleUpdatesPath, ResultProjectList.class);
 
-		result
-			.joinWith(
-				possibleUpdates,
-				result.col("id").equalTo(possibleUpdates.col("resultId")),
-				"left_outer")
-			.map(resultCommunityFn(), Encoders.bean(resultClazz))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(outputPath);
+		ModelSupport.entityTypes
+			.keySet()
+			.parallelStream()
+			.forEach(e -> {
+				if (ModelSupport.isResult(e)) {
+					removeOutputDir(spark, outputPath + e.name());
+					Class<R> resultClazz = ModelSupport.entityTypes.get(e);
+					Dataset<R> result = readPath(spark, inputPath + e.name(), resultClazz);
+
+					result
+						.joinWith(
+							possibleUpdates,
+							result.col("id").equalTo(possibleUpdates.col("resultId")),
+							"left_outer")
+						.map(resultCommunityFn(), Encoders.bean(resultClazz))
+						.write()
+						.mode(SaveMode.Overwrite)
+						.option("compression", "gzip")
+						.json(outputPath);
+				}
+			});
+
 	}
 
-	private static <R extends Result> MapFunction<Tuple2<R, ResultCommunityList>, R> resultCommunityFn() {
+	private static <R extends Result> MapFunction<Tuple2<R, ResultProjectList>, R> resultCommunityFn() {
 		return value -> {
 			R ret = value._1();
-			Optional<ResultCommunityList> rcl = Optional.ofNullable(value._2());
+			Optional<ResultProjectList> rcl = Optional.ofNullable(value._2());
 			if (rcl.isPresent()) {
 				ArrayList<String> communitySet = rcl.get().getCommunityList();
 				List<String> contextList = ret
@@ -122,8 +141,8 @@ public class SparkResultToCommunityFromOrganizationJob {
 									.asList(
 										getDataInfo(
 											PROPAGATION_DATA_INFO_TYPE,
-											PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_ID,
-											PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_NAME,
+											PROPAGATION_RESULT_COMMUNITY_PROJECT_CLASS_ID,
+											PROPAGATION_RESULT_COMMUNITY_PROJECT_CLASS_NAME,
 											ModelConstants.DNET_PROVENANCE_ACTIONS)));
 						propagatedContexts.add(newContext);
 					}
@@ -134,5 +153,4 @@ public class SparkResultToCommunityFromOrganizationJob {
 			return ret;
 		};
 	}
-
 }
