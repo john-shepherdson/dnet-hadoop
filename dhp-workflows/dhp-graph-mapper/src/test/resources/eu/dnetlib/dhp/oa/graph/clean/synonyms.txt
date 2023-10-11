@@ -1246,3 +1246,8 @@ dnet:relation_subRelType @=@ relationship @=@ publicationDataset
 dnet:provenanceActions @=@ iis @=@ erroneous label to be cleaned
 FOS @=@ 0101 mathematics @=@ FOS: Mathematics
 FOS @=@ 0102 computer and information sciences @=@ FOS: Computer and information sciences
+openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_5794 @=@ Proceedings paper
+openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_5794 @=@ Conference article
+openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_5794 @=@ http://purl.org/eprint/type/ConferencePaper
+openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_5794 @=@ Conference article
+openaire::user_resource_types @=@ Article @=@ http://purl.org/coar/resource_type/c_5794

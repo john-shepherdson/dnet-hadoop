@@ -5,12 +5,10 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -24,6 +22,8 @@ import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
+
+import static org.apache.commons.lang3.StringUtils.contains;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -139,6 +139,8 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 		final List<StructuredProperty> alternateIdentifier = prepareResultPids(doc, info);
 		final List<StructuredProperty> pid = IdentifierFactory.getPids(alternateIdentifier, collectedfrom);
 
+		instance.setInstanceTypeMapping(prepareInstanceTypeMapping(doc));
+
 		final Set<StructuredProperty> pids = new HashSet<>(pid);
 
 		instance
@@ -185,6 +187,28 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 		}
 
 		return Lists.newArrayList(instance);
+	}
+
+	/**
+	 * The Dublin Core element dc:type can be repeated, but we need to base our mapping on a single value
+	 * So this method tries to give precedence to the COAR resource type, when available. Otherwise, it looks for the
+	 * openaire's info:eu-repo type, and as last resort picks the 1st type text available
+	 *
+	 *     	<dc:type>http://purl.org/coar/resource_type/c_5794</dc:type>
+	 *     	<dc:type>info:eu-repo/semantics/article</dc:type>
+	 *     	<dc:type>Conference article</dc:type>
+	 *
+	 * @param doc the input document
+	 * @return the chosen resource type
+	 */
+	@Override
+	protected String findOriginalType(Document doc) {
+		return (String) doc.selectNodes("//dc:type")
+				.stream()
+				.map(o -> "" + ((Node) o).getText().trim())
+				.sorted(new OriginalTypeComparator())
+				.findFirst()
+				.orElse(null);
 	}
 
 	@Override

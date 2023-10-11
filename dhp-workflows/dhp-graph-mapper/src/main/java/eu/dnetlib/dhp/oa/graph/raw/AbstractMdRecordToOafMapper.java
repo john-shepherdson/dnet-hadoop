@@ -41,6 +41,11 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected static final String DATACITE_SCHEMA_KERNEL_4_SLASH = "http://datacite.org/schema/kernel-4/";
 	protected static final String DATACITE_SCHEMA_KERNEL_3 = "http://datacite.org/schema/kernel-3";
 	protected static final String DATACITE_SCHEMA_KERNEL_3_SLASH = "http://datacite.org/schema/kernel-3/";
+
+	protected static final String OPENAIRE_COAR_RESOURCE_TYPES_3_1 = "openaire::coar_resource_types_3_1";
+
+	public static final String OPENAIRE_USER_RESOURCE_TYPES = "openaire::user_resource_types";
+
 	protected static final Qualifier ORCID_PID_TYPE = qualifier(
 		ModelConstants.ORCID_PENDING,
 		ModelConstants.ORCID_CLASSNAME,
@@ -515,6 +520,32 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected abstract Field<String> prepareDatasetDevice(Document doc, DataInfo info);
 
 	protected abstract Field<String> prepareDatasetStorageDate(Document doc, DataInfo info);
+
+	protected abstract String findOriginalType(Document doc);
+
+	protected List<InstanceTypeMapping> prepareInstanceTypeMapping(Document doc) {
+		return Optional.ofNullable(findOriginalType(doc))
+				.map(originalType -> {
+					final List<InstanceTypeMapping> mappings = Lists.newArrayList();
+
+					if (vocs.vocabularyExists(OPENAIRE_COAR_RESOURCE_TYPES_3_1)) {
+
+						// TODO verify what the vocabs return when a synonym is not defined
+						Qualifier coarTerm = vocs.lookupTermBySynonym(OPENAIRE_COAR_RESOURCE_TYPES_3_1, originalType);
+						mappings.add(OafMapperUtils.instanceTypeMapping(originalType, coarTerm));
+
+						if (vocs.vocabularyExists(OPENAIRE_USER_RESOURCE_TYPES)) {
+
+							// TODO verify what the vocabs return when a synonym is not defined
+							Qualifier userTerm = vocs.lookupTermBySynonym(OPENAIRE_USER_RESOURCE_TYPES, coarTerm.getClassid());
+							mappings.add(OafMapperUtils.instanceTypeMapping(originalType, userTerm));
+						}
+					}
+
+					return mappings;
+				})
+				.orElse(new ArrayList<>());
+	}
 
 	private Journal prepareJournal(final Document doc, final DataInfo info) {
 		final Node n = doc.selectSingleNode("//oaf:journal");

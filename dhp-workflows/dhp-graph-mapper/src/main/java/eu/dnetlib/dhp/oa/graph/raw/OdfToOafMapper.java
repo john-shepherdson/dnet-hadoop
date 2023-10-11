@@ -9,6 +9,7 @@ import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -139,6 +140,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		final List<StructuredProperty> alternateIdentifier = prepareResultPids(doc, info);
 		final List<StructuredProperty> pid = IdentifierFactory.getPids(alternateIdentifier, collectedfrom);
 
+		instance.setInstanceTypeMapping(prepareInstanceTypeMapping(doc));
+
 		final Set<StructuredProperty> pids = new HashSet<>(pid);
 
 		instance
@@ -215,6 +218,30 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		} catch (Throwable t) {
 			return url;
 		}
+	}
+
+	@Override
+	protected List<InstanceTypeMapping> prepareInstanceTypeMapping(Document doc) {
+		return null;
+	}
+
+	/**
+	 * The Datacite element
+	 *
+	 * <datacite:resourceType xs:anyURI="http://purl.org/coar/resource_type/c_6501">journal article</datacite:resourceType>
+	 *
+	 * @param doc the input document
+	 * @return the chosen resource type
+	 */
+	@Override
+	protected String findOriginalType(Document doc) {
+		final Element resourceType = (Element) doc.selectSingleNode(
+				"//metadata/*[local-name() = 'resource']/*[local-name() = 'resourceType']");
+
+		final String resourceTypeURI = resourceType.attributeValue("anyURI");
+		final String resourceTypeTxt = resourceType.getText();
+
+		return ObjectUtils.firstNonNull(resourceTypeURI, resourceTypeTxt);
 	}
 
 	@Override

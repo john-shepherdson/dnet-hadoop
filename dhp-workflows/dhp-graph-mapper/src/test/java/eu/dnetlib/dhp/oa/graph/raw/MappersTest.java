@@ -116,6 +116,27 @@ class MappersTest {
 		assertNotNull(instance.getPid());
 		assertTrue(instance.getPid().isEmpty());
 
+		assertNotNull(instance.getInstanceTypeMapping());
+		assertEquals(2, instance.getInstanceTypeMapping().size());
+
+		Optional<InstanceTypeMapping> coarType = instance.getInstanceTypeMapping()
+				.stream()
+				.filter(itm -> AbstractMdRecordToOafMapper.OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(itm.getVocabularyName()))
+				.findFirst();
+
+		assertTrue(coarType.isPresent());
+		assertEquals("http://purl.org/coar/resource_type/c_5794", coarType.get().getTypeCode());
+		assertEquals("conference paper", coarType.get().getTypeLabel());
+
+		Optional<InstanceTypeMapping> userType = instance.getInstanceTypeMapping()
+				.stream()
+				.filter(itm -> AbstractMdRecordToOafMapper.OPENAIRE_USER_RESOURCE_TYPES.equals(itm.getVocabularyName()))
+				.findFirst();
+
+		assertTrue(userType.isPresent());
+		assertEquals("Article", userType.get().getTypeCode());
+		assertEquals("Article", userType.get().getTypeLabel());
+
 		assertFalse(instance.getAlternateIdentifier().isEmpty());
 		assertEquals("doi", instance.getAlternateIdentifier().get(0).getQualifier().getClassid());
 		assertEquals("10.3897/oneeco.2.e13718", instance.getAlternateIdentifier().get(0).getValue());
