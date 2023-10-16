@@ -90,14 +90,16 @@
             <class>eu.dnetlib.dhp.resulttocommunityfromorganization.PrepareResultCommunitySet</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=4
-                --executor-memory=10G
+                --executor-cores=6
+                --executor-memory=5G
+                --spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
+
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
@@ -117,14 +119,15 @@
             <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=6
+                --executor-memory=5G
+                --spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
