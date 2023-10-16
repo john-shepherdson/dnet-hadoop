@@ -157,20 +157,20 @@ public abstract class AbstractMdRecordToOafMapper {
 
 		if (vocs.vocabularyExists(OPENAIRE_META_RESOURCE_TYPE)) {
 			Optional<InstanceTypeMapping> instanceTypeMapping = instances
-					.stream()
-					.flatMap(i -> i.getInstanceTypeMapping().stream())
-					.filter(t -> OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(t.getVocabularyName()))
-					.findFirst();
+				.stream()
+				.flatMap(i -> i.getInstanceTypeMapping().stream())
+				.filter(t -> OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(t.getVocabularyName()))
+				.findFirst();
 
 			if (!instanceTypeMapping.isPresent()) {
-				throw new IllegalStateException("unable to find an instance from " + OPENAIRE_COAR_RESOURCE_TYPES_3_1);
+				return null;
 			} else {
 				final String typeCode = instanceTypeMapping.get().getTypeCode();
 				return Optional
-						.ofNullable(vocs.lookupTermBySynonym(OPENAIRE_META_RESOURCE_TYPE, typeCode))
-						.orElseThrow(() ->
-								new IllegalStateException("unable to find a synonym for '" + typeCode + "' in " +
-										OPENAIRE_META_RESOURCE_TYPE));
+					.ofNullable(vocs.lookupTermBySynonym(OPENAIRE_META_RESOURCE_TYPE, typeCode))
+					.orElseThrow(
+						() -> new IllegalStateException("unable to find a synonym for '" + typeCode + "' in " +
+							OPENAIRE_META_RESOURCE_TYPE));
 			}
 		} else {
 			throw new IllegalStateException("vocabulary '" + OPENAIRE_META_RESOURCE_TYPE + "' not available");
@@ -197,7 +197,8 @@ public abstract class AbstractMdRecordToOafMapper {
 		final DataInfo info,
 		final long lastUpdateTimestamp) {
 
-		final OafEntity entity = createEntity(doc, type, metaResourceType, instances, collectedFrom, info, lastUpdateTimestamp);
+		final OafEntity entity = createEntity(
+			doc, type, metaResourceType, instances, collectedFrom, info, lastUpdateTimestamp);
 
 		final Set<String> originalId = Sets.newHashSet(entity.getOriginalId());
 		originalId.add(entity.getId());
@@ -550,29 +551,33 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected abstract String findOriginalType(Document doc);
 
 	protected List<InstanceTypeMapping> prepareInstanceTypeMapping(Document doc) {
-		return Optional.ofNullable(findOriginalType(doc))
-				.map(originalType -> {
-					final List<InstanceTypeMapping> mappings = Lists.newArrayList();
+		return Optional
+			.ofNullable(findOriginalType(doc))
+			.map(originalType -> {
+				final List<InstanceTypeMapping> mappings = Lists.newArrayList();
 
-					if (vocs.vocabularyExists(OPENAIRE_COAR_RESOURCE_TYPES_3_1)) {
+				if (vocs.vocabularyExists(OPENAIRE_COAR_RESOURCE_TYPES_3_1)) {
 
-						// TODO verify what the vocabs return when a synonym is not defined
-						Optional.ofNullable(vocs.lookupTermBySynonym(OPENAIRE_COAR_RESOURCE_TYPES_3_1, originalType))
-								.ifPresent(coarTerm -> {
-									mappings.add(OafMapperUtils.instanceTypeMapping(originalType, coarTerm));
-									if (vocs.vocabularyExists(OPENAIRE_USER_RESOURCE_TYPES)) {
+					// TODO verify what the vocabs return when a synonym is not defined
+					Optional
+						.ofNullable(vocs.lookupTermBySynonym(OPENAIRE_COAR_RESOURCE_TYPES_3_1, originalType))
+						.ifPresent(coarTerm -> {
+							mappings.add(OafMapperUtils.instanceTypeMapping(originalType, coarTerm));
+							if (vocs.vocabularyExists(OPENAIRE_USER_RESOURCE_TYPES)) {
 
-										// TODO verify what the vocabs return when a synonym is not defined
-										Optional
-												.ofNullable(vocs.lookupTermBySynonym(OPENAIRE_USER_RESOURCE_TYPES, coarTerm.getClassid()))
-												.ifPresent(type -> mappings.add(OafMapperUtils.instanceTypeMapping(originalType, type)));
-									}
-								});
-					}
+								// TODO verify what the vocabs return when a synonym is not defined
+								Optional
+									.ofNullable(
+										vocs.lookupTermBySynonym(OPENAIRE_USER_RESOURCE_TYPES, coarTerm.getClassid()))
+									.ifPresent(
+										type -> mappings.add(OafMapperUtils.instanceTypeMapping(originalType, type)));
+							}
+						});
+				}
 
-					return mappings;
-				})
-				.orElse(new ArrayList<>());
+				return mappings;
+			})
+			.orElse(new ArrayList<>());
 	}
 
 	private Journal prepareJournal(final Document doc, final DataInfo info) {

@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Encoders;
 import org.dom4j.DocumentException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,8 +27,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.Constants;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.oa.graph.clean.CleaningRuleMap;
+import eu.dnetlib.dhp.oa.graph.clean.OafCleaner;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -119,19 +124,21 @@ class MappersTest {
 		assertNotNull(instance.getInstanceTypeMapping());
 		assertEquals(2, instance.getInstanceTypeMapping().size());
 
-		Optional<InstanceTypeMapping> coarType = instance.getInstanceTypeMapping()
-				.stream()
-				.filter(itm -> ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(itm.getVocabularyName()))
-				.findFirst();
+		Optional<InstanceTypeMapping> coarType = instance
+			.getInstanceTypeMapping()
+			.stream()
+			.filter(itm -> ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(itm.getVocabularyName()))
+			.findFirst();
 
 		assertTrue(coarType.isPresent());
 		assertEquals("http://purl.org/coar/resource_type/c_5794", coarType.get().getTypeCode());
 		assertEquals("conference paper", coarType.get().getTypeLabel());
 
-		Optional<InstanceTypeMapping> userType = instance.getInstanceTypeMapping()
-				.stream()
-				.filter(itm -> ModelConstants.OPENAIRE_USER_RESOURCE_TYPES.equals(itm.getVocabularyName()))
-				.findFirst();
+		Optional<InstanceTypeMapping> userType = instance
+			.getInstanceTypeMapping()
+			.stream()
+			.filter(itm -> ModelConstants.OPENAIRE_USER_RESOURCE_TYPES.equals(itm.getVocabularyName()))
+			.findFirst();
 
 		assertTrue(userType.isPresent());
 		assertEquals("Article", userType.get().getTypeCode());
@@ -266,8 +273,8 @@ class MappersTest {
 			});
 
 		Publication p_cleaned = cleanup(p, vocs);
-		assertEquals("0000", p_cleaned.getInstance().get(0).getRefereed().getClassid());
-		assertEquals("Unknown", p_cleaned.getInstance().get(0).getRefereed().getClassname());
+		assertEquals("0002", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("nonPeerReviewed", p_cleaned.getInstance().get(0).getRefereed().getClassname());
 
 		assertNotNull(p.getInstance().get(0).getPid());
 		assertEquals(2, p.getInstance().get(0).getPid().size());
@@ -485,8 +492,8 @@ class MappersTest {
 			});
 
 		Publication p_cleaned = cleanup(p, vocs);
-		assertEquals("0000", p_cleaned.getInstance().get(0).getRefereed().getClassid());
-		assertEquals("Unknown", p_cleaned.getInstance().get(0).getRefereed().getClassname());
+		assertEquals("0002", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("nonPeerReviewed", p_cleaned.getInstance().get(0).getRefereed().getClassname());
 	}
 
 	@Test
@@ -604,8 +611,137 @@ class MappersTest {
 		assertTrue(i.getUrl().contains("https://clinicaltrials.gov/ct2/show/NCT02321059"));
 
 		Dataset d_cleaned = cleanup(d, vocs);
-		assertEquals("0000", d_cleaned.getInstance().get(0).getRefereed().getClassid());
-		assertEquals("Unknown", d_cleaned.getInstance().get(0).getRefereed().getClassname());
+		assertEquals("0002", d_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("nonPeerReviewed", d_cleaned.getInstance().get(0).getRefereed().getClassname());
+	}
+
+	@Test
+	void test_record_from_Crossref() throws IOException {
+
+		final CleaningRuleMap mapping = CleaningRuleMap.create(vocs);
+
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_crossref.xml")));
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		assertEquals(1, list.size());
+		assertTrue(list.get(0) instanceof Publication);
+
+		final Publication p = OafCleaner.apply(fixVocabularyNames((Publication) list.get(0)), mapping);
+
+		assertNotNull(p.getDateofcollection());
+		assertEquals("2020-08-06T07:04:09.62Z", p.getDateofcollection());
+
+		assertNotNull(p.getDateoftransformation());
+		assertEquals("2020-08-06T07:20:57.911Z", p.getDateoftransformation());
+
+		assertNotNull(p.getDataInfo());
+		assertFalse(p.getDataInfo().getInvisible());
+		assertFalse(p.getDataInfo().getDeletedbyinference());
+		assertEquals("0.9", p.getDataInfo().getTrust());
+
+		assertValidId(p.getId());
+		assertEquals(2, p.getOriginalId().size());
+
+		assertEquals("50|doi_________::7f0f7807f17db50e5c2b5c452ccaf06d", p.getOriginalId().get(0));
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+
+		assertNotNull(p.getTitle());
+		assertEquals(1, p.getTitle().size());
+		assertEquals(
+			"A case report of serious haemolysis in a glucose-6-phosphate dehydrogenase-deficient COVID-19 patient receiving hydroxychloroquine",
+			p
+				.getTitle()
+				.get(0)
+				.getValue());
+
+		assertNotNull(p.getDescription());
+		assertEquals(0, p.getDescription().size());
+
+		assertEquals(8, p.getAuthor().size());
+
+		assertNotNull(p.getInstance());
+		assertEquals(1, p.getInstance().size());
+
+		final Instance i = p.getInstance().get(0);
+
+		assertNotNull(i.getAccessright());
+		assertEquals(ModelConstants.DNET_ACCESS_MODES, i.getAccessright().getSchemeid());
+		assertEquals(ModelConstants.DNET_ACCESS_MODES, i.getAccessright().getSchemename());
+		assertEquals("OPEN", i.getAccessright().getClassid());
+		assertEquals("Open Access", i.getAccessright().getClassname());
+
+		assertNotNull(i.getCollectedfrom());
+		assertEquals("10|openaire____::081b82f96300b6a6e3d282bad31cb6e2", i.getCollectedfrom().getKey());
+		assertEquals("Crossref", i.getCollectedfrom().getValue());
+
+		assertNotNull(i.getHostedby());
+		assertEquals("10|openaire____::55045bd2a65019fd8e6741a755395c8c", i.getHostedby().getKey());
+		assertEquals("Unknown Repository", i.getHostedby().getValue());
+
+		assertNotNull(i.getInstancetype());
+		assertEquals("0001", i.getInstancetype().getClassid());
+		assertEquals("Article", i.getInstancetype().getClassname());
+		assertEquals(ModelConstants.DNET_PUBLICATION_RESOURCE, i.getInstancetype().getSchemeid());
+		assertEquals(ModelConstants.DNET_PUBLICATION_RESOURCE, i.getInstancetype().getSchemename());
+
+		assertNull(i.getLicense());
+		assertNotNull(i.getDateofacceptance());
+		assertEquals("2020-06-04", i.getDateofacceptance().getValue());
+
+		assertNull(i.getProcessingchargeamount());
+		assertNull(i.getProcessingchargecurrency());
+
+		assertNotNull(i.getPid());
+		assertEquals(1, i.getPid().size());
+
+		assertNotNull(i.getAlternateIdentifier());
+		assertEquals(0, i.getAlternateIdentifier().size());
+
+		assertNotNull(i.getUrl());
+		assertEquals(1, i.getUrl().size());
+		assertTrue(i.getUrl().contains("http://dx.doi.org/10.1080/23744235.2020.1774644"));
+
+		assertEquals("", p.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("", p.getInstance().get(0).getRefereed().getClassname());
+
+		Publication p_cleaned = cleanup(p, vocs);
+
+		assertEquals("0001", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("peerReviewed", p_cleaned.getInstance().get(0).getRefereed().getClassname());
+
+		assertNotNull(p_cleaned.getMetaResourceType());
+		assertEquals("Research Literature", p_cleaned.getMetaResourceType().getClassid());
+		assertEquals("Research Literature", p_cleaned.getMetaResourceType().getClassname());
+		assertEquals(ModelConstants.OPENAIRE_META_RESOURCE_TYPE, p_cleaned.getMetaResourceType().getSchemeid());
+		assertEquals(ModelConstants.OPENAIRE_META_RESOURCE_TYPE, p_cleaned.getMetaResourceType().getSchemename());
+
+		assertNotNull(p_cleaned.getInstance().get(0).getInstanceTypeMapping());
+		assertEquals(2, p_cleaned.getInstance().get(0).getInstanceTypeMapping().size());
+
+		assertTrue(
+			p_cleaned
+				.getInstance()
+				.get(0)
+				.getInstanceTypeMapping()
+				.stream()
+				.anyMatch(
+					t -> "journal-article".equals(t.getOriginalType()) &&
+						ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(t.getVocabularyName()) &&
+						"http://purl.org/coar/resource_type/c_2df8fbb1".equals(t.getTypeCode()) &&
+						"research article".equals(t.getTypeLabel())));
+
+		assertTrue(
+			p_cleaned
+				.getInstance()
+				.get(0)
+				.getInstanceTypeMapping()
+				.stream()
+				.anyMatch(
+					t -> "journal-article".equals(t.getOriginalType()) &&
+						ModelConstants.OPENAIRE_USER_RESOURCE_TYPES.equals(t.getVocabularyName()) &&
+						"Article".equals(t.getTypeCode()) &&
+						"Article".equals(t.getTypeLabel())));
 	}
 
 	@Test
@@ -908,8 +1044,8 @@ class MappersTest {
 			});
 
 		Dataset p_cleaned = cleanup(p, vocs);
-		assertEquals("0000", p_cleaned.getInstance().get(0).getRefereed().getClassid());
-		assertEquals("Unknown", p_cleaned.getInstance().get(0).getRefereed().getClassname());
+		assertEquals("0002", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("nonPeerReviewed", p_cleaned.getInstance().get(0).getRefereed().getClassname());
 	}
 
 	@Test

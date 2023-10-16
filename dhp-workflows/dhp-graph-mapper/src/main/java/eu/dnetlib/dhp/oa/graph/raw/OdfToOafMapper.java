@@ -230,20 +230,18 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	 */
 	@Override
 	protected String findOriginalType(Document doc) {
-		String resourceType = Optional.ofNullable((Element) doc.selectSingleNode(
+		return Optional
+			.ofNullable(
+				(Element) doc
+					.selectSingleNode(
 						"//*[local-name()='metadata']/*[local-name() = 'resource']/*[local-name() = 'resourceType']"))
-				.map(element -> {
-					final String resourceTypeURI = element.attributeValue("anyURI");
-					final String resourceTypeTxt = element.getText();
+			.map(element -> {
+				final String resourceTypeURI = element.attributeValue("anyURI");
+				final String resourceTypeTxt = element.getText();
 
-					return ObjectUtils.firstNonNull(resourceTypeURI, resourceTypeTxt);
-				})
-				.orElse(doc.valueOf(
-						"//*[local-name()='metadata']/*[local-name() = 'resource']/*[local-name() = 'CobjCategory']/text()")
-				);
-
-		return resourceType;
-
+				return ObjectUtils.firstNonNull(resourceTypeURI, resourceTypeTxt);
+			})
+			.orElse(null);
 	}
 
 	@Override

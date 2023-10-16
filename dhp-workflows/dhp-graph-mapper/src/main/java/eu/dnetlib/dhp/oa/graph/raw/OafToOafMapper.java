@@ -1,17 +1,8 @@
 
 package eu.dnetlib.dhp.oa.graph.raw;
 
-import com.google.common.collect.Lists;
-import eu.dnetlib.dhp.common.PacePerson;
-import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
-import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
-import org.apache.commons.lang3.StringUtils;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.Node;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -20,8 +11,19 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
-import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
+import org.apache.commons.lang3.StringUtils;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.Node;
+
+import com.google.common.collect.Lists;
+
+import eu.dnetlib.dhp.common.PacePerson;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -201,12 +203,13 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	 */
 	@Override
 	protected String findOriginalType(Document doc) {
-		return (String) doc.selectNodes("//dc:type")
-				.stream()
-				.map(o -> "" + ((Node) o).getText().trim())
-				.sorted(new OriginalTypeComparator())
-				.findFirst()
-				.orElse(null);
+		return (String) doc
+			.selectNodes("//dc:type")
+			.stream()
+			.map(o -> "" + ((Node) o).getText().trim())
+			.sorted(new OriginalTypeComparator())
+			.findFirst()
+			.orElse(null);
 	}
 
 	@Override
