@@ -72,11 +72,7 @@ public class SparkCreateOrgsDedupRecord extends AbstractSparkAction {
 
 		final String mergeRelsPath = DedupUtility.createMergeRelPath(workingPath, actionSetId, "organization");
 
-		rootOrganization(spark, entityPath, mergeRelsPath)
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(outputPath);
+		save(rootOrganization(spark, entityPath, mergeRelsPath), outputPath, SaveMode.Overwrite);
 
 	}
 

@@ -67,8 +67,6 @@ public class SparkWhitelistSimRels extends AbstractSparkAction {
 		log.info("workingPath:   '{}'", workingPath);
 		log.info("whiteListPath: '{}'", whiteListPath);
 
-		JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-
 		// file format: source####target
 		Dataset<Row> whiteListRels = spark
 			.read()
