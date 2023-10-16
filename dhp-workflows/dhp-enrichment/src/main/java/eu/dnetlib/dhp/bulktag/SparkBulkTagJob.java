@@ -95,10 +95,7 @@ public class SparkBulkTagJob {
 
 		Dataset<String> datasources = readPath(
 			spark, inputPath
-				.substring(
-					0,
-					inputPath.lastIndexOf("/"))
-				+ "/datasource",
+				+ "datasource",
 			Datasource.class)
 				.filter((FilterFunction<Datasource>) ds -> isOKDatasource(ds))
 				.map((MapFunction<Datasource, String>) ds -> ds.getId(), Encoders.STRING());
@@ -106,10 +103,10 @@ public class SparkBulkTagJob {
 		Map<String, List<Pair<String, SelectionConstraints>>> dsm = cc.getEoscDatasourceMap();
 
 		for (String ds : datasources.collectAsList()) {
-			final String dsId = ds.substring(3);
-			if (!dsm.containsKey(dsId)) {
+			// final String dsId = ds.substring(3);
+			if (!dsm.containsKey(ds)) {
 				ArrayList<Pair<String, SelectionConstraints>> eoscList = new ArrayList<>();
-				dsm.put(dsId, eoscList);
+				dsm.put(ds, eoscList);
 			}
 		}
 

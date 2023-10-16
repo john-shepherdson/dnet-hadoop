@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.resulttocommunityfromproject;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.*;
 
@@ -51,16 +52,15 @@ public class PrepareResultCommunitySet {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		final boolean production = Boolean.valueOf(parser.get("outputPath"));
+		final boolean production = Boolean.valueOf(parser.get("production"));
 		log.info("production: {}", production);
 
 		final CommunityEntityMap projectsMap = Utils.getCommunityProjects(production);
 		log.info("projectsMap: {}", new Gson().toJson(projectsMap));
 
 		SparkConf conf = new SparkConf();
-		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
-		runWithSparkHiveSession(
+		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
@@ -94,24 +94,27 @@ public class PrepareResultCommunitySet {
 			.select(
 				new Column("source").as("resultId"),
 				new Column("target").as("projectId"))
-			.groupByKey((MapFunction<Row, String>) r -> (String) r.getAs("source"), Encoders.STRING())
+			.groupByKey((MapFunction<Row, String>) r -> (String) r.getAs("resultId"), Encoders.STRING())
 			.mapGroups((MapGroupsFunction<String, Row, ResultProjectList>) (k, v) -> {
 				ResultProjectList rpl = new ResultProjectList();
 				rpl.setResultId(k);
 				ArrayList<String> cl = new ArrayList<>();
-				cl.addAll(projectMap.get(v.next().getAs("target")));
+				cl.addAll(projectMap.get(v.next().getAs("projectId")));
 				v.forEachRemaining(r -> {
 					projectMap
-						.get(r.getAs("target"))
+						.get(r.getAs("projectId"))
 						.forEach(c -> {
 							if (!cl.contains(c))
 								cl.add(c);
 						});
 
 				});
+				if(cl.size() == 0)
+					return null;
 				rpl.setCommunityList(cl);
 				return rpl;
 			}, Encoders.bean(ResultProjectList.class))
+				.filter(Objects::nonNull)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")

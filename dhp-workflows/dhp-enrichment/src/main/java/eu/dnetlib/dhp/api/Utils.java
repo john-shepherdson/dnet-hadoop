@@ -11,6 +11,9 @@ import java.util.stream.Collectors;
 
 import javax.management.Query;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.amazonaws.util.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
@@ -21,6 +24,7 @@ import eu.dnetlib.dhp.bulktag.community.CommunityConfiguration;
 import eu.dnetlib.dhp.bulktag.community.Provider;
 import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
 import eu.dnetlib.dhp.bulktag.criteria.VerbResolverFactory;
+import eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob;
 
 /**
  * @author miriam.baglioni
@@ -29,6 +33,8 @@ import eu.dnetlib.dhp.bulktag.criteria.VerbResolverFactory;
 public class Utils implements Serializable {
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 	private static final VerbResolver resolver = VerbResolverFactory.newInstance();
+
+	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 
 	public static CommunityConfiguration getCommunityConfiguration(boolean production) throws IOException {
 		final Map<String, Community> communities = Maps.newHashMap();
@@ -126,6 +132,7 @@ public class Utils implements Serializable {
 					throw new RuntimeException(e);
 				}
 			});
+
 		return organizationMap;
 	}
 

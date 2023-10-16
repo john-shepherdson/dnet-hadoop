@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.bulktag;
+package eu.dnetlib.dhp.api;
 
 import java.util.List;
 
@@ -98,14 +98,22 @@ public class QueryCommunityAPITest {
 	@Test
 	void getCommunityProjects() throws Exception {
 		CommunityEntityMap projectMap = Utils.getCommunityProjects(true);
-		Assertions.assertFalse(projectMap.containsKey("mes"));
-		Assertions.assertEquals(33, projectMap.size());
+
 		Assertions
 			.assertTrue(
 				projectMap
 					.keySet()
 					.stream()
-					.allMatch(k -> projectMap.get(k).stream().allMatch(p -> p.startsWith("40|"))));
+					.allMatch(k -> k.startsWith("40|")));
+
+		System.out.println(projectMap);
+	}
+
+	@Test
+	void getCommunityOrganizations() throws Exception {
+		CommunityEntityMap organizationMap = Utils.getCommunityOrganization(true);
+		Assertions.assertTrue(organizationMap.keySet().stream().allMatch(k -> k.startsWith("20|")));
+
 	}
 
 }

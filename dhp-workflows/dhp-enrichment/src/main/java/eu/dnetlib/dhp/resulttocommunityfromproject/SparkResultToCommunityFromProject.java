@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.resulttocommunityfromproject;
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.PropagationConstant.PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_NAME;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -61,20 +62,14 @@ public class SparkResultToCommunityFromProject implements Serializable {
 		final String possibleupdatespath = parser.get("preparedInfoPath");
 		log.info("preparedInfoPath: {}", possibleupdatespath);
 
-		final String resultClassName = parser.get("resultTableName");
-		log.info("resultTableName: {}", resultClassName);
-
-		@SuppressWarnings("unchecked")
-		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		SparkConf conf = new SparkConf();
-		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
-		runWithSparkHiveSession(
+
+		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-//                    removeOutputDir(spark, outputPath);
 
 				execPropagation(spark, inputPath, outputPath, possibleupdatespath);
 
@@ -108,7 +103,7 @@ public class SparkResultToCommunityFromProject implements Serializable {
 						.write()
 						.mode(SaveMode.Overwrite)
 						.option("compression", "gzip")
-						.json(outputPath);
+						.json(outputPath + e.name());
 				}
 			});
 

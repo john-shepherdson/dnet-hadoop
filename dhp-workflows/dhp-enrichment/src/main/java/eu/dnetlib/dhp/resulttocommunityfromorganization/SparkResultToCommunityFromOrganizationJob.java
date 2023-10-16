@@ -2,7 +2,7 @@
 package eu.dnetlib.dhp.resulttocommunityfromorganization;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import scala.Tuple2;
@@ -53,22 +54,15 @@ public class SparkResultToCommunityFromOrganizationJob {
 		final String possibleupdatespath = parser.get("preparedInfoPath");
 		log.info("preparedInfoPath: {}", possibleupdatespath);
 
-		final String resultClassName = parser.get("resultTableName");
-		log.info("resultTableName: {}", resultClassName);
-
-		@SuppressWarnings("unchecked")
-		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
-
 		SparkConf conf = new SparkConf();
-		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
-		runWithSparkHiveSession(
+		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				removeOutputDir(spark, outputPath);
+				// removeOutputDir(spark, outputPath);
 
-				execPropagation(spark, inputPath, outputPath, resultClazz, possibleupdatespath);
+				execPropagation(spark, inputPath, outputPath, possibleupdatespath);
 
 			});
 	}
@@ -77,22 +71,32 @@ public class SparkResultToCommunityFromOrganizationJob {
 		SparkSession spark,
 		String inputPath,
 		String outputPath,
-		Class<R> resultClazz,
 		String possibleUpdatesPath) {
 
 		Dataset<ResultCommunityList> possibleUpdates = readPath(spark, possibleUpdatesPath, ResultCommunityList.class);
-		Dataset<R> result = readPath(spark, inputPath, resultClazz);
 
-		result
-			.joinWith(
-				possibleUpdates,
-				result.col("id").equalTo(possibleUpdates.col("resultId")),
-				"left_outer")
-			.map(resultCommunityFn(), Encoders.bean(resultClazz))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(outputPath);
+		ModelSupport.entityTypes
+			.keySet()
+			.parallelStream()
+			.forEach(e -> {
+				if (ModelSupport.isResult(e)) {
+					Class<R> resultClazz = ModelSupport.entityTypes.get(e);
+					removeOutputDir(spark, outputPath + e.name());
+					Dataset<R> result = readPath(spark, inputPath + e.name(), resultClazz);
+
+					result
+						.joinWith(
+							possibleUpdates,
+							result.col("id").equalTo(possibleUpdates.col("resultId")),
+							"left_outer")
+						.map(resultCommunityFn(), Encoders.bean(resultClazz))
+						.write()
+						.mode(SaveMode.Overwrite)
+						.option("compression", "gzip")
+						.json(outputPath + e.name());
+				}
+			});
+
 	}
 
 	private static <R extends Result> MapFunction<Tuple2<R, ResultCommunityList>, R> resultCommunityFn() {
