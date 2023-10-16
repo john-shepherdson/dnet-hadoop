@@ -74,7 +74,7 @@ class MappersTest {
 		assertTrue(StringUtils.isNotBlank(p.getDateofcollection()));
 		assertTrue(StringUtils.isNotBlank(p.getDateoftransformation()));
 
-		assertTrue(p.getAuthor().size() > 0);
+		assertFalse(p.getAuthor().isEmpty());
 		final Optional<Author> author = p
 			.getAuthor()
 			.stream()
@@ -97,14 +97,14 @@ class MappersTest {
 		assertEquals("Votsi", author.get().getSurname());
 		assertEquals("Nefta", author.get().getName());
 
-		assertTrue(p.getSubject().size() > 0);
+		assertFalse(p.getSubject().isEmpty());
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getIssnOnline()));
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getName()));
 
 		assertTrue(p.getPid().isEmpty());
 
 		assertNotNull(p.getInstance());
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getInstance().isEmpty());
 		p
 			.getInstance()
 			.forEach(i -> {
@@ -121,7 +121,7 @@ class MappersTest {
 
 		Optional<InstanceTypeMapping> coarType = instance.getInstanceTypeMapping()
 				.stream()
-				.filter(itm -> AbstractMdRecordToOafMapper.OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(itm.getVocabularyName()))
+				.filter(itm -> ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(itm.getVocabularyName()))
 				.findFirst();
 
 		assertTrue(coarType.isPresent());
@@ -130,7 +130,7 @@ class MappersTest {
 
 		Optional<InstanceTypeMapping> userType = instance.getInstanceTypeMapping()
 				.stream()
-				.filter(itm -> AbstractMdRecordToOafMapper.OPENAIRE_USER_RESOURCE_TYPES.equals(itm.getVocabularyName()))
+				.filter(itm -> ModelConstants.OPENAIRE_USER_RESOURCE_TYPES.equals(itm.getVocabularyName()))
 				.findFirst();
 
 		assertTrue(userType.isPresent());
@@ -228,7 +228,7 @@ class MappersTest {
 		assertTrue(StringUtils.isNotBlank(p.getDateofcollection()));
 		assertTrue(StringUtils.isNotBlank(p.getDateoftransformation()));
 
-		assertTrue(p.getAuthor().size() > 0);
+		assertFalse(p.getAuthor().isEmpty());
 		final Optional<Author> author = p
 			.getAuthor()
 			.stream()
@@ -251,13 +251,13 @@ class MappersTest {
 		assertEquals("Votsi", author.get().getSurname());
 		assertEquals("Nefta", author.get().getName());
 
-		assertTrue(p.getSubject().size() > 0);
-		assertTrue(p.getPid().size() > 0);
+		assertFalse(p.getSubject().isEmpty());
+		assertFalse(p.getPid().isEmpty());
 		assertEquals("PMC1517292", p.getPid().get(0).getValue());
 		assertEquals("pmc", p.getPid().get(0).getQualifier().getClassid());
 
 		assertNotNull(p.getInstance());
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getInstance().isEmpty());
 		p
 			.getInstance()
 			.forEach(i -> {
@@ -287,7 +287,7 @@ class MappersTest {
 
 		final List<Oaf> list = new OafToOafMapper(vocs, true, true).processMdRecord(xml);
 
-		assertTrue(list.size() > 0);
+		assertFalse(list.isEmpty());
 		assertTrue(list.get(0) instanceof Publication);
 
 		final Publication p = (Publication) list.get(0);
@@ -343,7 +343,7 @@ class MappersTest {
 		assertTrue(d.getOriginalId().stream().anyMatch(oid -> oid.equals("oai:zenodo.org:3234526")));
 		assertValidId(d.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
-		assertTrue(d.getAuthor().size() > 0);
+		assertFalse(d.getAuthor().isEmpty());
 
 		final Optional<Author> author = d
 			.getAuthor()
@@ -377,13 +377,13 @@ class MappersTest {
 		final Field<String> affiliation = opAff.get();
 		assertEquals("ISTI-CNR", affiliation.getValue());
 
-		assertTrue(d.getSubject().size() > 0);
-		assertTrue(d.getInstance().size() > 0);
-		assertTrue(d.getContext().size() > 0);
-		assertTrue(d.getContext().get(0).getId().length() > 0);
+		assertFalse(d.getSubject().isEmpty());
+		assertFalse(d.getInstance().isEmpty());
+		assertFalse(d.getContext().isEmpty());
+		assertFalse(d.getContext().get(0).getId().isEmpty());
 
 		assertNotNull(d.getInstance());
-		assertTrue(d.getInstance().size() > 0);
+		assertFalse(d.getInstance().isEmpty());
 		d
 			.getInstance()
 			.forEach(i -> {
@@ -457,7 +457,7 @@ class MappersTest {
 		// assertEquals("oai:pub.uni-bielefeld.de:2949739", p.getOriginalId().get(0));
 
 		assertValidId(p.getCollectedfrom().get(0).getKey());
-		assertTrue(p.getAuthor().size() > 0);
+		assertFalse(p.getAuthor().isEmpty());
 
 		final Optional<Author> author = p
 			.getAuthor()
@@ -469,14 +469,14 @@ class MappersTest {
 		assertEquals("Potwarka", author.get().getSurname());
 		assertEquals("Luke R.", author.get().getName());
 
-		assertTrue(p.getSubject().size() > 0);
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getSubject().isEmpty());
+		assertFalse(p.getInstance().isEmpty());
 
 		assertNotNull(p.getTitle());
 		assertFalse(p.getTitle().isEmpty());
 
 		assertNotNull(p.getInstance());
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getInstance().isEmpty());
 		p
 			.getInstance()
 			.forEach(i -> {
@@ -624,9 +624,9 @@ class MappersTest {
 		assertValidId(s.getId());
 		assertValidId(s.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(s.getTitle().get(0).getValue()));
-		assertTrue(s.getAuthor().size() > 0);
-		assertTrue(s.getSubject().size() > 0);
-		assertTrue(s.getInstance().size() > 0);
+		assertFalse(s.getAuthor().isEmpty());
+		assertFalse(s.getSubject().isEmpty());
+		assertFalse(s.getInstance().isEmpty());
 
 		final Relation r1 = (Relation) list.get(1);
 		final Relation r2 = (Relation) list.get(2);
@@ -882,7 +882,7 @@ class MappersTest {
 		assertEquals(2, p.getOriginalId().size());
 		assertTrue(p.getOriginalId().stream().anyMatch(oid -> oid.equals("df76e73f-0483-49a4-a9bb-63f2f985574a")));
 		assertValidId(p.getCollectedfrom().get(0).getKey());
-		assertTrue(p.getAuthor().size() > 0);
+		assertFalse(p.getAuthor().isEmpty());
 
 		final Optional<Author> author = p
 			.getAuthor()
@@ -892,14 +892,14 @@ class MappersTest {
 
 		assertEquals("Museum Sønderjylland", author.get().getFullname());
 
-		assertTrue(p.getSubject().size() > 0);
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getSubject().isEmpty());
+		assertFalse(p.getInstance().isEmpty());
 
 		assertNotNull(p.getTitle());
 		assertFalse(p.getTitle().isEmpty());
 
 		assertNotNull(p.getInstance());
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getInstance().isEmpty());
 		p
 			.getInstance()
 			.forEach(i -> {
@@ -939,10 +939,10 @@ class MappersTest {
 		System.out.println("***************");
 
 		final Dataset p = (Dataset) list.get(0);
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getInstance().isEmpty());
 		for (String url : p.getInstance().get(0).getUrl()) {
 			System.out.println(url);
-			assertTrue(!url.contains("&amp;"));
+			assertFalse(url.contains("&amp;"));
 		}
 	}
 
@@ -959,7 +959,7 @@ class MappersTest {
 		assertTrue(o.isPresent());
 
 		Publication p = (Publication) o.get();
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getInstance().isEmpty());
 
 		assertEquals("https://doi.org/10.1155/2015/439379", p.getInstance().get(0).getUrl().get(0));
 

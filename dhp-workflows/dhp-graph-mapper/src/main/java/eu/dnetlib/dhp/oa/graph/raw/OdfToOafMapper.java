@@ -220,11 +220,6 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		}
 	}
 
-	@Override
-	protected List<InstanceTypeMapping> prepareInstanceTypeMapping(Document doc) {
-		return null;
-	}
-
 	/**
 	 * The Datacite element
 	 *
@@ -235,13 +230,20 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	 */
 	@Override
 	protected String findOriginalType(Document doc) {
-		final Element resourceType = (Element) doc.selectSingleNode(
-				"//metadata/*[local-name() = 'resource']/*[local-name() = 'resourceType']");
+		String resourceType = Optional.ofNullable((Element) doc.selectSingleNode(
+						"//*[local-name()='metadata']/*[local-name() = 'resource']/*[local-name() = 'resourceType']"))
+				.map(element -> {
+					final String resourceTypeURI = element.attributeValue("anyURI");
+					final String resourceTypeTxt = element.getText();
 
-		final String resourceTypeURI = resourceType.attributeValue("anyURI");
-		final String resourceTypeTxt = resourceType.getText();
+					return ObjectUtils.firstNonNull(resourceTypeURI, resourceTypeTxt);
+				})
+				.orElse(doc.valueOf(
+						"//*[local-name()='metadata']/*[local-name() = 'resource']/*[local-name() = 'CobjCategory']/text()")
+				);
 
-		return ObjectUtils.firstNonNull(resourceTypeURI, resourceTypeTxt);
+		return resourceType;
+
 	}
 
 	@Override
