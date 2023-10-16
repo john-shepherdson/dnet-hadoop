@@ -509,12 +509,19 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 
 						// from the script from Dimitris
 						if ("0000".equals(i.getRefereed().getClassid())) {
-							final boolean isFromCrossref = ModelConstants.CROSSREF_ID
-								.equals(i.getCollectedfrom().getKey());
-							final boolean hasDoi = i
-								.getPid()
-								.stream()
-								.anyMatch(pid -> PidType.doi.toString().equals(pid.getQualifier().getClassid()));
+							final boolean isFromCrossref = Optional
+								.ofNullable(i.getCollectedfrom())
+								.map(KeyValue::getKey)
+								.map(id -> id.equals(ModelConstants.CROSSREF_ID))
+								.orElse(false);
+							final boolean hasDoi = Optional
+								.ofNullable(i.getPid())
+								.map(
+									pid -> pid
+										.stream()
+										.anyMatch(
+											p -> PidType.doi.toString().equals(p.getQualifier().getClassid())))
+								.orElse(false);
 							final boolean isPeerReviewedType = PEER_REVIEWED_TYPES
 								.contains(i.getInstancetype().getClassname());
 							final boolean noOtherLitType = r
