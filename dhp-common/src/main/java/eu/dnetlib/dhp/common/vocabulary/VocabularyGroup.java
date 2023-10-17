@@ -136,24 +136,21 @@ public class VocabularyGroup implements Serializable {
 	}
 
 	public Qualifier lookupTermBySynonym(final String vocId, final String syn) {
-		if (StringUtils.isBlank(vocId)) {
-			return OafMapperUtils.unknown("", "");
-		}
-
-		final Vocabulary vocabulary = vocs.get(vocId.toLowerCase());
-
-		return Optional
-			.ofNullable(vocabulary.getTerm(syn))
+		return find(vocId)
 			.map(
-				term -> OafMapperUtils
-					.qualifier(term.getId(), term.getName(), vocabulary.getId(), vocabulary.getName()))
-			.orElse(
-				Optional
-					.ofNullable(vocabulary.getTermBySynonym(syn))
+				vocabulary -> Optional
+					.ofNullable(vocabulary.getTerm(syn))
 					.map(
 						term -> OafMapperUtils
 							.qualifier(term.getId(), term.getName(), vocabulary.getId(), vocabulary.getName()))
-					.orElse(null));
+					.orElse(
+						Optional
+							.ofNullable(vocabulary.getTermBySynonym(syn))
+							.map(
+								term -> OafMapperUtils
+									.qualifier(term.getId(), term.getName(), vocabulary.getId(), vocabulary.getName()))
+							.orElse(null)))
+			.orElse(null);
 	}
 
 	/**
