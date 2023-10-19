@@ -71,7 +71,7 @@ public class GroupEntitiesSparkJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				HdfsSupport.remove(outputPath, spark.sparkContext().hadoopConfiguration());
+				HdfsSupport.remove(checkpointPath, spark.sparkContext().hadoopConfiguration());
 				groupEntities(spark, graphInputPath, checkpointPath, outputPath, filterInvisible);
 			});
 	}
