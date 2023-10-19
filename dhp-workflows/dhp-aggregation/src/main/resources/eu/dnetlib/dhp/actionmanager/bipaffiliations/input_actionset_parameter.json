@@ -8,7 +8,13 @@
   {
     "paramName": "ip",
     "paramLongName": "inputPath",
-    "paramDescription": "the URL from where to get the programme file",
+    "paramDescription": "the path to get the input data from Crossref",
+    "paramRequired": true
+  },
+  {
+    "paramName": "pip",
+    "paramLongName": "pubmedInputPath",
+    "paramDescription": "the path to get the input data from Pubmed",
     "paramRequired": true
   },
   {
