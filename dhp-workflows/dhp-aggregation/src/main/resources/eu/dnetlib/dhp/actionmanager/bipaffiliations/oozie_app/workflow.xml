@@ -3,7 +3,11 @@
 
         <property>
             <name>inputPath</name>
-            <description>the path where to find the inferred affiliation relations</description>
+            <description>the path where to find the inferred affiliation relations from Crossref</description>
+        </property>
+        <property>
+            <name>pubmedInputPath</name>
+            <description>the path where to find the inferred affiliation relations from Pubmed</description>
         </property>
         <property>
             <name>outputPath</name>
@@ -97,6 +101,7 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}</arg>
+            <arg>--pubmedInputPath</arg><arg>${pubmedInputPath}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>
