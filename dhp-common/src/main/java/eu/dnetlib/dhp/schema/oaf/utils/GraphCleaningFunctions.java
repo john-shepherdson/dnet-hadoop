@@ -286,6 +286,12 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 
 	public static <T extends Oaf> T cleanup(T value, VocabularyGroup vocs) {
 
+		if (Objects.isNull(value.getDataInfo())) {
+			final DataInfo d = new DataInfo();
+			d.setDeletedbyinference(false);
+			value.setDataInfo(d);
+		}
+
 		if (value instanceof OafEntity) {
 
 			OafEntity e = (OafEntity) value;
@@ -304,6 +310,10 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 				}
 			} else if (value instanceof Result) {
 				Result r = (Result) value;
+
+				if (Objects.isNull(r.getContext())) {
+					r.setContext(new ArrayList<>());
+				}
 
 				if (Objects.nonNull(r.getFulltext())
 					&& (ModelConstants.SOFTWARE_RESULTTYPE_CLASSID.equals(r.getResulttype().getClassid()) ||
