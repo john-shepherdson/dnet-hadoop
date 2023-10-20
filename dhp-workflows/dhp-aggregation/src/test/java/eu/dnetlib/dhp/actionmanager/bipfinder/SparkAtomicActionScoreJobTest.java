@@ -6,7 +6,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+
+import javax.xml.crypto.Data;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.io.Text;
@@ -27,7 +28,9 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.action.AtomicAction;
-import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class SparkAtomicActionScoreJobTest {
@@ -37,8 +40,8 @@ public class SparkAtomicActionScoreJobTest {
 	private static SparkSession spark;
 
 	private static Path workingDir;
-	private static final Logger log = LoggerFactory
-		.getLogger(SparkAtomicActionScoreJobTest.class);
+
+	private static final Logger log = LoggerFactory.getLogger(SparkAtomicActionScoreJobTest.class);
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
@@ -69,47 +72,64 @@ public class SparkAtomicActionScoreJobTest {
 		spark.stop();
 	}
 
-	@Test
-	void testMatch() throws Exception {
-		String bipScoresPath = getClass()
-			.getResource("/eu/dnetlib/dhp/actionmanager/bipfinder/bip_scores_oid.json")
-			.getPath();
-
+	private void runJob(String resultsInputPath, String projectsInputPath, String outputPath) throws Exception {
 		SparkAtomicActionScoreJob
 			.main(
 				new String[] {
-					"-isSparkSessionManaged",
-					Boolean.FALSE.toString(),
-					"-inputPath",
-
-					bipScoresPath,
-
-					"-outputPath",
-					workingDir.toString() + "/actionSet"
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-resultsInputPath", resultsInputPath,
+					"-projectsInputPath", projectsInputPath,
+					"-outputPath", outputPath,
 				});
+	}
+
+	@Test
+	void testScores() throws Exception {
+
+		String resultsInputPath = getClass()
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipfinder/result_bip_scores.json")
+			.getPath();
+
+		String projectsInputPath = getClass()
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipfinder/project_bip_scores.json")
+			.getPath();
+
+		String outputPath = workingDir.toString() + "/actionSet";
+
+		// execute the job to generate the action sets for result scores
+		runJob(resultsInputPath, projectsInputPath, outputPath);
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
-		JavaRDD<Result> tmp = sc
-			.sequenceFile(workingDir.toString() + "/actionSet", Text.class, Text.class)
+		JavaRDD<OafEntity> tmp = sc
+			.sequenceFile(outputPath, Text.class, Text.class)
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
-			.map(aa -> ((Result) aa.getPayload()));
+			.map(aa -> ((OafEntity) aa.getPayload()));
 
-		assertEquals(4, tmp.count());
+		assertEquals(8, tmp.count());
 
-		Dataset<Result> verificationDataset = spark.createDataset(tmp.rdd(), Encoders.bean(Result.class));
+		Dataset<OafEntity> verificationDataset = spark.createDataset(tmp.rdd(), Encoders.bean(OafEntity.class));
 		verificationDataset.createOrReplaceTempView("result");
 
-		Dataset<Row> execVerification = spark
+		Dataset<Row> testDataset = spark
 			.sql(
 				"Select p.id oaid, mes.id, mUnit.value from result p " +
 					"lateral view explode(measures) m as mes " +
 					"lateral view explode(mes.unit) u as mUnit ");
 
-		Assertions.assertEquals(12, execVerification.count());
+//		execVerification.show();
+
+		Assertions.assertEquals(28, testDataset.count());
+
+		assertResultImpactScores(testDataset);
+		assertProjectImpactScores(testDataset);
+
+	}
+
+	void assertResultImpactScores(Dataset<Row> testDataset) {
 		Assertions
 			.assertEquals(
-				"6.63451994567e-09", execVerification
+				"6.63451994567e-09", testDataset
 					.filter(
 						"oaid='50|arXiv_dedup_::4a2d5fd8d71daec016c176ec71d957b1' " +
 							"and id = 'influence'")
@@ -119,7 +139,7 @@ public class SparkAtomicActionScoreJobTest {
 					.getString(0));
 		Assertions
 			.assertEquals(
-				"0.348694533145", execVerification
+				"0.348694533145", testDataset
 					.filter(
 						"oaid='50|arXiv_dedup_::4a2d5fd8d71daec016c176ec71d957b1' " +
 							"and id = 'popularity_alt'")
@@ -129,7 +149,7 @@ public class SparkAtomicActionScoreJobTest {
 					.getString(0));
 		Assertions
 			.assertEquals(
-				"2.16094680115e-09", execVerification
+				"2.16094680115e-09", testDataset
 					.filter(
 						"oaid='50|arXiv_dedup_::4a2d5fd8d71daec016c176ec71d957b1' " +
 							"and id = 'popularity'")
@@ -137,7 +157,49 @@ public class SparkAtomicActionScoreJobTest {
 					.collectAsList()
 					.get(0)
 					.getString(0));
-
 	}
 
+	void assertProjectImpactScores(Dataset<Row> testDataset) throws Exception {
+
+		Assertions
+			.assertEquals(
+				"0", testDataset
+					.filter(
+						"oaid='40|nih_________::c02a8233e9b60f05bb418f0c9b714833' " +
+							"and id = 'numOfInfluentialResults'")
+					.select("value")
+					.collectAsList()
+					.get(0)
+					.getString(0));
+		Assertions
+			.assertEquals(
+				"1", testDataset
+					.filter(
+						"oaid='40|nih_________::c02a8233e9b60f05bb418f0c9b714833' " +
+							"and id = 'numOfPopularResults'")
+					.select("value")
+					.collectAsList()
+					.get(0)
+					.getString(0));
+		Assertions
+			.assertEquals(
+				"25", testDataset
+					.filter(
+						"oaid='40|nih_________::c02a8233e9b60f05bb418f0c9b714833' " +
+							"and id = 'totalImpulse'")
+					.select("value")
+					.collectAsList()
+					.get(0)
+					.getString(0));
+		Assertions
+			.assertEquals(
+				"43", testDataset
+					.filter(
+						"oaid='40|nih_________::c02a8233e9b60f05bb418f0c9b714833' " +
+							"and id = 'totalCitationCount'")
+					.select("value")
+					.collectAsList()
+					.get(0)
+					.getString(0));
+	}
 }

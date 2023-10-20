@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,8 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class MdStoreClientTest {
 
-	@Test
-	@Disabled
+	// @Test
 	public void testMongoCollection() throws IOException {
 		final MdstoreClient client = new MdstoreClient("mongodb://localhost:27017", "mdstore");
 

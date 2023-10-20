@@ -1,10 +1,12 @@
 
 package eu.dnetlib.dhp.oa.dedup;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
@@ -15,6 +17,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 
+import eu.dnetlib.dhp.oa.dedup.model.Identifier;
 import eu.dnetlib.dhp.oa.merge.AuthorMerger;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -74,33 +77,43 @@ public class DedupRecordFactory {
 
 	public static <T extends OafEntity> T entityMerger(
 		String id, Iterator<Tuple2<String, T>> entities, long ts, DataInfo dataInfo, Class<T> clazz)
-		throws IllegalAccessException, InstantiationException {
+		throws IllegalAccessException, InstantiationException, InvocationTargetException {
 
-		T entity = clazz.newInstance();
-		entity.setDataInfo(dataInfo);
+		final Comparator<Identifier<T>> idComparator = new IdentifierComparator<>();
 
-		final Collection<String> dates = Lists.newArrayList();
+		final LinkedList<T> entityList = Lists
+			.newArrayList(entities)
+			.stream()
+			.map(t -> Identifier.newInstance(t._2()))
+			.sorted(idComparator)
+			.map(Identifier::getEntity)
+			.collect(Collectors.toCollection(LinkedList::new));
+
+		final T entity = clazz.newInstance();
+		final T first = entityList.removeFirst();
+
+		BeanUtils.copyProperties(entity, first);
+
 		final List<List<Author>> authors = Lists.newArrayList();
 
-		entities
-			.forEachRemaining(
-				t -> {
-					T duplicate = t._2();
-
+		entityList
+			.forEach(
+				duplicate -> {
 					entity.mergeFrom(duplicate);
 					if (ModelSupport.isSubClass(duplicate, Result.class)) {
 						Result r1 = (Result) duplicate;
-						if (r1.getAuthor() != null && !r1.getAuthor().isEmpty())
-							authors.add(r1.getAuthor());
-						if (r1.getDateofacceptance() != null)
-							dates.add(r1.getDateofacceptance().getValue());
+						Optional
+							.ofNullable(r1.getAuthor())
+							.ifPresent(a -> authors.add(a));
 					}
-
 				});
 
 		// set authors and date
 		if (ModelSupport.isSubClass(entity, Result.class)) {
-			((Result) entity).setDateofacceptance(DatePicker.pick(dates));
+			Optional
+				.ofNullable(((Result) entity).getAuthor())
+				.ifPresent(a -> authors.add(a));
+
 			((Result) entity).setAuthor(AuthorMerger.merge(authors));
 		}
 

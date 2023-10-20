@@ -36,10 +36,6 @@ public class StreamingInputDocumentFactory {
 
 	private static final String INDEX_FIELD_PREFIX = "__";
 
-	private static final String DS_VERSION = INDEX_FIELD_PREFIX + "dsversion";
-
-	private static final String DS_ID = INDEX_FIELD_PREFIX + "dsid";
-
 	private static final String RESULT = "result";
 
 	private static final String INDEX_RESULT = INDEX_FIELD_PREFIX + RESULT;
@@ -65,20 +61,13 @@ public class StreamingInputDocumentFactory {
 	private final ThreadLocal<XMLEventFactory> eventFactory = ThreadLocal
 		.withInitial(XMLEventFactory::newInstance);
 
-	private final String version;
-
-	private final String dsId;
-
 	private String resultName = DEFAULTDNETRESULT;
 
-	public StreamingInputDocumentFactory(final String version, final String dsId) {
-		this(version, dsId, DEFAULTDNETRESULT);
+	public StreamingInputDocumentFactory() {
+		this(DEFAULTDNETRESULT);
 	}
 
-	public StreamingInputDocumentFactory(
-		final String version, final String dsId, final String resultName) {
-		this.version = version;
-		this.dsId = dsId;
+	public StreamingInputDocumentFactory(final String resultName) {
 		this.resultName = resultName;
 	}
 
@@ -109,14 +98,6 @@ public class StreamingInputDocumentFactory {
 						copyResult(indexDocument, results, parser, nsList, resultName);
 					}
 				}
-			}
-
-			if (version != null) {
-				indexDocument.addField(DS_VERSION, version);
-			}
-
-			if (dsId != null) {
-				indexDocument.addField(DS_ID, dsId);
 			}
 
 			if (!indexDocument.containsKey(INDEX_RECORD_ID)) {

@@ -28,5 +28,17 @@
     "paramLongName": "numPartitions",
     "paramDescription": "number of partitions for the similarity relations intermediate phases",
     "paramRequired": false
+  },
+  {
+    "paramName": "dl",
+    "paramLongName": "dataframeLog",
+    "paramDescription": "the path of the dataframe Log",
+    "paramRequired": false
+  },
+  {
+    "paramName": "rt",
+    "paramLongName": "runTAG",
+    "paramDescription": "the label of the current running",
+    "paramRequired": false
   }
 ]
