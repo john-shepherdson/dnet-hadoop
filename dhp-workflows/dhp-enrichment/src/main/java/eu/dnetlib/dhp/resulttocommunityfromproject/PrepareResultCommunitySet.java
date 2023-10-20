@@ -109,12 +109,12 @@ public class PrepareResultCommunitySet {
 						});
 
 				});
-				if(cl.size() == 0)
+				if (cl.size() == 0)
 					return null;
 				rpl.setCommunityList(cl);
 				return rpl;
 			}, Encoders.bean(ResultProjectList.class))
-				.filter(Objects::nonNull)
+			.filter(Objects::nonNull)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")

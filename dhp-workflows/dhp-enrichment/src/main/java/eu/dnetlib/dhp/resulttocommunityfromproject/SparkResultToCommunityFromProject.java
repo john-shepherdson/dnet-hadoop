@@ -62,9 +62,7 @@ public class SparkResultToCommunityFromProject implements Serializable {
 		final String possibleupdatespath = parser.get("preparedInfoPath");
 		log.info("preparedInfoPath: {}", possibleupdatespath);
 
-
 		SparkConf conf = new SparkConf();
-
 
 		runWithSparkSession(
 			conf,

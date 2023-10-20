@@ -1,4 +1,4 @@
-<workflow-app name="community_to_result_propagation" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="community_to_result_propagation_project" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>sourcePath</name>
@@ -22,7 +22,7 @@
         </configuration>
     </global>
 
-    <start to="prepare_result_communitylist"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -87,7 +87,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Prepare-Community-Result-Organization</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromorganization.PrepareResultCommunitySet</class>
+            <class>eu.dnetlib.dhp.resulttocommunityfromproject.PrepareResultCommunitySet</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=6
@@ -104,7 +104,6 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--production</arg><arg>${production}</arg>
         </spark>
         <ok to="exec-propagation"/>
@@ -115,8 +114,8 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>community2resultfromorganization-Publication</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob</class>
+            <name>community2resultfromproject</name>
+            <class>eu.dnetlib.dhp.resulttocommunityfromproject.SparkResultToCommunityFromProject</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=6
