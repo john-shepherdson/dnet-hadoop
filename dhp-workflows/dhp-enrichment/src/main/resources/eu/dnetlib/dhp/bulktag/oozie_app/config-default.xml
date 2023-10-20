@@ -45,10 +45,14 @@
     </property>
     <property>
         <name>sparkExecutorMemory</name>
-        <value>6G</value>
+        <value>5G</value>
     </property>
     <property>
-        <name>sparkExecutorCores</name>
-        <value>1</value>
+        <name>memoryOverhead</name>
+        <value>3g</value>
+    </property>
+    <property>
+        <name>partitions</name>
+        <value>3284</value>
     </property>
 </configuration>
