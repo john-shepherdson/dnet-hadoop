@@ -87,7 +87,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Produces the atomic action with the inferred by BIP! affiliation relations from Crossref</name>
+            <name>Produces the atomic action with the inferred by BIP! affiliation relations (from Crossref and Pubmed)</name>
             <class>eu.dnetlib.dhp.actionmanager.bipaffiliations.PrepareAffiliationRelations</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
