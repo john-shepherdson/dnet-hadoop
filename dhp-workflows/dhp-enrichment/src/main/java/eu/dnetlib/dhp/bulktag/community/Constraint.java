@@ -41,7 +41,6 @@ public class Constraint implements Serializable {
 		this.value = value;
 	}
 
-
 	@JsonIgnore
 	public void setSelection(VerbResolver resolver)
 		throws InvocationTargetException, NoSuchMethodException, InstantiationException,
@@ -52,6 +51,5 @@ public class Constraint implements Serializable {
 	public boolean verifyCriteria(String metadata) {
 		return selection.apply(metadata);
 	}
-
 
 }

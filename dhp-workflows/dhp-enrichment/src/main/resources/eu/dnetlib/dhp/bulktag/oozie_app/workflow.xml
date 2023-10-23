@@ -111,7 +111,7 @@
                 --num-executors=${sparkExecutorNumber}
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
-                --conf spark.executor.memoryOverhead=${memeoryOverhead}
+                --conf spark.executor.memoryOverhead=${memoryOverhead}
                 --conf spark.sql.shuffle.partitions=${partitions}
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
