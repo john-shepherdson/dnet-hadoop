@@ -2,7 +2,7 @@
     <parameters>
 
         <property>
-            <name>inputPath</name>
+            <name>crossrefInputPath</name>
             <description>the path where to find the inferred affiliation relations from Crossref</description>
         </property>
         <property>
@@ -100,7 +100,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--inputPath</arg><arg>${inputPath}</arg>
+            <arg>--crossrefInputPath</arg><arg>${crossrefInputPath}</arg>
             <arg>--pubmedInputPath</arg><arg>${pubmedInputPath}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>

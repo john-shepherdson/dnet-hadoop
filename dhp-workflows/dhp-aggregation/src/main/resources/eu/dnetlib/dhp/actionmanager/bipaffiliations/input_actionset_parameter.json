@@ -6,8 +6,8 @@
     "paramRequired": false
   },
   {
-    "paramName": "ip",
-    "paramLongName": "inputPath",
+    "paramName": "cip",
+    "paramLongName": "crossrefInputPath",
     "paramDescription": "the path to get the input data from Crossref",
     "paramRequired": true
   },
