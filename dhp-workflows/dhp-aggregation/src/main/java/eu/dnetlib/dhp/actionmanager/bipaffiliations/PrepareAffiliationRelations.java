@@ -58,8 +58,8 @@ public class PrepareAffiliationRelations implements Serializable {
 		Boolean isSparkSessionManaged = Constants.isSparkSessionManaged(parser);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		final String inputPath = parser.get("inputPath");
-		log.info("inputPath: {}", inputPath);
+		final String crossrefInputPath = parser.get("crossrefInputPath");
+		log.info("crossrefInputPath: {}", crossrefInputPath);
 
 		final String pubmedInputPath = parser.get("pubmedInputPath");
 		log.info("pubmedInputPath: {}", pubmedInputPath);
@@ -78,12 +78,12 @@ public class PrepareAffiliationRelations implements Serializable {
 				List<KeyValue> collectedFromCrossref = OafMapperUtils
 					.listKeyValues(ModelConstants.CROSSREF_ID, "Crossref");
 				JavaPairRDD<Text, Text> crossrefRelations = prepareAffiliationRelations(
-					spark, inputPath, collectedFromCrossref);
+					spark, crossrefInputPath, collectedFromCrossref);
 
 				List<KeyValue> collectedFromPubmed = OafMapperUtils
 					.listKeyValues(ModelConstants.PUBMED_CENTRAL_ID, "Pubmed");
 				JavaPairRDD<Text, Text> pubmedRelations = prepareAffiliationRelations(
-					spark, inputPath, collectedFromPubmed);
+					spark, pubmedInputPath, collectedFromPubmed);
 
 				crossrefRelations
 					.union(pubmedRelations)
