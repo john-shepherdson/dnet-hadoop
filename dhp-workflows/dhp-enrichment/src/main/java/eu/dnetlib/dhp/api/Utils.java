@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import javax.management.Query;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +22,6 @@ import eu.dnetlib.dhp.bulktag.community.CommunityConfiguration;
 import eu.dnetlib.dhp.bulktag.community.Provider;
 import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
 import eu.dnetlib.dhp.bulktag.criteria.VerbResolverFactory;
-import eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob;
 
 /**
  * @author miriam.baglioni
