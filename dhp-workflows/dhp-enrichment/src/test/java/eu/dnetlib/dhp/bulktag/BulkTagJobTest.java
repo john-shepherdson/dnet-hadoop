@@ -32,8 +32,6 @@ public class BulkTagJobTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	public static final String MOCK_IS_LOOK_UP_URL = "BASEURL:8280/is/services/isLookUp";
-
 	public static final String pathMap = "{ \"author\" : \"$['author'][*]['fullname']\","
 		+ "  \"title\" : \"$['title'][*]['value']\","
 		+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
