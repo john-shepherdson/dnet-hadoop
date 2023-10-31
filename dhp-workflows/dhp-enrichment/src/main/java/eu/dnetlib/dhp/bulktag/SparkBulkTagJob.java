@@ -27,6 +27,7 @@ import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 public class SparkBulkTagJob {
 
@@ -165,10 +166,12 @@ public class SparkBulkTagJob {
 	// TODO remove this hack as soon as the values fixed by this method will be provided as NON null
 	private static <R extends Result> MapFunction<R, R> patchResult() {
 		return r -> {
-			if (r.getDataInfo().getDeletedbyinference() == null) {
+			if (Objects.isNull(r.getDataInfo())) {
+				r.setDataInfo(OafMapperUtils.dataInfo(false, "", false, false, OafMapperUtils.unknown("", ""), ""));
+			} else if (r.getDataInfo().getDeletedbyinference() == null) {
 				r.getDataInfo().setDeletedbyinference(false);
 			}
-			if (r.getContext() == null) {
+			if (Objects.isNull(r.getContext())) {
 				r.setContext(new ArrayList<>());
 			}
 			return r;
