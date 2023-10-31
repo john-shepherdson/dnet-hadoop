@@ -11,12 +11,10 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.cxf.common.util.UrlUtils;
 
 import com.github.sisyphsu.dateparser.DateParserUtils;
 import com.google.common.collect.Lists;
@@ -27,7 +25,6 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import me.xuender.unidecode.Unidecode;
-import sun.awt.HKSCS;
 
 public class GraphCleaningFunctions extends CleaningFunctions {
 
