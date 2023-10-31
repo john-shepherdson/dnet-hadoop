@@ -3,16 +3,20 @@ package eu.dnetlib.dhp.schema.oaf.utils;
 
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.getProvenance;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.cxf.common.util.UrlUtils;
 
 import com.github.sisyphsu.dateparser.DateParserUtils;
 import com.google.common.collect.Lists;
@@ -23,6 +27,7 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import me.xuender.unidecode.Unidecode;
+import sun.awt.HKSCS;
 
 public class GraphCleaningFunctions extends CleaningFunctions {
 
@@ -36,6 +41,13 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 
 	public static final int TITLE_FILTER_RESIDUAL_LENGTH = 5;
 	private static final String NAME_CLEANING_REGEX = "[\\r\\n\\t\\s]+";
+
+	private static final Set<String> INVALID_AUTHOR_NAMES = new HashSet<>();
+
+	private static final Set<String> INVALID_URLS = new HashSet<>();
+
+	private static final Set<String> INVALID_URL_HOSTS = new HashSet<>();
+
 	private static final HashSet<String> PEER_REVIEWED_TYPES = new HashSet<>();
 
 	static {
@@ -48,6 +60,47 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		PEER_REVIEWED_TYPES.add("Thesis");
 		PEER_REVIEWED_TYPES.add("Bachelor thesis");
 		PEER_REVIEWED_TYPES.add("Conference object");
+
+		INVALID_AUTHOR_NAMES.add("(:null)");
+		INVALID_AUTHOR_NAMES.add("(:unap)");
+		INVALID_AUTHOR_NAMES.add("(:tba)");
+		INVALID_AUTHOR_NAMES.add("(:unas)");
+		INVALID_AUTHOR_NAMES.add("(:unav)");
+		INVALID_AUTHOR_NAMES.add("(:unkn)");
+		INVALID_AUTHOR_NAMES.add("(:unkn) unknown");
+		INVALID_AUTHOR_NAMES.add(":none");
+		INVALID_AUTHOR_NAMES.add(":null");
+		INVALID_AUTHOR_NAMES.add(":unas");
+		INVALID_AUTHOR_NAMES.add(":unav");
+		INVALID_AUTHOR_NAMES.add(":unkn");
+		INVALID_AUTHOR_NAMES.add("[autor desconocido]");
+		INVALID_AUTHOR_NAMES.add("[s. n.]");
+		INVALID_AUTHOR_NAMES.add("[s.n]");
+		INVALID_AUTHOR_NAMES.add("[unknown]");
+		INVALID_AUTHOR_NAMES.add("anonymous");
+		INVALID_AUTHOR_NAMES.add("n.n.");
+		INVALID_AUTHOR_NAMES.add("nn");
+		INVALID_AUTHOR_NAMES.add("no name supplied");
+		INVALID_AUTHOR_NAMES.add("none");
+		INVALID_AUTHOR_NAMES.add("none available");
+		INVALID_AUTHOR_NAMES.add("not available not available");
+		INVALID_AUTHOR_NAMES.add("null &na;");
+		INVALID_AUTHOR_NAMES.add("null anonymous");
+		INVALID_AUTHOR_NAMES.add("unbekannt");
+		INVALID_AUTHOR_NAMES.add("unknown");
+
+		INVALID_URL_HOSTS.add("creativecommons.org");
+		INVALID_URL_HOSTS.add("www.academia.edu");
+		INVALID_URL_HOSTS.add("academia.edu");
+		INVALID_URL_HOSTS.add("researchgate.net");
+		INVALID_URL_HOSTS.add("www.researchgate.net");
+
+		INVALID_URLS.add("http://repo.scoap3.org/api");
+		INVALID_URLS.add("http://ora.ox.ac.uk/objects/uuid:");
+		INVALID_URLS.add("http://ntur.lib.ntu.edu.tw/news/agent_contract.pdf");
+		INVALID_URLS.add("https://media.springer.com/full/springer-instructions-for-authors-assets/pdf/SN_BPF_EN.pdf");
+		INVALID_URLS.add("http://www.tobaccoinduceddiseases.org/dl/61aad426c96519bea4040a374c6a6110/");
+		INVALID_URLS.add("https://www.bilboard.nl/verenigingsbladen/bestuurskundige-berichten");
 	}
 
 	public static <T extends Oaf> T cleanContext(T value, String contextId, String verifyParam) {
@@ -558,6 +611,15 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 								ModelConstants.DATASET_RESULTTYPE_CLASSID.equals(r.getResulttype().getClassid()))) {
 							i.setFulltext(null);
 						}
+						if (Objects.nonNull(i.getUrl())) {
+							i
+								.setUrl(
+									i
+										.getUrl()
+										.stream()
+										.filter(GraphCleaningFunctions::urlFilter)
+										.collect(Collectors.toList()));
+						}
 					}
 				}
 				if (Objects.isNull(r.getBestaccessright())
@@ -580,8 +642,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 								.getAuthor()
 								.stream()
 								.filter(Objects::nonNull)
-								.filter(a -> StringUtils.isNotBlank(a.getFullname()))
-								.filter(a -> StringUtils.isNotBlank(a.getFullname().replaceAll("[\\W]", "")))
+								.filter(GraphCleaningFunctions::isValidAuthorName)
 								.map(GraphCleaningFunctions::cleanupAuthor)
 								.collect(Collectors.toList()));
 
@@ -739,12 +800,30 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	// HELPERS
 
 	private static boolean isValidAuthorName(Author a) {
-		return !Stream
-			.of(a.getFullname(), a.getName(), a.getSurname())
-			.filter(s -> s != null && !s.isEmpty())
-			.collect(Collectors.joining(""))
-			.toLowerCase()
-			.matches(INVALID_AUTHOR_REGEX);
+		return StringUtils.isNotBlank(a.getFullname()) &&
+			StringUtils.isNotBlank(a.getFullname().replaceAll("[\\W]", "")) &&
+			!INVALID_AUTHOR_NAMES.contains(StringUtils.lowerCase(a.getFullname()).trim()) &&
+			!Stream
+				.of(a.getFullname(), a.getName(), a.getSurname())
+				.filter(StringUtils::isNotBlank)
+				.collect(Collectors.joining(""))
+				.toLowerCase()
+				.matches(INVALID_AUTHOR_REGEX);
+	}
+
+	private static boolean urlFilter(String u) {
+		try {
+			final URL url = new URL(u);
+			if (StringUtils.isBlank(url.getPath()) || "/".equals(url.getPath())) {
+				return false;
+			}
+			if (INVALID_URL_HOSTS.contains(url.getHost())) {
+				return false;
+			}
+			return !INVALID_URLS.contains(url.toString());
+		} catch (MalformedURLException ex) {
+			return false;
+		}
 	}
 
 	private static List<StructuredProperty> processPidCleaning(List<StructuredProperty> pids) {
