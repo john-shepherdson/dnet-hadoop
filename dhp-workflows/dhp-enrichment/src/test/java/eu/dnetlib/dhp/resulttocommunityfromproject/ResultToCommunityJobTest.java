@@ -6,7 +6,9 @@ import static org.apache.spark.sql.functions.desc;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
+import eu.dnetlib.dhp.schema.oaf.Context;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -89,235 +91,30 @@ public class ResultToCommunityJobTest {
 			.textFile(workingDir.toString() + "/dataset")
 			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
 
-		tmp.foreach(d -> System.out.println(new ObjectMapper().writeValueAsString(d)));
-//		Assertions.assertEquals(10, tmp.count());
-//		org.apache.spark.sql.Dataset<Dataset> verificationDataset = spark
-//			.createDataset(tmp.rdd(), Encoders.bean(Dataset.class));
-//
-//		verificationDataset.createOrReplaceTempView("dataset");
-//
-//		String query = "select id, MyT.id community "
-//			+ "from dataset "
-//			+ "lateral view explode(context) c as MyT "
-//			+ "lateral view explode(MyT.datainfo) d as MyD "
-//			+ "where MyD.inferenceprovenance = 'propagation'";
-//
-//		org.apache.spark.sql.Dataset<Row> resultExplodedProvenance = spark.sql(query);
-//		Assertions.assertEquals(5, resultExplodedProvenance.count());
-//		Assertions
-//			.assertEquals(
-//				0,
-//				resultExplodedProvenance
-//					.filter("id = '50|dedup_wf_001::afaf128022d29872c4dad402b2db04fe'")
-//					.count());
-//		Assertions
-//			.assertEquals(
-//				1,
-//				resultExplodedProvenance
-//					.filter("id = '50|dedup_wf_001::3f62cfc27024d564ea86760c494ba93b'")
-//					.count());
-//		Assertions
-//			.assertEquals(
-//				"beopen",
-//				resultExplodedProvenance
-//					.select("community")
-//					.where(
-//						resultExplodedProvenance
-//							.col("id")
-//							.equalTo(
-//								"50|dedup_wf_001::3f62cfc27024d564ea86760c494ba93b"))
-//					.collectAsList()
-//					.get(0)
-//					.getString(0));
-//
-//		Assertions
-//			.assertEquals(
-//				2,
-//				resultExplodedProvenance
-//					.filter("id = '50|od________18::8887b1df8b563c4ea851eb9c882c9d7b'")
-//					.count());
-//		Assertions
-//			.assertEquals(
-//				"mes",
-//				resultExplodedProvenance
-//					.select("community")
-//					.where(
-//						resultExplodedProvenance
-//							.col("id")
-//							.equalTo(
-//								"50|od________18::8887b1df8b563c4ea851eb9c882c9d7b"))
-//					.sort(desc("community"))
-//					.collectAsList()
-//					.get(0)
-//					.getString(0));
-//		Assertions
-//			.assertEquals(
-//				"euromarine",
-//				resultExplodedProvenance
-//					.select("community")
-//					.where(
-//						resultExplodedProvenance
-//							.col("id")
-//							.equalTo(
-//								"50|od________18::8887b1df8b563c4ea851eb9c882c9d7b"))
-//					.sort(desc("community"))
-//					.collectAsList()
-//					.get(1)
-//					.getString(0));
-//
-//		Assertions
-//			.assertEquals(
-//				1,
-//				resultExplodedProvenance
-//					.filter("id = '50|doajarticles::8d817039a63710fcf97e30f14662c6c8'")
-//					.count());
-//		Assertions
-//			.assertEquals(
-//				"mes",
-//				resultExplodedProvenance
-//					.select("community")
-//					.where(
-//						resultExplodedProvenance
-//							.col("id")
-//							.equalTo(
-//								"50|doajarticles::8d817039a63710fcf97e30f14662c6c8"))
-//					.sort(desc("community"))
-//					.collectAsList()
-//					.get(0)
-//					.getString(0));
-//
-//		Assertions
-//			.assertEquals(
-//				1,
-//				resultExplodedProvenance
-//					.filter("id = '50|doajarticles::3c98f0632f1875b4979e552ba3aa01e6'")
-//					.count());
-//		Assertions
-//			.assertEquals(
-//				"mes",
-//				resultExplodedProvenance
-//					.select("community")
-//					.where(
-//						resultExplodedProvenance
-//							.col("id")
-//							.equalTo(
-//								"50|doajarticles::3c98f0632f1875b4979e552ba3aa01e6"))
-//					.sort(desc("community"))
-//					.collectAsList()
-//					.get(0)
-//					.getString(0));
-//
-//		query = "select id, MyT.id community "
-//			+ "from dataset "
-//			+ "lateral view explode(context) c as MyT "
-//			+ "lateral view explode(MyT.datainfo) d as MyD ";
-//
-//		org.apache.spark.sql.Dataset<Row> resultCommunityId = spark.sql(query);
-//
-//		Assertions.assertEquals(10, resultCommunityId.count());
-//
-//		Assertions
-//			.assertEquals(
-//				1,
-//				resultCommunityId
-//					.filter("id = '50|dedup_wf_001::afaf128022d29872c4dad402b2db04fe'")
-//					.count());
-//		Assertions
-//			.assertEquals(
-//				"beopen",
-//				resultCommunityId
-//					.select("community")
-//					.where(
-//						resultCommunityId
-//							.col("id")
-//							.equalTo(
-//								"50|dedup_wf_001::afaf128022d29872c4dad402b2db04fe"))
-//					.collectAsList()
-//					.get(0)
-//					.getString(0));
-//
-//		Assertions
-//			.assertEquals(
-//				1,
-//				resultCommunityId
-//					.filter("id = '50|dedup_wf_001::3f62cfc27024d564ea86760c494ba93b'")
-//					.count());
-//
-//		Assertions
-//			.assertEquals(
-//				3,
-//				resultCommunityId
-//					.filter("id = '50|od________18::8887b1df8b563c4ea851eb9c882c9d7b'")
-//					.count());
-//		Assertions
-//			.assertEquals(
-//				"beopen",
-//				resultCommunityId
-//					.select("community")
-//					.where(
-//						resultCommunityId
-//							.col("id")
-//							.equalTo(
-//								"50|od________18::8887b1df8b563c4ea851eb9c882c9d7b"))
-//					.sort(desc("community"))
-//					.collectAsList()
-//					.get(2)
-//					.getString(0));
-//
-//		Assertions
-//			.assertEquals(
-//				2,
-//				resultCommunityId
-//					.filter("id = '50|doajarticles::8d817039a63710fcf97e30f14662c6c8'")
-//					.count());
-//		Assertions
-//			.assertEquals(
-//				"euromarine",
-//				resultCommunityId
-//					.select("community")
-//					.where(
-//						resultCommunityId
-//							.col("id")
-//							.equalTo(
-//								"50|doajarticles::8d817039a63710fcf97e30f14662c6c8"))
-//					.sort(desc("community"))
-//					.collectAsList()
-//					.get(1)
-//					.getString(0));
-//
-//		Assertions
-//			.assertEquals(
-//				3,
-//				resultCommunityId
-//					.filter("id = '50|doajarticles::3c98f0632f1875b4979e552ba3aa01e6'")
-//					.count());
-//		Assertions
-//			.assertEquals(
-//				"euromarine",
-//				resultCommunityId
-//					.select("community")
-//					.where(
-//						resultCommunityId
-//							.col("id")
-//							.equalTo(
-//								"50|doajarticles::3c98f0632f1875b4979e552ba3aa01e6"))
-//					.sort(desc("community"))
-//					.collectAsList()
-//					.get(2)
-//					.getString(0));
-//		Assertions
-//			.assertEquals(
-//				"ni",
-//				resultCommunityId
-//					.select("community")
-//					.where(
-//						resultCommunityId
-//							.col("id")
-//							.equalTo(
-//								"50|doajarticles::3c98f0632f1875b4979e552ba3aa01e6"))
-//					.sort(desc("community"))
-//					.collectAsList()
-//					.get(0)
-//					.getString(0));
+		Assertions.assertEquals(10, tmp.count());
+		/**
+		 * {"resultId":"50|57a035e5b1ae::d5be548ca7ae489d762f893be67af52f","communityList":["aurora"]}
+		 * {"resultId":"50|57a035e5b1ae::a77232ffca9115fcad51c3503dbc7e3e","communityList":["aurora"]}
+		 * {"resultId":"50|57a035e5b1ae::803aaad4decab7e27cd4b52a1931b3a1","communityList":["sdsn-gr"]}
+		 * {"resultId":"50|57a035e5b1ae::a02e9e4087bca50687731ae5c765b5e1","communityList":["netherlands"]}
+		 */
+		List<Context> context = tmp.filter(r -> r.getId().equals("50|57a035e5b1ae::d5be548ca7ae489d762f893be67af52f"))
+				.first().getContext();
+		Assertions.assertTrue(context.stream().anyMatch(c -> containsResultCommunityProject(c)));
+
+		context = tmp.filter(r -> r.getId().equals("50|57a035e5b1ae::a77232ffca9115fcad51c3503dbc7e3e"))
+				.first().getContext();
+		Assertions.assertTrue(context.stream().anyMatch(c -> containsResultCommunityProject(c)));
+
+		Assertions.assertEquals(0, tmp.filter(r -> r.getId().equals("50|57a035e5b1ae::803aaad4decab7e27cd4b52a1931b3a1")).count());
+
+		Assertions.assertEquals(0, tmp.filter(r -> r.getId().equals("50|57a035e5b1ae::a02e9e4087bca50687731ae5c765b5e1")).count());
+
+		Assertions.assertEquals(2, tmp.filter(r -> r.getContext().stream().anyMatch(c -> c.getId().equals("aurora"))).count());
+
+	}
+
+	private static boolean containsResultCommunityProject(Context c) {
+		return c.getDataInfo().stream().anyMatch(di -> di.getProvenanceaction().getClassid().equals("result:community:project"));
 	}
 }

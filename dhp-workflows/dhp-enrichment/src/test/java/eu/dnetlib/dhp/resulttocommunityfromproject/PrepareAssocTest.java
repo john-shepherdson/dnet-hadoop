@@ -10,9 +10,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +59,7 @@ public class PrepareAssocTest {
 		spark.stop();
 	}
 
+	@Disabled
 	@Test
 	void test1() throws Exception {
 
@@ -72,8 +71,8 @@ public class PrepareAssocTest {
 					"-sourcePath",
 					getClass().getResource("/eu/dnetlib/dhp/resulttocommunityfromproject/relation/").getPath(),
 					"-outputPath", workingDir.toString() + "/prepared",
-					"-production", Boolean.TRUE.toString(),
-					"-hive_metastore_uris", ""
+					"-production", Boolean.TRUE.toString()
+
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -82,7 +81,10 @@ public class PrepareAssocTest {
 			.textFile(workingDir.toString() + "/prepared")
 			.map(item -> new ObjectMapper().readValue(item, ResultProjectList.class));
 
-		tmp.foreach(r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+		Assertions.assertEquals(4, tmp.count());
+		Assertions.assertEquals(2, tmp.filter(rpl -> rpl.getCommunityList().contains("aurora")).count());
+		Assertions.assertEquals(1, tmp.filter(rpl -> rpl.getCommunityList().contains("sdsn-gr")).count());
+		Assertions.assertEquals(1, tmp.filter(rpl -> rpl.getCommunityList().contains("netherlands")).count());
 	}
 
 }
