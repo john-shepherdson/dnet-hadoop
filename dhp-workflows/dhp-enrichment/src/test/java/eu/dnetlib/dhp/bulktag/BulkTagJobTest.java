@@ -6,7 +6,7 @@ import static eu.dnetlib.dhp.bulktag.community.TaggingConstants.ZENODO_COMMUNITY
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
+
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
