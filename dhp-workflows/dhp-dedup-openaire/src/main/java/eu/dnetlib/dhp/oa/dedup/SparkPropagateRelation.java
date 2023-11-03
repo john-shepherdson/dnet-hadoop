@@ -3,23 +3,19 @@ package eu.dnetlib.dhp.oa.dedup;
 
 import static org.apache.spark.sql.functions.col;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Objects;
-
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.ReduceFunction;
 import org.apache.spark.sql.*;
+import org.apache.spark.sql.catalyst.encoders.RowEncoder;
+import org.apache.spark.sql.types.StructType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
@@ -70,73 +66,63 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 		log.info("workingPath: '{}'", workingPath);
 		log.info("graphOutputPath: '{}'", graphOutputPath);
 
-		final String outputRelationPath = DedupUtility.createEntityPath(graphOutputPath, "relation");
-		removeOutputDir(spark, outputRelationPath);
-
 		Dataset<Relation> mergeRels = spark
 			.read()
 			.load(DedupUtility.createMergeRelPath(workingPath, "*", "*"))
 			.as(REL_BEAN_ENC);
 
 		// <mergedObjectID, dedupID>
-		Dataset<Row> mergedIds = mergeRels
+		Dataset<Row> idsToMerge = mergeRels
 			.where(col("relClass").equalTo(ModelConstants.MERGES))
 			.select(col("source").as("dedupID"), col("target").as("mergedObjectID"))
-			.distinct()
-			.cache();
+			.distinct();
 
 		Dataset<Row> allRels = spark
 			.read()
 			.schema(REL_BEAN_ENC.schema())
-			.json(DedupUtility.createEntityPath(graphBasePath, "relation"));
+			.json(graphBasePath + "/relation");
 
 		Dataset<Relation> dedupedRels = allRels
-			.joinWith(mergedIds, allRels.col("source").equalTo(mergedIds.col("mergedObjectID")), "left_outer")
-			.joinWith(mergedIds, col("_1.target").equalTo(mergedIds.col("mergedObjectID")), "left_outer")
+			.joinWith(idsToMerge, allRels.col("source").equalTo(idsToMerge.col("mergedObjectID")), "left_outer")
+			.joinWith(idsToMerge, col("_1.target").equalTo(idsToMerge.col("mergedObjectID")), "left_outer")
 			.select("_1._1", "_1._2.dedupID", "_2.dedupID")
 			.as(Encoders.tuple(REL_BEAN_ENC, Encoders.STRING(), Encoders.STRING()))
-			.flatMap(SparkPropagateRelation::addInferredRelations, REL_KRYO_ENC);
+			.map((MapFunction<Tuple3<Relation, String, String>, Relation>) t -> {
+				Relation rel = t._1();
+				String newSource = t._2();
+				String newTarget = t._3();
 
-		Dataset<Relation> processedRelations = distinctRelations(
-			dedupedRels.union(mergeRels.map((MapFunction<Relation, Relation>) r -> r, REL_KRYO_ENC)))
-				.filter((FilterFunction<Relation>) r -> !Objects.equals(r.getSource(), r.getTarget()));
+				if (rel.getDataInfo() == null) {
+					rel.setDataInfo(new DataInfo());
+				}
 
-		save(processedRelations, outputRelationPath, SaveMode.Overwrite);
-	}
+				if (newSource != null || newTarget != null) {
+					rel.getDataInfo().setDeletedbyinference(false);
 
-	private static Iterator<Relation> addInferredRelations(Tuple3<Relation, String, String> t) throws Exception {
-		Relation existingRel = t._1();
-		String newSource = t._2();
-		String newTarget = t._3();
+					if (newSource != null)
+						rel.setSource(newSource);
 
-		if (newSource == null && newTarget == null) {
-			return Collections.singleton(t._1()).iterator();
-		}
+					if (newTarget != null)
+						rel.setTarget(newTarget);
+				}
 
-		// update existing relation
-		if (existingRel.getDataInfo() == null) {
-			existingRel.setDataInfo(new DataInfo());
-		}
-		existingRel.getDataInfo().setDeletedbyinference(true);
+				return rel;
+			}, REL_BEAN_ENC);
 
-		// Create new relation inferred by dedupIDs
-		Relation inferredRel = (Relation) BeanUtils.cloneBean(existingRel);
+		// ids of records that are both not deletedbyinference and not invisible
+		Dataset<Row> ids = validIds(spark, graphBasePath);
 
-		inferredRel.setDataInfo((DataInfo) BeanUtils.cloneBean(existingRel.getDataInfo()));
-		inferredRel.getDataInfo().setDeletedbyinference(false);
+		// filter relations that point to valid records, can force them to be visible
+		Dataset<Relation> cleanedRels = dedupedRels
+			.join(ids, col("source").equalTo(ids.col("id")), "leftsemi")
+			.join(ids, col("target").equalTo(ids.col("id")), "leftsemi")
+			.as(REL_BEAN_ENC)
+			.map((MapFunction<Relation, Relation>) r -> {
+				r.getDataInfo().setInvisible(false);
+				return r;
+			}, REL_KRYO_ENC);
 
-		if (newSource != null)
-			inferredRel.setSource(newSource);
-
-		if (newTarget != null)
-			inferredRel.setTarget(newTarget);
-
-		return Arrays.asList(existingRel, inferredRel).iterator();
-	}
-
-	private Dataset<Relation> distinctRelations(Dataset<Relation> rels) {
-		return rels
-			.filter(getRelationFilterFunction())
+		Dataset<Relation> distinctRels = cleanedRels
 			.groupByKey(
 				(MapFunction<Relation, String>) r -> String
 					.join(" ", r.getSource(), r.getTarget(), r.getRelType(), r.getSubRelType(), r.getRelClass()),
@@ -146,13 +132,33 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 				return b;
 			})
 			.map((MapFunction<Tuple2<String, Relation>, Relation>) Tuple2::_2, REL_BEAN_ENC);
+
+		final String outputRelationPath = graphOutputPath + "/relation";
+		removeOutputDir(spark, outputRelationPath);
+		save(
+			distinctRels
+				.union(mergeRels)
+				.filter("source != target AND dataInfo.deletedbyinference != true AND dataInfo.invisible != true"),
+			outputRelationPath,
+			SaveMode.Overwrite);
 	}
 
-	private FilterFunction<Relation> getRelationFilterFunction() {
-		return r -> StringUtils.isNotBlank(r.getSource()) ||
-			StringUtils.isNotBlank(r.getTarget()) ||
-			StringUtils.isNotBlank(r.getRelType()) ||
-			StringUtils.isNotBlank(r.getSubRelType()) ||
-			StringUtils.isNotBlank(r.getRelClass());
+	static Dataset<Row> validIds(SparkSession spark, String graphBasePath) {
+		StructType idsSchema = StructType
+			.fromDDL("`id` STRING, `dataInfo` STRUCT<`deletedbyinference`:BOOLEAN,`invisible`:BOOLEAN>");
+
+		Dataset<Row> allIds = spark.emptyDataset(RowEncoder.apply(idsSchema));
+
+		for (EntityType entityType : ModelSupport.entityTypes.keySet()) {
+			String entityPath = graphBasePath + '/' + entityType.name();
+			if (HdfsSupport.exists(entityPath, spark.sparkContext().hadoopConfiguration())) {
+				allIds = allIds.union(spark.read().schema(idsSchema).json(entityPath));
+			}
+		}
+
+		return allIds
+			.filter("dataInfo.deletedbyinference != true AND dataInfo.invisible != true")
+			.select("id")
+			.distinct();
 	}
 }

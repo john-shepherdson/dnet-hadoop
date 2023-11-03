@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
@@ -23,9 +22,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.oa.merge.DispatchEntitiesSparkJob;
 import eu.dnetlib.dhp.oa.merge.GroupEntitiesSparkJob;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
@@ -40,8 +39,9 @@ public class GroupEntitiesSparkJobTest {
 	private static Path workingDir;
 	private Path dataInputPath;
 
-	private Path groupEntityPath;
-	private Path dispatchEntityPath;
+	private Path checkpointPath;
+
+	private Path outputPath;
 
 	@BeforeAll
 	public static void beforeAll() throws IOException {
@@ -58,8 +58,8 @@ public class GroupEntitiesSparkJobTest {
 	@BeforeEach
 	public void beforeEach() throws IOException, URISyntaxException {
 		dataInputPath = Paths.get(ClassLoader.getSystemResource("eu/dnetlib/dhp/oa/graph/group").toURI());
-		groupEntityPath = workingDir.resolve("grouped_entity");
-		dispatchEntityPath = workingDir.resolve("dispatched_entity");
+		checkpointPath = workingDir.resolve("grouped_entity");
+		outputPath = workingDir.resolve("dispatched_entity");
 	}
 
 	@AfterAll
@@ -76,39 +76,28 @@ public class GroupEntitiesSparkJobTest {
 			Boolean.FALSE.toString(),
 			"-graphInputPath",
 			dataInputPath.toString(),
+			"-checkpointPath",
+			checkpointPath.toString(),
 			"-outputPath",
-			groupEntityPath.toString()
+			outputPath.toString(),
+			"-filterInvisible",
+			Boolean.FALSE.toString()
 		});
 
-		Dataset<Result> output = spark
+		Dataset<OafEntity> checkpointTable = spark
 			.read()
-			.textFile(groupEntityPath.toString())
-			.map((MapFunction<String, String>) s -> StringUtils.substringAfter(s, "|"), Encoders.STRING())
-			.map((MapFunction<String, Result>) s -> mapper.readValue(s, Result.class), Encoders.bean(Result.class));
+			.load(checkpointPath.toString())
+			.selectExpr("COALESCE(*)")
+			.as(Encoders.kryo(OafEntity.class));
 
 		assertEquals(
 			1,
-			output
+			checkpointTable
 				.filter(
-					(FilterFunction<Result>) r -> "50|doi_________::09821844208a5cd6300b2bfb13bca1b9"
+					(FilterFunction<OafEntity>) r -> "50|doi_________::09821844208a5cd6300b2bfb13bca1b9"
 						.equals(r.getId()) &&
 						r.getCollectedfrom().stream().anyMatch(kv -> kv.getValue().equalsIgnoreCase("zenodo")))
 				.count());
-	}
-
-	@Test
-	@Order(2)
-	void testDispatchEntities() throws Exception {
-		DispatchEntitiesSparkJob.main(new String[] {
-			"-isSparkSessionManaged",
-			Boolean.FALSE.toString(),
-			"-inputPath",
-			groupEntityPath.toString(),
-			"-outputPath",
-			dispatchEntityPath.resolve(".").toString(),
-			"-filterInvisible",
-			Boolean.TRUE.toString()
-		});
 
 		Dataset<Result> output = spark
 			.read()
@@ -116,7 +105,7 @@ public class GroupEntitiesSparkJobTest {
 				DHPUtils
 					.toSeq(
 						HdfsSupport
-							.listFiles(dispatchEntityPath.toString(), spark.sparkContext().hadoopConfiguration())))
+							.listFiles(outputPath.toString(), spark.sparkContext().hadoopConfiguration())))
 			.map((MapFunction<String, Result>) s -> mapper.readValue(s, Result.class), Encoders.bean(Result.class));
 
 		assertEquals(3, output.count());

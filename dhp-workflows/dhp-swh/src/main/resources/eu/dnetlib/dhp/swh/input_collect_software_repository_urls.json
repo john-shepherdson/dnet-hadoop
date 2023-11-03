@@ -1,0 +1,32 @@
+[
+  {
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "when true will stop SparkSession after job execution",
+    "paramRequired": false
+  },
+  {
+    "paramName": "scr",
+    "paramLongName": "softwareCodeRepositoryURLs",
+    "paramDescription": "the URL where to store software repository URLs",
+    "paramRequired": true
+  },
+  {
+    "paramName": "db",
+    "paramLongName": "hiveDbName",
+    "paramDescription": "the target hive database name",
+    "paramRequired": true
+  },
+  {
+    "paramName": "hmu",
+    "paramLongName": "hiveMetastoreUris",
+    "paramDescription": "the hive metastore uris",
+    "paramRequired": true
+  },
+  {
+    "paramName": "slim",
+    "paramLongName": "softwareLimit",
+    "paramDescription": "limit on the number of software repo URL to fetch",
+    "paramRequired": false
+  }
+]

@@ -36,6 +36,19 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 
 	public static final int TITLE_FILTER_RESIDUAL_LENGTH = 5;
 	private static final String NAME_CLEANING_REGEX = "[\\r\\n\\t\\s]+";
+	private static final HashSet<String> PEER_REVIEWED_TYPES = new HashSet<>();
+
+	static {
+		PEER_REVIEWED_TYPES.add("Article");
+		PEER_REVIEWED_TYPES.add("Part of book or chapter of book");
+		PEER_REVIEWED_TYPES.add("Book");
+		PEER_REVIEWED_TYPES.add("Doctoral thesis");
+		PEER_REVIEWED_TYPES.add("Master thesis");
+		PEER_REVIEWED_TYPES.add("Data Paper");
+		PEER_REVIEWED_TYPES.add("Thesis");
+		PEER_REVIEWED_TYPES.add("Bachelor thesis");
+		PEER_REVIEWED_TYPES.add("Conference object");
+	}
 
 	public static <T extends Oaf> T cleanContext(T value, String contextId, String verifyParam) {
 		if (ModelSupport.isSubClass(value, Result.class)) {
@@ -273,6 +286,12 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 
 	public static <T extends Oaf> T cleanup(T value, VocabularyGroup vocs) {
 
+		if (Objects.isNull(value.getDataInfo())) {
+			final DataInfo d = new DataInfo();
+			d.setDeletedbyinference(false);
+			value.setDataInfo(d);
+		}
+
 		if (value instanceof OafEntity) {
 
 			OafEntity e = (OafEntity) value;
@@ -291,6 +310,10 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 				}
 			} else if (value instanceof Result) {
 				Result r = (Result) value;
+
+				if (Objects.isNull(r.getContext())) {
+					r.setContext(new ArrayList<>());
+				}
 
 				if (Objects.nonNull(r.getFulltext())
 					&& (ModelConstants.SOFTWARE_RESULTTYPE_CLASSID.equals(r.getResulttype().getClassid()) ||
@@ -493,6 +516,35 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 						if (Objects.isNull(i.getRefereed()) || StringUtils.isBlank(i.getRefereed().getClassid())) {
 							i.setRefereed(qualifier("0000", "Unknown", ModelConstants.DNET_REVIEW_LEVELS));
 						}
+
+						// from the script from Dimitris
+						if ("0000".equals(i.getRefereed().getClassid())) {
+							final boolean isFromCrossref = Optional
+								.ofNullable(i.getCollectedfrom())
+								.map(KeyValue::getKey)
+								.map(id -> id.equals(ModelConstants.CROSSREF_ID))
+								.orElse(false);
+							final boolean hasDoi = Optional
+								.ofNullable(i.getPid())
+								.map(
+									pid -> pid
+										.stream()
+										.anyMatch(
+											p -> PidType.doi.toString().equals(p.getQualifier().getClassid())))
+								.orElse(false);
+							final boolean isPeerReviewedType = PEER_REVIEWED_TYPES
+								.contains(i.getInstancetype().getClassname());
+							final boolean noOtherLitType = r
+								.getInstance()
+								.stream()
+								.noneMatch(ii -> "Other literature type".equals(ii.getInstancetype().getClassname()));
+							if (isFromCrossref && hasDoi && isPeerReviewedType && noOtherLitType) {
+								i.setRefereed(qualifier("0001", "peerReviewed", ModelConstants.DNET_REVIEW_LEVELS));
+							} else {
+								i.setRefereed(qualifier("0002", "nonPeerReviewed", ModelConstants.DNET_REVIEW_LEVELS));
+							}
+						}
+
 						if (Objects.nonNull(i.getDateofacceptance())) {
 							Optional<String> date = cleanDateField(i.getDateofacceptance());
 							if (date.isPresent()) {

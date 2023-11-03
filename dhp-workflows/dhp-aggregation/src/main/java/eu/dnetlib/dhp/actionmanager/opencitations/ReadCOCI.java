@@ -7,6 +7,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -42,12 +43,15 @@ public class ReadCOCI implements Serializable {
 		log.info("outputPath: {}", outputPath);
 
 		final String[] inputFile = parser.get("inputFile").split(";");
-		log.info("inputFile {}", inputFile.toString());
+		log.info("inputFile {}", Arrays.asList(inputFile));
 		Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		final String workingPath = parser.get("workingPath");
 		log.info("workingPath {}", workingPath);
+
+		final String format = parser.get("format");
+		log.info("format {}", format);
 
 		SparkConf sconf = new SparkConf();
 
@@ -64,16 +68,17 @@ public class ReadCOCI implements Serializable {
 					workingPath,
 					inputFile,
 					outputPath,
-					delimiter);
+					delimiter,
+					format);
 			});
 	}
 
 	private static void doRead(SparkSession spark, String workingPath, String[] inputFiles,
 		String outputPath,
-		String delimiter) throws IOException {
+		String delimiter, String format) {
 
 		for (String inputFile : inputFiles) {
-			String p_string = workingPath + "/" + inputFile + ".gz";
+			String pString = workingPath + "/" + inputFile + ".gz";
 
 			Dataset<Row> cociData = spark
 				.read()
@@ -82,14 +87,20 @@ public class ReadCOCI implements Serializable {
 				.option("inferSchema", "true")
 				.option("header", "true")
 				.option("quotes", "\"")
-				.load(p_string)
+				.load(pString)
 				.repartition(100);
 
 			cociData.map((MapFunction<Row, COCI>) row -> {
 				COCI coci = new COCI();
+				if (format.equals("COCI")) {
+					coci.setCiting(row.getString(1));
+					coci.setCited(row.getString(2));
+				} else {
+					coci.setCiting(String.valueOf(row.getInt(1)));
+					coci.setCited(String.valueOf(row.getInt(2)));
+				}
 				coci.setOci(row.getString(0));
-				coci.setCiting(row.getString(1));
-				coci.setCited(row.getString(2));
+
 				return coci;
 			}, Encoders.bean(COCI.class))
 				.write()
