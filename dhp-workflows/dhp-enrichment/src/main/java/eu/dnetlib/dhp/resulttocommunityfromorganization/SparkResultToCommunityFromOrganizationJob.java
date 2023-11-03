@@ -60,8 +60,6 @@ public class SparkResultToCommunityFromOrganizationJob {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				// removeOutputDir(spark, outputPath);
-
 				execPropagation(spark, inputPath, outputPath, possibleupdatespath);
 
 			});

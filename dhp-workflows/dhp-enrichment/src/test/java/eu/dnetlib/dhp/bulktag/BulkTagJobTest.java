@@ -40,7 +40,9 @@ public class BulkTagJobTest {
 		"\"fos\" : \"$['subject'][?(@['qualifier']['classid']=='FOS')].value\"," +
 		"\"sdg\" : \"$['subject'][?(@['qualifier']['classid']=='SDG')].value\"," +
 		"\"hostedby\" : \"$['instance'][*]['hostedby']['key']\" , " +
-		"\"collectedfrom\" : \"$['instance'][*]['collectedfrom']['key']\"} ";
+		"\"collectedfrom\" : \"$['instance'][*]['collectedfrom']['key']\"," +
+			"\"publisher\":\"$['publisher'].value\"," +
+			"\"publicationyear\":\"$['dateofacceptance'].value\"} ";
 
 	private static SparkSession spark;
 
