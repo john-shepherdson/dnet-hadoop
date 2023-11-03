@@ -56,7 +56,7 @@ public class PrepareResultCommunitySet {
 		log.info("production: {}", production);
 
 		final CommunityEntityMap projectsMap = Utils.getCommunityProjects(production);
-		//log.info("projectsMap: {}", new Gson().toJson(projectsMap));
+		// log.info("projectsMap: {}", new Gson().toJson(projectsMap));
 
 		SparkConf conf = new SparkConf();
 

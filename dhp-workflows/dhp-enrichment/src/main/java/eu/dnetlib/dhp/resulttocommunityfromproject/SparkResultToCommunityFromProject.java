@@ -112,7 +112,7 @@ public class SparkResultToCommunityFromProject implements Serializable {
 			R ret = value._1();
 			Optional<ResultProjectList> rcl = Optional.ofNullable(value._2());
 			if (rcl.isPresent()) {
-				ArrayList<String> communitySet = rcl.get().getCommunityList();
+				// ArrayList<String> communitySet = rcl.get().getCommunityList();
 				List<String> contextList = ret
 					.getContext()
 					.stream()
@@ -124,7 +124,7 @@ public class SparkResultToCommunityFromProject implements Serializable {
 
 				res.setId(ret.getId());
 				List<Context> propagatedContexts = new ArrayList<>();
-				for (String cId : communitySet) {
+				for (String cId : rcl.get().getCommunityList()) {
 					if (!contextList.contains(cId)) {
 						Context newContext = new Context();
 						newContext.setId(cId);
@@ -138,6 +138,20 @@ public class SparkResultToCommunityFromProject implements Serializable {
 											PROPAGATION_RESULT_COMMUNITY_PROJECT_CLASS_NAME,
 											ModelConstants.DNET_PROVENANCE_ACTIONS)));
 						propagatedContexts.add(newContext);
+					} else {
+						ret
+							.getContext()
+							.stream()
+							.filter(c -> c.getId().equals(cId))
+							.findFirst()
+							.get()
+							.getDataInfo()
+							.add(
+								getDataInfo(
+									PROPAGATION_DATA_INFO_TYPE,
+									PROPAGATION_RESULT_COMMUNITY_PROJECT_CLASS_ID,
+									PROPAGATION_RESULT_COMMUNITY_PROJECT_CLASS_NAME,
+									ModelConstants.DNET_PROVENANCE_ACTIONS));
 					}
 				}
 				res.setContext(propagatedContexts);
