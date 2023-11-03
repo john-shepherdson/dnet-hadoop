@@ -41,8 +41,8 @@ public class BulkTagJobTest {
 		"\"sdg\" : \"$['subject'][?(@['qualifier']['classid']=='SDG')].value\"," +
 		"\"hostedby\" : \"$['instance'][*]['hostedby']['key']\" , " +
 		"\"collectedfrom\" : \"$['instance'][*]['collectedfrom']['key']\"," +
-			"\"publisher\":\"$['publisher'].value\"," +
-			"\"publicationyear\":\"$['dateofacceptance'].value\"} ";
+		"\"publisher\":\"$['publisher'].value\"," +
+		"\"publicationyear\":\"$['dateofacceptance'].value\"} ";
 
 	private static SparkSession spark;
 
