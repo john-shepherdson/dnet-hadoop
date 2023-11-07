@@ -48,15 +48,24 @@
 			<case to="get-file-names">${wf:conf('resume') eq "format-results"}</case>
 			<case to="map-openaire-to-doi">${wf:conf('resume') eq "map-ids"}</case>
 			<case to="map-scores-to-dois">${wf:conf('resume') eq "map-scores"}</case>
-			<case to="create-openaire-ranking-graph">${wf:conf('resume') eq "start"}</case>
+			<case to="clear-working-dir">${wf:conf('resume') eq "start"}</case>
 
 			<!-- Aggregation of impact scores on the project level		-->
 			<case to="project-impact-indicators">${wf:conf('resume') eq "projects-impact"}</case>
 			<case to="create-actionset">${wf:conf('resume') eq "create-actionset"}</case>
 
-			<default to="create-openaire-ranking-graph" />
+			<default to="clear-working-dir" />
 		</switch>
 	</decision>
+
+	<action name="clear-working-dir">
+		<fs>
+			<delete path="${workingDir}"/>
+			<mkdir path="${workingDir}"/>
+		</fs>
+		<ok to="create-openaire-ranking-graph"/>
+		<error to="clear-working-dir-fail"/>
+	</action>
 
 	<!-- initial step: create citation network -->
 	<action name="create-openaire-ranking-graph">
@@ -604,6 +613,10 @@
 
 	<kill name="project-impact-indicators-fail">
 		<message>Calculating project impact indicators failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+
+	<kill name="clear-working-dir-fail">
+		<message>Re-create working dir failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
 	</kill>
 
 	<!-- Define ending node -->
