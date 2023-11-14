@@ -68,39 +68,11 @@
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="atomicactions">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Produces the atomic action with the usage stats count for results</name>
-<!--            <class>eu.dnetlib.dhp.actionmanager.stats_actionsets.SparkAtomicActionUsageJob</class>-->
-            <class>eu.dnetlib.dhp.actionmanager.stats_actionsets.SparkAtomicActionGreenOAJob</class>
-            <jar>dhp-stats-actionsets-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
-            </spark-opts>
-            <arg>--hive_metastore_uris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--outputPath</arg><arg>${outputPath}</arg>
-            <arg>--statsDB</arg><arg>${statsDB}</arg>
-            <arg>--workingPath</arg><arg>${workingDir}</arg>
-        </spark>
-        <ok to="End"/>
-        <error to="Kill"/>
-    </action>
-
     <action name="atomicactionsStats">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Produces the atomic action with the stats green_oa for results</name>
-            <!--            <class>eu.dnetlib.dhp.actionmanager.stats_actionsets.SparkAtomicActionUsageJob</class>-->
             <class>eu.dnetlib.dhp.actionmanager.stats_actionsets.StatsAtomicActionsJob</class>
             <jar>dhp-stats-actionsets-${projectVersion}.jar</jar>
             <spark-opts>

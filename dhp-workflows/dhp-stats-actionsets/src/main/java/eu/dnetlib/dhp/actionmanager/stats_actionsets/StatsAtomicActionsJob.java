@@ -1,7 +1,6 @@
 
 package eu.dnetlib.dhp.actionmanager.stats_actionsets;
 
-import static eu.dnetlib.dhp.actionmanager.Constants.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
 import java.io.Serializable;
@@ -12,14 +11,22 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
+import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +72,9 @@ public class StatsAtomicActionsJob implements Serializable {
 
 		SparkConf conf = new SparkConf();
 		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
+		conf.set("spark.speculation", "false");
+		conf.set("spark.hadoop.mapreduce.map.speculative", "false");
+		conf.set("spark.hadoop.mapreduce.reduce.speculative", "false");
 
 		final String dbname = parser.get("statsDB");
 
@@ -75,75 +85,26 @@ public class StatsAtomicActionsJob implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				removeOutputDir(spark, outputPath);
-				prepareGreenData(dbname, spark, workingPath + "/greenOADB", "indi_pub_green_oa", "id");
-				prepareDiamondData(dbname, spark, workingPath + "/diamondOADΒ", "indi_pub_diamond", "id");
-				preparePubliclyFundedData(
-					dbname, spark, workingPath + "/publiclyFundedDΒ", "indi_funded_result_with_fundref", "id");
-				prepareOAColourData(dbname, spark, workingPath + "/oacolourDB", "", "id");
+				prepareResultEnhancement(dbname, spark, workingPath + "/resultEnhancements", "id");
 				writeActionSet(spark, workingPath, outputPath);
 			});
 	}
 
-	private static void prepareGreenData(String dbname, SparkSession spark, String workingPath, String tableName,
+	private static void prepareResultEnhancement(String dbname, SparkSession spark, String workingPath,
 		String resultAttributeName) {
 		spark
 			.sql(
 				String
 					.format(
-						"select %s as id, green_oa as green_oa " +
-							"from %s.%s",
-						resultAttributeName, dbname, tableName))
-			.as(Encoders.bean(StatsGreenOAModel.class))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(workingPath);
-	}
-
-	private static void prepareDiamondData(String dbname, SparkSession spark, String workingPath, String tableName,
-		String resultAttributeName) {
-		spark
-			.sql(
-				String
-					.format(
-						"select %s as id, in_diamond_journal as in_diamond_journal " +
-							"from %s.%s",
-						resultAttributeName, dbname, tableName))
-			.as(Encoders.bean(StatsDiamondOAModel.class))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(workingPath);
-	}
-
-	private static void preparePubliclyFundedData(String dbname, SparkSession spark, String workingPath,
-		String tableName,
-		String resultAttributeName) {
-		spark
-			.sql(
-				String
-					.format(
-						"select %s as id, fundref as publicly_funded " +
-							"from %s.%s",
-						resultAttributeName, dbname, tableName))
-			.as(Encoders.bean(StatsPubliclyFundedModel.class))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(workingPath);
-	}
-
-	private static void prepareOAColourData(String dbname, SparkSession spark, String workingPath, String tableName,
-		String resultAttributeName) {
-		spark
-			.sql(
-				String
-					.format(
-						"select b.%s as id, is_gold, is_bronze_oa, is_hybrid  from %s.indi_pub_bronze_oa b " +
+						"select b.%s as id, is_gold, is_bronze_oa, is_hybrid,green_oa, in_diamond_journal,f.fundref as publicly_funded "
+							+ "from %s.indi_pub_bronze_oa b " +
 							"left outer join %s.indi_pub_gold_oa g on g.id=b.id " +
-							"left outer join %s.indi_pub_hybrid h on b.id=h.id",
-						resultAttributeName, dbname, dbname, dbname))
-			.as(Encoders.bean(StatsOAColourModel.class))
+							"left outer join %s.indi_pub_hybrid h on b.id=h.id " +
+							"left outer join %s.indi_pub_green_oa gr on b.id=gr.id " +
+							"left outer join %s.indi_pub_diamond d on b.id=d.id " +
+							"left outer join %s.indi_funded_result_with_fundref f on b.id=f.id ",
+						resultAttributeName, dbname, dbname, dbname, dbname, dbname, dbname))
+			.as(Encoders.bean(StatsResultEnhancementModel.class))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
@@ -152,123 +113,37 @@ public class StatsAtomicActionsJob implements Serializable {
 
 	public static void writeActionSet(SparkSession spark, String inputPath, String outputPath) {
 
-		getFinalIndicatorsGreenResult(spark, inputPath + "/greenOADB")
+		getResultEnhancements(spark, inputPath + "/resultEnhancements")
 			.toJavaRDD()
 			.map(p -> new AtomicAction(p.getClass(), p))
-			.union(
-				getFinalIndicatorsDiamondResult(spark, inputPath + "/diamondOADΒ")
-					.toJavaRDD()
-					.map(p -> new AtomicAction(p.getClass(), p)))
-			.union(
-				getFinalIndicatorsPubliclyFundedResult(spark, inputPath + "/publiclyFundedDΒ")
-					.toJavaRDD()
-					.map(p -> new AtomicAction(p.getClass(), p)))
-			.union(
-				getFinalIndicatorsOAColourResult(spark, inputPath + "/oacolourDB")
-					.toJavaRDD()
-					.map(p -> new AtomicAction(p.getClass(), p)))
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
-			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
+			.saveAsHadoopFile(
+				outputPath,
+				Text.class,
+				Text.class,
+				SequenceFileOutputFormat.class,
+				GzipCodec.class);
 	}
 
-	public static Measure newMeasureInstance(String id) {
-		Measure m = new Measure();
-		m.setId(id);
-		m.setUnit(new ArrayList<>());
-		return m;
-	}
+	private static Dataset<Result> getResultEnhancements(SparkSession spark, String inputPath) {
 
-	private static Dataset<Result> getFinalIndicatorsGreenResult(SparkSession spark, String inputPath) {
-
-		return readPath(spark, inputPath, StatsGreenOAModel.class)
-			.map((MapFunction<StatsGreenOAModel, Result>) usm -> {
+		return readPath(spark, inputPath, StatsResultEnhancementModel.class)
+			.map((MapFunction<StatsResultEnhancementModel, Result>) usm -> {
 				Result r = new Result();
 				r.setId("50|" + usm.getId());
-				r.setMeasures(getMeasure(usm.isGreen_oa(), "green_oa"));
+				r.setIsInDiamondJournal(usm.isIn_diamond_journal());
+				r.setIsGreen(usm.isGreen_oa());
+				r.setPubliclyFunded(usm.isPublicly_funded());
+				if (usm.isIs_bronze_oa())
+					r.setOpenAccessColor(OpenAccessColor.bronze);
+				else if (usm.isIs_gold())
+					r.setOpenAccessColor(OpenAccessColor.bronze);
+				else if (usm.isIs_gold())
+					r.setOpenAccessColor(OpenAccessColor.gold);
 				return r;
 			}, Encoders.bean(Result.class));
-	}
-
-	private static Dataset<Result> getFinalIndicatorsDiamondResult(SparkSession spark, String inputPath) {
-
-		return readPath(spark, inputPath, StatsDiamondOAModel.class)
-			.map((MapFunction<StatsDiamondOAModel, Result>) usm -> {
-				Result r = new Result();
-				r.setId("50|" + usm.getId());
-				r.setMeasures(getMeasure(usm.isIn_diamond_journal(), "in_diamond_journal"));
-				return r;
-			}, Encoders.bean(Result.class));
-	}
-
-	private static Dataset<Result> getFinalIndicatorsPubliclyFundedResult(SparkSession spark, String inputPath) {
-
-		return readPath(spark, inputPath, StatsPubliclyFundedModel.class)
-			.map((MapFunction<StatsPubliclyFundedModel, Result>) usm -> {
-				Result r = new Result();
-				r.setId("50|" + usm.getId());
-				r.setMeasures(getMeasure(usm.isPublicly_funded(), "publicly_funded"));
-				return r;
-			}, Encoders.bean(Result.class));
-	}
-
-	private static Dataset<Result> getFinalIndicatorsOAColourResult(SparkSession spark, String inputPath) {
-
-		return readPath(spark, inputPath, StatsOAColourModel.class)
-			.map((MapFunction<StatsOAColourModel, Result>) usm -> {
-				Result r = new Result();
-				r.setId("50|" + usm.getId());
-				r.setMeasures(getMeasureOAColour(usm.isIs_gold(), usm.isIs_bronze_oa(), usm.isIs_hybrid()));
-				return r;
-			}, Encoders.bean(Result.class));
-	}
-
-	private static List<Measure> getMeasure(Boolean is_model_oa, String model_type) {
-		DataInfo dataInfo = OafMapperUtils
-			.dataInfo(
-				false,
-				UPDATE_DATA_INFO_TYPE,
-				true,
-				false,
-				OafMapperUtils
-					.qualifier(
-						UPDATE_MEASURE_STATS_MODEL_CLASS_ID,
-						UPDATE_CLASS_NAME,
-						ModelConstants.DNET_PROVENANCE_ACTIONS,
-						ModelConstants.DNET_PROVENANCE_ACTIONS),
-				"");
-
-		return Arrays
-			.asList(
-				OafMapperUtils
-					.newMeasureInstance(model_type, String.valueOf(is_model_oa), UPDATE_KEY_STATS_MODEL, dataInfo));
-	}
-
-	private static List<Measure> getMeasureOAColour(Boolean is_gold, Boolean is_bronze_oa, Boolean is_hybrid) {
-		DataInfo dataInfo = OafMapperUtils
-			.dataInfo(
-				false,
-				UPDATE_DATA_INFO_TYPE,
-				true,
-				false,
-				OafMapperUtils
-					.qualifier(
-						UPDATE_MEASURE_STATS_MODEL_CLASS_ID,
-						UPDATE_CLASS_NAME,
-						ModelConstants.DNET_PROVENANCE_ACTIONS,
-						ModelConstants.DNET_PROVENANCE_ACTIONS),
-				"");
-
-		return Arrays
-			.asList(
-				OafMapperUtils
-					.newMeasureInstance("is_gold", String.valueOf(is_gold), UPDATE_KEY_STATS_MODEL, dataInfo),
-				OafMapperUtils
-					.newMeasureInstance("is_bronze_oa", String.valueOf(is_bronze_oa), UPDATE_KEY_STATS_MODEL, dataInfo),
-				OafMapperUtils
-					.newMeasureInstance("is_hybrid", String.valueOf(is_hybrid), UPDATE_KEY_STATS_MODEL, dataInfo));
-
 	}
 
 	private static void removeOutputDir(SparkSession spark, String path) {
@@ -282,5 +157,4 @@ public class StatsAtomicActionsJob implements Serializable {
 			.textFile(inputPath)
 			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
 	}
-
 }
