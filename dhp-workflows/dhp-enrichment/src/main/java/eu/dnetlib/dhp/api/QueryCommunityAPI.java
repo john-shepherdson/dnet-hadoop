@@ -14,8 +14,8 @@ import org.jetbrains.annotations.NotNull;
  * @Date 06/10/23
  */
 public class QueryCommunityAPI {
-	private static final String PRODUCTION_BASE_URL = "https://services.openaire.eu/openaire/";
-	private static final String BETA_BASE_URL = "https://beta.services.openaire.eu/openaire/";
+
+
 
 	private static String get(String geturl) throws IOException {
 		URL url = new URL(geturl);
@@ -32,35 +32,35 @@ public class QueryCommunityAPI {
 		return body;
 	}
 
-	public static String communities(boolean production) throws IOException {
-		if (production)
-			return get(PRODUCTION_BASE_URL + "community/communities");
-		return get(BETA_BASE_URL + "community/communities");
-	}
+	public static String communities(String baseURL) throws IOException {
 
-	public static String community(String id, boolean production) throws IOException {
-		if (production)
-			return get(PRODUCTION_BASE_URL + "community/" + id);
-		return get(BETA_BASE_URL + "community/" + id);
-	}
-
-	public static String communityDatasource(String id, boolean production) throws IOException {
-		if (production)
-			return get(PRODUCTION_BASE_URL + "community/" + id + "/contentproviders");
-		return (BETA_BASE_URL + "community/" + id + "/contentproviders");
+			return get(baseURL + "community/communities");
 
 	}
 
-	public static String communityPropagationOrganization(String id, boolean production) throws IOException {
-		if (production)
-			return get(PRODUCTION_BASE_URL + "community/" + id + "/propagationOrganizations");
-		return get(BETA_BASE_URL + "community/" + id + "/propagationOrganizations");
+	public static String community(String id, String baseURL ) throws IOException {
+
+			return get(baseURL + "community/" + id);
+
 	}
 
-	public static String communityProjects(String id, String page, String size, boolean production) throws IOException {
-		if (production)
-			return get(PRODUCTION_BASE_URL + "community/" + id + "/projects/" + page + "/" + size);
-		return get(BETA_BASE_URL + "community/" + id + "/projects/" + page + "/" + size);
+	public static String communityDatasource(String id, String baseURL ) throws IOException {
+
+			return get(baseURL + "community/" + id + "/contentproviders");
+
+
+	}
+
+	public static String communityPropagationOrganization(String id, String baseURL ) throws IOException {
+
+			return get(baseURL + "community/" + id + "/propagationOrganizations");
+
+	}
+
+	public static String communityProjects(String id, String page, String size, String baseURL ) throws IOException {
+
+			return get(baseURL + "community/" + id + "/projects/" + page + "/" + size);
+
 	}
 
 	@NotNull

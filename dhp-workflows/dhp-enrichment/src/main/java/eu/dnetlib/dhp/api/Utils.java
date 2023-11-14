@@ -36,14 +36,14 @@ public class Utils implements Serializable {
 
 	private static final Logger log = LoggerFactory.getLogger(Utils.class);
 
-	public static CommunityConfiguration getCommunityConfiguration(boolean production) throws IOException {
+	public static CommunityConfiguration getCommunityConfiguration(String baseURL) throws IOException {
 		final Map<String, Community> communities = Maps.newHashMap();
 		List<Community> validCommunities = new ArrayList<>();
-		getValidCommunities(production)
+		getValidCommunities(baseURL)
 			.forEach(community -> {
 				try {
 					CommunityModel cm = MAPPER
-						.readValue(QueryCommunityAPI.community(community.getId(), production), CommunityModel.class);
+						.readValue(QueryCommunityAPI.community(community.getId(), baseURL), CommunityModel.class);
 					validCommunities.add(getCommunity(cm));
 				} catch (IOException e) {
 					throw new RuntimeException(e);
@@ -53,7 +53,7 @@ public class Utils implements Serializable {
 			try {
 				DatasourceList dl = MAPPER
 					.readValue(
-						QueryCommunityAPI.communityDatasource(community.getId(), production), DatasourceList.class);
+						QueryCommunityAPI.communityDatasource(community.getId(), baseURL), DatasourceList.class);
 				community.setProviders(dl.stream().map(d -> {
 					if (d.getEnabled() == null || Boolean.FALSE.equals(d.getEnabled()))
 						return null;
@@ -98,9 +98,9 @@ public class Utils implements Serializable {
 		return c;
 	}
 
-	public static List<CommunityModel> getValidCommunities(boolean production) throws IOException {
+	public static List<CommunityModel> getValidCommunities(String baseURL) throws IOException {
 		return MAPPER
-			.readValue(QueryCommunityAPI.communities(production), CommunitySummary.class)
+			.readValue(QueryCommunityAPI.communities(baseURL), CommunitySummary.class)
 			.stream()
 			.filter(
 				community -> !community.getStatus().equals("hidden") &&
@@ -111,15 +111,15 @@ public class Utils implements Serializable {
 	/**
 	 * it returns for each organization the list of associated communities
 	 */
-	public static CommunityEntityMap getCommunityOrganization(boolean production) throws IOException {
+	public static CommunityEntityMap getCommunityOrganization(String baseURL) throws IOException {
 		CommunityEntityMap organizationMap = new CommunityEntityMap();
-		getValidCommunities(production)
+		getValidCommunities(baseURL)
 			.forEach(community -> {
 				String id = community.getId();
 				try {
 					List<String> associatedOrgs = MAPPER
 						.readValue(
-							QueryCommunityAPI.communityPropagationOrganization(id, production), OrganizationList.class);
+							QueryCommunityAPI.communityPropagationOrganization(id, baseURL), OrganizationList.class);
 					associatedOrgs.forEach(o -> {
 						if (!organizationMap
 							.keySet()
@@ -136,9 +136,10 @@ public class Utils implements Serializable {
 		return organizationMap;
 	}
 
-	public static CommunityEntityMap getCommunityProjects(boolean production) throws IOException {
+	public static CommunityEntityMap getCommunityProjects(String baseURL) throws IOException {
 		CommunityEntityMap projectMap = new CommunityEntityMap();
-		getValidCommunities(production)
+
+		getValidCommunities(baseURL)
 			.forEach(community -> {
 				int page = -1;
 				int size = 100;
@@ -150,7 +151,7 @@ public class Utils implements Serializable {
 							.readValue(
 								QueryCommunityAPI
 									.communityProjects(
-										community.getId(), String.valueOf(page), String.valueOf(size), production),
+										community.getId(), String.valueOf(page), String.valueOf(size), baseURL),
 								ContentModel.class);
 						if (cm.getContent().size() > 0) {
 							cm.getContent().forEach(p -> {

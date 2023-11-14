@@ -52,11 +52,10 @@ public class PrepareResultCommunitySet {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		final boolean production = Boolean.valueOf(parser.get("production"));
-		log.info("production: {}", production);
+		final String baseURL =   parser.get("baseURL");
+		log.info("baseUEL: {}", baseURL);
 
-		final CommunityEntityMap projectsMap = Utils.getCommunityProjects(production);
-		// log.info("projectsMap: {}", new Gson().toJson(projectsMap));
+		final CommunityEntityMap projectsMap = Utils.getCommunityProjects(baseURL);
 
 		SparkConf conf = new SparkConf();
 
