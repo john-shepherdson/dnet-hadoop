@@ -5,6 +5,8 @@
 -- Datasource table/view and Datasource related tables/views
 ------------------------------------------------------------
 ------------------------------------------------------------
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_tmp purge;
+
 CREATE TABLE ${stats_db_name}.datasource_tmp
 (
     `id`               string,
@@ -48,6 +50,7 @@ WHERE d1.datainfo.deletedbyinference = FALSE and d1.datainfo.invisible=false;
 
 -- Updating temporary table with everything that is not based on results -> This is done with the following "dual" table.
 -- Creating a temporary dual table that will be removed after the following insert
+
 CREATE TABLE ${stats_db_name}.dual ( dummy CHAR(1));
 
 INSERT INTO ${stats_db_name}.dual VALUES ('X');
@@ -74,15 +77,21 @@ DROP TABLE ${stats_db_name}.dual;
 UPDATE ${stats_db_name}.datasource_tmp SET name='Other' WHERE name = 'Unknown Repository';
 UPDATE ${stats_db_name}.datasource_tmp SET yearofvalidation=null WHERE yearofvalidation = '-1';
 
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_languages purge;
+
 CREATE TABLE ${stats_db_name}.datasource_languages STORED AS PARQUET AS
 SELECT substr(d.id, 4) AS id, langs.languages AS language
 FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.odlanguages.value) langs AS languages
 where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false;
 
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_oids purge;
+
 CREATE TABLE ${stats_db_name}.datasource_oids STORED AS PARQUET AS
 SELECT substr(d.id, 4) AS id, oids.ids AS oid
 FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.originalid) oids AS ids
 where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false;
+
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_organizations purge;
 
 CREATE TABLE ${stats_db_name}.datasource_organizations STORED AS PARQUET AS
 SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS organization
@@ -91,6 +100,8 @@ WHERE r.reltype = 'datasourceOrganization' and r.datainfo.deletedbyinference = f
 
 -- datasource sources:
 -- where the datasource info have been collected from.
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_sources purge;
+
 create table if not exists ${stats_db_name}.datasource_sources STORED AS PARQUET AS
 select substr(d.id, 4) as id, substr(cf.key, 4) as datasource
 from ${openaire_db_name}.datasource d lateral view explode(d.collectedfrom) cfrom as cf

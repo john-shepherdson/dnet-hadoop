@@ -104,7 +104,7 @@ from ${stats_db_name}.tmp as o1
 join ${stats_db_name}.tmp as o2 where o1.id=o2.id and o1.organization!=o2.organization and o1.name!=o2.name
 group by o1.organization, o2.organization, o1.name, o2.name;
 
-drop table ${stats_db_name}.tmp purge;
+drop table if exists ${stats_db_name}.tmp purge;
 
 create TEMPORARY TABLE ${stats_db_name}.tmp AS
 select distinct ro.organization organization, ro.id, o.name, o.country from ${stats_db_name}.result_organization ro
@@ -118,7 +118,7 @@ from ${stats_db_name}.tmp as o1 join ${stats_db_name}.tmp as o2 on o1.id=o2.id
 where o1.id=o2.id and o1.country!=o2.country
 group by o1.organization, o1.id, o1.name, o2.country;
 
-drop table ${stats_db_name}.tmp purge;
+drop table if exists  ${stats_db_name}.tmp purge;
 
 create TEMPORARY TABLE ${stats_db_name}.tmp AS
 select o.id organization, o.name, ro.project as project  from ${stats_db_name}.organization o
@@ -133,7 +133,7 @@ from ${stats_db_name}.tmp as o1
 where o1.organization<>o2.organization and o1.name<>o2.name
 group by o1.name,o2.name, o1.organization, o2.organization;
 
-drop table ${stats_db_name}.tmp purge;
+drop table if exists ${stats_db_name}.tmp purge;
 
 create TEMPORARY TABLE ${stats_db_name}.tmp AS
 select o.id organization, o.name, o.country , ro.project as project  from ${stats_db_name}.organization o
@@ -149,7 +149,7 @@ from ${stats_db_name}.tmp as o1
 where o1.organization<>o2.organization and o1.country<>o2.country
 group by o1.organization, o2.country, o1.name;
 
-drop table ${stats_db_name}.tmp purge;
+drop table if exists ${stats_db_name}.tmp purge;
 
 drop table if exists ${stats_db_name}.indi_funder_country_collab purge;
 
@@ -178,7 +178,7 @@ from ${stats_db_name}.tmp as o1
 where o1.country<>o2.country
 group by o1.country, o2.country;
 
-drop table ${stats_db_name}.tmp purge;
+drop table if exists ${stats_db_name}.tmp purge;
 
 ---- Sprint 4 ----
 drop table if exists ${stats_db_name}.indi_pub_diamond purge;
@@ -422,7 +422,7 @@ drop table if exists ${stats_db_name}.indi_pub_hybrid purge;
 --                         on pd.id=tmp.id;
 
 create table if not exists ${stats_db_name}.indi_pub_hybrid stored as parquet as
-select pd.id,coalesce(is_hybrid,0) is_hybrid from ${stats_db_name}.publication_datasources pd
+select distinct pd.id,coalesce(is_hybrid,0) is_hybrid from ${stats_db_name}.publication_datasources pd
 left outer join (select pd.id, 1 as is_hybrid from ${stats_db_name}.publication_datasources pd
 join ${stats_db_name}.datasource d on pd.datasource=d.id
 join ${stats_db_name}.result_instance ri on ri.id=pd.id
@@ -492,7 +492,7 @@ CREATE TEMPORARY TABLE ${stats_db_name}.allresults as select year, ro.organizati
 drop table if exists ${stats_db_name}.indi_org_fairness_pub_year purge;
 
 create table if not exists ${stats_db_name}.indi_org_fairness_pub_year stored as parquet as
-select allresults.year, allresults.organization, result_fair.no_result_fair/allresults.no_allresults org_fairness
+select cast(allresults.year as int) year, allresults.organization, result_fair.no_result_fair/allresults.no_allresults org_fairness
 from ${stats_db_name}.allresults
          join ${stats_db_name}.result_fair on result_fair.organization=allresults.organization and result_fair.year=allresults.year;
 
@@ -813,8 +813,8 @@ drop table if exists ${stats_db_name}.indi_pub_bronze_oa purge;
 --and (d.type='Journal' or d.type='Journal Aggregator/Publisher')
 --and ri.accessright='Open Access') tmp on tmp.id=p.id;
 
-create table ${stats_db_name}.indi_pub_bronze stored as parquet as
-select pd.id,coalesce(is_bronze_oa,0) is_bronze_oa from ${stats_db_name}.publication_datasources pd
+create table ${stats_db_name}.indi_pub_bronze_oa stored as parquet as
+select distinct pd.id,coalesce(is_bronze_oa,0) is_bronze_oa from ${stats_db_name}.publication_datasources pd
 left outer join (select pd.id, 1 as is_bronze_oa from ${stats_db_name}.publication_datasources pd
 join ${stats_db_name}.datasource d on pd.datasource=d.id
 join ${stats_db_name}.result_instance ri on ri.id=pd.id
