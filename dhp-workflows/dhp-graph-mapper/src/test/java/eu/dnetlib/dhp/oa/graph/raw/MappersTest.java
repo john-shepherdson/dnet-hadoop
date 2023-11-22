@@ -122,7 +122,7 @@ class MappersTest {
 		assertTrue(instance.getPid().isEmpty());
 
 		assertNotNull(instance.getInstanceTypeMapping());
-		assertEquals(2, instance.getInstanceTypeMapping().size());
+		assertEquals(1, instance.getInstanceTypeMapping().size());
 
 		Optional<InstanceTypeMapping> coarType = instance
 			.getInstanceTypeMapping()
@@ -131,8 +131,8 @@ class MappersTest {
 			.findFirst();
 
 		assertTrue(coarType.isPresent());
-		assertEquals("http://purl.org/coar/resource_type/c_5794", coarType.get().getTypeCode());
-		assertEquals("conference paper", coarType.get().getTypeLabel());
+		assertNull(coarType.get().getTypeCode());
+		assertNull(coarType.get().getTypeLabel());
 
 		Optional<InstanceTypeMapping> userType = instance
 			.getInstanceTypeMapping()
@@ -140,9 +140,7 @@ class MappersTest {
 			.filter(itm -> ModelConstants.OPENAIRE_USER_RESOURCE_TYPES.equals(itm.getVocabularyName()))
 			.findFirst();
 
-		assertTrue(userType.isPresent());
-		assertEquals("Article", userType.get().getTypeCode());
-		assertEquals("Article", userType.get().getTypeLabel());
+		assertFalse(userType.isPresent());
 
 		assertFalse(instance.getAlternateIdentifier().isEmpty());
 		assertEquals("doi", instance.getAlternateIdentifier().get(0).getQualifier().getClassid());
@@ -710,14 +708,10 @@ class MappersTest {
 		assertEquals("0001", p_cleaned.getInstance().get(0).getRefereed().getClassid());
 		assertEquals("peerReviewed", p_cleaned.getInstance().get(0).getRefereed().getClassname());
 
-		assertNotNull(p_cleaned.getMetaResourceType());
-		assertEquals("Research Literature", p_cleaned.getMetaResourceType().getClassid());
-		assertEquals("Research Literature", p_cleaned.getMetaResourceType().getClassname());
-		assertEquals(ModelConstants.OPENAIRE_META_RESOURCE_TYPE, p_cleaned.getMetaResourceType().getSchemeid());
-		assertEquals(ModelConstants.OPENAIRE_META_RESOURCE_TYPE, p_cleaned.getMetaResourceType().getSchemename());
+		assertNull(p_cleaned.getMetaResourceType());
 
 		assertNotNull(p_cleaned.getInstance().get(0).getInstanceTypeMapping());
-		assertEquals(2, p_cleaned.getInstance().get(0).getInstanceTypeMapping().size());
+		assertEquals(1, p_cleaned.getInstance().get(0).getInstanceTypeMapping().size());
 
 		assertTrue(
 			p_cleaned
@@ -728,8 +722,7 @@ class MappersTest {
 				.anyMatch(
 					t -> "journal-article".equals(t.getOriginalType()) &&
 						ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(t.getVocabularyName()) &&
-						"http://purl.org/coar/resource_type/c_2df8fbb1".equals(t.getTypeCode()) &&
-						"research article".equals(t.getTypeLabel())));
+						Objects.isNull(t.getTypeCode()) && Objects.isNull(t.getTypeLabel())));
 
 		assertTrue(
 			p_cleaned
@@ -737,11 +730,8 @@ class MappersTest {
 				.get(0)
 				.getInstanceTypeMapping()
 				.stream()
-				.anyMatch(
-					t -> "journal-article".equals(t.getOriginalType()) &&
-						ModelConstants.OPENAIRE_USER_RESOURCE_TYPES.equals(t.getVocabularyName()) &&
-						"Article".equals(t.getTypeCode()) &&
-						"Article".equals(t.getTypeLabel())));
+				.noneMatch(
+					t -> ModelConstants.OPENAIRE_USER_RESOURCE_TYPES.equals(t.getVocabularyName())));
 	}
 
 	@Test

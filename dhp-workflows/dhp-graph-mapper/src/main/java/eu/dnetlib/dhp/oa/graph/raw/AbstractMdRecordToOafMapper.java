@@ -125,9 +125,7 @@ public abstract class AbstractMdRecordToOafMapper {
 
 			final String type = getResultType(doc, instances);
 
-			final Qualifier metaResourceType = getMetaResourceType(instances);
-
-			return createOafs(doc, type, metaResourceType, instances, collectedFrom, entityInfo, lastUpdateTimestamp);
+			return createOafs(doc, type, instances, collectedFrom, entityInfo, lastUpdateTimestamp);
 		} catch (DocumentException e) {
 			log.error("Error with record:\n" + xml);
 			return Lists.newArrayList();
@@ -153,30 +151,6 @@ public abstract class AbstractMdRecordToOafMapper {
 		return type;
 	}
 
-	protected Qualifier getMetaResourceType(final List<Instance> instances) {
-
-		if (vocs.vocabularyExists(OPENAIRE_META_RESOURCE_TYPE)) {
-			Optional<InstanceTypeMapping> instanceTypeMapping = instances
-				.stream()
-				.flatMap(i -> i.getInstanceTypeMapping().stream())
-				.filter(t -> OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(t.getVocabularyName()))
-				.findFirst();
-
-			if (!instanceTypeMapping.isPresent()) {
-				return null;
-			} else {
-				final String typeCode = instanceTypeMapping.get().getTypeCode();
-				return Optional
-					.ofNullable(vocs.lookupTermBySynonym(OPENAIRE_META_RESOURCE_TYPE, typeCode))
-					.orElseThrow(
-						() -> new IllegalStateException("unable to find a synonym for '" + typeCode + "' in " +
-							OPENAIRE_META_RESOURCE_TYPE));
-			}
-		} else {
-			throw new IllegalStateException("vocabulary '" + OPENAIRE_META_RESOURCE_TYPE + "' not available");
-		}
-	}
-
 	private KeyValue getProvenanceDatasource(final Document doc, final String xpathId, final String xpathName) {
 		final String dsId = doc.valueOf(xpathId);
 		final String dsName = doc.valueOf(xpathName);
@@ -191,14 +165,13 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected List<Oaf> createOafs(
 		final Document doc,
 		final String type,
-		final Qualifier metaResourceType,
 		final List<Instance> instances,
 		final KeyValue collectedFrom,
 		final DataInfo info,
 		final long lastUpdateTimestamp) {
 
 		final OafEntity entity = createEntity(
-			doc, type, metaResourceType, instances, collectedFrom, info, lastUpdateTimestamp);
+			doc, type, instances, collectedFrom, info, lastUpdateTimestamp);
 
 		final Set<String> originalId = Sets.newHashSet(entity.getOriginalId());
 		originalId.add(entity.getId());
@@ -231,7 +204,6 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	private OafEntity createEntity(final Document doc,
 		final String type,
-		final Qualifier metaResourceType,
 		final List<Instance> instances,
 		final KeyValue collectedFrom,
 		final DataInfo info,
@@ -239,12 +211,12 @@ public abstract class AbstractMdRecordToOafMapper {
 		switch (type.toLowerCase()) {
 			case "publication":
 				final Publication p = new Publication();
-				populateResultFields(p, metaResourceType, doc, instances, collectedFrom, info, lastUpdateTimestamp);
+				populateResultFields(p, doc, instances, collectedFrom, info, lastUpdateTimestamp);
 				p.setJournal(prepareJournal(doc, info));
 				return p;
 			case "dataset":
 				final Dataset d = new Dataset();
-				populateResultFields(d, metaResourceType, doc, instances, collectedFrom, info, lastUpdateTimestamp);
+				populateResultFields(d, doc, instances, collectedFrom, info, lastUpdateTimestamp);
 				d.setStoragedate(prepareDatasetStorageDate(doc, info));
 				d.setDevice(prepareDatasetDevice(doc, info));
 				d.setSize(prepareDatasetSize(doc, info));
@@ -255,7 +227,7 @@ public abstract class AbstractMdRecordToOafMapper {
 				return d;
 			case "software":
 				final Software s = new Software();
-				populateResultFields(s, metaResourceType, doc, instances, collectedFrom, info, lastUpdateTimestamp);
+				populateResultFields(s, doc, instances, collectedFrom, info, lastUpdateTimestamp);
 				s.setDocumentationUrl(prepareSoftwareDocumentationUrls(doc, info));
 				s.setLicense(prepareSoftwareLicenses(doc, info));
 				s.setCodeRepositoryUrl(prepareSoftwareCodeRepositoryUrl(doc, info));
@@ -265,7 +237,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			case "otherresearchproducts":
 			default:
 				final OtherResearchProduct o = new OtherResearchProduct();
-				populateResultFields(o, metaResourceType, doc, instances, collectedFrom, info, lastUpdateTimestamp);
+				populateResultFields(o, doc, instances, collectedFrom, info, lastUpdateTimestamp);
 				o.setContactperson(prepareOtherResearchProductContactPersons(doc, info));
 				o.setContactgroup(prepareOtherResearchProductContactGroups(doc, info));
 				o.setTool(prepareOtherResearchProductTools(doc, info));
@@ -402,13 +374,11 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	private void populateResultFields(
 		final Result r,
-		final Qualifier metaResourceType,
 		final Document doc,
 		final List<Instance> instances,
 		final KeyValue collectedFrom,
 		final DataInfo info,
 		final long lastUpdateTimestamp) {
-		r.setMetaResourceType(metaResourceType);
 		r.setDataInfo(info);
 		r.setLastupdatetimestamp(lastUpdateTimestamp);
 		r.setId(createOpenaireId(50, doc.valueOf("//dri:objIdentifier"), false));
@@ -555,26 +525,7 @@ public abstract class AbstractMdRecordToOafMapper {
 			.ofNullable(findOriginalType(doc))
 			.map(originalType -> {
 				final List<InstanceTypeMapping> mappings = Lists.newArrayList();
-
-				if (vocs.vocabularyExists(OPENAIRE_COAR_RESOURCE_TYPES_3_1)) {
-
-					// TODO verify what the vocabs return when a synonym is not defined
-					Optional
-						.ofNullable(vocs.lookupTermBySynonym(OPENAIRE_COAR_RESOURCE_TYPES_3_1, originalType))
-						.ifPresent(coarTerm -> {
-							mappings.add(OafMapperUtils.instanceTypeMapping(originalType, coarTerm));
-							if (vocs.vocabularyExists(OPENAIRE_USER_RESOURCE_TYPES)) {
-
-								// TODO verify what the vocabs return when a synonym is not defined
-								Optional
-									.ofNullable(
-										vocs.lookupTermBySynonym(OPENAIRE_USER_RESOURCE_TYPES, coarTerm.getClassid()))
-									.ifPresent(
-										type -> mappings.add(OafMapperUtils.instanceTypeMapping(originalType, type)));
-							}
-						});
-				}
-
+				mappings.add(OafMapperUtils.instanceTypeMapping(originalType, OPENAIRE_COAR_RESOURCE_TYPES_3_1));
 				return mappings;
 			})
 			.orElse(new ArrayList<>());
