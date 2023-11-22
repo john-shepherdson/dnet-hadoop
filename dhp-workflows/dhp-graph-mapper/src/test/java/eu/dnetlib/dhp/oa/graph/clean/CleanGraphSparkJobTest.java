@@ -251,9 +251,19 @@ public class CleanGraphSparkJobTest {
 			.filter(String.format("id = '%s'", id))
 			.first();
 
+		final Set<String> invalidURLs = new HashSet<>();
+		invalidURLs.add("http://academia.edu/abcd");
+		invalidURLs.add("http://repo.scoap3.org/api");
+		invalidURLs.add("http://hdl.handle.net/");
+
 		assertNull(p_in.getBestaccessright());
 		assertTrue(p_in instanceof Result);
 		assertTrue(p_in instanceof Publication);
+		assertNotNull(p_in.getAuthor());
+		assertEquals(14, p_in.getAuthor().size());
+		assertNotNull(p_in.getInstance());
+		assertNotNull(p_in.getInstance().get(0));
+		assertEquals(3, p_in.getInstance().get(0).getUrl().stream().filter(invalidURLs::contains).count());
 
 		new CleanGraphSparkJob(
 			args(
@@ -272,6 +282,9 @@ public class CleanGraphSparkJobTest {
 			.first();
 
 		assertNull(p.getPublisher());
+
+		assertNotNull(p.getAuthor());
+		assertEquals(12, p.getAuthor().size());
 
 		assertEquals("und", p.getLanguage().getClassid());
 		assertEquals("Undetermined", p.getLanguage().getClassname());
@@ -363,6 +376,8 @@ public class CleanGraphSparkJobTest {
 				.getAlternateIdentifier()
 				.stream()
 				.anyMatch(s -> s.getValue().equals("10.1009/qwerty")));
+
+		assertTrue(p.getInstance().get(0).getUrl().stream().noneMatch(invalidURLs::contains));
 
 		assertNotNull(p.getSubject());
 
