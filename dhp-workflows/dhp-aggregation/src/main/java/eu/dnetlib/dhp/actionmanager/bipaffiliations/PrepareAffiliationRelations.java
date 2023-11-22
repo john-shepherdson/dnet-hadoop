@@ -12,6 +12,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
@@ -57,11 +58,14 @@ public class PrepareAffiliationRelations implements Serializable {
 		Boolean isSparkSessionManaged = Constants.isSparkSessionManaged(parser);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		final String inputPath = parser.get("inputPath");
-		log.info("inputPath {}: ", inputPath);
+		final String crossrefInputPath = parser.get("crossrefInputPath");
+		log.info("crossrefInputPath: {}", crossrefInputPath);
+
+		final String pubmedInputPath = parser.get("pubmedInputPath");
+		log.info("pubmedInputPath: {}", pubmedInputPath);
 
 		final String outputPath = parser.get("outputPath");
-		log.info("outputPath {}: ", outputPath);
+		log.info("outputPath: {}", outputPath);
 
 		SparkConf conf = new SparkConf();
 
@@ -70,12 +74,28 @@ public class PrepareAffiliationRelations implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Constants.removeOutputDir(spark, outputPath);
-				prepareAffiliationRelations(spark, inputPath, outputPath);
+
+				List<KeyValue> collectedFromCrossref = OafMapperUtils
+					.listKeyValues(ModelConstants.CROSSREF_ID, "Crossref");
+				JavaPairRDD<Text, Text> crossrefRelations = prepareAffiliationRelations(
+					spark, crossrefInputPath, collectedFromCrossref);
+
+				List<KeyValue> collectedFromPubmed = OafMapperUtils
+					.listKeyValues(ModelConstants.PUBMED_CENTRAL_ID, "Pubmed");
+				JavaPairRDD<Text, Text> pubmedRelations = prepareAffiliationRelations(
+					spark, pubmedInputPath, collectedFromPubmed);
+
+				crossrefRelations
+					.union(pubmedRelations)
+					.saveAsHadoopFile(
+						outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
+
 			});
 	}
 
-	private static <I extends Result> void prepareAffiliationRelations(SparkSession spark, String inputPath,
-		String outputPath) {
+	private static <I extends Result> JavaPairRDD<Text, Text> prepareAffiliationRelations(SparkSession spark,
+		String inputPath,
+		List<KeyValue> collectedfrom) {
 
 		// load and parse affiliation relations from HDFS
 		Dataset<Row> df = spark
@@ -92,7 +112,7 @@ public class PrepareAffiliationRelations implements Serializable {
 				new Column("matching.Confidence").as("confidence"));
 
 		// prepare action sets for affiliation relations
-		df
+		return df
 			.toJavaRDD()
 			.flatMap((FlatMapFunction<Row, Relation>) row -> {
 
@@ -120,8 +140,6 @@ public class PrepareAffiliationRelations implements Serializable {
 						qualifier,
 						Double.toString(row.getAs("confidence")));
 
-				List<KeyValue> collectedfrom = OafMapperUtils.listKeyValues(ModelConstants.CROSSREF_ID, "Crossref");
-
 				// return bi-directional relations
 				return getAffiliationRelationPair(paperId, affId, collectedfrom, dataInfo).iterator();
 
@@ -129,9 +147,7 @@ public class PrepareAffiliationRelations implements Serializable {
 			.map(p -> new AtomicAction(Relation.class, p))
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
-					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
-			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
-
+					new Text(OBJECT_MAPPER.writeValueAsString(aa))));
 	}
 
 	private static List<Relation> getAffiliationRelationPair(String paperId, String affId, List<KeyValue> collectedfrom,
