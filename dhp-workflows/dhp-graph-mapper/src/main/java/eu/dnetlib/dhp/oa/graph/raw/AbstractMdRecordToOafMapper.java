@@ -29,7 +29,7 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected final VocabularyGroup vocs;
 
-	protected static final UrlValidator URL_VALIDATOR = UrlValidator.getInstance();
+	protected static final UrlValidator URL_VALIDATOR = new UrlValidator(UrlValidator.ALLOW_2_SLASHES);
 
 	private final boolean invisible;
 

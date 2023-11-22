@@ -798,6 +798,20 @@ class MappersTest {
 	}
 
 	@Test
+	void test_instance_url_validation() throws IOException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("idus_sevilla.xml")));
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		final Publication p = (Publication) list.get(0);
+
+		assertNotNull(p.getInstance());
+		assertFalse(p.getInstance().isEmpty());
+		assertNotNull(p.getInstance().get(0).getUrl());
+		assertFalse(p.getInstance().get(0).getUrl().isEmpty());
+		assertEquals("https://idus.us.es/handle//11441/118940", p.getInstance().get(0).getUrl().get(0));
+	}
+
+	@Test
 	void testZenodo() throws IOException, DocumentException {
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_zenodo.xml")));
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
