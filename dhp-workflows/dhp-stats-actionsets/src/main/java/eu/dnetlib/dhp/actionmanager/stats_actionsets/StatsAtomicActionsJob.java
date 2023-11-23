@@ -139,9 +139,9 @@ public class StatsAtomicActionsJob implements Serializable {
 				if (usm.isIs_bronze_oa())
 					r.setOpenAccessColor(OpenAccessColor.bronze);
 				else if (usm.isIs_gold())
-					r.setOpenAccessColor(OpenAccessColor.bronze);
-				else if (usm.isIs_gold())
 					r.setOpenAccessColor(OpenAccessColor.gold);
+				else if (usm.isIs_hybrid())
+					r.setOpenAccessColor(OpenAccessColor.hybrid);
 				return r;
 			}, Encoders.bean(Result.class));
 	}
