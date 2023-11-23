@@ -14,6 +14,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import eu.dnetlib.dhp.common.vocabulary.VocabularyTerm;
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.sisyphsu.dateparser.DateParserUtils;
@@ -27,6 +28,10 @@ import eu.dnetlib.dhp.schema.oaf.*;
 import me.xuender.unidecode.Unidecode;
 
 public class GraphCleaningFunctions extends CleaningFunctions {
+
+	public static final String DNET_PUBLISHERS = "dnet:publishers";
+
+	public static final String DNET_LICENSES = "dnet:licenses";
 
 	public static final String ORCID_CLEANING_REGEX = ".*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9x]{4})";
 	public static final int ORCID_LEN = 19;
@@ -407,6 +412,13 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 									.getPublisher()
 									.getValue()
 									.replaceAll(NAME_CLEANING_REGEX, " "));
+
+						if (vocs.vocabularyExists(DNET_PUBLISHERS)) {
+							vocs.find(DNET_PUBLISHERS)
+									.map(voc -> voc.getTermBySynonym(r.getPublisher().getValue()))
+									.map(VocabularyTerm::getName)
+									.ifPresent(publisher -> r.getPublisher().setValue(publisher));
+						}
 					}
 				}
 				if (Objects.isNull(r.getLanguage()) || StringUtils.isBlank(r.getLanguage().getClassid())) {
@@ -565,6 +577,13 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 						}
 						if (Objects.isNull(i.getRefereed()) || StringUtils.isBlank(i.getRefereed().getClassid())) {
 							i.setRefereed(qualifier("0000", "Unknown", ModelConstants.DNET_REVIEW_LEVELS));
+						}
+
+						if (Objects.nonNull(i.getLicense()) && Objects.nonNull(i.getLicense().getValue())) {
+							vocs.find(DNET_LICENSES)
+									.map(voc -> voc.getTermBySynonym(i.getLicense().getValue()))
+									.map(VocabularyTerm::getId)
+									.ifPresent(license -> i.getLicense().setValue(license));
 						}
 
 						// from the script from Dimitris
