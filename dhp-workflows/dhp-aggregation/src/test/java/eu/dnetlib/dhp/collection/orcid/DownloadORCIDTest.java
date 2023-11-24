@@ -32,45 +32,6 @@ import eu.dnetlib.dhp.parser.utility.VtdException;
 public class DownloadORCIDTest {
 	private final Logger log = LoggerFactory.getLogger(DownloadORCIDTest.class);
 
-//	public void test() throws Exception {
-//
-//		Configuration conf = new Configuration();
-//		// Set FileSystem URI
-////        conf.set("fs.defaultFS", "file://");
-//		// Because of Maven
-//		conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
-//		conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
-//
-//		System.setProperty("hadoop.home.dir", "file:///Users/sandro/orcid/");
-//
-//		final FileSystem fileSystem = FileSystem.get(conf);
-//
-//		new ExtractORCIDDump(fileSystem).run("/Users/sandro/orcid/", "/Users/sandro/orcid/extracted");
-//
-////		final GZIPInputStream gzip = new GZIPInputStream(Files.newInputStream(Paths.get("/Users/sandro/orcid/ORCID_2023_10_activities_1.tar.gz")));
-////		try(final TarArchiveInputStream tais = new TarArchiveInputStream(gzip)) {
-////
-////			TarArchiveEntry entry;
-////			while ((entry = tais.getNextTarEntry()) != null) {
-////
-////				if (entry.isFile() && entry.getName().contains("employments")) {
-////
-////					System.out.println(entry.getName());
-////					final String [] items = entry.getName().split("/");
-////
-////					final String res = IOUtils.toString(new BufferedReader(new InputStreamReader(tais)));
-////					System.out.println("res = " + res);
-////
-////					System.out.println(items[items.length-2]);
-////					break;
-////				}
-////
-////
-////			}
-////		}
-//
-//	}
-
 	@Test
 	public void testSummary() throws Exception {
 		final String xml = IOUtils

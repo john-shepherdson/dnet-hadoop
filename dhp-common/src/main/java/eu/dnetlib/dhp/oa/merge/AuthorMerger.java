@@ -1,11 +1,18 @@
 
 package eu.dnetlib.dhp.oa.merge;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.Normalizer;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 
 import com.wcohen.ss.JaroWinkler;
 
@@ -13,6 +20,28 @@ import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.pace.model.Person;
 import scala.Tuple2;
+
+class SimilarityCellInfo implements Comparable<SimilarityCellInfo> {
+
+	public int authorPosition = 0;
+	public int orcidPosition = 0;
+
+	public double maxColumnSimilarity = 0.0;
+
+	public SimilarityCellInfo() {
+	}
+
+	public void setValues(final int authPos, final int orcidPos, final double similarity) {
+		this.authorPosition = authPos;
+		this.orcidPosition = orcidPos;
+		this.maxColumnSimilarity = similarity;
+	}
+
+	@Override
+	public int compareTo(@NotNull SimilarityCellInfo o) {
+		return Double.compare(maxColumnSimilarity, o.maxColumnSimilarity);
+	}
+}
 
 public class AuthorMerger {
 
@@ -119,6 +148,267 @@ public class AuthorMerger {
 				});
 	}
 
+	public static String normalizeFullName(final String fullname) {
+		return nfd(fullname)
+			.toLowerCase()
+			// do not compact the regexes in a single expression, would cause StackOverflowError
+			// in case
+			// of large input strings
+			.replaceAll("(\\W)+", " ")
+			.replaceAll("(\\p{InCombiningDiacriticalMarks})+", " ")
+			.replaceAll("(\\p{Punct})+", " ")
+			.replaceAll("(\\d)+", " ")
+			.replaceAll("(\\n)+", " ")
+			.trim();
+//        return Arrays.stream(fullname.split("[\\s | , | ;]+")).map(String::toLowerCase).sorted().collect(Collectors.joining());
+	}
+
+	private static String generateAuthorkey(final Author a) {
+		if (a.getSurname() == null)
+			return "NOSURNAME";
+
+		return normalize(a.getSurname());
+	}
+
+//
+//    public static List<Author> enrichOrcid2(List<Author> baseAuthor, List<Author> orcidAuthor) {
+//        if (baseAuthor == null || baseAuthor.isEmpty())
+//            return orcidAuthor;
+//
+//        if (orcidAuthor == null || orcidAuthor.isEmpty())
+//            return baseAuthor;
+//
+//        if (baseAuthor.size() == 1 && orcidAuthor.size() > 10)
+//            return baseAuthor;
+//
+//
+//        Map<String, List<Author>> pubClusters = baseAuthor.stream().collect(Collectors.toMap(AuthorMerger::generateAuthorkey, Arrays::asList, (a, b) -> {
+//            a.addAll(b);
+//            return a;
+//        }));
+//
+//        Map<String, List<Author>> orcidClusters = baseAuthor.stream().collect(Collectors.toMap(AuthorMerger::generateAuthorkey, Arrays::asList, (a, b) -> {
+//            a.addAll(b);
+//            return a;
+//        }));
+//
+//        System.out.println(pubClusters.keySet().size());
+//        System.out.println(orcidClusters.keySet().size());
+//
+//
+//
+//
+//       return null;
+//
+//
+//    }
+
+	static int hammingDist(String str1, String str2) {
+		if (str1.length() != str2.length())
+			return Math.max(str1.length(), str2.length());
+		int i = 0, count = 0;
+		while (i < str1.length()) {
+			if (str1.charAt(i) != str2.charAt(i))
+				count++;
+			i++;
+		}
+		return count;
+	}
+
+	private static String authorFieldToBeCompared(Author author) {
+		if (StringUtils.isNotBlank(author.getSurname())) {
+			return author.getSurname();
+
+		}
+		if (StringUtils.isNotBlank(author.getFullname())) {
+			return author.getFullname();
+		}
+		return null;
+	}
+
+	public static boolean checkSimilarity3(final Author left, final Author right) {
+
+		if (StringUtils.isNotBlank(left.getSurname()) && StringUtils.isNotBlank(left.getName())
+			&&
+			StringUtils.isNotBlank(right.getSurname()) && StringUtils.isNotBlank(right.getName())
+
+		)
+			return left.getSurname().equalsIgnoreCase(right.getSurname())
+				&& left.getName().substring(0, 1).equalsIgnoreCase(right.getName().substring(0, 1));
+
+		final Person pl = parse(left);
+		final Person pr = parse(right);
+
+		// If one of them didn't have a surname the match is false
+		if (!(pl.getSurname() != null && pl.getSurname().stream().anyMatch(StringUtils::isNotBlank) &&
+			pr.getSurname() != null && pr.getSurname().stream().anyMatch(StringUtils::isNotBlank)))
+			return false;
+
+		// The Authors have one surname in common
+		if (pl.getSurname().stream().anyMatch(sl -> pr.getSurname().stream().anyMatch(sr -> sr.equalsIgnoreCase(sl)))) {
+
+			// If one of them has only a surname and is the same we can say that they are the same author
+			if ((pl.getName() == null || pl.getName().stream().allMatch(StringUtils::isBlank)) ||
+				(pr.getName() == null || pr.getName().stream().allMatch(StringUtils::isBlank)))
+				return true;
+			// The authors have the same initials of Name in common
+			if (pl
+				.getName()
+				.stream()
+				.anyMatch(
+					nl -> pr
+						.getName()
+						.stream()
+						.anyMatch(nr -> nr.substring(0, 1).equalsIgnoreCase(nl.substring(0, 1)))))
+				return true;
+		}
+		return false;
+	}
+
+	public static boolean checkSimilarity2(final Author left, final Author right) {
+		final Person pl = parse(left);
+		final Person pr = parse(right);
+
+		// If one of them didn't have a surname the match is false
+		if (!(pl.getSurname() != null && pl.getSurname().stream().anyMatch(StringUtils::isNotBlank) &&
+			pr.getSurname() != null && pr.getSurname().stream().anyMatch(StringUtils::isNotBlank)))
+			return false;
+
+		// The Authors have one surname in common
+		if (pl.getSurname().stream().anyMatch(sl -> pr.getSurname().stream().anyMatch(sr -> sr.equalsIgnoreCase(sl)))) {
+
+			// If one of them has only a surname and is the same we can say that they are the same author
+			if ((pl.getName() == null || pl.getName().stream().allMatch(StringUtils::isBlank)) ||
+				(pr.getName() == null || pr.getName().stream().allMatch(StringUtils::isBlank)))
+				return true;
+			// The authors have the same initials of Name in common
+			if (pl
+				.getName()
+				.stream()
+				.anyMatch(
+					nl -> pr
+						.getName()
+						.stream()
+						.anyMatch(nr -> nr.substring(0, 1).equalsIgnoreCase(nl.substring(0, 1)))))
+				return true;
+		}
+		return false;
+	}
+
+	public static boolean checkSimilarity(final Author left, final Author right) {
+
+		if (left.getSurname() == null && left.getFullname() == null)
+			return false;
+		if (right.getSurname() == null && right.getFullname() == null)
+			return false;
+
+		// The Authors have the same surname, or we are tolerant from 1 different char(lets say 1 Typo)
+		if (StringUtils.isNotBlank(left.getSurname()) && StringUtils.isNotBlank(right.getSurname())) {
+			if (left.getSurname().equalsIgnoreCase(right.getSurname())
+				|| hammingDist(left.getSurname().toLowerCase(), right.getSurname().toLowerCase()) < 2) {
+				// IN case on of the two Authors has no given Name the match is true
+				if (StringUtils.isBlank(left.getName()) || StringUtils.isBlank(right.getName()))
+					return true;
+				// If the surname is correct, and they have the same name or the name starts with the same Letter we can
+				// say is the same author
+				if (left.getName().equalsIgnoreCase(right.getName())
+					|| left.getName().substring(0, 1).equalsIgnoreCase(right.getName().substring(0, 1)))
+					return true;
+			}
+			// Different SURNAME
+			else {
+				return false;
+			}
+		} else {
+			// This is the case where the two authors have or the surname or the fullname
+			// get the first not null of the surname or fullname of both
+			final String l = authorFieldToBeCompared(left);
+			final String r = authorFieldToBeCompared(right);
+			if (l == null || r == null)
+				return false;
+			// The same length means they are the same field
+			if (l.length() == r.length()) {
+				return normalize(l).equals(normalize(r));
+			}
+			// In this case probably l contains the surname and r contains the fullname
+			if (l.length() < r.length())
+				return normalize(r).contains(normalize(l));
+			// In this case probably l contains the fullname and r contains the surname
+			return normalize(l).contains(normalize(r));
+		}
+		return false;
+	}
+
+	public static List<Author> enrichOrcid2(List<Author> baseAuthor, List<Author> orcidAuthor) {
+
+		final Integer match_itm = 0;
+		if (baseAuthor == null || baseAuthor.isEmpty())
+			return orcidAuthor;
+
+		if (orcidAuthor == null || orcidAuthor.isEmpty())
+			return baseAuthor;
+
+		if (baseAuthor.size() == 1 && orcidAuthor.size() > 10)
+			return baseAuthor;
+
+		final List<Author> oAuthor = new ArrayList<>();
+		oAuthor.addAll(orcidAuthor);
+
+		baseAuthor.forEach(ba -> {
+			Optional<Author> aMatch = oAuthor.stream().filter(oa -> checkSimilarity2(ba, oa)).findFirst();
+			if (aMatch.isPresent()) {
+				final Author sameAuthor = aMatch.get();
+				addPid(ba, sameAuthor.getPid());
+				oAuthor.remove(sameAuthor);
+			}
+		});
+		return baseAuthor;
+	}
+
+	public static List<Author> enrichOrcid(List<Author> baseAuthor, List<Author> orcidAuthor) {
+
+		if (baseAuthor == null || baseAuthor.isEmpty())
+			return orcidAuthor;
+
+		if (orcidAuthor == null || orcidAuthor.isEmpty())
+			return baseAuthor;
+
+		if (baseAuthor.size() == 1 && orcidAuthor.size() > 10)
+			return baseAuthor;
+
+		final Double similarityMatrix[][] = new Double[baseAuthor.size()][orcidAuthor.size()];
+
+		final List<SimilarityCellInfo> maxColums = new ArrayList<>();
+
+		for (int i = 0; i < orcidAuthor.size(); i++)
+			maxColums.add(new SimilarityCellInfo());
+
+		for (int i = 0; i < baseAuthor.size(); i++) {
+			for (int j = 0; j < orcidAuthor.size(); j++) {
+				similarityMatrix[i][j] = sim(baseAuthor.get(i), orcidAuthor.get(j));
+				if (maxColums.get(j).maxColumnSimilarity < similarityMatrix[i][j])
+					maxColums.get(j).setValues(i, j, similarityMatrix[i][j]);
+			}
+		}
+		maxColums
+			.stream()
+			.sorted()
+			.filter(si -> si.maxColumnSimilarity > 0.85)
+			.forEach(si -> addPid(baseAuthor.get(si.authorPosition), orcidAuthor.get(si.orcidPosition).getPid()));
+		return baseAuthor;
+
+	}
+
+	private static void addPid(final Author a, final List<StructuredProperty> pids) {
+
+		if (a.getPid() == null) {
+			a.setPid(new ArrayList<>());
+		}
+
+		a.getPid().addAll(pids);
+
+	}
+
 	public static String pidToComparableString(StructuredProperty pid) {
 		final String classid = pid.getQualifier().getClassid() != null ? pid.getQualifier().getClassid().toLowerCase()
 			: "";
@@ -171,7 +461,7 @@ public class AuthorMerger {
 		}
 	}
 
-	private static String normalize(final String s) {
+	public static String normalize(final String s) {
 		String[] normalized = nfd(s)
 			.toLowerCase()
 			// do not compact the regexes in a single expression, would cause StackOverflowError
