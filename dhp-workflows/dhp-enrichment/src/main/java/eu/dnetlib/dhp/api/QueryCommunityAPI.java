@@ -15,8 +15,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public class QueryCommunityAPI {
 
-
-
 	private static String get(String geturl) throws IOException {
 		URL url = new URL(geturl);
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -34,32 +32,31 @@ public class QueryCommunityAPI {
 
 	public static String communities(String baseURL) throws IOException {
 
-			return get(baseURL + "communities");
+		return get(baseURL + "communities");
 
 	}
 
-	public static String community(String id, String baseURL ) throws IOException {
+	public static String community(String id, String baseURL) throws IOException {
 
-			return get(baseURL  + id);
-
-	}
-
-	public static String communityDatasource(String id, String baseURL ) throws IOException {
-
-			return get(baseURL  + id + "/contentproviders");
-
+		return get(baseURL + id);
 
 	}
 
-	public static String communityPropagationOrganization(String id, String baseURL ) throws IOException {
+	public static String communityDatasource(String id, String baseURL) throws IOException {
 
-			return get(baseURL  + id + "/propagationOrganizations");
+		return get(baseURL + id + "/contentproviders");
 
 	}
 
-	public static String communityProjects(String id, String page, String size, String baseURL ) throws IOException {
+	public static String communityPropagationOrganization(String id, String baseURL) throws IOException {
 
-			return get(baseURL  + id + "/projects/" + page + "/" + size);
+		return get(baseURL + id + "/propagationOrganizations");
+
+	}
+
+	public static String communityProjects(String id, String page, String size, String baseURL) throws IOException {
+
+		return get(baseURL + id + "/projects/" + page + "/" + size);
 
 	}
 

@@ -1576,7 +1576,7 @@ public class BulkTagJobTest {
 					"-outputPath", workingDir.toString() + "/",
 //					"-baseURL", "https://services.openaire.eu/openaire/community/",
 					"-pathMap", pathMap,
-						"-taggingConf", taggingConf
+					"-taggingConf", taggingConf
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
