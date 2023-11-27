@@ -19,10 +19,10 @@
     "paramRequired": true
   },
   {
-    "paramName": "p",
-    "paramLongName": "production",
+    "paramName": "bu",
+    "paramLongName": "baseURL",
     "paramDescription": "the path used to store temporary output files",
-    "paramRequired": true
+    "paramRequired": false
   }
 
 ]

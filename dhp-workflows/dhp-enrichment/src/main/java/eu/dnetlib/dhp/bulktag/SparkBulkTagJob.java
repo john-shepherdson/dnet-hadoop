@@ -80,6 +80,7 @@ public class SparkBulkTagJob {
 			cc = CommunityConfigurationFactory.newInstance(taggingConf);
 		} else {
 			cc = Utils.getCommunityConfiguration(baseURL);
+			log.info(OBJECT_MAPPER.writeValueAsString(cc));
 		}
 
 		runWithSparkSession(

@@ -24,10 +24,10 @@
     "paramRequired": true
   },
   {
-    "paramName": "p",
-    "paramLongName": "production",
-    "paramDescription": "the path used to store temporary output files",
-    "paramRequired": true
+    "paramName": "bu",
+    "paramLongName": "baseURL",
+    "paramDescription": "the base URL to the community API to use",
+    "paramRequired": false
   }
 
 ]

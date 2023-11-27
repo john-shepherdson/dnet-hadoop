@@ -533,6 +533,7 @@ public class BulkTagJobTest {
 			+ "where MyD.inferenceprovenance = 'bulktagging'";
 
 		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
+
 		Assertions.assertEquals(7, idExplodeCommunity.count());
 
 		Assertions
@@ -1572,11 +1573,10 @@ public class BulkTagJobTest {
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath",
 					getClass().getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/no_updates/").getPath(),
-					"-taggingConf", taggingConf,
-
 					"-outputPath", workingDir.toString() + "/",
-					"-production", Boolean.TRUE.toString(),
-					"-pathMap", pathMap
+//					"-baseURL", "https://services.openaire.eu/openaire/community/",
+					"-pathMap", pathMap,
+						"-taggingConf", taggingConf
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
