@@ -1,17 +1,11 @@
 
 package eu.dnetlib.dhp.oa.merge;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.text.Normalizer;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import com.wcohen.ss.JaroWinkler;
@@ -161,41 +155,7 @@ public class AuthorMerger {
 			.replaceAll("(\\n)+", " ")
 
 			.trim();
-//        return Arrays.stream(fullname.split("[\\s | , | ;]+")).map(String::toLowerCase).sorted().collect(Collectors.joining());
 	}
-
-//
-//    public static List<Author> enrichOrcid2(List<Author> baseAuthor, List<Author> orcidAuthor) {
-//        if (baseAuthor == null || baseAuthor.isEmpty())
-//            return orcidAuthor;
-//
-//        if (orcidAuthor == null || orcidAuthor.isEmpty())
-//            return baseAuthor;
-//
-//        if (baseAuthor.size() == 1 && orcidAuthor.size() > 10)
-//            return baseAuthor;
-//
-//
-//        Map<String, List<Author>> pubClusters = baseAuthor.stream().collect(Collectors.toMap(AuthorMerger::generateAuthorkey, Arrays::asList, (a, b) -> {
-//            a.addAll(b);
-//            return a;
-//        }));
-//
-//        Map<String, List<Author>> orcidClusters = baseAuthor.stream().collect(Collectors.toMap(AuthorMerger::generateAuthorkey, Arrays::asList, (a, b) -> {
-//            a.addAll(b);
-//            return a;
-//        }));
-//
-//        System.out.println(pubClusters.keySet().size());
-//        System.out.println(orcidClusters.keySet().size());
-//
-//
-//
-//
-//       return null;
-//
-//
-//    }
 
 	static int hammingDist(String str1, String str2) {
 		if (str1.length() != str2.length())
@@ -220,7 +180,14 @@ public class AuthorMerger {
 		return null;
 	}
 
-	public static boolean checkSimilarity2(final Author left, final Author right) {
+	/**
+	 * This method tries to figure out when two author are the same in the contest
+	 * of ORCID enrichment
+	 * @param left Author in the OAF entity
+	 * @param right Author ORCID
+	 * @return based on a heuristic on the names of the authors if they are the same.
+	 */
+	public static boolean checkORCIDSimilarity(final Author left, final Author right) {
 		final Person pl = parse(left);
 		final Person pr = parse(right);
 
@@ -267,8 +234,16 @@ public class AuthorMerger {
 		else
 			return false;
 	}
+	//
 
-	public static List<Author> enrichOrcid2(List<Author> baseAuthor, List<Author> orcidAuthor) {
+
+	/**
+	 * Method to enrich ORCID information in one list of authors based on another list
+	 * @param baseAuthor the Author List in the OAF Entity
+	 * @param orcidAuthor The list of ORCID Author intersected
+	 * @return The Author List of the OAF Entity enriched with the orcid Author
+	 */
+	public static List<Author> enrichOrcid(List<Author> baseAuthor, List<Author> orcidAuthor) {
 
 		if (baseAuthor == null || baseAuthor.isEmpty())
 			return orcidAuthor;
@@ -283,7 +258,7 @@ public class AuthorMerger {
 		oAuthor.addAll(orcidAuthor);
 
 		baseAuthor.forEach(ba -> {
-			Optional<Author> aMatch = oAuthor.stream().filter(oa -> checkSimilarity2(ba, oa)).findFirst();
+			Optional<Author> aMatch = oAuthor.stream().filter(oa -> checkORCIDSimilarity(ba, oa)).findFirst();
 			if (aMatch.isPresent()) {
 				final Author sameAuthor = aMatch.get();
 				addPid(ba, sameAuthor.getPid());
@@ -291,40 +266,6 @@ public class AuthorMerger {
 			}
 		});
 		return baseAuthor;
-	}
-
-	public static List<Author> enrichOrcid(List<Author> baseAuthor, List<Author> orcidAuthor) {
-
-		if (baseAuthor == null || baseAuthor.isEmpty())
-			return orcidAuthor;
-
-		if (orcidAuthor == null || orcidAuthor.isEmpty())
-			return baseAuthor;
-
-		if (baseAuthor.size() == 1 && orcidAuthor.size() > 10)
-			return baseAuthor;
-
-		final Double similarityMatrix[][] = new Double[baseAuthor.size()][orcidAuthor.size()];
-
-		final List<SimilarityCellInfo> maxColums = new ArrayList<>();
-
-		for (int i = 0; i < orcidAuthor.size(); i++)
-			maxColums.add(new SimilarityCellInfo());
-
-		for (int i = 0; i < baseAuthor.size(); i++) {
-			for (int j = 0; j < orcidAuthor.size(); j++) {
-				similarityMatrix[i][j] = sim(baseAuthor.get(i), orcidAuthor.get(j));
-				if (maxColums.get(j).maxColumnSimilarity < similarityMatrix[i][j])
-					maxColums.get(j).setValues(i, j, similarityMatrix[i][j]);
-			}
-		}
-		maxColums
-			.stream()
-			.sorted()
-			.filter(si -> si.maxColumnSimilarity > 0.85)
-			.forEach(si -> addPid(baseAuthor.get(si.authorPosition), orcidAuthor.get(si.orcidPosition).getPid()));
-		return baseAuthor;
-
 	}
 
 	private static void addPid(final Author a, final List<StructuredProperty> pids) {

@@ -4,13 +4,9 @@ package eu.dnetlib.oa.merge;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.StringUtils;
@@ -67,7 +63,7 @@ public class AuthorMergerTest {
 				long start = System.currentTimeMillis();
 
 //                final List<Author> enrichedList = AuthorMerger.enrichOrcid(publicationAuthors, orcidAuthors);
-				final List<Author> enrichedList = AuthorMerger.enrichOrcid2(publicationAuthors, orcidAuthors);
+				final List<Author> enrichedList = AuthorMerger.enrichOrcid(publicationAuthors, orcidAuthors);
 
 				long enrichedAuthorWithPid = enrichedList
 					.stream()
@@ -105,7 +101,7 @@ public class AuthorMergerTest {
 		right.setSurname("Anand");
 		right.setFullname("Rachna, Anand");
 //        System.out.println(AuthorMerger.normalize(right.getFullname()));
-		boolean same = AuthorMerger.checkSimilarity2(left, right);
+		boolean same = AuthorMerger.checkORCIDSimilarity(left, right);
 
 		assertTrue(same);
 

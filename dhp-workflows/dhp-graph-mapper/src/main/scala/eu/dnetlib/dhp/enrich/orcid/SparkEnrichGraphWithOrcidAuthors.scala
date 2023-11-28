@@ -89,7 +89,7 @@ class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String]
           p
         }
         case (p: Publication, r: Row) =>
-          p.setAuthor(AuthorMerger.enrichOrcid2(p.getAuthor, AuthorEnricher.toOAFAuthor(r)))
+          p.setAuthor(AuthorMerger.enrichOrcid(p.getAuthor, AuthorEnricher.toOAFAuthor(r)))
           p
       }
       .write
