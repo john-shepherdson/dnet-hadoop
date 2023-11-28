@@ -159,15 +159,9 @@ public class AuthorMerger {
 			.replaceAll("(\\p{Punct})+", " ")
 			.replaceAll("(\\d)+", " ")
 			.replaceAll("(\\n)+", " ")
+
 			.trim();
 //        return Arrays.stream(fullname.split("[\\s | , | ;]+")).map(String::toLowerCase).sorted().collect(Collectors.joining());
-	}
-
-	private static String generateAuthorkey(final Author a) {
-		if (a.getSurname() == null)
-			return "NOSURNAME";
-
-		return normalize(a.getSurname());
 	}
 
 //
@@ -226,54 +220,26 @@ public class AuthorMerger {
 		return null;
 	}
 
-	public static boolean checkSimilarity3(final Author left, final Author right) {
-
-		if (StringUtils.isNotBlank(left.getSurname()) && StringUtils.isNotBlank(left.getName())
-			&&
-			StringUtils.isNotBlank(right.getSurname()) && StringUtils.isNotBlank(right.getName())
-
-		)
-			return left.getSurname().equalsIgnoreCase(right.getSurname())
-				&& left.getName().substring(0, 1).equalsIgnoreCase(right.getName().substring(0, 1));
-
-		final Person pl = parse(left);
-		final Person pr = parse(right);
-
-		// If one of them didn't have a surname the match is false
-		if (!(pl.getSurname() != null && pl.getSurname().stream().anyMatch(StringUtils::isNotBlank) &&
-			pr.getSurname() != null && pr.getSurname().stream().anyMatch(StringUtils::isNotBlank)))
-			return false;
-
-		// The Authors have one surname in common
-		if (pl.getSurname().stream().anyMatch(sl -> pr.getSurname().stream().anyMatch(sr -> sr.equalsIgnoreCase(sl)))) {
-
-			// If one of them has only a surname and is the same we can say that they are the same author
-			if ((pl.getName() == null || pl.getName().stream().allMatch(StringUtils::isBlank)) ||
-				(pr.getName() == null || pr.getName().stream().allMatch(StringUtils::isBlank)))
-				return true;
-			// The authors have the same initials of Name in common
-			if (pl
-				.getName()
-				.stream()
-				.anyMatch(
-					nl -> pr
-						.getName()
-						.stream()
-						.anyMatch(nr -> nr.substring(0, 1).equalsIgnoreCase(nl.substring(0, 1)))))
-				return true;
-		}
-		return false;
-	}
-
 	public static boolean checkSimilarity2(final Author left, final Author right) {
 		final Person pl = parse(left);
 		final Person pr = parse(right);
 
-		// If one of them didn't have a surname the match is false
+		// If one of them didn't have a surname we verify if they have the fullName not empty
+		// and verify if the normalized version is equal
 		if (!(pl.getSurname() != null && pl.getSurname().stream().anyMatch(StringUtils::isNotBlank) &&
-			pr.getSurname() != null && pr.getSurname().stream().anyMatch(StringUtils::isNotBlank)))
-			return false;
+			pr.getSurname() != null && pr.getSurname().stream().anyMatch(StringUtils::isNotBlank))) {
 
+			if (pl.getFullname() != null && !pl.getFullname().isEmpty() && pr.getFullname() != null
+				&& !pr.getFullname().isEmpty()) {
+				return pl
+					.getFullname()
+					.stream()
+					.anyMatch(
+						fl -> pr.getFullname().stream().anyMatch(fr -> normalize(fl).equalsIgnoreCase(normalize(fr))));
+			} else {
+				return false;
+			}
+		}
 		// The Authors have one surname in common
 		if (pl.getSurname().stream().anyMatch(sl -> pr.getSurname().stream().anyMatch(sr -> sr.equalsIgnoreCase(sl)))) {
 
@@ -292,56 +258,18 @@ public class AuthorMerger {
 						.anyMatch(nr -> nr.substring(0, 1).equalsIgnoreCase(nl.substring(0, 1)))))
 				return true;
 		}
-		return false;
-	}
 
-	public static boolean checkSimilarity(final Author left, final Author right) {
-
-		if (left.getSurname() == null && left.getFullname() == null)
+		// Sometimes we noticed that publication have author wrote in inverse order Surname, Name
+		// We verify if we have an exact match between name and surname
+		if (pl.getSurname().stream().anyMatch(sl -> pr.getName().stream().anyMatch(nr -> nr.equalsIgnoreCase(sl))) &&
+			pl.getName().stream().anyMatch(nl -> pr.getSurname().stream().anyMatch(sr -> sr.equalsIgnoreCase(nl))))
+			return true;
+		else
 			return false;
-		if (right.getSurname() == null && right.getFullname() == null)
-			return false;
-
-		// The Authors have the same surname, or we are tolerant from 1 different char(lets say 1 Typo)
-		if (StringUtils.isNotBlank(left.getSurname()) && StringUtils.isNotBlank(right.getSurname())) {
-			if (left.getSurname().equalsIgnoreCase(right.getSurname())
-				|| hammingDist(left.getSurname().toLowerCase(), right.getSurname().toLowerCase()) < 2) {
-				// IN case on of the two Authors has no given Name the match is true
-				if (StringUtils.isBlank(left.getName()) || StringUtils.isBlank(right.getName()))
-					return true;
-				// If the surname is correct, and they have the same name or the name starts with the same Letter we can
-				// say is the same author
-				if (left.getName().equalsIgnoreCase(right.getName())
-					|| left.getName().substring(0, 1).equalsIgnoreCase(right.getName().substring(0, 1)))
-					return true;
-			}
-			// Different SURNAME
-			else {
-				return false;
-			}
-		} else {
-			// This is the case where the two authors have or the surname or the fullname
-			// get the first not null of the surname or fullname of both
-			final String l = authorFieldToBeCompared(left);
-			final String r = authorFieldToBeCompared(right);
-			if (l == null || r == null)
-				return false;
-			// The same length means they are the same field
-			if (l.length() == r.length()) {
-				return normalize(l).equals(normalize(r));
-			}
-			// In this case probably l contains the surname and r contains the fullname
-			if (l.length() < r.length())
-				return normalize(r).contains(normalize(l));
-			// In this case probably l contains the fullname and r contains the surname
-			return normalize(l).contains(normalize(r));
-		}
-		return false;
 	}
 
 	public static List<Author> enrichOrcid2(List<Author> baseAuthor, List<Author> orcidAuthor) {
 
-		final Integer match_itm = 0;
 		if (baseAuthor == null || baseAuthor.isEmpty())
 			return orcidAuthor;
 

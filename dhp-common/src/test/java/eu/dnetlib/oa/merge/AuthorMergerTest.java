@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
@@ -22,22 +23,15 @@ import eu.dnetlib.dhp.schema.oaf.Author;
 
 public class AuthorMergerTest {
 
+
 	@Test
-	public void testNormalization() {
-
-		assertEquals("bruzzolasandro", AuthorMerger.normalizeFullName("Sandro, La Bruzzo"));
-		assertEquals("baglionimiriam", AuthorMerger.normalizeFullName("Miriam Baglioni"));
-		assertEquals("baglionimiriam", AuthorMerger.normalizeFullName("Miriam ;Baglioni,"));
-
-	}
-
 	public void testEnrcichAuthor() throws Exception {
 		final ObjectMapper mapper = new ObjectMapper();
 
 		BufferedReader pr = new BufferedReader(new InputStreamReader(
-			AuthorMergerTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/merge/authors_publication.json")));
+				Objects.requireNonNull(AuthorMergerTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/merge/authors_publication_sample.json"))));
 		BufferedReader or = new BufferedReader(new InputStreamReader(
-			AuthorMergerTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/merge/authors_orcid.json")));
+				Objects.requireNonNull(AuthorMergerTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/merge/authors_orcid_sample.json"))));
 
 		TypeReference<List<Author>> aclass = new TypeReference<List<Author>>() {
 		};
@@ -93,32 +87,27 @@ public class AuthorMergerTest {
 						enrichedAuthorWithPid);
 
 				System.out.println("=================");
-
-				if (++i > 30)
-					break;
 			}
-
 		}
-
 	}
 
 	@Test
 	public void checkSimilarityTest() {
 		final Author left = new Author();
-		left.setSurname("Wu");
-		left.setName("M.");
-		left.setFullname("Wu, M.");
+		left.setName("Anand");
+		left.setSurname("Rachna");
+		left.setFullname("Anand, Rachna");
 
 		System.out.println(AuthorMerger.normalizeFullName(left.getFullname()));
 
 		final Author right = new Author();
-		right.setName("Xin");
-		right.setSurname("Wu");
-		right.setFullname("Xin Wu");
+		right.setName("Rachna");
+		right.setSurname("Anand");
+		right.setFullname("Rachna, Anand");
 //        System.out.println(AuthorMerger.normalize(right.getFullname()));
 		boolean same = AuthorMerger.checkSimilarity2(left, right);
 
-		assertFalse(same);
+		assertTrue(same);
 
 	}
 

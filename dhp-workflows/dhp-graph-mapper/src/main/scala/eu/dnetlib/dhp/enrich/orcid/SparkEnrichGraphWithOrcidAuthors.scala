@@ -27,6 +27,8 @@ class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String]
 
   def enrichResult(spark: SparkSession, graphPath: String, orcidPath: String, outputPath: String): Unit = {
     val orcidPublication = generateOrcidTable(spark, orcidPath)
+
+
     implicit val publicationEncoder = Encoders.bean(classOf[Publication])
 
     val aschema = new StructType()
@@ -68,6 +70,16 @@ class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String]
       .select("dnet_id", "orcid_authors")
       .cache()
 
+
+    orcidPublication
+      .join(
+        entities,
+        lower(col("schema")).equalTo(lower(col("pid_schema"))) &&
+          lower(col("value")).equalTo(lower(col("pid_value"))),
+        "inner"
+      )
+      .groupBy(col("dnet_id")).agg(collect_set(struct(col("pid_schema"), col("pid_value")))).write.mode("Overwrite").save("/user/sandro.labruzzo/enrich_pub")
+
     val publication = spark.read.schema(publicationEncoder.schema).json(graphPath).as[Publication]
 
     publication
@@ -95,13 +107,14 @@ class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String]
       .where(
         "identifier.schema = 'doi' or identifier.schema ='pmid' or identifier.schema ='pmc' or identifier.schema ='arxiv' or identifier.schema ='handle'"
       )
-    orcidAuthors
+    val orcidPublication =orcidAuthors
       .join(orcidWorks, orcidAuthors("orcid").equalTo(orcidWorks("orcid")))
       .select(
         col("identifier.schema").alias("schema"),
         col("identifier.value").alias("value"),
         struct(orcidAuthors("orcid").alias("orcid"), col("givenName"), col("familyName")).alias("author")
       )
+    orcidPublication
   }
 }
 
