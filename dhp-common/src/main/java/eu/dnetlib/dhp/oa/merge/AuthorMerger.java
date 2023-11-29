@@ -222,7 +222,7 @@ public class AuthorMerger {
 					nl -> pr
 						.getName()
 						.stream()
-						.anyMatch(nr -> nr.substring(0, 1).equalsIgnoreCase(nl.substring(0, 1)))))
+						.anyMatch(nr -> nr.equalsIgnoreCase(nl))))
 				return true;
 		}
 
@@ -235,7 +235,6 @@ public class AuthorMerger {
 			return false;
 	}
 	//
-
 
 	/**
 	 * Method to enrich ORCID information in one list of authors based on another list

@@ -19,15 +19,19 @@ import eu.dnetlib.dhp.schema.oaf.Author;
 
 public class AuthorMergerTest {
 
-
 	@Test
 	public void testEnrcichAuthor() throws Exception {
 		final ObjectMapper mapper = new ObjectMapper();
 
 		BufferedReader pr = new BufferedReader(new InputStreamReader(
-				Objects.requireNonNull(AuthorMergerTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/merge/authors_publication_sample.json"))));
+			Objects
+				.requireNonNull(
+					AuthorMergerTest.class
+						.getResourceAsStream("/eu/dnetlib/dhp/oa/merge/authors_publication_sample.json"))));
 		BufferedReader or = new BufferedReader(new InputStreamReader(
-				Objects.requireNonNull(AuthorMergerTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/merge/authors_orcid_sample.json"))));
+			Objects
+				.requireNonNull(
+					AuthorMergerTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/merge/authors_orcid_sample.json"))));
 
 		TypeReference<List<Author>> aclass = new TypeReference<List<Author>>() {
 		};
