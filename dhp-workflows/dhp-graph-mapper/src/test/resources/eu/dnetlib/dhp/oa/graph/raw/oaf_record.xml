@@ -47,7 +47,9 @@
     <dc:subject>provisioning services</dc:subject>
     <dc:subject>regulating services</dc:subject>
     <dc:subject>supporting services</dc:subject>
-    <dc:type>Research Article</dc:type>
+    <dc:type>conference paper</dc:type>
+    <dc:type>http://purl.org/coar/resource_type/c_5794</dc:type>
+    <dc:type>info:eu-repo/semantics/article</dc:type>
     <!--<dr:CobjCategory type="publication">0001</dr:CobjCategory>-->
     <dr:CobjCategory>0001</dr:CobjCategory>
     <oaf:dateAccepted>2017-01-01</oaf:dateAccepted>

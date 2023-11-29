@@ -28,5 +28,11 @@
     "paramLongName": "filterInvisible",
     "paramDescription": "if true filters out invisible entities",
     "paramRequired": true
+  },
+  {
+    "paramName": "isu",
+    "paramLongName": "isLookupUrl",
+    "paramDescription": "url to the ISLookup Service",
+    "paramRequired": true
   }
 ]

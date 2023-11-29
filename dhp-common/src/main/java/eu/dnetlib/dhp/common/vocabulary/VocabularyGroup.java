@@ -135,6 +135,24 @@ public class VocabularyGroup implements Serializable {
 		return vocs.get(vocId.toLowerCase()).getSynonymAsQualifier(syn);
 	}
 
+	public Qualifier lookupTermBySynonym(final String vocId, final String syn) {
+		return find(vocId)
+			.map(
+				vocabulary -> Optional
+					.ofNullable(vocabulary.getTerm(syn))
+					.map(
+						term -> OafMapperUtils
+							.qualifier(term.getId(), term.getName(), vocabulary.getId(), vocabulary.getName()))
+					.orElse(
+						Optional
+							.ofNullable(vocabulary.getTermBySynonym(syn))
+							.map(
+								term -> OafMapperUtils
+									.qualifier(term.getId(), term.getName(), vocabulary.getId(), vocabulary.getName()))
+							.orElse(null)))
+			.orElse(null);
+	}
+
 	/**
 	 * getSynonymAsQualifierCaseSensitive
 	 *

@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.OPENAIRE_META_RESOURCE_TYPE;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.getProvenance;
 
 import java.net.MalformedURLException;
@@ -868,6 +870,99 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	protected static Field<String> cleanValue(Field<String> s) {
 		s.setValue(s.getValue().replaceAll(CLEANING_REGEX, " "));
 		return s;
+	}
+
+	public static OafEntity applyCoarVocabularies(OafEntity entity, VocabularyGroup vocs) {
+
+		if (entity instanceof Result) {
+			final Result result = (Result) entity;
+
+			Optional
+				.ofNullable(result.getInstance())
+				.ifPresent(
+					instances -> instances
+						.forEach(
+							instance -> {
+								if (Objects.isNull(instance.getInstanceTypeMapping())) {
+									List<InstanceTypeMapping> mapping = Lists.newArrayList();
+									mapping
+										.add(
+											OafMapperUtils
+												.instanceTypeMapping(
+													instance.getInstancetype().getClassname(),
+													OPENAIRE_COAR_RESOURCE_TYPES_3_1));
+									instance.setInstanceTypeMapping(mapping);
+								}
+								Optional<InstanceTypeMapping> optionalItm = instance
+									.getInstanceTypeMapping()
+									.stream()
+									.filter(GraphCleaningFunctions::originalResourceType)
+									.findFirst();
+								if (optionalItm.isPresent()) {
+									InstanceTypeMapping coarItm = optionalItm.get();
+									Optional
+										.ofNullable(
+											vocs
+												.lookupTermBySynonym(
+													OPENAIRE_COAR_RESOURCE_TYPES_3_1, coarItm.getOriginalType()))
+										.ifPresent(type -> {
+											coarItm.setTypeCode(type.getClassid());
+											coarItm.setTypeLabel(type.getClassname());
+										});
+									final List<InstanceTypeMapping> mappings = Lists.newArrayList();
+									if (vocs.vocabularyExists(OPENAIRE_USER_RESOURCE_TYPES)) {
+										Optional
+											.ofNullable(
+												vocs
+													.lookupTermBySynonym(
+														OPENAIRE_USER_RESOURCE_TYPES, coarItm.getTypeCode()))
+											.ifPresent(
+												type -> mappings
+													.add(
+														OafMapperUtils
+															.instanceTypeMapping(coarItm.getTypeCode(), type)));
+									}
+									if (!mappings.isEmpty()) {
+										instance.getInstanceTypeMapping().addAll(mappings);
+									}
+								}
+							}));
+			result.setMetaResourceType(getMetaResourceType(result.getInstance(), vocs));
+		}
+
+		return entity;
+	}
+
+	private static boolean originalResourceType(InstanceTypeMapping itm) {
+		return StringUtils.isNotBlank(itm.getOriginalType()) &&
+			OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(itm.getVocabularyName()) &&
+			StringUtils.isBlank(itm.getTypeCode()) &&
+			StringUtils.isBlank(itm.getTypeLabel());
+	}
+
+	private static Qualifier getMetaResourceType(final List<Instance> instances, final VocabularyGroup vocs) {
+
+		if (vocs.vocabularyExists(OPENAIRE_META_RESOURCE_TYPE)) {
+			Optional<InstanceTypeMapping> instanceTypeMapping = instances
+				.stream()
+				.flatMap(
+					i -> Optional.ofNullable(i.getInstanceTypeMapping()).map(Collection::stream).orElse(Stream.empty()))
+				.filter(t -> OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(t.getVocabularyName()))
+				.findFirst();
+
+			if (!instanceTypeMapping.isPresent()) {
+				return null;
+			} else {
+				final String typeCode = instanceTypeMapping.get().getTypeCode();
+				return Optional
+					.ofNullable(vocs.lookupTermBySynonym(OPENAIRE_META_RESOURCE_TYPE, typeCode))
+					.orElseThrow(
+						() -> new IllegalStateException("unable to find a synonym for '" + typeCode + "' in " +
+							OPENAIRE_META_RESOURCE_TYPE));
+			}
+		} else {
+			throw new IllegalStateException("vocabulary '" + OPENAIRE_META_RESOURCE_TYPE + "' not available");
+		}
 	}
 
 }

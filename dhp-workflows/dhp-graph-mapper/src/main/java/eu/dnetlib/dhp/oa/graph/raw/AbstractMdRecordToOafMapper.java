@@ -41,6 +41,7 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected static final String DATACITE_SCHEMA_KERNEL_4_SLASH = "http://datacite.org/schema/kernel-4/";
 	protected static final String DATACITE_SCHEMA_KERNEL_3 = "http://datacite.org/schema/kernel-3";
 	protected static final String DATACITE_SCHEMA_KERNEL_3_SLASH = "http://datacite.org/schema/kernel-3/";
+
 	protected static final Qualifier ORCID_PID_TYPE = qualifier(
 		ModelConstants.ORCID_PENDING,
 		ModelConstants.ORCID_CLASSNAME,
@@ -169,7 +170,8 @@ public abstract class AbstractMdRecordToOafMapper {
 		final DataInfo info,
 		final long lastUpdateTimestamp) {
 
-		final OafEntity entity = createEntity(doc, type, instances, collectedFrom, info, lastUpdateTimestamp);
+		final OafEntity entity = createEntity(
+			doc, type, instances, collectedFrom, info, lastUpdateTimestamp);
 
 		final Set<String> originalId = Sets.newHashSet(entity.getOriginalId());
 		originalId.add(entity.getId());
@@ -515,6 +517,19 @@ public abstract class AbstractMdRecordToOafMapper {
 	protected abstract Field<String> prepareDatasetDevice(Document doc, DataInfo info);
 
 	protected abstract Field<String> prepareDatasetStorageDate(Document doc, DataInfo info);
+
+	protected abstract String findOriginalType(Document doc);
+
+	protected List<InstanceTypeMapping> prepareInstanceTypeMapping(Document doc) {
+		return Optional
+			.ofNullable(findOriginalType(doc))
+			.map(originalType -> {
+				final List<InstanceTypeMapping> mappings = Lists.newArrayList();
+				mappings.add(OafMapperUtils.instanceTypeMapping(originalType, OPENAIRE_COAR_RESOURCE_TYPES_3_1));
+				return mappings;
+			})
+			.orElse(new ArrayList<>());
+	}
 
 	private Journal prepareJournal(final Document doc, final DataInfo info) {
 		final Node n = doc.selectSingleNode("//oaf:journal");
