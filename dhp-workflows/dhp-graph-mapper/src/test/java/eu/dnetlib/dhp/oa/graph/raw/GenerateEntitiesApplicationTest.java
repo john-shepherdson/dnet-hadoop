@@ -92,13 +92,14 @@ class GenerateEntitiesApplicationTest {
 	private List<String> vocs() throws IOException {
 		return IOUtils
 			.readLines(
-				GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
+				GenerateEntitiesApplicationTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/terms.txt"));
 	}
 
 	private List<String> synonyms() throws IOException {
 		return IOUtils
 			.readLines(
-				GraphCleaningFunctionsTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
+				GenerateEntitiesApplicationTest.class
+					.getResourceAsStream("/eu/dnetlib/dhp/oa/graph/clean/synonyms.txt"));
 	}
 
 }
