@@ -107,7 +107,7 @@ case object Crossref2Oaf {
       .map(f => f.id)
   }
 
-  def mappingResult(result: Result, json: JValue, cobjCategory: String): Result = {
+  def mappingResult(result: Result, json: JValue, cobjCategory: String, originalType:String): Result = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
     //MAPPING Crossref DOI into PID
@@ -283,6 +283,10 @@ case object Crossref2Oaf {
         ModelConstants.DNET_PUBLICATION_RESOURCE
       )
     )
+    //ADD ORIGINAL TYPE to the mapping
+    val itm = new InstanceTypeMapping
+    itm.setOriginalType(originalType)
+    instance.setInstanceTypeMapping(List(itm).asJava)
     result.setResourcetype(
       OafMapperUtils.qualifier(
         cobjCategory.substring(0, 4),
@@ -367,7 +371,7 @@ case object Crossref2Oaf {
       objectType,
       mappingCrossrefSubType.getOrElse(objectSubType, "0038 Other literature type")
     )
-    mappingResult(result, json, cOBJCategory)
+    mappingResult(result, json, cOBJCategory, originalType)
     if (result == null || result.getId == null)
       return List()
 
