@@ -191,6 +191,7 @@ object PubMedToOaf {
       // ADD ORIGINAL TYPE to the publication
       val itm = new InstanceTypeMapping
       itm.setOriginalType(ja.get.getValue)
+      itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
       pubmedInstance.setInstanceTypeMapping(List(itm).asJava)
     } else {
       val i_type = article.getPublicationTypes.asScala
@@ -202,6 +203,7 @@ object PubMedToOaf {
         // ADD ORIGINAL TYPE to the publication
         val itm = new InstanceTypeMapping
         itm.setOriginalType(i_type.get._1)
+        itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
         pubmedInstance.setInstanceTypeMapping(List(itm).asJava)
       }
       else

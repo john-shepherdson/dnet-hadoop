@@ -225,7 +225,9 @@ object DataciteToOAFTransformation {
     // ADD ORIGINAL TYPE
     val itm = new InstanceTypeMapping
     itm.setOriginalType(typeQualifiers._3)
+    itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
     i.setInstanceTypeMapping(List(itm).asJava)
+
 
     typeQualifiers._2.getClassname match {
       case "dataset" =>

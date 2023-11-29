@@ -187,6 +187,7 @@ object BioDBToOAF {
       )
       val itm = new InstanceTypeMapping
       itm.setOriginalType(input.pidType)
+      itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
       i.setInstanceTypeMapping(List(itm).asJava)
     } else {
       i.setInstancetype(
@@ -199,6 +200,7 @@ object BioDBToOAF {
       )
       val itm = new InstanceTypeMapping
       itm.setOriginalType("Bioentity")
+      itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
       i.setInstanceTypeMapping(List(itm).asJava)
     }
 
@@ -274,6 +276,7 @@ object BioDBToOAF {
     )
     val itm = new InstanceTypeMapping
     itm.setOriginalType("Bioentity")
+    itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
     i.setInstanceTypeMapping(List(itm).asJava)
 
     i.setCollectedfrom(collectedFromMap("uniprot"))
@@ -483,6 +486,7 @@ object BioDBToOAF {
     )
     val itm = new InstanceTypeMapping
     itm.setOriginalType("Bioentity")
+    itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
     i.setInstanceTypeMapping(List(itm).asJava)
 
     i.setCollectedfrom(collectedFromMap("pdb"))
@@ -586,6 +590,7 @@ object BioDBToOAF {
     )
     val itm = new InstanceTypeMapping
     itm.setOriginalType("Bioentity")
+    itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
     i.setInstanceTypeMapping(List(itm).asJava)
 
 

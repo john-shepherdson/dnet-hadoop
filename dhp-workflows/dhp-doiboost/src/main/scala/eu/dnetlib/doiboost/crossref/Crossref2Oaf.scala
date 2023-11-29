@@ -286,6 +286,7 @@ case object Crossref2Oaf {
     //ADD ORIGINAL TYPE to the mapping
     val itm = new InstanceTypeMapping
     itm.setOriginalType(originalType)
+    itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
     instance.setInstanceTypeMapping(List(itm).asJava)
     result.setResourcetype(
       OafMapperUtils.qualifier(
