@@ -81,7 +81,7 @@ public class CommunityConfiguration implements Serializable {
 		this.removeConstraintsMap = removeConstraintsMap;
 	}
 
-	CommunityConfiguration(final Map<String, Community> communities) {
+	public CommunityConfiguration(final Map<String, Community> communities) {
 		this.communities = communities;
 		init();
 	}
@@ -117,10 +117,10 @@ public class CommunityConfiguration implements Serializable {
 				add(d.getOpenaireId(), new Pair<>(id, d.getSelectionConstraints()), datasourceMap);
 			}
 			// get zenodo communities
-			for (ZenodoCommunity zc : c.getZenodoCommunities()) {
+			for (String zc : c.getZenodoCommunities()) {
 				add(
-					zc.getZenodoCommunityId(),
-					new Pair<>(id, zc.getSelCriteria()),
+					zc,
+					new Pair<>(id, null),
 					zenodocommunityMap);
 			}
 			selectionConstraintsMap.put(id, c.getConstraints());

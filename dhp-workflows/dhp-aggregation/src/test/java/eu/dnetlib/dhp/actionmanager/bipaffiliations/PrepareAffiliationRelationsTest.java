@@ -79,8 +79,8 @@ public class PrepareAffiliationRelationsTest {
 			.getPath();
 
 		String pubmedAffiliationRelationsPath = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/doi_to_ror.json")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/doi_to_ror.json")
+			.getPath();
 
 		String outputPath = workingDir.toString() + "/actionSet";
 

@@ -82,19 +82,23 @@ public class ResultTagger implements Serializable {
 		// communities contains all the communities to be not added to the context
 		final Set<String> removeCommunities = new HashSet<>();
 
+		// if (conf.getRemoveConstraintsMap().keySet().size() > 0)
 		conf
 			.getRemoveConstraintsMap()
 			.keySet()
-			.forEach(communityId -> {
-				if (conf.getRemoveConstraintsMap().get(communityId).getCriteria() != null &&
-					conf
-						.getRemoveConstraintsMap()
-						.get(communityId)
-						.getCriteria()
-						.stream()
-						.anyMatch(crit -> crit.verifyCriteria(param)))
-					removeCommunities.add(communityId);
-			});
+			.forEach(
+				communityId -> {
+					// log.info("Remove constraints for " + communityId);
+					if (conf.getRemoveConstraintsMap().keySet().contains(communityId) &&
+						conf.getRemoveConstraintsMap().get(communityId).getCriteria() != null &&
+						conf
+							.getRemoveConstraintsMap()
+							.get(communityId)
+							.getCriteria()
+							.stream()
+							.anyMatch(crit -> crit.verifyCriteria(param)))
+						removeCommunities.add(communityId);
+				});
 
 		// communities contains all the communities to be added as context for the result
 		final Set<String> communities = new HashSet<>();
@@ -124,10 +128,10 @@ public class ResultTagger implements Serializable {
 		if (Objects.nonNull(result.getInstance())) {
 			for (Instance i : result.getInstance()) {
 				if (Objects.nonNull(i.getCollectedfrom()) && Objects.nonNull(i.getCollectedfrom().getKey())) {
-					collfrom.add(StringUtils.substringAfter(i.getCollectedfrom().getKey(), "|"));
+					collfrom.add(i.getCollectedfrom().getKey());
 				}
 				if (Objects.nonNull(i.getHostedby()) && Objects.nonNull(i.getHostedby().getKey())) {
-					hostdby.add(StringUtils.substringAfter(i.getHostedby().getKey(), "|"));
+					hostdby.add(i.getHostedby().getKey());
 				}
 
 			}
