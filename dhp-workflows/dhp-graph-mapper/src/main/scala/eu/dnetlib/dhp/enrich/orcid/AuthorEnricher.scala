@@ -1,5 +1,6 @@
 package eu.dnetlib.dhp.enrich.orcid
 
+import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.{Author, Publication}
 import eu.dnetlib.dhp.schema.sx.OafUtils
 import org.apache.spark.sql.Row
@@ -13,9 +14,11 @@ object AuthorEnricher extends Serializable {
     a.setName(givenName)
     a.setSurname(familyName)
     a.setFullname(s"$givenName $familyName")
-    a.setPid(List(OafUtils.createSP(orcid, "ORCID", "ORCID")).asJava)
+    val pid = OafUtils.createSP(orcid, ModelConstants.ORCID, ModelConstants.ORCID)
+    pid.setDataInfo(OafUtils.generateDataInfo())
+    pid.getDataInfo.setProvenanceaction(OafUtils.createQualifier("ORCID_ENRICHMENT", "ORCID_ENRICHMENT"))
+    a.setPid(List(pid).asJava)
     a
-
   }
 
   def toOAFAuthor(r: Row): java.util.List[Author] = {
