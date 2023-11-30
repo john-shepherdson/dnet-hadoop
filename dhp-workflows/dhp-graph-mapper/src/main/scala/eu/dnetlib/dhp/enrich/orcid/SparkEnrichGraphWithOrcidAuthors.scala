@@ -73,7 +73,7 @@ class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String]
         col("id").alias("dnet_id")
       )
 
-  val orcidDnet = orcidPublication
+    val orcidDnet = orcidPublication
       .join(
         entities,
         lower(col("schema")).equalTo(lower(col("pid_schema"))) &&

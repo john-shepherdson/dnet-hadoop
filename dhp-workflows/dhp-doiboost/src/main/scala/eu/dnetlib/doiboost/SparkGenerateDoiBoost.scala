@@ -92,7 +92,6 @@ object SparkGenerateDoiBoost {
       .mode(SaveMode.Overwrite)
       .save(s"$workingDirPath/firstJoin")
 
-
     logger.info("Phase 2) Join Result with MAG")
     val sj: Dataset[(String, Publication)] =
       spark.read.load(s"$workingDirPath/firstJoin").as[Publication].map(p => (p.getId, p))

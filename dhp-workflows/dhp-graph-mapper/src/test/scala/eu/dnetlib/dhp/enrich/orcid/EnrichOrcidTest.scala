@@ -6,12 +6,9 @@ import org.junit.jupiter.api.Test
 import org.slf4j.{Logger, LoggerFactory}
 import org.apache.spark.sql.functions._
 
-
 class EnrichOrcidTest {
 
   val log: Logger = LoggerFactory.getLogger(getClass)
-
-
 
   def test() = {
     val spark = SparkSession.builder().master("local[*]").getOrCreate()
@@ -63,8 +60,7 @@ class EnrichOrcidTest {
 //      }).filter(author => author != null)
 //    })
 
-
-  Encoders
+    Encoders
     import spark.implicits._
 
 //    val enriched = spark.read
@@ -75,10 +71,6 @@ class EnrichOrcidTest {
 //      .withColumn("dp", col("authors.pid.datainfo.provenanceAction.classid"))
 //
 //      .show()
-
-
-
-
 
   }
 
