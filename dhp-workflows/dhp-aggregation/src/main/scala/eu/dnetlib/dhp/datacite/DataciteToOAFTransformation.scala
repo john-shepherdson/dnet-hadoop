@@ -166,7 +166,7 @@ object DataciteToOAFTransformation {
     resourceTypeGeneral: String,
     schemaOrg: String,
     vocabularies: VocabularyGroup
-  ): (Qualifier, Qualifier) = {
+  ): (Qualifier, Qualifier, String) = {
     if (resourceType != null && resourceType.nonEmpty) {
       val typeQualifier =
         vocabularies.getSynonymAsQualifier(ModelConstants.DNET_PUBLICATION_RESOURCE, resourceType)
@@ -176,7 +176,7 @@ object DataciteToOAFTransformation {
           vocabularies.getSynonymAsQualifier(
             ModelConstants.DNET_RESULT_TYPOLOGIES,
             typeQualifier.getClassid
-          )
+          ), resourceType
         )
     }
     if (schemaOrg != null && schemaOrg.nonEmpty) {
@@ -188,7 +188,7 @@ object DataciteToOAFTransformation {
           vocabularies.getSynonymAsQualifier(
             ModelConstants.DNET_RESULT_TYPOLOGIES,
             typeQualifier.getClassid
-          )
+          ), schemaOrg
         )
 
     }
@@ -203,7 +203,7 @@ object DataciteToOAFTransformation {
           vocabularies.getSynonymAsQualifier(
             ModelConstants.DNET_RESULT_TYPOLOGIES,
             typeQualifier.getClassid
-          )
+          ), resourceTypeGeneral
         )
 
     }
@@ -216,12 +216,19 @@ object DataciteToOAFTransformation {
     schemaOrg: String,
     vocabularies: VocabularyGroup
   ): Result = {
-    val typeQualifiers: (Qualifier, Qualifier) =
+    val typeQualifiers: (Qualifier, Qualifier, String) =
       getTypeQualifier(resourceType, resourceTypeGeneral, schemaOrg, vocabularies)
     if (typeQualifiers == null)
       return null
     val i = new Instance
     i.setInstancetype(typeQualifiers._1)
+    // ADD ORIGINAL TYPE
+    val itm = new InstanceTypeMapping
+    itm.setOriginalType(typeQualifiers._3)
+    itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
+    i.setInstanceTypeMapping(List(itm).asJava)
+
+
     typeQualifiers._2.getClassname match {
       case "dataset" =>
         val r = new OafDataset

@@ -1122,3 +1122,295 @@ dnet:relation_subRelType @=@ dnet:relation_subRelType @=@ version @=@ version
 FOS @=@ Fields of Science and Technology classification @=@ 0101 mathematics @=@ 0101 mathematics
 FOS @=@ Fields of Science and Technology classification @=@ 0102 computer and information sciences @=@ 0102 computer and information sciences
 FOS @=@ Fields of Science and Technology classification @=@ 0103 physical sciences @=@ 0103 physical sciences
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_ddb1 @=@ dataset
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/ACF7-8YT9 @=@ aggregated data
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_12cc @=@ cartographic material
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_cb28 @=@ clinical trial data
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/FXF3-D3G7 @=@ compiled data
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/AM6W-6QAW @=@ encoded data
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/63NG-B465 @=@ experimental data
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/A8F1-NPV9 @=@ genomic data
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/2H0M-X761 @=@ geospatial data
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/H41Y-FW7B @=@ laboratory notebook
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_12cd @=@ map
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/DD58-GFSX @=@ measurement and test data
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/FF4C-28RK @=@ observational data
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/CQMR-7K63 @=@ recorded data
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/W2XT-7017 @=@ simulation data
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_18cc @=@ sound
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/NHD0-W6SY @=@ survey data
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_86bc @=@ bibliography
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_c513 @=@ image
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_8a7e @=@ moving image
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_ecc8 @=@ still image
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_12ce @=@ video
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/C53B-JCY5 @=@ design patent
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_15cd @=@ patent
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/SB3Y-W4EH @=@ PCT application
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/Z907-YMBB @=@ plant patent
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/GPQ7-G5VE @=@ plant variety protection
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/MW8G-3CR8 @=@ software patent
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/542X-3S04 @=@ design
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/JBNF-DYAD @=@ industrial design
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_e9a0 @=@ interactive resource
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/BW7T-YM2G @=@ layout design
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_e059 @=@ learning object
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_1843 @=@ other
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/9DKX-KSAF @=@ utility model
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_7ad9 @=@ website
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_7877 @=@ clinical study
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_2f33 @=@ book
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_3248 @=@ book part
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_ba08 @=@ book review
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/D97F-VB57 @=@ commentary
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_5794 @=@ conference paper
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_18cp @=@ conference paper not in proceedings
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_18co @=@ conference poster not in proceedings
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_7acd @=@ corrigendum
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_ab20 @=@ data management plan
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_beb9 @=@ data paper
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_6501 @=@ journal article
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/H9BQ-739P @=@ peer review
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_816b @=@ preprint
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_93fc @=@ report
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_2df8fbb1 @=@ research article
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_dcae04bc @=@ review article
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_7bab @=@ software paper
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_71bd @=@ technical documentation
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/6NC7-GK9S @=@ transcription
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/H6QP-SC1X @=@ trademark
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_393c @=@ workflow
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_7a1f @=@ bachelor thesis
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_db06 @=@ doctoral thesis
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_bdcc @=@ master thesis
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_18wz @=@ memorandum
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_186u @=@ policy report
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_18op @=@ project deliverable
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/YZ1N-ZFT9 @=@ research protocol
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_18ws @=@ research report
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_18gh @=@ technical report
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_46ec @=@ thesis
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_8042 @=@ working paper
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_6947 @=@ blog post
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_c94f @=@ conference output
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_6670 @=@ conference poster
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/R60J-J5BD @=@ conference presentation
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_f744 @=@ conference proceedings
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_b239 @=@ editorial
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_0640 @=@ journal
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_0857 @=@ letter
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_545b @=@ letter to the editor
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_2cd9 @=@ magazine
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_0040 @=@ manuscript
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_2fe3 @=@ newspaper
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_998f @=@ newspaper article
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/QX5C-AR31 @=@ other periodical
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_baaf @=@ research proposal
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_efa0 @=@ review
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_18cf @=@ text
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_1162 @=@ annotation
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_8544 @=@ lecture
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_18cd @=@ musical composition
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_18cw @=@ musical notation
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_c950 @=@ research software
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/c_5ce6 @=@ software
+openaire::coar_resource_types_3_1 @=@ openaire::coar_resource_types_3_1 @=@ http://purl.org/coar/resource_type/QH80-2R4E @=@ source code
+openaire::user_resource_types @=@ openaire::user_resource_types @=@ Article @=@ Article
+openaire::user_resource_types @=@ openaire::user_resource_types @=@ Thesis @=@ Thesis
+openaire::user_resource_types @=@ openaire::user_resource_types @=@ Report @=@ Report
+openaire::user_resource_types @=@ openaire::user_resource_types @=@ Project result @=@ Project result
+openaire::user_resource_types @=@ openaire::user_resource_types @=@ Research Data @=@ Research Data
+openaire::user_resource_types @=@ openaire::user_resource_types @=@ Presentation @=@ Presentation
+openaire::user_resource_types @=@ openaire::user_resource_types @=@ Book/Chapter @=@ Book/Chapter
+openaire::user_resource_types @=@ openaire::user_resource_types @=@ Multimedia @=@ Multimedia
+openaire::user_resource_types @=@ openaire::user_resource_types @=@ Clinical Study @=@ Clinical Study
+openaire::meta_resource_types @=@ openaire::meta_resource_types @=@ Research Literature @=@ Research Literature
+openaire::meta_resource_types @=@ openaire::meta_resource_types @=@ Research Data @=@ Research Data
+openaire::meta_resource_types @=@ openaire::meta_resource_types @=@ Research Software @=@ Research Software
+openaire::meta_resource_types @=@ openaire::meta_resource_types @=@ Other Research Products @=@ Other Research Products
+openaire::meta_resource_types @=@ Research Literature @=@ text:bibliography
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_86bc
+openaire::meta_resource_types @=@ Research Literature @=@ patent:design_patent
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/C53B-JCY5
+openaire::meta_resource_types @=@ Research Literature @=@ patent
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_15cd
+openaire::meta_resource_types @=@ Research Literature @=@ patent:PCT_application
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/SB3Y-W4EH
+openaire::meta_resource_types @=@ Research Literature @=@ patent:plant_patent
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/Z907-YMBB
+openaire::meta_resource_types @=@ Research Literature @=@ patent:plant_variety_protection
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/GPQ7-G5VE
+openaire::meta_resource_types @=@ Research Literature @=@ patent:software_patent
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/MW8G-3CR8
+openaire::meta_resource_types @=@ Research Literature @=@ patent:utility_model
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/9DKX-KSAF
+openaire::meta_resource_types @=@ Research Literature @=@ text:report:clinical_study
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_7877
+openaire::meta_resource_types @=@ Research Literature @=@ text:book
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_2f33
+openaire::meta_resource_types @=@ Research Literature @=@ text:book:book_part
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_3248
+openaire::meta_resource_types @=@ Research Literature @=@ text:review:book_review
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_ba08
+openaire::meta_resource_types @=@ Research Literature @=@ text:review:commentary
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/D97F-VB57
+openaire::meta_resource_types @=@ Research Literature @=@ text:conference_output:conference_proceedings:conference_paper
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_5794
+openaire::meta_resource_types @=@ Research Literature @=@ text:conference_output:conference_paper_not_in_proceedings
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_18cp
+openaire::meta_resource_types @=@ Research Literature @=@ text:conference_output:conference_poster_not_in_proceedings
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_18co
+openaire::meta_resource_types @=@ Research Literature @=@ text:journal:journal_article:corrigendum
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_7acd
+openaire::meta_resource_types @=@ Research Literature @=@ text:report:data_management_plan
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_ab20
+openaire::meta_resource_types @=@ Research Literature @=@ text:journal:journal_article:data_paper
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_beb9
+openaire::meta_resource_types @=@ Research Literature @=@ text:journal:journal_article
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_6501
+openaire::meta_resource_types @=@ Research Literature @=@ text:review:peer_review
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/H9BQ-739P
+openaire::meta_resource_types @=@ Research Literature @=@ text:preprint
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_816b
+openaire::meta_resource_types @=@ Research Literature @=@ text:report
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_93fc
+openaire::meta_resource_types @=@ Research Literature @=@ text:journal:journal_article:research_article
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_2df8fbb1
+openaire::meta_resource_types @=@ Research Literature @=@ text:journal:journal_article:review_article
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_dcae04bc
+openaire::meta_resource_types @=@ Research Literature @=@ text:journal:journal_article:software_paper
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_7bab
+openaire::meta_resource_types @=@ Research Literature @=@ text:technical_documentation
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_71bd
+openaire::meta_resource_types @=@ Research Literature @=@ text:transcription
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/6NC7-GK9S
+openaire::meta_resource_types @=@ Research Literature @=@ text:thesis:bachelor_thesis
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_7a1f
+openaire::meta_resource_types @=@ Research Literature @=@ text:thesis:doctoral_thesis
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_db06
+openaire::meta_resource_types @=@ Research Literature @=@ text:thesis:master_thesis
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_bdcc
+openaire::meta_resource_types @=@ Research Literature @=@ text:report:memorandum
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_18wz
+openaire::meta_resource_types @=@ Research Literature @=@ text:report:policy_report
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_186u
+openaire::meta_resource_types @=@ Research Literature @=@ text:report:project_deliverable
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_18op
+openaire::meta_resource_types @=@ Research Literature @=@ text:report:research_protocol
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/YZ1N-ZFT9
+openaire::meta_resource_types @=@ Research Literature @=@ text:report:research_report
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_18ws
+openaire::meta_resource_types @=@ Research Literature @=@ text:report:technical_report
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_18gh
+openaire::meta_resource_types @=@ Research Literature @=@ text:thesis
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_46ec
+openaire::meta_resource_types @=@ Research Literature @=@ text:working_paper
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_8042
+openaire::meta_resource_types @=@ Research Literature @=@ text:blog_post
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_6947
+openaire::meta_resource_types @=@ Research Literature @=@ text:conference_output
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_c94f
+openaire::meta_resource_types @=@ Research Literature @=@ text:conference_output:conference_proceedings:conference_poster
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_6670
+openaire::meta_resource_types @=@ Research Literature @=@ text:conference_output:conference_presentation
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/R60J-J5BD
+openaire::meta_resource_types @=@ Research Literature @=@ text:conference_output:conference_proceedings
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_f744
+openaire::meta_resource_types @=@ Research Literature @=@ text:journal:editorial
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_b239
+openaire::meta_resource_types @=@ Research Literature @=@ text:journal
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_0640
+openaire::meta_resource_types @=@ Research Literature @=@ text:letter
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_0857
+openaire::meta_resource_types @=@ Research Literature @=@ text:journal:letter_to_the_editor
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_545b
+openaire::meta_resource_types @=@ Research Literature @=@ text:magazine
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_2cd9
+openaire::meta_resource_types @=@ Research Literature @=@ text:manuscript
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_0040
+openaire::meta_resource_types @=@ Research Literature @=@ text:newspaper
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_2fe3
+openaire::meta_resource_types @=@ Research Literature @=@ text:newspaper:newspaper_article
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_998f
+openaire::meta_resource_types @=@ Research Literature @=@ text:other_periodical
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/QX5C-AR31
+openaire::meta_resource_types @=@ Research Literature @=@ text:research_proposal
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_baaf
+openaire::meta_resource_types @=@ Research Literature @=@ text:review
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_efa0
+openaire::meta_resource_types @=@ Research Literature @=@ text
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_18cf
+openaire::meta_resource_types @=@ Research Literature @=@ text:annotation
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_1162
+openaire::meta_resource_types @=@ Research Literature @=@ text:lecture
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_8544
+openaire::meta_resource_types @=@ Research Literature @=@ text:musical_notation
+openaire::meta_resource_types @=@ Research Literature @=@ http://purl.org/coar/resource_type/c_18cw
+openaire::meta_resource_types @=@ Research Data @=@ dataset
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/c_ddb1
+openaire::meta_resource_types @=@ Research Data @=@ dataset:aggregated_data
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/ACF7-8YT9
+openaire::meta_resource_types @=@ Research Data @=@ cartographic_material
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/c_12cc
+openaire::meta_resource_types @=@ Research Data @=@ dataset:clinical_trial_data
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/c_cb28
+openaire::meta_resource_types @=@ Research Data @=@ dataset:compiled_data
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/FXF3-D3G7
+openaire::meta_resource_types @=@ Research Data @=@ dataset:encoded_data
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/AM6W-6QAW
+openaire::meta_resource_types @=@ Research Data @=@ dataset:experimental_data
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/63NG-B465
+openaire::meta_resource_types @=@ Research Data @=@ dataset:genomic_data
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/A8F1-NPV9
+openaire::meta_resource_types @=@ Research Data @=@ dataset:geospatial_data
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/2H0M-X761
+openaire::meta_resource_types @=@ Research Data @=@ dataset:laboratory_notebook
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/H41Y-FW7B
+openaire::meta_resource_types @=@ Research Data @=@ cartographic_material:map
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/c_12cd
+openaire::meta_resource_types @=@ Research Data @=@ dataset:measurement_and_test_data
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/DD58-GFSX
+openaire::meta_resource_types @=@ Research Data @=@ dataset:observational_data
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/FF4C-28RK
+openaire::meta_resource_types @=@ Research Data @=@ dataset:recorded_data
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/CQMR-7K63
+openaire::meta_resource_types @=@ Research Data @=@ dataset:simulation_data
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/W2XT-7017
+openaire::meta_resource_types @=@ Research Data @=@ sound
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/c_18cc
+openaire::meta_resource_types @=@ Research Data @=@ dataset:survey_data
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/NHD0-W6SY
+openaire::meta_resource_types @=@ Research Data @=@ image
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/c_c513
+openaire::meta_resource_types @=@ Research Data @=@ image:moving_image
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/c_8a7e
+openaire::meta_resource_types @=@ Research Data @=@ image:still_image
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/c_ecc8
+openaire::meta_resource_types @=@ Research Data @=@ image:moving_image:video
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/c_12ce
+openaire::meta_resource_types @=@ Research Data @=@ design
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/542X-3S04
+openaire::meta_resource_types @=@ Research Data @=@ design:industrial_design
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/JBNF-DYAD
+openaire::meta_resource_types @=@ Research Data @=@ interactive_resource
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/c_e9a0
+openaire::meta_resource_types @=@ Research Data @=@ design:layout_design
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/BW7T-YM2G
+openaire::meta_resource_types @=@ Research Data @=@ interactive_resource:website
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/c_7ad9
+openaire::meta_resource_types @=@ Research Data @=@ sound:musical_composition
+openaire::meta_resource_types @=@ Research Data @=@ http://purl.org/coar/resource_type/c_18cd
+openaire::meta_resource_types @=@ Research Software @=@ software:research_software
+openaire::meta_resource_types @=@ Research Software @=@ http://purl.org/coar/resource_type/c_c950
+openaire::meta_resource_types @=@ Research Software @=@ software
+openaire::meta_resource_types @=@ Research Software @=@ http://purl.org/coar/resource_type/c_5ce6
+openaire::meta_resource_types @=@ Research Software @=@ software:source_code
+openaire::meta_resource_types @=@ Research Software @=@ http://purl.org/coar/resource_type/QH80-2R4E
+openaire::meta_resource_types @=@ Other Research Products @=@ learning_object
+openaire::meta_resource_types @=@ Other Research Products @=@ http://purl.org/coar/resource_type/c_e059
+openaire::meta_resource_types @=@ Other Research Products @=@ other
+openaire::meta_resource_types @=@ Other Research Products @=@ http://purl.org/coar/resource_type/c_1843
+openaire::meta_resource_types @=@ Other Research Products @=@ trademark
+openaire::meta_resource_types @=@ Other Research Products @=@ http://purl.org/coar/resource_type/H6QP-SC1X
+openaire::meta_resource_types @=@ Other Research Products @=@ workflow
+openaire::meta_resource_types @=@ Other Research Products @=@ http://purl.org/coar/resource_type/c_393c

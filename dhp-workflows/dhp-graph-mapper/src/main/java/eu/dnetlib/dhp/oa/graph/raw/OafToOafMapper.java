@@ -139,6 +139,8 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 		final List<StructuredProperty> alternateIdentifier = prepareResultPids(doc, info);
 		final List<StructuredProperty> pid = IdentifierFactory.getPids(alternateIdentifier, collectedfrom);
 
+		instance.setInstanceTypeMapping(prepareInstanceTypeMapping(doc));
+
 		final Set<StructuredProperty> pids = new HashSet<>(pid);
 
 		instance
@@ -185,6 +187,29 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 		}
 
 		return Lists.newArrayList(instance);
+	}
+
+	/**
+	 * The Dublin Core element dc:type can be repeated, but we need to base our mapping on a single value
+	 * So this method tries to give precedence to the COAR resource type, when available. Otherwise, it looks for the
+	 * openaire's info:eu-repo type, and as last resort picks the 1st type text available
+	 *
+	 *     	<dc:type>http://purl.org/coar/resource_type/c_5794</dc:type>
+	 *     	<dc:type>info:eu-repo/semantics/article</dc:type>
+	 *     	<dc:type>Conference article</dc:type>
+	 *
+	 * @param doc the input document
+	 * @return the chosen resource type
+	 */
+	@Override
+	protected String findOriginalType(Document doc) {
+		return (String) doc
+			.selectNodes("//dc:type")
+			.stream()
+			.map(o -> "" + ((Node) o).getText().trim())
+			.sorted(new OriginalTypeComparator())
+			.findFirst()
+			.orElse(null);
 	}
 
 	@Override

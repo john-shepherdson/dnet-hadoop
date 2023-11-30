@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+        xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <header xmlns="http://namespace.openaire.eu/">
+        <dri:objIdentifier>doi_________::7f0f7807f17db50e5c2b5c452ccaf06d</dri:objIdentifier>
+        <dri:recordIdentifier>doi_________::7f0f7807f17db50e5c2b5c452ccaf06d</dri:recordIdentifier>
+        <dri:dateOfCollection>2020-08-06T07:04:09.62Z</dri:dateOfCollection>
+        <dri:mdFormat/>
+        <dri:mdFormatInterpretation/>
+        <dri:repositoryId/>
+        <dr:objectIdentifier/>
+        <dr:dateOfCollection/>
+        <dr:dateOfTransformation>2020-08-06T07:20:57.911Z</dr:dateOfTransformation>
+        <oaf:datasourceprefix>openaire____</oaf:datasourceprefix>
+    </header>
+    <metadata xmlns="http://namespace.openaire.eu/">
+        <dc:title>A case report of serious haemolysis in a glucose-6-phosphate dehydrogenase-deficient COVID-19 patient receiving hydroxychloroquine</dc:title>
+        <dc:creator>Maillart, E.</dc:creator>
+        <dc:creator>Leemans, S.</dc:creator>
+        <dc:creator>Van Noten, H.</dc:creator>
+        <dc:creator>Vandergraesen, T.</dc:creator>
+        <dc:creator>Mahadeb, B.</dc:creator>
+        <dc:creator>Salaouatchi, M. T.</dc:creator>
+        <dc:creator>De Bels, D.</dc:creator>
+        <dc:creator>Clevenbergh, P.</dc:creator>
+        <dc:date/>
+        <dc:identifier>http://dx.doi.org/10.1080/23744235.2020.1774644</dc:identifier>
+        <dc:language/>
+        <dc:publisher>Informa UK Limited</dc:publisher>
+        <dc:source>Crossref</dc:source>
+        <dc:source>Infectious Diseases</dc:source>
+        <dc:subject>Microbiology (medical)</dc:subject>
+        <dc:subject>General Immunology and Microbiology</dc:subject>
+        <dc:subject>Infectious Diseases</dc:subject>
+        <dc:subject>General Medicine</dc:subject>
+        <dc:type>journal-article</dc:type>
+        <dr:CobjCategory type="publication">0001</dr:CobjCategory>
+        <oaf:dateAccepted>2020-06-04</oaf:dateAccepted>
+        <oaf:projectid/>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:hostedBy
+                id="openaire____::1256f046-bf1f-4afc-8b47-d0b147148b18" name="Unknown Repository"/>
+        <oaf:collectedFrom id="openaire____::crossref" name="Crossref"/>
+        <oaf:identifier identifierType="doi">10.1080/23744235.2020.1774644</oaf:identifier>
+        <oaf:journal eissn="2374-4243" ep="3" iss="" issn="2374-4235" sp="1" vol="">Infectious Diseases</oaf:journal>
+    </metadata>
+    <about xmlns:oai="http://www.openarchives.org/OAI/2.0/">
+        <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+            <originDescription altered="true" harvestDate="2020-08-06T07:04:09.62Z">
+                <baseURL>file%3A%2F%2F%2Fsrv%2Fclaims%2Frecords%2Fpublication%2Fcrossref</baseURL>
+                <identifier/>
+                <datestamp/>
+                <metadataNamespace/>
+            </originDescription>
+        </provenance>
+        <oaf:datainfo>
+            <oaf:inferred>false</oaf:inferred>
+            <oaf:deletedbyinference>false</oaf:deletedbyinference>
+            <oaf:trust>0.9</oaf:trust>
+            <oaf:inferenceprovenance/>
+            <oaf:provenanceaction classid="user:claim" classname="user:claim"
+                                  schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+        </oaf:datainfo>
+    </about>
+</record>
