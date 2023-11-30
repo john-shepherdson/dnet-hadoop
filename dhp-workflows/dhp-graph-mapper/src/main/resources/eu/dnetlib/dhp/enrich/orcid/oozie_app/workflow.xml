@@ -1,4 +1,4 @@
-    <workflow-app name="Enrich_graph_with_ORCID_Workflow" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Enrich_graph_with_ORCID_Workflow" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>orcidPath</name>
@@ -38,15 +38,51 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--orcidPath</arg><arg>${orcidPath}</arg>
-            <arg>--targetPath</arg><arg>${targetPath}</arg>
-            <arg>--graphPath</arg><arg>${graphPath}</arg>
-            <arg>--master</arg><arg>yarn</arg>
+            <arg>--orcidPath</arg>
+            <arg>${orcidPath}</arg>
+            <arg>--targetPath</arg>
+            <arg>${targetPath}</arg>
+            <arg>--graphPath</arg>
+            <arg>${graphPath}</arg>
+            <arg>--master</arg>
+            <arg>yarn</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
 
+    <action name="copy_datasource">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphPath}/datasource</arg>
+            <arg>${nameNode}/${targetPath}/datasource</arg>
+        </distcp>
+        <ok to="copy_organization"/>
+        <error to="Kill"/>
+    </action>
+    <action name="copy_organization">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphPath}/organization</arg>
+            <arg>${nameNode}/${targetPath}/organization</arg>
+        </distcp>
+        <ok to="copy_project"/>
+        <error to="Kill"/>
+    </action>
+    <action name="copy_project">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphPath}/project</arg>
+            <arg>${nameNode}/${targetPath}/project</arg>
+        </distcp>
+        <ok to="copy_relation"/>
+        <error to="Kill"/>
+    </action>
+    <action name="copy_relation">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphPath}/relation</arg>
+            <arg>${nameNode}/${targetPath}/relation</arg>
+        </distcp>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
     <end name="End"/>
 
 </workflow-app>
