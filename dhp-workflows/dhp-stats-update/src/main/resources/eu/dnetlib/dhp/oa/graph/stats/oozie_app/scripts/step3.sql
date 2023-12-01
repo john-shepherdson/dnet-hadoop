@@ -5,6 +5,8 @@
 ------------------------------------------------------
 
 -- Dataset temporary table supporting updates
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_tmp purge;
+
 CREATE TABLE ${stats_db_name}.dataset_tmp
 (
     id               STRING,
@@ -40,6 +42,8 @@ SELECT substr(d.id, 4)                                            AS id,
 FROM ${openaire_db_name}.dataset d
 WHERE d.datainfo.deletedbyinference = FALSE and d.datainfo.invisible=false;
 
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_citations purge;
+
 CREATE TABLE ${stats_db_name}.dataset_citations STORED AS PARQUET AS
 SELECT substr(d.id, 4) AS id, xpath_string(citation.value, "//citation/id[@type='openaire']/@value") AS cites
 FROM ${openaire_db_name}.dataset d
@@ -47,11 +51,15 @@ FROM ${openaire_db_name}.dataset d
 WHERE xpath_string(citation.value, "//citation/id[@type='openaire']/@value") != ""
   and d.datainfo.deletedbyinference = false and d.datainfo.invisible=false;
 
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_classifications purge;
+
 CREATE TABLE ${stats_db_name}.dataset_classifications STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, instancetype.classname AS type
 FROM ${openaire_db_name}.dataset p
          LATERAL VIEW explode(p.instance.instancetype) instances AS instancetype
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
+
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_concepts purge;
 
 CREATE TABLE ${stats_db_name}.dataset_concepts STORED AS PARQUET AS
 SELECT substr(p.id, 4) as id, case
@@ -61,6 +69,8 @@ SELECT substr(p.id, 4) as id, case
 from ${openaire_db_name}.dataset p
          LATERAL VIEW explode(p.context) contexts as context
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
+
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_datasources purge;
 
 CREATE TABLE ${stats_db_name}.dataset_datasources STORED AS PARQUET AS
 SELECT p.id, case when d.id IS NULL THEN 'other' ELSE p.datasource END AS datasource
@@ -74,10 +84,14 @@ FROM (
     FROM ${openaire_db_name}.datasource d
     WHERE d.datainfo.deletedbyinference = false and d.datainfo.invisible=false) d ON p.datasource = d.id;
 
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_languages purge;
+
 CREATE TABLE ${stats_db_name}.dataset_languages STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, p.language.classname AS language
 FROM ${openaire_db_name}.dataset p
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
+
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_oids purge;
 
 CREATE TABLE ${stats_db_name}.dataset_oids STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, oids.ids AS oid
@@ -85,11 +99,15 @@ FROM ${openaire_db_name}.dataset p
          LATERAL VIEW explode(p.originalid) oids AS ids
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
 
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_pids purge;
+
 CREATE TABLE ${stats_db_name}.dataset_pids STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, ppid.qualifier.classname AS type, ppid.value AS pid
 FROM ${openaire_db_name}.dataset p
          LATERAL VIEW explode(p.pid) pids AS ppid
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
+
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_topics purge;
 
 CREATE TABLE ${stats_db_name}.dataset_topics STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, subjects.subject.qualifier.classname AS type, subjects.subject.value AS topic
