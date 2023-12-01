@@ -5,6 +5,8 @@
 --------------------------------------------------------------------------------
 
 -- Otherresearchproduct temporary table supporting updates
+DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_tmp purge;
+
 CREATE TABLE ${stats_db_name}.otherresearchproduct_tmp
 (
     id               STRING,
@@ -40,6 +42,8 @@ FROM ${openaire_db_name}.otherresearchproduct o
 WHERE o.datainfo.deletedbyinference = FALSE and o.datainfo.invisible=false;
 
 -- Otherresearchproduct_citations
+DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_citations purge;
+
 CREATE TABLE ${stats_db_name}.otherresearchproduct_citations STORED AS PARQUET AS
 SELECT substr(o.id, 4) AS id, xpath_string(citation.value, "//citation/id[@type='openaire']/@value") AS cites
 FROM ${openaire_db_name}.otherresearchproduct o LATERAL VIEW explode(o.extrainfo) citations AS citation
@@ -51,6 +55,8 @@ SELECT substr(p.id, 4) AS id, instancetype.classname AS type
 FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.instance.instancetype) instances AS instancetype
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
 
+DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_concepts purge;
+
 CREATE TABLE ${stats_db_name}.otherresearchproduct_concepts STORED AS PARQUET AS
 SELECT substr(p.id, 4) as id, case
                                   when contexts.context.id RLIKE '^[^::]+::[^::]+::.+$' then contexts.context.id
@@ -58,6 +64,8 @@ SELECT substr(p.id, 4) as id, case
                                   when contexts.context.id RLIKE '^[^::]+$' then concat(contexts.context.id, '::other::other') END as concept
 FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.context) contexts AS context
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
+
+DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_datasources purge;
 
 CREATE TABLE ${stats_db_name}.otherresearchproduct_datasources STORED AS PARQUET AS
 SELECT p.id, CASE WHEN d.id IS NULL THEN 'other' ELSE p.datasource END AS datasource
@@ -68,20 +76,28 @@ FROM (SELECT substr(p.id, 4) AS id, substr(instances.instance.hostedby.key, 4) A
                          from ${openaire_db_name}.datasource d
                          WHERE d.datainfo.deletedbyinference = false and d.datainfo.invisible=false) d on p.datasource = d.id;
 
+DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_languages purge;
+
 CREATE TABLE ${stats_db_name}.otherresearchproduct_languages STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, p.language.classname AS language
 FROM ${openaire_db_name}.otherresearchproduct p
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
+
+DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_oids purge;
 
 CREATE TABLE ${stats_db_name}.otherresearchproduct_oids STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, oids.ids AS oid
 FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.originalid) oids AS ids
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
 
+DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_pids purge;
+
 CREATE TABLE ${stats_db_name}.otherresearchproduct_pids STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, ppid.qualifier.classname AS type, ppid.value AS pid
 FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.pid) pids AS ppid
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
+
+DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_topics purge;
 
 CREATE TABLE ${stats_db_name}.otherresearchproduct_topics STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, subjects.subject.qualifier.classname AS type, subjects.subject.value AS topic

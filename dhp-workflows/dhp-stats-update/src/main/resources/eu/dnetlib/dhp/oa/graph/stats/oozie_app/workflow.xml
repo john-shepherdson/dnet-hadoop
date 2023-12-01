@@ -114,6 +114,7 @@
             <case to="step21-createObservatoryDB">${wf:conf('resumeFrom') eq 'step21-createObservatoryDB'}</case>
             <case to="step21-createObservatoryDB-post">${wf:conf('resumeFrom') eq 'step21-createObservatoryDB-post'}</case>
             <case to="step22-copyDataToImpalaCluster">${wf:conf('resumeFrom') eq 'step22-copyDataToImpalaCluster'}</case>
+            <case to="step22a-createPDFsAggregated">${wf:conf('resumeFrom') eq 'step22a-createPDFsAggregated'}</case>
             <case to="step23-finalizeImpalaCluster">${wf:conf('resumeFrom') eq 'step23-finalizeImpalaCluster'}</case>
             <case to="Step24-updateCache">${wf:conf('resumeFrom') eq 'Step24-updateCache'}</case>
             <default to="Step1"/>
@@ -447,6 +448,22 @@
             <argument>${usage_stats_db_name}</argument>
             <argument>${hadoop_user_name}</argument>
             <file>copyDataToImpalaCluster.sh</file>
+        </shell>
+        <ok to="step22a-createPDFsAggregated"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="step22a-createPDFsAggregated">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>createPDFsAggregated.sh</exec>
+            <!--            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>-->
+            <!--            <argument>${external_stats_db_name}</argument>-->
+            <argument>${stats_db_name}</argument>
+            <argument>${monitor_db_name}</argument>
+            <argument>${hadoop_user_name}</argument>
+            <file>createPDFsAggregated.sh</file>
         </shell>
         <ok to="step23-finalizeImpalaCluster"/>
         <error to="Kill"/>
