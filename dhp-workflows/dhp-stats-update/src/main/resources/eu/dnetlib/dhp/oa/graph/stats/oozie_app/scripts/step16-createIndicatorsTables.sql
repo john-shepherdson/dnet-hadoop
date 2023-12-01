@@ -1177,3 +1177,24 @@ select allresults.ri_initiative, result_findable.no_result_findable/allresults.n
 from allresults
          join result_findable on result_findable.ri_initiative=allresults.ri_initiative;
 
+create table if not exists ${stats_db_name}.indi_pub_publicly_funded stored as parquet as
+with org_names_pids as
+(select org.id,name, pid from ${stats_db_name}.organization org
+join ${stats_db_name}.organization_pids op on org.id=op.id),
+publicly_funded_orgs as
+(select distinct name from
+(select pf.name from stats_ext.insitutions_for_publicly_funded pf
+join ${stats_db_name}.fundref f on f.name=pf.name where f.type='government'
+union all
+select pf.name from stats_ext.insitutions_for_publicly_funded pf
+join ${stats_db_name}.project p on p.funder=pf.name
+union all
+select pf.name from stats_ext.insitutions_for_publicly_funded pf
+join org_names_pids op on (op.name=pf.name or op.pid=pf.ror)
+and pf.publicly_funded='yes') foo)
+select distinct p.id, coalesce(publicly_funded, 0) as publicly_funded
+from ${stats_db_name}.publication p
+left outer join (
+select distinct ro.id, 1 as publicly_funded from result_organization ro
+join ${stats_db_name}.organization o on o.id=ro.organization
+join publicly_funded_orgs pfo on o.name=pfo.name) tmp on p.id=tmp.id;
