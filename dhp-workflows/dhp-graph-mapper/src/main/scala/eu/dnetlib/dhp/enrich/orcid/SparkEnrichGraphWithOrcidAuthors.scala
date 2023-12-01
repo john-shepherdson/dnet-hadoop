@@ -2,10 +2,12 @@ package eu.dnetlib.dhp.enrich.orcid
 
 import eu.dnetlib.dhp.application.AbstractScalaApplication
 import eu.dnetlib.dhp.oa.merge.AuthorMerger
+import eu.dnetlib.dhp.schema.common.ModelSupport
 import eu.dnetlib.dhp.schema.oaf.{OtherResearchProduct, Publication, Result, Software}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
+import scala.collection.JavaConverters._
 
 class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String], log: Logger)
     extends AbstractScalaApplication(propertyPath, args, log: Logger) {
@@ -21,6 +23,8 @@ class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String]
     val targetPath = parser.get("targetPath")
     log.info(s"targetPath is '$targetPath'")
     val orcidPublication: Dataset[Row] = generateOrcidTable(spark, orcidPath)
+//    ModelSupport.entityTypes.entrySet().asScala.filter(k => k.getKey.getClass isInstance(Result))
+
     enrichResult(
       spark,
       s"$graphPath/publication",
@@ -63,7 +67,7 @@ class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String]
       .schema(enc.schema)
       .json(graphPath)
       .select(col("id"), col("datainfo"), col("instance"))
-      .where("datainfo.deletedbyinference = false")
+      .where("datainfo.deletedbyinference != true")
       .drop("datainfo")
       .withColumn("instances", explode(col("instance")))
       .withColumn("pids", explode(col("instances.pid")))
@@ -109,7 +113,7 @@ class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String]
       .load(s"$inputPath/Works")
       .select(col("orcid"), explode(col("pids")).alias("identifier"))
       .where(
-        "identifier.schema = 'doi' or identifier.schema ='pmid' or identifier.schema ='pmc' or identifier.schema ='arxiv' or identifier.schema ='handle'"
+        "identifier.schema IN('doi','pmid','pmc','arxiv','handle')"
       )
     val orcidPublication = orcidAuthors
       .join(orcidWorks, orcidAuthors("orcid").equalTo(orcidWorks("orcid")))

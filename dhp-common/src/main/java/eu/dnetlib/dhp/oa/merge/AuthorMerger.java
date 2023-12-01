@@ -132,17 +132,6 @@ public class AuthorMerger {
                 .trim();
     }
 
-    static int hammingDist(String str1, String str2) {
-        if (str1.length() != str2.length())
-            return Math.max(str1.length(), str2.length());
-        int i = 0, count = 0;
-        while (i < str1.length()) {
-            if (str1.charAt(i) != str2.charAt(i))
-                count++;
-            i++;
-        }
-        return count;
-    }
 
     private static String authorFieldToBeCompared(Author author) {
         if (StringUtils.isNotBlank(author.getSurname())) {
