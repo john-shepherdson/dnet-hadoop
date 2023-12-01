@@ -4,10 +4,7 @@
             <name>sourcePath</name>
             <description>the source path</description>
         </property>
-        <property>
-            <name>organizationtoresultcommunitymap</name>
-            <description>organization community map</description>
-        </property>
+
         <property>
             <name>outputPath</name>
             <description>the output path</description>
@@ -25,7 +22,7 @@
         </configuration>
     </global>
 
-    <start to="reset_outputpath"/>
+    <start to="prepare_result_communitylist"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -93,33 +90,28 @@
             <class>eu.dnetlib.dhp.resulttocommunityfromorganization.PrepareResultCommunitySet</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=6
+                --executor-memory=5G
+                --conf spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
+
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--organizationtoresultcommunitymap</arg><arg>${organizationtoresultcommunitymap}</arg>
+            <arg>--production</arg><arg>${production}</arg>
         </spark>
-        <ok to="fork-join-exec-propagation"/>
+        <ok to="exec-propagation"/>
         <error to="Kill"/>
     </action>
 
-    <fork name="fork-join-exec-propagation">
-        <path start="join_propagate_publication"/>
-        <path start="join_propagate_dataset"/>
-        <path start="join_propagate_otherresearchproduct"/>
-        <path start="join_propagate_software"/>
-    </fork>
-
-    <action name="join_propagate_publication">
+    <action name="exec-propagation">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -127,115 +119,26 @@
             <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=6
+                --executor-memory=5G
+                --conf spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/</arg>
+            <arg>--outputPath</arg><arg>${outputPath}/</arg>
         </spark>
-        <ok to="wait2"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 
-    <action name="join_propagate_dataset">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>community2resultfromorganization-Dataset</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob</class>
-            <jar>dhp-enrichment-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
-                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
-            </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
-        </spark>
-        <ok to="wait2"/>
-        <error to="Kill"/>
-    </action>
 
-    <action name="join_propagate_otherresearchproduct">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>community2resultfromorganization-ORP</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob</class>
-            <jar>dhp-enrichment-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
-                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
-            </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
-        </spark>
-        <ok to="wait2"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="join_propagate_software">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>community2resultfromorganization-Software</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob</class>
-            <jar>dhp-enrichment-${projectVersion}.jar</jar>
-            <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
-                --driver-memory=${sparkDriverMemory}
-                --conf spark.extraListeners=${spark2ExtraListeners}
-                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
-                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
-                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
-                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
-            </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/software</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
-        </spark>
-        <ok to="wait2"/>
-        <error to="Kill"/>
-    </action>
-
-    <join name="wait2" to="End"/>
 
     <end name="End"/>
 

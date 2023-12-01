@@ -1,0 +1,144 @@
+<workflow-app name="community_to_result_propagation_project" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+
+        <property>
+            <name>outputPath</name>
+            <description>the output path</description>
+        </property>
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to="reset_outputpath"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="reset_outputpath">
+        <fs>
+            <delete path="${outputPath}"/>
+            <mkdir path="${outputPath}"/>
+        </fs>
+        <ok to="copy_entities"/>
+        <error to="Kill"/>
+    </action>
+
+    <fork name="copy_entities">
+        <path start="copy_relation"/>
+        <path start="copy_organization"/>
+        <path start="copy_projects"/>
+        <path start="copy_datasources"/>
+    </fork>
+
+    <action name="copy_relation">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${sourcePath}/relation</arg>
+            <arg>${nameNode}/${outputPath}/relation</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_organization">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${sourcePath}/organization</arg>
+            <arg>${nameNode}/${outputPath}/organization</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_projects">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${sourcePath}/project</arg>
+            <arg>${nameNode}/${outputPath}/project</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_datasources">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${sourcePath}/datasource</arg>
+            <arg>${nameNode}/${outputPath}/datasource</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="copy_wait" to="prepare_result_communitylist"/>
+
+    <action name="prepare_result_communitylist">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Prepare-Community-Result-Organization</name>
+            <class>eu.dnetlib.dhp.resulttocommunityfromproject.PrepareResultCommunitySet</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=6
+                --executor-memory=5G
+                --conf spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
+            <arg>--production</arg><arg>${production}</arg>
+        </spark>
+        <ok to="exec-propagation"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="exec-propagation">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>community2resultfromproject</name>
+            <class>eu.dnetlib.dhp.resulttocommunityfromproject.SparkResultToCommunityFromProject</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=6
+                --executor-memory=5G
+                --conf spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+            </spark-opts>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/</arg>
+            <arg>--outputPath</arg><arg>${outputPath}/</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+
+
+    <end name="End"/>
+
+</workflow-app>

@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.schema.common.AccessRightComparator;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 
@@ -139,6 +138,28 @@ public class OafMapperUtils {
 			.filter(Objects::nonNull)
 			.filter(distinctByKey(Field::getValue))
 			.collect(Collectors.toList());
+	}
+
+	public static InstanceTypeMapping instanceTypeMapping(String originalType, String code, String label,
+		String vocabularyName) {
+		final InstanceTypeMapping m = new InstanceTypeMapping();
+		m.setVocabularyName(vocabularyName);
+		m.setOriginalType(originalType);
+		m.setTypeCode(code);
+		m.setTypeLabel(label);
+		return m;
+	}
+
+	public static InstanceTypeMapping instanceTypeMapping(String originalType, Qualifier term) {
+		return instanceTypeMapping(originalType, term.getClassid(), term.getClassname(), term.getSchemeid());
+	}
+
+	public static InstanceTypeMapping instanceTypeMapping(String originalType) {
+		return instanceTypeMapping(originalType, null, null, null);
+	}
+
+	public static InstanceTypeMapping instanceTypeMapping(String originalType, String vocabularyName) {
+		return instanceTypeMapping(originalType, null, null, vocabularyName);
 	}
 
 	public static Qualifier unknown(final String schemeid, final String schemename) {

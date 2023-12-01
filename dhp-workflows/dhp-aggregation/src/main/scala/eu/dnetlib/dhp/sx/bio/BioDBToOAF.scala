@@ -176,7 +176,7 @@ object BioDBToOAF {
       i.setUrl(List(s"${resolvedURL(input.pidType)}${input.pid}").asJava)
     }
 
-    if (input.pidType.equalsIgnoreCase("clinicaltrials.gov"))
+    if (input.pidType.equalsIgnoreCase("clinicaltrials.gov")) {
       i.setInstancetype(
         OafMapperUtils.qualifier(
           "0037",
@@ -185,7 +185,11 @@ object BioDBToOAF {
           ModelConstants.DNET_PUBLICATION_RESOURCE
         )
       )
-    else
+      val itm = new InstanceTypeMapping
+      itm.setOriginalType(input.pidType)
+      itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
+      i.setInstanceTypeMapping(List(itm).asJava)
+    } else {
       i.setInstancetype(
         OafMapperUtils.qualifier(
           "0046",
@@ -194,6 +198,11 @@ object BioDBToOAF {
           ModelConstants.DNET_PUBLICATION_RESOURCE
         )
       )
+      val itm = new InstanceTypeMapping
+      itm.setOriginalType("Bioentity")
+      itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
+      i.setInstanceTypeMapping(List(itm).asJava)
+    }
 
     if (input.datasource == null || input.datasource.isEmpty)
       return null
@@ -265,6 +274,10 @@ object BioDBToOAF {
         ModelConstants.DNET_PUBLICATION_RESOURCE
       )
     )
+    val itm = new InstanceTypeMapping
+    itm.setOriginalType("Bioentity")
+    itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
+    i.setInstanceTypeMapping(List(itm).asJava)
 
     i.setCollectedfrom(collectedFromMap("uniprot"))
     d.setInstance(List(i).asJava)
@@ -471,6 +484,10 @@ object BioDBToOAF {
         ModelConstants.DNET_PUBLICATION_RESOURCE
       )
     )
+    val itm = new InstanceTypeMapping
+    itm.setOriginalType("Bioentity")
+    itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
+    i.setInstanceTypeMapping(List(itm).asJava)
 
     i.setCollectedfrom(collectedFromMap("pdb"))
     d.setInstance(List(i).asJava)
@@ -571,6 +588,11 @@ object BioDBToOAF {
         ModelConstants.DNET_PUBLICATION_RESOURCE
       )
     )
+    val itm = new InstanceTypeMapping
+    itm.setOriginalType("Bioentity")
+    itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
+    i.setInstanceTypeMapping(List(itm).asJava)
+
 
     i.setCollectedfrom(collectedFromMap("ebi"))
     d.setInstance(List(i).asJava)

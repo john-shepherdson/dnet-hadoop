@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Encoders;
 import org.dom4j.DocumentException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,8 +27,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.Constants;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.oa.graph.clean.CleaningRuleMap;
+import eu.dnetlib.dhp.oa.graph.clean.OafCleaner;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -74,7 +79,7 @@ class MappersTest {
 		assertTrue(StringUtils.isNotBlank(p.getDateofcollection()));
 		assertTrue(StringUtils.isNotBlank(p.getDateoftransformation()));
 
-		assertTrue(p.getAuthor().size() > 0);
+		assertFalse(p.getAuthor().isEmpty());
 		final Optional<Author> author = p
 			.getAuthor()
 			.stream()
@@ -97,14 +102,14 @@ class MappersTest {
 		assertEquals("Votsi", author.get().getSurname());
 		assertEquals("Nefta", author.get().getName());
 
-		assertTrue(p.getSubject().size() > 0);
+		assertFalse(p.getSubject().isEmpty());
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getIssnOnline()));
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getName()));
 
 		assertTrue(p.getPid().isEmpty());
 
 		assertNotNull(p.getInstance());
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getInstance().isEmpty());
 		p
 			.getInstance()
 			.forEach(i -> {
@@ -115,6 +120,27 @@ class MappersTest {
 		assertEquals("0001", instance.getRefereed().getClassid());
 		assertNotNull(instance.getPid());
 		assertTrue(instance.getPid().isEmpty());
+
+		assertNotNull(instance.getInstanceTypeMapping());
+		assertEquals(1, instance.getInstanceTypeMapping().size());
+
+		Optional<InstanceTypeMapping> coarType = instance
+			.getInstanceTypeMapping()
+			.stream()
+			.filter(itm -> ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(itm.getVocabularyName()))
+			.findFirst();
+
+		assertTrue(coarType.isPresent());
+		assertNull(coarType.get().getTypeCode());
+		assertNull(coarType.get().getTypeLabel());
+
+		Optional<InstanceTypeMapping> userType = instance
+			.getInstanceTypeMapping()
+			.stream()
+			.filter(itm -> ModelConstants.OPENAIRE_USER_RESOURCE_TYPES.equals(itm.getVocabularyName()))
+			.findFirst();
+
+		assertFalse(userType.isPresent());
 
 		assertFalse(instance.getAlternateIdentifier().isEmpty());
 		assertEquals("doi", instance.getAlternateIdentifier().get(0).getQualifier().getClassid());
@@ -207,7 +233,7 @@ class MappersTest {
 		assertTrue(StringUtils.isNotBlank(p.getDateofcollection()));
 		assertTrue(StringUtils.isNotBlank(p.getDateoftransformation()));
 
-		assertTrue(p.getAuthor().size() > 0);
+		assertFalse(p.getAuthor().isEmpty());
 		final Optional<Author> author = p
 			.getAuthor()
 			.stream()
@@ -230,13 +256,13 @@ class MappersTest {
 		assertEquals("Votsi", author.get().getSurname());
 		assertEquals("Nefta", author.get().getName());
 
-		assertTrue(p.getSubject().size() > 0);
-		assertTrue(p.getPid().size() > 0);
+		assertFalse(p.getSubject().isEmpty());
+		assertFalse(p.getPid().isEmpty());
 		assertEquals("PMC1517292", p.getPid().get(0).getValue());
 		assertEquals("pmc", p.getPid().get(0).getQualifier().getClassid());
 
 		assertNotNull(p.getInstance());
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getInstance().isEmpty());
 		p
 			.getInstance()
 			.forEach(i -> {
@@ -245,8 +271,8 @@ class MappersTest {
 			});
 
 		Publication p_cleaned = cleanup(p, vocs);
-		assertEquals("0000", p_cleaned.getInstance().get(0).getRefereed().getClassid());
-		assertEquals("Unknown", p_cleaned.getInstance().get(0).getRefereed().getClassname());
+		assertEquals("0002", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("nonPeerReviewed", p_cleaned.getInstance().get(0).getRefereed().getClassname());
 
 		assertNotNull(p.getInstance().get(0).getPid());
 		assertEquals(2, p.getInstance().get(0).getPid().size());
@@ -266,7 +292,7 @@ class MappersTest {
 
 		final List<Oaf> list = new OafToOafMapper(vocs, true, true).processMdRecord(xml);
 
-		assertTrue(list.size() > 0);
+		assertFalse(list.isEmpty());
 		assertTrue(list.get(0) instanceof Publication);
 
 		final Publication p = (Publication) list.get(0);
@@ -322,7 +348,7 @@ class MappersTest {
 		assertTrue(d.getOriginalId().stream().anyMatch(oid -> oid.equals("oai:zenodo.org:3234526")));
 		assertValidId(d.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
-		assertTrue(d.getAuthor().size() > 0);
+		assertFalse(d.getAuthor().isEmpty());
 
 		final Optional<Author> author = d
 			.getAuthor()
@@ -356,13 +382,13 @@ class MappersTest {
 		final Field<String> affiliation = opAff.get();
 		assertEquals("ISTI-CNR", affiliation.getValue());
 
-		assertTrue(d.getSubject().size() > 0);
-		assertTrue(d.getInstance().size() > 0);
-		assertTrue(d.getContext().size() > 0);
-		assertTrue(d.getContext().get(0).getId().length() > 0);
+		assertFalse(d.getSubject().isEmpty());
+		assertFalse(d.getInstance().isEmpty());
+		assertFalse(d.getContext().isEmpty());
+		assertFalse(d.getContext().get(0).getId().isEmpty());
 
 		assertNotNull(d.getInstance());
-		assertTrue(d.getInstance().size() > 0);
+		assertFalse(d.getInstance().isEmpty());
 		d
 			.getInstance()
 			.forEach(i -> {
@@ -436,7 +462,7 @@ class MappersTest {
 		// assertEquals("oai:pub.uni-bielefeld.de:2949739", p.getOriginalId().get(0));
 
 		assertValidId(p.getCollectedfrom().get(0).getKey());
-		assertTrue(p.getAuthor().size() > 0);
+		assertFalse(p.getAuthor().isEmpty());
 
 		final Optional<Author> author = p
 			.getAuthor()
@@ -448,14 +474,14 @@ class MappersTest {
 		assertEquals("Potwarka", author.get().getSurname());
 		assertEquals("Luke R.", author.get().getName());
 
-		assertTrue(p.getSubject().size() > 0);
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getSubject().isEmpty());
+		assertFalse(p.getInstance().isEmpty());
 
 		assertNotNull(p.getTitle());
 		assertFalse(p.getTitle().isEmpty());
 
 		assertNotNull(p.getInstance());
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getInstance().isEmpty());
 		p
 			.getInstance()
 			.forEach(i -> {
@@ -464,8 +490,8 @@ class MappersTest {
 			});
 
 		Publication p_cleaned = cleanup(p, vocs);
-		assertEquals("0000", p_cleaned.getInstance().get(0).getRefereed().getClassid());
-		assertEquals("Unknown", p_cleaned.getInstance().get(0).getRefereed().getClassname());
+		assertEquals("0002", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("nonPeerReviewed", p_cleaned.getInstance().get(0).getRefereed().getClassname());
 	}
 
 	@Test
@@ -583,8 +609,129 @@ class MappersTest {
 		assertTrue(i.getUrl().contains("https://clinicaltrials.gov/ct2/show/NCT02321059"));
 
 		Dataset d_cleaned = cleanup(d, vocs);
-		assertEquals("0000", d_cleaned.getInstance().get(0).getRefereed().getClassid());
-		assertEquals("Unknown", d_cleaned.getInstance().get(0).getRefereed().getClassname());
+		assertEquals("0002", d_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("nonPeerReviewed", d_cleaned.getInstance().get(0).getRefereed().getClassname());
+	}
+
+	@Test
+	void test_record_from_Crossref() throws IOException {
+
+		final CleaningRuleMap mapping = CleaningRuleMap.create(vocs);
+
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_crossref.xml")));
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		assertEquals(1, list.size());
+		assertTrue(list.get(0) instanceof Publication);
+
+		final Publication p = OafCleaner.apply(fixVocabularyNames((Publication) list.get(0)), mapping);
+
+		assertNotNull(p.getDateofcollection());
+		assertEquals("2020-08-06T07:04:09.62Z", p.getDateofcollection());
+
+		assertNotNull(p.getDateoftransformation());
+		assertEquals("2020-08-06T07:20:57.911Z", p.getDateoftransformation());
+
+		assertNotNull(p.getDataInfo());
+		assertFalse(p.getDataInfo().getInvisible());
+		assertFalse(p.getDataInfo().getDeletedbyinference());
+		assertEquals("0.9", p.getDataInfo().getTrust());
+
+		assertValidId(p.getId());
+		assertEquals(2, p.getOriginalId().size());
+
+		assertEquals("50|doi_________::7f0f7807f17db50e5c2b5c452ccaf06d", p.getOriginalId().get(0));
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+
+		assertNotNull(p.getTitle());
+		assertEquals(1, p.getTitle().size());
+		assertEquals(
+			"A case report of serious haemolysis in a glucose-6-phosphate dehydrogenase-deficient COVID-19 patient receiving hydroxychloroquine",
+			p
+				.getTitle()
+				.get(0)
+				.getValue());
+
+		assertNotNull(p.getDescription());
+		assertEquals(0, p.getDescription().size());
+
+		assertEquals(8, p.getAuthor().size());
+
+		assertNotNull(p.getInstance());
+		assertEquals(1, p.getInstance().size());
+
+		final Instance i = p.getInstance().get(0);
+
+		assertNotNull(i.getAccessright());
+		assertEquals(ModelConstants.DNET_ACCESS_MODES, i.getAccessright().getSchemeid());
+		assertEquals(ModelConstants.DNET_ACCESS_MODES, i.getAccessright().getSchemename());
+		assertEquals("OPEN", i.getAccessright().getClassid());
+		assertEquals("Open Access", i.getAccessright().getClassname());
+
+		assertNotNull(i.getCollectedfrom());
+		assertEquals("10|openaire____::081b82f96300b6a6e3d282bad31cb6e2", i.getCollectedfrom().getKey());
+		assertEquals("Crossref", i.getCollectedfrom().getValue());
+
+		assertNotNull(i.getHostedby());
+		assertEquals("10|openaire____::55045bd2a65019fd8e6741a755395c8c", i.getHostedby().getKey());
+		assertEquals("Unknown Repository", i.getHostedby().getValue());
+
+		assertNotNull(i.getInstancetype());
+		assertEquals("0001", i.getInstancetype().getClassid());
+		assertEquals("Article", i.getInstancetype().getClassname());
+		assertEquals(ModelConstants.DNET_PUBLICATION_RESOURCE, i.getInstancetype().getSchemeid());
+		assertEquals(ModelConstants.DNET_PUBLICATION_RESOURCE, i.getInstancetype().getSchemename());
+
+		assertNull(i.getLicense());
+		assertNotNull(i.getDateofacceptance());
+		assertEquals("2020-06-04", i.getDateofacceptance().getValue());
+
+		assertNull(i.getProcessingchargeamount());
+		assertNull(i.getProcessingchargecurrency());
+
+		assertNotNull(i.getPid());
+		assertEquals(1, i.getPid().size());
+
+		assertNotNull(i.getAlternateIdentifier());
+		assertEquals(0, i.getAlternateIdentifier().size());
+
+		assertNotNull(i.getUrl());
+		assertEquals(1, i.getUrl().size());
+		assertTrue(i.getUrl().contains("http://dx.doi.org/10.1080/23744235.2020.1774644"));
+
+		assertEquals("", p.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("", p.getInstance().get(0).getRefereed().getClassname());
+
+		Publication p_cleaned = cleanup(p, vocs);
+
+		assertEquals("0001", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("peerReviewed", p_cleaned.getInstance().get(0).getRefereed().getClassname());
+
+		assertNull(p_cleaned.getMetaResourceType());
+
+		assertNotNull(p_cleaned.getInstance().get(0).getInstanceTypeMapping());
+		assertEquals(1, p_cleaned.getInstance().get(0).getInstanceTypeMapping().size());
+
+		assertTrue(
+			p_cleaned
+				.getInstance()
+				.get(0)
+				.getInstanceTypeMapping()
+				.stream()
+				.anyMatch(
+					t -> "journal-article".equals(t.getOriginalType()) &&
+						ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(t.getVocabularyName()) &&
+						Objects.isNull(t.getTypeCode()) && Objects.isNull(t.getTypeLabel())));
+
+		assertTrue(
+			p_cleaned
+				.getInstance()
+				.get(0)
+				.getInstanceTypeMapping()
+				.stream()
+				.noneMatch(
+					t -> ModelConstants.OPENAIRE_USER_RESOURCE_TYPES.equals(t.getVocabularyName())));
 	}
 
 	@Test
@@ -603,9 +750,9 @@ class MappersTest {
 		assertValidId(s.getId());
 		assertValidId(s.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(s.getTitle().get(0).getValue()));
-		assertTrue(s.getAuthor().size() > 0);
-		assertTrue(s.getSubject().size() > 0);
-		assertTrue(s.getInstance().size() > 0);
+		assertFalse(s.getAuthor().isEmpty());
+		assertFalse(s.getSubject().isEmpty());
+		assertFalse(s.getInstance().isEmpty());
 
 		final Relation r1 = (Relation) list.get(1);
 		final Relation r2 = (Relation) list.get(2);
@@ -875,7 +1022,7 @@ class MappersTest {
 		assertEquals(2, p.getOriginalId().size());
 		assertTrue(p.getOriginalId().stream().anyMatch(oid -> oid.equals("df76e73f-0483-49a4-a9bb-63f2f985574a")));
 		assertValidId(p.getCollectedfrom().get(0).getKey());
-		assertTrue(p.getAuthor().size() > 0);
+		assertFalse(p.getAuthor().isEmpty());
 
 		final Optional<Author> author = p
 			.getAuthor()
@@ -885,14 +1032,14 @@ class MappersTest {
 
 		assertEquals("Museum Sønderjylland", author.get().getFullname());
 
-		assertTrue(p.getSubject().size() > 0);
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getSubject().isEmpty());
+		assertFalse(p.getInstance().isEmpty());
 
 		assertNotNull(p.getTitle());
 		assertFalse(p.getTitle().isEmpty());
 
 		assertNotNull(p.getInstance());
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getInstance().isEmpty());
 		p
 			.getInstance()
 			.forEach(i -> {
@@ -901,8 +1048,8 @@ class MappersTest {
 			});
 
 		Dataset p_cleaned = cleanup(p, vocs);
-		assertEquals("0000", p_cleaned.getInstance().get(0).getRefereed().getClassid());
-		assertEquals("Unknown", p_cleaned.getInstance().get(0).getRefereed().getClassname());
+		assertEquals("0002", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("nonPeerReviewed", p_cleaned.getInstance().get(0).getRefereed().getClassname());
 	}
 
 	@Test
@@ -932,10 +1079,10 @@ class MappersTest {
 		System.out.println("***************");
 
 		final Dataset p = (Dataset) list.get(0);
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getInstance().isEmpty());
 		for (String url : p.getInstance().get(0).getUrl()) {
 			System.out.println(url);
-			assertTrue(!url.contains("&amp;"));
+			assertFalse(url.contains("&amp;"));
 		}
 	}
 
@@ -952,7 +1099,7 @@ class MappersTest {
 		assertTrue(o.isPresent());
 
 		Publication p = (Publication) o.get();
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getInstance().isEmpty());
 
 		assertEquals("https://doi.org/10.1155/2015/439379", p.getInstance().get(0).getUrl().get(0));
 
