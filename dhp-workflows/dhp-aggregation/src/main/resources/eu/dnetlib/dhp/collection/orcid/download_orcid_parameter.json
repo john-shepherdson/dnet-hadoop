@@ -1,0 +1,21 @@
+[
+  {
+    "paramName": "n",
+    "paramLongName": "namenode",
+    "paramDescription": "the Name Node URI",
+    "paramRequired": true
+  },
+  {
+    "paramName": "t",
+    "paramLongName": "targetPath",
+    "paramDescription": "the target PATH where download the files",
+    "paramRequired": true
+  },
+  {
+    "paramName": "a",
+    "paramLongName": "apiURL",
+    "paramDescription": "the FIGSHARE  API id URL to retrieve all the dump files",
+    "paramRequired": true
+  }
+
+]

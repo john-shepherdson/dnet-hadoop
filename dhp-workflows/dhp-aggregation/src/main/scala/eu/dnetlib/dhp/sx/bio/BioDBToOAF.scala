@@ -593,7 +593,6 @@ object BioDBToOAF {
     itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
     i.setInstanceTypeMapping(List(itm).asJava)
 
-
     i.setCollectedfrom(collectedFromMap("ebi"))
     d.setInstance(List(i).asJava)
     i.setDateofacceptance(

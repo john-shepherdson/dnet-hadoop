@@ -107,7 +107,7 @@ case object Crossref2Oaf {
       .map(f => f.id)
   }
 
-  def mappingResult(result: Result, json: JValue, cobjCategory: String, originalType:String): Result = {
+  def mappingResult(result: Result, json: JValue, cobjCategory: String, originalType: String): Result = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
     //MAPPING Crossref DOI into PID
@@ -372,7 +372,7 @@ case object Crossref2Oaf {
       objectType,
       mappingCrossrefSubType.getOrElse(objectSubType, "0038 Other literature type")
     )
-    mappingResult(result, json, cOBJCategory, originalType)
+    mappingResult(result, json, cOBJCategory, objectSubType)
     if (result == null || result.getId == null)
       return List()
 
