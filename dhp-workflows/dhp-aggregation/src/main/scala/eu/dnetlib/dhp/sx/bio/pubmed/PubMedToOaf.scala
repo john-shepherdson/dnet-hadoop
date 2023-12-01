@@ -195,7 +195,7 @@ object PubMedToOaf {
       pubmedInstance.setInstanceTypeMapping(List(itm).asJava)
     } else {
       val i_type = article.getPublicationTypes.asScala
-        .map(s => (s.getValue,getVocabularyTerm(ModelConstants.DNET_PUBLICATION_RESOURCE, vocabularies, s.getValue)))
+        .map(s => (s.getValue, getVocabularyTerm(ModelConstants.DNET_PUBLICATION_RESOURCE, vocabularies, s.getValue)))
         .find(q => q._2 != null)
 
       if (i_type.isDefined) {
@@ -205,8 +205,7 @@ object PubMedToOaf {
         itm.setOriginalType(i_type.get._1)
         itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
         pubmedInstance.setInstanceTypeMapping(List(itm).asJava)
-      }
-      else
+      } else
         return null
     }
     val result = createResult(pubmedInstance.getInstancetype, vocabularies)

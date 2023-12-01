@@ -176,7 +176,8 @@ object DataciteToOAFTransformation {
           vocabularies.getSynonymAsQualifier(
             ModelConstants.DNET_RESULT_TYPOLOGIES,
             typeQualifier.getClassid
-          ), resourceType
+          ),
+          resourceType
         )
     }
     if (schemaOrg != null && schemaOrg.nonEmpty) {
@@ -188,7 +189,8 @@ object DataciteToOAFTransformation {
           vocabularies.getSynonymAsQualifier(
             ModelConstants.DNET_RESULT_TYPOLOGIES,
             typeQualifier.getClassid
-          ), schemaOrg
+          ),
+          schemaOrg
         )
 
     }
@@ -203,7 +205,8 @@ object DataciteToOAFTransformation {
           vocabularies.getSynonymAsQualifier(
             ModelConstants.DNET_RESULT_TYPOLOGIES,
             typeQualifier.getClassid
-          ), resourceTypeGeneral
+          ),
+          resourceTypeGeneral
         )
 
     }
@@ -227,7 +230,6 @@ object DataciteToOAFTransformation {
     itm.setOriginalType(typeQualifiers._3)
     itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
     i.setInstanceTypeMapping(List(itm).asJava)
-
 
     typeQualifiers._2.getClassname match {
       case "dataset" =>
