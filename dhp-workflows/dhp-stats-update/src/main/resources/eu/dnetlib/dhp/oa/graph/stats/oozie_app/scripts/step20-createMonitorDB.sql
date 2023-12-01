@@ -64,6 +64,8 @@ create table TARGET.result_accessroute stored as parquet as select * from SOURCE
 
 create table TARGET.result_orcid stored as parquet as select * from SOURCE.result_orcid orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 
+create table TARGET.result_instance stored as parquet as select * from SOURCE.result_instance orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+
 create view TARGET.foo1 as select * from SOURCE.result_result rr where rr.source in (select id from TARGET.result);
 create view TARGET.foo2 as select * from SOURCE.result_result rr where rr.target in (select id from TARGET.result);
 create table TARGET.result_result STORED AS PARQUET as select distinct * from (select * from TARGET.foo1 union all select * from TARGET.foo2) foufou;
