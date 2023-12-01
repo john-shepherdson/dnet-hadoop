@@ -96,14 +96,16 @@ public class StatsAtomicActionsJob implements Serializable {
 			.sql(
 				String
 					.format(
-						"select b.%s as id, is_gold, is_bronze_oa, is_hybrid,green_oa, in_diamond_journal,f.fundref as publicly_funded "
-							+ "from %s.indi_pub_bronze_oa b " +
-							"left outer join %s.indi_pub_gold_oa g on g.id=b.id " +
-							"left outer join %s.indi_pub_hybrid h on b.id=h.id " +
-							"left outer join %s.indi_pub_green_oa gr on b.id=gr.id " +
+						"select r.%s as id, is_gold, is_bronze_oa, is_hybrid,green_oa, in_diamond_journal,f.publicly_funded as publicly_funded "
+							+
+							"from %s.publication r " +
+							"left outer join %s.indi_pub_bronze_oa b on r.id=b.id " +
+							"left outer join %s.indi_pub_gold_oa g on r.id=g.id " +
+							"left outer join %s.indi_pub_hybrid h on r.id=h.id " +
+							"left outer join %s.indi_pub_green_oa gr on r.id=gr.id " +
 							"left outer join %s.indi_pub_diamond d on b.id=d.id " +
-							"left outer join %s.indi_funded_result_with_fundref f on b.id=f.id ",
-						resultAttributeName, dbname, dbname, dbname, dbname, dbname, dbname))
+							"left outer join %s.indi_pub_publicly_funded f on r.id=f.id ",
+						resultAttributeName, dbname, dbname, dbname, dbname, dbname, dbname, dbname))
 			.as(Encoders.bean(StatsResultEnhancementModel.class))
 			.write()
 			.mode(SaveMode.Overwrite)
@@ -136,12 +138,12 @@ public class StatsAtomicActionsJob implements Serializable {
 				r.setIsInDiamondJournal(usm.isIn_diamond_journal());
 				r.setIsGreen(usm.isGreen_oa());
 				r.setPubliclyFunded(usm.isPublicly_funded());
-				if (usm.isIs_bronze_oa())
-					r.setOpenAccessColor(OpenAccessColor.bronze);
-				else if (usm.isIs_gold())
+				if (usm.isIs_gold())
 					r.setOpenAccessColor(OpenAccessColor.gold);
 				else if (usm.isIs_hybrid())
 					r.setOpenAccessColor(OpenAccessColor.hybrid);
+				else if (usm.isIs_bronze_oa())
+					r.setOpenAccessColor(OpenAccessColor.bronze);
 				return r;
 			}, Encoders.bean(Result.class));
 	}
