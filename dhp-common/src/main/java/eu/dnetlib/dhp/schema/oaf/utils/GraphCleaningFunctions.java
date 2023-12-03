@@ -941,28 +941,36 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	}
 
 	private static Qualifier getMetaResourceType(final List<Instance> instances, final VocabularyGroup vocs) {
+		return Optional
+			.ofNullable(instances)
+			.map(ii -> {
+				if (vocs.vocabularyExists(OPENAIRE_META_RESOURCE_TYPE)) {
+					Optional<InstanceTypeMapping> itm = ii
+						.stream()
+						.filter(Objects::nonNull)
+						.flatMap(
+							i -> Optional
+								.ofNullable(i.getInstanceTypeMapping())
+								.map(Collection::stream)
+								.orElse(Stream.empty()))
+						.filter(t -> OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(t.getVocabularyName()))
+						.findFirst();
 
-		if (vocs.vocabularyExists(OPENAIRE_META_RESOURCE_TYPE)) {
-			Optional<InstanceTypeMapping> itm = instances
-				.stream()
-				.flatMap(
-					i -> Optional.ofNullable(i.getInstanceTypeMapping()).map(Collection::stream).orElse(Stream.empty()))
-				.filter(t -> OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(t.getVocabularyName()))
-				.findFirst();
-
-			if (!itm.isPresent() || Objects.isNull(itm.get().getTypeCode())) {
-				return null;
-			} else {
-				final String typeCode = itm.get().getTypeCode();
-				return Optional
-					.ofNullable(vocs.lookupTermBySynonym(OPENAIRE_META_RESOURCE_TYPE, typeCode))
-					.orElseThrow(
-						() -> new IllegalStateException("unable to find a synonym for '" + typeCode + "' in " +
-							OPENAIRE_META_RESOURCE_TYPE));
-			}
-		} else {
-			throw new IllegalStateException("vocabulary '" + OPENAIRE_META_RESOURCE_TYPE + "' not available");
-		}
+					if (!itm.isPresent() || Objects.isNull(itm.get().getTypeCode())) {
+						return null;
+					} else {
+						final String typeCode = itm.get().getTypeCode();
+						return Optional
+							.ofNullable(vocs.lookupTermBySynonym(OPENAIRE_META_RESOURCE_TYPE, typeCode))
+							.orElseThrow(
+								() -> new IllegalStateException("unable to find a synonym for '" + typeCode + "' in " +
+									OPENAIRE_META_RESOURCE_TYPE));
+					}
+				} else {
+					throw new IllegalStateException("vocabulary '" + OPENAIRE_META_RESOURCE_TYPE + "' not available");
+				}
+			})
+			.orElse(null);
 	}
 
 }
