@@ -373,7 +373,7 @@ case object Crossref2Oaf {
       mappingCrossrefSubType.getOrElse(objectSubType, "0038 Other literature type")
     )
 
-    val originalType = if  (mappingCrossrefSubType.contains(objectType)) objectType else objectSubType
+    val originalType = if (mappingCrossrefSubType.contains(objectType)) objectType else objectSubType
     mappingResult(result, json, cOBJCategory, originalType)
     if (result == null || result.getId == null)
       return List()
