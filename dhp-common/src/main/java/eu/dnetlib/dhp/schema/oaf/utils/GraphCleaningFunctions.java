@@ -943,17 +943,17 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	private static Qualifier getMetaResourceType(final List<Instance> instances, final VocabularyGroup vocs) {
 
 		if (vocs.vocabularyExists(OPENAIRE_META_RESOURCE_TYPE)) {
-			Optional<InstanceTypeMapping> instanceTypeMapping = instances
+			Optional<InstanceTypeMapping> itm = instances
 				.stream()
 				.flatMap(
 					i -> Optional.ofNullable(i.getInstanceTypeMapping()).map(Collection::stream).orElse(Stream.empty()))
 				.filter(t -> OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(t.getVocabularyName()))
 				.findFirst();
 
-			if (!instanceTypeMapping.isPresent()) {
+			if (!itm.isPresent() || Objects.isNull(itm.get().getTypeCode())) {
 				return null;
 			} else {
-				final String typeCode = instanceTypeMapping.get().getTypeCode();
+				final String typeCode = itm.get().getTypeCode();
 				return Optional
 					.ofNullable(vocs.lookupTermBySynonym(OPENAIRE_META_RESOURCE_TYPE, typeCode))
 					.orElseThrow(
