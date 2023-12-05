@@ -135,7 +135,7 @@ public class SparkBulkTagJob {
 		ModelSupport.entityTypes
 			.keySet()
 			.parallelStream()
-			.filter(e -> ModelSupport.isResult(e))
+			.filter(ModelSupport::isResult)
 			.forEach(e -> {
 				removeOutputDir(spark, outputPath + e.name());
 				ResultTagger resultTagger = new ResultTagger();
