@@ -4,10 +4,13 @@
             <name>sourcePath</name>
             <description>the source path</description>
         </property>
-
         <property>
             <name>outputPath</name>
             <description>the output path</description>
+        </property>
+        <property>
+            <name>baseURL</name>
+            <description>the community API base URL</description>
         </property>
     </parameters>
 
@@ -99,13 +102,12 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--production</arg><arg>${production}</arg>
+            <arg>--baseURL</arg><arg>${baseURL}</arg>
         </spark>
         <ok to="exec-propagation"/>
         <error to="Kill"/>
@@ -115,7 +117,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>community2resultfromorganization-Publication</name>
+            <name>community2resultfromorganization</name>
             <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
