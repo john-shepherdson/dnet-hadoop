@@ -25,7 +25,7 @@
         </configuration>
     </global>
 
-    <start to="prepare_result_communitylist"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
