@@ -4,10 +4,13 @@
             <name>sourcePath</name>
             <description>the source path</description>
         </property>
-
         <property>
             <name>outputPath</name>
             <description>the output path</description>
+        </property>
+        <property>
+            <name>baseURL</name>
+            <description>the community API base URL</description>
         </property>
     </parameters>
 
@@ -104,7 +107,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
-            <arg>--production</arg><arg>${production}</arg>
+            <arg>--baseURL</arg><arg>${baseURL}</arg>
         </spark>
         <ok to="exec-propagation"/>
         <error to="Kill"/>
