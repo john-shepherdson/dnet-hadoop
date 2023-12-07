@@ -1,0 +1,94 @@
+<workflow-app name="project_to_result_propagation" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>allowedsemrels</name>
+            <description>the allowed semantics </description>
+        </property>
+
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to="prepare_project_results_association"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    
+    <action name="prepare_project_results_association">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>PrepareProjectResultsAssociation</name>
+            <class>eu.dnetlib.dhp.projecttoresult.PrepareProjectResultsAssociation</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
+            <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--potentialUpdatePath</arg><arg>${workingDir}/resultproject/preparedInfo/potentialUpdates</arg>
+            <arg>--alreadyLinkedPath</arg><arg>${workingDir}/resultproject/preparedInfo/alreadyLinked</arg>
+        </spark>
+        <ok to="apply_propagation"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="apply_propagation">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>ProjectToResultPropagation</name>
+            <class>eu.dnetlib.dhp.projecttoresult.SparkResultToProjectThroughSemRelJob</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+            </spark-opts>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--outputPath</arg><arg>${sourcePath}/relation</arg>
+            <arg>--potentialUpdatePath</arg><arg>${workingDir}/resultproject/preparedInfo/potentialUpdates</arg>
+            <arg>--alreadyLinkedPath</arg><arg>${workingDir}/resultproject/preparedInfo/alreadyLinked</arg>
+        </spark>
+        <ok to="reset_workingDir"/>
+        <error to="Kill"/>
+    </action>
+    <action name="reset_workingDir">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    <end name="End"/>
+
+</workflow-app>

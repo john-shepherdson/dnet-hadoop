@@ -1,4 +1,4 @@
-<workflow-app name="result_to_community_from_semrel_propagation" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="orcid_to_result_from_semrel_propagation" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>sourcePath</name>
@@ -7,10 +7,6 @@
         <property>
             <name>allowedsemrels</name>
             <description>the semantic relationships allowed for propagation</description>
-        </property>
-        <property>
-            <name>baseURL</name>
-            <description>the baseurl for the comminity APIs</description>
         </property>
         <property>
             <name>outputPath</name>
@@ -84,21 +80,14 @@
         <error to="Kill"/>
     </action>
 
-    <join name="copy_wait" to="fork_prepare_assoc_step1"/>
-
-    <fork name="fork_prepare_assoc_step1">
-        <path start="join_prepare_publication"/>
-        <path start="join_prepare_dataset"/>
-        <path start="join_prepare_otherresearchproduct"/>
-        <path start="join_prepare_software"/>
-    </fork>
+    <join name="copy_wait" to="prepare_relations"/>
 
     <action name="join_prepare_publication">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>ResultToCommunitySemRel-PreparePhase1-Publications</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep1</class>
+            <name>ORCIDPropagation-PreparePhase1-Publications</name>
+            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.PrepareResultOrcidAssociationStep1</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -110,13 +99,16 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.speculation=false
+                --conf spark.hadoop.mapreduce.map.speculative=false
+                --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetCommunityAssoc</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--baseURL</arg><arg>${baseURL}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -126,8 +118,8 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>ResultToCommunitySemRel-PreparePhase1-Dataset</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep1</class>
+            <name>ORCIDPropagation-PreparePhase1-Dataset</name>
+            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.PrepareResultOrcidAssociationStep1</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -143,9 +135,8 @@
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetCommunityAssoc</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -155,8 +146,8 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>ResultToCommunitySemRel-PreparePhase1-ORP</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep1</class>
+            <name>ORCIDPropagation-PreparePhase1-ORP</name>
+            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.PrepareResultOrcidAssociationStep1</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -172,9 +163,8 @@
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetCommunityAssoc</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -184,8 +174,8 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>ResultToCommunitySemRel-PreparePhase1-Software</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep1</class>
+            <name>ORCIDPropagation-PreparePhase1-Software</name>
+            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.PrepareResultOrcidAssociationStep1</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -201,9 +191,8 @@
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetCommunityAssoc</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetOrcidAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -215,8 +204,8 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>ResultToCommunityEmRelPropagation-PreparePhase2</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep2</class>
+            <name>ORCIDPropagation-PreparePhase2</name>
+            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.PrepareResultOrcidAssociationStep2</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -229,8 +218,8 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/preparedInfo/targetCommunityAssoc</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/mergedCommunityAssoc</arg>
+            <arg>--sourcePath</arg><arg>${workingDir}/orcidprop</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/orcidprop/mergedOrcidAssoc</arg>
         </spark>
         <ok to="fork-join-exec-propagation"/>
         <error to="Kill"/>
@@ -247,8 +236,8 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Result2CommunitySemRelPropagation-Publication</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
+            <name>ORCIDPropagation-Publication</name>
+            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.SparkOrcidToResultFromSemRelJob</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -260,13 +249,15 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.speculation=false
+                --conf spark.hadoop.mapreduce.map.speculative=false
+                --conf spark.hadoop.mapreduce.reduce.speculative=false
+                --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/mergedCommunityAssoc</arg>
+            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -276,8 +267,8 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Result2CommunitySemRelPropagation-Dataset</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
+            <name>ORCIDPropagation-Dataset</name>
+            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.SparkOrcidToResultFromSemRelJob</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -289,13 +280,14 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.speculation=false
+                --conf spark.hadoop.mapreduce.map.speculative=false
+                --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/mergedCommunityAssoc</arg>
+            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -305,8 +297,8 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Result2CommunitySemRelPropagation-ORP</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
+            <name>ORCIDPropagation-ORP</name>
+            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.SparkOrcidToResultFromSemRelJob</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -318,13 +310,14 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.speculation=false
+                --conf spark.hadoop.mapreduce.map.speculative=false
+                --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/mergedCommunityAssoc</arg>
+            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -334,8 +327,8 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Result2CommunitySemRelPropagation-Software</name>
-            <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
+            <name>ORCIDPropagation-Software</name>
+            <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.SparkOrcidToResultFromSemRelJob</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
@@ -347,20 +340,30 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.speculation=false
+                --conf spark.hadoop.mapreduce.map.speculative=false
+                --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/mergedCommunityAssoc</arg>
+            <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcidprop/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
-            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${outputPath}/software</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
     </action>
+    
+    <join name="wait2" to="reset_workingDir"/>
 
-    <join name="wait2" to="End"/>
-
+    <action name="reset_workingDir">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    
     <end name="End"/>
-
+    
 </workflow-app>

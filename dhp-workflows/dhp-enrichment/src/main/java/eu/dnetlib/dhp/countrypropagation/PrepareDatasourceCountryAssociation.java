@@ -66,7 +66,7 @@ public class PrepareDatasourceCountryAssociation {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				removeOutputDir(spark, outputPath);
+				//removeOutputDir(spark, outputPath);
 				prepareDatasourceCountryAssociation(
 					spark,
 					Arrays.asList(parser.get("whitelist").split(";")),

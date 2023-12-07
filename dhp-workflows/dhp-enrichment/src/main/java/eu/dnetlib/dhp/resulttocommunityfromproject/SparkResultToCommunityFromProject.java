@@ -102,6 +102,12 @@ public class SparkResultToCommunityFromProject implements Serializable {
 						.mode(SaveMode.Overwrite)
 						.option("compression", "gzip")
 						.json(outputPath + e.name());
+
+					readPath(spark, outputPath + e.name(), resultClazz)
+							.write()
+							.mode(SaveMode.Overwrite)
+							.option("compression","gzip")
+							.json(inputPath + e.name());
 				}
 			});
 

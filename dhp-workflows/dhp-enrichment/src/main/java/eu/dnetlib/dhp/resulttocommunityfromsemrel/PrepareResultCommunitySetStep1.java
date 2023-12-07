@@ -4,9 +4,11 @@ package eu.dnetlib.dhp.resulttocommunityfromsemrel;
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import eu.dnetlib.dhp.api.Utils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.*;
@@ -25,11 +27,6 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 public class PrepareResultCommunitySetStep1 {
 	private static final Logger log = LoggerFactory.getLogger(PrepareResultCommunitySetStep1.class);
-
-	private static final String COMMUNITY_LIST_XQUERY = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType')"
-		+ "  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri']"
-		+ "  and  $x//CONFIGURATION/context/param[./@name='status']/text() != 'hidden'"
-		+ "  return $x//CONFIGURATION/context/@id/string()";
 
 	/**
 	 * associates to each result the set of community contexts they are associated to; associates to each target of a
@@ -88,10 +85,10 @@ public class PrepareResultCommunitySetStep1 {
 		final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrels").split(";"));
 		log.info("allowedSemRel: {}", new Gson().toJson(allowedsemrel));
 
-		final String isLookupUrl = parser.get("isLookUpUrl");
-		log.info("isLookupUrl: {}", isLookupUrl);
+		final String baseURL = parser.get("baseURL");
+		log.info("baseURL: {}", baseURL);
 
-		final List<String> communityIdList = getCommunityList(isLookupUrl);
+		final List<String> communityIdList = getCommunityList(baseURL);
 		log.info("communityIdList: {}", new Gson().toJson(communityIdList));
 
 		final String resultType = resultClassName.substring(resultClassName.lastIndexOf(".") + 1).toLowerCase();
@@ -159,9 +156,8 @@ public class PrepareResultCommunitySetStep1 {
 			.json(outputResultPath);
 	}
 
-	public static List<String> getCommunityList(final String isLookupUrl) throws ISLookUpException {
-		ISLookUpService isLookUp = ISLookupClientFactory.getLookUpService(isLookupUrl);
-		return isLookUp.quickSearchProfile(COMMUNITY_LIST_XQUERY);
+	public static List<String> getCommunityList(final String baseURL) throws IOException {
+		return Utils.getCommunityIdList(baseURL);
 	}
 
 }

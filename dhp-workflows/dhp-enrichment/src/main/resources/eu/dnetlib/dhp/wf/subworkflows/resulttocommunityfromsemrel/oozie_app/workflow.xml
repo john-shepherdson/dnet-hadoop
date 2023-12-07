@@ -10,7 +10,7 @@
         </property>
         <property>
             <name>baseURL</name>
-            <description>the baseurl for the comminity APIs</description>
+            <description>the isLookup service endpoint</description>
         </property>
         <property>
             <name>outputPath</name>
@@ -18,73 +18,13 @@
         </property>
     </parameters>
 
-    <start to="reset_outputpath"/>
+    <start to="fork_prepare_assoc_step1"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="reset_outputpath">
-        <fs>
-            <delete path="${outputPath}"/>
-            <mkdir path="${outputPath}"/>
-        </fs>
-        <ok to="copy_entities"/>
-        <error to="Kill"/>
-    </action>
 
-    <fork name="copy_entities">
-        <path start="copy_relation"/>
-        <path start="copy_organization"/>
-        <path start="copy_projects"/>
-        <path start="copy_datasources"/>
-    </fork>
-
-    <action name="copy_relation">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <arg>${nameNode}/${sourcePath}/relation</arg>
-            <arg>${nameNode}/${outputPath}/relation</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_organization">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <arg>${nameNode}/${sourcePath}/organization</arg>
-            <arg>${nameNode}/${outputPath}/organization</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_projects">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <arg>${nameNode}/${sourcePath}/project</arg>
-            <arg>${nameNode}/${outputPath}/project</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_datasources">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <arg>${nameNode}/${sourcePath}/datasource</arg>
-            <arg>${nameNode}/${outputPath}/datasource</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <join name="copy_wait" to="fork_prepare_assoc_step1"/>
 
     <fork name="fork_prepare_assoc_step1">
         <path start="join_prepare_publication"/>
@@ -114,7 +54,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetCommunityAssoc</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/targetCommunityAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
             <arg>--baseURL</arg><arg>${baseURL}</arg>
         </spark>
@@ -143,9 +83,9 @@
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetCommunityAssoc</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/targetCommunityAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--baseURL</arg><arg>${baseURL}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -172,9 +112,9 @@
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetCommunityAssoc</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/targetCommunityAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--baseURL</arg><arg>${baseURL}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -201,9 +141,9 @@
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/targetCommunityAssoc</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/targetCommunityAssoc</arg>
             <arg>--allowedsemrels</arg><arg>${allowedsemrels}</arg>
-            <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
+            <arg>--baseURL</arg><arg>${baseURL}</arg>
         </spark>
         <ok to="wait"/>
         <error to="Kill"/>
@@ -229,8 +169,8 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${workingDir}/preparedInfo/targetCommunityAssoc</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/preparedInfo/mergedCommunityAssoc</arg>
+            <arg>--sourcePath</arg><arg>${workingDir}/communitysemrel/preparedInfo/targetCommunityAssoc</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/mergedCommunityAssoc</arg>
         </spark>
         <ok to="fork-join-exec-propagation"/>
         <error to="Kill"/>
@@ -261,12 +201,12 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/mergedCommunityAssoc</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/mergedCommunityAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/publication</arg>
+
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -290,12 +230,12 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/mergedCommunityAssoc</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/mergedCommunityAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/dataset</arg>
+
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -319,12 +259,12 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/mergedCommunityAssoc</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/mergedCommunityAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/otherresearchproduct</arg>
+
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -348,18 +288,17 @@
                 --conf spark.dynamicAllocation.enabled=true
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/mergedCommunityAssoc</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/communitysemrel/preparedInfo/mergedCommunityAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
-            <arg>--outputPath</arg><arg>${outputPath}/software</arg>
-            <arg>--saveGraph</arg><arg>${saveGraph}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/software</arg>
+
         </spark>
-        <ok to="wait2"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 
-    <join name="wait2" to="End"/>
 
     <end name="End"/>
 

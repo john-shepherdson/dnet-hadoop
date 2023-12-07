@@ -53,7 +53,7 @@ public class PrepareResultCommunitySet {
 		log.info("outputPath: {}", outputPath);
 
 		final String baseURL = parser.get("baseURL");
-		log.info("baseUEL: {}", baseURL);
+		log.info("baseURL: {}", baseURL);
 
 		final CommunityEntityMap projectsMap = Utils.getCommunityProjects(baseURL);
 

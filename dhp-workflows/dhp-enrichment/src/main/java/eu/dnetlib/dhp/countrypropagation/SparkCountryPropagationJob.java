@@ -97,6 +97,12 @@ public class SparkCountryPropagationJob {
 			.mode(SaveMode.Overwrite)
 			.json(outputPath);
 
+		readPath(spark, outputPath, resultClazz)
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression","gzip")
+				.json(sourcePath);
+
 	}
 
 	private static <R extends Result> MapFunction<Tuple2<R, ResultCountrySet>, R> getCountryMergeFn() {

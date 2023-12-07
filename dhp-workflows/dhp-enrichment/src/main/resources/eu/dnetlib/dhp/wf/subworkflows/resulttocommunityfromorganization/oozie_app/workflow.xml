@@ -1,0 +1,88 @@
+<workflow-app name="community_to_result_propagation" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>baseURL</name>
+            <description>the baseURL from where to reach the community APIs</description>
+        </property>
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to="prepare_result_communitylist"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="prepare_result_communitylist">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Prepare-Community-Result-Organization</name>
+            <class>eu.dnetlib.dhp.resulttocommunityfromorganization.PrepareResultCommunitySet</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=6
+                --executor-memory=5G
+                --conf spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/relation</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communityorganization/preparedInfo/resultCommunityList</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--baseURL</arg><arg>${baseURL}</arg>
+        </spark>
+        <ok to="exec-propagation"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="exec-propagation">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>community2resultfromorganization-Publication</name>
+            <class>eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=6
+                --executor-memory=5G
+                --conf spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+            </spark-opts>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/resulttocommunityfromorganization/</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+
+</workflow-app>

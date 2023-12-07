@@ -167,4 +167,9 @@ public class Utils implements Serializable {
 			});
 		return projectMap;
 	}
+
+	public static List<String> getCommunityIdList(String baseURL) throws IOException {
+		return getValidCommunities(baseURL).stream()
+				.map(community -> community.getId()).collect(Collectors.toList());
+	}
 }

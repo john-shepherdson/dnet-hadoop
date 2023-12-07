@@ -100,6 +100,12 @@ public class SparkResultToCommunityThroughSemRelJob {
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
+
+		readPath(spark, outputPath, resultClazz)
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression","gzip")
+				.json(inputPath);
 	}
 
 	private static <R extends Result> MapFunction<Tuple2<R, ResultCommunityList>, R> contextUpdaterFn() {

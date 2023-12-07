@@ -151,7 +151,13 @@ public class SparkBulkTagJob {
 					.write()
 					.mode(SaveMode.Overwrite)
 					.option("compression", "gzip")
-					.json(outputPath + e.name());
+					.json(outputPath + e.name());//writing the tagging in the working dir for entity
+
+				readPath(spark, outputPath + e.name(), resultClazz) //copy the tagging in the actual result output path
+						.write()
+						.mode(SaveMode.Overwrite)
+						.option("compression","gzip")
+						.json(inputPath + e.name());
 			});
 
 	}

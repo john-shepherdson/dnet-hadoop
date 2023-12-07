@@ -1,0 +1,97 @@
+<workflow-app name="affiliation_from_semrel_propagation" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to="prepare_info"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="prepare_info">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>PrepareResultOrganizationAssociation</name>
+            <class>eu.dnetlib.dhp.resulttoorganizationfromsemrel.PrepareInfo</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--graphPath</arg><arg>${sourcePath}</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--leavesPath</arg><arg>${workingDir}/affiliationSemanticRelation/preparedInfo/leavesPath</arg>
+            <arg>--childParentPath</arg><arg>${workingDir}/affiliationSemanticRelation/preparedInfo/childParentPath</arg>
+            <arg>--resultOrgPath</arg><arg>${workingDir}/affiliationSemanticRelation/preparedInfo/resultOrgPath</arg>
+            <arg>--relationPath</arg><arg>${workingDir}/affiliationSemanticRelation/preparedInfo/relation</arg>
+        </spark>
+        <ok to="apply_resulttoorganization_propagation"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="apply_resulttoorganization_propagation">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>resultToOrganizationFromSemRel</name>
+            <class>eu.dnetlib.dhp.resulttoorganizationfromsemrel.SparkResultToOrganizationFromSemRel</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--relationPath</arg><arg>${workingDir}/affiliationSemanticRelation/preparedInfo/relation</arg>
+            <arg>--outputPath</arg><arg>${sourcePath}</arg>
+            <arg>--leavesPath</arg><arg>${workingDir}/affiliationSemanticRelation/preparedInfo/leavesPath</arg>
+            <arg>--childParentPath</arg><arg>${workingDir}/affiliationSemanticRelation/preparedInfo/childParentPath</arg>
+            <arg>--resultOrgPath</arg><arg>${workingDir}/affiliationSemanticRelation/preparedInfo/resultOrgPath</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}/affiliationSemanticRelation/working</arg>
+            <arg>--iterations</arg><arg>${iterations}</arg>
+        </spark>
+        <ok to="reset_workingDir"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="reset_workingDir">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+
+</workflow-app>
