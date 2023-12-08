@@ -6,7 +6,6 @@ then
     ln -sfn ${PYTHON_EGG_CACHE}${link_folder} ${link_folder}
 fi
 
-#export HADOOP_USER_NAME="dimitris.pierrakos"
 export HADOOP_USER_NAME=$6
 export PROD_USAGE_STATS_DB="openaire_prod_usage_stats"
 function copydb() {

@@ -21,10 +21,15 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
 
 /**
@@ -34,6 +39,12 @@ public class GroupEntitiesSparkJob {
 	private static final Logger log = LoggerFactory.getLogger(GroupEntitiesSparkJob.class);
 
 	private static final Encoder<OafEntity> OAFENTITY_KRYO_ENC = Encoders.kryo(OafEntity.class);
+
+	private ArgumentApplicationParser parser;
+
+	public GroupEntitiesSparkJob(ArgumentApplicationParser parser) {
+		this.parser = parser;
+	}
 
 	public static void main(String[] args) throws Exception {
 
@@ -51,6 +62,17 @@ public class GroupEntitiesSparkJob {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
+		final String isLookupUrl = parser.get("isLookupUrl");
+		log.info("isLookupUrl: {}", isLookupUrl);
+
+		final ISLookUpService isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl);
+
+		new GroupEntitiesSparkJob(parser).run(isSparkSessionManaged, isLookupService);
+	}
+
+	public void run(Boolean isSparkSessionManaged, ISLookUpService isLookUpService)
+		throws ISLookUpException {
+
 		String graphInputPath = parser.get("graphInputPath");
 		log.info("graphInputPath: {}", graphInputPath);
 
@@ -60,19 +82,21 @@ public class GroupEntitiesSparkJob {
 		String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		boolean filterInvisible = Boolean.valueOf(parser.get("filterInvisible"));
+		boolean filterInvisible = Boolean.parseBoolean(parser.get("filterInvisible"));
 		log.info("filterInvisible: {}", filterInvisible);
 
 		SparkConf conf = new SparkConf();
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 		conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
+		final VocabularyGroup vocs = VocabularyGroup.loadVocsFromIS(isLookUpService);
+
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
 				HdfsSupport.remove(checkpointPath, spark.sparkContext().hadoopConfiguration());
-				groupEntities(spark, graphInputPath, checkpointPath, outputPath, filterInvisible);
+				groupEntities(spark, graphInputPath, checkpointPath, outputPath, filterInvisible, vocs);
 			});
 	}
 
@@ -81,7 +105,7 @@ public class GroupEntitiesSparkJob {
 		String inputPath,
 		String checkpointPath,
 		String outputPath,
-		boolean filterInvisible) {
+		boolean filterInvisible, VocabularyGroup vocs) {
 
 		Dataset<OafEntity> allEntities = spark.emptyDataset(OAFENTITY_KRYO_ENC);
 
@@ -106,10 +130,14 @@ public class GroupEntitiesSparkJob {
 		}
 
 		Dataset<?> groupedEntities = allEntities
-			.groupByKey((MapFunction<OafEntity, String>) OafEntity::getId, Encoders.STRING())
-			.reduceGroups((ReduceFunction<OafEntity>) (b, a) -> OafMapperUtils.mergeEntities(b, a))
 			.map(
-				(MapFunction<Tuple2<String, OafEntity>, Tuple2<String, OafEntity>>) t -> new Tuple2(
+				(MapFunction<OafEntity, OafEntity>) entity -> GraphCleaningFunctions
+					.applyCoarVocabularies(entity, vocs),
+				OAFENTITY_KRYO_ENC)
+			.groupByKey((MapFunction<OafEntity, String>) OafEntity::getId, Encoders.STRING())
+			.reduceGroups((ReduceFunction<OafEntity>) OafMapperUtils::mergeEntities)
+			.map(
+				(MapFunction<Tuple2<String, OafEntity>, Tuple2<String, OafEntity>>) t -> new Tuple2<>(
 					t._2().getClass().getName(), t._2()),
 				Encoders.tuple(Encoders.STRING(), OAFENTITY_KRYO_ENC));
 

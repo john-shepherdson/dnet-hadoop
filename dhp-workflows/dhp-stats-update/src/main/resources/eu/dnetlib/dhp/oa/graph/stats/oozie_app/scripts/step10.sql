@@ -49,5 +49,7 @@ select * from openaire_prod_usage_stats.views_stats;
 -- Creation date of the database
 ------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS ${stats_db_name}.creation_date purge;
+
 create table ${stats_db_name}.creation_date STORED AS PARQUET as
 select date_format(current_date(), 'dd-MM-yyyy') as date;

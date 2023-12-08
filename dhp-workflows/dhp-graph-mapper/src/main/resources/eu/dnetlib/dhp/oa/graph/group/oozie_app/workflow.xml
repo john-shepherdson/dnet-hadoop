@@ -13,6 +13,10 @@
             <description>path of the output graph</description>
         </property>
         <property>
+            <name>isLookupUrl</name>
+            <description>the URL address of the lookUp service</description>
+        </property>
+        <property>
             <name>filterInvisible</name>
             <description>whether filter out invisible entities after merge</description>
         </property>
@@ -98,6 +102,7 @@
             <arg>--graphInputPath</arg><arg>${graphBasePath}</arg>
             <arg>--checkpointPath</arg><arg>${workingPath}/grouped_entities</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--filterInvisible</arg><arg>${filterInvisible}</arg>
         </spark>
         <ok to="delete_target_relation"/>

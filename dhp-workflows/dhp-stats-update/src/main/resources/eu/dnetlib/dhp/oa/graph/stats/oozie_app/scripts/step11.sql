@@ -20,6 +20,7 @@ WHERE project_tmp.id IN (SELECT pr.id
                               ${stats_db_name}.result r
                          WHERE pr.result = r.id
                            AND r.type = 'publication');
+DROP TABLE IF EXISTS ${stats_db_name}.stored purge;
 
 CREATE TABLE ${stats_db_name}.project stored as parquet as
 SELECT p.id,

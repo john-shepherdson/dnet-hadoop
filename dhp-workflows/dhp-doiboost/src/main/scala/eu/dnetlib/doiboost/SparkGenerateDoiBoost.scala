@@ -66,7 +66,7 @@ object SparkGenerateDoiBoost {
       Encoders.tuple(Encoders.STRING, mapEncoderPub)
     implicit val mapEncoderRel: Encoder[Relation] = Encoders.kryo[Relation]
 
-    logger.info("Phase 2) Join Crossref with UnpayWall")
+    logger.info("Phase 1) Join Crossref with UnpayWall")
 
     val crossrefPublication: Dataset[(String, Publication)] =
       spark.read.load(s"$workingDirPath/crossrefPublication").as[Publication].map(p => (p.getId, p))
@@ -91,20 +91,10 @@ object SparkGenerateDoiBoost {
       .write
       .mode(SaveMode.Overwrite)
       .save(s"$workingDirPath/firstJoin")
-    logger.info("Phase 3) Join Result with ORCID")
-    val fj: Dataset[(String, Publication)] =
-      spark.read.load(s"$workingDirPath/firstJoin").as[Publication].map(p => (p.getId, p))
-    val orcidPublication: Dataset[(String, Publication)] =
-      spark.read.load(s"$workingDirPath/orcidPublication").as[Publication].map(p => (p.getId, p))
-    fj.joinWith(orcidPublication, fj("_1").equalTo(orcidPublication("_1")), "left")
-      .map(applyMerge)
-      .write
-      .mode(SaveMode.Overwrite)
-      .save(s"$workingDirPath/secondJoin")
 
-    logger.info("Phase 4) Join Result with MAG")
+    logger.info("Phase 2) Join Result with MAG")
     val sj: Dataset[(String, Publication)] =
-      spark.read.load(s"$workingDirPath/secondJoin").as[Publication].map(p => (p.getId, p))
+      spark.read.load(s"$workingDirPath/firstJoin").as[Publication].map(p => (p.getId, p))
 
     val magPublication: Dataset[(String, Publication)] =
       spark.read.load(s"$workingDirPath/magPublication").as[Publication].map(p => (p.getId, p))
