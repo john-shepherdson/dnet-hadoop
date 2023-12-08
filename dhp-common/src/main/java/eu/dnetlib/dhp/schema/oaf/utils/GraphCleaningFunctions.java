@@ -16,7 +16,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import eu.dnetlib.dhp.common.vocabulary.VocabularyTerm;
 import org.apache.commons.lang3.StringUtils;
 
 import com.github.sisyphsu.dateparser.DateParserUtils;
@@ -24,6 +23,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyTerm;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -416,10 +416,11 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 									.replaceAll(NAME_CLEANING_REGEX, " "));
 
 						if (vocs.vocabularyExists(DNET_PUBLISHERS)) {
-							vocs.find(DNET_PUBLISHERS)
-									.map(voc -> voc.getTermBySynonym(r.getPublisher().getValue()))
-									.map(VocabularyTerm::getName)
-									.ifPresent(publisher -> r.getPublisher().setValue(publisher));
+							vocs
+								.find(DNET_PUBLISHERS)
+								.map(voc -> voc.getTermBySynonym(r.getPublisher().getValue()))
+								.map(VocabularyTerm::getName)
+								.ifPresent(publisher -> r.getPublisher().setValue(publisher));
 						}
 					}
 				}
@@ -582,10 +583,11 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 						}
 
 						if (Objects.nonNull(i.getLicense()) && Objects.nonNull(i.getLicense().getValue())) {
-							vocs.find(DNET_LICENSES)
-									.map(voc -> voc.getTermBySynonym(i.getLicense().getValue()))
-									.map(VocabularyTerm::getId)
-									.ifPresent(license -> i.getLicense().setValue(license));
+							vocs
+								.find(DNET_LICENSES)
+								.map(voc -> voc.getTermBySynonym(i.getLicense().getValue()))
+								.map(VocabularyTerm::getId)
+								.ifPresent(license -> i.getLicense().setValue(license));
 						}
 
 						// from the script from Dimitris
