@@ -80,7 +80,14 @@
         <error to="Kill"/>
     </action>
 
-    <join name="copy_wait" to="prepare_relations"/>
+    <join name="copy_wait" to="fork_prepare_assoc_step1"/>
+
+    <fork name="fork_prepare_assoc_step1">
+        <path start="join_prepare_publication"/>
+        <path start="join_prepare_dataset"/>
+        <path start="join_prepare_otherresearchproduct"/>
+        <path start="join_prepare_software"/>
+    </fork>
 
     <action name="join_prepare_publication">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -258,6 +265,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -288,6 +296,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -318,6 +327,7 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
@@ -348,21 +358,22 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
             <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--outputPath</arg><arg>${outputPath}/software</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
         </spark>
         <ok to="wait2"/>
         <error to="Kill"/>
     </action>
     
-    <join name="wait2" to="reset_workingDir"/>
+    <join name="wait2" to="End"/>
 
-    <action name="reset_workingDir">
-        <fs>
-            <delete path="${workingDir}"/>
-            <mkdir path="${workingDir}"/>
-        </fs>
-        <ok to="End"/>
-        <error to="Kill"/>
-    </action>
+<!--    <action name="reset_workingDir">-->
+<!--        <fs>-->
+<!--            <delete path="${workingDir}"/>-->
+<!--            <mkdir path="${workingDir}"/>-->
+<!--        </fs>-->
+<!--        <ok to="End"/>-->
+<!--        <error to="Kill"/>-->
+<!--    </action>-->
     
     <end name="End"/>
     

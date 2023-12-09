@@ -98,10 +98,10 @@ public class SparkCountryPropagationJob {
 			.json(outputPath);
 
 		readPath(spark, outputPath, resultClazz)
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression","gzip")
-				.json(sourcePath);
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(sourcePath);
 
 	}
 

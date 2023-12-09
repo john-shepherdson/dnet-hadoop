@@ -105,7 +105,6 @@ public class SparkBulkTagJob {
 		Map<String, List<Pair<String, SelectionConstraints>>> dsm = cc.getEoscDatasourceMap();
 
 		for (String ds : datasources.collectAsList()) {
-			// final String dsId = ds.substring(3);
 			if (!dsm.containsKey(ds)) {
 				ArrayList<Pair<String, SelectionConstraints>> eoscList = new ArrayList<>();
 				dsm.put(ds, eoscList);
@@ -116,13 +115,11 @@ public class SparkBulkTagJob {
 
 	private static boolean isOKDatasource(Datasource ds) {
 		final String compatibility = ds.getOpenairecompatibility().getClassid();
-		boolean isOk = (compatibility.equalsIgnoreCase(OPENAIRE_3) ||
+		return (compatibility.equalsIgnoreCase(OPENAIRE_3) ||
 			compatibility.equalsIgnoreCase(OPENAIRE_4) ||
 			compatibility.equalsIgnoreCase(OPENAIRE_CRIS) ||
 			compatibility.equalsIgnoreCase(OPENAIRE_DATA)) &&
 			ds.getCollectedfrom().stream().anyMatch(cf -> cf.getKey().equals(EOSC));
-
-		return isOk;
 	}
 
 	private static <R extends Result> void execBulkTag(
@@ -151,13 +148,13 @@ public class SparkBulkTagJob {
 					.write()
 					.mode(SaveMode.Overwrite)
 					.option("compression", "gzip")
-					.json(outputPath + e.name());//writing the tagging in the working dir for entity
+					.json(outputPath + e.name());// writing the tagging in the working dir for entity
 
-				readPath(spark, outputPath + e.name(), resultClazz) //copy the tagging in the actual result output path
-						.write()
-						.mode(SaveMode.Overwrite)
-						.option("compression","gzip")
-						.json(inputPath + e.name());
+				readPath(spark, outputPath + e.name(), resultClazz) // copy the tagging in the actual result output path
+					.write()
+					.mode(SaveMode.Overwrite)
+					.option("compression", "gzip")
+					.json(inputPath + e.name());
 			});
 
 	}

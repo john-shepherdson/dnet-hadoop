@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import eu.dnetlib.dhp.api.Utils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.*;
@@ -17,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
+import eu.dnetlib.dhp.api.Utils;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.resulttocommunityfromorganization.ResultCommunityList;
 import eu.dnetlib.dhp.schema.oaf.Relation;

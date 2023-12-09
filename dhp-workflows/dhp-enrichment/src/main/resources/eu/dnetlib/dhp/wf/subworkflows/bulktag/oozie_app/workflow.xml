@@ -51,7 +51,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/</arg>
-            <arg>--workingPath</arg><arg>${workingDir}/bulktag/</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/bulktag/</arg>
             <arg>--pathMap</arg><arg>${pathMap}</arg>
             <arg>--baseURL</arg><arg>${baseURL}</arg>
         </spark>
