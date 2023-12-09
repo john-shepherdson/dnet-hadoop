@@ -2,7 +2,8 @@
 package eu.dnetlib.dhp.orcidtoresultfromsemrel;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
+
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.List;
 import java.util.Optional;
@@ -65,9 +66,9 @@ public class SparkOrcidToResultFromSemRelJob {
 		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		SparkConf conf = new SparkConf();
-		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
-		runWithSparkHiveSession(
+
+		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
