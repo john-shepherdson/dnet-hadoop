@@ -219,20 +219,6 @@
   <field name="contextid" type="string" multiValued="true" indexed="true" stored="false"/>
   <field name="contextname" type="string" multiValued="true" indexed="true" stored="false"/>
   <field name="contexttype" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="counter_affiliation" type="pint" multiValued="false" indexed="true" stored="true"/>
-  <field name="counter_authorship" type="pint" multiValued="false" indexed="true" stored="true"/>
-  <field name="counter_dedup" type="pint" multiValued="false" indexed="true" stored="true"/>
-  <field name="counter_doi" type="pint" multiValued="false" indexed="true" stored="true"/>
-  <field name="counter_outcome" type="pint" multiValued="false" indexed="true" stored="true"/>
-  <field name="counter_outcome_claimed" type="pint" multiValued="false" indexed="true" stored="true"/>
-  <field name="counter_outcome_collected" type="pint" multiValued="false" indexed="true" stored="true"/>
-  <field name="counter_outcome_inferred" type="pint" multiValued="false" indexed="true" stored="true"/>
-  <field name="counter_participation" type="pint" multiValued="false" indexed="true" stored="true"/>
-  <field name="counter_publicationdataset" type="pint" multiValued="false" indexed="true" stored="true"/>
-  <field name="counter_publicationdataset_claimed" type="pint" multiValued="false" indexed="true" stored="true"/>
-  <field name="counter_publicationdataset_collected" type="pint" multiValued="false" indexed="true" stored="true"/>
-  <field name="counter_publicationdataset_inferred" type="pint" multiValued="false" indexed="true" stored="true"/>
-  <field name="counter_similarity" type="pint" multiValued="false" indexed="true" stored="true"/>
   <field name="country" type="string" multiValued="true" indexed="true" stored="false"/>
   <field name="datasourcecompatibilityid" type="string" multiValued="false" indexed="true" stored="false"/>
   <field name="datasourcecompatibilityname" type="string" multiValued="false" indexed="true" stored="false"/>
@@ -368,6 +354,10 @@
   <field name="text" type="text_common" indexed="false" stored="false"/>
   <field name="trust" type="string" multiValued="true" indexed="true" stored="false"/>
   <field name="versioning" type="string" multiValued="true" indexed="true" stored="false"/>
+  <field name="isgreen" type="boolean" multiValued="false" indexed="true" stored="false"/>
+  <field name="openaccesscolor" type="string" multiValued="false" indexed="true" stored="false"/>
+  <field name="isindiamondjournal" type="boolean" multiValued="false" indexed="true" stored="false"/>
+  <field name="publiclyfunded" type="boolean" multiValued="false" indexed="true" stored="false"/>
 
   <!-- Copy field definitions follow: -->
 

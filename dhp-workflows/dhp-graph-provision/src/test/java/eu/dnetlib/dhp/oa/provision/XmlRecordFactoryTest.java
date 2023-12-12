@@ -32,7 +32,7 @@ public class XmlRecordFactoryTest {
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	@Test
-	public void testXMLRecordFactory() throws IOException, DocumentException {
+	void testXMLRecordFactory() throws IOException, DocumentException {
 
 		final ContextMapper contextMapper = new ContextMapper();
 
@@ -93,6 +93,12 @@ public class XmlRecordFactoryTest {
 			"https://osf.io/preprints/socarxiv/7vgtu/download",
 			doc.valueOf("//*[local-name() = 'result']/fulltext[1]"));
 
+		assertEquals("true", doc.valueOf("//*[local-name() = 'result']/isgreen/text()"));
+		assertEquals("bronze", doc.valueOf("//*[local-name() = 'result']/openaccesscolor/text()"));
+		assertEquals("true", doc.valueOf("//*[local-name() = 'result']/isindiamondjournal/text()"));
+		assertEquals("true", doc.valueOf("//*[local-name() = 'result']/publiclyfunded/text()"));
+
+		System.out.println(doc.asXML());
 	}
 
 	@Test
