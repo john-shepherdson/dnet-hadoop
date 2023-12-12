@@ -689,6 +689,9 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 										.filter(Objects::nonNull)
 										.filter(p -> Objects.nonNull(p.getQualifier()))
 										.filter(p -> StringUtils.isNotBlank(p.getValue()))
+										.filter(
+											p -> StringUtils
+												.contains(StringUtils.lowerCase(p.getQualifier().getClassid()), ORCID))
 										.map(p -> {
 											// hack to distinguish orcid from orcid_pending
 											String pidProvenance = getProvenance(p.getDataInfo());
@@ -698,7 +701,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 												.toLowerCase()
 												.contains(ModelConstants.ORCID)) {
 												if (pidProvenance
-													.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)) {
+													.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY) ||
+													pidProvenance.equals("ORCID_ENRICHMENT")) {
 													p.getQualifier().setClassid(ModelConstants.ORCID);
 												} else {
 													p.getQualifier().setClassid(ModelConstants.ORCID_PENDING);
