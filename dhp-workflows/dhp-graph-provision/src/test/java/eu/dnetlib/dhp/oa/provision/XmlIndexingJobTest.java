@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.oa.provision;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
@@ -11,6 +12,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.ModifiableSolrParams;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
@@ -29,6 +31,8 @@ import eu.dnetlib.dhp.oa.provision.model.SerializableSolrInputDocument;
 import eu.dnetlib.dhp.oa.provision.utils.ISLookupClient;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class XmlIndexingJobTest extends SolrTest {
@@ -101,14 +105,39 @@ public class XmlIndexingJobTest extends SolrTest {
 		new XmlIndexingJob(spark, inputPath, FORMAT, batchSize, XmlIndexingJob.OutputFormat.SOLR, null)
 			.run(isLookupClient);
 
-		Assertions.assertEquals(0, miniCluster.getSolrClient().commit().getStatus());
+		assertEquals(0, miniCluster.getSolrClient().commit().getStatus());
 
 		QueryResponse rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "*:*"));
 
-		Assertions
-			.assertEquals(
+		assertEquals(
 				nRecord, rsp.getResults().getNumFound(),
 				"the number of indexed records should be equal to the number of input records");
+
+
+		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "isgreen:true"));
+		assertEquals(
+				0, rsp.getResults().getNumFound(),
+				"the number of indexed records having isgreen = true");
+
+		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "openaccesscolor:bronze"));
+		assertEquals(
+				0, rsp.getResults().getNumFound(),
+				"the number of indexed records having openaccesscolor = bronze");
+
+		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "isindiamondjournal:true"));
+		assertEquals(
+				0, rsp.getResults().getNumFound(),
+				"the number of indexed records having isindiamondjournal = true");
+
+		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "publiclyfunded:true"));
+		assertEquals(
+				0, rsp.getResults().getNumFound(),
+				"the number of indexed records having publiclyfunded = true");
+
+		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "peerreviewed:true"));
+		assertEquals(
+				0, rsp.getResults().getNumFound(),
+				"the number of indexed records having peerreviewed = true");
 	}
 
 	@Test
@@ -126,7 +155,7 @@ public class XmlIndexingJobTest extends SolrTest {
 			.map(s -> new SAXReader().read(new StringReader(s)).valueOf(ID_XPATH))
 			.distinct()
 			.count();
-		Assertions.assertEquals(nRecord, xmlIdUnique, "IDs should be unique among input records");
+		assertEquals(nRecord, xmlIdUnique, "IDs should be unique among input records");
 
 		final String outputPath = workingDir.resolve("outputPath").toAbsolutePath().toString();
 		new XmlIndexingJob(spark, inputPath, FORMAT, batchSize, XmlIndexingJob.OutputFormat.HDFS, outputPath)
@@ -142,7 +171,7 @@ public class XmlIndexingJobTest extends SolrTest {
 		}, Encoders.STRING())
 			.distinct()
 			.count();
-		Assertions.assertEquals(xmlIdUnique, docIdUnique, "IDs should be unique among the output records");
+		assertEquals(xmlIdUnique, docIdUnique, "IDs should be unique among the output records");
 
 	}
 
