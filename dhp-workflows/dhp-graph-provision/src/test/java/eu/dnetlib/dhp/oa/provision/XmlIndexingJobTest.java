@@ -132,7 +132,12 @@ public class XmlIndexingJobTest extends SolrTest {
 		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "publiclyfunded:true"));
 		assertEquals(
 				0, rsp.getResults().getNumFound(),
-				"the number of indexed records having publiclyfunded = publiclyfunded");
+				"the number of indexed records having publiclyfunded = true");
+
+		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "peerreviewed:true"));
+		assertEquals(
+				0, rsp.getResults().getNumFound(),
+				"the number of indexed records having peerreviewed = true");
 	}
 
 	@Test

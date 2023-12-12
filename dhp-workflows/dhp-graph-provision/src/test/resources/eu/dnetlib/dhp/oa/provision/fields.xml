@@ -74,6 +74,9 @@
         <FIELD indexable="true" multivalued="false" name="isindiamondjournal" result="false" stat="false" type="boolean" value="//*[local-name()='entity']/*[local-name()='result']/isindiamondjournal"/>
         <FIELD indexable="true" multivalued="false" name="publiclyfunded" result="false" stat="false" type="boolean" value="//*[local-name()='entity']/*[local-name()='result']/publiclyfunded"/>
 
+        <FIELD indexable="true" multivalued="false" name="peerreviewed" result="false" stat="false" type="boolean" value="some $refereed in //*[local-name()='entity']/*[local-name()='result']/children/instance/*[local-name()='refereed']/@classid satisfies ($refereed = '0001')"/>
+
+
         <FIELD indexable="true" name="eoscifguidelines" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name() = 'result']/eoscifguidelines/@code)"/><!-- FOS and SDGs non tokenizable for faceted search-->
         <FIELD indexable="true" name="fos" result="false" stat="false" tokenizable="false" xpath="distinct-values(//*[local-name()='entity']/*[local-name()='result']/subject[@classid='FOS'])"/>
         <FIELD indexable="true" name="foslabel" result="false" stat="false" tokenizable="false" value="concat(./text(), '||', replace(./text(), '^\d+\s', ''))" xpath="//*[local-name()='entity']/*[local-name()='result']/subject[@classid='FOS']"/>

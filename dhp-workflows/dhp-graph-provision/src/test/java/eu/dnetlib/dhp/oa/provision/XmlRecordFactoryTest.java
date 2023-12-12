@@ -97,8 +97,6 @@ public class XmlRecordFactoryTest {
 		assertEquals("bronze", doc.valueOf("//*[local-name() = 'result']/openaccesscolor/text()"));
 		assertEquals("true", doc.valueOf("//*[local-name() = 'result']/isindiamondjournal/text()"));
 		assertEquals("true", doc.valueOf("//*[local-name() = 'result']/publiclyfunded/text()"));
-
-		System.out.println(doc.asXML());
 	}
 
 	@Test

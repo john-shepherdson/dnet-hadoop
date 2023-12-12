@@ -371,6 +371,7 @@
   <field name="openaccesscolor" type="string" multiValued="false" indexed="true" stored="false"/>
   <field name="isindiamondjournal" type="boolean" multiValued="false" indexed="true" stored="false"/>
   <field name="publiclyfunded" type="boolean" multiValued="false" indexed="true" stored="false"/>
+  <field name="peerreviewed" type="boolean" multiValued="false" indexed="true" stored="false"/>
 
   <copyField source="datasourceenglishname" dest="__all"/>
   <copyField source="datasourceoddescription" dest="__all"/>
