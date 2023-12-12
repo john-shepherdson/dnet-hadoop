@@ -689,7 +689,9 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 										.filter(Objects::nonNull)
 										.filter(p -> Objects.nonNull(p.getQualifier()))
 										.filter(p -> StringUtils.isNotBlank(p.getValue()))
-										.filter(p -> StringUtils.contains(StringUtils.lowerCase(p.getQualifier().getClassid()), ORCID))
+										.filter(
+											p -> StringUtils
+												.contains(StringUtils.lowerCase(p.getQualifier().getClassid()), ORCID))
 										.map(p -> {
 											// hack to distinguish orcid from orcid_pending
 											String pidProvenance = getProvenance(p.getDataInfo());
