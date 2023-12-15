@@ -11,16 +11,11 @@
     "paramDescription": "the hive metastore uris",
     "paramRequired": true
   },
+
   {
-    "paramName":"dop",
-    "paramLongName":"datasourceOrganizationPath",
-    "paramDescription": "path where to store/find association from datasource and organization",
-    "paramRequired": true
-  },
-  {
-    "paramName":"alp",
-    "paramLongName":"alreadyLinkedPath",
-    "paramDescription": "path where to store/find already linked results and organizations",
+    "paramName":"wp",
+    "paramLongName":"workingPath",
+    "paramDescription": "the working path",
     "paramRequired": true
   },
   {

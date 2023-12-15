@@ -119,7 +119,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
 				"left_outer")
 			.flatMap(createRelationFn(), Encoders.bean(Relation.class))
 			.write()
-			.mode(SaveMode.Append)
+			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
 	}

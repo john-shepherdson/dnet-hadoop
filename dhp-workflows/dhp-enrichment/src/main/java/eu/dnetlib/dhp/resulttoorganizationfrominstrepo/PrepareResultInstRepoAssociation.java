@@ -52,10 +52,13 @@ public class PrepareResultInstRepoAssociation {
 		String inputPath = parser.get("sourcePath");
 		log.info("inputPath: {}", inputPath);
 
-		final String datasourceOrganizationPath = parser.get("datasourceOrganizationPath");
+		final String workingPath = parser.get("workingPath");
+		log.info("workingPath : {}", workingPath);
+
+		final String datasourceOrganizationPath = workingPath + "/preparedInfo/datasourceOrganization";
 		log.info("datasourceOrganizationPath {}: ", datasourceOrganizationPath);
 
-		final String alreadyLinkedPath = parser.get("alreadyLinkedPath");
+		final String alreadyLinkedPath = workingPath + "/preparedInfo/alreadyLinked";
 		log.info("alreadyLinkedPath {}: ", alreadyLinkedPath);
 
 		List<String> blacklist = Optional

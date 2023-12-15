@@ -2,7 +2,6 @@
 package eu.dnetlib.dhp.orcidtoresultfromsemrel;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
-
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.List;
@@ -66,7 +65,6 @@ public class SparkOrcidToResultFromSemRelJob {
 		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		SparkConf conf = new SparkConf();
-
 
 		runWithSparkSession(
 			conf,
