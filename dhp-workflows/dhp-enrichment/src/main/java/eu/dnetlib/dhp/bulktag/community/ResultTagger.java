@@ -82,11 +82,13 @@ public class ResultTagger implements Serializable {
 		// communities contains all the communities to be not added to the context
 		final Set<String> removeCommunities = new HashSet<>();
 
+		// if (conf.getRemoveConstraintsMap().keySet().size() > 0)
 		conf
 			.getRemoveConstraintsMap()
 			.keySet()
 			.forEach(
 				communityId -> {
+					// log.info("Remove constraints for " + communityId);
 					if (conf.getRemoveConstraintsMap().keySet().contains(communityId) &&
 						conf.getRemoveConstraintsMap().get(communityId).getCriteria() != null &&
 						conf

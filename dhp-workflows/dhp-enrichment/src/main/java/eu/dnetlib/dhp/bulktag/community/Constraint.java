@@ -13,7 +13,7 @@ public class Constraint implements Serializable {
 	private String verb;
 	private String field;
 	private String value;
-
+//	private String element;
 	@JsonIgnore
 	private Selection selection;
 
@@ -41,6 +41,10 @@ public class Constraint implements Serializable {
 		this.value = value;
 	}
 
+//@JsonIgnore
+	// public void setSelection(Selection sel) {
+//		selection = sel;
+//	}
 	@JsonIgnore
 	public void setSelection(VerbResolver resolver)
 		throws InvocationTargetException, NoSuchMethodException, InstantiationException,

@@ -6,12 +6,6 @@
     "paramRequired": true
   },
   {
-    "paramName":"ocm",
-    "paramLongName":"organizationtoresultcommunitymap",
-    "paramDescription": "the map for the association organization communities",
-    "paramRequired": true
-  },
-  {
     "paramName":"h",
     "paramLongName":"hive_metastore_uris",
     "paramDescription": "the hive metastore uris",
@@ -28,6 +22,12 @@
     "paramLongName": "outputPath",
     "paramDescription": "the path used to store temporary output files",
     "paramRequired": true
+  },
+  {
+    "paramName": "bu",
+    "paramLongName": "baseURL",
+    "paramDescription": "the base URL to the community API to use",
+    "paramRequired": false
   }
 
 ]

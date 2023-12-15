@@ -6,7 +6,6 @@ import static eu.dnetlib.dhp.bulktag.community.TaggingConstants.ZENODO_COMMUNITY
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -32,8 +31,6 @@ public class BulkTagJobTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	public static final String MOCK_IS_LOOK_UP_URL = "BASEURL:8280/is/services/isLookUp";
-
 	public static final String pathMap = "{ \"author\" : \"$['author'][*]['fullname']\","
 		+ "  \"title\" : \"$['title'][*]['value']\","
 		+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
@@ -43,7 +40,9 @@ public class BulkTagJobTest {
 		"\"fos\" : \"$['subject'][?(@['qualifier']['classid']=='FOS')].value\"," +
 		"\"sdg\" : \"$['subject'][?(@['qualifier']['classid']=='SDG')].value\"," +
 		"\"hostedby\" : \"$['instance'][*]['hostedby']['key']\" , " +
-		"\"collectedfrom\" : \"$['instance'][*]['collectedfrom']['key']\"} ";
+		"\"collectedfrom\" : \"$['instance'][*]['collectedfrom']['key']\"," +
+		"\"publisher\":\"$['publisher'].value\"," +
+		"\"publicationyear\":\"$['dateofacceptance'].value\"} ";
 
 	private static SparkSession spark;
 
@@ -534,6 +533,7 @@ public class BulkTagJobTest {
 			+ "where MyD.inferenceprovenance = 'bulktagging'";
 
 		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
+
 		Assertions.assertEquals(7, idExplodeCommunity.count());
 
 		Assertions
@@ -1573,11 +1573,10 @@ public class BulkTagJobTest {
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath",
 					getClass().getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/no_updates/").getPath(),
-					"-taggingConf", taggingConf,
-
 					"-outputPath", workingDir.toString() + "/",
-					"-production", Boolean.TRUE.toString(),
-					"-pathMap", pathMap
+//					"-baseURL", "https://services.openaire.eu/openaire/community/",
+					"-pathMap", pathMap,
+					"-taggingConf", taggingConf
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());

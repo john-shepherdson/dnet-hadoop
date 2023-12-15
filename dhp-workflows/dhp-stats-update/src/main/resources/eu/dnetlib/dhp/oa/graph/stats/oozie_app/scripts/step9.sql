@@ -3,6 +3,8 @@
 -- Organization table/view and Organization related tables/views
 ----------------------------------------------------------------
 ----------------------------------------------------------------
+DROP TABLE IF EXISTS ${stats_db_name}.organization purge;
+
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.organization STORED AS PARQUET AS
 SELECT substr(o.id, 4)        as id,
        o.legalname.value      as name,

@@ -1,8 +1,12 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.OPENAIRE_META_RESOURCE_TYPE;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.getProvenance;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -19,12 +23,17 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyTerm;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import me.xuender.unidecode.Unidecode;
 
 public class GraphCleaningFunctions extends CleaningFunctions {
+
+	public static final String DNET_PUBLISHERS = "dnet:publishers";
+
+	public static final String DNET_LICENSES = "dnet:licenses";
 
 	public static final String ORCID_CLEANING_REGEX = ".*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9x]{4})";
 	public static final int ORCID_LEN = 19;
@@ -36,6 +45,13 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 
 	public static final int TITLE_FILTER_RESIDUAL_LENGTH = 5;
 	private static final String NAME_CLEANING_REGEX = "[\\r\\n\\t\\s]+";
+
+	private static final Set<String> INVALID_AUTHOR_NAMES = new HashSet<>();
+
+	private static final Set<String> INVALID_URLS = new HashSet<>();
+
+	private static final Set<String> INVALID_URL_HOSTS = new HashSet<>();
+
 	private static final HashSet<String> PEER_REVIEWED_TYPES = new HashSet<>();
 
 	static {
@@ -48,6 +64,47 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		PEER_REVIEWED_TYPES.add("Thesis");
 		PEER_REVIEWED_TYPES.add("Bachelor thesis");
 		PEER_REVIEWED_TYPES.add("Conference object");
+
+		INVALID_AUTHOR_NAMES.add("(:null)");
+		INVALID_AUTHOR_NAMES.add("(:unap)");
+		INVALID_AUTHOR_NAMES.add("(:tba)");
+		INVALID_AUTHOR_NAMES.add("(:unas)");
+		INVALID_AUTHOR_NAMES.add("(:unav)");
+		INVALID_AUTHOR_NAMES.add("(:unkn)");
+		INVALID_AUTHOR_NAMES.add("(:unkn) unknown");
+		INVALID_AUTHOR_NAMES.add(":none");
+		INVALID_AUTHOR_NAMES.add(":null");
+		INVALID_AUTHOR_NAMES.add(":unas");
+		INVALID_AUTHOR_NAMES.add(":unav");
+		INVALID_AUTHOR_NAMES.add(":unkn");
+		INVALID_AUTHOR_NAMES.add("[autor desconocido]");
+		INVALID_AUTHOR_NAMES.add("[s. n.]");
+		INVALID_AUTHOR_NAMES.add("[s.n]");
+		INVALID_AUTHOR_NAMES.add("[unknown]");
+		INVALID_AUTHOR_NAMES.add("anonymous");
+		INVALID_AUTHOR_NAMES.add("n.n.");
+		INVALID_AUTHOR_NAMES.add("nn");
+		INVALID_AUTHOR_NAMES.add("no name supplied");
+		INVALID_AUTHOR_NAMES.add("none");
+		INVALID_AUTHOR_NAMES.add("none available");
+		INVALID_AUTHOR_NAMES.add("not available not available");
+		INVALID_AUTHOR_NAMES.add("null &na;");
+		INVALID_AUTHOR_NAMES.add("null anonymous");
+		INVALID_AUTHOR_NAMES.add("unbekannt");
+		INVALID_AUTHOR_NAMES.add("unknown");
+
+		INVALID_URL_HOSTS.add("creativecommons.org");
+		INVALID_URL_HOSTS.add("www.academia.edu");
+		INVALID_URL_HOSTS.add("academia.edu");
+		INVALID_URL_HOSTS.add("researchgate.net");
+		INVALID_URL_HOSTS.add("www.researchgate.net");
+
+		INVALID_URLS.add("http://repo.scoap3.org/api");
+		INVALID_URLS.add("http://ora.ox.ac.uk/objects/uuid:");
+		INVALID_URLS.add("http://ntur.lib.ntu.edu.tw/news/agent_contract.pdf");
+		INVALID_URLS.add("https://media.springer.com/full/springer-instructions-for-authors-assets/pdf/SN_BPF_EN.pdf");
+		INVALID_URLS.add("http://www.tobaccoinduceddiseases.org/dl/61aad426c96519bea4040a374c6a6110/");
+		INVALID_URLS.add("https://www.bilboard.nl/verenigingsbladen/bestuurskundige-berichten");
 	}
 
 	public static <T extends Oaf> T cleanContext(T value, String contextId, String verifyParam) {
@@ -357,6 +414,14 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 									.getPublisher()
 									.getValue()
 									.replaceAll(NAME_CLEANING_REGEX, " "));
+
+						if (vocs.vocabularyExists(DNET_PUBLISHERS)) {
+							vocs
+								.find(DNET_PUBLISHERS)
+								.map(voc -> voc.getTermBySynonym(r.getPublisher().getValue()))
+								.map(VocabularyTerm::getName)
+								.ifPresent(publisher -> r.getPublisher().setValue(publisher));
+						}
 					}
 				}
 				if (Objects.isNull(r.getLanguage()) || StringUtils.isBlank(r.getLanguage().getClassid())) {
@@ -517,6 +582,14 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 							i.setRefereed(qualifier("0000", "Unknown", ModelConstants.DNET_REVIEW_LEVELS));
 						}
 
+						if (Objects.nonNull(i.getLicense()) && Objects.nonNull(i.getLicense().getValue())) {
+							vocs
+								.find(DNET_LICENSES)
+								.map(voc -> voc.getTermBySynonym(i.getLicense().getValue()))
+								.map(VocabularyTerm::getId)
+								.ifPresent(license -> i.getLicense().setValue(license));
+						}
+
 						// from the script from Dimitris
 						if ("0000".equals(i.getRefereed().getClassid())) {
 							final boolean isFromCrossref = Optional
@@ -558,6 +631,15 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 								ModelConstants.DATASET_RESULTTYPE_CLASSID.equals(r.getResulttype().getClassid()))) {
 							i.setFulltext(null);
 						}
+						if (Objects.nonNull(i.getUrl())) {
+							i
+								.setUrl(
+									i
+										.getUrl()
+										.stream()
+										.filter(GraphCleaningFunctions::urlFilter)
+										.collect(Collectors.toList()));
+						}
 					}
 				}
 				if (Objects.isNull(r.getBestaccessright())
@@ -580,8 +662,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 								.getAuthor()
 								.stream()
 								.filter(Objects::nonNull)
-								.filter(a -> StringUtils.isNotBlank(a.getFullname()))
-								.filter(a -> StringUtils.isNotBlank(a.getFullname().replaceAll("[\\W]", "")))
+								.filter(GraphCleaningFunctions::isValidAuthorName)
 								.map(GraphCleaningFunctions::cleanupAuthor)
 								.collect(Collectors.toList()));
 
@@ -608,6 +689,9 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 										.filter(Objects::nonNull)
 										.filter(p -> Objects.nonNull(p.getQualifier()))
 										.filter(p -> StringUtils.isNotBlank(p.getValue()))
+										.filter(
+											p -> StringUtils
+												.contains(StringUtils.lowerCase(p.getQualifier().getClassid()), ORCID))
 										.map(p -> {
 											// hack to distinguish orcid from orcid_pending
 											String pidProvenance = getProvenance(p.getDataInfo());
@@ -617,7 +701,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 												.toLowerCase()
 												.contains(ModelConstants.ORCID)) {
 												if (pidProvenance
-													.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)) {
+													.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY) ||
+													pidProvenance.equals("ORCID_ENRICHMENT")) {
 													p.getQualifier().setClassid(ModelConstants.ORCID);
 												} else {
 													p.getQualifier().setClassid(ModelConstants.ORCID_PENDING);
@@ -739,12 +824,30 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	// HELPERS
 
 	private static boolean isValidAuthorName(Author a) {
-		return !Stream
-			.of(a.getFullname(), a.getName(), a.getSurname())
-			.filter(s -> s != null && !s.isEmpty())
-			.collect(Collectors.joining(""))
-			.toLowerCase()
-			.matches(INVALID_AUTHOR_REGEX);
+		return StringUtils.isNotBlank(a.getFullname()) &&
+			StringUtils.isNotBlank(a.getFullname().replaceAll("[\\W]", "")) &&
+			!INVALID_AUTHOR_NAMES.contains(StringUtils.lowerCase(a.getFullname()).trim()) &&
+			!Stream
+				.of(a.getFullname(), a.getName(), a.getSurname())
+				.filter(StringUtils::isNotBlank)
+				.collect(Collectors.joining(""))
+				.toLowerCase()
+				.matches(INVALID_AUTHOR_REGEX);
+	}
+
+	private static boolean urlFilter(String u) {
+		try {
+			final URL url = new URL(u);
+			if (StringUtils.isBlank(url.getPath()) || "/".equals(url.getPath())) {
+				return false;
+			}
+			if (INVALID_URL_HOSTS.contains(url.getHost())) {
+				return false;
+			}
+			return !INVALID_URLS.contains(url.toString());
+		} catch (MalformedURLException ex) {
+			return false;
+		}
 	}
 
 	private static List<StructuredProperty> processPidCleaning(List<StructuredProperty> pids) {
@@ -792,6 +895,107 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 	protected static Field<String> cleanValue(Field<String> s) {
 		s.setValue(s.getValue().replaceAll(CLEANING_REGEX, " "));
 		return s;
+	}
+
+	public static OafEntity applyCoarVocabularies(OafEntity entity, VocabularyGroup vocs) {
+
+		if (entity instanceof Result) {
+			final Result result = (Result) entity;
+
+			Optional
+				.ofNullable(result.getInstance())
+				.ifPresent(
+					instances -> instances
+						.forEach(
+							instance -> {
+								if (Objects.isNull(instance.getInstanceTypeMapping())) {
+									List<InstanceTypeMapping> mapping = Lists.newArrayList();
+									mapping
+										.add(
+											OafMapperUtils
+												.instanceTypeMapping(
+													instance.getInstancetype().getClassname(),
+													OPENAIRE_COAR_RESOURCE_TYPES_3_1));
+									instance.setInstanceTypeMapping(mapping);
+								}
+								Optional<InstanceTypeMapping> optionalItm = instance
+									.getInstanceTypeMapping()
+									.stream()
+									.filter(GraphCleaningFunctions::originalResourceType)
+									.findFirst();
+								if (optionalItm.isPresent()) {
+									InstanceTypeMapping coarItm = optionalItm.get();
+									Optional
+										.ofNullable(
+											vocs
+												.lookupTermBySynonym(
+													OPENAIRE_COAR_RESOURCE_TYPES_3_1, coarItm.getOriginalType()))
+										.ifPresent(type -> {
+											coarItm.setTypeCode(type.getClassid());
+											coarItm.setTypeLabel(type.getClassname());
+										});
+									final List<InstanceTypeMapping> mappings = Lists.newArrayList();
+									if (vocs.vocabularyExists(OPENAIRE_USER_RESOURCE_TYPES)) {
+										Optional
+											.ofNullable(
+												vocs
+													.lookupTermBySynonym(
+														OPENAIRE_USER_RESOURCE_TYPES, coarItm.getTypeCode()))
+											.ifPresent(
+												type -> mappings
+													.add(
+														OafMapperUtils
+															.instanceTypeMapping(coarItm.getTypeCode(), type)));
+									}
+									if (!mappings.isEmpty()) {
+										instance.getInstanceTypeMapping().addAll(mappings);
+									}
+								}
+							}));
+			result.setMetaResourceType(getMetaResourceType(result.getInstance(), vocs));
+		}
+
+		return entity;
+	}
+
+	private static boolean originalResourceType(InstanceTypeMapping itm) {
+		return StringUtils.isNotBlank(itm.getOriginalType()) &&
+			OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(itm.getVocabularyName()) &&
+			StringUtils.isBlank(itm.getTypeCode()) &&
+			StringUtils.isBlank(itm.getTypeLabel());
+	}
+
+	private static Qualifier getMetaResourceType(final List<Instance> instances, final VocabularyGroup vocs) {
+		return Optional
+			.ofNullable(instances)
+			.map(ii -> {
+				if (vocs.vocabularyExists(OPENAIRE_META_RESOURCE_TYPE)) {
+					Optional<InstanceTypeMapping> itm = ii
+						.stream()
+						.filter(Objects::nonNull)
+						.flatMap(
+							i -> Optional
+								.ofNullable(i.getInstanceTypeMapping())
+								.map(Collection::stream)
+								.orElse(Stream.empty()))
+						.filter(t -> OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(t.getVocabularyName()))
+						.findFirst();
+
+					if (!itm.isPresent() || Objects.isNull(itm.get().getTypeCode())) {
+						return null;
+					} else {
+						final String typeCode = itm.get().getTypeCode();
+						return Optional
+							.ofNullable(vocs.lookupTermBySynonym(OPENAIRE_META_RESOURCE_TYPE, typeCode))
+							.orElseThrow(
+								() -> new IllegalStateException("unable to find a synonym for '" + typeCode + "' in " +
+									OPENAIRE_META_RESOURCE_TYPE));
+					}
+				} else {
+					throw new IllegalStateException("vocabulary '" + OPENAIRE_META_RESOURCE_TYPE + "' not available");
+				}
+			})
+			.orElse(null);
 	}
 
 }

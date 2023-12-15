@@ -12,21 +12,10 @@
             <name>outputPath</name>
             <description>the output path</description>
         </property>
-
-
         <property>
-            <name>postgresURL</name>
-            <description>the url of the postgress server to query</description>
+            <name>baseURL</name>
+            <description>the community API base URL</description>
         </property>
-        <property>
-            <name>postgresUser</name>
-            <description>the username to access the postgres db</description>
-        </property>
-        <property>
-            <name>postgresPassword</name>
-            <description>the postgres password</description>
-        </property>
-
     </parameters>
 
     <global>
@@ -104,15 +93,13 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>bulkTagging-publication</name>
+            <name>bulkTagging-result</name>
             <class>eu.dnetlib.dhp.bulktag.SparkBulkTagJob</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --num-executors=${sparkExecutorNumber}
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
-                --conf spark.executor.memoryOverhead=${memoryOverhead}
-                --conf spark.sql.shuffle.partitions=${partitions}
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -122,13 +109,11 @@
             <arg>--sourcePath</arg><arg>${sourcePath}/</arg>
             <arg>--outputPath</arg><arg>${outputPath}/</arg>
             <arg>--pathMap</arg><arg>${pathMap}</arg>
-            <arg>--production</arg><arg>${production}</arg>
+            <arg>--baseURL</arg><arg>${baseURL}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-
-
 
     <end name="End"/>
 

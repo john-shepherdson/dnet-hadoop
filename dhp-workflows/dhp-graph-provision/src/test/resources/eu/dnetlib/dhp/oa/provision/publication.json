@@ -1067,8 +1067,8 @@
         "schemename": "dnet:dataCite_resource"
       },
       "refereed": {
-        "classid": "0001",
-        "classname": "peerReviewed",
+        "classid": "0002",
+        "classname": "nonPeerReviewed",
         "schemeid": "dnet:review_levels",
         "schemename": "dnet:review_levels"
       },
@@ -1968,5 +1968,9 @@
         "schemename": "dnet:provenanceActions"
       }
     }
-  }
+  },
+  "isGreen": true,
+  "openAccessColor": "bronze",
+  "isInDiamondJournal": true,
+  "publiclyFunded": true
 }

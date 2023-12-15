@@ -59,6 +59,7 @@ public class OafCleaner implements Serializable {
 	private static boolean isPrimitive(Object o) {
 		return Objects.isNull(o)
 			|| o.getClass().isPrimitive()
+			|| o.getClass().isEnum()
 			|| o instanceof Class
 			|| o instanceof Integer
 			|| o instanceof Double

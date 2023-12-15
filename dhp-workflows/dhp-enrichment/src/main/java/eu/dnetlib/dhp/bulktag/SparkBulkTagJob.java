@@ -62,8 +62,8 @@ public class SparkBulkTagJob {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		final boolean production = Boolean.valueOf(parser.get("production"));
-		log.info("production: {}", production);
+		final String baseURL = parser.get("baseURL");
+		log.info("baseURL: {}", baseURL);
 
 		ProtoMap protoMappingParams = new Gson().fromJson(parser.get("pathMap"), ProtoMap.class);
 		log.info("pathMap: {}", new Gson().toJson(protoMappingParams));
@@ -79,7 +79,8 @@ public class SparkBulkTagJob {
 		if (taggingConf != null) {
 			cc = CommunityConfigurationFactory.newInstance(taggingConf);
 		} else {
-			cc = Utils.getCommunityConfiguration(production);
+			cc = Utils.getCommunityConfiguration(baseURL);
+			log.info(OBJECT_MAPPER.writeValueAsString(cc));
 		}
 
 		runWithSparkSession(
@@ -134,7 +135,7 @@ public class SparkBulkTagJob {
 		ModelSupport.entityTypes
 			.keySet()
 			.parallelStream()
-			.filter(e -> ModelSupport.isResult(e))
+			.filter(ModelSupport::isResult)
 			.forEach(e -> {
 				removeOutputDir(spark, outputPath + e.name());
 				ResultTagger resultTagger = new ResultTagger();

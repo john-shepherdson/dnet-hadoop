@@ -1,5 +1,4 @@
 [
-
   {
     "paramName":"s",
     "paramLongName":"sourcePath",
@@ -12,7 +11,6 @@
     "paramDescription": "the json path associated to each selection field",
     "paramRequired": true
   },
-
   {
     "paramName": "out",
     "paramLongName": "outputPath",
@@ -25,19 +23,16 @@
     "paramDescription": "true if the spark session is managed, false otherwise",
     "paramRequired": false
   },
-
   {
     "paramName": "tg",
     "paramLongName": "taggingConf",
     "paramDescription": "this parameter is intended for testing purposes only. It is a possible tagging configuration obtained via the XQUERY. Intended to be removed",
     "paramRequired": false
   },
-
   {
-    "paramName": "p",
-    "paramLongName": "production",
-    "paramDescription": "this parameter is intended for testing purposes only. It is a possible tagging configuration obtained via the XQUERY. Intended to be removed",
-    "paramRequired": true
+    "paramName": "bu",
+    "paramLongName": "baseURL",
+    "paramDescription": "this parameter is to specify the api to be queried (beta or production)",
+    "paramRequired": false
   }
-
 ]
