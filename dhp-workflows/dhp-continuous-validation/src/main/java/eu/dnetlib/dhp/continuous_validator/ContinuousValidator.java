@@ -33,7 +33,7 @@ import scala.Option;
 public class ContinuousValidator {
 
 	public static final String TEST_FILES_V4_DIR = TestUtils.TEST_FILES_BASE_DIR + "openaireguidelinesV4/";
-	public static final String RESULTS_FILE = "results.json";
+	public static final String RESULTS_FILE_NAME = "results.json";
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ContinuousValidator.class);
 	private static final String parametersFile = "input_continuous_validator_parameters.json";
 
@@ -60,31 +60,19 @@ public class ContinuousValidator {
 
 				parser = new ArgumentApplicationParser(jsonConfiguration);
 				parser.parseArgument(args);
-
-				String isSParkSessionManagedStr = parser.get("isSparkSessionManaged");
-				if (isSParkSessionManagedStr == null) {
-					logger
-						.error(
-							"The \"isSParkSessionManagedStr\" was not retrieved from the parameters file: "
-								+ parametersFile);
-					return;
-				}
-
-				// This "is needed to implement a unit test in which the spark session is created in the context of the
-				// unit test itself rather than inside the spark application"
-				isSparkSessionManaged = Optional
-					.of(isSParkSessionManagedStr)
-					.map(Boolean::valueOf)
-					.orElse(Boolean.TRUE);
-
-				logger.info("isSparkSessionManaged: {}", isSparkSessionManaged);
-
-				// TODO - If the above is tru,e then the Spark-session defined in the unit-test should be used..
-
 			} catch (Exception e) {
 				logger.error("Error when parsing the parameters!", e);
 				return;
 			}
+
+			isSparkSessionManaged = Optional
+				.ofNullable(parser.get("isSparkSessionManaged")) // This param is not mandatory, so it may be null.
+				.map(Boolean::valueOf)
+				.orElse(Boolean.TRUE);
+
+			logger.info("isSparkSessionManaged: {}", isSparkSessionManaged);
+			// This is needed to implement a unit test in which the spark session is created in the context of the
+			// unit test itself rather than inside the spark application"
 
 			parquet_file_path = parser.get("parquet_file_path");
 			if (parquet_file_path == null) {
@@ -125,10 +113,8 @@ public class ContinuousValidator {
 		logger
 			.info(
 				"Will validate the contents of parquetFile: \"" + parquet_file_path + "\", against guidelines: \""
-					+ guidelines + "\"" + " and will output the results in: " + outputPath + RESULTS_FILE);
+					+ guidelines + "\"" + " and will output the results in: " + outputPath + RESULTS_FILE_NAME);
 
-
-		// TODO - USE THE "runWithSparkSession" METHOD TO RUN THE SPARK CODE INSIDE!!
 		AbstractOpenAireProfile profile = new LiteratureGuidelinesV4Profile();
 
 		SparkConf conf = new SparkConf();
@@ -168,7 +154,7 @@ public class ContinuousValidator {
 				.write()
 				.option("compression", "gzip")
 				.mode(SaveMode.Overwrite)
-				.json(finalOutputPath + RESULTS_FILE); // The filename should be the name of the input-file or the
+				.json(finalOutputPath + RESULTS_FILE_NAME); // The filename should be the name of the input-file or the
 														// input-directory.
 
 			if (logger.isDebugEnabled()) {

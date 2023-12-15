@@ -17,7 +17,7 @@ public class ReadResultsTest {
 
 		try {
 			List standardValidationResultList = new Gson()
-				.fromJson(new BufferedReader(new FileReader(ContinuousValidator.RESULTS_FILE)), List.class);
+				.fromJson(new BufferedReader(new FileReader(ContinuousValidator.RESULTS_FILE_NAME)), List.class);
 			if (standardValidationResultList == null)
 				logger.error("Could not map the json to a \"List\" object.");
 			else if (standardValidationResultList.isEmpty())
@@ -25,9 +25,9 @@ public class ReadResultsTest {
 			else
 				logger.info(standardValidationResultList.toString());
 		} catch (FileNotFoundException fnfe) {
-			logger.error("The results-file \"" + ContinuousValidator.RESULTS_FILE + "\" does not exist!");
+			logger.error("The results-file \"" + ContinuousValidator.RESULTS_FILE_NAME + "\" does not exist!");
 		} catch (Exception e) {
-			logger.error("Error when reading the json-results-file \"" + ContinuousValidator.RESULTS_FILE + "\"", e);
+			logger.error("Error when reading the json-results-file \"" + ContinuousValidator.RESULTS_FILE_NAME + "\"", e);
 		}
 	}
 
