@@ -231,7 +231,7 @@ object BioDBToOAF {
   def uniprotToOAF(input: String): List[Oaf] = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json = parse(input)
-    val pid = (json \ "pid").extract[String]
+    val pid = (json \ "pid").extract[String].trim()
 
     val d = new Dataset
 

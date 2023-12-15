@@ -1,10 +1,10 @@
 {
   "eoscifguidelines": [
     {
-      "code" : "EOSC::Jupyter Notebook",
-      "label" : "EOSC::Jupyter Notebook",
-      "url" : "",
-      "semanticRelation" : "compliesWith"
+      "code": "EOSC::Jupyter Notebook",
+      "label": "EOSC::Jupyter Notebook",
+      "url": "",
+      "semanticRelation": "compliesWith"
     }
   ],
   "measures": [
@@ -431,7 +431,26 @@
       "value": "VIRTA"
     }
   ],
-  "context": [],
+  "context": [
+    {
+      "id": "eosc",
+      "dataInfo": [
+        {
+          "invisible": false,
+          "inferred": false,
+          "deletedbyinference": false,
+          "trust": "0.9",
+          "inferenceprovenance": "",
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk",
+            "classname": "sysimport:crosswalk",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          }
+        }
+      ]
+    }
+  ],
   "contributor": [],
   "country": [],
   "coverage": [],

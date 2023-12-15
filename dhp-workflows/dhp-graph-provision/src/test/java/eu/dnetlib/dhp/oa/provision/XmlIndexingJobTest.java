@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
@@ -31,8 +33,6 @@ import eu.dnetlib.dhp.oa.provision.model.SerializableSolrInputDocument;
 import eu.dnetlib.dhp.oa.provision.utils.ISLookupClient;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class XmlIndexingJobTest extends SolrTest {
@@ -110,34 +110,33 @@ public class XmlIndexingJobTest extends SolrTest {
 		QueryResponse rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "*:*"));
 
 		assertEquals(
-				nRecord, rsp.getResults().getNumFound(),
-				"the number of indexed records should be equal to the number of input records");
-
+			nRecord, rsp.getResults().getNumFound(),
+			"the number of indexed records should be equal to the number of input records");
 
 		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "isgreen:true"));
 		assertEquals(
-				0, rsp.getResults().getNumFound(),
-				"the number of indexed records having isgreen = true");
+			0, rsp.getResults().getNumFound(),
+			"the number of indexed records having isgreen = true");
 
 		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "openaccesscolor:bronze"));
 		assertEquals(
-				0, rsp.getResults().getNumFound(),
-				"the number of indexed records having openaccesscolor = bronze");
+			0, rsp.getResults().getNumFound(),
+			"the number of indexed records having openaccesscolor = bronze");
 
 		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "isindiamondjournal:true"));
 		assertEquals(
-				0, rsp.getResults().getNumFound(),
-				"the number of indexed records having isindiamondjournal = true");
+			0, rsp.getResults().getNumFound(),
+			"the number of indexed records having isindiamondjournal = true");
 
 		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "publiclyfunded:true"));
 		assertEquals(
-				0, rsp.getResults().getNumFound(),
-				"the number of indexed records having publiclyfunded = true");
+			0, rsp.getResults().getNumFound(),
+			"the number of indexed records having publiclyfunded = true");
 
 		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "peerreviewed:true"));
 		assertEquals(
-				0, rsp.getResults().getNumFound(),
-				"the number of indexed records having peerreviewed = true");
+			0, rsp.getResults().getNumFound(),
+			"the number of indexed records having peerreviewed = true");
 	}
 
 	@Test
