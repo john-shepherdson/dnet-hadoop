@@ -1,0 +1,111 @@
+<workflow-app name="Validate metadata records against OpenAIRE Guidelines" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>parquet_file_path</name>
+            <value>./src/test/resources/part-00589-733117df-3822-4fce-bded-17289cc5959a-c000.snappy.parquet</value>
+            <description>the full path of the parquet file</description>
+        </property>
+        <property>
+            <name>openaire_guidelines</name>
+            <value>4.0</value>
+            <description>the version of the OpenAIRE Guidelines to validate the records against</description>
+        </property>
+        <property>
+            <name>outputPath</name>
+            <value>.</value>
+            <description>the (float) version of the OpenAIRE Guidelines to validate the records against</description>
+        </property>
+        <property>
+            <name>sparkDriverMemory</name>
+            <value>4096M</value>
+            <description>memory for driver process</description>
+        </property>
+        <property>
+            <name>sparkExecutorMemory</name>
+            <value>2048m</value>
+            <description>memory for individual executor</description>
+        </property>
+        <property>
+            <name>sparkExecutorCores</name>
+            <value>4</value>
+            <description>number of cores used by single executor</description>
+        </property>
+        <property>
+            <name>spark2ExtraListeners</name>
+            <value>com.cloudera.spark.lineage.NavigatorAppListener</value>
+            <description>spark 2.* extra listeners classname</description>
+        </property>
+        <property>
+            <name>spark2SqlQueryExecutionListeners</name>
+            <value>com.cloudera.spark.lineage.NavigatorQueryListener</value>
+            <description>spark 2.* sql query execution listeners classname</description>
+        </property>
+        <!--<property>
+            <name>oozieActionShareLibForSpark2</name>
+            <description>oozie action sharelib for spark 2.*</description>
+        </property>
+        <property>
+            <name>spark2YarnHistoryServerAddress</name>
+            <description>spark 2.* yarn history server address</description>
+        </property>-->
+        <property>
+            <name>spark2EventLogDir</name>
+            <value>spark2/logs</value>
+            <description>spark 2.* event log dir location</description>
+        </property>
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+            <!--<property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>-->
+        </configuration>
+    </global>
+
+    <start to="ValidateMetadataRecords"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="ValidateMetadataRecords">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Validate multiple records against OpenAIRE Guidelines</name>
+            <class>eu.dnetlib.dhp.continuous_validator.ContinuousValidator</class>
+            <jar>dhp-continuous-validation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemoryOverhead}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+               <!-- &#45;&#45;conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                &#45;&#45;conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}-->
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <!-- Arguments passed to the "main" method of the class defined above. -->
+            <arg>--parquet_file_path</arg><arg>${parquet_file_path}</arg>
+            <arg>--openaire_guidelines</arg><arg>${openaire_guidelines}</arg>
+            <arg>--outputPath</arg><arg>${outputPath}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>

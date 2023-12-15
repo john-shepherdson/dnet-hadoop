@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<resource xmlns="http://namespace.openaire.eu/schema/oaire/" xmlns:dc="http://purl.org/dc/elements/1.1/"
+          xmlns:oaire="http://namespace.openaire.eu/schema/oaire/" xmlns:datacite="http://datacite.org/schema/kernel-4"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://namespace.openaire.eu/schema/oaire/ https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd">
+     <datacite:titles>
+      <datacite:title xml:lang="eng">Journal bearings subjected to dynamic loads: the analytical mobility method</datacite:title>
+     </datacite:titles>
+     <datacite:creators>
+      <datacite:creator>
+       <datacite:creatorName>Flores, Paulo</datacite:creatorName>
+      </datacite:creator>
+      <datacite:creator>
+       <datacite:creatorName>Claro, José Carlos Pimenta</datacite:creatorName>
+      </datacite:creator>
+      <datacite:creator>
+       <datacite:creatorName>Ambrósio, Jorge</datacite:creatorName>
+      </datacite:creator>
+     </datacite:creators>
+     <datacite:contributors>
+      <datacite:contributor contributorType="HostingInstitution">
+       <datacite:contributorName>Universidade do Minho</datacite:contributorName>
+       <datacite:nameIdentifier nameIdentifierScheme="e-mail" schemeURI="mailto:repositorium@sdum.uminho.pt">repositorium@sdum.uminho.pt</datacite:nameIdentifier>
+      </datacite:contributor>
+     </datacite:contributors>
+     <datacite:relatedIdentifiers/>
+     <datacite:dates>
+      <datacite:date dateType="Accepted">2005-06-16</datacite:date>
+      <datacite:date dateType="Issued">2005-06-16</datacite:date>
+     </datacite:dates>
+     <dc:language>eng</dc:language>
+     <oaire:resourceType uri="http://purl.org/coar/resource_type/c_5794" resourceTypeGeneral="literature">conference paper</oaire:resourceType>
+     <dc:description xml:lang="por">The main purpose of this work is to use the analytical mobility method to analyze journal bearings subjected to dynamic loads, with the intent to include it in a general computational program that has been developed for the dynamic analysis of general mechanical systems. A simple journal bearing subjected to a dynamic load is chosen as a demonstrative example, in order to provide the necessary results for a comprehensive discussion of the methodology presented.</dc:description>
+     <dc:description xml:lang="por">Fundação para a Ciência e a Tecnologia (FCT)</dc:description>
+     <dc:description xml:lang="por">Fundo Comunitário Europeu FEDER under project POCTI/EME/2001/38281, entitled ‘Dynamic of Mechanical Systems with joint Clearances and Imperfections’</dc:description>
+     <dc:format>application/pdf</dc:format>
+     <datacite:identifier identifierType="Handle">https://hdl.handle.net/1822/18042</datacite:identifier>
+     <datacite:rights rightsURI="http://purl.org/coar/access_right/c_16ec">restricted access</datacite:rights>
+     <datacite:subjects>
+      <datacite:subject>Dynamic bearings</datacite:subject>
+      <datacite:subject>Hydrodynamic lubrication</datacite:subject>
+     </datacite:subjects>
+     <datacite:sizes>
+      <datacite:size>294443 bytes</datacite:size>
+     </datacite:sizes>
+     <oaire:file accessRightsURI="http://purl.org/coar/access_right/c_16ec" mimeType="application/pdf" objectType="fulltext">https://repositorium.sdum.uminho.pt/bitstream/1822/18042/1/CI-2005_02.pdf</oaire:file>
+     <oaire:citationTitle>IberTrib - 3º Congresso Ibérico de Tribologia</oaire:citationTitle>
+     <oaire:citationStartPage>1</oaire:citationStartPage>
+     <oaire:citationEndPage>15</oaire:citationEndPage>
+     <oaire:citationConferencePlace>Guimarães, Portugal</oaire:citationConferencePlace>
+    </resource>

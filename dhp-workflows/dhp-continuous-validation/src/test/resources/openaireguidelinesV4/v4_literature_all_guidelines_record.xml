@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--This document supports all available OpenAIRE Guidelines for Literature Repositories v4-->
+<resource
+        xmlns:oaire="http://namespace.openaire.eu/schema/oaire/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:dcterms="http://purl.org/dc/terms/"
+        xmlns:datacite="http://datacite.org/schema/kernel-4"
+        xmlns="http://namespace.openaire.eu/schema/oaire/"
+        xsi:schemaLocation="http://namespace.openaire.eu/schema/oaire/ https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd">
+    <!--1. Title (M)-->
+    <datacite:titles>
+        <datacite:title xml:lang="en-US">
+            National Institute for Environmental Studies and Center
+            for Climate System Research Japan
+        </datacite:title>
+        <datacite:title xml:lang="en-US" titleType="Subtitle">A survey</datacite:title>
+    </datacite:titles>
+
+    <!--2. Creator (M)-->
+    <datacite:creators>
+        <datacite:creator>
+            <datacite:creatorName nameType="Personal">Evans, R.J.</datacite:creatorName>
+            <datacite:givenName>Robert</datacite:givenName>
+            <datacite:familyName>Evans</datacite:familyName>
+            <datacite:affiliation>Institute of Science and Technology</datacite:affiliation>
+            <datacite:nameIdentifier nameIdentifierScheme="ORCID" schemeURI="http://orcid.org">
+                1234-1234-1234-1234
+            </datacite:nameIdentifier>
+        </datacite:creator>
+    </datacite:creators>
+
+    <!--3. Contributor (MA)-->
+    <datacite:contributors>
+        <datacite:contributor contributorType="Other">
+            <datacite:contributorName nameType="Organizational">i-5uvLfGD2R.y8fXv442y8o.D6v1</datacite:contributorName>
+            <datacite:givenName>givenName3</datacite:givenName>
+            <datacite:familyName>familyName3</datacite:familyName>
+            <datacite:nameIdentifier nameIdentifierScheme="hK9c28uVD" schemeURI="http://fkPymUoN/">MuDRo.ymY7qG1Or.9Ny</datacite:nameIdentifier>
+            <datacite:nameIdentifier nameIdentifierScheme="k_Q7K8AbQiwLlreHzyU" schemeURI="http://EaTpassQ/">a1Sp</datacite:nameIdentifier>
+            <datacite:affiliation>affiliation5</datacite:affiliation>
+            <datacite:affiliation>affiliation6</datacite:affiliation>
+        </datacite:contributor>
+        <datacite:contributor contributorType="Editor">
+            <datacite:contributorName nameType="Organizational">ZxHQr4TGMeqqEOTbMcNd_EMFvIf</datacite:contributorName>
+            <datacite:givenName>givenName4</datacite:givenName>
+            <datacite:familyName>familyName4</datacite:familyName>
+            <datacite:nameIdentifier nameIdentifierScheme="PWhc-.4-Ock6m2WlzXL4km" schemeURI="http://KTYQUXaS/">nJNWaCv</datacite:nameIdentifier>
+            <datacite:nameIdentifier nameIdentifierScheme="fZBhNb-U2t" schemeURI="http://BJDgOJde/">RobhZUU3Obaqq-3UlrgxKNe-c0</datacite:nameIdentifier>
+            <datacite:affiliation>affiliation7</datacite:affiliation>
+            <datacite:affiliation>affiliation8</datacite:affiliation>
+        </datacite:contributor>
+    </datacite:contributors>
+
+    <!--4. Funding Reference (MA)-->
+    <oaire:fundingReferences>
+        <oaire:fundingReference>
+            <oaire:funderName>pZT7SjviMp4yodvIG</oaire:funderName>
+            <oaire:funderIdentifier funderIdentifierType="ISNI">ff238yCNbhv5k5Y8AmbpyzYt</oaire:funderIdentifier>
+            <oaire:fundingStream>svI_6A</oaire:fundingStream>
+            <oaire:awardNumber awardURI="http://TNrUwkxq/">E-</oaire:awardNumber>
+            <oaire:awardTitle>award</oaire:awardTitle>
+        </oaire:fundingReference>
+        <oaire:fundingReference>
+            <oaire:funderName>funderName</oaire:funderName>
+            <oaire:funderIdentifier funderIdentifierType="Crossref Funder">QwqkD4y</oaire:funderIdentifier>
+            <oaire:fundingStream>yyADU1SFmiS-meqQ6</oaire:fundingStream>
+            <oaire:awardNumber awardURI="http://oKladiXr/">JyORkpwzt</oaire:awardNumber>
+            <oaire:awardTitle>gyg2F9EKT7Gp.mSBU8.Drqf</oaire:awardTitle>
+        </oaire:fundingReference>
+    </oaire:fundingReferences>
+
+    <!--5. Alternate Identifier (R)-->
+    <datacite:alternateIdentifiers>
+        <datacite:alternateIdentifier alternateIdentifierType="DOI">10.1002/chem.201701589</datacite:alternateIdentifier>
+        <datacite:alternateIdentifier alternateIdentifierType="PMID">PMC5574022</datacite:alternateIdentifier>
+    </datacite:alternateIdentifiers>
+
+    <!--6. Related Identifier (R)-->
+    <datacite:relatedIdentifiers>
+        <datacite:relatedIdentifier relatedIdentifierType="ISSN" relationType="HasMetadata" relatedMetadataScheme="sdfhr" schemeURI="http://fsdfg.cm" schemeType="XSD" resourceTypeGeneral="DataPaper">
+            0947-6539
+        </datacite:relatedIdentifier>
+        <datacite:relatedIdentifier relatedIdentifierType="EISSN" relationType="IsPartOf" resourceTypeGeneral="Model">1521-3765</datacite:relatedIdentifier>
+    </datacite:relatedIdentifiers>
+
+    <datacite:dates>
+        <!--7. Embargo Period Date (MA)-->
+        <datacite:date dateType="Accepted">2011-12-01</datacite:date>
+        <datacite:date dateType="Available">2012-12-31</datacite:date>
+        <!--10. Publication Date (M)-->
+        <datacite:date dateType="Issued">2011</datacite:date>
+    </datacite:dates>
+
+    <!--8. Language (MA)-->
+    <dc:language>eng</dc:language>
+    <dc:language>deu</dc:language>
+    <dc:language>nld</dc:language>
+
+    <!--9. Publisher (MA)-->
+    <dc:publisher>
+        Loughborough University. Department of Computer Science
+    </dc:publisher>
+    <dc:publisher>John Wiley &amp; Sons, Inc. (US)</dc:publisher>
+
+    <!--11. Resource Type (M)-->
+    <oaire:resourceType resourceTypeGeneral="literature" uri="http://purl.org/coar/resource_type/c_93fc">report</oaire:resourceType>
+
+    <!--12. Description (MA)-->
+    <dc:description xml:lang="en-US">
+        Foreword [by] Hazel Anderson; Introduction; The scientific heresy:
+        transformation of a society; Consciousness as causal reality [etc]
+    </dc:description>
+    <dc:description xml:lang="en-US">
+        A number of problems in quantum state and system identification are
+        addressed.
+    </dc:description>
+
+    <!--13. Format (R)-->
+    <dc:format>video/quicktime</dc:format>
+    <dc:format>application/pdf</dc:format>
+    <dc:format>application/xml</dc:format>
+
+    <!--14. Resource Identifier (M)-->
+    <datacite:identifier identifierType="URN">http://urn.kb.se/resolve?urn=urn:nbn:se:uu:diva-160648</datacite:identifier>
+
+    <!--15. Access Rights (M)-->
+    <datacite:rights uri="http://purl.org/coar/access_right/c_f1cf">embargoed access</datacite:rights>
+
+    <!--16. Source (R)-->
+    <dc:source>Ecology  Letters (1461023X)  vol.4 (2001)</dc:source>
+    <dc:source>Ecology  Letters (1461025X)  vol.5 (2002)</dc:source>
+
+    <!--17. Subject (MA)-->
+    <datacite:subjects>
+        <datacite:subject subjectScheme="fAOT3oCMLqANRdqCniD" schemeURI="http://bsOyHkIY/" valueURI="http://ZiIiSVAz/" xml:lang="it-IT">ft12Zy</datacite:subject>
+        <datacite:subject subjectScheme="b-FUtIiLRu6RsuIcde3KKhzz.9" schemeURI="http://ttXSOOlB/" valueURI="http://GixLBNfF/"
+                          xml:lang="el-GR">Bf6AElMCkh.mqutOmETp0</datacite:subject>
+    </datacite:subjects>
+
+    <!--18. License Condition (R)-->
+    <oaire:licenseCondition startDate="2019-02-01" uri="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial</oaire:licenseCondition>
+
+    <!--19. Coverage (R)-->
+    <dc:coverage>2000-2010</dc:coverage>
+    <dc:coverage>
+        scheme=historic; content=Ming Dynasty
+    </dc:coverage>
+
+    <!--20. Size (O)-->
+    <datacite:sizes>
+        <datacite:size>15 pages</datacite:size>
+        <datacite:size>6 MB</datacite:size>
+    </datacite:sizes>
+
+    <!--21. Geo Location (O)-->
+    <datacite:geoLocations>
+        <datacite:geoLocation>
+            <datacite:geoLocationPlace>Atlantic Ocean</datacite:geoLocationPlace>
+            <datacite:geoLocationPoint>
+                <datacite:pointLongitude>31.233</datacite:pointLongitude>
+                <datacite:pointLatitude>-67.302</datacite:pointLatitude>
+            </datacite:geoLocationPoint>
+            <datacite:geoLocationBox>
+                <datacite:westBoundLongitude>-71.032</datacite:westBoundLongitude>
+                <datacite:eastBoundLongitude>-68.211</datacite:eastBoundLongitude>
+                <datacite:southBoundLatitude>41.090</datacite:southBoundLatitude>
+                <datacite:northBoundLatitude>42.893</datacite:northBoundLatitude>
+            </datacite:geoLocationBox>
+            <datacite:geoLocationPolygon>
+                <datacite:polygonPoint>
+                    <datacite:pointLongitude>88.557</datacite:pointLongitude>
+                    <datacite:pointLatitude>-0.604</datacite:pointLatitude>
+                </datacite:polygonPoint>
+                <datacite:polygonPoint>
+                    <datacite:pointLongitude>-143.373</datacite:pointLongitude>
+                    <datacite:pointLatitude>88.832</datacite:pointLatitude>
+                </datacite:polygonPoint>
+                <datacite:polygonPoint>
+                    <datacite:pointLongitude>87.3</datacite:pointLongitude>
+                    <datacite:pointLatitude>-36.556</datacite:pointLatitude>
+                </datacite:polygonPoint>
+                <datacite:polygonPoint>
+                    <datacite:pointLongitude>129.128</datacite:pointLongitude>
+                    <datacite:pointLatitude>4.616</datacite:pointLatitude>
+                </datacite:polygonPoint>
+                <datacite:inPolygonPoint>
+                    <datacite:pointLongitude>-17.547</datacite:pointLongitude>
+                    <datacite:pointLatitude>-47.629</datacite:pointLatitude>
+                </datacite:inPolygonPoint>
+            </datacite:geoLocationPolygon>
+            <datacite:geoLocationPolygon>
+                <datacite:polygonPoint>
+                    <datacite:pointLongitude>78.121</datacite:pointLongitude>
+                    <datacite:pointLatitude>19.341</datacite:pointLatitude>
+                </datacite:polygonPoint>
+                <datacite:polygonPoint>
+                    <datacite:pointLongitude>-118.035</datacite:pointLongitude>
+                    <datacite:pointLatitude>53.647</datacite:pointLatitude>
+                </datacite:polygonPoint>
+                <datacite:polygonPoint>
+                    <datacite:pointLongitude>-49.07</datacite:pointLongitude>
+                    <datacite:pointLatitude>-45.561</datacite:pointLatitude>
+                </datacite:polygonPoint>
+                <datacite:polygonPoint>
+                    <datacite:pointLongitude>132.484</datacite:pointLongitude>
+                    <datacite:pointLatitude>-41.146</datacite:pointLatitude>
+                </datacite:polygonPoint>
+                <datacite:inPolygonPoint>
+                    <datacite:pointLongitude>179.293</datacite:pointLongitude>
+                    <datacite:pointLatitude>15.364</datacite:pointLatitude>
+                </datacite:inPolygonPoint>
+            </datacite:geoLocationPolygon>
+        </datacite:geoLocation>
+    </datacite:geoLocations>
+
+    <!--22. Resource Version (R)-->
+    <oaire:version uri="http://purl.org/coar/version/c_be7fb7dd8ff6fe43">NA</oaire:version>
+
+    <!--23. File Location (MA)-->
+    <oaire:file accessRightsURI="http://purl.org/coar/access_right/c_abf2" mimeType="application/pdf" objectType="fulltext">http://link-to-the-fulltext.org</oaire:file>
+    <oaire:file accessRightsURI="http://purl.org/coar/access_right/c_abf2" mimeType="application/pdf" objectType="fulltext">http://europepmc.org/articles/PMC5574022?pdf=render</oaire:file>
+
+    <!--24. Citation Title (R)-->
+    <oaire:citationTitle>some Journal Title</oaire:citationTitle>
+
+    <!--25. Citation Volume (R)-->
+    <oaire:citationVolume>10</oaire:citationVolume>
+
+    <!--26. Citation Issue (R)-->
+    <oaire:citationIssue>1</oaire:citationIssue>
+
+    <!--27. Citation Start Page (R)-->
+    <oaire:citationStartPage>100</oaire:citationStartPage>
+
+    <!--28. Citation End Page (R)-->
+    <oaire:citationEndPage>105</oaire:citationEndPage>
+
+    <!--29. Citation Edition (R)-->
+    <oaire:citationEdition>2</oaire:citationEdition>
+
+    <!--30. Citation Conference Place (R)-->
+    <oaire:citationConferencePlace>Berlin</oaire:citationConferencePlace>
+
+    <!--31. Citation Conference Date (R)-->
+    <oaire:citationConferenceDate>2013-10-22 - 2013-10-23</oaire:citationConferenceDate>
+
+    <!--32. Audience (O)-->
+    <dcterms:audience>Researchers</dcterms:audience>
+    <dcterms:audience>Students</dcterms:audience>
+</resource>

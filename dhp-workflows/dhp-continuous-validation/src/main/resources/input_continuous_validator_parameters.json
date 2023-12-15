@@ -1,0 +1,26 @@
+[
+  {
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "when true will stop SparkSession after job execution",
+    "paramRequired": false
+  },
+  {
+    "paramName": "prq_file",
+    "paramLongName": "parquet_file_path",
+    "paramDescription": "the full path for the parquet file to be processed",
+    "paramRequired": true
+  },
+  {
+    "paramName": "guidelines",
+    "paramLongName": "openaire_guidelines",
+    "paramDescription": "the version of the OpenAIRE Guidelines to validate the records against",
+    "paramRequired": true
+  },
+  {
+    "paramName": "o",
+    "paramLongName": "outputPath",
+    "paramDescription": "the path of the output-directory where the result-json-files will be stored",
+    "paramRequired": true
+  }
+]

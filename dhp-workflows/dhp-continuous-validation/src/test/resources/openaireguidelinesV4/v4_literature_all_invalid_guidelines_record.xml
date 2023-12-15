@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--This document supports all available OpenAIRE Guidelines for Literature Repositories v4-->
+<resource
+        xmlns:oaire="http://namespace.openaire.eu/schema/oaire/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:dcterms="http://purl.org/dc/terms/"
+        xmlns:datacite="http://datacite.org/schema/kernel-4"
+        xmlns="http://namespace.openaire.eu/schema/oaire/"
+        xsi:schemaLocation="http://namespace.openaire.eu/schema/oaire/ https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd">
+    <!--1. Title (M)-->
+    <datacite:titles>
+        <datacite:notitle xml:lang="en-US">
+            National Institute for Environmental Studies and Center
+            for Climate System Research Japan
+        </datacite:notitle>
+    </datacite:titles>
+
+    <!--2. Creator (M)-->
+    <datacite:creators>
+        <datacite:creator>
+<!--            <datacite:creatorName nameType="Personal">Evans, R.J.</datacite:creatorName>-->
+<!--            <datacite:givenName>Robert</datacite:givenName>-->
+<!--            <datacite:familyName>Evans</datacite:familyName>-->
+<!--            <datacite:affiliation>Institute of Science and Technology</datacite:affiliation>-->
+<!--            <datacite:nameIdentifier nameIdentifierScheme="ORCID" schemeURI="http://orcid.org">-->
+<!--                1234-1234-1234-1234-->
+<!--            </datacite:nameIdentifier>-->
+        </datacite:creator>
+    </datacite:creators>
+
+    <!--3. Contributor (MA)-->
+    <datacite:contributors>
+        <datacite:contributor>
+<!--            <datacite:contributorName nameType="Organizational">i-5uvLfGD2R.y8fXv442y8o.D6v1</datacite:contributorName>-->
+<!--            <datacite:givenName>givenName3</datacite:givenName>-->
+<!--            <datacite:familyName>familyName3</datacite:familyName>-->
+            <datacite:nameIdentifier>MuDRo.ymY7qG1Or.9Ny</datacite:nameIdentifier>
+            <datacite:nameIdentifier nameIdentifierScheme="k_Q7K8AbQiwLlreHzyU" schemeURI="http://EaTpassQ/">a1Sp</datacite:nameIdentifier>
+            <datacite:affiliation>affiliation5</datacite:affiliation>
+            <datacite:affiliation>affiliation6</datacite:affiliation>
+        </datacite:contributor>
+    </datacite:contributors>
+
+    <!--4. Funding Reference (MA)-->
+    <oaire:fundingReferences>
+        <oaire:fundingReference>
+<!--            <oaire:funderName>pZT7SjviMp4yodvIG</oaire:funderName> 1 error for missing mandatory element-->
+            <oaire:funderIdentifier funderIdentifierType="invalid">ff238yCNbhv5k5Y8AmbpyzYt</oaire:funderIdentifier><!--1 warning for incorrect value of funderIdentifierType-->
+            <oaire:fundingStream>svI_6A</oaire:fundingStream>
+            <oaire:awardNumber>E-</oaire:awardNumber><!--1 warning for missing awardURI attribute-->
+            <!--1 warning for missing oaire:awardTitle element-->
+        </oaire:fundingReference>
+        <oaire:fundingReference>
+            <oaire:funderName>funderName</oaire:funderName>
+            <oaire:funderIdentifier funderIdentifierType="Crossref Funder">QwqkD4y</oaire:funderIdentifier>
+            <oaire:fundingStream>yyADU1SFmiS-meqQ6</oaire:fundingStream>
+            <oaire:awardNumber awardURI="http://oKladiXr/">JyORkpwzt</oaire:awardNumber>
+            <oaire:awardTitle>gyg2F9EKT7Gp.mSBU8.Drqf</oaire:awardTitle>
+        </oaire:fundingReference>
+    </oaire:fundingReferences>
+
+    <!--5. Alternate Identifier (R)-->
+    <datacite:alternateIdentifiers>
+        <datacite:alternateIdentifier alternateIdentifierType="invalid">10.1002/chem.201701589</datacite:alternateIdentifier><!--1 error for incorrect value of alternateIdentifierType-->
+        <datacite:alternateIdentifier alternateIdentifierType="PMID">PMC5574022</datacite:alternateIdentifier>
+    </datacite:alternateIdentifiers>
+
+    <!--6. Related Identifier (R)-->
+    <datacite:relatedIdentifiers>
+        <datacite:relatedIdentifier relatedIdentifierType="ISSN" relationType="HasMetadata" relatedMetadataScheme="sdfhr" schemeURI="http://fsdfg.cm" schemeType="XSD" resourceTypeGeneral="DataPaper">
+            0947-6539
+        </datacite:relatedIdentifier>
+        <datacite:relatedIdentifier relatedIdentifierType="invalid" relationType="invalid" resourceTypeGeneral="Model">1521-3765</datacite:relatedIdentifier><!--2 errors for incorrect value of relationType and relatedIdentifierType-->
+    </datacite:relatedIdentifiers>
+
+    <datacite:dates>
+        <!--7. Embargo Period Date (MA)-->
+        <datacite:nodate dateType="Accepted">2011-12-01</datacite:nodate>
+        <datacite:nodate dateType="Available">2012-12-01</datacite:nodate>
+        <!--10. Publication Date (M)-->
+        <datacite:date dateType="invalid">2011</datacite:date>
+    </datacite:dates>
+
+    <!--8. Language (MA)-->
+    <dc:language>eng</dc:language>
+    <dc:language>deu</dc:language>
+    <dc:language>invalidTag</dc:language><!--1 error for not allowed value-->
+
+    <!--9. Publisher (MA)-->
+    <dc:nopublisher>
+        Loughborough University. Department of Computer Science
+    </dc:nopublisher>
+    <dc:nopublisher>John Wiley &amp; Sons, Inc. (US)</dc:nopublisher>
+
+    <!--11. Resource Type (M)-->
+    <oaire:resourceType resourceTypeGeneral="invalid" uri="http://invalid">report</oaire:resourceType><!--2 errors for invalid mandatory attributes-->
+
+    <!--12. Description (MA)-->
+    <dc:description xml:lang="invalidTag"><!--1 warning for not allowed value of optional attribute-->
+        Foreword [by] Hazel Anderson; Introduction; The scientific heresy:
+        transformation of a society; Consciousness as causal reality [etc]
+    </dc:description>
+    <dc:description xml:lang="en-US">
+        A number of problems in quantum state and system identification are
+        addressed.
+    </dc:description>
+
+    <!--13. Format (R)-->
+    <dc:format>video/quicktime</dc:format>
+    <dc:format>application/pdf</dc:format>
+    <dc:format>application/invalid</dc:format><!--Should return 1 warning for not allowed value?-->
+
+    <!--14 . Resource Identifier (M)-->
+    <datacite:identifier identifierType="invalid">http://urn.kb.se/resolve?urn=urn:nbn:se:uu:diva-160648</datacite:identifier><!--1 error for invalid mandatory attribute-->
+
+    <!--15. Access Rights (M)-->
+    <datacite:rights uri="http://purl.org/coar/access_right/c_f1cf">invalid</datacite:rights><!--1 error for not allowed value-->
+
+    <!--16. Source (R)-->
+    <dc:nosource>Ecology  Letters (1461023X)  vol.4 (2001)</dc:nosource>
+    <dc:nosource>Ecology  Letters (1461025X)  vol.5 (2002)</dc:nosource>
+
+    <!--17. Subject (MA)-->
+    <datacite:subjects>
+        <datacite:subject>ft12Zy</datacite:subject><!--3 warnings for missing attributes-->
+        <datacite:subject subjectScheme="b-FUtIiLRu6RsuIcde3KKhzz.9" schemeURI="http://ttXSOOlB/" valueURI="http://GixLBNfF/"
+                          xml:lang="el-GR">Bf6AElMCkh.mqutOmETp0</datacite:subject>
+    </datacite:subjects>
+
+    <!--18. License Condition (R)-->
+    <oaire:licenseCondition startDate="invalid date">Creative Commons Attribution-NonCommercial</oaire:licenseCondition><!--2 errors for invalid attributes-->
+
+    <!--19. Coverage (R)-->
+    <dc:nocoverage>2000-2010</dc:nocoverage>
+    <dc:nocoverage>
+        scheme=historic; content=Ming Dynasty
+    </dc:nocoverage>
+
+    <!--20. Size (O)-->
+    <datacite:sizes>
+<!--        <datacite:size>15 pages</datacite:size>-->
+<!--        <datacite:size>6 MB</datacite:size>-->
+    </datacite:sizes>
+
+    <!--21. Geo Location (O)-->
+    <datacite:geoLocations>
+        <datacite:geoLocation>
+            <datacite:geoLocationPlace>Atlantic Ocean</datacite:geoLocationPlace>
+            <datacite:geoLocationPoint>
+                <datacite:pointLongitude>31.233</datacite:pointLongitude>
+                <datacite:nopointLatitude>-67.302</datacite:nopointLatitude><!--1 error-->
+            </datacite:geoLocationPoint>
+            <datacite:geoLocationBox>
+                <datacite:westBoundLongitude>-71.032</datacite:westBoundLongitude>
+                <datacite:eastBoundLongitude>-68.211</datacite:eastBoundLongitude>
+                <datacite:nosouthBoundLatitude>41.090</datacite:nosouthBoundLatitude><!--1 error-->
+                <datacite:northBoundLatitude>42.893</datacite:northBoundLatitude>
+            </datacite:geoLocationBox>
+        </datacite:geoLocation>
+    </datacite:geoLocations>
+
+    <!--22. Resource Version (R)-->
+    <oaire:version>irrelevant</oaire:version><!--1 warning for missing MA attribute-->
+
+    <!--23. File Location (MA)-->
+    <oaire:file accessRightsURI="http://invalid" mimeType="invalid/type" objectType="invalid">http://link-to-the-fulltext.org</oaire:file><!--3 warnings for incorrect attributes-->
+    <oaire:file accessRightsURI="http://purl.org/coar/access_right/c_abf2" mimeType="application/pdf" objectType="fulltext">http://europepmc.org/articles/PMC5574022?pdf=render</oaire:file>
+
+    <!--24. Citation Title (R)-->
+    <oaire:nocitationTitle>some Journal Title</oaire:nocitationTitle>
+
+    <!--25. Citation Volume (R)-->
+    <oaire:nocitationVolume>10</oaire:nocitationVolume>
+
+    <!--26. Citation Issue (R)-->
+    <oaire:nocitationIssue>1</oaire:nocitationIssue>
+
+    <!--27. Citation Start Page (R)-->
+    <oaire:nocitationStartPage>100</oaire:nocitationStartPage>
+
+    <!--28. Citation End Page (R)-->
+    <oaire:nocitationEndPage>105</oaire:nocitationEndPage>
+
+    <!--29. Citation Edition (R)-->
+    <oaire:nocitationEdition>2</oaire:nocitationEdition>
+
+    <!--30. Citation Conference Place (R)-->
+    <oaire:nocitationConferencePlace>Berlin</oaire:nocitationConferencePlace>
+
+    <!--31. Citation Conference Date (R)-->
+    <oaire:citationConferenceDate>2013-02-29</oaire:citationConferenceDate><!--1 warning for not allowed value-->
+
+    <!--32. Audience (O)-->
+    <dcterms:noaudience>Researchers</dcterms:noaudience>
+    <dcterms:noaudience>Students</dcterms:noaudience>
+</resource>

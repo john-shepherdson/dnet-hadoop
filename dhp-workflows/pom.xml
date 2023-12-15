@@ -39,6 +39,7 @@
         <module>dhp-doiboost</module>
         <module>dhp-impact-indicators</module>
         <module>dhp-swh</module>
+        <module>dhp-continuous-validation</module>
     </modules>
 
     <pluginRepositories>

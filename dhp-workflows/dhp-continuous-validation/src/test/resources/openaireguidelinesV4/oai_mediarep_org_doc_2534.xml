@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?><record xmlns="http://www.openarchives.org/OAI/2.0/">
+         <header>
+            <identifier>oai:mediarep.org:doc/2534</identifier>
+            <datestamp>2020-03-27T11:35:21Z</datestamp>
+            <setSpec setName="Zeitschrift für Medienwissenschaft">com_doc_568</setSpec>
+            <setSpec setName="Zeitschriften">com_doc_179</setSpec>
+            <setSpec>col_doc_1963</setSpec>
+            <setSpec setName="OpenAIRE">openaire</setSpec>
+         </header>
+         <metadata>
+             <resource xmlns="http://namespace.openaire.eu/schema/oaire/"
+                       xmlns:datacite="http://datacite.org/schema/kernel-4" xmlns:dcterms="http://purl.org/dc/terms/"
+                       xmlns:dc="http://purl.org/dc/elements/1.1/"
+                       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                       xsi:schemaLocation="http://namespace.openaire.eu/schema/oaire/ https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd">
+               <datacite:title>Die autogerechte Stadt (Rückführung)</datacite:title>
+               <datacite:creators>
+                  <datacite:creator>
+                     <datacite:creatorName>Schmitt, Arne</datacite:creatorName>
+                  </datacite:creator>
+               </datacite:creators>
+               <datacite:alternateIdentifiers>
+                  <datacite:alternateIdentifier alternateIdentifierType="URL">https://mediarep.org/handle/doc/2534</datacite:alternateIdentifier>
+               </datacite:alternateIdentifiers>
+               <datacite:relatedIdentifiers>
+                  <datacite:relatedIdentifier relatedIdentifierType="ISSN" relationType="IsPartOf">1869-1722</datacite:relatedIdentifier>
+               </datacite:relatedIdentifiers>
+               <dc:language>deu</dc:language>
+               <dc:publisher>diaphanes</dc:publisher>
+               <datacite:date dateType="Issued">2015</datacite:date>
+               <resourceType resourceTypeGeneral="literature" uri="http://purl.org/coar/resource_type/c_6501">
+                        journal article
+                    </resourceType>
+               <dc:description>Bildstrecke ausgewählter Abbildungen aus Hans Bernhard Reichows Buch DIE AUTOGERECHTE STADT.</dc:description>
+               <dc:format>application/pdf</dc:format>
+               <datacite:identifier identifierType="DOI">http://dx.doi.org/10.25969/mediarep/1436</datacite:identifier>
+               <datacite:rights uri="http://purl.org/coar/access_right/c_abf2">
+                open access
+            </datacite:rights>
+               <datacite:subjects>
+                  <datacite:subject>Infrastruktur</datacite:subject>
+                  <datacite:subject>Urbanität</datacite:subject>
+                  <datacite:subject>Mobilität</datacite:subject>
+                  <datacite:subject subjectScheme="DDC">300</datacite:subject>
+               </datacite:subjects>
+               <version uri="http://purl.org/coar/version/c_970fb48d4fbd8a85">
+                        VoR
+                    </version>
+               <file accessRightsURI="http://purl.org/coar/access_right/c_abf2" mimeType="application/pdf" objectType="&#xa;                            fulltext&#xa;                        ">https://mediarep.org/bitstream/doc/2534/1/ZfM_12_104-133_Schmitt_Die_autogerechte_Stadt.pdf</file>
+               <citationTitle>Zeitschrift für Medienwissenschaft</citationTitle>
+               <citationVolume>7</citationVolume>
+               <citationIssue>1</citationIssue>
+               <citationStartPage>104</citationStartPage>
+               <citationEndPage>113</citationEndPage>
+               <dcterms:audience>Researchers</dcterms:audience>
+               <dcterms:audience>Students</dcterms:audience>
+            </resource>
+         </metadata>
+      </record>
