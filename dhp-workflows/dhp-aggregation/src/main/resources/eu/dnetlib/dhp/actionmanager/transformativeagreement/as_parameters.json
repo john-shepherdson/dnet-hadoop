@@ -1,0 +1,26 @@
+[
+  {
+    "paramName": "ip",
+    "paramLongName": "inputPath",
+    "paramDescription": "the zipped opencitations file",
+    "paramRequired": true
+  },
+  {
+    "paramName": "op",
+    "paramLongName": "outputPath",
+    "paramDescription": "the working path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "the hdfs name node",
+    "paramRequired": false
+  },
+  {
+    "paramName": "sdr",
+    "paramLongName": "shouldDuplicateRels",
+    "paramDescription": "activates/deactivates the construction of bidirectional relations Cites/IsCitedBy",
+    "paramRequired": false
+  }
+]
