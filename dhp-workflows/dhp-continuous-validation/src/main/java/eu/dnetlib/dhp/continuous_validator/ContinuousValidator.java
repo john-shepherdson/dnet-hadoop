@@ -1,10 +1,13 @@
 
 package eu.dnetlib.dhp.continuous_validator;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.validator2.validation.XMLApplicationProfile;
-import eu.dnetlib.validator2.validation.guideline.openaire.*;
-import eu.dnetlib.validator2.validation.utils.TestUtils;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -13,14 +16,12 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
 import org.slf4j.LoggerFactory;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.validator2.validation.XMLApplicationProfile;
+import eu.dnetlib.validator2.validation.guideline.openaire.*;
+import eu.dnetlib.validator2.validation.utils.TestUtils;
 import scala.Option;
-
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 public class ContinuousValidator {
 
@@ -74,7 +75,8 @@ public class ContinuousValidator {
 
 			guidelines = parser.get("openaire_guidelines");
 			if (guidelines == null) {
-				logger.error("The \"openaire_guidelines\" was not retrieved from the parameters file: " + parametersFile);
+				logger
+					.error("The \"openaire_guidelines\" was not retrieved from the parameters file: " + parametersFile);
 				return;
 			}
 
@@ -135,17 +137,6 @@ public class ContinuousValidator {
 		String finalOutputPath = outputPath;
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
-			Dataset<Row> parquetFileDF = spark.read().parquet(finalParquet_file_path);
-			parquetFileDF.show(5);
-
-			// Filter the results based on the XML-encoding and non-null id and body.
-			parquetFileDF = parquetFileDF
-				.filter(
-					parquetFileDF
-						.col("encoding")
-						.eqNullSafe("XML")
-						.and(parquetFileDF.col("id").isNotNull())
-						.and(parquetFileDF.col("body").isNotNull()));
 
 			// Use a new instance of Document Builder in each worker, as it is not thread-safe.
 			MapFunction<Row, XMLApplicationProfile.ValidationResult> validateMapFunction = row -> profile
@@ -155,58 +146,16 @@ public class ContinuousValidator {
 						.getDocumentBuilder()
 						.parse(IOUtils.toInputStream(row.getAs("body").toString(), StandardCharsets.UTF_8)));
 
-			Dataset<XMLApplicationProfile.ValidationResult> validationResultsDataset = parquetFileDF
-				.map(validateMapFunction, Encoders.bean(XMLApplicationProfile.ValidationResult.class));
-
-			if (logger.isTraceEnabled()) {
-				logger.trace("Showing a few validation-results.. just for checking");
-				validationResultsDataset.show(5);
-			}
-
-			// Write the results to json file immediately, without converting them to a list.
-			validationResultsDataset
+			spark
+				.read()
+				.parquet(finalParquet_file_path)
+				.filter("encoding = 'XML' and id != NULL and body != null")
+				.map(validateMapFunction, Encoders.bean(XMLApplicationProfile.ValidationResult.class))
 				.write()
 				.option("compression", "gzip")
 				.mode(SaveMode.Overwrite)
 				.json(finalOutputPath + RESULTS_FILE_NAME); // The filename should be the name of the input-file or the
-			// input-directory.
 
-			if (logger.isTraceEnabled()) {
-				List<XMLApplicationProfile.ValidationResult> validationResultsList = validationResultsDataset
-					.javaRDD()
-					.collect();
-
-				if (validationResultsList.isEmpty()) {
-					logger.error("The \"validationResultsList\" was empty!");
-					return;
-				}
-
-				validationResultsList.forEach(vr -> logger.trace(vr.id() + " | score:" + vr.score()));
-				for (XMLApplicationProfile.ValidationResult result : validationResultsList)
-					logger.trace(result.toString());
-			}
-
-			// TODO - REMOVE THIS WHEN THE WRITE FROM ABOVE IS OK
-			/*
-			 * try (BufferedWriter writer = Files .newBufferedWriter(Paths.get(outputPath + RESULTS_FILE),
-			 * StandardCharsets.UTF_8)) { writer.write(new Gson().toJson(validationResultsList)); } catch (Exception e)
-			 * { logger.error("Error when writing the \"validationResultsList\" as json into the results-file: " +
-			 * outputPath + RESULTS_FILE); return; }
-			 */
-
-			// TODO - Maybe the following section is not needed, when ran as an oozie workflow..
-			Option<String> uiWebUrl = spark.sparkContext().uiWebUrl();
-			if (uiWebUrl.isDefined()) {
-				logger
-					.info(
-						"Waiting 60 seconds, before shutdown, for the user to check the jobs' status at: "
-							+ uiWebUrl.get());
-				try {
-					Thread.sleep(60_000);
-				} catch (InterruptedException ignored) {
-				}
-			} else
-				logger.info("The \"uiWebUrl\" is not defined, in order to check the jobs' status. Shutting down..");
 		});
 	}
 }

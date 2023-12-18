@@ -19,10 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Getter
-@Setter
+
 public class BipProjectModel {
 	String projectId;
 
@@ -33,6 +30,17 @@ public class BipProjectModel {
 	String totalImpulse;
 
 	String totalCitationCount;
+
+	public BipProjectModel() {
+	}
+
+	public BipProjectModel(String projectId, String numOfInfluentialResults, String numOfPopularResults, String totalImpulse, String totalCitationCount) {
+		this.projectId = projectId;
+		this.numOfInfluentialResults = numOfInfluentialResults;
+		this.numOfPopularResults = numOfPopularResults;
+		this.totalImpulse = totalImpulse;
+		this.totalCitationCount = totalCitationCount;
+	}
 
 	// each project bip measure has exactly one value, hence one key-value pair
 	private Measure createMeasure(String measureId, String measureValue) {
@@ -71,4 +79,43 @@ public class BipProjectModel {
 				createMeasure("totalCitationCount", totalCitationCount));
 	}
 
+	public String getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(String projectId) {
+		this.projectId = projectId;
+	}
+
+	public String getNumOfInfluentialResults() {
+		return numOfInfluentialResults;
+	}
+
+	public void setNumOfInfluentialResults(String numOfInfluentialResults) {
+		this.numOfInfluentialResults = numOfInfluentialResults;
+	}
+
+	public String getNumOfPopularResults() {
+		return numOfPopularResults;
+	}
+
+	public void setNumOfPopularResults(String numOfPopularResults) {
+		this.numOfPopularResults = numOfPopularResults;
+	}
+
+	public String getTotalImpulse() {
+		return totalImpulse;
+	}
+
+	public void setTotalImpulse(String totalImpulse) {
+		this.totalImpulse = totalImpulse;
+	}
+
+	public String getTotalCitationCount() {
+		return totalCitationCount;
+	}
+
+	public void setTotalCitationCount(String totalCitationCount) {
+		this.totalCitationCount = totalCitationCount;
+	}
 }

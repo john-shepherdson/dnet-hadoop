@@ -1,11 +1,13 @@
-import com.google.gson.Gson;
-import eu.dnetlib.dhp.continuous_validator.ContinuousValidator;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.List;
+
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
+
+import eu.dnetlib.dhp.continuous_validator.ContinuousValidator;
 
 public class ReadResultsTest {
 
@@ -25,7 +27,8 @@ public class ReadResultsTest {
 		} catch (FileNotFoundException fnfe) {
 			logger.error("The results-file \"" + ContinuousValidator.RESULTS_FILE_NAME + "\" does not exist!");
 		} catch (Exception e) {
-			logger.error("Error when reading the json-results-file \"" + ContinuousValidator.RESULTS_FILE_NAME + "\"", e);
+			logger
+				.error("Error when reading the json-results-file \"" + ContinuousValidator.RESULTS_FILE_NAME + "\"", e);
 		}
 	}
 
