@@ -1,11 +1,5 @@
 [
   {
-    "paramName":"is",
-    "paramLongName":"isLookUpUrl",
-    "paramDescription": "URL of the isLookUp Service",
-    "paramRequired": true
-  },
-  {
     "paramName":"s",
     "paramLongName":"sourcePath",
     "paramDescription": "the path of the sequencial file to read",
@@ -15,12 +9,6 @@
     "paramName": "pm",
     "paramLongName":"pathMap",
     "paramDescription": "the json path associated to each selection field",
-    "paramRequired": true
-  },
-  {
-    "paramName":"tn",
-    "paramLongName":"resultTableName",
-    "paramDescription": "the name of the result table we are currently working on",
     "paramRequired": true
   },
   {
@@ -36,16 +24,15 @@
     "paramRequired": false
   },
   {
-    "paramName": "test",
-    "paramLongName": "isTest",
-    "paramDescription": "Parameter intended for testing purposes only. True if the reun is relatesd to a test and so the taggingConf parameter should be loaded",
-    "paramRequired": false
-  },
-  {
     "paramName": "tg",
     "paramLongName": "taggingConf",
     "paramDescription": "this parameter is intended for testing purposes only. It is a possible tagging configuration obtained via the XQUERY. Intended to be removed",
     "paramRequired": false
+  },
+  {
+    "paramName": "bu",
+    "paramLongName": "baseURL",
+    "paramDescription": "this parameter is to specify the api to be queried (beta or production)",
+    "paramRequired": false
   }
-
 ]

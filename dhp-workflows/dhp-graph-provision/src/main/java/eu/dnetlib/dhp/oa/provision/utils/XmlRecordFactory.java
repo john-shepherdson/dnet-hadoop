@@ -434,6 +434,24 @@ public class XmlRecordFactory implements Serializable {
 						XmlSerializationUtils
 							.asXmlElement("processingchargecurrency", r.getProcessingchargecurrency().getValue()));
 			}
+			if (r.getIsGreen() != null) {
+				metadata
+					.add(XmlSerializationUtils.asXmlElement("isgreen", Boolean.toString(r.getIsGreen())));
+			}
+			if (r.getOpenAccessColor() != null) {
+				metadata
+					.add(XmlSerializationUtils.asXmlElement("openaccesscolor", r.getOpenAccessColor().toString()));
+			}
+			if (r.getIsInDiamondJournal() != null) {
+				metadata
+					.add(
+						XmlSerializationUtils
+							.asXmlElement("isindiamondjournal", Boolean.toString(r.getIsInDiamondJournal())));
+			}
+			if (r.getPubliclyFunded() != null) {
+				metadata
+					.add(XmlSerializationUtils.asXmlElement("publiclyfunded", Boolean.toString(r.getPubliclyFunded())));
+			}
 		}
 
 		switch (type) {

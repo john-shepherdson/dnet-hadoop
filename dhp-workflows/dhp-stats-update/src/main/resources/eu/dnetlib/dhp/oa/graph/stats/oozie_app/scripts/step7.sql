@@ -123,6 +123,8 @@ UNION ALL
 SELECT *
 FROM ${stats_db_name}.otherresearchproduct_topics;
 
+DROP TABLE IF EXISTS ${stats_db_name}.result_fos purge;
+
 create table ${stats_db_name}.result_fos stored as parquet as
 with
     lvl1 as (select id, topic from ${stats_db_name}.result_topics where topic like '__ %' and type='Fields of Science and Technology classification'),
@@ -133,12 +135,16 @@ from lvl1
  join lvl2 on lvl1.id=lvl2.id and substr(lvl2.topic, 1, 2)=substr(lvl1.topic, 1, 2)
  join lvl3 on lvl3.id=lvl1.id and substr(lvl3.topic, 1, 4)=substr(lvl2.topic, 1, 4);
 
+DROP TABLE IF EXISTS ${stats_db_name}.result_organization purge;
+
 CREATE TABLE ${stats_db_name}.result_organization STORED AS PARQUET AS
 SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS organization
 FROM ${openaire_db_name}.relation r
 WHERE r.reltype = 'resultOrganization'
   and r.target like '50|%'
   and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false;
+
+DROP TABLE IF EXISTS ${stats_db_name}.result_projects purge;
 
 CREATE TABLE ${stats_db_name}.result_projects STORED AS PARQUET AS
 select pr.result AS id, pr.id AS project, datediff(p.enddate, p.startdate) AS daysfromend, pr.provenance as provenance

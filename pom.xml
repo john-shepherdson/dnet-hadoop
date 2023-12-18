@@ -112,6 +112,16 @@
 			<url>https://maven.d4science.org/nexus/content/repositories/dnet-deps</url>
 			<layout>default</layout>
 		</repository>
+		<repository>
+			<id>maven-restlet</id>
+			<name>Restlet repository</name>
+			<url>https://maven.restlet.talend.com</url>
+		</repository>
+		<repository>
+			<id>conjars</id>
+			<name>conjars</name>
+			<url>https://conjars.wensel.net/repo/</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -878,7 +888,7 @@
 		<mockito-core.version>3.3.3</mockito-core.version>
 		<mongodb.driver.version>3.4.2</mongodb.driver.version>
 		<vtd.version>[2.12,3.0)</vtd.version>
-		<dhp-schemas.version>[3.17.1]</dhp-schemas.version>
+		<dhp-schemas.version>[4.17.2]</dhp-schemas.version>
 		<dnet-actionmanager-api.version>[4.0.3]</dnet-actionmanager-api.version>
 		<dnet-actionmanager-common.version>[6.0.5]</dnet-actionmanager-common.version>
 		<dnet-openaire-broker-common.version>[3.1.6]</dnet-openaire-broker-common.version>

@@ -12,4 +12,3 @@ create table TARGET.result stored as parquet as
 --             join SOURCE.result
              where rc.id=r.id and conc.category not in (CONTEXTS))
 )  foo;
-ANALYZE TABLE TARGET.result COMPUTE STATISTICS;

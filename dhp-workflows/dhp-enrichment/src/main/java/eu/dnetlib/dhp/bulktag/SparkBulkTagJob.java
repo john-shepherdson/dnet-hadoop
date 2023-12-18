@@ -9,7 +9,6 @@ import java.util.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
-import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -21,10 +20,14 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
+import eu.dnetlib.dhp.api.Utils;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.bulktag.community.*;
+import eu.dnetlib.dhp.schema.common.EntityType;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
 public class SparkBulkTagJob {
 
@@ -53,50 +56,39 @@ public class SparkBulkTagJob {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		Boolean isTest = Optional
-			.ofNullable(parser.get("isTest"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.FALSE);
-		log.info("isTest: {} ", isTest);
-
 		final String inputPath = parser.get("sourcePath");
 		log.info("inputPath: {}", inputPath);
 
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
+		final String baseURL = parser.get("baseURL");
+		log.info("baseURL: {}", baseURL);
+
 		ProtoMap protoMappingParams = new Gson().fromJson(parser.get("pathMap"), ProtoMap.class);
 		log.info("pathMap: {}", new Gson().toJson(protoMappingParams));
-
-		final String resultClassName = parser.get("resultTableName");
-		log.info("resultTableName: {}", resultClassName);
-
-		final Boolean saveGraph = Optional
-			.ofNullable(parser.get("saveGraph"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.TRUE);
-		log.info("saveGraph: {}", saveGraph);
-
-		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		SparkConf conf = new SparkConf();
 		CommunityConfiguration cc;
 
-		String taggingConf = parser.get("taggingConf");
+		String taggingConf = Optional
+			.ofNullable(parser.get("taggingConf"))
+			.map(String::valueOf)
+			.orElse(null);
 
-		if (isTest) {
+		if (taggingConf != null) {
 			cc = CommunityConfigurationFactory.newInstance(taggingConf);
 		} else {
-			cc = QueryInformationSystem.getCommunityConfiguration(parser.get("isLookUpUrl"));
+			cc = Utils.getCommunityConfiguration(baseURL);
+			log.info(OBJECT_MAPPER.writeValueAsString(cc));
 		}
 
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				removeOutputDir(spark, outputPath);
 				extendCommunityConfigurationForEOSC(spark, inputPath, cc);
-				execBulkTag(spark, inputPath, outputPath, protoMappingParams, resultClazz, cc);
+				execBulkTag(spark, inputPath, outputPath, protoMappingParams, cc);
 			});
 	}
 
@@ -105,10 +97,7 @@ public class SparkBulkTagJob {
 
 		Dataset<String> datasources = readPath(
 			spark, inputPath
-				.substring(
-					0,
-					inputPath.lastIndexOf("/"))
-				+ "/datasource",
+				+ "datasource",
 			Datasource.class)
 				.filter((FilterFunction<Datasource>) ds -> isOKDatasource(ds))
 				.map((MapFunction<Datasource, String>) ds -> ds.getId(), Encoders.STRING());
@@ -116,10 +105,10 @@ public class SparkBulkTagJob {
 		Map<String, List<Pair<String, SelectionConstraints>>> dsm = cc.getEoscDatasourceMap();
 
 		for (String ds : datasources.collectAsList()) {
-			final String dsId = ds.substring(3);
-			if (!dsm.containsKey(dsId)) {
+			// final String dsId = ds.substring(3);
+			if (!dsm.containsKey(ds)) {
 				ArrayList<Pair<String, SelectionConstraints>> eoscList = new ArrayList<>();
-				dsm.put(dsId, eoscList);
+				dsm.put(ds, eoscList);
 			}
 		}
 
@@ -141,22 +130,30 @@ public class SparkBulkTagJob {
 		String inputPath,
 		String outputPath,
 		ProtoMap protoMappingParams,
-		Class<R> resultClazz,
 		CommunityConfiguration communityConfiguration) {
 
-		ResultTagger resultTagger = new ResultTagger();
-		readPath(spark, inputPath, resultClazz)
-			.map(patchResult(), Encoders.bean(resultClazz))
-			.filter(Objects::nonNull)
-			.map(
-				(MapFunction<R, R>) value -> resultTagger
-					.enrichContextCriteria(
-						value, communityConfiguration, protoMappingParams),
-				Encoders.bean(resultClazz))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(outputPath);
+		ModelSupport.entityTypes
+			.keySet()
+			.parallelStream()
+			.filter(ModelSupport::isResult)
+			.forEach(e -> {
+				removeOutputDir(spark, outputPath + e.name());
+				ResultTagger resultTagger = new ResultTagger();
+				Class<R> resultClazz = ModelSupport.entityTypes.get(e);
+				readPath(spark, inputPath + e.name(), resultClazz)
+					.map(patchResult(), Encoders.bean(resultClazz))
+					.filter(Objects::nonNull)
+					.map(
+						(MapFunction<R, R>) value -> resultTagger
+							.enrichContextCriteria(
+								value, communityConfiguration, protoMappingParams),
+						Encoders.bean(resultClazz))
+					.write()
+					.mode(SaveMode.Overwrite)
+					.option("compression", "gzip")
+					.json(outputPath + e.name());
+			});
+
 	}
 
 	public static <R> Dataset<R> readPath(
@@ -170,10 +167,12 @@ public class SparkBulkTagJob {
 	// TODO remove this hack as soon as the values fixed by this method will be provided as NON null
 	private static <R extends Result> MapFunction<R, R> patchResult() {
 		return r -> {
-			if (r.getDataInfo().getDeletedbyinference() == null) {
+			if (Objects.isNull(r.getDataInfo())) {
+				r.setDataInfo(OafMapperUtils.dataInfo(false, "", false, false, OafMapperUtils.unknown("", ""), ""));
+			} else if (r.getDataInfo().getDeletedbyinference() == null) {
 				r.getDataInfo().setDeletedbyinference(false);
 			}
-			if (r.getContext() == null) {
+			if (Objects.isNull(r.getContext())) {
 				r.setContext(new ArrayList<>());
 			}
 			return r;

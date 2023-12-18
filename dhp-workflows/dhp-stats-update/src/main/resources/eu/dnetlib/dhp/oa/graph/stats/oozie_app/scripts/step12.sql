@@ -1,21 +1,31 @@
 ------------------------------------------------------------------------------------------------------
 -- Creating parquet tables from the updated temporary tables and removing unnecessary temporary tables
 ------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS ${stats_db_name}.datasource purge;
+
 CREATE TABLE ${stats_db_name}.datasource stored AS parquet AS
 SELECT *
 FROM ${stats_db_name}.datasource_tmp;
+
+DROP TABLE IF EXISTS ${stats_db_name}.publication purge;
 
 CREATE TABLE ${stats_db_name}.publication stored AS parquet AS
 SELECT *
 FROM ${stats_db_name}.publication_tmp;
 
+DROP TABLE IF EXISTS ${stats_db_name}.dataset purge;
+
 CREATE TABLE ${stats_db_name}.dataset stored AS parquet AS
 SELECT *
 FROM ${stats_db_name}.dataset_tmp;
 
+DROP TABLE IF EXISTS ${stats_db_name}.software purge;
+
 CREATE TABLE ${stats_db_name}.software stored AS parquet AS
 SELECT *
 FROM ${stats_db_name}.software_tmp;
+
+DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct purge;
 
 CREATE TABLE ${stats_db_name}.otherresearchproduct stored AS parquet AS
 SELECT *

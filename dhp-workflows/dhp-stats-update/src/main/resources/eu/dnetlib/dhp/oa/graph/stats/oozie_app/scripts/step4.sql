@@ -5,6 +5,7 @@
 --------------------------------------------------------
 
 -- Software temporary table supporting updates
+DROP TABLE IF EXISTS ${stats_db_name}.software_tmp purge;
 CREATE TABLE ${stats_db_name}.software_tmp
 (
     id               STRING,
@@ -40,12 +41,16 @@ SELECT substr(s.id, 4)                                            as id,
 from ${openaire_db_name}.software s
 where s.datainfo.deletedbyinference = false and s.datainfo.invisible=false;
 
+DROP TABLE IF EXISTS ${stats_db_name}.software_citations purge;
+
 CREATE TABLE ${stats_db_name}.software_citations STORED AS PARQUET AS
 SELECT substr(s.id, 4) as id, xpath_string(citation.value, "//citation/id[@type='openaire']/@value") AS cites
 FROM ${openaire_db_name}.software s
          LATERAL VIEW explode(s.extrainfo) citations as citation
 where xpath_string(citation.value, "//citation/id[@type='openaire']/@value") != ""
   and s.datainfo.deletedbyinference = false and s.datainfo.invisible=false;
+
+DROP TABLE IF EXISTS ${stats_db_name}.software_classifications purge;
 
 CREATE TABLE ${stats_db_name}.software_classifications STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, instancetype.classname AS type
@@ -62,6 +67,8 @@ FROM ${openaire_db_name}.software p
          LATERAL VIEW explode(p.context) contexts AS context
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
 
+DROP TABLE IF EXISTS ${stats_db_name}.software_datasources purge;
+
 CREATE TABLE ${stats_db_name}.software_datasources STORED AS PARQUET AS
 SELECT p.id, CASE WHEN d.id IS NULL THEN 'other' ELSE p.datasource end as datasource
 FROM (
@@ -74,10 +81,14 @@ FROM (
     FROM ${openaire_db_name}.datasource d
     WHERE d.datainfo.deletedbyinference = false and d.datainfo.invisible=false) d ON p.datasource = d.id;
 
+DROP TABLE IF EXISTS ${stats_db_name}.software_languages purge;
+
 CREATE TABLE ${stats_db_name}.software_languages STORED AS PARQUET AS
 select substr(p.id, 4) AS id, p.language.classname AS language
 FROM ${openaire_db_name}.software p
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
+
+DROP TABLE IF EXISTS ${stats_db_name}.software_oids purge;
 
 CREATE TABLE ${stats_db_name}.software_oids STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, oids.ids AS oid
@@ -85,11 +96,15 @@ FROM ${openaire_db_name}.software p
          LATERAL VIEW explode(p.originalid) oids AS ids
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
 
+DROP TABLE IF EXISTS ${stats_db_name}.software_pids purge;
+
 CREATE TABLE ${stats_db_name}.software_pids STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, ppid.qualifier.classname AS type, ppid.value AS pid
 FROM ${openaire_db_name}.software p
          LATERAL VIEW explode(p.pid) pids AS ppid
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
+
+DROP TABLE IF EXISTS ${stats_db_name}.software_topics purge;
 
 CREATE TABLE ${stats_db_name}.software_topics STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, subjects.subject.qualifier.classname AS type, subjects.subject.value AS topic
