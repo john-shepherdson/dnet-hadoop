@@ -120,7 +120,7 @@
         <switch>
             <case to="bulk_tagging">${wf:conf('resumeFrom') eq 'BulkTagging'}</case>
             <case to="affiliation_inst_repo">${wf:conf('resumeFrom') eq 'AffiliationInstitutionalRepository'}</case>
-            <case to="affiliation_semantic_relation">${wf:conf('resumeFrom') eq 'AffiliationSemanticRelation'}</case>
+            <case to="entity_semantic_relation">${wf:conf('resumeFrom') eq 'AffiliationSemanticRelation'}</case>
             <case to="community_organization">${wf:conf('resumeFrom') eq 'CommunityOrganization'}</case>
             <case to="result_project">${wf:conf('resumeFrom') eq 'ResultProject'}</case>
             <case to="community_project">${wf:conf('resumeFrom') eq 'CommunityProject'}</case>

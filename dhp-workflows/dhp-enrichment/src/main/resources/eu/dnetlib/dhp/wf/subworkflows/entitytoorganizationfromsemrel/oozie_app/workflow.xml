@@ -29,7 +29,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>PrepareResultOrganizationAssociation</name>
+            <name>PrepareResultProjectOrganizationAssociation</name>
             <class>eu.dnetlib.dhp.entitytoorganizationfromsemrel.PrepareInfo</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
@@ -57,8 +57,8 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>resultToOrganizationFromSemRel</name>
-            <class>eu.dnetlib.dhp.entitytoorganizationfromsemrel.SparkResultToOrganizationFromSemRel</class>
+            <name>entityToOrganizationFromSemRel</name>
+            <class>eu.dnetlib.dhp.entitytoorganizationfromsemrel.SparkEntityToOrganizationFromSemRel</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}

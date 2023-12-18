@@ -162,7 +162,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>resultToOrganizationFromSemRel</name>
-            <class>eu.dnetlib.dhp.entitytoorganizationfromsemrel.SparkResultToOrganizationFromSemRel</class>
+            <class>eu.dnetlib.dhp.entitytoorganizationfromsemrel.SparkEntityToOrganizationFromSemRel</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}

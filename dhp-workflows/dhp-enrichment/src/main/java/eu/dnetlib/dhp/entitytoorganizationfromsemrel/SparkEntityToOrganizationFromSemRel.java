@@ -27,8 +27,8 @@ import eu.dnetlib.dhp.resulttoorganizationfrominstrepo.SparkResultToOrganization
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
-public class SparkResultToOrganizationFromSemRel implements Serializable {
-	private static final Logger log = LoggerFactory.getLogger(SparkResultToOrganizationFromSemRel.class);
+public class SparkEntityToOrganizationFromSemRel implements Serializable {
+	private static final Logger log = LoggerFactory.getLogger(SparkEntityToOrganizationFromSemRel.class);
 	private static final int MAX_ITERATION = 5;
 	public static final String NEW_RESULT_RELATION_PATH = "/newResultRelation";
 	public static final String NEW_PROJECT_RELATION_PATH = "/newProjectRelation";
