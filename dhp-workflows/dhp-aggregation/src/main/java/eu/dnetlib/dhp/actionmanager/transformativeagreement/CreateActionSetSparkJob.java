@@ -102,20 +102,21 @@ public class CreateActionSetSparkJob implements Serializable {
 
 		List<Relation> relationList = new ArrayList<>();
 
-		String paper;
+		if(value.getAgreement().startsWith("IReL")) {
+			String paper;
 
-		paper = "50|doi_________::"
-			+ IdentifierFactory
-				.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), value.getDoi()));
+			paper = "50|doi_________::"
+					+ IdentifierFactory
+					.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), value.getDoi()));
 
-		relationList
-			.add(
-				getRelation(
-					paper,
-					IREL_PROJECT, ModelConstants.IS_PRODUCED_BY));
+			relationList
+					.add(
+							getRelation(
+									paper,
+									IREL_PROJECT, ModelConstants.IS_PRODUCED_BY));
 
-		relationList.add(getRelation(IREL_PROJECT, paper, ModelConstants.PRODUCES));
-
+			relationList.add(getRelation(IREL_PROJECT, paper, ModelConstants.PRODUCES));
+		}
 		return relationList;
 	}
 
