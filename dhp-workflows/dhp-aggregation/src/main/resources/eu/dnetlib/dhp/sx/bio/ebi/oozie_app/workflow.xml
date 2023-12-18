@@ -9,34 +9,26 @@
             <description>the Working Path</description>
         </property>
         <property>
-            <name>targetPath</name>
-            <description>the OAF MDStore Path</description>
+            <name>mdStoreOutputId</name>
+            <description>the identifier of the cleaned MDStore</description>
         </property>
         <property>
-            <name>sparkDriverMemory</name>
-            <description>memory for driver process</description>
-        </property>
-        <property>
-            <name>sparkExecutorMemory</name>
-            <description>memory for individual executor</description>
-        </property>
-        <property>
-            <name>sparkExecutorCores</name>
-            <description>number of cores used by single executor</description>
+            <name>mdStoreManagerURI</name>
+            <description>the path of the cleaned mdstore</description>
         </property>
         <property>
             <name>resumeFrom</name>
-            <value>DownloadEBILinks</value>
+            <value>CreateEBIDataSet</value>
             <description>node to start</description>
         </property>
     </parameters>
 
-    <start to="resume_from"/>
+    <start to="StartTransaction"/>
 
     <decision name="resume_from">
         <switch>
             <case to="DownloadEBILinks">${wf:conf('resumeFrom') eq 'DownloadEBILinks'}</case>
-            <case to="CreateEBIDataSet">${wf:conf('resumeFrom') eq 'CreateEBIDataSet'}</case>
+            <case to="StartTransaction">${wf:conf('resumeFrom') eq 'CreateEBIDataSet'}</case>
             <default to="DownloadEBILinks"/>
         </switch>
     </decision>
@@ -77,9 +69,29 @@
             <move source="${sourcePath}/ebi_links_dataset" target="${sourcePath}/ebi_links_dataset_old"/>
             <move source="${workingPath}/links_final" target="${sourcePath}/ebi_links_dataset"/>
         </fs>
-        <ok to="CreateEBIDataSet"/>
+        <ok to="StartTransaction"/>
         <error to="Kill"/>
     </action>
+
+    <action name="StartTransaction">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>NEW_VERSION</arg>
+            <arg>--mdStoreID</arg><arg>${mdStoreOutputId}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <capture-output/>
+        </java>
+        <ok to="CreateEBIDataSet"/>
+        <error to="RollBack"/>
+    </action>
+
+
     <action name="CreateEBIDataSet">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn-cluster</master>
@@ -95,11 +107,49 @@
                 ${sparkExtraOPT}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/ebi_links_dataset</arg>
-            <arg>--targetPath</arg><arg>${targetPath}</arg>
+            <arg>--mdstoreOutputVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
             <arg>--master</arg><arg>yarn</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
+
+
+    <action name="CommitVersion">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>COMMIT</arg>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="RollBack">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>ROLLBACK</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
+        <ok to="Kill"/>
+        <error to="Kill"/>
+    </action>
+
     <end name="End"/>
+
 </workflow-app>

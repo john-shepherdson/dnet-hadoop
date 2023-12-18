@@ -9,6 +9,9 @@ import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
+import eu.dnetlib.dhp.common.Constants.{MDSTORE_DATA_PATH, MDSTORE_SIZE_PATH}
+import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion
+import eu.dnetlib.dhp.utils.DHPUtils.{MAPPER, writeHdfsFile}
 
 object SparkEBILinksToOaf {
 
@@ -32,8 +35,13 @@ object SparkEBILinksToOaf {
     import spark.implicits._
     val sourcePath = parser.get("sourcePath")
     log.info(s"sourcePath  -> $sourcePath")
-    val targetPath = parser.get("targetPath")
-    log.info(s"targetPath  -> $targetPath")
+    val mdstoreOutputVersion = parser.get("mdstoreOutputVersion")
+    log.info("mdstoreOutputVersion: {}", mdstoreOutputVersion)
+
+    val cleanedMdStoreVersion = MAPPER.readValue(mdstoreOutputVersion, classOf[MDStoreVersion])
+    val outputBasePath = cleanedMdStoreVersion.getHdfsPath
+    log.info("outputBasePath: {}", outputBasePath)
+
     implicit val PMEncoder: Encoder[Oaf] = Encoders.kryo(classOf[Oaf])
 
     val ebLinks: Dataset[EBILinkItem] = spark.read
@@ -46,7 +54,10 @@ object SparkEBILinksToOaf {
         .flatMap(j => BioDBToOAF.parse_ebi_links(j.links))
         .filter(p => BioDBToOAF.EBITargetLinksFilter(p))
         .flatMap(p => BioDBToOAF.convertEBILinksToOaf(p)),
-      targetPath
+      s"$outputBasePath/$MDSTORE_DATA_PATH"
     )
+    val df = spark.read.text(s"$outputBasePath/$MDSTORE_DATA_PATH")
+    val mdStoreSize = df.count
+    writeHdfsFile(spark.sparkContext.hadoopConfiguration, s"$mdStoreSize", s"$outputBasePath/$MDSTORE_SIZE_PATH")
   }
 }

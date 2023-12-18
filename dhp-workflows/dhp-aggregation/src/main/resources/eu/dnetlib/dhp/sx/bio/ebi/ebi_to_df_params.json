@@ -1,5 +1,20 @@
 [
-  {"paramName":"mt",  "paramLongName":"master",     "paramDescription": "should be local or yarn",                  "paramRequired": true},
-  {"paramName":"s",   "paramLongName":"sourcePath","paramDescription": "the source Path",                              "paramRequired": true},
-  {"paramName":"t",   "paramLongName":"targetPath","paramDescription": "the  oaf path ",  "paramRequired": true}
+  {
+    "paramName": "mt",
+    "paramLongName": "master",
+    "paramDescription": "should be local or yarn",
+    "paramRequired": true
+  },
+  {
+    "paramName": "s",
+    "paramLongName": "sourcePath",
+    "paramDescription": "the source Path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "mo",
+    "paramLongName": "mdstoreOutputVersion",
+    "paramDescription": "the oaf path ",
+    "paramRequired": true
+  }
 ]
