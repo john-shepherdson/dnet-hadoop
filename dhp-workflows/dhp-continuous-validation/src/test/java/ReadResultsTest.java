@@ -1,13 +1,11 @@
+import com.google.gson.Gson;
+import eu.dnetlib.dhp.continuous_validator.ContinuousValidator;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.List;
-
-import org.slf4j.LoggerFactory;
-
-import com.google.gson.Gson;
-
-import eu.dnetlib.dhp.continuous_validator.ContinuousValidator;
 
 public class ReadResultsTest {
 

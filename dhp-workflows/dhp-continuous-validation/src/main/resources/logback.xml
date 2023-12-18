@@ -33,6 +33,7 @@
             <appender-ref ref="Console" />
         </root>
 
+        <!-- TODO - Change the level below to "debug" -->
         <logger name="eu.dnetlib.dhp.continuous_validator" level="trace"/>
         <logger name="eu.dnetlib.validator2" level="error"/>
         <logger name="org.sparkproject" level="info"/>

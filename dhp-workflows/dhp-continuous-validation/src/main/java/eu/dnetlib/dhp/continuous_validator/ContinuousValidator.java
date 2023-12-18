@@ -1,34 +1,26 @@
 
 package eu.dnetlib.dhp.continuous_validator;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.validator2.validation.XMLApplicationProfile;
+import eu.dnetlib.validator2.validation.guideline.openaire.*;
+import eu.dnetlib.validator2.validation.utils.TestUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.SaveMode;
+import org.slf4j.LoggerFactory;
+import scala.Option;
 
-import java.io.BufferedWriter;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.jws.WebParam;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.spark.SparkConf;
-import org.apache.spark.SparkContext;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.*;
-import org.slf4j.LoggerFactory;
-
-import com.google.gson.Gson;
-
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.validator2.validation.XMLApplicationProfile;
-import eu.dnetlib.validator2.validation.guideline.openaire.AbstractOpenAireProfile;
-import eu.dnetlib.validator2.validation.guideline.openaire.LiteratureGuidelinesV4Profile;
-import eu.dnetlib.validator2.validation.utils.TestUtils;
-import scala.Option;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 public class ContinuousValidator {
 
@@ -80,9 +72,9 @@ public class ContinuousValidator {
 				return;
 			}
 
-			guidelines = parser.get("guidelines");
+			guidelines = parser.get("openaire_guidelines");
 			if (guidelines == null) {
-				logger.error("The \"guidelines\" was not retrieved from the parameters file: " + parametersFile);
+				logger.error("The \"openaire_guidelines\" was not retrieved from the parameters file: " + parametersFile);
 				return;
 			}
 
@@ -115,7 +107,27 @@ public class ContinuousValidator {
 				"Will validate the contents of parquetFile: \"" + parquet_file_path + "\", against guidelines: \""
 					+ guidelines + "\"" + " and will output the results in: " + outputPath + RESULTS_FILE_NAME);
 
-		AbstractOpenAireProfile profile = new LiteratureGuidelinesV4Profile();
+		AbstractOpenAireProfile profile;
+		switch (guidelines) {
+			case "4.0":
+				profile = new LiteratureGuidelinesV4Profile();
+				break;
+			case "3.0":
+				profile = new LiteratureGuidelinesV3Profile();
+				break;
+			case "2.0":
+				profile = new DataArchiveGuidelinesV2Profile();
+				break;
+			case "fair_data":
+				profile = new FAIR_Data_GuidelinesProfile();
+				break;
+			case "fair_literature_v4":
+				profile = new FAIR_Literature_GuidelinesV4Profile();
+				break;
+			default:
+				logger.error("Invalid OpenAIRE Guidelines were given: " + guidelines);
+				return;
+		}
 
 		SparkConf conf = new SparkConf();
 		conf.setAppName(ContinuousValidator.class.getSimpleName());
@@ -146,8 +158,10 @@ public class ContinuousValidator {
 			Dataset<XMLApplicationProfile.ValidationResult> validationResultsDataset = parquetFileDF
 				.map(validateMapFunction, Encoders.bean(XMLApplicationProfile.ValidationResult.class));
 
-			logger.info("Showing a few validation-results.. just for checking");
-			validationResultsDataset.show(5);
+			if (logger.isTraceEnabled()) {
+				logger.trace("Showing a few validation-results.. just for checking");
+				validationResultsDataset.show(5);
+			}
 
 			// Write the results to json file immediately, without converting them to a list.
 			validationResultsDataset
@@ -155,9 +169,9 @@ public class ContinuousValidator {
 				.option("compression", "gzip")
 				.mode(SaveMode.Overwrite)
 				.json(finalOutputPath + RESULTS_FILE_NAME); // The filename should be the name of the input-file or the
-														// input-directory.
+			// input-directory.
 
-			if (logger.isDebugEnabled()) {
+			if (logger.isTraceEnabled()) {
 				List<XMLApplicationProfile.ValidationResult> validationResultsList = validationResultsDataset
 					.javaRDD()
 					.collect();
@@ -167,9 +181,9 @@ public class ContinuousValidator {
 					return;
 				}
 
-				validationResultsList.forEach(vr -> logger.debug(vr.id() + " | score:" + vr.score()));
+				validationResultsList.forEach(vr -> logger.trace(vr.id() + " | score:" + vr.score()));
 				for (XMLApplicationProfile.ValidationResult result : validationResultsList)
-					logger.debug(result.toString());
+					logger.trace(result.toString());
 			}
 
 			// TODO - REMOVE THIS WHEN THE WRITE FROM ABOVE IS OK
@@ -180,6 +194,7 @@ public class ContinuousValidator {
 			 * outputPath + RESULTS_FILE); return; }
 			 */
 
+			// TODO - Maybe the following section is not needed, when ran as an oozie workflow..
 			Option<String> uiWebUrl = spark.sparkContext().uiWebUrl();
 			if (uiWebUrl.isDefined()) {
 				logger
