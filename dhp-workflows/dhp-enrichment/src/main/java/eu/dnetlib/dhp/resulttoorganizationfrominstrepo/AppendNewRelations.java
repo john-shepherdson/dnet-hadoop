@@ -2,26 +2,19 @@
 package eu.dnetlib.dhp.resulttoorganizationfrominstrepo;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
-import java.util.Objects;
-import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.bulktag.community.ResultTagger;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Result;
 
 /**
  * @author miriam.baglioni
@@ -54,7 +47,7 @@ public class AppendNewRelations implements Serializable {
 
 		SparkConf conf = new SparkConf();
 
-		runWithSparkHiveSession(
+		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> appendNewRelation(spark, inputPath, outputPath));

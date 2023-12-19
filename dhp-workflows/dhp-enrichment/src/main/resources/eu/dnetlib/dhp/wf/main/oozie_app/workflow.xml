@@ -195,19 +195,23 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="affiliation_semantic_relation" />
+        <ok to="entity_semantic_relation" />
         <error to="Kill" />
     </action>
 
-    <action name="affiliation_semantic_relation">
+    <action name="entity_semantic_relation">
         <sub-workflow>
-            <app-path>${wf:appPath()}/affiliation_semantic_relation
+            <app-path>${wf:appPath()}/entity_semantic_relation
             </app-path>
             <propagate-configuration/>
             <configuration>
                 <property>
                     <name>sourcePath</name>
                     <value>${outputPath}</value>
+                </property>
+                <property>
+                    <name>iterations</name>
+                    <value>${iterations}</value>
                 </property>
             </configuration>
         </sub-workflow>

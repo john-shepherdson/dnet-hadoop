@@ -1,0 +1,20 @@
+[
+  {
+    "paramName":"s",
+    "paramLongName":"sourcePath",
+    "paramDescription": "the path of the sequencial file to read",
+    "paramRequired": true
+  },
+
+  {
+    "paramName": "ssm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "the path where prepared info have been stored",
+    "paramRequired": false
+  },{
+  "paramName": "o",
+  "paramLongName": "outputPath",
+  "paramDescription": "institutional repositories that should not be considered for the propagation",
+  "paramRequired": false
+}
+]
