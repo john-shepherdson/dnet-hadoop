@@ -21,11 +21,20 @@
         </configuration>
     </global>
 
-    <start to="prepare_result_organization_association"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
+    <action name="reset_outputpath">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="prepare_result_organization_association"/>
+        <error to="Kill"/>
+    </action>
 
 
     <action name="prepare_result_organization_association">
@@ -79,7 +88,7 @@
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/affiliationinstrepo/publication/relation</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/affiliationInstRepo/publication/relation</arg>
             <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/datasourceOrganization</arg>
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/alreadyLinked</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
@@ -108,7 +117,7 @@
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/affiliationinstrepo/dataset/relation</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/affiliationInstRepo/dataset/relation</arg>
             <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/datasourceOrganization</arg>
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/alreadyLinked</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
@@ -137,7 +146,7 @@
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/affiliationinstrepo/otherresearchproduct/relation</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/affiliationInstRepo/otherresearchproduct/relation</arg>
             <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/datasourceOrganization</arg>
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/alreadyLinked</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
@@ -166,7 +175,7 @@
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/affiliationinstrepo/software/relation</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/affiliationInstRepo/software/relation</arg>
             <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/datasourceOrganization</arg>
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/alreadyLinked</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
@@ -197,7 +206,7 @@
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--outputPath</arg><arg>${sourcePath}/relation</arg>
-            <arg>--sourcePath</arg><arg>${workingDir}/affiliationinstrepo/</arg>
+            <arg>--sourcePath</arg><arg>${workingDir}/affiliationInstRepo/</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

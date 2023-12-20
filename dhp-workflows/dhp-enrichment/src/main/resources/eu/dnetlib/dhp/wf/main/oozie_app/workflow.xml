@@ -30,10 +30,6 @@
             <description>the output path</description>
         </property>
         <property>
-            <name>organizationtoresultcommunitymap</name>
-            <description>organization community map</description>
-        </property>
-        <property>
             <name>pathMap</name>
             <description>the json path associated to each selection field</description>
         </property>
@@ -315,7 +311,7 @@
                 </property>
                 <property>
                     <name>allowedtypes</name>
-                    <value>${allowedtupes}</value>
+                    <value>${allowedtypes}</value>
                 </property>
             </configuration>
         </sub-workflow>

@@ -22,13 +22,21 @@
         </configuration>
     </global>
 
-    <start to="prepare_project_results_association"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    
+    <action name="reset_outputpath">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="prepare_project_results_association"/>
+        <error to="Kill"/>
+    </action>
+
     <action name="prepare_project_results_association">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>

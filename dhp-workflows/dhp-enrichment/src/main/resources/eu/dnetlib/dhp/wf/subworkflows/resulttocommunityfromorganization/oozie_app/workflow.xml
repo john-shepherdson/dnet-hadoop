@@ -21,11 +21,20 @@
         </configuration>
     </global>
 
-    <start to="prepare_result_communitylist"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
+    <action name="reset_outputpath">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="prepare_result_communitylist"/>
+        <error to="Kill"/>
+    </action>
 
     <action name="prepare_result_communitylist">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -75,9 +84,9 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
-            <arg>--preparedInfoPath</arg><arg>${workingDir}/preparedInfo/resultCommunityList</arg>
+            <arg>--preparedInfoPath</arg><arg>${workingDir}/communityorganization/preparedInfo/resultCommunityList</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/resulttocommunityfromorganization/</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/communityorganization/resulttocommunityfromorganization/</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

@@ -18,12 +18,20 @@
         </configuration>
     </global>
 
-    <start to="prepare_info"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
+    <action name="reset_outputpath">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="prepare_info"/>
+        <error to="Kill"/>
+    </action>
 
     <action name="prepare_info">
         <spark xmlns="uri:oozie:spark-action:0.2">

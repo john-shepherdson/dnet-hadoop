@@ -25,12 +25,20 @@
         </configuration>
     </global>
 
-    <start to="prepare_datasource_country_association"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
+    <action name="reset_outputpath">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="prepare_datasource_country_association"/>
+        <error to="Kill"/>
+    </action>
 
 
     <action name="prepare_datasource_country_association">

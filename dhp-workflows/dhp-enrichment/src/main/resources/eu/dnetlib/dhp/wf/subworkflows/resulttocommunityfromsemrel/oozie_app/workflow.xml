@@ -18,13 +18,20 @@
         </property>
     </parameters>
 
-    <start to="fork_prepare_assoc_step1"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-
+    <action name="reset_outputpath">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="fork_prepare_assoc_step1"/>
+        <error to="Kill"/>
+    </action>
 
     <fork name="fork_prepare_assoc_step1">
         <path start="join_prepare_publication"/>
@@ -41,8 +48,10 @@
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep1</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=6
+                --executor-memory=5G
+                --conf spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -70,8 +79,10 @@
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep1</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=6
+                --executor-memory=5G
+                --conf spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -99,8 +110,10 @@
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep1</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=6
+                --executor-memory=5G
+                --conf spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -128,8 +141,10 @@
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep1</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=6
+                --executor-memory=5G
+                --conf spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -159,8 +174,10 @@
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.PrepareResultCommunitySetStep2</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=6
+                --executor-memory=5G
+                --conf spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -191,8 +208,10 @@
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=6
+                --executor-memory=5G
+                --conf spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -220,8 +239,10 @@
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=6
+                --executor-memory=5G
+                --conf spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -249,8 +270,10 @@
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=6
+                --executor-memory=5G
+                --conf spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -278,8 +301,10 @@
             <class>eu.dnetlib.dhp.resulttocommunityfromsemrel.SparkResultToCommunityThroughSemRelJob</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCores}
-                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=6
+                --executor-memory=5G
+                --conf spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -295,10 +320,11 @@
             <arg>--outputPath</arg><arg>${workingDir}/communitysemrel/software</arg>
 
         </spark>
-        <ok to="End"/>
+        <ok to="wait2"/>
         <error to="Kill"/>
     </action>
 
+    <join name="wait2" to="End"/>
 
     <end name="End"/>
 

@@ -26,12 +26,20 @@
         </configuration>
     </global>
 
-    <start to="exec_bulktag"/>
+    <start to="reset_outputpath"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
+    <action name="reset_outputpath">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="exec_bulktag"/>
+        <error to="Kill"/>
+    </action>
 
     <action name="exec_bulktag">
         <spark xmlns="uri:oozie:spark-action:0.2">
