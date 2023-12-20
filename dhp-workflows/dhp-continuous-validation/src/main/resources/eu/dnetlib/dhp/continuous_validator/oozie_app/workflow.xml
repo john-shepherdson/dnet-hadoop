@@ -13,7 +13,7 @@
         <property>
             <name>outputPath</name>
             <value>.</value>
-            <description>the (float) version of the OpenAIRE Guidelines to validate the records against</description>
+            <description>the path of the output-directory where the result-json-files will be stored</description>
         </property>
         <property>
             <name>sparkDriverMemory</name>

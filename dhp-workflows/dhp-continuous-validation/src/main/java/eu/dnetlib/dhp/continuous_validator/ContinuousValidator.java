@@ -100,9 +100,10 @@ public class ContinuousValidator {
 			parquet_file_path = args[1];
 			guidelines = args[2];
 			outputPath = args[3];
-			if (!outputPath.endsWith("/"))
-				outputPath += "/";
 		}
+
+		if (!outputPath.endsWith("/"))
+			outputPath += "/";
 
 		logger
 			.info(
@@ -149,7 +150,7 @@ public class ContinuousValidator {
 			spark
 				.read()
 				.parquet(finalParquet_file_path)
-				.filter("encoding = 'XML' and id != NULL and body != null")
+				.filter("encoding = 'XML' and id is not NULL and body is not NULL")
 				.map(validateMapFunction, Encoders.bean(XMLApplicationProfile.ValidationResult.class))
 				.write()
 				.option("compression", "gzip")
