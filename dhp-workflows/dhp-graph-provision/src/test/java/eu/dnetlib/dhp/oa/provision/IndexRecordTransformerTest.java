@@ -82,7 +82,7 @@ public class IndexRecordTransformerTest {
 	void testPeerReviewed() throws IOException, TransformerException {
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-				XmlConverterJob.schemaLocation);
+			XmlConverterJob.schemaLocation);
 
 		final Publication p = load("publication.json", Publication.class);
 
