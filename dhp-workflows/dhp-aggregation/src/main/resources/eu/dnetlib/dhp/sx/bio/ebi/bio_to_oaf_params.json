@@ -2,5 +2,5 @@
   {"paramName":"mt",  "paramLongName":"master",       "paramDescription": "should be local or yarn",                  "paramRequired": true},
   {"paramName":"db",  "paramLongName":"database",     "paramDescription": "should be PDB or UNIPROT",                 "paramRequired": true},
   {"paramName":"p",   "paramLongName":"dbPath",       "paramDescription": "the path of the database to transform",    "paramRequired": true},
-  {"paramName":"t",   "paramLongName":"targetPath",   "paramDescription": "the OAF target path ",                     "paramRequired": true}
+  {"paramName":"mo",   "paramLongName":"mdstoreOutputVersion",     "paramDescription": "the oaf path ",                "paramRequired": true}
 ]

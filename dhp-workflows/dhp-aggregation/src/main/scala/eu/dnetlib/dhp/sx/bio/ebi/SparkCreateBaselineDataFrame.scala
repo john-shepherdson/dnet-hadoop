@@ -2,9 +2,12 @@ package eu.dnetlib.dhp.sx.bio.ebi
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.collection.CollectionUtils
+import eu.dnetlib.dhp.common.Constants.{MDSTORE_DATA_PATH, MDSTORE_SIZE_PATH}
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
+import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Result}
 import eu.dnetlib.dhp.sx.bio.pubmed._
+import eu.dnetlib.dhp.utils.DHPUtils.{MAPPER, writeHdfsFile}
 import eu.dnetlib.dhp.utils.ISLookupClientFactory
 import org.apache.commons.io.IOUtils
 import org.apache.hadoop.conf.Configuration
@@ -164,11 +167,15 @@ object SparkCreateBaselineDataFrame {
     val workingPath = parser.get("workingPath")
     log.info("workingPath: {}", workingPath)
 
-    val targetPath = parser.get("targetPath")
-    log.info("targetPath: {}", targetPath)
+    val mdstoreOutputVersion = parser.get("mdstoreOutputVersion")
+    log.info("mdstoreOutputVersion: {}", mdstoreOutputVersion)
+
+    val cleanedMdStoreVersion = MAPPER.readValue(mdstoreOutputVersion, classOf[MDStoreVersion])
+    val outputBasePath = cleanedMdStoreVersion.getHdfsPath
+    log.info("outputBasePath: {}", outputBasePath)
 
     val hdfsServerUri = parser.get("hdfsServerUri")
-    log.info("hdfsServerUri: {}", targetPath)
+    log.info("hdfsServerUri: {}", hdfsServerUri)
 
     val skipUpdate = parser.get("skipUpdate")
     log.info("skipUpdate: {}", skipUpdate)
@@ -216,8 +223,11 @@ object SparkCreateBaselineDataFrame {
         .map(a => PubMedToOaf.convert(a, vocabularies))
         .as[Oaf]
         .filter(p => p != null),
-      targetPath
+      s"$outputBasePath/$MDSTORE_DATA_PATH"
     )
 
+    val df = spark.read.text(s"$outputBasePath/$MDSTORE_DATA_PATH")
+    val mdStoreSize = df.count
+    writeHdfsFile(spark.sparkContext.hadoopConfiguration, s"$mdStoreSize", s"$outputBasePath/$MDSTORE_SIZE_PATH")
   }
 }
