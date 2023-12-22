@@ -40,7 +40,7 @@ public class PrepareResultInstRepoAssociation {
 			.toString(
 				PrepareResultInstRepoAssociation.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/input_prepareresultorg_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/resulttoorganizationfrominstrepo/input_prepareresultorg_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 

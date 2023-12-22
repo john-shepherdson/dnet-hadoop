@@ -30,7 +30,7 @@ public class AppendNewRelations implements Serializable {
 			.toString(
 				AppendNewRelations.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/input_newrelation_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/resulttoorganizationfrominstrepo/input_newrelation_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
