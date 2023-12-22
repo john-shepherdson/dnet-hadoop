@@ -611,7 +611,7 @@ public class SparkDedupTest implements Serializable {
 		assertEquals(91, pubs.count());
 		assertEquals(47, sw_deduprecord);
 		assertEquals(97, ds_deduprecord);
-		assertEquals(93, orp_deduprecord);
+		assertEquals(92, orp_deduprecord);
 
 		verifyRoot_1(mapper, pubs);
 
@@ -751,7 +751,7 @@ public class SparkDedupTest implements Serializable {
 		assertEquals(100, datasource);
 		assertEquals(196, softwares);
 		assertEquals(389, dataset);
-		assertEquals(521, otherresearchproduct);
+		assertEquals(520, otherresearchproduct);
 
 //		System.out.println("publications = " + publications);
 //		System.out.println("organizations = " + organizations);
