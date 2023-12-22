@@ -40,7 +40,7 @@ public class IdGenerator implements Serializable {
 		if (PidType.isValid(pidType)) {
 			return prefix + "|" + dedupify(ns) + "::" + suffix;
 		} else {
-			return prefix + "|dedup_wf_001::" + md5(originalId); // hash the whole originalId to avoid collisions
+			return prefix + "|dedup_wf_002::" + md5(originalId); // hash the whole originalId to avoid collisions
 		}
 	}
 
