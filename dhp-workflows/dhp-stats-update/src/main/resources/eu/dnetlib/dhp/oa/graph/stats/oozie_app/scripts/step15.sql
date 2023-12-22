@@ -8,31 +8,103 @@
 
 DROP TABLE IF EXISTS ${stats_db_name}.publication_refereed purge;
 
+--CREATE TABLE IF NOT EXISTS ${stats_db_name}.publication_refereed STORED AS PARQUET as
+--select substr(r.id, 4) as id, inst.refereed.classname as refereed
+--from ${openaire_db_name}.publication r lateral view explode(r.instance) instances as inst
+--where r.datainfo.deletedbyinference=false and r.datainfo.invisible = FALSE;
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.publication_refereed STORED AS PARQUET as
-select substr(r.id, 4) as id, inst.refereed.classname as refereed
-from ${openaire_db_name}.publication r lateral view explode(r.instance) instances as inst
-where r.datainfo.deletedbyinference=false and r.datainfo.invisible = FALSE;
+with peer_reviewed as
+(select distinct substr(r.id, 4) as id, inst.refereed.classname as refereed
+from ${openaire_db_name}.publication r lateral
+view explode(r.instance) instances as inst
+where r.datainfo.deletedbyinference=false and r.datainfo.invisible = FALSE
+and inst.refereed.classname='peerReviewed'),
+non_peer_reviewed as
+(select distinct substr(r.id, 4) as id, inst.refereed.classname as refereed
+from ${openaire_db_name}.publication r lateral
+view explode(r.instance) instances as inst
+where r.datainfo.deletedbyinference=false and r.datainfo.invisible = FALSE
+and inst.refereed.classname='nonPeerReviewed')
+select peer_reviewed.* from peer_reviewed
+union all
+select non_peer_reviewed.* from non_peer_reviewed
+left join peer_reviewed on peer_reviewed.id=non_peer_reviewed.id
+where peer_reviewed.id is null;
 
 DROP TABLE IF EXISTS ${stats_db_name}.dataset_refereed purge;
 
+--CREATE TABLE IF NOT EXISTS ${stats_db_name}.dataset_refereed STORED AS PARQUET as
+--select substr(r.id, 4) as id, inst.refereed.classname as refereed
+--from ${openaire_db_name}.dataset r lateral view explode(r.instance) instances as inst
+--where r.datainfo.deletedbyinference=false and r.datainfo.invisible = FALSE;
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.dataset_refereed STORED AS PARQUET as
-select substr(r.id, 4) as id, inst.refereed.classname as refereed
-from ${openaire_db_name}.dataset r lateral view explode(r.instance) instances as inst
-where r.datainfo.deletedbyinference=false and r.datainfo.invisible = FALSE;
+with peer_reviewed as
+(select distinct substr(r.id, 4) as id, inst.refereed.classname as refereed
+from ${openaire_db_name}.dataset r lateral
+view explode(r.instance) instances as inst
+where r.datainfo.deletedbyinference=false and r.datainfo.invisible = FALSE
+and inst.refereed.classname='peerReviewed'),
+non_peer_reviewed as
+(select distinct substr(r.id, 4) as id, inst.refereed.classname as refereed
+from ${openaire_db_name}.dataset r lateral
+view explode(r.instance) instances as inst
+where r.datainfo.deletedbyinference=false and r.datainfo.invisible = FALSE
+and inst.refereed.classname='nonPeerReviewed')
+select peer_reviewed.* from peer_reviewed
+union all
+select non_peer_reviewed.* from non_peer_reviewed
+left join peer_reviewed on peer_reviewed.id=non_peer_reviewed.id
+where peer_reviewed.id is null;
 
 DROP TABLE IF EXISTS ${stats_db_name}.software_refereed purge;
 
+--CREATE TABLE IF NOT EXISTS ${stats_db_name}.software_refereed STORED AS PARQUET as
+--select substr(r.id, 4) as id, inst.refereed.classname as refereed
+--from ${openaire_db_name}.software r lateral view explode(r.instance) instances as inst
+--where r.datainfo.deletedbyinference=false and r.datainfo.invisible = FALSE;
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.software_refereed STORED AS PARQUET as
-select substr(r.id, 4) as id, inst.refereed.classname as refereed
-from ${openaire_db_name}.software r lateral view explode(r.instance) instances as inst
-where r.datainfo.deletedbyinference=false and r.datainfo.invisible = FALSE;
+with peer_reviewed as
+(select distinct substr(r.id, 4) as id, inst.refereed.classname as refereed
+from ${openaire_db_name}.software r lateral
+view explode(r.instance) instances as inst
+where r.datainfo.deletedbyinference=false and r.datainfo.invisible = FALSE
+and inst.refereed.classname='peerReviewed'),
+non_peer_reviewed as
+(select distinct substr(r.id, 4) as id, inst.refereed.classname as refereed
+from ${openaire_db_name}.software r lateral
+view explode(r.instance) instances as inst
+where r.datainfo.deletedbyinference=false and r.datainfo.invisible = FALSE
+and inst.refereed.classname='nonPeerReviewed')
+select peer_reviewed.* from peer_reviewed
+union all
+select non_peer_reviewed.* from non_peer_reviewed
+left join peer_reviewed on peer_reviewed.id=non_peer_reviewed.id
+where peer_reviewed.id is null;
 
 DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_refereed purge;
 
+--CREATE TABLE IF NOT EXISTS ${stats_db_name}.otherresearchproduct_refereed STORED AS PARQUET as
+--select substr(r.id, 4) as id, inst.refereed.classname as refereed
+--from ${openaire_db_name}.otherresearchproduct r lateral view explode(r.instance) instances as inst
+--where r.datainfo.deletedbyinference=false and r.datainfo.invisible = FALSE;
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.otherresearchproduct_refereed STORED AS PARQUET as
-select substr(r.id, 4) as id, inst.refereed.classname as refereed
-from ${openaire_db_name}.otherresearchproduct r lateral view explode(r.instance) instances as inst
-where r.datainfo.deletedbyinference=false and r.datainfo.invisible = FALSE;
+with peer_reviewed as
+(select distinct substr(r.id, 4) as id, inst.refereed.classname as refereed
+from ${openaire_db_name}.otherresearchproduct r lateral
+view explode(r.instance) instances as inst
+where r.datainfo.deletedbyinference=false and r.datainfo.invisible = FALSE
+and inst.refereed.classname='peerReviewed'),
+non_peer_reviewed as
+(select distinct substr(r.id, 4) as id, inst.refereed.classname as refereed
+from ${openaire_db_name}.otherresearchproduct r lateral
+view explode(r.instance) instances as inst
+where r.datainfo.deletedbyinference=false and r.datainfo.invisible = FALSE
+and inst.refereed.classname='nonPeerReviewed')
+select peer_reviewed.* from peer_reviewed
+union all
+select non_peer_reviewed.* from non_peer_reviewed
+left join peer_reviewed on peer_reviewed.id=non_peer_reviewed.id
+where peer_reviewed.id is null;
 
 CREATE VIEW IF NOT EXISTS ${stats_db_name}.result_refereed as
 select * from ${stats_db_name}.publication_refereed

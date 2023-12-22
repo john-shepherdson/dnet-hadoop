@@ -1195,6 +1195,21 @@ and pf.publicly_funded='yes') foo)
 select distinct p.id, coalesce(publicly_funded, 0) as publicly_funded
 from ${stats_db_name}.publication p
 left outer join (
-select distinct ro.id, 1 as publicly_funded from result_organization ro
+select distinct ro.id, 1 as publicly_funded from ${stats_db_name}.result_organization ro
 join ${stats_db_name}.organization o on o.id=ro.organization
 join publicly_funded_orgs pfo on o.name=pfo.name) tmp on p.id=tmp.id;
+
+create table ${stats_db_name}.indi_pub_green_with_license stored as parquet as
+select distinct p.id, coalesce(green_with_license, 0) as green_with_license
+from ${stats_db_name}.publication p
+left outer join (
+select distinct p.id, 1 as green_with_license from ${stats_db_name}.publication p
+join ${stats_db_name}.result_instance ri on ri.id = p.id
+join ${stats_db_name}.datasource on datasource.id = ri.hostedby
+where ri.license is not null and datasource.type like '%Repository%' and datasource.name!='Other') tmp
+on p.id= tmp.id;
+
+create table ${stats_db_name}.result_country stored as parquet as
+select distinct ro.id, o.country from ${stats_db_name}.result_organization ro
+join ${stats_db_name}.organization o on o.id=ro.organization
+join ${stats_db_name}.funder f on f.country=o.country;

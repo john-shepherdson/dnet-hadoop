@@ -95,7 +95,8 @@ DROP TABLE IF EXISTS ${stats_db_name}.funder purge;
 create table ${stats_db_name}.funder STORED AS PARQUET as
 select distinct xpath_string(fund, '//funder/id')        as id,
                 xpath_string(fund, '//funder/name')      as name,
-                xpath_string(fund, '//funder/shortname') as shortname
+                xpath_string(fund, '//funder/shortname') as shortname,
+                xpath_string(fundingtree[0].value, '//funder/jurisdiction') as country
 from ${openaire_db_name}.project p lateral view explode(p.fundingtree.value) fundingtree as fund;
 
 DROP TABLE IF EXISTS ${stats_db_name}.project_organization_contribution purge;

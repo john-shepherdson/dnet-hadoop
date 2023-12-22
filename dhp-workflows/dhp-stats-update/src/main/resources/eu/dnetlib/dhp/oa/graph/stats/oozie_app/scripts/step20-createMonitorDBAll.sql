@@ -80,8 +80,8 @@ create table TARGET.result stored as parquet as
              'openorgs____::0fccc7640f0cb44d5cd1b06b312a06b9',  -- Cardiff University
              'openorgs____::8839b55dae0c84d56fd533f52d5d483a',   -- Leibniz Institute of Ecological Urban and Regional Development
              'openorgs____::526468206bca24c1c90da6a312295cf4',	-- Cyprus University of Technology
-             'openorgs____::b5ca9d4340e26454e367e2908ef3872f'	-- Alma Mater Studiorum University of Bologna
-
+             'openorgs____::b5ca9d4340e26454e367e2908ef3872f',	-- Alma Mater Studiorum University of Bologna
+             'openorgs____::a6340e6ecf60f6bba163659df985b0f2'	-- TU Dresden
         ) )) foo;
 
 create view if not exists TARGET.category as select * from SOURCE.category;
@@ -263,5 +263,6 @@ create view TARGET.indi_funder_findable as select * from SOURCE.indi_funder_find
 create view TARGET.indi_ris_fairness as select * from SOURCE.indi_ris_fairness;
 create view TARGET.indi_ris_openess as select * from SOURCE.indi_ris_openess;
 create view TARGET.indi_ris_findable as select * from SOURCE.indi_ris_findable;
-
+create table TARGET.indi_pub_green_with_license stored as parquet as select * from SOURCE.indi_pub_green_with_license orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.result_country stored as parquet as select * from SOURCE.result_country orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 
