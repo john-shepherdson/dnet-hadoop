@@ -36,7 +36,7 @@ public class SparkResultToCommunityFromOrganizationJob {
 			.toString(
 				SparkResultToCommunityFromOrganizationJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttocommunityfromorganization/input_communitytoresult_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/resulttocommunityfromorganization/input_communitytoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
