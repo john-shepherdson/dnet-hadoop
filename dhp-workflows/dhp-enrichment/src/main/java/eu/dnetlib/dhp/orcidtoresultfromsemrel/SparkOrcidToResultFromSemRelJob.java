@@ -36,7 +36,7 @@ public class SparkOrcidToResultFromSemRelJob {
 			.toString(
 				SparkOrcidToResultFromSemRelJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/orcidtoresultfromsemrel/input_orcidtoresult_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/orcidtoresultfromsemrel/input_orcidtoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
