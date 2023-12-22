@@ -39,7 +39,7 @@ public class SparkEntityToOrganizationFromSemRel implements Serializable {
 			.toString(
 				SparkResultToOrganizationFromIstRepoJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/input_propagation_parameter.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/entitytoorganizationfromsemrel/input_propagation_parameter.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
