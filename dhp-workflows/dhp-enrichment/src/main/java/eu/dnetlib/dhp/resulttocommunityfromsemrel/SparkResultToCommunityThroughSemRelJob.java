@@ -33,7 +33,7 @@ public class SparkResultToCommunityThroughSemRelJob {
 			.toString(
 				SparkResultToCommunityThroughSemRelJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttocommunityfromsemrel/input_communitytoresult_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/resulttocommunityfromsemrel/input_communitytoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 

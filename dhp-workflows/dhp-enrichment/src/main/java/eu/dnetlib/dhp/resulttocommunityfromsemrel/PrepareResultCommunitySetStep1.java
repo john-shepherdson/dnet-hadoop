@@ -61,7 +61,7 @@ public class PrepareResultCommunitySetStep1 {
 			.toString(
 				PrepareResultCommunitySetStep1.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttocommunityfromsemrel/input_preparecommunitytoresult_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/resulttocommunityfromsemrel/input_preparecommunitytoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
