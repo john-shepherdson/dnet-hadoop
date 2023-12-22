@@ -33,7 +33,7 @@ public class SparkResultToProjectThroughSemRelJob {
 			.toString(
 				SparkResultToProjectThroughSemRelJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/projecttoresult/input_projecttoresult_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/projecttoresult/input_projecttoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
