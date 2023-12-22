@@ -44,7 +44,7 @@ public class SparkResultToCommunityFromProject implements Serializable {
 			.toString(
 				SparkResultToCommunityFromProject.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttocommunityfromproject/input_communitytoresult_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/resulttocommunityfromproject/input_communitytoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
