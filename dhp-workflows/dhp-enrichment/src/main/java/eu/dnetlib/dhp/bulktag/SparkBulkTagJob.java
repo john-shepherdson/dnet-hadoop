@@ -45,7 +45,7 @@ public class SparkBulkTagJob {
 			.toString(
 				SparkBulkTagJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/bulktag/input_bulkTag_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/bulktag/input_bulkTag_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
