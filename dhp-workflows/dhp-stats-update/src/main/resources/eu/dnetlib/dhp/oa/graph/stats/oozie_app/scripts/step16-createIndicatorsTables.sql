@@ -1210,6 +1210,10 @@ where ri.license is not null and datasource.type like '%Repository%' and datasou
 on p.id= tmp.id;
 
 create table ${stats_db_name}.result_country stored as parquet as
-select distinct ro.id, o.country from ${stats_db_name}.result_organization ro
-join ${stats_db_name}.organization o on o.id=ro.organization
-join ${stats_db_name}.funder f on f.country=o.country;
+select distinct ro.id, coalesce(o.country, f.country) 
+from ${stats_db_name}.result_organization ro
+left outer join ${stats_db_name}.organization o on o.id=ro.organization
+left outer join ${stats_db_name}.result_projects rp on rp.id=ro.id
+left outer join ${stats_db_name}.project p on p.id=rp.project
+left outer join ${stats_db_name}.funder f on f.name=p.funder
+where coalesce(o.country, f.country) IS NOT NULL;
