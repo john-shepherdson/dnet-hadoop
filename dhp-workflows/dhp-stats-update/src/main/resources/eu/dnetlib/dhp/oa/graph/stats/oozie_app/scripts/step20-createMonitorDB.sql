@@ -181,5 +181,11 @@ create view TARGET.indi_funder_findable as select * from SOURCE.indi_funder_find
 create view TARGET.indi_ris_fairness as select * from SOURCE.indi_ris_fairness;
 create view TARGET.indi_ris_openess as select * from SOURCE.indi_ris_openess;
 create view TARGET.indi_ris_findable as select * from SOURCE.indi_ris_findable;
+
 create table TARGET.indi_pub_green_with_license stored as parquet as select * from SOURCE.indi_pub_green_with_license orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 create table TARGET.result_country stored as parquet as select * from SOURCE.result_country orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+
+create table TARGET.indi_result_oa_with_license stored as parquet as select * from SOURCE.indi_result_oa_with_license orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.indi_result_oa_without_license stored as parquet as select * from SOURCE.indi_result_oa_without_license orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+
+create table TARGET.indi_result_under_transformative stored as parquet as select * from SOURCE.indi_result_under_transformative orig where exists (select 1 from TARGET.result r where r.id=orig.id);
