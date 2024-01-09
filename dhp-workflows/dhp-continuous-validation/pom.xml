@@ -15,13 +15,13 @@
     <!-- The "version" is inherited from the parent module. -->
 
 
-
     <dependencies>
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>eu.dnetlib</groupId>
             <artifactId>uoa-validator-engine2</artifactId>
@@ -32,32 +32,17 @@
             <artifactId>spark-core_${scala.binary.version}</artifactId>
         </dependency>
 
-
         <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-sql -->
         <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_${scala.binary.version}</artifactId>
         </dependency>
 
-
-<!--
-        <dependency>
-            <groupId>org.apache.thrift</groupId>
-            <artifactId>libthrift</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.woodstox</groupId>
-            <artifactId>woodstox-core</artifactId>
-        </dependency>
--->
-
         <!-- Other dependencies. -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
-
-
 
     </dependencies>
 
