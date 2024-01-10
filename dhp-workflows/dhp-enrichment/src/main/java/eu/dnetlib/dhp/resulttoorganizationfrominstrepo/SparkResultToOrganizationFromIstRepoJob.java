@@ -47,7 +47,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
 			.toString(
 				SparkResultToOrganizationFromIstRepoJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/input_propagationresulaffiliationfrominstrepo_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/resulttoorganizationfrominstrepo/input_propagationresulaffiliationfrominstrepo_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -119,7 +119,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
 				"left_outer")
 			.flatMap(createRelationFn(), Encoders.bean(Relation.class))
 			.write()
-			.mode(SaveMode.Append)
+			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
 	}

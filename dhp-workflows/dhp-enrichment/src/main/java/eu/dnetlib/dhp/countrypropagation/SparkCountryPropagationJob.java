@@ -35,7 +35,7 @@ public class SparkCountryPropagationJob {
 			.toString(
 				SparkCountryPropagationJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/countrypropagation/input_countrypropagation_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/countrypropagation/input_countrypropagation_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -96,6 +96,12 @@ public class SparkCountryPropagationJob {
 			.option("compression", "gzip")
 			.mode(SaveMode.Overwrite)
 			.json(outputPath);
+
+		readPath(spark, outputPath, resultClazz)
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(sourcePath);
 
 	}
 

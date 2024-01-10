@@ -33,7 +33,7 @@ public class SparkResultToCommunityThroughSemRelJob {
 			.toString(
 				SparkResultToCommunityThroughSemRelJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttocommunityfromsemrel/input_communitytoresult_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/resulttocommunityfromsemrel/input_communitytoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -100,6 +100,12 @@ public class SparkResultToCommunityThroughSemRelJob {
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
+
+		readPath(spark, outputPath, resultClazz)
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(inputPath);
 	}
 
 	private static <R extends Result> MapFunction<Tuple2<R, ResultCommunityList>, R> contextUpdaterFn() {
