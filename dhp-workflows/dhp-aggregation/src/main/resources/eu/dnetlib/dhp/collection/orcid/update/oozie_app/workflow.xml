@@ -1,0 +1,69 @@
+<workflow-app name="download_Update_ORCID" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>targetPath</name>
+            <description>the  path  to store the original ORCID dump</description>
+        </property>
+        <property>
+            <name>apiURL</name>
+            <description>The URL of the update CSV list </description>
+            <value>http://74804fb637bd8e2fba5b-e0a029c2f87486cddec3b416996a6057.r3.cf1.rackcdn.com/last_modified.csv.tar</value>
+        </property>
+        <property>
+            <name>accessToken</name>
+            <description>The access tocken</description>
+
+        </property>
+    </parameters>
+
+    <start to="startUpdate"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="startUpdate">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.collection.orcid.OrcidGetUpdatesFile</main-class>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}</arg>
+            <arg>--apiURL</arg><arg>${apiURL}</arg>
+            <arg>--accessToken</arg><arg>${accessToken}</arg>
+
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    <action name="generateTables">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Generate ORCID Tables</name>
+            <class>eu.dnetlib.dhp.collection.orcid.SparkGenerateORCIDTable</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=2g
+                --conf spark.sql.shuffle.partitions=3000
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${targetPath}/extracted</arg>
+            <arg>--targetPath</arg><arg>${targetPath}/tables</arg>
+            <arg>--master</arg><arg>yarn</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    <end name="End"/>
+</workflow-app>

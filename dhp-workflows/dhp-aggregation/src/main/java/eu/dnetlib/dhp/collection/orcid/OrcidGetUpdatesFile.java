@@ -41,7 +41,7 @@ public class OrcidGetUpdatesFile {
         final String targetPath = parser.get("targetPath");
         log.info("got variable targetPath: {}", targetPath);
 
-		//http://74804fb637bd8e2fba5b-e0a029c2f87486cddec3b416996a6057.r3.cf1.rackcdn.com/last_modified.csv.tar
+
         final String apiURL = parser.get("apiURL");
         log.info("got variable apiURL: {}", apiURL);
 
