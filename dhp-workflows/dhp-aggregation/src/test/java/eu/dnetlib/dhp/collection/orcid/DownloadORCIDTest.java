@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.collection.orcid;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -9,7 +10,12 @@ import java.util.Objects;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocalFileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Encoders;
@@ -115,5 +121,20 @@ public class DownloadORCIDTest {
 			}
 		});
 	}
+
+//	@Test
+//	public void testReadTar() throws Exception {
+////		new OrcidGetUpdatesFile().readTar();
+//
+//		Configuration conf = new Configuration();
+//		FileSystem fs = FileSystem.get(URI.create("file:///"), conf);
+//		final String token ="78fdb232-7105-4086-8570-e153f4198e3d";
+//
+//		new OrcidGetUpdatesFile().readTar(fs,token, "http://74804fb637bd8e2fba5b-e0a029c2f87486cddec3b416996a6057.r3.cf1.rackcdn.com/last_modified.csv.tar", "file:///Users/sandro/orcid","2023-09-30");
+//
+//
+//
+//
+//	}
 
 }
