@@ -23,12 +23,17 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyTerm;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import me.xuender.unidecode.Unidecode;
 
 public class GraphCleaningFunctions extends CleaningFunctions {
+
+	public static final String DNET_PUBLISHERS = "dnet:publishers";
+
+	public static final String DNET_LICENSES = "dnet:licenses";
 
 	public static final String ORCID_CLEANING_REGEX = ".*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9x]{4})";
 	public static final int ORCID_LEN = 19;
@@ -409,6 +414,14 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 									.getPublisher()
 									.getValue()
 									.replaceAll(NAME_CLEANING_REGEX, " "));
+
+						if (vocs.vocabularyExists(DNET_PUBLISHERS)) {
+							vocs
+								.find(DNET_PUBLISHERS)
+								.map(voc -> voc.getTermBySynonym(r.getPublisher().getValue()))
+								.map(VocabularyTerm::getName)
+								.ifPresent(publisher -> r.getPublisher().setValue(publisher));
+						}
 					}
 				}
 				if (Objects.isNull(r.getLanguage()) || StringUtils.isBlank(r.getLanguage().getClassid())) {
@@ -569,6 +582,14 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 							i.setRefereed(qualifier("0000", "Unknown", ModelConstants.DNET_REVIEW_LEVELS));
 						}
 
+						if (Objects.nonNull(i.getLicense()) && Objects.nonNull(i.getLicense().getValue())) {
+							vocs
+								.find(DNET_LICENSES)
+								.map(voc -> voc.getTermBySynonym(i.getLicense().getValue()))
+								.map(VocabularyTerm::getId)
+								.ifPresent(license -> i.getLicense().setValue(license));
+						}
+
 						// from the script from Dimitris
 						if ("0000".equals(i.getRefereed().getClassid())) {
 							final boolean isFromCrossref = Optional
@@ -668,6 +689,9 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 										.filter(Objects::nonNull)
 										.filter(p -> Objects.nonNull(p.getQualifier()))
 										.filter(p -> StringUtils.isNotBlank(p.getValue()))
+										.filter(
+											p -> StringUtils
+												.contains(StringUtils.lowerCase(p.getQualifier().getClassid()), ORCID))
 										.map(p -> {
 											// hack to distinguish orcid from orcid_pending
 											String pidProvenance = getProvenance(p.getDataInfo());
@@ -677,7 +701,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 												.toLowerCase()
 												.contains(ModelConstants.ORCID)) {
 												if (pidProvenance
-													.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)) {
+													.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY) ||
+													pidProvenance.equals("ORCID_ENRICHMENT")) {
 													p.getQualifier().setClassid(ModelConstants.ORCID);
 												} else {
 													p.getQualifier().setClassid(ModelConstants.ORCID_PENDING);

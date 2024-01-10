@@ -34,18 +34,6 @@
             <description>the MAG working path</description>
         </property>
 
-
-        <!--    ORCID Parameters    -->
-        <property>
-            <name>inputPathOrcid</name>
-            <description>the ORCID input path</description>
-        </property>
-
-        <property>
-            <name>workingPathOrcid</name>
-            <description>the ORCID working path</description>
-        </property>
-
     </parameters>
 
     <global>
@@ -65,7 +53,6 @@
         <switch>
             <case to="ResetMagWorkingPath">${wf:conf('resumeFrom') eq 'ResetMagWorkingPath'}</case>
             <case to="ConvertMagToDataset">${wf:conf('resumeFrom') eq 'ConvertMagToDataset'}</case>
-            <case to="PreProcessORCID">${wf:conf('resumeFrom') eq 'PreProcessORCID'}</case>
             <default to="GenerateCrossrefDataset"/> <!-- first action to be done when downloadDump is to be performed -->
         </switch>
     </decision>
