@@ -135,6 +135,8 @@ public class ORCIDWorker extends Thread {
                     total_time = System.currentTimeMillis() - start;
                     requests++;
                     if (total_time < 1000) {
+                        //I know making a sleep on a thread is bad, but we need to stay to 24 requests per seconds, hence
+                        //the time between two http request in a thread must be 1 second
                         Thread.sleep(1000L - total_time);
                     }
                     start = System.currentTimeMillis();
@@ -142,6 +144,8 @@ public class ORCIDWorker extends Thread {
                     total_time = System.currentTimeMillis() - start;
                     requests++;
                     if (total_time < 1000) {
+                        //I know making a sleep on a thread is bad, but we need to stay to 24 requests per seconds, hence
+                        //the time between two http request in a thread must be 1 second
                         Thread.sleep(1000L - total_time);
                     }
                     start = System.currentTimeMillis();
@@ -149,6 +153,8 @@ public class ORCIDWorker extends Thread {
                     total_time = System.currentTimeMillis() - start;
                     requests++;
                     if (total_time < 1000) {
+                        //I know making a sleep on a thread is bad, but we need to stay to 24 requests per seconds, hence
+                        //the time between two http request in a thread must be 1 second
                         Thread.sleep(1000L - total_time);
                     }
                     if (requests %30 ==0)
