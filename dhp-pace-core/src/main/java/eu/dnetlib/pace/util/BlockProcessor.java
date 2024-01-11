@@ -67,8 +67,10 @@ public class BlockProcessor {
 
 	private void processRows(final List<Row> queue, final Reporter context) {
 
-		for (int pivotPos = 0; pivotPos < queue.size(); pivotPos++) {
-			final Row pivot = queue.get(pivotPos);
+		IncrementalConnectedComponents icc = new IncrementalConnectedComponents(queue.size());
+
+		for (int i = 0; i < queue.size(); i++) {
+			final Row pivot = queue.get(i);
 
 			final String idPivot = pivot.getString(identifierFieldPos); // identifier
 			final Object fieldsPivot = getJavaValue(pivot, orderFieldPos);
@@ -76,9 +78,9 @@ public class BlockProcessor {
 			final WfConfig wf = dedupConf.getWf();
 
 			if (fieldPivot != null) {
-				int i = 0;
-				for (int windowPos = pivotPos + 1; windowPos < queue.size(); windowPos++) {
-					final Row curr = queue.get(windowPos);
+				for (int j = icc.nextUnconnected(i, i + 1); j >= 0
+					&& j < queue.size(); j = icc.nextUnconnected(i, j + 1)) {
+					final Row curr = queue.get(j);
 					final String idCurr = curr.getString(identifierFieldPos); // identifier
 
 					if (mustSkip(idCurr)) {
@@ -86,7 +88,7 @@ public class BlockProcessor {
 						break;
 					}
 
-					if (++i > wf.getSlidingWindowSize()) {
+					if (wf.getSlidingWindowSize() > 0 && (j - i) > wf.getSlidingWindowSize()) {
 						break;
 					}
 
@@ -97,7 +99,9 @@ public class BlockProcessor {
 
 						final TreeProcessor treeProcessor = new TreeProcessor(dedupConf);
 
-						emitOutput(treeProcessor.compare(pivot, curr), idPivot, idCurr, context);
+						if (emitOutput(treeProcessor.compare(pivot, curr), idPivot, idCurr, context)) {
+							icc.connect(i, j);
+						}
 					}
 				}
 			}
@@ -115,7 +119,8 @@ public class BlockProcessor {
 		return null;
 	}
 
-	private void emitOutput(final boolean result, final String idPivot, final String idCurr, final Reporter context) {
+	private boolean emitOutput(final boolean result, final String idPivot, final String idCurr,
+		final Reporter context) {
 
 		if (result) {
 			if (idPivot.compareTo(idCurr) <= 0) {
@@ -127,6 +132,8 @@ public class BlockProcessor {
 		} else {
 			context.incrementCounter(dedupConf.getWf().getEntityType(), "d < " + dedupConf.getWf().getThreshold(), 1);
 		}
+
+		return result;
 	}
 
 	private boolean mustSkip(final String idPivot) {
@@ -142,5 +149,4 @@ public class BlockProcessor {
 
 		context.emit(type, from, to);
 	}
-
 }

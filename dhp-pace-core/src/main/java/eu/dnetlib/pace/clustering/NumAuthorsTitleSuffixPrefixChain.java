@@ -3,25 +3,45 @@ package eu.dnetlib.pace.clustering;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.pace.config.Config;
 
-@ClusteringClass("wordsStatsSuffixPrefixChain")
-public class WordsStatsSuffixPrefixChain extends AbstractClusteringFunction {
+@ClusteringClass("numAuthorsTitleSuffixPrefixChain")
+public class NumAuthorsTitleSuffixPrefixChain extends AbstractClusteringFunction {
 
-	public WordsStatsSuffixPrefixChain(Map<String, Object> params) {
+	public NumAuthorsTitleSuffixPrefixChain(Map<String, Object> params) {
 		super(params);
 	}
 
 	@Override
+	public Collection<String> apply(Config conf, List<String> fields) {
+
+		try {
+			int num_authors = Math.min(Integer.parseInt(fields.get(0)), 21); // SIZE threshold is 20, +1
+
+			if (num_authors > 0) {
+				return super.apply(conf, fields.subList(1, fields.size()))
+					.stream()
+					.map(s -> num_authors + "-" + s)
+					.collect(Collectors.toList());
+			}
+		} catch (NumberFormatException e) {
+			// missing or null authors array
+		}
+
+		return Collections.emptyList();
+	}
+
+	@Override
 	protected Collection<String> doApply(Config conf, String s) {
-		return suffixPrefixChain(s, param("mod"));
+		return suffixPrefixChain(cleanup(s), param("mod"));
 	}
 
 	private Collection<String> suffixPrefixChain(String s, int mod) {
-
 		// create the list of words from the string (remove short words)
 		List<String> wordsList = Arrays
 			.stream(s.split(" "))
@@ -32,7 +52,7 @@ public class WordsStatsSuffixPrefixChain extends AbstractClusteringFunction {
 		final int letters = s.length();
 
 		// create the prefix: number of words + number of letters/mod
-		String prefix = words + "-" + letters / mod + "-";
+		String prefix = words / mod + "-";
 
 		return doSuffixPrefixChain(wordsList, prefix);
 
@@ -43,7 +63,9 @@ public class WordsStatsSuffixPrefixChain extends AbstractClusteringFunction {
 		Set<String> set = Sets.newLinkedHashSet();
 		switch (wordsList.size()) {
 			case 0:
+				break;
 			case 1:
+				set.add(wordsList.get(0));
 				break;
 			case 2:
 				set

@@ -14,9 +14,9 @@ import eu.dnetlib.pace.config.Config;
 
 public abstract class AbstractClusteringFunction extends AbstractPaceFunctions implements ClusteringFunction {
 
-	protected Map<String, Integer> params;
+	protected Map<String, Object> params;
 
-	public AbstractClusteringFunction(final Map<String, Integer> params) {
+	public AbstractClusteringFunction(final Map<String, Object> params) {
 		this.params = params;
 	}
 
@@ -27,7 +27,7 @@ public abstract class AbstractClusteringFunction extends AbstractPaceFunctions i
 		return fields
 			.stream()
 			.filter(f -> !f.isEmpty())
-			.map(this::normalize)
+			.map(s -> normalize(s))
 			.map(s -> filterAllStopWords(s))
 			.map(s -> doApply(conf, s))
 			.map(c -> filterBlacklisted(c, ngramBlacklist))
@@ -36,11 +36,24 @@ public abstract class AbstractClusteringFunction extends AbstractPaceFunctions i
 			.collect(Collectors.toCollection(HashSet::new));
 	}
 
-	public Map<String, Integer> getParams() {
+	public Map<String, Object> getParams() {
 		return params;
 	}
 
 	protected Integer param(String name) {
-		return params.get(name);
+		Object val = params.get(name);
+		if (val == null)
+			return null;
+		if (val instanceof Number) {
+			return ((Number) val).intValue();
+		}
+		return Integer.parseInt(val.toString());
+	}
+
+	protected int paramOrDefault(String name, int i) {
+		Integer res = param(name);
+		if (res == null)
+			res = i;
+		return res;
 	}
 }
