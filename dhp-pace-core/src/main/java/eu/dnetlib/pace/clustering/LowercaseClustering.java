@@ -15,7 +15,7 @@ import eu.dnetlib.pace.config.Config;
 @ClusteringClass("lowercase")
 public class LowercaseClustering extends AbstractClusteringFunction {
 
-	public LowercaseClustering(final Map<String, Integer> params) {
+	public LowercaseClustering(final Map<String, Object> params) {
 		super(params);
 	}
 

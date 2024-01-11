@@ -23,7 +23,6 @@ public class AuthorsMatch extends AbstractListComparator {
 	private String MODE; // full or surname
 	private int SIZE_THRESHOLD;
 	private String TYPE; // count or percentage
-	private int common;
 
 	public AuthorsMatch(Map<String, String> params) {
 		super(params, new com.wcohen.ss.JaroWinkler());
@@ -35,7 +34,6 @@ public class AuthorsMatch extends AbstractListComparator {
 		FULLNAME_THRESHOLD = Double.parseDouble(params.getOrDefault("fullname_th", "0.9"));
 		SIZE_THRESHOLD = Integer.parseInt(params.getOrDefault("size_th", "20"));
 		TYPE = params.getOrDefault("type", "percentage");
-		common = 0;
 	}
 
 	protected AuthorsMatch(double w, AbstractStringDistance ssalgo) {
@@ -44,22 +42,27 @@ public class AuthorsMatch extends AbstractListComparator {
 
 	@Override
 	public double compare(final List<String> a, final List<String> b, final Config conf) {
-
 		if (a.isEmpty() || b.isEmpty())
 			return -1;
 
 		if (a.size() > SIZE_THRESHOLD || b.size() > SIZE_THRESHOLD)
 			return 1.0;
 
-		List<Person> aList = a.stream().map(author -> new Person(author, false)).collect(Collectors.toList());
+		int maxMiss = Integer.MAX_VALUE;
 		List<Person> bList = b.stream().map(author -> new Person(author, false)).collect(Collectors.toList());
 
-		common = 0;
+		Double threshold = getDoubleParam("threshold");
+
+		if (threshold != null && threshold >= 0.0 && threshold <= 1.0 && a.size() == b.size()) {
+			maxMiss = (int) Math.floor((1 - threshold) * Math.max(a.size(), b.size()));
+		}
+
+		int common = 0;
 		// compare each element of List1 with each element of List2
-		for (Person p1 : aList)
+		for (int i = 0; i < a.size(); i++) {
+			Person p1 = new Person(a.get(i), false);
 
 			for (Person p2 : bList) {
-
 				// both persons are inaccurate
 				if (!p1.isAccurate() && !p2.isAccurate()) {
 					// compare just normalized fullnames
@@ -118,11 +121,15 @@ public class AuthorsMatch extends AbstractListComparator {
 					}
 
 				}
-
 			}
 
+			if (i - common > maxMiss) {
+				return 0.0;
+			}
+		}
+
 		// normalization factor to compute the score
-		int normFactor = aList.size() == bList.size() ? aList.size() : (aList.size() + bList.size() - common);
+		int normFactor = a.size() == b.size() ? a.size() : (a.size() + b.size() - common);
 
 		if (TYPE.equals("percentage")) {
 			return (double) common / normFactor;

@@ -40,7 +40,7 @@ public class PaceResolver implements Serializable {
 				Collectors.toMap(cl -> cl.getAnnotation(ComparatorClass.class).value(), cl -> (Class<Comparator>) cl));
 	}
 
-	public ClusteringFunction getClusteringFunction(String name, Map<String, Integer> params) throws PaceException {
+	public ClusteringFunction getClusteringFunction(String name, Map<String, Object> params) throws PaceException {
 		try {
 			return clusteringFunctions.get(name).getDeclaredConstructor(Map.class).newInstance(params);
 		} catch (InstantiationException | IllegalAccessException | InvocationTargetException

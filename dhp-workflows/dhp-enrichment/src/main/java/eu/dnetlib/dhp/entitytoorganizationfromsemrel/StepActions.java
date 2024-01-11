@@ -3,8 +3,8 @@ package eu.dnetlib.dhp.entitytoorganizationfromsemrel;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.PropagationConstant.readPath;
-import static eu.dnetlib.dhp.entitytoorganizationfromsemrel.SparkResultToOrganizationFromSemRel.NEW_PROJECT_RELATION_PATH;
-import static eu.dnetlib.dhp.entitytoorganizationfromsemrel.SparkResultToOrganizationFromSemRel.NEW_RESULT_RELATION_PATH;
+import static eu.dnetlib.dhp.entitytoorganizationfromsemrel.SparkEntityToOrganizationFromSemRel.NEW_PROJECT_RELATION_PATH;
+import static eu.dnetlib.dhp.entitytoorganizationfromsemrel.SparkEntityToOrganizationFromSemRel.NEW_RESULT_RELATION_PATH;
 
 import java.io.Serializable;
 import java.util.*;
@@ -20,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.KeyValueSet;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import scala.Tuple2;
 

@@ -28,7 +28,7 @@ public class PrepareProjectResultsAssociation {
 			.toString(
 				PrepareProjectResultsAssociation.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/projecttoresult/input_prepareprojecttoresult_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/projecttoresult/input_prepareprojecttoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 

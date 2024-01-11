@@ -44,7 +44,7 @@ public class SparkResultToCommunityFromProject implements Serializable {
 			.toString(
 				SparkResultToCommunityFromProject.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttocommunityfromproject/input_communitytoresult_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/resulttocommunityfromproject/input_communitytoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -102,6 +102,12 @@ public class SparkResultToCommunityFromProject implements Serializable {
 						.mode(SaveMode.Overwrite)
 						.option("compression", "gzip")
 						.json(outputPath + e.name());
+
+					readPath(spark, outputPath + e.name(), resultClazz)
+						.write()
+						.mode(SaveMode.Overwrite)
+						.option("compression", "gzip")
+						.json(inputPath + e.name());
 				}
 			});
 

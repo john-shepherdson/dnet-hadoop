@@ -25,6 +25,7 @@ public class InstanceTypeMatch extends AbstractListComparator {
 		translationMap.put("Conference object", "*");
 		translationMap.put("Other literature type", "*");
 		translationMap.put("Unknown", "*");
+		translationMap.put("UNKNOWN", "*");
 
 		// article types
 		translationMap.put("Article", "Article");
@@ -76,5 +77,4 @@ public class InstanceTypeMatch extends AbstractListComparator {
 	protected double normalize(final double d) {
 		return d;
 	}
-
 }

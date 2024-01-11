@@ -1,0 +1,217 @@
+<workflow-app name="affiliation_from_instrepo_propagation" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+        <property>
+            <name>blacklist</name>
+            <description>The list of institutional repositories that should not be used for the propagation</description>
+        </property>
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to="reset_outputpath"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="reset_outputpath">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="prepare_result_organization_association"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="prepare_result_organization_association">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>PrepareResultOrganizationAssociation</name>
+            <class>eu.dnetlib.dhp.resulttoorganizationfrominstrepo.PrepareResultInstRepoAssociation</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/affiliationInstRepo</arg>
+            <arg>--blacklist</arg><arg>${blacklist}</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+        </spark>
+        <ok to="fork_join_apply_resulttoorganization_propagation"/>
+        <error to="Kill"/>
+    </action>
+
+    <fork name="fork_join_apply_resulttoorganization_propagation">
+        <path start="join_propagation_publication"/>
+        <path start="join_propagation_dataset"/>
+        <path start="join_propagation_otherresearchproduct"/>
+        <path start="join_propagation_software"/>
+    </fork>
+
+    <action name="join_propagation_publication">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>resultToOrganizationFromInstRepoPropagationForPublications</name>
+            <class>eu.dnetlib.dhp.resulttoorganizationfrominstrepo.SparkResultToOrganizationFromIstRepoJob</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/affiliationInstRepo/publication/relation</arg>
+            <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/datasourceOrganization</arg>
+            <arg>--alreadyLinkedPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/alreadyLinked</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
+        </spark>
+        <ok to="wait2"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="join_propagation_dataset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>resultToOrganizationFromInstRepoPropagationForDataset</name>
+            <class>eu.dnetlib.dhp.resulttoorganizationfrominstrepo.SparkResultToOrganizationFromIstRepoJob</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/affiliationInstRepo/dataset/relation</arg>
+            <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/datasourceOrganization</arg>
+            <arg>--alreadyLinkedPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/alreadyLinked</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
+        </spark>
+        <ok to="wait2"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="join_propagation_otherresearchproduct">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>resultToOrganizationFromInstRepoPropagationForORP</name>
+            <class>eu.dnetlib.dhp.resulttoorganizationfrominstrepo.SparkResultToOrganizationFromIstRepoJob</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/affiliationInstRepo/otherresearchproduct/relation</arg>
+            <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/datasourceOrganization</arg>
+            <arg>--alreadyLinkedPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/alreadyLinked</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
+        </spark>
+        <ok to="wait2"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="join_propagation_software">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>resultToOrganizationFromInstRepoPropagationForSoftware</name>
+            <class>eu.dnetlib.dhp.resulttoorganizationfrominstrepo.SparkResultToOrganizationFromIstRepoJob</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/affiliationInstRepo/software/relation</arg>
+            <arg>--datasourceOrganizationPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/datasourceOrganization</arg>
+            <arg>--alreadyLinkedPath</arg><arg>${workingDir}/affiliationInstRepo/preparedInfo/alreadyLinked</arg>
+            <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--resultTableName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
+        </spark>
+        <ok to="wait2"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="wait2" to="append_new_relations"/>
+
+    <action name="append_new_relations">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>append new relations</name>
+            <class>eu.dnetlib.dhp.resulttoorganizationfrominstrepo.AppendNewRelations</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.enabled=true
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+            </spark-opts>
+            <arg>--outputPath</arg><arg>${sourcePath}/relation</arg>
+            <arg>--sourcePath</arg><arg>${workingDir}/affiliationInstRepo/</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+
+</workflow-app>

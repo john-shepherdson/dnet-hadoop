@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.ibm.icu.text.Transliterator;
 
@@ -27,7 +26,7 @@ import eu.dnetlib.pace.clustering.NGramUtils;
  *
  * @author claudio
  */
-public abstract class AbstractPaceFunctions {
+public class AbstractPaceFunctions {
 
 	// city map to be used when translating the city names into codes
 	private static Map<String, String> cityMap = AbstractPaceFunctions
@@ -62,11 +61,14 @@ public abstract class AbstractPaceFunctions {
 
 	private static Pattern hexUnicodePattern = Pattern.compile("\\\\u(\\p{XDigit}{4})");
 
-	protected String concat(final List<String> l) {
+	private static Pattern romanNumberPattern = Pattern
+		.compile("^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$");
+
+	protected static String concat(final List<String> l) {
 		return Joiner.on(" ").skipNulls().join(l);
 	}
 
-	protected String cleanup(final String s) {
+	public static String cleanup(final String s) {
 		final String s1 = HTML_REGEX.matcher(s).replaceAll("");
 		final String s2 = unicodeNormalization(s1.toLowerCase());
 		final String s3 = nfd(s2);
@@ -82,7 +84,7 @@ public abstract class AbstractPaceFunctions {
 		return s12;
 	}
 
-	protected String fixXML(final String a) {
+	protected static String fixXML(final String a) {
 
 		return a
 			.replaceAll("&ndash;", " ")
@@ -91,7 +93,7 @@ public abstract class AbstractPaceFunctions {
 			.replaceAll("&minus;", " ");
 	}
 
-	protected boolean checkNumbers(final String a, final String b) {
+	protected static boolean checkNumbers(final String a, final String b) {
 		final String numbersA = getNumbers(a);
 		final String numbersB = getNumbers(b);
 		final String romansA = getRomans(a);
@@ -99,7 +101,7 @@ public abstract class AbstractPaceFunctions {
 		return !numbersA.equals(numbersB) || !romansA.equals(romansB);
 	}
 
-	protected String getRomans(final String s) {
+	protected static String getRomans(final String s) {
 		final StringBuilder sb = new StringBuilder();
 		for (final String t : s.split(" ")) {
 			sb.append(isRoman(t) ? t : "");
@@ -107,13 +109,12 @@ public abstract class AbstractPaceFunctions {
 		return sb.toString();
 	}
 
-	protected boolean isRoman(final String s) {
-		return s
-			.replaceAll("^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$", "qwertyuiop")
-			.equals("qwertyuiop");
+	protected static boolean isRoman(final String s) {
+		Matcher m = romanNumberPattern.matcher(s);
+		return m.matches() && m.hitEnd();
 	}
 
-	protected String getNumbers(final String s) {
+	protected static String getNumbers(final String s) {
 		final StringBuilder sb = new StringBuilder();
 		for (final String t : s.split(" ")) {
 			sb.append(isNumber(t) ? t : "");
@@ -121,7 +122,7 @@ public abstract class AbstractPaceFunctions {
 		return sb.toString();
 	}
 
-	public boolean isNumber(String strNum) {
+	public static boolean isNumber(String strNum) {
 		if (strNum == null) {
 			return false;
 		}
@@ -147,7 +148,7 @@ public abstract class AbstractPaceFunctions {
 		}
 	}
 
-	protected String removeSymbols(final String s) {
+	protected static String removeSymbols(final String s) {
 		final StringBuilder sb = new StringBuilder();
 
 		s.chars().forEach(ch -> {
@@ -157,11 +158,11 @@ public abstract class AbstractPaceFunctions {
 		return sb.toString().replaceAll("\\s+", " ");
 	}
 
-	protected boolean notNull(final String s) {
+	protected static boolean notNull(final String s) {
 		return s != null;
 	}
 
-	protected String normalize(final String s) {
+	public static String normalize(final String s) {
 		return fixAliases(transliterate(nfd(unicodeNormalization(s))))
 			.toLowerCase()
 			// do not compact the regexes in a single expression, would cause StackOverflowError in case of large input
@@ -174,16 +175,16 @@ public abstract class AbstractPaceFunctions {
 			.trim();
 	}
 
-	public String nfd(final String s) {
+	public static String nfd(final String s) {
 		return Normalizer.normalize(s, Normalizer.Form.NFD);
 	}
 
-	public String utf8(final String s) {
+	public static String utf8(final String s) {
 		byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
 		return new String(bytes, StandardCharsets.UTF_8);
 	}
 
-	public String unicodeNormalization(final String s) {
+	public static String unicodeNormalization(final String s) {
 
 		Matcher m = hexUnicodePattern.matcher(s);
 		StringBuffer buf = new StringBuffer(s.length());
@@ -195,7 +196,7 @@ public abstract class AbstractPaceFunctions {
 		return buf.toString();
 	}
 
-	protected String filterStopWords(final String s, final Set<String> stopwords) {
+	protected static String filterStopWords(final String s, final Set<String> stopwords) {
 		final StringTokenizer st = new StringTokenizer(s);
 		final StringBuilder sb = new StringBuilder();
 		while (st.hasMoreTokens()) {
@@ -208,7 +209,7 @@ public abstract class AbstractPaceFunctions {
 		return sb.toString().trim();
 	}
 
-	public String filterAllStopWords(String s) {
+	public static String filterAllStopWords(String s) {
 
 		s = filterStopWords(s, stopwords_en);
 		s = filterStopWords(s, stopwords_de);
@@ -221,7 +222,8 @@ public abstract class AbstractPaceFunctions {
 		return s;
 	}
 
-	protected Collection<String> filterBlacklisted(final Collection<String> set, final Set<String> ngramBlacklist) {
+	protected static Collection<String> filterBlacklisted(final Collection<String> set,
+		final Set<String> ngramBlacklist) {
 		final Set<String> newset = Sets.newLinkedHashSet();
 		for (final String s : set) {
 			if (!ngramBlacklist.contains(s)) {
@@ -268,7 +270,7 @@ public abstract class AbstractPaceFunctions {
 		return m;
 	}
 
-	public String removeKeywords(String s, Set<String> keywords) {
+	public static String removeKeywords(String s, Set<String> keywords) {
 
 		s = " " + s + " ";
 		for (String k : keywords) {
@@ -278,39 +280,39 @@ public abstract class AbstractPaceFunctions {
 		return s.trim();
 	}
 
-	public double commonElementsPercentage(Set<String> s1, Set<String> s2) {
+	public static double commonElementsPercentage(Set<String> s1, Set<String> s2) {
 
 		double longer = Math.max(s1.size(), s2.size());
 		return (double) s1.stream().filter(s2::contains).count() / longer;
 	}
 
 	// convert the set of keywords to codes
-	public Set<String> toCodes(Set<String> keywords, Map<String, String> translationMap) {
+	public static Set<String> toCodes(Set<String> keywords, Map<String, String> translationMap) {
 		return keywords.stream().map(s -> translationMap.get(s)).collect(Collectors.toSet());
 	}
 
-	public Set<String> keywordsToCodes(Set<String> keywords, Map<String, String> translationMap) {
+	public static Set<String> keywordsToCodes(Set<String> keywords, Map<String, String> translationMap) {
 		return toCodes(keywords, translationMap);
 	}
 
-	public Set<String> citiesToCodes(Set<String> keywords) {
+	public static Set<String> citiesToCodes(Set<String> keywords) {
 		return toCodes(keywords, cityMap);
 	}
 
-	protected String firstLC(final String s) {
+	protected static String firstLC(final String s) {
 		return StringUtils.substring(s, 0, 1).toLowerCase();
 	}
 
-	protected Iterable<String> tokens(final String s, final int maxTokens) {
+	protected static Iterable<String> tokens(final String s, final int maxTokens) {
 		return Iterables.limit(Splitter.on(" ").omitEmptyStrings().trimResults().split(s), maxTokens);
 	}
 
-	public String normalizePid(String pid) {
+	public static String normalizePid(String pid) {
 		return DOI_PREFIX.matcher(pid.toLowerCase()).replaceAll("");
 	}
 
 	// get the list of keywords into the input string
-	public Set<String> getKeywords(String s1, Map<String, String> translationMap, int windowSize) {
+	public static Set<String> getKeywords(String s1, Map<String, String> translationMap, int windowSize) {
 
 		String s = s1;
 
@@ -340,7 +342,7 @@ public abstract class AbstractPaceFunctions {
 		return codes;
 	}
 
-	public Set<String> getCities(String s1, int windowSize) {
+	public static Set<String> getCities(String s1, int windowSize) {
 		return getKeywords(s1, cityMap, windowSize);
 	}
 

@@ -3,21 +3,21 @@ package eu.dnetlib.dhp.oa.dedup.model;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
-
-import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.oa.dedup.DatePicker;
 import eu.dnetlib.dhp.oa.dedup.IdentifierComparator;
 import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
-import eu.dnetlib.dhp.schema.oaf.utils.PidComparator;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 
 public class Identifier<T extends OafEntity> implements Serializable, Comparable<Identifier<T>> {
@@ -50,7 +50,7 @@ public class Identifier<T extends OafEntity> implements Serializable, Comparable
 		if (Objects.nonNull(date)) {
 			return date;
 		} else {
-			String sDate = BASE_DATE;
+			String sDate = LocalDate.now().plusDays(1).toString();
 			if (ModelSupport.isSubClass(getEntity(), Result.class)) {
 				Result result = (Result) getEntity();
 				if (isWellformed(result.getDateofacceptance())) {

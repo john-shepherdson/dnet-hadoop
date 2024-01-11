@@ -91,18 +91,12 @@ public class SparkWhitelistSimRels extends AbstractSparkAction {
 			Dataset<Row> entities = spark
 				.read()
 				.textFile(DedupUtility.createEntityPath(graphBasePath, subEntity))
-				.repartition(numPartitions)
-				.withColumn("id", functions.get_json_object(new Column("value"), dedupConf.getWf().getIdPath()));
+				.select(functions.get_json_object(new Column("value"), dedupConf.getWf().getIdPath()).as("id"))
+				.distinct();
 
-			Dataset<Row> whiteListRels1 = whiteListRels
-				.join(entities, entities.col("id").equalTo(whiteListRels.col("from")), "inner")
-				.select("from", "to");
-
-			Dataset<Row> whiteListRels2 = whiteListRels1
-				.join(entities, whiteListRels1.col("to").equalTo(entities.col("id")), "inner")
-				.select("from", "to");
-
-			Dataset<Relation> whiteListSimRels = whiteListRels2
+			Dataset<Relation> whiteListSimRels = whiteListRels
+				.join(entities, entities.col("id").equalTo(whiteListRels.col("from")), "leftsemi")
+				.join(entities, functions.col("to").equalTo(entities.col("id")), "leftsemi")
 				.map(
 					(MapFunction<Row, Relation>) r -> DedupUtility
 						.createSimRel(r.getString(0), r.getString(1), entity),

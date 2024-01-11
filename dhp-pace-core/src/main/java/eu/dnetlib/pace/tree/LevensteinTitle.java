@@ -3,6 +3,7 @@ package eu.dnetlib.pace.tree;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -30,16 +31,25 @@ public class LevensteinTitle extends AbstractStringComparator {
 	}
 
 	@Override
-	public double distance(final String a, final String b, final Config conf) {
-		final String ca = cleanup(a);
-		final String cb = cleanup(b);
-
+	public double distance(final String ca, final String cb, final Config conf) {
 		final boolean check = checkNumbers(ca, cb);
 
 		if (check)
 			return 0.5;
 
-		return normalize(ssalgo.score(ca, cb), ca.length(), cb.length());
+		Double threshold = getDoubleParam("threshold");
+
+		// reduce Levenshtein algo complexity when target threshold is known
+		if (threshold != null && threshold >= 0.0 && threshold <= 1.0) {
+			int maxdistance = (int) Math.floor((1 - threshold) * Math.max(ca.length(), cb.length()));
+			int score = StringUtils.getLevenshteinDistance(ca, cb, maxdistance);
+			if (score == -1) {
+				return 0;
+			}
+			return normalize(score, ca.length(), cb.length());
+		} else {
+			return normalize(StringUtils.getLevenshteinDistance(ca, cb), ca.length(), cb.length());
+		}
 	}
 
 	private double normalize(final double score, final int la, final int lb) {

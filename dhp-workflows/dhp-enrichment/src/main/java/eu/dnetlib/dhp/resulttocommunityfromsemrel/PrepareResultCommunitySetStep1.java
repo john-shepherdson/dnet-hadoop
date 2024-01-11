@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.resulttocommunityfromsemrel;
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
+import eu.dnetlib.dhp.api.Utils;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.resulttocommunityfromorganization.ResultCommunityList;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -25,11 +27,6 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 public class PrepareResultCommunitySetStep1 {
 	private static final Logger log = LoggerFactory.getLogger(PrepareResultCommunitySetStep1.class);
-
-	private static final String COMMUNITY_LIST_XQUERY = "for $x in collection('/db/DRIVER/ContextDSResources/ContextDSResourceType')"
-		+ "  where $x//CONFIGURATION/context[./@type='community' or ./@type='ri']"
-		+ "  and  $x//CONFIGURATION/context/param[./@name='status']/text() != 'hidden'"
-		+ "  return $x//CONFIGURATION/context/@id/string()";
 
 	/**
 	 * associates to each result the set of community contexts they are associated to; associates to each target of a
@@ -64,7 +61,7 @@ public class PrepareResultCommunitySetStep1 {
 			.toString(
 				PrepareResultCommunitySetStep1.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttocommunityfromsemrel/input_preparecommunitytoresult_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/resulttocommunityfromsemrel/input_preparecommunitytoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -88,10 +85,10 @@ public class PrepareResultCommunitySetStep1 {
 		final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrels").split(";"));
 		log.info("allowedSemRel: {}", new Gson().toJson(allowedsemrel));
 
-		final String isLookupUrl = parser.get("isLookUpUrl");
-		log.info("isLookupUrl: {}", isLookupUrl);
+		final String baseURL = parser.get("baseURL");
+		log.info("baseURL: {}", baseURL);
 
-		final List<String> communityIdList = getCommunityList(isLookupUrl);
+		final List<String> communityIdList = getCommunityList(baseURL);
 		log.info("communityIdList: {}", new Gson().toJson(communityIdList));
 
 		final String resultType = resultClassName.substring(resultClassName.lastIndexOf(".") + 1).toLowerCase();
@@ -159,9 +156,8 @@ public class PrepareResultCommunitySetStep1 {
 			.json(outputResultPath);
 	}
 
-	public static List<String> getCommunityList(final String isLookupUrl) throws ISLookUpException {
-		ISLookUpService isLookUp = ISLookupClientFactory.getLookUpService(isLookupUrl);
-		return isLookUp.quickSearchProfile(COMMUNITY_LIST_XQUERY);
+	public static List<String> getCommunityList(final String baseURL) throws IOException {
+		return Utils.getCommunityIdList(baseURL);
 	}
 
 }

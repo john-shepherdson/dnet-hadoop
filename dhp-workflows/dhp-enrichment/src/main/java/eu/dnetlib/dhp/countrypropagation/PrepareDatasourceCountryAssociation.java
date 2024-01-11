@@ -45,7 +45,7 @@ public class PrepareDatasourceCountryAssociation {
 			.toString(
 				PrepareDatasourceCountryAssociation.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/countrypropagation/input_prepareassoc_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/countrypropagation/input_prepareassoc_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -66,7 +66,7 @@ public class PrepareDatasourceCountryAssociation {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				removeOutputDir(spark, outputPath);
+				// removeOutputDir(spark, outputPath);
 				prepareDatasourceCountryAssociation(
 					spark,
 					Arrays.asList(parser.get("whitelist").split(";")),
@@ -90,7 +90,8 @@ public class PrepareDatasourceCountryAssociation {
 				(FilterFunction<Datasource>) ds -> !ds.getDataInfo().getDeletedbyinference() &&
 					Optional.ofNullable(ds.getDatasourcetype()).isPresent() &&
 					Optional.ofNullable(ds.getDatasourcetype().getClassid()).isPresent() &&
-					(allowedtypes.contains(ds.getDatasourcetype().getClassid()) ||
+					((Optional.ofNullable(ds.getJurisdiction()).isPresent() &&
+						allowedtypes.contains(ds.getJurisdiction().getClassid())) ||
 						whitelist.contains(ds.getId())));
 
 		// filtering of the relations taking the non deleted by inference and those with IsProvidedBy as relclass

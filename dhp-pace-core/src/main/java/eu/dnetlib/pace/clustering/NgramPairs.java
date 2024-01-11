@@ -12,11 +12,11 @@ import eu.dnetlib.pace.config.Config;
 @ClusteringClass("ngrampairs")
 public class NgramPairs extends Ngrams {
 
-	public NgramPairs(Map<String, Integer> params) {
+	public NgramPairs(Map<String, Object> params) {
 		super(params, false);
 	}
 
-	public NgramPairs(Map<String, Integer> params, boolean sorted) {
+	public NgramPairs(Map<String, Object> params, boolean sorted) {
 		super(params, sorted);
 	}
 
