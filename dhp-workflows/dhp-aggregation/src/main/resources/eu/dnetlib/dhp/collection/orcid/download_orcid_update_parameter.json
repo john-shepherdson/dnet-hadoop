@@ -1,5 +1,4 @@
-[
-  {
+[ {
     "paramName": "n",
     "paramLongName": "namenode",
     "paramDescription": "the Name Node URI",
@@ -23,5 +22,4 @@
     "paramDescription": "the accessToken to contact API",
     "paramRequired": true
   }
-
 ]

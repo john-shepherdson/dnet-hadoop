@@ -124,16 +124,9 @@ public class DownloadORCIDTest {
 
 //	@Test
 //	public void testReadTar() throws Exception {
-////		new OrcidGetUpdatesFile().readTar();
-//
-//		Configuration conf = new Configuration();
-//		FileSystem fs = FileSystem.get(URI.create("file:///"), conf);
-//		final String token ="78fdb232-7105-4086-8570-e153f4198e3d";
-//
-//		new OrcidGetUpdatesFile().readTar(fs,token, "http://74804fb637bd8e2fba5b-e0a029c2f87486cddec3b416996a6057.r3.cf1.rackcdn.com/last_modified.csv.tar", "file:///Users/sandro/orcid","2023-09-30");
-//
-//
-//
+//		OrcidGetUpdatesFile.main(new String[] {
+//			"--namenode", "puppa"
+//		});
 //
 //	}
 

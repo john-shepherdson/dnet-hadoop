@@ -6,12 +6,12 @@
         </property>
         <property>
             <name>apiURL</name>
-            <description>The URL of the update CSV list </description>
             <value>http://74804fb637bd8e2fba5b-e0a029c2f87486cddec3b416996a6057.r3.cf1.rackcdn.com/last_modified.csv.tar</value>
+            <description>The URL of the update CSV list </description>
         </property>
         <property>
             <name>accessToken</name>
-            <description>The access tocken</description>
+            <description>The access token</description>
 
         </property>
     </parameters>
