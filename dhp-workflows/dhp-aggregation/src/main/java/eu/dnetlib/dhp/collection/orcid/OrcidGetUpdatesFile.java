@@ -17,6 +17,8 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
@@ -96,9 +98,14 @@ public class OrcidGetUpdatesFile {
 		urlConn.setConnectTimeout(clientParams.getConnectTimeOut() * 1000);
 		if (urlConn.getResponseCode() > 199 && urlConn.getResponseCode() < 300) {
 			InputStream input = urlConn.getInputStream();
+
+			Path hdfsWritePath = new Path("/tmp/orcid_updates.tar.gz");
+			final FSDataOutputStream fsDataOutputStream = fileSystem.create(hdfsWritePath, true);
+			IOUtils.copy(input, fsDataOutputStream);
+			FSDataInputStream updateFile = fileSystem.open(hdfsWritePath);
 			TarArchiveInputStream tais = new TarArchiveInputStream(new GzipCompressorInputStream(
 				new BufferedInputStream(
-					input)));
+					updateFile.getWrappedStream())));
 			TarArchiveEntry entry;
 
 			BlockingQueue<String> queue = new ArrayBlockingQueue<String>(3000);

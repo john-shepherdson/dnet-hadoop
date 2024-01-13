@@ -101,16 +101,18 @@ public class ORCIDWorker extends Thread {
 		SequenceFile.Writer file) throws IOException {
 		final String response = retrieveURL(id, url, token);
 		if (response != null) {
-
-			if (orcidId == null || response == null) {
+			if (orcidId == null) {
 				log.error("Thread {}   {}   {}", id, orcidId, response);
 				throw new RuntimeException("null items ");
 			}
 
 			if (file == null) {
 				log.error("Thread {}   file is null for {}  URL:{}", id, url, orcidId);
-			} else
+			} else {
 				file.append(new Text(orcidId), new Text(response));
+				file.hflush();
+			}
+
 		}
 
 	}
