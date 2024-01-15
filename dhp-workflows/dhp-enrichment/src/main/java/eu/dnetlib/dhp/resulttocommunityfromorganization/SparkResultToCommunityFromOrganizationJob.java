@@ -76,29 +76,41 @@ public class SparkResultToCommunityFromOrganizationJob {
 		ModelSupport.entityTypes
 			.keySet()
 			.parallelStream()
+			.filter(e -> ModelSupport.isResult(e))
+			// .parallelStream()
 			.forEach(e -> {
-				if (ModelSupport.isResult(e)) {
-					Class<R> resultClazz = ModelSupport.entityTypes.get(e);
-					removeOutputDir(spark, outputPath + e.name());
-					Dataset<R> result = readPath(spark, inputPath + e.name(), resultClazz);
+				// if () {
+				Class<R> resultClazz = ModelSupport.entityTypes.get(e);
+				removeOutputDir(spark, outputPath + e.name());
+				Dataset<R> result = readPath(spark, inputPath + e.name(), resultClazz);
 
-					result
-						.joinWith(
-							possibleUpdates,
-							result.col("id").equalTo(possibleUpdates.col("resultId")),
-							"left_outer")
-						.map(resultCommunityFn(), Encoders.bean(resultClazz))
-						.write()
-						.mode(SaveMode.Overwrite)
-						.option("compression", "gzip")
-						.json(outputPath + e.name());
+				log.info("executing left join");
+				result
+					.joinWith(
+						possibleUpdates,
+						result.col("id").equalTo(possibleUpdates.col("resultId")),
+						"left_outer")
+					.map(resultCommunityFn(), Encoders.bean(resultClazz))
+					.write()
+					.mode(SaveMode.Overwrite)
+					.option("compression", "gzip")
+					.json(outputPath + e.name());
 
-					readPath(spark, outputPath + e.name(), resultClazz)
-						.write()
-						.mode(SaveMode.Overwrite)
-						.option("compression", "gzip")
-						.json(inputPath + e.name());
-				}
+//					log
+//						.info(
+//							"reading results from " + outputPath + e.name() + " and copying them to " + inputPath
+//								+ e.name());
+//					Dataset<R> tmp = readPath(spark, outputPath + e.name(), resultClazz);
+//					if (tmp.count() > 0){
+//
+//						tmp
+//								.write()
+//								.mode(SaveMode.Overwrite)
+//								.option("compression", "gzip")
+//								.json(inputPath + e.name());
+//					}
+
+				// }
 			});
 
 	}
@@ -115,11 +127,11 @@ public class SparkResultToCommunityFromOrganizationJob {
 					.map(Context::getId)
 					.collect(Collectors.toList());
 
-				@SuppressWarnings("unchecked")
-				R res = (R) ret.getClass().newInstance();
+				// @SuppressWarnings("unchecked")
+				// R res = (R) ret.getClass().newInstance();
 
-				res.setId(ret.getId());
-				List<Context> propagatedContexts = new ArrayList<>();
+				// res.setId(ret.getId());
+				// List<Context> propagatedContexts = new ArrayList<>();
 				for (String cId : communitySet) {
 					if (!contextList.contains(cId)) {
 						Context newContext = new Context();
@@ -133,11 +145,11 @@ public class SparkResultToCommunityFromOrganizationJob {
 											PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_ID,
 											PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_NAME,
 											ModelConstants.DNET_PROVENANCE_ACTIONS)));
-						propagatedContexts.add(newContext);
+						ret.getContext().add(newContext);
 					}
 				}
-				res.setContext(propagatedContexts);
-				ret.mergeFrom(res);
+				// res.setContext(propagatedContexts);
+				// ret.mergeFrom(res);
 			}
 			return ret;
 		};

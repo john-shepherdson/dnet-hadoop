@@ -231,7 +231,7 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="result_project" />
+        <ok to="End" />
         <error to="Kill" />
     </action>
 
