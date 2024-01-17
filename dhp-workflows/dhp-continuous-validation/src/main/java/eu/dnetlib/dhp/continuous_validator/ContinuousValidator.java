@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.continuous_validator;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
@@ -16,7 +17,10 @@ import org.apache.spark.sql.SaveMode;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.validator2.validation.StandardValidationResult;
 import eu.dnetlib.validator2.validation.XMLApplicationProfile;
+import eu.dnetlib.validator2.validation.guideline.Guideline;
+import eu.dnetlib.validator2.validation.guideline.StandardResult;
 import eu.dnetlib.validator2.validation.guideline.openaire.*;
 import eu.dnetlib.validator2.validation.utils.TestUtils;
 
@@ -61,6 +65,7 @@ public class ContinuousValidator {
 		// This is needed to implement a unit test in which the spark session is created in the context of the
 		// unit test itself rather than inside the spark application"
 
+		// Set the parquet input, either a parquet-file or a directory with parquet files.
 		parquet_file_path = parser.get("parquet_file_path");
 		if (parquet_file_path == null) {
 			logger.error("The \"parquet_file_path\" was not retrieved from the parameters file: " + parametersFile);
@@ -80,8 +85,8 @@ public class ContinuousValidator {
 			return;
 		}
 
-		if (!outputPath.endsWith("/"))
-			outputPath += "/";
+		if (!outputPath.endsWith(File.separator))
+			outputPath += File.separator;
 
 		logger
 			.info(
@@ -112,11 +117,15 @@ public class ContinuousValidator {
 
 		SparkConf conf = new SparkConf();
 		conf.setAppName(ContinuousValidator.class.getSimpleName());
+		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+		conf.registerKryoClasses(new Class[] {
+			XMLApplicationProfile.ValidationResult.class, Guideline.Result.class, StandardValidationResult.class,
+			StandardResult.class
+		});
 		String finalParquet_file_path = parquet_file_path;
 		String finalOutputPath = outputPath;
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
-
 			// Use a new instance of Document Builder in each worker, as it is not thread-safe.
 			MapFunction<Row, XMLApplicationProfile.ValidationResult> validateMapFunction = row -> profile
 				.validate(

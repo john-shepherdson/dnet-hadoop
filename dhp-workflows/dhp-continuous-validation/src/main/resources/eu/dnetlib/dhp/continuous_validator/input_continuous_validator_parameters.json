@@ -8,7 +8,7 @@
   {
     "paramName": "prq_file",
     "paramLongName": "parquet_file_path",
-    "paramDescription": "the full path for the parquet file to be processed",
+    "paramDescription": "the full path of a parquet-file or a directory with parquet files, to be processed",
     "paramRequired": true
   },
   {

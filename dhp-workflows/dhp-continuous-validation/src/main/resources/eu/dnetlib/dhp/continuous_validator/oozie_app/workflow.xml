@@ -2,8 +2,8 @@
     <parameters>
         <property>
             <name>parquet_file_path</name>
-            <value>./src/test/resources/part-00589-733117df-3822-4fce-bded-17289cc5959a-c000.snappy.parquet</value>
-            <description>the full path of the parquet file</description>
+            <value>/var/lib/dnet/mdstore_PROD/md-7763c517-538d-4aa7-83f8-6096b3ce0d96/md-7763c517-538d-4aa7-83f8-6096b3ce0d96-1702622132535/store</value>
+            <description>the full path of a parquet-file or a directory with parquet files, to be processed</description>
         </property>
         <property>
             <name>openaire_guidelines</name>
@@ -12,7 +12,7 @@
         </property>
         <property>
             <name>outputPath</name>
-            <value>.</value>
+            <value>/home/lsmyrnaios/continuous_validation/output</value>
             <description>the path of the output-directory where the result-json-files will be stored</description>
         </property>
         <property>

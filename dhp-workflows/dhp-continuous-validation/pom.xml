@@ -14,7 +14,6 @@
     <artifactId>dhp-continuous-validation</artifactId>
     <!-- The "version" is inherited from the parent module. -->
 
-
     <dependencies>
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
