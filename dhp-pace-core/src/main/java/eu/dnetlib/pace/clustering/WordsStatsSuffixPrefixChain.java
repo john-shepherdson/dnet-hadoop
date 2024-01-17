@@ -11,7 +11,7 @@ import eu.dnetlib.pace.config.Config;
 @ClusteringClass("wordsStatsSuffixPrefixChain")
 public class WordsStatsSuffixPrefixChain extends AbstractClusteringFunction {
 
-	public WordsStatsSuffixPrefixChain(Map<String, Integer> params) {
+	public WordsStatsSuffixPrefixChain(Map<String, Object> params) {
 		super(params);
 	}
 

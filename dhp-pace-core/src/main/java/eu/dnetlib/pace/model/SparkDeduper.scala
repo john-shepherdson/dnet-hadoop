@@ -5,9 +5,9 @@ import eu.dnetlib.pace.util.{BlockProcessor, SparkReporter}
 import org.apache.spark.SparkContext
 import org.apache.spark.sql.catalyst.expressions.Literal
 import org.apache.spark.sql.expressions._
-import org.apache.spark.sql.functions.{col, lit, udf}
+import org.apache.spark.sql.functions.{col, desc, expr, lit, udf}
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{Column, Dataset, Row, functions}
+import org.apache.spark.sql.{Column, Dataset, Row, SaveMode, functions}
 
 import java.util.function.Predicate
 import java.util.stream.Collectors
@@ -80,6 +80,8 @@ case class SparkDeduper(conf: DedupConfig) extends Serializable {
         .withColumn("key", functions.explode(clusterValuesUDF(cd).apply(functions.array(inputColumns: _*))))
         // Add position column having the position of the row within the set of rows having the same key value ordered by the sorting value
         .withColumn("position", functions.row_number().over(Window.partitionBy("key").orderBy(col(model.orderingFieldName), col(model.identifierFieldName))))
+       // .withColumn("count", functions.max("position").over(Window.partitionBy("key").orderBy(col(model.orderingFieldName), col(model.identifierFieldName)).rowsBetween(Window.unboundedPreceding,Window.unboundedFollowing) ))
+       // .filter("count > 1")
 
       if (df_with_clustering_keys == null)
         df_with_clustering_keys = ds
@@ -88,20 +90,44 @@ case class SparkDeduper(conf: DedupConfig) extends Serializable {
     }
 
     //TODO: analytics
+    /*df_with_clustering_keys.groupBy(col("clustering"), col("key"))
+      .agg(expr("max(count) AS size"))
+      .orderBy(desc("size"))
+      .show*/
 
     val df_with_blocks = df_with_clustering_keys
-      // filter out rows with position exceeding the maxqueuesize parameter
-      .filter(col("position").leq(conf.getWf.getQueueMaxSize))
-      .groupBy("clustering", "key")
+      // split the clustering block into smaller blocks of queuemaxsize
+      .groupBy(col("clustering"), col("key"), functions.floor(col("position").divide(lit(conf.getWf.getQueueMaxSize))))
       .agg(functions.collect_set(functions.struct(model.schema.fieldNames.map(col): _*)).as("block"))
       .filter(functions.size(new Column("block")).gt(1))
+       .union(
+        //adjacency blocks
+        df_with_clustering_keys
+          // filter out leading and trailing elements
+          .filter(col("position").gt(conf.getWf.getSlidingWindowSize/2))
+          //.filter(col("position").lt(col("count").minus(conf.getWf.getSlidingWindowSize/2)))
+          // create small blocks of records on "the border" of maxqueuesize: getSlidingWindowSize/2 elements before and after
+          .filter(
+            col("position").mod(conf.getWf.getQueueMaxSize).lt(conf.getWf.getSlidingWindowSize/2) // slice of the start of block
+            || col("position").mod(conf.getWf.getQueueMaxSize).gt(conf.getWf.getQueueMaxSize - (conf.getWf.getSlidingWindowSize/2)) //slice of the end of the block
+          )
+          .groupBy(col("clustering"), col("key"), functions.floor((col("position") + lit(conf.getWf.getSlidingWindowSize/2)).divide(lit(conf.getWf.getQueueMaxSize))))
+          .agg(functions.collect_set(functions.struct(model.schema.fieldNames.map(col): _*)).as("block"))
+          .filter(functions.size(new Column("block")).gt(1))
+      )
 
     df_with_blocks
   }
 
   def clusterValuesUDF(cd: ClusteringDef) = {
     udf[mutable.WrappedArray[String], mutable.WrappedArray[Any]](values => {
-      values.flatMap(f => cd.clusteringFunction().apply(conf, Seq(f.toString).asJava).asScala)
+      val valueList = values.flatMap {
+        case a: mutable.WrappedArray[Any] => a.map(_.toString)
+        case s: Any => Seq(s.toString)
+      }.asJava;
+
+      mutable.WrappedArray.make(cd.clusteringFunction().apply(conf, valueList).toArray())
+
     })
   }
 

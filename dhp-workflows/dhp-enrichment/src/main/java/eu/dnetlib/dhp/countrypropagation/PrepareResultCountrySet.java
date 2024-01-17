@@ -32,7 +32,7 @@ public class PrepareResultCountrySet {
 			.toString(
 				PrepareResultCountrySet.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/countrypropagation/input_prepareresultcountry_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/countrypropagation/input_prepareresultcountry_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 

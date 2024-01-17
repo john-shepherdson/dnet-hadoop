@@ -2,6 +2,7 @@
 package eu.dnetlib.pace.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -35,6 +36,16 @@ public class FieldDef implements Serializable {
 	 * Sets maximum length for field values in the model. -1 for unbounded length.
 	 */
 	private int length = -1;
+
+	private HashSet<String> filter;
+
+	private boolean sorted;
+
+	public boolean isSorted() {
+		return sorted;
+	}
+
+	private String clean;
 
 	public FieldDef() {
 	}
@@ -89,6 +100,30 @@ public class FieldDef implements Serializable {
 
 	public void setPath(String path) {
 		this.path = path;
+	}
+
+	public HashSet<String> getFilter() {
+		return filter;
+	}
+
+	public void setFilter(HashSet<String> filter) {
+		this.filter = filter;
+	}
+
+	public boolean getSorted() {
+		return sorted;
+	}
+
+	public void setSorted(boolean sorted) {
+		this.sorted = sorted;
+	}
+
+	public String getClean() {
+		return clean;
+	}
+
+	public void setClean(String clean) {
+		this.clean = clean;
 	}
 
 	@Override

@@ -114,7 +114,7 @@ public class SparkJobTest {
 			.option("compression", "gzip")
 			.json(workingDir.toString() + "/projectInput");
 
-		SparkResultToOrganizationFromSemRel
+		SparkEntityToOrganizationFromSemRel
 
 			.main(
 				new String[] {
@@ -395,7 +395,7 @@ public class SparkJobTest {
 			.option("compression", "gzip")
 			.json(workingDir.toString() + "/projectInput");
 
-		SparkResultToOrganizationFromSemRel
+		SparkEntityToOrganizationFromSemRel
 
 			.main(
 				new String[] {
@@ -678,7 +678,7 @@ public class SparkJobTest {
 			.option("compression", "gzip")
 			.json(workingDir.toString() + "/projectInput");
 
-		SparkResultToOrganizationFromSemRel
+		SparkEntityToOrganizationFromSemRel
 
 			.main(
 				new String[] {
