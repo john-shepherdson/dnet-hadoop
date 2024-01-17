@@ -97,17 +97,8 @@
             <arg>--potentialUpdatePath</arg><arg>${workingDir}/resultproject/preparedInfo/potentialUpdates</arg>
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/resultproject/preparedInfo/alreadyLinked</arg>
         </spark>
-        <ok to="reset_workingDir"/>
-        <error to="Kill"/>
-    </action>
-    <action name="reset_workingDir">
-        <fs>
-            <delete path="${workingDir}"/>
-            <mkdir path="${workingDir}"/>
-        </fs>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-    <end name="End"/>
 
 </workflow-app>
