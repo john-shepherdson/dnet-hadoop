@@ -8,6 +8,10 @@
             <name>baseURL</name>
             <description>the base URL to use to select the right community APIs</description>
         </property>
+        <property>
+            <name>startFrom</name>
+            <value>undelete</value>
+        </property>
     </parameters>
 
     <global>
@@ -21,7 +25,15 @@
         </configuration>
     </global>
 
-    <start to="reset_outputpath"/>
+    <start to="startFrom"/>
+
+    <decision name="startFrom">
+        <switch>
+            <case to="prepare_result_communitylist">${wf:conf('startFrom') eq 'undelete'}</case>
+
+            <default to="reset_outputpath"/>
+        </switch>
+    </decision>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -94,7 +106,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>community2resultfromorganization - move results</name>
+            <name>move results</name>
             <class>eu.dnetlib.dhp.MoveResult</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
