@@ -12,7 +12,7 @@
         </property>
         <property>
             <name>outputPath</name>
-            <value>/home/lsmyrnaios/continuous_validation/output</value>
+            <value>/user/lsmyrnaios/continuous_validator/output</value>
             <description>the path of the output-directory where the result-json-files will be stored</description>
         </property>
         <property>
@@ -52,6 +52,10 @@
             <name>spark2EventLogDir</name>
             <value>spark2/logs</value>
             <description>spark 2.* event log dir location</description>
+        </property>
+        <property>
+            <name>oozie.libpath</name>
+            <value>${nameNode}/user/oozie/share/lib</value>
         </property>
     </parameters>
 
