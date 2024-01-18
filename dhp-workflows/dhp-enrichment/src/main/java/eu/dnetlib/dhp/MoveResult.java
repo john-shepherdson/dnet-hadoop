@@ -30,7 +30,7 @@ public class MoveResult implements Serializable {
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
 			.toString(
-				SparkResultToCommunityFromOrganizationJob.class
+					MoveResult.class
 					.getResourceAsStream(
 						"/eu/dnetlib/dhp/wf/subworkflows/input_moveresult_parameters.json"));
 
