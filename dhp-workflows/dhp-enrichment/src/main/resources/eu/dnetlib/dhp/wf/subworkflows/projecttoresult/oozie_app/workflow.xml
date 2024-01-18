@@ -8,7 +8,10 @@
             <name>allowedsemrels</name>
             <description>the allowed semantics </description>
         </property>
-
+        <property>
+            <name>startFrom</name>
+            <value>undelete</value>
+        </property>
     </parameters>
 
     <global>
@@ -22,7 +25,15 @@
         </configuration>
     </global>
 
-    <start to="reset_outputpath"/>
+    <start to="startFrom"/>
+
+    <decision name="startFrom">
+        <switch>
+            <case to="prepare_project_results_association">${wf:conf('startFrom') eq 'undelete'}</case>
+
+            <default to="reset_outputpath"/>
+        </switch>
+    </decision>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -86,17 +97,8 @@
             <arg>--potentialUpdatePath</arg><arg>${workingDir}/resultproject/preparedInfo/potentialUpdates</arg>
             <arg>--alreadyLinkedPath</arg><arg>${workingDir}/resultproject/preparedInfo/alreadyLinked</arg>
         </spark>
-        <ok to="reset_workingDir"/>
-        <error to="Kill"/>
-    </action>
-    <action name="reset_workingDir">
-        <fs>
-            <delete path="${workingDir}"/>
-            <mkdir path="${workingDir}"/>
-        </fs>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
-    <end name="End"/>
 
 </workflow-app>

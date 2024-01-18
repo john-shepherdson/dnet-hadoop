@@ -101,11 +101,6 @@ public class SparkResultToCommunityThroughSemRelJob {
 			.option("compression", "gzip")
 			.json(outputPath);
 
-		readPath(spark, outputPath, resultClazz)
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(inputPath);
 	}
 
 	private static <R extends Result> MapFunction<Tuple2<R, ResultCommunityList>, R> contextUpdaterFn() {
@@ -115,11 +110,11 @@ public class SparkResultToCommunityThroughSemRelJob {
 			if (rcl.isPresent()) {
 				Set<String> contexts = new HashSet<>();
 				ret.getContext().forEach(c -> contexts.add(c.getId()));
-				List<Context> contextList = rcl
+				rcl
 					.get()
 					.getCommunityList()
 					.stream()
-					.map(
+					.forEach(
 						c -> {
 							if (!contexts.contains(c)) {
 								Context newContext = new Context();
@@ -133,19 +128,11 @@ public class SparkResultToCommunityThroughSemRelJob {
 													PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_ID,
 													PROPAGATION_RESULT_COMMUNITY_SEMREL_CLASS_NAME,
 													ModelConstants.DNET_PROVENANCE_ACTIONS)));
-								return newContext;
+								ret.getContext().add(newContext);
 							}
-							return null;
-						})
-					.filter(Objects::nonNull)
-					.collect(Collectors.toList());
 
-				@SuppressWarnings("unchecked")
-				R r = (R) ret.getClass().newInstance();
+						});
 
-				r.setId(ret.getId());
-				r.setContext(contextList);
-				ret.mergeFrom(r);
 			}
 
 			return ret;
