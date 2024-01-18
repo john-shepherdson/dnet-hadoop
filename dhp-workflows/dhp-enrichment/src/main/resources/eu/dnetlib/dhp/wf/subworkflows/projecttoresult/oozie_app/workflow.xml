@@ -30,7 +30,6 @@
     <decision name="startFrom">
         <switch>
             <case to="prepare_project_results_association">${wf:conf('startFrom') eq 'undelete'}</case>
-
             <default to="reset_outputpath"/>
         </switch>
     </decision>
@@ -101,4 +100,5 @@
         <error to="Kill"/>
     </action>
 
+    <end name="End"/>
 </workflow-app>
