@@ -1,13 +1,13 @@
 
 package eu.dnetlib.dhp.continuous_validator;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import java.util.Optional;
-
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.validator2.validation.StandardValidationResult;
+import eu.dnetlib.validator2.validation.XMLApplicationProfile;
+import eu.dnetlib.validator2.validation.guideline.Guideline;
+import eu.dnetlib.validator2.validation.guideline.StandardResult;
+import eu.dnetlib.validator2.validation.guideline.openaire.*;
+import eu.dnetlib.validator2.validation.utils.TestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -16,25 +16,21 @@ import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SaveMode;
 import org.slf4j.LoggerFactory;
 
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.validator2.validation.StandardValidationResult;
-import eu.dnetlib.validator2.validation.XMLApplicationProfile;
-import eu.dnetlib.validator2.validation.guideline.Guideline;
-import eu.dnetlib.validator2.validation.guideline.StandardResult;
-import eu.dnetlib.validator2.validation.guideline.openaire.*;
-import eu.dnetlib.validator2.validation.utils.TestUtils;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.Optional;
+
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 public class ContinuousValidator {
 
-	public static final String TEST_FILES_V4_DIR = TestUtils.TEST_FILES_BASE_DIR + "openaireguidelinesV4/";
-	public static final String RESULTS_FILE_NAME = "results.json";
 	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ContinuousValidator.class);
 	private static final String parametersFile = "input_continuous_validator_parameters.json";
 
 	public static void main(String[] args) {
 
 		ArgumentApplicationParser parser = null;
-		String sparkMaster = null;
 		Boolean isSparkSessionManaged = false;
 		String parquet_file_path = null;
 		String guidelines = null;
@@ -91,7 +87,7 @@ public class ContinuousValidator {
 		logger
 			.info(
 				"Will validate the contents of parquetFile: \"" + parquet_file_path + "\", against guidelines: \""
-					+ guidelines + "\"" + " and will output the results in: " + outputPath + RESULTS_FILE_NAME);
+					+ guidelines + "\"" + " and will output the results in: " + outputPath);
 
 		AbstractOpenAireProfile profile;
 		switch (guidelines) {
@@ -142,7 +138,7 @@ public class ContinuousValidator {
 				.write()
 				.option("compression", "gzip")
 				.mode(SaveMode.Overwrite)
-				.json(finalOutputPath + RESULTS_FILE_NAME); // The filename should be the name of the input-file or the
+				.json(finalOutputPath); // The output files have names of the input files which were processed.
 		});
 	}
 }
