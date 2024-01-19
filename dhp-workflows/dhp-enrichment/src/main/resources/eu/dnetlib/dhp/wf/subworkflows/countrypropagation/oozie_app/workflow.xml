@@ -233,7 +233,7 @@
                 --conf spark.speculation=false
                 --conf spark.hadoop.mapreduce.map.speculative=false
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=7680
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}/publication</arg>
             <arg>--preparedInfoPath</arg><arg>${workingDir}/country/publication</arg>
