@@ -12,9 +12,9 @@
     "paramRequired": true
   },
   {
-    "paramName": "ilu",
-    "paramLongName": "isLookupUrl",
-    "paramDescription": "URL of the isLookUp Service",
+    "paramName": "cau",
+    "paramLongName": "contextApiBaseUrl",
+    "paramDescription": "URL of the context API",
     "paramRequired": true
   }
 ]
