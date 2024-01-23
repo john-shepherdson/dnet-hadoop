@@ -31,16 +31,19 @@ public class ContextMapper extends HashMap<String, ContextDef> implements Serial
 
 		final ContextMapper contextMapper = new ContextMapper();
 
-		for (ContextSummary ctx : DNetRestClient.doGET(baseURL + "/contexts", ContextSummaryList.class)) {
+		for (ContextSummary ctx : DNetRestClient
+			.doGET(String.format("%s/contexts", baseURL), ContextSummaryList.class)) {
 
 			contextMapper.put(ctx.getId(), new ContextDef(ctx.getId(), ctx.getLabel(), "context", ctx.getType()));
 
 			for (CategorySummary cat : DNetRestClient
-				.doGET(baseURL + "/context/" + ctx.getId(), CategorySummaryList.class)) {
+				.doGET(String.format("%s/context/%s?all=true", baseURL, ctx.getId()), CategorySummaryList.class)) {
 				contextMapper.put(cat.getId(), new ContextDef(cat.getId(), cat.getLabel(), "category", ""));
 				if (cat.isHasConcept()) {
 					for (ConceptSummary c : DNetRestClient
-						.doGET(baseURL + "/context/category/" + cat.getId(), ConceptSummaryList.class)) {
+						.doGET(
+							String.format("%s/context/category/%s?all=true", baseURL, cat.getId()),
+							ConceptSummaryList.class)) {
 						contextMapper.put(c.getId(), new ContextDef(c.getId(), c.getLabel(), "concept", ""));
 						if (c.isHasSubConcept()) {
 							for (ConceptSummary cs : c.getConcepts()) {
