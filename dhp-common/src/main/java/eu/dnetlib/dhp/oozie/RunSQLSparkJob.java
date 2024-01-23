@@ -1,13 +1,7 @@
 
 package eu.dnetlib.dhp.oozie;
 
-import com.google.common.io.Resources;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import org.apache.commons.lang3.time.DurationFormatUtils;
-import org.apache.commons.text.StringSubstitutor;
-import org.apache.spark.SparkConf;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -15,7 +9,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
+import org.apache.commons.lang3.time.DurationFormatUtils;
+import org.apache.commons.text.StringSubstitutor;
+import org.apache.spark.SparkConf;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.io.Resources;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 
 public class RunSQLSparkJob {
 	private static final Logger log = LoggerFactory.getLogger(RunSQLSparkJob.class);
