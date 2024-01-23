@@ -8,10 +8,13 @@ import java.io.InputStream;
 import java.net.*;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.http.HttpHeaders;
+import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,6 +101,7 @@ public class HttpConnector2 {
 
 		InputStream input = null;
 
+		long start = System.currentTimeMillis();
 		try {
 			if (getClientParams().getRequestDelay() > 0) {
 				backoffAndSleep(getClientParams().getRequestDelay());
@@ -115,9 +119,8 @@ public class HttpConnector2 {
 					urlConn.addRequestProperty(headerEntry.getKey(), headerEntry.getValue());
 				}
 			}
-			if (log.isDebugEnabled()) {
-				logHeaderFields(urlConn);
-			}
+
+			logHeaderFields(urlConn);
 
 			int retryAfter = obtainRetryAfter(urlConn.getHeaderFields());
 			String rateLimit = urlConn.getHeaderField(Constants.HTTPHEADER_IETF_DRAFT_RATELIMIT_LIMIT);
@@ -167,12 +170,14 @@ public class HttpConnector2 {
 								.warn(
 									"{} - waiting and repeating request after default delay of {} sec.",
 									requestUrl, getClientParams().getRetryDelay());
-							backoffAndSleep(retryNumber * getClientParams().getRetryDelay() * 1000);
+							backoffAndSleep(retryNumber * getClientParams().getRetryDelay());
 						}
 						report.put(REPORT_PREFIX + urlConn.getResponseCode(), requestUrl);
 						urlConn.disconnect();
 						return attemptDownload(requestUrl, retryNumber + 1, report);
 					default:
+						log.error("gor error {} from URL: {}", urlConn.getResponseCode(), urlConn.getURL());
+						log.error("response message: {}", urlConn.getResponseMessage());
 						report
 							.put(
 								REPORT_PREFIX + urlConn.getResponseCode(),
@@ -196,16 +201,21 @@ public class HttpConnector2 {
 			report.put(e.getClass().getName(), e.getMessage());
 			backoffAndSleep(getClientParams().getRetryDelay() * retryNumber * 1000);
 			return attemptDownload(requestUrl, retryNumber + 1, report);
+		} finally {
+			log
+				.info(
+					"request time elapsed: {}sec",
+					TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - start));
 		}
 	}
 
 	private void logHeaderFields(final HttpURLConnection urlConn) throws IOException {
-		log.debug("StatusCode: {}", urlConn.getResponseMessage());
+		log.info("StatusCode: {}", urlConn.getResponseMessage());
 
 		for (Map.Entry<String, List<String>> e : urlConn.getHeaderFields().entrySet()) {
 			if (e.getKey() != null) {
 				for (String v : e.getValue()) {
-					log.debug("  key: {} - value: {}", e.getKey(), v);
+					log.info("  key: {} - value: {}", e.getKey(), v);
 				}
 			}
 		}
