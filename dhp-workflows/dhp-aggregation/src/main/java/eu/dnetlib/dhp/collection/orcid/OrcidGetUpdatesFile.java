@@ -128,7 +128,6 @@ public class OrcidGetUpdatesFile {
 						.map(s -> s[0])
 						.forEach(s -> {
 							try {
-								log.info("Adding item ");
 								queue.put(s);
 							} catch (InterruptedException e) {
 								throw new RuntimeException(e);

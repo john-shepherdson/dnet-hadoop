@@ -113,7 +113,8 @@ public class ORCIDWorker extends Thread {
 				file.hflush();
 			}
 
-		}
+		} else
+			log.error("Thread {} response is null for {}  URL:{}", id, url, orcidId);
 
 	}
 
