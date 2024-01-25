@@ -78,6 +78,10 @@
             	<name>hive.txn.timeout</name>
             	<value>${hive_timeout}</value>
             </property>
+            <property>
+                <name>hive.mapjoin.followby.gby.localtask.max.memory.usage</name>
+                <value>0.80</value>
+            </property>
 	<property>
 	    <name>mapred.job.queue.name</name>
 	    <value>analytics</value>
