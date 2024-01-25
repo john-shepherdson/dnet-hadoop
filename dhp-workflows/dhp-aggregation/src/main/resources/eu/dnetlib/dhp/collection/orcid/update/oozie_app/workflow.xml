@@ -1,6 +1,10 @@
 <workflow-app name="download_Update_ORCID" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
+            <name>graphPath</name>
+            <description>the  path  to store the original ORCID dump</description>
+        </property>
+        <property>
             <name>targetPath</name>
             <description>the  path  to store the original ORCID dump</description>
         </property>
@@ -12,8 +16,9 @@
         <property>
             <name>accessToken</name>
             <description>The access token</description>
-
         </property>
+
+
     </parameters>
 
     <start to="startUpdate"/>
@@ -37,7 +42,7 @@
             <arg>--accessToken</arg><arg>${accessToken}</arg>
 
         </java>
-        <ok to="End"/>
+        <ok to="generateTables"/>
         <error to="Kill"/>
     </action>
     <action name="generateTables">
@@ -58,8 +63,36 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--sourcePath</arg><arg>${targetPath}/extracted</arg>
-            <arg>--targetPath</arg><arg>${targetPath}/tables</arg>
+            <arg>--sourcePath</arg><arg>${targetPath}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}/updateTable</arg>
+            <arg>--fromUpdate</arg><arg>true</arg>
+            <arg>--master</arg><arg>yarn</arg>
+        </spark>
+        <ok to="updateTable"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="updateTable">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Update ORCID Tables</name>
+            <class>eu.dnetlib.dhp.collection.orcid.SparkApplyUpdate</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=2g
+                --conf spark.sql.shuffle.partitions=3000
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--graphPath</arg><arg>graphPath</arg>
+            <arg>--updatePath</arg><arg>${targetPath}/updateTable</arg>
+            <arg>--targetPath</arg><arg>${targetPath}/newTable</arg>
             <arg>--master</arg><arg>yarn</arg>
         </spark>
         <ok to="End"/>

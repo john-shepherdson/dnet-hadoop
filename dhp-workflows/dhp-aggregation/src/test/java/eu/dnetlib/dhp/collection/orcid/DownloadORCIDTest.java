@@ -33,6 +33,7 @@ import com.ximpleware.XPathParseException;
 
 import eu.dnetlib.dhp.collection.orcid.model.Author;
 import eu.dnetlib.dhp.collection.orcid.model.ORCIDItem;
+import eu.dnetlib.dhp.collection.orcid.model.Work;
 import eu.dnetlib.dhp.parser.utility.VtdException;
 
 public class DownloadORCIDTest {
@@ -89,6 +90,34 @@ public class DownloadORCIDTest {
 	}
 
 	@Test
+	public void testParsingOrcidUpdateEmployments() throws Exception {
+		final String xml = IOUtils
+			.toString(
+				Objects
+					.requireNonNull(
+						getClass().getResourceAsStream("/eu/dnetlib/dhp/collection/orcid/update_employments.xml")));
+
+		final OrcidParser parser = new OrcidParser();
+		final ObjectMapper mapper = new ObjectMapper();
+		System.out.println(mapper.writeValueAsString(parser.parseEmployments(xml)));
+	}
+
+	@Test
+	public void testParsingOrcidUpdateWorks() throws Exception {
+		final String xml = IOUtils
+			.toString(
+				Objects
+					.requireNonNull(
+						getClass().getResourceAsStream("/eu/dnetlib/dhp/collection/orcid/update_work.xml")));
+
+		final OrcidParser parser = new OrcidParser();
+		final List<Work> works = parser.parseWorks(xml);
+
+		final ObjectMapper mapper = new ObjectMapper();
+		System.out.println(mapper.writeValueAsString(works));
+	}
+
+	@Test
 	public void testParsingEmployments() throws Exception {
 
 		final List<String> works_path = Arrays
@@ -121,13 +150,5 @@ public class DownloadORCIDTest {
 			}
 		});
 	}
-
-//	@Test
-//	public void testReadTar() throws Exception {
-//		OrcidGetUpdatesFile.main(new String[] {
-//			"--namenode", "puppa"
-//		});
-//
-//	}
 
 }
