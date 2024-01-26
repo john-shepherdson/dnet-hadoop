@@ -1,0 +1,44 @@
+[
+  {
+    "paramName":"bu",
+    "paramLongName":"baseURL",
+    "paramDescription": "URL of the isLookUp Service",
+    "paramRequired": true
+  },
+  {
+    "paramName":"s",
+    "paramLongName":"sourcePath",
+    "paramDescription": "the path of the sequencial file to read",
+    "paramRequired": true
+  },
+  {
+    "paramName":"as",
+    "paramLongName":"allowedsemrels",
+    "paramDescription": "the allowed semantic relations for propagation",
+    "paramRequired": true
+  },
+  {
+    "paramName":"h",
+    "paramLongName":"hive_metastore_uris",
+    "paramDescription": "the hive metastore uris",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ssm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "true if the spark session is managed, false otherwise",
+    "paramRequired": false
+  },
+  {
+    "paramName": "out",
+    "paramLongName": "outputPath",
+    "paramDescription": "the path used to store temporary output files",
+    "paramRequired": true
+  },
+  {
+    "paramName":"tn",
+    "paramLongName":"resultTableName",
+    "paramDescription": "the name of the result table we are currently working on",
+    "paramRequired": true
+  }
+]

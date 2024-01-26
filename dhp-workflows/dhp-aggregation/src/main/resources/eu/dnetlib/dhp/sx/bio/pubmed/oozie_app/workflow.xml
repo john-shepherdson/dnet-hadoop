@@ -1,4 +1,4 @@
-    <workflow-app name="Download_Transform_Pubmed_Workflow" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Download_Transform_Pubmed_Workflow" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>baselineWorkingPath</name>
@@ -76,42 +76,42 @@
         <error to="RollBack"/>
     </action>
 
-        <action name="CommitVersion">
-            <java>
-                <configuration>
-                    <property>
-                        <name>oozie.launcher.mapreduce.user.classpath.first</name>
-                        <value>true</value>
-                    </property>
-                </configuration>
-                <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
-                <arg>--action</arg><arg>COMMIT</arg>
-                <arg>--namenode</arg><arg>${nameNode}</arg>
-                <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
-                <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
-            </java>
-            <ok to="End"/>
-            <error to="Kill"/>
-        </action>
+    <action name="CommitVersion">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>COMMIT</arg>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
 
-        <action name="RollBack">
-            <java>
-                <configuration>
-                    <property>
-                        <name>oozie.launcher.mapreduce.user.classpath.first</name>
-                        <value>true</value>
-                    </property>
-                </configuration>
-                <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
-                <arg>--action</arg><arg>ROLLBACK</arg>
-                <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
-                <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
-            </java>
-            <ok to="Kill"/>
-            <error to="Kill"/>
-        </action>
+    <action name="RollBack">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>ROLLBACK</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
+        <ok to="Kill"/>
+        <error to="Kill"/>
+    </action>
 
 
-        <end name="End"/>
+    <end name="End"/>
 
 </workflow-app>

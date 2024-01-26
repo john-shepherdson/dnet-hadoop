@@ -60,7 +60,7 @@ public class PrepareInfo implements Serializable {
 			.toString(
 				SparkResultToOrganizationFromIstRepoJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/entitytoorganizationfromsemrel/input_preparation_parameter.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/entitytoorganizationfromsemrel/input_preparation_parameter.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 

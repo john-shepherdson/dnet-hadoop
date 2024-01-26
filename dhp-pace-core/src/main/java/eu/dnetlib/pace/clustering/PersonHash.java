@@ -15,7 +15,7 @@ public class PersonHash extends AbstractClusteringFunction {
 
 	private boolean DEFAULT_AGGRESSIVE = false;
 
-	public PersonHash(final Map<String, Integer> params) {
+	public PersonHash(final Map<String, Object> params) {
 		super(params);
 	}
 
