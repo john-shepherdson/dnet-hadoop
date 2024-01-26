@@ -1,5 +1,5 @@
 -- Sprint 1 ----
-drop table if exists ${stats_db_name}.indi_pub_green_oa purge;
+drop table if exists ${stats_db_name}.indi_pub_green_oa purge; /*EOS*/
 
 --create table if not exists ${stats_db_name}.indi_pub_green_oa stored as parquet as
 --select distinct p.id, coalesce(green_oa, 0) as green_oa
@@ -24,9 +24,9 @@ from ${stats_db_name}.publication p
     where datasource.type like '%Repository%'
       and (ri.accessright = 'Open Access'
         or ri.accessright = 'Embargo' or ri.accessright = 'Open Source') and datasource.name!='Other') tmp
-                         on p.id= tmp.id;
+                         on p.id= tmp.id; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_pub_grey_lit purge;
+drop table if exists ${stats_db_name}.indi_pub_grey_lit purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_pub_grey_lit stored as parquet as
 select distinct p.id, coalesce(grey_lit, 0) as grey_lit
@@ -37,9 +37,9 @@ from ${stats_db_name}.publication p
              join ${stats_db_name}.result_classifications rt on rt.id = p.id
     where rt.type not in ('Article','Part of book or chapter of book','Book','Doctoral thesis','Master thesis','Data Paper', 'Thesis', 'Bachelor thesis', 'Conference object') and
         not exists (select 1 from ${stats_db_name}.result_classifications rc where type ='Other literature type'
-                                                              and rc.id=p.id)) tmp on p.id=tmp.id;
+                                                              and rc.id=p.id)) tmp on p.id=tmp.id; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_pub_doi_from_crossref purge;
+drop table if exists ${stats_db_name}.indi_pub_doi_from_crossref purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_pub_doi_from_crossref stored as parquet as
 select distinct p.id, coalesce(doi_from_crossref, 0) as doi_from_crossref
@@ -48,10 +48,10 @@ from ${stats_db_name}.publication p
      (select ri.id, 1 as doi_from_crossref from ${stats_db_name}.result_instance ri
                                                     join ${stats_db_name}.datasource d on d.id = ri.collectedfrom
       where pidtype='Digital Object Identifier' and d.name ='Crossref') tmp
-     on tmp.id=p.id;
+     on tmp.id=p.id; /*EOS*/
 
 -- Sprint 2 ----
-drop table if exists ${stats_db_name}.indi_result_has_cc_licence purge;
+drop table if exists ${stats_db_name}.indi_result_has_cc_licence purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_result_has_cc_licence stored as parquet as
 select distinct r.id, (case when lic='' or lic is null then 0 else 1 end) as has_cc_license
@@ -59,9 +59,9 @@ from ${stats_db_name}.result r
 left outer join (select r.id, license.type as lic from ${stats_db_name}.result r
                                                                     join ${stats_db_name}.result_licenses as license on license.id = r.id
                           where lower(license.type) LIKE '%creativecommons.org%' OR license.type LIKE '%CC%') tmp
-                         on r.id= tmp.id;
+                         on r.id= tmp.id; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_result_has_cc_licence_url purge;
+drop table if exists ${stats_db_name}.indi_result_has_cc_licence_url purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_result_has_cc_licence_url stored as parquet as
 select distinct r.id, case when lic_host='' or lic_host is null then 0 else 1 end as has_cc_license_url
@@ -70,32 +70,32 @@ from ${stats_db_name}.result r
                           from ${stats_db_name}.result r
                                    join ${stats_db_name}.result_licenses as license on license.id = r.id
                           WHERE lower(parse_url(license.type, "HOST")) = "creativecommons.org") tmp
-                         on r.id= tmp.id;
+                         on r.id= tmp.id; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_pub_has_abstract purge;
+drop table if exists ${stats_db_name}.indi_pub_has_abstract purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_pub_has_abstract stored as parquet as
 select distinct publication.id, cast(coalesce(abstract, true) as int) has_abstract
-from ${stats_db_name}.publication;
+from ${stats_db_name}.publication; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_result_with_orcid purge;
+drop table if exists ${stats_db_name}.indi_result_with_orcid purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_result_with_orcid stored as parquet as
 select distinct r.id, coalesce(has_orcid, 0) as has_orcid
 from ${stats_db_name}.result r
          left outer join (select id, 1 as has_orcid from ${stats_db_name}.result_orcid) tmp
-                         on r.id= tmp.id;
+                         on r.id= tmp.id; /*EOS*/
 
 ---- Sprint 3 ----
 
-drop table if exists ${stats_db_name}.indi_funded_result_with_fundref purge;
+drop table if exists ${stats_db_name}.indi_funded_result_with_fundref purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_funded_result_with_fundref stored as parquet as
 select distinct r.result as id, coalesce(fundref, 0) as fundref
 from ${stats_db_name}.project_results r
          left outer join (select distinct result, 1 as fundref from ${stats_db_name}.project_results
                           where provenance='Harvested') tmp
-                         on r.result= tmp.result;
+                         on r.result= tmp.result; /*EOS*/
 
 -- create table indi_result_org_collab stored as parquet as
 -- select o1.organization org1, o2.organization org2, count(distinct o1.id) as collaborations
@@ -106,64 +106,64 @@ from ${stats_db_name}.project_results r
 -- compute stats indi_result_org_collab;
 --
 create TEMPORARY TABLE ${stats_db_name}.tmp AS SELECT ro.organization organization, ro.id, o.name from ${stats_db_name}.result_organization ro
-join ${stats_db_name}.organization o on o.id=ro.organization where o.name is not null;
+join ${stats_db_name}.organization o on o.id=ro.organization where o.name is not null; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_result_org_collab purge;
+drop table if exists ${stats_db_name}.indi_result_org_collab purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_result_org_collab stored as parquet as
 select o1.organization org1, o1.name org1name1, o2.organization org2, o2.name org2name2, count(o1.id) as collaborations
 from ${stats_db_name}.tmp as o1
 join ${stats_db_name}.tmp as o2 where o1.id=o2.id and o1.organization!=o2.organization and o1.name!=o2.name
-group by o1.organization, o2.organization, o1.name, o2.name;
+group by o1.organization, o2.organization, o1.name, o2.name; /*EOS*/
 
-drop table if exists ${stats_db_name}.tmp purge;
+drop table if exists ${stats_db_name}.tmp purge; /*EOS*/
 
 create TEMPORARY TABLE ${stats_db_name}.tmp AS
 select distinct ro.organization organization, ro.id, o.name, o.country from ${stats_db_name}.result_organization ro
-join ${stats_db_name}.organization o on o.id=ro.organization where country <> 'UNKNOWN'  and o.name is not null;
+join ${stats_db_name}.organization o on o.id=ro.organization where country <> 'UNKNOWN'  and o.name is not null; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_result_org_country_collab purge;
+drop table if exists ${stats_db_name}.indi_result_org_country_collab purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_result_org_country_collab stored as parquet as
 select o1.organization org1,o1.name org1name1, o2.country country2, count(o1.id) as collaborations
 from ${stats_db_name}.tmp as o1 join ${stats_db_name}.tmp as o2 on o1.id=o2.id
 where o1.id=o2.id and o1.country!=o2.country
-group by o1.organization, o1.id, o1.name, o2.country;
+group by o1.organization, o1.id, o1.name, o2.country; /*EOS*/
 
-drop table if exists  ${stats_db_name}.tmp purge;
+drop table if exists  ${stats_db_name}.tmp purge; /*EOS*/
 
 create TEMPORARY TABLE ${stats_db_name}.tmp AS
 select o.id organization, o.name, ro.project as project  from ${stats_db_name}.organization o
-        join ${stats_db_name}.organization_projects ro on o.id=ro.id  where o.name is not null;
+        join ${stats_db_name}.organization_projects ro on o.id=ro.id  where o.name is not null; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_project_collab_org purge;
+drop table if exists ${stats_db_name}.indi_project_collab_org purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_project_collab_org stored as parquet as
 select o1.organization org1,o1.name orgname1, o2.organization org2, o2.name orgname2, count(distinct o1.project) as collaborations
 from ${stats_db_name}.tmp as o1
          join ${stats_db_name}.tmp as o2 on o1.project=o2.project
 where o1.organization<>o2.organization and o1.name<>o2.name
-group by o1.name,o2.name, o1.organization, o2.organization;
+group by o1.name,o2.name, o1.organization, o2.organization; /*EOS*/
 
-drop table if exists ${stats_db_name}.tmp purge;
+drop table if exists ${stats_db_name}.tmp purge; /*EOS*/
 
 create TEMPORARY TABLE ${stats_db_name}.tmp AS
 select o.id organization, o.name, o.country , ro.project as project  from ${stats_db_name}.organization o
         join ${stats_db_name}.organization_projects ro on o.id=ro.id
-        and o.country <> 'UNKNOWN' and o.name is not null;
+        and o.country <> 'UNKNOWN' and o.name is not null; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_project_collab_org_country purge;
+drop table if exists ${stats_db_name}.indi_project_collab_org_country purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_project_collab_org_country stored as parquet as
 select o1.organization org1,o1.name org1name, o2.country country2, count(distinct o1.project) as collaborations
 from ${stats_db_name}.tmp as o1
          join ${stats_db_name}.tmp as o2 on o1.project=o2.project
 where o1.organization<>o2.organization and o1.country<>o2.country
-group by o1.organization, o2.country, o1.name;
+group by o1.organization, o2.country, o1.name; /*EOS*/
 
-drop table if exists ${stats_db_name}.tmp purge;
+drop table if exists ${stats_db_name}.tmp purge; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_funder_country_collab purge;
+drop table if exists ${stats_db_name}.indi_funder_country_collab purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_funder_country_collab stored as parquet as
     with tmp as (select funder, project, country from ${stats_db_name}.organization_projects op
@@ -174,26 +174,26 @@ select f1.funder, f1.country as country1, f2.country as country2, count(distinct
 from tmp as f1
          join tmp as f2 on f1.project=f2.project
 where f1.country<>f2.country
-group by f1.funder, f2.country, f1.country;
+group by f1.funder, f2.country, f1.country; /*EOS*/
 
 create TEMPORARY TABLE ${stats_db_name}.tmp AS
 select distinct country, ro.id as result  from ${stats_db_name}.organization o
         join ${stats_db_name}.result_organization ro on o.id=ro.organization
-        where country <> 'UNKNOWN' and o.name is not null;
+        where country <> 'UNKNOWN' and o.name is not null; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_result_country_collab purge;
+drop table if exists ${stats_db_name}.indi_result_country_collab purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_result_country_collab stored as parquet as
 select o1.country country1, o2.country country2, count(o1.result) as collaborations
 from ${stats_db_name}.tmp as o1
          join ${stats_db_name}.tmp as o2 on o1.result=o2.result
 where o1.country<>o2.country
-group by o1.country, o2.country;
+group by o1.country, o2.country; /*EOS*/
 
-drop table if exists ${stats_db_name}.tmp purge;
+drop table if exists ${stats_db_name}.tmp purge; /*EOS*/
 
 ---- Sprint 4 ----
-drop table if exists ${stats_db_name}.indi_pub_diamond purge;
+drop table if exists ${stats_db_name}.indi_pub_diamond purge; /*EOS*/
 
 --create table if not exists ${stats_db_name}.indi_pub_diamond stored as parquet as
 --select distinct pd.id, coalesce(in_diamond_journal, 0) as in_diamond_journal
@@ -212,9 +212,9 @@ left outer join (select pd.id, 1 as in_diamond_journal from ${stats_db_name}.pub
 join ${stats_db_name}.datasource d on d.id=pd.datasource
 join STATS_EXT.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_online=d.issn_online)
 and (ps.journal_is_in_doaj=true or ps.journal_is_oa=true) and ps.has_apc=false) tmp
-on pd.id=tmp.id;
+on pd.id=tmp.id; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_pub_in_transformative purge;
+drop table if exists ${stats_db_name}.indi_pub_in_transformative purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_pub_in_transformative stored as parquet as
 select distinct pd.id, coalesce(is_transformative, 0) as is_transformative
@@ -224,9 +224,9 @@ from ${stats_db_name}.publication pd
                                                    join ${stats_db_name}.datasource d on d.id=pd.datasource
                                                    join STATS_EXT.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_online=d.issn_online)
                                                                                  and ps.is_transformative_journal=true) tmp
-                         on pd.id=tmp.id;
+                         on pd.id=tmp.id; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_pub_closed_other_open purge;
+drop table if exists ${stats_db_name}.indi_pub_closed_other_open purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_pub_closed_other_open stored as parquet as
 select distinct ri.id, coalesce(pub_closed_other_open, 0) as pub_closed_other_open from ${stats_db_name}.result_instance ri
@@ -236,53 +236,53 @@ select distinct ri.id, coalesce(pub_closed_other_open, 0) as pub_closed_other_op
                                                                                                                                            join ${stats_db_name}.datasource d on ri.hostedby=d.id
                                                                                          where d.type like '%Journal%' and ri.accessright='Closed Access' and
                                                                                              (p.bestlicence='Open Access' or p.bestlicence='Open Source')) tmp
-                                                                                        on tmp.id=ri.id;
+                                                                                        on tmp.id=ri.id; /*EOS*/
 
 ---- Sprint 5 ----
-drop table if exists ${stats_db_name}.indi_result_no_of_copies purge;
+drop table if exists ${stats_db_name}.indi_result_no_of_copies purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_result_no_of_copies stored as parquet as
-select id, count(id) as number_of_copies from ${stats_db_name}.result_instance group by id;
+select id, count(id) as number_of_copies from ${stats_db_name}.result_instance group by id; /*EOS*/
 
 ---- Sprint 6 ----
-drop table if exists ${stats_db_name}.indi_pub_downloads purge;
+drop table if exists ${stats_db_name}.indi_pub_downloads purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_pub_downloads stored as parquet as
 SELECT result_id, sum(downloads) no_downloads from openaire_prod_usage_stats.usage_stats
                                                       join ${stats_db_name}.publication on result_id=id
 where downloads>0
 GROUP BY result_id
-order by no_downloads desc;
+order by no_downloads desc; /*EOS*/
 
 --ANALYZE TABLE ${stats_db_name}.indi_pub_downloads COMPUTE STATISTICS;
 
-drop table if exists ${stats_db_name}.indi_pub_downloads_datasource purge;
+drop table if exists ${stats_db_name}.indi_pub_downloads_datasource purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_pub_downloads_datasource stored as parquet as
 SELECT result_id, repository_id, sum(downloads) no_downloads from openaire_prod_usage_stats.usage_stats
                                                                      join ${stats_db_name}.publication on result_id=id
 where downloads>0
 GROUP BY result_id, repository_id
-order by result_id;
+order by result_id; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_pub_downloads_year purge;
+drop table if exists ${stats_db_name}.indi_pub_downloads_year purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_pub_downloads_year stored as parquet as
 SELECT result_id, cast(substring(us.`date`, 1,4) as int) as `year`, sum(downloads) no_downloads
 from openaire_prod_usage_stats.usage_stats us
 join ${stats_db_name}.publication on result_id=id where downloads>0
-GROUP BY result_id, substring(us.`date`, 1,4);
+GROUP BY result_id, substring(us.`date`, 1,4); /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_pub_downloads_datasource_year purge;
+drop table if exists ${stats_db_name}.indi_pub_downloads_datasource_year purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_pub_downloads_datasource_year stored as parquet as
 SELECT result_id, cast(substring(us.`date`, 1,4) as int) as `year`, repository_id, sum(downloads) no_downloads from openaire_prod_usage_stats.usage_stats us
 join ${stats_db_name}.publication on result_id=id
 where downloads>0
-GROUP BY result_id, repository_id, substring(us.`date`, 1,4);
+GROUP BY result_id, repository_id, substring(us.`date`, 1,4); /*EOS*/
 
 ---- Sprint 7 ----
-drop table if exists ${stats_db_name}.indi_pub_gold_oa purge;
+drop table if exists ${stats_db_name}.indi_pub_gold_oa purge; /*EOS*/
 
 --create table if not exists ${stats_db_name}.indi_pub_gold_oa stored as parquet as
 --    WITH gold_oa AS (    SELECT
@@ -381,9 +381,9 @@ left outer join (
         select pd.id, 1 as is_gold
         FROM ${stats_db_name}.publication_datasources pd
         join dd on dd.id=pd.datasource
-        left outer join ${stats_db_name}.result_accessroute ra on ra.id = pd.id where ra.accessroute = 'gold') tmp on tmp.id=pd.id;
+        left outer join ${stats_db_name}.result_accessroute ra on ra.id = pd.id where ra.accessroute = 'gold') tmp on tmp.id=pd.id; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_pub_hybrid_oa_with_cc purge;
+drop table if exists ${stats_db_name}.indi_pub_hybrid_oa_with_cc purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_pub_hybrid_oa_with_cc stored as parquet as
     WITH hybrid_oa AS (
@@ -414,9 +414,9 @@ FROM ${stats_db_name}.publication_datasources pd
                                              JOIN hybrid_oa ON issn.issn = hybrid_oa.issn
                                              JOIN ${stats_db_name}.indi_result_has_cc_licence cc on pd.id=cc.id
                                              JOIN ${stats_db_name}.indi_pub_gold_oa ga on pd.id=ga.id
-    where cc.has_cc_license=1 and ga.is_gold=0) tmp on pd.id=tmp.id;
+    where cc.has_cc_license=1 and ga.is_gold=0) tmp on pd.id=tmp.id; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_pub_hybrid purge;
+drop table if exists ${stats_db_name}.indi_pub_hybrid purge; /*EOS*/
 
 --create table if not exists ${stats_db_name}.indi_pub_hybrid stored as parquet as
 --    WITH gold_oa AS ( SELECT
@@ -489,9 +489,9 @@ join ${stats_db_name}.result_accessroute ra on ra.id=pd.id
 join ${stats_db_name}.datasource d on d.id=ri.hostedby
 where indi_gold.is_gold=0 and ((d.type like '%Journal%' and ri.accessright!='Closed Access' and ri.accessright!='Restricted' and ri.license is not null) or
 ra.accessroute='hybrid'))tmp
-on pd.id=tmp.id;
+on pd.id=tmp.id; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_org_fairness purge;
+drop table if exists ${stats_db_name}.indi_org_fairness purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_org_fairness stored as parquet as
 --return results with PIDs, and rich metadata group by organization
@@ -509,7 +509,7 @@ create table if not exists ${stats_db_name}.indi_org_fairness stored as parquet 
 --return results_fair/all_results
 select allresults.organization, result_fair.no_result_fair/allresults.no_allresults org_fairness
 from allresults
-         join result_fair on result_fair.organization=allresults.organization;
+         join result_fair on result_fair.organization=allresults.organization; /*EOS*/
 
 CREATE TEMPORARY table ${stats_db_name}.result_fair as
 select ro.organization organization, count(distinct ro.id) no_result_fair
@@ -519,44 +519,44 @@ select ro.organization organization, count(distinct ro.id) no_result_fair
     join ${stats_db_name}.indi_pub_grey_lit gl on gl.id=p.id
     where (title is not null) and (publisher is not null) and (abstract=true) and (year is not null)
     and (authors>0) and cast(year as int)>2003 and dc.doi_from_crossref=1 and gl.grey_lit=0
-    group by ro.organization;
+    group by ro.organization; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allresults as
 select ro.organization, count(distinct ro.id) no_allresults from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.publication p on p.id=ro.id
     where cast(year as int)>2003
-    group by ro.organization;
+    group by ro.organization; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_org_fairness_pub_pr purge;
+drop table if exists ${stats_db_name}.indi_org_fairness_pub_pr purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_org_fairness_pub_pr stored as parquet as
 select ar.organization, rf.no_result_fair/ar.no_allresults org_fairness
 from ${stats_db_name}.allresults ar
-         join ${stats_db_name}.result_fair rf on rf.organization=ar.organization;
+         join ${stats_db_name}.result_fair rf on rf.organization=ar.organization; /*EOS*/
 
-DROP table ${stats_db_name}.result_fair purge;
-DROP table ${stats_db_name}.allresults purge;
+DROP table ${stats_db_name}.result_fair purge; /*EOS*/
+DROP table ${stats_db_name}.allresults purge; /*EOS*/
 
 CREATE TEMPORARY table ${stats_db_name}.result_fair as
     select year, ro.organization organization, count(distinct ro.id) no_result_fair from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result p on p.id=ro.id
     where (title is not null) and (publisher is not null) and (abstract=true) and (year is not null) and (authors>0) and cast(year as int)>2003
-    group by ro.organization, year;
+    group by ro.organization, year; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allresults as select year, ro.organization, count(distinct ro.id) no_allresults from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result p on p.id=ro.id
     where cast(year as int)>2003
-    group by ro.organization, year;
+    group by ro.organization, year; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_org_fairness_pub_year purge;
+drop table if exists ${stats_db_name}.indi_org_fairness_pub_year purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_org_fairness_pub_year stored as parquet as
 select cast(allresults.year as int) year, allresults.organization, result_fair.no_result_fair/allresults.no_allresults org_fairness
 from ${stats_db_name}.allresults
-         join ${stats_db_name}.result_fair on result_fair.organization=allresults.organization and result_fair.year=allresults.year;
+         join ${stats_db_name}.result_fair on result_fair.organization=allresults.organization and result_fair.year=allresults.year; /*EOS*/
 
-DROP table ${stats_db_name}.result_fair purge;
-DROP table ${stats_db_name}.allresults purge;
+DROP table ${stats_db_name}.result_fair purge; /*EOS*/
+DROP table ${stats_db_name}.allresults purge; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.result_fair as
     select ro.organization organization, count(distinct ro.id) no_result_fair
@@ -564,92 +564,92 @@ CREATE TEMPORARY TABLE ${stats_db_name}.result_fair as
               join ${stats_db_name}.result p on p.id=ro.id
      where (title is not null) and (publisher is not null) and (abstract=true) and (year is not null)
        and (authors>0) and cast(year as int)>2003
-     group by ro.organization;
+     group by ro.organization; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allresults as
     select ro.organization, count(distinct ro.id) no_allresults from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result p on p.id=ro.id
     where cast(year as int)>2003
-    group by ro.organization;
+    group by ro.organization; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_org_fairness_pub purge;
+drop table if exists ${stats_db_name}.indi_org_fairness_pub purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_org_fairness_pub as
 select ar.organization, rf.no_result_fair/ar.no_allresults org_fairness
 from ${stats_db_name}.allresults ar join ${stats_db_name}.result_fair rf
-on rf.organization=ar.organization;
+on rf.organization=ar.organization; /*EOS*/
 
-DROP table ${stats_db_name}.result_fair purge;
-DROP table ${stats_db_name}.allresults purge;
+DROP table ${stats_db_name}.result_fair purge; /*EOS*/
+DROP table ${stats_db_name}.allresults purge; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.result_fair as
     select year, ro.organization organization, count(distinct ro.id) no_result_fair from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result r on r.id=ro.id
     join ${stats_db_name}.result_pids rp on r.id=rp.id
     where (title is not null) and (publisher is not null) and (abstract=true) and (year is not null) and (authors>0) and  cast(year as int)>2003
-    group by ro.organization, year;
+    group by ro.organization, year; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allresults as
     select year, ro.organization, count(distinct ro.id) no_allresults from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result r on r.id=ro.id
     where  cast(year as int)>2003
-    group by ro.organization, year;
+    group by ro.organization, year; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_org_fairness_year purge;
+drop table if exists ${stats_db_name}.indi_org_fairness_year purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_org_fairness_year stored as parquet as
     select cast(allresults.year as int) year, allresults.organization, result_fair.no_result_fair/allresults.no_allresults org_fairness
     from ${stats_db_name}.allresults
-    join ${stats_db_name}.result_fair on result_fair.organization=allresults.organization and cast(result_fair.year as int)=cast(allresults.year as int);
+    join ${stats_db_name}.result_fair on result_fair.organization=allresults.organization and cast(result_fair.year as int)=cast(allresults.year as int); /*EOS*/
 
-DROP table ${stats_db_name}.result_fair purge;
-DROP table ${stats_db_name}.allresults purge;
+DROP table ${stats_db_name}.result_fair purge; /*EOS*/
+DROP table ${stats_db_name}.allresults purge; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.result_with_pid as
     select year, ro.organization, count(distinct rp.id) no_result_with_pid from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result_pids rp on rp.id=ro.id
     join ${stats_db_name}.result r on r.id=rp.id
     where cast(year as int) >2003
-    group by ro.organization, year;
+    group by ro.organization, year; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allresults as
     select year, ro.organization, count(distinct ro.id) no_allresults from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result r on r.id=ro.id
     where cast(year as int) >2003
-    group by ro.organization, year;
+    group by ro.organization, year; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_org_findable_year purge;
+drop table if exists ${stats_db_name}.indi_org_findable_year purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_org_findable_year stored as parquet as
 select cast(allresults.year as int) year, allresults.organization, result_with_pid.no_result_with_pid/allresults.no_allresults org_findable
 from ${stats_db_name}.allresults
-         join ${stats_db_name}.result_with_pid on result_with_pid.organization=allresults.organization and cast(result_with_pid.year as int)=cast(allresults.year as int);
+         join ${stats_db_name}.result_with_pid on result_with_pid.organization=allresults.organization and cast(result_with_pid.year as int)=cast(allresults.year as int); /*EOS*/
 
-DROP table ${stats_db_name}.result_with_pid purge;
-DROP table ${stats_db_name}.allresults purge;
+DROP table ${stats_db_name}.result_with_pid purge; /*EOS*/
+DROP table ${stats_db_name}.allresults purge; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.result_with_pid as
 select ro.organization, count(distinct rp.id) no_result_with_pid from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result_pids rp on rp.id=ro.id
     join ${stats_db_name}.result r on r.id=rp.id
     where cast(year as int) >2003
-    group by ro.organization;
+    group by ro.organization; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allresults as
 select ro.organization, count(distinct ro.id) no_allresults from ${stats_db_name}.result_organization ro
     join ${stats_db_name}.result r on r.id=ro.id
     where cast(year as int) >2003
-    group by ro.organization;
+    group by ro.organization; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_org_findable purge;
+drop table if exists ${stats_db_name}.indi_org_findable purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_org_findable stored as parquet as
 select allresults.organization, result_with_pid.no_result_with_pid/allresults.no_allresults org_findable
 from ${stats_db_name}.allresults
-         join ${stats_db_name}.result_with_pid on result_with_pid.organization=allresults.organization;
+         join ${stats_db_name}.result_with_pid on result_with_pid.organization=allresults.organization; /*EOS*/
 
-DROP table ${stats_db_name}.result_with_pid purge;
-DROP table ${stats_db_name}.allresults purge;
+DROP table ${stats_db_name}.result_with_pid purge; /*EOS*/
+DROP table ${stats_db_name}.allresults purge; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.pubs_oa as
 SELECT ro.organization, count(distinct r.id) no_oapubs FROM ${stats_db_name}.publication r
@@ -657,7 +657,7 @@ SELECT ro.organization, count(distinct r.id) no_oapubs FROM ${stats_db_name}.pub
     join ${stats_db_name}.result_instance ri on ri.id=r.id
     where (ri.accessright = 'Open Access' or ri.accessright = 'Embargo'  or ri.accessright = 'Open Source')
     and cast(r.year as int)>2003
-    group by ro.organization;
+    group by ro.organization; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.datasets_oa as
 SELECT ro.organization, count(distinct r.id) no_oadatasets FROM ${stats_db_name}.dataset r
@@ -665,7 +665,7 @@ SELECT ro.organization, count(distinct r.id) no_oadatasets FROM ${stats_db_name}
     join ${stats_db_name}.result_instance ri on ri.id=r.id
     where (ri.accessright = 'Open Access' or ri.accessright = 'Embargo'  or ri.accessright = 'Open Source')
     and cast(r.year as int)>2003
-    group by ro.organization;
+    group by ro.organization; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.software_oa as
 SELECT ro.organization, count(distinct r.id) no_oasoftware FROM ${stats_db_name}.software r
@@ -673,41 +673,41 @@ SELECT ro.organization, count(distinct r.id) no_oasoftware FROM ${stats_db_name}
     join ${stats_db_name}.result_instance ri on ri.id=r.id
     where (ri.accessright = 'Open Access' or ri.accessright = 'Embargo'  or ri.accessright = 'Open Source')
     and cast(r.year as int)>2003
-    group by ro.organization;
+    group by ro.organization; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allpubs as
 SELECT ro.organization, count(ro.id) no_allpubs FROM ${stats_db_name}.result_organization ro
     join ${stats_db_name}.publication ps on ps.id=ro.id
     where cast(ps.year as int)>2003
-    group by ro.organization;
+    group by ro.organization; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.alldatasets as
 SELECT ro.organization, count(ro.id) no_alldatasets FROM ${stats_db_name}.result_organization ro
     join ${stats_db_name}.dataset ps on ps.id=ro.id
     where cast(ps.year as int)>2003
-    group by ro.organization;
+    group by ro.organization; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allsoftware as
 SELECT ro.organization, count(ro.id) no_allsoftware FROM ${stats_db_name}.result_organization ro
     join ${stats_db_name}.software ps on ps.id=ro.id
     where cast(ps.year as int)>2003
-    group by ro.organization;
+    group by ro.organization; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allpubsshare as
 select pubs_oa.organization, pubs_oa.no_oapubs/allpubs.no_allpubs p from ${stats_db_name}.allpubs
-                        join ${stats_db_name}.pubs_oa on allpubs.organization=pubs_oa.organization;
+                        join ${stats_db_name}.pubs_oa on allpubs.organization=pubs_oa.organization; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.alldatasetssshare as
 select datasets_oa.organization, datasets_oa.no_oadatasets/alldatasets.no_alldatasets d
                              from ${stats_db_name}.alldatasets
-                             join ${stats_db_name}.datasets_oa on alldatasets.organization=datasets_oa.organization;
+                             join ${stats_db_name}.datasets_oa on alldatasets.organization=datasets_oa.organization; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allsoftwaresshare as
 select software_oa.organization, software_oa.no_oasoftware/allsoftware.no_allsoftware s
                              from ${stats_db_name}.allsoftware
-                             join ${stats_db_name}.software_oa on allsoftware.organization=software_oa.organization;
+                             join ${stats_db_name}.software_oa on allsoftware.organization=software_oa.organization; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_org_openess purge;
+drop table if exists ${stats_db_name}.indi_org_openess purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_org_openess stored as parquet as
 select allpubsshare.organization,
@@ -719,17 +719,17 @@ select allpubsshare.organization,
                                                 on tmp1.organization=allpubsshare.organization
                                 left outer join (select organization,s from
     ${stats_db_name}.allsoftwaresshare) tmp2
-                                                on tmp2.organization=allpubsshare.organization;
+                                                on tmp2.organization=allpubsshare.organization; /*EOS*/
 
-DROP TABLE ${stats_db_name}.pubs_oa purge;
-DROP TABLE ${stats_db_name}.datasets_oa purge;
-DROP TABLE ${stats_db_name}.software_oa purge;
-DROP TABLE ${stats_db_name}.allpubs purge;
-DROP TABLE ${stats_db_name}.alldatasets purge;
-DROP TABLE ${stats_db_name}.allsoftware purge;
-DROP TABLE ${stats_db_name}.allpubsshare purge;
-DROP TABLE ${stats_db_name}.alldatasetssshare purge;
-DROP TABLE ${stats_db_name}.allsoftwaresshare purge;
+DROP TABLE ${stats_db_name}.pubs_oa purge; /*EOS*/
+DROP TABLE ${stats_db_name}.datasets_oa purge; /*EOS*/
+DROP TABLE ${stats_db_name}.software_oa purge; /*EOS*/
+DROP TABLE ${stats_db_name}.allpubs purge; /*EOS*/
+DROP TABLE ${stats_db_name}.alldatasets purge; /*EOS*/
+DROP TABLE ${stats_db_name}.allsoftware purge; /*EOS*/
+DROP TABLE ${stats_db_name}.allpubsshare purge; /*EOS*/
+DROP TABLE ${stats_db_name}.alldatasetssshare purge; /*EOS*/
+DROP TABLE ${stats_db_name}.allsoftwaresshare purge; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.pubs_oa AS
 SELECT r.year, ro.organization, count(distinct r.id) no_oapubs FROM ${stats_db_name}.publication r
@@ -737,7 +737,7 @@ SELECT r.year, ro.organization, count(distinct r.id) no_oapubs FROM ${stats_db_n
     join ${stats_db_name}.result_instance ri on ri.id=r.id
     where (ri.accessright = 'Open Access' or ri.accessright = 'Embargo'  or ri.accessright = 'Open Source')
     and cast(r.year as int)>2003
-    group by ro.organization,r.year;
+    group by ro.organization,r.year; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.datasets_oa AS
 SELECT r.year,ro.organization, count(distinct r.id) no_oadatasets FROM ${stats_db_name}.dataset r
@@ -745,7 +745,7 @@ SELECT r.year,ro.organization, count(distinct r.id) no_oadatasets FROM ${stats_d
     join ${stats_db_name}.result_instance ri on ri.id=r.id
     where (ri.accessright = 'Open Access' or ri.accessright = 'Embargo'  or ri.accessright = 'Open Source')
     and cast(r.year as int)>2003
-    group by ro.organization, r.year;
+    group by ro.organization, r.year; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.software_oa AS
 SELECT r.year,ro.organization, count(distinct r.id) no_oasoftware FROM ${stats_db_name}.software r
@@ -753,38 +753,38 @@ SELECT r.year,ro.organization, count(distinct r.id) no_oasoftware FROM ${stats_d
     join ${stats_db_name}.result_instance ri on ri.id=r.id
     where (ri.accessright = 'Open Access' or ri.accessright = 'Embargo'  or ri.accessright = 'Open Source')
     and cast(r.year as int)>2003
-    group by ro.organization, r.year;
+    group by ro.organization, r.year; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allpubs as
 SELECT p.year,ro.organization organization, count(ro.id) no_allpubs FROM ${stats_db_name}.result_organization ro
     join ${stats_db_name}.publication p on p.id=ro.id where cast(p.year as int)>2003
-    group by ro.organization, p.year;
+    group by ro.organization, p.year; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.alldatasets as
 SELECT d.year, ro.organization organization, count(ro.id) no_alldatasets FROM ${stats_db_name}.result_organization ro
     join ${stats_db_name}.dataset d on d.id=ro.id where cast(d.year as int)>2003
-    group by ro.organization, d.year;
+    group by ro.organization, d.year; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allsoftware as
 SELECT s.year,ro.organization organization, count(ro.id) no_allsoftware FROM ${stats_db_name}.result_organization ro
     join ${stats_db_name}.software s on s.id=ro.id where cast(s.year as int)>2003
-    group by ro.organization, s.year;
+    group by ro.organization, s.year; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allpubsshare as
 select allpubs.year, pubs_oa.organization, pubs_oa.no_oapubs/allpubs.no_allpubs p from ${stats_db_name}.allpubs
-                        join ${stats_db_name}.pubs_oa on allpubs.organization=pubs_oa.organization where cast(allpubs.year as INT)=cast(pubs_oa.year as int);
+                        join ${stats_db_name}.pubs_oa on allpubs.organization=pubs_oa.organization where cast(allpubs.year as INT)=cast(pubs_oa.year as int); /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.alldatasetssshare as
 select alldatasets.year, datasets_oa.organization, datasets_oa.no_oadatasets/alldatasets.no_alldatasets d
                              from ${stats_db_name}.alldatasets
-                             join ${stats_db_name}.datasets_oa on alldatasets.organization=datasets_oa.organization where cast(alldatasets.year as INT)=cast(datasets_oa.year as int);
+                             join ${stats_db_name}.datasets_oa on alldatasets.organization=datasets_oa.organization where cast(alldatasets.year as INT)=cast(datasets_oa.year as int); /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allsoftwaresshare as
 select allsoftware.year, software_oa.organization, software_oa.no_oasoftware/allsoftware.no_allsoftware s
                              from ${stats_db_name}.allsoftware
-                             join ${stats_db_name}.software_oa on allsoftware.organization=software_oa.organization where cast(allsoftware.year as INT)=cast(software_oa.year as int);
+                             join ${stats_db_name}.software_oa on allsoftware.organization=software_oa.organization where cast(allsoftware.year as INT)=cast(software_oa.year as int); /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_org_openess_year purge;
+drop table if exists ${stats_db_name}.indi_org_openess_year purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_org_openess_year stored as parquet as
 select cast(allpubsshare.year as int) year, allpubsshare.organization,
@@ -796,19 +796,19 @@ select cast(allpubsshare.year as int) year, allpubsshare.organization,
                                                 on tmp1.organization=allpubsshare.organization and tmp1.year=allpubsshare.year
                                 left outer join (select cast(year as int), organization,s from
     ${stats_db_name}.allsoftwaresshare) tmp2
-                                                on tmp2.organization=allpubsshare.organization and cast(tmp2.year as int)=cast(allpubsshare.year as int);
+                                                on tmp2.organization=allpubsshare.organization and cast(tmp2.year as int)=cast(allpubsshare.year as int); /*EOS*/
 
-DROP TABLE ${stats_db_name}.pubs_oa purge;
-DROP TABLE ${stats_db_name}.datasets_oa purge;
-DROP TABLE ${stats_db_name}.software_oa purge;
-DROP TABLE ${stats_db_name}.allpubs purge;
-DROP TABLE ${stats_db_name}.alldatasets purge;
-DROP TABLE ${stats_db_name}.allsoftware purge;
-DROP TABLE ${stats_db_name}.allpubsshare purge;
-DROP TABLE ${stats_db_name}.alldatasetssshare purge;
-DROP TABLE ${stats_db_name}.allsoftwaresshare purge;
+DROP TABLE ${stats_db_name}.pubs_oa purge; /*EOS*/
+DROP TABLE ${stats_db_name}.datasets_oa purge; /*EOS*/
+DROP TABLE ${stats_db_name}.software_oa purge; /*EOS*/
+DROP TABLE ${stats_db_name}.allpubs purge; /*EOS*/
+DROP TABLE ${stats_db_name}.alldatasets purge; /*EOS*/
+DROP TABLE ${stats_db_name}.allsoftware purge; /*EOS*/
+DROP TABLE ${stats_db_name}.allpubsshare purge; /*EOS*/
+DROP TABLE ${stats_db_name}.alldatasetssshare purge; /*EOS*/
+DROP TABLE ${stats_db_name}.allsoftwaresshare purge; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_pub_has_preprint purge;
+drop table if exists ${stats_db_name}.indi_pub_has_preprint purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_pub_has_preprint stored as parquet as
 select distinct p.id, coalesce(has_preprint, 0) as has_preprint
@@ -817,8 +817,8 @@ from ${stats_db_name}.publication_classifications p
     select p.id, 1 as has_preprint
     from ${stats_db_name}.publication_classifications p
     where p.type='Preprint') tmp
-                         on p.id= tmp.id;
-drop table if exists ${stats_db_name}.indi_pub_in_subscribed purge;
+                         on p.id= tmp.id; /*EOS*/
+drop table if exists ${stats_db_name}.indi_pub_in_subscribed purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_pub_in_subscribed stored as parquet as
 select distinct p.id, coalesce(is_subscription, 0) as is_subscription
@@ -829,9 +829,9 @@ from ${stats_db_name}.publication p
                                                 join ${stats_db_name}.indi_pub_hybrid h on p.id=h.id
                                                 join ${stats_db_name}.indi_pub_in_transformative t on p.id=t.id
     where g.is_gold=0 and h.is_hybrid=0 and t.is_transformative=0) tmp
-                        on p.id=tmp.id;
+                        on p.id=tmp.id; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_result_with_pid purge;
+drop table if exists ${stats_db_name}.indi_result_with_pid purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_result_with_pid as
 select distinct p.id, coalesce(result_with_pid, 0) as result_with_pid
@@ -839,13 +839,13 @@ from ${stats_db_name}.result p
          left outer join (
     select p.id, 1 as result_with_pid
     from ${stats_db_name}.result_pids p) tmp
-                         on p.id= tmp.id;
+                         on p.id= tmp.id; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.pub_fos_totals as
 select rf.id, count(distinct lvl3) totals from ${stats_db_name}.result_fos rf
-group by rf.id;
+group by rf.id; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_pub_interdisciplinarity purge;
+drop table if exists ${stats_db_name}.indi_pub_interdisciplinarity purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_pub_interdisciplinarity as
 select distinct p.id as id, coalesce(is_interdisciplinary, 0)
@@ -853,11 +853,11 @@ as is_interdisciplinary
 from ${stats_db_name}.pub_fos_totals p
 left outer join (
 select pub_fos_totals.id, 1 as is_interdisciplinary from ${stats_db_name}.pub_fos_totals
-where totals>1) tmp on p.id=tmp.id;
+where totals>1) tmp on p.id=tmp.id; /*EOS*/
 
-drop table ${stats_db_name}.pub_fos_totals purge;
+drop table ${stats_db_name}.pub_fos_totals purge; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_pub_bronze_oa purge;
+drop table if exists ${stats_db_name}.indi_pub_bronze_oa purge; /*EOS*/
 
 --create table if not exists ${stats_db_name}.indi_pub_bronze_oa stored as parquet as
 --select distinct p.id, coalesce(is_bronze_oa,0) as is_bronze_oa
@@ -883,16 +883,16 @@ join ${stats_db_name}.datasource d on d.id=ri.hostedby
 where indi_gold.is_gold=0 and indi_hybrid.is_hybrid=0
 and ((d.type like '%Journal%' and ri.accessright!='Closed Access'
 and ri.accessright!='Restricted' and ri.license is null) or ra.accessroute='bronze')) tmp
-on pd.id=tmp.id;
+on pd.id=tmp.id; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.project_year_result_year as
 select p.id project_id, acronym, r.id result_id, r.year, p.end_year
 from ${stats_db_name}.project p
 join ${stats_db_name}.result_projects rp on p.id=rp.project
 join ${stats_db_name}.result r on r.id=rp.id
-where p.end_year is NOT NULL and r.year is not null;
+where p.end_year is NOT NULL and r.year is not null; /*EOS*/
 
-drop table if exists ${stats_db_name}.indi_is_project_result_after purge;
+drop table if exists ${stats_db_name}.indi_is_project_result_after purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_is_project_result_after stored as parquet as
 select pry.project_id, pry.acronym, pry.result_id,
@@ -900,21 +900,21 @@ coalesce(is_project_result_after, 0) as is_project_result_after
 from ${stats_db_name}.project_year_result_year pry
 left outer join (select pry.project_id, pry.acronym, pry.result_id, 1 as is_project_result_after
 from ${stats_db_name}.project_year_result_year pry
-where pry.year>pry.end_year) tmp on pry.result_id=tmp.result_id;
+where pry.year>pry.end_year) tmp on pry.result_id=tmp.result_id; /*EOS*/
 
-drop table ${stats_db_name}.project_year_result_year purge;
+drop table ${stats_db_name}.project_year_result_year purge; /*EOS*/
 
-drop table ${stats_db_name}.indi_is_funder_plan_s purge;
+drop table ${stats_db_name}.indi_is_funder_plan_s purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_is_funder_plan_s stored as parquet as
 select distinct f.id, f.name, coalesce(is_funder_plan_s, 0) as is_funder_plan_s
 from ${stats_db_name}.funder f
          left outer join (select id, name, 1 as is_funder_plan_s from ${stats_db_name}.funder
          join stats_ext.plan_s_short on c_o_alition_s_organisation_funder=name) tmp
-                         on f.name= tmp.name;
+                         on f.name= tmp.name; /*EOS*/
 
 --Funder Fairness
-drop table ${stats_db_name}.indi_funder_fairness purge;
+drop table ${stats_db_name}.indi_funder_fairness purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_funder_fairness stored as parquet as
     with result_fair as
@@ -930,10 +930,10 @@ create table if not exists ${stats_db_name}.indi_funder_fairness stored as parqu
     group by p.funder)
 select allresults.funder, result_fair.no_result_fair/allresults.no_allresults funder_fairness
 from allresults
-         join result_fair on result_fair.funder=allresults.funder;
+         join result_fair on result_fair.funder=allresults.funder; /*EOS*/
 
 --RIs Fairness
-drop table ${stats_db_name}.indi_ris_fairness purge;
+drop table ${stats_db_name}.indi_ris_fairness purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_ris_fairness stored as parquet as
 with result_contexts as
@@ -953,7 +953,7 @@ allresults as
     group by rc.ri_initiative)
 select allresults.ri_initiative, result_fair.no_result_fair/allresults.no_allresults ris_fairness
 from allresults
-         join result_fair on result_fair.ri_initiative=allresults.ri_initiative;
+         join result_fair on result_fair.ri_initiative=allresults.ri_initiative; /*EOS*/
 
 --Funder Openess
 
@@ -964,7 +964,7 @@ join ${stats_db_name}.publication r on r.id=rp.id
 join ${stats_db_name}.result_instance ri on ri.id=r.id
 where (ri.accessright = 'Open Access' or ri.accessright = 'Embargo'  or ri.accessright = 'Open Source')
 and cast(r.year as int)>2003
-group by p.funder;
+group by p.funder; /*EOS*/
 
 
 CREATE TEMPORARY TABLE ${stats_db_name}.datasets_oa as
@@ -974,7 +974,7 @@ join ${stats_db_name}.dataset r on r.id=rp.id
 join ${stats_db_name}.result_instance ri on ri.id=r.id
 where (ri.accessright = 'Open Access' or ri.accessright = 'Embargo'  or ri.accessright = 'Open Source')
 and cast(r.year as int)>2003
-group by p.funder;
+group by p.funder; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.software_oa as
 select p.funder funder, count(distinct rp.id) no_oasoftware from ${stats_db_name}.result_projects rp
@@ -983,44 +983,44 @@ join ${stats_db_name}.software r on r.id=rp.id
 join ${stats_db_name}.result_instance ri on ri.id=r.id
 where (ri.accessright = 'Open Access' or ri.accessright = 'Embargo'  or ri.accessright = 'Open Source')
 and cast(r.year as int)>2003
-group by p.funder;
+group by p.funder; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allpubs as
 select p.funder funder, count(distinct rp.id) no_allpubs from ${stats_db_name}.result_projects rp
 join ${stats_db_name}.project p on p.id=rp.project
 join ${stats_db_name}.publication r on r.id=rp.id
 where cast(r.year as int)>2003
-group by p.funder;
+group by p.funder; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.alldatasets as
 select p.funder funder, count(distinct rp.id) no_alldatasets from ${stats_db_name}.result_projects rp
 join ${stats_db_name}.project p on p.id=rp.project
 join ${stats_db_name}.dataset r on r.id=rp.id
 where cast(r.year as int)>2003
-group by p.funder;
+group by p.funder; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allsoftware as
 select p.funder funder, count(distinct rp.id) no_allsoftware from ${stats_db_name}.result_projects rp
 join ${stats_db_name}.project p on p.id=rp.project
 join ${stats_db_name}.software r on r.id=rp.id
 where cast(r.year as int)>2003
-group by p.funder;
+group by p.funder; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allpubsshare as
 select pubs_oa.funder, pubs_oa.no_oapubs/allpubs.no_allpubs p from ${stats_db_name}.allpubs
-                        join ${stats_db_name}.pubs_oa on allpubs.funder=pubs_oa.funder;
+                        join ${stats_db_name}.pubs_oa on allpubs.funder=pubs_oa.funder; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.alldatasetssshare as
 select datasets_oa.funder, datasets_oa.no_oadatasets/alldatasets.no_alldatasets d
                              from ${stats_db_name}.alldatasets
-                             join ${stats_db_name}.datasets_oa on alldatasets.funder=datasets_oa.funder;
+                             join ${stats_db_name}.datasets_oa on alldatasets.funder=datasets_oa.funder; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allsoftwaresshare as
 select software_oa.funder, software_oa.no_oasoftware/allsoftware.no_allsoftware s
                              from ${stats_db_name}.allsoftware
-                             join ${stats_db_name}.software_oa on allsoftware.funder=software_oa.funder;
+                             join ${stats_db_name}.software_oa on allsoftware.funder=software_oa.funder; /*EOS*/
 
-drop table ${stats_db_name}.indi_funder_openess purge;
+drop table ${stats_db_name}.indi_funder_openess purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_funder_openess stored as parquet as
 select allpubsshare.funder,
@@ -1032,17 +1032,17 @@ select allpubsshare.funder,
                                                 on tmp1.funder=allpubsshare.funder
                                 left outer join (select funder,s from
     ${stats_db_name}.allsoftwaresshare) tmp2
-                                                on tmp2.funder=allpubsshare.funder;
+                                                on tmp2.funder=allpubsshare.funder; /*EOS*/
 
-DROP TABLE ${stats_db_name}.pubs_oa purge;
-DROP TABLE ${stats_db_name}.datasets_oa purge;
-DROP TABLE ${stats_db_name}.software_oa purge;
-DROP TABLE ${stats_db_name}.allpubs purge;
-DROP TABLE ${stats_db_name}.alldatasets purge;
-DROP TABLE ${stats_db_name}.allsoftware purge;
-DROP TABLE ${stats_db_name}.allpubsshare purge;
-DROP TABLE ${stats_db_name}.alldatasetssshare purge;
-DROP TABLE ${stats_db_name}.allsoftwaresshare purge;
+DROP TABLE ${stats_db_name}.pubs_oa purge; /*EOS*/
+DROP TABLE ${stats_db_name}.datasets_oa purge; /*EOS*/
+DROP TABLE ${stats_db_name}.software_oa purge; /*EOS*/
+DROP TABLE ${stats_db_name}.allpubs purge; /*EOS*/
+DROP TABLE ${stats_db_name}.alldatasets purge; /*EOS*/
+DROP TABLE ${stats_db_name}.allsoftware purge; /*EOS*/
+DROP TABLE ${stats_db_name}.allpubsshare purge; /*EOS*/
+DROP TABLE ${stats_db_name}.alldatasetssshare purge; /*EOS*/
+DROP TABLE ${stats_db_name}.allsoftwaresshare purge; /*EOS*/
 
 --RIs Openess
 
@@ -1050,7 +1050,7 @@ CREATE TEMPORARY TABLE ${stats_db_name}.result_contexts as
 select distinct rc.id, context.name ri_initiative from ${stats_db_name}.result_concepts rc
 join ${stats_db_name}.concept on concept.id=rc.concept
 join ${stats_db_name}.category on category.id=concept.category
-join ${stats_db_name}.context on context.id=category.context;
+join ${stats_db_name}.context on context.id=category.context; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.pubs_oa as
 select rp.ri_initiative ri_initiative, count(distinct rp.id) no_oapubs from ${stats_db_name}.result_contexts rp
@@ -1058,7 +1058,7 @@ join ${stats_db_name}.publication r on r.id=rp.id
 join ${stats_db_name}.result_instance ri on ri.id=r.id
 where (ri.accessright = 'Open Access' or ri.accessright = 'Embargo'  or ri.accessright = 'Open Source')
 and cast(r.year as int)>2003
-group by rp.ri_initiative;
+group by rp.ri_initiative; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.datasets_oa as
 select rp.ri_initiative ri_initiative, count(distinct rp.id) no_oadatasets from ${stats_db_name}.result_contexts rp
@@ -1066,7 +1066,7 @@ join ${stats_db_name}.dataset r on r.id=rp.id
 join ${stats_db_name}.result_instance ri on ri.id=r.id
 where (ri.accessright = 'Open Access' or ri.accessright = 'Embargo'  or ri.accessright = 'Open Source')
 and cast(r.year as int)>2003
-group by rp.ri_initiative;
+group by rp.ri_initiative; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.software_oa as
 select rp.ri_initiative ri_initiative, count(distinct rp.id) no_oasoftware from ${stats_db_name}.result_contexts rp
@@ -1074,41 +1074,41 @@ join ${stats_db_name}.software r on r.id=rp.id
 join ${stats_db_name}.result_instance ri on ri.id=r.id
 where (ri.accessright = 'Open Access' or ri.accessright = 'Embargo'  or ri.accessright = 'Open Source')
 and cast(r.year as int)>2003
-group by rp.ri_initiative;
+group by rp.ri_initiative; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allpubs as
 select rp.ri_initiative ri_initiative, count(distinct rp.id) no_allpubs from ${stats_db_name}.result_contexts rp
 join ${stats_db_name}.publication r on r.id=rp.id
 where cast(r.year as int)>2003
-group by rp.ri_initiative;
+group by rp.ri_initiative; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.alldatasets as
 select rp.ri_initiative ri_initiative, count(distinct rp.id) no_alldatasets from ${stats_db_name}.result_contexts rp
 join ${stats_db_name}.dataset r on r.id=rp.id
 where cast(r.year as int)>2003
-group by rp.ri_initiative;
+group by rp.ri_initiative; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allsoftware as
 select rp.ri_initiative ri_initiative, count(distinct rp.id) no_allsoftware from ${stats_db_name}.result_contexts rp
 join ${stats_db_name}.software r on r.id=rp.id
 where cast(r.year as int)>2003
-group by rp.ri_initiative;
+group by rp.ri_initiative; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allpubsshare as
 select pubs_oa.ri_initiative, pubs_oa.no_oapubs/allpubs.no_allpubs p from ${stats_db_name}.allpubs
-                        join ${stats_db_name}.pubs_oa on allpubs.ri_initiative=pubs_oa.ri_initiative;
+                        join ${stats_db_name}.pubs_oa on allpubs.ri_initiative=pubs_oa.ri_initiative; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.alldatasetssshare as
 select datasets_oa.ri_initiative, datasets_oa.no_oadatasets/alldatasets.no_alldatasets d
                              from ${stats_db_name}.alldatasets
-                             join ${stats_db_name}.datasets_oa on alldatasets.ri_initiative=datasets_oa.ri_initiative;
+                             join ${stats_db_name}.datasets_oa on alldatasets.ri_initiative=datasets_oa.ri_initiative; /*EOS*/
 
 CREATE TEMPORARY TABLE ${stats_db_name}.allsoftwaresshare as
 select software_oa.ri_initiative, software_oa.no_oasoftware/allsoftware.no_allsoftware s
                              from ${stats_db_name}.allsoftware
-                             join ${stats_db_name}.software_oa on allsoftware.ri_initiative=software_oa.ri_initiative;
+                             join ${stats_db_name}.software_oa on allsoftware.ri_initiative=software_oa.ri_initiative; /*EOS*/
 
-drop table ${stats_db_name}.indi_ris_openess purge;
+drop table ${stats_db_name}.indi_ris_openess purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_ris_openess stored as parquet as
 select allpubsshare.ri_initiative,
@@ -1120,21 +1120,21 @@ select allpubsshare.ri_initiative,
                                                 on tmp1.ri_initiative=allpubsshare.ri_initiative
                                 left outer join (select ri_initiative,s from
     ${stats_db_name}.allsoftwaresshare) tmp2
-                                                on tmp2.ri_initiative=allpubsshare.ri_initiative;
+                                                on tmp2.ri_initiative=allpubsshare.ri_initiative; /*EOS*/
 
-DROP TABLE ${stats_db_name}.result_contexts purge;
-DROP TABLE ${stats_db_name}.pubs_oa purge;
-DROP TABLE ${stats_db_name}.datasets_oa purge;
-DROP TABLE ${stats_db_name}.software_oa purge;
-DROP TABLE ${stats_db_name}.allpubs purge;
-DROP TABLE ${stats_db_name}.alldatasets purge;
-DROP TABLE ${stats_db_name}.allsoftware purge;
-DROP TABLE ${stats_db_name}.allpubsshare purge;
-DROP TABLE ${stats_db_name}.alldatasetssshare purge;
-DROP TABLE ${stats_db_name}.allsoftwaresshare purge;
+DROP TABLE ${stats_db_name}.result_contexts purge; /*EOS*/
+DROP TABLE ${stats_db_name}.pubs_oa purge; /*EOS*/
+DROP TABLE ${stats_db_name}.datasets_oa purge; /*EOS*/
+DROP TABLE ${stats_db_name}.software_oa purge; /*EOS*/
+DROP TABLE ${stats_db_name}.allpubs purge; /*EOS*/
+DROP TABLE ${stats_db_name}.alldatasets purge; /*EOS*/
+DROP TABLE ${stats_db_name}.allsoftware purge; /*EOS*/
+DROP TABLE ${stats_db_name}.allpubsshare purge; /*EOS*/
+DROP TABLE ${stats_db_name}.alldatasetssshare purge; /*EOS*/
+DROP TABLE ${stats_db_name}.allsoftwaresshare purge; /*EOS*/
 
 --Funder Findability
-drop table ${stats_db_name}.indi_funder_findable purge;
+drop table ${stats_db_name}.indi_funder_findable purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_funder_findable stored as parquet as
 with result_findable as
@@ -1151,10 +1151,10 @@ with result_findable as
     group by p.funder)
 select allresults.funder, result_findable.no_result_findable/allresults.no_allresults funder_findable
 from allresults
-         join result_findable on result_findable.funder=allresults.funder;
+         join result_findable on result_findable.funder=allresults.funder; /*EOS*/
 
 --RIs Findability
-drop table ${stats_db_name}.indi_ris_findable purge;
+drop table ${stats_db_name}.indi_ris_findable purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_ris_findable stored as parquet as
 with result_contexts as
@@ -1175,7 +1175,7 @@ allresults as
     group by rc.ri_initiative)
 select allresults.ri_initiative, result_findable.no_result_findable/allresults.no_allresults ris_findable
 from allresults
-         join result_findable on result_findable.ri_initiative=allresults.ri_initiative;
+         join result_findable on result_findable.ri_initiative=allresults.ri_initiative; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_pub_publicly_funded stored as parquet as
 with org_names_pids as
@@ -1197,7 +1197,7 @@ from ${stats_db_name}.publication p
 left outer join (
 select distinct ro.id, 1 as publicly_funded from ${stats_db_name}.result_organization ro
 join ${stats_db_name}.organization o on o.id=ro.organization
-join publicly_funded_orgs pfo on o.name=pfo.name) tmp on p.id=tmp.id;
+join publicly_funded_orgs pfo on o.name=pfo.name) tmp on p.id=tmp.id; /*EOS*/
 
 create table ${stats_db_name}.indi_pub_green_with_license stored as parquet as
 select distinct p.id, coalesce(green_with_license, 0) as green_with_license
@@ -1207,7 +1207,7 @@ select distinct p.id, 1 as green_with_license from ${stats_db_name}.publication 
 join ${stats_db_name}.result_instance ri on ri.id = p.id
 join ${stats_db_name}.datasource on datasource.id = ri.hostedby
 where ri.license is not null and datasource.type like '%Repository%' and datasource.name!='Other') tmp
-on p.id= tmp.id;
+on p.id= tmp.id; /*EOS*/
 
 create table ${stats_db_name}.result_country stored as parquet as
 select distinct ro.id, coalesce(o.country, f.country) as country
@@ -1216,13 +1216,13 @@ left outer join ${stats_db_name}.organization o on o.id=ro.organization
 left outer join ${stats_db_name}.result_projects rp on rp.id=ro.id
 left outer join ${stats_db_name}.project p on p.id=rp.project
 left outer join ${stats_db_name}.funder f on f.name=p.funder
-where coalesce(o.country, f.country) IS NOT NULL;
+where coalesce(o.country, f.country) IS NOT NULL; /*EOS*/
 
 create table ${stats_db_name}.indi_result_oa_with_license stored as parquet as
 select distinct r.id, coalesce(oa_with_license,0) as oa_with_license
 from ${stats_db_name}.result r
 left outer join (select distinct r.id, 1 as oa_with_license from ${stats_db_name}.result r
-join ${stats_db_name}.result_licenses rl on rl.id=r.id where r.bestlicence='Open Access') tmp on r.id=tmp.id;
+join ${stats_db_name}.result_licenses rl on rl.id=r.id where r.bestlicence='Open Access') tmp on r.id=tmp.id; /*EOS*/
 
 create table ${stats_db_name}.indi_result_oa_without_license stored as parquet as
 with without_license as
@@ -1233,7 +1233,7 @@ from ${stats_db_name}.result r
 left outer join (select distinct r.id, 1 as oa_without_license
 from ${stats_db_name}.result r
 join without_license wl on wl.id=r.id
-where r.bestlicence='Open Access') tmp on r.id=tmp.id;
+where r.bestlicence='Open Access') tmp on r.id=tmp.id; /*EOS*/
 
 create table ${stats_db_name}.indi_result_under_transformative stored as parquet as
 with transformative_dois as
@@ -1242,4 +1242,4 @@ select distinct r.id, coalesce(under_transformative,0) as under_transformative
 from ${stats_db_name}.result r
 left outer join (select distinct rp.id, 1 as under_transformative
 from ${stats_db_name}.result_pids rp join ${stats_db_name}.result r on r.id=rp.id
-join transformative_dois td on td.doi=rp.pid) tmp on r.id=tmp.id;
+join transformative_dois td on td.doi=rp.pid) tmp on r.id=tmp.id; /*EOS*/

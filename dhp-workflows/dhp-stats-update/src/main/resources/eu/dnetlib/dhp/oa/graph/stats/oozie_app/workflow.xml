@@ -64,6 +64,26 @@
             <name>hadoop_user_name</name>
             <description>user name of the wf owner</description>
         </property>
+
+        <property>
+            <name>sparkSqlWarehouseDir</name>
+        </property>
+        <!-- General oozie workflow properties -->
+        <property>
+            <name>sparkClusterOpts</name>
+            <value>--conf spark.network.timeout=600 --conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-m3.ocean.icm.edu.pl:18088 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/applicationHistory</value>
+            <description>spark cluster-wide options</description>
+        </property>
+        <property>
+            <name>sparkResourceOpts</name>
+            <value>--executor-memory=3G --conf spark.executor.memoryOverhead=3G --executor-cores=6 --driver-memory=8G --driver-cores=4</value>
+            <description>spark resource options</description>
+        </property>
+        <property>
+            <name>sparkApplicationOpts</name>
+            <value>--conf spark.sql.shuffle.partitions=3840</value>
+            <description>spark resource options</description>
+        </property>
     </parameters>
 
     <global>
@@ -82,10 +102,14 @@
                 <name>hive.mapjoin.followby.gby.localtask.max.memory.usage</name>
                 <value>0.80</value>
             </property>
-	<property>
-	    <name>mapred.job.queue.name</name>
-	    <value>analytics</value>
-	</property>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+            <property>
+                <name>mapred.job.queue.name</name>
+                <value>analytics</value>
+            </property>
         </configuration>
     </global>
 
@@ -321,13 +345,35 @@
         <error to="Kill"/>
     </action>
 
+<!--    <action name="Step16-createIndicatorsTables">-->
+<!--        <hive2 xmlns="uri:oozie:hive2-action:0.1">-->
+<!--            <jdbc-url>${hive_jdbc_url}</jdbc-url>-->
+<!--            <script>scripts/step16-createIndicatorsTables.sql</script>-->
+<!--            <param>stats_db_name=${stats_db_name}</param>-->
+<!--            <param>external_stats_db_name=${external_stats_db_name}</param>-->
+<!--        </hive2>-->
+<!--        <ok to="Step16_1-definitions"/>-->
+<!--        <error to="Kill"/>-->
+<!--    </action>-->
+
     <action name="Step16-createIndicatorsTables">
-        <hive2 xmlns="uri:oozie:hive2-action:0.1">
-            <jdbc-url>${hive_jdbc_url}</jdbc-url>
-            <script>scripts/step16-createIndicatorsTables.sql</script>
-            <param>stats_db_name=${stats_db_name}</param>
-            <param>external_stats_db_name=${external_stats_db_name}</param>
-        </hive2>
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Step16-createIndicatorsTables</name>
+            <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step16-createIndicatorsTables.sql</arg>
+            <arg>--stats_db_name</arg><arg>${stats_db_name}</arg>
+            <arg>--external_stats_db_name</arg><arg>${external_stats_db_name}</arg>
+        </spark>
         <ok to="Step16_1-definitions"/>
         <error to="Kill"/>
     </action>
