@@ -242,13 +242,14 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 
 						// this was a pivot in a previous graph but it has been merged into a new group with different
 						// pivot
-						if (!r.isNullAt(r.fieldIndex("lastUsage")) && !pivot.equals(id) && !dedupId.equals(pivotDedupId)) {
+						if (!r.isNullAt(r.fieldIndex("lastUsage")) && !pivot.equals(id)
+							&& !dedupId.equals(pivotDedupId)) {
 							// materialize the previous dedup record as a merge relation with the new one
 							res.add(new Tuple3<>(dedupId, pivotDedupId, null));
 						}
 
 						// add merge relations
-						if (cut <=0 || r.<Integer>getAs("position") <= cut) {
+						if (cut <= 0 || r.<Integer> getAs("position") <= cut) {
 							res.add(new Tuple3<>(id, pivotDedupId, pivot));
 						}
 
