@@ -83,8 +83,6 @@ public class MultiAttemptsHttpConnector {
 			throw new CollectorException(msg);
 		}
 
-		log.info("Request attempt {} [{}]", retryNumber, requestUrl);
-
 		InputStream input = null;
 
 		try {
@@ -104,9 +102,9 @@ public class MultiAttemptsHttpConnector {
 				urlConn.addRequestProperty(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", getAuthToken()));
 			}
 
-			if (log.isDebugEnabled()) {
-				logHeaderFields(urlConn);
-			}
+//			if (log.isDebugEnabled()) {
+//				logHeaderFields(urlConn);
+//			}
 
 			int retryAfter = obtainRetryAfter(urlConn.getHeaderFields());
 			if (is2xx(urlConn.getResponseCode())) {

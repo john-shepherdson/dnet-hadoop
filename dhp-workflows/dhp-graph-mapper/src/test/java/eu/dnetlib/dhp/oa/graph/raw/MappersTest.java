@@ -10,9 +10,12 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Encoders;
 import org.dom4j.DocumentException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,12 +23,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.common.Constants;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.oa.graph.clean.CleaningRuleMap;
+import eu.dnetlib.dhp.oa.graph.clean.OafCleaner;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -50,20 +56,16 @@ class MappersTest {
 	}
 
 	@Test
-	void testPublication() throws IOException, DocumentException {
+	void testPublication() throws IOException {
 
 		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_record.xml")));
 
 		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
 
-		assertEquals(3, list.size());
-		assertTrue(list.get(0) instanceof Publication);
-		assertTrue(list.get(1) instanceof Relation);
-		assertTrue(list.get(2) instanceof Relation);
+		assertEquals(1, list.stream().filter(o -> o instanceof Publication).count());
+		assertEquals(4, list.stream().filter(o -> o instanceof Relation).count());
 
-		final Publication p = (Publication) list.get(0);
-		final Relation r1 = (Relation) list.get(1);
-		final Relation r2 = (Relation) list.get(2);
+		Publication p = (Publication) list.stream().filter(o -> o instanceof Publication).findFirst().get();
 
 		assertValidId(p.getId());
 
@@ -77,7 +79,7 @@ class MappersTest {
 		assertTrue(StringUtils.isNotBlank(p.getDateofcollection()));
 		assertTrue(StringUtils.isNotBlank(p.getDateoftransformation()));
 
-		assertTrue(p.getAuthor().size() > 0);
+		assertFalse(p.getAuthor().isEmpty());
 		final Optional<Author> author = p
 			.getAuthor()
 			.stream()
@@ -100,50 +102,111 @@ class MappersTest {
 		assertEquals("Votsi", author.get().getSurname());
 		assertEquals("Nefta", author.get().getName());
 
-		assertTrue(p.getSubject().size() > 0);
+		assertFalse(p.getSubject().isEmpty());
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getIssnOnline()));
 		assertTrue(StringUtils.isNotBlank(p.getJournal().getName()));
 
 		assertTrue(p.getPid().isEmpty());
 
 		assertNotNull(p.getInstance());
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getInstance().isEmpty());
 		p
 			.getInstance()
 			.forEach(i -> {
 				assertNotNull(i.getAccessright());
 				assertEquals("OPEN", i.getAccessright().getClassid());
 			});
-		assertEquals("0001", p.getInstance().get(0).getRefereed().getClassid());
-		assertNotNull(p.getInstance().get(0).getPid());
-		assertTrue(p.getInstance().get(0).getPid().isEmpty());
+		final Instance instance = p.getInstance().get(0);
+		assertEquals("0001", instance.getRefereed().getClassid());
+		assertNotNull(instance.getPid());
+		assertTrue(instance.getPid().isEmpty());
 
-		assertTrue(!p.getInstance().get(0).getAlternateIdentifier().isEmpty());
-		assertEquals("doi", p.getInstance().get(0).getAlternateIdentifier().get(0).getQualifier().getClassid());
-		assertEquals("10.3897/oneeco.2.e13718", p.getInstance().get(0).getAlternateIdentifier().get(0).getValue());
+		assertNotNull(instance.getInstanceTypeMapping());
+		assertEquals(1, instance.getInstanceTypeMapping().size());
+
+		Optional<InstanceTypeMapping> coarType = instance
+			.getInstanceTypeMapping()
+			.stream()
+			.filter(itm -> ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(itm.getVocabularyName()))
+			.findFirst();
+
+		assertTrue(coarType.isPresent());
+		assertNull(coarType.get().getTypeCode());
+		assertNull(coarType.get().getTypeLabel());
+
+		Optional<InstanceTypeMapping> userType = instance
+			.getInstanceTypeMapping()
+			.stream()
+			.filter(itm -> ModelConstants.OPENAIRE_USER_RESOURCE_TYPES.equals(itm.getVocabularyName()))
+			.findFirst();
+
+		assertFalse(userType.isPresent());
+
+		assertFalse(instance.getAlternateIdentifier().isEmpty());
+		assertEquals("doi", instance.getAlternateIdentifier().get(0).getQualifier().getClassid());
+		assertEquals("10.3897/oneeco.2.e13718", instance.getAlternateIdentifier().get(0).getValue());
+
+		assertNotNull(instance.getFulltext());
+		assertEquals("https://oneecosystem.pensoft.net/article/13718/", instance.getFulltext());
 
 		assertNotNull(p.getBestaccessright());
 		assertEquals("OPEN", p.getBestaccessright().getClassid());
-		assertValidId(r1.getSource());
-		assertValidId(r1.getTarget());
-		assertValidId(r2.getSource());
-		assertValidId(r2.getTarget());
-		assertValidId(r1.getCollectedfrom().get(0).getKey());
-		assertValidId(r2.getCollectedfrom().get(0).getKey());
-		assertNotNull(r1.getDataInfo());
-		assertNotNull(r2.getDataInfo());
-		assertNotNull(r1.getDataInfo().getTrust());
-		assertNotNull(r2.getDataInfo().getTrust());
-		assertEquals(r1.getSource(), r2.getTarget());
-		assertEquals(r2.getSource(), r1.getTarget());
-		assertTrue(StringUtils.isNotBlank(r1.getRelClass()));
-		assertTrue(StringUtils.isNotBlank(r2.getRelClass()));
-		assertTrue(StringUtils.isNotBlank(r1.getRelType()));
-		assertTrue(StringUtils.isNotBlank(r2.getRelType()));
-		assertTrue(r1.getValidated());
-		assertTrue(r2.getValidated());
-		assertEquals("2020-01-01", r1.getValidationDate());
-		assertEquals("2020-01-01", r2.getValidationDate());
+
+		assertNotNull(p.getFulltext());
+		assertEquals(1, p.getFulltext().size());
+		assertEquals("https://oneecosystem.pensoft.net/article/13718/", p.getFulltext().get(0).getValue());
+
+		// RESULT PROJECT
+		List<Relation> resultProject = list
+			.stream()
+			.filter(o -> o instanceof Relation)
+			.map(o -> (Relation) o)
+			.filter(r -> ModelConstants.RESULT_PROJECT.equals(r.getRelType()))
+			.collect(Collectors.toList());
+
+		assertEquals(2, resultProject.size());
+		final Relation rp1 = resultProject.get(0);
+		final Relation rp2 = resultProject.get(1);
+
+		verifyRelation(rp1);
+		verifyRelation(rp2);
+
+		assertTrue(rp1.getValidated());
+		assertTrue(rp2.getValidated());
+		assertEquals("2020-01-01", rp1.getValidationDate());
+		assertEquals("2020-01-01", rp2.getValidationDate());
+
+		assertEquals(rp1.getSource(), rp2.getTarget());
+		assertEquals(rp2.getSource(), rp1.getTarget());
+
+		// AFFILIATIONS
+		List<Relation> affiliation = list
+			.stream()
+			.filter(o -> o instanceof Relation)
+			.map(o -> (Relation) o)
+			.filter(r -> ModelConstants.RESULT_ORGANIZATION.equals(r.getRelType()))
+			.collect(Collectors.toList());
+
+		assertEquals(2, affiliation.size());
+		final Relation aff1 = affiliation.get(0);
+		final Relation aff2 = affiliation.get(1);
+
+		verifyRelation(aff1);
+		verifyRelation(aff2);
+
+		assertEquals(aff1.getSource(), aff2.getTarget());
+		assertEquals(aff2.getSource(), aff1.getTarget());
+	}
+
+	private void verifyRelation(Relation r) {
+		assertValidId(r.getSource());
+		assertValidId(r.getTarget());
+		assertValidId(r.getCollectedfrom().get(0).getKey());
+		assertNotNull(r.getDataInfo());
+		assertNotNull(r.getDataInfo().getTrust());
+		assertTrue(StringUtils.isNotBlank(r.getRelClass()));
+		assertTrue(StringUtils.isNotBlank(r.getRelType()));
+
 	}
 
 	@Test
@@ -170,7 +233,7 @@ class MappersTest {
 		assertTrue(StringUtils.isNotBlank(p.getDateofcollection()));
 		assertTrue(StringUtils.isNotBlank(p.getDateoftransformation()));
 
-		assertTrue(p.getAuthor().size() > 0);
+		assertFalse(p.getAuthor().isEmpty());
 		final Optional<Author> author = p
 			.getAuthor()
 			.stream()
@@ -193,20 +256,24 @@ class MappersTest {
 		assertEquals("Votsi", author.get().getSurname());
 		assertEquals("Nefta", author.get().getName());
 
-		assertTrue(p.getSubject().size() > 0);
-		assertTrue(p.getPid().size() > 0);
+		assertFalse(p.getSubject().isEmpty());
+		assertFalse(p.getPid().isEmpty());
 		assertEquals("PMC1517292", p.getPid().get(0).getValue());
 		assertEquals("pmc", p.getPid().get(0).getQualifier().getClassid());
 
 		assertNotNull(p.getInstance());
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getInstance().isEmpty());
 		p
 			.getInstance()
 			.forEach(i -> {
 				assertNotNull(i.getAccessright());
 				assertEquals("OPEN", i.getAccessright().getClassid());
 			});
-		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
+
+		Publication p_cleaned = cleanup(p, vocs);
+		assertEquals("0002", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("nonPeerReviewed", p_cleaned.getInstance().get(0).getRefereed().getClassname());
+
 		assertNotNull(p.getInstance().get(0).getPid());
 		assertEquals(2, p.getInstance().get(0).getPid().size());
 
@@ -225,7 +292,7 @@ class MappersTest {
 
 		final List<Oaf> list = new OafToOafMapper(vocs, true, true).processMdRecord(xml);
 
-		assertTrue(list.size() > 0);
+		assertFalse(list.isEmpty());
 		assertTrue(list.get(0) instanceof Publication);
 
 		final Publication p = (Publication) list.get(0);
@@ -281,7 +348,7 @@ class MappersTest {
 		assertTrue(d.getOriginalId().stream().anyMatch(oid -> oid.equals("oai:zenodo.org:3234526")));
 		assertValidId(d.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(d.getTitle().get(0).getValue()));
-		assertTrue(d.getAuthor().size() > 0);
+		assertFalse(d.getAuthor().isEmpty());
 
 		final Optional<Author> author = d
 			.getAuthor()
@@ -315,13 +382,13 @@ class MappersTest {
 		final Field<String> affiliation = opAff.get();
 		assertEquals("ISTI-CNR", affiliation.getValue());
 
-		assertTrue(d.getSubject().size() > 0);
-		assertTrue(d.getInstance().size() > 0);
-		assertTrue(d.getContext().size() > 0);
-		assertTrue(d.getContext().get(0).getId().length() > 0);
+		assertFalse(d.getSubject().isEmpty());
+		assertFalse(d.getInstance().isEmpty());
+		assertFalse(d.getContext().isEmpty());
+		assertFalse(d.getContext().get(0).getId().isEmpty());
 
 		assertNotNull(d.getInstance());
-		assertTrue(d.getInstance().size() > 0);
+		assertFalse(d.getInstance().isEmpty());
 		d
 			.getInstance()
 			.forEach(i -> {
@@ -355,6 +422,25 @@ class MappersTest {
 		assertTrue(r2.getValidated());
 		assertEquals("2020-01-01", r1.getValidationDate());
 		assertEquals("2020-01-01", r2.getValidationDate());
+
+		assertNotNull(d.getTitle());
+		assertEquals(2, d.getTitle().size());
+		verifyTitle(d, "main title", "Temperature and ADCP data collected on Lake Geneva between 2015 and 2017");
+		verifyTitle(d, "Subtitle", "survey");
+	}
+
+	private void verifyTitle(Dataset d, String titleType, String title) {
+		Optional
+			.of(
+				d
+					.getTitle()
+					.stream()
+					.filter(t -> titleType.equals(t.getQualifier().getClassid()))
+					.collect(Collectors.toList()))
+			.ifPresent(t -> {
+				assertEquals(1, t.size());
+				assertEquals(title, t.get(0).getValue());
+			});
 	}
 
 	@Test
@@ -376,7 +462,7 @@ class MappersTest {
 		// assertEquals("oai:pub.uni-bielefeld.de:2949739", p.getOriginalId().get(0));
 
 		assertValidId(p.getCollectedfrom().get(0).getKey());
-		assertTrue(p.getAuthor().size() > 0);
+		assertFalse(p.getAuthor().isEmpty());
 
 		final Optional<Author> author = p
 			.getAuthor()
@@ -388,21 +474,24 @@ class MappersTest {
 		assertEquals("Potwarka", author.get().getSurname());
 		assertEquals("Luke R.", author.get().getName());
 
-		assertTrue(p.getSubject().size() > 0);
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getSubject().isEmpty());
+		assertFalse(p.getInstance().isEmpty());
 
 		assertNotNull(p.getTitle());
 		assertFalse(p.getTitle().isEmpty());
 
 		assertNotNull(p.getInstance());
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getInstance().isEmpty());
 		p
 			.getInstance()
 			.forEach(i -> {
 				assertNotNull(i.getAccessright());
 				assertEquals("OPEN", i.getAccessright().getClassid());
 			});
-		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
+
+		Publication p_cleaned = cleanup(p, vocs);
+		assertEquals("0002", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("nonPeerReviewed", p_cleaned.getInstance().get(0).getRefereed().getClassname());
 	}
 
 	@Test
@@ -519,7 +608,130 @@ class MappersTest {
 		assertTrue(i.getUrl().contains("http://apps.who.int/trialsearch/Trial3.aspx?trialid=NCT02321059"));
 		assertTrue(i.getUrl().contains("https://clinicaltrials.gov/ct2/show/NCT02321059"));
 
-		assertEquals("UNKNOWN", i.getRefereed().getClassid());
+		Dataset d_cleaned = cleanup(d, vocs);
+		assertEquals("0002", d_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("nonPeerReviewed", d_cleaned.getInstance().get(0).getRefereed().getClassname());
+	}
+
+	@Test
+	void test_record_from_Crossref() throws IOException {
+
+		final CleaningRuleMap mapping = CleaningRuleMap.create(vocs);
+
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_crossref.xml")));
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		assertEquals(1, list.size());
+		assertTrue(list.get(0) instanceof Publication);
+
+		final Publication p = OafCleaner.apply(fixVocabularyNames((Publication) list.get(0)), mapping);
+
+		assertNotNull(p.getDateofcollection());
+		assertEquals("2020-08-06T07:04:09.62Z", p.getDateofcollection());
+
+		assertNotNull(p.getDateoftransformation());
+		assertEquals("2020-08-06T07:20:57.911Z", p.getDateoftransformation());
+
+		assertNotNull(p.getDataInfo());
+		assertFalse(p.getDataInfo().getInvisible());
+		assertFalse(p.getDataInfo().getDeletedbyinference());
+		assertEquals("0.9", p.getDataInfo().getTrust());
+
+		assertValidId(p.getId());
+		assertEquals(2, p.getOriginalId().size());
+
+		assertEquals("50|doi_________::7f0f7807f17db50e5c2b5c452ccaf06d", p.getOriginalId().get(0));
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+
+		assertNotNull(p.getTitle());
+		assertEquals(1, p.getTitle().size());
+		assertEquals(
+			"A case report of serious haemolysis in a glucose-6-phosphate dehydrogenase-deficient COVID-19 patient receiving hydroxychloroquine",
+			p
+				.getTitle()
+				.get(0)
+				.getValue());
+
+		assertNotNull(p.getDescription());
+		assertEquals(0, p.getDescription().size());
+
+		assertEquals(8, p.getAuthor().size());
+
+		assertNotNull(p.getInstance());
+		assertEquals(1, p.getInstance().size());
+
+		final Instance i = p.getInstance().get(0);
+
+		assertNotNull(i.getAccessright());
+		assertEquals(ModelConstants.DNET_ACCESS_MODES, i.getAccessright().getSchemeid());
+		assertEquals(ModelConstants.DNET_ACCESS_MODES, i.getAccessright().getSchemename());
+		assertEquals("OPEN", i.getAccessright().getClassid());
+		assertEquals("Open Access", i.getAccessright().getClassname());
+
+		assertNotNull(i.getCollectedfrom());
+		assertEquals("10|openaire____::081b82f96300b6a6e3d282bad31cb6e2", i.getCollectedfrom().getKey());
+		assertEquals("Crossref", i.getCollectedfrom().getValue());
+
+		assertNotNull(i.getHostedby());
+		assertEquals("10|openaire____::55045bd2a65019fd8e6741a755395c8c", i.getHostedby().getKey());
+		assertEquals("Unknown Repository", i.getHostedby().getValue());
+
+		assertNotNull(i.getInstancetype());
+		assertEquals("0001", i.getInstancetype().getClassid());
+		assertEquals("Article", i.getInstancetype().getClassname());
+		assertEquals(ModelConstants.DNET_PUBLICATION_RESOURCE, i.getInstancetype().getSchemeid());
+		assertEquals(ModelConstants.DNET_PUBLICATION_RESOURCE, i.getInstancetype().getSchemename());
+
+		assertNull(i.getLicense());
+		assertNotNull(i.getDateofacceptance());
+		assertEquals("2020-06-04", i.getDateofacceptance().getValue());
+
+		assertNull(i.getProcessingchargeamount());
+		assertNull(i.getProcessingchargecurrency());
+
+		assertNotNull(i.getPid());
+		assertEquals(1, i.getPid().size());
+
+		assertNotNull(i.getAlternateIdentifier());
+		assertEquals(0, i.getAlternateIdentifier().size());
+
+		assertNotNull(i.getUrl());
+		assertEquals(1, i.getUrl().size());
+		assertTrue(i.getUrl().contains("http://dx.doi.org/10.1080/23744235.2020.1774644"));
+
+		assertEquals("", p.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("", p.getInstance().get(0).getRefereed().getClassname());
+
+		Publication p_cleaned = cleanup(p, vocs);
+
+		assertEquals("0001", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("peerReviewed", p_cleaned.getInstance().get(0).getRefereed().getClassname());
+
+		assertNull(p_cleaned.getMetaResourceType());
+
+		assertNotNull(p_cleaned.getInstance().get(0).getInstanceTypeMapping());
+		assertEquals(1, p_cleaned.getInstance().get(0).getInstanceTypeMapping().size());
+
+		assertTrue(
+			p_cleaned
+				.getInstance()
+				.get(0)
+				.getInstanceTypeMapping()
+				.stream()
+				.anyMatch(
+					t -> "journal-article".equals(t.getOriginalType()) &&
+						ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(t.getVocabularyName()) &&
+						Objects.isNull(t.getTypeCode()) && Objects.isNull(t.getTypeLabel())));
+
+		assertTrue(
+			p_cleaned
+				.getInstance()
+				.get(0)
+				.getInstanceTypeMapping()
+				.stream()
+				.noneMatch(
+					t -> ModelConstants.OPENAIRE_USER_RESOURCE_TYPES.equals(t.getVocabularyName())));
 	}
 
 	@Test
@@ -528,17 +740,35 @@ class MappersTest {
 
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
-		assertEquals(1, list.size());
+		assertEquals(3, list.size());
 		assertTrue(list.get(0) instanceof Software);
+		assertTrue(list.get(1) instanceof Relation);
+		assertTrue(list.get(2) instanceof Relation);
 
 		final Software s = (Software) list.get(0);
 
 		assertValidId(s.getId());
 		assertValidId(s.getCollectedfrom().get(0).getKey());
 		assertTrue(StringUtils.isNotBlank(s.getTitle().get(0).getValue()));
-		assertTrue(s.getAuthor().size() > 0);
-		assertTrue(s.getSubject().size() > 0);
-		assertTrue(s.getInstance().size() > 0);
+		assertFalse(s.getAuthor().isEmpty());
+		assertFalse(s.getSubject().isEmpty());
+		assertFalse(s.getInstance().isEmpty());
+
+		final Relation r1 = (Relation) list.get(1);
+		final Relation r2 = (Relation) list.get(2);
+
+		assertEquals(s.getId(), r1.getSource());
+		assertEquals("50|doi_________::b453e7b4b2130ace57ff0c3db470a982", r1.getTarget());
+		assertEquals(ModelConstants.RESULT_RESULT, r1.getRelType());
+		assertEquals(ModelConstants.RELATIONSHIP, r1.getSubRelType());
+		assertEquals(ModelConstants.IS_REFERENCED_BY, r1.getRelClass());
+
+		assertEquals(s.getId(), r2.getTarget());
+		assertEquals("50|doi_________::b453e7b4b2130ace57ff0c3db470a982", r2.getSource());
+		assertEquals(ModelConstants.RESULT_RESULT, r2.getRelType());
+		assertEquals(ModelConstants.RELATIONSHIP, r2.getSubRelType());
+		assertEquals(ModelConstants.REFERENCES, r2.getRelClass());
+
 	}
 
 	@Test
@@ -708,10 +938,69 @@ class MappersTest {
 		assertEquals(1, p.getTitle().size());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
 
-		final Publication p_cleaned = cleanup(fixVocabularyNames(p));
+		final Publication p_cleaned = cleanup(fixVocabularyNames(p), vocs);
 
 		assertNotNull(p_cleaned.getTitle());
 		assertFalse(p_cleaned.getTitle().isEmpty());
+	}
+
+	@Test
+	void test_instance_url_validation() throws IOException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("idus_sevilla.xml")));
+		final List<Oaf> list = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		final Publication p = (Publication) list.get(0);
+
+		assertNotNull(p.getInstance());
+		assertFalse(p.getInstance().isEmpty());
+		assertNotNull(p.getInstance().get(0).getUrl());
+		assertFalse(p.getInstance().get(0).getUrl().isEmpty());
+		assertEquals("https://idus.us.es/handle//11441/118940", p.getInstance().get(0).getUrl().get(0));
+	}
+
+	@Test
+	void testZenodo() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_zenodo.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		final Publication p = (Publication) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+
+		assertNotNull(p.getTitle());
+		assertFalse(p.getTitle().isEmpty());
+		assertEquals(1, p.getTitle().size());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+
+		assertNotNull(p.getAuthor());
+		assertEquals(2, p.getAuthor().size());
+
+		Author author = p
+			.getAuthor()
+			.stream()
+			.filter(a -> a.getPid().stream().anyMatch(pi -> pi.getValue().equals("0000-0003-3272-8007")))
+			.findFirst()
+			.get();
+		assertNotNull(author);
+		assertTrue(StringUtils.isBlank(author.getSurname()));
+		assertTrue(StringUtils.isBlank(author.getName()));
+		assertEquals("Anne van Weerden", author.getFullname());
+
+		author = p
+			.getAuthor()
+			.stream()
+			.filter(a -> a.getPid().stream().anyMatch(pi -> pi.getValue().equals("0000-0003-3272-8008")))
+			.findFirst()
+			.get();
+		assertNotNull(author);
+		assertFalse(StringUtils.isBlank(author.getSurname()));
+		assertFalse(StringUtils.isBlank(author.getName()));
+		assertFalse(StringUtils.isBlank(author.getFullname()));
+
 	}
 
 	@Test
@@ -733,7 +1022,7 @@ class MappersTest {
 		assertEquals(2, p.getOriginalId().size());
 		assertTrue(p.getOriginalId().stream().anyMatch(oid -> oid.equals("df76e73f-0483-49a4-a9bb-63f2f985574a")));
 		assertValidId(p.getCollectedfrom().get(0).getKey());
-		assertTrue(p.getAuthor().size() > 0);
+		assertFalse(p.getAuthor().isEmpty());
 
 		final Optional<Author> author = p
 			.getAuthor()
@@ -743,21 +1032,24 @@ class MappersTest {
 
 		assertEquals("Museum Sønderjylland", author.get().getFullname());
 
-		assertTrue(p.getSubject().size() > 0);
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getSubject().isEmpty());
+		assertFalse(p.getInstance().isEmpty());
 
 		assertNotNull(p.getTitle());
 		assertFalse(p.getTitle().isEmpty());
 
 		assertNotNull(p.getInstance());
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getInstance().isEmpty());
 		p
 			.getInstance()
 			.forEach(i -> {
 				assertNotNull(i.getAccessright());
 				assertEquals("UNKNOWN", i.getAccessright().getClassid());
 			});
-		assertEquals("UNKNOWN", p.getInstance().get(0).getRefereed().getClassid());
+
+		Dataset p_cleaned = cleanup(p, vocs);
+		assertEquals("0002", p_cleaned.getInstance().get(0).getRefereed().getClassid());
+		assertEquals("nonPeerReviewed", p_cleaned.getInstance().get(0).getRefereed().getClassname());
 	}
 
 	@Test
@@ -787,11 +1079,184 @@ class MappersTest {
 		System.out.println("***************");
 
 		final Dataset p = (Dataset) list.get(0);
-		assertTrue(p.getInstance().size() > 0);
+		assertFalse(p.getInstance().isEmpty());
 		for (String url : p.getInstance().get(0).getUrl()) {
 			System.out.println(url);
-			assertTrue(!url.contains("&amp;"));
+			assertFalse(url.contains("&amp;"));
 		}
+	}
+
+	@Test
+	void testOpenAPC() throws IOException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_openapc.xml")));
+		final List<Oaf> list = new OafToOafMapper(vocs, true, true).processMdRecord(xml);
+
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+
+		final Optional<Oaf> o = list.stream().filter(r -> r instanceof Publication).findFirst();
+		assertTrue(o.isPresent());
+
+		Publication p = (Publication) o.get();
+		assertFalse(p.getInstance().isEmpty());
+
+		assertEquals("https://doi.org/10.1155/2015/439379", p.getInstance().get(0).getUrl().get(0));
+
+		assertNotNull(p.getProcessingchargeamount());
+		assertNotNull(p.getProcessingchargecurrency());
+
+		assertEquals("1721.47", p.getProcessingchargeamount().getValue());
+		assertEquals("EUR", p.getProcessingchargecurrency().getValue());
+
+		List<Oaf> affiliations = list.stream().filter(r -> r instanceof Relation).collect(Collectors.toList());
+		assertEquals(2, affiliations.size());
+
+		for (Oaf aff : affiliations) {
+			Relation r = (Relation) aff;
+			assertEquals(ModelConstants.AFFILIATION, r.getSubRelType());
+			assertEquals(ModelConstants.RESULT_ORGANIZATION, r.getRelType());
+			String source = r.getSource();
+			if (StringUtils.startsWith(source, "50")) {
+				assertEquals(ModelConstants.HAS_AUTHOR_INSTITUTION, r.getRelClass());
+			} else if (StringUtils.startsWith(source, "20")) {
+				assertTrue(StringUtils.contains(source, "::"));
+				assertEquals("20|" + Constants.ROR_NS_PREFIX, StringUtils.substringBefore(source, "::"));
+				assertEquals(ModelConstants.IS_AUTHOR_INSTITUTION_OF, r.getRelClass());
+			} else {
+				throw new IllegalArgumentException("invalid source / target prefixes for affiliation relations");
+			}
+
+			List<KeyValue> apcInfo = r.getProperties();
+			assertEquals(
+				"EUR", apcInfo
+					.stream()
+					.filter(kv -> "apc_currency".equals(kv.getKey()))
+					.map(KeyValue::getValue)
+					.findFirst()
+					.orElse(""));
+			assertEquals(
+				"1721.47", apcInfo
+					.stream()
+					.filter(kv -> "apc_amount".equals(kv.getKey()))
+					.map(KeyValue::getValue)
+					.findFirst()
+					.orElse(""));
+		}
+	}
+
+	@Test
+	void testROHub() throws IOException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("rohub.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+		assertEquals(5, list.size());
+		final OtherResearchProduct p = (OtherResearchProduct) list.get(0);
+		assertValidId(p.getId());
+		assertTrue(p.getId().startsWith("50|w3id"));
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+		assertEquals(1, p.getInstance().size());
+		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", p.getPid().get(0).getValue());
+		Instance inst = p.getInstance().get(0);
+		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", inst.getPid().get(0).getValue());
+		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", inst.getUrl().get(0));
+		assertEquals(1, p.getEoscifguidelines().size());
+		assertEquals("EOSC::RO-crate", p.getEoscifguidelines().get(0).getCode());
+		assertEquals("EOSC::RO-crate", p.getEoscifguidelines().get(0).getLabel());
+		assertEquals("", p.getEoscifguidelines().get(0).getUrl());
+		assertEquals("compliesWith", p.getEoscifguidelines().get(0).getSemanticRelation());
+
+	}
+
+	@Test
+	void testROHub2() throws IOException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("rohub-modified.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+		assertEquals(7, list.size());
+		final OtherResearchProduct p = (OtherResearchProduct) list.get(0);
+		assertValidId(p.getId());
+		assertValidId(p.getCollectedfrom().get(0).getKey());
+		assertEquals("50|w3id________::afc7592914ae190a50570db90f55f9c2", p.getId());
+		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+		assertEquals("w3id", (p.getPid().get(0).getQualifier().getClassid()));
+		assertEquals("https://w3id.org/ro-id/0ab171a7-45c5-4194-82d4-850955504bca", (p.getPid().get(0).getValue()));
+
+		assertEquals(1, list.stream().filter(o -> o instanceof OtherResearchProduct).count());
+		assertEquals(6, list.stream().filter(o -> o instanceof Relation).count());
+
+		for (Oaf oaf : list) {
+			if (oaf instanceof Relation) {
+				String source = ((Relation) oaf).getSource();
+				String target = ((Relation) oaf).getTarget();
+				assertNotEquals(source, target);
+				assertTrue(source.equals(p.getId()) || target.equals(p.getId()));
+				assertNotNull(((Relation) oaf).getSubRelType());
+				assertNotNull(((Relation) oaf).getRelClass());
+				assertNotNull(((Relation) oaf).getRelType());
+			}
+		}
+	}
+
+	@Test
+	void testRiunet() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("riunet.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+		final Publication p = (Publication) list.get(0);
+		assertNotNull(p.getInstance().get(0).getUrl().get(0));
+
+	}
+
+	@Test
+	void testEOSCFuture_ROHub() throws IOException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("photic-zone-transformed.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		final OtherResearchProduct rocrate = (OtherResearchProduct) list.get(0);
+		assertNotNull(rocrate.getEoscifguidelines());
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(rocrate));
+		System.out.println("***************");
+	}
+
+	@Test
+	public void testD4ScienceTraining() throws IOException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("d4science-1-training.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		final OtherResearchProduct trainingMaterial = (OtherResearchProduct) list.get(0);
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(trainingMaterial));
+		System.out.println("***************");
+	}
+
+	@Test
+	public void testD4ScienceDataset() throws IOException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("d4science-2-dataset.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		final Dataset trainingMaterial = (Dataset) list.get(0);
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(trainingMaterial));
+		System.out.println("***************");
+	}
+
+	@Test
+	void testNotWellFormed() throws IOException {
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_notwellformed.xml")));
+		final List<Oaf> actual = new OafToOafMapper(vocs, false, true).processMdRecord(xml);
+		assertNotNull(actual);
+		assertTrue(actual.isEmpty());
 	}
 
 	private void assertValidId(final String id) {

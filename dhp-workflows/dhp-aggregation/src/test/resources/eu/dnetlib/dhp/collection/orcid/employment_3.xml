@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<employment:employment xmlns:address="http://www.orcid.org/ns/address" xmlns:email="http://www.orcid.org/ns/email"
+                       xmlns:history="http://www.orcid.org/ns/history"
+                       xmlns:employment="http://www.orcid.org/ns/employment"
+                       xmlns:education="http://www.orcid.org/ns/education"
+                       xmlns:other-name="http://www.orcid.org/ns/other-name"
+                       xmlns:deprecated="http://www.orcid.org/ns/deprecated"
+                       xmlns:funding="http://www.orcid.org/ns/funding"
+                       xmlns:research-resource="http://www.orcid.org/ns/research-resource"
+                       xmlns:service="http://www.orcid.org/ns/service"
+                       xmlns:researcher-url="http://www.orcid.org/ns/researcher-url"
+                       xmlns:distinction="http://www.orcid.org/ns/distinction"
+                       xmlns:internal="http://www.orcid.org/ns/internal"
+                       xmlns:membership="http://www.orcid.org/ns/membership"
+                       xmlns:person="http://www.orcid.org/ns/person"
+                       xmlns:personal-details="http://www.orcid.org/ns/personal-details"
+                       xmlns:bulk="http://www.orcid.org/ns/bulk" xmlns:common="http://www.orcid.org/ns/common"
+                       xmlns:record="http://www.orcid.org/ns/record" xmlns:keyword="http://www.orcid.org/ns/keyword"
+                       xmlns:activities="http://www.orcid.org/ns/activities"
+                       xmlns:qualification="http://www.orcid.org/ns/qualification"
+                       xmlns:external-identifier="http://www.orcid.org/ns/external-identifier"
+                       xmlns:error="http://www.orcid.org/ns/error"
+                       xmlns:preferences="http://www.orcid.org/ns/preferences"
+                       xmlns:invited-position="http://www.orcid.org/ns/invited-position"
+                       xmlns:work="http://www.orcid.org/ns/work" xmlns:peer-review="http://www.orcid.org/ns/peer-review"
+                       put-code="7210424" path="/0000-0001-5022-8001/employment/7210424" display-index="1"
+                       visibility="public">
+    <common:created-date>2021-03-11T14:48:29.603Z</common:created-date>
+    <common:last-modified-date>2021-03-11T14:48:29.603Z</common:last-modified-date>
+    <common:source>
+        <common:source-orcid>
+            <common:uri>https://orcid.org/0000-0001-5012-1001</common:uri>
+            <common:path>0000-0001-5012-1001</common:path>
+            <common:host>orcid.org</common:host>
+        </common:source-orcid>
+        <common:source-name>Asma Bazzi</common:source-name>
+    </common:source>
+    <common:department-name>Pathology and Laboratory Medicine</common:department-name>
+    <common:role-title>Medical Laboratory Technologist</common:role-title>
+    <common:start-date>
+        <common:year>1994</common:year>
+        <common:month>10</common:month>
+        <common:day>01</common:day>
+    </common:start-date>
+    <common:end-date>
+        <common:year>2000</common:year>
+        <common:month>06</common:month>
+        <common:day>30</common:day>
+    </common:end-date>
+    <common:organization>
+        <common:name>American University of Beirut</common:name>
+        <common:address>
+            <common:city>Hamra</common:city>
+            <common:region>Beirut</common:region>
+            <common:country>LB</common:country>
+        </common:address>
+        <common:disambiguated-organization>
+            <common:disambiguated-organization-identifier>11238</common:disambiguated-organization-identifier>
+            <common:disambiguation-source>RINGGOLD</common:disambiguation-source>
+        </common:disambiguated-organization>
+    </common:organization>
+</employment:employment>

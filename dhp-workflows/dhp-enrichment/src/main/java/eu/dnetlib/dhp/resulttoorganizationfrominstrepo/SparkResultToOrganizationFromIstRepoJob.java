@@ -18,6 +18,7 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.dnetlib.dhp.KeyValueSet;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -28,7 +29,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
 
 	private static final Logger log = LoggerFactory.getLogger(SparkResultToOrganizationFromIstRepoJob.class);
 
-	private static final String RESULT_ORGANIZATIONSET_QUERY = "SELECT id resultId, collect_set(organizationId) organizationSet "
+	private static final String RESULT_ORGANIZATIONSET_QUERY = "SELECT id key, collect_set(organizationId) valueSet "
 		+ "FROM ( SELECT id, organizationId "
 		+ "FROM rels "
 		+ "JOIN cfhb "
@@ -46,7 +47,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
 			.toString(
 				SparkResultToOrganizationFromIstRepoJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/input_propagationresulaffiliationfrominstrepo_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/resulttoorganizationfrominstrepo/input_propagationresulaffiliationfrominstrepo_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -107,65 +108,50 @@ public class SparkResultToOrganizationFromIstRepoJob {
 
 		Dataset<DatasourceOrganization> dsOrg = readPath(spark, datasourceorganization, DatasourceOrganization.class);
 
-		Dataset<ResultOrganizationSet> potentialUpdates = getPotentialRelations(spark, inputPath, clazz, dsOrg);
+		Dataset<KeyValueSet> potentialUpdates = getPotentialRelations(spark, inputPath, clazz, dsOrg);
 
-		Dataset<ResultOrganizationSet> alreadyLinked = readPath(spark, alreadyLinkedPath, ResultOrganizationSet.class);
+		Dataset<KeyValueSet> alreadyLinked = readPath(spark, alreadyLinkedPath, KeyValueSet.class);
 
 		potentialUpdates
 			.joinWith(
 				alreadyLinked,
-				potentialUpdates.col("resultId").equalTo(alreadyLinked.col("resultId")),
+				potentialUpdates.col("key").equalTo(alreadyLinked.col("key")),
 				"left_outer")
 			.flatMap(createRelationFn(), Encoders.bean(Relation.class))
 			.write()
-			.mode(SaveMode.Append)
+			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
 	}
 
-	private static FlatMapFunction<Tuple2<ResultOrganizationSet, ResultOrganizationSet>, Relation> createRelationFn() {
+	private static FlatMapFunction<Tuple2<KeyValueSet, KeyValueSet>, Relation> createRelationFn() {
 		return value -> {
 			List<Relation> newRelations = new ArrayList<>();
-			ResultOrganizationSet potentialUpdate = value._1();
-			Optional<ResultOrganizationSet> alreadyLinked = Optional.ofNullable(value._2());
-			List<String> organizations = potentialUpdate.getOrganizationSet();
+			KeyValueSet potentialUpdate = value._1();
+			Optional<KeyValueSet> alreadyLinked = Optional.ofNullable(value._2());
+			List<String> organizations = potentialUpdate.getValueSet();
 			alreadyLinked
 				.ifPresent(
 					resOrg -> resOrg
-						.getOrganizationSet()
+						.getValueSet()
 						.forEach(organizations::remove));
-			String resultId = potentialUpdate.getResultId();
+			String resultId = potentialUpdate.getKey();
 			organizations
 				.forEach(
-					orgId -> {
-						newRelations
-							.add(
-								getRelation(
-									orgId,
-									resultId,
-									ModelConstants.IS_AUTHOR_INSTITUTION_OF,
-									ModelConstants.RESULT_ORGANIZATION,
-									ModelConstants.AFFILIATION,
-									PROPAGATION_DATA_INFO_TYPE,
-									PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_ID,
-									PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME));
-						newRelations
-							.add(
-								getRelation(
-									resultId,
-									orgId,
-									ModelConstants.HAS_AUTHOR_INSTITUTION,
-									ModelConstants.RESULT_ORGANIZATION,
-									ModelConstants.AFFILIATION,
-									PROPAGATION_DATA_INFO_TYPE,
-									PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_ID,
-									PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME));
-					});
+					orgId -> newRelations
+						.addAll(
+							getOrganizationRelationPair(
+								orgId,
+								resultId,
+								PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_ID,
+								PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME))
+
+				);
 			return newRelations.iterator();
 		};
 	}
 
-	private static <R extends Result> Dataset<ResultOrganizationSet> getPotentialRelations(
+	private static <R extends Result> Dataset<KeyValueSet> getPotentialRelations(
 		SparkSession spark,
 		String inputPath,
 		Class<R> resultClazz,
@@ -179,7 +165,7 @@ public class SparkResultToOrganizationFromIstRepoJob {
 
 		return spark
 			.sql(RESULT_ORGANIZATIONSET_QUERY)
-			.as(Encoders.bean(ResultOrganizationSet.class));
+			.as(Encoders.bean(KeyValueSet.class));
 	}
 
 }

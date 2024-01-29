@@ -11,6 +11,16 @@
         <WORKFLOW_TYPE>Data Provision</WORKFLOW_TYPE>
         <WORKFLOW_PRIORITY>30</WORKFLOW_PRIORITY>
         <CONFIGURATION start="manual">
+            <NODE isStart="true" name="setUnresolvedEntityPath" type="SetEnvParameter">
+                <DESCRIPTION>set the path of unresolved entities</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">unresolvedEntityPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/data/unresolved_PROD/content</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
             <NODE isStart="true" name="setNsPrefixBlacklist" type="SetEnvParameter">
                 <DESCRIPTION>set blacklist of funder nsPrefixes</DESCRIPTION>
                 <PARAMETERS>
@@ -51,11 +61,21 @@
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+            <NODE isStart="true" name="setResolvedGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the CLEANED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">resolvedGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_inference/graph/03_graph_resolved</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
             <NODE isStart="true" name="setDedupGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the target path to store the DEDUPED graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">dedupGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/03_graph_dedup</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/04_graph_dedup</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -65,7 +85,7 @@
                 <DESCRIPTION>Set the target path to store the INFERRED graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">inferredGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/04_graph_inferred</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/05_graph_inferred</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -75,7 +95,7 @@
                 <DESCRIPTION>Set the target path to store the CONSISTENCY graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">consistentGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/05_graph_consistent</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/06_graph_consistent</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -85,7 +105,7 @@
                 <DESCRIPTION>Set the target path to store the ORCID enriched graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">orcidGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/06_graph_orcid</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/07_graph_orcid</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -95,7 +115,7 @@
                 <DESCRIPTION>Set the target path to store the BULK TAGGED graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">bulkTaggingGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/07_graph_bulktagging</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/08_graph_bulktagging</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -105,7 +125,7 @@
                 <DESCRIPTION>Set the target path to store the AFFILIATION from INSTITUTIONAL REPOS graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">affiliationGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/08_graph_affiliation</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/09_graph_affiliation</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -115,7 +135,7 @@
                 <DESCRIPTION>Set the target path to store the COMMUNITY from SELECTED SOURCES graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">communityOrganizationGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/09_graph_comunity_organization</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/10_graph_comunity_organization</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -125,7 +145,7 @@
                 <DESCRIPTION>Set the target path to store the FUNDING from SEMANTIC RELATION graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">fundingGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/10_graph_funding</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/11_graph_funding</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -135,7 +155,7 @@
                 <DESCRIPTION>Set the target path to store the COMMUNITY from SEMANTIC RELATION graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">communitySemRelGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/11_graph_comunity_sem_rel</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/12_graph_comunity_sem_rel</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -145,7 +165,7 @@
                 <DESCRIPTION>Set the target path to store the COUNTRY enriched graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">countryGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/12_graph_country</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/13_graph_country</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -155,7 +175,7 @@
                 <DESCRIPTION>Set the target path to store the CLEANED graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">cleanedGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/13_graph_cleaned</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/14_graph_cleaned</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -165,7 +185,7 @@
                 <DESCRIPTION>Set the target path to store the blacklisted graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">blacklistedGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/14_graph_blacklisted</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_provision/graph/15_graph_blacklisted</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -447,6 +467,59 @@
                     <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
                 </PARAMETERS>
                 <ARCS>
+                    <ARC to="patchHostedBy"/>
+                </ARCS>
+            </NODE>
+            <NODE name="patchHostedBy" type="SubmitHadoopJob">
+                <DESCRIPTION>updates publication's hostedby info according to the ISSNs available from DOAJ and UNIBI</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'sourcePath' : 'cleanedFirstGraphPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'resumeFrom' : 'prepareInfo',
+                        'hostedByMapPath' : '/user/dnet.production/data/hostedByMap',
+                        'oozie.wf.application.path' : '/lib/dnet/PROD/oa/graph/hostedbymap/oozie_app',
+                        'workingDir' : '/tmp/prod_provision/working_dir/hostedbymap',
+                        'outputPath' : '/tmp/prod_provision/working_dir/hostedbymap',
+                        'sparkExecutorCores' : '3',
+                        'sparkExecutorMemory' : '10G'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="graphResolution"/>
+                </ARCS>
+            </NODE>
+            <NODE name="graphResolution" type="SubmitHadoopJob">
+                <DESCRIPTION>Graph resolution</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'graphBasePath':'cleanedFirstGraphPath',
+                        'unresolvedPath' :'unresolvedEntityPath',
+                        'targetPath':'resolvedGraphPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/PROD/oa/graph/resolution/oozie_app',
+                        'workingDir' : '/tmp/prod_provision/working_dir/relation_resolution',
+                        'shouldResolveEntities' : 'false',
+                        'sparkExecutorCores' : '4',
+                        'sparkExecutorMemory' : '9G'
+                        }
+                    </PARAM>
+                </PARAMETERS>
+                <ARCS>
                     <ARC to="duplicateScan"/>
                 </ARCS>
             </NODE>
@@ -458,7 +531,7 @@
                     <PARAM managedBy="system" name="envParams" required="true" type="string">
                         {
                         'actionSetId' : 'dedupConfig',
-                        'graphBasePath' : 'cleanedFirstGraphPath',
+                        'graphBasePath' : 'resolvedGraphPath',
                         'dedupGraphPath': 'dedupGraphPath',
                         'isLookUpUrl' : 'isLookUpUrl'
                         }

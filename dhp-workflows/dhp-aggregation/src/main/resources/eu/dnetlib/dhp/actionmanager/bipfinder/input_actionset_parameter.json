@@ -6,9 +6,15 @@
     "paramRequired": false
   },
   {
-    "paramName": "ip",
-    "paramLongName": "inputPath",
-    "paramDescription": "the URL from where to get the programme file",
+    "paramName": "rip",
+    "paramLongName": "resultsInputPath",
+    "paramDescription": "the URL from where to get the input file for results",
+    "paramRequired": true
+  },
+  {
+    "paramName": "pip",
+    "paramLongName": "projectsInputPath",
+    "paramDescription": "the URL from where to get the input file for projects",
     "paramRequired": true
   },
   {

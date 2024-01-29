@@ -13,6 +13,39 @@
             <name>isLookupUrl</name>
             <description>the address of the lookUp service</description>
         </property>
+        <property>
+            <name>shouldClean</name>
+            <description>true if the operation of deletion of not needed values from the results have to be performed</description>
+        </property>
+        <property>
+            <name>contextId</name>
+            <value>sobigdata</value>
+            <description>It is the context id that should be removed from the result if the condition is matched.
+            Now it is just sobigdata. In a futere implementation I plan to have the contextId as value in a json
+            where to specify also the constraints that should be verified to remove the context from the result</description>
+        </property>
+        <property>
+            <name>verifyParam</name>
+            <value>gcube </value>
+            <description>It is the constrint to be verified. This time is hardcoded as gcube and it is searched for in
+            the title. If title starts with gcube than the context sobigdata will be removed by the result if present</description>
+        </property>
+        <property>
+            <name>verifyCountryParam</name>
+            <value>10.17632;10.5061</value>
+            <description>It is the constraints to be verified. This time is hardcoded as the starting doi from mendeley and dryad and it is searched for in
+                the pid value. If the pid value starts with one of the two prefixes, then the country may be removed</description>
+        </property>
+        <property>
+            <name>country</name>
+            <value>NL</value>
+            <description>It is the country to be removed from the set of countries if it is present with provenance propagation. The country will not be removed if in one of the isntances there is a datasource with country `country`</description>
+        </property>
+        <property>
+            <name>collectedfrom</name>
+            <value>NARCIS</value>
+            <description>the only datasource for which the country NL will be removed from the country list</description>
+        </property>
 
         <property>
             <name>sparkDriverMemory</name>
@@ -50,11 +83,56 @@
         </property>
     </parameters>
 
-    <start to="fork_clean_graph"/>
+    <start to="prepare_info"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
+    <fork name="prepare_info">
+        <path start="select_datasourceId_from_country"/>
+        <path start="get_ds_master_duplicate"/>
+    </fork>
+
+    <action name="select_datasourceId_from_country">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Select datasource ID from country</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.GetDatasourceFromCountry</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=10000
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphInputPath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--country</arg><arg>${country}</arg>
+        </spark>
+        <ok to="wait_prepare"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="get_ds_master_duplicate">
+        <java>
+            <main-class>eu.dnetlib.dhp.oa.graph.clean.MasterDuplicateAction</main-class>
+            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
+            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
+            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
+            <arg>--hdfsPath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+        </java>
+        <ok to="wait_prepare"/>
+        <error to="Kill"/>
+    </action>
+
+    <join name="wait_prepare" to="fork_clean_graph"/>
 
     <fork name="fork_clean_graph">
         <path start="clean_publication"/>
@@ -82,12 +160,20 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/publication</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/publication</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -108,12 +194,20 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/dataset</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/dataset</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -134,12 +228,20 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=5000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/otherresearchproduct</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/otherresearchproduct</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -160,12 +262,20 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=2000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/software</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/software</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -186,12 +296,20 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/datasource</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/datasource</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -212,12 +330,20 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/organization</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/organization</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -238,12 +364,20 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=2000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/project</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/project</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -264,12 +398,20 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7680
+                --conf spark.sql.shuffle.partitions=20000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/relation</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/relation</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Relation</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
         </spark>
         <ok to="wait_clean"/>
         <error to="Kill"/>
@@ -278,4 +420,5 @@
     <join name="wait_clean" to="End"/>
 
     <end name="End"/>
+
 </workflow-app>

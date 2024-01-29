@@ -1,0 +1,50 @@
+[
+  {
+    "paramName":"gp",
+    "paramLongName":"graphPath",
+    "paramDescription": "the path of the sequencial file to read",
+    "paramRequired": true
+  },
+  {
+    "paramName":"h",
+    "paramLongName":"hive_metastore_uris",
+    "paramDescription": "the hive metastore uris",
+    "paramRequired": true
+  },
+  {
+    "paramName":"lp",
+    "paramLongName":"leavesPath",
+    "paramDescription": "true if the new version of the graph must be saved",
+    "paramRequired": false
+  },
+  {
+    "paramName":"cp",
+    "paramLongName":"childParentPath",
+    "paramDescription": "path where to store/find association from datasource and organization",
+    "paramRequired": true
+  },
+  {
+    "paramName":"rp",
+    "paramLongName":"resultOrgPath",
+    "paramDescription": "path where to store/find already linked results and organizations",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ssm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "the path where prepared info have been stored",
+    "paramRequired": false
+  },
+  {
+    "paramName": "rep",
+    "paramLongName": "relationPath",
+    "paramDescription": "the path where to store the selected subset of relations",
+    "paramRequired": false
+  },
+  {
+    "paramName": "pop",
+    "paramLongName": "projectOrganizationPath",
+    "paramDescription": "the number of iterations to be computed",
+    "paramRequired": true
+  }
+]

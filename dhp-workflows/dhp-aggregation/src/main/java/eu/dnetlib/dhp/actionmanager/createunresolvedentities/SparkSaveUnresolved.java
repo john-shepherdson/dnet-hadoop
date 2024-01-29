@@ -1,10 +1,11 @@
 
 package eu.dnetlib.dhp.actionmanager.createunresolvedentities;
 
-import static eu.dnetlib.dhp.actionmanager.createunresolvedentities.Constants.*;
+import static eu.dnetlib.dhp.actionmanager.Constants.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -20,7 +21,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class SparkSaveUnresolved implements Serializable {
-	private static final Logger log = LoggerFactory.getLogger(PrepareFOSSparkJob.class);
+	private static final Logger log = LoggerFactory.getLogger(SparkSaveUnresolved.class);
 
 	public static void main(String[] args) throws Exception {
 
@@ -64,10 +65,22 @@ public class SparkSaveUnresolved implements Serializable {
 			.map(
 				(MapFunction<String, Result>) l -> OBJECT_MAPPER.readValue(l, Result.class),
 				Encoders.bean(Result.class))
-			.groupByKey((MapFunction<Result, String>) r -> r.getId(), Encoders.STRING())
+			.groupByKey((MapFunction<Result, String>) Result::getId, Encoders.STRING())
 			.mapGroups((MapGroupsFunction<String, Result, Result>) (k, it) -> {
 				Result ret = it.next();
-				it.forEachRemaining(r -> ret.mergeFrom(r));
+				it.forEachRemaining(r -> {
+//					if (r.getInstance() != null) {
+//						ret.setInstance(r.getInstance());
+//					}
+					if (r.getSubject() != null) {
+						if (ret.getSubject() != null)
+							ret.getSubject().addAll(r.getSubject());
+						else
+							ret.setSubject(r.getSubject());
+					}
+
+					// ret.mergeFrom(r)
+				});
 				return ret;
 			}, Encoders.bean(Result.class))
 			.write()

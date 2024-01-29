@@ -1,9 +1,14 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -33,9 +38,6 @@ import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
  * The input is a JoinedEntity, i.e. a json representation of an OpenAIRE entity that embeds all the linked entities.
  */
 public class IndexRecordTransformerTest {
-
-	public static final String VERSION = "2021-04-15T10:05:53Z";
-	public static final String DSID = "b9ee796a-c49f-4473-a708-e7d67b84c16d_SW5kZXhEU1Jlc291cmNlcy9JbmRleERTUmVzb3VyY2VUeXBl";
 
 	private ContextMapper contextMapper;
 
@@ -77,6 +79,36 @@ public class IndexRecordTransformerTest {
 	}
 
 	@Test
+	void testPeerReviewed() throws IOException, TransformerException {
+
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+			XmlConverterJob.schemaLocation);
+
+		final Publication p = load("publication.json", Publication.class);
+
+		final JoinedEntity<Publication> je = new JoinedEntity<>(p);
+		final String record = xmlRecordFactory.build(je);
+		assertNotNull(record);
+		SolrInputDocument solrDoc = testRecordTransformation(record);
+
+		assertEquals("true", solrDoc.get("peerreviewed").getValue());
+	}
+
+	@Test
+	public void testRiunet() throws IOException, TransformerException {
+
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+			XmlConverterJob.schemaLocation);
+
+		final Publication p = load("riunet.json", Publication.class);
+
+		final JoinedEntity je = new JoinedEntity<>(p);
+		final String record = xmlRecordFactory.build(je);
+		assertNotNull(record);
+		testRecordTransformation(record);
+	}
+
+	@Test
 	public void testForEOSCFutureDataTransferPilot() throws IOException, TransformerException {
 		final String record = IOUtils.toString(getClass().getResourceAsStream("eosc-future/data-transfer-pilot.xml"));
 		testRecordTransformation(record);
@@ -109,7 +141,66 @@ public class IndexRecordTransformerTest {
 		testRecordTransformation(record);
 	}
 
-	private void testRecordTransformation(final String record) throws IOException, TransformerException {
+	@Test
+	public void testForEOSCFutureSoftwareNotebook() throws IOException, TransformerException {
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/software-justthink.xml"));
+		testRecordTransformation(record);
+	}
+
+	@Test
+	public void testForEOSCFutureSoftwareNotebookClaim() throws IOException, TransformerException {
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/software-justthink-claim.xml"));
+		testRecordTransformation(record);
+	}
+
+	@Test
+	public void testForEOSCFutureZenodo7353841() throws IOException, TransformerException {
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/zenodo7353841.xml"));
+		testRecordTransformation(record);
+	}
+
+	@Test
+	public void testForEOSCFutureZenodo7351393() throws IOException, TransformerException {
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/zenodo7351393.xml"));
+		testRecordTransformation(record);
+	}
+
+	@Test
+	public void testForEOSCFutureZenodo7351221() throws IOException, TransformerException {
+		final String record = IOUtils
+			.toString(getClass().getResourceAsStream("eosc-future/zenodo7351221.xml"));
+		testRecordTransformation(record);
+	}
+
+	@Test
+	void testDoiUrlNormalization() throws MalformedURLException {
+
+		// TODO add more test examples when needed
+		List<String> urls = Arrays
+			.asList(
+				"https://dx.doi.org/10.1016/j.jas.2019.105013",
+				"http://dx.doi.org/10.13140/rg.2.2.26964.65927",
+				"https://dx.doi.org/10.13140/rg.2.2.26964.65927",
+				"http://dx.doi.org/10.1016/j.jas.2019.105013",
+				"http://hdl.handle.net/2072/369223",
+				"https://doi.org/10.1016/j.jas.2019.105013");
+
+		for (String url : urls) {
+			URL u = new URL(XmlRecordFactory.normalizeDoiUrl(url));
+			if (url.contains(XmlRecordFactory.DOI_ORG_AUTHORITY)) {
+				assertEquals(XmlRecordFactory.HTTPS, u.getProtocol());
+				assertEquals(XmlRecordFactory.DOI_ORG_AUTHORITY, u.getAuthority());
+			} else {
+				assertEquals(url, u.toString());
+			}
+		}
+	}
+
+	private SolrInputDocument testRecordTransformation(final String record) throws IOException, TransformerException {
 		final String fields = IOUtils.toString(getClass().getResourceAsStream("fields.xml"));
 		final String xslt = IOUtils.toString(getClass().getResourceAsStream("layoutToRecordTransformer.xsl"));
 
@@ -119,13 +210,14 @@ public class IndexRecordTransformerTest {
 
 		final String indexRecordXML = XmlIndexingJob.toIndexRecord(tr, record);
 
-		final SolrInputDocument solrDoc = new StreamingInputDocumentFactory(VERSION, DSID)
-			.parseDocument(indexRecordXML);
+		final SolrInputDocument solrDoc = new StreamingInputDocumentFactory().parseDocument(indexRecordXML);
 
 		final String xmlDoc = ClientUtils.toXML(solrDoc);
 
 		Assertions.assertNotNull(xmlDoc);
 		System.out.println(xmlDoc);
+
+		return solrDoc;
 	}
 
 	private <T> T load(final String fileName, final Class<T> clazz) throws IOException {

@@ -2,12 +2,12 @@
 	{
 		"field": "project",
 		"type": "string",
-		"value": "nsf_________::1700003"
+		"value": "corda__h2020::824273"
 	},
 	{
 		"field": "resporganization",
 		"type": "string",
-		"value": "nsf_________::University_of_Notre_Dame"
+		"value": "corda__h2020::999945647"
 	},
 	{
 		"field": "participantnumber",
@@ -16,8 +16,13 @@
 	},
 	{
 		"field": "contribution",
-		"type": "not_used",
-		"value": null
+		"type": "double",
+		"value": 436754
+	},
+	{
+		"field": "currency",
+		"type": "string",
+		"value": "EUR"
 	},
 	{
 		"field": "startdate",
@@ -52,12 +57,12 @@
 	{
 		"field": "collectedfromid",
 		"type": "string",
-		"value": "openaire____::nsf"
+		"value": "openaire____::corda_h2020"
 	},
 	{
 		"field": "collectedfromname",
 		"type": "string",
-		"value": "NSF - National Science Foundation"
+		"value": "CORDA - COmmon Research DAta Warehouse - Horizon 2020"
 	},
 	{
 		"field": "semantics",

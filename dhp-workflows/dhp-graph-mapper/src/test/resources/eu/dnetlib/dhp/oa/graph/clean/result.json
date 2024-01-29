@@ -3,7 +3,7 @@
     {
       "affiliation": [
       ],
-      "fullname": "Brien, Tom",
+      "fullname": "Brien,     Tom",
       "name": "Tom",
       "pid": [
         {
@@ -403,6 +403,178 @@
         "http://juuli.fi/Record/0275158616",
         "http://dx.doi.org/10.1007/s109090161569x"
       ]
+    },
+    {
+      "pid": [
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1002/s21010127267xy"
+        },
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1008/abcd"
+        }
+      ],
+      "alternateIdentifier": [
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1007/s109090161569x"
+        },
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1009/qwerty"
+        }
+      ],
+      "accessright": {
+        "classid": "CLOSED",
+        "classname": "CLOSED",
+        "schemeid": "dnet:access_modes",
+        "schemename": "dnet:access_modes"
+      },
+      "collectedfrom": {
+        "key": "10|CSC_________::a2b9ce8435390bcbfc05f3cae3948747",
+        "value": "VIRTA"
+      },
+      "dateofacceptance": {
+        "dataInfo": {
+          "deletedbyinference": false,
+          "inferenceprovenance": "",
+          "inferred": false,
+          "invisible": false,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:datasetarchive",
+            "classname": "sysimport:crosswalk:datasetarchive",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          },
+          "trust": "0.9"
+        },
+        "value": "2016-01-01"
+      },
+      "distributionlocation": "",
+      "hostedby": {
+        "key": "10|CSC_________::a2b9ce8435390bcbfc05f3cae3948747",
+        "value": "VIRTA"
+      },
+      "instancetype": {
+        "classid": "Model",
+        "classname": "Model",
+        "schemeid": "dnet:publication_resource",
+        "schemename": "dnet:publication_resource"
+      },
+      "url": [
+        "http://dx.doi.org/10.1002/s21010127267xy"
+      ]
+    },
+    {
+      "pid": [
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1002/s21010127267xy"
+        },
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1008/abcd"
+        }
+      ],
+      "alternateIdentifier": [
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1007/s109090161569x"
+        },
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1009/qwerty"
+        }
+      ],
+      "accessright": {
+        "classid": "CLOSED",
+        "classname": "CLOSED",
+        "schemeid": "dnet:access_modes",
+        "schemename": "dnet:access_modes"
+      },
+      "collectedfrom": {
+        "key": "10|CSC_________::a2b9ce8435390bcbfc05f3cae3948747",
+        "value": "VIRTA"
+      },
+      "dateofacceptance": {
+        "dataInfo": {
+          "deletedbyinference": false,
+          "inferenceprovenance": "",
+          "inferred": false,
+          "invisible": false,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:datasetarchive",
+            "classname": "sysimport:crosswalk:datasetarchive",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          },
+          "trust": "0.9"
+        },
+        "value": "2016-01-01"
+      },
+      "distributionlocation": "",
+      "hostedby": {
+        "key": "10|CSC_________::a2b9ce8435390bcbfc05f3cae3948747",
+        "value": "VIRTA"
+      },
+      "instancetype": {
+        "classid": "xyz",
+        "classname": "xyz",
+        "schemeid": "dnet:publication_resource",
+        "schemename": "dnet:publication_resource"
+      },
+      "url": [
+        "http://dx.doi.org/10.1002/t32121238378t"
+      ]
     }
   ],
   "journal": {
@@ -536,6 +708,28 @@
   "subject": [
     {
       "dataInfo": {
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:repository",
+          "classname": "sysimport:crosswalk:repository",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "deletedbyinference": false,
+        "inferred": false,
+        "inferenceprovenance": "",
+        "invisible": false,
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "FOS",
+        "classname": "Fields of Science and Technology classification",
+        "schemeid": "dnet:result_subject",
+        "schemename": "dnet:result_subject"
+      },
+      "value": "In Situ Hybridization"
+    },
+    {
+      "dataInfo": {
         "deletedbyinference": false,
         "inferenceprovenance": "",
         "inferred": false,
@@ -571,12 +765,12 @@
         "trust": "0.9"
       },
       "qualifier": {
-        "classid": "",
-        "classname": "",
-        "schemeid": "",
-        "schemename": ""
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
       },
-      "value": "infrared detectors"
+      "value": "FOS: Mathematics"
     },
     {
       "dataInfo": {
@@ -593,12 +787,12 @@
         "trust": "0.9"
       },
       "qualifier": {
-        "classid": "",
-        "classname": "",
-        "schemeid": "",
-        "schemename": ""
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
       },
-      "value": "lens antennas"
+      "value": "FOS: Computer and information sciences"
     },
     {
       "dataInfo": {
@@ -615,12 +809,34 @@
         "trust": "0.9"
       },
       "qualifier": {
-        "classid": "",
-        "classname": "",
-        "schemeid": "",
-        "schemename": ""
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
       },
-      "value": "silicon"
+      "value": "0101 mathematics"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "subject:fos",
+          "classname": "subject:fos",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "0101 mathematics"
     },
     {
       "dataInfo": {
@@ -691,24 +907,23 @@
     {
       "dataInfo": {
         "deletedbyinference": false,
-        "inferenceprovenance": "",
         "inferred": false,
         "invisible": false,
         "provenanceaction": {
-          "classid": "sysimport:crosswalk:datasetarchive",
-          "classname": "sysimport:crosswalk:datasetarchive",
+          "classid": "sysimport:actionset",
+          "classname": "Harvested",
           "schemeid": "dnet:provenanceActions",
           "schemename": "dnet:provenanceActions"
         },
         "trust": "0.9"
       },
       "qualifier": {
-        "classid": "",
-        "classname": "",
-        "schemeid": "",
-        "schemename": ""
+        "classid": "FOS",
+        "classname": "Fields of Science and Technology classification",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
       },
-      "value": "doped silicon"
+      "value": "Avicennia"
     },
     {
       "dataInfo": {

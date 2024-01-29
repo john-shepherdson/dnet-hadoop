@@ -4,17 +4,28 @@
 	<parent>
 		<groupId>eu.dnetlib.dhp</groupId>
 		<artifactId>dhp</artifactId>
-		<version>1.2.4-SNAPSHOT</version>
+		<version>1.2.5-SNAPSHOT</version>
 	</parent>
 	<artifactId>dhp-build</artifactId>
 	<packaging>pom</packaging>
 
 	<description>This module is a container for the build tools used in dnet-hadoop</description>
+	<properties>
+		<maven.javadoc.skip>true</maven.javadoc.skip>
+	</properties>
 
 	<modules>
 		<module>dhp-code-style</module>
 		<module>dhp-build-assembly-resources</module>
 		<module>dhp-build-properties-maven-plugin</module>
 	</modules>
+
+
+ <distributionManagement>
+	 <site>
+		 <id>DHPSite</id>
+		 <url>${dhp.site.stage.path}/dhp-build/</url>
+	 </site>
+ </distributionManagement>
 
 </project>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+        xmlns:datacite="http://datacite.org/schema/kernel-3"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:dri="http://www.driver-repository.eu/namespace/dri">>
+    <header xmlns="http://www.openarchives.org/OAI/2.0/">
+        <identifier>oai:zenodo.org:3406824</identifier>
+        <datestamp>2020-01-20T16:45:20Z</datestamp>
+        <setSpec>openaire</setSpec>
+        <dr:dateOfTransformation>2022-06-07T10:21:24.06Z</dr:dateOfTransformation>
+        <dri:objIdentifier>test________::92fe3efa47883b2f3401e6a4bd92e9d7</dri:objIdentifier>
+        <dri:dateOfCollection>2020-05-21T05:26:15.93Z</dri:dateOfCollection>
+        <dri:dateOfTransformation>2020-08-01T11:06:26.977Z</dri:dateOfTransformation>
+    </header>
+    <metadata>
+        <resource xmlns="http://datacite.org/schema/kernel-4"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4.1/metadata.xsd">
+            <identifier identifierType="DOI">10.5281/zenodo.3406824</identifier>
+            <alternateIdentifiers xmlns="http://datacite.org/schema/kernel-3">
+                <alternateIdentifier alternateIdentifierType="URL">http://dx.doi.org/10.5281/zenodo.3406824</alternateIdentifier>
+            </alternateIdentifiers>
+            <creators>
+                <creator>
+                    <creatorName>Anne van Weerden</creatorName>
+                    <nameIdentifier nameIdentifierScheme="ORCID" schemeURI="http://orcid.org/">0000-0003-3272-8007</nameIdentifier>
+                    <affiliation>Utrecht University Library</affiliation>
+                </creator>
+                <creator>
+                    <creatorName>Anne van, Weerden</creatorName>
+                    <nameIdentifier nameIdentifierScheme="ORCID" schemeURI="http://orcid.org/">0000-0003-3272-8008</nameIdentifier>
+                    <affiliation>Utrecht University Library</affiliation>
+                </creator>
+            </creators>
+            <titles>
+                <title>Helen Bayly and Catherine Disney as influences in the life of Sir William Rowan Hamilton</title>
+            </titles>
+            <publisher>Zenodo</publisher>
+            <publicationYear>2018</publicationYear>
+            <subjects>
+                <subject>Sir William Rowan Hamilton, Lady Helena Maria Hamilton Bayly, Catherine Disney, Ireland, history, biography, nineteenth century</subject>
+            </subjects>
+            <dates>
+                <date dateType="Issued">2018-12-28</date>
+            </dates>
+            <language>en</language>
+            <resourceType resourceTypeGeneral="JournalArticle"/>
+            <relatedIdentifiers>
+                <relatedIdentifier relatedIdentifierType="DOI" relationType="IsVersionOf">10.5281/zenodo.3406823</relatedIdentifier>
+            </relatedIdentifiers>
+            <rightsList>
+                <rights rightsURI="https://creativecommons.org/licenses/by/4.0/legalcode">Creative Commons Attribution 4.0 International</rights>
+                <rights rightsURI="info:eu-repo/semantics/openAccess">Open Access</rights>
+            </rightsList>
+            <descriptions>
+                <description descriptionType="Abstract"><p>In the 1880s Robert Graves published a biography about Sir William Rowan Hamilton (1805-1865), to which in a 1980 biography Thomas Hankins added further information. From these biographies a picture emerged of a man who was unhappily married because he had lost the love of his life, which raised the question how such an unhappy man could produce so much beautiful mathematics. In this article it is stated that a main cause for the unhappy picture is that Graves ignored the influence on one another of Hamilton and his wife Helen Bayly, and Hankins that of Hamilton and his first and lost love Catherine Disney. It is then shown that if these influences are taken into account a very different view on Hamilton;s private life arises, in which he was happily married to a wife who enabled him to work as he needed to.</p></description>
+            </descriptions>
+        </resource>
+        <oaf:identifier identifierType="doi">10.5281/zenodo.3406824</oaf:identifier>
+        <dr:CobjCategory type="publication">0001</dr:CobjCategory>
+        <oaf:dateAccepted>2018-12-28</oaf:dateAccepted>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:license>https://creativecommons.org/licenses/by/4.0/legalcode</oaf:license>
+        <oaf:language>eng</oaf:language>
+        <oaf:hostedBy name="ZENODO" id="opendoar____::2659"/>
+        <oaf:collectedFrom name="ZENODO" id="opendoar____::2659"/>
+    </metadata>
+</record>

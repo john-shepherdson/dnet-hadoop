@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<oai:record xmlns:datacite="http://datacite.org/schema/kernel-4"
+            xmlns:date="http://exslt.org/dates-and-times"
+            xmlns:dc="http://purl.org/dc/elements/1.1/"
+            xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+            xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+            xmlns:oaf="http://namespace.openaire.eu/oaf" xmlns:oai="http://www.openarchives.org/OAI/2.0/">
+    <oai:header>
+        <dri:objIdentifier>openapc_____::000023f9cb6e3a247c764daec4273cbc</dri:objIdentifier>
+        <dri:recordIdentifier>10.1155/2015/439379</dri:recordIdentifier>
+        <dri:dateOfCollection>2022-02-01T15:26:33.817Z</dri:dateOfCollection>
+        <oaf:datasourceprefix>openapc_____</oaf:datasourceprefix>
+        <dr:dateOfTransformation>2022-02-02T15:45:32.502Z</dr:dateOfTransformation>
+    </oai:header>
+    <metadata xmlns="http://namespace.openaire.eu/">
+        <dc:identifier>https://doi.org/10.1155/2015/439379</dc:identifier>
+        <oaf:identifier identifierType="doi">10.1155/2015/439379</oaf:identifier>
+        <oaf:identifier identifierType="pmcid">PMC4354964</oaf:identifier>
+        <oaf:identifier identifierType="pmid">25811027.0</oaf:identifier>
+        <datacite:affiliation affiliationIdentifier="grid.83440.3b"
+                              affiliationIdentifierScheme="GRID" schemeURI="https://www.grid.ac/">UCL</datacite:affiliation>
+        <datacite:affiliation
+                affiliationIdentifier="https://ror.org/02jx3x895" affiliationIdentifierScheme="ROR">UCL</datacite:affiliation>
+        <oaf:processingchargeamount currency="EUR">1721.47</oaf:processingchargeamount>
+        <oaf:journal issn="2314-6133">BioMed Research International</oaf:journal>
+        <dc:license>http://creativecommons.org/licenses/by/3.0/</dc:license>
+        <dc:date>2015</dc:date>
+        <dr:CobjCategory type="publication">0004</dr:CobjCategory>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <datacite:rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</datacite:rights>
+        <oaf:hostedBy id="apc_________::openapc" name="OpenAPC Global Initiative"/>
+        <oaf:collectedFrom id="apc_________::openapc" name="OpenAPC Global Initiative"/>
+    </metadata>
+    <oaf:about xmlns:oai="http://wwww.openarchives.org/OAI/2.0/">
+        <oaf:datainfo>
+            <oaf:inferred>false</oaf:inferred>
+            <oaf:deletedbyinference>false</oaf:deletedbyinference>
+            <oaf:trust>0.9</oaf:trust>
+            <oaf:inferenceprovenance/>
+            <oaf:provenanceaction classid="sysimport:crosswalk:datasetarchive"
+                                  classname="sysimport:crosswalk:datasetarchive"
+                                  schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+        </oaf:datainfo>
+    </oaf:about>
+</oai:record>

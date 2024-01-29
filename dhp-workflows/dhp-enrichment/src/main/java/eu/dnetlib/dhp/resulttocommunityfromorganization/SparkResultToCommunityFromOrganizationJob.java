@@ -2,7 +2,7 @@
 package eu.dnetlib.dhp.resulttocommunityfromorganization;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import scala.Tuple2;
@@ -35,7 +36,7 @@ public class SparkResultToCommunityFromOrganizationJob {
 			.toString(
 				SparkResultToCommunityFromOrganizationJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttocommunityfromorganization/input_communitytoresult_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/resulttocommunityfromorganization/input_communitytoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -53,29 +54,14 @@ public class SparkResultToCommunityFromOrganizationJob {
 		final String possibleupdatespath = parser.get("preparedInfoPath");
 		log.info("preparedInfoPath: {}", possibleupdatespath);
 
-		final String resultClassName = parser.get("resultTableName");
-		log.info("resultTableName: {}", resultClassName);
-
-		final Boolean saveGraph = Optional
-			.ofNullable(parser.get("saveGraph"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.TRUE);
-		log.info("saveGraph: {}", saveGraph);
-
-		@SuppressWarnings("unchecked")
-		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
-
 		SparkConf conf = new SparkConf();
-		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
-		runWithSparkHiveSession(
+		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				removeOutputDir(spark, outputPath);
-				if (saveGraph) {
-					execPropagation(spark, inputPath, outputPath, resultClazz, possibleupdatespath);
-				}
+				execPropagation(spark, inputPath, outputPath, possibleupdatespath);
+
 			});
 	}
 
@@ -83,22 +69,50 @@ public class SparkResultToCommunityFromOrganizationJob {
 		SparkSession spark,
 		String inputPath,
 		String outputPath,
-		Class<R> resultClazz,
 		String possibleUpdatesPath) {
 
 		Dataset<ResultCommunityList> possibleUpdates = readPath(spark, possibleUpdatesPath, ResultCommunityList.class);
-		Dataset<R> result = readPath(spark, inputPath, resultClazz);
 
-		result
-			.joinWith(
-				possibleUpdates,
-				result.col("id").equalTo(possibleUpdates.col("resultId")),
-				"left_outer")
-			.map(resultCommunityFn(), Encoders.bean(resultClazz))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(outputPath);
+		ModelSupport.entityTypes
+			.keySet()
+			.parallelStream()
+			.filter(e -> ModelSupport.isResult(e))
+			// .parallelStream()
+			.forEach(e -> {
+				// if () {
+				Class<R> resultClazz = ModelSupport.entityTypes.get(e);
+				removeOutputDir(spark, outputPath + e.name());
+				Dataset<R> result = readPath(spark, inputPath + e.name(), resultClazz);
+
+				log.info("executing left join");
+				result
+					.joinWith(
+						possibleUpdates,
+						result.col("id").equalTo(possibleUpdates.col("resultId")),
+						"left_outer")
+					.map(resultCommunityFn(), Encoders.bean(resultClazz))
+					.write()
+					.mode(SaveMode.Overwrite)
+					.option("compression", "gzip")
+					.json(outputPath + e.name());
+
+//					log
+//						.info(
+//							"reading results from " + outputPath + e.name() + " and copying them to " + inputPath
+//								+ e.name());
+//					Dataset<R> tmp = readPath(spark, outputPath + e.name(), resultClazz);
+//					if (tmp.count() > 0){
+//
+//						tmp
+//								.write()
+//								.mode(SaveMode.Overwrite)
+//								.option("compression", "gzip")
+//								.json(inputPath + e.name());
+//					}
+
+				// }
+			});
+
 	}
 
 	private static <R extends Result> MapFunction<Tuple2<R, ResultCommunityList>, R> resultCommunityFn() {
@@ -113,11 +127,11 @@ public class SparkResultToCommunityFromOrganizationJob {
 					.map(Context::getId)
 					.collect(Collectors.toList());
 
-				@SuppressWarnings("unchecked")
-				R res = (R) ret.getClass().newInstance();
+				// @SuppressWarnings("unchecked")
+				// R res = (R) ret.getClass().newInstance();
 
-				res.setId(ret.getId());
-				List<Context> propagatedContexts = new ArrayList<>();
+				// res.setId(ret.getId());
+				// List<Context> propagatedContexts = new ArrayList<>();
 				for (String cId : communitySet) {
 					if (!contextList.contains(cId)) {
 						Context newContext = new Context();
@@ -131,11 +145,11 @@ public class SparkResultToCommunityFromOrganizationJob {
 											PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_ID,
 											PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_NAME,
 											ModelConstants.DNET_PROVENANCE_ACTIONS)));
-						propagatedContexts.add(newContext);
+						ret.getContext().add(newContext);
 					}
 				}
-				res.setContext(propagatedContexts);
-				ret.mergeFrom(res);
+				// res.setContext(propagatedContexts);
+				// ret.mergeFrom(res);
 			}
 			return ret;
 		};

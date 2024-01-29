@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.oa.graph.hostedbymap.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 import com.opencsv.bean.CsvBindByName;
 
@@ -17,7 +18,17 @@ public class DOAJModel implements Serializable {
 	private String eissn;
 
 	@CsvBindByName(column = "Review process")
-	private String reviewProcess;
+	private List<String> reviewProcess;
+
+	private Integer oaStart;
+
+	public Integer getOaStart() {
+		return oaStart;
+	}
+
+	public void setOaStart(Integer oaStart) {
+		this.oaStart = oaStart;
+	}
 
 	public String getJournalTitle() {
 		return journalTitle;
@@ -43,11 +54,11 @@ public class DOAJModel implements Serializable {
 		this.eissn = eissn;
 	}
 
-	public String getReviewProcess() {
+	public List<String> getReviewProcess() {
 		return reviewProcess;
 	}
 
-	public void setReviewProcess(String reviewProcess) {
+	public void setReviewProcess(List<String> reviewProcess) {
 		this.reviewProcess = reviewProcess;
 	}
 }

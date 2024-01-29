@@ -3,10 +3,13 @@ package eu.dnetlib.dhp.common.api;
 
 import java.io.*;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpHeaders;
 import org.apache.http.entity.ContentType;
+import org.jetbrains.annotations.NotNull;
 
 import com.google.gson.Gson;
 
@@ -60,33 +63,31 @@ public class ZenodoAPIClient implements Serializable {
 	 */
 	public int newDeposition() throws IOException {
 		String json = "{}";
-		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
 
-		RequestBody body = RequestBody.create(json, MEDIA_TYPE_JSON);
-
-		Request request = new Request.Builder()
-			.url(urlString)
-			.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString()) // add request headers
-			.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + access_token)
-			.post(body)
-			.build();
-
-		try (Response response = httpClient.newCall(request).execute()) {
-
-			if (!response.isSuccessful())
-				throw new IOException("Unexpected code " + response + response.body().string());
-
-			// Get response body
-			json = response.body().string();
-
-			ZenodoModel newSubmission = new Gson().fromJson(json, ZenodoModel.class);
-			this.bucket = newSubmission.getLinks().getBucket();
-			this.deposition_id = newSubmission.getId();
-
-			return response.code();
-
+		URL url = new URL(urlString);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
+		conn.setRequestProperty(HttpHeaders.AUTHORIZATION, "Bearer " + access_token);
+		conn.setRequestMethod("POST");
+		conn.setDoOutput(true);
+		try (OutputStream os = conn.getOutputStream()) {
+			byte[] input = json.getBytes("utf-8");
+			os.write(input, 0, input.length);
 		}
 
+		String body = getBody(conn);
+
+		int responseCode = conn.getResponseCode();
+		conn.disconnect();
+
+		if (!checkOKStatus(responseCode))
+			throw new IOException("Unexpected code " + responseCode + body);
+
+		ZenodoModel newSubmission = new Gson().fromJson(body, ZenodoModel.class);
+		this.bucket = newSubmission.getLinks().getBucket();
+		this.deposition_id = newSubmission.getId();
+
+		return responseCode;
 	}
 
 	/**
@@ -94,28 +95,48 @@ public class ZenodoAPIClient implements Serializable {
 	 *
 	 * @param is the inputStream for the file to upload
 	 * @param file_name the name of the file as it will appear on Zenodo
-	 * @param len the size of the file
 	 * @return the response code
 	 */
-	public int uploadIS(InputStream is, String file_name, long len) throws IOException {
-		OkHttpClient httpClient = new OkHttpClient.Builder()
-			.writeTimeout(600, TimeUnit.SECONDS)
-			.readTimeout(600, TimeUnit.SECONDS)
-			.connectTimeout(600, TimeUnit.SECONDS)
-			.build();
+	public int uploadIS(InputStream is, String file_name) throws IOException {
 
-		Request request = new Request.Builder()
-			.url(bucket + "/" + file_name)
-			.addHeader(HttpHeaders.CONTENT_TYPE, "application/zip") // add request headers
-			.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + access_token)
-			.put(InputStreamRequestBody.create(MEDIA_TYPE_ZIP, is, len))
-			.build();
+		URL url = new URL(bucket + "/" + file_name);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, "application/zip");
+		conn.setRequestProperty(HttpHeaders.AUTHORIZATION, "Bearer " + access_token);
+		conn.setDoOutput(true);
+		conn.setRequestMethod("PUT");
 
-		try (Response response = httpClient.newCall(request).execute()) {
-			if (!response.isSuccessful())
-				throw new IOException("Unexpected code " + response + response.body().string());
-			return response.code();
+		byte[] buf = new byte[8192];
+		int length;
+		try (OutputStream os = conn.getOutputStream()) {
+			while ((length = is.read(buf)) != -1) {
+				os.write(buf, 0, length);
+			}
+
 		}
+		int responseCode = conn.getResponseCode();
+		if (!checkOKStatus(responseCode)) {
+			throw new IOException("Unexpected code " + responseCode + getBody(conn));
+		}
+
+		return responseCode;
+	}
+
+	@NotNull
+	private String getBody(HttpURLConnection conn) throws IOException {
+		String body = "{}";
+		try (BufferedReader br = new BufferedReader(
+			new InputStreamReader(conn.getInputStream(), "utf-8"))) {
+			StringBuilder response = new StringBuilder();
+			String responseLine = null;
+			while ((responseLine = br.readLine()) != null) {
+				response.append(responseLine.trim());
+			}
+
+			body = response.toString();
+
+		}
+		return body;
 	}
 
 	/**
@@ -127,26 +148,34 @@ public class ZenodoAPIClient implements Serializable {
 	 */
 	public int sendMretadata(String metadata) throws IOException {
 
-		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
+		URL url = new URL(urlString + "/" + deposition_id);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
+		conn.setRequestProperty(HttpHeaders.AUTHORIZATION, "Bearer " + access_token);
+		conn.setDoOutput(true);
+		conn.setRequestMethod("PUT");
 
-		RequestBody body = RequestBody.create(metadata, MEDIA_TYPE_JSON);
-
-		Request request = new Request.Builder()
-			.url(urlString + "/" + deposition_id)
-			.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString()) // add request headers
-			.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + access_token)
-			.put(body)
-			.build();
-
-		try (Response response = httpClient.newCall(request).execute()) {
-
-			if (!response.isSuccessful())
-				throw new IOException("Unexpected code " + response + response.body().string());
-
-			return response.code();
+		try (OutputStream os = conn.getOutputStream()) {
+			byte[] input = metadata.getBytes("utf-8");
+			os.write(input, 0, input.length);
 
 		}
 
+		final int responseCode = conn.getResponseCode();
+		conn.disconnect();
+		if (!checkOKStatus(responseCode))
+			throw new IOException("Unexpected code " + responseCode + getBody(conn));
+
+		return responseCode;
+
+	}
+
+	private boolean checkOKStatus(int responseCode) {
+
+		if (HttpURLConnection.HTTP_OK != responseCode ||
+			HttpURLConnection.HTTP_CREATED != responseCode)
+			return true;
+		return false;
 	}
 
 	/**
@@ -155,6 +184,7 @@ public class ZenodoAPIClient implements Serializable {
 	 * @return response code
 	 * @throws IOException
 	 */
+	@Deprecated
 	public int publish() throws IOException {
 
 		String json = "{}";
@@ -191,31 +221,37 @@ public class ZenodoAPIClient implements Serializable {
 	 * @throws MissingConceptDoiException
 	 */
 	public int newVersion(String concept_rec_id) throws IOException, MissingConceptDoiException {
-		setDepositionId(concept_rec_id);
+		setDepositionId(concept_rec_id, 1);
 		String json = "{}";
 
-		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
+		URL url = new URL(urlString + "/" + deposition_id + "/actions/newversion");
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-		RequestBody body = RequestBody.create(json, MEDIA_TYPE_JSON);
+		conn.setRequestProperty(HttpHeaders.AUTHORIZATION, "Bearer " + access_token);
+		conn.setDoOutput(true);
+		conn.setRequestMethod("POST");
 
-		Request request = new Request.Builder()
-			.url(urlString + "/" + deposition_id + "/actions/newversion")
-			.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + access_token)
-			.post(body)
-			.build();
-
-		try (Response response = httpClient.newCall(request).execute()) {
-
-			if (!response.isSuccessful())
-				throw new IOException("Unexpected code " + response + response.body().string());
-
-			ZenodoModel zenodoModel = new Gson().fromJson(response.body().string(), ZenodoModel.class);
-			String latest_draft = zenodoModel.getLinks().getLatest_draft();
-			deposition_id = latest_draft.substring(latest_draft.lastIndexOf("/") + 1);
-			bucket = getBucket(latest_draft);
-			return response.code();
+		try (OutputStream os = conn.getOutputStream()) {
+			byte[] input = json.getBytes("utf-8");
+			os.write(input, 0, input.length);
 
 		}
+
+		String body = getBody(conn);
+
+		int responseCode = conn.getResponseCode();
+
+		conn.disconnect();
+		if (!checkOKStatus(responseCode))
+			throw new IOException("Unexpected code " + responseCode + body);
+
+		ZenodoModel zenodoModel = new Gson().fromJson(body, ZenodoModel.class);
+		String latest_draft = zenodoModel.getLinks().getLatest_draft();
+		deposition_id = latest_draft.substring(latest_draft.lastIndexOf("/") + 1);
+		bucket = getBucket(latest_draft);
+
+		return responseCode;
+
 	}
 
 	/**
@@ -233,29 +269,38 @@ public class ZenodoAPIClient implements Serializable {
 
 		this.deposition_id = deposition_id;
 
-		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
+		String json = "{}";
 
-		Request request = new Request.Builder()
-			.url(urlString + "/" + deposition_id)
-			.addHeader("Authorization", "Bearer " + access_token)
-			.build();
+		URL url = new URL(urlString + "/" + deposition_id);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-		try (Response response = httpClient.newCall(request).execute()) {
-
-			if (!response.isSuccessful())
-				throw new IOException("Unexpected code " + response + response.body().string());
-
-			ZenodoModel zenodoModel = new Gson().fromJson(response.body().string(), ZenodoModel.class);
-			bucket = zenodoModel.getLinks().getBucket();
-			return response.code();
-
+		conn.setRequestProperty(HttpHeaders.AUTHORIZATION, "Bearer " + access_token);
+		conn.setRequestMethod("POST");
+		conn.setDoOutput(true);
+		try (OutputStream os = conn.getOutputStream()) {
+			byte[] input = json.getBytes("utf-8");
+			os.write(input, 0, input.length);
 		}
+
+		String body = getBody(conn);
+
+		int responseCode = conn.getResponseCode();
+		conn.disconnect();
+
+		if (!checkOKStatus(responseCode))
+			throw new IOException("Unexpected code " + responseCode + body);
+
+		ZenodoModel zenodoModel = new Gson().fromJson(body, ZenodoModel.class);
+		bucket = zenodoModel.getLinks().getBucket();
+
+		return responseCode;
 
 	}
 
-	private void setDepositionId(String concept_rec_id) throws IOException, MissingConceptDoiException {
+	private void setDepositionId(String concept_rec_id, Integer page) throws IOException, MissingConceptDoiException {
 
-		ZenodoModelList zenodoModelList = new Gson().fromJson(getPrevDepositions(), ZenodoModelList.class);
+		ZenodoModelList zenodoModelList = new Gson()
+			.fromJson(getPrevDepositions(String.valueOf(page)), ZenodoModelList.class);
 
 		for (ZenodoModel zm : zenodoModelList) {
 			if (zm.getConceptrecid().equals(concept_rec_id)) {
@@ -263,55 +308,57 @@ public class ZenodoAPIClient implements Serializable {
 				return;
 			}
 		}
-
-		throw new MissingConceptDoiException("The concept record id specified was missing in the list of depositions");
-
-	}
-
-	private String getPrevDepositions() throws IOException {
-		OkHttpClient httpClient = new OkHttpClient.Builder().connectTimeout(600, TimeUnit.SECONDS).build();
-
-		Request request = new Request.Builder()
-			.url(urlString)
-			.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString()) // add request headers
-			.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + access_token)
-			.get()
-			.build();
-
-		try (Response response = httpClient.newCall(request).execute()) {
-
-			if (!response.isSuccessful())
-				throw new IOException("Unexpected code " + response + response.body().string());
-
-			return response.body().string();
-
-		}
+		if (zenodoModelList.size() == 0)
+			throw new MissingConceptDoiException(
+				"The concept record id specified was missing in the list of depositions");
+		setDepositionId(concept_rec_id, page + 1);
 
 	}
 
-	private String getBucket(String url) throws IOException {
-		OkHttpClient httpClient = new OkHttpClient.Builder()
-			.connectTimeout(600, TimeUnit.SECONDS)
-			.build();
+	private String getPrevDepositions(String page) throws IOException {
 
-		Request request = new Request.Builder()
-			.url(url)
-			.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString()) // add request headers
-			.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + access_token)
-			.get()
-			.build();
+		HttpUrl.Builder urlBuilder = HttpUrl.parse(urlString).newBuilder();
+		urlBuilder.addQueryParameter("page", page);
 
-		try (Response response = httpClient.newCall(request).execute()) {
+		URL url = new URL(urlBuilder.build().toString());
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
+		conn.setRequestProperty(HttpHeaders.AUTHORIZATION, "Bearer " + access_token);
+		conn.setDoOutput(true);
+		conn.setRequestMethod("GET");
 
-			if (!response.isSuccessful())
-				throw new IOException("Unexpected code " + response + response.body().string());
+		String body = getBody(conn);
 
-			// Get response body
-			ZenodoModel zenodoModel = new Gson().fromJson(response.body().string(), ZenodoModel.class);
+		int responseCode = conn.getResponseCode();
 
-			return zenodoModel.getLinks().getBucket();
+		conn.disconnect();
+		if (!checkOKStatus(responseCode))
+			throw new IOException("Unexpected code " + responseCode + body);
 
-		}
+		return body;
+
+	}
+
+	private String getBucket(String inputUurl) throws IOException {
+
+		URL url = new URL(inputUurl);
+		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.toString());
+		conn.setRequestProperty(HttpHeaders.AUTHORIZATION, "Bearer " + access_token);
+		conn.setDoOutput(true);
+		conn.setRequestMethod("GET");
+
+		String body = getBody(conn);
+
+		int responseCode = conn.getResponseCode();
+
+		conn.disconnect();
+		if (!checkOKStatus(responseCode))
+			throw new IOException("Unexpected code " + responseCode + body);
+
+		ZenodoModel zenodoModel = new Gson().fromJson(body, ZenodoModel.class);
+
+		return zenodoModel.getLinks().getBucket();
 
 	}
 

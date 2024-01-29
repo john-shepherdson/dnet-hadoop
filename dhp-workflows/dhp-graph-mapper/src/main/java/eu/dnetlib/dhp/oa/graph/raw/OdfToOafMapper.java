@@ -3,25 +3,32 @@ package eu.dnetlib.dhp.oa.graph.raw;
 
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
+import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
+import org.dom4j.Element;
 import org.dom4j.Node;
+
+import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.common.PacePerson;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.common.RelationInverse;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 
 public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
-	public static final String HTTP_DX_DOI_PREIFX = "http://dx.doi.org/";
+	public static final String HTTP_DOI_PREIFX = "https://doi.org/";
+	public static final String HTTP_HANDLE_PREIFX = "https://hdl.handle.net/";
 
 	public OdfToOafMapper(final VocabularyGroup vocs, final boolean invisible, final boolean shouldHashId,
 		final boolean forceOrginalId) {
@@ -34,10 +41,25 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<StructuredProperty> prepareTitles(final Document doc, final DataInfo info) {
-		return prepareListStructProps(
-			doc,
-			"//*[local-name()='titles']/*[local-name()='title']|//*[local-name()='resource']/*[local-name()='title']",
-			MAIN_TITLE_QUALIFIER, info);
+
+		final List<StructuredProperty> title = Lists.newArrayList();
+		final String xpath = "//*[local-name()='titles']/*[local-name()='title']|//*[local-name()='resource']/*[local-name()='title']";
+
+		for (Object o : doc.selectNodes(xpath)) {
+			Element e = (Element) o;
+			final String titleValue = e.getTextTrim();
+			final String titleType = e.attributeValue("titleType");
+			if (StringUtils.isNotBlank(titleType)) {
+				title
+					.add(
+						structuredProperty(
+							titleValue, titleType, titleType, DNET_DATACITE_TITLE, DNET_DATACITE_TITLE, info));
+			} else {
+				title.add(structuredProperty(titleValue, MAIN_TITLE_QUALIFIER, info));
+			}
+		}
+
+		return title;
 	}
 
 	@Override
@@ -118,7 +140,9 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		final List<StructuredProperty> alternateIdentifier = prepareResultPids(doc, info);
 		final List<StructuredProperty> pid = IdentifierFactory.getPids(alternateIdentifier, collectedfrom);
 
-		final Set<StructuredProperty> pids = pid.stream().collect(Collectors.toCollection(HashSet::new));
+		instance.setInstanceTypeMapping(prepareInstanceTypeMapping(doc));
+
+		final Set<StructuredProperty> pids = new HashSet<>(pid);
 
 		instance
 			.setAlternateIdentifier(
@@ -135,6 +159,11 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		instance.setProcessingchargeamount(field(doc.valueOf("//oaf:processingchargeamount"), info));
 		instance
 			.setProcessingchargecurrency(field(doc.valueOf("//oaf:processingchargeamount/@currency"), info));
+		prepareListURL(doc, "//oaf:fulltext", info)
+			.stream()
+			.findFirst()
+			.map(Field::getValue)
+			.ifPresent(instance::setFulltext);
 
 		final Set<String> url = new HashSet<>();
 		for (final Object o : doc
@@ -151,16 +180,34 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='landingPage']")) {
 			url.add(trimAndDecodeUrl(((Node) o).getText().trim()));
 		}
-		for (final Object o : doc
-			.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='DOI']")) {
-			url.add(HTTP_DX_DOI_PREIFX + ((Node) o).getText().trim());
+		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='w3id']")) {
+			url.add(trimAndDecodeUrl(((Node) o).getText().trim()));
 		}
-		for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='DOI']")) {
-			url.add(HTTP_DX_DOI_PREIFX + ((Node) o).getText().trim());
+
+		Set<String> validUrl = validateUrl(url);
+
+		if (validUrl.stream().noneMatch(s -> s.contains("doi.org"))) {
+			for (final Object o : doc
+				.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='DOI']")) {
+				validUrl.add(HTTP_DOI_PREIFX + ((Node) o).getText().trim());
+			}
+			for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='DOI']")) {
+				validUrl.add(HTTP_DOI_PREIFX + ((Node) o).getText().trim());
+			}
 		}
-		if (!url.isEmpty()) {
+		if (validUrl.stream().noneMatch(s -> s.contains("hdl.handle.net"))) {
+			for (final Object o : doc
+				.selectNodes("//*[local-name()='alternateIdentifier' and ./@alternateIdentifierType='Handle']")) {
+				validUrl.add(HTTP_HANDLE_PREIFX + ((Node) o).getText().trim());
+			}
+			for (final Object o : doc.selectNodes("//*[local-name()='identifier' and ./@identifierType='Handle']")) {
+				validUrl.add(HTTP_HANDLE_PREIFX + ((Node) o).getText().trim());
+			}
+		}
+
+		if (!validUrl.isEmpty()) {
 			instance.setUrl(new ArrayList<>());
-			instance.getUrl().addAll(url);
+			instance.getUrl().addAll(validUrl);
 		}
 		return Arrays.asList(instance);
 	}
@@ -171,6 +218,39 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		} catch (Throwable t) {
 			return url;
 		}
+	}
+
+	/**
+	 * Extracts the resource type from The Datacite element
+	 *
+	 * <datacite:resourceType
+	 * 		anyURI="http://purl.org/coar/resource_type/c_6501"
+	 * 		uri="http://purl.org/coar/resource_type/c_6501"
+	 * 	    resourceTypeGeneral="Dataset">journal article</datacite:resourceType>
+	 *
+	 * @param doc the input document
+	 * @return the chosen resource type
+	 */
+	@Override
+	protected String findOriginalType(Document doc) {
+		final String resourceType = Optional
+			.ofNullable(
+				(Element) doc
+					.selectSingleNode(
+						"//*[local-name()='metadata']/*[local-name() = 'resource']/*[local-name() = 'resourceType']"))
+			.map(element -> {
+				final String resourceTypeURI = element.attributeValue("uri");
+				final String resourceTypeAnyURI = element.attributeValue("anyURI");
+				final String resourceTypeTxt = element.getText();
+				final String resourceTypeGeneral = element.attributeValue("resourceTypeGeneral");
+
+				return ObjectUtils
+					.firstNonNull(resourceTypeURI, resourceTypeAnyURI, resourceTypeTxt, resourceTypeGeneral);
+			})
+			.orElse(null);
+
+		final String drCobjCategory = doc.valueOf("//dr:CobjCategory/text()");
+		return ObjectUtils.firstNonNull(resourceType, drCobjCategory);
 	}
 
 	@Override
@@ -230,8 +310,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<StructuredProperty> prepareSubjects(final Document doc, final DataInfo info) {
-		return prepareListStructProps(doc, "//*[local-name()='subject']", info);
+	protected List<Subject> prepareSubjects(final Document doc, final DataInfo info) {
+		return prepareSubjectList(doc, "//*[local-name()='subject']", info);
 	}
 
 	@Override
@@ -348,43 +428,58 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected List<Oaf> addOtherResultRels(
 		final Document doc,
-		final OafEntity entity) {
+		final OafEntity entity, DataInfo info) {
 
 		final String docId = entity.getId();
 
 		final List<Oaf> res = new ArrayList<>();
 
 		for (final Object o : doc
-			.selectNodes("//*[local-name()='relatedIdentifier' and ./@relatedIdentifierType='OPENAIRE']")) {
+			.selectNodes("//*[local-name()='relatedIdentifier']")) {
 
-			final String originalId = ((Node) o).getText();
+			final String originalId = ((Node) o).getText().trim();
 
 			if (StringUtils.isNotBlank(originalId)) {
-				final String otherId = createOpenaireId(50, originalId, false);
-				final String type = ((Node) o).valueOf("@relationType");
-
-				if (type.equalsIgnoreCase(IS_SUPPLEMENT_TO)) {
-					res
-						.add(
-							getRelation(
-								docId, otherId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENT_TO, entity));
-					res
-						.add(
-							getRelation(
-								otherId, docId, RESULT_RESULT, SUPPLEMENT, IS_SUPPLEMENTED_BY, entity));
-				} else if (type.equalsIgnoreCase(IS_PART_OF)) {
-					res
-						.add(
-							getRelation(
-								docId, otherId, RESULT_RESULT, PART, IS_PART_OF, entity));
-					res
-						.add(
-							getRelation(
-								otherId, docId, RESULT_RESULT, PART, HAS_PART, entity));
-				} else {
-					// TODO catch more semantics
+				final String idType = ((Node) o).valueOf("@relatedIdentifierType");
+				final String relType = ((Node) o).valueOf("@relationType");
+				String otherId = guessRelatedIdentifier(idType, originalId);
+				if (StringUtils.isNotBlank(otherId)) {
+					res.addAll(getRelations(relType, docId, otherId, entity, info));
 				}
+
 			}
+		}
+		return res;
+	}
+
+	protected String guessRelatedIdentifier(final String idType, final String value) {
+		if (StringUtils.isBlank(idType) || StringUtils.isBlank(value))
+			return null;
+		if (idType.equalsIgnoreCase("OPENAIRE"))
+			return createOpenaireId(50, value, false);
+		if (pidTypeWithAuthority.containsKey(idType.toLowerCase())) {
+			return IdentifierFactory.idFromPid("50", pidTypeWithAuthority.get(idType.toLowerCase()), value, true);
+		}
+		return null;
+
+	}
+
+	protected List<Oaf> getRelations(final String reltype, final String entityId, final String otherId,
+		final OafEntity entity, DataInfo info) {
+		final List<Oaf> res = new ArrayList<>();
+		RelationInverse rel = ModelSupport.findRelation(reltype);
+		if (rel != null) {
+			res
+				.add(
+					getRelation(
+						entityId, otherId, rel.getRelType(), rel.getSubReltype(), rel.getRelClass(),
+						entity.getCollectedfrom(), info, entity.getLastupdatetimestamp(), null, null));
+			res
+				.add(
+					getRelation(
+						otherId, entityId, rel.getRelType(), rel.getSubReltype(), rel.getInverseRelClass(),
+						entity.getCollectedfrom(), info, entity.getLastupdatetimestamp(), null, null));
+
 		}
 		return res;
 	}

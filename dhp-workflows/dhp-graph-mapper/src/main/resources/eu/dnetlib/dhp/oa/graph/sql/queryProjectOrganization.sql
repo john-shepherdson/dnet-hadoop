@@ -3,6 +3,7 @@ SELECT
 	po.resporganization                                                     AS resporganization,
 	po.participantnumber                                                    AS participantnumber,
 	po.contribution                                                         AS contribution,
+    po.currency                                                             AS currency,
 	NULL                                                                    AS startdate,
 	NULL                                                                    AS enddate,
 	false                                                                   AS inferred,
@@ -16,4 +17,4 @@ SELECT
 
 FROM project_organization po
 	LEFT OUTER JOIN projects p ON (p.id = po.project)
-	LEFT OUTER JOIN dsm_datasources dc ON (dc.id = p.collectedfrom);
+	LEFT OUTER JOIN dsm_services dc ON (dc.id = p.collectedfrom);

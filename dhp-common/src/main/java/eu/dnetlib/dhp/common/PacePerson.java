@@ -1,18 +1,18 @@
 
 package eu.dnetlib.dhp.common;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.text.WordUtils;
 
+import com.ctc.wstx.dtd.LargePrefixedNameSet;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.hash.Hashing;
 
@@ -29,7 +29,19 @@ public class PacePerson {
 	private List<String> fullname = Lists.newArrayList();
 	private final String original;
 
-	private static Set<String> particles = null;
+	private static Set<String> particles;
+
+	static {
+		try {
+			particles = new HashSet<>(IOUtils
+				.readLines(
+					PacePerson.class
+						.getResourceAsStream(
+							"/eu/dnetlib/dhp/common/name_particles.txt")));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	/**
 	 * Capitalizes a string
@@ -37,27 +49,18 @@ public class PacePerson {
 	 * @param s the string to capitalize
 	 * @return the input string with capital letter
 	 */
-	public static final String capitalize(final String s) {
+	public static String capitalize(final String s) {
+		if (particles.contains(s)) {
+			return s;
+		}
 		return WordUtils.capitalize(s.toLowerCase(), ' ', '-');
 	}
 
 	/**
 	 * Adds a dot to a string with length equals to 1
 	 */
-	public static final String dotAbbreviations(final String s) {
+	public static String dotAbbreviations(final String s) {
 		return s.length() == 1 ? s + "." : s;
-	}
-
-	public static Set<String> loadFromClasspath(final String classpath) {
-		final Set<String> h = new HashSet<>();
-		try {
-			for (final String s : IOUtils.readLines(PacePerson.class.getResourceAsStream(classpath))) {
-				h.add(s);
-			}
-		} catch (final Throwable e) {
-			return new HashSet<>();
-		}
-		return h;
 	}
 
 	/**
@@ -128,10 +131,6 @@ public class PacePerson {
 	}
 
 	private List<String> splitTerms(final String s) {
-		if (particles == null) {
-			particles = loadFromClasspath("/eu/dnetlib/dhp/oa/graph/pace/name_particles.txt");
-		}
-
 		final List<String> list = Lists.newArrayList();
 		for (final String part : Splitter.on(" ").omitEmptyStrings().split(s)) {
 			if (!particles.contains(part.toLowerCase())) {
@@ -187,17 +186,36 @@ public class PacePerson {
 	}
 
 	public List<String> getCapitalFirstnames() {
-		return Lists
-			.newArrayList(
-				Iterables.transform(getNameWithAbbreviations(), PacePerson::capitalize));
+		return Optional
+			.ofNullable(getNameWithAbbreviations())
+			.map(
+				name -> name
+					.stream()
+					.map(PacePerson::capitalize)
+					.collect(Collectors.toList()))
+			.orElse(new ArrayList<>());
 	}
 
 	public List<String> getCapitalSurname() {
-		return Lists.newArrayList(Iterables.transform(surname, PacePerson::capitalize));
+		return Optional
+			.ofNullable(getSurname())
+			.map(
+				surname -> surname
+					.stream()
+					.map(PacePerson::capitalize)
+					.collect(Collectors.toList()))
+			.orElse(new ArrayList<>());
 	}
 
 	public List<String> getNameWithAbbreviations() {
-		return Lists.newArrayList(Iterables.transform(name, PacePerson::dotAbbreviations));
+		return Optional
+			.ofNullable(getName())
+			.map(
+				name -> name
+					.stream()
+					.map(PacePerson::dotAbbreviations)
+					.collect(Collectors.toList()))
+			.orElse(new ArrayList<>());
 	}
 
 	public boolean isAccurate() {

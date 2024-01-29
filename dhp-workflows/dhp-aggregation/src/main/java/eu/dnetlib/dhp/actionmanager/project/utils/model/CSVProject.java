@@ -13,7 +13,7 @@ public class CSVProject implements Serializable {
 	@CsvBindByName(column = "id")
 	private String id;
 
-	@CsvBindByName(column = "programme")
+	@CsvBindByName(column = "legalBasis")
 	private String programme;
 
 	@CsvBindByName(column = "topics")

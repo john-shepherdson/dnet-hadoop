@@ -11,6 +11,16 @@
         <WORKFLOW_TYPE>IIS</WORKFLOW_TYPE>
         <WORKFLOW_PRIORITY>30</WORKFLOW_PRIORITY>
         <CONFIGURATION start="manual">
+            <NODE isStart="true" name="setUnresolvedEntityPath" type="SetEnvParameter">
+                <DESCRIPTION>set the path of unresolved entities</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">unresolvedEntityPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/data/unresolved_PROD/content</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
             <NODE isStart="true" name="setNsPrefixBlacklist" type="SetEnvParameter">
                 <DESCRIPTION>set blacklist of funder nsPrefixes</DESCRIPTION>
                 <PARAMETERS>
@@ -61,11 +71,21 @@
                     <ARC to="waitConfig"/>
                 </ARCS>
             </NODE>
+            <NODE isStart="true" name="setResolvedGraphPath" type="SetEnvParameter">
+                <DESCRIPTION>Set the target path to store the CLEANED graph</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="parameterName" required="true" type="string">resolvedGraphPath</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/beta_inference/graph/03_graph_resolved</PARAM>
+                </PARAMETERS>
+                <ARCS>
+                    <ARC to="waitConfig"/>
+                </ARCS>
+            </NODE>
             <NODE isStart="true" name="setDedupGraphPath" type="SetEnvParameter">
                 <DESCRIPTION>Set the target path to store the DEDUPED graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">dedupGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_inference/graph/03_graph_dedup</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_inference/graph/04_graph_dedup</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -75,7 +95,7 @@
                 <DESCRIPTION>Set the target path to store the CONSISTENCY graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">consistentGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_inference/graph/04_graph_consistent</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_inference/graph/05_graph_consistent</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -85,7 +105,7 @@
                 <DESCRIPTION>Set the target path to store the CLEANED graph</DESCRIPTION>
                 <PARAMETERS>
                     <PARAM managedBy="system" name="parameterName" required="true" type="string">cleanedGraphPath</PARAM>
-                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_inference/graph/05_graph_cleaned</PARAM>
+                    <PARAM managedBy="user" name="parameterValue" required="true" type="string">/tmp/prod_inference/graph/06_graph_cleaned</PARAM>
                 </PARAMETERS>
                 <ARCS>
                     <ARC to="waitConfig"/>
@@ -348,6 +368,31 @@
                     <PARAM managedBy="system" name="oozieReportActionsCsv" required="true" type="string">build-report</PARAM>
                 </PARAMETERS>
                 <ARCS>
+                    <ARC to="graphResolution"/>
+                </ARCS>
+            </NODE>
+            <NODE name="graphResolution" type="SubmitHadoopJob">
+                <DESCRIPTION>Resolve Relation</DESCRIPTION>
+                <PARAMETERS>
+                    <PARAM managedBy="system" name="hadoopJob" required="true" type="string">executeOozieJob</PARAM>
+                    <PARAM managedBy="system" name="cluster" required="true" type="string">IIS</PARAM>
+                    <PARAM managedBy="system" name="envParams" required="true" type="string">
+                        {
+                        'graphBasePath':'cleanedFirstGraphPath',
+                        'unresolvedPath' :'unresolvedEntityPath',
+                        'targetPath':'resolvedGraphPath'
+                        }
+                    </PARAM>
+                    <PARAM managedBy="system" name="params" required="true" type="string">
+                        {
+                        'oozie.wf.application.path' : '/lib/dnet/PROD/oa/graph/resolution/oozie_app',
+                        'workingDir' : '/tmp/prod_inference/working_dir/relation_resolution',
+                        'sparkExecutorCores' : '2',
+                        'sparkExecutorMemory' : '12G'
+                        }
+                    </PARAM>
+                </PARAMETERS>
+                <ARCS>
                     <ARC to="duplicateScan"/>
                 </ARCS>
             </NODE>
@@ -359,7 +404,7 @@
                     <PARAM managedBy="system" name="envParams" required="true" type="string">
                         {
                         'actionSetId' : 'dedupConfig',
-                        'graphBasePath' : 'cleanedFirstGraphPath',
+                        'graphBasePath' : 'resolvedGraphPath',
                         'dedupGraphPath': 'dedupGraphPath',
                         'isLookUpUrl' : 'isLookUpUrl'
                         }

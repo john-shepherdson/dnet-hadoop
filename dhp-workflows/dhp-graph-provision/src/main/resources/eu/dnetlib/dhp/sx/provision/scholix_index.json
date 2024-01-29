@@ -41,7 +41,8 @@
         }
       },
       "publicationDate": {
-        "type": "keyword"
+        "type":   "date",
+        "format": "yyyy-MM-dd"
       },
       "relationship": {
         "properties": {

@@ -1,4 +1,0 @@
-## This is a classpath-based import file (this header is required)
-dump_complete classpath eu/dnetlib/dhp/oa/graph/dump/wf/subworkflows/complete/oozie_app
-dump_funder classpath eu/dnetlib/dhp/oa/graph/dump/wf/subworkflows/funder/oozie_app
-dump_community classpath eu/dnetlib/dhp/oa/graph/dump/wf/subworkflows/community/oozie_app

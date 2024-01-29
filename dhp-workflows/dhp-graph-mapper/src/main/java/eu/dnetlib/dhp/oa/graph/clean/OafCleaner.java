@@ -30,6 +30,11 @@ public class OafCleaner implements Serializable {
 			}
 		} else if (hasMapping(o, mapping)) {
 			mapping.get(o.getClass()).accept(o);
+			for (final Field f : getAllFields(o.getClass())) {
+				f.setAccessible(true);
+				final Object val = f.get(o);
+				navigate(val, mapping);
+			}
 		} else {
 			for (final Field f : getAllFields(o.getClass())) {
 				f.setAccessible(true);
@@ -54,6 +59,7 @@ public class OafCleaner implements Serializable {
 	private static boolean isPrimitive(Object o) {
 		return Objects.isNull(o)
 			|| o.getClass().isPrimitive()
+			|| o.getClass().isEnum()
 			|| o instanceof Class
 			|| o instanceof Integer
 			|| o instanceof Double

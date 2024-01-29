@@ -1,7 +1,11 @@
 
 package eu.dnetlib.doiboost.orcid.xml;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.mortbay.log.Log;
@@ -34,6 +38,33 @@ public class XMLRecordParser {
 	private static final String NS_WORK_URL = "http://www.orcid.org/ns/work";
 	private static final String NS_HISTORY = "history";
 	private static final String NS_HISTORY_URL = "http://www.orcid.org/ns/history";
+	private static final String NS_BULK_URL = "http://www.orcid.org/ns/bulk";
+	private static final String NS_BULK = "bulk";
+
+	private static final String namespaceList = " xmlns:internal=\"http://www.orcid.org/ns/internal\"\n" +
+		"    xmlns:education=\"http://www.orcid.org/ns/education\"\n" +
+		"    xmlns:distinction=\"http://www.orcid.org/ns/distinction\"\n" +
+		"    xmlns:deprecated=\"http://www.orcid.org/ns/deprecated\"\n" +
+		"    xmlns:other-name=\"http://www.orcid.org/ns/other-name\"\n" +
+		"    xmlns:membership=\"http://www.orcid.org/ns/membership\"\n" +
+		"    xmlns:error=\"http://www.orcid.org/ns/error\" xmlns:common=\"http://www.orcid.org/ns/common\"\n" +
+		"    xmlns:record=\"http://www.orcid.org/ns/record\"\n" +
+		"    xmlns:personal-details=\"http://www.orcid.org/ns/personal-details\"\n" +
+		"    xmlns:keyword=\"http://www.orcid.org/ns/keyword\" xmlns:email=\"http://www.orcid.org/ns/email\"\n" +
+		"    xmlns:external-identifier=\"http://www.orcid.org/ns/external-identifier\"\n" +
+		"    xmlns:funding=\"http://www.orcid.org/ns/funding\"\n" +
+		"    xmlns:preferences=\"http://www.orcid.org/ns/preferences\"\n" +
+		"    xmlns:address=\"http://www.orcid.org/ns/address\"\n" +
+		"    xmlns:invited-position=\"http://www.orcid.org/ns/invited-position\"\n" +
+		"    xmlns:work=\"http://www.orcid.org/ns/work\" xmlns:history=\"http://www.orcid.org/ns/history\"\n" +
+		"    xmlns:employment=\"http://www.orcid.org/ns/employment\"\n" +
+		"    xmlns:qualification=\"http://www.orcid.org/ns/qualification\"\n" +
+		"    xmlns:service=\"http://www.orcid.org/ns/service\" xmlns:person=\"http://www.orcid.org/ns/person\"\n" +
+		"    xmlns:activities=\"http://www.orcid.org/ns/activities\"\n" +
+		"    xmlns:researcher-url=\"http://www.orcid.org/ns/researcher-url\"\n" +
+		"    xmlns:peer-review=\"http://www.orcid.org/ns/peer-review\"\n" +
+		"    xmlns:bulk=\"http://www.orcid.org/ns/bulk\"\n" +
+		"    xmlns:research-resource=\"http://www.orcid.org/ns/research-resource\"";
 
 	private static final String NS_ERROR = "error";
 
@@ -306,5 +337,66 @@ public class XMLRecordParser {
 			authorHistory.setLastModifiedDate(lastModifiedDate);
 		}
 		return authorHistory;
+	}
+
+	public static List<String> splitWorks(String orcidId, byte[] bytes)
+		throws ParseException, XPathParseException, NavException, XPathEvalException, VtdException, ModifyException,
+		IOException, TranscodeException {
+
+		final VTDGen vg = new VTDGen();
+		vg.setDoc(bytes);
+		vg.parse(true);
+		final VTDNav vn = vg.getNav();
+		final AutoPilot ap = new AutoPilot(vn);
+		ap.declareXPathNameSpace(NS_COMMON, NS_COMMON_URL);
+		ap.declareXPathNameSpace(NS_WORK, NS_WORK_URL);
+		ap.declareXPathNameSpace(NS_ERROR, NS_ERROR_URL);
+		ap.declareXPathNameSpace(NS_BULK, NS_BULK_URL);
+
+		List<String> works = new ArrayList<>();
+		try {
+			ap.selectXPath("//work:work");
+			while (ap.evalXPath() != -1) {
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				long l = vn.getElementFragment();
+				String xmlHeader = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>";
+				bos.write(xmlHeader.getBytes(StandardCharsets.UTF_8));
+				bos.write(vn.getXML().getBytes(), (int) l, (int) (l >> 32));
+				works.add(bos.toString());
+				bos.close();
+			}
+		} catch (Exception e) {
+			throw new VtdException(e);
+		}
+
+		List<VTDGen> vgModifiers = Arrays.asList(new VTDGen());
+		List<XMLModifier> xmModifiers = Arrays.asList(new XMLModifier());
+		List<ByteArrayOutputStream> buffer = Arrays.asList(new ByteArrayOutputStream());
+		List<String> updatedWorks = works.stream().map(work -> {
+			vgModifiers.get(0).setDoc(work.getBytes());
+			try {
+				vgModifiers.get(0).parse(false);
+				final VTDNav vnModifier = vgModifiers.get(0).getNav();
+				xmModifiers.get(0).bind(vnModifier);
+				vnModifier.toElement(VTDNav.ROOT);
+				int attr = vnModifier.getAttrVal("put-code");
+				if (attr > -1) {
+					xmModifiers
+						.get(0)
+						.insertAttribute(
+							" path=\"/" + orcidId + "/work/" + vnModifier.toNormalizedString(attr) + "\""
+								+ " " + namespaceList);
+				}
+				buffer.set(0, new ByteArrayOutputStream());
+				xmModifiers.get(0).output(buffer.get(0));
+				buffer.get(0).close();
+				return buffer.get(0).toString();
+			} catch (NavException | ModifyException | IOException | TranscodeException | ParseException e) {
+				e.printStackTrace();
+				throw new RuntimeException(e);
+			}
+		}).collect(Collectors.toList());
+
+		return updatedWorks;
 	}
 }

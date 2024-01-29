@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 
-class EnrichMissingPublicationDateTest {
+public class EnrichMissingPublicationDateTest {
 
 	final EnrichMissingPublicationDate matcher = new EnrichMissingPublicationDate();
 

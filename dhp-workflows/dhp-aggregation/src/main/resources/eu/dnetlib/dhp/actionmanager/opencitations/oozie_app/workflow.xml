@@ -26,6 +26,7 @@
         <switch>
             <case to="download">${wf:conf('resumeFrom') eq 'DownloadDump'}</case>
             <case to="extract">${wf:conf('resumeFrom') eq 'ExtractContent'}</case>
+            <case to="read">${wf:conf('resumeFrom') eq 'ReadContent'}</case>
             <default to="create_actionset"/> <!-- first action to be done when downloadDump is to be performed -->
         </switch>
     </decision>
@@ -33,6 +34,7 @@
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
     <action name="download">
         <shell xmlns="uri:oozie:shell-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>
@@ -45,7 +47,7 @@
             </configuration>
             <exec>download.sh</exec>
             <argument>${filelist}</argument>
-            <argument>${workingPath}/Original</argument>
+            <argument>${workingPath}/${prefix}/Original</argument>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>download.sh</file>
             <capture-output/>
@@ -53,13 +55,42 @@
         <ok to="extract"/>
         <error to="Kill"/>
     </action>
+
     <action name="extract">
         <java>
             <main-class>eu.dnetlib.dhp.actionmanager.opencitations.GetOpenCitationsRefs</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--inputFile</arg><arg>${inputFile}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}/${prefix}</arg>
+            <arg>--prefix</arg><arg>${prefix}</arg>
         </java>
+        <ok to="read"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="read">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Produces the AS for OC</name>
+            <class>eu.dnetlib.dhp.actionmanager.opencitations.ReadCOCI</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--workingPath</arg><arg>${workingPath}/${prefix}/${prefix}</arg>
+            <arg>--outputPath</arg><arg>${workingPath}/${prefix}/${prefix}_JSON/</arg>
+            <arg>--delimiter</arg><arg>${delimiter}</arg>
+            <arg>--inputFile</arg><arg>${inputFileCoci}</arg>
+            <arg>--format</arg><arg>${prefix}</arg>
+        </spark>
         <ok to="create_actionset"/>
         <error to="Kill"/>
     </action>
@@ -81,7 +112,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--inputPath</arg><arg>${workingPath}/COCI</arg>
+            <arg>--inputPath</arg><arg>${workingPath}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>

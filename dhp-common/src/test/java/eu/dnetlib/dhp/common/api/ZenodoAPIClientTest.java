@@ -33,7 +33,7 @@ class ZenodoAPIClientTest {
 
 		InputStream is = new FileInputStream(file);
 
-		Assertions.assertEquals(200, client.uploadIS(is, "COVID-19.json.gz", file.length()));
+		Assertions.assertEquals(200, client.uploadIS(is, "COVID-19.json.gz"));
 
 		String metadata = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/common/api/metadata.json"));
 
@@ -56,7 +56,7 @@ class ZenodoAPIClientTest {
 
 		InputStream is = new FileInputStream(file);
 
-		Assertions.assertEquals(200, client.uploadIS(is, "COVID-19.json.gz", file.length()));
+		Assertions.assertEquals(200, client.uploadIS(is, "COVID-19.json.gz"));
 
 		String metadata = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/common/api/metadata.json"));
 
@@ -80,7 +80,7 @@ class ZenodoAPIClientTest {
 
 		InputStream is = new FileInputStream(file);
 
-		Assertions.assertEquals(200, client.uploadIS(is, "newVersion_deposition", file.length()));
+		Assertions.assertEquals(200, client.uploadIS(is, "newVersion_deposition"));
 
 		Assertions.assertEquals(202, client.publish());
 
@@ -100,7 +100,7 @@ class ZenodoAPIClientTest {
 
 		InputStream is = new FileInputStream(file);
 
-		Assertions.assertEquals(200, client.uploadIS(is, "newVersion_deposition", file.length()));
+		Assertions.assertEquals(200, client.uploadIS(is, "newVersion_deposition"));
 
 		Assertions.assertEquals(202, client.publish());
 

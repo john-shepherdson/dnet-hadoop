@@ -74,7 +74,9 @@
     <decision name="resume_from">
         <switch>
             <case to="produceHBM">${wf:conf('resumeFrom') eq 'ProduceHBM'}</case>
-            <case to="remove_hbmpath">${wf:conf('resumeFrom') eq 'download_csv'}</case>
+            <case to="fork_downloads_csv">${wf:conf('resumeFrom') eq 'DownloadBoth'}</case>
+            <case to="downloadGold">${wf:conf('resumeFrom') eq 'DownloadGold'}</case>
+            <case to="downloadDOAJ">${wf:conf('resumeFrom') eq 'DownloadDoaj'}</case>
             <default to="prepareInfo"/>
         </switch>
     </decision>
@@ -83,47 +85,108 @@
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="remove_hbmpath">
-        <fs>
-            <delete path="${hostedByMapPath}"/>
-<!--            <mkdir path="${hostedByMapPath}"/>-->
-        </fs>
-        <ok to="fork_downloads_csv"/>
-        <error to="Kill"/>
-    </action>
-
-    <fork name="fork_downloads_csv">
+       <fork name="fork_downloads_csv">
         <path start="download_gold"/>
-        <path start="download_doaj"/>
+        <path start="download_doaj_json"/>
     </fork>
 
     <action name="download_gold">
         <java>
-            <main-class>eu.dnetlib.dhp.oa.graph.hostedbymap.DownloadCSV2</main-class>
+            <main-class>eu.dnetlib.dhp.oa.graph.hostedbymap.DownloadCSV</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--fileURL</arg><arg>${unibiFileURL}</arg>
             <arg>--tmpFile</arg><arg>/tmp/unibi_gold_replaced.csv</arg>
-            <arg>--outputFile</arg><arg>${workingDir}/unibi_gold.json</arg>
+            <arg>--outputFile</arg><arg>/user/${wf:user()}/data/unibi_gold.json</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.oa.graph.hostedbymap.model.UnibiGoldModel</arg>
         </java>
         <ok to="join_download"/>
         <error to="Kill"/>
     </action>
 
-    <action name="download_doaj">
+    <action name="download_doaj_json">
+        <shell xmlns="uri:oozie:shell-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <exec>download.sh</exec>
+            <argument>${doajJsonFileURL}</argument>
+            <argument>${dumpPath}</argument>
+            <argument>${dumpFileName}</argument>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>download.sh</file>
+            <capture-output/>
+        </shell>
+        <ok to="extractTarGzAndMap"/>
+        <error to="Kill"/>
+
+    </action>
+
+    <action name="extractTarGzAndMap">
         <java>
-            <main-class>eu.dnetlib.dhp.oa.graph.hostedbymap.DownloadCSV2</main-class>
+            <main-class>eu.dnetlib.dhp.oa.graph.hostedbymap.ExtractAndMapDoajJson</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
-            <arg>--fileURL</arg><arg>${doajFileURL}</arg>
-            <arg>--tmpFile</arg><arg>/tmp/doaj_replaced.csv</arg>
-            <arg>--outputFile</arg><arg>${workingDir}/doaj.json</arg>
-            <arg>--classForName</arg><arg>eu.dnetlib.dhp.oa.graph.hostedbymap.model.DOAJModel</arg>
+            <arg>--compressedFile</arg><arg>${dumpPath}/${dumpFileName}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/DOAJ/</arg>
+            <arg>--outputPath</arg><arg>/user/${wf:user()}/data/doaj.json</arg>
         </java>
         <ok to="join_download"/>
         <error to="Kill"/>
     </action>
 
     <join name="join_download" to="produceHBM"/>
+
+    <action name="downloadGold">
+        <java>
+            <main-class>eu.dnetlib.dhp.oa.graph.hostedbymap.DownloadCSV</main-class>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--fileURL</arg><arg>${unibiFileURL}</arg>
+            <arg>--tmpFile</arg><arg>/tmp/unibi_gold_replaced.csv</arg>
+            <arg>--outputFile</arg><arg>/user/${wf:user()}/data/unibi_gold.json</arg>
+            <arg>--classForName</arg><arg>eu.dnetlib.dhp.oa.graph.hostedbymap.model.UnibiGoldModel</arg>
+        </java>
+        <ok to="produceHBM"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="downloadDOAJ">
+        <shell xmlns="uri:oozie:shell-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <exec>download.sh</exec>
+            <argument>${doajJsonFileURL}</argument>
+            <argument>${dumpPath}</argument>
+            <argument>${dumpFileName}</argument>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>download.sh</file>
+            <capture-output/>
+        </shell>
+        <ok to="extract"/>
+        <error to="Kill"/>
+
+    </action>
+
+    <action name="extract">
+        <java>
+            <main-class>eu.dnetlib.dhp.oa.graph.hostedbymap.ExtractAndMapDoajJson</main-class>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--compressedFile</arg><arg>${dumpPath}/${dumpFileName}</arg>
+            <arg>--workingPath</arg><arg>${workingDir}/DOAJ/</arg>
+            <arg>--outputPath</arg><arg>/user/${wf:user()}/data/doaj.json</arg>
+        </java>
+        <ok to="produceHBM"/>
+        <error to="Kill"/>
+    </action>
 
     <action name="produceHBM">
         <spark xmlns="uri:oozie:spark-action:0.2">

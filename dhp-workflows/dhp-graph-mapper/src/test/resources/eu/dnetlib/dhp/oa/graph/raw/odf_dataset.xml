@@ -54,7 +54,8 @@
         </creator>
       </creators>
       <titles>
-        <title>Temperature and ADCP data collected on Lake Geneva between 2015 and 2017</title>
+        <title>Temperature and ADCP data collected on Lake Geneva between 2015 and  2017 </title>
+        <title titleType="Subtitle">survey</title>
       </titles>
       <publisher>Zenodo</publisher>
       <publicationYear>2019</publicationYear>
@@ -68,7 +69,6 @@
       </dates>
       <resourceType resourceTypeGeneral="Dataset"/>
       <relatedIdentifiers>
-        <relatedIdentifier relatedIdentifierType="DOI" relationType="IsVersionOf">10.5281/zenodo.3234525</relatedIdentifier>
         <relatedIdentifier relatedIdentifierType="URL" relationType="IsPartOf">https://zenodo.org/communities/epfl</relatedIdentifier>
       </relatedIdentifiers>
       <version>1.0.0</version>

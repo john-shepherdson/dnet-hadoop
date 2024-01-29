@@ -1,0 +1,26 @@
+[
+  {
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "when true will stop SparkSession after job execution",
+    "paramRequired": false
+  },
+  {
+    "paramName": "in",
+    "paramLongName": "inputPath",
+    "paramDescription": "the path to the graph data dump to read",
+    "paramRequired": true
+  },
+  {
+    "paramName": "wd",
+    "paramLongName": "workingDir",
+    "paramDescription": "the path to store the output graph",
+    "paramRequired": true
+  },
+  {
+    "paramName": "c",
+    "paramLongName": "country",
+    "paramDescription": "the id of the context to be removed",
+    "paramRequired": true
+  }
+]

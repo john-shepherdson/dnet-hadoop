@@ -44,105 +44,104 @@ class OafMapperUtilsTest {
 	@Test
 	void testDateValidation() {
 
-		assertTrue(GraphCleaningFunctions.doCleanDate("2016-05-07T12:41:19.202Z  ").isPresent());
-		assertTrue(GraphCleaningFunctions.doCleanDate("2020-09-10 11:08:52 ").isPresent());
-		assertTrue(GraphCleaningFunctions.doCleanDate("  2016-04-05").isPresent());
+		assertNotNull(GraphCleaningFunctions.cleanDate("2016-05-07T12:41:19.202Z  "));
+		assertNotNull(GraphCleaningFunctions.cleanDate("2020-09-10 11:08:52 "));
+		assertNotNull(GraphCleaningFunctions.cleanDate("  2016-04-05"));
 
-		assertEquals("2016-04-05", GraphCleaningFunctions.doCleanDate("2016 Apr 05").get());
+		assertEquals("2016-04-05", GraphCleaningFunctions.cleanDate("2016 Apr 05"));
 
-		assertEquals("2009-05-08", GraphCleaningFunctions.doCleanDate("May 8, 2009 5:57:51 PM").get());
-		assertEquals("1970-10-07", GraphCleaningFunctions.doCleanDate("oct 7, 1970").get());
-		assertEquals("1970-10-07", GraphCleaningFunctions.doCleanDate("oct 7, '70").get());
-		assertEquals("1970-10-07", GraphCleaningFunctions.doCleanDate("oct. 7, 1970").get());
-		assertEquals("1970-10-07", GraphCleaningFunctions.doCleanDate("oct. 7, 70").get());
-		assertEquals("2006-01-02", GraphCleaningFunctions.doCleanDate("Mon Jan  2 15:04:05 2006").get());
-		assertEquals("2006-01-02", GraphCleaningFunctions.doCleanDate("Mon Jan  2 15:04:05 MST 2006").get());
-		assertEquals("2006-01-02", GraphCleaningFunctions.doCleanDate("Mon Jan 02 15:04:05 -0700 2006").get());
-		assertEquals("2006-01-02", GraphCleaningFunctions.doCleanDate("Monday, 02-Jan-06 15:04:05 MST").get());
-		assertEquals("2006-01-02", GraphCleaningFunctions.doCleanDate("Mon, 02 Jan 2006 15:04:05 MST").get());
-		assertEquals("2017-07-11", GraphCleaningFunctions.doCleanDate("Tue, 11 Jul 2017 16:28:13 +0200 (CEST)").get());
-		assertEquals("2006-01-02", GraphCleaningFunctions.doCleanDate("Mon, 02 Jan 2006 15:04:05 -0700").get());
-		assertEquals("2018-01-04", GraphCleaningFunctions.doCleanDate("Thu, 4 Jan 2018 17:53:36 +0000").get());
-		assertEquals("2015-08-10", GraphCleaningFunctions.doCleanDate("Mon Aug 10 15:44:11 UTC+0100 2015").get());
+		assertEquals("2009-05-08", GraphCleaningFunctions.cleanDate("May 8, 2009 5:57:51 PM"));
+		assertEquals("1970-10-07", GraphCleaningFunctions.cleanDate("oct 7, 1970"));
+		assertEquals("1970-10-07", GraphCleaningFunctions.cleanDate("oct 7, '70"));
+		assertEquals("1970-10-07", GraphCleaningFunctions.cleanDate("oct. 7, 1970"));
+		assertEquals("1970-10-07", GraphCleaningFunctions.cleanDate("oct. 7, 70"));
+		assertEquals("2006-01-02", GraphCleaningFunctions.cleanDate("Mon Jan  2 15:04:05 2006"));
+		assertEquals("2006-01-02", GraphCleaningFunctions.cleanDate("Mon Jan  2 15:04:05 MST 2006"));
+		assertEquals("2006-01-02", GraphCleaningFunctions.cleanDate("Mon Jan 02 15:04:05 -0700 2006"));
+		assertEquals("2006-01-02", GraphCleaningFunctions.cleanDate("Monday, 02-Jan-06 15:04:05 MST"));
+		assertEquals("2006-01-02", GraphCleaningFunctions.cleanDate("Mon, 02 Jan 2006 15:04:05 MST"));
+		assertEquals("2017-07-11", GraphCleaningFunctions.cleanDate("Tue, 11 Jul 2017 16:28:13 +0200 (CEST)"));
+		assertEquals("2006-01-02", GraphCleaningFunctions.cleanDate("Mon, 02 Jan 2006 15:04:05 -0700"));
+		assertEquals("2018-01-04", GraphCleaningFunctions.cleanDate("Thu, 4 Jan 2018 17:53:36 +0000"));
+		assertEquals("2015-08-10", GraphCleaningFunctions.cleanDate("Mon Aug 10 15:44:11 UTC+0100 2015"));
 		assertEquals(
 			"2015-07-03",
-			GraphCleaningFunctions.doCleanDate("Fri Jul 03 2015 18:04:07 GMT+0100 (GMT Daylight Time)").get());
-		assertEquals("2012-09-17", GraphCleaningFunctions.doCleanDate("September 17, 2012 10:09am").get());
-		assertEquals("2012-09-17", GraphCleaningFunctions.doCleanDate("September 17, 2012 at 10:09am PST-08").get());
-		assertEquals("2012-09-17", GraphCleaningFunctions.doCleanDate("September 17, 2012, 10:10:09").get());
-		assertEquals("1970-10-07", GraphCleaningFunctions.doCleanDate("October 7, 1970").get());
-		assertEquals("1970-10-07", GraphCleaningFunctions.doCleanDate("October 7th, 1970").get());
-		assertEquals("2006-02-12", GraphCleaningFunctions.doCleanDate("12 Feb 2006, 19:17").get());
-		assertEquals("2006-02-12", GraphCleaningFunctions.doCleanDate("12 Feb 2006 19:17").get());
-		assertEquals("1970-10-07", GraphCleaningFunctions.doCleanDate("7 oct 70").get());
-		assertEquals("1970-10-07", GraphCleaningFunctions.doCleanDate("7 oct 1970").get());
-		assertEquals("2013-02-03", GraphCleaningFunctions.doCleanDate("03 February 2013").get());
-		assertEquals("2013-07-01", GraphCleaningFunctions.doCleanDate("1 July 2013").get());
-		assertEquals("2013-02-03", GraphCleaningFunctions.doCleanDate("2013-Feb-03").get());
-		assertEquals("2014-03-31", GraphCleaningFunctions.doCleanDate("3/31/2014").get());
-		assertEquals("2014-03-31", GraphCleaningFunctions.doCleanDate("03/31/2014").get());
-		assertEquals("1971-08-21", GraphCleaningFunctions.doCleanDate("08/21/71").get());
-		assertEquals("1971-01-08", GraphCleaningFunctions.doCleanDate("8/1/71").get());
-		assertEquals("2014-08-04", GraphCleaningFunctions.doCleanDate("4/8/2014 22:05").get());
-		assertEquals("2014-08-04", GraphCleaningFunctions.doCleanDate("04/08/2014 22:05").get());
-		assertEquals("2014-08-04", GraphCleaningFunctions.doCleanDate("4/8/14 22:05").get());
-		assertEquals("2014-02-04", GraphCleaningFunctions.doCleanDate("04/2/2014 03:00:51").get());
-		assertEquals("1965-08-08", GraphCleaningFunctions.doCleanDate("8/8/1965 12:00:00 AM").get());
-		assertEquals("1965-08-08", GraphCleaningFunctions.doCleanDate("8/8/1965 01:00:01 PM").get());
-		assertEquals("1965-08-08", GraphCleaningFunctions.doCleanDate("8/8/1965 01:00 PM").get());
-		assertEquals("1965-08-08", GraphCleaningFunctions.doCleanDate("8/8/1965 1:00 PM").get());
-		assertEquals("1965-08-08", GraphCleaningFunctions.doCleanDate("8/8/1965 12:00 AM").get());
-		assertEquals("2014-02-04", GraphCleaningFunctions.doCleanDate("4/02/2014 03:00:51").get());
-		assertEquals("2012-03-19", GraphCleaningFunctions.doCleanDate("03/19/2012 10:11:59").get());
-		assertEquals("2012-03-19", GraphCleaningFunctions.doCleanDate("03/19/2012 10:11:59.3186369").get());
-		assertEquals("2014-03-31", GraphCleaningFunctions.doCleanDate("2014/3/31").get());
-		assertEquals("2014-03-31", GraphCleaningFunctions.doCleanDate("2014/03/31").get());
-		assertEquals("2014-04-08", GraphCleaningFunctions.doCleanDate("2014/4/8 22:05").get());
-		assertEquals("2014-04-08", GraphCleaningFunctions.doCleanDate("2014/04/08 22:05").get());
-		assertEquals("2014-04-02", GraphCleaningFunctions.doCleanDate("2014/04/2 03:00:51").get());
-		assertEquals("2014-04-02", GraphCleaningFunctions.doCleanDate("2014/4/02 03:00:51").get());
-		assertEquals("2012-03-19", GraphCleaningFunctions.doCleanDate("2012/03/19 10:11:59").get());
-		assertEquals("2012-03-19", GraphCleaningFunctions.doCleanDate("2012/03/19 10:11:59.3186369").get());
-		assertEquals("2014-04-08", GraphCleaningFunctions.doCleanDate("2014年04月08日").get());
-		assertEquals("2006-01-02", GraphCleaningFunctions.doCleanDate("2006-01-02T15:04:05+0000").get());
-		assertEquals("2009-08-13", GraphCleaningFunctions.doCleanDate("2009-08-12T22:15:09-07:00").get());
-		assertEquals("2009-08-12", GraphCleaningFunctions.doCleanDate("2009-08-12T22:15:09").get());
-		assertEquals("2009-08-12", GraphCleaningFunctions.doCleanDate("2009-08-12T22:15:09Z").get());
-		assertEquals("2014-04-26", GraphCleaningFunctions.doCleanDate("2014-04-26 17:24:37.3186369").get());
-		assertEquals("2012-08-03", GraphCleaningFunctions.doCleanDate("2012-08-03 18:31:59.257000000").get());
-		assertEquals("2014-04-26", GraphCleaningFunctions.doCleanDate("2014-04-26 17:24:37.123").get());
-		assertEquals("2013-04-01", GraphCleaningFunctions.doCleanDate("2013-04-01 22:43").get());
-		assertEquals("2013-04-01", GraphCleaningFunctions.doCleanDate("2013-04-01 22:43:22").get());
-		assertEquals("2014-12-16", GraphCleaningFunctions.doCleanDate("2014-12-16 06:20:00 UTC").get());
-		assertEquals("2014-12-16", GraphCleaningFunctions.doCleanDate("2014-12-16 06:20:00 GMT").get());
-		assertEquals("2014-04-26", GraphCleaningFunctions.doCleanDate("2014-04-26 05:24:37 PM").get());
-		assertEquals("2014-04-26", GraphCleaningFunctions.doCleanDate("2014-04-26 13:13:43 +0800").get());
-		assertEquals("2014-04-26", GraphCleaningFunctions.doCleanDate("2014-04-26 13:13:43 +0800 +08").get());
-		assertEquals("2014-04-26", GraphCleaningFunctions.doCleanDate("2014-04-26 13:13:44 +09:00").get());
-		assertEquals("2012-08-03", GraphCleaningFunctions.doCleanDate("2012-08-03 18:31:59.257000000 +0000 UTC").get());
-		assertEquals("2015-09-30", GraphCleaningFunctions.doCleanDate("2015-09-30 18:48:56.35272715 +0000 UTC").get());
-		assertEquals("2015-02-18", GraphCleaningFunctions.doCleanDate("2015-02-18 00:12:00 +0000 GMT").get());
-		assertEquals("2015-02-18", GraphCleaningFunctions.doCleanDate("2015-02-18 00:12:00 +0000 UTC").get());
+			GraphCleaningFunctions.cleanDate("Fri Jul 03 2015 18:04:07 GMT+0100 (GMT Daylight Time)"));
+		assertEquals("2012-09-17", GraphCleaningFunctions.cleanDate("September 17, 2012 10:09am"));
+		assertEquals("2012-09-17", GraphCleaningFunctions.cleanDate("September 17, 2012 at 10:09am PST-08"));
+		assertEquals("2012-09-17", GraphCleaningFunctions.cleanDate("September 17, 2012, 10:10:09"));
+		assertEquals("1970-10-07", GraphCleaningFunctions.cleanDate("October 7, 1970"));
+		assertEquals("1970-10-07", GraphCleaningFunctions.cleanDate("October 7th, 1970"));
+		assertEquals("2006-02-12", GraphCleaningFunctions.cleanDate("12 Feb 2006, 19:17"));
+		assertEquals("2006-02-12", GraphCleaningFunctions.cleanDate("12 Feb 2006 19:17"));
+		assertEquals("1970-10-07", GraphCleaningFunctions.cleanDate("7 oct 70"));
+		assertEquals("1970-10-07", GraphCleaningFunctions.cleanDate("7 oct 1970"));
+		assertEquals("2013-02-03", GraphCleaningFunctions.cleanDate("03 February 2013"));
+		assertEquals("2013-07-01", GraphCleaningFunctions.cleanDate("1 July 2013"));
+		assertEquals("2013-02-03", GraphCleaningFunctions.cleanDate("2013-Feb-03"));
+		assertEquals("2014-03-31", GraphCleaningFunctions.cleanDate("3/31/2014"));
+		assertEquals("2014-03-31", GraphCleaningFunctions.cleanDate("03/31/2014"));
+		assertEquals("1971-08-21", GraphCleaningFunctions.cleanDate("08/21/71"));
+		assertEquals("1971-01-08", GraphCleaningFunctions.cleanDate("8/1/71"));
+		assertEquals("2014-08-04", GraphCleaningFunctions.cleanDate("4/8/2014 22:05"));
+		assertEquals("2014-08-04", GraphCleaningFunctions.cleanDate("04/08/2014 22:05"));
+		assertEquals("2014-08-04", GraphCleaningFunctions.cleanDate("4/8/14 22:05"));
+		assertEquals("2014-02-04", GraphCleaningFunctions.cleanDate("04/2/2014 03:00:51"));
+		assertEquals("1965-08-08", GraphCleaningFunctions.cleanDate("8/8/1965 12:00:00 AM"));
+		assertEquals("1965-08-08", GraphCleaningFunctions.cleanDate("8/8/1965 01:00:01 PM"));
+		assertEquals("1965-08-08", GraphCleaningFunctions.cleanDate("8/8/1965 01:00 PM"));
+		assertEquals("1965-08-08", GraphCleaningFunctions.cleanDate("8/8/1965 1:00 PM"));
+		assertEquals("1965-08-08", GraphCleaningFunctions.cleanDate("8/8/1965 12:00 AM"));
+		assertEquals("2014-02-04", GraphCleaningFunctions.cleanDate("4/02/2014 03:00:51"));
+		assertEquals("2012-03-19", GraphCleaningFunctions.cleanDate("03/19/2012 10:11:59"));
+		assertEquals("2012-03-19", GraphCleaningFunctions.cleanDate("03/19/2012 10:11:59.3186369"));
+		assertEquals("2014-03-31", GraphCleaningFunctions.cleanDate("2014/3/31"));
+		assertEquals("2014-03-31", GraphCleaningFunctions.cleanDate("2014/03/31"));
+		assertEquals("2014-04-08", GraphCleaningFunctions.cleanDate("2014/4/8 22:05"));
+		assertEquals("2014-04-08", GraphCleaningFunctions.cleanDate("2014/04/08 22:05"));
+		assertEquals("2014-04-02", GraphCleaningFunctions.cleanDate("2014/04/2 03:00:51"));
+		assertEquals("2014-04-02", GraphCleaningFunctions.cleanDate("2014/4/02 03:00:51"));
+		assertEquals("2012-03-19", GraphCleaningFunctions.cleanDate("2012/03/19 10:11:59"));
+		assertEquals("2012-03-19", GraphCleaningFunctions.cleanDate("2012/03/19 10:11:59.3186369"));
+		assertEquals("2014-04-08", GraphCleaningFunctions.cleanDate("2014年04月08日"));
+		assertEquals("2006-01-02", GraphCleaningFunctions.cleanDate("2006-01-02T15:04:05+0000"));
+		assertEquals("2009-08-13", GraphCleaningFunctions.cleanDate("2009-08-12T22:15:09-07:00"));
+		assertEquals("2009-08-12", GraphCleaningFunctions.cleanDate("2009-08-12T22:15:09"));
+		assertEquals("2014-04-26", GraphCleaningFunctions.cleanDate("2014-04-26 17:24:37.3186369"));
+		assertEquals("2012-08-03", GraphCleaningFunctions.cleanDate("2012-08-03 18:31:59.257000000"));
+		assertEquals("2014-04-26", GraphCleaningFunctions.cleanDate("2014-04-26 17:24:37.123"));
+		assertEquals("2013-04-01", GraphCleaningFunctions.cleanDate("2013-04-01 22:43"));
+		assertEquals("2013-04-01", GraphCleaningFunctions.cleanDate("2013-04-01 22:43:22"));
+		assertEquals("2014-12-16", GraphCleaningFunctions.cleanDate("2014-12-16 06:20:00 UTC"));
+		assertEquals("2014-12-16", GraphCleaningFunctions.cleanDate("2014-12-16 06:20:00 GMT"));
+		assertEquals("2014-04-26", GraphCleaningFunctions.cleanDate("2014-04-26 05:24:37 PM"));
+		assertEquals("2014-04-26", GraphCleaningFunctions.cleanDate("2014-04-26 13:13:43 +0800"));
+		assertEquals("2014-04-26", GraphCleaningFunctions.cleanDate("2014-04-26 13:13:43 +0800 +08"));
+		assertEquals("2014-04-26", GraphCleaningFunctions.cleanDate("2014-04-26 13:13:44 +09:00"));
+		assertEquals("2012-08-03", GraphCleaningFunctions.cleanDate("2012-08-03 18:31:59.257000000 +0000 UTC"));
+		assertEquals("2015-09-30", GraphCleaningFunctions.cleanDate("2015-09-30 18:48:56.35272715 +0000 UTC"));
+		assertEquals("2015-02-18", GraphCleaningFunctions.cleanDate("2015-02-18 00:12:00 +0000 GMT"));
+		assertEquals("2015-02-18", GraphCleaningFunctions.cleanDate("2015-02-18 00:12:00 +0000 UTC"));
 		assertEquals(
-			"2015-02-08", GraphCleaningFunctions.doCleanDate("2015-02-08 03:02:00 +0300 MSK m=+0.000000001").get());
+			"2015-02-08", GraphCleaningFunctions.cleanDate("2015-02-08 03:02:00 +0300 MSK m=+0.000000001"));
 		assertEquals(
-			"2015-02-08", GraphCleaningFunctions.doCleanDate("2015-02-08 03:02:00.001 +0300 MSK m=+0.000000001").get());
-		assertEquals("2017-07-19", GraphCleaningFunctions.doCleanDate("2017-07-19 03:21:51+00:00").get());
-		assertEquals("2014-04-26", GraphCleaningFunctions.doCleanDate("2014-04-26").get());
-		assertEquals("2014-04-01", GraphCleaningFunctions.doCleanDate("2014-04").get());
-		assertEquals("2014-01-01", GraphCleaningFunctions.doCleanDate("2014").get());
-		assertEquals("2014-05-11", GraphCleaningFunctions.doCleanDate("2014-05-11 08:20:13,787").get());
-		assertEquals("2014-03-31", GraphCleaningFunctions.doCleanDate("3.31.2014").get());
-		assertEquals("2014-03-31", GraphCleaningFunctions.doCleanDate("03.31.2014").get());
-		assertEquals("1971-08-21", GraphCleaningFunctions.doCleanDate("08.21.71").get());
-		assertEquals("2014-03-01", GraphCleaningFunctions.doCleanDate("2014.03").get());
-		assertEquals("2014-03-30", GraphCleaningFunctions.doCleanDate("2014.03.30").get());
-		assertEquals("2014-06-01", GraphCleaningFunctions.doCleanDate("20140601").get());
-		assertEquals("2014-07-22", GraphCleaningFunctions.doCleanDate("20140722105203").get());
-		assertEquals("2012-03-19", GraphCleaningFunctions.doCleanDate("1332151919").get());
-		assertEquals("2013-11-12", GraphCleaningFunctions.doCleanDate("1384216367189").get());
-		assertEquals("2013-11-12", GraphCleaningFunctions.doCleanDate("1384216367111222").get());
-		assertEquals("2013-11-12", GraphCleaningFunctions.doCleanDate("1384216367111222333").get());
+			"2015-02-08", GraphCleaningFunctions.cleanDate("2015-02-08 03:02:00.001 +0300 MSK m=+0.000000001"));
+		assertEquals("2017-07-19", GraphCleaningFunctions.cleanDate("2017-07-19 03:21:51+00:00"));
+		assertEquals("2014-04-26", GraphCleaningFunctions.cleanDate("2014-04-26"));
+		assertEquals("2014-04-01", GraphCleaningFunctions.cleanDate("2014-04"));
+		assertEquals("2014-01-01", GraphCleaningFunctions.cleanDate("2014"));
+		assertEquals("2014-05-11", GraphCleaningFunctions.cleanDate("2014-05-11 08:20:13,787"));
+		assertEquals("2014-03-31", GraphCleaningFunctions.cleanDate("3.31.2014"));
+		assertEquals("2014-03-31", GraphCleaningFunctions.cleanDate("03.31.2014"));
+		assertEquals("1971-08-21", GraphCleaningFunctions.cleanDate("08.21.71"));
+		assertEquals("2014-03-01", GraphCleaningFunctions.cleanDate("2014.03"));
+		assertEquals("2014-03-30", GraphCleaningFunctions.cleanDate("2014.03.30"));
+		assertEquals("2014-06-01", GraphCleaningFunctions.cleanDate("20140601"));
+		assertEquals("2014-07-22", GraphCleaningFunctions.cleanDate("20140722105203"));
+		assertEquals("2012-03-19", GraphCleaningFunctions.cleanDate("1332151919"));
+		assertEquals("2013-11-12", GraphCleaningFunctions.cleanDate("1384216367189"));
+		assertEquals("2013-11-12", GraphCleaningFunctions.cleanDate("1384216367111222"));
+		assertEquals("2013-11-12", GraphCleaningFunctions.cleanDate("1384216367111222333"));
 
 	}
 
@@ -183,6 +182,22 @@ class OafMapperUtilsTest {
 				.mergeResults(p2, d1)
 				.getResulttype()
 				.getClassid());
+	}
+
+	@Test
+	void testDelegatedAuthority() throws IOException {
+		Dataset d1 = read("dataset_2.json", Dataset.class);
+		Dataset d2 = read("dataset_delegated.json", Dataset.class);
+
+		assertEquals(1, d2.getCollectedfrom().size());
+		assertTrue(cfId(d2.getCollectedfrom()).contains(ModelConstants.ZENODO_OD_ID));
+
+		Result res = OafMapperUtils.mergeResults(d1, d2);
+
+		assertEquals(d2, res);
+
+		System.out.println(OBJECT_MAPPER.writeValueAsString(res));
+
 	}
 
 	protected HashSet<String> cfId(List<KeyValue> collectedfrom) {

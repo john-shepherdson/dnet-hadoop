@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
@@ -77,13 +78,12 @@ public class SparkCopyOpenorgsMergeRels extends AbstractSparkAction {
 
 		log.info("Number of Openorgs Merge Relations collected: {}", mergeRelsRDD.count());
 
-		spark
+		final Dataset<Relation> relations = spark
 			.createDataset(
 				mergeRelsRDD.rdd(),
-				Encoders.bean(Relation.class))
-			.write()
-			.mode(SaveMode.Append)
-			.parquet(outputPath);
+				Encoders.bean(Relation.class));
+
+		saveParquet(relations, outputPath, SaveMode.Append);
 	}
 
 	private boolean isMergeRel(Relation rel) {

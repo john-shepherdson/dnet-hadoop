@@ -1,0 +1,85 @@
+<record>
+    <result xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <header>
+            <dri:objIdentifier>doi_________::93d39dd7edef016928788c3500e149f1</dri:objIdentifier>
+            <dri:dateOfCollection>2022-11-24T08:41:37Z</dri:dateOfCollection>
+            <dri:status>under curation</dri:status>
+            <counters/>
+        </header>
+        <metadata>
+            <oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://namespace.openaire.eu/oaf http://namespace.openaire.eu/oaf http://www.openaire.eu/schema/0.2/oaf-0.2.xsd">
+                <oaf:result>
+                    <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title">ENVRI SP - Dashboard State of the Environment - Ocean Indicators</title>
+                    <creator rank="1" name="" surname="">Tjerk Krijger</creator>
+                    <dateofacceptance />
+                    <resulttype classid="other" classname="other" schemeid="dnet:result_typologies" schemename="dnet:result_typologies" />
+                    <language classid="" classname="" schemeid="dnet:languages" schemename="dnet:languages" />
+                    <description><p>The attached .yaml file is used as input to the Dashboard State of the Environment, which is a science project of the ENVRI-FAIR science cluster within EOSC-FUTURE. The contents of the file enable the visualization of  Ocean indicators on the dashboard. It is possible to download the attached file and change the contents to include indicators from different domains such as atmosphere or biodiversity.</p></description>
+                    <country classid="" classname="" schemeid="" schemename="" />
+                    <subject classid="" classname="" schemeid="" schemename="" />
+                    <relevantdate classid="" classname="" schemeid="" schemename="" />
+                    <publisher>Zenodo</publisher>
+                    <embargoenddate />
+                    <journal issn="" eissn="" lissn="" ep="" iss="" sp="" vol="" />
+                    <source />
+                    <fulltext />
+                    <format />
+                    <storagedate />
+                    <resourcetype classid="" classname="" schemeid="" schemename="" />
+                    <device />
+                    <size />
+                    <version />
+                    <lastmetadataupdate />
+                    <metadataversionnumber />
+                    <documentationUrl />
+                    <codeRepositoryUrl />
+                    <programmingLanguage classid="" classname="" schemeid="" schemename="" />
+                    <contactperson />
+                    <contactgroup />
+                    <tool />
+                    <originalId>oai:zenodo.org:7353841</originalId>
+                    <collectedfrom name="ZENODO" id="opendoar____::358aee4cc897452c00244351e4d91f69" />
+                    <pid classid="oai" classname="Open Archives Initiative" schemeid="dnet:pid_types" schemename="dnet:pid_types">oai:zenodo.org:7353841</pid>
+                    <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types" schemename="dnet:pid_types">10.5281/zenodo.7353841</pid>
+                    <bestaccessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                    <datainfo>
+                        <inferred>false</inferred>
+                        <deletedbyinference>false</deletedbyinference>
+                        <trust>0.9</trust>
+                        <inferenceprovenance />
+                        <provenanceaction classid="user:insert" classname="user:insert" schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions" />
+                    </datainfo>
+                    <rels>
+                        <rel inferred="false" trust="0.9" inferenceprovenance="" provenanceaction="user:claim">
+                            <to class="isProducedBy" scheme="dnet:result_project_relations" type="project">corda__h2020::256485716fdb9f5ca69007b7ca5a072b</to>
+                            <code>101017536</code>
+                            <acronym>EOSC Future</acronym>
+                            <title>EOSC Future</title>
+                            <contracttype classid="" classname="" schemeid="" schemename="" />
+                            <funding>
+                                <funder id="ec__________::EC" shortname="EC" name="European Commission" jurisdiction="" />
+                                <funding_level_0 name="H2020">ec__________::EC::H2020</funding_level_0>
+                            </funding>
+                            <websiteurl />
+                        </rel>
+                    </rels>
+                    <children>
+                        <instance id="od______2659::3e4323c221f269e5f3d6db4c61dd2ec8">
+                            <instancetype classid="0020" classname="Other ORP type" schemeid="dnet:publication_resource" schemename="dnet:publication_resource" />
+                            <collectedfrom name="ZENODO" id="opendoar____::358aee4cc897452c00244351e4d91f69" />
+                            <hostedby name="ZENODO" id="opendoar____::358aee4cc897452c00244351e4d91f69" />
+                            <accessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                            <dateofacceptance />
+                            <webresource>
+                                <url>https://zenodo.org/record/7353841</url>
+                            </webresource>
+                        </instance>
+                    </children>
+                </oaf:result>
+            </oaf:entity>
+        </metadata>
+    </result>
+</record>

@@ -1,26 +1,8 @@
 <workflow-app name="H2020Classification" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>projectFileURL</name>
-            <description>the url where to get the projects file</description>
-        </property>
-
-        <property>
-            <name>programmeFileURL</name>
-            <description>the url where to get the programme file</description>
-        </property>
-
-        <property>
-            <name>topicFileURL</name>
-            <description>the url where to get the topic file</description>
-        </property>
-        <property>
             <name>outputPath</name>
             <description>path where to store the action set</description>
-        </property>
-        <property>
-            <name>sheetName</name>
-            <description>the name of the sheet to read</description>
         </property>
     </parameters>
 
@@ -35,40 +17,103 @@
             <delete path='${workingDir}'/>
             <mkdir path='${workingDir}'/>
         </fs>
-        <ok to="fork_get_info"/>
+        <ok to="fork_download_info"/>
         <error to="Kill"/>
     </action>
 
-
-    <fork name="fork_get_info">
+    <fork name="fork_download_info">
         <path start="fork_get_projects"/>
-        <path start="get_programme_file"/>
-        <path start="get_topic_file"/>
-
+        <path start="download_programme_file"/>
     </fork>
 
     <fork name="fork_get_projects">
-        <path start="get_project_file"/>
-        <path start="read_projects"/>
+        <path start="download_projects"/>
+        <path start="read_projects_from_db"/>
     </fork>
 
-    <action name="get_project_file">
-        <java>
-            <main-class>eu.dnetlib.dhp.actionmanager.project.utils.ReadCSV</main-class>
-            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
-            <arg>--fileURL</arg><arg>${projectFileURL}</arg>
-            <arg>--hdfsPath</arg><arg>${workingDir}/projects</arg>
-            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProject</arg>
-        </java>
-        <ok to="wait_projects"/>
+    <action name="download_projects">
+        <shell xmlns="uri:oozie:shell-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <exec>download.sh</exec>
+            <argument>${downloadH2020Projects}</argument>
+            <argument>${projectPath}</argument>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>download.sh</file>
+            <capture-output/>
+        </shell>
+        <ok to="extract_projects"/>
         <error to="Kill"/>
     </action>
 
-    <action name="get_programme_file">
+    <action name="extract_projects">
+        <java>
+            <main-class>eu.dnetlib.dhp.actionmanager.project.utils.ExtractFromZip</main-class>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--inputPath</arg><arg>${projectPath}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/</arg>
+        </java>
+        <ok to="read_from_folder"/>
+        <error to="Kill"/>
+    </action>
+
+    <fork name="read_from_folder">
+        <path start="read_projects"/>
+        <path start="read_topic_file"/>
+    </fork>
+
+    <action name="read_projects">
+        <java>
+            <main-class>eu.dnetlib.dhp.actionmanager.project.utils.ReadProjects</main-class>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--inputPath</arg><arg>${workingDir}/json/project.json</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/projects</arg>
+        </java>
+        <ok to="wait_read_from_folder"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="download_programme_file">
+        <shell xmlns="uri:oozie:shell-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <exec>download.sh</exec>
+            <argument>${downloadH2020Programme}</argument>
+            <argument>${programmePath}</argument>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>download.sh</file>
+            <capture-output/>
+        </shell>
+        <ok to="extract_programme"/>
+        <error to="Kill"/>
+    </action>
+    <action name="extract_programme">
+        <java>
+            <main-class>eu.dnetlib.dhp.actionmanager.project.utils.ExtractFromZip</main-class>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--inputPath</arg><arg>${programmePath}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/downloadedProgramme/</arg>
+        </java>
+        <ok to="read_programme"/>
+        <error to="Kill"/>
+    </action>
+    <action name="read_programme">
         <java>
             <main-class>eu.dnetlib.dhp.actionmanager.project.utils.ReadCSV</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
-            <arg>--fileURL</arg><arg>${programmeFileURL}</arg>
+            <arg>--fileURL</arg><arg>${workingDir}/downloadedProgramme/csv/programme.csv</arg>
             <arg>--hdfsPath</arg><arg>${workingDir}/programme</arg>
             <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProgramme</arg>
         </java>
@@ -76,20 +121,18 @@
         <error to="Kill"/>
     </action>
 
-    <action name="get_topic_file">
+    <action name="read_topic_file">
         <java>
-            <main-class>eu.dnetlib.dhp.actionmanager.project.utils.ReadExcel</main-class>
+            <main-class>eu.dnetlib.dhp.actionmanager.project.utils.ReadTopics</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
-            <arg>--fileURL</arg><arg>${topicFileURL}</arg>
-            <arg>--hdfsPath</arg><arg>${workingDir}/topic</arg>
-            <arg>--sheetName</arg><arg>${sheetName}</arg>
-            <arg>--classForName</arg><arg>eu.dnetlib.dhp.actionmanager.project.utils.model.EXCELTopic</arg>
+            <arg>--inputPath</arg><arg>${workingDir}/json/topics.json</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/topic</arg>
         </java>
-        <ok to="wait"/>
+        <ok to="wait_read_from_folder"/>
         <error to="Kill"/>
     </action>
 
-    <action name="read_projects">
+    <action name="read_projects_from_db">
         <java>
             <main-class>eu.dnetlib.dhp.actionmanager.project.ReadProjectsFromDB</main-class>
             <arg>--hdfsPath</arg><arg>${workingDir}/dbProjects</arg>
@@ -123,9 +166,11 @@
             <arg>--outputPath</arg><arg>${workingDir}/preparedProgramme</arg>
         </spark>
         <ok to="wait"/>
+<!--        <ok to="End"/>-->
         <error to="Kill"/>
     </action>
 
+    <join name="wait_read_from_folder" to="wait_projects"/>
     <join name="wait" to="create_updates"/>
 
     <join name="wait_projects" to="prepare_project"/>
@@ -153,6 +198,7 @@
             <arg>--dbProjectPath</arg><arg>${workingDir}/dbProjects</arg>
         </spark>
         <ok to="wait"/>
+<!--        <ok to="End"/>-->
         <error to="Kill"/>
     </action>
 

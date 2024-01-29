@@ -35,7 +35,7 @@ public class SparkCountryPropagationJob {
 			.toString(
 				SparkCountryPropagationJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/countrypropagation/input_countrypropagation_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/countrypropagation/input_countrypropagation_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -56,12 +56,6 @@ public class SparkCountryPropagationJob {
 		final String resultClassName = parser.get("resultTableName");
 		log.info("resultTableName: {}", resultClassName);
 
-		final Boolean saveGraph = Optional
-			.ofNullable(parser.get("saveGraph"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.TRUE);
-		log.info("saveGraph: {}", saveGraph);
-
 		Class<? extends Result> resultClazz = (Class<? extends Result>) Class.forName(resultClassName);
 
 		SparkConf conf = new SparkConf();
@@ -75,8 +69,7 @@ public class SparkCountryPropagationJob {
 					sourcePath,
 					preparedInfoPath,
 					outputPath,
-					resultClazz,
-					saveGraph);
+					resultClazz);
 			});
 	}
 
@@ -85,47 +78,52 @@ public class SparkCountryPropagationJob {
 		String sourcePath,
 		String preparedInfoPath,
 		String outputPath,
-		Class<R> resultClazz,
-		boolean saveGraph) {
+		Class<R> resultClazz) {
 
-		if (saveGraph) {
-			log.info("Reading Graph table from: {}", sourcePath);
-			Dataset<R> res = readPath(spark, sourcePath, resultClazz);
+		log.info("Reading Graph table from: {}", sourcePath);
+		Dataset<R> res = readPath(spark, sourcePath, resultClazz);
 
-			log.info("Reading prepared info: {}", preparedInfoPath);
-			Dataset<ResultCountrySet> prepared = spark
-				.read()
-				.json(preparedInfoPath)
-				.as(Encoders.bean(ResultCountrySet.class));
+		log.info("Reading prepared info: {}", preparedInfoPath);
+		Dataset<ResultCountrySet> prepared = spark
+			.read()
+			.json(preparedInfoPath)
+			.as(Encoders.bean(ResultCountrySet.class));
 
-			res
-				.joinWith(prepared, res.col("id").equalTo(prepared.col("resultId")), "left_outer")
-				.map(getCountryMergeFn(), Encoders.bean(resultClazz))
-				.write()
-				.option("compression", "gzip")
-				.mode(SaveMode.Overwrite)
-				.json(outputPath);
-		}
+		res
+			.joinWith(prepared, res.col("id").equalTo(prepared.col("resultId")), "left_outer")
+			.map(getCountryMergeFn(), Encoders.bean(resultClazz))
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Overwrite)
+			.json(outputPath);
+
 	}
 
 	private static <R extends Result> MapFunction<Tuple2<R, ResultCountrySet>, R> getCountryMergeFn() {
 		return t -> {
 			Optional.ofNullable(t._2()).ifPresent(r -> {
-				t._1().getCountry().addAll(merge(t._1().getCountry(), r.getCountrySet()));
+				if (Optional.ofNullable(t._1().getCountry()).isPresent())
+					t._1().getCountry().addAll(merge(t._1().getCountry(), r.getCountrySet()));
+				else
+					t._1().setCountry(merge(null, t._2().getCountrySet()));
 			});
 			return t._1();
 		};
 	}
 
 	private static List<Country> merge(List<Country> c1, List<CountrySbs> c2) {
-		HashSet<String> countries = c1
-			.stream()
-			.map(Qualifier::getClassid)
-			.collect(Collectors.toCollection(HashSet::new));
+		HashSet<String> countries = new HashSet<>();
+		if (Optional.ofNullable(c1).isPresent()) {
+			countries = c1
+				.stream()
+				.map(Qualifier::getClassid)
+				.collect(Collectors.toCollection(HashSet::new));
+		}
 
+		HashSet<String> finalCountries = countries;
 		return c2
 			.stream()
-			.filter(c -> !countries.contains(c.getClassid()))
+			.filter(c -> !finalCountries.contains(c.getClassid()))
 			.map(c -> getCountry(c.getClassid(), c.getClassname()))
 			.collect(Collectors.toList());
 	}

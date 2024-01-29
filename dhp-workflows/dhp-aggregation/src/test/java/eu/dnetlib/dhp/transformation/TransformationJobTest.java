@@ -19,7 +19,9 @@ import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.util.LongAccumulator;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -50,7 +52,7 @@ class TransformationJobTest extends AbstractVocabularyTest {
 	@Test
 	@DisplayName("Test Date cleaner")
 	void testDateCleaner() throws Exception {
-		DateCleaner dc = new DateCleaner();
+		final DateCleaner dc = new DateCleaner();
 		assertEquals("1982-09-20", dc.clean("20/09/1982"));
 		assertEquals("2002-09-20", dc.clean("20-09-2002"));
 		assertEquals("2002-09-20", dc.clean("2002-09-20"));
@@ -68,9 +70,9 @@ class TransformationJobTest extends AbstractVocabularyTest {
 		mr.setProvenance(new Provenance("DSID", "DSNAME", "PREFIX"));
 		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_zenodo.xml")));
 		// We Load the XSLT transformation Rule from the classpath
-		XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/zenodo_tr.xslt");
+		final XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/zenodo_tr.xslt");
 
-		MetadataRecord result = tr.call(mr);
+		final MetadataRecord result = tr.call(mr);
 
 		// Print the record
 		System.out.println(result.getBody());
@@ -86,9 +88,9 @@ class TransformationJobTest extends AbstractVocabularyTest {
 		mr.setProvenance(new Provenance("DSID", "DSNAME", "PREFIX"));
 		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_itgv4.xml")));
 		// We Load the XSLT transformation Rule from the classpath
-		XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/zenodo_tr.xslt");
+		final XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/zenodo_tr.xslt");
 
-		MetadataRecord result = tr.call(mr);
+		final MetadataRecord result = tr.call(mr);
 
 		// Print the record
 		System.out.println(result.getBody());
@@ -108,9 +110,9 @@ class TransformationJobTest extends AbstractVocabularyTest {
 		mr.setProvenance(new Provenance("DSID", "DSNAME", "PREFIX"));
 		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_itgv4.xml")));
 		// We Load the XSLT transformation Rule from the classpath
-		XSLTTransformationFunction tr = loadTransformationRule(xslTransformationScript);
+		final XSLTTransformationFunction tr = loadTransformationRule(xslTransformationScript);
 
-		MetadataRecord result = tr.call(mr);
+		final MetadataRecord result = tr.call(mr);
 
 		// Print the record
 		System.out.println(result.getBody());
@@ -129,9 +131,9 @@ class TransformationJobTest extends AbstractVocabularyTest {
 		mr.setProvenance(new Provenance("DSID", "DSNAME", "PREFIX"));
 		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_omicsdi.xml")));
 		// We Load the XSLT transformation Rule from the classpath
-		XSLTTransformationFunction tr = loadTransformationRule(xslTransformationScript);
+		final XSLTTransformationFunction tr = loadTransformationRule(xslTransformationScript);
 
-		MetadataRecord result = tr.call(mr);
+		final MetadataRecord result = tr.call(mr);
 
 		// Print the record
 		System.out.println(result.getBody());
@@ -140,7 +142,8 @@ class TransformationJobTest extends AbstractVocabularyTest {
 
 	@Test
 	@DisplayName("Test TransformSparkJobNode.main with oaiOpenaire_datacite (v4)")
-	void transformTestITGv4OAIdatacite(@TempDir Path testDir) throws Exception {
+	void transformTestITGv4OAIdatacite(@TempDir
+	final Path testDir) throws Exception {
 
 		try (SparkSession spark = SparkSession.builder().config(sparkConf).getOrCreate()) {
 
@@ -203,7 +206,8 @@ class TransformationJobTest extends AbstractVocabularyTest {
 
 	@Test
 	@DisplayName("Test TransformSparkJobNode.main")
-	void transformTest(@TempDir Path testDir) throws Exception {
+	void transformTest(@TempDir
+	final Path testDir) throws Exception {
 
 		try (SparkSession spark = SparkSession.builder().config(sparkConf).getOrCreate()) {
 
@@ -254,6 +258,25 @@ class TransformationJobTest extends AbstractVocabularyTest {
 
 			assertEquals(total, recordNotEmpty);
 		}
+	}
+
+	@Test
+	@DisplayName("Test Transform Single XML using cnr_explora_tr XSLTTransformator")
+	void testCnrExploraTransformSaxonHE() throws Exception {
+
+		// We Set the input Record getting the XML from the classpath
+		final MetadataRecord mr = new MetadataRecord();
+
+		mr.setProvenance(new Provenance("openaire____::cnr_explora", "CNR ExploRA", "cnr_________"));
+		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_cnr_explora.xml")));
+		// We Load the XSLT transformation Rule from the classpath
+		final XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/cnr_explora_tr.xslt");
+
+		final MetadataRecord result = tr.call(mr);
+
+		// Print the record
+		System.out.println(result.getBody());
+		// TODO Create significant Assert
 	}
 
 	private XSLTTransformationFunction loadTransformationRule(final String path) throws Exception {

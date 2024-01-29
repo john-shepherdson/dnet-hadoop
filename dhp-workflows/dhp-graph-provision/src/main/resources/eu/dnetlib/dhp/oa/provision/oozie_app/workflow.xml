@@ -10,6 +10,10 @@
             <description>URL for the isLookup service</description>
         </property>
         <property>
+            <name>contextApiBaseUrl</name>
+            <description>context API URL</description>
+        </property>
+        <property>
             <name>relPartitions</name>
             <description>number or partitions for the relations Dataset</description>
         </property>
@@ -39,6 +43,18 @@
             <description>query used in the deleted by query operation</description>
         </property>
 
+        <property>
+            <name>sparkDriverMemory</name>
+            <description>memory for driver process</description>
+        </property>
+        <property>
+            <name>sparkExecutorMemory</name>
+            <description>memory for individual executor</description>
+        </property>
+        <property>
+            <name>sparkExecutorCores</name>
+            <description>number of cores used by single executor</description>
+        </property>
         <property>
             <name>sparkDriverMemoryForJoining</name>
             <description>memory for driver process</description>
@@ -565,9 +581,9 @@
             <class>eu.dnetlib.dhp.oa.provision.XmlConverterJob</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCoresForJoining}
-                --executor-memory=${sparkExecutorMemoryForJoining}
-                --driver-memory=${sparkDriverMemoryForJoining}
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -577,7 +593,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${workingDir}/join_entities</arg>
             <arg>--outputPath</arg><arg>${workingDir}/xml</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextApiBaseUrl</arg><arg>${contextApiBaseUrl}</arg>
         </spark>
         <ok to="should_index"/>
         <error to="Kill"/>

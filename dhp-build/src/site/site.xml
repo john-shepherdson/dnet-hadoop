@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.8.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 https://maven.apache.org/xsd/decoration-1.8.0.xsd"
+         name="DHP-Aggregation">
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.8</version>
+    </skin>
+    <poweredBy>
+        <logo name="OpenAIRE Research Graph" href="https://graph.openaire.eu/"
+              img="https://graph.openaire.eu/assets/common-assets/logo-large-graph.png"/>
+    </poweredBy>
+    <body>
+        <links>
+            <item name="Code" href="https://code-repo.d4science.org/" />
+        </links>
+
+        <menu ref="modules" />
+        <menu ref="reports"/>
+    </body>
+</project>

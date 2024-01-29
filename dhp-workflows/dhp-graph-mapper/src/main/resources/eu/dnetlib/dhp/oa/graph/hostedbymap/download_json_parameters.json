@@ -1,0 +1,27 @@
+[
+
+  {
+    "paramName":"op",
+    "paramLongName":"outputPath",
+    "paramDescription": "the output json file produced by the CSV downlaod procedure",
+    "paramRequired": true
+  },
+
+  {
+    "paramName": "hnn",
+    "paramLongName": "hdfsNameNode",
+    "paramDescription": "the path used to store the HostedByMap",
+    "paramRequired": true
+  },{
+  "paramName": "cf",
+  "paramLongName": "compressedFile",
+  "paramDescription": "the path used to store the HostedByMap",
+  "paramRequired": true
+},{
+  "paramName":"wp",
+  "paramLongName":"workingPath",
+  "paramDescription": "the output json file produced by the CSV downlaod procedure",
+  "paramRequired": true
+}
+]
+

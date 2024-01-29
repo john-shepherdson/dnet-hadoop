@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.oaf.Country;
+import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Software;
 import scala.Tuple2;
@@ -69,17 +70,16 @@ public class CountryPropagationJobTest {
 	@Test
 	void testCountryPropagationSoftware() throws Exception {
 		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/countrypropagation/sample/software")
+			.getResource("/eu/dnetlib/dhp/countrypropagation/graph/software")
 			.getPath();
 		final String preparedInfoPath = getClass()
-			.getResource("/eu/dnetlib/dhp/countrypropagation/preparedInfo")
+			.getResource("/eu/dnetlib/dhp/countrypropagation/preparedInfo/software")
 			.getPath();
 		SparkCountryPropagationJob
 			.main(
 				new String[] {
 					"--isSparkSessionManaged", Boolean.FALSE.toString(),
 					"--sourcePath", sourcePath,
-					"-saveGraph", "true",
 					"-resultTableName", Software.class.getCanonicalName(),
 					"-outputPath", workingDir.toString() + "/software",
 					"-preparedInfoPath", preparedInfoPath
@@ -90,8 +90,6 @@ public class CountryPropagationJobTest {
 		JavaRDD<Software> tmp = sc
 			.textFile(workingDir.toString() + "/software")
 			.map(item -> OBJECT_MAPPER.readValue(item, Software.class));
-
-		// tmp.map(s -> new Gson().toJson(s)).foreach(s -> System.out.println(s));
 
 		Assertions.assertEquals(10, tmp.count());
 
@@ -257,6 +255,147 @@ public class CountryPropagationJobTest {
 		Assertions
 			.assertEquals(
 				7, countryExplodedWithCountryProvenance.filter("_2 = 'propagation'").count());
+	}
+
+	@Test
+	void testCountryPropagationPublication() throws Exception {
+		final String sourcePath = getClass()
+			.getResource("/eu/dnetlib/dhp/countrypropagation/graph/publication")
+			.getPath();
+		final String preparedInfoPath = getClass()
+			.getResource("/eu/dnetlib/dhp/countrypropagation/preparedInfo/publication")
+			.getPath();
+		SparkCountryPropagationJob
+			.main(
+				new String[] {
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--sourcePath", sourcePath,
+					"-resultTableName", Publication.class.getCanonicalName(),
+					"-outputPath", workingDir.toString() + "/publication",
+					"-preparedInfoPath", preparedInfoPath
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Publication> tmp = sc
+			.textFile(workingDir.toString() + "/publication")
+			.map(item -> OBJECT_MAPPER.readValue(item, Publication.class));
+
+		Assertions.assertEquals(12, tmp.count());
+
+		Assertions.assertEquals(5, tmp.filter(r -> r.getCountry().size() > 0).count());
+
+		tmp
+			.foreach(
+				r -> r.getCountry().stream().forEach(c -> Assertions.assertEquals("dnet:countries", c.getSchemeid())));
+		tmp
+			.foreach(
+				r -> r
+					.getCountry()
+					.stream()
+					.forEach(c -> Assertions.assertEquals("dnet:countries", c.getSchemename())));
+		tmp
+			.foreach(
+				r -> r
+					.getCountry()
+					.stream()
+					.forEach(c -> Assertions.assertFalse(c.getDataInfo().getDeletedbyinference())));
+		tmp.foreach(r -> r.getCountry().stream().forEach(c -> Assertions.assertFalse(c.getDataInfo().getInvisible())));
+		tmp.foreach(r -> r.getCountry().stream().forEach(c -> Assertions.assertTrue(c.getDataInfo().getInferred())));
+		tmp
+			.foreach(
+				r -> r.getCountry().stream().forEach(c -> Assertions.assertEquals("0.85", c.getDataInfo().getTrust())));
+		tmp
+			.foreach(
+				r -> r
+					.getCountry()
+					.stream()
+					.forEach(c -> Assertions.assertEquals("propagation", c.getDataInfo().getInferenceprovenance())));
+		tmp
+			.foreach(
+				r -> r
+					.getCountry()
+					.stream()
+					.forEach(
+						c -> Assertions
+							.assertEquals("country:instrepos", c.getDataInfo().getProvenanceaction().getClassid())));
+		tmp
+			.foreach(
+				r -> r
+					.getCountry()
+					.stream()
+					.forEach(
+						c -> Assertions
+							.assertEquals(
+								"dnet:provenanceActions", c.getDataInfo().getProvenanceaction().getSchemeid())));
+		tmp
+			.foreach(
+				r -> r
+					.getCountry()
+					.stream()
+					.forEach(
+						c -> Assertions
+							.assertEquals(
+								"dnet:provenanceActions", c.getDataInfo().getProvenanceaction().getSchemename())));
+
+		List<Country> countries = tmp
+			.filter(r -> r.getId().equals("50|06cdd3ff4700::49ec404cee4e1452808aabeaffbd3072"))
+			.collect()
+			.get(0)
+			.getCountry();
+		Assertions.assertEquals(1, countries.size());
+		Assertions.assertEquals("NL", countries.get(0).getClassid());
+		Assertions.assertEquals("Netherlands", countries.get(0).getClassname());
+
+		countries = tmp
+			.filter(r -> r.getId().equals("50|07b5c0ccd4fe::e7f5459cc97865f2af6e3da964c1250b"))
+			.collect()
+			.get(0)
+			.getCountry();
+		Assertions.assertEquals(1, countries.size());
+		Assertions.assertEquals("NL", countries.get(0).getClassid());
+		Assertions.assertEquals("Netherlands", countries.get(0).getClassname());
+
+		countries = tmp
+			.filter(r -> r.getId().equals("50|355e65625b88::e7d48a470b13bda61f7ebe3513e20cb6"))
+			.collect()
+			.get(0)
+			.getCountry();
+		Assertions.assertEquals(2, countries.size());
+		Assertions
+			.assertTrue(
+				countries.stream().anyMatch(cs -> cs.getClassid().equals("IT") && cs.getClassname().equals("Italy")));
+		Assertions
+			.assertTrue(
+				countries.stream().anyMatch(cs -> cs.getClassid().equals("FR") && cs.getClassname().equals("France")));
+
+		countries = tmp
+			.filter(r -> r.getId().equals("50|355e65625b88::74009c567c81b4aa55c813db658734df"))
+			.collect()
+			.get(0)
+			.getCountry();
+		Assertions.assertEquals(2, countries.size());
+		Assertions
+			.assertTrue(
+				countries.stream().anyMatch(cs -> cs.getClassid().equals("IT") && cs.getClassname().equals("Italy")));
+		Assertions
+			.assertTrue(
+				countries
+					.stream()
+					.anyMatch(cs -> cs.getClassid().equals("NL") && cs.getClassname().equals("Netherlands")));
+
+		countries = tmp
+			.filter(r -> r.getId().equals("50|355e65625b88::54a1c76f520bb2c8da27d12e42891088"))
+			.collect()
+			.get(0)
+			.getCountry();
+		Assertions.assertEquals(2, countries.size());
+		Assertions
+			.assertTrue(
+				countries.stream().anyMatch(cs -> cs.getClassid().equals("IT") && cs.getClassname().equals("Italy")));
+		Assertions
+			.assertTrue(
+				countries.stream().anyMatch(cs -> cs.getClassid().equals("FR") && cs.getClassname().equals("France")));
 	}
 
 }
