@@ -6,7 +6,6 @@ then
     ln -sfn ${PYTHON_EGG_CACHE}${link_folder} ${link_folder}
 fi
 
-#export HADOOP_USER_NAME="dimitris.pierrakos"
 export HADOOP_USER_NAME=$6
 export PROD_USAGE_STATS_DB="openaire_prod_usage_stats"
 function copydb() {
@@ -24,13 +23,13 @@ function copydb() {
   # drop tables from db
   for i in `impala-shell --user $HADOOP_USER_NAME -i impala-cluster-dn1.openaire.eu -d ${db} --delimited  -q "show tables"`;
     do
-        `impala-shell  -i impala-cluster-dn1.openaire.eu -d -d ${db} -q "drop table $i;"`;
+        `impala-shell  -i impala-cluster-dn1.openaire.eu -d ${db} -q "drop table $i;"`;
     done
 
   # drop views from db
   for i in `impala-shell --user $HADOOP_USER_NAME -i impala-cluster-dn1.openaire.eu -d ${db} --delimited  -q "show tables"`;
     do
-        `impala-shell  -i impala-cluster-dn1.openaire.eu -d -d ${db} -q "drop view $i;"`;
+        `impala-shell  -i impala-cluster-dn1.openaire.eu -d ${db} -q "drop view $i;"`;
     done
 
   # delete the database
@@ -82,12 +81,12 @@ copydb $USAGE_STATS_DB
 copydb $PROD_USAGE_STATS_DB
 copydb $EXT_DB
 copydb $STATS_DB
-#copydb $MONITOR_DB
+copydb $MONITOR_DB
 copydb $OBSERVATORY_DB
 
 copydb $MONITOR_DB'_funded'
 copydb $MONITOR_DB'_institutions'
-copydb $MONITOR_DB'_RIs_tail'
+copydb $MONITOR_DB'_ris_tail'
 
 contexts="knowmad::other dh-ch::other enermaps::other gotriple::other neanias-atmospheric::other rural-digital-europe::other covid-19::other aurora::other neanias-space::other north-america-studies::other north-american-studies::other eutopia::other"
 for i in ${contexts}

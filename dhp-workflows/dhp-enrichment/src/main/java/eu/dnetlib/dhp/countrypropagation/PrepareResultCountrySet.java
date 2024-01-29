@@ -5,10 +5,7 @@ import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -35,7 +32,7 @@ public class PrepareResultCountrySet {
 			.toString(
 				PrepareResultCountrySet.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/countrypropagation/input_prepareresultcountry_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/countrypropagation/input_prepareresultcountry_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -88,14 +85,33 @@ public class PrepareResultCountrySet {
 		// selects all the results non deleted by inference and non invisible
 		Dataset<R> result = readPath(spark, inputPath, resultClazz)
 			.filter(
-				(FilterFunction<R>) r -> !r.getDataInfo().getDeletedbyinference() &&
-					!r.getDataInfo().getInvisible());
+				(FilterFunction<R>) r -> Optional
+					.ofNullable(r.getDataInfo())
+					.map(dataInfo -> !dataInfo.getDeletedbyinference() && !dataInfo.getInvisible())
+					.orElse(true));
 
 		// of the results collects the distinct keys for collected from (at the level of the result) and hosted by
 		// and produces pairs resultId, key for each distinct key associated to the result
 		result.flatMap((FlatMapFunction<R, EntityEntityRel>) r -> {
-			Set<String> cfhb = r.getCollectedfrom().stream().map(cf -> cf.getKey()).collect(Collectors.toSet());
-			cfhb.addAll(r.getInstance().stream().map(i -> i.getHostedby().getKey()).collect(Collectors.toSet()));
+			Set<String> cfhb = Optional
+				.ofNullable(r.getCollectedfrom())
+				.map(cf -> cf.stream().map(KeyValue::getKey).collect(Collectors.toSet()))
+				.orElse(new HashSet<>());
+			cfhb
+				.addAll(
+					Optional
+						.ofNullable(r.getInstance())
+						.map(
+							i -> i
+								.stream()
+								.map(
+									ii -> Optional
+										.ofNullable(ii.getHostedby())
+										.map(KeyValue::getKey)
+										.orElse(null))
+								.filter(Objects::nonNull)
+								.collect(Collectors.toSet()))
+						.orElse(new HashSet<>()));
 			return cfhb
 				.stream()
 				.map(value -> EntityEntityRel.newInstance(r.getId(), value))

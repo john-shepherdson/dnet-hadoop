@@ -25,6 +25,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.common.ModelSupport;
@@ -41,7 +42,8 @@ public class PromoteActionPayloadForGraphTableJobTest {
 	private Path inputActionPayloadRootDir;
 	private Path outputDir;
 
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	@BeforeAll
 	public static void beforeAll() {
@@ -154,6 +156,10 @@ public class PromoteActionPayloadForGraphTableJobTest {
 			List<? extends Oaf> actualOutputRows = readGraphTableFromJobOutput(outputGraphTableDir.toString(), rowClazz)
 				.collectAsList()
 				.stream()
+				.map(s -> {
+					s.setLastupdatetimestamp(0L);
+					return s;
+				})
 				.sorted(Comparator.comparingInt(Object::hashCode))
 				.collect(Collectors.toList());
 			String expectedOutputGraphTableJsonDumpPath = resultFileLocation(strategy, rowClazz, actionPayloadClazz);
@@ -166,6 +172,10 @@ public class PromoteActionPayloadForGraphTableJobTest {
 				expectedOutputGraphTableJsonDumpFile.toString(), rowClazz)
 					.collectAsList()
 					.stream()
+					.map(s -> {
+						s.setLastupdatetimestamp(0L);
+						return s;
+					})
 					.sorted(Comparator.comparingInt(Object::hashCode))
 					.collect(Collectors.toList());
 			assertIterableEquals(expectedOutputRows, actualOutputRows);

@@ -9,9 +9,7 @@ import java.util.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
@@ -20,6 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
+import eu.dnetlib.dhp.api.Utils;
+import eu.dnetlib.dhp.api.model.CommunityEntityMap;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -34,7 +34,7 @@ public class PrepareResultCommunitySet {
 			.toString(
 				PrepareResultCommunitySet.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttocommunityfromorganization/input_preparecommunitytoresult_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/resulttocommunityfromorganization/input_preparecommunitytoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
@@ -48,10 +48,10 @@ public class PrepareResultCommunitySet {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		final OrganizationMap organizationMap = new Gson()
-			.fromJson(
-				parser.get("organizationtoresultcommunitymap"),
-				OrganizationMap.class);
+		final String baseURL = parser.get("baseURL");
+		log.info("baseURL: {}", baseURL);
+
+		final CommunityEntityMap organizationMap = Utils.getCommunityOrganization(baseURL);
 		log.info("organizationMap: {}", new Gson().toJson(organizationMap));
 
 		SparkConf conf = new SparkConf();
@@ -70,7 +70,7 @@ public class PrepareResultCommunitySet {
 		SparkSession spark,
 		String inputPath,
 		String outputPath,
-		OrganizationMap organizationMap) {
+		CommunityEntityMap organizationMap) {
 
 		Dataset<Relation> relation = readPath(spark, inputPath, Relation.class);
 		relation.createOrReplaceTempView("relation");
@@ -115,7 +115,7 @@ public class PrepareResultCommunitySet {
 	}
 
 	private static MapFunction<ResultOrganizations, ResultCommunityList> mapResultCommunityFn(
-		OrganizationMap organizationMap) {
+		CommunityEntityMap organizationMap) {
 		return value -> {
 			String rId = value.getResultId();
 			Optional<List<String>> orgs = Optional.ofNullable(value.getMerges());

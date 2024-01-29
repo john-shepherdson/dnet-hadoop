@@ -485,10 +485,14 @@
   },
   "extraInfo": [],
   "format": [],
-  "fulltext": [],
+  "fulltext": [
+    { "value" : "https://osf.io/preprints/socarxiv/7vgtu/download" },
+    { "value" : "https://osf.io/preprints/socarxiv/7vgtu/download2" }
+  ],
   "id": "50|CSC_________::0000ec4dd9df012feaafa77e71a0fb4c",
   "instance": [
     {
+      "fulltext" :  "https://osf.io/preprints/socarxiv/7vgtu/download",
       "measures": [
         {
           "id": "influence",
@@ -1044,8 +1048,8 @@
         "schemename": "dnet:dataCite_resource"
       },
       "refereed": {
-        "classid": "0001",
-        "classname": "peerReviewed",
+        "classid": "0002",
+        "classname": "nonPeerReviewed",
         "schemeid": "dnet:review_levels",
         "schemename": "dnet:review_levels"
       },
@@ -1945,5 +1949,9 @@
         "schemename": "dnet:provenanceActions"
       }
     }
-  }
+  },
+  "isGreen": true,
+  "openAccessColor": "bronze",
+  "isInDiamondJournal": true,
+  "publiclyFunded": true
 }

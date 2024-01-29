@@ -88,9 +88,7 @@ abstract class AbstractSparkAction implements Serializable {
 						"for $x in /RESOURCE_PROFILE[.//RESOURCE_IDENTIFIER/@value = '%s'] return $x//DEDUPLICATION/text()",
 						configProfileId));
 
-		DedupConfig dedupConfig = new ObjectMapper().readValue(conf, DedupConfig.class);
-		dedupConfig.getPace().initModel();
-		dedupConfig.getPace().initTranslationMap();
+		DedupConfig dedupConfig = DedupConfig.load(conf);
 		dedupConfig.getWf().setConfigurationId(actionSetId);
 
 		return dedupConfig;
@@ -101,6 +99,10 @@ abstract class AbstractSparkAction implements Serializable {
 
 	protected static SparkSession getSparkSession(SparkConf conf) {
 		return SparkSession.builder().config(conf).getOrCreate();
+	}
+
+	protected static SparkSession getSparkWithHiveSession(SparkConf conf) {
+		return SparkSession.builder().enableHiveSupport().config(conf).getOrCreate();
 	}
 
 	protected static <T> void save(Dataset<T> dataset, String outPath, SaveMode mode) {

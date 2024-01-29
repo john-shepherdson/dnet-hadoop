@@ -47,7 +47,7 @@ class CommunityConfigurationFactoryTest {
 		sc.setVerb("not_contains");
 		sc.setField("contributor");
 		sc.setValue("DARIAH");
-		sc.setSelection(resolver.getSelectionCriteria(sc.getVerb(), sc.getValue()));
+		sc.setSelection(resolver);// .getSelectionCriteria(sc.getVerb(), sc.getValue()));
 		String metadata = "This work has been partially supported by DARIAH-EU infrastructure";
 		Assertions.assertFalse(sc.verifyCriteria(metadata));
 	}

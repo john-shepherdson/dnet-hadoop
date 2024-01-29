@@ -1,4 +1,4 @@
-    <workflow-app name="Download_Transform_Pubmed_Workflow" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Download_Transform_Pubmed_Workflow" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>baselineWorkingPath</name>
@@ -9,8 +9,12 @@
             <description>The IS lookUp service endopoint</description>
         </property>
         <property>
-            <name>targetPath</name>
-            <description>The target path</description>
+            <name>mdStoreOutputId</name>
+            <description>the identifier of the cleaned MDStore</description>
+        </property>
+        <property>
+            <name>mdStoreManagerURI</name>
+            <description>the path of the cleaned mdstore</description>
         </property>
         <property>
             <name>skipUpdate</name>
@@ -19,11 +23,30 @@
         </property>
     </parameters>
 
-    <start to="ConvertDataset"/>
+    <start to="StartTransaction"/>
+
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
+    <action name="StartTransaction">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>NEW_VERSION</arg>
+            <arg>--mdStoreID</arg><arg>${mdStoreOutputId}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <capture-output/>
+        </java>
+        <ok to="ConvertDataset"/>
+        <error to="RollBack"/>
+    </action>
 
     <action name="ConvertDataset">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -43,15 +66,51 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--workingPath</arg><arg>${baselineWorkingPath}</arg>
-            <arg>--targetPath</arg><arg>${targetPath}</arg>
+            <arg>--mdstoreOutputVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
             <arg>--master</arg><arg>yarn</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--hdfsServerUri</arg><arg>${nameNode}</arg>
             <arg>--skipUpdate</arg><arg>${skipUpdate}</arg>
         </spark>
+        <ok to="CommitVersion"/>
+        <error to="RollBack"/>
+    </action>
+
+    <action name="CommitVersion">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>COMMIT</arg>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
+
+    <action name="RollBack">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>ROLLBACK</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
+        <ok to="Kill"/>
+        <error to="Kill"/>
+    </action>
+
 
     <end name="End"/>
 

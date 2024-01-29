@@ -2,50 +2,49 @@
 package eu.dnetlib.dhp.oa.merge;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static eu.dnetlib.dhp.utils.DHPUtils.toSeq;
+import static org.apache.spark.sql.functions.col;
+import static org.apache.spark.sql.functions.when;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ForkJoinPool;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.api.java.function.ReduceFunction;
 import org.apache.spark.sql.*;
-import org.apache.spark.sql.expressions.Aggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.Option;
-
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
 
 /**
  * Groups the graph content by entity identifier to ensure ID uniqueness
  */
 public class GroupEntitiesSparkJob {
-
 	private static final Logger log = LoggerFactory.getLogger(GroupEntitiesSparkJob.class);
 
-	private static final String ID_JPATH = "$.id";
+	private static final Encoder<OafEntity> OAFENTITY_KRYO_ENC = Encoders.kryo(OafEntity.class);
 
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	private ArgumentApplicationParser parser;
+
+	public GroupEntitiesSparkJob(ArgumentApplicationParser parser) {
+		this.parser = parser;
+	}
 
 	public static void main(String[] args) throws Exception {
 
@@ -63,141 +62,133 @@ public class GroupEntitiesSparkJob {
 			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
+		final String isLookupUrl = parser.get("isLookupUrl");
+		log.info("isLookupUrl: {}", isLookupUrl);
+
+		final ISLookUpService isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl);
+
+		new GroupEntitiesSparkJob(parser).run(isSparkSessionManaged, isLookupService);
+	}
+
+	public void run(Boolean isSparkSessionManaged, ISLookUpService isLookUpService)
+		throws ISLookUpException {
+
 		String graphInputPath = parser.get("graphInputPath");
 		log.info("graphInputPath: {}", graphInputPath);
 
+		String checkpointPath = parser.get("checkpointPath");
+		log.info("checkpointPath: {}", checkpointPath);
+
 		String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
+
+		boolean filterInvisible = Boolean.parseBoolean(parser.get("filterInvisible"));
+		log.info("filterInvisible: {}", filterInvisible);
 
 		SparkConf conf = new SparkConf();
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
 		conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
+		final VocabularyGroup vocs = VocabularyGroup.loadVocsFromIS(isLookUpService);
+
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				HdfsSupport.remove(outputPath, spark.sparkContext().hadoopConfiguration());
-				groupEntities(spark, graphInputPath, outputPath);
+				HdfsSupport.remove(checkpointPath, spark.sparkContext().hadoopConfiguration());
+				groupEntities(spark, graphInputPath, checkpointPath, outputPath, filterInvisible, vocs);
 			});
 	}
 
 	private static void groupEntities(
 		SparkSession spark,
 		String inputPath,
-		String outputPath) {
+		String checkpointPath,
+		String outputPath,
+		boolean filterInvisible, VocabularyGroup vocs) {
 
-		final TypedColumn<OafEntity, OafEntity> aggregator = new GroupingAggregator().toColumn();
-		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-		spark
-			.read()
-			.textFile(toSeq(listEntityPaths(inputPath, sc)))
-			.map((MapFunction<String, OafEntity>) GroupEntitiesSparkJob::parseOaf, Encoders.kryo(OafEntity.class))
-			.filter((FilterFunction<OafEntity>) e -> StringUtils.isNotBlank(ModelSupport.idFn().apply(e)))
-			.groupByKey((MapFunction<OafEntity, String>) oaf -> ModelSupport.idFn().apply(oaf), Encoders.STRING())
-			.agg(aggregator)
+		Dataset<OafEntity> allEntities = spark.emptyDataset(OAFENTITY_KRYO_ENC);
+
+		for (Map.Entry<EntityType, Class> e : ModelSupport.entityTypes.entrySet()) {
+			String entity = e.getKey().name();
+			Class<? extends OafEntity> entityClass = e.getValue();
+			String entityInputPath = inputPath + "/" + entity;
+
+			if (!HdfsSupport.exists(entityInputPath, spark.sparkContext().hadoopConfiguration())) {
+				continue;
+			}
+
+			allEntities = allEntities
+				.union(
+					((Dataset<OafEntity>) spark
+						.read()
+						.schema(Encoders.bean(entityClass).schema())
+						.json(entityInputPath)
+						.filter("length(id) > 0")
+						.as(Encoders.bean(entityClass)))
+							.map((MapFunction<OafEntity, OafEntity>) r -> r, OAFENTITY_KRYO_ENC));
+		}
+
+		Dataset<?> groupedEntities = allEntities
 			.map(
-				(MapFunction<Tuple2<String, OafEntity>, String>) t -> t._2().getClass().getName() +
-					"|" + OBJECT_MAPPER.writeValueAsString(t._2()),
-				Encoders.STRING())
+				(MapFunction<OafEntity, OafEntity>) entity -> GraphCleaningFunctions
+					.applyCoarVocabularies(entity, vocs),
+				OAFENTITY_KRYO_ENC)
+			.groupByKey((MapFunction<OafEntity, String>) OafEntity::getId, Encoders.STRING())
+			.reduceGroups((ReduceFunction<OafEntity>) OafMapperUtils::mergeEntities)
+			.map(
+				(MapFunction<Tuple2<String, OafEntity>, Tuple2<String, OafEntity>>) t -> new Tuple2<>(
+					t._2().getClass().getName(), t._2()),
+				Encoders.tuple(Encoders.STRING(), OAFENTITY_KRYO_ENC));
+
+		// pivot on "_1" (classname of the entity)
+		// created columns containing only entities of the same class
+		for (Map.Entry<EntityType, Class> e : ModelSupport.entityTypes.entrySet()) {
+			String entity = e.getKey().name();
+			Class<? extends OafEntity> entityClass = e.getValue();
+
+			groupedEntities = groupedEntities
+				.withColumn(
+					entity,
+					when(col("_1").equalTo(entityClass.getName()), col("_2")));
+		}
+
+		groupedEntities
+			.drop("_1", "_2")
 			.write()
-			.option("compression", "gzip")
 			.mode(SaveMode.Overwrite)
-			.text(outputPath);
-	}
+			.option("compression", "gzip")
+			.save(checkpointPath);
 
-	public static class GroupingAggregator extends Aggregator<OafEntity, OafEntity, OafEntity> {
+		ForkJoinPool parPool = new ForkJoinPool(ModelSupport.entityTypes.size());
 
-		@Override
-		public OafEntity zero() {
-			return null;
-		}
-
-		@Override
-		public OafEntity reduce(OafEntity b, OafEntity a) {
-			return mergeAndGet(b, a);
-		}
-
-		private OafEntity mergeAndGet(OafEntity b, OafEntity a) {
-			if (Objects.nonNull(a) && Objects.nonNull(b)) {
-				return OafMapperUtils.mergeEntities(b, a);
-			}
-			return Objects.isNull(a) ? b : a;
-		}
-
-		@Override
-		public OafEntity merge(OafEntity b, OafEntity a) {
-			return mergeAndGet(b, a);
-		}
-
-		@Override
-		public OafEntity finish(OafEntity j) {
-			return j;
-		}
-
-		@Override
-		public Encoder<OafEntity> bufferEncoder() {
-			return Encoders.kryo(OafEntity.class);
-		}
-
-		@Override
-		public Encoder<OafEntity> outputEncoder() {
-			return Encoders.kryo(OafEntity.class);
-		}
-
-	}
-
-	private static OafEntity parseOaf(String s) {
-
-		DocumentContext dc = JsonPath
-			.parse(s, Configuration.defaultConfiguration().addOptions(Option.SUPPRESS_EXCEPTIONS));
-		final String id = dc.read(ID_JPATH);
-		if (StringUtils.isNotBlank(id)) {
-
-			String prefix = StringUtils.substringBefore(id, "|");
-			switch (prefix) {
-				case "10":
-					return parse(s, Datasource.class);
-				case "20":
-					return parse(s, Organization.class);
-				case "40":
-					return parse(s, Project.class);
-				case "50":
-					String resultType = dc.read("$.resulttype.classid");
-					switch (resultType) {
-						case "publication":
-							return parse(s, Publication.class);
-						case "dataset":
-							return parse(s, eu.dnetlib.dhp.schema.oaf.Dataset.class);
-						case "software":
-							return parse(s, Software.class);
-						case "other":
-							return parse(s, OtherResearchProduct.class);
-						default:
-							throw new IllegalArgumentException(String.format("invalid resultType: '%s'", resultType));
-					}
-				default:
-					throw new IllegalArgumentException(String.format("invalid id prefix: '%s'", prefix));
-			}
-		} else {
-			throw new IllegalArgumentException(String.format("invalid oaf: '%s'", s));
-		}
-	}
-
-	private static <T extends OafEntity> OafEntity parse(String s, Class<T> clazz) {
-		try {
-			return OBJECT_MAPPER.readValue(s, clazz);
-		} catch (IOException e) {
-			throw new IllegalArgumentException(e);
-		}
-	}
-
-	private static List<String> listEntityPaths(String inputPath, JavaSparkContext sc) {
-		return HdfsSupport
-			.listFiles(inputPath, sc.hadoopConfiguration())
+		ModelSupport.entityTypes
+			.entrySet()
 			.stream()
-			.filter(f -> !f.toLowerCase().contains("relation"))
-			.collect(Collectors.toList());
-	}
+			.map(e -> parPool.submit(() -> {
+				String entity = e.getKey().name();
+				Class<? extends OafEntity> entityClass = e.getValue();
 
+				spark
+					.read()
+					.load(checkpointPath)
+					.select(col(entity).as("value"))
+					.filter("value IS NOT NULL")
+					.as(OAFENTITY_KRYO_ENC)
+					.map((MapFunction<OafEntity, OafEntity>) r -> r, (Encoder<OafEntity>) Encoders.bean(entityClass))
+					.filter(filterInvisible ? "dataInfo.invisible != TRUE" : "TRUE")
+					.write()
+					.mode(SaveMode.Overwrite)
+					.option("compression", "gzip")
+					.json(outputPath + "/" + entity);
+			}))
+			.collect(Collectors.toList())
+			.forEach(t -> {
+				try {
+					t.get();
+				} catch (InterruptedException | ExecutionException e) {
+					throw new RuntimeException(e);
+				}
+			});
+	}
 }

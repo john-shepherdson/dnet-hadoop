@@ -16,6 +16,7 @@ import org.slf4j.{Logger, LoggerFactory}
 import java.util
 import scala.collection.JavaConverters._
 import scala.collection.mutable
+import scala.io.Source
 import scala.util.matching.Regex
 
 case class CrossrefDT(doi: String, json: String, timestamp: Long) {}
@@ -24,16 +25,27 @@ case class mappingAffiliation(name: String) {}
 
 case class mappingAuthor(
   given: Option[String],
-  family: String,
+  family: Option[String],
   sequence: Option[String],
   ORCID: Option[String],
   affiliation: Option[mappingAffiliation]
 ) {}
 
+case class funderInfo(id: String, uri: String, name: String, synonym: List[String]) {}
+
 case class mappingFunder(name: String, DOI: Option[String], award: Option[List[String]]) {}
 
 case object Crossref2Oaf {
   val logger: Logger = LoggerFactory.getLogger(Crossref2Oaf.getClass)
+
+  val irishFunder: List[funderInfo] = {
+    val s = Source
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/crossref/irish_funder.json"))
+      .mkString
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+    lazy val json: org.json4s.JValue = parse(s)
+    json.extract[List[funderInfo]]
+  }
 
   val mappingCrossrefType = Map(
     "book-section"        -> "publication",
@@ -88,7 +100,14 @@ case object Crossref2Oaf {
     "report"              -> "0017 Report"
   )
 
-  def mappingResult(result: Result, json: JValue, cobjCategory: String): Result = {
+  def getIrishId(doi: String): Option[String] = {
+    val id = doi.split("/").last
+    irishFunder
+      .find(f => id.equalsIgnoreCase(f.id) || (f.synonym.nonEmpty && f.synonym.exists(s => s.equalsIgnoreCase(id))))
+      .map(f => f.id)
+  }
+
+  def mappingResult(result: Result, json: JValue, cobjCategory: String, originalType: String): Result = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
     //MAPPING Crossref DOI into PID
@@ -207,14 +226,14 @@ case object Crossref2Oaf {
 
     //Mapping Author
     val authorList: List[mappingAuthor] =
-      (json \ "author").extractOrElse[List[mappingAuthor]](List())
+      (json \ "author").extract[List[mappingAuthor]].filter(a => a.family.isDefined)
 
     val sorted_list = authorList.sortWith((a: mappingAuthor, b: mappingAuthor) =>
       a.sequence.isDefined && a.sequence.get.equalsIgnoreCase("first")
     )
 
     result.setAuthor(sorted_list.zipWithIndex.map { case (a, index) =>
-      generateAuhtor(a.given.orNull, a.family, a.ORCID.orNull, index)
+      generateAuhtor(a.given.orNull, a.family.get, a.ORCID.orNull, index)
     }.asJava)
 
     // Mapping instance
@@ -264,6 +283,11 @@ case object Crossref2Oaf {
         ModelConstants.DNET_PUBLICATION_RESOURCE
       )
     )
+    //ADD ORIGINAL TYPE to the mapping
+    val itm = new InstanceTypeMapping
+    itm.setOriginalType(originalType)
+    itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
+    instance.setInstanceTypeMapping(List(itm).asJava)
     result.setResourcetype(
       OafMapperUtils.qualifier(
         cobjCategory.substring(0, 4),
@@ -348,7 +372,9 @@ case object Crossref2Oaf {
       objectType,
       mappingCrossrefSubType.getOrElse(objectSubType, "0038 Other literature type")
     )
-    mappingResult(result, json, cOBJCategory)
+
+    val originalType = if (mappingCrossrefSubType.contains(objectType)) objectType else objectSubType
+    mappingResult(result, json, cOBJCategory, originalType)
     if (result == null || result.getId == null)
       return List()
 
@@ -467,6 +493,14 @@ case object Crossref2Oaf {
     if (funders != null)
       funders.foreach(funder => {
         if (funder.DOI.isDefined && funder.DOI.get.nonEmpty) {
+
+          if (getIrishId(funder.DOI.get).isDefined) {
+            val nsPrefix = getIrishId(funder.DOI.get).get.padTo(12, '_')
+            val targetId = getProjectId(nsPrefix, "1e5e62235d094afd01cd56e65112fc63")
+            queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+            queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+          }
+
           funder.DOI.get match {
             case "10.13039/100010663" | "10.13039/100010661" | "10.13039/501100007601" | "10.13039/501100000780" |
                 "10.13039/100010665" =>

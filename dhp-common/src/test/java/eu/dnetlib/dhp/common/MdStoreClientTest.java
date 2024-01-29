@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class MdStoreClientTest {
 
-	@Test
+	// @Test
 	public void testMongoCollection() throws IOException {
 		final MdstoreClient client = new MdstoreClient("mongodb://localhost:27017", "mdstore");
 

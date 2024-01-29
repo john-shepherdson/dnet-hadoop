@@ -1,0 +1,26 @@
+DOI,OAID,level1,level2,level3,level4,score_for_L3,score_for_L4
+10.1016/j.anucene.2006.02.004,doi_________::00059d9963edf633bec756fb21b5bd72,02 engineering and technology,"0202 electrical engineering, electronic engineering, information engineering",020209 energy,02020908 Climate change policy/Ethanol fuel,0.5,0.5
+10.1016/j.anucene.2006.02.004,doi_________::00059d9963edf633bec756fb21b5bd72,02 engineering and technology,0211 other engineering and technologies,021108 energy,02110808 Climate change policy/Ethanol fuel,0.5,0.5
+10.1016/j.revmed.2006.07.010,doi_________::0026476c1651a92c933d752ff12496c7,03 medical and health sciences,0302 clinical medicine,030220 oncology & carcinogenesis,N/A,0.5036656856536865,0.0
+10.1016/j.revmed.2006.07.010,doi_________::0026476c1651a92c933d752ff12496c7,03 medical and health sciences,0302 clinical medicine,030212 general & internal medicine,N/A,0.4963343143463135,0.0
+10.20965/jrm.2006.p0312,doi_________::0028336a2f3826cc83c47dbefac71543,02 engineering and technology,0209 industrial biotechnology,020901 industrial engineering & automation,02090104 Robotics/Robots,0.6111094951629639,0.5053805979936855
+10.20965/jrm.2006.p0312,doi_________::0028336a2f3826cc83c47dbefac71543,01 natural sciences,0104 chemical sciences,010401 analytical chemistry,N/A,0.3888905048370361,0.0
+10.1111/j.1747-7379.2006.040_1.x,doi_________::002c7077e7c114a8304eb90f59e45fa4,05 social sciences,0506 political science,050602 political science & public administration,05060202 Ethnic groups/Ethnicity,0.6159052848815918,0.7369035568037298
+10.1111/j.1747-7379.2006.040_1.x,doi_________::002c7077e7c114a8304eb90f59e45fa4,05 social sciences,0502 economics and business,050207 economics,N/A,0.3840946555137634,0.0
+10.1007/s10512-006-0049-9,doi_________::003f29f9254819cf4c78558b1bc25f10,02 engineering and technology,"0202 electrical engineering, electronic engineering, information engineering",020209 energy,02020908 Climate change policy/Ethanol fuel,0.5,0.5
+10.1007/s10512-006-0049-9,doi_________::003f29f9254819cf4c78558b1bc25f10,02 engineering and technology,0211 other engineering and technologies,021108 energy,02110808 Climate change policy/Ethanol fuel,0.5,0.5
+10.1111/j.1365-2621.2005.01045.x,doi_________::00419355b4c3e0646bd0e1b301164c8e,04 agricultural and veterinary sciences,0404 agricultural biotechnology,040401 food science,04040102 Food science/Food industry,0.5,0.5
+10.1111/j.1365-2621.2005.01045.x,doi_________::00419355b4c3e0646bd0e1b301164c8e,04 agricultural and veterinary sciences,0405 other agricultural sciences,040502 food science,04050202 Food science/Food industry,0.5,0.5
+10.1002/chin.200617262,doi_________::004c8cef80668904961b9e62841793c8,01 natural sciences,0104 chemical sciences,010405 organic chemistry,01040508 Functional groups/Ethers,0.5566747188568115,0.5582916736602783
+10.1002/chin.200617262,doi_________::004c8cef80668904961b9e62841793c8,01 natural sciences,0104 chemical sciences,010402 general chemistry,01040207 Chemical synthesis/Total synthesis,0.4433253407478332,0.4417082965373993
+10.1016/j.revmed.2006.07.012,doi_________::005b1d0fb650b680abaf6cfe26a21604,03 medical and health sciences,0302 clinical medicine,030204 cardiovascular system & hematology,03020409 Hematology/Coagulopathies,0.5101401805877686,0.0546871414174914
+10.1016/j.revmed.2006.07.012,doi_________::005b1d0fb650b680abaf6cfe26a21604,03 medical and health sciences,0301 basic medicine,030105 genetics & heredity,N/A,0.4898599088191986,0.0
+10.4109/jslab.17.132,doi_________::00889baa06de363e37930daaf8e800c0,03 medical and health sciences,0301 basic medicine,030104 developmental biology,N/A,0.5,0.0
+10.4109/jslab.17.132,doi_________::00889baa06de363e37930daaf8e800c0,03 medical and health sciences,0303 health sciences,030304 developmental biology,N/A,0.5,0.0
+10.1108/00251740610715687,doi_________::0092cb1b1920d556719385a26363ecaa,05 social sciences,0502 economics and business,050203 business & management,05020311 International business/International trade,0.605047881603241,0.2156608108845153
+10.1108/00251740610715687,doi_________::0092cb1b1920d556719385a26363ecaa,05 social sciences,0502 economics and business,050211 marketing,N/A,0.394952118396759,0.0
+10.1080/03067310500248098,doi_________::00a76678d230e3f20b6356804448028f,04 agricultural and veterinary sciences,0404 agricultural biotechnology,040401 food science,04040102 Food science/Food industry,0.5,0.5
+10.1080/03067310500248098,doi_________::00a76678d230e3f20b6356804448028f,04 agricultural and veterinary sciences,0405 other agricultural sciences,040502 food science,04050202 Food science/Food industry,0.5,0.5
+10.3152/147154306781778533,doi_________::00acc520f3939e5a6675343881fed4f2,05 social sciences,0502 economics and business,050203 business & management,05020307 Innovation/Product management,0.5293408632278442,0.5326762795448303
+10.3152/147154306781778533,doi_________::00acc520f3939e5a6675343881fed4f2,05 social sciences,0509 other social sciences,050905 science studies,05090502 Social philosophy/Capitalism,0.4706590473651886,0.4673237204551697
+10.1785/0120050806,doi_________::00d5831d329e7ae4523d78bfc3042e98,02 engineering and technology,0211 other engineering and technologies,021101 geological & geomatics engineering,02110103 Concrete/Building materials,0.5343400835990906,0.3285667930180677

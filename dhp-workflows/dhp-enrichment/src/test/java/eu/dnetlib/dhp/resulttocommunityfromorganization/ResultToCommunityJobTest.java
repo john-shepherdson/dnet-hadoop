@@ -72,15 +72,13 @@ public class ResultToCommunityJobTest {
 		SparkResultToCommunityFromOrganizationJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", getClass()
-						.getResource("/eu/dnetlib/dhp/resulttocommunityfromorganization/sample")
+						.getResource("/eu/dnetlib/dhp/resulttocommunityfromorganization/sample/")
 						.getPath(),
-					"-hive_metastore_uris", "",
-					"-saveGraph", "true",
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
+
+					"-outputPath", workingDir.toString() + "/",
 					"-preparedInfoPath", preparedInfoPath
 				});
 

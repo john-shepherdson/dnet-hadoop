@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.oa.graph.raw;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -27,6 +27,15 @@ import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
+
+	private static Set<String> DC_TYPE_PUBLICATION_VERSION = new HashSet<>();
+
+	static {
+		DC_TYPE_PUBLICATION_VERSION.add("info:eu-repo/semantics/submittedVersion");
+		DC_TYPE_PUBLICATION_VERSION.add("info:eu-repo/semantics/acceptedVersion");
+		DC_TYPE_PUBLICATION_VERSION.add("info:eu-repo/semantics/publishedVersion");
+		DC_TYPE_PUBLICATION_VERSION.add("info:eu-repo/semantics/updatedVersion");
+	}
 
 	public OafToOafMapper(final VocabularyGroup vocs, final boolean invisible, final boolean shouldHashId,
 		final boolean forceOrginalId) {
@@ -140,6 +149,8 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 		final List<StructuredProperty> alternateIdentifier = prepareResultPids(doc, info);
 		final List<StructuredProperty> pid = IdentifierFactory.getPids(alternateIdentifier, collectedfrom);
 
+		instance.setInstanceTypeMapping(prepareInstanceTypeMapping(doc));
+
 		final Set<StructuredProperty> pids = new HashSet<>(pid);
 
 		instance
@@ -186,6 +197,45 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 		}
 
 		return Lists.newArrayList(instance);
+	}
+
+	/**
+	 * The Dublin Core element dc:type can be repeated, but we need to base our mapping on a single value
+	 * So this method tries to give precedence to the COAR resource type, when available. Otherwise, it looks for the
+	 * openaire's info:eu-repo type, but excluding the following
+	 *
+	 * info:eu-repo/semantics/draft
+	 * info:eu-repo/semantics/submittedVersion
+	 * info:eu-repo/semantics/acceptedVersion
+	 * info:eu-repo/semantics/publishedVersion
+	 * info:eu-repo/semantics/updatedVersion
+	 *
+	 * Then, it picks the 1st dc:type text available and, in case there is no dc:type element, as last resort it tries
+	 * to extract the type from the dr:CobjCategory element
+	 *
+	 * Examples:
+	 *
+	 *     	<dc:type>http://purl.org/coar/resource_type/c_5794</dc:type>
+	 *     	<dc:type>info:eu-repo/semantics/article</dc:type>
+	 *     	<dc:type>Conference article</dc:type>
+	 *     	<dr:CobjCategory type="publication">0006</dr:CobjCategory>
+	 *
+	 * @param doc the input document
+	 * @return the chosen resource type
+	 */
+	@Override
+	protected String findOriginalType(Document doc) {
+		final String dcType = (String) doc
+			.selectNodes("//dc:type")
+			.stream()
+			.map(o -> "" + ((Node) o).getText().trim())
+			.filter(t -> !DC_TYPE_PUBLICATION_VERSION.contains(t))
+			.sorted(new OriginalTypeComparator())
+			.findFirst()
+			.orElse(null);
+
+		final String drCobjCategory = doc.valueOf("//dr:CobjCategory/text()");
+		return ObjectUtils.firstNonNull(dcType, drCobjCategory);
 	}
 
 	@Override
@@ -292,7 +342,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected List<Oaf> addOtherResultRels(
 		final Document doc,
-		final OafEntity entity) {
+		final OafEntity entity, DataInfo info) {
 
 		final String docId = entity.getId();
 		final List<Oaf> res = new ArrayList<>();
@@ -308,11 +358,13 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 				res
 					.add(
 						getRelation(
-							docId, otherId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, entity));
+							docId, otherId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, entity.getCollectedfrom(), info,
+							entity.getLastupdatetimestamp(), null, null));
 				res
 					.add(
 						getRelation(
-							otherId, docId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, entity));
+							otherId, docId, RESULT_RESULT, RELATIONSHIP, IS_RELATED_TO, entity.getCollectedfrom(), info,
+							entity.getLastupdatetimestamp(), null, null));
 			}
 		}
 		return res;

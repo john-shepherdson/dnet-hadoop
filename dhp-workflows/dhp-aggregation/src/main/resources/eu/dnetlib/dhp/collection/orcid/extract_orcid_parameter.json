@@ -1,0 +1,21 @@
+[
+  {
+    "paramName": "n",
+    "paramLongName": "namenode",
+    "paramDescription": "the Name Node URI",
+    "paramRequired": true
+  },
+  {
+    "paramName": "t",
+    "paramLongName": "targetPath",
+    "paramDescription": "the target PATH to extract files",
+    "paramRequired": true
+  },
+  {
+    "paramName": "s",
+    "paramLongName": "sourcePath",
+    "paramDescription": "the PATH where the tar.gz files were downloaded",
+    "paramRequired": true
+  }
+
+]

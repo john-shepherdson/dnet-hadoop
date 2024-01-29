@@ -5,15 +5,12 @@ import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.structuredProperty;
 
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.validator.routines.UrlValidator;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
@@ -27,7 +24,6 @@ import eu.dnetlib.dhp.schema.common.RelationInverse;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
-import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 
 public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -144,6 +140,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		final List<StructuredProperty> alternateIdentifier = prepareResultPids(doc, info);
 		final List<StructuredProperty> pid = IdentifierFactory.getPids(alternateIdentifier, collectedfrom);
 
+		instance.setInstanceTypeMapping(prepareInstanceTypeMapping(doc));
+
 		final Set<StructuredProperty> pids = new HashSet<>(pid);
 
 		instance
@@ -220,6 +218,39 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 		} catch (Throwable t) {
 			return url;
 		}
+	}
+
+	/**
+	 * Extracts the resource type from The Datacite element
+	 *
+	 * <datacite:resourceType
+	 * 		anyURI="http://purl.org/coar/resource_type/c_6501"
+	 * 		uri="http://purl.org/coar/resource_type/c_6501"
+	 * 	    resourceTypeGeneral="Dataset">journal article</datacite:resourceType>
+	 *
+	 * @param doc the input document
+	 * @return the chosen resource type
+	 */
+	@Override
+	protected String findOriginalType(Document doc) {
+		final String resourceType = Optional
+			.ofNullable(
+				(Element) doc
+					.selectSingleNode(
+						"//*[local-name()='metadata']/*[local-name() = 'resource']/*[local-name() = 'resourceType']"))
+			.map(element -> {
+				final String resourceTypeURI = element.attributeValue("uri");
+				final String resourceTypeAnyURI = element.attributeValue("anyURI");
+				final String resourceTypeTxt = element.getText();
+				final String resourceTypeGeneral = element.attributeValue("resourceTypeGeneral");
+
+				return ObjectUtils
+					.firstNonNull(resourceTypeURI, resourceTypeAnyURI, resourceTypeTxt, resourceTypeGeneral);
+			})
+			.orElse(null);
+
+		final String drCobjCategory = doc.valueOf("//dr:CobjCategory/text()");
+		return ObjectUtils.firstNonNull(resourceType, drCobjCategory);
 	}
 
 	@Override
@@ -397,7 +428,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	@Override
 	protected List<Oaf> addOtherResultRels(
 		final Document doc,
-		final OafEntity entity) {
+		final OafEntity entity, DataInfo info) {
 
 		final String docId = entity.getId();
 
@@ -413,7 +444,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 				final String relType = ((Node) o).valueOf("@relationType");
 				String otherId = guessRelatedIdentifier(idType, originalId);
 				if (StringUtils.isNotBlank(otherId)) {
-					res.addAll(getRelations(relType, docId, otherId, entity));
+					res.addAll(getRelations(relType, docId, otherId, entity, info));
 				}
 
 			}
@@ -434,18 +465,20 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	protected List<Oaf> getRelations(final String reltype, final String entityId, final String otherId,
-		final OafEntity entity) {
+		final OafEntity entity, DataInfo info) {
 		final List<Oaf> res = new ArrayList<>();
 		RelationInverse rel = ModelSupport.findRelation(reltype);
 		if (rel != null) {
 			res
 				.add(
 					getRelation(
-						entityId, otherId, rel.getRelType(), rel.getSubReltype(), rel.getRelClass(), entity));
+						entityId, otherId, rel.getRelType(), rel.getSubReltype(), rel.getRelClass(),
+						entity.getCollectedfrom(), info, entity.getLastupdatetimestamp(), null, null));
 			res
 				.add(
 					getRelation(
-						otherId, entityId, rel.getRelType(), rel.getSubReltype(), rel.getInverseRelClass(), entity));
+						otherId, entityId, rel.getRelType(), rel.getSubReltype(), rel.getInverseRelClass(),
+						entity.getCollectedfrom(), info, entity.getLastupdatetimestamp(), null, null));
 
 		}
 		return res;

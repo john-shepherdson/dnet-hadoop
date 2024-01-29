@@ -1,4 +1,9 @@
 {
+ "ETHZ.UNIGENF": {
+  "openaire_id": "opendoar____::1400",
+  "datacite_name": "Uni Genf",
+  "official_name": "Archive ouverte UNIGE"
+ },
  "GESIS.RKI": {
   "openaire_id": "re3data_____::r3d100010436",
   "datacite_name": "Forschungsdatenzentrum  am Robert Koch Institut",

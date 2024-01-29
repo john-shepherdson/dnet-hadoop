@@ -63,7 +63,10 @@ public class Vocabulary implements Serializable {
 	}
 
 	public VocabularyTerm getTermBySynonym(final String syn) {
-		return getTerm(synonyms.get(syn.toLowerCase()));
+		return Optional
+			.ofNullable(syn)
+			.map(s -> getTerm(synonyms.get(s.toLowerCase())))
+			.orElse(null);
 	}
 
 	public Qualifier getTermAsQualifier(final String termId) {

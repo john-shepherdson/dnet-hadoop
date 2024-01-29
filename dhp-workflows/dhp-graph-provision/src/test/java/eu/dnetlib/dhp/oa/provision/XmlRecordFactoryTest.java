@@ -24,10 +24,7 @@ import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class XmlRecordFactoryTest {
 
@@ -35,7 +32,7 @@ public class XmlRecordFactoryTest {
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	@Test
-	public void testXMLRecordFactory() throws IOException, DocumentException {
+	void testXMLRecordFactory() throws IOException, DocumentException {
 
 		final ContextMapper contextMapper = new ContextMapper();
 
@@ -46,8 +43,6 @@ public class XmlRecordFactoryTest {
 			.readValue(IOUtils.toString(getClass().getResourceAsStream("publication.json")), Publication.class);
 
 		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
-
-		System.out.println(xml);
 
 		assertNotNull(xml);
 
@@ -92,6 +87,16 @@ public class XmlRecordFactoryTest {
 
 		assertEquals("EOSC::Jupyter Notebook", doc.valueOf("//*[local-name() = 'result']/eoscifguidelines/@code"));
 
+		assertEquals(2, Integer.parseInt(doc.valueOf("count(//*[local-name() = 'result']/fulltext)")));
+
+		assertEquals(
+			"https://osf.io/preprints/socarxiv/7vgtu/download",
+			doc.valueOf("//*[local-name() = 'result']/fulltext[1]"));
+
+		assertEquals("true", doc.valueOf("//*[local-name() = 'result']/isgreen/text()"));
+		assertEquals("bronze", doc.valueOf("//*[local-name() = 'result']/openaccesscolor/text()"));
+		assertEquals("true", doc.valueOf("//*[local-name() = 'result']/isindiamondjournal/text()"));
+		assertEquals("true", doc.valueOf("//*[local-name() = 'result']/publiclyfunded/text()"));
 	}
 
 	@Test
@@ -192,4 +197,51 @@ public class XmlRecordFactoryTest {
 		assertEquals("dnet:pid_types", ((Element) pids.get(0)).attribute("schemeid").getValue());
 		assertEquals("dnet:pid_types", ((Element) pids.get(0)).attribute("schemename").getValue());
 	}
+
+	@Test
+	public void testD4ScienceTraining() throws DocumentException, IOException {
+		final ContextMapper contextMapper = new ContextMapper();
+
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+			XmlConverterJob.schemaLocation);
+
+		final OtherResearchProduct p = OBJECT_MAPPER
+			.readValue(
+				IOUtils.toString(getClass().getResourceAsStream("d4science-1-training.json")),
+				OtherResearchProduct.class);
+
+		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
+
+		assertNotNull(xml);
+
+		final Document doc = new SAXReader().read(new StringReader(xml));
+
+		assertNotNull(doc);
+		System.out.println(doc.asXML());
+
+	}
+
+	@Test
+	public void testD4ScienceDataset() throws DocumentException, IOException {
+		final ContextMapper contextMapper = new ContextMapper();
+
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+			XmlConverterJob.schemaLocation);
+
+		final OtherResearchProduct p = OBJECT_MAPPER
+			.readValue(
+				IOUtils.toString(getClass().getResourceAsStream("d4science-2-dataset.json")),
+				OtherResearchProduct.class);
+
+		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
+
+		assertNotNull(xml);
+
+		final Document doc = new SAXReader().read(new StringReader(xml));
+
+		assertNotNull(doc);
+		System.out.println(doc.asXML());
+
+	}
+
 }

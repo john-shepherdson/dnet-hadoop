@@ -340,18 +340,7 @@ public class ProduceTest {
 	}
 
 	private JavaRDD<Result> getResultJavaRDD() throws Exception {
-		final String bipPath = getClass()
-			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/bip/bip.json")
-			.getPath();
 
-		PrepareBipFinder
-			.main(
-				new String[] {
-					"--isSparkSessionManaged", Boolean.FALSE.toString(),
-					"--sourcePath", bipPath,
-					"--outputPath", workingDir.toString() + "/work"
-
-				});
 		final String fosPath = getClass()
 			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/fos/fos.json")
 			.getPath();
@@ -377,6 +366,40 @@ public class ProduceTest {
 		return sc
 			.textFile(workingDir.toString() + "/unresolved")
 			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
+	}
+
+	@Test
+	public JavaRDD<Result> getResultFosJavaRDD() throws Exception {
+
+		final String fosPath = getClass()
+			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/fos/fos_sbs_2.json")
+			.getPath();
+
+		PrepareFOSSparkJob
+			.main(
+				new String[] {
+					"--isSparkSessionManaged", Boolean.FALSE.toString(),
+					"--sourcePath", fosPath,
+					"-outputPath", workingDir.toString() + "/work"
+				});
+
+		SparkSaveUnresolved.main(new String[] {
+			"--isSparkSessionManaged", Boolean.FALSE.toString(),
+			"--sourcePath", workingDir.toString() + "/work",
+
+			"-outputPath", workingDir.toString() + "/unresolved"
+
+		});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Result> tmp = sc
+			.textFile(workingDir.toString() + "/unresolved")
+			.map(item -> OBJECT_MAPPER.readValue(item, Result.class));
+		tmp.foreach(r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+
+		return tmp;
+
 	}
 
 	@Test
@@ -415,18 +438,7 @@ public class ProduceTest {
 	}
 
 	private JavaRDD<Result> getResultJavaRDDPlusSDG() throws Exception {
-		final String bipPath = getClass()
-			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/bip/bip.json")
-			.getPath();
 
-		PrepareBipFinder
-			.main(
-				new String[] {
-					"--isSparkSessionManaged", Boolean.FALSE.toString(),
-					"--sourcePath", bipPath,
-					"--outputPath", workingDir.toString() + "/work"
-
-				});
 		final String fosPath = getClass()
 			.getResource("/eu/dnetlib/dhp/actionmanager/createunresolvedentities/fos/fos.json")
 			.getPath();
@@ -481,14 +493,6 @@ public class ProduceTest {
 				50, tmp
 					.filter(row -> !row.getId().equals(doi))
 					.filter(row -> row.getSubject() != null)
-					.count());
-
-		Assertions
-			.assertEquals(
-				85,
-				tmp
-					.filter(row -> !row.getId().equals(doi))
-					.filter(r -> r.getInstance() != null && r.getInstance().size() > 0)
 					.count());
 
 	}

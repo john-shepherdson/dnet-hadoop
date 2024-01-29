@@ -129,7 +129,7 @@ public class SparkPublicationRootsTest implements Serializable {
 			.load(DedupUtility.createSimRelPath(workingPath, testActionSetId, "publication"))
 			.count();
 
-		assertEquals(74, pubs_simrel);
+		assertEquals(37, pubs_simrel);
 	}
 
 	@Test

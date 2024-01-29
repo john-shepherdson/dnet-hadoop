@@ -23,6 +23,13 @@ class CrossrefMappingTest {
   val mapper = new ObjectMapper()
 
   @Test
+  def testMissingAuthorParser():Unit = {
+    val json: String = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/doiboost/crossref/s41567-022-01757-y.json")).mkString
+    val result = Crossref2Oaf.convert(json)
+    result.filter(o => o.isInstanceOf[Publication]).map(p=> p.asInstanceOf[Publication]).foreach(p =>assertTrue(p.getAuthor.size()>0))
+  }
+
+  @Test
   def testFunderRelationshipsMapping(): Unit = {
     val template = Source
       .fromInputStream(
@@ -149,7 +156,7 @@ class CrossrefMappingTest {
     assertNotNull(relationList)
     assertFalse(relationList.isEmpty)
 
-    assertEquals(doisReference.size * 2, relationList.size)
+    assertEquals(doisReference.size, relationList.size)
 
     mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
     relationList.foreach(p => println(mapper.writeValueAsString(p)))
