@@ -1251,6 +1251,21 @@ class MappersTest {
 	}
 
 	@Test
+	void testIRISPub() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("iris-odf.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+		final Publication p = (Publication) list.get(0);
+		assertNotNull(p.getInstance().get(0).getUrl().get(0));
+		assertValidId(p.getId());
+		System.out.println(p.getInstance().get(0).getUrl());
+		p.getPid().forEach(x -> System.out.println(x.getValue()));
+		p.getInstance().get(0).getAlternateIdentifier().forEach(x -> System.out.println(x.getValue()));
+
+	}
+	@Test
 	void testNotWellFormed() throws IOException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("oaf_notwellformed.xml")));
