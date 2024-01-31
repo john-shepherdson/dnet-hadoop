@@ -25,7 +25,7 @@ case class mappingAffiliation(name: String) {}
 
 case class mappingAuthor(
   given: Option[String],
-  family: String,
+  family: Option[String],
   sequence: Option[String],
   ORCID: Option[String],
   affiliation: Option[mappingAffiliation]
@@ -226,14 +226,14 @@ case object Crossref2Oaf {
 
     //Mapping Author
     val authorList: List[mappingAuthor] =
-      (json \ "author").extractOrElse[List[mappingAuthor]](List())
+      (json \ "author").extract[List[mappingAuthor]].filter(a => a.family.isDefined)
 
     val sorted_list = authorList.sortWith((a: mappingAuthor, b: mappingAuthor) =>
       a.sequence.isDefined && a.sequence.get.equalsIgnoreCase("first")
     )
 
     result.setAuthor(sorted_list.zipWithIndex.map { case (a, index) =>
-      generateAuhtor(a.given.orNull, a.family, a.ORCID.orNull, index)
+      generateAuhtor(a.given.orNull, a.family.get, a.ORCID.orNull, index)
     }.asJava)
 
     // Mapping instance

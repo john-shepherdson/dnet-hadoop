@@ -43,6 +43,17 @@
             <arg>--graphPath</arg><arg>${graphPath}</arg>
             <arg>--master</arg><arg>yarn</arg>
         </spark>
+        <ok to="reset_outputpath"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="reset_outputpath">
+        <fs>
+            <delete path="${graphPath}/datasource"/>
+            <delete path="${graphPath}/organization"/>
+            <delete path="${graphPath}/project"/>
+            <delete path="${graphPath}/relation"/>
+        </fs>
         <ok to="copy_datasource"/>
         <error to="Kill"/>
     </action>

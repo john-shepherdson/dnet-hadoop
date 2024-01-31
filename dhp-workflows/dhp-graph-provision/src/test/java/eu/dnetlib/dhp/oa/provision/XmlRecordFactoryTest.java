@@ -244,4 +244,27 @@ public class XmlRecordFactoryTest {
 
 	}
 
+	@Test
+	public void testIrisGuidelines4() throws DocumentException, IOException {
+		final ContextMapper contextMapper = new ContextMapper();
+
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+				XmlConverterJob.schemaLocation);
+
+		final Publication p = OBJECT_MAPPER
+				.readValue(
+						IOUtils.toString(getClass().getResourceAsStream("iris-odf-4.json")),
+						Publication.class);
+
+		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
+
+		assertNotNull(xml);
+
+		final Document doc = new SAXReader().read(new StringReader(xml));
+
+		assertNotNull(doc);
+		System.out.println(doc.asXML());
+
+	}
+
 }

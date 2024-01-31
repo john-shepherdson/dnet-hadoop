@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:datacite="http://datacite.org/schema/kernel-4"
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+        xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+        xmlns:oaire="http://namespace.openaire.eu/schema/oaire/"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <oai:header xmlns="http://namespace.openaire.eu/" xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">
+        <identifier>oai:air.unimi.it:2434/907506</identifier>
+        <datestamp>2024-01-04T12:42:51Z</datestamp>
+        <setSpec>com_2434_73555</setSpec>
+        <setSpec>col_2434_73557</setSpec>
+        <setSpec>openaire</setSpec>
+        <dr:dateOfTransformation>2024-01-29T16:56:50.632Z</dr:dateOfTransformation>
+
+        <dri:objIdentifier>od______1261::ff2d9e058e7bea90a27f41c31078e601</dri:objIdentifier>
+        <dri:recordIdentifier>oai:air.unimi.it:2434/907506</dri:recordIdentifier>
+        <dri:dateOfCollection/>
+        <dri:mdFormat/>
+        <dri:mdFormatInterpretation/>
+        <dri:repositoryId/>
+        <oaf:datasourceprefix> od______1261</oaf:datasourceprefix>
+    </oai:header>
+    <metadata>
+        <oaire:resource xmlns:oaire="http://namespace.openaire.eu/schema/oaire/"
+                        xmlns:exslt="http://exslt.org/common"
+                        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                        xmlns:rdf="http://www.w3.org/TR/rdf-concepts/"
+                        xmlns:doc="http://www.lyncode.com/xoai"
+                        xmlns:dc="http://purl.org/dc/elements/1.1/"
+                        xmlns:datacite="http://datacite.org/schema/kernel-4"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+                        xmlns="http://www.openarchives.org/OAI/2.0/"
+                        xsi:schemaLocation="http://namespace.openaire.eu/schema/oaire/ https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd">
+            <datacite:titles>
+                <datacite:title xml:lang="en">Ensuring tests of conservation interventions build on existing literature</datacite:title>
+            </datacite:titles>
+            <datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>W.J. Sutherland</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>S.T. Alvarez-Castaneda</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>T. Amano</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>R. Ambrosini</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>P. Atkinson</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>J.M. Baxter</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>A.L. Bond</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>P.J. Boon</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>K.L. Buchanan</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>J. Barlow</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>G. Bogliani</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>O.M. Bragg</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>M. Burgman</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>M.W. Cadotte</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>M. Calver</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>S.J. Cooke</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>R.T. Corlett</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>V. Devictor</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>J.G. Ewen</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>M. Fisher</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>G. Freeman</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>E. Game</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>B.J. Godley</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>C. Gortazar</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>I.R. Hartley</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>D.L. Hawksworth</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>K.A. Hobson</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>M.-. Lu</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>B. Martin-Lopez</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>K. Ma</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>A. Machado</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>D. Mae</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>M. Mangiacotti</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>D.J. Mccafferty</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>V. Melfi</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>S. Molur</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>A.J. Moore</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>S.D. Murphy</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>D. Norri</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>A.P.E. van Oudenhoven</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>J. Power</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>E.C. Ree</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>M.W. Schwartz</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>I. Storch</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>C. Wordley</datacite:creatorName>
+                </datacite:creator>
+            </datacite:creator>
+            <datacite:relatedIdentifiers>
+            </datacite:relatedIdentifiers>
+            <datacite:dates>
+                <datacite:date dateType="Accepted">2020</datacite:date>
+                <datacite:date dateType="Issued">2020</datacite:date>
+                <datacite:date dateType="Available">2022-06-20</datacite:date>
+            </datacite:dates>
+            <dc:language>eng</dc:language>
+            <dc:publisher>Wiley Blackwell Publishing</dc:publisher>
+            <oaire:resourceType resourceTypeGeneral="literature"
+                                uri="http://purl.org/coar/resource_type/c_6501">journal article</oaire:resourceType>
+            <dc:format>application/pdf</dc:format>
+            <datacite:identifier xmlns:datacite="http://datacite.org/schema/kernel-3"
+                                 identifierType="Handle">2434/907506</datacite:identifier>
+            <datacite:rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</datacite:rights>
+            <datacite:subjects>
+                <datacite:subject>Conservation of Natural Resources</datacite:subject>
+            </datacite:subjects>
+            <datacite:sizes/>
+            <datacite:sizes/>
+            <datacite:sizes>
+                <datacite:size>191802 bytes</datacite:size>
+            </datacite:sizes>
+            <oaire:file accessRightsURI="" mimeType="application/pdf" objectType="fulltext">https://air.unimi.it/bitstream/2434/907506/4/Full%20manuscript%20resubmitted.pdf</oaire:file>
+        </oaire:resource>
+        <oaf:identifier identifierType="DOI">10.1111/cobi.13555</oaf:identifier>
+        <oaf:identifier identifierType="PMID">32779884</oaf:identifier>
+        <oaf:fulltext>https://air.unimi.it/bitstream/2434/907506/4/Full%20manuscript%20resubmitted.pdf</oaf:fulltext>
+        <dr:CobjCategory type="publication">0001</dr:CobjCategory>
+        <oaf:dateAccepted>2020-01-01</oaf:dateAccepted>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:language>eng</oaf:language>
+        <oaf:hostedBy name="Archivio Istituzionale della Ricerca dell'Università degli Studi di Milano"
+                      id="opendoar____::1261"/>
+        <oaf:collectedFrom name="Archivio Istituzionale della Ricerca dell'Università degli Studi di Milano"
+                           id="opendoar____::1261"/>
+    </metadata>
+</record>

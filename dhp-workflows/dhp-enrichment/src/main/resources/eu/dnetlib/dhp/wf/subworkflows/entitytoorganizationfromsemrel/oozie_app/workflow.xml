@@ -4,7 +4,10 @@
             <name>sourcePath</name>
             <description>the source path</description>
         </property>
-
+        <property>
+            <name>startFrom</name>
+            <value>undelete</value>
+        </property>
     </parameters>
 
     <global>
@@ -18,7 +21,15 @@
         </configuration>
     </global>
 
-    <start to="reset_outputpath"/>
+    <start to="startFrom"/>
+
+    <decision name="startFrom">
+        <switch>
+            <case to="prepare_info">${wf:conf('startFrom') eq 'undelete'}</case>
+
+            <default to="reset_outputpath"/>
+        </switch>
+    </decision>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
