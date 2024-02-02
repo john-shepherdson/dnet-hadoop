@@ -4,10 +4,10 @@
 
 <!--    <Appenders>-->
         <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>logs/ContinuousValidator.log</file>
+            <file>logs/ContinuousValidation.log</file>
 
             <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
-                <fileNamePattern>logs/ContinuousValidator.%i.log.zip</fileNamePattern>
+                <fileNamePattern>logs/ContinuousValidation.%i.log.zip</fileNamePattern>
                 <minIndex>1</minIndex>
                 <maxIndex>10</maxIndex>
             </rollingPolicy>
@@ -33,8 +33,7 @@
             <appender-ref ref="Console" />
         </root>
 
-        <!-- TODO - Change the level below to "debug" -->
-        <logger name="eu.dnetlib.dhp.continuous_validator" level="trace"/>
+        <logger name="eu.dnetlib.dhp.continuous_validation" level="debug"/>
         <logger name="eu.dnetlib.validator2" level="error"/>
         <logger name="org.sparkproject" level="info"/>
         <logger name="org.apache.spark" level="info"/>

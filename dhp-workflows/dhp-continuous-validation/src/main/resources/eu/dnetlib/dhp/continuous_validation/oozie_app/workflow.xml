@@ -1,7 +1,7 @@
 <workflow-app name="Validate metadata records against OpenAIRE Guidelines" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>parquet_file_path</name>
+            <name>parquet_path</name>
             <value>/var/lib/dnet/mdstore_PROD/md-7763c517-538d-4aa7-83f8-6096b3ce0d96/md-7763c517-538d-4aa7-83f8-6096b3ce0d96-1702622132535/store</value>
             <description>the full path of a parquet-file or a directory with parquet files, to be processed</description>
         </property>
@@ -11,8 +11,8 @@
             <description>the version of the OpenAIRE Guidelines to validate the records against</description>
         </property>
         <property>
-            <name>outputPath</name>
-            <value>/user/lsmyrnaios/continuous_validator/output</value>
+            <name>output_path</name>
+            <value>/user/${dhp.hadoop.frontend.user.name}/continuous_validation/output</value>
             <description>the path of the output-directory where the result-json-files will be stored</description>
         </property>
         <property>
@@ -89,7 +89,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Validate multiple records against OpenAIRE Guidelines</name>
-            <class>eu.dnetlib.dhp.continuous_validator.ContinuousValidator</class>
+            <class>eu.dnetlib.dhp.continuous_validation.ContinuousValidation</class>
             <jar>dhp-continuous-validation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -103,9 +103,9 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <!-- Arguments passed to the "main" method of the class defined above. -->
-            <arg>--parquet_file_path</arg><arg>${parquet_file_path}</arg>
+            <arg>--parquet_path</arg><arg>${parquet_path}</arg>
             <arg>--openaire_guidelines</arg><arg>${openaire_guidelines}</arg>
-            <arg>--outputPath</arg><arg>${outputPath}</arg>
+            <arg>--output_path</arg><arg>${output_path}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

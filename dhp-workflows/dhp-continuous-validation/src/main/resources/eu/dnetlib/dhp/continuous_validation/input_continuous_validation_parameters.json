@@ -7,7 +7,7 @@
   },
   {
     "paramName": "prq_file",
-    "paramLongName": "parquet_file_path",
+    "paramLongName": "parquet_path",
     "paramDescription": "the full path of a parquet-file or a directory with parquet files, to be processed",
     "paramRequired": true
   },
@@ -19,7 +19,7 @@
   },
   {
     "paramName": "o",
-    "paramLongName": "outputPath",
+    "paramLongName": "output_path",
     "paramDescription": "the path of the output-directory where the result-json-files will be stored",
     "paramRequired": true
   }

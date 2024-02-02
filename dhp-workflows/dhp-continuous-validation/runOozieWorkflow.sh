@@ -7,7 +7,7 @@ CHOSEN_MAVEN_PROFILE=${DEFAULT_PROFILE}
 
 # Build and deploy this module.
 mvn clean package -U ${CHOSEN_MAVEN_PROFILE} -Poozie-package,deploy,run \
-      -Dworkflow.source.dir=eu/dnetlib/dhp/continuous_validator
+      -Dworkflow.source.dir=eu/dnetlib/dhp/continuous_validation
 
 # Show the Oozie-job-ID.
 echo -e "\n\nShowing the contents of \"extract-and-run-on-remote-host.log\":\n"

@@ -37,12 +37,6 @@
             <artifactId>spark-sql_${scala.binary.version}</artifactId>
         </dependency>
 
-        <!-- Other dependencies. -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-        </dependency>
-
     </dependencies>
 
 </project>
