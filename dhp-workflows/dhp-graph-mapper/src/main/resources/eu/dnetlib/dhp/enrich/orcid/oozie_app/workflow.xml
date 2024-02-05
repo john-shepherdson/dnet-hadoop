@@ -49,10 +49,10 @@
 
     <action name="reset_outputpath">
         <fs>
-            <delete path="${graphPath}/datasource"/>
-            <delete path="${graphPath}/organization"/>
-            <delete path="${graphPath}/project"/>
-            <delete path="${graphPath}/relation"/>
+            <delete path="${targetPath}/datasource"/>
+            <delete path="${targetPath}/organization"/>
+            <delete path="${targetPath}/project"/>
+            <delete path="${targetPath}/relation"/>
         </fs>
         <ok to="copy_datasource"/>
         <error to="Kill"/>
