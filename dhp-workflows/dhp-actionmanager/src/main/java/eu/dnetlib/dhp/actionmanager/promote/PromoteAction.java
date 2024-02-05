@@ -29,7 +29,7 @@ public class PromoteAction {
 	public static String joinTypeForStrategy(PromoteAction.Strategy strategy) {
 		switch (strategy) {
 			case ENRICH:
-				return "join";
+				return "left_outer";
 			case UPSERT:
 				return "full_outer";
 			default:
