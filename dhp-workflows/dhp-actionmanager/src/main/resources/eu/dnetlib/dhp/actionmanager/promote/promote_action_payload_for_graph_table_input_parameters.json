@@ -42,6 +42,12 @@
     "paramRequired": true
   },
   {
+    "paramName": "pas",
+    "paramLongName": "promoteActionStrategy",
+    "paramDescription": "strategy for promoting the actionset contents into the graph tables, ENRICH or UPSERT (default)",
+    "paramRequired": false
+  },
+  {
     "paramName": "sgid",
     "paramLongName": "shouldGroupById",
     "paramDescription": "indicates whether the promotion operation should group objects in the graph by id or not",

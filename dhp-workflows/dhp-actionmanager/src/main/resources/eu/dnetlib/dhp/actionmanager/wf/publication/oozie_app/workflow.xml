@@ -115,6 +115,7 @@
             <arg>--actionPayloadClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputGraphTablePath</arg><arg>${workingDir}/publication</arg>
             <arg>--mergeAndGetStrategy</arg><arg>${mergeAndGetStrategy}</arg>
+            <arg>--promoteActionStrategy</arg><arg>${promoteActionStrategy}</arg>
             <arg>--shouldGroupById</arg><arg>${shouldGroupById}</arg>
         </spark>
         <ok to="DecisionPromoteResultActionPayloadForPublicationTable"/>
@@ -167,6 +168,7 @@
             <arg>--actionPayloadClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Result</arg>
             <arg>--outputGraphTablePath</arg><arg>${outputGraphRootPath}/publication</arg>
             <arg>--mergeAndGetStrategy</arg><arg>${mergeAndGetStrategy}</arg>
+            <arg>--promoteActionStrategy</arg><arg>${promoteActionStrategy}</arg>
             <arg>--shouldGroupById</arg><arg>${shouldGroupById}</arg>
         </spark>
         <ok to="End"/>

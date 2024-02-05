@@ -106,6 +106,7 @@
             <arg>--actionPayloadClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
             <arg>--outputGraphTablePath</arg><arg>${outputGraphRootPath}/project</arg>
             <arg>--mergeAndGetStrategy</arg><arg>${mergeAndGetStrategy}</arg>
+            <arg>--promoteActionStrategy</arg><arg>${promoteActionStrategy}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
