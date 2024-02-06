@@ -5,9 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.io.InputStream;
 import java.util.Iterator;
 
+import org.dom4j.Element;
 import org.junit.jupiter.api.Test;
-
-import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 
 public class BaseCollectorIteratorTest {
 
@@ -16,10 +15,10 @@ public class BaseCollectorIteratorTest {
 		long count = 0;
 
 		try (final InputStream is = getClass().getResourceAsStream("base-sample.tar")) {
-			final Iterator<String> iterator = new BaseCollectorIterator(is, new AggregatorReport());
+			final Iterator<Element> iterator = new BaseCollectorIterator(is);
 			while (iterator.hasNext()) {
-				final String record = iterator.next();
-				System.out.println(record);
+				final Element record = iterator.next();
+				System.out.println(record.asXML());
 				count++;
 			}
 		}
