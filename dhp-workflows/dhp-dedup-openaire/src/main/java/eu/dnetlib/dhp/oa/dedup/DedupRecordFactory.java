@@ -122,20 +122,39 @@ public class DedupRecordFactory {
 				}
 
 				return Stream
-					.concat(Stream.of(agg.getDedupId()), agg.aliases.stream())
-					.map(id -> {
-						try {
-							OafEntity res = (OafEntity) BeanUtils.cloneBean(agg.entity);
-							res.setId(id);
-							res.setDataInfo(dataInfo);
-							res.setLastupdatetimestamp(ts);
-							return res;
-						} catch (Exception e) {
-							throw new RuntimeException(e);
-						}
-					})
+					.concat(
+						Stream
+							.of(agg.getDedupId())
+							.map(id -> createDedupOafEntity(id, agg.entity, dataInfo, ts)),
+						agg.aliases
+							.stream()
+							.map(id -> createMergedDedupAliasOafEntity(id, agg.entity, dataInfo, ts)))
 					.iterator();
 			}, beanEncoder);
+	}
+
+	private static OafEntity createDedupOafEntity(String id, OafEntity base, DataInfo dataInfo, long ts) {
+		try {
+			OafEntity res = (OafEntity) BeanUtils.cloneBean(base);
+			res.setId(id);
+			res.setDataInfo(dataInfo);
+			res.setLastupdatetimestamp(ts);
+			return res;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static OafEntity createMergedDedupAliasOafEntity(String id, OafEntity base, DataInfo dataInfo, long ts) {
+		try {
+			OafEntity res = createDedupOafEntity(id, base, dataInfo, ts);
+			DataInfo ds = (DataInfo) BeanUtils.cloneBean(dataInfo);
+			ds.setDeletedbyinference(true);
+			res.setDataInfo(ds);
+			return res;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private static OafEntity reduceEntity(OafEntity entity, OafEntity duplicate) {
