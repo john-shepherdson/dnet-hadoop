@@ -1,7 +1,6 @@
 package eu.dnetlib.dhp.collection.plugin.base;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.Optional;
@@ -52,16 +51,11 @@ public class BaseCollectorPlugin implements CollectorPlugin {
 			throw new CollectorException(e);
 		}
 
-		try (InputStream is = this.fs.open(filePath)) {
-			final Iterator<Element> iterator = new BaseCollectorIterator(is);
-			final Spliterator<Element> spliterator = Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED);
-			return StreamSupport.stream(spliterator, false)
-					.filter(elem -> filterXml(elem, report))
-					.map(elem -> xmlToString(report, elem));
-		} catch (final Throwable e) {
-			report.put(e.getClass().getName(), e.getMessage());
-			throw new CollectorException(e);
-		}
+		final Iterator<Element> iterator = new BaseCollectorIterator(this.fs, filePath, report);
+		final Spliterator<Element> spliterator = Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED);
+		return StreamSupport.stream(spliterator, false)
+				.filter(elem -> filterXml(elem, report))
+				.map(elem -> xmlToString(report, elem));
 	}
 
 	private boolean filterXml(final Element elem, final AggregatorReport report) {
