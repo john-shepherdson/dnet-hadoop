@@ -27,7 +27,7 @@ public class BaseCollectorIterator implements Iterator<Element> {
 
 	private Object nextElement;
 
-	private final BlockingQueue<Object> queue = new LinkedBlockingQueue<>();
+	private final BlockingQueue<Object> queue = new LinkedBlockingQueue<>(20);
 
 	private static final Logger log = LoggerFactory.getLogger(BaseCollectorIterator.class);
 
@@ -78,8 +78,6 @@ public class BaseCollectorIterator implements Iterator<Element> {
 			log.error("Error processing BASE records", e);
 			report.put(e.getClass().getName(), e.getMessage());
 			throw new RuntimeException("Error processing BASE records", e);
-		} finally {
-			this.queue.add("__END__"); // I ADD A NOT ELEMENT OBJECT TO INDICATE THE END OF THE QUEUE
 		}
 	}
 
@@ -91,8 +89,6 @@ public class BaseCollectorIterator implements Iterator<Element> {
 			log.error("Error processing BASE records", e);
 			report.put(e.getClass().getName(), e.getMessage());
 			throw new RuntimeException("Error processing BASE records", e);
-		} finally {
-			this.queue.add("__END__"); // I ADD A NOT ELEMENT OBJECT TO INDICATE THE END OF THE QUEUE
 		}
 	}
 
@@ -119,13 +115,16 @@ public class BaseCollectorIterator implements Iterator<Element> {
 
 					for (final Object o : doc.selectNodes("//*[local-name()='ListRecords']/*[local-name()='record']")) {
 						if (o instanceof Element) {
-							this.queue.add(o);
+							this.queue.put(((Element) o).detach());
 							count++;
 						}
 					}
 				}
 			}
 		}
+
+		this.queue.put("__END__"); // I ADD A NOT ELEMENT OBJECT TO INDICATE THE END OF THE QUEUE
+
 		log.info("Total records (written in queue): " + count);
 	}
 
