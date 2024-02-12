@@ -11,6 +11,6 @@ public interface ClusteringFunction {
 
 	public Collection<String> apply(Config config, List<String> fields);
 
-	public Map<String, Integer> getParams();
+	public Map<String, Object> getParams();
 
 }

@@ -62,8 +62,8 @@ public class XmlConverterJob {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		final String isLookupUrl = parser.get("isLookupUrl");
-		log.info("isLookupUrl: {}", isLookupUrl);
+		final String contextApiBaseUrl = parser.get("contextApiBaseUrl");
+		log.info("contextApiBaseUrl: {}", contextApiBaseUrl);
 
 		final SparkConf conf = new SparkConf();
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
@@ -71,7 +71,7 @@ public class XmlConverterJob {
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 			removeOutputDir(spark, outputPath);
-			convertToXml(spark, inputPath, outputPath, ContextMapper.fromIS(isLookupUrl));
+			convertToXml(spark, inputPath, outputPath, ContextMapper.fromAPI(contextApiBaseUrl));
 		});
 	}
 

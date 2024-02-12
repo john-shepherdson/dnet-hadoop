@@ -8,7 +8,7 @@ import eu.dnetlib.pace.config.Config;
 
 public class RandomClusteringFunction extends AbstractClusteringFunction {
 
-	public RandomClusteringFunction(Map<String, Integer> params) {
+	public RandomClusteringFunction(Map<String, Object> params) {
 		super(params);
 	}
 

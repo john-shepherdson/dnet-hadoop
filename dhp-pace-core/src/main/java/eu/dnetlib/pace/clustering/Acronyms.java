@@ -13,7 +13,7 @@ import eu.dnetlib.pace.config.Config;
 @ClusteringClass("acronyms")
 public class Acronyms extends AbstractClusteringFunction {
 
-	public Acronyms(Map<String, Integer> params) {
+	public Acronyms(Map<String, Object> params) {
 		super(params);
 	}
 

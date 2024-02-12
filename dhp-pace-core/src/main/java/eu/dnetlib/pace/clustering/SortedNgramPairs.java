@@ -1,7 +1,10 @@
 
 package eu.dnetlib.pace.clustering;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -12,7 +15,7 @@ import eu.dnetlib.pace.config.Config;
 @ClusteringClass("sortedngrampairs")
 public class SortedNgramPairs extends NgramPairs {
 
-	public SortedNgramPairs(Map<String, Integer> params) {
+	public SortedNgramPairs(Map<String, Object> params) {
 		super(params, false);
 	}
 
