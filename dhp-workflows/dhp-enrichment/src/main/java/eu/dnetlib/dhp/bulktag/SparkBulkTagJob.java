@@ -5,7 +5,14 @@ import static eu.dnetlib.dhp.PropagationConstant.removeOutputDir;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.api.model.CommunityEntityMap;
+import eu.dnetlib.dhp.api.model.EntityCommunities;
+import eu.dnetlib.dhp.api.model.DatasourceCommunitiesList;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Context;
+import eu.dnetlib.dhp.schema.oaf.Project;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
@@ -23,11 +30,11 @@ import com.google.gson.Gson;
 import eu.dnetlib.dhp.api.Utils;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.bulktag.community.*;
-import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import scala.Tuple2;
 
 public class SparkBulkTagJob {
 
@@ -89,8 +96,79 @@ public class SparkBulkTagJob {
 			spark -> {
 				extendCommunityConfigurationForEOSC(spark, inputPath, cc);
 				execBulkTag(spark, inputPath, outputPath, protoMappingParams, cc);
+				execDatasourceTag(spark, inputPath, outputPath, Utils.getDatasourceCommunities(baseURL));
+				execProjectTag(spark, inputPath, outputPath, Utils.getCommunityProjects(baseURL));
 			});
 	}
+
+	private static void execProjectTag(SparkSession spark, String inputPath, String outputPath, CommunityEntityMap communityProjects) {
+		Dataset<Project> projects = readPath(spark, inputPath + "project", Project.class);
+		Dataset<EntityCommunities> pc = spark.createDataset(communityProjects.keySet().stream().map(k -> EntityCommunities.newInstance(k, communityProjects.get(k))).collect(Collectors.toList()), Encoders.bean(EntityCommunities.class));
+
+		projects.joinWith(pc, projects.col("id").equalTo(pc.col("entityId")), "left")
+				.map((MapFunction<Tuple2<Project, EntityCommunities>, Project>) t2 -> {
+					Project ds = t2._1();
+					if (t2._2() != null){
+						List<String> context = ds.getContext().stream().map(c -> c.getId()).collect(Collectors.toList());
+						t2._2().getCommunitiesId().forEach(c -> {
+							if(!context.contains(c)){
+								Context con = new Context();
+								con.setId(c);
+								con.setDataInfo(Arrays.asList(OafMapperUtils.dataInfo(false,TaggingConstants.BULKTAG_DATA_INFO_TYPE, true, false,
+										OafMapperUtils.qualifier(TaggingConstants.CLASS_ID_DATASOURCE, TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE, ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS), "1")));
+								ds.getContext().add(con)
+							}
+						});
+					}
+					return ds;
+				} ,Encoders.bean(Project.class))
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression","gzip")
+				.json(outputPath + "project");
+
+		readPath(spark, outputPath + "project", Datasource.class)
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression","gzip")
+				.json(inputPath + "project");
+	}
+
+
+	private static void execDatasourceTag(SparkSession spark, String inputPath, String outputPath, List<EntityCommunities> datasourceCommunities) {
+		Dataset<Datasource> datasource = readPath(spark, inputPath + "datasource", Datasource.class);
+
+		Dataset<EntityCommunities> dc = spark.createDataset(datasourceCommunities, Encoders.bean(EntityCommunities.class));
+		
+		datasource.joinWith(dc, datasource.col("id").equalTo(dc.col("entityId")), "left")
+				.map((MapFunction<Tuple2<Datasource, EntityCommunities>, Datasource>) t2 -> {
+					Datasource ds = t2._1();
+					if (t2._2() != null){
+						List<String> context = ds.getContext().stream().map(c -> c.getId()).collect(Collectors.toList());
+						t2._2().getCommunitiesId().forEach(c -> {
+							if(!context.contains(c)){
+								Context con = new Context();
+								con.setId(c);
+								con.setDataInfo(Arrays.asList(OafMapperUtils.dataInfo(false,TaggingConstants.BULKTAG_DATA_INFO_TYPE, true, false,
+										OafMapperUtils.qualifier(TaggingConstants.CLASS_ID_DATASOURCE, TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE, ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS), "1")));
+								ds.getContext().add(con)
+							}
+						});
+					}
+					return ds;
+				} ,Encoders.bean(Datasource.class))
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression","gzip")
+				.json(outputPath + "datasource");
+		
+		readPath(spark, outputPath + "datasource", Datasource.class)
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression","gzip")
+				.json(inputPath + "datasource");
+	}
+
 
 	private static void extendCommunityConfigurationForEOSC(SparkSession spark, String inputPath,
 		CommunityConfiguration cc) {
@@ -182,4 +260,6 @@ public class SparkBulkTagJob {
 		};
 	}
 
+
 }
+
