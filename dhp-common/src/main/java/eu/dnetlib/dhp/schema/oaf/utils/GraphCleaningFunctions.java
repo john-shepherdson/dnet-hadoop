@@ -312,7 +312,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		}
 
 		if (value instanceof Datasource) {
-			// nothing to evaluate here
+			final Datasource d = (Datasource) value;
+			return Objects.nonNull(d.getOfficialname()) && StringUtils.isNotBlank(d.getOfficialname().getValue());
 		} else if (value instanceof Project) {
 			final Project p = (Project) value;
 			return Objects.nonNull(p.getCode()) && StringUtils.isNotBlank(p.getCode().getValue());

@@ -8,10 +8,13 @@ import java.io.InputStream;
 import java.net.*;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.http.HttpHeaders;
+import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,14 +97,16 @@ public class HttpConnector2 {
 			throw new CollectorException(msg);
 		}
 
-		log.info("Request attempt {} [{}]", retryNumber, requestUrl);
-
 		InputStream input = null;
 
+		long start = System.currentTimeMillis();
 		try {
 			if (getClientParams().getRequestDelay() > 0) {
 				backoffAndSleep(getClientParams().getRequestDelay());
 			}
+
+			log.info("Request attempt {} [{}]", retryNumber, requestUrl);
+
 			final HttpURLConnection urlConn = (HttpURLConnection) new URL(requestUrl).openConnection();
 			urlConn.setInstanceFollowRedirects(false);
 			urlConn.setReadTimeout(getClientParams().getReadTimeOut() * 1000);
@@ -115,9 +120,8 @@ public class HttpConnector2 {
 					urlConn.addRequestProperty(headerEntry.getKey(), headerEntry.getValue());
 				}
 			}
-			if (log.isDebugEnabled()) {
-				logHeaderFields(urlConn);
-			}
+
+			logHeaderFields(urlConn);
 
 			int retryAfter = obtainRetryAfter(urlConn.getHeaderFields());
 			String rateLimit = urlConn.getHeaderField(Constants.HTTPHEADER_IETF_DRAFT_RATELIMIT_LIMIT);
@@ -132,9 +136,7 @@ public class HttpConnector2 {
 			}
 
 			if (is2xx(urlConn.getResponseCode())) {
-				input = urlConn.getInputStream();
-				responseType = urlConn.getContentType();
-				return input;
+				return getInputStream(urlConn, start);
 			}
 			if (is3xx(urlConn.getResponseCode())) {
 				// REDIRECTS
@@ -144,6 +146,7 @@ public class HttpConnector2 {
 					.put(
 						REPORT_PREFIX + urlConn.getResponseCode(),
 						String.format("Moved to: %s", newUrl));
+				logRequestTime(start);
 				urlConn.disconnect();
 				if (retryAfter > 0) {
 					backoffAndSleep(retryAfter);
@@ -159,26 +162,50 @@ public class HttpConnector2 {
 						if (retryAfter > 0) {
 							log
 								.warn(
-									"{} - waiting and repeating request after suggested retry-after {} sec.",
-									requestUrl, retryAfter);
+									"waiting and repeating request after suggested retry-after {} sec for URL {}",
+									retryAfter, requestUrl);
 							backoffAndSleep(retryAfter * 1000);
 						} else {
 							log
 								.warn(
-									"{} - waiting and repeating request after default delay of {} sec.",
-									requestUrl, getClientParams().getRetryDelay());
-							backoffAndSleep(retryNumber * getClientParams().getRetryDelay() * 1000);
+									"waiting and repeating request after default delay of {} sec for URL {}",
+									getClientParams().getRetryDelay(), requestUrl);
+							backoffAndSleep(retryNumber * getClientParams().getRetryDelay());
 						}
 						report.put(REPORT_PREFIX + urlConn.getResponseCode(), requestUrl);
+
+						logRequestTime(start);
+
 						urlConn.disconnect();
+
 						return attemptDownload(requestUrl, retryNumber + 1, report);
+					case 422: // UNPROCESSABLE ENTITY
+						report.put(REPORT_PREFIX + urlConn.getResponseCode(), requestUrl);
+						log.warn("waiting and repeating request after 10 sec for URL {}", requestUrl);
+						backoffAndSleep(10000);
+						urlConn.disconnect();
+						logRequestTime(start);
+						try {
+							return getInputStream(urlConn, start);
+						} catch (IOException e) {
+							log
+								.error(
+									"server returned 422 and got IOException accessing the response body from URL {}",
+									requestUrl);
+							log.error("IOException:", e);
+							return attemptDownload(requestUrl, retryNumber + 1, report);
+						}
 					default:
+						log.error("gor error {} from URL: {}", urlConn.getResponseCode(), urlConn.getURL());
+						log.error("response message: {}", urlConn.getResponseMessage());
 						report
 							.put(
 								REPORT_PREFIX + urlConn.getResponseCode(),
 								String
 									.format(
 										"%s Error: %s", requestUrl, urlConn.getResponseMessage()));
+						logRequestTime(start);
+						urlConn.disconnect();
 						throw new CollectorException(urlConn.getResponseCode() + " error " + report);
 				}
 			}
@@ -199,13 +226,27 @@ public class HttpConnector2 {
 		}
 	}
 
+	private InputStream getInputStream(HttpURLConnection urlConn, long start) throws IOException {
+		InputStream input = urlConn.getInputStream();
+		responseType = urlConn.getContentType();
+		logRequestTime(start);
+		return input;
+	}
+
+	private static void logRequestTime(long start) {
+		log
+			.info(
+				"request time elapsed: {}sec",
+				TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - start));
+	}
+
 	private void logHeaderFields(final HttpURLConnection urlConn) throws IOException {
-		log.debug("StatusCode: {}", urlConn.getResponseMessage());
+		log.info("Response: {} - {}", urlConn.getResponseCode(), urlConn.getResponseMessage());
 
 		for (Map.Entry<String, List<String>> e : urlConn.getHeaderFields().entrySet()) {
 			if (e.getKey() != null) {
 				for (String v : e.getValue()) {
-					log.debug("  key: {} - value: {}", e.getKey(), v);
+					log.info("  key: {} - value: {}", e.getKey(), v);
 				}
 			}
 		}
@@ -225,7 +266,7 @@ public class HttpConnector2 {
 		for (String key : headerMap.keySet()) {
 			if ((key != null) && key.equalsIgnoreCase(HttpHeaders.RETRY_AFTER) && (!headerMap.get(key).isEmpty())
 				&& NumberUtils.isCreatable(headerMap.get(key).get(0))) {
-				return Integer.parseInt(headerMap.get(key).get(0)) + 10;
+				return Integer.parseInt(headerMap.get(key).get(0));
 			}
 		}
 		return -1;
