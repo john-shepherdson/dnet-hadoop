@@ -15,6 +15,15 @@ public class TransformativeAgreementModel implements Serializable {
 	private String institution;
 	private String doi;
 	private String agreement;
+	private String country;
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
 
 	public String getInstitution() {
 		return institution;

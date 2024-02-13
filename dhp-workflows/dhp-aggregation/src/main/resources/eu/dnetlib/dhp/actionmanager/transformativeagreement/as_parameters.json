@@ -16,11 +16,5 @@
     "paramLongName": "isSparkSessionManaged",
     "paramDescription": "the hdfs name node",
     "paramRequired": false
-  },
-  {
-    "paramName": "sdr",
-    "paramLongName": "shouldDuplicateRels",
-    "paramDescription": "activates/deactivates the construction of bidirectional relations Cites/IsCitedBy",
-    "paramRequired": false
   }
 ]

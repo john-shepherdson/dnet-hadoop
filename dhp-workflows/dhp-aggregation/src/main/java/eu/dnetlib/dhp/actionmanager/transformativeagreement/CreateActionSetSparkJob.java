@@ -13,7 +13,6 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.MapFunction;
@@ -24,12 +23,13 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.opencitations.model.COCI;
 import eu.dnetlib.dhp.actionmanager.transformativeagreement.model.TransformativeAgreementModel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Country;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.*;
 import scala.Tuple2;
 
@@ -72,11 +72,11 @@ public class CreateActionSetSparkJob implements Serializable {
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
-			spark -> getRelations(spark, inputPath, outputPath));
+			spark -> createActionSet(spark, inputPath, outputPath));
 
 	}
 
-	private static void getRelations(SparkSession spark, String inputPath, String outputPath) {
+	private static void createActionSet(SparkSession spark, String inputPath, String outputPath) {
 		spark
 			.read()
 			.textFile(inputPath)
@@ -92,28 +92,73 @@ public class CreateActionSetSparkJob implements Serializable {
 			.filter((FilterFunction<Relation>) Objects::nonNull)
 			.toJavaRDD()
 			.map(p -> new AtomicAction(p.getClass(), p))
+			.union(
+				spark
+					.read()
+					.textFile(inputPath)
+					.map(
+						(MapFunction<String, TransformativeAgreementModel>) value -> OBJECT_MAPPER
+							.readValue(value, TransformativeAgreementModel.class),
+						Encoders.bean(TransformativeAgreementModel.class))
+					.map(
+						(MapFunction<TransformativeAgreementModel, Result>) value -> createResult(
+							value),
+						Encoders.bean(Result.class))
+					.filter((FilterFunction<Result>) r -> r != null)
+					.toJavaRDD()
+					.map(p -> new AtomicAction(p.getClass(), p)))
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
-			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
+			.saveAsHadoopFile(
+				outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
+
+	}
+
+	private static Result createResult(TransformativeAgreementModel value) {
+		Result r = new Result();
+		r
+			.setId(
+				"50|doi_________::"
+					+ IdentifierFactory
+						.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), value.getDoi())));
+		r.setTransformativeAgreement(value.getAgreement());
+		Country country = new Country();
+		country.setClassid(value.getCountry());
+		country.setClassname(value.getCountry());
+		country
+			.setDataInfo(
+				OafMapperUtils
+					.dataInfo(
+						false, ModelConstants.SYSIMPORT_ACTIONSET, false, false,
+						OafMapperUtils
+							.qualifier(
+								"openapc::transformativeagreement",
+								"Harvested from Trnasformative Agreement file from OpenAPC",
+								ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS),
+						"0.9"));
+		country.setSchemeid(ModelConstants.DNET_COUNTRY_TYPE);
+		country.setSchemename(ModelConstants.DNET_COUNTRY_TYPE);
+		r.setCountry(Arrays.asList(country));
+		return r;
 	}
 
 	private static List<Relation> createRelation(TransformativeAgreementModel value) {
 
 		List<Relation> relationList = new ArrayList<>();
 
-		if(value.getAgreement().startsWith("IReL")) {
+		if (value.getAgreement().startsWith("IReL")) {
 			String paper;
 
 			paper = "50|doi_________::"
-					+ IdentifierFactory
+				+ IdentifierFactory
 					.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), value.getDoi()));
 
 			relationList
-					.add(
-							getRelation(
-									paper,
-									IREL_PROJECT, ModelConstants.IS_PRODUCED_BY));
+				.add(
+					getRelation(
+						paper,
+						IREL_PROJECT, ModelConstants.IS_PRODUCED_BY));
 
 			relationList.add(getRelation(IREL_PROJECT, paper, ModelConstants.PRODUCES));
 		}
