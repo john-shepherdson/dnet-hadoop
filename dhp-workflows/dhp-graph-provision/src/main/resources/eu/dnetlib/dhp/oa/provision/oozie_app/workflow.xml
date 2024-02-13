@@ -152,6 +152,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
+                --conf spark.shuffle.sort.bypassMergeThreshold=3840
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${inputGraphRootPath}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation</arg>
@@ -190,6 +191,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=15000
+                --conf spark.shuffle.sort.bypassMergeThreshold=15000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
@@ -217,6 +219,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=15000
+                --conf spark.shuffle.sort.bypassMergeThreshold=15000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
@@ -244,6 +247,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=10000
+                --conf spark.shuffle.sort.bypassMergeThreshold=10000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
@@ -271,6 +275,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=5000
+                --conf spark.shuffle.sort.bypassMergeThreshold=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
@@ -298,6 +303,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=5000
+                --conf spark.shuffle.sort.bypassMergeThreshold=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
@@ -325,6 +331,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=5000
+                --conf spark.shuffle.sort.bypassMergeThreshold=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
@@ -352,6 +359,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=5000
+                --conf spark.shuffle.sort.bypassMergeThreshold=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
@@ -391,6 +399,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=15000
+                --conf spark.shuffle.sort.bypassMergeThreshold=15000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/publication</arg>
@@ -419,6 +428,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=10000
+                --conf spark.shuffle.sort.bypassMergeThreshold=10000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/dataset</arg>
@@ -447,6 +457,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=10000
+                --conf spark.shuffle.sort.bypassMergeThreshold=10000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/otherresearchproduct</arg>
@@ -475,6 +486,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=5000
+                --conf spark.shuffle.sort.bypassMergeThreshold=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/software</arg>
@@ -503,6 +515,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=8000
+                --conf spark.shuffle.sort.bypassMergeThreshold=8000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/datasource</arg>
@@ -531,6 +544,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=10000
+                --conf spark.shuffle.sort.bypassMergeThreshold=10000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/organization</arg>
@@ -559,6 +573,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=5000
+                --conf spark.shuffle.sort.bypassMergeThreshold=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/project</arg>
@@ -589,6 +604,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
+                --conf spark.shuffle.sort.bypassMergeThreshold=3840
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputPath</arg><arg>${workingDir}/join_entities</arg>
