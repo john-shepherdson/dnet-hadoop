@@ -1,0 +1,14 @@
+[
+	{
+		"paramName": "i",
+		"paramLongName": "inputPath",
+		"paramDescription": "the path of the BASE dump",
+		"paramRequired": true
+	},
+	{
+		"paramName": "o",
+		"paramLongName": "outputPath",
+		"paramDescription": "the path of the generated report",
+		"paramRequired": true
+	}
+]
