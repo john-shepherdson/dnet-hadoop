@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 
-public class BaseCollectorIterator implements Iterator<Element> {
+public class BaseCollectorIterator implements Iterator<Document> {
 
 	private Object nextElement;
 
@@ -51,13 +51,13 @@ public class BaseCollectorIterator implements Iterator<Element> {
 
 	@Override
 	public synchronized boolean hasNext() {
-		return (this.nextElement != null) && (this.nextElement instanceof Element);
+		return (this.nextElement != null) && (this.nextElement instanceof Document);
 	}
 
 	@Override
-	public synchronized Element next() {
+	public synchronized Document next() {
 		try {
-			return this.nextElement instanceof Element ? (Element) this.nextElement : null;
+			return this.nextElement instanceof Document ? (Document) this.nextElement : null;
 		} finally {
 			try {
 				this.nextElement = this.queue.take();
@@ -113,7 +113,9 @@ public class BaseCollectorIterator implements Iterator<Element> {
 
 						for (final Object o : doc.selectNodes("//*[local-name()='ListRecords']/*[local-name()='record']")) {
 							if (o instanceof Element) {
-								this.queue.put(((Element) o).detach());
+								final Element newRoot = (Element) ((Element) o).detach();
+								final Document newDoc = DocumentHelper.createDocument(newRoot);
+								this.queue.put(newDoc);
 								count++;
 							}
 						}

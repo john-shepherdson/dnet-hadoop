@@ -11,7 +11,7 @@ import java.util.stream.StreamSupport;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.dom4j.Element;
+import org.dom4j.Document;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
@@ -51,14 +51,14 @@ public class BaseCollectorPlugin implements CollectorPlugin {
 			throw new CollectorException(e);
 		}
 
-		final Iterator<Element> iterator = new BaseCollectorIterator(this.fs, filePath, report);
-		final Spliterator<Element> spliterator = Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED);
+		final Iterator<Document> iterator = new BaseCollectorIterator(this.fs, filePath, report);
+		final Spliterator<Document> spliterator = Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED);
 		return StreamSupport.stream(spliterator, false)
-				.filter(elem -> filterXml(elem, report))
-				.map(elem -> xmlToString(report, elem));
+				.filter(doc -> filterXml(doc, report))
+				.map(doc -> xmlToString(doc, report));
 	}
 
-	private boolean filterXml(final Element elem, final AggregatorReport report) {
+	private boolean filterXml(final Document doc, final AggregatorReport report) {
 		// TODO Auto-generated method stub
 
 		// HERE THE FILTERS ACCORDING TO THE DOCUMENTATION
@@ -66,10 +66,10 @@ public class BaseCollectorPlugin implements CollectorPlugin {
 		return true;
 	}
 
-	private String xmlToString(final AggregatorReport report, final Element elem) {
+	private String xmlToString(final Document doc, final AggregatorReport report) {
 		try (final StringWriter sw = new StringWriter()) {
 			final XMLWriter writer = new XMLWriter(sw, OutputFormat.createPrettyPrint());
-			writer.write(elem);
+			writer.write(doc);
 			return writer.toString();
 		} catch (final IOException e) {
 			report.put(e.getClass().getName(), e.getMessage());

@@ -4,13 +4,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Attribute;
+import org.dom4j.Document;
 import org.dom4j.Element;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 
@@ -27,7 +31,7 @@ public class BaseCollectorIteratorTest {
 		final Map<String, Map<String, String>> collections = new HashMap<>();
 
 		while (iterator.hasNext()) {
-			final Element record = iterator.next();
+			final Document record = iterator.next();
 
 			count++;
 
@@ -35,7 +39,10 @@ public class BaseCollectorIteratorTest {
 				System.out.println("# Read records: " + count);
 			}
 
+			// System.out.println(record.asXML());
+
 			for (final Object o : record.selectNodes("//*[local-name() = 'collection']")) {
+
 				final Element n = (Element) o;
 				final String collName = n.getText().trim();
 				if (StringUtils.isNotBlank(collName) && !collections.containsKey(collName)) {
@@ -46,14 +53,16 @@ public class BaseCollectorIteratorTest {
 					}
 
 					collections.put(collName, collAttrs);
+
 				}
 			}
 		}
 
-		collections.forEach((k, v) -> {
-			System.out.println(k);
-			v.forEach((ak, av) -> System.out.println(" - " + ak + "=" + av));
-		});
+		final ObjectMapper mapper = new ObjectMapper();
+		for (final Entry<String, Map<String, String>> e : collections.entrySet()) {
+			System.out.println(e.getKey() + ": " + mapper.writeValueAsString(e.getValue()));
+
+		}
 
 		assertEquals(30000, count);
 	}
