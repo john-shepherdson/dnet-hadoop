@@ -34,20 +34,19 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.ror.GenerateRorActionSetJob;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 
 public class BaseAnalyzerJob {
 
-	private static final Logger log = LoggerFactory.getLogger(GenerateRorActionSetJob.class);
+	private static final Logger log = LoggerFactory.getLogger(BaseAnalyzerJob.class);
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(final String[] args) throws Exception {
 
 		final String jsonConfiguration = IOUtils
-				.toString(GenerateRorActionSetJob.class
+				.toString(BaseAnalyzerJob.class
 						.getResourceAsStream("/eu/dnetlib/dhp/collection/plugin/base/action_set_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
