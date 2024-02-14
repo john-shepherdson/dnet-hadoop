@@ -10,6 +10,7 @@ import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Project;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -177,6 +178,8 @@ public class Utils implements Serializable {
 	public static List<EntityCommunities> getDatasourceCommunities(String baseURL)throws IOException{
 		List<CommunityModel> validCommunities = getValidCommunities(baseURL);
 		HashMap<String, Set<String>> map = new HashMap<>();
+		String entityPrefix = ModelSupport.getIdPrefix(Datasource.class) + "|" ;
+
 		validCommunities.forEach(c -> {
 			try {
 				new ObjectMapper().readValue(QueryCommunityAPI.communityDatasource(c.getId(), baseURL), DatasourceList.class)
@@ -191,9 +194,17 @@ public class Utils implements Serializable {
 			}
 		});
 
+		List<EntityCommunities> temp = map.keySet().stream()
+				.map(k -> EntityCommunities.newInstance(entityPrefix + k, getCollect(k, map))).collect(Collectors.toList());
 
-		return map.keySet().stream().map(k -> EntityCommunities.newInstance(k, map.get(k).stream().collect(Collectors.toList()))).collect(Collectors.toList());
+		return temp;
 
+	}
+
+	@NotNull
+	private static List<String> getCollect(String k, HashMap<String, Set<String>> map) {
+		List<String> temp = map.get(k).stream().collect(Collectors.toList());
+		return temp;
 	}
 
 

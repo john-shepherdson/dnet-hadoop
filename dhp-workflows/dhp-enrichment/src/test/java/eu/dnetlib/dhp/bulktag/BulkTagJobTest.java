@@ -325,7 +325,7 @@ public class BulkTagJobTest {
 					"-taggingConf", taggingConf,
 
 					"-outputPath", workingDir.toString() + "/",
-
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
 					"-pathMap", pathMap
 				});
 
@@ -348,6 +348,8 @@ public class BulkTagJobTest {
 			+ "where MyD.inferenceprovenance = 'bulktagging'";
 
 		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
+
+		idExplodeCommunity.show(false);
 
 		Assertions.assertEquals(5, idExplodeCommunity.count());
 		Assertions
@@ -381,6 +383,63 @@ public class BulkTagJobTest {
 						"community = 'aginfra' and (id = '50|ec_fp7health::000c8195edd542e4e64ebb32172cbf89' "
 							+ "or id = '50|ec_fp7health::0010eb63e181e3e91b8b6dc6b3e1c798')")
 					.count());
+	}
+
+	@Test
+	void datasourceTag() throws Exception {
+		final String sourcePath = getClass()
+				.getResource("/eu/dnetlib/dhp/bulktag/sample/publication/update_datasource/")
+				.getPath();
+		SparkBulkTagJob
+				.main(
+						new String[] {
+
+								"-isSparkSessionManaged", Boolean.FALSE.toString(),
+								"-sourcePath", sourcePath,
+								"-taggingConf", taggingConf,
+
+								"-outputPath", workingDir.toString() + "/",
+								"-baseURL", "https://services.openaire.eu/openaire/community/",
+								"-pathMap", pathMap
+						});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Datasource> tmp = sc
+				.textFile(workingDir.toString() + "/datasource")
+				.map(item -> OBJECT_MAPPER.readValue(item, Datasource.class));
+
+		Assertions.assertEquals(3, tmp.count());
+		org.apache.spark.sql.Dataset<Datasource> verificationDataset = spark
+				.createDataset(tmp.rdd(), Encoders.bean(Datasource.class));
+
+		verificationDataset.createOrReplaceTempView("datasource");
+
+		String query = "select id, MyT.id community, MyD.provenanceaction.classid provenance, MyD.provenanceaction.classname name "
+				+ "from datasource "
+				+ "lateral view explode(context) c as MyT "
+				+ "lateral view explode(MyT.datainfo) d as MyD "
+				+ "where MyD.inferenceprovenance = 'bulktagging'";
+
+		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
+
+		idExplodeCommunity.show(false);
+
+		Assertions.assertEquals(3, idExplodeCommunity.count());
+		Assertions
+				.assertEquals(
+						3, idExplodeCommunity.filter("provenance = 'community:datasource'").count());
+		Assertions
+				.assertEquals(
+						3,
+						idExplodeCommunity
+								.filter("name = 'Bulktagging for Community - Datasource'")
+								.count());
+
+		Assertions.assertEquals(2, idExplodeCommunity.filter("community = 'dh-ch'").count());
+		Assertions.assertEquals(1, idExplodeCommunity.filter("community = 'clarin'").count());
+
+
 	}
 
 	@Test

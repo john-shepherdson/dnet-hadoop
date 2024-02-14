@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import eu.dnetlib.dhp.api.model.CommunityEntityMap;
 import eu.dnetlib.dhp.api.model.EntityCommunities;
-import eu.dnetlib.dhp.api.model.DatasourceCommunitiesList;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.Project;
@@ -109,14 +108,20 @@ public class SparkBulkTagJob {
 				.map((MapFunction<Tuple2<Project, EntityCommunities>, Project>) t2 -> {
 					Project ds = t2._1();
 					if (t2._2() != null){
-						List<String> context = ds.getContext().stream().map(c -> c.getId()).collect(Collectors.toList());
+						List<String> context =
+								Optional.ofNullable(ds.getContext())
+										.map(v -> v.stream().map(c -> c.getId()).collect(Collectors.toList()))
+										.orElse(new ArrayList<>());
+
+						if(!Optional.ofNullable(ds.getContext()).isPresent())
+							ds.setContext(new ArrayList<>());
 						t2._2().getCommunitiesId().forEach(c -> {
 							if(!context.contains(c)){
 								Context con = new Context();
 								con.setId(c);
 								con.setDataInfo(Arrays.asList(OafMapperUtils.dataInfo(false,TaggingConstants.BULKTAG_DATA_INFO_TYPE, true, false,
 										OafMapperUtils.qualifier(TaggingConstants.CLASS_ID_DATASOURCE, TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE, ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS), "1")));
-								ds.getContext().add(con)
+								ds.getContext().add(con);
 							}
 						});
 					}
@@ -139,19 +144,27 @@ public class SparkBulkTagJob {
 		Dataset<Datasource> datasource = readPath(spark, inputPath + "datasource", Datasource.class);
 
 		Dataset<EntityCommunities> dc = spark.createDataset(datasourceCommunities, Encoders.bean(EntityCommunities.class));
-		
+
 		datasource.joinWith(dc, datasource.col("id").equalTo(dc.col("entityId")), "left")
 				.map((MapFunction<Tuple2<Datasource, EntityCommunities>, Datasource>) t2 -> {
 					Datasource ds = t2._1();
 					if (t2._2() != null){
-						List<String> context = ds.getContext().stream().map(c -> c.getId()).collect(Collectors.toList());
+
+						List<String> context =
+							Optional.ofNullable(ds.getContext())
+									.map(v -> v.stream().map(c -> c.getId()).collect(Collectors.toList()))
+									.orElse(new ArrayList<>());
+
+						if(!Optional.ofNullable(ds.getContext()).isPresent())
+							ds.setContext(new ArrayList<>());
+
 						t2._2().getCommunitiesId().forEach(c -> {
 							if(!context.contains(c)){
 								Context con = new Context();
 								con.setId(c);
 								con.setDataInfo(Arrays.asList(OafMapperUtils.dataInfo(false,TaggingConstants.BULKTAG_DATA_INFO_TYPE, true, false,
 										OafMapperUtils.qualifier(TaggingConstants.CLASS_ID_DATASOURCE, TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE, ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS), "1")));
-								ds.getContext().add(con)
+								ds.getContext().add(con);
 							}
 						});
 					}
