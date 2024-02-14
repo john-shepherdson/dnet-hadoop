@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.collection.plugin.base;
 
 import java.io.BufferedInputStream;
@@ -72,7 +73,7 @@ public class BaseCollectorIterator implements Iterator<Document> {
 		log.info("I start to read the TAR stream");
 
 		try (InputStream origInputStream = fs.open(filePath);
-				final TarArchiveInputStream tarInputStream = new TarArchiveInputStream(origInputStream)) {
+			final TarArchiveInputStream tarInputStream = new TarArchiveInputStream(origInputStream)) {
 			importTarStream(tarInputStream, report);
 		} catch (final Throwable e) {
 			throw new RuntimeException("Error processing BASE records", e);
@@ -81,7 +82,7 @@ public class BaseCollectorIterator implements Iterator<Document> {
 
 	private void importTestFile(final String resourcePath, final AggregatorReport report) {
 		try (final InputStream origInputStream = BaseCollectorIterator.class.getResourceAsStream(resourcePath);
-				final TarArchiveInputStream tarInputStream = new TarArchiveInputStream(origInputStream)) {
+			final TarArchiveInputStream tarInputStream = new TarArchiveInputStream(origInputStream)) {
 			importTarStream(tarInputStream, report);
 		} catch (final Throwable e) {
 			throw new RuntimeException("Error processing BASE records", e);
@@ -104,14 +105,16 @@ public class BaseCollectorIterator implements Iterator<Document> {
 					IOUtils.readFully(tarInputStream, bzipData);
 
 					try (InputStream bzipIs = new ByteArrayInputStream(bzipData);
-							final BufferedInputStream bzipBis = new BufferedInputStream(bzipIs);
-							final CompressorInputStream bzipInput = new CompressorStreamFactory().createCompressorInputStream(bzipBis)) {
+						final BufferedInputStream bzipBis = new BufferedInputStream(bzipIs);
+						final CompressorInputStream bzipInput = new CompressorStreamFactory()
+							.createCompressorInputStream(bzipBis)) {
 
 						final String xml = IOUtils.toString(new InputStreamReader(bzipInput));
 
 						final Document doc = DocumentHelper.parseText(xml);
 
-						for (final Object o : doc.selectNodes("//*[local-name()='ListRecords']/*[local-name()='record']")) {
+						for (final Object o : doc
+							.selectNodes("//*[local-name()='ListRecords']/*[local-name()='record']")) {
 							if (o instanceof Element) {
 								final Element newRoot = (Element) ((Element) o).detach();
 								final Document newDoc = DocumentHelper.createDocument(newRoot);

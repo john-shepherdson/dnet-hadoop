@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.collection.plugin.base;
 
 import java.io.IOException;
@@ -29,7 +30,8 @@ public class BaseCollectorPlugin implements CollectorPlugin {
 
 	private static final Logger log = LoggerFactory.getLogger(AbstractSplittedRecordPlugin.class);
 
-	// MAPPING AND FILTERING ARE DEFINED HERE: https://docs.google.com/document/d/1Aj-ZAV11b44MCrAAUCPiS2TUlXb6PnJEu1utCMAcCOU/edit
+	// MAPPING AND FILTERING ARE DEFINED HERE:
+	// https://docs.google.com/document/d/1Aj-ZAV11b44MCrAAUCPiS2TUlXb6PnJEu1utCMAcCOU/edit
 
 	public BaseCollectorPlugin(final FileSystem fs) {
 		this.fs = fs;
@@ -39,23 +41,26 @@ public class BaseCollectorPlugin implements CollectorPlugin {
 	public Stream<String> collect(final ApiDescriptor api, final AggregatorReport report) throws CollectorException {
 		// get path to file
 		final Path filePath = Optional
-				.ofNullable(api.getBaseUrl())
-				.map(Path::new)
-				.orElseThrow(() -> new CollectorException("missing baseUrl"));
+			.ofNullable(api.getBaseUrl())
+			.map(Path::new)
+			.orElseThrow(() -> new CollectorException("missing baseUrl"));
 
 		log.info("baseUrl: {}", filePath);
 
 		try {
-			if (!this.fs.exists(filePath)) { throw new CollectorException("path does not exist: " + filePath); }
+			if (!this.fs.exists(filePath)) {
+				throw new CollectorException("path does not exist: " + filePath);
+			}
 		} catch (final Throwable e) {
 			throw new CollectorException(e);
 		}
 
 		final Iterator<Document> iterator = new BaseCollectorIterator(this.fs, filePath, report);
 		final Spliterator<Document> spliterator = Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED);
-		return StreamSupport.stream(spliterator, false)
-				.filter(doc -> filterXml(doc, report))
-				.map(doc -> xmlToString(doc, report));
+		return StreamSupport
+			.stream(spliterator, false)
+			.filter(doc -> filterXml(doc, report))
+			.map(doc -> xmlToString(doc, report));
 	}
 
 	private boolean filterXml(final Document doc, final AggregatorReport report) {

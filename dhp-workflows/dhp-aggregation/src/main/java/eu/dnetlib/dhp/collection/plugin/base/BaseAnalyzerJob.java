@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.collection.plugin.base;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -47,17 +48,18 @@ public class BaseAnalyzerJob {
 	public static void main(final String[] args) throws Exception {
 
 		final String jsonConfiguration = IOUtils
-				.toString(GenerateRorActionSetJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/collection/plugin/base/action_set_parameters.json"));
+			.toString(
+				GenerateRorActionSetJob.class
+					.getResourceAsStream("/eu/dnetlib/dhp/collection/plugin/base/action_set_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
-				.ofNullable(parser.get("isSparkSessionManaged"))
-				.map(Boolean::valueOf)
-				.orElse(Boolean.TRUE);
+			.ofNullable(parser.get("isSparkSessionManaged"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.TRUE);
 
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
@@ -73,41 +75,47 @@ public class BaseAnalyzerJob {
 	}
 
 	private static void processBaseRecords(final SparkSession spark,
-			final String inputPath,
-			final String outputPath) throws IOException {
+		final String inputPath,
+		final String outputPath) throws IOException {
 
 		HdfsSupport.remove(outputPath, spark.sparkContext().hadoopConfiguration());
 
-		try (final FileSystem fs = FileSystem.get(new Configuration()); final AggregatorReport report = new AggregatorReport()) {
-			final AtomicInteger recordsCounter = new AtomicInteger(0);
-			final Map<String, AtomicInteger> fields = new HashMap<>();
-			final Map<String, AtomicInteger> types = new HashMap<>();
-			final Map<String, AtomicInteger> collections = new HashMap<>();
+		try (final FileSystem fs = FileSystem.get(new Configuration());
+			final AggregatorReport report = new AggregatorReport()) {
+			final Map<String, AtomicLong> fields = new HashMap<>();
+			final Map<String, AtomicLong> types = new HashMap<>();
+			final Map<String, AtomicLong> collections = new HashMap<>();
+			final Map<String, AtomicLong> totals = new HashMap<>();
 
-			analyze(fs, inputPath, recordsCounter, fields, types, collections, report);
-			saveReport(fs, outputPath + "/total", Map.of("#records", recordsCounter));
+			analyze(fs, inputPath, fields, types, collections, totals, report);
+
 			saveReport(fs, outputPath + "/fields", fields);
 			saveReport(fs, outputPath + "/types", types);
 			saveReport(fs, outputPath + "/collections", collections);
+			saveReport(fs, outputPath + "/totals", totals);
 		} catch (final Throwable e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	private static void analyze(final FileSystem fs,
-			final String inputPath,
-			final AtomicInteger recordsCounter,
-			final Map<String, AtomicInteger> fields,
-			final Map<String, AtomicInteger> types,
-			final Map<String, AtomicInteger> collections,
-			final AggregatorReport report) throws JsonProcessingException, IOException {
+		final String inputPath,
+		final Map<String, AtomicLong> fields,
+		final Map<String, AtomicLong> types,
+		final Map<String, AtomicLong> collections,
+		final Map<String, AtomicLong> totals,
+		final AggregatorReport report) throws JsonProcessingException, IOException {
+
+		final AtomicLong recordsCounter = new AtomicLong(0);
+
+		totals.put("Records", recordsCounter);
 
 		final BaseCollectorIterator iteraror = new BaseCollectorIterator(fs, new Path(inputPath), report);
 
 		while (iteraror.hasNext()) {
 			final Document record = iteraror.next();
 
-			final int i = recordsCounter.incrementAndGet();
+			final long i = recordsCounter.incrementAndGet();
 			if ((i % 10000) == 0) {
 				log.info("# Read records: " + i);
 			}
@@ -142,27 +150,30 @@ public class BaseAnalyzerJob {
 		}
 	}
 
-	private static void incrementMapCounter(final Map<String, AtomicInteger> map, final String key) {
+	private static void incrementMapCounter(final Map<String, AtomicLong> map, final String key) {
 		if (StringUtils.isNotBlank(key)) {
 			if (map.containsKey(key)) {
 				map.get(key).incrementAndGet();
 			} else {
-				map.put(key, new AtomicInteger(1));
+				map.put(key, new AtomicLong(1));
 			}
 		}
 	}
 
-	private static void saveReport(final FileSystem fs, final String outputPath, final Map<String, AtomicInteger> fields)
-			throws JsonProcessingException, IOException {
+	private static void saveReport(final FileSystem fs, final String outputPath, final Map<String, AtomicLong> fields)
+		throws JsonProcessingException, IOException {
 		try (final SequenceFile.Writer writer = SequenceFile
-				.createWriter(fs.getConf(), SequenceFile.Writer.file(new Path(outputPath)), SequenceFile.Writer
-						.keyClass(IntWritable.class), SequenceFile.Writer
-								.valueClass(Text.class), SequenceFile.Writer.compression(SequenceFile.CompressionType.BLOCK, new DeflateCodec()))) {
+			.createWriter(
+				fs.getConf(), SequenceFile.Writer.file(new Path(outputPath)), SequenceFile.Writer
+					.keyClass(IntWritable.class),
+				SequenceFile.Writer
+					.valueClass(Text.class),
+				SequenceFile.Writer.compression(SequenceFile.CompressionType.BLOCK, new DeflateCodec()))) {
 
 			final Text key = new Text();
 			final Text value = new Text();
 
-			for (final Entry<String, AtomicInteger> e : fields.entrySet()) {
+			for (final Entry<String, AtomicLong> e : fields.entrySet()) {
 				key.set(e.getKey());
 				value.set(e.getKey() + ": " + e.getValue());
 				try {
