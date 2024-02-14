@@ -1,0 +1,1500 @@
+dnet:access_modes @=@ CLOSED @=@ http://purl.org/coar/access_right/c_14cb
+dnet:access_modes @=@ CLOSED @=@ info:eu-repo/semantics/closedAccess
+dnet:access_modes @=@ EMBARGO @=@ http://purl.org/coar/access_right/c_f1cf
+dnet:access_modes @=@ EMBARGO @=@ info:eu-repo/semantics/embargoedAccess
+dnet:access_modes @=@ OPEN @=@ Creative Commons License [CC BY-NC-ND] http://creativecommons.org/licenses/by-nc-nd/3.0/de/
+dnet:access_modes @=@ OPEN @=@ Creative commons
+dnet:access_modes @=@ OPEN @=@ http://creativecommons.org/licenses/by-nc-nd/3.0/
+dnet:access_modes @=@ OPEN @=@ http://creativecommons.org/licenses/by-nc/3.0/
+dnet:access_modes @=@ OPEN @=@ http://creativecommons.org/licenses/by-sa/3.0/
+dnet:access_modes @=@ OPEN @=@ http://creativecommons.org/licenses/by-sa/4.0/
+dnet:access_modes @=@ OPEN @=@ http://creativecommons.org/licenses/by/3.0/
+dnet:access_modes @=@ OPEN @=@ http://creativecommons.org/licenses/by/3.0/us/
+dnet:access_modes @=@ OPEN @=@ http://creativecommons.org/licenses/by/4.0/
+dnet:access_modes @=@ OPEN @=@ http://creativecommons.org/publicdomain/zero/1.0/
+dnet:access_modes @=@ OPEN @=@ http://creativecommons.org/publicdomain/zero/1.0/ & http://www.canadensys.net/norms
+dnet:access_modes @=@ OPEN @=@ http://purl.org/coar/access_right/c_abf2
+dnet:access_modes @=@ OPEN @=@ https://creativecommons.org/licenses/by-nc/4.0/
+dnet:access_modes @=@ OPEN @=@ info:eu-repo/semantics/openAccess
+dnet:access_modes @=@ OPEN @=@ open_access
+dnet:access_modes @=@ RESTRICTED @=@ http://purl.org/coar/access_right/c_16ec
+dnet:access_modes @=@ RESTRICTED @=@ info:eu-repo/semantics/restrictedAccess
+dnet:compatibilityLevel @=@ openaire-pub_4.0 @=@ openaire4.0
+dnet:subject_classification_typologies @=@ jel @=@ jelElement
+dnet:publication_resource @=@ 0018 @=@ Comment/debate
+dnet:publication_resource @=@ 0018 @=@ http://purl.org/coar/resource_type/c_1162
+dnet:publication_resource @=@ 0018 @=@ info:eu-repo/semantics/annotation
+dnet:publication_resource @=@ 0001 @=@ A1 Alkuperäisartikkeli tieteellisessä aikakauslehdessä
+dnet:publication_resource @=@ 0001 @=@ Article
+dnet:publication_resource @=@ 0001 @=@ Article (author)
+dnet:publication_resource @=@ 0001 @=@ Article - letter to the editor
+dnet:publication_resource @=@ 0001 @=@ Article / Letter to editor
+dnet:publication_resource @=@ 0001 @=@ Article / Letter to the editor
+dnet:publication_resource @=@ 0001 @=@ Article / Newspaper
+dnet:publication_resource @=@ 0001 @=@ Article in journal
+dnet:publication_resource @=@ 0001 @=@ Article in monograph or in proceedings
+dnet:publication_resource @=@ 0001 @=@ Article in proceedings
+dnet:publication_resource @=@ 0001 @=@ Article-letter to the editor
+dnet:publication_resource @=@ 0001 @=@ Article/Letter to editor
+dnet:publication_resource @=@ 0001 @=@ Articolo
+dnet:publication_resource @=@ 0001 @=@ Artículo
+dnet:publication_resource @=@ 0001 @=@ Aufsatz
+dnet:publication_resource @=@ 0001 @=@ Clinical Study
+dnet:publication_resource @=@ 0001 @=@ Institutional Series
+dnet:publication_resource @=@ 0001 @=@ International Journal
+dnet:publication_resource @=@ 0001 @=@ International Journal Abstract
+dnet:publication_resource @=@ 0001 @=@ International Journal ISI/JCR
+dnet:publication_resource @=@ 0001 @=@ Journal (full / special issue)
+dnet:publication_resource @=@ 0001 @=@ Journal Article/Review
+dnet:publication_resource @=@ 0001 @=@ Journal article
+dnet:publication_resource @=@ 0001 @=@ Journal article (on-line or printed)
+dnet:publication_resource @=@ 0001 @=@ Journal articles
+dnet:publication_resource @=@ 0001 @=@ Journal paper
+dnet:publication_resource @=@ 0001 @=@ National Journal
+dnet:publication_resource @=@ 0001 @=@ Original article (non peer-reviewed)
+dnet:publication_resource @=@ 0001 @=@ Original article (peer-reviewed)
+dnet:publication_resource @=@ 0001 @=@ Peer-reviewed Article
+dnet:publication_resource @=@ 0001 @=@ Published Journal Article
+dnet:publication_resource @=@ 0001 @=@ Research Article
+dnet:publication_resource @=@ 0001 @=@ Review article (non peer-reviewed)
+dnet:publication_resource @=@ 0001 @=@ Review article (peer-reviewed)
+dnet:publication_resource @=@ 0001 @=@ Volumes Edited / Special Issues
+dnet:publication_resource @=@ 0001 @=@ article in non peer-reviewed journal
+dnet:publication_resource @=@ 0001 @=@ article in peer-reviewed journal
+dnet:publication_resource @=@ 0001 @=@ article-commentary
+dnet:publication_resource @=@ 0001 @=@ article_site_web
+dnet:publication_resource @=@ 0001 @=@ doc-type:Journal Article
+dnet:publication_resource @=@ 0001 @=@ doc-type:article
+dnet:publication_resource @=@ 0001 @=@ http://purl.org/coar/resource_type/c_2df8fbb1
+dnet:publication_resource @=@ 0001 @=@ http://purl.org/coar/resource_type/c_545b
+dnet:publication_resource @=@ 0001 @=@ http://purl.org/coar/resource_type/c_6501
+dnet:publication_resource @=@ 0001 @=@ http://purl.org/coar/resource_type/c_7877
+dnet:publication_resource @=@ 0001 @=@ in-brief
+dnet:publication_resource @=@ 0001 @=@ info:eu-repo/semantics/article
+dnet:publication_resource @=@ 0001 @=@ journal-article
+dnet:publication_resource @=@ 0001 @=@ journalArticle
+dnet:publication_resource @=@ 0001 @=@ journal_article
+dnet:publication_resource @=@ 0001 @=@ letter
+dnet:publication_resource @=@ 0001 @=@ non peer-reviewed article
+dnet:publication_resource @=@ 0001 @=@ partial-retraction
+dnet:publication_resource @=@ 0001 @=@ proceeding with peer review
+dnet:publication_resource @=@ 0001 @=@ publication-article
+dnet:publication_resource @=@ 0001 @=@ rapid-communication
+dnet:publication_resource @=@ 0001 @=@ reply
+dnet:publication_resource @=@ 0001 @=@ research-article
+dnet:publication_resource @=@ 0001 @=@ retraction
+dnet:publication_resource @=@ 0001 @=@ review-article
+dnet:publication_resource @=@ 0001 @=@ text (article)
+dnet:publication_resource @=@ 0001 @=@ Статья
+dnet:publication_resource @=@ 0001 @=@ ArticleArtikel
+dnet:publication_resource @=@ 0033 @=@ AUDIOVISUAL_DOCUMENT
+dnet:publication_resource @=@ 0033 @=@ Audiovisual/Audiovisual
+dnet:publication_resource @=@ 0033 @=@ http://purl.org/coar/resource_type/c_c513
+dnet:publication_resource @=@ 0008 @=@ Bachelor's
+dnet:publication_resource @=@ 0008 @=@ Bachelor's Degree
+dnet:publication_resource @=@ 0008 @=@ Bachelors Thesis
+dnet:publication_resource @=@ 0008 @=@ Proyecto fin de carrera
+dnet:publication_resource @=@ 0008 @=@ Undergraduate Thesis
+dnet:publication_resource @=@ 0008 @=@ http://purl.org/coar/resource_type/c_7a1f
+dnet:publication_resource @=@ 0008 @=@ info:eu-repo/semantics/bachelorThesis
+dnet:publication_resource @=@ 0008 @=@ выпускная бакалаврская работа
+dnet:publication_resource @=@ 0002 @=@ Book (monograph)
+dnet:publication_resource @=@ 0002 @=@ Book (non peer-reviewed)
+dnet:publication_resource @=@ 0002 @=@ Book (peer-reviewed)
+dnet:publication_resource @=@ 0002 @=@ Book - monograph - editorial book
+dnet:publication_resource @=@ 0002 @=@ Book Section
+dnet:publication_resource @=@ 0002 @=@ Book as author
+dnet:publication_resource @=@ 0013 @=@ book-chapter
+dnet:publication_resource @=@ 0002 @=@ Buch
+dnet:publication_resource @=@ 0002 @=@ International Book/Monograph
+dnet:publication_resource @=@ 0002 @=@ Libro
+dnet:publication_resource @=@ 0002 @=@ Monografia
+dnet:publication_resource @=@ 0002 @=@ Monograph
+dnet:publication_resource @=@ 0002 @=@ National Book/Monograph
+dnet:publication_resource @=@ 0002 @=@ atlas
+dnet:publication_resource @=@ 0002 @=@ book
+dnet:publication_resource @=@ 0002 @=@ book-series
+dnet:publication_resource @=@ 0002 @=@ book-set
+dnet:publication_resource @=@ 0002 @=@ book-track
+dnet:publication_resource @=@ 0002 @=@ book_series
+dnet:publication_resource @=@ 0002 @=@ book_title
+dnet:publication_resource @=@ 0002 @=@ doc-type:book
+dnet:publication_resource @=@ 0002 @=@ edited-book
+dnet:publication_resource @=@ 0002 @=@ http://purl.org/coar/resource_type/c_2f33
+dnet:publication_resource @=@ 0002 @=@ info:eu-repo/semantics/book
+dnet:publication_resource @=@ 0002 @=@ ouvrage
+dnet:publication_resource @=@ 0002 @=@ publication-book
+dnet:publication_resource @=@ 0002 @=@ reference-book
+dnet:publication_resource @=@ 0002 @=@ scientific book
+dnet:publication_resource @=@ 0002 @=@ Монография
+dnet:publication_resource @=@ 0002 @=@ Учебник
+dnet:publication_resource @=@ 0037 @=@ clinicalTrial
+dnet:publication_resource @=@ 0037 @=@ Clinical Trial
+dnet:publication_resource @=@ 0037 @=@ http://purl.org/coar/resource_type/c_cb28
+dnet:publication_resource @=@ 0022 @=@ collection
+dnet:publication_resource @=@ 0004 @=@ A4 Artikkeli konferenssijulkaisussa
+dnet:publication_resource @=@ 0004 @=@ Comunicación de congreso
+dnet:publication_resource @=@ 0004 @=@ Conference Paper
+dnet:publication_resource @=@ 0004 @=@ Conference Paper/Proceeding/Abstract
+dnet:publication_resource @=@ 0004 @=@ Conference Proceedings
+dnet:publication_resource @=@ 0004 @=@ Conference article
+dnet:publication_resource @=@ 0004 @=@ Conference contribution
+dnet:publication_resource @=@ 0004 @=@ Conference lecture
+dnet:publication_resource @=@ 0004 @=@ Conference or Workshop Item
+dnet:publication_resource @=@ 0004 @=@ Conference paper, poster, etc.
+dnet:publication_resource @=@ 0004 @=@ Conference papers
+dnet:publication_resource @=@ 0004 @=@ Conference report
+dnet:publication_resource @=@ 0004 @=@ International Conference
+dnet:publication_resource @=@ 0004 @=@ International Conference Abstract/Poster
+dnet:publication_resource @=@ 0004 @=@ International Conference ISI/JCR
+dnet:publication_resource @=@ 0004 @=@ International Conference communication/abstract/poster
+dnet:publication_resource @=@ 0004 @=@ National Conference
+dnet:publication_resource @=@ 0004 @=@ National Conference Abstract/Poster
+dnet:publication_resource @=@ 0004 @=@ National Conference communication/abstract/poster
+dnet:publication_resource @=@ 0004 @=@ PREFACE_PROCEEDINGS
+dnet:publication_resource @=@ 0004 @=@ PROCEEDING_PAPER
+dnet:publication_resource @=@ 0004 @=@ Papers in Conference Proceedings
+dnet:publication_resource @=@ 0004 @=@ Presentación
+dnet:publication_resource @=@ 0004 @=@ Proceedings (peer-reviewed)
+dnet:publication_resource @=@ 0004 @=@ Proceedings of a Conference
+dnet:publication_resource @=@ 0004 @=@ Proceedings paper
+dnet:publication_resource @=@ 0004 @=@ Póster
+dnet:publication_resource @=@ 0004 @=@ actes_congres
+dnet:publication_resource @=@ 0004 @=@ communication_avec_actes
+dnet:publication_resource @=@ 0004 @=@ communication_invitee
+dnet:publication_resource @=@ 0004 @=@ communication_par_affiche
+dnet:publication_resource @=@ 0004 @=@ communication_sans_actes
+dnet:publication_resource @=@ 0004 @=@ conference
+dnet:publication_resource @=@ 0004 @=@ conference item
+dnet:publication_resource @=@ 0004 @=@ conference proceeding
+dnet:publication_resource @=@ 0004 @=@ conferenceObject
+dnet:publication_resource @=@ 0004 @=@ conference_paper
+dnet:publication_resource @=@ 0004 @=@ doc-type:conferenceObject
+dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_18co
+dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_18cp
+dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_5794
+dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_6670
+dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_c94f
+dnet:publication_resource @=@ 0004 @=@ http://purl.org/coar/resource_type/c_f744
+dnet:publication_resource @=@ 0004 @=@ info:eu-repo/semantics/conferenceItem
+dnet:publication_resource @=@ 0004 @=@ info:eu-repo/semantics/conferenceObject
+dnet:publication_resource @=@ 0004 @=@ invited conference talk
+dnet:publication_resource @=@ 0004 @=@ poster
+dnet:publication_resource @=@ 0004 @=@ presentation
+dnet:publication_resource @=@ 0004 @=@ proceeding, seminar, workshop without peer review
+dnet:publication_resource @=@ 0004 @=@ proceedings
+dnet:publication_resource @=@ 0004 @=@ proceedings-article
+dnet:publication_resource @=@ 0004 @=@ publication-conferencepaper
+dnet:publication_resource @=@ 0004 @=@ научный доклад
+dnet:publication_resource @=@ 0005 @=@ Newspaper or magazine article
+dnet:publication_resource @=@ 0005 @=@ http://purl.org/coar/resource_type/c_998f
+dnet:publication_resource @=@ 0005 @=@ info:eu-repo/semantics/contributionToPeriodical
+dnet:publication_resource @=@ 0045 @=@ Data Management Plan
+dnet:publication_resource @=@ 0045 @=@ Data Management Plan (NSF Generic)
+dnet:publication_resource @=@ 0045 @=@ http://purl.org/coar/resource_type/c_ab20
+dnet:publication_resource @=@ 0045 @=@ http://purl.org/spar/fabio/DataManagementPolicy
+dnet:publication_resource @=@ 0045 @=@ http://purl.org/spar/fabio/DataManagementPolicyDocument
+dnet:publication_resource @=@ 0045 @=@ http://purl.org/spar/fabio/DataMangementPlan
+dnet:publication_resource @=@ 0045 @=@ plan de gestión de datos
+dnet:publication_resource @=@ 0045 @=@ publication-datamanagementplan
+dnet:publication_resource @=@ 0031 @=@ Data Descriptor
+dnet:publication_resource @=@ 0031 @=@ DataPaper
+dnet:publication_resource @=@ 0031 @=@ data-article
+dnet:publication_resource @=@ 0031 @=@ http://purl.org/coar/resource_type/c_beb9
+dnet:publication_resource @=@ 0021 @=@ Dataset/Dataset
+dnet:publication_resource @=@ 0021 @=@ Research Data
+dnet:publication_resource @=@ 0021 @=@ dataset
+dnet:publication_resource @=@ 0021 @=@ http://purl.org/coar/resource_type/c_ddb1
+dnet:publication_resource @=@ 0021 @=@ info:eu-repo/semantics/DDIInstance
+dnet:publication_resource @=@ 0021 @=@ info:eu-repo/semantics/datafile
+dnet:publication_resource @=@ 0021 @=@ info:eu-repo/semantics/dataset
+dnet:publication_resource @=@ 0021 @=@ info:eu-repo/semantics/enhancedObjectFile
+dnet:publication_resource @=@ 0006 @=@ Diss
+dnet:publication_resource @=@ 0006 @=@ Dissertation
+dnet:publication_resource @=@ 0006 @=@ Doctoral
+dnet:publication_resource @=@ 0006 @=@ DoctoralThesis
+dnet:publication_resource @=@ 0006 @=@ PhD thesis
+dnet:publication_resource @=@ 0006 @=@ Tesis
+dnet:publication_resource @=@ 0006 @=@ Text.Thesis.Doctoral
+dnet:publication_resource @=@ 0006 @=@ Theses
+dnet:publication_resource @=@ 0006 @=@ Thesis
+dnet:publication_resource @=@ 0006 @=@ Thesis or Dissertation
+dnet:publication_resource @=@ 0006 @=@ Thesis.Doctoral
+dnet:publication_resource @=@ 0006 @=@ doc-type:doctoralThesis
+dnet:publication_resource @=@ 0006 @=@ http://purl.org/coar/resource_type/c_db06
+dnet:publication_resource @=@ 0006 @=@ info:eu-repo/semantics/doctoralThesis
+dnet:publication_resource @=@ 0006 @=@ publication-thesis
+dnet:publication_resource @=@ 0006 @=@ these
+dnet:publication_resource @=@ 0006 @=@ these exercice
+dnet:publication_resource @=@ 0023 @=@ Event/Event
+dnet:publication_resource @=@ 0023 @=@ event
+dnet:publication_resource @=@ 0009 @=@ Departmental Technical Report
+dnet:publication_resource @=@ 0009 @=@ Informe Técnico
+dnet:publication_resource @=@ 0009 @=@ RESEARCH_REPORT
+dnet:publication_resource @=@ 0009 @=@ Tech-Report
+dnet:publication_resource @=@ 0009 @=@ Technical Report
+dnet:publication_resource @=@ 0009 @=@ http://purl.org/coar/resource_type/c_18gh
+dnet:publication_resource @=@ 0009 @=@ publication-technicalnote
+dnet:publication_resource @=@ 0009 @=@ research report
+dnet:publication_resource @=@ 0024 @=@ Video
+dnet:publication_resource @=@ 0024 @=@ film
+dnet:publication_resource @=@ 0024 @=@ http://purl.org/coar/resource_type/c_12ce
+dnet:publication_resource @=@ 0024 @=@ http://purl.org/coar/resource_type/c_8a7e
+dnet:publication_resource @=@ 0025 @=@ Diagram
+dnet:publication_resource @=@ 0025 @=@ Drawing
+dnet:publication_resource @=@ 0025 @=@ Figure
+dnet:publication_resource @=@ 0025 @=@ Image/Image
+dnet:publication_resource @=@ 0025 @=@ Imagen
+dnet:publication_resource @=@ 0025 @=@ Photo
+dnet:publication_resource @=@ 0025 @=@ Plot
+dnet:publication_resource @=@ 0025 @=@ fotó
+dnet:publication_resource @=@ 0025 @=@ grafika
+dnet:publication_resource @=@ 0025 @=@ http://purl.org/coar/resource_type/c_ecc8
+dnet:publication_resource @=@ 0025 @=@ image
+dnet:publication_resource @=@ 0025 @=@ image-diagram
+dnet:publication_resource @=@ 0025 @=@ image-drawing
+dnet:publication_resource @=@ 0025 @=@ image-figure
+dnet:publication_resource @=@ 0025 @=@ image-other
+dnet:publication_resource @=@ 0025 @=@ image-photo
+dnet:publication_resource @=@ 0025 @=@ image-plot
+dnet:publication_resource @=@ 0026 @=@ http://purl.org/coar/resource_type/c_e9a0
+dnet:publication_resource @=@ 0026 @=@ interactiveResource
+dnet:publication_resource @=@ 0011 @=@ Internal note
+dnet:publication_resource @=@ 0011 @=@ http://purl.org/coar/resource_type/c_18ww
+dnet:publication_resource @=@ 0043 @=@ http://purl.org/coar/resource_type/c_0640
+dnet:publication_resource @=@ 0010 @=@ Inaugural lecture
+dnet:publication_resource @=@ 0010 @=@ Material didáctico
+dnet:publication_resource @=@ 0010 @=@ Public-Lecture
+dnet:publication_resource @=@ 0010 @=@ http://purl.org/coar/resource_type/c_8544
+dnet:publication_resource @=@ 0010 @=@ info:eu-repo/semantics/lecture
+dnet:publication_resource @=@ 0010 @=@ lesson
+dnet:publication_resource @=@ 0010 @=@ Учебный материал
+dnet:publication_resource @=@ 0007 @=@ Diploma Project
+dnet:publication_resource @=@ 0007 @=@ MSc Thesis
+dnet:publication_resource @=@ 0007 @=@ Master Degree
+dnet:publication_resource @=@ 0007 @=@ Master's
+dnet:publication_resource @=@ 0007 @=@ Masterarbeit u.a.
+dnet:publication_resource @=@ 0007 @=@ Masters (Taught)
+dnet:publication_resource @=@ 0007 @=@ Masters thesis
+dnet:publication_resource @=@ 0007 @=@ Masters-Thesis.Magister
+dnet:publication_resource @=@ 0007 @=@ Tesina
+dnet:publication_resource @=@ 0007 @=@ Thesis.Master
+dnet:publication_resource @=@ 0007 @=@ Trabajo fin de Máster
+dnet:publication_resource @=@ 0007 @=@ doc-type:masterThesis
+dnet:publication_resource @=@ 0007 @=@ hdr
+dnet:publication_resource @=@ 0007 @=@ http://purl.org/coar/resource_type/c_bdcc
+dnet:publication_resource @=@ 0007 @=@ info:eu-repo/semantics/masterThesis
+dnet:publication_resource @=@ 0007 @=@ masterThesis
+dnet:publication_resource @=@ 0007 @=@ memoire
+dnet:publication_resource @=@ 0027 @=@ Model/Model
+dnet:publication_resource @=@ 0027 @=@ model
+dnet:publication_resource @=@ 0020 @=@ Exhibition
+dnet:publication_resource @=@ 0020 @=@ Learning Object
+dnet:publication_resource @=@ 0020 @=@ Mapa
+dnet:publication_resource @=@ 0020 @=@ Modelo de utilidad
+dnet:publication_resource @=@ 0020 @=@ PEDAGOGICAL_DOCUMENT
+dnet:publication_resource @=@ 0020 @=@ Partitura
+dnet:publication_resource @=@ 0020 @=@ Sitio web
+dnet:publication_resource @=@ 0020 @=@ Trabajo de divulgación
+dnet:publication_resource @=@ 0020 @=@ Web publication/site
+dnet:publication_resource @=@ 0020 @=@ application
+dnet:publication_resource @=@ 0020 @=@ artefact
+dnet:publication_resource @=@ 0020 @=@ carte
+dnet:publication_resource @=@ 0020 @=@ composition
+dnet:publication_resource @=@ 0020 @=@ document_audiovisuel
+dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_12cc
+dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_12cd
+dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_1843
+dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_18cd
+dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_18cw
+dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_26e4
+dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_7ad9
+dnet:publication_resource @=@ 0020 @=@ http://purl.org/coar/resource_type/c_e059
+dnet:publication_resource @=@ 0020 @=@ info:eu-repo/semantics/other
+dnet:publication_resource @=@ 0020 @=@ learningObject
+dnet:publication_resource @=@ 0020 @=@ map
+dnet:publication_resource @=@ 0020 @=@ misc
+dnet:publication_resource @=@ 0020 @=@ other
+dnet:publication_resource @=@ 0020 @=@ revue
+dnet:publication_resource @=@ 0038 @=@ Abstract
+dnet:publication_resource @=@ 0038 @=@ Blog
+dnet:publication_resource @=@ 0038 @=@ Book Prospectus
+dnet:publication_resource @=@ 0038 @=@ Dictionary Entry
+dnet:publication_resource @=@ 0038 @=@ Disclosure
+dnet:publication_resource @=@ 0038 @=@ Editorial
+dnet:publication_resource @=@ 0038 @=@ Editorial ISI/JCR
+dnet:publication_resource @=@ 0038 @=@ Editors
+dnet:publication_resource @=@ 0038 @=@ Editors (non peer-reviewed)
+dnet:publication_resource @=@ 0038 @=@ Editors (peer-reviewed)
+dnet:publication_resource @=@ 0038 @=@ Encyclopedia Entry
+dnet:publication_resource @=@ 0038 @=@ Entrada de blog
+dnet:publication_resource @=@ 0038 @=@ Funding Submission
+dnet:publication_resource @=@ 0038 @=@ HabilitationThesis
+dnet:publication_resource @=@ 0038 @=@ License
+dnet:publication_resource @=@ 0038 @=@ Manual
+dnet:publication_resource @=@ 0038 @=@ Manuscript
+dnet:publication_resource @=@ 0038 @=@ Manuscrito
+dnet:publication_resource @=@ 0038 @=@ Other publication (non peer-review)
+dnet:publication_resource @=@ 0038 @=@ Other publication (peer-review)
+dnet:publication_resource @=@ 0038 @=@ Revista
+dnet:publication_resource @=@ 0038 @=@ Supervised Student Publication
+dnet:publication_resource @=@ 0038 @=@ Tesis/trabajos de grado – Thesis
+dnet:publication_resource @=@ 0038 @=@ Text
+dnet:publication_resource @=@ 0038 @=@ Text/Text
+dnet:publication_resource @=@ 0038 @=@ Trademark
+dnet:publication_resource @=@ 0038 @=@ Translation
+dnet:publication_resource @=@ 0038 @=@ afterword
+dnet:publication_resource @=@ 0038 @=@ avantpropos
+dnet:publication_resource @=@ 0038 @=@ bibliography
+dnet:publication_resource @=@ 0038 @=@ chronique
+dnet:publication_resource @=@ 0038 @=@ compte rendu
+dnet:publication_resource @=@ 0038 @=@ correction
+dnet:publication_resource @=@ 0038 @=@ foreword
+dnet:publication_resource @=@ 0038 @=@ habilitation à diriger des recherches
+dnet:publication_resource @=@ 0038 @=@ historicalDocument
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_0040
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_0857
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_18cf
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_18wz
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_3e5a
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_46ec
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_6947
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_7acd
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_86bc
+dnet:publication_resource @=@ 0038 @=@ http://purl.org/coar/resource_type/c_b239
+dnet:publication_resource @=@ 0038 @=@ note de lecture
+dnet:publication_resource @=@ 0038 @=@ notedelecture
+dnet:publication_resource @=@ 0038 @=@ other publication
+dnet:publication_resource @=@ 0038 @=@ postface
+dnet:publication_resource @=@ 0038 @=@ publication-other
+dnet:publication_resource @=@ 0038 @=@ revuedepresse
+dnet:publication_resource @=@ 0038 @=@ sa_component
+dnet:publication_resource @=@ 0038 @=@ standard
+dnet:publication_resource @=@ 0038 @=@ standard-series
+dnet:publication_resource @=@ 0013 @=@ A3 Kirjan tai muun kokoomateoksen osa
+dnet:publication_resource @=@ 0013 @=@ Book Part (author)
+dnet:publication_resource @=@ 0013 @=@ Book Section / Chapter
+dnet:publication_resource @=@ 0013 @=@ Book chapter or Essay in book
+dnet:publication_resource @=@ 0013 @=@ Book editorial
+dnet:publication_resource @=@ 0013 @=@ Book section
+dnet:publication_resource @=@ 0013 @=@ Book_Chapter
+dnet:publication_resource @=@ 0013 @=@ Buchbeitrag
+dnet:publication_resource @=@ 0013 @=@ Capítulo de libro
+dnet:publication_resource @=@ 0013 @=@ Contribution to International Book/Monograph
+dnet:publication_resource @=@ 0013 @=@ Contribution to International Book/Monograph ISI/JCR
+dnet:publication_resource @=@ 0013 @=@ Contribution to National Book/Monograph
+dnet:publication_resource @=@ 0013 @=@ Contribution to book (non peer-reviewed)
+dnet:publication_resource @=@ 0013 @=@ Contribution to book (peer-reviewed)
+dnet:publication_resource @=@ 0013 @=@ Part of book - chapter
+dnet:publication_resource @=@ 0013 @=@ book chapter
+dnet:publication_resource @=@ 0013 @=@ book-part
+dnet:publication_resource @=@ 0013 @=@ bookPart
+dnet:publication_resource @=@ 0013 @=@ book_content
+dnet:publication_resource @=@ 0013 @=@ chapitre_ouvrage
+dnet:publication_resource @=@ 0013 @=@ chapter
+dnet:publication_resource @=@ 0013 @=@ doc-type:bookPart
+dnet:publication_resource @=@ 0013 @=@ http://purl.org/coar/resource_type/c_3248
+dnet:publication_resource @=@ 0013 @=@ info:eu-repo/semantics/bookPart
+dnet:publication_resource @=@ 0013 @=@ publication-section
+dnet:publication_resource @=@ 0013 @=@ reference-entry
+dnet:publication_resource @=@ 0013 @=@ reference_entry
+dnet:publication_resource @=@ 0013 @=@ scientific book chapter
+dnet:publication_resource @=@ 0013 @=@ Глава монографии
+dnet:publication_resource @=@ 0019 @=@ H1 Myönnetty patentti
+dnet:publication_resource @=@ 0019 @=@ Patent
+dnet:publication_resource @=@ 0019 @=@ Patente
+dnet:publication_resource @=@ 0019 @=@ Solicitud de patente
+dnet:publication_resource @=@ 0019 @=@ Traducción de patente
+dnet:publication_resource @=@ 0019 @=@ brevet
+dnet:publication_resource @=@ 0019 @=@ http://purl.org/coar/resource_type/c_15cd
+dnet:publication_resource @=@ 0019 @=@ info:eu-repo/semantics/patent
+dnet:publication_resource @=@ 0019 @=@ publication-patent
+dnet:publication_resource @=@ 0028 @=@ Service
+dnet:publication_resource @=@ 0028 @=@ physicalObject
+dnet:publication_resource @=@ 0016 @=@ Pre Print
+dnet:publication_resource @=@ 0016 @=@ Pre-print
+dnet:publication_resource @=@ 0016 @=@ http://purl.org/coar/resource_type/c_816b
+dnet:publication_resource @=@ 0016 @=@ info:eu-repo/semantics/preprint
+dnet:publication_resource @=@ 0016 @=@ publication-preprint
+dnet:publication_resource @=@ 0016 @=@ Препринт
+dnet:publication_resource @=@ 0034 @=@ Project deliverable
+dnet:publication_resource @=@ 0034 @=@ http://purl.org/coar/resource_type/c_18op
+dnet:publication_resource @=@ 0034 @=@ publication-deliverable
+dnet:publication_resource @=@ 0035 @=@ Project milestone
+dnet:publication_resource @=@ 0035 @=@ publication-milestone
+dnet:publication_resource @=@ 0036 @=@ Proposal
+dnet:publication_resource @=@ 0036 @=@ http://purl.org/coar/resource_type/c_baaf
+dnet:publication_resource @=@ 0036 @=@ research-proposal
+dnet:publication_resource @=@ 0017 @=@ ACTIVITY_REPORT
+dnet:publication_resource @=@ 0017 @=@ Commissioned report
+dnet:publication_resource @=@ 0017 @=@ D4 Julkaistu kehittämis- tai tutkimusraportti tai -selvitys
+dnet:publication_resource @=@ 0017 @=@ Deliverable
+dnet:publication_resource @=@ 0017 @=@ Documento tecnico
+dnet:publication_resource @=@ 0017 @=@ Project Report
+dnet:publication_resource @=@ 0017 @=@ Software documentation
+dnet:publication_resource @=@ 0017 @=@ brief-report
+dnet:publication_resource @=@ 0017 @=@ case-report
+dnet:publication_resource @=@ 0017 @=@ chapitre_rapport
+dnet:publication_resource @=@ 0017 @=@ doc-type:report
+dnet:publication_resource @=@ 0017 @=@ document_institutionnel
+dnet:publication_resource @=@ 0017 @=@ document_technique
+dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_186u
+dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_18hj
+dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_18wq
+dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_18ws
+dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_71bd
+dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_93fc
+dnet:publication_resource @=@ 0017 @=@ http://purl.org/coar/resource_type/c_ba1f
+dnet:publication_resource @=@ 0017 @=@ info:eu-repo/semantics/report
+dnet:publication_resource @=@ 0017 @=@ publication-report
+dnet:publication_resource @=@ 0017 @=@ publication-softwaredocumentation
+dnet:publication_resource @=@ 0017 @=@ rapport_expertise
+dnet:publication_resource @=@ 0017 @=@ rapport_mission
+dnet:publication_resource @=@ 0017 @=@ report
+dnet:publication_resource @=@ 0017 @=@ report-paper
+dnet:publication_resource @=@ 0017 @=@ report-paper_title
+dnet:publication_resource @=@ 0017 @=@ report-series
+dnet:publication_resource @=@ 0017 @=@ support_cours
+dnet:publication_resource @=@ 0014 @=@ Arbeitspapier
+dnet:publication_resource @=@ 0014 @=@ Departmental Bulletin Paper
+dnet:publication_resource @=@ 0014 @=@ Documento de trabajo
+dnet:publication_resource @=@ 0014 @=@ Paper
+dnet:publication_resource @=@ 0014 @=@ Project description
+dnet:publication_resource @=@ 0014 @=@ Research-Paper
+dnet:publication_resource @=@ 0014 @=@ ResearchPaper
+dnet:publication_resource @=@ 0014 @=@ Working / discussion paper
+dnet:publication_resource @=@ 0014 @=@ Working Paper
+dnet:publication_resource @=@ 0014 @=@ Working Paper / Technical Report
+dnet:publication_resource @=@ 0014 @=@ doc-type:workingPaper
+dnet:publication_resource @=@ 0014 @=@ http://purl.org/coar/resource_type/c_8042
+dnet:publication_resource @=@ 0014 @=@ info:eu-repo/semantics/paper
+dnet:publication_resource @=@ 0014 @=@ info:eu-repo/semantics/workingPaper
+dnet:publication_resource @=@ 0014 @=@ publication-workingpaper
+dnet:publication_resource @=@ 0014 @=@ workingPaper
+dnet:publication_resource @=@ 0015 @=@ A2 Katsausartikkeli tieteellisessä aikakauslehdessä
+dnet:publication_resource @=@ 0015 @=@ Book Review
+dnet:publication_resource @=@ 0015 @=@ Book/Film/Article review
+dnet:publication_resource @=@ 0015 @=@ Literature review
+dnet:publication_resource @=@ 0015 @=@ Peer review
+dnet:publication_resource @=@ 0015 @=@ Reseña bibliográfica
+dnet:publication_resource @=@ 0015 @=@ Review Article
+dnet:publication_resource @=@ 0015 @=@ RezensionReview
+dnet:publication_resource @=@ 0015 @=@ book-review
+dnet:publication_resource @=@ 0015 @=@ http://purl.org/coar/resource_type/c_ba08
+dnet:publication_resource @=@ 0015 @=@ http://purl.org/coar/resource_type/c_dcae04bc
+dnet:publication_resource @=@ 0015 @=@ http://purl.org/coar/resource_type/c_efa0
+dnet:publication_resource @=@ 0015 @=@ info:eu-repo/semantics/review
+dnet:publication_resource @=@ 0015 @=@ peer-review
+dnet:publication_resource @=@ 0029 @=@ Software
+dnet:publication_resource @=@ 0029 @=@ Software/Software
+dnet:publication_resource @=@ 0029 @=@ Workflow
+dnet:publication_resource @=@ 0029 @=@ Workflow/Workflow
+dnet:publication_resource @=@ 0029 @=@ http://purl.org/coar/resource_type/c_393c
+dnet:publication_resource @=@ 0029 @=@ http://purl.org/coar/resource_type/c_5ce6
+dnet:publication_resource @=@ 0029 @=@ http://purl.org/coar/resource_type/c_c950
+dnet:publication_resource @=@ 0032 @=@ http://purl.org/coar/resource_type/c_7bab
+dnet:publication_resource @=@ 0030 @=@ http://purl.org/coar/resource_type/c_18cc
+dnet:publication_resource @=@ 0030 @=@ sound
+dnet:publication_resource @=@ 0044 @=@ Graduate diploma
+dnet:publication_resource @=@ 0044 @=@ Undergraduate diploma
+dnet:publication_resource @=@ 0000 @=@ UNKNOWN
+dnet:publication_resource @=@ 0042 @=@ EGI Virtual Appliance
+dnet:languages @=@ abk @=@ ab
+dnet:languages @=@ aar @=@ aa
+dnet:languages @=@ afr @=@ af
+dnet:languages @=@ alb/sqi @=@ sq
+dnet:languages @=@ amh @=@ am
+dnet:languages @=@ ara @=@ ar
+dnet:languages @=@ arm/hye @=@ hy
+dnet:languages @=@ asm @=@ as
+dnet:languages @=@ ina @=@ ia
+dnet:languages @=@ aym @=@ ay
+dnet:languages @=@ aze @=@ az
+dnet:languages @=@ bak @=@ ba
+dnet:languages @=@ baq/eus @=@ eu
+dnet:languages @=@ bel @=@ be
+dnet:languages @=@ ben @=@ bn
+dnet:languages @=@ bih @=@ bh
+dnet:languages @=@ bis @=@ bi
+dnet:languages @=@ bre @=@ br
+dnet:languages @=@ bul @=@ bg
+dnet:languages @=@ bur/mya @=@ my
+dnet:languages @=@ cat @=@ ca
+dnet:languages @=@ chi/zho @=@ zh
+dnet:languages @=@ cos @=@ co
+dnet:languages @=@ hrv @=@ hr
+dnet:languages @=@ hrv @=@ hr
+dnet:languages @=@ hrv @=@ scr/hrv
+dnet:languages @=@ ces/cze @=@ cs
+dnet:languages @=@ dan @=@ da
+dnet:languages @=@ dut/nld @=@ dut/nla
+dnet:languages @=@ dut/nld @=@ dutdut
+dnet:languages @=@ dut/nld @=@ nl
+dnet:languages @=@ dut/nld @=@ nl_be
+dnet:languages @=@ dut/nld @=@ nl_nl
+dnet:languages @=@ dut/nld @=@ nld
+dnet:languages @=@ dzo @=@ dz
+dnet:languages @=@ eng @=@ en
+dnet:languages @=@ eng @=@ en_au
+dnet:languages @=@ eng @=@ en_en
+dnet:languages @=@ eng @=@ en_gb
+dnet:languages @=@ eng @=@ en_nz
+dnet:languages @=@ eng @=@ en_us
+dnet:languages @=@ eng @=@ english
+dnet:languages @=@ eng @=@ en-us
+dnet:languages @=@ eng @=@ en-US
+dnet:languages @=@ eng @=@ English
+dnet:languages @=@ eng @=@ EN
+dnet:languages @=@ eng @=@ en angielski
+dnet:languages @=@ eng @=@ en-GB
+dnet:languages @=@ eng @=@ Englisch
+dnet:languages @=@ epo @=@ eo
+dnet:languages @=@ est @=@ et
+dnet:languages @=@ fao @=@ fo
+dnet:languages @=@ fij @=@ fj
+dnet:languages @=@ fin @=@ fi
+dnet:languages @=@ fin @=@ Finnish
+dnet:languages @=@ fra/fre @=@ fr
+dnet:languages @=@ fra/fre @=@ FR
+dnet:languages @=@ fra/fre @=@ fr_be
+dnet:languages @=@ fra/fre @=@ fr_fr
+dnet:languages @=@ fra/fre @=@ fre/fra
+dnet:languages @=@ fra/fre @=@ fra
+dnet:languages @=@ fry @=@ fy
+dnet:languages @=@ glg @=@ gl
+dnet:languages @=@ geo/kat @=@ ka
+dnet:languages @=@ deu/ger @=@ de
+dnet:languages @=@ deu/ger @=@ ger/deu
+dnet:languages @=@ deu/ger @=@ german
+dnet:languages @=@ deu/ger @=@ ger
+dnet:languages @=@ deu/ger @=@ deu
+dnet:languages @=@ deu/ger @=@ DE-de
+dnet:languages @=@ ell/gre @=@ el
+dnet:languages @=@ ell/gre @=@ gr
+dnet:languages @=@ ell/gre @=@ el-GR
+dnet:languages @=@ kal @=@ kl
+dnet:languages @=@ grn @=@ gn
+dnet:languages @=@ guj @=@ gu
+dnet:languages @=@ hau @=@ ha
+dnet:languages @=@ heb @=@ he
+dnet:languages @=@ hin @=@ hi
+dnet:languages @=@ hun @=@ hu
+dnet:languages @=@ ice/isl @=@ is
+dnet:languages @=@ ine @=@ -
+dnet:languages @=@ ind @=@ id
+dnet:languages @=@ iku @=@ iu
+dnet:languages @=@ ipk @=@ ik
+dnet:languages @=@ gai/iri @=@ ga
+dnet:languages @=@ gai/iri @=@ gle
+dnet:languages @=@ ita @=@ it
+dnet:languages @=@ jpn @=@ ja
+dnet:languages @=@ jav @=@ jv
+dnet:languages @=@ jav @=@ jv/jw
+dnet:languages @=@ jav @=@ jw
+dnet:languages @=@ kan @=@ kn
+dnet:languages @=@ kas @=@ ks
+dnet:languages @=@ kaz @=@ kk
+dnet:languages @=@ khm @=@ km
+dnet:languages @=@ kin @=@ rw
+dnet:languages @=@ kir @=@ ky
+dnet:languages @=@ kor @=@ ko
+dnet:languages @=@ kur @=@ ku
+dnet:languages @=@ lao @=@ lo
+dnet:languages @=@ lat @=@ la
+dnet:languages @=@ lav @=@ lv
+dnet:languages @=@ lin @=@ ln
+dnet:languages @=@ lit @=@ lt
+dnet:languages @=@ mac/mak @=@ mk
+dnet:languages @=@ mlg @=@ mg
+dnet:languages @=@ may/msa @=@ ms
+dnet:languages @=@ mlt @=@ ml
+dnet:languages @=@ mao/mri @=@ mi
+dnet:languages @=@ mar @=@ mr
+dnet:languages @=@ mol @=@ mo
+dnet:languages @=@ mon @=@ mn
+dnet:languages @=@ nau @=@ na
+dnet:languages @=@ nep @=@ ne
+dnet:languages @=@ nor @=@ no
+dnet:languages @=@ oci @=@ oc
+dnet:languages @=@ ori @=@ or
+dnet:languages @=@ orm @=@ om
+dnet:languages @=@ pan @=@ pa
+dnet:languages @=@ fas/per @=@ fa
+dnet:languages @=@ pol @=@ pl
+dnet:languages @=@ por @=@ pt
+dnet:languages @=@ por @=@ pt_pt
+dnet:languages @=@ pus @=@ ps
+dnet:languages @=@ que @=@ qu
+dnet:languages @=@ roh @=@ rm
+dnet:languages @=@ ron/rum @=@ ro
+dnet:languages @=@ run @=@ rn
+dnet:languages @=@ rus @=@ ru
+dnet:languages @=@ smo @=@ sm
+dnet:languages @=@ sag @=@ sg
+dnet:languages @=@ san @=@ sa
+dnet:languages @=@ srp @=@ scc/srp
+dnet:languages @=@ srp @=@ sr
+dnet:languages @=@ scr @=@ sh
+dnet:languages @=@ sna @=@ sn
+dnet:languages @=@ snd @=@ sd
+dnet:languages @=@ sin @=@ si
+dnet:languages @=@ sit @=@ -
+dnet:languages @=@ slk/slo @=@ sk
+dnet:languages @=@ slv @=@ sl
+dnet:languages @=@ som @=@ so
+dnet:languages @=@ sot @=@ st
+dnet:languages @=@ esl/spa @=@ es
+dnet:languages @=@ sun @=@ su
+dnet:languages @=@ swa @=@ sw
+dnet:languages @=@ ssw @=@ ss
+dnet:languages @=@ swe @=@ sv
+dnet:languages @=@ swe @=@ sve/swe
+dnet:languages @=@ tgl @=@ tl
+dnet:languages @=@ tgk @=@ tg
+dnet:languages @=@ tam @=@ ta
+dnet:languages @=@ tat @=@ tt
+dnet:languages @=@ tel @=@ te
+dnet:languages @=@ tha @=@ th
+dnet:languages @=@ tha @=@ thai
+dnet:languages @=@ bod/tib @=@ bo
+dnet:languages @=@ tir @=@ ti
+dnet:languages @=@ tog @=@ to
+dnet:languages @=@ tso @=@ ts
+dnet:languages @=@ tsn @=@ tn
+dnet:languages @=@ tur @=@ tr
+dnet:languages @=@ tuk @=@ tk
+dnet:languages @=@ twi @=@ tw
+dnet:languages @=@ uig @=@ ug
+dnet:languages @=@ ukr @=@ uk
+dnet:languages @=@ und @=@ UNKNOWN
+dnet:languages @=@ und @=@ none
+dnet:languages @=@ urd @=@ ur
+dnet:languages @=@ uzb @=@ uz
+dnet:languages @=@ vie @=@ vi
+dnet:languages @=@ vol @=@ vo
+dnet:languages @=@ wln @=@ wa
+dnet:languages @=@ cym/wel @=@ cy
+dnet:languages @=@ wol @=@ wo
+dnet:languages @=@ xho @=@ xh
+dnet:languages @=@ yid @=@ yi
+dnet:languages @=@ yor @=@ yo
+dnet:languages @=@ zha @=@ za
+dnet:languages @=@ zul @=@ zu
+dnet:result_typologies @=@ dataset @=@ 0021
+dnet:result_typologies @=@ dataset @=@ 0024
+dnet:result_typologies @=@ dataset @=@ 0025
+dnet:result_typologies @=@ dataset @=@ 0030
+dnet:result_typologies @=@ dataset @=@ 0033
+dnet:result_typologies @=@ dataset @=@ 0037
+dnet:result_typologies @=@ dataset @=@ 0039
+dnet:result_typologies @=@ dataset @=@ 0046
+dnet:result_typologies @=@ other @=@ 0000
+dnet:result_typologies @=@ other @=@ 0010
+dnet:result_typologies @=@ other @=@ 0018
+dnet:result_typologies @=@ other @=@ 0020
+dnet:result_typologies @=@ other @=@ 0022
+dnet:result_typologies @=@ other @=@ 0023
+dnet:result_typologies @=@ other @=@ 0026
+dnet:result_typologies @=@ other @=@ 0027
+dnet:result_typologies @=@ other @=@ 0028
+dnet:result_typologies @=@ other @=@ 0042
+dnet:result_typologies @=@ publication @=@ 0001
+dnet:result_typologies @=@ publication @=@ 0002
+dnet:result_typologies @=@ publication @=@ 0004
+dnet:result_typologies @=@ publication @=@ 0005
+dnet:result_typologies @=@ publication @=@ 0006
+dnet:result_typologies @=@ publication @=@ 0007
+dnet:result_typologies @=@ publication @=@ 0008
+dnet:result_typologies @=@ publication @=@ 0009
+dnet:result_typologies @=@ publication @=@ 0011
+dnet:result_typologies @=@ publication @=@ 0012
+dnet:result_typologies @=@ publication @=@ 0013
+dnet:result_typologies @=@ publication @=@ 0014
+dnet:result_typologies @=@ publication @=@ 0015
+dnet:result_typologies @=@ publication @=@ 0016
+dnet:result_typologies @=@ publication @=@ 0017
+dnet:result_typologies @=@ publication @=@ 0019
+dnet:result_typologies @=@ publication @=@ 0031
+dnet:result_typologies @=@ publication @=@ 0032
+dnet:result_typologies @=@ publication @=@ 0034
+dnet:result_typologies @=@ publication @=@ 0035
+dnet:result_typologies @=@ publication @=@ 0036
+dnet:result_typologies @=@ publication @=@ 0038
+dnet:result_typologies @=@ publication @=@ 0044
+dnet:result_typologies @=@ publication @=@ 0045
+dnet:result_typologies @=@ software @=@ 0029
+dnet:result_typologies @=@ software @=@ 0040
+dnet:countries @=@ AF @=@ AFG
+dnet:countries @=@ AF @=@ Afghanistan
+dnet:countries @=@ AD @=@ Andorra
+dnet:countries @=@ AO @=@ Angola
+dnet:countries @=@ AR @=@ ARG
+dnet:countries @=@ AR @=@ Argentina
+dnet:countries @=@ AU @=@ AUS
+dnet:countries @=@ AU @=@ Australia
+dnet:countries @=@ AT @=@ AUT
+dnet:countries @=@ AT @=@ Austria
+dnet:countries @=@ AZ @=@ AZE
+dnet:countries @=@ BD @=@ Bangladesh
+dnet:countries @=@ BY @=@ Belarus
+dnet:countries @=@ BE @=@ BEL
+dnet:countries @=@ BE @=@ Belgium
+dnet:countries @=@ BJ @=@ BEN
+dnet:countries @=@ BO @=@ Bolivia, Plurinational State of
+dnet:countries @=@ BA @=@ BIH
+dnet:countries @=@ BA @=@ Bosnia-Hercegovina
+dnet:countries @=@ BR @=@ BRA
+dnet:countries @=@ BR @=@ Brazil
+dnet:countries @=@ BG @=@ Bulgaria
+dnet:countries @=@ BF @=@ BFA
+dnet:countries @=@ KH @=@ Cambodia
+dnet:countries @=@ KH @=@ Cambogia
+dnet:countries @=@ KH @=@ Campuchea
+dnet:countries @=@ CM @=@ CMR
+dnet:countries @=@ CA @=@ CAN
+dnet:countries @=@ CA @=@ Canada
+dnet:countries @=@ CV @=@ Cape Verde
+dnet:countries @=@ CL @=@ CHL
+dnet:countries @=@ CL @=@ Chile
+dnet:countries @=@ CN @=@ CHN
+dnet:countries @=@ CN @=@ China
+dnet:countries @=@ CO @=@ COL
+dnet:countries @=@ CO @=@ Colombia
+dnet:countries @=@ CD @=@ Congo
+dnet:countries @=@ CD @=@ Congo Democratic Republic (formerly Zaire)
+dnet:countries @=@ CD @=@ Congo, Republic
+dnet:countries @=@ CD @=@ Congo, the Democratic Republic of the
+dnet:countries @=@ CD @=@ Zaire
+dnet:countries @=@ CR @=@ CRI
+dnet:countries @=@ CI @=@ CIV
+dnet:countries @=@ CI @=@ Ivory Coast
+dnet:countries @=@ HR @=@ Croatia
+dnet:countries @=@ HR @=@ HRV
+dnet:countries @=@ CY @=@ CYP
+dnet:countries @=@ CY @=@ Cyprus
+dnet:countries @=@ CZ @=@ CZE
+dnet:countries @=@ CZ @=@ Czech Republic
+dnet:countries @=@ CZ @=@ Czechia
+dnet:countries @=@ CZ @=@ Czechoslovakia
+dnet:countries @=@ DK @=@ DNK
+dnet:countries @=@ DK @=@ Denmark
+dnet:countries @=@ EC @=@ Ecuador
+dnet:countries @=@ EG @=@ EGY
+dnet:countries @=@ EG @=@ Egypt
+dnet:countries @=@ SV @=@ SLV
+dnet:countries @=@ EE @=@ EST
+dnet:countries @=@ EE @=@ Estonia
+dnet:countries @=@ ET @=@ ETH
+dnet:countries @=@ EU @=@ EEC
+dnet:countries @=@ FJ @=@ FJI
+dnet:countries @=@ FI @=@ FIN
+dnet:countries @=@ FI @=@ Finland
+dnet:countries @=@ MK @=@ Macedonia
+dnet:countries @=@ MK @=@ Macedonia, the Former Yugoslav Republic Of
+dnet:countries @=@ MK @=@ North Macedonia
+dnet:countries @=@ FR @=@ FRA
+dnet:countries @=@ FR @=@ France
+dnet:countries @=@ PF @=@ French Polynesia
+dnet:countries @=@ PF @=@ PYF
+dnet:countries @=@ TF @=@ French Southern Territories
+dnet:countries @=@ GE @=@ Georgia
+dnet:countries @=@ DE @=@ DEU
+dnet:countries @=@ DE @=@ Germany
+dnet:countries @=@ DE @=@ Germany, Berlin
+dnet:countries @=@ GH @=@ GHA
+dnet:countries @=@ GR @=@ EL
+dnet:countries @=@ GR @=@ GRC
+dnet:countries @=@ GL @=@ GRL
+dnet:countries @=@ GN @=@ Guinea
+dnet:countries @=@ GW @=@ Guinea-Bissau
+dnet:countries @=@ VA @=@ Vatican State
+dnet:countries @=@ HK @=@ HKG
+dnet:countries @=@ HK @=@ Hong Kong
+dnet:countries @=@ HK @=@ Hongkong
+dnet:countries @=@ HU @=@ HUN
+dnet:countries @=@ HU @=@ Hungary
+dnet:countries @=@ IS @=@ ISL
+dnet:countries @=@ IN @=@ IND
+dnet:countries @=@ IN @=@ India
+dnet:countries @=@ ID @=@ IDN
+dnet:countries @=@ ID @=@ Indonesia
+dnet:countries @=@ IR @=@ Iran
+dnet:countries @=@ IR @=@ Iran, Islamic Republic of
+dnet:countries @=@ IE @=@ IRL
+dnet:countries @=@ IE @=@ Ireland
+dnet:countries @=@ IL @=@ ISR
+dnet:countries @=@ IL @=@ Israel
+dnet:countries @=@ IT @=@ ITA
+dnet:countries @=@ IT @=@ Italy
+dnet:countries @=@ JM @=@ Jamaica
+dnet:countries @=@ JP @=@ JPN
+dnet:countries @=@ JP @=@ Japan
+dnet:countries @=@ KZ @=@ KAZ
+dnet:countries @=@ KZ @=@ Kazakistan
+dnet:countries @=@ KZ @=@ Kazakstan
+dnet:countries @=@ KE @=@ KEN
+dnet:countries @=@ KE @=@ Kenya
+dnet:countries @=@ KR @=@ KOR
+dnet:countries @=@ KR @=@ Korea, Republic of
+dnet:countries @=@ KR @=@ Korean Republic (South Korea)
+dnet:countries @=@ KP @=@ PRK
+dnet:countries @=@ LV @=@ LVA
+dnet:countries @=@ LY @=@ Libya
+dnet:countries @=@ LT @=@ LTU
+dnet:countries @=@ LU @=@ LUX
+dnet:countries @=@ LU @=@ Luxembourg
+dnet:countries @=@ MO @=@ Macao
+dnet:countries @=@ MG @=@ Madagascar
+dnet:countries @=@ MY @=@ Malaysia
+dnet:countries @=@ ML @=@ Mali
+dnet:countries @=@ MT @=@ Malta
+dnet:countries @=@ MU @=@ Mauritius
+dnet:countries @=@ MX @=@ MEX
+dnet:countries @=@ MX @=@ Mexico
+dnet:countries @=@ FM @=@ Micronesia
+dnet:countries @=@ MD @=@ Moldova
+dnet:countries @=@ MD @=@ Moldova, Republic of
+dnet:countries @=@ MN @=@ Mongolia
+dnet:countries @=@ MA @=@ Morocco
+dnet:countries @=@ MZ @=@ Mozambique
+dnet:countries @=@ NA @=@ NAM
+dnet:countries @=@ NL @=@ NLD
+dnet:countries @=@ NL @=@ Netherlands
+dnet:countries @=@ AN @=@ Netherlands Antilles
+dnet:countries @=@ NC @=@ NCL
+dnet:countries @=@ NZ @=@ NZL
+dnet:countries @=@ NZ @=@ New Zealand
+dnet:countries @=@ NO @=@ NOR
+dnet:countries @=@ NO @=@ Norway
+dnet:countries @=@ OC @=@ Australasia
+dnet:countries @=@ OM @=@ Oman
+dnet:countries @=@ PK @=@ PAK
+dnet:countries @=@ PK @=@ Pakistan
+dnet:countries @=@ PS @=@ Palestin, State of
+dnet:countries @=@ PS @=@ Palestine, State of
+dnet:countries @=@ PS @=@ Palestinian Territory, Occupied
+dnet:countries @=@ PA @=@ PAN
+dnet:countries @=@ PA @=@ Panama
+dnet:countries @=@ PG @=@ PapuaNew Guinea
+dnet:countries @=@ PE @=@ PER
+dnet:countries @=@ PH @=@ PHL
+dnet:countries @=@ PH @=@ Philippines
+dnet:countries @=@ PL @=@ POL
+dnet:countries @=@ PL @=@ Poland
+dnet:countries @=@ PT @=@ PRT
+dnet:countries @=@ PT @=@ Portugal
+dnet:countries @=@ PR @=@ Puerto Rico
+dnet:countries @=@ RO @=@ ROU
+dnet:countries @=@ RO @=@ Romania
+dnet:countries @=@ RU @=@ RUS
+dnet:countries @=@ RU @=@ Russia
+dnet:countries @=@ RU @=@ Russian Federation
+dnet:countries @=@ RE @=@ Réunion
+dnet:countries @=@ KN @=@ Saint Kitts And Nevis
+dnet:countries @=@ SA @=@ Saudi Arabia
+dnet:countries @=@ SN @=@ SEN
+dnet:countries @=@ RS @=@ SRB
+dnet:countries @=@ CS @=@ Serbia and Montenegro
+dnet:countries @=@ SG @=@ SGP
+dnet:countries @=@ SG @=@ Singapore
+dnet:countries @=@ SK @=@ SVK
+dnet:countries @=@ SI @=@ SVN
+dnet:countries @=@ SI @=@ Slovenia
+dnet:countries @=@ ZA @=@ South Africa
+dnet:countries @=@ ZA @=@ ZAF
+dnet:countries @=@ ES @=@ ESP
+dnet:countries @=@ ES @=@ Spain
+dnet:countries @=@ LK @=@ LKA
+dnet:countries @=@ LK @=@ Sri Lanka
+dnet:countries @=@ SD @=@ SDN
+dnet:countries @=@ SR @=@ Suriname
+dnet:countries @=@ SE @=@ SWE
+dnet:countries @=@ SE @=@ Sweden
+dnet:countries @=@ CH @=@ CHE
+dnet:countries @=@ CH @=@ Switzerland
+dnet:countries @=@ SY @=@ Syria
+dnet:countries @=@ ST @=@ Sao Tome and Principe
+dnet:countries @=@ TW @=@ TWN
+dnet:countries @=@ TW @=@ Taiwan
+dnet:countries @=@ TW @=@ Taiwan, Province of China
+dnet:countries @=@ TZ @=@ Tanzania
+dnet:countries @=@ TZ @=@ Tanzania, United Republic of
+dnet:countries @=@ TH @=@ THA
+dnet:countries @=@ TH @=@ Thailand
+dnet:countries @=@ TL @=@ East Timor
+dnet:countries @=@ TN @=@ TUN
+dnet:countries @=@ TN @=@ Tunisia
+dnet:countries @=@ TR @=@ TUR
+dnet:countries @=@ TR @=@ Turkey
+dnet:countries @=@ UNKNOWN @=@ AAA
+dnet:countries @=@ UNKNOWN @=@ [Unknown]
+dnet:countries @=@ UNKNOWN @=@ _?
+dnet:countries @=@ UA @=@ UKR
+dnet:countries @=@ UA @=@ Ukraine
+dnet:countries @=@ AE @=@ United Arab Emirates
+dnet:countries @=@ GB @=@ England
+dnet:countries @=@ GB @=@ GBR
+dnet:countries @=@ GB @=@ Great Britain
+dnet:countries @=@ GB @=@ Great Britain and Northern Ireland
+dnet:countries @=@ GB @=@ Scotland
+dnet:countries @=@ GB @=@ UK
+dnet:countries @=@ GB @=@ United Kingdom
+dnet:countries @=@ US @=@ USA
+dnet:countries @=@ US @=@ United States
+dnet:countries @=@ US @=@ United States of America
+dnet:countries @=@ UY @=@ Uruguay
+dnet:countries @=@ UZ @=@ Uzbekistan
+dnet:countries @=@ VE @=@ Venezuela, Bolivarian Republic of
+dnet:countries @=@ VN @=@ Vietnam
+dnet:countries @=@ VG @=@ British Virgin Islands
+dnet:countries @=@ YU @=@ Jugoslavia
+dnet:countries @=@ YU @=@ Yugoslavia
+dnet:countries @=@ ZW @=@ ABW
+dnet:protocols @=@ oai @=@ OAI-PMH
+dnet:protocols @=@ oai @=@ OAI_PMH
+dnet:pid_types @=@ orcid @=@ ORCID12
+dnet:pid_types @=@ handle @=@ hdl
+dnet:review_levels @=@ 0000 @=@ UNKNOWN
+dnet:review_levels @=@ 0002 @=@ 80 大阪経大学会「Working Paper」
+dnet:review_levels @=@ 0002 @=@ AO
+dnet:review_levels @=@ 0002 @=@ ARTICLE SANS COMITE DE LECTURE (ASCL)
+dnet:review_levels @=@ 0002 @=@ Arbeitspapier
+dnet:review_levels @=@ 0002 @=@ Arbeitspapier [workingPaper]
+dnet:review_levels @=@ 0002 @=@ Article (author)
+dnet:review_levels @=@ 0002 @=@ Article type: preprint
+dnet:review_levels @=@ 0002 @=@ Article(author version)
+dnet:review_levels @=@ 0002 @=@ Article, not peer-reviewed
+dnet:review_levels @=@ 0002 @=@ Articulo no evaluado
+dnet:review_levels @=@ 0002 @=@ Artigo Solicitado e Não Avaliado por Pares
+dnet:review_levels @=@ 0002 @=@ Artigo não avaliado pelos pares
+dnet:review_levels @=@ 0002 @=@ Artigo não avaliado por pares
+dnet:review_levels @=@ 0002 @=@ Artigo não avaliado por pres
+dnet:review_levels @=@ 0002 @=@ Artikkeli|Artikkeli ammattilehdessä. Ei vertaisarvioitu
+dnet:review_levels @=@ 0002 @=@ Artículo no evaluado
+dnet:review_levels @=@ 0002 @=@ Book (non peer-reviewed)
+dnet:review_levels @=@ 0002 @=@ Book Part (author)
+dnet:review_levels @=@ 0002 @=@ Book item; Non-peer-reviewed
+dnet:review_levels @=@ 0002 @=@ Conference preprint
+dnet:review_levels @=@ 0002 @=@ Contribution to book (non peer-reviewed)
+dnet:review_levels @=@ 0002 @=@ Discussion Paper
+dnet:review_levels @=@ 0002 @=@ Document de travail (Working Paper)
+dnet:review_levels @=@ 0002 @=@ Documento de trabajo
+dnet:review_levels @=@ 0002 @=@ Documento de trabajo de investigaci??n
+dnet:review_levels @=@ 0002 @=@ Draft
+dnet:review_levels @=@ 0002 @=@ E-pub ahead of print
+dnet:review_levels @=@ 0002 @=@ Editorial de revista, no evaluado por pares
+dnet:review_levels @=@ 0002 @=@ Editorial de revista, não avaliado por pares
+dnet:review_levels @=@ 0002 @=@ Editorial não avaliado pelos pares
+dnet:review_levels @=@ 0002 @=@ Editors (non peer-reviewed)
+dnet:review_levels @=@ 0002 @=@ Epub ahead of print
+dnet:review_levels @=@ 0002 @=@ Hakemlik Sürecinden Geçmiş Makale
+dnet:review_levels @=@ 0002 @=@ Hakemlik sürecindeki makale
+dnet:review_levels @=@ 0002 @=@ Hakemlik sürecinden geçmemiş kitap değerlendirmesi
+dnet:review_levels @=@ 0002 @=@ Journal Article (author version)
+dnet:review_levels @=@ 0002 @=@ Journal Article Preprint
+dnet:review_levels @=@ 0002 @=@ Journal Editorial, not peer-reviewed
+dnet:review_levels @=@ 0002 @=@ Journal article; Non-peer-reviewed
+dnet:review_levels @=@ 0002 @=@ Journal:WorkingPaper
+dnet:review_levels @=@ 0002 @=@ Manuscript (preprint)
+dnet:review_levels @=@ 0002 @=@ Monográfico (Informes, Documentos de trabajo, etc.)
+dnet:review_levels @=@ 0002 @=@ NOTE INTERNE OU DE TRAVAIL
+dnet:review_levels @=@ 0002 @=@ Nicht begutachteter Beitrag
+dnet:review_levels @=@ 0002 @=@ No evaluado por pares
+dnet:review_levels @=@ 0002 @=@ Non-Refereed
+dnet:review_levels @=@ 0002 @=@ Non-refeered article
+dnet:review_levels @=@ 0002 @=@ Non-refereed Article
+dnet:review_levels @=@ 0002 @=@ Non-refereed Book Review
+dnet:review_levels @=@ 0002 @=@ Non-refereed Review
+dnet:review_levels @=@ 0002 @=@ Non-refereed Text
+dnet:review_levels @=@ 0002 @=@ NonPeerReviewed
+dnet:review_levels @=@ 0002 @=@ Not Peer reviewed
+dnet:review_levels @=@ 0002 @=@ Not Reviewed
+dnet:review_levels @=@ 0002 @=@ Not peer-reviewed
+dnet:review_levels @=@ 0002 @=@ Não Avaliado por Pares
+dnet:review_levels @=@ 0002 @=@ Não avaliada pelos pares
+dnet:review_levels @=@ 0002 @=@ Não avaliado pelos pares
+dnet:review_levels @=@ 0002 @=@ Original article (non peer-reviewed)
+dnet:review_levels @=@ 0002 @=@ Other publication (non peer-review)
+dnet:review_levels @=@ 0002 @=@ Pre Print
+dnet:review_levels @=@ 0002 @=@ Pre-print
+dnet:review_levels @=@ 0002 @=@ Preprint Article
+dnet:review_levels @=@ 0002 @=@ Preprints
+dnet:review_levels @=@ 0002 @=@ Preprints, Working Papers, ...
+dnet:review_levels @=@ 0002 @=@ Rapporto tecnico / Working Paper / Rapporto di progetto
+dnet:review_levels @=@ 0002 @=@ Resumo Não Avaliado por Pares
+dnet:review_levels @=@ 0002 @=@ Review article (non peer-reviewed)
+dnet:review_levels @=@ 0002 @=@ SMUR
+dnet:review_levels @=@ 0002 @=@ Submissão dos artigos
+dnet:review_levels @=@ 0002 @=@ Submitted version
+dnet:review_levels @=@ 0002 @=@ Vertaisarvioimaton kirjan tai muun kokoomateoksen osa
+dnet:review_levels @=@ 0002 @=@ Vorabdruck
+dnet:review_levels @=@ 0002 @=@ Wetensch. publ. non-refereed
+dnet:review_levels @=@ 0002 @=@ Working / discussion paper
+dnet:review_levels @=@ 0002 @=@ Working Document
+dnet:review_levels @=@ 0002 @=@ Working Notes
+dnet:review_levels @=@ 0002 @=@ Working Paper
+dnet:review_levels @=@ 0002 @=@ Working Paper / Technical Report
+dnet:review_levels @=@ 0002 @=@ Working Papers
+dnet:review_levels @=@ 0002 @=@ WorkingPaper <importModel: WorkingPaperImportModel>
+dnet:review_levels @=@ 0002 @=@ article in non peer-reviewed journal
+dnet:review_levels @=@ 0002 @=@ articolo preliminare
+dnet:review_levels @=@ 0002 @=@ articulo preliminar
+dnet:review_levels @=@ 0002 @=@ articulo sin revision por pares
+dnet:review_levels @=@ 0002 @=@ artigo preliminar
+dnet:review_levels @=@ 0002 @=@ artigo sem revisão
+dnet:review_levels @=@ 0002 @=@ artículo preliminar
+dnet:review_levels @=@ 0002 @=@ artículo sin revisión por pares
+dnet:review_levels @=@ 0002 @=@ bookchapter (author version)
+dnet:review_levels @=@ 0002 @=@ borrador
+dnet:review_levels @=@ 0002 @=@ column (author version)
+dnet:review_levels @=@ 0002 @=@ communication_invitee
+dnet:review_levels @=@ 0002 @=@ doc-type:preprint
+dnet:review_levels @=@ 0002 @=@ doc-type:workingPaper
+dnet:review_levels @=@ 0002 @=@ draf
+dnet:review_levels @=@ 0002 @=@ eu-repo/semantics/submittedVersion
+dnet:review_levels @=@ 0002 @=@ http://purl.org/coar/resource_type/c_8042
+dnet:review_levels @=@ 0002 @=@ http://purl.org/coar/resource_type/c_816b
+dnet:review_levels @=@ 0002 @=@ http://purl.org/coar/version/c_71e4c1898caa6e32
+dnet:review_levels @=@ 0002 @=@ http://purl.org/coar/version/c_b1a7d7d4d402bcce
+dnet:review_levels @=@ 0002 @=@ http://purl.org/eprint/type/SubmittedBookItem
+dnet:review_levels @=@ 0002 @=@ http://purl.org/eprint/type/SubmittedJournalArticle
+dnet:review_levels @=@ 0002 @=@ http://purl.org/info:eu-repo/semantics/authorVersion
+dnet:review_levels @=@ 0002 @=@ http://purl.org/info:eu-repo/semantics/submittedVersion
+dnet:review_levels @=@ 0002 @=@ http://purl.org/spar/fabio/Preprint
+dnet:review_levels @=@ 0002 @=@ http://purl.org/spar/fabio/WorkingPaper
+dnet:review_levels @=@ 0002 @=@ https://dictionary.casrai.org/Preprint
+dnet:review_levels @=@ 0002 @=@ info:ar-repo/semantics/documento de trabajo
+dnet:review_levels @=@ 0002 @=@ info:ar-repo/semantics/documentoDeTrabajo
+dnet:review_levels @=@ 0002 @=@ info:eu repo/semantics/draft
+dnet:review_levels @=@ 0002 @=@ info:eu-repo/semantics/authorVersion
+dnet:review_levels @=@ 0002 @=@ info:eu-repo/semantics/draft
+dnet:review_levels @=@ 0002 @=@ info:eu-repo/semantics/preprint
+dnet:review_levels @=@ 0002 @=@ info:eu-repo/semantics/submitedVersion
+dnet:review_levels @=@ 0002 @=@ info:eu-repo/semantics/submittedVersion
+dnet:review_levels @=@ 0002 @=@ info:eu-repo/semantics/unReviewed
+dnet:review_levels @=@ 0002 @=@ info:eu-repo/semantics/updatedVersion
+dnet:review_levels @=@ 0002 @=@ info:eu-repo/semantics/workingPaper
+dnet:review_levels @=@ 0002 @=@ info:eu-repo/submittedVersion
+dnet:review_levels @=@ 0002 @=@ info:ulb-repo/semantics/articleNonPeerReview
+dnet:review_levels @=@ 0002 @=@ info:ulb-repo/semantics/openurl/vlink-workingpaper
+dnet:review_levels @=@ 0002 @=@ info:ulb-repo/semantics/workingPaper
+dnet:review_levels @=@ 0002 @=@ non peer-reviewed article
+dnet:review_levels @=@ 0002 @=@ non-refereed review article
+dnet:review_levels @=@ 0002 @=@ não avaliado
+dnet:review_levels @=@ 0002 @=@ preprint
+dnet:review_levels @=@ 0002 @=@ prepublicación
+dnet:review_levels @=@ 0002 @=@ proceeding, seminar, workshop without peer review
+dnet:review_levels @=@ 0002 @=@ proceedings (author version)
+dnet:review_levels @=@ 0002 @=@ pré-print
+dnet:review_levels @=@ 0002 @=@ pré-publication
+dnet:review_levels @=@ 0002 @=@ préprint
+dnet:review_levels @=@ 0002 @=@ prépublication
+dnet:review_levels @=@ 0002 @=@ publicació preliminar
+dnet:review_levels @=@ 0002 @=@ publication-preprint
+dnet:review_levels @=@ 0002 @=@ publication-workingpaper
+dnet:review_levels @=@ 0002 @=@ submitedVersion
+dnet:review_levels @=@ 0002 @=@ submittedVersion
+dnet:review_levels @=@ 0002 @=@ voordruk
+dnet:review_levels @=@ 0002 @=@ workingPaper
+dnet:review_levels @=@ 0002 @=@ ön baskı
+dnet:review_levels @=@ 0002 @=@ Препринт
+dnet:review_levels @=@ 0002 @=@ предпечатная версия публикации
+dnet:review_levels @=@ 0002 @=@ препринт статьи
+dnet:review_levels @=@ 0002 @=@ ディスカッション／ワーキング・ペーパー DP/WP
+dnet:review_levels @=@ 0002 @=@ プレプリント
+dnet:review_levels @=@ 0002 @=@ プレプリント Preprint
+dnet:review_levels @=@ 0002 @=@ プレプリント（Preprint）
+dnet:review_levels @=@ 0002 @=@ 印刷物/電子媒体-その他（査読無し）
+dnet:review_levels @=@ 0002 @=@ 印刷物/電子媒体-テクニカルレポート類（査読無し）
+dnet:review_levels @=@ 0002 @=@ 印刷物/電子媒体-会議発表論文（査読無し）
+dnet:review_levels @=@ 0002 @=@ 印刷物/電子媒体-図書（査読無し）
+dnet:review_levels @=@ 0002 @=@ 印刷物/電子媒体-学術雑誌論文（査読無し）
+dnet:review_levels @=@ 0002 @=@ 印刷物/電子媒体-紀要論文（査読無し）
+dnet:review_levels @=@ 0002 @=@ 印刷物/電子媒体-雑誌記事（査読無し）
+dnet:review_levels @=@ 0002 @=@ 预印本
+dnet:review_levels @=@ 0001 @=@ ##rt.metadata.pkp.peerReviewed##
+dnet:review_levels @=@ 0001 @=@ A1 Alkuperäisartikkeli tieteellisessä aikakauslehdessä
+dnet:review_levels @=@ 0001 @=@ Art?culo revisado por pares
+dnet:review_levels @=@ 0001 @=@ Article revisat per persones expertes
+dnet:review_levels @=@ 0001 @=@ Article type: peer review
+dnet:review_levels @=@ 0001 @=@ Article Ã©valuÃ© par les pairs
+dnet:review_levels @=@ 0001 @=@ Article évalué par des pairs
+dnet:review_levels @=@ 0001 @=@ Article évalué par les pairs
+dnet:review_levels @=@ 0001 @=@ Articolo valutato secondo i criteri della peer review
+dnet:review_levels @=@ 0001 @=@ Articulo evaluado por dos pares
+dnet:review_levels @=@ 0001 @=@ Articulo revisado por pares
+dnet:review_levels @=@ 0001 @=@ Artigo Avaliado pelos Pares
+dnet:review_levels @=@ 0001 @=@ Artigo Revisto por Pares
+dnet:review_levels @=@ 0001 @=@ Artigo avaliado por blind peer review
+dnet:review_levels @=@ 0001 @=@ Artigo avaliado por pares
+dnet:review_levels @=@ 0001 @=@ Artigo de convidado. Avaliado pelos pares
+dnet:review_levels @=@ 0001 @=@ Artigos; Avaliado pelos pares
+dnet:review_levels @=@ 0001 @=@ Artículo de investigación, Investigaciones originales, Artículo evaluado por pares, Investigaciones empíricas
+dnet:review_levels @=@ 0001 @=@ Artículo evaluado por pares
+dnet:review_levels @=@ 0001 @=@ Artículo evaluado por pares, Ensayos de investigación
+dnet:review_levels @=@ 0001 @=@ Artículo evaluado por pares, Investigaciones empíricas, Artículos de investigación
+dnet:review_levels @=@ 0001 @=@ Artículo revisado
+dnet:review_levels @=@ 0001 @=@ Artículo revisado por pares
+dnet:review_levels @=@ 0001 @=@ Artículos de estudiantes, Artículo evaluado por pares, Artículos de investigación
+dnet:review_levels @=@ 0001 @=@ Artículos de investigación evaluados por doble ciego
+dnet:review_levels @=@ 0001 @=@ Artículos evaluadores por doble ciego
+dnet:review_levels @=@ 0001 @=@ Artículos evaluados por pares
+dnet:review_levels @=@ 0001 @=@ Artículos evaluados por pares académicos
+dnet:review_levels @=@ 0001 @=@ Artículos revisados por pares
+dnet:review_levels @=@ 0001 @=@ Avaliadas pelos pares
+dnet:review_levels @=@ 0001 @=@ Avaliado anonimamente por pares
+dnet:review_levels @=@ 0001 @=@ Avaliado em duplo cego por pares
+dnet:review_levels @=@ 0001 @=@ Avaliado pela Editoria
+dnet:review_levels @=@ 0001 @=@ Avaliado pela Editoria. Avaliado pelos pares.
+dnet:review_levels @=@ 0001 @=@ Avaliado pelo Editoria
+dnet:review_levels @=@ 0001 @=@ Avaliado pelo pares
+dnet:review_levels @=@ 0001 @=@ Avaliado pelos Editores
+dnet:review_levels @=@ 0001 @=@ Avaliado pelos pares
+dnet:review_levels @=@ 0001 @=@ Avaliado pelos pares, Artigo de convidado
+dnet:review_levels @=@ 0001 @=@ Avaliado pelos pares, Artigos Originais
+dnet:review_levels @=@ 0001 @=@ Avaliado pelos pares, Artigos Originais, Artigos de Revisão
+dnet:review_levels @=@ 0001 @=@ Avaliado pelos pares. Avaliado pelo Editoria
+dnet:review_levels @=@ 0001 @=@ Avaliado po Pares
+dnet:review_levels @=@ 0001 @=@ Avaliado por Editor
+dnet:review_levels @=@ 0001 @=@ Avaliado por pares
+dnet:review_levels @=@ 0001 @=@ Avaliados pelos pares
+dnet:review_levels @=@ 0001 @=@ Avaliados por Pares
+dnet:review_levels @=@ 0001 @=@ Blind Peer-reviewed Article
+dnet:review_levels @=@ 0001 @=@ Book (peer-reviewed)
+dnet:review_levels @=@ 0001 @=@ Comentario de libros, Comentario de revistas, Comentario de conferencias, Artículo evaluado por pares, Artículo de investigación
+dnet:review_levels @=@ 0001 @=@ Conference paper; Peer-reviewed
+dnet:review_levels @=@ 0001 @=@ Contribution to book (peer-reviewed)
+dnet:review_levels @=@ 0001 @=@ Documento Avaliado por Pares
+dnet:review_levels @=@ 0001 @=@ Double blind evaluation articles
+dnet:review_levels @=@ 0001 @=@ Double blind peer review
+dnet:review_levels @=@ 0001 @=@ Editors (peer-reviewed)
+dnet:review_levels @=@ 0001 @=@ Evaluación por pares
+dnet:review_levels @=@ 0001 @=@ Evaluado por pares
+dnet:review_levels @=@ 0001 @=@ Evaluados por los pares
+dnet:review_levels @=@ 0001 @=@ Hakem sürecinden geçmiş makale
+dnet:review_levels @=@ 0001 @=@ Hakemli makale
+dnet:review_levels @=@ 0001 @=@ Hakemlik Sürecinden Geçmiş
+dnet:review_levels @=@ 0001 @=@ Invited Peer-Reviewed Article
+dnet:review_levels @=@ 0001 @=@ Journal article; Peer-reviewed
+dnet:review_levels @=@ 0001 @=@ Original article (peer-reviewed)
+dnet:review_levels @=@ 0001 @=@ Other publication (peer-review)
+dnet:review_levels @=@ 0001 @=@ Paper peer-reviewed
+dnet:review_levels @=@ 0001 @=@ Papers evaluated by academic peers
+dnet:review_levels @=@ 0001 @=@ Peer reviewed
+dnet:review_levels @=@ 0001 @=@ Peer reviewed article
+dnet:review_levels @=@ 0001 @=@ Peer reviewed invited commentry
+dnet:review_levels @=@ 0001 @=@ Peer-Reviewed Protocol
+dnet:review_levels @=@ 0001 @=@ Peer-reviewd Article
+dnet:review_levels @=@ 0001 @=@ Peer-reviewed
+dnet:review_levels @=@ 0001 @=@ Peer-reviewed Article
+dnet:review_levels @=@ 0001 @=@ Peer-reviewed Paper
+dnet:review_levels @=@ 0001 @=@ Peer-reviewed Review
+dnet:review_levels @=@ 0001 @=@ Peer-reviewed Review Article
+dnet:review_levels @=@ 0001 @=@ Peer-reviewed Text
+dnet:review_levels @=@ 0001 @=@ Peer-reviewed communication
+dnet:review_levels @=@ 0001 @=@ Peer-reviewed conference proceedings
+dnet:review_levels @=@ 0001 @=@ Peer-reviewed research article
+dnet:review_levels @=@ 0001 @=@ Peer-reviewed short communication
+dnet:review_levels @=@ 0001 @=@ PeerReviewed
+dnet:review_levels @=@ 0001 @=@ Proceedings (peer-reviewed)
+dnet:review_levels @=@ 0001 @=@ Refereed
+dnet:review_levels @=@ 0001 @=@ Refereed Article
+dnet:review_levels @=@ 0001 @=@ Research articles evaluated by double blind
+dnet:review_levels @=@ 0001 @=@ Resenha avaliada pelos pares
+dnet:review_levels @=@ 0001 @=@ Review article (peer-reviewed)
+dnet:review_levels @=@ 0001 @=@ Reviewed by peers
+dnet:review_levels @=@ 0001 @=@ RevisiÃ³n por Expertos
+dnet:review_levels @=@ 0001 @=@ Revisto por Pares
+dnet:review_levels @=@ 0001 @=@ SBBq abstracts / peer-reviewed
+dnet:review_levels @=@ 0001 @=@ SBBq resúmenes - revisada por pares
+dnet:review_levels @=@ 0001 @=@ Scholarly publ. Refereed
+dnet:review_levels @=@ 0001 @=@ Scientific Publ (refereed)
+dnet:review_levels @=@ 0001 @=@ Vertaisarvioimaton kirjoitus tieteellisessä aikakauslehdessä
+dnet:review_levels @=@ 0001 @=@ Vertaisarvioitu alkuperäisartikkeli tieteellisessä aikakauslehdessä
+dnet:review_levels @=@ 0001 @=@ Vertaisarvioitu artikkeli konferenssijulkaisussa
+dnet:review_levels @=@ 0001 @=@ Vertaisarvioitu artikkeli tieteellisessä aikakauslehdessä
+dnet:review_levels @=@ 0001 @=@ Vertaisarvioitu kirjan tai muun kokoomateoksen osa
+dnet:review_levels @=@ 0001 @=@ Wetensch. publ. Refereed
+dnet:review_levels @=@ 0001 @=@ article in peer-reviewed journal
+dnet:review_levels @=@ 0001 @=@ articles validés
+dnet:review_levels @=@ 0001 @=@ avaliado por pares, temas livres
+dnet:review_levels @=@ 0001 @=@ info:eu-repo/semantics/peerReviewed
+dnet:review_levels @=@ 0001 @=@ info:ulb-repo/semantics/articlePeerReview
+dnet:review_levels @=@ 0001 @=@ proceeding with peer review
+dnet:review_levels @=@ 0001 @=@ refereed_publications
+dnet:review_levels @=@ 0001 @=@ ul_published_reviewed
+dnet:review_levels @=@ 0001 @=@ Άρθρο που έχει αξιολογηθεί από ομότιμους ειδικούς
+dnet:review_levels @=@ 0001 @=@ Άρθρο το οποίο έχει περάσει από ομότιμη αξιολόγηση
+dnet:review_levels @=@ 0001 @=@ レフェリー付き論文
+dnet:review_levels @=@ 0001 @=@ 印刷物/電子媒体-テクニカルレポート類（査読有り）
+dnet:review_levels @=@ 0001 @=@ 印刷物/電子媒体-会議発表論文（査読有り）
+dnet:review_levels @=@ 0001 @=@ 印刷物/電子媒体-図書（査読有り）
+dnet:review_levels @=@ 0001 @=@ 印刷物/電子媒体-学術雑誌論文（査読有り）
+dnet:review_levels @=@ 0001 @=@ 印刷物/電子媒体-紀要論文（査読有り）
+dnet:review_levels @=@ 0001 @=@ 印刷物/電子媒体-雑誌記事（査読有り）
+dnet:review_levels @=@ 0001 @=@ 原著論文（査読有り）
+dnet:review_levels @=@ 0001 @=@ 査読論文
+cnr:institutes @=@ https://ror.org/00brf2d87 @=@ CDS001
+cnr:institutes @=@ https://ror.org/00brf2d87 @=@ IDASC - Istituto di Acustica e Sensoristica \"Orso Mario Corbino\"
+cnr:institutes @=@ https://ror.org/006qkqr45 @=@ CDS002
+cnr:institutes @=@ https://ror.org/006qkqr45 @=@ IAMC - Istituto per l'ambiente marino costiero
+cnr:institutes @=@ https://ror.org/054ye0e45 @=@ CDS003
+cnr:institutes @=@ https://ror.org/054ye0e45 @=@ IASI - Istituto di analisi dei sistemi ed informatica \"Antonio Ruberti\"
+cnr:institutes @=@ https://ror.org/00ygy3d85 @=@ CDS004
+cnr:institutes @=@ https://ror.org/00ygy3d85 @=@ IAC - Istituto per le applicazioni del calcolo \"Mauro Picone\"
+cnr:institutes @=@ https://ror.org/000sy1f36 @=@ CDS005
+cnr:institutes @=@ https://ror.org/000sy1f36 @=@ IASF - Istituto di astrofisica spaziale e fisica cosmica
+cnr:institutes @=@ https://ror.org/00x5wpm25 @=@ CDS006
+cnr:institutes @=@ https://ror.org/00x5wpm25 @=@ IBAM - Istituto per i beni archeologici e monumentali
+cnr:institutes @=@ https://ror.org/03eqeqg74 @=@ CDS007
+cnr:institutes @=@ https://ror.org/03eqeqg74 @=@ IBP - Istituto di biochimica delle proteine
+cnr:institutes @=@ https://ror.org/041xzk838 @=@ CDS008
+cnr:institutes @=@ https://ror.org/041xzk838 @=@ IBF - Istituto di biofisica
+cnr:institutes @=@ https://ror.org/00s2j5046 @=@ CDS009
+cnr:institutes @=@ https://ror.org/00s2j5046 @=@ IBFM - Istituto di bioimmagini e fisiologia molecolare
+cnr:institutes @=@ __CDS010__ @=@ CDS010
+cnr:institutes @=@ __CDS010__ @=@ IBAF - Istituto di biologia agro-ambientale e forestale
+cnr:institutes @=@ __CDS011__ @=@ CDS011
+cnr:institutes @=@ __CDS011__ @=@ IBC - Istituto di biologia cellulare
+cnr:institutes @=@ https://ror.org/02e5sbe24 @=@ CDS012
+cnr:institutes @=@ https://ror.org/02e5sbe24 @=@ IBBA - Istituto di biologia e biotecnologia agraria
+cnr:institutes @=@ https://ror.org/01nyatq71 @=@ CDS013
+cnr:institutes @=@ https://ror.org/01nyatq71 @=@ IBPM - Istituto di biologia e patologia molecolari
+cnr:institutes @=@ https://ror.org/01dy2q607 @=@ CDS014
+cnr:institutes @=@ https://ror.org/01dy2q607 @=@ IBIM - Istituto di biomedicina e di immunologia molecolare \"Alberto Monroy\"
+cnr:institutes @=@ https://ror.org/05nzf7q96 @=@ CDS015
+cnr:institutes @=@ https://ror.org/05nzf7q96 @=@ IBIOM - Istituto di Biomembrane, Bioenergetica e Biotecnologie Molecolari
+cnr:institutes @=@ https://ror.org/05m1yqp60 @=@ CDS016
+cnr:institutes @=@ https://ror.org/05m1yqp60 @=@ IBIMET - Istituto di biometeorologia
+cnr:institutes @=@ https://ror.org/03rqtqb02 @=@ CDS017
+cnr:institutes @=@ https://ror.org/03rqtqb02 @=@ IBB - Istituto di biostrutture e bioimmagini
+cnr:institutes @=@ https://ror.org/04r5fge26 @=@ CDS018
+cnr:institutes @=@ https://ror.org/04r5fge26 @=@ ICAR - Istituto di calcolo e reti ad alte prestazioni
+cnr:institutes @=@ https://ror.org/03wyf0g15 @=@ CDS019
+cnr:institutes @=@ https://ror.org/03wyf0g15 @=@ ICB - Istituto di chimica biomolecolare
+cnr:institutes @=@ https://ror.org/02fkw1114 @=@ CDS020
+cnr:institutes @=@ https://ror.org/02fkw1114 @=@ ICCOM - Istituto di chimica dei composti organo metallici
+cnr:institutes @=@ https://ror.org/0141vn777 @=@ CDS021
+cnr:institutes @=@ https://ror.org/0141vn777 @=@ ICRM - Istituto di chimica del riconoscimento molecolare
+cnr:institutes @=@ __CDS022__ @=@ CDS022
+cnr:institutes @=@ __CDS022__ @=@ ICTP - Istituto di chimica e tecnologia dei polimeri
+cnr:institutes @=@ __CDS023__ @=@ CDS023
+cnr:institutes @=@ __CDS023__ @=@ ICIS - Istituto di chimica inorganica e delle superfici
+cnr:institutes @=@ https://ror.org/00be3zh53 @=@ CDS024
+cnr:institutes @=@ https://ror.org/00be3zh53 @=@ ISASI - Istituto di Scienze Applicate e Sistemi Intelligenti \"Eduardo Caianiello\"
+cnr:institutes @=@ __CDS025__ @=@ CDS025
+cnr:institutes @=@ __CDS025__ @=@ ICEVO - Istituto di Studi sulle Civiltà dell'Egeo e del Vicino Oriente
+cnr:institutes @=@ https://ror.org/02ynrme92 @=@ CDS026
+cnr:institutes @=@ https://ror.org/02ynrme92 @=@ ICVBC - Istituto per la conservazione e valorizzazione dei beni culturali
+cnr:institutes @=@ https://ror.org/05wba8r86 @=@ CDS027
+cnr:institutes @=@ https://ror.org/05wba8r86 @=@ IC - Istituto di cristallografia
+cnr:institutes @=@ https://ror.org/03z58xd74 @=@ CDS028
+cnr:institutes @=@ https://ror.org/03z58xd74 @=@ IDPA - Istituto per la dinamica dei processi ambientali
+cnr:institutes @=@ https://ror.org/00n4jbh84 @=@ CDS029
+cnr:institutes @=@ https://ror.org/00n4jbh84 @=@ IEIIT - Istituto di elettronica e di ingegneria dell'informazione e delle telecomunicazioni
+cnr:institutes @=@ https://ror.org/04sn06036 @=@ CDS030
+cnr:institutes @=@ https://ror.org/04sn06036 @=@ IEOS - Istituto per l'endocrinologia e l'oncologia \"Gaetano Salvatore\"
+cnr:institutes @=@ https://ror.org/01rg40y89 @=@ CDS031
+cnr:institutes @=@ https://ror.org/01rg40y89 @=@ ICMATE - Istituto di Chimica della Materia Condensata e di Tecnologie per l'Energia
+cnr:institutes @=@ https://ror.org/00dqega85 @=@ CDS032
+cnr:institutes @=@ https://ror.org/00dqega85 @=@ IFAC - Istituto di fisica applicata \"Nello Carrara\"
+cnr:institutes @=@ https://ror.org/02n2bgz18 @=@ CDS033
+cnr:institutes @=@ https://ror.org/02n2bgz18 @=@ IFP - Istituto di fisica del plasma \"Piero Caldirola\"
+cnr:institutes @=@ __CDS034__ @=@ CDS034
+cnr:institutes @=@ __CDS034__ @=@ IFSI - Istituto di fisica dello spazio interplanetario
+cnr:institutes @=@ https://ror.org/01kdj2848 @=@ CDS035
+cnr:institutes @=@ https://ror.org/01kdj2848 @=@ IFC - Istituto di fisiologia clinica
+cnr:institutes @=@ https://ror.org/049ebw417 @=@ CDS036
+cnr:institutes @=@ https://ror.org/049ebw417 @=@ IFN - Istituto di fotonica e nanotecnologie
+cnr:institutes @=@ https://ror.org/01f5tnx94 @=@ CDS037
+cnr:institutes @=@ https://ror.org/01f5tnx94 @=@ IGI - Istituto gas ionizzati
+cnr:institutes @=@ __CDS038__ @=@ CDS038
+cnr:institutes @=@ __CDS038__ @=@ IGP - Istituto di genetica delle popolazioni
+cnr:institutes @=@ https://ror.org/04hadk112 @=@ CDS039
+cnr:institutes @=@ https://ror.org/04hadk112 @=@ IGB - Istituto di genetica e biofisica \"Adriano Buzzati Traverso\"
+cnr:institutes @=@ https://ror.org/03qpd8w66 @=@ CDS040
+cnr:institutes @=@ https://ror.org/03qpd8w66 @=@ IGM - Istituto di genetica molecolare \"Luigi Luca Cavalli Sforza\"
+cnr:institutes @=@ https://ror.org/01gtsa866 @=@ CDS041
+cnr:institutes @=@ https://ror.org/01gtsa866 @=@ IBBR - Istituto di Bioscienze e Biorisorse
+cnr:institutes @=@ https://ror.org/00ytw6m58 @=@ CDS042
+cnr:institutes @=@ https://ror.org/00ytw6m58 @=@ IGAG - Istituto di geologia ambientale e geoingegneria
+cnr:institutes @=@ https://ror.org/015bmra78 @=@ CDS043
+cnr:institutes @=@ https://ror.org/015bmra78 @=@ IGG - Istituto di geoscienze e georisorse
+cnr:institutes @=@ https://ror.org/02gdcn153 @=@ CDS044
+cnr:institutes @=@ https://ror.org/02gdcn153 @=@ IIT - Istituto di informatica e telematica
+cnr:institutes @=@ __CDS045__ @=@ CDS045
+cnr:institutes @=@ __CDS045__ @=@ ISIB - Istituto di ingegneria biomedica
+cnr:institutes @=@ https://ror.org/05hky6p02 @=@ CDS046
+cnr:institutes @=@ https://ror.org/05hky6p02 @=@ IIA - Istituto sull'inquinamento atmosferico
+cnr:institutes @=@ https://ror.org/011n2hw53 @=@ CDS047
+cnr:institutes @=@ https://ror.org/011n2hw53 @=@ ILIESI - Istituto per il lessico intellettuale europeo e storia delle idee
+cnr:institutes @=@ https://ror.org/028g3pe33 @=@ CDS048
+cnr:institutes @=@ https://ror.org/028g3pe33 @=@ ILC - Istituto di linguistica computazionale \"Antonio Zampolli\"
+cnr:institutes @=@ __CDS049__ @=@ CDS049
+cnr:institutes @=@ __CDS049__ @=@ IMAMOTER - Istituto per le macchine agricole e movimento terra
+cnr:institutes @=@ https://ror.org/03m0n3c07 @=@ CDS050
+cnr:institutes @=@ https://ror.org/03m0n3c07 @=@ IMATI - Istituto di matematica applicata e tecnologie informatiche \"Enrico Magenes\"
+cnr:institutes @=@ __CDS051__ @=@ CDS051
+cnr:institutes @=@ __CDS051__ @=@ IMCB - Istituto per i materiali compositi e biomedici
+cnr:institutes @=@ https://ror.org/00z8ws214 @=@ CDS052
+cnr:institutes @=@ https://ror.org/00z8ws214 @=@ IMEM - Istituto dei materiali per l'elettronica ed il magnetismo
+cnr:institutes @=@ __CDS053__ @=@ CDS053
+cnr:institutes @=@ __CDS053__ @=@ ISB - Istituto per i Sistemi Biologici
+cnr:institutes @=@ https://ror.org/00bc51d88 @=@ CDS054
+cnr:institutes @=@ https://ror.org/00bc51d88 @=@ NANOTEC - Istituto di Nanotecnologia
+cnr:institutes @=@ https://ror.org/024ye7w89 @=@ CDS055
+cnr:institutes @=@ https://ror.org/024ye7w89 @=@ IMAA - Istituto di metodologie per l'analisi ambientale
+cnr:institutes @=@ __CDS056__ @=@ CDS056
+cnr:institutes @=@ __CDS056__ @=@ IMGC - Istituto di metrologia \"Gustavo Colonnetti\"
+cnr:institutes @=@ https://ror.org/05vk2g845 @=@ CDS057
+cnr:institutes @=@ https://ror.org/05vk2g845 @=@ IMM - Istituto per la microelettronica e microsistemi
+cnr:institutes @=@ https://ror.org/02qwy8e97 @=@ CDS058
+cnr:institutes @=@ https://ror.org/02qwy8e97 @=@ IM - Istituto motori
+cnr:institutes @=@ __CDS059__ @=@ CDS059
+cnr:institutes @=@ __CDS059__ @=@ INMM - Istituto di neurobiologia e medicina molecolare
+cnr:institutes @=@ https://ror.org/02dr63s31 @=@ CDS060
+cnr:institutes @=@ https://ror.org/02dr63s31 @=@ IRGB - Istituto di Ricerca Genetica e Biomedica
+cnr:institutes @=@ https://ror.org/0240rwx68 @=@ CDS061
+cnr:institutes @=@ https://ror.org/0240rwx68 @=@ IN - Istituto di neuroscienze
+cnr:institutes @=@ https://ror.org/02rzxrg25 @=@ CDS062
+cnr:institutes @=@ https://ror.org/02rzxrg25 @=@ OVI - Istituto opera del vocabolario italiano
+cnr:institutes @=@ https://ror.org/05patmk97 @=@ CDS063
+cnr:institutes @=@ https://ror.org/05patmk97 @=@ IPCF - Istituto per i processi chimico-fisici
+cnr:institutes @=@ __CDS064__ @=@ CDS064
+cnr:institutes @=@ __CDS064__ @=@ IPP - Istituto per la protezione delle piante
+cnr:institutes @=@ https://ror.org/029st3z03 @=@ CDS065
+cnr:institutes @=@ https://ror.org/029st3z03 @=@ IRA - Istituto di radioastronomia
+cnr:institutes @=@ https://ror.org/0040zx077 @=@ CDS066
+cnr:institutes @=@ https://ror.org/0040zx077 @=@ IRPI - Istituto di ricerca per la protezione idrogeologica
+cnr:institutes @=@ https://ror.org/044bfsy89 @=@ CDS067
+cnr:institutes @=@ https://ror.org/044bfsy89 @=@ IRCRES - Istituto di Ricerca sulla Crescita Economica Sostenibile
+cnr:institutes @=@ https://ror.org/01n1ayq61 @=@ CDS068
+cnr:institutes @=@ https://ror.org/01n1ayq61 @=@ IRPPS - Istituto di ricerche sulla popolazione e le politiche sociali
+cnr:institutes @=@ https://ror.org/02db0kh50 @=@ CDS069
+cnr:institutes @=@ https://ror.org/02db0kh50 @=@ IRSA - Istituto di ricerca sulle acque
+cnr:institutes @=@ https://ror.org/05813wx75 @=@ CDS070
+cnr:institutes @=@ https://ror.org/05813wx75 @=@ IRC - Istituto di ricerche sulla combustione
+cnr:institutes @=@ https://ror.org/04vnwke91 @=@ CDS071
+cnr:institutes @=@ https://ror.org/04vnwke91 @=@ IRISS - Istituto di Ricerca su Innovazione e Servizi per lo Sviluppo
+cnr:institutes @=@ https://ror.org/02wxw4x45 @=@ CDS072
+cnr:institutes @=@ https://ror.org/02wxw4x45 @=@ IREA - Istituto per il rilevamento elettromagnetico dell'ambiente
+cnr:institutes @=@ https://ror.org/01j6drw72 @=@ CDS073
+cnr:institutes @=@ https://ror.org/01j6drw72 @=@ ISTEC - Istituto di scienza e tecnologia dei materiali ceramici
+cnr:institutes @=@ https://ror.org/05kacka20 @=@ CDS074
+cnr:institutes @=@ https://ror.org/05kacka20 @=@ ISTI - Istituto di scienza e tecnologie dell'informazione \"Alessandro Faedo\"
+cnr:institutes @=@ https://ror.org/00n8ttd98 @=@ CDS075
+cnr:institutes @=@ https://ror.org/00n8ttd98 @=@ ISAC - Istituto di scienze dell'atmosfera e del clima
+cnr:institutes @=@ https://ror.org/0013zhk30 @=@ CDS076
+cnr:institutes @=@ https://ror.org/0013zhk30 @=@ ISA - Istituto di Scienze dell'Alimentazione
+cnr:institutes @=@ https://ror.org/03x7xkr71 @=@ CDS077
+cnr:institutes @=@ https://ror.org/03x7xkr71 @=@ ISPA - Istituto di scienze delle produzioni alimentari
+cnr:institutes @=@ https://ror.org/05w9g2j85 @=@ CDS078
+cnr:institutes @=@ https://ror.org/05w9g2j85 @=@ ISTC - Istituto di scienze e tecnologie della cognizione
+cnr:institutes @=@ https://ror.org/032tyv240 @=@ CDS079
+cnr:institutes @=@ https://ror.org/032tyv240 @=@ ISTM - Istituto di scienze e tecnologie molecolari
+cnr:institutes @=@ https://ror.org/02hdf6119 @=@ CDS080
+cnr:institutes @=@ https://ror.org/02hdf6119 @=@ ISMAR - Istituto di scienze marine
+cnr:institutes @=@ https://ror.org/01yg57d71 @=@ CDS081
+cnr:institutes @=@ https://ror.org/01yg57d71 @=@ ISN - Istituto di scienze neurologiche
+cnr:institutes @=@ https://ror.org/021z1mz76 @=@ CDS082
+cnr:institutes @=@ https://ror.org/021z1mz76 @=@ ISOF - Istituto per la sintesi organica e la fotoreattività
+cnr:institutes @=@ https://ror.org/01wqae691 @=@ CDS083
+cnr:institutes @=@ https://ror.org/01wqae691 @=@ ISPAAM - Istituto per il sistema produzione animale in ambiente Mediterraneo
+cnr:institutes @=@ __CDS084__ @=@ CDS084
+cnr:institutes @=@ __CDS084__ @=@ ISAFoM - Istituto per i sistemi agricoli e forestali del mediterraneo
+cnr:institutes @=@ https://ror.org/00awwz417 @=@ CDS085
+cnr:institutes @=@ https://ror.org/00awwz417 @=@ ISPF - Istituto per la storia del pensiero filosofico e scientifico moderno
+cnr:institutes @=@ https://ror.org/03a111314 @=@ CDS086
+cnr:institutes @=@ https://ror.org/03a111314 @=@ ISEM - Istituto di storia dell'Europa mediterranea
+cnr:institutes @=@ https://ror.org/01zz9wh30 @=@ CDS087
+cnr:institutes @=@ https://ror.org/01zz9wh30 @=@ ISM - Istituto di struttura della materia
+cnr:institutes @=@ https://ror.org/035y5td47 @=@ CDS088
+cnr:institutes @=@ https://ror.org/035y5td47 @=@ ISGI - Istituto di studi giuridici internazionali
+cnr:institutes @=@ __CDS089__ @=@ CDS089
+cnr:institutes @=@ __CDS089__ @=@ ISPRI - Istituto sperimentale di studi socio - economici sull'innovazione e le politiche della ricerca
+cnr:institutes @=@ https://ror.org/051t1q308 @=@ CDS090
+cnr:institutes @=@ https://ror.org/051t1q308 @=@ ISSIA - Istituto di studi sui sistemi intelligenti per l'automazione
+cnr:institutes @=@ https://ror.org/05k3cs357 @=@ CDS091
+cnr:institutes @=@ https://ror.org/05k3cs357 @=@ ISSIRFA - Istituto di studi sui sistemi regionali federali e sulle autonomie \"Massimo Severo Giannini\"
+cnr:institutes @=@ https://ror.org/02gcxw165 @=@ CDS092
+cnr:institutes @=@ https://ror.org/02gcxw165 @=@ ISMA - Istituto di Studi sul Mediterraneo Antico
+cnr:institutes @=@ https://ror.org/05db0es39 @=@ CDS093
+cnr:institutes @=@ https://ror.org/05db0es39 @=@ ISMed - Istituto di studi sul Mediterraneo
+cnr:institutes @=@ https://ror.org/029k6t707 @=@ CDS094
+cnr:institutes @=@ https://ror.org/029k6t707 @=@ ISE - Istituto per lo studio degli ecosistemi
+cnr:institutes @=@ https://ror.org/00w6r1881 @=@ CDS095
+cnr:institutes @=@ https://ror.org/00w6r1881 @=@ ISMN - Istituto per lo studio dei materiali nanostrutturati
+cnr:institutes @=@ https://ror.org/01mfmr054 @=@ CDS096
+cnr:institutes @=@ https://ror.org/01mfmr054 @=@ ISMAC - Istituto per lo studio delle macromolecole
+cnr:institutes @=@ https://ror.org/058nrs650 @=@ CDS097
+cnr:institutes @=@ https://ror.org/058nrs650 @=@ ITM - Istituto per la tecnologia delle membrane
+cnr:institutes @=@ https://ror.org/0331xj092 @=@ CDS098
+cnr:institutes @=@ https://ror.org/0331xj092 @=@ ITABC - Istituto per le tecnologie applicate ai beni culturali
+cnr:institutes @=@ https://ror.org/052q58629 @=@ CDS099
+cnr:institutes @=@ https://ror.org/052q58629 @=@ ITAE - Istituto di tecnologie avanzate per l'energia \"Nicola Giordano\"
+cnr:institutes @=@ https://ror.org/04ehykb85 @=@ CDS100
+cnr:institutes @=@ https://ror.org/04ehykb85 @=@ ITB - Istituto di tecnologie biomediche
+cnr:institutes @=@ https://ror.org/0221agg28 @=@ CDS101
+cnr:institutes @=@ https://ror.org/0221agg28 @=@ ITC - Istituto per le tecnologie della costruzione
+cnr:institutes @=@ https://ror.org/02xz4xc25 @=@ CDS102
+cnr:institutes @=@ https://ror.org/02xz4xc25 @=@ ITD - Istituto per le tecnologie didattiche
+cnr:institutes @=@ __CDS103__ @=@ CDS103
+cnr:institutes @=@ __CDS103__ @=@ STIIMA - Istituto di Sistemi e Tecnologie Industriali Intelligenti per il Manifatturiero Avanzato
+cnr:institutes @=@ https://ror.org/01as2bh37 @=@ CDS104
+cnr:institutes @=@ https://ror.org/01as2bh37 @=@ ITTIG - Istituto di teoria e tecniche dell'informazione giuridica
+cnr:institutes @=@ https://ror.org/01y5w6t76 @=@ CDS105
+cnr:institutes @=@ https://ror.org/01y5w6t76 @=@ ITOI - Istituto per i trapianti d'organo e immunocitologia
+cnr:institutes @=@ https://ror.org/04xy2mq71 @=@ CDS106
+cnr:institutes @=@ https://ror.org/04xy2mq71 @=@ IVALSA - Istituto per la valorizzazione del legno e delle specie arboree
+cnr:institutes @=@ __CDS107__ @=@ CDS107
+cnr:institutes @=@ __CDS107__ @=@ IVV - Istituto di virologia vegetale
+cnr:institutes @=@ https://ror.org/013nxtf56 @=@ CDS108
+cnr:institutes @=@ https://ror.org/013nxtf56 @=@ IRSIG - Istituto di ricerca sui sistemi giudiziari
+cnr:institutes @=@ https://ror.org/05rcgef49 @=@ CDS109
+cnr:institutes @=@ https://ror.org/05rcgef49 @=@ ISC - Istituto dei sistemi complessi
+cnr:institutes @=@ __CDS110__ @=@ CDS110
+cnr:institutes @=@ __CDS110__ @=@ INFM - Centro di responsabilità scientifica INFM
+cnr:institutes @=@ https://ror.org/02dp3a879 @=@ CDS111
+cnr:institutes @=@ https://ror.org/02dp3a879 @=@ INO - Istituto nazionale di ottica
+cnr:institutes @=@ __CDS112__ @=@ CDS112
+cnr:institutes @=@ __CDS112__ @=@ IDAIC - Centro di responsabilità di attività scientifica IDAIC
+cnr:institutes @=@ https://ror.org/00p03yg71 @=@ CDS113
+cnr:institutes @=@ https://ror.org/00p03yg71 @=@ SPIN - Istituto superconduttori, materiali innovativi e dispositivi
+cnr:institutes @=@ https://ror.org/00yfw2296 @=@ CDS114
+cnr:institutes @=@ https://ror.org/00yfw2296 @=@ IOM - Istituto officina dei materiali
+cnr:institutes @=@ https://ror.org/0042e5975 @=@ CDS115
+cnr:institutes @=@ https://ror.org/0042e5975 @=@ NANO - Istituto Nanoscienze
+cnr:institutes @=@ https://ror.org/03ta8pf33 @=@ CDS116
+cnr:institutes @=@ https://ror.org/03ta8pf33 @=@ IFT - Istituto di Farmacologia Traslazionale
+cnr:institutes @=@ https://ror.org/040xhth73 @=@ CDS117
+cnr:institutes @=@ https://ror.org/040xhth73 @=@ IBCN - Istituto di Biologia Cellulare e Neurobiologia
+cnr:institutes @=@ https://ror.org/02qnx8e75 @=@ CDS118
+cnr:institutes @=@ https://ror.org/02qnx8e75 @=@ INM - Istituto di iNgegneria del Mare
+cnr:institutes @=@ https://ror.org/05nr7xa08 @=@ CDS119
+cnr:institutes @=@ https://ror.org/05nr7xa08 @=@ IPCB - Istituto per i Polimeri, Compositi e Biomateriali
+cnr:institutes @=@ https://ror.org/008fjbg42 @=@ CDS121
+cnr:institutes @=@ https://ror.org/008fjbg42 @=@ IPSP - Istituto per la Protezione Sostenibile delle Piante
+cnr:institutes @=@ __CDS122__ @=@ CDS122
+cnr:institutes @=@ __CDS122__ @=@ IRBIM - Istituto per le Risorse Biologiche e le Biotecnologie Marine
+cnr:institutes @=@ __CDS123__ @=@ CDS123
+cnr:institutes @=@ __CDS123__ @=@ ISPC - Istituto di Scienze del Patrimonio Culturale
+cnr:institutes @=@ __CDS124__ @=@ CDS124
+cnr:institutes @=@ __CDS124__ @=@ IAS - Istituto per lo studio degli impatti Antropici e Sostenibilità in ambiente marino
+cnr:institutes @=@ __CDS125__ @=@ CDS125
+cnr:institutes @=@ __CDS125__ @=@ IRET - Istituto di Ricerca sugli Ecosistemi Terrestri
+cnr:institutes @=@ https://ror.org/03a0vt050 @=@ CDS126
+cnr:institutes @=@ https://ror.org/03a0vt050 @=@ ISTP - Istituto per la Scienza e Tecnologia dei Plasmi
+cnr:institutes @=@ __CDS127__ @=@ CDS127
+cnr:institutes @=@ __CDS127__ @=@ ISP - Istituto di Scienze Polari
+cnr:institutes @=@ https://ror.org/03byxpq91 @=@ CDS128
+cnr:institutes @=@ https://ror.org/03byxpq91 @=@ IRIB - Istituto per la Ricerca e l'Innovazione Biomedica
+cnr:institutes @=@ __CDS129__ @=@ CDS129
+cnr:institutes @=@ __CDS129__ @=@ IGSG - Istituto di Informatica Giuridica e Sistemi Giudiziari
+cnr:institutes @=@ __CDS130__ @=@ CDS130
+cnr:institutes @=@ __CDS130__ @=@ IBBC - Istituto di Biochimica e Biologia Cellulare
+cnr:institutes @=@ __CDS131__ @=@ CDS131
+cnr:institutes @=@ __CDS131__ @=@ IBE - Istituto per la BioEconomia
+cnr:institutes @=@ https://ror.org/0263zy895 @=@ CDS132
+cnr:institutes @=@ https://ror.org/0263zy895 @=@ SCITEC - Istituto di Scienze e Tecnologie Chimiche \"Giulio Natta\"
+cnr:institutes @=@ __CDS133__ @=@ CDS133
+cnr:institutes @=@ __CDS133__ @=@ STEMS - Istituto di Scienze e Tecnologie per l'Energia e la Mobilità Sostenibili

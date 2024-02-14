@@ -165,7 +165,7 @@ public class OaiIterator implements Iterator<String> {
 			} catch (final DocumentException e1) {
 				final String resumptionToken = extractResumptionToken(xml);
 				if (resumptionToken == null) {
-					report.put(e1.getClass().getName(), e1.getMessage());
+						report.put(e1.getClass().getName(), e1.getMessage());
 					throw new CollectorException("Error parsing cleaned document:\n" + cleaned, e1);
 				}
 				return resumptionToken;

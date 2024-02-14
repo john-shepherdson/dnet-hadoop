@@ -1,8 +1,10 @@
 package eu.dnetlib.doiboost.crossref
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.oaf
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Publication, Relation, Dataset => OafDataset}
+import eu.dnetlib.dhp.utils.ISLookupClientFactory
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql._
@@ -40,11 +42,17 @@ object SparkMapDumpIntoOAF {
     implicit val mapEncoderDatasets: Encoder[oaf.Dataset] = Encoders.kryo[OafDataset]
 
     val targetPath = parser.get("targetPath")
+    val isLookupUrl: String = parser.get("isLookupUrl")
+    logger.info("isLookupUrl: {}", isLookupUrl)
+    val isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl)
+    val vocabularies = VocabularyGroup.loadVocsFromIS(isLookupService)
+    require(vocabularies != null)
+
 
     spark.read
       .load(parser.get("sourcePath"))
       .as[CrossrefDT]
-      .flatMap(k => Crossref2Oaf.convert(k.json))
+      .flatMap(k => Crossref2Oaf.convert(k.json, vocabularies))
       .filter(o => o != null)
       .write
       .mode(SaveMode.Overwrite)
