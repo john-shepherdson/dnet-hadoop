@@ -5,7 +5,7 @@
             <description>the path of the BASE dump</description>
         </property>
         <property>
-            <name>reportsPath</name>
+            <name>baseReportsPath</name>
             <description>path where to store the reports</description>
         </property>
     </parameters>
@@ -18,8 +18,8 @@
     
     <action name="deleteoutputpath">
         <fs>
-            <delete path='${reportsPath}'/>
-            <mkdir path='${reportsPath}'/>
+            <delete path='${baseReportsPath}'/>
+            <mkdir path='${baseReportsPath}'/>
         </fs>
         <ok to="analyzeBaseRecords"/>
         <error to="Kill"/>
@@ -43,7 +43,7 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--inputPath</arg><arg>${baseInputPath}</arg>
-            <arg>--outputPath</arg><arg>${reportsPath}</arg>
+            <arg>--outputPath</arg><arg>${baseReportsPath}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>
