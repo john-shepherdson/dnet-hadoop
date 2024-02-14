@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.bulktag.actions;
 
 import java.io.Serializable;
@@ -8,23 +9,22 @@ import java.io.Serializable;
  */
 public class MapModel implements Serializable {
 
-    private String path;
-    private Action action;
+	private String path;
+	private Action action;
 
+	public String getPath() {
+		return path;
+	}
 
-    public String getPath() {
-        return path;
-    }
+	public void setPath(String path) {
+		this.path = path;
+	}
 
-    public void setPath(String path) {
-        this.path = path;
-    }
+	public Action getAction() {
+		return action;
+	}
 
-    public Action getAction() {
-        return action;
-    }
-
-    public void setAction(Action action) {
-        this.action = action;
-    }
+	public void setAction(Action action) {
+		this.action = action;
+	}
 }

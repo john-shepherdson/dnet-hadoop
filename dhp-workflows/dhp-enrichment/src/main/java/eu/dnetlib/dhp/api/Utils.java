@@ -6,10 +6,6 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.Project;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +20,10 @@ import eu.dnetlib.dhp.bulktag.community.CommunityConfiguration;
 import eu.dnetlib.dhp.bulktag.community.Provider;
 import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
 import eu.dnetlib.dhp.bulktag.criteria.VerbResolverFactory;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.Datasource;
+import eu.dnetlib.dhp.schema.oaf.Organization;
+import eu.dnetlib.dhp.schema.oaf.Project;
 
 /**
  * @author miriam.baglioni
@@ -57,7 +57,7 @@ public class Utils implements Serializable {
 					if (d.getEnabled() == null || Boolean.FALSE.equals(d.getEnabled()))
 						return null;
 					Provider p = new Provider();
-					p.setOpenaireId(ModelSupport.getIdPrefix(Datasource.class)+"|" + d.getOpenaireId());
+					p.setOpenaireId(ModelSupport.getIdPrefix(Datasource.class) + "|" + d.getOpenaireId());
 					p.setSelectionConstraints(d.getSelectioncriteria());
 					if (p.getSelectionConstraints() != null)
 						p.getSelectionConstraints().setSelection(resolver);
@@ -175,27 +175,31 @@ public class Utils implements Serializable {
 			.collect(Collectors.toList());
 	}
 
-	public static List<EntityCommunities> getDatasourceCommunities(String baseURL)throws IOException{
+	public static List<EntityCommunities> getDatasourceCommunities(String baseURL) throws IOException {
 		List<CommunityModel> validCommunities = getValidCommunities(baseURL);
 		HashMap<String, Set<String>> map = new HashMap<>();
-		String entityPrefix = ModelSupport.getIdPrefix(Datasource.class) + "|" ;
+		String entityPrefix = ModelSupport.getIdPrefix(Datasource.class) + "|";
 
 		validCommunities.forEach(c -> {
 			try {
-				new ObjectMapper().readValue(QueryCommunityAPI.communityDatasource(c.getId(), baseURL), DatasourceList.class)
-						.forEach(d -> {
-							if (!map.keySet().contains(d.getOpenaireId()))
-								map.put(d.getOpenaireId(), new HashSet<>());
+				new ObjectMapper()
+					.readValue(QueryCommunityAPI.communityDatasource(c.getId(), baseURL), DatasourceList.class)
+					.forEach(d -> {
+						if (!map.keySet().contains(d.getOpenaireId()))
+							map.put(d.getOpenaireId(), new HashSet<>());
 
-							map.get(d.getOpenaireId()).add(c.getId());
-						});
+						map.get(d.getOpenaireId()).add(c.getId());
+					});
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		});
 
-		List<EntityCommunities> temp = map.keySet().stream()
-				.map(k -> EntityCommunities.newInstance(entityPrefix + k, getCollect(k, map))).collect(Collectors.toList());
+		List<EntityCommunities> temp = map
+			.keySet()
+			.stream()
+			.map(k -> EntityCommunities.newInstance(entityPrefix + k, getCollect(k, map)))
+			.collect(Collectors.toList());
 
 		return temp;
 
@@ -206,6 +210,5 @@ public class Utils implements Serializable {
 		List<String> temp = map.get(k).stream().collect(Collectors.toList());
 		return temp;
 	}
-
 
 }

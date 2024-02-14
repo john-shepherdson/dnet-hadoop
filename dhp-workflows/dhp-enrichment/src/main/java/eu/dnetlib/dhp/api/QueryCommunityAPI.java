@@ -78,5 +78,4 @@ public class QueryCommunityAPI {
 		return body;
 	}
 
-
 }

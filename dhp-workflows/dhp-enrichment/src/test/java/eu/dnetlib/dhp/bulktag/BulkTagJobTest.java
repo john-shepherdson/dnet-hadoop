@@ -33,25 +33,25 @@ public class BulkTagJobTest {
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static final String pathMap = "{\"author\":{\"path\":\"$['author'][*]['fullname']\"}," +
-			" \"title\":{\"path\":\"$['title'][*]['value']\"}, "+
-			" \"orcid\":{\"path\":\"$['author'][*]['pid'][*][?(@['qualifier']['classid']=='orcid')]['value']\"} , " +
-			" \"orcid_pending\":{\"path\":\"$['author'][*]['pid'][*][?(@['qualifier']['classid']=='orcid_pending')]['value']\"} ,"+
-			"\"contributor\" : {\"path\":\"$['contributor'][*]['value']\"},"+
-			" \"description\" : {\"path\":\"$['description'][*]['value']\"},"+
-			" \"subject\" :{\"path\":\"$['subject'][*]['value']\"}, " +
-			" \"fos\" : {\"path\":\"$['subject'][?(@['qualifier']['classid']=='FOS')].value\"} , "+
-			"\"sdg\" : {\"path\":\"$['subject'][?(@['qualifier']['classid']=='SDG')].value\"}," +
-			"\"journal\":{\"path\":\"$['journal'].name\"}," +
-			"\"hostedby\":{\"path\":\"$['instance'][*]['hostedby']['key']\"}," +
-			"\"collectedfrom\":{\"path\":\"$['instance'][*]['collectedfrom']['key']\"}," +
-			"\"publisher\":{\"path\":\"$['publisher'].value\"}," +
-			"\"publicationyear\":{\"path\":\"$['dateofacceptance'].value\", " +
-			" \"action\":{\"clazz\":\"eu.dnetlib.dhp.bulktag.actions.ExecSubstringAction\"," +
-		                 "\"method\":\"execSubstring\","+
-		                 "\"params\":[" +
-						 "{\"paramName\":\"From\",  \"paramValue\":0}, " +
-		                     "{\"paramName\":\"To\",\"paramValue\":4}]}}}";
-
+		" \"title\":{\"path\":\"$['title'][*]['value']\"}, " +
+		" \"orcid\":{\"path\":\"$['author'][*]['pid'][*][?(@['qualifier']['classid']=='orcid')]['value']\"} , " +
+		" \"orcid_pending\":{\"path\":\"$['author'][*]['pid'][*][?(@['qualifier']['classid']=='orcid_pending')]['value']\"} ,"
+		+
+		"\"contributor\" : {\"path\":\"$['contributor'][*]['value']\"}," +
+		" \"description\" : {\"path\":\"$['description'][*]['value']\"}," +
+		" \"subject\" :{\"path\":\"$['subject'][*]['value']\"}, " +
+		" \"fos\" : {\"path\":\"$['subject'][?(@['qualifier']['classid']=='FOS')].value\"} , " +
+		"\"sdg\" : {\"path\":\"$['subject'][?(@['qualifier']['classid']=='SDG')].value\"}," +
+		"\"journal\":{\"path\":\"$['journal'].name\"}," +
+		"\"hostedby\":{\"path\":\"$['instance'][*]['hostedby']['key']\"}," +
+		"\"collectedfrom\":{\"path\":\"$['instance'][*]['collectedfrom']['key']\"}," +
+		"\"publisher\":{\"path\":\"$['publisher'].value\"}," +
+		"\"publicationyear\":{\"path\":\"$['dateofacceptance'].value\", " +
+		" \"action\":{\"clazz\":\"eu.dnetlib.dhp.bulktag.actions.ExecSubstringAction\"," +
+		"\"method\":\"execSubstring\"," +
+		"\"params\":[" +
+		"{\"paramName\":\"From\",  \"paramValue\":0}, " +
+		"{\"paramName\":\"To\",\"paramValue\":4}]}}}";
 
 	private static SparkSession spark;
 
@@ -325,7 +325,7 @@ public class BulkTagJobTest {
 					"-taggingConf", taggingConf,
 
 					"-outputPath", workingDir.toString() + "/",
-						"-baseURL", "https://services.openaire.eu/openaire/community/",
+					"-baseURL", "https://services.openaire.eu/openaire/community/",
 					"-pathMap", pathMap
 				});
 
@@ -388,38 +388,38 @@ public class BulkTagJobTest {
 	@Test
 	void datasourceTag() throws Exception {
 		final String sourcePath = getClass()
-				.getResource("/eu/dnetlib/dhp/bulktag/sample/publication/update_datasource/")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/bulktag/sample/publication/update_datasource/")
+			.getPath();
 		SparkBulkTagJob
-				.main(
-						new String[] {
+			.main(
+				new String[] {
 
-								"-isSparkSessionManaged", Boolean.FALSE.toString(),
-								"-sourcePath", sourcePath,
-								"-taggingConf", taggingConf,
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath", sourcePath,
+					"-taggingConf", taggingConf,
 
-								"-outputPath", workingDir.toString() + "/",
-								"-baseURL", "https://services.openaire.eu/openaire/community/",
-								"-pathMap", pathMap
-						});
+					"-outputPath", workingDir.toString() + "/",
+					"-baseURL", "https://services.openaire.eu/openaire/community/",
+					"-pathMap", pathMap
+				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Datasource> tmp = sc
-				.textFile(workingDir.toString() + "/datasource")
-				.map(item -> OBJECT_MAPPER.readValue(item, Datasource.class));
+			.textFile(workingDir.toString() + "/datasource")
+			.map(item -> OBJECT_MAPPER.readValue(item, Datasource.class));
 
 		Assertions.assertEquals(3, tmp.count());
 		org.apache.spark.sql.Dataset<Datasource> verificationDataset = spark
-				.createDataset(tmp.rdd(), Encoders.bean(Datasource.class));
+			.createDataset(tmp.rdd(), Encoders.bean(Datasource.class));
 
 		verificationDataset.createOrReplaceTempView("datasource");
 
 		String query = "select id, MyT.id community, MyD.provenanceaction.classid provenance, MyD.provenanceaction.classname name "
-				+ "from datasource "
-				+ "lateral view explode(context) c as MyT "
-				+ "lateral view explode(MyT.datainfo) d as MyD "
-				+ "where MyD.inferenceprovenance = 'bulktagging'";
+			+ "from datasource "
+			+ "lateral view explode(context) c as MyT "
+			+ "lateral view explode(MyT.datainfo) d as MyD "
+			+ "where MyD.inferenceprovenance = 'bulktagging'";
 
 		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
 
@@ -427,18 +427,17 @@ public class BulkTagJobTest {
 
 		Assertions.assertEquals(3, idExplodeCommunity.count());
 		Assertions
-				.assertEquals(
-						3, idExplodeCommunity.filter("provenance = 'community:datasource'").count());
+			.assertEquals(
+				3, idExplodeCommunity.filter("provenance = 'community:datasource'").count());
 		Assertions
-				.assertEquals(
-						3,
-						idExplodeCommunity
-								.filter("name = 'Bulktagging for Community - Datasource'")
-								.count());
+			.assertEquals(
+				3,
+				idExplodeCommunity
+					.filter("name = 'Bulktagging for Community - Datasource'")
+					.count());
 
 		Assertions.assertEquals(2, idExplodeCommunity.filter("community = 'dh-ch'").count());
 		Assertions.assertEquals(1, idExplodeCommunity.filter("community = 'clarin'").count());
-
 
 	}
 
@@ -1668,60 +1667,94 @@ public class BulkTagJobTest {
 		Assertions.assertEquals(0, spark.sql(query).count());
 	}
 
-
 	@Test
 	void pubdateTest() throws Exception {
 
-
 		final String pathMap = BulkTagJobTest.pathMap;
 		SparkBulkTagJob
-				.main(
-						new String[] {
-								"-isSparkSessionManaged", Boolean.FALSE.toString(),
-								"-sourcePath",
-								getClass().getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/publicationyear/").getPath(),
-								"-taggingConf",
-								IOUtils
-										.toString(
-										BulkTagJobTest.class
-												.getResourceAsStream(
-														"/eu/dnetlib/dhp/bulktag/communityconfiguration/tagging_conf_publicationdate.xml")),
-								"-outputPath", workingDir.toString() + "/",
-								"-pathMap", pathMap
-						});
+			.main(
+				new String[] {
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath",
+					getClass().getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/publicationyear/").getPath(),
+					"-taggingConf",
+					IOUtils
+						.toString(
+							BulkTagJobTest.class
+								.getResourceAsStream(
+									"/eu/dnetlib/dhp/bulktag/communityconfiguration/tagging_conf_publicationdate.xml")),
+					"-outputPath", workingDir.toString() + "/",
+					"-pathMap", pathMap
+				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Dataset> tmp = sc
-				.textFile(workingDir.toString() + "/dataset")
-				.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
+			.textFile(workingDir.toString() + "/dataset")
+			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
 
 		Assertions.assertEquals(10, tmp.count());
 		org.apache.spark.sql.Dataset<Dataset> verificationDataset = spark
-				.createDataset(tmp.rdd(), Encoders.bean(Dataset.class));
+			.createDataset(tmp.rdd(), Encoders.bean(Dataset.class));
 
 		verificationDataset.createOrReplaceTempView("dataset");
 
-
 		String query = "select id, MyT.id community, MyD.provenanceaction.classid "
-				+ "from dataset "
-				+ "lateral view explode(context) c as MyT "
-				+ "lateral view explode(MyT.datainfo) d as MyD "
-				+ "where MyD.inferenceprovenance = 'bulktagging'";
+			+ "from dataset "
+			+ "lateral view explode(context) c as MyT "
+			+ "lateral view explode(MyT.datainfo) d as MyD "
+			+ "where MyD.inferenceprovenance = 'bulktagging'";
 
 		org.apache.spark.sql.Dataset<Row> queryResult = spark.sql(query);
 		queryResult.show(false);
 		Assertions.assertEquals(5, queryResult.count());
 
-		Assertions.assertEquals(1, queryResult.filter((FilterFunction<Row>)  r -> r.getAs("id").equals("50|od______3989::02dd5d2c222191b0b9bd4f33c8e96529")).count());
-		Assertions.assertEquals(1, queryResult.filter((FilterFunction<Row>)  r -> r.getAs("id").equals("50|od______3989::2f4f3c820c450bd08dac08d07cc82dcf")).count());
-		Assertions.assertEquals(1, queryResult.filter((FilterFunction<Row>)  r -> r.getAs("id").equals("50|od______3989::7fcbe3a03280663cddebfd3cb9203177")).count());
-		Assertions.assertEquals(1, queryResult.filter((FilterFunction<Row>)  r -> r.getAs("id").equals("50|od______3989::d791339867bec6d3eb2104deeb4e4961")).count());
-		Assertions.assertEquals(1, queryResult.filter((FilterFunction<Row>)  r -> r.getAs("id").equals("50|od______3989::d90d3a1f64ad264b5ebed8a35b280343")).count());
-
+		Assertions
+			.assertEquals(
+				1,
+				queryResult
+					.filter(
+						(FilterFunction<Row>) r -> r
+							.getAs("id")
+							.equals("50|od______3989::02dd5d2c222191b0b9bd4f33c8e96529"))
+					.count());
+		Assertions
+			.assertEquals(
+				1,
+				queryResult
+					.filter(
+						(FilterFunction<Row>) r -> r
+							.getAs("id")
+							.equals("50|od______3989::2f4f3c820c450bd08dac08d07cc82dcf"))
+					.count());
+		Assertions
+			.assertEquals(
+				1,
+				queryResult
+					.filter(
+						(FilterFunction<Row>) r -> r
+							.getAs("id")
+							.equals("50|od______3989::7fcbe3a03280663cddebfd3cb9203177"))
+					.count());
+		Assertions
+			.assertEquals(
+				1,
+				queryResult
+					.filter(
+						(FilterFunction<Row>) r -> r
+							.getAs("id")
+							.equals("50|od______3989::d791339867bec6d3eb2104deeb4e4961"))
+					.count());
+		Assertions
+			.assertEquals(
+				1,
+				queryResult
+					.filter(
+						(FilterFunction<Row>) r -> r
+							.getAs("id")
+							.equals("50|od______3989::d90d3a1f64ad264b5ebed8a35b280343"))
+					.count());
 
 	}
-
-
 
 }
