@@ -114,6 +114,10 @@ public class BaseAnalyzerJob {
 			final long i = recordsCounter.incrementAndGet();
 			if ((i % 10000) == 0) {
 				log.info("# Read records: " + i);
+				log.info("# fields: " + fields.size());
+				log.info("# types: " + types.size());
+				log.info("# collections: " + collections.size());
+				log.info("# totals: " + totals.size());
 			}
 
 			final List<String> recTypes = new ArrayList<>();
