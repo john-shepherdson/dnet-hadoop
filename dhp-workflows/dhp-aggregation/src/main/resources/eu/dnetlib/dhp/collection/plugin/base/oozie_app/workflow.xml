@@ -5,25 +5,24 @@
             <description>the path of the BASE dump</description>
         </property>
         <property>
+            <name>baseDataPath</name>
+            <description>the path where to store BASE records</description>
+        </property>
+        <property>
             <name>baseReportsPath</name>
             <description>path where to store the reports</description>
         </property>
+        <property>
+            <name>baseReimportFlag</name>
+            <description>flag to re-import the records from dump</description>
+        </property>
     </parameters>
 
-    <start to="deleteoutputpath"/>
+    <start to="analyzeBaseRecords"/>
     
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
-    
-    <action name="deleteoutputpath">
-        <fs>
-            <delete path='${baseReportsPath}'/>
-            <mkdir path='${baseReportsPath}'/>
-        </fs>
-        <ok to="analyzeBaseRecords"/>
-        <error to="Kill"/>
-    </action>
 
     <action name="analyzeBaseRecords">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -43,7 +42,9 @@
                 --conf spark.sql.shuffle.partitions=3840
             </spark-opts>
             <arg>--inputPath</arg><arg>${baseInputPath}</arg>
+            <arg>--dataPath</arg><arg>${baseDataPath}</arg>
             <arg>--outputPath</arg><arg>${baseReportsPath}</arg>
+            <arg>--reimport</arg><arg>${baseReimportFlag}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

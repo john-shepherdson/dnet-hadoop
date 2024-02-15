@@ -6,9 +6,21 @@
 		"paramRequired": true
 	},
 	{
+		"paramName": "d",
+		"paramLongName": "dataPath",
+		"paramDescription": "the path of the loaded records",
+		"paramRequired": true
+	},
+	{
 		"paramName": "o",
 		"paramLongName": "outputPath",
 		"paramDescription": "the path of the generated report",
+		"paramRequired": true
+	},
+	{
+		"paramName": "r",
+		"paramLongName": "reimport",
+		"paramDescription": "complete re-import",
 		"paramRequired": true
 	}
 ]
