@@ -21,10 +21,6 @@ public class InstanceTypeMatch extends AbstractListComparator {
 	public InstanceTypeMatch(Map<String, String> params) {
 		super(params);
 
-
-		// chaper of book in article
-		//  in article
-
 		// jolly types
 		translationMap.put("Conference object", "*");
 		translationMap.put("Research", "*");
@@ -34,13 +30,11 @@ public class InstanceTypeMatch extends AbstractListComparator {
 
 		// article types
 		translationMap.put("Article", "Article");
-		// Book
+		translationMap.put("Journal", "Article");
 		translationMap.put("Data Paper", "Article");
 		translationMap.put("Software Paper", "Article");
 		translationMap.put("Preprint", "Article");
 		translationMap.put("Part of book or chapter of book", "Article");
-		//Journal
-
 
 		// thesis types
 		translationMap.put("Thesis", "Thesis");
