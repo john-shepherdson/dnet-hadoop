@@ -17,11 +17,11 @@ import eu.dnetlib.pace.model.Person;
 @ClusteringClass("personClustering")
 public class PersonClustering extends AbstractPaceFunctions implements ClusteringFunction {
 
-	private Map<String, Integer> params;
+	private Map<String, Object> params;
 
 	private static final int MAX_TOKENS = 5;
 
-	public PersonClustering(final Map<String, Integer> params) {
+	public PersonClustering(final Map<String, Object> params) {
 		this.params = params;
 	}
 
@@ -77,7 +77,7 @@ public class PersonClustering extends AbstractPaceFunctions implements Clusterin
 //	}
 
 	@Override
-	public Map<String, Integer> getParams() {
+	public Map<String, Object> getParams() {
 		return params;
 	}
 

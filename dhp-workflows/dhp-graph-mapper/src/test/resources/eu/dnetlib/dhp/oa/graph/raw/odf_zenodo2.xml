@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+        xmlns:datacite="http://datacite.org/schema/kernel-3"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:dri="http://www.driver-repository.eu/namespace/dri">
+    <header xmlns="http://www.openarchives.org/OAI/2.0/">
+        <identifier>oai:zenodo.org:1596086</identifier>
+        <datestamp>2020-01-20T13:50:28Z</datestamp>
+        <setSpec>openaire</setSpec>
+        <dr:dateOfTransformation>2024-02-08T11:03:10.994Z</dr:dateOfTransformation>
+        <dri:objIdentifier>od______2659::036d5555a6688ed00c8d0da97bdece3b</dri:objIdentifier>
+        <dri:dateOfCollection>2024-02-08T11:03:10.994Z</dri:dateOfCollection>
+        <dri:dateOfTransformation>2024-02-08T11:03:10.994Z</dri:dateOfTransformation>
+    </header>
+    <metadata>
+        <resource xmlns="http://datacite.org/schema/kernel-4"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://datacite.org/schema/kernel-4 http://schema.datacite.org/meta/kernel-4.1/metadata.xsd">
+            <identifier identifierType="URL">https://zenodo.org/record/1596086</identifier>
+            <alternateIdentifiers xmlns="http://datacite.org/schema/kernel-3"/>
+            <creators>
+                <creator>
+                    <creatorName>Bonney, T. G.</creatorName>
+                    <givenName>T. G.</givenName>
+                    <familyName>Bonney</familyName>
+                </creator>
+            </creators>
+            <titles>
+                <title>Ice Blocks on a Moraine</title>
+            </titles>
+            <publisher>Zenodo</publisher>
+            <publicationYear>1889</publicationYear>
+            <dates>
+                <date dateType="Issued">1889-08-22</date>
+            </dates>
+            <resourceType resourceTypeGeneral="JournalArticle"/>
+            <relatedIdentifiers>
+                <relatedIdentifier relatedIdentifierType="DOI" relationType="IsIdenticalTo"
+                >10.1038/040391a0</relatedIdentifier>
+            </relatedIdentifiers>
+            <rightsList>
+                <rights rightsURI="https://creativecommons.org/publicdomain/zero/1.0/legalcode"
+                >Creative Commons Zero v1.0 Universal</rights>
+                <rights rightsURI="info:eu-repo/semantics/openAccess">Open Access</rights>
+            </rightsList>
+            <descriptions>
+                <description descriptionType="Abstract">n/a</description>
+            </descriptions>
+        </resource>
+        <dr:CobjCategory type="publication">0001</dr:CobjCategory>
+        <oaf:dateAccepted>1889-08-22</oaf:dateAccepted>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:license>http://creativecommons.org/publicdomain/zero/1.0/legalcode</oaf:license>
+        <oaf:language/>
+        <oaf:hostedBy name="ZENODO" id="opendoar____::2659"/>
+        <oaf:collectedFrom name="ZENODO" id="opendoar____::2659"/>
+    </metadata>
+</record>

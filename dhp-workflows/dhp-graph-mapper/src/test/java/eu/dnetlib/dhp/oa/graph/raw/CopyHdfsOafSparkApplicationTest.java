@@ -59,7 +59,19 @@ public class CopyHdfsOafSparkApplicationTest {
 								.getResourceAsStream(
 									"/eu/dnetlib/dhp/oa/graph/raw/publication_2_unknownProperty.json")),
 					"publication"));
+	}
 
+	@Test
+	void isOafType_Datacite_ORP() throws IOException {
+		assertTrue(
+				CopyHdfsOafSparkApplication
+						.isOafType(
+								IOUtils
+										.toString(
+												getClass()
+														.getResourceAsStream(
+																"/eu/dnetlib/dhp/oa/graph/raw/datacite_orp.json")),
+								"otherresearchproduct"));
 	}
 
 }

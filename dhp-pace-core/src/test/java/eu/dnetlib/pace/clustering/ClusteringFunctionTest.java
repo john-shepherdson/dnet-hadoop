@@ -15,7 +15,7 @@ import eu.dnetlib.pace.config.DedupConfig;
 
 public class ClusteringFunctionTest extends AbstractPaceTest {
 
-	private static Map<String, Integer> params;
+	private static Map<String, Object> params;
 	private static DedupConfig conf;
 
 	@BeforeAll
@@ -40,10 +40,10 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 
 	@Test
 	public void testNgram() {
-		params.put("ngramLen", 3);
-		params.put("max", 8);
-		params.put("maxPerToken", 2);
-		params.put("minNgramLen", 1);
+		params.put("ngramLen", "3");
+		params.put("max", "8");
+		params.put("maxPerToken", "2");
+		params.put("minNgramLen", "1");
 
 		final ClusteringFunction ngram = new Ngrams(params);
 
@@ -54,8 +54,8 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 
 	@Test
 	public void testNgramPairs() {
-		params.put("ngramLen", 3);
-		params.put("max", 2);
+		params.put("ngramLen", "3");
+		params.put("max", "2");
 
 		final ClusteringFunction np = new NgramPairs(params);
 
@@ -66,8 +66,8 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 
 	@Test
 	public void testSortedNgramPairs() {
-		params.put("ngramLen", 3);
-		params.put("max", 2);
+		params.put("ngramLen", "3");
+		params.put("max", "2");
 
 		final ClusteringFunction np = new SortedNgramPairs(params);
 
@@ -87,9 +87,9 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 
 	@Test
 	public void testAcronym() {
-		params.put("max", 4);
-		params.put("minLen", 1);
-		params.put("maxLen", 3);
+		params.put("max", "4");
+		params.put("minLen", "1");
+		params.put("maxLen", "3");
 
 		final ClusteringFunction acro = new Acronyms(params);
 
@@ -100,8 +100,8 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 
 	@Test
 	public void testSuffixPrefix() {
-		params.put("len", 3);
-		params.put("max", 4);
+		params.put("len", "3");
+		params.put("max", "4");
 
 		final ClusteringFunction sp = new SuffixPrefix(params);
 
@@ -109,8 +109,8 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 		System.out.println(s);
 		System.out.println(sp.apply(conf, Lists.newArrayList(s)));
 
-		params.put("len", 3);
-		params.put("max", 1);
+		params.put("len", "3");
+		params.put("max", "1");
 
 		System.out.println(sp.apply(conf, Lists.newArrayList("Framework for general-purpose deduplication")));
 	}
@@ -118,8 +118,8 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 	@Test
 	public void testWordsSuffixPrefix() {
 
-		params.put("len", 3);
-		params.put("max", 4);
+		params.put("len", "3");
+		params.put("max", "4");
 
 		final ClusteringFunction sp = new WordsSuffixPrefix(params);
 
@@ -130,7 +130,7 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 
 	@Test
 	public void testWordsStatsSuffixPrefix() {
-		params.put("mod", 10);
+		params.put("mod", "10");
 
 		final ClusteringFunction sp = new WordsStatsSuffixPrefixChain(params);
 
@@ -167,7 +167,7 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 	@Test
 	public void testFieldValue() {
 
-		params.put("randomLength", 5);
+		params.put("randomLength", "5");
 
 		final ClusteringFunction sp = new SpaceTrimmingFieldValue(params);
 

@@ -221,27 +221,48 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	/**
-	 * The Datacite element
+	 * Extracts the resource type from The Datacite element
 	 *
-	 * <datacite:resourceType xs:anyURI="http://purl.org/coar/resource_type/c_6501">journal article</datacite:resourceType>
+	 * <datacite:resourceType
+	 * 		anyURI="http://purl.org/coar/resource_type/c_6501"
+	 * 		uri="http://purl.org/coar/resource_type/c_6501"
+	 * 	    resourceTypeGeneral="Dataset">journal article</datacite:resourceType>
 	 *
 	 * @param doc the input document
 	 * @return the chosen resource type
 	 */
 	@Override
 	protected String findOriginalType(Document doc) {
-		return Optional
+		final String resourceType = Optional
 			.ofNullable(
 				(Element) doc
 					.selectSingleNode(
 						"//*[local-name()='metadata']/*[local-name() = 'resource']/*[local-name() = 'resourceType']"))
-			.map(element -> {
-				final String resourceTypeURI = element.attributeValue("anyURI");
-				final String resourceTypeTxt = element.getText();
+			.map(e -> {
+				final String resourceTypeURI = Optional
+					.ofNullable(e.attributeValue("uri"))
+					.filter(StringUtils::isNotBlank)
+					.orElse(null);
+				final String resourceTypeAnyURI = Optional
+					.ofNullable(e.attributeValue("anyURI"))
+					.filter(StringUtils::isNotBlank)
+					.orElse(null);
+				final String resourceTypeTxt = Optional
+					.ofNullable(e.getText())
+					.filter(StringUtils::isNotBlank)
+					.orElse(null);
+				final String resourceTypeGeneral = Optional
+					.ofNullable(e.attributeValue("resourceTypeGeneral"))
+					.filter(StringUtils::isNotBlank)
+					.orElse(null);
 
-				return ObjectUtils.firstNonNull(resourceTypeURI, resourceTypeTxt);
+				return ObjectUtils
+					.firstNonNull(resourceTypeURI, resourceTypeAnyURI, resourceTypeTxt, resourceTypeGeneral);
 			})
 			.orElse(null);
+
+		final String drCobjCategory = doc.valueOf("//dr:CobjCategory/text()");
+		return ObjectUtils.firstNonNull(resourceType, drCobjCategory);
 	}
 
 	@Override

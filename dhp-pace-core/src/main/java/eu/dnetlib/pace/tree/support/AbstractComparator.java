@@ -127,4 +127,14 @@ public abstract class AbstractComparator<T> extends AbstractPaceFunctions implem
 		return this.weight;
 	}
 
+	public Double getDoubleParam(String name) {
+		String svalue = params.get(name);
+
+		try {
+			return Double.parseDouble(svalue);
+		} catch (Throwable t) {
+		}
+
+		return null;
+	}
 }

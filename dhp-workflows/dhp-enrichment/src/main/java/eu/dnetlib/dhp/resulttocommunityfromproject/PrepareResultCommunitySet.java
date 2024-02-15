@@ -38,7 +38,7 @@ public class PrepareResultCommunitySet {
 			.toString(
 				PrepareResultCommunitySet.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttocommunityfromproject/input_preparecommunitytoresult_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/resulttocommunityfromproject/input_preparecommunitytoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);

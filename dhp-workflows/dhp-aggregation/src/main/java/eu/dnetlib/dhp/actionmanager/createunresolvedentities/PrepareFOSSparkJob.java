@@ -124,8 +124,19 @@ public class PrepareFOSSparkJob implements Serializable {
 		FOSDataModel first) {
 		level1.add(first.getLevel1());
 		level2.add(first.getLevel2());
-		level3.add(first.getLevel3() + "@@" + first.getScoreL3());
-		level4.add(first.getLevel4() + "@@" + first.getScoreL4());
+		if (Optional.ofNullable(first.getLevel3()).isPresent() &&
+			!first.getLevel3().equalsIgnoreCase(NA) && !first.getLevel3().equalsIgnoreCase(NULL)
+			&& first.getLevel3() != null)
+			level3.add(first.getLevel3() + "@@" + first.getScoreL3());
+		else
+			level3.add(NULL);
+		if (Optional.ofNullable(first.getLevel4()).isPresent() &&
+			!first.getLevel4().equalsIgnoreCase(NA) &&
+			!first.getLevel4().equalsIgnoreCase(NULL) &&
+			first.getLevel4() != null)
+			level4.add(first.getLevel4() + "@@" + first.getScoreL4());
+		else
+			level4.add(NULL);
 	}
 
 }
