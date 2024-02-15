@@ -156,12 +156,16 @@ public class BaseAnalyzerJob {
 
 			final BaseRecordInfo info = new BaseRecordInfo();
 
+			info.setId(record.valueOf("//*[local-name() = 'header']/*[local-name() = 'identifier']").trim());
+
 			for (final Object o : record.selectNodes("//*|//@*")) {
 				info.getPaths().add(((Node) o).getPath());
 
-				final String nodeName = ((Node) o).getName();
 				if (o instanceof Element) {
 					final Element n = (Element) o;
+
+					final String nodeName = n.getName();
+
 					if ("collection".equals(nodeName)) {
 						final String collName = n.getText().trim();
 						if (StringUtils.isNotBlank(collName)) {
