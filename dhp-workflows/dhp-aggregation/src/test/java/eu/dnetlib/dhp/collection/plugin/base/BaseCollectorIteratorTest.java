@@ -47,7 +47,7 @@ public class BaseCollectorIteratorTest {
 
 			// System.out.println(record.asXML());
 
-			for (final Object o : record.selectNodes("//*[local-name()='metadata']//*")) {
+			for (final Object o : record.selectNodes("//*|//@*")) {
 				final String path = ((Node) o).getPath();
 
 				if (fields.containsKey(path)) {
@@ -56,22 +56,23 @@ public class BaseCollectorIteratorTest {
 					fields.put(path, new AtomicInteger(1));
 				}
 
-				if ("collection".equals(((Node) o).getName())) {
+				if (o instanceof Element) {
 					final Element n = (Element) o;
-					final String collName = n.getText().trim();
-					if (StringUtils.isNotBlank(collName) && !collections.containsKey(collName)) {
-						final Map<String, String> collAttrs = new HashMap<>();
-						for (final Object ao : n.attributes()) {
-							collAttrs.put(((Attribute) ao).getName(), ((Attribute) ao).getValue());
+
+					if ("collection".equals(n.getName())) {
+						final String collName = n.getText().trim();
+						if (StringUtils.isNotBlank(collName) && !collections.containsKey(collName)) {
+							final Map<String, String> collAttrs = new HashMap<>();
+							for (final Object ao : n.attributes()) {
+								collAttrs.put(((Attribute) ao).getName(), ((Attribute) ao).getValue());
+							}
+							collections.put(collName, collAttrs);
 						}
-						collections.put(collName, collAttrs);
+					} else if ("type".equals(n.getName())) {
+						types.add(n.getText().trim());
 					}
-				}
 
-				if ("type".equals(((Node) o).getName())) {
-					types.add(((Element) o).getText().trim());
 				}
-
 			}
 
 		}

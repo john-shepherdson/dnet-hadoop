@@ -48,18 +48,17 @@ public class BaseAnalyzerJob {
 	public static void main(final String[] args) throws Exception {
 
 		final String jsonConfiguration = IOUtils
-			.toString(
-				BaseAnalyzerJob.class
-					.getResourceAsStream("/eu/dnetlib/dhp/collection/plugin/base/action_set_parameters.json"));
+				.toString(BaseAnalyzerJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/collection/plugin/base/action_set_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
-			.ofNullable(parser.get("isSparkSessionManaged"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.TRUE);
+				.ofNullable(parser.get("isSparkSessionManaged"))
+				.map(Boolean::valueOf)
+				.orElse(Boolean.TRUE);
 
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
@@ -75,11 +74,11 @@ public class BaseAnalyzerJob {
 	}
 
 	private static void processBaseRecords(final SparkSession spark,
-		final String inputPath,
-		final String outputPath) throws IOException {
+			final String inputPath,
+			final String outputPath) throws IOException {
 
 		try (final FileSystem fs = FileSystem.get(new Configuration());
-			final AggregatorReport report = new AggregatorReport()) {
+				final AggregatorReport report = new AggregatorReport()) {
 			final Map<String, AtomicLong> fields = new HashMap<>();
 			final Map<String, AtomicLong> types = new HashMap<>();
 			final Map<String, AtomicLong> collections = new HashMap<>();
@@ -97,12 +96,12 @@ public class BaseAnalyzerJob {
 	}
 
 	private static void analyze(final FileSystem fs,
-		final String inputPath,
-		final Map<String, AtomicLong> fields,
-		final Map<String, AtomicLong> types,
-		final Map<String, AtomicLong> collections,
-		final Map<String, AtomicLong> totals,
-		final AggregatorReport report) throws JsonProcessingException, IOException, DocumentException {
+			final String inputPath,
+			final Map<String, AtomicLong> fields,
+			final Map<String, AtomicLong> types,
+			final Map<String, AtomicLong> collections,
+			final Map<String, AtomicLong> totals,
+			final AggregatorReport report) throws JsonProcessingException, IOException, DocumentException {
 
 		final AtomicLong recordsCounter = new AtomicLong(0);
 
@@ -124,27 +123,28 @@ public class BaseAnalyzerJob {
 
 			final List<String> recTypes = new ArrayList<>();
 
-			for (final Object o : record.selectNodes("//*[local-name()='metadata']//*")) {
+			for (final Object o : record.selectNodes("//*|//@*")) {
 
 				incrementMapCounter(fields, ((Node) o).getPath());
 
 				final String nodeName = ((Node) o).getName();
 
-				if ("collection".equals(nodeName)) {
+				if (o instanceof Element) {
 					final Element n = (Element) o;
-					final String collName = n.getText().trim();
-					if (StringUtils.isNotBlank(collName)) {
-						final Map<String, String> map = new HashMap<>();
-						for (final Object ao : n.attributes()) {
-							map.put(((Attribute) ao).getName(), ((Attribute) ao).getValue());
+					if ("collection".equals(nodeName)) {
+						final String collName = n.getText().trim();
+						if (StringUtils.isNotBlank(collName)) {
+							final Map<String, String> map = new HashMap<>();
+							for (final Object ao : n.attributes()) {
+								map.put(((Attribute) ao).getName(), ((Attribute) ao).getValue());
+							}
+							incrementMapCounter(collections, collName + ": " + OBJECT_MAPPER.writeValueAsString(map));
 						}
-
-						incrementMapCounter(collections, collName + ": " + OBJECT_MAPPER.writeValueAsString(map));
+					} else if ("type".equals(nodeName)) {
+						recTypes.add("TYPE: " + n.getText().trim());
+					} else if ("typenorm".equals(nodeName)) {
+						recTypes.add("TYPE_NORM: " + n.getText().trim());
 					}
-				} else if ("type".equals(nodeName)) {
-					recTypes.add("TYPE: " + nodeName);
-				} else if ("typenorm".equals(nodeName)) {
-					recTypes.add("TYPE_NORM: " + nodeName);
 				}
 			}
 
@@ -163,14 +163,11 @@ public class BaseAnalyzerJob {
 	}
 
 	private static void saveReport(final FileSystem fs, final String outputPath, final Map<String, AtomicLong> fields)
-		throws JsonProcessingException, IOException {
+			throws JsonProcessingException, IOException {
 		try (final SequenceFile.Writer writer = SequenceFile
-			.createWriter(
-				fs.getConf(), SequenceFile.Writer.file(new Path(outputPath)), SequenceFile.Writer
-					.keyClass(IntWritable.class),
-				SequenceFile.Writer
-					.valueClass(Text.class),
-				SequenceFile.Writer.compression(SequenceFile.CompressionType.BLOCK, new DeflateCodec()))) {
+				.createWriter(fs.getConf(), SequenceFile.Writer.file(new Path(outputPath)), SequenceFile.Writer
+						.keyClass(IntWritable.class), SequenceFile.Writer
+								.valueClass(Text.class), SequenceFile.Writer.compression(SequenceFile.CompressionType.BLOCK, new DeflateCodec()))) {
 
 			final Text key = new Text();
 			final Text value = new Text();
