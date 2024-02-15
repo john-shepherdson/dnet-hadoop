@@ -4,10 +4,18 @@ package eu.dnetlib.dhp.collection.plugin.base;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLEventWriter;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -16,21 +24,20 @@ import org.apache.commons.compress.compressors.CompressorStreamFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 
-public class BaseCollectorIterator implements Iterator<Document> {
+public class BaseCollectorIterator implements Iterator<String> {
 
-	private Object nextElement;
+	private String nextElement;
 
-	private final BlockingQueue<Object> queue = new LinkedBlockingQueue<>(20);
+	private final BlockingQueue<String> queue = new LinkedBlockingQueue<>(20);
 
 	private static final Logger log = LoggerFactory.getLogger(BaseCollectorIterator.class);
+
+	private static final String END_ELEM = "__END__";
 
 	public BaseCollectorIterator(final FileSystem fs, final Path filePath, final AggregatorReport report) {
 		new Thread(() -> importHadoopFile(fs, filePath, report)).start();
@@ -52,13 +59,13 @@ public class BaseCollectorIterator implements Iterator<Document> {
 
 	@Override
 	public synchronized boolean hasNext() {
-		return (this.nextElement != null) && (this.nextElement instanceof Document);
+		return (this.nextElement != null) & !END_ELEM.equals(this.nextElement);
 	}
 
 	@Override
-	public synchronized Document next() {
+	public synchronized String next() {
 		try {
-			return this.nextElement instanceof Document ? (Document) this.nextElement : null;
+			return END_ELEM.equals(this.nextElement) ? null : this.nextElement;
 		} finally {
 			try {
 				this.nextElement = this.queue.take();
@@ -92,6 +99,9 @@ public class BaseCollectorIterator implements Iterator<Document> {
 	private void importTarStream(final TarArchiveInputStream tarInputStream, final AggregatorReport report) {
 		long count = 0;
 
+		final XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+		final XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
+
 		try {
 			TarArchiveEntry entry;
 			while ((entry = (TarArchiveEntry) tarInputStream.getNextEntry()) != null) {
@@ -109,24 +119,46 @@ public class BaseCollectorIterator implements Iterator<Document> {
 						final CompressorInputStream bzipInput = new CompressorStreamFactory()
 							.createCompressorInputStream(bzipBis)) {
 
-						final String xml = IOUtils.toString(new InputStreamReader(bzipInput));
+						final XMLEventReader reader = xmlInputFactory.createXMLEventReader(bzipInput);
 
-						final Document doc = DocumentHelper.parseText(xml);
+						XMLEventWriter eventWriter = null;
+						StringWriter xmlWriter = null;
 
-						for (final Object o : doc
-							.selectNodes("//*[local-name()='ListRecords']/*[local-name()='record']")) {
-							if (o instanceof Element) {
-								final Element newRoot = (Element) ((Element) o).detach();
-								final Document newDoc = DocumentHelper.createDocument(newRoot);
-								this.queue.put(newDoc);
-								count++;
+						while (reader.hasNext()) {
+							final XMLEvent nextEvent = reader.nextEvent();
+
+							if (nextEvent.isStartElement()) {
+								final StartElement startElement = nextEvent.asStartElement();
+								if ("record".equals(startElement.getName().getLocalPart())) {
+									xmlWriter = new StringWriter();
+									eventWriter = xmlOutputFactory.createXMLEventWriter(xmlWriter);
+								}
 							}
+
+							if (eventWriter != null) {
+								eventWriter.add(nextEvent);
+							}
+
+							if (nextEvent.isEndElement()) {
+								final EndElement endElement = nextEvent.asEndElement();
+								if ("record".equals(endElement.getName().getLocalPart())) {
+									eventWriter.flush();
+									eventWriter.close();
+
+									this.queue.put(xmlWriter.toString());
+
+									eventWriter = null;
+									xmlWriter = null;
+									count++;
+								}
+							}
+
 						}
 					}
 				}
 			}
 
-			this.queue.put("__END__"); // I ADD A NOT ELEMENT OBJECT TO INDICATE THE END OF THE QUEUE
+			this.queue.put(END_ELEM); // TO INDICATE THE END OF THE QUEUE
 		} catch (final Throwable e) {
 			log.error("Error processing BASE records", e);
 			report.put(e.getClass().getName(), e.getMessage());

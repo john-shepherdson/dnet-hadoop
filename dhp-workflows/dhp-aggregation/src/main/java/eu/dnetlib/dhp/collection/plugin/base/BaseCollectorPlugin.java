@@ -1,8 +1,6 @@
 
 package eu.dnetlib.dhp.collection.plugin.base;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Spliterator;
@@ -12,9 +10,6 @@ import java.util.stream.StreamSupport;
 
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.dom4j.Document;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,31 +50,19 @@ public class BaseCollectorPlugin implements CollectorPlugin {
 			throw new CollectorException(e);
 		}
 
-		final Iterator<Document> iterator = new BaseCollectorIterator(this.fs, filePath, report);
-		final Spliterator<Document> spliterator = Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED);
+		final Iterator<String> iterator = new BaseCollectorIterator(this.fs, filePath, report);
+		final Spliterator<String> spliterator = Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED);
 		return StreamSupport
 			.stream(spliterator, false)
-			.filter(doc -> filterXml(doc, report))
-			.map(doc -> xmlToString(doc, report));
+			.filter(doc -> filterXml(doc, report));
 	}
 
-	private boolean filterXml(final Document doc, final AggregatorReport report) {
+	private boolean filterXml(final String xml, final AggregatorReport report) {
 		// TODO Auto-generated method stub
 
 		// HERE THE FILTERS ACCORDING TO THE DOCUMENTATION
 
 		return true;
-	}
-
-	private String xmlToString(final Document doc, final AggregatorReport report) {
-		try (final StringWriter sw = new StringWriter()) {
-			final XMLWriter writer = new XMLWriter(sw, OutputFormat.createPrettyPrint());
-			writer.write(doc);
-			return writer.toString();
-		} catch (final IOException e) {
-			report.put(e.getClass().getName(), e.getMessage());
-			throw new RuntimeException("Error indenting XML record", e);
-		}
 	}
 
 }

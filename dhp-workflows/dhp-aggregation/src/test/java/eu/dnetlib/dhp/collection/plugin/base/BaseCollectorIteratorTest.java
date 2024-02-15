@@ -13,16 +13,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 
-@Disabled
 public class BaseCollectorIteratorTest {
 
 	@Test
@@ -37,7 +36,8 @@ public class BaseCollectorIteratorTest {
 		final Set<String> types = new HashSet<>();
 
 		while (iterator.hasNext()) {
-			final Document record = iterator.next();
+
+			final Document record = DocumentHelper.parseText(iterator.next());
 
 			count++;
 
