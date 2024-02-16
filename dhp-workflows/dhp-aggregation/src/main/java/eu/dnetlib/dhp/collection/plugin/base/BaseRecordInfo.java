@@ -1,10 +1,11 @@
+
 package eu.dnetlib.dhp.collection.plugin.base;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class BaseRecordInfo implements Serializable {
 
@@ -12,8 +13,8 @@ public class BaseRecordInfo implements Serializable {
 
 	private String id;
 	private Map<String, Map<String, String>> collections = new HashMap<>();
-	private Set<String> paths = new LinkedHashSet<>();
-	private Set<String> types = new LinkedHashSet<>();
+	private List<String> paths = new ArrayList<>();
+	private List<String> types = new ArrayList<>();
 
 	public String getId() {
 		return this.id;
@@ -23,19 +24,19 @@ public class BaseRecordInfo implements Serializable {
 		this.id = id;
 	}
 
-	public Set<String> getPaths() {
+	public List<String> getPaths() {
 		return this.paths;
 	}
 
-	public void setPaths(final Set<String> paths) {
+	public void setPaths(final List<String> paths) {
 		this.paths = paths;
 	}
 
-	public Set<String> getTypes() {
+	public List<String> getTypes() {
 		return this.types;
 	}
 
-	public void setTypes(final Set<String> types) {
+	public void setTypes(final List<String> types) {
 		this.types = types;
 	}
 

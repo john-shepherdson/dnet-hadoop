@@ -3,14 +3,22 @@ package eu.dnetlib.dhp.collection.plugin.base;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SparkSession;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -99,4 +107,28 @@ public class BaseCollectorIteratorTest {
 		assertEquals(30000, count);
 	}
 
+	@Test
+	public void testParquet() throws Exception {
+
+		final String xml = IOUtils.toString(getClass().getResourceAsStream("record.xml"));
+
+		final SparkSession spark = SparkSession.builder().master("local[*]").getOrCreate();
+
+		final List<BaseRecordInfo> ls = new ArrayList<>();
+
+		for (int i = 0; i < 10; i++) {
+			ls.add(BaseAnalyzerJob.extractInfo(xml));
+		}
+
+		final JavaRDD<BaseRecordInfo> rdd = JavaSparkContext
+				.fromSparkContext(spark.sparkContext())
+				.parallelize(ls);
+
+		final Dataset<BaseRecordInfo> df = spark
+				.createDataset(rdd.rdd(), Encoders.bean(BaseRecordInfo.class));
+
+		df.printSchema();
+
+		df.show(false);
+	}
 }

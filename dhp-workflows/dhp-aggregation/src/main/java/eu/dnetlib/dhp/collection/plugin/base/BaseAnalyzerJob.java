@@ -5,8 +5,10 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.commons.io.IOUtils;
@@ -43,17 +45,18 @@ public class BaseAnalyzerJob {
 	public static void main(final String[] args) throws Exception {
 
 		final String jsonConfiguration = IOUtils
-				.toString(BaseAnalyzerJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/collection/plugin/base/action_set_parameters.json"));
+			.toString(
+				BaseAnalyzerJob.class
+					.getResourceAsStream("/eu/dnetlib/dhp/collection/plugin/base/action_set_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
-				.ofNullable(parser.get("isSparkSessionManaged"))
-				.map(Boolean::valueOf)
-				.orElse(Boolean.TRUE);
+			.ofNullable(parser.get("isSparkSessionManaged"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.TRUE);
 
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
@@ -71,24 +74,24 @@ public class BaseAnalyzerJob {
 
 		final SparkConf conf = new SparkConf();
 
-		runWithSparkSession(conf, isSparkSessionManaged, spark -> processBaseRecords(spark, inputPath, dataPath, outputPath, reimport));
+		runWithSparkSession(
+			conf, isSparkSessionManaged, spark -> processBaseRecords(spark, inputPath, dataPath, outputPath, reimport));
 	}
 
 	private static void processBaseRecords(final SparkSession spark,
-			final String inputPath,
-			final String dataPath,
-			final String outputPath,
-			final boolean reimport) throws IOException {
+		final String inputPath,
+		final String dataPath,
+		final String outputPath,
+		final boolean reimport) throws IOException {
 
 		try (final FileSystem fs = FileSystem.get(new Configuration());
-				final AggregatorReport report = new AggregatorReport()) {
+			final AggregatorReport report = new AggregatorReport()) {
 
 			if (reimport) {
-				fs.delete(new Path(dataPath), true);
 				loadRecords(fs, inputPath, dataPath, report);
 			}
 
-			fs.delete(new Path(outputPath), true);
+			// fs.delete(new Path(outputPath), true);
 			extractInfo(spark, dataPath, outputPath);
 		} catch (final Throwable e) {
 			throw new RuntimeException(e);
@@ -96,10 +99,10 @@ public class BaseAnalyzerJob {
 	}
 
 	private static void loadRecords(final FileSystem fs,
-			final String inputPath,
-			final String outputPath,
-			final AggregatorReport report)
-			throws Exception {
+		final String inputPath,
+		final String outputPath,
+		final AggregatorReport report)
+		throws Exception {
 
 		final AtomicLong recordsCounter = new AtomicLong(0);
 
@@ -107,9 +110,12 @@ public class BaseAnalyzerJob {
 		final Text value = new Text();
 
 		try (final SequenceFile.Writer writer = SequenceFile
-				.createWriter(fs.getConf(), SequenceFile.Writer.file(new Path(outputPath)), SequenceFile.Writer
-						.keyClass(LongWritable.class), SequenceFile.Writer
-								.valueClass(Text.class), SequenceFile.Writer.compression(SequenceFile.CompressionType.BLOCK, new DeflateCodec()))) {
+			.createWriter(
+				fs.getConf(), SequenceFile.Writer.file(new Path(outputPath)), SequenceFile.Writer
+					.keyClass(LongWritable.class),
+				SequenceFile.Writer
+					.valueClass(Text.class),
+				SequenceFile.Writer.compression(SequenceFile.CompressionType.BLOCK, new DeflateCodec()))) {
 
 			final BaseCollectorIterator iteraror = new BaseCollectorIterator(fs, new Path(inputPath), report);
 
@@ -135,31 +141,35 @@ public class BaseAnalyzerJob {
 	}
 
 	private static void extractInfo(final SparkSession spark,
-			final String inputPath,
-			final String targetPath) throws Exception {
+		final String inputPath,
+		final String targetPath) throws Exception {
 
-		final JavaRDD<BaseRecordInfo> rdd = JavaSparkContext.fromSparkContext(spark.sparkContext())
-				.sequenceFile(inputPath, LongWritable.class, Text.class)
-				.map(s -> s._2)
-				.map(BaseAnalyzerJob::extractInfo);
+		final JavaRDD<BaseRecordInfo> rdd = JavaSparkContext
+			.fromSparkContext(spark.sparkContext())
+			.sequenceFile(inputPath, LongWritable.class, Text.class)
+			.map(s -> s._2.toString())
+			.map(BaseAnalyzerJob::extractInfo);
 
-		spark.createDataset(rdd.rdd(), Encoders.bean(BaseRecordInfo.class))
-				.write()
-				.mode(SaveMode.Overwrite)
-				.format("parquet")
-				.save(targetPath);
+		spark
+			.createDataset(rdd.rdd(), Encoders.bean(BaseRecordInfo.class))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.format("parquet")
+			.save(targetPath);
 	}
 
-	private static BaseRecordInfo extractInfo(final Text s) {
+	protected static BaseRecordInfo extractInfo(final String s) {
 		try {
-			final Document record = DocumentHelper.parseText(s.toString());
+			final Document record = DocumentHelper.parseText(s);
 
 			final BaseRecordInfo info = new BaseRecordInfo();
 
-			info.setId(record.valueOf("//*[local-name() = 'header']/*[local-name() = 'identifier']").trim());
+			final Set<String> paths = new LinkedHashSet<>();
+			final Set<String> types = new LinkedHashSet<>();
+			final Map<String, Map<String, String>> colls = new HashMap<>();
 
 			for (final Object o : record.selectNodes("//*|//@*")) {
-				info.getPaths().add(((Node) o).getPath());
+				paths.add(((Node) o).getPath());
 
 				if (o instanceof Element) {
 					final Element n = (Element) o;
@@ -173,15 +183,21 @@ public class BaseAnalyzerJob {
 							for (final Object ao : n.attributes()) {
 								attrs.put(((Attribute) ao).getName(), ((Attribute) ao).getValue());
 							}
-							info.getCollections().put(collName, attrs);
+							colls.put(collName, attrs);
 						}
 					} else if ("type".equals(nodeName)) {
-						info.getTypes().add("TYPE: " + n.getText().trim());
+						types.add("TYPE: " + n.getText().trim());
 					} else if ("typenorm".equals(nodeName)) {
-						info.getTypes().add("TYPE_NORM: " + n.getText().trim());
+						types.add("TYPE_NORM: " + n.getText().trim());
 					}
 				}
 			}
+
+			info.setId(record.valueOf("//*[local-name() = 'header']/*[local-name() = 'identifier']").trim());
+			info.getTypes().addAll(types);
+			info.getPaths().addAll(paths);
+			info.setCollections(colls);
+
 			return info;
 		} catch (final DocumentException e) {
 			throw new RuntimeException(e);

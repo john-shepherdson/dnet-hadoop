@@ -1,0 +1,31 @@
+<record>
+  <header xmlns="http://www.openarchives.org/OAI/2.0/">
+    <identifier>ftterritoryanzac:oai:www.territorystories.nt.gov.au:10070/74188</identifier>
+    <datestamp>2015-09-07T22:26:28Z</datestamp>
+  </header>
+  <metadata xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:base_dc="http://oai.base-search.net/base_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <base_dc:dc xsi:schemaLocation="http://oai.base-search.net/base_dc/ http://oai.base-search.net/base_dc/base_dc.xsd">
+      <base_dc:global_id>ftterritoryanzac:oai:www.territorystories.nt.gov.au:10070/74188</base_dc:global_id>
+      <base_dc:continent>cau</base_dc:continent>
+      <base_dc:country>au</base_dc:country>
+      <base_dc:collection opendoar_id="1234">ftterritoryanzac</base_dc:collection>
+      <base_dc:collname>Territory Stories (Northern Territory Government, Australia)</base_dc:collname>
+      <dc:title>W. Wardle</dc:title>
+      <dc:creator>Wardle, W.</dc:creator>
+      <dc:description>"NX 112520 Bdr. W. Wardle Darwin Coast Art. 1943-45" ; NX 112520. Bombardier W. Wardle. Darwin Coast Artillery. 1943-1945.</dc:description>
+      <dc:date>2007-12-18T01:19:36Z</dc:date>
+      <base_dc:year>2007</base_dc:year>
+      <dc:type>Image</dc:type>
+      <dc:type>Reference</dc:type>
+      <base_dc:typenorm>51</base_dc:typenorm>
+      <dc:format>Cropped 408w X 338h Size 26.62k</dc:format>
+      <dc:identifier>http://hdl.handle.net/10070/74188</dc:identifier>
+      <base_dc:link>http://hdl.handle.net/10070/74188</base_dc:link>
+      <dc:relation>Darwin Commemorative Wall Quilt</dc:relation>
+      <dc:relation>http://www.ww2roll.gov.au/script/veteran.asp?ServiceID=A&amp;VeteranID=220307</dc:relation>
+      <dc:relation>http://hdl.handle.net/10070/74188</dc:relation>
+      <base_dc:oa>1</base_dc:oa>
+      <base_dc:lang>unknown</base_dc:lang>
+    </base_dc:dc>
+  </metadata>
+</record>
