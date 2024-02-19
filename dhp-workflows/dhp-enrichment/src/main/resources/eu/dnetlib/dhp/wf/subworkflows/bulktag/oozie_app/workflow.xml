@@ -76,6 +76,7 @@
             <arg>--outputPath</arg><arg>${workingDir}/bulktag/</arg>
             <arg>--pathMap</arg><arg>${pathMap}</arg>
             <arg>--baseURL</arg><arg>${baseURL}</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

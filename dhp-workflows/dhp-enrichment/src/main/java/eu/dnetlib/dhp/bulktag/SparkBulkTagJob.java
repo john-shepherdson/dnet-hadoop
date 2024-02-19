@@ -4,10 +4,23 @@ package eu.dnetlib.dhp.bulktag;
 import static eu.dnetlib.dhp.PropagationConstant.removeOutputDir;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPOutputStream;
 
+import org.apache.avro.TestAnnotation;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
@@ -18,8 +31,10 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.sun.media.sound.ModelInstrumentComparator;
 
 import eu.dnetlib.dhp.api.Utils;
 import eu.dnetlib.dhp.api.model.CommunityEntityMap;
@@ -73,8 +88,20 @@ public class SparkBulkTagJob {
 		log.info("baseURL: {}", baseURL);
 
 		log.info("pathMap: {}", parser.get("pathMap"));
-		ProtoMap protoMappingParams = new Gson().fromJson(parser.get("pathMap") + "}}", ProtoMap.class);
-		log.info("pathMap: {}", new Gson().toJson(protoMappingParams));
+		String protoMappingPath = parser.get("pathMap");
+		// log.info("pathMap: {}", new Gson().toJson(protoMappingParams));
+
+		final String hdfsNameNode = parser.get("nameNode");
+		log.info("nameNode: {}", hdfsNameNode);
+
+		Configuration configuration = new Configuration();
+		configuration.set("fs.defaultFS", hdfsNameNode);
+		FileSystem fs = FileSystem.get(configuration);
+
+		String temp = IOUtils.toString(fs.open(new Path(protoMappingPath)), StandardCharsets.UTF_8);
+		log.info("protoMap: {}", temp);
+		ProtoMap protoMap = new Gson().fromJson(temp, ProtoMap.class);
+		log.info("pathMap: {}", new Gson().toJson(protoMap));
 
 		SparkConf conf = new SparkConf();
 		CommunityConfiguration cc;
@@ -96,7 +123,8 @@ public class SparkBulkTagJob {
 			isSparkSessionManaged,
 			spark -> {
 				extendCommunityConfigurationForEOSC(spark, inputPath, cc);
-				execBulkTag(spark, inputPath, outputPath, protoMappingParams, cc);
+				execBulkTag(
+					spark, inputPath, outputPath, protoMap, cc);
 				execDatasourceTag(spark, inputPath, outputPath, Utils.getDatasourceCommunities(baseURL));
 				execProjectTag(spark, inputPath, outputPath, Utils.getCommunityProjects(baseURL));
 			});
@@ -256,6 +284,11 @@ public class SparkBulkTagJob {
 		ProtoMap protoMappingParams,
 		CommunityConfiguration communityConfiguration) {
 
+		try {
+			System.out.println(new ObjectMapper().writeValueAsString(protoMappingParams));
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
 		ModelSupport.entityTypes
 			.keySet()
 			.parallelStream()
