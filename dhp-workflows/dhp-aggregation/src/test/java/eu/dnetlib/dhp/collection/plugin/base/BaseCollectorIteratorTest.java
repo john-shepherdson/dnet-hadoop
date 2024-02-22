@@ -121,11 +121,11 @@ public class BaseCollectorIteratorTest {
 		}
 
 		final JavaRDD<BaseRecordInfo> rdd = JavaSparkContext
-				.fromSparkContext(spark.sparkContext())
-				.parallelize(ls);
+			.fromSparkContext(spark.sparkContext())
+			.parallelize(ls);
 
 		final Dataset<BaseRecordInfo> df = spark
-				.createDataset(rdd.rdd(), Encoders.bean(BaseRecordInfo.class));
+			.createDataset(rdd.rdd(), Encoders.bean(BaseRecordInfo.class));
 
 		df.printSchema();
 

@@ -4,9 +4,9 @@ package eu.dnetlib.dhp.collection.plugin.base;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -26,7 +26,6 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
-import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -166,7 +165,7 @@ public class BaseAnalyzerJob {
 
 			final Set<String> paths = new LinkedHashSet<>();
 			final Set<String> types = new LinkedHashSet<>();
-			final Map<String, Map<String, String>> colls = new HashMap<>();
+			final List<BaseCollectionInfo> colls = new ArrayList<>();
 
 			for (final Object o : record.selectNodes("//*|//@*")) {
 				paths.add(((Node) o).getPath());
@@ -178,12 +177,13 @@ public class BaseAnalyzerJob {
 
 					if ("collection".equals(nodeName)) {
 						final String collName = n.getText().trim();
+
 						if (StringUtils.isNotBlank(collName)) {
-							final Map<String, String> attrs = new HashMap<>();
-							for (final Object ao : n.attributes()) {
-								attrs.put(((Attribute) ao).getName(), ((Attribute) ao).getValue());
-							}
-							colls.put(collName, attrs);
+							final BaseCollectionInfo coll = new BaseCollectionInfo();
+							coll.setId(collName);
+							coll.setOpendoarId(n.valueOf("@opendoar_id").trim());
+							coll.setRorId(n.valueOf("@ror_id").trim());
+							colls.add(coll);
 						}
 					} else if ("type".equals(nodeName)) {
 						types.add("TYPE: " + n.getText().trim());

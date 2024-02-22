@@ -3,16 +3,14 @@ package eu.dnetlib.dhp.collection.plugin.base;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class BaseRecordInfo implements Serializable {
 
 	private static final long serialVersionUID = -8848232018350074593L;
 
 	private String id;
-	private Map<String, Map<String, String>> collections = new HashMap<>();
+	private List<BaseCollectionInfo> collections = new ArrayList<>();
 	private List<String> paths = new ArrayList<>();
 	private List<String> types = new ArrayList<>();
 
@@ -40,11 +38,11 @@ public class BaseRecordInfo implements Serializable {
 		this.types = types;
 	}
 
-	public Map<String, Map<String, String>> getCollections() {
+	public List<BaseCollectionInfo> getCollections() {
 		return this.collections;
 	}
 
-	public void setCollections(final Map<String, Map<String, String>> collections) {
+	public void setCollections(final List<BaseCollectionInfo> collections) {
 		this.collections = collections;
 	}
 
