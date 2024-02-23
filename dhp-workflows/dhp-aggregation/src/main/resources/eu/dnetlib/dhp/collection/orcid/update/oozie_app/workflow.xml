@@ -28,23 +28,35 @@
     </kill>
 
     <action name="startUpdate">
-        <java>
-            <configuration>
-                <property>
-                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
-                    <value>true</value>
-                </property>
-            </configuration>
-            <main-class>eu.dnetlib.dhp.collection.orcid.OrcidGetUpdatesFile</main-class>
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Check Latest Orcid and Download updates</name>
+            <class>eu.dnetlib.dhp.collection.orcid.OrcidGetUpdatesFile</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=2g
+                --conf spark.sql.shuffle.partitions=3000
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--master</arg><arg>yarn</arg>
             <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--graphPath</arg><arg>${graphPath}</arg>
             <arg>--targetPath</arg><arg>${targetPath}</arg>
             <arg>--apiURL</arg><arg>${apiURL}</arg>
             <arg>--accessToken</arg><arg>${accessToken}</arg>
-
-        </java>
+        </spark>
         <ok to="generateTables"/>
         <error to="Kill"/>
     </action>
+
+
     <action name="generateTables">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
@@ -90,7 +102,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--graphPath</arg><arg>graphPath</arg>
+            <arg>--graphPath</arg><arg>${graphPath}</arg>
             <arg>--updatePath</arg><arg>${targetPath}/updateTable</arg>
             <arg>--targetPath</arg><arg>${targetPath}/newTable</arg>
             <arg>--master</arg><arg>yarn</arg>

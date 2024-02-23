@@ -23,6 +23,7 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
+import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +51,9 @@ public class OrcidGetUpdatesFile {
 		final String namenode = parser.get("namenode");
 		log.info("got variable namenode: {}", namenode);
 
+		final String master = parser.get("master");
+		log.info("got variable master: {}", master);
+
 		final String targetPath = parser.get("targetPath");
 		log.info("got variable targetPath: {}", targetPath);
 
@@ -59,11 +63,27 @@ public class OrcidGetUpdatesFile {
 		final String accessToken = parser.get("accessToken");
 		log.info("got variable accessToken: {}", accessToken);
 
-		System.out.println("namenode = " + namenode);
+		final String graphPath = parser.get("graphPath");
+		log.info("got variable graphPath: {}", graphPath);
+
+		final SparkSession spark = SparkSession
+			.builder()
+			.appName(OrcidGetUpdatesFile.class.getName())
+			.master(master)
+			.getOrCreate();
+
+		final String latestDate = spark
+			.read()
+			.load(graphPath + "/Authors")
+			.selectExpr("max(lastModifiedDate)")
+			.first()
+			.getString(0);
+
+		log.info("latest date is {}", latestDate);
 
 		final FileSystem fileSystem = FileSystem.get(getHadoopConfiguration(namenode));
 
-		new OrcidGetUpdatesFile().readTar(fileSystem, accessToken, apiURL, targetPath, "2023-09-30");
+		new OrcidGetUpdatesFile().readTar(fileSystem, accessToken, apiURL, targetPath, latestDate);
 
 	}
 
@@ -102,6 +122,8 @@ public class OrcidGetUpdatesFile {
 			Path hdfsWritePath = new Path("/tmp/orcid_updates.tar.gz");
 			final FSDataOutputStream fsDataOutputStream = fileSystem.create(hdfsWritePath, true);
 			IOUtils.copy(input, fsDataOutputStream);
+			fsDataOutputStream.flush();
+			fsDataOutputStream.close();
 			FSDataInputStream updateFile = fileSystem.open(hdfsWritePath);
 			TarArchiveInputStream tais = new TarArchiveInputStream(new GzipCompressorInputStream(
 				new BufferedInputStream(
