@@ -2,6 +2,11 @@
 
 Dnet-hadoop is the project that defined all the [OOZIE workflows](https://oozie.apache.org/) for the OpenAIRE Graph construction, processing, provisioning.
 
+This project adheres to the Contributor Covenant [code of conduct](CODE_OF_CONDUCT.md).
+By participating, you are expected to uphold this code. Please report unacceptable behavior to [dnet-team@isti.cnr.it](mailto:dnet-team@isti.cnr.it).
+
+This project is licensed under the [AGPL v3 or later version](#LICENSE.md).
+
 How to build, package and run oozie workflows
 ====================
 

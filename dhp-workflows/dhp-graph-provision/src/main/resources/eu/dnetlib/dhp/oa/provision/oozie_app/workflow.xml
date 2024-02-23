@@ -10,6 +10,10 @@
             <description>URL for the isLookup service</description>
         </property>
         <property>
+            <name>contextApiBaseUrl</name>
+            <description>context API URL</description>
+        </property>
+        <property>
             <name>relPartitions</name>
             <description>number or partitions for the relations Dataset</description>
         </property>
@@ -589,7 +593,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${workingDir}/join_entities</arg>
             <arg>--outputPath</arg><arg>${workingDir}/xml</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextApiBaseUrl</arg><arg>${contextApiBaseUrl}</arg>
         </spark>
         <ok to="should_index"/>
         <error to="Kill"/>

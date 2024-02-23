@@ -16,9 +16,21 @@
             <name>outputPath</name>
             <description>the output path</description>
         </property>
+        <property>
+            <name>startFrom</name>
+            <value>undelete</value>
+        </property>
     </parameters>
 
-    <start to="reset_outputpath"/>
+    <start to="startFrom"/>
+
+    <decision name="startFrom">
+        <switch>
+            <case to="fork_prepare_assoc_step1">${wf:conf('startFrom') eq 'undelete'}</case>
+
+            <default to="reset_outputpath"/>
+        </switch>
+    </decision>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -209,9 +221,9 @@
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=6
-                --executor-memory=5G
-                --conf spark.executor.memoryOverhead=3g
-                --conf spark.sql.shuffle.partitions=3284
+                --executor-memory=4G
+                --conf spark.executor.memoryOverhead=5G
+                --conf spark.sql.shuffle.partitions=15000
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -324,7 +336,34 @@
         <error to="Kill"/>
     </action>
 
-    <join name="wait2" to="End"/>
+    <join name="wait2" to="move-results"/>
+
+    <action name="move-results">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>move results</name>
+            <class>eu.dnetlib.dhp.MoveResult</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=6
+                --executor-memory=5G
+                --conf spark.executor.memoryOverhead=3g
+                --conf spark.sql.shuffle.partitions=3284
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${workingDir}/communitysemrel/</arg>
+            <arg>--outputPath</arg><arg>${sourcePath}/</arg>
+            <!--            <arg>outputPath</arg><arg>/tmp/miriam/rescomm/</arg>-->
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
 
     <end name="End"/>
 

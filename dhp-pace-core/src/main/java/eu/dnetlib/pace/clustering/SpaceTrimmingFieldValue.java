@@ -15,7 +15,7 @@ import eu.dnetlib.pace.config.Config;
 @ClusteringClass("spacetrimmingfieldvalue")
 public class SpaceTrimmingFieldValue extends AbstractClusteringFunction {
 
-	public SpaceTrimmingFieldValue(final Map<String, Integer> params) {
+	public SpaceTrimmingFieldValue(final Map<String, Object> params) {
 		super(params);
 	}
 
@@ -25,7 +25,7 @@ public class SpaceTrimmingFieldValue extends AbstractClusteringFunction {
 
 		res
 			.add(
-				StringUtils.isBlank(s) ? RandomStringUtils.random(getParams().get("randomLength"))
+				StringUtils.isBlank(s) ? RandomStringUtils.random(param("randomLength"))
 					: s.toLowerCase().replaceAll("\\s+", ""));
 
 		return res;

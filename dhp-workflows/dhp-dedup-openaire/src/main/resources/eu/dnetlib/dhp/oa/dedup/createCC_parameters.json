@@ -28,5 +28,17 @@
     "paramLongName": "workingPath",
     "paramDescription": "path for the working directory",
     "paramRequired": true
+  },
+  {
+    "paramName":"h",
+    "paramLongName":"hiveMetastoreUris",
+    "paramDescription": "the hive metastore uris",
+    "paramRequired": true
+  },
+  {
+    "paramName": "p",
+    "paramLongName": "pivotHistoryDatabase",
+    "paramDescription": "Pivot history database",
+    "paramRequired": false
   }
 ]

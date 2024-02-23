@@ -86,29 +86,30 @@ public class SparkResultToCommunityFromProject implements Serializable {
 		ModelSupport.entityTypes
 			.keySet()
 			.parallelStream()
+			.filter(e -> ModelSupport.isResult(e))
 			.forEach(e -> {
-				if (ModelSupport.isResult(e)) {
-					removeOutputDir(spark, outputPath + e.name());
-					Class<R> resultClazz = ModelSupport.entityTypes.get(e);
-					Dataset<R> result = readPath(spark, inputPath + e.name(), resultClazz);
+				// if () {
+				removeOutputDir(spark, outputPath + e.name());
+				Class<R> resultClazz = ModelSupport.entityTypes.get(e);
+				Dataset<R> result = readPath(spark, inputPath + e.name(), resultClazz);
 
-					result
-						.joinWith(
-							possibleUpdates,
-							result.col("id").equalTo(possibleUpdates.col("resultId")),
-							"left_outer")
-						.map(resultCommunityFn(), Encoders.bean(resultClazz))
-						.write()
-						.mode(SaveMode.Overwrite)
-						.option("compression", "gzip")
-						.json(outputPath + e.name());
+				result
+					.joinWith(
+						possibleUpdates,
+						result.col("id").equalTo(possibleUpdates.col("resultId")),
+						"left_outer")
+					.map(resultCommunityFn(), Encoders.bean(resultClazz))
+					.write()
+					.mode(SaveMode.Overwrite)
+					.option("compression", "gzip")
+					.json(outputPath + e.name());
 
-					readPath(spark, outputPath + e.name(), resultClazz)
-						.write()
-						.mode(SaveMode.Overwrite)
-						.option("compression", "gzip")
-						.json(inputPath + e.name());
-				}
+//				readPath(spark, outputPath + e.name(), resultClazz)
+//					.write()
+//					.mode(SaveMode.Overwrite)
+//					.option("compression", "gzip")
+//					.json(inputPath + e.name());
+				// }
 			});
 
 	}

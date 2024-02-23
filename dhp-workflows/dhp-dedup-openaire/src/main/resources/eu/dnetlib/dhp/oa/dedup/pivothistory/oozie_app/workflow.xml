@@ -1,0 +1,95 @@
+<workflow-app name="Update pivot history" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <!-- properties used in SQL -->
+        <property>
+            <name>pivot_history_db</name>
+            <!-- <value>openaire_beta_pivots_test</value> -->
+            <description>Pivot history DB on hive</description>
+        </property>
+        <property>
+            <name>new_graph_db</name>
+            <!--<value>openaire_beta_20231208</value> -->
+            <description>New graph DB on hive</description>
+    </property>
+    <property>
+        <name>new_graph_date</name>
+        <!-- <value>20231208</value> -->
+        <description>Creation date of new graph db</description>
+    </property>
+
+    <!-- RunSQLSparkJob properties -->
+        <property>
+            <name>hiveMetastoreUris</name>
+            <description>hive server metastore URIs</description>
+        </property>
+        <property>
+            <name>sparkSqlWarehouseDir</name>
+        </property>
+        <!-- General oozie workflow properties -->
+        <property>
+            <name>sparkClusterOpts</name>
+            <value>--conf spark.network.timeout=600 --conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-m3.ocean.icm.edu.pl:18088 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/applicationHistory</value>
+            <description>spark cluster-wide options</description>
+        </property>
+        <property>
+            <name>sparkResourceOpts</name>
+            <value>--executor-memory=3G --conf spark.executor.memoryOverhead=3G --executor-cores=6 --driver-memory=8G --driver-cores=4</value>
+            <description>spark resource options</description>
+        </property>
+        <property>
+            <name>sparkApplicationOpts</name>
+            <value>--conf spark.sql.shuffle.partitions=3840</value>
+            <description>spark resource options</description>
+        </property>
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to="UpgradePivotHistory"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="UpgradePivotHistory">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Upgrade Pivot History</name>
+            <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
+            <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
+            <spark-opts>
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                ${sparkClusterOpts}
+                ${sparkResourceOpts}
+                ${sparkApplicationOpts}
+            </spark-opts>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
+            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/dedup/pivothistory/oozie_app/sql.sql</arg>
+            <arg>--pivot_history_db</arg><arg>${pivot_history_db}</arg>
+            <arg>--new_graph_db</arg><arg>${new_graph_db}</arg>
+            <arg>--new_graph_date</arg><arg>${new_graph_date}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>

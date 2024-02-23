@@ -97,6 +97,8 @@ public class MapDocumentUtil {
 			Object o = json.read(jsonPath);
 			if (o instanceof String)
 				return (String) o;
+			if (o instanceof Number)
+				return (String) o.toString();
 			if (o instanceof JSONArray && ((JSONArray) o).size() > 0)
 				return (String) ((JSONArray) o).get(0);
 			return "";

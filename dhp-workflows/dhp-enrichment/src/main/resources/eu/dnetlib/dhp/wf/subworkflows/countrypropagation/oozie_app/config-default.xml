@@ -45,11 +45,11 @@
     </property>
     <property>
         <name>sparkExecutorMemory</name>
-        <value>6G</value>
+        <value>5G</value>
     </property>
     <property>
         <name>sparkExecutorCores</name>
-        <value>1</value>
+        <value>4</value>
     </property>
     <property>
         <name>spark2MaxExecutors</name>
