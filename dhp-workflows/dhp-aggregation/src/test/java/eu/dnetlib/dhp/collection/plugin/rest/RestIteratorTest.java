@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.dnetlib.dhp.common.collection.CollectorException;
 import eu.dnetlib.dhp.common.collection.HttpClientParams;
 
 /**
@@ -37,7 +38,7 @@ public class RestIteratorTest {
 
 	@Disabled
 	@Test
-	public void test() {
+	public void test() throws CollectorException {
 
 		HttpClientParams clientParams = new HttpClientParams();
 
