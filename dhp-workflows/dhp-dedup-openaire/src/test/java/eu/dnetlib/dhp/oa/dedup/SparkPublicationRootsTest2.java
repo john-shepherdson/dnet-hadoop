@@ -200,7 +200,7 @@ public class SparkPublicationRootsTest2 implements Serializable {
 		assertEquals("2022-01-01", root.getDateofacceptance().getValue());
 		assertEquals(crossref_duplicate.getJournal().getName(), root.getJournal().getName());
 		assertEquals(crossref_duplicate.getJournal().getIssnPrinted(), root.getJournal().getIssnPrinted());
-//		assertEquals(crossref_duplicate.getPublisher().getValue(), root.getPublisher().getValue());
+		assertEquals(crossref_duplicate.getPublisher().getValue(), root.getPublisher().getValue());
 
 		Set<String> rootPids = root
 			.getPid()
