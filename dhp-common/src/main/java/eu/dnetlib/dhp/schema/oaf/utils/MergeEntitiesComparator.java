@@ -96,7 +96,7 @@ public class MergeEntitiesComparator implements Comparator<Oaf> {
 		// id
 		if (res == 0) {
 			if (left instanceof OafEntity && right instanceof OafEntity) {
-				res = ((OafEntity) left).getId().compareTo(((OafEntity) right).getId());
+				res = ((OafEntity) right).getId().compareTo(((OafEntity) left).getId());
 			}
 		}
 
