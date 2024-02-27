@@ -23,10 +23,6 @@
             <description>The path in the HDFS to save the action sets</description>
         </property>
         <property>
-            <name>graphPath</name>
-            <description>The path in the HDFS to the base folder of the graph</description>
-        </property>
-        <property>
             <name>maxNumberOfRetry</name>
             <description>Max number of retries for failed API calls</description>
         </property>
@@ -170,9 +166,9 @@
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
 
+            <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--lastVisitsPath</arg><arg>${lastVisitsPath}</arg>
             <arg>--actionsetsPath</arg><arg>${actionsetsPath}</arg>
-            <arg>--softwareInputPath</arg><arg>${graphPath}/software</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

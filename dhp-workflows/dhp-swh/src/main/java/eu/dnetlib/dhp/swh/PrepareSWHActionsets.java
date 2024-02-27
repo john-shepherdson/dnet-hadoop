@@ -58,6 +58,9 @@ public class PrepareSWHActionsets {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 		parser.parseArgument(args);
 
+		final String hiveDbName = parser.get("hiveDbName");
+		log.info("hiveDbName: {}", hiveDbName);
+
 		final Boolean isSparkSessionManaged = Optional
 			.ofNullable(parser.get("isSparkSessionManaged"))
 			.map(Boolean::valueOf)
@@ -66,9 +69,6 @@ public class PrepareSWHActionsets {
 
 		final String inputPath = parser.get("lastVisitsPath");
 		log.info("inputPath: {}", inputPath);
-
-		final String softwareInputPath = parser.get("softwareInputPath");
-		log.info("softwareInputPath: {}", softwareInputPath);
 
 		final String outputPath = parser.get("actionsetsPath");
 		log.info("outputPath: {}", outputPath);
@@ -79,7 +79,7 @@ public class PrepareSWHActionsets {
 			conf,
 			isSparkSessionManaged,
 			spark -> {
-				JavaPairRDD<Text, Text> softwareRDD = prepareActionsets(spark, inputPath, softwareInputPath);
+				JavaPairRDD<Text, Text> softwareRDD = prepareActionsets(spark, inputPath, hiveDbName);
 				softwareRDD
 					.saveAsHadoopFile(
 						outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
@@ -110,24 +110,27 @@ public class PrepareSWHActionsets {
 		return spark.createDataFrame(swhRDD, schema);
 	}
 
-	private static Dataset<Row> loadGraphSoftwareData(SparkSession spark, String softwareInputPath) {
-		return spark
-			.read()
-			.textFile(softwareInputPath)
-			.map(
-				(MapFunction<String, Software>) t -> OBJECT_MAPPER.readValue(t, Software.class),
-				Encoders.bean(Software.class))
-			.filter(t -> t.getCodeRepositoryUrl() != null)
-			.select(col("id"), col("codeRepositoryUrl.value").as("repoUrl"));
+	private static Dataset<Row> loadGraphSoftwareData(SparkSession spark, String hiveDbName) {
+
+		String queryTemplate = "SELECT id, coderepositoryurl.value AS repoUrl" +
+				"FROM %s.software " +
+				"WHERE coderepositoryurl IS NOT NULL";
+
+		String query = String.format(queryTemplate, hiveDbName);
+
+		log.info("Hive query to fetch all software with a code repository URL: {}", query);
+
+		return spark.sql(query);
+
 	}
 
 	private static <I extends Software> JavaPairRDD<Text, Text> prepareActionsets(SparkSession spark, String inputPath,
-		String softwareInputPath) {
+		String hiveDbName) {
 
 		Dataset<Row> swhDF = loadSWHData(spark, inputPath);
 //		swhDF.show(false);
 
-		Dataset<Row> graphSoftwareDF = loadGraphSoftwareData(spark, softwareInputPath);
+		Dataset<Row> graphSoftwareDF = loadGraphSoftwareData(spark, hiveDbName);
 //		graphSoftwareDF.show(5);
 
 		Dataset<Row> joinedDF = graphSoftwareDF.join(swhDF, "repoUrl").select("id", "swhid");

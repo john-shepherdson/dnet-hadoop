@@ -16,11 +16,5 @@
     "paramLongName": "actionsetsPath",
     "paramDescription": "the URL path where to store actionsets",
     "paramRequired": true
-  },
-  {
-    "paramName": "sip",
-    "paramLongName": "softwareInputPath",
-    "paramDescription": "the URL path of the software in the graph",
-    "paramRequired": true
   }
 ]
