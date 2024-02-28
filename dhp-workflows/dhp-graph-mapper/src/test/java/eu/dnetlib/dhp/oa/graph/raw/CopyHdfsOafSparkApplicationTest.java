@@ -64,14 +64,14 @@ public class CopyHdfsOafSparkApplicationTest {
 	@Test
 	void isOafType_Datacite_ORP() throws IOException {
 		assertTrue(
-				CopyHdfsOafSparkApplication
-						.isOafType(
-								IOUtils
-										.toString(
-												getClass()
-														.getResourceAsStream(
-																"/eu/dnetlib/dhp/oa/graph/raw/datacite_orp.json")),
-								"otherresearchproduct"));
+			CopyHdfsOafSparkApplication
+				.isOafType(
+					IOUtils
+						.toString(
+							getClass()
+								.getResourceAsStream(
+									"/eu/dnetlib/dhp/oa/graph/raw/datacite_orp.json")),
+					"otherresearchproduct"));
 	}
 
 }
