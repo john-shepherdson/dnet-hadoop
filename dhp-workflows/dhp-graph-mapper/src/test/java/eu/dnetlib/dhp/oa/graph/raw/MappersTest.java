@@ -1293,6 +1293,7 @@ class MappersTest {
 		p.getInstance().get(0).getAlternateIdentifier().forEach(x -> System.out.println(x.getValue()));
 
 	}
+
 	@Test
 	void testNotWellFormed() throws IOException {
 		final String xml = IOUtils
