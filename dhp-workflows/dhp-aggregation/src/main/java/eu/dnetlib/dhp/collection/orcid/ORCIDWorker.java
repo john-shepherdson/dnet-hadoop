@@ -135,7 +135,6 @@ public class ORCIDWorker extends Thread {
 				orcidId = queue.take();
 
 				if (orcidId.equalsIgnoreCase(JOB_COMPLETE)) {
-					queue.put(orcidId);
 					hasComplete = true;
 				} else {
 					start = System.currentTimeMillis();

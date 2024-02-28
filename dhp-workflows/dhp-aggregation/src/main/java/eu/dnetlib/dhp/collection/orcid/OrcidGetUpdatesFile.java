@@ -155,15 +155,17 @@ public class OrcidGetUpdatesFile {
 								throw new RuntimeException(e);
 							}
 						});
-					queue.put(ORCIDWorker.JOB_COMPLETE);
+
 
 				}
 			}
 
+			for (int i = 0; i < 22; i++) {
+				queue.put(ORCIDWorker.JOB_COMPLETE);
+			}
 			for (ORCIDWorker worker : workers) {
 				worker.join();
 			}
-
 		}
 
 	}
