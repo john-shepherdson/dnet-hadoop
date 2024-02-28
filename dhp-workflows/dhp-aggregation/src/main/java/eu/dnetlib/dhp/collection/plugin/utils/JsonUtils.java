@@ -49,6 +49,23 @@ public class JsonUtils {
 				res.put(i, cleanValue(array.opt(i)));
 			}
 			return res;
+		} else if (object instanceof String) {
+			String value = (String) object;
+
+			// XML 1.0 Allowed characters
+			// Char ::= #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+
+			return value
+				.codePoints()
+				.filter(
+					cp -> cp == 0x9 || cp == 0xA || cp == 0xD || (cp >= 0x20 && cp <= 0xD7FF)
+						|| (cp >= 0xE000 && cp <= 0xFFFD)
+						|| (cp >= 0x10000 && cp <= 0x10FFFF))
+				.collect(
+					StringBuilder::new,
+					StringBuilder::appendCodePoint,
+					StringBuilder::append)
+				.toString();
 		}
 
 		return object;

@@ -38,4 +38,11 @@ class JsonUtilsTest {
 			wrapped("<parent><id>1</id></parent><parent><id>2</id></parent>"),
 			JsonUtils.convertToXML("{\"parent\": [{\"id\": 1}, {\"id\": 2}]}"));
 	}
+
+	@Test
+	void removeControlCharacters() {
+		assertEquals(
+			wrapped("<m_100><n_200v>Test</n_200v></m_100>"),
+			JsonUtils.convertToXML("{\"100\" : {\"200v\" : \"\\u0000\\u000cTest\"}}"));
+	}
 }
