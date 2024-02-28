@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -45,6 +46,7 @@ import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 
 public class BaseAnalyzerJob {
 
+	private static final String BASE_DUMP = "BASE_DUMP";
 	private static final Logger log = LoggerFactory.getLogger(BaseAnalyzerJob.class);
 
 	public static void main(final String[] args) throws Exception {
@@ -143,7 +145,10 @@ public class BaseAnalyzerJob {
 			.map(row -> {
 				final OpenDoarRepoStatus repo = new OpenDoarRepoStatus();
 				repo.setId(row.getString(0));
-				repo.getAggregations().put("BASE_DUMP", row.getLong(1));
+				repo.getAggregations().put(BASE_DUMP, row.getLong(1));
+				repo.setFromBase(true);
+				repo.setBaseMAX(true);
+				repo.setHighCompliance(false);
 				return repo;
 			}, Encoders.bean(OpenDoarRepoStatus.class));
 
@@ -169,6 +174,23 @@ public class BaseAnalyzerJob {
 		r.setJurisdiction(ObjectUtils.firstNonNull(r1.getJurisdiction(), r2.getJurisdiction()));
 		r.getAggregations().putAll(r1.getAggregations());
 		r.getAggregations().putAll(r2.getAggregations());
+		r.setFromBase(r1.isFromBase() || r2.isFromBase());
+		r.setHighCompliance(r1.isHighCompliance() || r2.isHighCompliance());
+
+		if (r.getAggregations().containsKey(BASE_DUMP)) {
+			final long baseSize = r.getAggregations().get(BASE_DUMP);
+			final long otherSize = r
+				.getAggregations()
+				.entrySet()
+				.stream()
+				.filter(e -> !BASE_DUMP.equals(e.getKey()))
+				.mapToLong(Entry::getValue)
+				.max()
+				.orElse(0);
+			r.setBaseMAX(baseSize > otherSize);
+		} else {
+			r.setBaseMAX(false);
+		}
 
 		return r;
 	}
@@ -195,6 +217,10 @@ public class BaseAnalyzerJob {
 						final String api = StringUtils.substringBefore(s, "@@@");
 						final long count = NumberUtils.toLong(StringUtils.substringAfter(s, "@@@"), 0);
 						repo.getAggregations().put(api, count);
+						repo.setFromBase(false);
+						repo.setBaseMAX(false);
+						// This should recognize the HIGH Compliances: openaire*X.Y*
+						repo.setHighCompliance(s.contains("compliance: openaire"));
 					}
 					repos.add(repo);
 					log.info("# FOUND OPENDOAR (DB): " + repo.getId());

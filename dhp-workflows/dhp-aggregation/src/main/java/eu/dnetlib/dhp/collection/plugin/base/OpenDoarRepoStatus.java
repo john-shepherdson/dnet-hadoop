@@ -13,6 +13,12 @@ public class OpenDoarRepoStatus implements Serializable {
 
 	private String jurisdiction;
 
+	private boolean fromBase = false;
+
+	private boolean highCompliance = false;
+
+	private boolean baseMAX = false;
+
 	private Map<String, Long> aggregations = new HashMap<>();
 
 	public String getId() {
@@ -39,4 +45,27 @@ public class OpenDoarRepoStatus implements Serializable {
 		this.aggregations = aggregations;
 	}
 
+	public boolean isHighCompliance() {
+		return this.highCompliance;
+	}
+
+	public void setHighCompliance(final boolean highCompliance) {
+		this.highCompliance = highCompliance;
+	}
+
+	public boolean isFromBase() {
+		return this.fromBase;
+	}
+
+	public void setFromBase(final boolean fromBase) {
+		this.fromBase = fromBase;
+	}
+
+	public boolean isBaseMAX() {
+		return this.baseMAX;
+	}
+
+	public void setBaseMAX(final boolean baseMAX) {
+		this.baseMAX = baseMAX;
+	}
 }
