@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.collection.orcid;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -9,7 +10,12 @@ import java.util.Objects;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocalFileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.Encoders;
@@ -27,6 +33,7 @@ import com.ximpleware.XPathParseException;
 
 import eu.dnetlib.dhp.collection.orcid.model.Author;
 import eu.dnetlib.dhp.collection.orcid.model.ORCIDItem;
+import eu.dnetlib.dhp.collection.orcid.model.Work;
 import eu.dnetlib.dhp.parser.utility.VtdException;
 
 public class DownloadORCIDTest {
@@ -80,6 +87,34 @@ public class DownloadORCIDTest {
 				throw new RuntimeException(e);
 			}
 		});
+	}
+
+	@Test
+	public void testParsingOrcidUpdateEmployments() throws Exception {
+		final String xml = IOUtils
+			.toString(
+				Objects
+					.requireNonNull(
+						getClass().getResourceAsStream("/eu/dnetlib/dhp/collection/orcid/update_employments.xml")));
+
+		final OrcidParser parser = new OrcidParser();
+		final ObjectMapper mapper = new ObjectMapper();
+		System.out.println(mapper.writeValueAsString(parser.parseEmployments(xml)));
+	}
+
+	@Test
+	public void testParsingOrcidUpdateWorks() throws Exception {
+		final String xml = IOUtils
+			.toString(
+				Objects
+					.requireNonNull(
+						getClass().getResourceAsStream("/eu/dnetlib/dhp/collection/orcid/update_work.xml")));
+
+		final OrcidParser parser = new OrcidParser();
+		final List<Work> works = parser.parseWorks(xml);
+
+		final ObjectMapper mapper = new ObjectMapper();
+		System.out.println(mapper.writeValueAsString(works));
 	}
 
 	@Test
