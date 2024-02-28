@@ -13,8 +13,24 @@
             <description>path where to store the reports</description>
         </property>
         <property>
-            <name>baseReimportFlag</name>
-            <description>flag to re-import the records from dump</description>
+            <name>baseOpenDoarReportsPath</name>
+            <description>path where to store the OpenDOAR reports</description>
+        </property>
+        <property>
+            <name>postgresURL</name>
+            <description>the postgres URL to access to the database</description>
+        </property>
+        <property>
+            <name>postgresUser</name>
+            <description>the user postgres</description>
+        </property>
+        <property>
+            <name>postgresPassword</name>
+            <description>the password postgres</description>
+        </property> 
+        <property>
+            <name>baseFromStep</name>
+            <description>the initial step (numeric, 0 for ALL STEPS)</description>
         </property>
     </parameters>
 
@@ -44,7 +60,11 @@
             <arg>--inputPath</arg><arg>${baseInputPath}</arg>
             <arg>--dataPath</arg><arg>${baseDataPath}</arg>
             <arg>--outputPath</arg><arg>${baseReportsPath}</arg>
-            <arg>--reimport</arg><arg>${baseReimportFlag}</arg>
+            <arg>--opendoarPath</arg><arg>${baseOpenDoarReportsPath}</arg>
+            <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
+            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
+            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
+            <arg>--fromStep</arg><arg>${baseFromStep}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

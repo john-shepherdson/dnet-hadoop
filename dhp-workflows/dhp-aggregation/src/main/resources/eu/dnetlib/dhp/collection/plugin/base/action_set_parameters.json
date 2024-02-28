@@ -14,13 +14,37 @@
 	{
 		"paramName": "o",
 		"paramLongName": "outputPath",
-		"paramDescription": "the path of the generated report",
+		"paramDescription": "the path of the generated the report",
 		"paramRequired": true
 	},
 	{
-		"paramName": "r",
-		"paramLongName": "reimport",
-		"paramDescription": "complete re-import",
+		"paramName": "od",
+		"paramLongName": "opendoarPath",
+		"paramDescription": "the path of the generated the OpenDOAR report",
 		"paramRequired": true
+	},
+	{
+		"paramName": "f",
+		"paramLongName": "fromStep",
+		"paramDescription": "the initial step (numeric, 0 for ALL STEPS)",
+		"paramRequired": true
+	},
+	{
+		"paramName": "pgurl",
+		"paramLongName": "postgresUrl",
+		"paramDescription": "postgres url, example: jdbc:postgresql://localhost:5432/testdb",
+		"paramRequired": true
+	},
+	{
+		"paramName": "pguser",
+		"paramLongName": "postgresUser",
+		"paramDescription": "postgres user",
+		"paramRequired": false
+	},
+	{
+		"paramName": "pgpasswd",
+		"paramLongName": "postgresPassword",
+		"paramDescription": "postgres password",
+		"paramRequired": false
 	}
 ]

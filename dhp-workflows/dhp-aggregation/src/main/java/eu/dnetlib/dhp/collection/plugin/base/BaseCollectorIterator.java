@@ -33,7 +33,7 @@ public class BaseCollectorIterator implements Iterator<String> {
 
 	private String nextElement;
 
-	private final BlockingQueue<String> queue = new LinkedBlockingQueue<>(20);
+	private final BlockingQueue<String> queue = new LinkedBlockingQueue<>(100);
 
 	private static final Logger log = LoggerFactory.getLogger(BaseCollectorIterator.class);
 
