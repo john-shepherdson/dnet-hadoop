@@ -249,12 +249,12 @@ public class XmlRecordFactoryTest {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-				XmlConverterJob.schemaLocation);
+			XmlConverterJob.schemaLocation);
 
 		final Publication p = OBJECT_MAPPER
-				.readValue(
-						IOUtils.toString(getClass().getResourceAsStream("iris-odf-4.json")),
-						Publication.class);
+			.readValue(
+				IOUtils.toString(getClass().getResourceAsStream("iris-odf-4.json")),
+				Publication.class);
 
 		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
 
