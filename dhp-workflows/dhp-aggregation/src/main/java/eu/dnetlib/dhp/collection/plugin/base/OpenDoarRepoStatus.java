@@ -13,11 +13,11 @@ public class OpenDoarRepoStatus implements Serializable {
 
 	private String jurisdiction;
 
-	private boolean fromBase = false;
-
 	private boolean highCompliance = false;
 
-	private boolean baseMAX = false;
+	private long baseCount = 0;
+
+	private long openaireCount = 0;
 
 	private Map<String, Long> aggregations = new HashMap<>();
 
@@ -53,19 +53,19 @@ public class OpenDoarRepoStatus implements Serializable {
 		this.highCompliance = highCompliance;
 	}
 
-	public boolean isFromBase() {
-		return this.fromBase;
+	public long getOpenaireCount() {
+		return this.openaireCount;
 	}
 
-	public void setFromBase(final boolean fromBase) {
-		this.fromBase = fromBase;
+	public void setOpenaireCount(final long openaireCount) {
+		this.openaireCount = openaireCount;
 	}
 
-	public boolean isBaseMAX() {
-		return this.baseMAX;
+	public long getBaseCount() {
+		return this.baseCount;
 	}
 
-	public void setBaseMAX(final boolean baseMAX) {
-		this.baseMAX = baseMAX;
+	public void setBaseCount(final long baseCount) {
+		this.baseCount = baseCount;
 	}
 }
