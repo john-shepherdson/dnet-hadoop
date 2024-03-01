@@ -24,6 +24,12 @@
 		"paramRequired": true
 	},
 	{
+		"paramName": "t",
+		"paramLongName": "typesReportPath",
+		"paramDescription": "the path of the generated the types report",
+		"paramRequired": true
+	},
+	{
 		"paramName": "f",
 		"paramLongName": "fromStep",
 		"paramDescription": "the initial step (numeric, 0 for ALL STEPS)",

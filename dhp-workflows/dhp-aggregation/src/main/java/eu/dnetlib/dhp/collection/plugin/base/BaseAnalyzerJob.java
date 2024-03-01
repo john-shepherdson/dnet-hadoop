@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
+import scala.Tuple2;
 
 public class BaseAnalyzerJob {
 
@@ -76,6 +77,9 @@ public class BaseAnalyzerJob {
 
 		final String opendoarPath = parser.get("opendoarPath");
 		log.info("opendoarPath {}: ", opendoarPath);
+
+		final String typesReportPath = parser.get("typesReportPath");
+		log.info("typesReportPath {}: ", typesReportPath);
 
 		final int fromStep = Integer.parseInt(parser.get("fromStep"));
 		log.info("fromStep {}: ", fromStep);
@@ -115,7 +119,45 @@ public class BaseAnalyzerJob {
 				log
 						.info("\n**************************************\n* EXECUTING STEP 2: DONE\n**************************************");
 			}
+
+			if (fromStep <= 3) {
+				log
+						.info("\n**************************************\n* EXECUTING STEP 3: Type Vocabulary Report\n**************************************");
+				generateVocTypeReport(spark, outputPath, typesReportPath);
+				log
+						.info("\n**************************************\n* EXECUTING STEP 3: DONE\n**************************************");
+			}
 		});
+
+	}
+
+	private static void generateVocTypeReport(final SparkSession spark,
+			final String reportPath,
+			final String typesReportPath) {
+		spark
+				.read()
+				.parquet(reportPath)
+				.as(Encoders.bean(BaseRecordInfo.class))
+				.flatMap(rec -> {
+					final List<Tuple2<String, String>> list = new ArrayList<>();
+					for (final String t1 : rec.getTypes()) {
+						if (t1.startsWith("TYPE_NORM:")) {
+							for (final String t2 : rec.getTypes()) {
+								if (t2.startsWith("TYPE:")) {
+									list
+											.add(new Tuple2<>(StringUtils.substringAfter(t1, "TYPE_NORM:").trim(),
+													StringUtils.substringAfter(t2, "TYPE:").trim()));
+								}
+							}
+						}
+					}
+					return list.iterator();
+				}, Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
+				.distinct()
+				.write()
+				.mode(SaveMode.Overwrite)
+				.format("parquet")
+				.save(typesReportPath);
 
 	}
 

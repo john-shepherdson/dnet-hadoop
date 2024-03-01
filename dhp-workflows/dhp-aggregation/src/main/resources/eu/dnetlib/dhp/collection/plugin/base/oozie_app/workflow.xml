@@ -17,6 +17,10 @@
             <description>path where to store the OpenDOAR reports</description>
         </property>
         <property>
+			<name>baseTypesReportPath</name>
+			<description>path of the generated the types report</description>        
+        </property>
+        <property>
             <name>postgresURL</name>
             <description>the postgres URL to access to the database</description>
         </property>
@@ -61,6 +65,7 @@
             <arg>--dataPath</arg><arg>${baseDataPath}</arg>
             <arg>--outputPath</arg><arg>${baseReportsPath}</arg>
             <arg>--opendoarPath</arg><arg>${baseOpenDoarReportsPath}</arg>
+            <arg>--typesReportPath</arg><arg>${baseTypesReportPath}</arg>     
             <arg>--postgresUrl</arg><arg>${postgresURL}</arg>
             <arg>--postgresUser</arg><arg>${postgresUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
