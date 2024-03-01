@@ -99,7 +99,7 @@ public class BaseCollectorPlugin implements CollectorPlugin {
 
 	private boolean filterXml(final String xml, final Set<String> excludedOpendoarIds, final AggregatorReport report) {
 		try {
-			final String id = DocumentHelper.parseText(xml).valueOf("//*[local-name='collection']/@opendoar_id").trim;
+			final String id = DocumentHelper.parseText(xml).valueOf("//*[local-name='collection']/@opendoar_id").trim();
 			return (StringUtils.isNotBlank(id) && !excludedOpendoarIds.contains("opendoar____::" + id.trim()));
 		} catch (final DocumentException e) {
 			log.error("Error parsing document", e);
