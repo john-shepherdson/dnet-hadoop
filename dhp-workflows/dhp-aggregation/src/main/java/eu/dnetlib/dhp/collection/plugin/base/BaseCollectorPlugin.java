@@ -64,27 +64,27 @@ public class BaseCollectorPlugin implements CollectorPlugin {
 			throw new CollectorException(e);
 		}
 
-		final Set<String> excludedOpendoarIds = findExcludedOpendoarIds(dbUrl, dbUser, dbPassword);
+		final Set<String> acceptedOpendoarIds = findAcceptedOpendoarIds(dbUrl, dbUser, dbPassword);
 
 		final Iterator<String> iterator = new BaseCollectorIterator(this.fs, filePath, report);
 		final Spliterator<String> spliterator = Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED);
 		return StreamSupport
 				.stream(spliterator, false)
-				.filter(doc -> filterXml(doc, excludedOpendoarIds, report));
+				.filter(doc -> filterXml(doc, acceptedOpendoarIds, report));
 	}
 
-	private Set<String> findExcludedOpendoarIds(final String dbUrl, final String dbUser, final String dbPassword) throws CollectorException {
-		final Set<String> excluded = new HashSet<>();
+	private Set<String> findAcceptedOpendoarIds(final String dbUrl, final String dbUser, final String dbPassword) throws CollectorException {
+		final Set<String> accepted = new HashSet<>();
 
 		try (final DbClient dbClient = new DbClient(dbUrl, dbUser, dbPassword)) {
 
 			final String sql = IOUtils
 					.toString(BaseAnalyzerJob.class
-							.getResourceAsStream("/eu/dnetlib/dhp/collection/plugin/base/sql/opendoar-ds-exclusion.sql"));
+							.getResourceAsStream("/eu/dnetlib/dhp/collection/plugin/base/sql/opendoar-accepted.sql"));
 
 			dbClient.processResults(sql, row -> {
 				try {
-					excluded.add(row.getString("id"));
+					accepted.add(row.getString("id"));
 				} catch (final SQLException e) {
 					log.error("Error in SQL", e);
 					throw new RuntimeException("Error in SQL", e);
@@ -94,13 +94,13 @@ public class BaseCollectorPlugin implements CollectorPlugin {
 			log.error("Error accessong SQL", e);
 			throw new CollectorException("Error accessong SQL", e);
 		}
-		return excluded;
+		return accepted;
 	}
 
-	private boolean filterXml(final String xml, final Set<String> excludedOpendoarIds, final AggregatorReport report) {
+	private boolean filterXml(final String xml, final Set<String> acceptedOpendoarIds, final AggregatorReport report) {
 		try {
 			final String id = DocumentHelper.parseText(xml).valueOf("//*[local-name='collection']/@opendoar_id").trim();
-			return (StringUtils.isNotBlank(id) && !excludedOpendoarIds.contains("opendoar____::" + id.trim()));
+			return (StringUtils.isNotBlank(id) && acceptedOpendoarIds.contains("opendoar____::" + id.trim()));
 		} catch (final DocumentException e) {
 			log.error("Error parsing document", e);
 			throw new RuntimeException("Error parsing document", e);
