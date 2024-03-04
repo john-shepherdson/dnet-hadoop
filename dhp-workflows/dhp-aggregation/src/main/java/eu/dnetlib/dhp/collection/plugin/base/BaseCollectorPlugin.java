@@ -45,9 +45,9 @@ public class BaseCollectorPlugin implements CollectorPlugin {
 	public Stream<String> collect(final ApiDescriptor api, final AggregatorReport report) throws CollectorException {
 		// get path to file
 		final Path filePath = Optional
-				.ofNullable(api.getBaseUrl())
-				.map(Path::new)
-				.orElseThrow(() -> new CollectorException("missing baseUrl"));
+			.ofNullable(api.getBaseUrl())
+			.map(Path::new)
+			.orElseThrow(() -> new CollectorException("missing baseUrl"));
 
 		final String dbUrl = api.getParams().get("dbUrl");
 		final String dbUser = api.getParams().get("dbUser");
@@ -59,7 +59,9 @@ public class BaseCollectorPlugin implements CollectorPlugin {
 		log.info("dbPassword: {}", "***");
 
 		try {
-			if (!this.fs.exists(filePath)) { throw new CollectorException("path does not exist: " + filePath); }
+			if (!this.fs.exists(filePath)) {
+				throw new CollectorException("path does not exist: " + filePath);
+			}
 		} catch (final Throwable e) {
 			throw new CollectorException(e);
 		}
@@ -69,18 +71,20 @@ public class BaseCollectorPlugin implements CollectorPlugin {
 		final Iterator<String> iterator = new BaseCollectorIterator(this.fs, filePath, report);
 		final Spliterator<String> spliterator = Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED);
 		return StreamSupport
-				.stream(spliterator, false)
-				.filter(doc -> filterXml(doc, acceptedOpendoarIds, report));
+			.stream(spliterator, false)
+			.filter(doc -> filterXml(doc, acceptedOpendoarIds, report));
 	}
 
-	private Set<String> findAcceptedOpendoarIds(final String dbUrl, final String dbUser, final String dbPassword) throws CollectorException {
+	private Set<String> findAcceptedOpendoarIds(final String dbUrl, final String dbUser, final String dbPassword)
+		throws CollectorException {
 		final Set<String> accepted = new HashSet<>();
 
 		try (final DbClient dbClient = new DbClient(dbUrl, dbUser, dbPassword)) {
 
 			final String sql = IOUtils
-					.toString(BaseAnalyzerJob.class
-							.getResourceAsStream("/eu/dnetlib/dhp/collection/plugin/base/sql/opendoar-accepted.sql"));
+				.toString(
+					BaseAnalyzerJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/collection/plugin/base/sql/opendoar-accepted.sql"));
 
 			dbClient.processResults(sql, row -> {
 				try {
