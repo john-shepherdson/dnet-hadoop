@@ -26,7 +26,7 @@ INSERT INTO dsm_services(
 	'https://www.base-search.net',
 	'https://www.base-search.net/about/download/logo_224x57_white.gif',
 	'BASE',
-	'',
+	'openaire-helpdesk@uni-bielefeld.de',
 	'infrastruct_::openaire',
 	'user:insert',
 	'aggregator::pubsrepository::unknown',
@@ -41,8 +41,8 @@ INSERT INTO dsm_service_organization(
 	organization,
 	service
 ) VALUES (
-	'openaire____::base_search::Bielefeld University Library@@openaire____::base_search',
-	'openaire____::base_search::Bielefeld University Library',
+	'fairsharing_::org::214@@openaire____::base_search',
+	'fairsharing_::org::214',
 	'openaire____::base_search'
 );
 
