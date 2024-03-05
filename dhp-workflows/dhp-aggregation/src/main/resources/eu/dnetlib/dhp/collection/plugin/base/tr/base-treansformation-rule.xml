@@ -39,45 +39,33 @@
 								<xsl:apply-templates select="//*[local-name() = 'header']" />
 
 
-<!-- 
+<!-- TO EVALUATE
 ./base_dc:authod_id
 ./base_dc:authod_id/base_dc:creator_id
 ./base_dc:authod_id/base_dc:creator_name
+
 ./base_dc:autoclasscode
 ./base_dc:autoclasscode/@type
+
 ./base_dc:classcode
 ./base_dc:classcode/@type
-./base_dc:collection
-./base_dc:collection/@opendoar_id
-./base_dc:collection/@ror_id
-./base_dc:collname
-./base_dc:continent
-./base_dc:country
-./base_dc:doi
+
 ./base_dc:global_id
 ./base_dc:lang
 ./base_dc:link
 ./base_dc:oa
 ./base_dc:rightsnorm
 ./base_dc:typenorm
-./base_dc:year
-./dc:contributor
-./dc:coverage
-./dc:creator
-./dc:date
-./dc:description
-./dc:format
-./dc:identifier
-./dc:language
-./dc:publisher
-./dc:relation
-./dc:rights
-./dc:source
-./dc:subject
-./dc:title
-./dc:type
 -->
 
+<!-- NOT USED 
+./base_dc:collection/text()
+./base_dc:collection/@ror_id
+./base_dc:continent
+./base_dc:country
+./base_dc:year  (I use dc:date)
+./dc:coverage
+-->
 
 
 								<metadata>
@@ -166,6 +154,33 @@
 										<xsl:value-of select="vocabulary:clean( //dc:rights, 'dnet:access_modes')" />
 									</oaf:accessrights>
 									
+									<xsl:for-each select="//base_dc:doi">
+										<oaf:identifier>
+											<xsl:attribute name="identifierType" select="'doi'" />
+											<xsl:value-of select="." />
+										</oaf:identifier>
+									</xsl:for-each>
+									
+									<oaf:hostedBy>
+										<xsl:attribute name="name">
+                                            <xsl:value-of select="//base_dc:collname" />
+                                        </xsl:attribute>
+										<xsl:attribute name="id">
+                                            <xsl:value-of select="concat('opendoar____::', //base_dc:collection/@opendoar_id)" />
+                                        </xsl:attribute>
+									</oaf:hostedBy>
+									
+									<oaf:collectedFrom>
+										<xsl:attribute name="name">
+                                            <xsl:value-of select="$varOfficialName" />
+                                        </xsl:attribute>
+										<xsl:attribute name="id">
+                                            <xsl:value-of select="$varDataSourceId" />
+                                        </xsl:attribute>
+									</oaf:collectedFrom>
+									
+									<!-- TODO CONTINUE HERE -->
+									
 									<dr:CobjCategory>
 										<xsl:variable name="varCobjCategory" select="vocabulary:clean( //dc:type, 'dnet:publication_resource')" />
 										<xsl:variable name="varSuperType" select="vocabulary:clean( $varCobjCategory, 'dnet:result_typologies')" />
@@ -211,37 +226,11 @@
 										</oaf:fulltext>
 									</xsl:if>
 									
-									<oaf:hostedBy>
-										<xsl:attribute name="name">
-                                            TODO
-                                        </xsl:attribute>
-										<xsl:attribute name="id">
-                                            <xsl:value-of select="concat('opendoar____::', //base_dc:collection/@opendoar_id)" />
-                                        </xsl:attribute>
-									</oaf:hostedBy>
-									
-									<oaf:collectedFrom>
-										<xsl:attribute name="name">
-                                            <xsl:value-of select="$varOfficialName" />
-                                        </xsl:attribute>
-										<xsl:attribute name="id">
-                                            <xsl:value-of select="$varDataSourceId" />
-                                        </xsl:attribute>
-									</oaf:collectedFrom><!-- ID recognition incomplete -->
-									
 									<xsl:variable name="varKnownFileEndings"
 										select="('.bmp', '.doc', '.docx', '.epub', '.flv', '.jpeg', '.jpg', '.m4v', '.mp4', '.mpg', '.odp', '.pdf', '.png', '.ppt', '.tiv', '.txt', '.xls', '.xlsx', '.zip')" /><!-- regular expression 
 										for DOIs reduced here - letters like less-than and quotation marks don't work in matches, use identiferExtract when enabled -->
 									
-									<xsl:variable name="varIdDoi"
-										select="distinct-values((//dc:identifier[starts-with(., '10.')][matches(., '(10[.][0-9]{4,}[^\s/&gt;]*/[^\s&gt;]+)')], //dc:identifier[starts-with(., 'http') and (contains(., '://dx.doi.org/10.') or contains(., '://doi.org/10.'))]/substring-after(., 'doi.org/'), //dc:identifier[starts-with(lower-case(.), 'doi:10.')]/substring-after(lower-case(.), 'doi:')))" />
 									
-									<xsl:for-each select="$varIdDoi">
-										<oaf:identifier>
-											<xsl:attribute name="identifierType" select="'doi'" />
-											<xsl:value-of select="." />
-										</oaf:identifier>
-									</xsl:for-each>
 									
 									<xsl:variable name="varIdHdl" select="distinct-values(//dc:identifier[starts-with(., 'http') and contains(., '://hdl.handle.net/')]/substring-after(., 'hdl.handle.net/'))" />
 									<xsl:for-each select="$varIdHdl">
