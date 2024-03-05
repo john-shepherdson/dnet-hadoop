@@ -6,9 +6,66 @@ import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
 
+case class MAGPaper(
+  paperId: Option[Long],
+  rank: Option[Int],
+  doi: Option[String],
+  docType: Option[String],
+  paperTitle: Option[String],
+  originalTitle: Option[String],
+  bookTitle: Option[String],
+  year: Option[Int],
+  date: Option[String],
+  onlineDate: Option[String],
+  publisher: Option[String],
+  // Journal or Conference information (one will be populated)
+  journalId: Option[Long],
+  journalName: Option[String],
+  journalIssn: Option[String],
+  journalPublisher: Option[String],
+  journalWebpage: Option[String],
+  conferenceSeriesId: Option[Long],
+  conferenceInstanceId: Option[Long],
+  conferenceName: Option[String],
+  conferenceLocation: Option[String],
+  conferenceStartDate: Option[String],
+  conferenceEndDate: Option[String],
+  volume: Option[String],
+  issue: Option[String],
+  firstPage: Option[String],
+  lastPage: Option[String],
+  referenceCount: Option[Long],
+  citationCount: Option[Long],
+  estimatedCitation: Option[Long],
+  originalVenue: Option[String],
+  familyId: Option[Long],
+  familyRank: Option[Int],
+  docSubTypes: Option[String],
+  createdDate: Option[String],
+  abstractText: Option[String],
+  // List of authors
+  authors: Option[List[MAGAuthor]],
+  // List of Fields of Study
+  fos: Option[List[MAGFieldOfStudy]]
+)
+
+case class MAGAuthor(
+  AffiliationId: Option[Long],
+  AuthorSequenceNumber: Option[Int],
+  AffiliationName: Option[String],
+  AuthorName: Option[String],
+  AuthorId: Option[Long],
+  GridId: Option[String]
+)
+
+case class MAGFieldOfStudy(
+  FieldOfStudyId: Option[Long],
+  DisplayName: Option[String],
+  MainType: Option[String],
+  Score: Option[Double]
+)
 
 object MagUtility extends Serializable {
-
 
   val datatypedict = Map(
     "bool"     -> BooleanType,
@@ -251,22 +308,22 @@ object MagUtility extends Serializable {
   def getSchema(streamName: String): StructType = {
     var schema = new StructType()
     val d: Seq[String] = stream(streamName)._2
-    d.foreach { case t =>
-      val currentType = t.split(":")
-      val fieldName: String = currentType.head
-      var fieldType: String = currentType.last
-      val nullable: Boolean = fieldType.endsWith("?")
-      if (nullable)
-        fieldType = fieldType.replace("?", "")
-      schema = schema.add(StructField(fieldName, datatypedict(fieldType), nullable))
+    d.foreach {
+      case t =>
+        val currentType = t.split(":")
+        val fieldName: String = currentType.head
+        var fieldType: String = currentType.last
+        val nullable: Boolean = fieldType.endsWith("?")
+        if (nullable)
+          fieldType = fieldType.replace("?", "")
+        schema = schema.add(StructField(fieldName, datatypedict(fieldType), nullable))
     }
     schema
   }
 
-
-  def loadMagEntity(spark:SparkSession, entity:String, basePath:String):Dataset[Row] = {
+  def loadMagEntity(spark: SparkSession, entity: String, basePath: String): Dataset[Row] = {
     if (stream.contains(entity)) {
-      val s =getSchema(entity)
+      val s = getSchema(entity)
       val pt = stream(entity)._1
       spark.read
         .option("header", "false")
@@ -278,6 +335,7 @@ object MagUtility extends Serializable {
       null
 
   }
+
   def convertInvertedIndexString(json_input: String): String = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(json_input)

@@ -1,0 +1,95 @@
+<workflow-app name="generate_MAG_Datasource" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>crossrefPath</name>
+            <description>the  path  of the native Crossref DUMP</description>
+        </property>
+        <property>
+            <name>magBasePath</name>
+            <description>The base path of MAG DUMP CSV Tables</description>
+        </property>
+        <property>
+            <name>workingPath</name>
+            <description>The working path</description>
+        </property>
+        <property>
+            <name>resume_from</name>
+            <description>start Node</description>
+
+        </property>
+
+
+
+    </parameters>
+
+    <start to="resume_from"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+
+    <decision name="resume_from">
+        <switch>
+            <case to="generateTable">${wf:conf('resumeFrom') eq 'generateTable'}</case>
+            <default to="generateOAF"/> <!-- first action to be done when downloadDump is to be performed -->
+        </switch>
+    </decision>
+
+
+    <action name="generateTables">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Generate ORCID Tables</name>
+            <class>eu.dnetlib.dhp.collection.mag.SparkCreateMagDenormalizedTable</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=2g
+                --conf spark.sql.shuffle.partitions=3000
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--crossrefPath</arg><arg>${crossrefPath}</arg>
+            <arg>--magBasePath</arg><arg>${magBasePath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--master</arg><arg>yarn</arg>
+        </spark>
+        <ok to="generateOAF"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="generateOAF">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Generate ORCID Tables</name>
+            <class>eu.dnetlib.dhp.collection.mag.SparkCreateMagDenormalizedTable</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=2g
+                --conf spark.sql.shuffle.partitions=3000
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--crossrefPath</arg><arg>${crossrefPath}</arg>
+            <arg>--magBasePath</arg><arg>${magBasePath}</arg>
+            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--master</arg><arg>yarn</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>
