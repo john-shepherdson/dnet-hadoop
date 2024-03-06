@@ -28,6 +28,7 @@ import eu.dnetlib.dhp.actionmanager.opencitations.model.COCI;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.*;
 import eu.dnetlib.dhp.utils.DHPUtils;
@@ -36,12 +37,6 @@ import scala.Tuple2;
 public class CreateActionSetSparkJob implements Serializable {
 	public static final String OPENCITATIONS_CLASSID = "sysimport:crosswalk:opencitations";
 	public static final String OPENCITATIONS_CLASSNAME = "Imported from OpenCitations";
-
-	// DOI-to-DOI citations
-	public static final String COCI = "COCI";
-
-	// PMID-to-PMID citations
-	public static final String POCI = "POCI";
 
 	private static final String DOI_PREFIX = "50|doi_________::";
 
@@ -95,22 +90,21 @@ public class CreateActionSetSparkJob implements Serializable {
 	private static void extractContent(SparkSession spark, String inputPath, String outputPath,
 		boolean shouldDuplicateRels) {
 
-		getTextTextJavaPairRDD(spark, inputPath, shouldDuplicateRels, COCI)
-			.union(getTextTextJavaPairRDD(spark, inputPath, shouldDuplicateRels, POCI))
+		getTextTextJavaPairRDD(spark, inputPath)
+			// .union(getTextTextJavaPairRDD(spark, inputPath, shouldDuplicateRels, POCI))
 			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
 	}
 
-	private static JavaPairRDD<Text, Text> getTextTextJavaPairRDD(SparkSession spark, String inputPath,
-		boolean shouldDuplicateRels, String prefix) {
+	private static JavaPairRDD<Text, Text> getTextTextJavaPairRDD(SparkSession spark, String inputPath) {
 		return spark
 			.read()
-			.textFile(inputPath + "/" + prefix + "/" + prefix + "_JSON/*")
+			.textFile(inputPath)
 			.map(
 				(MapFunction<String, COCI>) value -> OBJECT_MAPPER.readValue(value, COCI.class),
 				Encoders.bean(COCI.class))
 			.flatMap(
 				(FlatMapFunction<COCI, Relation>) value -> createRelation(
-					value, shouldDuplicateRels, prefix)
+					value)
 						.iterator(),
 				Encoders.bean(Relation.class))
 			.filter((FilterFunction<Relation>) Objects::nonNull)
@@ -121,34 +115,41 @@ public class CreateActionSetSparkJob implements Serializable {
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))));
 	}
 
-	private static List<Relation> createRelation(COCI value, boolean duplicate, String p) {
+	private static List<Relation> createRelation(COCI value) {
 
 		List<Relation> relationList = new ArrayList<>();
-		String prefix;
+
 		String citing;
 		String cited;
 
-		switch (p) {
-			case COCI:
-				prefix = DOI_PREFIX;
-				citing = prefix
+		switch (value.getCiting_pid()) {
+			case "doi":
+				citing = DOI_PREFIX
 					+ IdentifierFactory
 						.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), value.getCiting()));
-				cited = prefix
-					+ IdentifierFactory
-						.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), value.getCited()));
 				break;
-			case POCI:
-				prefix = PMID_PREFIX;
-				citing = prefix
+			case "pmid":
+				citing = PMID_PREFIX
 					+ IdentifierFactory
-						.md5(PidCleaner.normalizePidValue(PidType.pmid.toString(), value.getCiting()));
-				cited = prefix
-					+ IdentifierFactory
-						.md5(PidCleaner.normalizePidValue(PidType.pmid.toString(), value.getCited()));
+						.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), value.getCiting()));
 				break;
 			default:
-				throw new IllegalStateException("Invalid prefix: " + p);
+				throw new IllegalStateException("Invalid prefix: " + value.getCiting_pid());
+		}
+
+		switch (value.getCited_pid()) {
+			case "doi":
+				cited = DOI_PREFIX
+					+ IdentifierFactory
+						.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), value.getCiting()));
+				break;
+			case "pmid":
+				cited = PMID_PREFIX
+					+ IdentifierFactory
+						.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), value.getCiting()));
+				break;
+			default:
+				throw new IllegalStateException("Invalid prefix: " + value.getCited_pid());
 		}
 
 		if (!citing.equals(cited)) {
@@ -157,15 +158,6 @@ public class CreateActionSetSparkJob implements Serializable {
 					getRelation(
 						citing,
 						cited, ModelConstants.CITES));
-
-			if (duplicate && value.getCiting().endsWith(".refs")) {
-				citing = prefix + IdentifierFactory
-					.md5(
-						CleaningFunctions
-							.normalizePidValue(
-								"doi", value.getCiting().substring(0, value.getCiting().indexOf(".refs"))));
-				relationList.add(getRelation(citing, cited, ModelConstants.CITES));
-			}
 		}
 
 		return relationList;

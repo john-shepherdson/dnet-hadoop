@@ -27,13 +27,23 @@
             <case to="download">${wf:conf('resumeFrom') eq 'DownloadDump'}</case>
             <case to="extract">${wf:conf('resumeFrom') eq 'ExtractContent'}</case>
             <case to="read">${wf:conf('resumeFrom') eq 'ReadContent'}</case>
-            <default to="create_actionset"/> <!-- first action to be done when downloadDump is to be performed -->
+            <case to="create_actionset">${wf:conf('resumeFrom') eq 'CreateAS'}</case>
+            <default to="deleteoutputpath"/> <!-- first action to be done when downloadDump is to be performed -->
         </switch>
     </decision>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+
+    <action name="deleteoutputpath">
+        <fs>
+            <delete path='${inputPath}'/>
+            <mkdir path='${inputPath}'/>
+        </fs>
+        <ok to="download"/>
+        <error to="Kill"/>
+    </action>
 
     <action name="download">
         <shell xmlns="uri:oozie:shell-action:0.2">
@@ -47,7 +57,28 @@
             </configuration>
             <exec>download.sh</exec>
             <argument>${filelist}</argument>
-            <argument>${workingPath}/${prefix}/Original</argument>
+            <argument>${inputPath}/Original</argument>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>download.sh</file>
+            <capture-output/>
+        </shell>
+        <ok to="download_correspondence"/>
+        <error to="Kill"/>
+    </action>
+<!--    downloads the correspondence from the omid and the pid (doi, pmid etc)-->
+    <action name="download_correspondence">
+        <shell xmlns="uri:oozie:shell-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <exec>download_corr.sh</exec>
+            <argument>${filecorrespondence}</argument>
+            <argument>${inputPath}/correspondence</argument>
             <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
             <file>download.sh</file>
             <capture-output/>
@@ -60,9 +91,19 @@
         <java>
             <main-class>eu.dnetlib.dhp.actionmanager.opencitations.GetOpenCitationsRefs</main-class>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
-            <arg>--inputFile</arg><arg>${inputFile}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}/${prefix}</arg>
-            <arg>--prefix</arg><arg>${prefix}</arg>
+            <arg>--inputPath</arg><arg>${inputPath}/Original</arg>
+            <arg>--outputPath</arg><arg>${inputPath}/Extracted</arg>
+        </java>
+        <ok to="read"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="extract_correspondence">
+        <java>
+            <main-class>eu.dnetlib.dhp.actionmanager.opencitations.GetOpenCitationsRefs</main-class>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--inputPath</arg><arg>${inputPath}/correspondence</arg>
+            <arg>--outputPath</arg><arg>${inputPath}/correspondence_extracted</arg>
         </java>
         <ok to="read"/>
         <error to="Kill"/>
@@ -85,11 +126,34 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--workingPath</arg><arg>${workingPath}/${prefix}/${prefix}</arg>
-            <arg>--outputPath</arg><arg>${workingPath}/${prefix}/${prefix}_JSON/</arg>
+            <arg>--inputPath</arg><arg>${inputPath}/Extracted</arg>
+            <arg>--outputPath</arg><arg>${inputPath}/JSON</arg>
             <arg>--delimiter</arg><arg>${delimiter}</arg>
-            <arg>--inputFile</arg><arg>${inputFileCoci}</arg>
-            <arg>--format</arg><arg>${prefix}</arg>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+        </spark>
+        <ok to="remap"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="remap">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Produces the AS for OC</name>
+            <class>eu.dnetlib.dhp.actionmanager.opencitations.MapOCIdsInPids</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${inputPath}</arg>
+            <arg>--outputPath</arg><arg>${outputPathExtraction}</arg>
         </spark>
         <ok to="create_actionset"/>
         <error to="Kill"/>
@@ -112,7 +176,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
             </spark-opts>
-            <arg>--inputPath</arg><arg>${workingPath}</arg>
+            <arg>--inputPath</arg><arg>${outputPathExtraction}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>

@@ -12,10 +12,7 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.LocatedFileStatus;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
+import org.apache.hadoop.fs.*;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
@@ -42,19 +39,21 @@ public class ReadCOCI implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		final String[] inputFile = parser.get("inputFile").split(";");
-		log.info("inputFile {}", Arrays.asList(inputFile));
+		final String hdfsNameNode = parser.get("hdfsNameNode");
+		log.info("hdfsNameNode {}", hdfsNameNode);
+
 		Boolean isSparkSessionManaged = isSparkSessionManaged(parser);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-		final String workingPath = parser.get("workingPath");
+		final String workingPath = parser.get("inputPath");
 		log.info("workingPath {}", workingPath);
-
-		final String format = parser.get("format");
-		log.info("format {}", format);
 
 		SparkConf sconf = new SparkConf();
 
+		Configuration conf = new Configuration();
+		conf.set("fs.defaultFS", hdfsNameNode);
+
+		FileSystem fileSystem = FileSystem.get(conf);
 		final String delimiter = Optional
 			.ofNullable(parser.get("delimiter"))
 			.orElse(DEFAULT_DELIMITER);
@@ -66,19 +65,20 @@ public class ReadCOCI implements Serializable {
 				doRead(
 					spark,
 					workingPath,
-					inputFile,
+					fileSystem,
 					outputPath,
-					delimiter,
-					format);
+					delimiter);
 			});
 	}
 
-	private static void doRead(SparkSession spark, String workingPath, String[] inputFiles,
+	private static void doRead(SparkSession spark, String workingPath, FileSystem fileSystem,
 		String outputPath,
-		String delimiter, String format) {
-
-		for (String inputFile : inputFiles) {
-			String pString = workingPath + "/" + inputFile + ".gz";
+		String delimiter) throws IOException {
+		RemoteIterator<LocatedFileStatus> fileStatusListIterator = fileSystem
+			.listFiles(
+				new Path(workingPath), true);
+		while (fileStatusListIterator.hasNext()) {
+			LocatedFileStatus fileStatus = fileStatusListIterator.next();
 
 			Dataset<Row> cociData = spark
 				.read()
@@ -87,26 +87,23 @@ public class ReadCOCI implements Serializable {
 				.option("inferSchema", "true")
 				.option("header", "true")
 				.option("quotes", "\"")
-				.load(pString)
+				.load(fileStatus.getPath().toString())
 				.repartition(100);
 
 			cociData.map((MapFunction<Row, COCI>) row -> {
 				COCI coci = new COCI();
-				if (format.equals("COCI")) {
-					coci.setCiting(row.getString(1));
-					coci.setCited(row.getString(2));
-				} else {
-					coci.setCiting(String.valueOf(row.getInt(1)));
-					coci.setCited(String.valueOf(row.getInt(2)));
-				}
+
+				coci.setCiting(row.getString(1));
+				coci.setCited(row.getString(2));
+
 				coci.setOci(row.getString(0));
 
 				return coci;
 			}, Encoders.bean(COCI.class))
 				.write()
-				.mode(SaveMode.Overwrite)
+				.mode(SaveMode.Append)
 				.option("compression", "gzip")
-				.json(outputPath + inputFile);
+				.json(outputPath);
 		}
 
 	}
