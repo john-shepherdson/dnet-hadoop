@@ -56,7 +56,7 @@ join ${stats_db_name}.result res on res.id=r.id;
 DROP TABLE IF EXISTS ${stats_db_name}.result_apc purge;
 
 create table if not exists ${stats_db_name}.result_apc STORED AS PARQUET as
-select r.id, r.amount, r.currency
+select distinct r.id, r.amount, r.currency
 from (
          select substr(r.id, 4) as id, cast(inst.processingchargeamount.value as float) as amount, inst.processingchargecurrency.value as currency
          from ${openaire_db_name}.result r lateral view explode(r.instance) instances as inst) r
