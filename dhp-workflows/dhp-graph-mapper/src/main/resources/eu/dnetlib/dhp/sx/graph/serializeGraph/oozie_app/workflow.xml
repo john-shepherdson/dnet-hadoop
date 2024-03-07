@@ -1,0 +1,83 @@
+<workflow-app name="Create Scholix final Graph" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>scholixUpdatePath</name>
+            <description>the working dir base path of the scholix updated</description>
+        </property>
+        <property>
+            <name>targetPath</name>
+            <description>the final graph path</description>
+        </property>
+    </parameters>
+
+    <start to="DropJSONPath"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+
+    <action name="DropJSONPath">
+        <fs>
+            <delete path='${targetPath}/index'/>
+            <mkdir path='${targetPath}/index/'/>
+        </fs>
+        <ok to="SerializeScholix"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="SerializeScholix">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Serialize scholix to JSON</name>
+            <class>eu.dnetlib.dhp.sx.graph.SparkConvertObjectToJson</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.shuffle.partitions=6000
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--master</arg><arg>yarn</arg>
+            <arg>--sourcePath</arg><arg>${targetPath}/provision/scholix/scholix</arg>
+            <arg>--targetPath</arg><arg>${targetPath}/index/scholix_json</arg>
+            <arg>--scholixUpdatePath</arg><arg>${scholixUpdatePath}</arg>
+            <arg>--objectType</arg><arg>scholix</arg>
+
+        </spark>
+        <ok to="SerializeSummary"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="SerializeSummary">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Serialize summary to JSON</name>
+            <class>eu.dnetlib.dhp.sx.graph.SparkConvertObjectToJson</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.shuffle.partitions=6000
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--master</arg><arg>yarn</arg>
+            <arg>--sourcePath</arg><arg>${targetPath}/provision/summaries_filtered</arg>
+            <arg>--targetPath</arg><arg>${targetPath}/index/summaries_json</arg>
+            <arg>--objectType</arg><arg>summary</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    <end name="End"/>
+</workflow-app>

@@ -1,6 +1,9 @@
 [
-  {"paramName":"mt",  "paramLongName":"master",     "paramDescription": "should be local or yarn",  "paramRequired": true},
-  {"paramName":"s",   "paramLongName":"sourcePath", "paramDescription": "the source Path",           "paramRequired": true},
-  {"paramName":"t",   "paramLongName":"targetPath", "paramDescription": "the path of the raw graph", "paramRequired": true},
-  {"paramName":"o",   "paramLongName":"objectType", "paramDescription": "should be scholix or Summary", "paramRequired": true}
+  {"paramName":"mt",  "paramLongName":"master",     "paramDescription": "should be local or yarn",                "paramRequired": true},
+  {"paramName":"s",   "paramLongName":"sourcePath", "paramDescription": "the source Path",                        "paramRequired": true},
+  {"paramName":"su",   "paramLongName":"scholixUpdatePath", "paramDescription": "the scholix updated Path",       "paramRequired": false},
+  {"paramName":"t",   "paramLongName":"targetPath", "paramDescription": "the path of the raw graph",              "paramRequired": true},
+  {"paramName":"o",   "paramLongName":"objectType", "paramDescription": "should be scholix or Summary",           "paramRequired": true},
+  {"paramName":"mp",   "paramLongName":"maxPidNumberFilter", "paramDescription": "filter max number of pids in source/target", "paramRequired": false}
+
 ]

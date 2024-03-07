@@ -1,0 +1,958 @@
+{
+  "author": [
+    {
+      "affiliation": [
+      ],
+      "fullname": "Brien, Tom",
+      "name": "Tom",
+      "pid": [
+        {
+          "dataInfo": {
+            "deletedbyinference": false,
+            "inferenceprovenance": "",
+            "inferred": false,
+            "invisible": false,
+            "provenanceaction": {
+              "classid": "sysimport:crosswalk:datasetarchive",
+              "classname": "sysimport:crosswalk:datasetarchive",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            },
+            "trust": "0.9"
+          },
+          "qualifier": {
+            "classid": "ORCID12",
+            "classname": "ORCID12",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "0000-0001-9613-6639"
+        },
+        {
+          "dataInfo": {
+            "deletedbyinference": false,
+            "inferenceprovenance": "",
+            "inferred": false,
+            "invisible": false,
+            "provenanceaction": {
+              "classid": "sysimport:crosswalk:datasetarchive",
+              "classname": "sysimport:crosswalk:datasetarchive",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            },
+            "trust": "0.9"
+          },
+          "qualifier": {
+            "classid": "ORCID12",
+            "classname": "ORCID12",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "https://orcid.org/0000-0001-9613-6639"
+        },
+        {
+          "dataInfo": {
+            "deletedbyinference": false,
+            "inferenceprovenance": "",
+            "inferred": false,
+            "invisible": false,
+            "provenanceaction": {
+              "classid": "sysimport:crosswalk:entityregistry",
+              "classname": "sysimport:crosswalk:entityregistry",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            },
+            "trust": "0.9"
+          },
+          "qualifier": {
+            "classid": "orcid",
+            "classname": "ORCID12",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "0000-0001-9613-6639"
+        }
+      ],
+      "rank": 1,
+      "surname": "Brien"
+    },
+    {
+      "affiliation": [
+      ],
+      "fullname": "Ade, Peter",
+      "name": "Peter",
+      "pid": [
+        {
+          "dataInfo": {
+            "deletedbyinference": false,
+            "inferenceprovenance": "",
+            "inferred": false,
+            "invisible": false,
+            "provenanceaction": {
+              "classid": "sysimport:crosswalk:datasetarchive",
+              "classname": "sysimport:crosswalk:datasetarchive",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            },
+            "trust": "0.9"
+          },
+          "qualifier": {
+            "classid": "xyz",
+            "classname": "XYZ",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "qwerty"
+        },
+        {
+          "dataInfo": {
+            "deletedbyinference": false,
+            "inferenceprovenance": "",
+            "inferred": false,
+            "invisible": false,
+            "provenanceaction": {
+              "classid": "sysimport:crosswalk:datasetarchive",
+              "classname": "sysimport:crosswalk:datasetarchive",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            },
+            "trust": "0.9"
+          },
+          "qualifier": {
+            "classid": "ORCID",
+            "classname": "ORCID",
+            "schemeid": "",
+            "schemename": ""
+          },
+          "value": "asdasd"
+        }
+      ],
+      "rank": 2,
+      "surname": "Ade"
+    },
+    {
+      "affiliation": [
+      ],
+      "fullname": "Barry, Peter S.",
+      "name": "Peter S.",
+      "pid": null,
+      "rank": 3,
+      "surname": "Barry"
+    },
+    {
+      "affiliation": [
+      ],
+      "fullname": "Dunscombe, Chris J.",
+      "name": "Chris J.",
+      "pid": [
+      ],
+      "rank": 4,
+      "surname": "Dunscombe"
+    },
+    {
+      "affiliation": [
+      ],
+      "fullname": "Leadley, David R.",
+      "name": "David R.",
+      "pid": [
+      ],
+      "rank": 5,
+      "surname": "Leadley"
+    },
+    {
+      "affiliation": [
+      ],
+      "fullname": "Morozov, Dmitry V.",
+      "name": "Dmitry V.",
+      "pid": [
+      ],
+      "rank": 6,
+      "surname": "Morozov"
+    },
+    {
+      "affiliation": [
+      ],
+      "fullname": "Myronov, Maksym",
+      "name": "Maksym",
+      "pid": [
+      ],
+      "rank": 7,
+      "surname": "Myronov"
+    },
+    {
+      "affiliation": [
+      ],
+      "fullname": "Parker, Evan",
+      "name": "Evan",
+      "pid": [
+      ],
+      "rank": 8,
+      "surname": "Parker"
+    },
+    {
+      "affiliation": [
+      ],
+      "fullname": "Prest, Martin J.",
+      "name": "Martin J.",
+      "pid": [
+      ],
+      "rank": 9,
+      "surname": "Prest"
+    },
+    {
+      "affiliation": [
+      ],
+      "fullname": "Prunnila, Mika",
+      "name": "Mika",
+      "pid": [
+      ],
+      "rank": 10,
+      "surname": "Prunnila"
+    },
+    {
+      "affiliation": [
+      ],
+      "fullname": "Sudiwala, Rashmi V.",
+      "name": "Rashmi V.",
+      "pid": [
+      ],
+      "rank": 11,
+      "surname": "Sudiwala"
+    },
+    {
+      "affiliation": [
+      ],
+      "fullname": "Whall, Terry E.",
+      "name": "Terry E.",
+      "pid": [
+      ],
+      "rank": 12,
+      "surname": "Whall"
+    },
+    {
+      "affiliation": [
+      ],
+      "fullname": "Mauskopf",
+      "name": "",
+      "pid": [
+      ],
+      "rank": 13,
+      "surname": ""
+    },
+    {
+      "affiliation": [
+      ],
+      "fullname": " P. D. ",
+      "name": "",
+      "pid": [
+      ],
+      "rank": 14,
+      "surname": ""
+    }
+  ],
+  "bestaccessright": null,
+  "publisher": {
+    "value": null
+  },
+  "collectedfrom": [
+    {
+      "key": "10|CSC_________::a2b9ce8435390bcbfc05f3cae3948747",
+      "value": "VIRTA"
+    }
+  ],
+  "context": [
+  ],
+  "contributor": [
+  ],
+  "country": [
+    {
+      "classid": "DE",
+      "classname": "DE",
+      "schemeid": "dnet:countries",
+      "schemename": "dnet:countries"
+    }
+  ],
+  "coverage": [
+  ],
+  "dataInfo": {
+    "deletedbyinference": false,
+    "inferenceprovenance": "",
+    "inferred": false,
+    "invisible": true,
+    "provenanceaction": {
+      "classid": "sysimport:crosswalk:datasetarchive",
+      "classname": "sysimport:crosswalk:datasetarchive",
+      "schemeid": "dnet:provenanceActions",
+      "schemename": "dnet:provenanceActions"
+    },
+    "trust": "0.9"
+  },
+  "dateofacceptance": {
+    "dataInfo": {
+      "deletedbyinference": false,
+      "inferenceprovenance": "",
+      "inferred": false,
+      "invisible": false,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:datasetarchive",
+        "classname": "sysimport:crosswalk:datasetarchive",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      },
+      "trust": "0.9"
+    },
+    "value": "7 oct 1970"
+  },
+  "dateofcollection": "",
+  "dateoftransformation": "2020-04-22T12:34:08.009Z",
+  "description": [
+  ],
+  "externalReference": [
+  ],
+  "extraInfo": [
+  ],
+  "format": [
+  ],
+  "fulltext": [
+  ],
+  "id": "50|CSC_________::2250a70c903c6ac6e4c01438259e9375",
+  "instance": [
+    {
+      "pid": [
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1007/s109090161569x"
+        },
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1008/abcd"
+        }
+      ],
+      "alternateIdentifier": [
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1007/s109090161569x"
+        },
+        {
+          "dataInfo": null,
+          "qualifier": {
+            "classid": "doi",
+            "classname": "doi",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.1009/qwerty"
+        }
+      ],
+      "accessright": {
+        "classid": "CLOSED",
+        "classname": "CLOSED",
+        "schemeid": "dnet:access_modes",
+        "schemename": "dnet:access_modes"
+      },
+      "collectedfrom": {
+        "key": "10|CSC_________::a2b9ce8435390bcbfc05f3cae3948747",
+        "value": "VIRTA"
+      },
+      "dateofacceptance": {
+        "dataInfo": {
+          "deletedbyinference": false,
+          "inferenceprovenance": "",
+          "inferred": false,
+          "invisible": false,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:datasetarchive",
+            "classname": "sysimport:crosswalk:datasetarchive",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          },
+          "trust": "0.9"
+        },
+        "value": "2016-01-01"
+      },
+      "distributionlocation": "",
+      "hostedby": {
+        "key": "10|CSC_________::a2b9ce8435390bcbfc05f3cae3948747",
+        "value": "VIRTA"
+      },
+      "instancetype": {
+        "classid": "Comment/debate",
+        "classname": "Comment/debate",
+        "schemeid": "dnet:publication_resource",
+        "schemename": "dnet:publication_resource"
+      },
+      "url": [
+        "http://juuli.fi/Record/0275158616",
+        "http://dx.doi.org/10.1007/s109090161569x"
+      ]
+    }
+  ],
+  "journal": {
+    "dataInfo": {
+      "deletedbyinference": false,
+      "inferenceprovenance": "",
+      "inferred": false,
+      "invisible": false,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:datasetarchive",
+        "classname": "sysimport:crosswalk:datasetarchive",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      },
+      "trust": "0.9"
+    },
+    "edition": "",
+    "ep": " 7",
+    "iss": "9 March",
+    "issnLinking": "",
+    "issnOnline": "",
+    "issnPrinted": "0022-2291",
+    "name": "Journal of Low Temperature Physics - Early Acces",
+    "sp": "1 ",
+    "vol": ""
+  },
+  "language": {
+    "classid": "UNKNOWN",
+    "classname": "UNKNOWN",
+    "schemeid": "dnet:languages",
+    "schemename": "dnet:languages"
+  },
+  "lastupdatetimestamp": 1591283286319,
+  "oaiprovenance": {
+    "originDescription": {
+      "altered": true,
+      "baseURL": "https%3A%2F%2Fvirta-jtp.csc.fi%2Fapi%2Fcerif",
+      "datestamp": "2019-07-30",
+      "harvestDate": "2020-04-22T11:04:38.685Z",
+      "identifier": "oai:virta-jtp.csc.fi:Publications/0275158616",
+      "metadataNamespace": ""
+    }
+  },
+  "originalId": [
+    "CSC_________::2250a70c903c6ac6e4c01438259e9375"
+  ],
+  "pid": [
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "doi",
+        "classname": "doi",
+        "schemeid": "dnet:pid_types",
+        "schemename": "dnet:pid_types"
+      },
+      "value": "10.1007/s109090161569x"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "doi",
+        "classname": "doi",
+        "schemeid": "dnet:pid_types",
+        "schemename": "dnet:pid_types"
+      },
+      "value": "10.1007/s109090161569x"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "doi",
+        "classname": "doi",
+        "schemeid": "dnet:pid_types",
+        "schemename": "dnet:pid_types"
+      },
+      "value": ""
+    }
+  ],
+  "relevantdate": [
+  ],
+  "resourcetype": {
+    "classid": "0001",
+    "classname": "0001",
+    "schemeid": "dnet:dataCite_resource",
+    "schemename": "dnet:dataCite_resource"
+  },
+  "resulttype": {
+    "classid": "publication",
+    "classname": "publication",
+    "schemeid": "dnet:result_typologies",
+    "schemename": "dnet:result_typologies"
+  },
+  "source": [
+  ],
+  "subject": [
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "value": "ta213"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "value": "infrared detectors"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "value": "lens antennas"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "value": "silicon"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "value": "slot antennas"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "value": "strained silicon"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "value": "cold electron bolometers"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "value": "doped silicon"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "value": "measure noise"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "value": "noise equivalent power"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "value": "optical characterisation"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "value": "optical response"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "value": "photon noise"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "",
+        "classname": "",
+        "schemeid": "",
+        "schemename": ""
+      },
+      "value": "silicon absorbers"
+    }
+  ],
+  "title": [
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "main title",
+        "classname": "main title",
+        "schemeid": "dnet:dataCite_title",
+        "schemename": "dnet:dataCite_title"
+      },
+      "value": "Optical response of strained- and unstrained-silicon cold-electron bolometers test"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "main title",
+        "classname": "main title",
+        "schemeid": "dnet:dataCite_title",
+        "schemename": "dnet:dataCite_title"
+      },
+      "value": "test test 123 test"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "main title",
+        "classname": "main title",
+        "schemeid": "dnet:dataCite_title",
+        "schemename": "dnet:dataCite_title"
+      },
+      "value": "omic"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "main title",
+        "classname": "main title",
+        "schemeid": "dnet:dataCite_title",
+        "schemename": "dnet:dataCite_title"
+      },
+      "value": "｢マキャベリ的知性と心の理論の進化論｣ リチャード・バーン， アンドリュー・ホワイトゥン 編／藤田和生， 山下博志， 友永雅巳 監訳"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferenceprovenance": "",
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:datasetarchive",
+          "classname": "sysimport:crosswalk:datasetarchive",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "main title",
+        "classname": "main title",
+        "schemeid": "dnet:dataCite_title",
+        "schemename": "dnet:dataCite_title"
+      },
+      "value": "-"
+    }
+  ]
+}

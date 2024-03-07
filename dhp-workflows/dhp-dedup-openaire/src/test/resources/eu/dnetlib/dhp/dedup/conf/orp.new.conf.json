@@ -1,0 +1,214 @@
+{
+  "wf": {
+    "threshold" : "0.99",
+    "dedupRun" : "001",
+    "entityType" : "result",
+    "subEntityType" : "resulttype",
+    "subEntityValue" : "otherresearchproduct",
+    "orderField" : "title",
+    "queueMaxSize" : "100",
+    "groupMaxSize" : "100",
+    "maxChildren" : "100",
+    "slidingWindowSize" : "100",
+    "rootBuilder" : [ "result", "resultProject_outcome_isProducedBy", "resultResult_publicationDataset_isRelatedTo", "resultResult_similarity_isAmongTopNSimilarDocuments", "resultResult_similarity_hasAmongTopNSimilarDocuments", "resultOrganization_affiliation_hasAuthorInstitution", "resultResult_part_hasPart", "resultResult_part_isPartOf", "resultResult_supplement_isSupplementTo", "resultResult_supplement_isSupplementedBy", "resultResult_version_isVersionOf" ],
+    "includeChildren" : "true",
+    "idPath" : "$.id",
+    "maxIterations" : 20
+  },
+  "pace": {
+    "clustering": [
+      {
+        "name": "wordsStatsSuffixPrefixChain",
+        "fields": [
+          "title"
+        ],
+        "params": {
+          "mod": "10"
+        }
+      },
+      {
+        "name": "lowercase",
+        "fields": [
+          "doi",
+          "altdoi"
+        ],
+        "params": {
+          "collapseOn:pid": "0"
+        }
+      }
+    ],
+    "decisionTree": {
+      "start": {
+        "fields": [
+          {
+            "field": "pid",
+            "comparator": "jsonListMatch",
+            "weight": 1.0,
+            "countIfUndefined": "false",
+            "params": {
+              "jpath_value": "$.value",
+              "jpath_classid": "$.qualifier.classid",
+              "mode": "count"
+            }
+          }
+        ],
+        "threshold": 1.0,
+        "aggregation": "MAX",
+        "positive": "MATCH",
+        "negative": "pidVSaltid",
+        "undefined": "pidVSaltid",
+        "ignoreUndefined": "false"
+      },
+      "pidVSaltid": {
+        "fields": [
+          {
+            "field": "pid",
+            "comparator": "jsonListMatch",
+            "weight": 1.0,
+            "countIfUndefined": "false",
+            "params": {
+              "jpath_value": "$.value",
+              "jpath_classid": "$.qualifier.classid",
+              "crossCompare": "alternateid",
+              "mode": "count"
+            }
+          }
+        ],
+        "threshold": 1.0,
+        "aggregation": "MAX",
+        "positive": "softCheck",
+        "negative": "earlyExits",
+        "undefined": "earlyExits",
+        "ignoreUndefined": "true"
+      },
+      "softCheck": {
+        "fields": [
+          {
+            "field": "title",
+            "comparator": "levensteinTitle",
+            "weight": 1.0,
+            "countIfUndefined": "true",
+            "params": {}
+          }
+        ],
+        "threshold": 0.9,
+        "aggregation": "AVG",
+        "positive": "MATCH",
+        "negative": "NO_MATCH",
+        "undefined": "NO_MATCH",
+        "ignoreUndefined": "true"
+      },
+      "earlyExits": {
+        "fields": [
+          {
+            "field": "title",
+            "comparator": "titleVersionMatch",
+            "weight": 1.0,
+            "countIfUndefined": "false",
+            "params": {}
+          },
+          {
+            "field": "authors",
+            "comparator": "sizeMatch",
+            "weight": 1.0,
+            "countIfUndefined": "false",
+            "params": {}
+          }
+        ],
+        "threshold": 1.0,
+        "aggregation": "AND",
+        "positive": "strongCheck",
+        "negative": "NO_MATCH",
+        "undefined": "strongCheck",
+        "ignoreUndefined": "false"
+      },
+      "strongCheck": {
+        "fields": [
+          {
+            "field": "title",
+            "comparator": "levensteinTitle",
+            "weight": 1.0,
+            "countIfUndefined": "true",
+            "params": {}
+          }
+        ],
+        "threshold": 0.99,
+        "aggregation": "AVG",
+        "positive": "surnames",
+        "negative": "NO_MATCH",
+        "undefined": "NO_MATCH",
+        "ignoreUndefined": "true"
+      },
+      "surnames": {
+        "fields": [
+          {
+            "field": "authors",
+            "comparator": "authorsMatch",
+            "weight": 1.0,
+            "countIfUndefined": "false",
+            "params": {
+              "surname_th": 0.75,
+              "fullname_th": 0.75,
+              "mode": "surname"
+            }
+          }
+        ],
+        "threshold": 0.6,
+        "aggregation": "MAX",
+        "positive": "MATCH",
+        "negative": "NO_MATCH",
+        "undefined": "MATCH",
+        "ignoreUndefined": "true"
+      }
+    },
+    "model": [
+      {
+        "name": "doi",
+        "type": "String",
+        "path": "$.instance[*].pid[?(@.qualifier.classid == 'doi')].value"
+      },
+      {
+        "name": "altdoi",
+        "type": "String",
+        "path": "$.instance[*].alternateIdentifier[?(@.qualifier.classid == 'doi')].value"
+      },
+      {
+        "name": "pid",
+        "type": "JSON",
+        "path": "$.instance[*].pid[*]",
+        "overrideMatch": "true"
+      },
+      {
+        "name": "alternateid",
+        "type": "JSON",
+        "path": "$.instance[*].alternateIdentifier[*]",
+        "overrideMatch": "true"
+      },
+      {
+        "name": "title",
+        "type": "String",
+        "path": "$.title[?(@.qualifier.classid == 'main title')].value",
+        "length": 250,
+        "size": 5
+      },
+      {
+        "name": "authors",
+        "type": "List",
+        "path": "$.author[*].fullname",
+        "size": 200
+      },
+      {
+        "name": "resulttype",
+        "type": "String",
+        "path": "$.resulttype.classid"
+      },
+      {
+        "name": "instance",
+        "type": "List",
+        "path": "$.instance[*].instancetype.classname"
+      }
+    ],
+    "blacklists": {},
+    "synonyms": {}
+  }
+}

@@ -3,8 +3,6 @@
 *.iws
 *.ipr
 *.iml
-*.ipr
-*.iws
 *~
 .vscode
 .metals
@@ -27,4 +25,5 @@ spark-warehouse
 /**/job-override.properties
 /**/*.log
 /**/.factorypath
-
+/**/.scalafmt.conf
+/.java-version

@@ -1,0 +1,1079 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<OpenDOAR apiVersion="1.3">
+  <copyright>Copyright 2012, University of Nottingham</copyright>
+  <licence>OpenDOAR data is available for re-use under a Creative Commons Attribution-Non-Commercial-Share Alike licence</licence>
+  <repositories>
+    <repository rID="1080">
+      <rName>Architektur-Informatik</rName>
+      <rAcronym />
+      <rNamePreferred>Y</rNamePreferred>
+      <rUrl>http://architektur-informatik.scix.net/</rUrl>
+      <rOaiBaseUrl>http://architektur-informatik.scix.net/cgi-bin/works/OAI</rOaiBaseUrl>
+      <uName />
+      <uAcronym />
+      <uNamePreferred />
+      <uUrl />
+      <oName>Arbeitskreis Architekturinformatik</oName>
+      <oAcronym>AK AI</oAcronym>
+      <oNamePreferred>Y</oNamePreferred>
+      <oUrl>http://www.architektur-informatik.org/</oUrl>
+      <postalAddress />
+      <country>
+        <cIsoCode>AT</cIsoCode>
+        <cCountry>Austria</cCountry>
+      </country>
+      <paLatitude>46.783300</paLatitude>
+      <paLongitude>12.950000</paLongitude>
+      <paPhone />
+      <paFax />
+      <rDescription>This is a German language repository on Computer Science. Full-text is not available for all items.</rDescription>
+      <rRemarks />
+      <rNumOfItems>68</rNumOfItems>
+      <rDateHarvested>2008-05-15</rDateHarvested>
+      <rYearEstablished />
+      <repositoryType>Disciplinary</repositoryType>
+      <operationalStatus>Operational</operationalStatus>
+      <rSoftWareName>SciX</rSoftWareName>
+      <rSoftWareVersion />
+      <classes>
+        <class>
+          <clCode>Cin</clCode>
+          <clTitle>Computers and IT</clTitle>
+        </class>
+      </classes>
+      <languages>
+        <language>
+          <lIsoCode>de</lIsoCode>
+          <lName>German</lName>
+        </language>
+      </languages>
+      <contentTypes>
+        <contentType ctID="1">Journal articles</contentType>
+        <contentType ctID="5">Conference and workshop papers</contentType>
+        <contentType ctID="6">Theses and dissertations</contentType>
+        <contentType ctID="7">Unpublished reports and working papers</contentType>
+      </contentTypes>
+      <policies>
+        <policy>
+          <policyType potID="1">Content</policyType>
+          <policyGrade pogID="2">Content policies not stated</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="2">Metadata</policyType>
+          <policyGrade pogID="7">Metadata policies not stated</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="3">Data</policyType>
+          <policyGrade pogID="13">Full data item policies unknown</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="4">Submission</policyType>
+          <policyGrade pogID="23">Submission policies not stated</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="5">Preserve</policyType>
+          <policyGrade pogID="28">Preservation policies not stated</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+      </policies>
+      <contacts>
+        <person>
+          <pName>Bob Martens</pName>
+          <pJobTitle>Administrator</pJobTitle>
+          <pEmail>b.martens@tuwien.ac.at</pEmail>
+          <pPhone />
+        </person>
+        <person>
+          <pName />
+          <pJobTitle>OAI Administrator</pJobTitle>
+          <pEmail>architektur-informatik@scix.net</pEmail>
+          <pPhone />
+        </person>
+      </contacts>
+    </repository>
+    <repository rID="1223">
+      <rName>Dokumentenserver des LBI-HTA</rName>
+      <rAcronym />
+      <rNamePreferred>Y</rNamePreferred>
+      <rUrl>http://eprints.hta.lbg.ac.at/</rUrl>
+      <rOaiBaseUrl>http://eprints.hta.lbg.ac.at/cgi/oai2</rOaiBaseUrl>
+      <uName />
+      <uAcronym />
+      <uNamePreferred />
+      <uUrl />
+      <oName>Ludwig Boltzmann Institut für Health Technology Assessment</oName>
+      <oAcronym>LBI-HTA</oAcronym>
+      <oNamePreferred>Y</oNamePreferred>
+      <oUrl>http://hta.lbg.ac.at/</oUrl>
+      <postalAddress />
+      <country>
+        <cIsoCode>AT</cIsoCode>
+        <cCountry>Austria</cCountry>
+      </country>
+      <paLatitude>48.209200</paLatitude>
+      <paLongitude>16.372800</paLongitude>
+      <paPhone />
+      <paFax />
+      <rDescription>This site provides access to the institutions outputs. Users may set up Atom and RSS feeds to be alerted to new content. The interface is available in English and German. Many items are not available as full-text.</rDescription>
+      <rRemarks>Special items include: Newsletters and Decision Support Document</rRemarks>
+      <rNumOfItems>600</rNumOfItems>
+      <rDateHarvested>2010-02-04</rDateHarvested>
+      <rYearEstablished />
+      <repositoryType>Institutional</repositoryType>
+      <operationalStatus>Operational</operationalStatus>
+      <rSoftWareName>EPrints</rSoftWareName>
+      <rSoftWareVersion>3.0.3</rSoftWareVersion>
+      <classes>
+        <class>
+          <clCode>Ce</clCode>
+          <clTitle>Health and Medicine</clTitle>
+        </class>
+      </classes>
+      <languages>
+        <language>
+          <lIsoCode>en</lIsoCode>
+          <lName>English</lName>
+        </language>
+      </languages>
+      <contentTypes>
+        <contentType ctID="1">Journal articles</contentType>
+        <contentType ctID="5">Conference and workshop papers</contentType>
+        <contentType ctID="7">Unpublished reports and working papers</contentType>
+        <contentType ctID="8">Books, chapters and sections</contentType>
+        <contentType ctID="14">Other special item types</contentType>
+      </contentTypes>
+      <policies>
+        <policy>
+          <policyType potID="1">Content</policyType>
+          <policyGrade pogID="3">Content policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="2">Metadata</policyType>
+          <policyGrade pogID="8">Metadata re-use policy explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="3">Data</policyType>
+          <policyGrade pogID="15">Full data item policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="4">Submission</policyType>
+          <policyGrade pogID="24">Submission policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="5">Preserve</policyType>
+          <policyGrade pogID="29">Preservation policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+      </policies>
+      <contacts />
+    </repository>
+    <repository rID="282">
+      <rName>Elektronisch archivierte Theorie - Sammelpunkt</rName>
+      <rAcronym />
+      <rNamePreferred>Y</rNamePreferred>
+      <rUrl>http://sammelpunkt.philo.at:8080/</rUrl>
+      <rOaiBaseUrl>http://sammelpunkt.philo.at:8080/cgi/oai2</rOaiBaseUrl>
+      <uName>Institut für Philosophie</uName>
+      <uAcronym />
+      <uNamePreferred>Y</uNamePreferred>
+      <uUrl />
+      <oName>Universität Wien</oName>
+      <oAcronym />
+      <oNamePreferred>Y</oNamePreferred>
+      <oUrl>http://www.univie.ac.at/</oUrl>
+      <postalAddress>Fakultät für Philosopohie und Bildungswissenschaft, Universitätsstraße 7, A-1010 Wien</postalAddress>
+      <country>
+        <cIsoCode>AT</cIsoCode>
+        <cCountry>Austria</cCountry>
+      </country>
+      <paLatitude>48.209190</paLatitude>
+      <paLongitude>16.372740</paLongitude>
+      <paPhone />
+      <paFax />
+      <rDescription>This is a subject based institutional repository hosted by the Institute for Philosophy of the University of Vienna. The interface is primarily available in German only, as are virtually all the papers. However the search form is in English and there are plans to make it available in other European languages.</rDescription>
+      <rRemarks />
+      <rNumOfItems>1293</rNumOfItems>
+      <rDateHarvested>2010-02-09</rDateHarvested>
+      <rYearEstablished />
+      <repositoryType>Institutional</repositoryType>
+      <operationalStatus>Operational</operationalStatus>
+      <rSoftWareName>EPrints</rSoftWareName>
+      <rSoftWareVersion>3.1.3</rSoftWareVersion>
+      <classes>
+        <class>
+          <clCode>Cop</clCode>
+          <clTitle>Philosophy and Religion</clTitle>
+        </class>
+      </classes>
+      <languages>
+        <language>
+          <lIsoCode>de</lIsoCode>
+          <lName>German</lName>
+        </language>
+      </languages>
+      <contentTypes>
+        <contentType ctID="6">Theses and dissertations</contentType>
+        <contentType ctID="8">Books, chapters and sections</contentType>
+        <contentType ctID="14">Other special item types</contentType>
+        <contentType ctID="1">Journal articles</contentType>
+        <contentType ctID="7">Unpublished reports and working papers</contentType>
+      </contentTypes>
+      <policies>
+        <policy>
+          <policyType potID="1">Content</policyType>
+          <policyGrade pogID="5">Content policies defined</policyGrade>
+          <poStandard>
+            <item>This is an institutional or departmental repository.</item>
+            <item>The repository holds all types of materials.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="2">Metadata</policyType>
+          <policyGrade pogID="11">Metadata re-use permitted for not-for-profit purposes</policyGrade>
+          <poStandard>
+            <item>Anyone may access the metadata free of charge.</item>
+            <item>The metadata may be re-used in any medium without prior permission for not-for-profit purposes provided:
+              <subitems>
+                <subitem>the OAI Identifier or a link to the original metadata record are given</subitem>
+                <subitem>the repository is mentioned</subitem>
+              </subitems>
+            </item>
+            <item>The metadata must not be re-used in any medium for commercial purposes without formal permission.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="3">Data</policyType>
+          <policyGrade pogID="15">Full data item policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>Anyone may access full items free of charge.</item>
+            <item>No full-item re-use policy defined. Assume no rights at all have been granted.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="4">Submission</policyType>
+          <policyGrade pogID="26">Submission policies defined</policyGrade>
+          <poStandard>
+            <item>Items may only be deposited by accredited members of the institution</item>
+            <item>Authors may only submit their own work for archiving.</item>
+            <item>The administrator only vets items for relevance to the scope of the repository</item>
+            <item>The validity and authenticity of the content of submissions is not checked.</item>
+            <item>No embargo policy defined.</item>
+            <item>Any copyright violations are entirely the responsibility of the authors/depositors.</item>
+            <item>If the repository receives proof of copyright violation, the relevant item will be removed immediately.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="5">Preserve</policyType>
+          <policyGrade pogID="28">Preservation policies not stated</policyGrade>
+          <poStandard>
+            <item>No preservation policy defined.</item>
+          </poStandard>
+        </policy>
+      </policies>
+      <contacts>
+        <person>
+          <pName>H Hracovec</pName>
+          <pJobTitle>Site Administrator</pJobTitle>
+          <pEmail>hrachov@philo.at</pEmail>
+          <pPhone />
+        </person>
+      </contacts>
+    </repository>
+    <repository rID="777">
+      <rName>Elektronische Publikationen der Wirtschaftsuniversität Wien</rName>
+      <rAcronym>Epub WU</rAcronym>
+      <rNamePreferred>Y</rNamePreferred>
+      <rUrl>http://epub.wu.ac.at/</rUrl>
+      <rOaiBaseUrl>http://epub.wu.ac.at/cgi/oai2</rOaiBaseUrl>
+      <uName>Universtätsbibliothek (University Library)</uName>
+      <uAcronym />
+      <uNamePreferred>Y</uNamePreferred>
+      <uUrl>http://www.wu.ac.at/library</uUrl>
+      <oName>Wirtschaftsuniversität Wien (Vienna University of Economics)</oName>
+      <oAcronym>WU</oAcronym>
+      <oNamePreferred>Y</oNamePreferred>
+      <oUrl>http://www.wu.ac.at/</oUrl>
+      <postalAddress>Augasse 2-6, A-Wien</postalAddress>
+      <country>
+        <cIsoCode>AT</cIsoCode>
+        <cCountry>Austria</cCountry>
+      </country>
+      <paLatitude>48.230000</paLatitude>
+      <paLongitude>16.357000</paLongitude>
+      <paPhone>0131-3364990</paPhone>
+      <paFax />
+      <rDescription>This is the institutional repository of the WU Vienna University of Economics and Business. It provides access to the research output of the institution. Documents are available in full text. The interface is accessable in English.</rDescription>
+      <rRemarks />
+      <rNumOfItems>1216</rNumOfItems>
+      <rDateHarvested>2012-02-28</rDateHarvested>
+      <rYearEstablished />
+      <repositoryType>Institutional</repositoryType>
+      <operationalStatus>Operational</operationalStatus>
+      <rSoftWareName>EPrints</rSoftWareName>
+      <rSoftWareVersion>3</rSoftWareVersion>
+      <classes>
+        <class>
+          <clCode>Cub</clCode>
+          <clTitle>Business and Economics</clTitle>
+        </class>
+      </classes>
+      <languages>
+        <language>
+          <lIsoCode>de</lIsoCode>
+          <lName>German</lName>
+        </language>
+      </languages>
+      <contentTypes>
+        <contentType ctID="5">Conference and workshop papers</contentType>
+        <contentType ctID="6">Theses and dissertations</contentType>
+        <contentType ctID="7">Unpublished reports and working papers</contentType>
+      </contentTypes>
+      <policies>
+        <policy>
+          <policyType potID="1">Content</policyType>
+          <policyGrade pogID="5">Content policies defined</policyGrade>
+          <poStandard>
+            <item>This is an institutional or departmental repository.</item>
+            <item>The repository holds all types of materials.</item>
+            <item>Deposited items may include:
+              <subitems>
+                <subitem>working drafts</subitem>
+                <subitem>submitted versions (as sent to journals for peer-review)</subitem>
+                <subitem>accepted versions (author's final peer-reviewed drafts)</subitem>
+                <subitem>published versions (publisher-created files)</subitem>
+              </subitems>
+            </item>
+            <item>Items are individually tagged with:
+              <subitems>
+                <subitem>their version type and date.</subitem>
+                <subitem>their peer-review status.</subitem>
+                <subitem>their publication status.</subitem>
+              </subitems>
+            </item>
+            <item>For more information, please see webpage: <a href="http://epub.wu.ac.at/policies.html">http://epub.wu.ac.at/policies.html</a></item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="2">Metadata</policyType>
+          <policyGrade pogID="11">Metadata re-use permitted for not-for-profit purposes</policyGrade>
+          <poStandard>
+            <item>Anyone may access the metadata free of charge.</item>
+            <item>The metadata may be re-used in any medium without prior permission for not-for-profit purposes provided the OAI Identifier or a link to the original metadata record are given.</item>
+            <item>The metadata must not be re-used in any medium for commercial purposes without formal permission.</item>
+            <item>For more information, please see webpage: <a href="http://epub.wu.ac.at/policies.html">http://epub.wu.ac.at/policies.html</a></item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="3">Data</policyType>
+          <policyGrade pogID="19">Rights vary for the re-use of full data items</policyGrade>
+          <poStandard>
+            <item>Anyone may access full items free of charge.</item>
+            <item>Copies of full items generally can be:
+              <subitems>
+                <subitem> reproduced, and displayed or performed in any format or medium</subitem>
+                <subitem>for personal research or study, educational, or not-for-profit purposes without prior permission or charge.</subitem>
+              </subitems>
+  provided:
+              <subitems>
+                <subitem> the authors, title and full bibliographic details are given</subitem>
+                <subitem> a hyperlink and/or URL are given for the original metadata page</subitem>
+                <subitem> the content is not changed in any way</subitem>
+              </subitems>
+            </item>
+            <item> Full items must not be sold commercially in any format or medium without formal permission of the copyright holders.</item>
+            <item> Some full items are individually tagged with different rights permissions and conditions.</item>
+            <item>For more information see webpage: <a href="http://epub.wu.ac.at/policies.html">http://epub.wu.ac.at/policies.html</a>.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="4">Submission</policyType>
+          <policyGrade pogID="26">Submission policies defined</policyGrade>
+          <poStandard>
+            <item>Items may only be deposited by accredited members of the organisation, or their delegated agents.</item>
+            <item>Authors may only submit their own work for archiving.</item>
+            <item>The administrator only vets items for the eligibility of authors/depositors, relevance to the scope of the repository, valid layout &amp; format, and the exclusion of spam</item>
+            <item>The validity and authenticity of the content of submissions is the sole responsibility of the depositor.</item>
+            <item>No embargo policy defined.</item>
+            <item>Any copyright violations are entirely the responsibility of the authors/depositors.</item>
+            <item>If the repository receives proof of copyright violation, the relevant item will be removed immediately.</item>
+            <item>For more information see webpage: <a href="http://epub.wu.ac.at/policies.html">http://epub.wu.ac.at/policies.html</a></item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="5">Preserve</policyType>
+          <policyGrade pogID="31">Preservation policies defined</policyGrade>
+          <poStandard>
+            <item>Items will be retained indefinitely.</item>
+            <item>The repository will try to ensure continued readability and accessibility.</item>
+            <item>The repository regularly backs up its files according to current best practice.</item>
+            <item>The original bit stream is retained for all items, in addition to any upgraded formats.</item>
+            <item>Items may be removed at the request of the author/copyright holder, but this is strongly discouraged.</item>
+            <item>Withdrawn items are not deleted per se, but are removed from public view. </item>
+            <item>Withdrawn items' identifiers/URLs are retained indefinitely.</item>
+            <item>URLs will continue to point to 'tombstone' citations, to avoid broken links and to retain item histories.  </item>
+            <item>Changes to deposited items are not permitted.</item>
+            <item>Errata and corrigenda lists may be included with the original record if required.</item>
+            <item>If necessary, an updated version may be deposited.
+              <subitems>
+                <subitem>The item's persistent URL will always link to the latest version.</subitem>
+                <subitem>There will be links between earlier and later versions, with the most recent version clearly identified.</subitem>
+              </subitems>
+            </item>
+            <item>In the event of the repository being closed down, the database will be transferred to another appropriate archive.</item>
+            <item>For more information see webpage: <a href="http://epub.wu.ac.at/policies.html">http://epub.wu.ac.at/policies.html</a></item>
+          </poStandard>
+        </policy>
+      </policies>
+      <contacts>
+        <person>
+          <pName>Gertraud Novotny</pName>
+          <pJobTitle>Administrator</pJobTitle>
+          <pEmail>gertraud.novotny@wu.ac.at</pEmail>
+          <pPhone />
+        </person>
+        <person>
+          <pName />
+          <pJobTitle>OAI Administrator</pJobTitle>
+          <pEmail>epub@wu.ac.at</pEmail>
+          <pPhone />
+        </person>
+      </contacts>
+    </repository>
+    <repository rID="386">
+      <rName>Elektronisches Publikationsportal der Österreichischen Akademie der Wissenschaften</rName>
+      <rAcronym>epub.oeaw</rAcronym>
+      <rNamePreferred>Y</rNamePreferred>
+      <rUrl>http://epub.oeaw.ac.at/</rUrl>
+      <rOaiBaseUrl>http://epub.oeaw.ac.at/oai</rOaiBaseUrl>
+      <uName />
+      <uAcronym />
+      <uNamePreferred />
+      <uUrl />
+      <oName>Austrian Academy of Sciences</oName>
+      <oAcronym />
+      <oNamePreferred>Y</oNamePreferred>
+      <oUrl>http://www.oeaw.ac.at/</oUrl>
+      <postalAddress>Postgasse 7, A-1010 Wien</postalAddress>
+      <country>
+        <cIsoCode>AT</cIsoCode>
+        <cCountry>Austria</cCountry>
+      </country>
+      <paLatitude>48.250000</paLatitude>
+      <paLongitude>16.350000</paLongitude>
+      <paPhone />
+      <paFax />
+      <rDescription>This site is a repository providing access to the publication output of the organisation. However only a very small proportion of material is available via Open Access as this site is mainly concerned with subscription-only access to its eBook and printed publications. As such that material which is offered freely is intended to induce a purchasing activity from the reader. The main site interface is available in English or German, however the supporting information and help is in the latter only. Users may set up RSS feeds to be alerted to new content.</rDescription>
+      <rRemarks>Partners: Verlag der Österreichischen Akademie der Wissenschaften</rRemarks>
+      <rNumOfItems />
+      <rDateHarvested>2012-02-27</rDateHarvested>
+      <rYearEstablished>2006</rYearEstablished>
+      <repositoryType>Institutional</repositoryType>
+      <operationalStatus>Operational</operationalStatus>
+      <rSoftWareName>Hyperwave</rSoftWareName>
+      <rSoftWareVersion />
+      <classes>
+        <class>
+          <clCode>C</clCode>
+          <clTitle>Multidisciplinary</clTitle>
+        </class>
+      </classes>
+      <languages>
+        <language>
+          <lIsoCode>de</lIsoCode>
+          <lName>German</lName>
+        </language>
+        <language>
+          <lIsoCode>en</lIsoCode>
+          <lName>English</lName>
+        </language>
+      </languages>
+      <contentTypes>
+        <contentType ctID="8">Books, chapters and sections</contentType>
+      </contentTypes>
+      <policies>
+        <policy>
+          <policyType potID="1">Content</policyType>
+          <policyGrade pogID="3">Content policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>This is an institutional or departmental repository.</item>
+            <item>No content policy defined.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="2">Metadata</policyType>
+          <policyGrade pogID="8">Metadata re-use policy explicitly undefined</policyGrade>
+          <poStandard>
+            <item>Anyone may access the metadata free of charge.</item>
+            <item>No metadata re-use policy defined. Assume no rights at all have been granted.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="3">Data</policyType>
+          <policyGrade pogID="15">Full data item policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>Anyone may access full items free of charge.</item>
+            <item>No full-item re-use policy defined. Assume no rights at all have been granted.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="4">Submission</policyType>
+          <policyGrade pogID="24">Submission policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No submission policy defined.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="5">Preserve</policyType>
+          <policyGrade pogID="28">Preservation policies not stated</policyGrade>
+          <poStandard>
+            <item>No preservation policy defined.</item>
+          </poStandard>
+        </policy>
+      </policies>
+      <contacts>
+        <person>
+          <pName>Herwig Stöger</pName>
+          <pJobTitle>Administrator</pJobTitle>
+          <pEmail>herwig.stoeger@oeaw.ac.at</pEmail>
+          <pPhone />
+        </person>
+      </contacts>
+    </repository>
+    <repository rID="782">
+      <rName>European Research Papers Archive</rName>
+      <rAcronym>ERPA</rAcronym>
+      <rNamePreferred>Y</rNamePreferred>
+      <rUrl>http://eiop.or.at/erpa/</rUrl>
+      <rOaiBaseUrl>http://eiop.or.at/cgi-bin/oaiserv.pl</rOaiBaseUrl>
+      <uName />
+      <uAcronym />
+      <uNamePreferred />
+      <uUrl />
+      <oName>European Communities Studies Association Austria</oName>
+      <oAcronym>ECSA Austria</oAcronym>
+      <oNamePreferred>Y</oNamePreferred>
+      <oUrl>http://www2.wu-wien.ac.at/ecsa/</oUrl>
+      <postalAddress>Institut für Technikfolgen-Abschätzung, Österreichische Akademie der Wissenschaften, Strohgasse 45/5, A-1030 Wien</postalAddress>
+      <country>
+        <cIsoCode>AT</cIsoCode>
+        <cCountry>Austria</cCountry>
+      </country>
+      <paLatitude>48.230100</paLatitude>
+      <paLongitude>16.359200</paLongitude>
+      <paPhone>+43 1 51581 6583</paPhone>
+      <paFax>+43 1 710 98 83</paFax>
+      <rDescription>This site is an aggregating repository that contains a collection of research papers from ten European institutions. The site contains working papers on European Integration. The site interface is in English but several papers are written in French and German.</rDescription>
+      <rRemarks />
+      <rNumOfItems>1098</rNumOfItems>
+      <rDateHarvested>2007-07-17</rDateHarvested>
+      <rYearEstablished />
+      <repositoryType>Aggregating</repositoryType>
+      <operationalStatus>Operational</operationalStatus>
+      <rSoftWareName />
+      <rSoftWareVersion />
+      <classes>
+        <class>
+          <clCode>Cog</clCode>
+          <clTitle>Geography and Regional Studies</clTitle>
+        </class>
+        <class>
+          <clCode>Cub</clCode>
+          <clTitle>Business and Economics</clTitle>
+        </class>
+        <class>
+          <clCode>Cup</clCode>
+          <clTitle>Law and Politics</clTitle>
+        </class>
+      </classes>
+      <languages>
+        <language>
+          <lIsoCode>en</lIsoCode>
+          <lName>English</lName>
+        </language>
+        <language>
+          <lIsoCode>fr</lIsoCode>
+          <lName>French</lName>
+        </language>
+        <language>
+          <lIsoCode>de</lIsoCode>
+          <lName>German</lName>
+        </language>
+      </languages>
+      <contentTypes>
+        <contentType ctID="1">Journal articles</contentType>
+        <contentType ctID="7">Unpublished reports and working papers</contentType>
+      </contentTypes>
+      <policies>
+        <policy>
+          <policyType potID="1">Content</policyType>
+          <policyGrade pogID="5">Content policies defined</policyGrade>
+          <poStandard>
+            <item>This is a multi-institution subject-based repository.</item>
+            <item>Subject Specialities: 
+              <subitems>
+                <subitem>Multidisciplinary</subitem>
+                <subitem>History and Archaeology</subitem>
+                <subitem>Social Sciences General</subitem>
+                <subitem>Business and Economics</subitem>
+                <subitem>Law and Politics</subitem>
+              </subitems>
+            </item>
+            <item>The repository is restricted to:
+              <subitems>
+                <subitem>Journal articles</subitem>
+                <subitem>Conference and workshop papers</subitem>
+                <subitem>Unpublished reports and working papers</subitem>
+              </subitems>
+            </item>
+            <item>Deposited items may include:
+              <subitems>
+                <subitem>submitted versions (as sent to journals for peer-review)</subitem>
+                <subitem>accepted versions (author's final peer-reviewed drafts)</subitem>
+                <subitem>published versions (publisher-created files)</subitem>
+              </subitems>
+            </item>
+            <item>Principal Languages: English; German</item>
+            <item>For more information, please see webpage: <a href="http://eiop.or.at/erpa/erpainfo.htm">http://eiop.or.at/erpa/erpainfo.htm</a></item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="2">Metadata</policyType>
+          <policyGrade pogID="11">Metadata re-use permitted for not-for-profit purposes</policyGrade>
+          <poStandard>
+            <item>Anyone may access the metadata free of charge.</item>
+            <item>The metadata may be re-used in any medium without prior permission for not-for-profit purposes provided:
+              <subitems>
+                <subitem>the OAI Identifier or a link to the original metadata record are given</subitem>
+                <subitem>the repository is mentioned</subitem>
+              </subitems>
+            </item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="3">Data</policyType>
+          <policyGrade pogID="20">Re-use of full data items permitted for not-for-profit purposes</policyGrade>
+          <poStandard>
+            <item>Anyone may access full items free of charge.</item>
+            <item>Copies of full items generally can be:
+              <subitems>
+                <subitem> displayed or performed</subitem>
+                <subitem>for personal research or study purposes without prior permission or charge.</subitem>
+              </subitems>
+            </item>
+            <item> This repository is not the publisher; it is merely the online archive.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="4">Submission</policyType>
+          <policyGrade pogID="26">Submission policies defined</policyGrade>
+          <poStandard>
+            <item>Items may only be deposited by accredited members of the institution, or their delegated agents.</item>
+            <item>Eligible depositors must deposit bibliographic metadata for all their publications.</item>
+            <item>Eligible depositors must deposit full texts of all their publications.</item>
+            <item>No moderation policy defined. Assume nothing has been vetted.</item>
+            <item>The validity and authenticity of the content of submissions is the sole responsibility of the depositor.</item>
+            <item>No embargo policy defined.</item>
+            <item>Any copyright violations are entirely the responsibility of the authors/depositors.</item>
+            <item>For more information see webpage: <a href="http://eiop.or.at/erpa/policy.htm">http://eiop.or.at/erpa/policy.htm</a></item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="5">Preserve</policyType>
+          <policyGrade pogID="30">Preservation policies unclearly stated</policyGrade>
+          <poStandard>
+            <item>No retention period defined.</item>
+            <item>The repository will try to ensure continued readability and accessibility.</item>
+            <item>No file preservation policy defined.</item>
+            <item>No withdrawal policy defined.</item>
+            <item>Withdrawn items are deleted entirely from the database.</item>
+            <item>Withdrawn items' identifiers/URLs are not retained.</item>
+            <item>In the event of the repository being closed down, the database will be transferred to another appropriate archive.</item>
+          </poStandard>
+        </policy>
+      </policies>
+      <contacts>
+        <person>
+          <pName>Michael Nentwich</pName>
+          <pJobTitle>Site Administrator</pJobTitle>
+          <pEmail>mnent@oeaw.ac.at</pEmail>
+          <pPhone />
+        </person>
+      </contacts>
+    </repository>
+    <repository rID="1030">
+      <rName>OTHES</rName>
+      <rAcronym />
+      <rNamePreferred>Y</rNamePreferred>
+      <rUrl>http://othes.univie.ac.at/</rUrl>
+      <rOaiBaseUrl>https://othes.univie.ac.at/secure/cgi/oai2</rOaiBaseUrl>
+      <uName />
+      <uAcronym />
+      <uNamePreferred />
+      <uUrl />
+      <oName>Universität Wien</oName>
+      <oAcronym />
+      <oNamePreferred>Y</oNamePreferred>
+      <oUrl>http://www.univie.ac.at/</oUrl>
+      <postalAddress>Fakultät für Philosopohie und Bildungswissenschaft, Universitätsstraße 7, A-1010 Wien</postalAddress>
+      <country>
+        <cIsoCode>AT</cIsoCode>
+        <cCountry>Austria</cCountry>
+      </country>
+      <paLatitude>48.209190</paLatitude>
+      <paLongitude>16.372740</paLongitude>
+      <paPhone />
+      <paFax />
+      <rDescription>This is an institutional repository for the University of Vienna providing access to the thesis and dissertation output of the university. Users may set up Atom and RSS feeds to be alerted to new content.</rDescription>
+      <rRemarks />
+      <rNumOfItems>8066</rNumOfItems>
+      <rDateHarvested>2010-04-16</rDateHarvested>
+      <rYearEstablished />
+      <repositoryType>Institutional</repositoryType>
+      <operationalStatus>Operational</operationalStatus>
+      <rSoftWareName>EPrints</rSoftWareName>
+      <rSoftWareVersion>3.0.1-beta-2</rSoftWareVersion>
+      <classes>
+        <class>
+          <clCode>C</clCode>
+          <clTitle>Multidisciplinary</clTitle>
+        </class>
+      </classes>
+      <languages>
+        <language>
+          <lIsoCode>de</lIsoCode>
+          <lName>German</lName>
+        </language>
+      </languages>
+      <contentTypes>
+        <contentType ctID="6">Theses and dissertations</contentType>
+      </contentTypes>
+      <policies>
+        <policy>
+          <policyType potID="1">Content</policyType>
+          <policyGrade pogID="3">Content policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>This is an institutional or departmental repository.</item>
+            <item>No content policy defined.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="2">Metadata</policyType>
+          <policyGrade pogID="8">Metadata re-use policy explicitly undefined</policyGrade>
+          <poStandard>
+            <item>Anyone may access the metadata free of charge.</item>
+            <item>No metadata re-use policy defined. Assume no rights at all have been granted.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="3">Data</policyType>
+          <policyGrade pogID="15">Full data item policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>Anyone may access full items free of charge.</item>
+            <item>No full-item re-use policy defined. Assume no rights at all have been granted.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="4">Submission</policyType>
+          <policyGrade pogID="24">Submission policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No submission policy defined.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="5">Preserve</policyType>
+          <policyGrade pogID="29">Preservation policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No preservation policy defined.</item>
+          </poStandard>
+        </policy>
+      </policies>
+      <contacts>
+        <person>
+          <pName>Adelheid Mayer</pName>
+          <pJobTitle>Administrator</pJobTitle>
+          <pEmail>adelheid.mayer@univie.ac.at</pEmail>
+          <pPhone />
+        </person>
+        <person>
+          <pName />
+          <pJobTitle />
+          <pEmail>thesis-help.ub@univie.ac.at</pEmail>
+          <pPhone />
+        </person>
+      </contacts>
+    </repository>
+    <repository rID="1726">
+      <rName>Permanent Hosting, Archiving and Indexing of Digital Resources and Assets</rName>
+      <rAcronym>Phaidra</rAcronym>
+      <rNamePreferred>N</rNamePreferred>
+      <rUrl>https://phaidra.univie.ac.at/</rUrl>
+      <rOaiBaseUrl />
+      <uName />
+      <uAcronym />
+      <uNamePreferred />
+      <uUrl />
+      <oName>Universität Wien</oName>
+      <oAcronym />
+      <oNamePreferred>Y</oNamePreferred>
+      <oUrl>http://www.univie.ac.at/</oUrl>
+      <postalAddress>Fakultät für Philosopohie und Bildungswissenschaft, Universitätsstraße 7, A-1010 Wien</postalAddress>
+      <country>
+        <cIsoCode>AT</cIsoCode>
+        <cCountry>Austria</cCountry>
+      </country>
+      <paLatitude>48.209190</paLatitude>
+      <paLongitude>16.372740</paLongitude>
+      <paPhone />
+      <paFax />
+      <rDescription>This site provides access to the digitised copies of the institutions collection as well as teaching material. The interface is in German.</rDescription>
+      <rRemarks />
+      <rNumOfItems />
+      <rDateHarvested>2010-02-17</rDateHarvested>
+      <rYearEstablished />
+      <repositoryType>Institutional</repositoryType>
+      <operationalStatus>Operational</operationalStatus>
+      <rSoftWareName>Fedora</rSoftWareName>
+      <rSoftWareVersion />
+      <classes>
+        <class>
+          <clCode>C</clCode>
+          <clTitle>Multidisciplinary</clTitle>
+        </class>
+      </classes>
+      <languages>
+        <language>
+          <lIsoCode>de</lIsoCode>
+          <lName>German</lName>
+        </language>
+      </languages>
+      <contentTypes>
+        <contentType ctID="8">Books, chapters and sections</contentType>
+        <contentType ctID="10">Learning Objects</contentType>
+        <contentType ctID="11">Multimedia and audio-visual materials</contentType>
+      </contentTypes>
+      <policies>
+        <policy>
+          <policyType potID="1">Content</policyType>
+          <policyGrade pogID="3">Content policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="2">Metadata</policyType>
+          <policyGrade pogID="8">Metadata re-use policy explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="3">Data</policyType>
+          <policyGrade pogID="15">Full data item policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="4">Submission</policyType>
+          <policyGrade pogID="24">Submission policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="5">Preserve</policyType>
+          <policyGrade pogID="29">Preservation policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+      </policies>
+      <contacts>
+        <person>
+          <pName>Paolo Budroni</pName>
+          <pJobTitle>Administrator</pJobTitle>
+          <pEmail>paolo.budroni@univie.ac.at</pEmail>
+          <pPhone />
+        </person>
+      </contacts>
+    </repository>
+    <repository rID="1276">
+      <rName>textfeld</rName>
+      <rAcronym />
+      <rNamePreferred>Y</rNamePreferred>
+      <rUrl>http://www.textfeld.ac.at/</rUrl>
+      <rOaiBaseUrl />
+      <uName />
+      <uAcronym />
+      <uNamePreferred />
+      <uUrl />
+      <oName>textfeld society for advancement of academic potential</oName>
+      <oAcronym />
+      <oNamePreferred>Y</oNamePreferred>
+      <oUrl>http://textfeld.ac.at/</oUrl>
+      <postalAddress>Wien</postalAddress>
+      <country>
+        <cIsoCode>AT</cIsoCode>
+        <cCountry>Austria</cCountry>
+      </country>
+      <paLatitude>48.239300</paLatitude>
+      <paLongitude>16.369600</paLongitude>
+      <paPhone />
+      <paFax />
+      <rDescription>This site provides access to publications by students and young scholars of all fields. Interface is in German.</rDescription>
+      <rRemarks />
+      <rNumOfItems>514</rNumOfItems>
+      <rDateHarvested>2012-02-13</rDateHarvested>
+      <rYearEstablished />
+      <repositoryType>Aggregating</repositoryType>
+      <operationalStatus>Operational</operationalStatus>
+      <rSoftWareName />
+      <rSoftWareVersion />
+      <classes>
+        <class>
+          <clCode>C</clCode>
+          <clTitle>Multidisciplinary</clTitle>
+        </class>
+      </classes>
+      <languages>
+        <language>
+          <lIsoCode>de</lIsoCode>
+          <lName>German</lName>
+        </language>
+      </languages>
+      <contentTypes>
+        <contentType ctID="1">Journal articles</contentType>
+        <contentType ctID="6">Theses and dissertations</contentType>
+      </contentTypes>
+      <policies>
+        <policy>
+          <policyType potID="1">Content</policyType>
+          <policyGrade pogID="3">Content policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="2">Metadata</policyType>
+          <policyGrade pogID="8">Metadata re-use policy explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="3">Data</policyType>
+          <policyGrade pogID="15">Full data item policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="4">Submission</policyType>
+          <policyGrade pogID="24">Submission policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+        <policy>
+          <policyType potID="5">Preserve</policyType>
+          <policyGrade pogID="29">Preservation policies explicitly undefined</policyGrade>
+          <poStandard>
+            <item>No policy registered in OpenDOAR.</item>
+          </poStandard>
+        </policy>
+      </policies>
+      <contacts />
+    </repository>
+    <repository rID="2402">
+      <rName>Repository of Belarusian National Technical University (BNTU)</rName>
+      <rAcronym />
+      <rNamePreferred>Y</rNamePreferred>
+      <rUrl>http://rep.bntu.by/</rUrl>
+      <rOaiBaseUrl />
+      <uName />
+      <uAcronym />
+      <uNamePreferred />
+      <uUrl />
+      <oName>Belarusian National Technical University</oName>
+      <oAcronym />
+      <oNamePreferred>Y</oNamePreferred>
+      <oUrl>http://www.bntu.by/</oUrl>
+      <postalAddress />
+      <country>
+        <cIsoCode>BY</cIsoCode>
+        <cCountry>Belarus</cCountry>
+      </country>
+      <paLatitude>53.922100</paLatitude>
+      <paLongitude>27.590700</paLongitude>
+      <paPhone />
+      <paFax />
+      <rDescription>This site provides access to the research output of the institution. The interface is available in Russian and English. Users may set up RSS feeds to be alerted to new content.</rDescription>
+      <rRemarks />
+      <rNumOfItems>286</rNumOfItems>
+      <rDateHarvested>2012-01-26</rDateHarvested>
+      <rYearEstablished />
+      <repositoryType>Institutional</repositoryType>
+      <operationalStatus>Operational</operationalStatus>
+      <rSoftWareName>DSpace</rSoftWareName>
+      <rSoftWareVersion />
+      <classes>
+        <class>
+          <clCode>C</clCode>
+          <clTitle>Multidisciplinary</clTitle>
+        </class>
+      </classes>
+      <languages>
+        <language>
+          <lIsoCode>en</lIsoCode>
+          <lName>English</lName>
+        </language>
+        <language>
+          <lIsoCode>ru</lIsoCode>
+          <lName>Russian</lName>
+        </language>
+      </languages>
+      <contentTypes>
+        <contentType ctID="1">Journal articles</contentType>
+        <contentType ctID="8">Books, chapters and sections</contentType>
+        <contentType ctID="10">Learning Objects</contentType>
+      </contentTypes>
+      <policies />
+      <contacts>
+        <person>
+          <pName>Alexey Skalaban</pName>
+          <pJobTitle>Administrator</pJobTitle>
+          <pEmail>skalaban@gmail.com</pEmail>
+          <pPhone />
+        </person>
+      </contacts>
+    </repository>
+  </repositories>
+</OpenDOAR>

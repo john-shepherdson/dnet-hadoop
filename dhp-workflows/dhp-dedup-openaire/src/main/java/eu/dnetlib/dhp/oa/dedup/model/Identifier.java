@@ -3,20 +3,21 @@ package eu.dnetlib.dhp.oa.dedup.model;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.google.common.collect.Sets;
-
 import eu.dnetlib.dhp.oa.dedup.DatePicker;
+import eu.dnetlib.dhp.oa.dedup.IdentifierComparator;
 import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
-import eu.dnetlib.dhp.schema.oaf.utils.PidComparator;
+import eu.dnetlib.dhp.schema.oaf.Field;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 
 public class Identifier<T extends OafEntity> implements Serializable, Comparable<Identifier<T>> {
@@ -49,7 +50,7 @@ public class Identifier<T extends OafEntity> implements Serializable, Comparable
 		if (Objects.nonNull(date)) {
 			return date;
 		} else {
-			String sDate = BASE_DATE;
+			String sDate = LocalDate.now().plusDays(1).toString();
 			if (ModelSupport.isSubClass(getEntity(), Result.class)) {
 				Result result = (Result) getEntity();
 				if (isWellformed(result.getDateofacceptance())) {
@@ -83,60 +84,12 @@ public class Identifier<T extends OafEntity> implements Serializable, Comparable
 		return entity.getId();
 	}
 
-	private PidType getPidType() {
+	public PidType getPidType() {
 		return PidType.tryValueOf(StringUtils.substringBefore(StringUtils.substringAfter(entity.getId(), "|"), "_"));
 	}
 
 	@Override
 	public int compareTo(Identifier<T> i) {
-		// priority in comparisons: 1) pidtype, 2) collectedfrom (depending on the entity type) , 3) date 4)
-		// alphabetical order of the originalID
-
-		Set<String> lKeys = Optional
-			.ofNullable(getCollectedFrom())
-			.map(c -> c.stream().map(KeyValue::getKey).collect(Collectors.toSet()))
-			.orElse(Sets.newHashSet());
-
-		final Optional<List<KeyValue>> cf = Optional.ofNullable(i.getCollectedFrom());
-		Set<String> rKeys = cf
-			.map(c -> c.stream().map(KeyValue::getKey).collect(Collectors.toSet()))
-			.orElse(Sets.newHashSet());
-
-		if (this.getPidType().compareTo(i.getPidType()) == 0) { // same type
-			if (getEntityType() == EntityType.publication) {
-				if (isFromDatasourceID(lKeys, ModelConstants.CROSSREF_ID)
-					&& !isFromDatasourceID(rKeys, ModelConstants.CROSSREF_ID))
-					return -1;
-				if (isFromDatasourceID(rKeys, ModelConstants.CROSSREF_ID)
-					&& !isFromDatasourceID(lKeys, ModelConstants.CROSSREF_ID))
-					return 1;
-			}
-			if (getEntityType() == EntityType.dataset) {
-				if (isFromDatasourceID(lKeys, ModelConstants.DATACITE_ID)
-					&& !isFromDatasourceID(rKeys, ModelConstants.DATACITE_ID))
-					return -1;
-				if (isFromDatasourceID(rKeys, ModelConstants.DATACITE_ID)
-					&& !isFromDatasourceID(lKeys, ModelConstants.DATACITE_ID))
-					return 1;
-			}
-
-			if (this.getDate().compareTo(i.getDate()) == 0) {// same date
-				// we need to take the alphabetically lower id
-				return this.getOriginalID().compareTo(i.getOriginalID());
-			} else
-				// we need to take the elder date
-				return this.getDate().compareTo(i.getDate());
-		} else {
-			return new PidComparator<>(getEntity()).compare(toSP(getPidType()), toSP(i.getPidType()));
-		}
-
-	}
-
-	private StructuredProperty toSP(PidType pidType) {
-		return OafMapperUtils.structuredProperty("", pidType.toString(), pidType.toString(), "", "", new DataInfo());
-	}
-
-	public boolean isFromDatasourceID(Set<String> collectedFrom, String dsId) {
-		return collectedFrom.contains(dsId);
+		return IdentifierComparator.compareIdentifiers(this, i);
 	}
 }

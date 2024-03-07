@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+        xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+        xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <header xmlns="http://namespace.openaire.eu/">
+        <dri:objIdentifier>od______3272::6a4d00217a024a46ce9697ce98b13c2a</dri:objIdentifier>
+        <dri:recordIdentifier>oai:idus.us.es:11441/118940</dri:recordIdentifier>
+        <dri:dateOfCollection/>
+        <dri:mdFormat/>
+        <dri:mdFormatInterpretation/>
+        <dri:repositoryId/>
+        <dr:objectIdentifier/>
+        <dr:dateOfCollection>2021-08-20T12:32:32.826Z</dr:dateOfCollection>
+        <dr:dateOfTransformation>2023-07-04T15:47:55.397Z</dr:dateOfTransformation>
+        <oaf:datasourceprefix>od______3272</oaf:datasourceprefix>
+    </header>
+    <metadata xmlns="http://namespace.openaire.eu/">
+        <dc:title>El museo pictorico y escala optica : tomo I : theorica de la pintura en que se describe su origen ... y se aprueban con demonstraciomes mathematicas y filosoficas, sus mas radicales fundamentos</dc:title>
+        <dc:creator>Palomino de Castro y Velasco, Antonio, 1653-1726</dc:creator>
+        <dc:contributor>Rovira y Brocandel, Hipólito, 1693-1765</dc:contributor>
+        <dc:contributor>Palomino de Castro y Velasco, Antonio, 1653-1726</dc:contributor>
+        <dc:date>2021-08-12T08:59:53Z</dc:date>
+        <dc:date>1715</dc:date>
+        <dc:description>A 042(a)/063</dc:description>
+        <dc:format>application/pdf</dc:format>
+        <dc:identifier>https://idus.us.es/handle//11441/118940</dc:identifier>
+        <dc:language>spa</dc:language>
+        <dc:publisher>En Madrid : por Lucas Antonio de Bedmar ... : vendese en casa de Don Joseph de Villar y Villanueva, 1715</dc:publisher>
+        <dc:type>info:eu-repo/semantics/book</dc:type>
+        <dc:type>info:eu-repo/semantics/publishedVersion</dc:type>
+        <dr:CobjCategory type="publication">0002</dr:CobjCategory>
+        <oaf:dateAccepted>1715-01-01</oaf:dateAccepted>
+        <oaf:embargoenddate/>
+        <oaf:collectedDatasourceid>opendoar____::3272</oaf:collectedDatasourceid>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:hostedBy id="opendoar____::3272" name="idUS. Depósito de Investigación de la Universidad de Sevilla."/>
+        <oaf:collectedFrom id="opendoar____::3272" name="idUS. Depósito de Investigación de la Universidad de Sevilla."/>
+        <oaf:identifier identifierType="landingPage">https://idus.us.es/handle//11441/118940</oaf:identifier>
+        <oaf:journal eissn="" ep="" iss="" issn="" sp="" vol=""/>
+        <oaf:license>http://creativecommons.org/licenses/by-nc-nd/4.0/</oaf:license>
+    </metadata>
+    <about>
+        <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+            <originDescription altered="true" harvestDate="2021-08-20T12:32:32.826Z">
+                <baseURL>http%3A%2F%2Fidus.us.es%2Foai%2Fdriver</baseURL>
+                <identifier>oai:idus.us.es:11441/118940</identifier>
+                <datestamp>2021-08-12T08:59:54Z</datestamp>
+                <metadataNamespace>http://www.openarchives.org/OAI/2.0/oai_dc/</metadataNamespace>
+            </originDescription>
+        </provenance>
+        <oaf:datainfo>
+            <oaf:inferred>false</oaf:inferred>
+            <oaf:deletedbyinference>false</oaf:deletedbyinference>
+            <oaf:trust>0.9</oaf:trust>
+            <oaf:inferenceprovenance/>
+            <oaf:provenanceaction classid="sysimport:crosswalk:repository"
+                                  classname="sysimport:crosswalk:repository"
+                                  schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+        </oaf:datainfo>
+    </about>
+</record>

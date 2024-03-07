@@ -44,12 +44,17 @@
             <description>the database schema according to the D-Net infrastructure (beta or production)</description>
         </property>
         <property>
+            <name>openOrgsAction</name>
+            <value>openorgs_dedup</value>
+            <description>The action to be executed during the import for OpenOrgs</description>
+        </property>
+        <property>
             <name>isLookupUrl</name>
             <description>the address of the lookUp service</description>
         </property>
         <property>
             <name>nsPrefixBlacklist</name>
-            <value></value>
+            <value>foo</value>
             <description>a blacklist of nsprefixes (comma separeted)</description>
         </property>
         <property>
@@ -156,7 +161,7 @@
             <arg>--postgresUser</arg><arg>${postgresOpenOrgsUser}</arg>
             <arg>--postgresPassword</arg><arg>${postgresOpenOrgsPassword}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--action</arg><arg>openorgs_dedup</arg>
+            <arg>--action</arg><arg>${openOrgsAction}</arg>
             <arg>--dbschema</arg><arg>${dbSchema}</arg>
             <arg>--nsPrefixBlacklist</arg><arg>${nsPrefixBlacklist}</arg>
         </java>

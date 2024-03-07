@@ -1,0 +1,388 @@
+{
+  "collectedfrom": [
+    {
+      "key": "10|openaire____::13068d7823ea0bd86516ac2cb66e96ba",
+      "value": "Jurnal Fakultas Sastra Universitas Ekasakti",
+      "dataInfo": null
+    }
+  ],
+  "dataInfo": {
+    "invisible": false,
+    "inferred": false,
+    "deletedbyinference": false,
+    "trust": "0.900",
+    "inferenceprovenance": null,
+    "provenanceaction": {
+      "classid": "sysimport:crosswalk:entityregistry",
+      "classname": "sysimport:crosswalk:entityregistry",
+      "schemeid": "dnet:provenanceActions",
+      "schemename": "dnet:provenanceActions"
+    }
+  },
+  "lastupdatetimestamp": 1645012035118,
+  "id": "10|274269ac6f3b::2a2e2793b500f3f7b47ef24b1a9277b7",
+  "originalId": [
+    "274269ac6f3b::2579-5449",
+    "piwik:13"
+  ],
+  "dateofcollection": "2020-01-21",
+  "dateoftransformation": null,
+  "extraInfo": [],
+  "oaiprovenance": null,
+  "datasourcetype": {
+    "classid": "pubsrepository::journal",
+    "classname": "Journal",
+    "schemeid": "dnet:datasource_typologies",
+    "schemename": "dnet:datasource_typologies"
+  },
+  "datasourcetypeui": {
+    "classid": "pubsrepository::journal",
+    "classname": "Journal archive",
+    "schemeid": "dnet:datasource_typologies_ui",
+    "schemename": "dnet:datasource_typologies_ui"
+  },
+  "pid": [
+    {
+      "value": "r3d100010218",
+      "qualifier": {
+        "classid": "re3data",
+        "classname": "Registry of research data repositories",
+        "schemeid": "dnet:pid_types",
+        "schemename": "dnet:pid_types"
+      }
+    }
+  ],
+  "eosctype": {
+    "classid": "Data Source",
+    "classname": "Data Source",
+    "schemeid": "dnet:eosc_types",
+    "schemename": "dnet:eosc_types"
+  },
+  "eoscdatasourcetype": {
+    "classid": "Journal archive",
+    "classname": "Journal archive",
+    "schemeid": "dnet:eosc_datasource_types",
+    "schemename": "dnet:eosc_datasource_types"
+  },
+  "openairecompatibility": {
+    "classid": "hostedBy",
+    "classname": "hostedBy",
+    "schemeid": "dnet:datasourceCompatibilityLevel",
+    "schemename": "dnet:datasourceCompatibilityLevel"
+  },
+  "officialname": {
+    "value": "Jurnal Ilmiah Pendidikan Scholastic",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.900",
+      "inferenceprovenance": null,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "englishname": {
+    "value": "Jurnal Ilmiah Pendidikan Scholastic",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.900",
+      "inferenceprovenance": null,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "websiteurl": {
+    "value": "http://e-journal.sastra-unes.com/index.php/JIPS/index",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.900",
+      "inferenceprovenance": null,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "logourl": null,
+  "contactemail": {
+    "value": "test@test.it",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.900",
+      "inferenceprovenance": null,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "namespaceprefix": {
+    "value": "ojs_25795449",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.900",
+      "inferenceprovenance": null,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "latitude": {
+    "value": "0.0",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.900",
+      "inferenceprovenance": null,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "longitude": {
+    "value": "0.0",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.900",
+      "inferenceprovenance": null,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "dateofvalidation": null,
+  "description": {
+    "value": "veterinary medicine",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.900",
+      "inferenceprovenance": null,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "subjects": [],
+  "odnumberofitems": {
+    "value": "0.0",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.900",
+      "inferenceprovenance": null,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "odnumberofitemsdate": null,
+  "odpolicies": null,
+  "odlanguages": [
+    {
+      "value": "English",
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.900",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:entityregistry",
+          "classname": "sysimport:crosswalk:entityregistry",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    },
+    {
+      "value": "German",
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.900",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:entityregistry",
+          "classname": "sysimport:crosswalk:entityregistry",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    }
+  ],
+  "languages" : [ "English", "German" ],
+  "accessinfopackage": [
+    {
+      "value": "http://www.revista.vocesdelaeducacion.com.mx/index.php/index/oai",
+      "dataInfo": {
+        "invisible": false,
+        "inferred": false,
+        "deletedbyinference": false,
+        "trust": "0.900",
+        "inferenceprovenance": null,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:entityregistry",
+          "classname": "sysimport:crosswalk:entityregistry",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        }
+      }
+    }
+  ],
+  "releasestartdate": null,
+  "releaseenddate": null,
+  "missionstatementurl": null,
+  "dataprovider": {
+    "value": false,
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.900",
+      "inferenceprovenance": null,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "serviceprovider": {
+    "value": false,
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.900",
+      "inferenceprovenance": null,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "databaseaccesstype": null,
+  "datauploadtype": null,
+  "databaseaccessrestriction": null,
+  "datauploadrestriction": null,
+  "versioning": {
+    "value": false,
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.900",
+      "inferenceprovenance": null,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "versioncontrol": false,
+  "citationguidelineurl": null,
+  "qualitymanagementkind": null,
+  "pidsystems": null,
+  "certificates": null,
+  "policies": [],
+  "journal": {
+    "name": "Jurnal Ilmiah Pendidikan Scholastic",
+    "issnPrinted": "2579-5449",
+    "issnOnline": "2579-5448",
+    "issnLinking": "2579-5447",
+    "ep": null,
+    "iss": null,
+    "sp": null,
+    "vol": null,
+    "edition": null,
+    "conferenceplace": null,
+    "conferencedate": null,
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.900",
+      "inferenceprovenance": null,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      }
+    }
+  },
+  "researchentitytypes":[ "Research Data" ],
+  "providedentitytypes": null,
+  "providedproducttypes": null,
+  "jurisdiction": {
+    "classid": "National",
+    "classname": "National",
+    "schemeid": "eosc:jurisdictions",
+    "schemename": "eosc:jurisdictions"
+  },
+  "thematic": true,
+  "contentpolicies": [
+    {
+      "classid": "Journal article",
+      "classname": "Journal article",
+      "schemeid": "eosc:contentpolicies",
+      "schemename": "eosc:contentpolicies"
+    }
+  ],
+  "submissionpolicyurl": null,
+  "preservationpolicyurl" : "Permanent Archiving https://datadryad.org/stash/faq",
+  "researchproductaccesspolicies": [
+    "https://100percentit.com/legal/"
+  ],
+  "researchproductmetadataaccesspolicies": [
+    "https://wenmr.science.uu.nl/conditions"
+  ]
+}

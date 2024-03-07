@@ -29,8 +29,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Dataset;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
@@ -38,16 +37,17 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.project.SparkAtomicActionJob;
 import eu.dnetlib.dhp.actionmanager.ror.model.ExternalIdType;
 import eu.dnetlib.dhp.actionmanager.ror.model.RorOrganization;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.Constants;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
@@ -60,10 +60,8 @@ public class GenerateRorActionSetJob {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	private static final String ROR_NS_PREFIX = "ror_________";
-
 	private static final List<KeyValue> ROR_COLLECTED_FROM = listKeyValues(
-		"10|openaire____::993a7ae7a863813cf95028b50708e222", "ROR");
+		Constants.ROR_OPENAIRE_ID, Constants.ROR_DATASOURCE_NAME);
 
 	private static final DataInfo ROR_DATA_INFO = dataInfo(
 		false, "", false, false, ENTITYREGISTRY_PROVENANCE_ACTION, "0.92");
@@ -112,25 +110,22 @@ public class GenerateRorActionSetJob {
 		final String outputPath) throws IOException {
 
 		readInputPath(spark, inputPath)
-			.map(
-				(MapFunction<RorOrganization, Organization>) GenerateRorActionSetJob::convertRorOrg,
-				Encoders.bean(Organization.class))
-			.toJavaRDD()
-			.map(o -> new AtomicAction<>(Organization.class, o))
+			.map(GenerateRorActionSetJob::convertRorOrg)
+			.flatMap(List::iterator)
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
 			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
 	}
 
-	protected static Organization convertRorOrg(final RorOrganization r) {
+	protected static List<AtomicAction<? extends Oaf>> convertRorOrg(final RorOrganization r) {
 
 		final Date now = new Date();
 
 		final Organization o = new Organization();
 
-		o.setId(String.format("20|%s::%s", ROR_NS_PREFIX, DHPUtils.md5(r.getId())));
-		o.setOriginalId(Arrays.asList(String.format("%s::%s", ROR_NS_PREFIX, r.getId())));
+		o.setId(calculateOpenaireId(r.getId()));
+		o.setOriginalId(Arrays.asList(String.format("%s::%s", Constants.ROR_NS_PREFIX, r.getId())));
 		o.setCollectedfrom(ROR_COLLECTED_FROM);
 		o.setPid(pids(r));
 		o.setDateofcollection(now.toString());
@@ -166,7 +161,15 @@ public class GenerateRorActionSetJob {
 		o.setDataInfo(ROR_DATA_INFO);
 		o.setLastupdatetimestamp(now.getTime());
 
-		return o;
+		final List<AtomicAction<? extends Oaf>> res = new ArrayList<>();
+		res.add(new AtomicAction<>(Organization.class, o));
+
+		return res;
+
+	}
+
+	public static String calculateOpenaireId(final String rorId) {
+		return String.format("20|%s::%s", Constants.ROR_NS_PREFIX, DHPUtils.md5(rorId));
 	}
 
 	private static List<StructuredProperty> pids(final RorOrganization r) {
@@ -202,14 +205,14 @@ public class GenerateRorActionSetJob {
 			.collect(Collectors.toList());
 	}
 
-	private static Dataset<RorOrganization> readInputPath(
+	private static JavaRDD<RorOrganization> readInputPath(
 		final SparkSession spark,
 		final String path) throws IOException {
 
 		try (final FileSystem fileSystem = FileSystem.get(new Configuration());
 			final InputStream is = fileSystem.open(new Path(path))) {
 			final RorOrganization[] arr = OBJECT_MAPPER.readValue(is, RorOrganization[].class);
-			return spark.createDataset(Arrays.asList(arr), Encoders.bean(RorOrganization.class));
+			return spark.createDataset(Arrays.asList(arr), Encoders.bean(RorOrganization.class)).toJavaRDD();
 		}
 	}
 

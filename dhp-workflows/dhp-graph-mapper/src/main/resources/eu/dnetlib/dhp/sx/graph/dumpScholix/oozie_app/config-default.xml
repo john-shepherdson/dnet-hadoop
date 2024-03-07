@@ -1,0 +1,10 @@
+<configuration>
+    <property>
+        <name>oozie.use.system.libpath</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>oozie.action.sharelib.for.spark</name>
+        <value>spark2</value>
+    </property>
+</configuration>

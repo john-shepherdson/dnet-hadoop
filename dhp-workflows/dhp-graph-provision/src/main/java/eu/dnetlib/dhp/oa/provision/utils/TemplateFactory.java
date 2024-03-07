@@ -8,10 +8,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.swing.text.html.Option;
 
 import org.apache.commons.lang3.StringUtils;
 import org.stringtemplate.v4.ST;
+
+import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
@@ -94,13 +99,15 @@ public class TemplateFactory {
 	}
 
 	public String getInstance(
-		final String resultId, final List<String> instancemetadata, final List<String> webresources) {
+		final List<String> instancemetadata, final String url) {
 		return getTemplate(resources.getInstance())
-			.add("instanceId", escapeXml(removePrefix(resultId)))
 			.add("metadata", instancemetadata)
 			.add(
 				"webresources",
-				(webresources != null ? webresources : new ArrayList<String>())
+				Optional
+					.ofNullable(url)
+					.map(u -> Lists.newArrayList(url))
+					.orElse(Lists.newArrayList())
 					.stream()
 					.filter(StringUtils::isNotBlank)
 					.map(this::getWebResource)

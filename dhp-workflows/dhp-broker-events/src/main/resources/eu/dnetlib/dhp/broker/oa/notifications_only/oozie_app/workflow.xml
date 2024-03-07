@@ -98,6 +98,11 @@
             <name>spark2EventLogDir</name>
             <description>spark 2.* event log dir location</description>
         </property>
+        <property>
+        	<name>sparkMaxExecutorsForIndexing</name>
+        	<value>8</value>
+        	<description>Max number of workers for ElasticSearch indexing</description>
+        </property>
     </parameters>
 
     <global>
@@ -119,11 +124,35 @@
         </configuration>
     </global>
 
-    <start to="index_notifications"/>
+    <start to="generate_notifications"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
+    
+     <action name="generate_notifications">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>GenerateNotificationsJob</name>
+            <class>eu.dnetlib.dhp.broker.oa.GenerateNotificationsJob</class>
+            <jar>dhp-broker-events-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=3840
+            </spark-opts>
+            <arg>--outputDir</arg><arg>${outputDir}</arg>
+            <arg>--brokerApiBaseUrl</arg><arg>${brokerApiBaseUrl}</arg>
+        </spark>
+        <ok to="index_notifications"/>
+        <error to="Kill"/>
+    </action>
     
     <action name="index_notifications">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -135,7 +164,7 @@
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
-                --conf spark.dynamicAllocation.maxExecutors="8" 
+                --conf spark.dynamicAllocation.maxExecutors=${sparkMaxExecutorsForIndexing} 
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}

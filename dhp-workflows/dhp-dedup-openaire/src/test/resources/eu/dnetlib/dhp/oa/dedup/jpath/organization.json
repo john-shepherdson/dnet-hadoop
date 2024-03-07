@@ -1,0 +1,241 @@
+{
+  "dataInfo": {
+    "invisible": false,
+    "inferred": false,
+    "deletedbyinference": false,
+    "trust": "0.810000002384185791",
+    "inferenceprovenance": "",
+    "provenanceaction": {
+      "classid": "sysimport:crosswalk:entityregistry",
+      "classname": "sysimport:crosswalk:entityregistry",
+      "schemeid": "dnet:provenance_actions",
+      "schemename": "dnet:provenance_actions"
+    }
+  },
+  "lastupdatetimestamp": 1584960968152,
+  "id": "20|corda__h2020::9faf23721249f26ac2c16eb857ea1fb9",
+  "originalId": ["corda__h2020::927957582"],
+  "collectedfrom": [
+    {
+      "key": "openaire____::corda_h2020",
+      "value": "CORDA - COmmon Research DAta Warehouse - Horizon 2020",
+      "dataInfo": null
+    }
+  ],
+  "pid": [],
+  "dateofcollection": "2016-06-05",
+  "dateoftransformation": "2019-11-19",
+  "extraInfo": [],
+  "oaiprovenance": null,
+  "legalshortname": {
+    "value": "Comentor AB",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.810000002384185791",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenance_actions",
+        "schemename": "dnet:provenance_actions"
+      }
+    }
+  },
+  "legalname": {
+    "value": "Comentor AB",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.810000002384185791",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenance_actions",
+        "schemename": "dnet:provenance_actions"
+      }
+    }
+  },
+  "alternativeNames": [],
+  "websiteurl": {
+    "value": "http://www.comentor.se",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.810000002384185791",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenance_actions",
+        "schemename": "dnet:provenance_actions"
+      }
+    }
+  },
+  "logourl": null,
+  "eclegalbody": {
+    "value": "false",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.810000002384185791",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenance_actions",
+        "schemename": "dnet:provenance_actions"
+      }
+    }
+  },
+  "eclegalperson": {
+    "value": "true",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.810000002384185791",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenance_actions",
+        "schemename": "dnet:provenance_actions"
+      }
+    }
+  },
+  "ecnonprofit": {
+    "value": "false",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.810000002384185791",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenance_actions",
+        "schemename": "dnet:provenance_actions"
+      }
+    }
+  },
+  "ecresearchorganization": {
+    "value": "false",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.810000002384185791",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenance_actions",
+        "schemename": "dnet:provenance_actions"
+      }
+    }
+  },
+  "echighereducation": {
+    "value": "false",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.810000002384185791",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenance_actions",
+        "schemename": "dnet:provenance_actions"
+      }
+    }
+  },
+  "ecinternationalorganizationeurinterests": {
+    "value": "false",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.810000002384185791",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenance_actions",
+        "schemename": "dnet:provenance_actions"
+      }
+    }
+  },
+  "ecinternationalorganization": {
+    "value": "false",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.810000002384185791",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenance_actions",
+        "schemename": "dnet:provenance_actions"
+      }
+    }
+  },
+  "ecenterprise": {
+    "value": "false",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.810000002384185791",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenance_actions",
+        "schemename": "dnet:provenance_actions"
+      }
+    }
+  },
+  "ecsmevalidated": {
+    "value": "true",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.810000002384185791",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenance_actions",
+        "schemename": "dnet:provenance_actions"
+      }
+    }
+  },
+  "ecnutscode": {
+    "value": "false",
+    "dataInfo": {
+      "invisible": false,
+      "inferred": false,
+      "deletedbyinference": false,
+      "trust": "0.810000002384185791",
+      "inferenceprovenance": "",
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:entityregistry",
+        "classname": "sysimport:crosswalk:entityregistry",
+        "schemeid": "dnet:provenance_actions",
+        "schemename": "dnet:provenance_actions"
+      }
+    }
+  },
+  "country": null
+}

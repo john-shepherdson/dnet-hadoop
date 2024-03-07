@@ -22,4 +22,11 @@ public class CountrySbs implements Serializable {
 	public void setClassname(String classname) {
 		this.classname = classname;
 	}
+
+	public static CountrySbs newInstance(String classid, String classname) {
+		CountrySbs csbs = new CountrySbs();
+		csbs.classid = classid;
+		csbs.classname = classname;
+		return csbs;
+	}
 }

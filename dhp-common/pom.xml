@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>eu.dnetlib.dhp</groupId>
 		<artifactId>dhp</artifactId>
-		<version>1.2.4-SNAPSHOT</version>
+		<version>1.2.5-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 
 	</parent>
@@ -13,9 +13,60 @@
 	<artifactId>dhp-common</artifactId>
 	<packaging>jar</packaging>
 
+	<distributionManagement>
+		<site>
+			<id>DHPSite</id>
+			<url>${dhp.site.stage.path}/dhp-common</url>
+		</site>
+	</distributionManagement>
+
 	<description>This module contains common utilities meant to be used across the dnet-hadoop submodules</description>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>scala-maven-plugin</artifactId>
+				<version>${net.alchim31.maven.version}</version>
+				<executions>
+					<execution>
+						<id>scala-compile-first</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>add-source</goal>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>scala-test-compile</id>
+						<phase>process-test-resources</phase>
+						<goals>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>scala-doc</id>
+						<phase>process-resources</phase> <!-- or wherever -->
+						<goals>
+							<goal>doc</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<failOnMultipleScalaVersions>true</failOnMultipleScalaVersions>
+					<scalaCompatVersion>${scala.binary.version}</scalaCompatVersion>
+					<scalaVersion>${scala.version}</scalaVersion>
+				</configuration>
+			</plugin>
+		</plugins>
+
+	</build>
 
 	<dependencies>
+		<dependency>
+			<groupId>eu.dnetlib.dhp</groupId>
+			<artifactId>dhp-pace-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
@@ -32,11 +83,11 @@
 
 		<dependency>
 			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-core_2.11</artifactId>
+			<artifactId>spark-core_${scala.binary.version}</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-sql_2.11</artifactId>
+			<artifactId>spark-sql_${scala.binary.version}</artifactId>
 		</dependency>
 
 		<dependency>
@@ -99,11 +150,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>eu.dnetlib</groupId>
-			<artifactId>dnet-pace-core</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 		</dependency>
@@ -115,7 +161,7 @@
 
 		<dependency>
 			<groupId>eu.dnetlib.dhp</groupId>
-			<artifactId>dhp-schemas</artifactId>
+			<artifactId>${dhp-schemas.artifact}</artifactId>
 		</dependency>
 
 		<dependency>

@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +44,7 @@ public class PropagationConstant {
 
 	public final static String NULL = "NULL";
 
-	public static final String INSTITUTIONAL_REPO_TYPE = "pubsrepository::institutional";
+	public static final String INSTITUTIONAL_REPO_TYPE = "institutional";
 
 	public static final String PROPAGATION_DATA_INFO_TYPE = "propagation";
 
@@ -55,6 +56,12 @@ public class PropagationConstant {
 	public static final String PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_ID = "result:organization:instrepo";
 	public static final String PROPAGATION_RELATION_RESULT_ORGANIZATION_INST_REPO_CLASS_NAME = "Propagation of affiliation to result collected from datasources of type institutional repository";
 
+	public static final String PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_ID = "result:organization:semrel";
+	public static final String PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_NAME = "Propagation of affiliation to result through semantic relations";
+
+	public static final String PROPAGATION_RELATION_PROJECT_ORGANIZATION_SEM_REL_CLASS_ID = "project:organization:semrel";
+	public static final String PROPAGATION_RELATION_PROJECT_ORGANIZATION_SEM_REL_CLASS_NAME = "Propagation of participation to project through semantic relations";
+
 	public static final String PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_ID = "result:project:semrel";
 	public static final String PROPAGATION_RELATION_RESULT_PROJECT_SEM_REL_CLASS_NAME = "Propagation of result to project through semantic relation";
 
@@ -64,8 +71,18 @@ public class PropagationConstant {
 	public static final String PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_ID = "result:community:organization";
 	public static final String PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_NAME = " Propagation of result belonging to community through organization";
 
+	public static final String PROPAGATION_RESULT_COMMUNITY_PROJECT_CLASS_ID = "result:community:project";
+	public static final String PROPAGATION_RESULT_COMMUNITY_PROJECT_CLASS_NAME = " Propagation of result belonging to community through project";
+
 	public static final String PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_ID = "authorpid:result";
 	public static final String PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME = "Propagation of authors pid to result through semantic relations";
+
+	public static final String ITERATION_ONE = "ExitAtFirstIteration";
+	public static final String ITERATION_TWO = "ExitAtSecondIteration";
+	public static final String ITERATION_THREE = "ExitAtThirdIteration";
+	public static final String ITERATION_FOUR = "ExitAtFourthIteration";
+	public static final String ITERATION_FIVE = "ExitAtFifthIteration";
+	public static final String ITERATION_NO_PARENT = "ExitAtNoFirstParentReached";
 
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -127,6 +144,74 @@ public class PropagationConstant {
 		return pa;
 	}
 
+	public static ArrayList<Relation> getOrganizationRelationPair(String orgId,
+		String resultId,
+		String classID,
+		String className
+
+	) {
+		ArrayList<Relation> newRelations = new ArrayList();
+		newRelations
+			.add(
+				getRelation(
+					orgId,
+					resultId,
+					ModelConstants.IS_AUTHOR_INSTITUTION_OF,
+					ModelConstants.RESULT_ORGANIZATION,
+					ModelConstants.AFFILIATION,
+					PROPAGATION_DATA_INFO_TYPE,
+					classID,
+					className));
+		newRelations
+			.add(
+				getRelation(
+					resultId,
+					orgId,
+					ModelConstants.HAS_AUTHOR_INSTITUTION,
+					ModelConstants.RESULT_ORGANIZATION,
+					ModelConstants.AFFILIATION,
+					PROPAGATION_DATA_INFO_TYPE,
+					classID,
+					className));
+
+		return newRelations;
+	}
+
+	public static Relation getRelation(String source, String target, String rel_class) {
+		if (ModelConstants.HAS_PARTICIPANT.equals(rel_class)) {
+			return getParticipantRelation(source, target, rel_class);
+		} else
+			return getAffiliationRelation(source, target, rel_class);
+	}
+
+	public static Relation getParticipantRelation(
+		String source,
+		String target,
+		String rel_class) {
+		return getRelation(
+			source, target,
+			rel_class,
+			ModelConstants.PROJECT_ORGANIZATION,
+			ModelConstants.PARTICIPATION,
+			PROPAGATION_DATA_INFO_TYPE,
+			PROPAGATION_RELATION_PROJECT_ORGANIZATION_SEM_REL_CLASS_ID,
+			PROPAGATION_RELATION_PROJECT_ORGANIZATION_SEM_REL_CLASS_NAME);
+	}
+
+	public static Relation getAffiliationRelation(
+		String source,
+		String target,
+		String rel_class) {
+		return getRelation(
+			source, target,
+			rel_class,
+			ModelConstants.RESULT_ORGANIZATION,
+			ModelConstants.AFFILIATION,
+			PROPAGATION_DATA_INFO_TYPE,
+			PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_ID,
+			PROPAGATION_RELATION_RESULT_ORGANIZATION_SEM_REL_CLASS_NAME);
+	}
+
 	public static Relation getRelation(
 		String source,
 		String target,
@@ -184,10 +269,15 @@ public class PropagationConstant {
 
 	public static <R> Dataset<R> readPath(
 		SparkSession spark, String inputPath, Class<R> clazz) {
-		return spark
-			.read()
-			.textFile(inputPath)
-			.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
+
+		if (HdfsSupport.exists(inputPath, spark.sparkContext().hadoopConfiguration())) {
+			return spark
+				.read()
+				.textFile(inputPath)
+				.map((MapFunction<String, R>) value -> OBJECT_MAPPER.readValue(value, clazz), Encoders.bean(clazz));
+		} else {
+			return spark.emptyDataset(Encoders.bean(clazz));
+		}
 	}
 
 }

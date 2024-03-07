@@ -23,7 +23,7 @@ public class DownloadCSV {
 
 	private static final Logger log = LoggerFactory.getLogger(DownloadCSV.class);
 
-	public static final char DEFAULT_DELIMITER = ';';
+	public static final char DEFAULT_DELIMITER = ',';
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -39,9 +39,6 @@ public class DownloadCSV {
 
 		final String fileURL = parser.get("fileURL");
 		log.info("fileURL {}", fileURL);
-
-		final String workingPath = parser.get("workingPath");
-		log.info("workingPath {}", workingPath);
 
 		final String outputFile = parser.get("outputFile");
 		log.info("outputFile {}", outputFile);
@@ -63,31 +60,15 @@ public class DownloadCSV {
 
 		FileSystem fileSystem = FileSystem.get(conf);
 
-		new DownloadCSV().doDownload(fileURL, workingPath, outputFile, classForName, delimiter, fileSystem);
+		new DownloadCSV().doDownload(fileURL, outputFile, classForName, delimiter, fileSystem);
 
 	}
 
-	protected void doDownload(String fileURL, String workingPath, String outputFile, String classForName,
+	protected void doDownload(String fileURL, String outputFile, String classForName,
 		char delimiter, FileSystem fs)
 		throws IOException, ClassNotFoundException, CollectorException {
 
-		final HttpConnector2 connector2 = new HttpConnector2();
-
-		final Path path = new Path(workingPath + "/replaced.csv");
-
-		try (BufferedReader in = new BufferedReader(
-			new InputStreamReader(connector2.getInputSourceAsStream(fileURL)))) {
-
-			try (PrintWriter writer = new PrintWriter(
-				new OutputStreamWriter(fs.create(path, true), StandardCharsets.UTF_8))) {
-				String line;
-				while ((line = in.readLine()) != null) {
-					writer.println(line.replace("\\\"", "\""));
-				}
-			}
-		}
-
-		try (InputStreamReader reader = new InputStreamReader(fs.open(path))) {
+		try (InputStreamReader reader = new InputStreamReader(new HttpConnector2().getInputSourceAsStream(fileURL))) {
 			GetCSV.getCsv(fs, reader, outputFile, classForName, delimiter);
 		}
 	}

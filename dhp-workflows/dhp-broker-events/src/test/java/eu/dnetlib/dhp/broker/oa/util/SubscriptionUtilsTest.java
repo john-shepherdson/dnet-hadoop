@@ -8,7 +8,7 @@ import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
 
-class SubscriptionUtilsTest {
+public class SubscriptionUtilsTest {
 
 	@Test
 	void testVerifyListSimilar() {
@@ -41,6 +41,18 @@ class SubscriptionUtilsTest {
 
 		assertTrue(SubscriptionUtils.verifyDateRange(date, "2010-01-01", "2011-01-01"));
 		assertFalse(SubscriptionUtils.verifyDateRange(date, "2020-01-01", "2021-01-01"));
+
+		assertTrue(SubscriptionUtils.verifyDateRange(date, "2010-01-01", "NULL"));
+		assertTrue(SubscriptionUtils.verifyDateRange(date, "2010-01-01", null));
+		assertTrue(SubscriptionUtils.verifyDateRange(date, "NULL", "2011-01-01"));
+		assertTrue(SubscriptionUtils.verifyDateRange(date, null, "2011-01-01"));
+		assertTrue(SubscriptionUtils.verifyDateRange(date, "NULL", "NULL"));
+		assertTrue(SubscriptionUtils.verifyDateRange(date, null, null));
+
+		assertFalse(SubscriptionUtils.verifyDateRange(date, "2020-01-01", null));
+		assertFalse(SubscriptionUtils.verifyDateRange(date, "2020-01-01", "NULL"));
+		assertFalse(SubscriptionUtils.verifyDateRange(date, null, "2005-01-01"));
+		assertFalse(SubscriptionUtils.verifyDateRange(date, "NULL", "2005-01-01"));
 	}
 
 	@Test

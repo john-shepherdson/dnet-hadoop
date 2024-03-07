@@ -3,6 +3,8 @@ package eu.dnetlib.dhp.schema.oaf.utils;
 
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
+import java.sql.Array;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -47,6 +49,17 @@ public class OafMapperUtils {
 	}
 
 	public static Result mergeResults(Result left, Result right) {
+
+		final boolean leftFromDelegatedAuthority = isFromDelegatedAuthority(left);
+		final boolean rightFromDelegatedAuthority = isFromDelegatedAuthority(right);
+
+		if (leftFromDelegatedAuthority && !rightFromDelegatedAuthority) {
+			return left;
+		}
+		if (!leftFromDelegatedAuthority && rightFromDelegatedAuthority) {
+			return right;
+		}
+
 		if (new ResultTypeComparator().compare(left, right) < 0) {
 			left.mergeFrom(right);
 			return left;
@@ -54,6 +67,18 @@ public class OafMapperUtils {
 			right.mergeFrom(left);
 			return right;
 		}
+	}
+
+	private static boolean isFromDelegatedAuthority(Result r) {
+		return Optional
+			.ofNullable(r.getInstance())
+			.map(
+				instance -> instance
+					.stream()
+					.filter(i -> Objects.nonNull(i.getCollectedfrom()))
+					.map(i -> i.getCollectedfrom().getKey())
+					.anyMatch(cfId -> IdentifierFactory.delegatedAuthorityDatasourceIds().contains(cfId)))
+			.orElse(false);
 	}
 
 	public static KeyValue keyValue(final String k, final String v) {
@@ -95,6 +120,17 @@ public class OafMapperUtils {
 			.collect(Collectors.toList());
 	}
 
+	public static <T> List<T> listValues(Array values) throws SQLException {
+		if (Objects.isNull(values)) {
+			return null;
+		}
+		return Arrays
+			.stream((T[]) values.getArray())
+			.filter(Objects::nonNull)
+			.distinct()
+			.collect(Collectors.toList());
+	}
+
 	public static List<Field<String>> listFields(final DataInfo info, final List<String> values) {
 		return values
 			.stream()
@@ -104,8 +140,30 @@ public class OafMapperUtils {
 			.collect(Collectors.toList());
 	}
 
+	public static InstanceTypeMapping instanceTypeMapping(String originalType, String code, String label,
+		String vocabularyName) {
+		final InstanceTypeMapping m = new InstanceTypeMapping();
+		m.setVocabularyName(vocabularyName);
+		m.setOriginalType(originalType);
+		m.setTypeCode(code);
+		m.setTypeLabel(label);
+		return m;
+	}
+
+	public static InstanceTypeMapping instanceTypeMapping(String originalType, Qualifier term) {
+		return instanceTypeMapping(originalType, term.getClassid(), term.getClassname(), term.getSchemeid());
+	}
+
+	public static InstanceTypeMapping instanceTypeMapping(String originalType) {
+		return instanceTypeMapping(originalType, null, null, null);
+	}
+
+	public static InstanceTypeMapping instanceTypeMapping(String originalType, String vocabularyName) {
+		return instanceTypeMapping(originalType, null, null, vocabularyName);
+	}
+
 	public static Qualifier unknown(final String schemeid, final String schemename) {
-		return qualifier("UNKNOWN", "Unknown", schemeid, schemename);
+		return qualifier(UNKNOWN, "Unknown", schemeid, schemename);
 	}
 
 	public static AccessRight accessRight(
@@ -153,6 +211,17 @@ public class OafMapperUtils {
 		return q;
 	}
 
+	public static Subject subject(
+		final String value,
+		final String classid,
+		final String classname,
+		final String schemeid,
+		final String schemename,
+		final DataInfo dataInfo) {
+
+		return subject(value, qualifier(classid, classname, schemeid, schemename), dataInfo);
+	}
+
 	public static StructuredProperty structuredProperty(
 		final String value,
 		final String classid,
@@ -162,6 +231,20 @@ public class OafMapperUtils {
 		final DataInfo dataInfo) {
 
 		return structuredProperty(value, qualifier(classid, classname, schemeid, schemename), dataInfo);
+	}
+
+	public static Subject subject(
+		final String value,
+		final Qualifier qualifier,
+		final DataInfo dataInfo) {
+		if (value == null) {
+			return null;
+		}
+		final Subject s = new Subject();
+		s.setValue(value);
+		s.setQualifier(qualifier);
+		s.setDataInfo(dataInfo);
+		return s;
 	}
 
 	public static StructuredProperty structuredProperty(
@@ -367,5 +450,89 @@ public class OafMapperUtils {
 			return rights;
 		}
 		return null;
+	}
+
+	public static KeyValue newKeyValueInstance(String key, String value, DataInfo dataInfo) {
+		KeyValue kv = new KeyValue();
+		kv.setDataInfo(dataInfo);
+		kv.setKey(key);
+		kv.setValue(value);
+		return kv;
+	}
+
+	public static Measure newMeasureInstance(String id, String value, String key, DataInfo dataInfo) {
+		Measure m = new Measure();
+		m.setId(id);
+		m.setUnit(Arrays.asList(newKeyValueInstance(key, value, dataInfo)));
+		return m;
+	}
+
+	public static Relation getRelation(final String source,
+		final String target,
+		final String relType,
+		final String subRelType,
+		final String relClass,
+		final OafEntity entity) {
+		return getRelation(source, target, relType, subRelType, relClass, entity, null);
+	}
+
+	public static Relation getRelation(final String source,
+		final String target,
+		final String relType,
+		final String subRelType,
+		final String relClass,
+		final OafEntity entity,
+		final String validationDate) {
+		return getRelation(
+			source, target, relType, subRelType, relClass, entity.getCollectedfrom(), entity.getDataInfo(),
+			entity.getLastupdatetimestamp(), validationDate, null);
+	}
+
+	public static Relation getRelation(final String source,
+		final String target,
+		final String relType,
+		final String subRelType,
+		final String relClass,
+		final List<KeyValue> collectedfrom,
+		final DataInfo dataInfo,
+		final Long lastupdatetimestamp) {
+		return getRelation(
+			source, target, relType, subRelType, relClass, collectedfrom, dataInfo, lastupdatetimestamp, null, null);
+	}
+
+	public static Relation getRelation(final String source,
+		final String target,
+		final String relType,
+		final String subRelType,
+		final String relClass,
+		final List<KeyValue> collectedfrom,
+		final DataInfo dataInfo,
+		final Long lastupdatetimestamp,
+		final String validationDate,
+		final List<KeyValue> properties) {
+		final Relation rel = new Relation();
+		rel.setRelType(relType);
+		rel.setSubRelType(subRelType);
+		rel.setRelClass(relClass);
+		rel.setSource(source);
+		rel.setTarget(target);
+		rel.setCollectedfrom(collectedfrom);
+		rel.setDataInfo(dataInfo);
+		rel.setLastupdatetimestamp(lastupdatetimestamp);
+		rel.setValidated(StringUtils.isNotBlank(validationDate));
+		rel.setValidationDate(StringUtils.isNotBlank(validationDate) ? validationDate : null);
+		rel.setProperties(properties);
+		return rel;
+	}
+
+	public static String getProvenance(DataInfo dataInfo) {
+		return Optional
+			.ofNullable(dataInfo)
+			.map(
+				d -> Optional
+					.ofNullable(d.getProvenanceaction())
+					.map(Qualifier::getClassid)
+					.orElse(""))
+			.orElse("");
 	}
 }

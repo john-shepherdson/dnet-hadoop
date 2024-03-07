@@ -40,7 +40,7 @@ SELECT
                 LEFT OUTER JOIN projectpids pp ON (pp.project = p.id)
                 LEFT OUTER JOIN dsm_identities i ON (i.pid = pp.pid)
 
-                LEFT OUTER JOIN dsm_datasources dc ON (dc.id = p.collectedfrom)
+                LEFT OUTER JOIN dsm_services dc ON (dc.id = p.collectedfrom)
 
                 LEFT OUTER JOIN project_fundingpath pf ON (pf.project = p.id)
                 LEFT OUTER JOIN fundingpaths fp ON (fp.id = pf.funding)

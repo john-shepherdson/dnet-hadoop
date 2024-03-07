@@ -75,9 +75,14 @@ public class DHPUtils {
 
 		final HttpGet req = new HttpGet(url);
 
+		log.info("MDStoreManager request: {}", req);
+
 		try (final CloseableHttpClient client = HttpClients.createDefault()) {
 			try (final CloseableHttpResponse response = client.execute(req)) {
 				final String json = IOUtils.toString(response.getEntity().getContent());
+
+				log.info("MDStoreManager response: {}", json);
+
 				final MDStoreWithInfo[] mdstores = objectMapper.readValue(json, MDStoreWithInfo[].class);
 				return Arrays
 					.stream(mdstores)

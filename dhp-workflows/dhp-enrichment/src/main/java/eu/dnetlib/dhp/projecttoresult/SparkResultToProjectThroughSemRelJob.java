@@ -33,7 +33,7 @@ public class SparkResultToProjectThroughSemRelJob {
 			.toString(
 				SparkResultToProjectThroughSemRelJob.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/projecttoresult/input_projecttoresult_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/projecttoresult/input_projecttoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -64,7 +64,7 @@ public class SparkResultToProjectThroughSemRelJob {
 					removeOutputDir(spark, outputPath);
 				}
 				execPropagation(
-					spark, outputPath, alreadyLinkedPath, potentialUpdatePath, saveGraph);
+					spark, outputPath, alreadyLinkedPath, potentialUpdatePath);
 			});
 	}
 
@@ -72,24 +72,23 @@ public class SparkResultToProjectThroughSemRelJob {
 		SparkSession spark,
 		String outputPath,
 		String alreadyLinkedPath,
-		String potentialUpdatePath,
-		Boolean saveGraph) {
+		String potentialUpdatePath) {
 
 		Dataset<ResultProjectSet> toaddrelations = readPath(spark, potentialUpdatePath, ResultProjectSet.class);
 		Dataset<ResultProjectSet> alreadyLinked = readPath(spark, alreadyLinkedPath, ResultProjectSet.class);
 
-		if (saveGraph) {
-			toaddrelations
-				.joinWith(
-					alreadyLinked,
-					toaddrelations.col("resultId").equalTo(alreadyLinked.col("resultId")),
-					"left_outer")
-				.flatMap(mapRelationRn(), Encoders.bean(Relation.class))
-				.write()
-				.mode(SaveMode.Append)
-				.option("compression", "gzip")
-				.json(outputPath);
-		}
+		// if (saveGraph) {
+		toaddrelations
+			.joinWith(
+				alreadyLinked,
+				toaddrelations.col("resultId").equalTo(alreadyLinked.col("resultId")),
+				"left_outer")
+			.flatMap(mapRelationRn(), Encoders.bean(Relation.class))
+			.write()
+			.mode(SaveMode.Append)
+			.option("compression", "gzip")
+			.json(outputPath);
+		// }
 	}
 
 	private static FlatMapFunction<Tuple2<ResultProjectSet, ResultProjectSet>, Relation> mapRelationRn() {

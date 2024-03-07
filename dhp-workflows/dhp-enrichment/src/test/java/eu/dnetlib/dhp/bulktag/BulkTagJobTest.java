@@ -6,6 +6,7 @@ import static eu.dnetlib.dhp.bulktag.community.TaggingConstants.ZENODO_COMMUNITY
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -24,22 +25,24 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Software;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class BulkTagJobTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	public static final String MOCK_IS_LOOK_UP_URL = "BASEURL:8280/is/services/isLookUp";
-
 	public static final String pathMap = "{ \"author\" : \"$['author'][*]['fullname']\","
 		+ "  \"title\" : \"$['title'][*]['value']\","
 		+ "  \"orcid\" : \"$['author'][*]['pid'][*][?(@['key']=='ORCID')]['value']\","
 		+ "  \"contributor\" : \"$['contributor'][*]['value']\","
-		+ "  \"description\" : \"$['description'][*]['value']\"}";
+		+ "  \"description\" : \"$['description'][*]['value']\", "
+		+ " \"subject\" :\"$['subject'][*]['value']\" , " +
+		"\"fos\" : \"$['subject'][?(@['qualifier']['classid']=='FOS')].value\"," +
+		"\"sdg\" : \"$['subject'][?(@['qualifier']['classid']=='SDG')].value\"," +
+		"\"hostedby\" : \"$['instance'][*]['hostedby']['key']\" , " +
+		"\"collectedfrom\" : \"$['instance'][*]['collectedfrom']['key']\"," +
+		"\"publisher\":\"$['publisher'].value\"," +
+		"\"publicationyear\":\"$['dateofacceptance'].value\"} ";
 
 	private static SparkSession spark;
 
@@ -55,7 +58,7 @@ public class BulkTagJobTest {
 				.toString(
 					BulkTagJobTest.class
 						.getResourceAsStream(
-							"/eu/dnetlib/dhp/bulktag/communityconfiguration/tagging_conf.xml"));
+							"/eu/dnetlib/dhp/bulktag/communityconfiguration/tagging_conf_remove.xml"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -95,14 +98,11 @@ public class BulkTagJobTest {
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath",
-					getClass().getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/no_updates").getPath(),
+					getClass().getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/no_updates/").getPath(),
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+					"-outputPath", workingDir.toString() + "/",
 					"-pathMap", pathMap
 				});
 
@@ -130,19 +130,16 @@ public class BulkTagJobTest {
 	@Test
 	void bulktagBySubjectNoPreviousContextTest() throws Exception {
 		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject/nocontext")
+			.getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject/nocontext/")
 			.getPath();
 		final String pathMap = BulkTagJobTest.pathMap;
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+					"-outputPath", workingDir.toString() + "/",
 					"-pathMap", pathMap
 				});
 
@@ -227,19 +224,19 @@ public class BulkTagJobTest {
 	void bulktagBySubjectPreviousContextNoProvenanceTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject/contextnoprovenance")
+				"/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject/contextnoprovenance/")
 			.getPath();
 		final String pathMap = BulkTagJobTest.pathMap;
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -308,18 +305,18 @@ public class BulkTagJobTest {
 	@Test
 	void bulktagByDatasourceTest() throws Exception {
 		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/bulktag/sample/publication/update_datasource")
+			.getResource("/eu/dnetlib/dhp/bulktag/sample/publication/update_datasource/")
 			.getPath();
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Publication",
-					"-outputPath", workingDir.toString() + "/publication",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -381,25 +378,25 @@ public class BulkTagJobTest {
 	void bulktagByZenodoCommunityTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/bulktag/sample/otherresearchproduct/update_zenodocommunity")
+				"/eu/dnetlib/dhp/bulktag/sample/otherresearchproduct/update_zenodocommunity/")
 			.getPath();
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.OtherResearchProduct",
-					"-outputPath", workingDir.toString() + "/orp",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<OtherResearchProduct> tmp = sc
-			.textFile(workingDir.toString() + "/orp")
+			.textFile(workingDir.toString() + "/otherresearchproduct")
 			.map(item -> OBJECT_MAPPER.readValue(item, OtherResearchProduct.class));
 
 		Assertions.assertEquals(10, tmp.count());
@@ -502,18 +499,18 @@ public class BulkTagJobTest {
 	@Test
 	void bulktagBySubjectDatasourceTest() throws Exception {
 		final String sourcePath = getClass()
-			.getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject_datasource")
+			.getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject_datasource/")
 			.getPath();
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -536,6 +533,7 @@ public class BulkTagJobTest {
 			+ "where MyD.inferenceprovenance = 'bulktagging'";
 
 		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
+
 		Assertions.assertEquals(7, idExplodeCommunity.count());
 
 		Assertions
@@ -633,13 +631,14 @@ public class BulkTagJobTest {
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
-					"-sourcePath", getClass().getResource("/eu/dnetlib/dhp/bulktag/sample/software/").getPath(),
+					"-sourcePath",
+					getClass().getResource("/eu/dnetlib/dhp/bulktag/sample/software/").getPath(),
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Software",
-					"-outputPath", workingDir.toString() + "/software",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -678,7 +677,7 @@ public class BulkTagJobTest {
 		Assertions.assertEquals(3, idExplodeCommunity.filter("community = 'covid-19'").count());
 		Assertions.assertEquals(1, idExplodeCommunity.filter("community = 'dh-ch'").count());
 		Assertions.assertEquals(4, idExplodeCommunity.filter("community = 'aginfra'").count());
-		Assertions.assertEquals(1, idExplodeCommunity.filter("community = 'dariah'").count());
+		Assertions.assertEquals(1, idExplodeCommunity.filter("community = 'dth'").count());
 		Assertions.assertEquals(1, idExplodeCommunity.filter("community = 'fam'").count());
 
 		Assertions
@@ -688,7 +687,7 @@ public class BulkTagJobTest {
 					.filter(
 						"provenance = 'community:zenodocommunity' and "
 							+ "id = '50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4' and ("
-							+ "community = 'dh-ch' or community = 'dariah')")
+							+ "community = 'dh-ch' or community = 'dth')")
 					.count());
 
 		query = "select id, MyT.id community, size(MyT.datainfo) datainfosize "
@@ -728,18 +727,18 @@ public class BulkTagJobTest {
 
 		final String sourcePath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/bulktag/sample/dataset/update_datasourcewithconstraints")
+				"/eu/dnetlib/dhp/bulktag/sample/dataset/update_datasourcewithconstraints/")
 			.getPath();
 		SparkBulkTagJob
 			.main(
 				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
+
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
-					"-resultTableName", "eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath", workingDir.toString() + "/dataset",
-					"-isLookUpUrl", MOCK_IS_LOOK_UP_URL,
+
+					"-outputPath", workingDir.toString() + "/",
+
 					"-pathMap", pathMap
 				});
 
@@ -749,7 +748,7 @@ public class BulkTagJobTest {
 			.textFile(workingDir.toString() + "/dataset")
 			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
 
-		Assertions.assertEquals(10, tmp.count());
+		Assertions.assertEquals(12, tmp.count());
 		org.apache.spark.sql.Dataset<Dataset> verificationDataset = spark
 			.createDataset(tmp.rdd(), Encoders.bean(Dataset.class));
 
@@ -763,10 +762,842 @@ public class BulkTagJobTest {
 		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
 
 		idExplodeCommunity.show(false);
-		Assertions.assertEquals(3, idExplodeCommunity.count());
+
+	}
+
+	@Test
+	void bulkTagOtherJupyter() throws Exception {
+		final String sourcePath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/eosctag/jupyter/")
+			.getPath();
+
+		SparkBulkTagJob
+			.main(
+				new String[] {
+
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath", sourcePath,
+					"-taggingConf", taggingConf,
+
+					"-outputPath", workingDir.toString() + "/",
+
+					"-pathMap", pathMap
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		Assertions
 			.assertEquals(
-				3, idExplodeCommunity.filter("provenance = 'community:datasource'").count());
+				10, sc
+					.textFile(workingDir.toString() + "/otherresearchproduct")
+					.map(item -> OBJECT_MAPPER.readValue(item, OtherResearchProduct.class))
+					.count());
+
+		Assertions
+			.assertEquals(
+				0, sc
+					.textFile(workingDir.toString() + "/otherresearchproduct")
+					.map(item -> OBJECT_MAPPER.readValue(item, OtherResearchProduct.class))
+					.filter(
+						orp -> orp
+							.getSubject()
+							.stream()
+							.anyMatch(sbj -> sbj.getValue().equals("EOSC::Jupyter Notebook")))
+					.count());
+
+		Assertions
+			.assertEquals(
+				0, sc
+					.textFile(workingDir.toString() + "/otherresearchproduct")
+					.map(item -> OBJECT_MAPPER.readValue(item, OtherResearchProduct.class))
+					.filter(
+						orp -> orp
+							.getSubject()
+							.stream()
+							.anyMatch(eig -> eig.getValue().equals("EOSC::Jupyter Notebook")))
+					.count());
+
 	}
+
+	@Test
+	public void bulkTagDatasetJupyter() throws Exception {
+		final String sourcePath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/eosctag/jupyter/")
+			.getPath();
+		SparkBulkTagJob
+			.main(
+				new String[] {
+
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath", sourcePath,
+					"-taggingConf", taggingConf,
+
+					"-outputPath", workingDir.toString() + "/",
+
+					"-pathMap", pathMap
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+		Assertions
+			.assertEquals(
+				10, sc
+					.textFile(workingDir.toString() + "/dataset")
+					.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class))
+					.count());
+
+		Assertions
+			.assertEquals(
+				0, sc
+					.textFile(workingDir.toString() + "/dataset")
+					.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class))
+					.filter(
+						ds -> ds.getSubject().stream().anyMatch(sbj -> sbj.getValue().equals("EOSC::Jupyter Notebook")))
+					.count());
+		Assertions
+			.assertEquals(
+				0, sc
+					.textFile(workingDir.toString() + "/dataset")
+					.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class))
+					.filter(
+						ds -> ds
+							.getEoscifguidelines()
+							.stream()
+							.anyMatch(eig -> eig.getCode().equals("EOSC::Jupyter Notebook")))
+					.count());
+	}
+
+	@Test
+	public void bulkTagSoftwareJupyter() throws Exception {
+
+		final String sourcePath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/eosctag/jupyter/")
+			.getPath();
+		SparkBulkTagJob
+			.main(
+				new String[] {
+
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath", sourcePath,
+					"-taggingConf", taggingConf,
+
+					"-outputPath", workingDir.toString() + "/",
+
+					"-pathMap", pathMap
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Software> tmp = sc
+			.textFile(workingDir.toString() + "/software")
+			.map(item -> OBJECT_MAPPER.readValue(item, Software.class));
+
+		Assertions.assertEquals(10, tmp.count());
+
+		Assertions
+			.assertEquals(
+				4,
+				tmp
+					.filter(s -> s.getEoscifguidelines() != null)
+					.filter(
+						s -> s
+							.getEoscifguidelines()
+							.stream()
+							.anyMatch(eig -> eig.getCode().equals("EOSC::Jupyter Notebook")))
+					.count());
+
+		Assertions
+			.assertEquals(
+				1, tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.size());
+
+		Assertions
+			.assertEquals(
+				1, tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.size());
+		Assertions
+			.assertTrue(
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.stream()
+					.anyMatch(s -> s.getCode().equals("EOSC::Jupyter Notebook")));
+
+		Assertions
+			.assertFalse(
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.stream()
+					.anyMatch(s -> s.getValue().equals("EOSC::Jupyter Notebook")));
+
+		Assertions
+			.assertEquals(
+				5, tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::501b25d420f808c8eddcd9b16e917f11"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.size());
+		Assertions
+			.assertFalse(
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::501b25d420f808c8eddcd9b16e917f11"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.stream()
+					.anyMatch(s -> s.getValue().equals("EOSC::Jupyter Notebook")));
+
+		Assertions
+			.assertEquals(
+				0,
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::501b25d420f808c8eddcd9b16e917f11"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.size());
+
+		Assertions
+			.assertEquals(
+				8, tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::581621232a561b7e8b4952b18b8b0e56"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.size());
+		Assertions
+			.assertFalse(
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::581621232a561b7e8b4952b18b8b0e56"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.stream()
+					.anyMatch(s -> s.getValue().equals("EOSC::Jupyter Notebook")));
+		Assertions
+			.assertEquals(
+				1, tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::581621232a561b7e8b4952b18b8b0e56"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.size());
+		Assertions
+			.assertTrue(
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::581621232a561b7e8b4952b18b8b0e56"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.stream()
+					.anyMatch(s -> s.getCode().equals("EOSC::Jupyter Notebook")));
+
+		Assertions
+			.assertEquals(
+				5, tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::5aec1186054301b66c0c5dc35972a589"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.size());
+		Assertions
+			.assertFalse(
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::5aec1186054301b66c0c5dc35972a589"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.stream()
+					.anyMatch(s -> s.getValue().equals("EOSC::Jupyter Notebook")));
+		Assertions
+			.assertEquals(
+				0,
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::5aec1186054301b66c0c5dc35972a589"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.size());
+
+		Assertions
+			.assertEquals(
+				8, tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::639909adfad9d708308f2aedb733e4a0"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.size());
+		Assertions
+			.assertFalse(
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::639909adfad9d708308f2aedb733e4a0"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.stream()
+					.anyMatch(s -> s.getValue().equals("EOSC::Jupyter Notebook")));
+		Assertions
+			.assertEquals(
+				1,
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::639909adfad9d708308f2aedb733e4a0"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.size());
+		Assertions
+			.assertTrue(
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::639909adfad9d708308f2aedb733e4a0"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.stream()
+					.anyMatch(s -> s.getCode().equals("EOSC::Jupyter Notebook")));
+
+		List<Subject> subjects = tmp
+			.filter(sw -> sw.getId().equals("50|od______1582::6e7a9b21a2feef45673890432af34244"))
+			.collect()
+			.get(0)
+			.getSubject();
+		Assertions.assertEquals(7, subjects.size());
+		Assertions.assertTrue(subjects.stream().anyMatch(s -> s.getValue().equals("jupyter")));
+		Assertions.assertTrue(subjects.stream().anyMatch(s -> s.getValue().equals("Modeling and Simulation")));
+		Assertions.assertTrue(subjects.stream().anyMatch(s -> s.getValue().equals("structure granulaire")));
+		Assertions.assertTrue(subjects.stream().anyMatch(s -> s.getValue().equals("algorithme")));
+		Assertions.assertTrue(subjects.stream().anyMatch(s -> s.getValue().equals("simulation numérique")));
+		Assertions.assertTrue(subjects.stream().anyMatch(s -> s.getValue().equals("flux de gaz")));
+		Assertions.assertTrue(subjects.stream().anyMatch(s -> s.getValue().equals("flux de liquide")));
+
+	}
+
+	@Test
+	void galaxyOtherTest() throws Exception {
+		final String sourcePath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/eosctag/galaxy/")
+			.getPath();
+		SparkBulkTagJob
+			.main(
+				new String[] {
+
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath", sourcePath,
+					"-taggingConf", taggingConf,
+
+					"-outputPath", workingDir.toString() + "/",
+
+					"-pathMap", pathMap
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+		JavaRDD<OtherResearchProduct> orp = sc
+			.textFile(workingDir.toString() + "/otherresearchproduct")
+			.map(item -> OBJECT_MAPPER.readValue(item, OtherResearchProduct.class));
+
+		Assertions.assertEquals(10, orp.count());
+
+		Assertions
+			.assertEquals(
+				0,
+				orp
+					.filter(
+						s -> s.getSubject().stream().anyMatch(sbj -> sbj.getValue().equals("EOSC::Galaxy Workflow")))
+					.count());
+		orp.foreach(o -> System.out.println(OBJECT_MAPPER.writeValueAsString(o)));
+
+		Assertions
+			.assertEquals(
+				1, orp
+					.filter(o -> o.getEoscifguidelines() != null)
+					.filter(
+						o -> o
+							.getEoscifguidelines()
+							.stream()
+							.anyMatch(eig -> eig.getCode().equals("EOSC::Galaxy Workflow")))
+					.count());
+
+		Assertions
+			.assertEquals(
+				2, orp
+					.filter(sw -> sw.getId().equals("50|od______2017::0750a4d0782265873d669520f5e33c07"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.size());
+		Assertions
+			.assertFalse(
+				orp
+					.filter(sw -> sw.getId().equals("50|od______2017::0750a4d0782265873d669520f5e33c07"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.stream()
+					.anyMatch(s -> s.getValue().equals("EOSC::Galaxy Workflow")));
+		Assertions
+			.assertEquals(
+				1, orp
+					.filter(sw -> sw.getId().equals("50|od______2017::0750a4d0782265873d669520f5e33c07"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.size());
+		Assertions
+			.assertTrue(
+				orp
+					.filter(sw -> sw.getId().equals("50|od______2017::0750a4d0782265873d669520f5e33c07"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.stream()
+					.anyMatch(s -> s.getCode().equals("EOSC::Galaxy Workflow")));
+
+		Assertions
+			.assertEquals(
+				2, orp
+					.filter(sw -> sw.getId().equals("50|od______2017::1bd97baef19dbd2db3203b112bb83bc5"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.size());
+		Assertions
+			.assertFalse(
+				orp
+					.filter(sw -> sw.getId().equals("50|od______2017::1bd97baef19dbd2db3203b112bb83bc5"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.stream()
+					.anyMatch(s -> s.getValue().equals("EOSC::Galaxy Workflow")));
+
+		Assertions
+			.assertEquals(
+				2, orp
+					.filter(sw -> sw.getId().equals("50|od______2017::1e400f1747487fd15998735c41a55c72"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.size());
+		Assertions
+			.assertFalse(
+				orp
+					.filter(sw -> sw.getId().equals("50|od______2017::1e400f1747487fd15998735c41a55c72"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.stream()
+					.anyMatch(s -> s.getValue().equals("EOSC::Galaxy Workflow")));
+	}
+
+	@Test
+	void galaxySoftwareTest() throws Exception {
+		final String sourcePath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/eosctag/galaxy/")
+			.getPath();
+		SparkBulkTagJob
+			.main(
+				new String[] {
+
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath", sourcePath,
+					"-taggingConf", taggingConf,
+
+					"-outputPath", workingDir.toString() + "/",
+
+					"-pathMap", pathMap
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Software> tmp = sc
+			.textFile(workingDir.toString() + "/software")
+			.map(item -> OBJECT_MAPPER.readValue(item, Software.class));
+
+		Assertions.assertEquals(11, tmp.count());
+
+		Assertions
+			.assertEquals(
+				0,
+				tmp
+					.filter(
+						s -> s.getSubject().stream().anyMatch(sbj -> sbj.getValue().equals("EOSC::Galaxy Workflow")))
+					.count());
+		Assertions
+			.assertEquals(
+				1,
+				tmp
+					.filter(
+						s -> s.getEoscifguidelines().size() > 0)
+					.count());
+		Assertions
+			.assertEquals(
+				1,
+				tmp
+					.filter(
+						s -> s.getEoscifguidelines().size() > 0)
+					.filter(
+						s -> s
+							.getEoscifguidelines()
+							.stream()
+							.anyMatch(eig -> eig.getCode().equals("EOSC::Galaxy Workflow")))
+					.count());
+
+		Assertions
+			.assertEquals(
+				1, tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.size());
+		Assertions
+			.assertFalse(
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.stream()
+					.anyMatch(s -> s.getValue().equals("EOSC::Galaxy Workflow")));
+
+		Assertions
+			.assertEquals(
+				1, tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.size());
+		Assertions
+			.assertTrue(
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::4132f5ec9496f0d6adc7b00a50a56ff4"))
+					.collect()
+					.get(0)
+					.getEoscifguidelines()
+					.stream()
+					.anyMatch(eig -> eig.getCode().equals("EOSC::Galaxy Workflow")));
+
+		Assertions
+			.assertEquals(
+				5, tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::501b25d420f808c8eddcd9b16e917f11"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.size());
+
+		Assertions
+			.assertEquals(
+				8, tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::581621232a561b7e8b4952b18b8b0e56"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.size());
+		Assertions
+			.assertFalse(
+				tmp
+					.filter(sw -> sw.getId().equals("50|od______1582::581621232a561b7e8b4952b18b8b0e56"))
+					.collect()
+					.get(0)
+					.getSubject()
+					.stream()
+					.anyMatch(s -> s.getValue().equals("EOSC::Galaxy Workflow")));
+
+	}
+
+	@Test
+	void twitterDatasetTest() throws Exception {
+		final String sourcePath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/eosctag/twitter/")
+			.getPath();
+
+		SparkBulkTagJob
+			.main(
+				new String[] {
+
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath", sourcePath,
+					"-taggingConf", taggingConf,
+
+					"-outputPath", workingDir.toString() + "/",
+
+					"-pathMap", pathMap
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+		JavaRDD<Dataset> dats = sc
+			.textFile(workingDir.toString() + "/dataset")
+			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
+
+		Assertions.assertEquals(11, dats.count());
+
+		Assertions
+			.assertEquals(
+				3,
+				dats
+					.filter(
+						s -> s
+							.getEoscifguidelines()
+							.stream()
+							.anyMatch(eig -> eig.getCode().equals("EOSC::Twitter Data")))
+					.count());
+
+	}
+
+	@Test
+	void twitterOtherTest() throws Exception {
+		final String sourcePath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/eosctag/twitter/")
+			.getPath();
+
+		SparkBulkTagJob
+			.main(
+				new String[] {
+
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath", sourcePath,
+					"-taggingConf", taggingConf,
+
+					"-outputPath", workingDir.toString() + "/",
+
+					"-pathMap", pathMap
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+		JavaRDD<OtherResearchProduct> orp = sc
+			.textFile(workingDir.toString() + "/otherresearchproduct")
+			.map(item -> OBJECT_MAPPER.readValue(item, OtherResearchProduct.class));
+
+		Assertions.assertEquals(10, orp.count());
+
+		Assertions
+			.assertEquals(
+				0,
+				orp
+					.filter(s -> s.getSubject().stream().anyMatch(sbj -> sbj.getValue().equals("EOSC::Twitter Data")))
+					.count());
+		Assertions
+			.assertEquals(
+				3,
+				orp
+					.filter(
+						s -> s
+							.getEoscifguidelines()
+							.stream()
+							.anyMatch(eig -> eig.getCode().equals("EOSC::Twitter Data")))
+					.count());
+	}
+
+	@Test
+	void twitterSoftwareTest() throws Exception {
+		final String sourcePath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/eosctag/twitter/")
+			.getPath();
+
+		SparkBulkTagJob
+			.main(
+				new String[] {
+
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath", sourcePath,
+					"-taggingConf", taggingConf,
+
+					"-outputPath", workingDir.toString() + "/",
+
+					"-pathMap", pathMap
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Software> tmp = sc
+			.textFile(workingDir.toString() + "/software")
+			.map(item -> OBJECT_MAPPER.readValue(item, Software.class));
+
+		Assertions.assertEquals(10, tmp.count());
+
+		Assertions
+			.assertEquals(
+				0,
+				tmp
+					.filter(s -> s.getSubject().stream().anyMatch(sbj -> sbj.getValue().equals("EOSC::Twitter Data")))
+					.count());
+
+	}
+
+	@Test
+	void EoscContextTagTest() throws Exception {
+		final String sourcePath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/bulktag/eosc/dataset/")
+			.getPath();
+
+		SparkBulkTagJob
+			.main(
+				new String[] {
+
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath", sourcePath,
+					"-taggingConf", taggingConf,
+
+					"-outputPath", workingDir.toString() + "/",
+
+					"-pathMap", pathMap
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Dataset> tmp = sc
+			.textFile(workingDir.toString() + "/dataset")
+			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
+
+		Assertions.assertEquals(8, tmp.count());
+
+		Assertions
+			.assertEquals(
+				4,
+				tmp
+					.filter(
+						s -> s.getContext().stream().anyMatch(c -> c.getId().equals("eosc")))
+					.count());
+
+		Assertions
+			.assertEquals(
+				1,
+				tmp
+					.filter(
+						d -> d.getId().equals("50|475c1990cbb2::0fecfb874d9395aa69d2f4d7cd1acbea")
+							&&
+							d.getContext().stream().anyMatch(c -> c.getId().equals("eosc")))
+					.count());
+		Assertions
+			.assertEquals(
+				1,
+				tmp
+					.filter(
+						d -> d.getId().equals("50|475c1990cbb2::3185cd5d8a2b0a06bb9b23ef11748eb1")
+							&&
+							d.getContext().stream().anyMatch(c -> c.getId().equals("eosc")))
+					.count());
+
+		Assertions
+			.assertEquals(
+				1,
+				tmp
+					.filter(
+						d -> d.getId().equals("50|475c1990cbb2::3894c94123e96df8a21249957cf160cb")
+							&&
+							d.getContext().stream().anyMatch(c -> c.getId().equals("eosc")))
+					.count());
+
+		Assertions
+			.assertEquals(
+				1,
+				tmp
+					.filter(
+						d -> d.getId().equals("50|475c1990cbb2::449f28eefccf9f70c04ad70d61e041c7")
+							&&
+							d.getContext().stream().anyMatch(c -> c.getId().equals("eosc")))
+					.count());
+	}
+
+	@Test
+	void removeTest() throws Exception {
+		final String pathMap = BulkTagJobTest.pathMap;
+		SparkBulkTagJob
+			.main(
+				new String[] {
+
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath",
+					getClass()
+						.getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/update_datasourcewithconstraints/")
+						.getPath(),
+					"-taggingConf", taggingConf,
+
+					"-outputPath", workingDir.toString() + "/",
+
+					"-pathMap", pathMap
+				});
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Dataset> tmp = sc
+			.textFile(workingDir.toString() + "/dataset")
+			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
+
+		Assertions.assertEquals(12, tmp.count());
+		org.apache.spark.sql.Dataset<Dataset> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(Dataset.class));
+
+		verificationDataset.createOrReplaceTempView("dataset");
+		String query = "select id, MyT.id community, MyD.provenanceaction.classid provenance, MyD.provenanceaction.classname name "
+			+ "from dataset "
+			+ "lateral view explode(context) c as MyT "
+			+ "lateral view explode(MyT.datainfo) d as MyD "
+			+ "where MyD.inferenceprovenance = 'bulktagging'";
+
+		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
+
+		Assertions.assertEquals(3, idExplodeCommunity.filter("community = 'dth'").count());
+
+	}
+
+	@Test
+	void newConfTest() throws Exception {
+		final String pathMap = BulkTagJobTest.pathMap;
+		SparkBulkTagJob
+			.main(
+				new String[] {
+
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath",
+					getClass().getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/no_updates/").getPath(),
+					"-outputPath", workingDir.toString() + "/",
+//					"-baseURL", "https://services.openaire.eu/openaire/community/",
+					"-pathMap", pathMap,
+					"-taggingConf", taggingConf
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Dataset> tmp = sc
+			.textFile(workingDir.toString() + "/dataset")
+			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
+
+		Assertions.assertEquals(10, tmp.count());
+		org.apache.spark.sql.Dataset<Dataset> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(Dataset.class));
+
+		verificationDataset.createOrReplaceTempView("dataset");
+
+		String query = "select id, MyT.id community "
+			+ "from dataset "
+			+ "lateral view explode(context) c as MyT "
+			+ "lateral view explode(MyT.datainfo) d as MyD "
+			+ "where MyD.inferenceprovenance = 'bulktagging'";
+
+		Assertions.assertEquals(0, spark.sql(query).count());
+	}
+
 }

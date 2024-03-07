@@ -27,7 +27,7 @@ SELECT
 		'sysimport:crosswalk:entityregistry@@@dnet:provenance_actions' AS provenanceaction,
 		 array_remove(array_agg(DISTINCT i.pid || '###' || i.issuertype || '@@@' || i.issuertype), NULL) AS pid
 FROM dsm_organizations o
-	LEFT OUTER JOIN dsm_datasources d ON (d.id = o.collectedfrom)
+	LEFT OUTER JOIN dsm_services d ON (d.id = o.collectedfrom)
 	LEFT OUTER JOIN dsm_organizationpids p ON (p.organization = o.id)
 	LEFT OUTER JOIN dsm_identities i ON (i.pid = p.pid)
 GROUP BY

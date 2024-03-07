@@ -2,7 +2,10 @@
 package eu.dnetlib.dhp.broker.oa.util;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.spark.sql.Row;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,9 +13,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.model.MapDocument;
+import eu.dnetlib.pace.model.SparkDeduper;
 import eu.dnetlib.pace.tree.support.TreeProcessor;
-import eu.dnetlib.pace.util.MapDocumentUtil;
 
 public class TrustUtils {
 
@@ -20,13 +22,22 @@ public class TrustUtils {
 
 	private static DedupConfig dedupConfig;
 
+	private static SparkDeduper deduper;
+
+	private static final ObjectMapper mapper;
+
 	static {
-		final ObjectMapper mapper = new ObjectMapper();
+		mapper = new ObjectMapper();
 		try {
-			dedupConfig = mapper
-				.readValue(
-					DedupConfig.class.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/dedupConfig/dedupConfig.json"),
-					DedupConfig.class);
+			dedupConfig = DedupConfig
+				.load(
+					IOUtils
+						.toString(
+							DedupConfig.class
+								.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/dedupConfig/dedupConfig.json"),
+							StandardCharsets.UTF_8));
+
+			deduper = new SparkDeduper(dedupConfig);
 		} catch (final IOException e) {
 			log.error("Error loading dedupConfig, e");
 		}
@@ -42,11 +53,8 @@ public class TrustUtils {
 		}
 
 		try {
-			final ObjectMapper objectMapper = new ObjectMapper();
-			final MapDocument doc1 = MapDocumentUtil
-				.asMapDocumentWithJPath(dedupConfig, objectMapper.writeValueAsString(r1));
-			final MapDocument doc2 = MapDocumentUtil
-				.asMapDocumentWithJPath(dedupConfig, objectMapper.writeValueAsString(r2));
+			final Row doc1 = deduper.model().rowFromJson(mapper.writeValueAsString(r1));
+			final Row doc2 = deduper.model().rowFromJson(mapper.writeValueAsString(r2));
 
 			final double score = new TreeProcessor(dedupConfig).computeScore(doc1, doc2);
 
@@ -55,7 +63,7 @@ public class TrustUtils {
 			return TrustUtils.rescale(score, threshold);
 		} catch (final Exception e) {
 			log.error("Error computing score between results", e);
-			return BrokerConstants.MIN_TRUST;
+			throw new RuntimeException(e);
 		}
 	}
 

@@ -1,38 +1,39 @@
-{"doi":"10.3390/s18072310","level1":"engineering and technology","level2":"nano-technology","level3":"nanoscience & nanotechnology"}
-{"doi":"10.1111/1365-2656.12831\u000210.17863/cam.24369","level1":"social sciences","level2":"psychology and cognitive sciences","level3":"NULL"}
-{"doi":"10.3929/ethz-b-000187584\u000210.1002/chem.201701644","level1":"natural sciences","level2":"NULL","level3":"NULL"}
-{"doi":"10.1080/01913123.2017.1367361","level1":"medical and health sciences","level2":"clinical medicine","level3":"oncology & carcinogenesis"}
-{"doi":"10.1051/e3sconf/20199207011","level1":"natural sciences","level2":"earth and related environmental sciences","level3":"environmental sciences"}
-{"doi":"10.1038/onc.2015.333","level1":"medical and health sciences","level2":"clinical medicine","level3":"oncology & carcinogenesis"}
-{"doi":"10.1093/mnras/staa256","level1":"natural sciences","level2":"physical sciences","level3":"NULL"}
-{"doi":"10.1016/j.jclepro.2018.07.166","level1":"engineering and technology","level2":"other engineering and technologies","level3":"building & construction"}
-{"doi":"10.1103/physrevlett.125.037403","level1":"natural sciences","level2":"physical sciences","level3":"nuclear & particles physics"}
-{"doi":"10.1080/03602532.2017.1316285","level1":"natural sciences","level2":"NULL","level3":"NULL"}
-{"doi":"10.1001/jamanetworkopen.2019.1868","level1":"medical and health sciences","level2":"other medical science","level3":"health policy & services"}
-{"doi":"10.1128/mra.00874-18","level1":"natural sciences","level2":"biological sciences","level3":"plant biology & botany"}
-{"doi":"10.1016/j.nancom.2018.03.001","level1":"engineering and technology","level2":"NULL","level3":"NULL"}
-{"doi":"10.1112/topo.12174","level1":"natural sciences","level2":"NULL","level3":"NULL"}
-{"doi":"10.12688/wellcomeopenres.15846.1","level1":"medical and health sciences","level2":"health sciences","level3":"NULL"}
-{"doi":"10.21468/scipostphys.3.1.001","level1":"natural sciences","level2":"physical sciences","level3":"NULL"}
-{"doi":"10.1088/1741-4326/ab6c77","level1":"natural sciences","level2":"physical sciences","level3":"nuclear & particles physics"}
-{"doi":"10.1109/tpwrs.2019.2944747","level1":"engineering and technology","level2":"electrical engineering, electronic engineering, information engineering","level3":"electrical & electronic engineering"}
-{"doi":"10.1016/j.expthermflusci.2019.109994\u000210.17863/cam.46212","level1":"engineering and technology","level2":"mechanical engineering","level3":"mechanical engineering & transports"}
-{"doi":"10.1109/tc.2018.2860012","level1":"engineering and technology","level2":"electrical engineering, electronic engineering, information engineering","level3":"computer hardware & architecture"}
-{"doi":"10.1002/mma.6622","level1":"natural sciences","level2":"mathematics","level3":"numerical & computational mathematics"}
-{"doi":"10.1051/radiopro/2020020","level1":"natural sciences","level2":"chemical sciences","level3":"NULL"}
-{"doi":"10.1007/s12268-019-1003-4","level1":"medical and health sciences","level2":"basic medicine","level3":"NULL"}
-{"doi":"10.3390/cancers12010236","level1":"medical and health sciences","level2":"health sciences","level3":"biochemistry & molecular biology"}
-{"doi":"10.6084/m9.figshare.9912614\u000210.6084/m9.figshare.9912614.v1\u000210.1080/00268976.2019.1665199","level1":"natural sciences","level2":"chemical sciences","level3":"physical chemistry"}
-{"doi":"10.1175/jpo-d-17-0239.1","level1":"natural sciences","level2":"biological sciences","level3":"marine biology & hydrobiology"}
-{"doi":"10.1007/s13218-020-00674-7","level1":"engineering and technology","level2":"industrial biotechnology","level3":"industrial engineering & automation"}
-{"doi":"10.1016/j.psyneuen.2016.02.003\u000210.1016/j.psyneuen.2016.02.00310.7892/boris.78886\u000210.7892/boris.78886","level1":"medical and health sciences","level2":"basic medicine","level3":"NULL"}
-{"doi":"10.1109/ted.2018.2813542","level1":"engineering and technology","level2":"electrical engineering, electronic engineering, information engineering","level3":"electrical & electronic engineering"}
-{"doi":"10.3989/scimar.04739.25a","level1":"natural sciences","level2":"biological sciences","level3":"NULL"}
-{"doi":"10.3390/su12187503","level1":"natural sciences","level2":"earth and related environmental sciences","level3":"NULL"}
-{"doi":"10.1016/j.ccell.2018.08.017","level1":"medical and health sciences","level2":"basic medicine","level3":"biochemistry & molecular biology"}
-{"doi":"10.1103/physrevresearch.2.023322","level1":"natural sciences","level2":"physical sciences","level3":"nuclear & particles physics"}
-{"doi":"10.1039/c8cp03234c","level1":"natural sciences","level2":"NULL","level3":"NULL"}
-{"doi":"10.5281/zenodo.3696557\u000210.5281/zenodo.3696556\u000210.1109/jsac.2016.2545384","level1":"engineering and technology","level2":"electrical engineering, electronic engineering, information engineering","level3":"networking & telecommunications"}
-{"doi":"10.1038/ng.3667\u000210.1038/ng.3667.\u000210.17615/tct6-4m26\u000210.17863/cam.15649","level1":"medical and health sciences","level2":"health sciences","level3":"genetics & heredity"}
-{"doi":"10.1016/j.jclepro.2019.119065","level1":"engineering and technology","level2":"other engineering and technologies","level3":"building & construction"}
-{"doi":"10.1111/pce.13392","level1":"agricultural and veterinary sciences","level2":"agriculture, forestry, and fisheries","level3":"agronomy & agriculture"}
+{"doi":"10.1080/1536383x.2020.1868997","level1":"02 engineering and technology","level2":"0210 nano-technology","level3":"021001 nanoscience & nanotechnology"}
+{"doi":"10.1080/1536383x.2020.1868997","level1":"01 natural sciences","level2":"0104 chemical sciences","level3":"010402 general chemistry"}
+{"doi":"10.1186/s40425-019-0732-8","level1":"03 medical and health sciences","level2":"0302 clinical medicine","level3":"030220 oncology & carcinogenesis"}
+{"doi":"10.1186/s40425-019-0732-8","level1":"03 medical and health sciences","level2":"0301 basic medicine","level3":"030304 developmental biology"}
+{"doi":"10.1007/s10482-021-01529-3","level1":"03 medical and health sciences","level2":"0301 basic medicine","level3":"030304 developmental biology"}
+{"doi":"10.1007/s10482-021-01529-3","level1":"03 medical and health sciences","level2":"0301 basic medicine","level3":"030306 microbiology"}
+{"doi":"10.1155/2021/6643273","level1":"01 natural sciences","level2":"0103 physical sciences","level3":"010301 acoustics"}
+{"doi":"10.1155/2021/6643273","level1":"02 engineering and technology","level2":"0209 industrial biotechnology","level3":"020901 industrial engineering & automation"}
+{"doi":"10.12737/article_5d6613dbf2ad51.82646096","level1":"02 engineering and technology","level2":"0210 nano-technology","level3":"021001 nanoscience & nanotechnology"}
+{"doi":"10.12737/article_5d6613dbf2ad51.82646096","level1":"01 natural sciences","level2":"0103 physical sciences","level3":"010302 applied physics"}
+{"doi":"10.1216/jie.2020.32.457","level1":"01 natural sciences","level2":"0101 mathematics","level3":"010101 applied mathematics"}
+{"doi":"10.1216/jie.2020.32.457","level1":"01 natural sciences","level2":"0101 mathematics","level3":"010102 general mathematics"}
+{"doi":"10.3934/naco.2021021","level1":"02 engineering and technology","level2":"0211 other engineering and technologies","level3":"021103 operations research"}
+{"doi":"10.3934/naco.2021021","level1":"02 engineering and technology","level2":"0209 industrial biotechnology","level3":"020901 industrial engineering & automation"}
+{"doi":"10.1080/1034912x.2021.1910933","level1":"05 social sciences","level2":"050301 education","level3":"050301 education"}
+{"doi":"10.1080/1034912x.2021.1910933","level1":"05 social sciences","level2":"0501 psychology and cognitive sciences","level3":"050104 developmental & child psychology"}
+{"doi":"10.1016/j.rtbm.2020.100596","level1":"05 social sciences","level2":"0502 economics and business","level3":"050211 marketing"}
+{"doi":"10.1016/j.rtbm.2020.100596","level1":"05 social sciences","level2":"0502 economics and business","level3":"050212 sport, leisure & tourism"}
+{"doi":"10.14807/ijmp.v11i8.1220","level1":"05 social sciences","level2":"0502 economics and business","level3":"050211 marketing"}
+{"doi":"10.14807/ijmp.v11i8.1220","level1":"05 social sciences","level2":"0502 economics and business","level3":"050203 business & management"}
+{"doi":"10.1007/s13205-020-02415-x","level1":"03 medical and health sciences","level2":"0303 health sciences","level3":"030304 developmental biology"}
+{"doi":"10.1007/s13205-020-02415-x","level1":"03 medical and health sciences","level2":"0303 health sciences","level3":"030302 biochemistry & molecular biology"}
+{"doi":"10.3390/s18072310","level1":"04 agricultural and veterinary sciences","level2":"0404 agricultural biotechnology","level3":"040502 food science"}
+{"doi":"10.3390/s18072310","level1":"03 medical and health sciences","level2":"0303 health sciences","level3":"030309 nutrition & dietetics"}
+{"doi":"10.1063/5.0032658","level1":"01 natural sciences","level2":"0103 physical sciences","level3":"010304 chemical physics"}
+{"doi":"10.1063/5.0032658","level1":"01 natural sciences","level2":"0104 chemical sciences","level3":"010402 general chemistry"}
+{"doi":"10.1145/3411174.3411195","level1":"02 engineering and technology","level2":"0202 electrical engineering, electronic engineering, information engineering","level3":"020201 artificial intelligence & image processing"}
+{"doi":"10.1145/3411174.3411195","level1":"02 engineering and technology","level2":"0202 electrical engineering, electronic engineering, information engineering","level3":"020206 networking & telecommunications"}
+{"doi":"10.1021/acs.joc.0c02755","level1":"01 natural sciences","level2":"0104 chemical sciences","level3":"010405 organic chemistry"}
+{"doi":"10.1021/acs.joc.0c02755","level1":"01 natural sciences","level2":"0104 chemical sciences","level3":"010402 general chemistry"}
+{"doi":"10.1002/jcp.28608","level1":"03 medical and health sciences","level2":"0302 clinical medicine","level3":"030220 oncology & carcinogenesis"}
+{"doi":"10.1002/jcp.28608","level1":"03 medical and health sciences","level2":"0301 basic medicine","level3":"030304 developmental biology"}
+{"doi":"10.1097/cmr.0000000000000579","level1":"03 medical and health sciences","level2":"0302 clinical medicine","level3":"030220 oncology & carcinogenesis"}
+{"doi":"10.1097/cmr.0000000000000579","level1":"03 medical and health sciences","level2":"0301 basic medicine","level3":"030304 developmental biology"}
+{"doi":"10.1007/s11164-020-04383-6","level1":"01 natural sciences","level2":"0104 chemical sciences","level3":"010405 organic chemistry"}
+{"doi":"10.1007/s11164-020-04383-6","level1":"01 natural sciences","level2":"0104 chemical sciences","level3":"010402 general chemistry"}
+{"doi":"10.1016/j.actpsy.2020.103155","level1":"05 social sciences","level2":"0501 psychology and cognitive sciences","level3":"050105 experimental psychology"}
+{"doi":"10.1016/j.actpsy.2020.103155","level1":"03 medical and health sciences","level2":"0302 clinical medicine","level3":"030217 neurology & neurosurgery"}
+{"doi":"10.1109/memea49120.2020.9137187","level1":"02 engineering and technology","level2":"0202 electrical engineering, electronic engineering, information engineering","level3":"020208 electrical & electronic engineering"}

@@ -19,7 +19,7 @@ import eu.dnetlib.dhp.broker.oa.matchers.simple.EnrichMissingPublicationDate;
 import eu.dnetlib.dhp.broker.oa.util.UpdateInfo;
 
 @ExtendWith(MockitoExtension.class)
-class UpdateMatcherTest {
+public class UpdateMatcherTest {
 
 	UpdateMatcher<String> matcher = new EnrichMissingPublicationDate();
 

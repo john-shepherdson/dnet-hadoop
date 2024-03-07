@@ -22,4 +22,11 @@ public class DatasourceCountry implements Serializable {
 	public void setCountry(CountrySbs country) {
 		this.country = country;
 	}
+
+	public static DatasourceCountry newInstance(String dataSourceId, CountrySbs country) {
+		DatasourceCountry dsc = new DatasourceCountry();
+		dsc.dataSourceId = dataSourceId;
+		dsc.country = country;
+		return dsc;
+	}
 }

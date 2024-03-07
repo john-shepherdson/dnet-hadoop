@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.dedup;
 
 import static java.nio.file.Files.createTempDirectory;
 
+import static org.apache.spark.sql.functions.col;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.lenient;
 
@@ -15,10 +16,6 @@ import java.nio.file.Paths;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
@@ -33,8 +30,6 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import eu.dnetlib.pace.util.MapDocumentUtil;
-import scala.Tuple2;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -44,11 +39,11 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 	ISLookUpService isLookUpService;
 
 	private static SparkSession spark;
-	private static JavaSparkContext jsc;
 
 	private static String testGraphBasePath;
 	private static String testOutputBasePath;
 	private static String testDedupGraphBasePath;
+	private static String testConsistencyGraphBasePath;
 	private static final String testActionSetId = "test-orchestrator";
 
 	@BeforeAll
@@ -64,6 +59,9 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 		testDedupGraphBasePath = createTempDirectory(SparkOpenorgsProvisionTest.class.getSimpleName() + "-")
 			.toAbsolutePath()
 			.toString();
+		testConsistencyGraphBasePath = createTempDirectory(SparkOpenorgsProvisionTest.class.getSimpleName() + "-")
+			.toAbsolutePath()
+			.toString();
 
 		FileUtils.deleteDirectory(new File(testOutputBasePath));
 		FileUtils.deleteDirectory(new File(testDedupGraphBasePath));
@@ -76,8 +74,13 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 			.master("local[*]")
 			.config(conf)
 			.getOrCreate();
+	}
 
-		jsc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+	@AfterAll
+	public static void finalCleanUp() throws IOException {
+		FileUtils.deleteDirectory(new File(testOutputBasePath));
+		FileUtils.deleteDirectory(new File(testDedupGraphBasePath));
+		FileUtils.deleteDirectory(new File(testConsistencyGraphBasePath));
 	}
 
 	@BeforeEach
@@ -186,26 +189,21 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 
 		new SparkUpdateEntity(parser, spark).run(isLookUpService);
 
-		long organizations = jsc.textFile(testDedupGraphBasePath + "/organization").count();
+		Dataset<Row> organizations = spark.read().json(testDedupGraphBasePath + "/organization");
 
-		long mergedOrgs = spark
+		Dataset<Row> mergedOrgs = spark
 			.read()
 			.load(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel")
-			.as(Encoders.bean(Relation.class))
 			.where("relClass=='merges'")
-			.javaRDD()
-			.map(Relation::getTarget)
-			.distinct()
-			.count();
+			.select("target")
+			.distinct();
 
-		assertEquals(80, organizations);
+		assertEquals(80, organizations.count());
 
-		long deletedOrgs = jsc
-			.textFile(testDedupGraphBasePath + "/organization")
-			.filter(this::isDeletedByInference)
-			.count();
+		Dataset<Row> deletedOrgs = organizations
+			.filter("dataInfo.deletedbyinference = TRUE");
 
-		assertEquals(mergedOrgs, deletedOrgs);
+		assertEquals(mergedOrgs.count(), deletedOrgs.count());
 	}
 
 	@Test
@@ -226,9 +224,9 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 
 		new SparkCopyRelationsNoOpenorgs(parser, spark).run(isLookUpService);
 
-		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
+		final Dataset<Row> outputRels = spark.read().text(testDedupGraphBasePath + "/relation");
 
-		assertEquals(2380, relations);
+		assertEquals(2382, outputRels.count());
 	}
 
 	@Test
@@ -243,51 +241,41 @@ public class SparkOpenorgsProvisionTest implements Serializable {
 		parser
 			.parseArgument(
 				new String[] {
-					"-i", testGraphBasePath, "-w", testOutputBasePath, "-o", testDedupGraphBasePath
+					"-i", testDedupGraphBasePath, "-w", testOutputBasePath, "-o", testConsistencyGraphBasePath
 				});
 
 		new SparkPropagateRelation(parser, spark).run(isLookUpService);
 
-		long relations = jsc.textFile(testDedupGraphBasePath + "/relation").count();
-
-		assertEquals(4894, relations);
-
-		// check deletedbyinference
 		final Dataset<Relation> mergeRels = spark
 			.read()
 			.load(DedupUtility.createMergeRelPath(testOutputBasePath, "*", "*"))
 			.as(Encoders.bean(Relation.class));
-		final JavaPairRDD<String, String> mergedIds = mergeRels
+
+		Dataset<Row> inputRels = spark
+			.read()
+			.json(testDedupGraphBasePath + "/relation");
+
+		Dataset<Row> outputRels = spark
+			.read()
+			.json(testConsistencyGraphBasePath + "/relation");
+
+		final Dataset<Row> mergedIds = mergeRels
 			.where("relClass == 'merges'")
-			.select(mergeRels.col("target"))
-			.distinct()
-			.toJavaRDD()
-			.mapToPair(
-				(PairFunction<Row, String, String>) r -> new Tuple2<String, String>(r.getString(0), "d"));
+			.select(col("target").as("id"))
+			.distinct();
 
-		JavaRDD<String> toCheck = jsc
-			.textFile(testDedupGraphBasePath + "/relation")
-			.mapToPair(json -> new Tuple2<>(MapDocumentUtil.getJPathString("$.source", json), json))
-			.join(mergedIds)
-			.map(t -> t._2()._1())
-			.mapToPair(json -> new Tuple2<>(MapDocumentUtil.getJPathString("$.target", json), json))
-			.join(mergedIds)
-			.map(t -> t._2()._1());
+		Dataset<Row> toUpdateRels = inputRels
+			.as("rel")
+			.join(mergedIds.as("s"), col("rel.source").equalTo(col("s.id")), "left_outer")
+			.join(mergedIds.as("t"), col("rel.target").equalTo(col("t.id")), "left_outer")
+			.filter("s.id IS NOT NULL OR t.id IS NOT NULL")
+			.distinct();
 
-		long deletedbyinference = toCheck.filter(this::isDeletedByInference).count();
-		long updated = toCheck.count();
+		Dataset<Row> updatedRels = inputRels
+			.select("source", "target", "relClass")
+			.except(outputRels.select("source", "target", "relClass"));
 
-		assertEquals(updated, deletedbyinference);
+		assertEquals(toUpdateRels.count(), updatedRels.count());
+		assertEquals(140, outputRels.count());
 	}
-
-	@AfterAll
-	public static void finalCleanUp() throws IOException {
-		FileUtils.deleteDirectory(new File(testOutputBasePath));
-		FileUtils.deleteDirectory(new File(testDedupGraphBasePath));
-	}
-
-	public boolean isDeletedByInference(String s) {
-		return s.contains("\"deletedbyinference\":true");
-	}
-
 }

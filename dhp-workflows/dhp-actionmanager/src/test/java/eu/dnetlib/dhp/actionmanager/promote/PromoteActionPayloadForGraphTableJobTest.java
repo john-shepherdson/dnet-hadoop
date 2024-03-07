@@ -25,6 +25,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.common.ModelSupport;
@@ -41,7 +42,8 @@ public class PromoteActionPayloadForGraphTableJobTest {
 	private Path inputActionPayloadRootDir;
 	private Path outputDir;
 
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	@BeforeAll
 	public static void beforeAll() {
@@ -154,6 +156,10 @@ public class PromoteActionPayloadForGraphTableJobTest {
 			List<? extends Oaf> actualOutputRows = readGraphTableFromJobOutput(outputGraphTableDir.toString(), rowClazz)
 				.collectAsList()
 				.stream()
+				.map(s -> {
+					s.setLastupdatetimestamp(0L);
+					return s;
+				})
 				.sorted(Comparator.comparingInt(Object::hashCode))
 				.collect(Collectors.toList());
 			String expectedOutputGraphTableJsonDumpPath = resultFileLocation(strategy, rowClazz, actionPayloadClazz);
@@ -166,10 +172,69 @@ public class PromoteActionPayloadForGraphTableJobTest {
 				expectedOutputGraphTableJsonDumpFile.toString(), rowClazz)
 					.collectAsList()
 					.stream()
+					.map(s -> {
+						s.setLastupdatetimestamp(0L);
+						return s;
+					})
 					.sorted(Comparator.comparingInt(Object::hashCode))
 					.collect(Collectors.toList());
 			assertIterableEquals(expectedOutputRows, actualOutputRows);
 		}
+	}
+
+	@Test
+	void shouldPromoteActionPayload_custom() throws Exception {
+
+		Class<? extends Oaf> rowClazz = Publication.class;
+		Class<? extends Oaf> actionPayloadClazz = Result.class;
+		MergeAndGet.Strategy strategy = MergeAndGet.Strategy.MERGE_FROM_AND_GET;
+
+		// given
+		Path inputGraphTableDir = createGraphTable(inputGraphRootDir, rowClazz);
+		Path inputActionPayloadDir = createActionPayload(inputActionPayloadRootDir, rowClazz, actionPayloadClazz);
+		Path outputGraphTableDir = outputDir.resolve("graph").resolve(rowClazz.getSimpleName().toLowerCase());
+
+		// when
+		PromoteActionPayloadForGraphTableJob
+			.main(
+				new String[] {
+					"-isSparkSessionManaged",
+					Boolean.FALSE.toString(),
+					"-inputGraphTablePath",
+					inputGraphTableDir.toString(),
+					"-graphTableClassName",
+					rowClazz.getCanonicalName(),
+					"-inputActionPayloadPath",
+					inputActionPayloadDir.toString(),
+					"-actionPayloadClassName",
+					actionPayloadClazz.getCanonicalName(),
+					"-outputGraphTablePath",
+					outputGraphTableDir.toString(),
+					"-mergeAndGetStrategy",
+					strategy.name(),
+					"--shouldGroupById",
+					"true"
+				});
+
+		// then
+		assertTrue(Files.exists(outputGraphTableDir));
+
+		List<? extends Oaf> actualOutputRows = readGraphTableFromJobOutput(outputGraphTableDir.toString(), rowClazz)
+			.collectAsList()
+			.stream()
+			.sorted(Comparator.comparingInt(Object::hashCode))
+			.collect(Collectors.toList());
+
+		Publication p = actualOutputRows
+			.stream()
+			.map(o -> (Publication) o)
+			.filter(o -> "50|4ScienceCRIS::6a67ed3daba1c380bf9de3c13ed9c879".equals(o.getId()))
+			.findFirst()
+			.get();
+
+		assertNotNull(p.getMeasures());
+		assertTrue(p.getMeasures().size() > 0);
+
 	}
 
 	public static Stream<Arguments> promoteJobTestParams() {

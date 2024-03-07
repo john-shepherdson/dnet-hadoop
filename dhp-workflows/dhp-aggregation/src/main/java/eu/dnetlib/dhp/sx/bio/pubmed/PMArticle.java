@@ -17,6 +17,9 @@ public class PMArticle implements Serializable {
 	 * the Pubmed Identifier
 	 */
 	private String pmid;
+
+	private String pmcId;
+
 	/**
 	 * the DOI
 	 */
@@ -122,7 +125,7 @@ public class PMArticle implements Serializable {
 
 	/**
 	 * The full journal title (taken from NLM cataloging data following NLM rules for how to compile a serial name) is exported in this element.
-		 * Some characters that are not part of the NLM MEDLINE/PubMed Character Set reside in a relatively small number of full journal titles.
+	 * Some characters that are not part of the NLM MEDLINE/PubMed Character Set reside in a relatively small number of full journal titles.
 	 * The NLM journal title abbreviation is exported in the <MedlineTA> element.
 	 *
 	 * @return the pubmed Journal Extracted
@@ -140,10 +143,11 @@ public class PMArticle implements Serializable {
 	}
 
 	/**
-	 * English-language abstracts are taken directly from the published article.
-	 * If the article does not have a published abstract, the National Library of Medicine does not create one,
-	 * thus the record lacks the <Abstract> and <AbstractText> elements. However, in the absence of a formally
-	 * labeled abstract in the published article, text from a substantive "summary", "summary and conclusions" or "conclusions and summary" may be used.
+	 * <ArticleTitle> contains the entire title of the journal article. <ArticleTitle> is always in English;
+	 * those titles originally published in a non-English language and translated for <ArticleTitle> are enclosed in square brackets.
+	 * All titles end with a period unless another punctuation mark such as a question mark or bracket is present.
+	 * Explanatory information about the title itself is enclosed in parentheses, e.g.: (author's transl).
+	 * Corporate/collective authors may appear at the end of <ArticleTitle> for citations up to about the year 2000.
 	 *
 	 *  @return the extracted pubmed Title
 	 */
@@ -249,5 +253,14 @@ public class PMArticle implements Serializable {
 
 	public List<PMGrant> getGrants() {
 		return grants;
+	}
+
+	public String getPmcId() {
+		return pmcId;
+	}
+
+	public PMArticle setPmcId(String pmcId) {
+		this.pmcId = pmcId;
+		return this;
 	}
 }

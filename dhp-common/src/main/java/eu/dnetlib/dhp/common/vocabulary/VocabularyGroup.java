@@ -57,8 +57,16 @@ public class VocabularyGroup implements Serializable {
 				final String syn = arr[2].trim();
 
 				vocs.addSynonyms(vocId, termId, syn);
+
 			}
 		}
+
+		// add the term names as synonyms
+		vocs.vocs.values().forEach(voc -> {
+			voc.getTerms().values().forEach(term -> {
+				voc.addSynonym(term.getName().toLowerCase(), term.getId());
+			});
+		});
 
 		return vocs;
 	}
@@ -71,6 +79,13 @@ public class VocabularyGroup implements Serializable {
 
 	public void addVocabulary(final String id, final String name) {
 		vocs.put(id.toLowerCase(), new Vocabulary(id, name));
+	}
+
+	public Optional<Vocabulary> find(final String vocId) {
+		return Optional
+			.ofNullable(vocId)
+			.map(String::toLowerCase)
+			.map(vocs::get);
 	}
 
 	public void addTerm(final String vocId, final String id, final String name) {
@@ -118,6 +133,24 @@ public class VocabularyGroup implements Serializable {
 			return OafMapperUtils.unknown("", "");
 		}
 		return vocs.get(vocId.toLowerCase()).getSynonymAsQualifier(syn);
+	}
+
+	public Qualifier lookupTermBySynonym(final String vocId, final String syn) {
+		return find(vocId)
+			.map(
+				vocabulary -> Optional
+					.ofNullable(vocabulary.getTerm(syn))
+					.map(
+						term -> OafMapperUtils
+							.qualifier(term.getId(), term.getName(), vocabulary.getId(), vocabulary.getName()))
+					.orElse(
+						Optional
+							.ofNullable(vocabulary.getTermBySynonym(syn))
+							.map(
+								term -> OafMapperUtils
+									.qualifier(term.getId(), term.getName(), vocabulary.getId(), vocabulary.getName()))
+							.orElse(null)))
+			.orElse(null);
 	}
 
 	/**

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns="http://www.openarchives.org/OAI/2.0/"> 
+  <header> 
+    <identifier><![CDATA[oai:it.cnr:prodotti:433382]]></identifier>  
+    <datestamp><![CDATA[2020-11-30T15:32:03Z]]></datestamp>  
+    <setSpec><![CDATA[openaire]]></setSpec>  
+    <setSpec><![CDATA[CDS027]]></setSpec>  
+    <setSpec><![CDATA[CDS080]]></setSpec> 
+  </header>  
+  <metadata> 
+    <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">  
+      <dc:type><![CDATA[info:eu-repo/semantics/conferenceObject]]></dc:type>  
+      <dc:type><![CDATA[Presentazione]]></dc:type>  
+      <dc:title><![CDATA[A multiscale observing approach for understanding acidification process in a marginal sea (northern Adriatic)]]></dc:title>  
+      <dc:creator><![CDATA[Cantoni C.]]></dc:creator>  
+      <dc:creator><![CDATA[Barba L.]]></dc:creator>  
+      <dc:creator><![CDATA[Bastianini M.]]></dc:creator>  
+      <dc:creator><![CDATA[Bortoluzzi G.]]></dc:creator>  
+      <dc:creator><![CDATA[Celio M.]]></dc:creator>  
+      <dc:creator><![CDATA[Chiggiato J.]]></dc:creator>  
+      <dc:creator><![CDATA[Cozzi S.]]></dc:creator>  
+      <dc:creator><![CDATA[Luchetta A.]]></dc:creator>  
+      <dc:creator><![CDATA[Ravaioli M.]]></dc:creator>  
+      <dc:creator><![CDATA[Sparnocchia S.]]></dc:creator>  
+      <dc:language><![CDATA[eng]]></dc:language>  
+      <dc:description><![CDATA[The Northern Adriatic is a shallow, semi-enclosed industrialized sub-basin of the Mediterranean affected by significant ecosystem
+changes, which are studied through several research activities including the long-term monitoring of ILTER international network.
+Changes of pHT (-0.06) and TA (+74 ?mol/kg) in dense winter waters over the last 25 years already showed that this area is prone to
+acidification process under a complex inorganic carbon chemistry variability. To understand these changes, monthly sampling of the
+main biogeochemical and biological parameters has been carrying out since 2008 by a fixed station (PALOMA, Gulf of Trieste). In 2013
+the site has been implemented with continuous pCO2 measurements at 3 m depth and has been regularly visiting during basin wide
+surveys for the last two years. The combination of automated in situ measurements, monthly samplings and basin scale
+oceanographic cruises is used to better understand the processes controlling air-sea CO2 fluxes and inorganic carbon chemistry under
+three different scenarios: an extreme event of dense water formation, the phytoplankton blooms associated with riverine inputs and
+the late-summer marked oxygen under saturation in the deeper waters.]]></dc:description>  
+      <dc:source><![CDATA[ASLO - Aquatic Sciences Meeting, Granada, Spagna, 22-27/02/2015]]></dc:source>  
+      <dc:source><![CDATA[info:cnr-pdr/source/autori:Cantoni C., Barba L., Bastianini M., Bortoluzzi G., Celio M., Chiggiato J., Cozzi S., Luchetta A., Ravaioli M., Sparnocchia S./congresso_nome:ASLO - Aquatic Sciences Meeting/congresso_luogo:Granada, Spagna/congresso_data:22-27%2F02%2F2015/anno:2015/pagina_da:/pagina_a:/intervallo_pagine:]]></dc:source>  
+      <dc:date><![CDATA[2015]]></dc:date>  
+      <dc:identifier><![CDATA[http://www.cnr.it/prodotto/i/433382]]></dc:identifier>  
+      <dc:identifier><![CDATA[https://publications.cnr.it/doc/433382]]></dc:identifier>  
+      <dc:identifier><![CDATA[http://sgmeet.com/aslo/granada2015/]]></dc:identifier>  
+      <dc:relation><![CDATA[info:eu-repo/grantAgreement/EC/FP7/211574//Integrated Carbon Observation System/ICOS]]></dc:relation>  
+      <dc:relation><![CDATA[info:cnr-pdr/author/matricola:502/SPARNOCCHIA/STEFANIA]]></dc:relation>  
+      <dc:relation><![CDATA[info:cnr-pdr/author/matricola:990/BASTIANINI/MAURO]]></dc:relation>  
+      <dc:relation><![CDATA[info:cnr-pdr/author/matricola:5185/BARBA/LUISA]]></dc:relation>  
+      <dc:relation><![CDATA[info:cnr-pdr/author/matricola:5453/COZZI/STEFANO]]></dc:relation>  
+      <dc:relation><![CDATA[info:cnr-pdr/author/matricola:12491/LUCHETTA/ANNA]]></dc:relation>  
+      <dc:relation><![CDATA[info:cnr-pdr/author/matricola:12837/CANTONI/CAROLINA]]></dc:relation>  
+      <dc:relation><![CDATA[info:cnr-pdr/author/matricola:18161/RAVAIOLI/MARIANGELA]]></dc:relation>  
+      <dc:rights><![CDATA[info:eu-repo/semantics/openAccess]]></dc:rights>  
+      <dc:subject><![CDATA[ocean acidification]]></dc:subject>  
+      <dc:subject><![CDATA[Northern Adriatic Sea]]></dc:subject>  
+      <dc:subject><![CDATA[inorganic carbon system]]></dc:subject>  
+      <dc:subject><![CDATA[PALOMA]]></dc:subject> 
+    </oai_dc:dc> 
+  </metadata> 
+</record>

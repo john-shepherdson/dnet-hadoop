@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.common.vocabulary;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -62,25 +63,46 @@ public class Vocabulary implements Serializable {
 	}
 
 	public VocabularyTerm getTermBySynonym(final String syn) {
-		return getTerm(synonyms.get(syn.toLowerCase()));
+		return Optional
+			.ofNullable(syn)
+			.map(s -> getTerm(synonyms.get(s.toLowerCase())))
+			.orElse(null);
 	}
 
 	public Qualifier getTermAsQualifier(final String termId) {
-		if (StringUtils.isBlank(termId)) {
+		return getTermAsQualifier(termId, false);
+	}
+
+	public Qualifier getTermAsQualifier(final String termId, boolean strict) {
+		final VocabularyTerm term = getTerm(termId);
+		if (Objects.nonNull(term)) {
+			return OafMapperUtils.qualifier(term.getId(), term.getName(), getId(), getName());
+		} else if (Objects.isNull(term) && strict) {
 			return OafMapperUtils.unknown(getId(), getName());
-		} else if (termExists(termId)) {
-			final VocabularyTerm t = getTerm(termId);
-			return OafMapperUtils.qualifier(t.getId(), t.getName(), getId(), getName());
 		} else {
 			return OafMapperUtils.qualifier(termId, termId, getId(), getName());
 		}
 	}
 
 	public Qualifier getSynonymAsQualifier(final String syn) {
+		return getSynonymAsQualifier(syn, false);
+	}
+
+	public Qualifier getSynonymAsQualifier(final String syn, boolean strict) {
 		return Optional
 			.ofNullable(getTermBySynonym(syn))
-			.map(term -> getTermAsQualifier(term.getId()))
+			.map(term -> getTermAsQualifier(term.getId(), strict))
 			.orElse(null);
+	}
+
+	public Qualifier lookup(String id) {
+		return lookup(id, false);
+	}
+
+	public Qualifier lookup(String id, boolean strict) {
+		return Optional
+			.ofNullable(getSynonymAsQualifier(id, strict))
+			.orElse(getTermAsQualifier(id, strict));
 	}
 
 }

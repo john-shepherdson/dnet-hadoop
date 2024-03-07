@@ -1,1032 +1,1052 @@
 {
-  "SND.QOG": {
-    "openaire_id": "re3data_____::r3d100012231",
-    "datacite_name": "Quality of Government Institute",
-    "official_name": "Quality of Government Institute's Data",
-    "similarity": 0.8985507246376812
-  },
-  "GESIS.CESSDA": {
-    "openaire_id": "re3data_____::r3d100010202",
-    "datacite_name": "CESSDA ERIC",
-    "official_name": "CESSDA ERIC"
-  },
-  "BL.CRAN": {
-    "openaire_id": "re3data_____::r3d100012068",
-    "datacite_name": "Cranfield University",
-    "official_name": "Cranfield Online Research Data"
-  },
-  "SUL.OPENNEURO": {
-    "openaire_id": "re3data_____::r3d100010924",
-    "datacite_name": "OpenNeuro",
-    "official_name": "OpenNeuro"
-  },
-  "UNAVCO.UNAVCO": {
-    "openaire_id": "re3data_____::r3d100010872",
-    "datacite_name": "UNAVCO",
-    "official_name": "UNAVCO"
-  },
-  "SUL.SDR": {
-    "openaire_id": "re3data_____::r3d100010710",
-    "datacite_name": "Stanford Digital Repository",
-    "official_name": "Stanford Digital Repository"
-  },
-  "DK.ICES": {
-    "openaire_id": "re3data_____::r3d100011288",
-    "datacite_name": "International Council for the Exploration of the Sea (ICES)",
-    "official_name": "International Council for the Exploration of the Sea datasets",
-    "similarity": 0.8833333333333333
-  },
-  "CISTI.DFOSCIMR": {
-    "openaire_id": "re3data_____::r3d100012039",
-    "datacite_name": "Bedford Institute of Oceanography - Fisheries and Oceans Canada - Ocean Data and Information Section",
-    "official_name": "Bedford Institute of Oceanography - Oceanographic Databases"
-  },
-  "CSIC.DIGITAL": {
-    "openaire_id": "re3data_____::r3d100011076",
-    "datacite_name": "Digital CSIC",
-    "official_name": "DIGITAL.CSIC"
-  },
-  "TIB.PANGAEA": {
-    "openaire_id": "re3data_____::r3d100010134",
-    "datacite_name": "PANGAEA",
-    "official_name": "PANGAEA"
-  },
-  "PSU.DATACOM": {
-    "openaire_id": "re3data_____::r3d100010477",
-    "datacite_name": "Data Commons",
-    "official_name": "ANU Data Commons",
-    "similarity": 0.8571428571428571
-  },
-  "ANDS.CENTRE72": {
-    "openaire_id": "re3data_____::r3d100010451",
-    "datacite_name": "PARADISEC",
-    "official_name": "Pacific and Regional Archive for Digital Sources in Endangered Cultures"
-  },
-  "BL.OXDB": {
-    "openaire_id": "re3data_____::r3d100011653",
-    "datacite_name": "Oxford University Library Service Databank",
-    "official_name": "DataBank, Bodleian Libraries, University of Oxford"
-  },
-  "BL.STANDREW": {
-    "openaire_id": "re3data_____::r3d100012411",
-    "datacite_name": "University of St Andrews",
-    "official_name": "St Andrews Research portal - Research Data"
-  },
-  "TIB.BAFG": {
-    "openaire_id": "re3data_____::r3d100011664",
-    "datacite_name": "Bundesanstalt f\u00fcr Gew\u00e4sserkunde",
-    "official_name": "Geoportal der BFG"
-  },
-  "CRUI.UNIBO": {
-    "openaire_id": "re3data_____::r3d100012604",
-    "datacite_name": "Universit\u00e0 degli Studi di Bologna",
-    "official_name": "AMS Acta"
-  },
-  "GDCC.ODUM-LIBRARY": {
-    "openaire_id": "re3data_____::r3d100000005",
-    "datacite_name": "UNC Libraries",
-    "official_name": "UNC Dataverse"
-  },
-  "RG.RG": {
-    "openaire_id": "re3data_____::r3d100012227",
-    "datacite_name": "ResearchGate",
-    "official_name": "ResearchGate"
-  },
-  "TIB.EUMETSAT": {
-    "openaire_id": "re3data_____::r3d100010232",
-    "datacite_name": "EUMETSAT",
-    "official_name": "Eumetsat"
-  },
-  "SND.SMHI": {
-    "openaire_id": "re3data_____::r3d100011776",
-    "datacite_name": "Swedish Meteorological and Hydrological Institute  open data",
-    "official_name": "Swedish Meteorological and Hydrological Institute  open data"
-  },
-  "NOAA.NCEI": {
-    "openaire_id": "re3data_____::r3d100011801",
-    "datacite_name": "National Oceanic and Atmospheric Administration (NOAA) National Centers for Environmental Information (NCEI)",
-    "official_name": "NCEI"
-  },
-  "TIB.WDCC": {
-    "openaire_id": "re3data_____::r3d100010299",
-    "datacite_name": "World Data Center for Climate",
-    "official_name": "World Data Center for Climate"
-  },
-  "CNGB.GIGADB": {
-    "openaire_id": "re3data_____::r3d100010478",
-    "datacite_name": "GigaDB",
-    "official_name": "GigaDB"
-  },
-  "DELFT.VLIZ": {
-    "openaire_id": "re3data_____::r3d100010661",
-    "datacite_name": "Vlaams Instituut voor de Zee",
-    "official_name": "Flanders Marine Institute"
-  },
-  "NUS.SB": {
-    "openaire_id": "re3data_____::r3d100012564",
-    "datacite_name": "National University of Singapore",
-    "official_name": "ScholarBank@NUS"
-  },
-  "EDI.EDI": {
-    "openaire_id": "re3data_____::r3d100010272",
-    "datacite_name": "Environmental Data Initiative",
-    "official_name": "Environmental Data Initiative Repository"
-  },
-  "INIST.ADISP": {
-    "openaire_id": "re3data_____::r3d100010494",
-    "datacite_name": "Quetelet PROGEDO Diffusion",
-    "official_name": "Quetelet PROGEDO Diffusion"
-  },
-  "GESIS.SHARE": {
-    "openaire_id": "re3data_____::r3d100010430",
-    "datacite_name": "SHARE - ERIC",
-    "official_name": "Survey of Health, Ageing and Retirement in Europe"
-  },
-  "ANDS.CENTRE-1": {
-    "openaire_id": "re3data_____::r3d100010864",
-    "datacite_name": "Griffith University",
-    "official_name": "Griffith University Research Data Repository"
-  },
-  "BL.READING": {
-    "openaire_id": "re3data_____::r3d100012064",
-    "datacite_name": "University of Reading",
-    "official_name": "University of Reading Research Data Archive"
-  },
-  "CORNELL.CISER": {
-    "openaire_id": "re3data_____::r3d100011056",
-    "datacite_name": "CISER Data Archive",
-    "official_name": "CISER Data Archive"
-  },
-  "DRYAD.DRYAD": {
-    "openaire_id": "re3data_____::r3d100000044",
-    "datacite_name": "DRYAD",
-    "official_name": "DRYAD"
-  },
-  "CDL.PISCO": {
-    "openaire_id": "re3data_____::r3d100010947",
-    "datacite_name": "Partnership for Interdisciplinary Studies of Coastal Oceans (PISCO)",
-    "official_name": "Partnership for Interdisciplinary Studies of Coastal Oceans"
-  },
-  "IEEE.DATAPORT": {
-    "openaire_id": "re3data_____::r3d100012569",
-    "datacite_name": "IEEE DataPort",
-    "official_name": "IEEE DataPort"
-  },
-  "DELFT.MAASTRO": {
-    "openaire_id": "re3data_____::r3d100011086",
-    "datacite_name": "MAASTRO Clinic",
-    "official_name": "CancerData.org"
-  },
-  "USGS.PROD": {
-    "openaire_id": "re3data_____::r3d100010054",
-    "datacite_name": "USGS DOI Tool Production Environment",
-    "official_name": "U.S. Geological Survey"
-  },
-  "GDCC.ODUM-DV": {
-    "openaire_id": "re3data_____::r3d100000005",
-    "datacite_name": "Odum Institute Dataverse",
-    "official_name": "UNC Dataverse"
-  },
-  "CDL.SDSCSG": {
-    "openaire_id": "re3data_____::r3d100011690",
-    "datacite_name": "UCSD Signaling Gateway",
-    "official_name": "UCSD Signaling gateway"
-  },
-  "ORBIS.NKN": {
-    "openaire_id": "re3data_____::r3d100011587",
-    "datacite_name": "Northwest Knowledge Network",
-    "official_name": "Northwest Knowledge Network"
-  },
-  "ANDS.CENTRE63": {
-    "openaire_id": "re3data_____::r3d100010918",
-    "datacite_name": "Test: Atlas of Living Australia",
-    "official_name": "Atlas of Living Australia",
-    "similarity": 0.8928571428571429
-  },
-  "SML.TALKBANK": {
-    "openaire_id": "re3data_____::r3d100010887",
-    "datacite_name": "TalkBank",
-    "official_name": "TalkBank"
-  },
-  "CORNELL.LIBRARY": {
-    "openaire_id": "re3data_____::r3d100012322",
-    "datacite_name": "Cornell University Library",
-    "official_name": "eCommons - Cornell's digital repository"
-  },
-  "BL.SOTON": {
-    "openaire_id": "re3data_____::r3d100011245",
-    "datacite_name": "University of Southampton",
-    "official_name": "University of Southampton Institutional Research Repository"
-  },
-  "GESIS.DB-BANK": {
-    "openaire_id": "re3data_____::r3d100012252",
-    "datacite_name": "Forschungsdaten- und Servicezentrum der Bundesbank",
-    "official_name": "Forschungsdaten- und Servicezentrum der Bundesbank"
-  },
-  "ANDS.CENTRE68": {
-    "openaire_id": "re3data_____::r3d100010918",
-    "datacite_name": "Atlas of Living Australia",
-    "official_name": "Atlas of Living Australia"
-  },
-  "ANDS.CENTRE69": {
-    "openaire_id": "re3data_____::r3d100010914",
-    "datacite_name": "Australian Ocean Data Network",
-    "official_name": "Australian Ocean Data Network Portal"
-  },
-  "INIST.CDS": {
-    "openaire_id": "re3data_____::r3d100010584",
-    "datacite_name": "Strasbourg Astronomical Data Center",
-    "official_name": "Strasbourg Astronomical Data Center"
-  },
-  "BL.NHM": {
-    "openaire_id": "re3data_____::r3d100011675",
-    "datacite_name": "Natural History Museum, London",
-    "official_name": "Natural History Museum, Data Portal"
-  },
-  "BL.ADS": {
-    "openaire_id": "re3data_____::r3d100000006",
-    "datacite_name": "Archaeology Data Service",
-    "official_name": "Archaeology Data Service"
-  },
-  "GDCC.JHU": {
-    "openaire_id": "re3data_____::r3d100011836",
-    "datacite_name": "Johns Hopkins University Library",
-    "official_name": "Johns Hopkins Data Archive Dataverse Network"
-  },
-  "BL.ED": {
-    "openaire_id": "re3data_____::r3d100000047",
-    "datacite_name": "University of Edinburgh",
-    "official_name": "Edinburgh DataShare"
-  },
-  "BL.EXETER": {
-    "openaire_id": "re3data_____::r3d100011202",
-    "datacite_name": "University of Exeter",
-    "official_name": "Open Research Exeter"
-  },
-  "BL.NCL": {
-    "openaire_id": "re3data_____::r3d100012408",
-    "datacite_name": "Newcastle University",
-    "official_name": "NCL Data"
-  },
-  "BROWN.BDR": {
-    "openaire_id": "re3data_____::r3d100011654",
-    "datacite_name": "Brown Digital Repository",
-    "official_name": "Brown Digital Repository"
-  },
-  "GDCC.SYR-QDR": {
-    "openaire_id": "re3data_____::r3d100011038",
-    "datacite_name": "Syracuse University Qualitative Data Repository",
-    "official_name": "Qualitative Data Repository"
-  },
-  "BL.BRISTOL": {
-    "openaire_id": "re3data_____::r3d100011099",
-    "datacite_name": "University of Bristol",
-    "official_name": "data.bris Research Data Repository"
-  },
-  "DATACITE.DATACITE": {
-    "openaire_id": "openaire____::datacite",
-    "datacite_name": "DataCite",
-    "official_name": "Datacite"
-  },
-  "ESTDOI.KEEL": {
-    "openaire_id": "re3data_____::r3d100011941",
-    "datacite_name": "Keeleressursid. The Center of Estonian Language Resources",
-    "official_name": "Center of Estonian Language Resources"
-  },
-  "BL.ESSEX": {
-    "openaire_id": "re3data_____::r3d100012405",
-    "datacite_name": "University of Essex",
-    "official_name": "Research Data at Essex"
-  },
-  "PURDUE.MDF": {
-    "openaire_id": "re3data_____::r3d100012080",
-    "datacite_name": "Univ Chicago Materials Data Facility",
-    "official_name": "Materials Data Facility"
-  },
-  "DELFT.KNMI": {
-    "openaire_id": "re3data_____::r3d100011879",
-    "datacite_name": "KNMI Data Centre",
-    "official_name": "KNMI Data Centre"
-  },
-  "CUL.CIESIN": {
-    "openaire_id": "re3data_____::r3d100010207",
-    "datacite_name": "Center for International Earth Science Information Network",
-    "official_name": "Center for International Earth Science Information Network"
-  },
-  "WISC.NEOTOMA": {
-    "openaire_id": "re3data_____::r3d100011761",
-    "datacite_name": "Neotoma Paleoecological Database",
-    "official_name": "Neotoma Paleoecology Database",
-    "similarity": 0.9180327868852459
-  },
-  "IRIS.IRIS": {
-    "openaire_id": "re3data_____::r3d100010268",
-    "datacite_name": "Incorporated Research Institutions for Seismology",
-    "official_name": "Incorporated Research Institutions for Seismology"
-  },
-  "ANDS.CENTRE50": {
-    "openaire_id": "re3data_____::r3d100012378",
-    "datacite_name": "Analysis and Policy Observatory",
-    "official_name": "Analysis and Policy Observatory"
-  },
-  "FAO.RING": {
-    "openaire_id": "re3data_____::r3d100012571",
-    "datacite_name": "CIARD RING",
-    "official_name": "CIARD Ring"
-  },
-  "CUL.R2R": {
-    "openaire_id": "re3data_____::r3d100010735",
-    "datacite_name": "Rolling Deck to Repository",
-    "official_name": "Rolling Deck to Repository"
-  },
-  "DEMO.GRIIDC": {
-    "openaire_id": "re3data_____::r3d100011571",
-    "datacite_name": "Gulf of Mexico Research Initiative Information and Data Cooperative",
-    "official_name": "Gulf of Mexico Research Initiative Information and Data Cooperative"
-  },
-  "ANDS.CENTRE-6": {
-    "openaire_id": "re3data_____::r3d100012268",
-    "datacite_name": "Curtin University",
-    "official_name": "Curtin University Research Data Collection"
-  },
-  "ANDS.CENTRE-5": {
-    "openaire_id": "re3data_____::r3d100012013",
-    "datacite_name": "TERN Central Portal",
-    "official_name": "TERN Data Discovery portal"
-  },
-  "FIGSHARE.UCT": {
-    "openaire_id": "re3data_____::r3d100012633",
-    "datacite_name": "University of Cape Town (UCT)",
-    "official_name": "ZivaHub"
-  },
-  "BIBSYS.UIT-ORD": {
-    "openaire_id": "re3data_____::r3d100012538",
-    "datacite_name": "DataverseNO",
-    "official_name": "DataverseNO"
-  },
-  "CISTI.CADC": {
-    "openaire_id": "re3data_____::r3d100000016",
-    "datacite_name": "Canadian Astronomy Data Centre",
-    "official_name": "The Canadian Astronomy Data Centre",
-    "similarity": 0.9375
-  },
-  "BL.CCDC": {
-    "openaire_id": "re3data_____::r3d100010197",
-    "datacite_name": "The Cambridge Crystallographic Data Centre",
-    "official_name": "The Cambridge Structural Database"
-  },
-  "BL.UCLD": {
-    "openaire_id": "re3data_____::r3d100012417",
-    "datacite_name": "University College London",
-    "official_name": "UCL Discovery"
-  },
-  "GESIS.RKI": {
-    "openaire_id": "re3data_____::r3d100010436",
-    "datacite_name": "'Health Monitoring' Research Data Centre at the Robert Koch Institute",
-    "official_name": "'Health Monitoring' Research Data Centre at the Robert Koch Institute"
-  },
-  "BL.DRI": {
-    "openaire_id": "re3data_____::r3d100011805",
-    "datacite_name": "Digital Repository of Ireland",
-    "official_name": "Digital Repository of Ireland"
-  },
-  "TIB.KIT-IMK": {
-    "openaire_id": "re3data_____::r3d100011956",
-    "datacite_name": "Institute for Meteorology and Climate Research - Atmospheric Trace Gases and Remote Sensing",
-    "official_name": "CARIBIC"
-  },
-  "DOINZ.LANDCARE": {
-    "openaire_id": "re3data_____::r3d100011662",
-    "datacite_name": "Landcare Research New Zealand Ltd",
-    "official_name": "Landcare Research Data Repository"
-  },
-  "DEMO.EMORY": {
-    "openaire_id": "re3data_____::r3d100011559",
-    "datacite_name": "The Cancer Imaging Archive",
-    "official_name": "The Cancer Imaging Archive"
-  },
-  "UMN.DRUM": {
-    "openaire_id": "re3data_____::r3d100011393",
-    "datacite_name": "Data Repository for the University of Minnesota",
-    "official_name": "Data Repository for the University of Minnesota"
-  },
-  "CISTI.SFU": {
-    "openaire_id": "re3data_____::r3d100012512",
-    "datacite_name": "Simon Fraser University",
-    "official_name": "SFU Radar"
-  },
-  "GESIS.ICPSR": {
-    "openaire_id": "re3data_____::r3d100010255",
-    "datacite_name": "ICPSR",
-    "official_name": "Inter-university Consortium for Political and Social Research"
-  },
-  "ANDS.CENTRE49": {
-    "openaire_id": "re3data_____::r3d100012145",
-    "datacite_name": "The University of Melbourne",
-    "official_name": "melbourne.figshare.com"
-  },
-  "ZBW.IFO": {
-    "openaire_id": "re3data_____::r3d100010201",
-    "datacite_name": "LMU-ifo Economics & Business Data Center",
-    "official_name": "LMU-ifo Economics & Business Data Center"
-  },
-  "TIB.BEILST": {
-    "openaire_id": "re3data_____::r3d100012329",
-    "datacite_name": "Beilstein-Institut zur F\u00f6rderung der Chemischen Wissenschaften",
-    "official_name": "STRENDA DB"
-  },
-  "ZBW.ZBW-JDA": {
-    "openaire_id": "re3data_____::r3d100012190",
-    "datacite_name": "ZBW Journal Data Archive",
-    "official_name": "ZBW Journal Data Archive"
-  },
-  "BL.UKDA": {
-    "openaire_id": "re3data_____::r3d100010215",
-    "datacite_name": "UK Data Archive",
-    "official_name": "UK Data Archive"
-  },
-  "CERN.INSPIRE": {
-    "openaire_id": "re3data_____::r3d100011077",
-    "datacite_name": "inspirehep.net",
-    "official_name": "Inspire-HEP"
-  },
-  "CISTI.OTNDC": {
-    "openaire_id": "re3data_____::r3d100012083",
-    "datacite_name": "Ocean Tracking Network",
-    "official_name": "Ocean Tracking Network"
-  },
-  "CISTI.CC": {
-    "openaire_id": "re3data_____::r3d100012646",
-    "datacite_name": "Compute Canada",
-    "official_name": "Federated Research Data Repository"
-  },
-  "SND.ICOS": {
-    "openaire_id": "re3data_____::r3d100012203",
-    "datacite_name": "ICOS Carbon Portal",
-    "official_name": "ICOS Carbon Portal"
-  },
-  "BL.MENDELEY": {
-    "openaire_id": "re3data_____::r3d100011868",
-    "datacite_name": "Mendeley",
-    "official_name": "Mendeley Data"
-  },
-  "DELFT.UU": {
-    "openaire_id": "re3data_____::r3d100011201",
-    "datacite_name": "Universiteit Utrecht",
-    "official_name": "DataverseNL"
-  },
-  "GESIS.DSZ-BO": {
-    "openaire_id": "re3data_____::r3d100010439",
-    "datacite_name": "Data Service Center for Business and Organizational Data",
-    "official_name": "Data Service Center for Business and Organizational Data"
-  },
-  "TIB.IPK": {
-    "openaire_id": "re3data_____::r3d100011647",
-    "datacite_name": "IPK Gatersleben",
-    "official_name": "IPK Gatersleben"
-  },
-  "GDCC.HARVARD-DV": {
-    "openaire_id": "re3data_____::r3d100010051",
-    "datacite_name": "Harvard IQSS Dataverse",
-    "official_name": "Harvard Dataverse"
-  },
-  "BL.LEEDS": {
-    "openaire_id": "re3data_____::r3d100011945",
-    "datacite_name": "University of Leeds",
-    "official_name": "Research Data Leeds Repository"
-  },
-  "BL.BRUNEL": {
-    "openaire_id": "re3data_____::r3d100012140",
-    "datacite_name": "Brunel University London",
-    "official_name": "Brunel figshare"
-  },
-  "DEMO.ENVIDAT": {
-    "openaire_id": "re3data_____::r3d100012587",
-    "datacite_name": "EnviDat",
-    "official_name": "EnviDat"
-  },
-  "GDCC.NTU": {
-    "openaire_id": "re3data_____::r3d100012440",
-    "datacite_name": "Nanyang Technological University",
-    "official_name": "DR-NTU (Data)"
-  },
-  "UNM.DATAONE": {
-    "openaire_id": "re3data_____::r3d100000045",
-    "datacite_name": "DataONE",
-    "official_name": "DataONE"
-  },
-  "CSC.NRD": {
-    "openaire_id": "re3data_____::r3d100012157",
-    "datacite_name": "Ministry of Culture and Education",
-    "official_name": "IDA Research Data Storage Service"
-  },
-  "GESIS.DIPF": {
-    "openaire_id": "re3data_____::r3d100010390",
-    "datacite_name": "Research Data Centre for Education",
-    "official_name": "Research Data Centre for Education"
-  },
-  "BL.HALLAM": {
-    "openaire_id": "re3data_____::r3d100011909",
-    "datacite_name": "Sheffield Hallam University",
-    "official_name": "Sheffield Hallam University Research Data Archive"
-  },
-  "BL.LSHTM": {
-    "openaire_id": "re3data_____::r3d100011800",
-    "datacite_name": "London School of Hygiene and Tropical Medicine",
-    "official_name": "LSHTM Data Compass"
-  },
-  "SUBGOE.DARIAH": {
-    "openaire_id": "re3data_____::r3d100011345",
-    "datacite_name": "Digital Research Infrastructure for the Arts and Humanities",
-    "official_name": "DARIAH-DE Repository"
-  },
-  "SND.SU": {
-    "openaire_id": "re3data_____::r3d100012147",
-    "datacite_name": "Stockholm University",
-    "official_name": "Stockholm University repository for data"
-  },
-  "GESIS.INDEPTH": {
-    "openaire_id": "re3data_____::r3d100011392",
-    "datacite_name": "INDEPTH Network",
-    "official_name": "INDEPTH Data Repository"
-  },
-  "TIB.FLOSS": {
-    "openaire_id": "re3data_____::r3d100010863",
-    "datacite_name": "FLOSS Project, Syracuse University",
-    "official_name": "FLOSSmole"
-  },
-  "ETHZ.WGMS": {
-    "openaire_id": "re3data_____::r3d100010627",
-    "datacite_name": "World Glacier Monitoring Service",
-    "official_name": "World Glacier Monitoring Service"
-  },
-  "BL.UEL": {
-    "openaire_id": "re3data_____::r3d100012414",
-    "datacite_name": "University of East London",
-    "official_name": "Data.uel"
-  },
-  "DELFT.DATA4TU": {
-    "openaire_id": "re3data_____::r3d100010216",
-    "datacite_name": "4TU.Centre for Research Data",
-    "official_name": "4TU.Centre for Research Data"
-  },
-  "GESIS.IANUS": {
-    "openaire_id": "re3data_____::r3d100012361",
-    "datacite_name": "IANUS - FDZ Arch\u00e4ologie & Altertumswissenschaften",
-    "official_name": "IANUS Datenportal"
-  },
-  "CDL.UCSDCCA": {
-    "openaire_id": "re3data_____::r3d100011655",
-    "datacite_name": "California Coastal Atlas",
-    "official_name": "California Coastal Atlas"
-  },
-  "VIVA.VT": {
-    "openaire_id": "re3data_____::r3d100012601",
-    "datacite_name": "Virginia Tech",
-    "official_name": "VTechData"
-  },
-  "ANDS.CENTRE39": {
-    "openaire_id": "re3data_____::r3d100011640",
-    "datacite_name": "University of the Sunshine Coast",
-    "official_name": "USC Research Bank research data"
-  },
-  "DEMO.OPENKIM": {
-    "openaire_id": "re3data_____::r3d100011864",
-    "datacite_name": "OpenKIM",
-    "official_name": "OpenKIM"
-  },
-  "INIST.OTELO": {
-    "openaire_id": "re3data_____::r3d100012505",
-    "datacite_name": "Observatoire Terre Environnement de Lorraine",
-    "official_name": "ORDaR"
-  },
-  "INIST.ILL": {
-    "openaire_id": "re3data_____::r3d100012072",
-    "datacite_name": "Institut Laue-Langevin",
-    "official_name": "ILL Data Portal"
-  },
-  "ANDS.CENTRE31": {
-    "openaire_id": "re3data_____::r3d100012378",
-    "datacite_name": "Test: Analysis and Policy Observatory",
-    "official_name": "Analysis and Policy Observatory",
-    "similarity": 0.9117647058823529
-  },
-  "ANDS.CENTRE30": {
-    "openaire_id": "re3data_____::r3d100010917",
-    "datacite_name": "Test: Geoscience Australia",
-    "official_name": "Geoscience Australia",
-    "similarity": 0.8695652173913043
-  },
-  "BL.SALFORD": {
-    "openaire_id": "re3data_____::r3d100012144",
-    "datacite_name": "University of Salford",
-    "official_name": "University of Salford Data Repository"
-  },
-  "CERN.HEPDATA": {
-    "openaire_id": "re3data_____::r3d100010081",
-    "datacite_name": "HEPData.net",
-    "official_name": "HEPData"
-  },
-  "ETHZ.E-COLL": {
-    "openaire_id": "re3data_____::r3d100012557",
-    "datacite_name": "ETH Z\u00fcrich Research Collection",
-    "official_name": "ETH Z\u00fcrich Research Collection"
-  },
-  "GBIF.GBIF": {
-    "openaire_id": "re3data_____::r3d100000039",
-    "datacite_name": "Global Biodiversity Information Facility",
-    "official_name": "Global Biodiversity Information Facility"
-  },
-  "ORNLDAAC.DAAC": {
-    "openaire_id": "re3data_____::r3d100000037",
-    "datacite_name": "Oak Ridge National Laboratory Distributed Active Archive Center",
-    "official_name": "Oak Ridge National Laboratory Distributed Active Archive Center for Biogeochemical Dynamics"
-  },
-  "KAUST.KAUSTREPO": {
-    "openaire_id": "re3data_____::r3d100011898",
-    "datacite_name": "KAUST Research Repository",
-    "official_name": "UWA Research Repository",
-    "similarity": 0.875
-  },
-  "ZBW.ZEW": {
-    "openaire_id": "re3data_____::r3d100010399",
-    "datacite_name": "Zentrum f\u00fcr Europ\u00e4ische Wirtschaftsforschung GmbH (ZEW)",
-    "official_name": "ZEW Forschungsdatenzentrum"
-  },
-  "SML.TDAR": {
-    "openaire_id": "re3data_____::r3d100010347",
-    "datacite_name": "Digital Antiquity (TDAR)",
-    "official_name": "tDAR"
-  },
-  "GESIS.CSDA": {
-    "openaire_id": "re3data_____::r3d100010484",
-    "datacite_name": "Czech Social Science Data Archive",
-    "official_name": "Czech Social Science Data Archive"
-  },
-  "SND.BOLIN": {
-    "openaire_id": "re3data_____::r3d100011699",
-    "datacite_name": "Bolin Centre Database",
-    "official_name": "Bolin Centre Database"
-  },
-  "MLA.HC": {
-    "openaire_id": "re3data_____::r3d100012309",
-    "datacite_name": "Humanities Commons",
-    "official_name": "Humanities Commons"
-  },
-  "CDL.IDASHREP": {
-    "openaire_id": "re3data_____::r3d100010382",
-    "datacite_name": "iDASH Repository",
-    "official_name": "IDS Repository",
-    "similarity": 0.8666666666666667
-  },
-  "ZBMED.SNSB": {
-    "openaire_id": "re3data_____::r3d100011873",
-    "datacite_name": "Staatliche Naturwissenschaftliche Sammlungen Bayerns",
-    "official_name": "Staatliche Naturwissenschaftliche Sammlungen Bayerns - datasets",
-    "similarity": 0.9043478260869565
-  },
-  "ORBIS.OHSU": {
-    "openaire_id": "re3data_____::r3d100012244",
-    "datacite_name": "Oregon Health Sciences University",
-    "official_name": "OHSU Digital Commons"
-  },
-  "DARTLIB.CRAWDAD": {
-    "openaire_id": "re3data_____::r3d100010716",
-    "datacite_name": "CRAWDAD",
-    "official_name": "CRAWDAD"
-  },
-  "CDL.CCHDO": {
-    "openaire_id": "re3data_____::r3d100010831",
-    "datacite_name": "CLIVAR and Carbon Hydrographic Data Office",
-    "official_name": "Climate Variability and Predictability and Carbon Hydrographic Data Office"
-  },
-  "GESIS.AUSSDA": {
-    "openaire_id": "re3data_____::r3d100010483",
-    "datacite_name": "Austrian Social Science Data Archive",
-    "official_name": "AUSSDA"
-  },
-  "NSIDC.DATACTR": {
-    "openaire_id": "re3data_____::r3d100010110",
-    "datacite_name": "National Snow and Ice Data Center",
-    "official_name": "National Snow and Ice Data Center"
-  },
-  "TIB.RADAR": {
-    "openaire_id": "re3data_____::r3d100012330",
-    "datacite_name": "FIZ Karlsruhe \u2013 Leibniz-Institut f\u00fcr Informationsinfrastruktur",
-    "official_name": "RADAR"
-  },
-  "KIM.OPENKIM": {
-    "openaire_id": "re3data_____::r3d100011864",
-    "datacite_name": "Open Knowledgebase of Interatomic Models (OpenKIM)",
-    "official_name": "OpenKIM"
-  },
-  "BL.LBORO": {
-    "openaire_id": "re3data_____::r3d100012143",
-    "datacite_name": "Loughborough University",
-    "official_name": "Loughborough Data Repository"
-  },
-  "GESIS.ZPID": {
-    "openaire_id": "re3data_____::r3d100010328",
-    "datacite_name": "GESIS.ZPID",
-    "official_name": "PsychData"
-  },
-  "SML.TCIA": {
-    "openaire_id": "re3data_____::r3d100011559",
-    "datacite_name": "The Cancer Imaging Archive",
-    "official_name": "The Cancer Imaging Archive"
-  },
-  "CDL.IRIS": {
-    "openaire_id": "re3data_____::r3d100010268",
-    "datacite_name": "Incorporated Research Institutions for Seismology",
-    "official_name": "Incorporated Research Institutions for Seismology"
-  },
-  "BIBSYS.NMDC": {
-    "openaire_id": "re3data_____::r3d100012291",
-    "datacite_name": "Norwegian Marine Data Centre",
-    "official_name": "Norwegian Polar Data Centre",
-    "similarity": 0.8727272727272727
-  },
-  "ANDS.CENTRE25": {
-    "openaire_id": "re3data_____::r3d100010917",
-    "datacite_name": "Geoscience Australia",
-    "official_name": "Geoscience Australia"
-  },
-  "BL.UCLAN": {
-    "openaire_id": "re3data_____::r3d100012019",
-    "datacite_name": "University of Central Lancashire",
-    "official_name": "UCLanData"
-  },
-  "ANDS.CENTRE23": {
-    "openaire_id": "re3data_____::r3d100011898",
-    "datacite_name": "The University of Western Australia",
-    "official_name": "UWA Research Repository"
-  },
-  "CISTI.WOUDC": {
-    "openaire_id": "re3data_____::r3d100010367",
-    "datacite_name": "World Ozone and Ultraviolet Radiation Data Centre",
-    "official_name": "World Ozone and Ultraviolet Radiation Data Centre"
-  },
-  "FIGSHARE.ARS": {
-    "openaire_id": "re3data_____::r3d100010066",
-    "datacite_name": "figshare Academic Research System",
-    "official_name": "figshare"
-  },
-  "ILLINOIS.DATABANK": {
-    "openaire_id": "re3data_____::r3d100012001",
-    "datacite_name": "Illinois Data Bank",
-    "official_name": "Illinois Data Bank"
-  },
-  "BL.ECMWF": {
-    "openaire_id": "re3data_____::r3d100011726",
-    "datacite_name": "European Centre for Medium-Range Weather Forecasts",
-    "official_name": "European Centre for Medium-Range Weather Forecasts"
-  },
-  "CDL.ISSDA": {
-    "openaire_id": "re3data_____::r3d100010497",
-    "datacite_name": "Irish Social Science Data Archive (ISSDA)",
-    "official_name": "Irish Social Science Data Archive"
-  },
-  "CDL.PQR": {
-    "openaire_id": "re3data_____::r3d100012225",
-    "datacite_name": "Pitt Quantum Repository",
-    "official_name": "Pitt Quantum Repository"
-  },
-  "ANDS.CENTRE82": {
-    "openaire_id": "re3data_____::r3d100010138",
-    "datacite_name": "Test: Australian Data Archive",
-    "official_name": "Australian Data Archive",
-    "similarity": 0.8846153846153846
-  },
-  "GDCC.HARVARD-SLP": {
-    "openaire_id": "re3data_____::r3d100011861",
-    "datacite_name": "National Sleep Research Resource",
-    "official_name": "National Sleep Research Resource"
-  },
-  "CDL.IMMPORT": {
-    "openaire_id": "re3data_____::r3d100012529",
-    "datacite_name": "UCSF ImmPort",
-    "official_name": "ImmPort"
-  },
-  "GESIS.FID": {
-    "openaire_id": "re3data_____::r3d100012347",
-    "datacite_name": "FID f\u00fcr internationale und interdisziplin\u00e4re Rechtsforschung",
-    "official_name": "<intR>\u00b2Dok[\u00a7]"
-  },
-  "OCEAN.OCEAN": {
-    "openaire_id": "re3data_____::r3d100012369",
-    "datacite_name": "Code Ocean",
-    "official_name": "Code Ocean"
-  },
-  "CERN.ZENODO": {
-    "openaire_id": "re3data_____::r3d100010468",
-    "datacite_name": "Zenodo",
-    "official_name": "Zenodo"
-  },
-  "ETHZ.DA-RD": {
-    "openaire_id": "re3data_____::r3d100011626",
-    "datacite_name": "ETHZ Data Archive - Research Data",
-    "official_name": "ETH Data Archive"
-  },
-  "SND.ECDS": {
-    "openaire_id": "re3data_____::r3d100011000",
-    "datacite_name": "Environment Climate Data Sweden",
-    "official_name": "Environment Climate Data Sweden"
-  },
-  "BL.BATH": {
-    "openaire_id": "re3data_____::r3d100011947",
-    "datacite_name": "University of Bath",
-    "official_name": "University of Bath Research Data Archive"
-  },
-  "TIB.LDEO": {
-    "openaire_id": "re3data_____::r3d100012547",
-    "datacite_name": "LDEO - Lamont-Doherty Earth Observatory, Columbia University",
-    "official_name": "Lamont-Doherty Core Repository"
-  },
-  "COS.OSF": {
-    "openaire_id": "re3data_____::r3d100011137",
-    "datacite_name": "Open Science Framework",
-    "official_name": "Open Science Framework"
-  },
-  "ESTDOI.REPO": {
-    "openaire_id": "re3data_____::r3d100012333",
-    "datacite_name": "DataDOI",
-    "official_name": "DataDOI"
-  },
-  "CDL.NSFADC": {
-    "openaire_id": "re3data_____::r3d100011973",
-    "datacite_name": "NSF Arctic Data Center",
-    "official_name": "NSF Arctic Data Center"
-  },
-  "ANDS.CENTRE13": {
-    "openaire_id": "re3data_____::r3d100010477",
-    "datacite_name": "The Australian National University",
-    "official_name": "ANU Data Commons"
-  },
-  "BL.NERC": {
-    "openaire_id": "re3data_____::r3d100010199",
-    "datacite_name": "Natural Environment Research Council",
-    "official_name": "Environmental Information Data Centre"
-  },
-  "SAGEBIO.SYNAPSE": {
-    "openaire_id": "re3data_____::r3d100011894",
-    "datacite_name": "Synapse",
-    "official_name": "Synapse"
-  },
-  "ANDS.CENTRE15": {
-    "openaire_id": "re3data_____::r3d100000038",
-    "datacite_name": "Australian Antarctic Division",
-    "official_name": "Australian Antarctic Data Centre"
-  },
-  "WISC.BMRB": {
-    "openaire_id": "re3data_____::r3d100010191",
-    "datacite_name": "Biological Magnetic Resonance Bank",
-    "official_name": "Biological Magnetic Resonance Data Bank",
-    "similarity": 0.9315068493150684
-  },
-  "STSCI.MAST": {
-    "openaire_id": "re3data_____::r3d100010403",
-    "datacite_name": "Barbara A. Mikulski Archive for Space Telescopes",
-    "official_name": "Barbara A. Mikulski Archive for Space Telescopes"
-  },
-  "CDL.NSIDC": {
-    "openaire_id": "re3data_____::r3d100010110",
-    "datacite_name": "National Snow and Ice Data Center",
-    "official_name": "National Snow and Ice Data Center"
-  },
-  "BL.STRATH": {
-    "openaire_id": "re3data_____::r3d100012412",
-    "datacite_name": "University of Strathclyde",
-    "official_name": "University of Strathclyde KnowledgeBase Datasets"
-  },
-  "DEMO.TDAR": {
-    "openaire_id": "re3data_____::r3d100010347",
-    "datacite_name": "The Digital Archaeological Record (tDAR)",
-    "official_name": "tDAR"
-  },
-  "TIND.CALTECH": {
-    "openaire_id": "re3data_____::r3d100012384",
-    "datacite_name": "CaltechDATA",
-    "official_name": "CaltechDATA"
-  },
-  "GESIS.BIBB-FDZ": {
-    "openaire_id": "re3data_____::r3d100010190",
-    "datacite_name": "Forschungsdatenzentrum im Bundesinstitut f\u00fcr Berufsbildung",
-    "official_name": "Forschungsdatenzentrum im Bundesinstitut f\u00fcr Berufsbildung"
-  },
-  "ANDS.CENTRE87": {
-    "openaire_id": "re3data_____::r3d100010138",
-    "datacite_name": "Australian Data Archive",
-    "official_name": "Australian Data Archive"
-  },
-  "GESIS.NEPS": {
-    "openaire_id": "re3data_____::r3d100010736",
-    "datacite_name": "Nationales Bildungspanel (National Educational Panel Study, NEPS)",
-    "official_name": "Nationales Bildungspanel"
-  },
-  "CDL.UCBCRCNS": {
-    "openaire_id": "re3data_____::r3d100011269",
-    "datacite_name": "Collaborative Research in Computational Neuroscience (CRCNS)",
-    "official_name": "Collaborative Research in Computational Neuroscience"
-  },
-  "TIB.UKON": {
-    "openaire_id": "re3data_____::r3d100010469",
-    "datacite_name": "Movebank",
-    "official_name": "Movebank"
-  },
-  "UMN.IPUMS": {
-    "openaire_id": "re3data_____::r3d100010794",
-    "datacite_name": "Minnesota Population Center",
-    "official_name": "Minnesota Population Center"
-  },
-  "TIB.BIKF": {
-    "openaire_id": "re3data_____::r3d100012379",
-    "datacite_name": "Senckenberg Data & Metadata Repository",
-    "official_name": "Senckenberg Data & Metadata Repository"
-  },
-  "TDL.GRIIDC": {
-    "openaire_id": "re3data_____::r3d100011571",
-    "datacite_name": "Gulf of Mexico Research Initiative Information and Data Cooperative",
-    "official_name": "Gulf of Mexico Research Initiative Information and Data Cooperative"
-  },
-  "DELFT.NIBG": {
-    "openaire_id": "re3data_____::r3d100012167",
-    "datacite_name": "Sound and Vision",
-    "official_name": "Sound and Vision"
-  },
-  "BL.SURREY": {
-    "openaire_id": "re3data_____::r3d100012232",
-    "datacite_name": "University of Surrey",
-    "official_name": "Surrey Research Insight"
-  },
-  "OSTI.ORNLNGEE": {
-    "openaire_id": "re3data_____::r3d100011676",
-    "datacite_name": "NGEE-Arctic  (Next Generation Ecosystems Experiement)",
-    "official_name": "NGEE Arctic"
-  },
-  "TIB.WDCRSAT": {
-    "openaire_id": "re3data_____::r3d100010156",
-    "datacite_name": "World Data Center for Remote Sensing of the Atmosphere",
-    "official_name": "The World Data Center for Remote Sensing of the Atmosphere",
-    "similarity": 0.9642857142857143
-  },
-  "ZBMED.DSMZ": {
-    "openaire_id": "re3data_____::r3d100010219",
-    "datacite_name": "DSMZ",
-    "official_name": "DSMZ"
-  },
-  "DOINZ.NZAU": {
-    "openaire_id": "re3data_____::r3d100012110",
-    "datacite_name": "University of Auckland Data Publishing and Discovery Service",
-    "official_name": "University of Auckland Data Repository"
-  },
-  "INIST.RESIF": {
-    "openaire_id": "re3data_____::r3d100012222",
-    "datacite_name": "R\u00e9seau sismologique et g\u00e9od\u00e9sique fran\u00e7ais",
-    "official_name": "RESIF Seismic Data Portal"
-  },
-  "CDL.NCEAS": {
-    "openaire_id": "re3data_____::r3d100010093",
-    "datacite_name": "National Center for Ecological Analysis and Synthesis (NCEAS)",
-    "official_name": "National Center for Ecological Analysis and Synthesis Data Repository"
-  },
-  "ZBMED.EMP": {
-    "openaire_id": "re3data_____::r3d100010234",
-    "datacite_name": "eyeMoviePedia",
-    "official_name": "eyeMoviePedia"
-  },
-  "ZBMED.BIOFRESH": {
-    "openaire_id": "re3data_____::r3d100011651",
-    "datacite_name": "Project BioFresh, Leibniz-Institute of Freshwater Ecology and Inland Fisheries",
-    "official_name": "Freshwater Biodiversity Data Portal"
-  },
-  "INIST.IFREMER": {
-    "openaire_id": "re3data_____::r3d100011867",
-    "datacite_name": "Institut Fran\u00e7ais de Recherche pour l'Exploitation de la Mer",
-    "official_name": "SEANOE"
-  },
-  "ETHZ.SICAS": {
-    "openaire_id": "re3data_____::r3d100011560",
-    "datacite_name": "SICAS",
-    "official_name": "Sicas Medical Image Repository"
-  },
-  "SND.SND": {
-    "openaire_id": "re3data_____::r3d100010146",
-    "datacite_name": "Swedish National Data Service",
-    "official_name": "Swedish National Data Service"
-  },
-  "DELFT.EASY": {
-    "openaire_id": "re3data_____::r3d100011201",
-    "datacite_name": "DANS",
-    "official_name": "DataverseNL"
-  },
-  "WH.WHOAS": {
-    "openaire_id": "re3data_____::r3d100010423",
-    "datacite_name": "Woods Hole Open Access Server",
-    "official_name": "Woods Hole Open Access Server"
-  },
-  "DATACITE.UCSC": {
-    "openaire_id": "re3data_____::r3d100010243",
-    "datacite_name": "UCSC Genome Browser",
-    "official_name": "UCSC Genome Browser"
-  }
+ "ETHZ.UNIGENF": {
+  "openaire_id": "opendoar____::1400",
+  "datacite_name": "Uni Genf",
+  "official_name": "Archive ouverte UNIGE"
+ },
+ "GESIS.RKI": {
+  "openaire_id": "re3data_____::r3d100010436",
+  "datacite_name": "Forschungsdatenzentrum  am Robert Koch Institut",
+  "official_name": "Forschungsdatenzentrum  am Robert Koch Institut"
+ },
+ "DELFT.DATA4TU": {
+  "openaire_id": "re3data_____::r3d100010216",
+  "datacite_name": "4TU.ResearchData | science.engineering.design",
+  "official_name": "4TU.ResearchData | science.engineering.design"
+ },
+ "FBTK.DMXFNR": {
+  "openaire_id": "re3data_____::r3d100013444",
+  "datacite_name": "Aperta TÜBİTAK Open Archive",
+  "official_name": "Aperta TÜBİTAK Open Archive"
+ },
+ "BL.CAM": {
+  "openaire_id": "opendoar____::109",
+  "datacite_name": "Apollo",
+  "official_name": "Apollo"
+ },
+ "NU.ARCH": {
+  "openaire_id": "re3data_____::r3d100012925",
+  "datacite_name": "Arch",
+  "official_name": "Arch"
+ },
+ "BL.ADS": {
+  "openaire_id": "re3data_____::r3d100000006",
+  "datacite_name": "Archaeology Data Service",
+  "official_name": "Archaeology Data Service"
+ },
+ "FZJ.B2SHARE": {
+  "openaire_id": "re3data_____::r3d100011394",
+  "datacite_name": "B2SHARE",
+  "official_name": "B2SHARE"
+ },
+ "STSCI.MAST": {
+  "openaire_id": "re3data_____::r3d100010403",
+  "datacite_name": "Barbara A. Mikulski Archive for Space Telescopes",
+  "official_name": "Barbara A. Mikulski Archive for Space Telescopes"
+ },
+ "CBG.DATASETS": {
+  "openaire_id": "re3data_____::r3d100010927",
+  "datacite_name": "Barcode of Life Data Systems",
+  "official_name": "Barcode of Life Data Systems"
+ },
+ "TIB.BEILST": {
+  "openaire_id": "re3data_____::r3d100012329",
+  "datacite_name": "STRENDA DB",
+  "official_name": "STRENDA DB"
+ },
+ "MLBS.SKUXGS": {
+  "openaire_id": "re3data_____::r3d100011696",
+  "datacite_name": "biodiversity.aq",
+  "official_name": "biodiversity.aq"
+ },
+ "BL.BIRKBECK": {
+  "openaire_id": "re3data_____::r3d100012185",
+  "datacite_name": "Birkbeck Research Data",
+  "official_name": "Birkbeck Research Data"
+ },
+ "SND.BOLIN": {
+  "openaire_id": "re3data_____::r3d100011699",
+  "datacite_name": "Bolin Centre Database",
+  "official_name": "Bolin Centre Database"
+ },
+ "BROWN.BDR": {
+  "openaire_id": "re3data_____::r3d100011654",
+  "datacite_name": "Brown Digital Repository",
+  "official_name": "Brown Digital Repository"
+ },
+ "BL.BRUNEL": {
+  "openaire_id": "re3data_____::r3d100012140",
+  "datacite_name": "Brunel figshare",
+  "official_name": "Brunel figshare"
+ },
+ "TIB.BAFG": {
+  "openaire_id": "re3data_____::r3d100011664",
+  "datacite_name": "Geoportal der BFG",
+  "official_name": "Geoportal der BFG"
+ },
+ "TIND.CALTECH": {
+  "openaire_id": "re3data_____::r3d100012384",
+  "datacite_name": "CaltechDATA",
+  "official_name": "CaltechDATA"
+ },
+ "CUL.CIESIN": {
+  "openaire_id": "re3data_____::r3d100010207",
+  "datacite_name": "Center for International Earth Science Information Network",
+  "official_name": "Center for International Earth Science Information Network"
+ },
+ "TIB.KIT-IOC": {
+  "openaire_id": "re3data_____::r3d100010748",
+  "datacite_name": "chemotion",
+  "official_name": "chemotion"
+ },
+ "CORNELL.CISER": {
+  "openaire_id": "re3data_____::r3d100011056",
+  "datacite_name": "CISER Data & Reproduction Archive",
+  "official_name": "CISER Data & Reproduction Archive"
+ },
+ "CLARIN.CLARIN": {
+  "openaire_id": "re3data_____::r3d100010209",
+  "datacite_name": "CLARIN-ERIC",
+  "official_name": "CLARIN-ERIC"
+ },
+ "OCEAN.OCEAN": {
+  "openaire_id": "re3data_____::r3d100012369",
+  "datacite_name": "Code Ocean",
+  "official_name": "Code Ocean"
+ },
+ "CORNELL.LIBRARY": {
+  "openaire_id": "re3data_____::r3d100012322",
+  "datacite_name": "eCommons - Cornell's digital repository",
+  "official_name": "eCommons - Cornell's digital repository"
+ },
+ "BL.CRAN": {
+  "openaire_id": "re3data_____::r3d100012068",
+  "datacite_name": "Cranfield Online Research Data",
+  "official_name": "Cranfield Online Research Data"
+ },
+ "DARTLIB.CRAWDAD": {
+  "openaire_id": "re3data_____::r3d100010716",
+  "datacite_name": "CRAWDAD",
+  "official_name": "CRAWDAD"
+ },
+ "GESIS.CSDA": {
+  "openaire_id": "re3data_____::r3d100010484",
+  "datacite_name": "Czech Social Science Data Archive",
+  "official_name": "Czech Social Science Data Archive"
+ },
+ "PSU.DATACOM": {
+  "openaire_id": "re3data_____::r3d100012927",
+  "datacite_name": "Data Commons",
+  "official_name": "Data Commons"
+ },
+ "INIST.INRA": {
+  "openaire_id": "re3data_____::r3d100012673",
+  "datacite_name": "Data INRAE",
+  "official_name": "Data INRAE"
+ },
+ "UMN.DRUM": {
+  "openaire_id": "re3data_____::r3d100011393",
+  "datacite_name": "Data Repository for the University of Minnesota",
+  "official_name": "Data Repository for the University of Minnesota"
+ },
+ "ESTDOI.REPO": {
+  "openaire_id": "re3data_____::r3d100012333",
+  "datacite_name": "DataDOI",
+  "official_name": "DataDOI"
+ },
+ "DAFI.CLIENT": {
+  "openaire_id": "re3data_____::r3d100010217",
+  "datacite_name": "DataFirst",
+  "official_name": "DataFirst"
+ },
+ "UNM.DATAONE": {
+  "openaire_id": "re3data_____::r3d100000045",
+  "datacite_name": "DataONE",
+  "official_name": "DataONE"
+ },
+ "FCT.UMINHO": {
+  "openaire_id": "re3data_____::r3d100013173",
+  "datacite_name": "DataRepositoriUM",
+  "official_name": "DataRepositoriUM"
+ },
+ "FIGSHARE.IASTATE": {
+  "openaire_id": "re3data_____::r3d100012696",
+  "datacite_name": "DataShare: the Open Data Repository of Iowa State University",
+  "official_name": "DataShare: the Open Data Repository of Iowa State University"
+ },
+ "PU.DATASPACE": {
+  "openaire_id": "re3data_____::r3d100012513",
+  "datacite_name": "DataSpace",
+  "official_name": "DataSpace"
+ },
+ "DANS.DATAVERSENL": {
+  "openaire_id": "re3data_____::r3d100011201",
+  "datacite_name": "DataverseNL",
+  "official_name": "DataverseNL"
+ },
+ "BIBSYS.UIT-ORD": {
+  "openaire_id": "re3data_____::r3d100012538",
+  "datacite_name": "DataverseNO",
+  "official_name": "DataverseNO"
+ },
+ "GESIS.SSRI": {
+  "openaire_id": "re3data_____::r3d100013494",
+  "datacite_name": "DATICE",
+  "official_name": "DATICE"
+ },
+ "SML.TDAR": {
+  "openaire_id": "re3data_____::r3d100010347",
+  "datacite_name": "tDAR",
+  "official_name": "tDAR"
+ },
+ "CSIC.DIGITAL": {
+  "openaire_id": "re3data_____::r3d100011076",
+  "datacite_name": "Digital CSIC",
+  "official_name": "DIGITAL.CSIC"
+ },
+ "BL.DRI": {
+  "openaire_id": "re3data_____::r3d100011805",
+  "datacite_name": "Digital Repository of Ireland",
+  "official_name": "Digital Repository of Ireland"
+ },
+ "SUBGOE.DARIAH": {
+  "openaire_id": "re3data_____::r3d100011345",
+  "datacite_name": "DARIAH-DE Repository",
+  "official_name": "DARIAH-DE Repository"
+ },
+ "DRYAD.DRYAD": {
+  "openaire_id": "re3data_____::r3d100000044",
+  "datacite_name": "DRYAD",
+  "official_name": "DRYAD"
+ },
+ "ZBMED.DSMZ": {
+  "openaire_id": "re3data_____::r3d100010219",
+  "datacite_name": "DSMZ",
+  "official_name": "DSMZ"
+ },
+ "DKRZ.ESGF": {
+  "openaire_id": "re3data_____::r3d100011159",
+  "datacite_name": "Earth System Grid Federation",
+  "official_name": "Earth System Grid Federation"
+ },
+ "KTSW.AEZVVV": {
+  "openaire_id": "re3data_____::r3d100013469",
+  "datacite_name": "EarthEnv",
+  "official_name": "EarthEnv"
+ },
+ "DANS.ARCHIVE": {
+  "openaire_id": "re3data_____::r3d100010214",
+  "datacite_name": "EASY",
+  "official_name": "EASY"
+ },
+ "ETHZ.WSL": {
+  "openaire_id": "re3data_____::r3d100012587",
+  "datacite_name": "EnviDat",
+  "official_name": "EnviDat"
+ },
+ "ETHZ.E-COLL": {
+  "openaire_id": "re3data_____::r3d100012557",
+  "datacite_name": "ETH Zürich Research Collection",
+  "official_name": "ETH Zürich Research Collection"
+ },
+ "ETHZ.DA-RD": {
+  "openaire_id": "re3data_____::r3d100011626",
+  "datacite_name": "ETH Data Archive",
+  "official_name": "ETH Data Archive"
+ },
+ "BL.ECMWF": {
+  "openaire_id": "re3data_____::r3d100011726",
+  "datacite_name": "European Centre for Medium-Range Weather Forecasts",
+  "official_name": "European Centre for Medium-Range Weather Forecasts"
+ },
+ "CARL.FRDR": {
+  "openaire_id": "re3data_____::r3d100012646",
+  "datacite_name": "Federated Research Data Repository",
+  "official_name": "Federated Research Data Repository"
+ },
+ "FIGSHARE.ARS": {
+  "openaire_id": "re3data_____::r3d100010066",
+  "datacite_name": "figshare",
+  "official_name": "figshare"
+ },
+ "TIB.FLOSS": {
+  "openaire_id": "re3data_____::r3d100010863",
+  "datacite_name": "FLOSSmole",
+  "official_name": "FLOSSmole"
+ },
+ "LXKC.DSKYFI": {
+  "openaire_id": "re3data_____::r3d100010976",
+  "datacite_name": "ForestPlots.net",
+  "official_name": "ForestPlots.net"
+ },
+ "YKDK.ZUYSQI": {
+  "openaire_id": "re3data_____::r3d100010368",
+  "datacite_name": "FORS DARIS",
+  "official_name": "FORS DARIS"
+ },
+ "TIB.LUIS": {
+  "openaire_id": "re3data_____::r3d100012825",
+  "datacite_name": "Forschungsdaten-Repositorium der LUH",
+  "official_name": "Forschungsdaten-Repositorium der LUH"
+ },
+ "GESIS.BIBB-FDZ": {
+  "openaire_id": "re3data_____::r3d100010190",
+  "datacite_name": "Forschungsdatenzentrum im Bundesinstitut für Berufsbildung",
+  "official_name": "Forschungsdatenzentrum im Bundesinstitut für Berufsbildung"
+ },
+ "GESIS.ZPID": {
+  "openaire_id": "re3data_____::r3d100010328",
+  "datacite_name": "PsychData",
+  "official_name": "PsychData"
+ },
+ "TIB.GFZ": {
+  "openaire_id": "re3data_____::r3d100012335",
+  "datacite_name": "GFZ Data Services",
+  "official_name": "GFZ Data Services"
+ },
+ "CNGB.GIGADB": {
+  "openaire_id": "re3data_____::r3d100010478",
+  "datacite_name": "GigaDB",
+  "official_name": "GigaDB"
+ },
+ "GBIF.GBIF": {
+  "openaire_id": "re3data_____::r3d100000039",
+  "datacite_name": "Global Biodiversity Information Facility",
+  "official_name": "Global Biodiversity Information Facility"
+ },
+ "ARDCX.GRIFFITH": {
+  "openaire_id": "re3data_____::r3d100010864",
+  "datacite_name": "Griffith University Research Data Repository",
+  "official_name": "Griffith University Research Data Repository"
+ },
+ "GDCC.HARVARD-SBGR": {
+  "openaire_id": "re3data_____::r3d100011601",
+  "datacite_name": "Structural Biology Data Grid",
+  "official_name": "Structural Biology Data Grid"
+ },
+ "GDCC.HARVARD-DV": {
+  "openaire_id": "re3data_____::r3d100010051",
+  "datacite_name": "Harvard Dataverse",
+  "official_name": "Harvard Dataverse"
+ },
+ "CERN.HEPDATA": {
+  "openaire_id": "re3data_____::r3d100010081",
+  "datacite_name": "HEPData",
+  "official_name": "HEPData"
+ },
+ "SND.ICOS": {
+  "openaire_id": "re3data_____::r3d100012203",
+  "datacite_name": "ICOS Carbon Portal",
+  "official_name": "ICOS Carbon Portal"
+ },
+ "GESIS.ICPSR": {
+  "openaire_id": "re3data_____::r3d100010255",
+  "datacite_name": "Inter-university Consortium for Political and Social Research",
+  "official_name": "Inter-university Consortium for Political and Social Research"
+ },
+ "IEEE.DATAPORT": {
+  "openaire_id": "re3data_____::r3d100012569",
+  "datacite_name": "IEEE DataPort",
+  "official_name": "IEEE DataPort"
+ },
+ "IIASA.DARE": {
+  "openaire_id": "re3data_____::r3d100012932",
+  "datacite_name": "IIASA DARE",
+  "official_name": "IIASA DARE"
+ },
+ "ILLINOIS.DATABANK": {
+  "openaire_id": "re3data_____::r3d100012001",
+  "datacite_name": "Illinois Data Bank",
+  "official_name": "Illinois Data Bank"
+ },
+ "IRIS.IRIS": {
+  "openaire_id": "re3data_____::r3d100010268",
+  "datacite_name": "Incorporated Research Institutions for Seismology",
+  "official_name": "Incorporated Research Institutions for Seismology"
+ },
+ "GESIS.INDEPTH": {
+  "openaire_id": "re3data_____::r3d100011392",
+  "datacite_name": "INDEPTH Data Repository",
+  "official_name": "INDEPTH Data Repository"
+ },
+ "JCVI.GXPWAQ": {
+  "openaire_id": "re3data_____::r3d100011558",
+  "datacite_name": "Influenza Research Database",
+  "official_name": "Influenza Research Database"
+ },
+ "TIB.INP": {
+  "openaire_id": "re3data_____::r3d100013120",
+  "datacite_name": "INPTDAT",
+  "official_name": "INPTDAT"
+ },
+ "CERN.INSPIRE": {
+  "openaire_id": "re3data_____::r3d100011077",
+  "datacite_name": "Inspire-HEP",
+  "official_name": "Inspire-HEP"
+ },
+ "INIST.IFREMER": {
+  "openaire_id": "re3data_____::r3d100012965",
+  "datacite_name": "IFREMER-SISMER Portail de données marines",
+  "official_name": "IFREMER-SISMER Portail de données marines"
+ },
+ "INIST.ILL": {
+  "openaire_id": "re3data_____::r3d100012072",
+  "datacite_name": "ILL Data Portal",
+  "official_name": "ILL Data Portal"
+ },
+ "TIB.KIT-IMK": {
+  "openaire_id": "re3data_____::r3d100011956",
+  "datacite_name": "CARIBIC",
+  "official_name": "CARIBIC"
+ },
+ "WWPX.INTR2": {
+  "openaire_id": "re3data_____::r3d100012347",
+  "datacite_name": "<intR>²Dok[§]",
+  "official_name": "<intR>²Dok[§]"
+ },
+ "BL.IITA": {
+  "openaire_id": "re3data_____::r3d100012883",
+  "datacite_name": "International Institute of Tropical Agriculture datasets",
+  "official_name": "International Institute of Tropical Agriculture datasets"
+ },
+ "TIB.IPK": {
+  "openaire_id": "re3data_____::r3d100011647",
+  "datacite_name": "IPK Gatersleben",
+  "official_name": "IPK Gatersleben"
+ },
+ "IST.REX": {
+  "openaire_id": "re3data_____::r3d100012394",
+  "datacite_name": "IST Austria Research Explorer",
+  "official_name": "IST Austria Research Explorer"
+ },
+ "GDCC.JHU": {
+  "openaire_id": "re3data_____::r3d100011836",
+  "datacite_name": "Johns Hopkins Data Archive Dataverse Network",
+  "official_name": "Johns Hopkins Data Archive Dataverse Network"
+ },
+ "KAGGLE.KAGGLE": {
+  "openaire_id": "re3data_____::r3d100012705",
+  "datacite_name": "Kaggle",
+  "official_name": "Kaggle"
+ },
+ "ESTDOI.KEEL": {
+  "openaire_id": "re3data_____::r3d100011941",
+  "datacite_name": "Center of Estonian Language Resources",
+  "official_name": "Center of Estonian Language Resources"
+ },
+ "RICE.KINDER": {
+  "openaire_id": "re3data_____::r3d100012884",
+  "datacite_name": "Kinder Institute Urban Data Platform",
+  "official_name": "Kinder Institute Urban Data Platform"
+ },
+ "DELFT.KNMI": {
+  "openaire_id": "re3data_____::r3d100011879",
+  "datacite_name": "KNMI Data Platform",
+  "official_name": "KNMI Data Platform"
+ },
+ "LANDCARE.SOILS": {
+  "openaire_id": "re3data_____::r3d100010835",
+  "datacite_name": "Land Resource Information Systems Portal",
+  "official_name": "Land Resource Information Systems Portal"
+ },
+ "LANDCARE.GENERAL": {
+  "openaire_id": "re3data_____::r3d100011662",
+  "datacite_name": "Landcare Research Data Repository",
+  "official_name": "Landcare Research Data Repository"
+ },
+ "TIB.LDEO": {
+  "openaire_id": "re3data_____::r3d100012547",
+  "datacite_name": "Lamont-Doherty Core Repository",
+  "official_name": "Lamont-Doherty Core Repository"
+ },
+ "ZBMED.LERNZDB": {
+  "openaire_id": "re3data_____::r3d100010066",
+  "datacite_name": "figshare",
+  "official_name": "figshare"
+ },
+ "GESIS.NEPS": {
+  "openaire_id": "re3data_____::r3d100010736",
+  "datacite_name": "Nationales Bildungspanel",
+  "official_name": "Nationales Bildungspanel"
+ },
+ "BL.LINCOLN": {
+  "openaire_id": "re3data_____::r3d100012407",
+  "datacite_name": "Lincoln repository",
+  "official_name": "Lincoln repository"
+ },
+ "LDC.CATALOG": {
+  "openaire_id": "re3data_____::r3d100011940",
+  "datacite_name": "Linguistic Data Consortium",
+  "official_name": "Linguistic Data Consortium"
+ },
+ "ZBW.IFO": {
+  "openaire_id": "re3data_____::r3d100010201",
+  "datacite_name": "LMU-ifo Economics & Business Data Center",
+  "official_name": "LMU-ifo Economics & Business Data Center"
+ },
+ "DK.SB": {
+  "openaire_id": "re3data_____::r3d100012617",
+  "datacite_name": "LOAR",
+  "official_name": "LOAR"
+ },
+ "BL.LSHTM": {
+  "openaire_id": "re3data_____::r3d100011800",
+  "datacite_name": "LSHTM Data Compass",
+  "official_name": "LSHTM Data Compass"
+ },
+ "BL.LBORO": {
+  "openaire_id": "re3data_____::r3d100012143",
+  "datacite_name": "Loughborough Data Repository",
+  "official_name": "Loughborough Data Repository"
+ },
+ "DELFT.MAASTRO": {
+  "openaire_id": "re3data_____::r3d100011086",
+  "datacite_name": "CancerData.org",
+  "official_name": "CancerData.org"
+ },
+ "OIBK.OHYCFA": {
+  "openaire_id": "re3data_____::r3d100013499",
+  "datacite_name": "Materials Data Repository",
+  "official_name": "Materials Data Repository"
+ },
+ "MDW.REPOSITORY": {
+  "openaire_id": "re3data_____::r3d100012108",
+  "datacite_name": "mdw Repository",
+  "official_name": "mdw Repository"
+ },
+ "ELSEVIER.MD": {
+  "openaire_id": "re3data_____::r3d100011868",
+  "datacite_name": "Mendeley Data",
+  "official_name": "Mendeley Data"
+ },
+ "BL.MENDELEY": {
+  "openaire_id": "re3data_____::r3d100011868",
+  "datacite_name": "Mendeley Data",
+  "official_name": "Mendeley Data"
+ },
+ "BKMX.AZJWZC": {
+  "openaire_id": "re3data_____::r3d100011394",
+  "datacite_name": "B2SHARE",
+  "official_name": "B2SHARE"
+ },
+ "CSC.NRD": {
+  "openaire_id": "re3data_____::r3d100012157",
+  "datacite_name": "Fairdata IDA Research Data Storage Service",
+  "official_name": "Fairdata IDA Research Data Storage Service"
+ },
+ "UMN.IPUMS": {
+  "openaire_id": "re3data_____::r3d100010794",
+  "datacite_name": "Minnesota Population Center",
+  "official_name": "Minnesota Population Center"
+ },
+ "PHBI.REPO": {
+  "openaire_id": "re3data_____::r3d100010101",
+  "datacite_name": "MorphoBank",
+  "official_name": "MorphoBank"
+ },
+ "TIB.UKON": {
+  "openaire_id": "re3data_____::r3d100010469",
+  "datacite_name": "Movebank Data Repository",
+  "official_name": "Movebank Data Repository"
+ },
+ "INIST.HUMANUM": {
+  "openaire_id": "re3data_____::r3d100012102",
+  "datacite_name": "NAKALA",
+  "official_name": "NAKALA"
+ },
+ "GDCC.NTU": {
+  "openaire_id": "re3data_____::r3d100012440",
+  "datacite_name": "DR-NTU (Data)",
+  "official_name": "DR-NTU (Data)"
+ },
+ "CORNELL.NDACAN": {
+  "openaire_id": "re3data_____::r3d100011036",
+  "datacite_name": "National Data Archive on Child Abuse and Neglect",
+  "official_name": "National Data Archive on Child Abuse and Neglect"
+ },
+ "NOAA.NCEI": {
+  "openaire_id": "re3data_____::r3d100011801",
+  "datacite_name": "NCEI",
+  "official_name": "NCEI"
+ },
+ "GDCC.HARVARD-SLP": {
+  "openaire_id": "re3data_____::r3d100011861",
+  "datacite_name": "National Sleep Research Resource",
+  "official_name": "National Sleep Research Resource"
+ },
+ "NSIDC.DATACTR": {
+  "openaire_id": "re3data_____::r3d100010110",
+  "datacite_name": "National Snow and Ice Data Center",
+  "official_name": "National Snow and Ice Data Center"
+ },
+ "NUS.SB": {
+  "openaire_id": "re3data_____::r3d100012564",
+  "datacite_name": "ScholarBank@NUS",
+  "official_name": "ScholarBank@NUS"
+ },
+ "BL.NHM": {
+  "openaire_id": "re3data_____::r3d100011675",
+  "datacite_name": "Natural History Museum, Data Portal",
+  "official_name": "Natural History Museum, Data Portal"
+ },
+ "ESDIS.ORNL": {
+  "openaire_id": "re3data_____::r3d100000037",
+  "datacite_name": "Oak Ridge National Laboratory Distributed Active Archive Center for Biogeochemical Dynamics",
+  "official_name": "Oak Ridge National Laboratory Distributed Active Archive Center for Biogeochemical Dynamics"
+ },
+ "INIST.OTELO": {
+  "openaire_id": "re3data_____::r3d100012505",
+  "datacite_name": "ORDaR",
+  "official_name": "ORDaR"
+ },
+ "EUROP.ODIN": {
+  "openaire_id": "re3data_____::r3d100011378",
+  "datacite_name": "MatDB",
+  "official_name": "MatDB"
+ },
+ "GDCC.ODUM-DV": {
+  "openaire_id": "re3data_____::r3d100000005",
+  "datacite_name": "UNC Dataverse",
+  "official_name": "UNC Dataverse"
+ },
+ "OHSU.OHSU": {
+  "openaire_id": "re3data_____::r3d100012244",
+  "datacite_name": "OHSU Digital Commons",
+  "official_name": "OHSU Digital Commons"
+ },
+ "KIM.OPENKIM": {
+  "openaire_id": "re3data_____::r3d100011864",
+  "datacite_name": "OpenKIM",
+  "official_name": "OpenKIM"
+ },
+ "COS.OSF": {
+  "openaire_id": "re3data_____::r3d100011137",
+  "datacite_name": "Open Science Framework",
+  "official_name": "Open Science Framework"
+ },
+ "SUL.OPENNEURO": {
+  "openaire_id": "re3data_____::r3d100010924",
+  "datacite_name": "OpenNeuro",
+  "official_name": "OpenNeuro"
+ },
+ "BL.SHEF": {
+  "openaire_id": "re3data_____::r3d100012124",
+  "datacite_name": "ORDA - The University of Sheffield Research Data Catalogue and Repository",
+  "official_name": "ORDA - The University of Sheffield Research Data Catalogue and Repository"
+ },
+ "BL.BROOKES": {
+  "openaire_id": "re3data_____::r3d100012929",
+  "datacite_name": "Oxford Brookes University: RADAR",
+  "official_name": "Oxford Brookes University: RADAR"
+ },
+ "BL.OXDB": {
+  "openaire_id": "re3data_____::r3d100011653",
+  "datacite_name": "DataBank, Bodleian Libraries, University of Oxford",
+  "official_name": "DataBank, Bodleian Libraries, University of Oxford"
+ },
+ "PANGAEA.REPOSITORY": {
+  "openaire_id": "re3data_____::r3d100010134",
+  "datacite_name": "PANGAEA",
+  "official_name": "PANGAEA - Data Publisher for Earth and Environmental Science"
+ },
+ "TIB.PANGAEA": {
+  "openaire_id": "re3data_____::r3d100010134",
+  "datacite_name": "PANGAEA",
+  "official_name": "PANGAEA - Data Publisher for Earth and Environmental Science"
+ },
+ "NASAPDS.NASAPDS": {
+  "openaire_id": "re3data_____::r3d100010121",
+  "datacite_name": "PDS",
+  "official_name": "PDS"
+ },
+ "BF.DISCOVER": {
+  "openaire_id": "re3data_____::r3d100013148",
+  "datacite_name": "Blackfynn Discover",
+  "official_name": "Blackfynn Discover"
+ },
+ "MIT.PHYSIO": {
+  "openaire_id": "re3data_____::r3d100011561",
+  "datacite_name": "PhysioNet",
+  "official_name": "PhysioNet"
+ },
+ "ZBMED.BIOFRESH": {
+  "openaire_id": "re3data_____::r3d100011651",
+  "datacite_name": "Freshwater Biodiversity Data Portal",
+  "official_name": "Freshwater Biodiversity Data Portal"
+ },
+ "PDS.DATA": {
+  "openaire_id": "re3data_____::r3d100013015",
+  "datacite_name": "Project Data Sphere",
+  "official_name": "Project Data Sphere"
+ },
+ "ESTDOI.QDB": {
+  "openaire_id": "re3data_____::r3d100013451",
+  "datacite_name": "QsarDB",
+  "official_name": "QsarDB"
+ },
+ "INIST.ADISP": {
+  "openaire_id": "re3data_____::r3d100010494",
+  "datacite_name": "Quetelet PROGEDO Diffusion",
+  "official_name": "Quetelet PROGEDO Diffusion"
+ },
+ "TIB.RADAR": {
+  "openaire_id": "re3data_____::r3d100012330",
+  "datacite_name": "RADAR",
+  "official_name": "RADAR"
+ },
+ "UCHILE.DATAVERSE": {
+  "openaire_id": "re3data_____::r3d100013108",
+  "datacite_name": "Repositorio de Datos de Investigación de la Universidad de Chile",
+  "official_name": "Repositorio de Datos de Investigación de la Universidad de Chile"
+ },
+ "UDR.RESEARCHDATA": {
+  "openaire_id": "re3data_____::r3d100013212",
+  "datacite_name": "Repositorio de datos de investigación de la Universidad del Rosario",
+  "official_name": "Repositorio de datos de investigación de la Universidad del Rosario"
+ },
+ "GESIS.DIPF": {
+  "openaire_id": "re3data_____::r3d100010390",
+  "datacite_name": "Forschungsdatenzentrum Bildung",
+  "official_name": "Forschungsdatenzentrum Bildung"
+ },
+ "RG.RG": {
+  "openaire_id": "re3data_____::r3d100012227",
+  "datacite_name": "ResearchGate Data",
+  "official_name": "ResearchGate Data"
+ },
+ "INIST.RESIF": {
+  "openaire_id": "re3data_____::r3d100012222",
+  "datacite_name": "Résif Seismological Data Portal",
+  "official_name": "Résif Seismological Data Portal"
+ },
+ "TIB.HZDR": {
+  "openaire_id": "re3data_____::r3d100012757",
+  "datacite_name": "RODARE",
+  "official_name": "RODARE"
+ },
+ "OCUL.SPDV": {
+  "openaire_id": "re3data_____::r3d100010691",
+  "datacite_name": "Scholars Portal Dataverse",
+  "official_name": "Scholars Portal Dataverse"
+ },
+ "PSU.SCHOLAR": {
+  "openaire_id": "re3data_____::r3d100010701",
+  "datacite_name": "ScholarSphere",
+  "official_name": "ScholarSphere"
+ },
+ "TIB.BIKF": {
+  "openaire_id": "re3data_____::r3d100012379",
+  "datacite_name": "Senckenberg (meta) data portal",
+  "official_name": "Senckenberg (meta) data portal"
+ },
+ "GESIS.SHARE": {
+  "openaire_id": "re3data_____::r3d100010430",
+  "datacite_name": "Survey of Health, Ageing and Retirement in Europe",
+  "official_name": "Survey of Health, Ageing and Retirement in Europe"
+ },
+ "BL.HALLAM": {
+  "openaire_id": "re3data_____::r3d100011909",
+  "datacite_name": "Sheffield Hallam University Research Data Archive",
+  "official_name": "Sheffield Hallam University Research Data Archive"
+ },
+ "ETHZ.SICAS": {
+  "openaire_id": "re3data_____::r3d100011560",
+  "datacite_name": "Sicas Medical Image Repository",
+  "official_name": "Sicas Medical Image Repository"
+ },
+ "SUL.SIMTK": {
+  "openaire_id": "re3data_____::r3d100012486",
+  "datacite_name": "SimTK",
+  "official_name": "SimTK"
+ },
+ "SI.SI": {
+  "openaire_id": "re3data_____::r3d100012274",
+  "datacite_name": "Smithsonian Research Online",
+  "official_name": "Smithsonian Research Online"
+ },
+ "CONCOR.KCYDCU": {
+  "openaire_id": "re3data_____::r3d100012818",
+  "datacite_name": "Spectrum Research Repository",
+  "official_name": "Spectrum Research Repository"
+ },
+ "SUL.SDR": {
+  "openaire_id": "re3data_____::r3d100010710",
+  "datacite_name": "Stanford Digital Repository",
+  "official_name": "Stanford Digital Repository"
+ },
+ "SND.SU": {
+  "openaire_id": "re3data_____::r3d100012147",
+  "datacite_name": "Stockholm University Figshare Repository",
+  "official_name": "Stockholm University Figshare Repository"
+ },
+ "INIST.CDS": {
+  "openaire_id": "re3data_____::r3d100010584",
+  "datacite_name": "Strasbourg Astronomical Data Center",
+  "official_name": "Strasbourg Astronomical Data Center"
+ },
+ "DELFT.SURFSARA": {
+  "openaire_id": "re3data_____::r3d100013084",
+  "datacite_name": "SURF Data Repository",
+  "official_name": "SURF Data Repository"
+ },
+ "SND.SMHI": {
+  "openaire_id": "re3data_____::r3d100011776",
+  "datacite_name": "Swedish Meteorological and Hydrological Institute  open data",
+  "official_name": "Swedish Meteorological and Hydrological Institute  open data"
+ },
+ "SND.SND": {
+  "openaire_id": "re3data_____::r3d100010146",
+  "datacite_name": "Swedish National Data Service",
+  "official_name": "Swedish National Data Service"
+ },
+ "SAGEBIO.SYNAPSE": {
+  "openaire_id": "re3data_____::r3d100011894",
+  "datacite_name": "Synapse",
+  "official_name": "Synapse"
+ },
+ "GDCC.SYR-QDR": {
+  "openaire_id": "re3data_____::r3d100011038",
+  "datacite_name": "Qualitative Data Repository",
+  "official_name": "Qualitative Data Repository"
+ },
+ "FZJ.TERENO": {
+  "openaire_id": "re3data_____::r3d100011471",
+  "datacite_name": "TERENO Data Discovery Portal",
+  "official_name": "TERENO Data Discovery Portal"
+ },
+ "TUW.TETHYS": {
+  "openaire_id": "re3data_____::r3d100013400",
+  "datacite_name": "Tethys",
+  "official_name": "Tethys"
+ },
+ "GESIS.AUSSDA": {
+  "openaire_id": "re3data_____::r3d100010483",
+  "datacite_name": "AUSSDA Dataverse",
+  "official_name": "AUSSDA Dataverse"
+ },
+ "CCDC.CSD": {
+  "openaire_id": "re3data_____::r3d100010197",
+  "datacite_name": "The Cambridge Structural Database",
+  "official_name": "The Cambridge Structural Database"
+ },
+ "SML.TCIA": {
+  "openaire_id": "re3data_____::r3d100011559",
+  "datacite_name": "The Cancer Imaging Archive",
+  "official_name": "The Cancer Imaging Archive"
+ },
+ "SI.CDA": {
+  "openaire_id": "re3data_____::r3d100010035",
+  "datacite_name": "The Chandra Data Archive",
+  "official_name": "The Chandra Data Archive"
+ },
+ "HLQC.ZNXELI": {
+  "openaire_id": "re3data_____::r3d100013029",
+  "datacite_name": "TUdatalib",
+  "official_name": "TUdatalib"
+ },
+ "TIB.TUHH": {
+  "openaire_id": "re3data_____::r3d100013076",
+  "datacite_name": "TUHH Open Research - Research Data TUHH",
+  "official_name": "TUHH Open Research - Research Data TUHH"
+ },
+ "BL.UEL": {
+  "openaire_id": "re3data_____::r3d100012414",
+  "datacite_name": "UEL Research Repository",
+  "official_name": "UEL Research Repository"
+ },
+ "ARFM.UFZDRP": {
+  "openaire_id": "re3data_____::r3d100013674",
+  "datacite_name": "Datenrechercheportal UFZ",
+  "official_name": "Datenrechercheportal UFZ"
+ },
+ "BL.UKDA": {
+  "openaire_id": "re3data_____::r3d100010215",
+  "datacite_name": "UK Data Archive",
+  "official_name": "UK Data Archive"
+ },
+ "GDCC.ODUM-LIBRARY": {
+  "openaire_id": "re3data_____::r3d100000005",
+  "datacite_name": "UNC Dataverse",
+  "official_name": "UNC Dataverse"
+ },
+ "CRUI.UNIBO": {
+  "openaire_id": "re3data_____::r3d100012604",
+  "datacite_name": "AMS Acta",
+  "official_name": "AMS Acta"
+ },
+ "LMU.UB": {
+  "openaire_id": "re3data_____::r3d100010731",
+  "datacite_name": "Open Data LMU",
+  "official_name": "Open Data LMU"
+ },
+ "INIST.IFSTTAR": {
+  "openaire_id": "re3data_____::r3d100013062",
+  "datacite_name": "Data Univ Gustave Eiffel",
+  "official_name": "Data Univ Gustave Eiffel"
+ },
+ "BL.UCLD": {
+  "openaire_id": "re3data_____::r3d100012417",
+  "datacite_name": "UCL Discovery",
+  "official_name": "UCL Discovery"
+ },
+ "NZAU.DATA": {
+  "openaire_id": "re3data_____::r3d100012110",
+  "datacite_name": "University of Auckland Data Repository",
+  "official_name": "University of Auckland Data Repository"
+ },
+ "BL.BATH": {
+  "openaire_id": "re3data_____::r3d100011947",
+  "datacite_name": "University of Bath Research Data Archive",
+  "official_name": "University of Bath Research Data Archive"
+ },
+ "BL.BRISTOL": {
+  "openaire_id": "re3data_____::r3d100011099",
+  "datacite_name": "data.bris Research Data Repository",
+  "official_name": "data.bris Research Data Repository"
+ },
+ "FIGSHARE.UCT": {
+  "openaire_id": "re3data_____::r3d100012633",
+  "datacite_name": "University of Cape Town (UCT)",
+  "official_name": "ZivaHub"
+ },
+ "BL.UCLAN": {
+  "openaire_id": "re3data_____::r3d100012019",
+  "datacite_name": "UCLanData",
+  "official_name": "UCLanData"
+ },
+ "BL.ED": {
+  "openaire_id": "re3data_____::r3d100000047",
+  "datacite_name": "Edinburgh DataShare",
+  "official_name": "Edinburgh DataShare"
+ },
+ "BL.ESSEX": {
+  "openaire_id": "re3data_____::r3d100012405",
+  "datacite_name": "Research Data at Essex",
+  "official_name": "Research Data at Essex"
+ },
+ "BL.EXETER": {
+  "openaire_id": "re3data_____::r3d100011202",
+  "datacite_name": "Open Research Exeter",
+  "official_name": "Open Research Exeter"
+ },
+ "BL.HERTS": {
+  "openaire_id": "re3data_____::r3d100013116",
+  "datacite_name": "University of Hertfordshire Research Archive",
+  "official_name": "University of Hertfordshire Research Archive"
+ },
+ "NKN.NKN": {
+  "openaire_id": "re3data_____::r3d100011587",
+  "datacite_name": "Northwest Knowledge Network",
+  "official_name": "Northwest Knowledge Network"
+ },
+ "BL.LEEDS": {
+  "openaire_id": "re3data_____::r3d100011945",
+  "datacite_name": "Research Data Leeds Repository",
+  "official_name": "Research Data Leeds Repository"
+ },
+ "UNIMELB.REPO1": {
+  "openaire_id": "re3data_____::r3d100012145",
+  "datacite_name": "melbourne.figshare.com",
+  "official_name": "melbourne.figshare.com"
+ },
+ "BL.READING": {
+  "openaire_id": "re3data_____::r3d100012064",
+  "datacite_name": "University of Reading Research Data Archive",
+  "official_name": "University of Reading Research Data Archive"
+ },
+ "BL.SALFORD": {
+  "openaire_id": "re3data_____::r3d100012144",
+  "datacite_name": "University of Salford Data Repository",
+  "official_name": "University of Salford Data Repository"
+ },
+ "BL.SOTON": {
+  "openaire_id": "re3data_____::r3d100011245",
+  "datacite_name": "University of Southampton Institutional Research Repository",
+  "official_name": "University of Southampton Institutional Research Repository"
+ },
+ "ARDCX.USQ": {
+  "openaire_id": "re3data_____::r3d100011638",
+  "datacite_name": "University of Southern Queensland research data collection",
+  "official_name": "University of Southern Queensland research data collection"
+ },
+ "BL.STANDREW": {
+  "openaire_id": "re3data_____::r3d100012411",
+  "datacite_name": "St Andrews Research portal - Research Data",
+  "official_name": "St Andrews Research portal - Research Data"
+ },
+ "BL.STRATH": {
+  "openaire_id": "re3data_____::r3d100012412",
+  "datacite_name": "University of Strathclyde KnowledgeBase Datasets",
+  "official_name": "University of Strathclyde KnowledgeBase Datasets"
+ },
+ "BL.SURREY": {
+  "openaire_id": "re3data_____::r3d100012232",
+  "datacite_name": "Surrey Research Insight",
+  "official_name": "Surrey Research Insight"
+ },
+ "USDA.USDA": {
+  "openaire_id": "re3data_____::r3d100011890",
+  "datacite_name": "Ag Data Commons",
+  "official_name": "Ag Data Commons"
+ },
+ "USGS.PROD": {
+  "openaire_id": "re3data_____::r3d100010054",
+  "datacite_name": "U.S. Geological Survey",
+  "official_name": "U.S. Geological Survey"
+ },
+ "DELFT.UU": {
+  "openaire_id": "re3data_____::r3d100012623",
+  "datacite_name": "Yoda",
+  "official_name": "Yoda"
+ },
+ "VT.VTECHDATA": {
+  "openaire_id": "re3data_____::r3d100012601",
+  "datacite_name": "Virginia Tech Data Repository",
+  "official_name": "Virginia Tech Data Repository"
+ },
+ "JCVI.EIVBWB": {
+  "openaire_id": "re3data_____::r3d100011931",
+  "datacite_name": "Virus Pathogen Resource",
+  "official_name": "Virus Pathogen Resource"
+ },
+ "VIVLI.SEARCH": {
+  "openaire_id": "re3data_____::r3d100012823",
+  "datacite_name": "Vivli",
+  "official_name": "Vivli"
+ },
+ "DELFT.VLIZ": {
+  "openaire_id": "re3data_____::r3d100010661",
+  "datacite_name": "Flanders Marine Institute",
+  "official_name": "Flanders Marine Institute"
+ },
+ "WH.WHOAS": {
+  "openaire_id": "re3data_____::r3d100010423",
+  "datacite_name": "Woods Hole Open Access Server",
+  "official_name": "Woods Hole Open Access Server"
+ },
+ "DKRZ.WDCC": {
+  "openaire_id": "re3data_____::r3d100010299",
+  "datacite_name": "World Data Center for Climate",
+  "official_name": "World Data Center for Climate"
+ },
+ "ETHZ.WGMS": {
+  "openaire_id": "re3data_____::r3d100010627",
+  "datacite_name": "World Glacier Monitoring Service",
+  "official_name": "World Glacier Monitoring Service"
+ },
+ "ZBW.ZBW-JDA": {
+  "openaire_id": "re3data_____::r3d100012190",
+  "datacite_name": "ZBW Journal Data Archive",
+  "official_name": "ZBW Journal Data Archive"
+ },
+ "CERN.ZENODO": {
+  "openaire_id": "opendoar____::2659",
+  "datacite_name": "Zenodo",
+  "official_name": "ZENODO"
+ },
+ "ZBW.ZEW": {
+  "openaire_id": "re3data_____::r3d100010399",
+  "datacite_name": "ZEW Forschungsdatenzentrum",
+  "official_name": "ZEW Forschungsdatenzentrum"
+ }
 }

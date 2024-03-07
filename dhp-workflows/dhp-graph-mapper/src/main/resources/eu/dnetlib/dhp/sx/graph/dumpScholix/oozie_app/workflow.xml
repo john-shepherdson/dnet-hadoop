@@ -1,0 +1,160 @@
+<workflow-app name="Create Scholix Dump" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the working dir base path</description>
+        </property>
+        <property>
+            <name>targetPath</name>
+            <description>the final graph path</description>
+        </property>
+        <property>
+            <name>relationFilter</name>
+            <description>Filter relation semantic</description>
+        </property>
+        <property>
+            <name>maxNumberOfPid</name>
+            <description>filter relation with at least #maxNumberOfPid</description>
+        </property>
+        <property>
+            <name>dumpCitations</name>
+            <value>false</value>
+            <description>should dump citation relations</description>
+        </property>
+    </parameters>
+
+    <start to="ImportDatasetEntities"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="ImportDatasetEntities">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Import JSONRDD to Dataset kryo</name>
+            <class>eu.dnetlib.dhp.sx.graph.SparkConvertRDDtoDataset</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.shuffle.partitions=3000
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--master</arg><arg>yarn</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}</arg>
+            <arg>--filterRelation</arg><arg>${relationFilter}</arg>
+        </spark>
+        <ok to="CreateSummaries"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="CreateSummaries">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Convert Entities to summaries</name>
+            <class>eu.dnetlib.dhp.sx.graph.SparkCreateSummaryObject</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.shuffle.partitions=20000
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--master</arg><arg>yarn</arg>
+            <arg>--sourcePath</arg><arg>${targetPath}/entities</arg>
+            <arg>--targetPath</arg><arg>${targetPath}/provision/summaries</arg>
+        </spark>
+        <ok to="CreateScholix"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="CreateScholix">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Generate Scholix Dataset</name>
+            <class>eu.dnetlib.dhp.sx.graph.SparkCreateScholix</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.shuffle.partitions=30000
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--master</arg><arg>yarn</arg>
+            <arg>--summaryPath</arg><arg>${targetPath}/provision/summaries</arg>
+            <arg>--targetPath</arg><arg>${targetPath}/provision/scholix</arg>
+            <arg>--relationPath</arg><arg>${targetPath}/relation</arg>
+            <arg>--dumpCitations</arg><arg>${dumpCitations}</arg>
+        </spark>
+        <ok to="DropJSONPath"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="DropJSONPath">
+        <fs>
+            <delete path='${targetPath}/json'/>
+            <mkdir path='${targetPath}/json/'/>
+        </fs>
+        <ok to="SerializeScholix"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="SerializeScholix">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Serialize scholix to JSON</name>
+            <class>eu.dnetlib.dhp.sx.graph.SparkConvertObjectToJson</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.shuffle.partitions=6000
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--master</arg><arg>yarn</arg>
+            <arg>--sourcePath</arg><arg>${targetPath}/provision/scholix/scholix</arg>
+            <arg>--targetPath</arg><arg>${targetPath}/json/scholix_json</arg>
+            <arg>--objectType</arg><arg>scholix</arg>
+            <arg>--maxPidNumberFilter</arg><arg>maxNumberOfPid</arg>
+        </spark>
+        <ok to="make_tar"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="make_tar">
+        <java>
+            <main-class>eu.dnetlib.dhp.common.MakeTarArchive</main-class>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
+            <arg>--hdfsPath</arg><arg>${targetPath}/tar</arg>
+            <arg>--sourcePath</arg><arg>${targetPath}/json</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+
+</workflow-app>

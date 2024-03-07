@@ -1,0 +1,10 @@
+## This is a classpath-based import file (this header is required)
+orcid_propagation classpath eu/dnetlib/dhp/wf/subworkflows/orcidtoresultfromsemrel/oozie_app
+bulk_tagging classpath  eu/dnetlib/dhp/wf/subworkflows/bulktag/oozie_app
+affiliation_inst_repo classpath  eu/dnetlib/dhp/wf/subworkflows/resulttoorganizationfrominstrepo/oozie_app
+entity_semantic_relation classpath eu/dnetlib/dhp/wf/subworkflows/entitytoorganizationfromsemrel/oozie_app
+community_organization classpath eu/dnetlib/dhp/wf/subworkflows/resulttocommunityfromorganization/oozie_app
+result_project classpath eu/dnetlib/dhp/wf/subworkflows/projecttoresult/oozie_app
+community_project classpath eu/dnetlib/dhp/wf/subworkflows/resulttocommunityfromproject/oozie_app
+community_sem_rel classpath eu/dnetlib/dhp/wf/subworkflows/resulttocommunityfromsemrel/oozie_app
+country_propagation classpath eu/dnetlib/dhp/wf/subworkflows/countrypropagation/oozie_app

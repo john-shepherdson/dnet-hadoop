@@ -37,7 +37,7 @@ public class CommunityConfigurationFactory {
 
 	public static CommunityConfiguration newInstance(final String xml) throws DocumentException, SAXException {
 
-		log.debug(String.format("parsing community configuration from:\n%s", xml));
+		log.info(String.format("parsing community configuration from:\n%s", xml));
 
 		final SAXReader reader = new SAXReader();
 		reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
@@ -85,7 +85,35 @@ public class CommunityConfigurationFactory {
 		c.setSubjects(parseSubjects(node));
 		c.setProviders(parseDatasources(node));
 		c.setZenodoCommunities(parseZenodoCommunities(node));
+		c.setConstraints(parseConstrains(node));
+		c.setRemoveConstraints(parseRemoveConstrains(node));
 		return c;
+	}
+
+	private static SelectionConstraints parseConstrains(Node node) {
+		Node advConstsNode = node.selectSingleNode("./advancedConstraints");
+		if (advConstsNode == null || StringUtils.isBlank(StringUtils.trim(advConstsNode.getText()))) {
+			return new SelectionConstraints();
+		}
+		SelectionConstraints selectionConstraints = new Gson()
+			.fromJson(advConstsNode.getText(), SelectionConstraints.class);
+
+		selectionConstraints.setSelection(resolver);
+		log.info("number of selection constraints set " + selectionConstraints.getCriteria().size());
+		return selectionConstraints;
+	}
+
+	private static SelectionConstraints parseRemoveConstrains(Node node) {
+		Node constsNode = node.selectSingleNode("./removeConstraints");
+		if (constsNode == null || StringUtils.isBlank(StringUtils.trim(constsNode.getText()))) {
+			return new SelectionConstraints();
+		}
+		SelectionConstraints selectionConstraints = new Gson()
+			.fromJson(constsNode.getText(), SelectionConstraints.class);
+
+		selectionConstraints.setSelection(resolver);
+		log.info("number of selection constraints set " + selectionConstraints.getCriteria().size());
+		return selectionConstraints;
 	}
 
 	private static List<String> parseSubjects(final Node node) {
@@ -115,16 +143,16 @@ public class CommunityConfigurationFactory {
 		return providerList;
 	}
 
-	private static List<ZenodoCommunity> parseZenodoCommunities(final Node node) {
+	private static List<String> parseZenodoCommunities(final Node node) {
 
 		final List<Node> list = node.selectNodes("./zenodocommunities/zenodocommunity");
-		final List<ZenodoCommunity> zenodoCommunityList = new ArrayList<>();
+		final List<String> zenodoCommunityList = new ArrayList<>();
 		for (Node n : list) {
-			ZenodoCommunity zc = new ZenodoCommunity();
-			zc.setZenodoCommunityId(n.selectSingleNode("./zenodoid").getText());
-			zc.setSelCriteria(n.selectSingleNode("./selcriteria"));
+//			ZenodoCommunity zc = new ZenodoCommunity();
+//			zc.setZenodoCommunityId(n.selectSingleNode("./zenodoid").getText());
+//			zc.setSelCriteria(n.selectSingleNode("./selcriteria"));
 
-			zenodoCommunityList.add(zc);
+			zenodoCommunityList.add(n.selectSingleNode("./zenodoid").getText());
 		}
 
 		log.info("size of the zenodo community list " + zenodoCommunityList.size());

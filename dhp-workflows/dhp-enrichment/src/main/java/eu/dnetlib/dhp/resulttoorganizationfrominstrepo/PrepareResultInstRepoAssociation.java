@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.KeyValueSet;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Datasource;
@@ -39,7 +40,7 @@ public class PrepareResultInstRepoAssociation {
 			.toString(
 				PrepareResultInstRepoAssociation.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttoorganizationfrominstrepo/input_prepareresultorg_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/resulttoorganizationfrominstrepo/input_prepareresultorg_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -51,10 +52,13 @@ public class PrepareResultInstRepoAssociation {
 		String inputPath = parser.get("sourcePath");
 		log.info("inputPath: {}", inputPath);
 
-		final String datasourceOrganizationPath = parser.get("datasourceOrganizationPath");
+		final String workingPath = parser.get("workingPath");
+		log.info("workingPath : {}", workingPath);
+
+		final String datasourceOrganizationPath = workingPath + "/preparedInfo/datasourceOrganization";
 		log.info("datasourceOrganizationPath {}: ", datasourceOrganizationPath);
 
-		final String alreadyLinkedPath = parser.get("alreadyLinkedPath");
+		final String alreadyLinkedPath = workingPath + "/preparedInfo/alreadyLinked";
 		log.info("alreadyLinkedPath {}: ", alreadyLinkedPath);
 
 		List<String> blacklist = Optional
@@ -101,7 +105,7 @@ public class PrepareResultInstRepoAssociation {
 		String query = "SELECT source datasourceId, target organizationId "
 			+ "FROM ( SELECT id "
 			+ "FROM datasource "
-			+ "WHERE datasourcetype.classid = '"
+			+ "WHERE lower(jurisdiction.classid) = '"
 			+ INSTITUTIONAL_REPO_TYPE
 			+ "' "
 			+ "AND datainfo.deletedbyinference = false  " + blacklisted + " ) d "
@@ -124,7 +128,7 @@ public class PrepareResultInstRepoAssociation {
 
 	private static void prepareAlreadyLinkedAssociation(
 		SparkSession spark, String alreadyLinkedPath) {
-		String query = "Select source resultId, collect_set(target) organizationSet "
+		String query = "Select source key, collect_set(target) valueSet "
 			+ "from relation "
 			+ "where datainfo.deletedbyinference = false "
 			+ "and lower(relClass) = '"
@@ -134,7 +138,7 @@ public class PrepareResultInstRepoAssociation {
 
 		spark
 			.sql(query)
-			.as(Encoders.bean(ResultOrganizationSet.class))
+			.as(Encoders.bean(KeyValueSet.class))
 			// TODO retry to stick with datasets
 			.toJavaRDD()
 			.map(r -> OBJECT_MAPPER.writeValueAsString(r))

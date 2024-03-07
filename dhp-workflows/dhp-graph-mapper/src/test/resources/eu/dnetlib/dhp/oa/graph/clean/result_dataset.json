@@ -1,0 +1,28 @@
+{
+  "resulttype": {
+    "classid": "dataset",
+    "classname": "dataset",
+    "schemeid": "dnet:result_typologies",
+    "schemename": "dnet:result_typologies"
+  },
+  "fulltext": [
+    {
+      "value" : "https://www.researchgate.net"
+    }
+  ],
+  "publisher" : {
+    "value" : "Best     publisher    in     the     world"
+  },
+  "id": "50|CSC_________::2250a70c903c6ac6e4c01438259e9375",
+  "instance": [
+    {
+      "instancetype": {
+        "classid": "Comment/debate",
+        "classname": "Comment/debate",
+        "schemeid": "dnet:publication_resource",
+        "schemename": "dnet:publication_resource"
+      },
+      "fulltext": "https://www.researchgate.net"
+    }
+  ]
+}

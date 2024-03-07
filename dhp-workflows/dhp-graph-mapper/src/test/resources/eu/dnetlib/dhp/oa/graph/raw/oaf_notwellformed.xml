@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+        xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <header xmlns="http://namespace.openaire.eu/">
+        <dri:objIdentifier>jairo_______::000012e58ed836576ef2a0d38b0f726f</dri:objIdentifier>
+        <dri:recordIdentifier>oai:irdb.nii.ac.jp:01221:0000010198</dri:recordIdentifier>
+        <dri:dateOfCollection/>
+        <dri:mdFormat/>
+        <dri:mdFormatInterpretation/>
+        <dri:repositoryId/>
+        <dr:objectIdentifier/>
+        <dr:dateOfCollection>2021-05-10T11:31:09.424Z</dr:dateOfCollection>
+        <dr:dateOfTransformation>2021-06-03T01:45:42.536Z</dr:dateOfTransformation>
+        <oaf:datasourceprefix>jairo_______</oaf:datasourceprefix>
+    </header>
+    <metadata xmlns="http://namespace.openaire.eu/">
+        <dc:title>多項式GCDを用いた復号法に関する研究<dc:title>
+        <dc:creator>上原, 剛</dc:creator>
+        <dc:creator>甲斐, 博</dc:creator>
+        <dc:creator>野田, 松太郎</dc:creator>
+        <dc:format>application/pdf</dc:format>
+        <dc:identifier>http://hdl.handle.net/2433/25934</dc:identifier>
+        <dc:language>jpn</dc:language>
+        <dc:publisher>京都大学数理解析研究所</dc:publisher>
+        <dc:subject classid="ndc" classname="ndc"
+                    schemeid="dnet:subject_classification_typologies" schemename="dnet:subject_classification_typologies">410</dc:subject>
+        <dc:type>Departmental Bulletin Paper</dc:type>
+        <dr:CobjCategory type="publication">0014</dr:CobjCategory>
+        <oaf:dateAccepted>2004-10-01</oaf:dateAccepted>
+        <oaf:projectid/>
+        <oaf:collectedDatasourceid>openaire____::554c7c2873</oaf:collectedDatasourceid>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:hostedBy id="openaire____::554c7c2873" name="JAIRO"/>
+        <oaf:collectedFrom id="openaire____::554c7c2873" name="JAIRO"/>
+        <oaf:identifier identifierType="handle">2433/25934</oaf:identifier>
+        <oaf:identifier identifierType="ncid">AN00061013</oaf:identifier>
+        <oaf:identifier identifierType="LandingPage">http://hdl.handle.net/2433/25934</oaf:identifier>
+        <oaf:fulltext>http://repository.kulib.kyoto-u.ac.jp/dspace/bitstream/2433/25934/1/1395-16.pdf</oaf:fulltext>
+        <oaf:journal ep="110" iss="" issn="1880-2818" sp="104" vol="1395">数理解析研究所講究録</oaf:journal>
+    </metadata>
+    <about>
+        <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
+            <originDescription altered="true" harvestDate="2021-05-10T11:31:09.424Z">
+                <baseURL>https%3A%2F%2Firdb.nii.ac.jp%2Foai</baseURL>
+                <identifier>oai:irdb.nii.ac.jp:01221:0000010198</identifier>
+                <datestamp>2021-04-13T13:36:29Z</datestamp>
+                <metadataNamespace/>
+                <originDescription altered="true" harvestDate="2021-04-13T13:36:29Z">
+                    <baseURL>http://repository.kulib.kyoto-u.ac.jp/dspace-oai/request</baseURL>
+                    <identifier>oai:repository.kulib.kyoto-u.ac.jp:2433/25934</identifier>
+                    <datestamp>2012-07-12T14:15:41Z</datestamp>
+                    <metadataNamespace>http://irdb.nii.ac.jp/oai</metadataNamespace>
+                </originDescription>
+            </originDescription>
+        </provenance>
+        <oaf:datainfo>
+            <oaf:inferred>false</oaf:inferred>
+            <oaf:deletedbyinference>false</oaf:deletedbyinference>
+            <oaf:trust>0.9</oaf:trust>
+            <oaf:inferenceprovenance/>
+            <oaf:provenanceaction classid="sysimport:crosswalk:repository"
+                                  classname="sysimport:crosswalk:repository"
+                                  schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+        </oaf:datainfo>
+    </about>
+</record>

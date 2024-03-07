@@ -101,7 +101,8 @@
         "type" : "String",
         "path" : "$.title[?(@.qualifier.classid == 'main title')].value",
         "length" : 250,
-        "size" : 5
+        "size" : 5,
+        "clean": "title"
       },
       {
         "name" : "authors",

@@ -1,6 +1,6 @@
 [
 	{
-		"field": "datasource",
+		"field": "service",
 		"type": "string",
 		"value": "openaire____::revistasunicauca"
 	},

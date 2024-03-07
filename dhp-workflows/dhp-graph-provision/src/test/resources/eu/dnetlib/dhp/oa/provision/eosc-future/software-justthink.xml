@@ -1,0 +1,429 @@
+<record>
+    <result xmlns:dri="http://www.driver-repository.eu/namespace/dri">
+    <header xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <dri:objIdentifier>doi_dedup___::c054151b6a8c4f41c7acf160651a6503</dri:objIdentifier>
+        <dri:dateOfCollection>2022-10-13T00:15:44+0000</dri:dateOfCollection>
+        <dri:dateOfTransformation>2022-10-13T07:44:29.152Z</dri:dateOfTransformation>
+    </header>
+    <metadata>
+        <oaf:entity xmlns:oaf="http://namespace.openaire.eu/oaf"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
+            <oaf:result>
+                <collectedfrom name="ZENODO" id="opendoar____::358aee4cc897452c00244351e4d91f69"/>
+                <collectedfrom name="Datacite" id="openaire____::9e3be59865b2c1c335d32dae2fe7b254"/>
+                <originalId>oai:zenodo.org:4675070</originalId>
+                <originalId>50|od______2659::3801993ea8f970cfc991277160edf277</originalId>
+                <originalId>oai:zenodo.org:6974562</originalId>
+                <originalId>50|od______2659::9c87ff4a5e7710052b873088e7265072</originalId>
+                <originalId>10.5281/zenodo.4675069</originalId>
+                <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types"
+                     schemename="dnet:pid_types" inferred="false"
+                     provenanceaction="sysimport:crosswalk:repository" trust="0.9"
+                >10.5281/zenodo.4675070</pid>
+                <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types"
+                     schemename="dnet:pid_types" inferred="false"
+                     provenanceaction="sysimport:crosswalk:repository" trust="0.9"
+                >10.5281/zenodo.6974562</pid>
+                <pid classid="doi" classname="Digital Object Identifier" schemeid="dnet:pid_types"
+                     schemename="dnet:pid_types" inferred="false"
+                     provenanceaction="sysimport:actionset" trust="0.9">10.5281/zenodo.4675069</pid>
+                <measure id="influence" score="4.916186E-9" class="C5"/>
+                <measure id="popularity" score="6.885733E-9" class="C5"/>
+                <measure id="influence_alt" score="0" class="C5"/>
+                <measure id="popularity_alt" score="0.0" class="C5"/>
+                <measure id="impulse" score="0" class="C5"/>
+                <title classid="main title" classname="main title" schemeid="dnet:dataCite_title"
+                       schemename="dnet:dataCite_title" inferred="false"
+                       provenanceaction="sysimport:crosswalk:repository" trust="0.9">JUSThink Alignment
+                    Analysis</title>
+                <bestaccessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes"
+                                 schemename="dnet:access_modes"/>
+                <creator rank="1" name="Utku" surname="Norman" orcid_pending="0000-0002-6802-1444"
+                >Norman, Utku</creator>
+                <creator rank="2" name="Tanvi" surname="Dinkar">Dinkar, Tanvi</creator>
+                <creator rank="3" name="Barbara" surname="Bruno" orcid_pending="0000-0003-0953-7173"
+                >Bruno, Barbara</creator>
+                <creator rank="4" name="Chloé" surname="Clavel" orcid_pending="0000-0003-4850-3398"
+                >Clavel, Chloé</creator>
+                <dateofacceptance>2022-08-08</dateofacceptance>
+                <description>&amp;lt;strong>1. Description&amp;lt;/strong> This repository
+                    contains&amp;lt;strong> tools to automatically analyse how participants align
+                    their use of task-specific referents in their dialogue and actions for a
+                    collaborative learning activity, and how it relates to the task
+                    success&amp;lt;/strong> (i.e. their learning outcomes and task performance). As
+                    a use case, it processes data from a collaborative problem solving activity
+                    named JUSThink [1, 2], i.e. JUSThink Dialogue and Actions Corpus data set that
+                    is available from the Zenodo Repository, DOI: 10.5281/zenodo.4627104, and
+                    reproduces the results and figures in [3]. In brief: &amp;lt;strong>JUSThink
+                    Dialogue and Actions Corpus&amp;lt;/strong> contains transcripts, event logs,
+                    and test responses of children aged 9 through 12, as they participate in the
+                    JUSThink activity [1, 2] in pairs of two, to solve a problem on graphs together.
+                    &amp;lt;strong>The JUSThink activity and its study&amp;lt;/strong> is first
+                    described in [1], and elaborated with findings concerning the link between
+                    children's learning, performance in the activity, and perception of self, the
+                    other and the robot in [2]. &amp;lt;strong>Alignment analysis in our work
+                    [3]&amp;lt;/strong> studies the participants' use of expressions that are
+                    related to the task at hand, their follow up actions of these expressions, and
+                    how it links to task success. &amp;lt;strong>Changes in Release
+                    v1.1.0:&amp;lt;/strong> updated with the publication information, finalized
+                    paper structure, research questions and hypotheses as in the published article:
+                    U. Norman*&amp;lt;em>, &amp;lt;/em>T. Dinkar*, B. Bruno, and C. Clavel,
+                    "Studying Alignment in a Collaborative Learning Activity via Automatic Methods:
+                    The Link Between What We Say and Do," Dialogue &amp;amp;amp; Discourse, 13(2),
+                    1–48. *Contributed equally to this work. 10.5210/dad.2022.201.
+                    &amp;lt;strong>Full Changelog:&amp;lt;/strong>
+                    https://github.com/chili-epfl/justhink-alignment-analysis/compare/v1.0.0...v1.1.0
+                    &amp;lt;strong>2. Publications&amp;lt;/strong> If you use this work in an
+                    academic context, please cite the following publications: Norman*, U., Dinkar*,
+                    T., Bruno, B., &amp;amp;amp; Clavel, C. (2022). Studying Alignment in a
+                    Collaborative Learning Activity via Automatic Methods: The Link Between What We
+                    Say and Do. Dialogue &amp;amp;amp; Discourse, 13(2), 1–48. *Contributed equally
+                    to this work. https://doi.org/10.5210/dad.2022.201 Norman, U., Dinkar, T.,
+                    Bruno, B., &amp;amp;amp; Clavel, C. (2021). JUSThink Alignment Analysis. In
+                    Dialogue &amp;amp;amp; Discourse (v1.1.0, Vol. 13, Number 2, pp. 1–48). Zenodo.
+                    https://doi.org/10.5281/zenodo.6974562 &amp;lt;strong>3. Content&amp;lt;/strong>
+                    The tools provided in this repository consists of 7 Jupyter Notebooks written in
+                    Python 3, and two additional external tools utilised by the notebooks.
+                    &amp;lt;strong>3.1. Jupyter Notebooks&amp;lt;/strong> We highlight that the
+                    notebooks up until the last (i.e. to test the hypotheses
+                    (tools/7_test_the_hypotheses.ipynb)) present a general pipeline to process event
+                    logs, test responses and transcripts to extract measures of task performance,
+                    learning outcomes, and measures of alignment. &amp;lt;strong>Extract task
+                    performance (and other features) from the logs
+                    &amp;lt;/strong>(tools/1_extract_performance_and_other_features_from_logs.ipynb):
+                    Extracts various measures of task behaviour from the logs, at varying
+                    granularities of the activity (i.e. the whole corpus, task, attempt, and turn
+                    levels). In later notebooks, we focus on one of the features to estimate the
+                    task performance of a team: (minimum) error. &amp;lt;strong>Extract learning
+                    outcomes from the test responses&amp;lt;/strong>
+                    (tools/2_extract_learning_gain_from_test_responses.ipynb): Extracts measures of
+                    learning outcomes from the responses to the pre-test and the post-test. In later
+                    notebooks, we focus on one of the features to estimate the learning outcome of a
+                    team: relative learning gain [4] &amp;lt;strong>Select and visualise a subset of
+                    teams for transcription&amp;lt;/strong>
+                    (tools/3_visualise_transcribed_teams.ipynb): Visualises the transcribed teams
+                    among the other teams in the feature space spanned by task performance and
+                    learning outcome, as well as the distribution of their number of attempts and
+                    turns. &amp;lt;strong>Extract routines from transcripts&amp;lt;/strong>
+                    (tools/4_extract_routines_from_transcripts.ipynb) (uses dialign to extract
+                    routines): Extracts routines of referring expressions that are "fixed", i.e.
+                    become shared or established amongst interlocutors. &amp;lt;strong>Combine
+                    transcripts with logs&amp;lt;/strong>
+                    (tools/5_construct_the_corpus_by_combining_transcripts_with_logs.ipynb): Merges
+                    transcripts with event logs to have a combined dialogue and actions corpus, to
+                    be processed e.g. to detect follow-up actions. &amp;lt;strong>Recognise
+                    instructions and detect follow-up actions&amp;lt;/strong>
+                    (tools/6_recognise_instructions_detect_follow-up_actions.ipynb): Extracts
+                    verbalised instruction such as "connect Mount Basel to Montreux", and pairs them
+                    with the follow-up action that may &amp;lt;em>match&amp;lt;/em> (e.g. if the
+                    other connects Basel to Montreux) or &amp;lt;em>mismatch&amp;lt;/em> (e.g. if
+                    the other connects Basel to Neuchatel) with the instruction. &amp;lt;strong>Test
+                    the hypotheses &amp;lt;/strong>in [3] (tools/7_test_the_hypotheses.ipynb) (uses
+                    &amp;lt;strong>effsize&amp;lt;/strong> to estimate effect size, specifically
+                    Cliff's Delta): Considers each research questions and hypotheses studied in [3]
+                    and generates the results in [3]. &amp;lt;strong>3.2. External
+                    Tools&amp;lt;/strong> &amp;lt;strong>dialign tool&amp;lt;/strong> to extract
+                    routines, specifically Release 1.0 from dialign-1.0.zip:&amp;lt;br> It extracts
+                    routine expressions that are "shared" among the participants from transcripts.
+                    &amp;lt;br> It is used as an external module (in accordance with its CeCILL-B
+                    License, see &amp;lt;strong>License&amp;lt;/strong>). &amp;lt;strong>effsize
+                    tool&amp;lt;/strong> to compute estimators of effect size.&amp;lt;br> We
+                    specifically use it to compute Cliff's Delta, which quantifies the amount
+                    difference between two groups of observations, by computing the Cliff's Delta
+                    statistic.&amp;lt;br> It is taken from project DABEST (see
+                    &amp;lt;strong>License&amp;lt;/strong>). &amp;lt;strong>4. Research Questions
+                    and Hypotheses in [3]&amp;lt;/strong> &amp;lt;strong>RQ1 Lexical
+                    alignment&amp;lt;/strong>: How do the interlocutors &amp;lt;em>use&amp;lt;/em>
+                    expressions related to the task? Is this associated with task success?
+                    &amp;lt;strong>H1.1&amp;lt;/strong>: Task-specific referents become routine
+                    early for more successful teams. &amp;lt;strong>H1.2&amp;lt;/strong>: Hesitation
+                    phenomena are more likely to occur in the vicinity of priming and establishment
+                    of task-specific referents for more successful teams. &amp;lt;strong>RQ2
+                    Behavioural alignment&amp;lt;/strong>: How do the interlocutors
+                    &amp;lt;em>follow up&amp;lt;/em> these expressions with actions? Is this
+                    associated with task success? &amp;lt;strong>H2.1&amp;lt;/strong>: Instructions
+                    are more likely to be followed by a corresponding action early in the dialogue
+                    for more successful teams. &amp;lt;strong>H2.2&amp;lt;/strong>: When
+                    instructions are followed by a corresponding or a different action, the action
+                    is more likely to be in the vicinity of information management phenomena for
+                    more successful teams. The RQs and Hs are addressed in the notebook for testing
+                    the hypotheses (i.e. tools/7_test_the_hypotheses.ipynb).
+                    &amp;lt;strong>Acknowledgements&amp;lt;/strong> This project has received
+                    funding from the European Union's Horizon 2020 research and innovation programme
+                    under grant agreement No 765955. Namely, the ANIMATAS Project.
+                    &amp;lt;strong>License&amp;lt;/strong> The whole package is under MIT License,
+                    see the &amp;lt;strong>LICENSE&amp;lt;/strong> file. Classes under the
+                    &amp;lt;strong>tools/effsize&amp;lt;/strong> package were taken from project
+                    &amp;lt;strong>DABEST&amp;lt;/strong>, Copyright 2016-2020 Joses W. Ho. These
+                    classes are licensed under the BSD 3-Clause Clear License. See
+                    &amp;lt;strong>tools/effsize/LICENSE&amp;lt;/strong> file for additional
+                    details. Classes under the &amp;lt;strong>tools/dialign-1.0&amp;lt;/strong>
+                    package were taken from project &amp;lt;strong>dialign&amp;lt;/strong>. These
+                    classes are licensed under the CeCILL-B License. This package is used as an
+                    "external module", see&amp;lt;strong>
+                    tools/dialign-1.0/LICENSE.txt&amp;lt;/strong> for additional
+                    details.</description>
+                <description>{"references": ["[1] J. Nasir, U. Norman, B. Bruno, and P. Dillenbourg,
+                    \"You Tell, I Do, and We Swap until we Connect All the Gold Mines!,\" ERCIM
+                    News, vol. 2020, no. 120, 2020, [Online]. Available:
+                    https://ercim-news.ercim.eu/en120/special/you-tell-i-do-and-we-swap-until-we-connect-all-the-gold-mines",
+                    "[2] J. Nasir*, U. Norman*, B. Bruno, and P. Dillenbourg, \"When Positive
+                    Perception of the Robot Has No Effect on Learning,\" in 2020 29th IEEE
+                    International Conference on Robot and Human Interactive Communication (RO-MAN),
+                    Aug. 2020, pp. 313\u2013320, doi: 10.1109/RO-MAN47096.2020.9223343", "[3] U.
+                    Norman*, T. Dinkar*, B. Bruno, and C. Clavel, \"Studying Alignment in a
+                    Collaborative Learning Activity via Automatic Methods: The Link Between What We
+                    Say and Do,\" Dialogue &amp;amp;amp; Discourse, vol. 13, no. 2, pp. 1\u201348,
+                    Aug. 2022, doi: 10.5210/dad.2022.201.", "[4] M. Sangin, G. Molinari, M.-A.
+                    N\u00fcssli, and P. Dillenbourg, \"Facilitating peer knowledge modeling: Effects
+                    of a knowledge awareness tool on collaborative learning outcomes and
+                    processes,\"\" Computers in Human Behavior, vol. 27, no. 3, pp. 1059\u20131067,
+                    May 2011, doi: 10.1016/j.chb.2010.05.032."]}</description>
+                <subject classid="keyword" classname="keyword"
+                         schemeid="dnet:subject_classification_typologies"
+                         schemename="dnet:subject_classification_typologies" inferred="false"
+                         provenanceaction="sysimport:crosswalk:repository" trust="0.9"
+                >alignment</subject>
+                <subject classid="keyword" classname="keyword"
+                         schemeid="dnet:subject_classification_typologies"
+                         schemename="dnet:subject_classification_typologies" inferred="false"
+                         provenanceaction="sysimport:crosswalk:repository" trust="0.9">situated
+                    dialogue</subject>
+                <subject classid="keyword" classname="keyword"
+                         schemeid="dnet:subject_classification_typologies"
+                         schemename="dnet:subject_classification_typologies" inferred="false"
+                         provenanceaction="sysimport:crosswalk:repository" trust="0.9">collaborative
+                    learning</subject>
+                <subject classid="keyword" classname="keyword"
+                         schemeid="dnet:subject_classification_typologies"
+                         schemename="dnet:subject_classification_typologies" inferred="false"
+                         provenanceaction="sysimport:crosswalk:repository" trust="0.9">spontaneous
+                    speech</subject>
+                <subject classid="keyword" classname="keyword"
+                         schemeid="dnet:subject_classification_typologies"
+                         schemename="dnet:subject_classification_typologies" inferred="false"
+                         provenanceaction="sysimport:crosswalk:repository" trust="0.9"
+                >disfluency</subject>
+                <subject classid="keyword" classname="keyword"
+                         schemeid="dnet:subject_classification_typologies"
+                         schemename="dnet:subject_classification_typologies" inferred="false"
+                         provenanceaction="sysimport:crosswalk:repository" trust="0.9">mutual
+                    understanding</subject>
+                <language classid="eng" classname="English" schemeid="dnet:languages"
+                          schemename="dnet:languages"/>
+                <relevantdate classid="issued" classname="issued" schemeid="dnet:dataCite_date"
+                              schemename="dnet:dataCite_date" inferred="false"
+                              provenanceaction="sysimport:crosswalk:repository" trust="0.9"
+                >2021-04-09</relevantdate>
+                <relevantdate classid="issued" classname="issued" schemeid="dnet:dataCite_date"
+                              schemename="dnet:dataCite_date" inferred="false"
+                              provenanceaction="sysimport:crosswalk:repository" trust="0.9"
+                >2022-08-08</relevantdate>
+                <publisher>Zenodo</publisher>
+                <resulttype classid="software" classname="software"
+                            schemeid="dnet:result_typologies" schemename="dnet:result_typologies"/>
+                <resourcetype classid="UNKNOWN" classname="UNKNOWN"
+                              schemeid="dnet:dataCite_resource" schemename="dnet:dataCite_resource"/>
+                <programmingLanguage/>
+                <context id="EC" label="European Commission" type="funding">
+                    <category id="EC::H2020" label="Horizon 2020 Framework Programme">
+                        <concept id="EC::H2020::MSCA-ITN-ETN" label="European Training Networks"/>
+                    </category>
+                </context>
+                <eoscifguidelines code="EOSC::Jupyter Notebook"
+                                  label="EOSC::Jupyter Notebook"
+                                  url=""
+                                  semanticrelation="compliesWith"/>
+                <datainfo>
+                    <inferred>true</inferred>
+                    <deletedbyinference>false</deletedbyinference>
+                    <trust>0.8</trust>
+                    <inferenceprovenance>dedup-result-decisiontree-v3</inferenceprovenance>
+                    <provenanceaction classid="sysimport:dedup" classname="Inferred by OpenAIRE"
+                                      schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions"/>
+                </datainfo>
+                <rels>
+                    <rel inferred="false" trust="0.9" inferenceprovenance=""
+                         provenanceaction="sysimport:actionset">
+                        <to class="IsSupplementTo" scheme="dnet:result_result_relations"
+                            type="publication">doi_dedup___::ae235765bbc422195a6c9f632b2d77eb</to>
+                        <collectedfrom name="arXiv.org e-Print Archive"
+                                       id="opendoar____::6f4922f45568161a8cdf4ad2299f6d23"/>
+                        <pid classid="arXiv" classname="arXiv" schemeid="dnet:pid_types"
+                             schemename="dnet:pid_types" inferred="false"
+                             provenanceaction="sysimport:crosswalk:repository" trust="0.9"
+                        >2104.04429</pid>
+                        <collectedfrom name="Infoscience - EPFL scientific publications"
+                                       id="opendoar____::eecca5b6365d9607ee5a9d336962c534"/>
+                        <publisher>arXiv</publisher>
+                        <collectedfrom name="Crossref"
+                                       id="openaire____::081b82f96300b6a6e3d282bad31cb6e2"/>
+                        <dateofacceptance>2022-08-05</dateofacceptance>
+                        <title classid="main title" classname="main title"
+                               schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title">Studying
+                            Alignment in a Collaborative Learning Activity via Automatic Methods:
+                            The Link Between What We Say and Do</title>
+                        <collectedfrom name="ORCID"
+                                       id="openaire____::806360c771262b4d6770e7cdf04b5c5a"/>
+                        <collectedfrom name="Datacite"
+                                       id="openaire____::9e3be59865b2c1c335d32dae2fe7b254"/>
+                        <pid classid="doi" classname="Digital Object Identifier"
+                             schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false"
+                             provenanceaction="sysimport:actionset" trust="0.9"
+                        >10.48550/arxiv.2104.04429</pid>
+                        <pid classid="doi" classname="Digital Object Identifier"
+                             schemeid="dnet:pid_types" schemename="dnet:pid_types"
+                        >10.5210/dad.2022.201</pid>
+                    </rel>
+                    <rel inferred="false" trust="0.9" inferenceprovenance=""
+                         provenanceaction="sysimport:actionset">
+                        <to class="isProducedBy" scheme="dnet:result_project_relations"
+                            type="project">corda__h2020::c4515ebef538a734cf11f795347f5dac</to>
+                        <title>Advancing intuitive human-machine interaction with human-like social
+                            capabilities for education in schools</title>
+                        <code>765955</code>
+                        <funding>
+                            <funder id="ec__________::EC" shortname="EC" name="European Commission"
+                                    jurisdiction="EU"/>
+                            <funding_level_0 name="H2020">ec__________::EC::H2020</funding_level_0>
+                            <funding_level_1 name="MSCA-ITN-ETN"
+                            >ec__________::EC::H2020::MSCA-ITN-ETN</funding_level_1>
+                        </funding>
+                        <acronym>ANIMATAS</acronym>
+                    </rel>
+                    <rel inferred="false" trust="0.9" inferenceprovenance=""
+                         provenanceaction="sysimport:actionset">
+                        <to class="IsSupplementedBy" scheme="dnet:result_result_relations"
+                            type="dataset">doi_dedup___::0a6314b0ed275d915f5b57a259375691</to>
+                        <dateofacceptance>2021-03-22</dateofacceptance>
+                        <publisher>Zenodo</publisher>
+                        <pid classid="doi" classname="Digital Object Identifier"
+                             schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false"
+                             provenanceaction="sysimport:crosswalk:repository" trust="0.9"
+                        >10.5281/zenodo.4627104</pid>
+                        <title classid="main title" classname="main title"
+                               schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title"
+                               inferred="false" provenanceaction="sysimport:crosswalk:repository"
+                               trust="0.9">JUSThink Dialogue and Actions Corpus</title>
+                        <pid classid="doi" classname="Digital Object Identifier"
+                             schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false"
+                             provenanceaction="sysimport:actionset" trust="0.9"
+                        >10.5281/zenodo.4627103</pid>
+                        <collectedfrom name="ZENODO"
+                                       id="opendoar____::358aee4cc897452c00244351e4d91f69"/>
+                        <collectedfrom name="Datacite"
+                                       id="openaire____::9e3be59865b2c1c335d32dae2fe7b254"/>
+                    </rel>
+                </rels>
+                <children>
+                    <result objidentifier="doi_________::c054151b6a8c4f41c7acf160651a6503">
+                        <publisher>Zenodo</publisher>
+                        <pid classid="doi" classname="Digital Object Identifier"
+                             schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false"
+                             provenanceaction="sysimport:crosswalk:repository" trust="0.9"
+                        >10.5281/zenodo.4675070</pid>
+                        <title classid="main title" classname="main title"
+                               schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title"
+                               inferred="false" provenanceaction="sysimport:crosswalk:repository"
+                               trust="0.9">JUSThink Alignment Analysis</title>
+                        <dateofacceptance>2021-04-09</dateofacceptance>
+                        <collectedfrom name="ZENODO"
+                                       id="opendoar____::358aee4cc897452c00244351e4d91f69"/>
+                    </result>
+                    <result objidentifier="doi_________::04aaa160a921cafdc90e03483de0a26f">
+                        <dateofacceptance>2022-08-08</dateofacceptance>
+                        <publisher>Zenodo</publisher>
+                        <pid classid="doi" classname="Digital Object Identifier"
+                             schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false"
+                             provenanceaction="sysimport:crosswalk:repository" trust="0.9"
+                        >10.5281/zenodo.6974562</pid>
+                        <collectedfrom name="ZENODO"
+                                       id="opendoar____::358aee4cc897452c00244351e4d91f69"/>
+                        <title classid="main title" classname="main title"
+                               schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title"
+                               inferred="false" provenanceaction="sysimport:crosswalk:repository"
+                               trust="0.9">JUSThink Alignment Analysis (v1.1.0)</title>
+                    </result>
+                    <result objidentifier="doi_________::684a8fbe0ff09f288e9d29db897233bb">
+                        <title classid="main title" classname="main title"
+                               schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title">JUSThink
+                            Alignment Analysis (v1.1.0)</title>
+                        <dateofacceptance>2022-08-08</dateofacceptance>
+                        <publisher>Zenodo</publisher>
+                        <pid classid="doi" classname="Digital Object Identifier"
+                             schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false"
+                             provenanceaction="sysimport:actionset" trust="0.9"
+                        >10.5281/zenodo.4675069</pid>
+                        <collectedfrom name="Datacite"
+                                       id="openaire____::9e3be59865b2c1c335d32dae2fe7b254"/>
+                    </result>
+                    <instance>
+                        <accessright classid="OPEN" classname="Open Access"
+                                     schemeid="dnet:access_modes" schemename="dnet:access_modes"/>
+                        <collectedfrom name="Datacite"
+                                       id="openaire____::9e3be59865b2c1c335d32dae2fe7b254"/>
+                        <hostedby name="ZENODO" id="opendoar____::358aee4cc897452c00244351e4d91f69"/>
+                        <dateofacceptance>2022-08-08</dateofacceptance>
+                        <instancetype classid="0029" classname="Software"
+                                      schemeid="dnet:publication_resource"
+                                      schemename="dnet:publication_resource"/>
+                        <pid classid="doi" classname="Digital Object Identifier"
+                             schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false"
+                             provenanceaction="sysimport:actionset" trust="0.9"
+                        >10.5281/zenodo.4675069</pid>
+                        <refereed classid="0000" classname="UNKNOWN" schemeid="dnet:review_levels"
+                                  schemename="dnet:review_levels"/>
+                        <license>https://opensource.org/licenses/MIT</license>
+                        <webresource>
+                            <url>https://doi.org/10.5281/zenodo.4675069</url>
+                        </webresource>
+                    </instance>
+                    <instance>
+                        <accessright classid="OPEN" classname="Open Access"
+                                     schemeid="dnet:access_modes" schemename="dnet:access_modes"/>
+                        <collectedfrom name="ZENODO"
+                                       id="opendoar____::358aee4cc897452c00244351e4d91f69"/>
+                        <hostedby name="ZENODO" id="opendoar____::358aee4cc897452c00244351e4d91f69"/>
+                        <dateofacceptance>2022-08-08</dateofacceptance>
+                        <instancetype classid="0029" classname="Software"
+                                      schemeid="dnet:publication_resource"
+                                      schemename="dnet:publication_resource"/>
+                        <pid classid="doi" classname="Digital Object Identifier"
+                             schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false"
+                             provenanceaction="sysimport:crosswalk:repository" trust="0.9"
+                        >10.5281/zenodo.6974562</pid>
+                        <refereed classid="0000" classname="UNKNOWN" schemeid="dnet:review_levels"
+                                  schemename="dnet:review_levels"/>
+                        <license>https://opensource.org/licenses/MIT</license>
+                        <webresource>
+                            <url>https://doi.org/10.5281/zenodo.6974562</url>
+                        </webresource>
+                    </instance>
+                    <instance>
+                        <accessright classid="OPEN" classname="Open Access"
+                                     schemeid="dnet:access_modes" schemename="dnet:access_modes"/>
+                        <collectedfrom name="ZENODO"
+                                       id="opendoar____::358aee4cc897452c00244351e4d91f69"/>
+                        <hostedby name="ZENODO" id="opendoar____::358aee4cc897452c00244351e4d91f69"/>
+                        <dateofacceptance>2021-04-09</dateofacceptance>
+                        <instancetype classid="0029" classname="Software"
+                                      schemeid="dnet:publication_resource"
+                                      schemename="dnet:publication_resource"/>
+                        <pid classid="doi" classname="Digital Object Identifier"
+                             schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false"
+                             provenanceaction="sysimport:crosswalk:repository" trust="0.9"
+                        >10.5281/zenodo.4675070</pid>
+                        <refereed classid="0000" classname="UNKNOWN" schemeid="dnet:review_levels"
+                                  schemename="dnet:review_levels"/>
+                        <license>https://opensource.org/licenses/MIT</license>
+                        <webresource>
+                            <url>https://doi.org/10.5281/zenodo.4675070</url>
+                        </webresource>
+                    </instance>
+                </children>
+            </oaf:result>
+        </oaf:entity>
+    </metadata>
+</result>
+</record>

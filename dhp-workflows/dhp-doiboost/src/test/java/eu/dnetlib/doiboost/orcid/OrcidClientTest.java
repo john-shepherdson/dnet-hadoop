@@ -161,13 +161,11 @@ public class OrcidClientTest {
 
 	@Test
 	@Disabled
-	void testReadBase64CompressedRecord() throws Exception {
+	void testReadBase64CompressedWork() throws Exception {
 		final String base64CompressedRecord = IOUtils
-			.toString(getClass().getResourceAsStream("0000-0003-3028-6161.compressed.base64"));
+			.toString(getClass().getResourceAsStream("0000-0001-7281-6306.compressed.base64"));
 		final String recordFromSeqFile = ArgumentApplicationParser.decompressValue(base64CompressedRecord);
 		logToFile(testPath, "\n\ndownloaded \n\n" + recordFromSeqFile);
-		final String downloadedRecord = testDownloadRecord("0000-0003-3028-6161", REQUEST_TYPE_RECORD);
-		assertEquals(recordFromSeqFile, downloadedRecord);
 	}
 
 	@Test
@@ -337,7 +335,7 @@ public class OrcidClientTest {
 	@Ignore
 	void testUpdatedRecord() throws Exception {
 		final String base64CompressedRecord = IOUtils
-			.toString(getClass().getResourceAsStream("0000-0003-3028-6161.compressed.base64"));
+			.toString(getClass().getResourceAsStream("0000-0001-7281-6306.compressed.base64"));
 		final String record = ArgumentApplicationParser.decompressValue(base64CompressedRecord);
 		logToFile(testPath, "\n\nrecord updated \n\n" + record);
 	}

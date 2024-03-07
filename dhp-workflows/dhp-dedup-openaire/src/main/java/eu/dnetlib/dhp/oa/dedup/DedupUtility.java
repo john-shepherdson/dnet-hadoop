@@ -2,24 +2,22 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.apache.spark.SparkContext;
-import org.apache.spark.util.LongAccumulator;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.xml.sax.SAXException;
 
-import com.google.common.collect.Sets;
-
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
-import eu.dnetlib.pace.clustering.BlacklistAwareClusteringCombiner;
 import eu.dnetlib.pace.config.DedupConfig;
-import eu.dnetlib.pace.model.MapDocument;
 
 public class DedupUtility {
 
@@ -27,43 +25,6 @@ public class DedupUtility {
 	public static final String CORDA_ID_PREFIX = "corda";
 
 	private DedupUtility() {
-	}
-
-	public static Map<String, LongAccumulator> constructAccumulator(
-		final DedupConfig dedupConf, final SparkContext context) {
-
-		Map<String, LongAccumulator> accumulators = new HashMap<>();
-
-		String acc1 = String.format("%s::%s", dedupConf.getWf().getEntityType(), "records per hash key = 1");
-		accumulators.put(acc1, context.longAccumulator(acc1));
-		String acc2 = String
-			.format(
-				"%s::%s",
-				dedupConf.getWf().getEntityType(), "missing " + dedupConf.getWf().getOrderField());
-		accumulators.put(acc2, context.longAccumulator(acc2));
-		String acc3 = String
-			.format(
-				"%s::%s",
-				dedupConf.getWf().getEntityType(),
-				String
-					.format(
-						"Skipped records for count(%s) >= %s",
-						dedupConf.getWf().getOrderField(), dedupConf.getWf().getGroupMaxSize()));
-		accumulators.put(acc3, context.longAccumulator(acc3));
-		String acc4 = String.format("%s::%s", dedupConf.getWf().getEntityType(), "skip list");
-		accumulators.put(acc4, context.longAccumulator(acc4));
-		String acc5 = String.format("%s::%s", dedupConf.getWf().getEntityType(), "dedupSimilarity (x2)");
-		accumulators.put(acc5, context.longAccumulator(acc5));
-		String acc6 = String
-			.format(
-				"%s::%s", dedupConf.getWf().getEntityType(), "d < " + dedupConf.getWf().getThreshold());
-		accumulators.put(acc6, context.longAccumulator(acc6));
-
-		return accumulators;
-	}
-
-	static Set<String> getGroupingKeys(DedupConfig conf, MapDocument doc) {
-		return Sets.newHashSet(BlacklistAwareClusteringCombiner.filterAndCombine(doc, conf));
 	}
 
 	public static String createDedupRecordPath(
@@ -150,6 +111,27 @@ public class DedupUtility {
 			return 1;
 
 		return o1.compareTo(o2);
+	}
+
+	public static Relation createSimRel(String source, String target, String entity) {
+		final Relation r = new Relation();
+		r.setSource(source);
+		r.setTarget(target);
+		r.setSubRelType("dedupSimilarity");
+		r.setRelClass(ModelConstants.IS_SIMILAR_TO);
+		r.setDataInfo(new DataInfo());
+
+		switch (entity) {
+			case "result":
+				r.setRelType(ModelConstants.RESULT_RESULT);
+				break;
+			case "organization":
+				r.setRelType(ModelConstants.ORG_ORG_RELTYPE);
+				break;
+			default:
+				throw new IllegalArgumentException("unmanaged entity type: " + entity);
+		}
+		return r;
 	}
 
 }

@@ -31,7 +31,7 @@ public class PrepareResultOrcidAssociationStep1 {
 			.toString(
 				PrepareResultOrcidAssociationStep1.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/orcidtoresultfromsemrel/input_prepareorcidtoresult_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/orcidtoresultfromsemrel/input_prepareorcidtoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConf);
 		parser.parseArgument(args);

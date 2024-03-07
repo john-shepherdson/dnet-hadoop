@@ -146,9 +146,9 @@
             <exec>finalizeImpalaCluster.sh</exec>
             <argument>${hist_db_name}</argument>
             <argument>${hist_db_prod_name}</argument>
-            <argument>${monitor_db_name}</argument>
-            <argument>${monitor_db_name}</argument>
-            <argument>${monitor_irish_db_name}</argument>
+            <argument>${hist_db_shadow_name}</argument>
+            <argument>${monitor_db_prod_name}</argument>
+            <argument>${monitor_irish_db_prod_name}</argument>
             <file>finalizeImpalaCluster.sh</file>
         </shell>
         <ok to="End"/>

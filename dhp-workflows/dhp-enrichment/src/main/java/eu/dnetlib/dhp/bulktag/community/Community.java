@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.bulktag.community;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.google.gson.Gson;
 
@@ -13,7 +14,9 @@ public class Community implements Serializable {
 	private String id;
 	private List<String> subjects = new ArrayList<>();
 	private List<Provider> providers = new ArrayList<>();
-	private List<ZenodoCommunity> zenodoCommunities = new ArrayList<>();
+	private List<String> zenodoCommunities = new ArrayList<>();
+	private SelectionConstraints constraints = new SelectionConstraints();
+	private SelectionConstraints removeConstraints = new SelectionConstraints();
 
 	public String toJson() {
 		final Gson g = new Gson();
@@ -23,7 +26,8 @@ public class Community implements Serializable {
 	public boolean isValid() {
 		return !getSubjects().isEmpty()
 			|| !getProviders().isEmpty()
-			|| !getZenodoCommunities().isEmpty();
+			|| !getZenodoCommunities().isEmpty()
+			|| (Optional.ofNullable(getConstraints()).isPresent() && getConstraints().getCriteria() != null);
 	}
 
 	public String getId() {
@@ -50,11 +54,27 @@ public class Community implements Serializable {
 		this.providers = providers;
 	}
 
-	public List<ZenodoCommunity> getZenodoCommunities() {
+	public List<String> getZenodoCommunities() {
 		return zenodoCommunities;
 	}
 
-	public void setZenodoCommunities(List<ZenodoCommunity> zenodoCommunities) {
+	public void setZenodoCommunities(List<String> zenodoCommunities) {
 		this.zenodoCommunities = zenodoCommunities;
+	}
+
+	public SelectionConstraints getConstraints() {
+		return constraints;
+	}
+
+	public void setConstraints(SelectionConstraints constraints) {
+		this.constraints = constraints;
+	}
+
+	public SelectionConstraints getRemoveConstraints() {
+		return removeConstraints;
+	}
+
+	public void setRemoveConstraints(SelectionConstraints removeConstraints) {
+		this.removeConstraints = removeConstraints;
 	}
 }
