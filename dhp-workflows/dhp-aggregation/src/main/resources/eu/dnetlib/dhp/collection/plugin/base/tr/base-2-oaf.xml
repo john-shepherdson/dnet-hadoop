@@ -12,7 +12,7 @@
 			<SINK_METADATA_FORMAT name="odf_hbase" />
 			<IMPORTED />
 			<SCRIPT>
-				<TITLE>xslt_dc2oaf_base_hadoop</TITLE>
+				<TITLE>xslt_base2oaf_hadoop</TITLE>
 				<CODE>
 					<xsl:stylesheet xmlns:oaire="http://namespace.openaire.eu/schema/oaire/" xmlns:dateCleaner="http://eu/dnetlib/transform/dateISO"
 						xmlns:base_dc="http://oai.base-search.net/base_dc/"
@@ -51,7 +51,7 @@ base_dc:collection/text()
 base_dc:collection/@ror_id
 base_dc:continent
 base_dc:country
-base_dc:year  (I used dc:date)
+base_dc:year (I used dc:date)
 dc:coverage
 dc:language (I used base_dc:lang)
 base_dc:link (I used dc:identifier)
@@ -86,7 +86,7 @@ base_dc:link (I used dc:identifier)
 									
 									<!-- TODO: I'm not sure if this is the correct encoding -->
 									<xsl:for-each select="//base_dc:classcode|//base_dc:autoclasscode">
-										<dc:subject><xsl:value-of  select="concat(@type, ':', .)" /></dc:subject>
+										<dc:subject><xsl:value-of select="concat(@type, ':', .)" /></dc:subject>
 									</xsl:for-each>
 									<!-- END TODO -->
 									
@@ -168,20 +168,20 @@ base_dc:link (I used dc:identifier)
 									
 									<oaf:hostedBy>
 										<xsl:attribute name="name">
-                                            <xsl:value-of select="//base_dc:collname" />
-                                        </xsl:attribute>
+											<xsl:value-of select="//base_dc:collname" />
+										</xsl:attribute>
 										<xsl:attribute name="id">
-                                            <xsl:value-of select="concat('opendoar____::', //base_dc:collection/@opendoar_id)" />
-                                        </xsl:attribute>
+											<xsl:value-of select="concat('opendoar____::', //base_dc:collection/@opendoar_id)" />
+										</xsl:attribute>
 									</oaf:hostedBy>
 									
 									<oaf:collectedFrom>
 										<xsl:attribute name="name">
-                                            <xsl:value-of select="$varOfficialName" />
-                                        </xsl:attribute>
+											<xsl:value-of select="$varOfficialName" />
+										</xsl:attribute>
 										<xsl:attribute name="id">
-                                            <xsl:value-of select="$varDataSourceId" />
-                                        </xsl:attribute>
+											<xsl:value-of select="$varDataSourceId" />
+										</xsl:attribute>
 									</oaf:collectedFrom>
 									
 									<oaf:dateAccepted>
@@ -213,7 +213,7 @@ base_dc:link (I used dc:identifier)
 									
 									
 									<xsl:variable name="varRefereedConvt"
-										select="for $i in (//dc:type, //dc:description, //oai:setSpec)                                                                             return vocabulary:clean( normalize-space($i), 'dnet:review_levels')" />
+										select="for $i in (//dc:type, //dc:description, //oai:setSpec) return vocabulary:clean( normalize-space($i), 'dnet:review_levels')" />
 									<xsl:variable name="varRefereedIdntf"
 										select="(//*[string(node-name(.)) = 'dc:identifier' and matches(lower-case(.), '(^|.*[\.\-_/\s\(\)%\d#])pre[\.\-_/\s\(\)%\d#]?prints?([\.\-_/\s\(\)%\d#].*)?$')][count(//dc:identifier) = 1]/'0002', //*[string(node-name(.)) = 'dc:identifier' and matches(lower-case(.), '(^|.*[\.\-_/\s\(\)%\d#])refereed([\.\-_/\s\(\)\d%\d#].*)?$')]/'0001', //*[string(node-name(.)) = 'dc:identifier' and matches(lower-case(.), '.*-peer-reviewed-(fulltext-)?article-.*')]/'0001')" />
 									<xsl:variable name="varRefereedSourc"
@@ -221,9 +221,9 @@ base_dc:link (I used dc:identifier)
 									<xsl:variable name="varRefereedDescr"
 										select="(//dc:description[matches(lower-case(.), '.*(this\s*book|this\s*volume|it)\s*constitutes\s*the\s*(thoroughly\s*)?refereed') or matches(lower-case(.), '.*peer[\.\-_/\s\(\)]?review\s*under\s*responsibility\s*of.*') or matches(lower-case(.), '(this|a)\s*(article|preprint)\s*(has\s*been\s*)?(peer[\-\s]*)?reviewed\s*and\s*recommended\s*by\s*peer[\-\s]*community')]/'0001', //dc:description[matches(., '^version\s*(préliminaire.*|preliminary.*|0$)')]/'0002')" />
 									<xsl:variable name="varRefereedTitle"
-										select="(//dc:title[matches(lower-case(.), '.*\[.*peer[\s\-\._]*review\s*:.*\]\s*$')]/'0001',                                      //dc:title[matches(lower-case(.), '.*\(\s*pre[\s\-\._]*prints?\s*\)\s*$')]/'0002')" />
+										select="(//dc:title[matches(lower-case(.), '.*\[.*peer[\s\-\._]*review\s*:.*\]\s*$')]/'0001', //dc:title[matches(lower-case(.), '.*\(\s*pre[\s\-\._]*prints?\s*\)\s*$')]/'0002')" />
 									<xsl:variable name="varRefereedSubjt"
-										select="(//dc:subject[matches(lower-case(.), '^\s*refereed\s*$')][//oaf:datasourceprefix = 'narcis______']/'0001',                                    //dc:subject[matches(lower-case(.), '^\s*no[nt].{0,3}refereed\s*$')][//oaf:datasourceprefix = 'narcis______']/'0002')" />
+										select="(//dc:subject[matches(lower-case(.), '^\s*refereed\s*$')][//oaf:datasourceprefix = 'narcis______']/'0001', //dc:subject[matches(lower-case(.), '^\s*no[nt].{0,3}refereed\s*$')][//oaf:datasourceprefix = 'narcis______']/'0002')" />
 									
 									<xsl:variable name="varRefereed" select="($varRefereedConvt, $varRefereedIdntf, $varRefereedSourc, $varRefereedDescr, $varRefereedTitle, $varRefereedSubjt)" />
 									
@@ -243,7 +243,6 @@ base_dc:link (I used dc:identifier)
 									<xsl:variable name="varKnownFileEndings"
 										select="('.bmp', '.doc', '.docx', '.epub', '.flv', '.jpeg', '.jpg', '.m4v', '.mp4', '.mpg', '.odp', '.pdf', '.png', '.ppt', '.tiv', '.txt', '.xls', '.xlsx', '.zip')" /><!-- regular expression 
 										for DOIs reduced here - letters like less-than and quotation marks don't work in matches, use identiferExtract when enabled -->
-									
 									
 									
 									<xsl:variable name="varIdHdl" select="distinct-values(//dc:identifier[starts-with(., 'http') and contains(., '://hdl.handle.net/')]/substring-after(., 'hdl.handle.net/'))" />
