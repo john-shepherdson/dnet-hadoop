@@ -40,31 +40,25 @@
 
 
 <!-- TO EVALUATE
-./base_dc:authod_id
-./base_dc:authod_id/base_dc:creator_id
-./base_dc:authod_id/base_dc:creator_name
+base_dc:authod_id
+base_dc:authod_id/base_dc:creator_id
+base_dc:authod_id/base_dc:creator_name
 
-./base_dc:autoclasscode
-./base_dc:autoclasscode/@type
-
-./base_dc:classcode
-./base_dc:classcode/@type
-
-./base_dc:global_id
-./base_dc:lang
-./base_dc:link
-./base_dc:oa
-./base_dc:rightsnorm
-./base_dc:typenorm
+base_dc:oa
+base_dc:rightsnorm
+base_dc:typenorm
 -->
 
 <!-- NOT USED 
-./base_dc:collection/text()
-./base_dc:collection/@ror_id
-./base_dc:continent
-./base_dc:country
-./base_dc:year  (I use dc:date)
-./dc:coverage
+base_dc:global_id (I used oai:identifier)
+base_dc:collection/text()
+base_dc:collection/@ror_id
+base_dc:continent
+base_dc:country
+base_dc:year  (I used dc:date)
+dc:coverage
+dc:language (I used base_dc:lang)
+base_dc:link (I used dc:identifier)
 -->
 
 
@@ -94,6 +88,12 @@
 										<xsl:with-param name="targetElement" select="'dc:subject'" />
 									</xsl:call-template>
 									
+									<!-- TODO: I'm not sure if this is the correct encoding -->
+									<xsl:for-each select="//base_dc:classcode|//base_dc:autoclasscode">
+										<dc:subject><xsl:value-of  select="concat(@type, ':', .)" /></dc:subject>
+									</xsl:for-each>
+									<!-- END TODO -->
+									
 									<xsl:call-template name="allElements">
 										<xsl:with-param name="sourceElement" select="//dc:publisher" />
 										<xsl:with-param name="targetElement" select="'dc:publisher'" />
@@ -115,7 +115,7 @@
 									</xsl:call-template>
 									
 									<dc:language>
-										<xsl:value-of select="vocabulary:clean( //dc:language, 'dnet:languages')" />
+										<xsl:value-of select="vocabulary:clean( //base_dc:lang, 'dnet:languages')" />
 									</dc:language>
 									
 									<xsl:call-template name="allElements">
@@ -179,6 +179,10 @@
                                         </xsl:attribute>
 									</oaf:collectedFrom>
 									
+									<oaf:dateAccepted>
+										<xsl:value-of select="dateCleaner:dateISO( //dc:date[1] )" />
+									</oaf:dateAccepted>
+									
 									<!-- TODO CONTINUE HERE -->
 									
 									<dr:CobjCategory>
@@ -216,9 +220,7 @@
 										</xsl:when>
 									</xsl:choose>
 									
-									<oaf:dateAccepted>
-										<xsl:value-of select="dateCleaner:dateISO( //dc:date[1] )" />
-									</oaf:dateAccepted>
+									
 									
 									<xsl:if test="//dc:relation[starts-with(., 'http')] and //dc:rights[.='info:eu-repo/semantics/openAccess']">
 										<oaf:fulltext>
