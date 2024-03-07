@@ -27,12 +27,23 @@ select distinct xpath_string(fundingtree[0].value, '//funder/name') as funder fr
 drop table if exists TARGET.result;
 
 create table TARGET.result stored as parquet as
-    select distinct * from SOURCE.result r where r.id in (select ro.id from SOURCE.result_organization ro
-                    left outer join SOURCE.organization o on o.id=ro.organization
-                    left outer join SOURCE.result_projects rp on rp.id=ro.id
-                    left outer join SOURCE.project p on p.id=rp.project
-                    join TARGET.irish_funders irf
-                    where o.country='IE' or p.funder=irf.funder);
+select distinct * from (
+       select r.*
+       from SOURCE.result r
+                join SOURCE.result_projects rp on rp.id=r.id
+                join SOURCE.project p on p.id=rp.project
+                join openaire_prod_stats_monitor_ie_20231226b.irish_funders irf on irf.funder=p.funder
+       union all
+       select r.*
+       from SOURCE.result r
+                join SOURCE.result_organization ro on ro.id=r.id
+                join SOURCE.organization o on o.id=ro.organization and o.country='IE'
+       union all
+       select r.*
+       from SOURCE.result r
+                join SOURCE.result_pids pid on pid.id=r.id
+                join stats_ext.transformative_facts tf on tf.doi=pid.pid
+   ) foo;
 
 create view if not exists TARGET.category as select * from SOURCE.category;
 create view if not exists TARGET.concept as select * from SOURCE.concept;
