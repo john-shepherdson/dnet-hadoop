@@ -43,10 +43,6 @@
 base_dc:authod_id
 base_dc:authod_id/base_dc:creator_id
 base_dc:authod_id/base_dc:creator_name
-
-base_dc:oa
-base_dc:rightsnorm
-base_dc:typenorm
 -->
 
 <!-- NOT USED 
@@ -151,7 +147,16 @@ base_dc:link (I used dc:identifier)
 									</xsl:for-each>
 									
 									<oaf:accessrights>
-										<xsl:value-of select="vocabulary:clean( //dc:rights, 'dnet:access_modes')" />
+										<xsl:choose>
+											<xsl:when test="//base_dc:oa[.='1']">OPEN</xsl:when>
+											<xsl:when test="//base_dc:rightsnorm">
+												<xsl:value-of select="vocabulary:clean(//base_dc:rightsnorm, 'dnet:access_modes')" />
+											</xsl:when>
+											<xsl:when test="//dc:rights">
+												<xsl:value-of select="vocabulary:clean( //dc:rights, 'dnet:access_modes')" />
+											</xsl:when>
+											<xsl:otherwise>UNKNOWN</xsl:otherwise>
+										</xsl:choose>
 									</oaf:accessrights>
 									
 									<xsl:for-each select="//base_dc:doi">
@@ -183,14 +188,29 @@ base_dc:link (I used dc:identifier)
 										<xsl:value-of select="dateCleaner:dateISO( //dc:date[1] )" />
 									</oaf:dateAccepted>
 									
-									<!-- TODO CONTINUE HERE -->
+									<xsl:if test="//dc:relation[starts-with(., 'http')] and //base_dc:oa[.='1']">
+										<oaf:fulltext>
+											<xsl:value-of select="//dc:relation[starts-with(., 'http')]" />
+										</oaf:fulltext>
+									</xsl:if>
 									
+									<oaf:identifier>
+										<xsl:attribute name="identifierType" select="'oai-original'" />
+										<xsl:value-of
+											select="//*[local-name() = 'about']/*[local-name() = 'provenance']//*[local-name() = 'originDescription' and not(./*[local-name() = 'originDescription'])]/*[local-name() = 'identifier']" />
+									</oaf:identifier>
+
+									<!-- TODO: ADD VOCABULARY TERMS -->
 									<dr:CobjCategory>
-										<xsl:variable name="varCobjCategory" select="vocabulary:clean( //dc:type, 'dnet:publication_resource')" />
+										<xsl:variable name="varCobjCategory" select="vocabulary:clean( //base_dc:typenorm, 'dnet:publication_resource')" />
 										<xsl:variable name="varSuperType" select="vocabulary:clean( $varCobjCategory, 'dnet:result_typologies')" />
 										<xsl:attribute name="type" select="$varSuperType" />
 										<xsl:value-of select="$varCobjCategory" />
-									</dr:CobjCategory><!-- review status --><!-- -->
+									</dr:CobjCategory>
+									<!-- END TODO -->
+									
+									<!-- TODO CONTINUE HERE -->
+									
 									
 									<xsl:variable name="varRefereedConvt"
 										select="for $i in (//dc:type, //dc:description, //oai:setSpec)                                                                             return vocabulary:clean( normalize-space($i), 'dnet:review_levels')" />
@@ -219,14 +239,6 @@ base_dc:link (I used dc:identifier)
 											</oaf:refereed>
 										</xsl:when>
 									</xsl:choose>
-									
-									
-									
-									<xsl:if test="//dc:relation[starts-with(., 'http')] and //dc:rights[.='info:eu-repo/semantics/openAccess']">
-										<oaf:fulltext>
-											<xsl:value-of select="//dc:relation[starts-with(., 'http')]" />
-										</oaf:fulltext>
-									</xsl:if>
 									
 									<xsl:variable name="varKnownFileEndings"
 										select="('.bmp', '.doc', '.docx', '.epub', '.flv', '.jpeg', '.jpg', '.m4v', '.mp4', '.mpg', '.odp', '.pdf', '.png', '.ppt', '.tiv', '.txt', '.xls', '.xlsx', '.zip')" /><!-- regular expression 
@@ -270,11 +282,6 @@ base_dc:link (I used dc:identifier)
 										</oaf:identifier>
 									</xsl:for-each>
 									
-									<oaf:identifier>
-										<xsl:attribute name="identifierType" select="'oai-original'" />
-										<xsl:value-of
-											select="//*[local-name() = 'about']/*[local-name() = 'provenance']//*[local-name() = 'originDescription' and not(./*[local-name() = 'originDescription'])]/*[local-name() = 'identifier']" />
-									</oaf:identifier>
 								</metadata>
 								<xsl:copy-of select="//*[local-name() = 'about']" />
 							</record>
