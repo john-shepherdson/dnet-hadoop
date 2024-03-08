@@ -1,0 +1,21 @@
+[
+  {
+    "paramName": "m",
+    "paramLongName": "master",
+    "paramDescription": "the master name",
+    "paramRequired": true
+  },
+  {
+    "paramName": "mp",
+    "paramLongName": "magBasePath",
+    "paramDescription": "The base path of MAG DUMP CSV Tables",
+    "paramRequired": true
+  },
+  {
+    "paramName": "w",
+    "paramLongName": "workingPath",
+    "paramDescription": "The working path",
+    "paramRequired": false
+  }
+
+]

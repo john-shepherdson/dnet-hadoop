@@ -13,18 +13,15 @@ class SparkCreateMagDenormalizedTable(propertyPath: String, args: Array[String],
     * where the whole logic of the spark node is defined
     */
   override def run(): Unit = {
-    val crossrefPath: String = parser.get("crossrefPath")
-    log.info("found parameters crossrefPath: {}", crossrefPath)
     val magBasePath: String = parser.get("magBasePath")
     log.info("found parameters magBasePath: {}", magBasePath)
     val workingPath: String = parser.get("workingPath")
     log.info("found parameters workingPath: {}", workingPath)
-    generatedDenormalizedMAGTable(spark, crossrefPath, magBasePath, workingPath)
+    generatedDenormalizedMAGTable(spark, magBasePath, workingPath)
   }
 
   private def generatedDenormalizedMAGTable(
     spark: SparkSession,
-    crossrefPath: String,
     magBasePath: String,
     workingPath: String
   ): Unit = {
@@ -33,17 +30,13 @@ class SparkCreateMagDenormalizedTable(propertyPath: String, args: Array[String],
     val schema: StructType = StructType(StructField("DOI", StringType) :: Nil)
 
     //Filter all the MAG Papers that intersect with a Crossref DOI
-    val crId =
-      spark.read.schema(schema).json(crossrefPath).withColumn("crId", lower(col("DOI"))).distinct.select("crId")
+
     val magPapers = MagUtility
       .loadMagEntity(spark, "Papers", magBasePath)
       .withColumn("Doi", lower(col("Doi")))
-      .where(col("Doi").isNotNull)
 
-    val intersectedPapers: Dataset[Row] =
-      magPapers.join(crId, magPapers("Doi").equalTo(crId("crId")), "leftsemi").dropDuplicates("Doi")
-    intersectedPapers.cache()
-    intersectedPapers.count()
+    magPapers.cache()
+    magPapers.count()
     //log.info("Create current abstract")
 
     //Abstract is an inverted list, we define a function that convert in string the abstract and recreate
@@ -56,14 +49,14 @@ class SparkCreateMagDenormalizedTable(propertyPath: String, args: Array[String],
 
     //We define Step0 as the result of the  Join between PaperIntersection and the PaperAbstract
 
-    val step0 = intersectedPapers
-      .join(paperAbstract, intersectedPapers("PaperId") === paperAbstract("PaperId"), "left")
-      .select(intersectedPapers("*"), paperAbstract("Abstract"))
+    val step0 = magPapers
+      .join(paperAbstract, magPapers("PaperId") === paperAbstract("PaperId"), "left")
+      .select(magPapers("*"), paperAbstract("Abstract"))
       .cache()
 
     step0.count()
 
-    intersectedPapers.unpersist()
+    magPapers.unpersist()
 
     // We have three table Author, Affiliation, and PaperAuthorAffiliation, in the
     //next step we create a table containing
@@ -214,9 +207,9 @@ object SparkCreateMagDenormalizedTable {
 
   def main(args: Array[String]): Unit = {
     new SparkCreateMagDenormalizedTable(
-      "/eu/dnetlib/dhp/collection/mag/create_MAG_denormalized_table_properites.json",
+      "/eu/dnetlib/dhp/collection/mag/create_MAG_denormalized_table_properties.json",
       args,
       log
-    )
+    ).initialize().run()
   }
 }

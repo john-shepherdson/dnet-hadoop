@@ -888,7 +888,7 @@
 		<mockito-core.version>3.3.3</mockito-core.version>
 		<mongodb.driver.version>3.4.2</mongodb.driver.version>
 		<vtd.version>[2.12,3.0)</vtd.version>
-		<dhp-schemas.version>[4.17.2]</dhp-schemas.version>
+		<dhp-schemas.version>[5.17.4-SNAPSHOT]</dhp-schemas.version>
 		<dnet-actionmanager-api.version>[4.0.3]</dnet-actionmanager-api.version>
 		<dnet-actionmanager-common.version>[6.0.5]</dnet-actionmanager-common.version>
 		<dnet-openaire-broker-common.version>[3.1.6]</dnet-openaire-broker-common.version>
