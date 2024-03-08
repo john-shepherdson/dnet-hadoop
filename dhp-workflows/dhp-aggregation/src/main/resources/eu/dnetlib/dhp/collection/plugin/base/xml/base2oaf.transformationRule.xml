@@ -43,6 +43,15 @@
 base_dc:authod_id
 base_dc:authod_id/base_dc:creator_id
 base_dc:authod_id/base_dc:creator_name
+
+example:
+
+<dc:creator>ALBU, Svetlana</dc:creator>
+
+<base_dc:authod_id>
+	<base_dc:creator_name>ALBU, Svetlana</base_dc:creator_name>
+    <base_dc:creator_id>https://orcid.org/0000-0002-8648-950X</base_dc:creator_id>
+</base_dc:authod_id>
 -->
 
 <!-- NOT USED 
