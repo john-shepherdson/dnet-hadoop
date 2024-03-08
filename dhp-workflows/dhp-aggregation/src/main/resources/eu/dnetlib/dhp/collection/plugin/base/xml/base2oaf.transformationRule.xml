@@ -236,7 +236,7 @@ base_dc:link (I used dc:identifier)
 										 	relClass="hasAuthorInstitution"
 											targetType="organization">
 											<xsl:choose>
-												<xsl:when test="contains(.,'https://ror.org/ror.org')">
+												<xsl:when test="contains(.,'https://ror.org/')">
 													<xsl:value-of select="concat('ror_________::', normalize-space(.))" />
 												</xsl:when>
 												<xsl:otherwise>
