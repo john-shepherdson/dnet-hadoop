@@ -13,6 +13,8 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class RelatedEntity implements Serializable {
 
+	private static final long serialVersionUID = -4982643490443810597L;
+
 	private String id;
 	private String type;
 

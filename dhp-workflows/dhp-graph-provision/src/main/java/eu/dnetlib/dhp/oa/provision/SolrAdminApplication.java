@@ -62,8 +62,16 @@ public class SolrAdminApplication implements Closeable {
 		final String collection = ProvisionConstants.getCollectionName(format);
 		log.info("collection: {}", collection);
 
-		try (SolrAdminApplication app = new SolrAdminApplication(zkHost)) {
-			app.execute(action, collection, query, commit);
+		final boolean shouldIndex = Optional
+			.ofNullable(parser.get("shouldIndex"))
+			.map(Boolean::valueOf)
+			.orElse(false);
+		log.info("shouldIndex: {}", shouldIndex);
+
+		if (shouldIndex) {
+			try (SolrAdminApplication app = new SolrAdminApplication(zkHost)) {
+				app.execute(action, collection, query, commit);
+			}
 		}
 	}
 

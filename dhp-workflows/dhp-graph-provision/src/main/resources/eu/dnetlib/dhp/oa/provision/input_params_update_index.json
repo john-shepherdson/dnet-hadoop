@@ -30,6 +30,12 @@
     "paramRequired": false
   },
   {
+    "paramName": "si",
+    "paramLongName": "shouldIndex",
+    "paramDescription": "should the action actually index the records?",
+    "paramRequired": true
+  },
+  {
     "paramName": "op",
     "paramLongName": "outputPath",
     "paramDescription": "path on hdfs activating an alternative output for the SolrInputDocuments",

@@ -591,21 +591,17 @@
                 --conf spark.sql.shuffle.partitions=3840
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
-            <arg>--inputPath</arg><arg>${workingDir}/join_entities</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/xml</arg>
+            <!--<arg>- -inputPath</arg><arg>${workingDir}/join_entities</arg>-->
+            <arg>--inputPath</arg><arg>/user/claudio.atzori/data/provision/join_entities</arg>
+
+            <!--<arg>- -outputPath</arg><arg>${workingDir}/xml_json</arg>-->
+            <arg>--outputPath</arg><arg>/user/claudio.atzori/data/provision/xml_json_test</arg>
             <arg>--contextApiBaseUrl</arg><arg>${contextApiBaseUrl}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
-        <ok to="should_index"/>
+        <ok to="drop_solr_collection"/>
         <error to="Kill"/>
     </action>
-
-    <decision name="should_index">
-        <switch>
-            <case to="drop_solr_collection">${wf:conf('shouldIndex') eq 'true'}</case>
-            <case to="End">${wf:conf('shouldIndex') eq 'false'}</case>
-            <default to="drop_solr_collection"/>
-        </switch>
-    </decision>
 
     <action name="drop_solr_collection">
         <java>
@@ -621,6 +617,7 @@
             <arg>--action</arg><arg>DELETE_BY_QUERY</arg>
             <arg>--query</arg><arg>${solrDeletionQuery}</arg>
             <arg>--commit</arg><arg>true</arg>
+            <arg>--shouldIndex</arg><arg>${shouldIndex}</arg>
         </java>
         <ok to="to_solr_index"/>
         <error to="Kill"/>
@@ -646,12 +643,17 @@
                 --conf spark.hadoop.mapreduce.map.speculative=false
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
-            <arg>--inputPath</arg><arg>${workingDir}/xml</arg>
+            <!--<arg>- -inputPath</arg><arg>${workingDir}/xml_json</arg>-->
+            <arg>--inputPath</arg><arg>/user/claudio.atzori/data/provision/xml_json_test</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--format</arg><arg>${format}</arg>
             <arg>--batchSize</arg><arg>${batchSize}</arg>
             <arg>--outputFormat</arg><arg>${outputFormat}</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/solr_documents</arg>
+
+            <!--<arg>- -outputPath</arg><arg>${workingDir}/solr_documents</arg>-->
+            <arg>--outputPath</arg><arg>/user/claudio.atzori/data/provision/solr_documents</arg>
+
+            <arg>--shouldIndex</arg><arg>${shouldIndex}</arg>
         </spark>
         <ok to="commit_solr_collection"/>
         <error to="Kill"/>
@@ -669,6 +671,7 @@
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--format</arg><arg>${format}</arg>
             <arg>--action</arg><arg>COMMIT</arg>
+            <arg>--shouldIndex</arg><arg>${shouldIndex}</arg>
         </java>
         <ok to="End"/>
         <error to="Kill"/>

@@ -21,9 +21,8 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,11 +30,13 @@ import com.lucidworks.spark.util.SolrSupport;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.provision.model.SerializableSolrInputDocument;
+import eu.dnetlib.dhp.oa.provision.model.TupleWrapper;
 import eu.dnetlib.dhp.oa.provision.utils.ISLookupClient;
 import eu.dnetlib.dhp.oa.provision.utils.StreamingInputDocumentFactory;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
+import scala.Tuple2;
 
 public class XmlIndexingJob {
 
@@ -58,6 +59,8 @@ public class XmlIndexingJob {
 	private final OutputFormat outputFormat;
 
 	private final String outputPath;
+
+	private boolean shouldIndex;
 
 	private final SparkSession spark;
 
@@ -101,7 +104,14 @@ public class XmlIndexingJob {
 			.orElse(OutputFormat.SOLR);
 		log.info("outputFormat: {}", outputFormat);
 
+		final boolean shouldIndex = Optional
+			.ofNullable(parser.get("shouldIndex"))
+			.map(Boolean::valueOf)
+			.orElse(false);
+		log.info("shouldIndex: {}", shouldIndex);
+
 		final SparkConf conf = new SparkConf();
+
 		conf.registerKryoClasses(new Class[] {
 			SerializableSolrInputDocument.class
 		});
@@ -113,18 +123,19 @@ public class XmlIndexingJob {
 				final String isLookupUrl = parser.get("isLookupUrl");
 				log.info("isLookupUrl: {}", isLookupUrl);
 				final ISLookupClient isLookup = new ISLookupClient(ISLookupClientFactory.getLookUpService(isLookupUrl));
-				new XmlIndexingJob(spark, inputPath, format, batchSize, outputFormat, outputPath).run(isLookup);
+				new XmlIndexingJob(spark, inputPath, format, batchSize, outputFormat, shouldIndex, outputPath)
+					.run(isLookup);
 			});
 	}
 
 	public XmlIndexingJob(SparkSession spark, String inputPath, String format, Integer batchSize,
-		OutputFormat outputFormat,
-		String outputPath) {
+		OutputFormat outputFormat, boolean shouldIndex, String outputPath) {
 		this.spark = spark;
 		this.inputPath = inputPath;
 		this.format = format;
 		this.batchSize = batchSize;
 		this.outputFormat = outputFormat;
+		this.shouldIndex = shouldIndex;
 		this.outputPath = outputPath;
 	}
 
@@ -140,33 +151,45 @@ public class XmlIndexingJob {
 		final String zkHost = isLookup.getZkHost();
 		log.info("zkHost: {}", zkHost);
 
-		final String version = getRecordDatestamp();
-
 		final String indexRecordXslt = getLayoutTransformer(format, fields, xslt);
 		log.info("indexRecordTransformer {}", indexRecordXslt);
 
-		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
-
-		JavaRDD<SolrInputDocument> docs = sc
-			.sequenceFile(inputPath, Text.class, Text.class)
-			.map(t -> t._2().toString())
-			.map(s -> toIndexRecord(SaxonTransformerFactory.newInstance(indexRecordXslt), s))
-			.map(s -> new StreamingInputDocumentFactory().parseDocument(s));
+		final Encoder<TupleWrapper> encoder = Encoders.bean(TupleWrapper.class);
+		final Dataset<TupleWrapper> records = spark
+			.read()
+			.schema(encoder.schema())
+			.json(inputPath)
+			.as(encoder)
+			.map(
+				(MapFunction<TupleWrapper, TupleWrapper>) t -> new TupleWrapper(
+					toIndexRecord(SaxonTransformerFactory.newInstance(indexRecordXslt), t.getXml()),
+					t.getJson()),
+				Encoders.bean(TupleWrapper.class));
 
 		switch (outputFormat) {
 			case SOLR:
-				final String collection = ProvisionConstants.getCollectionName(format);
+				if (shouldIndex) {
+					final String collection = ProvisionConstants.getCollectionName(format);
 
-				// SparkSolr >= 4
-				// com.lucidworks.spark.BatchSizeType bt = com.lucidworks.spark.BatchSizeType.NUM_DOCS;
-				// SolrSupport.indexDocs(zkHost, collection, batchSize, bt, docs.rdd());
-				// SparkSolr < 4
-				SolrSupport.indexDocs(zkHost, collection, batchSize, docs.rdd());
+					// SparkSolr >= 4
+					// com.lucidworks.spark.BatchSizeType bt = com.lucidworks.spark.BatchSizeType.NUM_DOCS;
+					// SolrSupport.indexDocs(zkHost, collection, batchSize, bt, docs.rdd());
+					// SparkSolr < 4
+					JavaRDD<SolrInputDocument> docs = records
+						.javaRDD()
+						.map(
+							t -> new StreamingInputDocumentFactory().parseDocument(t.getXml(), t.getJson()));
+					SolrSupport.indexDocs(zkHost, collection, batchSize, docs.rdd());
+				}
 				break;
 			case HDFS:
-				spark
-					.createDataset(
-						docs.map(SerializableSolrInputDocument::new).rdd(),
+				records
+					.map(
+						(MapFunction<TupleWrapper, SerializableSolrInputDocument>) t -> {
+							SolrInputDocument s = new StreamingInputDocumentFactory()
+								.parseDocument(t.getXml(), t.getJson());
+							return new SerializableSolrInputDocument(s);
+						},
 						Encoders.kryo(SerializableSolrInputDocument.class))
 					.write()
 					.mode(SaveMode.Overwrite)

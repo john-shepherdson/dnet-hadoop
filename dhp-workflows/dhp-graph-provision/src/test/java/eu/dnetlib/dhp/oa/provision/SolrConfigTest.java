@@ -95,7 +95,7 @@ public class SolrConfigTest extends SolrTest {
 
 		String inputPath = "src/test/resources/eu/dnetlib/dhp/oa/provision/xml";
 
-		new XmlIndexingJob(spark, inputPath, FORMAT, batchSize, XmlIndexingJob.OutputFormat.SOLR, null)
+		new XmlIndexingJob(spark, inputPath, FORMAT, batchSize, XmlIndexingJob.OutputFormat.SOLR, false, null)
 			.run(isLookupClient);
 		Assertions.assertEquals(0, miniCluster.getSolrClient().commit().getStatus());
 
