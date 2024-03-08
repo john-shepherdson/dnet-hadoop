@@ -48,7 +48,7 @@ base_dc:authod_id/base_dc:creator_name
 <!-- NOT USED 
 base_dc:global_id (I used oai:identifier)
 base_dc:collection/text()
-base_dc:collection/@ror_id
+
 base_dc:continent
 base_dc:country
 base_dc:year (I used dc:date)
@@ -152,6 +152,13 @@ base_dc:link (I used dc:identifier)
 											</oaf:projectid>
 										</xsl:if>
 									</xsl:for-each>
+
+									<dr:CobjCategory>
+										<xsl:variable name="varCobjCategory" select="vocabulary:clean($varBaseNormType, 'dnet:publication_resource')" />
+										<xsl:variable name="varSuperType" select="vocabulary:clean($varCobjCategory, 'dnet:result_typologies')" />
+										<xsl:attribute name="type" select="$varSuperType" />
+										<xsl:value-of select="$varCobjCategory" />
+									</dr:CobjCategory>
 									
 									<oaf:accessrights>
 										<xsl:choose>
@@ -167,11 +174,33 @@ base_dc:link (I used dc:identifier)
 									</oaf:accessrights>
 									
 									<xsl:for-each select="//base_dc:doi">
-										<oaf:identifier>
-											<xsl:attribute name="identifierType" select="'doi'" />
+										<oaf:identifier identifierType="doi">
 											<xsl:value-of select="." />
 										</oaf:identifier>
 									</xsl:for-each>
+
+									<xsl:for-each select="distinct-values(//dc:identifier[starts-with(., 'http')][not(contains(., '://dx.doi.org/') or contains(., '://doi.org/') or contains(., '://hdl.handle.net/'))][count(index-of($varIdLdpg, .)) = 0])">
+										<oaf:identifier identifierType="url">
+											<xsl:value-of select="." />
+										</oaf:identifier>
+									</xsl:for-each>
+
+									<xsl:for-each select="distinct-values(//dc:identifier[starts-with(., 'http') and contains(., '://hdl.handle.net/')]/substring-after(., 'hdl.handle.net/'))">
+										<oaf:identifier identifierType="handle">
+											<xsl:value-of select="." />
+										</oaf:identifier>
+									</xsl:for-each>									
+
+									<xsl:for-each select="distinct-values(//dc:identifier[starts-with(., 'urn:nbn:nl:') or starts-with(., 'URN:NBN:NL:')])">
+										<oaf:identifier identifierType='urn'>
+											<xsl:value-of select="." />
+										</oaf:identifier>
+									</xsl:for-each>
+									
+									<oaf:identifier identifierType="oai-original">
+										<xsl:value-of
+											select="//*[local-name() = 'about']/*[local-name() = 'provenance']//*[local-name() = 'originDescription' and not(./*[local-name() = 'originDescription'])]/*[local-name() = 'identifier']" />
+									</oaf:identifier>
 									
 									<oaf:hostedBy>
 										<xsl:attribute name="name">
@@ -201,93 +230,21 @@ base_dc:link (I used dc:identifier)
 										</oaf:fulltext>
 									</xsl:if>
 									
-									<oaf:identifier>
-										<xsl:attribute name="identifierType" select="'oai-original'" />
-										<xsl:value-of
-											select="//*[local-name() = 'about']/*[local-name() = 'provenance']//*[local-name() = 'originDescription' and not(./*[local-name() = 'originDescription'])]/*[local-name() = 'identifier']" />
-									</oaf:identifier>
-
-									<!-- TODO: ADD VOCABULARY TERMS -->
-									<dr:CobjCategory>
-										<xsl:variable name="varCobjCategory" select="vocabulary:clean($varBaseNormType, 'dnet:publication_resource')" />
-										<xsl:variable name="varSuperType" select="vocabulary:clean($varCobjCategory, 'dnet:result_typologies')" />
-										<xsl:attribute name="type" select="$varSuperType" />
-										<xsl:value-of select="$varCobjCategory" />
-									</dr:CobjCategory>
-									<!-- END TODO -->
-									
-									<!-- TODO CONTINUE HERE -->
-									
-									
-									<xsl:variable name="varRefereedConvt"
-										select="for $i in (//dc:type, //dc:description, //oai:setSpec) return vocabulary:clean( normalize-space($i), 'dnet:review_levels')" />
-									<xsl:variable name="varRefereedIdntf"
-										select="(//*[string(node-name(.)) = 'dc:identifier' and matches(lower-case(.), '(^|.*[\.\-_/\s\(\)%\d#])pre[\.\-_/\s\(\)%\d#]?prints?([\.\-_/\s\(\)%\d#].*)?$')][count(//dc:identifier) = 1]/'0002', //*[string(node-name(.)) = 'dc:identifier' and matches(lower-case(.), '(^|.*[\.\-_/\s\(\)%\d#])refereed([\.\-_/\s\(\)\d%\d#].*)?$')]/'0001', //*[string(node-name(.)) = 'dc:identifier' and matches(lower-case(.), '.*-peer-reviewed-(fulltext-)?article-.*')]/'0001')" />
-									<xsl:variable name="varRefereedSourc"
-										select="//*[string(node-name(.)) = ('dc:source', 'dc:publisher') and matches(lower-case(.), '^(.*\s)?pre[\s\-_]*prints?([\s\.,].*)?$')]/'0002'" />
-									<xsl:variable name="varRefereedDescr"
-										select="(//dc:description[matches(lower-case(.), '.*(this\s*book|this\s*volume|it)\s*constitutes\s*the\s*(thoroughly\s*)?refereed') or matches(lower-case(.), '.*peer[\.\-_/\s\(\)]?review\s*under\s*responsibility\s*of.*') or matches(lower-case(.), '(this|a)\s*(article|preprint)\s*(has\s*been\s*)?(peer[\-\s]*)?reviewed\s*and\s*recommended\s*by\s*peer[\-\s]*community')]/'0001', //dc:description[matches(., '^version\s*(préliminaire.*|preliminary.*|0$)')]/'0002')" />
-									<xsl:variable name="varRefereedTitle"
-										select="(//dc:title[matches(lower-case(.), '.*\[.*peer[\s\-\._]*review\s*:.*\]\s*$')]/'0001', //dc:title[matches(lower-case(.), '.*\(\s*pre[\s\-\._]*prints?\s*\)\s*$')]/'0002')" />
-									<xsl:variable name="varRefereedSubjt"
-										select="(//dc:subject[matches(lower-case(.), '^\s*refereed\s*$')][//oaf:datasourceprefix = 'narcis______']/'0001', //dc:subject[matches(lower-case(.), '^\s*no[nt].{0,3}refereed\s*$')][//oaf:datasourceprefix = 'narcis______']/'0002')" />
-									
-									<xsl:variable name="varRefereed" select="($varRefereedConvt, $varRefereedIdntf, $varRefereedSourc, $varRefereedDescr, $varRefereedTitle, $varRefereedSubjt)" />
-									
-									<xsl:choose>
-										<xsl:when test="count($varRefereed[. = '0001']) &gt; 0">
-											<oaf:refereed>
-												<xsl:value-of select="'0001'" />
-											</oaf:refereed>
-										</xsl:when>
-										<xsl:when test="count($varRefereed[. = '0002']) &gt; 0">
-											<oaf:refereed>
-												<xsl:value-of select="'0002'" />
-											</oaf:refereed>
-										</xsl:when>
-									</xsl:choose>
-									
-									<xsl:variable name="varKnownFileEndings"
-										select="('.bmp', '.doc', '.docx', '.epub', '.flv', '.jpeg', '.jpg', '.m4v', '.mp4', '.mpg', '.odp', '.pdf', '.png', '.ppt', '.tiv', '.txt', '.xls', '.xlsx', '.zip')" /><!-- regular expression 
-										for DOIs reduced here - letters like less-than and quotation marks don't work in matches, use identiferExtract when enabled -->
-									
-									
-									<xsl:variable name="varIdHdl" select="distinct-values(//dc:identifier[starts-with(., 'http') and contains(., '://hdl.handle.net/')]/substring-after(., 'hdl.handle.net/'))" />
-									<xsl:for-each select="$varIdHdl">
-										<oaf:identifier>
-											<xsl:attribute name="identifierType" select="'handle'" />
-											<xsl:value-of select="." />
-										</oaf:identifier>
+									<xsl:for-each select="//base_dc:collection/@ror_id">
+										<oaf:relation relType="resultOrganization"
+										 	subRelType="affiliation"
+										 	relClass="hasAuthorInstitution"
+											targetType="organization">
+											<xsl:choose>
+												<xsl:when test="contains(.,'https://ror.org/ror.org')">
+													<xsl:value-of select="concat('ror_________::', normalize-space(.))" />
+												</xsl:when>
+												<xsl:otherwise>
+													<xsl:value-of select="concat('ror_________::https://ror.org/', normalize-space(.))" />
+												</xsl:otherwise>
+											</xsl:choose>
+										</oaf:relation>
 									</xsl:for-each>
-									
-									<xsl:variable name="varIdUrn" select="distinct-values(//dc:identifier[starts-with(., 'urn:nbn:nl:') or starts-with(., 'URN:NBN:NL:')])" />
-									<xsl:for-each select="$varIdUrn">
-										<oaf:identifier>
-											<xsl:attribute name="identifierType" select="'urn'" />
-											<xsl:value-of select="." />
-										</oaf:identifier>
-									</xsl:for-each><!-- the 2 comparison orders needed to work also for URL encoded baseURLs or item URLs -->
-									
-									<xsl:variable name="varOrigBaseUrl"
-										select="//*[local-name() = 'about']/*[local-name() = 'provenance']//*[local-name() = 'originDescription' and not(./*[local-name() = 'originDescription'])]/*[local-name() = 'baseURL']" />
-									<xsl:variable name="varIdLdpg"
-										select="distinct-values(//dc:identifier[(contains(substring-after(., '://'), '/') and contains($varOrigBaseUrl, substring-before(substring-after(., '://'), '/'))) or (contains(substring-after(., '://'), ':') and contains($varOrigBaseUrl, substring-before(substring-after(., '://'), ':')))][not(replace(lower-case(.), '.*(\.[a-z]*)$', '$1') = $varKnownFileEndings)])" />
-									<xsl:for-each select="$varIdLdpg">
-										<oaf:identifier>
-											<xsl:attribute name="identifierType" select="'landingPage'" />
-											<xsl:value-of select="." />
-										</oaf:identifier>
-									</xsl:for-each>
-									
-									<xsl:variable name="varIdUrl"
-										select="distinct-values(//dc:identifier[starts-with(., 'http')][not(contains(., '://dx.doi.org/') or contains(., '://doi.org/') or contains(., '://hdl.handle.net/'))][count(index-of($varIdLdpg, .)) = 0])" />
-									<xsl:for-each select="$varIdUrl">
-										<oaf:identifier>
-											<xsl:attribute name="identifierType" select="'url'" />
-											<xsl:value-of select="." />
-										</oaf:identifier>
-									</xsl:for-each>
-									
 								</metadata>
 								<xsl:copy-of select="//*[local-name() = 'about']" />
 							</record>
