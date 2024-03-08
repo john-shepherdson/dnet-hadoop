@@ -1,0 +1,180 @@
+<RESOURCE_PROFILE>
+	<HEADER>
+		<RESOURCE_IDENTIFIER value="" />
+		<RESOURCE_TYPE value="VocabularyDSResourceType" />
+		<RESOURCE_KIND value="VocabularyDSResources" />
+		<RESOURCE_URI value="" />
+		<DATE_OF_CREATION value="2024-02-13T11:15:48+00:00" />
+	</HEADER>
+	<BODY>
+		<CONFIGURATION>
+			<VOCABULARY_NAME code="base:normalized_types">base:normalized_types</VOCABULARY_NAME>
+			<VOCABULARY_DESCRIPTION>base:normalized_types</VOCABULARY_DESCRIPTION>
+			<TERMS>
+				<TERM native_name="Text" code="Text" english_name="Text" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="1" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Book" code="Book" english_name="Book" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="11" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Book part" code="Book part" english_name="Book part" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="111" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Journal/Newspaper" code="Journal/Newspaper" english_name="Journal/Newspaper" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="12" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Article contribution" code="Article contribution" english_name="Article contribution" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="121" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Other non-article" code="Other non-article" english_name="Other non-article" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="122" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Conference object" code="Conference object" english_name="Conference object" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="13" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Report" code="Report" english_name="Report" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="14" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Review" code="Review" english_name="Review" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="15" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Course material" code="Course material" english_name="Course material" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="16" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Lecture" code="Lecture" english_name="Lecture" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="17" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Thesis" code="Thesis" english_name="Thesis" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="18" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Bachelor's thesis" code="Bachelor's thesis" english_name="Bachelor's thesis" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="181" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Master's thesis" code="Master's thesis" english_name="Master's thesis" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="182" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Doctoral and postdoctoral thesis" code="Doctoral and postdoctoral thesis" english_name="Doctoral and postdoctoral thesis" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="183" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Manuscript" code="Manuscript" english_name="Manuscript" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="19" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Patent" code="Patent" english_name="Patent" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="1A" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Musical notation" code="Musical notation" english_name="Musical notation" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="2" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Map" code="Map" english_name="Map" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="3" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Audio" code="Audio" english_name="Audio" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="4" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Image/Video" code="Image/Video" english_name="Image/Video" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="5" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Still image" code="Still image" english_name="Still image" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="51" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Moving image/Video" code="Moving image/Video" english_name="Moving image/Video" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="52" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Software" code="Software" english_name="Software" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="6" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Dataset" code="Dataset" english_name="Dataset" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="7" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+				<TERM native_name="Unknown" code="Unknown" english_name="Unknown" encoding="BASE">
+					<SYNONYMS>
+						<SYNONYM term="F" encoding="BASE" />
+					</SYNONYMS>
+					<RELATIONS />
+				</TERM>
+
+			</TERMS>
+		</CONFIGURATION>
+		<STATUS>
+			<LAST_UPDATE value="2013-11-18T10:46:36Z" />
+		</STATUS>
+		<SECURITY_PARAMETERS>String</SECURITY_PARAMETERS>
+	</BODY>
+</RESOURCE_PROFILE>
+
+                
