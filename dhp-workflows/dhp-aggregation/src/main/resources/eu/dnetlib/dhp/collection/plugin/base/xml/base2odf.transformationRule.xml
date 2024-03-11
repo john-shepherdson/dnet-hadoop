@@ -44,6 +44,9 @@
 									base_dc:continent 
 									base_dc:country  
 									dc:coverage
+									dc:source
+									dc:relation
+									dc:type (I used //base_dc:typenorm)
 									dc:language (I used base_dc:lang) 
 									base_dc:link (I used dc:identifier)
 								 -->
@@ -59,7 +62,7 @@
 											<datacite:identifier identifierType="DOI">
 												<xsl:value-of select="." />
 											</datacite:identifier>
-										</xsl:for-each>
+										</xsl:for-each>										
 
 										<datacite:alternateIdentifiers>
 											<xsl:for-each
@@ -90,7 +93,7 @@
 										<datacite:relatedIdentifiers />
 
 
-										<datacite:resourceType xs:anyURI="http://purl.org/coar/TODO">TODO</datacite:resourceType>
+										<datacite:resourceType><xsl:value-of select="$varBaseNormType" /></datacite:resourceType>
 
 										<datacite:titles>
 											<xsl:for-each select="//dc:title">
@@ -167,40 +170,22 @@
 											</xsl:for-each>
 										</datacite:formats>
 										
-										<!-- TODO : TO CONVERT FROM HERE -->
-
-										<dc:type>
-											<xsl:value-of select="$varBaseNormType" />
-										</dc:type>
-										<xsl:call-template name="allElements">
-											<xsl:with-param name="sourceElement" select="//dc:type" />
-											<xsl:with-param name="targetElement" select="'dc:type'" />
-										</xsl:call-template>
-
-
-										<xsl:call-template name="allElements">
-											<xsl:with-param name="sourceElement" select="//dc:source" />
-											<xsl:with-param name="targetElement" select="'dc:source'" />
-										</xsl:call-template>
-
-										<dc:language>
+										<datacite:language>
 											<xsl:value-of select="vocabulary:clean( //base_dc:lang, 'dnet:languages')" />
-										</dc:language>
+										</datacite:language>
 
-										<xsl:call-template name="allElements">
-											<xsl:with-param name="sourceElement" select="//dc:rights" />
-											<xsl:with-param name="targetElement" select="'dc:rights'" />
-										</xsl:call-template>
+										<oaf:accessrights>
+											<xsl:choose>
+												<xsl:if test="//base_dc:oa[.='1']">
+													<datacite:rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</datacite:rights>
+												</xsl:if>
+												<xsl:for-each select="//dc:rights|//base_dc:rightsnorm">
+													<datacite:rights><xsl:value-of select="vocabulary:clean(., 'dnet:access_modes')" /></datacite:rights>	
+												</xsl:for-each>
+											</xsl:choose>
+										</oaf:accessrights>
 
-										<xsl:call-template name="allElements">
-											<xsl:with-param name="sourceElement" select="//dc:relation" />
-											<xsl:with-param name="targetElement" select="'dc:relation'" />
-										</xsl:call-template>
-
-										<xsl:call-template name="allElements">
-											<xsl:with-param name="sourceElement" select="//dc:identifier[starts-with(., 'http')]" />
-											<xsl:with-param name="targetElement" select="'dc:identifier'" />
-										</xsl:call-template>
+									</datacite:resource>
 
 										<xsl:for-each select="//dc:relation">
 											<xsl:if test="matches(normalize-space(.), '(info:eu-repo/grantagreement/ec/fp7/)(\d\d\d\d\d\d)(.*)', 'i')">
@@ -214,8 +199,6 @@
 												</oaf:projectid>
 											</xsl:if>
 										</xsl:for-each>
-
-									</datacite:resource>
 
 									<dr:CobjCategory>
 										<xsl:variable name="varCobjCategory" select="vocabulary:clean($varBaseNormType, 'dnet:publication_resource')" />
