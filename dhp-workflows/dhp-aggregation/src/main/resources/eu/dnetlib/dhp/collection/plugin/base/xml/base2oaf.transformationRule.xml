@@ -188,7 +188,7 @@ base_dc:link (I used dc:identifier)
 										</oaf:identifier>
 									</xsl:for-each>
 
-									<xsl:for-each select="distinct-values(//dc:identifier[starts-with(., 'http')][not(contains(., '://dx.doi.org/') or contains(., '://doi.org/') or contains(., '://hdl.handle.net/'))][count(index-of($varIdLdpg, .)) = 0])">
+									<xsl:for-each select="distinct-values(//dc:identifier[starts-with(., 'http') and (not(contains(., '://dx.doi.org/') or contains(., '://doi.org/') or contains(., '://hdl.handle.net/')))])">
 										<oaf:identifier identifierType="url">
 											<xsl:value-of select="." />
 										</oaf:identifier>
@@ -233,10 +233,12 @@ base_dc:link (I used dc:identifier)
 										<xsl:value-of select="dateCleaner:dateISO( //dc:date[1] )" />
 									</oaf:dateAccepted>
 									
-									<xsl:if test="//dc:relation[starts-with(., 'http')] and //base_dc:oa[.='1']">
-										<oaf:fulltext>
-											<xsl:value-of select="//dc:relation[starts-with(., 'http')]" />
-										</oaf:fulltext>
+									<xsl:if test="//base_dc:oa[.='1']">
+										<xsl:for-each select="//dc:relation[starts-with(., 'http')]">
+											<oaf:fulltext>
+												<xsl:value-of select="normalize-space(.)" />
+											</oaf:fulltext>
+										</xsl:for-each>
 									</xsl:if>
 									
 									<xsl:for-each select="//base_dc:collection/@ror_id">

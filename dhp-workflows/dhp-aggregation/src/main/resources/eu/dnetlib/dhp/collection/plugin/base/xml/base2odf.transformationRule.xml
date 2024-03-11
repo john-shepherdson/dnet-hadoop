@@ -66,7 +66,7 @@
 
 										<datacite:alternateIdentifiers>
 											<xsl:for-each
-												select="distinct-values(//dc:identifier[starts-with(., 'http')][not(contains(., '://dx.doi.org/') or contains(., '://doi.org/') or contains(., '://hdl.handle.net/'))][count(index-of($varIdLdpg, .)) = 0])">
+												select="distinct-values(//dc:identifier[starts-with(., 'http') and (not(contains(., '://dx.doi.org/') or contains(., '://doi.org/') or contains(., '://hdl.handle.net/')))])">
 												<datacite:identifier alternateIdentifierType="url">
 													<xsl:value-of select="." />
 												</datacite:identifier>
@@ -110,7 +110,7 @@
 													<datacite:creatorName>
 														<xsl:value-of select="$author" />
 													</datacite:creatorName>
-													<xsl:for-each select="//base_dc:authod_id[normalize-space(./base_dc:creator_name = $author]/base_dc:creator_id ">
+													<xsl:for-each select="//base_dc:authod_id[normalize-space(./base_dc:creator_name) = $author]/base_dc:creator_id ">
 														<xsl:if test="contains(.,'https://orcid.org/')">
 															<nameIdentifier schemeURI="https://orcid.org/" nameIdentifierScheme="ORCID">
 																<xsl:value-of select="substring-after(., 'https://orcid.org/')" />
@@ -175,14 +175,12 @@
 										</datacite:language>
 
 										<oaf:accessrights>
-											<xsl:choose>
-												<xsl:if test="//base_dc:oa[.='1']">
-													<datacite:rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</datacite:rights>
-												</xsl:if>
-												<xsl:for-each select="//dc:rights|//base_dc:rightsnorm">
-													<datacite:rights><xsl:value-of select="vocabulary:clean(., 'dnet:access_modes')" /></datacite:rights>	
-												</xsl:for-each>
-											</xsl:choose>
+											<xsl:if test="//base_dc:oa[.='1']">
+												<datacite:rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</datacite:rights>
+											</xsl:if>
+											<xsl:for-each select="//dc:rights|//base_dc:rightsnorm">
+												<datacite:rights><xsl:value-of select="vocabulary:clean(., 'dnet:access_modes')" /></datacite:rights>	
+											</xsl:for-each>
 										</oaf:accessrights>
 
 									</datacite:resource>
@@ -209,18 +207,14 @@
 
 									<oaf:accessrights>
 										<xsl:choose>
-											<xsl:when test="//base_dc:oa[.='1']">
-												OPEN
-											</xsl:when>
+											<xsl:when test="//base_dc:oa[.='1']">OPEN</xsl:when>
 											<xsl:when test="//base_dc:rightsnorm">
 												<xsl:value-of select="vocabulary:clean(//base_dc:rightsnorm, 'dnet:access_modes')" />
 											</xsl:when>
 											<xsl:when test="//dc:rights">
 												<xsl:value-of select="vocabulary:clean( //dc:rights, 'dnet:access_modes')" />
 											</xsl:when>
-											<xsl:otherwise>
-												UNKNOWN
-											</xsl:otherwise>
+											<xsl:otherwise>UNKNOWN</xsl:otherwise>
 										</xsl:choose>
 									</oaf:accessrights>
 
@@ -231,7 +225,7 @@
 									</xsl:for-each>
 
 									<xsl:for-each
-										select="distinct-values(//dc:identifier[starts-with(., 'http')][not(contains(., '://dx.doi.org/') or contains(., '://doi.org/') or contains(., '://hdl.handle.net/'))][count(index-of($varIdLdpg, .)) = 0])">
+										select="distinct-values(//dc:identifier[starts-with(., 'http') and ( not(contains(., '://dx.doi.org/') or contains(., '://doi.org/') or contains(., '://hdl.handle.net/')))])">
 										<oaf:identifier identifierType="url">
 											<xsl:value-of select="." />
 										</oaf:identifier>
@@ -276,10 +270,13 @@
 										<xsl:value-of select="dateCleaner:dateISO( //dc:date[1] )" />
 									</oaf:dateAccepted>
 
-									<xsl:if test="//dc:relation[starts-with(., 'http')] and //base_dc:oa[.='1']">
-										<oaf:fulltext>
-											<xsl:value-of select="//dc:relation[starts-with(., 'http')]" />
-										</oaf:fulltext>
+
+									<xsl:if test="//base_dc:oa[.='1']">
+										<xsl:for-each select="//dc:relation[starts-with(., 'http')]">
+											<oaf:fulltext>
+												<xsl:value-of select="normalize-space(.)" />
+											</oaf:fulltext>
+										</xsl:for-each>
 									</xsl:if>
 
 									<xsl:for-each select="//base_dc:collection/@ror_id">

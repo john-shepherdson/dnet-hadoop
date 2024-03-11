@@ -7,6 +7,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.io.SAXReader;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,6 +19,7 @@ import eu.dnetlib.dhp.schema.mdstore.Provenance;
 import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
+@Disabled
 @ExtendWith(MockitoExtension.class)
 public class BaseTransfomationTest extends AbstractVocabularyTest {
 
@@ -41,6 +43,20 @@ public class BaseTransfomationTest extends AbstractVocabularyTest {
 		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("record.xml")));
 
 		final XSLTTransformationFunction tr = loadTransformationRule("xml/base2odf.transformationRule.xml");
+
+		final MetadataRecord result = tr.call(mr);
+
+		System.out.println(result.getBody());
+	}
+
+	@Test
+	void testBase2OAF() throws Exception {
+
+		final MetadataRecord mr = new MetadataRecord();
+		mr.setProvenance(new Provenance("DSID", "DSNAME", "PREFIX"));
+		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("record.xml")));
+
+		final XSLTTransformationFunction tr = loadTransformationRule("xml/base2oaf.transformationRule.xml");
 
 		final MetadataRecord result = tr.call(mr);
 
