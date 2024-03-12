@@ -2,7 +2,7 @@ package eu.dnetlib.dhp.sx.bio
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.collection.CollectionUtils
-import eu.dnetlib.dhp.common.Constants.{MDSTORE_DATA_PATH,MDSTORE_SIZE_PATH}
+import eu.dnetlib.dhp.common.Constants.{MDSTORE_DATA_PATH, MDSTORE_SIZE_PATH}
 import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion
 import eu.dnetlib.dhp.schema.oaf.Oaf
 import eu.dnetlib.dhp.sx.bio.BioDBToOAF.ScholixResolved
@@ -11,6 +11,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
 import org.slf4j.{Logger, LoggerFactory}
 import eu.dnetlib.dhp.utils.DHPUtils.{MAPPER, writeHdfsFile}
+
 object SparkTransformBioDatabaseToOAF {
 
   def main(args: Array[String]): Unit = {
