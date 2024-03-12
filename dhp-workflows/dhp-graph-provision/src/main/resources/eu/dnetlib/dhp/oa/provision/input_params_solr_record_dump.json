@@ -18,9 +18,9 @@
     "paramRequired": true
   },
   {
-    "paramName": "b",
-    "paramLongName": "batchSize",
-    "paramDescription": "size of the batch of documents sent to solr",
+    "paramName": "op",
+    "paramLongName": "outputPath",
+    "paramDescription": "path on hdfs activating an alternative output for the SolrInputDocuments",
     "paramRequired": false
   }
 ]

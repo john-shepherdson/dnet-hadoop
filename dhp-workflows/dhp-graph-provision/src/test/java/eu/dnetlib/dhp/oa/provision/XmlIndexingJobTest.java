@@ -1,24 +1,21 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.URI;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
-import org.dom4j.io.SAXReader;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -106,8 +103,7 @@ public class XmlIndexingJobTest extends SolrTest {
 
 		long nRecord = records.count();
 
-		new XmlIndexingJob(spark, inputPath, FORMAT, batchSize, XmlIndexingJob.OutputFormat.SOLR, true, null)
-			.run(isLookupClient);
+		new XmlIndexingJob(spark, inputPath, FORMAT, batchSize).run(isLookupClient);
 
 		assertEquals(0, miniCluster.getSolrClient().commit().getStatus());
 
@@ -161,73 +157,6 @@ public class XmlIndexingJobTest extends SolrTest {
 		assertTrue(json.isPresent());
 
 		log.info((String) json.get());
-
-	}
-
-	@Test
-	void testXmlIndexingJob_saveOnHDFS() throws Exception {
-		final String ID_XPATH = "//*[local-name()='header']/*[local-name()='objIdentifier']";
-
-		String inputPath = "src/test/resources/eu/dnetlib/dhp/oa/provision/xml";
-		// String inputPath = "/Users/claudio/workspace/data/index";
-
-		Dataset<TupleWrapper> records = spark
-			.read()
-			.schema(Encoders.bean(TupleWrapper.class).schema())
-			.json(inputPath)
-			.as(Encoders.bean(TupleWrapper.class));
-
-		records.printSchema();
-
-		long nRecord = records.count();
-		log.info("found {} records", nRecord);
-
-		final Dataset<String> ids = records
-			.map((MapFunction<TupleWrapper, String>) TupleWrapper::getXml, Encoders.STRING())
-			.map(
-				(MapFunction<String, String>) s -> new SAXReader().read(new StringReader(s)).valueOf(ID_XPATH),
-				Encoders.STRING());
-
-		log.info("found {} ids", ids.count());
-
-		long xmlIdUnique = ids
-			.distinct()
-			.count();
-
-		log.info("found {} unique ids", xmlIdUnique);
-
-		assertEquals(nRecord, xmlIdUnique, "IDs should be unique among input records");
-
-		final String outputPath = workingDir.resolve("outputPath").toAbsolutePath().toString();
-		new XmlIndexingJob(spark, inputPath, FORMAT, batchSize, XmlIndexingJob.OutputFormat.HDFS, false, outputPath)
-			.run(isLookupClient);
-
-		final Dataset<SerializableSolrInputDocument> solrDocs = spark
-			.read()
-			.load(outputPath)
-			.as(Encoders.kryo(SerializableSolrInputDocument.class));
-
-		solrDocs.foreach(doc -> {
-			assertNotNull(doc.get("__result"));
-			assertNotNull(doc.get("__json"));
-		});
-
-		long docIdUnique = solrDocs.map((MapFunction<SerializableSolrInputDocument, String>) doc -> {
-			final SolrInputField id = doc.getField("__indexrecordidentifier");
-			return id.getFirstValue().toString();
-		}, Encoders.STRING())
-			.distinct()
-			.count();
-		assertEquals(xmlIdUnique, docIdUnique, "IDs should be unique among the output XML records");
-
-		long jsonUnique = solrDocs
-			.map(
-				(MapFunction<SerializableSolrInputDocument, String>) je -> (String) je.getField("__json").getValue(),
-				Encoders.STRING())
-			.distinct()
-			.count();
-
-		assertEquals(jsonUnique, docIdUnique, "IDs should be unique among the output JSON records");
 
 	}
 

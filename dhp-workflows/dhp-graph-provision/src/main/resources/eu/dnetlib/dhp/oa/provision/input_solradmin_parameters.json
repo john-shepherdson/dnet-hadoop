@@ -28,11 +28,5 @@
     "paramLongName": "commit",
     "paramDescription": "should the action be followed by a commit?",
     "paramRequired": false
-  },
-  {
-    "paramName": "i",
-    "paramLongName": "shouldIndex",
-    "paramDescription": "should the action actually index the records?",
-    "paramRequired": true
   }
 ]

@@ -8,17 +8,16 @@ import java.util.Optional;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoder;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.lucidworks.spark.util.SolrSupport;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.oa.provision.model.SerializableSolrInputDocument;
@@ -29,9 +28,9 @@ import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
-public class XmlIndexingJob extends AbstractSolrRecordTransformJob {
+public class SolrRecordDumpJob extends AbstractSolrRecordTransformJob {
 
-	private static final Logger log = LoggerFactory.getLogger(XmlIndexingJob.class);
+	private static final Logger log = LoggerFactory.getLogger(SolrRecordDumpJob.class);
 
 	private static final Integer DEFAULT_BATCH_SIZE = 1000;
 
@@ -39,7 +38,7 @@ public class XmlIndexingJob extends AbstractSolrRecordTransformJob {
 
 	private final String format;
 
-	private final int batchSize;
+	private final String outputPath;
 
 	private final SparkSession spark;
 
@@ -48,9 +47,9 @@ public class XmlIndexingJob extends AbstractSolrRecordTransformJob {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					XmlIndexingJob.class
+					SolrRecordDumpJob.class
 						.getResourceAsStream(
-							"/eu/dnetlib/dhp/oa/provision/input_params_update_index.json")));
+							"/eu/dnetlib/dhp/oa/provision/input_params_solr_record_dump.json")));
 		parser.parseArgument(args);
 
 		Boolean isSparkSessionManaged = Optional
@@ -65,11 +64,23 @@ public class XmlIndexingJob extends AbstractSolrRecordTransformJob {
 		final String format = parser.get("format");
 		log.info("format: {}", format);
 
+		final String outputPath = Optional
+			.ofNullable(parser.get("outputPath"))
+			.map(StringUtils::trim)
+			.orElse(null);
+		log.info("outputPath: {}", outputPath);
+
 		final Integer batchSize = Optional
 			.ofNullable(parser.get("batchSize"))
 			.map(Integer::valueOf)
 			.orElse(DEFAULT_BATCH_SIZE);
 		log.info("batchSize: {}", batchSize);
+
+		final boolean shouldIndex = Optional
+			.ofNullable(parser.get("shouldIndex"))
+			.map(Boolean::valueOf)
+			.orElse(false);
+		log.info("shouldIndex: {}", shouldIndex);
 
 		final SparkConf conf = new SparkConf();
 
@@ -84,16 +95,15 @@ public class XmlIndexingJob extends AbstractSolrRecordTransformJob {
 				final String isLookupUrl = parser.get("isLookupUrl");
 				log.info("isLookupUrl: {}", isLookupUrl);
 				final ISLookupClient isLookup = new ISLookupClient(ISLookupClientFactory.getLookUpService(isLookupUrl));
-				new XmlIndexingJob(spark, inputPath, format, batchSize)
-					.run(isLookup);
+				new SolrRecordDumpJob(spark, inputPath, format, outputPath).run(isLookup);
 			});
 	}
 
-	public XmlIndexingJob(SparkSession spark, String inputPath, String format, Integer batchSize) {
+	public SolrRecordDumpJob(SparkSession spark, String inputPath, String format, String outputPath) {
 		this.spark = spark;
 		this.inputPath = inputPath;
 		this.format = format;
-		this.batchSize = batchSize;
+		this.outputPath = outputPath;
 	}
 
 	public void run(ISLookupClient isLookup) throws ISLookUpException, TransformerException {
@@ -105,18 +115,11 @@ public class XmlIndexingJob extends AbstractSolrRecordTransformJob {
 		final String dsId = isLookup.getDsId(format);
 		log.info("dsId: {}", dsId);
 
-		final String collection = ProvisionConstants.getCollectionName(format);
-		log.info("collection: {}", collection);
-
-		final String zkHost = isLookup.getZkHost();
-		log.info("zkHost: {}", zkHost);
-
 		final String indexRecordXslt = getLayoutTransformer(format, fields, xslt);
 		log.info("indexRecordTransformer {}", indexRecordXslt);
 
 		final Encoder<TupleWrapper> encoder = Encoders.bean(TupleWrapper.class);
-
-		JavaRDD<SolrInputDocument> docs = spark
+		spark
 			.read()
 			.schema(encoder.schema())
 			.json(inputPath)
@@ -126,10 +129,16 @@ public class XmlIndexingJob extends AbstractSolrRecordTransformJob {
 					toIndexRecord(SaxonTransformerFactory.newInstance(indexRecordXslt), t.getXml()),
 					t.getJson()),
 				Encoders.bean(TupleWrapper.class))
-			.javaRDD()
 			.map(
-				t -> new StreamingInputDocumentFactory().parseDocument(t.getXml(), t.getJson()));
-		SolrSupport.indexDocs(zkHost, collection, batchSize, docs.rdd());
+				(MapFunction<TupleWrapper, SerializableSolrInputDocument>) t -> {
+					SolrInputDocument s = new StreamingInputDocumentFactory()
+						.parseDocument(t.getXml(), t.getJson());
+					return new SerializableSolrInputDocument(s);
+				},
+				Encoders.kryo(SerializableSolrInputDocument.class))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.parquet(outputPath);
 	}
 
 }

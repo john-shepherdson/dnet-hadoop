@@ -10,6 +10,7 @@ import java.io.Serializable;
 
 public class TupleWrapper implements Serializable {
 
+	private static final long serialVersionUID = -1418439827125577822L;
 	private String xml;
 
 	private String json;

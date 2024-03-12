@@ -63,27 +63,32 @@ public class ProvisionModelSupport {
 	}
 
 	public static SolrRecord transform(JoinedEntity je, ContextMapper contextMapper, VocabularyGroup vocs) {
-		SolrRecord s = new SolrRecord();
+		SolrRecord record = new SolrRecord();
 		final OafEntity e = je.getEntity();
-		s
+		final RecordType type = RecordType.valueOf(e.getClass().getSimpleName().toLowerCase());
+		final Boolean deletedbyinference = Optional
+			.ofNullable(e.getDataInfo())
+			.map(DataInfo::getDeletedbyinference)
+			.orElse(null);
+		record
 			.setHeader(
 				SolrRecordHeader
 					.newInstance(
-						e.getId(), e.getOriginalId(), RecordType.valueOf(e.getClass().getSimpleName().toLowerCase())));
-		s.setCollectedfrom(asProvenance(e.getCollectedfrom()));
-		s.setContext(asContext(e.getContext(), contextMapper));
-		s.setPid(asPid(e.getPid()));
+						e.getId(), e.getOriginalId(), type, deletedbyinference));
+		record.setCollectedfrom(asProvenance(e.getCollectedfrom()));
+		record.setContext(asContext(e.getContext(), contextMapper));
+		record.setPid(asPid(e.getPid()));
 
 		if (e instanceof eu.dnetlib.dhp.schema.oaf.Result) {
-			s.setResult(mapResult((eu.dnetlib.dhp.schema.oaf.Result) e));
+			record.setResult(mapResult((eu.dnetlib.dhp.schema.oaf.Result) e));
 		} else if (e instanceof eu.dnetlib.dhp.schema.oaf.Datasource) {
-			s.setDatasource(mapDatasource((eu.dnetlib.dhp.schema.oaf.Datasource) e));
+			record.setDatasource(mapDatasource((eu.dnetlib.dhp.schema.oaf.Datasource) e));
 		} else if (e instanceof eu.dnetlib.dhp.schema.oaf.Organization) {
-			s.setOrganization(mapOrganization((eu.dnetlib.dhp.schema.oaf.Organization) e));
+			record.setOrganization(mapOrganization((eu.dnetlib.dhp.schema.oaf.Organization) e));
 		} else if (e instanceof eu.dnetlib.dhp.schema.oaf.Project) {
-			s.setProject(mapProject((eu.dnetlib.dhp.schema.oaf.Project) e, vocs));
+			record.setProject(mapProject((eu.dnetlib.dhp.schema.oaf.Project) e, vocs));
 		}
-		s
+		record
 			.setLinks(
 				Optional
 					.ofNullable(je.getLinks())
@@ -94,7 +99,7 @@ public class ProvisionModelSupport {
 							.collect(Collectors.toList()))
 					.orElse(null));
 
-		return s;
+		return record;
 	}
 
 	private static RelatedRecord mapRelatedRecord(RelatedEntityWrapper rew, VocabularyGroup vocs) {
