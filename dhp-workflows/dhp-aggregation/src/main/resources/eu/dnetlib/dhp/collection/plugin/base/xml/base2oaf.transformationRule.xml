@@ -8,8 +8,8 @@
 	</HEADER>
 	<BODY>
 		<CONFIGURATION>
-			<SOURCE_METADATA_FORMAT interpretation="cleaned" layout="store" name="odf" />
-			<SINK_METADATA_FORMAT name="odf_hbase" />
+			<SOURCE_METADATA_FORMAT interpretation="cleaned" layout="store" name="dc" />
+			<SINK_METADATA_FORMAT name="oaf_hbase" />
 			<IMPORTED />
 			<SCRIPT>
 				<TITLE>xslt_base2oaf_hadoop</TITLE>

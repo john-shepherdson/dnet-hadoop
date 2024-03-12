@@ -1,6 +1,6 @@
 <RESOURCE_PROFILE>
 	<HEADER>
-		<RESOURCE_IDENTIFIER value="" />
+		<RESOURCE_IDENTIFIER value="2ad0cdd9-c96c-484c-8b0e-ed56d86891fe_VHJhbnNmb3JtYXRpb25SdWxlRFNSZXNvdXJjZXMvVHJhbnNmb3JtYXRpb25SdWxlRFNSZXNvdXJjZVR5cGU=" />
 		<RESOURCE_TYPE value="TransformationRuleDSResourceType" />
 		<RESOURCE_KIND value="TransformationRuleDSResources" />
 		<RESOURCE_URI value="" />
@@ -8,11 +8,11 @@
 	</HEADER>
 	<BODY>
 		<CONFIGURATION>
-			<SOURCE_METADATA_FORMAT interpretation="cleaned" layout="store" name="odf" />
+			<SOURCE_METADATA_FORMAT interpretation="cleaned" layout="store" name="dc" />
 			<SINK_METADATA_FORMAT name="odf_hbase" />
 			<IMPORTED />
 			<SCRIPT>
-				<TITLE>xslt_base2oaf_hadoop</TITLE>
+				<TITLE>xslt_base2odf_hadoop</TITLE>
 				<CODE>
 					<xsl:stylesheet xmlns:oaire="http://namespace.openaire.eu/schema/oaire/" xmlns:dateCleaner="http://eu/dnetlib/transform/dateISO" xmlns:base_dc="http://oai.base-search.net/base_dc/"
 						xmlns:datacite="http://datacite.org/schema/kernel-4" xmlns:dr="http://www.driver-repository.eu/namespace/dr" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -269,7 +269,6 @@
 									<oaf:dateAccepted>
 										<xsl:value-of select="dateCleaner:dateISO( //dc:date[1] )" />
 									</oaf:dateAccepted>
-
 
 									<xsl:if test="//base_dc:oa[.='1']">
 										<xsl:for-each select="//dc:relation[starts-with(., 'http')]">
