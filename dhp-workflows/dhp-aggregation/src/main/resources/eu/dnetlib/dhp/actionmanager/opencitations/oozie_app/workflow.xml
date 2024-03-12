@@ -27,6 +27,7 @@
             <case to="download">${wf:conf('resumeFrom') eq 'DownloadDump'}</case>
             <case to="extract">${wf:conf('resumeFrom') eq 'ExtractContent'}</case>
             <case to="read">${wf:conf('resumeFrom') eq 'ReadContent'}</case>
+            <case to="remap">${wf:conf('resumeFrom') eq 'MapContent'}</case>
             <case to="create_actionset">${wf:conf('resumeFrom') eq 'CreateAS'}</case>
             <default to="deleteoutputpath"/> <!-- first action to be done when downloadDump is to be performed -->
         </switch>
@@ -154,6 +155,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}</arg>
             <arg>--outputPath</arg><arg>${outputPathExtraction}</arg>
+            <arg>--nameNode</arg><arg>${nameNode}</arg>
         </spark>
         <ok to="create_actionset"/>
         <error to="Kill"/>

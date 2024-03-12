@@ -22,6 +22,7 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.actionmanager.opencitations.model.COCI;
@@ -41,7 +42,9 @@ public class CreateActionSetSparkJob implements Serializable {
 	private static final String DOI_PREFIX = "50|doi_________::";
 
 	private static final String PMID_PREFIX = "50|pmid________::";
+	private static final String ARXIV_PREFIX = "50|arXiv_______::";
 
+	private static final String PMCID_PREFIX = "50|pmcid_______::";
 	private static final String TRUST = "0.91";
 
 	private static final Logger log = LoggerFactory.getLogger(CreateActionSetSparkJob.class);
@@ -74,25 +77,18 @@ public class CreateActionSetSparkJob implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath {}", outputPath);
 
-		final boolean shouldDuplicateRels = Optional
-			.ofNullable(parser.get("shouldDuplicateRels"))
-			.map(Boolean::valueOf)
-			.orElse(Boolean.FALSE);
-
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
-			spark -> extractContent(spark, inputPath, outputPath, shouldDuplicateRels));
+			spark -> extractContent(spark, inputPath, outputPath));
 
 	}
 
-	private static void extractContent(SparkSession spark, String inputPath, String outputPath,
-		boolean shouldDuplicateRels) {
+	private static void extractContent(SparkSession spark, String inputPath, String outputPath) {
 
 		getTextTextJavaPairRDD(spark, inputPath)
-			// .union(getTextTextJavaPairRDD(spark, inputPath, shouldDuplicateRels, POCI))
-			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
+			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);// , GzipCodec.class);
 	}
 
 	private static JavaPairRDD<Text, Text> getTextTextJavaPairRDD(SparkSession spark, String inputPath) {
@@ -115,7 +111,7 @@ public class CreateActionSetSparkJob implements Serializable {
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))));
 	}
 
-	private static List<Relation> createRelation(COCI value) {
+	private static List<Relation> createRelation(COCI value) throws JsonProcessingException {
 
 		List<Relation> relationList = new ArrayList<>();
 
@@ -131,25 +127,52 @@ public class CreateActionSetSparkJob implements Serializable {
 			case "pmid":
 				citing = PMID_PREFIX
 					+ IdentifierFactory
-						.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), value.getCiting()));
+						.md5(PidCleaner.normalizePidValue(PidType.pmid.toString(), value.getCiting()));
 				break;
+			case "arxiv":
+				citing = ARXIV_PREFIX
+					+ IdentifierFactory
+						.md5(PidCleaner.normalizePidValue(PidType.arXiv.toString(), value.getCiting()));
+				break;
+			case "pmcid":
+				citing = PMCID_PREFIX
+					+ IdentifierFactory
+						.md5(PidCleaner.normalizePidValue(PidType.pmc.toString(), value.getCiting()));
+				break;
+			case "isbn":
+			case "issn":
+				return relationList;
+
 			default:
-				throw new IllegalStateException("Invalid prefix: " + value.getCiting_pid());
+				throw new IllegalStateException("Invalid prefix: " + new ObjectMapper().writeValueAsString(value));
 		}
 
 		switch (value.getCited_pid()) {
 			case "doi":
 				cited = DOI_PREFIX
 					+ IdentifierFactory
-						.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), value.getCiting()));
+						.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), value.getCited()));
 				break;
 			case "pmid":
 				cited = PMID_PREFIX
 					+ IdentifierFactory
-						.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), value.getCiting()));
+						.md5(PidCleaner.normalizePidValue(PidType.pmid.toString(), value.getCited()));
 				break;
+			case "arxiv":
+				cited = ARXIV_PREFIX
+					+ IdentifierFactory
+						.md5(PidCleaner.normalizePidValue(PidType.arXiv.toString(), value.getCited()));
+				break;
+			case "pmcid":
+				cited = PMCID_PREFIX
+					+ IdentifierFactory
+						.md5(PidCleaner.normalizePidValue(PidType.pmc.toString(), value.getCited()));
+				break;
+			case "isbn":
+			case "issn":
+				return relationList;
 			default:
-				throw new IllegalStateException("Invalid prefix: " + value.getCited_pid());
+				throw new IllegalStateException("Invalid prefix: " + new ObjectMapper().writeValueAsString(value));
 		}
 
 		if (!citing.equals(cited)) {

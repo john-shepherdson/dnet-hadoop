@@ -14,6 +14,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.*;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.slf4j.Logger;
@@ -79,7 +80,7 @@ public class ReadCOCI implements Serializable {
 				new Path(workingPath), true);
 		while (fileStatusListIterator.hasNext()) {
 			LocatedFileStatus fileStatus = fileStatusListIterator.next();
-
+			log.info("extracting file {}", fileStatus.getPath().toString());
 			Dataset<Row> cociData = spark
 				.read()
 				.format("csv")
@@ -91,6 +92,7 @@ public class ReadCOCI implements Serializable {
 				.repartition(100);
 
 			cociData.map((MapFunction<Row, COCI>) row -> {
+
 				COCI coci = new COCI();
 
 				coci.setCiting(row.getString(1));
@@ -100,10 +102,12 @@ public class ReadCOCI implements Serializable {
 
 				return coci;
 			}, Encoders.bean(COCI.class))
+				.filter((FilterFunction<COCI>) c -> c != null)
 				.write()
 				.mode(SaveMode.Append)
 				.option("compression", "gzip")
 				.json(outputPath);
+			fileSystem.rename(fileStatus.getPath(), new Path("/tmp/miriam/OC/DONE"));
 		}
 
 	}

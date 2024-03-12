@@ -9,11 +9,19 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.slf4j.Logger;
@@ -62,11 +70,50 @@ public class MapOCIdsInPids implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath {}", outputPath);
 
+		final String nameNode = parser.get("nameNode");
+		log.info("nameNode {}", nameNode);
+
+		unzipCorrespondenceFile(inputPath, nameNode);
 		SparkConf conf = new SparkConf();
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
 			spark -> mapIdentifiers(spark, inputPath, outputPath));
+
+	}
+
+	private static void unzipCorrespondenceFile(String inputPath, String hdfsNameNode) throws IOException {
+		Configuration conf = new Configuration();
+		conf.set("fs.defaultFS", hdfsNameNode);
+
+		final Path path = new Path(inputPath + "/correspondence/omid.zip");
+		FileSystem fileSystem = FileSystem.get(conf);
+
+		FSDataInputStream project_zip = fileSystem.open(path);
+
+		try (ZipInputStream zis = new ZipInputStream(project_zip)) {
+			ZipEntry entry = null;
+			while ((entry = zis.getNextEntry()) != null) {
+
+				if (!entry.isDirectory()) {
+					String fileName = entry.getName();
+					byte buffer[] = new byte[1024];
+					int count;
+
+					try (
+						FSDataOutputStream out = fileSystem
+							.create(new Path(inputPath + "/correspondence/omid.csv"))) {
+
+						while ((count = zis.read(buffer, 0, buffer.length)) != -1)
+							out.write(buffer, 0, count);
+
+					}
+
+				}
+
+			}
+
+		}
 
 	}
 
@@ -85,7 +132,7 @@ public class MapOCIdsInPids implements Serializable {
 			.option("inferSchema", "true")
 			.option("header", "true")
 			.option("quotes", "\"")
-			.load(inputPath + "/correspondence/omid.zip")
+			.load(inputPath + "/correspondence/omid.csv")
 			.repartition(5000)
 			.flatMap((FlatMapFunction<Row, Tuple2<String, String>>) r -> {
 				String ocIdentifier = r.getAs("omid");
@@ -98,7 +145,7 @@ public class MapOCIdsInPids implements Serializable {
 			}, Encoders.tuple(Encoders.STRING(), Encoders.STRING()));
 
 		Dataset<COCI> mappedCitingDataset = coci
-			.joinWith(correspondenceData, coci.col("citing").equalTo(correspondenceData.col("_1")), "left")
+			.joinWith(correspondenceData, coci.col("citing").equalTo(correspondenceData.col("_1")))
 			.map((MapFunction<Tuple2<COCI, Tuple2<String, String>>, COCI>) t2 -> {
 				String correspondent = t2._2()._2();
 				t2._1().setCiting_pid(correspondent.substring(0, correspondent.indexOf(":")));
@@ -118,6 +165,16 @@ public class MapOCIdsInPids implements Serializable {
 			.mode(SaveMode.Append)
 			.option("compression", "gzip")
 			.json(outputPath);
+
+		mappedCitingDataset
+			.joinWith(correspondenceData, mappedCitingDataset.col("cited").equalTo(correspondenceData.col("_1")))
+			.map((MapFunction<Tuple2<COCI, Tuple2<String, String>>, COCI>) t2 -> {
+				String correspondent = t2._2()._2();
+				t2._1().setCited_pid(correspondent.substring(0, correspondent.indexOf(":")));
+				t2._1().setCited(correspondent.substring(correspondent.indexOf(":") + 1));
+				return t2._1();
+			}, Encoders.bean(COCI.class))
+			.foreach((ForeachFunction<COCI>) c -> System.out.println(OBJECT_MAPPER.writeValueAsString(c)));
 	}
 
 }

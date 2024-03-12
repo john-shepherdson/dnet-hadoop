@@ -27,6 +27,8 @@ public class COCI implements Serializable {
 	}
 
 	public void setCiting(String citing) {
+		if (citing != null && citing.startsWith("omid:"))
+			citing = citing.substring(5);
 		this.citing = citing;
 	}
 
@@ -35,6 +37,8 @@ public class COCI implements Serializable {
 	}
 
 	public void setCited(String cited) {
+		if (cited != null && cited.startsWith("omid:"))
+			cited = cited.substring(5);
 		this.cited = cited;
 	}
 
