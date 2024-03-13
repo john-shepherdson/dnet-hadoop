@@ -52,7 +52,8 @@ case class MAGPaper(
   // List of authors
   authors: Option[List[MAGAuthor]],
   // List of Fields of Study
-  fos: Option[List[MAGFieldOfStudy]]
+  fos: Option[List[MAGFieldOfStudy]],
+  urls: Option[List[String]]
 )
 
 case class MAGAuthor(

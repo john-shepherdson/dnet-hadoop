@@ -249,7 +249,7 @@ case object Crossref2Oaf {
     val subtitles =
       for { JString(title) <- json \ "subtitle" if title.nonEmpty } yield structuredProperty(
         title,
-        ModelConstants.SUBTITLE_QUALIFIER, null)
+          ModelConstants.SUBTITLE_QUALIFIER, null)
     result.setTitle((mainTitles ::: originalTitles ::: shortTitles ::: subtitles).asJava)
 
     // DESCRIPTION
