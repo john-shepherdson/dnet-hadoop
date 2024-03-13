@@ -1133,6 +1133,9 @@ public class XmlRecordFactory implements Serializable {
 				if (re.getCountry() != null && !re.getCountry().isBlank()) {
 					metadata.add(XmlSerializationUtils.mapQualifier("country", re.getCountry()));
 				}
+				if (StringUtils.isNotBlank(re.getWebsiteurl())) {
+					metadata.add(XmlSerializationUtils.asXmlElement("websiteurl", re.getWebsiteurl()));
+				}
 				break;
 			case project:
 				if (isNotBlank(re.getProjectTitle())) {
