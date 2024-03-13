@@ -166,15 +166,6 @@ public class MapOCIdsInPids implements Serializable {
 			.option("compression", "gzip")
 			.json(outputPath);
 
-		mappedCitingDataset
-			.joinWith(correspondenceData, mappedCitingDataset.col("cited").equalTo(correspondenceData.col("_1")))
-			.map((MapFunction<Tuple2<COCI, Tuple2<String, String>>, COCI>) t2 -> {
-				String correspondent = t2._2()._2();
-				t2._1().setCited_pid(correspondent.substring(0, correspondent.indexOf(":")));
-				t2._1().setCited(correspondent.substring(correspondent.indexOf(":") + 1));
-				return t2._1();
-			}, Encoders.bean(COCI.class))
-			.foreach((ForeachFunction<COCI>) c -> System.out.println(OBJECT_MAPPER.writeValueAsString(c)));
-	}
+			}
 
 }
