@@ -1071,6 +1071,9 @@ public class XmlRecordFactory implements Serializable {
 				if (re.getTitle() != null && isNotBlank(re.getTitle().getValue())) {
 					metadata.add(XmlSerializationUtils.mapStructuredProperty("title", re.getTitle()));
 				}
+				if (StringUtils.isNotBlank(re.getDescription())) {
+					metadata.add(XmlSerializationUtils.asXmlElement("description", re.getDescription()));
+				}
 				if (isNotBlank(re.getDateofacceptance())) {
 					metadata
 						.add(XmlSerializationUtils.asXmlElement("dateofacceptance", re.getDateofacceptance()));

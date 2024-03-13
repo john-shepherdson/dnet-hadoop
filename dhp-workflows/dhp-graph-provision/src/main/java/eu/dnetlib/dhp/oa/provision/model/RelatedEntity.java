@@ -23,6 +23,7 @@ public class RelatedEntity implements Serializable {
 	private String websiteurl; // datasource, organizations, projects
 
 	// results
+	private String description;
 	private String dateofacceptance;
 	private String publisher;
 	private List<StructuredProperty> pid;
@@ -75,6 +76,14 @@ public class RelatedEntity implements Serializable {
 
 	public String getWebsiteurl() {
 		return websiteurl;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public void setWebsiteurl(String websiteurl) {

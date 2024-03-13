@@ -161,6 +161,12 @@ public class CreateRelatedEntitiesJob_phase1 {
 					title.setValue(StringUtils.left(title.getValue(), ModelHardLimits.MAX_TITLE_LENGTH));
 					re.setTitle(title);
 				}
+				if (result.getDescription() != null && !result.getDescription().isEmpty()) {
+					final Field<String> description = result.getDescription().stream().findFirst().get();
+					if (StringUtils.isNotBlank(description.getValue())) {
+						re.setDescription(StringUtils.left(description.getValue(), ModelHardLimits.MAX_RELATED_ABSTRACT_LENGTH));
+					}
+				}
 
 				re.setDateofacceptance(getValue(result.getDateofacceptance()));
 				re.setPublisher(getValue(result.getPublisher()));
