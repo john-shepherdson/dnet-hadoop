@@ -78,6 +78,9 @@
         <oaf:projectid>corda_______::630786</oaf:projectid>
         <oaf:hostedBy id="re3data_____::r3d100010386" name="LINDAT/CLARIN repository"/>
         <oaf:collectedFrom id="re3data_____::r3d100010386" name="LINDAT/CLARIN repository"/>
+        <oaf:country code="IT">Italy</oaf:country>
+    	<oaf:country code="FR" />
+		<oaf:country>DE</oaf:country>
     </metadata>
     <about xmlns:dc="http://purl.org/dc/elements/1.1/"
            xmlns:dri="http://www.driver-repository.eu/namespace/dri" xmlns:prov="http://www.openarchives.org/OAI/2.0/provenance">

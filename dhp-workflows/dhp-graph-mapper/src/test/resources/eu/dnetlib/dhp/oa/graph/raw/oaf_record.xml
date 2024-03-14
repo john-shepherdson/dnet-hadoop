@@ -71,6 +71,9 @@
                   subRelType="outcome"
                   targetType="project"
                   validationDate="2020-01-01">corda_______::226852</oaf:relation>
+    <oaf:country code="IT">Italy</oaf:country>
+    <oaf:country code="FR" />
+	<oaf:country>DE</oaf:country>
   </metadata>
   <about xmlns:oai="http://www.openarchives.org/OAI/2.0/">
     <provenance xmlns="http://www.openarchives.org/OAI/2.0/provenance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/provenance http://www.openarchives.org/OAI/2.0/provenance.xsd">
