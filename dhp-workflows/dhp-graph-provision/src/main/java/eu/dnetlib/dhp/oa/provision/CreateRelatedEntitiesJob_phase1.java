@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.hadoop.yarn.webapp.hamlet.Hamlet;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
@@ -27,14 +28,7 @@ import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
 import scala.Tuple2;
 
@@ -156,16 +150,33 @@ public class CreateRelatedEntitiesJob_phase1 {
 			case software:
 				final Result result = (Result) entity;
 
-				if (result.getTitle() != null && !result.getTitle().isEmpty()) {
-					final StructuredProperty title = result.getTitle().stream().findFirst().get();
-					title.setValue(StringUtils.left(title.getValue(), ModelHardLimits.MAX_TITLE_LENGTH));
-					re.setTitle(title);
+				if (Objects.nonNull(result.getTitle()) && !result.getTitle().isEmpty()) {
+					result
+						.getTitle()
+						.stream()
+						.findFirst()
+						.map(StructuredProperty::getValue)
+						.ifPresent(
+							title -> re.getTitle().setValue(StringUtils.left(title, ModelHardLimits.MAX_TITLE_LENGTH)));
 				}
-				if (result.getDescription() != null && !result.getDescription().isEmpty()) {
-					final Field<String> description = result.getDescription().stream().findFirst().get();
-					if (StringUtils.isNotBlank(description.getValue())) {
-						re.setDescription(StringUtils.left(description.getValue(), ModelHardLimits.MAX_RELATED_ABSTRACT_LENGTH));
-					}
+				if (Objects.nonNull(result.getDescription()) && !result.getDescription().isEmpty()) {
+					result
+						.getDescription()
+						.stream()
+						.findFirst()
+						.map(Field::getValue)
+						.ifPresent(
+							d -> re.setDescription(StringUtils.left(d, ModelHardLimits.MAX_RELATED_ABSTRACT_LENGTH)));
+				}
+				if (Objects.nonNull(result.getAuthor()) && !result.getAuthor().isEmpty()) {
+					re
+						.setAuthor(
+							result
+								.getAuthor()
+								.stream()
+								.map(Author::getFullname)
+								.filter(StringUtils::isNotBlank)
+								.collect(Collectors.toList()));
 				}
 
 				re.setDateofacceptance(getValue(result.getDateofacceptance()));

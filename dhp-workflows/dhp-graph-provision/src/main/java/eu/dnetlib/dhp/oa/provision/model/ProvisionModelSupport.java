@@ -63,32 +63,32 @@ public class ProvisionModelSupport {
 	}
 
 	public static SolrRecord transform(JoinedEntity je, ContextMapper contextMapper, VocabularyGroup vocs) {
-		SolrRecord record = new SolrRecord();
+		SolrRecord r = new SolrRecord();
 		final OafEntity e = je.getEntity();
 		final RecordType type = RecordType.valueOf(e.getClass().getSimpleName().toLowerCase());
 		final Boolean deletedbyinference = Optional
 			.ofNullable(e.getDataInfo())
 			.map(DataInfo::getDeletedbyinference)
 			.orElse(null);
-		record
+		r
 			.setHeader(
 				SolrRecordHeader
 					.newInstance(
 						e.getId(), e.getOriginalId(), type, deletedbyinference));
-		record.setCollectedfrom(asProvenance(e.getCollectedfrom()));
-		record.setContext(asContext(e.getContext(), contextMapper));
-		record.setPid(asPid(e.getPid()));
+		r.setCollectedfrom(asProvenance(e.getCollectedfrom()));
+		r.setContext(asContext(e.getContext(), contextMapper));
+		r.setPid(asPid(e.getPid()));
 
 		if (e instanceof eu.dnetlib.dhp.schema.oaf.Result) {
-			record.setResult(mapResult((eu.dnetlib.dhp.schema.oaf.Result) e));
+			r.setResult(mapResult((eu.dnetlib.dhp.schema.oaf.Result) e));
 		} else if (e instanceof eu.dnetlib.dhp.schema.oaf.Datasource) {
-			record.setDatasource(mapDatasource((eu.dnetlib.dhp.schema.oaf.Datasource) e));
+			r.setDatasource(mapDatasource((eu.dnetlib.dhp.schema.oaf.Datasource) e));
 		} else if (e instanceof eu.dnetlib.dhp.schema.oaf.Organization) {
-			record.setOrganization(mapOrganization((eu.dnetlib.dhp.schema.oaf.Organization) e));
+			r.setOrganization(mapOrganization((eu.dnetlib.dhp.schema.oaf.Organization) e));
 		} else if (e instanceof eu.dnetlib.dhp.schema.oaf.Project) {
-			record.setProject(mapProject((eu.dnetlib.dhp.schema.oaf.Project) e, vocs));
+			r.setProject(mapProject((eu.dnetlib.dhp.schema.oaf.Project) e, vocs));
 		}
-		record
+		r
 			.setLinks(
 				Optional
 					.ofNullable(je.getLinks())
@@ -99,7 +99,7 @@ public class ProvisionModelSupport {
 							.collect(Collectors.toList()))
 					.orElse(null));
 
-		return record;
+		return r;
 	}
 
 	private static RelatedRecord mapRelatedRecord(RelatedEntityWrapper rew, VocabularyGroup vocs) {

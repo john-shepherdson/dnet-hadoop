@@ -24,6 +24,7 @@ public class RelatedEntity implements Serializable {
 
 	// results
 	private String description;
+	private List<String> author;
 	private String dateofacceptance;
 	private String publisher;
 	private List<StructuredProperty> pid;
@@ -84,6 +85,14 @@ public class RelatedEntity implements Serializable {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public List<String> getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(List<String> author) {
+		this.author = author;
 	}
 
 	public void setWebsiteurl(String websiteurl) {
