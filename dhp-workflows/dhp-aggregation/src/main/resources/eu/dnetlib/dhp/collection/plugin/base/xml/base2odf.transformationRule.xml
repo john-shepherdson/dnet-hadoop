@@ -42,7 +42,6 @@
 									base_dc:global_id (I used oai:identifier) 
 									base_dc:collection/text() 
 									base_dc:continent 
-									base_dc:country  
 									dc:coverage
 									dc:source
 									dc:relation
@@ -290,6 +289,11 @@
 											</xsl:choose>
 										</oaf:relation>
 									</xsl:for-each>
+									
+									<xsl:for-each select="//base_dc:country">
+										<oaf:country><xsl:value-of select="vocabulary:clean(., 'dnet:countries')" /></oaf:country>
+									</xsl:for-each>
+									
 								</metadata>
 								<xsl:copy-of select="//*[local-name() = 'about']" />
 							</record>

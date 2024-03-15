@@ -8,7 +8,6 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.io.SAXReader;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,7 +19,7 @@ import eu.dnetlib.dhp.schema.mdstore.Provenance;
 import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
-@Disabled
+// @Disabled
 @ExtendWith(MockitoExtension.class)
 public class BaseTransfomationTest extends AbstractVocabularyTest {
 
@@ -66,9 +65,9 @@ public class BaseTransfomationTest extends AbstractVocabularyTest {
 
 	private XSLTTransformationFunction loadTransformationRule(final String path) throws Exception {
 		final String xslt = new SAXReader()
-			.read(this.getClass().getResourceAsStream(path))
-			.selectSingleNode("//CODE/*")
-			.asXML();
+				.read(this.getClass().getResourceAsStream(path))
+				.selectSingleNode("//CODE/*")
+				.asXML();
 
 		final LongAccumulator la = new LongAccumulator();
 

@@ -59,7 +59,6 @@ base_dc:global_id (I used oai:identifier)
 base_dc:collection/text()
 
 base_dc:continent
-base_dc:country
 base_dc:year (I used dc:date)
 dc:coverage
 dc:language (I used base_dc:lang)
@@ -254,8 +253,13 @@ base_dc:link (I used dc:identifier)
 													<xsl:value-of select="concat('ror_________::https://ror.org/', normalize-space(.))" />
 												</xsl:otherwise>
 											</xsl:choose>
-										</oaf:relation>
+										</oaf:relation>										
 									</xsl:for-each>
+
+									<xsl:for-each select="//base_dc:country">
+										<oaf:country><xsl:value-of select="vocabulary:clean(., 'dnet:countries')" /></oaf:country>
+									</xsl:for-each>
+									
 								</metadata>
 								<xsl:copy-of select="//*[local-name() = 'about']" />
 							</record>
