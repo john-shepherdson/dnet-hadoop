@@ -45,15 +45,22 @@ public class BaseCollectorPlugin implements CollectorPlugin {
 
 	@Override
 	public Stream<String> collect(final ApiDescriptor api, final AggregatorReport report) throws CollectorException {
-		// get path to file
+		// the path of the dump file on HDFS
+		// http://oai.base-search.net/initial_load/base_oaipmh_dump-current.tar
+		// it could be downloaded from iis-cdh5-test-gw.ocean.icm.edu.pl and then copied on HDFS
 		final Path filePath = Optional
 			.ofNullable(api.getBaseUrl())
 			.map(Path::new)
 			.orElseThrow(() -> new CollectorException("missing baseUrl"));
 
+		// get the parameters for the connection to the OpenAIRE database.
+		// the database is used to obtain the list of the datasources that the plugin will collect
 		final String dbUrl = api.getParams().get("dbUrl");
 		final String dbUser = api.getParams().get("dbUser");
 		final String dbPassword = api.getParams().get("dbPassword");
+
+		// the types(comma separated, empty value for all) that the plugin will collect,
+		// the types should be expressed in the format of the normalized types of BASE (for example 1,121,...)
 		final String acceptedNormTypesString = api.getParams().get("acceptedNormTypes");
 
 		log.info("baseUrl: {}", filePath);
