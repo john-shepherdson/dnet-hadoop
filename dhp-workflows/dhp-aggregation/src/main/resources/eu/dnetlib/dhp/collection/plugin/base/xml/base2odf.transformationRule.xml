@@ -51,10 +51,6 @@
 									base_dc:link (I used dc:identifier)
 								 -->
 
-
-								<xsl:variable name="varBaseNormType" select="vocabulary:clean(//base_dc:typenorm, 'base:normalized_types')" />
-
-
 								<metadata>
 									<datacite:resource>
 
@@ -93,7 +89,9 @@
 										<datacite:relatedIdentifiers />
 
 
-										<datacite:resourceType><xsl:value-of select="$varBaseNormType" /></datacite:resourceType>
+										<xsl:for-each select="//base_dc:typenorm">
+											<datacite:resourceType><xsl:value-of select="vocabulary:clean(., 'base:normalized_types')" /></datacite:resourceType>
+										</xsl:for-each>
 
 										<datacite:titles>
 											<xsl:for-each select="//dc:title">
@@ -185,26 +183,157 @@
 
 									</datacite:resource>
 
-										<xsl:for-each select="//dc:relation">
-											<xsl:if test="matches(normalize-space(.), '(info:eu-repo/grantagreement/ec/fp7/)(\d\d\d\d\d\d)(.*)', 'i')">
-												<oaf:projectid>
-													<xsl:value-of select="concat($varFP7, replace(normalize-space(.), '(info:eu-repo/grantagreement/ec/fp7/)(\d\d\d\d\d\d)(.*)', '$2', 'i'))" />
-												</oaf:projectid>
-											</xsl:if>
-											<xsl:if test="matches(normalize-space(.), '(info:eu-repo/grantagreement/ec/h2020/)(\d\d\d\d\d\d)(.*)', 'i')">
-												<oaf:projectid>
-													<xsl:value-of select="concat($varH2020, replace(normalize-space(.), '(info:eu-repo/grantagreement/ec/h2020/)(\d\d\d\d\d\d)(.*)', '$2', 'i'))" />
-												</oaf:projectid>
-											</xsl:if>
-										</xsl:for-each>
+									<xsl:for-each select="//dc:relation">
+										<xsl:if test="matches(normalize-space(.), '(info:eu-repo/grantagreement/ec/fp7/)(\d\d\d\d\d\d)(.*)', 'i')">
+											<oaf:projectid>
+												<xsl:value-of select="concat($varFP7, replace(normalize-space(.), '(info:eu-repo/grantagreement/ec/fp7/)(\d\d\d\d\d\d)(.*)', '$2', 'i'))" />
+											</oaf:projectid>
+										</xsl:if>
+										<xsl:if test="matches(normalize-space(.), '(info:eu-repo/grantagreement/ec/h2020/)(\d\d\d\d\d\d)(.*)', 'i')">
+											<oaf:projectid>
+												<xsl:value-of select="concat($varH2020, replace(normalize-space(.), '(info:eu-repo/grantagreement/ec/h2020/)(\d\d\d\d\d\d)(.*)', '$2', 'i'))" />
+											</oaf:projectid>
+										</xsl:if>
+									</xsl:for-each>
 
-									<dr:CobjCategory>
-										<xsl:variable name="varCobjCategory" select="vocabulary:clean($varBaseNormType, 'dnet:publication_resource')" />
-										<xsl:variable name="varSuperType" select="vocabulary:clean($varCobjCategory, 'dnet:result_typologies')" />
-										<xsl:attribute name="type" select="$varSuperType" />
-										<xsl:value-of select="$varCobjCategory" />
-									</dr:CobjCategory>
+									<xsl:choose>
+										<!-- I used an inline mapping because the field typenorm could be repeated and I have to specify a list of priority  -->
+										
+										<!-- Book part -->
+										<xsl:when test="//base_dc:typenorm = '111'">
+											<dr:CobjCategory type="publication">0013</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Book -->
+										<xsl:when test="//base_dc:typenorm = '11'">
+											<dr:CobjCategory type="publication">0002</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Article contribution -->
+										<xsl:when test="//base_dc:typenorm = '121'">
+											<dr:CobjCategory type="publication">0001</dr:CobjCategory>
+										</xsl:when>
+										
+																				
+										<!-- Journal/Newspaper -->
+										<xsl:when test="//base_dc:typenorm = '12'">
+											<dr:CobjCategory type="publication">0043</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Report -->
+										<xsl:when test="//base_dc:typenorm = '14'">
+											<dr:CobjCategory type="publication">0017</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Review -->
+										<xsl:when test="//base_dc:typenorm = '15'">
+											<dr:CobjCategory type="publication">0015</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Lecture -->
+										<xsl:when test="//base_dc:typenorm = '17'">
+											<dr:CobjCategory type="publication">0010</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Bachelor's thesis -->
+										<xsl:when test="//base_dc:typenorm = '181'">
+											<dr:CobjCategory type="publication">0008</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Master's thesis -->
+										<xsl:when test="//base_dc:typenorm = '182'">
+											<dr:CobjCategory type="publication">0007</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Doctoral and postdoctoral thesis -->
+										<xsl:when test="//base_dc:typenorm = '183'">
+											<dr:CobjCategory type="publication">0006</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Thesis -->
+										<xsl:when test="//base_dc:typenorm = '18'">
+											<dr:CobjCategory type="publication">0044</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Patent -->
+										<xsl:when test="//base_dc:typenorm = '1A'">
+											<dr:CobjCategory type="publication">0019</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Text -->
+										<xsl:when test="//base_dc:typenorm = '1'">
+											<dr:CobjCategory type="publication">0001</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Software -->
+										<xsl:when test="//base_dc:typenorm = '6'">
+											<dr:CobjCategory type="software">0029</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Dataset -->										
+										<xsl:when test="//base_dc:typenorm = '7'">
+											<dr:CobjCategory type="dataset">0021</dr:CobjCategory>
+										</xsl:when>										
+																				
+										<!-- Still image -->
+										<xsl:when test="//base_dc:typenorm = '51'">
+											<dr:CobjCategory type="other">0025</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Moving image/Video -->										
+										<xsl:when test="//base_dc:typenorm = '52'">
+											<dr:CobjCategory type="other">0024</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Image/Video -->
+										<xsl:when test="//base_dc:typenorm = '5'">
+											<dr:CobjCategory type="other">0033</dr:CobjCategory>
+										</xsl:when>
 
+										<!-- Audio -->
+										<xsl:when test="//base_dc:typenorm = '4'">
+											<dr:CobjCategory type="other">0030</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Musical notation -->
+										<xsl:when test="//base_dc:typenorm = '2'">
+											<dr:CobjCategory type="other">0020</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Map -->
+										<xsl:when test="//base_dc:typenorm = '3'">
+											<dr:CobjCategory type="other">0020</dr:CobjCategory>
+										</xsl:when>										
+										
+										<!-- Other non-article -->
+										<xsl:when test="//base_dc:typenorm = '122'">
+											<dr:CobjCategory type="publication">0038</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Course material -->
+										<xsl:when test="//base_dc:typenorm = '16'">
+											<dr:CobjCategory type="publication">0038</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Manuscript -->
+										<xsl:when test="//base_dc:typenorm = '19'">
+											<dr:CobjCategory type="publication">0038</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Conference object -->
+										<xsl:when test="//base_dc:typenorm = '13'">
+											<dr:CobjCategory type="publication">0004</dr:CobjCategory>
+										</xsl:when>
+
+										<!-- Unknown -->
+										<xsl:when test="//base_dc:typenorm = 'F'">
+											<dr:CobjCategory type="other">0000</dr:CobjCategory>
+										</xsl:when>
+										<xsl:otherwise>
+											<dr:CobjCategory type="other">0000</dr:CobjCategory>
+										</xsl:otherwise>
+									</xsl:choose>
+									
 									<oaf:accessrights>
 										<xsl:choose>
 											<xsl:when test="//base_dc:oa[.='1']">OPEN</xsl:when>
