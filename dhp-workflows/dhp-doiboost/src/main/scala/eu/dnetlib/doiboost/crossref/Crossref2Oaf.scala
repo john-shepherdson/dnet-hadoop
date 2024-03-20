@@ -1,4 +1,4 @@
- package eu.dnetlib.doiboost.crossref
+package eu.dnetlib.doiboost.crossref
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.common.ModelConstants
@@ -48,16 +48,14 @@ case object Crossref2Oaf {
     json.extract[List[funderInfo]]
   }
 
- def getIrishId(doi: String): Option[String] = {
+  def getIrishId(doi: String): Option[String] = {
     val id = doi.split("/").last
     irishFunder
       .find(f => id.equalsIgnoreCase(f.id) || (f.synonym.nonEmpty && f.synonym.exists(s => s.equalsIgnoreCase(id))))
       .map(f => f.id)
   }
 
-
-
-  def mappingResult(result: Result, json: JValue, instanceType:Qualifier, originalType: String): Result = {
+  def mappingResult(result: Result, json: JValue, instanceType: Qualifier, originalType: String): Result = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
     //MAPPING Crossref DOI into PID
@@ -298,22 +296,22 @@ case object Crossref2Oaf {
   }
 
   /** *
-   * Use the vocabulary dnet:publication_resource to find a synonym to one of these terms and get the instance.type.
-   * Using the dnet:result_typologies vocabulary, we look up the instance.type synonym
-   * to generate one of the following main entities:
-   *  - publication
-   *  - dataset
-   *  - software
-   *  - otherresearchproduct
-   *
-   * @param resourceType
-   * @param vocabularies
-   * @return
-   */
+    * Use the vocabulary dnet:publication_resource to find a synonym to one of these terms and get the instance.type.
+    * Using the dnet:result_typologies vocabulary, we look up the instance.type synonym
+    * to generate one of the following main entities:
+    *  - publication
+    *  - dataset
+    *  - software
+    *  - otherresearchproduct
+    *
+    * @param resourceType
+    * @param vocabularies
+    * @return
+    */
   def getTypeQualifier(
-                        resourceType: String,
-                        vocabularies: VocabularyGroup
-                      ): (Qualifier, Qualifier, String) = {
+    resourceType: String,
+    vocabularies: VocabularyGroup
+  ): (Qualifier, Qualifier, String) = {
     if (resourceType != null && resourceType.nonEmpty) {
       val typeQualifier =
         vocabularies.getSynonymAsQualifier(ModelConstants.DNET_PUBLICATION_RESOURCE, resourceType)
@@ -340,7 +338,7 @@ case object Crossref2Oaf {
     val objectSubType = (json \ "subtype").extractOrElse[String](null)
     if (objectType == null)
       return resultList
-    val typology =getTypeQualifier(objectType, vocabularies)
+    val typology = getTypeQualifier(objectType, vocabularies)
 
     if (typology == null)
       return List()
@@ -348,7 +346,6 @@ case object Crossref2Oaf {
     val result = generateItemFromType(typology._2)
     if (result == null)
       return List()
-
 
     mappingResult(result, json, typology._1, typology._3)
     if (result == null || result.getId == null)
@@ -693,12 +690,11 @@ case object Crossref2Oaf {
       val item = new Dataset
       item.setResourcetype(objectType)
       return item
-    }
-    else if (objectType.getClassid.equalsIgnoreCase("software")){
+    } else if (objectType.getClassid.equalsIgnoreCase("software")) {
       val item = new Software
       item.setResourcetype(objectType)
       return item
-    }else if (objectType.getClassid.equalsIgnoreCase("OtherResearchProduct")){
+    } else if (objectType.getClassid.equalsIgnoreCase("OtherResearchProduct")) {
       val item = new OtherResearchProduct
       item.setResourcetype(objectType)
       return item

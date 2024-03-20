@@ -23,7 +23,7 @@ import scala.io.Source
 import scala.util.matching.Regex
 
 @ExtendWith(Array(classOf[MockitoExtension]))
-class CrossrefMappingTest extends  AbstractVocabularyTest{
+class CrossrefMappingTest extends AbstractVocabularyTest {
 
   val logger: Logger = LoggerFactory.getLogger(Crossref2Oaf.getClass)
   val mapper = new ObjectMapper()
@@ -34,10 +34,15 @@ class CrossrefMappingTest extends  AbstractVocabularyTest{
   }
 
   @Test
-  def testMissingAuthorParser():Unit = {
-    val json: String = Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/doiboost/crossref/s41567-022-01757-y.json")).mkString
+  def testMissingAuthorParser(): Unit = {
+    val json: String = Source
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/doiboost/crossref/s41567-022-01757-y.json"))
+      .mkString
     val result = Crossref2Oaf.convert(json, vocabularies)
-    result.filter(o => o.isInstanceOf[Publication]).map(p=> p.asInstanceOf[Publication]).foreach(p =>assertTrue(p.getAuthor.size()>0))
+    result
+      .filter(o => o.isInstanceOf[Publication])
+      .map(p => p.asInstanceOf[Publication])
+      .foreach(p => assertTrue(p.getAuthor.size() > 0))
   }
 
   @Test
@@ -127,7 +132,6 @@ class CrossrefMappingTest extends  AbstractVocabularyTest{
 
     val items = resultList.filter(p => p.isInstanceOf[Result])
 
-
     items.foreach(p => println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(p)))
 
   }
@@ -169,7 +173,6 @@ class CrossrefMappingTest extends  AbstractVocabularyTest{
 
     assertEquals(doisReference.size, relationList.size)
 
-
     relationList.foreach(p => println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(p)))
   }
 
@@ -189,7 +192,6 @@ class CrossrefMappingTest extends  AbstractVocabularyTest{
     assertTrue(resultList.nonEmpty)
 
     val items = resultList.filter(p => p.isInstanceOf[Result])
-
 
     items.foreach(p => println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(p)))
 
@@ -645,7 +647,6 @@ class CrossrefMappingTest extends  AbstractVocabularyTest{
     assertTrue(resultList.nonEmpty)
 
     val item: Result = resultList.filter(p => p.isInstanceOf[Result]).head.asInstanceOf[Result]
-
 
     println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(item))
 

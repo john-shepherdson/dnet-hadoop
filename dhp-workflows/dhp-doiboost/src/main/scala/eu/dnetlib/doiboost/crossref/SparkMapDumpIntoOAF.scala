@@ -48,7 +48,6 @@ object SparkMapDumpIntoOAF {
     val vocabularies = VocabularyGroup.loadVocsFromIS(isLookupService)
     require(vocabularies != null)
 
-
     spark.read
       .load(parser.get("sourcePath"))
       .as[CrossrefDT]

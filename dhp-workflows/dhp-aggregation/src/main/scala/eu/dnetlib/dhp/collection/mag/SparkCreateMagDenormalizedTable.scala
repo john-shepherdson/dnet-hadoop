@@ -62,9 +62,7 @@ class SparkCreateMagDenormalizedTable(propertyPath: String, args: Array[String],
     //next step we create a table containing
     val authors = MagUtility.loadMagEntity(spark, "Authors", magBasePath)
     val affiliations = MagUtility.loadMagEntity(spark, "Affiliations", magBasePath)
-    val paaf = MagUtility.loadMagEntity(spark, "PaperAuthorAffiliations", magBasePath)
-
-    val paperAuthorAffiliations = paaf.join(step0, paaf("PaperId") === step0("PaperId"), "leftsemi")
+    val paperAuthorAffiliations = MagUtility.loadMagEntity(spark, "PaperAuthorAffiliations", magBasePath)
 
     val j1 = paperAuthorAffiliations
       .join(authors, paperAuthorAffiliations("AuthorId") === authors("AuthorId"), "inner")
@@ -116,26 +114,26 @@ class SparkCreateMagDenormalizedTable(propertyPath: String, args: Array[String],
     step2.count()
     step1.unpersist()
 
-    val fos = MagUtility
-      .loadMagEntity(spark, "FieldsOfStudy", magBasePath)
-      .select($"FieldOfStudyId".alias("fos"), $"DisplayName", $"MainType")
-
-    val paperFieldsOfStudy = MagUtility
-      .loadMagEntity(spark, "PaperFieldsOfStudy", magBasePath)
-      .select($"FieldOfStudyId", $"Score", $"PaperId")
-
-    val paperFoS = paperFieldsOfStudy
-      .join(broadcast(fos), fos("fos") === paperFieldsOfStudy("FieldOfStudyId"))
-      .groupBy("PaperId")
-      .agg(collect_set(struct("FieldOfStudyId", "DisplayName", "MainType", "Score")).as("FoS"))
-
-    val step3 = step2
-      .join(paperFoS, step2("PaperId") === paperFoS("PaperId"), "left")
-      .select(step2("*"), paperFoS("FoS"))
-      .cache()
-    step3.count()
-
-    step2.unpersist()
+//    val fos = MagUtility
+//      .loadMagEntity(spark, "FieldsOfStudy", magBasePath)
+//      .select($"FieldOfStudyId".alias("fos"), $"DisplayName", $"MainType")
+//
+//    val paperFieldsOfStudy = MagUtility
+//      .loadMagEntity(spark, "PaperFieldsOfStudy", magBasePath)
+//      .select($"FieldOfStudyId", $"Score", $"PaperId")
+//
+//    val paperFoS = paperFieldsOfStudy
+//      .join(broadcast(fos), fos("fos") === paperFieldsOfStudy("FieldOfStudyId"))
+//      .groupBy("PaperId")
+//      .agg(collect_set(struct("FieldOfStudyId", "DisplayName", "MainType", "Score")).as("FoS"))
+//
+//    val step3 = step2
+//      .join(paperFoS, step2("PaperId") === paperFoS("PaperId"), "left")
+//      .select(step2("*"), paperFoS("FoS"))
+//      .cache()
+//    step3.count()
+//
+//    step2.unpersist()
 
     val journals = MagUtility
       .loadMagEntity(spark, "Journals", magBasePath)
@@ -143,20 +141,18 @@ class SparkCreateMagDenormalizedTable(propertyPath: String, args: Array[String],
         $"JournalId",
         $"DisplayName".as("journalName"),
         $"Issn".as("journalIssn"),
-        $"Publisher".as("journalPublisher"),
-        $"Webpage".as("journalWebpage")
+        $"Publisher".as("journalPublisher")
       )
-    val step4 = step3
-      .join(journals, step3("JournalId") === journals("JournalId"), "left")
+    val step3 = step2
+      .join(journals, step2("JournalId") === journals("JournalId"), "left")
       .select(
-        step3("*"),
+        step2("*"),
         journals("journalName"),
         journals("journalIssn"),
-        journals("journalPublisher"),
-        journals("journalWebpage")
+        journals("journalPublisher")
       )
       .cache
-    step4.count()
+    step3.count()
 
     val paper_urls = MagUtility
       .loadMagEntity(spark, "PaperUrls", magBasePath)
@@ -166,12 +162,11 @@ class SparkCreateMagDenormalizedTable(propertyPath: String, args: Array[String],
 
     paper_urls.count
 
-    step4
-      .join(paper_urls, step4("PaperId") === paper_urls("PaperId"))
-      .select(step4("*"), paper_urls("urls"))
+    step3
+      .join(paper_urls, step3("PaperId") === paper_urls("PaperId"))
+      .select(step3("*"), paper_urls("urls"))
       .select(
         $"PaperId".as("paperId"),
-        $"Rank".as("rank"),
         $"Doi".as("doi"),
         $"DocType".as("docType"),
         $"PaperTitle".as("paperTitle"),
@@ -202,11 +197,9 @@ class SparkCreateMagDenormalizedTable(propertyPath: String, args: Array[String],
         $"conferenceLocation".as("conferenceLocation"),
         $"conferenceStartDate".as("conferenceStartDate"),
         $"conferenceEndDate".as("conferenceEndDate"),
-        $"FoS".as("fos"),
         $"journalName".as("journalName"),
         $"journalIssn".as("journalIssn"),
         $"journalPublisher".as("journalPublisher"),
-        $"journalWebpage".as("journalWebpage"),
         $"urls"
       )
       .write

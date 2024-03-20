@@ -14,7 +14,6 @@ import scala.collection.JavaConverters._
 
 case class MAGPaper(
   paperId: Option[Long],
-  rank: Option[Int],
   doi: Option[String],
   docType: Option[String],
   paperTitle: Option[String],
@@ -29,7 +28,6 @@ case class MAGPaper(
   journalName: Option[String],
   journalIssn: Option[String],
   journalPublisher: Option[String],
-  journalWebpage: Option[String],
   conferenceSeriesId: Option[Long],
   conferenceInstanceId: Option[Long],
   conferenceName: Option[String],
@@ -51,8 +49,6 @@ case class MAGPaper(
   abstractText: Option[String],
   // List of authors
   authors: Option[List[MAGAuthor]],
-  // List of Fields of Study
-  fos: Option[List[MAGFieldOfStudy]],
   urls: Option[List[String]]
 )
 
@@ -63,13 +59,6 @@ case class MAGAuthor(
   AuthorName: Option[String],
   AuthorId: Option[Long],
   GridId: Option[String]
-)
-
-case class MAGFieldOfStudy(
-  FieldOfStudyId: Option[Long],
-  DisplayName: Option[String],
-  MainType: Option[String],
-  Score: Option[Double]
 )
 
 object MagUtility extends Serializable {

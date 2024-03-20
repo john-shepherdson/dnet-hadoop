@@ -61,6 +61,6 @@ object GenerateCrossrefDataset {
       .write
       .mode(SaveMode.Overwrite)
       .save(targetPath)
-      }
+  }
 
 }

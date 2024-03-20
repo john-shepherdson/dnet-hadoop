@@ -1,0 +1,54 @@
+<workflow-app name="generate_crossref_Datasource" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>The base path of MAG DUMP CSV Tables</description>
+        </property>
+        <property>
+            <name>targetPath</name>
+            <description>The base path of MAG DUMP CSV Tables</description>
+        </property>
+        <property>
+            <name>isLookupUrl</name>
+            <description>The Information service Lookup URL</description>
+        </property>
+    </parameters>
+
+    <start to="generateOAF"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+
+
+
+    <action name="generateOAF">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Crossref TO OAF</name>
+            <class>eu.dnetlib.dhp.collection.crossref.SparkMapDumpIntoOAF</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=2g
+                --conf spark.sql.shuffle.partitions=3000
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--targetPath</arg><arg>${targetPath}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--master</arg><arg>yarn</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>

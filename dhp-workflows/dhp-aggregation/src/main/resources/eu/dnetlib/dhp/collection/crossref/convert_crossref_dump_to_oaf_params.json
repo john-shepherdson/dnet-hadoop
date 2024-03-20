@@ -1,0 +1,26 @@
+[
+  {
+    "paramName": "m",
+    "paramLongName": "master",
+    "paramDescription": "the master name",
+    "paramRequired": true
+  },
+  {
+    "paramName": "s",
+    "paramLongName": "sourcePath",
+    "paramDescription": "The base path of Crossref DUMP",
+    "paramRequired": true
+  },
+  {
+    "paramName": "t",
+    "paramLongName": "targetPath",
+    "paramDescription": "The target path",
+    "paramRequired": false
+  },
+  {
+    "paramName": "i",
+    "paramLongName": "isLookupUrl",
+    "paramDescription": "the Information System Service LookUp URL",
+    "paramRequired": true
+  }
+]

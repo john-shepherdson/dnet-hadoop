@@ -1,10 +1,17 @@
 package eu.dnetlib.dhp.collection.crossref
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf._
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.{field, qualifier, structuredProperty, subject}
-import eu.dnetlib.dhp.schema.oaf.utils.{DoiCleaningRule, GraphCleaningFunctions, IdentifierFactory, OafMapperUtils, PidType}
+import eu.dnetlib.dhp.schema.oaf.utils.{
+  DoiCleaningRule,
+  GraphCleaningFunctions,
+  IdentifierFactory,
+  OafMapperUtils,
+  PidType
+}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang.StringUtils
 import org.json4s
@@ -37,17 +44,32 @@ case class funderInfo(id: String, uri: String, name: String, synonym: List[Strin
 
 case class mappingFunder(name: String, DOI: Option[String], award: Option[List[String]]) {}
 
+case class CrossrefResult(oafType: String, body: String) {}
+
 case object Crossref2Oaf {
   val logger: Logger = LoggerFactory.getLogger(Crossref2Oaf.getClass)
+  val mapper = new ObjectMapper
 
   val irishFunder: List[funderInfo] = {
     val s = Source
-      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/crossref/irish_funder.json"))
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/collection/crossref/irish_funder.json"))
       .mkString
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: org.json4s.JValue = parse(s)
     json.extract[List[funderInfo]]
   }
+
+  val invalidName = List(
+    ",",
+    "none none",
+    "none, none",
+    "none &na;",
+    "(:null)",
+    "test test test",
+    "test test",
+    "test",
+    "&na; &na;"
+  )
 
   def getIrishId(doi: String): Option[String] = {
     val id = doi.split("/").last
@@ -64,8 +86,9 @@ case object Crossref2Oaf {
     cf
 
   }
+
   def generateDataInfo(): DataInfo = {
-    generateDataInfo("0.9")
+    generateDataInfo("0.91")
   }
 
   def generateDataInfo(trust: String): DataInfo = {
@@ -84,6 +107,7 @@ case object Crossref2Oaf {
     )
     di
   }
+
   def getOpenAccessQualifier(): AccessRight = {
 
     OafMapperUtils.accessRight(
@@ -102,6 +126,7 @@ case object Crossref2Oaf {
       ModelConstants.DNET_ACCESS_MODES
     )
   }
+
   def getUnknownQualifier(): AccessRight = {
     OafMapperUtils.accessRight(
       ModelConstants.UNKNOWN,
@@ -138,16 +163,16 @@ case object Crossref2Oaf {
     //CC licenses
     if (
       license.startsWith("cc") ||
-        license.startsWith("http://creativecommons.org/licenses") ||
-        license.startsWith("https://creativecommons.org/licenses") ||
+      license.startsWith("http://creativecommons.org/licenses") ||
+      license.startsWith("https://creativecommons.org/licenses") ||
 
-        //ACS Publications Author choice licenses (considered OPEN also by Unpaywall)
-        license.equals("http://pubs.acs.org/page/policy/authorchoice_ccby_termsofuse.html") ||
-        license.equals("http://pubs.acs.org/page/policy/authorchoice_termsofuse.html") ||
-        license.equals("http://pubs.acs.org/page/policy/authorchoice_ccbyncnd_termsofuse.html") ||
+      //ACS Publications Author choice licenses (considered OPEN also by Unpaywall)
+      license.equals("http://pubs.acs.org/page/policy/authorchoice_ccby_termsofuse.html") ||
+      license.equals("http://pubs.acs.org/page/policy/authorchoice_termsofuse.html") ||
+      license.equals("http://pubs.acs.org/page/policy/authorchoice_ccbyncnd_termsofuse.html") ||
 
-        //APA (considered OPEN also by Unpaywall)
-        license.equals("http://www.apa.org/pubs/journals/resources/open-access.aspx")
+      //APA (considered OPEN also by Unpaywall)
+      license.equals("http://www.apa.org/pubs/journals/resources/open-access.aspx")
     ) {
 
       val oaq: AccessRight = getOpenAccessQualifier()
@@ -197,23 +222,92 @@ case object Crossref2Oaf {
 
   }
 
+  def isValidAuthorName(fullName: String): Boolean = {
+    if (fullName == null || fullName.isEmpty)
+      return false
+    if (invalidName.contains(fullName.toLowerCase.trim))
+      return false
+    true
+  }
 
+  def filterResult(publication: Result): Boolean = {
 
-  def mappingResult(result: Result, json: JValue, instanceType:Qualifier, originalType: String): Result = {
+    //Case empty publication
+    if (publication == null)
+      return false
+    if (publication.getId == null || publication.getId.isEmpty)
+      return false
+
+    //Case publication with no title
+    if (publication.getTitle == null || publication.getTitle.size == 0)
+      return false
+
+    val s = publication.getTitle.asScala.count(p =>
+      p.getValue != null
+      && p.getValue.nonEmpty && !p.getValue.equalsIgnoreCase("[NO TITLE AVAILABLE]")
+    )
+
+    if (s == 0)
+      return false
+
+    // fixes #4360 (test publisher)
+    val publisher =
+      if (publication.getPublisher != null) publication.getPublisher.getValue else null
+
+    if (
+      publisher != null && (publisher.equalsIgnoreCase("Test accounts") || publisher
+        .equalsIgnoreCase("CrossRef Test Account"))
+    ) {
+      return false;
+    }
+
+    //RELAXED this constraint
+    //Publication with no Author
+    if (publication.getAuthor == null || publication.getAuthor.size() == 0)
+      return true
+
+    //filter invalid author
+    val authors = publication.getAuthor.asScala.map(s => {
+      if (s.getFullname.nonEmpty) {
+        s.getFullname
+      } else
+        s"${s.getName} ${s.getSurname}"
+    })
+
+    val c = authors.count(isValidAuthorName)
+    if (c == 0)
+      return false
+
+    // fixes #4368
+    if (
+      authors.count(s => s.equalsIgnoreCase("Addie Jackson")) > 0 && "Elsevier BV".equalsIgnoreCase(
+        publication.getPublisher.getValue
+      )
+    )
+      return false
+
+    true
+  }
+
+  def mappingResult(result: Result, json: JValue, instanceType: Qualifier, originalType: String): Result = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
     //MAPPING Crossref DOI into PID
     val doi: String = DoiCleaningRule.normalizeDoi((json \ "DOI").extract[String])
-    result.setPid(List(structuredProperty(
-     doi,
-      qualifier(
-        PidType.doi.toString,
-        PidType.doi.toString,
-        ModelConstants.DNET_PID_TYPES,
-        ModelConstants.DNET_PID_TYPES
-      ),
-      null
-    )).asJava)
+    result.setPid(
+      List(
+        structuredProperty(
+          doi,
+          qualifier(
+            PidType.doi.toString,
+            PidType.doi.toString,
+            ModelConstants.DNET_PID_TYPES,
+            ModelConstants.DNET_PID_TYPES
+          ),
+          null
+        )
+      ).asJava
+    )
 
     //MAPPING Crossref DOI into OriginalId
     //and Other Original Identifier of dataset like clinical-trial-number
@@ -251,7 +345,9 @@ case object Crossref2Oaf {
     val subtitles =
       for { JString(title) <- json \ "subtitle" if title.nonEmpty } yield structuredProperty(
         title,
-          ModelConstants.SUBTITLE_QUALIFIER, null)
+        ModelConstants.SUBTITLE_QUALIFIER,
+        null
+      )
     result.setTitle((mainTitles ::: originalTitles ::: shortTitles ::: subtitles).asJava)
 
     // DESCRIPTION
@@ -302,9 +398,9 @@ case object Crossref2Oaf {
       (json \ "issued" \ "date-parts").extract[List[List[Int]]]
     )
     if (StringUtils.isNotBlank(issuedDate)) {
-      result.setDateofacceptance(field(issuedDate,null))
+      result.setDateofacceptance(field(issuedDate, null))
     } else {
-      result.setDateofacceptance(field(createdDate.getValue,null))
+      result.setDateofacceptance(field(createdDate.getValue, null))
     }
     result.setRelevantdate(
       List(createdDate, postedDate, acceptedDate, publishedOnlineDate, publishedPrintDate)
@@ -317,7 +413,7 @@ case object Crossref2Oaf {
 
     if (subjectList.nonEmpty) {
       result.setSubject(
-        subjectList.map(s => subject(s,ModelConstants.SUBTITLE_QUALIFIER,null)).asJava
+        subjectList.map(s => subject(s, ModelConstants.SUBTITLE_QUALIFIER, null)).asJava
       )
     }
 
@@ -339,7 +435,7 @@ case object Crossref2Oaf {
       JObject(license)                                    <- json \ "license"
       JField("URL", JString(lic))                         <- license
       JField("content-version", JString(content_version)) <- license
-    } yield (field[String](lic,null), content_version)
+    } yield (field[String](lic, null), content_version)
     val l = license.filter(d => StringUtils.isNotBlank(d._1.getValue))
     if (l.nonEmpty) {
       if (l exists (d => d._2.equals("vor"))) {
@@ -382,9 +478,9 @@ case object Crossref2Oaf {
 
     instance.setCollectedfrom(createCrossrefCollectedFrom())
     if (StringUtils.isNotBlank(issuedDate)) {
-      instance.setDateofacceptance(field(issuedDate,null))
+      instance.setDateofacceptance(field(issuedDate, null))
     } else {
-      instance.setDateofacceptance(field(createdDate.getValue,null))
+      instance.setDateofacceptance(field(createdDate.getValue, null))
     }
     val s: List[String] = List("https://doi.org/" + doi)
     //    val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null && p.toLowerCase().contains(doi.toLowerCase())).distinct
@@ -415,6 +511,7 @@ case object Crossref2Oaf {
     else
       result
   }
+
   def generateIdentifier(oaf: Result, doi: String): String = {
     val id = DHPUtils.md5(doi.toLowerCase)
     s"50|doiboost____|$id"
@@ -431,7 +528,12 @@ case object Crossref2Oaf {
         List(
           structuredProperty(
             orcid,
-            qualifier( ModelConstants.ORCID_PENDING, ModelConstants.ORCID_PENDING, ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES),
+            qualifier(
+              ModelConstants.ORCID_PENDING,
+              ModelConstants.ORCID_PENDING,
+              ModelConstants.DNET_PID_TYPES,
+              ModelConstants.DNET_PID_TYPES
+            ),
             generateDataInfo()
           )
         ).asJava
@@ -441,22 +543,22 @@ case object Crossref2Oaf {
   }
 
   /** *
-   * Use the vocabulary dnet:publication_resource to find a synonym to one of these terms and get the instance.type.
-   * Using the dnet:result_typologies vocabulary, we look up the instance.type synonym
-   * to generate one of the following main entities:
-   *  - publication
-   *  - dataset
-   *  - software
-   *  - otherresearchproduct
-   *
-   * @param resourceType
-   * @param vocabularies
-   * @return
-   */
+    * Use the vocabulary dnet:publication_resource to find a synonym to one of these terms and get the instance.type.
+    * Using the dnet:result_typologies vocabulary, we look up the instance.type synonym
+    * to generate one of the following main entities:
+    *  - publication
+    *  - dataset
+    *  - software
+    *  - otherresearchproduct
+    *
+    * @param resourceType
+    * @param vocabularies
+    * @return
+    */
   def getTypeQualifier(
-                        resourceType: String,
-                        vocabularies: VocabularyGroup
-                      ): (Qualifier, Qualifier, String) = {
+    resourceType: String,
+    vocabularies: VocabularyGroup
+  ): (Qualifier, Qualifier, String) = {
     if (resourceType != null && resourceType.nonEmpty) {
       val typeQualifier =
         vocabularies.getSynonymAsQualifier(ModelConstants.DNET_PUBLICATION_RESOURCE, resourceType)
@@ -473,17 +575,16 @@ case object Crossref2Oaf {
     null
   }
 
-  def convert(input: String, vocabularies: VocabularyGroup): List[Oaf] = {
+  def convert(input: String, vocabularies: VocabularyGroup): List[CrossrefResult] = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(input)
 
-    var resultList: List[Oaf] = List()
+    var resultList: List[CrossrefResult] = List()
 
     val objectType = (json \ "type").extractOrElse[String](null)
-    val objectSubType = (json \ "subtype").extractOrElse[String](null)
     if (objectType == null)
       return resultList
-    val typology =getTypeQualifier(objectType, vocabularies)
+    val typology = getTypeQualifier(objectType, vocabularies)
 
     if (typology == null)
       return List()
@@ -507,7 +608,7 @@ case object Crossref2Oaf {
         createCrossrefCollectedFrom(),
         result.getDataInfo,
         result.getLastupdatetimestamp
-      )
+      ).map(s => CrossrefResult(s.getClass.getSimpleName, mapper.writeValueAsString(s)))
     }
 
     result match {
@@ -522,10 +623,15 @@ case object Crossref2Oaf {
 
     if (doisReference != null && doisReference.nonEmpty) {
       val citation_relations: List[Relation] = generateCitationRelations(doisReference, result)
-      resultList = resultList ::: citation_relations
+      resultList = resultList ::: citation_relations.map(s =>
+        CrossrefResult(s.getClass.getSimpleName, mapper.writeValueAsString(s))
+      )
     }
-    resultList = resultList ::: List(result)
-    resultList
+    if (!filterResult(result))
+      List()
+    else
+      resultList ::: List(result).map(s => CrossrefResult(s.getClass.getSimpleName, mapper.writeValueAsString(s)))
+
   }
 
   private def createCiteRelation(source: Result, targetPid: String, targetPidType: String): List[Relation] = {
@@ -752,10 +858,10 @@ case object Crossref2Oaf {
         val source = s"${containerTitles.head} ISBN: ${ISBN.head}"
         if (publication.getSource != null) {
           val l: List[Field[String]] = publication.getSource.asScala.toList
-          val ll: List[Field[String]] = l ::: List(field(source,null))
+          val ll: List[Field[String]] = l ::: List(field(source, null))
           publication.setSource(ll.asJava)
         } else
-          publication.setSource(List(field(source,null)).asJava)
+          publication.setSource(List(field(source, null)).asJava)
       }
     } else {
       // Mapping Journal
@@ -823,7 +929,7 @@ case object Crossref2Oaf {
   ): StructuredProperty = {
     val dp = extractDate(dt, datePart)
     if (StringUtils.isNotBlank(dp))
-      return structuredProperty(dp, qualifier(classId,classId, schemeId, schemeId),null)
+      return structuredProperty(dp, qualifier(classId, classId, schemeId, schemeId), null)
     null
   }
 
@@ -836,12 +942,11 @@ case object Crossref2Oaf {
       val item = new Dataset
       item.setResourcetype(objectType)
       return item
-    }
-    else if (objectType.getClassid.equalsIgnoreCase("software")){
+    } else if (objectType.getClassid.equalsIgnoreCase("software")) {
       val item = new Software
       item.setResourcetype(objectType)
       return item
-    }else if (objectType.getClassid.equalsIgnoreCase("OtherResearchProduct")){
+    } else if (objectType.getClassid.equalsIgnoreCase("OtherResearchProduct")) {
       val item = new OtherResearchProduct
       item.setResourcetype(objectType)
       return item
