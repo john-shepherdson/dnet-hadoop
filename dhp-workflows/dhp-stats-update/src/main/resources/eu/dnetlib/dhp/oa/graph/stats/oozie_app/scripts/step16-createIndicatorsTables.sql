@@ -58,7 +58,7 @@ select distinct r.id, (case when lic='' or lic is null then 0 else 1 end) as has
 from ${stats_db_name}.result r
 left outer join (select r.id, license.type as lic from ${stats_db_name}.result r
                                                                     join ${stats_db_name}.result_licenses as license on license.id = r.id
-                          where lower(license.type) LIKE '%creativecommons.org%' OR lower(license.type) LIKE '%cc-%') tmp
+                          where lower(license.type) LIKE '%creativecommons.org%' OR lower(license.type) LIKE '%cc %') tmp
                          on r.id= tmp.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_result_has_cc_licence_url purge; /*EOS*/
@@ -856,19 +856,6 @@ drop view pub_fos_totals; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_pub_bronze_oa purge; /*EOS*/
 
---create table if not exists ${stats_db_name}.indi_pub_bronze_oa stored as parquet as
---select distinct p.id, coalesce(is_bronze_oa,0) as is_bronze_oa
---from ${stats_db_name}.publication p
---left outer join
---(select p.id, 1 as is_bronze_oa from ${stats_db_name}.publication p
---join ${stats_db_name}.indi_result_has_cc_licence cc on cc.id=p.id
---join ${stats_db_name}.indi_pub_gold_oa ga on ga.id=p.id
---join ${stats_db_name}.result_instance ri on ri.id=p.id
---join ${stats_db_name}.datasource d on d.id=ri.hostedby
---where cc.has_cc_license=0 and ga.is_gold=0
---and (d.type='Journal' or d.type='Journal Aggregator/Publisher')
---and ri.accessright='Open Access') tmp on tmp.id=p.id;
-
 create table ${stats_db_name}.indi_pub_bronze_oa stored as parquet as
 select distinct pd.id,coalesce(is_bronze_oa,0) is_bronze_oa from ${stats_db_name}.publication pd
 left outer join (select pd.id, 1 as is_bronze_oa from ${stats_db_name}.publication pd
@@ -1239,47 +1226,11 @@ where r.bestlicence='Open Access') tmp on r.id=tmp.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_result_under_transformative purge; /*EOS*/
 create table ${stats_db_name}.indi_result_under_transformative stored as parquet as
-with transformative_dois as
-(select distinct doi from stats_ext.transformative_facts)
+with transformative_dois as (
+    select distinct doi from stats_ext.transformative_facts)
 select distinct r.id, coalesce(under_transformative,0) as under_transformative
 from ${stats_db_name}.result r
-left outer join (select distinct rp.id, 1 as under_transformative
-from ${stats_db_name}.result_pids rp join ${stats_db_name}.result r on r.id=rp.id
-join transformative_dois td on td.doi=rp.pid) tmp on r.id=tmp.id; /*EOS*/
-
-select distinct ro.id, coalesce(o.country, f.country) as country
-from ${stats_db_name}.result_organization ro
-left outer join ${stats_db_name}.organization o on o.id=ro.organization
-left outer join ${stats_db_name}.result_projects rp on rp.id=ro.id
-left outer join ${stats_db_name}.project p on p.id=rp.project
-left outer join ${stats_db_name}.funder f on f.name=p.funder
-where coalesce(o.country, f.country) IS NOT NULL; /*EOS*/
-
-drop table if exists ${stats_db_name}.indi_result_oa_with_license purge; /*EOS*/
-create table ${stats_db_name}.indi_result_oa_with_license stored as parquet as
-select distinct r.id, coalesce(oa_with_license,0) as oa_with_license
-from ${stats_db_name}.result r
-left outer join (select distinct r.id, 1 as oa_with_license from ${stats_db_name}.result r
-join ${stats_db_name}.result_licenses rl on rl.id=r.id where r.bestlicence='Open Access') tmp on r.id=tmp.id; /*EOS*/
-
-drop table if exists ${stats_db_name}.indi_result_oa_without_license purge; /*EOS*/
-create table ${stats_db_name}.indi_result_oa_without_license stored as parquet as
-with without_license as
-(select distinct id from ${stats_db_name}.indi_result_oa_with_license
-where oa_with_license=0)
-select distinct r.id, coalesce(oa_without_license,0) as oa_without_license
-from ${stats_db_name}.result r
-left outer join (select distinct r.id, 1 as oa_without_license
-from ${stats_db_name}.result r
-join without_license wl on wl.id=r.id
-where r.bestlicence='Open Access') tmp on r.id=tmp.id; /*EOS*/
-
-drop table if exists ${stats_db_name}.indi_result_under_transformative purge; /*EOS*/
-create table ${stats_db_name}.indi_result_under_transformative stored as parquet as
-with transformative_dois as
-(select distinct doi from stats_ext.transformative_facts)
-select distinct r.id, coalesce(under_transformative,0) as under_transformative
-from ${stats_db_name}.result r
-left outer join (select distinct rp.id, 1 as under_transformative
-from ${stats_db_name}.result_pids rp join ${stats_db_name}.result r on r.id=rp.id
-join transformative_dois td on td.doi=rp.pid) tmp on r.id=tmp.id; /*EOS*/
+left outer join (
+    select distinct rp.id, 1 as under_transformative
+    from ${stats_db_name}.result_pids rp join ${stats_db_name}.result r on r.id=rp.id
+    join transformative_dois td on td.doi=rp.pid) tmp on r.id=tmp.id; /*EOS*/
