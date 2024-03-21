@@ -58,7 +58,7 @@ select distinct r.id, (case when lic='' or lic is null then 0 else 1 end) as has
 from ${stats_db_name}.result r
 left outer join (select r.id, license.type as lic from ${stats_db_name}.result r
                                                                     join ${stats_db_name}.result_licenses as license on license.id = r.id
-                          where lower(license.type) LIKE '%creativecommons.org%' OR lower(license.type) LIKE '%cc-%') tmp
+                          where lower(license.type) LIKE '%creativecommons.org%' OR lower(license.type) LIKE '%cc %') tmp
                          on r.id= tmp.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_result_has_cc_licence_url purge; /*EOS*/
@@ -130,7 +130,7 @@ from tmp as o1 join tmp as o2 on o1.id=o2.id
 where o1.id=o2.id and o1.country!=o2.country
 group by o1.organization, o1.id, o1.name, o2.country; /*EOS*/
 
-drop table if exists  tmp purge; /*EOS*/
+DROP VIEW if exists tmp; /*EOS*/
 
 create TEMPORARY VIEW tmp AS
 select o.id organization, o.name, ro.project as project  from ${stats_db_name}.organization o
@@ -195,48 +195,40 @@ DROP VIEW if exists tmp; /*EOS*/
 ---- Sprint 4 ----
 drop table if exists ${stats_db_name}.indi_pub_diamond purge; /*EOS*/
 
---create table if not exists ${stats_db_name}.indi_pub_diamond stored as parquet as
---select distinct pd.id, coalesce(in_diamond_journal, 0) as in_diamond_journal
---from ${stats_db_name}.publication_datasources pd
---         left outer join (
---    select pd.id, 1 as in_diamond_journal from ${stats_db_name}.publication_datasources pd
---                                                   join ${stats_db_name}.datasource d on d.id=pd.datasource
---                                                   join STATS_EXT.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_online=d.issn_online)
---                                                                                 and (ps.journal_is_in_doaj=true or ps.journal_is_oa=true) and ps.has_apc=false) tmp
---                         on pd.id=tmp.id;
-
 create table if not exists ${stats_db_name}.indi_pub_diamond stored as parquet as
 select distinct pd.id, coalesce(in_diamond_journal, 0) as in_diamond_journal
 from ${stats_db_name}.publication_datasources pd
-left outer join (select pd.id, 1 as in_diamond_journal from ${stats_db_name}.publication_datasources pd
-join ${stats_db_name}.datasource d on d.id=pd.datasource
-join STATS_EXT.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_online=d.issn_online)
-and (ps.journal_is_in_doaj=true or ps.journal_is_oa=true) and ps.has_apc=false) tmp
-on pd.id=tmp.id; /*EOS*/
+left outer join (
+    select pd.id, 1 as in_diamond_journal
+    from ${stats_db_name}.publication_datasources pd
+    join ${stats_db_name}.datasource d on d.id=pd.datasource
+    join STATS_EXT.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_online=d.issn_online)
+        and (ps.journal_is_in_doaj=true or ps.journal_is_oa=true) and ps.has_apc=false) tmp on pd.id=tmp.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_pub_in_transformative purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_pub_in_transformative stored as parquet as
 select distinct pd.id, coalesce(is_transformative, 0) as is_transformative
 from ${stats_db_name}.publication pd
-         left outer join (
-    select  pd.id, 1 as is_transformative from ${stats_db_name}.publication_datasources pd
-                                                   join ${stats_db_name}.datasource d on d.id=pd.datasource
-                                                   join STATS_EXT.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_online=d.issn_online)
-                                                                                 and ps.is_transformative_journal=true) tmp
-                         on pd.id=tmp.id; /*EOS*/
+left outer join (
+    select  pd.id, 1 as is_transformative
+    from ${stats_db_name}.publication_datasources pd
+    join ${stats_db_name}.datasource d on d.id=pd.datasource
+    join STATS_EXT.plan_s_jn ps where (ps.issn_print=d.issn_printed and ps.issn_online=d.issn_online)
+        and ps.is_transformative_journal=true) tmp on pd.id=tmp.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_pub_closed_other_open purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.indi_pub_closed_other_open stored as parquet as
-select distinct ri.id, coalesce(pub_closed_other_open, 0) as pub_closed_other_open from ${stats_db_name}.result_instance ri
-                                                                                            left outer join
-                                                                                        (select ri.id, 1 as pub_closed_other_open from ${stats_db_name}.result_instance ri
-                                                                                                                                           join ${stats_db_name}.publication p on p.id=ri.id
-                                                                                                                                           join ${stats_db_name}.datasource d on ri.hostedby=d.id
-                                                                                         where d.type like '%Journal%' and ri.accessright='Closed Access' and
-                                                                                             (p.bestlicence='Open Access' or p.bestlicence='Open Source')) tmp
-                                                                                        on tmp.id=ri.id; /*EOS*/
+select distinct ri.id, coalesce(pub_closed_other_open, 0) as pub_closed_other_open
+from ${stats_db_name}.result_instance ri
+left outer join (
+    select ri.id, 1 as pub_closed_other_open
+    from ${stats_db_name}.result_instance ri
+    join ${stats_db_name}.publication p on p.id=ri.id
+    join ${stats_db_name}.datasource d on ri.hostedby=d.id
+    where d.type like '%Journal%' and ri.accessright='Closed Access' and
+        (p.bestlicence='Open Access' or p.bestlicence='Open Source')) tmp on tmp.id=ri.id; /*EOS*/
 
 ---- Sprint 5 ----
 drop table if exists ${stats_db_name}.indi_result_no_of_copies purge; /*EOS*/
@@ -284,77 +276,6 @@ GROUP BY result_id, repository_id, substring(us.`date`, 1,4); /*EOS*/
 ---- Sprint 7 ----
 drop table if exists ${stats_db_name}.indi_pub_gold_oa purge; /*EOS*/
 
---create table if not exists ${stats_db_name}.indi_pub_gold_oa stored as parquet as
---    WITH gold_oa AS (    SELECT
---        issn_l,
---        journal_is_in_doaj,
---        journal_is_oa,
---        issn_1 as issn
---        FROM
---        STATS_EXT.oa_journals
---        WHERE
---        issn_1 != ""
---        UNION
---        ALL SELECT
---        issn_l,
---        journal_is_in_doaj,
---        journal_is_oa,
---        issn_2 as issn
---        FROM
---        STATS_EXT.oa_journals
---        WHERE
---        issn_2 != "" ),  issn AS ( SELECT
---                                   *
---                                   FROM
---( SELECT
---                                   id,
---                                   issn_printed as issn
---                                   FROM
---                                   ${stats_db_name}.datasource
---                                   WHERE
---                                   issn_printed IS NOT NULL
---                                   UNION ALL
---                                   SELECT
---                                   id,
---                                   issn_online as issn
---                                   FROM
---                                   ${stats_db_name}.datasource
---                                   WHERE
---                                   issn_online IS NOT NULL or id like '%doajarticles%') as issn
---    WHERE
---    LENGTH(issn) > 7)
---SELECT
---    DISTINCT pd.id, coalesce(is_gold, 0) as is_gold
---FROM
---    ${stats_db_name}.publication_datasources pd
---        left outer join(
---        select pd.id, 1 as is_gold FROM ${stats_db_name}.publication_datasources pd
---                                            JOIN issn on issn.id=pd.datasource
---                                            JOIN gold_oa  on issn.issn = gold_oa.issn) tmp
---                       on pd.id=tmp.id;
-
---create table if not exists ${stats_db_name}.indi_pub_gold_oa stored as parquet as
---with gold_oa as (
---SELECT issn,issn_l from stats_ext.issn_gold_oa_dataset_v5),
---issn AS (SELECT * FROM
---(SELECT id,issn_printed as issn FROM ${stats_db_name}.datasource
---WHERE issn_printed IS NOT NULL
---UNION ALL
---SELECT id, issn_online as issn FROM ${stats_db_name}.datasource
---WHERE issn_online IS NOT NULL or id like '%doajarticles%') as issn
---WHERE LENGTH(issn) > 7),
---alljournals AS(select issn, issn_l from stats_ext.alljournals
---where journal_is_in_doaj=true or journal_is_oa=true)
---SELECT DISTINCT pd.id, coalesce(is_gold, 0) as is_gold
---FROM ${stats_db_name}.publication_datasources pd
---left outer join (
---select pd.id, 1 as is_gold FROM ${stats_db_name}.publication_datasources pd
---JOIN issn on issn.id=pd.datasource
---JOIN gold_oa  on issn.issn = gold_oa.issn
---join alljournals on issn.issn=alljournals.issn
---left outer join ${stats_db_name}.result_instance ri on ri.id=pd.id
---and ri.accessright!='Closed Access' and ri.accessright_uw='gold') tmp
---on pd.id=tmp.id;
 create table if not exists ${stats_db_name}.indi_pub_gold_oa stored as parquet as
 with gold_oa as (
 select distinct issn from (
@@ -407,89 +328,25 @@ create table if not exists ${stats_db_name}.indi_pub_hybrid_oa_with_cc stored as
     WHERE LENGTH(issn) > 7)
 SELECT DISTINCT pd.id, coalesce(is_hybrid_oa, 0) as is_hybrid_oa
 FROM ${stats_db_name}.publication_datasources pd
-         LEFT OUTER JOIN (
+LEFT OUTER JOIN (
     SELECT pd.id, 1 as is_hybrid_oa from ${stats_db_name}.publication_datasources pd
-                                             JOIN ${stats_db_name}.datasource d on d.id=pd.datasource
-                                             JOIN issn on issn.id=pd.datasource
-                                             JOIN hybrid_oa ON issn.issn = hybrid_oa.issn
-                                             JOIN ${stats_db_name}.indi_result_has_cc_licence cc on pd.id=cc.id
-                                             JOIN ${stats_db_name}.indi_pub_gold_oa ga on pd.id=ga.id
-    where cc.has_cc_license=1 and ga.is_gold=0) tmp on pd.id=tmp.id; /*EOS*/
+    JOIN ${stats_db_name}.datasource d on d.id=pd.datasource
+    JOIN issn on issn.id=pd.datasource
+    JOIN hybrid_oa ON issn.issn = hybrid_oa.issn
+    JOIN ${stats_db_name}.indi_result_has_cc_licence cc on pd.id=cc.id
+    JOIN ${stats_db_name}.indi_pub_gold_oa ga on pd.id=ga.id where cc.has_cc_license=1 and ga.is_gold=0) tmp on pd.id=tmp.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_pub_hybrid purge; /*EOS*/
 
---create table if not exists ${stats_db_name}.indi_pub_hybrid stored as parquet as
---    WITH gold_oa AS ( SELECT
---        issn_l,
---        journal_is_in_doaj,
---        journal_is_oa,
---        issn_1 as issn,
---        has_apc
---        FROM
---        STATS_EXT.oa_journals
---        WHERE
---        issn_1 != ""
---        UNION
---        ALL SELECT
---        issn_l,
---        journal_is_in_doaj,
---        journal_is_oa,
---        issn_2 as issn,
---        has_apc
---        FROM
---        STATS_EXT.oa_journals
---        WHERE
---        issn_2 != "" ),  issn AS ( SELECT
---                                   *
---                                   FROM
---( SELECT
---                                   id,
---                                   issn_printed as issn
---                                   FROM
---                                   ${stats_db_name}.datasource
---                                   WHERE
---                                   issn_printed IS NOT NULL
---                                   UNION ALL
---                                   SELECT
---                                   id,
---                                   issn_online as issn
---                                   FROM
---                                   ${stats_db_name}.datasource
---                                   WHERE
---                                   issn_online IS NOT NULL or id like '%doajarticles%') as issn
---    WHERE
---    LENGTH(issn) > 7)
---select distinct pd.id, coalesce(is_hybrid, 0) as is_hybrid
---from ${stats_db_name}.publication_datasources pd
---         left outer join (
---    select pd.id, 1 as is_hybrid from ${stats_db_name}.publication_datasources pd
---                                          join ${stats_db_name}.datasource d on d.id=pd.datasource
---                                          join issn on issn.id=pd.datasource
---                                          join gold_oa on issn.issn=gold_oa.issn
---    where (gold_oa.journal_is_in_doaj=false or gold_oa.journal_is_oa=false))tmp
---                         on pd.id=tmp.id;
-
---create table if not exists ${stats_db_name}.indi_pub_hybrid stored as parquet as
---select distinct pd.id,coalesce(is_hybrid,0) is_hybrid from ${stats_db_name}.publication_datasources pd
---left outer join (select pd.id, 1 as is_hybrid from ${stats_db_name}.publication_datasources pd
---join ${stats_db_name}.datasource d on pd.datasource=d.id
---join ${stats_db_name}.result_instance ri on ri.id=pd.id
---join ${stats_db_name}.indi_pub_gold_oa indi_gold on indi_gold.id=pd.id
---join ${stats_db_name}.result_accessroute ra on ra.id=pd.id
---where d.type like '%Journal%' and ri.accessright!='Closed Access' and (ri.accessright_uw!='gold'
---or indi_gold.is_gold=0) and (ra.accessroute='hybrid' or ri.license is not null)) tmp
---on pd.id=tmp.id;
-
 create table if not exists ${stats_db_name}.indi_pub_hybrid stored as parquet as
 select distinct pd.id,coalesce(is_hybrid,0) is_hybrid from ${stats_db_name}.publication pd
-left outer join (select pd.id, 1 as is_hybrid from ${stats_db_name}.publication pd
-join ${stats_db_name}.result_instance ri on ri.id=pd.id
-join ${stats_db_name}.indi_pub_gold_oa indi_gold on indi_gold.id=pd.id
-join ${stats_db_name}.result_accessroute ra on ra.id=pd.id
-join ${stats_db_name}.datasource d on d.id=ri.hostedby
-where indi_gold.is_gold=0 and ((d.type like '%Journal%' and ri.accessright!='Closed Access' and ri.accessright!='Restricted' and ri.license is not null) or
-ra.accessroute='hybrid'))tmp
-on pd.id=tmp.id; /*EOS*/
+left outer join (
+    select pd.id, 1 as is_hybrid from ${stats_db_name}.publication pd
+    join ${stats_db_name}.result_instance ri on ri.id=pd.id
+    join ${stats_db_name}.indi_pub_gold_oa indi_gold on indi_gold.id=pd.id
+    join ${stats_db_name}.result_accessroute ra on ra.id=pd.id
+    join ${stats_db_name}.datasource d on d.id=ri.hostedby
+    where indi_gold.is_gold=0 and ((d.type like '%Journal%' and ri.accessright!='Closed Access' and ri.accessright!='Restricted' and ri.license is not null) or ra.accessroute='hybrid')) tmp on pd.id=tmp.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_org_fairness purge; /*EOS*/
 
@@ -533,6 +390,9 @@ create table if not exists ${stats_db_name}.indi_org_fairness_pub_pr stored as p
 select ar.organization, rf.no_result_fair/ar.no_allresults org_fairness
 from allresults ar
          join result_fair rf on rf.organization=ar.organization; /*EOS*/
+
+DROP VIEW result_fair;
+DROP VIEW allresults;
 
 CREATE TEMPORARY VIEW result_fair as
     select year, ro.organization organization, count(distinct ro.id) no_result_fair from ${stats_db_name}.result_organization ro
@@ -1201,11 +1061,10 @@ create table ${stats_db_name}.indi_pub_green_with_license stored as parquet as
 select distinct p.id, coalesce(green_with_license, 0) as green_with_license
 from ${stats_db_name}.publication p
 left outer join (
-select distinct p.id, 1 as green_with_license from ${stats_db_name}.publication p
-join ${stats_db_name}.result_instance ri on ri.id = p.id
-join ${stats_db_name}.datasource on datasource.id = ri.hostedby
-where ri.license is not null and datasource.type like '%Repository%' and datasource.name!='Other') tmp
-on p.id= tmp.id; /*EOS*/
+    select distinct p.id, 1 as green_with_license from ${stats_db_name}.publication p
+    join ${stats_db_name}.result_instance ri on ri.id = p.id
+    join ${stats_db_name}.datasource on datasource.id = ri.hostedby
+    where ri.license is not null and datasource.type like '%Repository%' and datasource.name!='Other') tmp on p.id= tmp.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.result_country purge; /*EOS*/
 
