@@ -36,7 +36,7 @@ import scala.Tuple2;
  */
 public class PrepareDblpActionSets implements Serializable {
 
-	private static final Logger log = LoggerFactory.getLogger(PrepareAffiliationRelations.class);
+	private static final Logger log = LoggerFactory.getLogger(PrepareDblpActionSets.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	private static final String ID_PREFIX = "50|doi_________::";
 	public static final String BIP_AFFILIATIONS_CLASSID = "result:organization:bipinference";
@@ -47,7 +47,7 @@ public class PrepareDblpActionSets implements Serializable {
 
 		String jsonConfiguration = IOUtils
 			.toString(
-				PrepareAffiliationRelations.class
+					PrepareDblpActionSets.class
 					.getResourceAsStream(
 						"/eu/dnetlib/dhp/actionmanager/dblp/input_actionset_parameter.json"));
 
@@ -79,7 +79,7 @@ public class PrepareDblpActionSets implements Serializable {
 
 				dblpData
 					.saveAsHadoopFile(
-						outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
+						outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);
 
 			});
 	}
@@ -88,6 +88,8 @@ public class PrepareDblpActionSets implements Serializable {
 		String inputPath,
 		List<KeyValue> collectedFrom) {
 
+		log.info("Reading DBLP XML data");
+//
 //		TODO: load DBLP data into a Dataset
 		Dataset<Row> df = spark
 			.read()

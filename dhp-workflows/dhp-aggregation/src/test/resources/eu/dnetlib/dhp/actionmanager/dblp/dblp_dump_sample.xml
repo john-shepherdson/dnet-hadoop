@@ -1,0 +1,1220 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE dblp SYSTEM "dblp.dtd">
+<dblp>
+    <incollection mdate="2017-07-12" key="reference/vision/X14bd" publtype="encyclopedia">
+        <title>Curvedness.</title>
+        <pages>159</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100117</ee>
+        <url>db/reference/vision/vision2014.html#X14bd</url>
+    </incollection>
+    <incollection mdate="2019-01-09" key="reference/vision/Singh14" publtype="encyclopedia">
+        <author>Manish Singh 0001</author>
+        <title>Transparency and Translucency.</title>
+        <pages>815-819</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_559</ee>
+        <url>db/reference/vision/vision2014.html#Singh14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14ii" publtype="encyclopedia">
+        <title>Surface Orientation Histogram (Discrete Version of EGI).</title>
+        <pages>781</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100229</ee>
+        <url>db/reference/vision/vision2014.html#X14ii</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14m" publtype="encyclopedia">
+        <title>Appearance Scanning.</title>
+        <pages>36</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100189</ee>
+        <url>db/reference/vision/vision2014.html#X14m</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Wong14" publtype="encyclopedia">
+        <author>Tien-Tsin Wong</author>
+        <title>Image-Based Lighting.</title>
+        <pages>387-390</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_14</ee>
+        <url>db/reference/vision/vision2014.html#Wong14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14gt" publtype="encyclopedia">
+        <title>Radiometric Camera Calibration.</title>
+        <pages>658</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100172</ee>
+        <url>db/reference/vision/vision2014.html#X14gt</url>
+    </incollection>
+    <incollection mdate="2018-11-02" key="reference/vision/Pont14b" publtype="encyclopedia">
+        <author orcid="0000-0002-9834-9600">Sylvia C. Pont</author>
+        <title>Surface Roughness.</title>
+        <pages>781-782</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_539</ee>
+        <url>db/reference/vision/vision2014.html#Pont14b</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Alexander14" publtype="encyclopedia">
+        <author>Daniel C. Alexander</author>
+        <title>Image Registration.</title>
+        <pages>380-385</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_194</ee>
+        <url>db/reference/vision/vision2014.html#Alexander14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Fukui14" publtype="encyclopedia">
+        <author>Kazuhiro Fukui</author>
+        <title>Subspace Methods.</title>
+        <pages>777-781</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_708</ee>
+        <url>db/reference/vision/vision2014.html#Fukui14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14if" publtype="encyclopedia">
+        <title>Structure-from-Motion (SfM).</title>
+        <pages>775</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100254</ee>
+        <url>db/reference/vision/vision2014.html#X14if</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14w" publtype="encyclopedia">
+        <title>Body Configuration Recovery.</title>
+        <pages>59</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100211</ee>
+        <url>db/reference/vision/vision2014.html#X14w</url>
+    </incollection>
+    <incollection mdate="2020-03-11" key="reference/vision/SrivastavaPKTA14" publtype="encyclopedia">
+        <author>Gaurav Srivastava 0004</author>
+        <author>Johnny Park</author>
+        <author>Avinash C. Kak</author>
+        <author>Birgi Tamersoy</author>
+        <author>J. K. Aggarwal</author>
+        <title>Multi-camera Human Action Recognition.</title>
+        <pages>501-511</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_776</ee>
+        <url>db/reference/vision/vision2014.html#SrivastavaPKTA14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Zhang14q" publtype="encyclopedia">
+        <author>Zhengyou Zhang</author>
+        <title>Iterative Closest Point (ICP).</title>
+        <pages>433-434</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_179</ee>
+        <url>db/reference/vision/vision2014.html#Zhang14q</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Gall14" publtype="encyclopedia">
+        <author>Juergen Gall</author>
+        <title>Simulated Annealing.</title>
+        <pages>737-741</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_680</ee>
+        <url>db/reference/vision/vision2014.html#Gall14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14ew" publtype="encyclopedia">
+        <title>Multisensor Data Fusion.</title>
+        <pages>516</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100091</ee>
+        <url>db/reference/vision/vision2014.html#X14ew</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14hp" publtype="encyclopedia">
+        <title>Semidefinite Optimization.</title>
+        <pages>716</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100253</ee>
+        <url>db/reference/vision/vision2014.html#X14hp</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Hartley14" publtype="encyclopedia">
+        <author>Richard I. Hartley</author>
+        <title>Projective Reconstruction.</title>
+        <pages>640-651</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_784</ee>
+        <url>db/reference/vision/vision2014.html#Hartley14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14au" publtype="encyclopedia">
+        <title>Computer Vision.</title>
+        <pages>145</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100073</ee>
+        <url>db/reference/vision/vision2014.html#X14au</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14ay" publtype="encyclopedia">
+        <title>Conditional Random Fields.</title>
+        <pages>146</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100233</ee>
+        <url>db/reference/vision/vision2014.html#X14ay</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14je" publtype="encyclopedia">
+        <title>Underwater Radiative Transfer Processes.</title>
+        <pages>837</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100197</ee>
+        <url>db/reference/vision/vision2014.html#X14je</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/PoggioU14" publtype="encyclopedia">
+        <author>Tomaso A. Poggio</author>
+        <author>Shimon Ullman</author>
+        <title>Machine Recognition of Objects.</title>
+        <pages>469-472</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_793</ee>
+        <url>db/reference/vision/vision2014.html#PoggioU14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14fz" publtype="encyclopedia">
+        <title>Partitioning.</title>
+        <pages>589</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100059</ee>
+        <url>db/reference/vision/vision2014.html#X14fz</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14gv" publtype="encyclopedia">
+        <title>Recognition-By-Components (RBC) Theory.</title>
+        <pages>663</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100121</ee>
+        <url>db/reference/vision/vision2014.html#X14gv</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14gb" publtype="encyclopedia">
+        <title>Perspective Projection.</title>
+        <pages>592</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100003</ee>
+        <url>db/reference/vision/vision2014.html#X14gb</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14gn" publtype="encyclopedia">
+        <title>Projection Matrix.</title>
+        <pages>639</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100004</ee>
+        <url>db/reference/vision/vision2014.html#X14gn</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14av" publtype="encyclopedia">
+        <title>Computing Architectures for Machine Perception.</title>
+        <pages>145</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100298</ee>
+        <url>db/reference/vision/vision2014.html#X14av</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14in" publtype="encyclopedia">
+        <title>Surveillance Camera.</title>
+        <pages>782</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100162</ee>
+        <url>db/reference/vision/vision2014.html#X14in</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14ez" publtype="encyclopedia">
+        <title>Network Camera.</title>
+        <pages>523</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100161</ee>
+        <url>db/reference/vision/vision2014.html#X14ez</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Zickler14" publtype="encyclopedia">
+        <author>Todd E. Zickler</author>
+        <title>Photometric Invariants.</title>
+        <pages>599-603</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_544</ee>
+        <url>db/reference/vision/vision2014.html#Zickler14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14dl" publtype="encyclopedia">
+        <title>Interface Reflection.</title>
+        <pages>422</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100181</ee>
+        <url>db/reference/vision/vision2014.html#X14dl</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Beyerer14" publtype="encyclopedia">
+        <author>J&uuml;rgen Beyerer</author>
+        <title>Mirrors.</title>
+        <pages>483-486</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100</ee>
+        <url>db/reference/vision/vision2014.html#Beyerer14</url>
+    </incollection>
+    <incollection mdate="2018-11-02" key="reference/vision/Rusinkiewicz14" publtype="encyclopedia">
+        <author orcid="0000-0002-4253-2588">Szymon Rusinkiewicz</author>
+        <title>Reflectance Models.</title>
+        <pages>674-677</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_537</ee>
+        <url>db/reference/vision/vision2014.html#Rusinkiewicz14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Agrawal14" publtype="encyclopedia">
+        <author>Amit K. Agrawal</author>
+        <title>Multi-focus Images.</title>
+        <pages>511-513</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_445</ee>
+        <url>db/reference/vision/vision2014.html#Agrawal14</url>
+    </incollection>
+    <incollection mdate="2019-10-17" key="reference/vision/ShenGCB14" publtype="encyclopedia">
+        <author>Rui Shen</author>
+        <author>Gaopeng Gou</author>
+        <author>Irene Cheng 0001</author>
+        <author>Anup Basu</author>
+        <title>Active Calibration.</title>
+        <pages>5</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_283</ee>
+        <url>db/reference/vision/vision2014.html#ShenGCB14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Pietikainen14" publtype="encyclopedia">
+        <author>Matti Pietik&auml;inen</author>
+        <title>Texture Recognition.</title>
+        <pages>789-793</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_328</ee>
+        <url>db/reference/vision/vision2014.html#Pietikainen14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14jv" publtype="encyclopedia">
+        <title>Volumetric Texture.</title>
+        <pages>874</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100072</ee>
+        <url>db/reference/vision/vision2014.html#X14jv</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Agrawal14a" publtype="encyclopedia">
+        <author>Amit K. Agrawal</author>
+        <title>Vignetting.</title>
+        <pages>854-856</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_563</ee>
+        <url>db/reference/vision/vision2014.html#Agrawal14a</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Basri14" publtype="encyclopedia">
+        <author>Ronen Basri</author>
+        <title>Photometric Stereo.</title>
+        <pages>603-608</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_254</ee>
+        <url>db/reference/vision/vision2014.html#Basri14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Zach14" publtype="encyclopedia">
+        <author>Christopher Zach</author>
+        <title>Dense Reconstruction.</title>
+        <pages>179-181</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_197</ee>
+        <url>db/reference/vision/vision2014.html#Zach14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14dh" publtype="encyclopedia">
+        <title>Implicit Polynomial Surface.</title>
+        <pages>399</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100120</ee>
+        <url>db/reference/vision/vision2014.html#X14dh</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14ax" publtype="encyclopedia">
+        <title>Concurrent Mapping and Localization (CML).</title>
+        <pages>146</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100077</ee>
+        <url>db/reference/vision/vision2014.html#X14ax</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Koenderink14c" publtype="encyclopedia">
+        <author>Jan J. Koenderink</author>
+        <title>Osculating Paraboloids.</title>
+        <pages>575-580</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_781</ee>
+        <url>db/reference/vision/vision2014.html#Koenderink14c</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14s" publtype="encyclopedia">
+        <title>Backscattering.</title>
+        <pages>43</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100957</ee>
+        <url>db/reference/vision/vision2014.html#X14s</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14bm" publtype="encyclopedia">
+        <title>Diffusely Scattered Reflectance.</title>
+        <pages>210</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100959</ee>
+        <url>db/reference/vision/vision2014.html#X14bm</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Tappen14a" publtype="encyclopedia">
+        <author>Marshall F. Tappen</author>
+        <title>Intrinsic Images.</title>
+        <pages>424-425</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_245</ee>
+        <url>db/reference/vision/vision2014.html#Tappen14a</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14bf" publtype="encyclopedia">
+        <title>Deconvolution.</title>
+        <pages>171</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100166</ee>
+        <url>db/reference/vision/vision2014.html#X14bf</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14dm" publtype="encyclopedia">
+        <title>Interpretation of Line Drawings.</title>
+        <pages>423</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100113</ee>
+        <url>db/reference/vision/vision2014.html#X14dm</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Tai14" publtype="encyclopedia">
+        <author>Yu-Wing Tai</author>
+        <title>Blur Estimation.</title>
+        <pages>57-59</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_509</ee>
+        <url>db/reference/vision/vision2014.html#Tai14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14cy" publtype="encyclopedia">
+        <title>Heterogeneous Parallel Computing.</title>
+        <pages>358</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100299</ee>
+        <url>db/reference/vision/vision2014.html#X14cy</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14bq" publtype="encyclopedia">
+        <title>Dimension Reduction.</title>
+        <pages>218</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100232</ee>
+        <url>db/reference/vision/vision2014.html#X14bq</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14ev" publtype="encyclopedia">
+        <title>Multiplexed Sensing.</title>
+        <pages>516</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100188</ee>
+        <url>db/reference/vision/vision2014.html#X14ev</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14dq" publtype="encyclopedia">
+        <title>Kalman-Bucy Filter.</title>
+        <pages>437</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100269</ee>
+        <url>db/reference/vision/vision2014.html#X14dq</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14hm" publtype="encyclopedia">
+        <title>Second Order Approximation.</title>
+        <pages>713</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100295</ee>
+        <url>db/reference/vision/vision2014.html#X14hm</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Chan14a" publtype="encyclopedia">
+        <author>Shing-Chow Chan</author>
+        <title>Light Field.</title>
+        <pages>447-453</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_5</ee>
+        <url>db/reference/vision/vision2014.html#Chan14a</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14dt" publtype="encyclopedia">
+        <title>KF.</title>
+        <pages>437</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100270</ee>
+        <url>db/reference/vision/vision2014.html#X14dt</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Sturm14a" publtype="encyclopedia">
+        <author>Peter F. Sturm</author>
+        <title>Fisheye Lens.</title>
+        <pages>300-301</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_487</ee>
+        <url>db/reference/vision/vision2014.html#Sturm14a</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/DickinsonSS14" publtype="encyclopedia">
+        <author>Sven J. Dickinson</author>
+        <author>Ali Shokoufandeh</author>
+        <author>Kaleem Siddiqi</author>
+        <title>Shock Graph.</title>
+        <pages>729-737</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_655</ee>
+        <url>db/reference/vision/vision2014.html#DickinsonSS14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Wu14b" publtype="encyclopedia">
+        <author>Ying Nian Wu</author>
+        <title>Histogram.</title>
+        <pages>361-362</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_742</ee>
+        <url>db/reference/vision/vision2014.html#Wu14b</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14gu" publtype="encyclopedia">
+        <title>Rao Metric.</title>
+        <pages>660</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100236</ee>
+        <url>db/reference/vision/vision2014.html#X14gu</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14gy" publtype="encyclopedia">
+        <title>Relation Between Objects and Their Digital Images.</title>
+        <pages>677</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100223</ee>
+        <url>db/reference/vision/vision2014.html#X14gy</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14el" publtype="encyclopedia">
+        <title>Monte Carlo Annealing.</title>
+        <pages>492</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100245</ee>
+        <url>db/reference/vision/vision2014.html#X14el</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14iq" publtype="encyclopedia">
+        <title>Symmetry-Based X.</title>
+        <pages>788</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100218</ee>
+        <url>db/reference/vision/vision2014.html#X14iq</url>
+    </incollection>
+    <incollection mdate="2018-11-14" key="reference/vision/Koppal14a" publtype="encyclopedia">
+        <author>Sanjeev J. Koppal</author>
+        <title>Lambertian Reflectance.</title>
+        <pages>441-443</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_534</ee>
+        <ee>https://www.wikidata.org/entity/Q56431771</ee>
+        <url>db/reference/vision/vision2014.html#Koppal14a</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14cg" publtype="encyclopedia">
+        <title>Face Reconstruction.</title>
+        <pages>288</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100104</ee>
+        <url>db/reference/vision/vision2014.html#X14cg</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Zhang14n" publtype="encyclopedia">
+        <author>Zhengyou Zhang</author>
+        <title>Fundamental Matrix.</title>
+        <pages>307-308</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_131</ee>
+        <url>db/reference/vision/vision2014.html#Zhang14n</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/RamanathD14b" publtype="encyclopedia">
+        <author>Rajeev Ramanath</author>
+        <author>Mark S. Drew</author>
+        <title>Gamut Mapping.</title>
+        <pages>318-325</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_456</ee>
+        <url>db/reference/vision/vision2014.html#RamanathD14b</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14et" publtype="encyclopedia">
+        <title>Multiple View Geometry.</title>
+        <pages>513</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100010</ee>
+        <url>db/reference/vision/vision2014.html#X14et</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14hz" publtype="encyclopedia">
+        <title>SPDE.</title>
+        <pages>749</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100249</ee>
+        <url>db/reference/vision/vision2014.html#X14hz</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14fx" publtype="encyclopedia">
+        <title>Pan-Tilt Camera Calibration.</title>
+        <pages>581</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100082</ee>
+        <url>db/reference/vision/vision2014.html#X14fx</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14fy" publtype="encyclopedia">
+        <title>Pan-Tilt Camera Calibration.</title>
+        <pages>586</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100083</ee>
+        <url>db/reference/vision/vision2014.html#X14fy</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Hasinoff14a" publtype="encyclopedia">
+        <author>Samuel W. Hasinoff</author>
+        <title>Saturation (Imaging).</title>
+        <pages>699-701</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_483</ee>
+        <url>db/reference/vision/vision2014.html#Hasinoff14a</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Tominaga14" publtype="encyclopedia">
+        <author>Shoji Tominaga</author>
+        <title>Color Model.</title>
+        <pages>116-120</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_449</ee>
+        <url>db/reference/vision/vision2014.html#Tominaga14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14ge" publtype="encyclopedia">
+        <title>Picture Understanding.</title>
+        <pages>610</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100115</ee>
+        <url>db/reference/vision/vision2014.html#X14ge</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14db" publtype="encyclopedia">
+        <title>ICP.</title>
+        <pages>371</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100030</ee>
+        <url>db/reference/vision/vision2014.html#X14db</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14gd" publtype="encyclopedia">
+        <title>Photometric Consistency Function.</title>
+        <pages>599</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100042</ee>
+        <url>db/reference/vision/vision2014.html#X14gd</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14bw" publtype="encyclopedia">
+        <title>Distance Estimation.</title>
+        <pages>229</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100007</ee>
+        <url>db/reference/vision/vision2014.html#X14bw</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14gm" publtype="encyclopedia">
+        <title>Probabilistic Hill Climbing.</title>
+        <pages>639</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100246</ee>
+        <url>db/reference/vision/vision2014.html#X14gm</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14u" publtype="encyclopedia">
+        <title>Blackbody Radiator.</title>
+        <pages>52</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100202</ee>
+        <url>db/reference/vision/vision2014.html#X14u</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Wang14" publtype="encyclopedia">
+        <author>Xiaogang Wang</author>
+        <title>Face Identification.</title>
+        <pages>279-285</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_354</ee>
+        <url>db/reference/vision/vision2014.html#Wang14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14cb" publtype="encyclopedia">
+        <title>Environment Mapping.</title>
+        <pages>247</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100016</ee>
+        <url>db/reference/vision/vision2014.html#X14cb</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14fl" publtype="encyclopedia">
+        <title>Object Segmentation.</title>
+        <pages>542</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100065</ee>
+        <url>db/reference/vision/vision2014.html#X14fl</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Vernon14a" publtype="encyclopedia">
+        <author>David Vernon</author>
+        <title>Cognitive Vision.</title>
+        <pages>106-109</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_83</ee>
+        <url>db/reference/vision/vision2014.html#Vernon14a</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14jc" publtype="encyclopedia">
+        <title>Two Dimensional Conditional Random Fields.</title>
+        <pages>829</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100234</ee>
+        <url>db/reference/vision/vision2014.html#X14jc</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14gq" publtype="encyclopedia">
+        <title>PTZ Camera Calibration.</title>
+        <pages>654</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100084</ee>
+        <url>db/reference/vision/vision2014.html#X14gq</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Wu14" publtype="encyclopedia">
+        <author>Ying Nian Wu</author>
+        <title>Cross Entropy.</title>
+        <pages>154</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_743</ee>
+        <url>db/reference/vision/vision2014.html#Wu14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/RamanathD14a" publtype="encyclopedia">
+        <author>Rajeev Ramanath</author>
+        <author>Mark S. Drew</author>
+        <title>Color Spaces.</title>
+        <pages>123-132</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_452</ee>
+        <url>db/reference/vision/vision2014.html#RamanathD14a</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Tan14d" publtype="encyclopedia">
+        <author>Robby T. Tan</author>
+        <title>Specularity, Specular Reflectance.</title>
+        <pages>750-752</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_538</ee>
+        <url>db/reference/vision/vision2014.html#Tan14d</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14di" publtype="encyclopedia">
+        <title>Inexact Matching.</title>
+        <pages>401</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100287</ee>
+        <url>db/reference/vision/vision2014.html#X14di</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14dn" publtype="encyclopedia">
+        <title>Intrinsic Parameters.</title>
+        <pages>426</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100023</ee>
+        <url>db/reference/vision/vision2014.html#X14dn</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14du" publtype="encyclopedia">
+        <title>Kinematic Chain Motion Models.</title>
+        <pages>437</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100212</ee>
+        <url>db/reference/vision/vision2014.html#X14du</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14bz" publtype="encyclopedia">
+        <title>Ellipse Matching.</title>
+        <pages>247</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100095</ee>
+        <url>db/reference/vision/vision2014.html#X14bz</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Lindeberg14" publtype="encyclopedia">
+        <author orcid="0000-0002-9081-2170">Tony Lindeberg</author>
+        <title>Scale Selection.</title>
+        <pages>701-713</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_242</ee>
+        <url>db/reference/vision/vision2014.html#Lindeberg14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Vernon14b" publtype="encyclopedia">
+        <author>David Vernon</author>
+        <title>Visual Cognition.</title>
+        <pages>860-862</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_785</ee>
+        <url>db/reference/vision/vision2014.html#Vernon14b</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Neumann14" publtype="encyclopedia">
+        <author>Bernd Neumann</author>
+        <title>Description Logics.</title>
+        <pages>189-191</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_706</ee>
+        <url>db/reference/vision/vision2014.html#Neumann14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14fb" publtype="encyclopedia">
+        <title>Non-central Camera Calibration.</title>
+        <pages>523</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100025</ee>
+        <url>db/reference/vision/vision2014.html#X14fb</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14br" publtype="encyclopedia">
+        <title>Dimensional Compression.</title>
+        <pages>218</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100230</ee>
+        <url>db/reference/vision/vision2014.html#X14br</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14dc" publtype="encyclopedia">
+        <title>Image Alignment.</title>
+        <pages>373</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100038</ee>
+        <url>db/reference/vision/vision2014.html#X14dc</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Joshi14a" publtype="encyclopedia">
+        <author>Neel Joshi</author>
+        <title>Motion Blur.</title>
+        <pages>492-495</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_512</ee>
+        <url>db/reference/vision/vision2014.html#Joshi14a</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14cx" publtype="encyclopedia">
+        <title>Hazard Detection.</title>
+        <pages>358</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100174</ee>
+        <url>db/reference/vision/vision2014.html#X14cx</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14cp" publtype="encyclopedia">
+        <title>Gait Analysis.</title>
+        <pages>309</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100109</ee>
+        <url>db/reference/vision/vision2014.html#X14cp</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Koch14" publtype="encyclopedia">
+        <author>Reinhard Koch</author>
+        <title>Depth Estimation.</title>
+        <pages>183-186</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_125</ee>
+        <url>db/reference/vision/vision2014.html#Koch14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/PereraBZ14" publtype="encyclopedia">
+        <author>Samunda Perera</author>
+        <author>Nick Barnes</author>
+        <author>Alexander Zelinsky</author>
+        <title>Exploration: Simultaneous Localization and Mapping (SLAM).</title>
+        <pages>268-275</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_280</ee>
+        <url>db/reference/vision/vision2014.html#PereraBZ14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14gx" publtype="encyclopedia">
+        <title>Reflectometry.</title>
+        <pages>677</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100191</ee>
+        <url>db/reference/vision/vision2014.html#X14gx</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/LangguthG14a" publtype="encyclopedia">
+        <author>Fabian Langguth</author>
+        <author>Michael Goesele</author>
+        <title>Radiance.</title>
+        <pages>655-656</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_526</ee>
+        <url>db/reference/vision/vision2014.html#LangguthG14a</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14bc" publtype="encyclopedia">
+        <title>Coplanarity Constraint.</title>
+        <pages>152</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100009</ee>
+        <url>db/reference/vision/vision2014.html#X14bc</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14jb" publtype="encyclopedia">
+        <title>Transportation Problem.</title>
+        <pages>827</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100288</ee>
+        <url>db/reference/vision/vision2014.html#X14jb</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14p" publtype="encyclopedia">
+        <title>Automatic Gait Recognition.</title>
+        <pages>42</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100108</ee>
+        <url>db/reference/vision/vision2014.html#X14p</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14gf" publtype="encyclopedia">
+        <title>Piecewise Polynomial.</title>
+        <pages>610</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100118</ee>
+        <url>db/reference/vision/vision2014.html#X14gf</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Bonaiuto14" publtype="encyclopedia">
+        <author>James Bonaiuto</author>
+        <title>Affordances and Action Recognition.</title>
+        <pages>25-27</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_772</ee>
+        <url>db/reference/vision/vision2014.html#Bonaiuto14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Zhang14g" publtype="encyclopedia">
+        <author>Zhengyou Zhang</author>
+        <title>Camera Parameters (Intrinsic, Extrinsic).</title>
+        <pages>81-85</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_152</ee>
+        <url>db/reference/vision/vision2014.html#Zhang14g</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/RamanathD14d" publtype="encyclopedia">
+        <author>Rajeev Ramanath</author>
+        <author>Mark S. Drew</author>
+        <title>Planckian Locus.</title>
+        <pages>613-616</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_566</ee>
+        <url>db/reference/vision/vision2014.html#RamanathD14d</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Wu14c" publtype="encyclopedia">
+        <author>Ying Nian Wu</author>
+        <title>Statistical Independence.</title>
+        <pages>759-760</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_744</ee>
+        <url>db/reference/vision/vision2014.html#Wu14c</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14l" publtype="encyclopedia">
+        <title>Aperture Ghosting.</title>
+        <pages>36</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100146</ee>
+        <url>db/reference/vision/vision2014.html#X14l</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14bu" publtype="encyclopedia">
+        <title>Discrete AdaBoost.</title>
+        <pages>221</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100239</ee>
+        <url>db/reference/vision/vision2014.html#X14bu</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Ackermann14" publtype="encyclopedia">
+        <author>Hanno Ackermann</author>
+        <title>Factorization.</title>
+        <pages>288-291</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_689</ee>
+        <url>db/reference/vision/vision2014.html#Ackermann14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14bj" publtype="encyclopedia">
+        <title>Depth Imaging.</title>
+        <pages>186</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100006</ee>
+        <url>db/reference/vision/vision2014.html#X14bj</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14ft" publtype="encyclopedia">
+        <title>Out of Focus Blur.</title>
+        <pages>580</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100167</ee>
+        <url>db/reference/vision/vision2014.html#X14ft</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14af" publtype="encyclopedia">
+        <title>CIE Standard Illuminant.</title>
+        <pages>100</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100123</ee>
+        <url>db/reference/vision/vision2014.html#X14af</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14ek" publtype="encyclopedia">
+        <title>MoCap.</title>
+        <pages>488</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100047</ee>
+        <url>db/reference/vision/vision2014.html#X14ek</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Chaumette14" publtype="encyclopedia">
+        <author>Fran&ccedil;ois Chaumette</author>
+        <title>Visual Servoing.</title>
+        <pages>869-874</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_281</ee>
+        <url>db/reference/vision/vision2014.html#Chaumette14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14jd" publtype="encyclopedia">
+        <title>Underwater Light Field.</title>
+        <pages>837</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100196</ee>
+        <url>db/reference/vision/vision2014.html#X14jd</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Zhang14a" publtype="encyclopedia">
+        <author>Zhengyou Zhang</author>
+        <title>Affine Projection.</title>
+        <pages>22</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_791</ee>
+        <url>db/reference/vision/vision2014.html#Zhang14a</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/SrivastavaKK14" publtype="encyclopedia">
+        <author>Anuj Srivastava</author>
+        <author>Sebastian Kurtek</author>
+        <author>Eric Klassen</author>
+        <title>Statistical Shape Analysis.</title>
+        <pages>760-770</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_778</ee>
+        <url>db/reference/vision/vision2014.html#SrivastavaKK14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Maire14" publtype="encyclopedia">
+        <author>Michael Maire</author>
+        <title>Corner Detection.</title>
+        <pages>152-154</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_216</ee>
+        <url>db/reference/vision/vision2014.html#Maire14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14ig" publtype="encyclopedia">
+        <title>Superresolution.</title>
+        <pages>781</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100036</ee>
+        <url>db/reference/vision/vision2014.html#X14ig</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14gg" publtype="encyclopedia">
+        <title>Pinhole Camera.</title>
+        <pages>610</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100001</ee>
+        <url>db/reference/vision/vision2014.html#X14gg</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14fe" publtype="encyclopedia">
+        <title>Numerical Partial Differential Equations.</title>
+        <pages>531</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100262</ee>
+        <url>db/reference/vision/vision2014.html#X14fe</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Maeda14" publtype="encyclopedia">
+        <author>Eisaku Maeda</author>
+        <title>Dimensionality Reduction.</title>
+        <pages>218-221</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_652</ee>
+        <url>db/reference/vision/vision2014.html#Maeda14</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/X14cw" publtype="encyclopedia">
+        <title>GVF.</title>
+        <pages>354</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_100267</ee>
+        <url>db/reference/vision/vision2014.html#X14cw</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Atkinson14a" publtype="encyclopedia">
+        <author>Gary A. Atkinson</author>
+        <title>Polarized Light in Computer Vision.</title>
+        <pages>630-634</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_571</ee>
+        <url>db/reference/vision/vision2014.html#Atkinson14a</url>
+    </incollection>
+    <incollection mdate="2017-07-12" key="reference/vision/Vernon14" publtype="encyclopedia">
+        <author>David Vernon</author>
+        <title>Cognitive System.</title>
+        <pages>100-106</pages>
+        <year>2014</year>
+        <booktitle>Computer Vision, A Reference Guide</booktitle>
+        <ee>https://doi.org/10.1007/978-0-387-31439-6_82</ee>
+        <url>db/reference/vision/vision2014.html#Vernon14</url>
+    </incollection>
+    <article mdate="2023-08-28" key="persons/CasperGGGHLR12">
+        <author orcid="0000-0002-1163-8988">Markus Casper</author>
+        <author>Gayane Grigoryan</author>
+        <author>Oliver Gronz</author>
+        <author>Oliver Gutjahr</author>
+        <author orcid="0000-0002-4831-9016">G&uuml;nther Heinemann</author>
+        <author>Rita Ley</author>
+        <author>Andreas Rock</author>
+        <title>Analysis of projected hydrological behavior of catchments based on signature indices</title>
+        <journal>Hydrology and Earth System Sciences</journal>
+        <volume>16</volume>
+        <pages>409-421</pages>
+        <year>2012</year>
+        <ee type="oa">https://doi.org/10.5194/hess-16-409-2012</ee>
+        <ee>https://www.wikidata.org/entity/Q114958217</ee>
+    </article>
+    <article mdate="2020-02-21" key="persons/Codd71a" publtype="informal">
+        <author>E. F. Codd</author>
+        <title>Further Normalization of the Data Base Relational Model.</title>
+        <journal>Research Report / RJ / IBM / San Jose, California</journal>
+        <volume>RJ909</volume>
+        <month>August</month>
+        <year>1971</year>
+    </article>
+    <book mdate="2019-12-30" key="persons/Lions1996">
+        <author>John Lions</author>
+        <title>Lions' Commentary on UNIX 6th Edition, with Source Code</title>
+        <year>1996</year>
+        <publisher>Peer-to-Peer Communications</publisher>
+        <series>Computer classics revisited</series>
+        <isbn>1-57398-013-7</isbn>
+        <ee>http://www.lemis.com/grog/Documentation/Lions/index.html</ee>
+        <ee>https://www.wikidata.org/entity/Q493858</ee>
+    </book>
+    <article mdate="2020-02-21" key="persons/Codd72" publtype="informal">
+        <author>E. F. Codd</author>
+        <title>Relational Completeness of Data Base Sublanguages.</title>
+        <journal>Research Report / RJ / IBM / San Jose, California</journal>
+        <volume>RJ987</volume>
+        <month>March</month>
+        <year>1972</year>
+        <cdrom>ibmTR/rj987.pdf</cdrom>
+        <note>republished on "ACM SIGMOD Anthology"</note>
+    </article>
+    <inproceedings mdate="2019-08-02" key="persons/Codd74">
+        <author>E. F. Codd</author>
+        <title>Seven Steps to Rendezvous with the Casual User.</title>
+        <month>January</month>
+        <year>1974</year>
+        <pages>179-200</pages>
+        <booktitle>IFIP Working Conference Data Base Management</booktitle>
+        <crossref>conf/ds/1974</crossref>
+        <url>db/conf/ds/dbm74.html#Codd74</url>
+        <note>IBM Research Report RJ 1333, San Jose, California</note>
+        <cdrom>DS/DS1974/P179.pdf</cdrom>
+    </inproceedings>
+    <article mdate="2020-02-21" key="persons/Codd71b" publtype="informal">
+        <author>E. F. Codd</author>
+        <title>Normalized Data Base Structure: A Brief Tutorial.</title>
+        <journal>Research Report / RJ / IBM / San Jose, California</journal>
+        <month>November</month>
+        <year>1971</year>
+        <volume>RJ935</volume>
+    </article>
+    <article mdate="2020-02-21" key="persons/Codd71" publtype="informal">
+        <author>E. F. Codd</author>
+        <title>Data Base Sublanguage Founded on the Relational Calculus.</title>
+        <journal>Research Report / RJ / IBM / San Jose, California</journal>
+        <month>July</month>
+        <volume>RJ893</volume>
+        <year>1971</year>
+    </article>
+    <article mdate="2002-01-03" key="persons/Hall74">
+        <author>Patrick A. V. Hall</author>
+        <title>Common Subexpression Identification in General Algebraic Systems.</title>
+        <journal>Technical Rep. UKSC 0060, IBM United Kingdom Scientific Centre</journal>
+        <month>November</month>
+        <year>1974</year>
+    </article>
+    <article mdate="2020-02-21" key="persons/Codd69" publtype="informal">
+        <author>E. F. Codd</author>
+        <title>Derivability, Redundancy and Consistency of Relations Stored in Large Data Banks.</title>
+        <journal>Research Report / RJ / IBM / San Jose, California</journal>
+        <volume>RJ599</volume>
+        <month>August</month>
+        <year>1969</year>
+        <cdrom>ibmTR/rj599.pdf</cdrom>
+    </article>
+    <article mdate="2018-07-05" key="persons/Ley95" publtype="informal">
+        <author>Michael Ley</author>
+        <title>DB&amp;LP: A WWW Bibliography on Databases and Logic Programming</title>
+        <journal>Compulog Newsletter</journal>
+        <year>1995</year>
+    </article>
+</dblp>
