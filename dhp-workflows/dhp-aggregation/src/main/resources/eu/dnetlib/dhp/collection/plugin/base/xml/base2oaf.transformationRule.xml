@@ -340,7 +340,7 @@ base_dc:link (I used dc:identifier)
 									
 									<oaf:identifier identifierType="oai-original">
 										<xsl:value-of
-											select="//*[local-name() = 'about']/*[local-name() = 'provenance']//*[local-name() = 'originDescription' and not(./*[local-name() = 'originDescription'])]/*[local-name() = 'identifier']" />
+											select="//oai:header/oai:identifier" />
 									</oaf:identifier>
 									
 									<oaf:hostedBy>
