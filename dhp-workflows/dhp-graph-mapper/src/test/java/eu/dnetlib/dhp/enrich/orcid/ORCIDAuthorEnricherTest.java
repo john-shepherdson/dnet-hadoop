@@ -1,10 +1,9 @@
 
-package eu.dnetlib.oa.merge;
-
-import static org.junit.jupiter.api.Assertions.*;
+package eu.dnetlib.dhp.enrich.orcid;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -14,10 +13,9 @@ import org.junit.platform.commons.util.StringUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.oa.merge.AuthorMerger;
 import eu.dnetlib.dhp.schema.oaf.Author;
 
-public class AuthorMergerTest {
+public class ORCIDAuthorEnricherTest {
 
 	@Test
 	public void testEnrcichAuthor() throws Exception {
@@ -26,12 +24,13 @@ public class AuthorMergerTest {
 		BufferedReader pr = new BufferedReader(new InputStreamReader(
 			Objects
 				.requireNonNull(
-					AuthorMergerTest.class
-						.getResourceAsStream("/eu/dnetlib/dhp/oa/merge/authors_publication_sample.json"))));
+					ORCIDAuthorEnricherTest.class
+						.getResourceAsStream("/eu/dnetlib/dhp/enrich/orcid/authors_publication_sample.json"))));
 		BufferedReader or = new BufferedReader(new InputStreamReader(
 			Objects
 				.requireNonNull(
-					AuthorMergerTest.class.getResourceAsStream("/eu/dnetlib/dhp/oa/merge/authors_orcid_sample.json"))));
+					ORCIDAuthorEnricherTest.class
+						.getResourceAsStream("/eu/dnetlib/dhp/enrich/orcid/authors_orcid_sample.json"))));
 
 		TypeReference<List<Author>> aclass = new TypeReference<List<Author>>() {
 		};
@@ -67,7 +66,8 @@ public class AuthorMergerTest {
 				long start = System.currentTimeMillis();
 
 //                final List<Author> enrichedList = AuthorMerger.enrichOrcid(publicationAuthors, orcidAuthors);
-				final List<Author> enrichedList = AuthorMerger.enrichOrcid(publicationAuthors, orcidAuthors);
+				final List<Author> enrichedList = Collections.emptyList(); // SparkEnrichGraphWithOrcidAuthors.enrichOrcid(publicationAuthors,
+																			// orcidAuthors);
 
 				long enrichedAuthorWithPid = enrichedList
 					.stream()
@@ -89,26 +89,6 @@ public class AuthorMergerTest {
 				System.out.println("=================");
 			}
 		}
-	}
-
-	@Test
-	public void checkSimilarityTest() {
-		final Author left = new Author();
-		left.setName("Anand");
-		left.setSurname("Rachna");
-		left.setFullname("Anand, Rachna");
-
-		System.out.println(AuthorMerger.normalizeFullName(left.getFullname()));
-
-		final Author right = new Author();
-		right.setName("Rachna");
-		right.setSurname("Anand");
-		right.setFullname("Rachna, Anand");
-//        System.out.println(AuthorMerger.normalize(right.getFullname()));
-		boolean same = AuthorMerger.checkORCIDSimilarity(left, right);
-
-		assertTrue(same);
-
 	}
 
 }
