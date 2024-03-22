@@ -149,7 +149,7 @@ public class SparkResultToCommunityFromOrganizationJob {
 					}
 				}
 				// res.setContext(propagatedContexts);
-				// ret.mergeFrom(res);
+				// return MergeUtils.mergeResult(ret, res);
 			}
 			return ret;
 		};

@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.sx.graph
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils
 import eu.dnetlib.dhp.schema.oaf.{Dataset => OafDataset, _}
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
@@ -130,10 +131,7 @@ object SparkCreateInputGraph {
     val ds: Dataset[T] = spark.read.load(sourcePath).as[T]
 
     ds.groupByKey(_.getId)
-      .reduceGroups { (x: T, y: T) =>
-        x.mergeFrom(y)
-        x
-      }
+      .reduceGroups { (x: T, y: T) => MergeUtils.merge(x, y).asInstanceOf[T] }
       .map(_._2)
       .write
       .mode(SaveMode.Overwrite)
