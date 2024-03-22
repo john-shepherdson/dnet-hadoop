@@ -5,11 +5,14 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.common.ModelSupport;
+import com.google.common.collect.Lists;
+import eu.dnetlib.dhp.schema.oaf.*;
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
@@ -17,15 +20,32 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 
 public class MergeUtilsTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+
+	@Test
+	void testMergePubs_new() throws IOException {
+		Publication pt = read("publication_test.json", Publication.class);
+		Publication p1 = read("publication_test.json", Publication.class);
+
+		assertEquals(1, pt.getCollectedfrom().size());
+		assertEquals(ModelConstants.CROSSREF_ID, pt.getCollectedfrom().get(0).getKey());
+
+		Instance i = new Instance();
+		i.setUrl(Lists.newArrayList("https://..."));
+		p1.getInstance().add(i);
+
+		Publication ptp1 = MergeUtils.mergePublication(pt, p1);
+
+		assertNotNull(ptp1.getInstance());
+		assertEquals(2, ptp1.getInstance().size());
+
+	}
 
 	@Test
 	void testMergePubs() throws IOException {
@@ -45,7 +65,7 @@ public class MergeUtilsTest {
 		assertTrue(cfId(d1.getCollectedfrom()).contains(ModelConstants.CROSSREF_ID));
 
 		final Result p1d2 = MergeUtils.checkedMerge(p1, d2);
-		assertEquals(ModelConstants.PUBLICATION_RESULTTYPE_CLASSID,  p1d2.getResulttype().getClassid());
+		assertEquals(ModelConstants.PUBLICATION_RESULTTYPE_CLASSID, p1d2.getResulttype().getClassid());
 		assertTrue(p1d2 instanceof Publication);
 		assertEquals(p1.getId(), p1d2.getId());
 	}

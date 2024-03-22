@@ -1,0 +1,428 @@
+{
+  "author": [
+    {
+      "affiliation": null,
+      "fullname": "Deymier, Ghislaine",
+      "name": "Ghislaine",
+      "pid": [],
+      "rank": 1,
+      "surname": "Deymier"
+    },
+    {
+      "affiliation": null,
+      "fullname": "Gaschet, Frédéric",
+      "name": "Frédéric",
+      "pid": [],
+      "rank": 2,
+      "surname": "Gaschet"
+    },
+    {
+      "affiliation": null,
+      "fullname": "Pouyanne, Guillaume",
+      "name": "Guillaume",
+      "pid": [],
+      "rank": 3,
+      "surname": "Pouyanne"
+    }
+  ],
+  "bestaccessright": {
+    "classid": "OPEN",
+    "classname": "Open Access",
+    "schemeid": "dnet:access_modes",
+    "schemename": "dnet:access_modes"
+  },
+  "collectedfrom": [
+    {
+      "key" : "10|openaire____::081b82f96300b6a6e3d282bad31cb6e2",
+      "value" : "Crossref"
+    }
+  ],
+  "context": [],
+  "contributor": [],
+  "country": [],
+  "coverage": [],
+  "dataInfo": {
+    "deletedbyinference": false,
+    "inferred": false,
+    "invisible": false,
+    "provenanceaction": {
+      "classid": "sysimport:crosswalk:repository",
+      "classname": "Harvested",
+      "schemeid": "dnet:provenanceActions",
+      "schemename": "dnet:provenanceActions"
+    },
+    "trust": "0.9"
+  },
+  "dateofacceptance": {
+    "dataInfo": {
+      "deletedbyinference": false,
+      "inferred": false,
+      "invisible": false,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:repository",
+        "classname": "Harvested",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      },
+      "trust": "0.9"
+    },
+    "value": "2013-11-30"
+  },
+  "dateofcollection": "2024-02-28T00:22:13+0000",
+  "dateoftransformation": "2024-03-06T08:43:13.253Z",
+  "description": [
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:repository",
+          "classname": "Harvested",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "value": "For analyzing the reciprocal interaction between urban sprawl and car use, research has first focused on the link between urban density and mobility. By looking for a reduction in energy consumption, cities have favoured a compact planning development. Then reflection has broadened from the simple density to the wider, multi-dimensional concept of urban form. This controversy has led to a renewal of analysis in term of the costs of urban growth, notably by comparing the costs of \"compact\" and \"sprawled\" development. The idea is to compare the mobility costs of different urban forms. However, most often because of a lack of data, such studies are scarce. This paper suggests an innovative method to compute mobility costs at an infra-urban scale : The Spatialized Travel Account (STA). It is based on the CERTU's travel account methodology at a metropolitan scale. It puts forward an accurate estimate of the mobility costs for each transport mode (individual and public) and for each type of payer (households, firms, local authorities...). In order to test the relationships between mobility costs and urban form, we link the computed costs to morphological characteristics of infra-urban zones, taking in account sociodemographic characteristics of households."
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:repository",
+          "classname": "Harvested",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "value": "L'interaction réciproque entre étalement urbain et usage de l'automobile a conduit la recherche à se focaliser sur le lien entre les densités urbaines et la mobilité. En cherchant à réduire leur consommation d'énergie pour les transports, et donc leurs émissions de Gaz à Effet de Serre, les villes ont alors cherché à planifier la \" ville compacte \", privilégiant notamment la reconstruction de la ville sur elle-même et la densification. Par la suite, la réflexion s'est élargie de la simple densité à la notion de forme urbaine et à toutes ses dimensions. Cette controverse devait conduire à un renouveau des analyses en termes de coûts de la croissance urbaine : le débat reste vif, encore aujourd'hui, sur les coûts comparés de la ville étalée et de la ville compacte. Plus largement, il s'agit d'explorer les coûts des différentes formes urbaines en termes de mobilité. Malgré cela, généralement pour des raisons de disponibilité de données, les études sur le sujet restent extrêmement rares. Cet article propose un outil novateur pour mesurer les coûts de la mobilité à l'échelle intraurbaine : le Compte Déplacements Territorialisé (CDT). Il s'inspire de la méthode développée par le CERTU pour l'établissement des Comptes Déplacements Voyageurs à l'échelle métropolitaine. Le CDT propose, pour chacune des zones de l'agglomération, une estimation précise de l'ensemble des coûts liés aux déplacements de personnes, ventilés par mode de transport (individuels et collectifs) et par type de financeurs (ménages, entreprises, collectivités territoriales, etc.). Nous proposons une application de cette méthode à la controverse sur le lien entre forme urbaine et coûts de la mobilité. Les coûts sont reliés aux caractéristiques morphologiques des zones (en termes de densité et de diversité, notamment), en prenant soin de contrôler les facteurs socio-économiques qui influent traditionnellement sur les comportements de mobilité (taille du ménage, revenu, etc.)."
+    }
+  ],
+  "eoscifguidelines": [],
+  "externalReference": [],
+  "extraInfo": [],
+  "format": [
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:repository",
+          "classname": "Harvested",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "value": "application/pdf"
+    }
+  ],
+  "fulltext": [],
+  "id": "50|06cdd3ff4700::4826ac62a11a957fe332e2c291dcfcca",
+  "instance": [
+    {
+      "accessright": {
+        "classid": "OPEN",
+        "classname": "Open Access",
+        "schemeid": "dnet:access_modes",
+        "schemename": "dnet:access_modes"
+      },
+      "alternateIdentifier": [
+        {
+          "dataInfo": {
+            "deletedbyinference": false,
+            "inferred": false,
+            "invisible": false,
+            "provenanceaction": {
+              "classid": "sysimport:crosswalk:repository",
+              "classname": "Harvested",
+              "schemeid": "dnet:provenanceActions",
+              "schemename": "dnet:provenanceActions"
+            },
+            "trust": "0.9"
+          },
+          "qualifier": {
+            "classid": "doi",
+            "classname": "Digital Object Identifier",
+            "schemeid": "dnet:pid_types",
+            "schemename": "dnet:pid_types"
+          },
+          "value": "10.46298/cst.12132"
+        }
+      ],
+      "collectedfrom": {
+        "key": "10|openaire____::6824b298c96ba906a3e6a70593affbf5",
+        "value": "Episciences"
+      },
+      "dateofacceptance": {
+        "dataInfo": {
+          "deletedbyinference": false,
+          "inferred": false,
+          "invisible": false,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "Harvested",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          },
+          "trust": "0.9"
+        },
+        "value": "2013-11-30"
+      },
+      "hostedby": {
+        "key": "10|openaire____::6824b298c96ba906a3e6a70593affbf5",
+        "value": "Episciences"
+      },
+      "instanceTypeMapping": [
+        {
+          "originalType": "http://purl.org/coar/resource_type/c_6501",
+          "typeCode": "http://purl.org/coar/resource_type/c_6501",
+          "typeLabel": "journal article",
+          "vocabularyName": "openaire::coar_resource_types_3_1"
+        },
+        {
+          "originalType": "http://purl.org/coar/resource_type/c_6501",
+          "typeCode": "Article",
+          "typeLabel": "Article",
+          "vocabularyName": "openaire::user_resource_types"
+        }
+      ],
+      "instancetype": {
+        "classid": "0001",
+        "classname": "Article",
+        "schemeid": "dnet:publication_resource",
+        "schemename": "dnet:publication_resource"
+      },
+      "license": {
+        "dataInfo": {
+          "deletedbyinference": false,
+          "inferred": false,
+          "invisible": false,
+          "provenanceaction": {
+            "classid": "sysimport:crosswalk:repository",
+            "classname": "Harvested",
+            "schemeid": "dnet:provenanceActions",
+            "schemename": "dnet:provenanceActions"
+          },
+          "trust": "0.9"
+        },
+        "value": "CC BY NC SA"
+      },
+      "pid": [],
+      "refereed": {
+        "classid": "0002",
+        "classname": "nonPeerReviewed",
+        "schemeid": "dnet:review_levels",
+        "schemename": "dnet:review_levels"
+      },
+      "url": [
+        "https://doi.org/10.46298/cst.12132",
+        "https://cst.episciences.org/12132"
+      ]
+    }
+  ],
+  "language": {
+    "classid": "fra/fre",
+    "classname": "French",
+    "schemeid": "dnet:languages",
+    "schemename": "dnet:languages"
+  },
+  "lastupdatetimestamp": 1710636106633,
+  "metaResourceType": {
+    "classid": "Research Literature",
+    "classname": "Research Literature",
+    "schemeid": "openaire::meta_resource_types",
+    "schemename": "openaire::meta_resource_types"
+  },
+  "originalId": [
+    "oai:episciences.org:cst:12132",
+    "50|06cdd3ff4700::4826ac62a11a957fe332e2c291dcfcca"
+  ],
+  "pid": [],
+  "publisher": {
+    "dataInfo": {
+      "deletedbyinference": false,
+      "inferred": false,
+      "invisible": false,
+      "provenanceaction": {
+        "classid": "sysimport:crosswalk:repository",
+        "classname": "Harvested",
+        "schemeid": "dnet:provenanceActions",
+        "schemename": "dnet:provenanceActions"
+      },
+      "trust": "0.9"
+    },
+    "value": "episciences.org"
+  },
+  "relevantdate": [
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:repository",
+          "classname": "Harvested",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "Accepted",
+        "classname": "Accepted",
+        "schemeid": "dnet:dataCite_date",
+        "schemename": "dnet:dataCite_date"
+      },
+      "value": "2024-02-11"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:repository",
+          "classname": "Harvested",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "issued",
+        "classname": "issued",
+        "schemeid": "dnet:dataCite_date",
+        "schemename": "dnet:dataCite_date"
+      },
+      "value": "2013-11-30"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:repository",
+          "classname": "Harvested",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "available",
+        "classname": "available",
+        "schemeid": "dnet:dataCite_date",
+        "schemename": "dnet:dataCite_date"
+      },
+      "value": "2013-11-30"
+    }
+  ],
+  "resourcetype": {
+    "classid": "journal article",
+    "classname": "journal article",
+    "schemeid": "dnet:dataCite_resource",
+    "schemename": "dnet:dataCite_resource"
+  },
+  "resulttype": {
+    "classid": "publication",
+    "classname": "publication",
+    "schemeid": "dnet:result_typologies",
+    "schemename": "dnet:result_typologies"
+  },
+  "source": [],
+  "subject": [
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:repository",
+          "classname": "Harvested",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "JEL: H - Public Economics/H.H7 - State and Local Government • Intergovernmental Relations/H.H7.H72 - State and Local Budget and Expenditures"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:repository",
+          "classname": "Harvested",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "Local public finance"
+    },
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:repository",
+          "classname": "Harvested",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "keyword",
+        "classname": "keyword",
+        "schemeid": "dnet:subject_classification_typologies",
+        "schemename": "dnet:subject_classification_typologies"
+      },
+      "value": "JEL: R - Urban, Rural, Regional, Real Estate, and Transportation Economics/R.R5 - Regional Government Analysis/R.R5.R51 - Finance in Urban and Rural Economies"
+    }
+  ],
+  "title": [
+    {
+      "dataInfo": {
+        "deletedbyinference": false,
+        "inferred": false,
+        "invisible": false,
+        "provenanceaction": {
+          "classid": "sysimport:crosswalk:repository",
+          "classname": "Harvested",
+          "schemeid": "dnet:provenanceActions",
+          "schemename": "dnet:provenanceActions"
+        },
+        "trust": "0.9"
+      },
+      "qualifier": {
+        "classid": "main title",
+        "classname": "main title",
+        "schemeid": "dnet:dataCite_title",
+        "schemename": "dnet:dataCite_title"
+      },
+      "value": "Urban form and the costs of daily mobility. The spatialized travel account tool and its application to the Bordeaux metropolitan area"
+    }
+  ]
+}
