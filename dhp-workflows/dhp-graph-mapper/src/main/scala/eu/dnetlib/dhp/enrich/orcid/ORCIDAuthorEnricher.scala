@@ -87,7 +87,7 @@ object ORCIDAuthorEnricher extends Serializable {
   ) = {
     val matched = scala.collection.mutable.ArrayBuffer.empty[MatchedAuthors]
 
-    if (graph_authors != null && graph_authors.isEmpty) {
+    if (graph_authors != null && !graph_authors.isEmpty) {
       val ait = graph_authors.iterator
 
       while (ait.hasNext) {

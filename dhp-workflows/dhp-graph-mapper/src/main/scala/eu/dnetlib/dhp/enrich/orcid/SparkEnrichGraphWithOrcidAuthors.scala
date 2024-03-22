@@ -72,7 +72,7 @@ class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String]
           .join(matched, Seq("id"), "left")
           .withColumn(
             "author",
-            when(size(col("enriched_author")).gt(1), col("enriched_author"))
+            when(size(col("enriched_author")).gt(0), col("enriched_author"))
               .otherwise(col("author"))
           )
           .drop("enriched_author")
