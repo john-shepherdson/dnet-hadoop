@@ -303,7 +303,9 @@ base_dc:link (I used dc:identifier)
 									
 									<oaf:accessrights>
 										<xsl:choose>
+											<xsl:when test="//base_dc:oa[.='0']">CLOSED</xsl:when>
 											<xsl:when test="//base_dc:oa[.='1']">OPEN</xsl:when>
+											<xsl:when test="//base_dc:oa[.='2']">UNKNOWN</xsl:when>
 											<xsl:when test="//base_dc:rightsnorm">
 												<xsl:value-of select="vocabulary:clean(//base_dc:rightsnorm, 'dnet:access_modes')" />
 											</xsl:when>

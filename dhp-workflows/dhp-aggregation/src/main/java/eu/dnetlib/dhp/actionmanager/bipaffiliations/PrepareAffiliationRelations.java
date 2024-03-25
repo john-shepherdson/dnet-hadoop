@@ -64,6 +64,9 @@ public class PrepareAffiliationRelations implements Serializable {
 		final String pubmedInputPath = parser.get("pubmedInputPath");
 		log.info("pubmedInputPath: {}", pubmedInputPath);
 
+		final String openapcInputPath = parser.get("openapcInputPath");
+		log.info("openapcInputPath: {}", openapcInputPath);
+
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
@@ -85,8 +88,14 @@ public class PrepareAffiliationRelations implements Serializable {
 				JavaPairRDD<Text, Text> pubmedRelations = prepareAffiliationRelations(
 					spark, pubmedInputPath, collectedFromPubmed);
 
+				List<KeyValue> collectedFromOpenAPC = OafMapperUtils
+					.listKeyValues(ModelConstants.OPEN_APC_ID, "OpenAPC");
+				JavaPairRDD<Text, Text> openAPCRelations = prepareAffiliationRelations(
+					spark, openapcInputPath, collectedFromOpenAPC);
+
 				crossrefRelations
 					.union(pubmedRelations)
+					.union(openAPCRelations)
 					.saveAsHadoopFile(
 						outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
 

@@ -48,7 +48,7 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 	@Override
 	public MetadataRecord call(MetadataRecord value) {
 		aggregationCounter.getTotalItems().add(1);
-		try {
+
 			Processor processor = new Processor(false);
 
 			processor.registerExtensionFunction(cleanFunction);
@@ -60,11 +60,18 @@ public class XSLTTransformationFunction implements MapFunction<MetadataRecord, M
 			comp.setParameter(datasourceIDParam, new XdmAtomicValue(value.getProvenance().getDatasourceId()));
 			QName datasourceNameParam = new QName(DATASOURCE_NAME_PARAM);
 			comp.setParameter(datasourceNameParam, new XdmAtomicValue(value.getProvenance().getDatasourceName()));
-			XsltExecutable xslt = comp
-				.compile(new StreamSource(IOUtils.toInputStream(transformationRule, StandardCharsets.UTF_8)));
-			XdmNode source = processor
-				.newDocumentBuilder()
-				.build(new StreamSource(IOUtils.toInputStream(value.getBody(), StandardCharsets.UTF_8)));
+		    XsltExecutable xslt;
+			XdmNode source;
+			try {
+				xslt = comp
+						.compile(new StreamSource(IOUtils.toInputStream(transformationRule, StandardCharsets.UTF_8)));
+				source = processor
+						.newDocumentBuilder()
+						.build(new StreamSource(IOUtils.toInputStream(value.getBody(), StandardCharsets.UTF_8)));
+			} catch (Throwable e) {
+				throw new RuntimeException("Error on parsing xslt", e);
+			}
+			try {
 			XsltTransformer trans = xslt.load();
 			trans.setInitialContextNode(source);
 			final StringWriter output = new StringWriter();

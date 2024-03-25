@@ -5,11 +5,15 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-public class JoinedEntity<E extends OafEntity> implements Serializable {
+import eu.dnetlib.dhp.schema.common.EntityType;
+import eu.dnetlib.dhp.schema.oaf.*;
 
-	private E entity;
+public class JoinedEntity implements Serializable {
+
+	private OafEntity entity;
 
 	private List<RelatedEntityWrapper> links;
 
@@ -17,16 +21,16 @@ public class JoinedEntity<E extends OafEntity> implements Serializable {
 		links = new LinkedList<>();
 	}
 
-	public JoinedEntity(E entity) {
+	public JoinedEntity(OafEntity entity) {
 		this();
 		this.entity = entity;
 	}
 
-	public E getEntity() {
+	public OafEntity getEntity() {
 		return entity;
 	}
 
-	public void setEntity(E entity) {
+	public void setEntity(OafEntity entity) {
 		this.entity = entity;
 	}
 

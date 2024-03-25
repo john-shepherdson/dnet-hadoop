@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.collection.plugin.base;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
@@ -61,6 +63,21 @@ public class BaseTransfomationTest extends AbstractVocabularyTest {
 		final MetadataRecord result = tr.call(mr);
 
 		System.out.println(result.getBody());
+	}
+
+	@Test
+	void testBase2ODF_wrong_date() throws Exception {
+
+		final MetadataRecord mr = new MetadataRecord();
+		mr.setProvenance(new Provenance("DSID", "DSNAME", "PREFIX"));
+		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("record_wrong_1.xml")));
+
+		final XSLTTransformationFunction tr = loadTransformationRule("xml/base2oaf.transformationRule.xml");
+
+		assertThrows(NullPointerException.class, () -> {
+			final MetadataRecord result = tr.call(mr);
+			System.out.println(result.getBody());
+		});
 	}
 
 	private XSLTTransformationFunction loadTransformationRule(final String path) throws Exception {

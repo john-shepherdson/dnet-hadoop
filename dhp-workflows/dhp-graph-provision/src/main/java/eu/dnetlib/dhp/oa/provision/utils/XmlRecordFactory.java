@@ -49,6 +49,7 @@ import eu.dnetlib.dhp.schema.common.*;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
 import scala.Tuple2;
 
 public class XmlRecordFactory implements Serializable {
@@ -365,6 +366,7 @@ public class XmlRecordFactory implements Serializable {
 							.getDescription()
 							.stream()
 							.filter(Objects::nonNull)
+							.limit(ModelHardLimits.MAX_ABSTRACTS)
 							.map(c -> XmlSerializationUtils.asXmlElement("description", c.getValue()))
 							.collect(Collectors.toCollection(HashSet::new)));
 			}
@@ -1057,7 +1059,8 @@ public class XmlRecordFactory implements Serializable {
 		return kv != null && StringUtils.isNotBlank(kv.getKey()) && StringUtils.isNotBlank(kv.getValue());
 	}
 
-	private List<String> mapFields(final RelatedEntityWrapper link, final Set<String> contexts) {
+	private List<String> mapFields(final TemplateFactory templateFactory, final RelatedEntityWrapper link,
+		final Set<String> contexts) {
 		final Relation rel = link.getRelation();
 		final RelatedEntity re = link.getTarget();
 		final String targetType = link.getTarget().getType();
@@ -1070,6 +1073,18 @@ public class XmlRecordFactory implements Serializable {
 			case software:
 				if (re.getTitle() != null && isNotBlank(re.getTitle().getValue())) {
 					metadata.add(XmlSerializationUtils.mapStructuredProperty("title", re.getTitle()));
+				}
+				if (StringUtils.isNotBlank(re.getDescription())) {
+					metadata.add(XmlSerializationUtils.asXmlElement("description", re.getDescription()));
+				}
+				if (re.getAuthor() != null) {
+					metadata
+						.addAll(
+							re
+								.getAuthor()
+								.stream()
+								.map(author -> XmlSerializationUtils.asXmlElement("creator", author))
+								.collect(Collectors.toList()));
 				}
 				if (isNotBlank(re.getDateofacceptance())) {
 					metadata
@@ -1104,6 +1119,54 @@ public class XmlRecordFactory implements Serializable {
 								.map(p -> XmlSerializationUtils.mapStructuredProperty("pid", p))
 								.collect(Collectors.toList()));
 				}
+				if (re.getInstances() != null) {
+					re
+						.getInstances()
+						.forEach(i -> {
+							final List<String> instanceFields = Lists.newArrayList();
+							if (i.getAccessright() != null && !i.getAccessright().isBlank()) {
+								instanceFields
+									.add(XmlSerializationUtils.mapQualifier("accessright", i.getAccessright()));
+							}
+							if (i.getHostedby() != null) {
+								instanceFields.add(XmlSerializationUtils.mapKeyValue("hostedby", i.getHostedby()));
+							}
+							if (i.getDateofacceptance() != null && isNotBlank(i.getDateofacceptance().getValue())) {
+								instanceFields
+									.add(
+										XmlSerializationUtils
+											.asXmlElement("dateofacceptance", i.getDateofacceptance().getValue()));
+							}
+							if (i.getInstancetype() != null && !i.getInstancetype().isBlank()) {
+								instanceFields
+									.add(XmlSerializationUtils.mapQualifier("instancetype", i.getInstancetype()));
+							}
+
+							if (i.getRefereed() != null && !i.getRefereed().isBlank()) {
+								instanceFields.add(XmlSerializationUtils.mapQualifier("refereed", i.getRefereed()));
+							}
+
+							if (i.getLicense() != null && isNotBlank(i.getLicense().getValue())) {
+								instanceFields
+									.add(XmlSerializationUtils.asXmlElement("license", i.getLicense().getValue()));
+							}
+							if (isNotBlank(i.getFulltext())) {
+								instanceFields.add(XmlSerializationUtils.asXmlElement("fulltext", i.getFulltext()));
+							}
+							if (i.getUrl() != null && !i.getUrl().isEmpty()) {
+								instanceFields
+									.addAll(
+										i
+											.getUrl()
+											.stream()
+											.filter(StringUtils::isNotBlank)
+											.map(url -> XmlSerializationUtils.asXmlElement("url", url))
+											.collect(Collectors.toList()));
+							}
+							metadata.add(templateFactory.getInstance(instanceFields, i.getUrl()));
+						});
+				}
+
 				break;
 			case datasource:
 				if (isNotBlank(re.getOfficialname())) {
@@ -1132,6 +1195,9 @@ public class XmlRecordFactory implements Serializable {
 				}
 				if (re.getCountry() != null && !re.getCountry().isBlank()) {
 					metadata.add(XmlSerializationUtils.mapQualifier("country", re.getCountry()));
+				}
+				if (StringUtils.isNotBlank(re.getWebsiteurl())) {
+					metadata.add(XmlSerializationUtils.asXmlElement("websiteurl", re.getWebsiteurl()));
 				}
 				break;
 			case project:
@@ -1182,7 +1248,7 @@ public class XmlRecordFactory implements Serializable {
 			throw new IllegalArgumentException(
 				String.format("missing scheme for: <%s - %s>", type, targetType));
 		}
-		final HashSet<String> fields = Sets.newHashSet(mapFields(link, contexts));
+		final HashSet<String> fields = Sets.newHashSet(mapFields(templateFactory, link, contexts));
 		if (rel.getValidated() == null) {
 			rel.setValidated(false);
 		}
@@ -1206,7 +1272,7 @@ public class XmlRecordFactory implements Serializable {
 			.map(link -> {
 				final String targetType = link.getTarget().getType();
 				final String name = ModelSupport.getMainType(EntityType.valueOf(targetType));
-				final HashSet<String> fields = Sets.newHashSet(mapFields(link, null));
+				final HashSet<String> fields = Sets.newHashSet(mapFields(templateFactory, link, null));
 				return templateFactory
 					.getChild(name, link.getTarget().getId(), Lists.newArrayList(fields));
 			})

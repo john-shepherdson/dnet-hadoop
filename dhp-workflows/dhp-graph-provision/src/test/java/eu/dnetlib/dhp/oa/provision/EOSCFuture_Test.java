@@ -57,7 +57,7 @@ public class EOSCFuture_Test {
 				IOUtils.toString(getClass().getResourceAsStream("eosc-future/photic-zone.json")),
 				OtherResearchProduct.class);
 
-		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
+		final String xml = xmlRecordFactory.build(new JoinedEntity(p));
 
 		assertNotNull(xml);
 

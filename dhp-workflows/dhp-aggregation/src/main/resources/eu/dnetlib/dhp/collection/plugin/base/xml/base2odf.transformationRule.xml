@@ -153,14 +153,18 @@
 											</xsl:for-each>
 										</datacite:subjects>
 										
-										<datacite:publisher>
-											<xsl:value-of select="normalize-space(//dc:publisher)" />
-										</datacite:publisher>
+										<xsl:for-each select="//dc:publisher">
+											<datacite:publisher>
+												<xsl:value-of select="normalize-space(.)" />
+											</datacite:publisher>
+										</xsl:for-each>
 										
-										<datacite:publicationYear>
-											<xsl:value-of select="normalize-space(//base_dc:year)" />
-										</datacite:publicationYear>
-										
+										<xsl:for-each select="//base_dc:year">
+											<datacite:publicationYear>
+												<xsl:value-of select="normalize-space(.)" />
+											</datacite:publicationYear>
+										</xsl:for-each>
+																				
 										<datacite:formats>
 											<xsl:for-each select="//dc:format">
 												<datacite:format>
@@ -174,6 +178,9 @@
 										</datacite:language>
 
 										<oaf:accessrights>
+											<xsl:if test="//base_dc:oa[.='0']">
+												<datacite:rights rightsURI="http://purl.org/coar/access_right/c_16ec">restricted access</datacite:rights>
+											</xsl:if>
 											<xsl:if test="//base_dc:oa[.='1']">
 												<datacite:rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</datacite:rights>
 											</xsl:if>
@@ -337,7 +344,9 @@
 									
 									<oaf:accessrights>
 										<xsl:choose>
+											<xsl:when test="//base_dc:oa[.='0']">CLOSED</xsl:when>
 											<xsl:when test="//base_dc:oa[.='1']">OPEN</xsl:when>
+											<xsl:when test="//base_dc:oa[.='2']">UNKNOWN</xsl:when>
 											<xsl:when test="//base_dc:rightsnorm">
 												<xsl:value-of select="vocabulary:clean(//base_dc:rightsnorm, 'dnet:access_modes')" />
 											</xsl:when>
