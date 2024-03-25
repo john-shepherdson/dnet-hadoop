@@ -46,6 +46,10 @@ case class mappingFunder(name: String, DOI: Option[String], award: Option[List[S
 
 case class CrossrefResult(oafType: String, body: String) {}
 
+case class UnpayWall(doi: String, is_oa: Boolean, best_oa_location: UnpayWallOALocation, oa_status: String) {}
+
+case class UnpayWallOALocation(license: Option[String], url: String, host_type: Option[String]) {}
+
 case object Crossref2Oaf {
   val logger: Logger = LoggerFactory.getLogger(Crossref2Oaf.getClass)
   val mapper = new ObjectMapper
@@ -83,6 +87,15 @@ case object Crossref2Oaf {
     val cf = new KeyValue
     cf.setValue("Crossref");
     cf.setKey(ModelConstants.CROSSREF_ID)
+    cf
+
+  }
+
+  def createUnpayWallCollectedFrom(): KeyValue = {
+
+    val cf = new KeyValue
+    cf.setValue("UnpayWall")
+    cf.setKey(s"10|openaire____:${DHPUtils.md5("UnpayWall".toLowerCase)}")
     cf
 
   }
@@ -287,6 +300,34 @@ case object Crossref2Oaf {
       return false
 
     true
+  }
+
+  def get_unpaywall_color(input: String): Option[OpenAccessRoute] = {
+    if (input == null || input.equalsIgnoreCase("close"))
+      return None
+    if (input.equalsIgnoreCase("green"))
+      return Some(OpenAccessRoute.green)
+    if (input.equalsIgnoreCase("bronze"))
+      return Some(OpenAccessRoute.bronze)
+    if (input.equalsIgnoreCase("hybrid"))
+      return Some(OpenAccessRoute.hybrid)
+    else
+      return Some(OpenAccessRoute.gold)
+
+  }
+
+  def get_color(input: String): Option[OpenAccessRoute] = {
+    if (input == null || input.equalsIgnoreCase("closed"))
+      return None
+    if (input.equalsIgnoreCase("green"))
+      return Some(OpenAccessRoute.green)
+    if (input.equalsIgnoreCase("bronze"))
+      return Some(OpenAccessRoute.bronze)
+    if (input.equalsIgnoreCase("hybrid"))
+      return Some(OpenAccessRoute.hybrid)
+    else
+      return Some(OpenAccessRoute.gold)
+
   }
 
   def mappingResult(result: Result, json: JValue, instanceType: Qualifier, originalType: String): Result = {
@@ -575,9 +616,15 @@ case object Crossref2Oaf {
     null
   }
 
-  def convert(input: String, vocabularies: VocabularyGroup): List[CrossrefResult] = {
+  def extract_doi(input: String): CrossrefDT = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(input)
+    CrossrefDT(doi = (json \ "DOI").extract[String].toLowerCase, json = input, 0)
+  }
+
+  def convert(input: CrossrefDT, uw: UnpayWall, vocabularies: VocabularyGroup): List[CrossrefResult] = {
+    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
+    lazy val json: json4s.JValue = parse(input.json)
 
     var resultList: List[CrossrefResult] = List()
 
@@ -626,6 +673,32 @@ case object Crossref2Oaf {
       resultList = resultList ::: citation_relations.map(s =>
         CrossrefResult(s.getClass.getSimpleName, mapper.writeValueAsString(s))
       )
+    }
+
+    if (uw != null) {
+      result.getCollectedfrom.add(createUnpayWallCollectedFrom())
+      val i: Instance = new Instance()
+      i.setCollectedfrom(createUnpayWallCollectedFrom())
+      if (uw.best_oa_location != null) {
+
+        i.setUrl(List(uw.best_oa_location.url).asJava)
+        if (uw.best_oa_location.license.isDefined) {
+          i.setLicense(field[String](uw.best_oa_location.license.get, null))
+        }
+
+        val colour = get_unpaywall_color(uw.oa_status)
+        if (colour.isDefined) {
+          val a = new AccessRight
+          a.setClassid(ModelConstants.ACCESS_RIGHT_OPEN)
+          a.setClassname(ModelConstants.ACCESS_RIGHT_OPEN)
+          a.setSchemeid(ModelConstants.DNET_ACCESS_MODES)
+          a.setSchemename(ModelConstants.DNET_ACCESS_MODES)
+          a.setOpenAccessRoute(colour.get)
+          i.setAccessright(a)
+        }
+        i.setPid(result.getPid)
+        result.getInstance().add(i)
+      }
     }
     if (!filterResult(result))
       List()

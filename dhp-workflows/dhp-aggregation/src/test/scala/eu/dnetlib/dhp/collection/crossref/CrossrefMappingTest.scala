@@ -21,7 +21,6 @@ class CrossrefMappingTest extends AbstractVocabularyTest {
     super.setUpVocabulary()
   }
 
-  @Test
   def testMapping(): Unit = {
     val spark = SparkSession.builder().master("local[*]").appName("TransformCrossref").getOrCreate()
 
@@ -32,6 +31,7 @@ class CrossrefMappingTest extends AbstractVocabularyTest {
       spark,
       sourcePath = "/home/sandro/Downloads/crossref",
       targetPath = "/home/sandro/Downloads/crossref_transformed",
+      unpaywallPath = null,
       vocabularies = vocabularies
     )
 

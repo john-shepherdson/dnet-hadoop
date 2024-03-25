@@ -12,6 +12,12 @@
     "paramRequired": true
   },
   {
+    "paramName": "uw",
+    "paramLongName": "unpaywallPath",
+    "paramDescription": "The base path of unpaywall DUMP",
+    "paramRequired": true
+  },
+  {
     "paramName": "t",
     "paramLongName": "targetPath",
     "paramDescription": "The target path",

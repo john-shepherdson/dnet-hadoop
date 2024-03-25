@@ -2,11 +2,15 @@
     <parameters>
         <property>
             <name>sourcePath</name>
-            <description>The base path of MAG DUMP CSV Tables</description>
+            <description>The base path of Crossref DUMP </description>
         </property>
         <property>
             <name>targetPath</name>
-            <description>The base path of MAG DUMP CSV Tables</description>
+            <description>The targetPath</description>
+        </property>
+        <property>
+            <name>unpaywallPath</name>
+            <description>The base path of unpaywall DUMP </description>
         </property>
         <property>
             <name>isLookupUrl</name>
@@ -42,6 +46,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
+            <arg>--unpaywallPath</arg><arg>${unpaywallPath}</arg>
             <arg>--targetPath</arg><arg>${targetPath}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--master</arg><arg>yarn</arg>
