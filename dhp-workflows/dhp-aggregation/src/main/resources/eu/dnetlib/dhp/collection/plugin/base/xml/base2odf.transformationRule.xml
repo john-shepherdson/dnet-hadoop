@@ -153,14 +153,18 @@
 											</xsl:for-each>
 										</datacite:subjects>
 										
-										<datacite:publisher>
-											<xsl:value-of select="normalize-space(//dc:publisher)" />
-										</datacite:publisher>
+										<xsl:for-each select="//dc:publisher">
+											<datacite:publisher>
+												<xsl:value-of select="normalize-space(.)" />
+											</datacite:publisher>
+										</xsl:for-each>
 										
-										<datacite:publicationYear>
-											<xsl:value-of select="normalize-space(//base_dc:year)" />
-										</datacite:publicationYear>
-										
+										<xsl:for-each select="//base_dc:year">
+											<datacite:publicationYear>
+												<xsl:value-of select="normalize-space(.)" />
+											</datacite:publicationYear>
+										</xsl:for-each>
+																				
 										<datacite:formats>
 											<xsl:for-each select="//dc:format">
 												<datacite:format>
