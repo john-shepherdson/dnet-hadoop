@@ -178,6 +178,9 @@
 										</datacite:language>
 
 										<oaf:accessrights>
+											<xsl:if test="//base_dc:oa[.='0']">
+												<datacite:rights rightsURI="http://purl.org/coar/access_right/c_16ec">restricted access</datacite:rights>
+											</xsl:if>
 											<xsl:if test="//base_dc:oa[.='1']">
 												<datacite:rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</datacite:rights>
 											</xsl:if>
@@ -341,7 +344,9 @@
 									
 									<oaf:accessrights>
 										<xsl:choose>
+											<xsl:when test="//base_dc:oa[.='0']">CLOSED</xsl:when>
 											<xsl:when test="//base_dc:oa[.='1']">OPEN</xsl:when>
+											<xsl:when test="//base_dc:oa[.='2']">UNKNOWN</xsl:when>
 											<xsl:when test="//base_dc:rightsnorm">
 												<xsl:value-of select="vocabulary:clean(//base_dc:rightsnorm, 'dnet:access_modes')" />
 											</xsl:when>
