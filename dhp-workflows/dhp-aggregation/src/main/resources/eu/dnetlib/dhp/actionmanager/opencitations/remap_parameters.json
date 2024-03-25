@@ -12,9 +12,14 @@
     "paramRequired": true
   },
   {
-    "paramName": "hnn",
-    "paramLongName": "hdfsNameNode",
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManged",
     "paramDescription": "the hdfs name node",
-    "paramRequired": true
-  }
+    "paramRequired": false
+  },{
+  "paramName": "nn",
+  "paramLongName": "nameNode",
+  "paramDescription": "the hdfs name node",
+  "paramRequired": true
+}
 ]
