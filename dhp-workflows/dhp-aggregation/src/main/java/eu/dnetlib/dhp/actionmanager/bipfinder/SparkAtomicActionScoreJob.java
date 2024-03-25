@@ -95,7 +95,7 @@ public class SparkAtomicActionScoreJob implements Serializable {
 
 		return projectScores.map((MapFunction<BipProjectModel, Project>) bipProjectScores -> {
 			Project project = new Project();
-			project.setId(bipProjectScores.getProjectId());
+			//project.setId(bipProjectScores.getProjectId());
 			project.setMeasures(bipProjectScores.toMeasures());
 			return project;
 		}, Encoders.bean(Project.class))

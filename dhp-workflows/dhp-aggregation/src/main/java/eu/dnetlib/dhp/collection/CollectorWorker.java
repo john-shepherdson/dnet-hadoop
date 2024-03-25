@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import eu.dnetlib.dhp.aggregation.common.ReporterCallback;
 import eu.dnetlib.dhp.aggregation.common.ReportingJob;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
+import eu.dnetlib.dhp.collection.plugin.base.BaseCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.file.FileCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.file.FileGZipCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.mongodb.MDStoreCollectorPlugin;
@@ -120,6 +121,8 @@ public class CollectorWorker extends ReportingJob {
 				return new FileCollectorPlugin(fileSystem);
 			case fileGzip:
 				return new FileGZipCollectorPlugin(fileSystem);
+			case baseDump:
+				return new BaseCollectorPlugin(this.fileSystem);
 			case other:
 				final CollectorPlugin.NAME.OTHER_NAME plugin = Optional
 					.ofNullable(api.getParams().get("other_plugin_type"))

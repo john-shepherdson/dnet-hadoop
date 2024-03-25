@@ -3,17 +3,18 @@ package eu.dnetlib.doiboost
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.oa.merge.AuthorMerger
 import eu.dnetlib.dhp.schema.common.ModelConstants
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils
 import eu.dnetlib.dhp.schema.oaf.{Organization, Publication, Relation, Dataset => OafDataset}
 import eu.dnetlib.doiboost.mag.ConversionUtil
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql._
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.parse
 import org.slf4j.{Logger, LoggerFactory}
+
 import scala.collection.JavaConverters._
 
 object SparkGenerateDoiBoost {
@@ -78,8 +79,10 @@ object SparkGenerateDoiBoost {
       if (item._2 != null) {
         val otherPub = item._2._2
         if (otherPub != null) {
-          crossrefPub.mergeFrom(otherPub)
-          crossrefPub.setAuthor(AuthorMerger.mergeAuthor(crossrefPub.getAuthor, otherPub.getAuthor))
+          val mergedAuthor = AuthorMerger.mergeAuthor(crossrefPub.getAuthor, otherPub.getAuthor)
+          val res = MergeUtils.mergePublication(crossrefPub, otherPub)
+          res.setAuthor(mergedAuthor);
+          return res
         }
       }
       crossrefPub
@@ -130,14 +133,13 @@ object SparkGenerateDoiBoost {
             // So we have to merge
             val b1 = left._2
             val b2 = right._2
-            b1.mergeFrom(b2)
-            b1.mergeOAFDataInfo(b2)
             val authors = AuthorMerger.mergeAuthor(b1.getAuthor, b2.getAuthor)
-            b1.setAuthor(authors)
+            val merged = MergeUtils.mergePublication(b1, b2);
+            merged.setAuthor(authors)
             if (b2.getId != null && b2.getId.nonEmpty)
-              b1.setId(b2.getId)
+              merged.setId(b2.getId)
             //Return publication Merged
-            (b1.getId, b1)
+            (merged.getId, merged)
           }
         } else {
           // Left is Null so we return right
