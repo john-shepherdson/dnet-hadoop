@@ -1497,3 +1497,29 @@ cnr:institutes @=@ https://ror.org/0263zy895 @=@ CDS132
 cnr:institutes @=@ https://ror.org/0263zy895 @=@ SCITEC - Istituto di Scienze e Tecnologie Chimiche \"Giulio Natta\"
 cnr:institutes @=@ __CDS133__ @=@ CDS133
 cnr:institutes @=@ __CDS133__ @=@ STEMS - Istituto di Scienze e Tecnologie per l'Energia e la Mobilità Sostenibili
+base:normalized_types @=@ Text @=@ 1
+base:normalized_types @=@ Book @=@ 11
+base:normalized_types @=@ Book part @=@ 111
+base:normalized_types @=@ Journal/Newspaper @=@ 12
+base:normalized_types @=@ Article contribution @=@ 121
+base:normalized_types @=@ Other non-article @=@ 122
+base:normalized_types @=@ Conference object @=@ 13
+base:normalized_types @=@ Report @=@ 14
+base:normalized_types @=@ Review @=@ 15
+base:normalized_types @=@ Course material @=@ 16
+base:normalized_types @=@ Lecture @=@ 17
+base:normalized_types @=@ Thesis @=@ 18
+base:normalized_types @=@ Bachelor's thesis @=@ 181
+base:normalized_types @=@ Master's thesis @=@ 182
+base:normalized_types @=@ Doctoral and postdoctoral thesis @=@ 183
+base:normalized_types @=@ Manuscript @=@ 19
+base:normalized_types @=@ Patent @=@ 1A
+base:normalized_types @=@ Musical notation @=@ 2
+base:normalized_types @=@ Map @=@ 3
+base:normalized_types @=@ Audio @=@ 4
+base:normalized_types @=@ Image/Video @=@ 5
+base:normalized_types @=@ Still image @=@ 51
+base:normalized_types @=@ Moving image/Video @=@ 52
+base:normalized_types @=@ Software @=@ 6
+base:normalized_types @=@ Dataset @=@ 7
+base:normalized_types @=@ Unknown @=@ F

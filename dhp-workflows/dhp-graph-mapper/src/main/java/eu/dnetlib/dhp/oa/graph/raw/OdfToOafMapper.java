@@ -238,11 +238,23 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 				(Element) doc
 					.selectSingleNode(
 						"//*[local-name()='metadata']/*[local-name() = 'resource']/*[local-name() = 'resourceType']"))
-			.map(element -> {
-				final String resourceTypeURI = element.attributeValue("uri");
-				final String resourceTypeAnyURI = element.attributeValue("anyURI");
-				final String resourceTypeTxt = element.getText();
-				final String resourceTypeGeneral = element.attributeValue("resourceTypeGeneral");
+			.map(e -> {
+				final String resourceTypeURI = Optional
+					.ofNullable(e.attributeValue("uri"))
+					.filter(StringUtils::isNotBlank)
+					.orElse(null);
+				final String resourceTypeAnyURI = Optional
+					.ofNullable(e.attributeValue("anyURI"))
+					.filter(StringUtils::isNotBlank)
+					.orElse(null);
+				final String resourceTypeTxt = Optional
+					.ofNullable(e.getText())
+					.filter(StringUtils::isNotBlank)
+					.orElse(null);
+				final String resourceTypeGeneral = Optional
+					.ofNullable(e.attributeValue("resourceTypeGeneral"))
+					.filter(StringUtils::isNotBlank)
+					.orElse(null);
 
 				return ObjectUtils
 					.firstNonNull(resourceTypeURI, resourceTypeAnyURI, resourceTypeTxt, resourceTypeGeneral);

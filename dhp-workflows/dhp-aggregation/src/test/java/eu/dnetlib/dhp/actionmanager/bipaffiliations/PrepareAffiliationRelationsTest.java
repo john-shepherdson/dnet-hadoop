@@ -78,10 +78,6 @@ public class PrepareAffiliationRelationsTest {
 			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/doi_to_ror.json")
 			.getPath();
 
-		String pubmedAffiliationRelationsPath = getClass()
-			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/doi_to_ror.json")
-			.getPath();
-
 		String outputPath = workingDir.toString() + "/actionSet";
 
 		PrepareAffiliationRelations
@@ -89,7 +85,8 @@ public class PrepareAffiliationRelationsTest {
 				new String[] {
 					"-isSparkSessionManaged", Boolean.FALSE.toString(),
 					"-crossrefInputPath", crossrefAffiliationRelationPath,
-					"-pubmedInputPath", pubmedAffiliationRelationsPath,
+					"-pubmedInputPath", crossrefAffiliationRelationPath,
+					"-openapcInputPath", crossrefAffiliationRelationPath,
 					"-outputPath", outputPath
 				});
 
@@ -106,7 +103,7 @@ public class PrepareAffiliationRelationsTest {
 //            );
 //        }
 		// count the number of relations
-		assertEquals(40, tmp.count());
+		assertEquals(60, tmp.count());
 
 		Dataset<Relation> dataset = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
 		dataset.createOrReplaceTempView("result");
@@ -117,7 +114,7 @@ public class PrepareAffiliationRelationsTest {
 		// verify that we have equal number of bi-directional relations
 		Assertions
 			.assertEquals(
-				20, execVerification
+				30, execVerification
 					.filter(
 						"relClass='" + ModelConstants.HAS_AUTHOR_INSTITUTION + "'")
 					.collectAsList()
@@ -125,7 +122,7 @@ public class PrepareAffiliationRelationsTest {
 
 		Assertions
 			.assertEquals(
-				20, execVerification
+				30, execVerification
 					.filter(
 						"relClass='" + ModelConstants.IS_AUTHOR_INSTITUTION_OF + "'")
 					.collectAsList()

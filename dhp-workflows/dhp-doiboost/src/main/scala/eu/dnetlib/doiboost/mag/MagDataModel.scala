@@ -1,8 +1,8 @@
 package eu.dnetlib.doiboost.mag
 
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
-import eu.dnetlib.dhp.schema.oaf.{Instance, Journal, Publication, StructuredProperty, Subject}
+import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, MergeUtils}
+import eu.dnetlib.dhp.schema.oaf.{Instance, Journal, Publication, Subject}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.DoiBoostMappingUtil._
 import org.json4s
@@ -142,8 +142,7 @@ case object ConversionUtil {
 
   def mergePublication(a: Publication, b: Publication): Publication = {
     if ((a != null) && (b != null)) {
-      a.mergeFrom(b)
-      a
+      MergeUtils.mergePublication(a, b)
     } else {
       if (a == null) b else a
     }

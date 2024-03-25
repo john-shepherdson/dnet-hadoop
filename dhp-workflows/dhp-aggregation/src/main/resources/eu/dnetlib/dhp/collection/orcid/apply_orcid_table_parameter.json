@@ -1,0 +1,26 @@
+[
+  {
+    "paramName": "m",
+    "paramLongName": "master",
+    "paramDescription": "the master name",
+    "paramRequired": true
+  },
+  {
+    "paramName": "t",
+    "paramLongName": "targetPath",
+    "paramDescription": "the target PATH of the DF tables",
+    "paramRequired": true
+  },
+  {
+    "paramName": "g",
+    "paramLongName": "graphPath",
+    "paramDescription": "the PATH of the current graph path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "u",
+    "paramLongName": "updatePath",
+    "paramDescription": "the PATH of the current graph update path",
+    "paramRequired": true
+  }
+  ]

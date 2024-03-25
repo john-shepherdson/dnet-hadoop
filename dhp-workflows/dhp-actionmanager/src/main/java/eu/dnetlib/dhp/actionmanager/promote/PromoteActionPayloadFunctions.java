@@ -34,6 +34,7 @@ public class PromoteActionPayloadFunctions {
 	 * @param rowIdFn Function used to get the id of graph table row
 	 * @param actionPayloadIdFn Function used to get id of action payload instance
 	 * @param mergeAndGetFn Function used to merge graph table row and action payload instance
+	 * @param promoteActionStrategy the Actionset promotion strategy
 	 * @param rowClazz Class of graph table
 	 * @param actionPayloadClazz Class of action payload
 	 * @param <G> Type of graph table row
@@ -46,6 +47,7 @@ public class PromoteActionPayloadFunctions {
 		SerializableSupplier<Function<G, String>> rowIdFn,
 		SerializableSupplier<Function<A, String>> actionPayloadIdFn,
 		SerializableSupplier<BiFunction<G, A, G>> mergeAndGetFn,
+		PromoteAction.Strategy promoteActionStrategy,
 		Class<G> rowClazz,
 		Class<A> actionPayloadClazz) {
 		if (!isSubClass(rowClazz, actionPayloadClazz)) {
@@ -61,7 +63,7 @@ public class PromoteActionPayloadFunctions {
 			.joinWith(
 				actionPayloadWithIdDS,
 				rowWithIdDS.col("_1").equalTo(actionPayloadWithIdDS.col("_1")),
-				"full_outer")
+				PromoteAction.joinTypeForStrategy(promoteActionStrategy))
 			.map(
 				(MapFunction<Tuple2<Tuple2<String, G>, Tuple2<String, A>>, G>) value -> {
 					Optional<G> rowOpt = Optional.ofNullable(value._1()).map(Tuple2::_2);
