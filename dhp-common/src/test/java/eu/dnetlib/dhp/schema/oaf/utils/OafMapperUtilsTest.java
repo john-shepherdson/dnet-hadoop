@@ -149,7 +149,7 @@ class OafMapperUtilsTest {
 	void testDate() {
 		final String date = GraphCleaningFunctions.cleanDate("23-FEB-1998");
 		assertNotNull(date);
-		System.out.println(date);
+		assertEquals("1998-02-23", date);
 	}
 
 	@Test
@@ -166,8 +166,8 @@ class OafMapperUtilsTest {
 
 		assertEquals(
 			ModelConstants.PUBLICATION_RESULTTYPE_CLASSID,
-			OafMapperUtils
-				.mergeResults(p1, d2)
+			MergeUtils
+				.mergeResult(p1, d2)
 				.getResulttype()
 				.getClassid());
 
@@ -178,8 +178,8 @@ class OafMapperUtilsTest {
 
 		assertEquals(
 			ModelConstants.DATASET_RESULTTYPE_CLASSID,
-			OafMapperUtils
-				.mergeResults(p2, d1)
+			MergeUtils
+				.mergeResult(p2, d1)
 				.getResulttype()
 				.getClassid());
 	}
@@ -192,7 +192,7 @@ class OafMapperUtilsTest {
 		assertEquals(1, d2.getCollectedfrom().size());
 		assertTrue(cfId(d2.getCollectedfrom()).contains(ModelConstants.ZENODO_OD_ID));
 
-		Result res = OafMapperUtils.mergeResults(d1, d2);
+		Result res = MergeUtils.mergeResult(d1, d2);
 
 		assertEquals(d2, res);
 
