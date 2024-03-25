@@ -52,8 +52,6 @@ public class RestIterator implements Iterator<String> {
 
 	private final String BASIC = "basic";
 
-	private final JsonUtils jsonUtils;
-
 	private final String baseUrl;
 	private final String resumptionType;
 	private final String resumptionParam;
@@ -106,7 +104,6 @@ public class RestIterator implements Iterator<String> {
 		final String resultOutputFormat) {
 
 		this.clientParams = clientParams;
-		this.jsonUtils = new JsonUtils();
 		this.baseUrl = baseUrl;
 		this.resumptionType = resumptionType;
 		this.resumptionParam = resumptionParam;
@@ -126,6 +123,7 @@ public class RestIterator implements Iterator<String> {
 		} catch (Exception e) {
 			throw new IllegalStateException("xml transformation init failed: " + e.getMessage());
 		}
+
 		initQueue();
 	}
 
@@ -190,7 +188,7 @@ public class RestIterator implements Iterator<String> {
 		String resultJson;
 		String resultXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 		String nextQuery = "";
-		String emptyXml = resultXml + "<" + JsonUtils.wrapName + "></" + JsonUtils.wrapName + ">";
+		String emptyXml = resultXml + "<" + JsonUtils.XML_WRAP_TAG + "></" + JsonUtils.XML_WRAP_TAG + ">";
 		Node resultNode = null;
 		NodeList nodeList = null;
 		String qUrlArgument = "";
@@ -231,7 +229,7 @@ public class RestIterator implements Iterator<String> {
 			resultStream = theHttpInputStream;
 			if ("json".equals(resultOutputFormat)) {
 				resultJson = IOUtils.toString(resultStream, StandardCharsets.UTF_8);
-				resultXml = jsonUtils.convertToXML(resultJson);
+				resultXml = JsonUtils.convertToXML(resultJson);
 				resultStream = IOUtils.toInputStream(resultXml, UTF_8);
 			}
 

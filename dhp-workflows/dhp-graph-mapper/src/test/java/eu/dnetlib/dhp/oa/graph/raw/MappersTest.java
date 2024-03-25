@@ -1172,6 +1172,34 @@ class MappersTest {
 	}
 
 	@Test
+	void test_Zenodo2() throws IOException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_zenodo2.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+
+		assertEquals(3, list.size());
+		Publication p = cleanup((Publication) list.get(0), vocs);
+
+		assertNotNull(p.getInstance());
+		assertEquals(1, p.getInstance().size());
+
+		final Instance instance = p.getInstance().get(0);
+
+		assertNotNull(instance.getInstanceTypeMapping());
+		assertEquals(1, instance.getInstanceTypeMapping().size());
+
+		Optional<InstanceTypeMapping> coarType = instance
+			.getInstanceTypeMapping()
+			.stream()
+			.filter(itm -> ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1.equals(itm.getVocabularyName()))
+			.findFirst();
+
+		assertTrue(coarType.isPresent());
+		assertNotNull(coarType.get().getOriginalType());
+		assertNull(coarType.get().getTypeCode());
+		assertNull(coarType.get().getTypeLabel());
+	}
+
+	@Test
 	void testROHub2() throws IOException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("rohub-modified.xml")));
@@ -1229,7 +1257,7 @@ class MappersTest {
 	}
 
 	@Test
-	public void testD4ScienceTraining() throws IOException {
+	void testD4ScienceTraining() throws IOException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("d4science-1-training.xml")));
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
@@ -1240,7 +1268,7 @@ class MappersTest {
 	}
 
 	@Test
-	public void testD4ScienceDataset() throws IOException {
+	void testD4ScienceDataset() throws IOException {
 		final String xml = IOUtils
 			.toString(Objects.requireNonNull(getClass().getResourceAsStream("d4science-2-dataset.xml")));
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
@@ -1248,6 +1276,22 @@ class MappersTest {
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(trainingMaterial));
 		System.out.println("***************");
+	}
+
+	@Test
+	void testIRISPub() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("iris-odf.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+		final Publication p = (Publication) list.get(0);
+		assertNotNull(p.getInstance().get(0).getUrl().get(0));
+		assertValidId(p.getId());
+		System.out.println(p.getInstance().get(0).getUrl());
+		p.getPid().forEach(x -> System.out.println(x.getValue()));
+		p.getInstance().get(0).getAlternateIdentifier().forEach(x -> System.out.println(x.getValue()));
+
 	}
 
 	@Test

@@ -1210,4 +1210,29 @@ cnr:institutes @=@ cnr:institutes @=@ __CDS130__ @=@ __CDS130__
 cnr:institutes @=@ cnr:institutes @=@ __CDS131__ @=@ __CDS131__
 cnr:institutes @=@ cnr:institutes @=@ https://ror.org/0263zy895 @=@ https://ror.org/0263zy895
 cnr:institutes @=@ cnr:institutes @=@ __CDS133__ @=@ __CDS133__
-
+base:normalized_types @=@ base:normalized_types @=@ Text @=@ Text
+base:normalized_types @=@ base:normalized_types @=@ Book @=@ Book
+base:normalized_types @=@ base:normalized_types @=@ Book part @=@ Book part
+base:normalized_types @=@ base:normalized_types @=@ Journal/Newspaper @=@ Journal/Newspaper
+base:normalized_types @=@ base:normalized_types @=@ Article contribution @=@ Article contribution
+base:normalized_types @=@ base:normalized_types @=@ Other non-article @=@ Other non-article
+base:normalized_types @=@ base:normalized_types @=@ Conference object @=@ Conference object
+base:normalized_types @=@ base:normalized_types @=@ Report @=@ Report
+base:normalized_types @=@ base:normalized_types @=@ Review @=@ Review
+base:normalized_types @=@ base:normalized_types @=@ Course material @=@ Course material
+base:normalized_types @=@ base:normalized_types @=@ Lecture @=@ Lecture
+base:normalized_types @=@ base:normalized_types @=@ Thesis @=@ Thesis
+base:normalized_types @=@ base:normalized_types @=@ Bachelor's thesis @=@ Bachelor's thesis
+base:normalized_types @=@ base:normalized_types @=@ Master's thesis @=@ Master's thesis
+base:normalized_types @=@ base:normalized_types @=@ Doctoral and postdoctoral thesis @=@ Doctoral and postdoctoral thesis
+base:normalized_types @=@ base:normalized_types @=@ Manuscript @=@ Manuscript
+base:normalized_types @=@ base:normalized_types @=@ Patent @=@ Patent
+base:normalized_types @=@ base:normalized_types @=@ Musical notation @=@ Musical notation
+base:normalized_types @=@ base:normalized_types @=@ Map @=@ Map
+base:normalized_types @=@ base:normalized_types @=@ Audio @=@ Audio
+base:normalized_types @=@ base:normalized_types @=@ Image/Video @=@ Image/Video
+base:normalized_types @=@ base:normalized_types @=@ Still image @=@ Still image
+base:normalized_types @=@ base:normalized_types @=@ Moving image/Video @=@ Moving image/Video
+base:normalized_types @=@ base:normalized_types @=@ Software @=@ Software
+base:normalized_types @=@ base:normalized_types @=@ Dataset @=@ Dataset
+base:normalized_types @=@ base:normalized_types @=@ Unknown @=@ Unknown

@@ -1,0 +1,461 @@
+<RESOURCE_PROFILE>
+	<HEADER>
+		<RESOURCE_IDENTIFIER value="2ad0cdd9-c96c-484c-8b0e-ed56d86891fe_VHJhbnNmb3JtYXRpb25SdWxlRFNSZXNvdXJjZXMvVHJhbnNmb3JtYXRpb25SdWxlRFNSZXNvdXJjZVR5cGU=" />
+		<RESOURCE_TYPE value="TransformationRuleDSResourceType" />
+		<RESOURCE_KIND value="TransformationRuleDSResources" />
+		<RESOURCE_URI value="" />
+		<DATE_OF_CREATION value="2024-03-05T11:23:00+00:00" />
+	</HEADER>
+	<BODY>
+		<CONFIGURATION>
+			<SOURCE_METADATA_FORMAT interpretation="cleaned" layout="store" name="dc" />
+			<SINK_METADATA_FORMAT name="odf_hbase" />
+			<IMPORTED />
+			<SCRIPT>
+				<TITLE>xslt_base2odf_hadoop</TITLE>
+				<CODE>
+					<xsl:stylesheet xmlns:oaire="http://namespace.openaire.eu/schema/oaire/" xmlns:dateCleaner="http://eu/dnetlib/transform/dateISO" xmlns:base_dc="http://oai.base-search.net/base_dc/"
+						xmlns:datacite="http://datacite.org/schema/kernel-4" xmlns:dr="http://www.driver-repository.eu/namespace/dr" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+						xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:vocabulary="http://eu/dnetlib/transform/clean" xmlns:oaf="http://namespace.openaire.eu/oaf"
+						xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:dri="http://www.driver-repository.eu/namespace/dri" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:dc="http://purl.org/dc/elements/1.1/"
+						exclude-result-prefixes="xsl vocabulary dateCleaner base_dc" version="2.0">
+						<xsl:param name="varOfficialName" />
+						<xsl:param name="varDataSourceId" />
+						<xsl:param name="varFP7" select="'corda_______::'" />
+						<xsl:param name="varH2020" select="'corda__h2020::'" />
+						<xsl:param name="repoCode" select="substring-before(//*[local-name() = 'header']/*[local-name()='recordIdentifier'], ':')" />
+						<xsl:param name="index" select="0" />
+						<xsl:param name="transDate" select="current-dateTime()" />
+
+						<xsl:template name="terminate">
+							<xsl:message terminate="yes">
+								record is not compliant, transformation is interrupted.
+							</xsl:message>
+						</xsl:template>
+
+						<xsl:template match="/">
+							<record>
+								<xsl:apply-templates select="//*[local-name() = 'header']" />
+
+
+								<!-- NOT USED 
+									base_dc:global_id (I used oai:identifier) 
+									base_dc:collection/text() 
+									base_dc:continent 
+									base_dc:country  
+									dc:coverage
+									dc:source
+									dc:relation
+									dc:type (I used //base_dc:typenorm)
+									dc:language (I used base_dc:lang) 
+									base_dc:link (I used dc:identifier)
+								 -->
+
+								<metadata>
+									<datacite:resource>
+
+										<xsl:for-each select="//base_dc:doi">
+											<datacite:identifier identifierType="DOI">
+												<xsl:value-of select="." />
+											</datacite:identifier>
+										</xsl:for-each>										
+
+										<datacite:alternateIdentifiers>
+											<xsl:for-each
+												select="distinct-values(//dc:identifier[starts-with(., 'http') and (not(contains(., '://dx.doi.org/') or contains(., '://doi.org/') or contains(., '://hdl.handle.net/')))])">
+												<datacite:identifier alternateIdentifierType="url">
+													<xsl:value-of select="." />
+												</datacite:identifier>
+											</xsl:for-each>
+
+											<xsl:for-each select="distinct-values(//dc:identifier[starts-with(., 'http') and contains(., '://hdl.handle.net/')]/substring-after(., 'hdl.handle.net/'))">
+												<datacite:identifier alternateIdentifierType="handle">
+													<xsl:value-of select="." />
+												</datacite:identifier>
+											</xsl:for-each>
+
+											<xsl:for-each select="distinct-values(//dc:identifier[starts-with(., 'urn:nbn:nl:') or starts-with(., 'URN:NBN:NL:')])">
+												<datacite:identifier alternateIdentifierType='urn'>
+													<xsl:value-of select="." />
+												</datacite:identifier>
+											</xsl:for-each>
+
+											<datacite:identifier alternateIdentifierType="oai-original">
+												<xsl:value-of
+													select="//oai:header/oai:identifier" />
+											</datacite:identifier>
+											
+										</datacite:alternateIdentifiers>
+
+										<datacite:relatedIdentifiers />
+
+
+										<xsl:for-each select="//base_dc:typenorm">
+											<datacite:resourceType><xsl:value-of select="vocabulary:clean(., 'base:normalized_types')" /></datacite:resourceType>
+										</xsl:for-each>
+
+										<datacite:titles>
+											<xsl:for-each select="//dc:title">
+												<datacite:title>
+													<xsl:value-of select="normalize-space(.)" />
+												</datacite:title>
+											</xsl:for-each>
+										</datacite:titles>
+
+										<datacite:creators>
+											<xsl:for-each select="//dc:creator">
+												<xsl:variable name="author" select="normalize-space(.)" />
+												<datacite:creator>
+													<datacite:creatorName>
+														<xsl:value-of select="$author" />
+													</datacite:creatorName>
+													<xsl:for-each select="//base_dc:authod_id[normalize-space(./base_dc:creator_name) = $author]/base_dc:creator_id ">
+														<xsl:if test="contains(.,'https://orcid.org/')">
+															<nameIdentifier schemeURI="https://orcid.org/" nameIdentifierScheme="ORCID">
+																<xsl:value-of select="substring-after(., 'https://orcid.org/')" />
+															</nameIdentifier>
+														</xsl:if>
+													</xsl:for-each>
+												</datacite:creator>
+											</xsl:for-each>
+										</datacite:creators>
+
+										<datacite:contributors>
+											<xsl:for-each select="//dc:contributor">
+												<datacite:contributor>
+													<datacite:contributorName>
+														<xsl:value-of select="normalize-space(.)" />
+													</datacite:contributorName>
+												</datacite:contributor>
+											</xsl:for-each>
+										</datacite:contributors>
+
+										<datacite:descriptions>
+											<xsl:for-each select="//dc:description">
+												<datacite:description descriptionType="Abstract">
+													<xsl:value-of select="normalize-space(.)" />
+												</datacite:description>
+											</xsl:for-each>
+										</datacite:descriptions>
+
+										<datacite:subjects>
+											<xsl:for-each select="//dc:subject">
+												<datacite:subject>
+													<xsl:value-of select="normalize-space(.)" />
+												</datacite:subject>
+											</xsl:for-each>
+											
+											<xsl:for-each select="//base_dc:classcode|//base_dc:autoclasscode">
+												<datacite:subject subjectScheme="{@type}" classificationCode="{normalize-space(.)}">
+													<!-- TODO the value should be obtained by the Code -->
+													<xsl:value-of select="normalize-space(.)" />
+												</datacite:subject>
+											</xsl:for-each>
+										</datacite:subjects>
+										
+										<xsl:for-each select="//dc:publisher">
+											<datacite:publisher>
+												<xsl:value-of select="normalize-space(.)" />
+											</datacite:publisher>
+										</xsl:for-each>
+										
+										<xsl:for-each select="//base_dc:year">
+											<datacite:publicationYear>
+												<xsl:value-of select="normalize-space(.)" />
+											</datacite:publicationYear>
+										</xsl:for-each>
+																				
+										<datacite:formats>
+											<xsl:for-each select="//dc:format">
+												<datacite:format>
+													<xsl:value-of select="normalize-space(.)" />
+												</datacite:format>
+											</xsl:for-each>
+										</datacite:formats>
+										
+										<datacite:language>
+											<xsl:value-of select="vocabulary:clean( //base_dc:lang, 'dnet:languages')" />
+										</datacite:language>
+
+										<oaf:accessrights>
+											<xsl:if test="//base_dc:oa[.='0']">
+												<datacite:rights rightsURI="http://purl.org/coar/access_right/c_16ec">restricted access</datacite:rights>
+											</xsl:if>
+											<xsl:if test="//base_dc:oa[.='1']">
+												<datacite:rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</datacite:rights>
+											</xsl:if>
+											<xsl:for-each select="//dc:rights|//base_dc:rightsnorm">
+												<datacite:rights><xsl:value-of select="vocabulary:clean(., 'dnet:access_modes')" /></datacite:rights>	
+											</xsl:for-each>
+										</oaf:accessrights>
+
+									</datacite:resource>
+
+									<xsl:for-each select="//dc:relation">
+										<xsl:if test="matches(normalize-space(.), '(info:eu-repo/grantagreement/ec/fp7/)(\d\d\d\d\d\d)(.*)', 'i')">
+											<oaf:projectid>
+												<xsl:value-of select="concat($varFP7, replace(normalize-space(.), '(info:eu-repo/grantagreement/ec/fp7/)(\d\d\d\d\d\d)(.*)', '$2', 'i'))" />
+											</oaf:projectid>
+										</xsl:if>
+										<xsl:if test="matches(normalize-space(.), '(info:eu-repo/grantagreement/ec/h2020/)(\d\d\d\d\d\d)(.*)', 'i')">
+											<oaf:projectid>
+												<xsl:value-of select="concat($varH2020, replace(normalize-space(.), '(info:eu-repo/grantagreement/ec/h2020/)(\d\d\d\d\d\d)(.*)', '$2', 'i'))" />
+											</oaf:projectid>
+										</xsl:if>
+									</xsl:for-each>
+
+									<xsl:choose>
+										<!-- I used an inline mapping because the field typenorm could be repeated and I have to specify a list of priority  -->
+										
+										<!-- Book part -->
+										<xsl:when test="//base_dc:typenorm = '111'">
+											<dr:CobjCategory type="publication">0013</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Book -->
+										<xsl:when test="//base_dc:typenorm = '11'">
+											<dr:CobjCategory type="publication">0002</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Article contribution -->
+										<xsl:when test="//base_dc:typenorm = '121'">
+											<dr:CobjCategory type="publication">0001</dr:CobjCategory>
+										</xsl:when>
+										
+																				
+										<!-- Journal/Newspaper -->
+										<xsl:when test="//base_dc:typenorm = '12'">
+											<dr:CobjCategory type="publication">0043</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Report -->
+										<xsl:when test="//base_dc:typenorm = '14'">
+											<dr:CobjCategory type="publication">0017</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Review -->
+										<xsl:when test="//base_dc:typenorm = '15'">
+											<dr:CobjCategory type="publication">0015</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Lecture -->
+										<xsl:when test="//base_dc:typenorm = '17'">
+											<dr:CobjCategory type="publication">0010</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Bachelor's thesis -->
+										<xsl:when test="//base_dc:typenorm = '181'">
+											<dr:CobjCategory type="publication">0008</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Master's thesis -->
+										<xsl:when test="//base_dc:typenorm = '182'">
+											<dr:CobjCategory type="publication">0007</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Doctoral and postdoctoral thesis -->
+										<xsl:when test="//base_dc:typenorm = '183'">
+											<dr:CobjCategory type="publication">0006</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Thesis -->
+										<xsl:when test="//base_dc:typenorm = '18'">
+											<dr:CobjCategory type="publication">0044</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Patent -->
+										<xsl:when test="//base_dc:typenorm = '1A'">
+											<dr:CobjCategory type="publication">0019</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Text -->
+										<xsl:when test="//base_dc:typenorm = '1'">
+											<dr:CobjCategory type="publication">0001</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Software -->
+										<xsl:when test="//base_dc:typenorm = '6'">
+											<dr:CobjCategory type="software">0029</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Dataset -->										
+										<xsl:when test="//base_dc:typenorm = '7'">
+											<dr:CobjCategory type="dataset">0021</dr:CobjCategory>
+										</xsl:when>										
+																				
+										<!-- Still image -->
+										<xsl:when test="//base_dc:typenorm = '51'">
+											<dr:CobjCategory type="other">0025</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Moving image/Video -->										
+										<xsl:when test="//base_dc:typenorm = '52'">
+											<dr:CobjCategory type="other">0024</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Image/Video -->
+										<xsl:when test="//base_dc:typenorm = '5'">
+											<dr:CobjCategory type="other">0033</dr:CobjCategory>
+										</xsl:when>
+
+										<!-- Audio -->
+										<xsl:when test="//base_dc:typenorm = '4'">
+											<dr:CobjCategory type="other">0030</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Musical notation -->
+										<xsl:when test="//base_dc:typenorm = '2'">
+											<dr:CobjCategory type="other">0020</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Map -->
+										<xsl:when test="//base_dc:typenorm = '3'">
+											<dr:CobjCategory type="other">0020</dr:CobjCategory>
+										</xsl:when>										
+										
+										<!-- Other non-article -->
+										<xsl:when test="//base_dc:typenorm = '122'">
+											<dr:CobjCategory type="publication">0038</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Course material -->
+										<xsl:when test="//base_dc:typenorm = '16'">
+											<dr:CobjCategory type="publication">0038</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Manuscript -->
+										<xsl:when test="//base_dc:typenorm = '19'">
+											<dr:CobjCategory type="publication">0038</dr:CobjCategory>
+										</xsl:when>
+										
+										<!-- Conference object -->
+										<xsl:when test="//base_dc:typenorm = '13'">
+											<dr:CobjCategory type="publication">0004</dr:CobjCategory>
+										</xsl:when>
+
+										<!-- Unknown -->
+										<xsl:when test="//base_dc:typenorm = 'F'">
+											<dr:CobjCategory type="other">0000</dr:CobjCategory>
+										</xsl:when>
+										<xsl:otherwise>
+											<dr:CobjCategory type="other">0000</dr:CobjCategory>
+										</xsl:otherwise>
+									</xsl:choose>
+									
+									<oaf:accessrights>
+										<xsl:choose>
+											<xsl:when test="//base_dc:oa[.='0']">CLOSED</xsl:when>
+											<xsl:when test="//base_dc:oa[.='1']">OPEN</xsl:when>
+											<xsl:when test="//base_dc:oa[.='2']">UNKNOWN</xsl:when>
+											<xsl:when test="//base_dc:rightsnorm">
+												<xsl:value-of select="vocabulary:clean(//base_dc:rightsnorm, 'dnet:access_modes')" />
+											</xsl:when>
+											<xsl:when test="//dc:rights">
+												<xsl:value-of select="vocabulary:clean( //dc:rights, 'dnet:access_modes')" />
+											</xsl:when>
+											<xsl:otherwise>UNKNOWN</xsl:otherwise>
+										</xsl:choose>
+									</oaf:accessrights>
+
+									<xsl:for-each select="//base_dc:doi">
+										<oaf:identifier identifierType="doi">
+											<xsl:value-of select="." />
+										</oaf:identifier>
+									</xsl:for-each>
+
+									<xsl:for-each
+										select="distinct-values(//dc:identifier[starts-with(., 'http') and ( not(contains(., '://dx.doi.org/') or contains(., '://doi.org/') or contains(., '://hdl.handle.net/')))])">
+										<oaf:identifier identifierType="url">
+											<xsl:value-of select="." />
+										</oaf:identifier>
+									</xsl:for-each>
+
+									<xsl:for-each select="distinct-values(//dc:identifier[starts-with(., 'http') and contains(., '://hdl.handle.net/')]/substring-after(., 'hdl.handle.net/'))">
+										<oaf:identifier identifierType="handle">
+											<xsl:value-of select="." />
+										</oaf:identifier>
+									</xsl:for-each>
+
+									<xsl:for-each select="distinct-values(//dc:identifier[starts-with(., 'urn:nbn:nl:') or starts-with(., 'URN:NBN:NL:')])">
+										<oaf:identifier identifierType='urn'>
+											<xsl:value-of select="." />
+										</oaf:identifier>
+									</xsl:for-each>
+
+									<oaf:identifier identifierType="oai-original">
+										<xsl:value-of
+											select="//oai:header/oai:identifier" />
+									</oaf:identifier>
+
+									<oaf:hostedBy>
+										<xsl:attribute name="name">
+											<xsl:value-of select="//base_dc:collname" />
+										</xsl:attribute>
+										<xsl:attribute name="id">
+											<xsl:value-of select="concat('opendoar____::', //base_dc:collection/@opendoar_id)" />
+										</xsl:attribute>
+									</oaf:hostedBy>
+
+									<oaf:collectedFrom>
+										<xsl:attribute name="name">
+											<xsl:value-of select="$varOfficialName" />
+										</xsl:attribute>
+										<xsl:attribute name="id">
+											<xsl:value-of select="$varDataSourceId" />
+										</xsl:attribute>
+									</oaf:collectedFrom>
+
+									<oaf:dateAccepted>
+										<xsl:value-of select="dateCleaner:dateISO( //dc:date[1] )" />
+									</oaf:dateAccepted>
+
+									<xsl:if test="//base_dc:oa[.='1']">
+										<xsl:for-each select="//dc:relation[starts-with(., 'http')]">
+											<oaf:fulltext>
+												<xsl:value-of select="normalize-space(.)" />
+											</oaf:fulltext>
+										</xsl:for-each>
+									</xsl:if>
+
+									<xsl:for-each select="//base_dc:collection/@ror_id">
+										<oaf:relation relType="resultOrganization" subRelType="affiliation" relClass="hasAuthorInstitution" targetType="organization">
+											<xsl:choose>
+												<xsl:when test="contains(.,'https://ror.org/')">
+													<xsl:value-of select="concat('ror_________::', normalize-space(.))" />
+												</xsl:when>
+												<xsl:otherwise>
+													<xsl:value-of select="concat('ror_________::https://ror.org/', normalize-space(.))" />
+												</xsl:otherwise>
+											</xsl:choose>
+										</oaf:relation>
+									</xsl:for-each>
+								</metadata>
+								<xsl:copy-of select="//*[local-name() = 'about']" />
+							</record>
+						</xsl:template>
+
+						<xsl:template match="//*[local-name() = 'header']">
+							<xsl:if test="//oai:header/@status='deleted'">
+								<xsl:call-template name="terminate" />
+							</xsl:if>
+							<xsl:copy>
+								<xsl:apply-templates select="node()|@*" />
+								<xsl:element name="dr:dateOfTransformation">
+									<xsl:value-of select="$transDate" />
+								</xsl:element>
+							</xsl:copy>
+						</xsl:template>
+
+						<xsl:template match="node()|@*">
+							<xsl:copy>
+								<xsl:apply-templates select="node()|@*" />
+							</xsl:copy>
+						</xsl:template>
+					</xsl:stylesheet>
+				</CODE>
+			</SCRIPT>
+		</CONFIGURATION>
+		<STATUS />
+		<SECURITY_PARAMETERS />
+	</BODY>
+</RESOURCE_PROFILE>
