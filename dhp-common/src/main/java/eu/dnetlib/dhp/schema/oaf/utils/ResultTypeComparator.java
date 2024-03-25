@@ -1,16 +1,16 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.CROSSREF_ID;
 
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static eu.dnetlib.dhp.schema.common.ModelConstants.CROSSREF_ID;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.KeyValue;
+import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class ResultTypeComparator implements Comparator<Result> {
 

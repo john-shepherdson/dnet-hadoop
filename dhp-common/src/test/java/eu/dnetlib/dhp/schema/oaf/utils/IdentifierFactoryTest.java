@@ -1,16 +1,18 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.apache.commons.io.IOUtils;
+import org.junit.jupiter.api.Test;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.schema.oaf.Publication;
 
 class IdentifierFactoryTest {
 
@@ -42,7 +44,7 @@ class IdentifierFactoryTest {
 			"publication_pmc2.json", "50|pmc_________::94e4cb08c93f8733b48e2445d04002ac", true);
 
 		verifyIdentifier(
-				"publication_openapc.json", "50|doi_________::79dbc7a2a56dc1532659f9038843256e", true);
+			"publication_openapc.json", "50|doi_________::79dbc7a2a56dc1532659f9038843256e", true);
 
 		final String defaultID = "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1f";
 		verifyIdentifier("publication_3.json", defaultID, true);
@@ -69,7 +71,7 @@ class IdentifierFactoryTest {
 	@Test
 	void testCreateIdentifierForROHub() throws IOException {
 		verifyIdentifier(
-				"orp-rohub.json", "50|w3id________::afc7592914ae190a50570db90f55f9c2", true);
+			"orp-rohub.json", "50|w3id________::afc7592914ae190a50570db90f55f9c2", true);
 	}
 
 	protected void verifyIdentifier(String filename, String expectedID, boolean md5) throws IOException {

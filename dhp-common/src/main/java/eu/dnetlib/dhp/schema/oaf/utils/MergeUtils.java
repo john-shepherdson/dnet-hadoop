@@ -1,21 +1,23 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
-import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
 import java.text.ParseException;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.google.common.base.Joiner;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+
+import com.github.sisyphsu.dateparser.DateParserUtils;
+import com.google.common.base.Joiner;
 
 import eu.dnetlib.dhp.schema.common.AccessRightComparator;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -173,7 +175,8 @@ public class MergeUtils {
 		return a || b;
 	}
 
-	private static <T, K> List<T> mergeLists(final List<T> left, final List<T> right, int trust, Function<T, K> keyExtractor, BinaryOperator<T> merger) {
+	private static <T, K> List<T> mergeLists(final List<T> left, final List<T> right, int trust,
+		Function<T, K> keyExtractor, BinaryOperator<T> merger) {
 		if (left == null) {
 			return right;
 		} else if (right == null) {
@@ -184,11 +187,11 @@ public class MergeUtils {
 		List<T> l = trust >= 0 ? right : left;
 
 		return new ArrayList<>(Stream
-                .concat(h.stream(), l.stream())
-                .filter(Objects::nonNull)
-                .distinct()
-                .collect(Collectors.toMap(keyExtractor, v -> v, merger))
-                .values());
+			.concat(h.stream(), l.stream())
+			.filter(Objects::nonNull)
+			.distinct()
+			.collect(Collectors.toMap(keyExtractor, v -> v, merger))
+			.values());
 	}
 
 	private static <T, K> List<T> unionDistinctLists(final List<T> left, final List<T> right, int trust) {
@@ -202,10 +205,10 @@ public class MergeUtils {
 		List<T> l = trust >= 0 ? right : left;
 
 		return Stream
-				.concat(h.stream(), l.stream())
-				.filter(Objects::nonNull)
-				.distinct()
-				.collect(Collectors.toList());
+			.concat(h.stream(), l.stream())
+			.filter(Objects::nonNull)
+			.distinct()
+			.collect(Collectors.toList());
 	}
 
 	private static List<String> unionDistinctListOfString(final List<String> l, final List<String> r) {
@@ -402,11 +405,12 @@ public class MergeUtils {
 		// instance enrichment or union
 		// review instance equals => add pid to comparision
 		if (!isAnEnrichment(merge) && !isAnEnrichment(enrich))
-			merge.setInstance(
-					mergeLists(merge.getInstance(), enrich.getInstance(), trust,
-					MergeUtils::instanceKeyExtractor,
-					MergeUtils::instanceMerger
-			));
+			merge
+				.setInstance(
+					mergeLists(
+						merge.getInstance(), enrich.getInstance(), trust,
+						MergeUtils::instanceKeyExtractor,
+						MergeUtils::instanceMerger));
 		else {
 			final List<Instance> enrichmentInstances = isAnEnrichment(merge) ? merge.getInstance()
 				: enrich.getInstance();
@@ -428,12 +432,103 @@ public class MergeUtils {
 	}
 
 	private static String instanceKeyExtractor(Instance i) {
-        return String.join("::",
-                kvKeyExtractor(i.getHostedby()),
-                qualifierKeyExtractor(i.getAccessright()),
-                qualifierKeyExtractor(i.getInstancetype()),
-                Optional.ofNullable(i.getUrl()).map(u -> String.join("::", u)).orElse(null),
-                Optional.ofNullable(i.getPid()).map(pp -> pp.stream().map(MergeUtils::spKeyExtractor).collect(Collectors.joining("::"))).orElse(null));
+		return String
+			.join(
+				"::",
+				kvKeyExtractor(i.getHostedby()),
+				kvKeyExtractor(i.getCollectedfrom()),
+				qualifierKeyExtractor(i.getAccessright()),
+				qualifierKeyExtractor(i.getInstancetype()),
+				Optional.ofNullable(i.getUrl()).map(u -> String.join("::", u)).orElse(null),
+				Optional
+					.ofNullable(i.getPid())
+					.map(pp -> pp.stream().map(MergeUtils::spKeyExtractor).collect(Collectors.joining("::")))
+					.orElse(null));
+	}
+
+	private static Instance instanceMerger(Instance i1, Instance i2) {
+		Instance i = new Instance();
+		i.setHostedby(i1.getHostedby());
+		i.setCollectedfrom(i1.getCollectedfrom());
+		i.setAccessright(i1.getAccessright());
+		i.setInstancetype(i1.getInstancetype());
+		i.setPid(mergeLists(i1.getPid(), i2.getPid(), 0, MergeUtils::spKeyExtractor, (sp1, sp2) -> sp1));
+		i
+			.setAlternateIdentifier(
+				mergeLists(
+					i1.getAlternateIdentifier(), i2.getAlternateIdentifier(), 0, MergeUtils::spKeyExtractor,
+					(sp1, sp2) -> sp1));
+
+		i
+			.setRefereed(
+				Collections
+					.min(
+						Stream.of(i1.getRefereed(), i2.getRefereed()).collect(Collectors.toList()),
+						new RefereedComparator()));
+		i
+			.setInstanceTypeMapping(
+				mergeLists(
+					i1.getInstanceTypeMapping(), i2.getInstanceTypeMapping(), 0,
+					MergeUtils::instanceTypeMappingKeyExtractor, (itm1, itm2) -> itm1));
+		i.setFulltext(selectFulltext(i1.getFulltext(), i2.getFulltext()));
+		i.setDateofacceptance(selectOldestDate(i1.getDateofacceptance(), i2.getDateofacceptance()));
+		i.setLicense(firstNonNull(i1.getLicense(), i2.getLicense()));
+		i.setProcessingchargeamount(firstNonNull(i1.getProcessingchargeamount(), i2.getProcessingchargeamount()));
+		i.setProcessingchargecurrency(firstNonNull(i1.getProcessingchargecurrency(), i2.getProcessingchargecurrency()));
+		i
+			.setMeasures(
+				mergeLists(i1.getMeasures(), i2.getMeasures(), 0, MergeUtils::measureKeyExtractor, (m1, m2) -> m1));
+
+		i.setUrl(unionDistinctListOfString(i1.getUrl(), i2.getUrl()));
+
+		return i;
+	}
+
+	private static String measureKeyExtractor(Measure m) {
+		return String
+			.join(
+				"::",
+				m.getId(),
+				m
+					.getUnit()
+					.stream()
+					.map(KeyValue::getKey)
+					.collect(Collectors.joining("::")));
+	}
+
+	private static Field<String> selectOldestDate(Field<String> d1, Field<String> d2) {
+		return Stream
+			.of(d1, d2)
+			.filter(Objects::nonNull)
+			.min(
+				Comparator
+					.comparing(
+						f -> DateParserUtils
+							.parseDate(f.getValue())
+							.toInstant()
+							.atZone(ZoneId.systemDefault())
+							.toLocalDate()))
+			.orElse(d1);
+	}
+
+	private static String selectFulltext(String ft1, String ft2) {
+		if (StringUtils.endsWith(ft1, "pdf")) {
+			return ft1;
+		}
+		if (StringUtils.endsWith(ft2, "pdf")) {
+			return ft2;
+		}
+		return firstNonNull(ft1, ft2);
+	}
+
+	private static String instanceTypeMappingKeyExtractor(InstanceTypeMapping itm) {
+		return String
+			.join(
+				"::",
+				itm.getOriginalType(),
+				itm.getTypeCode(),
+				itm.getTypeLabel(),
+				itm.getVocabularyName());
 	}
 
 	private static String kvKeyExtractor(KeyValue kv) {
@@ -444,21 +539,16 @@ public class MergeUtils {
 		return Optional.ofNullable(q).map(Qualifier::getClassid).orElse(null);
 	}
 
-	private static <T> T FieldKeyExtractor(Field<T> f) {
+	private static <T> T fieldKeyExtractor(Field<T> f) {
 		return Optional.ofNullable(f).map(Field::getValue).orElse(null);
 	}
 
 	private static String spKeyExtractor(StructuredProperty sp) {
-		return Optional.ofNullable(sp).map(s -> Joiner.on("::").join(s, qualifierKeyExtractor(s.getQualifier()))).orElse(null);
+		return Optional
+			.ofNullable(sp)
+			.map(s -> Joiner.on("::").join(s, qualifierKeyExtractor(s.getQualifier())))
+			.orElse(null);
 	}
-
-	private static Instance instanceMerger(Instance i1, Instance i2) {
-
-		// TODO implement me!
-
-		return i1;
-	}
-
 
 	private static <T extends OtherResearchProduct> T mergeORP(T original, T enrich) {
 		int trust = compareTrust(original, enrich);

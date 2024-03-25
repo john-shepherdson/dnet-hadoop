@@ -1,12 +1,8 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Maps;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.*;
-import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.StringUtils;
+import static com.google.common.base.Preconditions.checkArgument;
+import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -16,8 +12,14 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.Maps;
+
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 /**
  * Factory class for OpenAIRE identifiers in the Graph
@@ -87,10 +89,11 @@ public class IdentifierFactory implements Serializable {
 	}
 
 	public static Set<String> delegatedAuthorityDatasourceIds() {
-		return DELEGATED_PID_AUTHORITY.values()
-				.stream()
-				.flatMap(m -> m.keySet().stream())
-				.collect(Collectors.toCollection(HashSet::new));
+		return DELEGATED_PID_AUTHORITY
+			.values()
+			.stream()
+			.flatMap(m -> m.keySet().stream())
+			.collect(Collectors.toCollection(HashSet::new));
 	}
 
 	public static List<StructuredProperty> getPids(List<StructuredProperty> pid, KeyValue collectedFrom) {
@@ -210,7 +213,6 @@ public class IdentifierFactory implements Serializable {
 			.orElse(Stream.empty());
 	}
 
-
 	private static boolean shouldFilterPidByCriteria(KeyValue collectedFrom, StructuredProperty p, boolean mapHandles) {
 		final PidType pType = PidType.tryValueOf(p.getQualifier().getClassid());
 
@@ -219,16 +221,18 @@ public class IdentifierFactory implements Serializable {
 		}
 
 		boolean isEnrich = Optional
-				.ofNullable(ENRICHMENT_PROVIDER.get(pType))
-				.map(enrich -> enrich.containsKey(collectedFrom.getKey())
-						|| enrich.containsValue(collectedFrom.getValue()))
-				.orElse(false);
+			.ofNullable(ENRICHMENT_PROVIDER.get(pType))
+			.map(
+				enrich -> enrich.containsKey(collectedFrom.getKey())
+					|| enrich.containsValue(collectedFrom.getValue()))
+			.orElse(false);
 
 		boolean isAuthority = Optional
-				.ofNullable(PID_AUTHORITY.get(pType))
-				.map(authorities -> authorities.containsKey(collectedFrom.getKey())
-						|| authorities.containsValue(collectedFrom.getValue()))
-				.orElse(false);
+			.ofNullable(PID_AUTHORITY.get(pType))
+			.map(
+				authorities -> authorities.containsKey(collectedFrom.getKey())
+					|| authorities.containsValue(collectedFrom.getValue()))
+			.orElse(false);
 
 		return (mapHandles && pType.equals(PidType.handle)) || isEnrich || isAuthority;
 	}
@@ -260,12 +264,12 @@ public class IdentifierFactory implements Serializable {
 
 	public static String idFromPid(String numericPrefix, String pidType, String pidValue, boolean md5) {
 		return new StringBuilder()
-				.append(numericPrefix)
-				.append(ID_PREFIX_SEPARATOR)
-				.append(createPrefix(pidType))
-				.append(ID_SEPARATOR)
-				.append(md5 ? md5(pidValue) : pidValue)
-				.toString();
+			.append(numericPrefix)
+			.append(ID_PREFIX_SEPARATOR)
+			.append(createPrefix(pidType))
+			.append(ID_SEPARATOR)
+			.append(md5 ? md5(pidValue) : pidValue)
+			.toString();
 	}
 
 	// create the prefix (length = 12)

@@ -3,7 +3,8 @@ package eu.dnetlib.dhp.schema.oaf.utils;
 
 public class ModelHardLimits {
 
-	private ModelHardLimits() {}
+	private ModelHardLimits() {
+	}
 
 	public static final String LAYOUT = "index";
 	public static final String INTERPRETATION = "openaire";

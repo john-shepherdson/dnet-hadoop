@@ -1,10 +1,10 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-
 import java.util.Comparator;
 import java.util.Optional;
+
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class PidValueComparator implements Comparator<StructuredProperty> {
 

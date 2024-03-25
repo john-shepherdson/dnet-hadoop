@@ -1,13 +1,13 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
+import java.util.Comparator;
+
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Organization;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-
-import java.util.Comparator;
 
 public class PidComparator<T extends OafEntity> implements Comparator<StructuredProperty> {
 

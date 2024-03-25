@@ -1,13 +1,14 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.io.IOUtils;
-
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+
+import org.apache.commons.io.IOUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class PidBlacklistProvider {
 
@@ -33,6 +34,7 @@ public class PidBlacklistProvider {
 			.orElse(new HashSet<>());
 	}
 
-	private PidBlacklistProvider() {}
+	private PidBlacklistProvider() {
+	}
 
 }

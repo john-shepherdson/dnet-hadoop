@@ -1,13 +1,14 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class CleaningFunctions {
 
@@ -21,7 +22,8 @@ public class CleaningFunctions {
 		PID_BLACKLIST.add("na");
 	}
 
-	public CleaningFunctions() {}
+	public CleaningFunctions() {
+	}
 
 	/**
 	 * Utility method that filter PID values on a per-type basis.
@@ -47,7 +49,8 @@ public class CleaningFunctions {
 	 * @return the PID containing the normalised value.
 	 */
 	public static StructuredProperty normalizePidValue(StructuredProperty pid) {
-		pid.setValue(
+		pid
+			.setValue(
 				normalizePidValue(
 					pid.getQualifier().getClassid(),
 					pid.getValue()));
@@ -57,9 +60,9 @@ public class CleaningFunctions {
 
 	public static String normalizePidValue(String pidType, String pidValue) {
 		String value = Optional
-				.ofNullable(pidValue)
-				.map(String::trim)
-				.orElseThrow(() -> new IllegalArgumentException("PID value cannot be empty"));
+			.ofNullable(pidValue)
+			.map(String::trim)
+			.orElseThrow(() -> new IllegalArgumentException("PID value cannot be empty"));
 
 		switch (pidType) {
 

@@ -1,10 +1,10 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
+import java.util.Set;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.Set;
 
 class BlackListProviderTest {
 

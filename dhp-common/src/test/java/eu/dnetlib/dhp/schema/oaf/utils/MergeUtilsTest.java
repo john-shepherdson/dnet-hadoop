@@ -10,23 +10,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.Lists;
-import eu.dnetlib.dhp.schema.oaf.*;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.*;
 
 public class MergeUtilsTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
 		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
 
 	@Test
 	void testMergePubs_new() throws IOException {
