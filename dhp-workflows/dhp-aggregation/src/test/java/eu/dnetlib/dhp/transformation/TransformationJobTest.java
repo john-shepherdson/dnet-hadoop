@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.transformation;
 
 import static eu.dnetlib.dhp.common.Constants.MDSTORE_DATA_PATH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -277,6 +278,19 @@ class TransformationJobTest extends AbstractVocabularyTest {
 		// Print the record
 		System.out.println(result.getBody());
 		// TODO Create significant Assert
+	}
+
+	@Test
+	public void testInvalidXSLT() throws Exception{
+		final MetadataRecord mr = new MetadataRecord();
+
+		mr.setProvenance(new Provenance("openaire____::cnr_explora", "CNR ExploRA", "cnr_________"));
+		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/transform/input_cnr_explora.xml")));
+		// We Load the XSLT transformation Rule from the classpath
+		final XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/invalid.xslt");
+
+		assertThrows(RuntimeException.class,()->tr.call(mr));
+
 	}
 
 	private XSLTTransformationFunction loadTransformationRule(final String path) throws Exception {

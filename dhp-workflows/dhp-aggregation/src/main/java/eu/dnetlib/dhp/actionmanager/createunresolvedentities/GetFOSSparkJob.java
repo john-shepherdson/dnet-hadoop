@@ -75,6 +75,7 @@ public class GetFOSSparkJob implements Serializable {
 		fosData.map((MapFunction<Row, FOSDataModel>) r -> {
 			FOSDataModel fosDataModel = new FOSDataModel();
 			fosDataModel.setDoi(r.getString(0).toLowerCase());
+			fosDataModel.setOaid(r.getString(1).toLowerCase());
 			fosDataModel.setLevel1(r.getString(2));
 			fosDataModel.setLevel2(r.getString(3));
 			fosDataModel.setLevel3(r.getString(4));

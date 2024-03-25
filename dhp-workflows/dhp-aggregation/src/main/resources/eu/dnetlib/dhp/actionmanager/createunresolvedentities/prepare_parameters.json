@@ -16,5 +16,10 @@
     "paramLongName": "outputPath",
     "paramDescription": "the path of the new ActionSet",
     "paramRequired": true
-  }
+  },  {
+  "paramName": "fd",
+  "paramLongName": "distributeDoi",
+  "paramDescription": "the path of the new ActionSet",
+  "paramRequired": false
+}
 ]
