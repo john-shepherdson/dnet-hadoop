@@ -1,14 +1,13 @@
 
 package eu.dnetlib.dhp.actionmanager.promote;
 
-import static eu.dnetlib.dhp.schema.common.ModelSupport.isSubClass;
+import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableSupplier;
+import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 
 import java.util.function.BiFunction;
 
-import eu.dnetlib.dhp.common.FunctionalInterfaceSupport.SerializableSupplier;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import static eu.dnetlib.dhp.schema.common.ModelSupport.isSubClass;
 
 /** OAF model merging support. */
 public class MergeAndGet {
@@ -46,20 +45,7 @@ public class MergeAndGet {
 	}
 
 	private static <G extends Oaf, A extends Oaf> G mergeFromAndGet(G x, A y) {
-		if (isSubClass(x, Relation.class) && isSubClass(y, Relation.class)) {
-			((Relation) x).mergeFrom((Relation) y);
-			return x;
-		} else if (isSubClass(x, OafEntity.class)
-			&& isSubClass(y, OafEntity.class)
-			&& isSubClass(x, y)) {
-			((OafEntity) x).mergeFrom((OafEntity) y);
-			return x;
-		}
-		throw new RuntimeException(
-			String
-				.format(
-					"MERGE_FROM_AND_GET incompatible types: %s, %s",
-					x.getClass().getCanonicalName(), y.getClass().getCanonicalName()));
+		return (G) MergeUtils.merge(x, y);
 	}
 
 	@SuppressWarnings("unchecked")

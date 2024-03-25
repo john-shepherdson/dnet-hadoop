@@ -1,13 +1,13 @@
 [
   {
-    "paramName": "if",
-    "paramLongName": "inputFile",
+    "paramName": "ip",
+    "paramLongName": "inputPath",
     "paramDescription": "the zipped opencitations file",
     "paramRequired": true
   },
   {
-    "paramName": "wp",
-    "paramLongName": "workingPath",
+    "paramName": "op",
+    "paramLongName": "outputPath",
     "paramDescription": "the working path",
     "paramRequired": true
   },
@@ -15,12 +15,6 @@
     "paramName": "hnn",
     "paramLongName": "hdfsNameNode",
     "paramDescription": "the hdfs name node",
-    "paramRequired": true
-  },
-  {
-    "paramName": "p",
-    "paramLongName": "prefix",
-    "paramDescription": "COCI or POCI",
     "paramRequired": true
   }
 ]

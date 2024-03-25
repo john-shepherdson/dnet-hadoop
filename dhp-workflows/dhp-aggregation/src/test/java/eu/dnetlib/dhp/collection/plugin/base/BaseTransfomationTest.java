@@ -1,6 +1,8 @@
 
 package eu.dnetlib.dhp.collection.plugin.base;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
@@ -8,7 +10,6 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.util.LongAccumulator;
 import org.dom4j.io.SAXReader;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,7 +21,7 @@ import eu.dnetlib.dhp.schema.mdstore.Provenance;
 import eu.dnetlib.dhp.transformation.xslt.XSLTTransformationFunction;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 
-@Disabled
+// @Disabled
 @ExtendWith(MockitoExtension.class)
 public class BaseTransfomationTest extends AbstractVocabularyTest {
 
@@ -64,11 +65,26 @@ public class BaseTransfomationTest extends AbstractVocabularyTest {
 		System.out.println(result.getBody());
 	}
 
+	@Test
+	void testBase2ODF_wrong_date() throws Exception {
+
+		final MetadataRecord mr = new MetadataRecord();
+		mr.setProvenance(new Provenance("DSID", "DSNAME", "PREFIX"));
+		mr.setBody(IOUtils.toString(getClass().getResourceAsStream("record_wrong_1.xml")));
+
+		final XSLTTransformationFunction tr = loadTransformationRule("xml/base2oaf.transformationRule.xml");
+
+		assertThrows(NullPointerException.class, () -> {
+			final MetadataRecord result = tr.call(mr);
+			System.out.println(result.getBody());
+		});
+	}
+
 	private XSLTTransformationFunction loadTransformationRule(final String path) throws Exception {
 		final String xslt = new SAXReader()
-			.read(this.getClass().getResourceAsStream(path))
-			.selectSingleNode("//CODE/*")
-			.asXML();
+				.read(this.getClass().getResourceAsStream(path))
+				.selectSingleNode("//CODE/*")
+				.asXML();
 
 		final LongAccumulator la = new LongAccumulator();
 

@@ -100,13 +100,17 @@ public class TemplateFactory {
 
 	public String getInstance(
 		final List<String> instancemetadata, final String url) {
+		return getInstance(instancemetadata, Lists.newArrayList(url));
+	}
+
+	public String getInstance(
+		final List<String> instancemetadata, final List<String> url) {
 		return getTemplate(resources.getInstance())
 			.add("metadata", instancemetadata)
 			.add(
 				"webresources",
 				Optional
 					.ofNullable(url)
-					.map(u -> Lists.newArrayList(url))
 					.orElse(Lists.newArrayList())
 					.stream()
 					.filter(StringUtils::isNotBlank)
