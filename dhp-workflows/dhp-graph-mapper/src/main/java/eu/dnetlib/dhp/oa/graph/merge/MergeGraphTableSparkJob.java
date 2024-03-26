@@ -251,7 +251,6 @@ public class MergeGraphTableSparkJob {
 					return (T) MergeUtils.merge(b, a);
 				}
 				if (a instanceof Relation && b instanceof Relation) {
-					((Relation) a).mergeFrom(b);
 					return (T) MergeUtils.mergeRelation((Relation)a, (Relation) b);
 				}
 			}

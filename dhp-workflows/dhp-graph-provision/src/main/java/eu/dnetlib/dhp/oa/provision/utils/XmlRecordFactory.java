@@ -1097,7 +1097,7 @@ public class XmlRecordFactory implements Serializable {
 					metadata
 						.add(XmlSerializationUtils.asXmlElement("coderepositoryurl", re.getCodeRepositoryUrl()));
 				}
-				if (re.getResulttype() != null && re.getResulttype().isBlank()) {
+				if (re.getResulttype() != null && StringUtils.isNotBlank(re.getResulttype().getClassid())) {
 					metadata.add(XmlSerializationUtils.mapQualifier("resulttype", re.getResulttype()));
 				}
 				if (re.getCollectedfrom() != null) {
@@ -1124,7 +1124,7 @@ public class XmlRecordFactory implements Serializable {
 						.getInstances()
 						.forEach(i -> {
 							final List<String> instanceFields = Lists.newArrayList();
-							if (i.getAccessright() != null && !i.getAccessright().isBlank()) {
+							if (i.getAccessright() != null && StringUtils.isNotBlank(i.getAccessright().getClassid())) {
 								instanceFields
 									.add(XmlSerializationUtils.mapQualifier("accessright", i.getAccessright()));
 							}
@@ -1137,12 +1137,12 @@ public class XmlRecordFactory implements Serializable {
 										XmlSerializationUtils
 											.asXmlElement("dateofacceptance", i.getDateofacceptance().getValue()));
 							}
-							if (i.getInstancetype() != null && !i.getInstancetype().isBlank()) {
+							if (i.getInstancetype() != null && StringUtils.isNotBlank(i.getInstancetype().getClassid())) {
 								instanceFields
 									.add(XmlSerializationUtils.mapQualifier("instancetype", i.getInstancetype()));
 							}
 
-							if (i.getRefereed() != null && !i.getRefereed().isBlank()) {
+							if (i.getRefereed() != null && StringUtils.isNotBlank(i.getRefereed().getClassid())) {
 								instanceFields.add(XmlSerializationUtils.mapQualifier("refereed", i.getRefereed()));
 							}
 
@@ -1172,13 +1172,13 @@ public class XmlRecordFactory implements Serializable {
 				if (isNotBlank(re.getOfficialname())) {
 					metadata.add(XmlSerializationUtils.asXmlElement("officialname", re.getOfficialname()));
 				}
-				if (re.getDatasourcetype() != null && !re.getDatasourcetype().isBlank()) {
+				if (re.getDatasourcetype() != null && StringUtils.isNotBlank(re.getDatasourcetype().getClassid())) {
 					metadata.add(XmlSerializationUtils.mapQualifier("datasourcetype", re.getDatasourcetype()));
 				}
-				if (re.getDatasourcetypeui() != null && !re.getDatasourcetypeui().isBlank()) {
+				if (re.getDatasourcetypeui() != null && StringUtils.isNotBlank(re.getDatasourcetypeui().getClassid())) {
 					metadata.add(XmlSerializationUtils.mapQualifier("datasourcetypeui", re.getDatasourcetypeui()));
 				}
-				if (re.getOpenairecompatibility() != null && !re.getOpenairecompatibility().isBlank()) {
+				if (re.getOpenairecompatibility() != null && StringUtils.isNotBlank(re.getOpenairecompatibility().getClassid())) {
 					metadata
 						.add(
 							XmlSerializationUtils
@@ -1193,7 +1193,7 @@ public class XmlRecordFactory implements Serializable {
 					metadata
 						.add(XmlSerializationUtils.asXmlElement("legalshortname", re.getLegalshortname()));
 				}
-				if (re.getCountry() != null && !re.getCountry().isBlank()) {
+				if (re.getCountry() != null && StringUtils.isNotBlank(re.getCountry().getClassid())) {
 					metadata.add(XmlSerializationUtils.mapQualifier("country", re.getCountry()));
 				}
 				if (StringUtils.isNotBlank(re.getWebsiteurl())) {
@@ -1210,7 +1210,7 @@ public class XmlRecordFactory implements Serializable {
 				if (isNotBlank(re.getAcronym())) {
 					metadata.add(XmlSerializationUtils.asXmlElement("acronym", re.getAcronym()));
 				}
-				if (re.getContracttype() != null && !re.getContracttype().isBlank()) {
+				if (re.getContracttype() != null && StringUtils.isNotBlank(re.getContracttype().getClassid())) {
 					metadata.add(XmlSerializationUtils.mapQualifier("contracttype", re.getContracttype()));
 				}
 				if (re.getFundingtree() != null && contexts != null) {
@@ -1285,7 +1285,7 @@ public class XmlRecordFactory implements Serializable {
 				groupInstancesByUrl(((Result) entity).getInstance()).forEach(instance -> {
 					final List<String> fields = Lists.newArrayList();
 
-					if (instance.getAccessright() != null && !instance.getAccessright().isBlank()) {
+					if (instance.getAccessright() != null && StringUtils.isNotBlank(instance.getAccessright().getClassid())) {
 						fields
 							.add(XmlSerializationUtils.mapQualifier("accessright", instance.getAccessright()));
 					}
@@ -1326,7 +1326,7 @@ public class XmlRecordFactory implements Serializable {
 								instance
 									.getInstancetype()
 									.stream()
-									.filter(t -> !t.isBlank())
+									.filter(t -> !StringUtils.isNotBlank(t.getClassid()))
 									.map(t -> XmlSerializationUtils.mapQualifier("instancetype", t))
 									.collect(Collectors.toList()));
 					}

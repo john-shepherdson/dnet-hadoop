@@ -10,6 +10,7 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.schema.oaf.*;
+import org.apache.commons.lang3.StringUtils;
 import scala.Tuple2;
 
 public class XmlSerializationUtils {
@@ -142,7 +143,7 @@ public class XmlSerializationUtils {
 	}
 
 	public static String getAttributes(final Qualifier q) {
-		if (q == null || q.isBlank())
+		if (q == null || StringUtils.isBlank(q.getClassid()))
 			return "";
 
 		return new StringBuilder(" ")
