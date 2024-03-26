@@ -1,6 +1,7 @@
 package eu.dnetlib.dhp.collection.crossref
 
 import com.fasterxml.jackson.databind.ObjectMapper
+
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf._
@@ -28,8 +29,6 @@ import scala.collection.mutable
 import scala.io.Source
 import scala.util.matching.Regex
 
-case class CrossrefDT(doi: String, json: String, timestamp: Long) {}
-
 case class mappingAffiliation(name: String) {}
 
 case class mappingAuthor(
@@ -43,8 +42,6 @@ case class mappingAuthor(
 case class funderInfo(id: String, uri: String, name: String, synonym: List[String]) {}
 
 case class mappingFunder(name: String, DOI: Option[String], award: Option[List[String]]) {}
-
-case class CrossrefResult(oafType: String, body: String) {}
 
 case class UnpayWall(doi: String, is_oa: Boolean, best_oa_location: UnpayWallOALocation, oa_status: String) {}
 
@@ -616,17 +613,48 @@ case object Crossref2Oaf {
     null
   }
 
-  def extract_doi(input: String): CrossrefDT = {
-    implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
-    lazy val json: json4s.JValue = parse(input)
-    CrossrefDT(doi = (json \ "DOI").extract[String].toLowerCase, json = input, 0)
+  object TransformationType extends Enumeration {
+    type TransformationType = Value
+    val OnlyRelation, OnlyResult, All = Value
+  }
+  import TransformationType._
+
+  def mergeUnpayWall(r: Result, uw: UnpayWall): Result = {
+    if (uw != null) {
+
+      r.setCollectedfrom(List(r.getCollectedfrom.get(0), createUnpayWallCollectedFrom()).asJava)
+      val i: Instance = new Instance()
+      i.setCollectedfrom(createUnpayWallCollectedFrom())
+      if (uw.best_oa_location != null) {
+        i.setUrl(List(uw.best_oa_location.url).asJava)
+        if (uw.best_oa_location.license.isDefined) {
+          i.setLicense(field[String](uw.best_oa_location.license.get, null))
+        }
+        val colour = get_unpaywall_color(uw.oa_status)
+        if (colour.isDefined) {
+          val a = new AccessRight
+          a.setClassid(ModelConstants.ACCESS_RIGHT_OPEN)
+          a.setClassname(ModelConstants.ACCESS_RIGHT_OPEN)
+          a.setSchemeid(ModelConstants.DNET_ACCESS_MODES)
+          a.setSchemename(ModelConstants.DNET_ACCESS_MODES)
+          a.setOpenAccessRoute(colour.get)
+          i.setAccessright(a)
+        }
+        i.setInstancetype(r.getInstance().get(0).getInstancetype)
+        i.setInstanceTypeMapping(r.getInstance().get(0).getInstanceTypeMapping)
+        i.setPid(r.getPid)
+        r.setInstance(List(r.getInstance().get(0), i).asJava)
+      }
+
+    }
+    r
   }
 
-  def convert(input: CrossrefDT, uw: UnpayWall, vocabularies: VocabularyGroup): List[CrossrefResult] = {
+  def convert(input: String, vocabularies: VocabularyGroup, mode: TransformationType): List[Oaf] = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
-    lazy val json: json4s.JValue = parse(input.json)
+    lazy val json: json4s.JValue = parse(input)
 
-    var resultList: List[CrossrefResult] = List()
+    var resultList: List[Oaf] = List()
 
     val objectType = (json \ "type").extractOrElse[String](null)
     if (objectType == null)
@@ -645,65 +673,70 @@ case object Crossref2Oaf {
     if (result == null || result.getId == null)
       return List()
 
-    val funderList: List[mappingFunder] =
-      (json \ "funder").extractOrElse[List[mappingFunder]](List())
-
-    if (funderList.nonEmpty) {
-      resultList = resultList ::: mappingFunderToRelations(
-        funderList,
-        result.getId,
-        createCrossrefCollectedFrom(),
-        result.getDataInfo,
-        result.getLastupdatetimestamp
-      ).map(s => CrossrefResult(s.getClass.getSimpleName, mapper.writeValueAsString(s)))
-    }
-
     result match {
       case publication: Publication => convertPublication(publication, json, typology._1)
       case dataset: Dataset         => convertDataset(dataset)
     }
 
-    val doisReference: List[String] = for {
-      JObject(reference_json)          <- json \ "reference"
-      JField("DOI", JString(doi_json)) <- reference_json
-    } yield doi_json
+    //RELATION SECTION
+    if (mode == OnlyRelation || mode == All) {
+      val funderList: List[mappingFunder] =
+        (json \ "funder").extractOrElse[List[mappingFunder]](List())
 
-    if (doisReference != null && doisReference.nonEmpty) {
-      val citation_relations: List[Relation] = generateCitationRelations(doisReference, result)
-      resultList = resultList ::: citation_relations.map(s =>
-        CrossrefResult(s.getClass.getSimpleName, mapper.writeValueAsString(s))
-      )
-    }
+      if (funderList.nonEmpty) {
+        resultList = resultList ::: mappingFunderToRelations(
+          funderList,
+          result.getId,
+          createCrossrefCollectedFrom(),
+          result.getDataInfo,
+          result.getLastupdatetimestamp
+        )
+        //        .map(s => CrossrefResult(s.getClass.getSimpleName, mapper.writeValueAsString(s)))
+      }
+      val doisReference: List[String] = for {
+        JObject(reference_json)          <- json \ "reference"
+        JField("DOI", JString(doi_json)) <- reference_json
+      } yield doi_json
 
-    if (uw != null) {
-      result.getCollectedfrom.add(createUnpayWallCollectedFrom())
-      val i: Instance = new Instance()
-      i.setCollectedfrom(createUnpayWallCollectedFrom())
-      if (uw.best_oa_location != null) {
-
-        i.setUrl(List(uw.best_oa_location.url).asJava)
-        if (uw.best_oa_location.license.isDefined) {
-          i.setLicense(field[String](uw.best_oa_location.license.get, null))
-        }
-
-        val colour = get_unpaywall_color(uw.oa_status)
-        if (colour.isDefined) {
-          val a = new AccessRight
-          a.setClassid(ModelConstants.ACCESS_RIGHT_OPEN)
-          a.setClassname(ModelConstants.ACCESS_RIGHT_OPEN)
-          a.setSchemeid(ModelConstants.DNET_ACCESS_MODES)
-          a.setSchemename(ModelConstants.DNET_ACCESS_MODES)
-          a.setOpenAccessRoute(colour.get)
-          i.setAccessright(a)
-        }
-        i.setPid(result.getPid)
-        result.getInstance().add(i)
+      if (doisReference != null && doisReference.nonEmpty) {
+        val citation_relations: List[Relation] = generateCitationRelations(doisReference, result)
+        resultList = resultList ::: citation_relations
       }
     }
     if (!filterResult(result))
       List()
-    else
-      resultList ::: List(result).map(s => CrossrefResult(s.getClass.getSimpleName, mapper.writeValueAsString(s)))
+    else {
+      if (mode == OnlyResult || mode == All)
+        resultList ::: List(result)
+      else
+        resultList
+    }
+
+    //    if (uw != null) {
+//      result.getCollectedfrom.add(createUnpayWallCollectedFrom())
+//      val i: Instance = new Instance()
+//      i.setCollectedfrom(createUnpayWallCollectedFrom())
+//      if (uw.best_oa_location != null) {
+//
+//        i.setUrl(List(uw.best_oa_location.url).asJava)
+//        if (uw.best_oa_location.license.isDefined) {
+//          i.setLicense(field[String](uw.best_oa_location.license.get, null))
+//        }
+//
+//        val colour = get_unpaywall_color(uw.oa_status)
+//        if (colour.isDefined) {
+//          val a = new AccessRight
+//          a.setClassid(ModelConstants.ACCESS_RIGHT_OPEN)
+//          a.setClassname(ModelConstants.ACCESS_RIGHT_OPEN)
+//          a.setSchemeid(ModelConstants.DNET_ACCESS_MODES)
+//          a.setSchemename(ModelConstants.DNET_ACCESS_MODES)
+//          a.setOpenAccessRoute(colour.get)
+//          i.setAccessright(a)
+//        }
+//        i.setPid(result.getPid)
+//        result.getInstance().add(i)
+//      }
+//    }
 
   }
 

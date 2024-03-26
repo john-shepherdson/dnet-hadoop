@@ -1,8 +1,10 @@
 package eu.dnetlib.dhp.collection.crossref
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.application.AbstractScalaApplication
+import eu.dnetlib.dhp.collection.crossref.Crossref2Oaf.{TransformationType, mergeUnpayWall}
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
-import eu.dnetlib.dhp.schema.oaf.{Oaf, Publication, Dataset => OafDataset}
+import eu.dnetlib.dhp.schema.oaf.{Oaf, Publication, Relation, Result, Dataset => OafDataset}
 import eu.dnetlib.dhp.utils.ISLookupClientFactory
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions.{col, lower}
@@ -70,21 +72,38 @@ class SparkMapDumpIntoOAF(propertyPath: String, args: Array[String], log: Logger
     vocabularies: VocabularyGroup
   ): Unit = {
     import spark.implicits._
+
+    val mapper = new ObjectMapper()
+
+    implicit val oafEncoder: Encoder[Oaf] = Encoders.kryo(classOf[Oaf])
+    implicit val resultEncoder: Encoder[Result] = Encoders.kryo(classOf[Result])
+
     val dump: Dataset[String] = spark.read.text(sourcePath).as[String]
-
-    val uw = transformUnpayWall(spark, unpaywallPath, sourcePath)
-
-    val crId = dump.map(s => Crossref2Oaf.extract_doi(s))
-
-    crId
-      .joinWith(uw, crId("doi") === uw("doi"), "left")
-      .flatMap(s => Crossref2Oaf.convert(s._1, s._2, vocabularies))
+    dump
+      .flatMap(s => Crossref2Oaf.convert(s, vocabularies, TransformationType.OnlyRelation))
+      .as[Oaf]
+      .map(r => mapper.writeValueAsString(r))
       .write
       .mode(SaveMode.Overwrite)
-      .partitionBy("oafType")
       .option("compression", "gzip")
       .text(targetPath)
-
+    val uw = transformUnpayWall(spark, unpaywallPath, sourcePath)
+    val resultCrossref: Dataset[(String, Result)] = dump
+      .flatMap(s => Crossref2Oaf.convert(s, vocabularies, TransformationType.OnlyResult))
+      .as[Oaf]
+      .map(r => r.asInstanceOf[Result])
+      .map(r => (r.getPid.get(0).getValue, r))(Encoders.tuple(Encoders.STRING, resultEncoder))
+    resultCrossref
+      .joinWith(uw, resultCrossref("_1").equalTo(uw("doi")), "left")
+      .map(k => {
+        mergeUnpayWall(k._1._2, k._2)
+      })
+      .map(r => mapper.writeValueAsString(r))
+      .as[Result]
+      .write
+      .mode(SaveMode.Append)
+      .option("compression", "gzip")
+      .text(s"$targetPath")
   }
 }
 
