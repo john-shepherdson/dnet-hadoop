@@ -90,7 +90,6 @@ public class SparkBulkTagJob {
 		log.info("pathMap: {}", parser.get("pathMap"));
 		String protoMappingPath = parser.get("pathMap");
 
-
 		final String hdfsNameNode = parser.get("nameNode");
 		log.info("nameNode: {}", hdfsNameNode);
 
