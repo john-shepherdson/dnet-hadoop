@@ -281,7 +281,7 @@ class TransformationJobTest extends AbstractVocabularyTest {
 	}
 
 	@Test
-	public void testInvalidXSLT() throws Exception{
+	public void testInvalidXSLT() throws Exception {
 		final MetadataRecord mr = new MetadataRecord();
 
 		mr.setProvenance(new Provenance("openaire____::cnr_explora", "CNR ExploRA", "cnr_________"));
@@ -289,7 +289,7 @@ class TransformationJobTest extends AbstractVocabularyTest {
 		// We Load the XSLT transformation Rule from the classpath
 		final XSLTTransformationFunction tr = loadTransformationRule("/eu/dnetlib/dhp/transform/invalid.xslt");
 
-		assertThrows(RuntimeException.class,()->tr.call(mr));
+		assertThrows(RuntimeException.class, () -> tr.call(mr));
 
 	}
 

@@ -1,7 +1,26 @@
 
 package eu.dnetlib.dhp.actionmanager.project;
 
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.SequenceFileOutputFormat;
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.api.java.function.MapGroupsFunction;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.SparkSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProgramme;
 import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProject;
 import eu.dnetlib.dhp.actionmanager.project.utils.model.JsonTopic;
@@ -15,24 +34,7 @@ import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Project;
 import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import eu.dnetlib.dhp.utils.DHPUtils;
-import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.SequenceFileOutputFormat;
-import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.api.java.function.MapGroupsFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SparkSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import scala.Tuple2;
-
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
-
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 /**
  * Class that makes the ActionSet. To prepare the AS two joins are needed

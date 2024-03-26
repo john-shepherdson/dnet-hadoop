@@ -79,35 +79,35 @@ public class CreateActionSetSparkJob implements Serializable {
 
 	private static void createActionSet(SparkSession spark, String inputPath, String outputPath) {
 		JavaRDD<AtomicAction> relations = spark
-				.read()
-				.textFile(inputPath)
-				.map(
-						(MapFunction<String, TransformativeAgreementModel>) value -> OBJECT_MAPPER
-								.readValue(value, TransformativeAgreementModel.class),
-						Encoders.bean(TransformativeAgreementModel.class))
-				.flatMap(
-						(FlatMapFunction<TransformativeAgreementModel, Relation>) value -> createRelation(
-								value)
-								.iterator(),
-						Encoders.bean(Relation.class))
-				.filter((FilterFunction<Relation>) Objects::nonNull)
-				.toJavaRDD()
-				.map(p -> new AtomicAction(p.getClass(), p));
+			.read()
+			.textFile(inputPath)
+			.map(
+				(MapFunction<String, TransformativeAgreementModel>) value -> OBJECT_MAPPER
+					.readValue(value, TransformativeAgreementModel.class),
+				Encoders.bean(TransformativeAgreementModel.class))
+			.flatMap(
+				(FlatMapFunction<TransformativeAgreementModel, Relation>) value -> createRelation(
+					value)
+						.iterator(),
+				Encoders.bean(Relation.class))
+			.filter((FilterFunction<Relation>) Objects::nonNull)
+			.toJavaRDD()
+			.map(p -> new AtomicAction(p.getClass(), p));
 //TODO relations in stand-by waiting to know if we need to create them or not In case we need just make a union before saving the sequence file
-				spark
-					.read()
-					.textFile(inputPath)
-					.map(
-						(MapFunction<String, TransformativeAgreementModel>) value -> OBJECT_MAPPER
-							.readValue(value, TransformativeAgreementModel.class),
-						Encoders.bean(TransformativeAgreementModel.class))
-					.map(
-						(MapFunction<TransformativeAgreementModel, Result>) value -> createResult(
-							value),
-						Encoders.bean(Result.class))
-					.filter((FilterFunction<Result>) r -> r != null)
-					.toJavaRDD()
-					.map(p -> new AtomicAction(p.getClass(), p))
+		spark
+			.read()
+			.textFile(inputPath)
+			.map(
+				(MapFunction<String, TransformativeAgreementModel>) value -> OBJECT_MAPPER
+					.readValue(value, TransformativeAgreementModel.class),
+				Encoders.bean(TransformativeAgreementModel.class))
+			.map(
+				(MapFunction<TransformativeAgreementModel, Result>) value -> createResult(
+					value),
+				Encoders.bean(Result.class))
+			.filter((FilterFunction<Result>) r -> r != null)
+			.toJavaRDD()
+			.map(p -> new AtomicAction(p.getClass(), p))
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))))

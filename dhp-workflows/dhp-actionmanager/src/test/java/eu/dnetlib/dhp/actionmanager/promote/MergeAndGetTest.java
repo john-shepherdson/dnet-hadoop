@@ -100,7 +100,7 @@ public class MergeAndGetTest {
 			assertTrue(Relation.class.isAssignableFrom(x.getClass()));
 
 			// TODO should be reimplemented
-			//verify(a).mergeFrom(b);
+			// verify(a).mergeFrom(b);
 			assertEquals(a, x);
 		}
 
@@ -163,7 +163,7 @@ public class MergeAndGetTest {
 			assertTrue(OafEntity.class.isAssignableFrom(x.getClass()));
 
 			// TODO should be reimplemented
-			//verify(a).mergeFrom(b);
+			// verify(a).mergeFrom(b);
 			assertEquals(a, x);
 		}
 	}

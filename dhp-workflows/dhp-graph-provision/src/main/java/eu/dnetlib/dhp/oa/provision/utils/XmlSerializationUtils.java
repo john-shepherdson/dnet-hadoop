@@ -7,10 +7,11 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.schema.oaf.*;
-import org.apache.commons.lang3.StringUtils;
 import scala.Tuple2;
 
 public class XmlSerializationUtils {

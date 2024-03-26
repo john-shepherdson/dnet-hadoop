@@ -166,6 +166,6 @@ public class MapOCIdsInPids implements Serializable {
 			.option("compression", "gzip")
 			.json(outputPath);
 
-			}
+	}
 
 }

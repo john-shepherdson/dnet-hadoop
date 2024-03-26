@@ -82,9 +82,9 @@ public class BaseTransfomationTest extends AbstractVocabularyTest {
 
 	private XSLTTransformationFunction loadTransformationRule(final String path) throws Exception {
 		final String xslt = new SAXReader()
-				.read(this.getClass().getResourceAsStream(path))
-				.selectSingleNode("//CODE/*")
-				.asXML();
+			.read(this.getClass().getResourceAsStream(path))
+			.selectSingleNode("//CODE/*")
+			.asXML();
 
 		final LongAccumulator la = new LongAccumulator();
 
