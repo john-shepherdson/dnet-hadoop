@@ -1,4 +1,3 @@
-
 package eu.dnetlib.dhp.bulktag.actions;
 
 import java.io.Serializable;
@@ -38,18 +37,7 @@ public class ExecSubstringAction implements Serializable {
 	}
 
 	public String execSubstring() {
-		int to = Integer.valueOf(this.to);
-		int from = Integer.valueOf(this.from);
+        return this.value.substring(Integer.valueOf(this.from), Integer.valueOf(this.to));
 
-		if (to < from || from > this.value.length())
-			return "";
-
-		if (from < 0)
-			from = 0;
-		if (to > this.value.length())
-			to = this.value.length();
-
-		return this.value.substring(from, to);
-
-	}
+    }
 }

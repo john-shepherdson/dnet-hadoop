@@ -366,8 +366,6 @@ public class BulkTagJobTest {
 
 		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
 
-		idExplodeCommunity.show(false);
-
 		Assertions.assertEquals(5, idExplodeCommunity.count());
 		Assertions
 			.assertEquals(

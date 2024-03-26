@@ -1,0 +1,26 @@
+[
+  {
+    "paramName": "is",
+    "paramLongName": "isLookupUrl",
+    "paramDescription": "URL of the isLookUp Service",
+    "paramRequired": true
+  },
+  {
+    "paramName": "i",
+    "paramLongName": "inputPath",
+    "paramDescription": "the path of the sequence file to read the XML records",
+    "paramRequired": true
+  },
+  {
+    "paramName": "f",
+    "paramLongName": "format",
+    "paramDescription": "MDFormat name found in the IS profile",
+    "paramRequired": true
+  },
+  {
+    "paramName": "op",
+    "paramLongName": "outputPath",
+    "paramDescription": "path on hdfs activating an alternative output for the SolrInputDocuments",
+    "paramRequired": false
+  }
+]

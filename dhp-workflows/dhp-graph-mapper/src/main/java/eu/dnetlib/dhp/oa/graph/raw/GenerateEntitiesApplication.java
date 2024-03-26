@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -16,11 +15,7 @@ import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.rdd.RDD;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
-import org.dom4j.DocumentException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +27,7 @@ import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.oa.graph.raw.common.AbstractMigrationApplication;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
@@ -137,7 +132,7 @@ public class GenerateEntitiesApplication extends AbstractMigrationApplication {
 				save(
 					inputRdd
 						.mapToPair(oaf -> new Tuple2<>(ModelSupport.idFn().apply(oaf), oaf))
-						.reduceByKey(OafMapperUtils::merge)
+						.reduceByKey(MergeUtils::merge)
 						.map(Tuple2::_2),
 					targetPath);
 				break;

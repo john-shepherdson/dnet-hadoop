@@ -60,5 +60,8 @@ create table TARGET.result stored as parquet as
              'openorgs____::0fccc7640f0cb44d5cd1b06b312a06b9',  -- Cardiff University
              'openorgs____::8839b55dae0c84d56fd533f52d5d483a',   -- Leibniz Institute of Ecological Urban and Regional Development
              'openorgs____::526468206bca24c1c90da6a312295cf4',	-- Cyprus University of Technology
-             'openorgs____::b5ca9d4340e26454e367e2908ef3872f'	-- Alma Mater Studiorum University of Bologna
+             'openorgs____::b5ca9d4340e26454e367e2908ef3872f',	-- Alma Mater Studiorum University of Bologna
+             'openorgs____::a6340e6ecf60f6bba163659df985b0f2',	-- TU Dresden
+             'openorgs____::64badd35233ba2cd4946368ef2f4cf57',  -- University of Vienna
+             'openorgs____::7501d66d2297a963ebfb075c43fff88e'   -- Royal Institute of Technology
         )))  foo;
