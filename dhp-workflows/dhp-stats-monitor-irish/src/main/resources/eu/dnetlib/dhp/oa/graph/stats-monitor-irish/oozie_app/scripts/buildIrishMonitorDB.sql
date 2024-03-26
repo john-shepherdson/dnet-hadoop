@@ -1,10 +1,13 @@
+drop database if exists TARGET cascade;
+create database if not exists TARGET;
+
 create view if not exists TARGET.category as select * from SOURCE.category;
 create view if not exists TARGET.concept as select * from SOURCE.concept;
 create view if not exists TARGET.context as select * from SOURCE.context;
 create view if not exists TARGET.country as select * from SOURCE.country;
 create view if not exists TARGET.countrygdp as select * from SOURCE.countrygdp;
 create view if not exists TARGET.creation_date as select * from SOURCE.creation_date;
-create view if not exists TARGET.funder as select * from SOURCE.funder;
+--create view if not exists TARGET.funder as select * from SOURCE.funder;
 create view if not exists TARGET.fundref as select * from SOURCE.fundref;
 create view if not exists TARGET.rndexpenditure as select * from SOURCE.rndexpediture;
 create view if not exists TARGET.rndgdpexpenditure as select * from SOURCE.rndgdpexpenditure;
@@ -12,7 +15,53 @@ create view if not exists TARGET.doctoratestudents as select * from SOURCE.docto
 create view if not exists TARGET.totalresearchers as select * from SOURCE.totalresearchers;
 create view if not exists TARGET.totalresearchersft as select * from SOURCE.totalresearchersft;
 create view if not exists TARGET.hrrst as select * from SOURCE.hrrst;
-create view if not exists TARGET.graduatedoctorates as select * from SOURCE.graduatedoctorates;
+
+drop table if exists TARGET.irish_funders;
+
+create TEMPORARY table TARGET.irish_funders as
+select distinct xpath_string(fundingtree[0].value, '//funder/name') as funder from GRAPHDB.project
+                     where xpath_string(fundingtree[0].value, '//funder/jurisdiction')='IE';
+--create TEMPORARY table TARGET.irish_funders as
+--select distinct name as funder from SOURCE.fundref where country='IE';
+
+drop table if exists TARGET.result;
+
+create table TARGET.result stored as parquet as
+select distinct * from (
+       select r.*
+       from SOURCE.result r
+                join SOURCE.result_projects rp on rp.id=r.id
+                join SOURCE.project p on p.id=rp.project
+                join openaire_prod_stats_monitor_ie_20231226b.irish_funders irf on irf.funder=p.funder
+       union all
+       select r.*
+       from SOURCE.result r
+                join SOURCE.result_organization ro on ro.id=r.id
+                join SOURCE.organization o on o.id=ro.organization and o.country='IE'
+       union all
+       select r.*
+       from SOURCE.result r
+                join SOURCE.result_pids pid on pid.id=r.id
+                join stats_ext.transformative_facts tf on tf.doi=pid.pid
+   ) foo;
+
+create view if not exists TARGET.category as select * from SOURCE.category;
+create view if not exists TARGET.concept as select * from SOURCE.concept;
+create view if not exists TARGET.context as select * from SOURCE.context;
+create view if not exists TARGET.country as select * from SOURCE.country;
+create view if not exists TARGET.countrygdp as select * from SOURCE.countrygdp;
+create view if not exists TARGET.creation_date as select * from SOURCE.creation_date;
+
+create table TARGET.funder stored as parquet as select * from SOURCE.funder where country='IE';
+
+create view if not exists TARGET.fundref as select * from SOURCE.fundref;
+create view if not exists TARGET.rndexpenditure as select * from SOURCE.rndexpediture;
+create view if not exists TARGET.rndgdpexpenditure as select * from SOURCE.rndgdpexpenditure;
+create view if not exists TARGET.doctoratestudents as select * from SOURCE.doctoratestudents;
+create view if not exists TARGET.totalresearchers as select * from SOURCE.totalresearchers;
+create view if not exists TARGET.totalresearchersft as select * from SOURCE.totalresearchersft;
+create view if not exists TARGET.hrrst as select * from SOURCE.hrrst;
+--create view if not exists TARGET.graduatedoctorates as select * from SOURCE.graduatedoctorates;
 
 create table TARGET.result_citations stored as parquet as select * from SOURCE.result_citations orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 
@@ -62,10 +111,9 @@ create table TARGET.result_fos stored as parquet as select * from SOURCE.result_
 
 create table TARGET.result_accessroute stored as parquet as select * from SOURCE.result_accessroute orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 
-create table TARGET.result_orcid stored as parquet as select * from SOURCE.result_orcid orig where exists (select 1 from TARGET.result r where r.id=orig.id);
-create table TARGET.indi_pub_publicly_funded stored as parquet as select * from SOURCE.indi_pub_publicly_funded orig where exists (select 1 from TARGET.result r where r.id=orig.id);
-
 create table TARGET.result_instance stored as parquet as select * from SOURCE.result_instance orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+
+create table TARGET.result_orcid stored as parquet as select * from SOURCE.result_orcid orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 
 create view TARGET.foo1 as select * from SOURCE.result_result rr where rr.source in (select id from TARGET.result);
 create view TARGET.foo2 as select * from SOURCE.result_result rr where rr.target in (select id from TARGET.result);
@@ -97,6 +145,7 @@ create view if not exists TARGET.project_classification as select * from SOURCE.
 create view if not exists TARGET.project_organization_contribution as select * from SOURCE.project_organization_contribution;
 
 create table TARGET.project_results stored as parquet as select id as result, project as id from TARGET.result_projects;
+
 
 -- indicators
 -- Sprint 1 ----
@@ -174,7 +223,7 @@ create table TARGET.indi_pub_interdisciplinarity stored as parquet as select * f
 create table TARGET.result_apc_affiliations stored as parquet as select * from SOURCE.result_apc_affiliations orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 
 create table TARGET.indi_is_project_result_after stored as parquet as select * from SOURCE.indi_is_project_result_after orig where exists (select 1 from TARGET.result r where r.id=orig.result_id);
-create table TARGET.indi_is_funder_plan_s stored as parquet as select * from SOURCE.indi_is_funder_plan_s orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create view TARGET.indi_is_funder_plan_s as select * from SOURCE.indi_is_funder_plan_s;
 create view TARGET.indi_funder_fairness as select * from SOURCE.indi_funder_fairness;
 create view TARGET.indi_funder_openess as select * from SOURCE.indi_funder_openess;
 create view TARGET.indi_funder_findable as select * from SOURCE.indi_funder_findable;
@@ -184,6 +233,7 @@ create view TARGET.indi_ris_findable as select * from SOURCE.indi_ris_findable;
 
 create table TARGET.indi_pub_green_with_license stored as parquet as select * from SOURCE.indi_pub_green_with_license orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 create table TARGET.result_country stored as parquet as select * from SOURCE.result_country orig where exists (select 1 from TARGET.result r where r.id=orig.id);
+create table TARGET.indi_pub_publicly_funded stored as parquet as select * from SOURCE.indi_pub_publicly_funded orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 
 create table TARGET.indi_result_oa_with_license stored as parquet as select * from SOURCE.indi_result_oa_with_license orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 create table TARGET.indi_result_oa_without_license stored as parquet as select * from SOURCE.indi_result_oa_without_license orig where exists (select 1 from TARGET.result r where r.id=orig.id);

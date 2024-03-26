@@ -1,0 +1,30 @@
+<configuration>
+    <property>
+        <name>jobTracker</name>
+        <value>${jobTracker}</value>
+    </property>
+    <property>
+        <name>nameNode</name>
+        <value>${nameNode}</value>
+    </property>
+    <property>
+        <name>oozie.use.system.libpath</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>oozie.action.sharelib.for.spark</name>
+        <value>spark2</value>
+    </property>
+    <property>
+        <name>hive_metastore_uris</name>
+        <value>thrift://iis-cdh5-test-m3.ocean.icm.edu.pl:9083</value>
+    </property>
+    <property>
+        <name>hive_jdbc_url</name>
+        <value>jdbc:hive2://iis-cdh5-test-m3.ocean.icm.edu.pl:10000/;UseNativeQuery=1;?spark.executor.memory=22166291558;spark.yarn.executor.memoryOverhead=3225;spark.driver.memory=15596411699;spark.yarn.driver.memoryOverhead=1228</value>
+    </property>
+	<property>
+		<name>oozie.wf.workflow.notification.url</name>
+		<value>{serviceUrl}/v1/oozieNotification/jobUpdate?jobId=$jobId%26status=$status</value>
+	</property>
+</configuration>
