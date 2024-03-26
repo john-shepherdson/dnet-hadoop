@@ -6,14 +6,19 @@ import static eu.dnetlib.dhp.bulktag.community.TaggingConstants.ZENODO_COMMUNITY
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocalFileSystem;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -25,14 +30,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 
+import eu.dnetlib.dhp.bulktag.community.ProtoMap;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class BulkTagJobTest {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-	public static final String pathMap = "{\"author\":{\"path\":\"$['author'][*]['fullname']\"}," +
+	public static final String pathMap = "{\"protoMap\":{\"author\":{\"path\":\"$['author'][*]['fullname']\"}," +
 		" \"title\":{\"path\":\"$['title'][*]['value']\"}, " +
 		" \"orcid\":{\"path\":\"$['author'][*]['pid'][*][?(@['qualifier']['classid']=='orcid')]['value']\"} , " +
 		" \"orcid_pending\":{\"path\":\"$['author'][*]['pid'][*][?(@['qualifier']['classid']=='orcid_pending')]['value']\"} ,"
@@ -51,7 +58,7 @@ public class BulkTagJobTest {
 		"\"method\":\"execSubstring\"," +
 		"\"params\":[" +
 		"{\"paramName\":\"From\",  \"paramValue\":0}, " +
-		"{\"paramName\":\"To\",\"paramValue\":4}]}}}";
+		"{\"paramName\":\"To\",\"paramValue\":4}]}}}}";
 
 	private static SparkSession spark;
 
@@ -231,6 +238,14 @@ public class BulkTagJobTest {
 
 	@Test
 	void bulktagBySubjectPreviousContextNoProvenanceTest() throws Exception {
+		LocalFileSystem fs = FileSystem.getLocal(new Configuration());
+		fs
+			.copyFromLocalFile(
+				false, new org.apache.hadoop.fs.Path(getClass()
+					.getResource("/eu/dnetlib/dhp/bulktag/pathMap/")
+					.getPath()),
+				new org.apache.hadoop.fs.Path(workingDir.toString() + "/data/bulktagging/protoMap"));
+
 		final String sourcePath = getClass()
 			.getResource(
 				"/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject/contextnoprovenance/")
@@ -246,7 +261,8 @@ public class BulkTagJobTest {
 
 					"-outputPath", workingDir.toString() + "/",
 
-					"-pathMap", pathMap
+					"-pathMap", workingDir.toString() + "/data/bulktagging/protoMap",
+					"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
@@ -316,6 +332,7 @@ public class BulkTagJobTest {
 		final String sourcePath = getClass()
 			.getResource("/eu/dnetlib/dhp/bulktag/sample/publication/update_datasource/")
 			.getPath();
+
 		SparkBulkTagJob
 			.main(
 				new String[] {
@@ -325,7 +342,7 @@ public class BulkTagJobTest {
 					"-taggingConf", taggingConf,
 
 					"-outputPath", workingDir.toString() + "/",
-
+					"-baseURL", "https://services.openaire.eu/openaire/community/",
 					"-pathMap", pathMap
 				});
 
@@ -381,6 +398,71 @@ public class BulkTagJobTest {
 						"community = 'aginfra' and (id = '50|ec_fp7health::000c8195edd542e4e64ebb32172cbf89' "
 							+ "or id = '50|ec_fp7health::0010eb63e181e3e91b8b6dc6b3e1c798')")
 					.count());
+	}
+
+	@Test
+	void datasourceTag() throws Exception {
+		final String sourcePath = getClass()
+			.getResource("/eu/dnetlib/dhp/bulktag/sample/publication/update_datasource/")
+			.getPath();
+		LocalFileSystem fs = FileSystem.getLocal(new Configuration());
+		fs
+			.copyFromLocalFile(
+				false, new org.apache.hadoop.fs.Path(getClass()
+					.getResource("/eu/dnetlib/dhp/bulktag/pathMap/")
+					.getPath()),
+				new org.apache.hadoop.fs.Path(workingDir.toString() + "/data/bulktagging/protoMap"));
+		SparkBulkTagJob
+			.main(
+				new String[] {
+
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath", sourcePath,
+					"-taggingConf", taggingConf,
+
+					"-outputPath", workingDir.toString() + "/",
+					"-baseURL", "https://services.openaire.eu/openaire/community/",
+
+					"-pathMap", workingDir.toString() + "/data/bulktagging/protoMap/pathMap",
+					"-nameNode", "local"
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Datasource> tmp = sc
+			.textFile(workingDir.toString() + "/datasource")
+			.map(item -> OBJECT_MAPPER.readValue(item, Datasource.class));
+
+		Assertions.assertEquals(3, tmp.count());
+		org.apache.spark.sql.Dataset<Datasource> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(Datasource.class));
+
+		verificationDataset.createOrReplaceTempView("datasource");
+
+		String query = "select id, MyT.id community, MyD.provenanceaction.classid provenance, MyD.provenanceaction.classname name "
+			+ "from datasource "
+			+ "lateral view explode(context) c as MyT "
+			+ "lateral view explode(MyT.datainfo) d as MyD "
+			+ "where MyD.inferenceprovenance = 'bulktagging'";
+
+		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
+
+		idExplodeCommunity.show(false);
+
+		Assertions.assertEquals(3, idExplodeCommunity.count());
+		Assertions
+			.assertEquals(
+				3, idExplodeCommunity.filter("provenance = 'community:datasource'").count());
+		Assertions
+			.assertEquals(
+				3,
+				idExplodeCommunity
+					.filter("name = 'Bulktagging for Community - Datasource'")
+					.count());
+
+		Assertions.assertEquals(2, idExplodeCommunity.filter("community = 'dh-ch'").count());
+		Assertions.assertEquals(1, idExplodeCommunity.filter("community = 'clarin'").count());
+
 	}
 
 	@Test
@@ -1696,6 +1778,42 @@ public class BulkTagJobTest {
 							.getAs("id")
 							.equals("50|od______3989::d90d3a1f64ad264b5ebed8a35b280343"))
 					.count());
+
+	}
+
+	@Test
+	public void prova() throws Exception {
+		LocalFileSystem fs = FileSystem.getLocal(new Configuration());
+		fs
+			.copyFromLocalFile(
+				false, new org.apache.hadoop.fs.Path(getClass()
+					.getResource("/eu/dnetlib/dhp/bulktag/pathMap/")
+					.getPath()),
+				new org.apache.hadoop.fs.Path(workingDir.toString() + "/data/bulktagging/protoMap"));
+
+		final String sourcePath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject/contextnoprovenance/")
+			.getPath();
+
+		ProtoMap prova = new Gson()
+			.fromJson(
+				"{\"author\":{\"path\":\"$['author'][]['fullname']\"},\"title\":{\"path\":\"$['title'][]['value']\"},\"orcid\":{\"path\":\"$['author'][]['pid'][][?(@['qualifier']['classid']=='orcid')]['value']\"},\"orcid_pending\":{\"path\":\"$['author'][]['pid'][][?(@['qualifier']['classid']=='orcid_pending')]['value']\"},\"contributor\":{\"path\":\"$['contributor'][]['value']\"},\"description\":{\"path\":\"$['description'][]['value']\"},\"subject\":{\"path\":\"$['subject'][]['value']\"},\"fos\":{\"path\":\"$['subject'][?(@['qualifier']['classid']=='FOS')].value\"},\"sdg\":{\"path\":\"$['subject'][?(@['qualifier']['classid']=='SDG')].value\"},\"journal\":{\"path\":\"$['journal'].name\"},\"hostedby\":{\"path\":\"$['instance'][]['hostedby']['key']\"},\"collectedfrom\":{\"path\":\"$['instance'][*]['collectedfrom']['key']\"},\"publisher\":{\"path\":\"$['publisher'].value\"},\"publicationyear\":{\"path\":\"$['dateofacceptance'].value\",\"action\":{\"clazz\":\"eu.dnetlib.dhp.bulktag.actions.ExecSubstringAction\",\"method\":\"execSubstring\",\"params\":[{\"paramName\":\"From\",\"paramValue\":0},{\"paramName\":\"To\",\"paramValue\":4}]}}}",
+				ProtoMap.class);
+		SparkBulkTagJob
+			.main(
+				new String[] {
+
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath", sourcePath,
+					"-taggingConf", taggingConf,
+
+					"-outputPath", workingDir.toString() + "/",
+
+					"-pathMap", workingDir.toString() + "/data/bulktagging/protoMap/pathMap",
+					"-baseURL", "none",
+					"-nameNode", "local"
+				});
 
 	}
 

@@ -38,7 +38,6 @@ public class ExecSubstringAction implements Serializable {
 	}
 
 	public String execSubstring() {
-
 		return this.value.substring(Integer.valueOf(this.from), Integer.valueOf(this.to));
 
 	}
