@@ -34,14 +34,14 @@ create table TARGET.result stored as parquet as
              'openorgs____::3e8d1f8c3f6cd7f418b09f1f58b4873b', -- Aristotle University of Thessaloniki
              'openorgs____::3fcef6e1c469c10f2a84b281372c9814', -- World Bank
              'openorgs____::1698a2eb1885ef8adb5a4a969e745ad3', -- École des Ponts ParisTech
-             'openorgs____::e15adb13c4dadd49de4d35c39b5da93a', -- Nanyang Technological University
-             'openorgs____::4b34103bde246228fcd837f5f1bf4212', -- Autonomous University of Barcelona
-             'openorgs____::72ec75fcfc4e0df1a76dc4c49007fceb', -- McMaster University
-             'openorgs____::51c7fc556e46381734a25a6fbc3fd398', -- University of Modena and Reggio Emilia
-             'openorgs____::235d7f9ad18ecd7e6dc62ea4990cb9db', -- Bilkent University
-             'openorgs____::31f2fa9e05b49d4cf40a19c3fed8eb06', -- Saints Cyril and Methodius University of Skopje
-             'openorgs____::db7686f30f22cbe73a4fde872ce812a6', -- University of Milan
-             'openorgs____::b8b8ca674452579f3f593d9f5e557483',  -- University College Cork
+             'openorgs____::e15adb13c4dadd49de4d35c39b5da93a',  -- Nanyang Technological University
+             'openorgs____::4b34103bde246228fcd837f5f1bf4212',  -- Autonomous University of Barcelona
+             'openorgs____::72ec75fcfc4e0df1a76dc4c49007fceb',	-- McMaster University
+             'openorgs____::51c7fc556e46381734a25a6fbc3fd398',	-- University of Modena and Reggio Emilia
+             'openorgs____::235d7f9ad18ecd7e6dc62ea4990cb9db',	-- Bilkent University
+             'openorgs____::31f2fa9e05b49d4cf40a19c3fed8eb06',	-- Saints Cyril and Methodius University of Skopje
+             'openorgs____::db7686f30f22cbe73a4fde872ce812a6',  -- University of Milan
+             'openorgs____::b8b8ca674452579f3f593d9f5e557483',   -- University College Cork
              'openorgs____::38d7097854736583dde879d12dacafca',	-- Brown University
              'openorgs____::57784c9e047e826fefdb1ef816120d92',  --Arts et Métiers ParisTech
              'openorgs____::2530baca8a15936ba2e3297f2bce2e7e',	-- University of Cape Town
@@ -54,14 +54,14 @@ create table TARGET.result stored as parquet as
              'openorgs____::c0b262bd6eab819e4c994914f9c010e2',   -- National Institute of Geophysics and Volcanology
              'openorgs____::1624ff7c01bb641b91f4518539a0c28a',   -- Vrije Universiteit Amsterdam
              'openorgs____::4d4051b56708688235252f1d8fddb8c1',	 --Iscte - Instituto Universitário de Lisboa
-             'openorgs____::ab4ac74c35fa5dada770cf08e5110fab',	 -- Universidade Católica Portuguesa
-             'openorgs____::4d4051b56708688235252f1d8fddb8c1',	 -- Iscte - Instituto Universitário de Lisboa
+             'openorgs____::ab4ac74c35fa5dada770cf08e5110fab',	-- Universidade Católica Portuguesa
+             'openorgs____::4d4051b56708688235252f1d8fddb8c1',	-- Iscte - Instituto Universitário de Lisboa
              'openorgs____::5d55fb216b14691cf68218daf5d78cd9',  -- Munster Technological University
              'openorgs____::0fccc7640f0cb44d5cd1b06b312a06b9',  -- Cardiff University
-             'openorgs____::8839b55dae0c84d56fd533f52d5d483a',   -- Leibniz Institute of Ecological Urban and Regional Development
+             'openorgs____::8839b55dae0c84d56fd533f52d5d483a',  -- Leibniz Institute of Ecological Urban and Regional Development
              'openorgs____::526468206bca24c1c90da6a312295cf4',	-- Cyprus University of Technology
              'openorgs____::b5ca9d4340e26454e367e2908ef3872f',	-- Alma Mater Studiorum University of Bologna
-             'openorgs____::a6340e6ecf60f6bba163659df985b0f2',	-- TU Dresden
-             'openorgs____::64badd35233ba2cd4946368ef2f4cf57',  -- University of Vienna
-             'openorgs____::7501d66d2297a963ebfb075c43fff88e'   -- Royal Institute of Technology
+             'openorgs____::a6340e6ecf60f6bba163659df985b0f2'	-- TU Dresden
         )))  foo;
+
+--ANALYZE TABLE TARGET.result COMPUTE STATISTICS;

@@ -2,9 +2,8 @@ create table ${observatory_db_name}.result_cc_licence stored as parquet as
 select r.id, coalesce(rln.count, 0) > 0 as cc_licence
 from ${stats_db_name}.result r
          left outer join (
-    select rl.id, sum(case when lower(rln.normalized) like 'cc-%' then 1 else 0 end) as count
+    select rl.id, sum(case when rl.type like 'CC%' then 1 else 0 end) as count
     from ${stats_db_name}.result_licenses rl
-        left outer join ${stats_db_name}.licenses_normalized rln on rl.type=rln.license
     group by rl.id
 ) rln on rln.id=r.id;
 
