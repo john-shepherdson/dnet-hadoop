@@ -63,5 +63,7 @@ create table TARGET.result stored as parquet as
              'openorgs____::b5ca9d4340e26454e367e2908ef3872f',	-- Alma Mater Studiorum University of Bologna
              'openorgs____::a6340e6ecf60f6bba163659df985b0f2',	-- TU Dresden
              'openorgs____::64badd35233ba2cd4946368ef2f4cf57',  -- University of Vienna
-             'openorgs____::7501d66d2297a963ebfb075c43fff88e'   -- Royal Institute of Technology
+             'openorgs____::7501d66d2297a963ebfb075c43fff88e',  -- Royal Institute of Technology
+             'openorgs____::d5eb679abdd31f70fcd4c8ba711148bf',	-- Sorbonne University
+             'openorgs____::b316f25380d106aac402f5ae8653910d'   -- Centre for Research on Ecology and Forestry Applications
         )))  foo;
