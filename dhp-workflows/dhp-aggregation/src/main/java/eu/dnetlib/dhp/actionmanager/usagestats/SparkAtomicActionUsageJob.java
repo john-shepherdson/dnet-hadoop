@@ -111,8 +111,11 @@ public class SparkAtomicActionUsageJob implements Serializable {
 		resultModel
 			.joinWith(datasource, resultModel.col("datasourceId").equalTo(datasource.col("id")), "left")
 			.map((MapFunction<Tuple2<UsageStatsResultModel, Datasource>, UsageStatsResultModel>) t2 -> {
-				UsageStatsResultModel usrm = t2._1();
-				usrm.setDatasourceId(usrm.getDatasourceId() + "||" + t2._2().getOfficialname().getValue());
+				if(Optional.ofNullable(t2._2()).isPresent())
+					usrm.setDatasourceId(usrm.getDatasourceId() + "||" + t2._2().getOfficialname().getValue());
+				else
+					usrm.setDatasourceId(usrm.getDatasourceId() + "||NO_MATCH_FOUND");
+				return usrm;
 				return usrm;
 			}, Encoders.bean(UsageStatsResultModel.class))
 			.write()
