@@ -9,15 +9,28 @@ fi
 #export HADOOP_USER_NAME=$2
 
 IMPALA_HDFS_NODE=''
-if hdfs dfs -test -e hdfs://impala-cluster-mn1.openaire.eu >/dev/null 2>&1; then
-    IMPALA_HDFS_NODE='hdfs://impala-cluster-mn1.openaire.eu:8020'
-elif hdfs dfs -test -e hdfs://impala-cluster-mn2.openaire.eu >/dev/null 2>&1; then
-    IMPALA_HDFS_NODE='hdfs://impala-cluster-mn2.openaire.eu:8020'
-else
-    echo -e "\n\nPROBLEM WHEN SETTING THE HDFS-NODE FOR IMPALA CLUSTER!\n\n"
+COUNTER=0
+
+while [ $COUNTER -lt 3 ]; do
+  if hdfs dfs -test -e hdfs://impala-cluster-mn1.openaire.eu/tmp >/dev/null 2>&1; then
+      IMPALA_HDFS_NODE='hdfs://impala-cluster-mn1.openaire.eu:8020'
+      break
+  elif hdfs dfs -test -e hdfs://impala-cluster-mn2.openaire.eu/tmp >/dev/null 2>&1; then
+      IMPALA_HDFS_NODE='hdfs://impala-cluster-mn2.openaire.eu:8020'
+      break
+  else
+      IMPALA_HDFS_NODE=''
+      sleep 1
+  fi
+  ((COUNTER++))
+done
+
+if [ -z "$IMPALA_HDFS_NODE" ]; then
+    echo -e "\n\nPROBLEM WHEN SETTING THE HDFS-NODE FOR IMPALA CLUSTER! $COUNTER\n\n"
     exit 1
 fi
-echo "Active IMPALA HDFS Node: ${IMPALA_HDFS_NODE}"
+echo "Active IMPALA HDFS Node: ${IMPALA_HDFS_NODE} , after ${COUNTER} retries."
+
 
 function copydb() {
 
