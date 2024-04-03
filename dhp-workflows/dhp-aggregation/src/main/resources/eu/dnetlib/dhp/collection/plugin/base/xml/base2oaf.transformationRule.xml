@@ -390,6 +390,18 @@ base_dc:link (I used dc:identifier)
 											</xsl:choose>
 										</oaf:relation>
 									</xsl:for-each>
+									
+									<oaf:datainfo>
+										<oaf:inferred>false</oaf:inferred>
+										<oaf:deletedbyinference>false</oaf:deletedbyinference>
+										<oaf:trust>0.89</oaf:trust>
+										<oaf:inferenceprovenance/>
+										<oaf:provenanceaction classid="sysimport:crosswalk:aggregator"
+											classname="sysimport:crosswalk:aggregator"
+											schemeid="dnet:provenanceActions"
+											schemename="dnet:provenanceActions"/>
+									</oaf:datainfo>
+									
 								</metadata>
 								<xsl:copy-of select="//*[local-name() = 'about']" />
 							</record>
