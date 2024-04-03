@@ -88,7 +88,7 @@ public class CreateActionSetSparkJob implements Serializable {
 	private static void extractContent(SparkSession spark, String inputPath, String outputPath) {
 
 		getTextTextJavaPairRDD(spark, inputPath)
-			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);// , GzipCodec.class);
+			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
 	}
 
 	private static JavaPairRDD<Text, Text> getTextTextJavaPairRDD(SparkSession spark, String inputPath) {
