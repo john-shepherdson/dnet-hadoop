@@ -92,7 +92,7 @@ public abstract class SolrTest {
 		FileUtils.deleteDirectory(workingDir.toFile());
 	}
 
-	protected static NamedList<Object> createCollection(CloudSolrClient client, String name, int numShards,
+	public static NamedList<Object> createCollection(CloudSolrClient client, String name, int numShards,
 		int replicationFactor, int maxShardsPerNode, String configName) throws Exception {
 		ModifiableSolrParams modParams = new ModifiableSolrParams();
 		modParams.set(CoreAdminParams.ACTION, CollectionParams.CollectionAction.CREATE.name());

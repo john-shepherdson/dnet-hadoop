@@ -7,7 +7,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
@@ -25,6 +24,7 @@ import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import scala.Tuple2;
 
 /**
@@ -251,8 +251,7 @@ public class MergeGraphTableSparkJob {
 					return (T) MergeUtils.merge(b, a);
 				}
 				if (a instanceof Relation && b instanceof Relation) {
-					((Relation) a).mergeFrom(b);
-					return (T) MergeUtils.mergeRelation((Relation)a, (Relation) b);
+					return (T) MergeUtils.mergeRelation((Relation) a, (Relation) b);
 				}
 			}
 			return Objects.isNull(a) ? b : a;

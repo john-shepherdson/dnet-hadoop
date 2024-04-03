@@ -38,7 +38,6 @@ public class BipProjectModel {
 		return projectId;
 	}
 
-
 	// each project bip measure has exactly one value, hence one key-value pair
 	private Measure createMeasure(String measureId, String measureValue) {
 

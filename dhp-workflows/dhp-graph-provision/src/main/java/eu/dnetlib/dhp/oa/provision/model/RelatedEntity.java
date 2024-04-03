@@ -13,6 +13,8 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class RelatedEntity implements Serializable {
 
+	private static final long serialVersionUID = -4982643490443810597L;
+
 	private String id;
 	private String type;
 
@@ -21,6 +23,8 @@ public class RelatedEntity implements Serializable {
 	private String websiteurl; // datasource, organizations, projects
 
 	// results
+	private String description;
+	private List<String> author;
 	private String dateofacceptance;
 	private String publisher;
 	private List<StructuredProperty> pid;
@@ -73,6 +77,22 @@ public class RelatedEntity implements Serializable {
 
 	public String getWebsiteurl() {
 		return websiteurl;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public List<String> getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(List<String> author) {
+		this.author = author;
 	}
 
 	public void setWebsiteurl(String websiteurl) {

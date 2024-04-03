@@ -10,6 +10,14 @@
             <description>the path where to find the inferred affiliation relations from Pubmed</description>
         </property>
         <property>
+            <name>openapcInputPath</name>
+            <description>the path where to find the inferred affiliation relations from OpenAPC</description>
+        </property>
+        <property>
+            <name>dataciteInputPath</name>
+            <description>the path where to find the inferred affiliation relations from Datacite</description>
+        </property>
+        <property>
             <name>outputPath</name>
             <description>the path where to store the actionset</description>
         </property>
@@ -102,6 +110,9 @@
             </spark-opts>
             <arg>--crossrefInputPath</arg><arg>${crossrefInputPath}</arg>
             <arg>--pubmedInputPath</arg><arg>${pubmedInputPath}</arg>
+            <arg>--openapcInputPath</arg><arg>${openapcInputPath}</arg>
+            <arg>--dataciteInputPath</arg><arg>${dataciteInputPath}</arg>
+
             <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>

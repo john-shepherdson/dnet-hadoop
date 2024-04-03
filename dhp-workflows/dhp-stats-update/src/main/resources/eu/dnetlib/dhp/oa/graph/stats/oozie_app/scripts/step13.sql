@@ -69,7 +69,7 @@ SELECT * FROM ${stats_db_name}.otherresearchproduct_sources;
 DROP TABLE IF EXISTS ${stats_db_name}.result_orcid purge;
 
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.result_orcid STORED AS PARQUET as
-select distinct res.id, regexp_replace(res.orcid, 'http://orcid.org/' ,'') as orcid
+select distinct res.id, upper(regexp_replace(res.orcid, 'http://orcid.org/' ,'')) as orcid
 from (
     SELECT substr(res.id, 4) as id, auth_pid.value as orcid
     FROM ${openaire_db_name}.result res
