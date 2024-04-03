@@ -946,7 +946,15 @@ case object Crossref2Oaf {
                 "10.13039/501100000266" | "10.13039/501100006041" | "10.13039/501100000265" | "10.13039/501100000270" |
                 "10.13039/501100013589" | "10.13039/501100000271" =>
               generateSimpleRelationFromAward(funder, "ukri________", a => a)
-
+            //HFRI
+            case "10.13039/501100013209" =>
+              generateSimpleRelationFromAward(funder, "hfri________", a => a)
+              val targetId = getProjectId("hfri________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+              //ERASMUS+
+            case "10.13039/501100010790" =>
+              generateSimpleRelationFromAward(funder, "erasmusplus_", a => a)
             case _ => logger.debug("no match for " + funder.DOI.get)
 
           }
