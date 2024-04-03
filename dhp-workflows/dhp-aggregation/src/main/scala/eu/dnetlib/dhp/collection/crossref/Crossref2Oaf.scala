@@ -1,7 +1,7 @@
 package eu.dnetlib.dhp.collection.crossref
 
 import com.fasterxml.jackson.databind.ObjectMapper
-
+import eu.dnetlib.dhp.actionmanager.ror.GenerateRorActionSetJob
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf._
@@ -15,6 +15,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.{
 }
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.commons.lang.StringUtils
+import org.apache.spark.sql.Row
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST._
@@ -648,6 +649,33 @@ case object Crossref2Oaf {
 
     }
     r
+  }
+
+  def generateAffliation(input: Row): List[String] = {
+    val doi = input.getString(0)
+    val rorId = input.getString(1)
+
+    val pubId = s"50|${PidType.doi.toString.padTo(12, "_")}::${DoiCleaningRule.normalizeDoi(doi)}"
+    val affId = GenerateRorActionSetJob.calculateOpenaireId(rorId)
+
+    val r: Relation = new Relation
+    DoiCleaningRule.clean(doi)
+    r.setSource(pubId)
+    r.setTarget(affId)
+    r.setRelType(ModelConstants.RESULT_ORGANIZATION)
+    r.setRelClass(ModelConstants.HAS_AUTHOR_INSTITUTION)
+    r.setSubRelType(ModelConstants.AFFILIATION)
+    r.setDataInfo(generateDataInfo())
+    r.setCollectedfrom(List(createCrossrefCollectedFrom()).asJava)
+    val r1: Relation = new Relation
+    r1.setTarget(pubId)
+    r1.setSource(affId)
+    r1.setRelType(ModelConstants.RESULT_ORGANIZATION)
+    r1.setRelClass(ModelConstants.IS_AUTHOR_INSTITUTION_OF)
+    r1.setSubRelType(ModelConstants.AFFILIATION)
+    r1.setDataInfo(generateDataInfo())
+    r1.setCollectedfrom(List(createCrossrefCollectedFrom()).asJava)
+    List(mapper.writeValueAsString(r), mapper.writeValueAsString(r1))
   }
 
   def convert(input: String, vocabularies: VocabularyGroup, mode: TransformationType): List[Oaf] = {
