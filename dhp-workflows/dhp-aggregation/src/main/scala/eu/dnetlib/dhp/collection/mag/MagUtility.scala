@@ -2,7 +2,16 @@ package eu.dnetlib.dhp.collection.mag
 
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf
-import eu.dnetlib.dhp.schema.oaf.{ Dataset => OafDataset, Author, DataInfo, Instance, Journal, Publication, Qualifier, Result}
+import eu.dnetlib.dhp.schema.oaf.{
+  Dataset => OafDataset,
+  Author,
+  DataInfo,
+  Instance,
+  Journal,
+  Publication,
+  Qualifier,
+  Result
+}
 import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils, PidType}
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils._
 import eu.dnetlib.dhp.utils
@@ -26,7 +35,6 @@ case class MAGPaper(
   date: Option[String],
   onlineDate: Option[String],
   publisher: Option[String],
-  // Journal or Conference information (one will be populated)
   journalId: Option[Long],
   journalName: Option[String],
   journalIssn: Option[String],
@@ -50,7 +58,6 @@ case class MAGPaper(
   docSubTypes: Option[String],
   createdDate: Option[String],
   abstractText: Option[String],
-  // List of authors
   authors: Option[List[MAGAuthor]],
   urls: Option[List[String]]
 )
@@ -335,11 +342,8 @@ object MagUtility extends Serializable {
 
   }
 
-  def getInstanceType(magType: Option[String], source: Option[String]): Result = {
-
-
-
-    var result:Result = null
+  def createResultFromType(magType: Option[String], source: Option[String]): Result = {
+    var result: Result = null
     val di = new DataInfo
     di.setDeletedbyinference(false)
     di.setInferred(false)
@@ -353,16 +357,18 @@ object MagUtility extends Serializable {
         ModelConstants.DNET_PROVENANCE_ACTIONS
       )
     )
-    if (magType== null) {
+    if (magType == null) {
       result = new Publication
       result.setDataInfo(di)
-      val i =new Instance
-      i.setInstancetype(qualifier(
-        "0038",
-        "Other literature type",
-        ModelConstants.DNET_PUBLICATION_RESOURCE,
-        ModelConstants.DNET_PUBLICATION_RESOURCE
-      ))
+      val i = new Instance
+      i.setInstancetype(
+        qualifier(
+          "0038",
+          "Other literature type",
+          ModelConstants.DNET_PUBLICATION_RESOURCE,
+          ModelConstants.DNET_PUBLICATION_RESOURCE
+        )
+      )
 
       result.setInstance(List(i).asJava)
       return result
@@ -386,7 +392,7 @@ object MagUtility extends Serializable {
         result = new Publication
         qualifier("0043", "Journal", ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE)
       case "patent" =>
-        if (source.nonEmpty) {
+        if (source != null) {
           val s = source.get.toLowerCase
           if (s.contains("patent") || s.contains("brevet")) {
             result = new Publication
@@ -405,8 +411,8 @@ object MagUtility extends Serializable {
               ModelConstants.DNET_PUBLICATION_RESOURCE
             )
           } else if (s.contains("proceedings") || s.contains("conference") || s.contains("workshop") || s.contains(
-                     "symposium"
-                   )) {
+                       "symposium"
+                     )) {
             result = new Publication
             qualifier(
               "0001",
@@ -430,32 +436,32 @@ object MagUtility extends Serializable {
       case "thesis" =>
         result = new Publication
         qualifier(
-        "0044",
-        "Thesis",
-        ModelConstants.DNET_PUBLICATION_RESOURCE,
-        ModelConstants.DNET_PUBLICATION_RESOURCE
-      )
+          "0044",
+          "Thesis",
+          ModelConstants.DNET_PUBLICATION_RESOURCE,
+          ModelConstants.DNET_PUBLICATION_RESOURCE
+        )
       case "dataset" =>
         result = new OafDataset
         qualifier(
-        "0021",
-        "Dataset",
-        ModelConstants.DNET_PUBLICATION_RESOURCE,
-        ModelConstants.DNET_PUBLICATION_RESOURCE
-      )
+          "0021",
+          "Dataset",
+          ModelConstants.DNET_PUBLICATION_RESOURCE,
+          ModelConstants.DNET_PUBLICATION_RESOURCE
+        )
       case "conference" =>
         result = new Publication
         qualifier(
-        "0001",
-        "Article",
-        ModelConstants.DNET_PUBLICATION_RESOURCE,
-        ModelConstants.DNET_PUBLICATION_RESOURCE
-      )
+          "0001",
+          "Article",
+          ModelConstants.DNET_PUBLICATION_RESOURCE,
+          ModelConstants.DNET_PUBLICATION_RESOURCE
+        )
     }
 
     if (result != null) {
       result.setDataInfo(di)
-      val i =new Instance
+      val i = new Instance
       i.setInstancetype(tp)
       result.setInstance(List(i).asJava)
     }
@@ -463,60 +469,111 @@ object MagUtility extends Serializable {
 
   }
 
-  def convertMAGtoOAF(paper: MAGPaper): Publication = {
-    val pub = new Publication
+  def convertMAGtoOAF(paper: MAGPaper): Result = {
 
-    val magPid = structuredProperty(
-      paper.doi.get,
-      qualifier(
-        PidType.mag_id.toString,
-        PidType.mag_id.toString,
-        ModelConstants.DNET_PID_TYPES,
-        ModelConstants.DNET_PID_TYPES
-      ),
-      null
+    // FILTER all the  MAG paper with no URL
+    if (paper.urls == null || paper.urls.get != null || paper.urls.get.isEmpty)
+      return null
+
+    val result = createResultFromType(paper.docType, paper.originalVenue)
+
+    if (result == null)
+      return null
+
+    val pidList = List(
+      structuredProperty(
+        paper.doi.get,
+        qualifier(
+          PidType.mag_id.toString,
+          PidType.mag_id.toString,
+          ModelConstants.DNET_PID_TYPES,
+          ModelConstants.DNET_PID_TYPES
+        ),
+        null
+      )
     )
 
-    if (paper.doi.isDefined) {
-      pub.setPid(
+    result.setPid(pidList.asJava)
+
+    result.setOriginalId(pidList.map(s => s.getValue).asJava)
+
+    result.setId(s"50|mag_________::${DHPUtils.md5(paper.paperId.get.toString)}")
+
+    val originalTitles = structuredProperty(paper.paperTitle.get, ModelConstants.MAIN_TITLE_QUALIFIER, null)
+
+    result.setTitle(List(originalTitles).asJava)
+
+    if (paper.date.orNull != null) {
+      result.setDateofacceptance(field(paper.date.get, null))
+    } else {
+      if (paper.year.isDefined && paper.year.get > 1700) {
+        result.setDateofacceptance(field(s"${paper.year.get}-01-01", null))
+      }
+    }
+
+    if (paper.onlineDate.orNull != null) {
+      result.setRelevantdate(
         List(
-          magPid,
           structuredProperty(
-            paper.doi.get,
+            paper.onlineDate.get,
             qualifier(
-              PidType.doi.toString,
-              PidType.doi.toString,
-              ModelConstants.DNET_PID_TYPES,
-              ModelConstants.DNET_PID_TYPES
+              "published-online",
+              "published-online",
+              ModelConstants.DNET_DATACITE_DATE,
+              ModelConstants.DNET_DATACITE_DATE
             ),
             null
           )
         ).asJava
       )
-      pub.setOriginalId(List(paper.paperId.get.toString, paper.doi.get).asJava)
-    } else {
-      pub.setPid(
-        List(
-          magPid
-        ).asJava
-      )
-      pub.setOriginalId(List(paper.paperId.get.toString).asJava)
     }
 
-    pub.setId(s"50|mag_________::${DHPUtils.md5(paper.paperId.get.toString)}")
+    if (paper.publisher.orNull != null) {
+      result.setPublisher(field(paper.publisher.get, null))
+    }
 
-    val mainTitles = structuredProperty(paper.originalTitle.get, ModelConstants.MAIN_TITLE_QUALIFIER, null)
+    if (paper.date.isDefined)
+      result.setDateofacceptance(field(paper.date.get, null))
+    if (paper.onlineDate.orNull != null)
+      result.setRelevantdate(
+        List(
+          structuredProperty(
+            paper.onlineDate.get,
+            qualifier(
+              "published-online",
+              "published-online",
+              ModelConstants.DNET_DATACITE_DATE,
+              ModelConstants.DNET_DATACITE_DATE
+            ),
+            null
+          )
+        ).asJava
+      )
 
-    val originalTitles = structuredProperty(paper.paperTitle.get, ModelConstants.ALTERNATIVE_TITLE_QUALIFIER, null)
+    if (paper.publisher.isDefined)
+      result.setPublisher(field(paper.publisher.get, null))
 
-    pub.setTitle(List(mainTitles, originalTitles).asJava)
+    if (paper.journalId.isDefined && paper.journalName.isDefined) {
+      val j = new Journal
 
-    if (paper.bookTitle.isDefined)
-      pub.setSource(List(field[String](paper.bookTitle.get, null)).asJava)
+      j.setName(paper.journalName.get)
+      j.setSp(paper.firstPage.orNull)
+      j.setEp(paper.lastPage.orNull)
+      if (paper.publisher.isDefined)
+        result.setPublisher(field(paper.publisher.get, null))
+      j.setIssnPrinted(paper.journalIssn.orNull)
+      j.setVol(paper.volume.orNull)
+      j.setIss(paper.issue.orNull)
+      j.setConferenceplace(paper.conferenceLocation.orNull)
+      result match {
+        case publication: Publication => publication.setJournal(j)
+      }
+    }
+
     if (paper.abstractText.isDefined)
-      pub.setDescription(List(field(paper.abstractText.get, null)).asJava)
+      result.setDescription(List(field(paper.abstractText.get, null)).asJava)
     if (paper.authors.isDefined && paper.authors.get.nonEmpty) {
-      pub.setAuthor(
+      result.setAuthor(
         paper.authors.get
           .filter(a => a.AuthorName.isDefined)
           .map(a => {
@@ -528,30 +585,70 @@ object MagUtility extends Serializable {
       )
     }
 
-    if (paper.date.isDefined)
-      pub.setDateofacceptance(field(paper.date.get, null))
+    val instance = result.getInstance().get(0)
+    instance.setPid(pidList.asJava)
+    instance.setAlternateIdentifier(
+      List(
+        structuredProperty(
+          paper.doi.get,
+          qualifier(
+            PidType.doi.toString,
+            PidType.doi.toString,
+            ModelConstants.DNET_PID_TYPES,
+            ModelConstants.DNET_PID_TYPES
+          ),
+          null
+        )
+      ).asJava
+    )
+    instance.setUrl(paper.urls.get.asJava)
+    instance.setHostedby(ModelConstants.UNKNOWN_REPOSITORY)
+    instance.setAccessright(accessRight(
+      ModelConstants.UNKNOWN,
+      ModelConstants.NOT_AVAILABLE,
+      ModelConstants.DNET_ACCESS_MODES,
+      ModelConstants.DNET_ACCESS_MODES
+    ))
 
-    if (paper.publisher.isDefined)
-      pub.setPublisher(field(paper.publisher.get, null))
-
-    if (paper.journalId.isDefined && paper.journalName.isDefined) {
-      val j = new Journal
-
-      j.setName(paper.journalName.get)
-      j.setSp(paper.firstPage.orNull)
-      j.setEp(paper.lastPage.orNull)
-      if (paper.publisher.isDefined)
-        pub.setPublisher(field(paper.publisher.get, null))
-      j.setIssnPrinted(paper.journalIssn.orNull)
-      j.setVol(paper.volume.orNull)
-      j.setIss(paper.issue.orNull)
-      j.setConferenceplace(paper.conferenceLocation.orNull)
-      j.setEdition(paper.conferenceName.orNull)
-      pub.setJournal(j)
-    }
-
-    pub
-
+    if (paper.authors.orNull != null && paper.authors.get.nonEmpty)
+      result.setAuthor(
+        paper.authors.get
+          .filter(a => a.AuthorName.orNull != null)
+          .map { a =>
+            val author = new Author
+            author.setFullname(a.AuthorName.get)
+            var authorPid = List(
+              structuredProperty(
+                a.AuthorId.get.toString,
+                qualifier(
+                  PidType.mag_id.toString,
+                  PidType.mag_id.toString,
+                  ModelConstants.DNET_PID_TYPES,
+                  ModelConstants.DNET_PID_TYPES
+                ),
+                null
+              )
+            )
+            if (a.GridId.orNull != null) {
+              authorPid = authorPid ::: List(
+                structuredProperty(
+                  a.AuthorId.get.toString,
+                  qualifier(
+                    PidType.mag_id.toString,
+                    PidType.mag_id.toString,
+                    ModelConstants.DNET_PID_TYPES,
+                    ModelConstants.DNET_PID_TYPES
+                  ),
+                  null
+                )
+              )
+            }
+            author.setPid(authorPid.asJava)
+            author
+          }
+          .asJava
+      )
+    result
   }
 
   def convertInvertedIndexString(json_input: String): String = {

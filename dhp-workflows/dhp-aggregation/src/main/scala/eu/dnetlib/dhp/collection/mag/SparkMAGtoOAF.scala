@@ -1,7 +1,8 @@
 package eu.dnetlib.dhp.collection.mag
 
 import eu.dnetlib.dhp.application.AbstractScalaApplication
-import org.apache.spark.sql.SparkSession
+import eu.dnetlib.dhp.schema.oaf.Result
+import org.apache.spark.sql.{Encoders, SaveMode, SparkSession}
 import org.slf4j.{Logger, LoggerFactory}
 
 class SparkMAGtoOAF(propertyPath: String, args: Array[String], log: Logger)
@@ -20,9 +21,20 @@ class SparkMAGtoOAF(propertyPath: String, args: Array[String], log: Logger)
 
   def convertMAG(spark: SparkSession, workingPath: String, mdStorePath: String): Unit = {
     import spark.implicits._
-    val papers = spark.read.load(s"$workingPath/mag").as[MAGPaper]
-    val total = papers.count()
-    log.info(s"TOTAL PAPERS: $total")
+    implicit val resultEncoder = Encoders.bean(classOf[Result])
+
+    spark.read
+      .load(s"$workingPath/mag")
+      .as[MAGPaper].show()
+
+    spark.read
+      .load(s"$workingPath/mag")
+      .as[MAGPaper]
+      .map(s => MagUtility.convertMAGtoOAF(s))
+      .write
+      .mode(SaveMode.Overwrite)
+      .json(mdStorePath)
+
   }
 }
 
