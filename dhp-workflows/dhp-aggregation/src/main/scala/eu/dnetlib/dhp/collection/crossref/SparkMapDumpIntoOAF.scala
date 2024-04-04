@@ -7,7 +7,7 @@ import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Publication, Relation, Result, Dataset => OafDataset}
 import eu.dnetlib.dhp.utils.ISLookupClientFactory
 import org.apache.spark.sql._
-import org.apache.spark.sql.functions.{col, lower}
+import org.apache.spark.sql.functions.{col, explode, lower}
 import org.apache.spark.sql.types._
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -104,6 +104,22 @@ class SparkMapDumpIntoOAF(propertyPath: String, args: Array[String], log: Logger
       .mode(SaveMode.Append)
       .option("compression", "gzip")
       .text(s"$targetPath")
+
+    // Generate affiliation relations:
+    spark.read
+      .json(sourcePath)
+      .select(col("DOI"), explode(col("author.affiliation")).alias("affiliations"))
+      .select(col("DOI"), explode(col("affiliations.id")).alias("aids"))
+      .where("aids is not null")
+      .select(col("DOI"), explode(col("aids")).alias("aff"))
+      .select(col("DOI"), col("aff.id").alias("id"), col("aff.id-type").alias("idType"))
+      .where(col("idType").like("ROR"))
+      .flatMap(r => Crossref2Oaf.generateAffliation(r))
+      .write
+      .mode(SaveMode.Append)
+      .option("compression", "gzip")
+      .text(s"$targetPath")
+
   }
 }
 

@@ -1,9 +1,12 @@
 package eu.dnetlib.dhp.collection.mag
 
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf.{Author, Journal, Publication}
-import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, PidType}
+import eu.dnetlib.dhp.schema.oaf
+import eu.dnetlib.dhp.schema.oaf.{ Dataset => OafDataset, Author, DataInfo, Instance, Journal, Publication, Qualifier, Result}
+import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils, PidType}
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils._
+import eu.dnetlib.dhp.utils
+import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
 import org.json4s
@@ -304,14 +307,15 @@ object MagUtility extends Serializable {
   def getSchema(streamName: String): StructType = {
     var schema = new StructType()
     val d: Seq[String] = stream(streamName)._2
-    d.foreach { case t =>
-      val currentType = t.split(":")
-      val fieldName: String = currentType.head
-      var fieldType: String = currentType.last
-      val nullable: Boolean = fieldType.endsWith("?")
-      if (nullable)
-        fieldType = fieldType.replace("?", "")
-      schema = schema.add(StructField(fieldName, datatypedict(fieldType), nullable))
+    d.foreach {
+      case t =>
+        val currentType = t.split(":")
+        val fieldName: String = currentType.head
+        var fieldType: String = currentType.last
+        val nullable: Boolean = fieldType.endsWith("?")
+        if (nullable)
+          fieldType = fieldType.replace("?", "")
+        schema = schema.add(StructField(fieldName, datatypedict(fieldType), nullable))
     }
     schema
   }
@@ -331,12 +335,152 @@ object MagUtility extends Serializable {
 
   }
 
+  def getInstanceType(magType: Option[String], source: Option[String]): Result = {
+
+
+
+    var result:Result = null
+    val di = new DataInfo
+    di.setDeletedbyinference(false)
+    di.setInferred(false)
+    di.setInvisible(false)
+    di.setTrust("0.9")
+    di.setProvenanceaction(
+      OafMapperUtils.qualifier(
+        ModelConstants.SYSIMPORT_ACTIONSET,
+        ModelConstants.SYSIMPORT_ACTIONSET,
+        ModelConstants.DNET_PROVENANCE_ACTIONS,
+        ModelConstants.DNET_PROVENANCE_ACTIONS
+      )
+    )
+    if (magType== null) {
+      result = new Publication
+      result.setDataInfo(di)
+      val i =new Instance
+      i.setInstancetype(qualifier(
+        "0038",
+        "Other literature type",
+        ModelConstants.DNET_PUBLICATION_RESOURCE,
+        ModelConstants.DNET_PUBLICATION_RESOURCE
+      ))
+
+      result.setInstance(List(i).asJava)
+      return result
+    }
+
+    val currentType: String = magType.get
+
+    val tp = currentType.toLowerCase match {
+      case "book" =>
+        result = new Publication
+        qualifier("0002", "Book", ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE)
+      case "bookchapter" =>
+        result = new Publication
+        qualifier(
+          "00013",
+          "Part of book or chapter of book",
+          ModelConstants.DNET_PUBLICATION_RESOURCE,
+          ModelConstants.DNET_PUBLICATION_RESOURCE
+        )
+      case "journal" =>
+        result = new Publication
+        qualifier("0043", "Journal", ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE)
+      case "patent" =>
+        if (source.nonEmpty) {
+          val s = source.get.toLowerCase
+          if (s.contains("patent") || s.contains("brevet")) {
+            result = new Publication
+            qualifier(
+              "0019",
+              "Patent",
+              ModelConstants.DNET_PUBLICATION_RESOURCE,
+              ModelConstants.DNET_PUBLICATION_RESOURCE
+            )
+          } else if (s.contains("journal of")) {
+            result = new Publication
+            qualifier(
+              "0043",
+              "Journal",
+              ModelConstants.DNET_PUBLICATION_RESOURCE,
+              ModelConstants.DNET_PUBLICATION_RESOURCE
+            )
+          } else if (s.contains("proceedings") || s.contains("conference") || s.contains("workshop") || s.contains(
+                     "symposium"
+                   )) {
+            result = new Publication
+            qualifier(
+              "0001",
+              "Article",
+              ModelConstants.DNET_PUBLICATION_RESOURCE,
+              ModelConstants.DNET_PUBLICATION_RESOURCE
+            )
+          } else null
+        } else null
+
+      case "repository" =>
+        result = new Publication()
+        di.setInvisible(true)
+        qualifier(
+          "0038",
+          "Other literature type",
+          ModelConstants.DNET_PUBLICATION_RESOURCE,
+          ModelConstants.DNET_PUBLICATION_RESOURCE
+        )
+
+      case "thesis" =>
+        result = new Publication
+        qualifier(
+        "0044",
+        "Thesis",
+        ModelConstants.DNET_PUBLICATION_RESOURCE,
+        ModelConstants.DNET_PUBLICATION_RESOURCE
+      )
+      case "dataset" =>
+        result = new OafDataset
+        qualifier(
+        "0021",
+        "Dataset",
+        ModelConstants.DNET_PUBLICATION_RESOURCE,
+        ModelConstants.DNET_PUBLICATION_RESOURCE
+      )
+      case "conference" =>
+        result = new Publication
+        qualifier(
+        "0001",
+        "Article",
+        ModelConstants.DNET_PUBLICATION_RESOURCE,
+        ModelConstants.DNET_PUBLICATION_RESOURCE
+      )
+    }
+
+    if (result != null) {
+      result.setDataInfo(di)
+      val i =new Instance
+      i.setInstancetype(tp)
+      result.setInstance(List(i).asJava)
+    }
+    result
+
+  }
+
   def convertMAGtoOAF(paper: MAGPaper): Publication = {
+    val pub = new Publication
+
+    val magPid = structuredProperty(
+      paper.doi.get,
+      qualifier(
+        PidType.mag_id.toString,
+        PidType.mag_id.toString,
+        ModelConstants.DNET_PID_TYPES,
+        ModelConstants.DNET_PID_TYPES
+      ),
+      null
+    )
 
     if (paper.doi.isDefined) {
-      val pub = new Publication
       pub.setPid(
         List(
+          magPid,
           structuredProperty(
             paper.doi.get,
             qualifier(
@@ -349,75 +493,64 @@ object MagUtility extends Serializable {
           )
         ).asJava
       )
-
       pub.setOriginalId(List(paper.paperId.get.toString, paper.doi.get).asJava)
+    } else {
+      pub.setPid(
+        List(
+          magPid
+        ).asJava
+      )
+      pub.setOriginalId(List(paper.paperId.get.toString).asJava)
+    }
 
-      //IMPORTANT
-      //The old method result.setId(generateIdentifier(result, doi))
-      //will be replaced using IdentifierFactory
-      pub.setId(IdentifierFactory.createDOIBoostIdentifier(pub))
+    pub.setId(s"50|mag_________::${DHPUtils.md5(paper.paperId.get.toString)}")
 
-      val mainTitles = structuredProperty(paper.originalTitle.get, ModelConstants.MAIN_TITLE_QUALIFIER, null)
+    val mainTitles = structuredProperty(paper.originalTitle.get, ModelConstants.MAIN_TITLE_QUALIFIER, null)
 
-      val originalTitles = structuredProperty(paper.paperTitle.get, ModelConstants.ALTERNATIVE_TITLE_QUALIFIER, null)
+    val originalTitles = structuredProperty(paper.paperTitle.get, ModelConstants.ALTERNATIVE_TITLE_QUALIFIER, null)
 
-      pub.setTitle(List(mainTitles, originalTitles).asJava)
+    pub.setTitle(List(mainTitles, originalTitles).asJava)
 
-      if (paper.bookTitle.isDefined)
-        pub.setSource(List(field[String](paper.bookTitle.get, null)).asJava)
-      if (paper.abstractText.isDefined)
-        pub.setDescription(List(field(paper.abstractText.get, null)).asJava)
-      if (paper.authors.isDefined && paper.authors.get.nonEmpty) {
-        pub.setAuthor(
-          paper.authors.get
-            .filter(a => a.AuthorName.isDefined)
-            .map(a => {
-              val author = new Author
-              author.setFullname(a.AuthorName.get)
-              if (a.AffiliationName.isDefined)
-                author.setAffiliation(List(field(a.AffiliationName.get, null)).asJava)
-              author.setPid(
-                List(
-                  structuredProperty(
-                    s"https://academic.microsoft.com/#/detail/${a.AuthorId.get}",
-                    qualifier("url", "url", ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES),
-                    null
-                  )
-                ).asJava
-              )
-              author
-            })
-            .asJava
-        )
+    if (paper.bookTitle.isDefined)
+      pub.setSource(List(field[String](paper.bookTitle.get, null)).asJava)
+    if (paper.abstractText.isDefined)
+      pub.setDescription(List(field(paper.abstractText.get, null)).asJava)
+    if (paper.authors.isDefined && paper.authors.get.nonEmpty) {
+      pub.setAuthor(
+        paper.authors.get
+          .filter(a => a.AuthorName.isDefined)
+          .map(a => {
+            val author = new Author
+            author.setFullname(a.AuthorName.get)
+            author
+          })
+          .asJava
+      )
+    }
 
-      }
+    if (paper.date.isDefined)
+      pub.setDateofacceptance(field(paper.date.get, null))
 
-      if (paper.date.isDefined)
-        pub.setDateofacceptance(field(paper.date.get, null))
+    if (paper.publisher.isDefined)
+      pub.setPublisher(field(paper.publisher.get, null))
 
+    if (paper.journalId.isDefined && paper.journalName.isDefined) {
+      val j = new Journal
+
+      j.setName(paper.journalName.get)
+      j.setSp(paper.firstPage.orNull)
+      j.setEp(paper.lastPage.orNull)
       if (paper.publisher.isDefined)
         pub.setPublisher(field(paper.publisher.get, null))
-
-      if (paper.journalId.isDefined && paper.journalName.isDefined) {
-        val j = new Journal
-
-        j.setName(paper.journalName.get)
-        j.setSp(paper.firstPage.orNull)
-        j.setEp(paper.lastPage.orNull)
-        if (paper.publisher.isDefined)
-          pub.setPublisher(field(paper.publisher.get, null))
-        j.setIssnPrinted(paper.journalIssn.orNull)
-        j.setVol(paper.volume.orNull)
-        j.setIss(paper.issue.orNull)
-        j.setConferenceplace(paper.conferenceLocation.orNull)
-        j.setEdition(paper.conferenceName.orNull)
-        pub.setJournal(j)
-      }
-
-      pub
-    } else {
-      null
+      j.setIssnPrinted(paper.journalIssn.orNull)
+      j.setVol(paper.volume.orNull)
+      j.setIss(paper.issue.orNull)
+      j.setConferenceplace(paper.conferenceLocation.orNull)
+      j.setEdition(paper.conferenceName.orNull)
+      pub.setJournal(j)
     }
+
+    pub
 
   }
 
