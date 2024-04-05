@@ -1,20 +1,10 @@
 package eu.dnetlib.dhp.collection.mag
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.common.ModelConstants
-import eu.dnetlib.dhp.schema.oaf
-import eu.dnetlib.dhp.schema.oaf.{
-  Dataset => OafDataset,
-  Author,
-  DataInfo,
-  Instance,
-  Journal,
-  Publication,
-  Qualifier,
-  Result
-}
-import eu.dnetlib.dhp.schema.oaf.utils.{IdentifierFactory, OafMapperUtils, PidType}
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils._
-import eu.dnetlib.dhp.utils
+import eu.dnetlib.dhp.schema.oaf.utils.{OafMapperUtils, PidType}
+import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Instance, Journal, Publication, Result, Dataset => OafDataset}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
@@ -72,6 +62,10 @@ case class MAGAuthor(
 )
 
 object MagUtility extends Serializable {
+
+  val mapper = new ObjectMapper()
+
+  val MAGCollectedFrom =keyValue(ModelConstants.MAG_ID,ModelConstants.MAG_NAME)
 
   val datatypedict = Map(
     "bool"     -> BooleanType,
@@ -357,7 +351,7 @@ object MagUtility extends Serializable {
         ModelConstants.DNET_PROVENANCE_ACTIONS
       )
     )
-    if (magType == null) {
+    if (magType == null || magType.orNull ==null) {
       result = new Publication
       result.setDataInfo(di)
       val i = new Instance
@@ -392,7 +386,7 @@ object MagUtility extends Serializable {
         result = new Publication
         qualifier("0043", "Journal", ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE)
       case "patent" =>
-        if (source != null) {
+        if (source!= null && source.orNull != null) {
           val s = source.get.toLowerCase
           if (s.contains("patent") || s.contains("brevet")) {
             result = new Publication
@@ -469,20 +463,21 @@ object MagUtility extends Serializable {
 
   }
 
-  def convertMAGtoOAF(paper: MAGPaper): Result = {
+  def convertMAGtoOAF(paper: MAGPaper): String = {
 
     // FILTER all the  MAG paper with no URL
-    if (paper.urls == null || paper.urls.get != null || paper.urls.get.isEmpty)
+    if (paper.urls.orNull == null  )
       return null
 
     val result = createResultFromType(paper.docType, paper.originalVenue)
-
     if (result == null)
       return null
 
+
+    result.setCollectedfrom(List(MAGCollectedFrom).asJava)
     val pidList = List(
       structuredProperty(
-        paper.doi.get,
+        paper.paperId.get.toString,
         qualifier(
           PidType.mag_id.toString,
           PidType.mag_id.toString,
@@ -587,6 +582,7 @@ object MagUtility extends Serializable {
 
     val instance = result.getInstance().get(0)
     instance.setPid(pidList.asJava)
+    if(paper.doi.orNull != null)
     instance.setAlternateIdentifier(
       List(
         structuredProperty(
@@ -603,6 +599,7 @@ object MagUtility extends Serializable {
     )
     instance.setUrl(paper.urls.get.asJava)
     instance.setHostedby(ModelConstants.UNKNOWN_REPOSITORY)
+    instance.setCollectedfrom(MAGCollectedFrom)
     instance.setAccessright(accessRight(
       ModelConstants.UNKNOWN,
       ModelConstants.NOT_AVAILABLE,
@@ -648,7 +645,7 @@ object MagUtility extends Serializable {
           }
           .asJava
       )
-    result
+    mapper.writeValueAsString(result)
   }
 
   def convertInvertedIndexString(json_input: String): String = {

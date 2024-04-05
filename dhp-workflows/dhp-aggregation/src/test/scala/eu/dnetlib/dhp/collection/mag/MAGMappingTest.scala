@@ -3,7 +3,6 @@ package eu.dnetlib.dhp.collection.mag
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.oaf.{Dataset, Publication, Result}
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.col
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions._
 
@@ -14,18 +13,18 @@ class MAGMappingTest {
   val mapper = new ObjectMapper()
 
 
-  @Test
-  def mappingTest(): Unit = {
-
-    val spark = SparkSession
-      .builder()
-      .appName("Test")
-      .master("local[*]")
-      .getOrCreate()
-
-    new SparkMAGtoOAF(null,null,null).convertMAG(spark,"/Users/sandro/Downloads", "/Users/sandro/Downloads/mag_oaf")
-
-  }
+//  @Test
+//  def mappingTest(): Unit = {
+//
+//    val spark = SparkSession
+//      .builder()
+//      .appName("Test")
+//      .master("local[*]")
+//      .getOrCreate()
+//
+//    new SparkMAGtoOAF(null,null,null).convertMAG(spark,"/home/sandro/Downloads", "/home/sandro/Downloads/mag_oaf")
+//
+//  }
 
 
 
