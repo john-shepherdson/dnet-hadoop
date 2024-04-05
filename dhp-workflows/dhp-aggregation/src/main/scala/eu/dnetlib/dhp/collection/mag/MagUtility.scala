@@ -4,7 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils._
 import eu.dnetlib.dhp.schema.oaf.utils.{OafMapperUtils, PidType}
-import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Instance, Journal, Publication, Result, Dataset => OafDataset}
+import eu.dnetlib.dhp.schema.oaf.{
+  Author,
+  DataInfo,
+  Instance,
+  Journal,
+  Publication,
+  Relation,
+  Result,
+  Dataset => OafDataset
+}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
@@ -65,7 +74,41 @@ object MagUtility extends Serializable {
 
   val mapper = new ObjectMapper()
 
-  val MAGCollectedFrom =keyValue(ModelConstants.MAG_ID,ModelConstants.MAG_NAME)
+  private val MAGCollectedFrom = keyValue(ModelConstants.MAG_ID, ModelConstants.MAG_NAME)
+
+  private val MAGDataInfo: DataInfo = {
+    val di = new DataInfo
+    di.setDeletedbyinference(false)
+    di.setInferred(false)
+    di.setInvisible(false)
+    di.setTrust("0.9")
+    di.setProvenanceaction(
+      OafMapperUtils.qualifier(
+        ModelConstants.SYSIMPORT_ACTIONSET,
+        ModelConstants.SYSIMPORT_ACTIONSET,
+        ModelConstants.DNET_PROVENANCE_ACTIONS,
+        ModelConstants.DNET_PROVENANCE_ACTIONS
+      )
+    )
+    di
+  }
+
+  private val MAGDataInfoInvisible: DataInfo = {
+    val di = new DataInfo
+    di.setDeletedbyinference(false)
+    di.setInferred(false)
+    di.setInvisible(true)
+    di.setTrust("0.9")
+    di.setProvenanceaction(
+      OafMapperUtils.qualifier(
+        ModelConstants.SYSIMPORT_ACTIONSET,
+        ModelConstants.SYSIMPORT_ACTIONSET,
+        ModelConstants.DNET_PROVENANCE_ACTIONS,
+        ModelConstants.DNET_PROVENANCE_ACTIONS
+      )
+    )
+    di
+  }
 
   val datatypedict = Map(
     "bool"     -> BooleanType,
@@ -308,15 +351,14 @@ object MagUtility extends Serializable {
   def getSchema(streamName: String): StructType = {
     var schema = new StructType()
     val d: Seq[String] = stream(streamName)._2
-    d.foreach {
-      case t =>
-        val currentType = t.split(":")
-        val fieldName: String = currentType.head
-        var fieldType: String = currentType.last
-        val nullable: Boolean = fieldType.endsWith("?")
-        if (nullable)
-          fieldType = fieldType.replace("?", "")
-        schema = schema.add(StructField(fieldName, datatypedict(fieldType), nullable))
+    d.foreach { case t =>
+      val currentType = t.split(":")
+      val fieldName: String = currentType.head
+      var fieldType: String = currentType.last
+      val nullable: Boolean = fieldType.endsWith("?")
+      if (nullable)
+        fieldType = fieldType.replace("?", "")
+      schema = schema.add(StructField(fieldName, datatypedict(fieldType), nullable))
     }
     schema
   }
@@ -338,22 +380,10 @@ object MagUtility extends Serializable {
 
   def createResultFromType(magType: Option[String], source: Option[String]): Result = {
     var result: Result = null
-    val di = new DataInfo
-    di.setDeletedbyinference(false)
-    di.setInferred(false)
-    di.setInvisible(false)
-    di.setTrust("0.9")
-    di.setProvenanceaction(
-      OafMapperUtils.qualifier(
-        ModelConstants.SYSIMPORT_ACTIONSET,
-        ModelConstants.SYSIMPORT_ACTIONSET,
-        ModelConstants.DNET_PROVENANCE_ACTIONS,
-        ModelConstants.DNET_PROVENANCE_ACTIONS
-      )
-    )
-    if (magType == null || magType.orNull ==null) {
+
+    if (magType == null || magType.orNull == null) {
       result = new Publication
-      result.setDataInfo(di)
+      result.setDataInfo(MAGDataInfo)
       val i = new Instance
       i.setInstancetype(
         qualifier(
@@ -386,7 +416,7 @@ object MagUtility extends Serializable {
         result = new Publication
         qualifier("0043", "Journal", ModelConstants.DNET_PUBLICATION_RESOURCE, ModelConstants.DNET_PUBLICATION_RESOURCE)
       case "patent" =>
-        if (source!= null && source.orNull != null) {
+        if (source != null && source.orNull != null) {
           val s = source.get.toLowerCase
           if (s.contains("patent") || s.contains("brevet")) {
             result = new Publication
@@ -404,9 +434,11 @@ object MagUtility extends Serializable {
               ModelConstants.DNET_PUBLICATION_RESOURCE,
               ModelConstants.DNET_PUBLICATION_RESOURCE
             )
-          } else if (s.contains("proceedings") || s.contains("conference") || s.contains("workshop") || s.contains(
-                       "symposium"
-                     )) {
+          } else if (
+            s.contains("proceedings") || s.contains("conference") || s.contains("workshop") || s.contains(
+              "symposium"
+            )
+          ) {
             result = new Publication
             qualifier(
               "0001",
@@ -419,7 +451,7 @@ object MagUtility extends Serializable {
 
       case "repository" =>
         result = new Publication()
-        di.setInvisible(true)
+        result.setDataInfo(MAGDataInfoInvisible)
         qualifier(
           "0038",
           "Other literature type",
@@ -454,7 +486,8 @@ object MagUtility extends Serializable {
     }
 
     if (result != null) {
-      result.setDataInfo(di)
+      if (result.getDataInfo == null)
+        result.setDataInfo(MAGDataInfo)
       val i = new Instance
       i.setInstancetype(tp)
       result.setInstance(List(i).asJava)
@@ -466,13 +499,12 @@ object MagUtility extends Serializable {
   def convertMAGtoOAF(paper: MAGPaper): String = {
 
     // FILTER all the  MAG paper with no URL
-    if (paper.urls.orNull == null  )
+    if (paper.urls.orNull == null)
       return null
 
     val result = createResultFromType(paper.docType, paper.originalVenue)
     if (result == null)
       return null
-
 
     result.setCollectedfrom(List(MAGCollectedFrom).asJava)
     val pidList = List(
@@ -582,30 +614,32 @@ object MagUtility extends Serializable {
 
     val instance = result.getInstance().get(0)
     instance.setPid(pidList.asJava)
-    if(paper.doi.orNull != null)
-    instance.setAlternateIdentifier(
-      List(
-        structuredProperty(
-          paper.doi.get,
-          qualifier(
-            PidType.doi.toString,
-            PidType.doi.toString,
-            ModelConstants.DNET_PID_TYPES,
-            ModelConstants.DNET_PID_TYPES
-          ),
-          null
-        )
-      ).asJava
-    )
+    if (paper.doi.orNull != null)
+      instance.setAlternateIdentifier(
+        List(
+          structuredProperty(
+            paper.doi.get,
+            qualifier(
+              PidType.doi.toString,
+              PidType.doi.toString,
+              ModelConstants.DNET_PID_TYPES,
+              ModelConstants.DNET_PID_TYPES
+            ),
+            null
+          )
+        ).asJava
+      )
     instance.setUrl(paper.urls.get.asJava)
     instance.setHostedby(ModelConstants.UNKNOWN_REPOSITORY)
     instance.setCollectedfrom(MAGCollectedFrom)
-    instance.setAccessright(accessRight(
-      ModelConstants.UNKNOWN,
-      ModelConstants.NOT_AVAILABLE,
-      ModelConstants.DNET_ACCESS_MODES,
-      ModelConstants.DNET_ACCESS_MODES
-    ))
+    instance.setAccessright(
+      accessRight(
+        ModelConstants.UNKNOWN,
+        ModelConstants.NOT_AVAILABLE,
+        ModelConstants.DNET_ACCESS_MODES,
+        ModelConstants.DNET_ACCESS_MODES
+      )
+    )
 
     if (paper.authors.orNull != null && paper.authors.get.nonEmpty)
       result.setAuthor(
@@ -646,6 +680,31 @@ object MagUtility extends Serializable {
           .asJava
       )
     mapper.writeValueAsString(result)
+
+  }
+
+  def generateAffiliationRelations(paperAffiliation: Row): List[Relation] = {
+
+    val affId = s"20|mag_________::${DHPUtils.md5(paperAffiliation.getAs[Long]("AffiliationId").toString)}"
+    val oafId = s"50|mag_________::${DHPUtils.md5(paperAffiliation.getAs[Long]("PaperId").toString)}"
+    val r: Relation = new Relation
+    r.setSource(oafId)
+    r.setTarget(affId)
+    r.setRelType(ModelConstants.RESULT_ORGANIZATION)
+    r.setRelClass(ModelConstants.HAS_AUTHOR_INSTITUTION)
+    r.setSubRelType(ModelConstants.AFFILIATION)
+    r.setDataInfo(MAGDataInfo)
+    r.setCollectedfrom(List(MAGCollectedFrom).asJava)
+    val r1: Relation = new Relation
+    r1.setTarget(oafId)
+    r1.setSource(affId)
+    r1.setRelType(ModelConstants.RESULT_ORGANIZATION)
+    r1.setRelClass(ModelConstants.IS_AUTHOR_INSTITUTION_OF)
+    r1.setSubRelType(ModelConstants.AFFILIATION)
+    r1.setDataInfo(MAGDataInfo)
+    r1.setCollectedfrom(List(MAGCollectedFrom).asJava)
+    List(r, r1)
+
   }
 
   def convertInvertedIndexString(json_input: String): String = {

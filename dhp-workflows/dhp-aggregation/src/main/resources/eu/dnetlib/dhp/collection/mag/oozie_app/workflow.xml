@@ -9,10 +9,6 @@
             <description>The base path of MAG DUMP CSV Tables</description>
         </property>
         <property>
-            <name>workingPath</name>
-            <description>The working path</description>
-        </property>
-        <property>
             <name>resume_from</name>
             <value>generateOAF</value>
             <description>start Node</description>
@@ -53,7 +49,6 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--magBasePath</arg><arg>${magBasePath}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
             <arg>--master</arg><arg>yarn</arg>
         </spark>
         <ok to="generateOAF"/>
@@ -79,7 +74,7 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--mdstorePath</arg><arg>${mdstorePath}</arg>
-            <arg>--workingPath</arg><arg>${workingPath}</arg>
+            <arg>--magBasePath</arg><arg>${magBasePath}</arg>
             <arg>--master</arg><arg>yarn</arg>
         </spark>
         <ok to="End"/>

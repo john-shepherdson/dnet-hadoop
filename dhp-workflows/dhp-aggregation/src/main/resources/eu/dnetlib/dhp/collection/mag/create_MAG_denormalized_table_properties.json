@@ -10,12 +10,6 @@
     "paramLongName": "magBasePath",
     "paramDescription": "The base path of MAG DUMP CSV Tables",
     "paramRequired": true
-  },
-  {
-    "paramName": "w",
-    "paramLongName": "workingPath",
-    "paramDescription": "The working path",
-    "paramRequired": false
   }
 
 ]

@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
 import org.slf4j.{Logger, LoggerFactory}
 
-
 @ExtendWith(Array(classOf[MockitoExtension]))
 class CrossrefMappingTest extends AbstractVocabularyTest {
 
@@ -18,7 +17,5 @@ class CrossrefMappingTest extends AbstractVocabularyTest {
   def setUp(): Unit = {
     super.setUpVocabulary()
   }
-
-
 
 }

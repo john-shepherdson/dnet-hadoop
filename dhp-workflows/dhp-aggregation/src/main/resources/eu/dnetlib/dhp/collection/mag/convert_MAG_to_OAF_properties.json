@@ -12,9 +12,9 @@
     "paramRequired": true
   },
   {
-    "paramName": "w",
-    "paramLongName": "workingPath",
-    "paramDescription": "The working path",
+    "paramName": "ma",
+    "paramLongName": "magBasePath",
+    "paramDescription": "The mag Base path",
     "paramRequired": false
   }
 

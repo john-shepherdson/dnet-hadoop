@@ -15,15 +15,12 @@ class SparkCreateMagDenormalizedTable(propertyPath: String, args: Array[String],
   override def run(): Unit = {
     val magBasePath: String = parser.get("magBasePath")
     log.info("found parameters magBasePath: {}", magBasePath)
-    val workingPath: String = parser.get("workingPath")
-    log.info("found parameters workingPath: {}", workingPath)
-    generatedDenormalizedMAGTable(spark, magBasePath, workingPath)
+    generatedDenormalizedMAGTable(spark, magBasePath)
   }
 
   private def generatedDenormalizedMAGTable(
     spark: SparkSession,
-    magBasePath: String,
-    workingPath: String
+    magBasePath: String
   ): Unit = {
 
     import spark.implicits._
@@ -114,27 +111,6 @@ class SparkCreateMagDenormalizedTable(propertyPath: String, args: Array[String],
     step2.count()
     step1.unpersist()
 
-//    val fos = MagUtility
-//      .loadMagEntity(spark, "FieldsOfStudy", magBasePath)
-//      .select($"FieldOfStudyId".alias("fos"), $"DisplayName", $"MainType")
-//
-//    val paperFieldsOfStudy = MagUtility
-//      .loadMagEntity(spark, "PaperFieldsOfStudy", magBasePath)
-//      .select($"FieldOfStudyId", $"Score", $"PaperId")
-//
-//    val paperFoS = paperFieldsOfStudy
-//      .join(broadcast(fos), fos("fos") === paperFieldsOfStudy("FieldOfStudyId"))
-//      .groupBy("PaperId")
-//      .agg(collect_set(struct("FieldOfStudyId", "DisplayName", "MainType", "Score")).as("FoS"))
-//
-//    val step3 = step2
-//      .join(paperFoS, step2("PaperId") === paperFoS("PaperId"), "left")
-//      .select(step2("*"), paperFoS("FoS"))
-//      .cache()
-//    step3.count()
-//
-//    step2.unpersist()
-
     val journals = MagUtility
       .loadMagEntity(spark, "Journals", magBasePath)
       .select(
@@ -204,7 +180,7 @@ class SparkCreateMagDenormalizedTable(propertyPath: String, args: Array[String],
       )
       .write
       .mode("OverWrite")
-      .save(s"$workingPath/mag")
+      .save(s"$magBasePath/mag_denormalized")
     step3.unpersist()
   }
 }
