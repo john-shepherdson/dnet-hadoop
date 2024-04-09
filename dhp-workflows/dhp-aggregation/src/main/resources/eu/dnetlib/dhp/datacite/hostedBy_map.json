@@ -1048,5 +1048,10 @@
   "openaire_id": "re3data_____::r3d100010399",
   "datacite_name": "ZEW Forschungsdatenzentrum",
   "official_name": "ZEW Forschungsdatenzentrum"
+ },
+ "HBP.NEUROINF": {
+  "openaire_id": "fairsharing_::2975",
+  "datacite_name": "EBRAINS",
+  "official_name": "EBRAINS"
  }
 }
