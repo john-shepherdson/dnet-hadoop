@@ -97,9 +97,9 @@ public class PrepareAffiliationRelations implements Serializable {
 					spark, openapcInputPath, collectedFromOpenAPC);
 
 				List<KeyValue> collectedFromDatacite = OafMapperUtils
-						.listKeyValues(ModelConstants.DATACITE_ID, "Datacite");
+					.listKeyValues(ModelConstants.DATACITE_ID, "Datacite");
 				JavaPairRDD<Text, Text> dataciteRelations = prepareAffiliationRelations(
-						spark, dataciteInputPath, collectedFromDatacite);
+					spark, dataciteInputPath, collectedFromDatacite);
 
 				crossrefRelations
 					.union(pubmedRelations)
