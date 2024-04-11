@@ -490,7 +490,7 @@ object MagUtility extends Serializable {
         result.setDataInfo(MAGDataInfo)
       val i = new Instance
       i.setInstancetype(tp)
-      i.setInstanceTypeMapping(List(instanceTypeMapping(currentType)).asJava)
+      i.setInstanceTypeMapping(List(instanceTypeMapping(currentType,ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)).asJava)
       result.setInstance(List(i).asJava)
     }
     result

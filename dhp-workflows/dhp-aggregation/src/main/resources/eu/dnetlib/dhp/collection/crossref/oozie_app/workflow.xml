@@ -5,10 +5,6 @@
             <description>The base path of Crossref DUMP </description>
         </property>
         <property>
-            <name>targetPath</name>
-            <description>The targetPath</description>
-        </property>
-        <property>
             <name>unpaywallPath</name>
             <description>The base path of unpaywall DUMP </description>
         </property>
@@ -16,16 +12,39 @@
             <name>isLookupUrl</name>
             <description>The Information service Lookup URL</description>
         </property>
+        <property>
+            <name>mdStoreOutputId</name>
+            <description>the identifier of the cleaned MDStore</description>
+        </property>
+        <property>
+            <name>mdStoreManagerURI</name>
+            <description>the path of the cleaned mdstore</description>
+        </property>
     </parameters>
 
-    <start to="generateOAF"/>
+    <start to="StartTransaction"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-
-
+    <action name="StartTransaction">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>NEW_VERSION</arg>
+            <arg>--mdStoreID</arg><arg>${mdStoreOutputId}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <capture-output/>
+        </java>
+        <ok to="generateOAF"/>
+        <error to="EndReadRollBack"/>
+    </action>
 
     <action name="generateOAF">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -47,11 +66,64 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--unpaywallPath</arg><arg>${unpaywallPath}</arg>
-            <arg>--targetPath</arg><arg>${targetPath}</arg>
+            <arg>--mdstoreOutputVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--master</arg><arg>yarn</arg>
         </spark>
+        <ok to="CommitVersion"/>
+        <error to="RollBack"/>
+    </action>
+
+    <action name="CommitVersion">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>COMMIT</arg>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
         <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="EndReadRollBack">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_UNLOCK</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
+            <capture-output/>
+        </java>
+        <ok to="RollBack"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="RollBack">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>ROLLBACK</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
+        <ok to="Kill"/>
         <error to="Kill"/>
     </action>
 

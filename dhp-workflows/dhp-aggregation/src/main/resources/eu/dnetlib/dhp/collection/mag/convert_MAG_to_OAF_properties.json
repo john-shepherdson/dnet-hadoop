@@ -6,9 +6,9 @@
     "paramRequired": true
   },
   {
-    "paramName": "md",
-    "paramLongName": "mdstorePath",
-    "paramDescription": "The base path of MAG DUMP CSV Tables",
+    "paramName": "mo",
+    "paramLongName": "mdstoreOutputVersion",
+    "paramDescription": "The mdstore output",
     "paramRequired": true
   },
   {

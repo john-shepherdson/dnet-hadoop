@@ -3,8 +3,10 @@ package eu.dnetlib.dhp.collection.crossref
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.application.AbstractScalaApplication
 import eu.dnetlib.dhp.collection.crossref.Crossref2Oaf.{TransformationType, mergeUnpayWall}
+import eu.dnetlib.dhp.common.Constants.MDSTORE_DATA_PATH
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
-import eu.dnetlib.dhp.schema.oaf.{Oaf, Publication, Relation, Result, Dataset => OafDataset}
+import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion
+import eu.dnetlib.dhp.schema.oaf.{Oaf, Result}
 import eu.dnetlib.dhp.utils.ISLookupClientFactory
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions.{col, explode, lower}
@@ -20,8 +22,6 @@ class SparkMapDumpIntoOAF(propertyPath: String, args: Array[String], log: Logger
   override def run(): Unit = {
     val sourcePath = parser.get("sourcePath")
     log.info("sourcePath: {}", sourcePath)
-    val targetPath = parser.get("targetPath")
-    log.info("targetPath: {}", targetPath)
     val unpaywallPath = parser.get("unpaywallPath")
     log.info("unpaywallPath: {}", unpaywallPath)
     val isLookupUrl: String = parser.get("isLookupUrl")
@@ -29,8 +29,17 @@ class SparkMapDumpIntoOAF(propertyPath: String, args: Array[String], log: Logger
     val isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl)
     val vocabularies = VocabularyGroup.loadVocsFromIS(isLookupService)
     require(vocabularies != null)
-    transformCrossref(spark, sourcePath, targetPath, unpaywallPath, vocabularies)
+    val mdstoreOutputVersion = parser.get("mdstoreOutputVersion")
+    log.info(s"mdstoreOutputVersion is '$mdstoreOutputVersion'")
 
+    val mapper = new ObjectMapper()
+    val cleanedMdStoreVersion = mapper.readValue(mdstoreOutputVersion, classOf[MDStoreVersion])
+    val outputBasePath = cleanedMdStoreVersion.getHdfsPath
+    log.info(s"outputBasePath is '$outputBasePath'")
+    val targetPath = s"$outputBasePath$MDSTORE_DATA_PATH"
+    log.info(s"targetPath is '$targetPath'")
+    transformCrossref(spark, sourcePath, targetPath, unpaywallPath, vocabularies)
+    reportTotalSize(targetPath, outputBasePath)
   }
 
   def transformUnpayWall(spark: SparkSession, unpaywallPath: String, crossrefPath: String): Dataset[UnpayWall] = {

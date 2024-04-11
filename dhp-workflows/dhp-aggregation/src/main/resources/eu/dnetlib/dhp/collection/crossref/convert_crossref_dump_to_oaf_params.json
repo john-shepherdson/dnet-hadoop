@@ -18,9 +18,9 @@
     "paramRequired": true
   },
   {
-    "paramName": "t",
-    "paramLongName": "targetPath",
-    "paramDescription": "The target path",
+    "paramName": "mov",
+    "paramLongName": "mdstoreOutputVersion",
+    "paramDescription": "The mdstore Output Version",
     "paramRequired": false
   },
   {

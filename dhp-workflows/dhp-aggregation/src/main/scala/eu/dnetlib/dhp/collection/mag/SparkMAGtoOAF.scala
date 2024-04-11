@@ -1,7 +1,10 @@
 package eu.dnetlib.dhp.collection.mag
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.application.AbstractScalaApplication
-import eu.dnetlib.dhp.schema.oaf.{Publication, Relation, Result}
+import eu.dnetlib.dhp.common.Constants.MDSTORE_DATA_PATH
+import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion
+import eu.dnetlib.dhp.schema.oaf.Relation
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types.{ArrayType, StringType, StructField, StructType}
 import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}
@@ -14,12 +17,19 @@ class SparkMAGtoOAF(propertyPath: String, args: Array[String], log: Logger)
     * where the whole logic of the spark node is defined
     */
   override def run(): Unit = {
-    val mdstorePath: String = parser.get("mdstorePath")
-    log.info("found parameters mdstorePath: {}", mdstorePath)
+    val mdstoreOutputVersion = parser.get("mdstoreOutputVersion")
+    log.info(s"mdstoreOutputVersion is '$mdstoreOutputVersion'")
+
+    val mapper = new ObjectMapper()
+    val cleanedMdStoreVersion = mapper.readValue(mdstoreOutputVersion, classOf[MDStoreVersion])
+    val outputBasePath = cleanedMdStoreVersion.getHdfsPath
+    log.info(s"outputBasePath is '$outputBasePath'")
+    val mdstorePath = s"$outputBasePath$MDSTORE_DATA_PATH"
     val magBasePath: String = parser.get("magBasePath")
     log.info("found parameters magBasePath: {}", magBasePath)
     convertMAG(spark, magBasePath, mdstorePath)
     generateAffiliations(spark, magBasePath, mdstorePath)
+    reportTotalSize(mdstorePath, outputBasePath)
   }
 
   def convertMAG(spark: SparkSession, magBasePath: String, mdStorePath: String): Unit = {

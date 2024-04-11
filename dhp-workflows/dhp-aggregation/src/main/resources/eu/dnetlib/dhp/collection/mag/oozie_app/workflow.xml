@@ -5,8 +5,12 @@
             <description>The base path of MAG DUMP CSV Tables</description>
         </property>
         <property>
-            <name>mdstorePath</name>
-            <description>The base path of MAG DUMP CSV Tables</description>
+            <name>mdStoreOutputId</name>
+            <description>the identifier of the cleaned MDStore</description>
+        </property>
+        <property>
+            <name>mdStoreManagerURI</name>
+            <description>the path of the cleaned mdstore</description>
         </property>
         <property>
             <name>resume_from</name>
@@ -25,7 +29,7 @@
     <decision name="resume_from">
         <switch>
             <case to="generateTable">${wf:conf('resume_from') eq 'generateTable'}</case>
-            <default to="generateOAF"/> <!-- first action to be done when downloadDump is to be performed -->
+            <default to="StartTransaction"/> <!-- first action to be done when downloadDump is to be performed -->
         </switch>
     </decision>
 
@@ -51,8 +55,25 @@
             <arg>--magBasePath</arg><arg>${magBasePath}</arg>
             <arg>--master</arg><arg>yarn</arg>
         </spark>
-        <ok to="generateOAF"/>
+        <ok to="StartTransaction"/>
         <error to="Kill"/>
+    </action>
+    <action name="StartTransaction">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>NEW_VERSION</arg>
+            <arg>--mdStoreID</arg><arg>${mdStoreOutputId}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <capture-output/>
+        </java>
+        <ok to="generateOAF"/>
+        <error to="EndReadRollBack"/>
     </action>
 
     <action name="generateOAF">
@@ -73,13 +94,67 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--mdstorePath</arg><arg>${mdstorePath}</arg>
+            <arg>--mdstoreOutputVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
             <arg>--magBasePath</arg><arg>${magBasePath}</arg>
             <arg>--master</arg><arg>yarn</arg>
         </spark>
+        <ok to="CommitVersion"/>
+        <error to="RollBack"/>
+    </action>
+
+    <action name="CommitVersion">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>COMMIT</arg>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
         <ok to="End"/>
         <error to="Kill"/>
     </action>
+
+    <action name="EndReadRollBack">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_UNLOCK</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
+            <capture-output/>
+        </java>
+        <ok to="RollBack"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="RollBack">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>ROLLBACK</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
+        <ok to="Kill"/>
+        <error to="Kill"/>
+    </action>
+
 
     <end name="End"/>
 </workflow-app>
