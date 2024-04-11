@@ -34,6 +34,10 @@ public class BipProjectModel {
 
 	String totalCitationCount;
 
+	public String getProjectId() {
+		return projectId;
+	}
+
 	// each project bip measure has exactly one value, hence one key-value pair
 	private Measure createMeasure(String measureId, String measureValue) {
 

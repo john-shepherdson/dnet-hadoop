@@ -1,0 +1,37 @@
+{
+  "id": "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1f",
+  "instance": [
+    {
+      "collectedfrom": {
+        "key": "10|opendoar____::358aee4cc897452c00244351e4d91f69",
+        "value": "Zenodo"
+      },
+      "pid": [
+        {
+          "qualifier": {"classid": "doi"},
+          "value": "10.5281/zenodo.5121485"
+        }
+      ]
+    },
+    {
+      "collectedfrom": {
+        "key": "10|opendoar____::8b6dd7db9af49e67306feb59a8bdc52c",
+        "value": "Europe PubMed Central"
+      },
+      "pid": [
+        {
+          "qualifier": {"classid": "urn"},
+          "value": "urn:nbn:nl:ui:29-f3ed5f9e-edf6-457e-8848-61b58a4075e2"
+        },
+        {
+          "qualifier": {"classid": "scp-number"},
+          "value": "79953761260"
+        },
+        {
+          "qualifier": {"classid": "pmc"},
+          "value": "21459329"
+        }
+      ]
+    }
+  ]
+}

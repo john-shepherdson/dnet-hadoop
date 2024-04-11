@@ -196,6 +196,12 @@ class MappersTest {
 
 		assertEquals(aff1.getSource(), aff2.getTarget());
 		assertEquals(aff2.getSource(), aff1.getTarget());
+
+		// COUNTRIES
+		assertEquals(3, p.getCountry().size());
+		assertEquals("IT", p.getCountry().get(0).getClassid());
+		assertEquals("FR", p.getCountry().get(1).getClassid());
+		assertEquals("DE", p.getCountry().get(2).getClassid());
 	}
 
 	private void verifyRelation(Relation r) {
@@ -867,6 +873,12 @@ class MappersTest {
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		System.out.println(p.getTitle().get(0).getValue());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+
+		// COUNTRIES
+		assertEquals(3, p.getCountry().size());
+		assertEquals("IT", p.getCountry().get(0).getClassid());
+		assertEquals("FR", p.getCountry().get(1).getClassid());
+		assertEquals("DE", p.getCountry().get(2).getClassid());
 	}
 
 	@Test

@@ -20,6 +20,7 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
@@ -127,10 +128,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 				(MapFunction<Relation, String>) r -> String
 					.join(" ", r.getSource(), r.getTarget(), r.getRelType(), r.getSubRelType(), r.getRelClass()),
 				Encoders.STRING())
-			.reduceGroups((ReduceFunction<Relation>) (b, a) -> {
-				b.mergeFrom(a);
-				return b;
-			})
+			.reduceGroups((ReduceFunction<Relation>) MergeUtils::mergeRelation)
 			.map((MapFunction<Tuple2<String, Relation>, Relation>) Tuple2::_2, REL_BEAN_ENC);
 
 		final String outputRelationPath = graphOutputPath + "/relation";

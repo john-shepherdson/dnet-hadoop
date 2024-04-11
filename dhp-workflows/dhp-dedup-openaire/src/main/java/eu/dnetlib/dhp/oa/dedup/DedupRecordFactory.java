@@ -18,6 +18,7 @@ import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import scala.Tuple2;
 import scala.Tuple3;
 import scala.collection.JavaConversions;
@@ -172,7 +173,7 @@ public class DedupRecordFactory {
 			entity = swap;
 		}
 
-		entity.mergeFrom(duplicate);
+		entity = MergeUtils.checkedMerge(entity, duplicate);
 
 		if (ModelSupport.isSubClass(duplicate, Result.class)) {
 			Result re = (Result) entity;

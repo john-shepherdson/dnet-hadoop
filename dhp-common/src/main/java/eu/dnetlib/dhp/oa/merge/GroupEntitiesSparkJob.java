@@ -26,7 +26,7 @@ import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -135,7 +135,7 @@ public class GroupEntitiesSparkJob {
 					.applyCoarVocabularies(entity, vocs),
 				OAFENTITY_KRYO_ENC)
 			.groupByKey((MapFunction<OafEntity, String>) OafEntity::getId, Encoders.STRING())
-			.reduceGroups((ReduceFunction<OafEntity>) OafMapperUtils::mergeEntities)
+			.reduceGroups((ReduceFunction<OafEntity>) MergeUtils::checkedMerge)
 			.map(
 				(MapFunction<Tuple2<String, OafEntity>, Tuple2<String, OafEntity>>) t -> new Tuple2<>(
 					t._2().getClass().getName(), t._2()),

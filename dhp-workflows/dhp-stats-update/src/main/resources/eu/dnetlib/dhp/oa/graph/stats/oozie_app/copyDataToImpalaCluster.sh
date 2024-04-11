@@ -6,16 +6,40 @@ then
     ln -sfn ${PYTHON_EGG_CACHE}${link_folder} ${link_folder}
 fi
 
+IMPALA_HDFS_NODE=''
+COUNTER=0
+
+while [ $COUNTER -lt 3 ]; do
+  if hdfs dfs -test -e hdfs://impala-cluster-mn1.openaire.eu/tmp >/dev/null 2>&1; then
+      IMPALA_HDFS_NODE='hdfs://impala-cluster-mn1.openaire.eu:8020'
+      break
+  elif hdfs dfs -test -e hdfs://impala-cluster-mn2.openaire.eu/tmp >/dev/null 2>&1; then
+      IMPALA_HDFS_NODE='hdfs://impala-cluster-mn2.openaire.eu:8020'
+      break
+  else
+      IMPALA_HDFS_NODE=''
+      sleep 1
+  fi
+  ((COUNTER++))
+done
+
+if [ -z "$IMPALA_HDFS_NODE" ]; then
+    echo -e "\n\nPROBLEM WHEN SETTING THE HDFS-NODE FOR IMPALA CLUSTER! $COUNTER\n\n"
+    exit 1
+fi
+echo "Active IMPALA HDFS Node: ${IMPALA_HDFS_NODE} , after ${COUNTER} retries."
+
+
 export HADOOP_USER_NAME=$6
 export PROD_USAGE_STATS_DB="openaire_prod_usage_stats"
 function copydb() {
   db=$1
   FILE=("hive_wf_tmp_"$RANDOM)
-  hdfs dfs -mkdir hdfs://impala-cluster-mn1.openaire.eu:8020/tmp/$FILE/
+  hdfs dfs -mkdir ${IMPALA_HDFS_NODE}/tmp/$FILE/
   # copy the databases from ocean to impala
 
   echo "copying $db"
-  hadoop distcp -Dmapreduce.map.memory.mb=6144 -pb hdfs://nameservice1/user/hive/warehouse/${db}.db hdfs://impala-cluster-mn1.openaire.eu:8020/tmp/$FILE/
+  hadoop distcp -Dmapreduce.map.memory.mb=6144 -pb hdfs://nameservice1/user/hive/warehouse/${db}.db ${IMPALA_HDFS_NODE}/tmp/$FILE/
 
   # change ownership to impala
   hdfs dfs -conf /etc/impala_cluster/hdfs-site.xml -chmod -R 777 /tmp/$FILE/${db}.db

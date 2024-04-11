@@ -85,12 +85,12 @@ hive $HIVE_OPTS --database ${2}_funded -e "show tables" | grep -v WARN | sed "s/
 hive -f foo
 echo "Updated shadow monitor funded database"
 
-echo "Updating shadow monitor insitutions database"
+echo "Updating shadow monitor institutions database"
 hive -e "drop database if exists ${SHADOW}_institutions cascade"
 hive -e "create database if not exists ${SHADOW}_institutions"
 hive $HIVE_OPTS --database ${2}_institutions -e "show tables" | grep -v WARN | sed "s/\(.*\)/create view ${SHADOW}_institutions.\1 as select * from ${2}_institutions.\1;/" > foo
 hive -f foo
-echo "Shadow db monitor insitutions ready!"
+echo "Shadow db monitor institutions ready!"
 
 echo "Updating shadow monitor RIs database"
 for i in $contexts
