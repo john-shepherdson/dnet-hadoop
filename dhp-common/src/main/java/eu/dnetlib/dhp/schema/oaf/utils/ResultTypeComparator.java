@@ -14,6 +14,8 @@ import eu.dnetlib.dhp.schema.oaf.Result;
 
 public class ResultTypeComparator implements Comparator<Result> {
 
+	public static final ResultTypeComparator INSTANCE = new ResultTypeComparator();
+
 	@Override
 	public int compare(Result left, Result right) {
 
@@ -37,28 +39,27 @@ public class ResultTypeComparator implements Comparator<Result> {
 		String lClass = left.getResulttype().getClassid();
 		String rClass = right.getResulttype().getClassid();
 
-		if (lClass.equals(rClass))
-			return 0;
+		if (!lClass.equals(rClass)) {
+			if (lClass.equals(ModelConstants.PUBLICATION_RESULTTYPE_CLASSID))
+				return -1;
+			if (rClass.equals(ModelConstants.PUBLICATION_RESULTTYPE_CLASSID))
+				return 1;
 
-		if (lClass.equals(ModelConstants.PUBLICATION_RESULTTYPE_CLASSID))
-			return -1;
-		if (rClass.equals(ModelConstants.PUBLICATION_RESULTTYPE_CLASSID))
-			return 1;
+			if (lClass.equals(ModelConstants.DATASET_RESULTTYPE_CLASSID))
+				return -1;
+			if (rClass.equals(ModelConstants.DATASET_RESULTTYPE_CLASSID))
+				return 1;
 
-		if (lClass.equals(ModelConstants.DATASET_RESULTTYPE_CLASSID))
-			return -1;
-		if (rClass.equals(ModelConstants.DATASET_RESULTTYPE_CLASSID))
-			return 1;
+			if (lClass.equals(ModelConstants.SOFTWARE_RESULTTYPE_CLASSID))
+				return -1;
+			if (rClass.equals(ModelConstants.SOFTWARE_RESULTTYPE_CLASSID))
+				return 1;
 
-		if (lClass.equals(ModelConstants.SOFTWARE_RESULTTYPE_CLASSID))
-			return -1;
-		if (rClass.equals(ModelConstants.SOFTWARE_RESULTTYPE_CLASSID))
-			return 1;
-
-		if (lClass.equals(ModelConstants.ORP_RESULTTYPE_CLASSID))
-			return -1;
-		if (rClass.equals(ModelConstants.ORP_RESULTTYPE_CLASSID))
-			return 1;
+			if (lClass.equals(ModelConstants.ORP_RESULTTYPE_CLASSID))
+				return -1;
+			if (rClass.equals(ModelConstants.ORP_RESULTTYPE_CLASSID))
+				return 1;
+		}
 
 		// Else (but unlikely), lexicographical ordering will do.
 		return lClass.compareTo(rClass);

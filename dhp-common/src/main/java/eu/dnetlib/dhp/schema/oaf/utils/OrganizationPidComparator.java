@@ -9,9 +9,17 @@ public class OrganizationPidComparator implements Comparator<StructuredProperty>
 
 	@Override
 	public int compare(StructuredProperty left, StructuredProperty right) {
+		if (left == null) {
+			return right == null ? 0 : -1;
+		} else if (right == null) {
+			return 1;
+		}
 
 		PidType lClass = PidType.tryValueOf(left.getQualifier().getClassid());
 		PidType rClass = PidType.tryValueOf(right.getQualifier().getClassid());
+
+		if (lClass.equals(rClass))
+			return 0;
 
 		if (lClass.equals(PidType.openorgs))
 			return -1;
