@@ -8,9 +8,13 @@ fi
 
 export HADOOP_USER_NAME=$2
 
+
+# Set the active HDFS node of OCEAN and IMPALA cluster.
+OCEAN_HDFS_NODE='hdfs://nameservice1'
+echo "OCEAN HDFS virtual-name which resolves automatically to the active-node: ${OCEAN_HDFS_NODE}"
+
 IMPALA_HDFS_NODE=''
 COUNTER=0
-
 while [ $COUNTER -lt 3 ]; do
   if hdfs dfs -test -e hdfs://impala-cluster-mn1.openaire.eu/tmp >/dev/null 2>&1; then
       IMPALA_HDFS_NODE='hdfs://impala-cluster-mn1.openaire.eu:8020'
@@ -24,70 +28,177 @@ while [ $COUNTER -lt 3 ]; do
   fi
   ((COUNTER++))
 done
-
 if [ -z "$IMPALA_HDFS_NODE" ]; then
-    echo -e "\n\nPROBLEM WHEN SETTING THE HDFS-NODE FOR IMPALA CLUSTER! $COUNTER\n\n"
+    echo -e "\n\nPROBLEM WHEN SETTING THE HDFS-NODE FOR IMPALA CLUSTER! | AFTER ${COUNTER} RETRIES.\n\n"
     exit 1
 fi
 echo "Active IMPALA HDFS Node: ${IMPALA_HDFS_NODE} , after ${COUNTER} retries."
 
+IMPALA_HOSTNAME='impala-cluster-dn1.openaire.eu'
+IMPALA_CONFIG_FILE='/etc/impala_cluster/hdfs-site.xml'
+
+IMPALA_HDFS_DB_BASE_PATH="${IMPALA_HDFS_NODE}/user/hive/warehouse"
+
+
+# Set sed arguments.
+LOCATION_HDFS_NODE_SED_ARG="s|${OCEAN_HDFS_NODE}|${IMPALA_HDFS_NODE}|g" # This requires to be used with "sed -e" in order to have the "|" delimiter (as the "/" conflicts with the URIs)
+
+# Set the SED command arguments for column-names with reserved words:
+DATE_SED_ARG_1='s/[[:space:]]\date[[:space:]]/\`date\`/g'
+DATE_SED_ARG_2='s/\.date,/\.\`date\`,/g'  # the "date" may be part of a larger field name like "datestamp" or "date_aggregated", so we need to be careful with what we are replacing.
+DATE_SED_ARG_3='s/\.date[[:space:]]/\.\`date\` /g'
+
+HASH_SED_ARG_1='s/[[:space:]]\hash[[:space:]]/\`hash\`/g'
+HASH_SED_ARG_2='s/\.hash,/\.\`hash\`,/g'
+HASH_SED_ARG_3='s/\.hash[[:space:]]/\.\`hash\` /g'
+
+LOCATION_SED_ARG_1='s/[[:space:]]\location[[:space:]]/\`location\`/g'
+LOCATION_SED_ARG_2='s/\.location,/\.\`location\`,/g'
+LOCATION_SED_ARG_3='s/\.location[[:space:]]/\.\`location\` /g'
+
 
 function copydb() {
-
-
   db=$1
-  FILE=("hive_wf_tmp_"$RANDOM)
-  hdfs dfs -mkdir ${IMPALA_HDFS_NODE}/tmp/$FILE/
 
-  # change ownership to impala
-#  hdfs dfs -conf /etc/impala_cluster/hdfs-site.xml -chmod -R 777 /tmp/$FILE/${db}.db
-  hdfs dfs -conf /etc/impala_cluster/hdfs-site.xml -chmod -R 777 /tmp/$FILE/
+  # Delete the old DB from Impala cluster (if exists).
+  impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "drop database if exists ${db} cascade" |& tee error.log # impala-shell prints all logs in stderr, so wee need to capture them and put them in a file, in order to perform "grep" on them later
+  log_errors=`cat error.log | grep -E "WARN|ERROR|FAILED"`
+  if [ -n "$log_errors" ]; then
+    echo -e "\n\nTHERE WAS A PROBLEM WHEN DROPPING THE OLD DATABASE! EXITING...\n\n"
+    rm -f error.log
+    exit 2
+  fi
 
+  # Make Impala aware of the deletion of the old DB immediately.
+  sleep 1
+  impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "INVALIDATE METADATA"
 
-  # copy the databases from ocean to impala
-  echo "copying $db"
-  hadoop distcp -Dmapreduce.map.memory.mb=6144 -pb hdfs://nameservice1/user/hive/warehouse/${db}.db ${IMPALA_HDFS_NODE}/tmp/$FILE/
+  echo "Copying $db files from Ocean to Impala cluster.."
+  # Using max-bandwidth of: 50 * 100 Mb/s = 5 Gb/s
+  # Using max memory of: 50 * 6144 = 300 Gb
+  # Using 1MB as a buffer-size.
+  # The " -Ddistcp.dynamic.recordsPerChunk=50" arg is not available in our version of hadoop
+  # The "ug" args cannot be used as we get a "User does not belong to hive" error.
+  # The "p" argument cannot be used, as it blocks the files from being used, giving a "sticky bit"-error, even after applying chmod and chown onm the files.
+  hadoop distcp -Dmapreduce.map.memory.mb=6144 -m 70 -bandwidth 150 \
+                -numListstatusThreads 40 \
+                -copybuffersize 1048576 \
+                -strategy dynamic \
+                -pb \
+                ${OCEAN_HDFS_NODE}/user/hive/warehouse/${db}.db ${IMPALA_HDFS_DB_BASE_PATH}
 
-  hdfs dfs -conf /etc/impala_cluster/hdfs-site.xml -chmod -R 777 /tmp/$FILE/${db}.db
+  # In case we ever use this script for a writable DB (using inserts/updates), we should perform the following costly operation as well..
+  #hdfs dfs -conf ${IMPALA_CONFIG_FILE} -chmod -R 777 ${TEMP_SUBDIR_FULLPATH}/${db}.db
 
-  # drop tables from db
-  for i in `impala-shell -i impala-cluster-dn1.openaire.eu -d ${db} --delimited  -q "show tables"`;
-    do
-        `impala-shell -i impala-cluster-dn1.openaire.eu -d ${db} -q "drop table $i;"`;
-    done
+  echo "Creating schema for ${db}"
 
-  # drop views from db
-  for i in `impala-shell -i impala-cluster-dn1.openaire.eu -d ${db} --delimited  -q "show tables"`;
-    do
-        `impala-shell  -i impala-cluster-dn1.openaire.eu -d ${db} -q "drop view $i;"`;
-    done
+  # create the new database (with the same name)
+  impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "create database ${db}"
 
-  # delete the database
-  impala-shell -i impala-cluster-dn1.openaire.eu -q "drop database if exists ${db} cascade";
+  # Make Impala aware of the creation of the new DB immediately.
+  sleep 1
+  impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "INVALIDATE METADATA"
+  sleep 1
+  # Because "Hive" and "Impala" do not have compatible schemas, we cannot use the "show create table <name>" output from hive to create the exact same table in impala.
+  # So, we have to find at least one parquet file (check if it's there) from the table in the ocean cluster for impala to use it to extract the table-schema itself from that file.
 
-  # create the databases
-  impala-shell -i impala-cluster-dn1.openaire.eu -q "create database ${db}";
+  all_create_view_commands=()
 
-  impala-shell -q "INVALIDATE METADATA"
-  echo "creating schema for ${db}"
-  for ((  k  = 0;  k  < 5;  k ++ )); do
-  for i in `impala-shell -d ${db} --delimited  -q "show tables"`;
-    do
-      impala-shell -d ${db} --delimited  -q "show create table $i";
-    done |  sed 's/"$/;/' | sed 's/^"//' | sed 's/[[:space:]]\date[[:space:]]/`date`/g' | impala-shell --user $HADOOP_USER_NAME -i impala-cluster-dn1.openaire.eu -c -f -
+  for i in `hive -e "show tables in ${db};" | sed 's/WARN:.*//g'`; do # Get the tables and views without any potential the "WARN" logs.
+    # Check if this is a view by showing the create-command where it should print "create view" for a view, not the "create table". Unfortunately, there is now "show views" command.
+    create_entity_command=`hive -e "show create table ${db}.${i};"` # It needs to happen in two stages, otherwise the "grep" is not able to match multi-line command.
+
+    create_view_command_test=`echo -e "$create_entity_command" | grep 'CREATE VIEW'`
+    if [ -n "$create_view_command_test" ]; then
+      echo -e "\n'${i}' is a view, so we will save its 'create view' command and execute it on Impala, after all tables have been created.\n"
+      create_view_command=`echo -e "$create_entity_command" | sed 's/WARN:.*//g' | sed 's/\`//g' \
+        | sed 's/"$/;/' | sed 's/^"//' | sed 's/\\"\\"/\"/g' | sed -e "${LOCATION_HDFS_NODE_SED_ARG}" | sed "${DATE_SED_ARG_1}" | sed "${HASH_SED_ARG_1}" | sed "${LOCATION_SED_ARG_1}" \
+        | sed "${DATE_SED_ARG_2}" | sed "${HASH_SED_ARG_2}" | sed "${LOCATION_SED_ARG_2}" \
+        | sed "${DATE_SED_ARG_3}" | sed "${HASH_SED_ARG_3}" | sed "${LOCATION_SED_ARG_3}"`
+      all_create_view_commands+=("$create_view_command")
+    else
+      echo -e "\n'${i}' is a table, so we will check for its parquet files and create the table on Impala cluster.\n"
+      CURRENT_PRQ_FILE=`hdfs dfs -conf ${IMPALA_CONFIG_FILE} -ls -C "${IMPALA_HDFS_DB_BASE_PATH}/${db}.db/${i}/" | grep -v 'Found' | grep -v '_impala_insert_staging' |  head -1`
+      if [ -z "$CURRENT_PRQ_FILE" ]; then # If there is not parquet-file inside.
+          echo -e "\n\nTHE TABLE \"${i}\" HAD NO PARQUET FILES TO GET THE SCHEMA FROM! IT'S EMPTY!\n\n"
+      else
+        impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "create table ${db}.${i} like parquet '${CURRENT_PRQ_FILE}' stored as parquet;" |& tee error.log
+        log_errors=`cat error.log | grep -E "WARN|ERROR|FAILED"`
+        if [ -n "$log_errors" ]; then
+          echo -e "\n\nTHERE WAS A PROBLEM WHEN CREATING TABLE '${i}'!\n\n"
+        fi
+      fi
+    fi
   done
 
-  # load the data from /tmp in the respective tables
-  echo "copying data in tables and computing stats"
-  for i in `impala-shell -i impala-cluster-dn1.openaire.eu -d ${db} --delimited  -q "show tables"`;
-      do
-        impala-shell -i impala-cluster-dn1.openaire.eu -d ${db} -q "load data inpath '/tmp/$FILE/${db}.db/$i' into table $i";
-        impala-shell -i impala-cluster-dn1.openaire.eu -d ${db} -q "compute stats $i";
-      done
+  echo -e "\nAll tables have been created, going to create the views..\n"
 
-  # deleting the remaining directory from hdfs
-hdfs dfs -conf /etc/impala_cluster/hdfs-site.xml -rm -R /tmp/$FILE/${db}.db
+  # Make Impala aware of the new tables.
+  sleep 1
+  impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "INVALIDATE METADATA"
+  sleep 1
+
+  # Time to loop through the views and create them.
+  # At this point all table-schemas should have been created.
+  echo -e "\nAll_create_view_commands:\n\n${all_create_view_commands[@]}\n\n"  # DEBUG
+
+  should_retry=1  # Should retry creating the views (in case their tables where not created before them).
+  # There are views of other views as well, so we may have 3,4,5 nested-view and need to retry..
+
+  previous_num_of_views_to_retry=${#all_create_view_commands}
+
+  while ((should_retry)); do
+
+    # The only accepted reason for a view to not be created, is if it depends on another view, which has not been created yet.
+    # In this case, we should retry creating this particular view again.
+    should_retry=0  # We should NOT do another iteration, unless at least one view could NOT be created.
+
+    should_retry_create_view_commands=()
+
+    for create_view_command in "${all_create_view_commands[@]}"; do # Get the tables and views without any potential the "WARN" logs.
+      impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "${create_view_command}" |& tee error.log # impala-shell prints all logs in stderr, so wee need to capture them and put them in a file, in order to perform "grep" on them later
+      specific_errors=`cat error.log | grep -E "FAILED: ParseException line 1:13 missing TABLE at 'view'|ERROR: AnalysisException: Could not resolve table reference:"`
+      echo -e "\nspecific_errors: ${specific_errors}\n"
+      if [ -n "$specific_errors" ]; then
+        echo -e "\nView '$(cat error.log | grep "CREATE VIEW " | sed 's/CREATE VIEW //g' | sed 's/ as select .*//g')' failed to be created, possibly because it depends on another view.\n"
+        should_retry=1
+        should_retry_create_view_commands+=("$create_view_command")
+      else
+          sleep 1 # Wait a bit for Impala to register that the view was created, before possibly referencing it by another view.
+      fi
+    done
+
+    echo -e "\nTo be retried \"create_view_commands\":\n\n${should_retry_create_view_commands[@]}\n"
+
+    new_num_of_views_to_retry=${#should_retry_create_view_commands}
+    if [[ $new_num_of_views_to_retry -eq $previous_num_of_views_to_retry ]]; then
+      echo -e "THE NUMBER OF VIEWS TO RETRY HAS NOT BEEN REDUCED! THE SCRIPT IS LIKELY GOING TO AN INFINITE-LOOP! EXITING.."
+      exit 3
+    else
+      previous_num_of_views_to_retry=$new_num_of_views_to_retry
+    fi
+
+    all_create_view_commands=$should_retry_create_view_command
+  done
+
+  sleep 1
+  impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "INVALIDATE METADATA"
+  sleep 1
+
+  echo "Computing stats for tables.."
+  for i in `impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} --delimited -q "show tables in ${db}"`; do
+    # Taking the create table statement from the Ocean cluster, just to check if its a view, as the output is easier than using impala-shell from Impala cluster.
+    create_view_command=`hive -e "show create table ${db}.${i};" | grep "CREATE VIEW"`  # This grep works here, as we do not want to match multiple-lines.
+    if [ -z "$create_view_command" ]; then  # If it's a table, then go load the data to it.
+      impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "compute stats ${db}.${i}";
+    fi
+  done
+
+  rm -f error.log
+
+  echo -e "\n\nFinished processing db: ${db}\n\n"
 }
+
 
 MONITOR_DB=$1
 #HADOOP_USER_NAME=$2
