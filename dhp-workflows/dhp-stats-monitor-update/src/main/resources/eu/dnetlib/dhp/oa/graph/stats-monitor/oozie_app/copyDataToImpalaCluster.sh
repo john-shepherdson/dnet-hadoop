@@ -6,7 +6,7 @@ then
     ln -sfn ${PYTHON_EGG_CACHE}${link_folder} ${link_folder}
 fi
 
-#export HADOOP_USER_NAME=$2
+export HADOOP_USER_NAME=$2
 
 # Set the active HDFS node of OCEAN and IMPALA cluster.
 OCEAN_HDFS_NODE='hdfs://nameservice1'
@@ -54,10 +54,6 @@ HASH_SED_ARG_3='s/\.hash[[:space:]]/\.\`hash\` /g'
 LOCATION_SED_ARG_1='s/[[:space:]]\location[[:space:]]/\`location\`/g'
 LOCATION_SED_ARG_2='s/\.location,/\.\`location\`,/g'
 LOCATION_SED_ARG_3='s/\.location[[:space:]]/\.\`location\` /g'
-
-
-export HADOOP_USER="dimitris.pierrakos"
-export HADOOP_USER_NAME='dimitris.pierrakos'
 
 
 function copydb() {
@@ -204,7 +200,6 @@ function copydb() {
 
 
 MONITOR_DB=$1
-#HADOOP_USER_NAME=$2
 
 copydb $MONITOR_DB'_institutions'
 copydb $MONITOR_DB
