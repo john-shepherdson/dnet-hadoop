@@ -67,7 +67,7 @@ function copydb() {
   if [ -n "$log_errors" ]; then
     echo -e "\n\nTHERE WAS A PROBLEM WHEN DROPPING THE OLD DATABASE! EXITING...\n\n"
     rm -f error.log
-    exit 2
+    return 1
   fi
 
   # Make Impala aware of the deletion of the old DB immediately.
@@ -88,6 +88,15 @@ function copydb() {
                 -pb \
                 ${OCEAN_HDFS_NODE}/user/hive/warehouse/${db}.db ${IMPALA_HDFS_DB_BASE_PATH}
 
+  # Check the exit status of the "hadoop distcp" command.
+  if [ $? -eq 0 ]; then
+    echo "Successfully copied the files of '${db}'."
+  else
+    echo "Failed to transfer the files of '${db}', with 'hadoop distcp'. Got with exit status: $?"
+    rm -f error.log
+    return 2
+  fi
+
   # In case we ever use this script for a writable DB (using inserts/updates), we should perform the following costly operation as well..
   #hdfs dfs -conf ${IMPALA_CONFIG_FILE} -chmod -R 777 ${TEMP_SUBDIR_FULLPATH}/${db}.db
 
@@ -105,7 +114,8 @@ function copydb() {
 
   all_create_view_commands=()
 
-  for i in `hive -e "show tables in ${db};" | sed 's/WARN:.*//g'`; do # Get the tables and views without any potential the "WARN" logs.
+  entities_on_ocean=`hive -e "show tables in ${db};" | sed 's/WARN:.*//g'`  # Get the tables and views without any potential the "WARN" logs.
+  for i in ${entities_on_ocean[@]}; do # Use un-quoted values, as the elemetns are single-words.
     # Check if this is a view by showing the create-command where it should print "create view" for a view, not the "create table". Unfortunately, there is now "show views" command.
     create_entity_command=`hive -e "show create table ${db}.${i};"` # It needs to happen in two stages, otherwise the "grep" is not able to match multi-line command.
 
@@ -141,45 +151,44 @@ function copydb() {
 
   # Time to loop through the views and create them.
   # At this point all table-schemas should have been created.
-  echo -e "\nAll_create_view_commands:\n\n${all_create_view_commands[@]}\n\n"  # DEBUG
-
-  should_retry=1  # Should retry creating the views (in case their tables where not created before them).
-  # There are views of other views as well, so we may have 3,4,5 nested-view and need to retry..
 
   previous_num_of_views_to_retry=${#all_create_view_commands}
+  if [[ $previous_num_of_views_to_retry -gt 0 ]]; then
+    echo -e "\nAll_create_view_commands:\n\n${all_create_view_commands[@]}\n"  # DEBUG
+  else
+    echo -e "\nDB '${db}' does not contain views.\n"
+  fi
 
-  while ((should_retry)); do
-
+  level_counter=0
+  while [[ ${#all_create_view_commands[@]} -gt 0 ]]; do
+    ((level_counter++))
     # The only accepted reason for a view to not be created, is if it depends on another view, which has not been created yet.
     # In this case, we should retry creating this particular view again.
-    should_retry=0  # We should NOT do another iteration, unless at least one view could NOT be created.
-
     should_retry_create_view_commands=()
 
-    for create_view_command in "${all_create_view_commands[@]}"; do # Get the tables and views without any potential the "WARN" logs.
+    for create_view_command in "${all_create_view_commands[@]}"; do # Here we use double quotes, as the elements are phrases, instead of single-words.
       impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "${create_view_command}" |& tee error.log # impala-shell prints all logs in stderr, so wee need to capture them and put them in a file, in order to perform "grep" on them later
       specific_errors=`cat error.log | grep -E "FAILED: ParseException line 1:13 missing TABLE at 'view'|ERROR: AnalysisException: Could not resolve table reference:"`
-      echo -e "\nspecific_errors: ${specific_errors}\n"
       if [ -n "$specific_errors" ]; then
+        echo -e "\nspecific_errors: ${specific_errors}\n"
         echo -e "\nView '$(cat error.log | grep "CREATE VIEW " | sed 's/CREATE VIEW //g' | sed 's/ as select .*//g')' failed to be created, possibly because it depends on another view.\n"
-        should_retry=1
         should_retry_create_view_commands+=("$create_view_command")
       else
           sleep 1 # Wait a bit for Impala to register that the view was created, before possibly referencing it by another view.
       fi
     done
 
-    echo -e "\nTo be retried \"create_view_commands\":\n\n${should_retry_create_view_commands[@]}\n"
-
     new_num_of_views_to_retry=${#should_retry_create_view_commands}
     if [[ $new_num_of_views_to_retry -eq $previous_num_of_views_to_retry ]]; then
       echo -e "THE NUMBER OF VIEWS TO RETRY HAS NOT BEEN REDUCED! THE SCRIPT IS LIKELY GOING TO AN INFINITE-LOOP! EXITING.."
-      exit 3
-    else
+      return 3
+    elif [[ $new_num_of_views_to_retry -gt 0 ]]; then
+      echo -e "\nTo be retried \"create_view_commands\":\n\n${should_retry_create_view_commands[@]}\n"
       previous_num_of_views_to_retry=$new_num_of_views_to_retry
+    else
+      echo -e "\nFinished creating views db: ${db}, in level-${level_counter}.\n"
     fi
-
-    all_create_view_commands=$should_retry_create_view_command
+    all_create_view_commands=("${should_retry_create_view_command[@]}") # This is needed in any case to either move forward with the rest of the views or stop at 0 remaining views.
   done
 
   sleep 1
@@ -187,13 +196,24 @@ function copydb() {
   sleep 1
 
   echo "Computing stats for tables.."
-  for i in `impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} --delimited -q "show tables in ${db}"`; do
+
+  entities_on_impala=`impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} --delimited -q "show tables in ${db}"`
+
+  for i in ${entities_on_impala[@]}; do # Use un-quoted values, as the elemetns are single-words.
     # Taking the create table statement from the Ocean cluster, just to check if its a view, as the output is easier than using impala-shell from Impala cluster.
     create_view_command=`hive -e "show create table ${db}.${i};" | grep "CREATE VIEW"`  # This grep works here, as we do not want to match multiple-lines.
     if [ -z "$create_view_command" ]; then  # If it's a table, then go load the data to it.
       impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "compute stats ${db}.${i}";
     fi
   done
+
+  if [ "${entities_on_impala[@]}" == "${entities_on_ocean[@]}" ]; then
+    echo -e "\nAll entities have been copied to Impala cluster.\n"
+  else
+    echo -e "\n\n1 OR MORE ENTITIES OF DB '${db}' FAILED TO BE COPIED TO IMPALA CLUSTER!\n\n"
+    rm -f error.log
+    return 4
+  fi
 
   rm -f error.log
 
