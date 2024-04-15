@@ -5,33 +5,33 @@
 -- Licences related tables/views
 ------------------------------------------------------
 ------------------------------------------------------
-DROP TABLE IF EXISTS ${stats_db_name}.publication_licenses purge;
+DROP TABLE IF EXISTS ${stats_db_name}.publication_licenses purge; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.publication_licenses STORED AS PARQUET AS
 SELECT substr(p.id, 4) as id, licenses.value as type
 from ${openaire_db_name}.publication p LATERAL VIEW explode(p.instance.license) instances as licenses
-where licenses.value is not null and licenses.value != '' and p.datainfo.deletedbyinference=false and p.datainfo.invisible = FALSE;
+where licenses.value is not null and licenses.value != '' and p.datainfo.deletedbyinference=false and p.datainfo.invisible = FALSE; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.dataset_licenses purge;
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_licenses purge; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.dataset_licenses STORED AS PARQUET AS
 SELECT substr(p.id, 4) as id, licenses.value as type 
 from ${openaire_db_name}.dataset p LATERAL VIEW explode(p.instance.license) instances as licenses
-where licenses.value is not null and licenses.value != '' and p.datainfo.deletedbyinference=false and p.datainfo.invisible = FALSE;
+where licenses.value is not null and licenses.value != '' and p.datainfo.deletedbyinference=false and p.datainfo.invisible = FALSE; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.software_licenses purge;
+DROP TABLE IF EXISTS ${stats_db_name}.software_licenses purge; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.software_licenses STORED AS PARQUET AS
 SELECT substr(p.id, 4) as id, licenses.value as type 
 from ${openaire_db_name}.software p LATERAL VIEW explode(p.instance.license) instances as licenses
-where licenses.value is not null and licenses.value != '' and p.datainfo.deletedbyinference=false and p.datainfo.invisible = FALSE;
+where licenses.value is not null and licenses.value != '' and p.datainfo.deletedbyinference=false and p.datainfo.invisible = FALSE; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_licenses purge;
+DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_licenses purge; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.otherresearchproduct_licenses STORED AS PARQUET AS
 SELECT substr(p.id, 4) as id, licenses.value as type 
 from ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.instance.license) instances as licenses
-where licenses.value is not null and licenses.value != '' and p.datainfo.deletedbyinference=false and p.datainfo.invisible = FALSE;
+where licenses.value is not null and licenses.value != '' and p.datainfo.deletedbyinference=false and p.datainfo.invisible = FALSE; /*EOS*/
 
 CREATE VIEW IF NOT EXISTS ${stats_db_name}.result_licenses AS
 SELECT * FROM ${stats_db_name}.publication_licenses
@@ -40,15 +40,15 @@ SELECT * FROM ${stats_db_name}.dataset_licenses
 UNION ALL
 SELECT * FROM ${stats_db_name}.software_licenses
 UNION ALL
-SELECT * FROM ${stats_db_name}.otherresearchproduct_licenses;
+SELECT * FROM ${stats_db_name}.otherresearchproduct_licenses; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.organization_pids purge;
+DROP TABLE IF EXISTS ${stats_db_name}.organization_pids purge; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.organization_pids STORED AS PARQUET AS
 select substr(o.id, 4) as id, ppid.qualifier.classname as type, ppid.value as pid 
-from ${openaire_db_name}.organization o lateral view explode(o.pid) pids as ppid;
+from ${openaire_db_name}.organization o lateral view explode(o.pid) pids as ppid; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.organization_sources purge;
+DROP TABLE IF EXISTS ${stats_db_name}.organization_sources purge; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.organization_sources STORED AS PARQUET as
 SELECT o.id, case when d.id is null then 'other' else o.datasource end as datasource 
@@ -58,10 +58,10 @@ FROM (
     LEFT OUTER JOIN (
         SELECT substr(d.id, 4) id 
         from ${openaire_db_name}.datasource d 
-        WHERE d.datainfo.deletedbyinference=false and d.datainfo.invisible = FALSE) d on o.datasource = d.id;
+        WHERE d.datainfo.deletedbyinference=false and d.datainfo.invisible = FALSE) d on o.datasource = d.id; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.result_accessroute purge;
+DROP TABLE IF EXISTS ${stats_db_name}.result_accessroute purge; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.result_accessroute STORED AS PARQUET as
 select distinct substr(id,4) as id, accessroute from ${openaire_db_name}.result
-lateral view explode (instance.accessright.openaccessroute) openaccessroute as accessroute;
+lateral view explode (instance.accessright.openaccessroute) openaccessroute as accessroute; /*EOS*/

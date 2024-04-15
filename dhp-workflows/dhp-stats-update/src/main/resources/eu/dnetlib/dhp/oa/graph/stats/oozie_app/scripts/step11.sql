@@ -10,7 +10,7 @@ SET harvested='true'
 WHERE datasource_tmp.id IN (SELECT DISTINCT d.id
                             FROM ${stats_db_name}.datasource_tmp d,
                                  ${stats_db_name}.result_datasources rd
-                            WHERE d.id = rd.datasource);
+                            WHERE d.id = rd.datasource); /*EOS*/
 
 -- Project temporary table update and final project table creation with final updates that can not be applied to ORC tables
 UPDATE ${stats_db_name}.project_tmp
@@ -19,8 +19,8 @@ WHERE project_tmp.id IN (SELECT pr.id
                          FROM ${stats_db_name}.project_results pr,
                               ${stats_db_name}.result r
                          WHERE pr.result = r.id
-                           AND r.type = 'publication');
-DROP TABLE IF EXISTS ${stats_db_name}.stored purge;
+                           AND r.type = 'publication'); /*EOS*/
+DROP TABLE IF EXISTS ${stats_db_name}.stored purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.project stored as parquet as
 SELECT p.id,
@@ -63,7 +63,7 @@ FROM ${stats_db_name}.project_tmp p
                       AND r.type = 'publication'
                       AND datediff(to_date(r.date), to_date(pp.enddate)) > 0
                     GROUP BY pp.id) AS prr2
-                   ON prr2.id = p.id;
+                   ON prr2.id = p.id; /*EOS*/
 
 UPDATE ${stats_db_name}.publication_tmp
 SET delayed = 'yes'
@@ -73,7 +73,7 @@ WHERE publication_tmp.id IN (SELECT distinct r.id
                                   ${stats_db_name}.project_tmp p
                              WHERE r.id = pr.result
                                AND pr.id = p.id
-                               AND to_date(r.date) - to_date(p.enddate) > 0);
+                               AND to_date(r.date) - to_date(p.enddate) > 0); /*EOS*/
 
 UPDATE ${stats_db_name}.dataset_tmp
 SET delayed = 'yes'
@@ -83,7 +83,7 @@ WHERE dataset_tmp.id IN (SELECT distinct r.id
                               ${stats_db_name}.project_tmp p
                          WHERE r.id = pr.result
                            AND pr.id = p.id
-                           AND to_date(r.date) - to_date(p.enddate) > 0);
+                           AND to_date(r.date) - to_date(p.enddate) > 0); /*EOS*/
 
 UPDATE ${stats_db_name}.software_tmp
 SET delayed = 'yes'
@@ -93,7 +93,7 @@ WHERE software_tmp.id IN (SELECT distinct r.id
                                ${stats_db_name}.project_tmp p
                           WHERE r.id = pr.result
                             AND pr.id = p.id
-                            AND to_date(r.date) - to_date(p.enddate) > 0);
+                            AND to_date(r.date) - to_date(p.enddate) > 0); /*EOS*/
 
 UPDATE ${stats_db_name}.otherresearchproduct_tmp
 SET delayed = 'yes'
@@ -103,7 +103,7 @@ WHERE otherresearchproduct_tmp.id IN (SELECT distinct r.id
                                            ${stats_db_name}.project_tmp p
                                       WHERE r.id = pr.result
                                         AND pr.id = p.id
-                                        AND to_date(r.date) - to_date(p.enddate) > 0);
+                                        AND to_date(r.date) - to_date(p.enddate) > 0); /*EOS*/
 
 CREATE OR REPLACE VIEW ${stats_db_name}.project_results_publication AS
 SELECT result_projects.id          AS result,
@@ -116,4 +116,4 @@ FROM ${stats_db_name}.result_projects,
      ${stats_db_name}.project
 WHERE result_projects.id = result.id
   AND result.type = 'publication'
-  AND project.id = result_projects.project;
+  AND project.id = result_projects.project; /*EOS*/

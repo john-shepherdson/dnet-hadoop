@@ -5,7 +5,7 @@
 -- Datasource table/view and Datasource related tables/views
 ------------------------------------------------------------
 ------------------------------------------------------------
-DROP TABLE IF EXISTS ${stats_db_name}.datasource_tmp purge;
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_tmp purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.datasource_tmp
 (
@@ -22,7 +22,7 @@ CREATE TABLE ${stats_db_name}.datasource_tmp
     `compatibility`    STRING,
     issn_printed       STRING,
     issn_online        STRING
-) CLUSTERED BY (id) INTO 100 buckets stored AS orc tblproperties ('transactional' = 'true');
+) CLUSTERED BY (id) INTO 100 buckets stored AS orc tblproperties ('transactional' = 'true'); /*EOS*/
 
 -- Insert statement that takes into account the piwik_id of the openAIRE graph
 INSERT INTO ${stats_db_name}.datasource_tmp
@@ -46,14 +46,14 @@ FROM ${openaire_db_name}.datasource d1
                LATERAL VIEW EXPLODE(originalid) temp AS originalidd
       WHERE originalidd like "piwik:%") AS d2
      ON d1.id = d2.id
-WHERE d1.datainfo.deletedbyinference = FALSE and d1.datainfo.invisible=false;
+WHERE d1.datainfo.deletedbyinference = FALSE and d1.datainfo.invisible=false; /*EOS*/
 
 -- Updating temporary table with everything that is not based on results -> This is done with the following "dual" table.
 -- Creating a temporary dual table that will be removed after the following insert
 
-CREATE TABLE ${stats_db_name}.dual ( dummy CHAR(1));
+CREATE TABLE ${stats_db_name}.dual ( dummy CHAR(1)); /*EOS*/
 
-INSERT INTO ${stats_db_name}.dual VALUES ('X');
+INSERT INTO ${stats_db_name}.dual VALUES ('X'); /*EOS*/
 
 INSERT INTO ${stats_db_name}.datasource_tmp (`id`, `name`, `type`, `dateofvalidation`, `yearofvalidation`, `harvested`,
                                              `piwik_id`, `latitude`, `longitude`, `websiteurl`, `compatibility`, `issn_printed`, `issn_online`)
@@ -71,42 +71,42 @@ SELECT 'other',
        null,
        null
 FROM ${stats_db_name}.dual
-WHERE 'other' not in (SELECT id FROM ${stats_db_name}.datasource_tmp WHERE name = 'Unknown Repository');
-DROP TABLE ${stats_db_name}.dual;
+WHERE 'other' not in (SELECT id FROM ${stats_db_name}.datasource_tmp WHERE name = 'Unknown Repository'); /*EOS*/
+DROP TABLE ${stats_db_name}.dual; /*EOS*/
 
-UPDATE ${stats_db_name}.datasource_tmp SET name='Other' WHERE name = 'Unknown Repository';
-UPDATE ${stats_db_name}.datasource_tmp SET yearofvalidation=null WHERE yearofvalidation = '-1';
+UPDATE ${stats_db_name}.datasource_tmp SET name='Other' WHERE name = 'Unknown Repository'; /*EOS*/
+UPDATE ${stats_db_name}.datasource_tmp SET yearofvalidation=null WHERE yearofvalidation = '-1'; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.datasource_languages purge;
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_languages purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.datasource_languages STORED AS PARQUET AS
 SELECT substr(d.id, 4) AS id, langs.languages AS language
 FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.odlanguages.value) langs AS languages
-where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false;
+where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.datasource_oids purge;
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_oids purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.datasource_oids STORED AS PARQUET AS
 SELECT substr(d.id, 4) AS id, oids.ids AS oid
 FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.originalid) oids AS ids
-where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false;
+where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.datasource_organizations purge;
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_organizations purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.datasource_organizations STORED AS PARQUET AS
 SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS organization
 FROM ${openaire_db_name}.relation r
-WHERE r.reltype = 'datasourceOrganization' and r.datainfo.deletedbyinference = false and r.source like '20|%' and r.datainfo.invisible=false;
+WHERE r.reltype = 'datasourceOrganization' and r.datainfo.deletedbyinference = false and r.source like '20|%' and r.datainfo.invisible=false; /*EOS*/
 
 -- datasource sources:
 -- where the datasource info have been collected from.
-DROP TABLE IF EXISTS ${stats_db_name}.datasource_sources purge;
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_sources purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.datasource_sources STORED AS PARQUET AS
 select substr(d.id, 4) as id, substr(cf.key, 4) as datasource
 from ${openaire_db_name}.datasource d lateral view explode(d.collectedfrom) cfrom as cf
-where d.datainfo.deletedbyinference = false and d.datainfo.invisible=false;
+where d.datainfo.deletedbyinference = false and d.datainfo.invisible=false; /*EOS*/
 
 CREATE OR REPLACE VIEW ${stats_db_name}.datasource_results AS
 SELECT datasource AS id, id AS result
-FROM ${stats_db_name}.result_datasources;
+FROM ${stats_db_name}.result_datasources; /*EOS*/

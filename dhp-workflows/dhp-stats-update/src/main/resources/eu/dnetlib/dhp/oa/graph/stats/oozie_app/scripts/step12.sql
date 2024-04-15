@@ -1,42 +1,42 @@
 ------------------------------------------------------------------------------------------------------
 -- Creating parquet tables from the updated temporary tables and removing unnecessary temporary tables
 ------------------------------------------------------------------------------------------------------
-DROP TABLE IF EXISTS ${stats_db_name}.datasource purge;
+DROP TABLE IF EXISTS ${stats_db_name}.datasource purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.datasource stored AS parquet AS
 SELECT *
-FROM ${stats_db_name}.datasource_tmp;
+FROM ${stats_db_name}.datasource_tmp; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.publication purge;
+DROP TABLE IF EXISTS ${stats_db_name}.publication purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.publication stored AS parquet AS
 SELECT *
-FROM ${stats_db_name}.publication_tmp;
+FROM ${stats_db_name}.publication_tmp; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.dataset purge;
+DROP TABLE IF EXISTS ${stats_db_name}.dataset purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.dataset stored AS parquet AS
 SELECT *
-FROM ${stats_db_name}.dataset_tmp;
+FROM ${stats_db_name}.dataset_tmp; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.software purge;
+DROP TABLE IF EXISTS ${stats_db_name}.software purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.software stored AS parquet AS
 SELECT *
-FROM ${stats_db_name}.software_tmp;
+FROM ${stats_db_name}.software_tmp; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct purge;
+DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.otherresearchproduct stored AS parquet AS
 SELECT *
-FROM ${stats_db_name}.otherresearchproduct_tmp;
+FROM ${stats_db_name}.otherresearchproduct_tmp; /*EOS*/
 
-DROP TABLE ${stats_db_name}.project_tmp;
-DROP TABLE ${stats_db_name}.datasource_tmp;
-DROP TABLE ${stats_db_name}.publication_tmp;
-DROP TABLE ${stats_db_name}.dataset_tmp;
-DROP TABLE ${stats_db_name}.software_tmp;
-DROP TABLE ${stats_db_name}.otherresearchproduct_tmp;
+DROP TABLE ${stats_db_name}.project_tmp; /*EOS*/
+DROP TABLE ${stats_db_name}.datasource_tmp; /*EOS*/
+DROP TABLE ${stats_db_name}.publication_tmp; /*EOS*/
+DROP TABLE ${stats_db_name}.dataset_tmp; /*EOS*/
+DROP TABLE ${stats_db_name}.software_tmp; /*EOS*/
+DROP TABLE ${stats_db_name}.otherresearchproduct_tmp; /*EOS*/
 
 ----------------------------------------------
 -- Re-creating views from final parquet tables
@@ -54,4 +54,4 @@ SELECT *, bestlicence AS access_mode
 FROM ${stats_db_name}.dataset
 UNION ALL
 SELECT *, bestlicence AS access_mode
-FROM ${stats_db_name}.otherresearchproduct;
+FROM ${stats_db_name}.otherresearchproduct; /*EOS*/

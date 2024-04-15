@@ -4,5 +4,5 @@
 --------------------------------------------------------------
 --------------------------------------------------------------
 
-DROP database IF EXISTS ${stats_db_name} CASCADE;
-CREATE database ${stats_db_name};
+DROP database IF EXISTS ${stats_db_name} CASCADE; /*EOS*/
+CREATE database ${stats_db_name}; /*EOS*/
