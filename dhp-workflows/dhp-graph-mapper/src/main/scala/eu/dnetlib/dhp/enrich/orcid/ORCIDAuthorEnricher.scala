@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.enrich.orcid
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.{Author, StructuredProperty}
 import eu.dnetlib.dhp.schema.sx.OafUtils
+import eu.dnetlib.pace.util.AuthorMatchers
 
 import java.util
 import scala.beans.BeanProperty
@@ -39,7 +40,7 @@ object ORCIDAuthorEnricher extends Serializable {
         unmatched_authors,
         orcid_authors,
         (author, orcid) =>
-          ORCIDAuthorMatchers.matchEqualsIgnoreCase(author.getFullname, orcid.givenName + " " + orcid.familyName),
+          AuthorMatchers.matchEqualsIgnoreCase(author.getFullname, orcid.givenName + " " + orcid.familyName),
         "fullName"
       ) ++
       // Look after exact reversed fullname match, reconstruct ORCID fullname as familyName + givenName
@@ -47,7 +48,7 @@ object ORCIDAuthorEnricher extends Serializable {
         unmatched_authors,
         orcid_authors,
         (author, orcid) =>
-          ORCIDAuthorMatchers.matchEqualsIgnoreCase(author.getFullname, orcid.familyName + " " + orcid.givenName),
+          AuthorMatchers.matchEqualsIgnoreCase(author.getFullname, orcid.familyName + " " + orcid.givenName),
         "reversedFullName"
       ) ++
       // split author names in tokens, order the tokens, then check for matches of full tokens or abbreviations
@@ -55,7 +56,7 @@ object ORCIDAuthorEnricher extends Serializable {
         unmatched_authors,
         orcid_authors,
         (author, orcid) =>
-          ORCIDAuthorMatchers
+          AuthorMatchers
             .matchOrderedTokenAndAbbreviations(author.getFullname, orcid.givenName + " " + orcid.familyName),
         "orderedTokens"
       ) ++
@@ -63,7 +64,7 @@ object ORCIDAuthorEnricher extends Serializable {
       extractAndEnrichMatches(
         unmatched_authors,
         orcid_authors,
-        (author, orcid) => ORCIDAuthorMatchers.matchEqualsIgnoreCase(author.getFullname, orcid.creditName),
+        (author, orcid) => AuthorMatchers.matchEqualsIgnoreCase(author.getFullname, orcid.creditName),
         "creditName"
       ) ++
       // look after exact matches in  ORCID otherNames
@@ -71,7 +72,7 @@ object ORCIDAuthorEnricher extends Serializable {
         unmatched_authors,
         orcid_authors,
         (author, orcid) =>
-          orcid.otherNames != null && ORCIDAuthorMatchers.matchOtherNames(author.getFullname, orcid.otherNames.asScala),
+          orcid.otherNames != null && AuthorMatchers.matchOtherNames(author.getFullname, orcid.otherNames.asScala),
         "otherNames"
       )
     }
