@@ -1,6 +1,6 @@
 package eu.dnetlib.dhp.enrich.orcid
 
-import eu.dnetlib.dhp.enrich.orcid.ORCIDAuthorMatchers.matchOrderedTokenAndAbbreviations
+import eu.dnetlib.pace.util.AuthorMatchers.matchOrderedTokenAndAbbreviations
 import org.junit.jupiter.api.Assertions.{assertFalse, assertTrue}
 import org.junit.jupiter.api.Test
 

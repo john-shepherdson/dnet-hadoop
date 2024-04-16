@@ -497,9 +497,14 @@ public class MergeUtils {
 	}
 
 	private static Field<String> selectOldestDate(Field<String> d1, Field<String> d2) {
+		if (d1 == null || StringUtils.isBlank(d1.getValue())) {
+			return d2;
+		} else if (d2 == null || StringUtils.isBlank(d2.getValue())) {
+			return d1;
+		}
+
 		return Stream
 			.of(d1, d2)
-			.filter(Objects::nonNull)
 			.min(
 				Comparator
 					.comparing(
