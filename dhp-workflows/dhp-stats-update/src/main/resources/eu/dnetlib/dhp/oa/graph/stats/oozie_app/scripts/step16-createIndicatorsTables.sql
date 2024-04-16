@@ -965,6 +965,8 @@ select allresults.ri_initiative, result_findable.no_result_findable/allresults.n
 from allresults
          join result_findable on result_findable.ri_initiative=allresults.ri_initiative; /*EOS*/
 
+drop table if exists ${stats_db_name}.indi_pub_publicly_funded purge; /*EOS*/
+
 create table if not exists ${stats_db_name}.indi_pub_publicly_funded stored as parquet as
 with org_names_pids as
 (select org.id,name, pid from ${stats_db_name}.organization org

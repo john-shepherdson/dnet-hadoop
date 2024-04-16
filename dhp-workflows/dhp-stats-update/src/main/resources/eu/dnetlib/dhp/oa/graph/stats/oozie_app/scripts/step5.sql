@@ -50,6 +50,8 @@ FROM ${openaire_db_name}.otherresearchproduct o LATERAL VIEW explode(o.extrainfo
 WHERE xpath_string(citation.value, "//citation/id[@type='openaire']/@value") != ""
   and o.datainfo.deletedbyinference = false and o.datainfo.invisible=false; /*EOS*/
 
+DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_classifications purge; /*EOS*/
+
 CREATE TABLE ${stats_db_name}.otherresearchproduct_classifications STORED AS PARQUET AS
 SELECT substr(p.id, 4) AS id, instancetype.classname AS type
 FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.instance.instancetype) instances AS instancetype
@@ -72,7 +74,7 @@ SELECT p.id, CASE WHEN d.id IS NULL THEN 'other' ELSE p.datasource END AS dataso
 FROM (SELECT substr(p.id, 4) AS id, substr(instances.instance.hostedby.key, 4) AS datasource
       from ${openaire_db_name}.otherresearchproduct p lateral view explode(p.instance) instances as instance
       where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false) p
-         LEFT OUTER JOIN(SELECT substr(d.id, 4) id
+         LEFT OUTER JOIN (SELECT substr(d.id, 4) id
                          from ${openaire_db_name}.datasource d
                          WHERE d.datainfo.deletedbyinference = false and d.datainfo.invisible=false) d on p.datasource = d.id; /*EOS*/
 

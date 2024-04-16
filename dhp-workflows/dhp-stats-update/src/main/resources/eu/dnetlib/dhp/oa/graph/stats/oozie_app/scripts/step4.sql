@@ -58,6 +58,8 @@ FROM ${openaire_db_name}.software p
          LATERAL VIEW explode(p.instance.instancetype) instances AS instancetype
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
+DROP TABLE IF EXISTS ${stats_db_name}.software_concepts purge; /*EOS*/
+
 CREATE TABLE ${stats_db_name}.software_concepts STORED AS PARQUET AS
 SELECT substr(p.id, 4) as id, case
                                   when contexts.context.id RLIKE '^[^::]+::[^::]+::.+$' then contexts.context.id

@@ -51,6 +51,8 @@ WHERE d1.datainfo.deletedbyinference = FALSE and d1.datainfo.invisible=false; /*
 -- Updating temporary table with everything that is not based on results -> This is done with the following "dual" table.
 -- Creating a temporary dual table that will be removed after the following insert
 
+DROP TABLE IF EXISTS ${stats_db_name}.dual purge; /*EOS*/
+
 CREATE TABLE ${stats_db_name}.dual ( dummy CHAR(1)); /*EOS*/
 
 INSERT INTO ${stats_db_name}.dual VALUES ('X'); /*EOS*/
