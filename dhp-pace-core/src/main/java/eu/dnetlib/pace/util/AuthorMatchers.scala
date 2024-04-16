@@ -1,9 +1,10 @@
-package eu.dnetlib.dhp.enrich.orcid
+package eu.dnetlib.pace.util
 
 import java.util.Locale
 import java.util.regex.Pattern
+import scala.util.control.Breaks.{break, breakable}
 
-object ORCIDAuthorMatchers {
+object AuthorMatchers {
   val SPLIT_REGEX = Pattern.compile("[\\s,\\.]+")
 
   val WORD_DIFF = 2
@@ -45,7 +46,8 @@ object ORCIDAuthorMatchers {
         var res: Boolean = false
         if (e1.length != 1 && e2.length != 1) {
           res = e1 == e2
-          longMatches += 1
+          if (res)
+            longMatches += 1
         } else {
           res = true
           shortMatches += 1
@@ -62,4 +64,49 @@ object ORCIDAuthorMatchers {
     }
     longMatches > 0 && (shortMatches + longMatches) == Math.min(p1.length, p2.length)
   }
+
+  def removeMatches(
+                     graph_authors: java.util.List[String],
+                     orcid_authors: java.util.List[String],
+                     matchingFunc: java.util.function.BiFunction[String,String,Boolean]
+                   ) : java.util.List[String] = {
+    removeMatches(graph_authors, orcid_authors, (a, b) => matchingFunc(a,b))
+  }
+
+
+  def removeMatches(
+                                       graph_authors: java.util.List[String],
+                                       orcid_authors: java.util.List[String],
+                                       matchingFunc: (String, String) => Boolean
+                                     ) : java.util.List[String]  = {
+    val matched = new java.util.ArrayList[String]()
+
+    if (graph_authors != null && !graph_authors.isEmpty) {
+      val ait = graph_authors.iterator
+
+      while (ait.hasNext) {
+        val author = ait.next()
+        val oit = orcid_authors.iterator
+
+        breakable {
+          while (oit.hasNext) {
+            val orcid = oit.next()
+
+            if (matchingFunc(author, orcid)) {
+              ait.remove()
+              oit.remove()
+
+              matched.add(author)
+              matched.add(orcid)
+
+              break()
+            }
+          }
+        }
+      }
+    }
+
+    matched
+  }
+
 }

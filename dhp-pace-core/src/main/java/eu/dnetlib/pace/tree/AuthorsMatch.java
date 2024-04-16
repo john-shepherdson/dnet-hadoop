@@ -1,16 +1,18 @@
 
 package eu.dnetlib.pace.tree;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import com.wcohen.ss.AbstractStringDistance;
-
 import eu.dnetlib.pace.config.Config;
 import eu.dnetlib.pace.model.Person;
 import eu.dnetlib.pace.tree.support.AbstractListComparator;
 import eu.dnetlib.pace.tree.support.ComparatorClass;
+import eu.dnetlib.pace.util.AuthorMatchers;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 @ComparatorClass("authorsMatch")
 public class AuthorsMatch extends AbstractListComparator {
@@ -41,24 +43,36 @@ public class AuthorsMatch extends AbstractListComparator {
 	}
 
 	@Override
-	public double compare(final List<String> a, final List<String> b, final Config conf) {
-		if (a.isEmpty() || b.isEmpty())
+	public double compare(final List<String> left, final List<String> right, final Config conf) {
+		if (left.isEmpty() || right.isEmpty())
 			return -1;
 
-		if (a.size() > SIZE_THRESHOLD || b.size() > SIZE_THRESHOLD)
+		if (left.size() > SIZE_THRESHOLD || right.size() > SIZE_THRESHOLD)
 			return 1.0;
 
-		int maxMiss = Integer.MAX_VALUE;
-		List<Person> bList = b.stream().map(author -> new Person(author, false)).collect(Collectors.toList());
-
 		Double threshold = getDoubleParam("threshold");
+		int maxMiss = Integer.MAX_VALUE;
 
-		if (threshold != null && threshold >= 0.0 && threshold <= 1.0 && a.size() == b.size()) {
-			maxMiss = (int) Math.floor((1 - threshold) * Math.max(a.size(), b.size()));
+		if (threshold != null && threshold >= 0.0 && threshold <= 1.0 && left.size() == right.size()) {
+			maxMiss = (int) Math.floor((1 - threshold) * Math.max(left.size(), right.size()));
 		}
 
 		int common = 0;
+
+		List<String> a = new ArrayList<>(left);
+		List<String> b = new ArrayList<>(right);
+
+		common += AuthorMatchers
+			.removeMatches(a, b, (BiFunction<String, String, Object>) AuthorMatchers::matchEqualsIgnoreCase)
+			.size() / 2;
+		common += AuthorMatchers
+			.removeMatches(a, b, (BiFunction<String, String, Object>) AuthorMatchers::matchOrderedTokenAndAbbreviations)
+			.size() / 2;
+
+		List<Person> bList = b.stream().map(author -> new Person(author, false)).collect(Collectors.toList());
+
 		// compare each element of List1 with each element of List2
+		int alreadyMatched = common;
 		for (int i = 0; i < a.size(); i++) {
 			Person p1 = new Person(a.get(i), false);
 
@@ -123,13 +137,13 @@ public class AuthorsMatch extends AbstractListComparator {
 				}
 			}
 
-			if (i - common > maxMiss) {
+			if (i - common - alreadyMatched > maxMiss) {
 				return 0.0;
 			}
 		}
 
 		// normalization factor to compute the score
-		int normFactor = a.size() == b.size() ? a.size() : (a.size() + b.size() - common);
+		int normFactor = left.size() == right.size() ? left.size() : (left.size() + right.size() - common);
 
 		if (TYPE.equals("percentage")) {
 			return (double) common / normFactor;
@@ -160,5 +174,4 @@ public class AuthorsMatch extends AbstractListComparator {
 	public String normalization(String s) {
 		return normalize(utf8(cleanup(s)));
 	}
-
 }
