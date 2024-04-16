@@ -10,6 +10,7 @@ class MAGMappingTest {
 
   val mapper = new ObjectMapper()
 
+
   def mappingTest(): Unit = {
 
     val spark = SparkSession
@@ -18,10 +19,9 @@ class MAGMappingTest {
       .master("local[*]")
       .getOrCreate()
 
-    val s = new SparkMAGtoOAF(null, null, null)
+    val s = new SparkMagOrganizationAS(null, null, null)
 
-    s.convertMAG(spark, "/home/sandro/Downloads/mag_test", "/home/sandro/Downloads/mag_oaf")
-    s.generateAffiliations(spark, "/home/sandro/Downloads/mag_test", "/home/sandro/Downloads/mag_oaf")
+    s.generateAS(spark, "/home/sandro/Downloads/mag_test", "/home/sandro/Downloads/mag_AS")
 
   }
 
