@@ -92,6 +92,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		INVALID_AUTHOR_NAMES.add("null anonymous");
 		INVALID_AUTHOR_NAMES.add("unbekannt");
 		INVALID_AUTHOR_NAMES.add("unknown");
+		INVALID_AUTHOR_NAMES.add("autor, Sin");
+		INVALID_AUTHOR_NAMES.add("Desconocido / Inconnu,");
 
 		INVALID_URL_HOSTS.add("creativecommons.org");
 		INVALID_URL_HOSTS.add("www.academia.edu");
