@@ -242,7 +242,7 @@ create table if not exists ${stats_db_name}.indi_pub_gold_oa stored as parquet a
             select id, issn_online as issn from ${stats_db_name}.datasource d join gold_oa on gold_oa.issn=d.issn_online) foo
     )
     SELECT DISTINCT pd.id, coalesce(is_gold, 0) as is_gold
-    FROM ${stats_db_name}.publication_datasources pd
+    FROM ${stats_db_name}.publication pd
     left outer join (
             select pd.id, 1 as is_gold
             FROM ${stats_db_name}.publication_datasources pd
