@@ -1,26 +1,34 @@
-package eu.dnetlib.doiboost.crossref
+package eu.dnetlib.dhp.collection.crossref
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import eu.dnetlib.dhp.actionmanager.ror.GenerateRorActionSetJob
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf._
-import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactory, OafMapperUtils}
+import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.{field, qualifier, structuredProperty, subject}
+import eu.dnetlib.dhp.schema.oaf.utils.{
+  DoiCleaningRule,
+  GraphCleaningFunctions,
+  IdentifierFactory,
+  OafMapperUtils,
+  PidType
+}
 import eu.dnetlib.dhp.utils.DHPUtils
-import eu.dnetlib.doiboost.DoiBoostMappingUtil
-import eu.dnetlib.doiboost.DoiBoostMappingUtil._
 import org.apache.commons.lang.StringUtils
+import org.apache.spark.sql.Row
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST._
 import org.json4s.jackson.JsonMethods._
 import org.slf4j.{Logger, LoggerFactory}
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.io.Source
 import scala.util.matching.Regex
-
-case class CrossrefDT(doi: String, json: String, timestamp: Long) {}
 
 case class mappingAffiliation(name: String) {}
 
@@ -36,17 +44,34 @@ case class funderInfo(id: String, uri: String, name: String, synonym: List[Strin
 
 case class mappingFunder(name: String, DOI: Option[String], award: Option[List[String]]) {}
 
+case class UnpayWall(doi: String, is_oa: Boolean, best_oa_location: UnpayWallOALocation, oa_status: String) {}
+
+case class UnpayWallOALocation(license: Option[String], url: String, host_type: Option[String]) {}
+
 case object Crossref2Oaf {
   val logger: Logger = LoggerFactory.getLogger(Crossref2Oaf.getClass)
+  val mapper = new ObjectMapper
 
   val irishFunder: List[funderInfo] = {
     val s = Source
-      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/doiboost/crossref/irish_funder.json"))
+      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/collection/crossref/irish_funder.json"))
       .mkString
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: org.json4s.JValue = parse(s)
     json.extract[List[funderInfo]]
   }
+
+  val invalidName = List(
+    ",",
+    "none none",
+    "none, none",
+    "none &na;",
+    "(:null)",
+    "test test test",
+    "test test",
+    "test",
+    "&na; &na;"
+  )
 
   def getIrishId(doi: String): Option[String] = {
     val id = doi.split("/").last
@@ -55,12 +80,273 @@ case object Crossref2Oaf {
       .map(f => f.id)
   }
 
+  def createCrossrefCollectedFrom(): KeyValue = {
+
+    val cf = new KeyValue
+    cf.setValue("Crossref");
+    cf.setKey(ModelConstants.CROSSREF_ID)
+    cf
+
+  }
+
+  def createUnpayWallCollectedFrom(): KeyValue = {
+
+    val cf = new KeyValue
+    cf.setValue("UnpayWall")
+    cf.setKey(s"10|openaire____:${DHPUtils.md5("UnpayWall".toLowerCase)}")
+    cf
+
+  }
+
+  def generateDataInfo(): DataInfo = {
+    generateDataInfo("0.91")
+  }
+
+  def generateDataInfo(trust: String): DataInfo = {
+    val di = new DataInfo
+    di.setDeletedbyinference(false)
+    di.setInferred(false)
+    di.setInvisible(false)
+    di.setTrust(trust)
+    di.setProvenanceaction(
+      OafMapperUtils.qualifier(
+        ModelConstants.SYSIMPORT_ACTIONSET,
+        ModelConstants.SYSIMPORT_ACTIONSET,
+        ModelConstants.DNET_PROVENANCE_ACTIONS,
+        ModelConstants.DNET_PROVENANCE_ACTIONS
+      )
+    )
+    di
+  }
+
+  def getOpenAccessQualifier(): AccessRight = {
+
+    OafMapperUtils.accessRight(
+      ModelConstants.ACCESS_RIGHT_OPEN,
+      "Open Access",
+      ModelConstants.DNET_ACCESS_MODES,
+      ModelConstants.DNET_ACCESS_MODES
+    )
+  }
+
+  def getRestrictedQualifier(): AccessRight = {
+    OafMapperUtils.accessRight(
+      "RESTRICTED",
+      "Restricted",
+      ModelConstants.DNET_ACCESS_MODES,
+      ModelConstants.DNET_ACCESS_MODES
+    )
+  }
+
+  def getUnknownQualifier(): AccessRight = {
+    OafMapperUtils.accessRight(
+      ModelConstants.UNKNOWN,
+      ModelConstants.NOT_AVAILABLE,
+      ModelConstants.DNET_ACCESS_MODES,
+      ModelConstants.DNET_ACCESS_MODES
+    )
+  }
+
+  def getEmbargoedAccessQualifier(): AccessRight = {
+    OafMapperUtils.accessRight(
+      "EMBARGO",
+      "Embargo",
+      ModelConstants.DNET_ACCESS_MODES,
+      ModelConstants.DNET_ACCESS_MODES
+    )
+  }
+
+  def getClosedAccessQualifier(): AccessRight = {
+    OafMapperUtils.accessRight(
+      "CLOSED",
+      "Closed Access",
+      ModelConstants.DNET_ACCESS_MODES,
+      ModelConstants.DNET_ACCESS_MODES
+    )
+  }
+
+  def decideAccessRight(lic: Field[String], date: String): AccessRight = {
+    if (lic == null) {
+      //Default value Unknown
+      return getUnknownQualifier()
+    }
+    val license: String = lic.getValue
+    //CC licenses
+    if (
+      license.startsWith("cc") ||
+      license.startsWith("http://creativecommons.org/licenses") ||
+      license.startsWith("https://creativecommons.org/licenses") ||
+
+      //ACS Publications Author choice licenses (considered OPEN also by Unpaywall)
+      license.equals("http://pubs.acs.org/page/policy/authorchoice_ccby_termsofuse.html") ||
+      license.equals("http://pubs.acs.org/page/policy/authorchoice_termsofuse.html") ||
+      license.equals("http://pubs.acs.org/page/policy/authorchoice_ccbyncnd_termsofuse.html") ||
+
+      //APA (considered OPEN also by Unpaywall)
+      license.equals("http://www.apa.org/pubs/journals/resources/open-access.aspx")
+    ) {
+
+      val oaq: AccessRight = getOpenAccessQualifier()
+      oaq.setOpenAccessRoute(OpenAccessRoute.hybrid)
+      return oaq
+    }
+
+    //OUP (BUT ONLY AFTER 12 MONTHS FROM THE PUBLICATION DATE, OTHERWISE THEY ARE EMBARGOED)
+    if (
+      license.equals(
+        "https://academic.oup.com/journals/pages/open_access/funder_policies/chorus/standard_publication_model"
+      )
+    ) {
+      val now = java.time.LocalDate.now
+
+      try {
+        val pub_date = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        if (((now.toEpochDay - pub_date.toEpochDay) / 365.0) > 1) {
+          val oaq: AccessRight = getOpenAccessQualifier()
+          oaq.setOpenAccessRoute(OpenAccessRoute.hybrid)
+          return oaq
+        } else {
+          return getEmbargoedAccessQualifier()
+        }
+      } catch {
+        case e: Exception => {
+          try {
+            val pub_date =
+              LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'"))
+            if (((now.toEpochDay - pub_date.toEpochDay) / 365.0) > 1) {
+              val oaq: AccessRight = getOpenAccessQualifier()
+              oaq.setOpenAccessRoute(OpenAccessRoute.hybrid)
+              return oaq
+            } else {
+              return getEmbargoedAccessQualifier()
+            }
+          } catch {
+            case ex: Exception => return getClosedAccessQualifier()
+          }
+        }
+
+      }
+
+    }
+
+    getClosedAccessQualifier()
+
+  }
+
+  def isValidAuthorName(fullName: String): Boolean = {
+    if (fullName == null || fullName.isEmpty)
+      return false
+    if (invalidName.contains(fullName.toLowerCase.trim))
+      return false
+    true
+  }
+
+  def filterResult(publication: Result): Boolean = {
+
+    //Case empty publication
+    if (publication == null)
+      return false
+    if (publication.getId == null || publication.getId.isEmpty)
+      return false
+
+    //Case publication with no title
+    if (publication.getTitle == null || publication.getTitle.size == 0)
+      return false
+
+    val s = publication.getTitle.asScala.count(p =>
+      p.getValue != null
+      && p.getValue.nonEmpty && !p.getValue.equalsIgnoreCase("[NO TITLE AVAILABLE]")
+    )
+
+    if (s == 0)
+      return false
+
+    // fixes #4360 (test publisher)
+    val publisher =
+      if (publication.getPublisher != null) publication.getPublisher.getValue else null
+
+    if (
+      publisher != null && (publisher.equalsIgnoreCase("Test accounts") || publisher
+        .equalsIgnoreCase("CrossRef Test Account"))
+    ) {
+      return false;
+    }
+
+    //RELAXED this constraint
+    //Publication with no Author
+    if (publication.getAuthor == null || publication.getAuthor.size() == 0)
+      return true
+
+    //filter invalid author
+    val authors = publication.getAuthor.asScala.map(s => {
+      if (s.getFullname.nonEmpty) {
+        s.getFullname
+      } else
+        s"${s.getName} ${s.getSurname}"
+    })
+
+    val c = authors.count(isValidAuthorName)
+    if (c == 0)
+      return false
+
+    // fixes #4368
+    if (
+      authors.count(s => s.equalsIgnoreCase("Addie Jackson")) > 0 && "Elsevier BV".equalsIgnoreCase(
+        publication.getPublisher.getValue
+      )
+    )
+      return false
+
+    true
+  }
+
+  def get_unpaywall_color(input: String): Option[OpenAccessRoute] = {
+    if (input == null || input.equalsIgnoreCase("close"))
+      return None
+    if (input.equalsIgnoreCase("green"))
+      return Some(OpenAccessRoute.green)
+    if (input.equalsIgnoreCase("bronze"))
+      return Some(OpenAccessRoute.bronze)
+    if (input.equalsIgnoreCase("hybrid"))
+      return Some(OpenAccessRoute.hybrid)
+    else
+      return Some(OpenAccessRoute.gold)
+
+  }
+
+  def get_color(input: String): Option[OpenAccessRoute] = {
+    if (input == null || input.equalsIgnoreCase("closed"))
+      return None
+    if (input.equalsIgnoreCase("green"))
+      return Some(OpenAccessRoute.green)
+    if (input.equalsIgnoreCase("bronze"))
+      return Some(OpenAccessRoute.bronze)
+    if (input.equalsIgnoreCase("hybrid"))
+      return Some(OpenAccessRoute.hybrid)
+    else
+      return Some(OpenAccessRoute.gold)
+
+  }
+
   def mappingResult(result: Result, json: JValue, instanceType: Qualifier, originalType: String): Result = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
     //MAPPING Crossref DOI into PID
-    val doi: String = DoiBoostMappingUtil.normalizeDoi((json \ "DOI").extract[String])
-    result.setPid(List(createSP(doi, "doi", ModelConstants.DNET_PID_TYPES)).asJava)
+    val doi: String = DoiCleaningRule.normalizeDoi((json \ "DOI").extract[String])
+    result.setPid(
+      List(
+        structuredProperty(
+          doi,
+          qualifier(
+            PidType.doi.toString,
+            PidType.doi.toString,
+            ModelConstants.DNET_PID_TYPES,
+            ModelConstants.DNET_PID_TYPES
+          ),
+          null
+        )
+      ).asJava
+    )
 
     //MAPPING Crossref DOI into OriginalId
     //and Other Original Identifier of dataset like clinical-trial-number
@@ -82,38 +368,36 @@ case object Crossref2Oaf {
     // Publisher ( Name of work's publisher mapped into  Result/Publisher)
     val publisher = (json \ "publisher").extractOrElse[String](null)
     if (publisher != null && publisher.nonEmpty)
-      result.setPublisher(asField(publisher))
+      result.setPublisher(field(publisher, null))
 
     // TITLE
     val mainTitles =
-      for { JString(title) <- json \ "title" if title.nonEmpty } yield createSP(
-        title,
-        "main title",
-        ModelConstants.DNET_DATACITE_TITLE
-      )
+      for { JString(title) <- json \ "title" if title.nonEmpty } yield {
+        structuredProperty(title, ModelConstants.MAIN_TITLE_QUALIFIER, null)
+      }
     val originalTitles = for {
       JString(title) <- json \ "original-title" if title.nonEmpty
-    } yield createSP(title, "alternative title", ModelConstants.DNET_DATACITE_TITLE)
+    } yield structuredProperty(title, ModelConstants.ALTERNATIVE_TITLE_QUALIFIER, null)
     val shortTitles = for {
       JString(title) <- json \ "short-title" if title.nonEmpty
-    } yield createSP(title, "alternative title", ModelConstants.DNET_DATACITE_TITLE)
+    } yield structuredProperty(title, ModelConstants.ALTERNATIVE_TITLE_QUALIFIER, null)
     val subtitles =
-      for { JString(title) <- json \ "subtitle" if title.nonEmpty } yield createSP(
+      for { JString(title) <- json \ "subtitle" if title.nonEmpty } yield structuredProperty(
         title,
-        "subtitle",
-        ModelConstants.DNET_DATACITE_TITLE
+        ModelConstants.SUBTITLE_QUALIFIER,
+        null
       )
     result.setTitle((mainTitles ::: originalTitles ::: shortTitles ::: subtitles).asJava)
 
     // DESCRIPTION
     val descriptionList =
-      for { JString(description) <- json \ "abstract" } yield asField(description)
+      for { JString(description) <- json \ "abstract" } yield field[String](description, null)
     result.setDescription(descriptionList.asJava)
 
     // Source
     val sourceList = for {
       JString(source) <- json \ "source" if source != null && source.nonEmpty
-    } yield asField(source)
+    } yield field(source, null)
     result.setSource(sourceList.asJava)
 
     //RELEVANT DATE Mapping
@@ -153,9 +437,9 @@ case object Crossref2Oaf {
       (json \ "issued" \ "date-parts").extract[List[List[Int]]]
     )
     if (StringUtils.isNotBlank(issuedDate)) {
-      result.setDateofacceptance(asField(issuedDate))
+      result.setDateofacceptance(field(issuedDate, null))
     } else {
-      result.setDateofacceptance(asField(createdDate.getValue))
+      result.setDateofacceptance(field(createdDate.getValue, null))
     }
     result.setRelevantdate(
       List(createdDate, postedDate, acceptedDate, publishedOnlineDate, publishedPrintDate)
@@ -168,7 +452,7 @@ case object Crossref2Oaf {
 
     if (subjectList.nonEmpty) {
       result.setSubject(
-        subjectList.map(s => createSubject(s, "keyword", ModelConstants.DNET_SUBJECT_TYPOLOGIES)).asJava
+        subjectList.map(s => subject(s, ModelConstants.SUBTITLE_QUALIFIER, null)).asJava
       )
     }
 
@@ -190,7 +474,7 @@ case object Crossref2Oaf {
       JObject(license)                                    <- json \ "license"
       JField("URL", JString(lic))                         <- license
       JField("content-version", JString(content_version)) <- license
-    } yield (asField(lic), content_version)
+    } yield (field[String](lic, null), content_version)
     val l = license.filter(d => StringUtils.isNotBlank(d._1.getValue))
     if (l.nonEmpty) {
       if (l exists (d => d._2.equals("vor"))) {
@@ -224,25 +508,18 @@ case object Crossref2Oaf {
       decideAccessRight(instance.getLicense, result.getDateofacceptance.getValue)
     )
     instance.setInstancetype(instanceType)
+
     //ADD ORIGINAL TYPE to the mapping
     val itm = new InstanceTypeMapping
     itm.setOriginalType(originalType)
     itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
     instance.setInstanceTypeMapping(List(itm).asJava)
-//    result.setResourcetype(
-//      OafMapperUtils.qualifier(
-//        cobjCategory.substring(0, 4),
-//        cobjCategory.substring(5),
-//        ModelConstants.DNET_PUBLICATION_RESOURCE,
-//        ModelConstants.DNET_PUBLICATION_RESOURCE
-//      )
-//    )
 
     instance.setCollectedfrom(createCrossrefCollectedFrom())
     if (StringUtils.isNotBlank(issuedDate)) {
-      instance.setDateofacceptance(asField(issuedDate))
+      instance.setDateofacceptance(field(issuedDate, null))
     } else {
-      instance.setDateofacceptance(asField(createdDate.getValue))
+      instance.setDateofacceptance(field(createdDate.getValue, null))
     }
     val s: List[String] = List("https://doi.org/" + doi)
     //    val links: List[String] = ((for {JString(url) <- json \ "link" \ "URL"} yield url) ::: List(s)).filter(p => p != null && p.toLowerCase().contains(doi.toLowerCase())).distinct
@@ -274,6 +551,11 @@ case object Crossref2Oaf {
       result
   }
 
+  def generateIdentifier(oaf: Result, doi: String): String = {
+    val id = DHPUtils.md5(doi.toLowerCase)
+    s"50|doiboost____|$id"
+  }
+
   def generateAuhtor(given: String, family: String, orcid: String, index: Int): Author = {
     val a = new Author
     a.setName(given)
@@ -283,10 +565,14 @@ case object Crossref2Oaf {
     if (StringUtils.isNotBlank(orcid))
       a.setPid(
         List(
-          createSP(
+          structuredProperty(
             orcid,
-            ModelConstants.ORCID_PENDING,
-            ModelConstants.DNET_PID_TYPES,
+            qualifier(
+              ModelConstants.ORCID_PENDING,
+              ModelConstants.ORCID_PENDING,
+              ModelConstants.DNET_PID_TYPES,
+              ModelConstants.DNET_PID_TYPES
+            ),
             generateDataInfo()
           )
         ).asJava
@@ -328,14 +614,77 @@ case object Crossref2Oaf {
     null
   }
 
-  def convert(input: String, vocabularies: VocabularyGroup): List[Oaf] = {
+  object TransformationType extends Enumeration {
+    type TransformationType = Value
+    val OnlyRelation, OnlyResult, All = Value
+  }
+  import TransformationType._
+
+  def mergeUnpayWall(r: Result, uw: UnpayWall): Result = {
+    if (uw != null) {
+
+      r.setCollectedfrom(List(r.getCollectedfrom.get(0), createUnpayWallCollectedFrom()).asJava)
+      val i: Instance = new Instance()
+      i.setCollectedfrom(createUnpayWallCollectedFrom())
+      if (uw.best_oa_location != null) {
+        i.setUrl(List(uw.best_oa_location.url).asJava)
+        if (uw.best_oa_location.license.isDefined) {
+          i.setLicense(field[String](uw.best_oa_location.license.get, null))
+        }
+        val colour = get_unpaywall_color(uw.oa_status)
+        if (colour.isDefined) {
+          val a = new AccessRight
+          a.setClassid(ModelConstants.ACCESS_RIGHT_OPEN)
+          a.setClassname(ModelConstants.ACCESS_RIGHT_OPEN)
+          a.setSchemeid(ModelConstants.DNET_ACCESS_MODES)
+          a.setSchemename(ModelConstants.DNET_ACCESS_MODES)
+          a.setOpenAccessRoute(colour.get)
+          i.setAccessright(a)
+        }
+        i.setInstancetype(r.getInstance().get(0).getInstancetype)
+        i.setInstanceTypeMapping(r.getInstance().get(0).getInstanceTypeMapping)
+        i.setPid(r.getPid)
+        r.setInstance(List(r.getInstance().get(0), i).asJava)
+      }
+
+    }
+    r
+  }
+
+  def generateAffliation(input: Row): List[String] = {
+    val doi = input.getString(0)
+    val rorId = input.getString(1)
+
+    val pubId = s"50|${PidType.doi.toString.padTo(12, "_")}::${DoiCleaningRule.normalizeDoi(doi)}"
+    val affId = GenerateRorActionSetJob.calculateOpenaireId(rorId)
+
+    val r: Relation = new Relation
+    DoiCleaningRule.clean(doi)
+    r.setSource(pubId)
+    r.setTarget(affId)
+    r.setRelType(ModelConstants.RESULT_ORGANIZATION)
+    r.setRelClass(ModelConstants.HAS_AUTHOR_INSTITUTION)
+    r.setSubRelType(ModelConstants.AFFILIATION)
+    r.setDataInfo(generateDataInfo())
+    r.setCollectedfrom(List(createCrossrefCollectedFrom()).asJava)
+    val r1: Relation = new Relation
+    r1.setTarget(pubId)
+    r1.setSource(affId)
+    r1.setRelType(ModelConstants.RESULT_ORGANIZATION)
+    r1.setRelClass(ModelConstants.IS_AUTHOR_INSTITUTION_OF)
+    r1.setSubRelType(ModelConstants.AFFILIATION)
+    r1.setDataInfo(generateDataInfo())
+    r1.setCollectedfrom(List(createCrossrefCollectedFrom()).asJava)
+    List(mapper.writeValueAsString(r), mapper.writeValueAsString(r1))
+  }
+
+  def convert(input: String, vocabularies: VocabularyGroup, mode: TransformationType): List[Oaf] = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(input)
 
     var resultList: List[Oaf] = List()
 
     val objectType = (json \ "type").extractOrElse[String](null)
-    val objectSubType = (json \ "subtype").extractOrElse[String](null)
     if (objectType == null)
       return resultList
     val typology = getTypeQualifier(objectType, vocabularies)
@@ -348,38 +697,75 @@ case object Crossref2Oaf {
       return List()
 
     mappingResult(result, json, typology._1, typology._3)
+
     if (result == null || result.getId == null)
       return List()
-
-    val funderList: List[mappingFunder] =
-      (json \ "funder").extractOrElse[List[mappingFunder]](List())
-
-    if (funderList.nonEmpty) {
-      resultList = resultList ::: mappingFunderToRelations(
-        funderList,
-        result.getId,
-        createCrossrefCollectedFrom(),
-        result.getDataInfo,
-        result.getLastupdatetimestamp
-      )
-    }
 
     result match {
       case publication: Publication => convertPublication(publication, json, typology._1)
       case dataset: Dataset         => convertDataset(dataset)
     }
 
-    val doisReference: List[String] = for {
-      JObject(reference_json)          <- json \ "reference"
-      JField("DOI", JString(doi_json)) <- reference_json
-    } yield doi_json
+    //RELATION SECTION
+    if (mode == OnlyRelation || mode == All) {
+      val funderList: List[mappingFunder] =
+        (json \ "funder").extractOrElse[List[mappingFunder]](List())
 
-    if (doisReference != null && doisReference.nonEmpty) {
-      val citation_relations: List[Relation] = generateCitationRelations(doisReference, result)
-      resultList = resultList ::: citation_relations
+      if (funderList.nonEmpty) {
+        resultList = resultList ::: mappingFunderToRelations(
+          funderList,
+          result.getId,
+          createCrossrefCollectedFrom(),
+          result.getDataInfo,
+          result.getLastupdatetimestamp
+        )
+        //        .map(s => CrossrefResult(s.getClass.getSimpleName, mapper.writeValueAsString(s)))
+      }
+      val doisReference: List[String] = for {
+        JObject(reference_json)          <- json \ "reference"
+        JField("DOI", JString(doi_json)) <- reference_json
+      } yield doi_json
+
+      if (doisReference != null && doisReference.nonEmpty) {
+        val citation_relations: List[Relation] = generateCitationRelations(doisReference, result)
+        resultList = resultList ::: citation_relations
+      }
     }
-    resultList = resultList ::: List(result)
-    resultList
+    if (!filterResult(result))
+      List()
+    else {
+      if (mode == OnlyResult || mode == All)
+        resultList ::: List(result)
+      else
+        resultList
+    }
+
+    //    if (uw != null) {
+//      result.getCollectedfrom.add(createUnpayWallCollectedFrom())
+//      val i: Instance = new Instance()
+//      i.setCollectedfrom(createUnpayWallCollectedFrom())
+//      if (uw.best_oa_location != null) {
+//
+//        i.setUrl(List(uw.best_oa_location.url).asJava)
+//        if (uw.best_oa_location.license.isDefined) {
+//          i.setLicense(field[String](uw.best_oa_location.license.get, null))
+//        }
+//
+//        val colour = get_unpaywall_color(uw.oa_status)
+//        if (colour.isDefined) {
+//          val a = new AccessRight
+//          a.setClassid(ModelConstants.ACCESS_RIGHT_OPEN)
+//          a.setClassname(ModelConstants.ACCESS_RIGHT_OPEN)
+//          a.setSchemeid(ModelConstants.DNET_ACCESS_MODES)
+//          a.setSchemename(ModelConstants.DNET_ACCESS_MODES)
+//          a.setOpenAccessRoute(colour.get)
+//          i.setAccessright(a)
+//        }
+//        i.setPid(result.getPid)
+//        result.getInstance().add(i)
+//      }
+//    }
+
   }
 
   private def createCiteRelation(source: Result, targetPid: String, targetPidType: String): List[Relation] = {
@@ -560,7 +946,15 @@ case object Crossref2Oaf {
                 "10.13039/501100000266" | "10.13039/501100006041" | "10.13039/501100000265" | "10.13039/501100000270" |
                 "10.13039/501100013589" | "10.13039/501100000271" =>
               generateSimpleRelationFromAward(funder, "ukri________", a => a)
-
+            //HFRI
+            case "10.13039/501100013209" =>
+              generateSimpleRelationFromAward(funder, "hfri________", a => a)
+              val targetId = getProjectId("hfri________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            //ERASMUS+
+            case "10.13039/501100010790" =>
+              generateSimpleRelationFromAward(funder, "erasmusplus_", a => a)
             case _ => logger.debug("no match for " + funder.DOI.get)
 
           }
@@ -606,10 +1000,10 @@ case object Crossref2Oaf {
         val source = s"${containerTitles.head} ISBN: ${ISBN.head}"
         if (publication.getSource != null) {
           val l: List[Field[String]] = publication.getSource.asScala.toList
-          val ll: List[Field[String]] = l ::: List(asField(source))
+          val ll: List[Field[String]] = l ::: List(field(source, null))
           publication.setSource(ll.asJava)
         } else
-          publication.setSource(List(asField(source)).asJava)
+          publication.setSource(List(field(source, null)).asJava)
       }
     } else {
       // Mapping Journal
@@ -677,7 +1071,7 @@ case object Crossref2Oaf {
   ): StructuredProperty = {
     val dp = extractDate(dt, datePart)
     if (StringUtils.isNotBlank(dp))
-      return createSP(dp, classId, schemeId)
+      return structuredProperty(dp, qualifier(classId, classId, schemeId, schemeId), null)
     null
   }
 

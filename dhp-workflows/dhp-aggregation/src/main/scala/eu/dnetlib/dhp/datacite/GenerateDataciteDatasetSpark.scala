@@ -46,20 +46,6 @@ class GenerateDataciteDatasetSpark(propertyPath: String, args: Array[String], lo
     reportTotalSize(targetPath, outputBasePath)
   }
 
-  /** For working with MDStore we need to store in a file on hdfs the size of
-    * the current dataset
-    * @param targetPath
-    * @param outputBasePath
-    */
-  def reportTotalSize(targetPath: String, outputBasePath: String): Unit = {
-    val total_items = spark.read.text(targetPath).count()
-    writeHdfsFile(
-      spark.sparkContext.hadoopConfiguration,
-      s"$total_items",
-      outputBasePath + MDSTORE_SIZE_PATH
-    )
-  }
-
   /** Generate the transformed and cleaned OAF Dataset from the native one
     *
     * @param sourcePath  sourcePath of the native Dataset in format JSON/Datacite

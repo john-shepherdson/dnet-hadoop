@@ -1,33 +1,44 @@
 package eu.dnetlib.dhp.doiboost.crossref
 
+import com.fasterxml.jackson.databind.SerializationFeature
+import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf._
 import eu.dnetlib.dhp.utils.DHPUtils
 import eu.dnetlib.doiboost.crossref.Crossref2Oaf
-import org.codehaus.jackson.map.{ObjectMapper, SerializationConfig}
 import org.json4s
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.{DefaultFormats, JValue}
 import org.json4s.jackson.JsonMethods
 import org.junit.jupiter.api.Assertions._
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.{BeforeEach, Test}
+import org.mockito.junit.jupiter.MockitoExtension
 import org.slf4j.{Logger, LoggerFactory}
 
+import java.nio.file.Files
 import scala.collection.JavaConverters._
 import scala.io.Source
 import scala.util.matching.Regex
 
-class CrossrefMappingTest {
+@ExtendWith(Array(classOf[MockitoExtension]))
+class CrossrefMappingTest extends AbstractVocabularyTest {
 
   val logger: Logger = LoggerFactory.getLogger(Crossref2Oaf.getClass)
   val mapper = new ObjectMapper()
+
+  @BeforeEach
+  def setUp(): Unit = {
+    super.setUpVocabulary()
+  }
 
   @Test
   def testMissingAuthorParser(): Unit = {
     val json: String = Source
       .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/doiboost/crossref/s41567-022-01757-y.json"))
       .mkString
-    val result = Crossref2Oaf.convert(json)
+    val result = Crossref2Oaf.convert(json, vocabularies)
     result
       .filter(o => o.isInstanceOf[Publication])
       .map(p => p.asInstanceOf[Publication])
@@ -50,13 +61,13 @@ class CrossrefMappingTest {
 
     for (line <- funder_doi.linesWithSeparators.map(l => l.stripLineEnd)) {
       val json = template.replace("%s", line)
-      val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+      val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
       assertTrue(resultList.nonEmpty)
       checkRelation(resultList)
     }
     for (line <- funder_name.linesWithSeparators.map(l => l.stripLineEnd)) {
       val json = template.replace("%s", line)
-      val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+      val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
       assertTrue(resultList.nonEmpty)
       checkRelation(resultList)
     }
@@ -96,7 +107,7 @@ class CrossrefMappingTest {
       Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/doiboost/crossref/issue_date.json")).mkString
     assertNotNull(json)
     assertFalse(json.isEmpty)
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
     assertTrue(resultList.nonEmpty)
 
     val items = resultList.filter(p => p.isInstanceOf[Result])
@@ -115,14 +126,13 @@ class CrossrefMappingTest {
     assertNotNull(json)
     assertFalse(json.isEmpty)
 
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
 
     assertTrue(resultList.nonEmpty)
 
     val items = resultList.filter(p => p.isInstanceOf[Result])
 
-    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
-    items.foreach(p => println(mapper.writeValueAsString(p)))
+    items.foreach(p => println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(p)))
 
   }
 
@@ -142,7 +152,7 @@ class CrossrefMappingTest {
     assertNotNull(json)
     assertFalse(json.isEmpty)
 
-    val result: List[Oaf] = Crossref2Oaf.convert(json)
+    val result: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
 
     assertTrue(result.nonEmpty)
 
@@ -163,8 +173,7 @@ class CrossrefMappingTest {
 
     assertEquals(doisReference.size, relationList.size)
 
-    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
-    relationList.foreach(p => println(mapper.writeValueAsString(p)))
+    relationList.foreach(p => println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(p)))
   }
 
   @Test
@@ -178,14 +187,13 @@ class CrossrefMappingTest {
     assertNotNull(json)
     assertFalse(json.isEmpty);
 
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
 
     assertTrue(resultList.nonEmpty)
 
     val items = resultList.filter(p => p.isInstanceOf[Result])
 
-    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
-    items.foreach(p => println(mapper.writeValueAsString(p)))
+    items.foreach(p => println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(p)))
 
   }
 
@@ -194,18 +202,17 @@ class CrossrefMappingTest {
     val json = Source
       .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/doiboost/crossref/prwTest.json"))
       .mkString
-    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
 
     assertNotNull(json)
     assertFalse(json.isEmpty);
 
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
 
     assertTrue(resultList.nonEmpty)
 
     val items = resultList.filter(p => p.isInstanceOf[Result])
 
-    items.foreach(p => logger.info(mapper.writeValueAsString(p)))
+    items.foreach(p => logger.info(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(p)))
 
   }
 
@@ -235,7 +242,7 @@ class CrossrefMappingTest {
 
     assertFalse(json.isEmpty)
 
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
 
     assertTrue(resultList.nonEmpty)
     val rels: List[Relation] =
@@ -255,7 +262,7 @@ class CrossrefMappingTest {
 
     assertFalse(json.isEmpty);
 
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
 
     assertTrue(resultList.nonEmpty)
 
@@ -266,7 +273,7 @@ class CrossrefMappingTest {
     val result: Result = items.head.asInstanceOf[Result]
     assertNotNull(result)
 
-    logger.info(mapper.writeValueAsString(result));
+    logger.info(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result));
 
     assertNotNull(result.getDataInfo, "Datainfo test not null Failed");
     assertNotNull(
@@ -331,7 +338,7 @@ class CrossrefMappingTest {
 
     assertFalse(json.isEmpty);
 
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
 
     assertTrue(resultList.nonEmpty)
 
@@ -415,7 +422,7 @@ class CrossrefMappingTest {
 
     assertFalse(json.isEmpty);
 
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
 
     assertTrue(resultList.nonEmpty)
 
@@ -463,7 +470,7 @@ class CrossrefMappingTest {
 
     assertFalse(json.isEmpty);
 
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
 
     assertTrue(resultList.nonEmpty)
 
@@ -542,7 +549,7 @@ class CrossrefMappingTest {
 
     assertFalse(json.isEmpty);
 
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
 
     assertTrue(resultList.nonEmpty)
 
@@ -568,7 +575,7 @@ class CrossrefMappingTest {
 
     assertFalse(json.isEmpty);
 
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
 
     assertTrue(resultList.nonEmpty)
 
@@ -578,7 +585,8 @@ class CrossrefMappingTest {
     assert(items.size == 1)
     val result: Result = items.head.asInstanceOf[Publication]
     assertNotNull(result)
-    logger.info(mapper.writeValueAsString(result));
+
+    logger.info(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(result));
   }
 
   @Test
@@ -591,7 +599,7 @@ class CrossrefMappingTest {
     val line: String =
       "\"funder\": [{\"name\": \"Wellcome Trust Masters Fellowship\",\"award\": [\"090633\"]}],"
     val json = template.replace("%s", line)
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
     assertTrue(resultList.nonEmpty)
     val items = resultList.filter(p => p.isInstanceOf[Publication])
     val result: Result = items.head.asInstanceOf[Publication]
@@ -610,7 +618,7 @@ class CrossrefMappingTest {
       .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/doiboost/crossref/article.json"))
       .mkString
 
-    val resultList: List[Oaf] = Crossref2Oaf.convert(template)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(template, vocabularies)
     assertTrue(resultList.nonEmpty)
     val items = resultList.filter(p => p.isInstanceOf[Publication])
     val result: Result = items.head.asInstanceOf[Publication]
@@ -634,14 +642,13 @@ class CrossrefMappingTest {
     assertNotNull(json)
     assertFalse(json.isEmpty);
 
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
 
     assertTrue(resultList.nonEmpty)
 
     val item: Result = resultList.filter(p => p.isInstanceOf[Result]).head.asInstanceOf[Result]
 
-    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
-    println(mapper.writeValueAsString(item))
+    println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(item))
 
     assertTrue(
       item.getInstance().asScala exists (i => i.getLicense.getValue.equals("https://www.springer.com/vor"))
@@ -664,7 +671,7 @@ class CrossrefMappingTest {
     assertNotNull(json)
     assertFalse(json.isEmpty);
 
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
 
     assertTrue(resultList.nonEmpty)
 
@@ -681,8 +688,8 @@ class CrossrefMappingTest {
     assertTrue(
       item.getInstance().asScala exists (i => i.getAccessright.getOpenAccessRoute == OpenAccessRoute.hybrid)
     )
-    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
-    println(mapper.writeValueAsString(item))
+
+    println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(item))
 
   }
 
@@ -699,7 +706,7 @@ class CrossrefMappingTest {
     assertNotNull(json)
     assertFalse(json.isEmpty);
 
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
 
     assertTrue(resultList.nonEmpty)
 
@@ -716,8 +723,7 @@ class CrossrefMappingTest {
     assertTrue(
       item.getInstance().asScala exists (i => i.getAccessright.getOpenAccessRoute == OpenAccessRoute.hybrid)
     )
-    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
-    println(mapper.writeValueAsString(item))
+    println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(item))
 
   }
 
@@ -734,7 +740,7 @@ class CrossrefMappingTest {
     assertNotNull(json)
     assertFalse(json.isEmpty);
 
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
 
     assertTrue(resultList.nonEmpty)
 
@@ -751,8 +757,7 @@ class CrossrefMappingTest {
       item.getInstance().asScala exists (i => i.getAccessright.getClassid.equals("EMBARGO"))
     )
     assertTrue(item.getInstance().asScala exists (i => i.getAccessright.getOpenAccessRoute == null))
-    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
-    println(mapper.writeValueAsString(item))
+    println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(item))
 
   }
 
@@ -769,7 +774,7 @@ class CrossrefMappingTest {
     assertNotNull(json)
     assertFalse(json.isEmpty);
 
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
 
     assertTrue(resultList.nonEmpty)
 
@@ -786,8 +791,8 @@ class CrossrefMappingTest {
       item.getInstance().asScala exists (i => i.getAccessright.getClassid.equals("EMBARGO"))
     )
     assertTrue(item.getInstance().asScala exists (i => i.getAccessright.getOpenAccessRoute == null))
-    mapper.getSerializationConfig.enable(SerializationConfig.Feature.INDENT_OUTPUT)
-    println(mapper.writeValueAsString(item))
+
+    println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(item))
 
   }
 
@@ -802,7 +807,7 @@ class CrossrefMappingTest {
     assertNotNull(json)
     assertFalse(json.isEmpty);
 
-    val resultList: List[Oaf] = Crossref2Oaf.convert(json)
+    val resultList: List[Oaf] = Crossref2Oaf.convert(json, vocabularies)
 
     assertTrue(resultList.nonEmpty)
 
@@ -812,9 +817,8 @@ class CrossrefMappingTest {
     assertEquals(1, item.getInstance().get(0).getUrl().size())
     assertEquals(
       "https://doi.org/10.1016/j.jas.2019.105013",
-      item.getInstance().get(0).getUrl().get(0)
+      item.getInstance().get(0).getUrl.get(0)
     )
-    //println(mapper.writeValueAsString(item))
 
   }
 
