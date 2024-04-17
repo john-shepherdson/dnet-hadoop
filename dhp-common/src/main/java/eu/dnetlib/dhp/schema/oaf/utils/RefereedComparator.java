@@ -4,7 +4,6 @@ package eu.dnetlib.dhp.schema.oaf.utils;
 import java.util.Comparator;
 
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 /**
  * Comparator for sorting the values from the dnet:review_levels vocabulary, implements the following ordering
@@ -15,9 +14,17 @@ public class RefereedComparator implements Comparator<Qualifier> {
 
 	@Override
 	public int compare(Qualifier left, Qualifier right) {
+		if (left == null || left.getClassid() == null) {
+			return (right == null || right.getClassid() == null) ? 0 : -1;
+		} else if (right == null || right.getClassid() == null) {
+			return 1;
+		}
 
 		String lClass = left.getClassid();
 		String rClass = right.getClassid();
+
+		if (lClass.equals(rClass))
+			return 0;
 
 		if ("0001".equals(lClass))
 			return -1;

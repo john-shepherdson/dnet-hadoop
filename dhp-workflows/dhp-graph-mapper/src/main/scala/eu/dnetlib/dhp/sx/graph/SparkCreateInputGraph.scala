@@ -8,6 +8,8 @@ import org.apache.spark.SparkConf
 import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
 
+import scala.collection.JavaConverters._
+
 object SparkCreateInputGraph {
 
   def main(args: Array[String]): Unit = {
@@ -131,8 +133,9 @@ object SparkCreateInputGraph {
     val ds: Dataset[T] = spark.read.load(sourcePath).as[T]
 
     ds.groupByKey(_.getId)
-      .reduceGroups { (x: T, y: T) => MergeUtils.merge(x, y).asInstanceOf[T] }
-      .map(_._2)
+      .mapGroups { (id, it) => MergeUtils.mergeGroup(id, it.asJava).asInstanceOf[T] }
+//      .reduceGroups { (x: T, y: T) => MergeUtils.merge(x, y).asInstanceOf[T] }
+//      .map(_)
       .write
       .mode(SaveMode.Overwrite)
       .save(targetPath)
