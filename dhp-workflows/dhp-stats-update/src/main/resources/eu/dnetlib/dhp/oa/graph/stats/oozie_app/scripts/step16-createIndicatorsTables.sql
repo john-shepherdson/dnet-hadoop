@@ -335,8 +335,8 @@ select ar.organization, rf.no_result_fair/ar.no_allresults org_fairness
 from allresults ar
          join result_fair rf on rf.organization=ar.organization; /*EOS*/
 
-DROP VIEW result_fair;
-DROP VIEW allresults;
+DROP VIEW result_fair; /*EOS*/
+DROP VIEW allresults; /*EOS*/
 
 CREATE TEMPORARY VIEW result_fair as
     select year, ro.organization organization, count(distinct ro.id) no_result_fair from ${stats_db_name}.result_organization ro
@@ -1006,7 +1006,7 @@ left outer join ${stats_db_name}.organization o on o.id=ro.organization
 left outer join ${stats_db_name}.result_projects rp on rp.id=ro.id
 left outer join ${stats_db_name}.project p on p.id=rp.project
 left outer join ${stats_db_name}.funder f on f.name=p.funder
-where coalesce(o.country, f.country) IS NOT NULL;
+where coalesce(o.country, f.country) IS NOT NULL; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_result_oa_with_license purge; /*EOS*/
 create table ${stats_db_name}.indi_result_oa_with_license stored as parquet as
