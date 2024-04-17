@@ -171,8 +171,7 @@
             <arg>--stats_db_name</arg><arg>${stats_db_name}</arg>
             <arg>--openaire_db_name</arg><arg>${openaire_db_name}</arg>
         </spark>
-<!--        <ok to="Step2"/>-->
-        <ok to="End"/>
+        <ok to="Step2"/>
         <error to="Kill"/>
     </action>
 
@@ -304,7 +303,8 @@
             <arg>--stats_db_name</arg><arg>${stats_db_name}</arg>
             <arg>--openaire_db_name</arg><arg>${openaire_db_name}</arg>
         </spark>
-        <ok to="Step8"/>
+<!--        <ok to="Step8"/>-->
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 
@@ -369,6 +369,7 @@
             <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step10.sql</arg>
             <arg>--stats_db_name</arg><arg>${stats_db_name}</arg>
             <arg>--openaire_db_name</arg><arg>${openaire_db_name}</arg>
+            <arg>--external_stats_db_name</arg><arg>${external_stats_db_name}</arg>
         </spark>
         <ok to="Step11"/>
         <error to="Kill"/>
@@ -391,6 +392,7 @@
             <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step11.sql</arg>
             <arg>--stats_db_name</arg><arg>${stats_db_name}</arg>
             <arg>--openaire_db_name</arg><arg>${openaire_db_name}</arg>
+            <arg>--external_stats_db_name</arg><arg>${external_stats_db_name}</arg>
         </spark>
         <ok to="Step12"/>
         <error to="Kill"/>
@@ -501,6 +503,7 @@
             <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step15_5.sql</arg>
             <arg>--stats_db_name</arg><arg>${stats_db_name}</arg>
             <arg>--openaire_db_name</arg><arg>${openaire_db_name}</arg>
+            <arg>--external_stats_db_name</arg><arg>${external_stats_db_name}</arg>
         </spark>
         <ok to="Contexts"/>
         <error to="Kill"/>
@@ -672,7 +675,7 @@
             <arg>--hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step21-createObservatoryDB.sql</arg>
             <arg>--stats_db_name</arg><arg>${stats_db_name}</arg>
-            <arg>--openaire_db_name</arg><arg>${openaire_db_name}</arg>
+            <arg>--observatory_db_name</arg><arg>${observatory_db_name}</arg>
         </spark>
         <ok to="step21-createObservatoryDB-post"/>
         <error to="Kill"/>

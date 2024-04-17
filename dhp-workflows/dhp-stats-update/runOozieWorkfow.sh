@@ -17,4 +17,4 @@ cat ./target/extract-and-run-on-remote-host.log
 # oozie job -oozie http://iis-cdh5-test-m3:11000/oozie -info <workflow-ID>
 
 # Get the <job-ID> from the previous output and check the logs:
-# yarn logs -applicationId <job-ID>
+# yarn logs -applicationId application_<job-ID>
