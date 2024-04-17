@@ -1000,7 +1000,7 @@ left outer join (
 drop table if exists ${stats_db_name}.result_country purge; /*EOS*/
 
 create table ${stats_db_name}.result_country stored as parquet as
-select distinct ro.id, coalesce(o.country, f.country)
+select distinct ro.id, coalesce(o.country, f.country) as country
 from ${stats_db_name}.result_organization ro
 left outer join ${stats_db_name}.organization o on o.id=ro.organization
 left outer join ${stats_db_name}.result_projects rp on rp.id=ro.id
