@@ -130,10 +130,12 @@ public class GenerateEntitiesApplication extends AbstractMigrationApplication {
 		switch (mode) {
 			case claim:
 				save(
-					inputRdd
-						.mapToPair(oaf -> new Tuple2<>(ModelSupport.idFn().apply(oaf), oaf))
-						.reduceByKey(MergeUtils::merge)
-						.map(Tuple2::_2),
+					inputRdd.keyBy(oaf -> ModelSupport.idFn().apply(oaf))
+							.groupByKey()
+							.map(t -> MergeUtils.mergeGroup(t._1, t._2.iterator())),
+						//.mapToPair(oaf -> new Tuple2<>(ModelSupport.idFn().apply(oaf), oaf))
+						//.reduceByKey(MergeUtils::merge)
+						//.map(Tuple2::_2),
 					targetPath);
 				break;
 			case graph:
