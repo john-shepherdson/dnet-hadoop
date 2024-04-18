@@ -6,7 +6,7 @@
 DROP TABLE IF EXISTS ${stats_db_name}.organization purge; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.organization STORED AS PARQUET AS
-SELECT substr(o.id, 4)        as id,
+SELECT /*+ COALESCE(100) */ substr(o.id, 4)        as id,
        o.legalname.value      as name,
        o.legalshortname.value as legalshortname,
        o.country.classid      as country

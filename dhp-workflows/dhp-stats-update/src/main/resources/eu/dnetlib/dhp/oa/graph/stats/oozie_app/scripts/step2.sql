@@ -44,7 +44,7 @@ where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EO
 DROP TABLE IF EXISTS ${stats_db_name}.publication_classifications purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.publication_classifications STORED AS PARQUET AS
-SELECT substr(p.id, 4) as id, instancetype.classname as type
+SELECT /*+ COALESCE(100) */ substr(p.id, 4) as id, instancetype.classname as type
 from ${openaire_db_name}.publication p
          LATERAL VIEW explode(p.instance.instancetype) instances as instancetype
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
@@ -52,7 +52,7 @@ where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EO
 DROP TABLE IF EXISTS ${stats_db_name}.publication_concepts purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.publication_concepts STORED AS PARQUET AS
-SELECT substr(p.id, 4) as id, case
+SELECT /*+ COALESCE(100) */ substr(p.id, 4) as id, case
     when contexts.context.id RLIKE '^[^::]+::[^::]+::.+$' then contexts.context.id
     when contexts.context.id RLIKE '^[^::]+::[^::]+$' then concat(contexts.context.id, '::other')
     when contexts.context.id RLIKE '^[^::]+$' then concat(contexts.context.id, '::other::other') END as concept
@@ -63,7 +63,7 @@ where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EO
 DROP TABLE IF EXISTS ${stats_db_name}.publication_datasources purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.publication_datasources STORED AS PARQUET as
-SELECT p.id, case when d.id is null then 'other' else p.datasource end as datasource
+SELECT /*+ COALESCE(100) */ p.id, case when d.id is null then 'other' else p.datasource end as datasource
 FROM (
          SELECT substr(p.id, 4) as id, substr(instances.instance.hostedby.key, 4) as datasource
          from ${openaire_db_name}.publication p lateral view explode(p.instance) instances as instance
@@ -76,14 +76,14 @@ FROM (
 DROP TABLE IF EXISTS ${stats_db_name}.publication_languages purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.publication_languages STORED AS PARQUET AS
-select substr(p.id, 4) as id, p.language.classname as language
+select /*+ COALESCE(100) */ substr(p.id, 4) as id, p.language.classname as language
 FROM ${openaire_db_name}.publication p
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.publication_oids purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.publication_oids STORED AS PARQUET AS
-SELECT substr(p.id, 4) AS id, oids.ids AS oid
+SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, oids.ids AS oid
 FROM ${openaire_db_name}.publication p
          LATERAL VIEW explode(p.originalid) oids AS ids
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
@@ -91,7 +91,7 @@ where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EO
 DROP TABLE IF EXISTS ${stats_db_name}.publication_pids purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.publication_pids STORED AS PARQUET AS
-SELECT substr(p.id, 4) AS id, ppid.qualifier.classname AS type, ppid.value as pid
+SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, ppid.qualifier.classname AS type, ppid.value as pid
 FROM ${openaire_db_name}.publication p
          LATERAL VIEW explode(p.pid) pids AS ppid
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
@@ -99,7 +99,7 @@ where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EO
 DROP TABLE IF EXISTS ${stats_db_name}.publication_topics purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.publication_topics STORED AS PARQUET as
-select substr(p.id, 4) AS id, subjects.subject.qualifier.classname AS TYPE, subjects.subject.value AS topic
+select /*+ COALESCE(100) */ substr(p.id, 4) AS id, subjects.subject.qualifier.classname AS TYPE, subjects.subject.value AS topic
 FROM ${openaire_db_name}.publication p
          LATERAL VIEW explode(p.subject) subjects AS subject
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
@@ -107,7 +107,7 @@ where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EO
 DROP TABLE IF EXISTS ${stats_db_name}.publication_citations purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.publication_citations STORED AS PARQUET AS
-SELECT substr(p.id, 4) AS id, xpath_string(citation.value, "//citation/id[@type='openaire']/@value") AS cites
+SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, xpath_string(citation.value, "//citation/id[@type='openaire']/@value") AS cites
 FROM ${openaire_db_name}.publication p
          lateral view explode(p.extrainfo) citations AS citation
 WHERE xpath_string(citation.value, "//citation/id[@type='openaire']/@value") != ""

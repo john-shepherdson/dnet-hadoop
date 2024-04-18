@@ -303,8 +303,7 @@
             <arg>--stats_db_name</arg><arg>${stats_db_name}</arg>
             <arg>--openaire_db_name</arg><arg>${openaire_db_name}</arg>
         </spark>
-<!--        <ok to="Step8"/>-->
-        <ok to="End"/>
+        <ok to="Step8"/>
         <error to="Kill"/>
     </action>
 
@@ -382,7 +381,8 @@
             <arg>--openaire_db_name</arg><arg>${openaire_db_name}</arg>
             <arg>--external_stats_db_name</arg><arg>${external_stats_db_name}</arg>
         </spark>
-        <ok to="Step11"/>
+<!--        <ok to="Step11"/>-->
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 

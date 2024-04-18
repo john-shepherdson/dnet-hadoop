@@ -130,7 +130,7 @@ with
     lvl1 as (select id, topic from ${stats_db_name}.result_topics where topic like '__ %' and type='Fields of Science and Technology classification'),
     lvl2 as (select id, topic from ${stats_db_name}.result_topics where topic like '____ %' and type='Fields of Science and Technology classification'),
     lvl3 as (select id, topic from ${stats_db_name}.result_topics where topic like '______ %' and type='Fields of Science and Technology classification')
-select lvl1.id, lvl1.topic as lvl1, lvl2.topic as lvl2, lvl3.topic as lvl3
+select /*+ COALESCE(100) */ lvl1.id, lvl1.topic as lvl1, lvl2.topic as lvl2, lvl3.topic as lvl3
 from lvl1
  join lvl2 on lvl1.id=lvl2.id and substr(lvl2.topic, 1, 2)=substr(lvl1.topic, 1, 2)
  join lvl3 on lvl3.id=lvl1.id and substr(lvl3.topic, 1, 4)=substr(lvl2.topic, 1, 4); /*EOS*/
@@ -138,7 +138,7 @@ from lvl1
 DROP TABLE IF EXISTS ${stats_db_name}.result_organization purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.result_organization STORED AS PARQUET AS
-SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS organization
+SELECT /*+ COALESCE(100) */ substr(r.target, 4) AS id, substr(r.source, 4) AS organization
 FROM ${openaire_db_name}.relation r
 WHERE r.reltype = 'resultOrganization'
   and r.target like '50|%'
@@ -147,8 +147,7 @@ WHERE r.reltype = 'resultOrganization'
 DROP TABLE IF EXISTS ${stats_db_name}.result_projects purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.result_projects STORED AS PARQUET AS
-select pr.result AS id, pr.id AS project, datediff(p.enddate, p.startdate) AS daysfromend, pr.provenance as provenance
+select /*+ COALESCE(100) */ pr.result AS id, pr.id AS project, datediff(p.enddate, p.startdate) AS daysfromend, pr.provenance as provenance
 FROM ${stats_db_name}.result r
          JOIN ${stats_db_name}.project_results pr ON r.id = pr.result
          JOIN ${stats_db_name}.project_tmp p ON p.id = pr.id; /*EOS*/
-

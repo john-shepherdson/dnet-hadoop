@@ -6,14 +6,14 @@
 DROP TABLE IF EXISTS ${stats_db_name}.project_oids purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.project_oids STORED AS PARQUET AS
-SELECT substr(p.id, 4) AS id, oids.ids AS oid
+SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, oids.ids AS oid
 FROM ${openaire_db_name}.project p LATERAL VIEW explode(p.originalid) oids AS ids
 where p.datainfo.deletedbyinference=false  and p.datainfo.invisible=false; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.project_organizations purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.project_organizations STORED AS PARQUET AS
-SELECT substr(r.source, 4) AS id, substr(r.target, 4) AS organization
+SELECT /*+ COALESCE(100) */ substr(r.source, 4) AS id, substr(r.target, 4) AS organization
 from ${openaire_db_name}.relation r
 WHERE r.reltype = 'projectOrganization' and r.source like '40|%'
   and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false; /*EOS*/
@@ -21,7 +21,7 @@ WHERE r.reltype = 'projectOrganization' and r.source like '40|%'
 DROP TABLE IF EXISTS ${stats_db_name}.project_results purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.project_results STORED AS PARQUET AS
-SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS result, r.datainfo.provenanceaction.classname as provenance
+SELECT /*+ COALESCE(100) */ substr(r.target, 4) AS id, substr(r.source, 4) AS result, r.datainfo.provenanceaction.classname as provenance
 FROM ${openaire_db_name}.relation r
 WHERE r.reltype = 'resultProject' and r.target like '40|%'
   and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false; /*EOS*/
@@ -29,7 +29,7 @@ WHERE r.reltype = 'resultProject' and r.target like '40|%'
 DROP TABLE IF EXISTS ${stats_db_name}.project_classification purge; /*EOS*/
 
 create table ${stats_db_name}.project_classification STORED AS PARQUET as
-select substr(p.id, 4) as id, class.h2020programme.code, class.level1, class.level2, class.level3
+select /*+ COALESCE(100) */ substr(p.id, 4) as id, class.h2020programme.code, class.level1, class.level2, class.level3
 from ${openaire_db_name}.project p
     lateral view explode(p.h2020classification) classifs as class
 where p.datainfo.deletedbyinference=false and p.datainfo.invisible=false and class.h2020programme is not null; /*EOS*/
@@ -93,7 +93,7 @@ WHERE p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EO
 DROP TABLE IF EXISTS ${stats_db_name}.funder purge; /*EOS*/
 
 create table ${stats_db_name}.funder STORED AS PARQUET as
-select distinct xpath_string(fund, '//funder/id')        as id,
+select /*+ COALESCE(100) */ distinct xpath_string(fund, '//funder/id')        as id,
                 xpath_string(fund, '//funder/name')      as name,
                 xpath_string(fund, '//funder/shortname') as shortname,
                 xpath_string(fundingtree[0].value, '//funder/jurisdiction') as country
@@ -102,7 +102,7 @@ from ${openaire_db_name}.project p lateral view explode(p.fundingtree.value) fun
 DROP TABLE IF EXISTS ${stats_db_name}.project_organization_contribution purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.project_organization_contribution STORED AS PARQUET AS
-SELECT distinct substr(r.source, 4) AS project, substr(r.target, 4) AS organization,
+SELECT /*+ COALESCE(100) */ distinct substr(r.source, 4) AS project, substr(r.target, 4) AS organization,
 properties[0].value contribution, properties[1].value currency
 from ${openaire_db_name}.relation r
 LATERAL VIEW explode (r.properties) properties
