@@ -22,7 +22,6 @@ CREATE TABLE ${stats_db_name}.datasource_tmp
     `compatibility`    STRING,
     issn_printed       STRING,
     issn_online        STRING
-) CLUSTERED BY (id) INTO 100 buckets stored AS orc tblproperties ('transactional' = 'true'); /*EOS*/
 ) CLUSTERED BY (id) INTO 100 buckets stored AS orc tblproperties ('transactional' = 'true'); -- /*EOS*/
 
 -- Insert statement that takes into account the piwik_id of the openAIRE graph
