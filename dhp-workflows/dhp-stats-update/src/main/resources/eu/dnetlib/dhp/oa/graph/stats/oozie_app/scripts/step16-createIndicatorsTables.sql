@@ -247,7 +247,9 @@ create table if not exists ${stats_db_name}.indi_pub_gold_oa stored as parquet a
             select pd.id, 1 as is_gold
             FROM ${stats_db_name}.publication_datasources pd
             left semi join dd on dd.id=pd.datasource
-            left outer join ${stats_db_name}.result_accessroute ra on ra.id = pd.id where ra.accessroute = 'gold') tmp on tmp.id=pd.id; /*EOS*/
+            union all
+            select ra.id, 1 as is_gold
+            from ${stats_db_name}.result_accessroute ra on ra.id = pd.id where ra.accessroute = 'gold') tmp on tmp.id=pd.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_pub_hybrid_oa_with_cc purge; /*EOS*/
 create table if not exists ${stats_db_name}.indi_pub_hybrid_oa_with_cc stored as parquet as
