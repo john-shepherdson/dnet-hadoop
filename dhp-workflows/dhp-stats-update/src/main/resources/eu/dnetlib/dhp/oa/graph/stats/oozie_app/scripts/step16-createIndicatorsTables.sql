@@ -237,16 +237,16 @@ create table if not exists ${stats_db_name}.indi_pub_gold_oa stored as parquet a
             UNION ALL
             select id, issn_online as issn from ${stats_db_name}.datasource d where d.id like '%doajarticles%'
             UNION ALL
-            select id, issn_printed as issn from ${stats_db_name}.datasource d join gold_oa on gold_oa.issn=d.issn_printed
+            select id, issn_printed as issn from ${stats_db_name}.datasource d left semi join gold_oa on gold_oa.issn=d.issn_printed
             UNION ALL
-            select id, issn_online as issn from ${stats_db_name}.datasource d join gold_oa on gold_oa.issn=d.issn_online) foo
+            select id, issn_online as issn from ${stats_db_name}.datasource d left semi join gold_oa on gold_oa.issn=d.issn_online) foo
     )
     SELECT DISTINCT pd.id, coalesce(is_gold, 0) as is_gold
     FROM ${stats_db_name}.publication_datasources pd
     left outer join (
             select pd.id, 1 as is_gold
             FROM ${stats_db_name}.publication_datasources pd
-            join dd on dd.id=pd.datasource
+            left semi join dd on dd.id=pd.datasource
             left outer join ${stats_db_name}.result_accessroute ra on ra.id = pd.id where ra.accessroute = 'gold') tmp on tmp.id=pd.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_pub_hybrid_oa_with_cc purge; /*EOS*/
@@ -335,8 +335,8 @@ select ar.organization, rf.no_result_fair/ar.no_allresults org_fairness
 from allresults ar
          join result_fair rf on rf.organization=ar.organization; /*EOS*/
 
-DROP VIEW result_fair;
-DROP VIEW allresults;
+DROP VIEW result_fair; /*EOS*/
+DROP VIEW allresults; /*EOS*/
 
 CREATE TEMPORARY VIEW result_fair as
     select year, ro.organization organization, count(distinct ro.id) no_result_fair from ${stats_db_name}.result_organization ro
@@ -1000,13 +1000,18 @@ left outer join (
 drop table if exists ${stats_db_name}.result_country purge; /*EOS*/
 
 create table ${stats_db_name}.result_country stored as parquet as
-select distinct ro.id, coalesce(o.country, f.country)
-from ${stats_db_name}.result_organization ro
-left outer join ${stats_db_name}.organization o on o.id=ro.organization
-left outer join ${stats_db_name}.result_projects rp on rp.id=ro.id
-left outer join ${stats_db_name}.project p on p.id=rp.project
-left outer join ${stats_db_name}.funder f on f.name=p.funder
-where coalesce(o.country, f.country) IS NOT NULL;
+select distinct *
+from (
+    select ro.id, o.country
+    from ${stats_db_name}.result_organization ro
+    left outer join ${stats_db_name}.organization o on o.id=ro.organization
+    union all
+    select rp.id, f.country
+    from ${stats_db_name}.result_projects
+    left outer join ${stats_db_name}.project p on p.id=rp.project
+    left outer join ${stats_db_name}.funder f on f.name=p.funder
+     ) rc
+where rc.country is not null; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_result_oa_with_license purge; /*EOS*/
 create table ${stats_db_name}.indi_result_oa_with_license stored as parquet as
