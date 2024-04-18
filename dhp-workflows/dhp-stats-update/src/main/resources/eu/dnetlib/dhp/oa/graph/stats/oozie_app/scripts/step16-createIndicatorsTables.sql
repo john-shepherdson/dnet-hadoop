@@ -664,17 +664,18 @@ drop view pub_fos_totals; /*EOS*/
 drop table if exists ${stats_db_name}.indi_pub_bronze_oa purge; /*EOS*/
 
 create table ${stats_db_name}.indi_pub_bronze_oa stored as parquet as
-select distinct pd.id,coalesce(is_bronze_oa,0) is_bronze_oa from ${stats_db_name}.publication pd
-left outer join (select pd.id, 1 as is_bronze_oa from ${stats_db_name}.publication pd
-join ${stats_db_name}.result_instance ri on ri.id=pd.id
-join ${stats_db_name}.indi_pub_gold_oa indi_gold on indi_gold.id=pd.id
-join ${stats_db_name}.indi_pub_hybrid indi_hybrid on indi_hybrid.id=pd.id
-join ${stats_db_name}.result_accessroute ra on ra.id=pd.id
-join ${stats_db_name}.datasource d on d.id=ri.hostedby
-where indi_gold.is_gold=0 and indi_hybrid.is_hybrid=0
-and ((d.type like '%Journal%' and ri.accessright!='Closed Access'
-and ri.accessright!='Restricted' and ri.license is null) or ra.accessroute='bronze')) tmp
-on pd.id=tmp.id; /*EOS*/
+select distinct p.id,coalesce(is_bronze_oa,0) is_bronze_oa
+from ${stats_db_name}.publication p
+left outer join (
+    select p.id, 1 as is_bronze_oa
+    from ${stats_db_name}.publication p
+    join ${stats_db_name}.result_instance ri on ri.id=p.id
+    join ${stats_db_name}.datasource d on d.id=ri.hostedby
+    join ${stats_db_name}.indi_pub_gold_oa indi_gold on indi_gold.id=p.id
+    join ${stats_db_name}.indi_pub_hybrid indi_hybrid on indi_hybrid.id=p.id
+    left outer join ${stats_db_name}.result_accessroute ra on ra.id=p.id
+    where indi_gold.is_gold=0 and indi_hybrid.is_hybrid=0
+    and ((d.type like '%Journal%' and ri.accessright not in ('Closed Access', 'Restricted', 'Not Available') and ri.license is null) or ra.accessroute='bronze')) tmp on p.id=tmp.id; /*EOS*/
 
 CREATE TEMPORARY VIEW project_year_result_year as
 select p.id project_id, acronym, r.id result_id, r.year, p.end_year
