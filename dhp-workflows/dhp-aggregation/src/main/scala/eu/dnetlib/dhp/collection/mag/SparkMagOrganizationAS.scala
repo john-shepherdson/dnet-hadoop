@@ -3,6 +3,9 @@ package eu.dnetlib.dhp.collection.mag
 import eu.dnetlib.dhp.application.AbstractScalaApplication
 import eu.dnetlib.dhp.schema.action.AtomicAction
 import eu.dnetlib.dhp.schema.oaf.Organization
+import org.apache.hadoop.io.Text
+import org.apache.hadoop.io.compress.{BZip2Codec, GzipCodec}
+import org.apache.hadoop.mapred.SequenceFileOutputFormat
 import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -24,9 +27,18 @@ class SparkMagOrganizationAS (propertyPath: String, args: Array[String], log: Lo
   def generateAS(spark:SparkSession, magBasePath:String,outputPath:String  ):Unit = {
     import spark.implicits._
     val organizations = MagUtility.loadMagEntity(spark,"Affiliations", magBasePath)
-    organizations.map(r => MagUtility.generateOrganization(r)).write.mode(SaveMode.Overwrite)
-      .option("compression", "gzip")
-      .text(outputPath)
+    organizations
+      .map(r => MagUtility.generateOrganization(r))
+      .rdd
+      .map(s => (new Text(s._1), new Text(s._2)))
+      .filter(s => s!=null)
+      .saveAsHadoopFile(
+        outputPath,
+        classOf[Text],
+        classOf[Text],
+        classOf[SequenceFileOutputFormat[Text, Text]],
+        classOf[BZip2Codec]
+      )
   }
 }
 

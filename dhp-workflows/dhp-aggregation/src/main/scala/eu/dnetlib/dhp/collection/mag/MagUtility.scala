@@ -678,7 +678,7 @@ object MagUtility extends Serializable {
 
   }
 
-  def generateOrganization(r: Row): String = {
+  def generateOrganization(r: Row): (String,String) = {
 
     val o = new Organization
     val affId = s"20|mag_________::${DHPUtils.md5(r.getAs[Long]("AffiliationId").toString)}"
@@ -727,7 +727,7 @@ object MagUtility extends Serializable {
     val a = new AtomicAction[Organization]()
     a.setClazz(classOf[Organization])
     a.setPayload(o)
-    mapper.writeValueAsString(a)
+    (a.getClazz.getName,mapper.writeValueAsString(a))
   }
 
   def generateAffiliationRelations(paperAffiliation: Row): List[Relation] = {
