@@ -1000,13 +1000,18 @@ left outer join (
 drop table if exists ${stats_db_name}.result_country purge; /*EOS*/
 
 create table ${stats_db_name}.result_country stored as parquet as
-select distinct ro.id, coalesce(o.country, f.country) as country
-from ${stats_db_name}.result_organization ro
-left outer join ${stats_db_name}.organization o on o.id=ro.organization
-left outer join ${stats_db_name}.result_projects rp on rp.id=ro.id
-left outer join ${stats_db_name}.project p on p.id=rp.project
-left outer join ${stats_db_name}.funder f on f.name=p.funder
-where coalesce(o.country, f.country) IS NOT NULL; /*EOS*/
+select distinct *
+from (
+    select ro.id, o.country
+    from ${stats_db_name}.result_organization ro
+    left outer join ${stats_db_name}.organization o on o.id=ro.organization
+    union all
+    select rp.id, f.country
+    from ${stats_db_name}.result_projects
+    left outer join ${stats_db_name}.project p on p.id=rp.project
+    left outer join ${stats_db_name}.funder f on f.name=p.funder
+     ) rc
+where rc.country is not null; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_result_oa_with_license purge; /*EOS*/
 create table ${stats_db_name}.indi_result_oa_with_license stored as parquet as
