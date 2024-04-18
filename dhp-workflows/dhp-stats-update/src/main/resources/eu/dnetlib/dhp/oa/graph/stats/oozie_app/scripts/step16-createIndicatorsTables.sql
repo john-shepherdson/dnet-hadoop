@@ -282,14 +282,17 @@ create table if not exists ${stats_db_name}.indi_pub_hybrid_oa_with_cc stored as
 
 drop table if exists ${stats_db_name}.indi_pub_hybrid purge; /*EOS*/
 create table if not exists ${stats_db_name}.indi_pub_hybrid stored as parquet as
-select distinct pd.id,coalesce(is_hybrid,0) is_hybrid from ${stats_db_name}.publication pd
+select distinct p.id, coalesce(is_hybrid, 0) is_hybrid
+from ${stats_db_name}.publication p
 left outer join (
-    select pd.id, 1 as is_hybrid from ${stats_db_name}.publication pd
-    join ${stats_db_name}.result_instance ri on ri.id=pd.id
-    join ${stats_db_name}.indi_pub_gold_oa indi_gold on indi_gold.id=pd.id
-    join ${stats_db_name}.result_accessroute ra on ra.id=pd.id
+    select p.id, 1 as is_hybrid
+    from ${stats_db_name}.publication p
+    join ${stats_db_name}.result_instance ri on ri.id=p.id
     join ${stats_db_name}.datasource d on d.id=ri.hostedby
-    where indi_gold.is_gold=0 and ((d.type like '%Journal%' and ri.accessright!='Closed Access' and ri.accessright!='Restricted' and ri.license is not null) or ra.accessroute='hybrid')) tmp on pd.id=tmp.id; /*EOS*/
+    join ${stats_db_name}.indi_pub_gold_oa indi_gold on indi_gold.id=p.id
+    left outer join ${stats_db_name}.result_accessroute ra on ra.id=p.id
+    where indi_gold.is_gold=0 and
+          ((d.type like '%Journal%' and ri.accessright not in ('Closed Access', 'Restricted', 'Not Available') and ri.license is not null) or ra.accessroute='hybrid')) tmp on pd.i=tmp.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_org_fairness purge; /*EOS*/
 create table if not exists ${stats_db_name}.indi_org_fairness stored as parquet as
