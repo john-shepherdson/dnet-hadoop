@@ -308,7 +308,7 @@
         <error to="Kill"/>
     </action>
 
-    <action name="Step8">
+<!--    <action name="Step8">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -316,16 +316,27 @@
             <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
             <jar>dhp-stats-update-${projectVersion}.jar</jar>
             <spark-opts>
-                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                &#45;&#45;conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
             </spark-opts>
-            <arg>--hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step8.sql</arg>
-            <arg>--stats_db_name</arg><arg>${stats_db_name}</arg>
-            <arg>--openaire_db_name</arg><arg>${openaire_db_name}</arg>
+            <arg>&#45;&#45;hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>&#45;&#45;sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step8.sql</arg>
+            <arg>&#45;&#45;stats_db_name</arg><arg>${stats_db_name}</arg>
+            <arg>&#45;&#45;openaire_db_name</arg><arg>${openaire_db_name}</arg>
         </spark>
+        <ok to="Step9"/>
+        <error to="Kill"/>
+    </action>-->
+
+    <action name="Step8">
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
+            <jdbc-url>${hive_jdbc_url}</jdbc-url>
+            <script>scripts/step8.sql</script>
+            <param>stats_db_name=${stats_db_name}</param>
+            <param>openaire_db_name=${openaire_db_name}</param>
+        </hive2>
         <ok to="Step9"/>
         <error to="Kill"/>
     </action>
@@ -375,7 +386,7 @@
         <error to="Kill"/>
     </action>
 
-    <action name="Step11">
+<!--    <action name="Step11">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
@@ -383,17 +394,29 @@
             <class>eu.dnetlib.dhp.oozie.RunSQLSparkJob</class>
             <jar>dhp-stats-update-${projectVersion}.jar</jar>
             <spark-opts>
-                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                &#45;&#45;conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
             </spark-opts>
-            <arg>--hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
-            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step11.sql</arg>
-            <arg>--stats_db_name</arg><arg>${stats_db_name}</arg>
-            <arg>--openaire_db_name</arg><arg>${openaire_db_name}</arg>
-            <arg>--external_stats_db_name</arg><arg>${external_stats_db_name}</arg>
+            <arg>&#45;&#45;hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
+            <arg>&#45;&#45;sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step11.sql</arg>
+            <arg>&#45;&#45;stats_db_name</arg><arg>${stats_db_name}</arg>
+            <arg>&#45;&#45;openaire_db_name</arg><arg>${openaire_db_name}</arg>
+            <arg>&#45;&#45;external_stats_db_name</arg><arg>${external_stats_db_name}</arg>
         </spark>
+        <ok to="Step12"/>
+        <error to="Kill"/>
+    </action>-->
+
+    <action name="Step11">
+        <hive2 xmlns="uri:oozie:hive2-action:0.1">
+            <jdbc-url>${hive_jdbc_url}</jdbc-url>
+            <script>scripts/step11.sql</script>
+            <param>stats_db_name=${stats_db_name}</param>
+            <param>openaire_db_name=${openaire_db_name}</param>
+            <param>external_stats_db_name=${external_stats_db_name}</param>
+        </hive2>
         <ok to="Step12"/>
         <error to="Kill"/>
     </action>
