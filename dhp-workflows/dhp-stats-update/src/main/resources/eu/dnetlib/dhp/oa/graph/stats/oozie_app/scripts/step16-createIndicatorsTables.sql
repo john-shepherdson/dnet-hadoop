@@ -242,12 +242,14 @@ create table if not exists ${stats_db_name}.indi_pub_gold_oa stored as parquet a
             select id, issn_online as issn from ${stats_db_name}.datasource d join gold_oa on gold_oa.issn=d.issn_online) foo
     )
     SELECT DISTINCT pd.id, coalesce(is_gold, 0) as is_gold
-    FROM ${stats_db_name}.publication_datasources pd
+    FROM ${stats_db_name}.publication pd
     left outer join (
             select pd.id, 1 as is_gold
             FROM ${stats_db_name}.publication_datasources pd
-            join dd on dd.id=pd.datasource
-            left outer join ${stats_db_name}.result_accessroute ra on ra.id = pd.id where ra.accessroute = 'gold') tmp on tmp.id=pd.id; /*EOS*/
+            left semi join dd on dd.id=pd.datasource
+            union all
+            select ra.id, 1 as is_gold
+            from ${stats_db_name}.result_accessroute ra on ra.id = pd.id where ra.accessroute = 'gold') tmp on tmp.id=pd.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_pub_hybrid_oa_with_cc purge; /*EOS*/
 create table if not exists ${stats_db_name}.indi_pub_hybrid_oa_with_cc stored as parquet as
@@ -282,14 +284,17 @@ create table if not exists ${stats_db_name}.indi_pub_hybrid_oa_with_cc stored as
 
 drop table if exists ${stats_db_name}.indi_pub_hybrid purge; /*EOS*/
 create table if not exists ${stats_db_name}.indi_pub_hybrid stored as parquet as
-select distinct pd.id,coalesce(is_hybrid,0) is_hybrid from ${stats_db_name}.publication pd
+select distinct p.id, coalesce(is_hybrid, 0) is_hybrid
+from ${stats_db_name}.publication p
 left outer join (
-    select pd.id, 1 as is_hybrid from ${stats_db_name}.publication pd
-    join ${stats_db_name}.result_instance ri on ri.id=pd.id
-    join ${stats_db_name}.indi_pub_gold_oa indi_gold on indi_gold.id=pd.id
-    join ${stats_db_name}.result_accessroute ra on ra.id=pd.id
+    select p.id, 1 as is_hybrid
+    from ${stats_db_name}.publication p
+    join ${stats_db_name}.result_instance ri on ri.id=p.id
     join ${stats_db_name}.datasource d on d.id=ri.hostedby
-    where indi_gold.is_gold=0 and ((d.type like '%Journal%' and ri.accessright!='Closed Access' and ri.accessright!='Restricted' and ri.license is not null) or ra.accessroute='hybrid')) tmp on pd.id=tmp.id; /*EOS*/
+    join ${stats_db_name}.indi_pub_gold_oa indi_gold on indi_gold.id=p.id
+    left outer join ${stats_db_name}.result_accessroute ra on ra.id=p.id
+    where indi_gold.is_gold=0 and
+          ((d.type like '%Journal%' and ri.accessright not in ('Closed Access', 'Restricted', 'Not Available') and ri.license is not null) or ra.accessroute='hybrid')) tmp on pd.i=tmp.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_org_fairness purge; /*EOS*/
 create table if not exists ${stats_db_name}.indi_org_fairness stored as parquet as
@@ -661,17 +666,18 @@ drop view pub_fos_totals; /*EOS*/
 drop table if exists ${stats_db_name}.indi_pub_bronze_oa purge; /*EOS*/
 
 create table ${stats_db_name}.indi_pub_bronze_oa stored as parquet as
-select distinct pd.id,coalesce(is_bronze_oa,0) is_bronze_oa from ${stats_db_name}.publication pd
-left outer join (select pd.id, 1 as is_bronze_oa from ${stats_db_name}.publication pd
-join ${stats_db_name}.result_instance ri on ri.id=pd.id
-join ${stats_db_name}.indi_pub_gold_oa indi_gold on indi_gold.id=pd.id
-join ${stats_db_name}.indi_pub_hybrid indi_hybrid on indi_hybrid.id=pd.id
-join ${stats_db_name}.result_accessroute ra on ra.id=pd.id
-join ${stats_db_name}.datasource d on d.id=ri.hostedby
-where indi_gold.is_gold=0 and indi_hybrid.is_hybrid=0
-and ((d.type like '%Journal%' and ri.accessright!='Closed Access'
-and ri.accessright!='Restricted' and ri.license is null) or ra.accessroute='bronze')) tmp
-on pd.id=tmp.id; /*EOS*/
+select distinct p.id,coalesce(is_bronze_oa,0) is_bronze_oa
+from ${stats_db_name}.publication p
+left outer join (
+    select p.id, 1 as is_bronze_oa
+    from ${stats_db_name}.publication p
+    join ${stats_db_name}.result_instance ri on ri.id=p.id
+    join ${stats_db_name}.datasource d on d.id=ri.hostedby
+    join ${stats_db_name}.indi_pub_gold_oa indi_gold on indi_gold.id=p.id
+    join ${stats_db_name}.indi_pub_hybrid indi_hybrid on indi_hybrid.id=p.id
+    left outer join ${stats_db_name}.result_accessroute ra on ra.id=p.id
+    where indi_gold.is_gold=0 and indi_hybrid.is_hybrid=0
+    and ((d.type like '%Journal%' and ri.accessright not in ('Closed Access', 'Restricted', 'Not Available') and ri.license is null) or ra.accessroute='bronze')) tmp on p.id=tmp.id; /*EOS*/
 
 CREATE TEMPORARY VIEW project_year_result_year as
 select p.id project_id, acronym, r.id result_id, r.year, p.end_year
@@ -1002,13 +1008,18 @@ left outer join (
 drop table if exists ${stats_db_name}.result_country purge; /*EOS*/
 
 create table ${stats_db_name}.result_country stored as parquet as
-select distinct ro.id, coalesce(o.country, f.country)
-from ${stats_db_name}.result_organization ro
-left outer join ${stats_db_name}.organization o on o.id=ro.organization
-left outer join ${stats_db_name}.result_projects rp on rp.id=ro.id
-left outer join ${stats_db_name}.project p on p.id=rp.project
-left outer join ${stats_db_name}.funder f on f.name=p.funder
-where coalesce(o.country, f.country) IS NOT NULL;
+select distinct *
+from (
+    select ro.id, o.country
+    from ${stats_db_name}.result_organization ro
+    left outer join ${stats_db_name}.organization o on o.id=ro.organization
+    union all
+    select rp.id, f.country
+    from ${stats_db_name}.result_projects
+    left outer join ${stats_db_name}.project p on p.id=rp.project
+    left outer join ${stats_db_name}.funder f on f.name=p.funder
+     ) rc
+where rc.country is not null; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_result_oa_with_license purge; /*EOS*/
 create table ${stats_db_name}.indi_result_oa_with_license stored as parquet as
