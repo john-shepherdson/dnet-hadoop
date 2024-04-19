@@ -16,5 +16,11 @@
     "paramLongName": "contextApiBaseUrl",
     "paramDescription": "URL of the context API",
     "paramRequired": true
+  },
+  {
+    "paramName": "isu",
+    "paramLongName": "isLookupUrl",
+    "paramDescription": "URL of the context ISLookup Service",
+    "paramRequired": true
   }
 ]

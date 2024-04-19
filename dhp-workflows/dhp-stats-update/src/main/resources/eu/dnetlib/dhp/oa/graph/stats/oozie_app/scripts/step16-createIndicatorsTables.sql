@@ -237,9 +237,9 @@ create table if not exists ${stats_db_name}.indi_pub_gold_oa stored as parquet a
             UNION ALL
             select id, issn_online as issn from ${stats_db_name}.datasource d where d.id like '%doajarticles%'
             UNION ALL
-            select id, issn_printed as issn from ${stats_db_name}.datasource d join gold_oa on gold_oa.issn=d.issn_printed
+            select id, issn_printed as issn from ${stats_db_name}.datasource d left semi join gold_oa on gold_oa.issn=d.issn_printed
             UNION ALL
-            select id, issn_online as issn from ${stats_db_name}.datasource d join gold_oa on gold_oa.issn=d.issn_online) foo
+            select id, issn_online as issn from ${stats_db_name}.datasource d left semi join gold_oa on gold_oa.issn=d.issn_online) foo
     )
     SELECT DISTINCT pd.id, coalesce(is_gold, 0) as is_gold
     FROM ${stats_db_name}.publication pd
@@ -340,8 +340,8 @@ select ar.organization, rf.no_result_fair/ar.no_allresults org_fairness
 from allresults ar
          join result_fair rf on rf.organization=ar.organization; /*EOS*/
 
-DROP VIEW result_fair;
-DROP VIEW allresults;
+DROP VIEW result_fair; /*EOS*/
+DROP VIEW allresults; /*EOS*/
 
 CREATE TEMPORARY VIEW result_fair as
     select year, ro.organization organization, count(distinct ro.id) no_result_fair from ${stats_db_name}.result_organization ro

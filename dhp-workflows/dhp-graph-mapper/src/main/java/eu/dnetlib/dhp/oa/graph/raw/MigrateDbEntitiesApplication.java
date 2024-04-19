@@ -317,7 +317,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 					listKeyValues(
 						createOpenaireId(10, rs.getString("collectedfromid"), true),
 						rs.getString("collectedfromname")));
-			p.setPid(new ArrayList<>());
+			p.setPid(prepareListOfStructProps(rs.getArray("pid"), info));
 			p.setDateofcollection(asString(rs.getDate("dateofcollection")));
 			p.setDateoftransformation(asString(rs.getDate("dateoftransformation")));
 			p.setExtraInfo(new ArrayList<>()); // Values not present in the DB

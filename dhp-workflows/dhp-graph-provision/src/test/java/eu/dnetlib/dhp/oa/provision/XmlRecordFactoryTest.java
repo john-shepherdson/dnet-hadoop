@@ -42,7 +42,7 @@ public class XmlRecordFactoryTest {
 		final Publication p = OBJECT_MAPPER
 			.readValue(IOUtils.toString(getClass().getResourceAsStream("publication.json")), Publication.class);
 
-		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
+		final String xml = xmlRecordFactory.build(new JoinedEntity(p));
 
 		assertNotNull(xml);
 
@@ -117,7 +117,7 @@ public class XmlRecordFactoryTest {
 		final List<RelatedEntityWrapper> links = Lists.newArrayList();
 		final RelatedEntityWrapper rew = new RelatedEntityWrapper(rel, relatedProject);
 		links.add(rew);
-		final JoinedEntity je = new JoinedEntity<>(p);
+		final JoinedEntity je = new JoinedEntity(p);
 		je.setLinks(links);
 
 		final String xml = xmlRecordFactory.build(je);
@@ -148,7 +148,7 @@ public class XmlRecordFactoryTest {
 		final List<RelatedEntityWrapper> links = Lists.newArrayList();
 		final RelatedEntityWrapper rew = new RelatedEntityWrapper(rel, relatedProject);
 		links.add(rew);
-		final JoinedEntity je = new JoinedEntity<>(p);
+		final JoinedEntity je = new JoinedEntity(p);
 		je.setLinks(links);
 
 		final String xml = xmlRecordFactory.build(je);
@@ -171,7 +171,7 @@ public class XmlRecordFactoryTest {
 		final Datasource d = OBJECT_MAPPER
 			.readValue(IOUtils.toString(getClass().getResourceAsStream("datasource.json")), Datasource.class);
 
-		final String xml = xmlRecordFactory.build(new JoinedEntity<>(d));
+		final String xml = xmlRecordFactory.build(new JoinedEntity(d));
 
 		assertNotNull(xml);
 
@@ -210,7 +210,7 @@ public class XmlRecordFactoryTest {
 				IOUtils.toString(getClass().getResourceAsStream("d4science-1-training.json")),
 				OtherResearchProduct.class);
 
-		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
+		final String xml = xmlRecordFactory.build(new JoinedEntity(p));
 
 		assertNotNull(xml);
 
@@ -233,7 +233,30 @@ public class XmlRecordFactoryTest {
 				IOUtils.toString(getClass().getResourceAsStream("d4science-2-dataset.json")),
 				OtherResearchProduct.class);
 
-		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
+		final String xml = xmlRecordFactory.build(new JoinedEntity(p));
+
+		assertNotNull(xml);
+
+		final Document doc = new SAXReader().read(new StringReader(xml));
+
+		assertNotNull(doc);
+		System.out.println(doc.asXML());
+
+	}
+
+	@Test
+	public void testIrisGuidelines4() throws DocumentException, IOException {
+		final ContextMapper contextMapper = new ContextMapper();
+
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+			XmlConverterJob.schemaLocation);
+
+		final Publication p = OBJECT_MAPPER
+			.readValue(
+				IOUtils.toString(getClass().getResourceAsStream("iris-odf-4.json")),
+				Publication.class);
+
+		final String xml = xmlRecordFactory.build(new JoinedEntity(p));
 
 		assertNotNull(xml);
 
