@@ -380,7 +380,7 @@ CREATE TEMPORARY VIEW allresults as
 
 drop table if exists ${stats_db_name}.indi_org_fairness_pub purge; /*EOS*/
 
-create table if not exists ${stats_db_name}.indi_org_fairness_pub as
+create table if not exists ${stats_db_name}.indi_org_fairness_pub stored as parquet as
 select ar.organization, rf.no_result_fair/ar.no_allresults org_fairness
 from allresults ar join result_fair rf
 on rf.organization=ar.organization; /*EOS*/
@@ -639,7 +639,7 @@ from ${stats_db_name}.publication p
 
 drop table if exists ${stats_db_name}.indi_result_with_pid purge; /*EOS*/
 
-create table if not exists ${stats_db_name}.indi_result_with_pid as
+create table if not exists ${stats_db_name}.indi_result_with_pid stored as parquet as
 select distinct p.id, coalesce(result_with_pid, 0) as result_with_pid
 from ${stats_db_name}.result p
          left outer join (
@@ -653,7 +653,7 @@ group by rf.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_pub_interdisciplinarity purge; /*EOS*/
 
-create table if not exists ${stats_db_name}.indi_pub_interdisciplinarity as
+create table if not exists ${stats_db_name}.indi_pub_interdisciplinarity stored as parquet as
 select distinct p.id as id, coalesce(is_interdisciplinary, 0)
 as is_interdisciplinary
 from pub_fos_totals p
