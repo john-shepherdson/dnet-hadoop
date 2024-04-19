@@ -164,7 +164,7 @@
 
 		<dependency>
 			<groupId>eu.dnetlib.dhp</groupId>
-			<artifactId>${dhp-schemas.artifact}</artifactId>
+			<artifactId>dhp-schemas</artifactId>
 		</dependency>
 
 		<dependency>

@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.dedup;
 
 import static org.apache.spark.sql.functions.col;
 
+import eu.dnetlib.pace.util.SparkCompatUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -147,7 +148,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 		StructType idsSchema = StructType
 			.fromDDL("`id` STRING, `dataInfo` STRUCT<`deletedbyinference`:BOOLEAN,`invisible`:BOOLEAN>");
 
-		Dataset<Row> allIds = spark.emptyDataset(RowEncoder.apply(idsSchema));
+		Dataset<Row> allIds = spark.emptyDataset(SparkCompatUtils.encoderFor(idsSchema));
 
 		for (EntityType entityType : ModelSupport.entityTypes.keySet()) {
 			String entityPath = graphBasePath + '/' + entityType.name();
