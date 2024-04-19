@@ -3,7 +3,6 @@ package eu.dnetlib.dhp.oa.dedup;
 
 import static org.apache.spark.sql.functions.col;
 
-import eu.dnetlib.pace.util.SparkCompatUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
@@ -23,6 +22,7 @@ import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import eu.dnetlib.pace.util.SparkCompatUtils;
 import scala.Tuple2;
 import scala.Tuple3;
 
