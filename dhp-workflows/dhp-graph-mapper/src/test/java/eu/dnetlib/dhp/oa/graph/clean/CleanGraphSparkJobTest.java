@@ -691,6 +691,38 @@ public class CleanGraphSparkJobTest {
 	}
 
 	@Test
+	void testClean_ORP() throws Exception {
+		final String prefix = "gcube ";
+
+		new CleanGraphSparkJob(
+			args(
+				"/eu/dnetlib/dhp/oa/graph/input_clean_graph_parameters.json",
+				new String[] {
+					"--inputPath", graphInputPath + "/orp",
+					"--outputPath", graphOutputPath + "/orp",
+					"--isLookupUrl", "lookupurl",
+					"--graphTableClassName", OtherResearchProduct.class.getCanonicalName(),
+					"--deepClean", "true",
+					"--contextId", "sobigdata",
+					"--verifyParam", "gCube ",
+					"--masterDuplicatePath", dsMasterDuplicatePath,
+					"--country", "NL",
+					"--verifyCountryParam", "10.17632",
+					"--collectedfrom", "NARCIS",
+					"--hostedBy", Objects
+						.requireNonNull(
+							getClass()
+								.getResource("/eu/dnetlib/dhp/oa/graph/clean/hostedBy"))
+						.getPath()
+				})).run(false, isLookUpService);
+
+		Dataset<OtherResearchProduct> orp = read(spark, graphOutputPath + "/orp", OtherResearchProduct.class);
+
+		assertEquals(1, orp.count());
+
+	}
+
+	@Test
 	void testCleanCfHbSparkJob() throws Exception {
 
 		final Dataset<Publication> pubs_in = read(spark, graphInputPath + "/publication", Publication.class);

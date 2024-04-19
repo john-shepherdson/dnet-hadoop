@@ -16,7 +16,7 @@ public class LastNameFirstInitial extends AbstractClusteringFunction {
 
 	private boolean DEFAULT_AGGRESSIVE = true;
 
-	public LastNameFirstInitial(final Map<String, Integer> params) {
+	public LastNameFirstInitial(final Map<String, Object> params) {
 		super(params);
 	}
 
@@ -25,7 +25,7 @@ public class LastNameFirstInitial extends AbstractClusteringFunction {
 		return fields
 			.stream()
 			.filter(f -> !f.isEmpty())
-			.map(this::normalize)
+			.map(LastNameFirstInitial::normalize)
 			.map(s -> doApply(conf, s))
 			.map(c -> filterBlacklisted(c, ngramBlacklist))
 			.flatMap(c -> c.stream())
@@ -33,8 +33,7 @@ public class LastNameFirstInitial extends AbstractClusteringFunction {
 			.collect(Collectors.toCollection(HashSet::new));
 	}
 
-	@Override
-	protected String normalize(final String s) {
+	public static String normalize(final String s) {
 		return fixAliases(transliterate(nfd(unicodeNormalization(s))))
 			// do not compact the regexes in a single expression, would cause StackOverflowError in case of large input
 			// strings

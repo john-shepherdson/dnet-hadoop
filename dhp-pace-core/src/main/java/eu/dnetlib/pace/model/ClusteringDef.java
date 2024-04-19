@@ -18,7 +18,7 @@ public class ClusteringDef implements Serializable {
 
 	private List<String> fields;
 
-	private Map<String, Integer> params;
+	private Map<String, Object> params;
 
 	public ClusteringDef() {
 	}
@@ -43,11 +43,11 @@ public class ClusteringDef implements Serializable {
 		this.fields = fields;
 	}
 
-	public Map<String, Integer> getParams() {
+	public Map<String, Object> getParams() {
 		return params;
 	}
 
-	public void setParams(final Map<String, Integer> params) {
+	public void setParams(final Map<String, Object> params) {
 		this.params = params;
 	}
 

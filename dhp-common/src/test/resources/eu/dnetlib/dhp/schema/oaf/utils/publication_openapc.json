@@ -1,0 +1,31 @@
+{
+  "id": "50|openapc_____::000023f9cb6e3a247c764daec4273cbc",
+  "resuttype": {
+    "classid": "publication"
+  },
+  "instance": [
+    {
+      "collectedfrom": {
+        "key": "10|apc_________::e2b1600b229fc30663c8a1f662debddf",
+        "value": "OpenAPC Global Initiative"
+      },
+      "pid": [
+        {
+          "qualifier": {"classid": "doi"},
+          "value": "10.1016/j.cmet.2010.03.013"
+        },
+        {
+          "qualifier": {"classid": "pmc"},
+          "value": "21459329"
+        },
+        {
+          "qualifier": {"classid": "pmid"},
+          "value": "25811027"
+        }
+      ],
+      "url":["https://doi.org/10.1155/2015/439379"]
+    }
+  ]
+}
+
+

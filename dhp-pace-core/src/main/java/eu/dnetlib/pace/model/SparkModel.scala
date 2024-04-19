@@ -1,12 +1,16 @@
 package eu.dnetlib.pace.model
 
 import com.jayway.jsonpath.{Configuration, JsonPath}
+import eu.dnetlib.pace.common.AbstractPaceFunctions
 import eu.dnetlib.pace.config.{DedupConfig, Type}
-import eu.dnetlib.pace.util.{MapDocumentUtil, SparkCompatUtils}
-import org.apache.spark.sql.{Dataset, Row}
+import eu.dnetlib.pace.util.MapDocumentUtil
+import org.apache.commons.lang3.StringUtils
+import org.apache.spark.sql.catalyst.encoders.RowEncoder
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
 import org.apache.spark.sql.types.{DataTypes, Metadata, StructField, StructType}
+import org.apache.spark.sql.{Dataset, Row}
 
+import java.util.Locale
 import java.util.regex.Pattern
 import scala.collection.JavaConverters._
 
@@ -47,8 +51,8 @@ case class SparkModel(conf: DedupConfig) {
 
   val orderingFieldPosition: Int = schema.fieldIndex(orderingFieldName)
 
-   val parseJsonDataset: (Dataset[String] => Dataset[Row]) = df => {
-    df.map(r => rowFromJson(r))(SparkCompatUtils.encoderFor(schema))
+  val parseJsonDataset: (Dataset[String] => Dataset[Row]) = df => {
+    df.map(r => rowFromJson(r))(RowEncoder(schema))
   }
 
   def rowFromJson(json: String): Row = {
@@ -59,7 +63,7 @@ case class SparkModel(conf: DedupConfig) {
     values(identityFieldPosition) = MapDocumentUtil.getJPathString(conf.getWf.getIdPath, documentContext)
 
     schema.fieldNames.zipWithIndex.foldLeft(values) {
-      case ((res, (fname, index))) => {
+      case ((res, (fname, index))) =>
         val fdef = conf.getPace.getModelMap.get(fname)
 
         if (fdef != null) {
@@ -95,13 +99,52 @@ case class SparkModel(conf: DedupConfig) {
             case Type.DoubleArray =>
               MapDocumentUtil.getJPathArray(fdef.getPath, json)
           }
+
+          val filter = fdef.getFilter
+
+          if (StringUtils.isNotBlank(fdef.getClean)) {
+            res(index) = res(index) match {
+              case x: Seq[String] => x.map(clean(_, fdef.getClean)).toSeq
+              case _ => clean(res(index).toString, fdef.getClean)
+            }
+          }
+
+          if (filter != null && !filter.isEmpty) {
+            res(index) = res(index) match {
+              case x: String if filter.contains(x.toLowerCase(Locale.ROOT)) => null
+              case x: Seq[String] => x.filter(s => !filter.contains(s.toLowerCase(Locale.ROOT))).toSeq
+              case _ => res(index)
+            }
+          }
+
+          if (fdef.getSorted) {
+            res(index) = res(index) match {
+              case x: Seq[String] => x.sorted.toSeq
+              case _ => res(index)
+            }
+          }
         }
 
         res
-      }
     }
 
     new GenericRowWithSchema(values, schema)
   }
+
+  def clean(value: String, cleantype: String) : String = {
+    val res = cleantype match {
+      case "title" => AbstractPaceFunctions.cleanup(value)
+      case _ => value
+    }
+
+//    if (!res.equals(AbstractPaceFunctions.normalize(value))) {
+//      println(res)
+//      println(AbstractPaceFunctions.normalize(value))
+//      println()
+//    }
+
+    res
+  }
+
 }
 

@@ -63,7 +63,7 @@ public class IndexRecordTransformerTest {
 		final Project pj = load("project.json", Project.class);
 		final Relation rel = load("relToValidatedProject.json", Relation.class);
 
-		final JoinedEntity je = new JoinedEntity<>(p);
+		final JoinedEntity je = new JoinedEntity(p);
 		je
 			.setLinks(
 				Lists
@@ -79,6 +79,22 @@ public class IndexRecordTransformerTest {
 	}
 
 	@Test
+	void testPeerReviewed() throws IOException, TransformerException {
+
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+			XmlConverterJob.schemaLocation);
+
+		final Publication p = load("publication.json", Publication.class);
+
+		final JoinedEntity je = new JoinedEntity(p);
+		final String record = xmlRecordFactory.build(je);
+		assertNotNull(record);
+		SolrInputDocument solrDoc = testRecordTransformation(record);
+
+		assertEquals("true", solrDoc.get("peerreviewed").getValue());
+	}
+
+	@Test
 	public void testRiunet() throws IOException, TransformerException {
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
@@ -86,7 +102,7 @@ public class IndexRecordTransformerTest {
 
 		final Publication p = load("riunet.json", Publication.class);
 
-		final JoinedEntity je = new JoinedEntity<>(p);
+		final JoinedEntity je = new JoinedEntity(p);
 		final String record = xmlRecordFactory.build(je);
 		assertNotNull(record);
 		testRecordTransformation(record);
@@ -184,7 +200,7 @@ public class IndexRecordTransformerTest {
 		}
 	}
 
-	private void testRecordTransformation(final String record) throws IOException, TransformerException {
+	private SolrInputDocument testRecordTransformation(final String record) throws IOException, TransformerException {
 		final String fields = IOUtils.toString(getClass().getResourceAsStream("fields.xml"));
 		final String xslt = IOUtils.toString(getClass().getResourceAsStream("layoutToRecordTransformer.xsl"));
 
@@ -200,6 +216,8 @@ public class IndexRecordTransformerTest {
 
 		Assertions.assertNotNull(xmlDoc);
 		System.out.println(xmlDoc);
+
+		return solrDoc;
 	}
 
 	private <T> T load(final String fileName, final Class<T> clazz) throws IOException {

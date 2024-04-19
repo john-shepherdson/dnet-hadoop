@@ -90,6 +90,7 @@
             <arg>--outputPath</arg><arg>${outputPath}</arg>
             <arg>--usagestatsdb</arg><arg>${usagestatsdb}</arg>
             <arg>--workingPath</arg><arg>${workingDir}</arg>
+            <arg>--datasourcePath</arg><arg>${datasourcePath}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

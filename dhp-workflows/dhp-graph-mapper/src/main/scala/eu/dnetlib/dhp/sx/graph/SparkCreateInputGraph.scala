@@ -1,11 +1,14 @@
 package eu.dnetlib.dhp.sx.graph
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils
 import eu.dnetlib.dhp.schema.oaf.{Dataset => OafDataset, _}
 import org.apache.commons.io.IOUtils
 import org.apache.spark.SparkConf
 import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
+
+import scala.collection.JavaConverters._
 
 object SparkCreateInputGraph {
 
@@ -130,11 +133,9 @@ object SparkCreateInputGraph {
     val ds: Dataset[T] = spark.read.load(sourcePath).as[T]
 
     ds.groupByKey(_.getId)
-      .reduceGroups { (x: T, y: T) =>
-        x.mergeFrom(y)
-        x
-      }
-      .map(_._2)
+      .mapGroups { (id, it) => MergeUtils.mergeGroup(id, it.asJava).asInstanceOf[T] }
+//      .reduceGroups { (x: T, y: T) => MergeUtils.merge(x, y).asInstanceOf[T] }
+//      .map(_)
       .write
       .mode(SaveMode.Overwrite)
       .save(targetPath)

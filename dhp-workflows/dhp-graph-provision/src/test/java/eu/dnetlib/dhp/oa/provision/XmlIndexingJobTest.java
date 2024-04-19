@@ -1,31 +1,32 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.URI;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.io.Text;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
-import org.dom4j.io.SAXReader;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import eu.dnetlib.dhp.oa.provision.model.SerializableSolrInputDocument;
+import eu.dnetlib.dhp.oa.provision.model.TupleWrapper;
 import eu.dnetlib.dhp.oa.provision.utils.ISLookupClient;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -66,6 +67,7 @@ public class XmlIndexingJobTest extends SolrTest {
 
 		SparkConf conf = new SparkConf();
 		conf.setAppName(XmlIndexingJobTest.class.getSimpleName());
+
 		conf.registerKryoClasses(new Class[] {
 			SerializableSolrInputDocument.class
 		});
@@ -93,56 +95,68 @@ public class XmlIndexingJobTest extends SolrTest {
 
 		String inputPath = "src/test/resources/eu/dnetlib/dhp/oa/provision/xml";
 
-		long nRecord = JavaSparkContext
-			.fromSparkContext(spark.sparkContext())
-			.sequenceFile(inputPath, Text.class, Text.class)
-			.count();
+		Dataset<TupleWrapper> records = spark
+			.read()
+			.schema(Encoders.bean(TupleWrapper.class).schema())
+			.json(inputPath)
+			.as(Encoders.bean(TupleWrapper.class));
 
-		new XmlIndexingJob(spark, inputPath, FORMAT, batchSize, XmlIndexingJob.OutputFormat.SOLR, null)
-			.run(isLookupClient);
+		long nRecord = records.count();
 
-		Assertions.assertEquals(0, miniCluster.getSolrClient().commit().getStatus());
+		new XmlIndexingJob(spark, inputPath, FORMAT, batchSize).run(isLookupClient);
+
+		assertEquals(0, miniCluster.getSolrClient().commit().getStatus());
 
 		QueryResponse rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "*:*"));
 
-		Assertions
-			.assertEquals(
-				nRecord, rsp.getResults().getNumFound(),
-				"the number of indexed records should be equal to the number of input records");
-	}
+		assertEquals(
+			nRecord, rsp.getResults().getNumFound(),
+			"the number of indexed records should be equal to the number of input records");
 
-	@Test
-	void testXmlIndexingJob_saveOnHDFS() throws Exception {
-		final String ID_XPATH = "//header/*[local-name()='objIdentifier']";
+		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "isgreen:true"));
+		assertEquals(
+			0, rsp.getResults().getNumFound(),
+			"the number of indexed records having isgreen = true");
 
-		String inputPath = "src/test/resources/eu/dnetlib/dhp/oa/provision/xml";
+		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "openaccesscolor:bronze"));
+		assertEquals(
+			0, rsp.getResults().getNumFound(),
+			"the number of indexed records having openaccesscolor = bronze");
 
-		final JavaPairRDD<Text, Text> xmlRecords = JavaSparkContext
-			.fromSparkContext(spark.sparkContext())
-			.sequenceFile(inputPath, Text.class, Text.class);
-		long nRecord = xmlRecords.count();
-		long xmlIdUnique = xmlRecords
-			.map(t -> t._2().toString())
-			.map(s -> new SAXReader().read(new StringReader(s)).valueOf(ID_XPATH))
-			.distinct()
-			.count();
-		Assertions.assertEquals(nRecord, xmlIdUnique, "IDs should be unique among input records");
+		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "isindiamondjournal:true"));
+		assertEquals(
+			0, rsp.getResults().getNumFound(),
+			"the number of indexed records having isindiamondjournal = true");
 
-		final String outputPath = workingDir.resolve("outputPath").toAbsolutePath().toString();
-		new XmlIndexingJob(spark, inputPath, FORMAT, batchSize, XmlIndexingJob.OutputFormat.HDFS, outputPath)
-			.run(isLookupClient);
+		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "publiclyfunded:true"));
+		assertEquals(
+			0, rsp.getResults().getNumFound(),
+			"the number of indexed records having publiclyfunded = true");
 
-		final Dataset<SerializableSolrInputDocument> solrDocs = spark
-			.read()
-			.load(outputPath)
-			.as(Encoders.kryo(SerializableSolrInputDocument.class));
-		long docIdUnique = solrDocs.map((MapFunction<SerializableSolrInputDocument, String>) doc -> {
-			final SolrInputField id = doc.getField("__indexrecordidentifier");
-			return id.getFirstValue().toString();
-		}, Encoders.STRING())
-			.distinct()
-			.count();
-		Assertions.assertEquals(xmlIdUnique, docIdUnique, "IDs should be unique among the output records");
+		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "peerreviewed:true"));
+		assertEquals(
+			0, rsp.getResults().getNumFound(),
+			"the number of indexed records having peerreviewed = true");
+
+		rsp = miniCluster
+			.getSolrClient()
+			.query(
+				new SolrQuery()
+					.add(CommonParams.Q, "objidentifier:\"iddesignpres::ae77e56e84ad058d9e7f19fa2f7325db\"")
+					.add(CommonParams.FL, "__json"));
+		assertEquals(
+			1, rsp.getResults().getNumFound(),
+			"the number of indexed records having the given identifier");
+		Optional<Object> json = rsp
+			.getResults()
+			.stream()
+			.map(d -> d.getFieldValues("__json"))
+			.flatMap(d -> d.stream())
+			.findFirst();
+
+		assertTrue(json.isPresent());
+
+		log.info((String) json.get());
 
 	}
 

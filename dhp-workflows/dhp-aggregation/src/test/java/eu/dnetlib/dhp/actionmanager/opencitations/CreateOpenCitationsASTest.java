@@ -76,7 +76,7 @@ public class CreateOpenCitationsASTest {
 
 		String inputPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/opencitations/COCI")
+				"/eu/dnetlib/dhp/actionmanager/opencitations/COCI/inputremap/jsonforas")
 			.getPath();
 
 		CreateActionSetSparkJob
@@ -84,8 +84,6 @@ public class CreateOpenCitationsASTest {
 				new String[] {
 					"-isSparkSessionManaged",
 					Boolean.FALSE.toString(),
-					"-shouldDuplicateRels",
-					Boolean.TRUE.toString(),
 					"-inputPath",
 					inputPath,
 					"-outputPath",
@@ -99,9 +97,10 @@ public class CreateOpenCitationsASTest {
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
-		assertEquals(31, tmp.count());
+		Assertions.assertEquals(27, tmp.count());
+		tmp.foreach(r -> Assertions.assertEquals(1, r.getCollectedfrom().size()));
 
-		// tmp.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
+		tmp.foreach(r -> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
 
 	}
 

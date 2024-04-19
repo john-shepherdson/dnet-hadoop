@@ -1,6 +1,7 @@
 
 package eu.dnetlib.dhp.oa.provision.utils;
 
+import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -32,13 +33,15 @@ import com.google.common.collect.Lists;
  *
  * @author claudio
  */
-public class StreamingInputDocumentFactory {
+public class StreamingInputDocumentFactory implements Serializable {
 
 	private static final String INDEX_FIELD_PREFIX = "__";
 
 	private static final String RESULT = "result";
 
 	private static final String INDEX_RESULT = INDEX_FIELD_PREFIX + RESULT;
+
+	private static final String INDEX_JSON_RESULT = INDEX_FIELD_PREFIX + "json";
 
 	private static final String INDEX_RECORD_ID = INDEX_FIELD_PREFIX + "indexrecordidentifier";
 
@@ -71,13 +74,17 @@ public class StreamingInputDocumentFactory {
 		this.resultName = resultName;
 	}
 
-	public SolrInputDocument parseDocument(final String inputDocument) {
+	public SolrInputDocument parseDocument(final String xml) {
+		return parseDocument(xml, "");
+	}
+
+	public SolrInputDocument parseDocument(final String xml, final String json) {
 
 		final StringWriter results = new StringWriter();
 		final List<Namespace> nsList = Lists.newLinkedList();
 		try {
 
-			XMLEventReader parser = inputFactory.get().createXMLEventReader(new StringReader(inputDocument));
+			XMLEventReader parser = inputFactory.get().createXMLEventReader(new StringReader(xml));
 
 			final SolrInputDocument indexDocument = new SolrInputDocument(new HashMap<>());
 
@@ -95,13 +102,13 @@ public class StreamingInputDocumentFactory {
 					} else if (TARGETFIELDS.equals(localName)) {
 						parseTargetFields(indexDocument, parser);
 					} else if (resultName.equals(localName)) {
-						copyResult(indexDocument, results, parser, nsList, resultName);
+						copyResult(indexDocument, json, results, parser, nsList, resultName);
 					}
 				}
 			}
 
 			if (!indexDocument.containsKey(INDEX_RECORD_ID)) {
-				throw new IllegalStateException("cannot extract record ID from: " + inputDocument);
+				throw new IllegalStateException("cannot extract record ID from: " + xml);
 			}
 
 			return indexDocument;
@@ -171,6 +178,7 @@ public class StreamingInputDocumentFactory {
 	 */
 	protected void copyResult(
 		final SolrInputDocument indexDocument,
+		final String json,
 		final StringWriter results,
 		final XMLEventReader parser,
 		final List<Namespace> nsList,
@@ -205,6 +213,7 @@ public class StreamingInputDocumentFactory {
 			}
 			writer.close();
 			indexDocument.addField(INDEX_RESULT, results.toString());
+			indexDocument.addField(INDEX_JSON_RESULT, json);
 		} finally {
 			outputFactory.remove();
 			eventFactory.remove();

@@ -24,12 +24,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.resulttocommunityfromorganization.ResultCommunityList;
-import eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import scala.Tuple2;
 
 /**
@@ -44,7 +43,7 @@ public class SparkResultToCommunityFromProject implements Serializable {
 			.toString(
 				SparkResultToCommunityFromProject.class
 					.getResourceAsStream(
-						"/eu/dnetlib/dhp/resulttocommunityfromproject/input_communitytoresult_parameters.json"));
+						"/eu/dnetlib/dhp/wf/subworkflows/resulttocommunityfromproject/input_communitytoresult_parameters.json"));
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
 
@@ -86,23 +85,30 @@ public class SparkResultToCommunityFromProject implements Serializable {
 		ModelSupport.entityTypes
 			.keySet()
 			.parallelStream()
+			.filter(e -> ModelSupport.isResult(e))
 			.forEach(e -> {
-				if (ModelSupport.isResult(e)) {
-					removeOutputDir(spark, outputPath + e.name());
-					Class<R> resultClazz = ModelSupport.entityTypes.get(e);
-					Dataset<R> result = readPath(spark, inputPath + e.name(), resultClazz);
+				// if () {
+				removeOutputDir(spark, outputPath + e.name());
+				Class<R> resultClazz = ModelSupport.entityTypes.get(e);
+				Dataset<R> result = readPath(spark, inputPath + e.name(), resultClazz);
 
-					result
-						.joinWith(
-							possibleUpdates,
-							result.col("id").equalTo(possibleUpdates.col("resultId")),
-							"left_outer")
-						.map(resultCommunityFn(), Encoders.bean(resultClazz))
-						.write()
-						.mode(SaveMode.Overwrite)
-						.option("compression", "gzip")
-						.json(outputPath + e.name());
-				}
+				result
+					.joinWith(
+						possibleUpdates,
+						result.col("id").equalTo(possibleUpdates.col("resultId")),
+						"left_outer")
+					.map(resultCommunityFn(), Encoders.bean(resultClazz))
+					.write()
+					.mode(SaveMode.Overwrite)
+					.option("compression", "gzip")
+					.json(outputPath + e.name());
+
+//				readPath(spark, outputPath + e.name(), resultClazz)
+//					.write()
+//					.mode(SaveMode.Overwrite)
+//					.option("compression", "gzip")
+//					.json(inputPath + e.name());
+				// }
 			});
 
 	}
@@ -155,7 +161,7 @@ public class SparkResultToCommunityFromProject implements Serializable {
 					}
 				}
 				res.setContext(propagatedContexts);
-				ret.mergeFrom(res);
+				return MergeUtils.checkedMerge(ret, res);
 			}
 			return ret;
 		};

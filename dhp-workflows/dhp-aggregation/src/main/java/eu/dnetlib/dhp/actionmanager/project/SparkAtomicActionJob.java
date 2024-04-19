@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProgramme;
 import eu.dnetlib.dhp.actionmanager.project.utils.model.CSVProject;
-import eu.dnetlib.dhp.actionmanager.project.utils.model.EXCELTopic;
 import eu.dnetlib.dhp.actionmanager.project.utils.model.JsonTopic;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
@@ -33,6 +32,7 @@ import eu.dnetlib.dhp.schema.oaf.H2020Classification;
 import eu.dnetlib.dhp.schema.oaf.H2020Programme;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Project;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
@@ -160,9 +160,11 @@ public class SparkAtomicActionJob {
 				(MapFunction<Project, String>) OafEntity::getId,
 				Encoders.STRING())
 			.mapGroups((MapGroupsFunction<String, Project, Project>) (s, it) -> {
-				Project first = it.next();
-				it.forEachRemaining(first::mergeFrom);
-				return first;
+				Project merge = it.next();
+				while (it.hasNext()) {
+					merge = MergeUtils.mergeProject(merge, it.next());
+				}
+				return merge;
 			}, Encoders.bean(Project.class))
 			.toJavaRDD()
 			.map(p -> new AtomicAction(Project.class, p))

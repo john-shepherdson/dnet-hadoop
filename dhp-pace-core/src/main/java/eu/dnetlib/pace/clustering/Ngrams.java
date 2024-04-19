@@ -10,11 +10,11 @@ public class Ngrams extends AbstractClusteringFunction {
 
 	private final boolean sorted;
 
-	public Ngrams(Map<String, Integer> params) {
+	public Ngrams(Map<String, Object> params) {
 		this(params, false);
 	}
 
-	public Ngrams(Map<String, Integer> params, boolean sorted) {
+	public Ngrams(Map<String, Object> params, boolean sorted) {
 		super(params);
 		this.sorted = sorted;
 	}

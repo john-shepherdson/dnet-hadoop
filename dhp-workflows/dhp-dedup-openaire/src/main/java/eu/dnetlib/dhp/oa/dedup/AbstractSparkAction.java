@@ -101,6 +101,10 @@ abstract class AbstractSparkAction implements Serializable {
 		return SparkSession.builder().config(conf).getOrCreate();
 	}
 
+	protected static SparkSession getSparkWithHiveSession(SparkConf conf) {
+		return SparkSession.builder().enableHiveSupport().config(conf).getOrCreate();
+	}
+
 	protected static <T> void save(Dataset<T> dataset, String outPath, SaveMode mode) {
 		dataset.write().option("compression", "gzip").mode(mode).json(outPath);
 	}

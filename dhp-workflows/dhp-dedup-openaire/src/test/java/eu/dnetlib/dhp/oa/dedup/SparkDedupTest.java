@@ -41,6 +41,7 @@ import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -48,6 +49,7 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SparkDedupTest implements Serializable {
+	static final boolean CHECK_CARDINALITIES = true;
 
 	@Mock(serializable = true)
 	ISLookUpService isLookUpService;
@@ -97,6 +99,7 @@ public class SparkDedupTest implements Serializable {
 
 		final SparkConf conf = new SparkConf();
 		conf.set("spark.sql.shuffle.partitions", "200");
+		conf.set("spark.sql.warehouse.dir", testOutputBasePath + "/spark-warehouse");
 		spark = SparkSession
 			.builder()
 			.appName(SparkDedupTest.class.getSimpleName())
@@ -186,12 +189,13 @@ public class SparkDedupTest implements Serializable {
 		System.out.println("ds_simrel = " + ds_simrel);
 		System.out.println("orp_simrel = " + orp_simrel);
 
-		assertEquals(1538, orgs_simrel);
-		assertEquals(3523, pubs_simrel);
-		assertEquals(168, sw_simrel);
-		assertEquals(221, ds_simrel);
-		assertEquals(3392, orp_simrel);
-
+		if (CHECK_CARDINALITIES) {
+			assertEquals(751, orgs_simrel);
+			assertEquals(566, pubs_simrel);
+			assertEquals(113, sw_simrel);
+			assertEquals(148, ds_simrel);
+			assertEquals(280, orp_simrel);
+		}
 	}
 
 	@Test
@@ -234,20 +238,25 @@ public class SparkDedupTest implements Serializable {
 			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "otherresearchproduct"))
 			.count();
 
-		// entities simrels supposed to be equal to the number of previous step (no rels in whitelist)
-		assertEquals(1538, orgs_simrel);
-		assertEquals(3523, pubs_simrel);
-		assertEquals(221, ds_simrel);
-		assertEquals(3392, orp_simrel);
-//		System.out.println("orgs_simrel = " + orgs_simrel);
-//		System.out.println("pubs_simrel = " + pubs_simrel);
-//		System.out.println("ds_simrel = " + ds_simrel);
-//		System.out.println("orp_simrel = " + orp_simrel);
-
 		// entities simrels to be different from the number of previous step (new simrels in the whitelist)
 		Dataset<Row> sw_simrel = spark
 			.read()
 			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "software"));
+
+		System.out.println("orgs_simrel = " + orgs_simrel);
+		System.out.println("pubs_simrel = " + pubs_simrel);
+		System.out.println("ds_simrel = " + ds_simrel);
+		System.out.println("orp_simrel = " + orp_simrel);
+		System.out.println("sw_simrel = " + sw_simrel.count());
+
+		// entities simrels supposed to be equal to the number of previous step (no rels in whitelist)
+		if (CHECK_CARDINALITIES) {
+			assertEquals(751, orgs_simrel);
+			assertEquals(566, pubs_simrel);
+			assertEquals(148, ds_simrel);
+			assertEquals(280, orp_simrel);
+			assertEquals(115, sw_simrel.count());
+		}
 
 		// check if the first relation in the whitelist exists
 		assertTrue(
@@ -267,10 +276,6 @@ public class SparkDedupTest implements Serializable {
 					rel -> rel.getSource().equalsIgnoreCase(whiteList.get(1).split(WHITELIST_SEPARATOR)[0])
 						&& rel.getTarget().equalsIgnoreCase(whiteList.get(1).split(WHITELIST_SEPARATOR)[1]))
 				.count() > 0);
-
-		assertEquals(170, sw_simrel.count());
-//		System.out.println("sw_simrel = " + sw_simrel.count());
-
 	}
 
 	@Test
@@ -292,7 +297,9 @@ public class SparkDedupTest implements Serializable {
 					"-w",
 					testOutputBasePath,
 					"-cc",
-					"3"
+					"3",
+					"-h",
+					""
 				});
 
 		new SparkCreateMergeRels(parser, spark).run(isLookUpService);
@@ -366,6 +373,115 @@ public class SparkDedupTest implements Serializable {
 	}
 
 	@Test
+	@Order(3)
+	void createMergeRelsWithPivotHistoryTest() throws Exception {
+
+		ArgumentApplicationParser parser = new ArgumentApplicationParser(
+			classPathResourceAsString("/eu/dnetlib/dhp/oa/dedup/createCC_parameters.json"));
+
+		spark.sql("CREATE DATABASE IF NOT EXISTS pivot_history_test");
+		ModelSupport.oafTypes.keySet().forEach(entityType -> {
+			try {
+				spark
+					.read()
+					.json(
+						Paths
+							.get(SparkDedupTest.class.getResource("/eu/dnetlib/dhp/dedup/pivot_history").toURI())
+							.toFile()
+							.getAbsolutePath())
+					.write()
+					.mode("overwrite")
+					.saveAsTable("pivot_history_test." + entityType);
+			} catch (URISyntaxException e) {
+				throw new RuntimeException(e);
+			}
+		});
+
+		parser
+			.parseArgument(
+				new String[] {
+					"-i",
+					testGraphBasePath,
+					"-asi",
+					testActionSetId,
+					"-la",
+					"lookupurl",
+					"-w",
+					testOutputBasePath,
+					"-h",
+					"",
+					"-pivotHistoryDatabase",
+					"pivot_history_test"
+
+				});
+
+		new SparkCreateMergeRels(parser, spark).run(isLookUpService);
+
+		long orgs_mergerel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel")
+			.count();
+		final Dataset<Relation> pubs = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/publication_mergerel")
+			.as(Encoders.bean(Relation.class));
+		long sw_mergerel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/software_mergerel")
+			.count();
+		long ds_mergerel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/dataset_mergerel")
+			.count();
+
+		long orp_mergerel = spark
+			.read()
+			.load(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_mergerel")
+			.count();
+
+		final List<Relation> merges = pubs
+			.filter("source == '50|arXiv_dedup_::c93aeb433eb90ed7a86e29be00791b7c'")
+			.collectAsList();
+		assertEquals(3, merges.size());
+		Set<String> dups = Sets
+			.newHashSet(
+				"50|doi_________::3b1d0d8e8f930826665df9d6b82fbb73",
+				"50|doi_________::d5021b53204e4fdeab6ff5d5bc468032",
+				"50|arXiv_______::c93aeb433eb90ed7a86e29be00791b7c");
+		merges.forEach(r -> {
+			assertEquals(ModelConstants.RESULT_RESULT, r.getRelType());
+			assertEquals(ModelConstants.DEDUP, r.getSubRelType());
+			assertEquals(ModelConstants.MERGES, r.getRelClass());
+			assertTrue(dups.contains(r.getTarget()));
+		});
+
+		final List<Relation> mergedIn = pubs
+			.filter("target == '50|arXiv_dedup_::c93aeb433eb90ed7a86e29be00791b7c'")
+			.collectAsList();
+		assertEquals(3, mergedIn.size());
+		mergedIn.forEach(r -> {
+			assertEquals(ModelConstants.RESULT_RESULT, r.getRelType());
+			assertEquals(ModelConstants.DEDUP, r.getSubRelType());
+			assertEquals(ModelConstants.IS_MERGED_IN, r.getRelClass());
+			assertTrue(dups.contains(r.getSource()));
+		});
+
+		System.out.println("orgs_mergerel = " + orgs_mergerel);
+		System.out.println("pubs_mergerel = " + pubs.count());
+		System.out.println("sw_mergerel = " + sw_mergerel);
+		System.out.println("ds_mergerel = " + ds_mergerel);
+		System.out.println("orp_mergerel = " + orp_mergerel);
+
+		if (CHECK_CARDINALITIES) {
+			assertEquals(1268, orgs_mergerel);
+			assertEquals(1156, pubs.count());
+			assertEquals(292, sw_mergerel);
+			assertEquals(476, ds_mergerel);
+			assertEquals(742, orp_mergerel);
+		}
+	}
+
+	@Test
 	@Order(4)
 	void createMergeRelsTest() throws Exception {
 
@@ -382,7 +498,9 @@ public class SparkDedupTest implements Serializable {
 					"-la",
 					"lookupurl",
 					"-w",
-					testOutputBasePath
+					testOutputBasePath,
+					"-h",
+					""
 				});
 
 		new SparkCreateMergeRels(parser, spark).run(isLookUpService);
@@ -436,17 +554,19 @@ public class SparkDedupTest implements Serializable {
 			assertTrue(dups.contains(r.getSource()));
 		});
 
-		assertEquals(1268, orgs_mergerel);
-		assertEquals(1450, pubs.count());
-		assertEquals(286, sw_mergerel);
-		assertEquals(472, ds_mergerel);
-		assertEquals(738, orp_mergerel);
-//		System.out.println("orgs_mergerel = " + orgs_mergerel);
-//		System.out.println("pubs_mergerel = " + pubs_mergerel);
-//		System.out.println("sw_mergerel = " + sw_mergerel);
-//		System.out.println("ds_mergerel = " + ds_mergerel);
-//		System.out.println("orp_mergerel = " + orp_mergerel);
+		System.out.println("orgs_mergerel = " + orgs_mergerel);
+		System.out.println("pubs_mergerel = " + pubs.count());
+		System.out.println("sw_mergerel = " + sw_mergerel);
+		System.out.println("ds_mergerel = " + ds_mergerel);
+		System.out.println("orp_mergerel = " + orp_mergerel);
 
+		if (CHECK_CARDINALITIES) {
+			assertEquals(1268, orgs_mergerel);
+			assertEquals(1156, pubs.count());
+			assertEquals(292, sw_mergerel);
+			assertEquals(476, ds_mergerel);
+			assertEquals(742, orp_mergerel);
+		}
 	}
 
 	@Test
@@ -491,19 +611,21 @@ public class SparkDedupTest implements Serializable {
 				testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_deduprecord")
 			.count();
 
-		assertEquals(86, orgs_deduprecord);
-		assertEquals(68, pubs.count());
-		assertEquals(49, sw_deduprecord);
-		assertEquals(97, ds_deduprecord);
-		assertEquals(92, orp_deduprecord);
+		System.out.println("orgs_deduprecord = " + orgs_deduprecord);
+		System.out.println("pubs_deduprecord = " + pubs.count());
+		System.out.println("sw_deduprecord = " + sw_deduprecord);
+		System.out.println("ds_deduprecord = " + ds_deduprecord);
+		System.out.println("orp_deduprecord = " + orp_deduprecord);
+
+		if (CHECK_CARDINALITIES) {
+			assertEquals(86, orgs_deduprecord);
+			assertEquals(96, pubs.count());
+			assertEquals(47, sw_deduprecord);
+			assertEquals(97, ds_deduprecord);
+			assertEquals(92, orp_deduprecord);
+		}
 
 		verifyRoot_1(mapper, pubs);
-
-//		System.out.println("orgs_deduprecord = " + orgs_deduprecord);
-//		System.out.println("pubs_deduprecord = " + pubs_deduprecord);
-//		System.out.println("sw_deduprecord = " + sw_deduprecord);
-//		System.out.println("ds_deduprecord = " + ds_deduprecord);
-//		System.out.println("orp_deduprecord = " + orp_deduprecord);
 	}
 
 	private static void verifyRoot_1(ObjectMapper mapper, Dataset<Publication> pubs) {
@@ -629,21 +751,23 @@ public class SparkDedupTest implements Serializable {
 			.distinct()
 			.count();
 
-		assertEquals(902, publications);
-		assertEquals(839, organizations);
-		assertEquals(100, projects);
-		assertEquals(100, datasource);
-		assertEquals(198, softwares);
-		assertEquals(389, dataset);
-		assertEquals(520, otherresearchproduct);
+		System.out.println("publications = " + publications);
+		System.out.println("organizations = " + organizations);
+		System.out.println("projects = " + projects);
+		System.out.println("datasource = " + datasource);
+		System.out.println("software = " + softwares);
+		System.out.println("dataset = " + dataset);
+		System.out.println("otherresearchproduct = " + otherresearchproduct);
 
-//		System.out.println("publications = " + publications);
-//		System.out.println("organizations = " + organizations);
-//		System.out.println("projects = " + projects);
-//		System.out.println("datasource = " + datasource);
-//		System.out.println("software = " + softwares);
-//		System.out.println("dataset = " + dataset);
-//		System.out.println("otherresearchproduct = " + otherresearchproduct);
+		if (CHECK_CARDINALITIES) {
+			assertEquals(930, publications);
+			assertEquals(839, organizations);
+			assertEquals(100, projects);
+			assertEquals(100, datasource);
+			assertEquals(196, softwares);
+			assertEquals(389, dataset);
+			assertEquals(520, otherresearchproduct);
+		}
 
 		long deletedOrgs = jsc
 			.textFile(testDedupGraphBasePath + "/organization")

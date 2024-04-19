@@ -12,7 +12,7 @@ import eu.dnetlib.pace.config.Config;
 @ClusteringClass("immutablefieldvalue")
 public class ImmutableFieldValue extends AbstractClusteringFunction {
 
-	public ImmutableFieldValue(final Map<String, Integer> params) {
+	public ImmutableFieldValue(final Map<String, Object> params) {
 		super(params);
 	}
 

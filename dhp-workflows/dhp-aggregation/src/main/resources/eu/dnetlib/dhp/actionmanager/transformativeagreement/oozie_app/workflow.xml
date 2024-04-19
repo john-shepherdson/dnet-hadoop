@@ -1,0 +1,82 @@
+<workflow-app name="Transfomative Agreement Integration" xmlns="uri:oozie:workflow:0.5">
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>mapreduce.job.queuename</name>
+                <value>${queueName}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapred.job.queue.name</name>
+                <value>${oozieLauncherQueueName}</value>
+            </property>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+
+        </configuration>
+    </global>
+
+    <start to="resume_from"/>
+
+    <decision name="resume_from">
+        <switch>
+            <case to="download">${wf:conf('resumeFrom') eq 'DownloadDump'}</case>
+            <default to="create_actionset"/> <!-- first action to be done when downloadDump is to be performed -->
+        </switch>
+    </decision>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="download">
+        <shell xmlns="uri:oozie:shell-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <configuration>
+                <property>
+                    <name>mapred.job.queue.name</name>
+                    <value>${queueName}</value>
+                </property>
+            </configuration>
+            <exec>download.sh</exec>
+            <argument>${inputFile}</argument>
+            <argument>${workingDir}/transformativeagreement/transformativeAgreement.json</argument>
+            <env-var>HADOOP_USER_NAME=${wf:user()}</env-var>
+            <file>download.sh</file>
+            <capture-output/>
+        </shell>
+        <ok to="create_actionset"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="create_actionset">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Produces the AS for the Transformative Agreement</name>
+            <class>eu.dnetlib.dhp.actionmanager.transformativeagreement.CreateActionSetSparkJob</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${workingDir}/transformativeagreement/</arg>
+            <arg>--outputPath</arg><arg>${outputPath}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    <end name="End"/>
+</workflow-app>

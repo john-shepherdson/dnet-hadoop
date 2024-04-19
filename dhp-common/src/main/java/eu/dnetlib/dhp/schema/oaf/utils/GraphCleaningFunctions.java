@@ -23,12 +23,17 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyTerm;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import me.xuender.unidecode.Unidecode;
 
 public class GraphCleaningFunctions extends CleaningFunctions {
+
+	public static final String DNET_PUBLISHERS = "dnet:publishers";
+
+	public static final String DNET_LICENSES = "dnet:licenses";
 
 	public static final String ORCID_CLEANING_REGEX = ".*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9]{4}).*[-–—−=].*([0-9x]{4})";
 	public static final int ORCID_LEN = 19;
@@ -87,6 +92,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		INVALID_AUTHOR_NAMES.add("null anonymous");
 		INVALID_AUTHOR_NAMES.add("unbekannt");
 		INVALID_AUTHOR_NAMES.add("unknown");
+		INVALID_AUTHOR_NAMES.add("autor, Sin");
+		INVALID_AUTHOR_NAMES.add("Desconocido / Inconnu,");
 
 		INVALID_URL_HOSTS.add("creativecommons.org");
 		INVALID_URL_HOSTS.add("www.academia.edu");
@@ -307,7 +314,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		}
 
 		if (value instanceof Datasource) {
-			// nothing to evaluate here
+			final Datasource d = (Datasource) value;
+			return Objects.nonNull(d.getOfficialname()) && StringUtils.isNotBlank(d.getOfficialname().getValue());
 		} else if (value instanceof Project) {
 			final Project p = (Project) value;
 			return Objects.nonNull(p.getCode()) && StringUtils.isNotBlank(p.getCode().getValue());
@@ -409,6 +417,14 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 									.getPublisher()
 									.getValue()
 									.replaceAll(NAME_CLEANING_REGEX, " "));
+
+						if (vocs.vocabularyExists(DNET_PUBLISHERS)) {
+							vocs
+								.find(DNET_PUBLISHERS)
+								.map(voc -> voc.getTermBySynonym(r.getPublisher().getValue()))
+								.map(VocabularyTerm::getName)
+								.ifPresent(publisher -> r.getPublisher().setValue(publisher));
+						}
 					}
 				}
 				if (Objects.isNull(r.getLanguage()) || StringUtils.isBlank(r.getLanguage().getClassid())) {
@@ -492,6 +508,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 								.filter(Objects::nonNull)
 								.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
 								.map(GraphCleaningFunctions::cleanValue)
+								.sorted((s1, s2) -> s2.getValue().length() - s1.getValue().length())
+								.limit(ModelHardLimits.MAX_ABSTRACTS)
 								.collect(Collectors.toList()));
 				}
 				if (Objects.isNull(r.getResourcetype()) || StringUtils.isBlank(r.getResourcetype().getClassid())) {
@@ -567,6 +585,14 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 						}
 						if (Objects.isNull(i.getRefereed()) || StringUtils.isBlank(i.getRefereed().getClassid())) {
 							i.setRefereed(qualifier("0000", "Unknown", ModelConstants.DNET_REVIEW_LEVELS));
+						}
+
+						if (Objects.nonNull(i.getLicense()) && Objects.nonNull(i.getLicense().getValue())) {
+							vocs
+								.find(DNET_LICENSES)
+								.map(voc -> voc.getTermBySynonym(i.getLicense().getValue()))
+								.map(VocabularyTerm::getId)
+								.ifPresent(license -> i.getLicense().setValue(license));
 						}
 
 						// from the script from Dimitris
@@ -668,6 +694,9 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 										.filter(Objects::nonNull)
 										.filter(p -> Objects.nonNull(p.getQualifier()))
 										.filter(p -> StringUtils.isNotBlank(p.getValue()))
+										.filter(
+											p -> StringUtils
+												.contains(StringUtils.lowerCase(p.getQualifier().getClassid()), ORCID))
 										.map(p -> {
 											// hack to distinguish orcid from orcid_pending
 											String pidProvenance = getProvenance(p.getDataInfo());
@@ -677,7 +706,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 												.toLowerCase()
 												.contains(ModelConstants.ORCID)) {
 												if (pidProvenance
-													.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY)) {
+													.equals(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY) ||
+													pidProvenance.equals("ORCID_ENRICHMENT")) {
 													p.getQualifier().setClassid(ModelConstants.ORCID);
 												} else {
 													p.getQualifier().setClassid(ModelConstants.ORCID_PENDING);

@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static eu.dnetlib.dhp.utils.DHPUtils.toSeq;
+import static org.apache.spark.sql.functions.*;
 
 import java.util.List;
 import java.util.Map;
@@ -14,22 +15,31 @@ import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
+import org.apache.spark.sql.expressions.UserDefinedFunction;
+import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
+import eu.dnetlib.dhp.oa.provision.model.TupleWrapper;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
+import eu.dnetlib.dhp.schema.solr.SolrRecord;
+import eu.dnetlib.dhp.utils.ISLookupClientFactory;
+import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import scala.Tuple2;
 
 /**
@@ -62,8 +72,13 @@ public class XmlConverterJob {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
-		final String isLookupUrl = parser.get("isLookupUrl");
+		final String contextApiBaseUrl = parser.get("contextApiBaseUrl");
+		log.info("contextApiBaseUrl: {}", contextApiBaseUrl);
+
+		String isLookupUrl = parser.get("isLookupUrl");
 		log.info("isLookupUrl: {}", isLookupUrl);
+
+		ISLookUpService isLookup = ISLookupClientFactory.getLookUpService(isLookupUrl);
 
 		final SparkConf conf = new SparkConf();
 		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
@@ -71,7 +86,9 @@ public class XmlConverterJob {
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 			removeOutputDir(spark, outputPath);
-			convertToXml(spark, inputPath, outputPath, ContextMapper.fromIS(isLookupUrl));
+			convertToXml(
+				spark, inputPath, outputPath, ContextMapper.fromAPI(contextApiBaseUrl),
+				VocabularyGroup.loadVocsFromIS(isLookup));
 		});
 	}
 
@@ -79,7 +96,8 @@ public class XmlConverterJob {
 		final SparkSession spark,
 		final String inputPath,
 		final String outputPath,
-		final ContextMapper contextMapper) {
+		final ContextMapper contextMapper,
+		final VocabularyGroup vocabularies) {
 
 		final XmlRecordFactory recordFactory = new XmlRecordFactory(
 			prepareAccumulators(spark.sparkContext()),
@@ -92,20 +110,25 @@ public class XmlConverterJob {
 
 		log.info("Found paths: {}", String.join(",", paths));
 
+		final ObjectMapper mapper = new ObjectMapper();
+		mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 		spark
 			.read()
 			.load(toSeq(paths))
 			.as(Encoders.kryo(JoinedEntity.class))
 			.map(
-				(MapFunction<JoinedEntity, Tuple2<String, String>>) je -> new Tuple2<>(
-					je.getEntity().getId(),
-					recordFactory.build(je)),
-				Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
-			.javaRDD()
-			.mapToPair(
-				(PairFunction<Tuple2<String, String>, Text, Text>) t -> new Tuple2<>(new Text(t._1()),
-					new Text(t._2())))
-			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
+				(MapFunction<JoinedEntity, Tuple2<String, SolrRecord>>) je -> new Tuple2<>(
+					recordFactory.build(je),
+					ProvisionModelSupport.transform(je, contextMapper, vocabularies)),
+				Encoders.tuple(Encoders.STRING(), Encoders.bean(SolrRecord.class)))
+			.map(
+				(MapFunction<Tuple2<String, SolrRecord>, TupleWrapper>) t -> new TupleWrapper(
+					t._1(), mapper.writeValueAsString(t._2())),
+				Encoders.bean(TupleWrapper.class))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(outputPath);
 	}
 
 	private static void removeOutputDir(final SparkSession spark, final String path) {

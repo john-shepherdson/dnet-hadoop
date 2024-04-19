@@ -29,9 +29,8 @@
   },
   "pace": {
     "clustering" : [
-      { "name" : "ngrampairs", "fields" : [ "title" ], "params" : { "max" : "1", "ngramLen" : "3"} },
-      { "name" : "suffixprefix", "fields" : [ "title" ], "params" : { "max" : "1", "len" : "3" } },
-      { "name" : "lowercase", "fields" : [ "doi" ], "params" : { } }
+      { "name" : "numAuthorsTitleSuffixPrefixChain", "fields" : [ "num_authors", "title" ], "params" : { "mod" : "10" } },
+      { "name" : "jsonlistclustering", "fields" : [ "pid" ], "params" : { "jpath_value": "$.value", "jpath_classid": "$.qualifier.classid"} }
     ],
     "decisionTree": {
       "start": {
@@ -81,11 +80,35 @@
       "layer3": {
         "fields": [
           {
+            "field": "authors",
+            "comparator": "authorsMatch",
+            "weight": 1.0,
+            "countIfUndefined": "false",
+            "params": {
+              "surname_th": 0.75,
+              "fullname_th": 0.75,
+              "threshold": 0.6,
+              "mode": "full"
+            }
+          }
+        ],
+        "threshold": 0.6,
+        "aggregation": "MAX",
+        "positive": "layer4",
+        "negative": "NO_MATCH",
+        "undefined": "MATCH",
+        "ignoreUndefined": "true"
+      },
+      "layer4": {
+        "fields": [
+          {
             "field": "title",
             "comparator": "levensteinTitle",
             "weight": 1.0,
             "countIfUndefined": "true",
-            "params": {}
+            "params": {
+              "threshold": "0.99"
+            }
           }
         ],
         "threshold": 0.99,
@@ -98,14 +121,15 @@
     },
     "model": [
       {
-        "name": "doi",
-        "type": "String",
-        "path": "$.pid[?(@.qualifier.classid == 'doi')].value"
-      },
-      {
         "name": "pid",
         "type": "JSON",
         "path": "$.pid",
+        "overrideMatch": "true"
+      },
+      {
+        "name": "alternateid",
+        "type": "JSON",
+        "path": "$.instance[*].alternateIdentifier[*]",
         "overrideMatch": "true"
       },
       {
@@ -113,7 +137,8 @@
         "type": "String",
         "path": "$.title[?(@.qualifier.classid == 'main title')].value",
         "length": 250,
-        "size": 5
+        "size": 5,
+        "clean": "title"
       },
       {
         "name": "authors",
@@ -122,9 +147,9 @@
         "size": 200
       },
       {
-        "name": "resulttype",
+        "name": "num_authors",
         "type": "String",
-        "path": "$.resulttype.classid"
+        "path": "$.author.length()"
       }
     ],
     "blacklists": {

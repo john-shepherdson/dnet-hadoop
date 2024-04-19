@@ -9,6 +9,11 @@
     <artifactId>dhp-stats-update</artifactId>
     <dependencies>
         <dependency>
+            <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>dhp-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-core_${scala.binary.version}</artifactId>
         </dependency>

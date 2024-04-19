@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.BZip2Codec;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
@@ -64,6 +65,12 @@ public class PrepareAffiliationRelations implements Serializable {
 		final String pubmedInputPath = parser.get("pubmedInputPath");
 		log.info("pubmedInputPath: {}", pubmedInputPath);
 
+		final String openapcInputPath = parser.get("openapcInputPath");
+		log.info("openapcInputPath: {}", openapcInputPath);
+
+		final String dataciteInputPath = parser.get("dataciteInputPath");
+		log.info("dataciteInputPath: {}", dataciteInputPath);
+
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
@@ -85,10 +92,22 @@ public class PrepareAffiliationRelations implements Serializable {
 				JavaPairRDD<Text, Text> pubmedRelations = prepareAffiliationRelations(
 					spark, pubmedInputPath, collectedFromPubmed);
 
+				List<KeyValue> collectedFromOpenAPC = OafMapperUtils
+					.listKeyValues(ModelConstants.OPEN_APC_ID, "OpenAPC");
+				JavaPairRDD<Text, Text> openAPCRelations = prepareAffiliationRelations(
+					spark, openapcInputPath, collectedFromOpenAPC);
+
+				List<KeyValue> collectedFromDatacite = OafMapperUtils
+					.listKeyValues(ModelConstants.DATACITE_ID, "Datacite");
+				JavaPairRDD<Text, Text> dataciteRelations = prepareAffiliationRelations(
+					spark, dataciteInputPath, collectedFromDatacite);
+
 				crossrefRelations
 					.union(pubmedRelations)
+					.union(openAPCRelations)
+					.union(dataciteRelations)
 					.saveAsHadoopFile(
-						outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
+						outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, BZip2Codec.class);
 
 			});
 	}
