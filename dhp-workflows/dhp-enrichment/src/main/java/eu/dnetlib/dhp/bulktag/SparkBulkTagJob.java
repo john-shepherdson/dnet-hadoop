@@ -4,21 +4,12 @@ package eu.dnetlib.dhp.bulktag;
 import static eu.dnetlib.dhp.PropagationConstant.removeOutputDir;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.io.BufferedOutputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.zip.GZIPOutputStream;
 
-import org.apache.avro.TestAnnotation;
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
@@ -34,7 +25,6 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import com.sun.media.sound.ModelInstrumentComparator;
 
 import eu.dnetlib.dhp.api.Utils;
 import eu.dnetlib.dhp.api.model.CommunityEntityMap;
