@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.pace.model.Person;
 
-
 public class UtilTest {
 
 	static Map<String, String> params;

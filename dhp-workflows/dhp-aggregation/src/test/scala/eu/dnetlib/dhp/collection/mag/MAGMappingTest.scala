@@ -10,7 +10,6 @@ class MAGMappingTest {
 
   val mapper = new ObjectMapper()
 
-
   def mappingTest(): Unit = {
 
     val spark = SparkSession

@@ -1,18 +1,19 @@
 
 package eu.dnetlib.pace.tree;
 
-import com.wcohen.ss.AbstractStringDistance;
-import eu.dnetlib.pace.config.Config;
-import eu.dnetlib.pace.model.Person;
-import eu.dnetlib.pace.tree.support.AbstractListComparator;
-import eu.dnetlib.pace.tree.support.ComparatorClass;
-import eu.dnetlib.pace.util.AuthorMatchers;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+
+import com.wcohen.ss.AbstractStringDistance;
+
+import eu.dnetlib.pace.config.Config;
+import eu.dnetlib.pace.model.Person;
+import eu.dnetlib.pace.tree.support.AbstractListComparator;
+import eu.dnetlib.pace.tree.support.ComparatorClass;
+import eu.dnetlib.pace.util.AuthorMatchers;
 
 @ComparatorClass("authorsMatch")
 public class AuthorsMatch extends AbstractListComparator {

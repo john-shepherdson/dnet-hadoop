@@ -31,7 +31,6 @@ import eu.dnetlib.dhp.schema.orcid.AuthorData;
 import eu.dnetlib.doiboost.orcid.util.DownloadsReport;
 import eu.dnetlib.doiboost.orcid.util.MultiAttemptsHttpConnector;
 
-
 public class OrcidClientTest {
 	final int REQ_LIMIT = 24;
 	final int REQ_MAX_TEST = 100;
