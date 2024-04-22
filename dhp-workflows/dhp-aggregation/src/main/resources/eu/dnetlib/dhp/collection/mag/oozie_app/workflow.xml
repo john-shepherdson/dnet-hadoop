@@ -1,0 +1,160 @@
+<workflow-app name="generate_MAG_Datasource" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>magBasePath</name>
+            <description>The base path of MAG DUMP CSV Tables</description>
+        </property>
+        <property>
+            <name>mdStoreOutputId</name>
+            <description>the identifier of the cleaned MDStore</description>
+        </property>
+        <property>
+            <name>mdStoreManagerURI</name>
+            <description>the path of the cleaned mdstore</description>
+        </property>
+        <property>
+            <name>resume_from</name>
+            <value>generateOAF</value>
+            <description>start Node</description>
+        </property>
+    </parameters>
+
+    <start to="resume_from"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+
+    <decision name="resume_from">
+        <switch>
+            <case to="generateTable">${wf:conf('resume_from') eq 'generateTable'}</case>
+            <default to="StartTransaction"/> <!-- first action to be done when downloadDump is to be performed -->
+        </switch>
+    </decision>
+
+
+    <action name="generateTable">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Generate MAG Table</name>
+            <class>eu.dnetlib.dhp.collection.mag.SparkCreateMagDenormalizedTable</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=2g
+                --conf spark.sql.shuffle.partitions=3000
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--magBasePath</arg><arg>${magBasePath}</arg>
+            <arg>--master</arg><arg>yarn</arg>
+        </spark>
+        <ok to="StartTransaction"/>
+        <error to="Kill"/>
+    </action>
+    <action name="StartTransaction">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>NEW_VERSION</arg>
+            <arg>--mdStoreID</arg><arg>${mdStoreOutputId}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <capture-output/>
+        </java>
+        <ok to="generateOAF"/>
+        <error to="EndReadRollBack"/>
+    </action>
+
+    <action name="generateOAF">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>MAG TO OAF</name>
+            <class>eu.dnetlib.dhp.collection.mag.SparkMAGtoOAF</class>
+            <jar>dhp-aggregation-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=2g
+                --conf spark.sql.shuffle.partitions=3000
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--mdstoreOutputVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--magBasePath</arg><arg>${magBasePath}</arg>
+            <arg>--master</arg><arg>yarn</arg>
+        </spark>
+        <ok to="CommitVersion"/>
+        <error to="RollBack"/>
+    </action>
+
+    <action name="CommitVersion">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>COMMIT</arg>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="EndReadRollBack">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>READ_UNLOCK</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+            <arg>--readMDStoreId</arg><arg>${wf:actionData('BeginRead')['mdStoreReadLockVersion']}</arg>
+            <capture-output/>
+        </java>
+        <ok to="RollBack"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="RollBack">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.aggregation.mdstore.MDStoreActionNode</main-class>
+            <arg>--action</arg><arg>ROLLBACK</arg>
+            <arg>--mdStoreVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
+            <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
+        </java>
+        <ok to="Kill"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <end name="End"/>
+</workflow-app>

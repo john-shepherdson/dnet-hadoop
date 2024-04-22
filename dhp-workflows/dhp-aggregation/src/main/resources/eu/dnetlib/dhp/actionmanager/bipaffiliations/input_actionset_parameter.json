@@ -18,6 +18,18 @@
     "paramRequired": true
   },
   {
+    "paramName": "oip",
+    "paramLongName": "openapcInputPath",
+    "paramDescription": "the path to get the input data from OpenAPC",
+    "paramRequired": true
+  },
+  {
+    "paramName": "dip",
+    "paramLongName": "dataciteInputPath",
+    "paramDescription": "the path to get the input data from Datacite",
+    "paramRequired": true
+  },
+  {
     "paramName": "o",
     "paramLongName": "outputPath",
     "paramDescription": "the path of the new ActionSet",

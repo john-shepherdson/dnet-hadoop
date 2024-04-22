@@ -22,17 +22,5 @@
     "paramLongName": "batchSize",
     "paramDescription": "size of the batch of documents sent to solr",
     "paramRequired": false
-  },
-  {
-    "paramName": "of",
-    "paramLongName": "outputFormat",
-    "paramDescription": "decides the job output format, SOLR | HDFS",
-    "paramRequired": false
-  },
-  {
-    "paramName": "op",
-    "paramLongName": "outputPath",
-    "paramDescription": "path on hdfs activating an alternative output for the SolrInputDocuments",
-    "paramRequired": false
   }
 ]

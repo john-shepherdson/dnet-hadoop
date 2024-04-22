@@ -1,5 +1,6 @@
 package eu.dnetlib.doiboost.crossref
 
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf._
 import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactory, OafMapperUtils}
@@ -47,59 +48,6 @@ case object Crossref2Oaf {
     json.extract[List[funderInfo]]
   }
 
-  val mappingCrossrefType = Map(
-    "book-section"        -> "publication",
-    "book"                -> "publication",
-    "book-chapter"        -> "publication",
-    "book-part"           -> "publication",
-    "book-series"         -> "publication",
-    "book-set"            -> "publication",
-    "book-track"          -> "publication",
-    "edited-book"         -> "publication",
-    "reference-book"      -> "publication",
-    "monograph"           -> "publication",
-    "journal-article"     -> "publication",
-    "dissertation"        -> "publication",
-    "other"               -> "publication",
-    "peer-review"         -> "publication",
-    "proceedings"         -> "publication",
-    "proceedings-article" -> "publication",
-    "reference-entry"     -> "publication",
-    "report"              -> "publication",
-    "report-series"       -> "publication",
-    "standard"            -> "publication",
-    "standard-series"     -> "publication",
-    "posted-content"      -> "publication",
-    "dataset"             -> "dataset"
-  )
-
-  val mappingCrossrefSubType = Map(
-    "book-section"        -> "0013 Part of book or chapter of book",
-    "book"                -> "0002 Book",
-    "book-chapter"        -> "0013 Part of book or chapter of book",
-    "book-part"           -> "0013 Part of book or chapter of book",
-    "book-series"         -> "0002 Book",
-    "book-set"            -> "0002 Book",
-    "book-track"          -> "0002 Book",
-    "edited-book"         -> "0002 Book",
-    "reference-book"      -> "0002 Book",
-    "monograph"           -> "0002 Book",
-    "journal-article"     -> "0001 Article",
-    "dissertation"        -> "0044 Thesis",
-    "other"               -> "0038 Other literature type",
-    "peer-review"         -> "0015 Review",
-    "proceedings"         -> "0004 Conference object",
-    "proceedings-article" -> "0004 Conference object",
-    "reference-entry"     -> "0013 Part of book or chapter of book",
-    "report"              -> "0017 Report",
-    "report-series"       -> "0017 Report",
-    "standard"            -> "0038 Other literature type",
-    "standard-series"     -> "0038 Other literature type",
-    "dataset"             -> "0021 Dataset",
-    "preprint"            -> "0016 Preprint",
-    "report"              -> "0017 Report"
-  )
-
   def getIrishId(doi: String): Option[String] = {
     val id = doi.split("/").last
     irishFunder
@@ -107,7 +55,7 @@ case object Crossref2Oaf {
       .map(f => f.id)
   }
 
-  def mappingResult(result: Result, json: JValue, cobjCategory: String, originalType: String): Result = {
+  def mappingResult(result: Result, json: JValue, instanceType: Qualifier, originalType: String): Result = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
     //MAPPING Crossref DOI into PID
@@ -275,27 +223,20 @@ case object Crossref2Oaf {
     instance.setAccessright(
       decideAccessRight(instance.getLicense, result.getDateofacceptance.getValue)
     )
-    instance.setInstancetype(
-      OafMapperUtils.qualifier(
-        cobjCategory.substring(0, 4),
-        cobjCategory.substring(5),
-        ModelConstants.DNET_PUBLICATION_RESOURCE,
-        ModelConstants.DNET_PUBLICATION_RESOURCE
-      )
-    )
+    instance.setInstancetype(instanceType)
     //ADD ORIGINAL TYPE to the mapping
     val itm = new InstanceTypeMapping
     itm.setOriginalType(originalType)
     itm.setVocabularyName(ModelConstants.OPENAIRE_COAR_RESOURCE_TYPES_3_1)
     instance.setInstanceTypeMapping(List(itm).asJava)
-    result.setResourcetype(
-      OafMapperUtils.qualifier(
-        cobjCategory.substring(0, 4),
-        cobjCategory.substring(5),
-        ModelConstants.DNET_PUBLICATION_RESOURCE,
-        ModelConstants.DNET_PUBLICATION_RESOURCE
-      )
-    )
+//    result.setResourcetype(
+//      OafMapperUtils.qualifier(
+//        cobjCategory.substring(0, 4),
+//        cobjCategory.substring(5),
+//        ModelConstants.DNET_PUBLICATION_RESOURCE,
+//        ModelConstants.DNET_PUBLICATION_RESOURCE
+//      )
+//    )
 
     instance.setCollectedfrom(createCrossrefCollectedFrom())
     if (StringUtils.isNotBlank(issuedDate)) {
@@ -354,7 +295,40 @@ case object Crossref2Oaf {
     a
   }
 
-  def convert(input: String): List[Oaf] = {
+  /** *
+    * Use the vocabulary dnet:publication_resource to find a synonym to one of these terms and get the instance.type.
+    * Using the dnet:result_typologies vocabulary, we look up the instance.type synonym
+    * to generate one of the following main entities:
+    *  - publication
+    *  - dataset
+    *  - software
+    *  - otherresearchproduct
+    *
+    * @param resourceType
+    * @param vocabularies
+    * @return
+    */
+  def getTypeQualifier(
+    resourceType: String,
+    vocabularies: VocabularyGroup
+  ): (Qualifier, Qualifier, String) = {
+    if (resourceType != null && resourceType.nonEmpty) {
+      val typeQualifier =
+        vocabularies.getSynonymAsQualifier(ModelConstants.DNET_PUBLICATION_RESOURCE, resourceType)
+      if (typeQualifier != null)
+        return (
+          typeQualifier,
+          vocabularies.getSynonymAsQualifier(
+            ModelConstants.DNET_RESULT_TYPOLOGIES,
+            typeQualifier.getClassid
+          ),
+          resourceType
+        )
+    }
+    null
+  }
+
+  def convert(input: String, vocabularies: VocabularyGroup): List[Oaf] = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: json4s.JValue = parse(input)
 
@@ -364,17 +338,16 @@ case object Crossref2Oaf {
     val objectSubType = (json \ "subtype").extractOrElse[String](null)
     if (objectType == null)
       return resultList
+    val typology = getTypeQualifier(objectType, vocabularies)
 
-    val result = generateItemFromType(objectType, objectSubType)
+    if (typology == null)
+      return List()
+
+    val result = generateItemFromType(typology._2)
     if (result == null)
       return List()
-    val cOBJCategory = mappingCrossrefSubType.getOrElse(
-      objectType,
-      mappingCrossrefSubType.getOrElse(objectSubType, "0038 Other literature type")
-    )
 
-    val originalType = if (mappingCrossrefSubType.contains(objectType)) objectType else objectSubType
-    mappingResult(result, json, cOBJCategory, originalType)
+    mappingResult(result, json, typology._1, typology._3)
     if (result == null || result.getId == null)
       return List()
 
@@ -392,7 +365,7 @@ case object Crossref2Oaf {
     }
 
     result match {
-      case publication: Publication => convertPublication(publication, json, cOBJCategory)
+      case publication: Publication => convertPublication(publication, json, typology._1)
       case dataset: Dataset         => convertDataset(dataset)
     }
 
@@ -630,12 +603,12 @@ case object Crossref2Oaf {
     // TODO check if there are other info to map into the Dataset
   }
 
-  def convertPublication(publication: Publication, json: JValue, cobjCategory: String): Unit = {
+  def convertPublication(publication: Publication, json: JValue, cobjCategory: Qualifier): Unit = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     val containerTitles = for { JString(ct) <- json \ "container-title" } yield ct
 
     //Mapping book
-    if (cobjCategory.toLowerCase.contains("book")) {
+    if (cobjCategory.getClassname.toLowerCase.contains("book")) {
       val ISBN = for { JString(isbn) <- json \ "ISBN" } yield isbn
       if (ISBN.nonEmpty && containerTitles.nonEmpty) {
         val source = s"${containerTitles.head} ISBN: ${ISBN.head}"
@@ -716,12 +689,23 @@ case object Crossref2Oaf {
     null
   }
 
-  def generateItemFromType(objectType: String, objectSubType: String): Result = {
-    if (mappingCrossrefType.contains(objectType)) {
-      if (mappingCrossrefType(objectType).equalsIgnoreCase("publication"))
-        return new Publication()
-      if (mappingCrossrefType(objectType).equalsIgnoreCase("dataset"))
-        return new Dataset()
+  def generateItemFromType(objectType: Qualifier): Result = {
+    if (objectType.getClassid.equalsIgnoreCase("publication")) {
+      val item = new Publication
+      item.setResourcetype(objectType)
+      return item
+    } else if (objectType.getClassid.equalsIgnoreCase("dataset")) {
+      val item = new Dataset
+      item.setResourcetype(objectType)
+      return item
+    } else if (objectType.getClassid.equalsIgnoreCase("software")) {
+      val item = new Software
+      item.setResourcetype(objectType)
+      return item
+    } else if (objectType.getClassid.equalsIgnoreCase("OtherResearchProduct")) {
+      val item = new OtherResearchProduct
+      item.setResourcetype(objectType)
+      return item
     }
     null
   }

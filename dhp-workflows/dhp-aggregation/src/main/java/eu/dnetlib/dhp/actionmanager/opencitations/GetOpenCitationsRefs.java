@@ -12,10 +12,7 @@ import java.util.zip.ZipInputStream;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,17 +34,17 @@ public class GetOpenCitationsRefs implements Serializable {
 
 		parser.parseArgument(args);
 
-		final String[] inputFile = parser.get("inputFile").split(";");
-		log.info("inputFile {}", Arrays.asList(inputFile));
+//		final String[] inputFile = parser.get("inputFile").split(";");
+//		log.info("inputFile {}", Arrays.asList(inputFile));
 
-		final String workingPath = parser.get("workingPath");
-		log.info("workingPath {}", workingPath);
+		final String inputPath = parser.get("inputPath");
+		log.info("inputPath {}", inputPath);
 
 		final String hdfsNameNode = parser.get("hdfsNameNode");
 		log.info("hdfsNameNode {}", hdfsNameNode);
 
-		final String prefix = parser.get("prefix");
-		log.info("prefix {}", prefix);
+		final String outputPath = parser.get("outputPath");
+		log.info("outputPath {}", outputPath);
 
 		Configuration conf = new Configuration();
 		conf.set("fs.defaultFS", hdfsNameNode);
@@ -56,41 +53,42 @@ public class GetOpenCitationsRefs implements Serializable {
 
 		GetOpenCitationsRefs ocr = new GetOpenCitationsRefs();
 
-		for (String file : inputFile) {
-			ocr.doExtract(workingPath + "/Original/" + file, workingPath, fileSystem, prefix);
-		}
+		ocr.doExtract(inputPath, outputPath, fileSystem);
 
 	}
 
-	private void doExtract(String inputFile, String workingPath, FileSystem fileSystem, String prefix)
+	private void doExtract(String inputPath, String outputPath, FileSystem fileSystem)
 		throws IOException {
 
-		final Path path = new Path(inputFile);
+		RemoteIterator<LocatedFileStatus> fileStatusListIterator = fileSystem
+			.listFiles(
+				new Path(inputPath), true);
+		while (fileStatusListIterator.hasNext()) {
+			LocatedFileStatus fileStatus = fileStatusListIterator.next();
+			// do stuff with the file like ...
+			FSDataInputStream oc_zip = fileSystem.open(fileStatus.getPath());
+			try (ZipInputStream zis = new ZipInputStream(oc_zip)) {
+				ZipEntry entry = null;
+				while ((entry = zis.getNextEntry()) != null) {
 
-		FSDataInputStream oc_zip = fileSystem.open(path);
+					if (!entry.isDirectory()) {
+						String fileName = entry.getName();
+						// fileName = fileName.substring(0, fileName.indexOf("T")) + "_" + count;
+						fileName = fileName.substring(0, fileName.lastIndexOf("."));
+						// count++;
+						try (
+							FSDataOutputStream out = fileSystem
+								.create(new Path(outputPath + "/" + fileName + ".gz"));
+							GZIPOutputStream gzipOs = new GZIPOutputStream(new BufferedOutputStream(out))) {
 
-		// int count = 1;
-		try (ZipInputStream zis = new ZipInputStream(oc_zip)) {
-			ZipEntry entry = null;
-			while ((entry = zis.getNextEntry()) != null) {
+							IOUtils.copy(zis, gzipOs);
 
-				if (!entry.isDirectory()) {
-					String fileName = entry.getName();
-					// fileName = fileName.substring(0, fileName.indexOf("T")) + "_" + count;
-					fileName = fileName.substring(0, fileName.lastIndexOf("."));
-					// count++;
-					try (
-						FSDataOutputStream out = fileSystem
-							.create(new Path(workingPath + "/" + prefix + "/" + fileName + ".gz"));
-						GZIPOutputStream gzipOs = new GZIPOutputStream(new BufferedOutputStream(out))) {
-
-						IOUtils.copy(zis, gzipOs);
-
+						}
 					}
+
 				}
 
 			}
-
 		}
 
 	}
