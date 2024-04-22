@@ -1,7 +1,7 @@
 [
   {
-    "paramName": "wp",
-    "paramLongName": "workingPath",
+    "paramName": "ip",
+    "paramLongName": "inputPath",
     "paramDescription": "the zipped opencitations file",
     "paramRequired": true
   },
@@ -24,15 +24,9 @@
     "paramLongName": "outputPath",
     "paramDescription": "the hdfs name node",
     "paramRequired": true
-  },
-  {
-    "paramName": "if",
-    "paramLongName": "inputFile",
-    "paramDescription": "the hdfs name node",
-    "paramRequired": true
-  }, {
-  "paramName": "f",
-  "paramLongName": "format",
+  },  {
+  "paramName": "nn",
+  "paramLongName": "hdfsNameNode",
   "paramDescription": "the hdfs name node",
   "paramRequired": true
 }

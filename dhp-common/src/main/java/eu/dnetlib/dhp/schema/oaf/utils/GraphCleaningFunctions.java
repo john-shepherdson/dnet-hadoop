@@ -92,6 +92,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		INVALID_AUTHOR_NAMES.add("null anonymous");
 		INVALID_AUTHOR_NAMES.add("unbekannt");
 		INVALID_AUTHOR_NAMES.add("unknown");
+		INVALID_AUTHOR_NAMES.add("autor, Sin");
+		INVALID_AUTHOR_NAMES.add("Desconocido / Inconnu,");
 
 		INVALID_URL_HOSTS.add("creativecommons.org");
 		INVALID_URL_HOSTS.add("www.academia.edu");
@@ -312,7 +314,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		}
 
 		if (value instanceof Datasource) {
-			// nothing to evaluate here
+			final Datasource d = (Datasource) value;
+			return Objects.nonNull(d.getOfficialname()) && StringUtils.isNotBlank(d.getOfficialname().getValue());
 		} else if (value instanceof Project) {
 			final Project p = (Project) value;
 			return Objects.nonNull(p.getCode()) && StringUtils.isNotBlank(p.getCode().getValue());
@@ -505,6 +508,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 								.filter(Objects::nonNull)
 								.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
 								.map(GraphCleaningFunctions::cleanValue)
+								.sorted((s1, s2) -> s2.getValue().length() - s1.getValue().length())
+								.limit(ModelHardLimits.MAX_ABSTRACTS)
 								.collect(Collectors.toList()));
 				}
 				if (Objects.isNull(r.getResourcetype()) || StringUtils.isBlank(r.getResourcetype().getClassid())) {

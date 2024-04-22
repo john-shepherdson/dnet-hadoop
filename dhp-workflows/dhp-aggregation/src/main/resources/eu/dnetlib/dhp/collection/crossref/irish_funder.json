@@ -1,0 +1,916 @@
+[
+  {
+    "id": "100007630",
+    "uri": "http://dx.doi.org/10.13039/100007630",
+    "name": "College of Engineering and Informatics, National University of Ireland, Galway",
+    "synonym": []
+  },
+  {
+    "id": "100007731",
+    "uri": "http://dx.doi.org/10.13039/100007731",
+    "name": "Endo International",
+    "synonym": []
+  },
+  {
+    "id": "100008099",
+    "uri": "http://dx.doi.org/10.13039/100008099",
+    "name": "Food Safety Authority of Ireland",
+    "synonym": []
+  },
+  {
+    "id": "100008124",
+    "uri": "http://dx.doi.org/10.13039/100008124",
+    "name": "Department of Jobs, Enterprise and Innovation",
+    "synonym": []
+  },
+  {
+    "id": "100009098",
+    "uri": "http://dx.doi.org/10.13039/100009098",
+    "name": "Department of Foreign Affairs and Trade, Ireland",
+    "synonym": []
+  },
+  {
+    "id": "100009099",
+    "uri": "http://dx.doi.org/10.13039/100009099",
+    "name": "Irish Aid",
+    "synonym": []
+  },
+  {
+    "id": "100009770",
+    "uri": "http://dx.doi.org/10.13039/100009770",
+    "name": "National University of Ireland",
+    "synonym": []
+  },
+  {
+    "id": "100009985",
+    "uri": "http://dx.doi.org/10.13039/100009985",
+    "name": "Parkinson's Association of Ireland",
+    "synonym": []
+  },
+  {
+    "id": "100010399",
+    "uri": "http://dx.doi.org/10.13039/100010399",
+    "name": "European Society of Cataract and Refractive Surgeons",
+    "synonym": []
+  },
+  {
+    "id": "100010414",
+    "uri": "http://dx.doi.org/10.13039/100010414",
+    "name": "Health Research Board",
+    "synonym": [
+      "501100001590"
+    ]
+  },
+  {
+    "id": "100010546",
+    "uri": "http://dx.doi.org/10.13039/100010546",
+    "name": "Deparment of Children and Youth Affairs, Ireland",
+    "synonym": []
+  },
+  {
+    "id": "100010993",
+    "uri": "http://dx.doi.org/10.13039/100010993",
+    "name": "Irish Nephrology Society",
+    "synonym": []
+  },
+  {
+    "id": "100011096",
+    "uri": "http://dx.doi.org/10.13039/100011096",
+    "name": "Jazz Pharmaceuticals",
+    "synonym": []
+  },
+  {
+    "id": "100011396",
+    "uri": "http://dx.doi.org/10.13039/100011396",
+    "name": "Irish College of General Practitioners",
+    "synonym": []
+  },
+  {
+    "id": "100012734",
+    "uri": "http://dx.doi.org/10.13039/100012734",
+    "name": "Department for Culture, Heritage and the Gaeltacht, Ireland",
+    "synonym": []
+  },
+  {
+    "id": "100012754",
+    "uri": "http://dx.doi.org/10.13039/100012754",
+    "name": "Horizon Pharma",
+    "synonym": []
+  },
+  {
+    "id": "100012891",
+    "uri": "http://dx.doi.org/10.13039/100012891",
+    "name": "Medical Research Charities Group",
+    "synonym": []
+  },
+  {
+    "id": "100012919",
+    "uri": "http://dx.doi.org/10.13039/100012919",
+    "name": "Epilepsy Ireland",
+    "synonym": []
+  },
+  {
+    "id": "100012920",
+    "uri": "http://dx.doi.org/10.13039/100012920",
+    "name": "GLEN",
+    "synonym": []
+  },
+  {
+    "id": "100012921",
+    "uri": "http://dx.doi.org/10.13039/100012921",
+    "name": "Royal College of Surgeons in Ireland",
+    "synonym": []
+  },
+  {
+    "id": "100013029",
+    "uri": "http://dx.doi.org/10.13039/100013029",
+    "name": "Iris O'Brien Foundation",
+    "synonym": []
+  },
+  {
+    "id": "100013206",
+    "uri": "http://dx.doi.org/10.13039/100013206",
+    "name": "Food Institutional Research Measure",
+    "synonym": []
+  },
+  {
+    "id": "100013381",
+    "uri": "http://dx.doi.org/10.13039/100013381",
+    "name": "Irish Phytochemical Food Network",
+    "synonym": []
+  },
+  {
+    "id": "100013433",
+    "uri": "http://dx.doi.org/10.13039/100013433",
+    "name": "Transport Infrastructure Ireland",
+    "synonym": []
+  },
+  {
+    "id": "100013461",
+    "uri": "http://dx.doi.org/10.13039/100013461",
+    "name": "Arts and Disability Ireland",
+    "synonym": []
+  },
+  {
+    "id": "100013548",
+    "uri": "http://dx.doi.org/10.13039/100013548",
+    "name": "Filmbase",
+    "synonym": []
+  },
+  {
+    "id": "100013917",
+    "uri": "http://dx.doi.org/10.13039/100013917",
+    "name": "Society for Musicology in Ireland",
+    "synonym": []
+  },
+  {
+    "id": "100014251",
+    "uri": "http://dx.doi.org/10.13039/100014251",
+    "name": "Humanities in the European Research Area",
+    "synonym": []
+  },
+  {
+    "id": "100014364",
+    "uri": "http://dx.doi.org/10.13039/100014364",
+    "name": "National Children's Research Centre",
+    "synonym": []
+  },
+  {
+    "id": "100014384",
+    "uri": "http://dx.doi.org/10.13039/100014384",
+    "name": "Amarin Corporation",
+    "synonym": []
+  },
+  {
+    "id": "100014902",
+    "uri": "http://dx.doi.org/10.13039/100014902",
+    "name": "Irish Association for Cancer Research",
+    "synonym": []
+  },
+  {
+    "id": "100015023",
+    "uri": "http://dx.doi.org/10.13039/100015023",
+    "name": "Ireland Funds",
+    "synonym": []
+  },
+  {
+    "id": "100015037",
+    "uri": "http://dx.doi.org/10.13039/100015037",
+    "name": "Simon Cumbers Media Fund",
+    "synonym": []
+  },
+  {
+    "id": "100015319",
+    "uri": "http://dx.doi.org/10.13039/100015319",
+    "name": "Sport Ireland Institute",
+    "synonym": []
+  },
+  {
+    "id": "100015320",
+    "uri": "http://dx.doi.org/10.13039/100015320",
+    "name": "Paralympics Ireland",
+    "synonym": []
+  },
+  {
+    "id": "100015442",
+    "uri": "http://dx.doi.org/10.13039/100015442",
+    "name": "Global Brain Health Institute",
+    "synonym": []
+  },
+  {
+    "id": "100015992",
+    "uri": "http://dx.doi.org/10.13039/100015992",
+    "name": "St. Luke's Institute of Cancer Research",
+    "synonym": []
+  },
+  {
+    "id": "100017897",
+    "uri": "http://dx.doi.org/10.13039/100017897",
+    "name": "Friedreich\u2019s Ataxia Research Alliance Ireland",
+    "synonym": []
+  },
+  {
+    "id": "100018064",
+    "uri": "http://dx.doi.org/10.13039/100018064",
+    "name": "Department of Tourism, Culture, Arts, Gaeltacht, Sport and Media",
+    "synonym": []
+  },
+  {
+    "id": "100018172",
+    "uri": "http://dx.doi.org/10.13039/100018172",
+    "name": "Department of the Environment, Climate and Communications",
+    "synonym": []
+  },
+  {
+    "id": "100018175",
+    "uri": "http://dx.doi.org/10.13039/100018175",
+    "name": "Dairy Processing Technology Centre",
+    "synonym": []
+  },
+  {
+    "id": "100018270",
+    "uri": "http://dx.doi.org/10.13039/100018270",
+    "name": "Health Service Executive",
+    "synonym": []
+  },
+  {
+    "id": "100018529",
+    "uri": "http://dx.doi.org/10.13039/100018529",
+    "name": "Alkermes",
+    "synonym": []
+  },
+  {
+    "id": "100018542",
+    "uri": "http://dx.doi.org/10.13039/100018542",
+    "name": "Irish Endocrine Society",
+    "synonym": []
+  },
+  {
+    "id": "100018754",
+    "uri": "http://dx.doi.org/10.13039/100018754",
+    "name": "An Roinn Sl\u00e1inte",
+    "synonym": []
+  },
+  {
+    "id": "100018998",
+    "uri": "http://dx.doi.org/10.13039/100018998",
+    "name": "Irish Research eLibrary",
+    "synonym": []
+  },
+  {
+    "id": "100019428",
+    "uri": "http://dx.doi.org/10.13039/100019428",
+    "name": "Nabriva Therapeutics",
+    "synonym": []
+  },
+  {
+    "id": "100019637",
+    "uri": "http://dx.doi.org/10.13039/100019637",
+    "name": "Horizon Therapeutics",
+    "synonym": []
+  },
+  {
+    "id": "100020174",
+    "uri": "http://dx.doi.org/10.13039/100020174",
+    "name": "Health Research Charities Ireland",
+    "synonym": []
+  },
+  {
+    "id": "100020202",
+    "uri": "http://dx.doi.org/10.13039/100020202",
+    "name": "UCD Foundation",
+    "synonym": []
+  },
+  {
+    "id": "100020233",
+    "uri": "http://dx.doi.org/10.13039/100020233",
+    "name": "Ireland Canada University Foundation",
+    "synonym": []
+  },
+  {
+    "id": "100022943",
+    "uri": "http://dx.doi.org/10.13039/100022943",
+    "name": "National Cancer Registry Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100001581",
+    "uri": "http://dx.doi.org/10.13039/501100001581",
+    "name": "Arts Council of Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100001582",
+    "uri": "http://dx.doi.org/10.13039/501100001582",
+    "name": "Centre for Ageing Research and Development in Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100001583",
+    "uri": "http://dx.doi.org/10.13039/501100001583",
+    "name": "Cystinosis Foundation Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100001584",
+    "uri": "http://dx.doi.org/10.13039/501100001584",
+    "name": "Department of Agriculture, Food and the Marine, Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100001586",
+    "uri": "http://dx.doi.org/10.13039/501100001586",
+    "name": "Department of Education and Skills, Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100001587",
+    "uri": "http://dx.doi.org/10.13039/501100001587",
+    "name": "Economic and Social Research Institute",
+    "synonym": []
+  },
+  {
+    "id": "501100001588",
+    "uri": "http://dx.doi.org/10.13039/501100001588",
+    "name": "Enterprise Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100001589",
+    "uri": "http://dx.doi.org/10.13039/501100001589",
+    "name": "Environmental Protection Agency",
+    "synonym": []
+  },
+  {
+    "id": "501100001591",
+    "uri": "http://dx.doi.org/10.13039/501100001591",
+    "name": "Heritage Council",
+    "synonym": []
+  },
+  {
+    "id": "501100001592",
+    "uri": "http://dx.doi.org/10.13039/501100001592",
+    "name": "Higher Education Authority",
+    "synonym": []
+  },
+  {
+    "id": "501100001593",
+    "uri": "http://dx.doi.org/10.13039/501100001593",
+    "name": "Irish Cancer Society",
+    "synonym": []
+  },
+  {
+    "id": "501100001594",
+    "uri": "http://dx.doi.org/10.13039/501100001594",
+    "name": "Irish Heart Foundation",
+    "synonym": []
+  },
+  {
+    "id": "501100001595",
+    "uri": "http://dx.doi.org/10.13039/501100001595",
+    "name": "Irish Hospice Foundation",
+    "synonym": []
+  },
+  {
+    "id": "501100001598",
+    "uri": "http://dx.doi.org/10.13039/501100001598",
+    "name": "Mental Health Commission",
+    "synonym": []
+  },
+  {
+    "id": "501100001600",
+    "uri": "http://dx.doi.org/10.13039/501100001600",
+    "name": "Research and Education Foundation, Sligo General Hospital",
+    "synonym": []
+  },
+  {
+    "id": "501100001601",
+    "uri": "http://dx.doi.org/10.13039/501100001601",
+    "name": "Royal Irish Academy",
+    "synonym": []
+  },
+  {
+    "id": "501100001603",
+    "uri": "http://dx.doi.org/10.13039/501100001603",
+    "name": "Sustainable Energy Authority of Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100001604",
+    "uri": "http://dx.doi.org/10.13039/501100001604",
+    "name": "Teagasc",
+    "synonym": []
+  },
+  {
+    "id": "501100001627",
+    "uri": "http://dx.doi.org/10.13039/501100001627",
+    "name": "Marine Institute",
+    "synonym": []
+  },
+  {
+    "id": "501100001628",
+    "uri": "http://dx.doi.org/10.13039/501100001628",
+    "name": "Central Remedial Clinic",
+    "synonym": []
+  },
+  {
+    "id": "501100001629",
+    "uri": "http://dx.doi.org/10.13039/501100001629",
+    "name": "Royal Dublin Society",
+    "synonym": []
+  },
+  {
+    "id": "501100001630",
+    "uri": "http://dx.doi.org/10.13039/501100001630",
+    "name": "Dublin Institute for Advanced Studies",
+    "synonym": []
+  },
+  {
+    "id": "501100001631",
+    "uri": "http://dx.doi.org/10.13039/501100001631",
+    "name": "University College Dublin",
+    "synonym": []
+  },
+  {
+    "id": "501100001633",
+    "uri": "http://dx.doi.org/10.13039/501100001633",
+    "name": "National University of Ireland, Maynooth",
+    "synonym": []
+  },
+  {
+    "id": "501100001634",
+    "uri": "http://dx.doi.org/10.13039/501100001634",
+    "name": "University of Galway",
+    "synonym": []
+  },
+  {
+    "id": "501100001635",
+    "uri": "http://dx.doi.org/10.13039/501100001635",
+    "name": "University of Limerick",
+    "synonym": []
+  },
+  {
+    "id": "501100001636",
+    "uri": "http://dx.doi.org/10.13039/501100001636",
+    "name": "University College Cork",
+    "synonym": []
+  },
+  {
+    "id": "501100001637",
+    "uri": "http://dx.doi.org/10.13039/501100001637",
+    "name": "Trinity College Dublin",
+    "synonym": []
+  },
+  {
+    "id": "501100001638",
+    "uri": "http://dx.doi.org/10.13039/501100001638",
+    "name": "Dublin City University",
+    "synonym": []
+  },
+  {
+    "id": "501100002081",
+    "uri": "http://dx.doi.org/10.13039/501100002081",
+    "name": "Irish Research Council",
+    "synonym": ["501100001596", "501100001597"]
+  },
+  {
+    "id": "501100002736",
+    "uri": "http://dx.doi.org/10.13039/501100002736",
+    "name": "Covidien",
+    "synonym": []
+  },
+  {
+    "id": "501100002755",
+    "uri": "http://dx.doi.org/10.13039/501100002755",
+    "name": "Brennan and Company",
+    "synonym": []
+  },
+  {
+    "id": "501100002919",
+    "uri": "http://dx.doi.org/10.13039/501100002919",
+    "name": "Cork Institute of Technology",
+    "synonym": []
+  },
+  {
+    "id": "501100002959",
+    "uri": "http://dx.doi.org/10.13039/501100002959",
+    "name": "Dublin City Council",
+    "synonym": []
+  },
+  {
+    "id": "501100003036",
+    "uri": "http://dx.doi.org/10.13039/501100003036",
+    "name": "Perrigo Company Charitable Foundation",
+    "synonym": []
+  },
+  {
+    "id": "501100003037",
+    "uri": "http://dx.doi.org/10.13039/501100003037",
+    "name": "Elan",
+    "synonym": []
+  },
+  {
+    "id": "501100003496",
+    "uri": "http://dx.doi.org/10.13039/501100003496",
+    "name": "HeyStaks Technologies",
+    "synonym": []
+  },
+  {
+    "id": "501100003553",
+    "uri": "http://dx.doi.org/10.13039/501100003553",
+    "name": "Gaelic Athletic Association",
+    "synonym": []
+  },
+  {
+    "id": "501100003840",
+    "uri": "http://dx.doi.org/10.13039/501100003840",
+    "name": "Irish Institute of Clinical Neuroscience",
+    "synonym": []
+  },
+  {
+    "id": "501100003956",
+    "uri": "http://dx.doi.org/10.13039/501100003956",
+    "name": "Aspect Medical Systems",
+    "synonym": []
+  },
+  {
+    "id": "501100004162",
+    "uri": "http://dx.doi.org/10.13039/501100004162",
+    "name": "Meath Foundation",
+    "synonym": []
+  },
+  {
+    "id": "501100004210",
+    "uri": "http://dx.doi.org/10.13039/501100004210",
+    "name": "Our Lady's Children's Hospital, Crumlin",
+    "synonym": []
+  },
+  {
+    "id": "501100004321",
+    "uri": "http://dx.doi.org/10.13039/501100004321",
+    "name": "Shire",
+    "synonym": []
+  },
+  {
+    "id": "501100004981",
+    "uri": "http://dx.doi.org/10.13039/501100004981",
+    "name": "Athlone Institute of Technology",
+    "synonym": []
+  },
+  {
+    "id": "501100006518",
+    "uri": "http://dx.doi.org/10.13039/501100006518",
+    "name": "Department of Communications, Energy and Natural Resources, Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100006553",
+    "uri": "http://dx.doi.org/10.13039/501100006553",
+    "name": "Collaborative Centre for Applied Nanotechnology",
+    "synonym": []
+  },
+  {
+    "id": "501100006759",
+    "uri": "http://dx.doi.org/10.13039/501100006759",
+    "name": "CLARITY Centre for Sensor Web Technologies",
+    "synonym": []
+  },
+  {
+    "id": "501100009246",
+    "uri": "http://dx.doi.org/10.13039/501100009246",
+    "name": "Technological University Dublin",
+    "synonym": []
+  },
+  {
+    "id": "501100009269",
+    "uri": "http://dx.doi.org/10.13039/501100009269",
+    "name": "Programme of Competitive Forestry Research for Development",
+    "synonym": []
+  },
+  {
+    "id": "501100009315",
+    "uri": "http://dx.doi.org/10.13039/501100009315",
+    "name": "Cystinosis Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100010808",
+    "uri": "http://dx.doi.org/10.13039/501100010808",
+    "name": "Geological Survey of Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100011030",
+    "uri": "http://dx.doi.org/10.13039/501100011030",
+    "name": "Alimentary Glycoscience Research Cluster",
+    "synonym": []
+  },
+  {
+    "id": "501100011031",
+    "uri": "http://dx.doi.org/10.13039/501100011031",
+    "name": "Alimentary Health",
+    "synonym": []
+  },
+  {
+    "id": "501100011103",
+    "uri": "http://dx.doi.org/10.13039/501100011103",
+    "name": "Rann\u00eds",
+    "synonym": []
+  },
+  {
+    "id": "501100012354",
+    "uri": "http://dx.doi.org/10.13039/501100012354",
+    "name": "Inland Fisheries Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100014384",
+    "uri": "http://dx.doi.org/10.13039/501100014384",
+    "name": "X-Bolt Orthopaedics",
+    "synonym": []
+  },
+  {
+    "id": "501100014710",
+    "uri": "http://dx.doi.org/10.13039/501100014710",
+    "name": "PrecisionBiotics Group",
+    "synonym": []
+  },
+  {
+    "id": "501100014827",
+    "uri": "http://dx.doi.org/10.13039/501100014827",
+    "name": "Dormant Accounts Fund",
+    "synonym": []
+  },
+  {
+    "id": "501100016041",
+    "uri": "http://dx.doi.org/10.13039/501100016041",
+    "name": "St Vincents Anaesthesia Foundation",
+    "synonym": []
+  },
+  {
+    "id": "501100017501",
+    "uri": "http://dx.doi.org/10.13039/501100017501",
+    "name": "FotoNation",
+    "synonym": []
+  },
+  {
+    "id": "501100018641",
+    "uri": "http://dx.doi.org/10.13039/501100018641",
+    "name": "Dairy Research Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100018839",
+    "uri": "http://dx.doi.org/10.13039/501100018839",
+    "name": "Irish Centre for High-End Computing",
+    "synonym": []
+  },
+  {
+    "id": "501100019905",
+    "uri": "http://dx.doi.org/10.13039/501100019905",
+    "name": "Galway University Foundation",
+    "synonym": []
+  },
+  {
+    "id": "501100020036",
+    "uri": "http://dx.doi.org/10.13039/501100020036",
+    "name": "Dystonia Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100020221",
+    "uri": "http://dx.doi.org/10.13039/501100020221",
+    "name": "Irish Motor Neurone Disease Association",
+    "synonym": []
+  },
+  {
+    "id": "501100020270",
+    "uri": "http://dx.doi.org/10.13039/501100020270",
+    "name": "Advanced Materials and Bioengineering Research",
+    "synonym": []
+  },
+  {
+    "id": "501100020403",
+    "uri": "http://dx.doi.org/10.13039/501100020403",
+    "name": "Irish Composites Centre",
+    "synonym": []
+  },
+  {
+    "id": "501100020425",
+    "uri": "http://dx.doi.org/10.13039/501100020425",
+    "name": "Irish Thoracic Society",
+    "synonym": []
+  },
+  {
+    "id": "501100021102",
+    "uri": "http://dx.doi.org/10.13039/501100021102",
+    "name": "Waterford Institute of Technology",
+    "synonym": []
+  },
+  {
+    "id": "501100021110",
+    "uri": "http://dx.doi.org/10.13039/501100021110",
+    "name": "Irish MPS Society",
+    "synonym": []
+  },
+  {
+    "id": "501100021525",
+    "uri": "http://dx.doi.org/10.13039/501100021525",
+    "name": "Insight SFI Research Centre for Data Analytics",
+    "synonym": []
+  },
+  {
+    "id": "501100021694",
+    "uri": "http://dx.doi.org/10.13039/501100021694",
+    "name": "Elan Pharma International",
+    "synonym": []
+  },
+  {
+    "id": "501100021838",
+    "uri": "http://dx.doi.org/10.13039/501100021838",
+    "name": "Royal College of Physicians of Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100022542",
+    "uri": "http://dx.doi.org/10.13039/501100022542",
+    "name": "Breakthrough Cancer Research",
+    "synonym": []
+  },
+  {
+    "id": "501100022610",
+    "uri": "http://dx.doi.org/10.13039/501100022610",
+    "name": "Breast Cancer Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100022728",
+    "uri": "http://dx.doi.org/10.13039/501100022728",
+    "name": "Munster Technological University",
+    "synonym": []
+  },
+  {
+    "id": "501100022729",
+    "uri": "http://dx.doi.org/10.13039/501100022729",
+    "name": "Institute of Technology, Tralee",
+    "synonym": []
+  },
+  {
+    "id": "501100023273",
+    "uri": "http://dx.doi.org/10.13039/501100023273",
+    "name": "HRB Clinical Research Facility Galway",
+    "synonym": []
+  },
+  {
+    "id": "501100023378",
+    "uri": "http://dx.doi.org/10.13039/501100023378",
+    "name": "Lauritzson Foundation",
+    "synonym": []
+  },
+  {
+    "id": "501100023551",
+    "uri": "http://dx.doi.org/10.13039/501100023551",
+    "name": "Cystic Fibrosis Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100023970",
+    "uri": "http://dx.doi.org/10.13039/501100023970",
+    "name": "Tyndall National Institute",
+    "synonym": []
+  },
+  {
+    "id": "501100024094",
+    "uri": "http://dx.doi.org/10.13039/501100024094",
+    "name": "Raidi\u00f3 Teilif\u00eds \u00c9ireann",
+    "synonym": []
+  },
+  {
+    "id": "501100024242",
+    "uri": "http://dx.doi.org/10.13039/501100024242",
+    "name": "Synthesis and Solid State Pharmaceutical Centre",
+    "synonym": []
+  },
+  {
+    "id": "501100024313",
+    "uri": "http://dx.doi.org/10.13039/501100024313",
+    "name": "Irish Rugby Football Union",
+    "synonym": []
+  },
+  {
+    "id": "100007490",
+    "uri": "http://dx.doi.org/10.13039/100007490",
+    "name": "Bausch and Lomb Ireland",
+    "synonym": []
+  },
+  {
+    "id": "100007819",
+    "uri": "http://dx.doi.org/10.13039/100007819",
+    "name": "Allergan",
+    "synonym": []
+  },
+  {
+    "id": "100010547",
+    "uri": "http://dx.doi.org/10.13039/100010547",
+    "name": "Irish Youth Justice Service",
+    "synonym": []
+  },
+  {
+    "id": "100012733",
+    "uri": "http://dx.doi.org/10.13039/100012733",
+    "name": "National Parks and Wildlife Service",
+    "synonym": []
+  },
+  {
+    "id": "100015278",
+    "uri": "http://dx.doi.org/10.13039/100015278",
+    "name": "Pfizer Healthcare Ireland",
+    "synonym": []
+  },
+  {
+    "id": "100017144",
+    "uri": "http://dx.doi.org/10.13039/100017144",
+    "name": "Shell E and P Ireland",
+    "synonym": []
+  },
+  {
+    "id": "100022895",
+    "uri": "http://dx.doi.org/10.13039/100022895",
+    "name": "Health Research Institute, University of Limerick",
+    "synonym": []
+  },
+  {
+    "id": "501100001599",
+    "uri": "http://dx.doi.org/10.13039/501100001599",
+    "name": "National Council for Forest Research and Development",
+    "synonym": []
+  },
+  {
+    "id": "501100006554",
+    "uri": "http://dx.doi.org/10.13039/501100006554",
+    "name": "IDA Ireland",
+    "synonym": []
+  },
+  {
+    "id": "501100011626",
+    "uri": "http://dx.doi.org/10.13039/501100011626",
+    "name": "Energy Policy Research Centre, Economic and Social Research Institute",
+    "synonym": []
+  },
+  {
+    "id": "501100014531",
+    "uri": "http://dx.doi.org/10.13039/501100014531",
+    "name": "Physical Education and Sport Sciences Department, University of Limerick",
+    "synonym": []
+  },
+  {
+    "id": "501100014745",
+    "uri": "http://dx.doi.org/10.13039/501100014745",
+    "name": "APC Microbiome Institute",
+    "synonym": []
+  },
+  {
+    "id": "501100014826",
+    "uri": "http://dx.doi.org/10.13039/501100014826",
+    "name": "ADAPT - Centre for Digital Content Technology",
+    "synonym": []
+  },
+  {
+    "id": "501100020570",
+    "uri": "http://dx.doi.org/10.13039/501100020570",
+    "name": "College of Medicine, Nursing and Health Sciences, National University of Ireland, Galway",
+    "synonym": []
+  },
+  {
+    "id": "501100020871",
+    "uri": "http://dx.doi.org/10.13039/501100020871",
+    "name": "Bernal Institute, University of Limerick",
+    "synonym": []
+  },
+  {
+    "id": "501100023852",
+    "uri": "http://dx.doi.org/10.13039/501100023852",
+    "name": "Moore Institute for Research in the Humanities and Social Studies, University of Galway",
+    "synonym": []
+  }
+]
