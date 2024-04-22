@@ -78,7 +78,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 			spark -> {
 
 				createActionSet(spark, inputPath, outputPath + "actionSet");
-				// createPlainRelations(spark, inputPath, outputPath + "relations");
+				createPlainRelations(spark, inputPath, outputPath + "relations");
 			});
 	}
 
@@ -139,6 +139,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 		String outputPath) {
 
 		final Dataset<Row> dataset = readWebCrawl(spark, inputPath)
+				.filter("publication_year <= 2020 or country_code=='IE'")
 			.drop("publication_year");
 
 		dataset.flatMap((FlatMapFunction<Row, Relation>) row -> {
