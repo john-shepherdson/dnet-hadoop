@@ -23,6 +23,7 @@
         <module>dhp-pace-core</module>
         <module>dhp-common</module>
         <module>dhp-workflows</module>
+        <module>dhp-shade-package</module>
     </modules>
 
     <issueManagement>
