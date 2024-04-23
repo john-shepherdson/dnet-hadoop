@@ -77,7 +77,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 
-				createActionSet(spark, inputPath, outputPath );
+				createActionSet(spark, inputPath, outputPath);
 
 			});
 	}
@@ -143,7 +143,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 		return createAffiliatioRelationPair(
 			PMCID_PREFIX
 				+ IdentifierFactory
-					.md5(PidCleaner.normalizePidValue(PidType.pmc.toString(), removeResolver("PMC" , pmcid))),
+					.md5(PidCleaner.normalizePidValue(PidType.pmc.toString(), removeResolver("PMC", pmcid))),
 			ror);
 	}
 
@@ -159,7 +159,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 	}
 
 	private static String removeResolver(String pidType, String pid) {
-		switch (pidType){
+		switch (pidType) {
 			case "PMID":
 				return pid.substring(33);
 			case "PMC":
@@ -179,7 +179,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 		return createAffiliatioRelationPair(
 			DOI_PREFIX
 				+ IdentifierFactory
-					.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), removeResolver("DOI" ,doi))),
+					.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), removeResolver("DOI", doi))),
 			ror);
 
 	}
