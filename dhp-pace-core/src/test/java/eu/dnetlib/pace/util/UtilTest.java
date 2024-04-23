@@ -7,9 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.pace.model.Person;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 
 public class UtilTest {
 
@@ -20,7 +22,8 @@ public class UtilTest {
 		params = new HashMap<>();
 	}
 
-	// @Test
+	@Test
+	@Disabled
 	public void paceResolverTest() {
 		PaceResolver paceResolver = new PaceResolver();
 		paceResolver.getComparator("keywordMatch", params);

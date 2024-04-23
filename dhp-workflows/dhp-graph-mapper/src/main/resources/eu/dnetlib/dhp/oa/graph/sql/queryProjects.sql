@@ -33,7 +33,7 @@ SELECT
                 dc.officialname                                                                                            AS collectedfromname,
                 p.contracttype || '@@@' || p.contracttypescheme                                                            AS contracttype,
                 p.provenanceactionclass || '@@@' || p.provenanceactionscheme                                             AS provenanceaction,
-                array_remove(array_agg(DISTINCT i.pid || '###' || i.issuertype || '@@@' || i.issuertype), NULL)            AS pid,,
+                array_remove(array_agg(DISTINCT i.pid || '###' || i.issuertype || '@@@' || i.issuertype), NULL)            AS pid,
                 array_agg(DISTINCT s.name || '###' || s.semanticclass || '@@@' || s.semanticscheme)          AS subjects,
                 array_agg(DISTINCT fp.path)                                                                                         AS fundingtree
 
