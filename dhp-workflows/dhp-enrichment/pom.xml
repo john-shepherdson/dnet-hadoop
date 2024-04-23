@@ -3,7 +3,7 @@
     <parent>
         <artifactId>dhp-workflows</artifactId>
         <groupId>eu.dnetlib.dhp</groupId>
-        <version>1.2.5-SNAPSHOT</version>
+        <version>1.2.5-beta</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-aggregation</artifactId>
-            <version>1.2.5-SNAPSHOT</version>
+            <version>1.2.5-beta</version>
             <scope>compile</scope>
         </dependency>
 
