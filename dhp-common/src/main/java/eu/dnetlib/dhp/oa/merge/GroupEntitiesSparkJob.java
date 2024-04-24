@@ -135,7 +135,7 @@ public class GroupEntitiesSparkJob {
 					.applyCoarVocabularies(entity, vocs),
 				OAFENTITY_KRYO_ENC)
 			.groupByKey((MapFunction<OafEntity, String>) OafEntity::getId, Encoders.STRING())
-			.mapGroups((MapGroupsFunction<String, OafEntity, OafEntity>) MergeUtils::mergeGroup, OAFENTITY_KRYO_ENC)
+			.mapGroups((MapGroupsFunction<String, OafEntity, OafEntity>) MergeUtils::mergeById, OAFENTITY_KRYO_ENC)
 			.map(
 				(MapFunction<OafEntity, Tuple2<String, OafEntity>>) t -> new Tuple2<>(
 					t.getClass().getName(), t),
