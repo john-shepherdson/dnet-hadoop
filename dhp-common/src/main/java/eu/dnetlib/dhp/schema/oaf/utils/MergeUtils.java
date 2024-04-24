@@ -288,8 +288,9 @@ public class MergeUtils {
 		}
 
 		HashMap<String, KeyValue> values = new HashMap<>();
-		left.forEach(kv -> values.put(kv.getKey(), kv));
-		right.forEach(kv -> values.putIfAbsent(kv.getKey(), kv));
+
+		Optional.ofNullable(left).ifPresent(l -> l.forEach(kv -> values.put(kv.getKey(), kv)));
+		Optional.ofNullable(right).ifPresent(r -> r.forEach(kv -> values.putIfAbsent(kv.getKey(), kv)));
 
 		return new ArrayList<>(values.values());
 	}
