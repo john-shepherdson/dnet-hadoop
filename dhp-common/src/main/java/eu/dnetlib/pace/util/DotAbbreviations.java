@@ -8,4 +8,4 @@ public class DotAbbreviations implements Function<String, String> {
 	public String apply(String s) {
 		return s.length() == 1 ? s + "." : s;
 	}
-};
+}
