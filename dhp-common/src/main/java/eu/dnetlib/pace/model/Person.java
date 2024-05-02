@@ -1,20 +1,19 @@
 
 package eu.dnetlib.pace.model;
 
-import java.nio.charset.Charset;
-import java.text.Normalizer;
-import java.util.List;
-import java.util.Set;
-
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.hash.Hashing;
-
-import eu.dnetlib.pace.common.AbstractPaceFunctions;
+import eu.dnetlib.pace.common.PaceCommonUtils;
 import eu.dnetlib.pace.util.Capitalise;
 import eu.dnetlib.pace.util.DotAbbreviations;
+
+import java.nio.charset.Charset;
+import java.text.Normalizer;
+import java.util.List;
+import java.util.Set;
 
 public class Person {
 
@@ -86,7 +85,7 @@ public class Person {
 
 	private List<String> splitTerms(final String s) {
 		if (particles == null) {
-			particles = AbstractPaceFunctions.loadFromClasspath("/eu/dnetlib/pace/config/name_particles.txt");
+			particles = PaceCommonUtils.loadFromClasspath("/eu/dnetlib/pace/config/name_particles.txt");
 		}
 
 		final List<String> list = Lists.newArrayList();
