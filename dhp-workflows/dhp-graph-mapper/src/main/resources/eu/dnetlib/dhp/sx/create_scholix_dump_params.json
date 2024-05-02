@@ -1,5 +1,5 @@
 [
-  {"paramName":"mt",  "paramLongName":"master",     "paramDescription": "should be local or yarn",  "paramRequired": true},
+  {"paramName":"mt",  "paramLongName":"master",     "paramDescription": "should be local or yarn",  "paramRequired": false},
   {"paramName":"s",   "paramLongName":"sourcePath", "paramDescription": "the source Path",           "paramRequired": true},
   {"paramName":"t",   "paramLongName":"targetPath", "paramDescription": "the path of the scholix dump", "paramRequired": true}
 ]
