@@ -15,13 +15,6 @@
 
     <description>This module is the container for the oozie workflow definitions in dnet-hadoop project</description>
 
-    <distributionManagement>
-        <site>
-            <id>DHPSite</id>
-            <url>${dhp.site.stage.path}/dhp-workflows</url>
-        </site>
-    </distributionManagement>
-
     <modules>
         <module>dhp-workflow-profiles</module>
         <module>dhp-aggregation</module>

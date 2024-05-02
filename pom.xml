@@ -180,8 +180,20 @@
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
+				<groupId>org.apache.hadoop</groupId>
+				<artifactId>hadoop-mapreduce-client-core</artifactId>
+				<version>${dhp.hadoop.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
 				<groupId>org.apache.spark</groupId>
 				<artifactId>spark-core_${scala.binary.version}</artifactId>
+				<version>${dhp.spark.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.spark</groupId>
+				<artifactId>spark-catalyst_2.11</artifactId>
 				<version>${dhp.spark.version}</version>
 				<scope>provided</scope>
 			</dependency>
@@ -202,6 +214,12 @@
 				<artifactId>spark-hive_${scala.binary.version}</artifactId>
 				<version>${dhp.spark.version}</version>
 				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>1.7.5</version>
 			</dependency>
 
 			<dependency>
@@ -325,7 +343,11 @@
 				<version>3.2.6</version>
 				<scope>test</scope>
 			</dependency>
-
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-core</artifactId>
+				<version>3.2.1.RELEASE</version>
+			</dependency>
 
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>
@@ -336,6 +358,16 @@
 				<groupId>org.apache.httpcomponents</groupId>
 				<artifactId>httpmime</artifactId>
 				<version>${org.apache.httpcomponents.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpcore</artifactId>
+				<version>4.4.6</version>
+			</dependency>
+			<dependency>
+				<groupId>com.squareup.okio</groupId>
+				<artifactId>okio</artifactId>
+				<version>2.6.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.noggit</groupId>
@@ -413,6 +445,21 @@
 			<dependency>
 				<groupId>org.apache.cxf</groupId>
 				<artifactId>cxf-rt-transports-http</artifactId>
+				<version>3.1.5</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-frontend-simple</artifactId>
+				<version>3.1.5</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-rt-frontend-jaxws</artifactId>
+				<version>3.1.5</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.cxf</groupId>
+				<artifactId>cxf-core</artifactId>
 				<version>3.1.5</version>
 			</dependency>
 			<dependency>
@@ -504,6 +551,11 @@
 				<artifactId>commons-compress</artifactId>
 				<version>${common.compress.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>commons-lang</groupId>
+				<artifactId>commons-lang</artifactId>
+				<version>2.6</version>
+			</dependency>
 
 			<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
 			<dependency>
@@ -524,6 +576,18 @@
 				<groupId>org.json</groupId>
 				<artifactId>json</artifactId>
 				<version>20180813</version>
+			</dependency>
+
+			<dependency>
+				<groupId>net.minidev</groupId>
+				<artifactId>json-smart</artifactId>
+				<version>2.3</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.json4s</groupId>
+				<artifactId>json4s-core_${scala.binary.version}</artifactId>
+				<version>${json4s.version}</version>
 			</dependency>
 
 			<dependency>
@@ -630,14 +694,6 @@
 					<artifactId>maven-project-info-reports-plugin</artifactId>
 					<version>3.0.0</version>
 				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-site-plugin</artifactId>
-					<version>3.9.1</version>
-					<configuration>
-						<skip>${dhp.site.skip}</skip>
-					</configuration>
-				</plugin>
 
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -723,10 +779,6 @@
 			</plugins>
 		</pluginManagement>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
@@ -848,10 +900,6 @@
 			<id>dnet45-releases</id>
 			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-releases</url>
 		</repository>
-		<site>
-			<id>DHPSite</id>
-			<url>${dhp.site.stage.path}/</url>
-		</site>
 	</distributionManagement>
 	<reporting>
 		<plugins>
@@ -867,7 +915,6 @@
 	</reporting>
 
 	<properties>
-		<dhp.site.stage.path>sftp://dnet-hadoop@static-web.d4science.org/dnet-hadoop</dhp.site.stage.path>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>

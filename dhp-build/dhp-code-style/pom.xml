@@ -22,10 +22,6 @@
             <id>dnet45-releases</id>
             <url>https://maven.d4science.org/nexus/content/repositories/dnet45-releases</url>
         </repository>
-        <site>
-            <id>DHPSite</id>
-            <url>${dhp.site.stage.path}/dhp-build/dhp-code-style</url>
-        </site>
     </distributionManagement>
 
     <build>
@@ -43,22 +39,12 @@
                     <artifactId>maven-project-info-reports-plugin</artifactId>
                     <version>3.0.0</version>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-site-plugin</artifactId>
-                    <version>3.9.1</version>
-                    <configuration>
-                        <skip>true</skip>
-                    </configuration>
-                </plugin>
             </plugins>
         </pluginManagement>
     </build>
 
     <properties>
-
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <dhp.site.stage.path>sftp://dnet-hadoop@static-web.d4science.org/dnet-hadoop</dhp.site.stage.path>
     </properties>
 
 </project>
