@@ -1,8 +1,9 @@
 
 package eu.dnetlib.pace.util;
 
-import com.google.common.base.Function;
 import org.apache.commons.lang3.text.WordUtils;
+
+import com.google.common.base.Function;
 
 public class Capitalise implements Function<String, String> {
 
