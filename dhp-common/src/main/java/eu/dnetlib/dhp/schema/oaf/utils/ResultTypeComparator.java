@@ -36,6 +36,15 @@ public class ResultTypeComparator implements Comparator<Result> {
 			return 1;
 		}
 
+		if (left.getResulttype() == null || left.getResulttype().getClassid() == null) {
+			if (right.getResulttype() == null || right.getResulttype().getClassid() == null) {
+				return 0;
+			}
+			return 1;
+		} else if (right.getResulttype() == null || right.getResulttype().getClassid() == null) {
+			return -1;
+		}
+
 		String lClass = left.getResulttype().getClassid();
 		String rClass = right.getResulttype().getClassid();
 

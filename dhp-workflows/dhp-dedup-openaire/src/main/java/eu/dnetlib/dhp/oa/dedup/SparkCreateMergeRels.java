@@ -175,6 +175,7 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 			}
 
 			// cap pidType at w3id as from there on they are considered equal
+
 			UserDefinedFunction mapPid = udf(
 				(String s) -> Math.min(PidType.tryValueOf(s).ordinal(), PidType.w3id.ordinal()), DataTypes.IntegerType);
 
