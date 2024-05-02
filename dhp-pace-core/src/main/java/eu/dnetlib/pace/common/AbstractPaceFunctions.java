@@ -1,32 +1,26 @@
 
 package eu.dnetlib.pace.common;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Sets;
+import com.ibm.icu.text.Transliterator;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
-import java.text.Normalizer;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
-import com.ibm.icu.text.Transliterator;
-
-import eu.dnetlib.pace.clustering.NGramUtils;
 
 /**
  * Set of common functions for the framework
  *
  * @author claudio
  */
-public class AbstractPaceFunctions {
+public class AbstractPaceFunctions extends PaceCommonUtils {
 
 	// city map to be used when translating the city names into codes
 	private static Map<String, String> cityMap = AbstractPaceFunctions
@@ -41,9 +35,6 @@ public class AbstractPaceFunctions {
 	protected static Set<String> stopwords_it = loadFromClasspath("/eu/dnetlib/pace/config/stopwords_it.txt");
 	protected static Set<String> stopwords_pt = loadFromClasspath("/eu/dnetlib/pace/config/stopwords_pt.txt");
 
-	// transliterator
-	protected static Transliterator transliterator = Transliterator.getInstance("Any-Eng");
-
 	// blacklist of ngrams: to avoid generic keys
 	protected static Set<String> ngramBlacklist = loadFromClasspath("/eu/dnetlib/pace/config/ngram_blacklist.txt");
 
@@ -51,8 +42,6 @@ public class AbstractPaceFunctions {
 	public static final Pattern HTML_REGEX = Pattern.compile("<[^>]*>");
 
 	private static final String alpha = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ";
-	private static final String aliases_from = "⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻⁼⁽⁾ⁿ₀₁₂₃₄₅₆₇₈₉₊₋₌₍₎àáâäæãåāèéêëēėęəîïíīįìôöòóœøōõûüùúūßśšłžźżçćčñń";
-	private static final String aliases_to = "0123456789+-=()n0123456789+-=()aaaaaaaaeeeeeeeeiiiiiioooooooouuuuussslzzzcccnn";
 
 	// doi prefix for normalization
 	public static final Pattern DOI_PREFIX = Pattern.compile("(https?:\\/\\/dx\\.doi\\.org\\/)|(doi:)");
@@ -129,25 +118,6 @@ public class AbstractPaceFunctions {
 		return numberPattern.matcher(strNum).matches();
 	}
 
-	protected static String fixAliases(final String s) {
-		final StringBuilder sb = new StringBuilder();
-
-		s.chars().forEach(ch -> {
-			final int i = StringUtils.indexOf(aliases_from, ch);
-			sb.append(i >= 0 ? aliases_to.charAt(i) : (char) ch);
-		});
-
-		return sb.toString();
-	}
-
-	protected static String transliterate(final String s) {
-		try {
-			return transliterator.transliterate(s);
-		} catch (Exception e) {
-			return s;
-		}
-	}
-
 	protected static String removeSymbols(final String s) {
 		final StringBuilder sb = new StringBuilder();
 
@@ -160,23 +130,6 @@ public class AbstractPaceFunctions {
 
 	protected static boolean notNull(final String s) {
 		return s != null;
-	}
-
-	public static String normalize(final String s) {
-		return fixAliases(transliterate(nfd(unicodeNormalization(s))))
-			.toLowerCase()
-			// do not compact the regexes in a single expression, would cause StackOverflowError in case of large input
-			// strings
-			.replaceAll("[^ \\w]+", "")
-			.replaceAll("(\\p{InCombiningDiacriticalMarks})+", "")
-			.replaceAll("(\\p{Punct})+", " ")
-			.replaceAll("(\\d)+", " ")
-			.replaceAll("(\\n)+", " ")
-			.trim();
-	}
-
-	public static String nfd(final String s) {
-		return Normalizer.normalize(s, Normalizer.Form.NFD);
 	}
 
 	public static String utf8(final String s) {
@@ -233,22 +186,6 @@ public class AbstractPaceFunctions {
 		return newset;
 	}
 
-	public static Set<String> loadFromClasspath(final String classpath) {
-
-		Transliterator transliterator = Transliterator.getInstance("Any-Eng");
-
-		final Set<String> h = Sets.newHashSet();
-		try {
-			for (final String s : IOUtils
-				.readLines(NGramUtils.class.getResourceAsStream(classpath), StandardCharsets.UTF_8)) {
-				h.add(fixAliases(transliterator.transliterate(s))); // transliteration of the stopwords
-			}
-		} catch (final Throwable e) {
-			return Sets.newHashSet();
-		}
-		return h;
-	}
-
 	public static Map<String, String> loadMapFromClasspath(final String classpath) {
 
 		Transliterator transliterator = Transliterator.getInstance("Any-Eng");
@@ -301,10 +238,6 @@ public class AbstractPaceFunctions {
 
 	protected static String firstLC(final String s) {
 		return StringUtils.substring(s, 0, 1).toLowerCase();
-	}
-
-	protected static Iterable<String> tokens(final String s, final int maxTokens) {
-		return Iterables.limit(Splitter.on(" ").omitEmptyStrings().trimResults().split(s), maxTokens);
 	}
 
 	public static String normalizePid(String pid) {

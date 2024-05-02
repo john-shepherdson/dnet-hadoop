@@ -189,7 +189,7 @@ public class DedupRecordFactory {
 			entity = swap;
 		}
 
-		entity = MergeUtils.checkedMerge(entity, duplicate);
+		entity = MergeUtils.checkedMerge(entity, duplicate, false);
 
 		if (ModelSupport.isSubClass(duplicate, Result.class)) {
 			Result re = (Result) entity;
