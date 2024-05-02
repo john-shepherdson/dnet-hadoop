@@ -4,7 +4,7 @@
     <parent>
         <groupId>eu.dnetlib.dhp</groupId>
         <artifactId>dhp-workflows</artifactId>
-        <version>1.2.5-beta</version>
+        <version>1.2.5-SNAPSHOT</version>
     </parent>
     <artifactId>dhp-actionmanager</artifactId>
 
