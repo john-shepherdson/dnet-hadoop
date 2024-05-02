@@ -65,7 +65,8 @@ public class RestIterator implements Iterator<String> {
 	private final int resultSizeValue;
 	private int resumptionInt = 0; // integer resumption token (first record to harvest)
 	private int resultTotal = -1;
-	private String resumptionStr = Integer.toString(this.resumptionInt); // string resumption token (first record to harvest
+	private String resumptionStr = Integer.toString(this.resumptionInt); // string resumption token (first record to
+																			// harvest
 	// or token scanned from results)
 	private InputStream resultStream;
 	private Transformer transformer;
@@ -82,9 +83,9 @@ public class RestIterator implements Iterator<String> {
 	private int discoverResultSize = 0;
 	private int pagination = 1;
 	/*
-	 * While resultFormatValue is added to the request parameter, this is used to say that the results are retrieved in json. useful for
-	 * cases when the target API expects a resultFormatValue != json, but the results are returned in json. An example is the EU Open Data
-	 * Portal API: resultFormatValue=standard, results are in json format.
+	 * While resultFormatValue is added to the request parameter, this is used to say that the results are retrieved in
+	 * json. useful for cases when the target API expects a resultFormatValue != json, but the results are returned in
+	 * json. An example is the EU Open Data Portal API: resultFormatValue=standard, results are in json format.
 	 */
 	private final String resultOutputFormat;
 
@@ -92,21 +93,21 @@ public class RestIterator implements Iterator<String> {
 	 * RestIterator class compatible to version 1.3.33
 	 */
 	public RestIterator(
-			final HttpClientParams clientParams,
-			final String baseUrl,
-			final String resumptionType,
-			final String resumptionParam,
-			final String resumptionXpath,
-			final String resultTotalXpath,
-			final String resultFormatParam,
-			final String resultFormatValue,
-			final String resultSizeParam,
-			final String resultSizeValueStr,
-			final String queryParams,
-			final String entityXpath,
-			final String authMethod,
-			final String authToken,
-			final String resultOutputFormat) {
+		final HttpClientParams clientParams,
+		final String baseUrl,
+		final String resumptionType,
+		final String resumptionParam,
+		final String resumptionXpath,
+		final String resultTotalXpath,
+		final String resultFormatParam,
+		final String resultFormatValue,
+		final String resultSizeParam,
+		final String resultSizeValueStr,
+		final String queryParams,
+		final String entityXpath,
+		final String authMethod,
+		final String authToken,
+		final String resultOutputFormat) {
 
 		this.clientParams = clientParams;
 		this.baseUrl = baseUrl;
@@ -120,8 +121,9 @@ public class RestIterator implements Iterator<String> {
 		this.resultOutputFormat = resultOutputFormat;
 
 		this.queryFormat = StringUtils.isNotBlank(resultFormatParam) ? "&" + resultFormatParam + "=" + resultFormatValue
-				: "";
-		this.querySize = StringUtils.isNotBlank(resultSizeParam) ? "&" + resultSizeParam + "=" + resultSizeValueStr : "";
+			: "";
+		this.querySize = StringUtils.isNotBlank(resultSizeParam) ? "&" + resultSizeParam + "=" + resultSizeValueStr
+			: "";
 
 		try {
 			initXmlTransformation(resultTotalXpath, resumptionXpath, entityXpath);
@@ -132,8 +134,9 @@ public class RestIterator implements Iterator<String> {
 		initQueue();
 	}
 
-	private void initXmlTransformation(final String resultTotalXpath, final String resumptionXpath, final String entityXpath)
-			throws TransformerConfigurationException, XPathExpressionException {
+	private void initXmlTransformation(final String resultTotalXpath, final String resumptionXpath,
+		final String entityXpath)
+		throws TransformerConfigurationException, XPathExpressionException {
 		final TransformerFactory factory = TransformerFactory.newInstance();
 		this.transformer = factory.newTransformer();
 		this.transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -155,7 +158,6 @@ public class RestIterator implements Iterator<String> {
 
 	/*
 	 * (non-Javadoc)
-	 *
 	 * @see java.util.Iterator#hasNext()
 	 */
 	@Override
@@ -169,7 +171,6 @@ public class RestIterator implements Iterator<String> {
 
 	/*
 	 * (non-Javadoc)
-	 *
 	 * @see java.util.Iterator#next()
 	 */
 	@Override
@@ -192,7 +193,9 @@ public class RestIterator implements Iterator<String> {
 	 */
 	private String downloadPage(String query, final int attempt) throws CollectorException {
 
-		if (attempt > MAX_ATTEMPTS) { throw new CollectorException("Max Number of attempts reached, query:" + query); }
+		if (attempt > MAX_ATTEMPTS) {
+			throw new CollectorException("Max Number of attempts reached, query:" + query);
+		}
 
 		if (attempt > 0) {
 			final int delay = (attempt * 5000);
@@ -254,15 +257,19 @@ public class RestIterator implements Iterator<String> {
 				}
 
 				if (!(emptyXml).equalsIgnoreCase(resultXml)) {
-					resultNode = (Node) this.xpath.evaluate("/", new InputSource(this.resultStream), XPathConstants.NODE);
+					resultNode = (Node) this.xpath
+						.evaluate("/", new InputSource(this.resultStream), XPathConstants.NODE);
 					nodeList = (NodeList) this.xprEntity.evaluate(resultNode, XPathConstants.NODESET);
 					log.debug("nodeList.length: {}", nodeList.getLength());
 					for (int i = 0; i < nodeList.getLength(); i++) {
 						final StringWriter sw = new StringWriter();
 						this.transformer.transform(new DOMSource(nodeList.item(i)), new StreamResult(sw));
 						final String toEnqueue = sw.toString();
-						if ((toEnqueue == null) || StringUtils.isBlank(toEnqueue) || emptyXml.equalsIgnoreCase(toEnqueue)) {
-							log.warn("The following record resulted in empty item for the feeding queue: {}", resultXml);
+						if ((toEnqueue == null) || StringUtils.isBlank(toEnqueue)
+							|| emptyXml.equalsIgnoreCase(toEnqueue)) {
+							log
+								.warn(
+									"The following record resulted in empty item for the feeding queue: {}", resultXml);
 						} else {
 							this.recordQueue.add(sw.toString());
 						}
@@ -274,90 +281,95 @@ public class RestIterator implements Iterator<String> {
 				this.resumptionInt += this.resultSizeValue;
 
 				switch (this.resumptionType.toLowerCase()) {
-				case "scan": // read of resumptionToken , evaluate next results, e.g. OAI, iterate over items
-					this.resumptionStr = this.xprResumptionPath.evaluate(resultNode);
-					break;
+					case "scan": // read of resumptionToken , evaluate next results, e.g. OAI, iterate over items
+						this.resumptionStr = this.xprResumptionPath.evaluate(resultNode);
+						break;
 
-				case "count": // begin at one step for all records, iterate over items
-					this.resumptionStr = Integer.toString(this.resumptionInt);
-					break;
+					case "count": // begin at one step for all records, iterate over items
+						this.resumptionStr = Integer.toString(this.resumptionInt);
+						break;
 
-				case "discover": // size of result items unknown, iterate over items (for openDOAR - 201808)
-					if (this.resultSizeValue < 2) { throw new CollectorException("Mode: discover, Param 'resultSizeValue' is less than 2"); }
-					qUrlArgument = qUrl.getQuery();
-					final String[] arrayQUrlArgument = qUrlArgument.split("&");
-					for (final String arrayUrlArgStr : arrayQUrlArgument) {
-						if (arrayUrlArgStr.startsWith(this.resumptionParam)) {
-							final String[] resumptionKeyValue = arrayUrlArgStr.split("=");
-							if (isInteger(resumptionKeyValue[1])) {
-								urlOldResumptionSize = Integer.parseInt(resumptionKeyValue[1]);
-								log.debug("discover OldResumptionSize from Url (int): {}", urlOldResumptionSize);
-							} else {
-								log.debug("discover OldResumptionSize from Url (str): {}", resumptionKeyValue[1]);
+					case "discover": // size of result items unknown, iterate over items (for openDOAR - 201808)
+						if (this.resultSizeValue < 2) {
+							throw new CollectorException("Mode: discover, Param 'resultSizeValue' is less than 2");
+						}
+						qUrlArgument = qUrl.getQuery();
+						final String[] arrayQUrlArgument = qUrlArgument.split("&");
+						for (final String arrayUrlArgStr : arrayQUrlArgument) {
+							if (arrayUrlArgStr.startsWith(this.resumptionParam)) {
+								final String[] resumptionKeyValue = arrayUrlArgStr.split("=");
+								if (isInteger(resumptionKeyValue[1])) {
+									urlOldResumptionSize = Integer.parseInt(resumptionKeyValue[1]);
+									log.debug("discover OldResumptionSize from Url (int): {}", urlOldResumptionSize);
+								} else {
+									log.debug("discover OldResumptionSize from Url (str): {}", resumptionKeyValue[1]);
+								}
 							}
 						}
-					}
 
-					if (((emptyXml).equalsIgnoreCase(resultXml))
+						if (((emptyXml).equalsIgnoreCase(resultXml))
 							|| ((nodeList != null) && (nodeList.getLength() < this.resultSizeValue))) {
-						// resumptionStr = "";
+							// resumptionStr = "";
+							if (nodeList != null) {
+								this.discoverResultSize += nodeList.getLength();
+							}
+							this.resultTotal = this.discoverResultSize;
+						} else {
+							this.resumptionStr = Integer.toString(this.resumptionInt);
+							this.resultTotal = this.resumptionInt + 1;
+							if (nodeList != null) {
+								this.discoverResultSize += nodeList.getLength();
+							}
+						}
+						log.info("discoverResultSize: {}", this.discoverResultSize);
+						break;
+
+					case "pagination":
+					case "page": // pagination, iterate over page numbers
+						this.pagination += 1;
 						if (nodeList != null) {
 							this.discoverResultSize += nodeList.getLength();
+						} else {
+							this.resultTotal = this.discoverResultSize;
+							this.pagination = this.discoverResultSize;
 						}
-						this.resultTotal = this.discoverResultSize;
-					} else {
+						this.resumptionInt = this.pagination;
 						this.resumptionStr = Integer.toString(this.resumptionInt);
-						this.resultTotal = this.resumptionInt + 1;
-						if (nodeList != null) {
-							this.discoverResultSize += nodeList.getLength();
+						break;
+
+					case "deep-cursor": // size of result items unknown, iterate over items (for supporting deep cursor
+										// in
+										// solr)
+						// isn't relevant -- if (resultSizeValue < 2) {throw new CollectorServiceException("Mode:
+						// deep-cursor, Param 'resultSizeValue' is less than 2");}
+
+						this.resumptionStr = encodeValue(this.xprResumptionPath.evaluate(resultNode));
+						this.queryParams = this.queryParams.replace("&cursor=*", "");
+
+						// terminating if length of nodeList is 0
+						if ((nodeList != null) && (nodeList.getLength() < this.discoverResultSize)) {
+							this.resumptionInt += ((nodeList.getLength() + 1) - this.resultSizeValue);
+						} else {
+							this.resumptionInt += (nodeList.getLength() - this.resultSizeValue); // subtract the
+																									// resultSizeValue
+							// because the iteration is over
+							// real length and the
+							// resultSizeValue is added before
+							// the switch()
 						}
-					}
-					log.info("discoverResultSize: {}", this.discoverResultSize);
-					break;
 
-				case "pagination":
-				case "page": // pagination, iterate over page numbers
-					this.pagination += 1;
-					if (nodeList != null) {
-						this.discoverResultSize += nodeList.getLength();
-					} else {
-						this.resultTotal = this.discoverResultSize;
-						this.pagination = this.discoverResultSize;
-					}
-					this.resumptionInt = this.pagination;
-					this.resumptionStr = Integer.toString(this.resumptionInt);
-					break;
+						this.discoverResultSize = nodeList.getLength();
 
-				case "deep-cursor": // size of result items unknown, iterate over items (for supporting deep cursor in
-									 // solr)
-					// isn't relevant -- if (resultSizeValue < 2) {throw new CollectorServiceException("Mode:
-					// deep-cursor, Param 'resultSizeValue' is less than 2");}
-
-					this.resumptionStr = encodeValue(this.xprResumptionPath.evaluate(resultNode));
-					this.queryParams = this.queryParams.replace("&cursor=*", "");
-
-					// terminating if length of nodeList is 0
-					if ((nodeList != null) && (nodeList.getLength() < this.discoverResultSize)) {
-						this.resumptionInt += ((nodeList.getLength() + 1) - this.resultSizeValue);
-					} else {
-						this.resumptionInt += (nodeList.getLength() - this.resultSizeValue); // subtract the resultSizeValue
-						// because the iteration is over
-						// real length and the
-						// resultSizeValue is added before
-						// the switch()
-					}
-
-					this.discoverResultSize = nodeList.getLength();
-
-					log
-							.debug("downloadPage().deep-cursor: resumptionStr=" + this.resumptionStr + " ; queryParams="
+						log
+							.debug(
+								"downloadPage().deep-cursor: resumptionStr=" + this.resumptionStr + " ; queryParams="
 									+ this.queryParams + " resumptionLengthIncreased: " + this.resumptionInt);
 
-					break;
+						break;
 
-				default: // otherwise: abort
-					// resultTotal = resumptionInt;
-					break;
+					default: // otherwise: abort
+						// resultTotal = resumptionInt;
+						break;
 				}
 
 			} catch (final Exception e) {
@@ -380,8 +392,9 @@ public class RestIterator implements Iterator<String> {
 			log.debug("resultTotal: " + this.resultTotal);
 			log.debug("resInt: " + this.resumptionInt);
 			if (this.resumptionInt <= this.resultTotal) {
-				nextQuery = this.baseUrl + "?" + this.queryParams + this.querySize + "&" + this.resumptionParam + "=" + this.resumptionStr
-						+ this.queryFormat;
+				nextQuery = this.baseUrl + "?" + this.queryParams + this.querySize + "&" + this.resumptionParam + "="
+					+ this.resumptionStr
+					+ this.queryFormat;
 			} else {
 				nextQuery = "";
 				// if (resumptionType.toLowerCase().equals("deep-cursor")) { resumptionInt -= 1; } // correct the
