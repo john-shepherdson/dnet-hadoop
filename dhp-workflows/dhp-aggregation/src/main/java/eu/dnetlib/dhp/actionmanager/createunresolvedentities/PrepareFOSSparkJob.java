@@ -82,7 +82,8 @@ public class PrepareFOSSparkJob implements Serializable {
 			.groupByKey((MapFunction<FOSDataModel, String>) v -> v.getOaid().toLowerCase(), Encoders.STRING())
 			.mapGroups(
 				(MapGroupsFunction<String, FOSDataModel, Result>) (k,
-					it) -> getResult(ModelSupport.entityIdPrefix.get(Result.class.getSimpleName()) + "|" + k, it),
+					it) -> getResult(
+						ModelSupport.entityIdPrefix.get(Result.class.getSimpleName().toLowerCase()) + "|" + k, it),
 				Encoders.bean(Result.class))
 			.write()
 			.mode(SaveMode.Overwrite)
