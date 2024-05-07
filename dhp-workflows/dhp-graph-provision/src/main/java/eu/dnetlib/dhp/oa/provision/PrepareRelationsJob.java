@@ -1,14 +1,15 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Sets;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.HdfsSupport;
-import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static org.apache.spark.sql.functions.col;
+
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.Encoders;
@@ -20,12 +21,15 @@ import org.apache.spark.sql.functions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Sets;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static org.apache.spark.sql.functions.col;
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 
 /**
  * PrepareRelationsJob prunes the relationships: only consider relationships that are not virtually deleted
@@ -119,27 +123,33 @@ public class PrepareRelationsJob {
 		Set<String> relationFilter, int sourceMaxRelations, int targetMaxRelations, int relPartitions) {
 
 		WindowSpec source_w = Window
-				.partitionBy("source", "subRelType")
-				.orderBy(col("target").desc_nulls_last());
+			.partitionBy("source", "subRelType")
+			.orderBy(col("target").desc_nulls_last());
 
 		WindowSpec target_w = Window
-				.partitionBy("target", "subRelType")
-				.orderBy(col("source").desc_nulls_last());
+			.partitionBy("target", "subRelType")
+			.orderBy(col("source").desc_nulls_last());
 
-		spark.read().schema(Encoders.bean(Relation.class).schema()).json(inputRelationsPath)
-				.where("source NOT LIKE 'unresolved%' AND  target  NOT LIKE 'unresolved%'")
-				.where("datainfo.deletedbyinference != true")
-				.where(relationFilter.isEmpty() ? "" : "lower(relClass) NOT IN ("+ Joiner.on(',').join(relationFilter) +")")
-				.withColumn("source_w_pos", functions.row_number().over(source_w))
-				.where("source_w_pos < " + sourceMaxRelations )
-				.drop("source_w_pos")
-				.withColumn("target_w_pos", functions.row_number().over(target_w))
-				.where("target_w_pos < " + targetMaxRelations)
-				.drop( "target_w_pos")
-				.coalesce(relPartitions)
-				.write()
-				.mode(SaveMode.Overwrite)
-				.parquet(outputPath);
+		spark
+			.read()
+			.schema(Encoders.bean(Relation.class).schema())
+			.json(inputRelationsPath)
+			.where("source NOT LIKE 'unresolved%' AND  target  NOT LIKE 'unresolved%'")
+			.where("datainfo.deletedbyinference != true")
+			.where(
+				relationFilter.isEmpty() ? ""
+					: "lower(relClass) NOT IN ("
+						+ relationFilter.stream().map(s -> "'" + s + "'").collect(Collectors.joining(",")) + ")")
+			.withColumn("source_w_pos", functions.row_number().over(source_w))
+			.where("source_w_pos < " + sourceMaxRelations)
+			.drop("source_w_pos")
+			.withColumn("target_w_pos", functions.row_number().over(target_w))
+			.where("target_w_pos < " + targetMaxRelations)
+			.drop("target_w_pos")
+			.coalesce(relPartitions)
+			.write()
+			.mode(SaveMode.Overwrite)
+			.parquet(outputPath);
 	}
 
 	private static void removeOutputDir(SparkSession spark, String path) {
