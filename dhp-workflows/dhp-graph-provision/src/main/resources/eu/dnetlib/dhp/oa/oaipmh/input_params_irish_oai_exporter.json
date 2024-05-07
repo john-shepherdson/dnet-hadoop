@@ -1,0 +1,38 @@
+[
+  {
+    "paramName": "i",
+    "paramLongName": "inputPath",
+    "paramDescription": "The path of the input records on HDFS",
+    "paramRequired": true
+  },
+  {
+    "paramName": "nc",
+    "paramLongName": "numConnections",
+    "paramDescription": "number of connections to the postgres db (for the write operation)",
+    "paramRequired": false
+  },
+  {
+    "paramName": "du",
+    "paramLongName": "dbUrl",
+    "paramDescription": "the url of the database",
+    "paramRequired": true
+  },
+  {
+    "paramName": "dusr",
+    "paramLongName": "dbUser",
+    "paramDescription": "the user of the database",
+    "paramRequired": true
+  },
+  {
+    "paramName": "t",
+    "paramLongName": "dbTable",
+    "paramDescription": "the name of the table in the database",
+    "paramRequired": true
+  },
+  {
+    "paramName": "dpwd",
+    "paramLongName": "dbPwd",
+    "paramDescription": "the password for the user of the database",
+    "paramRequired": true
+  }		
+]
