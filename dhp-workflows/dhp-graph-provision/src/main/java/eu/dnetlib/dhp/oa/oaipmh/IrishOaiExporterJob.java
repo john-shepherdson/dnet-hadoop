@@ -98,7 +98,7 @@ public class IrishOaiExporterJob {
 		});
 	}
 
-	private static OaiRecordWrapper asIrishOaiResult(final String xml) {
+	protected static OaiRecordWrapper asIrishOaiResult(final String xml) {
 		try {
 			final Document doc = DocumentHelper.parseText(xml);
 			final OaiRecordWrapper r = new OaiRecordWrapper();
@@ -116,21 +116,24 @@ public class IrishOaiExporterJob {
 		}
 	}
 
-	private static boolean isValid(final Document doc) {
+	protected static boolean isValid(final Document doc) {
 
 		final Node n = doc.selectSingleNode("//*[local-name()='entity']/*[local-name()='result']");
 
 		if (n != null) {
+
 			for (final Object o : n.selectNodes(".//*[local-name()='datainfo']/*[local-name()='deletedbyinference']")) {
 				if ("true".equals(((Node) o).getText().trim())) { return false; }
 			}
 
+			// verify the main country of the result
 			for (final Object o : n.selectNodes("./*[local-name()='country']")) {
 				if ("IE".equals(((Node) o).valueOf("@classid").trim())) { return true; }
 			}
 
+			// verify the countries of the related organizations
 			for (final Object o : n.selectNodes(".//*[local-name()='rel']")) {
-				final String relType = ((Node) o).valueOf("./[local-name() = 'to']/@type").trim();
+				final String relType = ((Node) o).valueOf("./*[local-name() = 'to']/@type").trim();
 				final String relCountry = ((Node) o).valueOf("./*[local-name() = 'country']/@classid").trim();
 				if ("organization".equals(relType) && "IE".equals(relCountry)) { return true; }
 			}
@@ -139,7 +142,7 @@ public class IrishOaiExporterJob {
 
 	}
 
-	private static byte[] gzip(final String str) {
+	protected static byte[] gzip(final String str) {
 		if (StringUtils.isBlank(str)) { return null; }
 
 		try {
