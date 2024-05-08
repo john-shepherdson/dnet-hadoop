@@ -105,7 +105,7 @@ public class IrishOaiExporterJob {
 
 			if (isValid(doc)) {
 				r.setId(doc.valueOf("//*[local-name()='objIdentifier']").trim());
-				r.setBody(gzip(xml));
+				r.setBody(gzip(doc.selectSingleNode("//*[local-name()='entity']").asXML()));
 				r.setDate(LocalDateTime.now());
 				r.setSets(new ArrayList<>());
 			}
