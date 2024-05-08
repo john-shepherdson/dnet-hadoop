@@ -1,3 +1,5 @@
+set mapred.job.queue.name=analytics;
+
 --------------------------------------------------------------
 --------------------------------------------------------------
 -- Publication table/view and Publication related tables/views
