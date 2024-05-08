@@ -1,8 +1,6 @@
 
 package eu.dnetlib.dhp.oa.provision.model;
 
-import static org.apache.commons.lang3.StringUtils.substringBefore;
-
 import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,12 +14,9 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyTerm;
-import eu.dnetlib.dhp.oa.provision.RelationList;
-import eu.dnetlib.dhp.oa.provision.SortableRelation;
 import eu.dnetlib.dhp.oa.provision.utils.ContextDef;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
@@ -55,10 +50,7 @@ public class ProvisionModelSupport {
 					.newArrayList(
 						RelatedEntityWrapper.class,
 						JoinedEntity.class,
-						RelatedEntity.class,
-						SortableRelationKey.class,
-						SortableRelation.class,
-						RelationList.class));
+						RelatedEntity.class));
 		return modelClasses.toArray(new Class[] {});
 	}
 
