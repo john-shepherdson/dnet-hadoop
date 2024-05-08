@@ -6,10 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.IOUtils;
@@ -57,7 +56,7 @@ class IrishOaiExporterJobTest {
 		final byte[] bytes = IrishOaiExporterJob.gzip(message);
 		assertNotNull(bytes);
 		assertTrue(bytes.length > 0);
-		assertEquals(message, decompress(bytes));
+		assertEquals(message, gunzip(bytes));
 	}
 
 	@Test
@@ -66,22 +65,11 @@ class IrishOaiExporterJobTest {
 		assertNull(IrishOaiExporterJob.gzip(null));
 	}
 
-	private static String decompress(final byte[] compressed) {
-		final StringBuilder outStr = new StringBuilder();
+	public static String gunzip(final byte[] compressed) {
 		if ((compressed == null) || (compressed.length == 0)) { return null; }
-		try {
-			if (isCompressed(compressed)) {
-				final GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(compressed));
-				final BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(gis, "UTF-8"));
-
-				String line;
-				while ((line = bufferedReader.readLine()) != null) {
-					outStr.append(line);
-				}
-			} else {
-				outStr.append(compressed);
-			}
-			return outStr.toString();
+		if (!isCompressed(compressed)) { return new String(compressed); }
+		try (final GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(compressed))) {
+			return IOUtils.toString(gis, Charset.defaultCharset());
 		} catch (final IOException e) {
 			throw new RuntimeException("error in gunzip", e);
 		}

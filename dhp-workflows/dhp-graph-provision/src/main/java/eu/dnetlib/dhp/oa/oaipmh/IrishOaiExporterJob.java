@@ -4,6 +4,7 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -145,15 +146,14 @@ public class IrishOaiExporterJob {
 	protected static byte[] gzip(final String str) {
 		if (StringUtils.isBlank(str)) { return null; }
 
-		try {
-			final ByteArrayOutputStream obj = new ByteArrayOutputStream();
-			final GZIPOutputStream gzip = new GZIPOutputStream(obj);
-			gzip.write(str.getBytes("UTF-8"));
-			gzip.flush();
-			gzip.close();
-			return obj.toByteArray();
+		try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+			try (final GZIPOutputStream gzip = new GZIPOutputStream(baos)) {
+				IOUtils.write(str.getBytes(Charset.defaultCharset()), gzip);
+			}
+			return baos.toByteArray();
 		} catch (final IOException e) {
 			throw new RuntimeException("error in gzip", e);
 		}
 	}
+
 }
