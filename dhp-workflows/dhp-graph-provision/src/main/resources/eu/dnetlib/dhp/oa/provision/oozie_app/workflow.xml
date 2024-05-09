@@ -14,6 +14,11 @@
             <description>context API URL</description>
         </property>
         <property>
+            <name>validateXML</name>
+            <description>should the payload converter validate the XMLs</description>
+            <value>false</value>
+        </property>
+        <property>
             <name>relPartitions</name>
             <description>number or partitions for the relations Dataset</description>
         </property>
@@ -610,6 +615,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>/user/claudio.atzori/data/beta_provision/join_entities</arg>
             <arg>--outputPath</arg><arg>${workingDir}/xml_json</arg>
+            <arg>--validateXML</arg><arg>${validateXML}</arg>
             <arg>--contextApiBaseUrl</arg><arg>${contextApiBaseUrl}</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>

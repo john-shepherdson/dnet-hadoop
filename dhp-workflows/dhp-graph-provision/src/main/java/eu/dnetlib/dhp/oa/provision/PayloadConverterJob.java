@@ -64,6 +64,12 @@ public class PayloadConverterJob {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
+		final Boolean validateXML = Optional
+				.ofNullable(parser.get("validateXML"))
+				.map(Boolean::valueOf)
+				.orElse(Boolean.FALSE);
+		log.info("validateXML: {}", validateXML);
+
 		final String contextApiBaseUrl = parser.get("contextApiBaseUrl");
 		log.info("contextApiBaseUrl: {}", contextApiBaseUrl);
 
@@ -78,18 +84,19 @@ public class PayloadConverterJob {
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 			removeOutputDir(spark, outputPath);
-			convertToXml(
+			createPayloads(
 				spark, inputPath, outputPath, ContextMapper.fromAPI(contextApiBaseUrl),
-				VocabularyGroup.loadVocsFromIS(isLookup));
+				VocabularyGroup.loadVocsFromIS(isLookup), validateXML);
 		});
 	}
 
-	private static void convertToXml(
+	private static void createPayloads(
 		final SparkSession spark,
 		final String inputPath,
 		final String outputPath,
 		final ContextMapper contextMapper,
-		final VocabularyGroup vocabularies) {
+		final VocabularyGroup vocabularies,
+		final Boolean validateXML) {
 
 		final XmlRecordFactory recordFactory = new XmlRecordFactory(
 			prepareAccumulators(spark.sparkContext()),
@@ -110,7 +117,7 @@ public class PayloadConverterJob {
 			.as(Encoders.kryo(JoinedEntity.class))
 			.map(
 				(MapFunction<JoinedEntity, Tuple2<String, SolrRecord>>) je -> new Tuple2<>(
-					recordFactory.build(je),
+					recordFactory.build(je, validateXML),
 					ProvisionModelSupport.transform(je, contextMapper, vocabularies)),
 				Encoders.tuple(Encoders.STRING(), Encoders.bean(SolrRecord.class)))
 			.map(
