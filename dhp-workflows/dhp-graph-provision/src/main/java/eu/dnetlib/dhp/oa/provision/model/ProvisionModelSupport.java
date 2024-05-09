@@ -19,8 +19,10 @@ import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyTerm;
 import eu.dnetlib.dhp.oa.provision.utils.ContextDef;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.solr.*;
 import eu.dnetlib.dhp.schema.solr.AccessRight;
 import eu.dnetlib.dhp.schema.solr.Author;
@@ -66,7 +68,11 @@ public class ProvisionModelSupport {
 			.setHeader(
 				SolrRecordHeader
 					.newInstance(
-						e.getId(), e.getOriginalId(), type, deletedbyinference));
+						StringUtils
+							.substringAfter(
+								e.getId(),
+								IdentifierFactory.ID_PREFIX_SEPARATOR),
+						e.getOriginalId(), type, deletedbyinference));
 		r.setCollectedfrom(asProvenance(e.getCollectedfrom()));
 		r.setContext(asContext(e.getContext(), contextMapper));
 		r.setPid(asPid(e.getPid()));
@@ -106,7 +112,8 @@ public class ProvisionModelSupport {
 					.newInstance(
 						relation.getRelType(),
 						relation.getRelClass(),
-						relation.getTarget(), relatedRecordType));
+						StringUtils.substringAfter(relation.getTarget(), IdentifierFactory.ID_PREFIX_SEPARATOR),
+						relatedRecordType));
 
 		rr.setAcronym(re.getAcronym());
 		rr.setCode(re.getCode());

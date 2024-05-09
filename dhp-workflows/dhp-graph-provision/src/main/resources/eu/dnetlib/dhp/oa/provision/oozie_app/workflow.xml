@@ -594,7 +594,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>create_payloads</name>
-            <class>eu.dnetlib.dhp.oa.provision.XmlConverterJob</class>
+            <class>eu.dnetlib.dhp.oa.provision.PayloadConverterJob</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
