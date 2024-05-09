@@ -5,7 +5,11 @@ import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.removePrefix;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -163,6 +167,35 @@ public class XmlSerializationUtils {
 			sb.append(" ").append(attr(attr._1(), attr._2()));
 		}
 		sb.append("/>");
+		return sb.toString();
+	}
+
+	// <measure downloads="0" views="0">infrastruct_::f66f1bd369679b5b077dcdf006089556||OpenAIRE</measure>
+	public static String usageMeasureAsXmlElement(String name, Measure measure) {
+		HashSet<String> dsIds = Optional
+			.ofNullable(measure.getUnit())
+			.map(
+				m -> m
+					.stream()
+					.map(KeyValue::getKey)
+					.collect(Collectors.toCollection(HashSet::new)))
+			.orElse(new HashSet<>());
+
+		StringBuilder sb = new StringBuilder();
+		dsIds.forEach(dsId -> {
+			sb
+				.append("<")
+				.append(name);
+			for (KeyValue kv : measure.getUnit()) {
+				sb.append(" ").append(attr(measure.getId(), kv.getValue()));
+			}
+			sb
+				.append(">")
+				.append(dsId)
+				.append("</")
+				.append(name)
+				.append(">");
+		});
 		return sb.toString();
 	}
 

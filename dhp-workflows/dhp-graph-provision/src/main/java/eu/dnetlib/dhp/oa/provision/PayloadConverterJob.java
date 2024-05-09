@@ -3,24 +3,16 @@ package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static eu.dnetlib.dhp.utils.DHPUtils.toSeq;
-import static org.apache.spark.sql.functions.*;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.compress.GzipCodec;
-import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.*;
-import org.apache.spark.sql.expressions.UserDefinedFunction;
-import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.util.LongAccumulator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +37,9 @@ import scala.Tuple2;
 /**
  * XmlConverterJob converts the JoinedEntities as XML records
  */
-public class XmlConverterJob {
+public class PayloadConverterJob {
 
-	private static final Logger log = LoggerFactory.getLogger(XmlConverterJob.class);
+	private static final Logger log = LoggerFactory.getLogger(PayloadConverterJob.class);
 
 	public static final String schemaLocation = "https://www.openaire.eu/schema/1.0/oaf-1.0.xsd";
 
@@ -56,8 +48,8 @@ public class XmlConverterJob {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					XmlConverterJob.class
-						.getResourceAsStream("/eu/dnetlib/dhp/oa/provision/input_params_xml_converter.json")));
+					PayloadConverterJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/oa/provision/input_params_payload_converter.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
@@ -71,6 +63,12 @@ public class XmlConverterJob {
 
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
+
+		final Boolean validateXML = Optional
+				.ofNullable(parser.get("validateXML"))
+				.map(Boolean::valueOf)
+				.orElse(Boolean.FALSE);
+		log.info("validateXML: {}", validateXML);
 
 		final String contextApiBaseUrl = parser.get("contextApiBaseUrl");
 		log.info("contextApiBaseUrl: {}", contextApiBaseUrl);
@@ -86,18 +84,19 @@ public class XmlConverterJob {
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 			removeOutputDir(spark, outputPath);
-			convertToXml(
+			createPayloads(
 				spark, inputPath, outputPath, ContextMapper.fromAPI(contextApiBaseUrl),
-				VocabularyGroup.loadVocsFromIS(isLookup));
+				VocabularyGroup.loadVocsFromIS(isLookup), validateXML);
 		});
 	}
 
-	private static void convertToXml(
+	private static void createPayloads(
 		final SparkSession spark,
 		final String inputPath,
 		final String outputPath,
 		final ContextMapper contextMapper,
-		final VocabularyGroup vocabularies) {
+		final VocabularyGroup vocabularies,
+		final Boolean validateXML) {
 
 		final XmlRecordFactory recordFactory = new XmlRecordFactory(
 			prepareAccumulators(spark.sparkContext()),
@@ -118,7 +117,7 @@ public class XmlConverterJob {
 			.as(Encoders.kryo(JoinedEntity.class))
 			.map(
 				(MapFunction<JoinedEntity, Tuple2<String, SolrRecord>>) je -> new Tuple2<>(
-					recordFactory.build(je),
+					recordFactory.build(je, validateXML),
 					ProvisionModelSupport.transform(je, contextMapper, vocabularies)),
 				Encoders.tuple(Encoders.STRING(), Encoders.bean(SolrRecord.class)))
 			.map(

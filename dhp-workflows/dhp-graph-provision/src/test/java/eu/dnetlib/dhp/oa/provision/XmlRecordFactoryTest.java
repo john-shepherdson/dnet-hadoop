@@ -37,7 +37,7 @@ public class XmlRecordFactoryTest {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final Publication p = OBJECT_MAPPER
 			.readValue(IOUtils.toString(getClass().getResourceAsStream("publication.json")), Publication.class);
@@ -105,7 +105,7 @@ public class XmlRecordFactoryTest {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final Publication p = OBJECT_MAPPER
 			.readValue(IOUtils.toString(getClass().getResourceAsStream("publication.json")), Publication.class);
@@ -136,7 +136,7 @@ public class XmlRecordFactoryTest {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final Publication p = OBJECT_MAPPER
 			.readValue(IOUtils.toString(getClass().getResourceAsStream("publication.json")), Publication.class);
@@ -166,7 +166,7 @@ public class XmlRecordFactoryTest {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final Datasource d = OBJECT_MAPPER
 			.readValue(IOUtils.toString(getClass().getResourceAsStream("datasource.json")), Datasource.class);
@@ -203,7 +203,7 @@ public class XmlRecordFactoryTest {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final OtherResearchProduct p = OBJECT_MAPPER
 			.readValue(
@@ -226,7 +226,7 @@ public class XmlRecordFactoryTest {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final OtherResearchProduct p = OBJECT_MAPPER
 			.readValue(
@@ -249,7 +249,7 @@ public class XmlRecordFactoryTest {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final Publication p = OBJECT_MAPPER
 			.readValue(

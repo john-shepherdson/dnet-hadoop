@@ -153,10 +153,15 @@ public class CreateRelatedEntitiesJob_phase1 {
 					result
 						.getTitle()
 						.stream()
+						.filter(t -> StringUtils.isNotBlank(t.getValue()))
 						.findFirst()
-						.map(StructuredProperty::getValue)
 						.ifPresent(
-							title -> re.getTitle().setValue(StringUtils.left(title, ModelHardLimits.MAX_TITLE_LENGTH)));
+							title -> {
+								re.setTitle(title);
+								re
+									.getTitle()
+									.setValue(StringUtils.left(title.getValue(), ModelHardLimits.MAX_TITLE_LENGTH));
+							});
 				}
 				if (Objects.nonNull(result.getDescription()) && !result.getDescription().isEmpty()) {
 					result

@@ -50,7 +50,7 @@ public class EOSCFuture_Test {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final OtherResearchProduct p = OBJECT_MAPPER
 			.readValue(
