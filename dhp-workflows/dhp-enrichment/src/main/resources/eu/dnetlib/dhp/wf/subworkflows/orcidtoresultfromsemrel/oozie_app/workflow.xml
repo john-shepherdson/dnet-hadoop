@@ -100,16 +100,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
-                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
-                --conf spark.sql.shuffle.partitions=3840
-                --conf spark.speculation=false
-                --conf spark.hadoop.mapreduce.map.speculative=false
-                --conf spark.hadoop.mapreduce.reduce.speculative=false
+                --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
@@ -132,12 +128,11 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
-                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
@@ -160,12 +155,11 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
-                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
@@ -188,12 +182,11 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
-                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--hive_metastore_uris</arg><arg>${hive_metastore_uris}</arg>
@@ -218,12 +211,11 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
-                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
             </spark-opts>
             <arg>--sourcePath</arg><arg>${workingDir}/orcid/targetOrcidAssoc</arg>
             <arg>--outputPath</arg><arg>${workingDir}/orcid/mergedOrcidAssoc</arg>
@@ -247,19 +239,14 @@
             <class>eu.dnetlib.dhp.orcidtoresultfromsemrel.SparkOrcidToResultFromSemRelJob</class>
             <jar>dhp-enrichment-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=4
-                --executor-memory=4G
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
-                --conf spark.executor.memoryOverhead=5G
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
-                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
-                --conf spark.speculation=false
-                --conf spark.hadoop.mapreduce.map.speculative=false
-                --conf spark.hadoop.mapreduce.reduce.speculative=false
                 --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcid/mergedOrcidAssoc</arg>
@@ -282,15 +269,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
-                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
-                --conf spark.speculation=false
-                --conf spark.hadoop.mapreduce.map.speculative=false
-                --conf spark.hadoop.mapreduce.reduce.speculative=false
+                --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcid/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/dataset</arg>
@@ -312,15 +296,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
-                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
-                --conf spark.speculation=false
-                --conf spark.hadoop.mapreduce.map.speculative=false
-                --conf spark.hadoop.mapreduce.reduce.speculative=false
+                --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcid/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/otherresearchproduct</arg>
@@ -342,15 +323,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.dynamicAllocation.enabled=true
-                --conf spark.dynamicAllocation.maxExecutors=${spark2MaxExecutors}
-                --conf spark.speculation=false
-                --conf spark.hadoop.mapreduce.map.speculative=false
-                --conf spark.hadoop.mapreduce.reduce.speculative=false
+                --conf spark.sql.shuffle.partitions=4000
             </spark-opts>
             <arg>--possibleUpdatesPath</arg><arg>${workingDir}/orcid/mergedOrcidAssoc</arg>
             <arg>--sourcePath</arg><arg>${sourcePath}/software</arg>
@@ -362,15 +340,6 @@
     </action>
     
     <join name="wait2" to="End"/>
-
-<!--    <action name="reset_workingDir">-->
-<!--        <fs>-->
-<!--            <delete path="${workingDir}"/>-->
-<!--            <mkdir path="${workingDir}"/>-->
-<!--        </fs>-->
-<!--        <ok to="End"/>-->
-<!--        <error to="Kill"/>-->
-<!--    </action>-->
     
     <end name="End"/>
     

@@ -57,7 +57,7 @@ public class IndexRecordTransformerTest {
 	public void testPublicationRecordTransformation() throws IOException, TransformerException {
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final Publication p = load("publication.json", Publication.class);
 		final Project pj = load("project.json", Project.class);
@@ -82,7 +82,7 @@ public class IndexRecordTransformerTest {
 	void testPeerReviewed() throws IOException, TransformerException {
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final Publication p = load("publication.json", Publication.class);
 
@@ -98,7 +98,7 @@ public class IndexRecordTransformerTest {
 	public void testRiunet() throws IOException, TransformerException {
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final Publication p = load("riunet.json", Publication.class);
 

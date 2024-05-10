@@ -1,25 +1,23 @@
 
 package eu.dnetlib.dhp.oa.provision.utils;
 
-import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.authorPidTypes;
-import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.getRelDescriptor;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.substringBefore;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.xml.transform.*;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.mycila.xmltool.XMLDoc;
+import com.mycila.xmltool.XMLTag;
+import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
+import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
+import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
+import eu.dnetlib.dhp.oa.provision.model.XmlInstance;
+import eu.dnetlib.dhp.schema.common.*;
+import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -31,26 +29,25 @@ import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.mycila.xmltool.XMLDoc;
-import com.mycila.xmltool.XMLTag;
-
-import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
-import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
-import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
-import eu.dnetlib.dhp.oa.provision.model.XmlInstance;
-import eu.dnetlib.dhp.schema.common.*;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
-import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
 import scala.Tuple2;
+
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.authorPidTypes;
+import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.getRelDescriptor;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.substringBefore;
 
 public class XmlRecordFactory implements Serializable {
 
@@ -93,10 +90,13 @@ public class XmlRecordFactory implements Serializable {
 	}
 
 	public String build(final JoinedEntity je) {
+		return build(je, false);
+	}
+
+	public String build(final JoinedEntity je, final Boolean validate) {
 
 		final Set<String> contexts = Sets.newHashSet();
 
-		// final OafEntity entity = toOafEntity(je.getEntity());
 		final OafEntity entity = je.getEntity();
 		final TemplateFactory templateFactory = new TemplateFactory();
 		try {
@@ -122,8 +122,14 @@ public class XmlRecordFactory implements Serializable {
 				.buildBody(
 					mainType, metadata, relations, listChildren(entity, je, templateFactory), listExtraInfo(entity));
 
-			return templateFactory.buildRecord(entity, schemaLocation, body);
-			// return printXML(templateFactory.buildRecord(entity, schemaLocation, body), indent);
+			String xmlRecord = templateFactory.buildRecord(entity, schemaLocation, body);
+
+			if (Boolean.TRUE.equals(validate)) {
+				// rise an exception when an invalid record was built
+				new SAXReader().read(new StringReader(xmlRecord));
+            }
+            return xmlRecord;
+            // return printXML(templateFactory.buildRecord(entity, schemaLocation, body), indent);
 		} catch (final Throwable e) {
 			throw new RuntimeException(String.format("error building record '%s'", entity.getId()), e);
 		}
@@ -1038,13 +1044,21 @@ public class XmlRecordFactory implements Serializable {
 	}
 
 	private List<String> measuresAsXml(List<Measure> measures) {
-		return measures
-			.stream()
-			.map(m -> {
-				List<Tuple2<String, String>> l = Lists.newArrayList(new Tuple2<>("id", m.getId()));
-				m.getUnit().forEach(kv -> l.add(new Tuple2<>(kv.getKey(), kv.getValue())));
-				return XmlSerializationUtils.asXmlElement("measure", l);
-			})
+		return Stream
+			.concat(
+				measures
+					.stream()
+					.filter(m -> !"downloads".equals(m.getId()) && !"views".equals(m.getId()))
+					.map(m -> {
+						List<Tuple2<String, String>> l = Lists.newArrayList(new Tuple2<>("id", m.getId()));
+						m.getUnit().forEach(kv -> l.add(new Tuple2<>(kv.getKey(), kv.getValue())));
+						return XmlSerializationUtils.asXmlElement("measure", l);
+					}),
+				measures
+					.stream()
+					.filter(m -> "downloads".equals(m.getId()) || "views".equals(m.getId()))
+					.filter(m -> m.getUnit().stream().anyMatch(u -> Integer.parseInt(u.getValue()) > 0))
+					.map(m -> XmlSerializationUtils.usageMeasureAsXmlElement("measure", m)))
 			.collect(Collectors.toList());
 	}
 

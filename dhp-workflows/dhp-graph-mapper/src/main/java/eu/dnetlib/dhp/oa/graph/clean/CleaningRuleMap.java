@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.oa.graph.clean;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.commons.lang3.SerializationUtils;
@@ -29,7 +30,10 @@ public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Obje
 		mapping.put(AccessRight.class, o -> cleanQualifier(vocabularies, (AccessRight) o));
 		mapping.put(Country.class, o -> cleanCountry(vocabularies, (Country) o));
 		mapping.put(Relation.class, o -> cleanRelation(vocabularies, (Relation) o));
-		mapping.put(Subject.class, o -> cleanSubject(vocabularies, (Subject) o));
+
+		// commenting out the subject cleaning until we decide if we want to it or not and the implementation will
+		// be completed. At the moment it is not capable of expanding the whole hierarchy.
+		// mapping.put(Subject.class, o -> cleanSubject(vocabularies, (Subject) o));
 		return mapping;
 	}
 
@@ -38,8 +42,15 @@ public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Obje
 		// TODO cleaning based on different subject vocabs can be added here
 	}
 
+	/**
+	 * The procedure cleans out the subject values, using a vocabulary identified by the field subject.qualifier.classid.
+	 *
+	 * @param vocabularyId
+	 * @param vocabularies
+	 * @param subject
+	 */
 	private static void cleanSubjectForVocabulary(String vocabularyId, VocabularyGroup vocabularies,
-		Subject subject) {
+												  Subject subject) {
 
 		vocabularies.find(vocabularyId).ifPresent(vocabulary -> {
 			if (ModelConstants.DNET_SUBJECT_KEYWORD.equalsIgnoreCase(subject.getQualifier().getClassid())) {
@@ -49,14 +60,21 @@ public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Obje
 					subject.getQualifier().setClassid(vocabularyId);
 					subject.getQualifier().setClassname(vocabulary.getName());
 				}
-			} else if (vocabularyId.equals(subject.getQualifier().getClassid()) &&
-				Objects.nonNull(subject.getDataInfo()) &&
-				!"subject:fos".equals(subject.getDataInfo().getProvenanceaction())) {
-				Qualifier syn = vocabulary.getSynonymAsQualifier(subject.getValue());
-				VocabularyTerm term = vocabulary.getTerm(subject.getValue());
-				if (Objects.isNull(syn) && Objects.isNull(term)) {
-					subject.getQualifier().setClassid(ModelConstants.DNET_SUBJECT_KEYWORD);
-					subject.getQualifier().setClassname(ModelConstants.DNET_SUBJECT_KEYWORD);
+			} else {
+				final String provenanceActionClassId = Optional.ofNullable(subject.getDataInfo())
+						.map(DataInfo::getProvenanceaction)
+						.map(Qualifier::getClassid)
+						.orElse(null);
+
+				if (vocabularyId.equals(subject.getQualifier().getClassid()) &&
+						!"subject:fos".equals(provenanceActionClassId)) {
+
+					Qualifier syn = vocabulary.getSynonymAsQualifier(subject.getValue());
+					VocabularyTerm term = vocabulary.getTerm(subject.getValue());
+					if (Objects.isNull(syn) && Objects.isNull(term)) {
+						subject.getQualifier().setClassid(ModelConstants.DNET_SUBJECT_KEYWORD);
+						subject.getQualifier().setClassname(ModelConstants.DNET_SUBJECT_KEYWORD);
+					}
 				}
 			}
 		});

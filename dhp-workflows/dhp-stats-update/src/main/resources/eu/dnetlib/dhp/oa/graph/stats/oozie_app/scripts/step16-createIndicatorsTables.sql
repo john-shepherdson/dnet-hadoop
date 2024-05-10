@@ -249,7 +249,7 @@ create table if not exists ${stats_db_name}.indi_pub_gold_oa stored as parquet a
             left semi join dd on dd.id=pd.datasource
             union all
             select ra.id, 1 as is_gold
-            from ${stats_db_name}.result_accessroute ra on ra.id = pd.id where ra.accessroute = 'gold') tmp on tmp.id=pd.id; /*EOS*/
+            from ${stats_db_name}.result_accessroute ra where ra.accessroute = 'gold') tmp on tmp.id=pd.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_pub_hybrid_oa_with_cc purge; /*EOS*/
 create table if not exists ${stats_db_name}.indi_pub_hybrid_oa_with_cc stored as parquet as
@@ -294,7 +294,7 @@ left outer join (
     join ${stats_db_name}.indi_pub_gold_oa indi_gold on indi_gold.id=p.id
     left outer join ${stats_db_name}.result_accessroute ra on ra.id=p.id
     where indi_gold.is_gold=0 and
-          ((d.type like '%Journal%' and ri.accessright not in ('Closed Access', 'Restricted', 'Not Available') and ri.license is not null) or ra.accessroute='hybrid')) tmp on pd.i=tmp.id; /*EOS*/
+          ((d.type like '%Journal%' and ri.accessright not in ('Closed Access', 'Restricted', 'Not Available') and ri.license is not null) or ra.accessroute='hybrid')) tmp on p.id=tmp.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_org_fairness purge; /*EOS*/
 create table if not exists ${stats_db_name}.indi_org_fairness stored as parquet as
@@ -380,7 +380,7 @@ CREATE TEMPORARY VIEW allresults as
 
 drop table if exists ${stats_db_name}.indi_org_fairness_pub purge; /*EOS*/
 
-create table if not exists ${stats_db_name}.indi_org_fairness_pub as
+create table if not exists ${stats_db_name}.indi_org_fairness_pub stored as parquet as
 select ar.organization, rf.no_result_fair/ar.no_allresults org_fairness
 from allresults ar join result_fair rf
 on rf.organization=ar.organization; /*EOS*/
@@ -639,7 +639,7 @@ from ${stats_db_name}.publication p
 
 drop table if exists ${stats_db_name}.indi_result_with_pid purge; /*EOS*/
 
-create table if not exists ${stats_db_name}.indi_result_with_pid as
+create table if not exists ${stats_db_name}.indi_result_with_pid stored as parquet as
 select distinct p.id, coalesce(result_with_pid, 0) as result_with_pid
 from ${stats_db_name}.result p
          left outer join (
@@ -653,7 +653,7 @@ group by rf.id; /*EOS*/
 
 drop table if exists ${stats_db_name}.indi_pub_interdisciplinarity purge; /*EOS*/
 
-create table if not exists ${stats_db_name}.indi_pub_interdisciplinarity as
+create table if not exists ${stats_db_name}.indi_pub_interdisciplinarity stored as parquet as
 select distinct p.id as id, coalesce(is_interdisciplinary, 0)
 as is_interdisciplinary
 from pub_fos_totals p
@@ -1006,14 +1006,14 @@ left outer join (
 drop table if exists ${stats_db_name}.result_country purge; /*EOS*/
 
 create table ${stats_db_name}.result_country stored as parquet as
-select distinct *
+select distinct id, country
 from (
     select ro.id, o.country
     from ${stats_db_name}.result_organization ro
     left outer join ${stats_db_name}.organization o on o.id=ro.organization
     union all
     select rp.id, f.country
-    from ${stats_db_name}.result_projects
+    from ${stats_db_name}.result_projects rp
     left outer join ${stats_db_name}.project p on p.id=rp.project
     left outer join ${stats_db_name}.funder f on f.name=p.funder
      ) rc
