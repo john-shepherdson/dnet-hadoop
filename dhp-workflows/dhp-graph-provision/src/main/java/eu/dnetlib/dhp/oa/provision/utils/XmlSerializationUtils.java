@@ -190,11 +190,9 @@ public class XmlSerializationUtils {
 				sb.append(" ").append(attr(measure.getId(), kv.getValue()));
 			}
 			sb
-				.append(">")
-				.append(dsId)
-				.append("</")
-				.append(name)
-				.append(">");
+				.append(" ")
+				.append(attr("datasource", dsId))
+				.append("/>");
 		});
 		return sb.toString();
 	}

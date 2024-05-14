@@ -65,9 +65,9 @@ public class PayloadConverterJob {
 		log.info("outputPath: {}", outputPath);
 
 		final Boolean validateXML = Optional
-				.ofNullable(parser.get("validateXML"))
-				.map(Boolean::valueOf)
-				.orElse(Boolean.FALSE);
+			.ofNullable(parser.get("validateXML"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.FALSE);
 		log.info("validateXML: {}", validateXML);
 
 		final String contextApiBaseUrl = parser.get("contextApiBaseUrl");

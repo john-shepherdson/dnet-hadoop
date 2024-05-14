@@ -146,6 +146,7 @@ public class ProvisionModelSupport {
 		ps.setContracttype(mapCodeLabel(p.getContracttype()));
 		ps.setCurrency(mapField(p.getCurrency()));
 		ps.setDuration(mapField(p.getDuration()));
+		ps.setOamandatepublications(mapField(p.getOamandatepublications()));
 		ps.setCallidentifier(mapField(p.getCallidentifier()));
 		ps.setEcarticle29_3(mapField(p.getEcarticle29_3()));
 		ps.setEnddate(mapField(p.getEnddate()));
