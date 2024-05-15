@@ -387,7 +387,7 @@ public class ProvisionModelSupport {
 							.equals(
 								Optional
 									.ofNullable(t.getQualifier())
-									.map(Qualifier::getClassid)
+									.map(Qualifier::getClassname)
 									.orElse(null)))
 					.map(StructuredProperty::getValue)
 					.collect(Collectors.toList()))
@@ -405,7 +405,7 @@ public class ProvisionModelSupport {
 							.equals(
 								Optional
 									.ofNullable(t.getQualifier())
-									.map(Qualifier::getClassid)
+									.map(Qualifier::getClassname)
 									.orElse(null)))
 					.map(StructuredProperty::getValue)
 					.findFirst())
@@ -472,7 +472,7 @@ public class ProvisionModelSupport {
 	}
 
 	private static String mapQualifier(eu.dnetlib.dhp.schema.oaf.Qualifier q) {
-		return Optional.ofNullable(q).map(Qualifier::getClassid).orElse(null);
+		return Optional.ofNullable(q).map(Qualifier::getClassname).orElse(null);
 	}
 
 	private static Journal mapJournal(eu.dnetlib.dhp.schema.oaf.Journal joaf) {
@@ -581,7 +581,7 @@ public class ProvisionModelSupport {
 			.map(
 				pids -> pids
 					.stream()
-					.map(p -> Pid.newInstance(p.getQualifier().getClassid(), p.getValue()))
+					.map(p -> Pid.newInstance(p.getQualifier().getClassname(), p.getValue()))
 					.collect(Collectors.toList()))
 			.orElse(null);
 	}
@@ -606,8 +606,8 @@ public class ProvisionModelSupport {
 				subjects -> subjects
 					.stream()
 					.filter(s -> Objects.nonNull(s.getQualifier()))
-					.filter(s -> Objects.nonNull(s.getQualifier().getClassid()))
-					.map(s -> Subject.newInstance(s.getValue(), s.getQualifier().getClassid()))
+					.filter(s -> Objects.nonNull(s.getQualifier().getClassname()))
+					.map(s -> Subject.newInstance(s.getValue(), s.getQualifier().getClassname()))
 					.collect(Collectors.toList()))
 			.orElse(null);
 	}
@@ -619,8 +619,8 @@ public class ProvisionModelSupport {
 				subjects -> subjects
 					.stream()
 					.filter(s -> Objects.nonNull(s.getQualifier()))
-					.filter(s -> Objects.nonNull(s.getQualifier().getClassid()))
-					.map(s -> Subject.newInstance(s.getValue(), s.getQualifier().getClassid()))
+					.filter(s -> Objects.nonNull(s.getQualifier().getClassname()))
+					.map(s -> Subject.newInstance(s.getValue(), s.getQualifier().getClassname()))
 					.collect(Collectors.toList()))
 			.orElse(null);
 	}
