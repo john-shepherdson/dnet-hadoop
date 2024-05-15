@@ -613,7 +613,7 @@
                 --conf spark.sql.shuffle.partitions=3840
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
-            <arg>--inputPath</arg><arg>/user/claudio.atzori/data/beta_provision/join_entities</arg>
+            <arg>--inputPath</arg><arg>${workingDir}/join_entities</arg>
             <arg>--outputPath</arg><arg>${workingDir}/xml_json</arg>
             <arg>--validateXML</arg><arg>${validateXML}</arg>
             <arg>--contextApiBaseUrl</arg><arg>${contextApiBaseUrl}</arg>
