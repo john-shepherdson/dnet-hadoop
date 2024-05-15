@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.oa.oaipmh;
 
 import static org.junit.Assert.assertNull;
@@ -17,7 +18,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 import org.junit.jupiter.api.Test;
 
-class IrishOaiExporterJobTest {
+public class IrishOaiExporterJobTest {
 
 	@Test
 	void testAsIrishOaiResult() throws Exception {
@@ -66,8 +67,12 @@ class IrishOaiExporterJobTest {
 	}
 
 	public static String gunzip(final byte[] compressed) {
-		if ((compressed == null) || (compressed.length == 0)) { return null; }
-		if (!isCompressed(compressed)) { return new String(compressed); }
+		if ((compressed == null) || (compressed.length == 0)) {
+			return null;
+		}
+		if (!isCompressed(compressed)) {
+			return new String(compressed);
+		}
 		try (final GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(compressed))) {
 			return IOUtils.toString(gis, Charset.defaultCharset());
 		} catch (final IOException e) {
@@ -76,6 +81,7 @@ class IrishOaiExporterJobTest {
 	}
 
 	private static boolean isCompressed(final byte[] compressed) {
-		return (compressed[0] == (byte) GZIPInputStream.GZIP_MAGIC) && (compressed[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8));
+		return (compressed[0] == (byte) GZIPInputStream.GZIP_MAGIC)
+			&& (compressed[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8));
 	}
 }

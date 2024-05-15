@@ -24,12 +24,6 @@
     "paramRequired": true
   },
   {
-    "paramName": "t",
-    "paramLongName": "dbTable",
-    "paramDescription": "the name of the table in the database",
-    "paramRequired": true
-  },
-  {
     "paramName": "dpwd",
     "paramLongName": "dbPwd",
     "paramDescription": "the password for the user of the database",

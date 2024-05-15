@@ -1,7 +1,7 @@
+
 package eu.dnetlib.dhp.oa.oaipmh;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class OaiRecordWrapper implements Serializable {
@@ -10,10 +10,11 @@ public class OaiRecordWrapper implements Serializable {
 
 	private String id;
 	private byte[] body;
-	private LocalDateTime date;
+	private String date;
 	private List<String> sets;
 
-	public OaiRecordWrapper() {}
+	public OaiRecordWrapper() {
+	}
 
 	public String getId() {
 		return this.id;
@@ -31,11 +32,11 @@ public class OaiRecordWrapper implements Serializable {
 		this.body = body;
 	}
 
-	public LocalDateTime getDate() {
+	public String getDate() {
 		return this.date;
 	}
 
-	public void setDate(final LocalDateTime date) {
+	public void setDate(final String date) {
 		this.date = date;
 	}
 

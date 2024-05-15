@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.oa.oaipmh;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
@@ -5,6 +6,9 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -37,6 +41,8 @@ public class IrishOaiExporterJob {
 
 	protected static final int NUM_CONNECTIONS = 20;
 
+	public static final String TMP_OAI_TABLE = "temp_oai_data";
+
 	public static void main(final String[] args) throws Exception {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
@@ -53,7 +59,6 @@ public class IrishOaiExporterJob {
 
 		final String inputPath = parser.get("inputPath");
 		final String dbUrl = parser.get("dbUrl");
-		final String dbTable = parser.get("dbTable");
 		final String dbUser = parser.get("dbUser");
 		final String dbPwd = parser.get("dbPwd");
 		final int numConnections = Optional
@@ -64,7 +69,6 @@ public class IrishOaiExporterJob {
 		log.info("inputPath:     '{}'", inputPath);
 		log.info("dbUrl:         '{}'", dbUrl);
 		log.info("dbUser:        '{}'", dbUser);
-		log.info("table:         '{}'", dbTable);
 		log.info("dbPwd:         '{}'", "xxx");
 		log.info("numPartitions: '{}'", numConnections);
 
@@ -80,6 +84,7 @@ public class IrishOaiExporterJob {
 		final Encoder<TupleWrapper> encoderTuple = Encoders.bean(TupleWrapper.class);
 		final Encoder<OaiRecordWrapper> encoderOaiRecord = Encoders.bean(OaiRecordWrapper.class);
 
+		log.info("Creating temporary table...");
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 
 			final Dataset<OaiRecordWrapper> docs = spark
@@ -91,12 +96,23 @@ public class IrishOaiExporterJob {
 					.map((MapFunction<String, OaiRecordWrapper>) IrishOaiExporterJob::asIrishOaiResult, encoderOaiRecord)
 					.filter((FilterFunction<OaiRecordWrapper>) obj -> (obj != null) && StringUtils.isNotBlank(obj.getId()));
 
-			docs.repartition(numConnections)
+			docs
+					.repartition(numConnections)
 					.write()
 					.mode(SaveMode.Overwrite)
-					.jdbc(dbUrl, dbTable, connectionProperties);
+					.jdbc(dbUrl, TMP_OAI_TABLE, connectionProperties);
 
 		});
+		log.info("Temporary table created.");
+
+		log.info("Updating OAI records...");
+		try (final Connection con = DriverManager.getConnection(dbUrl, dbUser, dbPwd)) {
+			try (final Statement st = con.createStatement()) {
+				final String query = IOUtils.toString(IrishOaiExporterJob.class.getResourceAsStream("oai-finalize.sql"));
+				st.execute(query);
+			}
+		}
+		log.info("DONE.");
 	}
 
 	protected static OaiRecordWrapper asIrishOaiResult(final String xml) {
@@ -107,7 +123,7 @@ public class IrishOaiExporterJob {
 			if (isValid(doc)) {
 				r.setId(doc.valueOf("//*[local-name()='objIdentifier']").trim());
 				r.setBody(gzip(doc.selectSingleNode("//*[local-name()='entity']").asXML()));
-				r.setDate(LocalDateTime.now());
+				r.setDate(LocalDateTime.now().toString());
 				r.setSets(new ArrayList<>());
 			}
 			return r;
