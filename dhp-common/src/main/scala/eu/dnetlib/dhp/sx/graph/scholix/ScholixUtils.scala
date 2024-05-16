@@ -389,7 +389,7 @@ object ScholixUtils extends Serializable {
     if (persistentIdentifiers.isEmpty)
       return null
     s.setLocalIdentifier(persistentIdentifiers.asJava)
-    s.setTypology(r.getResulttype.getClassid)
+//    s.setTypology(r.getResulttype.getClassid)
 
     s.setSubType(r.getInstance().get(0).getInstancetype.getClassname)
 
