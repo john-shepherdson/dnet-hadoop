@@ -109,18 +109,14 @@ class SparkCreateScholexplorerDump(propertyPath: String, args: Array[String], lo
     val relations = spark.read.load(s"$outputPath/relation").as[RelationInfo]
     val resource = spark.read.load(s"$outputPath/resource").as[ScholixResource]
 
-
-
     val scholix_one_verse = relations
       .joinWith(resource, relations("source") === resource("dnetIdentifier"), "inner")
       .map(res => ScholexplorerUtils.generateScholix(res._1, res._2))
-      .map(s=> (s.getIdentifier, s))(Encoders.tuple(Encoders.STRING, Encoders.kryo(classOf[Scholix])))
-
+      .map(s => (s.getIdentifier, s))(Encoders.tuple(Encoders.STRING, Encoders.kryo(classOf[Scholix])))
 
     val resourceTarget = relations
       .joinWith(resource, relations("target") === resource("dnetIdentifier"), "inner")
       .map(res => (res._1.id, res._2))(Encoders.tuple(Encoders.STRING, Encoders.kryo(classOf[ScholixResource])))
-
 
     scholix_one_verse
       .joinWith(resourceTarget, scholix_one_verse("_1") === resourceTarget("_1"), "inner")

@@ -22,7 +22,5 @@ class ScholixGenerationTest {
 //    )
     app.generateScholix("/home/sandro/Downloads/scholix/", spark)
 
-
-
   }
 }

@@ -2,7 +2,14 @@ package eu.dnetlib.dhp.sx.graph
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.oaf.{KeyValue, Result, StructuredProperty}
-import eu.dnetlib.dhp.schema.sx.scholix.{Scholix, ScholixCollectedFrom, ScholixEntityId, ScholixIdentifier, ScholixRelationship, ScholixResource}
+import eu.dnetlib.dhp.schema.sx.scholix.{
+  Scholix,
+  ScholixCollectedFrom,
+  ScholixEntityId,
+  ScholixIdentifier,
+  ScholixRelationship,
+  ScholixResource
+}
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
@@ -22,7 +29,7 @@ case class RelKeyValue(key: String, value: String) {}
 object ScholexplorerUtils {
 
   val OPENAIRE_IDENTIFIER_SCHEMA: String = "OpenAIRE Identifier"
-  val mapper= new ObjectMapper()
+  val mapper = new ObjectMapper()
 
   case class RelationVocabulary(original: String, inverse: String) {}
 
