@@ -874,9 +874,11 @@ public class MergeUtils {
 		if (toEnrichInstances == null) {
 			return enrichmentResult;
 		}
-		if (enrichmentInstances == null) {
-			return enrichmentResult;
+
+		if (enrichmentInstances == null || enrichmentInstances.isEmpty()) {
+			return toEnrichInstances;
 		}
+
 		Map<String, Instance> ri = toInstanceMap(enrichmentInstances);
 
 		toEnrichInstances.forEach(i -> {
