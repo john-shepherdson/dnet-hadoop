@@ -82,23 +82,6 @@ object MagUtility extends Serializable {
     val di = new DataInfo
     di.setDeletedbyinference(false)
     di.setInferred(false)
-    di.setInvisible(false)
-    di.setTrust("0.9")
-    di.setProvenanceaction(
-      OafMapperUtils.qualifier(
-        ModelConstants.SYSIMPORT_ACTIONSET,
-        ModelConstants.SYSIMPORT_ACTIONSET,
-        ModelConstants.DNET_PROVENANCE_ACTIONS,
-        ModelConstants.DNET_PROVENANCE_ACTIONS
-      )
-    )
-    di
-  }
-
-  private val MAGDataInfoInvisible: DataInfo = {
-    val di = new DataInfo
-    di.setDeletedbyinference(false)
-    di.setInferred(false)
     di.setInvisible(true)
     di.setTrust("0.9")
     di.setProvenanceaction(
@@ -111,8 +94,7 @@ object MagUtility extends Serializable {
     )
     di
   }
-
-  val datatypedict = Map(
+val datatypedict = Map(
     "bool"     -> BooleanType,
     "int"      -> IntegerType,
     "uint"     -> IntegerType,
@@ -453,7 +435,6 @@ object MagUtility extends Serializable {
 
       case "repository" =>
         result = new Publication()
-        result.setDataInfo(MAGDataInfoInvisible)
         qualifier(
           "0038",
           "Other literature type",
@@ -488,8 +469,7 @@ object MagUtility extends Serializable {
     }
 
     if (result != null) {
-      if (result.getDataInfo == null)
-        result.setDataInfo(MAGDataInfo)
+      result.setDataInfo(MAGDataInfo)
       val i = new Instance
       i.setInstancetype(tp)
       i.setInstanceTypeMapping(
@@ -512,7 +492,7 @@ object MagUtility extends Serializable {
       return null
 
     result.setCollectedfrom(List(MAGCollectedFrom).asJava)
-    val pidList = List(
+    var pidList = List(
       structuredProperty(
         paper.paperId.get.toString,
         qualifier(
@@ -525,7 +505,7 @@ object MagUtility extends Serializable {
       )
     )
 
-    result.setPid(pidList.asJava)
+
 
     result.setOriginalId(pidList.map(s => s.getValue).asJava)
 
@@ -618,10 +598,9 @@ object MagUtility extends Serializable {
     }
 
     val instance = result.getInstance().get(0)
-    instance.setPid(pidList.asJava)
-    if (paper.doi.orNull != null)
-      instance.setAlternateIdentifier(
-        List(
+
+    if (paper.doi.orNull != null) {
+      pidList = pidList ::: List(
           structuredProperty(
             paper.doi.get,
             qualifier(
@@ -632,8 +611,10 @@ object MagUtility extends Serializable {
             ),
             null
           )
-        ).asJava
-      )
+        )
+    }
+    instance.setPid(pidList.asJava)
+    result.setPid(pidList.asJava)
     instance.setUrl(paper.urls.get.asJava)
     instance.setHostedby(ModelConstants.UNKNOWN_REPOSITORY)
     instance.setCollectedfrom(MAGCollectedFrom)
