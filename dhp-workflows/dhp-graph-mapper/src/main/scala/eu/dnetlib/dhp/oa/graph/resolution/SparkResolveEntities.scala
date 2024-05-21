@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.graph.resolution
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.schema.common.EntityType
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils
 import eu.dnetlib.dhp.schema.oaf.{Dataset => OafDataset, _}
 import org.apache.commons.io.IOUtils
 import org.apache.hadoop.fs.{FileSystem, Path}
@@ -118,15 +119,12 @@ object SparkResolveEntities {
         currentEntityDataset
           .joinWith(re, currentEntityDataset("_1").equalTo(re("_1")), "left")
           .map(k => {
-
             val a = k._1
             val b = k._2
             if (b == null)
               a._2
-            else {
-              a._2.mergeFrom(b._2)
-              a._2
-            }
+            else
+              MergeUtils.mergeResult(a._2, b._2)
           })
           .map(r => mapper.writeValueAsString(r))(Encoders.STRING)
           .write

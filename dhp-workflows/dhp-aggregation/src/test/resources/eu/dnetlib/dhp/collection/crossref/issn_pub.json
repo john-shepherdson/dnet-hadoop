@@ -1,0 +1,849 @@
+{
+  "URL": "http://dx.doi.org/10.1016/j.joca.2019.11.002",
+  "resource": {
+    "primary": {
+      "URL": "https://linkinghub.elsevier.com/retrieve/pii/S106345841931266X"
+    }
+  },
+  "member": "78",
+  "score": 0.0,
+  "created": {
+    "date-parts": [
+      [
+        2019,
+        11,
+        14
+      ]
+    ],
+    "date-time": "2019-11-14T18:08:38Z",
+    "timestamp": 1573754918000
+  },
+  "update-policy": "http://dx.doi.org/10.1016/elsevier_cm_policy",
+  "license": [
+    {
+      "start": {
+        "date-parts": [
+          [
+            2020,
+            5,
+            1
+          ]
+        ],
+        "date-time": "2020-05-01T00:00:00Z",
+        "timestamp": 1588291200000
+      },
+      "content-version": "tdm",
+      "delay-in-days": 0,
+      "URL": "https://www.elsevier.com/tdm/userlicense/1.0/"
+    },
+    {
+      "start": {
+        "date-parts": [
+          [
+            2021,
+            5,
+            1
+          ]
+        ],
+        "date-time": "2021-05-01T00:00:00Z",
+        "timestamp": 1619827200000
+      },
+      "content-version": "vor",
+      "delay-in-days": 365,
+      "URL": "http://www.elsevier.com/open-access/userlicense/1.0/"
+    }
+  ],
+  "ISSN": [
+    "1063-4584"
+  ],
+  "container-title": [
+    "Osteoarthritis and Cartilage"
+  ],
+  "issued": {
+    "date-parts": [
+      [
+        2020,
+        5
+      ]
+    ]
+  },
+  "issue": "5",
+  "prefix": "10.1016",
+  "reference-count": 50,
+  "indexed": {
+    "date-parts": [
+      [
+        2024,
+        2,
+        27
+      ]
+    ],
+    "date-time": "2024-02-27T00:38:44Z",
+    "timestamp": 1708994324729
+  },
+  "author": [
+    {
+      "given": "N.",
+      "family": "Sharma",
+      "sequence": "first",
+      "affiliation": []
+    },
+    {
+      "given": "P.",
+      "family": "Drobinski",
+      "sequence": "additional",
+      "affiliation": []
+    },
+    {
+      "given": "A.",
+      "family": "Kayed",
+      "sequence": "additional",
+      "affiliation": []
+    },
+    {
+      "given": "Z.",
+      "family": "Chen",
+      "sequence": "additional",
+      "affiliation": []
+    },
+    {
+      "given": "C.F.",
+      "family": "Kjelgaard-Petersen",
+      "sequence": "additional",
+      "affiliation": []
+    },
+    {
+      "given": "T.",
+      "family": "Gantzel",
+      "sequence": "additional",
+      "affiliation": []
+    },
+    {
+      "given": "M.A.",
+      "family": "Karsdal",
+      "sequence": "additional",
+      "affiliation": []
+    },
+    {
+      "given": "M.",
+      "family": "Michaelis",
+      "sequence": "additional",
+      "affiliation": []
+    },
+    {
+      "given": "C.",
+      "family": "Ladel",
+      "sequence": "additional",
+      "affiliation": []
+    },
+    {
+      "given": "A.C.",
+      "family": "Bay-Jensen",
+      "sequence": "additional",
+      "affiliation": []
+    },
+    {
+      "given": "S.",
+      "family": "Lindemann",
+      "sequence": "additional",
+      "affiliation": []
+    },
+    {
+      "given": "C.S.",
+      "family": "Thudium",
+      "sequence": "additional",
+      "affiliation": []
+    }
+  ],
+  "DOI": "10.1016/j.joca.2019.11.002",
+  "is-referenced-by-count": 27,
+  "funder": [
+    {
+      "DOI": "10.13039/501100001732",
+      "name": "Danmarks Grundforskningsfond",
+      "doi-asserted-by": "publisher"
+    }
+  ],
+  "published": {
+    "date-parts": [
+      [
+        2020,
+        5
+      ]
+    ]
+  },
+  "published-print": {
+    "date-parts": [
+      [
+        2020,
+        5
+      ]
+    ]
+  },
+  "alternative-id": [
+    "S106345841931266X"
+  ],
+  "subject": [
+    "Orthopedics and Sports Medicine",
+    "Biomedical Engineering",
+    "Rheumatology"
+  ],
+  "content-domain": {
+    "domain": [
+      "clinicalkey.fr",
+      "clinicalkey.jp",
+      "clinicalkey.es",
+      "clinicalkey.com.au",
+      "oarsijournal.com",
+      "clinicalkey.com",
+      "elsevier.com",
+      "sciencedirect.com"
+    ],
+    "crossmark-restriction": true
+  },
+  "reference": [
+    {
+      "key": "10.1016/j.joca.2019.11.002_bib1",
+      "series-title": "Priority Medicines for Europe and the World. 2013 Update",
+      "author": "Kaplan",
+      "year": "2013"
+    },
+    {
+      "issue": "August 2016",
+      "key": "10.1016/j.joca.2019.11.002_bib2",
+      "article-title": "Osteoarthritis: toward a comprehensive understanding of pathological mechanism",
+      "volume": "5",
+      "author": "Chen",
+      "year": "2017",
+      "journal-title": "Bone Res"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "77",
+      "issue": "2",
+      "author": "Sokolove",
+      "key": "10.1016/j.joca.2019.11.002_bib3",
+      "DOI": "10.1177/1759720X12467868",
+      "article-title": "Role of inflammation in the pathogenesis of osteoarthritis: latest findings and interpretations",
+      "year": "2013",
+      "volume": "5",
+      "journal-title": "Ther Adv Musculoskelet Dis"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "issue": "5",
+      "author": "Alberton",
+      "key": "10.1016/j.joca.2019.11.002_bib4",
+      "DOI": "10.3390/ijms20051008",
+      "article-title": "Aggrecan hypomorphism compromises articular cartilage biomechanical properties and is associated with increased incidence of spontaneous osteoarthritis",
+      "year": "2019",
+      "volume": "20",
+      "journal-title": "Int J Mol Sci"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "issue": "6",
+      "author": "Miller",
+      "key": "10.1016/j.joca.2019.11.002_bib5",
+      "DOI": "10.1172/jci.insight.95704",
+      "article-title": "An aggrecan fragment drives osteoarthritis pain through Toll-like receptor 2",
+      "year": "2018",
+      "volume": "3",
+      "journal-title": "JCI Insight"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "1240",
+      "issue": "5",
+      "author": "Lees",
+      "key": "10.1016/j.joca.2019.11.002_bib6",
+      "DOI": "10.1002/art.39063",
+      "article-title": "Bioactivity in an aggrecan 32-mer fragment is mediated via toll-like receptor 2",
+      "year": "2015",
+      "volume": "67",
+      "journal-title": "Arthritis Rheum"
+    },
+    {
+      "key": "10.1016/j.joca.2019.11.002_bib7",
+      "article-title": "Increased function of pronociceptive TRPV1 at the level of the joint in a rat model of osteoarthritis pain",
+      "author": "Kelly",
+      "year": "2013",
+      "journal-title": "Ann Rheum Dis"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "580",
+      "issue": "10",
+      "author": "Robinson",
+      "key": "10.1016/j.joca.2019.11.002_bib8",
+      "DOI": "10.1038/nrrheum.2016.136",
+      "article-title": "Low-grade inflammation as a key mediator of the pathogenesis of osteoarthritis",
+      "year": "2016",
+      "volume": "12",
+      "journal-title": "Nat Rev Rheumatol"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "625",
+      "issue": "11",
+      "author": "Sellam",
+      "key": "10.1016/j.joca.2019.11.002_bib9",
+      "DOI": "10.1038/nrrheum.2010.159",
+      "article-title": "The role of synovitis in pathophysiology and clinical symptoms of osteoarthritis",
+      "year": "2010",
+      "volume": "6",
+      "journal-title": "Nat Rev Rheumatol"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "249",
+      "issue": "2",
+      "author": "Scanzello",
+      "key": "10.1016/j.joca.2019.11.002_bib10",
+      "DOI": "10.1016/j.bone.2012.02.012",
+      "article-title": "The role of synovitis in osteoarthritis pathogenesis",
+      "year": "2012",
+      "volume": "51",
+      "journal-title": "Bone"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "33",
+      "issue": "1",
+      "author": "Kapoor",
+      "key": "10.1016/j.joca.2019.11.002_bib11",
+      "DOI": "10.1038/nrrheum.2010.196",
+      "article-title": "Role of proinflammatory cytokines in the pathophysiology of osteoarthritis",
+      "year": "2011",
+      "volume": "7",
+      "journal-title": "Nat Rev Rheumatol"
+    },
+    {
+      "issue": "4",
+      "key": "10.1016/j.joca.2019.11.002_bib12",
+      "first-page": "1",
+      "volume": "18",
+      "author": "Roh",
+      "year": "2018",
+      "journal-title": "Origin and List of Damps"
+    },
+    {
+      "key": "10.1016/j.joca.2019.11.002_bib13",
+      "doi-asserted-by": "crossref",
+      "article-title": "Overexpression of toll-like receptors 3 and 4 in synovial tissue from patients with early rheumatoid arthritis: toll-like receptor expression in early and longstanding arthritis",
+      "author": "Ospelt",
+      "year": "2008",
+      "journal-title": "Arthritis Rheum",
+      "DOI": "10.1002/art.24140"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "338",
+      "issue": "2",
+      "author": "Roelofs",
+      "key": "10.1016/j.joca.2019.11.002_bib14",
+      "DOI": "10.1002/art.23217",
+      "article-title": "The orchestra of toll-like receptors and their potential role in frequently occurring rheumatic conditions",
+      "year": "2008",
+      "volume": "58",
+      "journal-title": "Arthritis Rheum"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "657",
+      "issue": "3",
+      "author": "Gondokaryono",
+      "key": "10.1016/j.joca.2019.11.002_bib15",
+      "DOI": "10.1189/jlb.1206730",
+      "article-title": "The extra domain A of fibronectin stimulates murine mast cells via Toll-like receptor 4",
+      "year": "2007",
+      "volume": "82",
+      "journal-title": "J Leukoc Biol"
+    },
+    {
+      "issue": "7",
+      "key": "10.1016/j.joca.2019.11.002_bib16",
+      "first-page": "2004",
+      "article-title": "Chondrocyte innate immune myeloid differentiation factor 88-dependent signaling drives procatabolic effects of the endogenous toll-like receptor 2/toll-like receptor 4 ligands low molecular weight hyaluronan and high mobility group box chromosomal protein",
+      "volume": "62",
+      "author": "Liu-Bryan",
+      "year": "2010",
+      "journal-title": "Arthritis Rheum"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "774",
+      "issue": "7",
+      "author": "Midwood",
+      "key": "10.1016/j.joca.2019.11.002_bib17",
+      "DOI": "10.1038/nm.1987",
+      "article-title": "Tenascin-C is an endogenous activator of Toll-like receptor 4 that is essential for maintaining inflammation in arthritic joint disease",
+      "year": "2009",
+      "volume": "15",
+      "journal-title": "Nat Med"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "16",
+      "author": "Berenbaum",
+      "key": "10.1016/j.joca.2019.11.002_bib18",
+      "DOI": "10.1016/j.joca.2012.11.012",
+      "article-title": "Osteoarthritis as an inflammatory disease (osteoarthritis is not osteoarthrosis!)",
+      "year": "2013",
+      "volume": "21",
+      "journal-title": "Osteoarthr Cartil"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "259",
+      "issue": "4",
+      "author": "Wang",
+      "key": "10.1016/j.joca.2019.11.002_bib19",
+      "DOI": "10.1186/1756-0500-2-259",
+      "article-title": "Suppression of MMP activity in bovine cartilage explants cultures has little if any effect on the release of aggrecanase-derived aggrecan fragments",
+      "year": "2009",
+      "volume": "2",
+      "journal-title": "BMC Res Notes"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "423",
+      "issue": "5–6",
+      "author": "Bay-Jensen",
+      "key": "10.1016/j.joca.2019.11.002_bib20",
+      "DOI": "10.1016/j.clinbiochem.2011.01.001",
+      "article-title": "Enzyme-linked immunosorbent assay (ELISAs) for metalloproteinase derived type II collagen neoepitope, CIIM-Increased serum CIIM in subjects with severe radiographic osteoarthritis",
+      "year": "2011",
+      "volume": "44",
+      "journal-title": "Clin Biochem"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "18789",
+      "issue": "10",
+      "author": "Gudmann",
+      "key": "10.1016/j.joca.2019.11.002_bib21",
+      "DOI": "10.3390/ijms151018789",
+      "article-title": "Cartilage turnover reflected by metabolic processing of type II collagen: a novel marker of anabolic function in chondrocytes",
+      "year": "2014",
+      "volume": "15",
+      "journal-title": "Int J Mol Sci"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "899",
+      "issue": "10–11",
+      "author": "Barascuk",
+      "key": "10.1016/j.joca.2019.11.002_bib22",
+      "DOI": "10.1016/j.clinbiochem.2010.03.012",
+      "article-title": "A novel assay for extracellular matrix remodeling associated with liver fibrosis: an enzyme-linked immunosorbent assay (ELISA) for a MMP-9 proteolytically revealed neo-epitope of type III collagen",
+      "year": "2010",
+      "volume": "43",
+      "journal-title": "Clin Biochem"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "93",
+      "author": "Sun",
+      "key": "10.1016/j.joca.2019.11.002_bib23",
+      "DOI": "10.1186/1471-2474-15-93",
+      "article-title": "The active form of MMP-3 is a marker of synovial inflammation and cartilage turnover in inflammatory joint diseases",
+      "year": "2014",
+      "volume": "15",
+      "journal-title": "BMC Muscoskelet Disord"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "103",
+      "issue": "1",
+      "author": "Chandrasekhar",
+      "key": "10.1016/j.joca.2019.11.002_bib24",
+      "DOI": "10.1016/0003-2697(87)90658-0",
+      "article-title": "Microdetermination of proteoglycans and glycosaminoglycans in the presence of guanidine hydrochloride",
+      "year": "1987",
+      "volume": "161",
+      "journal-title": "Anal Biochem"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "8722",
+      "issue": "22",
+      "author": "Hankins",
+      "key": "10.1016/j.joca.2019.11.002_bib25",
+      "DOI": "10.1073/pnas.1201313109",
+      "article-title": "Amino acid addition to Vibrio cholerae LPS establishes a link between surface remodeling in Gram-positive and Gram-negative bacteria",
+      "year": "2012",
+      "volume": "109",
+      "journal-title": "Proc Natl Acad Sci"
+    },
+    {
+      "issue": "c",
+      "key": "10.1016/j.joca.2019.11.002_bib26",
+      "first-page": "1",
+      "volume": "2",
+      "author": "Bailie",
+      "year": "2010",
+      "journal-title": "Supporting Information"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "1145",
+      "issue": "9",
+      "author": "Neogi",
+      "key": "10.1016/j.joca.2019.11.002_bib27",
+      "DOI": "10.1016/j.joca.2013.03.018",
+      "article-title": "The epidemiology and impact of pain in osteoarthritis",
+      "year": "2013",
+      "volume": "21",
+      "journal-title": "Osteoarthr Cartil"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "623",
+      "issue": "3",
+      "author": "Hunter",
+      "key": "10.1016/j.joca.2019.11.002_bib28",
+      "DOI": "10.1016/j.rdc.2008.05.004",
+      "article-title": "The symptoms of osteoarthritis and the genesis of pain",
+      "year": "2008",
+      "volume": "34",
+      "journal-title": "Rheum Dis Clin N Am"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "1326",
+      "issue": "11",
+      "author": "Xu",
+      "key": "10.1016/j.joca.2019.11.002_bib29",
+      "DOI": "10.1038/nm.3978",
+      "article-title": "Inhibition of mechanical allodynia in neuropathic pain by TLR5-mediated A-fiber blockade",
+      "year": "2015",
+      "volume": "21",
+      "journal-title": "Nat Med"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "145",
+      "issue": "October 2017",
+      "author": "Lacagnina",
+      "key": "10.1016/j.joca.2019.11.002_bib30",
+      "DOI": "10.1016/j.pharmthera.2017.10.006",
+      "article-title": "Toll-like receptors and their role in persistent pain",
+      "year": "2018",
+      "volume": "184",
+      "journal-title": "Pharmacol Ther"
+    },
+    {
+      "key": "10.1016/j.joca.2019.11.002_bib31",
+      "first-page": "2016",
+      "article-title": "Blockade of toll-like receptors (TLR2, TLR4) attenuates pain and potentiates buprenorphine analgesia in a rat neuropathic pain model",
+      "author": "Jurga",
+      "year": "2016",
+      "journal-title": "Neural Plast"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "357",
+      "issue": "5",
+      "author": "Huang",
+      "key": "10.1016/j.joca.2019.11.002_bib32",
+      "DOI": "10.1007/s11926-009-0051-z",
+      "article-title": "The role of toll-like receptors in rheumatoid arthritis",
+      "year": "2009",
+      "volume": "11",
+      "journal-title": "Curr Rheumatol Rep"
+    },
+    {
+      "issue": "3",
+      "key": "10.1016/j.joca.2019.11.002_bib33",
+      "first-page": "1",
+      "article-title": "TLR4 signalling in osteoarthritis-finding targets for candidate DMOADs",
+      "volume": "11",
+      "author": "Gómez",
+      "year": "2014",
+      "journal-title": "Nat Rev Rheumatol"
+    },
+    {
+      "issue": "5 Pt 1",
+      "key": "10.1016/j.joca.2019.11.002_bib34",
+      "first-page": "1432",
+      "article-title": "Procollagen types I and III aminoterminal propeptide levels during acute respiratory distress syndrome and in response to methylprednisolone treatment.[Erratum appears in Am J Respir Crit Care Med. 2013 Dec 15;188(12):1477]",
+      "volume": "158",
+      "author": "Meduri",
+      "year": "1998",
+      "journal-title": "Am J Respir Crit Care Med"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "5",
+      "issue": "1",
+      "author": "Scheja",
+      "key": "10.1016/j.joca.2019.11.002_bib35",
+      "DOI": "10.3109/03009749209095054",
+      "article-title": "Serum levels of aminoterminal type III procollagen peptide and hyaluronan predict mortality in systemic sclerosis",
+      "year": "1992",
+      "volume": "21",
+      "journal-title": "Scand J Rheumatol"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "547",
+      "issue": "8",
+      "author": "Kjelgaard-Petersen",
+      "key": "10.1016/j.joca.2019.11.002_bib36",
+      "DOI": "10.3109/1354750X.2015.1105497",
+      "article-title": "Synovitis biomarkers: ex vivo characterization of three biomarkers for identification of inflammatory osteoarthritis",
+      "year": "2015",
+      "volume": "20",
+      "journal-title": "Biomarkers"
+    },
+    {
+      "key": "10.1016/j.joca.2019.11.002_bib37",
+      "article-title": "Sensitization and serological biomarkers in knee osteoarthritis patients with different degrees of synovitis",
+      "author": "Petersen",
+      "year": "2015",
+      "journal-title": "Clin J Pain"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "309",
+      "author": "He",
+      "key": "10.1016/j.joca.2019.11.002_bib38",
+      "DOI": "10.1186/1471-2474-15-309",
+      "article-title": "Type X collagen levels are elevated in serum from human osteoarthritis patients and associated with biomarkers of cartilage degradation and inflammation",
+      "year": "2014",
+      "volume": "15",
+      "journal-title": "BMC Muscoskelet Disord"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "1",
+      "issue": "1",
+      "author": "Bay-Jensen",
+      "key": "10.1016/j.joca.2019.11.002_bib39",
+      "DOI": "10.1371/journal.pone.0054504",
+      "article-title": "Circulating protein fragments of cartilage and connective tissue degradation are diagnostic and prognostic markers of rheumatoid arthritis and ankylosing spondylitis",
+      "year": "2013",
+      "volume": "8",
+      "journal-title": "PLoS One"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "44",
+      "issue": "1",
+      "author": "Siebuhr",
+      "key": "10.1016/j.joca.2019.11.002_bib40",
+      "DOI": "10.1016/j.joca.2013.10.020",
+      "article-title": "Identification and characterisation of osteoarthritis patients with inflammation derived tissue turnover",
+      "year": "2014",
+      "volume": "22",
+      "journal-title": "Osteoarthr Cartil"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "221",
+      "issue": "3",
+      "author": "Yuji Yoshida",
+      "key": "10.1016/j.joca.2019.11.002_bib41",
+      "DOI": "10.1016/0306-9877(88)90147-8",
+      "article-title": "Interleukin 6 and rheumatoid arthritis",
+      "year": "1988",
+      "volume": "27",
+      "journal-title": "Med Hypotheses"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "5173",
+      "issue": "22",
+      "author": "Suthaus",
+      "key": "10.1016/j.joca.2019.11.002_bib42",
+      "DOI": "10.1182/blood-2011-09-377705",
+      "article-title": "HHV8 encoded viral IL-6 collaborates with mouse IL-6 in MCD-like development in mice",
+      "year": "2012",
+      "volume": "119",
+      "journal-title": "Blood"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "1",
+      "issue": "1",
+      "author": "Zhou",
+      "key": "10.1016/j.joca.2019.11.002_bib43",
+      "DOI": "10.1186/s12974-016-0607-6",
+      "article-title": "Interleukin-6: an emerging regulator of pathological pain",
+      "year": "2016",
+      "volume": "13",
+      "journal-title": "J Neuroinflammation"
+    },
+    {
+      "key": "10.1016/j.joca.2019.11.002_bib44",
+      "series-title": "Local Translation and Retrograde Axonal Transport of Creb Regulates Il-6-Induced Nociceptive Plasticity",
+      "first-page": "1",
+      "author": "Melemedjian",
+      "year": "2014"
+    },
+    {
+      "issue": "6",
+      "key": "10.1016/j.joca.2019.11.002_bib45",
+      "first-page": "1149",
+      "article-title": "Aggrecanase and Aggrecan degradation in osteoarthritis: a review",
+      "volume": "36",
+      "author": "Huang",
+      "year": "2008",
+      "journal-title": "J Int Med Res"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "133",
+      "issue": "1",
+      "author": "Troeberg",
+      "key": "10.1016/j.joca.2019.11.002_bib46",
+      "DOI": "10.1016/j.bbapap.2011.06.020",
+      "article-title": "Proteases involved in cartilage matrix degradation in osteoarthritis",
+      "year": "2012",
+      "volume": "1824",
+      "journal-title": "Biochim Biophys Acta Protein Proteonomics"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "1633",
+      "issue": "11",
+      "author": "Zhang",
+      "key": "10.1016/j.joca.2019.11.002_bib47",
+      "DOI": "10.1136/ard.2007.079574",
+      "article-title": "Differential Toll-like receptor-dependent collagenase expression in chondrocytes",
+      "year": "2008",
+      "volume": "67",
+      "journal-title": "Ann Rheum Dis"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "2152",
+      "issue": "7",
+      "author": "Kim",
+      "key": "10.1016/j.joca.2019.11.002_bib48",
+      "DOI": "10.1002/art.21951",
+      "article-title": "The catabolic pathway mediated by toll-like receptors in human osteoarthritic chondrocytes",
+      "year": "2006",
+      "volume": "54",
+      "journal-title": "Arthritis Rheum"
+    },
+    {
+      "issue": "2018",
+      "key": "10.1016/j.joca.2019.11.002_bib49",
+      "article-title": "The anti-ADAMTS-5 nanobody®, M6495, protects against cartilage breakdown in cartilage and synovial joint tissue explant models",
+      "volume": "26",
+      "author": "Siebuhr",
+      "year": "2018",
+      "journal-title": "Osteoarthr Cartil"
+    },
+    {
+      "doi-asserted-by": "crossref",
+      "first-page": "2933",
+      "issue": "11",
+      "author": "Miller",
+      "key": "10.1016/j.joca.2019.11.002_bib50",
+      "DOI": "10.1002/art.39291",
+      "article-title": "Damage-associated molecular patterns generated in osteoarthritis directly excite murine nociceptive neurons through toll-like receptor 4",
+      "year": "2015",
+      "volume": "67",
+      "journal-title": "Arthritis Rheum"
+    }
+  ],
+  "title": [
+    "Inflammation and joint destruction may be linked to the generation of cartilage metabolites of ADAMTS-5 through activation of toll-like receptors"
+  ],
+  "link": [
+    {
+      "URL": "https://api.elsevier.com/content/article/PII:S106345841931266X?httpAccept=text/xml",
+      "content-type": "text/xml",
+      "content-version": "vor",
+      "intended-application": "text-mining"
+    },
+    {
+      "URL": "https://api.elsevier.com/content/article/PII:S106345841931266X?httpAccept=text/plain",
+      "content-type": "text/plain",
+      "content-version": "vor",
+      "intended-application": "text-mining"
+    }
+  ],
+  "source": "Crossref",
+  "type": "journal-article",
+  "publisher": "Elsevier BV",
+  "journal-issue": {
+    "issue": "5",
+    "published-print": {
+      "date-parts": [
+        [
+          2020,
+          5
+        ]
+      ]
+    }
+  },
+  "volume": "28",
+  "references-count": 50,
+  "issn-type": [
+
+    {
+      "value": "2227-9717",
+      "type": "electronic"
+    },
+    {
+      "value": "VALUE",
+      "type": "PIPPO"
+    },
+    {
+      "value": "1063-4584",
+      "type": "pu"
+    }
+  ],
+  "assertion": [
+    {
+      "value": "Elsevier",
+      "name": "publisher",
+      "label": "This article is maintained by"
+    },
+    {
+      "value": "Inflammation and joint destruction may be linked to the generation of cartilage metabolites of ADAMTS-5 through activation of toll-like receptors",
+      "name": "articletitle",
+      "label": "Article Title"
+    },
+    {
+      "value": "Osteoarthritis and Cartilage",
+      "name": "journaltitle",
+      "label": "Journal Title"
+    },
+    {
+      "value": "https://doi.org/10.1016/j.joca.2019.11.002",
+      "name": "articlelink",
+      "label": "CrossRef DOI link to publisher maintained version"
+    },
+    {
+      "value": "article",
+      "name": "content_type",
+      "label": "Content Type"
+    },
+    {
+      "value": "© 2019 Osteoarthritis Research Society International. Published by Elsevier Ltd.",
+      "name": "copyright",
+      "label": "Copyright"
+    }
+  ],
+  "deposited": {
+    "date-parts": [
+      [
+        2022,
+        7,
+        9
+      ]
+    ],
+    "date-time": "2022-07-09T14:08:02Z",
+    "timestamp": 1657375682000
+  },
+  "language": "en",
+  "page": "658-668",
+  "short-container-title": [
+    "Osteoarthritis and Cartilage"
+  ]
+}

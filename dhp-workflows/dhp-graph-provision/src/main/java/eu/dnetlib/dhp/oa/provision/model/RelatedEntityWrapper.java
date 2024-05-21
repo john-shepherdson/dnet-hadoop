@@ -9,6 +9,8 @@ import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class RelatedEntityWrapper implements Serializable {
 
+	private static final long serialVersionUID = -2624854064081757234L;
+
 	private Relation relation;
 	private RelatedEntity target;
 

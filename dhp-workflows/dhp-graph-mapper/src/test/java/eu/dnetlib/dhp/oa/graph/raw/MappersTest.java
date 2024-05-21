@@ -196,6 +196,12 @@ class MappersTest {
 
 		assertEquals(aff1.getSource(), aff2.getTarget());
 		assertEquals(aff2.getSource(), aff1.getTarget());
+
+		// COUNTRIES
+		assertEquals(3, p.getCountry().size());
+		assertEquals("IT", p.getCountry().get(0).getClassid());
+		assertEquals("FR", p.getCountry().get(1).getClassid());
+		assertEquals("DE", p.getCountry().get(2).getClassid());
 	}
 
 	private void verifyRelation(Relation r) {
@@ -867,6 +873,12 @@ class MappersTest {
 		assertValidId(p.getCollectedfrom().get(0).getKey());
 		System.out.println(p.getTitle().get(0).getValue());
 		assertTrue(StringUtils.isNotBlank(p.getTitle().get(0).getValue()));
+
+		// COUNTRIES
+		assertEquals(3, p.getCountry().size());
+		assertEquals("IT", p.getCountry().get(0).getClassid());
+		assertEquals("FR", p.getCountry().get(1).getClassid());
+		assertEquals("DE", p.getCountry().get(2).getClassid());
 	}
 
 	@Test
@@ -1276,6 +1288,22 @@ class MappersTest {
 		System.out.println("***************");
 		System.out.println(new ObjectMapper().writeValueAsString(trainingMaterial));
 		System.out.println("***************");
+	}
+
+	@Test
+	void testIRISPub() throws IOException, DocumentException {
+		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("iris-odf.xml")));
+		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
+		System.out.println("***************");
+		System.out.println(new ObjectMapper().writeValueAsString(list));
+		System.out.println("***************");
+		final Publication p = (Publication) list.get(0);
+		assertNotNull(p.getInstance().get(0).getUrl().get(0));
+		assertValidId(p.getId());
+		System.out.println(p.getInstance().get(0).getUrl());
+		p.getPid().forEach(x -> System.out.println(x.getValue()));
+		p.getInstance().get(0).getAlternateIdentifier().forEach(x -> System.out.println(x.getValue()));
+
 	}
 
 	@Test

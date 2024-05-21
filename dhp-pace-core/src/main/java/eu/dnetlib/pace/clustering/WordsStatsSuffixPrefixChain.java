@@ -20,7 +20,7 @@ public class WordsStatsSuffixPrefixChain extends AbstractClusteringFunction {
 		return suffixPrefixChain(s, param("mod"));
 	}
 
-	private Collection<String> suffixPrefixChain(String s, int mod) {
+	static Collection<String> suffixPrefixChain(String s, int mod) {
 
 		// create the list of words from the string (remove short words)
 		List<String> wordsList = Arrays
@@ -38,7 +38,7 @@ public class WordsStatsSuffixPrefixChain extends AbstractClusteringFunction {
 
 	}
 
-	private Collection<String> doSuffixPrefixChain(List<String> wordsList, String prefix) {
+	static private Collection<String> doSuffixPrefixChain(List<String> wordsList, String prefix) {
 
 		Set<String> set = Sets.newLinkedHashSet();
 		switch (wordsList.size()) {
@@ -80,12 +80,16 @@ public class WordsStatsSuffixPrefixChain extends AbstractClusteringFunction {
 
 	}
 
-	private String suffix(String s, int len) {
+	private static String suffix(String s, int len) {
 		return s.substring(s.length() - len);
 	}
 
-	private String prefix(String s, int len) {
+	private static String prefix(String s, int len) {
 		return s.substring(0, len);
 	}
 
+	static public void main(String[] args) {
+		String title = "MY LIFE AS A BOSON: THE STORY OF \"THE HIGGS\"".toLowerCase();
+		System.out.println(suffixPrefixChain(title, 10));
+	}
 }

@@ -17,10 +17,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.oa.graph.clean.GraphCleaningFunctionsTest;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
@@ -72,7 +71,7 @@ class GenerateEntitiesApplicationTest {
 
 	protected <T extends Result> void verifyMerge(Result publication, Result dataset, Class<T> clazz,
 		String resultType) {
-		final Result merge = OafMapperUtils.mergeResults(publication, dataset);
+		final Result merge = (Result) MergeUtils.merge(publication, dataset);
 		assertTrue(clazz.isAssignableFrom(merge.getClass()));
 		assertEquals(resultType, merge.getResulttype().getClassid());
 	}

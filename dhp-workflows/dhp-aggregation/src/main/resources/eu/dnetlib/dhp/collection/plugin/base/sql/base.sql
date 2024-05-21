@@ -108,7 +108,7 @@ INSERT INTO dsm_apiparams(
 	'api_________::openaire____::base_search::dump@@acceptedNormTypes',
 	'api_________::openaire____::base_search::dump',
 	'acceptedNormTypes',
-	'1,11,111,121,13,14,15,18,181,182,183,1A,6,7'
+	'1,11,111,121,14,15,18,181,182,183,1A,6,7'
 );
 
 COMMIT;

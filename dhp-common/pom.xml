@@ -63,11 +63,13 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>eu.dnetlib.dhp</groupId>
-			<artifactId>dhp-pace-core</artifactId>
-			<version>${project.version}</version>
+			<groupId>edu.cmu</groupId>
+			<artifactId>secondstring</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>com.ibm.icu</groupId>
+			<artifactId>icu4j</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.hadoop</groupId>
 			<artifactId>hadoop-common</artifactId>

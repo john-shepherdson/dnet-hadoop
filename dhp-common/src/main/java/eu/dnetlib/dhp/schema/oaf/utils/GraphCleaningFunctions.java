@@ -92,6 +92,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		INVALID_AUTHOR_NAMES.add("null anonymous");
 		INVALID_AUTHOR_NAMES.add("unbekannt");
 		INVALID_AUTHOR_NAMES.add("unknown");
+		INVALID_AUTHOR_NAMES.add("autor, Sin");
+		INVALID_AUTHOR_NAMES.add("Desconocido / Inconnu,");
 
 		INVALID_URL_HOSTS.add("creativecommons.org");
 		INVALID_URL_HOSTS.add("www.academia.edu");
@@ -506,6 +508,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 								.filter(Objects::nonNull)
 								.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
 								.map(GraphCleaningFunctions::cleanValue)
+								.sorted((s1, s2) -> s2.getValue().length() - s1.getValue().length())
+								.limit(ModelHardLimits.MAX_ABSTRACTS)
 								.collect(Collectors.toList()));
 				}
 				if (Objects.isNull(r.getResourcetype()) || StringUtils.isBlank(r.getResourcetype().getClassid())) {

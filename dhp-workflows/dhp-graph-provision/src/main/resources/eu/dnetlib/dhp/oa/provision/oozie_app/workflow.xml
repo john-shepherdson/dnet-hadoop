@@ -14,6 +14,11 @@
             <description>context API URL</description>
         </property>
         <property>
+            <name>validateXML</name>
+            <value>false</value>
+            <description>should the payload converter validate the XMLs</description>
+        </property>
+        <property>
             <name>relPartitions</name>
             <description>number or partitions for the relations Dataset</description>
         </property>
@@ -125,7 +130,7 @@
             <case to="prepare_relations">${wf:conf('resumeFrom') eq 'prepare_relations'}</case>
             <case to="fork_join_related_entities">${wf:conf('resumeFrom') eq 'fork_join_related_entities'}</case>
             <case to="fork_join_all_entities">${wf:conf('resumeFrom') eq 'fork_join_all_entities'}</case>
-            <case to="convert_to_xml">${wf:conf('resumeFrom') eq 'convert_to_xml'}</case>
+            <case to="create_payloads">${wf:conf('resumeFrom') eq 'create_payloads'}</case>
             <case to="drop_solr_collection">${wf:conf('resumeFrom') eq 'drop_solr_collection'}</case>
             <case to="to_solr_index">${wf:conf('resumeFrom') eq 'to_solr_index'}</case>
             <default to="prepare_relations"/>
@@ -144,21 +149,23 @@
             <class>eu.dnetlib.dhp.oa.provision.PrepareRelationsJob</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-cores=${sparkExecutorCoresForJoining}
-                --executor-memory=${sparkExecutorMemoryForJoining}
+                --executor-cores=4
+                --executor-memory=6G
                 --driver-memory=${sparkDriverMemoryForJoining}
+                --conf spark.executor.memoryOverhead=6G
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=15000
+                --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${inputGraphRootPath}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation</arg>
             <arg>--sourceMaxRelations</arg><arg>${sourceMaxRelations}</arg>
             <arg>--targetMaxRelations</arg><arg>${targetMaxRelations}</arg>
             <arg>--relationFilter</arg><arg>${relationFilter}</arg>
-            <arg>--relPartitions</arg><arg>5000</arg>
+            <arg>--relPartitions</arg><arg>15000</arg>
         </spark>
         <ok to="fork_join_related_entities"/>
         <error to="Kill"/>
@@ -585,19 +592,20 @@
         <error to="Kill"/>
     </action>
 
-    <join name="wait_join_phase2" to="convert_to_xml"/>
+    <join name="wait_join_phase2" to="create_payloads"/>
 
-    <action name="convert_to_xml">
+    <action name="create_payloads">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>convert_to_xml</name>
-            <class>eu.dnetlib.dhp.oa.provision.XmlConverterJob</class>
+            <name>create_payloads</name>
+            <class>eu.dnetlib.dhp.oa.provision.PayloadConverterJob</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -606,8 +614,10 @@
                 --conf spark.network.timeout=${sparkNetworkTimeout}
             </spark-opts>
             <arg>--inputPath</arg><arg>${workingDir}/join_entities</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/xml</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/xml_json</arg>
+            <arg>--validateXML</arg><arg>${validateXML}</arg>
             <arg>--contextApiBaseUrl</arg><arg>${contextApiBaseUrl}</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
         <ok to="should_index"/>
         <error to="Kill"/>
@@ -616,8 +626,8 @@
     <decision name="should_index">
         <switch>
             <case to="drop_solr_collection">${wf:conf('shouldIndex') eq 'true'}</case>
-            <case to="End">${wf:conf('shouldIndex') eq 'false'}</case>
-            <default to="drop_solr_collection"/>
+            <case to="dump_solr_records_hdfs">${wf:conf('shouldIndex') eq 'false'}</case>
+            <default to="dump_solr_records_hdfs"/>
         </switch>
     </decision>
 
@@ -660,12 +670,10 @@
                 --conf spark.hadoop.mapreduce.map.speculative=false
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
-            <arg>--inputPath</arg><arg>${workingDir}/xml</arg>
+            <arg>--inputPath</arg><arg>${workingDir}/xml_json</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--format</arg><arg>${format}</arg>
             <arg>--batchSize</arg><arg>${batchSize}</arg>
-            <arg>--outputFormat</arg><arg>${outputFormat}</arg>
-            <arg>--outputPath</arg><arg>${workingDir}/solr_documents</arg>
         </spark>
         <ok to="commit_solr_collection"/>
         <error to="Kill"/>
@@ -684,6 +692,31 @@
             <arg>--format</arg><arg>${format}</arg>
             <arg>--action</arg><arg>COMMIT</arg>
         </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="dump_solr_records_hdfs">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>dump_solr_records_hdfs</name>
+            <class>eu.dnetlib.dhp.oa.provision.SolrRecordDumpJob</class>
+            <jar>dhp-graph-provision-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCoresForJoining}
+                --executor-memory=${sparkExecutorMemoryForJoining}
+                --driver-memory=${sparkDriverMemoryForJoining}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${workingDir}/xml_json</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--format</arg><arg>${format}</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/solr_documents</arg>
+        </spark>
         <ok to="End"/>
         <error to="Kill"/>
     </action>

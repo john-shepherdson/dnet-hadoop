@@ -1,0 +1,32 @@
+[
+  {
+    "paramName": "in",
+    "paramLongName": "inputPath",
+    "paramDescription": "the path of the sequence file to read",
+    "paramRequired": true
+  },
+  {
+    "paramName": "out",
+    "paramLongName": "outputPath",
+    "paramDescription": "the path used to store temporary output files",
+    "paramRequired": true
+  },
+  {
+    "paramName": "cau",
+    "paramLongName": "contextApiBaseUrl",
+    "paramDescription": "URL of the context API",
+    "paramRequired": true
+  },
+  {
+    "paramName": "isu",
+    "paramLongName": "isLookupUrl",
+    "paramDescription": "URL of the context ISLookup Service",
+    "paramRequired": true
+  },
+  {
+    "paramName": "val",
+    "paramLongName": "validateXML",
+    "paramDescription": "should the process check the XML validity",
+    "paramRequired": false
+  }
+]

@@ -53,7 +53,7 @@ public class Constraints implements Serializable {
 
 		for (Constraint sc : constraint) {
 			boolean verified = false;
-			if(!param.containsKey(sc.getField()))
+			if (!param.containsKey(sc.getField()))
 				return false;
 			for (String value : param.get(sc.getField())) {
 				if (sc.verifyCriteria(value.trim())) {

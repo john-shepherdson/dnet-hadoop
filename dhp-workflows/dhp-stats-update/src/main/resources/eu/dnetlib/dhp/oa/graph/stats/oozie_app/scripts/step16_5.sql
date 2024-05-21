@@ -1,3 +1,5 @@
+set mapred.job.queue.name=analytics;
+
 -- replace the creation of the result view to include the boolean fields from the previous tables (green, gold,
 -- peer reviewed)
 drop table if exists ${stats_db_name}.result_tmp;

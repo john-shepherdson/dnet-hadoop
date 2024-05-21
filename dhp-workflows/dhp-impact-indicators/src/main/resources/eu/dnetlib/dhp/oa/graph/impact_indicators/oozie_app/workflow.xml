@@ -80,6 +80,7 @@
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
 				--driver-memory=${sparkHighDriverMemory}
+				--conf spark.executor.memoryOverhead=${sparkHighExecutorMemory}
 				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
 				--conf spark.extraListeners=${spark2ExtraListeners}
 				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -117,6 +118,7 @@
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
 				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.executor.memoryOverhead=${sparkHighExecutorMemory}
 				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
 				--conf spark.extraListeners=${spark2ExtraListeners}
 				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -150,6 +152,7 @@
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
 				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.executor.memoryOverhead=${sparkHighExecutorMemory}
 				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
 				--conf spark.extraListeners=${spark2ExtraListeners}
 				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -185,6 +188,7 @@
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
 				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.executor.memoryOverhead=${sparkHighExecutorMemory}
 				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
 				--conf spark.extraListeners=${spark2ExtraListeners}
 				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -218,6 +222,7 @@
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
 				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.executor.memoryOverhead=${sparkHighExecutorMemory}
 				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
 				--conf spark.extraListeners=${spark2ExtraListeners}
 				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -254,6 +259,7 @@
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
 				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.executor.memoryOverhead=${sparkHighExecutorMemory}
 				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
 				--conf spark.extraListeners=${spark2ExtraListeners}
 				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -324,6 +330,7 @@
 				--executor-memory=${sparkNormalExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
 				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.executor.memoryOverhead=${sparkNormalExecutorMemory}
 				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
 				--conf spark.extraListeners=${spark2ExtraListeners}
 				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -370,6 +377,7 @@
 				--executor-memory=${sparkNormalExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
 				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.executor.memoryOverhead=${sparkNormalExecutorMemory}
 				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
 				--conf spark.extraListeners=${spark2ExtraListeners}
 				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -418,6 +426,7 @@
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
 				--driver-memory=${sparkHighDriverMemory}
+				--conf spark.executor.memoryOverhead=${sparkHighExecutorMemory}
 				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
 				--conf spark.extraListeners=${spark2ExtraListeners}
 				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -453,6 +462,7 @@
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
 				--driver-memory=${sparkHighDriverMemory}
+				--conf spark.executor.memoryOverhead=${sparkHighExecutorMemory}
 				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
 				--conf spark.extraListeners=${spark2ExtraListeners}
 				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -491,6 +501,7 @@
 				--executor-memory=${sparkHighExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
 				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.executor.memoryOverhead=${sparkHighExecutorMemory}
 				--conf spark.sql.shuffle.partitions=${sparkShufflePartitions}
 				--conf spark.extraListeners=${spark2ExtraListeners}
 				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -542,6 +553,7 @@
 				--executor-memory=${sparkNormalExecutorMemory}
 				--executor-cores=${sparkExecutorCores}
 				--driver-memory=${sparkNormalDriverMemory}
+				--conf spark.executor.memoryOverhead=${sparkNormalExecutorMemory}
 				--conf spark.extraListeners=${spark2ExtraListeners}
 				--conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
 				--conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}

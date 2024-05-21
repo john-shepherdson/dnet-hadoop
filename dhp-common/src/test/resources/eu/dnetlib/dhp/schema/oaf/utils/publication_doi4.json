@@ -1,0 +1,37 @@
+{
+  "id": "50|od______2852::38861c44e6052a8d49f59a4c39ba5e66",
+  "instance": [
+    {
+      "collectedfrom": {
+        "key": "10|opendoar____::358aee4cc897452c00244351e4d91f69",
+        "value": "Zenodo"
+      },
+      "pid": [
+        {
+          "qualifier": {"classid": "doi"},
+          "value": "10.1016/j.cmet.2010.03.013"
+        },
+        {
+          "qualifier": {"classid": "handle"},
+          "value": "11012/83840"
+        }
+      ]
+    },
+    {
+      "collectedfrom": {
+        "key": "10|opendoar____::2852",
+        "value": "Digital library of Brno University of Technology"
+      },
+      "pid": [
+        {
+          "qualifier": {"classid": "pmc"},
+          "value": "21459329"
+        },
+        {
+          "qualifier": {"classid": "handle"},
+          "value": "11012/83840"
+        }
+      ]
+    }
+  ]
+}
