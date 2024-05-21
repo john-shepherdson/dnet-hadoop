@@ -15,8 +15,8 @@
         </property>
         <property>
             <name>validateXML</name>
-            <description>should the payload converter validate the XMLs</description>
             <value>false</value>
+            <description>should the payload converter validate the XMLs</description>
         </property>
         <property>
             <name>relPartitions</name>

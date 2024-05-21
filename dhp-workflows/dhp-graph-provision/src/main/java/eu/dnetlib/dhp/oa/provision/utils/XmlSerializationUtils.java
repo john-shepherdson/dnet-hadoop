@@ -170,30 +170,19 @@ public class XmlSerializationUtils {
 		return sb.toString();
 	}
 
-	// <measure downloads="0" views="0">infrastruct_::f66f1bd369679b5b077dcdf006089556||OpenAIRE</measure>
+	// <measure views="0" datasource="infrastruct_::f66f1bd369679b5b077dcdf006089556||OpenAIRE" />
+	// <measure downloads="0" datasource="infrastruct_::f66f1bd369679b5b077dcdf006089556||OpenAIRE" />
 	public static String usageMeasureAsXmlElement(String name, Measure measure) {
-		HashSet<String> dsIds = Optional
-			.ofNullable(measure.getUnit())
-			.map(
-				m -> m
-					.stream()
-					.map(KeyValue::getKey)
-					.collect(Collectors.toCollection(HashSet::new)))
-			.orElse(new HashSet<>());
-
 		StringBuilder sb = new StringBuilder();
-		dsIds.forEach(dsId -> {
+		for (KeyValue kv : measure.getUnit()) {
 			sb
 				.append("<")
-				.append(name);
-			for (KeyValue kv : measure.getUnit()) {
-				sb.append(" ").append(attr(measure.getId(), kv.getValue()));
-			}
-			sb
+				.append(name)
 				.append(" ")
-				.append(attr("datasource", dsId))
-				.append("/>");
-		});
+				.append(attr(measure.getId(), kv.getValue()))
+				.append(attr("datasource", kv.getKey()))
+				.append(" />");
+		}
 		return sb.toString();
 	}
 
