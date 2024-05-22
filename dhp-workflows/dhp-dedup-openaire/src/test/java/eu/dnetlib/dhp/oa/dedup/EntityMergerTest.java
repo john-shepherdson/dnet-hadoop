@@ -123,7 +123,7 @@ class EntityMergerTest implements Serializable {
 		assertEquals(dataInfo, pub_merged.getDataInfo());
 
 		// verify datepicker
-		assertEquals("2018-09-30", pub_merged.getDateofacceptance().getValue());
+		assertEquals("2016-01-01", pub_merged.getDateofacceptance().getValue());
 
 		// verify authors
 		assertEquals(13, pub_merged.getAuthor().size());

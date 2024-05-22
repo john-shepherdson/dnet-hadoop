@@ -30,8 +30,16 @@ import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class MergeUtils {
+	public static <T extends Oaf> T mergeById(String s, Iterator<T> oafEntityIterator) {
+		return mergeGroup(s, oafEntityIterator, true);
+	}
 
 	public static <T extends Oaf> T mergeGroup(String s, Iterator<T> oafEntityIterator) {
+		return mergeGroup(s, oafEntityIterator, false);
+	}
+
+	public static <T extends Oaf> T mergeGroup(String s, Iterator<T> oafEntityIterator,
+		boolean checkDelegateAuthority) {
 		TreeSet<T> sortedEntities = new TreeSet<>((o1, o2) -> {
 			int res = 0;
 
@@ -52,18 +60,22 @@ public class MergeUtils {
 			sortedEntities.add(oafEntityIterator.next());
 		}
 
-		T merged = sortedEntities.descendingIterator().next();
-
 		Iterator<T> it = sortedEntities.descendingIterator();
+		T merged = it.next();
+
 		while (it.hasNext()) {
-			merged = checkedMerge(merged, it.next());
+			merged = checkedMerge(merged, it.next(), checkDelegateAuthority);
 		}
 
 		return merged;
 	}
 
-	public static <T extends Oaf> T checkedMerge(final T left, final T right) {
-		return (T) merge(left, right, false);
+	public static <T extends Oaf> T checkedMerge(final T left, final T right, boolean checkDelegateAuthority) {
+		return (T) merge(left, right, checkDelegateAuthority);
+	}
+
+	public static <T extends Result, E extends Result> Result mergeResult(final T left, final E right) {
+		return (Result) merge(left, right, false);
 	}
 
 	public static Oaf merge(final Oaf left, final Oaf right) {
@@ -108,7 +120,7 @@ public class MergeUtils {
 				return mergeSoftware((Software) left, (Software) right);
 			}
 
-			return mergeResult((Result) left, (Result) right);
+			return mergeResultFields((Result) left, (Result) right);
 		} else if (sameClass(left, right, Datasource.class)) {
 			// TODO
 			final int trust = compareTrust(left, right);
@@ -151,9 +163,9 @@ public class MergeUtils {
 		}
 		// TODO: raise trust to have preferred fields from one or the other??
 		if (new ResultTypeComparator().compare(left, right) < 0) {
-			return mergeResult(left, right);
+			return mergeResultFields(left, right);
 		} else {
-			return mergeResult(right, left);
+			return mergeResultFields(right, left);
 		}
 	}
 
@@ -263,6 +275,12 @@ public class MergeUtils {
 
 	// TODO review
 	private static List<KeyValue> mergeByKey(List<KeyValue> left, List<KeyValue> right, int trust) {
+		if (left == null) {
+			return right;
+		} else if (right == null) {
+			return left;
+		}
+
 		if (trust < 0) {
 			List<KeyValue> s = left;
 			left = right;
@@ -368,7 +386,7 @@ public class MergeUtils {
 		return merge;
 	}
 
-	public static <T extends Result> T mergeResult(T original, T enrich) {
+	private static <T extends Result> T mergeResultFields(T original, T enrich) {
 		final int trust = compareTrust(original, enrich);
 		T merge = mergeOafEntityFields(original, enrich, trust);
 
@@ -694,7 +712,7 @@ public class MergeUtils {
 
 	private static <T extends OtherResearchProduct> T mergeORP(T original, T enrich) {
 		int trust = compareTrust(original, enrich);
-		final T merge = mergeResult(original, enrich);
+		final T merge = mergeResultFields(original, enrich);
 
 		merge.setContactperson(unionDistinctLists(merge.getContactperson(), enrich.getContactperson(), trust));
 		merge.setContactgroup(unionDistinctLists(merge.getContactgroup(), enrich.getContactgroup(), trust));
@@ -705,7 +723,7 @@ public class MergeUtils {
 
 	private static <T extends Software> T mergeSoftware(T original, T enrich) {
 		int trust = compareTrust(original, enrich);
-		final T merge = mergeResult(original, enrich);
+		final T merge = mergeResultFields(original, enrich);
 
 		merge.setDocumentationUrl(unionDistinctLists(merge.getDocumentationUrl(), enrich.getDocumentationUrl(), trust));
 		merge.setLicense(unionDistinctLists(merge.getLicense(), enrich.getLicense(), trust));
@@ -719,7 +737,7 @@ public class MergeUtils {
 
 	private static <T extends Dataset> T mergeDataset(T original, T enrich) {
 		int trust = compareTrust(original, enrich);
-		T merge = mergeResult(original, enrich);
+		T merge = mergeResultFields(original, enrich);
 
 		merge.setStoragedate(chooseReference(merge.getStoragedate(), enrich.getStoragedate(), trust));
 		merge.setDevice(chooseReference(merge.getDevice(), enrich.getDevice(), trust));
@@ -738,7 +756,7 @@ public class MergeUtils {
 
 	public static <T extends Publication> T mergePublication(T original, T enrich) {
 		final int trust = compareTrust(original, enrich);
-		T merged = mergeResult(original, enrich);
+		T merged = mergeResultFields(original, enrich);
 
 		merged.setJournal(chooseReference(merged.getJournal(), enrich.getJournal(), trust));
 
@@ -856,9 +874,11 @@ public class MergeUtils {
 		if (toEnrichInstances == null) {
 			return enrichmentResult;
 		}
-		if (enrichmentInstances == null) {
-			return enrichmentResult;
+
+		if (enrichmentInstances == null || enrichmentInstances.isEmpty()) {
+			return toEnrichInstances;
 		}
+
 		Map<String, Instance> ri = toInstanceMap(enrichmentInstances);
 
 		toEnrichInstances.forEach(i -> {

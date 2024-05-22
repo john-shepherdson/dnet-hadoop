@@ -1,3 +1,5 @@
+set mapred.job.queue.name=analytics;
+
 -------------------------------------------
 --- Extra tables, mostly used by indicators
 
