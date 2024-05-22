@@ -11,7 +11,7 @@ import eu.dnetlib.dhp.schema.oaf.{
   Dataset => OafDataset
 }
 import eu.dnetlib.dhp.schema.sx.scholix.{Scholix, ScholixResource}
-import org.apache.spark.sql.functions.{col, concat, expr, md5}
+import org.apache.spark.sql.functions.{col, concat, expr, first, md5}
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql._
 import org.slf4j.{Logger, LoggerFactory}
@@ -89,7 +89,13 @@ class SparkCreateScholexplorerDump(propertyPath: String, args: Array[String], lo
       .withColumn("cf", expr("transform(collectedfrom, x -> struct(x.key, x.value))"))
       .drop("collectedfrom")
       .withColumnRenamed("cf", "collectedfrom")
-      .distinct()
+      .groupBy(col("id"))
+      .agg(
+        first("source").alias("source"),
+        first("target").alias("target"),
+        first("relClass").alias("relClass"),
+        first("collectedfrom").alias("collectedfrom")
+      )
 
     bidRel.write.mode(SaveMode.Overwrite).save(s"$otuputPath/relation")
 
@@ -97,7 +103,7 @@ class SparkCreateScholexplorerDump(propertyPath: String, args: Array[String], lo
 
   def generateScholix(outputPath: String, spark: SparkSession): Unit = {
     implicit val scholixResourceEncoder: Encoder[ScholixResource] = Encoders.bean(classOf[ScholixResource])
-    implicit val scholixEncoder: Encoder[Scholix] = Encoders.bean(classOf[Scholix])
+    implicit val scholixEncoder: Encoder[Scholix] = Encoders.kryo(classOf[Scholix])
 
     import spark.implicits._
     val relations = spark.read.load(s"$outputPath/relation").as[RelationInfo]
@@ -106,18 +112,19 @@ class SparkCreateScholexplorerDump(propertyPath: String, args: Array[String], lo
     val scholix_one_verse = relations
       .joinWith(resource, relations("source") === resource("dnetIdentifier"), "inner")
       .map(res => ScholexplorerUtils.generateScholix(res._1, res._2))
+      .map(s => (s.getIdentifier, s))(Encoders.tuple(Encoders.STRING, Encoders.kryo(classOf[Scholix])))
 
     val resourceTarget = relations
       .joinWith(resource, relations("target") === resource("dnetIdentifier"), "inner")
       .map(res => (res._1.id, res._2))(Encoders.tuple(Encoders.STRING, Encoders.kryo(classOf[ScholixResource])))
 
     scholix_one_verse
-      .joinWith(resourceTarget, scholix_one_verse("identifier") === resourceTarget("_1"), "inner")
-      .map(k => ScholexplorerUtils.updateTarget(k._1, k._2._2))
+      .joinWith(resourceTarget, scholix_one_verse("_1") === resourceTarget("_1"), "inner")
+      .map(k => ScholexplorerUtils.updateTarget(k._1._2, k._2._2))
       .write
       .mode(SaveMode.Overwrite)
       .option("compression", "gzip")
-      .json(s"$outputPath/scholix")
+      .text(s"$outputPath/scholix")
   }
 }
 

@@ -31,31 +31,31 @@
             <artifactId>dhp-actionmanager</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-aggregation</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-blacklist</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-broker-events</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-dedup-openaire</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-enrichment</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>eu.dnetlib.dhp</groupId>-->
+<!--            <artifactId>dhp-aggregation</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>eu.dnetlib.dhp</groupId>-->
+<!--            <artifactId>dhp-blacklist</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>eu.dnetlib.dhp</groupId>-->
+<!--            <artifactId>dhp-broker-events</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>eu.dnetlib.dhp</groupId>-->
+<!--            <artifactId>dhp-dedup-openaire</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>eu.dnetlib.dhp</groupId>-->
+<!--            <artifactId>dhp-enrichment</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-graph-mapper</artifactId>

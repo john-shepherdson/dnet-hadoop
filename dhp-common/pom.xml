@@ -128,12 +128,6 @@
 		<dependency>
 			<groupId>eu.dnetlib</groupId>
 			<artifactId>cnr-rmi-api</artifactId>
-			<exclusions>
-				<exclusion>
-					<artifactId>log4j</artifactId>
-					<groupId>log4j</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<dependency>
