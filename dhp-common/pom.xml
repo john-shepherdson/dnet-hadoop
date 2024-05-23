@@ -70,10 +70,7 @@
 			<groupId>com.ibm.icu</groupId>
 			<artifactId>icu4j</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.hadoop</groupId>
-			<artifactId>hadoop-common</artifactId>
-		</dependency>
+
 		<dependency>
 			<groupId>com.github.sisyphsu</groupId>
 			<artifactId>dateparser</artifactId>
@@ -163,7 +160,7 @@
 
 		<dependency>
 			<groupId>eu.dnetlib.dhp</groupId>
-			<artifactId>${dhp-schemas.artifact}</artifactId>
+			<artifactId>dhp-schemas</artifactId>
 		</dependency>
 
 		<dependency>

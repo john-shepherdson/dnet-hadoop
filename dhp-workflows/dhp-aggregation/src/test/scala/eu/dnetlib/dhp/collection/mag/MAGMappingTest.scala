@@ -7,12 +7,9 @@ import org.apache.spark.sql.functions.col
 import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.Test
 
-
-
 class MAGMappingTest {
 
   val mapper = new ObjectMapper()
-
 
   def mappingTest(): Unit = {
 
@@ -25,8 +22,6 @@ class MAGMappingTest {
     val s = new SparkMAGtoOAF(null, null, null)
     s.convertMAG(spark, "/Users/sandro/Downloads/", "/Users/sandro/Downloads/mag_OAF")
   }
-
-
 
   @Test
   def mappingMagType(): Unit = {

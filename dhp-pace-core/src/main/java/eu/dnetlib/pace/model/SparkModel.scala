@@ -3,7 +3,7 @@ package eu.dnetlib.pace.model
 import com.jayway.jsonpath.{Configuration, JsonPath}
 import eu.dnetlib.pace.common.AbstractPaceFunctions
 import eu.dnetlib.pace.config.{DedupConfig, Type}
-import eu.dnetlib.pace.util.MapDocumentUtil
+import eu.dnetlib.pace.util.{MapDocumentUtil, SparkCompatUtils}
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.catalyst.encoders.RowEncoder
 import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
@@ -52,7 +52,7 @@ case class SparkModel(conf: DedupConfig) {
   val orderingFieldPosition: Int = schema.fieldIndex(orderingFieldName)
 
   val parseJsonDataset: (Dataset[String] => Dataset[Row]) = df => {
-    df.map(r => rowFromJson(r))(RowEncoder(schema))
+    df.map(r => rowFromJson(r))(SparkCompatUtils.encoderFor(schema))
   }
 
   def rowFromJson(json: String): Row = {

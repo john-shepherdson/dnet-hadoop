@@ -35,8 +35,6 @@ class SparkMAGtoOAF(propertyPath: String, args: Array[String], log: Logger)
   def convertMAG(spark: SparkSession, magBasePath: String, mdStorePath: String): Unit = {
     import spark.implicits._
 
-
-
     spark.read
       .load(s"$magBasePath/mag_denormalized")
       .as[MAGPaper]

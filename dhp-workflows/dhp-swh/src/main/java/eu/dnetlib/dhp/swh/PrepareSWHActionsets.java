@@ -17,6 +17,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
@@ -117,7 +118,7 @@ public class PrepareSWHActionsets {
 			.map(
 				(MapFunction<String, Software>) t -> OBJECT_MAPPER.readValue(t, Software.class),
 				Encoders.bean(Software.class))
-			.filter(t -> t.getCodeRepositoryUrl() != null)
+			.filter((FilterFunction<Software>) t -> t.getCodeRepositoryUrl() != null)
 			.select(col("id"), col("codeRepositoryUrl.value").as("repoUrl"));
 	}
 

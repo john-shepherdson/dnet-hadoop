@@ -94,7 +94,8 @@ object MagUtility extends Serializable {
     )
     di
   }
-val datatypedict = Map(
+
+  val datatypedict = Map(
     "bool"     -> BooleanType,
     "int"      -> IntegerType,
     "uint"     -> IntegerType,
@@ -505,8 +506,6 @@ val datatypedict = Map(
       )
     )
 
-
-
     result.setOriginalId(pidList.map(s => s.getValue).asJava)
 
     result.setId(s"50|mag_________::${DHPUtils.md5(paper.paperId.get.toString)}")
@@ -601,17 +600,17 @@ val datatypedict = Map(
 
     if (paper.doi.orNull != null) {
       pidList = pidList ::: List(
-          structuredProperty(
-            paper.doi.get,
-            qualifier(
-              PidType.doi.toString,
-              PidType.doi.toString,
-              ModelConstants.DNET_PID_TYPES,
-              ModelConstants.DNET_PID_TYPES
-            ),
-            null
-          )
+        structuredProperty(
+          paper.doi.get,
+          qualifier(
+            PidType.doi.toString,
+            PidType.doi.toString,
+            ModelConstants.DNET_PID_TYPES,
+            ModelConstants.DNET_PID_TYPES
+          ),
+          null
         )
+      )
     }
     instance.setPid(pidList.asJava)
     result.setPid(pidList.asJava)
