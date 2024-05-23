@@ -8,6 +8,7 @@ fi
 
 export HADOOP_USER_NAME=$2
 
+SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR=1
 
 # Set the active HDFS node of OCEAN and IMPALA cluster.
 OCEAN_HDFS_NODE='hdfs://nameservice1'
@@ -30,7 +31,9 @@ while [ $COUNTER -lt 3 ]; do
 done
 if [ -z "$IMPALA_HDFS_NODE" ]; then
     echo -e "\n\nERROR: PROBLEM WHEN SETTING THE HDFS-NODE FOR IMPALA CLUSTER! | AFTER ${COUNTER} RETRIES.\n\n"
-    exit 1
+    if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
+      exit 1
+    fi
 fi
 echo -e "Active IMPALA HDFS Node: ${IMPALA_HDFS_NODE} , after ${COUNTER} retries.\n\n"
 
@@ -43,8 +46,21 @@ IMPALA_HDFS_DB_BASE_PATH="${IMPALA_HDFS_NODE}/user/hive/warehouse"
 LOCATION_HDFS_NODE_SED_ARG="s|${OCEAN_HDFS_NODE}|${IMPALA_HDFS_NODE}|g" # This requires to be used with "sed -e" in order to have the "|" delimiter (as the "/" conflicts with the URIs)
 
 
+function print_elapsed_time()
+{
+  start_time=$1
+  end_time=$(date +%s)
+  elapsed_time=$(($end_time-$start_time))
+  hours=$((elapsed_time / 3600))
+  minutes=$(((elapsed_time % 3600) / 60))
+  seconds=$((elapsed_time % 60))
+  printf "\nElapsed time: %02d:%02d:%02d\n\n" $hours $minutes $seconds
+}
+
+
 function copydb() {
   db=$1
+  start_db_time=$(date +%s)
   echo -e "\nStart processing db: '${db}'..\n"
 
   # Delete the old DB from Impala cluster (if exists).
@@ -53,7 +69,9 @@ function copydb() {
   if [ -n "$log_errors" ]; then
     echo -e "\n\nERROR: THERE WAS A PROBLEM WHEN DROPPING THE OLD DATABASE! EXITING...\n\n"
     rm -f error.log
-    exit 2
+    if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
+      exit 2
+    fi
   fi
 
   echo -e "\n\nCopying files of '${db}', from Ocean to Impala cluster..\n"
@@ -77,7 +95,9 @@ function copydb() {
   else
     echo -e "\n\nERROR: FAILED TO TRANSFER THE FILES OF '${db}', WITH 'hadoop distcp'. GOT EXIT STATUS: $?\n\n"
     rm -f error.log
-    exit 3
+    if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
+      exit 3
+    fi
   fi
 
   # In case we ever use this script for a writable DB (using inserts/updates), we should perform the following costly operation as well..
@@ -109,12 +129,17 @@ function copydb() {
       CURRENT_PRQ_FILE=`hdfs dfs -conf ${IMPALA_CONFIG_FILE} -ls -C "${IMPALA_HDFS_DB_BASE_PATH}/${db}.db/${i}/" | grep -v 'Found' | grep -v '_impala_insert_staging' |  head -1`
       if [ -z "$CURRENT_PRQ_FILE" ]; then # If there is not parquet-file inside.
           echo -e "\nERROR: THE TABLE \"${i}\" HAD NO FILES TO GET THE SCHEMA FROM! IT'S EMPTY!\n\n"
-          exit 4 # Comment out when testing a DB which has such a table, just for performing this exact test-check.
+          if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
+            exit 4
+          fi
       else
         impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "create table ${db}.${i} like parquet '${CURRENT_PRQ_FILE}' stored as parquet;" |& tee error.log
         log_errors=`cat error.log | grep -E "WARN|ERROR|FAILED"`
         if [ -n "$log_errors" ]; then
           echo -e "\n\nERROR: THERE WAS A PROBLEM WHEN CREATING TABLE '${i}'!\n\n"
+          if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
+            exit 5
+          fi
         fi
       fi
     fi
@@ -158,7 +183,9 @@ function copydb() {
 
     if [[ $new_num_of_views_to_retry -eq $previous_num_of_views_to_retry ]]; then
       echo -e "\n\nERROR: THE NUMBER OF VIEWS TO RETRY HAS NOT BEEN REDUCED! THE SCRIPT IS LIKELY GOING TO AN INFINITE-LOOP! EXITING..\n\n"
-      exit 5
+      if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
+        exit 6
+      fi
     elif [[ $new_num_of_views_to_retry -gt 0 ]]; then
       echo -e "\nTo be retried \"create_view_statements\" (${new_num_of_views_to_retry}):\n\n${all_create_view_statements[@]}\n"
     else
@@ -186,11 +213,14 @@ function copydb() {
   else
     echo -e "\n\nERROR: 1 OR MORE ENTITIES OF DB '${db}' FAILED TO BE COPIED TO IMPALA CLUSTER!\n\n"
     rm -f error.log
-    exit 6
+    if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
+      exit 7
+    fi
   fi
 
   rm -f error.log
-  echo -e "\n\nFinished processing db: ${db}\n\n"
+  echo -e "\n\nFinished processing db: ${db}\n"
+  print_elapsed_time start_db_time
 }
 
 
