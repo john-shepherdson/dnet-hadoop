@@ -38,22 +38,8 @@ IMPALA_CONFIG_FILE='/etc/impala_cluster/hdfs-site.xml'
 
 IMPALA_HDFS_DB_BASE_PATH="${IMPALA_HDFS_NODE}/user/hive/warehouse"
 
-
 # Set sed arguments.
 LOCATION_HDFS_NODE_SED_ARG="s|${OCEAN_HDFS_NODE}|${IMPALA_HDFS_NODE}|g" # This requires to be used with "sed -e" in order to have the "|" delimiter (as the "/" conflicts with the URIs)
-
-# Set the SED command arguments for column-names with reserved words:
-DATE_SED_ARG_1='s/[[:space:]]\date[[:space:]]/\`date\`/g'
-DATE_SED_ARG_2='s/\.date,/\.\`date\`,/g'  # the "date" may be part of a larger field name like "datestamp" or "date_aggregated", so we need to be careful with what we are replacing.
-DATE_SED_ARG_3='s/\.date[[:space:]]/\.\`date\` /g'
-
-HASH_SED_ARG_1='s/[[:space:]]\hash[[:space:]]/\`hash\`/g'
-HASH_SED_ARG_2='s/\.hash,/\.\`hash\`,/g'
-HASH_SED_ARG_3='s/\.hash[[:space:]]/\.\`hash\` /g'
-
-LOCATION_SED_ARG_1='s/[[:space:]]\location[[:space:]]/\`location\`/g'
-LOCATION_SED_ARG_2='s/\.location,/\.\`location\`,/g'
-LOCATION_SED_ARG_3='s/\.location[[:space:]]/\.\`location\` /g'
 
 
 function copydb() {
@@ -108,17 +94,13 @@ function copydb() {
   num_tables=0
 
   entities_on_ocean=`hive -e "show tables in ${db};" | sed 's/WARN:.*//g'`  # Get the tables and views without any potential the "WARN" logs.
-  for i in ${entities_on_ocean[@]}; do # Use un-quoted values, as the elemetns are single-words.
+  for i in ${entities_on_ocean[@]}; do # Use un-quoted values, as the elements are single-words.
     # Check if this is a view by showing the create-statement where it should print "create view" for a view, not the "create table". Unfortunately, there is no "show views" command.
-    create_entity_statement=`hive -e "show create table ${db}.${i};"` # It needs to happen in two stages, otherwise the "grep" is not able to match multi-line statement.
-
-    create_view_statement_test=`echo -e "$create_entity_statement" | grep 'CREATE VIEW'`
+    create_entity_statement=`hive --database ${db} -e "show create table ${i};"`  # We need to use the "--database", instead of including it inside the query, in order to return the statements with the '`' chars being in the right place to be used by impala-shell. However, we need to add the db-name in the "CREATE VIEW view_name" statement.
+    create_view_statement_test=`echo -e "$create_entity_statement" | grep 'CREATE VIEW'`  # It needs to happen in two stages, otherwise the "grep" is not able to match multi-line statement.
     if [ -n "$create_view_statement_test" ]; then
       echo -e "\n'${i}' is a view, so we will save its 'create view' statement and execute it on Impala, after all tables have been created.\n"
-      create_view_statement=`echo -e "$create_entity_statement" | sed 's/WARN:.*//g' | sed 's/\`//g' \
-        | sed 's/"$/;/' | sed 's/^"//' | sed 's/\\"\\"/\"/g' | sed -e "${LOCATION_HDFS_NODE_SED_ARG}" | sed "${DATE_SED_ARG_1}" | sed "${HASH_SED_ARG_1}" | sed "${LOCATION_SED_ARG_1}" \
-        | sed "${DATE_SED_ARG_2}" | sed "${HASH_SED_ARG_2}" | sed "${LOCATION_SED_ARG_2}" \
-        | sed "${DATE_SED_ARG_3}" | sed "${HASH_SED_ARG_3}" | sed "${LOCATION_SED_ARG_3}"`
+      create_view_statement=`echo -e "$create_entity_statement" | sed 's/WARN:.*//g' | sed 's/"$/;/' | sed 's/^"//' | sed 's/\\"\\"/\"/g' | sed -e "${LOCATION_HDFS_NODE_SED_ARG}" | sed "s/CREATE VIEW /CREATE VIEW ${db}./"`
       all_create_view_statements+=("$create_view_statement")
     else
       echo -e "\n'${i}' is a table, so we will check for its parquet files and create the table on Impala cluster.\n"
