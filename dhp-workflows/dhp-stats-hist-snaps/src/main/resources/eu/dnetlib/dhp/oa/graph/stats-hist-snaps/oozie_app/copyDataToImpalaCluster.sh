@@ -8,7 +8,8 @@ fi
 
 export HADOOP_USER_NAME=$2
 
-SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR=1
+SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR=0
+
 
 # Set the active HDFS node of OCEAN and IMPALA cluster.
 OCEAN_HDFS_NODE='hdfs://nameservice1'
