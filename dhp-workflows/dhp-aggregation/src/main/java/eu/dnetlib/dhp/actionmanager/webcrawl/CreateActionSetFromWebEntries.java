@@ -95,26 +95,27 @@ public class CreateActionSetFromWebEntries implements Serializable {
 
 		final Dataset<Row> blackList = readBlackList(spark, blackListInputPath);
 
-		dataset.join(blackList, dataset.col("id").equalTo(blackList.col("OpenAlexId")), "left")
-				.filter((FilterFunction<Row>) r -> r.getAs("OpenAlexId") == null)
-				.drop("OpenAlexId")
-				.flatMap((FlatMapFunction<Row, Relation>) row -> {
-					List<Relation> ret = new ArrayList<>();
-					final String ror = ROR_PREFIX
-							+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", row.getAs("ror")));
-					ret.addAll(createAffiliationRelationPairDOI(row.getAs("doi"), ror));
-					ret.addAll(createAffiliationRelationPairPMID(row.getAs("pmid"), ror));
-					ret.addAll(createAffiliationRelationPairPMCID(row.getAs("pmcid"), ror));
+		dataset
+			.join(blackList, dataset.col("id").equalTo(blackList.col("OpenAlexId")), "left")
+			.filter((FilterFunction<Row>) r -> r.getAs("OpenAlexId") == null)
+			.drop("OpenAlexId")
+			.flatMap((FlatMapFunction<Row, Relation>) row -> {
+				List<Relation> ret = new ArrayList<>();
+				final String ror = ROR_PREFIX
+					+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", row.getAs("ror")));
+				ret.addAll(createAffiliationRelationPairDOI(row.getAs("doi"), ror));
+				ret.addAll(createAffiliationRelationPairPMID(row.getAs("pmid"), ror));
+				ret.addAll(createAffiliationRelationPairPMCID(row.getAs("pmcid"), ror));
 
-					return ret
-							.iterator();
-				}, Encoders.bean(Relation.class))
-				.toJavaRDD()
-				.map(p -> new AtomicAction(p.getClass(), p))
-				.mapToPair(
-						aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
-								new Text(OBJECT_MAPPER.writeValueAsString(aa))))
-				.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class);//, GzipCodec.class);
+				return ret
+					.iterator();
+			}, Encoders.bean(Relation.class))
+			.toJavaRDD()
+			.map(p -> new AtomicAction(p.getClass(), p))
+			.mapToPair(
+				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
+					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
+			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
 
 	}
 
@@ -145,13 +146,13 @@ public class CreateActionSetFromWebEntries implements Serializable {
 
 	}
 
-	private static Dataset<Row> readBlackList(SparkSession spark, String inputPath){
+	private static Dataset<Row> readBlackList(SparkSession spark, String inputPath) {
 
 		return spark
-				.read()
-				.option("header", true)
-				.csv(inputPath)
-				.select("OpenAlexId");
+			.read()
+			.option("header", true)
+			.csv(inputPath)
+			.select("OpenAlexId");
 	}
 
 	private static List<Relation> createAffiliationRelationPairPMCID(String pmcid, String ror) {
