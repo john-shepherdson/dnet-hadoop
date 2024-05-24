@@ -16,5 +16,10 @@
     "paramLongName": "isSparkSessionManaged",
     "paramDescription": "the hdfs name node",
     "paramRequired": false
-  }
+  },{
+  "paramName": "bl",
+  "paramLongName": "blackListPath",
+  "paramDescription": "the working path",
+  "paramRequired": true
+}
 ]
