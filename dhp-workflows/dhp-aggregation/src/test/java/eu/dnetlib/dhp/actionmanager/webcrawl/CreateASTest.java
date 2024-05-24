@@ -78,9 +78,9 @@ public class CreateASTest {
 				"/eu/dnetlib/dhp/actionmanager/webcrawl/input/")
 			.getPath();
 		String blackListPath = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/actionmanager/webcrawl/blackList/")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/actionmanager/webcrawl/blackList/")
+			.getPath();
 
 		CreateActionSetFromWebEntries
 			.main(
@@ -91,7 +91,7 @@ public class CreateASTest {
 					inputPath,
 					"-outputPath",
 					workingDir.toString() + "/actionSet1",
-						"-blackListPath", blackListPath
+					"-blackListPath", blackListPath
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
@@ -115,9 +115,9 @@ public class CreateASTest {
 				"/eu/dnetlib/dhp/actionmanager/webcrawl/")
 			.getPath();
 		String blackListPath = getClass()
-				.getResource(
-						"/eu/dnetlib/dhp/actionmanager/webcrawl/blackList/")
-				.getPath();
+			.getResource(
+				"/eu/dnetlib/dhp/actionmanager/webcrawl/blackList/")
+			.getPath();
 
 		CreateActionSetFromWebEntries
 			.main(
@@ -128,7 +128,7 @@ public class CreateASTest {
 					inputPath,
 					"-outputPath",
 					workingDir.toString() + "/actionSet1",
-						"-blackListPath", blackListPath
+					"-blackListPath", blackListPath
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
