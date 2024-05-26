@@ -217,7 +217,7 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 					final Organization o = r._2()._2();
 					return new OrgSimRel(
 						r._1()._1(),
-						o.getOriginalId().get(0),
+						Optional.ofNullable(o.getOriginalId()).map(oid -> oid.get(0)).orElse(null),
 						Optional.ofNullable(o.getLegalname()).map(Field::getValue).orElse(""),
 						Optional.ofNullable(o.getLegalshortname()).map(Field::getValue).orElse(""),
 						Optional.ofNullable(o.getCountry()).map(Qualifier::getClassid).orElse(""),
