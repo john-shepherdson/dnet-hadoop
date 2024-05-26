@@ -249,7 +249,9 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 			.map(
 				(MapFunction<Tuple2<Tuple2<String, OrgSimRel>, Tuple2<String, Organization>>, OrgSimRel>) r -> {
 					OrgSimRel orgSimRel = r._1()._2();
-					orgSimRel.setLocal_id(r._2()._2().getOriginalId().get(0));
+					orgSimRel
+						.setLocal_id(
+							Optional.ofNullable(r._2()._2().getOriginalId()).map(oid -> oid.get(0)).orElse(null));
 					return orgSimRel;
 				},
 				Encoders.bean(OrgSimRel.class));
