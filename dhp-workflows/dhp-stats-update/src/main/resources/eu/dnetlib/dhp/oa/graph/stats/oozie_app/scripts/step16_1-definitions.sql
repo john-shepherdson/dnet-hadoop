@@ -1,3 +1,5 @@
+set mapred.job.queue.name=analytics;
+
 ----------------------------------------------------
 -- Shortcuts for various definitions in stats db ---
 ----------------------------------------------------

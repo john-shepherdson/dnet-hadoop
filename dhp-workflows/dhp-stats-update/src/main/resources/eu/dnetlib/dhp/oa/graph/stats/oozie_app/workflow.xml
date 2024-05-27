@@ -568,6 +568,7 @@
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
+		--queue analytics
             </spark-opts>
             <arg>--hiveMetastoreUris</arg><arg>${hive_metastore_uris}</arg>
             <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/stats/oozie_app/scripts/step16-createIndicatorsTables.sql</arg>
