@@ -1,4 +1,4 @@
-set mapred.job.queue.name=analytics;
+set mapred.job.queue.name=analytics; /*EOS*/
 
 -------------------------------------------
 --- Extra tables, mostly used by indicators

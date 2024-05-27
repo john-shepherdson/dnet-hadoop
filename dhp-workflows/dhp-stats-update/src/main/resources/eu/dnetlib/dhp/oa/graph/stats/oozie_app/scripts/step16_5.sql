@@ -1,4 +1,4 @@
-set mapred.job.queue.name=analytics;
+set mapred.job.queue.name=analytics; /*EOS*/
 
 -- replace the creation of the result view to include the boolean fields from the previous tables (green, gold,
 -- peer reviewed)

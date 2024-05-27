@@ -1,4 +1,4 @@
-set mapred.job.queue.name=analytics;
+set mapred.job.queue.name=analytics; /*EOS*/
 
 --------------------------------------------------------------
 --------------------------------------------------------------
@@ -113,4 +113,4 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, xpath_string(citation.value, 
 FROM ${openaire_db_name}.publication p
          lateral view explode(p.extrainfo) citations AS citation
 WHERE xpath_string(citation.value, "//citation/id[@type='openaire']/@value") != ""
-  and p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
+  and p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
