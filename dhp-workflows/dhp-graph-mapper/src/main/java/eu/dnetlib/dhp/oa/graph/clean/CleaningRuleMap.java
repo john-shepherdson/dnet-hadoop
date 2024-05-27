@@ -50,7 +50,7 @@ public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Obje
 	 * @param subject
 	 */
 	private static void cleanSubjectForVocabulary(String vocabularyId, VocabularyGroup vocabularies,
-												  Subject subject) {
+		Subject subject) {
 
 		vocabularies.find(vocabularyId).ifPresent(vocabulary -> {
 			if (ModelConstants.DNET_SUBJECT_KEYWORD.equalsIgnoreCase(subject.getQualifier().getClassid())) {
@@ -61,13 +61,14 @@ public class CleaningRuleMap extends HashMap<Class<?>, SerializableConsumer<Obje
 					subject.getQualifier().setClassname(vocabulary.getName());
 				}
 			} else {
-				final String provenanceActionClassId = Optional.ofNullable(subject.getDataInfo())
-						.map(DataInfo::getProvenanceaction)
-						.map(Qualifier::getClassid)
-						.orElse(null);
+				final String provenanceActionClassId = Optional
+					.ofNullable(subject.getDataInfo())
+					.map(DataInfo::getProvenanceaction)
+					.map(Qualifier::getClassid)
+					.orElse(null);
 
 				if (vocabularyId.equals(subject.getQualifier().getClassid()) &&
-						!"subject:fos".equals(provenanceActionClassId)) {
+					!"subject:fos".equals(provenanceActionClassId)) {
 
 					Qualifier syn = vocabulary.getSynonymAsQualifier(subject.getValue());
 					VocabularyTerm term = vocabulary.getTerm(subject.getValue());

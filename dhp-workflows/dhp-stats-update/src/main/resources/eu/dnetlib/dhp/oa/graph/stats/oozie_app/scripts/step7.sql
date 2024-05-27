@@ -129,11 +129,14 @@ create table ${stats_db_name}.result_fos stored as parquet as
 with
     lvl1 as (select id, topic from ${stats_db_name}.result_topics where topic like '__ %' and type='Fields of Science and Technology classification'),
     lvl2 as (select id, topic from ${stats_db_name}.result_topics where topic like '____ %' and type='Fields of Science and Technology classification'),
-    lvl3 as (select id, topic from ${stats_db_name}.result_topics where topic like '______ %' and type='Fields of Science and Technology classification')
-select lvl1.id, lvl1.topic as lvl1, lvl2.topic as lvl2, lvl3.topic as lvl3
+    lvl3 as (select id, topic from ${stats_db_name}.result_topics where topic like '______ %' and type='Fields of Science and Technology classification'),
+    lvl4 as (select id, topic from ${stats_db_name}.result_topics where topic like '________ %' and type='Fields of Science and Technology classification')
+select lvl1.id, lvl1.topic as lvl1, lvl2.topic as lvl2, lvl3.topic as lvl3, lvl4.topic as lvl4
 from lvl1
  join lvl2 on lvl1.id=lvl2.id and substr(lvl2.topic, 1, 2)=substr(lvl1.topic, 1, 2)
- join lvl3 on lvl3.id=lvl1.id and substr(lvl3.topic, 1, 4)=substr(lvl2.topic, 1, 4);
+ join lvl3 on lvl3.id=lvl1.id and substr(lvl3.topic, 1, 4)=substr(lvl2.topic, 1, 4)
+ join lvl4 on lvl4.id=lvl1.id and substr(lvl4.topic, 1, 6)=substr(lvl3.topic, 1, 6);
+
 
 DROP TABLE IF EXISTS ${stats_db_name}.result_organization purge;
 
