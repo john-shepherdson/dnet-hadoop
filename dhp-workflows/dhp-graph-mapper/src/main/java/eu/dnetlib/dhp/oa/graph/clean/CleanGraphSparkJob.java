@@ -147,6 +147,7 @@ public class CleanGraphSparkJob {
 			.map((MapFunction<T, T>) GraphCleaningFunctions::fixVocabularyNames, Encoders.bean(clazz))
 			.map((MapFunction<T, T>) value -> OafCleaner.apply(value, mapping), Encoders.bean(clazz))
 			.map((MapFunction<T, T>) value -> GraphCleaningFunctions.cleanup(value, vocs), Encoders.bean(clazz))
+			.map((MapFunction<T, T>) GraphCleaningFunctions::dedicatedUglyHacks, Encoders.bean(clazz))
 			.filter((FilterFunction<T>) GraphCleaningFunctions::filter);
 
 		// read the master-duplicate tuples

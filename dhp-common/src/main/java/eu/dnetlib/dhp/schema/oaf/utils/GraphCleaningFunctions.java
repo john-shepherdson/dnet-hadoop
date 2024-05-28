@@ -1003,4 +1003,30 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 			.orElse(null);
 	}
 
+	/**
+	 * Implements bad and ugly things that we should get rid of ASAP.
+	 *
+	 * @param value
+	 * @return
+	 * @param <T>
+	 */
+	public static <T extends Oaf> T dedicatedUglyHacks(T value) {
+		if (value instanceof OafEntity) {
+			if (value instanceof Result) {
+				final Result r = (Result) value;
+
+				// Fix for AMS Acta
+				r.getInstance()
+						.stream()
+						.filter(i -> Optional.ofNullable(i.getHostedby()).map(KeyValue::getKey).map(dsId -> dsId.equals("10|re3data_____::4cc76bed7ce2fb95fd8e7a2dfde16016")).orElse(false))
+						.forEach(i -> {
+							if (Optional.ofNullable(i.getPid()).map(pid -> pid.stream().noneMatch(p -> p.getValue().startsWith("10.6092/unibo/amsacta"))).orElse(false)) {
+								i.setHostedby(UNKNOWN_REPOSITORY);
+							}
+						});
+			}
+		}
+		return value;
+	}
+
 }
