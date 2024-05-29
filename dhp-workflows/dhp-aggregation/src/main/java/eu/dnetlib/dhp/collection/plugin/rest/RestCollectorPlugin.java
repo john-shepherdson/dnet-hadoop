@@ -8,8 +8,9 @@ import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
+
+import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
@@ -95,7 +96,7 @@ public class RestCollectorPlugin implements CollectorPlugin {
 			authMethod,
 			authToken,
 			resultOutputFormat,
-				requestHeaders);
+			requestHeaders);
 
 		return StreamSupport
 			.stream(
