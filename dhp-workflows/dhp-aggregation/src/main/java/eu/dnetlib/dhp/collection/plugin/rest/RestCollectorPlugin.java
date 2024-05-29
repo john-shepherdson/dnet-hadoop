@@ -1,12 +1,14 @@
 
 package eu.dnetlib.dhp.collection.plugin.rest;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import com.google.gson.Gson;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.collection.ApiDescriptor;
@@ -47,6 +49,9 @@ public class RestCollectorPlugin implements CollectorPlugin {
 		final String entityXpath = api.getParams().get("entityXpath");
 		final String authMethod = api.getParams().get("authMethod");
 		final String authToken = api.getParams().get("authToken");
+		final String requestHeaderMap = api.getParams().get("requestHeaderMap");
+		Gson gson = new Gson();
+		Map requestHeaders = gson.fromJson(requestHeaderMap, Map.class);
 		final String resultSizeValue = Optional
 			.ofNullable(api.getParams().get("resultSizeValue"))
 			.filter(StringUtils::isNotBlank)
@@ -63,9 +68,6 @@ public class RestCollectorPlugin implements CollectorPlugin {
 		}
 		if (StringUtils.isBlank(resultFormatValue)) {
 			throw new CollectorException("Param 'resultFormatValue' is null or empty");
-		}
-		if (StringUtils.isBlank(queryParams)) {
-			throw new CollectorException("Param 'queryParams' is null or empty");
 		}
 		if (StringUtils.isBlank(entityXpath)) {
 			throw new CollectorException("Param 'entityXpath' is null or empty");
@@ -92,7 +94,8 @@ public class RestCollectorPlugin implements CollectorPlugin {
 			entityXpath,
 			authMethod,
 			authToken,
-			resultOutputFormat);
+			resultOutputFormat,
+				requestHeaders);
 
 		return StreamSupport
 			.stream(
