@@ -8,7 +8,10 @@ import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CodingErrorAction;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventReader;
@@ -19,6 +22,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -58,13 +62,22 @@ public class XMLIterator implements Iterator<String> {
 
 	private String element;
 
+	private List<String> elements;
+
 	private InputStream inputStream;
 
 	public XMLIterator(final String element, final InputStream inputStream) {
 		super();
 		this.element = element;
+		if (element.contains(",")) {
+			elements= Arrays.stream(element.split(","))
+					.filter(StringUtils::isNoneBlank)
+					.map(String::toLowerCase)
+					.collect(Collectors.toList());
+		}
 		this.inputStream = inputStream;
 		this.parser = getParser();
+
 		try {
 			this.current = findElement(parser);
 		} catch (XMLStreamException e) {
@@ -113,7 +126,7 @@ public class XMLIterator implements Iterator<String> {
 				final XMLEvent event = parser.nextEvent();
 
 				// TODO: replace with depth tracking instead of close tag tracking.
-				if (event.isEndElement() && event.asEndElement().getName().getLocalPart().equals(element)) {
+				if (event.isEndElement() && isCheckTag(event.asEndElement().getName().getLocalPart())) {
 					writer.add(event);
 					break;
 				}
@@ -142,18 +155,16 @@ public class XMLIterator implements Iterator<String> {
 		XMLEvent peek = parser.peek();
 		if (peek != null && peek.isStartElement()) {
 			String name = peek.asStartElement().getName().getLocalPart();
-			if (element.equals(name)) {
-				return peek;
-			}
+			if( isCheckTag(name))
+				return  peek;
 		}
 
 		while (parser.hasNext()) {
-			final XMLEvent event = parser.nextEvent();
+			XMLEvent event= parser.nextEvent();
 			if (event != null && event.isStartElement()) {
 				String name = event.asStartElement().getName().getLocalPart();
-				if (element.equals(name)) {
-					return event;
-				}
+				if( isCheckTag(name))
+					return  event;
 			}
 		}
 		return null;
@@ -161,10 +172,28 @@ public class XMLIterator implements Iterator<String> {
 
 	private XMLEventReader getParser() {
 		try {
-			return inputFactory.get().createXMLEventReader(sanitize(inputStream));
+			XMLInputFactory xif = inputFactory.get();
+			xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+			return xif.createXMLEventReader(sanitize(inputStream));
 		} catch (XMLStreamException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private boolean isCheckTag(final String tagName) {
+		if (elements!= null) {
+			final String found =elements.stream()
+					.filter(e -> e.equalsIgnoreCase(tagName))
+					.findFirst()
+					.orElse(null);
+			if (found!= null)
+				return true;
+		} else {
+			if (element.equalsIgnoreCase(tagName)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private Reader sanitize(final InputStream in) {
