@@ -50,13 +50,13 @@ select distinct r.*
 from (
          select substr(r.id, 4) as id, inst.accessright.classname as accessright, inst.accessright.openaccessroute as accessright_uw, substr(inst.collectedfrom.key, 4) as collectedfrom,
                 substr(inst.hostedby.key, 4) as hostedby, inst.dateofacceptance.value as dateofacceptance, inst.license.value as license, p.qualifier.classname as pidtype, p.value as pid
-         from ${openaire_db_name}.result r lateral view explode(r.instance) instances as inst lateral view explode(inst.pid) pids as p) r
+         from ${openaire_db_name}.result r lateral view explode(r.instance) instances as inst lateral view outer explode(inst.pid) pids as p) r
 join ${stats_db_name}.result res on res.id=r.id;
 
 DROP TABLE IF EXISTS ${stats_db_name}.result_apc purge;
 
 create table if not exists ${stats_db_name}.result_apc STORED AS PARQUET as
-select r.id, r.amount, r.currency
+select distinct r.id, r.amount, r.currency
 from (
          select substr(r.id, 4) as id, cast(inst.processingchargeamount.value as float) as amount, inst.processingchargecurrency.value as currency
          from ${openaire_db_name}.result r lateral view explode(r.instance) instances as inst) r

@@ -74,12 +74,6 @@
     "synonym": []
   },
   {
-    "id": "100011062",
-    "uri": "http://dx.doi.org/10.13039/100011062",
-    "name": "Asian Spinal Cord Network",
-    "synonym": []
-  },
-  {
     "id": "100011096",
     "uri": "http://dx.doi.org/10.13039/100011096",
     "name": "Jazz Pharmaceuticals",
@@ -221,12 +215,6 @@
     "id": "100015442",
     "uri": "http://dx.doi.org/10.13039/100015442",
     "name": "Global Brain Health Institute",
-    "synonym": []
-  },
-  {
-    "id": "100015776",
-    "uri": "http://dx.doi.org/10.13039/100015776",
-    "name": "Health and Social Care Board",
     "synonym": []
   },
   {
@@ -404,18 +392,6 @@
     "synonym": []
   },
   {
-    "id": "501100001596",
-    "uri": "http://dx.doi.org/10.13039/501100001596",
-    "name": "Irish Research Council for Science, Engineering and Technology",
-    "synonym": []
-  },
-  {
-    "id": "501100001597",
-    "uri": "http://dx.doi.org/10.13039/501100001597",
-    "name": "Irish Research Council for the Humanities and Social Sciences",
-    "synonym": []
-  },
-  {
     "id": "501100001598",
     "uri": "http://dx.doi.org/10.13039/501100001598",
     "name": "Mental Health Commission",
@@ -515,7 +491,7 @@
     "id": "501100002081",
     "uri": "http://dx.doi.org/10.13039/501100002081",
     "name": "Irish Research Council",
-    "synonym": []
+    "synonym": ["501100001596", "501100001597"]
   },
   {
     "id": "501100002736",

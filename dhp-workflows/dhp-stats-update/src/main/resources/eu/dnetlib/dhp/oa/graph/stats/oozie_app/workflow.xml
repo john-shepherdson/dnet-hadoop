@@ -345,6 +345,17 @@
         <error to="Kill"/>
     </action>
 
+<!--    <action name="Step16-createIndicatorsTables">-->
+<!--        <hive2 xmlns="uri:oozie:hive2-action:0.1">-->
+<!--            <jdbc-url>${hive_jdbc_url}</jdbc-url>-->
+<!--            <script>scripts/step16-createIndicatorsTables.sql</script>-->
+<!--            <param>stats_db_name=${stats_db_name}</param>-->
+<!--            <param>external_stats_db_name=${external_stats_db_name}</param>-->
+<!--        </hive2>-->
+<!--        <ok to="Step16_1-definitions"/>-->
+<!--        <error to="Kill"/>-->
+<!--    </action>-->
+
     <action name="Step16-createIndicatorsTables">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
