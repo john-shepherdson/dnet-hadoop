@@ -9,6 +9,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -34,6 +35,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+import com.google.common.collect.Maps;
+
 import eu.dnetlib.dhp.collection.plugin.utils.JsonUtils;
 import eu.dnetlib.dhp.common.collection.CollectorException;
 import eu.dnetlib.dhp.common.collection.HttpClientParams;
@@ -55,7 +58,7 @@ public class RestIterator implements Iterator<String> {
 
 	private final HttpClientParams clientParams;
 
-	private final String BASIC = "basic";
+	private final String AUTHBASIC = "basic";
 
 	private final String baseUrl;
 	private final String resumptionType;
@@ -89,6 +92,11 @@ public class RestIterator implements Iterator<String> {
 	 */
 	private final String resultOutputFormat;
 
+	/*
+	 * Can be used to set additional request headers, like for content negotiation
+	 */
+	private Map<String, String> requestHeaders;
+
 	/**
 	 * RestIterator class compatible to version 1.3.33
 	 */
@@ -107,7 +115,8 @@ public class RestIterator implements Iterator<String> {
 		final String entityXpath,
 		final String authMethod,
 		final String authToken,
-		final String resultOutputFormat) {
+		final String resultOutputFormat,
+		final Map<String, String> requestHeaders) {
 
 		this.clientParams = clientParams;
 		this.baseUrl = baseUrl;
@@ -119,6 +128,7 @@ public class RestIterator implements Iterator<String> {
 		this.authMethod = authMethod;
 		this.authToken = authToken;
 		this.resultOutputFormat = resultOutputFormat;
+		this.requestHeaders = requestHeaders != null ? requestHeaders : Maps.newHashMap();
 
 		this.queryFormat = StringUtils.isNotBlank(resultFormatParam) ? "&" + resultFormatParam + "=" + resultFormatValue
 			: "";
@@ -231,25 +241,20 @@ public class RestIterator implements Iterator<String> {
 
 				final URL qUrl = new URL(query);
 				log.debug("authMethod: {}", this.authMethod);
-				if ("bearer".equalsIgnoreCase(this.authMethod)) {
-					log.trace("authMethod before inputStream: {}", resultXml);
-					final HttpURLConnection conn = (HttpURLConnection) qUrl.openConnection();
-					conn.setRequestProperty(HttpHeaders.AUTHORIZATION, "Bearer " + this.authToken);
-					conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType());
-					conn.setRequestMethod("GET");
-					theHttpInputStream = conn.getInputStream();
-				} else if (this.BASIC.equalsIgnoreCase(this.authMethod)) {
-					log.trace("authMethod before inputStream: {}", resultXml);
-					final HttpURLConnection conn = (HttpURLConnection) qUrl.openConnection();
-					conn.setRequestProperty(HttpHeaders.AUTHORIZATION, "Basic " + this.authToken);
-					conn.setRequestProperty(HttpHeaders.ACCEPT, ContentType.APPLICATION_XML.getMimeType());
-					conn.setRequestMethod("GET");
-					theHttpInputStream = conn.getInputStream();
-				} else {
-					theHttpInputStream = qUrl.openStream();
+				if (this.authMethod == "bearer") {
+					log.trace("RestIterator.downloadPage():: authMethod before inputStream: " + resultXml);
+					requestHeaders.put("Authorization", "Bearer " + authToken);
+					// requestHeaders.put("Content-Type", "application/json");
+				} else if (AUTHBASIC.equalsIgnoreCase(this.authMethod)) {
+					log.trace("RestIterator.downloadPage():: authMethod before inputStream: " + resultXml);
+					requestHeaders.put("Authorization", "Basic " + authToken);
+					// requestHeaders.put("accept", "application/xml");
 				}
+				HttpURLConnection conn = (HttpURLConnection) qUrl.openConnection();
+				conn.setRequestMethod("GET");
+				this.setRequestHeader(conn);
+				resultStream = conn.getInputStream();
 
-				this.resultStream = theHttpInputStream;
 				if ("json".equals(this.resultOutputFormat)) {
 					resultJson = IOUtils.toString(this.resultStream, StandardCharsets.UTF_8);
 					resultXml = JsonUtils.convertToXML(resultJson);
@@ -380,7 +385,8 @@ public class RestIterator implements Iterator<String> {
 			try {
 				if (this.resultTotal == -1) {
 					this.resultTotal = Integer.parseInt(this.xprResultTotalPath.evaluate(resultNode));
-					if ("page".equalsIgnoreCase(this.resumptionType) && !this.BASIC.equalsIgnoreCase(this.authMethod)) {
+					if ("page".equalsIgnoreCase(this.resumptionType)
+						&& !this.AUTHBASIC.equalsIgnoreCase(this.authMethod)) {
 						this.resultTotal += 1;
 					} // to correct the upper bound
 					log.info("resultTotal was -1 is now: " + this.resultTotal);
@@ -431,6 +437,22 @@ public class RestIterator implements Iterator<String> {
 		} catch (final UnsupportedEncodingException ex) {
 			throw new RuntimeException(ex.getCause());
 		}
+	}
+
+	/**
+	 * setRequestHeader
+	 *
+	 * setRequestProperty: Sets the general request property. If a property with the key already exists, overwrite its value with the new value.
+	 * @param conn
+	 */
+	private void setRequestHeader(HttpURLConnection conn) {
+		if (requestHeaders != null) {
+			for (String key : requestHeaders.keySet()) {
+				conn.setRequestProperty(key, requestHeaders.get(key));
+			}
+			log.debug("Set Request Header with: " + requestHeaders);
+		}
+
 	}
 
 	public String getResultFormatValue() {
