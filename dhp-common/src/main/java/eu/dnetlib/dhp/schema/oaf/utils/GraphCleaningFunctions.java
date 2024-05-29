@@ -1016,14 +1016,25 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 				final Result r = (Result) value;
 
 				// Fix for AMS Acta
-				r.getInstance()
-						.stream()
-						.filter(i -> Optional.ofNullable(i.getHostedby()).map(KeyValue::getKey).map(dsId -> dsId.equals("10|re3data_____::4cc76bed7ce2fb95fd8e7a2dfde16016")).orElse(false))
-						.forEach(i -> {
-							if (Optional.ofNullable(i.getPid()).map(pid -> pid.stream().noneMatch(p -> p.getValue().startsWith("10.6092/unibo/amsacta"))).orElse(false)) {
-								i.setHostedby(UNKNOWN_REPOSITORY);
-							}
-						});
+				Optional
+					.ofNullable(r.getInstance())
+					.map(
+						instance -> instance
+							.stream()
+							.filter(
+								i -> Optional
+									.ofNullable(i.getHostedby())
+									.map(KeyValue::getKey)
+									.map(dsId -> dsId.equals("10|re3data_____::4cc76bed7ce2fb95fd8e7a2dfde16016"))
+									.orElse(false)))
+					.ifPresent(instance -> instance.forEach(i -> {
+						if (Optional
+							.ofNullable(i.getPid())
+							.map(pid -> pid.stream().noneMatch(p -> p.getValue().startsWith("10.6092/unibo/amsacta")))
+							.orElse(false)) {
+							i.setHostedby(UNKNOWN_REPOSITORY);
+						}
+					}));
 			}
 		}
 		return value;
