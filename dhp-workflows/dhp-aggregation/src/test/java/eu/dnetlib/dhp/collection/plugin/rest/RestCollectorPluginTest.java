@@ -13,10 +13,11 @@ import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import com.google.gson.Gson;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
@@ -67,7 +68,6 @@ class RestCollectorPluginTest {
 		api.setBaseUrl(baseUrl);
 		api.setParams(params);
 
-
 		rcp = new RestCollectorPlugin(new HttpClientParams());
 	}
 
@@ -99,7 +99,6 @@ class RestCollectorPluginTest {
 		System.out.println("Request header");
 		System.out.println(gson.toJson(conn.getHeaderFields()));
 		InputStream inputStream = conn.getInputStream();
-
 
 	}
 }

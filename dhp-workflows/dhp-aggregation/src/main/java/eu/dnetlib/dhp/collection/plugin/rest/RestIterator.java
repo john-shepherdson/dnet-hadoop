@@ -25,7 +25,6 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import com.google.common.collect.Maps;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHeaders;
@@ -35,6 +34,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+
+import com.google.common.collect.Maps;
 
 import eu.dnetlib.dhp.collection.plugin.utils.JsonUtils;
 import eu.dnetlib.dhp.common.collection.CollectorException;
@@ -50,7 +51,6 @@ import eu.dnetlib.dhp.common.collection.HttpClientParams;
  *
  */
 public class RestIterator implements Iterator<String> {
-
 
 	private static final Logger log = LoggerFactory.getLogger(RestIterator.class);
 	public static final String UTF_8 = "UTF-8";
@@ -93,10 +93,9 @@ public class RestIterator implements Iterator<String> {
 	private final String resultOutputFormat;
 
 	/*
-    Can be used to set additional request headers, like for content negotiation
-     */
+	 * Can be used to set additional request headers, like for content negotiation
+	 */
 	private Map<String, String> requestHeaders;
-
 
 	/**
 	 * RestIterator class compatible to version 1.3.33
@@ -245,11 +244,11 @@ public class RestIterator implements Iterator<String> {
 				if (this.authMethod == "bearer") {
 					log.trace("RestIterator.downloadPage():: authMethod before inputStream: " + resultXml);
 					requestHeaders.put("Authorization", "Bearer " + authToken);
-					//requestHeaders.put("Content-Type", "application/json");
+					// requestHeaders.put("Content-Type", "application/json");
 				} else if (AUTHBASIC.equalsIgnoreCase(this.authMethod)) {
 					log.trace("RestIterator.downloadPage():: authMethod before inputStream: " + resultXml);
 					requestHeaders.put("Authorization", "Basic " + authToken);
-					//requestHeaders.put("accept", "application/xml");
+					// requestHeaders.put("accept", "application/xml");
 				}
 				HttpURLConnection conn = (HttpURLConnection) qUrl.openConnection();
 				conn.setRequestMethod("GET");
@@ -386,7 +385,8 @@ public class RestIterator implements Iterator<String> {
 			try {
 				if (this.resultTotal == -1) {
 					this.resultTotal = Integer.parseInt(this.xprResultTotalPath.evaluate(resultNode));
-					if ("page".equalsIgnoreCase(this.resumptionType) && !this.AUTHBASIC.equalsIgnoreCase(this.authMethod)) {
+					if ("page".equalsIgnoreCase(this.resumptionType)
+						&& !this.AUTHBASIC.equalsIgnoreCase(this.authMethod)) {
 						this.resultTotal += 1;
 					} // to correct the upper bound
 					log.info("resultTotal was -1 is now: " + this.resultTotal);
