@@ -72,6 +72,8 @@ function copydb() {
     rm -f error.log
     if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
       exit 2
+    else
+      return 2
     fi
   fi
 
@@ -90,19 +92,30 @@ function copydb() {
                 -pb \
                 ${OCEAN_HDFS_NODE}/user/hive/warehouse/${db}.db ${IMPALA_HDFS_DB_BASE_PATH}
 
-  # Check the exit status of the "hadoop distcp" command.
-  if [ $? -eq 0 ]; then
-    echo -e "\nSuccessfully copied the files of '${db}'.\n"
+  if [ $? -eq 0 ]; then # Check the exit status of the "hadoop distcp" command.
+    echo -e "\nSuccessfully copied the files of '${db}' from Ocean to Impala cluster.\n"
   else
     echo -e "\n\nERROR: FAILED TO TRANSFER THE FILES OF '${db}', WITH 'hadoop distcp'. GOT EXIT STATUS: $?\n\n"
     rm -f error.log
     if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
       exit 3
+    else
+      return 3
     fi
   fi
 
-  # In case we ever use this script for a writable DB (using inserts/updates), we should perform the following costly operation as well..
-  #hdfs dfs -conf ${IMPALA_CONFIG_FILE} -chmod -R 777 ${TEMP_SUBDIR_FULLPATH}/${db}.db
+  # Give WRITE and EXECUTE permissions to the DBs' directory only, in order to be able to create more tables later, on top of that DB.
+  hdfs dfs -conf ${IMPALA_CONFIG_FILE} -chmod u+wx ${IMPALA_HDFS_DB_BASE_PATH}/${db}.db
+  # In case we ever use this script for a writable DB (using inserts/updates), we should perform the costly recursive operation as well, using the "-R" param.
+  if [ $? -ne 0 ]; then # Check the exit status..
+    echo -e "\n\nERROR: FAILED TO ASSIGN WRITE AND EXECUTE PERMISSIONS TO THE DIRECTORY OF DB: '${db}'. GOT EXIT STATUS: $?\n\n"
+    rm -f error.log
+    if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
+      exit 4
+    else
+      return 4
+    fi
+  fi
 
   echo -e "\nCreating schema for db: '${db}'\n"
 
@@ -131,7 +144,7 @@ function copydb() {
       if [ -z "$CURRENT_PRQ_FILE" ]; then # If there is not parquet-file inside.
           echo -e "\nERROR: THE TABLE \"${i}\" HAD NO FILES TO GET THE SCHEMA FROM! IT'S EMPTY!\n\n"
           if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
-            exit 4
+            exit 5
           fi
       else
         impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "create table ${db}.${i} like parquet '${CURRENT_PRQ_FILE}' stored as parquet;" |& tee error.log
@@ -139,7 +152,7 @@ function copydb() {
         if [ -n "$log_errors" ]; then
           echo -e "\n\nERROR: THERE WAS A PROBLEM WHEN CREATING TABLE '${i}'!\n\n"
           if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
-            exit 5
+            exit 6
           fi
         fi
       fi
@@ -185,7 +198,7 @@ function copydb() {
     if [[ $new_num_of_views_to_retry -eq $previous_num_of_views_to_retry ]]; then
       echo -e "\n\nERROR: THE NUMBER OF VIEWS TO RETRY HAS NOT BEEN REDUCED! THE SCRIPT IS LIKELY GOING TO AN INFINITE-LOOP! EXITING..\n\n"
       if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
-        exit 6
+        exit 7
       fi
     elif [[ $new_num_of_views_to_retry -gt 0 ]]; then
       echo -e "\nTo be retried \"create_view_statements\" (${new_num_of_views_to_retry}):\n\n${all_create_view_statements[@]}\n"
@@ -215,7 +228,7 @@ function copydb() {
     echo -e "\n\nERROR: 1 OR MORE ENTITIES OF DB '${db}' FAILED TO BE COPIED TO IMPALA CLUSTER!\n\n"
     rm -f error.log
     if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
-      exit 7
+      exit 8
     fi
   fi
 
