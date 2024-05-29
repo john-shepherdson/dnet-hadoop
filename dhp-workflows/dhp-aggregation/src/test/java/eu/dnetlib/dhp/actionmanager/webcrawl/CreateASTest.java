@@ -75,7 +75,11 @@ public class CreateASTest {
 
 		String inputPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/webcrawl/")
+				"/eu/dnetlib/dhp/actionmanager/webcrawl/input/")
+			.getPath();
+		String blackListPath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/actionmanager/webcrawl/blackList/")
 			.getPath();
 
 		CreateActionSetFromWebEntries
@@ -86,7 +90,8 @@ public class CreateASTest {
 					"-sourcePath",
 					inputPath,
 					"-outputPath",
-					workingDir.toString() + "/actionSet1"
+					workingDir.toString() + "/actionSet1",
+					"-blackListPath", blackListPath
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
@@ -96,7 +101,7 @@ public class CreateASTest {
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
-		Assertions.assertEquals(64, tmp.count());
+		Assertions.assertEquals(58, tmp.count());
 
 	}
 
@@ -109,6 +114,10 @@ public class CreateASTest {
 			.getResource(
 				"/eu/dnetlib/dhp/actionmanager/webcrawl/")
 			.getPath();
+		String blackListPath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/actionmanager/webcrawl/blackList/")
+			.getPath();
 
 		CreateActionSetFromWebEntries
 			.main(
@@ -118,7 +127,8 @@ public class CreateASTest {
 					"-sourcePath",
 					inputPath,
 					"-outputPath",
-					workingDir.toString() + "/actionSet1"
+					workingDir.toString() + "/actionSet1",
+					"-blackListPath", blackListPath
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
@@ -184,7 +194,7 @@ public class CreateASTest {
 
 		Assertions
 			.assertEquals(
-				5, tmp
+				2, tmp
 					.filter(
 						r -> r
 							.getSource()
@@ -197,7 +207,7 @@ public class CreateASTest {
 
 		Assertions
 			.assertEquals(
-				5, tmp
+				2, tmp
 					.filter(
 						r -> r
 							.getTarget()
@@ -210,7 +220,7 @@ public class CreateASTest {
 
 		Assertions
 			.assertEquals(
-				2, tmp
+				1, tmp
 					.filter(
 						r -> r
 							.getTarget()
@@ -224,7 +234,7 @@ public class CreateASTest {
 
 		Assertions
 			.assertEquals(
-				2, tmp
+				1, tmp
 					.filter(
 						r -> r
 							.getTarget()
@@ -238,7 +248,7 @@ public class CreateASTest {
 
 		Assertions
 			.assertEquals(
-				1, tmp
+				0, tmp
 					.filter(
 						r -> r
 							.getTarget()

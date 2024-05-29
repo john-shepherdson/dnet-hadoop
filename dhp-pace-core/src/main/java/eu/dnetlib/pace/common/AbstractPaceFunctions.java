@@ -1,12 +1,6 @@
 
 package eu.dnetlib.pace.common;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Sets;
-import com.ibm.icu.text.Transliterator;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -14,6 +8,13 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Sets;
+import com.ibm.icu.text.Transliterator;
 
 /**
  * Set of common functions for the framework

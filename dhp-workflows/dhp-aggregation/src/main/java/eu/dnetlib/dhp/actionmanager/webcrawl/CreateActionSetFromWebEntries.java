@@ -12,6 +12,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.types.StructType;
@@ -70,6 +71,9 @@ public class CreateActionSetFromWebEntries implements Serializable {
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
 
+		final String blackListInputPath = parser.get("blackListPath");
+		log.info("blackListInputPath: {}", blackListInputPath);
+
 		SparkConf conf = new SparkConf();
 
 		runWithSparkSession(
@@ -77,29 +81,35 @@ public class CreateActionSetFromWebEntries implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 
-				createActionSet(spark, inputPath, outputPath);
+				createActionSet(spark, inputPath, outputPath, blackListInputPath);
 
 			});
 	}
 
 	public static void createActionSet(SparkSession spark, String inputPath,
-		String outputPath) {
+		String outputPath, String blackListInputPath) {
 
 		final Dataset<Row> dataset = readWebCrawl(spark, inputPath)
-			.filter("publication_year <= 2020 or country_code=='IE'")
+			.filter("country_code=='IE'")
 			.drop("publication_year");
 
-		dataset.flatMap((FlatMapFunction<Row, Relation>) row -> {
-			List<Relation> ret = new ArrayList<>();
-			final String ror = ROR_PREFIX
-				+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", row.getAs("ror")));
-			ret.addAll(createAffiliationRelationPairDOI(row.getAs("doi"), ror));
-			ret.addAll(createAffiliationRelationPairPMID(row.getAs("pmid"), ror));
-			ret.addAll(createAffiliationRelationPairPMCID(row.getAs("pmcid"), ror));
+		final Dataset<Row> blackList = readBlackList(spark, blackListInputPath);
 
-			return ret
-				.iterator();
-		}, Encoders.bean(Relation.class))
+		dataset
+			.join(blackList, dataset.col("id").equalTo(blackList.col("OpenAlexId")), "left")
+			.filter((FilterFunction<Row>) r -> r.getAs("OpenAlexId") == null)
+			.drop("OpenAlexId")
+			.flatMap((FlatMapFunction<Row, Relation>) row -> {
+				List<Relation> ret = new ArrayList<>();
+				final String ror = ROR_PREFIX
+					+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", row.getAs("ror")));
+				ret.addAll(createAffiliationRelationPairDOI(row.getAs("doi"), ror));
+				ret.addAll(createAffiliationRelationPairPMID(row.getAs("pmid"), ror));
+				ret.addAll(createAffiliationRelationPairPMCID(row.getAs("pmcid"), ror));
+
+				return ret
+					.iterator();
+			}, Encoders.bean(Relation.class))
 			.toJavaRDD()
 			.map(p -> new AtomicAction(p.getClass(), p))
 			.mapToPair(
@@ -134,6 +144,15 @@ public class CreateActionSetFromWebEntries implements Serializable {
 				"institution.country_code as country_code", "publication_year")
 			.distinct();
 
+	}
+
+	private static Dataset<Row> readBlackList(SparkSession spark, String inputPath) {
+
+		return spark
+			.read()
+			.option("header", true)
+			.csv(inputPath)
+			.select("OpenAlexId");
 	}
 
 	private static List<Relation> createAffiliationRelationPairPMCID(String pmcid, String ror) {

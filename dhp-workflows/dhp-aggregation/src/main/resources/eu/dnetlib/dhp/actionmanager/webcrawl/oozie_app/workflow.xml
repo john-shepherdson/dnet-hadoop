@@ -45,6 +45,7 @@
             </spark-opts>
             <arg>--sourcePath</arg><arg>${sourcePath}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
+            <arg>--blackListPath</arg><arg>${blackListPath}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

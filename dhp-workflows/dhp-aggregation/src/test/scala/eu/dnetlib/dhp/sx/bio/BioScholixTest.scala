@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension
 
 import java.io.{BufferedReader, InputStream, InputStreamReader}
 import java.util.zip.GZIPInputStream
+import javax.xml.stream.XMLInputFactory
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
@@ -49,10 +50,8 @@ class BioScholixTest extends AbstractVocabularyTest {
 
   @Test
   def testEBIData() = {
-    val inputXML = Source
-      .fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml"))
-      .mkString
-    val xml = new XMLEventReader(Source.fromBytes(inputXML.getBytes()))
+    val inputFactory = XMLInputFactory.newInstance
+    val xml = inputFactory.createXMLEventReader(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml"))
     new PMParser(xml).foreach(s => println(mapper.writeValueAsString(s)))
   }
 
@@ -91,9 +90,10 @@ class BioScholixTest extends AbstractVocabularyTest {
 
   @Test
   def testParsingPubmedXML(): Unit = {
-    val xml = new XMLEventReader(
-      Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml"))
-    )
+    val inputFactory = XMLInputFactory.newInstance
+
+    val xml = inputFactory.createXMLEventReader(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml"))
+
     val parser = new PMParser(xml)
     parser.foreach(checkPMArticle)
   }
@@ -156,9 +156,9 @@ class BioScholixTest extends AbstractVocabularyTest {
   @Test
   def testPubmedMapping(): Unit = {
 
-    val xml = new XMLEventReader(
-      Source.fromInputStream(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml"))
-    )
+    val inputFactory = XMLInputFactory.newInstance
+    val xml = inputFactory.createXMLEventReader(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/pubmed.xml"))
+
     val parser = new PMParser(xml)
     val results = ListBuffer[Oaf]()
     parser.foreach(x => results += PubMedToOaf.convert(x, vocabularies))

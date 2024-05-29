@@ -39,8 +39,8 @@ public class OsfPreprintCollectorTest {
 	private final String resumptionType = "page";
 	private final String resumptionXpath = "/*/*[local-name()='links']/*[local-name()='next']";
 
-	private final String resultSizeParam = "";
-	private final String resultSizeValue = "";
+	private final String resultSizeParam = "page[size]";
+	private final String resultSizeValue = "100";
 
 	private final String resultFormatParam = "format";
 	private final String resultFormatValue = "json";
@@ -74,7 +74,7 @@ public class OsfPreprintCollectorTest {
 		final AtomicInteger i = new AtomicInteger(0);
 		final Stream<String> stream = this.rcp.collect(this.api, new AggregatorReport());
 
-		stream.limit(200).forEach(s -> {
+		stream.limit(2000).forEach(s -> {
 			Assertions.assertTrue(s.length() > 0);
 			i.incrementAndGet();
 			log.info(s);

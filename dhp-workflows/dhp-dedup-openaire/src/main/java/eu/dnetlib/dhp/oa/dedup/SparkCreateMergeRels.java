@@ -42,6 +42,7 @@ import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
+import eu.dnetlib.pace.util.SparkCompatUtils;
 import scala.Tuple3;
 import scala.collection.JavaConversions;
 
@@ -148,8 +149,7 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 			Dataset<Row> pivotHistory = spark
 				.createDataset(
 					Collections.emptyList(),
-					RowEncoder
-						.apply(StructType.fromDDL("id STRING, lastUsage STRING")));
+					SparkCompatUtils.encoderFor(StructType.fromDDL("id STRING, lastUsage STRING")));
 
 			if (StringUtils.isNotBlank(pivotHistoryDatabase)) {
 				pivotHistory = spark
