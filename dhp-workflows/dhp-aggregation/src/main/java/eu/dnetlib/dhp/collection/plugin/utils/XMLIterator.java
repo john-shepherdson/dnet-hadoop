@@ -70,10 +70,11 @@ public class XMLIterator implements Iterator<String> {
 		super();
 		this.element = element;
 		if (element.contains(",")) {
-			elements= Arrays.stream(element.split(","))
-					.filter(StringUtils::isNoneBlank)
-					.map(String::toLowerCase)
-					.collect(Collectors.toList());
+			elements = Arrays
+				.stream(element.split(","))
+				.filter(StringUtils::isNoneBlank)
+				.map(String::toLowerCase)
+				.collect(Collectors.toList());
 		}
 		this.inputStream = inputStream;
 		this.parser = getParser();
@@ -155,16 +156,16 @@ public class XMLIterator implements Iterator<String> {
 		XMLEvent peek = parser.peek();
 		if (peek != null && peek.isStartElement()) {
 			String name = peek.asStartElement().getName().getLocalPart();
-			if( isCheckTag(name))
-				return  peek;
+			if (isCheckTag(name))
+				return peek;
 		}
 
 		while (parser.hasNext()) {
-			XMLEvent event= parser.nextEvent();
+			XMLEvent event = parser.nextEvent();
 			if (event != null && event.isStartElement()) {
 				String name = event.asStartElement().getName().getLocalPart();
-				if( isCheckTag(name))
-					return  event;
+				if (isCheckTag(name))
+					return event;
 			}
 		}
 		return null;
@@ -181,12 +182,13 @@ public class XMLIterator implements Iterator<String> {
 	}
 
 	private boolean isCheckTag(final String tagName) {
-		if (elements!= null) {
-			final String found =elements.stream()
-					.filter(e -> e.equalsIgnoreCase(tagName))
-					.findFirst()
-					.orElse(null);
-			if (found!= null)
+		if (elements != null) {
+			final String found = elements
+				.stream()
+				.filter(e -> e.equalsIgnoreCase(tagName))
+				.findFirst()
+				.orElse(null);
+			if (found != null)
 				return true;
 		} else {
 			if (element.equalsIgnoreCase(tagName)) {
