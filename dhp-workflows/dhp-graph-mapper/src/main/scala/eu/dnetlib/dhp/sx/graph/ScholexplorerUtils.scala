@@ -2,6 +2,7 @@ package eu.dnetlib.dhp.sx.graph
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.schema.oaf.{KeyValue, Result, StructuredProperty}
+import eu.dnetlib.dhp.schema.sx.scholix.flat.ScholixFlat
 import eu.dnetlib.dhp.schema.sx.scholix.{
   Scholix,
   ScholixCollectedFrom,
@@ -10,6 +11,7 @@ import eu.dnetlib.dhp.schema.sx.scholix.{
   ScholixRelationship,
   ScholixResource
 }
+import org.apache.logging.log4j.core.appender.ConsoleAppender.Target
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
@@ -25,6 +27,16 @@ case class RelationInfo(
   collectedfrom: Seq[RelKeyValue]
 ) {}
 case class RelKeyValue(key: String, value: String) {}
+
+case class SummaryResource(
+  id: String,
+  typology: String,
+  subType: String,
+  pids: List[String],
+  pidTypes: List[String],
+  publishers: List[String],
+  date: String
+) {}
 
 object ScholexplorerUtils {
 
@@ -84,6 +96,99 @@ object ScholexplorerUtils {
       .map(i => new ScholixIdentifier(i._1.getValue, i._1.getQualifier.getClassid, i._2))
       .distinct
       .toList
+  }
+
+  def generateSummaryResource(input: ScholixResource): SummaryResource = {
+    val distinctIds = if (input.getIdentifier != null) {
+      input.getIdentifier.asScala.map(i => i.getIdentifier).distinct.toList
+    } else List()
+    val distinctTypes = if (input.getIdentifier != null) {
+      input.getIdentifier.asScala.map(i => i.getSchema).distinct.toList
+    } else List()
+    val distinctPublishers = if (input.getPublisher != null) {
+      input.getPublisher.asScala.map(i => i.getName).distinct.sorted.take(5).toList
+    } else List()
+    SummaryResource(
+      id = input.getDnetIdentifier,
+      typology = input.getObjectType,
+      subType = input.getObjectSubType,
+      pids = distinctIds,
+      pidTypes = distinctTypes,
+      publishers = distinctPublishers,
+      date = input.getPublicationDate
+    )
+  }
+
+  def generateScholixFlat(relation: RelationInfo, summary: SummaryResource, updateSource: Boolean): ScholixFlat = {
+    val scholix = new ScholixFlat
+    scholix.setIdentifier(relation.id)
+    if (relation.collectedfrom != null && relation.collectedfrom.nonEmpty)
+      scholix.setLinkProviders(
+        relation.collectedfrom
+          .map(cf => {
+            cf.value
+          })
+          .distinct
+          .sorted
+          .take(5)
+          .toList
+          .asJava
+      )
+    else {
+      scholix.setLinkProviders(List("OpenAIRE").asJava)
+    }
+    val semanticRelation = relations.getOrElse(relation.relclass.toLowerCase, null)
+    if (semanticRelation == null)
+      return null
+
+    scholix.setRelationType(semanticRelation.original)
+    scholix.setPublicationDate(summary.date)
+    if (updateSource) {
+      if (summary.pids.isEmpty)
+        return null
+      scholix.setSourceId(summary.id)
+      scholix.setSourcePid(summary.pids.asJava)
+      scholix.setSourcePidType(summary.pidTypes.asJava)
+      scholix.setSourceType(summary.typology)
+      scholix.setSourceSubType(summary.subType)
+      if (summary.publishers.nonEmpty) {
+        scholix.setSourcePublisher(summary.publishers.asJava)
+      }
+    } else {
+      if (summary.pids.isEmpty)
+        return null
+      scholix.setTargetId(summary.id)
+      scholix.setTargetPid(summary.pids.asJava)
+      scholix.setTargetPidType(summary.pidTypes.asJava)
+      scholix.setTargetType(summary.typology)
+      scholix.setTargetSubType(summary.subType)
+      if (summary.publishers.nonEmpty) {
+        scholix.setTargetPublisher(summary.publishers.asJava)
+      }
+    }
+    scholix
+  }
+
+  def mergeScholixFlat(source: ScholixFlat, target: ScholixFlat): ScholixFlat = {
+    if (source.getPublicationDate == null) {
+      source.setPublicationDate(target.getPublicationDate)
+    }
+
+    source.setTargetId(target.getTargetId)
+    source.setTargetPid(target.getTargetPid)
+    source.setTargetPidType(target.getTargetPidType)
+    source.setTargetType(target.getTargetType)
+    source.setTargetSubType(target.getTargetSubType)
+
+    if (source.getLinkProviders != null)
+      source.setTargetPublisher(target.getTargetPublisher)
+    else if (source.getLinkProviders != null && target.getLinkProviders != null) {
+      source.setLinkProviders(
+        source.getLinkProviders.asScala.union(target.getLinkProviders.asScala).sorted.distinct.take(5).asJava
+      )
+    }
+
+    source
   }
 
   def generateScholixResourceFromResult(result: Result): ScholixResource = {

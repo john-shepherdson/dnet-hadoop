@@ -1,15 +1,8 @@
 package eu.dnetlib.dhp.sx.graph
 
 import eu.dnetlib.dhp.application.AbstractScalaApplication
-import eu.dnetlib.dhp.schema.oaf.{
-  KeyValue,
-  OtherResearchProduct,
-  Publication,
-  Relation,
-  Result,
-  Software,
-  Dataset => OafDataset
-}
+import eu.dnetlib.dhp.schema.oaf.{KeyValue, OtherResearchProduct, Publication, Relation, Result, Software, Dataset => OafDataset}
+import eu.dnetlib.dhp.schema.sx.scholix.flat.ScholixFlat
 import eu.dnetlib.dhp.schema.sx.scholix.{Scholix, ScholixResource}
 import org.apache.spark.sql.functions.{col, concat, expr, first, md5}
 import org.apache.spark.sql.types.StructType
@@ -99,6 +92,31 @@ class SparkCreateScholexplorerDump(propertyPath: String, args: Array[String], lo
 
     bidRel.write.mode(SaveMode.Overwrite).save(s"$otuputPath/relation")
 
+  }
+
+  def generateFlatScholix(outputPath: String, spark: SparkSession): Unit = {
+    import spark.implicits._
+    implicit val scholixResourceEncoder: Encoder[ScholixResource] = Encoders.bean(classOf[ScholixResource])
+    implicit val scholixEncoder: Encoder[ScholixFlat] = Encoders.bean(classOf[ScholixFlat])
+    val relations = spark.read.load(s"$outputPath/relation").as[RelationInfo]
+    val resource = spark.read.load(s"$outputPath/resource").as[ScholixResource]
+
+    val summaries =resource.map(s=> ScholexplorerUtils.generateSummaryResource(s))
+
+    val scholix_source =relations
+      .joinWith(summaries, relations("source")=== summaries("id"))
+      .map(k => ScholexplorerUtils.generateScholixFlat(k._1, k._2, true))
+
+    val scholix_target =relations.joinWith(summaries, relations("target")=== summaries("id"))
+      .map(k => ScholexplorerUtils.generateScholixFlat(k._1, k._2, false))
+
+    scholix_source
+      .joinWith(scholix_target, scholix_source("identifier")===scholix_target("identifier"), "inner")
+      .map(s =>ScholexplorerUtils.mergeScholixFlat(s._1, s._2))
+      .write
+      .mode(SaveMode.Overwrite)
+      .option("compression", "gzip")
+      .json(s"$outputPath/scholix")
   }
 
   def generateScholix(outputPath: String, spark: SparkSession): Unit = {

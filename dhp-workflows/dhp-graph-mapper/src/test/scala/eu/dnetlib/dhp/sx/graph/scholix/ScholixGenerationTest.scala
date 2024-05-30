@@ -14,13 +14,15 @@ class ScholixGenerationTest {
 
     val spark: SparkSession = SparkSession.builder().master("local[*]").getOrCreate()
     val app = new SparkCreateScholexplorerDump(null, null, null)
-//   app.generateScholixResource("/home/sandro/Downloads/scholix_sample/", "/home/sandro/Downloads/scholix/", spark)
-//    app.generateBidirectionalRelations(
-//      "/home/sandro/Downloads/scholix_sample/",
-//      "/home/sandro/Downloads/scholix/",
-//      spark
-//    )
-    app.generateScholix("/home/sandro/Downloads/scholix/", spark)
+
+    val basePath = "/Users/sandro/Downloads"
+   app.generateScholixResource(s"$basePath/scholix_sample/", s"$basePath/scholix/", spark)
+    app.generateBidirectionalRelations(
+      s"$basePath/scholix_sample/",
+      s"$basePath/scholix/",
+      spark
+    )
+    app.generateFlatScholix(s"$basePath/scholix/", spark)
 
   }
 }
