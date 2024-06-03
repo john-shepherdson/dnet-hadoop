@@ -40,27 +40,12 @@ public class MergeUtils {
 
 	public static <T extends Oaf> T mergeGroup(String s, Iterator<T> oafEntityIterator,
 		boolean checkDelegateAuthority) {
-		TreeSet<T> sortedEntities = new TreeSet<>((o1, o2) -> {
-			int res = 0;
 
-			if (o1.getDataInfo() != null && o2.getDataInfo() != null) {
-				res = o1.getDataInfo().getTrust().compareTo(o2.getDataInfo().getTrust());
-			}
+		ArrayList<T> sortedEntities = new ArrayList<>();
+		oafEntityIterator.forEachRemaining(sortedEntities::add);
+		sortedEntities.sort(MergeEntitiesComparator.INSTANCE.reversed());
 
-			if (res == 0) {
-				if (o1 instanceof Result && o2 instanceof Result) {
-					return ResultTypeComparator.INSTANCE.compare((Result) o1, (Result) o2);
-				}
-			}
-
-			return res;
-		});
-
-		while (oafEntityIterator.hasNext()) {
-			sortedEntities.add(oafEntityIterator.next());
-		}
-
-		Iterator<T> it = sortedEntities.descendingIterator();
+		Iterator<T> it = sortedEntities.iterator();
 		T merged = it.next();
 
 		while (it.hasNext()) {
@@ -143,7 +128,7 @@ public class MergeUtils {
 	 * https://graph.openaire.eu/docs/data-model/pids-and-identifiers#delegated-authorities and in that case it prefers
 	 * such version.
 	 * <p>
-	 * Otherwise, it considers a resulttype priority order implemented in {@link ResultTypeComparator}
+	 * Otherwise, it considers a resulttype priority order implemented in {@link MergeEntitiesComparator}
 	 * and proceeds with the canonical property merging.
 	 *
 	 * @param left
@@ -161,8 +146,9 @@ public class MergeUtils {
 		if (!leftFromDelegatedAuthority && rightFromDelegatedAuthority) {
 			return right;
 		}
+
 		// TODO: raise trust to have preferred fields from one or the other??
-		if (new ResultTypeComparator().compare(left, right) < 0) {
+		if (MergeEntitiesComparator.INSTANCE.compare(left, right) > 0) {
 			return mergeResultFields(left, right);
 		} else {
 			return mergeResultFields(right, left);
@@ -225,9 +211,9 @@ public class MergeUtils {
 
 	private static <T, K> List<T> mergeLists(final List<T> left, final List<T> right, int trust,
 		Function<T, K> keyExtractor, BinaryOperator<T> merger) {
-		if (left == null) {
-			return right;
-		} else if (right == null) {
+		if (left == null || left.isEmpty()) {
+			return right != null ? right : new ArrayList<>();
+		} else if (right == null || right.isEmpty()) {
 			return left;
 		}
 
@@ -405,7 +391,7 @@ public class MergeUtils {
 		}
 
 		// should be an instance attribute, get the first non-null value
-		merge.setLanguage(coalesce(merge.getLanguage(), enrich.getLanguage()));
+		merge.setLanguage(coalesceQualifier(merge.getLanguage(), enrich.getLanguage()));
 
 		// distinct countries, do not manage datainfo
 		merge.setCountry(mergeQualifiers(merge.getCountry(), enrich.getCountry(), trust));
@@ -575,6 +561,13 @@ public class MergeUtils {
 		return m != null ? m : e;
 	}
 
+	private static Qualifier coalesceQualifier(Qualifier m, Qualifier e) {
+		if (m == null || m.getClassid() == null || StringUtils.isBlank(m.getClassid())) {
+			return e;
+		}
+		return m;
+	}
+
 	private static List<Author> mergeAuthors(List<Author> author, List<Author> author1, int trust) {
 		List<List<Author>> authors = new ArrayList<>();
 		if (author != null) {
@@ -587,6 +580,10 @@ public class MergeUtils {
 	}
 
 	private static String instanceKeyExtractor(Instance i) {
+		// three levels of concatenating:
+		// 1. ::
+		// 2. @@
+		// 3. ||
 		return String
 			.join(
 				"::",
@@ -594,10 +591,10 @@ public class MergeUtils {
 				kvKeyExtractor(i.getCollectedfrom()),
 				qualifierKeyExtractor(i.getAccessright()),
 				qualifierKeyExtractor(i.getInstancetype()),
-				Optional.ofNullable(i.getUrl()).map(u -> String.join("::", u)).orElse(null),
+				Optional.ofNullable(i.getUrl()).map(u -> String.join("@@", u)).orElse(null),
 				Optional
 					.ofNullable(i.getPid())
-					.map(pp -> pp.stream().map(MergeUtils::spKeyExtractor).collect(Collectors.joining("::")))
+					.map(pp -> pp.stream().map(MergeUtils::spKeyExtractor).collect(Collectors.joining("@@")))
 					.orElse(null));
 	}
 
@@ -706,7 +703,7 @@ public class MergeUtils {
 	private static String spKeyExtractor(StructuredProperty sp) {
 		return Optional
 			.ofNullable(sp)
-			.map(s -> Joiner.on("::").join(s, qualifierKeyExtractor(s.getQualifier())))
+			.map(s -> Joiner.on("||").join(qualifierKeyExtractor(s.getQualifier()), s.getValue()))
 			.orElse(null);
 	}
 
