@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.oa.provision.XmlConverterJob;
 import eu.dnetlib.dhp.oa.provision.model.SerializableSolrInputDocument;
 import eu.dnetlib.dhp.oa.provision.model.TupleWrapper;
 
@@ -48,7 +47,7 @@ public class IrishOaiExporterJob {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					XmlConverterJob.class
+					IrishOaiExporterJob.class
 						.getResourceAsStream("/eu/dnetlib/dhp/oa/oaipmh/input_params_irish_oai_exporter.json")));
 		parser.parseArgument(args);
 
