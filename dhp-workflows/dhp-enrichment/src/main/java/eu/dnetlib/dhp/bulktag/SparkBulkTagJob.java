@@ -172,7 +172,7 @@ public class SparkBulkTagJob {
 			.option("compression", "gzip")
 			.json(outputPath + "project");
 
-		readPath(spark, outputPath + "project", Datasource.class)
+		readPath(spark, outputPath + "project", Project.class)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
