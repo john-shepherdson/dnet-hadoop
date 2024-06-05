@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.IOUtils;
@@ -23,7 +24,7 @@ public class IrishOaiExporterJobTest {
 	@Test
 	void testAsIrishOaiResult() throws Exception {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream("record_IE.xml"));
-		final OaiRecordWrapper res = IrishOaiExporterJob.asIrishOaiResult(xml);
+		final OaiRecordWrapper res = IrishOaiExporterJob.asIrishOaiResult(xml, LocalDateTime.now().toString());
 		assertNotNull(res.getId());
 		assertNotNull(res.getBody());
 		assertNotNull(res.getSets());

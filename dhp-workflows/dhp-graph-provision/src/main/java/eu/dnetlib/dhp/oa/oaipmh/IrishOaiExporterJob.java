@@ -46,15 +46,16 @@ public class IrishOaiExporterJob {
 	public static void main(final String[] args) throws Exception {
 
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
-				IOUtils
-						.toString(XmlConverterJob.class
-								.getResourceAsStream("/eu/dnetlib/dhp/oa/oaipmh/input_params_irish_oai_exporter.json")));
+			IOUtils
+				.toString(
+					XmlConverterJob.class
+						.getResourceAsStream("/eu/dnetlib/dhp/oa/oaipmh/input_params_irish_oai_exporter.json")));
 		parser.parseArgument(args);
 
 		final Boolean isSparkSessionManaged = Optional
-				.ofNullable(parser.get("isSparkSessionManaged"))
-				.map(Boolean::valueOf)
-				.orElse(Boolean.TRUE);
+			.ofNullable(parser.get("isSparkSessionManaged"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.TRUE);
 		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
 		final String inputPath = parser.get("inputPath");
@@ -62,9 +63,9 @@ public class IrishOaiExporterJob {
 		final String dbUser = parser.get("dbUser");
 		final String dbPwd = parser.get("dbPwd");
 		final int numConnections = Optional
-				.ofNullable(parser.get("numConnections"))
-				.map(Integer::valueOf)
-				.orElse(NUM_CONNECTIONS);
+			.ofNullable(parser.get("numConnections"))
+			.map(Integer::valueOf)
+			.orElse(NUM_CONNECTIONS);
 
 		log.info("inputPath:     '{}'", inputPath);
 		log.info("dbUrl:         '{}'", dbUrl);
@@ -78,29 +79,31 @@ public class IrishOaiExporterJob {
 
 		final SparkConf conf = new SparkConf();
 		conf.registerKryoClasses(new Class[] {
-				SerializableSolrInputDocument.class
+			SerializableSolrInputDocument.class
 		});
 
 		final Encoder<TupleWrapper> encoderTuple = Encoders.bean(TupleWrapper.class);
 		final Encoder<OaiRecordWrapper> encoderOaiRecord = Encoders.bean(OaiRecordWrapper.class);
 
+		final String date = LocalDateTime.now().toString();
+
 		log.info("Creating temporary table...");
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 
 			final Dataset<OaiRecordWrapper> docs = spark
-					.read()
-					.schema(encoderTuple.schema())
-					.json(inputPath)
-					.as(encoderTuple)
-					.map((MapFunction<TupleWrapper, String>) TupleWrapper::getXml, Encoders.STRING())
-					.map((MapFunction<String, OaiRecordWrapper>) IrishOaiExporterJob::asIrishOaiResult, encoderOaiRecord)
-					.filter((FilterFunction<OaiRecordWrapper>) obj -> (obj != null) && StringUtils.isNotBlank(obj.getId()));
+				.read()
+				.schema(encoderTuple.schema())
+				.json(inputPath)
+				.as(encoderTuple)
+				.map((MapFunction<TupleWrapper, String>) TupleWrapper::getXml, Encoders.STRING())
+				.map((MapFunction<String, OaiRecordWrapper>) r -> asIrishOaiResult(r, date), encoderOaiRecord)
+				.filter((FilterFunction<OaiRecordWrapper>) obj -> (obj != null) && StringUtils.isNotBlank(obj.getId()));
 
 			docs
-					.repartition(numConnections)
-					.write()
-					.mode(SaveMode.Overwrite)
-					.jdbc(dbUrl, TMP_OAI_TABLE, connectionProperties);
+				.repartition(numConnections)
+				.write()
+				.mode(SaveMode.Overwrite)
+				.jdbc(dbUrl, TMP_OAI_TABLE, connectionProperties);
 
 		});
 		log.info("Temporary table created.");
@@ -108,14 +111,15 @@ public class IrishOaiExporterJob {
 		log.info("Updating OAI records...");
 		try (final Connection con = DriverManager.getConnection(dbUrl, dbUser, dbPwd)) {
 			try (final Statement st = con.createStatement()) {
-				final String query = IOUtils.toString(IrishOaiExporterJob.class.getResourceAsStream("oai-finalize.sql"));
+				final String query = IOUtils
+					.toString(IrishOaiExporterJob.class.getResourceAsStream("oai-finalize.sql"));
 				st.execute(query);
 			}
 		}
 		log.info("DONE.");
 	}
 
-	protected static OaiRecordWrapper asIrishOaiResult(final String xml) {
+	protected static OaiRecordWrapper asIrishOaiResult(final String xml, final String date) {
 		try {
 			final Document doc = DocumentHelper.parseText(xml);
 			final OaiRecordWrapper r = new OaiRecordWrapper();
@@ -123,7 +127,7 @@ public class IrishOaiExporterJob {
 			if (isValid(doc)) {
 				r.setId(doc.valueOf("//*[local-name()='objIdentifier']").trim());
 				r.setBody(gzip(doc.selectSingleNode("//*[local-name()='entity']").asXML()));
-				r.setDate(LocalDateTime.now().toString());
+				r.setDate(date);
 				r.setSets(new ArrayList<>());
 			}
 			return r;
@@ -140,19 +144,25 @@ public class IrishOaiExporterJob {
 		if (n != null) {
 
 			for (final Object o : n.selectNodes(".//*[local-name()='datainfo']/*[local-name()='deletedbyinference']")) {
-				if ("true".equals(((Node) o).getText().trim())) { return false; }
+				if ("true".equals(((Node) o).getText().trim())) {
+					return false;
+				}
 			}
 
 			// verify the main country of the result
 			for (final Object o : n.selectNodes("./*[local-name()='country']")) {
-				if ("IE".equals(((Node) o).valueOf("@classid").trim())) { return true; }
+				if ("IE".equals(((Node) o).valueOf("@classid").trim())) {
+					return true;
+				}
 			}
 
 			// verify the countries of the related organizations
 			for (final Object o : n.selectNodes(".//*[local-name()='rel']")) {
 				final String relType = ((Node) o).valueOf("./*[local-name() = 'to']/@type").trim();
 				final String relCountry = ((Node) o).valueOf("./*[local-name() = 'country']/@classid").trim();
-				if ("organization".equals(relType) && "IE".equals(relCountry)) { return true; }
+				if ("organization".equals(relType) && "IE".equals(relCountry)) {
+					return true;
+				}
 			}
 		}
 		return false;
@@ -160,7 +170,9 @@ public class IrishOaiExporterJob {
 	}
 
 	protected static byte[] gzip(final String str) {
-		if (StringUtils.isBlank(str)) { return null; }
+		if (StringUtils.isBlank(str)) {
+			return null;
+		}
 
 		try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
 			try (final GZIPOutputStream gzip = new GZIPOutputStream(baos)) {

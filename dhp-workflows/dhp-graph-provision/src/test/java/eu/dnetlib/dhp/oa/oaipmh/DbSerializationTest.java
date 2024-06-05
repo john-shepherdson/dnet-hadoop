@@ -42,10 +42,10 @@ public class DbSerializationTest {
 		conf.set("spark.driver.host", "localhost");
 
 		spark = SparkSession
-				.builder()
-				.appName("TEST")
-				.config(conf)
-				.getOrCreate();
+			.builder()
+			.appName("TEST")
+			.config(conf)
+			.getOrCreate();
 	}
 
 	@AfterAll
@@ -79,9 +79,9 @@ public class DbSerializationTest {
 			final Dataset<OaiRecordWrapper> docs = spark.createDataset(list, Encoders.bean(OaiRecordWrapper.class));
 
 			docs
-					.write()
-					.mode(SaveMode.Overwrite)
-					.jdbc(dbUrl, IrishOaiExporterJob.TMP_OAI_TABLE, connectionProperties);
+				.write()
+				.mode(SaveMode.Overwrite)
+				.jdbc(dbUrl, IrishOaiExporterJob.TMP_OAI_TABLE, connectionProperties);
 
 		});
 
