@@ -9,6 +9,26 @@
   ],
   "measures": [
     {
+      "id": "downloads",
+      "unit": [
+        {
+          "key": "fakeds",
+          "value": "10",
+          "dataInfo": null
+        }
+      ]
+    },
+    {
+      "id": "views",
+      "unit": [
+        {
+          "key": "fakedss",
+          "value": "0",
+          "dataInfo": null
+        }
+      ]
+    },
+    {
       "id": "influence",
       "unit": [
         {
@@ -505,13 +525,13 @@
   "extraInfo": [],
   "format": [],
   "fulltext": [
-    { "value" : "https://osf.io/preprints/socarxiv/7vgtu/download" },
-    { "value" : "https://osf.io/preprints/socarxiv/7vgtu/download2" }
+    {"value": "https://osf.io/preprints/socarxiv/7vgtu/download"},
+    {"value": "https://osf.io/preprints/socarxiv/7vgtu/download2"}
   ],
   "id": "50|CSC_________::0000ec4dd9df012feaafa77e71a0fb4c",
   "instance": [
     {
-      "fulltext" :  "https://osf.io/preprints/socarxiv/7vgtu/download",
+      "fulltext": "https://osf.io/preprints/socarxiv/7vgtu/download",
       "measures": [
         {
           "id": "influence",
@@ -537,6 +557,24 @@
             {
               "key": "score",
               "value": "4.62970429725e-08"
+            }
+          ]
+        },
+        {
+          "id": "downloads",
+          "unit": [
+            {
+              "key": "fakeds",
+              "value": "10"
+            }
+          ]
+        },
+        {
+          "id": "views",
+          "unit": [
+            {
+              "key": "fakeds",
+              "value": "10"
             }
           ]
         }
@@ -674,9 +712,7 @@
         },
         "value": ""
       },
-      "url": [
-        "http://dx.doi.org/10.1109/TED.2018.2853550"
-      ]
+      "url": ["http://dx.doi.org/10.1109/TED.2018.2853550"]
     },
     {
       "pid": [
@@ -812,9 +848,7 @@
         },
         "value": "CC-BY"
       },
-      "url": [
-        "http://dx.doi.org/10.1109/TED.2018.2853550"
-      ]
+      "url": ["http://dx.doi.org/10.1109/TED.2018.2853550"]
     },
     {
       "pid": [
@@ -950,9 +984,7 @@
         },
         "value": ""
       },
-      "url": [
-        "http://dx.doi.org/10.1109/TED.2018.2853551"
-      ]
+      "url": ["http://dx.doi.org/10.1109/TED.2018.2853551"]
     },
     {
       "pid": [
@@ -1221,8 +1253,7 @@
         },
         "value": ""
       },
-      "url": [
-      ]
+      "url": []
     },
     {
       "pid": [
@@ -1352,9 +1383,7 @@
         },
         "value": ""
       },
-      "url": [
-        ""
-      ]
+      "url": [""]
     },
     {
       "pid": [
@@ -1484,9 +1513,7 @@
         },
         "value": ""
       },
-      "url": [
-        "asdasd://not a URL"
-      ]
+      "url": ["asdasd://not a URL"]
     }
   ],
   "journal": {
@@ -1580,7 +1607,9 @@
     "schemeid": "dnet:result_typologies",
     "schemename": "dnet:result_typologies"
   },
-  "source": [ { "value" : "Bulletin of the National Technical University \"KhPI\" A series of \"Information and Modeling\"; № 1 (3) (2020):" } ],
+  "source": [
+    {"value": "Bulletin of the National Technical University \"KhPI\" A series of \"Information and Modeling\"; № 1 (3) (2020):"}
+  ],
   "subject": [
     {
       "dataInfo": {
