@@ -170,18 +170,19 @@ public class XmlSerializationUtils {
 		return sb.toString();
 	}
 
-	// <measure views="0" datasource="infrastruct_::f66f1bd369679b5b077dcdf006089556||OpenAIRE" />
-	// <measure downloads="0" datasource="infrastruct_::f66f1bd369679b5b077dcdf006089556||OpenAIRE" />
+	// <measure id="views" count="0" datasource="infrastruct_::f66f1bd369679b5b077dcdf006089556||OpenAIRE" />
+	// <measure id="downloads" count="0" datasource="infrastruct_::f66f1bd369679b5b077dcdf006089556||OpenAIRE" />
 	public static String usageMeasureAsXmlElement(String name, Measure measure) {
 		StringBuilder sb = new StringBuilder();
 		for (KeyValue kv : measure.getUnit()) {
 			sb
-				.append("<")
-				.append(name)
-				.append(" ")
-				.append(attr(measure.getId(), kv.getValue()))
-				.append(attr("datasource", kv.getKey()))
-				.append(" />");
+					.append("<")
+					.append(name)
+					.append(" ")
+					.append(attr("id", measure.getId()))
+					.append(attr("count", kv.getValue()))
+					.append(attr("datasource", kv.getKey()))
+					.append(" />");
 		}
 		return sb.toString();
 	}
