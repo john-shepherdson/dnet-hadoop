@@ -9,6 +9,7 @@ import java.io.StringReader;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.math3.optim.AbstractOptimizationProblem;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -42,6 +43,7 @@ public class XmlRecordFactoryTest {
 		final Publication p = OBJECT_MAPPER
 			.readValue(IOUtils.toString(getClass().getResourceAsStream("publication.json")), Publication.class);
 
+
 		final String xml = xmlRecordFactory.build(new JoinedEntity(p));
 
 		assertNotNull(xml);
@@ -51,7 +53,12 @@ public class XmlRecordFactoryTest {
 
 		assertNotNull(doc);
 
-		// System.out.println(doc.asXML());
+		System.out.println(doc.asXML());
+
+		assertEquals("10", doc.valueOf("//measure[@id = 'downloads']/@count"));
+		assertEquals("fakeds", doc.valueOf("//measure[@id = 'downloads']/@datasource"));
+
+		assertEquals(0, doc.selectNodes("//measure[@id = 'views']").size());
 
 		assertEquals("0000-0001-9613-6638", doc.valueOf("//creator[@rank = '1']/@orcid"));
 		assertEquals("0000-0001-9613-6639", doc.valueOf("//creator[@rank = '1']/@orcid_pending"));
