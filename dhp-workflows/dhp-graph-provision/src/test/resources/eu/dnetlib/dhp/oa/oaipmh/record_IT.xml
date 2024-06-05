@@ -1,0 +1,66 @@
+<record rank="null">
+    <result>
+        <header>
+            <objIdentifier>od_______310::02365c51a0ed7cbb54b2bbc7c0426d1b</objIdentifier>
+            <dateOfCollection>2024-04-06T06:05:16+0000</dateOfCollection>
+            <dateOfTransformation>2024-04-06T06:56:01.776Z</dateOfTransformation>
+        </header>
+        <metadata>
+            <entity schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
+                <result>
+                    <collectedfrom name="Flore (Florence Research Repository)" id="opendoar____::06eb61b839a0cefee4967c67ccb099dc" />
+                    <originalId>50|od_______310::02365c51a0ed7cbb54b2bbc7c0426d1b</originalId>
+                    <originalId>oai:flore.unifi.it:2158/608965</originalId>
+                    <pid classid="handle" classname="Handle" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:crosswalk:repository" trust="0.9">2158/608965</pid>
+                    <measure id="influence" score="3.1177596E-9" class="C5" />
+                    <measure id="popularity" score="7.6231693E-10" class="C5" />
+                    <measure id="influence_alt" score="0" class="C5" />
+                    <measure id="popularity_alt" score="0.0" class="C5" />
+                    <measure id="impulse" score="0" class="C5" />
+                    <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title" inferred="false" provenanceaction="sysimport:crosswalk:repository" trust="0.9">Estorsione (art. 629)</title>
+                    <bestaccessright classid="UNKNOWN" classname="not available" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                    <creator rank="1" name="Francesco" surname="Macri" orcid_pending="0000-0001-7658-6173">MACRI', FRANCESCO</creator>
+                    <country classid="IT" classname="Italy" schemeid="dnet:countries" schemename="dnet:countries" />
+                    <dateofacceptance>2011-01-01</dateofacceptance>
+                    <language classid="und" classname="Undetermined" schemeid="dnet:languages" schemename="dnet:languages" />
+                    <relevantdate classid="Accepted" classname="Accepted" schemeid="dnet:dataCite_date" schemename="dnet:dataCite_date" inferred="false" provenanceaction="sysimport:crosswalk:repository" trust="0.9">2011-01-01</relevantdate>
+                    <relevantdate classid="issued" classname="issued" schemeid="dnet:dataCite_date" schemename="dnet:dataCite_date" inferred="false" provenanceaction="sysimport:crosswalk:repository" trust="0.9">2011-01-01</relevantdate>
+                    <relevantdate classid="available" classname="available" schemeid="dnet:dataCite_date" schemename="dnet:dataCite_date" inferred="false" provenanceaction="sysimport:crosswalk:repository" trust="0.9">2015-04-28</relevantdate>
+                    <publisher>UTET</publisher>
+                    <resulttype classid="publication" classname="publication" schemeid="dnet:result_typologies" schemename="dnet:result_typologies" />
+                    <resourcetype classid="book part" classname="book part" schemeid="dnet:dataCite_resource" schemename="dnet:dataCite_resource" />
+                    <datainfo>
+                        <inferred>false</inferred>
+                        <deletedbyinference>false</deletedbyinference>
+                        <trust>0.9</trust>
+                        <inferenceprovenance>null</inferenceprovenance>
+                        <provenanceaction classid="sysimport:crosswalk:repository" classname="Harvested" schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions" />
+                    </datainfo>
+                    <rels>
+                        <rel inferred="true" trust="0.85" inferenceprovenance="propagation" provenanceaction="result:organization:instrepo">
+                            <to class="hasAuthorInstitution" scheme="dnet:result_organization_relations" type="organization">openorgs____::41406edad82942e9e0b29317b8a847e2</to>
+                            <legalshortname>University of Florence</legalshortname>
+                            <country classid="IT" classname="Italy" schemeid="dnet:countries" schemename="dnet:countries" />
+                            <legalname>University of Florence</legalname>
+                        </rel>
+                    </rels>
+                    <children>
+                        <instance>
+                            <accessright classid="UNKNOWN" classname="not available" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                            <collectedfrom name="Flore (Florence Research Repository)" id="opendoar____::06eb61b839a0cefee4967c67ccb099dc" />
+                            <hostedby name="Flore (Florence Research Repository)" id="opendoar____::06eb61b839a0cefee4967c67ccb099dc" />
+                            <dateofacceptance>2011-01-01</dateofacceptance>
+                            <instancetype classid="0013" classname="Part of book or chapter of book" schemeid="dnet:publication_resource" schemename="dnet:publication_resource" />
+                            <pid classid="handle" classname="Handle" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:crosswalk:repository" trust="0.9">2158/608965</pid>
+                            <alternateidentifier classid="urn" classname="urn" schemeid="dnet:pid_types" schemename="dnet:pid_types" inferred="false" provenanceaction="sysimport:crosswalk:repository" trust="0.9">http://hdl.handle.net/2158/608965</alternateidentifier>
+                            <refereed classid="0002" classname="nonPeerReviewed" schemeid="dnet:review_levels" schemename="dnet:review_levels" />
+                            <webresource>
+                                <url>https://hdl.handle.net/2158/608965</url>
+                            </webresource>
+                        </instance>
+                    </children>
+                </result>
+            </entity>
+        </metadata>
+    </result>
+</record>
