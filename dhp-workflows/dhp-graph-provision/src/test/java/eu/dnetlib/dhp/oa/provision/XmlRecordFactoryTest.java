@@ -43,7 +43,6 @@ public class XmlRecordFactoryTest {
 		final Publication p = OBJECT_MAPPER
 			.readValue(IOUtils.toString(getClass().getResourceAsStream("publication.json")), Publication.class);
 
-
 		final String xml = xmlRecordFactory.build(new JoinedEntity(p));
 
 		assertNotNull(xml);
