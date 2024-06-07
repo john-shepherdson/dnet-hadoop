@@ -398,6 +398,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			o.setEcsmevalidated(field(Boolean.toString(rs.getBoolean("ecsmevalidated")), info));
 			o.setEcnutscode(field(Boolean.toString(rs.getBoolean("ecnutscode")), info));
 			o.setCountry(prepareQualifierSplitting(rs.getString("country")));
+			o.setOrganizationType(Organization.OrganizationType.valueOf(rs.getString("typology")));
 			o.setDataInfo(info);
 			o.setLastupdatetimestamp(lastUpdateTimestamp);
 
