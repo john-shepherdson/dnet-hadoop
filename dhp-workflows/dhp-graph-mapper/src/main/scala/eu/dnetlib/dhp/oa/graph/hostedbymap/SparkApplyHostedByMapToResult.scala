@@ -27,10 +27,12 @@ object SparkApplyHostedByMapToResult {
             val inst: Instance = i.head
             patchInstance(p, ei, inst)
 
-          } else if (i.size == 2) {
-            if (i.map(ii => ii.getCollectedfrom.getValue).contains("UnpayWall")) {
-              val inst: Instance = i.filter(ii => "Crossref".equals(ii.getCollectedfrom.getValue)).head
-              patchInstance(p, ei, inst)
+          } else {
+            val cf = i.map(ii => ii.getCollectedfrom.getValue)
+            if (cf.contains("Crossref")) {
+              i.foreach(ii => {
+                patchInstance(p, ei, ii)
+              })
             }
           }
         }
