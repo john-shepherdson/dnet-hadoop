@@ -103,6 +103,7 @@
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -155,11 +156,12 @@
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=2560
+                --conf spark.sql.shuffle.partitions=4000
             </spark-opts>
             <arg>--inputGraphTablePath</arg><arg>${workingDir}/software</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
