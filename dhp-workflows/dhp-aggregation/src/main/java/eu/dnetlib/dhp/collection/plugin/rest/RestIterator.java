@@ -249,7 +249,8 @@ public class RestIterator implements Iterator<String> {
 				String[] pageVal = m.group(0).split("=");
 				pagination = Integer.parseInt(pageVal[1]);
 
-				// remove page start number from queryParams
+				// remove page start number from query and queryParams
+				queryParams = queryParams.replaceFirst("&?paginationStart=[0-9]+", "");
 				query = query.replaceFirst("&?paginationStart=[0-9]+", "");
 
 			}
