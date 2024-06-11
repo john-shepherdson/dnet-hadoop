@@ -432,7 +432,10 @@ public class MergeUtils {
 
 		// merge datainfo for same context id
 		merge.setContext(mergeLists(merge.getContext(), enrich.getContext(), trust, Context::getId, (r, l) -> {
-			r.getDataInfo().addAll(l.getDataInfo());
+			ArrayList<DataInfo> di = new ArrayList<>();
+			di.addAll(r.getDataInfo());
+			di.addAll(l.getDataInfo());
+			r.setDataInfo(di);
 			return r;
 		}));
 

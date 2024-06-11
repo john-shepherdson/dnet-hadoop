@@ -119,7 +119,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 							.getContext()
 							.stream()
 							.filter(c -> !StringUtils.startsWith(c.getId().toLowerCase(), contextId))
-							.collect(Collectors.toList()));
+							.collect(Collectors.toCollection(ArrayList::new)));
 			}
 			return (T) res;
 		} else {
