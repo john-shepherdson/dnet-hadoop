@@ -176,13 +176,13 @@ public class XmlSerializationUtils {
 		StringBuilder sb = new StringBuilder();
 		for (KeyValue kv : measure.getUnit()) {
 			sb
-					.append("<")
-					.append(name)
-					.append(" ")
-					.append(attr("id", measure.getId()))
-					.append(attr("count", kv.getValue()))
-					.append(attr("datasource", kv.getKey()))
-					.append(" />");
+				.append("<")
+				.append(name)
+				.append(" ")
+				.append(attr("id", measure.getId()))
+				.append(attr("count", kv.getValue()))
+				.append(attr("datasource", kv.getKey()))
+				.append(" />");
 		}
 		return sb.toString();
 	}
