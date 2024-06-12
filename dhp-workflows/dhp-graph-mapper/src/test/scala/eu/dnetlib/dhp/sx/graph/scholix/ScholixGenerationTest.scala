@@ -16,7 +16,7 @@ class ScholixGenerationTest {
     val app = new SparkCreateScholexplorerDump(null, null, null)
 
     val basePath = "/Users/sandro/Downloads"
-   app.generateScholixResource(s"$basePath/scholix_sample/", s"$basePath/scholix/", spark)
+    app.generateScholixResource(s"$basePath/scholix_sample/", s"$basePath/scholix/", spark)
     app.generateBidirectionalRelations(
       s"$basePath/scholix_sample/",
       s"$basePath/scholix/",
