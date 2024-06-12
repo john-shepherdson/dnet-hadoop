@@ -176,19 +176,6 @@ public class RestIterator implements Iterator<String> {
 	 */
 	@Override
 	public boolean hasNext() {
-		if (this.recordQueue.isEmpty() && this.query.isEmpty()) {
-			disconnect();
-			return false;
-		}
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Iterator#next()
-	 */
-	@Override
-	public String next() {
 		synchronized (this.recordQueue) {
 			while (this.recordQueue.isEmpty() && !this.query.isEmpty()) {
 				try {
@@ -198,6 +185,23 @@ public class RestIterator implements Iterator<String> {
 					throw new RuntimeException(e);
 				}
 			}
+
+			if (!this.recordQueue.isEmpty()) {
+				return true;
+			}
+
+			disconnect();
+			return false;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.util.Iterator#next()
+	 */
+	@Override
+	public String next() {
+		synchronized (this.recordQueue) {
 			return this.recordQueue.poll();
 		}
 	}
