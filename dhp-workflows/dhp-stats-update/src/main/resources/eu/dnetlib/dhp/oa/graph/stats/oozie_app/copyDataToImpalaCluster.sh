@@ -57,20 +57,20 @@ function print_elapsed_time()
   hours=$((elapsed_time / 3600))
   minutes=$(((elapsed_time % 3600) / 60))
   seconds=$((elapsed_time % 60))
-  printf "\nElapsed time: %02d:%02d:%02d\n\n" $hours $minutes $seconds
+  printf "%02d:%02d:%02d" $hours $minutes $seconds
 }
 
 
 function copydb() {
   db=$1
-  start_db_time=$(date +%s)
   echo -e "\nStart processing db: '${db}'..\n"
+  start_db_time=$(date +%s)
 
   # Delete the old DB from Impala cluster (if exists).
   impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "drop database if exists ${db} cascade" |& tee error.log # impala-shell prints all logs in stderr, so wee need to capture them and put them in a file, in order to perform "grep" on them later
   log_errors=`cat error.log | grep -E "WARN|ERROR|FAILED"`
   if [ -n "$log_errors" ]; then
-    echo -e "\n\nERROR: THERE WAS A PROBLEM WHEN DROPPING THE OLD DATABASE! EXITING...\n\n"
+    echo -e "\n\nERROR: THERE WAS A PROBLEM WHEN DROPPING THE OLD DATABASE FROM IMPALA CLUSTER! EXITING...\n\n"
     rm -f error.log
     if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
       exit 2
@@ -80,6 +80,7 @@ function copydb() {
   fi
 
   echo -e "\n\nCopying files of '${db}', from Ocean to Impala cluster..\n"
+  start_file_transfer_time=$(date +%s)
   # Using max-bandwidth of: 70 * 150 Mb/s = 10.5 Gb/s
   # Using max memory of: 70 * 6144 = 430 Gb
   # Using 1MB as a buffer-size.
@@ -95,7 +96,7 @@ function copydb() {
                 ${OCEAN_HDFS_NODE}/user/hive/warehouse/${db}.db ${IMPALA_HDFS_DB_BASE_PATH}
 
   if [ $? -eq 0 ]; then # Check the exit status of the "hadoop distcp" command.
-    echo -e "\nSuccessfully copied the files of '${db}' from Ocean to Impala cluster.\n"
+    echo -e "\nSuccessfully copied the files of '${db}' from Ocean to Impala cluster, after: $(print_elapsed_time start_file_transfer_time)\n"
   else
     echo -e "\n\nERROR: FAILED TO TRANSFER THE FILES OF '${db}', WITH 'hadoop distcp'. GOT EXIT STATUS: $?\n\n"
     rm -f error.log
@@ -120,6 +121,7 @@ function copydb() {
   fi
 
   echo -e "\nCreating schema for db: '${db}'\n"
+  start_create_schema_time=$(date +%s)
 
   # create the new database (with the same name)
   impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "create database ${db}"
@@ -130,7 +132,8 @@ function copydb() {
   all_create_view_statements=()
   num_tables=0
 
-  entities_on_ocean=`hive -e "show tables in ${db};" | sed 's/WARN:.*//g'`  # Get the tables and views without any potential the "WARN" logs.
+  entities_on_ocean=(`hive -e "show tables in ${db};" | sed 's/WARN:.*//g'`)  # Get the tables and views without any potential the "WARN" logs.
+  echo -e "\nGoing to create ${#entities_on_ocean[@]} entities for db '${db}'..\n"
   for i in ${entities_on_ocean[@]}; do # Use un-quoted values, as the elements are single-words.
     # Check if this is a view by showing the create-statement where it should print "create view" for a view, not the "create table". Unfortunately, there is no "show views" command.
     create_entity_statement=`hive --database ${db} -e "show create table ${i};"`  # We need to use the "--database", instead of including it inside the query, in order to return the statements with the '`' chars being in the right place to be used by impala-shell. However, we need to add the db-name in the "CREATE VIEW view_name" statement.
@@ -154,8 +157,9 @@ function copydb() {
         if [ -n "$log_errors" ]; then
           echo -e "\n\nERROR: THERE WAS A PROBLEM WHEN CREATING TABLE '${i}'!\n\n"
           if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
+            rm -f error.log
             exit 6
-          fi
+          fi  # This error is not FATAL, do we do not return from this function, in normal circumstances.
         fi
       fi
     fi
@@ -210,8 +214,11 @@ function copydb() {
     previous_num_of_views_to_retry=$new_num_of_views_to_retry
   done
 
+  entities_on_impala=(`impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} --delimited -q "show tables in ${db}"`)
+  echo -e "\nThe schema of db '${db}', along with ${#entities_on_impala[@]} entities have been created, on Impala cluster, after: $(print_elapsed_time start_create_schema_time)\n"
+
+  start_compute_stats_time=$(date +%s)
   echo -e "\nComputing stats for tables..\n"
-  entities_on_impala=`impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} --delimited -q "show tables in ${db}"`
   for i in ${entities_on_impala[@]}; do # Use un-quoted values, as the elemetns are single-words.
     # Taking the create table statement from the Ocean cluster, just to check if its a view, as the output is easier than using impala-shell from Impala cluster.
     create_view_statement=`hive -e "show create table ${db}.${i};" | grep "CREATE VIEW"`  # This grep works here, as we do not want to match multiple-lines.
@@ -223,20 +230,18 @@ function copydb() {
     fi
   done
 
+  echo -e "\nFinished computing stats for tables, after: $(print_elapsed_time start_compute_stats_time)\n"
+  rm -f error.log # Cleanup the temp log-file.
+
   # Check if the entities in both clusters are the same, down to the exact names, not just the counts. (they are sorted in the same way both in hive and impala)
-  if [ "${entities_on_impala[@]}" == "${entities_on_ocean[@]}" ]; then
-    echo -e "\nAll entities have been copied to Impala cluster.\n"
+  if [[ "${entities_on_impala[@]}" == "${entities_on_ocean[@]}" ]]; then
+    echo -e "\nAll entities have been copied to Impala cluster.\n\nFinished processing db: '${db}', after: $(print_elapsed_time start_db_time)\n"
   else
-    echo -e "\n\nERROR: 1 OR MORE ENTITIES OF DB '${db}' FAILED TO BE COPIED TO IMPALA CLUSTER!\n\n"
-    rm -f error.log
+    echo -e "\n\nERROR: $((${#entities_on_ocean[@]} - ${#entities_on_impala[@]})) ENTITIES OF DB '${db}' FAILED TO BE COPIED TO IMPALA CLUSTER!\n\n\nFinished processing db: '${db}', after: $(print_elapsed_time start_db_time)\n"
     if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
       exit 8
     fi
   fi
-
-  rm -f error.log
-  echo -e "\n\nFinished processing db: ${db}\n"
-  print_elapsed_time start_db_time
 }
 
 STATS_DB=$1
