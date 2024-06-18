@@ -14,7 +14,7 @@
         </property>
     </parameters>
 
-    <start to="DropAndCreateIndex"/>
+    <start to="indexSummary"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
@@ -42,7 +42,7 @@
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
-                --conf spark.dynamicAllocation.maxExecutors="8"
+                --conf spark.dynamicAllocation.maxExecutors="16"
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -50,10 +50,10 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--master</arg><arg>yarn</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}/summaries_json</arg>
-            <arg>--index</arg><arg>${index}_object</arg>
+            <arg>--sourcePath</arg><arg>/user/sandro.labruzzo/scholix_new/summary_json</arg>
+            <arg>--index</arg><arg>summary</arg>
             <arg>--idPath</arg><arg>id</arg>
-            <arg>--cluster</arg><arg>${esCluster}</arg>
+            <arg>--cluster</arg><arg>cluster1</arg>
         </spark>
         <ok to="indexScholix"/>
         <error to="Kill"/>
@@ -68,7 +68,7 @@
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
-                --conf spark.dynamicAllocation.maxExecutors="8"
+                --conf spark.dynamicAllocation.maxExecutors="48"
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -76,10 +76,10 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
             <arg>--master</arg><arg>yarn</arg>
-            <arg>--sourcePath</arg><arg>${sourcePath}/scholix_json</arg>
-            <arg>--index</arg><arg>${index}_scholix</arg>
+            <arg>--sourcePath</arg><arg>/user/sandro.labruzzo/scholix_new/scholix</arg>
+            <arg>--index</arg><arg>scholix</arg>
             <arg>--idPath</arg><arg>identifier</arg>
-            <arg>--cluster</arg><arg>${esCluster}</arg>
+            <arg>--cluster</arg><arg>cluster1</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

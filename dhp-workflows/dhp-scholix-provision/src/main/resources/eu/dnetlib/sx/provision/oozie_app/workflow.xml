@@ -1,0 +1,62 @@
+<workflow-app name="Index Scholexplorer Infospace" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the sourcePath of the json RDDs</description>
+        </property>
+        <property>
+            <name>esCluster</name>
+            <description>the Index cluster</description>
+        </property>
+    </parameters>
+
+    <start to="indexSummary"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="DropAndCreateIndex">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.dhp.sx.provision.DropAndCreateESIndex</main-class>
+            <arg>-i</arg><arg>${index}</arg>
+            <arg>-c</arg><arg>${esCluster}</arg>
+        </java>
+        <ok to="indexSummary"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="indexSummary">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.sx.index.feeder.IndexFeed</main-class>
+            <arg>-namenode</arg><arg>${nameNode}</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/summary_json</arg>
+            <arg>--cluster</arg><arg>${esCluster}</arg>
+            <arg>--index</arg><arg>summary</arg>
+        </java>
+        <ok to="indexScholix"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="indexScholix">
+        <java>
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <main-class>eu.dnetlib.sx.index.feeder.IndexFeed</main-class>
+            <arg>-namenode</arg><arg>${nameNode}</arg>
+            <arg>--sourcePath</arg><arg>${sourcePath}/scholix</arg>
+            <arg>--cluster</arg><arg>${esCluster}</arg>
+            <arg>--index</arg><arg>scholix</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <end name="End"/>
+</workflow-app>

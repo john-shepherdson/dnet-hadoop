@@ -1,0 +1,27 @@
+[
+  {
+    "paramName": "n",
+    "paramLongName": "namenode",
+    "paramDescription": "the name node param",
+    "paramRequired": true
+  },
+  {
+    "paramName": "s",
+    "paramLongName": "sourcePath",
+    "paramDescription": "The source Path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "c",
+    "paramLongName": "cluster",
+    "paramDescription": "The cluster name",
+    "paramRequired": true
+  },
+  {
+    "paramName": "i",
+    "paramLongName": "index",
+    "paramDescription": "The index name",
+    "paramRequired": true
+  }
+
+]
