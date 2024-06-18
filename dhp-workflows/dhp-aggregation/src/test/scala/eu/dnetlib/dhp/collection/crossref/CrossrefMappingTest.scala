@@ -2,7 +2,9 @@ package eu.dnetlib.dhp.collection.crossref
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest
-import org.junit.jupiter.api.BeforeEach
+import eu.dnetlib.dhp.collection.crossref.Crossref2Oaf.TransformationType
+import org.apache.commons.io.IOUtils
+import org.junit.jupiter.api.{BeforeEach, Test}
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.junit.jupiter.MockitoExtension
 import org.slf4j.{Logger, LoggerFactory}
@@ -16,6 +18,15 @@ class CrossrefMappingTest extends AbstractVocabularyTest {
   @BeforeEach
   def setUp(): Unit = {
     super.setUpVocabulary()
+  }
+
+  @Test
+  def mappingRecord(): Unit = {
+    val input =
+      IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/collection/crossref/issn_pub.json"), "utf-8")
+
+    println(Crossref2Oaf.convert(input, vocabularies, TransformationType.All))
+
   }
 
 }

@@ -15,4 +15,4 @@ public class Capitalise implements Function<String, String> {
 	public String apply(final String s) {
 		return WordUtils.capitalize(s.toLowerCase(), DELIM);
 	}
-};
+}

@@ -78,7 +78,7 @@ public class IdGeneratorTest {
 		System.out.println("winner 3 = " + id2);
 
 		assertEquals("50|doi_dedup___::1a77a3bba737f8b669dcf330ad3b37e2", id1);
-		assertEquals("50|dedup_wf_001::0829b5191605bdbea36d6502b8c1ce1g", id2);
+		assertEquals("50|dedup_wf_002::345e5d1b80537b0d0e0a49241ae9e516", id2);
 	}
 
 	@Test

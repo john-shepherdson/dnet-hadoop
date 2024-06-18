@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.wcohen.ss.JaroWinkler;
 
 import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.pace.model.Person;
 import scala.Tuple2;
@@ -146,10 +147,20 @@ public class AuthorMerger {
 	}
 
 	public static String pidToComparableString(StructuredProperty pid) {
-		final String classid = pid.getQualifier().getClassid() != null ? pid.getQualifier().getClassid().toLowerCase()
-			: "";
-		return (pid.getQualifier() != null ? classid : "")
-			+ (pid.getValue() != null ? pid.getValue().toLowerCase() : "");
+		final String classId = Optional
+			.ofNullable(pid)
+			.map(
+				p -> Optional
+					.ofNullable(p.getQualifier())
+					.map(Qualifier::getClassid)
+					.map(String::toLowerCase)
+					.orElse(""))
+			.orElse("");
+		return Optional
+			.ofNullable(pid)
+			.map(StructuredProperty::getValue)
+			.map(v -> String.join("|", v, classId))
+			.orElse("");
 	}
 
 	public static int countAuthorsPids(List<Author> authors) {
