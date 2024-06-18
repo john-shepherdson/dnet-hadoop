@@ -22,7 +22,9 @@ import eu.dnetlib.dhp.oa.dedup.model.OrgSimRel;
 import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.Field;
 import eu.dnetlib.dhp.schema.oaf.Organization;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -164,12 +166,12 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 			.map(
 				(MapFunction<Tuple2<Tuple2<String, Organization>, Tuple2<String, String>>, OrgSimRel>) r -> new OrgSimRel(
 					"",
-					r._1()._2().getOriginalId().get(0),
-					r._1()._2().getLegalname() != null ? r._1()._2().getLegalname().getValue() : "",
-					r._1()._2().getLegalshortname() != null ? r._1()._2().getLegalshortname().getValue() : "",
-					r._1()._2().getCountry() != null ? r._1()._2().getCountry().getClassid() : "",
-					r._1()._2().getWebsiteurl() != null ? r._1()._2().getWebsiteurl().getValue() : "",
-					r._1()._2().getCollectedfrom().get(0).getValue(),
+					Optional.ofNullable(r._1()._2().getOriginalId()).map(oid -> oid.get(0)).orElse(null),
+					Optional.ofNullable(r._1()._2().getLegalname()).map(Field::getValue).orElse(""),
+					Optional.ofNullable(r._1()._2().getLegalshortname()).map(Field::getValue).orElse(""),
+					Optional.ofNullable(r._1()._2().getCountry()).map(Qualifier::getClassid).orElse(""),
+					Optional.ofNullable(r._1()._2().getWebsiteurl()).map(Field::getValue).orElse(""),
+					Optional.ofNullable(r._1()._2().getCollectedfrom()).map(cf -> cf.get(0).getValue()).orElse(null),
 					"",
 					structuredPropertyListToString(r._1()._2().getPid()),
 					parseECField(r._1()._2().getEclegalbody()),

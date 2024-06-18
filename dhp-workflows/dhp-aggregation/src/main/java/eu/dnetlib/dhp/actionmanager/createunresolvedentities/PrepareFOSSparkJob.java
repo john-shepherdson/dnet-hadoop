@@ -80,9 +80,11 @@ public class PrepareFOSSparkJob implements Serializable {
 
 		fosDataset
 			.groupByKey((MapFunction<FOSDataModel, String>) v -> v.getOaid().toLowerCase(), Encoders.STRING())
-			.mapGroups((MapGroupsFunction<String, FOSDataModel, Result>) (k, it) -> {
-				return getResult(ModelSupport.getIdPrefix(Result.class) + "|" + k, it);
-			}, Encoders.bean(Result.class))
+			.mapGroups(
+				(MapGroupsFunction<String, FOSDataModel, Result>) (k,
+					it) -> getResult(
+						ModelSupport.entityIdPrefix.get(Result.class.getSimpleName().toLowerCase()) + "|" + k, it),
+				Encoders.bean(Result.class))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
@@ -113,19 +115,7 @@ public class PrepareFOSSparkJob implements Serializable {
 			.forEach(
 				l -> add(sbjs, getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID, true)));
 		r.setSubject(sbjs);
-		r
-			.setDataInfo(
-				OafMapperUtils
-					.dataInfo(
-						false, null, true,
-						false,
-						OafMapperUtils
-							.qualifier(
-								ModelConstants.PROVENANCE_ENRICH,
-								null,
-								ModelConstants.DNET_PROVENANCE_ACTIONS,
-								ModelConstants.DNET_PROVENANCE_ACTIONS),
-						null));
+
 		return r;
 	}
 

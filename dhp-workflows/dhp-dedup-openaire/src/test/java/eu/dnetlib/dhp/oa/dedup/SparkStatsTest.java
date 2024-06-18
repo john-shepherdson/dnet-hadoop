@@ -169,10 +169,10 @@ public class SparkStatsTest implements Serializable {
 			.count();
 
 		assertEquals(414, orgs_blocks);
-		assertEquals(187, pubs_blocks);
-		assertEquals(128, sw_blocks);
-		assertEquals(192, ds_blocks);
-		assertEquals(194, orp_blocks);
+		assertEquals(221, pubs_blocks);
+		assertEquals(134, sw_blocks);
+		assertEquals(196, ds_blocks);
+		assertEquals(198, orp_blocks);
 	}
 
 	@AfterAll

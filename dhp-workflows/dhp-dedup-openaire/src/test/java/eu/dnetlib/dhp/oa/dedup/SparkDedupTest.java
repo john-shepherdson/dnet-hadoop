@@ -258,7 +258,6 @@ public class SparkDedupTest implements Serializable {
 			assertEquals(115, sw_simrel.count());
 		}
 
-
 		// check if the first relation in the whitelist exists
 		assertTrue(
 			sw_simrel

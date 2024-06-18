@@ -38,7 +38,7 @@ public class PacePerson {
 					PacePerson.class
 						.getResourceAsStream(
 							"/eu/dnetlib/dhp/common/name_particles.txt")));
-		} catch (IOException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}

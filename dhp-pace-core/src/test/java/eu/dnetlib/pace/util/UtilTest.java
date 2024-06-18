@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.pace.model.Person;
@@ -22,7 +23,7 @@ public class UtilTest {
 	}
 
 	@Test
-	@Ignore
+	@Disabled
 	public void paceResolverTest() {
 		PaceResolver paceResolver = new PaceResolver();
 		paceResolver.getComparator("keywordMatch", params);

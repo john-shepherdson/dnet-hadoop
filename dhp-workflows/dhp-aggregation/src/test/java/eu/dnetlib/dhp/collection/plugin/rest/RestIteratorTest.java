@@ -44,7 +44,7 @@ public class RestIteratorTest {
 
 		final RestIterator iterator = new RestIterator(clientParams, baseUrl, resumptionType, resumptionParam,
 			resumptionXpath, resultTotalXpath, resultFormatParam, resultFormatValue, resultSizeParam, resultSizeValue,
-			query, entityXpath, authMethod, authToken, resultOffsetParam);
+			query, entityXpath, authMethod, authToken, resultOffsetParam, null);
 		int i = 20;
 		while (iterator.hasNext() && i > 0) {
 			String result = iterator.next();

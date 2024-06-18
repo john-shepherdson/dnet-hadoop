@@ -1,7 +1,9 @@
+
 package eu.dnetlib.dhp.collection.plugin.rest;
 
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Assertions;
@@ -34,11 +36,11 @@ public class OsfPreprintCollectorTest {
 	private final String resultTotalXpath = "/*/*[local-name()='links']/*[local-name()='meta']/*[local-name()='total']";
 
 	private final String resumptionParam = "page";
-	private final String resumptionType = "page";
-	private final String resumptionXpath = "/*/*[local-name()='links']/*[local-name()='next']";
+	private final String resumptionType = "scan";
+	private final String resumptionXpath = "substring-before(substring-after(/*/*[local-name()='links']/*[local-name()='next'], 'page='), '&')";
 
-	private final String resultSizeParam = "";
-	private final String resultSizeValue = "";
+	private final String resultSizeParam = "page[size]";
+	private final String resultSizeValue = "100";
 
 	private final String resultFormatParam = "format";
 	private final String resultFormatValue = "json";
@@ -68,11 +70,11 @@ public class OsfPreprintCollectorTest {
 
 	@Test
 	@Disabled
-	void test() throws CollectorException {
+	void test_limited() throws CollectorException {
 		final AtomicInteger i = new AtomicInteger(0);
 		final Stream<String> stream = this.rcp.collect(this.api, new AggregatorReport());
 
-		stream.limit(200).forEach(s -> {
+		stream.limit(2000).forEach(s -> {
 			Assertions.assertTrue(s.length() > 0);
 			i.incrementAndGet();
 			log.info(s);
@@ -81,4 +83,23 @@ public class OsfPreprintCollectorTest {
 		log.info("{}", i.intValue());
 		Assertions.assertTrue(i.intValue() > 0);
 	}
+
+	@Test
+	@Disabled
+	void test_all() throws CollectorException {
+		final AtomicLong i = new AtomicLong(0);
+		final Stream<String> stream = this.rcp.collect(this.api, new AggregatorReport());
+
+		stream.forEach(s -> {
+			Assertions.assertTrue(s.length() > 0);
+			if ((i.incrementAndGet() % 1000) == 0) {
+				log.info("COLLECTED: {}", i.get());
+			}
+
+		});
+
+		log.info("TOTAL: {}", i.get());
+		Assertions.assertTrue(i.get() > 0);
+	}
+
 }

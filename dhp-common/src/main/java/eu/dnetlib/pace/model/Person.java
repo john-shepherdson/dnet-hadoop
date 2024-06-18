@@ -12,7 +12,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.hash.Hashing;
 
-import eu.dnetlib.pace.common.AbstractPaceFunctions;
+import eu.dnetlib.pace.common.PaceCommonUtils;
 import eu.dnetlib.pace.util.Capitalise;
 import eu.dnetlib.pace.util.DotAbbreviations;
 
@@ -86,7 +86,7 @@ public class Person {
 
 	private List<String> splitTerms(final String s) {
 		if (particles == null) {
-			particles = AbstractPaceFunctions.loadFromClasspath("/eu/dnetlib/pace/config/name_particles.txt");
+			particles = PaceCommonUtils.loadFromClasspath("/eu/dnetlib/pace/config/name_particles.txt");
 		}
 
 		final List<String> list = Lists.newArrayList();

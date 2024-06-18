@@ -1025,6 +1025,7 @@ case object Crossref2Oaf {
             tp._1 match {
               case "electronic" => journal.setIssnOnline(tp._2)
               case "print"      => journal.setIssnPrinted(tp._2)
+              case _            =>
             }
           })
         }

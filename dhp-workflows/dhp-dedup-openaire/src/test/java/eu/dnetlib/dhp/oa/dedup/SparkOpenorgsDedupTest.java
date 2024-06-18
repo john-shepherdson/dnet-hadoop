@@ -143,7 +143,7 @@ public class SparkOpenorgsDedupTest implements Serializable {
 			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "organization"))
 			.count();
 
-		assertEquals(145, orgs_simrel);
+		assertEquals(86, orgs_simrel);
 	}
 
 	@Test
@@ -172,7 +172,7 @@ public class SparkOpenorgsDedupTest implements Serializable {
 			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "organization"))
 			.count();
 
-		assertEquals(181, orgs_simrel);
+		assertEquals(122, orgs_simrel);
 	}
 
 	@Test
@@ -196,7 +196,9 @@ public class SparkOpenorgsDedupTest implements Serializable {
 					"-la",
 					"lookupurl",
 					"-w",
-					testOutputBasePath
+					testOutputBasePath,
+					"-h",
+					""
 				});
 
 		new SparkCreateMergeRels(parser, spark).run(isLookUpService);

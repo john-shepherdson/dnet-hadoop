@@ -161,7 +161,7 @@ public class SparkResultToCommunityFromProject implements Serializable {
 					}
 				}
 				res.setContext(propagatedContexts);
-				return MergeUtils.checkedMerge(ret, res);
+				return MergeUtils.checkedMerge(ret, res, true);
 			}
 			return ret;
 		};
