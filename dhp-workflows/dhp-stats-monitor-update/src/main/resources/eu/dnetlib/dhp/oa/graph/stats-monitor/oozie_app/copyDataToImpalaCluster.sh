@@ -32,9 +32,7 @@ while [ $COUNTER -lt 3 ]; do
 done
 if [ -z "$IMPALA_HDFS_NODE" ]; then
     echo -e "\n\nERROR: PROBLEM WHEN SETTING THE HDFS-NODE FOR IMPALA CLUSTER! | AFTER ${COUNTER} RETRIES.\n\n"
-    if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
-      exit 1
-    fi
+    exit 1  # This is fatal and we have to exit independently of the "SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR" config, as none of the DBs will be able to get transferred.
 fi
 echo -e "Active IMPALA HDFS Node: ${IMPALA_HDFS_NODE} , after ${COUNTER} retries.\n\n"
 
@@ -148,7 +146,7 @@ function copydb() {
           echo -e "\nERROR: THE TABLE \"${i}\" HAD NO FILES TO GET THE SCHEMA FROM! IT'S EMPTY!\n\n"
           if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
             exit 5
-          fi
+          fi  # This error is not FATAL, do we do not return from this function, in normal circumstances.
       else
         impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "create table ${db}.${i} like parquet '${CURRENT_PRQ_FILE}' stored as parquet;" |& tee error.log
         log_errors=`cat error.log | grep -E "WARN|ERROR|FAILED"`
@@ -188,7 +186,7 @@ function copydb() {
       specific_errors=`cat error.log | grep -E "FAILED: ParseException line 1:13 missing TABLE at 'view'|ERROR: AnalysisException: Could not resolve table reference:"`
       if [ -n "$specific_errors" ]; then
         echo -e "\nspecific_errors: ${specific_errors}\n"
-        echo -e "\nView '$(cat error.log | grep -Eo "Query: CREATE VIEW ([^\s]+)" | sed 's/Query: CREATE VIEW //g')' failed to be created, possibly because it depends on another view.\n"
+        echo -e "\nView '$(cat error.log | grep -Po "Query: CREATE VIEW ([^\s]+)" | sed 's/Query: CREATE VIEW //g')' failed to be created, possibly because it depends on another view.\n"
         ((new_num_of_views_to_retry++)) # Increment it here, instead of acquiring the array's size in the end, as that doesn't work for some reason.
       else
           all_create_view_statements=("${all_create_view_statements[@]/$create_view_statement}")  # Remove the current successful statement from the list.
@@ -200,9 +198,11 @@ function copydb() {
     # Although the above command reduces the "active" elements to just the few to-be-retried, it does not manage to make the array return the its true size through the "${#all_create_view_statements[@]}" statement. So we use counters.
 
     if [[ $new_num_of_views_to_retry -eq $previous_num_of_views_to_retry ]]; then
-      echo -e "\n\nERROR: THE NUMBER OF VIEWS TO RETRY HAS NOT BEEN REDUCED! THE SCRIPT IS LIKELY GOING TO AN INFINITE-LOOP! EXITING..\n\n"
+      echo -e "\n\nERROR: THE NUMBER OF VIEWS TO RETRY HAS NOT BEEN REDUCED! THE SCRIPT IS LIKELY GOING TO AN INFINITE-LOOP! BREAKING-OUT..\n\n"
       if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
         exit 7
+      else
+        break # Break form the inf-loop of views and continue by computing stats for the tables.
       fi
     elif [[ $new_num_of_views_to_retry -gt 0 ]]; then
       echo -e "\nTo be retried \"create_view_statements\" (${new_num_of_views_to_retry}):\n\n${all_create_view_statements[@]}\n"
@@ -224,7 +224,15 @@ function copydb() {
       # Invalidate metadata of this DB's tables, in order for Impala to be aware of all parquet files put inside the tables' directories, previously, by "hadoop distcp".
       impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "INVALIDATE METADATA ${db}.${i}"
       sleep 1
-      impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "compute stats ${db}.${i}";
+      impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "compute stats ${db}.${i}" |& tee error.log
+      log_errors=`cat error.log | grep -E "WARN|ERROR|FAILED"`
+      if [ -n "$log_errors" ]; then
+        echo -e "\n\nERROR: THERE WAS A PROBLEM WHEN COMPUTING STATS FOR TABLE '${i}'!\n\n"
+        if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
+          rm -f error.log
+          exit 8
+        fi  # This error is not FATAL, do we do not return from this function, in normal circumstances.
+      fi
     fi
   done
 
@@ -237,7 +245,7 @@ function copydb() {
   else
     echo -e "\n\nERROR: $((${#entities_on_ocean[@]} - ${#entities_on_impala[@]})) ENTITIES OF DB '${db}' FAILED TO BE COPIED TO IMPALA CLUSTER!\n\n\nFinished processing db: '${db}', after: $(print_elapsed_time start_db_time)\n"
     if [[ SHOULD_EXIT_WHOLE_SCRIPT_UPON_ERROR -eq 1 ]]; then
-      exit 8
+      exit 9
     fi
   fi
 }
