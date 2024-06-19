@@ -1,13 +1,9 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
-import static eu.dnetlib.dhp.schema.common.ModelConstants.CROSSREF_ID;
-
 import java.util.*;
-import java.util.stream.Collectors;
 
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Result;
@@ -42,17 +38,23 @@ public class MergeEntitiesComparator implements Comparator<Oaf> {
 		int res = 0;
 
 		// pid authority
-		int cfp1 = left
-			.getCollectedfrom()
-			.stream()
-			.map(kv -> PID_AUTHORITIES.indexOf(kv.getKey()))
-			.max(Integer::compare)
+		int cfp1 = Optional
+			.ofNullable(left.getCollectedfrom())
+			.map(
+				cf -> cf
+					.stream()
+					.map(kv -> PID_AUTHORITIES.indexOf(kv.getKey()))
+					.max(Integer::compare)
+					.orElse(-1))
 			.orElse(-1);
-		int cfp2 = right
-			.getCollectedfrom()
-			.stream()
-			.map(kv -> PID_AUTHORITIES.indexOf(kv.getKey()))
-			.max(Integer::compare)
+		int cfp2 = Optional
+			.ofNullable(right.getCollectedfrom())
+			.map(
+				cf -> cf
+					.stream()
+					.map(kv -> PID_AUTHORITIES.indexOf(kv.getKey()))
+					.max(Integer::compare)
+					.orElse(-1))
 			.orElse(-1);
 
 		if (cfp1 >= 0 && cfp1 > cfp2) {

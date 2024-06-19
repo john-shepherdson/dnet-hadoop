@@ -176,19 +176,6 @@ public class RestIterator implements Iterator<String> {
 	 */
 	@Override
 	public boolean hasNext() {
-		if (this.recordQueue.isEmpty() && this.query.isEmpty()) {
-			disconnect();
-			return false;
-		}
-		return true;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see java.util.Iterator#next()
-	 */
-	@Override
-	public String next() {
 		synchronized (this.recordQueue) {
 			while (this.recordQueue.isEmpty() && !this.query.isEmpty()) {
 				try {
@@ -198,6 +185,23 @@ public class RestIterator implements Iterator<String> {
 					throw new RuntimeException(e);
 				}
 			}
+
+			if (!this.recordQueue.isEmpty()) {
+				return true;
+			}
+
+			disconnect();
+			return false;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see java.util.Iterator#next()
+	 */
+	@Override
+	public String next() {
+		synchronized (this.recordQueue) {
 			return this.recordQueue.poll();
 		}
 	}
@@ -249,7 +253,8 @@ public class RestIterator implements Iterator<String> {
 				String[] pageVal = m.group(0).split("=");
 				pagination = Integer.parseInt(pageVal[1]);
 
-				// remove page start number from queryParams
+				// remove page start number from query and queryParams
+				queryParams = queryParams.replaceFirst("&?paginationStart=[0-9]+", "");
 				query = query.replaceFirst("&?paginationStart=[0-9]+", "");
 
 			}
