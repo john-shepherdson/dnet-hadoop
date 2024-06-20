@@ -110,6 +110,14 @@
             <name>sparkNetworkTimeout</name>
             <description>configures spark.network.timeout</description>
         </property>
+        <property>
+            <name>publicFormat</name>
+            <description>the public metadata format - used to create the public collection alias</description>
+        </property>
+        <property>
+            <name>shadowFormat</name>
+            <description>the shadow metadata format - used to create the shadow collection alias</description>
+        </property>
     </parameters>
 
     <global>
@@ -133,6 +141,7 @@
             <case to="create_payloads">${wf:conf('resumeFrom') eq 'create_payloads'}</case>
             <case to="drop_solr_collection">${wf:conf('resumeFrom') eq 'drop_solr_collection'}</case>
             <case to="to_solr_index">${wf:conf('resumeFrom') eq 'to_solr_index'}</case>
+            <case to="update_solr_aliases">${wf:conf('resumeFrom') eq 'update_solr_aliases'}</case>
             <default to="prepare_relations"/>
         </switch>
     </decision>
@@ -717,6 +726,26 @@
             <arg>--format</arg><arg>${format}</arg>
             <arg>--outputPath</arg><arg>${workingDir}/solr_documents</arg>
         </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <!-- Action that updates the solr core aliases - out of order execution, only using the 'resume_from' param -->
+    <action name="update_solr_aliases">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.oa.provision.SolrAdminApplication</main-class>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--format</arg><arg>${format}</arg>
+            <arg>--action</arg><arg>UPDATE_ALIASES</arg>
+            <arg>--publicFormat</arg><arg>${publicFormat}</arg>
+            <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>
+        </java>
         <ok to="End"/>
         <error to="Kill"/>
     </action>

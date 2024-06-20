@@ -28,5 +28,18 @@
     "paramLongName": "commit",
     "paramDescription": "should the action be followed by a commit?",
     "paramRequired": false
+  },
+  {
+    "paramName": "pf",
+    "paramLongName": "publicFormat",
+    "paramDescription": "the name of the public metadata format profile - used to create an alias",
+    "paramRequired": false
+  },
+  {
+    "paramName": "sf",
+    "paramLongName": "shadowFormat",
+    "paramDescription": "the name of the shadow metadata format profile - used to create an alias",
+    "paramRequired": false
   }
+
 ]
