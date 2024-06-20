@@ -5,11 +5,11 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.solr.Measure;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.base.Splitter;
@@ -77,6 +77,7 @@ public class ProvisionModelSupport {
 		r.setCollectedfrom(asProvenance(e.getCollectedfrom()));
 		r.setContext(asContext(e.getContext(), contextMapper));
 		r.setPid(asPid(e.getPid()));
+		r.setMeasures(mapMeasures(e.getMeasures()));
 
 		if (e instanceof eu.dnetlib.dhp.schema.oaf.Result) {
 			r.setResult(mapResult((eu.dnetlib.dhp.schema.oaf.Result) e));
@@ -107,6 +108,13 @@ public class ProvisionModelSupport {
 		final RelatedEntity re = rew.getTarget();
 		final RecordType relatedRecordType = RecordType.valueOf(re.getType());
 		final Relation relation = rew.getRelation();
+		final String relationProvenance = Optional
+				.ofNullable(relation.getDataInfo())
+				.map(d -> Optional
+						.ofNullable(d.getProvenanceaction())
+						.map(Qualifier::getClassid)
+						.orElse(null))
+				.orElse(null);
 		rr
 			.setHeader(
 				RelatedRecordHeader
@@ -115,9 +123,8 @@ public class ProvisionModelSupport {
 						relation.getRelClass(),
 						StringUtils.substringAfter(relation.getTarget(), IdentifierFactory.ID_PREFIX_SEPARATOR),
 						relatedRecordType,
-						Optional.ofNullable(relation.getDataInfo())
-								.map(d -> Optional.ofNullable(d.getProvenanceaction())
-										.map(Qualifier::getClassid).orElse(null)).orElse(null)));
+						relationProvenance,
+						Optional.ofNullable(relation.getDataInfo()).map(DataInfo::getTrust).orElse(null)));
 
 		rr.setAcronym(re.getAcronym());
 		rr.setCode(re.getCode());
@@ -135,6 +142,7 @@ public class ProvisionModelSupport {
 		rr.setOfficialname(re.getOfficialname());
 		rr.setOpenairecompatibility(mapCodeLabel(re.getOpenairecompatibility()));
 		rr.setPid(asPid(re.getPid()));
+		rr.setWebsiteurl(re.getWebsiteurl());
 		rr.setProjectTitle(re.getProjectTitle());
 		rr.setPublisher(re.getPublisher());
 		rr.setResulttype(mapQualifier(re.getResulttype()));
@@ -277,6 +285,7 @@ public class ProvisionModelSupport {
 		ds.setOfficialname(mapField(d.getOfficialname()));
 		ds.setDescription(mapField(d.getDescription()));
 		ds.setJournal(mapJournal(d.getJournal()));
+		ds.setWebsiteurl(mapField(d.getWebsiteurl()));
 		ds.setLogourl(mapField(d.getLogourl()));
 		ds.setAccessinfopackage(mapFieldList(d.getAccessinfopackage()));
 		ds.setCertificates(mapField(d.getCertificates()));
@@ -322,6 +331,7 @@ public class ProvisionModelSupport {
 		ds.setSubjects(asSubjectSP(d.getSubjects()));
 		ds.setSubmissionpolicyurl(d.getSubmissionpolicyurl());
 		ds.setThematic(d.getThematic());
+		ds.setContentpolicies(mapCodeLabel(d.getContentpolicies()));
 		ds.setVersioncontrol(d.getVersioncontrol());
 		ds.setVersioning(mapField(d.getVersioning()));
 
@@ -440,7 +450,7 @@ public class ProvisionModelSupport {
 						Instance i = new Instance();
 						i.setCollectedfrom(asProvenance(instance.getCollectedfrom()));
 						i.setHostedby(asProvenance(instance.getHostedby()));
-						i.setFulltext(i.getFulltext());
+						i.setFulltext(instance.getFulltext());
 						i.setPid(asPid(instance.getPid()));
 						i.setAlternateIdentifier(asPid(instance.getAlternateIdentifier()));
 						i.setAccessright(mapAccessRight(instance.getAccessright()));
@@ -471,7 +481,8 @@ public class ProvisionModelSupport {
 	private static AccessRight mapAccessRight(eu.dnetlib.dhp.schema.oaf.AccessRight accessright) {
 		return AccessRight
 			.newInstance(
-				mapQualifier(accessright),
+				accessright.getClassid(),
+				accessright.getClassname(),
 				Optional
 					.ofNullable(accessright.getOpenAccessRoute())
 					.map(route -> OpenAccessRoute.valueOf(route.toString()))
@@ -530,6 +541,14 @@ public class ProvisionModelSupport {
 				Provenance.newInstance(
 					StringUtils.substringAfter(kv.getKey(), IdentifierFactory.ID_PREFIX_SEPARATOR),
 					kv.getValue())).orElse(null);
+	}
+
+	private static List<Measure> mapMeasures(List<eu.dnetlib.dhp.schema.oaf.Measure> measures) {
+		return Optional.ofNullable(measures)
+				.map(ml -> ml.stream()
+						.map(m -> Measure.newInstance(m.getId(), mapCodeLabelKV(m.getUnit())))
+						.collect(Collectors.toList()))
+				.orElse(null);
 	}
 
 	private static List<Context> asContext(List<eu.dnetlib.dhp.schema.oaf.Context> ctxList,
@@ -715,7 +734,7 @@ public class ProvisionModelSupport {
 	private static CodeLabel mapCodeLabel(KeyValue kv) {
 		return Optional
 			.ofNullable(kv)
-			.map(q -> CodeLabel.newInstance(kv.getKey(), kv.getValue()))
+			.map(k -> CodeLabel.newInstance(k.getKey(), k.getValue()))
 			.orElse(null);
 	}
 
