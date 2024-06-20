@@ -86,18 +86,6 @@
     "synonym": []
   },
   {
-    "id": "100012754",
-    "uri": "http://dx.doi.org/10.13039/100012754",
-    "name": "Horizon Pharma",
-    "synonym": []
-  },
-  {
-    "id": "100012891",
-    "uri": "http://dx.doi.org/10.13039/100012891",
-    "name": "Medical Research Charities Group",
-    "synonym": []
-  },
-  {
     "id": "100012919",
     "uri": "http://dx.doi.org/10.13039/100012919",
     "name": "Epilepsy Ireland",
@@ -275,13 +263,13 @@
     "id": "100019637",
     "uri": "http://dx.doi.org/10.13039/100019637",
     "name": "Horizon Therapeutics",
-    "synonym": []
+    "synonym": ["100012754"]
   },
   {
     "id": "100020174",
     "uri": "http://dx.doi.org/10.13039/100020174",
     "name": "Health Research Charities Ireland",
-    "synonym": []
+    "synonym": ["100012891"]
   },
   {
     "id": "100020202",
@@ -510,7 +498,7 @@
     "id": "501100003037",
     "uri": "http://dx.doi.org/10.13039/501100003037",
     "name": "Elan",
-    "synonym": []
+    "synonym": ["501100021694"]
   },
   {
     "id": "501100003496",
@@ -582,12 +570,6 @@
     "id": "501100009246",
     "uri": "http://dx.doi.org/10.13039/501100009246",
     "name": "Technological University Dublin",
-    "synonym": []
-  },
-  {
-    "id": "501100009269",
-    "uri": "http://dx.doi.org/10.13039/501100009269",
-    "name": "Programme of Competitive Forestry Research for Development",
     "synonym": []
   },
   {
@@ -714,12 +696,6 @@
     "id": "501100021525",
     "uri": "http://dx.doi.org/10.13039/501100021525",
     "name": "Insight SFI Research Centre for Data Analytics",
-    "synonym": []
-  },
-  {
-    "id": "501100021694",
-    "uri": "http://dx.doi.org/10.13039/501100021694",
-    "name": "Elan Pharma International",
     "synonym": []
   },
   {
