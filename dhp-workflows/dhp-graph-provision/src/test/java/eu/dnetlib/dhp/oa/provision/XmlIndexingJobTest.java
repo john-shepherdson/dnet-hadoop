@@ -115,12 +115,12 @@ public class XmlIndexingJobTest extends SolrTest {
 
 		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "isgreen:true"));
 		assertEquals(
-			0, rsp.getResults().getNumFound(),
+			4, rsp.getResults().getNumFound(),
 			"the number of indexed records having isgreen = true");
 
 		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "openaccesscolor:bronze"));
 		assertEquals(
-			0, rsp.getResults().getNumFound(),
+			2, rsp.getResults().getNumFound(),
 			"the number of indexed records having openaccesscolor = bronze");
 
 		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "isindiamondjournal:true"));
@@ -135,14 +135,14 @@ public class XmlIndexingJobTest extends SolrTest {
 
 		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "peerreviewed:true"));
 		assertEquals(
-			0, rsp.getResults().getNumFound(),
+			35, rsp.getResults().getNumFound(),
 			"the number of indexed records having peerreviewed = true");
 
 		rsp = miniCluster
 			.getSolrClient()
 			.query(
 				new SolrQuery()
-					.add(CommonParams.Q, "objidentifier:\"iddesignpres::ae77e56e84ad058d9e7f19fa2f7325db\"")
+					.add(CommonParams.Q, "objidentifier:\"57a035e5b1ae::236d6d8c1e03368b5ae72acfeeb11bbc\"")
 					.add(CommonParams.FL, "__json"));
 		assertEquals(
 			1, rsp.getResults().getNumFound(),
