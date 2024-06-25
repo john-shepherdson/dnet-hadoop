@@ -1,8 +1,6 @@
 
 package eu.dnetlib.dhp.oa.provision.model;
 
-import static org.apache.commons.lang3.StringUtils.substringBefore;
-
 import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,16 +14,15 @@ import org.jetbrains.annotations.Nullable;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyTerm;
-import eu.dnetlib.dhp.oa.provision.RelationList;
-import eu.dnetlib.dhp.oa.provision.SortableRelation;
 import eu.dnetlib.dhp.oa.provision.utils.ContextDef;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.solr.*;
 import eu.dnetlib.dhp.schema.solr.AccessRight;
 import eu.dnetlib.dhp.schema.solr.Author;
@@ -55,10 +52,7 @@ public class ProvisionModelSupport {
 					.newArrayList(
 						RelatedEntityWrapper.class,
 						JoinedEntity.class,
-						RelatedEntity.class,
-						SortableRelationKey.class,
-						SortableRelation.class,
-						RelationList.class));
+						RelatedEntity.class));
 		return modelClasses.toArray(new Class[] {});
 	}
 
@@ -74,7 +68,11 @@ public class ProvisionModelSupport {
 			.setHeader(
 				SolrRecordHeader
 					.newInstance(
-						e.getId(), e.getOriginalId(), type, deletedbyinference));
+						StringUtils
+							.substringAfter(
+								e.getId(),
+								IdentifierFactory.ID_PREFIX_SEPARATOR),
+						e.getOriginalId(), type, deletedbyinference));
 		r.setCollectedfrom(asProvenance(e.getCollectedfrom()));
 		r.setContext(asContext(e.getContext(), contextMapper));
 		r.setPid(asPid(e.getPid()));
@@ -114,7 +112,8 @@ public class ProvisionModelSupport {
 					.newInstance(
 						relation.getRelType(),
 						relation.getRelClass(),
-						relation.getTarget(), relatedRecordType));
+						StringUtils.substringAfter(relation.getTarget(), IdentifierFactory.ID_PREFIX_SEPARATOR),
+						relatedRecordType));
 
 		rr.setAcronym(re.getAcronym());
 		rr.setCode(re.getCode());
@@ -147,6 +146,7 @@ public class ProvisionModelSupport {
 		ps.setContracttype(mapCodeLabel(p.getContracttype()));
 		ps.setCurrency(mapField(p.getCurrency()));
 		ps.setDuration(mapField(p.getDuration()));
+		ps.setOamandatepublications(mapField(p.getOamandatepublications()));
 		ps.setCallidentifier(mapField(p.getCallidentifier()));
 		ps.setEcarticle29_3(mapField(p.getEcarticle29_3()));
 		ps.setEnddate(mapField(p.getEnddate()));
@@ -387,7 +387,7 @@ public class ProvisionModelSupport {
 							.equals(
 								Optional
 									.ofNullable(t.getQualifier())
-									.map(Qualifier::getClassid)
+									.map(Qualifier::getClassname)
 									.orElse(null)))
 					.map(StructuredProperty::getValue)
 					.collect(Collectors.toList()))
@@ -405,7 +405,7 @@ public class ProvisionModelSupport {
 							.equals(
 								Optional
 									.ofNullable(t.getQualifier())
-									.map(Qualifier::getClassid)
+									.map(Qualifier::getClassname)
 									.orElse(null)))
 					.map(StructuredProperty::getValue)
 					.findFirst())
@@ -472,7 +472,7 @@ public class ProvisionModelSupport {
 	}
 
 	private static String mapQualifier(eu.dnetlib.dhp.schema.oaf.Qualifier q) {
-		return Optional.ofNullable(q).map(Qualifier::getClassid).orElse(null);
+		return Optional.ofNullable(q).map(Qualifier::getClassname).orElse(null);
 	}
 
 	private static Journal mapJournal(eu.dnetlib.dhp.schema.oaf.Journal joaf) {
@@ -581,7 +581,7 @@ public class ProvisionModelSupport {
 			.map(
 				pids -> pids
 					.stream()
-					.map(p -> Pid.newInstance(p.getQualifier().getClassid(), p.getValue()))
+					.map(p -> Pid.newInstance(p.getQualifier().getClassname(), p.getValue()))
 					.collect(Collectors.toList()))
 			.orElse(null);
 	}
@@ -606,8 +606,8 @@ public class ProvisionModelSupport {
 				subjects -> subjects
 					.stream()
 					.filter(s -> Objects.nonNull(s.getQualifier()))
-					.filter(s -> Objects.nonNull(s.getQualifier().getClassid()))
-					.map(s -> Subject.newInstance(s.getValue(), s.getQualifier().getClassid()))
+					.filter(s -> Objects.nonNull(s.getQualifier().getClassname()))
+					.map(s -> Subject.newInstance(s.getValue(), s.getQualifier().getClassname()))
 					.collect(Collectors.toList()))
 			.orElse(null);
 	}
@@ -619,8 +619,8 @@ public class ProvisionModelSupport {
 				subjects -> subjects
 					.stream()
 					.filter(s -> Objects.nonNull(s.getQualifier()))
-					.filter(s -> Objects.nonNull(s.getQualifier().getClassid()))
-					.map(s -> Subject.newInstance(s.getValue(), s.getQualifier().getClassid()))
+					.filter(s -> Objects.nonNull(s.getQualifier().getClassname()))
+					.map(s -> Subject.newInstance(s.getValue(), s.getQualifier().getClassname()))
 					.collect(Collectors.toList()))
 			.orElse(null);
 	}

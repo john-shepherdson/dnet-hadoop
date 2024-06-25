@@ -65,4 +65,5 @@ DROP TABLE IF EXISTS ${stats_db_name}.result_accessroute purge; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.result_accessroute STORED AS PARQUET as
 select distinct substr(id,4) as id, accessroute from ${openaire_db_name}.result
-lateral view explode (instance.accessright.openaccessroute) openaccessroute as accessroute; /*EOS*/
+    lateral view explode (instance.accessright.openaccessroute) openaccessroute as accessroute
+WHERE datainfo.deletedbyinference=false and datainfo.invisible = FALSE;

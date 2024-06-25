@@ -93,10 +93,13 @@ public class XmlRecordFactory implements Serializable {
 	}
 
 	public String build(final JoinedEntity je) {
+		return build(je, false);
+	}
+
+	public String build(final JoinedEntity je, final Boolean validate) {
 
 		final Set<String> contexts = Sets.newHashSet();
 
-		// final OafEntity entity = toOafEntity(je.getEntity());
 		final OafEntity entity = je.getEntity();
 		final TemplateFactory templateFactory = new TemplateFactory();
 		try {
@@ -122,7 +125,13 @@ public class XmlRecordFactory implements Serializable {
 				.buildBody(
 					mainType, metadata, relations, listChildren(entity, je, templateFactory), listExtraInfo(entity));
 
-			return templateFactory.buildRecord(entity, schemaLocation, body);
+			String xmlRecord = templateFactory.buildRecord(entity, schemaLocation, body);
+
+			if (Boolean.TRUE.equals(validate)) {
+				// rise an exception when an invalid record was built
+				new SAXReader().read(new StringReader(xmlRecord));
+			}
+			return xmlRecord;
 			// return printXML(templateFactory.buildRecord(entity, schemaLocation, body), indent);
 		} catch (final Throwable e) {
 			throw new RuntimeException(String.format("error building record '%s'", entity.getId()), e);
@@ -1038,13 +1047,21 @@ public class XmlRecordFactory implements Serializable {
 	}
 
 	private List<String> measuresAsXml(List<Measure> measures) {
-		return measures
-			.stream()
-			.map(m -> {
-				List<Tuple2<String, String>> l = Lists.newArrayList(new Tuple2<>("id", m.getId()));
-				m.getUnit().forEach(kv -> l.add(new Tuple2<>(kv.getKey(), kv.getValue())));
-				return XmlSerializationUtils.asXmlElement("measure", l);
-			})
+		return Stream
+			.concat(
+				measures
+					.stream()
+					.filter(m -> !"downloads".equals(m.getId()) && !"views".equals(m.getId()))
+					.map(m -> {
+						List<Tuple2<String, String>> l = Lists.newArrayList(new Tuple2<>("id", m.getId()));
+						m.getUnit().forEach(kv -> l.add(new Tuple2<>(kv.getKey(), kv.getValue())));
+						return XmlSerializationUtils.asXmlElement("measure", l);
+					}),
+				measures
+					.stream()
+					.filter(m -> "downloads".equals(m.getId()) || "views".equals(m.getId()))
+					.filter(m -> m.getUnit().stream().anyMatch(u -> Integer.parseInt(u.getValue()) > 0))
+					.map(m -> XmlSerializationUtils.usageMeasureAsXmlElement("measure", m)))
 			.collect(Collectors.toList());
 	}
 

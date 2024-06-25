@@ -5,7 +5,17 @@ import eu.dnetlib.dhp.schema.action.AtomicAction
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils._
 import eu.dnetlib.dhp.schema.oaf.utils.{OafMapperUtils, PidType}
-import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Instance, Journal, Organization, Publication, Relation, Result, Dataset => OafDataset}
+import eu.dnetlib.dhp.schema.oaf.{
+  Author,
+  DataInfo,
+  Instance,
+  Journal,
+  Organization,
+  Publication,
+  Relation,
+  Result,
+  Dataset => OafDataset
+}
 import eu.dnetlib.dhp.utils.DHPUtils
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{Dataset, Row, SparkSession}
@@ -69,23 +79,6 @@ object MagUtility extends Serializable {
   private val MAGCollectedFrom = keyValue(ModelConstants.MAG_ID, ModelConstants.MAG_NAME)
 
   private val MAGDataInfo: DataInfo = {
-    val di = new DataInfo
-    di.setDeletedbyinference(false)
-    di.setInferred(false)
-    di.setInvisible(false)
-    di.setTrust("0.9")
-    di.setProvenanceaction(
-      OafMapperUtils.qualifier(
-        ModelConstants.SYSIMPORT_ACTIONSET,
-        ModelConstants.SYSIMPORT_ACTIONSET,
-        ModelConstants.DNET_PROVENANCE_ACTIONS,
-        ModelConstants.DNET_PROVENANCE_ACTIONS
-      )
-    )
-    di
-  }
-
-  private val MAGDataInfoInvisible: DataInfo = {
     val di = new DataInfo
     di.setDeletedbyinference(false)
     di.setInferred(false)
@@ -443,7 +436,6 @@ object MagUtility extends Serializable {
 
       case "repository" =>
         result = new Publication()
-        result.setDataInfo(MAGDataInfoInvisible)
         qualifier(
           "0038",
           "Other literature type",
@@ -478,8 +470,7 @@ object MagUtility extends Serializable {
     }
 
     if (result != null) {
-      if (result.getDataInfo == null)
-        result.setDataInfo(MAGDataInfo)
+      result.setDataInfo(MAGDataInfo)
       val i = new Instance
       i.setInstancetype(tp)
       i.setInstanceTypeMapping(
@@ -502,7 +493,7 @@ object MagUtility extends Serializable {
       return null
 
     result.setCollectedfrom(List(MAGCollectedFrom).asJava)
-    val pidList = List(
+    var pidList = List(
       structuredProperty(
         paper.paperId.get.toString,
         qualifier(
@@ -514,8 +505,6 @@ object MagUtility extends Serializable {
         null
       )
     )
-
-    result.setPid(pidList.asJava)
 
     result.setOriginalId(pidList.map(s => s.getValue).asJava)
 
@@ -608,22 +597,23 @@ object MagUtility extends Serializable {
     }
 
     val instance = result.getInstance().get(0)
-    instance.setPid(pidList.asJava)
-    if (paper.doi.orNull != null)
-      instance.setAlternateIdentifier(
-        List(
-          structuredProperty(
-            paper.doi.get,
-            qualifier(
-              PidType.doi.toString,
-              PidType.doi.toString,
-              ModelConstants.DNET_PID_TYPES,
-              ModelConstants.DNET_PID_TYPES
-            ),
-            null
-          )
-        ).asJava
+
+    if (paper.doi.orNull != null) {
+      pidList = pidList ::: List(
+        structuredProperty(
+          paper.doi.get,
+          qualifier(
+            PidType.doi.toString,
+            PidType.doi.toString,
+            ModelConstants.DNET_PID_TYPES,
+            ModelConstants.DNET_PID_TYPES
+          ),
+          null
+        )
       )
+    }
+    instance.setPid(pidList.asJava)
+    result.setPid(pidList.asJava)
     instance.setUrl(paper.urls.get.asJava)
     instance.setHostedby(ModelConstants.UNKNOWN_REPOSITORY)
     instance.setCollectedfrom(MAGCollectedFrom)
@@ -688,33 +678,45 @@ object MagUtility extends Serializable {
     o.setLegalname(field(r.getAs[String]("DisplayName"), null))
     val gid = r.getAs[String]("GridId")
     if (gid != null) {
-      o.setPid(List(
-        structuredProperty(gid, qualifier(
-          PidType.GRID.toString,
-          PidType.GRID.toString,
-          ModelConstants.DNET_PID_TYPES,
-          ModelConstants.DNET_PID_TYPES
-        ),
-          null),
-        structuredProperty(r.getAs[Long]("AffiliationId").toString, qualifier(
-          PidType.mag_id.toString,
-          PidType.mag_id.toString,
-          ModelConstants.DNET_PID_TYPES,
-          ModelConstants.DNET_PID_TYPES
-        ),
-          null)
-
-      ).asJava)
+      o.setPid(
+        List(
+          structuredProperty(
+            gid,
+            qualifier(
+              PidType.GRID.toString,
+              PidType.GRID.toString,
+              ModelConstants.DNET_PID_TYPES,
+              ModelConstants.DNET_PID_TYPES
+            ),
+            null
+          ),
+          structuredProperty(
+            r.getAs[Long]("AffiliationId").toString,
+            qualifier(
+              PidType.mag_id.toString,
+              PidType.mag_id.toString,
+              ModelConstants.DNET_PID_TYPES,
+              ModelConstants.DNET_PID_TYPES
+            ),
+            null
+          )
+        ).asJava
+      )
     } else {
-      o.setPid(List(
-        structuredProperty(r.getAs[Long]("AffiliationId").toString, qualifier(
-          PidType.mag_id.toString,
-          PidType.mag_id.toString,
-          ModelConstants.DNET_PID_TYPES,
-          ModelConstants.DNET_PID_TYPES
-        ),
-          null)
-      ).asJava)
+      o.setPid(
+        List(
+          structuredProperty(
+            r.getAs[Long]("AffiliationId").toString,
+            qualifier(
+              PidType.mag_id.toString,
+              PidType.mag_id.toString,
+              ModelConstants.DNET_PID_TYPES,
+              ModelConstants.DNET_PID_TYPES
+            ),
+            null
+          )
+        ).asJava
+      )
     }
     val c = r.getAs[String]("Iso3166Code")
     if (c != null)

@@ -58,7 +58,7 @@
     "uri": "http://dx.doi.org/10.13039/100010414",
     "name": "Health Research Board",
     "synonym": [
-      "501100001590"
+      "501100001590", "501100023273"
     ]
   },
   {
@@ -83,24 +83,6 @@
     "id": "100011396",
     "uri": "http://dx.doi.org/10.13039/100011396",
     "name": "Irish College of General Practitioners",
-    "synonym": []
-  },
-  {
-    "id": "100012734",
-    "uri": "http://dx.doi.org/10.13039/100012734",
-    "name": "Department for Culture, Heritage and the Gaeltacht, Ireland",
-    "synonym": []
-  },
-  {
-    "id": "100012754",
-    "uri": "http://dx.doi.org/10.13039/100012754",
-    "name": "Horizon Pharma",
-    "synonym": []
-  },
-  {
-    "id": "100012891",
-    "uri": "http://dx.doi.org/10.13039/100012891",
-    "name": "Medical Research Charities Group",
     "synonym": []
   },
   {
@@ -233,7 +215,7 @@
     "id": "100018064",
     "uri": "http://dx.doi.org/10.13039/100018064",
     "name": "Department of Tourism, Culture, Arts, Gaeltacht, Sport and Media",
-    "synonym": []
+    "synonym": ["100012734"]
   },
   {
     "id": "100018172",
@@ -272,12 +254,6 @@
     "synonym": []
   },
   {
-    "id": "100018998",
-    "uri": "http://dx.doi.org/10.13039/100018998",
-    "name": "Irish Research eLibrary",
-    "synonym": []
-  },
-  {
     "id": "100019428",
     "uri": "http://dx.doi.org/10.13039/100019428",
     "name": "Nabriva Therapeutics",
@@ -287,13 +263,13 @@
     "id": "100019637",
     "uri": "http://dx.doi.org/10.13039/100019637",
     "name": "Horizon Therapeutics",
-    "synonym": []
+    "synonym": ["100012754"]
   },
   {
     "id": "100020174",
     "uri": "http://dx.doi.org/10.13039/100020174",
     "name": "Health Research Charities Ireland",
-    "synonym": []
+    "synonym": ["100012891"]
   },
   {
     "id": "100020202",
@@ -325,12 +301,7 @@
     "name": "Centre for Ageing Research and Development in Ireland",
     "synonym": []
   },
-  {
-    "id": "501100001583",
-    "uri": "http://dx.doi.org/10.13039/501100001583",
-    "name": "Cystinosis Foundation Ireland",
-    "synonym": []
-  },
+
   {
     "id": "501100001584",
     "uri": "http://dx.doi.org/10.13039/501100001584",
@@ -527,7 +498,7 @@
     "id": "501100003037",
     "uri": "http://dx.doi.org/10.13039/501100003037",
     "name": "Elan",
-    "synonym": []
+    "synonym": ["501100021694"]
   },
   {
     "id": "501100003496",
@@ -602,16 +573,10 @@
     "synonym": []
   },
   {
-    "id": "501100009269",
-    "uri": "http://dx.doi.org/10.13039/501100009269",
-    "name": "Programme of Competitive Forestry Research for Development",
-    "synonym": []
-  },
-  {
     "id": "501100009315",
     "uri": "http://dx.doi.org/10.13039/501100009315",
     "name": "Cystinosis Ireland",
-    "synonym": []
+    "synonym": ["501100001583"]
   },
   {
     "id": "501100010808",
@@ -629,12 +594,6 @@
     "id": "501100011031",
     "uri": "http://dx.doi.org/10.13039/501100011031",
     "name": "Alimentary Health",
-    "synonym": []
-  },
-  {
-    "id": "501100011103",
-    "uri": "http://dx.doi.org/10.13039/501100011103",
-    "name": "Rann\u00eds",
     "synonym": []
   },
   {
@@ -740,12 +699,6 @@
     "synonym": []
   },
   {
-    "id": "501100021694",
-    "uri": "http://dx.doi.org/10.13039/501100021694",
-    "name": "Elan Pharma International",
-    "synonym": []
-  },
-  {
     "id": "501100021838",
     "uri": "http://dx.doi.org/10.13039/501100021838",
     "name": "Royal College of Physicians of Ireland",
@@ -773,12 +726,6 @@
     "id": "501100022729",
     "uri": "http://dx.doi.org/10.13039/501100022729",
     "name": "Institute of Technology, Tralee",
-    "synonym": []
-  },
-  {
-    "id": "501100023273",
-    "uri": "http://dx.doi.org/10.13039/501100023273",
-    "name": "HRB Clinical Research Facility Galway",
     "synonym": []
   },
   {

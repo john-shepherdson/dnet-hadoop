@@ -25,6 +25,7 @@ import eu.dnetlib.dhp.oa.provision.model.SerializableSolrInputDocument;
 import eu.dnetlib.dhp.oa.provision.model.TupleWrapper;
 import eu.dnetlib.dhp.oa.provision.utils.ISLookupClient;
 import eu.dnetlib.dhp.oa.provision.utils.StreamingInputDocumentFactory;
+import eu.dnetlib.dhp.sparksolr.DHPSolrSupport;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
@@ -129,7 +130,7 @@ public class XmlIndexingJob extends AbstractSolrRecordTransformJob {
 			.javaRDD()
 			.map(
 				t -> new StreamingInputDocumentFactory().parseDocument(t.getXml(), t.getJson()));
-		SolrSupport.indexDocs(zkHost, collection, batchSize, docs.rdd());
+		DHPSolrSupport.indexDocs(zkHost, collection, batchSize, docs.rdd());
 	}
 
 }

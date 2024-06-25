@@ -2,12 +2,9 @@ package eu.dnetlib.dhp.sx.bio.ebi
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.collection.CollectionUtils
-import eu.dnetlib.dhp.common.Constants.{MDSTORE_DATA_PATH, MDSTORE_SIZE_PATH}
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
-import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion
-import eu.dnetlib.dhp.schema.oaf.{Oaf, Result}
+import eu.dnetlib.dhp.schema.oaf.Oaf
 import eu.dnetlib.dhp.sx.bio.pubmed._
-import eu.dnetlib.dhp.utils.DHPUtils.{MAPPER, writeHdfsFile}
 import eu.dnetlib.dhp.utils.ISLookupClientFactory
 import org.apache.commons.io.IOUtils
 import org.apache.hadoop.conf.Configuration
@@ -17,13 +14,13 @@ import org.apache.http.client.methods.HttpGet
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql._
+import org.apache.spark.sql.expressions.Aggregator
 import org.slf4j.{Logger, LoggerFactory}
 
-import java.io.InputStream
-import scala.io.Source
-import scala.xml.pull.XMLEventReader
+import java.io.{ByteArrayInputStream, InputStream}
+import java.nio.charset.Charset
+import javax.xml.stream.XMLInputFactory
 
 object SparkCreateBaselineDataFrame {
 
@@ -86,7 +83,7 @@ object SparkCreateBaselineDataFrame {
           if (response.getStatusLine.getStatusCode > 400) {
             tries -= 1
           } else
-            return IOUtils.toString(response.getEntity.getContent)
+            return IOUtils.toString(response.getEntity.getContent, Charset.defaultCharset())
         } catch {
           case e: Throwable =>
             println(s"Error on requesting ${r.getURI}")
@@ -158,7 +155,8 @@ object SparkCreateBaselineDataFrame {
       IOUtils.toString(
         SparkEBILinksToOaf.getClass.getResourceAsStream(
           "/eu/dnetlib/dhp/sx/bio/ebi/baseline_to_oaf_params.json"
-        )
+        ),
+        Charset.defaultCharset()
       )
     )
     parser.parseArgument(args)
@@ -167,15 +165,11 @@ object SparkCreateBaselineDataFrame {
     val workingPath = parser.get("workingPath")
     log.info("workingPath: {}", workingPath)
 
-    val mdstoreOutputVersion = parser.get("mdstoreOutputVersion")
-    log.info("mdstoreOutputVersion: {}", mdstoreOutputVersion)
-
-    val cleanedMdStoreVersion = MAPPER.readValue(mdstoreOutputVersion, classOf[MDStoreVersion])
-    val outputBasePath = cleanedMdStoreVersion.getHdfsPath
-    log.info("outputBasePath: {}", outputBasePath)
+    val targetPath = parser.get("targetPath")
+    log.info("targetPath: {}", targetPath)
 
     val hdfsServerUri = parser.get("hdfsServerUri")
-    log.info("hdfsServerUri: {}", hdfsServerUri)
+    log.info("hdfsServerUri: {}", targetPath)
 
     val skipUpdate = parser.get("skipUpdate")
     log.info("skipUpdate: {}", skipUpdate)
@@ -201,10 +195,11 @@ object SparkCreateBaselineDataFrame {
     if (!"true".equalsIgnoreCase(skipUpdate)) {
       downloadBaseLineUpdate(s"$workingPath/baseline", hdfsServerUri)
       val k: RDD[(String, String)] = sc.wholeTextFiles(s"$workingPath/baseline", 2000)
+      val inputFactory = XMLInputFactory.newInstance
       val ds: Dataset[PMArticle] = spark.createDataset(
         k.filter(i => i._1.endsWith(".gz"))
           .flatMap(i => {
-            val xml = new XMLEventReader(Source.fromBytes(i._2.getBytes()))
+            val xml = inputFactory.createXMLEventReader(new ByteArrayInputStream(i._2.getBytes()))
             new PMParser(xml)
           })
       )
@@ -223,11 +218,8 @@ object SparkCreateBaselineDataFrame {
         .map(a => PubMedToOaf.convert(a, vocabularies))
         .as[Oaf]
         .filter(p => p != null),
-      s"$outputBasePath/$MDSTORE_DATA_PATH"
+      targetPath
     )
 
-    val df = spark.read.text(s"$outputBasePath/$MDSTORE_DATA_PATH")
-    val mdStoreSize = df.count
-    writeHdfsFile(spark.sparkContext.hadoopConfiguration, s"$mdStoreSize", s"$outputBasePath/$MDSTORE_SIZE_PATH")
   }
 }

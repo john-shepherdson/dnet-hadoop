@@ -22,5 +22,11 @@
     "paramLongName": "isLookupUrl",
     "paramDescription": "URL of the context ISLookup Service",
     "paramRequired": true
+  },
+  {
+    "paramName": "val",
+    "paramLongName": "validateXML",
+    "paramDescription": "should the process check the XML validity",
+    "paramRequired": false
   }
 ]

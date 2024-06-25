@@ -93,7 +93,7 @@ public class CreateActionSetSparkJob implements Serializable {
 			.filter((FilterFunction<Relation>) Objects::nonNull)
 			.toJavaRDD()
 			.map(p -> new AtomicAction(p.getClass(), p));
-//TODO relations in stand-by waiting to know if we need to create them or not In case we need just make a union before saving the sequence file
+
 		spark
 			.read()
 			.textFile(inputPath)
@@ -108,6 +108,7 @@ public class CreateActionSetSparkJob implements Serializable {
 			.filter((FilterFunction<Result>) r -> r != null)
 			.toJavaRDD()
 			.map(p -> new AtomicAction(p.getClass(), p))
+			.union(relations)
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
