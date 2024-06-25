@@ -6,12 +6,6 @@
     "paramRequired": true
   },
   {
-    "paramName": "f",
-    "paramLongName": "format",
-    "paramDescription": "metadata format profile name",
-    "paramRequired": true
-  },
-  {
     "paramName": "a",
     "paramLongName": "action",
     "paramDescription": "the action to be performed by the application",

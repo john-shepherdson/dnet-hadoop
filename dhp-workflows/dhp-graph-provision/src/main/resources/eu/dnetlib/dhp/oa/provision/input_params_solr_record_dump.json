@@ -13,7 +13,7 @@
   },
   {
     "paramName": "f",
-    "paramLongName": "format",
+    "paramLongName": "shadowFormat",
     "paramDescription": "MDFormat name found in the IS profile",
     "paramRequired": true
   },

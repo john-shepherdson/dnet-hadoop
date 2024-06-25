@@ -35,8 +35,12 @@
             <description>maximum number of relations allowed for a each entity grouping by target</description>
         </property>
         <property>
-            <name>format</name>
+            <name>shadowFormat</name>
             <description>metadata format name (DMF|TMF)</description>
+        </property>
+        <property>
+            <name>publicFormat</name>
+            <description>the public metadata format - used to create the public collection alias</description>
         </property>
         <property>
             <name>batchSize</name>
@@ -109,14 +113,6 @@
         <property>
             <name>sparkNetworkTimeout</name>
             <description>configures spark.network.timeout</description>
-        </property>
-        <property>
-            <name>publicFormat</name>
-            <description>the public metadata format - used to create the public collection alias</description>
-        </property>
-        <property>
-            <name>shadowFormat</name>
-            <description>the shadow metadata format - used to create the shadow collection alias</description>
         </property>
     </parameters>
 
@@ -650,8 +646,8 @@
             </configuration>
             <main-class>eu.dnetlib.dhp.oa.provision.SolrAdminApplication</main-class>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--format</arg><arg>${format}</arg>
             <arg>--action</arg><arg>DELETE_BY_QUERY</arg>
+            <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>
             <arg>--query</arg><arg>${solrDeletionQuery}</arg>
             <arg>--commit</arg><arg>true</arg>
         </java>
@@ -681,7 +677,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${workingDir}/xml_json</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--format</arg><arg>${format}</arg>
+            <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>
             <arg>--batchSize</arg><arg>${batchSize}</arg>
         </spark>
         <ok to="commit_solr_collection"/>
@@ -698,7 +694,7 @@
             </configuration>
             <main-class>eu.dnetlib.dhp.oa.provision.SolrAdminApplication</main-class>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--format</arg><arg>${format}</arg>
+            <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>
             <arg>--action</arg><arg>COMMIT</arg>
         </java>
         <ok to="End"/>
@@ -723,7 +719,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${workingDir}/xml_json</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--format</arg><arg>${format}</arg>
+            <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>
             <arg>--outputPath</arg><arg>${workingDir}/solr_documents</arg>
         </spark>
         <ok to="End"/>
@@ -741,7 +737,6 @@
             </configuration>
             <main-class>eu.dnetlib.dhp.oa.provision.SolrAdminApplication</main-class>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--format</arg><arg>${format}</arg>
             <arg>--action</arg><arg>UPDATE_ALIASES</arg>
             <arg>--publicFormat</arg><arg>${publicFormat}</arg>
             <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>

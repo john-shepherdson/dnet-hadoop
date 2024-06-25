@@ -2,24 +2,15 @@
 package eu.dnetlib.dhp.oa.provision;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.URI;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.io.Text;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.SparkSession;
-import org.dom4j.io.SAXReader;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -50,9 +41,6 @@ public class SolrConfigTest extends SolrTest {
 
 		int solrPort = URI.create("http://" + miniCluster.getZkClient().getZkServerAddress()).getPort();
 
-		Mockito
-			.when(isLookupClient.getDsId(Mockito.anyString()))
-			.thenReturn("313f0381-23b6-466f-a0b8-c72a9679ac4b_SW5kZXhEU1Jlc291cmNlcy9JbmRleERTUmVzb3VyY2VUeXBl");
 		Mockito.when(isLookupClient.getZkHost()).thenReturn(String.format("127.0.0.1:%s/solr", solrPort));
 		Mockito
 			.when(isLookupClient.getLayoutSource(Mockito.anyString()))
@@ -95,9 +83,9 @@ public class SolrConfigTest extends SolrTest {
 
 		String inputPath = "src/test/resources/eu/dnetlib/dhp/oa/provision/xml";
 
-		new XmlIndexingJob(spark, inputPath, FORMAT, batchSize)
+		new XmlIndexingJob(spark, inputPath, SHADOW_FORMAT, ProvisionConstants.SHADOW_ALIAS_NAME, batchSize)
 			.run(isLookupClient);
-		Assertions.assertEquals(0, miniCluster.getSolrClient().commit().getStatus());
+		Assertions.assertEquals(0, miniCluster.getSolrClient().commit(ProvisionConstants.SHADOW_ALIAS_NAME).getStatus());
 
 		String[] queryStrings = {
 			"cancer",
@@ -109,8 +97,8 @@ public class SolrConfigTest extends SolrTest {
 			SolrQuery query = new SolrQuery();
 			query.add(CommonParams.Q, q);
 
-			log.info("Submit query to Solr with params: {}", query.toString());
-			QueryResponse rsp = miniCluster.getSolrClient().query(query);
+			log.info("Submit query to Solr with params: {}", query);
+			QueryResponse rsp = miniCluster.getSolrClient().query(ProvisionConstants.SHADOW_ALIAS_NAME, query);
 
 			for (SolrDocument doc : rsp.getResults()) {
 				System.out

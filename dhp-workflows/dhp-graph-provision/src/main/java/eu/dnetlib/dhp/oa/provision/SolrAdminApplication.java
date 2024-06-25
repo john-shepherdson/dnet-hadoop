@@ -40,9 +40,6 @@ public class SolrAdminApplication implements Closeable {
 		final String isLookupUrl = parser.get("isLookupUrl");
 		log.info("isLookupUrl: {}", isLookupUrl);
 
-		final String format = parser.get("format");
-		log.info("format: {}", format);
-
 		final Action action = Action.valueOf(parser.get("action"));
 		log.info("action: {}", action);
 
@@ -60,9 +57,6 @@ public class SolrAdminApplication implements Closeable {
 		final String zkHost = isLookup.getZkHost();
 		log.info("zkHost: {}", zkHost);
 
-		final String collection = ProvisionConstants.getCollectionName(format);
-		log.info("collection: {}", collection);
-
 		final String publicFormat = parser.get("publicFormat");
 		log.info("publicFormat: {}", publicFormat);
 
@@ -77,7 +71,7 @@ public class SolrAdminApplication implements Closeable {
 		log.info("shadowCollection: {}", shadowCollection);
 
 		try (SolrAdminApplication app = new SolrAdminApplication(zkHost)) {
-			app.execute(action, collection, query, commit, publicCollection, shadowCollection);
+			app.execute(action, query, commit, publicCollection, shadowCollection);
 		}
 	}
 
@@ -86,24 +80,24 @@ public class SolrAdminApplication implements Closeable {
 		this.solrClient = new CloudSolrClient.Builder(zk.getHosts(), zk.getChroot()).build();
 	}
 
-	public SolrResponse commit(String collection) throws IOException, SolrServerException {
-		return execute(Action.COMMIT, collection, null, true, null, null);
+	public SolrResponse commit(String shadowCollection) throws IOException, SolrServerException {
+		return execute(Action.COMMIT, null, true, null, shadowCollection);
 	}
 
-	public SolrResponse execute(Action action, String collection, String query, boolean commit,
+	public SolrResponse execute(Action action, String query, boolean commit,
 		String publicCollection, String shadowCollection)
 		throws IOException, SolrServerException {
 		switch (action) {
 
 			case DELETE_BY_QUERY:
-				UpdateResponse rsp = solrClient.deleteByQuery(collection, query);
+				UpdateResponse rsp = solrClient.deleteByQuery(shadowCollection, query);
 				if (commit) {
-					return solrClient.commit(collection);
+					return solrClient.commit(shadowCollection);
 				}
 				return rsp;
 
 			case COMMIT:
-				return solrClient.commit(collection);
+				return solrClient.commit(shadowCollection);
 
 			case UPDATE_ALIASES:
 				this.updateAliases(publicCollection, shadowCollection);
