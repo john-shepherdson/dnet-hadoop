@@ -25,6 +25,7 @@ import eu.dnetlib.dhp.oa.provision.model.SerializableSolrInputDocument;
 import eu.dnetlib.dhp.oa.provision.model.TupleWrapper;
 import eu.dnetlib.dhp.oa.provision.utils.ISLookupClient;
 import eu.dnetlib.dhp.oa.provision.utils.StreamingInputDocumentFactory;
+import eu.dnetlib.dhp.sparksolr.DHPSolrSupport;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
@@ -38,6 +39,8 @@ public class XmlIndexingJob extends AbstractSolrRecordTransformJob {
 	private final String inputPath;
 
 	private final String format;
+
+	private final String shadowCollection;
 
 	private final int batchSize;
 
@@ -62,8 +65,11 @@ public class XmlIndexingJob extends AbstractSolrRecordTransformJob {
 		final String inputPath = parser.get("inputPath");
 		log.info("inputPath: {}", inputPath);
 
-		final String format = parser.get("format");
-		log.info("format: {}", format);
+		final String shadowFormat = parser.get("shadowFormat");
+		log.info("shadowFormat: {}", shadowFormat);
+
+		final String shadowCollection = ProvisionConstants.getCollectionName(shadowFormat);
+		log.info("shadowCollection: {}", shadowCollection);
 
 		final Integer batchSize = Optional
 			.ofNullable(parser.get("batchSize"))
@@ -84,15 +90,17 @@ public class XmlIndexingJob extends AbstractSolrRecordTransformJob {
 				final String isLookupUrl = parser.get("isLookupUrl");
 				log.info("isLookupUrl: {}", isLookupUrl);
 				final ISLookupClient isLookup = new ISLookupClient(ISLookupClientFactory.getLookUpService(isLookupUrl));
-				new XmlIndexingJob(spark, inputPath, format, batchSize)
+				new XmlIndexingJob(spark, inputPath, shadowFormat, shadowCollection, batchSize)
 					.run(isLookup);
 			});
 	}
 
-	public XmlIndexingJob(SparkSession spark, String inputPath, String format, Integer batchSize) {
+	public XmlIndexingJob(SparkSession spark, String inputPath, String format, String shadowCollection,
+		Integer batchSize) {
 		this.spark = spark;
 		this.inputPath = inputPath;
 		this.format = format;
+		this.shadowCollection = shadowCollection;
 		this.batchSize = batchSize;
 	}
 
@@ -101,12 +109,6 @@ public class XmlIndexingJob extends AbstractSolrRecordTransformJob {
 		log.info("fields: {}", fields);
 
 		final String xslt = isLookup.getLayoutTransformer();
-
-		final String dsId = isLookup.getDsId(format);
-		log.info("dsId: {}", dsId);
-
-		final String collection = ProvisionConstants.getCollectionName(format);
-		log.info("collection: {}", collection);
 
 		final String zkHost = isLookup.getZkHost();
 		log.info("zkHost: {}", zkHost);
@@ -129,7 +131,7 @@ public class XmlIndexingJob extends AbstractSolrRecordTransformJob {
 			.javaRDD()
 			.map(
 				t -> new StreamingInputDocumentFactory().parseDocument(t.getXml(), t.getJson()));
-		SolrSupport.indexDocs(zkHost, collection, batchSize, docs.rdd());
+		DHPSolrSupport.indexDocs(zkHost, shadowCollection, batchSize, docs.rdd());
 	}
 
 }

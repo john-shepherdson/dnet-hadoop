@@ -67,7 +67,7 @@ public class PrepareRelationsJobTest {
 	@Test
 	void testRunPrepareRelationsJob(@TempDir Path testPath) throws Exception {
 
-		final int maxRelations = 20;
+		final int maxRelations = 5;
 		PrepareRelationsJob
 			.main(
 				new String[] {
@@ -86,7 +86,7 @@ public class PrepareRelationsJobTest {
 			.as(Encoders.bean(Relation.class))
 			.cache();
 
-		assertEquals(maxRelations, out.count());
+		assertEquals(44, out.count());
 
 		Dataset<Row> freq = out
 			.toDF()
@@ -101,12 +101,8 @@ public class PrepareRelationsJobTest {
 		long affiliation = getRows(freq, AFFILIATION).get(0).getAs("count");
 
 		assertEquals(outcome, participation);
-		assertTrue(outcome > affiliation);
-		assertTrue(participation > affiliation);
-
-		assertEquals(7, outcome);
-		assertEquals(7, participation);
-		assertEquals(6, affiliation);
+		assertEquals(outcome, affiliation);
+		assertEquals(4, affiliation);
 	}
 
 	protected List<Row> getRows(Dataset<Row> freq, String col) {

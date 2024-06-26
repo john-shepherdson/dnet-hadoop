@@ -69,13 +69,13 @@
         </configuration>
     </global>
 
-    <start to="irish_oaipmh_provision"/>
+    <start to="oaiphm_provision"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="irish_oaipmh_provision">
+    <action name="irish_oaiphm_provision">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>

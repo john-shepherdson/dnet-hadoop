@@ -213,7 +213,7 @@ public class StreamingInputDocumentFactory implements Serializable {
 			}
 			writer.close();
 			indexDocument.addField(INDEX_RESULT, results.toString());
-			indexDocument.addField(INDEX_JSON_RESULT, json);
+			//indexDocument.addField(INDEX_JSON_RESULT, json);
 		} finally {
 			outputFactory.remove();
 			eventFactory.remove();

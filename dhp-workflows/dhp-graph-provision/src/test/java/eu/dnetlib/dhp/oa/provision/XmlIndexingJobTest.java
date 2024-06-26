@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.params.CommonParams;
 import org.apache.spark.SparkConf;
@@ -50,9 +51,6 @@ public class XmlIndexingJobTest extends SolrTest {
 
 		int solrPort = URI.create("http://" + miniCluster.getZkClient().getZkServerAddress()).getPort();
 
-		Mockito
-			.when(isLookupClient.getDsId(Mockito.anyString()))
-			.thenReturn("313f0381-23b6-466f-a0b8-c72a9679ac4b_SW5kZXhEU1Jlc291cmNlcy9JbmRleERTUmVzb3VyY2VUeXBl");
 		Mockito.when(isLookupClient.getZkHost()).thenReturn(String.format("127.0.0.1:%s/solr", solrPort));
 		Mockito
 			.when(isLookupClient.getLayoutSource(Mockito.anyString()))
@@ -103,37 +101,62 @@ public class XmlIndexingJobTest extends SolrTest {
 
 		long nRecord = records.count();
 
-		new XmlIndexingJob(spark, inputPath, FORMAT, batchSize).run(isLookupClient);
+		new XmlIndexingJob(spark, inputPath, SHADOW_FORMAT, ProvisionConstants.SHADOW_ALIAS_NAME, batchSize)
+			.run(isLookupClient);
 
-		assertEquals(0, miniCluster.getSolrClient().commit().getStatus());
+		assertEquals(0, miniCluster.getSolrClient().commit(SHADOW_COLLECTION).getStatus());
 
-		QueryResponse rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "*:*"));
+		QueryResponse rsp = miniCluster
+			.getSolrClient()
+			.query(
+				ProvisionConstants.SHADOW_ALIAS_NAME,
+				new SolrQuery().add(CommonParams.Q, "*:*"));
 
 		assertEquals(
 			nRecord, rsp.getResults().getNumFound(),
 			"the number of indexed records should be equal to the number of input records");
 
-		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "isgreen:true"));
+		rsp = miniCluster
+			.getSolrClient()
+			.query(
+				ProvisionConstants.SHADOW_ALIAS_NAME,
+				new SolrQuery().add(CommonParams.Q, "isgreen:true"));
 		assertEquals(
 			4, rsp.getResults().getNumFound(),
 			"the number of indexed records having isgreen = true");
 
-		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "openaccesscolor:bronze"));
+		rsp = miniCluster
+			.getSolrClient()
+			.query(
+				ProvisionConstants.SHADOW_ALIAS_NAME,
+				new SolrQuery().add(CommonParams.Q, "openaccesscolor:bronze"));
 		assertEquals(
 			2, rsp.getResults().getNumFound(),
 			"the number of indexed records having openaccesscolor = bronze");
 
-		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "isindiamondjournal:true"));
+		rsp = miniCluster
+			.getSolrClient()
+			.query(
+				ProvisionConstants.SHADOW_ALIAS_NAME,
+				new SolrQuery().add(CommonParams.Q, "isindiamondjournal:true"));
 		assertEquals(
 			0, rsp.getResults().getNumFound(),
 			"the number of indexed records having isindiamondjournal = true");
 
-		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "publiclyfunded:true"));
+		rsp = miniCluster
+			.getSolrClient()
+			.query(
+				ProvisionConstants.SHADOW_ALIAS_NAME,
+				new SolrQuery().add(CommonParams.Q, "publiclyfunded:true"));
 		assertEquals(
 			0, rsp.getResults().getNumFound(),
 			"the number of indexed records having publiclyfunded = true");
 
-		rsp = miniCluster.getSolrClient().query(new SolrQuery().add(CommonParams.Q, "peerreviewed:true"));
+		rsp = miniCluster
+			.getSolrClient()
+			.query(
+				ProvisionConstants.SHADOW_ALIAS_NAME,
+				new SolrQuery().add(CommonParams.Q, "peerreviewed:true"));
 		assertEquals(
 			35, rsp.getResults().getNumFound(),
 			"the number of indexed records having peerreviewed = true");
@@ -141,6 +164,7 @@ public class XmlIndexingJobTest extends SolrTest {
 		rsp = miniCluster
 			.getSolrClient()
 			.query(
+				ProvisionConstants.SHADOW_ALIAS_NAME,
 				new SolrQuery()
 					.add(CommonParams.Q, "objidentifier:\"57a035e5b1ae::236d6d8c1e03368b5ae72acfeeb11bbc\"")
 					.add(CommonParams.FL, "__json"));
@@ -158,6 +182,22 @@ public class XmlIndexingJobTest extends SolrTest {
 
 		log.info((String) json.get());
 
+		admin
+			.execute(
+				SolrAdminApplication.Action.UPDATE_ALIASES, null, false,
+				SHADOW_COLLECTION, PUBLIC_COLLECTION);
+
+		rsp = miniCluster
+			.getSolrClient()
+			.query(
+				ProvisionConstants.PUBLIC_ALIAS_NAME,
+				new SolrQuery()
+					.add(CommonParams.Q, "objidentifier:\"57a035e5b1ae::236d6d8c1e03368b5ae72acfeeb11bbc\"")
+					.add(CommonParams.FL, "__json"));
+
+		assertEquals(
+			1, rsp.getResults().getNumFound(),
+			"the number of indexed records having the given identifier, found in the public collection");
 	}
 
 }
