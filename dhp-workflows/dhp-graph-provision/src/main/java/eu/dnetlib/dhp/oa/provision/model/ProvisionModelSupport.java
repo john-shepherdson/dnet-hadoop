@@ -5,7 +5,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.solr.Measure;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -33,6 +32,7 @@ import eu.dnetlib.dhp.schema.solr.Datasource;
 import eu.dnetlib.dhp.schema.solr.EoscIfGuidelines;
 import eu.dnetlib.dhp.schema.solr.Instance;
 import eu.dnetlib.dhp.schema.solr.Journal;
+import eu.dnetlib.dhp.schema.solr.Measure;
 import eu.dnetlib.dhp.schema.solr.OpenAccessColor;
 import eu.dnetlib.dhp.schema.solr.OpenAccessRoute;
 import eu.dnetlib.dhp.schema.solr.Organization;
@@ -109,12 +109,13 @@ public class ProvisionModelSupport {
 		final RecordType relatedRecordType = RecordType.valueOf(re.getType());
 		final Relation relation = rew.getRelation();
 		final String relationProvenance = Optional
-				.ofNullable(relation.getDataInfo())
-				.map(d -> Optional
-						.ofNullable(d.getProvenanceaction())
-						.map(Qualifier::getClassid)
-						.orElse(null))
-				.orElse(null);
+			.ofNullable(relation.getDataInfo())
+			.map(
+				d -> Optional
+					.ofNullable(d.getProvenanceaction())
+					.map(Qualifier::getClassid)
+					.orElse(null))
+			.orElse(null);
 		rr
 			.setHeader(
 				RelatedRecordHeader
@@ -151,7 +152,8 @@ public class ProvisionModelSupport {
 		if (relation.getValidated() == null) {
 			relation.setValidated(false);
 		}
-		if (ModelConstants.OUTCOME.equals(relation.getSubRelType()) && StringUtils.isNotBlank(relation.getValidationDate())) {
+		if (ModelConstants.OUTCOME.equals(relation.getSubRelType())
+			&& StringUtils.isNotBlank(relation.getValidationDate())) {
 			rr.setValidationDate(relation.getValidationDate());
 		}
 
@@ -363,14 +365,14 @@ public class ProvisionModelSupport {
 		rs.setCountry(asCountry(r.getCountry()));
 		rs.setEoscifguidelines(asEOSCIF(r.getEoscifguidelines()));
 
-		rs.setGreen(r.getIsGreen());
+		rs.setIsGreen(r.getIsGreen());
 		rs
 			.setOpenAccessColor(
 				Optional
 					.ofNullable(r.getOpenAccessColor())
 					.map(color -> OpenAccessColor.valueOf(color.toString()))
 					.orElse(null));
-		rs.setInDiamondJournal(r.getIsInDiamondJournal());
+		rs.setIsInDiamondJournal(r.getIsInDiamondJournal());
 		rs.setPubliclyFunded(r.getPubliclyFunded());
 		rs.setTransformativeAgreement(r.getTransformativeAgreement());
 
@@ -398,9 +400,10 @@ public class ProvisionModelSupport {
 	}
 
 	private static Language asLanguage(Qualifier lang) {
-		return Optional.ofNullable(lang)
-				.map(q -> Language.newInstance(q.getClassid(), q.getClassname()))
-				.orElse(null);
+		return Optional
+			.ofNullable(lang)
+			.map(q -> Language.newInstance(q.getClassid(), q.getClassname()))
+			.orElse(null);
 	}
 
 	@Nullable
@@ -537,18 +540,25 @@ public class ProvisionModelSupport {
 	}
 
 	private static Provenance asProvenance(KeyValue keyValue) {
-		return Optional.ofNullable(keyValue).map(kv ->
-				Provenance.newInstance(
-					StringUtils.substringAfter(kv.getKey(), IdentifierFactory.ID_PREFIX_SEPARATOR),
-					kv.getValue())).orElse(null);
+		return Optional
+			.ofNullable(keyValue)
+			.map(
+				kv -> Provenance
+					.newInstance(
+						StringUtils.substringAfter(kv.getKey(), IdentifierFactory.ID_PREFIX_SEPARATOR),
+						kv.getValue()))
+			.orElse(null);
 	}
 
 	private static List<Measure> mapMeasures(List<eu.dnetlib.dhp.schema.oaf.Measure> measures) {
-		return Optional.ofNullable(measures)
-				.map(ml -> ml.stream()
-						.map(m -> Measure.newInstance(m.getId(), mapCodeLabelKV(m.getUnit())))
-						.collect(Collectors.toList()))
-				.orElse(null);
+		return Optional
+			.ofNullable(measures)
+			.map(
+				ml -> ml
+					.stream()
+					.map(m -> Measure.newInstance(m.getId(), mapCodeLabelKV(m.getUnit())))
+					.collect(Collectors.toList()))
+			.orElse(null);
 	}
 
 	private static List<Context> asContext(List<eu.dnetlib.dhp.schema.oaf.Context> ctxList,
@@ -623,10 +633,12 @@ public class ProvisionModelSupport {
 					.stream()
 					.filter(p -> Objects.nonNull(p.getQualifier()))
 					.filter(p -> Objects.nonNull(p.getQualifier().getClassid()))
-					.map(p -> Pid.newInstance(
-							p.getValue(),
-							p.getQualifier().getClassid(),
-							p.getQualifier().getClassname()))
+					.map(
+						p -> Pid
+							.newInstance(
+								p.getValue(),
+								p.getQualifier().getClassid(),
+								p.getQualifier().getClassname()))
 					.collect(Collectors.toList()))
 			.orElse(null);
 	}
@@ -652,7 +664,9 @@ public class ProvisionModelSupport {
 					.stream()
 					.filter(s -> Objects.nonNull(s.getQualifier()))
 					.filter(s -> Objects.nonNull(s.getQualifier().getClassname()))
-					.map(s -> Subject.newInstance(s.getValue(), s.getQualifier().getClassid(), s.getQualifier().getClassname()))
+					.map(
+						s -> Subject
+							.newInstance(s.getValue(), s.getQualifier().getClassid(), s.getQualifier().getClassname()))
 					.collect(Collectors.toList()))
 			.orElse(null);
 	}
@@ -665,7 +679,9 @@ public class ProvisionModelSupport {
 					.stream()
 					.filter(s -> Objects.nonNull(s.getQualifier()))
 					.filter(s -> Objects.nonNull(s.getQualifier().getClassname()))
-					.map(s -> Subject.newInstance(s.getValue(), s.getQualifier().getClassid(), s.getQualifier().getClassname()))
+					.map(
+						s -> Subject
+							.newInstance(s.getValue(), s.getQualifier().getClassid(), s.getQualifier().getClassname()))
 					.collect(Collectors.toList()))
 			.orElse(null);
 	}
