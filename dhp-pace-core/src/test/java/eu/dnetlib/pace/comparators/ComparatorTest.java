@@ -336,4 +336,23 @@ public class ComparatorTest extends AbstractPaceTest {
 		System.out.println("compare = " + compare);
 	}
 
+	@Test
+	public void countryMatch() {
+
+		CountryMatch countryMatch = new CountryMatch(params);
+
+		double result = countryMatch.distance("UNKNOWN", "UNKNOWN", conf);
+		assertEquals(-1.0, result);
+
+		result = countryMatch.distance("CHILE", "UNKNOWN", conf);
+		assertEquals(-1.0, result);
+
+		result = countryMatch.distance("CHILE", "ITALY", conf);
+		assertEquals(0.0, result);
+
+		result = countryMatch.distance("CHILE", "CHILE", conf);
+		assertEquals(1.0, result);
+
+	}
+
 }
