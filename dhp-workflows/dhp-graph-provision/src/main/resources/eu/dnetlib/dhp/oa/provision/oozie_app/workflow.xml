@@ -39,10 +39,6 @@
             <description>metadata format name (DMF|TMF)</description>
         </property>
         <property>
-            <name>publicFormat</name>
-            <description>the public metadata format - used to create the public collection alias</description>
-        </property>
-        <property>
             <name>batchSize</name>
             <description>number of records to be included in each indexing request</description>
         </property>
