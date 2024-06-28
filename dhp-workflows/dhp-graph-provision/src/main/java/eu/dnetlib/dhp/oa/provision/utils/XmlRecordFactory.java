@@ -1315,7 +1315,7 @@ public class XmlRecordFactory implements Serializable {
 								instance
 									.getCollectedfrom()
 									.stream()
-									.filter(cf -> kvNotBlank(cf))
+									.filter(XmlRecordFactory::kvNotBlank)
 									.map(cf -> XmlSerializationUtils.mapKeyValue("collectedfrom", cf))
 									.collect(Collectors.toList()));
 					}
@@ -1326,7 +1326,7 @@ public class XmlRecordFactory implements Serializable {
 								instance
 									.getHostedby()
 									.stream()
-									.filter(hb -> kvNotBlank(hb))
+									.filter(XmlRecordFactory::kvNotBlank)
 									.map(hb -> XmlSerializationUtils.mapKeyValue("hostedby", hb))
 									.collect(Collectors.toList()));
 					}
@@ -1336,7 +1336,7 @@ public class XmlRecordFactory implements Serializable {
 								instance
 									.getDateofacceptance()
 									.stream()
-									.filter(d -> isNotBlank(d))
+									.filter(StringUtils::isNotBlank)
 									.map(d -> XmlSerializationUtils.asXmlElement("dateofacceptance", d))
 									.collect(Collectors.toList()));
 					}
@@ -1346,7 +1346,7 @@ public class XmlRecordFactory implements Serializable {
 								instance
 									.getInstancetype()
 									.stream()
-									.filter(t -> !StringUtils.isNotBlank(t.getClassid()))
+									.filter(t -> StringUtils.isNotBlank(t.getClassid()))
 									.map(t -> XmlSerializationUtils.mapQualifier("instancetype", t))
 									.collect(Collectors.toList()));
 					}
@@ -1356,7 +1356,7 @@ public class XmlRecordFactory implements Serializable {
 								instance
 									.getDistributionlocation()
 									.stream()
-									.filter(d -> isNotBlank(d))
+									.filter(StringUtils::isNotBlank)
 									.map(d -> XmlSerializationUtils.asXmlElement("distributionlocation", d))
 									.collect(Collectors.toList()));
 					}
@@ -1409,7 +1409,7 @@ public class XmlRecordFactory implements Serializable {
 								instance
 									.getLicense()
 									.stream()
-									.filter(d -> isNotBlank(d))
+									.filter(StringUtils::isNotBlank)
 									.map(d -> XmlSerializationUtils.asXmlElement("license", d))
 									.collect(Collectors.toList()));
 					}
@@ -1540,11 +1540,16 @@ public class XmlRecordFactory implements Serializable {
 					.min(new RefereedComparator())
 					.orElse(XmlInstance.UNKNOWN_REVIEW_LEVEL));
 
+		Map<String, Qualifier> instanceTypes = Maps.newHashMap();
+
 		instances.forEach(p -> {
 			final Instance i = p.getRight();
 			instance.getCollectedfrom().add(i.getCollectedfrom());
 			instance.getHostedby().add(i.getHostedby());
-			instance.getInstancetype().add(i.getInstancetype());
+
+			if (Optional.ofNullable(i.getInstancetype()).map(Qualifier::getClassid).isPresent()) {
+				instanceTypes.putIfAbsent(i.getInstancetype().getClassid(), i.getInstancetype());
+			}
 			instance
 				.setProcessingchargeamount(
 					Optional.ofNullable(i.getProcessingchargeamount()).map(apc -> apc.getValue()).orElse(null));
@@ -1570,6 +1575,8 @@ public class XmlRecordFactory implements Serializable {
 				.ofNullable(i.getFulltext())
 				.ifPresent(instance::setFulltext);
 		});
+
+		instance.getInstancetype().addAll(instanceTypes.values());
 
 		if (instance.getHostedby().size() > 1
 			&& instance.getHostedby().stream().anyMatch(hb -> ModelConstants.UNKNOWN_REPOSITORY.equals(hb))) {
