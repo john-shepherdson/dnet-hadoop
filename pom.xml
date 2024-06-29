@@ -994,6 +994,25 @@
 
     <!-- Build with scala 12 and Spark 3.4 -->
     <profiles>
+        <!-- Activate ARM-compatible snappy dependency on new Silicon Macs -->
+        <profile>
+            <id>arm-silicon-mac</id>
+            <activation>
+                <os>
+                    <arch>aarch64</arch>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.xerial.snappy</groupId>
+                        <artifactId>snappy-java</artifactId>
+                        <version>1.1.8.4</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
         <profile>
             <id>spark-34</id>
             <properties>

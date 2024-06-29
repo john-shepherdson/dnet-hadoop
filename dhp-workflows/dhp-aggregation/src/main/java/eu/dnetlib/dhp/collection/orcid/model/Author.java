@@ -20,6 +20,9 @@ public class Author extends ORCIDItem {
 
 	private String lastModifiedDate;
 
+	public Author() {
+	}
+
 	public String getBiography() {
 		return biography;
 	}

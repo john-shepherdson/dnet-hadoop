@@ -32,4 +32,6 @@ public class Work extends ORCIDItem {
 		pids.add(pid);
 	}
 
+	public Work() {
+	}
 }
