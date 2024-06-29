@@ -1,12 +1,15 @@
 
 package eu.dnetlib.dhp.actionmanager.webcrawl;
 
+
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.actionmanager.Constants;
+import io.netty.util.Constant;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.GzipCodec;
@@ -44,8 +47,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 	private static final String PMID_PREFIX = "50|pmid________::";
 
 	private static final String PMCID_PREFIX = "50|pmc_________::";
-	private static final String WEB_CRAWL_ID = "10|openaire____::fb98a192f6a055ba495ef414c330834b";
-	private static final String WEB_CRAWL_NAME = "Web Crawl";
+
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(String[] args) throws Exception {
@@ -214,7 +216,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 						ModelConstants.IS_AUTHOR_INSTITUTION_OF,
 						Arrays
 							.asList(
-								OafMapperUtils.keyValue(WEB_CRAWL_ID, WEB_CRAWL_NAME)),
+								OafMapperUtils.keyValue(Constants.WEB_CRAWL_ID, Constants.WEB_CRAWL_NAME)),
 						OafMapperUtils
 							.dataInfo(
 								false, null, false, false,
@@ -233,7 +235,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 						ModelConstants.HAS_AUTHOR_INSTITUTION,
 						Arrays
 							.asList(
-								OafMapperUtils.keyValue(WEB_CRAWL_ID, WEB_CRAWL_NAME)),
+								OafMapperUtils.keyValue(Constants.WEB_CRAWL_ID, Constants.WEB_CRAWL_NAME)),
 						OafMapperUtils
 							.dataInfo(
 								false, null, false, false,

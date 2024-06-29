@@ -88,6 +88,7 @@ public class PrepareAffiliationRelationsTest {
 					"-pubmedInputPath", crossrefAffiliationRelationPath,
 					"-openapcInputPath", crossrefAffiliationRelationPath,
 					"-dataciteInputPath", crossrefAffiliationRelationPath,
+						"-webCrawlInputPath", crossrefAffiliationRelationPath,
 					"-outputPath", outputPath
 				});
 
@@ -104,7 +105,7 @@ public class PrepareAffiliationRelationsTest {
 //            );
 //        }
 		// count the number of relations
-		assertEquals(80, tmp.count());
+		assertEquals(120, tmp.count());
 
 		Dataset<Relation> dataset = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
 		dataset.createOrReplaceTempView("result");
@@ -115,7 +116,7 @@ public class PrepareAffiliationRelationsTest {
 		// verify that we have equal number of bi-directional relations
 		Assertions
 			.assertEquals(
-				40, execVerification
+				60, execVerification
 					.filter(
 						"relClass='" + ModelConstants.HAS_AUTHOR_INSTITUTION + "'")
 					.collectAsList()
@@ -123,7 +124,7 @@ public class PrepareAffiliationRelationsTest {
 
 		Assertions
 			.assertEquals(
-				40, execVerification
+				60, execVerification
 					.filter(
 						"relClass='" + ModelConstants.IS_AUTHOR_INSTITUTION_OF + "'")
 					.collectAsList()
