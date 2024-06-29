@@ -88,7 +88,7 @@ public class PrepareAffiliationRelationsTest {
 					"-pubmedInputPath", crossrefAffiliationRelationPath,
 					"-openapcInputPath", crossrefAffiliationRelationPath,
 					"-dataciteInputPath", crossrefAffiliationRelationPath,
-						"-webCrawlInputPath", crossrefAffiliationRelationPath,
+					"-webCrawlInputPath", crossrefAffiliationRelationPath,
 					"-outputPath", outputPath
 				});
 

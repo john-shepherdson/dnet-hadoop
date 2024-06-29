@@ -106,15 +106,15 @@ public class PrepareAffiliationRelations implements Serializable {
 					spark, dataciteInputPath, collectedFromDatacite);
 
 				List<KeyValue> collectedFromWebCrawl = OafMapperUtils
-						.listKeyValues(Constants.WEB_CRAWL_ID, Constants.WEB_CRAWL_NAME);
+					.listKeyValues(Constants.WEB_CRAWL_ID, Constants.WEB_CRAWL_NAME);
 				JavaPairRDD<Text, Text> webCrawlRelations = prepareAffiliationRelations(
-						spark, webcrawlInputPath, collectedFromWebCrawl);
+					spark, webcrawlInputPath, collectedFromWebCrawl);
 
 				crossrefRelations
 					.union(pubmedRelations)
 					.union(openAPCRelations)
 					.union(dataciteRelations)
-						.union(webCrawlRelations)
+					.union(webCrawlRelations)
 					.saveAsHadoopFile(
 						outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, BZip2Codec.class);
 
