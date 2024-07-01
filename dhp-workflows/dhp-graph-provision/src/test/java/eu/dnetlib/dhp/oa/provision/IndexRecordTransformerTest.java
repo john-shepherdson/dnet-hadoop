@@ -14,6 +14,7 @@ import java.util.List;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 
+import eu.dnetlib.dhp.schema.oaf.Datasource;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrInputDocument;
@@ -83,6 +84,36 @@ public class IndexRecordTransformerTest {
 		assertEquals("Article", doc.valueOf("//children/instance/instancetype/@classname"));
 
 		testRecordTransformation(xmlRecord);
+	}
+
+	@Test
+	public void testDatasourceRecordTransformation() throws IOException, TransformerException, DocumentException {
+
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+				PayloadConverterJob.schemaLocation);
+
+		final Datasource d = load("datasource.json", Datasource.class);
+
+		final JoinedEntity je = new JoinedEntity(d);
+		je
+				.setLinks(
+						Lists
+								.newArrayList()
+										);
+
+		final String xmlRecord = xmlRecordFactory.build(je);
+
+		assertNotNull(xmlRecord);
+
+		System.out.println(xmlRecord);
+
+		Document doc = new SAXReader().read(new StringReader(xmlRecord));
+
+		System.out.println("CONTEXT " + doc.valueOf( "//*[local-name()='datasource']//*[local-name()='context']"));
+
+		Assertions.assertEquals(0, doc.valueOf( "//*[local-name()='datasource']//*[local-name()='context']").length());
+
+		//testRecordTransformation(xmlRecord);
 	}
 
 	@Test

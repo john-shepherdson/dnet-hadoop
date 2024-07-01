@@ -41,6 +41,26 @@
     "schemeid": "dnet:datasource_typologies_ui",
     "schemename": "dnet:datasource_typologies_ui"
   },
+  "context":[
+    {
+      "id":"netherlands",
+      "dataInfo":[
+        {
+          "invisible":false,
+          "inferred":false,
+          "deletedbyinference":false,
+          "trust":"0.9",
+          "inferenceprovenance":"",
+          "provenanceaction":{
+            "classid":"sysimport:crosswalk",
+            "classname":"sysimport:crosswalk",
+            "schemeid":"dnet:provenanceActions",
+            "schemename":"dnet:provenanceActions"
+          }
+        }
+      ]
+    }
+  ],
   "pid": [
     {
       "value": "r3d100010218",

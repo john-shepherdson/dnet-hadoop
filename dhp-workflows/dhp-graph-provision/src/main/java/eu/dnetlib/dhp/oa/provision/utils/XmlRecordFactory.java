@@ -1605,7 +1605,8 @@ public class XmlRecordFactory implements Serializable {
 
 		if (contextMapper != null
 			&& !contextMapper.isEmpty()
-			&& MainEntityType.result.toString().equals(type)) {
+		//	&& MainEntityType.result.toString().equals(type)
+		) {
 
 			XMLTag document = XMLDoc.newDocument(true).addRoot("contextRoot");
 
