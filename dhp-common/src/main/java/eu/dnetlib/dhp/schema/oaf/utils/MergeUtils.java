@@ -655,6 +655,13 @@ public class MergeUtils {
 			return d1;
 		}
 
+		if (StringUtils.contains(d1.getValue(), "null")) {
+			return d2;
+		}
+		if (StringUtils.contains(d2.getValue(), "null")) {
+			return d1;
+		}
+
 		return Stream
 			.of(d1, d2)
 			.min(
