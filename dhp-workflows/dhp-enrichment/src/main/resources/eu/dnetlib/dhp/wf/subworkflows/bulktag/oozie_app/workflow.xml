@@ -77,6 +77,7 @@
             <arg>--pathMap</arg><arg>${pathMap}</arg>
             <arg>--baseURL</arg><arg>${baseURL}</arg>
             <arg>--nameNode</arg><arg>${nameNode}</arg>
+            <arg>--taggingCriteria</arg><arg>${taggingCriteria}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

@@ -68,6 +68,8 @@ public class BulkTagJobTest {
 
 	private static String taggingConf = "";
 
+	private static String taggingCriteria = "{\"criteria\":[{\"constraint\":[{\"verb\":\"starts_with_caseinsensitive\",\"field\":\"title\",\"value\":\"supplementary material\"}]}]}";
+
 	static {
 		try {
 			taggingConf = IOUtils
@@ -119,7 +121,10 @@ public class BulkTagJobTest {
 					getClass().getResource("/eu/dnetlib/dhp/bulktag/sample/dataset/no_updates/").getPath(),
 					"-taggingConf", taggingConf,
 					"-outputPath", workingDir.toString() + "/",
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -156,7 +161,10 @@ public class BulkTagJobTest {
 					"-sourcePath", sourcePath,
 					"-taggingConf", taggingConf,
 					"-outputPath", workingDir.toString() + "/",
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -242,15 +250,15 @@ public class BulkTagJobTest {
 		fs
 			.copyFromLocalFile(
 				false, new org.apache.hadoop.fs.Path(getClass()
-					.getResource("/eu/dnetlib/dhp/bulktag/pathMap/")
+					.getResource("/eu/dnetlib/dhp/bulktag/pathMap/pathMap")
 					.getPath()),
 				new org.apache.hadoop.fs.Path(workingDir.toString() + "/data/bulktagging/protoMap"));
-
+		final String pathMap = workingDir.toString() + "/data/bulktagging/protoMap";
 		final String sourcePath = getClass()
 			.getResource(
 				"/eu/dnetlib/dhp/bulktag/sample/dataset/update_subject/contextnoprovenance/")
 			.getPath();
-		final String pathMap = BulkTagJobTest.pathMap;
+
 		SparkBulkTagJob
 			.main(
 				new String[] {
@@ -262,7 +270,9 @@ public class BulkTagJobTest {
 					"-outputPath", workingDir.toString() + "/",
 
 					"-pathMap", workingDir.toString() + "/data/bulktagging/protoMap",
-					"-nameNode", "local"
+					"-nameNode", "local",
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/"
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
@@ -342,8 +352,11 @@ public class BulkTagJobTest {
 					"-taggingConf", taggingConf,
 
 					"-outputPath", workingDir.toString() + "/",
-					"-baseURL", "https://services.openaire.eu/openaire/community/",
-					"-pathMap", pathMap
+
+					"-pathMap", pathMap,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -424,7 +437,8 @@ public class BulkTagJobTest {
 					"-baseURL", "https://services.openaire.eu/openaire/community/",
 
 					"-pathMap", workingDir.toString() + "/data/bulktagging/protoMap/pathMap",
-					"-nameNode", "local"
+					"-nameNode", "local",
+						"-taggingCriteria", taggingCriteria
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -481,7 +495,10 @@ public class BulkTagJobTest {
 
 					"-outputPath", workingDir.toString() + "/",
 
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -602,7 +619,10 @@ public class BulkTagJobTest {
 
 					"-outputPath", workingDir.toString() + "/",
 
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -730,7 +750,10 @@ public class BulkTagJobTest {
 
 					"-outputPath", workingDir.toString() + "/",
 
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -830,7 +853,10 @@ public class BulkTagJobTest {
 
 					"-outputPath", workingDir.toString() + "/",
 
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -873,7 +899,10 @@ public class BulkTagJobTest {
 
 					"-outputPath", workingDir.toString() + "/",
 
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -927,7 +956,10 @@ public class BulkTagJobTest {
 
 					"-outputPath", workingDir.toString() + "/",
 
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -976,7 +1008,10 @@ public class BulkTagJobTest {
 
 					"-outputPath", workingDir.toString() + "/",
 
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -1194,7 +1229,11 @@ public class BulkTagJobTest {
 
 					"-outputPath", workingDir.toString() + "/",
 
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -1312,7 +1351,10 @@ public class BulkTagJobTest {
 
 					"-outputPath", workingDir.toString() + "/",
 
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -1432,7 +1474,10 @@ public class BulkTagJobTest {
 
 					"-outputPath", workingDir.toString() + "/",
 
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -1472,7 +1517,10 @@ public class BulkTagJobTest {
 
 					"-outputPath", workingDir.toString() + "/",
 
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -1517,7 +1565,10 @@ public class BulkTagJobTest {
 
 					"-outputPath", workingDir.toString() + "/",
 
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -1554,7 +1605,10 @@ public class BulkTagJobTest {
 
 					"-outputPath", workingDir.toString() + "/",
 
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -1629,7 +1683,10 @@ public class BulkTagJobTest {
 
 					"-outputPath", workingDir.toString() + "/",
 
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
@@ -1667,7 +1724,10 @@ public class BulkTagJobTest {
 					"-outputPath", workingDir.toString() + "/",
 //					"-baseURL", "https://services.openaire.eu/openaire/community/",
 					"-pathMap", pathMap,
-					"-taggingConf", taggingConf
+					"-taggingConf", taggingConf,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -1708,7 +1768,10 @@ public class BulkTagJobTest {
 								.getResourceAsStream(
 									"/eu/dnetlib/dhp/bulktag/communityconfiguration/tagging_conf_publicationdate.xml")),
 					"-outputPath", workingDir.toString() + "/",
-					"-pathMap", pathMap
+					"-pathMap", pathMap,
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
@@ -1811,8 +1874,9 @@ public class BulkTagJobTest {
 					"-outputPath", workingDir.toString() + "/",
 
 					"-pathMap", workingDir.toString() + "/data/bulktagging/protoMap/pathMap",
-					"-baseURL", "none",
-					"-nameNode", "local"
+						"-taggingCriteria", taggingCriteria,
+						"-baseURL", "https://services.openaire.eu/openaire/community/",
+						"-nameNode", "local"
 				});
 
 	}

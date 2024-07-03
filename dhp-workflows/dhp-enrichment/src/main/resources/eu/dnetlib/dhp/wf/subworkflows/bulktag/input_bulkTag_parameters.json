@@ -39,5 +39,10 @@
   "paramLongName": "nameNode",
   "paramDescription": "this parameter is to specify the api to be queried (beta or production)",
   "paramRequired": true
+},{
+  "paramName": "tc",
+  "paramLongName": "taggingCriteria",
+  "paramDescription": "this parameter is to specify the api to be queried (beta or production)",
+  "paramRequired": true
 }
 ]

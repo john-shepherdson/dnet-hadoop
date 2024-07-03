@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.bulktag.criteria.VerbResolverFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -92,6 +93,10 @@ public class SparkBulkTagJob {
 		ProtoMap protoMap = new Gson().fromJson(temp, ProtoMap.class);
 		log.info("pathMap: {}", new Gson().toJson(protoMap));
 
+		SelectionConstraints taggingConstraints = new Gson()
+				.fromJson(parser.get("taggingCriteria"), SelectionConstraints.class);
+		taggingConstraints.setSelection(VerbResolverFactory.newInstance());
+
 		SparkConf conf = new SparkConf();
 		CommunityConfiguration cc;
 
@@ -113,7 +118,7 @@ public class SparkBulkTagJob {
 			spark -> {
 				extendCommunityConfigurationForEOSC(spark, inputPath, cc);
 				execBulkTag(
-					spark, inputPath, outputPath, protoMap, cc);
+					spark, inputPath, outputPath, protoMap, cc, taggingConstraints);
 				execDatasourceTag(spark, inputPath, outputPath, Utils.getDatasourceCommunities(baseURL));
 				execProjectTag(spark, inputPath, outputPath, Utils.getCommunityProjects(baseURL));
 			});
@@ -271,7 +276,8 @@ public class SparkBulkTagJob {
 		String inputPath,
 		String outputPath,
 		ProtoMap protoMappingParams,
-		CommunityConfiguration communityConfiguration) {
+		CommunityConfiguration communityConfiguration,
+		SelectionConstraints taggingConstraints) {
 
 		try {
 			System.out.println(new ObjectMapper().writeValueAsString(protoMappingParams));
@@ -289,21 +295,30 @@ public class SparkBulkTagJob {
 				readPath(spark, inputPath + e.name(), resultClazz)
 					.map(patchResult(), Encoders.bean(resultClazz))
 					.filter(Objects::nonNull)
-					.map(
-						(MapFunction<R, R>) value -> resultTagger
+						.map((MapFunction<R, Tagging>) value -> resultTagger
 							.enrichContextCriteria(
-								value, communityConfiguration, protoMappingParams),
-						Encoders.bean(resultClazz))
+								value, communityConfiguration, protoMappingParams, taggingConstraints),
+						Encoders.bean(Tagging.class))
 					.write()
 					.mode(SaveMode.Overwrite)
 					.option("compression", "gzip")
 					.json(outputPath + e.name());// writing the tagging in the working dir for entity
 
-				readPath(spark, outputPath + e.name(), resultClazz) // copy the tagging in the actual result output path
+				readPath(spark, outputPath + e.name(), Tagging.class)
+						.map((MapFunction<Tagging, R>) t -> (R) t.getResult(), Encoders.bean(resultClazz) )// copy the tagging in the actual result output path
 					.write()
 					.mode(SaveMode.Overwrite)
 					.option("compression", "gzip")
 					.json(inputPath + e.name());
+
+				readPath(spark, outputPath + e.name(), Tagging.class)
+						.map((MapFunction<Tagging, String>) t -> t.getTag(), Encoders.STRING() )// copy the tagging in the actual result output path
+						.filter(Objects::nonNull)
+						.write()
+						.mode(SaveMode.Overwrite)
+						.option("compression", "gzip")
+						.json("/user/miriam.baglioni/graphTagging/" + e.name());
+
 			});
 
 	}
