@@ -17,4 +17,4 @@ FROM ${stats_db_name}.result_projects,
      ${stats_db_name}.project
 WHERE result_projects.id = result.id
   AND result.type = 'publication'
-  AND project.id = result_projects.project; -- /*EOS*/
+  AND project.id = result_projects.project; /*EOS*/
