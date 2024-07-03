@@ -1,3 +1,5 @@
+set mapred.job.queue.name=analytics; /*EOS*/
+
 ----------------------------------------------------
 ----------------------------------------------------
 -- Result table/view and Result related tables/views

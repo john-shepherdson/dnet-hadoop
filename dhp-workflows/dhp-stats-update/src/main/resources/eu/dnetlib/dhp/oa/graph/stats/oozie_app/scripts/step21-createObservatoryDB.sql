@@ -1,3 +1,5 @@
+set mapred.job.queue.name=analytics; /*EOS*/
+
 create table ${observatory_db_name}.result_cc_licence stored as parquet as
 select r.id, coalesce(rln.count, 0) > 0 as cc_licence
 from ${stats_db_name}.result r

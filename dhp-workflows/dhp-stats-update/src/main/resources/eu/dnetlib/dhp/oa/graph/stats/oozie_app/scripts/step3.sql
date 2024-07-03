@@ -1,3 +1,5 @@
+set mapred.job.queue.name=analytics; /*EOS*/
+
 ------------------------------------------------------
 ------------------------------------------------------
 -- Dataset table/view and Dataset related tables/views

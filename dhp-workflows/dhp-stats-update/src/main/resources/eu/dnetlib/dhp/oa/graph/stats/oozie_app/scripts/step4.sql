@@ -1,3 +1,5 @@
+set mapred.job.queue.name=analytics; /*EOS*/
+
 --------------------------------------------------------
 --------------------------------------------------------
 -- Software table/view and Software related tables/views

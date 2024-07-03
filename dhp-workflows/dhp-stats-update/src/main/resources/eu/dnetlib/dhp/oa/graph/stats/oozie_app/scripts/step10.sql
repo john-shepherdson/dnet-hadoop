@@ -1,3 +1,5 @@
+set mapred.job.queue.name=analytics; /*EOS*/
+
 ------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------
 -- Tables/views from external tables/views (Fundref, Country, CountyGDP, roarmap, rndexpediture)

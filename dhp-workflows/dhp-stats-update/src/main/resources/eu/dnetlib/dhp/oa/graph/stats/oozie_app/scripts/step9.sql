@@ -1,3 +1,5 @@
+set mapred.job.queue.name=analytics; /*EOS*/
+
 ----------------------------------------------------------------
 ----------------------------------------------------------------
 -- Organization table/view and Organization related tables/views
