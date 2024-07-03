@@ -5,41 +5,41 @@
 --------------------------------------------------------
 
 -- Software temporary table supporting updates
-DROP TABLE IF EXISTS ${stats_db_name}.software_tmp purge; /*EOS*/
-CREATE TABLE ${stats_db_name}.software_tmp
-(
-    id               STRING,
-    title            STRING,
-    publisher        STRING,
-    journal          STRING,
-    date             STRING,
-    year             STRING,
-    bestlicence      STRING,
-    embargo_end_date STRING,
-    delayed          BOOLEAN,
-    authors          INT,
-    source           STRING,
-    abstract         BOOLEAN,
-    type             STRING
-)
-    clustered by (id) INTO 100 buckets stored AS orc tblproperties ('transactional' = 'true'); /*EOS*/
+DROP TABLE IF EXISTS ${stats_db_name}.software purge; /*EOS*/
 
-INSERT INTO ${stats_db_name}.software_tmp
-SELECT substr(s.id, 4)                                            as id,
-       s.title[0].value                                           AS title,
-       s.publisher.value                                          AS publisher,
-       CAST(NULL AS string)                                       AS journal,
-       s.dateofacceptance.value                                   AS DATE,
-       date_format(s.dateofacceptance.value, 'yyyy')              AS YEAR,
-       s.bestaccessright.classname                                AS bestlicence,
-       s.embargoenddate.value                                     AS embargo_end_date,
-       FALSE                                                      AS delayed,
-       SIZE(s.author)                                             AS authors,
-       concat_ws('\u003B', s.source.value)                        AS source,
-       CASE WHEN SIZE(s.description) > 0 THEN TRUE ELSE FALSE END AS abstract,
-       'software'                                                 as type
-from ${openaire_db_name}.software s
-where s.datainfo.deletedbyinference = false and s.datainfo.invisible=false; /*EOS*/
+CREATE TABLE ${stats_db_name}.software stored as parquet as
+with soft_pr as (
+    select soft.id as soft_id, case when (to_date(soft.dateofacceptance.value) > to_date( pj.enddate.value)) then true else false end as delayed
+    from ${openaire_db_name}.software soft
+        join ${openaire_db_name}.relation rel
+            on reltype = 'resultProject' and relclass = 'isProducedBy' and rel.source=soft.id
+                and rel.datainfo.deletedbyinference = false and rel.datainfo.invisible = false
+        join ${openaire_db_name}.project pj on pj.id=rel.target and pj.datainfo.deletedbyinference = false and pj.datainfo.invisible = false
+    where soft.datainfo.deletedbyinference = false and soft.datainfo.invisible = false
+),
+soft_delayed as (
+    select soft_id, max(delayed) as delayed
+    from soft_pr
+    group by soft_id
+)
+select /*+ COALESCE(100) */
+    substr(soft.id, 4)                                                       as id,
+    soft.title[0].value                                                      as title,
+    soft.publisher.value                                                     as publisher,
+    cast(null as string)                                                     as journal,
+    soft.dateofacceptance.value                                              as date,
+    date_format(soft.dateofacceptance.value, 'yyyy')                         as year,
+    soft.bestaccessright.classname                                           as bestlicence,
+    soft.embargoenddate.value                                                as embargo_end_date,
+    coalesce(soft_delayed.delayed, false)                                    as delayed, -- It's delayed, when the software was published after the end of the project.
+    size(soft.author)                                                        as authors,
+    concat_ws('\u003B', soft.source.value)                                   as source,
+    case when size(soft.description) > 0 then true else false end            as abstract,
+    'software'                                                               as type
+from ${openaire_db_name}.software soft
+         left outer join soft_delayed on soft.id=soft_delayed.soft_id
+where soft.datainfo.deletedbyinference = false and soft.datainfo.invisible = false; /*EOS*/
+
 
 DROP TABLE IF EXISTS ${stats_db_name}.software_citations purge; /*EOS*/
 

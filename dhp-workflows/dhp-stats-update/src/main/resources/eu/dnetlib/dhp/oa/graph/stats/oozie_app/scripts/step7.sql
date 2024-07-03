@@ -7,16 +7,16 @@
 -- Views on temporary tables that should be re-created in the end
 CREATE OR REPLACE VIEW ${stats_db_name}.result as
 SELECT *, bestlicence AS access_mode
-FROM ${stats_db_name}.publication_tmp
+FROM ${stats_db_name}.publication
 UNION ALL
 SELECT *, bestlicence AS access_mode
-FROM ${stats_db_name}.software_tmp
+FROM ${stats_db_name}.software
 UNION ALL
 SELECT *, bestlicence AS access_mode
-FROM ${stats_db_name}.dataset_tmp
+FROM ${stats_db_name}.dataset
 UNION ALL
 SELECT *, bestlicence AS access_mode
-FROM ${stats_db_name}.otherresearchproduct_tmp; /*EOS*/
+FROM ${stats_db_name}.otherresearchproduct; /*EOS*/
 
 -- Views on final tables
 CREATE OR REPLACE VIEW ${stats_db_name}.result_datasources AS
@@ -153,4 +153,4 @@ CREATE TABLE ${stats_db_name}.result_projects STORED AS PARQUET AS
 select /*+ COALESCE(100) */ pr.result AS id, pr.id AS project, datediff(p.enddate, p.startdate) AS daysfromend, pr.provenance as provenance
 FROM ${stats_db_name}.result r
          JOIN ${stats_db_name}.project_results pr ON r.id = pr.result
-         JOIN ${stats_db_name}.project_tmp p ON p.id = pr.id; /*EOS*/
+         JOIN ${stats_db_name}.project p ON p.id = pr.id; /*EOS*/

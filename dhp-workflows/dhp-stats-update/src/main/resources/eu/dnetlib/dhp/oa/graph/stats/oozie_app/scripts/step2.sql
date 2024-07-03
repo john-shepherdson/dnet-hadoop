@@ -7,41 +7,41 @@ set mapred.job.queue.name=analytics; /*EOS*/
 --------------------------------------------------------------
 
 -- Publication temporary table
-DROP TABLE IF EXISTS ${stats_db_name}.publication_tmp purge; /*EOS*/
-CREATE TABLE ${stats_db_name}.publication_tmp
-(
-    id               STRING,
-    title            STRING,
-    publisher        STRING,
-    journal          STRING,
-    date             STRING,
-    year             STRING,
-    bestlicence      STRING,
-    embargo_end_date STRING,
-    delayed          BOOLEAN,
-    authors          INT,
-    source           STRING,
-    abstract         BOOLEAN,
-    type             STRING
-)
-    clustered by (id) into 100 buckets stored as orc tblproperties ('transactional' = 'true'); /*EOS*/
+DROP TABLE IF EXISTS ${stats_db_name}.publication purge; /*EOS*/
 
-INSERT INTO ${stats_db_name}.publication_tmp
-SELECT substr(p.id, 4)                                            as id,
-       p.title[0].value                                           as title,
-       p.publisher.value                                          as publisher,
-       p.journal.name                                             as journal,
-       p.dateofacceptance.value                                   as date,
-       date_format(p.dateofacceptance.value, 'yyyy')              as year,
-       p.bestaccessright.classname                                as bestlicence,
-       p.embargoenddate.value                                     as embargo_end_date,
-       false                                                      as delayed,
-       size(p.author)                                             as authors,
-       concat_ws('\u003B', p.source.value)                        as source,
-       case when size(p.description) > 0 then true else false end as abstract,
-       'publication'                                              as type
-from ${openaire_db_name}.publication p
-where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
+CREATE TABLE ${stats_db_name}.publication stored as parquet as
+with pub_pr as (
+    select pub.id as pub_id, case when (to_date(pub.dateofacceptance.value) > to_date( pj.enddate.value)) then true else false end as delayed
+    from ${openaire_db_name}.publication pub
+             join ${openaire_db_name}.relation rel
+                  on reltype = 'resultProject' and relclass = 'isProducedBy' and rel.source=pub.id
+                      and rel.datainfo.deletedbyinference = false and rel.datainfo.invisible = false
+             join ${openaire_db_name}.project pj on pj.id=rel.target and pj.datainfo.deletedbyinference = false and pj.datainfo.invisible = false
+    where pub.datainfo.deletedbyinference = false and pub.datainfo.invisible = false
+),
+ pub_delayed as (
+     select pub_id, max(delayed) as delayed
+     from pub_pr
+     group by pub_id
+ )
+select /*+ COALESCE(100) */
+    substr(pub.id, 4)                                                     as id,
+    pub.title[0].value                                                    as title,
+    pub.publisher.value                                                   as publisher,
+    pub.journal.name                                                      as journal,
+    pub.dateofacceptance.value                                            as date,
+    date_format(pub.dateofacceptance.value, 'yyyy')                       as year,
+    pub.bestaccessright.classname                                         as bestlicence,
+    pub.embargoenddate.value                                              as embargo_end_date,
+    coalesce(pub_delayed.delayed, false)                                  as delayed, -- It's delayed, when the publication was published after the end of at least one of its projects.
+    size(pub.author)                                                      as authors,
+    concat_ws('\u003B', pub.source.value)                                 as source,
+    case when size(pub.description) > 0 then true else false end          as abstract,
+    'publication'                                                         as type
+from ${openaire_db_name}.publication pub
+    left outer join pub_delayed on pub.id=pub_delayed.pub_id
+where pub.datainfo.deletedbyinference = false and pub.datainfo.invisible = false; /*EOS*/
+
 
 DROP TABLE IF EXISTS ${stats_db_name}.publication_classifications purge; /*EOS*/
 

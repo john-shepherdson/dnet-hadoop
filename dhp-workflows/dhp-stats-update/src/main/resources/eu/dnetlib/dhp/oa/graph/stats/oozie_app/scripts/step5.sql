@@ -5,41 +5,41 @@
 --------------------------------------------------------------------------------
 
 -- Otherresearchproduct temporary table supporting updates
-DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_tmp purge; /*EOS*/
+DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct purge; /*EOS*/
 
-CREATE TABLE ${stats_db_name}.otherresearchproduct_tmp
-(
-    id               STRING,
-    title            STRING,
-    publisher        STRING,
-    journal          STRING,
-    date             STRING,
-    year             STRING,
-    bestlicence      STRING,
-    embargo_end_date STRING,
-    delayed          BOOLEAN,
-    authors          INT,
-    source           STRING,
-    abstract         BOOLEAN,
-    type             STRING
-) CLUSTERED BY (id) INTO 100 buckets stored AS orc tblproperties ('transactional' = 'true'); /*EOS*/
+CREATE TABLE ${stats_db_name}.otherresearchproduct stored as parquet as
+with other_pr as (
+    select other.id as other_id, case when (to_date(other.dateofacceptance.value) > to_date( pj.enddate.value)) then true else false end as delayed
+    from ${openaire_db_name}.otherresearchproduct other
+    join ${openaire_db_name}.relation rel
+        on reltype = 'resultProject' and relclass = 'isProducedBy' and rel.source=other.id
+            and rel.datainfo.deletedbyinference = false and rel.datainfo.invisible = false
+    join ${openaire_db_name}.project pj on pj.id=rel.target and pj.datainfo.deletedbyinference = false and pj.datainfo.invisible = false
+    where other.datainfo.deletedbyinference = false and other.datainfo.invisible = false
+),
+other_delayed as (
+    select other_id, max(delayed) as delayed
+    from other_pr
+    group by other_id
+)
+select /*+ COALESCE(100) */
+    substr(other.id, 4)                                            as id,
+    other.title[0].value                                           as title,
+    other.publisher.value                                          as publisher,
+    cast(null as string)                                           as journal,
+    other.dateofacceptance.value                                   as date,
+    date_format(other.dateofacceptance.value, 'yyyy')              as year,
+    other.bestaccessright.classname                                as bestlicence,
+    other.embargoenddate.value                                     as embargo_end_date,
+    false                                                          as delayed,
+    size(other.author)                                             as authors,
+    concat_ws('\u003B', other.source.value)                        as source,
+    case when size(other.description) > 0 then true else false end as abstract,
+    'other'                                                        as type
+from ${openaire_db_name}.otherresearchproduct other
+    left outer join other_delayed on other.id=other_delayed.other_id
+where other.datainfo.deletedbyinference = false and other.datainfo.invisible = false; /*EOS*/
 
-INSERT INTO ${stats_db_name}.otherresearchproduct_tmp
-SELECT substr(o.id, 4)                                            AS id,
-       o.title[0].value                                           AS title,
-       o.publisher.value                                          AS publisher,
-       CAST(NULL AS string)                                       AS journal,
-       o.dateofacceptance.value                                   AS DATE,
-       date_format(o.dateofacceptance.value, 'yyyy')              AS year,
-       o.bestaccessright.classname                                AS bestlicence,
-       o.embargoenddate.value                                     as embargo_end_date,
-       FALSE                                                      AS delayed,
-       SIZE(o.author)                                             AS authors,
-       concat_ws('\u003B', o.source.value)                        AS source,
-       CASE WHEN SIZE(o.description) > 0 THEN TRUE ELSE FALSE END AS abstract,
-       'other'                                                    AS type
-FROM ${openaire_db_name}.otherresearchproduct o
-WHERE o.datainfo.deletedbyinference = FALSE and o.datainfo.invisible=false; /*EOS*/
 
 -- Otherresearchproduct_citations
 DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_citations purge; /*EOS*/
