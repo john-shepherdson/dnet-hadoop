@@ -203,8 +203,8 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 			WindowSpec w = Window
 				.partitionBy("groupId")
 				.orderBy(
-					col("lastUsage").desc_nulls_last(),
 					col("pidType").asc_nulls_last(),
+					col("lastUsage").desc_nulls_last(),
 					col("collectedfrom").desc_nulls_last(),
 					col("date").asc_nulls_last(),
 					col("id").asc_nulls_last());
