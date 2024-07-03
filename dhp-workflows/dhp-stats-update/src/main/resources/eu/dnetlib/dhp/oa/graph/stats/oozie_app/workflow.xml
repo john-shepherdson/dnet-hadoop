@@ -150,7 +150,8 @@
     </decision>
 
     <kill name="Kill">
-        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}
+            ${wf:actionData(wf:lastErrorNode())['stackTrace']}]</message>
     </kill>
 
     <action name="Step1">

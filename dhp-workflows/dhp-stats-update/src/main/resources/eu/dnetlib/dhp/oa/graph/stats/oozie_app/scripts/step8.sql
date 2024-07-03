@@ -67,5 +67,5 @@ from ${openaire_db_name}.datasource d lateral view explode(d.collectedfrom) cfro
 where d.datainfo.deletedbyinference = false and d.datainfo.invisible=false; /*EOS*/
 
 CREATE OR REPLACE VIEW ${stats_db_name}.datasource_results AS
-SELECT datasource AS id, id AS result
+SELECT /*+ COALESCE(100) */ datasource AS id, id AS result
 FROM ${stats_db_name}.result_datasources; /*EOS*/

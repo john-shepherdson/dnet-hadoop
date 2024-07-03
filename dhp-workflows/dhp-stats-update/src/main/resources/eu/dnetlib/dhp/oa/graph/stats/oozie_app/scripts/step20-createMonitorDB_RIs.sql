@@ -1,7 +1,7 @@
+set mapred.job.queue.name=analytics;
+
 drop database if exists TARGET cascade;
 create database if not exists TARGET;
-set mapred.job.queue.name=analytics; /*EOS*/
-
 
 create table TARGET.result stored as parquet as
     select distinct * from (

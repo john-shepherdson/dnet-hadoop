@@ -139,6 +139,8 @@ from lvl1
     join lvl3 on lvl3.id=lvl1.id and substr(lvl3.topic, 1, 4)=substr(lvl2.topic, 1, 4)
     join lvl4 on lvl4.id=lvl1.id and substr(lvl4.topic, 1, 6)=substr(lvl3.topic, 1, 6); /*EOS*/
 
+DROP TABLE ${stats_db_name}.result_fos_base_tmp purge; /*EOS*/
+
 
 DROP TABLE IF EXISTS ${stats_db_name}.result_organization purge; /*EOS*/
 
