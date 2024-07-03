@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.BZip2Codec;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
@@ -40,9 +41,9 @@ public class PrepareAffiliationRelations implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(PrepareAffiliationRelations.class);
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	private static final String ID_PREFIX = "50|doi_________::";
-	public static final String BIP_AFFILIATIONS_CLASSID = "result:organization:bipinference";
-	public static final String BIP_AFFILIATIONS_CLASSNAME = "Affiliation relation inferred by BIP!";
-	public static final String BIP_INFERENCE_PROVENANCE = "bip:affiliation:crossref";
+	public static final String BIP_AFFILIATIONS_CLASSID = "result:organization:openaireinference";
+	public static final String BIP_AFFILIATIONS_CLASSNAME = "Affiliation relation inferred by OpenAIRE";
+	public static final String BIP_INFERENCE_PROVENANCE = "openaire:affiliation";
 
 	public static <I extends Result> void main(String[] args) throws Exception {
 
@@ -69,6 +70,9 @@ public class PrepareAffiliationRelations implements Serializable {
 
 		final String dataciteInputPath = parser.get("dataciteInputPath");
 		log.info("dataciteInputPath: {}", dataciteInputPath);
+
+		final String webcrawlInputPath = parser.get("webCrawlInputPath");
+		log.info("webcrawlInputPath: {}", webcrawlInputPath);
 
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
@@ -101,12 +105,18 @@ public class PrepareAffiliationRelations implements Serializable {
 				JavaPairRDD<Text, Text> dataciteRelations = prepareAffiliationRelations(
 					spark, dataciteInputPath, collectedFromDatacite);
 
+				List<KeyValue> collectedFromWebCrawl = OafMapperUtils
+					.listKeyValues(Constants.WEB_CRAWL_ID, Constants.WEB_CRAWL_NAME);
+				JavaPairRDD<Text, Text> webCrawlRelations = prepareAffiliationRelations(
+					spark, webcrawlInputPath, collectedFromWebCrawl);
+
 				crossrefRelations
 					.union(pubmedRelations)
 					.union(openAPCRelations)
 					.union(dataciteRelations)
+					.union(webCrawlRelations)
 					.saveAsHadoopFile(
-						outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
+						outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, BZip2Codec.class);
 
 			});
 	}
