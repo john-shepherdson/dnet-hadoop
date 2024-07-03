@@ -39,21 +39,21 @@ where dtrce.datainfo.deletedbyinference = false and dtrce.datainfo.invisible = f
 DROP TABLE IF EXISTS ${stats_db_name}.datasource_languages purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.datasource_languages STORED AS PARQUET AS
-SELECT substr(d.id, 4) AS id, langs.languages AS language
+SELECT /*+ COALESCE(100) */ substr(d.id, 4) AS id, langs.languages AS language
 FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.odlanguages.value) langs AS languages
 where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.datasource_oids purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.datasource_oids STORED AS PARQUET AS
-SELECT substr(d.id, 4) AS id, oids.ids AS oid
+SELECT /*+ COALESCE(100) */ substr(d.id, 4) AS id, oids.ids AS oid
 FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.originalid) oids AS ids
 where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.datasource_organizations purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.datasource_organizations STORED AS PARQUET AS
-SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS organization
+SELECT /*+ COALESCE(100) */ substr(r.target, 4) AS id, substr(r.source, 4) AS organization
 FROM ${openaire_db_name}.relation r
 WHERE r.reltype = 'datasourceOrganization' and r.datainfo.deletedbyinference = false and r.source like '20|%' and r.datainfo.invisible=false; /*EOS*/
 
@@ -62,10 +62,10 @@ WHERE r.reltype = 'datasourceOrganization' and r.datainfo.deletedbyinference = f
 DROP TABLE IF EXISTS ${stats_db_name}.datasource_sources purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.datasource_sources STORED AS PARQUET AS
-select substr(d.id, 4) as id, substr(cf.key, 4) as datasource
+select /*+ COALESCE(100) */ substr(d.id, 4) as id, substr(cf.key, 4) as datasource
 from ${openaire_db_name}.datasource d lateral view explode(d.collectedfrom) cfrom as cf
 where d.datainfo.deletedbyinference = false and d.datainfo.invisible=false; /*EOS*/
 
 CREATE OR REPLACE VIEW ${stats_db_name}.datasource_results AS
-SELECT /*+ COALESCE(100) */ datasource AS id, id AS result
+SELECT datasource AS id, id AS result
 FROM ${stats_db_name}.result_datasources; /*EOS*/

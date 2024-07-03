@@ -1,7 +1,7 @@
 set mapred.job.queue.name=analytics; /*EOS*/
 
 create table ${observatory_db_name}.result_cc_licence stored as parquet as
-select r.id, coalesce(rln.count, 0) > 0 as cc_licence
+select /*+ COALESCE(100) */ r.id, coalesce(rln.count, 0) > 0 as cc_licence
 from ${stats_db_name}.result r
          left outer join (
     select rl.id, sum(case when rl.type like 'CC%' then 1 else 0 end) as count
@@ -11,7 +11,7 @@ from ${stats_db_name}.result r
 
 
 create table ${observatory_db_name}.result_affiliated_country stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
@@ -41,7 +41,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
 
 
 create table ${observatory_db_name}.result_affiliated_year stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
@@ -71,7 +71,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
 
 
 create table ${observatory_db_name}.result_affiliated_year_country stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
@@ -101,7 +101,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
 
 
 create table ${observatory_db_name}.result_affiliated_datasource stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
@@ -132,7 +132,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, d.name; /*EOS*/
 
 create table ${observatory_db_name}.result_affiliated_datasource_country stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
@@ -163,7 +163,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, d.name, c.code, c.name; /*EOS*/
 
 create table ${observatory_db_name}.result_affiliated_organization stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
@@ -192,7 +192,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, o.name; /*EOS*/
 
 create table ${observatory_db_name}.result_affiliated_organization_country stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
@@ -221,7 +221,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, o.name, c.code, c.name; /*EOS*/
 
 create table ${observatory_db_name}.result_affiliated_funder stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
@@ -252,7 +252,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, p.funder; /*EOS*/
 
 create table ${observatory_db_name}.result_affiliated_funder_country stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
@@ -283,7 +283,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, p.funder, c.code, c.name; /*EOS*/
 
 create table ${observatory_db_name}.result_deposited_country stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
@@ -314,7 +314,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, c.code, c.name; /*EOS*/
 
 create table ${observatory_db_name}.result_deposited_year stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
@@ -346,7 +346,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
 
 
 create table ${observatory_db_name}.result_deposited_year_country stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
@@ -377,7 +377,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, r.year, c.code, c.name; /*EOS*/
 
 create table ${observatory_db_name}.result_deposited_datasource stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
@@ -408,7 +408,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, d.name; /*EOS*/
 
 create table ${observatory_db_name}.result_deposited_datasource_country stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
@@ -439,7 +439,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, d.name, c.code, c.name; /*EOS*/
 
 create table ${observatory_db_name}.result_deposited_organization stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
@@ -470,7 +470,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, o.name; /*EOS*/
 
 create table ${observatory_db_name}.result_deposited_organization_country stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
@@ -501,7 +501,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, o.name, c.code, c.name; /*EOS*/
 
 create table ${observatory_db_name}.result_deposited_funder stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
@@ -534,7 +534,7 @@ group by r.green, r.gold, case when rl.type is not null then true else false end
          cc_licence, r.authors > 1, rpc.count > 1, rfc.count > 1, p.funder; /*EOS*/
 
 create table ${observatory_db_name}.result_deposited_funder_country stored as parquet as
-select
+select /*+ COALESCE(100) */
     count(distinct r.id) as total,
     r.green,
     r.gold,
