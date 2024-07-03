@@ -7,12 +7,12 @@ import java.sql.*;
 import java.util.function.Consumer;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DbClient implements Closeable {
 
-	private static final Log log = LogFactory.getLog(DbClient.class);
+	private static final Logger log = LoggerFactory.getLogger(DbClient.class);
 
 	private final Connection connection;
 
@@ -36,6 +36,8 @@ public class DbClient implements Closeable {
 
 		try (final Statement stmt = connection.createStatement()) {
 			stmt.setFetchSize(100);
+
+			log.info("running SQL:\n\n{}\n\n", sql);
 
 			try (final ResultSet rs = stmt.executeQuery(sql)) {
 				while (rs.next()) {
