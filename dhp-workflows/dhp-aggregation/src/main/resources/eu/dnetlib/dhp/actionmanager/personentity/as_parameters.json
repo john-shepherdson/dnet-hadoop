@@ -16,11 +16,10 @@
     "paramLongName": "isSparkSessionManaged",
     "paramDescription": "the hdfs name node",
     "paramRequired": false
-  },
-  {
-    "paramName": "wd",
-    "paramLongName": "workingDir",
-    "paramDescription": "the hdfs name node",
-    "paramRequired": false
-  }
+  }, {
+  "paramName": "wd",
+  "paramLongName": "workingDir",
+  "paramDescription": "the hdfs name node",
+  "paramRequired": false
+}
 ]
