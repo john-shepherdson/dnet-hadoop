@@ -328,7 +328,7 @@ public class MergeUtils {
 		final T merged = mergeOafFields(original, enrich, trust);
 
 		merged.setOriginalId(unionDistinctListOfString(merged.getOriginalId(), enrich.getOriginalId()));
-		merged.setPid(unionDistinctLists(merged.getPid(), enrich.getPid(), trust));
+		merged.setPid(mergeLists(merged.getPid(), enrich.getPid(), trust, MergeUtils::spKeyExtractor, (p1, p2) -> p1));
 		merged.setDateofcollection(LocalDateTime.now().toString());
 		merged
 			.setDateoftransformation(
