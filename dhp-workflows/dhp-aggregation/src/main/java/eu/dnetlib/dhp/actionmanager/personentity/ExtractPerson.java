@@ -26,6 +26,7 @@ import org.spark_project.jetty.util.StringUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.actionmanager.Constants;
+import eu.dnetlib.dhp.actionmanager.transformativeagreement.model.TransformativeAgreementModel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.collection.orcid.model.Author;
 import eu.dnetlib.dhp.collection.orcid.model.Employment;
@@ -202,7 +203,7 @@ public class ExtractPerson implements Serializable {
 			.mode(SaveMode.Overwrite)
 			.json(workingDir + "/authorship");
 
-		works
+		Dataset<Relation> coauthorship = works
 			.flatMap((FlatMapFunction<Work, Tuple2<String, String>>) w -> {
 				List<Tuple2<String, String>> lista = new ArrayList<>();
 				w.getPids().stream().forEach(p -> {
@@ -217,10 +218,13 @@ public class ExtractPerson implements Serializable {
 				(MapGroupsFunction<String, Tuple2<String, String>, Coauthors>) (k, it) -> extractCoAuthors(it),
 				Encoders.bean(Coauthors.class))
 			.flatMap(
-				(FlatMapFunction<Coauthors, Relation>) c -> c.getCoauthors().iterator(), Encoders.bean(Relation.class))
+				(FlatMapFunction<Coauthors, Relation>) c -> new CoAuthorshipIterator(c.getCoauthors()),
+				Encoders.bean(Relation.class))
 			.groupByKey((MapFunction<Relation, String>) r -> r.getSource() + r.getTarget(), Encoders.STRING())
 			.mapGroups(
-				(MapGroupsFunction<String, Relation, Relation>) (k, it) -> it.next(), Encoders.bean(Relation.class))
+				(MapGroupsFunction<String, Relation, Relation>) (k, it) -> it.next(), Encoders.bean(Relation.class));
+
+		coauthorship
 			.write()
 			.option("compression", "gzip")
 			.mode(SaveMode.Overwrite)
@@ -237,10 +241,16 @@ public class ExtractPerson implements Serializable {
 			.mode(SaveMode.Overwrite)
 			.json(workingDir + "/affiliation");
 
-		spark
+		people = spark
 			.read()
-			.json(workingDir + "/people")
-			.as(Encoders.bean(Person.class))
+			.textFile(workingDir + "/people")
+			.map(
+				(MapFunction<String, Person>) value -> OBJECT_MAPPER
+					.readValue(value, Person.class),
+				Encoders.bean(Person.class));
+
+		people.show(false);
+		people
 			.toJavaRDD()
 			.map(p -> new AtomicAction(p.getClass(), p))
 			.union(
@@ -261,20 +271,21 @@ public class ExtractPerson implements Serializable {
 	}
 
 	private static Dataset<Relation> getRelations(SparkSession spark, String path) {
-		return spark.read().json(path).as(Encoders.bean(Relation.class));
+		return spark
+			.read()
+			.textFile(path)
+			.map(
+				(MapFunction<String, Relation>) value -> OBJECT_MAPPER
+					.readValue(value, Relation.class),
+				Encoders.bean(Relation.class));// spark.read().json(path).as(Encoders.bean(Relation.class));
 	}
 
 	private static Coauthors extractCoAuthors(Iterator<Tuple2<String, String>> it) {
 		Coauthors coauth = new Coauthors();
-		ArrayList<Relation> ret = new ArrayList<>();
 		List<String> coauthors = new ArrayList<>();
 		while (it.hasNext())
 			coauthors.add(it.next()._2());
-		for (int i = 0; i < coauthors.size() - 1; i++)
-			for (int j = i + 1; j < coauthors.size(); j++)
-				ret.addAll(getCoAuthorshipRelations(coauthors.get(i), coauthors.get(j)));
-
-		coauth.setCoauthors(ret);
+		coauth.setCoauthors(coauthors);
 
 		return coauth;
 	}
