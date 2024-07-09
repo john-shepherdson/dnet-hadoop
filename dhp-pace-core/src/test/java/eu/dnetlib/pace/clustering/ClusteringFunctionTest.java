@@ -3,6 +3,7 @@ package eu.dnetlib.pace.clustering;
 
 import java.util.Map;
 
+import com.mongodb.connection.Cluster;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -177,41 +178,16 @@ public class ClusteringFunctionTest extends AbstractPaceTest {
 	}
 
 	@Test
-	public void testKeywordsClustering() {
+	public void legalnameClustering() {
 
-		final ClusteringFunction cf = new KeywordsClustering(params);
-		final String s = "Polytechnic University of Turin";
+		final ClusteringFunction cf = new LegalnameClustering(params);
+		String s = "key::1 key::2 city::1";
 		System.out.println(s);
 		System.out.println(cf.apply(conf, Lists.newArrayList(s)));
 
-		final String s1 = "POLITECNICO DI TORINO";
-		System.out.println(s1);
-		System.out.println(cf.apply(conf, Lists.newArrayList(s1)));
-
-		final String s2 = "Universita farmaceutica culturale di milano bergamo";
-		System.out.println("s2 = " + s2);
-		System.out.println(cf.apply(conf, Lists.newArrayList(s2)));
-
-		final String s3 = "universita universita milano milano";
-		System.out.println("s3 = " + s3);
-		System.out.println(cf.apply(conf, Lists.newArrayList(s3)));
-
-		final String s4 = "Politechniki Warszawskiej (Warsaw University of Technology)";
-		System.out.println("s4 = " + s4);
-		System.out.println(cf.apply(conf, Lists.newArrayList(s4)));
-
-		final String s5 = "İstanbul Ticarət Universiteti";
-		System.out.println("s5 = " + s5);
-		System.out.println(cf.apply(conf, Lists.newArrayList(s5)));
-
-		final String s6 = "National and Kapodistrian University of Athens";
-		System.out.println("s6 = " + s6);
-		System.out.println(cf.apply(conf, Lists.newArrayList(s6)));
-
-		final String s7 = "Εθνικό και Καποδιστριακό Πανεπιστήμιο Αθηνών";
-		System.out.println("s7 = " + s7);
-		System.out.println(cf.apply(conf, Lists.newArrayList(s7)));
-
+		s = "key::1 key::2 city::1 city::2";
+		System.out.println(s);
+		System.out.println(cf.apply(conf, Lists.newArrayList(s)));
 	}
 
 	@Test

@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.dedup.jpath;
 
 import java.io.IOException;
 
+import eu.dnetlib.dhp.oa.dedup.SparkOpenorgsDedupTest;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.sql.Row;
 import org.junit.jupiter.api.Assertions;
@@ -24,6 +25,30 @@ class JsonPathTest {
 
 		Row row = SparkModel.apply(conf).rowFromJson(org);
 
+		System.out.println("row = " + row);
+		Assertions.assertNotNull(row);
+		Assertions.assertTrue(StringUtils.isNotBlank(row.getAs("identifier")));
+
+		System.out.println("row = " + row.getAs("countrytitle"));
+	}
+
+	@Test
+	void jsonToModelTest() throws IOException{
+		DedupConfig conf = DedupConfig
+				.load(IOUtils
+						.toString(
+								SparkOpenorgsDedupTest.class
+										.getResourceAsStream(
+												"/eu/dnetlib/dhp/dedup/conf/org.curr.conf.json")));
+
+		final String org = IOUtils.toString(getClass().getResourceAsStream("organization_example1.json"));
+
+		Row row = SparkModel.apply(conf).rowFromJson(org);
+		// to check that the same parsing returns the same row
+		Row row1 = SparkModel.apply(conf).rowFromJson(org);
+
+		Assertions.assertEquals(row, row1);
+		System.out.println("row = " + row);
 		Assertions.assertNotNull(row);
 		Assertions.assertTrue(StringUtils.isNotBlank(row.getAs("identifier")));
 	}

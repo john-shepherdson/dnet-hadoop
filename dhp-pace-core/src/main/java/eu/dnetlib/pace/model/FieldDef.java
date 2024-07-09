@@ -47,7 +47,19 @@ public class FieldDef implements Serializable {
 
 	private String clean;
 
+	private String infer;
+
+	private String inferenceFrom;
+
 	public FieldDef() {
+	}
+
+	public String getInferenceFrom() {
+		return inferenceFrom;
+	}
+
+	public void setInferenceFrom(final String inferenceFrom) {
+		this.inferenceFrom = inferenceFrom;
 	}
 
 	public String getName() {
@@ -124,6 +136,14 @@ public class FieldDef implements Serializable {
 
 	public void setClean(String clean) {
 		this.clean = clean;
+	}
+
+	public String getInfer() {
+		return infer;
+	}
+
+	public void setInfer(String infer) {
+		this.infer = infer;
 	}
 
 	@Override
