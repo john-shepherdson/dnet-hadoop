@@ -69,7 +69,7 @@
         </configuration>
     </global>
 
-    <start to="oaiphm_provision"/>
+    <start to="irish_oaiphm_provision"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
