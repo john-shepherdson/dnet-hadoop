@@ -76,16 +76,17 @@ public class ResearchFiIterator implements Iterator<String> {
 
 		this.currPage += 1;
 
+		final String url;
+		if (!this.baseUrl.contains("?")) {
+			url = String.format("%s?PageNumber=%d&PageSize=%d", this.baseUrl, this.currPage, PAGE_SIZE);
+		} else if (!this.baseUrl.contains("PageSize=")) {
+			url = String.format("%s&PageNumber=%d&PageSize=%d", this.baseUrl, this.currPage, PAGE_SIZE);
+		} else {
+			url = String.format("%s&PageNumber=%d", this.baseUrl, this.currPage);
+		}
+		log.info("Calling url: " + url);
+
 		try (final CloseableHttpClient client = HttpClients.createDefault()) {
-			final String url;
-			if (!this.baseUrl.contains("?")) {
-				url = String.format("%s?PageNumber=%d&PageSize=%d", this.baseUrl, this.currPage, PAGE_SIZE);
-			} else if (!this.baseUrl.contains("PageSize=")) {
-				url = String.format("%s&PageNumber=%d&PageSize=%d", this.baseUrl, this.currPage, PAGE_SIZE);
-			} else {
-				url = String.format("%s&PageNumber=%d", this.baseUrl, this.currPage);
-			}
-			log.info("Calling url: " + url);
 
 			final HttpGet req = new HttpGet(url);
 			req.addHeader("Authorization", "Bearer " + this.authToken);
@@ -107,8 +108,8 @@ public class ResearchFiIterator implements Iterator<String> {
 				jsonArray.forEach(obj -> this.queue.add(JsonUtils.convertToXML(obj.toString())));
 			}
 		} catch (final Throwable e) {
-			log.warn("Error obtaining access token", e);
-			throw new CollectorException("Error obtaining access token", e);
+			log.warn("Error calling url: " + url, e);
+			throw new CollectorException("Error calling url: " + url, e);
 		}
 	}
 
