@@ -179,7 +179,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>PrepareSimpleEntititiesJob</name>
-            <class>eu.dnetlib.dhp.broker.oa.PrepareSimpleEntititiesJob</class>
+            <class>eu.dnetlib.dhp.broker.oa.PrepareSimpleEntitiesJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
