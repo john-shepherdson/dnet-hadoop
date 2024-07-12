@@ -54,6 +54,12 @@
             <description>Used to configure the Java home location for oozie.launcher.mapreduce.map.env</description>
         </property>
 
+        <property>
+            <name>JAVA_OPTS</name>
+                <value>-Dcom.sun.security.enableAIAcaIssuers=true</value>
+            <description>Used to configure the JAVA_OPTS parameter</description>
+        </property>
+
     </parameters>
 
     <global>
