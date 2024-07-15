@@ -1,4 +1,4 @@
-<workflow-app name="Graph Stats" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Promote Graph Stats" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>stats_db_name</name>
