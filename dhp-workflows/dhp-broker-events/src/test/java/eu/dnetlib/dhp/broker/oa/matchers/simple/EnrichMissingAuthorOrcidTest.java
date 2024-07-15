@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.broker.oa.matchers.simple;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,7 +17,8 @@ class EnrichMissingAuthorOrcidTest {
 	final EnrichMissingAuthorOrcid matcher = new EnrichMissingAuthorOrcid();
 
 	@BeforeEach
-	void setUp() throws Exception {}
+	void setUp() throws Exception {
+	}
 
 	@Test
 	void testFindDifferences_1() {
