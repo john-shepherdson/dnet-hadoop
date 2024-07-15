@@ -26,15 +26,15 @@ import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.Software;
 
-public class PrepareSimpleEntititiesJob {
+public class PrepareSimpleEntitiesJob {
 
-	private static final Logger log = LoggerFactory.getLogger(PrepareSimpleEntititiesJob.class);
+	private static final Logger log = LoggerFactory.getLogger(PrepareSimpleEntitiesJob.class);
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
 			IOUtils
 				.toString(
-					PrepareSimpleEntititiesJob.class
+					PrepareSimpleEntitiesJob.class
 						.getResourceAsStream("/eu/dnetlib/dhp/broker/oa/common_params.json")));
 		parser.parseArgument(args);
 

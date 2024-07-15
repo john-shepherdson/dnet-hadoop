@@ -2,27 +2,31 @@
 package eu.dnetlib.dhp.broker.oa.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import eu.dnetlib.broker.objects.OaBrokerMainEntity;
 import eu.dnetlib.broker.objects.OaBrokerTypedValue;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Instance;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
-class ConversionUtilsTest {
+public class ConversionUtilsTest {
 
 	@BeforeEach
-	void setUp() throws Exception {
-	}
+	public void setUp() throws Exception {}
 
 	@Test
-	void testAllResultPids() {
+	public void testAllResultPids() {
 		final Qualifier qf = new Qualifier();
 		qf.setClassid("test");
 		qf.setClassname("test");
@@ -89,6 +93,44 @@ class ConversionUtilsTest {
 		// list.forEach(x -> System.out.println(x.getValue()));
 
 		assertEquals(6, list.size());
+	}
+
+	public void testOafResultToBrokerResult() {
+
+		final Author a1 = createAuthor("Michele Artini", "0000-0002-4406-428X");
+		final Author a2 = createAuthor("Claudio Atzori", "http://orcid.org/0000-0001-9613-6639");
+		final Author a3 = createAuthor("Alessia Bardi", null);
+
+		final Result r = new Result();
+		r.setAuthor(Arrays.asList(a1, a2, a3));
+
+		final OaBrokerMainEntity br = ConversionUtils.oafResultToBrokerResult(r);
+
+		assertEquals(3, br.getCreators().size());
+		assertEquals("0000-0002-4406-428X", br.getCreators().get(0).getOrcid());
+		assertEquals("0000-0001-9613-6639", br.getCreators().get(1).getOrcid());
+		assertNull(br.getCreators().get(2).getOrcid());
+	}
+
+	private Author createAuthor(final String name, final String orcid) {
+
+		final Author a = new Author();
+		a.setFullname("Michele Artini");
+
+		if (orcid != null) {
+			final Qualifier q = new Qualifier();
+			q.setClassid(ModelConstants.ORCID);
+			q.setClassname(ModelConstants.ORCID);
+			q.setSchemeid("dnet:pids");
+			q.setSchemename("dnet:pids");
+
+			final StructuredProperty pid = new StructuredProperty();
+			pid.setQualifier(q);
+			pid.setValue(orcid);
+
+			a.setPid(Arrays.asList(pid));
+		}
+		return a;
 	}
 
 }
