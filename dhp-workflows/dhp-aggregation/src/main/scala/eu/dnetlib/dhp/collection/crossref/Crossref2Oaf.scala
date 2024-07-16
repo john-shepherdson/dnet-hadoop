@@ -93,7 +93,7 @@ case object Crossref2Oaf {
 
     val cf = new KeyValue
     cf.setValue("UnpayWall")
-    cf.setKey(s"10|openaire____:${DHPUtils.md5("UnpayWall".toLowerCase)}")
+    cf.setKey(s"10|openaire____::${DHPUtils.md5("UnpayWall".toLowerCase)}")
     cf
 
   }
