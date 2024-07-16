@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.actionmanager.Constants;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -29,6 +30,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
+import io.netty.util.Constant;
 import scala.Tuple2;
 
 /**
@@ -44,8 +46,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 	private static final String PMID_PREFIX = "50|pmid________::";
 
 	private static final String PMCID_PREFIX = "50|pmc_________::";
-	private static final String WEB_CRAWL_ID = "10|openaire____::fb98a192f6a055ba495ef414c330834b";
-	private static final String WEB_CRAWL_NAME = "Web Crawl";
+
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
 	public static void main(String[] args) throws Exception {
@@ -104,8 +105,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 				final String ror = ROR_PREFIX
 					+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", row.getAs("ror")));
 				ret.addAll(createAffiliationRelationPairDOI(row.getAs("doi"), ror));
-				ret.addAll(createAffiliationRelationPairPMID(row.getAs("pmid"), ror));
-				ret.addAll(createAffiliationRelationPairPMCID(row.getAs("pmcid"), ror));
+
 
 				return ret
 					.iterator();
@@ -139,8 +139,9 @@ public class CreateActionSetFromWebEntries implements Serializable {
 				"institution", functions
 					.explode(
 						functions.col("institutions")))
+
 			.selectExpr(
-				"id", "doi", "ids.pmcid as pmcid", "ids.pmid as pmid", "institution.ror as ror",
+				"id", "doi", "institution.ror as ror",
 				"institution.country_code as country_code", "publication_year")
 			.distinct();
 
@@ -214,7 +215,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 						ModelConstants.IS_AUTHOR_INSTITUTION_OF,
 						Arrays
 							.asList(
-								OafMapperUtils.keyValue(WEB_CRAWL_ID, WEB_CRAWL_NAME)),
+								OafMapperUtils.keyValue(Constants.WEB_CRAWL_ID, Constants.WEB_CRAWL_NAME)),
 						OafMapperUtils
 							.dataInfo(
 								false, null, false, false,
@@ -233,7 +234,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 						ModelConstants.HAS_AUTHOR_INSTITUTION,
 						Arrays
 							.asList(
-								OafMapperUtils.keyValue(WEB_CRAWL_ID, WEB_CRAWL_NAME)),
+								OafMapperUtils.keyValue(Constants.WEB_CRAWL_ID, Constants.WEB_CRAWL_NAME)),
 						OafMapperUtils
 							.dataInfo(
 								false, null, false, false,
