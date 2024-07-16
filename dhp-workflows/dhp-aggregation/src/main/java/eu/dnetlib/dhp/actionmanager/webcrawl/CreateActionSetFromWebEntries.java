@@ -30,7 +30,6 @@ import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
-import io.netty.util.Constant;
 import scala.Tuple2;
 
 /**
@@ -105,8 +104,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 				final String ror = ROR_PREFIX
 					+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", row.getAs("ror")));
 				ret.addAll(createAffiliationRelationPairDOI(row.getAs("doi"), ror));
-//				ret.addAll(createAffiliationRelationPairPMID(row.getAs("pmid"), ror));
-//				ret.addAll(createAffiliationRelationPairPMCID(row.getAs("pmcid"), ror));
+
 
 				return ret
 					.iterator();
@@ -146,57 +144,22 @@ public class CreateActionSetFromWebEntries implements Serializable {
 				"institution.country_code as country_code", "publication_year")
 			.distinct();
 
-//			.selectExpr(
-//				"id", "doi", "ids.pmcid as pmcid", "ids.pmid as pmid", "institution.ror as ror",
-//				"institution.country_code as country_code", "publication_year")
-//			.distinct();
-
 	}
 
 	private static Dataset<Row> readBlackList(SparkSession spark, String inputPath) {
 
 		return spark
 			.read()
-			.option("header", true)
-			.csv(inputPath)
+			.json(inputPath)
 			.select("OpenAlexId");
 	}
 
-	private static List<Relation> createAffiliationRelationPairPMCID(String pmcid, String ror) {
-		if (pmcid == null)
-			return new ArrayList<>();
-
-		return createAffiliatioRelationPair(
-			PMCID_PREFIX
-				+ IdentifierFactory
-					.md5(PidCleaner.normalizePidValue(PidType.pmc.toString(), removeResolver("PMC", pmcid))),
-			ror);
-	}
-
-	private static List<Relation> createAffiliationRelationPairPMID(String pmid, String ror) {
-		if (pmid == null)
-			return new ArrayList<>();
-
-		return createAffiliatioRelationPair(
-			PMID_PREFIX
-				+ IdentifierFactory
-					.md5(PidCleaner.normalizePidValue(PidType.pmid.toString(), removeResolver("PMID", pmid))),
-			ror);
-	}
-
 	private static String removeResolver(String pidType, String pid) {
-		switch (pidType) {
-			case "PMID":
-				return pid.substring(33);
-			case "PMC":
-				return "PMC" + pid.substring(43);
-			case "DOI":
-				return pid.substring(16);
-		}
-
-		throw new RuntimeException();
-
-	}
+        if (pidType.equals("DOI")) {
+            return pid.substring(16);
+        }
+        throw new IllegalArgumentException("DOI is the only supported PID type");
+    }
 
 	private static List<Relation> createAffiliationRelationPairDOI(String doi, String ror) {
 		if (doi == null)
