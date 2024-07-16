@@ -5,7 +5,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.solr.ExternalReference;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -31,6 +30,7 @@ import eu.dnetlib.dhp.schema.solr.Context;
 import eu.dnetlib.dhp.schema.solr.Country;
 import eu.dnetlib.dhp.schema.solr.Datasource;
 import eu.dnetlib.dhp.schema.solr.EoscIfGuidelines;
+import eu.dnetlib.dhp.schema.solr.ExternalReference;
 import eu.dnetlib.dhp.schema.solr.Instance;
 import eu.dnetlib.dhp.schema.solr.Journal;
 import eu.dnetlib.dhp.schema.solr.Measure;
@@ -562,10 +562,16 @@ public class ProvisionModelSupport {
 			.orElse(null);
 	}
 
-	private static List<ExternalReference> mapExternalReference(List<eu.dnetlib.dhp.schema.oaf.ExternalReference> externalReference) {
-		return Optional.ofNullable(externalReference)
-				.map(ext -> ext.stream()
-						.map(e -> ExternalReference.newInstance(
+	private static List<ExternalReference> mapExternalReference(
+		List<eu.dnetlib.dhp.schema.oaf.ExternalReference> externalReference) {
+		return Optional
+			.ofNullable(externalReference)
+			.map(
+				ext -> ext
+					.stream()
+					.map(
+						e -> ExternalReference
+							.newInstance(
 								e.getSitename(),
 								e.getLabel(),
 								e.getAlternateLabel(),
@@ -573,8 +579,8 @@ public class ProvisionModelSupport {
 								mapCodeLabel(e.getQualifier()),
 								e.getRefidentifier(),
 								e.getQuery()))
-						.collect(Collectors.toList()))
-				.orElse(Lists.newArrayList());
+					.collect(Collectors.toList()))
+			.orElse(Lists.newArrayList());
 	}
 
 	private static List<Context> asContext(List<eu.dnetlib.dhp.schema.oaf.Context> ctxList,
