@@ -1,930 +1,1107 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>eu.dnetlib.dhp</groupId>
-	<artifactId>dhp</artifactId>
-	<version>1.2.5-SNAPSHOT</version>
-	<packaging>pom</packaging>
-
-	<licenses>
-		<license>
-			<name>GNU Affero General Public License v3.0 or later</name>
-			<url>https://spdx.org/licenses/AGPL-3.0-or-later.html#licenseText</url>
-			<distribution>repo</distribution>
-			<comments>This program is free software: you can redistribute it and/or modify it under the terms of the
-				GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the
-				License, or (at your option) any later version.</comments>
-		</license>
-	</licenses>
-
-	<modules>
-		<module>dhp-build</module>
-		<module>dhp-pace-core</module>
-		<module>dhp-common</module>
-		<module>dhp-workflows</module>
-	</modules>
-
-	<issueManagement>
-		<system>Redmine</system>
-		<url>https://support.openaire.eu/projects/openaire</url>
-	</issueManagement>
-
-	<ciManagement>
-		<system>jenkins</system>
-		<url>https://jenkins-dnet.d4science.org/</url>
-	</ciManagement>
-
-	<scm>
-		<connection>scm:git:gitea@code-repo.d4science.org:D-Net/dnet-hadoop.git</connection>
-		<developerConnection>scm:git:gitea@code-repo.d4science.org:D-Net/dnet-hadoop.git</developerConnection>
-		<url>https://code-repo.d4science.org/D-Net/dnet-hadoop/</url>
-		<tag>HEAD</tag>
-	</scm>
-
-	<description>This module is the root descriptor for the dnet-hadoop project</description>
-
-	<pluginRepositories>
-	</pluginRepositories>
-
-	<repositories>
-		<repository>
-			<id>dnet45-releases</id>
-			<name>D-Net 45 releases</name>
-			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-releases</url>
-			<layout>default</layout>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository>
-		<repository>
-			<id>dnet45-snapshots</id>
-			<name>D-Net 45 snapshots</name>
-			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-snapshots</url>
-			<layout>default</layout>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</repository>
-		<repository>
-			<id>dnet45-bootstrap-snapshot</id>
-			<name>D-Net 45 Bootstrap Snapshot</name>
-			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-bootstrap-snapshot/</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<layout>default</layout>
-		</repository>
-		<repository>
-			<id>dnet45-bootstrap-release</id>
-			<name>D-Net 45 Bootstrap Release</name>
-			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-bootstrap-release/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-			<layout>default</layout>
-		</repository>
-		<repository>
-			<id>cloudera</id>
-			<name>Cloudera Repository</name>
-			<url>https://repository.cloudera.com/artifactory/cloudera-repos</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>dnet-deps</id>
-			<name>dnet-dependencies</name>
-			<url>https://maven.d4science.org/nexus/content/repositories/dnet-deps</url>
-			<layout>default</layout>
-		</repository>
-		<repository>
-			<id>maven-restlet</id>
-			<name>Restlet repository</name>
-			<url>https://maven.restlet.talend.com</url>
-		</repository>
-		<repository>
-			<id>conjars</id>
-			<name>conjars</name>
-			<url>https://conjars.wensel.net/repo/</url>
-		</repository>
-	</repositories>
-
-	<dependencies>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter</artifactId>
-			<version>${junit-jupiter.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>${mockito-core.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-junit-jupiter</artifactId>
-			<version>${mockito-core.version}</version>
-			<scope>test</scope>
-		</dependency>
-
-	</dependencies>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>eu.dnetlib.dhp</groupId>
-				<artifactId>${dhp-schemas.artifact}</artifactId>
-				<version>${dhp-schemas.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.hadoop</groupId>
-				<artifactId>hadoop-hdfs</artifactId>
-				<version>${dhp.hadoop.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.hadoop</groupId>
-				<artifactId>hadoop-common</artifactId>
-				<version>${dhp.hadoop.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.hadoop</groupId>
-				<artifactId>hadoop-client</artifactId>
-				<version>${dhp.hadoop.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.hadoop</groupId>
-				<artifactId>hadoop-distcp</artifactId>
-				<version>${dhp.hadoop.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.spark</groupId>
-				<artifactId>spark-core_${scala.binary.version}</artifactId>
-				<version>${dhp.spark.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.spark</groupId>
-				<artifactId>spark-sql_${scala.binary.version}</artifactId>
-				<version>${dhp.spark.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.spark</groupId>
-				<artifactId>spark-graphx_${scala.binary.version}</artifactId>
-				<version>${dhp.spark.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.spark</groupId>
-				<artifactId>spark-hive_${scala.binary.version}</artifactId>
-				<version>${dhp.spark.version}</version>
-				<scope>test</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>jcl-over-slf4j</artifactId>
-				<version>1.7.25</version>
-				<scope>provided</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-lang3</artifactId>
-				<version>${dhp.commons.lang.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>commons-validator</groupId>
-				<artifactId>commons-validator</artifactId>
-				<version>1.7</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.github.sisyphsu</groupId>
-				<artifactId>dateparser</artifactId>
-				<version>1.0.7</version>
-			</dependency>
-
-			<dependency>
-				<groupId>me.xuender</groupId>
-				<artifactId>unidecode</artifactId>
-				<version>0.0.7</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.google.guava</groupId>
-				<artifactId>guava</artifactId>
-				<version>${dhp.guava.version}</version>
-			</dependency>
-
-
-			<dependency>
-				<groupId>commons-codec</groupId>
-				<artifactId>commons-codec</artifactId>
-				<version>1.9</version>
-			</dependency>
-
-			<dependency>
-				<groupId>commons-io</groupId>
-				<artifactId>commons-io</artifactId>
-				<version>2.4</version>
-			</dependency>
-
-			<dependency>
-				<groupId>commons-cli</groupId>
-				<artifactId>commons-cli</artifactId>
-				<version>1.2</version>
-				<scope>provided</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>net.sf.saxon</groupId>
-				<artifactId>Saxon-HE</artifactId>
-				<version>9.9.1-6</version>
-			</dependency>
-
-			<dependency>
-				<groupId>dom4j</groupId>
-				<artifactId>dom4j</artifactId>
-				<version>1.6.1</version>
-			</dependency>
-
-			<dependency>
-				<groupId>xml-apis</groupId>
-				<artifactId>xml-apis</artifactId>
-				<version>1.4.01</version>
-			</dependency>
-
-			<dependency>
-				<groupId>jaxen</groupId>
-				<artifactId>jaxen</artifactId>
-				<version>1.1.6</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.mycila.xmltool</groupId>
-				<artifactId>xmltool</artifactId>
-				<version>3.3</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.apache.solr</groupId>
-				<artifactId>solr-solrj</artifactId>
-				<version>${solr.version}</version>
-				<exclusions>
-					<exclusion>
-						<artifactId>*</artifactId>
-						<groupId>*</groupId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>com.lucidworks.spark</groupId>
-				<artifactId>spark-solr</artifactId>
-				<version>${sparksolr.version}</version>
-				<exclusions>
-					<exclusion>
-						<artifactId>*</artifactId>
-						<groupId>*</groupId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.solr</groupId>
-				<artifactId>solr-test-framework</artifactId>
-				<version>${solr.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>io.dropwizard.metrics</groupId>
-				<artifactId>metrics-core</artifactId>
-				<version>3.2.6</version>
-				<scope>test</scope>
-			</dependency>
-
-
-			<dependency>
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>httpclient</artifactId>
-				<version>${org.apache.httpcomponents.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.httpcomponents</groupId>
-				<artifactId>httpmime</artifactId>
-				<version>${org.apache.httpcomponents.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.noggit</groupId>
-				<artifactId>noggit</artifactId>
-				<version>0.8</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.zookeeper</groupId>
-				<artifactId>zookeeper</artifactId>
-				<version>3.4.11</version>
-			</dependency>
-
-			<dependency>
-				<groupId>net.schmizz</groupId>
-				<artifactId>sshj</artifactId>
-				<version>0.10.0</version>
-				<scope>test</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-core</artifactId>
-				<version>${dhp.jackson.version}</version>
-				<scope>provided</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-annotations</artifactId>
-				<version>${dhp.jackson.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.core</groupId>
-				<artifactId>jackson-databind</artifactId>
-				<version>${dhp.jackson.version}</version>
-				<scope>provided</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>eu.dnetlib</groupId>
-				<artifactId>cnr-rmi-api</artifactId>
-				<version>${cnr-rmi-api.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>eu.dnetlib.dhp</groupId>
-				<artifactId>dnet-openaire-broker-common</artifactId>
-				<version>${dnet-openaire-broker-common.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.apache.cxf</groupId>
-				<artifactId>cxf-rt-transports-http</artifactId>
-				<version>3.1.5</version>
-			</dependency>
-			<dependency>
-				<groupId>javax.persistence</groupId>
-				<artifactId>javax.persistence-api</artifactId>
-				<version>2.2</version>
-				<scope>provided</scope>
-			</dependency>
-
-			<dependency>
-				<groupId>com.jayway.jsonpath</groupId>
-				<artifactId>json-path</artifactId>
-				<version>2.4.0</version>
-			</dependency>
-			<dependency>
-				<groupId>com.arakelian</groupId>
-				<artifactId>java-jq</artifactId>
-				<version>0.10.1</version>
-			</dependency>
-			<dependency>
-				<groupId>edu.cmu</groupId>
-				<artifactId>secondstring</artifactId>
-				<version>1.0.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mongodb</groupId>
-				<artifactId>mongo-java-driver</artifactId>
-				<version>${mongodb.driver.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>io.fares.junit.mongodb</groupId>
-				<artifactId>mongodb-junit-test</artifactId>
-				<version>1.1.0</version>
-			</dependency>
-			<dependency>
-				<groupId>org.postgresql</groupId>
-				<artifactId>postgresql</artifactId>
-				<version>42.2.10</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.antlr</groupId>
-				<artifactId>stringtemplate</artifactId>
-				<version>3.2.1</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.antlr</groupId>
-				<artifactId>ST4</artifactId>
-				<version>4.3.4</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.ximpleware</groupId>
-				<artifactId>vtd-xml</artifactId>
-				<version>${vtd.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.elasticsearch</groupId>
-				<artifactId>elasticsearch-hadoop</artifactId>
-				<version>7.6.0</version>
-			</dependency>
-
-
-			<dependency>
-				<groupId>org.apache.oozie</groupId>
-				<artifactId>oozie-client</artifactId>
-				<version>${dhp.oozie.version}</version>
-				<scope>provided</scope>
-				<exclusions>
-					<!-- conflicts -->
-					<exclusion>
-						<artifactId>slf4j-simple</artifactId>
-						<groupId>org.slf4j</groupId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-
-
-			<dependency>
-				<groupId>com.squareup.okhttp3</groupId>
-				<artifactId>okhttp</artifactId>
-				<version>${okhttp.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-compress</artifactId>
-				<version>${common.compress.version}</version>
-			</dependency>
-
-			<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-csv -->
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-csv</artifactId>
-				<version>${common.csv.version}</version>
-			</dependency>
-
-
-			<!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
-			<dependency>
-				<groupId>org.apache.poi</groupId>
-				<artifactId>poi-ooxml</artifactId>
-				<version>${apache.poi.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.json</groupId>
-				<artifactId>json</artifactId>
-				<version>20180813</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.json4s</groupId>
-				<artifactId>json4s-jackson_${scala.binary.version}</artifactId>
-				<version>${json4s.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.github.victools</groupId>
-				<artifactId>jsonschema-generator</artifactId>
-				<version>${jsonschemagenerator.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-text</artifactId>
-				<version>${common.text.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.opencsv</groupId>
-				<artifactId>opencsv</artifactId>
-				<version>5.5</version>
-			</dependency>
-			<dependency>
-				<groupId>io.github.classgraph</groupId>
-				<artifactId>classgraph</artifactId>
-				<version>4.8.71</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.fasterxml.jackson.dataformat</groupId>
-				<artifactId>jackson-dataformat-xml</artifactId>
-				<version>${jackson.version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson.module</groupId>
-				<artifactId>jackson-module-jsonSchema</artifactId>
-				<version>${jackson.version}</version>
-				<scope>provided</scope>
-			</dependency>
-
-
-			<dependency>
-				<groupId>org.apache.commons</groupId>
-				<artifactId>commons-math3</artifactId>
-				<version>3.6.1</version>
-			</dependency>
-
-
-			<dependency>
-				<groupId>com.google.code.gson</groupId>
-				<artifactId>gson</artifactId>
-				<version>${google.gson.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>commons-collections</groupId>
-				<artifactId>commons-collections</artifactId>
-				<version>${commons.collections.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>commons-logging</groupId>
-				<artifactId>commons-logging</artifactId>
-				<version>${commons.logging.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.reflections</groupId>
-				<artifactId>reflections</artifactId>
-				<version>0.9.10</version>
-			</dependency>
-
-			<dependency>
-				<groupId>org.scala-lang</groupId>
-				<artifactId>scala-library</artifactId>
-				<version>${scala.version}</version>
-			</dependency>
-
-			<dependency>
-				<groupId>com.ibm.icu</groupId>
-				<artifactId>icu4j</artifactId>
-				<version>70.1</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
-	<build>
-		<directory>target</directory>
-		<outputDirectory>target/classes</outputDirectory>
-		<finalName>${project.artifactId}-${project.version}</finalName>
-		<testOutputDirectory>target/test-classes</testOutputDirectory>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-plugin-plugin</artifactId>
-					<version>3.3</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-project-info-reports-plugin</artifactId>
-					<version>3.0.0</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-site-plugin</artifactId>
-					<version>3.9.1</version>
-					<configuration>
-						<skip>${dhp.site.skip}</skip>
-					</configuration>
-				</plugin>
-
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>${maven.compiler.plugin.version}</version>
-					<configuration>
-						<source>1.8</source>
-						<target>1.8</target>
-						<encoding>${project.build.sourceEncoding}</encoding>
-					</configuration>
-				</plugin>
-
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.0.2</version>
-				</plugin>
-
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-source-plugin</artifactId>
-					<version>3.0.1</version>
-					<executions>
-						<execution>
-							<id>attach-sources</id>
-							<phase>verify</phase>
-							<goals>
-								<goal>jar-no-fork</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.0.0-M4</version>
-					<configuration>
-						<redirectTestOutputToFile>true</redirectTestOutputToFile>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-javadoc-plugin</artifactId>
-					<version>3.2.0</version>
-					<configuration>
-						<detectLinks>true</detectLinks>
-						<doclint>none</doclint>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-dependency-plugin</artifactId>
-					<version>3.6.0</version>
-				</plugin>
-
-				<plugin>
-					<groupId>net.revelc.code.formatter</groupId>
-					<artifactId>formatter-maven-plugin</artifactId>
-					<version>2.11.0</version>
-					<dependencies>
-						<dependency>
-							<groupId>eu.dnetlib.dhp</groupId>
-							<artifactId>dhp-code-style</artifactId>
-							<version>${project.version}</version>
-						</dependency>
-					</dependencies>
-				</plugin>
-				<plugin>
-					<groupId>org.antipathy</groupId>
-					<artifactId>mvn-scalafmt_${scala.binary.version}</artifactId>
-					<version>1.0.1640073709.733712b</version>
-					<dependencies>
-						<dependency>
-							<groupId>eu.dnetlib.dhp</groupId>
-							<artifactId>dhp-code-style</artifactId>
-							<version>${project.version}</version>
-						</dependency>
-					</dependencies>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-site-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>net.revelc.code.formatter</groupId>
-				<artifactId>formatter-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>format</goal>
-						</goals>
-						<configuration>
-							<configFile>eclipse/formatter_dnet.xml</configFile>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>net.revelc.code</groupId>
-				<artifactId>impsort-maven-plugin</artifactId>
-				<version>1.4.1</version>
-				<configuration>
-					<groups>java.,javax.,org.,com.</groups>
-					<staticGroups>java,*</staticGroups>
-					<excludes>
-						<exclude>**/thrift/*.java</exclude>
-					</excludes>
-				</configuration>
-				<executions>
-					<execution>
-						<id>sort-imports</id>
-						<goals>
-							<goal>sort</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.antipathy</groupId>
-				<artifactId>mvn-scalafmt_${scala.binary.version}</artifactId>
-				<configuration>
-					<configLocation>https://code-repo.d4science.org/D-Net/dnet-hadoop/raw/branch/beta/dhp-build/dhp-code-style/src/main/resources/scalafmt/scalafmt.conf</configLocation>
-					<skipTestSources>false</skipTestSources>
-					<skipSources>false</skipSources>
-					<sourceDirectories>
-						<param>${project.basedir}/src/main/scala</param>
-					</sourceDirectories>
-					<testSourceDirectories>
-						<param>${project.basedir}/src/test/scala</param>
-					</testSourceDirectories>
-					<validateOnly>false</validateOnly>
-					<onlyChangedFiles>false</onlyChangedFiles>
-					<branch>: git rev-parse --abbrev-ref HEAD</branch>
-					<useSpecifiedRepositories>false</useSpecifiedRepositories>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>validate</phase>
-						<goals>
-							<goal>format</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
-			</plugin>
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.9</version>
-				<configuration>
-					<excludes>
-						<exclude>**/schemas/*</exclude>
-						<exclude>**/com/cloudera/**/*</exclude>
-						<exclude>**/org/apache/avro/io/**/*</exclude>
-					</excludes>
-				</configuration>
-				<executions>
-					<execution>
-						<id>default-prepare-agent</id>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>default-report</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-		</plugins>
-
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh</artifactId>
-				<version>2.10</version>
-			</extension>
-		</extensions>
-	</build>
-	<distributionManagement>
-		<snapshotRepository>
-			<id>dnet45-snapshots</id>
-			<name>DNet45 Snapshots</name>
-			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-snapshots</url>
-			<layout>default</layout>
-		</snapshotRepository>
-		<repository>
-			<id>dnet45-releases</id>
-			<url>https://maven.d4science.org/nexus/content/repositories/dnet45-releases</url>
-		</repository>
-		<site>
-			<id>DHPSite</id>
-			<url>${dhp.site.stage.path}/</url>
-		</site>
-	</distributionManagement>
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<configuration>
-					<detectLinks>true</detectLinks>
-					<doclint>none</doclint>
-				</configuration>
-			</plugin>
-		</plugins>
-	</reporting>
-
-	<properties>
-		<dhp.site.stage.path>sftp://dnet-hadoop@static-web.d4science.org/dnet-hadoop</dhp.site.stage.path>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-		<maven.failsave.plugin.version>2.22.2</maven.failsave.plugin.version>
-		<properties.maven.plugin.version>2.0.1</properties.maven.plugin.version>
-		<dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
-		<dhp.hadoop.version>2.6.0-${dhp.cdh.version}</dhp.hadoop.version>
-		<dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>
-		<dhp-schemas.artifact>dhp-schemas</dhp-schemas.artifact>
-		<sparksolr.version>3.6.0</sparksolr.version>
-		<dhp.spark.version>2.4.0.cloudera2</dhp.spark.version>
-		<dhp.jackson.version>2.9.6</dhp.jackson.version>
-		<dhp.commons.lang.version>3.5</dhp.commons.lang.version>
-		<dhp.site.skip>true</dhp.site.skip>
-		<dhp.guava.version>11.0.2</dhp.guava.version>
-		<scala.version>2.11.12</scala.version>
-		<scala.binary.version>2.11</scala.binary.version>
-		<scala-xml.version>1.3.0</scala-xml.version>
-		<junit-jupiter.version>5.6.1</junit-jupiter.version>
-		<mockito-core.version>3.3.3</mockito-core.version>
-		<mongodb.driver.version>3.4.2</mongodb.driver.version>
-		<vtd.version>[2.12,3.0)</vtd.version>
-		<dhp-schemas.version>[6.1.3]</dhp-schemas.version>
-		<dnet-openaire-broker-common.version>[3.1.6]</dnet-openaire-broker-common.version>
-		<cnr-rmi-api.version>[2.6.1]</cnr-rmi-api.version>
-		<solr.version>7.5.0</solr.version>
-		<okhttp.version>4.7.2</okhttp.version>
-		<common.compress.version>1.20</common.compress.version>
-		<json4s.version>3.5.3</json4s.version>
-		<jsonschemagenerator.version>4.13.0</jsonschemagenerator.version>
-		<common.csv.version>1.8</common.csv.version>
-		<apache.poi.version>4.1.2</apache.poi.version>
-		<common.text.version>1.8</common.text.version>
-		<org.apache.httpcomponents.version>4.5.3</org.apache.httpcomponents.version>
-		<net.alchim31.maven.version>4.0.1</net.alchim31.maven.version>
-		<google.gson.version>2.2.2</google.gson.version>
-		<commons.logging.version>1.1.3</commons.logging.version>
-		<commons.collections.version>3.2.1</commons.collections.version>
-	</properties>
-
-	<!-- Build with scala 12 and Spark 3.4 -->
-	<profiles>
-		<profile>
-			<id>scala-2.12</id>
-			<properties>
-				<scala.binary.version>2.12</scala.binary.version>
-				<scala.version>2.12.18</scala.version>
-				<!-- scala-xml.version>2.1.0</scala-xml.version -->
-
-
-				<sparksolr.version>4.0.2</sparksolr.version>
-				<dhp.spark.version>3.4.1</dhp.spark.version>
-				<dhp.jackson.version>2.14.2</dhp.jackson.version>
-				<dhp.commons.lang.version>3.12.0</dhp.commons.lang.version>
-				<json4s.version>3.7.0-M11</json4s.version>
-				<net.alchim31.maven.version>4.8.1</net.alchim31.maven.version>
-
-				<!--
-				<dhp-schemas.artifact>dhp-schemas_${scala.binary.version}</dhp-schemas.artifact>
-				<dhp-schemas.version>3.17.2-SNAPSHOT</dhp-schemas.version>
-				 -->
-			</properties>
-		</profile>
-
-		<!-- Activate ARM-compatible snappy dependency on new Silicon Macs -->
-		<profile>
-			<id>arm-silicon-mac</id>
-			<activation>
-				<os>
-					<arch>aarch64</arch>
-					<family>mac</family>
-				</os>
-			</activation>
-			<dependencyManagement>
-				<dependencies>
-					<dependency>
-						<groupId>org.xerial.snappy</groupId>
-						<artifactId>snappy-java</artifactId>
-						<version>1.1.8.4</version>
-					</dependency>
-				</dependencies>
-			</dependencyManagement>
-		</profile>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>eu.dnetlib.dhp</groupId>
+    <artifactId>dhp</artifactId>
+    <version>1.2.5-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <licenses>
+        <license>
+            <name>GNU Affero General Public License v3.0 or later</name>
+            <url>https://spdx.org/licenses/AGPL-3.0-or-later.html#licenseText</url>
+            <distribution>repo</distribution>
+            <comments>This program is free software: you can redistribute it and/or modify it under the terms of the
+                GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the
+                License, or (at your option) any later version.
+            </comments>
+        </license>
+    </licenses>
+
+    <modules>
+        <module>dhp-build</module>
+        <module>dhp-pace-core</module>
+        <module>dhp-common</module>
+        <module>dhp-workflows</module>
+        <module>dhp-shade-package</module>
+    </modules>
+
+    <issueManagement>
+        <system>Redmine</system>
+        <url>https://support.openaire.eu/projects/openaire</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>jenkins</system>
+        <url>https://jenkins-dnet.d4science.org/</url>
+    </ciManagement>
+
+    <scm>
+        <connection>scm:git:gitea@code-repo.d4science.org:D-Net/dnet-hadoop.git</connection>
+        <developerConnection>scm:git:gitea@code-repo.d4science.org:D-Net/dnet-hadoop.git</developerConnection>
+        <url>https://code-repo.d4science.org/D-Net/dnet-hadoop/</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <description>This module is the root descriptor for the dnet-hadoop project</description>
+
+    <pluginRepositories>
+    </pluginRepositories>
+
+    <repositories>
+
+        <repository>
+            <id>Openaire-third-parties-snaphot</id>
+            <name>Openaire third parties Snapshot</name>
+            <url>https://maven.d4science.org/nexus/content/repositories/Openaire-third-parties-snaphot/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>dnet45-releases</id>
+            <name>D-Net 45 releases</name>
+            <url>https://maven.d4science.org/nexus/content/repositories/dnet45-releases</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>dnet45-snapshots</id>
+            <name>D-Net 45 snapshots</name>
+            <url>https://maven.d4science.org/nexus/content/repositories/dnet45-snapshots</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>dnet45-bootstrap-snapshot</id>
+            <name>D-Net 45 Bootstrap Snapshot</name>
+            <url>https://maven.d4science.org/nexus/content/repositories/dnet45-bootstrap-snapshot/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>dnet45-bootstrap-release</id>
+            <name>D-Net 45 Bootstrap Release</name>
+            <url>https://maven.d4science.org/nexus/content/repositories/dnet45-bootstrap-release/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>cloudera</id>
+            <name>Cloudera Repository</name>
+            <url>https://repository.cloudera.com/artifactory/cloudera-repos</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>dnet-deps</id>
+            <name>dnet-dependencies</name>
+            <url>https://maven.d4science.org/nexus/content/repositories/dnet-deps</url>
+            <layout>default</layout>
+        </repository>
+        <repository>
+            <id>maven-restlet</id>
+            <name>Restlet repository</name>
+            <url>https://maven.restlet.talend.com</url>
+        </repository>
+        <repository>
+            <id>conjars</id>
+            <name>conjars</name>
+            <url>https://conjars.wensel.net/repo/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <!-- Quick FIX not to remove lombok everywhere -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.28</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>eu.dnetlib.dhp</groupId>
+                <artifactId>dhp-schemas</artifactId>
+                <version>${dhp-schemas.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-hdfs</artifactId>
+                <version>${dhp.hadoop.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-common</artifactId>
+                <version>${dhp.hadoop.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-client</artifactId>
+                <version>${dhp.hadoop.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.hadoop</groupId>
+                <artifactId>hadoop-distcp</artifactId>
+                <version>${dhp.hadoop.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-core_${scala.binary.version}</artifactId>
+                <version>${dhp.spark.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-sql_${scala.binary.version}</artifactId>
+                <version>${dhp.spark.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-graphx_${scala.binary.version}</artifactId>
+                <version>${dhp.spark.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.spark</groupId>
+                <artifactId>spark-hive_${scala.binary.version}</artifactId>
+                <version>${dhp.spark.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${org.slf4j.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+                <version>${org.slf4j.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${org.slf4j.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j2-impl</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <!-- API bridge between log4j 1 and 2 -->
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-1.2-api</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${dhp.commons.lang.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${commons-beanutils.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>commons-validator</groupId>
+                <artifactId>commons-validator</artifactId>
+                <version>${commons-validator.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.sisyphsu</groupId>
+                <artifactId>dateparser</artifactId>
+                <version>${dateparser.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>me.xuender</groupId>
+                <artifactId>unidecode</artifactId>
+                <version>${unidecode.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${dhp.guava.version}</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>${commons-codec.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-io</groupId>
+                <artifactId>commons-io</artifactId>
+                <version>${commons-io.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-cli</groupId>
+                <artifactId>commons-cli</artifactId>
+                <version>1.2</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>net.sf.saxon</groupId>
+                <artifactId>Saxon-HE</artifactId>
+                <version>9.9.1-6</version>
+            </dependency>
+
+            <dependency>
+                <groupId>dom4j</groupId>
+                <artifactId>dom4j</artifactId>
+                <version>1.6.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>xml-apis</groupId>
+                <artifactId>xml-apis</artifactId>
+                <version>1.4.01</version>
+            </dependency>
+
+            <dependency>
+                <groupId>jaxen</groupId>
+                <artifactId>jaxen</artifactId>
+                <version>1.1.6</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.mycila.xmltool</groupId>
+                <artifactId>xmltool</artifactId>
+                <version>3.3</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-solrj</artifactId>
+                <version>${solr.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>*</artifactId>
+                        <groupId>*</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.lucidworks.spark</groupId>
+                <artifactId>spark-solr</artifactId>
+                <version>${sparksolr.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>*</artifactId>
+                        <groupId>*</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.solr</groupId>
+                <artifactId>solr-test-framework</artifactId>
+                <version>${solr.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics</groupId>
+                <artifactId>metrics-core</artifactId>
+                <version>3.2.6</version>
+                <scope>test</scope>
+            </dependency>
+
+
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${org.apache.httpcomponents.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpmime</artifactId>
+                <version>${org.apache.httpcomponents.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.noggit</groupId>
+                <artifactId>noggit</artifactId>
+                <version>0.8</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>${zookeeper.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.schmizz</groupId>
+                <artifactId>sshj</artifactId>
+                <version>0.10.0</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${dhp.jackson.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${dhp.jackson.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${dhp.jackson.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>eu.dnetlib</groupId>
+                <artifactId>dnet-actionmanager-common</artifactId>
+                <version>${dnet-actionmanager-common.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.hadoop</groupId>
+                        <artifactId>hadoop-common</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>eu.dnetlib</groupId>
+                <artifactId>dnet-actionmanager-api</artifactId>
+                <version>${dnet-actionmanager-api.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>eu.dnetlib</groupId>
+                        <artifactId>cnr-misc-utils</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>eu.dnetlib</groupId>
+                <artifactId>cnr-rmi-api</artifactId>
+                <version>${cnr-rmi-api.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>eu.dnetlib.dhp</groupId>
+                <artifactId>dnet-openaire-broker-common</artifactId>
+                <version>${dnet-openaire-broker-common.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-rt-transports-http</artifactId>
+                <version>3.1.5</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.persistence</groupId>
+                <artifactId>javax.persistence-api</artifactId>
+                <version>2.2</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.jayway.jsonpath</groupId>
+                <artifactId>json-path</artifactId>
+                <version>2.4.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.arakelian</groupId>
+                <artifactId>java-jq</artifactId>
+                <version>0.10.1</version>
+            </dependency>
+            <dependency>
+                <groupId>edu.cmu</groupId>
+                <artifactId>secondstring</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mongodb</groupId>
+                <artifactId>mongo-java-driver</artifactId>
+                <version>${mongodb.driver.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fares.junit.mongodb</groupId>
+                <artifactId>mongodb-junit-test</artifactId>
+                <version>1.1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>42.2.10</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.antlr</groupId>
+                <artifactId>stringtemplate</artifactId>
+                <version>3.2.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.antlr</groupId>
+                <artifactId>ST4</artifactId>
+                <version>4.3.4</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ximpleware</groupId>
+                <artifactId>vtd-xml</artifactId>
+                <version>${vtd.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch-hadoop</artifactId>
+                <version>7.6.0</version>
+            </dependency>
+
+
+            <dependency>
+                <groupId>org.apache.oozie</groupId>
+                <artifactId>oozie-client</artifactId>
+                <version>${dhp.oozie.version}</version>
+                <scope>provided</scope>
+                <exclusions>
+                    <!-- conflicts -->
+                    <exclusion>
+                        <artifactId>slf4j-simple</artifactId>
+                        <groupId>org.slf4j</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-compress</artifactId>
+                <version>${common.compress.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-csv</artifactId>
+                <version>${common.csv.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.poi</groupId>
+                <artifactId>poi-ooxml</artifactId>
+                <version>${apache.poi.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>20180813</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.json4s</groupId>
+                <artifactId>json4s-jackson_${scala.binary.version}</artifactId>
+                <version>${json4s.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.victools</groupId>
+                <artifactId>jsonschema-generator</artifactId>
+                <version>${jsonschemagenerator.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>${common.text.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.opencsv</groupId>
+                <artifactId>opencsv</artifactId>
+                <version>5.5</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.classgraph</groupId>
+                <artifactId>classgraph</artifactId>
+                <version>4.8.71</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-xml</artifactId>
+                <version>${jackson.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-jsonSchema</artifactId>
+                <version>${jackson.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-math3</artifactId>
+                <version>3.6.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.code.gson</groupId>
+                <artifactId>gson</artifactId>
+                <version>${google.gson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>${commons.collections.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                <version>${commons.logging.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>${reflections.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-library</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.ibm.icu</groupId>
+                <artifactId>icu4j</artifactId>
+                <version>70.1</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>${javassist.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <directory>target</directory>
+        <outputDirectory>target/classes</outputDirectory>
+        <finalName>${project.artifactId}-${project.version}</finalName>
+        <testOutputDirectory>target/test-classes</testOutputDirectory>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-plugin-plugin</artifactId>
+                    <version>3.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-project-info-reports-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.9.1</version>
+                    <configuration>
+                        <skip>${dhp.site.skip}</skip>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin.version}</version>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                        <encoding>${project.build.sourceEncoding}</encoding>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.0.2</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>3.0.1</version>
+                    <executions>
+                        <execution>
+                            <id>attach-sources</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>jar-no-fork</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.0.0-M4</version>
+                    <configuration>
+                        <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                        <trimStackTrace>false</trimStackTrace>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.2.0</version>
+                    <configuration>
+                        <detectLinks>true</detectLinks>
+                        <doclint>none</doclint>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>3.6.0</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>net.revelc.code.formatter</groupId>
+                    <artifactId>formatter-maven-plugin</artifactId>
+                    <version>2.11.0</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>eu.dnetlib.dhp</groupId>
+                            <artifactId>dhp-code-style</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                    <groupId>org.antipathy</groupId>
+                    <artifactId>mvn-scalafmt_${scala.binary.version}</artifactId>
+                    <version>1.0.1640073709.733712b</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>eu.dnetlib.dhp</groupId>
+                            <artifactId>dhp-code-style</artifactId>
+                            <version>${project.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                        <configuration>
+                            <configFile>eclipse/formatter_dnet.xml</configFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>net.revelc.code</groupId>
+                <artifactId>impsort-maven-plugin</artifactId>
+                <version>1.6.2</version>
+                <configuration>
+                    <groups>java.,javax.,org.,com.</groups>
+                    <staticGroups>java,*</staticGroups>
+                    <excludes>
+                        <exclude>**/thrift/*.java</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>sort-imports</id>
+                        <goals>
+                            <goal>sort</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.antipathy</groupId>
+                <artifactId>mvn-scalafmt_${scala.binary.version}</artifactId>
+                <configuration>
+                    <configLocation>
+                        https://code-repo.d4science.org/D-Net/dnet-hadoop/raw/branch/beta/dhp-build/dhp-code-style/src/main/resources/scalafmt/scalafmt.conf
+                    </configLocation>
+                    <skipTestSources>false</skipTestSources>
+                    <skipSources>false</skipSources>
+                    <sourceDirectories>
+                        <param>${project.basedir}/src/main/scala</param>
+                    </sourceDirectories>
+                    <testSourceDirectories>
+                        <param>${project.basedir}/src/test/scala</param>
+                    </testSourceDirectories>
+                    <validateOnly>false</validateOnly>
+                    <onlyChangedFiles>false</onlyChangedFiles>
+                    <branch>: git rev-parse --abbrev-ref HEAD</branch>
+                    <useSpecifiedRepositories>false</useSpecifiedRepositories>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>format</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.10</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/schemas/*</exclude>
+                        <exclude>**/com/cloudera/**/*</exclude>
+                        <exclude>**/org/apache/avro/io/**/*</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>default-report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.10</version>
+            </extension>
+        </extensions>
+    </build>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>dnet45-snapshots</id>
+            <name>DNet45 Snapshots</name>
+            <url>https://maven.d4science.org/nexus/content/repositories/dnet45-snapshots</url>
+            <layout>default</layout>
+        </snapshotRepository>
+        <repository>
+            <id>dnet45-releases</id>
+            <url>https://maven.d4science.org/nexus/content/repositories/dnet45-releases</url>
+        </repository>
+        <site>
+            <id>DHPSite</id>
+            <url>${dhp.site.stage.path}/</url>
+        </site>
+    </distributionManagement>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <detectLinks>true</detectLinks>
+                    <doclint>none</doclint>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
+
+    <properties>
+        <dhp.site.stage.path>sftp://dnet-hadoop@static-web.d4science.org/dnet-hadoop</dhp.site.stage.path>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+
+        <!-- scala version -->
+        <scala.version>2.11.12</scala.version>
+        <scala.binary.version>2.11</scala.binary.version>
+
+        <!-- plugin versions -->
+        <maven.compiler.plugin.version>3.6.0</maven.compiler.plugin.version>
+        <maven.failsave.plugin.version>2.22.2</maven.failsave.plugin.version>
+        <properties.maven.plugin.version>2.0.1</properties.maven.plugin.version>
+        <net.alchim31.maven.version>4.0.1</net.alchim31.maven.version>
+
+        <!-- dependency versions -->
+        <apache.poi.version>4.1.2</apache.poi.version>
+        <cnr-rmi-api.version>[2.6.1]</cnr-rmi-api.version>
+        <common.compress.version>1.20</common.compress.version>
+        <common.csv.version>1.8</common.csv.version>
+        <common.text.version>1.8</common.text.version>
+        <commons-beanutils.version>1.9.4</commons-beanutils.version>
+        <commons-codec.version>1.9</commons-codec.version>
+        <commons.collections.version>3.2.1</commons.collections.version>
+        <commons-io.version>2.4</commons-io.version>
+        <commons.logging.version>1.1.3</commons.logging.version>
+        <commons-validator.version>1.7</commons-validator.version>
+        <dateparser.version>1.0.7</dateparser.version>
+        <dhp-schemas.version>[6.1.4-SNAPSHOT]</dhp-schemas.version>
+        <dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
+        <dhp.commons.lang.version>3.5</dhp.commons.lang.version>
+        <dhp.guava.version>11.0.2</dhp.guava.version>
+        <dhp.hadoop.version>2.6.0-${dhp.cdh.version}</dhp.hadoop.version>
+        <dhp.jackson.version>2.9.6</dhp.jackson.version>
+        <dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>
+        <dhp.site.skip>true</dhp.site.skip>
+        <dhp.spark.version>2.4.0.cloudera2</dhp.spark.version>
+        <dnet-actionmanager-api.version>[4.0.3]</dnet-actionmanager-api.version>
+        <dnet-actionmanager-common.version>[6.0.5]</dnet-actionmanager-common.version>
+        <dnet-openaire-broker-common.version>[3.1.6]</dnet-openaire-broker-common.version>
+        <google.gson.version>2.2.2</google.gson.version>
+        <log4j.version>1.2.17</log4j.version>
+        <javassist.version>3.19.0-GA</javassist.version>
+        <json4s.version>3.5.3</json4s.version>
+        <jsonschemagenerator.version>4.13.0</jsonschemagenerator.version>
+        <junit-jupiter.version>5.6.1</junit-jupiter.version>
+        <mockito-core.version>3.3.3</mockito-core.version>
+        <mongodb.driver.version>3.4.2</mongodb.driver.version>
+        <okhttp.version>4.7.2</okhttp.version>
+        <org.apache.httpcomponents.version>4.5.3</org.apache.httpcomponents.version>
+        <org.slf4j.version>1.7.25</org.slf4j.version>
+        <reflections.version>0.9.10</reflections.version>
+        <scala-xml.version>1.3.0</scala-xml.version>
+        <solr.version>7.5.0</solr.version>
+        <sparksolr.version>3.6.0</sparksolr.version>
+        <unidecode.version>0.0.7</unidecode.version>
+        <vtd.version>[2.12,3.0)</vtd.version>
+        <zookeeper.version>3.4.6</zookeeper.version>
+    </properties>
+
+    <!-- Build with scala 12 and Spark 3.4 -->
+    <profiles>
+        <profile>
+            <id>spark-34</id>
+            <properties>
+                <scala.binary.version>2.12</scala.binary.version>
+                <scala.version>2.12.18</scala.version>
+                <scala-xml.version>1.3.0</scala-xml.version>
+
+                <!-- plugin versions -->
+                <net.alchim31.maven.version>4.8.1</net.alchim31.maven.version>
+
+                <!-- dependencies -->
+                <common.compress.version>1.22</common.compress.version>
+                <common.csv.version>1.8</common.csv.version>
+                <common.text.version>1.10.0</common.text.version>
+                <commons-beanutils.version>1.9.4</commons-beanutils.version>
+                <commons-codec.version>1.15</commons-codec.version>
+                <commons.collections.version>3.2.2</commons.collections.version>
+                <commons-io.version>2.11.0</commons-io.version>
+                <commons.logging.version>1.1.3</commons.logging.version>
+                <commons-validator.version>1.7</commons-validator.version>
+
+                <dhp.guava.version>14.0.1</dhp.guava.version>
+                <solr.version>8.11.0</solr.version>
+                <sparksolr.version>4.0.4</sparksolr.version>
+                <dhp.spark.version>3.4.2.openaire</dhp.spark.version>
+                <dhp.jackson.version>2.14.2</dhp.jackson.version>
+                <dhp.commons.lang.version>3.12.0</dhp.commons.lang.version>
+                <log4j.version>2.19.0</log4j.version>
+                <json4s.version>3.7.0-M11</json4s.version>
+                <javassist.version>3.25.0-GA</javassist.version>
+                <okhttp.version>4.10.0</okhttp.version>
+                <org.slf4j.version>2.0.6</org.slf4j.version>
+                <reflections.version>0.10.2</reflections.version>
+                <zookeeper.version>3.6.3</zookeeper.version>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>spark-35</id>
+            <properties>
+                <scala.binary.version>2.12</scala.binary.version>
+                <scala.version>2.12.18</scala.version>
+                <scala-xml.version>1.3.0</scala-xml.version>
+
+                <!-- plugin versions -->
+                <net.alchim31.maven.version>4.8.1</net.alchim31.maven.version>
+
+                <!-- dependencies -->
+                <common.compress.version>1.23.0</common.compress.version>
+                <common.csv.version>1.8</common.csv.version>
+                <common.text.version>1.10.0</common.text.version>
+                <commons-beanutils.version>1.9.4</commons-beanutils.version>
+                <commons-codec.version>1.16.0</commons-codec.version>
+                <commons.collections.version>3.2.2</commons.collections.version>
+                <commons-io.version>2.13.0</commons-io.version>
+                <commons.logging.version>1.1.3</commons.logging.version>
+                <commons-validator.version>1.7</commons-validator.version>
+
+                <dhp.guava.version>14.0.1</dhp.guava.version>
+                <solr.version>8.11.0</solr.version>
+                <sparksolr.version>4.0.4</sparksolr.version>
+                <dhp.spark.version>3.5.1.openaire-SNAPSHOT</dhp.spark.version>
+                <dhp.jackson.version>2.15.2</dhp.jackson.version>
+                <dhp.commons.lang.version>3.12.0</dhp.commons.lang.version>
+                <log4j.version>2.20.0</log4j.version>
+                <json4s.version>3.7.0-M11</json4s.version>
+                <javassist.version>3.25.0-GA</javassist.version>
+                <okhttp.version>4.10.0</okhttp.version>
+                <org.slf4j.version>2.0.7</org.slf4j.version>
+                <reflections.version>0.10.2</reflections.version>
+                <zookeeper.version>3.6.3</zookeeper.version>
+            </properties>
+        </profile>
+
+        <profile>
+            <id>java11</id>
+            <activation>
+                <jdk>[11</jdk>
+            </activation>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <version>3.0.0-M4</version>
+                            <configuration>
+                                <!-- only for java 11+ to run spark in tests -->
+                                <argLine>--add-opens=java.base/java.lang=ALL-UNNAMED
+                                    --add-opens=java.base/java.lang.invoke=ALL-UNNAMED
+                                    --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+                                    --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED
+                                    --add-opens=java.base/java.nio=ALL-UNNAMED
+                                    --add-opens=java.base/java.util=ALL-UNNAMED
+                                    --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+                                    --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED
+                                    --add-opens=java.base/sun.nio.ch=ALL-UNNAMED
+                                    --add-opens=java.base/sun.nio.cs=ALL-UNNAMED
+                                    --add-opens=java.base/sun.security.action=ALL-UNNAMED
+                                    --add-opens=java.base/sun.util.calendar=ALL-UNNAMED
+                                </argLine>
+                                <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                                <trimStackTrace>false</trimStackTrace>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
 	</profiles>
 </project>

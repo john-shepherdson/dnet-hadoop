@@ -52,6 +52,49 @@
         </dependency>
 
         <dependency>
+            <groupId>eu.dnetlib</groupId>
+            <artifactId>dnet-actionmanager-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>eu.dnetlib</groupId>
+            <artifactId>dnet-actionmanager-common</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>eu.dnetlib</groupId>
+                    <artifactId>dnet-openaireplus-mapping-utils</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>saxonica</groupId>
+                    <artifactId>saxon</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>saxonica</groupId>
+                    <artifactId>saxon-dom</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jgrapht</groupId>
+                    <artifactId>jgrapht</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.sf.ehcache</groupId>
+                    <artifactId>ehcache</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-test</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.*</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>apache</groupId>
+                    <artifactId>*</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.5.13</version>

@@ -50,12 +50,11 @@
             <groupId>org.apache.hadoop</groupId>
             <artifactId>hadoop-distcp</artifactId>
         </dependency>
-<!--
+
         <dependency>
             <groupId>eu.dnetlib</groupId>
             <artifactId>dnet-actionmanager-api</artifactId>
         </dependency>
-
         <dependency>
             <groupId>eu.dnetlib</groupId>
             <artifactId>dnet-actionmanager-common</artifactId>
@@ -94,7 +93,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
--->
 
     </dependencies>
 </project>
