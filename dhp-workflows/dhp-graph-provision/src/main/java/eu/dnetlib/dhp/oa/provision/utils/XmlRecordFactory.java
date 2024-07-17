@@ -219,6 +219,13 @@ public class XmlRecordFactory implements Serializable {
 		if (entity.getMeasures() != null) {
 			metadata.addAll(measuresAsXml(entity.getMeasures()));
 		}
+		if (entity.getContext() != null) {
+			contexts.addAll(entity.getContext().stream().map(Context::getId).collect(Collectors.toList()));
+			/* FIXME: Workaround for CLARIN mining issue: #3670#note-29 */
+			if (contexts.contains("dh-ch::subcommunity::2")) {
+				contexts.add("clarin");
+			}
+		}
 
 		if (ModelSupport.isResult(type)) {
 			final Result r = (Result) entity;
@@ -243,14 +250,6 @@ public class XmlRecordFactory implements Serializable {
 							.filter(Objects::nonNull)
 							.map(e -> XmlSerializationUtils.mapEoscIf(e))
 							.collect(Collectors.toList()));
-			}
-
-			if (r.getContext() != null) {
-				contexts.addAll(r.getContext().stream().map(c -> c.getId()).collect(Collectors.toList()));
-				/* FIXME: Workaround for CLARIN mining issue: #3670#note-29 */
-				if (contexts.contains("dh-ch::subcommunity::2")) {
-					contexts.add("clarin");
-				}
 			}
 
 			if (r.getTitle() != null) {
@@ -1603,9 +1602,7 @@ public class XmlRecordFactory implements Serializable {
 	private List<String> buildContexts(final String type, final Set<String> contexts) {
 		final List<String> res = Lists.newArrayList();
 
-		if (contextMapper != null
-			&& !contextMapper.isEmpty()
-			&& MainEntityType.result.toString().equals(type)) {
+		if (contextMapper != null && !contextMapper.isEmpty()) {
 
 			XMLTag document = XMLDoc.newDocument(true).addRoot("contextRoot");
 
