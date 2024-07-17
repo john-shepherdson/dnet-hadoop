@@ -105,8 +105,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 				final String ror = ROR_PREFIX
 					+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", row.getAs("ror")));
 				ret.addAll(createAffiliationRelationPairDOI(row.getAs("doi"), ror));
-				ret.addAll(createAffiliationRelationPairPMID(row.getAs("pmid"), ror));
-				ret.addAll(createAffiliationRelationPairPMCID(row.getAs("pmcid"), ror));
+
 
 				return ret
 					.iterator();
@@ -140,8 +139,9 @@ public class CreateActionSetFromWebEntries implements Serializable {
 				"institution", functions
 					.explode(
 						functions.col("institutions")))
+
 			.selectExpr(
-				"id", "doi", "ids.pmcid as pmcid", "ids.pmid as pmid", "institution.ror as ror",
+				"id", "doi", "institution.ror as ror",
 				"institution.country_code as country_code", "publication_year")
 			.distinct();
 
