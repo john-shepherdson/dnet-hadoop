@@ -5,7 +5,6 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
@@ -30,7 +29,6 @@ import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
-import io.netty.util.Constant;
 import scala.Tuple2;
 
 /**
