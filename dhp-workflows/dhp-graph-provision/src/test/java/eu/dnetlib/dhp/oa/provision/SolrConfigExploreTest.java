@@ -1,13 +1,12 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 
+import eu.dnetlib.dhp.oa.provision.model.SerializableSolrInputDocument;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -33,13 +32,14 @@ import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import eu.dnetlib.dhp.oa.provision.model.SerializableSolrInputDocument;
 import eu.dnetlib.dhp.oa.provision.utils.ISLookupClient;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class SolrConfigExploreTest {
@@ -91,7 +91,7 @@ public class SolrConfigExploreTest {
 		SparkConf conf = new SparkConf();
 		conf.setAppName(XmlIndexingJobTest.class.getSimpleName());
 		conf.registerKryoClasses(new Class[] {
-			SerializableSolrInputDocument.class
+				SerializableSolrInputDocument.class
 		});
 
 		conf.setMaster("local[1]");
@@ -101,10 +101,10 @@ public class SolrConfigExploreTest {
 		conf.set("spark.sql.warehouse.dir", workingDir.resolve("spark").toString());
 
 		spark = SparkSession
-			.builder()
-			.appName(SolrConfigExploreTest.class.getSimpleName())
-			.config(conf)
-			.getOrCreate();
+				.builder()
+				.appName(SolrConfigExploreTest.class.getSimpleName())
+				.config(conf)
+				.getOrCreate();
 
 		// random unassigned HTTP port
 		final int jettyPort = 0;
@@ -134,35 +134,35 @@ public class SolrConfigExploreTest {
 
 		log.info(new ConfigSetAdminRequest.List().process(miniCluster.getSolrClient()).toString());
 		log
-			.info(
-				CollectionAdminRequest.ClusterStatus
-					.getClusterStatus()
-					.process(miniCluster.getSolrClient())
-					.toString());
+				.info(
+						CollectionAdminRequest.ClusterStatus
+								.getClusterStatus()
+								.process(miniCluster.getSolrClient())
+								.toString());
 
 		NamedList<Object> res = createCollection(
-			miniCluster.getSolrClient(), SHADOW_COLLECTION, 4, 2, 20, CONFIG_NAME);
+				miniCluster.getSolrClient(), SHADOW_COLLECTION, 4, 2, 20, CONFIG_NAME);
 		res.forEach(o -> log.info(o.toString()));
 
 		// miniCluster.getSolrClient().setDefaultCollection(SHADOW_COLLECTION);
 
 		res = createCollection(
-			miniCluster.getSolrClient(), PUBLIC_COLLECTION, 4, 2, 20, CONFIG_NAME);
+				miniCluster.getSolrClient(), PUBLIC_COLLECTION, 4, 2, 20, CONFIG_NAME);
 		res.forEach(o -> log.info(o.toString()));
 
 		admin = new SolrAdminApplication(miniCluster.getZkClient().getZkServerAddress());
 		CollectionAdminResponse rsp = (CollectionAdminResponse) admin
-			.createAlias(ProvisionConstants.PUBLIC_ALIAS_NAME, PUBLIC_COLLECTION);
+				.createAlias(ProvisionConstants.PUBLIC_ALIAS_NAME, PUBLIC_COLLECTION);
 		assertEquals(0, rsp.getStatus());
 		rsp = (CollectionAdminResponse) admin.createAlias(ProvisionConstants.SHADOW_ALIAS_NAME, SHADOW_COLLECTION);
 		assertEquals(0, rsp.getStatus());
 
 		log
-			.info(
-				CollectionAdminRequest.ClusterStatus
-					.getClusterStatus()
-					.process(miniCluster.getSolrClient())
-					.toString());
+				.info(
+						CollectionAdminRequest.ClusterStatus
+								.getClusterStatus()
+								.process(miniCluster.getSolrClient())
+								.toString());
 
 	}
 
@@ -180,8 +180,7 @@ public class SolrConfigExploreTest {
 
 		new XmlIndexingJob(spark, inputPath, SHADOW_FORMAT, ProvisionConstants.SHADOW_ALIAS_NAME, batchSize)
 			.run(isLookupClient);
-		Assertions
-			.assertEquals(0, miniCluster.getSolrClient().commit(ProvisionConstants.SHADOW_ALIAS_NAME).getStatus());
+		Assertions.assertEquals(0, miniCluster.getSolrClient().commit(ProvisionConstants.SHADOW_ALIAS_NAME).getStatus());
 
 		String[] queryStrings = {
 			"cancer",
@@ -201,8 +200,7 @@ public class SolrConfigExploreTest {
 //            System.out.println(rsp.getExplainMap());
 
 			for (SolrDocument doc : rsp.getResults()) {
-				log
-					.info(
+				log.info(
 						doc.get("score") + "\t" +
 							doc.get("__indexrecordidentifier") + "\t" +
 							doc.get("resultidentifier") + "\t" +
@@ -218,7 +216,7 @@ public class SolrConfigExploreTest {
 	}
 
 	protected static NamedList<Object> createCollection(CloudSolrClient client, String name, int numShards,
-		int replicationFactor, int maxShardsPerNode, String configName) throws Exception {
+														int replicationFactor, int maxShardsPerNode, String configName) throws Exception {
 		ModifiableSolrParams modParams = new ModifiableSolrParams();
 		modParams.set(CoreAdminParams.ACTION, CollectionParams.CollectionAction.CREATE.name());
 		modParams.set("name", name);

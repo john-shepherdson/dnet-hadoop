@@ -85,8 +85,7 @@ public class SolrConfigTest extends SolrTest {
 
 		new XmlIndexingJob(spark, inputPath, SHADOW_FORMAT, ProvisionConstants.SHADOW_ALIAS_NAME, batchSize)
 			.run(isLookupClient);
-		Assertions
-			.assertEquals(0, miniCluster.getSolrClient().commit(ProvisionConstants.SHADOW_ALIAS_NAME).getStatus());
+		Assertions.assertEquals(0, miniCluster.getSolrClient().commit(ProvisionConstants.SHADOW_ALIAS_NAME).getStatus());
 
 		String[] queryStrings = {
 			"cancer",
