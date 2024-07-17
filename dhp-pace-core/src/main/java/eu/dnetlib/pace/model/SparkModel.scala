@@ -123,9 +123,19 @@ case class SparkModel(conf: DedupConfig) {
               case _ => res(index)
             }
           }
+
+          if (StringUtils.isNotBlank(fdef.getInfer)) {
+            val inferFrom : String = if (StringUtils.isNotBlank(fdef.getInferenceFrom)) fdef.getInferenceFrom else fdef.getPath
+            res(index) = res(index) match {
+              case x: Seq[String] => x.map(inference(_, MapDocumentUtil.getJPathString(inferFrom, documentContext), fdef.getInfer))
+              case _ => inference(res(index).toString, MapDocumentUtil.getJPathString(inferFrom, documentContext), fdef.getInfer)
+            }
+          }
+
         }
 
         res
+
     }
 
     new GenericRowWithSchema(values, schema)
@@ -142,6 +152,18 @@ case class SparkModel(conf: DedupConfig) {
 //      println(AbstractPaceFunctions.normalize(value))
 //      println()
 //    }
+
+    res
+  }
+
+  def inference(value: String, inferfrom: String, infertype: String) : String = {
+    val res = infertype match {
+      case "country" => AbstractPaceFunctions.countryInference(value, inferfrom)
+      case "city" => AbstractPaceFunctions.cityInference(value)
+      case "keyword" => AbstractPaceFunctions.keywordInference(value)
+      case "city_keyword" => AbstractPaceFunctions.cityKeywordInference(value)
+      case _ => value
+    }
 
     res
   }

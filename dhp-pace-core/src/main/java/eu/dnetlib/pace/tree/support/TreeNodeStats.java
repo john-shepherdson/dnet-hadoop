@@ -9,8 +9,11 @@ public class TreeNodeStats implements Serializable {
 
 	private Map<String, FieldStats> results; // this is an accumulator for the results of the node
 
-	public TreeNodeStats() {
+	private final boolean ignoreUndefined;
+
+	public TreeNodeStats(boolean ignoreUndefined) {
 		this.results = new HashMap<>();
+		this.ignoreUndefined = ignoreUndefined;
 	}
 
 	public Map<String, FieldStats> getResults() {
@@ -22,7 +25,10 @@ public class TreeNodeStats implements Serializable {
 	}
 
 	public int fieldsCount() {
-		return this.results.size();
+		if(ignoreUndefined)
+			return this.results.size();
+		else
+			return this.results.size() - undefinedCount();	//do not count undefined
 	}
 
 	public int undefinedCount() {
@@ -78,11 +84,25 @@ public class TreeNodeStats implements Serializable {
 		double min = 100.0; // random high value
 		for (FieldStats fs : this.results.values()) {
 			if (fs.getResult() < min) {
-				if (fs.getResult() >= 0.0 || (fs.getResult() == -1 && fs.isCountIfUndefined()))
+				if (fs.getResult() == -1) {
+					if (fs.isCountIfUndefined()) {
+						min = 0.0;
+					}
+					else {
+						min = -1;
+					}
+				}
+				else {
 					min = fs.getResult();
+				}
 			}
 		}
-		return min;
+		if (ignoreUndefined) {
+			return min==-1.0? 0.0 : min;
+		}
+		else {
+			return min;
+		}
 	}
 
 	// if at least one is true, return 1.0
@@ -91,7 +111,11 @@ public class TreeNodeStats implements Serializable {
 			if (fieldStats.getResult() >= fieldStats.getThreshold())
 				return 1.0;
 		}
-		return 0.0;
+		if (!ignoreUndefined && undefinedCount()>0){
+			return -1.0;
+		} else {
+			return 0.0;
+		}
 	}
 
 	// if at least one is false, return 0.0
@@ -100,7 +124,7 @@ public class TreeNodeStats implements Serializable {
 
 			if (fieldStats.getResult() == -1) {
 				if (fieldStats.isCountIfUndefined())
-					return 0.0;
+					return ignoreUndefined? 0.0 : -1.0;
 			} else {
 				if (fieldStats.getResult() < fieldStats.getThreshold())
 					return 0.0;

@@ -35,6 +35,7 @@ public class ComparatorTest extends AbstractPaceTest {
 		params.put("name_th", "0.95");
 		params.put("jpath_value", "$.value");
 		params.put("jpath_classid", "$.qualifier.classid");
+		params.put("codeRegex", "key::\\d+");
 	}
 
 	@Test
@@ -44,52 +45,23 @@ public class ComparatorTest extends AbstractPaceTest {
 	}
 
 	@Test
-	public void cityMatchTest() {
-		final CityMatch cityMatch = new CityMatch(params);
+	public void codeMatchTest() {
+		CodeMatch codeMatch = new CodeMatch(params);
 
-		// both names with no cities
-		assertEquals(1.0, cityMatch.distance("Università", "Centro di ricerca", conf));
+		// both names with no codes
+		assertEquals(1.0, codeMatch.distance("testing1", "testing2", conf));
 
-		// one of the two names with no cities
-		assertEquals(-1.0, cityMatch.distance("Università di Bologna", "Centro di ricerca", conf));
+		// one of the two names with no codes
+		assertEquals(-1.0, codeMatch.distance("testing1 key::1", "testing", conf));
 
-		// both names with cities (same)
-		assertEquals(1.0, cityMatch.distance("Universita di Bologna", "Biblioteca di Bologna", conf));
+		// both names with codes (same)
+		assertEquals(1.0, codeMatch.distance("testing1 key::1", "testing2 key::1", conf));
 
-		// both names with cities (different)
-		assertEquals(0.0, cityMatch.distance("Universita di Bologna", "Universita di Torino", conf));
-		assertEquals(0.0, cityMatch.distance("Franklin College", "Concordia College", conf));
+		// both names with codes (different)
+		assertEquals(0.0, codeMatch.distance("testing1 key::1", "testing2 key::2", conf));
 
-		// particular cases
-		assertEquals(1.0, cityMatch.distance("Free University of Bozen-Bolzano", "Università di Bolzano", conf));
-		assertEquals(
-			1.0,
-			cityMatch
-				.distance(
-					"Politechniki Warszawskiej (Warsaw University of Technology)", "Warsaw University of Technology",
-					conf));
-
-		// failing becasuse 'Allen' is a transliterrated greek stopword
-		// assertEquals(-1.0, cityMatch.distance("Allen (United States)", "United States Military Academy", conf));
-		assertEquals(-1.0, cityMatch.distance("Washington (United States)", "United States Military Academy", conf));
-	}
-
-	@Test
-	public void keywordMatchTest() {
-		params.put("threshold", "0.5");
-
-		final KeywordMatch keywordMatch = new KeywordMatch(params);
-
-		assertEquals(
-			0.5, keywordMatch.distance("Biblioteca dell'Universita di Bologna", "Università di Bologna", conf));
-		assertEquals(1.0, keywordMatch.distance("Universita degli studi di Pisa", "Universita di Pisa", conf));
-		assertEquals(1.0, keywordMatch.distance("Polytechnic University of Turin", "POLITECNICO DI TORINO", conf));
-		assertEquals(1.0, keywordMatch.distance("Istanbul Commerce University", "İstanbul Ticarət Universiteti", conf));
-		assertEquals(1.0, keywordMatch.distance("Franklin College", "Concordia College", conf));
-		assertEquals(2.0 / 3.0, keywordMatch.distance("University of Georgia", "Georgia State University", conf));
-		assertEquals(0.5, keywordMatch.distance("University College London", "University of London", conf));
-		assertEquals(0.5, keywordMatch.distance("Washington State University", "University of Washington", conf));
-		assertEquals(-1.0, keywordMatch.distance("Allen (United States)", "United States Military Academy", conf));
+		// both names with codes (1 same, 1 different)
+		assertEquals(0.5,codeMatch.distance("key::1 key::2 testing1", "key::1 testing", conf));
 
 	}
 
@@ -155,15 +127,15 @@ public class ComparatorTest extends AbstractPaceTest {
 	}
 
 	@Test
-	public void jaroWinklerNormalizedNameTest() {
+	public void jaroWinklerLegalnameTest() {
 
-		final JaroWinklerNormalizedName jaroWinklerNormalizedName = new JaroWinklerNormalizedName(params);
+		final JaroWinklerLegalname jaroWinklerLegalname = new JaroWinklerLegalname(params);
 
-		double result = jaroWinklerNormalizedName
-			.distance("AT&T (United States)", "United States Military Academy", conf);
+		double result = jaroWinklerLegalname
+			.distance("AT&T (United States)", "United States key::2 key::1", conf);
 		System.out.println("result = " + result);
 
-		result = jaroWinklerNormalizedName.distance("NOAA - Servicio Meteorol\\u00f3gico Nacional", "NOAA - NWS", conf);
+		result = jaroWinklerLegalname.distance("NOAA - Servicio Meteorol\\u00f3gico Nacional", "NOAA - NWS", conf);
 		System.out.println("result = " + result);
 
 	}
@@ -344,13 +316,13 @@ public class ComparatorTest extends AbstractPaceTest {
 		double result = countryMatch.distance("UNKNOWN", "UNKNOWN", conf);
 		assertEquals(-1.0, result);
 
-		result = countryMatch.distance("CHILE", "UNKNOWN", conf);
+		result = countryMatch.distance("CL", "UNKNOWN", conf);
 		assertEquals(-1.0, result);
 
-		result = countryMatch.distance("CHILE", "ITALY", conf);
+		result = countryMatch.distance("CL", "IT", conf);
 		assertEquals(0.0, result);
 
-		result = countryMatch.distance("CHILE", "CHILE", conf);
+		result = countryMatch.distance("CL", "CL", conf);
 		assertEquals(1.0, result);
 
 	}
