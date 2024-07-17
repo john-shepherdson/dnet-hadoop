@@ -3,12 +3,12 @@ package eu.dnetlib.pace.clustering;
 
 import java.util.Map;
 
-import com.mongodb.connection.Cluster;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mongodb.connection.Cluster;
 
 import eu.dnetlib.pace.AbstractPaceTest;
 import eu.dnetlib.pace.common.AbstractPaceFunctions;

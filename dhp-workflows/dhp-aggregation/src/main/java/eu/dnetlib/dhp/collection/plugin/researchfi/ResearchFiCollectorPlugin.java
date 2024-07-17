@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.collection.plugin.researchfi;
 
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class ResearchFiCollectorPlugin implements CollectorPlugin {
 
 	@Override
 	public Stream<String> collect(final ApiDescriptor api, final AggregatorReport report)
-			throws CollectorException {
+		throws CollectorException {
 
 		final String authUrl = api.getParams().get("auth_url");
 		final String clientId = api.getParams().get("auth_client_id");
@@ -45,7 +46,8 @@ public class ResearchFiCollectorPlugin implements CollectorPlugin {
 		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iter, Spliterator.ORDERED), false);
 	}
 
-	private String authenticate(final String authUrl, final String clientId, final String clientSecret) throws CollectorException {
+	private String authenticate(final String authUrl, final String clientId, final String clientSecret)
+		throws CollectorException {
 		try (final CloseableHttpClient client = HttpClients.createDefault()) {
 			final HttpPost req = new HttpPost(authUrl);
 			final List<NameValuePair> params = new ArrayList<>();
@@ -59,7 +61,9 @@ public class ResearchFiCollectorPlugin implements CollectorPlugin {
 				final String content = IOUtils.toString(response.getEntity().getContent());
 				final JSONObject obj = new JSONObject(content);
 				final String token = obj.getString("access_token");
-				if (StringUtils.isNotBlank(token)) { return token; }
+				if (StringUtils.isNotBlank(token)) {
+					return token;
+				}
 			}
 		} catch (final Throwable e) {
 			log.warn("Error obtaining access token", e);

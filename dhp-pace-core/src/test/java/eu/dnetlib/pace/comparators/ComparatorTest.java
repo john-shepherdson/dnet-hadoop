@@ -61,7 +61,7 @@ public class ComparatorTest extends AbstractPaceTest {
 		assertEquals(0.0, codeMatch.distance("testing1 key::1", "testing2 key::2", conf));
 
 		// both names with codes (1 same, 1 different)
-		assertEquals(0.5,codeMatch.distance("key::1 key::2 testing1", "key::1 testing", conf));
+		assertEquals(0.5, codeMatch.distance("key::1 key::2 testing1", "key::1 testing", conf));
 
 	}
 

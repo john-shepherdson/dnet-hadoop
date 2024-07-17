@@ -106,7 +106,6 @@ public class CreateActionSetFromWebEntries implements Serializable {
 					+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", row.getAs("ror")));
 				ret.addAll(createAffiliationRelationPairDOI(row.getAs("doi"), ror));
 
-
 				return ret
 					.iterator();
 			}, Encoders.bean(Relation.class))

@@ -25,10 +25,10 @@ public class TreeNodeStats implements Serializable {
 	}
 
 	public int fieldsCount() {
-		if(ignoreUndefined)
+		if (ignoreUndefined)
 			return this.results.size();
 		else
-			return this.results.size() - undefinedCount();	//do not count undefined
+			return this.results.size() - undefinedCount(); // do not count undefined
 	}
 
 	public int undefinedCount() {
@@ -87,20 +87,17 @@ public class TreeNodeStats implements Serializable {
 				if (fs.getResult() == -1) {
 					if (fs.isCountIfUndefined()) {
 						min = 0.0;
-					}
-					else {
+					} else {
 						min = -1;
 					}
-				}
-				else {
+				} else {
 					min = fs.getResult();
 				}
 			}
 		}
 		if (ignoreUndefined) {
-			return min==-1.0? 0.0 : min;
-		}
-		else {
+			return min == -1.0 ? 0.0 : min;
+		} else {
 			return min;
 		}
 	}
@@ -111,7 +108,7 @@ public class TreeNodeStats implements Serializable {
 			if (fieldStats.getResult() >= fieldStats.getThreshold())
 				return 1.0;
 		}
-		if (!ignoreUndefined && undefinedCount()>0){
+		if (!ignoreUndefined && undefinedCount() > 0) {
 			return -1.0;
 		} else {
 			return 0.0;
@@ -124,7 +121,7 @@ public class TreeNodeStats implements Serializable {
 
 			if (fieldStats.getResult() == -1) {
 				if (fieldStats.isCountIfUndefined())
-					return ignoreUndefined? 0.0 : -1.0;
+					return ignoreUndefined ? 0.0 : -1.0;
 			} else {
 				if (fieldStats.getResult() < fieldStats.getThreshold())
 					return 0.0;

@@ -43,16 +43,15 @@ public class TreeProcessor {
 
 			TreeNodeStats stats = currentNode.evaluate(doc1, doc2, config);
 			treeStats.addNodeStats(nextNodeName, stats);
-			
+
 			double finalScore = stats.getFinalScore(currentNode.getAggregation());
-			if(finalScore == -1.0)
+			if (finalScore == -1.0)
 				nextNodeName = currentNode.getUndefined();
 			else if (finalScore >= currentNode.getThreshold()) {
 				nextNodeName = currentNode.getPositive();
 			} else {
 				nextNodeName = currentNode.getNegative();
 			}
-
 
 		} while (MatchType.parse(nextNodeName) == MatchType.UNDEFINED);
 

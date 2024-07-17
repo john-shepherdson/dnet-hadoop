@@ -37,6 +37,7 @@ import eu.dnetlib.dhp.schema.solr.Measure;
 import eu.dnetlib.dhp.schema.solr.OpenAccessColor;
 import eu.dnetlib.dhp.schema.solr.OpenAccessRoute;
 import eu.dnetlib.dhp.schema.solr.Organization;
+import eu.dnetlib.dhp.schema.solr.Pid;
 import eu.dnetlib.dhp.schema.solr.Project;
 import eu.dnetlib.dhp.schema.solr.Result;
 import eu.dnetlib.dhp.schema.solr.Subject;

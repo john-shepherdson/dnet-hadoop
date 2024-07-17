@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.collection.plugin.researchfi;
 
 import java.util.Iterator;

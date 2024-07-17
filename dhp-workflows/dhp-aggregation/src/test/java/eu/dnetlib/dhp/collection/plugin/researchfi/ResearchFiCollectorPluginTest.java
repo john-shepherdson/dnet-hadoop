@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.collection.plugin.researchfi;
 
 import java.util.HashSet;
@@ -23,7 +24,9 @@ public class ResearchFiCollectorPluginTest {
 		final ApiDescriptor api = new ApiDescriptor();
 		api.setBaseUrl("https://research.fi/api/rest/v1/funding-decisions?FunderName=AKA&FundingStartYearFrom=2022");
 		api.setProtocol("research_fi");
-		api.getParams().put("auth_url", "https://researchfi-auth.2.rahtiapp.fi/realms/publicapi/protocol/openid-connect/token");
+		api
+			.getParams()
+			.put("auth_url", "https://researchfi-auth.2.rahtiapp.fi/realms/publicapi/protocol/openid-connect/token");
 		api.getParams().put("auth_client_id", "");
 		api.getParams().put("auth_client_secret", "");
 
