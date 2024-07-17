@@ -63,7 +63,7 @@ function copydb() {
   start_db_time=$(date +%s)
 
   # Delete the old DB from Impala cluster (if exists).
-  impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "drop database if exists ${db} cascade" |& tee error.log # impala-shell prints all logs in stderr, so wee need to capture them and put them in a file, in order to perform "grep" on them later
+  impala-shell -i ${IMPALA_HOSTNAME} -q "drop database if exists ${db} cascade" |& tee error.log # impala-shell prints all logs in stderr, so wee need to capture them and put them in a file, in order to perform "grep" on them later
   log_errors=`cat error.log | grep -E "WARN|ERROR|FAILED"`
   if [ -n "$log_errors" ]; then
     echo -e "\n\nERROR: THERE WAS A PROBLEM WHEN DROPPING THE OLD DATABASE FROM IMPALA CLUSTER! EXITING...\n\n"
@@ -120,7 +120,7 @@ function copydb() {
   start_create_schema_time=$(date +%s)
 
   # create the new database (with the same name)
-  impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "create database ${db}"
+  impala-shell -i ${IMPALA_HOSTNAME} -q "create database ${db}"
 
   # Because "Hive" and "Impala" do not have compatible schemas, we cannot use the "show create table <name>" output from hive to create the exact same table in impala.
   # So, we have to find at least one parquet file (check if it's there) from the table in the ocean cluster for impala to use it to extract the table-schema itself from that file.
@@ -148,7 +148,7 @@ function copydb() {
             exit 5
           fi  # This error is not FATAL, do we do not return from this function, in normal circumstances.
       else
-        impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "create table ${db}.${i} like parquet '${CURRENT_PRQ_FILE}' stored as parquet;" |& tee error.log
+        impala-shell -i ${IMPALA_HOSTNAME} -q "create table ${db}.${i} like parquet '${CURRENT_PRQ_FILE}' stored as parquet;" |& tee error.log
         log_errors=`cat error.log | grep -E "WARN|ERROR|FAILED"`
         if [ -n "$log_errors" ]; then
           echo -e "\n\nERROR: THERE WAS A PROBLEM WHEN CREATING TABLE '${i}'!\n\n"
@@ -182,7 +182,7 @@ function copydb() {
     new_num_of_views_to_retry=0
 
     for create_view_statement in "${all_create_view_statements[@]}"; do # Here we use double quotes, as the elements are phrases, instead of single-words.
-      impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "${create_view_statement}" |& tee error.log # impala-shell prints all logs in stderr, so wee need to capture them and put them in a file, in order to perform "grep" on them later
+      impala-shell -i ${IMPALA_HOSTNAME} -q "${create_view_statement}" |& tee error.log # impala-shell prints all logs in stderr, so wee need to capture them and put them in a file, in order to perform "grep" on them later
       specific_errors=`cat error.log | grep -E "FAILED: ParseException line 1:13 missing TABLE at 'view'|ERROR: AnalysisException: Could not resolve table reference:"`
       if [ -n "$specific_errors" ]; then
         echo -e "\nspecific_errors: ${specific_errors}\n"
@@ -212,7 +212,7 @@ function copydb() {
     previous_num_of_views_to_retry=$new_num_of_views_to_retry
   done
 
-  entities_on_impala=(`impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} --delimited -q "show tables in ${db}"`)
+  entities_on_impala=(`impala-shell -i ${IMPALA_HOSTNAME} --delimited -q "show tables in ${db}"`)
   echo -e "\nThe schema of db '${db}', along with ${#entities_on_impala[@]} entities have been created, on Impala cluster, after: $(print_elapsed_time start_create_schema_time)\n"
 
   start_compute_stats_time=$(date +%s)
@@ -222,9 +222,9 @@ function copydb() {
     create_view_statement=`hive -e "show create table ${db}.${i};" | grep "CREATE VIEW"`  # This grep works here, as we do not want to match multiple-lines.
     if [ -z "$create_view_statement" ]; then  # If it's a table, then go load the data to it.
       # Invalidate metadata of this DB's tables, in order for Impala to be aware of all parquet files put inside the tables' directories, previously, by "hadoop distcp".
-      impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "INVALIDATE METADATA ${db}.${i}"
+      impala-shell -i ${IMPALA_HOSTNAME} -q "INVALIDATE METADATA ${db}.${i}"
       sleep 1
-      impala-shell --user ${HADOOP_USER_NAME} -i ${IMPALA_HOSTNAME} -q "compute stats ${db}.${i}" |& tee error.log
+      impala-shell -i ${IMPALA_HOSTNAME} -q "compute stats ${db}.${i}" |& tee error.log
       log_errors=`cat error.log | grep -E "WARN|ERROR|FAILED"`
       if [ -n "$log_errors" ]; then
         echo -e "\n\nERROR: THERE WAS A PROBLEM WHEN COMPUTING STATS FOR TABLE '${i}'!\n\n"

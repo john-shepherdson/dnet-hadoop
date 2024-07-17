@@ -35,7 +35,7 @@
             <description>maximum number of relations allowed for a each entity grouping by target</description>
         </property>
         <property>
-            <name>format</name>
+            <name>shadowFormat</name>
             <description>metadata format name (DMF|TMF)</description>
         </property>
         <property>
@@ -133,6 +133,7 @@
             <case to="create_payloads">${wf:conf('resumeFrom') eq 'create_payloads'}</case>
             <case to="drop_solr_collection">${wf:conf('resumeFrom') eq 'drop_solr_collection'}</case>
             <case to="to_solr_index">${wf:conf('resumeFrom') eq 'to_solr_index'}</case>
+            <case to="update_solr_aliases">${wf:conf('resumeFrom') eq 'update_solr_aliases'}</case>
             <default to="prepare_relations"/>
         </switch>
     </decision>
@@ -641,8 +642,8 @@
             </configuration>
             <main-class>eu.dnetlib.dhp.oa.provision.SolrAdminApplication</main-class>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--format</arg><arg>${format}</arg>
             <arg>--action</arg><arg>DELETE_BY_QUERY</arg>
+            <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>
             <arg>--query</arg><arg>${solrDeletionQuery}</arg>
             <arg>--commit</arg><arg>true</arg>
         </java>
@@ -672,7 +673,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${workingDir}/xml_json</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--format</arg><arg>${format}</arg>
+            <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>
             <arg>--batchSize</arg><arg>${batchSize}</arg>
         </spark>
         <ok to="commit_solr_collection"/>
@@ -689,7 +690,7 @@
             </configuration>
             <main-class>eu.dnetlib.dhp.oa.provision.SolrAdminApplication</main-class>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--format</arg><arg>${format}</arg>
+            <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>
             <arg>--action</arg><arg>COMMIT</arg>
         </java>
         <ok to="End"/>
@@ -714,9 +715,28 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${workingDir}/xml_json</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--format</arg><arg>${format}</arg>
+            <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>
             <arg>--outputPath</arg><arg>${workingDir}/solr_documents</arg>
         </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <!-- Action that updates the solr core aliases - out of order execution, only using the 'resume_from' param -->
+    <action name="update_solr_aliases">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.oa.provision.SolrAdminApplication</main-class>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--action</arg><arg>UPDATE_ALIASES</arg>
+            <arg>--publicFormat</arg><arg>${publicFormat}</arg>
+            <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>
+        </java>
         <ok to="End"/>
         <error to="Kill"/>
     </action>

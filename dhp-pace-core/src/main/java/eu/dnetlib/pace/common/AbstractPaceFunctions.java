@@ -27,6 +27,14 @@ public class AbstractPaceFunctions extends PaceCommonUtils {
 	private static Map<String, String> cityMap = AbstractPaceFunctions
 		.loadMapFromClasspath("/eu/dnetlib/pace/config/city_map.csv");
 
+	// keywords map to be used when translating the keyword names into codes
+	private static Map<String, String> keywordMap = AbstractPaceFunctions
+		.loadMapFromClasspath("/eu/dnetlib/pace/config/translation_map.csv");
+
+	// country map to be used when inferring the country from the city name
+	private static Map<String, String> countryMap = AbstractPaceFunctions
+		.loadCountryMapFromClasspath("/eu/dnetlib/pace/config/country_map.csv");
+
 	// list of stopwords in different languages
 	protected static Set<String> stopwords_gr = loadFromClasspath("/eu/dnetlib/pace/config/stopwords_gr.txt");
 	protected static Set<String> stopwords_en = loadFromClasspath("/eu/dnetlib/pace/config/stopwords_en.txt");
@@ -72,6 +80,64 @@ public class AbstractPaceFunctions extends PaceCommonUtils {
 		final String s11 = s10.replaceAll("(?m)\\s+", " ");
 		final String s12 = s11.trim();
 		return s12;
+	}
+
+	public static String countryInference(final String original, String inferFrom) {
+		if (!original.equalsIgnoreCase("unknown"))
+			return original;
+
+		inferFrom = cleanup(inferFrom);
+		inferFrom = normalize(inferFrom);
+		inferFrom = filterAllStopWords(inferFrom);
+		Set<String> cities = getCities(inferFrom, 4);
+		return citiesToCountry(cities).stream().findFirst().orElse("UNKNOWN");
+	}
+
+	public static String cityInference(String original) {
+		original = cleanup(original);
+		original = normalize(original);
+		original = filterAllStopWords(original);
+
+		Set<String> cities = getCities(original, 4);
+
+		for (String city : cities) {
+			original = original.replaceAll(city, cityMap.get(city));
+		}
+
+		return original;
+	}
+
+	public static String keywordInference(String original) {
+		original = cleanup(original);
+		original = normalize(original);
+		original = filterAllStopWords(original);
+
+		Set<String> keywords = getKeywords(original, keywordMap, 4);
+
+		for (String keyword : keywords) {
+			original = original.replaceAll(keyword, keywordMap.get(keyword));
+		}
+
+		return original;
+	}
+
+	public static String cityKeywordInference(String original) {
+		original = cleanup(original);
+		original = normalize(original);
+		original = filterAllStopWords(original);
+
+		Set<String> keywords = getKeywords(original, keywordMap, 4);
+		Set<String> cities = getCities(original, 4);
+
+		for (String keyword : keywords) {
+			original = original.replaceAll(keyword, keywordMap.get(keyword));
+		}
+
+		for (String city : cities) {
+			original = original.replaceAll(city, cityMap.get(city));
+		}
+
+		return original;
 	}
 
 	protected static String fixXML(final String a) {
@@ -208,6 +274,30 @@ public class AbstractPaceFunctions extends PaceCommonUtils {
 		return m;
 	}
 
+	public static Map<String, String> loadCountryMapFromClasspath(final String classpath) {
+
+		Transliterator transliterator = Transliterator.getInstance("Any-Eng");
+
+		final Map<String, String> m = new HashMap<>();
+		try {
+			for (final String s : IOUtils
+				.readLines(AbstractPaceFunctions.class.getResourceAsStream(classpath), StandardCharsets.UTF_8)) {
+				// string is like this: country_code;city1;city2;city3
+				String[] line = s.split(";");
+				String value = line[0];
+				for (int i = 1; i < line.length; i++) {
+					String city = fixAliases(transliterator.transliterate(line[i].toLowerCase()));
+					String code = cityMap.get(city);
+					m.put(code, value);
+				}
+			}
+		} catch (final Throwable e) {
+			return new HashMap<>();
+		}
+		return m;
+
+	}
+
 	public static String removeKeywords(String s, Set<String> keywords) {
 
 		s = " " + s + " ";
@@ -235,6 +325,10 @@ public class AbstractPaceFunctions extends PaceCommonUtils {
 
 	public static Set<String> citiesToCodes(Set<String> keywords) {
 		return toCodes(keywords, cityMap);
+	}
+
+	public static Set<String> citiesToCountry(Set<String> cities) {
+		return toCodes(toCodes(cities, cityMap), countryMap);
 	}
 
 	protected static String firstLC(final String s) {

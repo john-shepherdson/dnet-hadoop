@@ -194,228 +194,173 @@
   <fieldType name="tints" class="solr.TrieIntField" positionIncrementGap="0" docValues="true" multiValued="true" precisionStep="8"/>
   <fieldType name="tlong" class="solr.TrieLongField" positionIncrementGap="0" docValues="true" precisionStep="8"/>
   <fieldType name="tlongs" class="solr.TrieLongField" positionIncrementGap="0" docValues="true" multiValued="true" precisionStep="8"/>
-
-  <!-- Indexed fields -->
   <field name="__all" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="__deleted" type="boolean" default="false" omitNorms="true" omitTermFreqAndPositions="true" indexed="true" stored="false"/>
-  <field name="__dsid" type="string" omitNorms="true" omitTermFreqAndPositions="true" indexed="true" stored="true"/>
-  <field name="__dsversion" type="pdate" omitNorms="true" omitTermFreqAndPositions="true" indexed="true" stored="true"/>
   <field name="__indexrecordidentifier" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
-  <field name="__result" type="string" docValues="false" multiValued="false" indexed="false" stored="true"/>
   <field name="__json" type="string" docValues="false" multiValued="false" indexed="false" stored="true"/>
+  <field name="__result" type="string" docValues="false" multiValued="false" indexed="false" stored="true"/>
   <field name="_root_" type="string" docValues="false" indexed="true" stored="false"/>
   <field name="_version_" type="long" multiValued="false" indexed="true" stored="true"/>
-  <field name="authorid" type="string_ci" multiValued="true" indexed="true" stored="false"/>
-  <field name="authoridtype" type="string_ci" multiValued="true" indexed="true" stored="false"/>
-  <field name="categoryid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="categoryname" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="collectedfrom" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="collectedfromdatasourceid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="collectedfromname" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="community" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="communityid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="communityname" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="conceptid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="conceptname" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="contextid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="contextname" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="contexttype" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="country" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="datasourcecompatibilityid" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="datasourcecompatibilityname" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="datasourceenglishname" type="text_common" multiValued="true" indexed="true" stored="false"/>
+  <field name="authorid" type="string_ci" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="categoryid" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="citation_count" type="pint" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="citation_count_class" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="collectedfromdatasourceid" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="collectedfromname" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="community" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="communityid" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="conceptname" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="contextid" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="contextname" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="country" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="countrynojurisdiction" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="datasourcecompatibilityid" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="datasourcecompatibilityname" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="datasourceenglishname" type="text_common" docValues="false" multiValued="true" indexed="true" stored="false"/>
   <field name="datasourcejurisdiction" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
-  <field name="datasourceodcontenttypes" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="datasourceoddescription" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="datasourceodlanguages" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="datasourceodsubjects" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="datasourceofficialname" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="datasourcesubject" type="ngramtext" multiValued="true" indexed="true" stored="false"/>
+  <field name="datasourceodcontenttypes" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="datasourceoddescription" type="text_common" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="datasourceodlanguages" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="datasourceodsubjects" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="datasourceofficialname" type="text_common" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="datasourcesubject" type="ngramtext" docValues="false" multiValued="true" indexed="true" stored="false"/>
   <field name="datasourcethematic" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
-  <field name="datasourcetypename" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="datasourcetypeuiid" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="datasourcetypeuiname" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="dateofcollection" type="pdate" multiValued="false" indexed="true" stored="false"/>
-  <field name="deletedbyinference" type="string" multiValued="true" indexed="true" stored="false"/>
+  <field name="datasourcetypename" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="datasourcetypeuiid" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="datasourcetypeuiname" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="dateofcollection" type="date" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="deletedbyinference" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
   <field name="eoscdatasourcetype" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
   <field name="eoscifguidelines" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
   <field name="eosctype" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
-  <field name="externalrefclass" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="externalrefid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="externalreflabel" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="externalrefsite" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="funder" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="funderid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="funderjurisdiction" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="fundername" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="funderoriginalname" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="fundershortname" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="fundinglevel0_description" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="fundinglevel0_id" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="fundinglevel0_name" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="fundinglevel1_description" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="fundinglevel1_id" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="fundinglevel1_name" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="fundinglevel2_description" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="fundinglevel2_id" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="fundinglevel2_name" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="inferenceprovenance" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="inferred" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="instancetypename" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="oafentity" type="string" multiValued="true" indexed="false" stored="false"/>
-  <field name="oaftype" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="objidentifier" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="organizationalternativenames" type="ngramtext" multiValued="true" indexed="true" stored="false"/>
-  <field name="organizationcountryname" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="organizationdupid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="organizationecenterprise" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="organizationecinternationalorganization" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="organizationecinternationalorganizationeurinterests" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="organizationeclegalbody" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="organizationeclegalperson" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="organizationecnonprofit" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="organizationecnutscode" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="organizationecresearchorganization" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="organizationecsmevalidated" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="organizationlegalname" type="ngramtext" multiValued="true" indexed="true" stored="false"/>
-  <field name="organizationlegalshortname" type="ngramtext" multiValued="true" indexed="true" stored="false"/>
-  <field name="originalid" type="string_ci" multiValued="true" indexed="true" stored="false"/>
-  <field name="pid" type="string_ci" multiValued="true" indexed="true" stored="false"/>
-  <field name="pidclassid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="pidclassname" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="projectacronym" type="ngramtext" multiValued="true" indexed="true" stored="false"/>
-  <field name="projectcallidentifier" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="projectcode" type="ngramtext" multiValued="true" indexed="true" stored="false"/>
-  <field name="projectcode_nt" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="projectcontracttypename" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="projectduration" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="projectecarticle29_3" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="projectecsc39" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="projectenddate" type="pdate" multiValued="false" indexed="true" stored="false"/>
-  <field name="projectendyear" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="projectkeywords" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="projectoamandatepublications" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="projectstartdate" type="pdate" multiValued="false" indexed="true" stored="false"/>
-  <field name="projectstartyear" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="projectsubject" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="projecttitle" type="ngramtext" multiValued="true" indexed="true" stored="false"/>
-  <field name="provenanceactionclassid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relclass" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relcollectedfromid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relcollectedfromname" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relcontracttypeid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relcontracttypename" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="reldatasourcecompatibilityid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relfunder" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relfunderid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relfunderjurisdiction" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relfundername" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relfundershortname" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relfundinglevel0_id" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relfundinglevel0_name" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relfundinglevel1_id" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relfundinglevel1_name" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relfundinglevel2_id" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relfundinglevel2_name" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relinferenceprovenance" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relinferred" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relorganizationcountryid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relorganizationcountryname" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="relorganizationid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relorganizationname" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="relorganizationshortname" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="relproject" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relprojectcode" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relprojectid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relprojectname" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relprojecttitle" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="relprovenanceactionclassid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relresultid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="relresulttype" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="reltrust" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="resultacceptanceyear" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="resultaccessright" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="resultauthor" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="resultauthor_nt" type="string_ci" multiValued="true" indexed="true" stored="false"/>
-  <field name="resultbestaccessright" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="resultdateofacceptance" type="pdate" multiValued="false" indexed="true" stored="false"/>
-  <field name="resultdescription" type="text_en" multiValued="true" indexed="true" stored="false"/>
-  <field name="resultdupid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="resultembargoenddate" type="pdate" multiValued="false" indexed="true" stored="false"/>
-  <field name="resultembargoendyear" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="resulthostingdatasource" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="resulthostingdatasourceid" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="resulthostingdatasourcename" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="resultidentifier" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="resultlanguagename" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="resultlicense" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="resultpublisher" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="resultsource" type="text_common" multiValued="true" indexed="true" stored="false"/>
-  <field name="resultsubject" type="text_en" multiValued="true" indexed="true" stored="false"/>
-  <field name="resultsubjectclass" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="resulttitle" type="text_en" multiValued="true" indexed="true" stored="false"/>
-  <field name="resulttypeid" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="resulttypename" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="semrelid" type="string" multiValued="true" indexed="true" stored="false"/>
+  <field name="externalreflabel" type="text_common" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="fos" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="foslabel" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="funder" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="funderid" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="fundershortname" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="fundinglevel0_description" type="text_common" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="fundinglevel0_id" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="fundinglevel0_name" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="fundinglevel1_description" type="text_common" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="fundinglevel1_id" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="fundinglevel1_name" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="fundinglevel2_description" type="text_common" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="fundinglevel2_id" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="fundinglevel2_name" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="haslicense" type="boolean" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="impulse" type="pint" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="impulse_class" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="influence" type="pfloat" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="influence_class" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="instancetypename" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="isgreen" type="boolean" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="isindiamondjournal" type="boolean" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="oafentity" type="string" docValues="false" multiValued="true" indexed="false" stored="false"/>
+  <field name="oaftype" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="objidentifier" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="openaccesscolor" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="orcidtypevalue" type="string_ci" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="organizationalternativenames" type="ngramtext" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="organizationdupid" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="organizationlegalname" type="ngramtext" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="organizationlegalshortname" type="ngramtext" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="originalid" type="string_ci" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="peerreviewed" type="boolean" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="pid" type="string_ci" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="pidclassid" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="popularity" type="pfloat" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="popularity_alt" type="pfloat" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="popularity_alt_class" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="popularity_class" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="projectacronym" type="ngramtext" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="projectcallidentifier" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="projectcode" type="ngramtext" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="projectcode_nt" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="projectduration" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="projectecsc39" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="projectenddate" type="date" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="projectendyear" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="projectkeywords" type="text_common" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="projectoamandatepublications" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="projectstartdate" type="date" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="projectstartyear" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="projecttitle" type="ngramtext" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="projecttitle_alternative" type="text_en" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="provenanceactionclassid" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="publiclyfunded" type="boolean" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="relclass" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relcontracttypename" type="text_common" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="reldatasourcecompatibilityid" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relfunder" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relfunderid" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relfundershortname" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relfundinglevel0_id" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relfundinglevel0_name" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relfundinglevel1_id" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relfundinglevel1_name" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relfundinglevel2_id" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relfundinglevel2_name" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relorganizationcountryid" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relorganizationcountryname" type="text_common" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relorganizationid" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relorganizationname" type="text_common" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relorganizationshortname" type="text_common" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relproject" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relprojectcode" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relprojectid" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relprojectname" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relprojecttitle" type="text_common" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relresultid" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="relresulttype" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="resultacceptanceyear" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="resultauthor" type="text_common" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="resultbestaccessright" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="resultdateofacceptance" type="date" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="resultdescription" type="text_en" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="resultdupid" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="resultembargoenddate" type="date" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="resultembargoendyear" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="resulthostingdatasource" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="resulthostingdatasourceid" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="resultidentifier" type="string_ci" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="resultlanguagename" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="resultpublisher" type="text_common" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="resultsource" type="text_common" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="resultsubject" type="text_en" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="resulttitle" type="text_en" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="resulttypeid" type="string" docValues="false" multiValued="false" indexed="true" stored="false"/>
+  <field name="sdg" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="semrelid" type="string" docValues="false" multiValued="true" indexed="true" stored="false"/>
+  <field name="status" type="string_ci" docValues="false" multiValued="true" indexed="true" stored="false"/>
   <field name="text" type="text_common" indexed="false" stored="false"/>
-  <field name="trust" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="versioning" type="string" multiValued="true" indexed="true" stored="false"/>
-  <field name="isgreen" type="boolean" multiValued="false" indexed="true" stored="false"/>
-  <field name="openaccesscolor" type="string" multiValued="false" indexed="true" stored="false"/>
-  <field name="isindiamondjournal" type="boolean" multiValued="false" indexed="true" stored="false"/>
-  <field name="publiclyfunded" type="boolean" multiValued="false" indexed="true" stored="false"/>
-  <field name="peerreviewed" type="boolean" multiValued="false" indexed="true" stored="false"/>
-
-  <!-- Copy field definitions follow: -->
-
-  <!-- Data source -->
   <copyField source="datasourceenglishname" dest="__all"/>
   <copyField source="datasourceoddescription" dest="__all"/>
+  <copyField source="datasourceodsubjects" dest="__all"/>
   <copyField source="datasourceofficialname" dest="__all"/>
   <copyField source="datasourcesubject" dest="__all"/>
-
-  <!-- Organization -->
+  <copyField source="externalreflabel" dest="__all"/>
+  <copyField source="fundinglevel0_description" dest="__all"/>
+  <copyField source="fundinglevel1_description" dest="__all"/>
+  <copyField source="fundinglevel2_description" dest="__all"/>
   <copyField source="organizationalternativenames" dest="__all"/>
-  <copyField source="organizationecenterprise" dest="__all"/>
-  <copyField source="organizationecinternationalorganization" dest="__all"/>
-  <copyField source="organizationecinternationalorganizationeurinterests" dest="__all"/>
-  <copyField source="organizationeclegalbody" dest="__all"/>
-  <copyField source="organizationeclegalperson" dest="__all"/>
-  <copyField source="organizationecnonprofit" dest="__all"/>
-  <copyField source="organizationecnutscode" dest="__all"/>
-  <copyField source="organizationecresearchorganization" dest="__all"/>
-  <copyField source="organizationecsmevalidated" dest="__all"/>
   <copyField source="organizationlegalname" dest="__all"/>
   <copyField source="organizationlegalshortname" dest="__all"/>
-
-  <!-- Project -->
   <copyField source="projectacronym" dest="__all"/>
   <copyField source="projectcode" dest="__all"/>
   <copyField source="projectkeywords" dest="__all"/>
   <copyField source="projecttitle" dest="__all"/>
-
-  <!-- Result -->
-  <copyField source="resultpublisher" dest="__all"/>
-  <copyField source="resultsource" dest="__all"/>
-  <copyField source="resultidentifier" dest="__all"/>
-  <copyField source="resultauthor" dest="__all"/>
-  <copyField source="resulttitle" dest="__all"/>
-  <copyField source="resultdescription" dest="__all"/>
-  <copyField source="resultsubject" dest="__all"/>
-  <copyField source="resultacceptanceyear" dest="__all"/>
-
-  <!-- Other -->
-  <copyField source="externalreflabel" dest="__all"/>
-
-  <copyField source="fundinglevel0_description" dest="__all"/>
-  <copyField source="fundinglevel1_description" dest="__all"/>
-  <copyField source="fundinglevel2_description" dest="__all"/>
-
+  <copyField source="projecttitle_alternative" dest="__all"/>
   <copyField source="relcontracttypename" dest="__all"/>
   <copyField source="relorganizationcountryname" dest="__all"/>
   <copyField source="relorganizationname" dest="__all"/>
   <copyField source="relorganizationshortname" dest="__all"/>
-  <copyField source="relprojecttitle" dest="__all"/>
   <copyField source="relprojectname" dest="__all"/>
-
+  <copyField source="relprojecttitle" dest="__all"/>
+  <copyField source="resultacceptanceyear" dest="__all"/>
+  <copyField source="resultauthor" dest="__all"/>
+  <copyField source="resultdescription" dest="__all"/>
+  <copyField source="resultidentifier" dest="__all"/>
+  <copyField source="resultpublisher" dest="__all"/>
+  <copyField source="resultsource" dest="__all"/>
+  <copyField source="resulttitle" dest="__all"/>
 </schema>

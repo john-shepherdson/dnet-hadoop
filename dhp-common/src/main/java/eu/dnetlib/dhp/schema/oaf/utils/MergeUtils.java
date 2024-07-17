@@ -328,7 +328,7 @@ public class MergeUtils {
 		final T merged = mergeOafFields(original, enrich, trust);
 
 		merged.setOriginalId(unionDistinctListOfString(merged.getOriginalId(), enrich.getOriginalId()));
-		merged.setPid(unionDistinctLists(merged.getPid(), enrich.getPid(), trust));
+		merged.setPid(mergeLists(merged.getPid(), enrich.getPid(), trust, MergeUtils::spKeyExtractor, (p1, p2) -> p1));
 		merged.setDateofcollection(LocalDateTime.now().toString());
 		merged
 			.setDateoftransformation(
@@ -463,6 +463,10 @@ public class MergeUtils {
 		merge.setOpenAccessColor(coalesce(merge.getOpenAccessColor(), enrich.getOpenAccessColor()));
 		merge.setIsInDiamondJournal(booleanOR(merge.getIsInDiamondJournal(), enrich.getIsInDiamondJournal()));
 		merge.setPubliclyFunded(booleanOR(merge.getPubliclyFunded(), enrich.getPubliclyFunded()));
+
+		if (StringUtils.isBlank(merge.getTransformativeAgreement())) {
+			merge.setTransformativeAgreement(enrich.getTransformativeAgreement());
+		}
 
 		return merge;
 	}
@@ -652,6 +656,13 @@ public class MergeUtils {
 		if (d1 == null || StringUtils.isBlank(d1.getValue())) {
 			return d2;
 		} else if (d2 == null || StringUtils.isBlank(d2.getValue())) {
+			return d1;
+		}
+
+		if (StringUtils.contains(d1.getValue(), "null")) {
+			return d2;
+		}
+		if (StringUtils.contains(d2.getValue(), "null")) {
 			return d1;
 		}
 

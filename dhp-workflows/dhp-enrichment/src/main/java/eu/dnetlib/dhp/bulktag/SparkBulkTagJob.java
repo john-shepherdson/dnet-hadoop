@@ -33,10 +33,7 @@ import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.bulktag.community.*;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Context;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import scala.Tuple2;
 
@@ -114,27 +111,35 @@ public class SparkBulkTagJob {
 				extendCommunityConfigurationForEOSC(spark, inputPath, cc);
 				execBulkTag(
 					spark, inputPath, outputPath, protoMap, cc);
+				execEntityTag(
+					spark, inputPath + "organization", outputPath + "organization",
+					Utils.getCommunityOrganization(baseURL), Organization.class, TaggingConstants.CLASS_ID_ORGANIZATION,
+					TaggingConstants.CLASS_NAME_BULKTAG_ORGANIZATION);
+				execEntityTag(
+					spark, inputPath + "project", outputPath + "project", Utils.getCommunityProjects(baseURL),
+					Project.class, TaggingConstants.CLASS_ID_PROJECT, TaggingConstants.CLASS_NAME_BULKTAG_PROJECT);
 				execDatasourceTag(spark, inputPath, outputPath, Utils.getDatasourceCommunities(baseURL));
-				execProjectTag(spark, inputPath, outputPath, Utils.getCommunityProjects(baseURL));
+
 			});
 	}
 
-	private static void execProjectTag(SparkSession spark, String inputPath, String outputPath,
-		CommunityEntityMap communityProjects) {
-		Dataset<Project> projects = readPath(spark, inputPath + "project", Project.class);
+	private static <E extends OafEntity> void execEntityTag(SparkSession spark, String inputPath, String outputPath,
+		CommunityEntityMap communityEntity, Class<E> entityClass,
+		String classID, String calssName) {
+		Dataset<E> entity = readPath(spark, inputPath, entityClass);
 		Dataset<EntityCommunities> pc = spark
 			.createDataset(
-				communityProjects
+				communityEntity
 					.keySet()
 					.stream()
-					.map(k -> EntityCommunities.newInstance(k, communityProjects.get(k)))
+					.map(k -> EntityCommunities.newInstance(k, communityEntity.get(k)))
 					.collect(Collectors.toList()),
 				Encoders.bean(EntityCommunities.class));
 
-		projects
-			.joinWith(pc, projects.col("id").equalTo(pc.col("entityId")), "left")
-			.map((MapFunction<Tuple2<Project, EntityCommunities>, Project>) t2 -> {
-				Project ds = t2._1();
+		entity
+			.joinWith(pc, entity.col("id").equalTo(pc.col("entityId")), "left")
+			.map((MapFunction<Tuple2<E, EntityCommunities>, E>) t2 -> {
+				E ds = t2._1();
 				if (t2._2() != null) {
 					List<String> context = Optional
 						.ofNullable(ds.getContext())
@@ -156,8 +161,8 @@ public class SparkBulkTagJob {
 													false, TaggingConstants.BULKTAG_DATA_INFO_TYPE, true, false,
 													OafMapperUtils
 														.qualifier(
-															TaggingConstants.CLASS_ID_DATASOURCE,
-															TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE,
+															classID,
+															calssName,
 															ModelConstants.DNET_PROVENANCE_ACTIONS,
 															ModelConstants.DNET_PROVENANCE_ACTIONS),
 													"1")));
@@ -166,17 +171,17 @@ public class SparkBulkTagJob {
 					});
 				}
 				return ds;
-			}, Encoders.bean(Project.class))
+			}, Encoders.bean(entityClass))
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.json(outputPath + "project");
+			.json(outputPath);
 
-		readPath(spark, outputPath + "project", Project.class)
+		readPath(spark, outputPath, entityClass)
 			.write()
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
-			.json(inputPath + "project");
+			.json(inputPath);
 	}
 
 	private static void execDatasourceTag(SparkSession spark, String inputPath, String outputPath,

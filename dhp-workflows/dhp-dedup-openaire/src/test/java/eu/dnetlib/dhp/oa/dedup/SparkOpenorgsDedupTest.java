@@ -22,8 +22,11 @@ import java.util.Properties;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -143,7 +146,7 @@ public class SparkOpenorgsDedupTest implements Serializable {
 			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "organization"))
 			.count();
 
-		assertEquals(86, orgs_simrel);
+		assertEquals(92, orgs_simrel);
 	}
 
 	@Test
@@ -172,7 +175,7 @@ public class SparkOpenorgsDedupTest implements Serializable {
 			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "organization"))
 			.count();
 
-		assertEquals(122, orgs_simrel);
+		assertEquals(128, orgs_simrel);
 	}
 
 	@Test
@@ -207,7 +210,7 @@ public class SparkOpenorgsDedupTest implements Serializable {
 			.read()
 			.load(testOutputBasePath + "/" + testActionSetId + "/organization_mergerel")
 			.count();
-		assertEquals(132, orgs_mergerel);
+		assertEquals(128, orgs_mergerel);
 
 		// verify that a DiffRel is in the mergerels (to be sure that the job supposed to remove them has something to
 		// do)
