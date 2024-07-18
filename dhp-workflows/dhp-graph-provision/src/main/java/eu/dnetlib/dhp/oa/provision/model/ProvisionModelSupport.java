@@ -5,7 +5,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.solr.ExternalReference;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -31,12 +30,14 @@ import eu.dnetlib.dhp.schema.solr.Context;
 import eu.dnetlib.dhp.schema.solr.Country;
 import eu.dnetlib.dhp.schema.solr.Datasource;
 import eu.dnetlib.dhp.schema.solr.EoscIfGuidelines;
+import eu.dnetlib.dhp.schema.solr.ExternalReference;
 import eu.dnetlib.dhp.schema.solr.Instance;
 import eu.dnetlib.dhp.schema.solr.Journal;
 import eu.dnetlib.dhp.schema.solr.Measure;
 import eu.dnetlib.dhp.schema.solr.OpenAccessColor;
 import eu.dnetlib.dhp.schema.solr.OpenAccessRoute;
 import eu.dnetlib.dhp.schema.solr.Organization;
+import eu.dnetlib.dhp.schema.solr.Pid;
 import eu.dnetlib.dhp.schema.solr.Project;
 import eu.dnetlib.dhp.schema.solr.Result;
 import eu.dnetlib.dhp.schema.solr.Subject;
@@ -60,7 +61,7 @@ public class ProvisionModelSupport {
 
 	public static SolrRecord transform(JoinedEntity je, ContextMapper contextMapper, VocabularyGroup vocs) {
 		SolrRecord r = new SolrRecord();
-		final OafEntity e = je.getEntity();
+		final OafEntity e = (OafEntity) je.getEntity();
 		final RecordType type = RecordType.valueOf(e.getClass().getSimpleName().toLowerCase());
 		final Boolean deletedbyinference = Optional
 			.ofNullable(e.getDataInfo())
@@ -89,16 +90,15 @@ public class ProvisionModelSupport {
 		} else if (e instanceof eu.dnetlib.dhp.schema.oaf.Project) {
 			r.setProject(mapProject((eu.dnetlib.dhp.schema.oaf.Project) e, vocs));
 		}
-		r
-			.setLinks(
-				Optional
-					.ofNullable(je.getLinks())
-					.map(
-						links -> links
-							.stream()
-							.map(rew -> mapRelatedRecord(rew, vocs))
-							.collect(Collectors.toList()))
-					.orElse(null));
+		final List<RelatedEntityWrapper> links = je.getLinks();
+		if (links != null) {
+			r
+				.setLinks(
+					links
+						.stream()
+						.map(rew -> mapRelatedRecord(rew, vocs))
+						.collect(Collectors.toList()));
+		}
 
 		return r;
 	}
@@ -562,10 +562,16 @@ public class ProvisionModelSupport {
 			.orElse(null);
 	}
 
-	private static List<ExternalReference> mapExternalReference(List<eu.dnetlib.dhp.schema.oaf.ExternalReference> externalReference) {
-		return Optional.ofNullable(externalReference)
-				.map(ext -> ext.stream()
-						.map(e -> ExternalReference.newInstance(
+	private static List<ExternalReference> mapExternalReference(
+		List<eu.dnetlib.dhp.schema.oaf.ExternalReference> externalReference) {
+		return Optional
+			.ofNullable(externalReference)
+			.map(
+				ext -> ext
+					.stream()
+					.map(
+						e -> ExternalReference
+							.newInstance(
 								e.getSitename(),
 								e.getLabel(),
 								e.getAlternateLabel(),
@@ -573,8 +579,8 @@ public class ProvisionModelSupport {
 								mapCodeLabel(e.getQualifier()),
 								e.getRefidentifier(),
 								e.getQuery()))
-						.collect(Collectors.toList()))
-				.orElse(Lists.newArrayList());
+					.collect(Collectors.toList()))
+			.orElse(Lists.newArrayList());
 	}
 
 	private static List<Context> asContext(List<eu.dnetlib.dhp.schema.oaf.Context> ctxList,

@@ -26,7 +26,4 @@ public class GraphMappingUtils {
 		return s;
 	}
 
-	public static String getRelDescriptor(String relType, String subRelType, String relClass) {
-		return relType + SEPARATOR + subRelType + SEPARATOR + relClass;
-	}
 }

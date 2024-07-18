@@ -92,9 +92,6 @@ class SolrRecordDumpJobTest {
 		isLookupClient.setIsLookup(isLookUpService);
 
 		Mockito
-			.when(isLookupClient.getDsId(Mockito.anyString()))
-			.thenReturn("313f0381-23b6-466f-a0b8-c72a9679ac4b_SW5kZXhEU1Jlc291cmNlcy9JbmRleERTUmVzb3VyY2VUeXBl");
-		Mockito
 			.when(isLookupClient.getLayoutSource(Mockito.anyString()))
 			.thenReturn(IOUtils.toString(getClass().getResourceAsStream("fields.xml")));
 		Mockito

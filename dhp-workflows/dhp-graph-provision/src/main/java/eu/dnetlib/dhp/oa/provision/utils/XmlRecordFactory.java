@@ -2,7 +2,6 @@
 package eu.dnetlib.dhp.oa.provision.utils;
 
 import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.authorPidTypes;
-import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.getRelDescriptor;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.substringBefore;
 
@@ -61,8 +60,6 @@ public class XmlRecordFactory implements Serializable {
 	public static final String DOI_ORG_AUTHORITY = "doi.org";
 	public static final String HTTPS = "https";
 
-	private final Map<String, LongAccumulator> accumulators;
-
 	private final ContextMapper contextMapper;
 
 	private final String schemaLocation;
@@ -85,7 +82,6 @@ public class XmlRecordFactory implements Serializable {
 		final boolean indent,
 		final String schemaLocation) {
 
-		this.accumulators = accumulators;
 		this.contextMapper = contextMapper;
 		this.schemaLocation = schemaLocation;
 
@@ -100,7 +96,7 @@ public class XmlRecordFactory implements Serializable {
 
 		final Set<String> contexts = Sets.newHashSet();
 
-		final OafEntity entity = je.getEntity();
+		final OafEntity entity = (OafEntity) je.getEntity();
 		final TemplateFactory templateFactory = new TemplateFactory();
 		try {
 
@@ -1245,11 +1241,6 @@ public class XmlRecordFactory implements Serializable {
 				break;
 			default:
 				throw new IllegalArgumentException("invalid target type: " + targetType);
-		}
-
-		final String accumulatorName = getRelDescriptor(rel.getRelType(), rel.getSubRelType(), rel.getRelClass());
-		if (accumulators.containsKey(accumulatorName)) {
-			accumulators.get(accumulatorName).add(1);
 		}
 
 		return metadata;

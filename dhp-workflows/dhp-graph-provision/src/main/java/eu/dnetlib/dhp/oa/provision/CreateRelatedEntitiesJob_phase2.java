@@ -111,7 +111,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 		entities
 			.joinWith(relatedEntities, entities.col("_1").equalTo(relatedEntities.col("_1")), "left")
 			.map((MapFunction<Tuple2<Tuple2<String, E>, Tuple2<String, RelatedEntityWrapper>>, JoinedEntity>) value -> {
-				JoinedEntity je = new JoinedEntity(value._1()._2());
+				JoinedEntity<E> je = new JoinedEntity(value._1()._2());
 				Optional
 					.ofNullable(value._2())
 					.map(Tuple2::_2)
@@ -119,15 +119,16 @@ public class CreateRelatedEntitiesJob_phase2 {
 				return je;
 			}, Encoders.kryo(JoinedEntity.class))
 			.groupByKey(
-				(MapFunction<JoinedEntity, String>) value -> value.getEntity().getId(),
+				(MapFunction<JoinedEntity, String>) value -> ((OafEntity) value.getEntity()).getId(),
 				Encoders.STRING())
 			.agg(aggregator)
 			.map(
-				(MapFunction<Tuple2<String, JoinedEntity>, JoinedEntity>) value -> value._2(),
-				Encoders.kryo(JoinedEntity.class))
+				(MapFunction<Tuple2<String, JoinedEntity>, JoinedEntity>) Tuple2::_2,
+				Encoders.bean(JoinedEntity.class))
 			.write()
 			.mode(SaveMode.Overwrite)
-			.parquet(outputPath);
+			.option("compression", "gzip")
+			.json(outputPath);
 	}
 
 	public static class AdjacencyListAggregator extends Aggregator<JoinedEntity, JoinedEntity, JoinedEntity> {

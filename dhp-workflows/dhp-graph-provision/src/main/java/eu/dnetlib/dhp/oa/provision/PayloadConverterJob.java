@@ -25,13 +25,14 @@ import com.google.common.collect.Maps;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
-import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
-import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
-import eu.dnetlib.dhp.oa.provision.model.TupleWrapper;
+import eu.dnetlib.dhp.oa.provision.model.*;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.Publication;
+import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.solr.SolrRecord;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -82,8 +83,6 @@ public class PayloadConverterJob {
 		ISLookUpService isLookup = ISLookupClientFactory.getLookUpService(isLookupUrl);
 
 		final SparkConf conf = new SparkConf();
-		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-		conf.registerKryoClasses(ProvisionModelSupport.getModelClasses());
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 			removeOutputDir(spark, outputPath);
@@ -102,7 +101,6 @@ public class PayloadConverterJob {
 		final Boolean validateXML) {
 
 		final XmlRecordFactory recordFactory = new XmlRecordFactory(
-			prepareAccumulators(spark.sparkContext()),
 			contextMapper,
 			false,
 			schemaLocation);
@@ -114,98 +112,63 @@ public class PayloadConverterJob {
 
 		final ObjectMapper mapper = new ObjectMapper();
 		mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
-		spark
+
+		createPayloads(
+			spark, inputPath + "/publication", JoinedPublication.class, recordFactory, validateXML, contextMapper,
+			vocabularies)
+				.union(
+					createPayloads(
+						spark, inputPath + "/dataset", JoinedDataset.class, recordFactory, validateXML, contextMapper,
+						vocabularies))
+				.union(
+					createPayloads(
+						spark, inputPath + "/otherresearchproduct", JoinedOrp.class, recordFactory, validateXML,
+						contextMapper, vocabularies))
+				.union(
+					createPayloads(
+						spark, inputPath + "/Software", JoinedSoftware.class, recordFactory, validateXML, contextMapper,
+						vocabularies))
+				.union(
+					createPayloads(
+						spark, inputPath + "/datasource", JoinedDatasource.class, recordFactory, validateXML,
+						contextMapper, vocabularies))
+				.union(
+					createPayloads(
+						spark, inputPath + "/project", JoinedProject.class, recordFactory, validateXML, contextMapper,
+						vocabularies))
+				.union(
+					createPayloads(
+						spark, inputPath + "/organization", JoinedOrganization.class, recordFactory, validateXML,
+						contextMapper, vocabularies))
+				// .union(createPayloads(spark, inputPath + "/person", JoinedPerson.class, recordFactory, validateXML,
+				// contextMapper, vocabularies))
+				.map(
+					(MapFunction<Tuple2<String, SolrRecord>, TupleWrapper>) t -> new TupleWrapper(
+						t._1(), mapper.writeValueAsString(t._2())),
+					Encoders.bean(TupleWrapper.class))
+				.write()
+				.mode(SaveMode.Overwrite)
+				.option("compression", "gzip")
+				.json(outputPath);
+	}
+
+	private static <T extends JoinedEntity> Dataset<Tuple2<String, SolrRecord>> createPayloads(SparkSession spark,
+		String path, Class<T> clazz, XmlRecordFactory recordFactory, boolean validateXML, ContextMapper contextMapper,
+		VocabularyGroup vocabularies) {
+		return spark
 			.read()
-			.load(toSeq(paths))
-			.as(Encoders.kryo(JoinedEntity.class))
-			.filter(
-				(FilterFunction<JoinedEntity>) je -> !Optional
-					.ofNullable(je.getEntity())
-					.map(OafEntity::getDataInfo)
-					.map(DataInfo::getDeletedbyinference)
-					.orElse(true))
+			.json(path)
+			.as(Encoders.bean(clazz))
+			.where("entity.dataInfo.deletedbyinference == false")
 			.map(
-				(MapFunction<JoinedEntity, Tuple2<String, SolrRecord>>) je -> new Tuple2<>(
+				(MapFunction<T, Tuple2<String, SolrRecord>>) je -> new Tuple2<>(
 					recordFactory.build(je, validateXML),
 					ProvisionModelSupport.transform(je, contextMapper, vocabularies)),
-				Encoders.tuple(Encoders.STRING(), Encoders.bean(SolrRecord.class)))
-			.map(
-				(MapFunction<Tuple2<String, SolrRecord>, TupleWrapper>) t -> new TupleWrapper(
-					t._1(), mapper.writeValueAsString(t._2())),
-				Encoders.bean(TupleWrapper.class))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(outputPath);
+				Encoders.tuple(Encoders.STRING(), Encoders.bean(SolrRecord.class)));
 	}
 
 	private static void removeOutputDir(final SparkSession spark, final String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}
 
-	private static Map<String, LongAccumulator> prepareAccumulators(final SparkContext sc) {
-		final Map<String, LongAccumulator> accumulators = Maps.newHashMap();
-		accumulators
-			.put(
-				"resultResult_similarity_isAmongTopNSimilarDocuments",
-				sc.longAccumulator("resultResult_similarity_isAmongTopNSimilarDocuments"));
-		accumulators
-			.put(
-				"resultResult_similarity_hasAmongTopNSimilarDocuments",
-				sc.longAccumulator("resultResult_similarity_hasAmongTopNSimilarDocuments"));
-		accumulators
-			.put(
-				"resultResult_supplement_isSupplementTo", sc.longAccumulator("resultResult_supplement_isSupplementTo"));
-		accumulators
-			.put(
-				"resultResult_supplement_isSupplementedBy",
-				sc.longAccumulator("resultResult_supplement_isSupplementedBy"));
-		accumulators
-			.put("resultResult_dedup_isMergedIn", sc.longAccumulator("resultResult_dedup_isMergedIn"));
-		accumulators.put("resultResult_dedup_merges", sc.longAccumulator("resultResult_dedup_merges"));
-
-		accumulators
-			.put(
-				"resultResult_publicationDataset_isRelatedTo",
-				sc.longAccumulator("resultResult_publicationDataset_isRelatedTo"));
-		accumulators
-			.put("resultResult_relationship_isRelatedTo", sc.longAccumulator("resultResult_relationship_isRelatedTo"));
-		accumulators
-			.put("resultProject_outcome_isProducedBy", sc.longAccumulator("resultProject_outcome_isProducedBy"));
-		accumulators
-			.put("resultProject_outcome_produces", sc.longAccumulator("resultProject_outcome_produces"));
-		accumulators
-			.put(
-				"resultOrganization_affiliation_isAuthorInstitutionOf",
-				sc.longAccumulator("resultOrganization_affiliation_isAuthorInstitutionOf"));
-
-		accumulators
-			.put(
-				"resultOrganization_affiliation_hasAuthorInstitution",
-				sc.longAccumulator("resultOrganization_affiliation_hasAuthorInstitution"));
-		accumulators
-			.put(
-				"projectOrganization_participation_hasParticipant",
-				sc.longAccumulator("projectOrganization_participation_hasParticipant"));
-		accumulators
-			.put(
-				"projectOrganization_participation_isParticipant",
-				sc.longAccumulator("projectOrganization_participation_isParticipant"));
-		accumulators
-			.put(
-				"organizationOrganization_dedup_isMergedIn",
-				sc.longAccumulator("organizationOrganization_dedup_isMergedIn"));
-		accumulators
-			.put("organizationOrganization_dedup_merges", sc.longAccumulator("resultProject_outcome_produces"));
-		accumulators
-			.put(
-				"datasourceOrganization_provision_isProvidedBy",
-				sc.longAccumulator("datasourceOrganization_provision_isProvidedBy"));
-		accumulators
-			.put(
-				"datasourceOrganization_provision_provides",
-				sc.longAccumulator("datasourceOrganization_provision_provides"));
-
-		return accumulators;
-	}
 }
