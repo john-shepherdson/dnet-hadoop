@@ -1106,10 +1106,6 @@ public class XmlRecordFactory implements Serializable {
 				if (isNotBlank(re.getPublisher())) {
 					metadata.add(XmlSerializationUtils.asXmlElement("publisher", re.getPublisher()));
 				}
-				if (isNotBlank(re.getCodeRepositoryUrl())) {
-					metadata
-						.add(XmlSerializationUtils.asXmlElement("coderepositoryurl", re.getCodeRepositoryUrl()));
-				}
 				if (re.getResulttype() != null && StringUtils.isNotBlank(re.getResulttype().getClassid())) {
 					metadata.add(XmlSerializationUtils.mapQualifier("resulttype", re.getResulttype()));
 				}

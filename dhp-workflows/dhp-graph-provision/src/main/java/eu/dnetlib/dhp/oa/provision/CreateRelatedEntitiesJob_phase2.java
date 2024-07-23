@@ -81,8 +81,6 @@ public class CreateRelatedEntitiesJob_phase2 {
 		Class<? extends OafEntity> entityClazz = (Class<? extends OafEntity>) Class.forName(graphTableClassName);
 
 		SparkConf conf = new SparkConf();
-		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-		conf.registerKryoClasses(ProvisionModelSupport.getModelClasses());
 
 		runWithSparkSession(
 			conf,
@@ -117,7 +115,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 					.map(Tuple2::_2)
 					.ifPresent(r -> je.getLinks().add(r));
 				return je;
-			}, Encoders.kryo(JoinedEntity.class))
+			}, Encoders.bean(JoinedEntity.class))
 			.groupByKey(
 				(MapFunction<JoinedEntity, String>) value -> ((OafEntity) value.getEntity()).getId(),
 				Encoders.STRING())
@@ -168,12 +166,12 @@ public class CreateRelatedEntitiesJob_phase2 {
 
 		@Override
 		public Encoder<JoinedEntity> bufferEncoder() {
-			return Encoders.kryo(JoinedEntity.class);
+			return Encoders.bean(JoinedEntity.class);
 		}
 
 		@Override
 		public Encoder<JoinedEntity> outputEncoder() {
-			return Encoders.kryo(JoinedEntity.class);
+			return Encoders.bean(JoinedEntity.class);
 		}
 
 	}
@@ -190,15 +188,19 @@ public class CreateRelatedEntitiesJob_phase2 {
 
 		final String idPrefix = ModelSupport.getIdPrefix(entityClazz);
 
+		final Encoder<RelatedEntityWrapper> relatedEntityWrapperEncoder = Encoders.bean(RelatedEntityWrapper.class);
 		return spark
 			.read()
-			.load(toSeq(paths))
-			.as(Encoders.kryo(RelatedEntityWrapper.class))
-			.filter((FilterFunction<RelatedEntityWrapper>) e -> e.getRelation().getSource().startsWith(idPrefix))
+			.schema(relatedEntityWrapperEncoder.schema())
+			.json(toSeq(paths))
+			.as(relatedEntityWrapperEncoder)
+			.filter(
+				(FilterFunction<RelatedEntityWrapper>) r -> StringUtils
+					.startsWith(r.getRelation().getSource(), idPrefix))
 			.map(
 				(MapFunction<RelatedEntityWrapper, Tuple2<String, RelatedEntityWrapper>>) value -> new Tuple2<>(
 					value.getRelation().getSource(), value),
-				Encoders.tuple(Encoders.STRING(), Encoders.kryo(RelatedEntityWrapper.class)));
+				Encoders.tuple(Encoders.STRING(), relatedEntityWrapperEncoder));
 	}
 
 	private static <E extends OafEntity> Dataset<Tuple2<String, E>> readPathEntity(
@@ -215,7 +217,7 @@ public class CreateRelatedEntitiesJob_phase2 {
 			.map((MapFunction<E, E>) e -> pruneOutliers(entityClazz, e), Encoders.bean(entityClazz))
 			.map(
 				(MapFunction<E, Tuple2<String, E>>) e -> new Tuple2<>(e.getId(), e),
-				Encoders.tuple(Encoders.STRING(), Encoders.kryo(entityClazz)));
+				Encoders.tuple(Encoders.STRING(), Encoders.bean(entityClazz)));
 	}
 
 	private static <E extends OafEntity> E pruneOutliers(Class<E> entityClazz, E e) {

@@ -132,7 +132,6 @@ public class ProvisionModelSupport {
 		rr.setCode(re.getCode());
 		rr.setContracttype(mapCodeLabel(re.getContracttype()));
 		rr.setCollectedfrom(asProvenance(re.getCollectedfrom()));
-		rr.setCodeRepositoryUrl(re.getCodeRepositoryUrl());
 		rr.setCountry(asCountry(re.getCountry()));
 		rr.setDatasourcetype(mapCodeLabel(re.getDatasourcetype()));
 		rr.setDatasourcetypeui(mapCodeLabel(re.getDatasourcetypeui()));

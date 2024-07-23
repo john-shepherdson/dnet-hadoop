@@ -28,7 +28,6 @@ public class RelatedEntity implements Serializable {
 	private String dateofacceptance;
 	private String publisher;
 	private List<StructuredProperty> pid;
-	private String codeRepositoryUrl;
 	private Qualifier resulttype;
 	private List<KeyValue> collectedfrom;
 	private List<Instance> instances;
@@ -121,14 +120,6 @@ public class RelatedEntity implements Serializable {
 
 	public void setPid(List<StructuredProperty> pid) {
 		this.pid = pid;
-	}
-
-	public String getCodeRepositoryUrl() {
-		return codeRepositoryUrl;
-	}
-
-	public void setCodeRepositoryUrl(String codeRepositoryUrl) {
-		this.codeRepositoryUrl = codeRepositoryUrl;
 	}
 
 	public Qualifier getResulttype() {
@@ -265,7 +256,6 @@ public class RelatedEntity implements Serializable {
 			&& Objects.equal(dateofacceptance, that.dateofacceptance)
 			&& Objects.equal(publisher, that.publisher)
 			&& Objects.equal(pid, that.pid)
-			&& Objects.equal(codeRepositoryUrl, that.codeRepositoryUrl)
 			&& Objects.equal(resulttype, that.resulttype)
 			&& Objects.equal(collectedfrom, that.collectedfrom)
 			&& Objects.equal(instances, that.instances)
@@ -294,7 +284,6 @@ public class RelatedEntity implements Serializable {
 				dateofacceptance,
 				publisher,
 				pid,
-				codeRepositoryUrl,
 				resulttype,
 				collectedfrom,
 				instances,

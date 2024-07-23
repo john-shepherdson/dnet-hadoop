@@ -75,8 +75,6 @@ public class CreateRelatedEntitiesJob_phase1 {
 		final Class<? extends OafEntity> entityClazz = (Class<? extends OafEntity>) Class.forName(graphTableClassName);
 
 		final SparkConf conf = new SparkConf();
-		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-		conf.registerKryoClasses(ProvisionModelSupport.getModelClasses());
 
 		runWithSparkSession(conf, isSparkSessionManaged, spark -> {
 			removeOutputDir(spark, outputPath);
@@ -95,14 +93,14 @@ public class CreateRelatedEntitiesJob_phase1 {
 			.map(
 				(MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(r.getTarget(),
 					r),
-				Encoders.tuple(Encoders.STRING(), Encoders.kryo(Relation.class)))
+				Encoders.tuple(Encoders.STRING(), Encoders.bean(Relation.class)))
 			.cache();
 
 		final Dataset<Tuple2<String, RelatedEntity>> entities = readPathEntity(spark, inputEntityPath, clazz)
 			.filter("dataInfo.invisible == false")
 			.map(
 				(MapFunction<E, Tuple2<String, RelatedEntity>>) e -> new Tuple2<>(e.getId(), asRelatedEntity(e, clazz)),
-				Encoders.tuple(Encoders.STRING(), Encoders.kryo(RelatedEntity.class)))
+				Encoders.tuple(Encoders.STRING(), Encoders.bean(RelatedEntity.class)))
 			.cache();
 
 		relsByTarget
@@ -110,10 +108,11 @@ public class CreateRelatedEntitiesJob_phase1 {
 			.map(
 				(MapFunction<Tuple2<Tuple2<String, Relation>, Tuple2<String, RelatedEntity>>, RelatedEntityWrapper>) t -> new RelatedEntityWrapper(
 					t._1()._2(), t._2()._2()),
-				Encoders.kryo(RelatedEntityWrapper.class))
+				Encoders.bean(RelatedEntityWrapper.class))
 			.write()
 			.mode(SaveMode.Overwrite)
-			.parquet(outputPath);
+			.option("compression", "gzip")
+			.json(outputPath);
 	}
 
 	private static <E extends OafEntity> Dataset<E> readPathEntity(
