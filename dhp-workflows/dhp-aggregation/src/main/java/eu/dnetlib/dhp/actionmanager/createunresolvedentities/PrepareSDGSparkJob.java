@@ -73,7 +73,7 @@ public class PrepareSDGSparkJob implements Serializable {
 			});
 	}
 
-	private static void doPrepareoaid(SparkSession spark, String sourcePath, String outputPath) {
+	private static void doPrepare(SparkSession spark, String sourcePath, String outputPath) {
 		Dataset<Row> sdgDataset = spark
 			.read()
 			.format("csv")
@@ -84,7 +84,7 @@ public class PrepareSDGSparkJob implements Serializable {
 			.load(sourcePath);
 
 		sdgDataset
-			.groupByKey((MapFunction<Row, String>) v -> ((String) v.getAs("oaid")).toLowerCase(), Encoders.STRING())
+			.groupByKey((MapFunction<Row, String>) v -> ((String) v.getAs("doi")).toLowerCase(), Encoders.STRING())
 			.mapGroups(
 				(MapGroupsFunction<String, Row, Result>) (k,
 					it) -> getResult(
@@ -100,11 +100,19 @@ public class PrepareSDGSparkJob implements Serializable {
 			.json(outputPath + "/sdg");
 	}
 
-	private static void doPrepare(SparkSession spark, String sourcePath, String outputPath) {
-		Dataset<Row> sdgDataset = spark.read().csv(sourcePath);
+	private static void doPrepareoaid(SparkSession spark, String sourcePath, String outputPath) {
+		Dataset<Row> sdgDataset = spark
+			.read()
+			.format("csv")
+			.option("sep", DEFAULT_DELIMITER)
+			.option("inferSchema", "true")
+			.option("header", "true")
+			.option("quotes", "\"")
+			.load(sourcePath);
+		;
 
 		sdgDataset
-			.groupByKey((MapFunction<Row, String>) r -> ((String) r.getAs("doi")).toLowerCase(), Encoders.STRING())
+			.groupByKey((MapFunction<Row, String>) r -> "50|" + ((String) r.getAs("oaid")), Encoders.STRING())
 			.mapGroups(
 				(MapGroupsFunction<String, Row, Result>) PrepareSDGSparkJob::getResult, Encoders.bean(Result.class))
 			.write()
