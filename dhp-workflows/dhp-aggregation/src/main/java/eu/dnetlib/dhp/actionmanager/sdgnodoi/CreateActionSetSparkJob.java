@@ -1,11 +1,12 @@
 
-package eu.dnetlib.dhp.actionmanager.fosnodoi;
+package eu.dnetlib.dhp.actionmanager.sdgnodoi;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
