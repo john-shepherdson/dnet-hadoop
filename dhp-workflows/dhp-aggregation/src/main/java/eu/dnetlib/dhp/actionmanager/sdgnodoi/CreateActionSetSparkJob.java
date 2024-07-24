@@ -1,14 +1,16 @@
 
-package eu.dnetlib.dhp.actionmanager.fosnodoi;
+package eu.dnetlib.dhp.actionmanager.sdgnodoi;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.*;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.fs.Hdfs;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
@@ -22,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import scala.Tuple2;
@@ -62,7 +65,10 @@ public class CreateActionSetSparkJob implements Serializable {
 		runWithSparkSession(
 			conf,
 			isSparkSessionManaged,
-			spark -> createActionSet(spark, inputPath, outputPath));
+			spark -> {
+				HdfsSupport.remove(outputPath, spark.sparkContext().hadoopConfiguration());
+				createActionSet(spark, inputPath, outputPath);
+			});
 
 	}
 
