@@ -148,8 +148,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 
 		return spark
 			.read()
-			.option("header", true)
-			.csv(inputPath)
+			.json(inputPath)
 			.select("OpenAlexId");
 	}
 
