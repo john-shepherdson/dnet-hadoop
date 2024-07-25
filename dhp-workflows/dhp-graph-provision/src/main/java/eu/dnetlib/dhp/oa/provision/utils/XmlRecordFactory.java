@@ -20,6 +20,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import eu.dnetlib.dhp.oa.provision.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -41,10 +42,6 @@ import com.google.common.collect.Sets;
 import com.mycila.xmltool.XMLDoc;
 import com.mycila.xmltool.XMLTag;
 
-import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
-import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
-import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
-import eu.dnetlib.dhp.oa.provision.model.XmlInstance;
 import eu.dnetlib.dhp.schema.common.*;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.Result;
@@ -389,6 +386,7 @@ public class XmlRecordFactory implements Serializable {
 							.getSubject()
 							.stream()
 							.filter(Objects::nonNull)
+							.filter(ProvisionModelSupport::filterFosL1L2)
 							.map(s -> XmlSerializationUtils.mapStructuredProperty("subject", s))
 							.collect(Collectors.toList()));
 			}
