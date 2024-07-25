@@ -1,244 +1,159 @@
+
 package eu.dnetlib.dhp.actionmanager.webcrawl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import eu.dnetlib.dhp.actionmanager.Constants;
-import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.schema.action.AtomicAction;
-import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
-import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
-import eu.dnetlib.dhp.schema.oaf.utils.PidType;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static org.apache.spark.sql.functions.*;
+
+import java.io.File;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Optional;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
+import org.apache.commons.io.filefilter.FileFileFilter;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.BZip2Codec;
 import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaPairRDD;
+import org.apache.spark.api.java.JavaRDD;
+import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FilterFunction;
-import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
-import org.apache.spark.sql.types.StructType;
+import org.apache.spark.sql.types.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import eu.dnetlib.dhp.application.ArgumentApplicationParser;
+import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.schema.action.AtomicAction;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import scala.Tuple2;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-
 public class RemoveRelationFromActionSet
-        implements Serializable {
-    private static final Logger log = LoggerFactory.getLogger(CreateActionSetFromWebEntries.class);
-    private static final String DOI_PREFIX = "50|doi_________::";
+	implements Serializable {
+	private static final Logger log = LoggerFactory.getLogger(CreateActionSetFromWebEntries.class);
 
+	private static final ObjectMapper MAPPER = new ObjectMapper();
+	private static final StructType KV_SCHEMA = StructType$.MODULE$
+		.apply(
+			Arrays
+				.asList(
+					StructField$.MODULE$.apply("key", DataTypes.StringType, false, Metadata.empty()),
+					StructField$.MODULE$.apply("value", DataTypes.StringType, false, Metadata.empty())));
 
-    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final StructType ATOMIC_ACTION_SCHEMA = StructType$.MODULE$
+		.apply(
+			Arrays
+				.asList(
+					StructField$.MODULE$.apply("clazz", DataTypes.StringType, false, Metadata.empty()),
+					StructField$.MODULE$
+						.apply(
+							"payload", DataTypes.StringType, false, Metadata.empty())));
 
-    public static void main(String[] args) throws Exception {
-        String jsonConfiguration = IOUtils
-                .toString(
-                        CreateActionSetFromWebEntries.class
-                                .getResourceAsStream(
-                                        "/eu/dnetlib/dhp/actionmanager/webcrawl/as_parameters.json"));
+	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-        final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
-        parser.parseArgument(args);
+	public static void main(String[] args) throws Exception {
+		String jsonConfiguration = IOUtils
+			.toString(
+				CreateActionSetFromWebEntries.class
+					.getResourceAsStream(
+						"/eu/dnetlib/dhp/actionmanager/webcrawl/as_parameters.json"));
 
-        Boolean isSparkSessionManaged = Optional
-                .ofNullable(parser.get("isSparkSessionManaged"))
-                .map(Boolean::valueOf)
-                .orElse(Boolean.TRUE);
+		final ArgumentApplicationParser parser = new ArgumentApplicationParser(jsonConfiguration);
+		parser.parseArgument(args);
 
-        log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
+		Boolean isSparkSessionManaged = Optional
+			.ofNullable(parser.get("isSparkSessionManaged"))
+			.map(Boolean::valueOf)
+			.orElse(Boolean.TRUE);
 
-        final String inputPath = parser.get("actionSetPath");
-        log.info("inputPath: {}", inputPath);
+		log.info("isSparkSessionManaged: {}", isSparkSessionManaged);
 
-        final String outputPath = parser.get("outputPath");
-        log.info("outputPath: {}", outputPath);
+		// the actionSet path
+		final String inputPath = parser.get("sourcePath");
+		log.info("inputPath: {}", inputPath);
 
-        final String blackListInputPath = parser.get("blackListPath");
-        log.info("blackListInputPath: {}", blackListInputPath);
+		final String outputPath = parser.get("outputPath");
+		log.info("outputPath: {}", outputPath);
 
-        SparkConf conf = new SparkConf();
+		final String blackListInputPath = parser.get("blackListPath");
+		log.info("blackListInputPath: {}", blackListInputPath);
 
-        runWithSparkSession(
-                conf,
-                isSparkSessionManaged,
-                spark -> {
+		SparkConf conf = new SparkConf();
 
-                    removeFromActionSet(spark, inputPath, outputPath, blackListInputPath);
+		runWithSparkSession(
+			conf,
+			isSparkSessionManaged,
+			spark -> {
 
-                });
-    }
+				removeFromActionSet(spark, inputPath, outputPath, blackListInputPath);
 
-    private static void removeFromActionSet(SparkSession spark, String inputPath, String outputPath, String blackListInputPath) {
+			});
+	}
 
-    }
+	private static void removeFromActionSet(SparkSession spark, String inputPath, String outputPath,
+		String blackListInputPath) {
+		// read the blacklist
+		Dataset<String> blackList = readBlackList(spark, blackListInputPath)
+			.map(
+				(MapFunction<Row, String>) r -> IdentifierFactory
+					.idFromPid("50", "doi", ((String) r.getAs("DOI / PMID")).substring(16), true),
+				Encoders.STRING());
 
-    public static void createActionSet(SparkSession spark, String inputPath,
-                                       String outputPath, String blackListInputPath) {
+		// read the old actionset and get the relations in the payload
+		JavaPairRDD<Text, Text> seq = JavaSparkContext
+			.fromSparkContext(spark.sparkContext())
+			.sequenceFile(inputPath, Text.class, Text.class);
 
-        final Dataset<Row> dataset = readWebCrawl(spark, inputPath)
-                .filter("country_code=='IE'")
-                .drop("publication_year");
+		JavaRDD<Row> rdd = seq
+			.map(x -> RowFactory.create(x._1().toString(), x._2().toString()));
 
-        final Dataset<Row> blackList = readBlackList(spark, blackListInputPath);
+		Dataset<Row> actionSet = spark
+			.createDataFrame(rdd, KV_SCHEMA)
+			.withColumn("atomic_action", from_json(col("value"), ATOMIC_ACTION_SCHEMA))
+			.select(expr("atomic_action.*"));
 
-        dataset
-                .join(blackList, dataset.col("id").equalTo(blackList.col("OpenAlexId")), "left")
-                .filter((FilterFunction<Row>) r -> r.getAs("OpenAlexId") == null)
-                .drop("OpenAlexId")
-                .flatMap((FlatMapFunction<Row, Relation>) row -> {
-                    List<Relation> ret = new ArrayList<>();
-                    final String ror = ROR_PREFIX
-                            + IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", row.getAs("ror")));
-                    ret.addAll(createAffiliationRelationPairDOI(row.getAs("doi"), ror));
+		Dataset<Relation> relation = actionSet
+			.map(
+				(MapFunction<Row, Relation>) r -> MAPPER.readValue((String) r.getAs("payload"), Relation.class),
+				Encoders.bean(Relation.class));
 
-                    return ret
-                            .iterator();
-                }, Encoders.bean(Relation.class))
-                .toJavaRDD()
-                .map(p -> new AtomicAction(p.getClass(), p))
-                .mapToPair(
-                        aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
-                                new Text(OBJECT_MAPPER.writeValueAsString(aa))))
-                .saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
+		// select only the relation not matching any pid in the blacklist as source for the relation
+		Dataset<Relation> relNoSource = relation
+			.joinWith(blackList, relation.col("source").equalTo(blackList.col("value")), "left")
+			.filter((FilterFunction<Tuple2<Relation, String>>) t2 -> t2._2() == null)
+			.map((MapFunction<Tuple2<Relation, String>, Relation>) t2 -> t2._1(), Encoders.bean(Relation.class));
 
-    }
+		// select only the relation not matching any pid in the blacklist as target of the relation
+		relNoSource
+			.joinWith(blackList, relNoSource.col("target").equalTo(blackList.col("value")), "left")
+			.filter((FilterFunction<Tuple2<Relation, String>>) t2 -> t2._2() == null)
+			.map((MapFunction<Tuple2<Relation, String>, Relation>) t2 -> t2._1(), Encoders.bean(Relation.class))
+			.toJavaRDD()
+			.map(p -> new AtomicAction(p.getClass(), p))
+			.mapToPair(
+				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
+					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
+			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, BZip2Codec.class);
+		;
 
-    private static Dataset<Row> readWebCrawl(SparkSession spark, String inputPath) {
-        StructType webInfo = StructType
-                .fromDDL(
-                        "`id` STRING , `doi` STRING, `ids` STRUCT<`pmid` :STRING, `pmcid`: STRING >, `publication_year` STRING, "
-                                +
-                                "`authorships` ARRAY<STRUCT <`institutions`: ARRAY <STRUCT <`ror`: STRING, `country_code` :STRING>>>>");
+	}
 
-        return spark
-                .read()
-                .schema(webInfo)
-                .json(inputPath)
-                .withColumn(
-                        "authors", functions
-                                .explode(
-                                        functions.col("authorships")))
-                .selectExpr("id", "doi", "ids", "publication_year", "authors.institutions as institutions")
-                .withColumn(
-                        "institution", functions
-                                .explode(
-                                        functions.col("institutions")))
+	private static Dataset<Row> readBlackList(SparkSession spark, String inputPath) {
 
-                .selectExpr(
-                        "id", "doi", "institution.ror as ror",
-                        "institution.country_code as country_code", "publication_year")
-                .distinct();
+		return spark
+			.read()
+			.option("header", true)
+			.csv(inputPath)
+			.select("DOI / PMID");
+	}
 
-    }
-
-    private static Dataset<Row> readBlackList(SparkSession spark, String inputPath) {
-
-        return spark
-                .read()
-                .option("header", true)
-                .csv(inputPath)
-                .select("OpenAlexId");
-    }
-
-    private static List<Relation> createAffiliationRelationPairPMCID(String pmcid, String ror) {
-        if (pmcid == null)
-            return new ArrayList<>();
-
-        return createAffiliatioRelationPair(
-                PMCID_PREFIX
-                        + IdentifierFactory
-                        .md5(PidCleaner.normalizePidValue(PidType.pmc.toString(), removeResolver("PMC", pmcid))),
-                ror);
-    }
-
-    private static List<Relation> createAffiliationRelationPairPMID(String pmid, String ror) {
-        if (pmid == null)
-            return new ArrayList<>();
-
-        return createAffiliatioRelationPair(
-                PMID_PREFIX
-                        + IdentifierFactory
-                        .md5(PidCleaner.normalizePidValue(PidType.pmid.toString(), removeResolver("PMID", pmid))),
-                ror);
-    }
-
-    private static String removeResolver(String pidType, String pid) {
-        switch (pidType) {
-            case "PMID":
-                return pid.substring(33);
-            case "PMC":
-                return "PMC" + pid.substring(43);
-            case "DOI":
-                return pid.substring(16);
-        }
-
-        throw new RuntimeException();
-
-    }
-
-    private static List<Relation> createAffiliationRelationPairDOI(String doi, String ror) {
-        if (doi == null)
-            return new ArrayList<>();
-
-        return createAffiliatioRelationPair(
-                DOI_PREFIX
-                        + IdentifierFactory
-                        .md5(PidCleaner.normalizePidValue(PidType.doi.toString(), removeResolver("DOI", doi))),
-                ror);
-
-    }
-
-    private static List<Relation> createAffiliatioRelationPair(String resultId, String orgId) {
-        ArrayList<Relation> newRelations = new ArrayList();
-
-        newRelations
-                .add(
-                        OafMapperUtils
-                                .getRelation(
-                                        orgId, resultId, ModelConstants.RESULT_ORGANIZATION, ModelConstants.AFFILIATION,
-                                        ModelConstants.IS_AUTHOR_INSTITUTION_OF,
-                                        Arrays
-                                                .asList(
-                                                        OafMapperUtils.keyValue(Constants.WEB_CRAWL_ID, Constants.WEB_CRAWL_NAME)),
-                                        OafMapperUtils
-                                                .dataInfo(
-                                                        false, null, false, false,
-                                                        OafMapperUtils
-                                                                .qualifier(
-                                                                        "sysimport:crasswalk:webcrawl", "Imported from Webcrawl",
-                                                                        ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS),
-                                                        "0.9"),
-                                        null));
-
-        newRelations
-                .add(
-                        OafMapperUtils
-                                .getRelation(
-                                        resultId, orgId, ModelConstants.RESULT_ORGANIZATION, ModelConstants.AFFILIATION,
-                                        ModelConstants.HAS_AUTHOR_INSTITUTION,
-                                        Arrays
-                                                .asList(
-                                                        OafMapperUtils.keyValue(Constants.WEB_CRAWL_ID, Constants.WEB_CRAWL_NAME)),
-                                        OafMapperUtils
-                                                .dataInfo(
-                                                        false, null, false, false,
-                                                        OafMapperUtils
-                                                                .qualifier(
-                                                                        "sysimport:crasswalk:webcrawl", "Imported from Webcrawl",
-                                                                        ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS),
-                                                        "0.9"),
-                                        null));
-
-        return newRelations;
-
-    }
 }
