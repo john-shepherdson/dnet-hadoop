@@ -105,7 +105,7 @@ public class RemoveRelationFromActionSet
 		Dataset<String> blackList = readBlackList(spark, blackListInputPath)
 			.map(
 				(MapFunction<Row, String>) r -> IdentifierFactory
-					.idFromPid("50", "doi", ((String) r.getAs("DOI / PMID")).substring(16), true),
+					.idFromPid("50", "doi", ((String) r.getAs("doi")).substring(16), true),
 				Encoders.STRING());
 
 		// read the old actionset and get the relations in the payload
@@ -151,9 +151,8 @@ public class RemoveRelationFromActionSet
 
 		return spark
 			.read()
-			.option("header", true)
-			.csv(inputPath)
-			.select("DOI / PMID");
+			.json(inputPath)
+			.select("doi");
 	}
 
 }
