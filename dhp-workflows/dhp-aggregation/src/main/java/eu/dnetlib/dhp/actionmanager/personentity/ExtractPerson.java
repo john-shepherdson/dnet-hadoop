@@ -13,7 +13,6 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.BZip2Codec;
-import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.*;
@@ -25,8 +24,6 @@ import org.spark_project.jetty.util.StringUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.Constants;
-import eu.dnetlib.dhp.actionmanager.transformativeagreement.model.TransformativeAgreementModel;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.collection.orcid.model.Author;
 import eu.dnetlib.dhp.collection.orcid.model.Employment;
@@ -37,7 +34,6 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Person;
-import eu.dnetlib.dhp.schema.oaf.Pid;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
@@ -181,10 +177,20 @@ public class ExtractPerson implements Serializable {
 						.map(
 							v -> v
 								.stream()
-								.map(p -> Pid.newInstance(p.getSchema(), p.getValue()))
+								.map(
+									p -> OafMapperUtils
+										.structuredProperty(
+											p.getValue(), p.getSchema(), p.getSchema(), ModelConstants.DNET_PID_TYPES,
+											ModelConstants.DNET_PID_TYPES, null))
 								.collect(Collectors.toList()))
 						.orElse(new ArrayList<>()));
-			person.getPid().add(Pid.newInstance(ModelConstants.ORCID, op.getOrcid()));
+			person
+				.getPid()
+				.add(
+					OafMapperUtils
+						.structuredProperty(
+							op.getOrcid(), ModelConstants.ORCID, ModelConstants.ORCID_CLASSNAME,
+							ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES, null));
 			person.setDateofcollection(op.getLastModifiedDate());
 			person.setOriginalId(Arrays.asList(op.getOrcid()));
 			return person;

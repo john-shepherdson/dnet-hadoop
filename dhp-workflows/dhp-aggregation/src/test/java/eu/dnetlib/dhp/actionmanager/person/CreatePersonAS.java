@@ -1,22 +1,15 @@
 
 package eu.dnetlib.dhp.actionmanager.person;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.io.Text;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.FilterFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -27,15 +20,11 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.actionmanager.opencitations.CreateActionSetSparkJob;
 import eu.dnetlib.dhp.actionmanager.personentity.ExtractPerson;
-import eu.dnetlib.dhp.collection.orcid.model.Author;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Person;
 import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.utils.DHPUtils;
 
 public class CreatePersonAS {
@@ -167,7 +156,7 @@ public class CreatePersonAS {
 					.getPid()
 					.stream()
 					.anyMatch(
-						p -> p.getSchema().equalsIgnoreCase("Scopus Author ID")
+						p -> p.getQualifier().getSchemename().equalsIgnoreCase("Scopus Author ID")
 							&& p.getValue().equalsIgnoreCase("15119405200")));
 
 		Assertions
