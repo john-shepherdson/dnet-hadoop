@@ -1,0 +1,130 @@
+<workflow-app name="promote_action_payload_for_person_table" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>activePromotePersonActionPayload</name>
+            <description>when true will promote actions with eu.dnetlib.dhp.schema.oaf.Person payload</description>
+        </property>
+        <property>
+            <name>inputGraphRootPath</name>
+            <description>root location of input materialized graph</description>
+        </property>
+        <property>
+            <name>inputActionPayloadRootPath</name>
+            <description>root location of action payloads to promote</description>
+        </property>
+        <property>
+            <name>outputGraphRootPath</name>
+            <description>root location for output materialized graph</description>
+        </property>
+        <property>
+            <name>mergeAndGetStrategy</name>
+            <description>strategy for merging graph table objects with action payload instances, MERGE_FROM_AND_GET or SELECT_NEWER_AND_GET</description>
+        </property>
+        <property>
+            <name>sparkDriverMemory</name>
+            <description>memory for driver process</description>
+        </property>
+        <property>
+            <name>sparkExecutorMemory</name>
+            <description>memory for individual executor</description>
+        </property>
+        <property>
+            <name>sparkExecutorCores</name>
+            <description>number of cores used by single executor</description>
+        </property>
+        <property>
+            <name>oozieActionShareLibForSpark2</name>
+            <description>oozie action sharelib for spark 2.*</description>
+        </property>
+        <property>
+            <name>spark2ExtraListeners</name>
+            <value>com.cloudera.spark.lineage.NavigatorAppListener</value>
+            <description>spark 2.* extra listeners classname</description>
+        </property>
+        <property>
+            <name>spark2SqlQueryExecutionListeners</name>
+            <value>com.cloudera.spark.lineage.NavigatorQueryListener</value>
+            <description>spark 2.* sql query execution listeners classname</description>
+        </property>
+        <property>
+            <name>spark2YarnHistoryServerAddress</name>
+            <description>spark 2.* yarn history server address</description>
+        </property>
+        <property>
+            <name>spark2EventLogDir</name>
+            <description>spark 2.* event log dir location</description>
+        </property>
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to="DecisionPromotePersonActionPayload"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <decision name="DecisionPromotePersonActionPayload">
+        <switch>
+            <case to="PromotePersonActionPayloadForPersonTable">
+                ${(activePromotePersonActionPayload eq "true") and
+                (fs:exists(concat(concat(concat(concat(wf:conf('nameNode'),'/'),wf:conf('inputGraphRootPath')),'/'),'person')) eq "true") and
+                (fs:exists(concat(concat(concat(concat(wf:conf('nameNode'),'/'),wf:conf('inputActionPayloadRootPath')),'/'),'clazz=eu.dnetlib.dhp.schema.oaf.Person')) eq "true")}
+            </case>
+            <default to="SkipPromotePersonActionPayloadForPersonTable"/>
+        </switch>
+    </decision>
+
+    <action name="PromotePersonActionPayloadForPersonTable">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn-cluster</master>
+            <mode>cluster</mode>
+            <name>PromotePersonActionPayloadForPersonTable</name>
+            <class>eu.dnetlib.dhp.actionmanager.promote.PromoteActionPayloadForGraphTableJob</class>
+            <jar>dhp-actionmanager-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--inputGraphTablePath</arg><arg>${inputGraphRootPath}/person</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Person</arg>
+            <arg>--inputActionPayloadPath</arg><arg>${inputActionPayloadRootPath}/clazz=eu.dnetlib.dhp.schema.oaf.Person</arg>
+            <arg>--actionPayloadClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Person</arg>
+            <arg>--outputGraphTablePath</arg><arg>${outputGraphRootPath}/person</arg>
+            <arg>--mergeAndGetStrategy</arg><arg>${mergeAndGetStrategy}</arg>
+            <arg>--promoteActionStrategy</arg><arg>${promoteActionStrategy}</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="SkipPromotePersonActionPayloadForPersonTable">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <prepare>
+                <delete path="${outputGraphRootPath}/person"/>
+            </prepare>
+            <arg>-pb</arg>
+            <arg>${inputGraphRootPath}/person</arg>
+            <arg>${outputGraphRootPath}/person</arg>
+        </distcp>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>

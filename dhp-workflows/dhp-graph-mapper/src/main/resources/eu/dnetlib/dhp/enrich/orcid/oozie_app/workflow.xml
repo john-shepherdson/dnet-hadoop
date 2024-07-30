@@ -89,6 +89,14 @@
             <arg>${nameNode}/${graphPath}/project</arg>
             <arg>${nameNode}/${targetPath}/project</arg>
         </distcp>
+        <ok to="copy_person"/>
+        <error to="Kill"/>
+    </action>
+    <action name="copy_person">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphPath}/person</arg>
+            <arg>${nameNode}/${targetPath}/person</arg>
+        </distcp>
         <ok to="copy_relation"/>
         <error to="Kill"/>
     </action>
