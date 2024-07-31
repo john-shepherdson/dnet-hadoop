@@ -77,7 +77,6 @@
         <switch>
             <case to="PromotePersonActionPayloadForPersonTable">
                 ${(activePromotePersonActionPayload eq "true") and
-                (fs:exists(concat(concat(concat(concat(wf:conf('nameNode'),'/'),wf:conf('inputGraphRootPath')),'/'),'person')) eq "true") and
                 (fs:exists(concat(concat(concat(concat(wf:conf('nameNode'),'/'),wf:conf('inputActionPayloadRootPath')),'/'),'clazz=eu.dnetlib.dhp.schema.oaf.Person')) eq "true")}
             </case>
             <default to="SkipPromotePersonActionPayloadForPersonTable"/>

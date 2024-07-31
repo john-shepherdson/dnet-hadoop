@@ -50,7 +50,7 @@ public class PromoteActionPayloadFunctions {
 		PromoteAction.Strategy promoteActionStrategy,
 		Class<G> rowClazz,
 		Class<A> actionPayloadClazz) {
-		if (!isSubClass(rowClazz, actionPayloadClazz)) {
+		if (Boolean.FALSE.equals(isSubClass(rowClazz, actionPayloadClazz))) {
 			throw new RuntimeException(
 				"action payload type must be the same or be a super type of table row type");
 		}
