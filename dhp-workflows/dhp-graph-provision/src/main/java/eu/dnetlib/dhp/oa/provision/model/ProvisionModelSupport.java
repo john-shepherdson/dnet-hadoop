@@ -5,6 +5,7 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.schema.solr.Person;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -89,6 +90,8 @@ public class ProvisionModelSupport {
 			r.setOrganization(mapOrganization((eu.dnetlib.dhp.schema.oaf.Organization) e));
 		} else if (e instanceof eu.dnetlib.dhp.schema.oaf.Project) {
 			r.setProject(mapProject((eu.dnetlib.dhp.schema.oaf.Project) e, vocs));
+		} else if (e instanceof eu.dnetlib.dhp.schema.oaf.Person) {
+			r.setPerson(mapPerson((eu.dnetlib.dhp.schema.oaf.Person) e));
 		}
 		r
 			.setLinks(
@@ -182,6 +185,14 @@ public class ProvisionModelSupport {
 		ps.setTotalcost(p.getTotalcost());
 		ps.setWebsiteurl(mapField(p.getWebsiteurl()));
 		ps.setFunding(mapFundingField(p.getFundingtree(), vocs));
+		return ps;
+	}
+
+	private static Person mapPerson(eu.dnetlib.dhp.schema.oaf.Person p) {
+		Person ps = new Person();
+		ps.setFamilyName(p.getFamilyName());
+		ps.setGivenName(p.getGivenName());
+		ps.setAlternativeNames(p.getAlternativeNames());
 		return ps;
 	}
 

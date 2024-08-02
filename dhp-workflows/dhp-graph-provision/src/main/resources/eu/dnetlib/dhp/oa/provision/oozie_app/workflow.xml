@@ -180,6 +180,7 @@
         <path start="join_relation_datasource"/>
         <path start="join_relation_organization"/>
         <path start="join_relation_project"/>
+        <path start="join_relation_person"/>
     </fork>
 
     <action name="join_relation_publication">
@@ -378,6 +379,34 @@
         <error to="Kill"/>
     </action>
 
+    <action name="join_relation_person">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Join[relation.target = person.id]</name>
+            <class>eu.dnetlib.dhp.oa.provision.CreateRelatedEntitiesJob_phase1</class>
+            <jar>dhp-graph-provision-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCoresForJoining}
+                --executor-memory=${sparkExecutorMemoryForJoining}
+                --driver-memory=${sparkDriverMemoryForJoining}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=5000
+                --conf spark.network.timeout=${sparkNetworkTimeout}
+            </spark-opts>
+            <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
+            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/person</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Person</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/join_partial/person</arg>
+        </spark>
+        <ok to="wait_joins"/>
+        <error to="Kill"/>
+    </action>
+
     <join name="wait_joins" to="fork_join_all_entities"/>
 
     <fork name="fork_join_all_entities">
@@ -388,6 +417,7 @@
         <path start="join_datasource_relations"/>
         <path start="join_organization_relations"/>
         <path start="join_project_relations"/>
+        <path start="join_person_relations"/>
     </fork>
 
     <action name="join_publication_relations">
@@ -587,6 +617,35 @@
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
             <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
             <arg>--outputPath</arg><arg>${workingDir}/join_entities/project</arg>
+            <arg>--numPartitions</arg><arg>10000</arg>
+        </spark>
+        <ok to="wait_join_phase2"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="join_person_relations">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Join[person.id = relatedEntity.source]</name>
+            <class>eu.dnetlib.dhp.oa.provision.CreateRelatedEntitiesJob_phase2</class>
+            <jar>dhp-graph-provision-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCoresForJoining}
+                --executor-memory=${sparkExecutorMemoryForJoining}
+                --driver-memory=${sparkDriverMemoryForJoining}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=5000
+                --conf spark.network.timeout=${sparkNetworkTimeout}
+            </spark-opts>
+            <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/person</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Person</arg>
+            <arg>--inputRelatedEntitiesPath</arg><arg>${workingDir}/join_partial</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/join_entities/person</arg>
             <arg>--numPartitions</arg><arg>10000</arg>
         </spark>
         <ok to="wait_join_phase2"/>
