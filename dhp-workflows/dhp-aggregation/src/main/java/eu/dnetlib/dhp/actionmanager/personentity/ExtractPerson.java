@@ -32,6 +32,7 @@ import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.KeyValue;
 import eu.dnetlib.dhp.schema.oaf.Person;
 import eu.dnetlib.dhp.schema.oaf.Relation;
@@ -61,6 +62,20 @@ public class ExtractPerson implements Serializable {
 	private static final String PERSON_PREFIX = ModelSupport.getIdPrefix(Person.class) + "|orcid_______";
 	public static final String ORCID_AUTHORS_CLASSID = "sysimport:crosswalk:orcid";
 	public static final String ORCID_AUTHORS_CLASSNAME = "Imported from ORCID";
+
+	public static final DataInfo DATAINFO = OafMapperUtils
+		.dataInfo(
+			false,
+			null,
+			false,
+			false,
+			OafMapperUtils
+				.qualifier(
+					ORCID_AUTHORS_CLASSID,
+					ORCID_AUTHORS_CLASSNAME,
+					ModelConstants.DNET_PROVENANCE_ACTIONS,
+					ModelConstants.DNET_PROVENANCE_ACTIONS),
+			"0.91");
 
 	public static void main(final String[] args) throws IOException, ParseException {
 
@@ -193,6 +208,7 @@ public class ExtractPerson implements Serializable {
 							ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES, null));
 			person.setDateofcollection(op.getLastModifiedDate());
 			person.setOriginalId(Arrays.asList(op.getOrcid()));
+			person.setDataInfo(DATAINFO);
 			return person;
 		}, Encoders.bean(Person.class))
 			.write()
@@ -307,14 +323,7 @@ public class ExtractPerson implements Serializable {
 				source, target, ModelConstants.ORG_PERSON_RELTYPE, ModelConstants.ORG_PERSON_SUBRELTYPE,
 				ModelConstants.ORG_PERSON_PARTICIPATES,
 				Arrays.asList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
-				OafMapperUtils
-					.dataInfo(
-						false, null, false, false,
-						OafMapperUtils
-							.qualifier(
-								ORCID_AUTHORS_CLASSID, ORCID_AUTHORS_CLASSNAME, ModelConstants.DNET_PROVENANCE_ACTIONS,
-								ModelConstants.DNET_PROVENANCE_ACTIONS),
-						"0.91"),
+				DATAINFO,
 				null);
 
 		if (Optional.ofNullable(row.getStartDate()).isPresent() && StringUtil.isNotBlank(row.getStartDate())) {
@@ -348,14 +357,7 @@ public class ExtractPerson implements Serializable {
 						ModelConstants.PERSON_PERSON_SUBRELTYPE,
 						ModelConstants.PERSON_PERSON_HASCOAUTHORED,
 						Arrays.asList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
-						OafMapperUtils
-							.dataInfo(
-								false, null, false, false,
-								OafMapperUtils
-									.qualifier(
-										ORCID_AUTHORS_CLASSID, ORCID_AUTHORS_CLASSNAME,
-										ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS),
-								"0.91"),
+						DATAINFO,
 						null),
 				OafMapperUtils
 					.getRelation(
@@ -363,14 +365,7 @@ public class ExtractPerson implements Serializable {
 						ModelConstants.PERSON_PERSON_SUBRELTYPE,
 						ModelConstants.PERSON_PERSON_HASCOAUTHORED,
 						Arrays.asList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
-						OafMapperUtils
-							.dataInfo(
-								false, null, false, false,
-								OafMapperUtils
-									.qualifier(
-										ORCID_AUTHORS_CLASSID, ORCID_AUTHORS_CLASSNAME,
-										ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS),
-								"0.91"),
+						DATAINFO,
 						null));
 
 	}
@@ -424,14 +419,7 @@ public class ExtractPerson implements Serializable {
 				ModelConstants.RESULT_PERSON_SUBRELTYPE,
 				ModelConstants.RESULT_PERSON_HASAUTHORED,
 				Arrays.asList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
-				OafMapperUtils
-					.dataInfo(
-						false, null, false, false,
-						OafMapperUtils
-							.qualifier(
-								ORCID_AUTHORS_CLASSID, ORCID_AUTHORS_CLASSNAME, ModelConstants.DNET_PROVENANCE_ACTIONS,
-								ModelConstants.DNET_PROVENANCE_ACTIONS),
-						"0.91"),
+				DATAINFO,
 				null);
 	}
 }
