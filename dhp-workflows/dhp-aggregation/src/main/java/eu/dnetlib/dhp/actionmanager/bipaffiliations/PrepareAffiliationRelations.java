@@ -130,7 +130,7 @@ public class PrepareAffiliationRelations implements Serializable {
 			.read()
 			.schema("`DOI` STRING, `Matchings` ARRAY<STRUCT<`RORid`:STRING,`Confidence`:DOUBLE>>")
 			.json(inputPath)
-				.where("DOI is not NULL");
+			.where("DOI is not null");
 
 		// unroll nested arrays
 		df = df
