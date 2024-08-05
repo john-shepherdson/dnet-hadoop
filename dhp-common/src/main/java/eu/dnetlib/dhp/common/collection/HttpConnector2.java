@@ -214,11 +214,11 @@ public class HttpConnector2 {
 					.format(
 						"Unexpected status code: %s errors: %s", urlConn.getResponseCode(),
 						MAPPER.writeValueAsString(report)));
-		} catch (MalformedURLException | UnknownHostException e) {
+		} catch (MalformedURLException e) {
 			log.error(e.getMessage(), e);
 			report.put(e.getClass().getName(), e.getMessage());
 			throw new CollectorException(e.getMessage(), e);
-		} catch (SocketTimeoutException | SocketException e) {
+		} catch (SocketTimeoutException | SocketException | UnknownHostException e) {
 			log.error(e.getMessage(), e);
 			report.put(e.getClass().getName(), e.getMessage());
 			backoffAndSleep(getClientParams().getRetryDelay() * retryNumber * 1000);
