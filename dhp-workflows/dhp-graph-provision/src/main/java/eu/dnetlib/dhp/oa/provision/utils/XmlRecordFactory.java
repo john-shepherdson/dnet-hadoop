@@ -20,6 +20,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import eu.dnetlib.dhp.oa.provision.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -41,10 +42,6 @@ import com.google.common.collect.Sets;
 import com.mycila.xmltool.XMLDoc;
 import com.mycila.xmltool.XMLTag;
 
-import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
-import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
-import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
-import eu.dnetlib.dhp.oa.provision.model.XmlInstance;
 import eu.dnetlib.dhp.schema.common.*;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.Result;
@@ -219,6 +216,13 @@ public class XmlRecordFactory implements Serializable {
 		if (entity.getMeasures() != null) {
 			metadata.addAll(measuresAsXml(entity.getMeasures()));
 		}
+		if (entity.getContext() != null) {
+			contexts.addAll(entity.getContext().stream().map(Context::getId).collect(Collectors.toList()));
+			/* FIXME: Workaround for CLARIN mining issue: #3670#note-29 */
+			if (contexts.contains("dh-ch::subcommunity::2")) {
+				contexts.add("clarin");
+			}
+		}
 
 		if (ModelSupport.isResult(type)) {
 			final Result r = (Result) entity;
@@ -243,14 +247,6 @@ public class XmlRecordFactory implements Serializable {
 							.filter(Objects::nonNull)
 							.map(e -> XmlSerializationUtils.mapEoscIf(e))
 							.collect(Collectors.toList()));
-			}
-
-			if (r.getContext() != null) {
-				contexts.addAll(r.getContext().stream().map(c -> c.getId()).collect(Collectors.toList()));
-				/* FIXME: Workaround for CLARIN mining issue: #3670#note-29 */
-				if (contexts.contains("dh-ch::subcommunity::2")) {
-					contexts.add("clarin");
-				}
 			}
 
 			if (r.getTitle() != null) {
@@ -390,6 +386,7 @@ public class XmlRecordFactory implements Serializable {
 							.getSubject()
 							.stream()
 							.filter(Objects::nonNull)
+							.filter(ProvisionModelSupport::filterFosL1L2)
 							.map(s -> XmlSerializationUtils.mapStructuredProperty("subject", s))
 							.collect(Collectors.toList()));
 			}
@@ -1603,9 +1600,7 @@ public class XmlRecordFactory implements Serializable {
 	private List<String> buildContexts(final String type, final Set<String> contexts) {
 		final List<String> res = Lists.newArrayList();
 
-		if (contextMapper != null
-			&& !contextMapper.isEmpty()
-			&& MainEntityType.result.toString().equals(type)) {
+		if (contextMapper != null && !contextMapper.isEmpty()) {
 
 			XMLTag document = XMLDoc.newDocument(true).addRoot("contextRoot");
 

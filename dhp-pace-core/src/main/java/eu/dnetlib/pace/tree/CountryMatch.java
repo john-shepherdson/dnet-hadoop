@@ -1,7 +1,7 @@
-
 package eu.dnetlib.pace.tree;
 
 import java.util.Map;
+import java.util.Set;
 
 import com.wcohen.ss.AbstractStringDistance;
 
@@ -12,8 +12,11 @@ import eu.dnetlib.pace.tree.support.ComparatorClass;
 @ComparatorClass("countryMatch")
 public class CountryMatch extends AbstractStringComparator {
 
+	private Map<String, String> params;
+
 	public CountryMatch(Map<String, String> params) {
 		super(params, new com.wcohen.ss.JaroWinkler());
+		this.params = params;
 	}
 
 	public CountryMatch(final double weight) {
@@ -26,6 +29,7 @@ public class CountryMatch extends AbstractStringComparator {
 
 	@Override
 	public double distance(final String a, final String b, final Config conf) {
+
 		if (a.isEmpty() || b.isEmpty()) {
 			return -1.0; // return -1 if a field is missing
 		}
@@ -45,4 +49,5 @@ public class CountryMatch extends AbstractStringComparator {
 	protected double normalize(final double d) {
 		return d;
 	}
+
 }

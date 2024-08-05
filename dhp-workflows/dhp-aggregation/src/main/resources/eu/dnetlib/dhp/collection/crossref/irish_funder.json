@@ -1,10 +1,5 @@
 [
-  {
-    "id": "100007630",
-    "uri": "http://dx.doi.org/10.13039/100007630",
-    "name": "College of Engineering and Informatics, National University of Ireland, Galway",
-    "synonym": []
-  },
+
   {
     "id": "100007731",
     "uri": "http://dx.doi.org/10.13039/100007731",
@@ -432,13 +427,13 @@
     "id": "501100001634",
     "uri": "http://dx.doi.org/10.13039/501100001634",
     "name": "University of Galway",
-    "synonym": []
+    "synonym": ["501100019905", "100007630", "501100020570", "501100023852"]
   },
   {
     "id": "501100001635",
     "uri": "http://dx.doi.org/10.13039/501100001635",
     "name": "University of Limerick",
-    "synonym": []
+    "synonym": ["501100014531"]
   },
   {
     "id": "501100001636",
@@ -468,7 +463,7 @@
     "id": "501100002736",
     "uri": "http://dx.doi.org/10.13039/501100002736",
     "name": "Covidien",
-    "synonym": []
+    "synonym": ["501100003956"]
   },
   {
     "id": "501100002755",
@@ -516,12 +511,6 @@
     "id": "501100003840",
     "uri": "http://dx.doi.org/10.13039/501100003840",
     "name": "Irish Institute of Clinical Neuroscience",
-    "synonym": []
-  },
-  {
-    "id": "501100003956",
-    "uri": "http://dx.doi.org/10.13039/501100003956",
-    "name": "Aspect Medical Systems",
     "synonym": []
   },
   {
@@ -644,12 +633,7 @@
     "name": "Irish Centre for High-End Computing",
     "synonym": []
   },
-  {
-    "id": "501100019905",
-    "uri": "http://dx.doi.org/10.13039/501100019905",
-    "name": "Galway University Foundation",
-    "synonym": []
-  },
+
   {
     "id": "501100020036",
     "uri": "http://dx.doi.org/10.13039/501100020036",
@@ -824,12 +808,7 @@
     "name": "Energy Policy Research Centre, Economic and Social Research Institute",
     "synonym": []
   },
-  {
-    "id": "501100014531",
-    "uri": "http://dx.doi.org/10.13039/501100014531",
-    "name": "Physical Education and Sport Sciences Department, University of Limerick",
-    "synonym": []
-  },
+
   {
     "id": "501100014745",
     "uri": "http://dx.doi.org/10.13039/501100014745",
@@ -842,22 +821,11 @@
     "name": "ADAPT - Centre for Digital Content Technology",
     "synonym": []
   },
-  {
-    "id": "501100020570",
-    "uri": "http://dx.doi.org/10.13039/501100020570",
-    "name": "College of Medicine, Nursing and Health Sciences, National University of Ireland, Galway",
-    "synonym": []
-  },
+
   {
     "id": "501100020871",
     "uri": "http://dx.doi.org/10.13039/501100020871",
     "name": "Bernal Institute, University of Limerick",
-    "synonym": []
-  },
-  {
-    "id": "501100023852",
-    "uri": "http://dx.doi.org/10.13039/501100023852",
-    "name": "Moore Institute for Research in the Humanities and Social Studies, University of Galway",
     "synonym": []
   }
 ]

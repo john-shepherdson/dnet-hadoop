@@ -37,6 +37,7 @@ import eu.dnetlib.dhp.schema.solr.Measure;
 import eu.dnetlib.dhp.schema.solr.OpenAccessColor;
 import eu.dnetlib.dhp.schema.solr.OpenAccessRoute;
 import eu.dnetlib.dhp.schema.solr.Organization;
+import eu.dnetlib.dhp.schema.solr.Pid;
 import eu.dnetlib.dhp.schema.solr.Project;
 import eu.dnetlib.dhp.schema.solr.Result;
 import eu.dnetlib.dhp.schema.solr.Subject;
@@ -686,6 +687,7 @@ public class ProvisionModelSupport {
 					.stream()
 					.filter(s -> Objects.nonNull(s.getQualifier()))
 					.filter(s -> Objects.nonNull(s.getQualifier().getClassname()))
+					.filter(ProvisionModelSupport::filterFosL1L2)
 					.map(
 						s -> Subject
 							.newInstance(s.getValue(), s.getQualifier().getClassid(), s.getQualifier().getClassname()))
@@ -706,6 +708,16 @@ public class ProvisionModelSupport {
 							.newInstance(s.getValue(), s.getQualifier().getClassid(), s.getQualifier().getClassname()))
 					.collect(Collectors.toList()))
 			.orElse(null);
+	}
+
+	public static boolean filterFosL1L2(StructuredProperty s) {
+		final String subjectType = Optional.ofNullable(s.getQualifier()).map(Qualifier::getClassid).orElse("");
+		if (ModelConstants.DNET_SUBJECT_FOS_CLASSID.equals(subjectType)) {
+			String code = StringUtils.substringBefore(s.getValue(), " ");
+			return code.matches("^\\d{2}$|^\\d{4}$");
+		}
+
+		return true;
 	}
 
 	private static Country asCountry(eu.dnetlib.dhp.schema.oaf.Qualifier country) {

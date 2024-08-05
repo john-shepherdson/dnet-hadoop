@@ -128,12 +128,14 @@ public class SolrAdminApplication implements Closeable {
 
 	public SolrResponse deleteAlias(String aliasName) throws SolrServerException, IOException {
 		CollectionAdminRequest.DeleteAlias deleteAliasRequest = CollectionAdminRequest.deleteAlias(aliasName);
+		log.info("deleting alias: {}", aliasName);
 		return deleteAliasRequest.process(solrClient);
 	}
 
 	public SolrResponse createAlias(String aliasName, String collection) throws IOException, SolrServerException {
 		CollectionAdminRequest.CreateAlias createAliasRequest = CollectionAdminRequest
 			.createAlias(aliasName, collection);
+		log.info("creating alias: {} for collection: {}", aliasName, collection);
 		return createAliasRequest.process(solrClient);
 	}
 

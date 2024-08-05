@@ -480,6 +480,138 @@ public class BulkTagJobTest {
 	}
 
 	@Test
+	void organizationTag() throws Exception {
+		final String sourcePath = getClass()
+			.getResource("/eu/dnetlib/dhp/bulktag/sample/publication/update_datasource/")
+			.getPath();
+		LocalFileSystem fs = FileSystem.getLocal(new Configuration());
+		fs
+			.copyFromLocalFile(
+				false, new org.apache.hadoop.fs.Path(getClass()
+					.getResource("/eu/dnetlib/dhp/bulktag/pathMap/")
+					.getPath()),
+				new org.apache.hadoop.fs.Path(workingDir.toString() + "/data/bulktagging/protoMap"));
+		SparkBulkTagJob
+			.main(
+				new String[] {
+
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath", sourcePath,
+					"-taggingConf", taggingConf,
+
+					"-outputPath", workingDir.toString() + "/",
+					"-baseURL", "https://services.openaire.eu/openaire/community/",
+
+					"-pathMap", workingDir.toString() + "/data/bulktagging/protoMap/pathMap",
+					"-nameNode", "local"
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Organization> tmp = sc
+			.textFile(workingDir.toString() + "/organization")
+			.map(item -> OBJECT_MAPPER.readValue(item, Organization.class));
+
+		Assertions.assertEquals(4, tmp.count());
+		org.apache.spark.sql.Dataset<Organization> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(Organization.class));
+
+		verificationDataset.createOrReplaceTempView("organization");
+
+		String query = "select id, MyT.id community, MyD.provenanceaction.classid provenance, MyD.provenanceaction.classname name "
+			+ "from organization "
+			+ "lateral view explode(context) c as MyT "
+			+ "lateral view explode(MyT.datainfo) d as MyD "
+			+ "where MyD.inferenceprovenance = 'bulktagging'";
+
+		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
+
+		idExplodeCommunity.show(false);
+
+		Assertions.assertEquals(3, idExplodeCommunity.count());
+		Assertions
+			.assertEquals(
+				3, idExplodeCommunity.filter("provenance = 'community:organization'").count());
+		Assertions
+			.assertEquals(
+				3,
+				idExplodeCommunity
+					.filter("name = 'Bulktagging for Community - Organization'")
+					.count());
+
+		Assertions.assertEquals(1, idExplodeCommunity.filter("community = 'netherlands'").count());
+		Assertions.assertEquals(1, idExplodeCommunity.filter("community = 'beopen'").count());
+		Assertions.assertEquals(1, idExplodeCommunity.filter("community = 'mes'").count());
+
+	}
+
+	@Test
+	void projectTag() throws Exception {
+		final String sourcePath = getClass()
+			.getResource("/eu/dnetlib/dhp/bulktag/sample/publication/update_datasource/")
+			.getPath();
+		LocalFileSystem fs = FileSystem.getLocal(new Configuration());
+		fs
+			.copyFromLocalFile(
+				false, new org.apache.hadoop.fs.Path(getClass()
+					.getResource("/eu/dnetlib/dhp/bulktag/pathMap/")
+					.getPath()),
+				new org.apache.hadoop.fs.Path(workingDir.toString() + "/data/bulktagging/protoMap"));
+		SparkBulkTagJob
+			.main(
+				new String[] {
+
+					"-isSparkSessionManaged", Boolean.FALSE.toString(),
+					"-sourcePath", sourcePath,
+					"-taggingConf", taggingConf,
+
+					"-outputPath", workingDir.toString() + "/",
+					"-baseURL", "https://services.openaire.eu/openaire/community/",
+
+					"-pathMap", workingDir.toString() + "/data/bulktagging/protoMap/pathMap",
+					"-nameNode", "local"
+				});
+
+		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
+
+		JavaRDD<Project> tmp = sc
+			.textFile(workingDir.toString() + "/project")
+			.map(item -> OBJECT_MAPPER.readValue(item, Project.class));
+
+		Assertions.assertEquals(4, tmp.count());
+		org.apache.spark.sql.Dataset<Project> verificationDataset = spark
+			.createDataset(tmp.rdd(), Encoders.bean(Project.class));
+
+		verificationDataset.createOrReplaceTempView("project");
+
+		String query = "select id, MyT.id community, MyD.provenanceaction.classid provenance, MyD.provenanceaction.classname name "
+			+ "from project "
+			+ "lateral view explode(context) c as MyT "
+			+ "lateral view explode(MyT.datainfo) d as MyD "
+			+ "where MyD.inferenceprovenance = 'bulktagging'";
+
+		org.apache.spark.sql.Dataset<Row> idExplodeCommunity = spark.sql(query);
+
+		idExplodeCommunity.show(false);
+
+		Assertions.assertEquals(4, idExplodeCommunity.count());
+		Assertions
+			.assertEquals(
+				4, idExplodeCommunity.filter("provenance = 'community:project'").count());
+		Assertions
+			.assertEquals(
+				4,
+				idExplodeCommunity
+					.filter("name = 'Bulktagging for Community - Project'")
+					.count());
+
+		Assertions.assertEquals(1, idExplodeCommunity.filter("community = 'enermaps'").count());
+		Assertions.assertEquals(1, idExplodeCommunity.filter("community = 'clarin'").count());
+		Assertions.assertEquals(2, idExplodeCommunity.filter("community = 'dh-ch'").count());
+
+	}
+
+	@Test
 	void bulktagByZenodoCommunityTest() throws Exception {
 		final String sourcePath = getClass()
 			.getResource(

@@ -93,7 +93,7 @@ case object Crossref2Oaf {
 
     val cf = new KeyValue
     cf.setValue("UnpayWall")
-    cf.setKey(s"10|openaire____:${DHPUtils.md5("UnpayWall".toLowerCase)}")
+    cf.setKey(s"10|openaire____::${DHPUtils.md5("UnpayWall".toLowerCase)}")
     cf
 
   }
@@ -888,7 +888,11 @@ case object Crossref2Oaf {
               val targetId = getProjectId("cihr________", "1e5e62235d094afd01cd56e65112fc63")
               queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
               queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
-
+//              Added mapping for DFG
+            case "10.13039/501100001659" =>
+              val targetId = getProjectId("dfgf________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
             case "10.13039/100020031" =>
               val targetId = getProjectId("tara________", "1e5e62235d094afd01cd56e65112fc63")
               queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
