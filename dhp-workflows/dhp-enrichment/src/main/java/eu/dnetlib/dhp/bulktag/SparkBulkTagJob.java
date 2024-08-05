@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.bulktag.criteria.VerbResolverFactory;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -23,7 +22,6 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
@@ -32,6 +30,8 @@ import eu.dnetlib.dhp.api.model.CommunityEntityMap;
 import eu.dnetlib.dhp.api.model.EntityCommunities;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.bulktag.community.*;
+import eu.dnetlib.dhp.bulktag.criteria.VerbResolver;
+import eu.dnetlib.dhp.bulktag.criteria.VerbResolverFactory;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.Context;
@@ -93,9 +93,10 @@ public class SparkBulkTagJob {
 		ProtoMap protoMap = new Gson().fromJson(temp, ProtoMap.class);
 		log.info("pathMap: {}", new Gson().toJson(protoMap));
 
-		SelectionConstraints taggingConstraints = new Gson()
-				.fromJson(parser.get("taggingCriteria"), SelectionConstraints.class);
-		taggingConstraints.setSelection(VerbResolverFactory.newInstance());
+		TaggingConstraints taggingConstraints = new Gson()
+			.fromJson(parser.get("taggingCriteria"), TaggingConstraints.class);
+
+		taggingConstraints.getTags().forEach(t -> t.setSelection(VerbResolverFactory.newInstance()));
 
 		SparkConf conf = new SparkConf();
 		CommunityConfiguration cc;
@@ -277,13 +278,8 @@ public class SparkBulkTagJob {
 		String outputPath,
 		ProtoMap protoMappingParams,
 		CommunityConfiguration communityConfiguration,
-		SelectionConstraints taggingConstraints) {
+		TaggingConstraints taggingConstraints) {
 
-		try {
-			System.out.println(new ObjectMapper().writeValueAsString(protoMappingParams));
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
-		}
 		ModelSupport.entityTypes
 			.keySet()
 			.parallelStream()
@@ -295,29 +291,21 @@ public class SparkBulkTagJob {
 				readPath(spark, inputPath + e.name(), resultClazz)
 					.map(patchResult(), Encoders.bean(resultClazz))
 					.filter(Objects::nonNull)
-						.map((MapFunction<R, Tagging>) value -> resultTagger
+					.map(
+						(MapFunction<R, R>) value -> resultTagger
 							.enrichContextCriteria(
 								value, communityConfiguration, protoMappingParams, taggingConstraints),
-						Encoders.bean(Tagging.class))
+						Encoders.bean(resultClazz))
 					.write()
 					.mode(SaveMode.Overwrite)
 					.option("compression", "gzip")
 					.json(outputPath + e.name());// writing the tagging in the working dir for entity
 
-				readPath(spark, outputPath + e.name(), Tagging.class)
-						.map((MapFunction<Tagging, R>) t -> (R) t.getResult(), Encoders.bean(resultClazz) )// copy the tagging in the actual result output path
+				readPath(spark, outputPath + e.name(), resultClazz)
 					.write()
 					.mode(SaveMode.Overwrite)
 					.option("compression", "gzip")
 					.json(inputPath + e.name());
-
-				readPath(spark, outputPath + e.name(), Tagging.class)
-						.map((MapFunction<Tagging, String>) t -> t.getTag(), Encoders.STRING() )// copy the tagging in the actual result output path
-						.filter(Objects::nonNull)
-						.write()
-						.mode(SaveMode.Overwrite)
-						.option("compression", "gzip")
-						.json("/user/miriam.baglioni/graphTagging/" + e.name());
 
 			});
 

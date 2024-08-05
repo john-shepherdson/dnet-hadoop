@@ -10,8 +10,6 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
-import eu.dnetlib.dhp.bulktag.Tagging;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +19,7 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 
+import eu.dnetlib.dhp.bulktag.Tagging;
 import eu.dnetlib.dhp.bulktag.actions.MapModel;
 import eu.dnetlib.dhp.bulktag.actions.Parameters;
 import eu.dnetlib.dhp.bulktag.eosc.EoscIFTag;
@@ -93,18 +92,18 @@ public class ResultTagger implements Serializable {
 
 	}
 
-	public <R extends Result> Tagging enrichContextCriteria(
-		final R result, final CommunityConfiguration conf, final Map<String, MapModel> criteria, SelectionConstraints taggingConstraints)
+	public <R extends Result> R enrichContextCriteria(
+		final R result, final CommunityConfiguration conf, final Map<String, MapModel> criteria,
+		TaggingConstraints taggingConstraints)
 		throws InvocationTargetException, NoSuchMethodException {
 
 		// Verify if the entity is deletedbyinference. In case verify if to clean the context list
 		// from all the zenodo communities
 		if (result.getDataInfo().getDeletedbyinference()) {
 			clearContext(result);
-			return Tagging.newInstance(result, null);
+			return result;
 		}
 
-		String retString = null;
 		final Map<String, List<String>> param = getParamMap(result, criteria);
 
 		// Execute the EOSCTag for the services
@@ -123,8 +122,11 @@ public class ResultTagger implements Serializable {
 		}
 
 //adding code for tagging of results searching supplementaryMaterial
-		if(taggingConstraints.getCriteria().stream().anyMatch(crit -> crit.verifyCriteria(param)))
-			retString = "supplementary";
+		final Set<String> tags = new HashSet<>();
+		taggingConstraints.getTags().forEach(t -> {
+			if (t.getCriteria().stream().anyMatch(crit -> crit.verifyCriteria(param)))
+				tags.add(t.getTagId());
+		});
 
 		// communities contains all the communities to be not added to the context
 		final Set<String> removeCommunities = new HashSet<>();
@@ -253,9 +255,25 @@ public class ResultTagger implements Serializable {
 		clearContext(result);
 
 		/* Verify if there is something to bulktag */
-		if (communities.isEmpty()) {
-			return Tagging.newInstance(result, retString);
+		if (communities.isEmpty() && tags.isEmpty()) {
+			return result;
 		}
+
+		tags.forEach(t -> {
+			Context con = new Context();
+			con.setId(t);
+			List<DataInfo> dataInfoList = Arrays
+				.asList(
+					OafMapperUtils
+						.dataInfo(
+							false, ANNOTATION_DATA_INFO_TYPE, true, false,
+							OafMapperUtils
+								.qualifier(
+									CLASS_ID_ANNOTATION, CLASS_NAME_ANNOTATION, DNET_PROVENANCE_ACTIONS,
+									DNET_PROVENANCE_ACTIONS),
+							TAGGING_TRUST));
+			result.getContext().add(con);
+		});
 
 		result.getContext().forEach(c -> {
 			final String cId = c.getId();
@@ -321,7 +339,7 @@ public class ResultTagger implements Serializable {
 				result.getContext().stream().map(Context::getId).collect(Collectors.toSet()));
 
 		if (communities.isEmpty())
-			return Tagging.newInstance(result, retString);
+			return result;
 
 		List<Context> toaddcontext = communities
 			.stream()
@@ -381,7 +399,7 @@ public class ResultTagger implements Serializable {
 			.collect(Collectors.toList());
 
 		result.getContext().addAll(toaddcontext);
-		return Tagging.newInstance(result, retString);
+		return result;
 	}
 
 }

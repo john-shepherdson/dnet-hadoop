@@ -8,6 +8,10 @@ public class TaggingConstants {
 
 	public static final String BULKTAG_DATA_INFO_TYPE = "bulktagging";
 
+	public static final String ANNOTATION_DATA_INFO_TYPE = "annotation";
+	public static final String CLASS_ID_ANNOTATION = "graph:annotation";
+	public static final String CLASS_NAME_ANNOTATION = "Graph Annotation";
+
 	public static final String CLASS_ID_SUBJECT = "community:subject";
 	public static final String CLASS_ID_DATASOURCE = "community:datasource";
 	public static final String CLASS_ID_CZENODO = "community:zenodocommunity";
