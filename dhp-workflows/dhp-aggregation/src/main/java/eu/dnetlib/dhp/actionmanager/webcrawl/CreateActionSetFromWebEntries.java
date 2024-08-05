@@ -105,7 +105,6 @@ public class CreateActionSetFromWebEntries implements Serializable {
 					+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", row.getAs("ror")));
 				ret.addAll(createAffiliationRelationPairDOI(row.getAs("doi"), ror));
 
-
 				return ret
 					.iterator();
 			}, Encoders.bean(Relation.class))
@@ -155,11 +154,11 @@ public class CreateActionSetFromWebEntries implements Serializable {
 	}
 
 	private static String removeResolver(String pidType, String pid) {
-        if (pidType.equals("DOI")) {
-            return pid.substring(16);
-        }
-        throw new IllegalArgumentException("DOI is the only supported PID type");
-    }
+		if (pidType.equals("DOI")) {
+			return pid.substring(16);
+		}
+		throw new IllegalArgumentException("DOI is the only supported PID type");
+	}
 
 	private static List<Relation> createAffiliationRelationPairDOI(String doi, String ror) {
 		if (doi == null)
