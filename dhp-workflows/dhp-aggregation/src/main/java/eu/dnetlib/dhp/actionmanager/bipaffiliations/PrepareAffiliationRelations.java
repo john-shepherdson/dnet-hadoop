@@ -44,6 +44,8 @@ public class PrepareAffiliationRelations implements Serializable {
 	public static final String BIP_AFFILIATIONS_CLASSID = "result:organization:openaireinference";
 	public static final String BIP_AFFILIATIONS_CLASSNAME = "Affiliation relation inferred by OpenAIRE";
 	public static final String BIP_INFERENCE_PROVENANCE = "openaire:affiliation";
+	public static final String OPENAIRE_DATASOURCE_ID = "10|infrastruct_::f66f1bd369679b5b077dcdf006089556";
+	public static final String OPENAIRE_DATASOURCE_NAME = "OpenAIRE";
 
 	public static <I extends Result> void main(String[] args) throws Exception {
 
@@ -73,6 +75,9 @@ public class PrepareAffiliationRelations implements Serializable {
 
 		final String webcrawlInputPath = parser.get("webCrawlInputPath");
 		log.info("webcrawlInputPath: {}", webcrawlInputPath);
+
+		final String publisherlInputPath = parser.get("publisherlInputPath");
+		log.info("publisherlInputPath: {}", publisherlInputPath);
 
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
@@ -106,19 +111,38 @@ public class PrepareAffiliationRelations implements Serializable {
 					spark, dataciteInputPath, collectedFromDatacite);
 
 				List<KeyValue> collectedFromWebCrawl = OafMapperUtils
-					.listKeyValues(Constants.WEB_CRAWL_ID, Constants.WEB_CRAWL_NAME);
+					.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
 				JavaPairRDD<Text, Text> webCrawlRelations = prepareAffiliationRelations(
 					spark, webcrawlInputPath, collectedFromWebCrawl);
+
+				List<KeyValue> collectedfromPublisher = OafMapperUtils
+						.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
+				JavaPairRDD<Text, Text> publisherRelations = prepareAffiliationRelationFromPublisher(
+						spark, publisherlInputPath, collectedfromPublisher);
 
 				crossrefRelations
 					.union(pubmedRelations)
 					.union(openAPCRelations)
 					.union(dataciteRelations)
 					.union(webCrawlRelations)
+						.union(publisherRelations)
 					.saveAsHadoopFile(
 						outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, BZip2Codec.class);
 
 			});
+	}
+
+	private static JavaPairRDD<Text,Text> prepareAffiliationRelationFromPublisher(SparkSession spark, String inputPath,
+																				  List<KeyValue> collectedfrom){
+		Dataset<Row> df = spark
+				.read()
+				.schema("`DOI` STRING, `Organizations` ARRAY<STRUCT<RORid`:STRING,`Confidence`:DOUBLE>>")
+				.json(inputPath)
+				.where("DOI is not null");
+
+		return getTextTextJavaPairRDD(collectedfrom, df.selectExpr("DOI", "Organizations as Matchings"));
+
+
 	}
 
 	private static <I extends Result> JavaPairRDD<Text, Text> prepareAffiliationRelations(SparkSession spark,
@@ -132,6 +156,10 @@ public class PrepareAffiliationRelations implements Serializable {
 			.json(inputPath)
 			.where("DOI is not null");
 
+		return getTextTextJavaPairRDD(collectedfrom, df);
+	}
+
+	private static JavaPairRDD<Text, Text> getTextTextJavaPairRDD(List<KeyValue> collectedfrom, Dataset<Row> df) {
 		// unroll nested arrays
 		df = df
 			.withColumn("matching", functions.explode(new Column("Matchings")))
@@ -142,41 +170,41 @@ public class PrepareAffiliationRelations implements Serializable {
 
 		// prepare action sets for affiliation relations
 		return df
-			.toJavaRDD()
-			.flatMap((FlatMapFunction<Row, Relation>) row -> {
+				.toJavaRDD()
+				.flatMap((FlatMapFunction<Row, Relation>) row -> {
 
-				// DOI to OpenAIRE id
-				final String paperId = ID_PREFIX
-					+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", row.getAs("doi")));
+					// DOI to OpenAIRE id
+					final String paperId = ID_PREFIX
+							+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", row.getAs("doi")));
 
-				// ROR id to OpenAIRE id
-				final String affId = GenerateRorActionSetJob.calculateOpenaireId(row.getAs("rorid"));
+					// ROR id to OpenAIRE id
+					final String affId = GenerateRorActionSetJob.calculateOpenaireId(row.getAs("rorid"));
 
-				Qualifier qualifier = OafMapperUtils
-					.qualifier(
-						BIP_AFFILIATIONS_CLASSID,
-						BIP_AFFILIATIONS_CLASSNAME,
-						ModelConstants.DNET_PROVENANCE_ACTIONS,
-						ModelConstants.DNET_PROVENANCE_ACTIONS);
+					Qualifier qualifier = OafMapperUtils
+							.qualifier(
+									BIP_AFFILIATIONS_CLASSID,
+									BIP_AFFILIATIONS_CLASSNAME,
+									ModelConstants.DNET_PROVENANCE_ACTIONS,
+									ModelConstants.DNET_PROVENANCE_ACTIONS);
 
-				// format data info; setting `confidence` into relation's `trust`
-				DataInfo dataInfo = OafMapperUtils
-					.dataInfo(
-						false,
-						BIP_INFERENCE_PROVENANCE,
-						true,
-						false,
-						qualifier,
-						Double.toString(row.getAs("confidence")));
+					// format data info; setting `confidence` into relation's `trust`
+					DataInfo dataInfo = OafMapperUtils
+							.dataInfo(
+									false,
+									BIP_INFERENCE_PROVENANCE,
+									true,
+									false,
+									qualifier,
+									Double.toString(row.getAs("confidence")));
 
-				// return bi-directional relations
-				return getAffiliationRelationPair(paperId, affId, collectedfrom, dataInfo).iterator();
+					// return bi-directional relations
+					return getAffiliationRelationPair(paperId, affId, collectedfrom, dataInfo).iterator();
 
-			})
-			.map(p -> new AtomicAction(Relation.class, p))
-			.mapToPair(
-				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
-					new Text(OBJECT_MAPPER.writeValueAsString(aa))));
+				})
+				.map(p -> new AtomicAction(Relation.class, p))
+				.mapToPair(
+						aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
+								new Text(OBJECT_MAPPER.writeValueAsString(aa))));
 	}
 
 	private static List<Relation> getAffiliationRelationPair(String paperId, String affId, List<KeyValue> collectedfrom,
