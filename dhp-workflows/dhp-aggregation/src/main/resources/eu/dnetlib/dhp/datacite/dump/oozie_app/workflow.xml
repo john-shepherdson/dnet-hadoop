@@ -1,0 +1,52 @@
+<workflow-app name="collect_dump" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>mainPath</name>
+            <description>the working path of Datacite</description>
+        </property>
+
+    </parameters>
+
+    <start to="extractDump"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+
+    <action name="extractDump">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.collection.datacite.DumpExtractor</main-class>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--targetPath</arg><arg>${mainPath}/metadata.seq</arg>
+            <arg>--sourcePath</arg><arg>${mainPath}/datacite.gz</arg>
+        </java>
+        <ok to="extractRelation"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="extractRelation">
+        <java>
+            <configuration>
+                <property>
+                    <name>oozie.launcher.mapreduce.user.classpath.first</name>
+                    <value>true</value>
+                </property>
+            </configuration>
+            <main-class>eu.dnetlib.dhp.collection.datacite.DumpExtractor</main-class>
+            <arg>--namenode</arg><arg>${nameNode}</arg>
+            <arg>--targetPath</arg><arg>${mainPath}/links.seq</arg>
+            <arg>--sourcePath</arg><arg>${mainPath}/pidlinks.gz</arg>
+        </java>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    <end name="End"/>
+</workflow-app>
