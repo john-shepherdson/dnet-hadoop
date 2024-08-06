@@ -1,8 +1,8 @@
-<workflow-app name="promote_action_payload_for_datasource_table" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="promote_action_payload_for_person_table" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
-            <name>activePromoteDatasourceActionPayload</name>
-            <description>when true will promote actions with eu.dnetlib.dhp.schema.oaf.Datasource payload</description>
+            <name>activePromotePersonActionPayload</name>
+            <description>when true will promote actions with eu.dnetlib.dhp.schema.oaf.Person payload</description>
         </property>
         <property>
             <name>inputGraphRootPath</name>
@@ -45,39 +45,38 @@
         </configuration>
     </global>
 
-    <start to="DecisionPromoteDatasourceActionPayload"/>
+    <start to="DecisionPromotePersonActionPayload"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <decision name="DecisionPromoteDatasourceActionPayload">
+    <decision name="DecisionPromotePersonActionPayload">
         <switch>
-            <case to="PromoteDatasourceActionPayloadForDatasourceTable">
-                ${(activePromoteDatasourceActionPayload eq "true") and
-                (fs:exists(concat(concat(concat(concat(wf:conf('nameNode'),'/'),wf:conf('inputGraphRootPath')),'/'),'datasource')) eq "true") and
-                (fs:exists(concat(concat(concat(concat(wf:conf('nameNode'),'/'),wf:conf('inputActionPayloadRootPath')),'/'),'clazz=eu.dnetlib.dhp.schema.oaf.Datasource')) eq "true")}
+            <case to="PromotePersonActionPayloadForPersonTable">
+                ${(activePromotePersonActionPayload eq "true") and
+                (fs:exists(concat(concat(concat(concat(wf:conf('nameNode'),'/'),wf:conf('inputActionPayloadRootPath')),'/'),'clazz=eu.dnetlib.dhp.schema.oaf.Person')) eq "true")}
             </case>
-            <default to="SkipPromoteDatasourceActionPayloadForDatasourceTable"/>
+            <default to="SkipPromotePersonActionPayloadForPersonTable"/>
         </switch>
     </decision>
 
-    <action name="PromoteDatasourceActionPayloadForDatasourceTable">
+    <action name="PromotePersonActionPayloadForPersonTable">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn-cluster</master>
             <mode>cluster</mode>
-            <name>PromoteDatasourceActionPayloadForDatasourceTable</name>
+            <name>PromotePersonActionPayloadForPersonTable</name>
             <class>eu.dnetlib.dhp.actionmanager.promote.PromoteActionPayloadForGraphTableJob</class>
             <jar>dhp-actionmanager-${projectVersion}.jar</jar>
             <spark-opts>
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
             </spark-opts>
-            <arg>--inputGraphTablePath</arg><arg>${inputGraphRootPath}/datasource</arg>
-            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
-            <arg>--inputActionPayloadPath</arg><arg>${inputActionPayloadRootPath}/clazz=eu.dnetlib.dhp.schema.oaf.Datasource</arg>
-            <arg>--actionPayloadClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
-            <arg>--outputGraphTablePath</arg><arg>${outputGraphRootPath}/datasource</arg>
+            <arg>--inputGraphTablePath</arg><arg>${inputGraphRootPath}/person</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Person</arg>
+            <arg>--inputActionPayloadPath</arg><arg>${inputActionPayloadRootPath}/clazz=eu.dnetlib.dhp.schema.oaf.Person</arg>
+            <arg>--actionPayloadClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Person</arg>
+            <arg>--outputGraphTablePath</arg><arg>${outputGraphRootPath}/person</arg>
             <arg>--mergeAndGetStrategy</arg><arg>${mergeAndGetStrategy}</arg>
             <arg>--promoteActionStrategy</arg><arg>${promoteActionStrategy}</arg>
         </spark>
@@ -85,14 +84,14 @@
         <error to="Kill"/>
     </action>
 
-    <action name="SkipPromoteDatasourceActionPayloadForDatasourceTable">
+    <action name="SkipPromotePersonActionPayloadForPersonTable">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <prepare>
-                <delete path="${outputGraphRootPath}/datasource"/>
+                <delete path="${outputGraphRootPath}/person"/>
             </prepare>
             <arg>-pb</arg>
-            <arg>${inputGraphRootPath}/datasource</arg>
-            <arg>${outputGraphRootPath}/datasource</arg>
+            <arg>${inputGraphRootPath}/person</arg>
+            <arg>${outputGraphRootPath}/person</arg>
         </distcp>
         <ok to="End"/>
         <error to="Kill"/>
