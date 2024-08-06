@@ -123,8 +123,8 @@ public class SparkBulkTagJob {
 					TaggingConstants.CLASS_NAME_BULKTAG_ORGANIZATION);
 				execEntityTag(
 					spark, inputPath + "project", outputPath + "project",
-						Utils.getCommunityProjects(baseURL), Project.class, TaggingConstants.CLASS_ID_PROJECT,
-						TaggingConstants.CLASS_NAME_BULKTAG_PROJECT);
+					Utils.getCommunityProjects(baseURL), Project.class, TaggingConstants.CLASS_ID_PROJECT,
+					TaggingConstants.CLASS_NAME_BULKTAG_PROJECT);
 				execDatasourceTag(spark, inputPath, outputPath, Utils.getDatasourceCommunities(baseURL));
 			});
 	}
@@ -290,6 +290,7 @@ public class SparkBulkTagJob {
 			.parallelStream()
 			.filter(ModelSupport::isResult)
 			.forEach(e -> {
+
 				removeOutputDir(spark, outputPath + e.name());
 				ResultTagger resultTagger = new ResultTagger();
 				Class<R> resultClazz = ModelSupport.entityTypes.get(e);

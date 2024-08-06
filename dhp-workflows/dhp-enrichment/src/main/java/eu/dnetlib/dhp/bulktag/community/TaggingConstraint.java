@@ -1,14 +1,16 @@
 
 package eu.dnetlib.dhp.bulktag.community;
 
-public class TaggingConstraint extends SelectionConstraints {
-	private String tagId;
+import java.io.Serializable;
 
-	public String getTagId() {
-		return tagId;
+public class TaggingConstraint extends SelectionConstraints implements Serializable {
+	private String id;
+
+	public String getId() {
+		return id;
 	}
 
-	public void setTagId(String tagId) {
-		this.tagId = tagId;
+	public void setId(String id) {
+		this.id = id;
 	}
 }

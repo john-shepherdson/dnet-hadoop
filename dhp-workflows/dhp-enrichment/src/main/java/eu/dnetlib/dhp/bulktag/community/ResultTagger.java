@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.jayway.jsonpath.Criteria;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,13 +20,11 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 
-import eu.dnetlib.dhp.bulktag.Tagging;
 import eu.dnetlib.dhp.bulktag.actions.MapModel;
 import eu.dnetlib.dhp.bulktag.actions.Parameters;
 import eu.dnetlib.dhp.bulktag.eosc.EoscIFTag;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
-import scala.Tuple2;
 
 /** Created by miriam on 02/08/2018. */
 public class ResultTagger implements Serializable {
@@ -123,9 +122,11 @@ public class ResultTagger implements Serializable {
 
 //adding code for tagging of results searching supplementaryMaterial
 		final Set<String> tags = new HashSet<>();
+
+
 		taggingConstraints.getTags().forEach(t -> {
 			if (t.getCriteria().stream().anyMatch(crit -> crit.verifyCriteria(param)))
-				tags.add(t.getTagId());
+				tags.add(t.getId());
 		});
 
 		// communities contains all the communities to be not added to the context
@@ -262,7 +263,7 @@ public class ResultTagger implements Serializable {
 		tags.forEach(t -> {
 			Context con = new Context();
 			con.setId(t);
-			List<DataInfo> dataInfoList = Arrays
+			con.setDataInfo(Arrays
 				.asList(
 					OafMapperUtils
 						.dataInfo(
@@ -271,7 +272,7 @@ public class ResultTagger implements Serializable {
 								.qualifier(
 									CLASS_ID_ANNOTATION, CLASS_NAME_ANNOTATION, DNET_PROVENANCE_ACTIONS,
 									DNET_PROVENANCE_ACTIONS),
-							TAGGING_TRUST));
+							TAGGING_TRUST)));
 			result.getContext().add(con);
 		});
 

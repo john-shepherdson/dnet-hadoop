@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.bulktag.community.ProtoMap;
+import eu.dnetlib.dhp.bulktag.community.TaggingConstraints;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class BulkTagJobTest {
@@ -68,7 +69,7 @@ public class BulkTagJobTest {
 
 	private static String taggingConf = "";
 
-	private static String taggingCriteria = "{\"criteria\":[{\"constraint\":[{\"verb\":\"starts_with_caseinsensitive\",\"field\":\"title\",\"value\":\"supplementary material\"}]}]}";
+	private static String taggingCriteria = "{\"tags\":[{\"id\":\"SM\",\"criteria\":[{\"constraint\":[{\"verb\":\"starts_with_caseinsensitive\",\"field\":\"title\",\"value\":\"supplementary material for\"}]},{\"constraint\":[{\"verb\":\"starts_with_caseinsensitive\",\"field\":\"title\",\"value\":\"supplementary document for\"}]},{\"constraint\":[{\"verb\":\"starts_with_caseinsensitive\",\"field\":\"title\",\"value\":\"figure\"}]},{\"constraint\":[{\"verb\":\"starts_with_caseinsensitive\",\"field\":\"title\",\"value\":\"supplementary figure\"}]},{\"constraint\":[{\"verb\":\"starts_with_caseinsensitive\",\"field\":\"title\",\"value\":\"supplemental figure\"}]},{\"constraint\":[{\"verb\":\"starts_with_caseinsensitive\",\"field\":\"title\",\"value\":\"supplementary table\"}]},{\"constraint\":[{\"verb\":\"starts_with_caseinsensitive\",\"field\":\"title\",\"value\":\"table for\"}]}]}]}";
 
 	static {
 		try {
@@ -2011,6 +2012,10 @@ public class BulkTagJobTest {
 					"-nameNode", "local"
 				});
 
+		System.out.println("prrr");
+
 	}
+
+
 
 }
