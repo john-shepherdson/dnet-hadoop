@@ -23,7 +23,8 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 public class ConversionUtilsTest {
 
 	@BeforeEach
-	public void setUp() throws Exception {}
+	public void setUp() throws Exception {
+	}
 
 	@Test
 	public void testAllResultPids() {

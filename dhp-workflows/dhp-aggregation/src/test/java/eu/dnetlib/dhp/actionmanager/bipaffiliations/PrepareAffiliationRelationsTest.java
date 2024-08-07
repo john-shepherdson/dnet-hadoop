@@ -79,8 +79,8 @@ public class PrepareAffiliationRelationsTest {
 			.getPath();
 
 		String publisherAffiliationRelationPath = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/publishers")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/publishers")
+			.getPath();
 
 		String outputPath = workingDir.toString() + "/actionSet";
 
@@ -93,7 +93,7 @@ public class PrepareAffiliationRelationsTest {
 					"-openapcInputPath", crossrefAffiliationRelationPath,
 					"-dataciteInputPath", crossrefAffiliationRelationPath,
 					"-webCrawlInputPath", crossrefAffiliationRelationPath,
-						"-publisherInputPath", publisherAffiliationRelationPath,
+					"-publisherInputPath", publisherAffiliationRelationPath,
 					"-outputPath", outputPath
 				});
 
