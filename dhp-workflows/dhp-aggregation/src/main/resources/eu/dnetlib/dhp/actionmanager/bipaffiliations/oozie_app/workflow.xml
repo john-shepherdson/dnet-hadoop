@@ -22,6 +22,10 @@
             <description>the path where to find the inferred affiliation relations from webCrawl</description>
         </property>
         <property>
+            <name>publisherInputPath</name>
+            <description>the path where to find the inferred affiliation relations from publisher websites</description>
+        </property>
+        <property>
             <name>outputPath</name>
             <description>the path where to store the actionset</description>
         </property>
@@ -117,6 +121,7 @@
             <arg>--openapcInputPath</arg><arg>${openapcInputPath}</arg>
             <arg>--dataciteInputPath</arg><arg>${dataciteInputPath}</arg>
             <arg>--webCrawlInputPath</arg><arg>${webCrawlInputPath}</arg>
+            <arg>--publisherInputPath</arg><arg>${publisherInputPath}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>
