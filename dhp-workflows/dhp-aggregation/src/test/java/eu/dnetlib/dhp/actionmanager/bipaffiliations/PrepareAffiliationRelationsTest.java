@@ -150,5 +150,11 @@ public class PrepareAffiliationRelationsTest {
 					.get(0)
 					.getString(4));
 
+
+		final String publisherid = ID_PREFIX + IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1007/s00217-010-1268-9"));
+		final String rorId = "20|ror_________::" + IdentifierFactory.md5("https://ror.org/03265fv13");
+
+		Assertions.assertEquals(1, execVerification.filter("source = '" + publisherid + "' and target = '" + rorId +"'").count()
+				);
 	}
 }
