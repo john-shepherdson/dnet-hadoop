@@ -60,8 +60,9 @@ object SparkCreateBaselineDataFrame {
       .setSocketTimeout(timeout * 1000)
       .build()
     val client = HttpClientBuilder.create().setDefaultRequestConfig(config).build()
+    println(s"Downloading ${url}")
     val response = client.execute(r)
-    println(s"get response with status${response.getStatusLine.getStatusCode}")
+    println(s"got response with status: ${response.getStatusLine.getStatusCode}")
     response.getEntity.getContent
 
   }
@@ -125,7 +126,7 @@ object SparkCreateBaselineDataFrame {
       val fsDataOutputStream: FSDataOutputStream = fs.create(hdfsWritePath, true)
       val i = downloadBaselinePart(u._2)
       IOUtils.copy(i, fsDataOutputStream)
-      println(s"Downloaded ${u._2} into $baselinePath/${u._1}")
+      println(s"Saved file ${u._2} in path $baselinePath/${u._1}")
       fsDataOutputStream.close()
     }
 
@@ -216,6 +217,8 @@ object SparkCreateBaselineDataFrame {
         .mode(SaveMode.Overwrite)
         .save(s"$workingPath/baseline_dataset")
     }
+
+    log.info(s"saved dataset: '$workingPath/baseline_dataset'")
 
     val exported_dataset = spark.read.load(s"$workingPath/baseline_dataset").as[PMArticle]
     CollectionUtils.saveDataset(

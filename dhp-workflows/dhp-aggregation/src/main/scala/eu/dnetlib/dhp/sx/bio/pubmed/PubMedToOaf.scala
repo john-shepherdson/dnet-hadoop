@@ -309,6 +309,13 @@ object PubMedToOaf {
     } else
       result.setOriginalId(pidList.map(s => s.getValue).asJava)
 
+    if (article.getDoi != null) {
+      val normalizedPid = cleanDoi(article.getDoi)
+      if (normalizedPid != null) {
+        result.getOriginalId.add(IdentifierFactory.idFromPid("50", PidType.doi.toString, normalizedPid, true))
+      }
+    }
+
     result.setId(article.getPmid)
 
     // END RESULT MAPPING
