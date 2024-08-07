@@ -17,6 +17,7 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.types.StructType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,8 +77,8 @@ public class PrepareAffiliationRelations implements Serializable {
 		final String webcrawlInputPath = parser.get("webCrawlInputPath");
 		log.info("webcrawlInputPath: {}", webcrawlInputPath);
 
-		final String publisherlInputPath = parser.get("publisherlInputPath");
-		log.info("publisherlInputPath: {}", publisherlInputPath);
+		final String publisherInputPath = parser.get("publisherInputPath");
+		log.info("publisherInputPath: {}", publisherInputPath);
 
 		final String outputPath = parser.get("outputPath");
 		log.info("outputPath: {}", outputPath);
@@ -89,7 +90,7 @@ public class PrepareAffiliationRelations implements Serializable {
 			isSparkSessionManaged,
 			spark -> {
 				Constants.removeOutputDir(spark, outputPath);
-				createActionSet(spark, crossrefInputPath, pubmedInputPath, openapcInputPath, dataciteInputPath, webcrawlInputPath, publisherlInputPath, outputPath);
+				createActionSet(spark, crossrefInputPath, pubmedInputPath, openapcInputPath, dataciteInputPath, webcrawlInputPath, publisherInputPath, outputPath);
 			});
 	}
 
@@ -136,9 +137,11 @@ public class PrepareAffiliationRelations implements Serializable {
 
 	private static JavaPairRDD<Text,Text> prepareAffiliationRelationFromPublisher(SparkSession spark, String inputPath,
 																				  List<KeyValue> collectedfrom){
+
+
 		Dataset<Row> df = spark
 				.read()
-				.schema("`DOI` STRING, `Organizations` ARRAY<STRUCT<RORid`:STRING,`Confidence`:DOUBLE>>")
+				.schema("`DOI` STRING, `Organizations` ARRAY<STRUCT<`RORid`:STRING,`Confidence`:DOUBLE>>")
 				.json(inputPath)
 				.where("DOI is not null");
 
