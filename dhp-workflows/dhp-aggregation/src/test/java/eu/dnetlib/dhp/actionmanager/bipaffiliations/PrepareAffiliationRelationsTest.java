@@ -78,6 +78,10 @@ public class PrepareAffiliationRelationsTest {
 			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/doi_to_ror.json")
 			.getPath();
 
+		String publisherAffiliationRelationPath = getClass()
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/publishers")
+			.getPath();
+
 		String outputPath = workingDir.toString() + "/actionSet";
 
 		PrepareAffiliationRelations
@@ -89,6 +93,7 @@ public class PrepareAffiliationRelationsTest {
 					"-openapcInputPath", crossrefAffiliationRelationPath,
 					"-dataciteInputPath", crossrefAffiliationRelationPath,
 					"-webCrawlInputPath", crossrefAffiliationRelationPath,
+					"-publisherInputPath", publisherAffiliationRelationPath,
 					"-outputPath", outputPath
 				});
 
@@ -105,7 +110,7 @@ public class PrepareAffiliationRelationsTest {
 //            );
 //        }
 		// count the number of relations
-		assertEquals(120, tmp.count());
+		assertEquals(138, tmp.count());
 
 		Dataset<Relation> dataset = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
 		dataset.createOrReplaceTempView("result");
@@ -116,7 +121,7 @@ public class PrepareAffiliationRelationsTest {
 		// verify that we have equal number of bi-directional relations
 		Assertions
 			.assertEquals(
-				60, execVerification
+				69, execVerification
 					.filter(
 						"relClass='" + ModelConstants.HAS_AUTHOR_INSTITUTION + "'")
 					.collectAsList()
@@ -124,7 +129,7 @@ public class PrepareAffiliationRelationsTest {
 
 		Assertions
 			.assertEquals(
-				60, execVerification
+				69, execVerification
 					.filter(
 						"relClass='" + ModelConstants.IS_AUTHOR_INSTITUTION_OF + "'")
 					.collectAsList()
@@ -145,5 +150,11 @@ public class PrepareAffiliationRelationsTest {
 					.get(0)
 					.getString(4));
 
+
+		final String publisherid = ID_PREFIX + IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1007/s00217-010-1268-9"));
+		final String rorId = "20|ror_________::" + IdentifierFactory.md5("https://ror.org/03265fv13");
+
+		Assertions.assertEquals(1, execVerification.filter("source = '" + publisherid + "' and target = '" + rorId +"'").count()
+				);
 	}
 }
