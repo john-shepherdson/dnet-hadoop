@@ -313,7 +313,7 @@ public class ExtractPerson implements Serializable {
 	}
 
 	private static Relation getAffiliationRelation(Employment row) {
-		String source = PERSON_PREFIX + IdentifierFactory.md5(row.getOrcid());
+		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(row.getOrcid());
 		String target = ROR_PREFIX
 			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", row.getAffiliationId().getValue()));
 		List<KeyValue> properties = new ArrayList<>();
