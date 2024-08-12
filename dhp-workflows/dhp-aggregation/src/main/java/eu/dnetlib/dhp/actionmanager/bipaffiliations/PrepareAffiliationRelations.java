@@ -129,7 +129,8 @@ public class PrepareAffiliationRelations implements Serializable {
 		Dataset<Row> df = spark
 			.read()
 			.schema("`DOI` STRING, `Matchings` ARRAY<STRUCT<`RORid`:STRING,`Confidence`:DOUBLE>>")
-			.json(inputPath);
+			.json(inputPath)
+			.where("DOI is not null");
 
 		// unroll nested arrays
 		df = df
