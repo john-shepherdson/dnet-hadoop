@@ -457,18 +457,6 @@
 		<message>Error formatting json files, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
 	</kill>
 
-	<kill name="bip-formatting-fail">
-		<message>Error formatting BIP files, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-	</kill>
-
-	<kill name="synonym-collection-fail">
-		<message>Synonym collection failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-	</kill>
-
-	<kill name="map-scores-fail">
-		<message>Mapping scores to DOIs failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-	</kill>
-
 	<kill name="actionset-delete-fail">
 		<message>Deleting output path for actionsets failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
 	</kill>
