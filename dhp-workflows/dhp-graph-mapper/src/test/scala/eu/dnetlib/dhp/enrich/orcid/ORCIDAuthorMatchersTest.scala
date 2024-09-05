@@ -31,6 +31,7 @@ class ORCIDAuthorMatchersTest {
     assertTrue(matchOrderedTokenAndAbbreviations("孙林 Sun Lin", "Sun Lin"))
     // assertTrue(AuthorsMatchRevised.compare("孙林 Sun Lin", "孙林")); // not yet implemented
   }
+
   @Test def testDocumentationNames(): Unit = {
     assertTrue(matchOrderedTokenAndAbbreviations("James C. A. Miller-Jones", "James Antony Miller-Jones"))
   }

@@ -10,12 +10,12 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.jayway.jsonpath.Criteria;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.jayway.jsonpath.Criteria;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
@@ -122,7 +122,6 @@ public class ResultTagger implements Serializable {
 
 //adding code for tagging of results searching supplementaryMaterial
 		final Set<String> tags = new HashSet<>();
-
 
 		taggingConstraints.getTags().forEach(t -> {
 			if (t.getCriteria().stream().anyMatch(crit -> crit.verifyCriteria(param)))
@@ -263,16 +262,18 @@ public class ResultTagger implements Serializable {
 		tags.forEach(t -> {
 			Context con = new Context();
 			con.setId(t);
-			con.setDataInfo(Arrays
-				.asList(
-					OafMapperUtils
-						.dataInfo(
-							false, ANNOTATION_DATA_INFO_TYPE, true, false,
+			con
+				.setDataInfo(
+					Arrays
+						.asList(
 							OafMapperUtils
-								.qualifier(
-									CLASS_ID_ANNOTATION, CLASS_NAME_ANNOTATION, DNET_PROVENANCE_ACTIONS,
-									DNET_PROVENANCE_ACTIONS),
-							TAGGING_TRUST)));
+								.dataInfo(
+									false, ANNOTATION_DATA_INFO_TYPE, true, false,
+									OafMapperUtils
+										.qualifier(
+											CLASS_ID_ANNOTATION, CLASS_NAME_ANNOTATION, DNET_PROVENANCE_ACTIONS,
+											DNET_PROVENANCE_ACTIONS),
+									TAGGING_TRUST)));
 			result.getContext().add(con);
 		});
 

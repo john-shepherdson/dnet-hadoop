@@ -2016,6 +2016,4 @@ public class BulkTagJobTest {
 
 	}
 
-
-
 }
