@@ -6,7 +6,18 @@
         <artifactId>dhp-workflows</artifactId>
         <version>1.2.5-SNAPSHOT</version>
     </parent>
+
     <artifactId>dhp-aggregation</artifactId>
+
+    <properties>
+        <affro.release.version>1.0.0</affro.release.version>
+    </properties>
+
+    <scm>
+        <url>https://code-repo.d4science.org/mkallipo/affRo</url>
+        <connection>scm:git:https://code-repo.d4science.org/mkallipo/affRo.git</connection>
+    </scm>
+
     <build>
         <plugins>
             <plugin>
@@ -43,6 +54,28 @@
                     <scalaVersion>${scala.version}</scalaVersion>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-scm-plugin</artifactId>
+                <version>1.8.1</version>
+                <configuration>
+                    <connectionType>connection</connectionType>
+                    <scmVersionType>tag</scmVersionType><!-- 'branch' can also be provided here -->
+                    <scmVersion>${affro.release.version}</scmVersion><!-- in case of scmVersionType == 'branch', this field points to the branch name -->
+                    <checkoutDirectory>${project.build.directory}/${oozie.package.file.name}/${oozieAppDir}/affRo</checkoutDirectory>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>checkout-affro</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>checkout</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
 
     </build>

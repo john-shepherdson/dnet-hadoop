@@ -1,30 +1,5 @@
 <workflow-app name="AffroAffiliations" xmlns="uri:oozie:workflow:0.5">
     <parameters>
-
-<!--        <property>-->
-<!--            <name>crossrefInputPath</name>-->
-<!--            <description>the path where to find the inferred affiliation relations from Crossref</description>-->
-<!--        </property>-->
-<!--        <property>-->
-<!--            <name>pubmedInputPath</name>-->
-<!--            <description>the path where to find the inferred affiliation relations from Pubmed</description>-->
-<!--        </property>-->
-<!--        <property>-->
-<!--            <name>openapcInputPath</name>-->
-<!--            <description>the path where to find the inferred affiliation relations from OpenAPC</description>-->
-<!--        </property>-->
-<!--        <property>-->
-<!--            <name>dataciteInputPath</name>-->
-<!--            <description>the path where to find the inferred affiliation relations from Datacite</description>-->
-<!--        </property>-->
-<!--        <property>-->
-<!--            <name>webCrawlInputPath</name>-->
-<!--            <description>the path where to find the inferred affiliation relations from webCrawl</description>-->
-<!--        </property>-->
-<!--        <property>-->
-<!--            <name>outputPath</name>-->
-<!--            <description>the path where to store the actionset</description>-->
-<!--        </property>-->
         <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
@@ -93,7 +68,7 @@
             <master>yarn-cluster</master>
             <mode>cluster</mode>
             <name>Affiliations inference (Affro)</name>
-            <jar>affro_spark.py</jar>
+            <jar>update_records.py</jar>
 
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -107,13 +82,13 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=python3
                 --conf spark.executorEnv.PYSPARK_PYTHON=python3
-                --py-files ${wfAppPath}/affro_cluster.py,${wfAppPath}/create_input_cluster.py,${wfAppPath}/functions_cluster.py,${wfAppPath}/matching_cluster.py
-                --files ${wfAppPath}/dictionaries/dix_acad.json,${wfAppPath}/dictionaries/dix_categ.json,${wfAppPath}/dictionaries/dix_city.json,${wfAppPath}/dictionaries/dix_country.json,${wfAppPath}/dictionaries/dix_mult.json,${wfAppPath}/txt_files/city_names.txt,${wfAppPath}/txt_files/remove_list.txt,${wfAppPath}/txt_files/stop_words.txt,${wfAppPath}/txt_files/university_terms.txt
+                --py-files ${wfAppPath}/affRo/affro_cluster.py,${wfAppPath}/affRo/affro_test_example.py,${wfAppPath}/affRo/create_input_cluster.py,${wfAppPath}/affRo/functions_cluster.py,${wfAppPath}/affRo/matching_cluster.py
+                --files ${wfAppPath}/affRo/dictionaries/dix_acad.json,${wfAppPath}/affRo/dictionaries/dix_categ.json,${wfAppPath}/affRo/dictionaries/dix_city.json,${wfAppPath}/affRo/dictionaries/dix_country.json,${wfAppPath}/affRo/dictionaries/dix_mult.json,${wfAppPath}/affRo/txt_files/city_names.txt,${wfAppPath}/affRo/txt_files/remove_list.txt,${wfAppPath}/affRo/txt_files/stop_words.txt,${wfAppPath}/affRo/txt_files/university_terms.txt
             </spark-opts>
 
             <arg>${resultFolder}</arg>
 
-            <file>${wfAppPath}/affro_spark.py#affro_spark.py</file>
+            <file>${wfAppPath}/affRo/update_records.py#update_records.py</file>
         </spark>
 
         <ok to="End" />
