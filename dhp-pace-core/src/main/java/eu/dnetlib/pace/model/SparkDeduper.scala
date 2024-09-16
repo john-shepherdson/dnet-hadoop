@@ -19,46 +19,8 @@ case class SparkDeduper(conf: DedupConfig) extends Serializable {
   val model: SparkModel = SparkModel(conf)
 
   val dedup: (Dataset[Row] => Dataset[Row]) = df => {
-    df.transform(filterAndCleanup)
-      .transform(generateClustersWithCollect)
+    df.transform(generateClustersWithCollect)
       .transform(processBlocks)
-  }
-
-
-  val filterAndCleanup: (Dataset[Row] => Dataset[Row]) = df => {
-    val df_with_filters = conf.getPace.getModel.asScala.foldLeft(df)((res, fdef) => {
-      if (conf.blacklists.containsKey(fdef.getName)) {
-        res.withColumn(
-          fdef.getName + "_filtered",
-          filterColumnUDF(fdef).apply(new Column(fdef.getName))
-        )
-      } else {
-        res
-      }
-    })
-
-    df_with_filters
-  }
-
-  def filterColumnUDF(fdef: FieldDef): UserDefinedFunction = {
-    val blacklist: Predicate[String] = conf.blacklists().get(fdef.getName)
-
-    if (blacklist == null) {
-      throw new IllegalArgumentException("Column: " + fdef.getName + " does not have any filter")
-    } else {
-      fdef.getType match {
-        case Type.List | Type.JSON =>
-          udf[Array[String], Array[String]](values => {
-            values.filter((v: String) => !blacklist.test(v))
-          })
-
-        case _ =>
-          udf[String, String](v => {
-            if (blacklist.test(v)) ""
-            else v
-          })
-      }
-    }
   }
 
   val generateClustersWithCollect: (Dataset[Row] => Dataset[Row]) = df_with_filters => {

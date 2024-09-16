@@ -327,4 +327,16 @@ public class ComparatorTest extends AbstractPaceTest {
 
 	}
 
+	@Test
+	public void titleVersionMatchTest() {
+
+		TitleVersionMatch titleVersionMatch = new TitleVersionMatch(params);
+
+		double result = titleVersionMatch
+			.compare(
+				"parp 2 regulates sirt 1 expression and whole body energy expenditure",
+				"parp 2 regulates sirt 1 expression and whole body energy expenditure", conf);
+		assertEquals(1.0, result);
+	}
+
 }
