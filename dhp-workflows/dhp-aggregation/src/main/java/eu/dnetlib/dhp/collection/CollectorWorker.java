@@ -22,6 +22,7 @@ import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.base.BaseCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.file.FileCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.file.FileGZipCollectorPlugin;
+import eu.dnetlib.dhp.collection.plugin.gtr2.Gtr2PublicationsCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.mongodb.MDStoreCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.mongodb.MongoDbDumpCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.oai.OaiCollectorPlugin;
@@ -58,7 +59,7 @@ public class CollectorWorker extends ReportingJob {
 
 	public void collect() throws UnknownCollectorPluginException, CollectorException, IOException {
 
-		final String outputPath = mdStoreVersion.getHdfsPath() + SEQUENCE_FILE_NAME;
+		final String outputPath = this.mdStoreVersion.getHdfsPath() + SEQUENCE_FILE_NAME;
 		log.info("outputPath path is {}", outputPath);
 
 		final CollectorPlugin plugin = getCollectorPlugin();
@@ -68,36 +69,36 @@ public class CollectorWorker extends ReportingJob {
 
 		try (SequenceFile.Writer writer = SequenceFile
 			.createWriter(
-				fileSystem.getConf(),
-				SequenceFile.Writer.file(new Path(outputPath)),
-				SequenceFile.Writer.keyClass(IntWritable.class),
-				SequenceFile.Writer.valueClass(Text.class),
+				this.fileSystem.getConf(), SequenceFile.Writer.file(new Path(outputPath)), SequenceFile.Writer
+					.keyClass(IntWritable.class),
+				SequenceFile.Writer
+					.valueClass(Text.class),
 				SequenceFile.Writer.compression(SequenceFile.CompressionType.BLOCK, new DeflateCodec()))) {
 			final IntWritable key = new IntWritable(counter.get());
 			final Text value = new Text();
 			plugin
-				.collect(api, report)
-				.forEach(
-					content -> {
-						key.set(counter.getAndIncrement());
-						value.set(content);
-						try {
-							writer.append(key, value);
-						} catch (Throwable e) {
-							throw new RuntimeException(e);
-						}
-					});
-		} catch (Throwable e) {
-			report.put(e.getClass().getName(), e.getMessage());
+				.collect(this.api, this.report)
+				.forEach(content -> {
+					key.set(counter.getAndIncrement());
+					value.set(content);
+					try {
+						writer.append(key, value);
+					} catch (final Throwable e) {
+						throw new RuntimeException(e);
+					}
+				});
+		} catch (final Throwable e) {
+			this.report.put(e.getClass().getName(), e.getMessage());
 			throw new CollectorException(e);
 		} finally {
 			shutdown();
-			report.ongoing(counter.longValue(), counter.longValue());
+			this.report.ongoing(counter.longValue(), counter.longValue());
 		}
 	}
 
-	private void scheduleReport(AtomicInteger counter) {
+	private void scheduleReport(final AtomicInteger counter) {
 		schedule(new ReporterCallback() {
+
 			@Override
 			public Long getCurrent() {
 				return counter.longValue();
@@ -112,33 +113,35 @@ public class CollectorWorker extends ReportingJob {
 
 	private CollectorPlugin getCollectorPlugin() throws UnknownCollectorPluginException {
 
-		switch (CollectorPlugin.NAME.valueOf(api.getProtocol())) {
+		switch (CollectorPlugin.NAME.valueOf(this.api.getProtocol())) {
 			case oai:
-				return new OaiCollectorPlugin(clientParams);
+				return new OaiCollectorPlugin(this.clientParams);
 			case rest_json2xml:
-				return new RestCollectorPlugin(clientParams);
+				return new RestCollectorPlugin(this.clientParams);
 			case file:
-				return new FileCollectorPlugin(fileSystem);
+				return new FileCollectorPlugin(this.fileSystem);
 			case fileGzip:
-				return new FileGZipCollectorPlugin(fileSystem);
+				return new FileGZipCollectorPlugin(this.fileSystem);
 			case baseDump:
 				return new BaseCollectorPlugin(this.fileSystem);
+			case gtr2Publications:
+				return new Gtr2PublicationsCollectorPlugin(this.clientParams);
 			case other:
 				final CollectorPlugin.NAME.OTHER_NAME plugin = Optional
-					.ofNullable(api.getParams().get("other_plugin_type"))
+					.ofNullable(this.api.getParams().get("other_plugin_type"))
 					.map(CollectorPlugin.NAME.OTHER_NAME::valueOf)
 					.orElseThrow(() -> new IllegalArgumentException("invalid other_plugin_type"));
 
 				switch (plugin) {
 					case mdstore_mongodb_dump:
-						return new MongoDbDumpCollectorPlugin(fileSystem);
+						return new MongoDbDumpCollectorPlugin(this.fileSystem);
 					case mdstore_mongodb:
 						return new MDStoreCollectorPlugin();
 					default:
 						throw new UnknownCollectorPluginException("plugin is not managed: " + plugin);
 				}
 			default:
-				throw new UnknownCollectorPluginException("protocol is not managed: " + api.getProtocol());
+				throw new UnknownCollectorPluginException("protocol is not managed: " + this.api.getProtocol());
 		}
 	}
 
