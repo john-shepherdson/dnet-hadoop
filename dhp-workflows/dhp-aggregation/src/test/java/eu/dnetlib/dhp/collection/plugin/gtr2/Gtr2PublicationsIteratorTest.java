@@ -48,16 +48,16 @@ class Gtr2PublicationsIteratorTest {
 	public void testOnePage() throws Exception {
 		final Iterator<String> iterator = new Gtr2PublicationsIterator(baseURL, null, "12", "12", clientParams);
 		final int count = iterateAndCount(iterator);
-		assertEquals(21, count);
+		assertEquals(20, count);
 	}
 
 	@Test
 	@Disabled
 	public void testIncrementalHarvestingNoRecords() throws Exception {
 		System.out.println("incremental Harvesting");
-		final Iterator<String> iterator = new Gtr2PublicationsIterator(baseURL, "2050-12-12", "11", "13", clientParams);
+		final Iterator<String> iterator = new Gtr2PublicationsIterator(baseURL, "2050-12-12T", "11", "13", clientParams);
 		final int count = iterateAndCount(iterator);
-		assertEquals(1, count);
+		assertEquals(0, count);
 	}
 
 	@Test
@@ -66,7 +66,7 @@ class Gtr2PublicationsIteratorTest {
 		System.out.println("incremental Harvesting");
 		final Iterator<String> iterator = new Gtr2PublicationsIterator(baseURL, "2016-11-30", "11", "11", clientParams);
 		final int count = iterateAndCount(iterator);
-		assertEquals(21, count);
+		assertEquals(20, count);
 	}
 
 	@Test

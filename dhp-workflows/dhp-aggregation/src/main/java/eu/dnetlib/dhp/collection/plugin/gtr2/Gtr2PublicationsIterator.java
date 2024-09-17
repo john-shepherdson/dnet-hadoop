@@ -199,12 +199,10 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 	}
 
 	private DateTime parseDate(final String s) {
-		// I expect dates in the format 'yyyy-MM-dd'. See class
-		// eu.dnetlib.msro.workflows.nodes.collect.FindDateRangeForIncrementalHarvestingJobNode
-		return DateTime.parse(s.substring(0, s.indexOf("T")), simpleDateTimeFormatter);
+		return DateTime.parse(s.contains("T") ? s.substring(0, s.indexOf("T")) : s, simpleDateTimeFormatter);
 	}
 
 	private boolean isAfter(final String d, final DateTime fromDate) {
-		return parseDate(d).isAfter(fromDate);
+		return StringUtils.isNotBlank(d) && parseDate(d).isAfter(fromDate);
 	}
 }
