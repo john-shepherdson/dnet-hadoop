@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.collection.plugin.rest;
+package eu.dnetlib.dhp.collection.plugin.osf;
 
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,9 +18,9 @@ import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 import eu.dnetlib.dhp.common.collection.CollectorException;
 import eu.dnetlib.dhp.common.collection.HttpClientParams;
 
-public class OsfPreprintCollectorTest {
+public class OsfPreprintsCollectorPluginTest {
 
-	private static final Logger log = LoggerFactory.getLogger(OsfPreprintCollectorTest.class);
+	private static final Logger log = LoggerFactory.getLogger(OsfPreprintsCollectorPlugin.class);
 
 	private final String baseUrl = "https://api.osf.io/v2/preprints/";
 
@@ -29,50 +29,28 @@ public class OsfPreprintCollectorTest {
 	// private final String authToken = "";
 	// private final String resultOutputFormat = "";
 
-	private final String queryParams = "filter:is_published:d=true";
-
-	private final String entityXpath = "/*/*[local-name()='data']";
-
-	private final String resultTotalXpath = "/*/*[local-name()='links']/*[local-name()='meta']/*[local-name()='total']";
-
-	private final String resumptionParam = "page";
-	private final String resumptionType = "scan";
-	private final String resumptionXpath = "substring-before(substring-after(/*/*[local-name()='links']/*[local-name()='next'], 'page='), '&')";
-
-	private final String resultSizeParam = "page[size]";
-	private final String resultSizeValue = "100";
-
-	private final String resultFormatParam = "format";
-	private final String resultFormatValue = "json";
+	private final int pageSize = 100;
 
 	private final ApiDescriptor api = new ApiDescriptor();
-	private RestCollectorPlugin rcp;
+
+	private OsfPreprintsCollectorPlugin plugin;
 
 	@BeforeEach
 	public void setUp() {
 		final HashMap<String, String> params = new HashMap<>();
-		params.put("resumptionType", this.resumptionType);
-		params.put("resumptionParam", this.resumptionParam);
-		params.put("resumptionXpath", this.resumptionXpath);
-		params.put("resultTotalXpath", this.resultTotalXpath);
-		params.put("resultFormatParam", this.resultFormatParam);
-		params.put("resultFormatValue", this.resultFormatValue);
-		params.put("resultSizeParam", this.resultSizeParam);
-		params.put("resultSizeValue", this.resultSizeValue);
-		params.put("queryParams", this.queryParams);
-		params.put("entityXpath", this.entityXpath);
+		params.put("pageSize", "" + this.pageSize);
 
 		this.api.setBaseUrl(this.baseUrl);
 		this.api.setParams(params);
 
-		this.rcp = new RestCollectorPlugin(new HttpClientParams());
+		this.plugin = new OsfPreprintsCollectorPlugin(new HttpClientParams());
 	}
 
 	@Test
 	@Disabled
 	void test_limited() throws CollectorException {
 		final AtomicInteger i = new AtomicInteger(0);
-		final Stream<String> stream = this.rcp.collect(this.api, new AggregatorReport());
+		final Stream<String> stream = this.plugin.collect(this.api, new AggregatorReport());
 
 		stream.limit(2000).forEach(s -> {
 			Assertions.assertTrue(s.length() > 0);
@@ -88,7 +66,7 @@ public class OsfPreprintCollectorTest {
 	@Disabled
 	void test_all() throws CollectorException {
 		final AtomicLong i = new AtomicLong(0);
-		final Stream<String> stream = this.rcp.collect(this.api, new AggregatorReport());
+		final Stream<String> stream = this.plugin.collect(this.api, new AggregatorReport());
 
 		stream.forEach(s -> {
 			Assertions.assertTrue(s.length() > 0);
