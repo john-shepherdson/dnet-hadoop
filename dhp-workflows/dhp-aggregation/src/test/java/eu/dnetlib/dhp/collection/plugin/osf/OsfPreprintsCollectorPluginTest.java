@@ -24,11 +24,6 @@ public class OsfPreprintsCollectorPluginTest {
 
 	private final String baseUrl = "https://api.osf.io/v2/preprints/";
 
-	// private final String requestHeaderMap = "";
-	// private final String authMethod = "";
-	// private final String authToken = "";
-	// private final String resultOutputFormat = "";
-
 	private final int pageSize = 100;
 
 	private final ApiDescriptor api = new ApiDescriptor();

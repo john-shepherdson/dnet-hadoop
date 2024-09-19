@@ -10,8 +10,6 @@ import java.util.stream.StreamSupport;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
-import com.google.gson.Gson;
-
 import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.collection.plugin.CollectorPlugin;
 import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
@@ -31,8 +29,6 @@ public class OsfPreprintsCollectorPlugin implements CollectorPlugin {
 	@Override
 	public Stream<String> collect(final ApiDescriptor api, final AggregatorReport report) throws CollectorException {
 		final String baseUrl = api.getBaseUrl();
-
-		final Gson gson = new Gson();
 
 		final int pageSize = Optional
 				.ofNullable(api.getParams().get("pageSize"))
