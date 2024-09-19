@@ -29,9 +29,12 @@ public class Gtr2PublicationsCollectorPlugin implements CollectorPlugin {
 		final String endPage = api.getParams().get("endPage");
 		final String fromDate = api.getParams().get("fromDate");
 
-		if ((fromDate != null) && !fromDate.matches("\\d{4}-\\d{2}-\\d{2}")) { throw new CollectorException("Invalid date (YYYY-MM-DD): " + fromDate); }
+		if ((fromDate != null) && !fromDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
+			throw new CollectorException("Invalid date (YYYY-MM-DD): " + fromDate);
+		}
 
-		final Iterator<String> iterator = new Gtr2PublicationsIterator(baseUrl, fromDate, startPage, endPage, this.clientParams);
+		final Iterator<String> iterator = new Gtr2PublicationsIterator(baseUrl, fromDate, startPage, endPage,
+			this.clientParams);
 		final Spliterator<String> spliterator = Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED);
 
 		return StreamSupport.stream(spliterator, false);

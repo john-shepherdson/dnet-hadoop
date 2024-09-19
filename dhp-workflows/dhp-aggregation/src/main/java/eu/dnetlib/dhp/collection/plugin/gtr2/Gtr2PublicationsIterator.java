@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.collection.plugin.gtr2;
 
 import java.util.ArrayList;
@@ -48,9 +49,10 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 
 	private String nextElement;
 
-	public Gtr2PublicationsIterator(final String baseUrl, final String fromDate, final String startPage, final String endPage,
-			final HttpClientParams clientParams)
-			throws CollectorException {
+	public Gtr2PublicationsIterator(final String baseUrl, final String fromDate, final String startPage,
+		final String endPage,
+		final HttpClientParams clientParams)
+		throws CollectorException {
 
 		this.baseUrl = baseUrl;
 		this.currPage = NumberUtils.toInt(startPage, 1);
@@ -120,7 +122,8 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 		return res;
 	}
 
-	private void addLinkedEntities(final Element master, final String relType, final Element newRoot, final Function<Document, Element> mapper) {
+	private void addLinkedEntities(final Element master, final String relType, final Element newRoot,
+		final Function<Document, Element> mapper) {
 
 		for (final Object o : master.selectNodes(".//*[local-name()='link']")) {
 			final String rel = ((Element) o).valueOf("@*[local-name()='rel']");
@@ -149,7 +152,7 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 
 	private boolean filterIncremental(final Element e) {
 		if (!this.incremental || isAfter(e.valueOf("@*[local-name() = 'created']"), this.fromDate)
-				|| isAfter(e.valueOf("@*[local-name() = 'updated']"), this.fromDate)) {
+			|| isAfter(e.valueOf("@*[local-name() = 'updated']"), this.fromDate)) {
 			return true;
 		}
 		return false;
@@ -165,7 +168,9 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 	private Element asProjectElement(final Document doc) {
 		final Element newOrg = DocumentHelper.createElement("project");
 		newOrg.addElement("id").setText(doc.valueOf("/*/@*[local-name()='id']"));
-		newOrg.addElement("code").setText(doc.valueOf("//*[local-name()='identifier' and @*[local-name()='type'] = 'RCUK']"));
+		newOrg
+			.addElement("code")
+			.setText(doc.valueOf("//*[local-name()='identifier' and @*[local-name()='type'] = 'RCUK']"));
 		newOrg.addElement("title").setText(doc.valueOf("//*[local-name()='title']"));
 		return newOrg;
 	}
@@ -188,7 +193,9 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 			return DocumentHelper.parseText(new String(bytes));
 		} catch (final Throwable e) {
 			log.error("Error dowloading url: " + cleanUrl + ", attempt = " + attempt, e);
-			if (attempt >= MAX_ATTEMPTS) { throw new RuntimeException("Error dowloading url: " + cleanUrl, e); }
+			if (attempt >= MAX_ATTEMPTS) {
+				throw new RuntimeException("Error dowloading url: " + cleanUrl, e);
+			}
 			try {
 				Thread.sleep(60000); // I wait for a minute
 			} catch (final InterruptedException e1) {
