@@ -20,7 +20,6 @@ import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import eu.dnetlib.dhp.oa.provision.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -42,6 +41,7 @@ import com.google.common.collect.Sets;
 import com.mycila.xmltool.XMLDoc;
 import com.mycila.xmltool.XMLTag;
 
+import eu.dnetlib.dhp.oa.provision.model.*;
 import eu.dnetlib.dhp.schema.common.*;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.Result;
@@ -1036,6 +1036,42 @@ public class XmlRecordFactory implements Serializable {
 				}
 
 				break;
+			case person:
+				final Person person = (Person) entity;
+
+				if (person.getGivenName() != null) {
+					metadata.add(XmlSerializationUtils.asXmlElement("givenname", person.getGivenName()));
+				}
+				if (person.getFamilyName() != null) {
+					metadata.add(XmlSerializationUtils.asXmlElement("familyname", person.getFamilyName()));
+				}
+				if (person.getAlternativeNames() != null) {
+					metadata.addAll(person.getAlternativeNames());
+				}
+				if (person.getBiography() != null) {
+					metadata.add(XmlSerializationUtils.asXmlElement("biography", person.getBiography()));
+				}
+				if (person.getSubject() != null) {
+					metadata
+						.addAll(
+							person
+								.getSubject()
+								.stream()
+								.map(pt -> {
+									List<Tuple2<String, String>> attrs = Lists.newArrayList();
+									attrs.add(new Tuple2<>("schema", pt.getSchema()));
+									attrs.add(new Tuple2<>("value", pt.getValue()));
+									attrs.add(new Tuple2<>("fromYear", String.valueOf(pt.getFromYear())));
+									attrs.add(new Tuple2<>("toYear", String.valueOf(pt.getToYear())));
+									return XmlSerializationUtils.asXmlElement("subject", attrs);
+								})
+								.collect(Collectors.toList()));
+				}
+				if (person.getConsent() != null) {
+					metadata.add(XmlSerializationUtils.asXmlElement("consent", String.valueOf(person.getConsent())));
+				}
+
+				break;
 			default:
 				throw new IllegalArgumentException("invalid entity type: " + type);
 		}
@@ -1237,6 +1273,25 @@ public class XmlRecordFactory implements Serializable {
 								.stream()
 								.peek(ft -> fillContextMap(ft, contexts))
 								.map(ft -> getRelFundingTree(ft))
+								.collect(Collectors.toList()));
+				}
+				break;
+
+			case person:
+
+				if (isNotBlank(re.getGivenName())) {
+					metadata.add(XmlSerializationUtils.asXmlElement("givenname", re.getGivenName()));
+				}
+				if (isNotBlank(re.getFamilyName())) {
+					metadata.add(XmlSerializationUtils.asXmlElement("familyname", re.getFamilyName()));
+				}
+				if (re.getAlternativeNames() != null && !re.getAlternativeNames().isEmpty()) {
+					metadata
+						.addAll(
+							re
+								.getAlternativeNames()
+								.stream()
+								.map(name -> XmlSerializationUtils.asXmlElement("alternativename", name))
 								.collect(Collectors.toList()));
 				}
 				break;

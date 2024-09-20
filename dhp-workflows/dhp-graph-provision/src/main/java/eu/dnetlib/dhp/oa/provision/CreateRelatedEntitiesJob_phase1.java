@@ -232,6 +232,14 @@ public class CreateRelatedEntitiesJob_phase1 {
 					re.setFundingtree(f.stream().map(Field::getValue).collect(Collectors.toList()));
 				}
 				break;
+			case person:
+				final Person person = (Person) entity;
+
+				re.setGivenName(person.getGivenName());
+				re.setFamilyName(person.getFamilyName());
+				re.setAlternativeNames(person.getAlternativeNames());
+
+				break;
 		}
 		return re;
 	}

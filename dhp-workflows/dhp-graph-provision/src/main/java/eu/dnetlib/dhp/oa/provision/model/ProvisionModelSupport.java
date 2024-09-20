@@ -5,7 +5,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.solr.Person;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -38,6 +37,8 @@ import eu.dnetlib.dhp.schema.solr.Measure;
 import eu.dnetlib.dhp.schema.solr.OpenAccessColor;
 import eu.dnetlib.dhp.schema.solr.OpenAccessRoute;
 import eu.dnetlib.dhp.schema.solr.Organization;
+import eu.dnetlib.dhp.schema.solr.Person;
+import eu.dnetlib.dhp.schema.solr.PersonTopic;
 import eu.dnetlib.dhp.schema.solr.Pid;
 import eu.dnetlib.dhp.schema.solr.Project;
 import eu.dnetlib.dhp.schema.solr.Result;
@@ -193,6 +194,10 @@ public class ProvisionModelSupport {
 		ps.setFamilyName(p.getFamilyName());
 		ps.setGivenName(p.getGivenName());
 		ps.setAlternativeNames(p.getAlternativeNames());
+		ps.setBiography(p.getBiography());
+		ps.setConsent(p.getConsent());
+		// ps.setSubject(...));
+
 		return ps;
 	}
 
