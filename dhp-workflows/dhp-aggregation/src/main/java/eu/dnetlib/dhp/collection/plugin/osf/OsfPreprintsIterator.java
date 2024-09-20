@@ -8,6 +8,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.dom4j.Node;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +54,7 @@ public class OsfPreprintsIterator implements Iterator<String> {
 		synchronized (this.recordQueue) {
 			while (this.recordQueue.isEmpty() && !this.currentUrl.isEmpty()) {
 				try {
-					this.currentUrl = downloadPage(this.currentUrl, 0);
+					this.currentUrl = downloadPage(this.currentUrl);
 				} catch (final CollectorException e) {
 					log.debug("CollectorPlugin.next()-Exception: {}", e);
 					throw new RuntimeException(e);
@@ -73,8 +74,36 @@ public class OsfPreprintsIterator implements Iterator<String> {
 		}
 	}
 
-	private String downloadPage(final String url, final int attempt) throws CollectorException {
+	private String downloadPage(final String url) throws CollectorException {
 
+		final Document doc = downloadUrl(url, 0);
+
+		for (final Object o : doc.selectNodes("/*/data")) {
+
+			final Element n = (Element) ((Element) o).detach();
+
+			final Element group = DocumentHelper.createElement("group");
+			group.addAttribute("id", n.valueOf(".//data/id"));
+
+			group.addElement("preprint").add(n);
+
+			for (final Object o1 : n.selectNodes(".//contributors//href")) {
+				final Document doc1 = downloadUrl(((Node) o1).getText(), 0);
+				group.addElement("contributors").add(doc1.getRootElement().detach());
+			}
+			for (final Object o1 : n.selectNodes(".//primary_file//href")) {
+				final Document doc1 = downloadUrl(((Node) o1).getText(), 0);
+				group.addElement("primary_file").add(doc1.getRootElement().detach());
+			}
+
+			this.recordQueue.add(DocumentHelper.createDocument(group).asXML());
+		}
+
+		return doc.valueOf("/*/links/next");
+
+	}
+
+	private Document downloadUrl(final String url, final int attempt) throws CollectorException {
 		if (attempt > MAX_ATTEMPTS) { throw new CollectorException("Max Number of attempts reached, url:" + url); }
 
 		if (attempt > 0) {
@@ -95,28 +124,10 @@ public class OsfPreprintsIterator implements Iterator<String> {
 			final String json = connector.getInputSource(url);
 			final String xml = JsonUtils.convertToXML(json);
 
-			final Document doc = DocumentHelper.parseText(xml);
-
-			for (final Object o : doc.selectNodes("/*/*[local-name()='data']")) {
-				final Element n = (Element) ((Element) o).detach();
-
-				for (final Object o1 : n.selectNodes(".//contributors//href")) {
-					// TODO ADD creators
-				}
-				for (final Object o1 : n.selectNodes(".//primary_file//href")) {
-					// TODO ADD fulltexts
-				}
-
-				this.recordQueue.add(DocumentHelper.createDocument(n).asXML());
-			}
-
-			return doc.valueOf("/*/*[local-name()='links']/*[local-name()='next']");
-
+			return DocumentHelper.parseText(xml);
 		} catch (final Throwable e) {
 			log.warn(e.getMessage(), e);
-			return downloadPage(url, attempt + 1);
+			return downloadUrl(url, attempt + 1);
 		}
-
 	}
-
 }

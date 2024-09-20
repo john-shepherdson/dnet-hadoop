@@ -43,6 +43,14 @@ public class OsfPreprintsCollectorPluginTest {
 
 	@Test
 	@Disabled
+	void test_one() throws CollectorException {
+		this.plugin.collect(this.api, new AggregatorReport())
+				.limit(1)
+				.forEach(log::info);
+	}
+
+	@Test
+	// @Disabled
 	void test_limited() throws CollectorException {
 		final AtomicInteger i = new AtomicInteger(0);
 		final Stream<String> stream = this.plugin.collect(this.api, new AggregatorReport());
