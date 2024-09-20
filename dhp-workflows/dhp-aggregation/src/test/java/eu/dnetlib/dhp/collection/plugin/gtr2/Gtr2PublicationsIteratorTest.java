@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.collection.plugin.gtr2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -55,7 +56,8 @@ class Gtr2PublicationsIteratorTest {
 	@Disabled
 	public void testIncrementalHarvestingNoRecords() throws Exception {
 		System.out.println("incremental Harvesting");
-		final Iterator<String> iterator = new Gtr2PublicationsIterator(baseURL, "2050-12-12T", "11", "13", clientParams);
+		final Iterator<String> iterator = new Gtr2PublicationsIterator(baseURL, "2050-12-12T", "11", "13",
+			clientParams);
 		final int count = iterateAndCount(iterator);
 		assertEquals(0, count);
 	}
