@@ -70,9 +70,8 @@ public class PrepareRelatedProjectsJob {
 
 			final Dataset<Relation> rels = ClusterUtils
 				.loadRelations(graphPath, spark)
-				.filter((FilterFunction<Relation>) r -> r.getDataInfo().getDeletedbyinference())
-				.filter((FilterFunction<Relation>) r -> r.getRelType().equals(ModelConstants.RESULT_PROJECT))
-				.filter((FilterFunction<Relation>) r -> !r.getRelClass().equals(BrokerConstants.IS_MERGED_IN_CLASS))
+				.filter((FilterFunction<Relation>) r -> ModelConstants.RESULT_PROJECT.equals(r.getRelType()))
+				.filter((FilterFunction<Relation>) r -> !BrokerConstants.IS_MERGED_IN_CLASS.equals(r.getRelClass()))
 				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getSource()))
 				.filter((FilterFunction<Relation>) r -> !ClusterUtils.isDedupRoot(r.getTarget()));
 
