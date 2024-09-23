@@ -1,6 +1,12 @@
 
 package eu.dnetlib.dhp.schema.oaf.utils;
 
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+
 public class ModelHardLimits {
 
 	private ModelHardLimits() {
@@ -19,6 +25,12 @@ public class ModelHardLimits {
 	public static final int MAX_ABSTRACT_LENGTH = 150000;
 	public static final int MAX_RELATED_ABSTRACT_LENGTH = 500;
 	public static final int MAX_INSTANCES = 10;
+	public static final Map<String, Integer> MAX_RELATIONS_BY_RELCLASS = Maps.newHashMap();
+
+	static {
+		MAX_RELATIONS_BY_RELCLASS.put(ModelConstants.PERSON_PERSON_HASCOAUTHORED, 500);
+		MAX_RELATIONS_BY_RELCLASS.put(ModelConstants.RESULT_PERSON_HASAUTHORED, 500);
+	}
 
 	public static String getCollectionName(String format) {
 		return format + SEPARATOR + LAYOUT + SEPARATOR + INTERPRETATION;

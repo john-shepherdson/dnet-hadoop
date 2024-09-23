@@ -1046,7 +1046,13 @@ public class XmlRecordFactory implements Serializable {
 					metadata.add(XmlSerializationUtils.asXmlElement("familyname", person.getFamilyName()));
 				}
 				if (person.getAlternativeNames() != null) {
-					metadata.addAll(person.getAlternativeNames());
+					metadata
+						.addAll(
+							person
+								.getAlternativeNames()
+								.stream()
+								.map(altName -> XmlSerializationUtils.asXmlElement("alternativename", altName))
+								.collect(Collectors.toList()));
 				}
 				if (person.getBiography() != null) {
 					metadata.add(XmlSerializationUtils.asXmlElement("biography", person.getBiography()));
