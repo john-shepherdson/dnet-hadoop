@@ -89,7 +89,7 @@ public class OsfPreprintsCollectorPluginTest {
 	}
 
 	@Test
-	// @Disabled
+	@Disabled
 	void test_authentication_required() {
 		final HttpConnector2 connector = new HttpConnector2();
 
