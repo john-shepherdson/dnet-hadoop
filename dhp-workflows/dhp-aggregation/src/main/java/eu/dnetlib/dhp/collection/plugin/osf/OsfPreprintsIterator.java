@@ -125,8 +125,13 @@ public class OsfPreprintsIterator implements Iterator<String> {
 			final String xml = JsonUtils.convertToXML(json);
 
 			return DocumentHelper.parseText(xml);
+
 		} catch (final Throwable e) {
 			log.warn(e.getMessage(), e);
+			if ((e instanceof CollectorException) && e.getMessage().contains("401")) {
+				final Element root = DocumentHelper.createElement("error_401_authorization_required");
+				return DocumentHelper.createDocument(root);
+			}
 			return downloadUrl(url, attempt + 1);
 		}
 	}
