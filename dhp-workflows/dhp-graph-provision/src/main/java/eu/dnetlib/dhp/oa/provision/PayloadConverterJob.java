@@ -160,12 +160,12 @@ public class PayloadConverterJob {
 			je.getLinks().forEach(link -> {
 				final String relClass = link.getRelation().getRelClass();
 
-				final Long count = freqs.getOrDefault(relClass, Long.MAX_VALUE);
+				final Long count = freqs.getOrDefault(relClass, 0L);
 				final Long max = MAX_RELATIONS_BY_RELCLASS.getOrDefault(relClass, Long.MAX_VALUE);
 
 				if (count <= max) {
 					rew.add(link);
-					freqs.put(relClass, freqs.get(relClass) + 1);
+					freqs.put(relClass, freqs.getOrDefault(relClass, 0L) + 1);
 				}
 			});
 			je.setLinks(rew);
