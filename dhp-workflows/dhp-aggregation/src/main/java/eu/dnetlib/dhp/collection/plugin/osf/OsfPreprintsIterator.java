@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -46,13 +47,14 @@ public class OsfPreprintsIterator implements Iterator<String> {
 
 	private void initQueue() {
 		this.currentUrl = this.baseUrl + "?filter:is_published:d=true&format=json&page[size]=" + this.pageSize;
+
 		log.info("REST calls starting with {}", this.currentUrl);
 	}
 
 	@Override
 	public boolean hasNext() {
 		synchronized (this.recordQueue) {
-			while (this.recordQueue.isEmpty() && !this.currentUrl.isEmpty()) {
+			while (this.recordQueue.isEmpty() && StringUtils.isNotBlank(this.currentUrl) && this.currentUrl.startsWith("http")) {
 				try {
 					this.currentUrl = downloadPage(this.currentUrl);
 				} catch (final CollectorException e) {
@@ -88,12 +90,18 @@ public class OsfPreprintsIterator implements Iterator<String> {
 			group.addElement("preprint").add(n);
 
 			for (final Object o1 : n.selectNodes(".//contributors//href")) {
-				final Document doc1 = downloadUrl(((Node) o1).getText(), 0);
-				group.addElement("contributors").add(doc1.getRootElement().detach());
+				final String href = ((Node) o1).getText();
+				if (StringUtils.isNotBlank(href) && href.startsWith("http")) {
+					final Document doc1 = downloadUrl(href, 0);
+					group.addElement("contributors").add(doc1.getRootElement().detach());
+				}
 			}
 			for (final Object o1 : n.selectNodes(".//primary_file//href")) {
-				final Document doc1 = downloadUrl(((Node) o1).getText(), 0);
-				group.addElement("primary_file").add(doc1.getRootElement().detach());
+				final String href = ((Node) o1).getText();
+				if (StringUtils.isNotBlank(href) && href.startsWith("http")) {
+					final Document doc1 = downloadUrl(href, 0);
+					group.addElement("primary_file").add(doc1.getRootElement().detach());
+				}
 			}
 
 			this.recordQueue.add(DocumentHelper.createDocument(group).asXML());

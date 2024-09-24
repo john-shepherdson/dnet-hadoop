@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.collection.ApiDescriptor;
+import eu.dnetlib.dhp.collection.plugin.utils.JsonUtils;
 import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 import eu.dnetlib.dhp.common.collection.CollectorException;
 import eu.dnetlib.dhp.common.collection.HttpClientParams;
@@ -108,6 +109,12 @@ public class OsfPreprintsCollectorPluginTest {
 			assertTrue(e.getMessage().contains("401"));
 		}
 
+	}
+
+	@Test
+	void testXML() {
+		final String xml = JsonUtils.convertToXML("{'next':null}");
+		System.out.println(xml);
 	}
 
 }
