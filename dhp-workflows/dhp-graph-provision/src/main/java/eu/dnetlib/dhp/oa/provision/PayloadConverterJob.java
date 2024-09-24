@@ -149,8 +149,8 @@ public class PayloadConverterJob {
 	}
 
 	/**
-	 This function iterates through the RelatedEntityWrapper(s) associated to the JoinedEntity and rules out
-	 those exceeding the maximum allowed frequency defined in eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits#MAX_RELATIONS_BY_RELCLASS
+	 * This function iterates through the RelatedEntityWrapper(s) associated to the JoinedEntity and rules out
+	 * those exceeding the maximum allowed frequency defined in eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits#MAX_RELATIONS_BY_RELCLASS
 	 */
 	private static JoinedEntity pruneRelatedEntities(JoinedEntity je) {
 		Map<String, Long> freqs = Maps.newHashMap();
@@ -159,9 +159,11 @@ public class PayloadConverterJob {
 		if (je.getLinks() != null) {
 			je.getLinks().forEach(link -> {
 				final String relClass = link.getRelation().getRelClass();
-				Long count = freqs.putIfAbsent(relClass, 0L);
-				if (Objects.isNull(count) || (MAX_RELATIONS_BY_RELCLASS.containsKey(relClass)
-					&& count <= MAX_RELATIONS_BY_RELCLASS.get(relClass))) {
+
+				final Long count = freqs.getOrDefault(relClass, Long.MAX_VALUE);
+				final Long max = MAX_RELATIONS_BY_RELCLASS.getOrDefault(relClass, Long.MAX_VALUE);
+
+				if (count <= max) {
 					rew.add(link);
 					freqs.put(relClass, freqs.get(relClass) + 1);
 				}

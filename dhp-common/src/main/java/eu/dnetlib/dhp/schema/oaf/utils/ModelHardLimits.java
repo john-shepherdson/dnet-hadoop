@@ -25,11 +25,11 @@ public class ModelHardLimits {
 	public static final int MAX_ABSTRACT_LENGTH = 150000;
 	public static final int MAX_RELATED_ABSTRACT_LENGTH = 500;
 	public static final int MAX_INSTANCES = 10;
-	public static final Map<String, Integer> MAX_RELATIONS_BY_RELCLASS = Maps.newHashMap();
+	public static final Map<String, Long> MAX_RELATIONS_BY_RELCLASS = Maps.newHashMap();
 
 	static {
-		MAX_RELATIONS_BY_RELCLASS.put(ModelConstants.PERSON_PERSON_HASCOAUTHORED, 500);
-		MAX_RELATIONS_BY_RELCLASS.put(ModelConstants.RESULT_PERSON_HASAUTHORED, 500);
+		MAX_RELATIONS_BY_RELCLASS.put(ModelConstants.PERSON_PERSON_HASCOAUTHORED, 500L);
+		MAX_RELATIONS_BY_RELCLASS.put(ModelConstants.RESULT_PERSON_HASAUTHORED, 500L);
 	}
 
 	public static String getCollectionName(String format) {
