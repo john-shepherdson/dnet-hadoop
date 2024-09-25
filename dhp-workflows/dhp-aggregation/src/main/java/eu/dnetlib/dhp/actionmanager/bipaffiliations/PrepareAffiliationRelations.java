@@ -98,35 +98,26 @@ public class PrepareAffiliationRelations implements Serializable {
 	private static void createActionSet(SparkSession spark, String crossrefInputPath, String pubmedInputPath,
 		String openapcInputPath, String dataciteInputPath, String webcrawlInputPath, String publisherlInputPath,
 		String outputPath) {
-		List<KeyValue> collectedFromCrossref = OafMapperUtils
-			.listKeyValues(ModelConstants.CROSSREF_ID, "Crossref");
+		List<KeyValue> collectedfromOpenAIRE = OafMapperUtils
+				.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
+
 		JavaPairRDD<Text, Text> crossrefRelations = prepareAffiliationRelations(
-			spark, crossrefInputPath, collectedFromCrossref);
+			spark, crossrefInputPath, collectedfromOpenAIRE);
 
-		List<KeyValue> collectedFromPubmed = OafMapperUtils
-			.listKeyValues(ModelConstants.PUBMED_CENTRAL_ID, "Pubmed");
 		JavaPairRDD<Text, Text> pubmedRelations = prepareAffiliationRelations(
-			spark, pubmedInputPath, collectedFromPubmed);
+			spark, pubmedInputPath, collectedfromOpenAIRE);
 
-		List<KeyValue> collectedFromOpenAPC = OafMapperUtils
-			.listKeyValues(ModelConstants.OPEN_APC_ID, "OpenAPC");
 		JavaPairRDD<Text, Text> openAPCRelations = prepareAffiliationRelations(
-			spark, openapcInputPath, collectedFromOpenAPC);
+			spark, openapcInputPath, collectedfromOpenAIRE);
 
-		List<KeyValue> collectedFromDatacite = OafMapperUtils
-			.listKeyValues(ModelConstants.DATACITE_ID, "Datacite");
 		JavaPairRDD<Text, Text> dataciteRelations = prepareAffiliationRelations(
-			spark, dataciteInputPath, collectedFromDatacite);
+			spark, dataciteInputPath, collectedfromOpenAIRE);
 
-		List<KeyValue> collectedFromWebCrawl = OafMapperUtils
-			.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
 		JavaPairRDD<Text, Text> webCrawlRelations = prepareAffiliationRelations(
-			spark, webcrawlInputPath, collectedFromWebCrawl);
+			spark, webcrawlInputPath, collectedfromOpenAIRE);
 
-		List<KeyValue> collectedfromPublisher = OafMapperUtils
-			.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
 		JavaPairRDD<Text, Text> publisherRelations = prepareAffiliationRelationFromPublisher(
-			spark, publisherlInputPath, collectedfromPublisher);
+			spark, publisherlInputPath, collectedfromOpenAIRE);
 
 		crossrefRelations
 			.union(pubmedRelations)
