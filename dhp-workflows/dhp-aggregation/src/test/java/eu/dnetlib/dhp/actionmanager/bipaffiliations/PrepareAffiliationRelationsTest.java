@@ -110,10 +110,11 @@ public class PrepareAffiliationRelationsTest {
 //            );
 //        }
 		// count the number of relations
-		assertEquals(138, tmp.count());
+		assertEquals(168, tmp.count());//150 +
 
 		Dataset<Relation> dataset = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
 		dataset.createOrReplaceTempView("result");
+
 
 		Dataset<Row> execVerification = spark
 			.sql("select r.relType, r.relClass, r.source, r.target, r.dataInfo.trust from result r");
@@ -121,7 +122,7 @@ public class PrepareAffiliationRelationsTest {
 		// verify that we have equal number of bi-directional relations
 		Assertions
 			.assertEquals(
-				69, execVerification
+				84, execVerification
 					.filter(
 						"relClass='" + ModelConstants.HAS_AUTHOR_INSTITUTION + "'")
 					.collectAsList()
@@ -129,21 +130,21 @@ public class PrepareAffiliationRelationsTest {
 
 		Assertions
 			.assertEquals(
-				69, execVerification
+				84, execVerification
 					.filter(
 						"relClass='" + ModelConstants.IS_AUTHOR_INSTITUTION_OF + "'")
 					.collectAsList()
 					.size());
 
 		// check confidence value of a specific relation
-		String sourceDOI = "10.1061/(asce)0733-9399(2002)128:7(759)";
+		String sourceDOI = "10.1089/10872910260066679";
 
 		final String sourceOpenaireId = ID_PREFIX
 			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", sourceDOI));
 
 		Assertions
 			.assertEquals(
-				"0.7071067812", execVerification
+				"1.0", execVerification
 					.filter(
 						"source='" + sourceOpenaireId + "'")
 					.collectAsList()
@@ -151,11 +152,14 @@ public class PrepareAffiliationRelationsTest {
 					.getString(4));
 
 		final String publisherid = ID_PREFIX
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1007/s00217-010-1268-9"));
-		final String rorId = "20|ror_________::" + IdentifierFactory.md5("https://ror.org/03265fv13");
+			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1089/10872910260066679"));
+		final String rorId = "20|ror_________::" + IdentifierFactory.md5("https://ror.org/05cf8a891");
 
 		Assertions
 			.assertEquals(
-				1, execVerification.filter("source = '" + publisherid + "' and target = '" + rorId + "'").count());
+				5, execVerification.filter("source = '" + publisherid + "' and target = '" + rorId + "'").count());
+
+		Assertions.assertEquals(1,execVerification.filter("source = '" + ID_PREFIX
+				+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi",  "10.1007/s00217-010-1268-9")) + "' and target = '" + "20|ror_________::" + IdentifierFactory.md5("https://ror.org/03265fv13") + "'").count());
 	}
 }
