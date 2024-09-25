@@ -50,9 +50,10 @@ public class OsfPreprintsCollectorPluginTest {
 	@Test
 	@Disabled
 	void test_one() throws CollectorException {
-		this.plugin.collect(this.api, new AggregatorReport())
-				.limit(1)
-				.forEach(log::info);
+		this.plugin
+			.collect(this.api, new AggregatorReport())
+			.limit(1)
+			.forEach(log::info);
 	}
 
 	@Test
@@ -95,7 +96,8 @@ public class OsfPreprintsCollectorPluginTest {
 		final HttpConnector2 connector = new HttpConnector2();
 
 		try {
-			final String res = connector.getInputSource("https://api.osf.io/v2/preprints/ydtzx/contributors/?format=json");
+			final String res = connector
+				.getInputSource("https://api.osf.io/v2/preprints/ydtzx/contributors/?format=json");
 			System.out.println(res);
 			fail();
 		} catch (final Throwable e) {

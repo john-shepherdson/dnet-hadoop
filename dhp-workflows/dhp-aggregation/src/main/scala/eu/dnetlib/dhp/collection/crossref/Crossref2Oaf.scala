@@ -517,8 +517,10 @@ case object Crossref2Oaf {
       )
     }
 
-    if(doi.startsWith("10.3410") || doi.startsWith("10.12703"))
-      instance.setHostedby(OafMapperUtils.keyValue(OafMapperUtils.createOpenaireId(10, "openaire____::H1Connect", true),"H1Connect"))
+    if (doi.startsWith("10.3410") || doi.startsWith("10.12703"))
+      instance.setHostedby(
+        OafMapperUtils.keyValue(OafMapperUtils.createOpenaireId(10, "openaire____::H1Connect", true), "H1Connect")
+      )
 
     instance.setAccessright(
       decideAccessRight(instance.getLicense, result.getDateofacceptance.getValue)
