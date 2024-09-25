@@ -129,6 +129,7 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/Extracted</arg>
             <arg>--outputPath</arg><arg>${inputPath}/JSON</arg>
+            <arg>--backupPath</arg><arg>${inputPath}/backup</arg>
             <arg>--delimiter</arg><arg>${delimiter}</arg>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
         </spark>
