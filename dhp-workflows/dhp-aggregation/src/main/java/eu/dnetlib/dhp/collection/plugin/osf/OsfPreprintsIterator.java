@@ -85,7 +85,7 @@ public class OsfPreprintsIterator implements Iterator<String> {
 			final Element n = (Element) ((Element) o).detach();
 
 			final Element group = DocumentHelper.createElement("group");
-			group.addAttribute("id", n.valueOf(".//data/id"));
+			group.addAttribute("id", n.valueOf("./id"));
 
 			group.addElement("preprint").add(n);
 
