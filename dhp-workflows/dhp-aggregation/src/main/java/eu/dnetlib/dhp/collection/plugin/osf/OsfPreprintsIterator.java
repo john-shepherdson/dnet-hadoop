@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
@@ -33,9 +34,9 @@ public class OsfPreprintsIterator implements Iterator<String> {
 	private final Queue<String> recordQueue = new PriorityBlockingQueue<>();
 
 	public OsfPreprintsIterator(
-			final String baseUrl,
-			final int pageSize,
-			final HttpClientParams clientParams) {
+		final String baseUrl,
+		final int pageSize,
+		final HttpClientParams clientParams) {
 
 		this.clientParams = clientParams;
 		this.baseUrl = baseUrl;
@@ -46,13 +47,15 @@ public class OsfPreprintsIterator implements Iterator<String> {
 
 	private void initQueue() {
 		this.currentUrl = this.baseUrl + "?filter:is_published:d=true&format=json&page[size]=" + this.pageSize;
+
 		log.info("REST calls starting with {}", this.currentUrl);
 	}
 
 	@Override
 	public boolean hasNext() {
 		synchronized (this.recordQueue) {
-			while (this.recordQueue.isEmpty() && !this.currentUrl.isEmpty()) {
+			while (this.recordQueue.isEmpty() && StringUtils.isNotBlank(this.currentUrl)
+				&& this.currentUrl.startsWith("http")) {
 				try {
 					this.currentUrl = downloadPage(this.currentUrl);
 				} catch (final CollectorException e) {
@@ -61,7 +64,9 @@ public class OsfPreprintsIterator implements Iterator<String> {
 				}
 			}
 
-			if (!this.recordQueue.isEmpty()) { return true; }
+			if (!this.recordQueue.isEmpty()) {
+				return true;
+			}
 
 			return false;
 		}
@@ -83,17 +88,23 @@ public class OsfPreprintsIterator implements Iterator<String> {
 			final Element n = (Element) ((Element) o).detach();
 
 			final Element group = DocumentHelper.createElement("group");
-			group.addAttribute("id", n.valueOf(".//data/id"));
+			group.addAttribute("id", n.valueOf("./id"));
 
 			group.addElement("preprint").add(n);
 
 			for (final Object o1 : n.selectNodes(".//contributors//href")) {
-				final Document doc1 = downloadUrl(((Node) o1).getText(), 0);
-				group.addElement("contributors").add(doc1.getRootElement().detach());
+				final String href = ((Node) o1).getText();
+				if (StringUtils.isNotBlank(href) && href.startsWith("http")) {
+					final Document doc1 = downloadUrl(href, 0);
+					group.addElement("contributors").add(doc1.getRootElement().detach());
+				}
 			}
 			for (final Object o1 : n.selectNodes(".//primary_file//href")) {
-				final Document doc1 = downloadUrl(((Node) o1).getText(), 0);
-				group.addElement("primary_file").add(doc1.getRootElement().detach());
+				final String href = ((Node) o1).getText();
+				if (StringUtils.isNotBlank(href) && href.startsWith("http")) {
+					final Document doc1 = downloadUrl(href, 0);
+					group.addElement("primary_file").add(doc1.getRootElement().detach());
+				}
 			}
 
 			this.recordQueue.add(DocumentHelper.createDocument(group).asXML());
@@ -104,7 +115,9 @@ public class OsfPreprintsIterator implements Iterator<String> {
 	}
 
 	private Document downloadUrl(final String url, final int attempt) throws CollectorException {
-		if (attempt > MAX_ATTEMPTS) { throw new CollectorException("Max Number of attempts reached, url:" + url); }
+		if (attempt > MAX_ATTEMPTS) {
+			throw new CollectorException("Max Number of attempts reached, url:" + url);
+		}
 
 		if (attempt > 0) {
 			final int delay = (attempt * 5000);

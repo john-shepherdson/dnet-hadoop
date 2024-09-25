@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dnetlib.dhp.collection.ApiDescriptor;
+import eu.dnetlib.dhp.collection.plugin.utils.JsonUtils;
 import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 import eu.dnetlib.dhp.common.collection.CollectorException;
 import eu.dnetlib.dhp.common.collection.HttpClientParams;
@@ -49,9 +50,10 @@ public class OsfPreprintsCollectorPluginTest {
 	@Test
 	@Disabled
 	void test_one() throws CollectorException {
-		this.plugin.collect(this.api, new AggregatorReport())
-				.limit(1)
-				.forEach(log::info);
+		this.plugin
+			.collect(this.api, new AggregatorReport())
+			.limit(1)
+			.forEach(log::info);
 	}
 
 	@Test
@@ -94,7 +96,8 @@ public class OsfPreprintsCollectorPluginTest {
 		final HttpConnector2 connector = new HttpConnector2();
 
 		try {
-			final String res = connector.getInputSource("https://api.osf.io/v2/preprints/ydtzx/contributors/?format=json");
+			final String res = connector
+				.getInputSource("https://api.osf.io/v2/preprints/ydtzx/contributors/?format=json");
 			System.out.println(res);
 			fail();
 		} catch (final Throwable e) {
@@ -108,6 +111,12 @@ public class OsfPreprintsCollectorPluginTest {
 			assertTrue(e.getMessage().contains("401"));
 		}
 
+	}
+
+	@Test
+	void testXML() {
+		final String xml = JsonUtils.convertToXML("{'next':null}");
+		System.out.println(xml);
 	}
 
 }

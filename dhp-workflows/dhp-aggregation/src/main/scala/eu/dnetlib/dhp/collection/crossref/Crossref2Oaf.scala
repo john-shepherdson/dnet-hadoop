@@ -504,6 +504,24 @@ case object Crossref2Oaf {
       )
     }
 
+    val is_review = json \ "relation" \ "is-review-of" \ "id"
+
+    if (is_review != JNothing) {
+      instance.setInstancetype(
+        OafMapperUtils.qualifier(
+          "0015",
+          "peerReviewed",
+          ModelConstants.DNET_REVIEW_LEVELS,
+          ModelConstants.DNET_REVIEW_LEVELS
+        )
+      )
+    }
+
+    if (doi.startsWith("10.3410") || doi.startsWith("10.12703"))
+      instance.setHostedby(
+        OafMapperUtils.keyValue(OafMapperUtils.createOpenaireId(10, "openaire____::H1Connect", true), "H1Connect")
+      )
+
     instance.setAccessright(
       decideAccessRight(instance.getLicense, result.getDateofacceptance.getValue)
     )
