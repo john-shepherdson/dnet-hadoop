@@ -143,10 +143,10 @@ public class PrepareAffiliationRelations implements Serializable {
 
 		Dataset<Row> df = spark
 			.read()
-			.schema("`DOI` STRING, `Organizations` ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>")
+			.schema(
+				"`DOI` STRING, `Organizations` ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>")
 			.json(inputPath)
 			.where("DOI is not null");
-
 
 		return getTextTextJavaPairRDD(collectedfrom, df.selectExpr("DOI", "Organizations as Matchings"));
 
@@ -158,10 +158,10 @@ public class PrepareAffiliationRelations implements Serializable {
 		// load and parse affiliation relations from HDFS
 		Dataset<Row> df = spark
 			.read()
-			.schema("`DOI` STRING, `Matchings` ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>")
+			.schema(
+				"`DOI` STRING, `Matchings` ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>")
 			.json(inputPath)
 			.where("DOI is not null");
-
 
 		return getTextTextJavaPairRDD(collectedfrom, df);
 	}
@@ -175,9 +175,8 @@ public class PrepareAffiliationRelations implements Serializable {
 				new Column("matching.PID").as("pidtype"),
 				new Column("matching.Value").as("pidvalue"),
 				new Column("matching.Confidence").as("confidence"),
-					new Column("matching.Status").as("status"))
-				.where("status = 'active'");
-
+				new Column("matching.Status").as("status"))
+			.where("status = 'active'");
 
 		// prepare action sets for affiliation relations
 		return df
@@ -188,14 +187,13 @@ public class PrepareAffiliationRelations implements Serializable {
 				final String paperId = ID_PREFIX
 					+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", row.getAs("doi")));
 
-
 				// Organization to OpenAIRE identifier
 				String affId = null;
-				if(row.getAs("pidtype").equals("ROR"))
-					//ROR id to OpenIARE id
-				 	affId = GenerateRorActionSetJob.calculateOpenaireId(row.getAs("pidvalue"));
+				if (row.getAs("pidtype").equals("ROR"))
+					// ROR id to OpenIARE id
+					affId = GenerateRorActionSetJob.calculateOpenaireId(row.getAs("pidvalue"));
 				else
-					//getting the OpenOrgs identifier for the organization
+					// getting the OpenOrgs identifier for the organization
 					affId = row.getAs("pidvalue");
 
 				Qualifier qualifier = OafMapperUtils

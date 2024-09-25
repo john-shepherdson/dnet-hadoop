@@ -110,11 +110,10 @@ public class PrepareAffiliationRelationsTest {
 //            );
 //        }
 		// count the number of relations
-		assertEquals(168, tmp.count());//150 +
+		assertEquals(168, tmp.count());// 150 +
 
 		Dataset<Relation> dataset = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
 		dataset.createOrReplaceTempView("result");
-
 
 		Dataset<Row> execVerification = spark
 			.sql("select r.relType, r.relClass, r.source, r.target, r.dataInfo.trust from result r");
@@ -159,7 +158,15 @@ public class PrepareAffiliationRelationsTest {
 			.assertEquals(
 				5, execVerification.filter("source = '" + publisherid + "' and target = '" + rorId + "'").count());
 
-		Assertions.assertEquals(1,execVerification.filter("source = '" + ID_PREFIX
-				+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi",  "10.1007/s00217-010-1268-9")) + "' and target = '" + "20|ror_________::" + IdentifierFactory.md5("https://ror.org/03265fv13") + "'").count());
+		Assertions
+			.assertEquals(
+				1, execVerification
+					.filter(
+						"source = '" + ID_PREFIX
+							+ IdentifierFactory
+								.md5(CleaningFunctions.normalizePidValue("doi", "10.1007/s00217-010-1268-9"))
+							+ "' and target = '" + "20|ror_________::"
+							+ IdentifierFactory.md5("https://ror.org/03265fv13") + "'")
+					.count());
 	}
 }
