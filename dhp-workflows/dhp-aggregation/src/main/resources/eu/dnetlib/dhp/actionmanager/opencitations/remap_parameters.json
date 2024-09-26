@@ -16,10 +16,11 @@
     "paramLongName": "isSparkSessionManged",
     "paramDescription": "the hdfs name node",
     "paramRequired": false
-  },{
-  "paramName": "nn",
-  "paramLongName": "nameNode",
-  "paramDescription": "the hdfs name node",
-  "paramRequired": true
-}
+  },
+  {
+    "paramName": "nn",
+    "paramLongName": "nameNode",
+    "paramDescription": "the hdfs name node",
+    "paramRequired": true
+  }
 ]

@@ -468,6 +468,10 @@ public class MergeUtils {
 		merge.setIsInDiamondJournal(booleanOR(merge.getIsInDiamondJournal(), enrich.getIsInDiamondJournal()));
 		merge.setPubliclyFunded(booleanOR(merge.getPubliclyFunded(), enrich.getPubliclyFunded()));
 
+		if (StringUtils.isBlank(merge.getTransformativeAgreement())) {
+			merge.setTransformativeAgreement(enrich.getTransformativeAgreement());
+		}
+
 		return merge;
 	}
 

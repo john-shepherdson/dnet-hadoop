@@ -26,7 +26,7 @@ class MAGMappingTest {
   @Test
   def mappingMagType(): Unit = {
 
-    checkResult[Publication](MagUtility.createResultFromType(null, null), invisible = false, "Other literature type")
+    checkResult[Publication](MagUtility.createResultFromType(null, null), invisible = true, "Other literature type")
     checkResult[Publication](
       MagUtility.createResultFromType(Some("BookChapter"), null),
       invisible = false,

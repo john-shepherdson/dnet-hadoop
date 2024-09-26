@@ -368,6 +368,32 @@
             <arg>--mdLayout</arg><arg>store</arg>
             <arg>--mdInterpretation</arg><arg>cleaned</arg>
         </spark>
+        <ok to="ImportODF_hdfs_invisible"/>
+        <error to="Kill"/>
+    </action>
+    
+    <action name="ImportODF_hdfs_invisible">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>ImportODF_hdfs_invisible</name>
+            <class>eu.dnetlib.dhp.oa.graph.raw.MigrateHdfsMdstoresApplication</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory ${sparkExecutorMemory}
+                --executor-cores ${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--hdfsPath</arg><arg>${contentPath}/odf_mdstore_hdfs_invisible</arg>
+            <arg>--mdstoreManagerUrl</arg><arg>${mdstoreManagerUrl}</arg>
+            <arg>--mdFormat</arg><arg>ODF</arg>
+            <arg>--mdLayout</arg><arg>store</arg>
+            <arg>--mdInterpretation</arg><arg>intersection</arg>
+        </spark>
         <ok to="reuse_oaf_hdfs"/>
         <error to="Kill"/>
     </action>
@@ -529,7 +555,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--sourcePaths</arg><arg>${contentPath}/db_openaire,${contentPath}/db_openorgs,${contentPath}/oaf_mdstore_hdfs,${contentPath}/odf_mdstore_hdfs,${contentPath}/mdstore/*/*</arg>
+            <arg>--sourcePaths</arg><arg>${contentPath}/db_openaire,${contentPath}/db_openorgs,${contentPath}/oaf_mdstore_hdfs,${contentPath}/odf_mdstore_hdfs,${contentPath}/odf_mdstore_hdfs_invisible,${contentPath}/mdstore/*/*</arg>
             <arg>--invalidPath</arg><arg>${workingDir}/invalid_records</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
@@ -553,7 +579,7 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--sourcePaths</arg><arg>${contentPath}/db_openaire,${contentPath}/db_openorgs,${contentPath}/oaf_mdstore_hdfs,${contentPath}/odf_mdstore_hdfs,${contentPath}/mdstore/*/*</arg>
+            <arg>--sourcePaths</arg><arg>${contentPath}/db_openaire,${contentPath}/db_openorgs,${contentPath}/oaf_mdstore_hdfs,${contentPath}/odf_mdstore_hdfs,${contentPath}/odf_mdstore_hdfs_invisible,${contentPath}/mdstore/*/*</arg>
             <arg>--targetPath</arg><arg>${workingDir}/entities</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--shouldHashId</arg><arg>${shouldHashId}</arg>

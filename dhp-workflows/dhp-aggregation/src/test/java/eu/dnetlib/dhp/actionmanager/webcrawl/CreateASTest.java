@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.actionmanager.webcrawl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -101,7 +102,10 @@ public class CreateASTest {
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
-		Assertions.assertEquals(58, tmp.count());
+		tmp.foreach(r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+		tmp.foreach(r -> assertTrue(r.getSource().startsWith("20|ror") || r.getSource().startsWith("50|doi")));
+		tmp.foreach(r -> assertTrue(r.getTarget().startsWith("20|ror") || r.getTarget().startsWith("50|doi")));
+		Assertions.assertEquals(24, tmp.count());
 
 	}
 
@@ -112,7 +116,7 @@ public class CreateASTest {
 
 		String inputPath = getClass()
 			.getResource(
-				"/eu/dnetlib/dhp/actionmanager/webcrawl/")
+				"/eu/dnetlib/dhp/actionmanager/webcrawl/input/")
 			.getPath();
 		String blackListPath = getClass()
 			.getResource(
@@ -194,7 +198,7 @@ public class CreateASTest {
 
 		Assertions
 			.assertEquals(
-				2, tmp
+				1, tmp
 					.filter(
 						r -> r
 							.getSource()
@@ -207,7 +211,7 @@ public class CreateASTest {
 
 		Assertions
 			.assertEquals(
-				2, tmp
+				1, tmp
 					.filter(
 						r -> r
 							.getTarget()
@@ -228,13 +232,13 @@ public class CreateASTest {
 								"20|ror_________::" + IdentifierFactory
 									.md5(
 										PidCleaner
-											.normalizePidValue(PidType.doi.toString(), "https://ror.org/03265fv13")))
+											.normalizePidValue("ROR", "https://ror.org/03265fv13")))
 							&& r.getSource().startsWith("50|doi"))
 					.count());
 
 		Assertions
 			.assertEquals(
-				1, tmp
+				0, tmp
 					.filter(
 						r -> r
 							.getTarget()
@@ -268,6 +272,10 @@ public class CreateASTest {
 			.getResource(
 				"/eu/dnetlib/dhp/actionmanager/webcrawl")
 			.getPath();
+		String blackListPath = getClass()
+			.getResource(
+				"/eu/dnetlib/dhp/actionmanager/webcrawl/blackList/")
+			.getPath();
 
 		CreateActionSetFromWebEntries
 			.main(
@@ -277,7 +285,8 @@ public class CreateASTest {
 					"-sourcePath",
 					inputPath,
 					"-outputPath",
-					workingDir.toString() + "/actionSet1"
+					workingDir.toString() + "/actionSet1",
+					"-blackListPath", blackListPath
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());

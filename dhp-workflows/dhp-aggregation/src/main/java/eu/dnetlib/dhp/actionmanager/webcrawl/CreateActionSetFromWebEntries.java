@@ -5,11 +5,10 @@ import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.compress.GzipCodec;
+import org.apache.hadoop.io.compress.BZip2Codec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
@@ -113,7 +112,7 @@ public class CreateActionSetFromWebEntries implements Serializable {
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
-			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, GzipCodec.class);
+			.saveAsHadoopFile(outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, BZip2Codec.class);
 
 	}
 
@@ -153,11 +152,40 @@ public class CreateActionSetFromWebEntries implements Serializable {
 			.select("OpenAlexId");
 	}
 
+	private static List<Relation> createAffiliationRelationPairPMCID(String pmcid, String ror) {
+		if (pmcid == null)
+			return new ArrayList<>();
+
+		return createAffiliatioRelationPair(
+			PMCID_PREFIX
+				+ IdentifierFactory
+					.md5(PidCleaner.normalizePidValue(PidType.pmc.toString(), removeResolver("PMC", pmcid))),
+			ror);
+	}
+
+	private static List<Relation> createAffiliationRelationPairPMID(String pmid, String ror) {
+		if (pmid == null)
+			return new ArrayList<>();
+
+		return createAffiliatioRelationPair(
+			PMID_PREFIX
+				+ IdentifierFactory
+					.md5(PidCleaner.normalizePidValue(PidType.pmid.toString(), removeResolver("PMID", pmid))),
+			ror);
+	}
+
 	private static String removeResolver(String pidType, String pid) {
-		if (pidType.equals("DOI")) {
-			return pid.substring(16);
+		switch (pidType) {
+			case "PMID":
+				return pid.substring(33);
+			case "PMC":
+				return "PMC" + pid.substring(43);
+			case "DOI":
+				return pid.substring(16);
 		}
-		throw new IllegalArgumentException("DOI is the only supported PID type");
+
+		throw new RuntimeException();
+
 	}
 
 	private static List<Relation> createAffiliationRelationPairDOI(String doi, String ror) {

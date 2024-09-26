@@ -77,13 +77,13 @@ public class RemapTest {
 		MapOCIdsInPids
 			.main(
 				new String[] {
-					"-isSparkSessionManged",
+					"--isSparkSessionManged",
 					Boolean.FALSE.toString(),
-					"-inputPath",
+					"--inputPath",
 					inputPath,
-					"-outputPath",
+					"--outputPath",
 					workingDir.toString() + "/out/",
-					"-nameNode", "input1;input2;input3;input4;input5"
+					"--nameNode", "hdfs://localhost"
 				});
 
 	}

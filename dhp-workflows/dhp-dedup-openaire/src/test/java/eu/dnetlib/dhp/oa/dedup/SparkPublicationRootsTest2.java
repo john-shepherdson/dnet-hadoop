@@ -143,7 +143,9 @@ public class SparkPublicationRootsTest2 implements Serializable {
 				"--graphBasePath", graphInputPath,
 				"--actionSetId", testActionSetId,
 				"--isLookUpUrl", "lookupurl",
-				"--workingPath", workingPath
+				"--workingPath", workingPath,
+				"--hiveMetastoreUris", "none",
+				"--pivotHistoryDatabase", "none"
 			}), spark)
 				.run(isLookUpService);
 

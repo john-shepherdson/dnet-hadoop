@@ -177,7 +177,7 @@ class OafMapperUtilsTest {
 		assertTrue(cfId(d1.getCollectedfrom()).contains(ModelConstants.CROSSREF_ID));
 
 		assertEquals(
-			ModelConstants.DATASET_RESULTTYPE_CLASSID,
+			ModelConstants.PUBLICATION_RESULTTYPE_CLASSID,
 			((Result) MergeUtils
 				.merge(p2, d1))
 					.getResulttype()

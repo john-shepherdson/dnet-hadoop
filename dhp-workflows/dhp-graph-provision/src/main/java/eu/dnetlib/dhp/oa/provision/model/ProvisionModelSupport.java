@@ -30,12 +30,14 @@ import eu.dnetlib.dhp.schema.solr.Context;
 import eu.dnetlib.dhp.schema.solr.Country;
 import eu.dnetlib.dhp.schema.solr.Datasource;
 import eu.dnetlib.dhp.schema.solr.EoscIfGuidelines;
+import eu.dnetlib.dhp.schema.solr.ExternalReference;
 import eu.dnetlib.dhp.schema.solr.Instance;
 import eu.dnetlib.dhp.schema.solr.Journal;
 import eu.dnetlib.dhp.schema.solr.Measure;
 import eu.dnetlib.dhp.schema.solr.OpenAccessColor;
 import eu.dnetlib.dhp.schema.solr.OpenAccessRoute;
 import eu.dnetlib.dhp.schema.solr.Organization;
+import eu.dnetlib.dhp.schema.solr.Pid;
 import eu.dnetlib.dhp.schema.solr.Project;
 import eu.dnetlib.dhp.schema.solr.Result;
 import eu.dnetlib.dhp.schema.solr.Subject;
@@ -375,7 +377,7 @@ public class ProvisionModelSupport {
 		rs.setIsInDiamondJournal(r.getIsInDiamondJournal());
 		rs.setPubliclyFunded(r.getPubliclyFunded());
 		rs.setTransformativeAgreement(r.getTransformativeAgreement());
-
+		rs.setExternalReference(mapExternalReference(r.getExternalReference()));
 		rs.setInstance(mapInstances(r.getInstance()));
 
 		if (r instanceof Publication) {
@@ -561,6 +563,27 @@ public class ProvisionModelSupport {
 			.orElse(null);
 	}
 
+	private static List<ExternalReference> mapExternalReference(
+		List<eu.dnetlib.dhp.schema.oaf.ExternalReference> externalReference) {
+		return Optional
+			.ofNullable(externalReference)
+			.map(
+				ext -> ext
+					.stream()
+					.map(
+						e -> ExternalReference
+							.newInstance(
+								e.getSitename(),
+								e.getLabel(),
+								e.getAlternateLabel(),
+								e.getUrl(),
+								mapCodeLabel(e.getQualifier()),
+								e.getRefidentifier(),
+								e.getQuery()))
+					.collect(Collectors.toList()))
+			.orElse(Lists.newArrayList());
+	}
+
 	private static List<Context> asContext(List<eu.dnetlib.dhp.schema.oaf.Context> ctxList,
 		ContextMapper contextMapper) {
 
@@ -579,7 +602,7 @@ public class ProvisionModelSupport {
 		}
 
 		return Optional
-			.ofNullable(contexts)
+			.of(contexts)
 			.map(
 				ctx -> ctx
 					.stream()
