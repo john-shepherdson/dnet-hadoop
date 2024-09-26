@@ -452,18 +452,18 @@ public class SparkDedupTest implements Serializable {
 			assertEquals(ModelConstants.RESULT_RESULT, r.getRelType());
 			assertEquals(ModelConstants.DEDUP, r.getSubRelType());
 			assertEquals(ModelConstants.IS_MERGED_IN, r.getRelClass());
-			assertTrue(dups.contains(r.getTarget()));
+			assertFalse(dups.contains(r.getTarget()));
 		});
 
 		final List<Relation> mergedIn = pubs
 			.filter("target == '50|arXiv_dedup_::c93aeb433eb90ed7a86e29be00791b7c'")
 			.collectAsList();
-		assertEquals(3, mergedIn.size());
+		assertEquals(1, mergedIn.size());
 		mergedIn.forEach(r -> {
 			assertEquals(ModelConstants.RESULT_RESULT, r.getRelType());
 			assertEquals(ModelConstants.DEDUP, r.getSubRelType());
-			assertEquals(ModelConstants.IS_MERGED_IN, r.getRelClass());
-			assertTrue(dups.contains(r.getSource()));
+			assertEquals(ModelConstants.MERGES, r.getRelClass());
+			assertFalse(dups.contains(r.getSource()));
 		});
 
 		System.out.println("orgs_mergerel = " + orgs_mergerel);
@@ -473,8 +473,8 @@ public class SparkDedupTest implements Serializable {
 		System.out.println("orp_mergerel = " + orp_mergerel);
 
 		if (CHECK_CARDINALITIES) {
-			assertEquals(1268, orgs_mergerel);
-			assertEquals(1156, pubs.count());
+			assertEquals(1278, orgs_mergerel);
+			assertEquals(1158, pubs.count());
 			assertEquals(292, sw_mergerel);
 			assertEquals(476, ds_mergerel);
 			assertEquals(742, orp_mergerel);

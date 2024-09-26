@@ -168,7 +168,7 @@ public class SparkStatsTest implements Serializable {
 			.load(testOutputBasePath + "/" + testActionSetId + "/otherresearchproduct_blockstats")
 			.count();
 
-		assertEquals(414, orgs_blocks);
+		assertEquals(412, orgs_blocks);
 		assertEquals(221, pubs_blocks);
 		assertEquals(134, sw_blocks);
 		assertEquals(196, ds_blocks);

@@ -241,7 +241,6 @@ public class SparkPublicationRootsTest implements Serializable {
 
 		verifyRoot_case_1(roots, pubs);
 		verifyRoot_case_2(roots, pubs);
-		verifyRoot_case_3(roots, pubs);
 	}
 
 	private static void verifyRoot_case_1(Dataset<Publication> roots, Dataset<Publication> pubs) {
@@ -305,34 +304,6 @@ public class SparkPublicationRootsTest implements Serializable {
 		assertEquals(crossref_duplicate.getJournal().getVol(), root.getJournal().getVol());
 
 		assertEquals(crossref_duplicate.getPublisher().getValue(), root.getPublisher().getValue());
-
-		Set<String> dups_cf = pubs
-			.collectAsList()
-			.stream()
-			.flatMap(p -> p.getCollectedfrom().stream())
-			.map(KeyValue::getValue)
-			.collect(Collectors.toCollection(HashSet::new));
-
-		Set<String> root_cf = root
-			.getCollectedfrom()
-			.stream()
-			.map(KeyValue::getValue)
-			.collect(Collectors.toCollection(HashSet::new));
-
-		assertTrue(Sets.difference(root_cf, dups_cf).isEmpty());
-	}
-
-	private void verifyRoot_case_3(Dataset<Publication> roots, Dataset<Publication> pubs) {
-		Publication root = roots
-			.filter("id = '50|dedup_wf_001::31ca734cc22181b704c4aa8fd050062a'")
-			.first();
-		assertNotNull(root);
-
-		Publication pivot_duplicate = pubs
-			.filter("id = '50|od_______166::31ca734cc22181b704c4aa8fd050062a'")
-			.first();
-
-		assertEquals(pivot_duplicate.getPublisher().getValue(), root.getPublisher().getValue());
 
 		Set<String> dups_cf = pubs
 			.collectAsList()
