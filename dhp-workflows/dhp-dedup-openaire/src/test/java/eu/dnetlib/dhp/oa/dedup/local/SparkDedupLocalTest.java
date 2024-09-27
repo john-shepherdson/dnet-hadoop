@@ -14,9 +14,6 @@ import eu.dnetlib.pace.config.DedupConfig;
 import eu.dnetlib.pace.model.SparkDeduper;
 import eu.dnetlib.pace.model.SparkModel;
 import eu.dnetlib.pace.tree.support.TreeProcessor;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.FlatMapGroupsFunction;
@@ -34,15 +31,12 @@ import scala.Tuple3;
 import scala.collection.JavaConversions;
 
 import java.awt.*;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
-import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
@@ -167,7 +161,7 @@ public class SparkDedupLocalTest extends DedupLocalTestUtils {
 
         long before_dedupentity = System.currentTimeMillis();
 
-        final Class<OafEntity> clazz = ModelSupport.entityTypes.get(EntityType.valueOf(config.getWf().getSubEntityType()));
+        final Class<OafEntity> clazz = ModelSupport.entityTypes.get(EntityType.valueOf(config.getWf().getSubEntityValue()));
         final Encoder<OafEntity> beanEncoder = Encoders.bean(clazz);
         final Encoder<OafEntity> kryoEncoder = Encoders.kryo(clazz);
 
@@ -300,7 +294,7 @@ public class SparkDedupLocalTest extends DedupLocalTestUtils {
                     entities,
                     simRels,
                     "/tmp/graph.html",
-                    Paths.get(SparkDedupLocalTest.class.getResource("/eu/dnetlib/dhp/dedup/visualization_tools/graph_template.html").toURI()).toFile().getAbsolutePath());
+                    Paths.get(Objects.requireNonNull(SparkDedupLocalTest.class.getResource("/eu/dnetlib/dhp/dedup/visualization_tools/graph_template.html")).toURI()).toFile().getAbsolutePath());
             Desktop.getDesktop().browse(new File("/tmp/graph.html").toURI());
         } catch (Exception e) {
             e.printStackTrace();

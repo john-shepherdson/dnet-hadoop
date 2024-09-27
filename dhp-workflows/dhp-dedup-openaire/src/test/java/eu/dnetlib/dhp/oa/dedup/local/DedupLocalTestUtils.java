@@ -20,9 +20,7 @@ import scala.collection.JavaConverters;
 import scala.collection.convert.Wrappers;
 
 import java.io.*;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public abstract class DedupLocalTestUtils {
@@ -71,12 +69,7 @@ public abstract class DedupLocalTestUtils {
 
         List<String> vertexes = entities.toJavaRDD().map(r -> r.getAs("identifier").toString()).collect();
 
-        List<Node> nodes = vertexes
-                .stream()
-                .map(v -> new Node(v.substring(3, 20).replaceAll("_", ""), vertexes.indexOf(v), prepareTable(
-                        entities.toJavaRDD().filter(r -> r.getAs("identifier").toString().equals(v)).first()
-                )))
-                .collect(Collectors.toList());
+        List<Node> nodes = entities.toJavaRDD().map(e -> new Node(e.getAs("identifier").toString(), vertexes.indexOf(e.getAs("identifier").toString()), prepareTable(e))).collect();
 
         List<Edge> edges = simRels.toJavaRDD().collect().stream().map(sr -> new Edge(vertexes.indexOf(sr.getSource()), vertexes.indexOf(sr.getTarget()))).collect(Collectors.toList());
 
@@ -137,7 +130,7 @@ public abstract class DedupLocalTestUtils {
 
 }
 
-class Node{
+class Node implements Serializable{
     String label;
     int id;
     String title;
@@ -173,7 +166,7 @@ class Node{
     }
 }
 
-class Edge{
+class Edge implements Serializable{
     int from;
     int to;
 
