@@ -1,55 +1,139 @@
 package eu.dnetlib.dhp.oa.dedup.local;
 
+import com.cloudera.com.fasterxml.jackson.core.JsonFactory;
+import com.cloudera.com.fasterxml.jackson.databind.JsonNode;
+import com.cloudera.com.fasterxml.jackson.databind.ObjectMapper;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.pace.config.DedupConfig;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections4.IteratorUtils;
+import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Row;
+import org.spark_project.guava.hash.Hashing;
+import scala.collection.JavaConverters;
+import scala.collection.convert.Wrappers;
+
+import java.io.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 public abstract class DedupLocalTestUtils {
 
-//    public static String prepareTable(MapDocument doc) {
-//
-//        String ret = "<table>";
-//
-//        for(String fieldName: doc.getFieldMap().keySet()) {
-//            if (doc.getFieldMap().get(fieldName).getType().equals(Type.String)) {
-//                ret += "<tr><th>" + fieldName + "</th><td>" + doc.getFieldMap().get(fieldName).stringValue() + "</td></tr>";
-//            }
-//            else if (doc.getFieldMap().get(fieldName).getType().equals(Type.List)) {
-//                ret += "<tr><th>" + fieldName + "</th><td>[" + ((FieldListImpl)doc.getFieldMap().get(fieldName)).stringList().stream().collect(Collectors.joining(";")) + "]</td></tr>";
-//            }
-//        }
-//
-//        return ret + "</table>";
-//
-//    }
-//
-//    public static void prepareGraphParams(List<String> vertexes, List<Tuple2<String, String>> edgesTuple, String filePath, String templateFilePath, Map<String, MapDocument> mapDocuments) {
-//
-//        List<Node> nodes = vertexes.stream().map(v -> new Node(v.substring(3, 20).replaceAll("_", ""), vertexes.indexOf(v), prepareTable(mapDocuments.get(v)))).collect(Collectors.toList());
-//        List<Edge> edges = edgesTuple.stream().map(e -> new Edge(vertexes.indexOf(e._1()), vertexes.indexOf(e._2()))).collect(Collectors.toList());
-//
-//        try(FileWriter fw = new FileWriter(filePath)) {
-//            String fullText = IOUtils.toString(new FileReader(templateFilePath));
-//
-//            String s = fullText
-//                    .replaceAll("%nodes%", new ObjectMapper().writeValueAsString(nodes))
-//                    .replaceAll("%edges%", new ObjectMapper().writeValueAsString(edges));
-//
-//            IOUtils.write(s, fw);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
-//
-//    public static String getOrganizationLegalname(MapDocument mapDocument){
-//        return mapDocument.getFieldMap().get("legalname").stringValue();
-//    }
-//
-//    public static String getJSONEntity(List<String> entities, String id){
-//
-//        for (String entity: entities) {
-//            if(entity.contains(id))
-//                return entity;
-//        }
-//        return "";
-//    }
+    public static String prepareTable(Row doc) {
+        StringBuilder ret = new StringBuilder("<table>");
+
+        for(String fieldName: doc.schema().fieldNames()) {
+            Object value = doc.getAs(fieldName);
+            if(value.getClass() == String.class){
+                ret.append("<tr><th>").append(fieldName).append("</th><td>").append(value).append("</td></tr>");
+            }
+            else {
+                List<String> strings = IteratorUtils.toList(JavaConverters.asJavaIteratorConverter(((Wrappers.JListWrapper<String>) value).iterator()).asJava());
+
+                if(value.toString().contains("value")) {
+                    List<String> values = strings.stream().map(DedupLocalTestUtils::takeValue).collect(Collectors.toList());
+                    ret.append("<tr><th>").append(fieldName).append("</th><td>[").append(String.join(";", values)).append("]</td></tr>");
+                }
+                else {
+                    ret.append("<tr><th>").append(fieldName).append("</th><td>[").append(String.join(";", strings)).append("]</td></tr>");
+                }
+
+            }
+
+        }
+
+        ret.append("</table>");
+        return ret.toString();
+
+    }
+
+    protected static String fileToString(String filePath) throws IOException {
+
+        Path path=new Path(filePath);
+        FileSystem fs = FileSystem.get(new Configuration());
+        BufferedReader br=new BufferedReader(new InputStreamReader(fs.open(path)));
+        try {
+            return String.join("", br.lines().collect(Collectors.toList()));
+        } finally {
+            br.close();
+        }
+    }
+
+    public static void prepareGraphParams(Dataset<Row> entities, Dataset<Relation> simRels, String filePath, String templateFilePath) {
+
+        List<String> vertexes = entities.toJavaRDD().map(r -> r.getAs("identifier").toString()).collect();
+
+        List<Node> nodes = vertexes
+                .stream()
+                .map(v -> new Node(v.substring(3, 20).replaceAll("_", ""), vertexes.indexOf(v), prepareTable(
+                        entities.toJavaRDD().filter(r -> r.getAs("identifier").toString().equals(v)).first()
+                )))
+                .collect(Collectors.toList());
+
+        List<Edge> edges = simRels.toJavaRDD().collect().stream().map(sr -> new Edge(vertexes.indexOf(sr.getSource()), vertexes.indexOf(sr.getTarget()))).collect(Collectors.toList());
+
+        try(FileWriter fw = new FileWriter(filePath)) {
+            String fullText = IOUtils.toString(new FileReader(templateFilePath));
+
+            String s = fullText
+                    .replaceAll("%nodes%", new ObjectMapper().writeValueAsString(nodes))
+                    .replaceAll("%edges%", new ObjectMapper().writeValueAsString(edges));
+
+            IOUtils.write(s, fw);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static long hash(final String id) {
+        return Hashing.murmur3_128().hashString(id).asLong();
+    }
+
+    public static Relation createRel(String source, String target, String relClass, DedupConfig dedupConf) {
+
+        String entityType = dedupConf.getWf().getEntityType();
+
+        Relation r = new Relation();
+        r.setSource(source);
+        r.setTarget(target);
+        r.setRelClass(relClass);
+        r.setRelType(entityType + entityType.substring(0, 1).toUpperCase() + entityType.substring(1));
+        r.setSubRelType(ModelConstants.DEDUP);
+        return r;
+    }
+
+    public static OafEntity createOafEntity(String id, OafEntity base, long ts) {
+        try {
+            OafEntity res = (OafEntity) BeanUtils.cloneBean(base);
+            res.setId(id);
+            res.setLastupdatetimestamp(ts);
+            return res;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String takeValue(String json) {
+        ObjectMapper mapper = new ObjectMapper(new JsonFactory());
+        try {
+            JsonNode rootNode = mapper.readTree(json);
+            return rootNode.get("value").toString().replaceAll("\"", "");
+
+        } catch (Exception e) {
+            return "";
+        }
+
+
+    }
 
 }
 
