@@ -79,16 +79,16 @@ public class PrepareAffiliationRelationsTest {
 			.getPath();
 
 		String crossrefAffiliationRelationPath = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/doi_to_ror_old.json")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/doi_to_ror_old.json")
+			.getPath();
 
 		String publisherAffiliationRelationPath = getClass()
 			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/publishers")
 			.getPath();
 
 		String publisherAffiliationRelationOldPath = getClass()
-				.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/publichers_old")
-				.getPath();
+			.getResource("/eu/dnetlib/dhp/actionmanager/bipaffiliations/publichers_old")
+			.getPath();
 
 		String outputPath = workingDir.toString() + "/actionSet";
 
@@ -112,9 +112,8 @@ public class PrepareAffiliationRelationsTest {
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Relation) aa.getPayload()));
 
-
 		// count the number of relations
-		assertEquals(150, tmp.count());//  18 + 24 *3 + 30 * 2 =
+		assertEquals(150, tmp.count());// 18 + 24 *3 + 30 * 2 =
 
 		Dataset<Relation> dataset = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
 		dataset.createOrReplaceTempView("result");
@@ -173,18 +172,16 @@ public class PrepareAffiliationRelationsTest {
 							+ IdentifierFactory.md5("https://ror.org/03265fv13") + "'")
 					.count());
 
-
 		Assertions
-				.assertEquals(
-						3, execVerification
-								.filter(
-										"source = '" + ID_PREFIX
-												+ IdentifierFactory
-												.md5(CleaningFunctions.normalizePidValue("doi", "10.1007/3-540-47984-8_14"))
-												+ "' and target = '" + "20|ror_________::"
-												+ IdentifierFactory.md5("https://ror.org/00a0n9e72") + "'")
-								.count());
-
+			.assertEquals(
+				3, execVerification
+					.filter(
+						"source = '" + ID_PREFIX
+							+ IdentifierFactory
+								.md5(CleaningFunctions.normalizePidValue("doi", "10.1007/3-540-47984-8_14"))
+							+ "' and target = '" + "20|ror_________::"
+							+ IdentifierFactory.md5("https://ror.org/00a0n9e72") + "'")
+					.count());
 
 	}
 }

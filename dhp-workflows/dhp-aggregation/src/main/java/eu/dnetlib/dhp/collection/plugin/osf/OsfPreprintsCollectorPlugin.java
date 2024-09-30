@@ -31,17 +31,19 @@ public class OsfPreprintsCollectorPlugin implements CollectorPlugin {
 		final String baseUrl = api.getBaseUrl();
 
 		final int pageSize = Optional
-				.ofNullable(api.getParams().get("pageSize"))
-				.filter(StringUtils::isNotBlank)
-				.map(s -> NumberUtils.toInt(s, PAGE_SIZE_VALUE_DEFAULT))
-				.orElse(PAGE_SIZE_VALUE_DEFAULT);
+			.ofNullable(api.getParams().get("pageSize"))
+			.filter(StringUtils::isNotBlank)
+			.map(s -> NumberUtils.toInt(s, PAGE_SIZE_VALUE_DEFAULT))
+			.orElse(PAGE_SIZE_VALUE_DEFAULT);
 
-		if (StringUtils.isBlank(baseUrl)) { throw new CollectorException("Param 'baseUrl' is null or empty"); }
+		if (StringUtils.isBlank(baseUrl)) {
+			throw new CollectorException("Param 'baseUrl' is null or empty");
+		}
 
 		final OsfPreprintsIterator it = new OsfPreprintsIterator(baseUrl, pageSize, getClientParams());
 
 		return StreamSupport
-				.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.ORDERED), false);
+			.stream(Spliterators.spliteratorUnknownSize(it, Spliterator.ORDERED), false);
 	}
 
 	public HttpClientParams getClientParams() {

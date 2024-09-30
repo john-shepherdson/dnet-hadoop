@@ -100,7 +100,7 @@ public class PrepareAffiliationRelations implements Serializable {
 		String openapcInputPath, String dataciteInputPath, String webcrawlInputPath, String publisherlInputPath,
 		String outputPath) {
 		List<KeyValue> collectedfromOpenAIRE = OafMapperUtils
-				.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
+			.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
 
 		JavaPairRDD<Text, Text> crossrefRelations = prepareAffiliationRelationsNewModel(
 			spark, crossrefInputPath, collectedfromOpenAIRE);
@@ -130,7 +130,8 @@ public class PrepareAffiliationRelations implements Serializable {
 				outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, BZip2Codec.class);
 	}
 
-	private static JavaPairRDD<Text, Text> prepareAffiliationRelationFromPublisherNewModel(SparkSession spark, String inputPath,
+	private static JavaPairRDD<Text, Text> prepareAffiliationRelationFromPublisherNewModel(SparkSession spark,
+		String inputPath,
 		List<KeyValue> collectedfrom) {
 
 		Dataset<Row> df = spark
@@ -145,29 +146,28 @@ public class PrepareAffiliationRelations implements Serializable {
 	}
 
 	private static JavaPairRDD<Text, Text> prepareAffiliationRelationFromPublisher(SparkSession spark, String inputPath,
-																				   List<KeyValue> collectedfrom) {
+		List<KeyValue> collectedfrom) {
 
 		Dataset<Row> df = spark
-				.read()
-				.schema("`DOI` STRING, `Organizations` ARRAY<STRUCT<`RORid`:STRING,`Confidence`:DOUBLE>>")
-				.json(inputPath)
-				.where("DOI is not null");
-
+			.read()
+			.schema("`DOI` STRING, `Organizations` ARRAY<STRUCT<`RORid`:STRING,`Confidence`:DOUBLE>>")
+			.json(inputPath)
+			.where("DOI is not null");
 
 		return getTextTextJavaPairRDD(collectedfrom, df.selectExpr("DOI", "Organizations as Matchings"));
 
 	}
 
 	private static <I extends Result> JavaPairRDD<Text, Text> prepareAffiliationRelations(SparkSession spark,
-																						  String inputPath,
-																						  List<KeyValue> collectedfrom) {
+		String inputPath,
+		List<KeyValue> collectedfrom) {
 
 		// load and parse affiliation relations from HDFS
 		Dataset<Row> df = spark
-				.read()
-				.schema("`DOI` STRING, `Matchings` ARRAY<STRUCT<`RORid`:STRING,`Confidence`:DOUBLE>>")
-				.json(inputPath)
-				.where("DOI is not null");
+			.read()
+			.schema("`DOI` STRING, `Matchings` ARRAY<STRUCT<`RORid`:STRING,`Confidence`:DOUBLE>>")
+			.json(inputPath)
+			.where("DOI is not null");
 
 		return getTextTextJavaPairRDD(collectedfrom, df);
 	}
@@ -189,49 +189,49 @@ public class PrepareAffiliationRelations implements Serializable {
 	private static JavaPairRDD<Text, Text> getTextTextJavaPairRDD(List<KeyValue> collectedfrom, Dataset<Row> df) {
 		// unroll nested arrays
 		df = df
-				.withColumn("matching", functions.explode(new Column("Matchings")))
-				.select(
-						new Column("DOI").as("doi"),
-						new Column("matching.RORid").as("rorid"),
-						new Column("matching.Confidence").as("confidence"));
+			.withColumn("matching", functions.explode(new Column("Matchings")))
+			.select(
+				new Column("DOI").as("doi"),
+				new Column("matching.RORid").as("rorid"),
+				new Column("matching.Confidence").as("confidence"));
 
 		// prepare action sets for affiliation relations
 		return df
-				.toJavaRDD()
-				.flatMap((FlatMapFunction<Row, Relation>) row -> {
+			.toJavaRDD()
+			.flatMap((FlatMapFunction<Row, Relation>) row -> {
 
-					// DOI to OpenAIRE id
-					final String paperId = ID_PREFIX
-							+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", removePrefix(row.getAs("doi"))));
+				// DOI to OpenAIRE id
+				final String paperId = ID_PREFIX
+					+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", removePrefix(row.getAs("doi"))));
 
-					// ROR id to OpenAIRE id
-					final String affId = GenerateRorActionSetJob.calculateOpenaireId(row.getAs("rorid"));
+				// ROR id to OpenAIRE id
+				final String affId = GenerateRorActionSetJob.calculateOpenaireId(row.getAs("rorid"));
 
-					Qualifier qualifier = OafMapperUtils
-							.qualifier(
-									BIP_AFFILIATIONS_CLASSID,
-									BIP_AFFILIATIONS_CLASSNAME,
-									ModelConstants.DNET_PROVENANCE_ACTIONS,
-									ModelConstants.DNET_PROVENANCE_ACTIONS);
+				Qualifier qualifier = OafMapperUtils
+					.qualifier(
+						BIP_AFFILIATIONS_CLASSID,
+						BIP_AFFILIATIONS_CLASSNAME,
+						ModelConstants.DNET_PROVENANCE_ACTIONS,
+						ModelConstants.DNET_PROVENANCE_ACTIONS);
 
-					// format data info; setting `confidence` into relation's `trust`
-					DataInfo dataInfo = OafMapperUtils
-							.dataInfo(
-									false,
-									BIP_INFERENCE_PROVENANCE,
-									true,
-									false,
-									qualifier,
-									Double.toString(row.getAs("confidence")));
+				// format data info; setting `confidence` into relation's `trust`
+				DataInfo dataInfo = OafMapperUtils
+					.dataInfo(
+						false,
+						BIP_INFERENCE_PROVENANCE,
+						true,
+						false,
+						qualifier,
+						Double.toString(row.getAs("confidence")));
 
-					// return bi-directional relations
-					return getAffiliationRelationPair(paperId, affId, collectedfrom, dataInfo).iterator();
+				// return bi-directional relations
+				return getAffiliationRelationPair(paperId, affId, collectedfrom, dataInfo).iterator();
 
-				})
-				.map(p -> new AtomicAction(Relation.class, p))
-				.mapToPair(
-						aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
-								new Text(OBJECT_MAPPER.writeValueAsString(aa))));
+			})
+			.map(p -> new AtomicAction(Relation.class, p))
+			.mapToPair(
+				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
+					new Text(OBJECT_MAPPER.writeValueAsString(aa))));
 	}
 
 	private static JavaPairRDD<Text, Text> getTextTextJavaPairRDDNew(List<KeyValue> collectedfrom, Dataset<Row> df) {
@@ -292,7 +292,7 @@ public class PrepareAffiliationRelations implements Serializable {
 	}
 
 	private static String removePrefix(String doi) {
-		if(doi.startsWith(DOI_URL_PREFIX))
+		if (doi.startsWith(DOI_URL_PREFIX))
 			return doi.substring(DOI_URL_PREFIX_LENGTH);
 		return doi;
 	}
