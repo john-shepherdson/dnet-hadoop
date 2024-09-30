@@ -1,3 +1,5 @@
+set mapred.job.queue.name=analytics; /*EOS*/
+
 ------------------------------------------------------
 ------------------------------------------------------
 -- Dataset table/view and Dataset related tables/views
@@ -5,75 +7,74 @@
 ------------------------------------------------------
 
 -- Dataset temporary table supporting updates
-DROP TABLE IF EXISTS ${stats_db_name}.dataset_tmp purge;
+DROP TABLE IF EXISTS ${stats_db_name}.dataset purge; /*EOS*/
 
-CREATE TABLE ${stats_db_name}.dataset_tmp
-(
-    id               STRING,
-    title            STRING,
-    publisher        STRING,
-    journal          STRING,
-    date             STRING,
-    year             STRING,
-    bestlicence      STRING,
-    embargo_end_date STRING,
-    delayed          BOOLEAN,
-    authors          INT,
-    source           STRING,
-    abstract         BOOLEAN,
-    type             STRING
+CREATE TABLE ${stats_db_name}.dataset stored as parquet as
+with datast_pr as (
+    select datast.id as datast_id, case when (to_date(datast.dateofacceptance.value) > to_date( pj.enddate.value)) then true else false end as delayed
+    from ${openaire_db_name}.dataset datast
+        join ${openaire_db_name}.relation rel
+            on reltype = 'resultProject' and relclass = 'isProducedBy' and rel.source=datast.id
+                and rel.datainfo.deletedbyinference = false and rel.datainfo.invisible = false
+    join ${openaire_db_name}.project pj on pj.id=rel.target and pj.datainfo.deletedbyinference = false and pj.datainfo.invisible = false
+    where datast.datainfo.deletedbyinference = false and datast.datainfo.invisible = false
+),
+datast_delayed as (
+    select datast_id, max(delayed) as delayed
+    from datast_pr
+    group by datast_id
 )
-    clustered by (id) into 100 buckets stored AS orc tblproperties ('transactional' = 'true');
+select /*+ COALESCE(100) */
+    substr(datast.id, 4)                                                  as id,
+    datast.title[0].value                                                 as title,
+    datast.publisher.value                                                as publisher,
+    cast(null as string)                                                  as journal,
+    datast.dateofacceptance.value                                         as date,
+    date_format(datast.dateofacceptance.value, 'yyyy')                    as year,
+    datast.bestaccessright.classname                                      as bestlicence,
+    datast.embargoenddate.value                                           as embargo_end_date,
+    coalesce(datast_delayed.delayed, false)                               as delayed, -- It's delayed, when the dataset was published after the end of the project.
+    size(datast.author)                                                   as authors,
+    concat_ws('\u003B', datast.source.value)                              as source,
+    case when size(datast.description) > 0 then true else false end       as abstract,
+    'dataset'                                                             as type
+from ${openaire_db_name}.dataset datast
+    left outer join datast_delayed on datast.id=datast_delayed.datast_id
+where datast.datainfo.deletedbyinference = false and datast.datainfo.invisible = false; /*EOS*/
 
-INSERT INTO ${stats_db_name}.dataset_tmp
-SELECT substr(d.id, 4)                                            AS id,
-       d.title[0].value                                           AS title,
-       d.publisher.value                                          AS publisher,
-       cast(null AS string)                                       AS journal,
-       d.dateofacceptance.value                                   as date,
-       date_format(d.dateofacceptance.value, 'yyyy')              AS year,
-       d.bestaccessright.classname                                AS bestlicence,
-       d.embargoenddate.value                                     AS embargo_end_date,
-       false                                                      AS delayed,
-       size(d.author)                                             AS authors,
-       concat_ws('\u003B', d.source.value)                        AS source,
-       CASE WHEN SIZE(d.description) > 0 THEN TRUE ELSE FALSE end AS abstract,
-       'dataset'                                                  AS type
-FROM ${openaire_db_name}.dataset d
-WHERE d.datainfo.deletedbyinference = FALSE and d.datainfo.invisible=false;
 
-DROP TABLE IF EXISTS ${stats_db_name}.dataset_citations purge;
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_citations purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.dataset_citations STORED AS PARQUET AS
-SELECT substr(d.id, 4) AS id, xpath_string(citation.value, "//citation/id[@type='openaire']/@value") AS cites
+SELECT /*+ COALESCE(100) */ substr(d.id, 4) AS id, xpath_string(citation.value, "//citation/id[@type='openaire']/@value") AS cites
 FROM ${openaire_db_name}.dataset d
          LATERAL VIEW explode(d.extrainfo) citations AS citation
 WHERE xpath_string(citation.value, "//citation/id[@type='openaire']/@value") != ""
-  and d.datainfo.deletedbyinference = false and d.datainfo.invisible=false;
+  and d.datainfo.deletedbyinference = false and d.datainfo.invisible=false; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.dataset_classifications purge;
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_classifications purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.dataset_classifications STORED AS PARQUET AS
-SELECT substr(p.id, 4) AS id, instancetype.classname AS type
+SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, instancetype.classname AS type
 FROM ${openaire_db_name}.dataset p
          LATERAL VIEW explode(p.instance.instancetype) instances AS instancetype
-where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
+where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.dataset_concepts purge;
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_concepts purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.dataset_concepts STORED AS PARQUET AS
-SELECT substr(p.id, 4) as id, case
+SELECT /*+ COALESCE(100) */ substr(p.id, 4) as id, case
                                   when contexts.context.id RLIKE '^[^::]+::[^::]+::.+$' then contexts.context.id
                                   when contexts.context.id RLIKE '^[^::]+::[^::]+$' then concat(contexts.context.id, '::other')
                                   when contexts.context.id RLIKE '^[^::]+$' then concat(contexts.context.id, '::other::other') END as concept
 from ${openaire_db_name}.dataset p
          LATERAL VIEW explode(p.context) contexts as context
-where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
+where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.dataset_datasources purge;
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_datasources purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.dataset_datasources STORED AS PARQUET AS
-SELECT p.id, case when d.id IS NULL THEN 'other' ELSE p.datasource END AS datasource
+SELECT /*+ COALESCE(100) */ p.id, case when d.id IS NULL THEN 'other' ELSE p.datasource END AS datasource
 FROM (
          SELECT substr(p.id, 4) as id, substr(instances.instance.hostedby.key, 4) AS datasource
          FROM ${openaire_db_name}.dataset p
@@ -82,35 +83,35 @@ FROM (
          LEFT OUTER JOIN (
     SELECT substr(d.id, 4) id
     FROM ${openaire_db_name}.datasource d
-    WHERE d.datainfo.deletedbyinference = false and d.datainfo.invisible=false) d ON p.datasource = d.id;
+    WHERE d.datainfo.deletedbyinference = false and d.datainfo.invisible=false) d ON p.datasource = d.id; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.dataset_languages purge;
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_languages purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.dataset_languages STORED AS PARQUET AS
-SELECT substr(p.id, 4) AS id, p.language.classname AS language
+SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, p.language.classname AS language
 FROM ${openaire_db_name}.dataset p
-where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
+where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.dataset_oids purge;
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_oids purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.dataset_oids STORED AS PARQUET AS
-SELECT substr(p.id, 4) AS id, oids.ids AS oid
+SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, oids.ids AS oid
 FROM ${openaire_db_name}.dataset p
          LATERAL VIEW explode(p.originalid) oids AS ids
-where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
+where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.dataset_pids purge;
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_pids purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.dataset_pids STORED AS PARQUET AS
-SELECT substr(p.id, 4) AS id, ppid.qualifier.classname AS type, ppid.value AS pid
+SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, ppid.qualifier.classname AS type, ppid.value AS pid
 FROM ${openaire_db_name}.dataset p
          LATERAL VIEW explode(p.pid) pids AS ppid
-where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
+where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.dataset_topics purge;
+DROP TABLE IF EXISTS ${stats_db_name}.dataset_topics purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.dataset_topics STORED AS PARQUET AS
-SELECT substr(p.id, 4) AS id, subjects.subject.qualifier.classname AS type, subjects.subject.value AS topic
+SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, subjects.subject.qualifier.classname AS type, subjects.subject.value AS topic
 FROM ${openaire_db_name}.dataset p
          LATERAL VIEW explode(p.subject) subjects AS subject
-where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false;
+where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
