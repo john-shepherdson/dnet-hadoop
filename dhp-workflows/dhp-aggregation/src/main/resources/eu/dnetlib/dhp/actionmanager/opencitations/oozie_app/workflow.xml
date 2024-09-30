@@ -94,17 +94,7 @@
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
             <arg>--inputPath</arg><arg>${inputPath}/Original</arg>
             <arg>--outputPath</arg><arg>${inputPath}/Extracted</arg>
-        </java>
-        <ok to="read"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="extract_correspondence">
-        <java>
-            <main-class>eu.dnetlib.dhp.actionmanager.opencitations.GetOpenCitationsRefs</main-class>
-            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
-            <arg>--inputPath</arg><arg>${inputPath}/correspondence</arg>
-            <arg>--outputPath</arg><arg>${inputPath}/correspondence_extracted</arg>
+            <arg>--backupPath</arg><arg>${inputPath}/backup</arg>
         </java>
         <ok to="read"/>
         <error to="Kill"/>
@@ -129,7 +119,6 @@
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/Extracted</arg>
             <arg>--outputPath</arg><arg>${inputPath}/JSON</arg>
-            <arg>--backupPath</arg><arg>${inputPath}/backup</arg>
             <arg>--delimiter</arg><arg>${delimiter}</arg>
             <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
         </spark>
