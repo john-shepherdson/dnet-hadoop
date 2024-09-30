@@ -1,4 +1,3 @@
-
 package eu.dnetlib.dhp.schema.oaf.utils;
 
 import java.util.*;

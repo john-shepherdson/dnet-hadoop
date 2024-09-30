@@ -29,7 +29,7 @@ class JsonPathTest {
 		Assertions.assertNotNull(row);
 		Assertions.assertTrue(StringUtils.isNotBlank(row.getAs("identifier")));
 
-		System.out.println("row = " + row.getAs("country"));
+		System.out.println("row = " + row.getAs("countrytitle"));
 	}
 
 	@Test

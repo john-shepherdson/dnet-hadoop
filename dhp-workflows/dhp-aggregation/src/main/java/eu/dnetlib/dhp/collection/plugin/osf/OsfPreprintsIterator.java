@@ -34,9 +34,9 @@ public class OsfPreprintsIterator implements Iterator<String> {
 	private final Queue<String> recordQueue = new PriorityBlockingQueue<>();
 
 	public OsfPreprintsIterator(
-		final String baseUrl,
-		final int pageSize,
-		final HttpClientParams clientParams) {
+			final String baseUrl,
+			final int pageSize,
+			final HttpClientParams clientParams) {
 
 		this.clientParams = clientParams;
 		this.baseUrl = baseUrl;
@@ -54,8 +54,7 @@ public class OsfPreprintsIterator implements Iterator<String> {
 	@Override
 	public boolean hasNext() {
 		synchronized (this.recordQueue) {
-			while (this.recordQueue.isEmpty() && StringUtils.isNotBlank(this.currentUrl)
-				&& this.currentUrl.startsWith("http")) {
+			while (this.recordQueue.isEmpty() && StringUtils.isNotBlank(this.currentUrl) && this.currentUrl.startsWith("http")) {
 				try {
 					this.currentUrl = downloadPage(this.currentUrl);
 				} catch (final CollectorException e) {
@@ -64,9 +63,7 @@ public class OsfPreprintsIterator implements Iterator<String> {
 				}
 			}
 
-			if (!this.recordQueue.isEmpty()) {
-				return true;
-			}
+			if (!this.recordQueue.isEmpty()) { return true; }
 
 			return false;
 		}
@@ -115,9 +112,7 @@ public class OsfPreprintsIterator implements Iterator<String> {
 	}
 
 	private Document downloadUrl(final String url, final int attempt) throws CollectorException {
-		if (attempt > MAX_ATTEMPTS) {
-			throw new CollectorException("Max Number of attempts reached, url:" + url);
-		}
+		if (attempt > MAX_ATTEMPTS) { throw new CollectorException("Max Number of attempts reached, url:" + url); }
 
 		if (attempt > 0) {
 			final int delay = (attempt * 5000);
