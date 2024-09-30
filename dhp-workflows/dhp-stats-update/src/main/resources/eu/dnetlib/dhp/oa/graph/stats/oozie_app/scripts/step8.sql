@@ -8,14 +8,20 @@ set mapred.job.queue.name=analytics; /*EOS*/
 ------------------------------------------------------------
 ------------------------------------------------------------
 DROP TABLE IF EXISTS ${stats_db_name}.datasource purge; /*EOS*/
+DROP TABLE IF EXISTS ${stats_db_name}.harested_datasources purge; /*EOS*/
+DROP TABLE IF EXISTS ${stats_db_name}.piwik_datasource purge; /*EOS*/
+
+create table ${stats_db_name}.harested_datasources stored as parquet as
+select distinct inst.hostedby.key as d_id
+from ${openaire_db_name}.result lateral view outer explode (instance) insts as inst; /*EOS*/
+
+create table ${stats_db_name}.piwik_datasource stored as parquet as
+select id, split(originalidd, '\\:')[1] as piwik_id
+from ${openaire_db_name}.datasource
+         lateral view explode(originalid) temp as originalidd
+where originalidd like "piwik:%"; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.datasource stored as parquet as
-with piwik_datasource as (
-    select id, split(originalidd, '\\:')[1] as piwik_id
-    from ${openaire_db_name}.datasource
-             lateral view explode(originalid) temp as originalidd
-    where originalidd like "piwik:%"
-)
 select /*+ COALESCE(100) */
        substr(dtrce.id, 4)                                                                                                 as id,
        case when dtrce.officialname.value='Unknown Repository' then 'Other' else dtrce.officialname.value end              as name,
@@ -31,10 +37,12 @@ select /*+ COALESCE(100) */
        dtrce.journal.issnprinted                                                                                           as issn_printed,
        dtrce.journal.issnonline                                                                                            as issn_online
 from ${openaire_db_name}.datasource dtrce
-         left outer join (select inst.hostedby.key as d_id from ${openaire_db_name}.result lateral view outer explode (instance) insts as inst) res on res.d_id=dtrce.id
-         left outer join piwik_datasource piwik_d on piwik_d.id=dtrce.id
+left outer join ${stats_db_name}.harested_datasources res on res.d_id=dtrce.id
+left outer join ${stats_db_name}.piwik_datasource piwik_d on piwik_d.id=dtrce.id
 where dtrce.datainfo.deletedbyinference = false and dtrce.datainfo.invisible = false; /*EOS*/
 
+drop table ${stats_db_name}.harested_datasources; /*EOS*/
+drop table ${stats_db_name}.piwik_datasource; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.datasource_languages purge; /*EOS*/
 
