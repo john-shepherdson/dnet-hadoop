@@ -18,45 +18,6 @@ import eu.dnetlib.pace.tree.support.TreeStats;
 class DecisionTreeTest {
 
 	@Test
-	void testJPath() throws IOException {
-
-		DedupConfig conf = DedupConfig
-			.load(IOUtils.toString(getClass().getResourceAsStream("dedup_conf_organization.json")));
-
-		final String org = IOUtils.toString(getClass().getResourceAsStream("organization.json"));
-
-		Row row = SparkModel.apply(conf).rowFromJson(org);
-
-		System.out.println("row = " + row);
-		Assertions.assertNotNull(row);
-		Assertions.assertTrue(StringUtils.isNotBlank(row.getAs("identifier")));
-
-		System.out.println("row = " + row.getAs("countrytitle"));
-	}
-
-	@Test
-	void jsonToModelTest() throws IOException {
-		DedupConfig conf = DedupConfig
-			.load(
-				IOUtils
-					.toString(
-						SparkOpenorgsDedupTest.class
-							.getResourceAsStream(
-								"/eu/dnetlib/dhp/dedup/conf/org.curr.conf.json")));
-
-		final String org = IOUtils.toString(getClass().getResourceAsStream("organization_example1.json"));
-
-		Row row = SparkModel.apply(conf).rowFromJson(org);
-		// to check that the same parsing returns the same row
-		Row row1 = SparkModel.apply(conf).rowFromJson(org);
-
-		Assertions.assertEquals(row, row1);
-		System.out.println("row = " + row);
-		Assertions.assertNotNull(row);
-		Assertions.assertTrue(StringUtils.isNotBlank(row.getAs("identifier")));
-	}
-
-	@Test
 	void organizationDecisionTreeTest() throws Exception {
 		DedupConfig conf = DedupConfig
 			.load(

@@ -49,18 +49,15 @@ public class SparkDedupLocalTest extends DedupLocalTestUtils {
     static DedupConfig config;
     static JavaSparkContext context;
 
-//    final String entitiesPath = Paths
-//            .get(Objects.requireNonNull(SparkDedupLocalTest.class.getResource("/eu/dnetlib/dhp/dedup/entities/publication")).toURI())
-//            .toFile()
-//            .getAbsolutePath();
+    final String entitiesPath = Paths
+            .get(Objects.requireNonNull(SparkDedupLocalTest.class.getResource("/eu/dnetlib/dhp/dedup/entities/publication")).toURI())
+            .toFile()
+            .getAbsolutePath();
 
-//    final String dedupConfPath = Paths
-//            .get(Objects.requireNonNull(SparkDedupLocalTest.class.getResource("/eu/dnetlib/dhp/dedup/conf/pub.curr.conf.json")).toURI())
-//            .toFile()
-//            .getAbsolutePath();
-
-    final String entitiesPath = "/Users/miconis/Desktop/pub_to_fix1.json";
-    final String dedupConfPath = "/Users/miconis/Desktop/pub.conf.json";
+    final String dedupConfPath = Paths
+            .get(Objects.requireNonNull(SparkDedupLocalTest.class.getResource("/eu/dnetlib/dhp/dedup/conf/pub.curr.conf.json")).toURI())
+            .toFile()
+            .getAbsolutePath();
 
     final static int MAX_ACCEPTANCE_DATE = 20;
 
