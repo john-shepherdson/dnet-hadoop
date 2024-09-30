@@ -54,4 +54,19 @@ class JsonPathTest {
 		Assertions.assertTrue(StringUtils.isNotBlank(row.getAs("identifier")));
 	}
 
+	@Test
+	void testJPath2() throws IOException {
+
+		DedupConfig conf = DedupConfig
+				.load(IOUtils.toString(getClass().getResourceAsStream("dedup_conf_dataset.json")));
+
+		final String dat = IOUtils.toString(getClass().getResourceAsStream("dataset_example1.json"));
+
+		Row row = SparkModel.apply(conf).rowFromJson(dat);
+
+		System.out.println("row = " + row);
+		Assertions.assertNotNull(row);
+		Assertions.assertTrue(StringUtils.isNotBlank(row.getAs("identifier")));
+
+	}
 }

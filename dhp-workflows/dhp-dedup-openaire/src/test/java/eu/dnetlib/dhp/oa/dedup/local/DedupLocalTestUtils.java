@@ -18,8 +18,10 @@ import org.apache.spark.sql.Row;
 import org.spark_project.guava.hash.Hashing;
 import scala.collection.JavaConverters;
 import scala.collection.convert.Wrappers;
+import scala.collection.mutable.ArrayBuffer;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,17 +35,16 @@ public abstract class DedupLocalTestUtils {
             if(value.getClass() == String.class){
                 ret.append("<tr><th>").append(fieldName).append("</th><td>").append(value).append("</td></tr>");
             }
-            else {
-                List<String> strings = IteratorUtils.toList(JavaConverters.asJavaIteratorConverter(((Wrappers.JListWrapper<String>) value).iterator()).asJava());
-
-                if(value.toString().contains("value")) {
-                    List<String> values = strings.stream().map(DedupLocalTestUtils::takeValue).collect(Collectors.toList());
-                    ret.append("<tr><th>").append(fieldName).append("</th><td>[").append(String.join(";", values)).append("]</td></tr>");
-                }
-                else {
-                    ret.append("<tr><th>").append(fieldName).append("</th><td>[").append(String.join(";", strings)).append("]</td></tr>");
-                }
-
+            else if(value.getClass() == Wrappers.JListWrapper.class) {
+                List<String> values = IteratorUtils.toList(JavaConverters.asJavaIteratorConverter(((Wrappers.JListWrapper<String>) value).iterator()).asJava())
+                        .stream()
+                        .map(DedupLocalTestUtils::takeValue)
+                        .collect(Collectors.toList());
+                ret.append("<tr><th>").append(fieldName).append("</th><td>[").append(String.join(";", values)).append("]</td></tr>");
+            }
+            else if(value.getClass() == ArrayBuffer.class){
+                List<String> values = new ArrayList<>(IteratorUtils.toList(JavaConverters.asJavaIteratorConverter(((ArrayBuffer<String>) value).iterator()).asJava()));
+                ret.append("<tr><th>").append(fieldName).append("</th><td>[").append(String.join(";", values)).append("]</td></tr>");
             }
 
         }
@@ -122,9 +123,8 @@ public abstract class DedupLocalTestUtils {
             return rootNode.get("value").toString().replaceAll("\"", "");
 
         } catch (Exception e) {
-            return "";
+            return json;
         }
-
 
     }
 
