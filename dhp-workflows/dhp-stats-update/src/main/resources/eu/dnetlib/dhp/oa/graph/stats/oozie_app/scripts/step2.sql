@@ -41,6 +41,7 @@ select /*+ COALESCE(100) */
 from ${openaire_db_name}.publication pub
     left outer join pub_delayed on pub.id=pub_delayed.pub_id
 where pub.datainfo.deletedbyinference = false and pub.datainfo.invisible = false; /*EOS*/
+ANALYSE TABLE ${stats_db_name}.publication COMPUTE STATISTICS; /*EOS*/
 
 
 DROP TABLE IF EXISTS ${stats_db_name}.publication_classifications purge; /*EOS*/
@@ -50,6 +51,7 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) as id, instancetype.classname as typ
 from ${openaire_db_name}.publication p
          LATERAL VIEW explode(p.instance.instancetype) instances as instancetype
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
+ANALYSE TABLE ${stats_db_name}.publication_classifications COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.publication_concepts purge; /*EOS*/
 
@@ -61,6 +63,8 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) as id, case
 from ${openaire_db_name}.publication p
          LATERAL VIEW explode(p.context) contexts as context
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
+
+ANALYSE TABLE ${stats_db_name}.publication_concepts COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.publication_datasources purge; /*EOS*/
 
@@ -75,12 +79,16 @@ FROM (
     from ${openaire_db_name}.datasource d
     WHERE d.datainfo.deletedbyinference = false and d.datainfo.invisible=false) d on p.datasource = d.id; /*EOS*/
 
+ANALYSE TABLE ${stats_db_name}.publication_datasources COMPUTE STATISTICS; /*EOS*/
+
 DROP TABLE IF EXISTS ${stats_db_name}.publication_languages purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.publication_languages STORED AS PARQUET AS
 select /*+ COALESCE(100) */ substr(p.id, 4) as id, p.language.classname as language
 FROM ${openaire_db_name}.publication p
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
+
+ANALYSE TABLE ${stats_db_name}.publication_languages COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.publication_oids purge; /*EOS*/
 
@@ -90,6 +98,8 @@ FROM ${openaire_db_name}.publication p
          LATERAL VIEW explode(p.originalid) oids AS ids
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
+ANALYSE TABLE ${stats_db_name}.publication_oids COMPUTE STATISTICS; /*EOS*/
+
 DROP TABLE IF EXISTS ${stats_db_name}.publication_pids purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.publication_pids STORED AS PARQUET AS
@@ -97,6 +107,8 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, ppid.qualifier.classname AS t
 FROM ${openaire_db_name}.publication p
          LATERAL VIEW explode(p.pid) pids AS ppid
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
+
+ANALYSE TABLE ${stats_db_name}.publication_pids COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.publication_topics purge; /*EOS*/
 
@@ -106,6 +118,8 @@ FROM ${openaire_db_name}.publication p
          LATERAL VIEW explode(p.subject) subjects AS subject
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
+ANALYSE TABLE ${stats_db_name}.publication_topics COMPUTE STATISTICS; /*EOS*/
+
 DROP TABLE IF EXISTS ${stats_db_name}.publication_citations purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.publication_citations STORED AS PARQUET AS
@@ -114,3 +128,5 @@ FROM ${openaire_db_name}.publication p
          lateral view explode(p.extrainfo) citations AS citation
 WHERE xpath_string(citation.value, "//citation/id[@type='openaire']/@value") != ""
   and p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
+
+ANALYSE TABLE ${stats_db_name}.publication_citations COMPUTE STATISTICS; /*EOS*/

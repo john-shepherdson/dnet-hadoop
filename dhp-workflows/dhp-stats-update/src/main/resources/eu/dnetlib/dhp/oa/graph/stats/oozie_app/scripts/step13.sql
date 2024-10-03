@@ -20,6 +20,8 @@ LEFT OUTER JOIN
     from ${openaire_db_name}.datasource d 
     WHERE d.datainfo.deletedbyinference=false and d.datainfo.invisible = FALSE) d on p.datasource = d.id; /*EOS*/
 
+ANALYSE TABLE ${stats_db_name}.publication_sources COMPUTE STATISTICS; /*EOS*/
+
 DROP TABLE IF EXISTS ${stats_db_name}.dataset_sources purge; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.dataset_sources STORED AS PARQUET as
@@ -32,7 +34,9 @@ LEFT OUTER JOIN
     SELECT substr(d.id, 4) id 
     from ${openaire_db_name}.datasource d 
     WHERE d.datainfo.deletedbyinference=false and d.datainfo.invisible = FALSE) d on p.datasource = d.id; /*EOS*/
-    
+
+ANALYSE TABLE ${stats_db_name}.dataset_sources COMPUTE STATISTICS; /*EOS*/
+
 DROP TABLE IF EXISTS ${stats_db_name}.software_sources purge; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.software_sources STORED AS PARQUET as
@@ -45,7 +49,9 @@ LEFT OUTER JOIN
     SELECT substr(d.id, 4) id 
     from ${openaire_db_name}.datasource d 
     WHERE d.datainfo.deletedbyinference=false and d.datainfo.invisible = FALSE) d on p.datasource = d.id; /*EOS*/
-    
+
+ANALYSE TABLE ${stats_db_name}.software_sources COMPUTE STATISTICS; /*EOS*/
+
 DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_sources purge; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.otherresearchproduct_sources STORED AS PARQUET as
@@ -58,6 +64,8 @@ LEFT OUTER JOIN
     SELECT substr(d.id, 4) id 
     from ${openaire_db_name}.datasource d 
     WHERE d.datainfo.deletedbyinference=false and d.datainfo.invisible = FALSE) d on p.datasource = d.id; /*EOS*/
+
+ANALYSE TABLE ${stats_db_name}.otherresearchproduct_sources COMPUTE STATISTICS; /*EOS*/
 
 CREATE VIEW IF NOT EXISTS ${stats_db_name}.result_sources AS
 SELECT * FROM ${stats_db_name}.publication_sources
@@ -80,6 +88,8 @@ from (
     LATERAL VIEW explode(auth.pid.qualifier.classid) apt as author_pid_type
     WHERE res.datainfo.deletedbyinference = FALSE and res.datainfo.invisible = FALSE and author_pid_type = 'orcid') as res; /*EOS*/
 
+ANALYSE TABLE ${stats_db_name}.result_orcid COMPUTE STATISTICS; /*EOS*/
+
 DROP TABLE IF EXISTS ${stats_db_name}.result_result purge; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.result_result stored as parquet as
@@ -94,6 +104,8 @@ where reltype='resultResult'
     and r1.resulttype.classname != 'other'
     and r2.resulttype.classname != 'other'
     and rel.datainfo.deletedbyinference=false and rel.datainfo.invisible = FALSE; /*EOS*/
+
+ANALYSE TABLE ${stats_db_name}.result_result COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.result_citations_oc purge; /*EOS*/
 
@@ -112,6 +124,8 @@ where relClass='Cites' and rel.datainfo.provenanceaction.classid = 'sysimport:cr
     and rel.datainfo.deletedbyinference=false and rel.datainfo.invisible = FALSE
 group by substr(target, 4); /*EOS*/
 
+ANALYSE TABLE ${stats_db_name}.result_citations COMPUTE STATISTICS; /*EOS*/
+
 DROP TABLE IF EXISTS ${stats_db_name}.result_references_oc purge; /*EOS*/
 
 CREATE TABLE IF NOT EXISTS ${stats_db_name}.result_references_oc stored as parquet as
@@ -128,3 +142,5 @@ where relClass='Cites' and rel.datainfo.provenanceaction.classid = 'sysimport:cr
     and r2.resulttype.classname != 'other'
     and rel.datainfo.deletedbyinference=false and rel.datainfo.invisible = FALSE
 group by substr(source, 4); /*EOS*/
+
+ANALYSE TABLE ${stats_db_name}.result_references_oc COMPUTE STATISTICS; /*EOS*/

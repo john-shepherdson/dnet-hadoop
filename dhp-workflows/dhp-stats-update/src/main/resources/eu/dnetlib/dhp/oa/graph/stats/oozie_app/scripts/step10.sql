@@ -37,15 +37,22 @@ FROM ${external_stats_db_name}.licenses_normalized; /*EOS*/
 create or replace view ${stats_db_name}.usage_stats as
 select * from openaire_prod_usage_stats.usage_stats; /*EOS*/
 
+ANALYSE TABLE ${stats_db_name}.usage_stats COMPUTE STATISTICS; /*EOS*/
+
 create or replace view ${stats_db_name}.downloads_stats as
 select * from openaire_prod_usage_stats.downloads_stats; /*EOS*/
+
+ANALYSE TABLE ${stats_db_name}.download_stats COMPUTE STATISTICS; /*EOS*/
 
 create or replace view ${stats_db_name}.pageviews_stats as
 select * from openaire_prod_usage_stats.pageviews_stats; /*EOS*/
 
+ANALYSE TABLE ${stats_db_name}.pageviews COMPUTE STATISTICS; /*EOS*/
+
 create or replace view ${stats_db_name}.views_stats as
 select * from openaire_prod_usage_stats.views_stats; /*EOS*/
 
+ANALYSE TABLE ${stats_db_name}.views_stats COMPUTE STATISTICS; /*EOS*/
 ------------------------------------------------------------------------------------------------
 ------------------------------------------------------------------------------------------------
 -- Creation date of the database
