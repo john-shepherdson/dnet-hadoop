@@ -8,10 +8,9 @@ set mapred.job.queue.name=analytics; /*EOS*/
 drop table if exists ${stats_db_name}.result_peerreviewed purge; /*EOS*/
 
 create table IF NOT EXISTS ${stats_db_name}.result_peerreviewed STORED AS PARQUET as
-select /*+ COALESCE(100) */ r.id as id, case when doi.doi_from_crossref=1 and grey.grey_lit=0 then true else false end as peer_reviewed
+select /*+ COALESCE(100) */ r.id as id, case when rf.refereed='peerReviewed' then true else false end as peer_reviewed
 from ${stats_db_name}.result r
-left outer join ${stats_db_name}.indi_pub_doi_from_crossref doi on doi.id=r.id
-left outer join ${stats_db_name}.indi_pub_grey_lit grey on grey.id=r.id; /*EOS*/
+left outer join ${stats_db_name}.result_refereed rf on rf.id=r.id; /*EOS*/
 
 -- Green OA:
 drop table if exists ${stats_db_name}.result_greenoa purge; /*EOS*/
