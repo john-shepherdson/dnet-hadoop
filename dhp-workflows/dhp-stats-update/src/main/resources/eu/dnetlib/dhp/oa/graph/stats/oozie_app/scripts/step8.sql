@@ -8,6 +8,18 @@ set mapred.job.queue.name=analytics; /*EOS*/
 ------------------------------------------------------------
 ------------------------------------------------------------
 DROP TABLE IF EXISTS ${stats_db_name}.datasource purge; /*EOS*/
+DROP TABLE IF EXISTS ${stats_db_name}.harested_datasources purge; /*EOS*/
+DROP TABLE IF EXISTS ${stats_db_name}.piwik_datasource purge; /*EOS*/
+
+create table ${stats_db_name}.harested_datasources stored as parquet as
+select distinct inst.hostedby.key as d_id
+from ${openaire_db_name}.result lateral view outer explode (instance) insts as inst; /*EOS*/
+
+create table ${stats_db_name}.piwik_datasource stored as parquet as
+select id, split(originalidd, '\\:')[1] as piwik_id
+from ${openaire_db_name}.datasource
+         lateral view explode(originalid) temp as originalidd
+where originalidd like "piwik:%"; /*EOS*/
 
 create table ${stats_db_name}.harested_datasources stored as parquet as
 select distinct inst.hostedby.key as d_id
