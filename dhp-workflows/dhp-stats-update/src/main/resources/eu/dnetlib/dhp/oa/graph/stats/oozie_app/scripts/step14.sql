@@ -14,7 +14,7 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) as id, licenses.value as type
 from ${openaire_db_name}.publication p LATERAL VIEW explode(p.instance.license) instances as licenses
 where licenses.value is not null and licenses.value != '' and p.datainfo.deletedbyinference=false and p.datainfo.invisible = FALSE; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.publication_licenses COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.publication_licenses COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.dataset_licenses purge; /*EOS*/
 
@@ -23,7 +23,7 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) as id, licenses.value as type
 from ${openaire_db_name}.dataset p LATERAL VIEW explode(p.instance.license) instances as licenses
 where licenses.value is not null and licenses.value != '' and p.datainfo.deletedbyinference=false and p.datainfo.invisible = FALSE; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.dataset_licenses COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.dataset_licenses COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.software_licenses purge; /*EOS*/
 
@@ -32,7 +32,7 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) as id, licenses.value as type
 from ${openaire_db_name}.software p LATERAL VIEW explode(p.instance.license) instances as licenses
 where licenses.value is not null and licenses.value != '' and p.datainfo.deletedbyinference=false and p.datainfo.invisible = FALSE; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.software_licenses COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.software_licenses COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_licenses purge; /*EOS*/
 
@@ -41,7 +41,7 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) as id, licenses.value as type
 from ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.instance.license) instances as licenses
 where licenses.value is not null and licenses.value != '' and p.datainfo.deletedbyinference=false and p.datainfo.invisible = FALSE; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.otherresearproduct_licenses COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.otherresearproduct_licenses COMPUTE STATISTICS; /*EOS*/
 
 CREATE VIEW IF NOT EXISTS ${stats_db_name}.result_licenses AS
 SELECT * FROM ${stats_db_name}.publication_licenses
@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS ${stats_db_name}.organization_pids STORED AS PARQUET 
 select /*+ COALESCE(100) */ substr(o.id, 4) as id, ppid.qualifier.classname as type, ppid.value as pid
 from ${openaire_db_name}.organization o lateral view explode(o.pid) pids as ppid; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.organization_pids COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.organization_pids COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.organization_sources purge; /*EOS*/
 
@@ -72,7 +72,7 @@ FROM (
         from ${openaire_db_name}.datasource d 
         WHERE d.datainfo.deletedbyinference=false and d.datainfo.invisible = FALSE) d on o.datasource = d.id; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.organization_sources COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.organization_sources COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.result_accessroute purge; /*EOS*/
 
@@ -81,4 +81,4 @@ select /*+ COALESCE(100) */ distinct substr(id,4) as id, accessroute from ${open
     lateral view explode (instance.accessright.openaccessroute) openaccessroute as accessroute
 WHERE datainfo.deletedbyinference=false and datainfo.invisible = FALSE; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.result_accessroute COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.result_accessroute COMPUTE STATISTICS; /*EOS*/

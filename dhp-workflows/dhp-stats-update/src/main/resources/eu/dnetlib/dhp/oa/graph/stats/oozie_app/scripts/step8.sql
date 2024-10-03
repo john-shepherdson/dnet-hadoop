@@ -25,7 +25,7 @@ create table ${stats_db_name}.harested_datasources stored as parquet as
 select distinct inst.hostedby.key as d_id
 from ${openaire_db_name}.result lateral view outer explode (instance) insts as inst; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.harested_datasources COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.harested_datasources COMPUTE STATISTICS; /*EOS*/
 
 create table ${stats_db_name}.piwik_datasource stored as parquet as
 select id, split(originalidd, '\\:')[1] as piwik_id
@@ -33,7 +33,7 @@ from ${openaire_db_name}.datasource
          lateral view explode(originalid) temp as originalidd
 where originalidd like "piwik:%"; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.piwik_datasource COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.piwik_datasource COMPUTE STATISTICS; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.datasource stored as parquet as
 select /*+ COALESCE(100) */
@@ -55,7 +55,7 @@ left outer join ${stats_db_name}.harested_datasources res on res.d_id=dtrce.id
 left outer join ${stats_db_name}.piwik_datasource piwik_d on piwik_d.id=dtrce.id
 where dtrce.datainfo.deletedbyinference = false and dtrce.datainfo.invisible = false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.datasource COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.datasource COMPUTE STATISTICS; /*EOS*/
 
 drop table ${stats_db_name}.harested_datasources; /*EOS*/
 drop table ${stats_db_name}.piwik_datasource; /*EOS*/
@@ -67,7 +67,7 @@ SELECT /*+ COALESCE(100) */ substr(d.id, 4) AS id, langs.languages AS language
 FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.odlanguages.value) langs AS languages
 where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.datasource_languages COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.datasource_languages COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.datasource_oids purge; /*EOS*/
 
@@ -76,7 +76,7 @@ SELECT /*+ COALESCE(100) */ substr(d.id, 4) AS id, oids.ids AS oid
 FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.originalid) oids AS ids
 where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.datasource_oids COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.datasource_oids COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.datasource_organizations purge; /*EOS*/
 
@@ -85,7 +85,7 @@ SELECT /*+ COALESCE(100) */ substr(r.target, 4) AS id, substr(r.source, 4) AS or
 FROM ${openaire_db_name}.relation r
 WHERE r.reltype = 'datasourceOrganization' and r.datainfo.deletedbyinference = false and r.source like '20|%' and r.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.datasource_organizations COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.datasource_organizations COMPUTE STATISTICS; /*EOS*/
 
 -- datasource sources:
 -- where the datasource info have been collected from.
@@ -96,7 +96,7 @@ select /*+ COALESCE(100) */ substr(d.id, 4) as id, substr(cf.key, 4) as datasour
 from ${openaire_db_name}.datasource d lateral view explode(d.collectedfrom) cfrom as cf
 where d.datainfo.deletedbyinference = false and d.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.datasource_sources COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.datasource_sources COMPUTE STATISTICS; /*EOS*/
 
 CREATE OR REPLACE VIEW ${stats_db_name}.datasource_results AS
 SELECT datasource AS id, id AS result

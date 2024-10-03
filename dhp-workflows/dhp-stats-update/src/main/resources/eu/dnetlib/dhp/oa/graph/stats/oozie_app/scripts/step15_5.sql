@@ -11,7 +11,7 @@ from ${stats_db_name}.result r
 left outer join ${stats_db_name}.result_projects rp on rp.id=r.id
 group by r.id; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.result_projectcount COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.result_projectcount COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.project_resultcount purge; /*EOS*/
 
@@ -21,7 +21,7 @@ from ${stats_db_name}.project p
 left outer join ${stats_db_name}.result_projects rp on rp.project=p.id
 left outer join ${stats_db_name}.result r on r.id=rp.id; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.project_res COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.project_res COMPUTE STATISTICS; /*EOS*/
 
 
 create table if not exists ${stats_db_name}.project_resultcount STORED AS PARQUET as
@@ -33,7 +33,7 @@ select pid,
 from ${stats_db_name}.project_res
 group by pid; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.project_resultcount COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.project_resultcount COMPUTE STATISTICS; /*EOS*/
 
 drop table ${stats_db_name}.project_res; /*EOS*/
 
@@ -45,7 +45,7 @@ select distinct rp.id, p.funder
 from ${stats_db_name}.result_projects rp
 join ${stats_db_name}.project p on p.id=rp.project; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.result_funder COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.result_funder COMPUTE STATISTICS; /*EOS*/
 
 create table if not exists ${stats_db_name}.result_fundercount STORED AS PARQUET as
 select /*+ COALESCE(100) */ r.id, count(rf.funder) as count
@@ -53,7 +53,7 @@ from ${stats_db_name}.result r
 left outer join ${stats_db_name}.result_funder rf on rf.id=r.id
 group by r.id; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.result_fundercount COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.result_fundercount COMPUTE STATISTICS; /*EOS*/
 
 drop table ${stats_db_name}.result_funder; /*EOS*/
 
@@ -75,7 +75,7 @@ from (
          from ${openaire_db_name}.result r lateral view explode(r.instance) instances as inst lateral view outer explode(inst.pid) pids as p) r
 join ${stats_db_name}.result res on res.id=r.id; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.result_instance COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.result_instance COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.result_apc purge; /*EOS*/
 
@@ -87,6 +87,6 @@ from (
 join ${stats_db_name}.result res on res.id=r.id
 where r.amount is not null; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.result_apc COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.result_apc COMPUTE STATISTICS; /*EOS*/
 
 create or replace view ${stats_db_name}.issn_gold_oa_dataset as select * from ${external_stats_db_name}.issn_gold_oa_dataset; /*EOS*/

@@ -42,7 +42,7 @@ from ${openaire_db_name}.otherresearchproduct other
     left outer join other_delayed on other.id=other_delayed.other_id
 where other.datainfo.deletedbyinference = false and other.datainfo.invisible = false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.otherresearchproduct COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.otherresearchproduct COMPUTE STATISTICS; /*EOS*/
 
 -- Otherresearchproduct_citations
 DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_citations purge; /*EOS*/
@@ -53,7 +53,7 @@ FROM ${openaire_db_name}.otherresearchproduct o LATERAL VIEW explode(o.extrainfo
 WHERE xpath_string(citation.value, "//citation/id[@type='openaire']/@value") != ""
   and o.datainfo.deletedbyinference = false and o.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.otherresearchproduct_citations COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.otherresearchproduct_citations COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_classifications purge; /*EOS*/
 
@@ -62,7 +62,7 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, instancetype.classname AS typ
 FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.instance.instancetype) instances AS instancetype
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.otherresearchproduct_classifications COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.otherresearchproduct_classifications COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_concepts purge; /*EOS*/
 
@@ -74,7 +74,7 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) as id, case
 FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.context) contexts AS context
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.otherresearchproduct_concepts COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.otherresearchproduct_concepts COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_datasources purge; /*EOS*/
 
@@ -87,7 +87,7 @@ FROM (SELECT substr(p.id, 4) AS id, substr(instances.instance.hostedby.key, 4) A
                          from ${openaire_db_name}.datasource d
                          WHERE d.datainfo.deletedbyinference = false and d.datainfo.invisible=false) d on p.datasource = d.id; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.otherresearchproduct_datasources COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.otherresearchproduct_datasources COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_languages purge; /*EOS*/
 
@@ -96,7 +96,7 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, p.language.classname AS langu
 FROM ${openaire_db_name}.otherresearchproduct p
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.otherresearchproduct_languages COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.otherresearchproduct_languages COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_oids purge; /*EOS*/
 
@@ -105,7 +105,7 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, oids.ids AS oid
 FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.originalid) oids AS ids
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.otherresearchproduct_oids COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.otherresearchproduct_oids COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_pids purge; /*EOS*/
 
@@ -114,7 +114,7 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, ppid.qualifier.classname AS t
 FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.pid) pids AS ppid
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.otherresearchproduct_pids  COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.otherresearchproduct_pids  COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.otherresearchproduct_topics purge; /*EOS*/
 
@@ -123,4 +123,4 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, subjects.subject.qualifier.cl
 FROM ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.subject) subjects AS subject
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.otherresearchproduct_topics COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.otherresearchproduct_topics COMPUTE STATISTICS; /*EOS*/

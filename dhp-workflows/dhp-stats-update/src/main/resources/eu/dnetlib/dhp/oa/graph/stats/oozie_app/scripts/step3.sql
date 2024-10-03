@@ -42,7 +42,7 @@ from ${openaire_db_name}.dataset datast
     left outer join datast_delayed on datast.id=datast_delayed.datast_id
 where datast.datainfo.deletedbyinference = false and datast.datainfo.invisible = false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.dataset COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.dataset COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.dataset_citations purge; /*EOS*/
 
@@ -53,7 +53,7 @@ FROM ${openaire_db_name}.dataset d
 WHERE xpath_string(citation.value, "//citation/id[@type='openaire']/@value") != ""
   and d.datainfo.deletedbyinference = false and d.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.dataset_citations COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.dataset_citations COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.dataset_classifications purge; /*EOS*/
 
@@ -63,7 +63,7 @@ FROM ${openaire_db_name}.dataset p
          LATERAL VIEW explode(p.instance.instancetype) instances AS instancetype
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.dataset_classifications COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.dataset_classifications COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.dataset_concepts purge; /*EOS*/
 
@@ -76,7 +76,7 @@ from ${openaire_db_name}.dataset p
          LATERAL VIEW explode(p.context) contexts as context
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.dataset_concepts COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.dataset_concepts COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.dataset_datasources purge; /*EOS*/
 
@@ -92,7 +92,7 @@ FROM (
     FROM ${openaire_db_name}.datasource d
     WHERE d.datainfo.deletedbyinference = false and d.datainfo.invisible=false) d ON p.datasource = d.id; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.dataset_datasources COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.dataset_datasources COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.dataset_languages purge; /*EOS*/
 
@@ -101,7 +101,7 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, p.language.classname AS langu
 FROM ${openaire_db_name}.dataset p
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.dataset_languages COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.dataset_languages COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.dataset_oids purge; /*EOS*/
 
@@ -111,7 +111,7 @@ FROM ${openaire_db_name}.dataset p
          LATERAL VIEW explode(p.originalid) oids AS ids
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.dataset_oids COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.dataset_oids COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.dataset_pids purge; /*EOS*/
 
@@ -121,7 +121,7 @@ FROM ${openaire_db_name}.dataset p
          LATERAL VIEW explode(p.pid) pids AS ppid
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.dataset_pids COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.dataset_pids COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.dataset_topics purge; /*EOS*/
 
@@ -131,4 +131,4 @@ FROM ${openaire_db_name}.dataset p
          LATERAL VIEW explode(p.subject) subjects AS subject
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.dataset_topics COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.dataset_topics COMPUTE STATISTICS; /*EOS*/

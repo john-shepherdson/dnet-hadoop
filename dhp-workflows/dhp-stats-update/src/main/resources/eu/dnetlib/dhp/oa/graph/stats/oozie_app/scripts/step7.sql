@@ -168,4 +168,4 @@ CREATE TABLE ${stats_db_name}.result_projects STORED AS PARQUET AS
 select /*+ COALESCE(100) */ pr.result AS id, pr.id AS project, pr.provenance
 FROM ${stats_db_name}.project_results pr; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.result_projects COMPUTE STATISTICS; /*EOS*/
+ANALYZE

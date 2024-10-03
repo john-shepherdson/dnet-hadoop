@@ -12,7 +12,7 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) AS id, oids.ids AS oid
 FROM ${openaire_db_name}.project p LATERAL VIEW explode(p.originalid) oids AS ids
 where p.datainfo.deletedbyinference=false  and p.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.project_oids COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.project_oids COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.project_organizations purge; /*EOS*/
 
@@ -22,7 +22,7 @@ from ${openaire_db_name}.relation r
 WHERE r.reltype = 'projectOrganization' and r.source like '40|%'
   and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.project_organizations COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.project_organizations COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.project_results purge; /*EOS*/
 
@@ -32,7 +32,7 @@ FROM ${openaire_db_name}.relation r
 WHERE r.reltype = 'resultProject' and r.target like '40|%'
   and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.project_results COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.project_results COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.project_classification purge; /*EOS*/
 
@@ -42,7 +42,7 @@ from ${openaire_db_name}.project p
     lateral view explode(p.h2020classification) classifs as class
 where p.datainfo.deletedbyinference=false and p.datainfo.invisible=false and class.h2020programme is not null; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.project_classification COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.project_classification COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.project purge; /*EOS*/
 
@@ -107,7 +107,7 @@ left outer join num_pubs_pr on num_pubs_pr.pr_id = p.id
 left outer join num_pub_delayed npd on npd.pr_id=p.id
 where p.datainfo.deletedbyinference = false and p.datainfo.invisible = false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.project COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.project COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.funder purge; /*EOS*/
 
@@ -118,7 +118,7 @@ select /*+ COALESCE(100) */ distinct xpath_string(fund, '//funder/id')        as
                 xpath_string(fundingtree[0].value, '//funder/jurisdiction') as country
 from ${openaire_db_name}.project p lateral view explode(p.fundingtree.value) fundingtree as fund; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.funder COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.funder COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.project_organization_contribution purge; /*EOS*/
 
@@ -130,4 +130,4 @@ LATERAL VIEW explode (r.properties) properties
 where properties[0].key='contribution' and r.reltype = 'projectOrganization' and r.source like '40|%'
 and properties[0].value>0.0 and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.project_organization_contribution COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.project_organization_contribution COMPUTE STATISTICS; /*EOS*/
