@@ -131,7 +131,7 @@ DROP TABLE IF EXISTS ${stats_db_name}.result_fos_base_tmp purge; /*EOS*/
 create table ${stats_db_name}.result_fos_base_tmp stored as parquet as
 select /*+ COALESCE(100) */ id, topic from ${stats_db_name}.result_topics where type='Fields of Science and Technology classification'; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.result_fos_base_tmp COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.result_fos_base_tmp COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.result_fos purge; /*EOS*/
 
@@ -147,7 +147,7 @@ from lvl1
     join lvl3 on lvl3.id=lvl1.id and substr(lvl3.topic, 1, 4)=substr(lvl2.topic, 1, 4)
     join lvl4 on lvl4.id=lvl1.id and substr(lvl4.topic, 1, 6)=substr(lvl3.topic, 1, 6); /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.result_fos COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.result_fos COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE ${stats_db_name}.result_fos_base_tmp purge; /*EOS*/
 
@@ -160,7 +160,7 @@ WHERE r.reltype = 'resultOrganization'
   and r.target like '50|%'
   and r.datainfo.deletedbyinference = false and r.datainfo.invisible=false; /*EOS*/
 
-ANALYSE TABLE ${stats_db_name}.result_organization COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.result_organization COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.result_projects purge; /*EOS*/
 
