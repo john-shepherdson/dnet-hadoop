@@ -22,13 +22,6 @@ from ${openaire_db_name}.datasource
 where originalidd like "piwik:%"; /*EOS*/
 
 ANALYZE TABLE ${stats_db_name}.harested_datasources COMPUTE STATISTICS; /*EOS*/
-
-create table ${stats_db_name}.piwik_datasource stored as parquet as
-select id, split(originalidd, '\\:')[1] as piwik_id
-from ${openaire_db_name}.datasource
-         lateral view explode(originalid) temp as originalidd
-where originalidd like "piwik:%"; /*EOS*/
-
 ANALYZE TABLE ${stats_db_name}.piwik_datasource COMPUTE STATISTICS; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.datasource stored as parquet as
