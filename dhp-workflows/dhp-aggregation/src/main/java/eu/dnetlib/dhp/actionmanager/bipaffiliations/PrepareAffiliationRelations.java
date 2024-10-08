@@ -28,6 +28,7 @@ import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
+import eu.dnetlib.dhp.schema.oaf.utils.DoiCleaningRule;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import scala.Tuple2;
@@ -202,7 +203,7 @@ public class PrepareAffiliationRelations implements Serializable {
 
 				// DOI to OpenAIRE id
 				final String paperId = ID_PREFIX
-					+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", removePrefix(row.getAs("doi"))));
+					+ IdentifierFactory.md5(DoiCleaningRule.clean(removePrefix(row.getAs("doi"))));
 
 				// ROR id to OpenAIRE id
 				final String affId = GenerateRorActionSetJob.calculateOpenaireId(row.getAs("rorid"));
@@ -253,7 +254,7 @@ public class PrepareAffiliationRelations implements Serializable {
 
 				// DOI to OpenAIRE id
 				final String paperId = ID_PREFIX
-					+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", removePrefix(row.getAs("doi"))));
+					+ IdentifierFactory.md5(DoiCleaningRule.clean(removePrefix(row.getAs("doi"))));
 
 				// Organization to OpenAIRE identifier
 				String affId = null;

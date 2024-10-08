@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:oaire="http://namespace.openaire.eu/schema/oaire/"
+        xmlns:datacite="http://datacite.org/schema/kernel-4"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:oai="http://www.openarchives.org/OAI/2.0/"
+        xmlns:dri="http://www.driver-repository.eu/namespace/dri"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <header xmlns="http://www.openarchives.org/OAI/2.0/">
+        <dri:objIdentifier>base_oa_____::7ecf1ef502253efffe203ca9a22bb9f1</dri:objIdentifier>
+        <identifier>ftunivqespace:oai:espace.library.uq.edu.au:UQ:336902</identifier>
+        <datestamp>2020-12-22T10:30:27Z</datestamp>
+        <dr:dateOfTransformation>2024-09-10T17:21:36.972Z</dr:dateOfTransformation>
+    </header>
+    <metadata>
+        <datacite:resource>
+            <datacite:identifier identifierType="DOI">https://doi.org/10.1016/j.envint.2014.07.004</datacite:identifier>
+            <datacite:alternateIdentifiers>
+                <datacite:identifier alternateIdentifierType="url">https://espace.library.uq.edu.au/view/UQ:336902</datacite:identifier>
+                <datacite:identifier alternateIdentifierType="oai-original">ftunivqespace:oai:espace.library.uq.edu.au:UQ:336902</datacite:identifier>
+            </datacite:alternateIdentifiers>
+            <datacite:relatedIdentifiers/>
+            <datacite:resourceType>Article contribution</datacite:resourceType>
+            <datacite:titles>
+                <datacite:title>The role of environmental factors in the spatial distribution of Japanese encephalitis in mainland China</datacite:title>
+            </datacite:titles>
+            <datacite:creators>
+                <datacite:creator>
+                    <datacite:creatorName>Wang, Liya</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Hu, Wenbiao</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Soares Magalhaes, Ricardo J.</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Bi, Peng</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Ding, Fan</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Sun, Hailong</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Li, Shenlong</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Yin, Wenwu</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Wei, Lan</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Liu, Qiyong</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Haque, Ubydul</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Sun, Yansong</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Huang, Liuyu</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Tong, Shilu</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Clements, Archie C.A.</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Zhang, Wenyi</datacite:creatorName>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>Li, Chengyi</datacite:creatorName>
+                </datacite:creator>
+            </datacite:creators>
+            <datacite:contributors/>
+            <datacite:descriptions>
+                <datacite:description descriptionType="Abstract">Japanese encephalitis (JE) is the most common cause of viral encephalitis and an important public health concern in the Asia-Pacific region, particularly in China where 50% of global cases are notified. To explore the association between environmental factors and human JE cases and identify the high risk areas for JE transmission in China, we used annual notified data on JE cases at the center of administrative township and environmental variables with a pixel resolution of 1. km. ×. 1. km from 2005 to 2011 to construct models using ecological niche modeling (ENM) approaches based on maximum entropy. These models were then validated by overlaying reported human JE case localities from 2006 to 2012 onto each prediction map. ENMs had good discriminatory ability with the area under the curve (AUC) of the receiver operating curve (ROC) of 0.82-0.91, and low extrinsic omission rate of 5.44-7.42%. Resulting maps showed JE being presented extensively throughout southwestern and central China, with local spatial variations in probability influenced by minimum temperatures, human population density, mean temperatures, and elevation, with contribution of 17.94%-38.37%, 15.47%-21.82%, 3.86%-21.22%, and 12.05%-16.02%, respectively. Approximately 60% of JE cases occurred in predicted high risk areas, which covered less than 6% of areas in mainland China. Our findings will help inform optimal geographical allocation of the limited resources available for JE prevention and control in China, find hidden high-risk areas, and increase the effectiveness of public health interventions against JE transmission.</datacite:description>
+            </datacite:descriptions>
+            <datacite:subjects>
+                <datacite:subject>Japanese encephalitis</datacite:subject>
+                <datacite:subject>Ecological niche model</datacite:subject>
+                <datacite:subject>MaxEnt</datacite:subject>
+                <datacite:subject>China</datacite:subject>
+                <datacite:subject>2300 Environmental Science</datacite:subject>
+                <datacite:subject classificationCode="950" subjectScheme="ddc">950</datacite:subject>
+            </datacite:subjects>
+            <datacite:publisher>Pergamon Press</datacite:publisher>
+            <datacite:publicationYear>2014</datacite:publicationYear>
+            <datacite:formats/>
+            <datacite:language>eng</datacite:language>
+            <oaf:accessrights/>
+        </datacite:resource>
+        <dr:CobjCategory type="publication">0001</dr:CobjCategory>
+        <oaf:accessrights>UNKNOWN</oaf:accessrights>
+        <oaf:identifier identifierType="doi">10.1163/qwerty</oaf:identifier>
+        <oaf:identifier identifierType="doi">0.1163/18763308-90001038</oaf:identifier>
+        <oaf:identifier identifierType="doi">https://doi.org/10.1016/j.envint.2014.07.004</oaf:identifier>
+        <oaf:identifier identifierType="doi">https://doi.org/10.1080/09672567.2013.792375</oaf:identifier>
+        <oaf:identifier identifierType="doi">http://doi.org/10.1080/08673487.2012.812376</oaf:identifier>
+        <oaf:identifier identifierType="doi">http://dx.doi.org/10.1090/08673487.2012.812376</oaf:identifier>
+        <oaf:identifier identifierType="url">https://espace.library.uq.edu.au/view/UQ:336902</oaf:identifier>
+        <oaf:identifier identifierType="oai-original">ftunivqespace:oai:espace.library.uq.edu.au:UQ:336902</oaf:identifier>
+        <oaf:hostedBy name="The University of Queensland: UQ eSpace" id="opendoar____::575"/>
+        <oaf:collectedFrom name="Bielefeld Academic Search Engine (BASE)"
+                           id="openaire____::base_search"/>
+        <oaf:dateAccepted>2014-12-01</oaf:dateAccepted>
+        <oaf:relation relClass="hasAuthorInstitution"
+                      relType="resultOrganization"
+                      subRelType="affiliation"
+                      targetType="organization">ror_________::https://ror.org/00rqy9422</oaf:relation>
+        <oaf:datainfo>
+            <oaf:inferred>false</oaf:inferred>
+            <oaf:deletedbyinference>false</oaf:deletedbyinference>
+            <oaf:trust>0.89</oaf:trust>
+            <oaf:inferenceprovenance/>
+            <oaf:provenanceaction classid="sysimport:crosswalk:aggregator"
+                                  classname="sysimport:crosswalk:aggregator"
+                                  schemeid="dnet:provenanceActions"
+                                  schemename="dnet:provenanceActions"/>
+        </oaf:datainfo>
+    </metadata>
+</record>
