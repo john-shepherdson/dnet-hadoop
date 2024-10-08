@@ -41,7 +41,7 @@ SELECT /*+ COALESCE(100) */ substr(p.id, 4) as id, licenses.value as type
 from ${openaire_db_name}.otherresearchproduct p LATERAL VIEW explode(p.instance.license) instances as licenses
 where licenses.value is not null and licenses.value != '' and p.datainfo.deletedbyinference=false and p.datainfo.invisible = FALSE; /*EOS*/
 
-ANALYZE TABLE ${stats_db_name}.otherresearproduct_licenses COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.otherresearchproduct_licenses COMPUTE STATISTICS; /*EOS*/
 
 CREATE VIEW IF NOT EXISTS ${stats_db_name}.result_licenses AS
 SELECT * FROM ${stats_db_name}.publication_licenses
