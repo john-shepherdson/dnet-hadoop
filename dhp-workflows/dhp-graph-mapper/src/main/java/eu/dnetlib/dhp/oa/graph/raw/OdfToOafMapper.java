@@ -24,6 +24,7 @@ import eu.dnetlib.dhp.schema.common.RelationInverse;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
 
 public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -504,7 +505,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<StructuredProperty> prepareResultPids(final Document doc, final DataInfo info) {
-		final Set<StructuredProperty> res = new HashSet<>();
+		final Set<HashableStructuredProperty> res = new HashSet<>();
 		res
 			.addAll(
 				prepareListStructPropsWithValidQualifier(
@@ -524,7 +525,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 		return res
 			.stream()
-			.map(CleaningFunctions::normalizePidValue)
+			.map(PidCleaner::normalizePidValue)
+			.filter(CleaningFunctions::pidFilter)
 			.collect(Collectors.toList());
 	}
 
