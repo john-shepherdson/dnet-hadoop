@@ -130,5 +130,10 @@
 		"value": [
 			"Pippo", "Foo"
 		]
+	},
+	{
+		"field": "typology",
+		"type": "string",
+		"value": "Government"
 	}
 ]

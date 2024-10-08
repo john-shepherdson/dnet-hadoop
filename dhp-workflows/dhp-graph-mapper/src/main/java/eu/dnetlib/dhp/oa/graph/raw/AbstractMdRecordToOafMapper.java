@@ -55,29 +55,7 @@ import eu.dnetlib.dhp.common.Constants;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.AccessRight;
-import eu.dnetlib.dhp.schema.oaf.Author;
-import eu.dnetlib.dhp.schema.oaf.Context;
-import eu.dnetlib.dhp.schema.oaf.Country;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.Dataset;
-import eu.dnetlib.dhp.schema.oaf.EoscIfGuidelines;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.GeoLocation;
-import eu.dnetlib.dhp.schema.oaf.Instance;
-import eu.dnetlib.dhp.schema.oaf.InstanceTypeMapping;
-import eu.dnetlib.dhp.schema.oaf.Journal;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.OAIProvenance;
-import eu.dnetlib.dhp.schema.oaf.Oaf;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.OtherResearchProduct;
-import eu.dnetlib.dhp.schema.oaf.Publication;
-import eu.dnetlib.dhp.schema.oaf.Qualifier;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.Software;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
-import eu.dnetlib.dhp.schema.oaf.Subject;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
@@ -667,22 +645,25 @@ public abstract class AbstractMdRecordToOafMapper {
 		return this.vocs.getTermAsQualifier(schemeId, classId);
 	}
 
-	protected List<StructuredProperty> prepareListStructPropsWithValidQualifier(
+	protected List<HashableStructuredProperty> prepareListStructPropsWithValidQualifier(
 		final Node node,
 		final String xpath,
 		final String xpathClassId,
 		final String schemeId,
 		final DataInfo info) {
-		final List<StructuredProperty> res = new ArrayList<>();
+		final Set<HashableStructuredProperty> res = new HashSet<>();
 
 		for (final Object o : node.selectNodes(xpath)) {
 			final Node n = (Node) o;
 			final String classId = n.valueOf(xpathClassId).trim();
 			if (this.vocs.termExists(schemeId, classId)) {
-				res.add(structuredProperty(n.getText(), this.vocs.getTermAsQualifier(schemeId, classId), info));
+				res
+					.add(
+						HashableStructuredProperty
+							.newInstance(n.getText(), this.vocs.getTermAsQualifier(schemeId, classId), info));
 			}
 		}
-		return res;
+		return Lists.newArrayList(res);
 	}
 
 	protected List<StructuredProperty> prepareListStructProps(

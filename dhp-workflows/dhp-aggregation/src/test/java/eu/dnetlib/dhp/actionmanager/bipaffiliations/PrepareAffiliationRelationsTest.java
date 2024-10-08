@@ -30,6 +30,7 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
 
 public class PrepareAffiliationRelationsTest {
 
@@ -142,7 +143,7 @@ public class PrepareAffiliationRelationsTest {
 		String sourceDOI = "10.1089/10872910260066679";
 
 		final String sourceOpenaireId = ID_PREFIX
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", sourceDOI));
+			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", sourceDOI));
 
 		Assertions
 			.assertEquals(
@@ -154,7 +155,7 @@ public class PrepareAffiliationRelationsTest {
 					.getString(4));
 
 		final String publisherid = ID_PREFIX
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1089/10872910260066679"));
+			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", "10.1089/10872910260066679"));
 		final String rorId = "20|ror_________::" + IdentifierFactory.md5("https://ror.org/05cf8a891");
 
 		Assertions
@@ -167,7 +168,7 @@ public class PrepareAffiliationRelationsTest {
 					.filter(
 						"source = '" + ID_PREFIX
 							+ IdentifierFactory
-								.md5(CleaningFunctions.normalizePidValue("doi", "10.1007/s00217-010-1268-9"))
+								.md5(PidCleaner.normalizePidValue("doi", "10.1007/s00217-010-1268-9"))
 							+ "' and target = '" + "20|ror_________::"
 							+ IdentifierFactory.md5("https://ror.org/03265fv13") + "'")
 					.count());
@@ -178,7 +179,7 @@ public class PrepareAffiliationRelationsTest {
 					.filter(
 						"source = '" + ID_PREFIX
 							+ IdentifierFactory
-								.md5(CleaningFunctions.normalizePidValue("doi", "10.1007/3-540-47984-8_14"))
+								.md5(PidCleaner.normalizePidValue("doi", "10.1007/3-540-47984-8_14"))
 							+ "' and target = '" + "20|ror_________::"
 							+ IdentifierFactory.md5("https://ror.org/00a0n9e72") + "'")
 					.count());
