@@ -94,7 +94,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 					author.setFullname(String.format("%s, %s", author.getSurname(), author.getName()));
 				}
 
-				author.setAffiliation(prepareListFields(n, "./*[local-name()='affiliation']", info));
+				author.setRawAffiliationString(prepareListString(n, "./*[local-name()='affiliation']"));
 				author.setPid(preparePids(n, info));
 				author.setRank(pos++);
 				res.add(author);

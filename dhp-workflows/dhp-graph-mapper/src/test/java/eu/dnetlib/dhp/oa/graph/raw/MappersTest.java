@@ -406,15 +406,15 @@ class MappersTest {
 		assertEquals("Baracchini", author.get().getSurname());
 		assertEquals("Theo", author.get().getName());
 
-		assertEquals(1, author.get().getAffiliation().size());
-		final Optional<Field<String>> opAff = author
+		assertEquals(1, author.get().getRawAffiliationString().size());
+		final Optional<String> opAff = author
 			.get()
-			.getAffiliation()
+			.getRawAffiliationString()
 			.stream()
 			.findFirst();
 		assertTrue(opAff.isPresent());
-		final Field<String> affiliation = opAff.get();
-		assertEquals("ISTI-CNR", affiliation.getValue());
+		final String affiliation = opAff.get();
+		assertEquals("ISTI-CNR", affiliation);
 
 		assertFalse(d.getSubject().isEmpty());
 		assertFalse(d.getInstance().isEmpty());
