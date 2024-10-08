@@ -124,7 +124,7 @@ where relClass='Cites' and rel.datainfo.provenanceaction.classid = 'sysimport:cr
     and rel.datainfo.deletedbyinference=false and rel.datainfo.invisible = FALSE
 group by substr(target, 4); /*EOS*/
 
-ANALYZE TABLE ${stats_db_name}.result_citations COMPUTE STATISTICS; /*EOS*/
+ANALYZE TABLE ${stats_db_name}.result_citations_oc COMPUTE STATISTICS; /*EOS*/
 
 DROP TABLE IF EXISTS ${stats_db_name}.result_references_oc purge; /*EOS*/
 
