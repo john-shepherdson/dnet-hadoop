@@ -6,7 +6,7 @@ set mapred.job.queue.name=analytics; /*EOS*/
 DROP TABLE IF EXISTS ${stats_db_name}.result_projectcount purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.result_projectcount STORED AS PARQUET as
-select /*+ COALESCE(100) */ r.id, count(distinct rp.project) as count
+select /*+ COALESCE(100), BROADCAST(${stats_db_name}.result_projects) */ r.id, count(distinct rp.project) as count
 from ${stats_db_name}.result r
 left outer join ${stats_db_name}.result_projects rp on rp.id=r.id
 group by r.id; /*EOS*/
@@ -24,7 +24,7 @@ left outer join ${stats_db_name}.result r on r.id=rp.id; /*EOS*/
 ANALYZE TABLE ${stats_db_name}.project_res COMPUTE STATISTICS; /*EOS*/
 
 
-create table if not exists ${stats_db_name}.project_resultcount STORED AS PARQUET as
+create  /*+ COALESCE(100) */ table if not exists ${stats_db_name}.project_resultcount STORED AS PARQUET as
 select pid,
        sum(case when rp.type='publication' then 1 else 0 end) as publications,
        sum(case when rp.type='dataset' then 1 else 0 end) as datasets,
@@ -41,14 +41,14 @@ DROP TABLE IF EXISTS ${stats_db_name}.result_fundercount purge; /*EOS*/
 drop table if exists ${stats_db_name}.result_funder purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.result_funder stored as parquet as
-select distinct rp.id, p.funder
+select /*+ BROADCAST(${stats_db_name}.result_projects), BROADCAST(${stats_db_name}.project) */ distinct rp.id, p.funder
 from ${stats_db_name}.result_projects rp
 join ${stats_db_name}.project p on p.id=rp.project; /*EOS*/
 
 ANALYZE TABLE ${stats_db_name}.result_funder COMPUTE STATISTICS; /*EOS*/
 
 create table if not exists ${stats_db_name}.result_fundercount STORED AS PARQUET as
-select /*+ COALESCE(100) */ r.id, count(rf.funder) as count
+select /*+ COALESCE(100), BROADCAST(${stats_db_name}.result_funder) */ r.id, count(rf.funder) as count
 from ${stats_db_name}.result r
 left outer join ${stats_db_name}.result_funder rf on rf.id=r.id
 group by r.id; /*EOS*/
