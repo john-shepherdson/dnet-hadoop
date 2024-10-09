@@ -16,7 +16,7 @@ ANALYZE TABLE ${stats_db_name}.result_projectcount COMPUTE STATISTICS; /*EOS*/
 DROP TABLE IF EXISTS ${stats_db_name}.project_resultcount purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.project_res stored as parquet as
-select distinct r.id as res, r.type, p.id as pid
+select /*+ BROADCAST(${stats_db_name}.project), BROADCAST(${stats_db_name}.result_projects) */  distinct r.id as res, r.type, p.id as pid
 from ${stats_db_name}.project p
 left outer join ${stats_db_name}.result_projects rp on rp.project=p.id
 left outer join ${stats_db_name}.result r on r.id=rp.id; /*EOS*/
@@ -30,7 +30,7 @@ select pid,
        sum(case when rp.type='dataset' then 1 else 0 end) as datasets,
        sum(case when rp.type='software' then 1 else 0 end) as software,
        sum(case when rp.type='other' then 1 else 0 end) as other
-from ${stats_db_name}.project_res
+from ${stats_db_name}.project_res rp
 group by pid; /*EOS*/
 
 ANALYZE TABLE ${stats_db_name}.project_resultcount COMPUTE STATISTICS; /*EOS*/
