@@ -41,21 +41,38 @@ public class JsonListMatch extends AbstractListComparator {
 			return -1;
 		}
 
-		final Set<String> ca = sa.stream().map(this::toComparableString).collect(Collectors.toSet());
-		final Set<String> cb = sb.stream().map(this::toComparableString).collect(Collectors.toSet());
+		Set<String> ca = sa.stream().map(this::toComparableString).collect(Collectors.toSet());
+		Set<String> cb = sb.stream().map(this::toComparableString).collect(Collectors.toSet());
 
-		int incommon = Sets.intersection(ca, cb).size();
-		int simDiff = Sets.symmetricDifference(ca, cb).size();
+		switch (MODE) {
+			case "count":
+				return Sets.intersection(ca, cb).size();
 
-		if (incommon + simDiff == 0) {
-			return 0.0;
+			case "percentage":
+				int incommon = Sets.intersection(ca, cb).size();
+				int simDiff = Sets.symmetricDifference(ca, cb).size();
+				if (incommon + simDiff == 0) {
+					return 0.0;
+				}
+				return (double) incommon / (incommon + simDiff);
+
+			case "type":
+				Set<String> typesA = ca.stream().map(s -> s.split("::")[0]).collect(Collectors.toSet());
+				Set<String> typesB = cb.stream().map(s -> s.split("::")[0]).collect(Collectors.toSet());
+
+				Set<String> types = Sets.intersection(typesA, typesB);
+
+				if (types.isEmpty())  // if no common type, it is impossible to compare
+					return -1;
+
+				ca = ca.stream().filter(s -> types.contains(s.split("::")[0])).collect(Collectors.toSet());
+				cb = cb.stream().filter(s -> types.contains(s.split("::")[0])).collect(Collectors.toSet());
+
+				return (double) Sets.intersection(ca, cb).size() / types.size();
+
+			default:
+				return -1;
 		}
-
-		if (MODE.equals("percentage"))
-			return (double) incommon / (incommon + simDiff);
-		else
-			return incommon;
-
 	}
 
 	// converts every json into a comparable string basing on parameters
@@ -69,7 +86,7 @@ public class JsonListMatch extends AbstractListComparator {
 		// for each path in the param list
 		for (String key : params.keySet().stream().filter(k -> k.contains("jpath")).collect(Collectors.toList())) {
 			String path = params.get(key);
-			String value = MapDocumentUtil.getJPathString(path, documentContext);
+			String value = MapDocumentUtil.getJPathString(path, documentContext).toLowerCase();
 			if (value == null || value.isEmpty())
 				value = "";
 			st.append(value);
