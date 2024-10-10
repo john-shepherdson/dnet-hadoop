@@ -18,12 +18,12 @@ class JsonPathTest {
 	@Test
 	void jsonToModelTest() throws IOException {
 		DedupConfig conf = DedupConfig
-				.load(
-						IOUtils
-								.toString(
-										SparkOpenorgsDedupTest.class
-												.getResourceAsStream(
-														"/eu/dnetlib/dhp/dedup/conf/org.curr.conf.json")));
+			.load(
+				IOUtils
+					.toString(
+						SparkOpenorgsDedupTest.class
+							.getResourceAsStream(
+								"/eu/dnetlib/dhp/dedup/conf/org.curr.conf.json")));
 
 		final String org = IOUtils.toString(getClass().getResourceAsStream("organization_example1.json"));
 
@@ -58,7 +58,7 @@ class JsonPathTest {
 	void testJPath2() throws IOException {
 
 		DedupConfig conf = DedupConfig
-				.load(IOUtils.toString(getClass().getResourceAsStream("dedup_conf_dataset.json")));
+			.load(IOUtils.toString(getClass().getResourceAsStream("dedup_conf_dataset.json")));
 
 		final String dat = IOUtils.toString(getClass().getResourceAsStream("dataset_example1.json"));
 
