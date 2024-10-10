@@ -332,7 +332,7 @@ case object Crossref2Oaf {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
     //MAPPING Crossref DOI into PID
-    val doi: String = DoiCleaningRule.normalizeDoi((json \ "DOI").extract[String])
+    val doi: String = DoiCleaningRule.clean((json \ "DOI").extract[String])
     result.setPid(
       List(
         structuredProperty(
@@ -517,8 +517,10 @@ case object Crossref2Oaf {
       )
     }
 
-    if(doi.startsWith("10.3410") || doi.startsWith("10.12703"))
-      instance.setHostedby(OafMapperUtils.keyValue(OafMapperUtils.createOpenaireId(10, "openaire____::H1Connect", true),"H1Connect"))
+    if (doi.startsWith("10.3410") || doi.startsWith("10.12703"))
+      instance.setHostedby(
+        OafMapperUtils.keyValue(OafMapperUtils.createOpenaireId(10, "openaire____::H1Connect", true), "H1Connect")
+      )
 
     instance.setAccessright(
       decideAccessRight(instance.getLicense, result.getDateofacceptance.getValue)
@@ -671,7 +673,7 @@ case object Crossref2Oaf {
     val doi = input.getString(0)
     val rorId = input.getString(1)
 
-    val pubId = s"50|${PidType.doi.toString.padTo(12, "_")}::${DoiCleaningRule.normalizeDoi(doi)}"
+    val pubId = s"50|${PidType.doi.toString.padTo(12, "_")}::${DoiCleaningRule.clean(doi)}"
     val affId = GenerateRorActionSetJob.calculateOpenaireId(rorId)
 
     val r: Relation = new Relation

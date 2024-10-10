@@ -25,6 +25,7 @@ import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
+import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
 
 public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -380,7 +381,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 		return prepareListStructPropsWithValidQualifier(
 			doc, "//oaf:identifier", "@identifierType", DNET_PID_TYPES, info)
 				.stream()
-				.map(CleaningFunctions::normalizePidValue)
+				.map(PidCleaner::normalizePidValue)
 				.collect(Collectors.toList());
 	}
 

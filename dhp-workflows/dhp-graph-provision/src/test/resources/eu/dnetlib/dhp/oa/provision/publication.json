@@ -9,6 +9,26 @@
   ],
   "measures": [
     {
+      "id": "views",
+      "unit": [
+        {
+          "key": "opendoar____::358aee4cc897452c00244351e4d91f69||ZENODO",
+          "value": "5",
+          "dataInfo": null
+        }
+      ]
+    },
+    {
+      "id": "downloads",
+      "unit": [
+        {
+          "key": "opendoar____::358aee4cc897452c00244351e4d91f69||ZENODO",
+          "value": "2",
+          "dataInfo": null
+        }
+      ]
+    },
+    {
       "id": "influence",
       "unit": [
         {

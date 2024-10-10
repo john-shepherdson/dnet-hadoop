@@ -1,3 +1,5 @@
+set mapred.job.queue.name=analytics;
+
 drop database if exists TARGET cascade;
 create database if not exists TARGET;
 
@@ -65,5 +67,11 @@ create table TARGET.result stored as parquet as
              'openorgs____::64badd35233ba2cd4946368ef2f4cf57',  -- University of Vienna
              'openorgs____::7501d66d2297a963ebfb075c43fff88e',  -- Royal Institute of Technology
              'openorgs____::d5eb679abdd31f70fcd4c8ba711148bf',	-- Sorbonne University
-             'openorgs____::b316f25380d106aac402f5ae8653910d'   -- Centre for Research on Ecology and Forestry Applications
-        )))  foo;
+             'openorgs____::b316f25380d106aac402f5ae8653910d',  -- Centre for Research on Ecology and Forestry Applications
+             'openorgs____::45a2076eee3013e0e85625ce61bcd272',  -- Institut d'Investigació Sanitària Illes Balears
+             'openorgs____::00b20b0a743a96169e6cf135e6e2bd7c',  -- Universidad Publica De Navarra
+             'openorgs____::0f398605c2459294d125ff23473a97dc',  -- Aalto University
+             'openorgs____::25b1fa62c7fd8e409d3a83c07e04b2d4',  -- WHU-Otto Beisheim School of Management
+             'openorgs____::d6eec313417f11205db4e736a34c0db6',  -- KEMPELENOV INSTITUT INTELIGENTNYCH TECHNOLOGII
+             'openorgs____::c2dfb90e797a2dc52f0084c549289d0c'  -- National Research Institute for Agriculture, Food and Environment
+            )))  foo;
