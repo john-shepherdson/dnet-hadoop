@@ -351,4 +351,23 @@ public class ComparatorTest extends AbstractPaceTest {
 
 	}
 
+	@Test
+	public void dateMatch() {
+
+		DateRange dateRange = new DateRange(params);
+
+		double result = dateRange.distance("2021-05-13", "2023-05-13", conf);
+		assertEquals(1.0, result);
+
+		result = dateRange.distance("2021-05-13", "2025-05-13", conf);
+		assertEquals(0.0, result);
+
+		result = dateRange.distance("", "2020-05-05", conf);
+		assertEquals(-1.0, result);
+
+		result = dateRange.distance("invalid date", "2021-05-02", conf);
+		assertEquals(-1.0, result);
+
+	}
+
 }
