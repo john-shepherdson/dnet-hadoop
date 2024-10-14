@@ -972,7 +972,7 @@ public class MergeUtils {
 	private static String extractKeyFromPid(final StructuredProperty pid) {
 		if (pid == null)
 			return null;
-		final StructuredProperty normalizedPid = CleaningFunctions.normalizePidValue(pid);
+		final StructuredProperty normalizedPid = PidCleaner.normalizePidValue(pid);
 
 		return String.format("%s::%s", normalizedPid.getQualifier().getClassid(), normalizedPid.getValue());
 	}

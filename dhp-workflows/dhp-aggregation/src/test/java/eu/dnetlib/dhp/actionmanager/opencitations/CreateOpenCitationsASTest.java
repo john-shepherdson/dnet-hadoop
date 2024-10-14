@@ -31,6 +31,7 @@ import eu.dnetlib.dhp.schema.oaf.Publication;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
 
 public class CreateOpenCitationsASTest {
 
@@ -280,17 +281,17 @@ public class CreateOpenCitationsASTest {
 	@Test
 	void testRelationsSourceTargetCouple() throws Exception {
 		final String doi1 = "50|doi_________::"
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1007/s10854-015-3684-x"));
+			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", "10.1007/s10854-015-3684-x"));
 		final String doi2 = "50|doi_________::"
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1111/j.1551-2916.2008.02408.x"));
+			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", "10.1111/j.1551-2916.2008.02408.x"));
 		final String doi3 = "50|doi_________::"
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1007/s10854-014-2114-9"));
+			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", "10.1007/s10854-014-2114-9"));
 		final String doi4 = "50|doi_________::"
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1016/j.ceramint.2013.09.069"));
+			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", "10.1016/j.ceramint.2013.09.069"));
 		final String doi5 = "50|doi_________::"
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1007/s10854-009-9913-4"));
+			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", "10.1007/s10854-009-9913-4"));
 		final String doi6 = "50|doi_________::"
-			+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", "10.1016/0038-1098(72)90370-5"));
+			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("doi", "10.1016/0038-1098(72)90370-5"));
 
 		String inputPath = getClass()
 			.getResource(

@@ -28,6 +28,7 @@ import com.jayway.jsonpath.JsonPath;
 
 import eu.dnetlib.dhp.schema.mdstore.MDStoreWithInfo;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
+import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
 import net.minidev.json.JSONArray;
 import scala.collection.JavaConverters;
 import scala.collection.Seq;
@@ -104,7 +105,7 @@ public class DHPUtils {
 
 	public static String generateUnresolvedIdentifier(final String pid, final String pidType) {
 
-		final String cleanedPid = CleaningFunctions.normalizePidValue(pidType, pid);
+		final String cleanedPid = PidCleaner.normalizePidValue(pidType, pid);
 
 		return String.format("unresolved::%s::%s", cleanedPid, pidType.toLowerCase().trim());
 	}
