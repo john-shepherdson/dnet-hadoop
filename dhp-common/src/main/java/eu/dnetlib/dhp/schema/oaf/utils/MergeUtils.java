@@ -469,6 +469,12 @@ public class MergeUtils {
 			merge.setTransformativeAgreement(enrich.getTransformativeAgreement());
 		}
 
+		merge
+			.getInstance()
+			.forEach(
+				instance -> merge
+					.setBestInstancetype(bestInstanceType(merge.getBestInstancetype(), instance.getInstancetype())));
+
 		return merge;
 	}
 
@@ -608,7 +614,7 @@ public class MergeUtils {
 		i.setHostedby(i1.getHostedby());
 		i.setCollectedfrom(i1.getCollectedfrom());
 		i.setAccessright(i1.getAccessright());
-		i.setInstancetype(i1.getInstancetype());
+		i.setInstancetype(bestInstanceType(i1.getInstancetype(), i2.getInstancetype()));
 		i.setPid(mergeLists(i1.getPid(), i2.getPid(), 0, MergeUtils::spKeyExtractor, (sp1, sp2) -> sp1));
 		i
 			.setAlternateIdentifier(
@@ -1024,7 +1030,8 @@ public class MergeUtils {
 
 		merge.setLicense(firstNonNull(merge.getLicense(), enrichment.getLicense()));
 		merge.setAccessright(firstNonNull(merge.getAccessright(), enrichment.getAccessright()));
-		merge.setInstancetype(firstNonNull(merge.getInstancetype(), enrichment.getInstancetype()));
+
+		merge.setInstancetype(bestInstanceType(merge.getInstancetype(), enrichment.getInstancetype()));
 		merge.setInstanceTypeMapping(firstNonNull(merge.getInstanceTypeMapping(), enrichment.getInstanceTypeMapping()));
 		merge.setHostedby(firstNonNull(merge.getHostedby(), enrichment.getHostedby()));
 		merge.setUrl(unionDistinctLists(merge.getUrl(), enrichment.getUrl(), 0));
@@ -1043,6 +1050,25 @@ public class MergeUtils {
 		merge.setRefereed(firstNonNull(merge.getRefereed(), enrichment.getRefereed()));
 		merge.setMeasures(unionDistinctLists(merge.getMeasures(), enrichment.getMeasures(), 0));
 		merge.setFulltext(firstNonNull(merge.getFulltext(), enrichment.getFulltext()));
+	}
+
+	static String bestInstanceType(String instancetype1, String instancetype2) {
+		if (instancetype2 == null) {
+			return instancetype1;
+		}
+
+		if (instancetype1 == null) {
+			return instancetype2;
+		}
+
+		InstancetypeHierarchy it1 = InstancetypeHierarchy.fromClassName(instancetype1);
+		InstancetypeHierarchy it2 = InstancetypeHierarchy.fromClassName(instancetype2);
+
+		if (it1 == InstancetypeHierarchy.Unknown || it1.isParentOf(it2)) {
+			return instancetype2; // it's most accurate
+		}
+
+		return instancetype1;
 	}
 
 	private static int compareTrust(Oaf a, Oaf b) {

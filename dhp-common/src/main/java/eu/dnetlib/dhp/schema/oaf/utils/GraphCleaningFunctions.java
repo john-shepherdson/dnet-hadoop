@@ -750,6 +750,13 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 										.collect(Collectors.toList()));
 						}
 					}
+
+					r
+						.getInstance()
+						.forEach(
+							instance -> r
+								.setBestInstancetype(
+									MergeUtils.bestInstanceType(r.getBestInstancetype(), instance.getInstancetype())));
 				}
 				if (value instanceof Publication) {
 
