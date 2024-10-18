@@ -72,9 +72,9 @@ public class GraphHiveTableImporterJob {
 		final Encoder<T> clazzEncoder = Encoders.bean(clazz);
 
 		Dataset<Row> dataset = spark
-				.read()
-				.schema(clazzEncoder.schema())
-				.json(inputPath);
+			.read()
+			.schema(clazzEncoder.schema())
+			.json(inputPath);
 
 		if (numPartitions > 0) {
 			log.info("repartitioning {} to {} partitions", clazz.getSimpleName(), numPartitions);
