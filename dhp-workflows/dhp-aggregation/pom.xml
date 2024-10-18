@@ -61,8 +61,12 @@
                 <version>1.8.1</version>
                 <configuration>
                     <connectionType>connection</connectionType>
-                    <scmVersionType>tag</scmVersionType><!-- 'branch' can also be provided here -->
-                    <scmVersion>${affro.release.version}</scmVersion><!-- in case of scmVersionType == 'branch', this field points to the branch name -->
+                    <!--
+                     <scmVersionType>tag</scmVersionType>--><!-- 'branch' can also be provided here -->
+                  <!--  <scmVersion>${affro.release.version}</scmVersion>--><!-- in case of scmVersionType == 'branch', this field points to the branch name -->
+
+                    <scmVersionType>branch</scmVersionType><!-- 'branch' can also be provided here -->
+                    <scmVersion>openaire-workflow-ready</scmVersion><!-- in case of scmVersionType == 'branch', this field points to the branch name -->
                     <checkoutDirectory>${project.build.directory}/${oozie.package.file.name}/${oozieAppDir}/affRo</checkoutDirectory>
                 </configuration>
                 <executions>
