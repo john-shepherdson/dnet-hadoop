@@ -7,7 +7,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.{GraphCleaningFunctions, IdentifierFactor
 import eu.dnetlib.dhp.utils.DHPUtils
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.DoiBoostMappingUtil._
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST._
