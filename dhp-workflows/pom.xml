@@ -40,7 +40,6 @@
         <module>dhp-usage-stats-build</module>
         <module>dhp-usage-raw-data-update</module>
         <module>dhp-broker-events</module>
-        <module>dhp-doiboost</module>
         <module>dhp-impact-indicators</module>
         <module>dhp-swh</module>
     </modules>
@@ -94,6 +93,12 @@
         </dependency>
     </dependencies>
     <profiles>
+        <profile>
+            <id>spark-24</id>
+            <modules>
+                <module>dhp-doiboost</module>
+            </modules>
+        </profile>
         <profile>
             <!-- This profile sets properties that are required for test oozie workflows To be used only with 'oozie-package' profile -->
             <id>attach-test-resources</id>

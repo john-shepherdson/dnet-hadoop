@@ -63,6 +63,12 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>eu.dnetlib</groupId>
+			<artifactId>dhp-rmi-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>edu.cmu</groupId>
 			<artifactId>secondstring</artifactId>
 		</dependency>
@@ -125,10 +131,6 @@
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-transports-http</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>eu.dnetlib</groupId>
-			<artifactId>cnr-rmi-api</artifactId>
-		</dependency>
 
 		<dependency>
 			<groupId>com.ximpleware</groupId>
@@ -168,24 +170,4 @@
 			<artifactId>opencsv</artifactId>
 		</dependency>
 	</dependencies>
-
-	<!-- dependencies required on JDK9+ because J2EE has been removed -->
-	<profiles>
-		<profile>
-			<id>spark-34</id>
-			<dependencies>
-				<dependency>
-					<groupId>javax.xml.bind</groupId>
-					<artifactId>jaxb-api</artifactId>
-					<version>2.2.11</version>
-				</dependency>
-				<dependency>
-					<groupId>com.sun.xml.ws</groupId>
-					<artifactId>jaxws-ri</artifactId>
-					<version>2.3.3</version>
-					<type>pom</type>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
 </project>
