@@ -2,6 +2,7 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
@@ -132,7 +133,7 @@ public class SparkUpdateEntity extends AbstractSparkAction {
 
 		boolean result = false;
 
-		FileSystem fileSystem = FileSystem.get(new Configuration());
+		FileSystem fileSystem = FileSystem.get(URI.create(basePath), new Configuration());
 		FileStatus[] fileStatuses = fileSystem.listStatus(new Path(basePath));
 
 		for (FileStatus fs : fileStatuses) {
