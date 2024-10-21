@@ -30,6 +30,7 @@ import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class MergeUtils {
+
 	public static <T extends Oaf> T mergeById(String s, Iterator<T> oafEntityIterator) {
 		return mergeGroup(s, oafEntityIterator, true);
 	}
@@ -88,7 +89,7 @@ public class MergeUtils {
 	private static Oaf mergeEntities(Oaf left, Oaf right, boolean checkDelegatedAuthority) {
 
 		if (sameClass(left, right, Result.class)) {
-			if (!left.getClass().equals(right.getClass()) || checkDelegatedAuthority) {
+			if (checkDelegatedAuthority) {
 				return mergeResultsOfDifferentTypes((Result) left, (Result) right);
 			}
 
@@ -971,7 +972,7 @@ public class MergeUtils {
 	private static String extractKeyFromPid(final StructuredProperty pid) {
 		if (pid == null)
 			return null;
-		final StructuredProperty normalizedPid = CleaningFunctions.normalizePidValue(pid);
+		final StructuredProperty normalizedPid = PidCleaner.normalizePidValue(pid);
 
 		return String.format("%s::%s", normalizedPid.getQualifier().getClassid(), normalizedPid.getValue());
 	}

@@ -48,7 +48,7 @@ public class TreeNodeDef implements Serializable {
 	// function for the evaluation of the node
 	public TreeNodeStats evaluate(Row doc1, Row doc2, Config conf) {
 
-		TreeNodeStats stats = new TreeNodeStats(ignoreUndefined);
+		TreeNodeStats stats = new TreeNodeStats();
 
 		// for each field in the node, it computes the
 		for (FieldConf fieldConf : fields) {

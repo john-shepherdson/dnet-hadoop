@@ -563,12 +563,24 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 						Optional
 							.ofNullable(i.getPid())
 							.ifPresent(pid -> {
-								final Set<StructuredProperty> pids = Sets.newHashSet(pid);
+								final Set<HashableStructuredProperty> pids = pid
+									.stream()
+									.map(HashableStructuredProperty::newInstance)
+									.collect(Collectors.toCollection(HashSet::new));
 								Optional
 									.ofNullable(i.getAlternateIdentifier())
 									.ifPresent(altId -> {
-										final Set<StructuredProperty> altIds = Sets.newHashSet(altId);
-										i.setAlternateIdentifier(Lists.newArrayList(Sets.difference(altIds, pids)));
+										final Set<HashableStructuredProperty> altIds = altId
+											.stream()
+											.map(HashableStructuredProperty::newInstance)
+											.collect(Collectors.toCollection(HashSet::new));
+										i
+											.setAlternateIdentifier(
+												Sets
+													.difference(altIds, pids)
+													.stream()
+													.map(HashableStructuredProperty::toStructuredProperty)
+													.collect(Collectors.toList()));
 									});
 							});
 

@@ -18,8 +18,8 @@ public class PidValueComparator implements Comparator<StructuredProperty> {
 		if (right == null)
 			return -1;
 
-		StructuredProperty l = CleaningFunctions.normalizePidValue(left);
-		StructuredProperty r = CleaningFunctions.normalizePidValue(right);
+		StructuredProperty l = PidCleaner.normalizePidValue(left);
+		StructuredProperty r = PidCleaner.normalizePidValue(right);
 
 		return Optional
 			.ofNullable(l.getValue())
