@@ -144,18 +144,13 @@ public class ExtractPerson implements Serializable {
 			.parquet(inputPath + "Employments")
 			.as(Encoders.bean(Employment.class));
 
-		Dataset<Author> peopleToMap = authors
-			.joinWith(works, authors.col("orcid").equalTo(works.col("orcid")))
-			.map((MapFunction<Tuple2<Author, Work>, Author>) t2 -> t2._1(), Encoders.bean(Author.class))
-			.groupByKey((MapFunction<Author, String>) a -> a.getOrcid(), Encoders.STRING())
-			.mapGroups((MapGroupsFunction<String, Author, Author>) (k, it) -> it.next(), Encoders.bean(Author.class));
-
 		Dataset<Employment> employment = employmentDataset
-			.joinWith(peopleToMap, employmentDataset.col("orcid").equalTo(peopleToMap.col("orcid")))
+			.joinWith(authors, employmentDataset.col("orcid").equalTo(authors.col("orcid")))
 			.map((MapFunction<Tuple2<Employment, Author>, Employment>) t2 -> t2._1(), Encoders.bean(Employment.class));
 
+		//Mapping all the orcid profiles even if the profile has no visible works
 		Dataset<Person> people;
-		peopleToMap.map((MapFunction<Author, Person>) op -> {
+		authors.map((MapFunction<Author, Person>) op -> {
 			Person person = new Person();
 			person.setId(DHPUtils.generateIdentifier(op.getOrcid(), PERSON_PREFIX));
 			person
@@ -325,6 +320,7 @@ public class ExtractPerson implements Serializable {
 				Arrays.asList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
 				DATAINFO,
 				null);
+		relation.setValidated(true);
 
 		if (Optional.ofNullable(row.getStartDate()).isPresent() && StringUtil.isNotBlank(row.getStartDate())) {
 			KeyValue kv = new KeyValue();
@@ -412,14 +408,15 @@ public class ExtractPerson implements Serializable {
 			default:
 				return null;
 		}
-
-		return OafMapperUtils
-			.getRelation(
-				source, target, ModelConstants.RESULT_PERSON_RELTYPE,
-				ModelConstants.RESULT_PERSON_SUBRELTYPE,
-				ModelConstants.RESULT_PERSON_HASAUTHORED,
-				Arrays.asList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
-				DATAINFO,
-				null);
+		Relation relation = OafMapperUtils
+				.getRelation(
+						source, target, ModelConstants.RESULT_PERSON_RELTYPE,
+						ModelConstants.RESULT_PERSON_SUBRELTYPE,
+						ModelConstants.RESULT_PERSON_HASAUTHORED,
+						Arrays.asList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
+						DATAINFO,
+						null);
+		relation.setValidated(true);
+		return relation;
 	}
 }
