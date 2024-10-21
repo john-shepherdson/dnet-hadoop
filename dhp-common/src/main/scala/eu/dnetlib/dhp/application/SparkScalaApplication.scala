@@ -2,6 +2,7 @@ package eu.dnetlib.dhp.application
 
 import eu.dnetlib.dhp.common.Constants
 import eu.dnetlib.dhp.utils.DHPUtils.writeHdfsFile
+import org.apache.commons.lang3.StringUtils
 
 import scala.io.Source
 
@@ -69,7 +70,7 @@ abstract class AbstractScalaApplication(
       .builder()
       .config(conf)
       .appName(getClass.getSimpleName)
-    if (master != null)
+    if (StringUtils.isNotBlank(master))
       b.master(master)
     b.getOrCreate()
   }
