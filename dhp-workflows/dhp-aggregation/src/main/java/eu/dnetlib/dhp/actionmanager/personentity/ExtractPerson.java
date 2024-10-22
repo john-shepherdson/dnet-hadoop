@@ -13,9 +13,12 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.common.DbClient;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.compress.BZip2Codec;
 import org.apache.hadoop.mapred.SequenceFileOutputFormat;
@@ -27,13 +30,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spark_project.jetty.util.StringUtil;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.collection.orcid.model.Author;
 import eu.dnetlib.dhp.collection.orcid.model.Employment;
 import eu.dnetlib.dhp.collection.orcid.model.Work;
+import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -48,11 +51,6 @@ import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
 import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 
 public class ExtractPerson implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(ExtractPerson.class);
@@ -77,8 +75,7 @@ public class ExtractPerson implements Serializable {
 	public static final String OPENAIRE_DATASOURCE_NAME = "OpenAIRE";
 
 	public static List<KeyValue> collectedfromOpenAIRE = OafMapperUtils
-			.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
-
+		.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
 
 	public static final DataInfo DATAINFO = OafMapperUtils
 		.dataInfo(
@@ -136,14 +133,15 @@ public class ExtractPerson implements Serializable {
 			spark -> {
 				HdfsSupport.remove(outputPath, spark.sparkContext().hadoopConfiguration());
 				extractInfoForActionSetFromORCID(spark, inputPath, workingDir);
-				extractInfoForActionSetFromProjects(spark, inputPath, workingDir, dbUrl, dbUser, dbPassword, workingDir + "/project", hdfsNameNode);
+				extractInfoForActionSetFromProjects(
+					spark, inputPath, workingDir, dbUrl, dbUser, dbPassword, workingDir + "/project", hdfsNameNode);
 				createActionSet(spark, outputPath, workingDir);
 			});
 
 	}
 
 	private static void extractInfoForActionSetFromProjects(SparkSession spark, String inputPath, String workingDir,
-															String dbUrl, String dbUser, String dbPassword, String hdfsPath, String hdfsNameNode) throws IOException {
+		String dbUrl, String dbUser, String dbPassword, String hdfsPath, String hdfsNameNode) throws IOException {
 
 		Configuration conf = new Configuration();
 		conf.set("fs.defaultFS", hdfsNameNode);
@@ -164,41 +162,40 @@ public class ExtractPerson implements Serializable {
 
 	public static Relation getRelationWithProject(ResultSet rs) {
 		try {
-			return getProjectRelation(rs.getString("project"), rs.getString("pid"),
-					rs.getString("role"));
+			return getProjectRelation(
+				rs.getString("project"), rs.getString("pid"),
+				rs.getString("role"));
 		} catch (final SQLException e) {
 			throw new RuntimeException(e);
 		}
-    }
+	}
 
 	private static Relation getProjectRelation(String project, String orcid, String role) {
 
-			String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(orcid);
-			String target = project.substring(0,14)
-					+ IdentifierFactory.md5(project.substring(15));
-			List<KeyValue> properties = new ArrayList<>();
+		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(orcid);
+		String target = project.substring(0, 14)
+			+ IdentifierFactory.md5(project.substring(15));
+		List<KeyValue> properties = new ArrayList<>();
 
-			Relation relation = OafMapperUtils
-					.getRelation(
-							source, target, ModelConstants.PROJECT_PERSON_RELTYPE, ModelConstants.PROJECT_PERSON_SUBRELTYPE,
-							ModelConstants.PROJECT_PERSON_PARTICIPATES,
-							collectedfromOpenAIRE,
-							DATAINFO,
-							null);
-			relation.setValidated(true);
+		Relation relation = OafMapperUtils
+			.getRelation(
+				source, target, ModelConstants.PROJECT_PERSON_RELTYPE, ModelConstants.PROJECT_PERSON_SUBRELTYPE,
+				ModelConstants.PROJECT_PERSON_PARTICIPATES,
+				collectedfromOpenAIRE,
+				DATAINFO,
+				null);
+		relation.setValidated(true);
 
-			if (StringUtil.isNotBlank(role)) {
-				KeyValue kv = new KeyValue();
-				kv.setKey("role");
-				kv.setValue(role);
-				properties.add(kv);
-			}
+		if (StringUtil.isNotBlank(role)) {
+			KeyValue kv = new KeyValue();
+			kv.setKey("role");
+			kv.setValue(role);
+			properties.add(kv);
+		}
 
-
-			if (!properties.isEmpty())
-				relation.setProperties(properties);
-			return relation;
-
+		if (!properties.isEmpty())
+			relation.setProperties(properties);
+		return relation;
 
 	}
 
@@ -211,7 +208,7 @@ public class ExtractPerson implements Serializable {
 		}
 	}
 
-	private static void createActionSet(SparkSession spark,String outputPath, String workingDir) {
+	private static void createActionSet(SparkSession spark, String outputPath, String workingDir) {
 
 		Dataset<Person> people;
 		people = spark
@@ -221,7 +218,7 @@ public class ExtractPerson implements Serializable {
 				(MapFunction<String, Person>) value -> OBJECT_MAPPER
 					.readValue(value, Person.class),
 				Encoders.bean(Person.class));
-		
+
 		people
 			.toJavaRDD()
 			.map(p -> new AtomicAction(p.getClass(), p))
@@ -235,10 +232,10 @@ public class ExtractPerson implements Serializable {
 				getRelations(spark, workingDir + "/affiliation")
 					.toJavaRDD()
 					.map(r -> new AtomicAction(r.getClass(), r)))
-				.union(
-						getRelations(spark, workingDir + "/project")
-								.toJavaRDD()
-								.map(r -> new AtomicAction(r.getClass(), r)))
+			.union(
+				getRelations(spark, workingDir + "/project")
+					.toJavaRDD()
+					.map(r -> new AtomicAction(r.getClass(), r)))
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
@@ -276,7 +273,7 @@ public class ExtractPerson implements Serializable {
 			.joinWith(authors, employmentDataset.col("orcid").equalTo(authors.col("orcid")))
 			.map((MapFunction<Tuple2<Employment, Author>, Employment>) t2 -> t2._1(), Encoders.bean(Employment.class));
 
-		//Mapping all the orcid profiles even if the profile has no visible works
+		// Mapping all the orcid profiles even if the profile has no visible works
 
 		authors.map((MapFunction<Author, Person>) op -> {
 			Person person = new Person();
@@ -509,13 +506,13 @@ public class ExtractPerson implements Serializable {
 				return null;
 		}
 		Relation relation = OafMapperUtils
-				.getRelation(
-						source, target, ModelConstants.RESULT_PERSON_RELTYPE,
-						ModelConstants.RESULT_PERSON_SUBRELTYPE,
-						ModelConstants.RESULT_PERSON_HASAUTHORED,
-						Arrays.asList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
-						DATAINFO,
-						null);
+			.getRelation(
+				source, target, ModelConstants.RESULT_PERSON_RELTYPE,
+				ModelConstants.RESULT_PERSON_SUBRELTYPE,
+				ModelConstants.RESULT_PERSON_HASAUTHORED,
+				Arrays.asList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
+				DATAINFO,
+				null);
 		relation.setValidated(true);
 		return relation;
 	}
