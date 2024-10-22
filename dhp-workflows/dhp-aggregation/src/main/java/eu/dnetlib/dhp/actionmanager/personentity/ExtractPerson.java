@@ -71,13 +71,15 @@ public class ExtractPerson implements Serializable {
 	private static final String PERSON_PREFIX = ModelSupport.getIdPrefix(Person.class) + "|orcid_______";
 	public static final String ORCID_AUTHORS_CLASSID = "sysimport:crosswalk:orcid";
 	public static final String ORCID_AUTHORS_CLASSNAME = "Imported from ORCID";
+	public static final String FUNDER_AUTHORS_CLASSID = "sysimport:crosswalk:funderdatabase";
+	public static final String FUNDER_AUTHORS_CLASSNAME = "Imported from Funder Database";
 	public static final String OPENAIRE_DATASOURCE_ID = "10|infrastruct_::f66f1bd369679b5b077dcdf006089556";
 	public static final String OPENAIRE_DATASOURCE_NAME = "OpenAIRE";
 
 	public static List<KeyValue> collectedfromOpenAIRE = OafMapperUtils
 		.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
 
-	public static final DataInfo DATAINFO = OafMapperUtils
+	public static final DataInfo ORCIDDATAINFO = OafMapperUtils
 		.dataInfo(
 			false,
 			null,
@@ -90,6 +92,20 @@ public class ExtractPerson implements Serializable {
 					ModelConstants.DNET_PROVENANCE_ACTIONS,
 					ModelConstants.DNET_PROVENANCE_ACTIONS),
 			"0.91");
+
+	public static final DataInfo FUNDERDATAINFO = OafMapperUtils
+			.dataInfo(
+					false,
+					null,
+					false,
+					false,
+					OafMapperUtils
+							.qualifier(
+									FUNDER_AUTHORS_CLASSID,
+									FUNDER_AUTHORS_CLASSNAME,
+									ModelConstants.DNET_PROVENANCE_ACTIONS,
+									ModelConstants.DNET_PROVENANCE_ACTIONS),
+					"0.91");
 
 	public static void main(final String[] args) throws IOException, ParseException {
 
@@ -182,7 +198,7 @@ public class ExtractPerson implements Serializable {
 				source, target, ModelConstants.PROJECT_PERSON_RELTYPE, ModelConstants.PROJECT_PERSON_SUBRELTYPE,
 				ModelConstants.PROJECT_PERSON_PARTICIPATES,
 				collectedfromOpenAIRE,
-				DATAINFO,
+					FUNDERDATAINFO,
 				null);
 		relation.setValidated(true);
 
@@ -328,7 +344,7 @@ public class ExtractPerson implements Serializable {
 							ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES, null));
 			person.setDateofcollection(op.getLastModifiedDate());
 			person.setOriginalId(Arrays.asList(op.getOrcid()));
-			person.setDataInfo(DATAINFO);
+			person.setDataInfo(ORCIDDATAINFO);
 			return person;
 		}, Encoders.bean(Person.class))
 			.write()
@@ -415,7 +431,7 @@ public class ExtractPerson implements Serializable {
 				source, target, ModelConstants.ORG_PERSON_RELTYPE, ModelConstants.ORG_PERSON_SUBRELTYPE,
 				ModelConstants.ORG_PERSON_PARTICIPATES,
 				Arrays.asList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
-				DATAINFO,
+					ORCIDDATAINFO,
 				null);
 		relation.setValidated(true);
 
@@ -435,31 +451,6 @@ public class ExtractPerson implements Serializable {
 		if (properties.size() > 0)
 			relation.setProperties(properties);
 		return relation;
-
-	}
-
-	private static Collection<? extends Relation> getCoAuthorshipRelations(String orcid1, String orcid2) {
-		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(orcid1);
-		String target = PERSON_PREFIX + "::" + IdentifierFactory.md5(orcid2);
-
-		return Arrays
-			.asList(
-				OafMapperUtils
-					.getRelation(
-						source, target, ModelConstants.PERSON_PERSON_RELTYPE,
-						ModelConstants.PERSON_PERSON_SUBRELTYPE,
-						ModelConstants.PERSON_PERSON_HASCOAUTHORED,
-						Arrays.asList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
-						DATAINFO,
-						null),
-				OafMapperUtils
-					.getRelation(
-						target, source, ModelConstants.PERSON_PERSON_RELTYPE,
-						ModelConstants.PERSON_PERSON_SUBRELTYPE,
-						ModelConstants.PERSON_PERSON_HASCOAUTHORED,
-						Arrays.asList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
-						DATAINFO,
-						null));
 
 	}
 
@@ -511,7 +502,7 @@ public class ExtractPerson implements Serializable {
 				ModelConstants.RESULT_PERSON_SUBRELTYPE,
 				ModelConstants.RESULT_PERSON_HASAUTHORED,
 				Arrays.asList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
-				DATAINFO,
+					ORCIDDATAINFO,
 				null);
 		relation.setValidated(true);
 		return relation;
