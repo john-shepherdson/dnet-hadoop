@@ -112,7 +112,7 @@ public class PrepareAffiliationRelationsTest {
 			.map(aa -> ((Relation) aa.getPayload()));
 
 		// count the number of relations
-		assertEquals(162, tmp.count());// 18 + 24  + 30 * 4 =
+		assertEquals(162, tmp.count());// 18 + 24 + 30 * 4 =
 
 		Dataset<Relation> dataset = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
 		dataset.createOrReplaceTempView("result");

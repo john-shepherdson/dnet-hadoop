@@ -34,7 +34,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import scala.Tuple2;
 
 /**
- * Creates action sets for Crossref affiliation relations inferred by BIP!
+ * Creates action sets for Crossref affiliation relations inferred by OpenAIRE
  */
 public class PrepareAffiliationRelations implements Serializable {
 
