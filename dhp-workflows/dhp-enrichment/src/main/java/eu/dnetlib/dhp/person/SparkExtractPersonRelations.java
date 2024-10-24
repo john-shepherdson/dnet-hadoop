@@ -140,6 +140,8 @@ public class SparkExtractPersonRelations {
 						.flatMap(
 							(FlatMapFunction<Result, Relation>) r -> getAuthorshipRelations(r),
 							Encoders.bean(Relation.class))
+//							.groupByKey((MapFunction<Relation, String>) r-> r.getSource()+r.getTarget(), Encoders.STRING() )
+//							.mapGroups((MapGroupsFunction<String, Relation, Relation>) (k,it) -> it.next(), Encoders.bean(Relation.class) )
 						.map(
 							(MapFunction<Relation, Tuple2<String, Relation>>) r -> new Tuple2<>(
 								r.getSource() + r.getRelClass() + r.getTarget(), r),
