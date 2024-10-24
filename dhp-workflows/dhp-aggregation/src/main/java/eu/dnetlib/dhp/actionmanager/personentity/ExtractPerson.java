@@ -13,6 +13,8 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.common.person.CoAuthorshipIterator;
+import eu.dnetlib.dhp.common.person.Coauthors;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;

@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.actionmanager.personentity;
+package eu.dnetlib.dhp.common.person;
 
 import java.util.Arrays;
 import java.util.Iterator;
