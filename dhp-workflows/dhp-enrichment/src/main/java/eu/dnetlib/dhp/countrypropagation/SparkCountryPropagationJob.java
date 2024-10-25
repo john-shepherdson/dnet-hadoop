@@ -12,10 +12,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,10 +81,12 @@ public class SparkCountryPropagationJob {
 		Dataset<R> res = readPath(spark, sourcePath, resultClazz);
 
 		log.info("Reading prepared info: {}", preparedInfoPath);
+		Encoder<ResultCountrySet> rcsEncoder = Encoders.bean(ResultCountrySet.class);
 		Dataset<ResultCountrySet> prepared = spark
 			.read()
+			.schema(rcsEncoder.schema())
 			.json(preparedInfoPath)
-			.as(Encoders.bean(ResultCountrySet.class));
+			.as(rcsEncoder);
 
 		res
 			.joinWith(prepared, res.col("id").equalTo(prepared.col("resultId")), "left_outer")
