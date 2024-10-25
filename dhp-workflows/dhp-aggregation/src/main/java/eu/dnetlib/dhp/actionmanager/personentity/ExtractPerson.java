@@ -13,8 +13,11 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import eu.dnetlib.dhp.actionmanager.ror.GenerateRorActionSetJob;
 import eu.dnetlib.dhp.common.person.CoAuthorshipIterator;
 import eu.dnetlib.dhp.common.person.Coauthors;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.*;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -27,6 +30,7 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.*;
 import org.apache.spark.sql.*;
+import org.apache.spark.sql.Dataset;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,14 +47,6 @@ import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Person;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
-import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
-import eu.dnetlib.dhp.schema.oaf.utils.PidType;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
@@ -153,9 +149,68 @@ public class ExtractPerson implements Serializable {
 				extractInfoForActionSetFromORCID(spark, inputPath, workingDir);
 				extractInfoForActionSetFromProjects(
 					spark, inputPath, workingDir, dbUrl, dbUser, dbPassword, workingDir + "/project", hdfsNameNode);
+				extractInfoForActionSetFromPublisher(spark,inputPath, workingDir);
 				createActionSet(spark, outputPath, workingDir);
 			});
 
+	}
+
+	private static void extractInfoForActionSetFromPublisher(SparkSession spark, String inputPath, String workingDir) {
+
+
+			// load and parse affiliation relations from HDFS
+			Dataset<Row> df = spark
+					.read()
+					.schema("`DOI` STRING, `Matchings` ARRAY<STRUCT<`RORid`:STRING,`Confidence`:DOUBLE>>")
+					.json(inputPath)
+					.where("DOI is not null");
+
+			// unroll nested arrays
+			df = df
+					.withColumn("matching", functions.explode(new Column("Matchings")))
+					.select(
+							new Column("DOI").as("doi"),
+							new Column("matching.RORid").as("rorid"),
+							new Column("matching.Confidence").as("confidence"));
+
+			// prepare action sets for affiliation relations
+			return df
+					.toJavaRDD()
+					.flatMap((FlatMapFunction<Row, Relation>) row -> {
+
+						// DOI to OpenAIRE id
+						final String paperId = ID_PREFIX
+								+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", row.getAs("doi")));
+
+						// ROR id to OpenAIRE id
+						final String affId = GenerateRorActionSetJob.calculateOpenaireId(row.getAs("rorid"));
+
+						Qualifier qualifier = OafMapperUtils
+								.qualifier(
+										BIP_AFFILIATIONS_CLASSID,
+										BIP_AFFILIATIONS_CLASSNAME,
+										ModelConstants.DNET_PROVENANCE_ACTIONS,
+										ModelConstants.DNET_PROVENANCE_ACTIONS);
+
+						// format data info; setting `confidence` into relation's `trust`
+						DataInfo dataInfo = OafMapperUtils
+								.dataInfo(
+										false,
+										BIP_INFERENCE_PROVENANCE,
+										true,
+										false,
+										qualifier,
+										Double.toString(row.getAs("confidence")));
+
+						// return bi-directional relations
+						return getAffiliationRelationPair(paperId, affId, collectedfrom, dataInfo).iterator();
+
+					})
+					.map(p -> new AtomicAction(Relation.class, p))
+					.mapToPair(
+							aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
+									new Text(OBJECT_MAPPER.writeValueAsString(aa))));
+		}
 	}
 
 	private static void extractInfoForActionSetFromProjects(SparkSession spark, String inputPath, String workingDir,
