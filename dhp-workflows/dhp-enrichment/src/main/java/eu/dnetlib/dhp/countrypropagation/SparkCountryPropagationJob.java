@@ -12,11 +12,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,14 +81,16 @@ public class SparkCountryPropagationJob {
 		Dataset<R> res = readPath(spark, sourcePath, resultClazz);
 
 		log.info("Reading prepared info: {}", preparedInfoPath);
-		final Dataset<Row> preparedInfoRaw = spark
+		Encoder<ResultCountrySet> rcsEncoder = Encoders.bean(ResultCountrySet.class);
+		final Dataset<ResultCountrySet> preparedInfoRaw = spark
 			.read()
-			.json(preparedInfoPath);
+			.schema(rcsEncoder.schema())
+			.json(preparedInfoPath)
+			.as(rcsEncoder);
 
 		if (!preparedInfoRaw.isEmpty()) {
-			final Dataset<ResultCountrySet> prepared = preparedInfoRaw.as(Encoders.bean(ResultCountrySet.class));
 			res
-				.joinWith(prepared, res.col("id").equalTo(prepared.col("resultId")), "left_outer")
+				.joinWith(preparedInfoRaw, res.col("id").equalTo(prepared.col("resultId")), "left_outer")
 				.map(getCountryMergeFn(), Encoders.bean(resultClazz))
 				.write()
 				.option("compression", "gzip")

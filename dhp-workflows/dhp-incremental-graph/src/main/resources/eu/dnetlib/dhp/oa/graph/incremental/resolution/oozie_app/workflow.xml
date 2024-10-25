@@ -1,0 +1,138 @@
+<workflow-app name="Transformation_Workflow" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>graphBasePath</name>
+            <description>input graph to resolve</description>
+        </property>
+        <property>
+            <name>targetGraph</name>
+            <description>outputDirectory</description>
+        </property>
+        <property>
+            <name>workingDir</name>
+            <description>outputDirectory</description>
+        </property>
+        <property>
+            <name>hiveMetastoreUris</name>
+            <description>hive server metastore URIs</description>
+        </property>
+        <property>
+            <name>hiveDbName</name>
+            <description>hive database containing last generated graph</description>
+        </property>
+    </parameters>
+
+    <start to="ResolveJob"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+
+    <action name="ResolveJob">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Resolve Relations</name>
+            <class>eu.dnetlib.dhp.incremental.SparkResolveRelationById</class>
+            <jar>dhp-incremental-graph-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+            </spark-opts>
+            <arg>--graphBasePath</arg><arg>${graphBasePath}</arg>
+            <arg>--targetGraph</arg><arg>${targetGraph}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}/resolve_relation</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
+            <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
+        </spark>
+        <ok to="reset_outputpath"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="reset_outputpath">
+        <fs>
+            <delete path="${targetGraph}/dataset"/>
+            <delete path="${targetGraph}/datasource"/>
+            <delete path="${targetGraph}/organization"/>
+            <delete path="${targetGraph}/otherresearchproduct"/>
+            <delete path="${targetGraph}/person"/>
+            <delete path="${targetGraph}/project"/>
+            <delete path="${targetGraph}/publication"/>
+            <delete path="${targetGraph}/software"/>
+        </fs>
+        <ok to="copy_dataset"/>
+        <error to="Kill"/>
+    </action>
+    <action name="copy_dataset">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/dataset</arg>
+            <arg>${nameNode}/${targetGraph}/dataset</arg>
+        </distcp>
+        <ok to="copy_datasource"/>
+        <error to="Kill"/>
+    </action>
+    <action name="copy_datasource">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/datasource</arg>
+            <arg>${nameNode}/${targetGraph}/datasource</arg>
+        </distcp>
+        <ok to="copy_organization"/>
+        <error to="Kill"/>
+    </action>
+    <action name="copy_organization">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/organization</arg>
+            <arg>${nameNode}/${targetGraph}/organization</arg>
+        </distcp>
+        <ok to="copy_otherresearchproduct"/>
+        <error to="Kill"/>
+    </action>
+    <action name="copy_otherresearchproduct">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/otherresearchproduct</arg>
+            <arg>${nameNode}/${targetGraph}/otherresearchproduct</arg>
+        </distcp>
+        <ok to="copy_person"/>
+        <error to="Kill"/>
+    </action>
+    <action name="copy_person">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/person</arg>
+            <arg>${nameNode}/${targetGraph}/person</arg>
+        </distcp>
+        <ok to="copy_project"/>
+        <error to="Kill"/>
+    </action>
+    <action name="copy_project">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/project</arg>
+            <arg>${nameNode}/${targetGraph}/project</arg>
+        </distcp>
+        <ok to="copy_publication"/>
+        <error to="Kill"/>
+    </action>
+    <action name="copy_publication">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/publication</arg>
+            <arg>${nameNode}/${targetGraph}/publication</arg>
+        </distcp>
+        <ok to="copy_software"/>
+        <error to="Kill"/>
+    </action>
+    <action name="copy_software">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${graphBasePath}/software</arg>
+            <arg>${nameNode}/${targetGraph}/software</arg>
+        </distcp>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+    
+    <end name="End"/>
+</workflow-app>

@@ -1,12 +1,10 @@
 package eu.dnetlib.dhp.oa.graph.raw
 
-import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
 import eu.dnetlib.dhp.application.ArgumentApplicationParser
 import eu.dnetlib.dhp.common.HdfsSupport
 import eu.dnetlib.dhp.schema.common.ModelSupport
-import eu.dnetlib.dhp.schema.oaf.Oaf
 import eu.dnetlib.dhp.utils.DHPUtils
-import org.apache.spark.sql.{Encoder, Encoders, SaveMode, SparkSession}
+import org.apache.spark.sql.{Encoders, SaveMode, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
@@ -54,48 +52,60 @@ object CopyHdfsOafSparkApplication {
     val hdfsPath = parser.get("hdfsPath")
     log.info("hdfsPath: {}", hdfsPath)
 
-    implicit val oafEncoder: Encoder[Oaf] = Encoders.kryo[Oaf]
-
     val paths =
       DHPUtils.mdstorePaths(mdstoreManagerUrl, mdFormat, mdLayout, mdInterpretation, true).asScala
 
     val validPaths: List[String] =
       paths.filter(p => HdfsSupport.exists(p, sc.hadoopConfiguration)).toList
 
-    val types = ModelSupport.oafTypes.entrySet.asScala
-      .map(e => Tuple2(e.getKey, e.getValue))
-
     if (validPaths.nonEmpty) {
-      val oaf = spark.read.textFile(validPaths: _*)
-      val mapper =
-        new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+      val oaf = spark.read
+        .textFile(validPaths: _*)
+        .map(v => (getOafType(v), v))(Encoders.tuple(Encoders.STRING, Encoders.STRING))
+        .cache()
 
-      types.foreach(t =>
-        oaf
-          .filter(o => isOafType(o, t._1))
-          .map(j => mapper.readValue(j, t._2).asInstanceOf[Oaf])
-          .map(s => mapper.writeValueAsString(s))(Encoders.STRING)
-          .write
-          .option("compression", "gzip")
-          .mode(SaveMode.Append)
-          .text(s"$hdfsPath/${t._1}")
-      )
+      try {
+        ModelSupport.oafTypes
+          .keySet()
+          .asScala
+          .foreach(entity =>
+            oaf
+              .filter(s"_1 = '${entity}'")
+              .selectExpr("_2")
+              .write
+              .option("compression", "gzip")
+              .mode(SaveMode.Append)
+              .text(s"$hdfsPath/${entity}")
+          )
+      } finally {
+        oaf.unpersist()
+      }
     }
   }
 
-  def isOafType(input: String, oafType: String): Boolean = {
+  def getOafType(input: String): String = {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
     lazy val json: org.json4s.JValue = parse(input)
-    if (oafType == "relation") {
-      val hasSource = (json \ "source").extractOrElse[String](null)
-      val hasTarget = (json \ "target").extractOrElse[String](null)
 
-      hasSource != null && hasTarget != null
+    val hasId = (json \ "id").extractOrElse[String](null)
+    val hasSource = (json \ "source").extractOrElse[String](null)
+    val hasTarget = (json \ "target").extractOrElse[String](null)
+
+    if (hasId == null && hasSource != null && hasTarget != null) {
+      "relation"
+    } else if (hasId != null) {
+      val oafType: String = ModelSupport.idPrefixEntity.get(hasId.substring(0, 2))
+
+      oafType match {
+        case "result" =>
+          (json \ "resulttype" \ "classid").extractOrElse[String](null) match {
+            case "other" => "otherresearchproduct"
+            case any     => any
+          }
+        case _ => oafType
+      }
     } else {
-      val hasId = (json \ "id").extractOrElse[String](null)
-      val resultType = (json \ "resulttype" \ "classid").extractOrElse[String]("")
-      hasId != null && oafType.startsWith(resultType)
+      null
     }
-
   }
 }
