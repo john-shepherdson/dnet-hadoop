@@ -1,0 +1,20 @@
+[
+  {
+    "paramName": "out",
+    "paramLongName": "outputPath",
+    "paramDescription": "the path to the graph data dump to read",
+    "paramRequired": true
+  },
+  {
+    "paramName": "hmu",
+    "paramLongName": "hiveMetastoreUris",
+    "paramDescription": "the hive metastore uris",
+    "paramRequired": true
+  },
+  {
+    "paramName": "db",
+    "paramLongName": "hiveDbName",
+    "paramDescription": "the input hive database identifier",
+    "paramRequired": true
+  }
+]
