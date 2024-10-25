@@ -14,7 +14,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.{
   PidType
 }
 import eu.dnetlib.dhp.utils.DHPUtils
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.Row
 import org.json4s
 import org.json4s.DefaultFormats
