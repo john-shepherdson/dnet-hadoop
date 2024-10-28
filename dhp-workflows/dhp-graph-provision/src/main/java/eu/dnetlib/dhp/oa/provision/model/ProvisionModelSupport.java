@@ -109,7 +109,7 @@ public class ProvisionModelSupport {
 		RelatedRecord rr = new RelatedRecord();
 
 		final RelatedEntity re = rew.getTarget();
-		final RecordType relatedRecordType = RecordType.valueOf(re.getType());
+		final RecordType relatedRecordType = RecordType.fromString(re.getType());
 		final Relation relation = rew.getRelation();
 		final String relationProvenance = Optional
 			.ofNullable(relation.getDataInfo())
