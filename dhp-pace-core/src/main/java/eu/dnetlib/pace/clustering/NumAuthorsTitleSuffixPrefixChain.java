@@ -38,7 +38,7 @@ public class NumAuthorsTitleSuffixPrefixChain extends AbstractClusteringFunction
 
 	@Override
 	protected Collection<String> doApply(Config conf, String s) {
-		return suffixPrefixChain(cleanup(s), param("mod"));
+		return suffixPrefixChain(cleanup(s), paramOrDefault("mod", 10));
 	}
 
 	private Collection<String> suffixPrefixChain(String s, int mod) {

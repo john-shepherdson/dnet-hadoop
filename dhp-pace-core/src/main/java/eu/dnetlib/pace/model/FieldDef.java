@@ -54,6 +54,22 @@ public class FieldDef implements Serializable {
 	public FieldDef() {
 	}
 
+	public FieldDef clone() {
+		FieldDef fieldDef = new FieldDef();
+		fieldDef.setName(this.name);
+		fieldDef.setPath(this.path);
+		fieldDef.setType(this.type);
+		fieldDef.setOverrideMatch(this.overrideMatch);
+		fieldDef.setSize(this.size);
+		fieldDef.setLength(this.length);
+		fieldDef.setFilter(this.filter);
+		fieldDef.setSorted(this.sorted);
+		fieldDef.setClean(this.clean);
+		fieldDef.setInfer(this.infer);
+		fieldDef.setInferenceFrom(this.inferenceFrom);
+		return fieldDef;
+	}
+
 	public String getInferenceFrom() {
 		return inferenceFrom;
 	}
