@@ -1,4 +1,4 @@
-<workflow-app name="BipAffiliations" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="OpenAIREAffiliations" xmlns="uri:oozie:workflow:0.5">
     <parameters>
 
         <property>
@@ -20,6 +20,10 @@
         <property>
             <name>webCrawlInputPath</name>
             <description>the path where to find the inferred affiliation relations from webCrawl</description>
+        </property>
+        <property>
+            <name>publisherInputPath</name>
+            <description>the path where to find the inferred affiliation relations from publisher websites</description>
         </property>
         <property>
             <name>outputPath</name>
@@ -99,7 +103,7 @@
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Produces the atomic action with the inferred by BIP! affiliation relations (from Crossref and Pubmed)</name>
+            <name>Produces the atomic action with the inferred by OpenAIRE affiliation relations</name>
             <class>eu.dnetlib.dhp.actionmanager.bipaffiliations.PrepareAffiliationRelations</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
@@ -117,6 +121,7 @@
             <arg>--openapcInputPath</arg><arg>${openapcInputPath}</arg>
             <arg>--dataciteInputPath</arg><arg>${dataciteInputPath}</arg>
             <arg>--webCrawlInputPath</arg><arg>${webCrawlInputPath}</arg>
+            <arg>--publisherInputPath</arg><arg>${publisherInputPath}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
         <ok to="End"/>
