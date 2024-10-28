@@ -157,61 +157,18 @@ public class ExtractPerson implements Serializable {
 
 	private static void extractInfoForActionSetFromPublisher(SparkSession spark, String inputPath, String workingDir) {
 
-
-			// load and parse affiliation relations from HDFS
 			Dataset<Row> df = spark
 					.read()
-					.schema("`DOI` STRING, `Matchings` ARRAY<STRUCT<`RORid`:STRING,`Confidence`:DOUBLE>>")
+					.schema(
+							"`DOI` STRING, `Authors` ARRAY<STRUCT<`Name`: STRUCT<`Full`:STRING, `First`:STRING, `Last`:STRING>, `Corresponding`:STRING,`Contributor_roles`:ARRAY<STRUCT<`schema`:STRING, `value`:STRING>>, `Matchings`:ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>, `PIDs`:ARRAY<STRUCT<`schema`:STRING, `value`:STRING>>>>")
 					.json(inputPath)
 					.where("DOI is not null");
 
-			// unroll nested arrays
-			df = df
-					.withColumn("matching", functions.explode(new Column("Matchings")))
-					.select(
-							new Column("DOI").as("doi"),
-							new Column("matching.RORid").as("rorid"),
-							new Column("matching.Confidence").as("confidence"));
+//			return getTextTextJavaPairRDDNew(
+//					collectedfrom, df.selectExpr("DOI", "Organizations as Matchings"), dataprovenance);
 
-			// prepare action sets for affiliation relations
-			return df
-					.toJavaRDD()
-					.flatMap((FlatMapFunction<Row, Relation>) row -> {
-
-						// DOI to OpenAIRE id
-						final String paperId = ID_PREFIX
-								+ IdentifierFactory.md5(CleaningFunctions.normalizePidValue("doi", row.getAs("doi")));
-
-						// ROR id to OpenAIRE id
-						final String affId = GenerateRorActionSetJob.calculateOpenaireId(row.getAs("rorid"));
-
-						Qualifier qualifier = OafMapperUtils
-								.qualifier(
-										BIP_AFFILIATIONS_CLASSID,
-										BIP_AFFILIATIONS_CLASSNAME,
-										ModelConstants.DNET_PROVENANCE_ACTIONS,
-										ModelConstants.DNET_PROVENANCE_ACTIONS);
-
-						// format data info; setting `confidence` into relation's `trust`
-						DataInfo dataInfo = OafMapperUtils
-								.dataInfo(
-										false,
-										BIP_INFERENCE_PROVENANCE,
-										true,
-										false,
-										qualifier,
-										Double.toString(row.getAs("confidence")));
-
-						// return bi-directional relations
-						return getAffiliationRelationPair(paperId, affId, collectedfrom, dataInfo).iterator();
-
-					})
-					.map(p -> new AtomicAction(Relation.class, p))
-					.mapToPair(
-							aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
-									new Text(OBJECT_MAPPER.writeValueAsString(aa))));
 		}
-	}
+
 
 	private static void extractInfoForActionSetFromProjects(SparkSession spark, String inputPath, String workingDir,
 		String dbUrl, String dbUser, String dbPassword, String hdfsPath, String hdfsNameNode) throws IOException {
