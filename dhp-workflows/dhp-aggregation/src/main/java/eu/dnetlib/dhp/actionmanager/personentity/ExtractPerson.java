@@ -25,6 +25,7 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.*;
 import org.apache.spark.sql.*;
+import org.apache.spark.sql.Dataset;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,10 +44,7 @@ import eu.dnetlib.dhp.common.person.Coauthors;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.DataInfo;
-import eu.dnetlib.dhp.schema.oaf.KeyValue;
-import eu.dnetlib.dhp.schema.oaf.Person;
-import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
@@ -70,7 +68,11 @@ public class ExtractPerson implements Serializable {
 
 	private static final String PMCID_PREFIX = "50|pmcid_______::";
 	private static final String ROR_PREFIX = "20|ror_________::";
-	private static final String PERSON_PREFIX = ModelSupport.getIdPrefix(Person.class) + "|orcid_______";
+	private static final String PERSON_PREFIX = ModelSupport.getIdPrefix(Person.class)
+		+ IdentifierFactory.ID_PREFIX_SEPARATOR + ModelConstants.ORCID + "_______";
+	private static final String PROJECT_ID_PREFIX = ModelSupport.getIdPrefix(Project.class)
+		+ IdentifierFactory.ID_PREFIX_SEPARATOR;
+
 	public static final String ORCID_AUTHORS_CLASSID = "sysimport:crosswalk:orcid";
 	public static final String ORCID_AUTHORS_CLASSNAME = "Imported from ORCID";
 	public static final String FUNDER_AUTHORS_CLASSID = "sysimport:crosswalk:funderdatabase";
@@ -173,7 +175,7 @@ public class ExtractPerson implements Serializable {
 			}
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 
 	}
@@ -191,7 +193,7 @@ public class ExtractPerson implements Serializable {
 	private static Relation getProjectRelation(String project, String orcid, String role) {
 
 		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(orcid);
-		String target = project.substring(0, 14)
+		String target = PROJECT_ID_PREFIX + project.substring(0, 14)
 			+ IdentifierFactory.md5(project.substring(15));
 		List<KeyValue> properties = new ArrayList<>();
 
