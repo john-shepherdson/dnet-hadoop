@@ -363,6 +363,8 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 				// nothing to clean here
 			} else if (value instanceof Project) {
 				// nothing to clean here
+			} else if (value instanceof Person) {
+				// nothing to clean here
 			} else if (value instanceof Organization) {
 				Organization o = (Organization) value;
 				if (Objects.isNull(o.getCountry()) || StringUtils.isBlank(o.getCountry().getClassid())) {

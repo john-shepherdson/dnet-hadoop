@@ -522,10 +522,10 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 					case "resultOrganization_affiliation_isAuthorInstitutionOf":
 						if (!"organization".equals(sourceType)) {
 							throw new IllegalStateException(
-									String
-											.format(
-													"invalid claim, sourceId: %s, targetId: %s, semantics: %s", sourceId, targetId,
-													semantics));
+								String
+									.format(
+										"invalid claim, sourceId: %s, targetId: %s, semantics: %s", sourceId, targetId,
+										semantics));
 						}
 						r1 = setRelationSemantic(r1, RESULT_ORGANIZATION, AFFILIATION, IS_AUTHOR_INSTITUTION_OF);
 						r2 = setRelationSemantic(r2, RESULT_ORGANIZATION, AFFILIATION, HAS_AUTHOR_INSTITUTION);
@@ -533,10 +533,10 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 					case "resultOrganization_affiliation_hasAuthorInstitution":
 						if (!"organization".equals(targetType)) {
 							throw new IllegalStateException(
-									String
-											.format(
-													"invalid claim, sourceId: %s, targetId: %s, semantics: %s", sourceId, targetId,
-													semantics));
+								String
+									.format(
+										"invalid claim, sourceId: %s, targetId: %s, semantics: %s", sourceId, targetId,
+										semantics));
 						}
 						r1 = setRelationSemantic(r1, RESULT_ORGANIZATION, AFFILIATION, HAS_AUTHOR_INSTITUTION);
 						r2 = setRelationSemantic(r2, RESULT_ORGANIZATION, AFFILIATION, IS_AUTHOR_INSTITUTION_OF);

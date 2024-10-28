@@ -10,6 +10,18 @@
             <description>the path where to store the actionset</description>
         </property>
         <property>
+            <name>postgresUrl</name>
+            <description>the path where to store the actionset</description>
+        </property>
+        <property>
+            <name>postgresUser</name>
+            <description>the path where to store the actionset</description>
+        </property>
+        <property>
+            <name>postgresPassword</name>
+            <description>the path where to store the actionset</description>
+        </property>
+        <property>
             <name>sparkDriverMemory</name>
             <description>memory for driver process</description>
         </property>
@@ -102,6 +114,10 @@
             <arg>--inputPath</arg><arg>${inputPath}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
+            <arg>--hdfsNameNode</arg><arg>${nameNode}</arg>
+            <arg>--postgresUrl</arg><arg>${postgresUrl}</arg>
+            <arg>--postgresUser</arg><arg>${postgresUser}</arg>
+            <arg>--postgresPassword</arg><arg>${postgresPassword}</arg>
         </spark>
         <ok to="End"/>
         <error to="Kill"/>

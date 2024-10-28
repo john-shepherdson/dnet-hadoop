@@ -16,8 +16,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.common.RelationInverse;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +30,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.common.RelationInverse;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
@@ -366,6 +366,7 @@ class MigrateDbEntitiesApplicationTest {
 		assertValidId(r1.getCollectedfrom().get(0).getKey());
 		assertValidId(r2.getCollectedfrom().get(0).getKey());
 	}
+
 	@Test
 	void testProcessClaims_affiliation() throws Exception {
 		final List<TypedField> fields = prepareMocks("claimsrel_resultset_affiliation.json");

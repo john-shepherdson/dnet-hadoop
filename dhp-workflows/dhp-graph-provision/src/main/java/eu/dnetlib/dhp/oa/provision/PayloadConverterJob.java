@@ -2,10 +2,12 @@
 package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits.MAX_RELATIONS_BY_RELCLASS;
 import static eu.dnetlib.dhp.utils.DHPUtils.toSeq;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -15,11 +17,13 @@ import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
 import org.apache.spark.util.LongAccumulator;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -27,11 +31,13 @@ import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
+import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.oa.provision.model.TupleWrapper;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Oaf;
+import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
 import eu.dnetlib.dhp.schema.solr.SolrRecord;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -125,6 +131,9 @@ public class PayloadConverterJob {
 					.map(DataInfo::getDeletedbyinference)
 					.orElse(false))
 			.map(
+				(MapFunction<JoinedEntity, JoinedEntity>) PayloadConverterJob::pruneRelatedEntities,
+				Encoders.kryo(JoinedEntity.class))
+			.map(
 				(MapFunction<JoinedEntity, Tuple2<String, SolrRecord>>) je -> new Tuple2<>(
 					recordFactory.build(je, validateXML),
 					ProvisionModelSupport.transform(je, contextMapper, vocabularies)),
@@ -137,6 +146,32 @@ public class PayloadConverterJob {
 			.mode(SaveMode.Overwrite)
 			.option("compression", "gzip")
 			.json(outputPath);
+	}
+
+	/**
+	 * This function iterates through the RelatedEntityWrapper(s) associated to the JoinedEntity and rules out
+	 * those exceeding the maximum allowed frequency defined in eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits#MAX_RELATIONS_BY_RELCLASS
+	 */
+	private static JoinedEntity pruneRelatedEntities(JoinedEntity je) {
+		Map<String, Long> freqs = Maps.newHashMap();
+		List<RelatedEntityWrapper> rew = Lists.newArrayList();
+
+		if (je.getLinks() != null) {
+			je.getLinks().forEach(link -> {
+				final String relClass = link.getRelation().getRelClass();
+
+				final Long count = freqs.getOrDefault(relClass, 0L);
+				final Long max = MAX_RELATIONS_BY_RELCLASS.getOrDefault(relClass, Long.MAX_VALUE);
+
+				if (count <= max) {
+					rew.add(link);
+					freqs.put(relClass, freqs.getOrDefault(relClass, 0L) + 1);
+				}
+			});
+			je.setLinks(rew);
+		}
+
+		return je;
 	}
 
 	private static void removeOutputDir(final SparkSession spark, final String path) {

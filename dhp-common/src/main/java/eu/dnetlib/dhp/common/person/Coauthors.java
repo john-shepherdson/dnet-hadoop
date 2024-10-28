@@ -1,11 +1,8 @@
 
-package eu.dnetlib.dhp.actionmanager.personentity;
+package eu.dnetlib.dhp.common.person;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
-
-import eu.dnetlib.dhp.schema.oaf.Relation;
 
 public class Coauthors implements Serializable {
 	private List<String> coauthors;
