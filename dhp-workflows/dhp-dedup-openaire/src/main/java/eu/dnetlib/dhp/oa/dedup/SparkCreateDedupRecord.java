@@ -98,7 +98,9 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
 				.read()
 				.load(mergeRelPath)
 				.where("relClass == 'merges'")
-				.join(dedupIds, JavaConverters.asScalaBuffer(Arrays.asList("source", "target")).toSeq(), "left_semi")
+				.join(
+					dedupIds, JavaConverters.asScalaBufferConverter(Arrays.asList("source", "target")).asScala(),
+					"left_semi")
 				.write()
 				.mode(SaveMode.Overwrite)
 				.option("compression", "gzip")
