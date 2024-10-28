@@ -26,6 +26,7 @@ import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
+import scala.collection.JavaConversions;
 import scala.collection.JavaConverters;
 
 public class SparkCreateDedupRecord extends AbstractSparkAction {
@@ -98,9 +99,7 @@ public class SparkCreateDedupRecord extends AbstractSparkAction {
 				.read()
 				.load(mergeRelPath)
 				.where("relClass == 'merges'")
-				.join(
-					dedupIds, JavaConverters.asScalaBufferConverter(Arrays.asList("source", "target")).asScala(),
-					"left_semi")
+				.join(dedupIds, JavaConversions.asScalaBuffer(Arrays.asList("source", "target")), "left_semi")
 				.write()
 				.mode(SaveMode.Overwrite)
 				.option("compression", "gzip")
