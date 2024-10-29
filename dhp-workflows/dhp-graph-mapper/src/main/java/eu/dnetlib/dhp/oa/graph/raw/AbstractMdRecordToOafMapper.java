@@ -657,13 +657,21 @@ public abstract class AbstractMdRecordToOafMapper {
 			final Node n = (Node) o;
 			final String classId = n.valueOf(xpathClassId).trim();
 			if (this.vocs.termExists(schemeId, classId)) {
-				res
-					.add(
-						HashableStructuredProperty
-							.newInstance(n.getText(), this.vocs.getTermAsQualifier(schemeId, classId), info));
+				final String value = n.getText();
+				if (StringUtils.isNotBlank(value)) {
+					res
+						.add(
+							HashableStructuredProperty
+								.newInstance(value, this.vocs.getTermAsQualifier(schemeId, classId), info));
+				}
 			}
 		}
-		return Lists.newArrayList(res);
+		return res
+			.stream()
+			.filter(Objects::nonNull)
+			.filter(p -> StringUtils.isNotBlank(p.getValue()))
+			.filter(p -> StringUtils.isNotBlank(p.getValue().trim()))
+			.collect(Collectors.toList());
 	}
 
 	protected List<StructuredProperty> prepareListStructProps(
