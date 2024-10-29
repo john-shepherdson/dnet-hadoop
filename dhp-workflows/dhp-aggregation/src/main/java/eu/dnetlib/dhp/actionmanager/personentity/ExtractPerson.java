@@ -30,6 +30,7 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.*;
 import org.apache.spark.sql.*;
+import org.apache.spark.sql.functions.*;
 import org.apache.spark.sql.Dataset;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -160,12 +161,25 @@ public class ExtractPerson implements Serializable {
 			Dataset<Row> df = spark
 					.read()
 					.schema(
-							"`DOI` STRING, `Authors` ARRAY<STRUCT<`Name`: STRUCT<`Full`:STRING, `First`:STRING, `Last`:STRING>, `Corresponding`:STRING,`Contributor_roles`:ARRAY<STRUCT<`schema`:STRING, `value`:STRING>>, `Matchings`:ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>, `PIDs`:ARRAY<STRUCT<`schema`:STRING, `value`:STRING>>>>")
+							"`DOI` STRING, " +
+									"`Authors` ARRAY<STRUCT<`Corresponding` : STRING, " +
+									                       "`Contributor_roles` : ARRAY<STRUCT<`Scheme`:STRING, `Value`:STRING>> ," +
+									                       "`Name` : STRUCT<`Full`:STRING, `First` : STRING, `Last`: STRING>,  " +
+									                       "`Matchings`: ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>, " +
+									                       "`PIDs` : STRUCT<`Schema`:STRING , `Value`: STRING>>>")
 					.json(inputPath)
 					.where("DOI is not null");
 
-//			return getTextTextJavaPairRDDNew(
-//					collectedfrom, df.selectExpr("DOI", "Organizations as Matchings"), dataprovenance);
+			df.selectExpr("DOI", "explode(Authors) as author")
+					.selectExpr("DOI", "author.Name.Full as fullname", "author.Name.First as firstname",
+							"author.Name.Last as lastname", "author.Contributor_roles as roles",
+							"author.Corresponding as corresponding", "author.Matchings as affs",
+							"authors.PIDs as pid")
+					.where("pid.Schema=='ORCID'")
+					.selectExpr("explode affs as affiliation", "DOI", "fullname", "firstname", "lastname", "roles", "pid.Value as orcid")
+					.where("aff.Status == 'active");
+
+
 
 		}
 
