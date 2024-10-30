@@ -12,6 +12,7 @@ class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String]
     extends SparkEnrichWithOrcidAuthors(propertyPath, args, log: Logger) {
 
   override def createTemporaryData(spark:SparkSession, graphPath: String, orcidPath: String, targetPath: String): Unit = {
+
     val orcidAuthors =
       spark.read.load(s"$orcidPath/Authors").select("orcid", "familyName", "givenName", "creditName", "otherNames")
 
