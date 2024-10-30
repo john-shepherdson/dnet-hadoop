@@ -1,4 +1,4 @@
-package eu.dnetlib.pace.util
+package eu.dnetlib.dhp.utils
 
 import java.util.Locale
 import java.util.regex.Pattern
@@ -66,19 +66,18 @@ object AuthorMatchers {
   }
 
   def removeMatches(
-                     graph_authors: java.util.List[String],
-                     orcid_authors: java.util.List[String],
-                     matchingFunc: java.util.function.BiFunction[String,String,Boolean]
-                   ) : java.util.List[String] = {
-    removeMatches(graph_authors, orcid_authors, (a, b) => matchingFunc(a,b))
+    graph_authors: java.util.List[String],
+    orcid_authors: java.util.List[String],
+    matchingFunc: java.util.function.BiFunction[String, String, Boolean]
+  ): java.util.List[String] = {
+    removeMatches(graph_authors, orcid_authors, (a, b) => matchingFunc(a, b))
   }
 
-
   def removeMatches(
-                                       graph_authors: java.util.List[String],
-                                       orcid_authors: java.util.List[String],
-                                       matchingFunc: (String, String) => Boolean
-                                     ) : java.util.List[String]  = {
+    graph_authors: java.util.List[String],
+    orcid_authors: java.util.List[String],
+    matchingFunc: (String, String) => Boolean
+  ): java.util.List[String] = {
     val matched = new java.util.ArrayList[String]()
 
     if (graph_authors != null && !graph_authors.isEmpty) {

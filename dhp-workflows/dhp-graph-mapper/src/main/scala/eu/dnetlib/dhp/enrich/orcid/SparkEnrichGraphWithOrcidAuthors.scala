@@ -2,37 +2,12 @@ package eu.dnetlib.dhp.enrich.orcid
 
 import eu.dnetlib.dhp.application.AbstractScalaApplication
 import eu.dnetlib.dhp.schema.common.ModelSupport
-import eu.dnetlib.dhp.schema.oaf._
+import eu.dnetlib.dhp.utils.{MatchData, ORCIDAuthorEnricher, ORCIDAuthorEnricherResult}
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.slf4j.{Logger, LoggerFactory}
 
-import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
-
-case class OrcidAutor(
-  @BeanProperty var orcid: String,
-  @BeanProperty var familyName: String,
-  @BeanProperty var givenName: String,
-  @BeanProperty var creditName: String,
-  @BeanProperty var otherNames: java.util.List[String]
-) {
-  def this() = this("null", "null", "null", "null", null)
-}
-
-case class MatchData(
-  @BeanProperty var id: String,
-  @BeanProperty var graph_authors: java.util.List[Author],
-  @BeanProperty var orcid_authors: java.util.List[OrcidAutor]
-) {
-  def this() = this("null", null, null)
-}
-
-case class MatchedAuthors(
-  @BeanProperty var author: Author,
-  @BeanProperty var orcid: OrcidAutor,
-  @BeanProperty var `type`: String
-)
 
 class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String], log: Logger)
     extends AbstractScalaApplication(propertyPath, args, log: Logger) {
@@ -87,7 +62,7 @@ class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String]
 
   }
 
-  private def createTemporaryData(graphPath: String, orcidPath: String, targetPath: String): Unit = {
+  def createTemporaryData(graphPath: String, orcidPath: String, targetPath: String): Unit = {
     val orcidAuthors =
       spark.read.load(s"$orcidPath/Authors").select("orcid", "familyName", "givenName", "creditName", "otherNames")
 
