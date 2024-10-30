@@ -1,21 +1,44 @@
-package eu.dnetlib.dhp.enrich.orcid
+package eu.dnetlib.dhp.utils
 
 import eu.dnetlib.dhp.schema.common.ModelConstants
 import eu.dnetlib.dhp.schema.oaf.{Author, StructuredProperty}
 import eu.dnetlib.dhp.schema.sx.OafUtils
-import eu.dnetlib.pace.util.AuthorMatchers
 
 import java.util
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 import scala.util.control.Breaks.{break, breakable}
 
+case class OrcidAuthor(
+  @BeanProperty var orcid: String,
+  @BeanProperty var familyName: String,
+  @BeanProperty var givenName: String,
+  @BeanProperty var creditName: String,
+  @BeanProperty var otherNames: java.util.List[String]
+) {
+  def this() = this("null", "null", "null", "null", null)
+}
+
+case class MatchedAuthors(
+                           @BeanProperty var author: Author,
+                           @BeanProperty var orcid: OrcidAuthor,
+                           @BeanProperty var `type`: String
+)
+
+case class MatchData(
+  @BeanProperty var id: String,
+  @BeanProperty var graph_authors: java.util.List[Author],
+  @BeanProperty var orcid_authors: java.util.List[OrcidAuthor]
+) {
+  def this() = this("null", null, null)
+}
+
 case class ORCIDAuthorEnricherResult(
   @BeanProperty var id: String,
   @BeanProperty var enriched_author: java.util.List[Author],
   @BeanProperty var author_matched: java.util.List[MatchedAuthors],
   @BeanProperty var author_unmatched: java.util.List[Author],
-  @BeanProperty var orcid_unmatched: java.util.List[OrcidAutor]
+  @BeanProperty var orcid_unmatched: java.util.List[OrcidAuthor]
 )
 
 object ORCIDAuthorEnricher extends Serializable {
@@ -23,7 +46,7 @@ object ORCIDAuthorEnricher extends Serializable {
   def enrichOrcid(
     id: String,
     graph_authors: java.util.List[Author],
-    orcid_authors: java.util.List[OrcidAutor]
+    orcid_authors: java.util.List[OrcidAuthor]
   ): ORCIDAuthorEnricherResult = {
     // Author enriching strategy:
     // 1) create a copy of graph author list in unmatched_authors
@@ -81,10 +104,10 @@ object ORCIDAuthorEnricher extends Serializable {
   }
 
   private def extractAndEnrichMatches(
-    graph_authors: java.util.List[Author],
-    orcid_authors: java.util.List[OrcidAutor],
-    matchingFunc: (Author, OrcidAutor) => Boolean,
-    matchName: String
+                                       graph_authors: java.util.List[Author],
+                                       orcid_authors: java.util.List[OrcidAuthor],
+                                       matchingFunc: (Author, OrcidAuthor) => Boolean,
+                                       matchName: String
   ) = {
     val matched = scala.collection.mutable.ArrayBuffer.empty[MatchedAuthors]
 
