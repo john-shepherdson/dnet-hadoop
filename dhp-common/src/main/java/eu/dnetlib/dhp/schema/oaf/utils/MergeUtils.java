@@ -715,7 +715,9 @@ public class MergeUtils {
 	private static String spKeyExtractor(StructuredProperty sp) {
 		return Optional
 			.ofNullable(sp)
-			.map(s -> Joiner.on("||").join(qualifierKeyExtractor(s.getQualifier()), s.getValue()))
+			.map(s -> Joiner.on("||")
+					.useForNull("")
+					.join(qualifierKeyExtractor(s.getQualifier()), s.getValue()))
 			.orElse(null);
 	}
 
