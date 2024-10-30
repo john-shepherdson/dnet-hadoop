@@ -1,0 +1,5 @@
+[
+  {"paramName":"w",   "paramLongName":"relationPath",  "paramDescription": "the source Path",            "paramRequired": true},
+  {"paramName":"g",   "paramLongName":"graphBasePath",   "paramDescription": "the path of the raw graph",  "paramRequired": true},
+  {"paramName":"t",   "paramLongName":"targetPath",   "paramDescription": "the target path",  "paramRequired": true}
+]

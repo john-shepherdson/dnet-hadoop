@@ -1,0 +1,14 @@
+[
+	{
+		"paramName": "p",
+		"paramLongName": "inputPath",
+		"paramDescription": "the path where delta is stored",
+		"paramRequired": true
+	},
+	{
+		"paramName": "o",
+		"paramLongName": "graphOutputPath",
+		"paramDescription": "the path where store the graph",
+		"paramRequired": true
+	}
+]
