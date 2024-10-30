@@ -80,9 +80,6 @@ public class PatchRelationsApplication {
 		final Dataset<Relation> rels = readPath(spark, relationPath, Relation.class);
 		final Dataset<RelationIdMapping> idMapping = readPath(spark, idMappingPath, RelationIdMapping.class);
 
-		log.info("relations: {}", rels.count());
-		log.info("idMapping: {}", idMapping.count());
-
 		final Dataset<Relation> bySource = rels
 			.joinWith(idMapping, rels.col("source").equalTo(idMapping.col("oldId")), "left")
 			.map((MapFunction<Tuple2<Relation, RelationIdMapping>, Relation>) t -> {
