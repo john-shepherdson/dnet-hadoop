@@ -810,7 +810,7 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		return author;
 	}
 
-	private static Optional<String> cleanDateField(Field<String> dateofacceptance) {
+	public static Optional<String> cleanDateField(Field<String> dateofacceptance) {
 		return Optional
 			.ofNullable(dateofacceptance)
 			.map(Field::getValue)
