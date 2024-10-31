@@ -296,9 +296,12 @@ public class MergeUtils {
 			right = s;
 		}
 
-		List<KeyValue> collect = unionDistinctLists(left.stream().map(HashableKeyValue::newInstance).collect(Collectors.toList()),
-				right.stream().map(HashableKeyValue::newInstance).collect(Collectors.toList()), trust)
-				.stream().map(HashableKeyValue::toKeyValue).collect(Collectors.toList());
+		List<KeyValue> collect = unionDistinctLists(
+			left.stream().map(HashableKeyValue::newInstance).collect(Collectors.toList()),
+			right.stream().map(HashableKeyValue::newInstance).collect(Collectors.toList()), trust)
+				.stream()
+				.map(HashableKeyValue::toKeyValue)
+				.collect(Collectors.toList());
 		return collect;
 
 	}

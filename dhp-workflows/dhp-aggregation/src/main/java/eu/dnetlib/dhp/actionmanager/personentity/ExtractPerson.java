@@ -13,11 +13,6 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.actionmanager.ror.GenerateRorActionSetJob;
-import eu.dnetlib.dhp.common.person.CoAuthorshipIterator;
-import eu.dnetlib.dhp.common.person.Coauthors;
-import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.*;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -30,8 +25,8 @@ import org.apache.hadoop.mapred.SequenceFileOutputFormat;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.*;
 import org.apache.spark.sql.*;
-import org.apache.spark.sql.functions.*;
 import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.functions.*;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,17 +34,23 @@ import org.spark_project.jetty.util.StringUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import eu.dnetlib.dhp.actionmanager.ror.GenerateRorActionSetJob;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.collection.orcid.model.Author;
 import eu.dnetlib.dhp.collection.orcid.model.Employment;
 import eu.dnetlib.dhp.collection.orcid.model.Work;
 import eu.dnetlib.dhp.common.DbClient;
 import eu.dnetlib.dhp.common.HdfsSupport;
+import eu.dnetlib.dhp.common.person.CoAuthorshipIterator;
+import eu.dnetlib.dhp.common.person.Coauthors;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.oaf.*;
+import eu.dnetlib.dhp.schema.oaf.utils.*;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
+import scala.collection.Seq;
 
 public class ExtractPerson implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(ExtractPerson.class);
@@ -67,6 +68,7 @@ public class ExtractPerson implements Serializable {
 
 	private static final String PMCID_PREFIX = "50|pmcid_______::";
 	private static final String ROR_PREFIX = "20|ror_________::";
+	private static final String OPENORGS_PREFIX = "20|openorgs____::";
 	private static final String PERSON_PREFIX = ModelSupport.getIdPrefix(Person.class) + "|orcid_______";
 	public static final String ORCID_AUTHORS_CLASSID = "sysimport:crosswalk:orcid";
 	public static final String ORCID_AUTHORS_CLASSNAME = "Imported from ORCID";
@@ -93,18 +95,18 @@ public class ExtractPerson implements Serializable {
 			"0.91");
 
 	public static final DataInfo FUNDERDATAINFO = OafMapperUtils
-			.dataInfo(
-					false,
-					null,
-					false,
-					false,
-					OafMapperUtils
-							.qualifier(
-									FUNDER_AUTHORS_CLASSID,
-									FUNDER_AUTHORS_CLASSNAME,
-									ModelConstants.DNET_PROVENANCE_ACTIONS,
-									ModelConstants.DNET_PROVENANCE_ACTIONS),
-					"0.91");
+		.dataInfo(
+			false,
+			null,
+			false,
+			false,
+			OafMapperUtils
+				.qualifier(
+					FUNDER_AUTHORS_CLASSID,
+					FUNDER_AUTHORS_CLASSNAME,
+					ModelConstants.DNET_PROVENANCE_ACTIONS,
+					ModelConstants.DNET_PROVENANCE_ACTIONS),
+			"0.91");
 
 	public static void main(final String[] args) throws IOException, ParseException {
 
@@ -152,8 +154,8 @@ public class ExtractPerson implements Serializable {
 				HdfsSupport.remove(outputPath, spark.sparkContext().hadoopConfiguration());
 				extractInfoForActionSetFromORCID(spark, inputPath, workingDir);
 				extractInfoForActionSetFromProjects(
-					 dbUrl, dbUser, dbPassword, workingDir + "/project", hdfsNameNode, isSparkSessionManaged);
-				extractInfoForActionSetFromPublisher(spark,publisherInputPath, workingDir);
+					dbUrl, dbUser, dbPassword, workingDir + "/project", hdfsNameNode, isSparkSessionManaged);
+				extractInfoForActionSetFromPublisher(spark, publisherInputPath, workingDir);
 				createActionSet(spark, outputPath, workingDir);
 			});
 
@@ -161,104 +163,143 @@ public class ExtractPerson implements Serializable {
 
 	private static void extractInfoForActionSetFromPublisher(SparkSession spark, String inputPath, String workingDir) {
 //Read the publishers output
-			Dataset<Row> df = spark
-					.read()
-					.schema(
-							"`DOI` STRING, " +
-									"`Authors` ARRAY<STRUCT<`Corresponding` : STRING, " +
-									                       "`Contributor_roles` : ARRAY<STRUCT<`Scheme`:STRING, `Value`:STRING>> ," +
-									                       "`Name` : STRUCT<`Full`:STRING, `First` : STRING, `Last`: STRING>,  " +
-									                       "`Matchings`: ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>, " +
-									                       "`PIDs` : STRUCT<`Schema`:STRING , `Value`: STRING>>>")
-					.json(inputPath + "/*/")
-					.where("DOI is not null");
+		Dataset<Row> df = spark
+			.read()
+			.schema(
+				"`DOI` STRING, " +
+					"`Authors` ARRAY<STRUCT<`Corresponding` : STRING, " +
+					"`Contributor_roles` : ARRAY<STRUCT<`Schema`:STRING, `Value`:STRING>> ," +
+					"`Name` : STRUCT<`Full`:STRING, `First` : STRING, `Last`: STRING>,  " +
+					"`Matchings`: ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>, " +
+					"`PIDs` : STRUCT<`Schema`:STRING , `Value`: STRING>>>")
+			.json(inputPath + "/*/")
+			.where("DOI is not null");
 
 //Select the relevant information
-		Dataset<Row> authors = df.selectExpr("DOI", "explode(Authors) as author")
-				.selectExpr("DOI", "author.Contributor_roles as roles",
-						"author.Corresponding as corresponding", "author.Matchings as affs",
-						"authors.PIDs as pid")
-				.where("pid.Schema=='ORCID'")
-				.selectExpr("explode affs as affiliation", "DOI", "corresponding", "roles", "pid.Value as orcid")
-				.where("aff.Status == 'active")
-				.selectExpr("affiliation", "DOI", "corresponding", "explode roles as role", "orcid");
+		Dataset<Row> authors = df
+			.selectExpr("DOI", "explode(Authors) as author")
+			.selectExpr(
+				"DOI", "author.Contributor_roles as roles",
+				"author.Corresponding as corresponding", "author.Matchings as affs",
+				"author.PIDs as pid")
+			.where("pid.Schema = 'ORCID'")
+			.selectExpr("explode (affs) as affiliation", "DOI", "corresponding", "roles", "pid.Value as orcid")
+			.where("affiliation.Status = 'active'")
+			.selectExpr(
+				"affiliation.Value as orgid", "affiliation.PID as orgpid", "affiliation.Confidence as trust", "DOI",
+				"corresponding", "roles", "orcid");
 
-		//create the relation dataset with possible redundant relations
-		Dataset<Relation> relations = authors.flatMap((FlatMapFunction<Row, Relation>) a ->
-				Arrays.asList(getAuthorshipRelation(a), getAffiliationRelation(a)).iterator(), Encoders.bean(Relation.class))
-						.unionAll(
+		authors = authors
+			.where("roles is null")
+			.selectExpr("*", " '' AS roleschema", " '' AS rolevalue")
+			.drop("roles")
+			.unionAll(
+				authors
+					.where("roles is not null")
+					.selectExpr("orgid", "orgpid", "trust", "DOI", "corresponding", "explode(roles) as role", "orcid")
+					.selectExpr("*", "role.Schema as roleschema", "role.Value as rolevalue")
+					.drop("role"));
 
-		df.selectExpr("DOI","explode Authors as author").where("author.PIDs.Schema == 'ORCID")
-				.selectExpr("DOI", "author.PIDs.value as orcid")
-				.groupByKey((MapFunction<Row, String>) r -> r.getAs("DOI"), Encoders.STRING() )
+		// create the relation dataset with possible redundant relations
+		Dataset<Relation> relations = authors
+			.flatMap(
+				(FlatMapFunction<Row, Relation>) a -> Arrays
+					.asList(getAuthorshipRelation(a), getAffiliationRelation(a))
+					.iterator(),
+				Encoders.bean(Relation.class))
+			.unionAll(
+				df
+					.selectExpr("DOI", "explode (Authors) as author")
+					.where("author.PIDs.Schema = 'ORCID'")
+					.selectExpr("DOI", "author.PIDs.Value as orcid")
+					.groupByKey((MapFunction<Row, String>) r -> r.getAs("DOI"), Encoders.STRING())
 
-				.mapGroups((MapGroupsFunction<String, Row, Coauthors>) (k,it) -> extractCoAuthorsRow(it),
+					.mapGroups(
+						(MapGroupsFunction<String, Row, Coauthors>) (k, it) -> extractCoAuthorsRow(it),
 						Encoders.bean(Coauthors.class))
-				.flatMap(
+					.flatMap(
 						(FlatMapFunction<Coauthors, Relation>) c -> new CoAuthorshipIterator(c.getCoauthors()),
 						Encoders.bean(Relation.class))
-				.groupByKey((MapFunction<Relation, String>) r -> r.getSource() + r.getTarget(), Encoders.STRING())
-				.mapGroups(
-						(MapGroupsFunction<String, Relation, Relation>) (k, it) -> it.next(), Encoders.bean(Relation.class)));
+					.groupByKey((MapFunction<Relation, String>) r -> r.getSource() + r.getTarget(), Encoders.STRING())
+					.mapGroups(
+						(MapGroupsFunction<String, Relation, Relation>) (k, it) -> it.next(),
+						Encoders.bean(Relation.class)));
 
-		//produce one dataset with only one relation per source, target and semantics. Eventually extend the list of properties
+		// produce one dataset with only one relation per source, target and semantics. Eventually extend the list of
+		// properties
 
-		relations.groupByKey((MapFunction<Relation, String>) r -> r.getSource() + r.getRelClass() + r.getTarget(), Encoders.STRING() )
-				.mapGroups((MapGroupsFunction<String, Relation, Relation>) (k,it) -> mergeRelation(it), Encoders.bean(Relation.class) )
-				.write()
-				.mode(SaveMode.Overwrite)
-				.option("compression","gzip")
-				.json(workingDir + "/publishers");
+		relations
+			.groupByKey(
+				(MapFunction<Relation, String>) r -> r.getSource() + r.getRelClass() + r.getTarget(), Encoders.STRING())
+			.mapGroups(
+				(MapGroupsFunction<String, Relation, Relation>) (k, it) -> mergeRelation(it),
+				Encoders.bean(Relation.class))
+			.write()
+			.mode(SaveMode.Overwrite)
+			.option("compression", "gzip")
+			.json(workingDir + "/publishers");
 
+	}
+
+	private static Relation mergeRelation(Iterator<Relation> it) {
+		Relation r = it.next();
+
+		while (it.hasNext()) {
+			Relation r1 = it.next();
+			r = MergeUtils.mergeRelation(r, r1);
 		}
-
-		private static Relation mergeRelation(Iterator<Relation> it){
-			Relation r = it.next();
-
-			while (it.hasNext()){
-				Relation r1 = it.next();
-				r = MergeUtils.mergeRelation(r, r1);
-			}
-			return r;
-		}
+		return r;
+	}
 
 	private static @NotNull Relation getAuthorshipRelation(Row a) {
 		String target = DOI_PREFIX
-				+ IdentifierFactory
+			+ IdentifierFactory
 				.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), a.getAs("DOI")));
 		;
 		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(a.getAs("orcid"));
 
 		Relation relation = OafMapperUtils
-				.getRelation(
-						source, target, ModelConstants.RESULT_PERSON_RELTYPE,
-						ModelConstants.RESULT_PERSON_SUBRELTYPE,
-						ModelConstants.RESULT_PERSON_HASAUTHORED,
-						OafMapperUtils.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME),
-						null,
-						null);
+			.getRelation(
+				source, target, ModelConstants.RESULT_PERSON_RELTYPE,
+				ModelConstants.RESULT_PERSON_SUBRELTYPE,
+				ModelConstants.RESULT_PERSON_HASAUTHORED,
+				OafMapperUtils.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME),
+				null,
+				null);
 
-		if(StringUtil.isNotBlank(a.getAs("aff.Value"))){
+		if (StringUtil.isNotBlank(a.getAs("orgid"))) {
 			KeyValue kv = new KeyValue();
 			kv.setKey("declared_affiliation");
-			kv.setValue(ROR_PREFIX
-					+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", a.getAs("aff.Value"))));
-			relation.getProperties().add(new KeyValue());
+			if (((String) a.getAs("orgpid")).equalsIgnoreCase("ror"))
+				kv.setValue(a.getAs("orgid"));
+			else
+				kv
+					.setValue(
+						OPENORGS_PREFIX
+							+ IdentifierFactory.md5(PidCleaner.normalizePidValue("OPENORGS", a.getAs("orgid"))));
+			if (!Optional.ofNullable(relation.getProperties()).isPresent())
+				relation.setProperties(new ArrayList<>());
+			relation.getProperties().add(kv);
 		}
-		if(StringUtil.isNotBlank(a.getAs("corresponding")) && a.getAs("corresponding").equals("true")){
+		if (Optional.ofNullable(a.getAs("corresponding")).isPresent() &&
+			a.getAs("corresponding").equals("true")) {
 			KeyValue kv = new KeyValue();
 			kv.setKey("corresponding");
 			kv.setValue("true");
-			relation.getProperties().add(new KeyValue());
+			if (!Optional.ofNullable(relation.getProperties()).isPresent())
+				relation.setProperties(new ArrayList<>());
+			relation.getProperties().add(kv);
 		}
-		if(StringUtil.isNotBlank(a.getAs("role"))){
 
+		if (StringUtil.isNotBlank(a.getAs("roleschema"))) {
 			KeyValue kv = new KeyValue();
 			kv.setKey("role");
-			String role = (String) a.getAs("role.Schema")
-					+(String) a.getAs("role.value");
+			String role = (String) a.getAs("roleschema")
+				+ (String) a.getAs("rolevalue");
 			kv.setValue(role);
-			relation.getProperties().add(new KeyValue());
+			if (!Optional.ofNullable(relation.getProperties()).isPresent())
+				relation.setProperties(new ArrayList<>());
+			relation.getProperties().add(kv);
 		}
 		return relation;
 	}
@@ -267,31 +308,31 @@ public class ExtractPerson implements Serializable {
 
 		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(a.getAs("orcid"));
 		String target = ROR_PREFIX
-				+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", a.getAs("aff.Value")));
+			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", a.getAs("orgid")));
 
 		Relation relation = OafMapperUtils
-				.getRelation(
-						source, target, ModelConstants.ORG_PERSON_RELTYPE,
-						ModelConstants.ORG_PERSON_SUBRELTYPE,
-						ModelConstants.ORG_PERSON_PARTICIPATES,
-						OafMapperUtils.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME),
-						null,
-						null);
-
+			.getRelation(
+				source, target, ModelConstants.ORG_PERSON_RELTYPE,
+				ModelConstants.ORG_PERSON_SUBRELTYPE,
+				ModelConstants.ORG_PERSON_PARTICIPATES,
+				OafMapperUtils.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME),
+				null,
+				null);
 
 		return relation;
 	}
 
-
 	private static void extractInfoForActionSetFromProjects(
-		String dbUrl, String dbUser, String dbPassword, String hdfsPath, String hdfsNameNode, Boolean exec) throws IOException {
+		String dbUrl, String dbUser, String dbPassword, String hdfsPath, String hdfsNameNode, Boolean exec)
+		throws IOException {
 
-		Configuration conf = new Configuration();
-		conf.set("fs.defaultFS", hdfsNameNode);
+		if (exec) {
+			Configuration conf = new Configuration();
+			conf.set("fs.defaultFS", hdfsNameNode);
 
-		FileSystem fileSystem = FileSystem.get(conf);
-		Path hdfsWritePath = new Path(hdfsPath);
-		if(exec){
+			FileSystem fileSystem = FileSystem.get(conf);
+			Path hdfsWritePath = new Path(hdfsPath);
+
 			FSDataOutputStream fos = fileSystem.create(hdfsWritePath);
 			try (DbClient dbClient = new DbClient(dbUrl, dbUser, dbPassword)) {
 				try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
@@ -302,7 +343,6 @@ public class ExtractPerson implements Serializable {
 				e.printStackTrace();
 			}
 		}
-
 
 	}
 
@@ -328,7 +368,7 @@ public class ExtractPerson implements Serializable {
 				source, target, ModelConstants.PROJECT_PERSON_RELTYPE, ModelConstants.PROJECT_PERSON_SUBRELTYPE,
 				ModelConstants.PROJECT_PERSON_PARTICIPATES,
 				collectedfromOpenAIRE,
-					FUNDERDATAINFO,
+				FUNDERDATAINFO,
 				null);
 		relation.setValidated(true);
 
@@ -382,10 +422,10 @@ public class ExtractPerson implements Serializable {
 				getRelations(spark, workingDir + "/project")
 					.toJavaRDD()
 					.map(r -> new AtomicAction(r.getClass(), r)))
-				.union(
-						getRelations(spark, workingDir + "/publishers")
-								.toJavaRDD()
-								.map(r -> new AtomicAction(r.getClass(), r)))
+			.union(
+				getRelations(spark, workingDir + "/publishers")
+					.toJavaRDD()
+					.map(r -> new AtomicAction(r.getClass(), r)))
 			.mapToPair(
 				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
 					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
@@ -535,13 +575,16 @@ public class ExtractPerson implements Serializable {
 	}
 
 	private static Dataset<Relation> getRelations(SparkSession spark, String path) {
-		return spark
-			.read()
-			.textFile(path)
-			.map(
-				(MapFunction<String, Relation>) value -> OBJECT_MAPPER
-					.readValue(value, Relation.class),
-				Encoders.bean(Relation.class));// spark.read().json(path).as(Encoders.bean(Relation.class));
+		if (HdfsSupport.exists(path, spark.sparkContext().hadoopConfiguration()))
+			return spark
+				.read()
+				.textFile(path)
+				.map(
+					(MapFunction<String, Relation>) value -> OBJECT_MAPPER
+						.readValue(value, Relation.class),
+					Encoders.bean(Relation.class));// spark.read().json(path).as(Encoders.bean(Relation.class));
+		else
+			return spark.emptyDataset(Encoders.bean(Relation.class));
 	}
 
 	private static Coauthors extractCoAuthors(Iterator<Tuple2<String, String>> it) {
@@ -575,7 +618,7 @@ public class ExtractPerson implements Serializable {
 				source, target, ModelConstants.ORG_PERSON_RELTYPE, ModelConstants.ORG_PERSON_SUBRELTYPE,
 				ModelConstants.ORG_PERSON_PARTICIPATES,
 				Arrays.asList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
-					ORCIDDATAINFO,
+				ORCIDDATAINFO,
 				null);
 		relation.setValidated(true);
 
@@ -645,8 +688,8 @@ public class ExtractPerson implements Serializable {
 				source, target, ModelConstants.RESULT_PERSON_RELTYPE,
 				ModelConstants.RESULT_PERSON_SUBRELTYPE,
 				ModelConstants.RESULT_PERSON_HASAUTHORED,
-                    Collections.singletonList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
-					ORCIDDATAINFO,
+				Collections.singletonList(OafMapperUtils.keyValue(orcidKey, ModelConstants.ORCID_DS)),
+				ORCIDDATAINFO,
 				null);
 		relation.setValidated(true);
 		return relation;
