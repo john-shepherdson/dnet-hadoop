@@ -282,6 +282,27 @@ public class MergeUtils {
 		return new ArrayList<>(values.values());
 	}
 
+	// TODO review
+	private static List<KeyValue> appendKey(List<KeyValue> left, List<KeyValue> right, int trust) {
+		if (left == null) {
+			return right;
+		} else if (right == null) {
+			return left;
+		}
+
+		if (trust < 0) {
+			List<KeyValue> s = left;
+			left = right;
+			right = s;
+		}
+
+		List<KeyValue> collect = unionDistinctLists(left.stream().map(HashableKeyValue::newInstance).collect(Collectors.toList()),
+				right.stream().map(HashableKeyValue::newInstance).collect(Collectors.toList()), trust)
+				.stream().map(HashableKeyValue::toKeyValue).collect(Collectors.toList());
+		return collect;
+
+	}
+
 	private static List<StructuredProperty> unionTitle(List<StructuredProperty> left, List<StructuredProperty> right,
 		int trust) {
 		if (left == null) {
@@ -368,7 +389,7 @@ public class MergeUtils {
 		}
 
 		// TODO keyvalue merge
-		merge.setProperties(mergeByKey(merge.getProperties(), enrich.getProperties(), trust));
+		merge.setProperties(appendKey(merge.getProperties(), enrich.getProperties(), trust));
 
 		return merge;
 	}
