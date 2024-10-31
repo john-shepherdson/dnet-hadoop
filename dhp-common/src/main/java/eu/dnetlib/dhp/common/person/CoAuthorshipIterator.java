@@ -1,30 +1,24 @@
 
 package eu.dnetlib.dhp.common.person;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
-import eu.dnetlib.dhp.schema.oaf.Person;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
-import eu.dnetlib.dhp.utils.DHPUtils;
+
+
+
+import static eu.dnetlib.dhp.common.person.Constants.*;
 
 public class CoAuthorshipIterator implements Iterator<Relation> {
 	private int firstIndex;
 	private int secondIndex;
 	private boolean firstRelation;
 	private List<String> authors;
-	private static final String PERSON_PREFIX = ModelSupport.getIdPrefix(Person.class) + "|orcid_______::";
-	private static final String OPENAIRE_PREFIX = "openaire____";
-	private static final String SEPARATOR = "::";
-	private static final String ORCID_KEY = "10|" + OPENAIRE_PREFIX + SEPARATOR
-		+ DHPUtils.md5(ModelConstants.ORCID.toLowerCase());
-	public static final String ORCID_AUTHORS_CLASSID = "sysimport:crosswalk:orcid";
-	public static final String ORCID_AUTHORS_CLASSNAME = "Imported from ORCID";
+	
 
 	@Override
 	public boolean hasNext() {
@@ -66,15 +60,8 @@ public class CoAuthorshipIterator implements Iterator<Relation> {
 				source, target, ModelConstants.PERSON_PERSON_RELTYPE,
 				ModelConstants.PERSON_PERSON_SUBRELTYPE,
 				ModelConstants.PERSON_PERSON_HASCOAUTHORED,
-				Arrays.asList(OafMapperUtils.keyValue(ORCID_KEY, ModelConstants.ORCID_DS)),
-				OafMapperUtils
-					.dataInfo(
-						false, null, false, false,
-						OafMapperUtils
-							.qualifier(
-								ORCID_AUTHORS_CLASSID, ORCID_AUTHORS_CLASSNAME,
-								ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS),
-						"0.91"),
+                    Collections.singletonList(OafMapperUtils.keyValue(ORCID_KEY, ModelConstants.ORCID_DS)),
+				ORCIDDATAINFO,
 				null);
 		relation.setValidated(true);
 		return relation;
