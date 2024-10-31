@@ -95,7 +95,13 @@ public class CreatePersonAS {
 					"-outputPath",
 					workingDir.toString() + "/actionSet1",
 					"-workingDir",
-					workingDir.toString() + "/working"
+					workingDir.toString() + "/working",
+		"-postgresUrl", "noneed",
+		"-postgresUser","noneed",
+		"-postgresPassword", "noneed",
+						"-publisherInputPath", getClass().getResource("/eu/dnetlib/dhp/actionmanager/personpublisher/")
+						.getPath()
+
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());

@@ -135,6 +135,9 @@ public class ExtractPerson implements Serializable {
 		final String workingDir = parser.get("workingDir");
 		log.info("workingDir {}", workingDir);
 
+		final String publisherInputPath = parser.get("publisherInputPath");
+		log.info("publisherInputPath {}", publisherInputPath);
+
 		final String dbUrl = parser.get("postgresUrl");
 		final String dbUser = parser.get("postgresUser");
 		final String dbPassword = parser.get("postgresPassword");
@@ -149,8 +152,8 @@ public class ExtractPerson implements Serializable {
 				HdfsSupport.remove(outputPath, spark.sparkContext().hadoopConfiguration());
 				extractInfoForActionSetFromORCID(spark, inputPath, workingDir);
 				extractInfoForActionSetFromProjects(
-					spark, inputPath, workingDir, dbUrl, dbUser, dbPassword, workingDir + "/project", hdfsNameNode);
-				extractInfoForActionSetFromPublisher(spark,inputPath, workingDir);
+					 dbUrl, dbUser, dbPassword, workingDir + "/project", hdfsNameNode, isSparkSessionManaged);
+				extractInfoForActionSetFromPublisher(spark,publisherInputPath, workingDir);
 				createActionSet(spark, outputPath, workingDir);
 			});
 
@@ -167,7 +170,7 @@ public class ExtractPerson implements Serializable {
 									                       "`Name` : STRUCT<`Full`:STRING, `First` : STRING, `Last`: STRING>,  " +
 									                       "`Matchings`: ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>, " +
 									                       "`PIDs` : STRUCT<`Schema`:STRING , `Value`: STRING>>>")
-					.json(inputPath)
+					.json(inputPath + "/*/")
 					.where("DOI is not null");
 
 //Select the relevant information
@@ -280,23 +283,26 @@ public class ExtractPerson implements Serializable {
 	}
 
 
-	private static void extractInfoForActionSetFromProjects(SparkSession spark, String inputPath, String workingDir,
-		String dbUrl, String dbUser, String dbPassword, String hdfsPath, String hdfsNameNode) throws IOException {
+	private static void extractInfoForActionSetFromProjects(
+		String dbUrl, String dbUser, String dbPassword, String hdfsPath, String hdfsNameNode, Boolean exec) throws IOException {
 
 		Configuration conf = new Configuration();
 		conf.set("fs.defaultFS", hdfsNameNode);
 
 		FileSystem fileSystem = FileSystem.get(conf);
 		Path hdfsWritePath = new Path(hdfsPath);
-		FSDataOutputStream fos = fileSystem.create(hdfsWritePath);
-		try (DbClient dbClient = new DbClient(dbUrl, dbUser, dbPassword)) {
-			try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
-				dbClient.processResults(QUERY, rs -> writeRelation(getRelationWithProject(rs), writer));
-			}
+		if(exec){
+			FSDataOutputStream fos = fileSystem.create(hdfsWritePath);
+			try (DbClient dbClient = new DbClient(dbUrl, dbUser, dbPassword)) {
+				try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8))) {
+					dbClient.processResults(QUERY, rs -> writeRelation(getRelationWithProject(rs), writer));
+				}
 
-		} catch (IOException e) {
-			e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
+
 
 	}
 
