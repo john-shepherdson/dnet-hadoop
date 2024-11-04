@@ -216,7 +216,7 @@ public class CreatePersonAS {
 							&& r.getRelClass().equalsIgnoreCase(ModelConstants.RESULT_PERSON_HASAUTHORED)
 							&& r.getTarget().startsWith("50|arXiv"))
 					.count());
-
+		relations.foreach(r-> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
 		Assertions
 			.assertEquals(
 				1,

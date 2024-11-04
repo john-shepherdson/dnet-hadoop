@@ -23,6 +23,7 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
 import eu.dnetlib.dhp.schema.solr.*;
 import eu.dnetlib.dhp.schema.solr.AccessRight;
 import eu.dnetlib.dhp.schema.solr.Author;
@@ -112,7 +113,7 @@ public class ProvisionModelSupport {
 		RelatedRecord rr = new RelatedRecord();
 
 		final RelatedEntity re = rew.getTarget();
-		final RecordType relatedRecordType = RecordType.valueOf(re.getType());
+		final RecordType relatedRecordType = RecordType.fromString(re.getType());
 		final Relation relation = rew.getRelation();
 		final String relationProvenance = Optional
 			.ofNullable(relation.getDataInfo())
@@ -154,6 +155,17 @@ public class ProvisionModelSupport {
 		rr.setPublisher(re.getPublisher());
 		rr.setResulttype(mapQualifier(re.getResulttype()));
 		rr.setTitle(Optional.ofNullable(re.getTitle()).map(StructuredProperty::getValue).orElse(null));
+		rr.setDescription(StringUtils.left(re.getDescription(), ModelHardLimits.MAX_RELATED_ABSTRACT_LENGTH));
+		rr
+			.setAuthor(
+				Optional
+					.ofNullable(re.getAuthor())
+					.map(
+						aa -> aa
+							.stream()
+							.limit(ModelHardLimits.MAX_RELATED_AUTHORS)
+							.collect(Collectors.toList()))
+					.orElse(null));
 
 		if (relation.getValidated() == null) {
 			relation.setValidated(false);
@@ -394,6 +406,7 @@ public class ProvisionModelSupport {
 		rs.setPubliclyFunded(r.getPubliclyFunded());
 		rs.setTransformativeAgreement(r.getTransformativeAgreement());
 		rs.setExternalReference(mapExternalReference(r.getExternalReference()));
+		rs.setBestinstancetype(mapQualifier(r.getBestInstancetype()));
 		rs.setInstance(mapInstances(r.getInstance()));
 
 		if (r instanceof Publication) {
@@ -683,14 +696,23 @@ public class ProvisionModelSupport {
 	}
 
 	private static List<Author> asAuthor(List<eu.dnetlib.dhp.schema.oaf.Author> authorList) {
+		return asAuthor(authorList, ModelHardLimits.MAX_AUTHORS);
+	}
+
+	private static List<Author> asAuthor(List<eu.dnetlib.dhp.schema.oaf.Author> authorList, int maxAuthors) {
 		return Optional
 			.ofNullable(authorList)
 			.map(
 				authors -> authors
 					.stream()
+					.limit(maxAuthors)
 					.map(
 						a -> Author
-							.newInstance(a.getFullname(), a.getName(), a.getSurname(), a.getRank(), asPid(a.getPid())))
+							.newInstance(
+								StringUtils.left(a.getFullname(), ModelHardLimits.MAX_AUTHOR_FULLNAME_LENGTH),
+								a.getName(),
+								a.getSurname(),
+								a.getRank(), asPid(a.getPid())))
 					.collect(Collectors.toList()))
 			.orElse(null);
 	}

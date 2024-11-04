@@ -175,7 +175,8 @@ public class XmlSerializationUtils {
 				.append("<")
 				.append(name)
 				.append(" ")
-				.append(attr(measure.getId(), kv.getValue()))
+				.append(attr("id", measure.getId()))
+				.append(attr("score", kv.getValue()))
 				.append(attr("datasource", kv.getKey()))
 				.append(" />");
 		}

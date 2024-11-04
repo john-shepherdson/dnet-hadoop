@@ -1,10 +1,9 @@
 
 package eu.dnetlib.dhp.actionmanager.personentity;
 
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-
-import static eu.dnetlib.dhp.common.person.Constants.*;
 import static eu.dnetlib.dhp.actionmanager.personentity.ASConstants.*;
+import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.common.person.Constants.*;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -46,17 +45,16 @@ import eu.dnetlib.dhp.common.person.CoAuthorshipIterator;
 import eu.dnetlib.dhp.common.person.Coauthors;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.*;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import scala.Tuple2;
 
-
 public class ExtractPerson implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(ExtractPerson.class);
 	private static final String QUERY = "SELECT * FROM project_person WHERE pid_type = 'ORCID'";
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
 
 	public static void main(final String[] args) throws IOException, ParseException {
 
@@ -111,9 +109,9 @@ public class ExtractPerson implements Serializable {
 
 	}
 
-	//PUBLISHER
+	// PUBLISHER
 	private static void extractInfoForActionSetFromPublisher(SparkSession spark, String inputPath, String workingDir) {
-	//Read the publishers output
+		// Read the publishers output
 		Dataset<Row> df = spark
 			.read()
 			.schema(
@@ -123,7 +121,7 @@ public class ExtractPerson implements Serializable {
 					"`Name` : STRUCT<`Full`:STRING, `First` : STRING, `Last`: STRING>,  " +
 					"`Matchings`: ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>, " +
 					"`PIDs` : STRUCT<`Schema`:STRING , `Value`: STRING>>>")
-			.json(inputPath + "/*/")
+			.json(inputPath)
 			.where("DOI is not null");
 
 //Select the relevant information
@@ -207,7 +205,7 @@ public class ExtractPerson implements Serializable {
 			+ IdentifierFactory
 				.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), a.getAs("DOI")));
 		;
-		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(a.getAs("orcid"));
+		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(a.getAs("orcid"));
 
 		Relation relation = OafMapperUtils
 			.getRelation(
@@ -257,7 +255,7 @@ public class ExtractPerson implements Serializable {
 
 	private static @NotNull Relation getAffiliationRelation(Row a) {
 
-		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(a.getAs("orcid"));
+		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(a.getAs("orcid"));
 		String target = ROR_PREFIX
 			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", a.getAs("orgid")));
 
@@ -273,7 +271,7 @@ public class ExtractPerson implements Serializable {
 		return relation;
 	}
 
-	//PROJECT
+	// PROJECT
 	private static void extractInfoForActionSetFromProjects(
 		String dbUrl, String dbUser, String dbPassword, String hdfsPath, String hdfsNameNode, Boolean exec)
 		throws IOException {
@@ -310,8 +308,8 @@ public class ExtractPerson implements Serializable {
 
 	private static Relation getProjectRelation(String project, String orcid, String role) {
 
-		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(orcid);
-		String target = project.substring(0, 14)
+		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(orcid);
+		String target = PROJECT_ID_PREFIX + project.substring(0, 14)
 			+ IdentifierFactory.md5(project.substring(15));
 		List<KeyValue> properties = new ArrayList<>();
 
@@ -346,7 +344,7 @@ public class ExtractPerson implements Serializable {
 		}
 	}
 
-	//ORCID
+	// ORCID
 	private static void extractInfoForActionSetFromORCID(SparkSession spark, String inputPath, String workingDir) {
 		writePerson(spark, inputPath, workingDir);
 		writeAuthorship(spark, inputPath, workingDir);
@@ -360,9 +358,9 @@ public class ExtractPerson implements Serializable {
 			.parquet(inputPath + "Employments")
 			.as(Encoders.bean(Employment.class));
 		Dataset<Author> authors = spark
-				.read()
-				.parquet(inputPath + "Authors")
-				.as(Encoders.bean(Author.class));
+			.read()
+			.parquet(inputPath + "Authors")
+			.as(Encoders.bean(Author.class));
 
 		Dataset<Employment> employment = employmentDataset
 			.joinWith(authors, employmentDataset.col("orcid").equalTo(authors.col("orcid")))
@@ -382,14 +380,18 @@ public class ExtractPerson implements Serializable {
 
 	private static void writeCoAuthorship(SparkSession spark, String inputPath, String workingDir) {
 		Dataset<Relation> coauthorship = spark
-				.read()
-				.parquet(inputPath + "Works")
-				.as(Encoders.bean(Work.class))
-				.flatMap((FlatMapFunction<Work, Tuple2<String, String>>) work ->
-					work.getPids().stream()
-						.filter(p -> isRelevantSchema(p.getSchema()))
-						.map(p -> new Tuple2<>(p.getValue(), work.getOrcid()))
-						.collect(Collectors.toList()).iterator(), Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
+			.read()
+			.parquet(inputPath + "Works")
+			.as(Encoders.bean(Work.class))
+			.flatMap(
+				(FlatMapFunction<Work, Tuple2<String, String>>) work -> work
+					.getPids()
+					.stream()
+					.filter(p -> isRelevantSchema(p.getSchema()))
+					.map(p -> new Tuple2<>(p.getValue(), work.getOrcid()))
+					.collect(Collectors.toList())
+					.iterator(),
+				Encoders.tuple(Encoders.STRING(), Encoders.STRING()))
 			.groupByKey((MapFunction<Tuple2<String, String>, String>) Tuple2::_1, Encoders.STRING())
 			.mapGroups(
 				(MapGroupsFunction<String, Tuple2<String, String>, Coauthors>) (k, it) -> extractCoAuthors(it),
@@ -416,13 +418,13 @@ public class ExtractPerson implements Serializable {
 			.filter(
 				(FilterFunction<Work>) ExtractPerson::isAllowedPidType);
 		works
-				.flatMap(
-						(FlatMapFunction<Work, Relation>) ExtractPerson::getAuthorshipRelationIterator,
-						Encoders.bean(Relation.class))
-				.write()
-				.option("compression", "gzip")
-				.mode(SaveMode.Overwrite)
-				.json(workingDir + "/authorship");
+			.flatMap(
+				(FlatMapFunction<Work, Relation>) ExtractPerson::getAuthorshipRelationIterator,
+				Encoders.bean(Relation.class))
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Overwrite)
+			.json(workingDir + "/authorship");
 
 	}
 
@@ -433,31 +435,32 @@ public class ExtractPerson implements Serializable {
 			.parquet(inputPath + "Authors")
 			.as(Encoders.bean(Author.class));
 
-		authors.map((MapFunction<Author, Person>) ExtractPerson::getPerson, Encoders.bean(Person.class))
-				.write()
-				.option("compression", "gzip")
-				.mode(SaveMode.Overwrite)
-				.json(workingDir + "/people");
+		authors
+			.map((MapFunction<Author, Person>) ExtractPerson::getPerson, Encoders.bean(Person.class))
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Overwrite)
+			.json(workingDir + "/people");
 
 	}
 
 	private static boolean isRelevantSchema(String schema) {
 		return schema.equalsIgnoreCase("doi") ||
-				schema.equalsIgnoreCase("pmc") ||
-				schema.equalsIgnoreCase("pmid") ||
-				schema.equalsIgnoreCase("arxiv");
+			schema.equalsIgnoreCase("pmc") ||
+			schema.equalsIgnoreCase("pmid") ||
+			schema.equalsIgnoreCase("arxiv");
 	}
 
 	private static @NotNull Iterator<Relation> getAuthorshipRelationIterator(Work w) {
 
 		if (Optional.ofNullable(w.getPids()).isPresent())
 			return w
-					.getPids()
-					.stream()
-					.map(pid -> getRelation(w.getOrcid(), pid))
-					.filter(Objects::nonNull)
-					.collect(Collectors.toList())
-					.iterator();
+				.getPids()
+				.stream()
+				.map(pid -> getRelation(w.getOrcid(), pid))
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList())
+				.iterator();
 
 		List<Relation> ret = new ArrayList<>();
 		return ret.iterator();
@@ -465,11 +468,10 @@ public class ExtractPerson implements Serializable {
 
 	private static boolean isAllowedPidType(Work w) {
 		return Optional.ofNullable(w.getPids()).isPresent() &&
-				w
-						.getPids()
-						.stream()
-						.anyMatch(p ->
-								isRelevantSchema(p.getSchema()));
+			w
+				.getPids()
+				.stream()
+				.anyMatch(p -> isRelevantSchema(p.getSchema()));
 	}
 
 	private static @NotNull Person getPerson(Author op) {
@@ -563,7 +565,7 @@ public class ExtractPerson implements Serializable {
 	}
 
 	private static Relation getAffiliationRelation(Employment row) {
-		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(row.getOrcid());
+		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(row.getOrcid());
 		String target = ROR_PREFIX
 			+ IdentifierFactory.md5(PidCleaner.normalizePidValue("ROR", row.getAffiliationId().getValue()));
 		List<KeyValue> properties = new ArrayList<>();
@@ -598,7 +600,7 @@ public class ExtractPerson implements Serializable {
 
 	private static Relation getRelation(String orcid, eu.dnetlib.dhp.collection.orcid.model.Pid pid) {
 		String target;
-		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(orcid);
+		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(orcid);
 		switch (pid.getSchema()) {
 			case "doi":
 				target = DOI_PREFIX
@@ -636,43 +638,43 @@ public class ExtractPerson implements Serializable {
 		return relation;
 	}
 
-	//ACTION SET
+	// ACTION SET
 	private static void createActionSet(SparkSession spark, String outputPath, String workingDir) {
 
 		Dataset<Person> people;
 		people = spark
-				.read()
-				.textFile(workingDir + "/people")
-				.map(
-						(MapFunction<String, Person>) value -> OBJECT_MAPPER
-								.readValue(value, Person.class),
-						Encoders.bean(Person.class));
+			.read()
+			.textFile(workingDir + "/people")
+			.map(
+				(MapFunction<String, Person>) value -> OBJECT_MAPPER
+					.readValue(value, Person.class),
+				Encoders.bean(Person.class));
 
 		people
-				.toJavaRDD()
-				.map(p -> new AtomicAction(p.getClass(), p))
-				.union(
-						getRelations(spark, workingDir + "/authorship").toJavaRDD().map(r -> new AtomicAction(r.getClass(), r)))
-				.union(
-						getRelations(spark, workingDir + "/coauthorship")
-								.toJavaRDD()
-								.map(r -> new AtomicAction(r.getClass(), r)))
-				.union(
-						getRelations(spark, workingDir + "/affiliation")
-								.toJavaRDD()
-								.map(r -> new AtomicAction(r.getClass(), r)))
-				.union(
-						getRelations(spark, workingDir + "/project")
-								.toJavaRDD()
-								.map(r -> new AtomicAction(r.getClass(), r)))
-				.union(
-						getRelations(spark, workingDir + "/publishers")
-								.toJavaRDD()
-								.map(r -> new AtomicAction(r.getClass(), r)))
-				.mapToPair(
-						aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
-								new Text(OBJECT_MAPPER.writeValueAsString(aa))))
-				.saveAsHadoopFile(
-						outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, BZip2Codec.class);
+			.toJavaRDD()
+			.map(p -> new AtomicAction(p.getClass(), p))
+			.union(
+				getRelations(spark, workingDir + "/authorship").toJavaRDD().map(r -> new AtomicAction(r.getClass(), r)))
+			.union(
+				getRelations(spark, workingDir + "/coauthorship")
+					.toJavaRDD()
+					.map(r -> new AtomicAction(r.getClass(), r)))
+			.union(
+				getRelations(spark, workingDir + "/affiliation")
+					.toJavaRDD()
+					.map(r -> new AtomicAction(r.getClass(), r)))
+			.union(
+				getRelations(spark, workingDir + "/project")
+					.toJavaRDD()
+					.map(r -> new AtomicAction(r.getClass(), r)))
+			.union(
+				getRelations(spark, workingDir + "/publishers")
+					.toJavaRDD()
+					.map(r -> new AtomicAction(r.getClass(), r)))
+			.mapToPair(
+				aa -> new Tuple2<>(new Text(aa.getClazz().getCanonicalName()),
+					new Text(OBJECT_MAPPER.writeValueAsString(aa))))
+			.saveAsHadoopFile(
+				outputPath, Text.class, Text.class, SequenceFileOutputFormat.class, BZip2Codec.class);
 	}
 }

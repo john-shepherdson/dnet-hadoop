@@ -14,7 +14,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.{
   PidType
 }
 import eu.dnetlib.dhp.utils.DHPUtils
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.Row
 import org.json4s
 import org.json4s.DefaultFormats
@@ -332,7 +332,7 @@ case object Crossref2Oaf {
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats
 
     //MAPPING Crossref DOI into PID
-    val doi: String = DoiCleaningRule.normalizeDoi((json \ "DOI").extract[String])
+    val doi: String = DoiCleaningRule.clean((json \ "DOI").extract[String])
     result.setPid(
       List(
         structuredProperty(
@@ -504,6 +504,24 @@ case object Crossref2Oaf {
       )
     }
 
+    val is_review = json \ "relation" \ "is-review-of" \ "id"
+
+    if (is_review != JNothing) {
+      instance.setInstancetype(
+        OafMapperUtils.qualifier(
+          "0015",
+          "peerReviewed",
+          ModelConstants.DNET_REVIEW_LEVELS,
+          ModelConstants.DNET_REVIEW_LEVELS
+        )
+      )
+    }
+
+    if (doi.startsWith("10.3410") || doi.startsWith("10.12703"))
+      instance.setHostedby(
+        OafMapperUtils.keyValue(OafMapperUtils.createOpenaireId(10, "openaire____::H1Connect", true), "H1Connect")
+      )
+
     instance.setAccessright(
       decideAccessRight(instance.getLicense, result.getDateofacceptance.getValue)
     )
@@ -655,7 +673,7 @@ case object Crossref2Oaf {
     val doi = input.getString(0)
     val rorId = input.getString(1)
 
-    val pubId = s"50|${PidType.doi.toString.padTo(12, "_")}::${DoiCleaningRule.normalizeDoi(doi)}"
+    val pubId = s"50|${PidType.doi.toString.padTo(12, "_")}::${DoiCleaningRule.clean(doi)}"
     val affId = GenerateRorActionSetJob.calculateOpenaireId(rorId)
 
     val r: Relation = new Relation

@@ -678,16 +678,9 @@ public class MergeUtils {
 	}
 
 	private static Field<String> selectOldestDate(Field<String> d1, Field<String> d2) {
-		if (d1 == null || StringUtils.isBlank(d1.getValue())) {
+		if (!GraphCleaningFunctions.cleanDateField(d1).isPresent()) {
 			return d2;
-		} else if (d2 == null || StringUtils.isBlank(d2.getValue())) {
-			return d1;
-		}
-
-		if (StringUtils.contains(d1.getValue(), "null")) {
-			return d2;
-		}
-		if (StringUtils.contains(d2.getValue(), "null")) {
+		} else if (!GraphCleaningFunctions.cleanDateField(d2).isPresent()) {
 			return d1;
 		}
 
@@ -739,7 +732,11 @@ public class MergeUtils {
 	private static String spKeyExtractor(StructuredProperty sp) {
 		return Optional
 			.ofNullable(sp)
-			.map(s -> Joiner.on("||").join(qualifierKeyExtractor(s.getQualifier()), s.getValue()))
+			.map(
+				s -> Joiner
+					.on("||")
+					.useForNull("")
+					.join(qualifierKeyExtractor(s.getQualifier()), s.getValue()))
 			.orElse(null);
 	}
 
@@ -996,7 +993,7 @@ public class MergeUtils {
 	private static String extractKeyFromPid(final StructuredProperty pid) {
 		if (pid == null)
 			return null;
-		final StructuredProperty normalizedPid = CleaningFunctions.normalizePidValue(pid);
+		final StructuredProperty normalizedPid = PidCleaner.normalizePidValue(pid);
 
 		return String.format("%s::%s", normalizedPid.getQualifier().getClassid(), normalizedPid.getValue());
 	}

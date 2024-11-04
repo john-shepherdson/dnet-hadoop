@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import eu.dnetlib.pace.model.Person;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 
 public class UtilTest {
 

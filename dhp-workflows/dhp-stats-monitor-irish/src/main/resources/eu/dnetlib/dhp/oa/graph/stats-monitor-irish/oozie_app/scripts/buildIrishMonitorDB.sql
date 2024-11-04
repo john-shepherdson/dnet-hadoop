@@ -32,7 +32,7 @@ select distinct * from (
        from SOURCE.result r
                 join SOURCE.result_projects rp on rp.id=r.id
                 join SOURCE.project p on p.id=rp.project
-                join openaire_prod_stats_monitor_ie_20231226b.irish_funders irf on irf.funder=p.funder
+                join TARGET.irish_funders irf on irf.funder=p.funder
        union all
        select r.*
        from SOURCE.result r
