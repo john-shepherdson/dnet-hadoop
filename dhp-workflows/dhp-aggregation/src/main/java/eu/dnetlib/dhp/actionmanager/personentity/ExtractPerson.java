@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -29,7 +30,6 @@ import org.apache.spark.sql.Dataset;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spark_project.jetty.util.StringUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -206,7 +206,7 @@ public class ExtractPerson implements Serializable {
 				null);
 		relation.setValidated(true);
 
-		if (StringUtil.isNotBlank(role)) {
+		if (StringUtils.isNotBlank(role)) {
 			KeyValue kv = new KeyValue();
 			kv.setKey("role");
 			kv.setValue(role);
@@ -439,13 +439,13 @@ public class ExtractPerson implements Serializable {
 				null);
 		relation.setValidated(true);
 
-		if (Optional.ofNullable(row.getStartDate()).isPresent() && StringUtil.isNotBlank(row.getStartDate())) {
+		if (Optional.ofNullable(row.getStartDate()).isPresent() && StringUtils.isNotBlank(row.getStartDate())) {
 			KeyValue kv = new KeyValue();
 			kv.setKey("startDate");
 			kv.setValue(row.getStartDate());
 			properties.add(kv);
 		}
-		if (Optional.ofNullable(row.getEndDate()).isPresent() && StringUtil.isNotBlank(row.getEndDate())) {
+		if (Optional.ofNullable(row.getEndDate()).isPresent() && StringUtils.isNotBlank(row.getEndDate())) {
 			KeyValue kv = new KeyValue();
 			kv.setKey("endDate");
 			kv.setValue(row.getEndDate());

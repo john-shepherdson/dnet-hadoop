@@ -1,0 +1,222 @@
+<PubmedArticle>
+    <MedlineCitation Status="MEDLINE" IndexingMethod="Automated" Owner="NLM">
+        <PMID Version="1">37885214</PMID>
+        <DateCompleted>
+            <Year>2024</Year>
+            <Month>02</Month>
+            <Day>14</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2024</Year>
+            <Month>02</Month>
+            <Day>14</Day>
+        </DateRevised>
+        <Article PubModel="Print-Electronic">
+            <Journal>
+                <ISSN IssnType="Electronic">2752-7549</ISSN>
+                <JournalIssue CitedMedium="Internet">
+                    <Volume>40</Volume>
+                    <Issue>5</Issue>
+                    <PubDate>
+                        <MedlineDate>2023 Sep-Oct</MedlineDate>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Journal of pediatric hematology/oncology nursing</Title>
+                <ISOAbbreviation>J Pediatr Hematol Oncol Nurs</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Care Needs of Parents of Children With Cancer in a Low-Middle-Income Country.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>295-304</MedlinePgn>
+            </Pagination>
+            <ELocationID EIdType="doi" ValidYN="Y">10.1177/27527530231193972</ELocationID>
+            <Abstract>
+                <AbstractText><b>Background:</b> Mapping out actual supportive care needs assists nurses in providing holistic individualized care. This study aimed to explore the care needs of parents of children with cancer in the Philippines. <b>Method:</b> Guided by the Supportive Care Needs Framework (SCNF), this study used an embedded mixed-method design with the quantitative revised Cancer Patient Needs Questionnaire and qualitative semistructured interviews to describe parents' care needs and priorities. <b>Results:</b> Filipino parents (<i>N</i> = 156) of children with cancer have various care needs which could be classified along the SCNF categories-practical, informational, spiritual, physical, emotional, and physical needs as ranked from highest to lowest. A number of variables were significantly associated with care needs. Solid tumor diagnosis was associated with greater practical, emotional, and psychosocial care needs; having a child who had undergone surgery was associated with more practical and spiritual care needs; and being within one year of the child's diagnosis was associated with practical, psychosocial, and spiritual care needs. Parent priority needs included (a) addressing financial needs; (b) access to temporary housing to minimize treatment-related costs; (c) support groups among parents of children with cancer as a source of information; (d) financial and social support between members of family and partners of parents of children with cancer; and (e) using prayer to facilitate acceptance. <b>Conclusions:</b> Supportive care needs of parents of children with cancer are important components of care that should be given recognition to enhance holistic individualized care throughout the childhood cancer experience.</AbstractText>
+            </Abstract>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Banayat</LastName>
+                    <ForeName>Aprille Campos</ForeName>
+                    <Initials>AC</Initials>
+                    <Identifier Source="ORCID">0000-0001-9339-9871</Identifier>
+                    <AffiliationInfo>
+                        <Affiliation>College of Nursing, University of the Philippines Manila, Manila, Philippines.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Abad</LastName>
+                    <ForeName>Peter James B</ForeName>
+                    <Initials>PJB</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>College of Nursing, University of the Philippines Manila, Manila, Philippines.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Bonito</LastName>
+                    <ForeName>Sheila R</ForeName>
+                    <Initials>SR</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>College of Nursing, University of the Philippines Manila, Manila, Philippines.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Manahan</LastName>
+                    <ForeName>Lydia T</ForeName>
+                    <Initials>LT</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>College of Nursing, University of the Philippines Manila, Manila, Philippines.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Peralta</LastName>
+                    <ForeName>Arnold B</ForeName>
+                    <Initials>AB</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>College of Nursing, University of the Philippines Manila, Manila, Philippines.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType UI="D016428">Journal Article</PublicationType>
+            </PublicationTypeList>
+            <ArticleDate DateType="Electronic">
+                <Year>2023</Year>
+                <Month>10</Month>
+                <Day>26</Day>
+            </ArticleDate>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>United States</Country>
+            <MedlineTA>J Pediatr Hematol Oncol Nurs</MedlineTA>
+            <NlmUniqueID>9918282681506676</NlmUniqueID>
+            <ISSNLinking>2752-7530</ISSNLinking>
+        </MedlineJournalInfo>
+        <CitationSubset>IM</CitationSubset>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName UI="D002648" MajorTopicYN="N">Child</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D006801" MajorTopicYN="N">Humans</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D010290" MajorTopicYN="Y">Parents</DescriptorName>
+                <QualifierName UI="Q000523" MajorTopicYN="N">psychology</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D012944" MajorTopicYN="N">Social Support</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D029181" MajorTopicYN="N">Spirituality</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D012067" MajorTopicYN="N">Religion</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D009369" MajorTopicYN="Y">Neoplasms</DescriptorName>
+                <QualifierName UI="Q000628" MajorTopicYN="N">therapy</QualifierName>
+            </MeshHeading>
+        </MeshHeadingList>
+        <KeywordList Owner="NOTNLM">
+            <Keyword MajorTopicYN="N">cancer</Keyword>
+            <Keyword MajorTopicYN="N">mixed methods</Keyword>
+            <Keyword MajorTopicYN="N">parent</Keyword>
+            <Keyword MajorTopicYN="N">pediatric</Keyword>
+            <Keyword MajorTopicYN="N">research</Keyword>
+            <Keyword MajorTopicYN="N">supportive care</Keyword>
+        </KeywordList>
+        <CoiStatement>Declaration of Conflicting InterestsThe author(s) declared no potential conflicts of interest with respect to the research, authorship, and/or publication of this article.</CoiStatement>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2024</Year>
+                <Month>2</Month>
+                <Day>12</Day>
+                <Hour>18</Hour>
+                <Minute>42</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2023</Year>
+                <Month>10</Month>
+                <Day>27</Day>
+                <Hour>6</Hour>
+                <Minute>42</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2023</Year>
+                <Month>10</Month>
+                <Day>27</Day>
+                <Hour>3</Hour>
+                <Minute>43</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">37885214</ArticleId>
+            <ArticleId IdType="doi">10.1177/27527530231193972</ArticleId>
+        </ArticleIdList>
+    </PubmedData>
+</PubmedArticle>
+<DeleteCitation>
+<PMID Version="1">30522158</PMID>
+<PMID Version="1">32769323</PMID>
+<PMID Version="1">34061701</PMID>
+<PMID Version="1">34661197</PMID>
+<PMID Version="1">34837091</PMID>
+<PMID Version="1">35035475</PMID>
+<PMID Version="1">35211699</PMID>
+<PMID Version="1">35557982</PMID>
+<PMID Version="1">35782783</PMID>
+<PMID Version="1">35795240</PMID>
+<PMID Version="1">35832688</PMID>
+<PMID Version="1">35847411</PMID>
+<PMID Version="1">36081602</PMID>
+<PMID Version="1">36081858</PMID>
+<PMID Version="1">36468085</PMID>
+<PMID Version="1">36468934</PMID>
+<PMID Version="1">36580086</PMID>
+<PMID Version="1">36589526</PMID>
+<PMID Version="1">36619609</PMID>
+<PMID Version="1">36649460</PMID>
+<PMID Version="1">36654909</PMID>
+<PMID Version="1">36655054</PMID>
+<PMID Version="1">36700856</PMID>
+<PMID Version="1">36705625</PMID>
+<PMID Version="1">36713939</PMID>
+<PMID Version="1">36714172</PMID>
+<PMID Version="1">36741203</PMID>
+<PMID Version="1">36741905</PMID>
+<PMID Version="1">36743825</PMID>
+<PMID Version="1">36788221</PMID>
+<PMID Version="1">36844926</PMID>
+<PMID Version="1">36846546</PMID>
+<PMID Version="1">36935776</PMID>
+<PMID Version="1">36946757</PMID>
+<PMID Version="1">36972191</PMID>
+<PMID Version="1">37034422</PMID>
+<PMID Version="1">37124311</PMID>
+<PMID Version="1">37152108</PMID>
+<PMID Version="1">37171968</PMID>
+<PMID Version="1">37273889</PMID>
+<PMID Version="1">37333905</PMID>
+<PMID Version="1">37387733</PMID>
+<PMID Version="1">37431449</PMID>
+<PMID Version="1">37576947</PMID>
+<PMID Version="1">37601162</PMID>
+<PMID Version="1">37711214</PMID>
+<PMID Version="1">37901290</PMID>
+<PMID Version="1">37981909</PMID>
+<PMID Version="1">37981945</PMID>
+<PMID Version="1">37982005</PMID>
+<PMID Version="1">38037601</PMID>
+<PMID Version="1">38037602</PMID>
+<PMID Version="1">38150730</PMID>
+<PMID Version="1">38274640</PMID>
+<PMID Version="1">38332671</PMID>
+<PMID Version="1">38334184</PMID>
+<PMID Version="1">38335456</PMID>
+<PMID Version="1">38349506</PMID>
+<PMID Version="1">38349576</PMID>
+<PMID Version="1">38353676</PMID>
+</DeleteCitation>

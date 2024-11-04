@@ -5,7 +5,10 @@ import eu.dnetlib.dhp.aggregation.AbstractVocabularyTest
 import eu.dnetlib.dhp.schema.oaf.utils.PidType
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Publication, Relation, Result}
 import eu.dnetlib.dhp.sx.bio.BioDBToOAF.ScholixResolved
-import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMParser, PMSubject, PubMedToOaf}
+import eu.dnetlib.dhp.sx.bio.ebi.SparkCreatePubmedDump
+import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMAuthor, PMJournal, PMParser, PMParser2, PMSubject, PubMedToOaf}
+import org.apache.commons.io.IOUtils
+import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.parse
@@ -13,8 +16,9 @@ import org.junit.jupiter.api.Assertions._
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.{BeforeEach, Test}
 import org.mockito.junit.jupiter.MockitoExtension
+import org.slf4j.LoggerFactory
 
-import java.io.{BufferedReader, InputStream, InputStreamReader}
+import java.io.{BufferedReader, ByteArrayInputStream, InputStream, InputStreamReader}
 import java.util.zip.GZIPInputStream
 import javax.xml.stream.XMLInputFactory
 import scala.collection.JavaConverters._
@@ -46,6 +50,17 @@ class BioScholixTest extends AbstractVocabularyTest {
         new BufferedReader(new InputStreamReader(new GZIPInputStream(is), encoding))
       )
     }
+  }
+
+  @Test
+  def testParsingPubmed2(): Unit = {
+    val mapper = new ObjectMapper()
+    val xml = IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/single_pubmed.xml"))
+    val parser = new PMParser2()
+    val article = parser.parse(xml)
+
+    println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(article))
+
   }
 
   @Test
@@ -122,6 +137,15 @@ class BioScholixTest extends AbstractVocabularyTest {
     if (hasPMC) {
       assertTrue(p.getOriginalId.asScala.exists(oId => oId.startsWith("od_______267::")))
     }
+  }
+
+  @Test
+  def testPubmedSplitting(): Unit = {
+
+    val spark: SparkSession = SparkSession.builder().appName("test").master("local").getOrCreate()
+    new SparkCreatePubmedDump("", Array.empty, LoggerFactory.getLogger(getClass))
+      .createPubmedDump(spark, "/home/sandro/Downloads/pubmed", "/home/sandro/Downloads/pubmed_mapped", vocabularies)
+
   }
 
   @Test
