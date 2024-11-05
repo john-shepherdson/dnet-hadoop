@@ -1,8 +1,7 @@
 package eu.dnetlib.dhp.enrich.orcid
 
-import eu.dnetlib.dhp.application.AbstractScalaApplication
+import eu.dnetlib.dhp.common.author.SparkEnrichWithOrcidAuthors
 import eu.dnetlib.dhp.schema.common.ModelSupport
-import eu.dnetlib.dhp.utils.{MatchData, ORCIDAuthorEnricher, ORCIDAuthorEnricherResult}
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.slf4j.{Logger, LoggerFactory}
@@ -10,59 +9,9 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.JavaConverters._
 
 class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String], log: Logger)
-    extends AbstractScalaApplication(propertyPath, args, log: Logger) {
+    extends SparkEnrichWithOrcidAuthors(propertyPath, args, log: Logger) {
 
-  /** Here all the spark applications runs this method
-    * where the whole logic of the spark node is defined
-    */
-  override def run(): Unit = {
-    val graphPath = parser.get("graphPath")
-    log.info(s"graphPath is '$graphPath'")
-    val orcidPath = parser.get("orcidPath")
-    log.info(s"orcidPath is '$orcidPath'")
-    val targetPath = parser.get("targetPath")
-    log.info(s"targetPath is '$targetPath'")
-    val workingDir = parser.get("workingDir")
-    log.info(s"targetPath is '$workingDir'")
-
-    createTemporaryData(graphPath, orcidPath, workingDir)
-    analisys(workingDir)
-    generateGraph(graphPath, workingDir, targetPath)
-  }
-
-  private def generateGraph(graphPath: String, workingDir: String, targetPath: String): Unit = {
-
-    ModelSupport.entityTypes.asScala
-      .filter(e => ModelSupport.isResult(e._1))
-      .foreach(e => {
-        val resultType = e._1.name()
-        val enc = Encoders.bean(e._2)
-
-        val matched = spark.read
-          .schema(Encoders.bean(classOf[ORCIDAuthorEnricherResult]).schema)
-          .parquet(s"${workingDir}/${resultType}_matched")
-          .selectExpr("id", "enriched_author")
-
-        spark.read
-          .schema(enc.schema)
-          .json(s"$graphPath/$resultType")
-          .join(matched, Seq("id"), "left")
-          .withColumn(
-            "author",
-            when(size(col("enriched_author")).gt(0), col("enriched_author"))
-              .otherwise(col("author"))
-          )
-          .drop("enriched_author")
-          .write
-          .mode(SaveMode.Overwrite)
-          .option("compression", "gzip")
-          .json(s"${targetPath}/${resultType}")
-
-      })
-
-  }
-
-  def createTemporaryData(graphPath: String, orcidPath: String, targetPath: String): Unit = {
+  override def createTemporaryData(spark:SparkSession, graphPath: String, orcidPath: String, targetPath: String): Unit = {
     val orcidAuthors =
       spark.read.load(s"$orcidPath/Authors").select("orcid", "familyName", "givenName", "creditName", "otherNames")
 
@@ -131,35 +80,16 @@ class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String]
 
     orcidWorksWithAuthors.unpersist()
   }
-
-  private def analisys(targetPath: String): Unit = {
-    ModelSupport.entityTypes.asScala
-      .filter(e => ModelSupport.isResult(e._1))
-      .foreach(e => {
-        val resultType = e._1.name()
-
-        spark.read
-          .parquet(s"$targetPath/${resultType}_unmatched")
-          .where("size(graph_authors) > 0")
-          .as[MatchData](Encoders.bean(classOf[MatchData]))
-          .map(md => {
-            ORCIDAuthorEnricher.enrichOrcid(md.id, md.graph_authors, md.orcid_authors)
-          })(Encoders.bean(classOf[ORCIDAuthorEnricherResult]))
-          .write
-          .option("compression", "gzip")
-          .mode("overwrite")
-          .parquet(s"$targetPath/${resultType}_matched")
-      })
-  }
 }
 
-object SparkEnrichGraphWithOrcidAuthors {
+  object SparkEnrichGraphWithOrcidAuthors {
 
-  val log: Logger = LoggerFactory.getLogger(SparkEnrichGraphWithOrcidAuthors.getClass)
+    val log: Logger = LoggerFactory.getLogger(SparkEnrichGraphWithOrcidAuthors.getClass)
 
-  def main(args: Array[String]): Unit = {
-    new SparkEnrichGraphWithOrcidAuthors("/eu/dnetlib/dhp/enrich/orcid/enrich_graph_orcid_parameters.json", args, log)
-      .initialize()
-      .run()
+    def main(args: Array[String]): Unit = {
+      new SparkEnrichGraphWithOrcidAuthors("/eu/dnetlib/dhp/enrich/orcid/enrich_graph_orcid_parameters.json", args, log)
+        .initialize()
+        .run()
+    }
   }
-}
+
