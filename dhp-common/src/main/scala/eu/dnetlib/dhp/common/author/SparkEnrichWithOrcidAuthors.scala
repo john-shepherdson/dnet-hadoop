@@ -11,11 +11,11 @@ import eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_TYPE
 import scala.collection.JavaConverters._
 
 abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[String], log: Logger)
-    extends AbstractScalaApplication(propertyPath, args, log: Logger) {
+  extends AbstractScalaApplication(propertyPath, args, log: Logger) {
 
   /** Here all the spark applications runs this method
-    * where the whole logic of the spark node is defined
-    */
+   * where the whole logic of the spark node is defined
+   */
   override def run(): Unit = {
     val graphPath = parser.get("graphPath")
     log.info(s"graphPath is '$graphPath'")
