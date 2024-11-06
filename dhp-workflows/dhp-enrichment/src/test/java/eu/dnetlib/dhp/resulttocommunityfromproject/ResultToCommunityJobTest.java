@@ -1,8 +1,6 @@
 
 package eu.dnetlib.dhp.resulttocommunityfromproject;
 
-import static org.apache.spark.sql.functions.desc;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,8 +10,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -24,8 +20,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.orcidtoresultfromsemrel.OrcidPropagationJobTest;
-import eu.dnetlib.dhp.resulttocommunityfromorganization.SparkResultToCommunityFromOrganizationJob;
 import eu.dnetlib.dhp.schema.oaf.Context;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 
@@ -56,7 +50,7 @@ public class ResultToCommunityJobTest {
 
 		spark = SparkSession
 			.builder()
-			.appName(OrcidPropagationJobTest.class.getSimpleName())
+			.appName(ResultToCommunityJobTest.class.getSimpleName())
 			.config(conf)
 			.getOrCreate();
 	}

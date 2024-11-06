@@ -5,6 +5,7 @@ import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.PropagationConstant.PROPAGATION_RESULT_COMMUNITY_ORGANIZATION_CLASS_NAME;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
+import static eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_TYPE;
 
 import java.io.Serializable;
 import java.util.ArrayList;

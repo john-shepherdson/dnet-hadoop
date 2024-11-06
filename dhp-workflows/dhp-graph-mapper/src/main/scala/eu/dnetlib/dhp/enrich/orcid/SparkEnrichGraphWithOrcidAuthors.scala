@@ -11,7 +11,12 @@ import scala.collection.JavaConverters._
 class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String], log: Logger)
     extends SparkEnrichWithOrcidAuthors(propertyPath, args, log: Logger) {
 
-  override def createTemporaryData(spark:SparkSession, graphPath: String, orcidPath: String, targetPath: String): Unit = {
+  override def createTemporaryData(
+    spark: SparkSession,
+    graphPath: String,
+    orcidPath: String,
+    targetPath: String
+  ): Unit = {
     val orcidAuthors =
       spark.read.load(s"$orcidPath/Authors").select("orcid", "familyName", "givenName", "creditName", "otherNames")
 
@@ -82,14 +87,13 @@ class SparkEnrichGraphWithOrcidAuthors(propertyPath: String, args: Array[String]
   }
 }
 
-  object SparkEnrichGraphWithOrcidAuthors {
+object SparkEnrichGraphWithOrcidAuthors {
 
-    val log: Logger = LoggerFactory.getLogger(SparkEnrichGraphWithOrcidAuthors.getClass)
+  val log: Logger = LoggerFactory.getLogger(SparkEnrichGraphWithOrcidAuthors.getClass)
 
-    def main(args: Array[String]): Unit = {
-      new SparkEnrichGraphWithOrcidAuthors("/eu/dnetlib/dhp/enrich/orcid/enrich_graph_orcid_parameters.json", args, log)
-        .initialize()
-        .run()
-    }
+  def main(args: Array[String]): Unit = {
+    new SparkEnrichGraphWithOrcidAuthors("/eu/dnetlib/dhp/enrich/orcid/enrich_graph_orcid_parameters.json", args, log)
+      .initialize()
+      .run()
   }
-
+}

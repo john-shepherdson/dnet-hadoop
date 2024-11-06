@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import eu.dnetlib.dhp.orcidtoresultfromsemrel.OrcidPropagationJobTest;
 import eu.dnetlib.dhp.schema.oaf.Dataset;
 
 public class ResultToCommunityJobTest {
@@ -53,7 +52,7 @@ public class ResultToCommunityJobTest {
 
 		spark = SparkSession
 			.builder()
-			.appName(OrcidPropagationJobTest.class.getSimpleName())
+			.appName(ResultToCommunityJobTest.class.getSimpleName())
 			.config(conf)
 			.getOrCreate();
 	}

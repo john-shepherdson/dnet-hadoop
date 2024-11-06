@@ -25,14 +25,16 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
     log.info(s"targetPath is '$targetPath'")
     val workingDir = parser.get("workingDir")
     log.info(s"targetPath is '$workingDir'")
-    val classid = Option(parser.get("matchingSource")).map(_=>ModelConstants.ORCID_PENDING).getOrElse(ModelConstants.ORCID)
+    val classid =
+      Option(parser.get("matchingSource")).map(_ => ModelConstants.ORCID_PENDING).getOrElse(ModelConstants.ORCID)
 
     log.info(s"classid is '$classid'")
-    val provenance = Option(parser.get("matchingSource")).map(_=>PROPAGATION_DATA_INFO_TYPE).getOrElse("ORCID_ENRICHMENT")
+    val provenance =
+      Option(parser.get("matchingSource")).map(_ => PROPAGATION_DATA_INFO_TYPE).getOrElse("ORCID_ENRICHMENT")
     log.info(s"targetPath is '$workingDir'")
 
     createTemporaryData(spark, graphPath, orcidPath, workingDir)
-    analisys(workingDir,classid,provenance)
+    analisys(workingDir, classid, provenance)
     generateGraph(spark, graphPath, workingDir, targetPath)
   }
 
@@ -70,7 +72,7 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
 
   def createTemporaryData(spark: SparkSession, graphPath: String, orcidPath: String, targetPath: String): Unit
 
-  private def analisys(targetPath: String, classid:String, provenance:String): Unit = {
+  private def analisys(targetPath: String, classid: String, provenance: String): Unit = {
     ModelSupport.entityTypes.asScala
       .filter(e => ModelSupport.isResult(e._1))
       .foreach(e => {
@@ -90,4 +92,3 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
       })
   }
 }
-
