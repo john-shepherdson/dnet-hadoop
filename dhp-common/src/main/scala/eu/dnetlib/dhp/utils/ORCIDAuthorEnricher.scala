@@ -46,7 +46,9 @@ object ORCIDAuthorEnricher extends Serializable {
   def enrichOrcid(
     id: String,
     graph_authors: java.util.List[Author],
-    orcid_authors: java.util.List[OrcidAuthor]
+    orcid_authors: java.util.List[OrcidAuthor],
+    classid:String,
+    provenance:String
   ): ORCIDAuthorEnricherResult = {
     // Author enriching strategy:
     // 1) create a copy of graph author list in unmatched_authors
@@ -64,7 +66,9 @@ object ORCIDAuthorEnricher extends Serializable {
         orcid_authors,
         (author, orcid) =>
           AuthorMatchers.matchEqualsIgnoreCase(author.getFullname, orcid.givenName + " " + orcid.familyName),
-        "fullName"
+        "fullName",
+        classid,
+        provenance
       ) ++
       // Look after exact reversed fullname match, reconstruct ORCID fullname as familyName + givenName
       extractAndEnrichMatches(
@@ -72,7 +76,9 @@ object ORCIDAuthorEnricher extends Serializable {
         orcid_authors,
         (author, orcid) =>
           AuthorMatchers.matchEqualsIgnoreCase(author.getFullname, orcid.familyName + " " + orcid.givenName),
-        "reversedFullName"
+        "reversedFullName",
+        classid,
+        provenance
       ) ++
       // split author names in tokens, order the tokens, then check for matches of full tokens or abbreviations
       extractAndEnrichMatches(
@@ -81,14 +87,18 @@ object ORCIDAuthorEnricher extends Serializable {
         (author, orcid) =>
           AuthorMatchers
             .matchOrderedTokenAndAbbreviations(author.getFullname, orcid.givenName + " " + orcid.familyName),
-        "orderedTokens"
+        "orderedTokens",
+        classid,
+        provenance
       ) ++
       // look after exact matches of ORCID creditName
       extractAndEnrichMatches(
         unmatched_authors,
         orcid_authors,
         (author, orcid) => AuthorMatchers.matchEqualsIgnoreCase(author.getFullname, orcid.creditName),
-        "creditName"
+        "creditName",
+        classid,
+        provenance
       ) ++
       // look after exact matches in  ORCID otherNames
       extractAndEnrichMatches(
@@ -96,7 +106,9 @@ object ORCIDAuthorEnricher extends Serializable {
         orcid_authors,
         (author, orcid) =>
           orcid.otherNames != null && AuthorMatchers.matchOtherNames(author.getFullname, orcid.otherNames.asScala),
-        "otherNames"
+        "otherNames",
+        classid,
+        provenance
       )
     }
 
@@ -107,7 +119,9 @@ object ORCIDAuthorEnricher extends Serializable {
                                        graph_authors: java.util.List[Author],
                                        orcid_authors: java.util.List[OrcidAuthor],
                                        matchingFunc: (Author, OrcidAuthor) => Boolean,
-                                       matchName: String
+                                       matchName: String,
+                                       classid:String,
+                                       provenance : String
   ) = {
     val matched = scala.collection.mutable.ArrayBuffer.empty[MatchedAuthors]
 
@@ -131,10 +145,12 @@ object ORCIDAuthorEnricher extends Serializable {
                 author.setPid(new util.ArrayList[StructuredProperty]())
               }
 
-              val orcidPID = OafUtils.createSP(orcid.orcid, ModelConstants.ORCID, ModelConstants.ORCID)
+             val orcidPID = OafUtils.createSP(orcid.orcid, classid, classid)
+             //val orcidPID = OafUtils.createSP(orcid.orcid, ModelConstants.ORCID, ModelConstants.ORCID)
               orcidPID.setDataInfo(OafUtils.generateDataInfo())
               orcidPID.getDataInfo.setProvenanceaction(
-                OafUtils.createQualifier("ORCID_ENRICHMENT", "ORCID_ENRICHMENT")
+                //OafUtils.createQualifier("ORCID_ENRICHMENT", "ORCID_ENRICHMENT")
+                OafUtils.createQualifier(provenance, provenance)
               )
 
               author.getPid.add(orcidPID)

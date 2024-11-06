@@ -1,11 +1,12 @@
 package eu.dnetlib.dhp.common.author
 
 import eu.dnetlib.dhp.application.AbstractScalaApplication
-import eu.dnetlib.dhp.schema.common.ModelSupport
+import eu.dnetlib.dhp.schema.common.{ModelConstants, ModelSupport}
 import eu.dnetlib.dhp.utils.{MatchData, ORCIDAuthorEnricher, ORCIDAuthorEnricherResult}
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
 import org.slf4j.{Logger, LoggerFactory}
+import eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_TYPE
 
 import scala.collection.JavaConverters._
 
@@ -24,13 +25,18 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
     log.info(s"targetPath is '$targetPath'")
     val workingDir = parser.get("workingDir")
     log.info(s"targetPath is '$workingDir'")
+    val classid = Option(parser.get("matchingSource")).map(_=>ModelConstants.ORCID_PENDING).getOrElse(ModelConstants.ORCID)
 
-    createTemporaryData(graphPath, orcidPath, workingDir)
-    analisys(workingDir)
-    generateGraph(graphPath, workingDir, targetPath)
+    log.info(s"classid is '$classid'")
+    val provenance = Option(parser.get("matchingSource")).map(_=>PROPAGATION_DATA_INFO_TYPE).getOrElse("ORCID_ENRICHMENT")
+    log.info(s"targetPath is '$workingDir'")
+
+    createTemporaryData(spark, graphPath, orcidPath, workingDir)
+    analisys(workingDir,classid,provenance)
+    generateGraph(spark, graphPath, workingDir, targetPath)
   }
 
-  private def generateGraph(graphPath: String, workingDir: String, targetPath: String): Unit = {
+  private def generateGraph(spark: SparkSession, graphPath: String, workingDir: String, targetPath: String): Unit = {
 
     ModelSupport.entityTypes.asScala
       .filter(e => ModelSupport.isResult(e._1))
@@ -64,7 +70,7 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
 
   def createTemporaryData(spark: SparkSession, graphPath: String, orcidPath: String, targetPath: String): Unit
 
-  private def analisys(targetPath: String): Unit = {
+  private def analisys(targetPath: String, classid:String, provenance:String): Unit = {
     ModelSupport.entityTypes.asScala
       .filter(e => ModelSupport.isResult(e._1))
       .foreach(e => {
@@ -75,7 +81,7 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
           .where("size(graph_authors) > 0")
           .as[MatchData](Encoders.bean(classOf[MatchData]))
           .map(md => {
-            ORCIDAuthorEnricher.enrichOrcid(md.id, md.graph_authors, md.orcid_authors)
+            ORCIDAuthorEnricher.enrichOrcid(md.id, md.graph_authors, md.orcid_authors, classid, provenance)
           })(Encoders.bean(classOf[ORCIDAuthorEnricherResult]))
           .write
           .option("compression", "gzip")

@@ -8,8 +8,6 @@ import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.utils.OrcidAuthor;
-import org.apache.commons.io.IOUtils;
-import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.*;
@@ -19,6 +17,8 @@ import scala.Tuple2;
 
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -39,20 +39,25 @@ public class SparkPropagateOrcidAuthor extends SparkEnrichWithOrcidAuthors {
 
     private static OrcidAuthors getOrcidAuthorsList(List<Author> authors) {
         OrcidAuthors oas = new OrcidAuthors();
-        List<OrcidAuthor> tmp = authors.stream().map(SparkPropagateOrcidAuthor::getOrcidAuthor).collect(Collectors.toList());
+        List<OrcidAuthor> tmp = authors.stream().map(SparkPropagateOrcidAuthor::getOrcidAuthor)
+                .filter(Objects::nonNull).collect(Collectors.toList());
         oas.setOrcidAuthorList(tmp);
         return oas;
     }
 
     private static OrcidAuthor getOrcidAuthor(Author a){
-        return new OrcidAuthor(getOrcid(a),a.getSurname(), a.getName(), a.getFullname(), null);
+        return Optional.ofNullable(getOrcid(a))
+                .map(orcid -> new OrcidAuthor(orcid,a.getSurname(), a.getName(), a.getFullname(), null))
+                .orElse(null);
 
     }
 
     private static String getOrcid(Author a){
         if (a.getPid().stream().anyMatch(p->p.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID)))
             return a.getPid().stream().filter(p->p.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID)).findFirst().get().getValue();
-        return a.getPid().stream().filter(p->p.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID_PENDING)).findFirst().get().getValue();
+        if (a.getPid().stream().anyMatch(p->p.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID_PENDING)))
+            return a.getPid().stream().filter(p->p.getQualifier().getClassid().equalsIgnoreCase(ModelConstants.ORCID_PENDING)).findFirst().get().getValue();
+        return null;
 
     }
 
