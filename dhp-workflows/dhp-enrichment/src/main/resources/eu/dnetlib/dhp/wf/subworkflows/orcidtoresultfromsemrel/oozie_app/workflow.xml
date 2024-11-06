@@ -112,10 +112,10 @@
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
-            <arg>--graphPath</arg><arg>${sourcePath}/</arg>
-            <arg>--orcidPath</arg><arg>${sourcePath}/</arg>
-            <arg>--workingDir</arg><arg>${workingDir}/</arg>
-            <arg>--targetPath</arg><arg>${outputPath}/</arg>
+            <arg>--graphPath</arg><arg>${sourcePath}</arg>
+            <arg>--orcidPath</arg><arg>${sourcePath}</arg>
+            <arg>--workingDir</arg><arg>${workingDir}</arg>
+            <arg>--targetPath</arg><arg>${outputPath}</arg>
             <arg>--matchingSource</arg><arg>graph</arg>
         </spark>
         <ok to="End"/>
