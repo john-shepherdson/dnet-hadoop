@@ -1,21 +1,32 @@
 [
   {
     "paramName":"s",
-    "paramLongName":"sourcePath",
+    "paramLongName":"graphPath",
     "paramDescription": "the path of the sequencial file to read",
     "paramRequired": true
   },
 
   {
     "paramName": "out",
-    "paramLongName": "outputPath",
+    "paramLongName": "targetPath",
     "paramDescription": "the path used to store temporary output files",
     "paramRequired": true
-  },
+  }, {
+  "paramName": "o",
+  "paramLongName": "orcidPath",
+  "paramDescription": "the path used to store temporary output files",
+  "paramRequired": true
+}, {
+  "paramName": "w",
+  "paramLongName": "workingDir",
+  "paramDescription": "the path used to store temporary output files",
+  "paramRequired": true
+},
   {
-    "paramName": "ssm",
-    "paramLongName": "isSparkSessionManaged",
-    "paramDescription": "true if the spark session is managed, false otherwise",
+    "paramName": "m",
+    "paramLongName": "matchingSource",
+    "paramDescription": "the path used to store temporary output files",
     "paramRequired": false
   }
+
 ]
