@@ -21,6 +21,8 @@ import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
+import static eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_TYPE;
+
 public class PropagationConstant {
 
 	private PropagationConstant() {
@@ -46,7 +48,7 @@ public class PropagationConstant {
 
 	public static final String INSTITUTIONAL_REPO_TYPE = "institutional";
 
-	public static final String PROPAGATION_DATA_INFO_TYPE = "propagation";
+	//public static final String PROPAGATION_DATA_INFO_TYPE = "propagation";
 
 	public static final String TRUE = "true";
 
