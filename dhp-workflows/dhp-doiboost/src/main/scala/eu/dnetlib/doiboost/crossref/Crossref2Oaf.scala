@@ -566,7 +566,23 @@ case object Crossref2Oaf {
               queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
               queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
             case _ => logger.debug("no match for " + funder.DOI.get)
-
+            //Add for Danish funders
+            //Independent Research Fund Denmark (IRFD)
+            case "10.13039/501100004836" =>
+              val targetId = getProjectId("irfd________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            //Carlsberg Foundation (CF)
+            case "10.13039/501100002808" =>
+              val targetId = getProjectId("cf__________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            //Novo Nordisk Foundation (NNF)
+            case "10.13039/501100009708" =>
+              val targetId = getProjectId("nnf_________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            case _ => logger.debug("no match for " + funder.DOI.get)
           }
 
         } else {
