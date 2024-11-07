@@ -569,16 +569,19 @@ case object Crossref2Oaf {
             //Add for Danish funders
             //Independent Research Fund Denmark (IRFD)
             case "10.13039/501100004836" =>
+              generateSimpleRelationFromAward(funder, "irfd________", a => a)
               val targetId = getProjectId("irfd________", "1e5e62235d094afd01cd56e65112fc63")
               queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
               queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
             //Carlsberg Foundation (CF)
             case "10.13039/501100002808" =>
+              generateSimpleRelationFromAward(funder, "cf__________", a => a)
               val targetId = getProjectId("cf__________", "1e5e62235d094afd01cd56e65112fc63")
               queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
               queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
             //Novo Nordisk Foundation (NNF)
             case "10.13039/501100009708" =>
+              generateSimpleRelationFromAward(funder, "nnf___________", a => a)
               val targetId = getProjectId("nnf_________", "1e5e62235d094afd01cd56e65112fc63")
               queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
               queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
