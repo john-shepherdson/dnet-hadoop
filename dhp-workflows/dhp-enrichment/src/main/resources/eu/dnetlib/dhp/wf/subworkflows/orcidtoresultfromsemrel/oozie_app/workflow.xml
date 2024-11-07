@@ -8,91 +8,16 @@
             <name>allowedsemrels</name>
             <description>the semantic relationships allowed for propagation</description>
         </property>
-        <property>
-            <name>outputPath</name>
-            <description>the output path</description>
-        </property>
+
     </parameters>
 
-    <start to="reset_outputpath"/>
+    <start to="exec_propagation"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <action name="reset_outputpath">
-        <fs>
-            <delete path="${outputPath}"/>
-            <mkdir path="${outputPath}"/>
-        </fs>
-        <ok to="copy_entities"/>
-        <error to="Kill"/>
-    </action>
 
-    <fork name="copy_entities">
-        <path start="copy_relation"/>
-        <path start="copy_organization"/>
-        <path start="copy_projects"/>
-        <path start="copy_datasources"/>
-        <path start="copy_persons"/>
-    </fork>
-
-    <action name="copy_relation">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <arg>${nameNode}/${sourcePath}/relation</arg>
-            <arg>${nameNode}/${outputPath}/relation</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_organization">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <arg>${nameNode}/${sourcePath}/organization</arg>
-            <arg>${nameNode}/${outputPath}/organization</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_projects">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <arg>${nameNode}/${sourcePath}/project</arg>
-            <arg>${nameNode}/${outputPath}/project</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_datasources">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <arg>${nameNode}/${sourcePath}/datasource</arg>
-            <arg>${nameNode}/${outputPath}/datasource</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <action name="copy_persons">
-        <distcp xmlns="uri:oozie:distcp-action:0.2">
-            <job-tracker>${jobTracker}</job-tracker>
-            <name-node>${nameNode}</name-node>
-            <arg>${nameNode}/${sourcePath}/person</arg>
-            <arg>${nameNode}/${outputPath}/person</arg>
-        </distcp>
-        <ok to="copy_wait"/>
-        <error to="Kill"/>
-    </action>
-
-    <join name="copy_wait" to="exec_propagation"/>
 
     <action name="exec_propagation">
         <spark xmlns="uri:oozie:spark-action:0.2">
@@ -115,7 +40,7 @@
             <arg>--graphPath</arg><arg>${sourcePath}</arg>
             <arg>--orcidPath</arg><arg>${sourcePath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
-            <arg>--targetPath</arg><arg>${outputPath}</arg>
+            <arg>--targetPath</arg><arg>${sourcePath}</arg>
             <arg>--matchingSource</arg><arg>graph</arg>
         </spark>
         <ok to="End"/>

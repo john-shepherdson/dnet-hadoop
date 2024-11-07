@@ -1,14 +1,11 @@
 
 package eu.dnetlib.dhp.person;
 
-import static com.ibm.icu.text.PluralRules.Operand.w;
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
-import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
@@ -161,7 +158,7 @@ public class SparkExtractPersonRelations {
 											.stream()
 											.anyMatch(
 												p -> Arrays
-													.asList("orcid", "orcid_pending")
+													.asList("eu/dnetlib/dhp/enrich/orcid", "orcid_pending")
 													.contains(p.getQualifier().getClassid().toLowerCase()))));
 					// 2. create authorship relations between the result identifier and the person entity with
 					// orcid_pending.
@@ -242,12 +239,12 @@ public class SparkExtractPersonRelations {
 							.getPid()
 							.stream()
 							.anyMatch(
-								p -> Arrays.asList("orcid", "orcid_pending").contains(p.getQualifier().getClassid())))
+								p -> Arrays.asList("eu/dnetlib/dhp/enrich/orcid", "orcid_pending").contains(p.getQualifier().getClassid())))
 					.map(a -> {
 						Optional<StructuredProperty> tmp = a
 							.getPid()
 							.stream()
-							.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("orcid"))
+							.filter(p -> p.getQualifier().getClassid().equalsIgnoreCase("eu/dnetlib/dhp/enrich/orcid"))
 							.findFirst();
 						if (tmp.isPresent())
 							return tmp.get().getValue();

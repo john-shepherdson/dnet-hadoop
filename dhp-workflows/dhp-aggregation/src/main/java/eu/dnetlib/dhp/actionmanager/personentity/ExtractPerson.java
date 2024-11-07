@@ -124,7 +124,7 @@ public class ExtractPerson implements Serializable {
 			.json(inputPath)
 			.where("DOI is not null");
 
-//Select the relevant information
+		//Select the relevant information
 		Dataset<Row> authors = df
 			.selectExpr("DOI", "explode(Authors) as author")
 			.selectExpr(

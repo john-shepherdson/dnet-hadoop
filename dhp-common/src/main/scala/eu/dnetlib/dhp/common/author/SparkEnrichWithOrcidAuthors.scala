@@ -62,7 +62,15 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
           .write
           .mode(SaveMode.Overwrite)
           .option("compression", "gzip")
-          .json(s"${targetPath}/${resultType}")
+          .json(s"${workingDir}/enriched/${resultType}")
+
+        spark.read
+          .schema(enc.schema)
+          .json(s"${workingDir}/enriched/${resultType}")
+          .write
+          .mode(SaveMode.Overwrite)
+          .option("compression","gzip")
+          .json(s"$graphPath/$resultType")
 
       })
 
