@@ -75,6 +75,7 @@ public class CreatePersonAS {
 				"/eu/dnetlib/dhp/actionmanager/person/")
 			.getPath();
 
+//
 //		spark
 //				.read()
 //				.parquet(inputPath + "Authors")
@@ -95,7 +96,14 @@ public class CreatePersonAS {
 					"-outputPath",
 					workingDir.toString() + "/actionSet1",
 					"-workingDir",
-					workingDir.toString() + "/working"
+					workingDir.toString() + "/working",
+					"-postgresUrl", "noneed",
+					"-postgresUser", "noneed",
+					"-postgresPassword", "noneed",
+					"-publisherInputPath", getClass()
+						.getResource("/eu/dnetlib/dhp/actionmanager/personpublisher/")
+						.getPath()
+
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
@@ -112,62 +120,73 @@ public class CreatePersonAS {
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Person) aa.getPayload()));
 //
-		Assertions.assertEquals(7, people.count());
+		Assertions.assertEquals(8, people.count());
 		Assertions
 			.assertEquals(
-				"Paulo",
+				"Manuel Edelberto",
 				people
 					.filter(
-						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0002-3210-3034")))
+						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0003-0046-4895")))
 					.first()
 					.getGivenName());
 		Assertions
 			.assertEquals(
-				"Tavares",
+				"Ortega Coello",
 				people
 					.filter(
-						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0002-3210-3034")))
+						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0003-0046-4895")))
 					.first()
 					.getFamilyName());
 		Assertions
 			.assertEquals(
-				4,
+				1,
 				people
 					.filter(
-						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0002-3210-3034")))
+						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0003-0046-4895")))
 					.first()
 					.getAlternativeNames()
 					.size());
 		Assertions
 			.assertEquals(
-				4,
+				2,
 				people
 					.filter(
-						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0002-3210-3034")))
+						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0003-0046-4895")))
 					.first()
 					.getPid()
 					.size());
+		System.out
+			.println(
+				new ObjectMapper()
+					.writeValueAsString(
+						people
+							.filter(
+								p -> p
+									.getPid()
+									.stream()
+									.anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0003-0046-4895")))
+							.first()));
 		Assertions
 			.assertTrue(
 				people
 					.filter(
-						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0002-3210-3034")))
+						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0003-0046-4895")))
 					.first()
 					.getPid()
 					.stream()
 					.anyMatch(
-						p -> p.getQualifier().getSchemename().equalsIgnoreCase("Scopus Author ID")
-							&& p.getValue().equalsIgnoreCase("15119405200")));
+						p -> p.getQualifier().getClassname().equalsIgnoreCase("Scopus Author ID")
+							&& p.getValue().equalsIgnoreCase("6603539671")));
 
 		Assertions
 			.assertEquals(
-				16,
+				19,
 				relations
 					.filter(r -> r.getRelClass().equalsIgnoreCase(ModelConstants.RESULT_PERSON_HASAUTHORED))
 					.count());
 		Assertions
 			.assertEquals(
-				14,
+				16,
 				relations
 					.filter(r -> r.getRelClass().equalsIgnoreCase(ModelConstants.PERSON_PERSON_HASCOAUTHORED))
 					.count());
@@ -197,7 +216,7 @@ public class CreatePersonAS {
 							&& r.getRelClass().equalsIgnoreCase(ModelConstants.RESULT_PERSON_HASAUTHORED)
 							&& r.getTarget().startsWith("50|arXiv"))
 					.count());
-
+		relations.foreach(r-> System.out.println(OBJECT_MAPPER.writeValueAsString(r)));
 		Assertions
 			.assertEquals(
 				1,
@@ -206,7 +225,8 @@ public class CreatePersonAS {
 						r -> r.getSource().equalsIgnoreCase("30|orcid_______::" + DHPUtils.md5("0000-0001-6291-9619"))
 							&& r.getRelClass().equalsIgnoreCase(ModelConstants.PERSON_PERSON_HASCOAUTHORED))
 					.count());
-		Assertions.assertEquals(33, relations.count());
+		Assertions.assertEquals(38, relations.count());
+		relations.foreach(r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
 
 	}
 

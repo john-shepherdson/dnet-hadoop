@@ -282,6 +282,30 @@ public class MergeUtils {
 		return new ArrayList<>(values.values());
 	}
 
+	// TODO review
+	private static List<KeyValue> appendKey(List<KeyValue> left, List<KeyValue> right, int trust) {
+		if (left == null) {
+			return right;
+		} else if (right == null) {
+			return left;
+		}
+
+		if (trust < 0) {
+			List<KeyValue> s = left;
+			left = right;
+			right = s;
+		}
+
+		List<KeyValue> collect = unionDistinctLists(
+			left.stream().map(HashableKeyValue::newInstance).collect(Collectors.toList()),
+			right.stream().map(HashableKeyValue::newInstance).collect(Collectors.toList()), trust)
+				.stream()
+				.map(HashableKeyValue::toKeyValue)
+				.collect(Collectors.toList());
+		return collect;
+
+	}
+
 	private static List<StructuredProperty> unionTitle(List<StructuredProperty> left, List<StructuredProperty> right,
 		int trust) {
 		if (left == null) {
@@ -368,7 +392,7 @@ public class MergeUtils {
 		}
 
 		// TODO keyvalue merge
-		merge.setProperties(mergeByKey(merge.getProperties(), enrich.getProperties(), trust));
+		merge.setProperties(appendKey(merge.getProperties(), enrich.getProperties(), trust));
 
 		return merge;
 	}
@@ -654,16 +678,9 @@ public class MergeUtils {
 	}
 
 	private static Field<String> selectOldestDate(Field<String> d1, Field<String> d2) {
-		if (d1 == null || StringUtils.isBlank(d1.getValue())) {
+		if (!GraphCleaningFunctions.cleanDateField(d1).isPresent()) {
 			return d2;
-		} else if (d2 == null || StringUtils.isBlank(d2.getValue())) {
-			return d1;
-		}
-
-		if (StringUtils.contains(d1.getValue(), "null")) {
-			return d2;
-		}
-		if (StringUtils.contains(d2.getValue(), "null")) {
+		} else if (!GraphCleaningFunctions.cleanDateField(d2).isPresent()) {
 			return d1;
 		}
 
@@ -715,7 +732,9 @@ public class MergeUtils {
 	private static String spKeyExtractor(StructuredProperty sp) {
 		return Optional
 			.ofNullable(sp)
-			.map(s -> Joiner.on("||")
+			.map(
+				s -> Joiner
+					.on("||")
 					.useForNull("")
 					.join(qualifierKeyExtractor(s.getQualifier()), s.getValue()))
 			.orElse(null);

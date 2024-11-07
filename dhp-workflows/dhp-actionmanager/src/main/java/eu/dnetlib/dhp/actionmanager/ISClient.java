@@ -27,7 +27,7 @@ import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 
 public class ISClient implements Serializable {
 
-	private static final Logger log = LoggerFactory.getLogger(ISClient.class);
+	public static final Logger log = LoggerFactory.getLogger(ISClient.class);
 
 	private static final String INPUT_ACTION_SET_ID_SEPARATOR = ",";
 
