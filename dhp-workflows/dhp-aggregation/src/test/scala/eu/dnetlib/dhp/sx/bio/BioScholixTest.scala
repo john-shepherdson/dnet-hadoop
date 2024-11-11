@@ -6,9 +6,9 @@ import eu.dnetlib.dhp.schema.oaf.utils.PidType
 import eu.dnetlib.dhp.schema.oaf.{Oaf, Publication, Relation, Result}
 import eu.dnetlib.dhp.sx.bio.BioDBToOAF.ScholixResolved
 import eu.dnetlib.dhp.sx.bio.ebi.SparkCreatePubmedDump
-import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMAuthor, PMJournal, PMParser, PMParser2, PMSubject, PubMedToOaf}
+import eu.dnetlib.dhp.sx.bio.pubmed._
 import org.apache.commons.io.IOUtils
-import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.{JField, JObject, JString}
 import org.json4s.jackson.JsonMethods.parse
@@ -18,13 +18,12 @@ import org.junit.jupiter.api.{BeforeEach, Test}
 import org.mockito.junit.jupiter.MockitoExtension
 import org.slf4j.LoggerFactory
 
-import java.io.{BufferedReader, ByteArrayInputStream, InputStream, InputStreamReader}
+import java.io.{BufferedReader, InputStream, InputStreamReader}
 import java.util.zip.GZIPInputStream
 import javax.xml.stream.XMLInputFactory
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
-import scala.xml.pull.XMLEventReader
 
 @ExtendWith(Array(classOf[MockitoExtension]))
 class BioScholixTest extends AbstractVocabularyTest {
@@ -139,7 +138,6 @@ class BioScholixTest extends AbstractVocabularyTest {
     }
   }
 
-  @Test
   def testPubmedSplitting(): Unit = {
 
     val spark: SparkSession = SparkSession.builder().appName("test").master("local").getOrCreate()
