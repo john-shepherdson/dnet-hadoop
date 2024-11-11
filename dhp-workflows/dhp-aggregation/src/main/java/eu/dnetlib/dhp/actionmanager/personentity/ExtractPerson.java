@@ -345,7 +345,16 @@ public class ExtractPerson implements Serializable {
 					OafMapperUtils
 						.structuredProperty(
 							op.getOrcid(), ModelConstants.ORCID, ModelConstants.ORCID_CLASSNAME,
-							ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES, null));
+							ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES,
+								OafMapperUtils.dataInfo(false,
+										null,
+										false,
+										false,
+										OafMapperUtils.qualifier(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY,
+												ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY,
+												ModelConstants.DNET_PID_TYPES,
+												ModelConstants.DNET_PID_TYPES),
+								"0.91")));
 			person.setDateofcollection(op.getLastModifiedDate());
 			person.setOriginalId(Arrays.asList(op.getOrcid()));
 			person.setDataInfo(ORCIDDATAINFO);
