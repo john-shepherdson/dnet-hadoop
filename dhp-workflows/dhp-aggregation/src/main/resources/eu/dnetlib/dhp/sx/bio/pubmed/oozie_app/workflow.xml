@@ -1,4 +1,4 @@
-<workflow-app name="Download_Transform_Pubmed_Workflow" xmlns="uri:oozie:workflow:0.5">
+<workflow-app name="Transform_Pubmed_Workflow" xmlns="uri:oozie:workflow:0.5">
     <parameters>
         <property>
             <name>baselineWorkingPath</name>
