@@ -158,7 +158,7 @@ public class SparkExtractPersonRelations {
 											.stream()
 											.anyMatch(
 												p -> Arrays
-													.asList("eu/dnetlib/dhp/enrich/orcid", "orcid_pending")
+													.asList("orcid", "orcid_pending")
 													.contains(p.getQualifier().getClassid().toLowerCase()))));
 					// 2. create authorship relations between the result identifier and the person entity with
 					// orcid_pending.

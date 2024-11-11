@@ -35,7 +35,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>Enrich Graph with ORCID</name>
-            <class>orcid.SparkEnrichGraphWithOrcidAuthors</class>
+            <class>eu.dnetlib.dhp.enrich.orcid.SparkEnrichGraphWithOrcidAuthors</class>
             <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}

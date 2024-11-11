@@ -36,7 +36,7 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
     generateGraph(spark, graphPath, workingDir, targetPath)
   }
 
-  private def generateGraph(spark: SparkSession, graphPath: String, workingDir: String, targetPath: String): Unit = {
+   def generateGraph(spark: SparkSession, graphPath: String, workingDir: String, targetPath: String): Unit = {
 
     ModelSupport.entityTypes.asScala
       .filter(e => ModelSupport.isResult(e._1))
