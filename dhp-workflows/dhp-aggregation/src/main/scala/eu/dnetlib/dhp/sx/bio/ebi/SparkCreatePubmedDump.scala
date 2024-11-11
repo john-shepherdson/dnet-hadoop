@@ -1,17 +1,13 @@
 package eu.dnetlib.dhp.sx.bio.ebi
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import eu.dnetlib.dhp.application.{AbstractScalaApplication, ArgumentApplicationParser}
+import eu.dnetlib.dhp.application.AbstractScalaApplication
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup
-import eu.dnetlib.dhp.schema.oaf.Oaf
-import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMAuthor, PMJournal, PMParser, PMParser2, PubMedToOaf}
+import eu.dnetlib.dhp.schema.mdstore.MDStoreVersion
+import eu.dnetlib.dhp.sx.bio.pubmed.{PMArticle, PMParser2, PubMedToOaf}
 import eu.dnetlib.dhp.utils.ISLookupClientFactory
-import org.apache.spark.sql.functions._
-import org.apache.spark.sql.{Dataset, Encoder, Encoders, SparkSession}
+import org.apache.spark.sql.{Encoder, Encoders, SparkSession}
 import org.slf4j.{Logger, LoggerFactory}
-
-import java.io.ByteArrayInputStream
-import javax.xml.stream.XMLInputFactory
 
 class SparkCreatePubmedDump(propertyPath: String, args: Array[String], log: Logger)
     extends AbstractScalaApplication(propertyPath, args, log: Logger) {
@@ -24,16 +20,26 @@ class SparkCreatePubmedDump(propertyPath: String, args: Array[String], log: Logg
     log.info("isLookupUrl: {}", isLookupUrl)
     val sourcePath = parser.get("sourcePath")
     log.info(s"SourcePath is '$sourcePath'")
-    val targetPath = parser.get("targetPath")
-    log.info(s"TargetPath is '$targetPath'")
+    val mdstoreOutputVersion = parser.get("mdstoreOutputVersion")
+    log.info(s"mdstoreOutputVersion is '$mdstoreOutputVersion'")
+    val mapper = new ObjectMapper()
+    val cleanedMdStoreVersion = mapper.readValue(mdstoreOutputVersion, classOf[MDStoreVersion])
+    val outputBasePath = cleanedMdStoreVersion.getHdfsPath
+    log.info(s"outputBasePath is '$outputBasePath'")
 
     val isLookupService = ISLookupClientFactory.getLookUpService(isLookupUrl)
     val vocabularies = VocabularyGroup.loadVocsFromIS(isLookupService)
 
-    createPubmedDump(spark, sourcePath, targetPath, vocabularies)
+    createPubmedDump(spark, sourcePath, outputBasePath, vocabularies)
 
   }
 
+  /** This method creates a dump of the pubmed articles
+    * @param spark the spark session
+    * @param sourcePath the path of the source file
+    * @param targetPath the path of the target file
+    * @param vocabularies the vocabularies
+    */
   def createPubmedDump(
     spark: SparkSession,
     sourcePath: String,
@@ -54,6 +60,7 @@ class SparkCreatePubmedDump(propertyPath: String, args: Array[String], log: Logg
       })
       .filter(s => s != null)
       .map { i =>
+        //remove try catch
         try {
           new PMParser2().parse(i)
         } catch {

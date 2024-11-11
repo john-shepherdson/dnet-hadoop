@@ -16,11 +16,6 @@
             <name>mdStoreManagerURI</name>
             <description>the path of the cleaned mdstore</description>
         </property>
-        <property>
-            <name>skipUpdate</name>
-            <value>false</value>
-            <description>The request block size</description>
-        </property>
     </parameters>
 
     <start to="StartTransaction"/>
@@ -44,16 +39,16 @@
             <arg>--mdStoreManagerURI</arg><arg>${mdStoreManagerURI}</arg>
             <capture-output/>
         </java>
-        <ok to="ConvertDataset"/>
+        <ok to="TransformPubMed"/>
         <error to="RollBack"/>
     </action>
 
-    <action name="ConvertDataset">
+    <action name="TransformPubMed">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Convert Baseline to OAF Dataset</name>
-            <class>eu.dnetlib.dhp.sx.bio.ebi.SparkCreateBaselineDataFrame</class>
+            <name>Convert Baseline Pubmed to OAF Dataset</name>
+            <class>eu.dnetlib.dhp.sx.bio.ebi.SparkCreatePubmedDump</class>
             <jar>dhp-aggregation-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
@@ -65,12 +60,10 @@
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
             </spark-opts>
-            <arg>--workingPath</arg><arg>${baselineWorkingPath}</arg>
+            <arg>--sourcePath</arg><arg>${baselineWorkingPath}</arg>
             <arg>--mdstoreOutputVersion</arg><arg>${wf:actionData('StartTransaction')['mdStoreVersion']}</arg>
             <arg>--master</arg><arg>yarn</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--hdfsServerUri</arg><arg>${nameNode}</arg>
-            <arg>--skipUpdate</arg><arg>${skipUpdate}</arg>
         </spark>
         <ok to="CommitVersion"/>
         <error to="RollBack"/>

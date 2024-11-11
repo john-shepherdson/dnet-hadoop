@@ -1,7 +1,7 @@
 [
-  {"paramName":"mt",  "paramLongName":"master",         "paramDescription": "should be local or yarn",                  "paramRequired": true},
-  {"paramName":"i",   "paramLongName":"isLookupUrl",    "paramDescription": "isLookupUrl",                              "paramRequired": true},
-  {"paramName":"s",   "paramLongName":"sourcePath",    "paramDescription": "the baseline path",  "paramRequired": true},
-  {"paramName":"t",   "paramLongName":"targetPath",     "paramDescription": "the mdstore path to save",                 "paramRequired": true}
+  {"paramName":"mt",  "paramLongName":"master",               "paramDescription": "should be local or yarn",                  "paramRequired": true},
+  {"paramName":"i",   "paramLongName":"isLookupUrl",          "paramDescription": "isLookupUrl",                              "paramRequired": true},
+  {"paramName":"s",   "paramLongName":"sourcePath",           "paramDescription": "the baseline path",                        "paramRequired": true},
+  {"paramName":"mo",  "paramLongName":"mdstoreOutputVersion", "paramDescription": "the mdstore path to save",                 "paramRequired": true}
 
 ]
