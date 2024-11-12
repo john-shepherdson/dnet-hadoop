@@ -104,22 +104,22 @@ public class PrepareAffiliationRelations implements Serializable {
 			.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
 
 		JavaPairRDD<Text, Text> crossrefRelations = prepareAffiliationRelationsNewModel(
-			spark, crossrefInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + "::crossref");
+			spark, crossrefInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":crossref");
 
 		JavaPairRDD<Text, Text> pubmedRelations = prepareAffiliationRelations(
-			spark, pubmedInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + "::pubmed");
+			spark, pubmedInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":pubmed");
 
 		JavaPairRDD<Text, Text> openAPCRelations = prepareAffiliationRelationsNewModel(
-			spark, openapcInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + "::openapc");
+			spark, openapcInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":openapc");
 
 		JavaPairRDD<Text, Text> dataciteRelations = prepareAffiliationRelationsNewModel(
-			spark, dataciteInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + "::datacite");
+			spark, dataciteInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":datacite");
 
 		JavaPairRDD<Text, Text> webCrawlRelations = prepareAffiliationRelationsNewModel(
-			spark, webcrawlInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + "::rawaff");
+			spark, webcrawlInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":rawaff");
 
 		JavaPairRDD<Text, Text> publisherRelations = prepareAffiliationRelationFromPublisherNewModel(
-			spark, publisherlInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + "::webcrawl");
+			spark, publisherlInputPath, collectedfromOpenAIRE, BIP_INFERENCE_PROVENANCE + ":webcrawl");
 
 		crossrefRelations
 			.union(pubmedRelations)

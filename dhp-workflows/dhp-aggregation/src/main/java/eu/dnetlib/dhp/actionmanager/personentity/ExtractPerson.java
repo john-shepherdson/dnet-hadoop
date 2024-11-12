@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -193,8 +194,8 @@ public class ExtractPerson implements Serializable {
 	private static Relation getProjectRelation(String project, String orcid, String role) {
 
 		String source = PERSON_PREFIX + "::" + IdentifierFactory.md5(orcid);
-		String target = PROJECT_ID_PREFIX + project.substring(0, 14)
-			+ IdentifierFactory.md5(project.substring(15));
+		String target = PROJECT_ID_PREFIX + StringUtils.substringBefore(project, "::") + "::"
+			+ IdentifierFactory.md5(StringUtils.substringAfter(project, "::"));
 		List<KeyValue> properties = new ArrayList<>();
 
 		Relation relation = OafMapperUtils
@@ -345,7 +346,16 @@ public class ExtractPerson implements Serializable {
 					OafMapperUtils
 						.structuredProperty(
 							op.getOrcid(), ModelConstants.ORCID, ModelConstants.ORCID_CLASSNAME,
-							ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES, null));
+							ModelConstants.DNET_PID_TYPES, ModelConstants.DNET_PID_TYPES,
+								OafMapperUtils.dataInfo(false,
+										null,
+										false,
+										false,
+										OafMapperUtils.qualifier(ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY,
+												ModelConstants.SYSIMPORT_CROSSWALK_ENTITYREGISTRY,
+												ModelConstants.DNET_PID_TYPES,
+												ModelConstants.DNET_PID_TYPES),
+								"0.91")));
 			person.setDateofcollection(op.getLastModifiedDate());
 			person.setOriginalId(Arrays.asList(op.getOrcid()));
 			person.setDataInfo(ORCIDDATAINFO);
