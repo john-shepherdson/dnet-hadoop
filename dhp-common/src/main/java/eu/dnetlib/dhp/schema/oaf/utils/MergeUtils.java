@@ -23,24 +23,30 @@ import org.apache.commons.lang3.tuple.Pair;
 import com.github.sisyphsu.dateparser.DateParserUtils;
 import com.google.common.base.Joiner;
 
+import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.oa.merge.AuthorMerger;
 import eu.dnetlib.dhp.schema.common.AccessRightComparator;
+import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class MergeUtils {
 
-	public static <T extends Oaf> T mergeById(String s, Iterator<T> oafEntityIterator) {
-		return mergeGroup(s, oafEntityIterator, true);
+	public static <T extends Oaf> T mergeById(Iterator<T> oafEntityIterator, VocabularyGroup vocs) {
+		return mergeGroup(oafEntityIterator, true, vocs);
 	}
 
-	public static <T extends Oaf> T mergeGroup(String s, Iterator<T> oafEntityIterator) {
-		return mergeGroup(s, oafEntityIterator, false);
+	public static <T extends Oaf> T mergeGroup(Iterator<T> oafEntityIterator) {
+		return mergeGroup(oafEntityIterator, false);
 	}
 
-	public static <T extends Oaf> T mergeGroup(String s, Iterator<T> oafEntityIterator,
-		boolean checkDelegateAuthority) {
+	public static <T extends Oaf> T mergeGroup(Iterator<T> oafEntityIterator, boolean checkDelegateAuthority) {
+		return mergeGroup(oafEntityIterator, checkDelegateAuthority, null);
+	}
+
+	public static <T extends Oaf> T mergeGroup(Iterator<T> oafEntityIterator,
+		boolean checkDelegateAuthority, VocabularyGroup vocs) {
 
 		ArrayList<T> sortedEntities = new ArrayList<>();
 		oafEntityIterator.forEachRemaining(sortedEntities::add);
@@ -49,11 +55,47 @@ public class MergeUtils {
 		Iterator<T> it = sortedEntities.iterator();
 		T merged = it.next();
 
-		while (it.hasNext()) {
-			merged = checkedMerge(merged, it.next(), checkDelegateAuthority);
+		if (!it.hasNext() && merged instanceof Result && vocs != null) {
+			return enforceResultType(vocs, (Result) merged);
+		} else {
+			while (it.hasNext()) {
+				merged = checkedMerge(merged, it.next(), checkDelegateAuthority);
+			}
 		}
-
 		return merged;
+	}
+
+	private static <T extends Oaf> T enforceResultType(VocabularyGroup vocs, Result mergedResult) {
+		if (Optional.ofNullable(mergedResult.getInstance()).map(List::isEmpty).orElse(true)) {
+			return (T) mergedResult;
+		} else {
+			final Instance i = mergedResult.getInstance().get(0);
+
+			if (!vocs.vocabularyExists(ModelConstants.DNET_RESULT_TYPOLOGIES)) {
+				return (T) mergedResult;
+			} else {
+				final Qualifier expectedResultType = vocs
+					.getSynonymAsQualifier(
+						ModelConstants.DNET_RESULT_TYPOLOGIES,
+						i.getInstancetype().getClassid());
+
+				// there is a clash among the result types
+				if (!expectedResultType.getClassid().equals(mergedResult.getResulttype().getClassid())) {
+					try {
+						String resulttype = expectedResultType.getClassid();
+						if (EntityType.otherresearchproduct.toString().equals(resulttype)) {
+							resulttype = "other";
+						}
+						Result result = (Result) ModelSupport.oafTypes.get(resulttype).newInstance();
+						return (T) mergeResultFields(result, mergedResult);
+					} catch (InstantiationException | IllegalAccessException e) {
+						throw new IllegalStateException(e);
+					}
+				} else {
+					return (T) mergedResult;
+				}
+			}
+		}
 	}
 
 	public static <T extends Oaf> T checkedMerge(final T left, final T right, boolean checkDelegateAuthority) {
@@ -106,7 +148,7 @@ public class MergeUtils {
 				return mergeSoftware((Software) left, (Software) right);
 			}
 
-			return mergeResultFields((Result) left, (Result) right);
+			return left;
 		} else if (sameClass(left, right, Datasource.class)) {
 			// TODO
 			final int trust = compareTrust(left, right);

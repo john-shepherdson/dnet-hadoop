@@ -155,7 +155,7 @@ public abstract class AbstractMdRecordToOafMapper {
 
 			final List<Instance> instances = prepareInstances(doc, entityInfo, collectedFrom, hostedBy);
 
-			final String type = getResultType(doc, instances);
+			final String type = getResultType(instances);
 
 			return createOafs(doc, type, instances, collectedFrom, entityInfo, lastUpdateTimestamp);
 		} catch (final DocumentException e) {
@@ -164,10 +164,9 @@ public abstract class AbstractMdRecordToOafMapper {
 		}
 	}
 
-	protected String getResultType(final Document doc, final List<Instance> instances) {
-		final String type = doc.valueOf("//dr:CobjCategory/@type");
+	protected String getResultType(final List<Instance> instances) {
 
-		if (StringUtils.isBlank(type) && this.vocs.vocabularyExists(ModelConstants.DNET_RESULT_TYPOLOGIES)) {
+		if (this.vocs.vocabularyExists(ModelConstants.DNET_RESULT_TYPOLOGIES)) {
 			final String instanceType = instances
 				.stream()
 				.map(i -> i.getInstancetype().getClassid())
@@ -178,9 +177,9 @@ public abstract class AbstractMdRecordToOafMapper {
 				.ofNullable(this.vocs.getSynonymAsQualifier(ModelConstants.DNET_RESULT_TYPOLOGIES, instanceType))
 				.map(Qualifier::getClassid)
 				.orElse("0000");
+		} else {
+			throw new IllegalStateException("Missing vocabulary: " + ModelConstants.DNET_RESULT_TYPOLOGIES);
 		}
-
-		return type;
 	}
 
 	private KeyValue getProvenanceDatasource(final Document doc, final String xpathId, final String xpathName) {
