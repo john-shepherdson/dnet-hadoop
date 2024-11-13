@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.collection.plugin.gtr2;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,7 +19,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import java.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -188,11 +188,11 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 
 	private Document loadURL(final String cleanUrl, final int attempt) {
 		try {
-            log.debug("  * Downloading Url: {}", cleanUrl);
+			log.debug("  * Downloading Url: {}", cleanUrl);
 			final byte[] bytes = this.connector.getInputSource(cleanUrl).getBytes(StandardCharsets.UTF_8);
 			return DocumentHelper.parseText(new String(bytes));
 		} catch (final Throwable e) {
-            log.error("Error dowloading url: {}, attempt = {}", cleanUrl, attempt, e);
+			log.error("Error dowloading url: {}, attempt = {}", cleanUrl, attempt, e);
 			if (attempt >= MAX_ATTEMPTS) {
 				throw new RuntimeException("Error downloading url: " + cleanUrl, e);
 			}
