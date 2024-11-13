@@ -673,11 +673,12 @@ case object Crossref2Oaf {
     val doi = input.getString(0)
     val rorId = input.getString(1)
 
-    val pubId = s"50|${PidType.doi.toString.padTo(12, "_")}::${DoiCleaningRule.clean(doi)}"
+
+    val pubId = IdentifierFactory.idFromPid("50", "doi", DoiCleaningRule.clean(doi), true)
     val affId = GenerateRorActionSetJob.calculateOpenaireId(rorId)
 
     val r: Relation = new Relation
-    DoiCleaningRule.clean(doi)
+
     r.setSource(pubId)
     r.setTarget(affId)
     r.setRelType(ModelConstants.RESULT_ORGANIZATION)
