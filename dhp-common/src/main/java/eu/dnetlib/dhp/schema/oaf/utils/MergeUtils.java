@@ -74,15 +74,9 @@ public class MergeUtils {
 			if (!vocs.vocabularyExists(ModelConstants.DNET_RESULT_TYPOLOGIES)) {
 				return (T) mergedResult;
 			} else {
-				final Qualifier expectedResultType = vocs.lookupTermBySynonym(
-						ModelConstants.DNET_RESULT_TYPOLOGIES,
-						i.getInstancetype().getClassid());
-
-				if (Objects.isNull(expectedResultType)) {
-					throw new IllegalArgumentException(
-							"instance type not bound to any result type in dnet:result_typologies: " +
-									i.getInstancetype().getClassid());
-				}
+				final Qualifier expectedResultType = Optional
+						.ofNullable(vocs.lookupTermBySynonym(ModelConstants.DNET_RESULT_TYPOLOGIES, i.getInstancetype().getClassid()))
+						.orElse(OafMapperUtils.unknown(ModelConstants.DNET_RESULT_TYPOLOGIES, ModelConstants.DNET_RESULT_TYPOLOGIES));
 
 				// there is a clash among the result types
 				if (!expectedResultType.getClassid().equals(mergedResult.getResulttype().getClassid())) {
