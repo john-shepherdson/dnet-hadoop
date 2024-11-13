@@ -1,77 +1,56 @@
 <PubmedArticle>
-    <MedlineCitation Status="MEDLINE" IndexingMethod="Automated" Owner="NLM">
-        <PMID Version="1">37885214</PMID>
+    <MedlineCitation Status="MEDLINE" IndexingMethod="Curated" Owner="NLM">
+        <PMID Version="1">37318999</PMID>
         <DateCompleted>
             <Year>2024</Year>
             <Month>02</Month>
-            <Day>14</Day>
+            <Day>09</Day>
         </DateCompleted>
         <DateRevised>
             <Year>2024</Year>
             <Month>02</Month>
-            <Day>14</Day>
+            <Day>09</Day>
         </DateRevised>
         <Article PubModel="Print-Electronic">
             <Journal>
-                <ISSN IssnType="Electronic">2752-7549</ISSN>
+                <ISSN IssnType="Electronic">1522-1229</ISSN>
                 <JournalIssue CitedMedium="Internet">
-                    <Volume>40</Volume>
-                    <Issue>5</Issue>
+                    <Volume>47</Volume>
+                    <Issue>3</Issue>
                     <PubDate>
-                        <MedlineDate>2023 Sep-Oct</MedlineDate>
+                        <Year>2023</Year>
+                        <Month>Sep</Month>
+                        <Day>01</Day>
                     </PubDate>
                 </JournalIssue>
-                <Title>Journal of pediatric hematology/oncology nursing</Title>
-                <ISOAbbreviation>J Pediatr Hematol Oncol Nurs</ISOAbbreviation>
+                <Title>Advances in physiology education</Title>
+                <ISOAbbreviation>Adv Physiol Educ</ISOAbbreviation>
             </Journal>
-            <ArticleTitle>Care Needs of Parents of Children With Cancer in a Low-Middle-Income Country.</ArticleTitle>
+            <ArticleTitle>Providing the choice of in-person or videoconference attendance in a clinical physiology course may harm learning outcomes for the entire cohort.</ArticleTitle>
             <Pagination>
-                <MedlinePgn>295-304</MedlinePgn>
+                <MedlinePgn>548-556</MedlinePgn>
             </Pagination>
-            <ELocationID EIdType="doi" ValidYN="Y">10.1177/27527530231193972</ELocationID>
+            <ELocationID EIdType="doi" ValidYN="Y">10.1152/advan.00160.2022</ELocationID>
             <Abstract>
-                <AbstractText><b>Background:</b> Mapping out actual supportive care needs assists nurses in providing holistic individualized care. This study aimed to explore the care needs of parents of children with cancer in the Philippines. <b>Method:</b> Guided by the Supportive Care Needs Framework (SCNF), this study used an embedded mixed-method design with the quantitative revised Cancer Patient Needs Questionnaire and qualitative semistructured interviews to describe parents' care needs and priorities. <b>Results:</b> Filipino parents (<i>N</i> = 156) of children with cancer have various care needs which could be classified along the SCNF categories-practical, informational, spiritual, physical, emotional, and physical needs as ranked from highest to lowest. A number of variables were significantly associated with care needs. Solid tumor diagnosis was associated with greater practical, emotional, and psychosocial care needs; having a child who had undergone surgery was associated with more practical and spiritual care needs; and being within one year of the child's diagnosis was associated with practical, psychosocial, and spiritual care needs. Parent priority needs included (a) addressing financial needs; (b) access to temporary housing to minimize treatment-related costs; (c) support groups among parents of children with cancer as a source of information; (d) financial and social support between members of family and partners of parents of children with cancer; and (e) using prayer to facilitate acceptance. <b>Conclusions:</b> Supportive care needs of parents of children with cancer are important components of care that should be given recognition to enhance holistic individualized care throughout the childhood cancer experience.</AbstractText>
+                <AbstractText>Clinical Physiology 1 and 2 are flipped classes in which students watch prerecorded videos before class. During the 3-h class, students take practice assessments, work in groups on critical thinking exercises, work through case studies, and engage in drawing exercises. Due to the COVID pandemic, these courses were transitioned from in-person classes to online classes. Despite the university's return-to-class policy, some students were reluctant to return to in-person classes; therefore during the 2021-2022 academic year, Clinical Physiology 1 and 2 were offered as flipped, hybrid courses. In a hybrid format, students either attended the synchronous class in person or online. Here we evaluate the learning outcomes and the perceptions of the learning experience for students who attended Clinical Physiology 1 and 2 either online (2020-2021) or in a hybrid format (2021-2022). In addition to exam scores, in-class surveys and end of course evaluations were compiled to describe the student experience in the flipped hybrid setting. Retrospective linear mixed-model regression analysis of exam scores revealed that a hybrid modality (2021-2022) was associated with lower exam scores when controlling for sex, graduate/undergraduate status, delivery method, and the order in which the courses were taken (<i>F</i> test: <i>F</i> = 8.65, df1 = 2, df2 = 179.28, <i>P</i> = 0.0003). In addition, being a Black Indigenous Person of Color (BIPOC) student is associated with a lower exam score, controlling for the same previous factors (<i>F</i> test: <i>F</i> = 4.23, df1 = 1, df2 = 130.28, <i>P</i> = 0.04), albeit with lower confidence; the BIPOC representation in this sample is small (BIPOC: <i>n</i> = 144; total: <i>n</i> = 504). There is no significant interaction between the hybrid modality and race, meaning that BIPOC and White students are both negatively affected in a hybrid flipped course. Instructors should consider carefully about offering hybrid courses and build in extra student support.<b>NEW &amp; NOTEWORTHY</b> The transition from online to in-person teaching has been as challenging as the original transition to remote teaching with the onset of the pandemic. Since not all students were ready to return to the classroom, students could choose to take this course in person or online. This arrangement provided flexibility and opportunities for innovative class activities for students but introduced tradeoffs in lower test scores from the hybrid modality than fully online or fully in-person modalities.</AbstractText>
             </Abstract>
             <AuthorList CompleteYN="Y">
                 <Author ValidYN="Y">
-                    <LastName>Banayat</LastName>
-                    <ForeName>Aprille Campos</ForeName>
-                    <Initials>AC</Initials>
-                    <Identifier Source="ORCID">0000-0001-9339-9871</Identifier>
+                    <LastName>Anderson</LastName>
+                    <ForeName>Lisa Carney</ForeName>
+                    <Initials>LC</Initials>
+                    <Identifier Source="ORCID">0000-0003-2261-1921</Identifier>
                     <AffiliationInfo>
-                        <Affiliation>College of Nursing, University of the Philippines Manila, Manila, Philippines.</Affiliation>
+                        <Affiliation>Department of Integrative Biology and Physiology, University of Minnesota, Minneapolis, Minnesota, United States.</Affiliation>
+                        <Identifier Source="ROR">https://ror.org/017zqws13</Identifier>
                     </AffiliationInfo>
                 </Author>
                 <Author ValidYN="Y">
-                    <LastName>Abad</LastName>
-                    <ForeName>Peter James B</ForeName>
-                    <Initials>PJB</Initials>
+                    <LastName>Jacobson</LastName>
+                    <ForeName>Tate</ForeName>
+                    <Initials>T</Initials>
                     <AffiliationInfo>
-                        <Affiliation>College of Nursing, University of the Philippines Manila, Manila, Philippines.</Affiliation>
-                    </AffiliationInfo>
-                </Author>
-                <Author ValidYN="Y">
-                    <LastName>Bonito</LastName>
-                    <ForeName>Sheila R</ForeName>
-                    <Initials>SR</Initials>
-                    <AffiliationInfo>
-                        <Affiliation>College of Nursing, University of the Philippines Manila, Manila, Philippines.</Affiliation>
-                    </AffiliationInfo>
-                </Author>
-                <Author ValidYN="Y">
-                    <LastName>Manahan</LastName>
-                    <ForeName>Lydia T</ForeName>
-                    <Initials>LT</Initials>
-                    <AffiliationInfo>
-                        <Affiliation>College of Nursing, University of the Philippines Manila, Manila, Philippines.</Affiliation>
-                    </AffiliationInfo>
-                </Author>
-                <Author ValidYN="Y">
-                    <LastName>Peralta</LastName>
-                    <ForeName>Arnold B</ForeName>
-                    <Initials>AB</Initials>
-                    <AffiliationInfo>
-                        <Affiliation>College of Nursing, University of the Philippines Manila, Manila, Philippines.</Affiliation>
+                        <Affiliation>Department of Statistics, University of Minnesota, Minneapolis, Minnesota, United States.</Affiliation>
                     </AffiliationInfo>
                 </Author>
             </AuthorList>
@@ -81,142 +60,98 @@
             </PublicationTypeList>
             <ArticleDate DateType="Electronic">
                 <Year>2023</Year>
-                <Month>10</Month>
-                <Day>26</Day>
+                <Month>06</Month>
+                <Day>15</Day>
             </ArticleDate>
         </Article>
         <MedlineJournalInfo>
             <Country>United States</Country>
-            <MedlineTA>J Pediatr Hematol Oncol Nurs</MedlineTA>
-            <NlmUniqueID>9918282681506676</NlmUniqueID>
-            <ISSNLinking>2752-7530</ISSNLinking>
+            <MedlineTA>Adv Physiol Educ</MedlineTA>
+            <NlmUniqueID>100913944</NlmUniqueID>
+            <ISSNLinking>1043-4046</ISSNLinking>
         </MedlineJournalInfo>
         <CitationSubset>IM</CitationSubset>
         <MeshHeadingList>
             <MeshHeading>
-                <DescriptorName UI="D002648" MajorTopicYN="N">Child</DescriptorName>
+                <DescriptorName UI="D010827" MajorTopicYN="Y">Physiology</DescriptorName>
+                <QualifierName UI="Q000193" MajorTopicYN="N">education</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D012189" MajorTopicYN="N">Retrospective Studies</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D007858" MajorTopicYN="N">Learning</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D058873" MajorTopicYN="N">Pandemics</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D000086382" MajorTopicYN="N">COVID-19</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D012044" MajorTopicYN="N">Regression Analysis</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D013334" MajorTopicYN="N">Students</DescriptorName>
             </MeshHeading>
             <MeshHeading>
                 <DescriptorName UI="D006801" MajorTopicYN="N">Humans</DescriptorName>
             </MeshHeading>
             <MeshHeading>
-                <DescriptorName UI="D010290" MajorTopicYN="Y">Parents</DescriptorName>
-                <QualifierName UI="Q000523" MajorTopicYN="N">psychology</QualifierName>
+                <DescriptorName UI="D008297" MajorTopicYN="N">Male</DescriptorName>
             </MeshHeading>
             <MeshHeading>
-                <DescriptorName UI="D012944" MajorTopicYN="N">Social Support</DescriptorName>
+                <DescriptorName UI="D005260" MajorTopicYN="N">Female</DescriptorName>
             </MeshHeading>
             <MeshHeading>
-                <DescriptorName UI="D029181" MajorTopicYN="N">Spirituality</DescriptorName>
+                <DescriptorName UI="D044465" MajorTopicYN="N">White People</DescriptorName>
             </MeshHeading>
             <MeshHeading>
-                <DescriptorName UI="D012067" MajorTopicYN="N">Religion</DescriptorName>
+                <DescriptorName UI="D044383" MajorTopicYN="N">Black People</DescriptorName>
             </MeshHeading>
             <MeshHeading>
-                <DescriptorName UI="D009369" MajorTopicYN="Y">Neoplasms</DescriptorName>
-                <QualifierName UI="Q000628" MajorTopicYN="N">therapy</QualifierName>
+                <DescriptorName UI="D020375" MajorTopicYN="N">Education, Distance</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D003479" MajorTopicYN="N">Curriculum</DescriptorName>
             </MeshHeading>
         </MeshHeadingList>
         <KeywordList Owner="NOTNLM">
-            <Keyword MajorTopicYN="N">cancer</Keyword>
-            <Keyword MajorTopicYN="N">mixed methods</Keyword>
-            <Keyword MajorTopicYN="N">parent</Keyword>
-            <Keyword MajorTopicYN="N">pediatric</Keyword>
-            <Keyword MajorTopicYN="N">research</Keyword>
-            <Keyword MajorTopicYN="N">supportive care</Keyword>
+            <Keyword MajorTopicYN="N">flipped teaching</Keyword>
+            <Keyword MajorTopicYN="N">hybrid teaching</Keyword>
+            <Keyword MajorTopicYN="N">inequity</Keyword>
+            <Keyword MajorTopicYN="N">learning outcomes</Keyword>
+            <Keyword MajorTopicYN="N">responsive teaching</Keyword>
         </KeywordList>
-        <CoiStatement>Declaration of Conflicting InterestsThe author(s) declared no potential conflicts of interest with respect to the research, authorship, and/or publication of this article.</CoiStatement>
     </MedlineCitation>
     <PubmedData>
         <History>
             <PubMedPubDate PubStatus="medline">
-                <Year>2024</Year>
-                <Month>2</Month>
-                <Day>12</Day>
-                <Hour>18</Hour>
-                <Minute>42</Minute>
+                <Year>2023</Year>
+                <Month>7</Month>
+                <Day>21</Day>
+                <Hour>6</Hour>
+                <Minute>44</Minute>
             </PubMedPubDate>
             <PubMedPubDate PubStatus="pubmed">
                 <Year>2023</Year>
-                <Month>10</Month>
-                <Day>27</Day>
-                <Hour>6</Hour>
-                <Minute>42</Minute>
+                <Month>6</Month>
+                <Day>15</Day>
+                <Hour>19</Hour>
+                <Minute>14</Minute>
             </PubMedPubDate>
             <PubMedPubDate PubStatus="entrez">
                 <Year>2023</Year>
-                <Month>10</Month>
-                <Day>27</Day>
-                <Hour>3</Hour>
-                <Minute>43</Minute>
+                <Month>6</Month>
+                <Day>15</Day>
+                <Hour>12</Hour>
+                <Minute>53</Minute>
             </PubMedPubDate>
         </History>
         <PublicationStatus>ppublish</PublicationStatus>
         <ArticleIdList>
-            <ArticleId IdType="pubmed">37885214</ArticleId>
-            <ArticleId IdType="doi">10.1177/27527530231193972</ArticleId>
+            <ArticleId IdType="pubmed">37318999</ArticleId>
+            <ArticleId IdType="doi">10.1152/advan.00160.2022</ArticleId>
         </ArticleIdList>
     </PubmedData>
 </PubmedArticle>
-<DeleteCitation>
-<PMID Version="1">30522158</PMID>
-<PMID Version="1">32769323</PMID>
-<PMID Version="1">34061701</PMID>
-<PMID Version="1">34661197</PMID>
-<PMID Version="1">34837091</PMID>
-<PMID Version="1">35035475</PMID>
-<PMID Version="1">35211699</PMID>
-<PMID Version="1">35557982</PMID>
-<PMID Version="1">35782783</PMID>
-<PMID Version="1">35795240</PMID>
-<PMID Version="1">35832688</PMID>
-<PMID Version="1">35847411</PMID>
-<PMID Version="1">36081602</PMID>
-<PMID Version="1">36081858</PMID>
-<PMID Version="1">36468085</PMID>
-<PMID Version="1">36468934</PMID>
-<PMID Version="1">36580086</PMID>
-<PMID Version="1">36589526</PMID>
-<PMID Version="1">36619609</PMID>
-<PMID Version="1">36649460</PMID>
-<PMID Version="1">36654909</PMID>
-<PMID Version="1">36655054</PMID>
-<PMID Version="1">36700856</PMID>
-<PMID Version="1">36705625</PMID>
-<PMID Version="1">36713939</PMID>
-<PMID Version="1">36714172</PMID>
-<PMID Version="1">36741203</PMID>
-<PMID Version="1">36741905</PMID>
-<PMID Version="1">36743825</PMID>
-<PMID Version="1">36788221</PMID>
-<PMID Version="1">36844926</PMID>
-<PMID Version="1">36846546</PMID>
-<PMID Version="1">36935776</PMID>
-<PMID Version="1">36946757</PMID>
-<PMID Version="1">36972191</PMID>
-<PMID Version="1">37034422</PMID>
-<PMID Version="1">37124311</PMID>
-<PMID Version="1">37152108</PMID>
-<PMID Version="1">37171968</PMID>
-<PMID Version="1">37273889</PMID>
-<PMID Version="1">37333905</PMID>
-<PMID Version="1">37387733</PMID>
-<PMID Version="1">37431449</PMID>
-<PMID Version="1">37576947</PMID>
-<PMID Version="1">37601162</PMID>
-<PMID Version="1">37711214</PMID>
-<PMID Version="1">37901290</PMID>
-<PMID Version="1">37981909</PMID>
-<PMID Version="1">37981945</PMID>
-<PMID Version="1">37982005</PMID>
-<PMID Version="1">38037601</PMID>
-<PMID Version="1">38037602</PMID>
-<PMID Version="1">38150730</PMID>
-<PMID Version="1">38274640</PMID>
-<PMID Version="1">38332671</PMID>
-<PMID Version="1">38334184</PMID>
-<PMID Version="1">38335456</PMID>
-<PMID Version="1">38349506</PMID>
-<PMID Version="1">38349576</PMID>
-<PMID Version="1">38353676</PMID>
-</DeleteCitation>

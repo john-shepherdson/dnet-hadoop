@@ -81,6 +81,26 @@ class PMParser2 {
         val a = new PMAuthor
         a.setLastName((author \ "LastName").text)
         a.setForeName((author \ "ForeName").text)
+        val id = (author \ "Identifier").text
+        val idType =(author \ "Identifier" \ "@Source").text
+
+        if(id != null && id.nonEmpty && idType != null && idType.nonEmpty) {
+          a.setIdentifier(new PMIdentifier(id, idType))
+        }
+
+
+        val affiliation = (author \ "AffiliationInfo" \ "Affiliation").text
+        val affiliationId  = (author \ "AffiliationInfo" \ "Identifier").text
+        val affiliationIdType = (author \ "AffiliationInfo" \ "Identifier" \ "@Source").text
+
+        if(affiliation != null && affiliation.nonEmpty) {
+          val aff = new PMAffiliation()
+          aff.setName(affiliation)
+          if(affiliationId != null && affiliationId.nonEmpty && affiliationIdType != null && affiliationIdType.nonEmpty) {
+            aff.setIdentifier(new PMIdentifier(affiliationId, affiliationIdType))
+          }
+          a.setAffiliation(aff)
+        }
         a
       })
       .toList
@@ -99,15 +119,7 @@ class PMParser2 {
     val authors = xml \ "MedlineCitation" \ "Article" \ "AuthorList" \ "Author"
 
     article.setAuthors(
-      authors
-        .map(author => {
-          val a = new PMAuthor
-          a.setLastName((author \ "LastName").text)
-          a.setForeName((author \ "ForeName").text)
-          a
-        })
-        .toList
-        .asJava
+      extractAuthors(authors).asJava
     )
 
     val pmId = xml \ "MedlineCitation" \ "PMID"

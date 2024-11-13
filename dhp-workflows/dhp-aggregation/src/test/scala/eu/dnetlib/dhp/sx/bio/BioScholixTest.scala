@@ -19,9 +19,11 @@ import org.mockito.junit.jupiter.MockitoExtension
 import org.slf4j.LoggerFactory
 
 import java.io.{BufferedReader, InputStream, InputStreamReader}
+import java.util.regex.Pattern
 import java.util.zip.GZIPInputStream
 import javax.xml.stream.XMLInputFactory
 import scala.collection.JavaConverters._
+import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 import scala.io.Source
 
@@ -52,13 +54,73 @@ class BioScholixTest extends AbstractVocabularyTest {
   }
 
   @Test
+  def testPid(): Unit = {
+    val pids = List(
+      "0000000163025705",
+      "000000018494732X",
+      "0000000308873343",
+      "0000000335964515",
+      "0000000333457333",
+      "0000000335964515",
+      "0000000302921949",
+
+      "http://orcid.org/0000-0001-8567-3543",
+      "http://orcid.org/0000-0001-7868-8528",
+      "0000-0001-9189-1440",
+      "0000-0003-3727-9247",
+      "0000-0001-7246-1058",
+      "000000033962389X",
+      "0000000330371470",
+      "0000000171236123",
+      "0000000272569752",
+      "0000000293231371",
+      "http://orcid.org/0000-0003-3345-7333",
+      "0000000340145688",
+      "http://orcid.org/0000-0003-4894-1689"
+    )
+
+    pids.foreach(pid => {
+      val pidCleaned = new PMIdentifier(pid, "ORCID").getPid
+      // assert pid is in the format of ORCID
+      println(pidCleaned)
+      assertTrue(pidCleaned.matches("[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]"))
+    })
+  }
+
+  def extractAffiliation(s: String): List[String] = {
+    val regex: String = "<Affiliation>(.*)<\\/Affiliation>"
+    val pattern = Pattern.compile(regex, Pattern.MULTILINE)
+    val matcher = pattern.matcher(s)
+    val l: mutable.ListBuffer[String] = mutable.ListBuffer()
+    while (matcher.find()) {
+      l += matcher.group(1)
+    }
+    l.toList
+  }
+
+  case class AuthorPID(pidType: String, pid: String) {}
+
+  def extractAuthorIdentifier(s: String): List[AuthorPID] = {
+    val regex: String = "<Identifier Source=\"(.*)\">(.*)<\\/Identifier>"
+    val pattern = Pattern.compile(regex, Pattern.MULTILINE)
+    val matcher = pattern.matcher(s)
+    val l: mutable.ListBuffer[AuthorPID] = mutable.ListBuffer()
+    while (matcher.find()) {
+      l += AuthorPID(pidType = matcher.group(1), pid = matcher.group(2))
+    }
+    l.toList
+  }
+
+  @Test
   def testParsingPubmed2(): Unit = {
     val mapper = new ObjectMapper()
     val xml = IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/sx/graph/bio/single_pubmed.xml"))
     val parser = new PMParser2()
     val article = parser.parse(xml)
 
-    println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(article))
+//    println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(article))
+
+    println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(PubMedToOaf.convert(article, vocabularies)))
 
   }
 
