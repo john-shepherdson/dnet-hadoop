@@ -1,14 +1,13 @@
 package eu.dnetlib.dhp.enrich.relsfrompublisherenricheddata;
 
-import com.azul.tooling.in.Model;
 import eu.dnetlib.dhp.common.author.SparkEnrichWithOrcidAuthors;
+import eu.dnetlib.dhp.common.person.CoAuthorshipIterator;
+import eu.dnetlib.dhp.common.person.Coauthors;
 import eu.dnetlib.dhp.orcidtoresultfromsemrel.OrcidAuthors;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
 import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
-import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
 import eu.dnetlib.dhp.utils.DHPUtils;
 import eu.dnetlib.dhp.utils.ORCIDAuthorEnricherResult;
 import eu.dnetlib.dhp.utils.OrcidAuthor;
@@ -57,6 +56,8 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 
 	}
 
+
+
 	private static OrcidAuthors getOrcidAuthorsList(List<Author> authors) {
 		OrcidAuthors oas = new OrcidAuthors();
 		List<OrcidAuthor> tmp = authors
@@ -102,12 +103,11 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 
 	@Override
 	public void generateGraph(SparkSession spark, String graphPath, String workingDir, String targetPath) {
-		//creates new relations
+		//creates new relations of authorship
 		Dataset<Relation> newRelations = spark.read().schema(Encoders.bean(ORCIDAuthorEnricherResult.class).schema())
 				.parquet(workingDir + "/publication_matched")
 				.selectExpr("id as doi", "enriched_author")
 				.flatMap((FlatMapFunction<Row, Relation>) this::getRelationsList, Encoders.bean(Relation.class));
-
 
 		//redirects new relations versus representatives if any
 		Dataset<Row> graph_relations = spark.read().schema(Encoders.bean(Relation.class).schema())
@@ -154,14 +154,24 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 
 		eauthors.forEach(author -> {
 			List<Row> pids =author.getAs("pid");
-			pids.forEach(p -> {
-				if(p.getAs("scheme")==ModelConstants.ORCID)
-					relationList.add(getRelations(r.getAs("doi"),author.getAs("raw_affiliation_string"), p.getAs("value")));
-			});
+			List<Row> pidList = pids.stream().filter(p -> ModelConstants.ORCID.equalsIgnoreCase(p.getAs("schema")) || ModelConstants.ORCID_PENDING.equalsIgnoreCase(p.getAs("schema"))).collect(Collectors.toList());
+			pidList.forEach(p -> relationList.add(getRelations(r.getAs("doi"),author.getAs("raw_affiliation_string"), p.getAs("value")))
+			);
+			new CoAuthorshipIterator(extractCoAuthors(pidList)).forEachRemaining(relationList::add);
+
 		});
 			return relationList.iterator();
     }
 
+	private static List<String> extractCoAuthors(List<Row> pidList) {
+
+		List<String> coauthors = new ArrayList<>();
+		for(Row pid : pidList)
+			coauthors.add(pid.getAs("Value"));
+
+
+		return coauthors;
+	}
 	private Relation getRelations(String doi, List<String> rawAffiliationString, String orcid) {
 		Relation rel = OafMapperUtils.getRelation("30|orcid_______::"+ DHPUtils.md5(orcid) , "50|doi_________::" + DHPUtils.md5(doi)
 				,ModelConstants.RESULT_PERSON_RELTYPE, ModelConstants.RESULT_PERSON_SUBRELTYPE, ModelConstants.RESULT_PERSON_HASAUTHORED,
@@ -272,9 +282,12 @@ public class EnrichExternalDataWithGraphORCID extends SparkEnrichWithOrcidAuthor
 		List<StructuredProperty> pids = new ArrayList<>();
 		List<String> affs = new ArrayList<>();
 
-		((List<Row>)a.getAs("pids")).forEach(pid -> pids.add(getPid(pid)));
+		List<Row> publisherPids = a.getAs("pids");
+		if(Optional.ofNullable(publisherPids).isPresent())
+			publisherPids.forEach(pid -> pids.add(getPid(pid)));
+		List<Row>affiliations = a.getAs("affiliations");
 		//"`Matchings`: ARRAY<STRUCT<`PID`:STRING, `Value`:STRING,`Confidence`:DOUBLE, `Status`:STRING>>,
-		((List<Row>)a.getAs("affiliations")).forEach(aff -> {
+		affiliations.forEach(aff -> {
 			if(aff.getAs("Status").equals(Boolean.TRUE))
 				affs.add(aff.getAs("PID") + "@@" + aff.getAs("Value") + "@@" + String.valueOf(aff.getAs("Confidence")));
 
