@@ -155,10 +155,11 @@ public abstract class AbstractMdRecordToOafMapper {
 
 			final Instance instance = prepareInstances(doc, entityInfo, collectedFrom, hostedBy);
 
-			if (!Optional.ofNullable(instance.getInstancetype())
-					.map(Qualifier::getClassid)
-					.filter(StringUtils::isNotBlank)
-					.isPresent()) {
+			if (!Optional
+				.ofNullable(instance.getInstancetype())
+				.map(Qualifier::getClassid)
+				.filter(StringUtils::isNotBlank)
+				.isPresent()) {
 				return Lists.newArrayList();
 			}
 
@@ -173,13 +174,16 @@ public abstract class AbstractMdRecordToOafMapper {
 
 	protected String getResultType(final Instance instance) {
 		if (this.vocs.vocabularyExists(ModelConstants.DNET_RESULT_TYPOLOGIES)) {
-			return Optional.ofNullable(instance.getInstancetype())
-					.map(Qualifier::getClassid)
-					.map(instanceType -> Optional
-								.ofNullable(this.vocs.getSynonymAsQualifier(ModelConstants.DNET_RESULT_TYPOLOGIES, instanceType))
-								.map(Qualifier::getClassid)
-								.orElse("0000"))
-					.orElse("0000");
+			return Optional
+				.ofNullable(instance.getInstancetype())
+				.map(Qualifier::getClassid)
+				.map(
+					instanceType -> Optional
+						.ofNullable(
+							this.vocs.getSynonymAsQualifier(ModelConstants.DNET_RESULT_TYPOLOGIES, instanceType))
+						.map(Qualifier::getClassid)
+						.orElse("0000"))
+				.orElse("0000");
 		} else {
 			throw new IllegalStateException("Missing vocabulary: " + ModelConstants.DNET_RESULT_TYPOLOGIES);
 		}
