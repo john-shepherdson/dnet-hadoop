@@ -162,6 +162,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
                 --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/publication</arg>
@@ -197,6 +198,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
                 --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/dataset</arg>
@@ -232,6 +234,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
                 --conf spark.sql.shuffle.partitions=5000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/otherresearchproduct</arg>
@@ -267,6 +270,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
                 --conf spark.sql.shuffle.partitions=2000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/software</arg>
@@ -302,6 +306,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
                 --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/datasource</arg>
@@ -337,6 +342,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
                 --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/organization</arg>
@@ -372,6 +378,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
                 --conf spark.sql.shuffle.partitions=2000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/project</arg>
@@ -407,6 +414,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
                 --conf spark.sql.shuffle.partitions=2000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/person</arg>
@@ -442,6 +450,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
                 --conf spark.sql.shuffle.partitions=20000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/relation</arg>
