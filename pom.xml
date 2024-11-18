@@ -937,7 +937,7 @@
         <commons.logging.version>1.1.3</commons.logging.version>
         <commons-validator.version>1.7</commons-validator.version>
         <dateparser.version>1.0.7</dateparser.version>
-        <dhp-schemas.version>[8.0.1]</dhp-schemas.version>
+        <dhp-schemas.version>[9.0.0]</dhp-schemas.version>
         <dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
         <dhp.commons.lang.version>3.5</dhp.commons.lang.version>
         <dhp.guava.version>11.0.2</dhp.guava.version>

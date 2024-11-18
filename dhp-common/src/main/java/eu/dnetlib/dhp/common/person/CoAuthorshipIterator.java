@@ -1,5 +1,5 @@
 
-package eu.dnetlib.dhp.actionmanager.personentity;
+package eu.dnetlib.dhp.common.person;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -61,7 +61,7 @@ public class CoAuthorshipIterator implements Iterator<Relation> {
 	private Relation getRelation(String orcid1, String orcid2) {
 		String source = PERSON_PREFIX + IdentifierFactory.md5(orcid1);
 		String target = PERSON_PREFIX + IdentifierFactory.md5(orcid2);
-		return OafMapperUtils
+		Relation relation = OafMapperUtils
 			.getRelation(
 				source, target, ModelConstants.PERSON_PERSON_RELTYPE,
 				ModelConstants.PERSON_PERSON_SUBRELTYPE,
@@ -76,5 +76,7 @@ public class CoAuthorshipIterator implements Iterator<Relation> {
 								ModelConstants.DNET_PROVENANCE_ACTIONS, ModelConstants.DNET_PROVENANCE_ACTIONS),
 						"0.91"),
 				null);
+		relation.setValidated(true);
+		return relation;
 	}
 }

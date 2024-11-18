@@ -1,0 +1,68 @@
+<workflow-app name="person_propagation" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>sourcePath</name>
+            <description>the source path</description>
+        </property>
+
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>oozie.action.sharelib.for.spark</name>
+                <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+        </configuration>
+    </global>
+
+    <start to="reset_outputpath"/>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="reset_outputpath">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="extract_person_relation_from_graph"/>
+        <error to="Kill"/>
+    </action>
+
+
+    <action name="extract_person_relation_from_graph">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>personPropagation</name>
+            <class>eu.dnetlib.dhp.person.SparkExtractPersonRelations</class>
+            <jar>dhp-enrichment-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.speculation=false
+                --conf spark.hadoop.mapreduce.map.speculative=false
+                --conf spark.hadoop.mapreduce.reduce.speculative=false
+                --conf spark.sql.shuffle.partitions=7680
+            </spark-opts>
+            <arg>--sourcePath</arg><arg>${sourcePath}/</arg>
+            <arg>--outputPath</arg><arg>${workingDir}/relation</arg>
+        </spark>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+
+
+    <end name="End"/>
+
+</workflow-app>

@@ -46,8 +46,8 @@ class DatasetMergerTest implements Serializable {
 	}
 
 	@Test
-	void datasetMergerTest() throws InstantiationException, IllegalAccessException, InvocationTargetException {
-		Dataset pub_merged = MergeUtils.mergeGroup(dedupId, datasets.stream().map(Tuple2::_2).iterator());
+	void datasetMergerTest() {
+		Dataset pub_merged = MergeUtils.mergeGroup(datasets.stream().map(Tuple2::_2).iterator());
 
 		// verify id
 		assertEquals(dedupId, pub_merged.getId());

@@ -6,7 +6,7 @@ import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory
 import eu.dnetlib.dhp.schema.oaf.{Author, DataInfo, Publication}
 import eu.dnetlib.doiboost.DoiBoostMappingUtil
 import eu.dnetlib.doiboost.DoiBoostMappingUtil.{createSP, generateDataInfo}
-import org.apache.commons.lang.StringUtils
+import org.apache.commons.lang3.StringUtils
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST._

@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -167,8 +168,9 @@ public class CreateRelatedEntitiesJob_phase1 {
 					result
 						.getDescription()
 						.stream()
-						.findFirst()
+						.filter(d -> Objects.nonNull(d.getValue()))
 						.map(Field::getValue)
+						.max(Comparator.comparingInt(String::length))
 						.ifPresent(
 							d -> re.setDescription(StringUtils.left(d, ModelHardLimits.MAX_RELATED_ABSTRACT_LENGTH)));
 				}
@@ -231,6 +233,14 @@ public class CreateRelatedEntitiesJob_phase1 {
 				if (!f.isEmpty()) {
 					re.setFundingtree(f.stream().map(Field::getValue).collect(Collectors.toList()));
 				}
+				break;
+			case person:
+				final Person person = (Person) entity;
+
+				re.setGivenName(person.getGivenName());
+				re.setFamilyName(person.getFamilyName());
+				re.setAlternativeNames(person.getAlternativeNames());
+
 				break;
 		}
 		return re;

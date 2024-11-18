@@ -98,9 +98,9 @@ public class PrepareAffiliationRelationsTest {
 					"-crossrefInputPath", crossrefAffiliationRelationPathNew,
 					"-pubmedInputPath", crossrefAffiliationRelationPath,
 					"-openapcInputPath", crossrefAffiliationRelationPathNew,
-					"-dataciteInputPath", crossrefAffiliationRelationPath,
-					"-webCrawlInputPath", crossrefAffiliationRelationPath,
-					"-publisherInputPath", publisherAffiliationRelationOldPath,
+					"-dataciteInputPath", crossrefAffiliationRelationPathNew,
+					"-webCrawlInputPath", crossrefAffiliationRelationPathNew,
+					"-publisherInputPath", publisherAffiliationRelationPath,
 					"-outputPath", outputPath
 				});
 
@@ -112,7 +112,7 @@ public class PrepareAffiliationRelationsTest {
 			.map(aa -> ((Relation) aa.getPayload()));
 
 		// count the number of relations
-		assertEquals(150, tmp.count());// 18 + 24 *3 + 30 * 2 =
+		assertEquals(162, tmp.count());// 18 + 24 + 30 * 4 =
 
 		Dataset<Relation> dataset = spark.createDataset(tmp.rdd(), Encoders.bean(Relation.class));
 		dataset.createOrReplaceTempView("result");
@@ -123,7 +123,7 @@ public class PrepareAffiliationRelationsTest {
 		// verify that we have equal number of bi-directional relations
 		Assertions
 			.assertEquals(
-				75, execVerification
+				81, execVerification
 					.filter(
 						"relClass='" + ModelConstants.HAS_AUTHOR_INSTITUTION + "'")
 					.collectAsList()
@@ -131,7 +131,7 @@ public class PrepareAffiliationRelationsTest {
 
 		Assertions
 			.assertEquals(
-				75, execVerification
+				81, execVerification
 					.filter(
 						"relClass='" + ModelConstants.IS_AUTHOR_INSTITUTION_OF + "'")
 					.collectAsList()
@@ -158,7 +158,7 @@ public class PrepareAffiliationRelationsTest {
 
 		Assertions
 			.assertEquals(
-				2, execVerification.filter("source = '" + publisherid + "' and target = '" + rorId + "'").count());
+				4, execVerification.filter("source = '" + publisherid + "' and target = '" + rorId + "'").count());
 
 		Assertions
 			.assertEquals(
@@ -173,7 +173,7 @@ public class PrepareAffiliationRelationsTest {
 
 		Assertions
 			.assertEquals(
-				3, execVerification
+				1, execVerification
 					.filter(
 						"source = '" + ID_PREFIX
 							+ IdentifierFactory

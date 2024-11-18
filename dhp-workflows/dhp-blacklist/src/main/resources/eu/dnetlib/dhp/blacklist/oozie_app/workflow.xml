@@ -63,6 +63,7 @@
         <path start="copy_software"/>
         <path start="copy_datasource"/>
         <path start="copy_project"/>
+        <path start="copy_person"/>
         <path start="copy_organization"/>
     </fork>
 
@@ -115,6 +116,15 @@
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <arg>${nameNode}/${sourcePath}/project</arg>
             <arg>${nameNode}/${outputPath}/project</arg>
+        </distcp>
+        <ok to="wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_person">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <arg>${nameNode}/${sourcePath}/person</arg>
+            <arg>${nameNode}/${outputPath}/person</arg>
         </distcp>
         <ok to="wait"/>
         <error to="Kill"/>

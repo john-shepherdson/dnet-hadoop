@@ -8,3 +8,4 @@ result_project classpath eu/dnetlib/dhp/wf/subworkflows/projecttoresult/oozie_ap
 community_project classpath eu/dnetlib/dhp/wf/subworkflows/resulttocommunityfromproject/oozie_app
 community_sem_rel classpath eu/dnetlib/dhp/wf/subworkflows/resulttocommunityfromsemrel/oozie_app
 country_propagation classpath eu/dnetlib/dhp/wf/subworkflows/countrypropagation/oozie_app
+person_propagation classpath eu/dnetlib/dhp/wf/subworkflows/person/oozie_app

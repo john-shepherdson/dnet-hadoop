@@ -1,8 +1,7 @@
 
 package eu.dnetlib.pace.common;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.*;
 
@@ -54,8 +53,17 @@ public class PaceFunctionTest extends AbstractPaceFunctions {
 		System.out.println("Fixed aliases  : " + fixAliases(TEST_STRING));
 	}
 
+	@Test()
+	public void countryInferenceTest_NPE() {
+		assertThrows(
+			NullPointerException.class,
+			() -> countryInference("UNKNOWN", null),
+			"Expected countryInference() to throw an NPE");
+	}
+
 	@Test
 	public void countryInferenceTest() {
+		assertEquals("UNKNOWN", countryInference("UNKNOWN", ""));
 		assertEquals("IT", countryInference("UNKNOWN", "Università di Bologna"));
 		assertEquals("UK", countryInference("UK", "Università di Bologna"));
 		assertEquals("IT", countryInference("UNKNOWN", "Universiteé de Naples"));

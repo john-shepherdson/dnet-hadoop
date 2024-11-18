@@ -48,12 +48,7 @@
             <groupId>io.github.classgraph</groupId>
             <artifactId>classgraph</artifactId>
         </dependency>
-        <dependency>
-            <groupId>eu.dnetlib.dhp</groupId>
-            <artifactId>dhp-aggregation</artifactId>
-            <version>1.2.5-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
+
 
 
     </dependencies>
