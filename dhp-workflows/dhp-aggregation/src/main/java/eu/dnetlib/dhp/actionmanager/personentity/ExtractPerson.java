@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -200,7 +201,7 @@ public class ExtractPerson implements Serializable {
 		return r;
 	}
 
-	private static @NotNull Relation getAuthorshipRelation(Row a) {
+	private static @NotNull Relation getAuthorshipRelation(Row a) throws JsonProcessingException {
 		String target = DOI_PREFIX
 			+ IdentifierFactory
 				.md5(PidCleaner.normalizePidValue(PidType.doi.toString(), a.getAs("DOI")));
@@ -216,6 +217,8 @@ public class ExtractPerson implements Serializable {
 				null,
 				null);
 
+		final Double trust = a.getAs("trust");
+
 		if (StringUtil.isNotBlank(a.getAs("orgid"))) {
 			KeyValue kv = new KeyValue();
 			kv.setKey("declared_affiliation");
@@ -226,9 +229,13 @@ public class ExtractPerson implements Serializable {
 					.setValue(
 						OPENORGS_PREFIX
 							+ IdentifierFactory.md5(PidCleaner.normalizePidValue("OPENORGS", a.getAs("orgid"))));
+			kv.setDataInfo(OafMapperUtils.dataInfo(false,"openaire",true,false,null,
+					String.valueOf(trust)));
+
 			if (!Optional.ofNullable(relation.getProperties()).isPresent())
 				relation.setProperties(new ArrayList<>());
 			relation.getProperties().add(kv);
+			System.out.println(new ObjectMapper().writeValueAsString(relation));
 		}
 		if (Optional.ofNullable(a.getAs("corresponding")).isPresent() &&
 			a.getAs("corresponding").equals("true")) {
@@ -650,25 +657,25 @@ public class ExtractPerson implements Serializable {
 					.readValue(value, Person.class),
 				Encoders.bean(Person.class));
 
+		Dataset<Relation> relations = getRelations(spark, workingDir + "/coauthorship")
+				.union(
+						getRelations(spark, workingDir + "/authorship"))
+				.union(
+						getRelations(spark, workingDir + "/affiliation"))
+				.union(
+						getRelations(spark, workingDir + "/project"))
+				.union(
+						getRelations(spark, workingDir + "/publishers"));
+
+		System.out.println(relations.count());
+
+
 		people
 			.toJavaRDD()
 			.map(p -> new AtomicAction(p.getClass(), p))
-			.union(
-				getRelations(spark, workingDir + "/authorship").toJavaRDD().map(r -> new AtomicAction(r.getClass(), r)))
-			.union(
-				getRelations(spark, workingDir + "/coauthorship")
-					.toJavaRDD()
-					.map(r -> new AtomicAction(r.getClass(), r)))
-			.union(
-				getRelations(spark, workingDir + "/affiliation")
-					.toJavaRDD()
-					.map(r -> new AtomicAction(r.getClass(), r)))
-			.union(
-				getRelations(spark, workingDir + "/project")
-					.toJavaRDD()
-					.map(r -> new AtomicAction(r.getClass(), r)))
-			.union(
-				getRelations(spark, workingDir + "/publishers")
+			.union(relations
+					.groupByKey((MapFunction<Relation, String>) r -> r.getSource() + r.getRelClass() + r.getTarget(), Encoders.STRING())
+					.mapGroups((MapGroupsFunction<String, Relation, Relation>) (k,it) ->  mergeRelation(it), Encoders.bean(Relation.class))
 					.toJavaRDD()
 					.map(r -> new AtomicAction(r.getClass(), r)))
 			.mapToPair(
