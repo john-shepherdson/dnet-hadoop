@@ -372,8 +372,8 @@ public class ExtractPerson implements Serializable {
 
 		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(orcid);
 
-		String target = PROJECT_ID_PREFIX + StringUtils.substringBefore(project, "::") + "::"
-			+ IdentifierFactory.md5(StringUtils.substringAfter(project, "::"));
+		String target = PROJECT_ID_PREFIX + StringUtils.substringBefore(project, SEPARATOR) + SEPARATOR
+			+ IdentifierFactory.md5(StringUtils.substringAfter(project, SEPARATOR));
 		List<KeyValue> properties = new ArrayList<>();
 
 		Relation relation = OafMapperUtils
