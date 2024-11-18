@@ -79,6 +79,11 @@ public class CreatePersonAS {
 				"/eu/dnetlib/dhp/actionmanager/person/")
 			.getPath();
 
+//		spark.read()
+//				.parquet("/Users/miriam/Downloads/part-00000-761dbe11-9f51-4275-a8fd-592649f334ef-c000.snappy.parquet")
+//						.write()
+//								.json("/tmp/part-00000.json");
+
 //
 //		spark
 //				.read()
@@ -123,30 +128,30 @@ public class CreatePersonAS {
 			.filter(v -> "eu.dnetlib.dhp.schema.oaf.Person".equalsIgnoreCase(v._1().toString()))
 			.map(value -> OBJECT_MAPPER.readValue(value._2().toString(), AtomicAction.class))
 			.map(aa -> ((Person) aa.getPayload()));
-//
+
 		Assertions.assertEquals(8, people.count());
 		Assertions
 			.assertEquals(
-				"Manuel Edelberto",
+				"Seda",
 				people
 					.filter(
-						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0003-0046-4895")))
+						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0001-6544-2588")))
 					.first()
 					.getGivenName());
 		Assertions
 			.assertEquals(
-				"Ortega Coello",
+				"Ardahan Sevgili",
 				people
 					.filter(
-						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0003-0046-4895")))
+						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0001-6544-2588")))
 					.first()
 					.getFamilyName());
 		Assertions
 			.assertEquals(
-				1,
+				0,
 				people
 					.filter(
-						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0003-0046-4895")))
+						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0001-6544-2588")))
 					.first()
 					.getAlternativeNames()
 					.size());
@@ -155,7 +160,7 @@ public class CreatePersonAS {
 				2,
 				people
 					.filter(
-						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0003-0046-4895")))
+						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0001-6544-2588")))
 					.first()
 					.getPid()
 					.size());
@@ -164,18 +169,14 @@ public class CreatePersonAS {
 			.assertTrue(
 				people
 					.filter(
-						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0003-0046-4895")))
+						p -> p.getPid().stream().anyMatch(id -> id.getValue().equalsIgnoreCase("0000-0001-6544-2588")))
 					.first()
 					.getPid()
 					.stream()
 					.anyMatch(
 						p -> p.getQualifier().getClassname().equalsIgnoreCase("Scopus Author ID")
-							&& p.getValue().equalsIgnoreCase("6603539671")));
-		relations
-				.filter(
-						r -> r.getSource().equalsIgnoreCase("30|orcid_______::" + DHPUtils.md5("0000-0001-6291-9619"))
-								&& r.getRelClass().equalsIgnoreCase(ModelConstants.RESULT_PERSON_HASAUTHORED))
-				.foreach(r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+							&& p.getValue().equalsIgnoreCase("57203318816")));
+
 
 		Assertions
 			.assertEquals(
@@ -227,8 +228,7 @@ public class CreatePersonAS {
 						r -> r.getSource().equalsIgnoreCase("30|orcid_______::" + DHPUtils.md5("0000-0001-6291-9619"))
 							&& r.getRelClass().equalsIgnoreCase(ModelConstants.PERSON_PERSON_HASCOAUTHORED))
 					.count());
-		Assertions.assertEquals(37, relations.count());
-		relations.foreach(r -> System.out.println(new ObjectMapper().writeValueAsString(r)));
+		Assertions.assertEquals(38, relations.count());
 
 		//check contribution from publisher papers
 		//the relation was merged with the other one already extracted from orcid
@@ -242,13 +242,7 @@ public class CreatePersonAS {
 		List<KeyValue> properties = filterRelations.first().getProperties();
 		Assertions.assertFalse(properties.isEmpty());
 		Assertions.assertEquals(4, properties.size());
-		properties.forEach(p-> {
-            try {
-                System.out.println(new ObjectMapper().writeValueAsString(p));
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        });
+
 		Assertions.assertEquals(1, properties.stream().filter(p->p.getKey().equalsIgnoreCase("corresponding")).count());
 		Assertions.assertEquals(1, properties.stream().filter(p->p.getKey().equalsIgnoreCase("corresponding") &&
 				p.getValue().equalsIgnoreCase("true")).count());
@@ -259,7 +253,12 @@ public class CreatePersonAS {
 				).count());
 		Assertions.assertEquals(2, properties.stream().filter(p->p.getKey().equalsIgnoreCase("role")).count());
 
-
+		JavaRDD<Relation> filterAffiliation = relations.filter(r -> r.getRelClass().equalsIgnoreCase(ModelConstants.ORG_PERSON_PARTICIPATES));
+		JavaRDD<Relation> rels = filterAffiliation;
+						rels.foreach(r-> System.out.println(new ObjectMapper().writeValueAsString(r)));
+		Assertions.assertEquals(4, filterAffiliation.count());
+		Assertions.assertEquals(3, filterAffiliation.filter(r -> r.getCollectedfrom().get(0).getValue().equalsIgnoreCase("OpenAIRE")).count());
+		Assertions.assertEquals(1, filterAffiliation.filter(r -> r.getCollectedfrom().get(0).getValue().equalsIgnoreCase("ORCID")).count());
 
 	}
 
