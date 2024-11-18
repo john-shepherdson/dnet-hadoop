@@ -412,7 +412,7 @@
                                         </xsl:choose>
                                     </oaf:accessrights>
 
-                                	<xsl:if test="//base_dc:rightsnorm">
+                                	<xsl:if test="//base_dc:rightsnorm and not(contains(//base_dc:rightsnorm, ';'))">
                                 		<oaf:license><xsl:value-of select="vocabulary:clean(//base_dc:rightsnorm, 'dnet:licenses')" /></oaf:license>
                                 	</xsl:if>
                                 	
