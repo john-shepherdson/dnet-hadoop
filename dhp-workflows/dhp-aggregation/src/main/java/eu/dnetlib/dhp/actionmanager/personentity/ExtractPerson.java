@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -56,6 +57,60 @@ public class ExtractPerson implements Serializable {
 	private static final Logger log = LoggerFactory.getLogger(ExtractPerson.class);
 	private static final String QUERY = "SELECT * FROM project_person WHERE pid_type = 'ORCID'";
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final String OPENAIRE_PREFIX = "openaire____";
+	private static final String SEPARATOR = "::";
+	private static final String orcidKey = "10|" + OPENAIRE_PREFIX + SEPARATOR
+		+ DHPUtils.md5(ModelConstants.ORCID.toLowerCase());
+
+	private static final String DOI_PREFIX = "50|doi_________::";
+
+	private static final String PMID_PREFIX = "50|pmid________::";
+	private static final String ARXIV_PREFIX = "50|arXiv_______::";
+
+	private static final String PMCID_PREFIX = "50|pmcid_______::";
+	private static final String ROR_PREFIX = "20|ror_________::";
+	private static final String PERSON_PREFIX = ModelSupport.getIdPrefix(Person.class)
+		+ IdentifierFactory.ID_PREFIX_SEPARATOR + ModelConstants.ORCID + "_______";
+	private static final String PROJECT_ID_PREFIX = ModelSupport.getIdPrefix(Project.class)
+		+ IdentifierFactory.ID_PREFIX_SEPARATOR;
+
+	public static final String ORCID_AUTHORS_CLASSID = "sysimport:crosswalk:orcid";
+	public static final String ORCID_AUTHORS_CLASSNAME = "Imported from ORCID";
+	public static final String FUNDER_AUTHORS_CLASSID = "sysimport:crosswalk:funderdatabase";
+	public static final String FUNDER_AUTHORS_CLASSNAME = "Imported from Funder Database";
+	public static final String OPENAIRE_DATASOURCE_ID = "10|infrastruct_::f66f1bd369679b5b077dcdf006089556";
+	public static final String OPENAIRE_DATASOURCE_NAME = "OpenAIRE";
+
+	public static List<KeyValue> collectedfromOpenAIRE = OafMapperUtils
+		.listKeyValues(OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
+
+	public static final DataInfo ORCIDDATAINFO = OafMapperUtils
+		.dataInfo(
+			false,
+			null,
+			false,
+			false,
+			OafMapperUtils
+				.qualifier(
+					ORCID_AUTHORS_CLASSID,
+					ORCID_AUTHORS_CLASSNAME,
+					ModelConstants.DNET_PROVENANCE_ACTIONS,
+					ModelConstants.DNET_PROVENANCE_ACTIONS),
+			"0.91");
+
+	public static final DataInfo FUNDERDATAINFO = OafMapperUtils
+		.dataInfo(
+			false,
+			null,
+			false,
+			false,
+			OafMapperUtils
+				.qualifier(
+					FUNDER_AUTHORS_CLASSID,
+					FUNDER_AUTHORS_CLASSNAME,
+					ModelConstants.DNET_PROVENANCE_ACTIONS,
+					ModelConstants.DNET_PROVENANCE_ACTIONS),
+			"0.91");
 
 	public static void main(final String[] args) throws IOException, ParseException {
 
@@ -316,8 +371,9 @@ public class ExtractPerson implements Serializable {
 	private static Relation getProjectRelation(String project, String orcid, String role) {
 
 		String source = PERSON_PREFIX + SEPARATOR + IdentifierFactory.md5(orcid);
-		String target = PROJECT_ID_PREFIX + project.substring(0, 14)
-			+ IdentifierFactory.md5(project.substring(15));
+
+		String target = PROJECT_ID_PREFIX + StringUtils.substringBefore(project, "::") + "::"
+			+ IdentifierFactory.md5(StringUtils.substringAfter(project, "::"));
 		List<KeyValue> properties = new ArrayList<>();
 
 		Relation relation = OafMapperUtils

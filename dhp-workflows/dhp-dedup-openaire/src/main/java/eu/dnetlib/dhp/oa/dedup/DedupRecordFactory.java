@@ -135,7 +135,7 @@ public class DedupRecordFactory {
 						return Collections.emptyIterator();
 					}
 
-					OafEntity mergedEntity = MergeUtils.mergeGroup(dedupId, cliques.iterator());
+					OafEntity mergedEntity = MergeUtils.mergeGroup(cliques.iterator());
 					// dedup records do not have date of transformation attribute
 					mergedEntity.setDateoftransformation(null);
 					mergedEntity
