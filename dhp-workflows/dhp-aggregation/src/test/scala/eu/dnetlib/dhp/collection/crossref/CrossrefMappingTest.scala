@@ -25,8 +25,18 @@ class CrossrefMappingTest extends AbstractVocabularyTest {
     val input =
       IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/collection/crossref/issn_pub.json"), "utf-8")
 
-    println(Crossref2Oaf.convert(input, vocabularies, TransformationType.All))
+    Crossref2Oaf.convert(input, vocabularies, TransformationType.All).foreach(record => {
+      println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(record))
+    })
 
   }
 
+
+  @Test
+  def mappingAffiliation(): Unit = {
+    val input =
+      IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/collection/crossref/affiliationTest.json"), "utf-8")
+    val data = Crossref2Oaf.convert(input, vocabularies, TransformationType.OnlyResult)
+    println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(data.head))
+  }
 }
