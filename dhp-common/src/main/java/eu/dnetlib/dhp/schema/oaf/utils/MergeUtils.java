@@ -74,29 +74,29 @@ public class MergeUtils {
 			if (!vocs.vocabularyExists(ModelConstants.DNET_RESULT_TYPOLOGIES)) {
 				return (T) mergedResult;
 			} else {
-				final Qualifier expectedResultType = vocs
-					.lookupTermBySynonym(
-						ModelConstants.DNET_RESULT_TYPOLOGIES,
-						i.getInstancetype().getClassid());
-
-				if (Objects.isNull(expectedResultType)) {
-					throw new IllegalArgumentException(
-						"instance type not bound to any result type in dnet:result_typologies: " +
-							i.getInstancetype().getClassid());
-				}
+				final String expectedResultType = Optional
+					.ofNullable(
+						vocs
+							.lookupTermBySynonym(
+								ModelConstants.DNET_RESULT_TYPOLOGIES, i.getInstancetype().getClassid()))
+					.orElse(ModelConstants.ORP_DEFAULT_RESULTTYPE)
+					.getClassid();
 
 				// there is a clash among the result types
-				if (!expectedResultType.getClassid().equals(mergedResult.getResulttype().getClassid())) {
-					try {
-						String resulttype = expectedResultType.getClassid();
-						if (EntityType.otherresearchproduct.toString().equals(resulttype)) {
-							resulttype = "other";
-						}
-						Result result = (Result) ModelSupport.oafTypes.get(resulttype).newInstance();
-						return (T) mergeResultFields(result, mergedResult);
-					} catch (InstantiationException | IllegalAccessException e) {
-						throw new IllegalStateException(e);
-					}
+				if (!expectedResultType.equals(mergedResult.getResulttype().getClassid())) {
+
+					Result result = (Result) Optional
+						.ofNullable(ModelSupport.oafTypes.get(expectedResultType))
+						.map(r -> {
+							try {
+								return r.newInstance();
+							} catch (InstantiationException | IllegalAccessException e) {
+								throw new IllegalStateException(e);
+							}
+						})
+						.orElse(new OtherResearchProduct());
+					result.setId(mergedResult.getId());
+					return (T) mergeResultFields(result, mergedResult);
 				} else {
 					return (T) mergedResult;
 				}
