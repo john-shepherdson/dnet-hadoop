@@ -1,8 +1,7 @@
 [
-  {"paramName":"mt",  "paramLongName":"master",         "paramDescription": "should be local or yarn",                  "paramRequired": true},
-  {"paramName":"i",   "paramLongName":"isLookupUrl",    "paramDescription": "isLookupUrl",                              "paramRequired": true},
-  {"paramName":"w",   "paramLongName":"workingPath",    "paramDescription": "the path of the sequencial file to read",  "paramRequired": true},
-  {"paramName":"mo",   "paramLongName":"mdstoreOutputVersion",     "paramDescription": "the oaf path ",                            "paramRequired": true},
-  {"paramName":"s",   "paramLongName":"skipUpdate",     "paramDescription": "skip update ",                             "paramRequired": false},
-  {"paramName":"h",   "paramLongName":"hdfsServerUri",  "paramDescription": "the  working path ",                       "paramRequired": true}
+  {"paramName":"mt",  "paramLongName":"master",               "paramDescription": "should be local or yarn",                  "paramRequired": true},
+  {"paramName":"i",   "paramLongName":"isLookupUrl",          "paramDescription": "isLookupUrl",                              "paramRequired": true},
+  {"paramName":"s",   "paramLongName":"sourcePath",           "paramDescription": "the baseline path",                        "paramRequired": true},
+  {"paramName":"mo",  "paramLongName":"mdstoreOutputVersion", "paramDescription": "the mdstore path to save",                 "paramRequired": true}
+
 ]
