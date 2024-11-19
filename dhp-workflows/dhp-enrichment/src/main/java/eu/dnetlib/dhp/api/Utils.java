@@ -33,17 +33,17 @@ public class Utils implements Serializable {
 	private static final ObjectMapper MAPPER = new ObjectMapper();
 	private static final VerbResolver resolver = VerbResolverFactory.newInstance();
 
-	private static final Logger log = LoggerFactory.getLogger(Utils.class);
-
 	public static CommunityConfiguration getCommunityConfiguration(String baseURL) throws IOException {
 		final Map<String, Community> communities = Maps.newHashMap();
+		List<CommunityModel> communityList = getValidCommunities(baseURL);
 		List<Community> validCommunities = new ArrayList<>();
-		getValidCommunities(baseURL)
+		communityList
 			.forEach(community -> {
 				try {
 					CommunityModel cm = MAPPER
 						.readValue(QueryCommunityAPI.community(community.getId(), baseURL), CommunityModel.class);
 					validCommunities.add(getCommunity(cm));
+
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
@@ -70,30 +70,89 @@ public class Utils implements Serializable {
 			}
 		});
 
+		//add subcommunities information if any
+		communityList.forEach(community -> {
+			try {
+				List<SubCommunityModel> subcommunities = getSubcommunities(community.getId(), baseURL);
+				subcommunities.forEach(sc ->
+						validCommunities.add(getSubCommunityConfiguration(baseURL, community.getId(), sc)));
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+
+		});
+
 		validCommunities.forEach(community -> {
 			if (community.isValid())
 				communities.put(community.getId(), community);
 		});
+
+
 		return new CommunityConfiguration(communities);
 	}
 
-	private static Community getCommunity(CommunityModel cm) {
+	private static @NotNull Community getSubCommunityConfiguration(String baseURL, String communityId, SubCommunityModel sc) {
+		Community c = getCommunity(sc);
+		c.setProviders(getSubcommunityDatasources(baseURL, communityId, sc.getSubCommunityId()));
+
+		return c;
+	}
+
+	private static List<Provider> getSubcommunityDatasources(String baseURL, String communityId, String subcommunityId) {
+		try {
+		DatasourceList dl = null;
+			dl = MAPPER
+					.readValue(
+							QueryCommunityAPI.subcommunityDatasource(communityId, subcommunityId, baseURL), DatasourceList.class);
+			return dl.stream().map(d -> {
+						if (d.getEnabled() == null || Boolean.FALSE.equals(d.getEnabled()))
+							return null;
+						Provider p = new Provider();
+						p.setOpenaireId(ModelSupport.getIdPrefix(Datasource.class) + "|" + d.getOpenaireId());
+						p.setSelectionConstraints(d.getSelectioncriteria());
+						if (p.getSelectionConstraints() != null)
+							p.getSelectionConstraints().setSelection(resolver);
+						return p;
+					})
+					.filter(Objects::nonNull)
+					.collect(Collectors.toList());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static <C extends CommonConfigurationModel> Community getCommonConfiguration(C input){
 		Community c = new Community();
-		c.setId(cm.getId());
-		c.setZenodoCommunities(cm.getOtherZenodoCommunities());
-		if (StringUtils.isNotBlank(cm.getZenodoCommunity()))
-			c.getZenodoCommunities().add(cm.getZenodoCommunity());
-		c.setSubjects(cm.getSubjects());
-		c.getSubjects().addAll(cm.getFos());
-		c.getSubjects().addAll(cm.getSdg());
-		if (cm.getAdvancedConstraints() != null) {
-			c.setConstraints(cm.getAdvancedConstraints());
+		c.setZenodoCommunities(input.getOtherZenodoCommunities());
+		if (StringUtils.isNotBlank(input.getZenodoCommunity()))
+			c.getZenodoCommunities().add(input.getZenodoCommunity());
+		c.setSubjects(input.getSubjects());
+		c.getSubjects().addAll(input.getFos());
+		c.getSubjects().addAll(input.getSdg());
+		if (input.getAdvancedConstraints() != null) {
+			c.setConstraints(input.getAdvancedConstraints());
 			c.getConstraints().setSelection(resolver);
 		}
-		if (cm.getRemoveConstraints() != null) {
-			c.setRemoveConstraints(cm.getRemoveConstraints());
+		if (input.getRemoveConstraints() != null) {
+			c.setRemoveConstraints(input.getRemoveConstraints());
 			c.getRemoveConstraints().setSelection(resolver);
 		}
+		return c;
+
+	}
+
+	private static Community getCommunity(SubCommunityModel sc) {
+		Community c = getCommonConfiguration(sc);
+		c.setId(sc.getSubCommunityId());
+		return c;
+	}
+
+
+
+	private static Community getCommunity(CommunityModel cm) {
+		Community c = getCommonConfiguration(cm);
+		c.setId(cm.getId());
+
 		return c;
 	}
 
@@ -105,6 +164,10 @@ public class Utils implements Serializable {
 				community -> !community.getStatus().equals("hidden") &&
 					(community.getType().equals("ri") || community.getType().equals("community")))
 			.collect(Collectors.toList());
+	}
+
+	public static List<SubCommunityModel> getSubcommunities(String communityId, String baseURL) throws IOException {
+		return MAPPER.readValue(QueryCommunityAPI.subcommunities(communityId, baseURL), SubCommunitySummary.class);
 	}
 
 	/**

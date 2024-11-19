@@ -43,9 +43,16 @@ public class QueryCommunityAPI {
 
 	}
 
+	public static String subcommunities(String communityId, String baseURL) throws IOException {
+
+		return get(baseURL + communityId + "/subcommunities");
+
+	}
+
+
 	public static String communityDatasource(String id, String baseURL) throws IOException {
 
-		return get(baseURL + id + "/contentproviders");
+		return get(baseURL + id + "/datasources");
 
 	}
 
@@ -78,4 +85,7 @@ public class QueryCommunityAPI {
 		return body;
 	}
 
+	public static String subcommunityDatasource(String communityId, String subcommunityId, String baseURL) throws IOException {
+		return get(baseURL + communityId + "/subcommunities/datasources?subCommunityId=" + subcommunityId);
+	}
 }

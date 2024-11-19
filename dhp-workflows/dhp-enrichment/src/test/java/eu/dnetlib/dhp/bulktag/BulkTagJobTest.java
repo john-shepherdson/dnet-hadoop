@@ -9,6 +9,13 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import eu.dnetlib.dhp.api.QueryCommunityAPI;
+import eu.dnetlib.dhp.api.Utils;
+import eu.dnetlib.dhp.api.model.CommunityModel;
+import eu.dnetlib.dhp.api.model.SubCommunityModel;
+import eu.dnetlib.dhp.api.model.SubCommunitySummary;
+import eu.dnetlib.dhp.bulktag.community.CommunityConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -1947,6 +1954,21 @@ public class BulkTagJobTest {
 					"-nameNode", "local"
 				});
 
+	}
+
+	@Test
+	public void testApi() throws IOException {
+		String baseURL = "https://dev-openaire.d4science.org/openaire/community/";
+		List<SubCommunityModel> subcommunities = Utils.getSubcommunities("clarin", baseURL);
+
+		CommunityConfiguration tmp = Utils.getCommunityConfiguration(baseURL);
+				tmp.getCommunities().keySet().forEach(c -> {
+                    try {
+                        System.out.println(new ObjectMapper().writeValueAsString(tmp.getCommunities().get(c)));
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
 	}
 
 }
