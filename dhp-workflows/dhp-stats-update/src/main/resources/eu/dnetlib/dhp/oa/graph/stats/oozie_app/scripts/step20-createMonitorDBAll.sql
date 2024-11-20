@@ -1,3 +1,5 @@
+set mapred.job.queue.name=analytics; /*EOS*/
+
 drop database if exists TARGET cascade;
 create database if not exists TARGET;
 
@@ -81,11 +83,17 @@ create table TARGET.result stored as parquet as
              'openorgs____::8839b55dae0c84d56fd533f52d5d483a',   -- Leibniz Institute of Ecological Urban and Regional Development
              'openorgs____::526468206bca24c1c90da6a312295cf4',	-- Cyprus University of Technology
              'openorgs____::b5ca9d4340e26454e367e2908ef3872f',	-- Alma Mater Studiorum University of Bologna
-             'openorgs____::a6340e6ecf60f6bba163659df985b0f2',  -- TU Dresden
-             'openorgs____::64badd35233ba2cd4946368ef2f4cf57',  --	University of Vienna
+             'openorgs____::a6340e6ecf60f6bba163659df985b0f2',	-- TU Dresden
+             'openorgs____::64badd35233ba2cd4946368ef2f4cf57',  -- University of Vienna
              'openorgs____::7501d66d2297a963ebfb075c43fff88e',  -- Royal Institute of Technology
-             'openorgs____::d5eb679abdd31f70fcd4c8ba711148bf',  -- Sorbonne University
-             'openorgs____::b316f25380d106aac402f5ae8653910d'  --	Centre for Research on Ecology and Forestry Applications
+             'openorgs____::d5eb679abdd31f70fcd4c8ba711148bf',	-- Sorbonne University
+             'openorgs____::b316f25380d106aac402f5ae8653910d',  -- Centre for Research on Ecology and Forestry Applications
+             'openorgs____::45a2076eee3013e0e85625ce61bcd272',  -- Institut d'Investigació Sanitària Illes Balears
+             'openorgs____::00b20b0a743a96169e6cf135e6e2bd7c',  -- Universidad Publica De Navarra
+             'openorgs____::0f398605c2459294d125ff23473a97dc',  -- Aalto University
+             'openorgs____::25b1fa62c7fd8e409d3a83c07e04b2d4',  -- WHU-Otto Beisheim School of Management
+             'openorgs____::d6eec313417f11205db4e736a34c0db6',  -- KEMPELENOV INSTITUT INTELIGENTNYCH TECHNOLOGII
+             'openorgs____::c2dfb90e797a2dc52f0084c549289d0c'  -- National Research Institute for Agriculture, Food and Environment
         ) )) foo;
 
 create view if not exists TARGET.category as select * from SOURCE.category;
@@ -256,7 +264,6 @@ create table TARGET.indi_pub_interdisciplinarity stored as parquet as select * f
 
 create table TARGET.result_apc_affiliations stored as parquet as select * from SOURCE.result_apc_affiliations orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 create table TARGET.result_instance stored as parquet as select * from SOURCE.result_instance orig where exists (select 1 from TARGET.result r where r.id=orig.id);
-create table TARGET.result_orcid stored as parquet as select * from SOURCE.result_orcid orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 create table TARGET.indi_pub_publicly_funded stored as parquet as select * from SOURCE.indi_pub_publicly_funded orig where exists (select 1 from TARGET.result r where r.id=orig.id);
 
 create table TARGET.indi_is_project_result_after stored as parquet as select * from SOURCE.indi_is_project_result_after orig where exists (select 1 from TARGET.result r where r.id=orig.result_id);

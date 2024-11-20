@@ -13,13 +13,13 @@ public class CommunityContentprovider {
 	private String openaireId;
 	private SelectionConstraints selectioncriteria;
 
-	private String enabled;
+	private Boolean enabled;
 
-	public String getEnabled() {
+	public Boolean getEnabled() {
 		return enabled;
 	}
 
-	public void setEnabled(String enabled) {
+	public void setEnabled(Boolean enabled) {
 		this.enabled = enabled;
 	}
 

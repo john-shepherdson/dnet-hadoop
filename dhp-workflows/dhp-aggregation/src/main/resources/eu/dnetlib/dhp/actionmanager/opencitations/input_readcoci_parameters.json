@@ -24,12 +24,13 @@
     "paramLongName": "outputPath",
     "paramDescription": "the hdfs name node",
     "paramRequired": true
-  },  {
-  "paramName": "nn",
-  "paramLongName": "hdfsNameNode",
-  "paramDescription": "the hdfs name node",
-  "paramRequired": true
-}
+  },
+  {
+    "paramName": "nn",
+    "paramLongName": "hdfsNameNode",
+    "paramDescription": "the hdfs name node",
+    "paramRequired": true
+  }
 ]
 
 

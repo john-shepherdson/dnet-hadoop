@@ -125,6 +125,7 @@
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -147,6 +148,7 @@
         <path start="PromoteActionPayloadForPublicationTable"/>
         <path start="PromoteActionPayloadForRelationTable"/>
         <path start="PromoteActionPayloadForSoftwareTable"/>
+        <path start="PromoteActionPayloadForPersonTable"/>
     </fork>
 
     <action name="PromoteActionPayloadForDatasetTable">
@@ -257,6 +259,21 @@
     <action name="PromoteActionPayloadForSoftwareTable">
         <sub-workflow>
             <app-path>${wf:appPath()}/promote_action_payload_for_software_table</app-path>
+            <propagate-configuration/>
+            <configuration>
+                <property>
+                    <name>inputActionPayloadRootPath</name>
+                    <value>${workingDir}/action_payload_by_type</value>
+                </property>
+            </configuration>
+        </sub-workflow>
+        <ok to="JoinPromote"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="PromoteActionPayloadForPersonTable">
+        <sub-workflow>
+            <app-path>${wf:appPath()}/promote_action_payload_for_person_table</app-path>
             <propagate-configuration/>
             <configuration>
                 <property>

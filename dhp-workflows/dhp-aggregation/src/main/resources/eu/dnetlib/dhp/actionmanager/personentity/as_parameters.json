@@ -1,0 +1,50 @@
+[
+  {
+    "paramName": "ip",
+    "paramLongName": "inputPath",
+    "paramDescription": "the zipped opencitations file",
+    "paramRequired": true
+  },
+  {
+    "paramName": "op",
+    "paramLongName": "outputPath",
+    "paramDescription": "the working path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "the hdfs name node",
+    "paramRequired": false
+  }, {
+  "paramName": "wd",
+  "paramLongName": "workingDir",
+  "paramDescription": "the hdfs name node",
+  "paramRequired": false
+},
+  {
+    "paramName": "pu",
+    "paramLongName": "postgresUrl",
+    "paramDescription": "the hdfs name node",
+    "paramRequired": false
+  },
+
+  {
+    "paramName": "ps",
+    "paramLongName": "postgresUser",
+    "paramDescription": "the hdfs name node",
+    "paramRequired": false
+  },
+  {
+  "paramName": "pp",
+  "paramLongName": "postgresPassword",
+  "paramDescription": "the hdfs name node",
+  "paramRequired": false
+},{
+  "paramName": "nn",
+  "paramLongName": "hdfsNameNode",
+  "paramDescription": "the hdfs name node",
+  "paramRequired": false
+}
+
+]

@@ -442,29 +442,6 @@
 
             <dependency>
                 <groupId>eu.dnetlib</groupId>
-                <artifactId>dnet-actionmanager-common</artifactId>
-                <version>${dnet-actionmanager-common.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.apache.hadoop</groupId>
-                        <artifactId>hadoop-common</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>eu.dnetlib</groupId>
-                <artifactId>dnet-actionmanager-api</artifactId>
-                <version>${dnet-actionmanager-api.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>eu.dnetlib</groupId>
-                        <artifactId>cnr-misc-utils</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>eu.dnetlib</groupId>
                 <artifactId>cnr-rmi-api</artifactId>
                 <version>${cnr-rmi-api.version}</version>
             </dependency>
@@ -960,7 +937,7 @@
         <commons.logging.version>1.1.3</commons.logging.version>
         <commons-validator.version>1.7</commons-validator.version>
         <dateparser.version>1.0.7</dateparser.version>
-        <dhp-schemas.version>[6.1.2]</dhp-schemas.version>
+        <dhp-schemas.version>[9.0.0]</dhp-schemas.version>
         <dhp.cdh.version>cdh5.9.2</dhp.cdh.version>
         <dhp.commons.lang.version>3.5</dhp.commons.lang.version>
         <dhp.guava.version>11.0.2</dhp.guava.version>
@@ -969,8 +946,6 @@
         <dhp.oozie.version>4.1.0-${dhp.cdh.version}</dhp.oozie.version>
         <dhp.site.skip>true</dhp.site.skip>
         <dhp.spark.version>2.4.0.cloudera2</dhp.spark.version>
-        <dnet-actionmanager-api.version>[4.0.3]</dnet-actionmanager-api.version>
-        <dnet-actionmanager-common.version>[6.0.5]</dnet-actionmanager-common.version>
         <dnet-openaire-broker-common.version>[3.1.6]</dnet-openaire-broker-common.version>
         <google.gson.version>2.2.2</google.gson.version>
         <log4j.version>1.2.17</log4j.version>
@@ -994,6 +969,25 @@
 
     <!-- Build with scala 12 and Spark 3.4 -->
     <profiles>
+        <!-- Activate ARM-compatible snappy dependency on new Silicon Macs -->
+        <profile>
+            <id>arm-silicon-mac</id>
+            <activation>
+                <os>
+                    <arch>aarch64</arch>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.xerial.snappy</groupId>
+                        <artifactId>snappy-java</artifactId>
+                        <version>1.1.8.4</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
+        </profile>
         <profile>
             <id>spark-34</id>
             <properties>

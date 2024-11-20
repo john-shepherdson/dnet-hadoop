@@ -1,8 +1,7 @@
 
 package eu.dnetlib.pace.common;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.*;
 
@@ -52,6 +51,58 @@ public class PaceFunctionTest extends AbstractPaceFunctions {
 	@Test
 	public void testFixAliases() {
 		System.out.println("Fixed aliases  : " + fixAliases(TEST_STRING));
+	}
+
+	@Test()
+	public void countryInferenceTest_NPE() {
+		assertThrows(
+			NullPointerException.class,
+			() -> countryInference("UNKNOWN", null),
+			"Expected countryInference() to throw an NPE");
+	}
+
+	@Test
+	public void countryInferenceTest() {
+		assertEquals("UNKNOWN", countryInference("UNKNOWN", ""));
+		assertEquals("IT", countryInference("UNKNOWN", "Università di Bologna"));
+		assertEquals("UK", countryInference("UK", "Università di Bologna"));
+		assertEquals("IT", countryInference("UNKNOWN", "Universiteé de Naples"));
+		assertEquals("UNKNOWN", countryInference("UNKNOWN", "Università del Lavoro"));
+	}
+
+	@Test
+	public void cityInferenceTest() {
+		assertEquals("universita city::3181928", cityInference("Università di Bologna"));
+		assertEquals("university city::3170647", cityInference("University of Pisa"));
+		assertEquals("universita", cityInference("Università del lavoro"));
+		assertEquals("universita city::3173331 city::3169522", cityInference("Università di Modena e Reggio Emilia"));
+	}
+
+	@Test
+	public void keywordInferenceTest() {
+		assertEquals("key::41 turin", keywordInference("Polytechnic University of Turin"));
+		assertEquals("key::41 torino", keywordInference("POLITECNICO DI TORINO"));
+		assertEquals(
+			"key::1 key::60 key::81 milano bergamo",
+			keywordInference("Universita farmaceutica culturale di milano bergamo"));
+		assertEquals("key::1 key::1 milano milano", keywordInference("universita universita milano milano"));
+		assertEquals(
+			"key::10 kapodistriako panepistemio athenon",
+			keywordInference("Εθνικό και Καποδιστριακό Πανεπιστήμιο Αθηνών"));
+	}
+
+	@Test
+	public void cityKeywordInferenceTest() {
+		assertEquals("key::41 city::3165524", cityKeywordInference("Polytechnic University of Turin"));
+		assertEquals("key::41 city::3165524", cityKeywordInference("POLITECNICO DI TORINO"));
+		assertEquals(
+			"key::1 key::60 key::81 city::3173435 city::3182164",
+			cityKeywordInference("Universita farmaceutica culturale di milano bergamo"));
+		assertEquals(
+			"key::1 key::1 city::3173435 city::3173435", cityKeywordInference("universita universita milano milano"));
+		assertEquals(
+			"key::10 kapodistriako panepistemio city::264371",
+			cityKeywordInference("Εθνικό και Καποδιστριακό Πανεπιστήμιο Αθηνών"));
 	}
 
 }

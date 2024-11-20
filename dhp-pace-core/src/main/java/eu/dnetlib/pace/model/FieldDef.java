@@ -47,7 +47,35 @@ public class FieldDef implements Serializable {
 
 	private String clean;
 
+	private String infer;
+
+	private String inferenceFrom;
+
 	public FieldDef() {
+	}
+
+	public FieldDef clone() {
+		FieldDef fieldDef = new FieldDef();
+		fieldDef.setName(this.name);
+		fieldDef.setPath(this.path);
+		fieldDef.setType(this.type);
+		fieldDef.setOverrideMatch(this.overrideMatch);
+		fieldDef.setSize(this.size);
+		fieldDef.setLength(this.length);
+		fieldDef.setFilter(this.filter);
+		fieldDef.setSorted(this.sorted);
+		fieldDef.setClean(this.clean);
+		fieldDef.setInfer(this.infer);
+		fieldDef.setInferenceFrom(this.inferenceFrom);
+		return fieldDef;
+	}
+
+	public String getInferenceFrom() {
+		return inferenceFrom;
+	}
+
+	public void setInferenceFrom(final String inferenceFrom) {
+		this.inferenceFrom = inferenceFrom;
 	}
 
 	public String getName() {
@@ -124,6 +152,14 @@ public class FieldDef implements Serializable {
 
 	public void setClean(String clean) {
 		this.clean = clean;
+	}
+
+	public String getInfer() {
+		return infer;
+	}
+
+	public void setInfer(String infer) {
+		this.infer = infer;
 	}
 
 	@Override

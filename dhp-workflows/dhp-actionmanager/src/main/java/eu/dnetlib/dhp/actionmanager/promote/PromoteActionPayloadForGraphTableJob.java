@@ -151,12 +151,17 @@ public class PromoteActionPayloadForGraphTableJob {
 		SparkSession spark, String path, Class<G> rowClazz) {
 		logger.info("Reading graph table from path: {}", path);
 
-		return spark
-			.read()
-			.textFile(path)
-			.map(
-				(MapFunction<String, G>) value -> OBJECT_MAPPER.readValue(value, rowClazz),
-				Encoders.bean(rowClazz));
+		if (HdfsSupport.exists(path, spark.sparkContext().hadoopConfiguration())) {
+			return spark
+				.read()
+				.textFile(path)
+				.map(
+					(MapFunction<String, G>) value -> OBJECT_MAPPER.readValue(value, rowClazz),
+					Encoders.bean(rowClazz));
+		} else {
+			logger.info("Found empty graph table from path: {}", path);
+			return spark.emptyDataset(Encoders.bean(rowClazz));
+		}
 	}
 
 	private static <A extends Oaf> Dataset<A> readActionPayload(
@@ -223,7 +228,7 @@ public class PromoteActionPayloadForGraphTableJob {
 				rowClazz,
 				actionPayloadClazz);
 
-		if (shouldGroupById) {
+		if (Boolean.TRUE.equals(shouldGroupById)) {
 			return PromoteActionPayloadFunctions
 				.groupGraphTableByIdAndMerge(
 					joinedAndMerged, rowIdFn, mergeRowsAndGetFn, zeroFn, isNotZeroFn, rowClazz);
@@ -250,6 +255,8 @@ public class PromoteActionPayloadForGraphTableJob {
 				return () -> clazz.cast(new eu.dnetlib.dhp.schema.oaf.Relation());
 			case "eu.dnetlib.dhp.schema.oaf.Software":
 				return () -> clazz.cast(new eu.dnetlib.dhp.schema.oaf.Software());
+			case "eu.dnetlib.dhp.schema.oaf.Person":
+				return () -> clazz.cast(new eu.dnetlib.dhp.schema.oaf.Person());
 			default:
 				throw new RuntimeException("unknown class: " + clazz.getCanonicalName());
 		}

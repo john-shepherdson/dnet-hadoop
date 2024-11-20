@@ -65,7 +65,13 @@ public class RunSQLSparkJob {
 				for (String statement : sql.split(";\\s*/\\*\\s*EOS\\s*\\*/\\s*")) {
 					log.info("executing: {}", statement);
 					long startTime = System.currentTimeMillis();
-					spark.sql(statement).show();
+					try {
+						spark.sql(statement).show();
+					} catch (Exception e) {
+						log.error("Error executing statement: {}", statement, e);
+						System.err.println("Error executing statement: " + statement + "\n" + e);
+						throw e;
+					}
 					log
 						.info(
 							"executed in {}",

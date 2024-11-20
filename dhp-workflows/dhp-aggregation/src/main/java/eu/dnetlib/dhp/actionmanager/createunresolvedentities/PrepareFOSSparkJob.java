@@ -115,19 +115,7 @@ public class PrepareFOSSparkJob implements Serializable {
 			.forEach(
 				l -> add(sbjs, getSubject(l, FOS_CLASS_ID, FOS_CLASS_NAME, UPDATE_SUBJECT_FOS_CLASS_ID, true)));
 		r.setSubject(sbjs);
-		r
-			.setDataInfo(
-				OafMapperUtils
-					.dataInfo(
-						false, null, true,
-						false,
-						OafMapperUtils
-							.qualifier(
-								ModelConstants.PROVENANCE_ENRICH,
-								null,
-								ModelConstants.DNET_PROVENANCE_ACTIONS,
-								ModelConstants.DNET_PROVENANCE_ACTIONS),
-						null));
+
 		return r;
 	}
 

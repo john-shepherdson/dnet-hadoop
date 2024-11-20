@@ -2,14 +2,13 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.spark.api.java.function.FlatMapFunction;
 import org.apache.spark.api.java.function.FlatMapGroupsFunction;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.api.java.function.ReduceFunction;
 import org.apache.spark.sql.*;
 
 import eu.dnetlib.dhp.oa.dedup.model.Identifier;
@@ -107,6 +106,8 @@ public class DedupRecordFactory {
 
 					final HashSet<String> acceptanceDate = new HashSet<>();
 
+					boolean isVisible = false;
+
 					while (it.hasNext()) {
 						Tuple3<String, String, OafEntity> t = it.next();
 						OafEntity entity = t._3();
@@ -114,6 +115,7 @@ public class DedupRecordFactory {
 						if (entity == null) {
 							aliases.add(t._2());
 						} else {
+							isVisible = isVisible || !entity.getDataInfo().getInvisible();
 							cliques.add(entity);
 
 							if (acceptanceDate.size() < MAX_ACCEPTANCE_DATE) {
@@ -129,13 +131,20 @@ public class DedupRecordFactory {
 
 					}
 
-					if (acceptanceDate.size() >= MAX_ACCEPTANCE_DATE || cliques.isEmpty()) {
+					if (!isVisible || acceptanceDate.size() >= MAX_ACCEPTANCE_DATE || cliques.isEmpty()) {
 						return Collections.emptyIterator();
 					}
 
-					OafEntity mergedEntity = MergeUtils.mergeGroup(dedupId, cliques.iterator());
+					OafEntity mergedEntity = MergeUtils.mergeGroup(cliques.iterator());
 					// dedup records do not have date of transformation attribute
 					mergedEntity.setDateoftransformation(null);
+					mergedEntity
+						.setMergedIds(
+							Stream
+								.concat(cliques.stream().map(OafEntity::getId), aliases.stream())
+								.distinct()
+								.sorted()
+								.collect(Collectors.toList()));
 
 					return Stream
 						.concat(
