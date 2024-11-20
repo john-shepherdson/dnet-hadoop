@@ -135,7 +135,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<Instance> prepareInstances(
+	protected Instance prepareInstances(
 		final Document doc,
 		final DataInfo info,
 		final KeyValue collectedfrom,
@@ -197,7 +197,7 @@ public class OafToOafMapper extends AbstractMdRecordToOafMapper {
 			instance.getUrl().addAll(validUrl);
 		}
 
-		return Lists.newArrayList(instance);
+		return instance;
 	}
 
 	/**

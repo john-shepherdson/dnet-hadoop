@@ -69,6 +69,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 
 		Dataset<Relation> mergeRels = spark
 			.read()
+			.schema(REL_BEAN_ENC.schema())
 			.load(DedupUtility.createMergeRelPath(workingPath, "*", "*"))
 			.as(REL_BEAN_ENC);
 

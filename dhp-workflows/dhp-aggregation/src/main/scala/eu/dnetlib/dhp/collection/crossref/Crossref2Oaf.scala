@@ -667,11 +667,12 @@ case object Crossref2Oaf {
     val doi = input.getString(0)
     val rorId = input.getString(1)
 
-    val pubId = s"50|${PidType.doi.toString.padTo(12, "_")}::${DoiCleaningRule.clean(doi)}"
+
+    val pubId = IdentifierFactory.idFromPid("50", "doi", DoiCleaningRule.clean(doi), true)
     val affId = GenerateRorActionSetJob.calculateOpenaireId(rorId)
 
     val r: Relation = new Relation
-    DoiCleaningRule.clean(doi)
+
     r.setSource(pubId)
     r.setTarget(affId)
     r.setRelType(ModelConstants.RESULT_ORGANIZATION)
@@ -955,7 +956,26 @@ case object Crossref2Oaf {
             case "10.13039/501100010790" =>
               generateSimpleRelationFromAward(funder, "erasmusplus_", a => a)
             case _ => logger.debug("no match for " + funder.DOI.get)
-
+            //Add for Danish funders
+            //Independent Research Fund Denmark (IRFD)
+            case "10.13039/501100004836" =>
+              generateSimpleRelationFromAward(funder, "irfd________", a => a)
+              val targetId = getProjectId("irfd________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            //Carlsberg Foundation (CF)
+            case "10.13039/501100002808" =>
+              generateSimpleRelationFromAward(funder, "cf__________", a => a)
+              val targetId = getProjectId("cf__________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            //Novo Nordisk Foundation (NNF)
+            case "10.13039/501100009708" =>
+              generateSimpleRelationFromAward(funder, "nnf___________", a => a)
+              val targetId = getProjectId("nnf_________", "1e5e62235d094afd01cd56e65112fc63")
+              queue += generateRelation(sourceId, targetId, ModelConstants.IS_PRODUCED_BY)
+              queue += generateRelation(targetId, sourceId, ModelConstants.PRODUCES)
+            case _ => logger.debug("no match for " + funder.DOI.get)
           }
 
         } else {
