@@ -8,8 +8,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
@@ -93,15 +91,14 @@ public class Utils implements Serializable {
 
 	private static @NotNull Community getSubCommunityConfiguration(String baseURL, String communityId, SubCommunityModel sc) {
 		Community c = getCommunity(sc);
-		c.setProviders(getSubcommunityDatasources(baseURL, communityId, sc.getSubCommunityId()));
+		c.setProviders(getRelevantDatasources(baseURL, communityId, sc.getSubCommunityId()));
 
 		return c;
 	}
 
-	private static List<Provider> getSubcommunityDatasources(String baseURL, String communityId, String subcommunityId) {
+	private static List<Provider> getRelevantDatasources(String baseURL, String communityId, String subcommunityId) {
 		try {
-		DatasourceList dl = null;
-			dl = MAPPER
+		DatasourceList dl =  MAPPER
 					.readValue(
 							QueryCommunityAPI.subcommunityDatasource(communityId, subcommunityId, baseURL), DatasourceList.class);
 			return dl.stream().map(d -> {
@@ -239,50 +236,77 @@ public class Utils implements Serializable {
 		return projectMap;
 	}
 
-	private static void addRelevantProjects(String communityId, String baseURL, CommunityEntityMap communityEntityMap){
-		int page = -1;
-		int size = 100;
-		ContentModel cm = new ContentModel();
-		do {
-			page++;
-			try {
-				cm = MAPPER
-						.readValue(
-								QueryCommunityAPI
-										.communityProjects(
-												communityId, String.valueOf(page), String.valueOf(size), baseURL),
-								ContentModel.class);
-				if (!cm.getContent().isEmpty()) {
-					cm.getContent().forEach(p -> updateEntityMap(communityId, p.getOpenaireId(),communityEntityMap, ModelSupport.getIdPrefix(Project.class)));
-				}
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		} while (!cm.getLast());
+	private static void addRelevantProjects(
+			String communityId,
+			String baseURL,
+			CommunityEntityMap communityEntityMap
+	) {
+		fetchAndProcessProjects(
+				(page, size) -> {
+                    try {
+                        return QueryCommunityAPI.communityProjects(communityId, String.valueOf(page), String.valueOf(size), baseURL);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+				communityId,
+				communityEntityMap
+		);
 	}
 
-	private static void addRelevantProjects(String communityId, String subcommunityId, String baseURL, CommunityEntityMap communityEntityMap){
-		int page = -1;
-		int size = 100;
-		ContentModel cm = new ContentModel();
-		do {
-			page++;
-			try {
-				cm = MAPPER
-						.readValue(
-								QueryCommunityAPI
-										.subcommunityProjects(
-												communityId, subcommunityId , String.valueOf(page), String.valueOf(size), baseURL),
-								ContentModel.class);
-				if (!cm.getContent().isEmpty()) {
-					cm.getContent().forEach(p -> updateEntityMap(communityId, p.getOpenaireId(),communityEntityMap, ModelSupport.getIdPrefix(Project.class)));
-				}
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		} while (!cm.getLast());
+	private static void addRelevantProjects(
+			String communityId,
+			String subcommunityId,
+			String baseURL,
+			CommunityEntityMap communityEntityMap
+	) {
+		fetchAndProcessProjects(
+				(page, size) -> {
+                    try {
+                        return QueryCommunityAPI.subcommunityProjects(communityId, subcommunityId, String.valueOf(page), String.valueOf(size), baseURL);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                },
+				communityId,
+				communityEntityMap
+		);
 	}
 
+	@FunctionalInterface
+	private interface ProjectQueryFunction {
+		String query(int page, int size);
+	}
+	private static void fetchAndProcessProjects(
+			ProjectQueryFunction projectQueryFunction,
+			String communityId,
+			CommunityEntityMap communityEntityMap
+	) {
+		int page = 0;
+		final int size = 100;
+		ContentModel contentModel;
+
+		do {
+			try {
+				String response = projectQueryFunction.query(page, size);
+				contentModel = MAPPER.readValue(response, ContentModel.class);
+
+				if (!contentModel.getContent().isEmpty()) {
+					contentModel.getContent().forEach(project ->
+							updateEntityMap(
+									communityId,
+									project.getOpenaireId(),
+									communityEntityMap,
+									ModelSupport.getIdPrefix(Project.class)
+							)
+					);
+				}
+			} catch (IOException e) {
+				throw new RuntimeException("Error processing projects for community: " + communityId, e);
+			}
+			page++;
+		} while (!contentModel.getLast());
+	}
 	public static List<String> getCommunityIdList(String baseURL) throws IOException {
 		return getValidCommunities(baseURL)
 			.stream()
