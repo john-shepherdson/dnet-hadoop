@@ -170,65 +170,117 @@ public class Utils implements Serializable {
 		return MAPPER.readValue(QueryCommunityAPI.subcommunities(communityId, baseURL), SubCommunitySummary.class);
 	}
 
+	private static void getRelatedOrganizations(String communityId, String baseURL, CommunityEntityMap communityEntityMap){
+
+		try {
+			List<String> associatedOrgs = MAPPER
+					.readValue(
+							QueryCommunityAPI.communityPropagationOrganization(communityId, baseURL), OrganizationList.class);
+			associatedOrgs.forEach(o -> updateEntityMap(communityId, o, communityEntityMap, ModelSupport.getIdPrefix(Organization.class)));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+	private static void getRelatedOrganizations(String communityId, String subcommunityId, String baseURL, CommunityEntityMap communityEntityMap){
+
+		try {
+			List<String> associatedOrgs = MAPPER
+					.readValue(
+							QueryCommunityAPI.subcommunityPropagationOrganization(communityId, subcommunityId, baseURL), OrganizationList.class);
+			associatedOrgs.forEach(o -> updateEntityMap(communityId, o, communityEntityMap, ModelSupport.getIdPrefix(Organization.class)));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+	}
+
+	private static void updateEntityMap(String communityId, String entityId, CommunityEntityMap communityEntityMap, String entityPrefix){
+
+			if (!communityEntityMap
+					.containsKey(entityPrefix + "|" + entityId))
+                communityEntityMap.put(entityPrefix + "|" + entityId, new ArrayList<>());
+
+		communityEntityMap.get(entityPrefix + "|" + entityId).add(communityId);
+
+	}
 	/**
 	 * it returns for each organization the list of associated communities
 	 */
 	public static CommunityEntityMap getCommunityOrganization(String baseURL) throws IOException {
 		CommunityEntityMap organizationMap = new CommunityEntityMap();
-		String entityPrefix = ModelSupport.getIdPrefix(Organization.class);
-		getValidCommunities(baseURL)
-			.forEach(community -> {
-				String id = community.getId();
-				try {
-					List<String> associatedOrgs = MAPPER
-						.readValue(
-							QueryCommunityAPI.communityPropagationOrganization(id, baseURL), OrganizationList.class);
-					associatedOrgs.forEach(o -> {
-						if (!organizationMap
-							.keySet()
-							.contains(
-								entityPrefix + "|" + o))
-							organizationMap.put(entityPrefix + "|" + o, new ArrayList<>());
-						organizationMap.get(entityPrefix + "|" + o).add(community.getId());
-					});
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
-			});
+		List<CommunityModel> communityList = getValidCommunities(baseURL);
+			communityList.forEach(community -> {
+				getRelatedOrganizations(community.getId(), baseURL, organizationMap );
+                try {
+                    List<SubCommunityModel> subcommunities = getSubcommunities(community.getId(), baseURL);
+					subcommunities.forEach(sc -> getRelatedOrganizations(community.getId(), sc.getSubCommunityId(), baseURL, organizationMap));
+					} catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
 		return organizationMap;
 	}
 
 	public static CommunityEntityMap getCommunityProjects(String baseURL) throws IOException {
 		CommunityEntityMap projectMap = new CommunityEntityMap();
-		String entityPrefix = ModelSupport.getIdPrefix(Project.class);
+
 		getValidCommunities(baseURL)
 			.forEach(community -> {
-				int page = -1;
-				int size = 100;
-				ContentModel cm = new ContentModel();
-				do {
-					page++;
-					try {
-						cm = MAPPER
-							.readValue(
-								QueryCommunityAPI
-									.communityProjects(
-										community.getId(), String.valueOf(page), String.valueOf(size), baseURL),
-								ContentModel.class);
-						if (cm.getContent().size() > 0) {
-							cm.getContent().forEach(p -> {
-								if (!projectMap.keySet().contains(entityPrefix + "|" + p.getOpenaireId()))
-									projectMap.put(entityPrefix + "|" + p.getOpenaireId(), new ArrayList<>());
-								projectMap.get(entityPrefix + "|" + p.getOpenaireId()).add(community.getId());
-							});
-						}
-					} catch (IOException e) {
-						throw new RuntimeException(e);
-					}
-				} while (!cm.getLast());
+				addRelevantProjects(community.getId(), baseURL, projectMap);
+				try {
+					List<SubCommunityModel> subcommunities = getSubcommunities(community.getId(), baseURL);
+					subcommunities.forEach(sc -> addRelevantProjects(community.getId(), sc.getSubCommunityId(), baseURL, projectMap));
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 			});
 		return projectMap;
+	}
+
+	private static void addRelevantProjects(String communityId, String baseURL, CommunityEntityMap communityEntityMap){
+		int page = -1;
+		int size = 100;
+		ContentModel cm = new ContentModel();
+		do {
+			page++;
+			try {
+				cm = MAPPER
+						.readValue(
+								QueryCommunityAPI
+										.communityProjects(
+												communityId, String.valueOf(page), String.valueOf(size), baseURL),
+								ContentModel.class);
+				if (!cm.getContent().isEmpty()) {
+					cm.getContent().forEach(p -> updateEntityMap(communityId, p.getOpenaireId(),communityEntityMap, ModelSupport.getIdPrefix(Project.class)));
+				}
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		} while (!cm.getLast());
+	}
+
+	private static void addRelevantProjects(String communityId, String subcommunityId, String baseURL, CommunityEntityMap communityEntityMap){
+		int page = -1;
+		int size = 100;
+		ContentModel cm = new ContentModel();
+		do {
+			page++;
+			try {
+				cm = MAPPER
+						.readValue(
+								QueryCommunityAPI
+										.subcommunityProjects(
+												communityId, subcommunityId , String.valueOf(page), String.valueOf(size), baseURL),
+								ContentModel.class);
+				if (!cm.getContent().isEmpty()) {
+					cm.getContent().forEach(p -> updateEntityMap(communityId, p.getOpenaireId(),communityEntityMap, ModelSupport.getIdPrefix(Project.class)));
+				}
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		} while (!cm.getLast());
 	}
 
 	public static List<String> getCommunityIdList(String baseURL) throws IOException {
