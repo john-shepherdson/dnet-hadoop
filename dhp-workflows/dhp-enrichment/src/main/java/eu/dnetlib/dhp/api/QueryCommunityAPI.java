@@ -37,12 +37,6 @@ public class QueryCommunityAPI {
 
 	}
 
-	public static String community(String id, String baseURL) throws IOException {
-
-		return get(baseURL + id);
-
-	}
-
 	public static String subcommunities(String communityId, String baseURL) throws IOException {
 
 		return get(baseURL + communityId + "/subcommunities");
@@ -56,6 +50,8 @@ public class QueryCommunityAPI {
 
 	}
 
+
+
 	public static String communityPropagationOrganization(String id, String baseURL) throws IOException {
 
 		return get(baseURL + id + "/propagationOrganizations");
@@ -66,6 +62,10 @@ public class QueryCommunityAPI {
 
 		return get(baseURL + id + "/projects/" + page + "/" + size);
 
+	}
+
+	public static String propagationOrganizationCommunityMap(String baseURL) throws IOException {
+		return get(baseURL + "/propagationOrganizationCommunityMap");
 	}
 
 	@NotNull
@@ -95,5 +95,9 @@ public class QueryCommunityAPI {
 
 	public static String subcommunityProjects(String communityId, String subcommunityId, String page, String size, String baseURL) throws IOException {
 		return get(baseURL + communityId + "/subcommunities/projects/" + page + "/" + size + "?subCommunityId=" + subcommunityId);
+	}
+
+	public static String propagationDatasourceCommunityMap(String baseURL) throws IOException {
+		return get(baseURL + "/propagationDatasourceCommunityMap");
 	}
 }

@@ -18,4 +18,13 @@ public class CommunityEntityMap extends HashMap<String, List<String>> {
 		}
 		return super.get(key);
 	}
+
+	public void add(String key, String value){
+		if(!super.containsKey(key)){
+			super.put(key, new ArrayList<>());
+		}
+		super.get(key).add(value);
+	}
+
+
 }

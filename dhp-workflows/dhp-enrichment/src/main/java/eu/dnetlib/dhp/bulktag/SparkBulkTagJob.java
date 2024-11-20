@@ -113,12 +113,19 @@ public class SparkBulkTagJob {
 					spark, inputPath, outputPath, protoMap, cc);
 				execEntityTag(
 					spark, inputPath + "organization", outputPath + "organization",
-					Utils.getCommunityOrganization(baseURL), Organization.class, TaggingConstants.CLASS_ID_ORGANIZATION,
+					Utils.getCommunityOrganization(baseURL),
+					//Utils.getOrganizationCommunityMap(baseURL),
+						Organization.class, TaggingConstants.CLASS_ID_ORGANIZATION,
 					TaggingConstants.CLASS_NAME_BULKTAG_ORGANIZATION);
 				execEntityTag(
-					spark, inputPath + "project", outputPath + "project", Utils.getCommunityProjects(baseURL),
+					spark, inputPath + "project", outputPath + "project",
+						Utils.getProjectCommunityMap(baseURL),
 					Project.class, TaggingConstants.CLASS_ID_PROJECT, TaggingConstants.CLASS_NAME_BULKTAG_PROJECT);
-				execDatasourceTag(spark, inputPath, outputPath, Utils.getDatasourceCommunities(baseURL));
+				execEntityTag(
+						spark, inputPath + "datasource", outputPath + "datasource",
+						Utils.getCommunityDatasource(baseURL),
+						//Utils.getDatasourceCommunityMap(baseURL),
+						Datasource.class, TaggingConstants.CLASS_ID_DATASOURCE, TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE);
 
 			});
 	}
@@ -184,62 +191,6 @@ public class SparkBulkTagJob {
 			.json(inputPath);
 	}
 
-	private static void execDatasourceTag(SparkSession spark, String inputPath, String outputPath,
-		List<EntityCommunities> datasourceCommunities) {
-		Dataset<Datasource> datasource = readPath(spark, inputPath + "datasource", Datasource.class);
-
-		Dataset<EntityCommunities> dc = spark
-			.createDataset(datasourceCommunities, Encoders.bean(EntityCommunities.class));
-
-		datasource
-			.joinWith(dc, datasource.col("id").equalTo(dc.col("entityId")), "left")
-			.map((MapFunction<Tuple2<Datasource, EntityCommunities>, Datasource>) t2 -> {
-				Datasource ds = t2._1();
-				if (t2._2() != null) {
-
-					List<String> context = Optional
-						.ofNullable(ds.getContext())
-						.map(v -> v.stream().map(c -> c.getId()).collect(Collectors.toList()))
-						.orElse(new ArrayList<>());
-
-					if (!Optional.ofNullable(ds.getContext()).isPresent())
-						ds.setContext(new ArrayList<>());
-
-					t2._2().getCommunitiesId().forEach(c -> {
-						if (!context.contains(c)) {
-							Context con = new Context();
-							con.setId(c);
-							con
-								.setDataInfo(
-									Arrays
-										.asList(
-											OafMapperUtils
-												.dataInfo(
-													false, TaggingConstants.BULKTAG_DATA_INFO_TYPE, true, false,
-													OafMapperUtils
-														.qualifier(
-															TaggingConstants.CLASS_ID_DATASOURCE,
-															TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE,
-															ModelConstants.DNET_PROVENANCE_ACTIONS,
-															ModelConstants.DNET_PROVENANCE_ACTIONS),
-													"1")));
-							ds.getContext().add(con);
-						}
-					});
-				}
-				return ds;
-			}, Encoders.bean(Datasource.class))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(outputPath + "datasource");
-
-		readPath(spark, outputPath + "datasource", Datasource.class)
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(inputPath + "datasource");
-	}
 
 	private static void extendCommunityConfigurationForEOSC(SparkSession spark, String inputPath,
 		CommunityConfiguration cc) {

@@ -52,6 +52,7 @@ public class PrepareResultCommunitySet {
 		log.info("baseURL: {}", baseURL);
 
 		final CommunityEntityMap organizationMap = Utils.getCommunityOrganization(baseURL);
+		//final CommunityEntityMap organizationMap = Utils.getOrganizationCommunityMap(baseURL);
 		log.info("organizationMap: {}", new Gson().toJson(organizationMap));
 
 		SparkConf conf = new SparkConf();

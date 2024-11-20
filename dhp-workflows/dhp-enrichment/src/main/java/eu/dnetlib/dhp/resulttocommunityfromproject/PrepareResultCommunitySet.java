@@ -2,13 +2,11 @@
 package eu.dnetlib.dhp.resulttocommunityfromproject;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
-import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
 import java.util.*;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.MapGroupsFunction;
@@ -18,16 +16,10 @@ import org.apache.spark.sql.types.StructType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-
 import eu.dnetlib.dhp.api.Utils;
 import eu.dnetlib.dhp.api.model.CommunityEntityMap;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.resulttocommunityfromorganization.ResultCommunityList;
-import eu.dnetlib.dhp.resulttocommunityfromorganization.ResultOrganizations;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import scala.Tuple2;
 
 public class PrepareResultCommunitySet {
 
@@ -55,7 +47,7 @@ public class PrepareResultCommunitySet {
 		final String baseURL = parser.get("baseURL");
 		log.info("baseURL: {}", baseURL);
 
-		final CommunityEntityMap projectsMap = Utils.getCommunityProjects(baseURL);
+		final CommunityEntityMap projectsMap = Utils.getProjectCommunityMap(baseURL);
 
 		SparkConf conf = new SparkConf();
 

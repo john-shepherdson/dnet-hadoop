@@ -6,15 +6,11 @@ import static eu.dnetlib.dhp.bulktag.community.TaggingConstants.ZENODO_COMMUNITY
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import eu.dnetlib.dhp.api.QueryCommunityAPI;
 import eu.dnetlib.dhp.api.Utils;
-import eu.dnetlib.dhp.api.model.CommunityModel;
 import eu.dnetlib.dhp.api.model.SubCommunityModel;
-import eu.dnetlib.dhp.api.model.SubCommunitySummary;
 import eu.dnetlib.dhp.bulktag.community.CommunityConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -25,7 +21,6 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FilterFunction;
-import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
