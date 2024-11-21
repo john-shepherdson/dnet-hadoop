@@ -7,6 +7,7 @@ import eu.dnetlib.dhp.schema.sx.OafUtils
 import java.util
 import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
+import scala.collection.mutable.ArrayBuffer
 import scala.util.control.Breaks.{break, breakable}
 
 case class OrcidAuthor(
@@ -20,9 +21,9 @@ case class OrcidAuthor(
 }
 
 case class MatchedAuthors(
-                           @BeanProperty var author: Author,
-                           @BeanProperty var orcid: OrcidAuthor,
-                           @BeanProperty var `type`: String
+  @BeanProperty var author: Author,
+  @BeanProperty var orcid: OrcidAuthor,
+  @BeanProperty var `type`: String
 )
 
 case class MatchData(
@@ -47,13 +48,14 @@ object ORCIDAuthorEnricher extends Serializable {
     id: String,
     graph_authors: java.util.List[Author],
     orcid_authors: java.util.List[OrcidAuthor],
-    classid:String,
-    provenance:String
+    classid: String,
+    provenance: String
   ): ORCIDAuthorEnricherResult = {
     // Author enriching strategy:
     // 1) create a copy of graph author list in unmatched_authors
     // 2) find best match in unmatched_authors, remove it from unmatched_authors and enrich it so
-    //     that the enrichment is reflected in  graph_authors (they share author instances)
+    //     that the enrichment is reflected in  graph_authors (they share author instances).
+    //     Do not match in case of ambiguity: two authors match and at least one of them has affiliation string
     // 3) repeat (2) till the end of the list and then with different matching algorithms that have decreasing
     //    trust in their output
     // At the end unmatched_authors will contain authors not matched with any of the matching algos
@@ -87,7 +89,19 @@ object ORCIDAuthorEnricher extends Serializable {
         (author, orcid) =>
           AuthorMatchers
             .matchOrderedTokenAndAbbreviations(author.getFullname, orcid.givenName + " " + orcid.familyName),
-        "orderedTokens",
+        "orderedTokens-1",
+        classid,
+        provenance,
+        skipAmbiguities = true
+      ) ++
+      // split author names in tokens, order the tokens, then check for matches of full tokens or abbreviations
+      extractAndEnrichMatches(
+        unmatched_authors,
+        orcid_authors,
+        (author, orcid) =>
+          AuthorMatchers
+            .matchOrderedTokenAndAbbreviations(author.getFullname, orcid.givenName + " " + orcid.familyName),
+        "orderedTokens-2",
         classid,
         provenance
       ) ++
@@ -116,50 +130,54 @@ object ORCIDAuthorEnricher extends Serializable {
   }
 
   private def extractAndEnrichMatches(
-                                       graph_authors: java.util.List[Author],
-                                       orcid_authors: java.util.List[OrcidAuthor],
-                                       matchingFunc: (Author, OrcidAuthor) => Boolean,
-                                       matchName: String,
-                                       classid:String,
-                                       provenance : String
-  ) = {
-    val matched = scala.collection.mutable.ArrayBuffer.empty[MatchedAuthors]
+    unmatched_authors: java.util.List[Author],
+    orcid_authors: java.util.List[OrcidAuthor],
+    matchingFunc: (Author, OrcidAuthor) => Boolean,
+    matchName: String,
+    classid: String,
+    provenance: String,
+    skipAmbiguities: Boolean = false
+  ): ArrayBuffer[MatchedAuthors] = {
+    val matched = ArrayBuffer.empty[MatchedAuthors]
 
-    if (graph_authors != null && !graph_authors.isEmpty) {
-      val ait = graph_authors.iterator
+    if (unmatched_authors == null || unmatched_authors.isEmpty) {
+      return matched
+    }
 
-      while (ait.hasNext) {
-        val author = ait.next()
-        val oit = orcid_authors.iterator
-
-        breakable {
-          while (oit.hasNext) {
-            val orcid = oit.next()
-
-            if (matchingFunc(author, orcid)) {
-              ait.remove()
-              oit.remove()
-              matched += MatchedAuthors(author, orcid, matchName)
-
-              if (author.getPid == null) {
-                author.setPid(new util.ArrayList[StructuredProperty]())
-              }
-
-             val orcidPID = OafUtils.createSP(orcid.orcid, classid, classid)
-             //val orcidPID = OafUtils.createSP(orcid.orcid, ModelConstants.ORCID, ModelConstants.ORCID)
-              orcidPID.setDataInfo(OafUtils.generateDataInfo())
-              orcidPID.getDataInfo.setProvenanceaction(
-                //OafUtils.createQualifier("ORCID_ENRICHMENT", "ORCID_ENRICHMENT")
-                OafUtils.createQualifier(provenance, provenance)
-              )
-
-              author.getPid.add(orcidPID)
-
-              break()
-            }
-          }
+    val oit = orcid_authors.iterator
+    while (oit.hasNext) {
+      val orcid = oit.next()
+      val candidates = unmatched_authors.asScala.foldLeft(ArrayBuffer[Author]())((res, author) => {
+        if (matchingFunc(author, orcid)) {
+          res += author
         }
+
+        res
+      })
+
+      if (
+        candidates.size == 1 ||
+        (candidates.size > 1 && !skipAmbiguities && !candidates
+          .exists(a => a.getRawAffiliationString != null && !a.getRawAffiliationString.isEmpty))
+      ) {
+        val author = candidates(0)
+        unmatched_authors.remove(author)
+        oit.remove()
+        matched += MatchedAuthors(author, orcid, matchName)
+
+        if (author.getPid == null) {
+          author.setPid(new util.ArrayList[StructuredProperty]())
+        }
+
+        val orcidPID = OafUtils.createSP(orcid.orcid, classid, classid)
+        orcidPID.setDataInfo(OafUtils.generateDataInfo())
+        orcidPID.getDataInfo.setProvenanceaction(
+          OafUtils.createQualifier(provenance, provenance)
+        )
+
+        author.getPid.add(orcidPID)
       }
+
     }
 
     matched
