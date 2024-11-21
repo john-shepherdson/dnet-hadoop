@@ -113,8 +113,7 @@ public class SparkBulkTagJob {
 					spark, inputPath, outputPath, protoMap, cc);
 				execEntityTag(
 					spark, inputPath + "organization", outputPath + "organization",
-					Utils.getCommunityOrganization(baseURL),
-					//Utils.getOrganizationCommunityMap(baseURL),
+					Utils.getOrganizationCommunityMap(baseURL),
 						Organization.class, TaggingConstants.CLASS_ID_ORGANIZATION,
 					TaggingConstants.CLASS_NAME_BULKTAG_ORGANIZATION);
 				execEntityTag(
@@ -123,8 +122,7 @@ public class SparkBulkTagJob {
 					Project.class, TaggingConstants.CLASS_ID_PROJECT, TaggingConstants.CLASS_NAME_BULKTAG_PROJECT);
 				execEntityTag(
 						spark, inputPath + "datasource", outputPath + "datasource",
-						Utils.getCommunityDatasource(baseURL),
-						//Utils.getDatasourceCommunityMap(baseURL),
+						Utils.getDatasourceCommunityMap(baseURL),
 						Datasource.class, TaggingConstants.CLASS_ID_DATASOURCE, TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE);
 
 			});
