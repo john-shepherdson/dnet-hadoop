@@ -15,10 +15,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,7 +111,7 @@ public class SparkBulkTagJob {
 					spark, inputPath, outputPath, protoMap, cc);
 				execEntityTag(
 					spark, inputPath + "organization", outputPath + "organization",
-					Utils.getOrganizationCommunityMap(baseURL),
+					mapWithRepresentative(spark, inputPath + "relation", Utils.getOrganizationCommunityMap(baseURL)),
 						Organization.class, TaggingConstants.CLASS_ID_ORGANIZATION,
 					TaggingConstants.CLASS_NAME_BULKTAG_ORGANIZATION);
 				execEntityTag(
@@ -126,6 +124,38 @@ public class SparkBulkTagJob {
 						Datasource.class, TaggingConstants.CLASS_ID_DATASOURCE, TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE);
 
 			});
+	}
+
+	private static CommunityEntityMap mapWithRepresentative(SparkSession spark, String relationPath
+			, CommunityEntityMap organizationCommunityMap) {
+		Dataset<Row> mergesRel = spark.read().schema(Encoders.bean(Relation.class).schema())
+				.json(relationPath)
+				.filter("datainfo.deletedbyinference != true and relClass = 'merges")
+				.select("source", "target");
+
+		ArrayList<String> idList = organizationCommunityMap.keySet()
+                .stream()
+                .map(k -> ModelSupport.idPrefixMap.get(Organization.class) + "|" + k).collect(Collectors.toCollection(ArrayList::new));
+
+		Dataset<String> organizationIdentifiers = spark.createDataset(idList, Encoders.STRING());
+		List<Row> mappedKeys = organizationIdentifiers.join(mergesRel, organizationIdentifiers.col("_1").equalTo(mergesRel.col("target")), "left_semi")
+				.select("source", "target").collectAsList();
+
+			for (Row mappedEntry : mappedKeys) {
+				String oldKey = mappedEntry.getAs("target");
+				String newKey = mappedEntry.getAs("source");
+				//inserts the newKey in the map while removing the oldKey. The remove produces the value in the Map, which
+				//will be used as the newValue parameter of the BiFunction
+				organizationCommunityMap.merge(newKey, organizationCommunityMap.remove(oldKey), (existing, newValue) ->{
+					existing.addAll(newValue);
+					return existing;
+				});
+
+			}
+
+
+		return organizationCommunityMap;
+
 	}
 
 	private static <E extends OafEntity> void execEntityTag(SparkSession spark, String inputPath, String outputPath,

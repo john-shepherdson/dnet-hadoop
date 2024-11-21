@@ -43,7 +43,8 @@ public class Community implements Serializable {
 	}
 
 	public void setSubjects(List<String> subjects) {
-		this.subjects = subjects;
+		if(subjects != null)
+			this.subjects = subjects;
 	}
 
 	public List<Provider> getProviders() {
@@ -59,7 +60,8 @@ public class Community implements Serializable {
 	}
 
 	public void setZenodoCommunities(List<String> zenodoCommunities) {
-		this.zenodoCommunities = zenodoCommunities;
+		if(zenodoCommunities!=null)
+			this.zenodoCommunities = zenodoCommunities;
 	}
 
 	public SelectionConstraints getConstraints() {

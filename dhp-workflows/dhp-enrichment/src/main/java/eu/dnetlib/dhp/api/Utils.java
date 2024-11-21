@@ -127,7 +127,8 @@ public class Utils implements Serializable {
 	) {
 			try {
 				String response = datasourceQueryFunction.query();
-				DatasourceList datasourceList = MAPPER.readValue(response, DatasourceList.class);
+				List<CommunityContentprovider> datasourceList = MAPPER.readValue(response, new TypeReference<List<CommunityContentprovider>>() {
+				});
 
 				return datasourceList.stream().map(d -> {
 							if (d.getEnabled() == null || Boolean.FALSE.equals(d.getEnabled()))
@@ -256,8 +257,10 @@ public class Utils implements Serializable {
 		if (StringUtils.isNotBlank(input.getZenodoCommunity()))
 			c.getZenodoCommunities().add(input.getZenodoCommunity());
 		c.setSubjects(input.getSubjects());
-		c.getSubjects().addAll(input.getFos());
-		c.getSubjects().addAll(input.getSdg());
+		if(input.getFos() != null)
+			c.getSubjects().addAll(input.getFos());
+		if(input.getSdg()!=null)
+			c.getSubjects().addAll(input.getSdg());
 		if (input.getAdvancedConstraints() != null) {
 			c.setConstraints(input.getAdvancedConstraints());
 			c.getConstraints().setSelection(resolver);

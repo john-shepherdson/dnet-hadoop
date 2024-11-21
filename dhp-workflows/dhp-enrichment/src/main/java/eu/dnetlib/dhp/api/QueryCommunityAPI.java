@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -65,7 +66,7 @@ public class QueryCommunityAPI {
 	}
 
 	public static String propagationOrganizationCommunityMap(String baseURL) throws IOException {
-		return get(baseURL + "/propagationOrganizationCommunityMap");
+		return get(StringUtils.substringBefore(baseURL, "community") + "propagationOrganizationCommunityMap");
 	}
 
 	@NotNull

@@ -1964,6 +1964,8 @@ public class BulkTagJobTest {
                         throw new RuntimeException(e);
                     }
                 });
+
+		System.out.println(new ObjectMapper().writeValueAsString(Utils.getOrganizationCommunityMap(baseURL)));
 	}
 
 }
