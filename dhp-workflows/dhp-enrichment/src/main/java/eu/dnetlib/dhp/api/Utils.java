@@ -171,7 +171,7 @@ public class Utils implements Serializable {
 	public static List<String> getCommunityIdList(String baseURL) throws IOException {
 		return getValidCommunities(baseURL)
 			.stream()
-			.map(community -> community.getId())
+			.map(CommunityModel::getId)
 			.collect(Collectors.toList());
 	}
 
