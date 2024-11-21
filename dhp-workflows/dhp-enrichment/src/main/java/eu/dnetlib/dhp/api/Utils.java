@@ -359,47 +359,6 @@ public class Utils implements Serializable {
 			.collect(Collectors.toList());
 	}
 
-	public static CommunityEntityMap getCommunityDatasource(String baseURL) throws IOException {
-		CommunityEntityMap datasourceMap = new CommunityEntityMap();
-
-		getValidCommunities(baseURL)
-				.forEach(community -> {
-					getRelatedDatasource(community.getId(), baseURL, datasourceMap);
-					try {
-						List<SubCommunityModel> subcommunities = getSubcommunities(community.getId(), baseURL);
-						subcommunities.forEach(sc -> getRelatedDatasource(community.getId(), sc.getSubCommunityId(), baseURL, datasourceMap));
-					} catch (IOException e) {
-						throw new RuntimeException(e);
-					}
-				});
-		return datasourceMap;
-	}
-
-	private static void getRelatedDatasource(String communityId, String baseURL, CommunityEntityMap communityEntityMap){
-
-		try {
-			List<String> associatedDatasources = MAPPER
-					.readValue(
-							QueryCommunityAPI.communityDatasource(communityId, baseURL), EntityIdentifierList.class);
-			associatedDatasources.forEach(d -> communityEntityMap.add(ModelSupport.getIdPrefix(Datasource.class) + "|" + d, communityId ));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-	}
-
-	private static void getRelatedDatasource(String communityId, String baseURL,String subcommunityId, CommunityEntityMap communityEntityMap){
-
-		try {
-			List<String> associatedDatasources = MAPPER
-					.readValue(
-							QueryCommunityAPI.subcommunityDatasource(communityId, subcommunityId, baseURL), EntityIdentifierList.class);
-			associatedDatasources.forEach(d -> communityEntityMap.add(ModelSupport.getIdPrefix(Datasource.class) + "|" + d, communityId ));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-
-	}
 
 
 }
