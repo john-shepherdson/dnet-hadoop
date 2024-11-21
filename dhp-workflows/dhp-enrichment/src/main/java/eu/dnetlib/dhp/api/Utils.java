@@ -345,7 +345,17 @@ public class Utils implements Serializable {
 	public static List<String> getCommunityIdList(String baseURL) throws IOException {
 		return getValidCommunities(baseURL)
 			.stream()
-			.map(CommunityModel::getId)
+				.flatMap(communityModel -> {
+					List<String> communityIds = new ArrayList<>();
+					communityIds.add(communityModel.getId());
+                    try {
+                        Utils.getSubcommunities(communityModel.getId(), baseURL).forEach(sc -> communityIds.add(sc.getSubCommunityId()));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return communityIds.stream();
+				})
+
 			.collect(Collectors.toList());
 	}
 
