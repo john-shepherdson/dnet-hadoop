@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.KeyValueSet;
 import eu.dnetlib.dhp.PropagationConstant;
+import eu.dnetlib.dhp.common.enrichment.Constants;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 
@@ -145,7 +146,7 @@ public class SparkJobTest {
 			.foreach(
 				r -> Assertions
 					.assertEquals(
-						PropagationConstant.PROPAGATION_DATA_INFO_TYPE, r.getDataInfo().getInferenceprovenance()));
+						Constants.PROPAGATION_DATA_INFO_TYPE, r.getDataInfo().getInferenceprovenance()));
 		result
 			.foreach(
 				r -> Assertions
@@ -428,7 +429,7 @@ public class SparkJobTest {
 			.foreach(
 				r -> Assertions
 					.assertEquals(
-						PropagationConstant.PROPAGATION_DATA_INFO_TYPE, r.getDataInfo().getInferenceprovenance()));
+						Constants.PROPAGATION_DATA_INFO_TYPE, r.getDataInfo().getInferenceprovenance()));
 		project
 			.foreach(
 				r -> Assertions

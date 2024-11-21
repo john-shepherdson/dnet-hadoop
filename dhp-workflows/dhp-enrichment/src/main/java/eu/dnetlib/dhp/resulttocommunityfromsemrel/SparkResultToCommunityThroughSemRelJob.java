@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.resulttocommunityfromsemrel;
 
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
+import static eu.dnetlib.dhp.common.enrichment.Constants.PROPAGATION_DATA_INFO_TYPE;
 
 import java.util.*;
 import java.util.stream.Collectors;
