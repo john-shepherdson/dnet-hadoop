@@ -94,7 +94,7 @@ public class SparkBulkTagJob {
 		log.info("dbUser: {}", dbUser);
 		final String dbPassword = parser.get("dbPassword");
 		log.info("dbPassword: {}", dbPassword);
-		final String hdfsPath = parser.get("hdfsPath");
+		final String hdfsPath = outputPath + "masterDuplicate";
 		log.info("hdfsPath: {}", hdfsPath);
 		
 
