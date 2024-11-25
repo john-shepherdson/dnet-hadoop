@@ -173,24 +173,13 @@ public class PrepareResultCommunitySetStep1 {
 					"AND  lower(co.id) IN " + communityIdList,
 					"AND lower(relClass) IN " + allowedsemrel);
 		Dataset<Row> result_context = spark.sql(resultContextQuery);
-		//result_context.createOrReplaceTempView("result_context");
-
-//		spark
-//			.sql(RESULT_COMMUNITY_LIST_QUERY)
-//			.as(Encoders.bean(ResultCommunityList.class))
-//			.write()
-//			.option("compression", "gzip")
-//			.mode(SaveMode.Overwrite)
-//			.json(outputResultPath);
 
 		Dataset<Row> rwc = spark.sql(String.format(RESULT_WITH_CONTEXT, communityIdList));
 		Dataset<Row> patents = spark.sql(RESULT_PATENT);
 		Dataset<Row> relatedToRelations = spark.sql(IS_RELATED_TO_RELATIONS);
 
 		rwc.createOrReplaceTempView("resultWithContext");
-
 		patents.createOrReplaceTempView("patents");
-
 		relatedToRelations.createOrReplaceTempView("relatedTorelations");
 
 

@@ -326,4 +326,6 @@ public class ResultToCommunityJobTest {
 		Assertions.assertEquals(1, communities.size());
 		Assertions.assertEquals("dh-ch", communities.get(0));
 	}
+
+
 }
