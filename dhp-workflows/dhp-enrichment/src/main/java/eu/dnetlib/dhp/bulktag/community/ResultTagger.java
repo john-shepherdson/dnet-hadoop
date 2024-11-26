@@ -130,6 +130,7 @@ public class ResultTagger implements Serializable {
 					// log.info("Remove constraints for " + communityId);
 					if (conf.getRemoveConstraintsMap().keySet().contains(communityId) &&
 						conf.getRemoveConstraintsMap().get(communityId).getCriteria() != null &&
+							!conf.getRemoveConstraintsMap().get(communityId).getCriteria().isEmpty() &&
 						conf
 							.getRemoveConstraintsMap()
 							.get(communityId)
@@ -161,29 +162,30 @@ public class ResultTagger implements Serializable {
 
 		// Tagging for datasource
 		final Set<String> datasources = new HashSet<>();
-		final Set<String> collfrom = new HashSet<>();
+		final Set<String> cfhb = new HashSet<>();
 		final Set<String> hostdby = new HashSet<>();
 
 		if (Objects.nonNull(result.getInstance())) {
 			for (Instance i : result.getInstance()) {
 				if (Objects.nonNull(i.getCollectedfrom()) && Objects.nonNull(i.getCollectedfrom().getKey())) {
-					collfrom.add(i.getCollectedfrom().getKey());
+					cfhb.add(i.getCollectedfrom().getKey());
 				}
 				if (Objects.nonNull(i.getHostedby()) && Objects.nonNull(i.getHostedby().getKey())) {
+					cfhb.add(i.getHostedby().getKey());
 					hostdby.add(i.getHostedby().getKey());
 				}
 
 			}
 
-			collfrom
+			cfhb
 				.forEach(
 					dsId -> datasources
 						.addAll(
 							conf.getCommunityForDatasource(dsId, param)));
 			hostdby.forEach(dsId -> {
-				datasources
-					.addAll(
-						conf.getCommunityForDatasource(dsId, param));
+//				datasources
+//					.addAll(
+//						conf.getCommunityForDatasource(dsId, param));
 				if (conf.isEoscDatasource(dsId)) {
 					datasources.add("eosc");
 				}
@@ -226,6 +228,7 @@ public class ResultTagger implements Serializable {
 			.forEach(communityId -> {
 				if (!removeCommunities.contains(communityId) &&
 					conf.getSelectionConstraintsMap().get(communityId).getCriteria() != null &&
+						!conf.getSelectionConstraintsMap().get(communityId).getCriteria().isEmpty() &&
 					conf
 						.getSelectionConstraintsMap()
 						.get(communityId)
