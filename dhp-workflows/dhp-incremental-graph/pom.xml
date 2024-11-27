@@ -55,6 +55,11 @@
         </dependency>
         <dependency>
             <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>dhp-enrichment</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-graph-mapper</artifactId>
             <version>${project.version}</version>
         </dependency>

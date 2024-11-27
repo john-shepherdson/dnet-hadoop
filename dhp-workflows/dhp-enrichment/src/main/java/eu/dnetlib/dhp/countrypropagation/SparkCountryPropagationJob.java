@@ -90,7 +90,7 @@ public class SparkCountryPropagationJob {
 
 		if (!preparedInfoRaw.isEmpty()) {
 			res
-				.joinWith(preparedInfoRaw, res.col("id").equalTo(prepared.col("resultId")), "left_outer")
+				.joinWith(preparedInfoRaw, res.col("id").equalTo(preparedInfoRaw.col("resultId")), "left_outer")
 				.map(getCountryMergeFn(), Encoders.bean(resultClazz))
 				.write()
 				.option("compression", "gzip")
