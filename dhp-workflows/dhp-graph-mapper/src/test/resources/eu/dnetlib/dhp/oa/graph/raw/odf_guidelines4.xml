@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<record xmlns:datacite="http://datacite.org/schema/kernel-3"
+        xmlns:dr="http://www.driver-repository.eu/namespace/dr"
+        xmlns:oaf="http://namespace.openaire.eu/oaf"
+        xmlns:oai="http://www.openarchives.org/OAI/2.0/">
+    <header xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:dri="http://www.driver-repository.eu/namespace/dri">
+        <dri:objIdentifier>od______1261::66de86a37fa980b9b8f4cefdf1c5a0c5</dri:objIdentifier>
+        <dri:recordIdentifier>oai:air.unimi.it:2434/636308</dri:recordIdentifier>
+        <dri:dateOfCollection>2020-09-04T14:36:48.411Z</dri:dateOfCollection>
+        <oaf:datasourceprefix>od______1261</oaf:datasourceprefix>
+        <identifier>oai:air.unimi.it:2434/636308</identifier>
+        <datestamp>2022-10-14T14:17:28Z</datestamp>
+        <setSpec>com_2434_73555</setSpec>
+        <setSpec>col_2434_73557</setSpec>
+        <setSpec>openaire</setSpec>
+        <dr:dateOfTransformation>2024-11-07T06:17:52.454Z</dr:dateOfTransformation>
+    </header>
+    <metadata>
+        <oaire:resource xmlns:oaire="http://namespace.openaire.eu/schema/oaire/"
+                        xmlns:exslt="http://exslt.org/common"
+                        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                        xmlns:rdf="http://www.w3.org/TR/rdf-concepts/"
+                        xmlns:doc="http://www.lyncode.com/xoai"
+                        xmlns:dc="http://purl.org/dc/elements/1.1/"
+                        xmlns:datacite="http://datacite.org/schema/kernel-4"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning"
+                        xmlns="http://www.openarchives.org/OAI/2.0/"
+                        xsi:schemaLocation="http://namespace.openaire.eu/schema/oaire/ https://www.openaire.eu/schema/repo-lit/4.0/openaire.xsd">
+            <datacite:titles>
+                <datacite:title xml:lang="en">I processi incorpati di costruzione della conoscenza nelle pratiche di cura</datacite:title>
+            </datacite:titles>
+            <datacite:creators>
+                <datacite:creator>
+                    <datacite:creatorName>S. Visioli</datacite:creatorName>
+                    <nameIdentifier nameIdentifierScheme="IRIS">rp17381</nameIdentifier>
+                    <affiliation affiliationIdentifierScheme="ROR"
+                                 affiliationIdentifier="https://ror.org/00wjc7c48">University of Milan</affiliation>
+                    <nameIdentifier nameIdentifierScheme="UGOV">53567</nameIdentifier>
+                </datacite:creator>
+                <datacite:creator>
+                    <datacite:creatorName>L. Zannini</datacite:creatorName>
+                    <datacite:nameIdentifier schemeURI="https://orcid.org" nameIdentifierScheme="ORCID">0000-0001-7287-6616</datacite:nameIdentifier>
+                    <nameIdentifier nameIdentifierScheme="IRIS">rp31993</nameIdentifier>
+                    <affiliation affiliationIdentifierScheme="ROR"
+                                 affiliationIdentifier="https://ror.org/00wjc7c48">University of Milan</affiliation>
+                    <nameIdentifier nameIdentifierScheme="UGOV">5556</nameIdentifier>
+                </datacite:creator>
+            </datacite:creators>
+            <oaire:citationStartPage>487</oaire:citationStartPage>
+            <oaire:citationIssue>2</oaire:citationIssue>
+            <oaire:citationEndPage>506</oaire:citationEndPage>
+            <oaire:citationVolume>8</oaire:citationVolume>
+            <oaire:citationTitle>METIS</oaire:citationTitle>
+            <datacite:alternateIdentifiers>
+                <datacite:alternateIdentifier alternateIdentifierType="DOI">10.30557/MT00041</datacite:alternateIdentifier>
+                <datacite:alternateIdentifier alternateIdentifierType="URN">http://hdl.handle.net/2434/636308</datacite:alternateIdentifier>
+            </datacite:alternateIdentifiers>
+            <datacite:dates>
+                <datacite:date dateType="Accepted">2018</datacite:date>
+                <datacite:date dateType="Issued">2018</datacite:date>
+                <datacite:date dateType="Available">2019-05-23</datacite:date>
+            </datacite:dates>
+            <dc:language>ita</dc:language>
+            <oaire:resourceType resourceTypeGeneral="literature"
+                                uri="http://purl.org/coar/resource_type/c_6501">journal article</oaire:resourceType>
+            <dc:description>In ambito educativo, il corpo è stato tradizionalmente marginalizzato o rifiutato come fonte di conoscenza. Negli ultimi decenni, la letteratura pedagogica ha manifestato crescente interesse per il ruolo che ha il corpo dell’insegnante, nel pianificare e realizzare l’insegnamento, sfidando le ideologie e le epistemologie dominanti, secondo le quali la nostra mente è la fonte primaria di apprendimento. Al contrario, una pedagogia della conoscenza incorpata (embodiment) considera il corpo centrale nel nostro conoscere (le pratiche d’insegnamento) e nel nostro essere (insegnanti). Analogamente, la letteratura delle professioni del caring si è rivelata molto attenta ai temi della conoscenza incorpata, ossia di quel sapere che è presente in un corpo, spesso in modo tacito. Le infermiere hanno da tempo esplorato il ruolo del loro corpo nei processi di costruzione della conoscenza, come anche il ruolo del corpo dello studente, e addirittura del paziente, nel conoscere la malattia. In questo paper riportiamo alcune riflessioni ed esperienze sulla conoscenza incorpata nelle pratiche assistenziali, mettendo in luce come questa, benché spesso tacita, abbia un ruolo centrale nell’aver cura delle persone malate.</dc:description>
+            <dc:description>In educational contexts, the body has been traditionally marginalized or rejected as a source of knowledge. In the last decades, some pedagogical contributions have shown interest for the role that the teacher’s body has in planning and implementing teaching, challenging dominant ideologies and epistemologies that tell us our minds are the primary sources of learning. Conversely, a pedagogy of embodiment makes the body central in our knowing (educational practices) and being (a teacher). Similarly, literature from the caring professions has revealed very receptive to-ward issues related to embodied knowledge, that is to say the knowledge that the body owns, which is frequently tacit. Since many years, nurses have explored the role of body in the processes of knowledge building, as well as the role of the student’s body, and even the patient’s body, in knowing the illness. In this paper we report some reflections and experiences concerning embodied knowledge in the nursing practice, highlighting that embodied knowledge, even if tacit, has a pivotal role when caring for sick people.</dc:description>
+            <dc:format>application/pdf</dc:format>
+            <datacite:identifier xmlns:datacite="http://datacite.org/schema/kernel-3"
+                                 identifierType="Handle">2434/636308</datacite:identifier>
+            <datacite:rights rightsURI="http://purl.org/coar/access_right/c_abf2">open access</datacite:rights>
+            <datacite:subjects>
+                <datacite:subject>body; educational practices; embodied knowledge; nursing; teaching</datacite:subject>
+            </datacite:subjects>
+            <datacite:sizes/>
+            <datacite:sizes>
+                <datacite:size>413926 bytes</datacite:size>
+            </datacite:sizes>
+            <datacite:sizes/>
+            <oaire:file accessRightsURI="http://purl.org/coar/access_right/c_14cb"
+                        mimeType="application/pdf"
+                        objectType="fulltext">https://air.unimi.it/bitstream/2434/636308/2/Finale%20pubblicato.pdf</oaire:file>
+        </oaire:resource>
+        <oaf:fulltext>https://air.unimi.it/bitstream/2434/636308/2/Finale%20pubblicato.pdf</oaf:fulltext>
+        <dr:CobjCategory type="publication">0001</dr:CobjCategory>
+        <oaf:dateAccepted>2018-01-01</oaf:dateAccepted>
+        <oaf:accessrights>OPEN</oaf:accessrights>
+        <oaf:language>ita</oaf:language>
+        <oaf:hostedBy name="Archivio Istituzionale della Ricerca dell'Università degli Studi di Milano"
+                      id="opendoar____::1261"/>
+        <oaf:collectedFrom name="Archivio Istituzionale della Ricerca dell'Università degli Studi di Milano"
+                           id="opendoar____::1261"/>
+    </metadata>
+</record>
