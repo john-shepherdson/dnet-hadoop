@@ -1,0 +1,27 @@
+[
+  {
+    "paramName": "s",
+    "paramLongName": "sourcePath",
+    "paramDescription": "the source mdstore path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "m",
+    "paramLongName": "master",
+    "paramDescription": "the master name",
+    "paramRequired": false
+  },
+  {
+    "paramName": "w",
+    "paramLongName": "workingDir",
+    "paramDescription": "the working Directory",
+    "paramRequired": true
+  },
+  {
+    "paramName": "c",
+    "paramLongName": "currentDump",
+    "paramDescription": "the current Dump Directory",
+    "paramRequired": true
+  }
+
+]

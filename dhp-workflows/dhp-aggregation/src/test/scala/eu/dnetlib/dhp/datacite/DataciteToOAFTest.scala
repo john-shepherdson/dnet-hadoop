@@ -112,6 +112,11 @@ class DataciteToOAFTest extends AbstractVocabularyTest {
   }
 
   @Test
+  def testConvertDataciteToDataset(): Unit = {
+    SparkApplyDump.main(Array("--sourcePath", "/home/sandro/Downloads/datacite", "--currentDump", "/tmp/currentDump", "--workingDir", "/tmp/workingDir", "--master", "local[*]"))
+  }
+
+  @Test
   def testFilter(): Unit = {
     val record = Source
       .fromInputStream(
