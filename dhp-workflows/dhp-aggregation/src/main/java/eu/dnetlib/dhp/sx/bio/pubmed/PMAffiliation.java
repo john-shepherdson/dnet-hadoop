@@ -23,9 +23,8 @@ public class PMAffiliation {
         return name;
     }
 
-    public PMAffiliation setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
     public PMIdentifier getIdentifier() {
