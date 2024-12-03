@@ -31,8 +31,7 @@ public class PMAffiliation {
         return identifier;
     }
 
-    public PMAffiliation setIdentifier(PMIdentifier identifier) {
+    public void setIdentifier(PMIdentifier identifier) {
         this.identifier = identifier;
-        return this;
     }
 }
