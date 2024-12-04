@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import eu.dnetlib.dhp.collection.plugin.zenodo.CollectZenodoDumpCollectorPlugin;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -129,6 +130,8 @@ public class CollectorWorker extends ReportingJob {
 				return new Gtr2PublicationsCollectorPlugin(this.clientParams);
 			case osfPreprints:
 				return new OsfPreprintsCollectorPlugin(this.clientParams);
+			case zenodoDump:
+				return new CollectZenodoDumpCollectorPlugin();
 			case other:
 				final CollectorPlugin.NAME.OTHER_NAME plugin = Optional
 					.ofNullable(this.api.getParams().get("other_plugin_type"))
