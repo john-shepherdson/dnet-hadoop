@@ -1,3 +1,4 @@
+
 package eu.dnetlib.dhp.sx.bio.pubmed;
 
 /**
@@ -7,31 +8,32 @@ package eu.dnetlib.dhp.sx.bio.pubmed;
  */
 public class PMAffiliation {
 
-    private  String name;
+	private String name;
 
-    private PMIdentifier identifier;
+	private PMIdentifier identifier;
 
-    public PMAffiliation() {
+	public PMAffiliation() {
 
-    }
-    public PMAffiliation(String name, PMIdentifier identifier) {
-        this.name = name;
-        this.identifier = identifier;
-    }
+	}
 
-    public String getName() {
-        return name;
-    }
+	public PMAffiliation(String name, PMIdentifier identifier) {
+		this.name = name;
+		this.identifier = identifier;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public PMIdentifier getIdentifier() {
-        return identifier;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setIdentifier(PMIdentifier identifier) {
-        this.identifier = identifier;
-    }
+	public PMIdentifier getIdentifier() {
+		return identifier;
+	}
+
+	public void setIdentifier(PMIdentifier identifier) {
+		this.identifier = identifier;
+	}
 }
