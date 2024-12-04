@@ -63,7 +63,6 @@ class BioScholixTest extends AbstractVocabularyTest {
       "0000000333457333",
       "0000000335964515",
       "0000000302921949",
-
       "http://orcid.org/0000-0001-8567-3543",
       "http://orcid.org/0000-0001-7868-8528",
       "0000-0001-9189-1440",

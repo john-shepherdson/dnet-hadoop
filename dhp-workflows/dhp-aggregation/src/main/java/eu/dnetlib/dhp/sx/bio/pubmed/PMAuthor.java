@@ -97,5 +97,4 @@ public class PMAuthor implements Serializable {
 		this.affiliation = affiliation;
 	}
 
-
 }

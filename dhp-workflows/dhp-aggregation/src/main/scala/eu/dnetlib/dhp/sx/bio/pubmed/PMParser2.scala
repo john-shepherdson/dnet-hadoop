@@ -82,21 +82,22 @@ class PMParser2 {
         a.setLastName((author \ "LastName").text)
         a.setForeName((author \ "ForeName").text)
         val id = (author \ "Identifier").text
-        val idType =(author \ "Identifier" \ "@Source").text
+        val idType = (author \ "Identifier" \ "@Source").text
 
-        if(id != null && id.nonEmpty && idType != null && idType.nonEmpty) {
+        if (id != null && id.nonEmpty && idType != null && idType.nonEmpty) {
           a.setIdentifier(new PMIdentifier(id, idType))
         }
 
-
         val affiliation = (author \ "AffiliationInfo" \ "Affiliation").text
-        val affiliationId  = (author \ "AffiliationInfo" \ "Identifier").text
+        val affiliationId = (author \ "AffiliationInfo" \ "Identifier").text
         val affiliationIdType = (author \ "AffiliationInfo" \ "Identifier" \ "@Source").text
 
-        if(affiliation != null && affiliation.nonEmpty) {
+        if (affiliation != null && affiliation.nonEmpty) {
           val aff = new PMAffiliation()
           aff.setName(affiliation)
-          if(affiliationId != null && affiliationId.nonEmpty && affiliationIdType != null && affiliationIdType.nonEmpty) {
+          if (
+            affiliationId != null && affiliationId.nonEmpty && affiliationIdType != null && affiliationIdType.nonEmpty
+          ) {
             aff.setIdentifier(new PMIdentifier(affiliationId, affiliationIdType))
           }
           a.setAffiliation(aff)
