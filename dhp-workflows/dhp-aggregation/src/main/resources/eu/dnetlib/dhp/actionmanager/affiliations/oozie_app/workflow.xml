@@ -127,6 +127,7 @@
                 --files ${wfAppPath}/affRo/dictionaries/dix_acad.json,${wfAppPath}/affRo/dictionaries/dix_acad_oaire.json,${wfAppPath}/affRo/dictionaries/dix_categ.json,${wfAppPath}/affRo/dictionaries/dix_city.json,${wfAppPath}/affRo/dictionaries/dix_country.json,${wfAppPath}/affRo/dictionaries/dix_country_oaire.json,${wfAppPath}/affRo/dictionaries/dix_grids_rors.json,${wfAppPath}/affRo/dictionaries/dix_mult.json,${wfAppPath}/affRo/dictionaries/dix_mult_oaire.json,${wfAppPath}/affRo/dictionaries/dix_status.json,${wfAppPath}/affRo/txt_files/city_names.txt,${wfAppPath}/affRo/txt_files/remove_list.txt,${wfAppPath}/affRo/txt_files/stop_words.txt,${wfAppPath}/affRo/txt_files/university_terms.txt
             </spark-opts>
 
+            <arg>${inputFolder}</arg>
             <arg>${resultFolder}</arg>
 
             <file>${wfAppPath}/affRo/update_records.py#update_records.py</file>
