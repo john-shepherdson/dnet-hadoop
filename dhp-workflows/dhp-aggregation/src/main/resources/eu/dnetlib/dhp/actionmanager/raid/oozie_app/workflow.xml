@@ -20,8 +20,6 @@
         <fs>
             <delete path='${raidActionSetPath}'/>
             <mkdir path='${raidActionSetPath}'/>
-            <delete path='${workingDir}'/>
-            <mkdir path='${workingDir}'/>
         </fs>
         <ok to="processRAiDFile"/>
         <error to="Kill"/>

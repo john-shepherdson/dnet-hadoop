@@ -72,14 +72,34 @@ public class ComparatorTest extends AbstractPaceTest {
 		CodeMatch codeMatch = new CodeMatch(params);
 
 		// names have different codes
-		assertEquals(0.0, codeMatch.distance("physical oceanography at ctd station june 1998 ev02a", "physical oceanography at ctd station june 1998 ir02", conf));
+		assertEquals(
+			0.0,
+			codeMatch
+				.distance(
+					"physical oceanography at ctd station june 1998 ev02a",
+					"physical oceanography at ctd station june 1998 ir02", conf));
 
 		// names have same code
-		assertEquals(1.0, codeMatch.distance("physical oceanography at ctd station june 1998 ev02a", "physical oceanography at ctd station june 1998 ev02a", conf));
+		assertEquals(
+			1.0,
+			codeMatch
+				.distance(
+					"physical oceanography at ctd station june 1998 ev02a",
+					"physical oceanography at ctd station june 1998 ev02a", conf));
 
 		// code is not in both names
-		assertEquals(-1, codeMatch.distance("physical oceanography at ctd station june 1998", "physical oceanography at ctd station june 1998 ev02a", conf));
-		assertEquals(1.0, codeMatch.distance("physical oceanography at ctd station june 1998", "physical oceanography at ctd station june 1998", conf));
+		assertEquals(
+			-1,
+			codeMatch
+				.distance(
+					"physical oceanography at ctd station june 1998",
+					"physical oceanography at ctd station june 1998 ev02a", conf));
+		assertEquals(
+			1.0,
+			codeMatch
+				.distance(
+					"physical oceanography at ctd station june 1998", "physical oceanography at ctd station june 1998",
+					conf));
 	}
 
 	@Test
@@ -275,7 +295,7 @@ public class ComparatorTest extends AbstractPaceTest {
 			Arrays
 				.asList(
 					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":null,\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:actionset\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"grid\",\"classname\":\"GRID Identifier\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"grid_1\"}",
-						"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":null,\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:actionset\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"ror\",\"classname\":\"Research Organization Registry\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"ror_1\"}"),
+					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":null,\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:actionset\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"ror\",\"classname\":\"Research Organization Registry\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"ror_1\"}"),
 			"authors");
 		List<String> b = createFieldList(
 			Arrays

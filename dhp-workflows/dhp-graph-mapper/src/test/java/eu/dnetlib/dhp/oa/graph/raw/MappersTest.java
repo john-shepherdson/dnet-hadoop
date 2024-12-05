@@ -915,7 +915,8 @@ class MappersTest {
 
 	@Test
 	void testODFRecord_guidelines4() throws IOException {
-		final String xml = IOUtils.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_guidelines4.xml")));
+		final String xml = IOUtils
+			.toString(Objects.requireNonNull(getClass().getResourceAsStream("odf_guidelines4.xml")));
 		final List<Oaf> list = new OdfToOafMapper(vocs, false, true).processMdRecord(xml);
 
 		final Publication p = (Publication) list.get(0);

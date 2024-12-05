@@ -62,7 +62,7 @@ public class JsonListMatch extends AbstractListComparator {
 
 				Set<String> types = Sets.intersection(typesA, typesB);
 
-				if (types.isEmpty())  // if no common type, it is impossible to compare
+				if (types.isEmpty()) // if no common type, it is impossible to compare
 					return -1;
 
 				ca = ca.stream().filter(s -> types.contains(s.split("::")[0])).collect(Collectors.toSet());
