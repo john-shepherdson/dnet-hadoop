@@ -23,4 +23,8 @@
         <name>hiveDbName</name>
         <value>openaire</value>
     </property>
+    <property>
+        <name>sparkSqlWarehouseDir</name>
+        <value>/user/hive/warehouse</value>
+    </property>
 </configuration>
