@@ -989,6 +989,9 @@
             </dependencyManagement>
         </profile>
         <profile>
+            <id>spark-24</id>
+        </profile>
+        <profile>
             <id>spark-34</id>
             <properties>
                 <scala.binary.version>2.12</scala.binary.version>

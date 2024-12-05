@@ -160,7 +160,7 @@ public class ORCIDExtractor extends Thread {
 			}
 		} finally {
 			for (SequenceFile.Writer k : fileMap.values()) {
-					log.info("Thread {}: Completed processed {} items", id, extractedItem);
+				log.info("Thread {}: Completed processed {} items", id, extractedItem);
 				k.hflush();
 				k.close();
 			}
