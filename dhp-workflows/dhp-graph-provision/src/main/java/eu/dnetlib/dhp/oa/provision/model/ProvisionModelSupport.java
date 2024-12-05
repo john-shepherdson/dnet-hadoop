@@ -5,7 +5,6 @@ import java.io.StringReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import eu.dnetlib.dhp.schema.solr.PersonTopic;
 import org.apache.commons.lang3.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -40,6 +39,7 @@ import eu.dnetlib.dhp.schema.solr.OpenAccessColor;
 import eu.dnetlib.dhp.schema.solr.OpenAccessRoute;
 import eu.dnetlib.dhp.schema.solr.Organization;
 import eu.dnetlib.dhp.schema.solr.Person;
+import eu.dnetlib.dhp.schema.solr.PersonTopic;
 import eu.dnetlib.dhp.schema.solr.Pid;
 import eu.dnetlib.dhp.schema.solr.Project;
 import eu.dnetlib.dhp.schema.solr.Result;
@@ -216,11 +216,14 @@ public class ProvisionModelSupport {
 	}
 
 	private static List<PersonTopic> mapPersonTopics(List<eu.dnetlib.dhp.schema.oaf.PersonTopic> subjects) {
-		return Optional.ofNullable(subjects)
-				.map(ss -> ss.stream()
-						.map(ProvisionModelSupport::mapPersonTopic)
-						.collect(Collectors.toList()))
-				.orElse(null);
+		return Optional
+			.ofNullable(subjects)
+			.map(
+				ss -> ss
+					.stream()
+					.map(ProvisionModelSupport::mapPersonTopic)
+					.collect(Collectors.toList()))
+			.orElse(null);
 	}
 
 	private static PersonTopic mapPersonTopic(eu.dnetlib.dhp.schema.oaf.PersonTopic pt) {
