@@ -3,6 +3,8 @@ package eu.dnetlib.dhp.actionmanager;
 
 import java.util.Optional;
 
+import eu.dnetlib.dhp.schema.oaf.Instance;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Encoders;
@@ -108,6 +110,12 @@ public class Constants {
 		String diqualifierclassid) {
 		return getSubject(sbj, classid, classname, diqualifierclassid, false);
 
+	}
+
+	public static Instance getInstance(Qualifier qualifier) {
+		Instance instance = new Instance();
+		instance.setInstancetype(qualifier);
+		return instance;
 	}
 
 	public static void removeOutputDir(SparkSession spark, String path) {

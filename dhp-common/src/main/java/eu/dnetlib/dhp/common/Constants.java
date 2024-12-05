@@ -10,6 +10,10 @@ public class Constants {
 	public static final Map<String, String> accessRightsCoarMap = Maps.newHashMap();
 	public static final Map<String, String> coarCodeLabelMap = Maps.newHashMap();
 
+	public static final String RAID_NS_PREFIX = "raid________";
+	public static final String RAID_DATASOURCE_NAME = "Research Activity Identifier Service (RAiD)";
+	public static final String RAID_OPENAIRE_ID = "";
+
 	public static final String ROR_NS_PREFIX = "ror_________";
 
 	public static final String ROR_OPENAIRE_ID = "10|openaire____::993a7ae7a863813cf95028b50708e222";
