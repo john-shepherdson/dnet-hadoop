@@ -37,7 +37,7 @@ case class mappingAuthor(
   family: Option[String],
   sequence: Option[String],
   ORCID: Option[String],
-  affiliation: Option[mappingAffiliation]
+  affiliation: Option[List[mappingAffiliation]]
 ) {}
 
 case class funderInfo(id: String, uri: String, name: String, synonym: List[String]) {}
@@ -457,15 +457,14 @@ case object Crossref2Oaf {
     }
 
     //Mapping Author
-    val authorList: List[mappingAuthor] =
-      (json \ "author").extract[List[mappingAuthor]].filter(a => a.family.isDefined)
+    val authorList: List[mappingAuthor] = (json \ "author").extract[List[mappingAuthor]].filter(a => a.family.isDefined)
 
     val sorted_list = authorList.sortWith((a: mappingAuthor, b: mappingAuthor) =>
       a.sequence.isDefined && a.sequence.get.equalsIgnoreCase("first")
     )
 
     result.setAuthor(sorted_list.zipWithIndex.map { case (a, index) =>
-      generateAuhtor(a.given.orNull, a.family.get, a.ORCID.orNull, index)
+      generateAuthor(a.given.orNull, a.family.get, a.ORCID.orNull, index, a.affiliation)
     }.asJava)
 
     // Mapping instance
@@ -504,18 +503,6 @@ case object Crossref2Oaf {
       )
     }
 
-    val is_review = json \ "relation" \ "is-review-of" \ "id"
-
-    if (is_review != JNothing) {
-      instance.setInstancetype(
-        OafMapperUtils.qualifier(
-          "0015",
-          "peerReviewed",
-          ModelConstants.DNET_REVIEW_LEVELS,
-          ModelConstants.DNET_REVIEW_LEVELS
-        )
-      )
-    }
 
     if (doi.startsWith("10.3410") || doi.startsWith("10.12703"))
       instance.setHostedby(
@@ -569,17 +556,24 @@ case object Crossref2Oaf {
       result
   }
 
+
+
   def generateIdentifier(oaf: Result, doi: String): String = {
     val id = DHPUtils.md5(doi.toLowerCase)
     s"50|doiboost____|$id"
   }
 
-  def generateAuhtor(given: String, family: String, orcid: String, index: Int): Author = {
+  private def generateAuthor(given: String, family: String, orcid: String, index: Int, affiliation: Option[List[mappingAffiliation]]): Author = {
     val a = new Author
     a.setName(given)
     a.setSurname(family)
     a.setFullname(s"$given $family")
     a.setRank(index + 1)
+
+    // Adding Raw affiliation if it's defined
+    if (affiliation.isDefined) {
+      a.setRawAffiliationString(affiliation.get.map(a => a.name).asJava)
+    }
     if (StringUtils.isNotBlank(orcid))
       a.setPid(
         List(
@@ -705,10 +699,20 @@ case object Crossref2Oaf {
     val objectType = (json \ "type").extractOrElse[String](null)
     if (objectType == null)
       return resultList
-    val typology = getTypeQualifier(objectType, vocabularies)
+
+
+    // If the item has a relations is-review-of, then we force it to a peer-review
+    val is_review = json \ "relation" \ "is-review-of" \ "id"
+    var force_to_review = false
+    if (is_review != JNothing) {
+      force_to_review = true
+    }
+
+    val typology = getTypeQualifier(if (force_to_review) "peer-review" else objectType, vocabularies)
 
     if (typology == null)
       return List()
+
 
     val result = generateItemFromType(typology._2)
     if (result == null)
@@ -757,33 +761,6 @@ case object Crossref2Oaf {
       else
         resultList
     }
-
-    //    if (uw != null) {
-//      result.getCollectedfrom.add(createUnpayWallCollectedFrom())
-//      val i: Instance = new Instance()
-//      i.setCollectedfrom(createUnpayWallCollectedFrom())
-//      if (uw.best_oa_location != null) {
-//
-//        i.setUrl(List(uw.best_oa_location.url).asJava)
-//        if (uw.best_oa_location.license.isDefined) {
-//          i.setLicense(field[String](uw.best_oa_location.license.get, null))
-//        }
-//
-//        val colour = get_unpaywall_color(uw.oa_status)
-//        if (colour.isDefined) {
-//          val a = new AccessRight
-//          a.setClassid(ModelConstants.ACCESS_RIGHT_OPEN)
-//          a.setClassname(ModelConstants.ACCESS_RIGHT_OPEN)
-//          a.setSchemeid(ModelConstants.DNET_ACCESS_MODES)
-//          a.setSchemename(ModelConstants.DNET_ACCESS_MODES)
-//          a.setOpenAccessRoute(colour.get)
-//          i.setAccessright(a)
-//        }
-//        i.setPid(result.getPid)
-//        result.getInstance().add(i)
-//      }
-//    }
-
   }
 
   private def createCiteRelation(source: Result, targetPid: String, targetPidType: String): List[Relation] = {
