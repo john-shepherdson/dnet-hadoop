@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.actionmanager.raid;
 
 import static eu.dnetlib.dhp.actionmanager.personentity.ExtractPerson.OPENAIRE_DATASOURCE_ID;
 import static eu.dnetlib.dhp.actionmanager.personentity.ExtractPerson.OPENAIRE_DATASOURCE_NAME;
+import static eu.dnetlib.dhp.common.Constants.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 import static eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils.*;
@@ -24,7 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.actionmanager.raid.model.RAiDEntity;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
-import eu.dnetlib.dhp.common.Constants;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.action.AtomicAction;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
@@ -120,8 +120,10 @@ public class GenerateRAiDActionSetJob {
 							qualifier("main title", "main title", DNET_DATACITE_TITLE, DNET_DATACITE_TITLE),
 							RAID_DATA_INFO)));
 		orp.setDescription(listFields(RAID_DATA_INFO, r.getSummary()));
-//		orp.setAuthor(createAuthors(r.getAuthors()));
-		orp.setInstance(Collections.singletonList(eu.dnetlib.dhp.actionmanager.Constants.getInstance(RAID_QUALIFIER)));
+
+		Instance instance = new Instance();
+		instance.setInstancetype(RAID_QUALIFIER);
+		orp.setInstance(Collections.singletonList(instance));
 		orp
 			.setSubject(
 				r
@@ -140,11 +142,11 @@ public class GenerateRAiDActionSetJob {
 				Arrays
 					.asList(
 						structuredProperty(
-							r.getEndDate(), qualifier("endDate", "endDate", DNET_DATACITE_DATE, DNET_DATACITE_DATE),
+							r.getEndDate(), qualifier(END_DATE, END_DATE, DNET_DATACITE_DATE, DNET_DATACITE_DATE),
 							RAID_DATA_INFO),
 						structuredProperty(
 							r.getStartDate(),
-							qualifier("startDate", "startDate", DNET_DATACITE_DATE, DNET_DATACITE_DATE),
+							qualifier(START_DATE, START_DATE, DNET_DATACITE_DATE, DNET_DATACITE_DATE),
 							RAID_DATA_INFO)));
 		orp.setLastupdatetimestamp(now.getTime());
 		orp.setDateofacceptance(field(r.getStartDate(), RAID_DATA_INFO));
@@ -159,11 +161,7 @@ public class GenerateRAiDActionSetJob {
 					ModelConstants.RESULT_RESULT,
 					PART,
 					HAS_PART,
-					RAID_COLLECTED_FROM,
-					RAID_DATA_INFO,
-					now.getTime(),
-					null,
-					null);
+					orp);
 			Relation rel2 = OafMapperUtils
 				.getRelation(
 					resultId,
@@ -171,11 +169,7 @@ public class GenerateRAiDActionSetJob {
 					ModelConstants.RESULT_RESULT,
 					PART,
 					IS_PART_OF,
-					RAID_COLLECTED_FROM,
-					RAID_DATA_INFO,
-					now.getTime(),
-					null,
-					null);
+					orp);
 			res.add(new AtomicAction<>(Relation.class, rel1));
 			res.add(new AtomicAction<>(Relation.class, rel2));
 		}
@@ -184,7 +178,7 @@ public class GenerateRAiDActionSetJob {
 	}
 
 	public static String calculateOpenaireId(final String raid) {
-		return String.format("50|%s::%s", Constants.RAID_NS_PREFIX, DHPUtils.md5(raid));
+		return String.format("50|%s::%s", RAID_NS_PREFIX, DHPUtils.md5(raid));
 	}
 
 	public static List<Author> createAuthors(final List<String> author) {
@@ -204,7 +198,6 @@ public class GenerateRAiDActionSetJob {
 			.json(path)
 			.as(Encoders.bean(RAiDEntity.class))
 			.toJavaRDD();
-
 	}
 
 }
