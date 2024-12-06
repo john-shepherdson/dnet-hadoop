@@ -147,9 +147,10 @@
             <jar>strings.py</jar>
 
             <spark-opts>
-                --executor-cores=4
+                --executor-cores=6
                 --executor-memory=6G
-                --driver-memory=15G
+                --driver-memory=4G
+                --num-executors=27
                 --conf spark.executor.memoryOverhead=6G
                 --conf spark.sql.shuffle.partitions=20000
                 --conf spark.extraListeners=${spark2ExtraListeners}
