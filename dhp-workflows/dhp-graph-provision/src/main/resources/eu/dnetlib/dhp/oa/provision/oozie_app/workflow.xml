@@ -715,7 +715,7 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>to_solr_index</name>
-            <class>eu.dnetlib.dhp.oa.provision.XmlIndexingJob</class>
+            <class>eu.dnetlib.dhp.RecordImporterApplication</class>
             <jar>dhp-graph-provision-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-memory=${sparkExecutorMemoryForIndexing}
@@ -730,7 +730,7 @@
                 --conf spark.hadoop.mapreduce.map.speculative=false
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
             </spark-opts>
-            <arg>--inputPath</arg><arg>${workingDir}/xml_json</arg>
+            <arg>--path</arg><arg>${workingDir}/xml_json</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>
             <arg>--batchSize</arg><arg>${batchSize}</arg>

@@ -80,10 +80,7 @@
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.lucidworks.spark</groupId>
-            <artifactId>spark-solr</artifactId>
-        </dependency>
+
 
         <!-- the solr-test-framework requires the old junit:junit test framework -->
         <dependency>
@@ -216,6 +213,11 @@
             <groupId>eu.dnetlib.dhp</groupId>
             <artifactId>dhp-common</artifactId>
             <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>openaire-solr-importer</artifactId>
         </dependency>
 
     </dependencies>
