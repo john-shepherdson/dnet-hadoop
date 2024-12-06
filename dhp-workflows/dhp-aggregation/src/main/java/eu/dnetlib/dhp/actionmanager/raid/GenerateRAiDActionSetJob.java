@@ -43,7 +43,8 @@ public class GenerateRAiDActionSetJob {
 	private static final List<KeyValue> RAID_COLLECTED_FROM = listKeyValues(
 		OPENAIRE_DATASOURCE_ID, OPENAIRE_DATASOURCE_NAME);
 
-	private static final Qualifier RAID_QUALIFIER = qualifier("0049", "Research Activity Identifier", DNET_PUBLICATION_RESOURCE, DNET_PUBLICATION_RESOURCE);
+	private static final Qualifier RAID_QUALIFIER = qualifier(
+		"0049", "Research Activity Identifier", DNET_PUBLICATION_RESOURCE, DNET_PUBLICATION_RESOURCE);
 
 	private static final Qualifier RAID_INFERENCE_QUALIFIER = qualifier(
 		"raid:openaireinference", "Inferred by OpenAIRE", DNET_PROVENANCE_ACTIONS, DNET_PROVENANCE_ACTIONS);
