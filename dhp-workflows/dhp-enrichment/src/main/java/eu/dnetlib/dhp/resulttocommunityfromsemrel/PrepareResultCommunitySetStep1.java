@@ -70,7 +70,7 @@ public class PrepareResultCommunitySetStep1 {
 	private static final String RESULT_WITH_CONTEXT = "select id, collect_set(co.id) community_context        \n" +
 			"    from  result        " +
 			"    lateral view explode (context) c as co     " +
-			"    where datainfo.deletedbyinference = false  AND lower(co.id) IN %s" +
+			"    where  lower(co.id) IN %s" +
 			"    group by id";
 
 	private static final String RESULT_PATENT = "select id " +
@@ -160,7 +160,8 @@ public class PrepareResultCommunitySetStep1 {
 		Dataset<Relation> relation = readPath(spark, inputRelationPath, Relation.class);
 		relation.createOrReplaceTempView("relation");
 
-		Dataset<R> result = readPath(spark, inputResultPath, resultClazz);
+		Dataset<R> result = readPath(spark, inputResultPath, resultClazz)
+				.where("datainfo.deletedbyinference != true AND datainfo.invisible != true");
 		result.createOrReplaceTempView("result");
 
 		final String outputResultPath = outputPath + "/" + resultType;
