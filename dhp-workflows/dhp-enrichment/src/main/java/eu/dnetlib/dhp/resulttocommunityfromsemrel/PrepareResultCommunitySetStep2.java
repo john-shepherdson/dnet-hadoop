@@ -4,6 +4,7 @@ package eu.dnetlib.dhp.resulttocommunityfromsemrel;
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -76,22 +77,13 @@ public class PrepareResultCommunitySetStep2 {
 					if (b == null) {
 						return a;
 					}
-					Set<String> community_set = new HashSet<>();
-					a.getCommunityList().stream().forEach(aa -> community_set.add(aa));
-					b
-						.getCommunityList()
-						.stream()
-						.forEach(
-							aa -> {
-								if (!community_set.contains(aa)) {
-									a.getCommunityList().add(aa);
-									community_set.add(aa);
-								}
-							});
+                    Set<String> community_set = new HashSet<>(a.getCommunityList());
+					community_set.addAll(b.getCommunityList());
+					a.setCommunityList(new ArrayList<>(community_set));
 					return a;
 				})
 			.map(Tuple2::_2)
-			.map(r -> OBJECT_MAPPER.writeValueAsString(r))
+			.map(OBJECT_MAPPER::writeValueAsString)
 			.saveAsTextFile(outputPath, GzipCodec.class);
 	}
 
