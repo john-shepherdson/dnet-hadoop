@@ -1,6 +1,9 @@
 
 package eu.dnetlib.dhp.collection.plugin.gtr2;
 
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -16,9 +19,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 	private static final Logger log = LoggerFactory.getLogger(Gtr2PublicationsIterator.class);
 
 	private final HttpConnector2 connector;
-	private static final DateTimeFormatter simpleDateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+	private static final DateTimeFormatter simpleDateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	private static final int MAX_ATTEMPTS = 10;
 
@@ -41,7 +41,7 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 	private int currPage;
 	private int endPage;
 	private boolean incremental = false;
-	private DateTime fromDate;
+	private LocalDate fromDate;
 
 	private final Map<String, String> cache = new HashMap<>();
 
@@ -188,28 +188,28 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 
 	private Document loadURL(final String cleanUrl, final int attempt) {
 		try {
-			log.debug("  * Downloading Url: " + cleanUrl);
-			final byte[] bytes = this.connector.getInputSource(cleanUrl).getBytes("UTF-8");
+			log.debug("  * Downloading Url: {}", cleanUrl);
+			final byte[] bytes = this.connector.getInputSource(cleanUrl).getBytes(StandardCharsets.UTF_8);
 			return DocumentHelper.parseText(new String(bytes));
 		} catch (final Throwable e) {
-			log.error("Error dowloading url: " + cleanUrl + ", attempt = " + attempt, e);
+			log.error("Error dowloading url: {}, attempt = {}", cleanUrl, attempt, e);
 			if (attempt >= MAX_ATTEMPTS) {
-				throw new RuntimeException("Error dowloading url: " + cleanUrl, e);
+				throw new RuntimeException("Error downloading url: " + cleanUrl, e);
 			}
 			try {
 				Thread.sleep(60000); // I wait for a minute
 			} catch (final InterruptedException e1) {
-				throw new RuntimeException("Error dowloading url: " + cleanUrl, e);
+				throw new RuntimeException("Error downloading url: " + cleanUrl, e);
 			}
 			return loadURL(cleanUrl, attempt + 1);
 		}
 	}
 
-	private DateTime parseDate(final String s) {
-		return DateTime.parse(s.contains("T") ? s.substring(0, s.indexOf("T")) : s, simpleDateTimeFormatter);
+	private LocalDate parseDate(final String s) {
+		return LocalDate.parse(s.contains("T") ? s.substring(0, s.indexOf("T")) : s, simpleDateTimeFormatter);
 	}
 
-	private boolean isAfter(final String d, final DateTime fromDate) {
+	private boolean isAfter(final String d, final LocalDate fromDate) {
 		return StringUtils.isNotBlank(d) && parseDate(d).isAfter(fromDate);
 	}
 }

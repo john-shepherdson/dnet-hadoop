@@ -154,7 +154,6 @@ public class ORCIDExtractor extends Thread {
 						extractedItem++;
 						if (extractedItem % 100000 == 0) {
 							log.info("Thread {}: Extracted {} items", id, extractedItem);
-							break;
 						}
 					}
 				}

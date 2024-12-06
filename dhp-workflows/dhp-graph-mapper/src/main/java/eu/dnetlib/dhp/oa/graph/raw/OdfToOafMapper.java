@@ -319,7 +319,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<Field<String>> prepareDescriptions(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//*[local-name()='description' and ./@descriptionType='Abstract']", info);
+		return prepareListFields(doc, "//datacite:description[./@descriptionType='Abstract'] | //dc:description", info);
 	}
 
 	@Override
