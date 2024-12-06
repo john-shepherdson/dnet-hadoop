@@ -77,7 +77,7 @@ public class PrepareResultCommunitySetStep2 {
 					if (b == null) {
 						return a;
 					}
-                    Set<String> community_set = new HashSet<>(a.getCommunityList());
+					Set<String> community_set = new HashSet<>(a.getCommunityList());
 					community_set.addAll(b.getCommunityList());
 					a.setCommunityList(new ArrayList<>(community_set));
 					return a;

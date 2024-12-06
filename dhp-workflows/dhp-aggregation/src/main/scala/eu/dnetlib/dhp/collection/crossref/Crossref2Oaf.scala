@@ -503,7 +503,6 @@ case object Crossref2Oaf {
       )
     }
 
-
     if (doi.startsWith("10.3410") || doi.startsWith("10.12703"))
       instance.setHostedby(
         OafMapperUtils.keyValue(OafMapperUtils.createOpenaireId(10, "openaire____::H1Connect", true), "H1Connect")
@@ -556,14 +555,18 @@ case object Crossref2Oaf {
       result
   }
 
-
-
   def generateIdentifier(oaf: Result, doi: String): String = {
     val id = DHPUtils.md5(doi.toLowerCase)
     s"50|doiboost____|$id"
   }
 
-  private def generateAuthor(given: String, family: String, orcid: String, index: Int, affiliation: Option[List[mappingAffiliation]]): Author = {
+  private def generateAuthor(
+    given: String,
+    family: String,
+    orcid: String,
+    index: Int,
+    affiliation: Option[List[mappingAffiliation]]
+  ): Author = {
     val a = new Author
     a.setName(given)
     a.setSurname(family)
@@ -700,7 +703,6 @@ case object Crossref2Oaf {
     if (objectType == null)
       return resultList
 
-
     // If the item has a relations is-review-of, then we force it to a peer-review
     val is_review = json \ "relation" \ "is-review-of" \ "id"
     var force_to_review = false
@@ -712,7 +714,6 @@ case object Crossref2Oaf {
 
     if (typology == null)
       return List()
-
 
     val result = generateItemFromType(typology._2)
     if (result == null)

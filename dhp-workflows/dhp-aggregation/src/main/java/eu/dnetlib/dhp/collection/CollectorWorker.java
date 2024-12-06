@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import eu.dnetlib.dhp.collection.plugin.zenodo.CollectZenodoDumpCollectorPlugin;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -29,6 +28,7 @@ import eu.dnetlib.dhp.collection.plugin.mongodb.MongoDbDumpCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.oai.OaiCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.osf.OsfPreprintsCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.rest.RestCollectorPlugin;
+import eu.dnetlib.dhp.collection.plugin.zenodo.CollectZenodoDumpCollectorPlugin;
 import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 import eu.dnetlib.dhp.common.collection.CollectorException;
 import eu.dnetlib.dhp.common.collection.HttpClientParams;

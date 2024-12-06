@@ -1,16 +1,16 @@
 
 package eu.dnetlib.dhp.resulttocommunityfromsemrel;
 
+import static java.lang.String.join;
+
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
-import static java.lang.String.join;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import eu.dnetlib.dhp.schema.common.ModelConstants;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.sql.*;
@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import eu.dnetlib.dhp.api.Utils;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.resulttocommunityfromorganization.ResultCommunityList;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
@@ -37,8 +38,7 @@ public class PrepareResultCommunitySetStep1 {
 	 * relation
 	 */
 	// TODO
-	private static final String RESULT_CONTEXT_QUERY_TEMPLATE =
-			"select target resultId, community_context  "
+	private static final String RESULT_CONTEXT_QUERY_TEMPLATE = "select target resultId, community_context  "
 		+ "from (select id, collect_set(co.id) community_context "
 		+ "       from  result "
 		+ "       lateral view explode (context) c as co "
@@ -60,26 +60,26 @@ public class PrepareResultCommunitySetStep1 {
 		+ "where length(co) > 0 "
 		+ "group by resultId";
 
-	private static final String RESULT_CONTEXT_QUERY_TEMPLATE_IS_RELATED_TO =
-			"select target as resultId, community_context " +
-			"from resultWithContext rwc " +
-			"join relatedToRelations r " +
-			"join patents p  " +
-			"on rwc.id = r.source and r.target = p.id";
+	private static final String RESULT_CONTEXT_QUERY_TEMPLATE_IS_RELATED_TO = "select target as resultId, community_context "
+		+
+		"from resultWithContext rwc " +
+		"join relatedToRelations r " +
+		"join patents p  " +
+		"on rwc.id = r.source and r.target = p.id";
 
 	private static final String RESULT_WITH_CONTEXT = "select id, collect_set(co.id) community_context        \n" +
-			"    from  result        " +
-			"    lateral view explode (context) c as co     " +
-			"    where  lower(co.id) IN %s" +
-			"    group by id";
+		"    from  result        " +
+		"    lateral view explode (context) c as co     " +
+		"    where  lower(co.id) IN %s" +
+		"    group by id";
 
 	private static final String RESULT_PATENT = "select id " +
-			"    from result " +
-			"    where array_contains(instance.instancetype.classname, 'Patent')";
+		"    from result " +
+		"    where array_contains(instance.instancetype.classname, 'Patent')";
 
 	private static final String IS_RELATED_TO_RELATIONS = "select source, target " +
-			"    from relation " +
-			"    where lower(relClass) = 'isrelatedto' and datainfo.deletedbyinference = false";
+		"    from relation " +
+		"    where lower(relClass) = 'isrelatedto' and datainfo.deletedbyinference = false";
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
@@ -107,17 +107,25 @@ public class PrepareResultCommunitySetStep1 {
 		SparkConf conf = new SparkConf();
 		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
-		final String allowedsemrel ="(" + join(",",
-				Arrays.asList(parser.get("allowedsemrels").split(";")).stream().map(value -> "'" + value.toLowerCase() + "'")
-						.toArray(String[]::new)) + ")";
+		final String allowedsemrel = "(" + join(
+			",",
+			Arrays
+				.asList(parser.get("allowedsemrels").split(";"))
+				.stream()
+				.map(value -> "'" + value.toLowerCase() + "'")
+				.toArray(String[]::new))
+			+ ")";
 		log.info("allowedSemRel: {}", allowedsemrel);
 
 		final String baseURL = parser.get("baseURL");
 		log.info("baseURL: {}", baseURL);
 
-		final String communityIdList = "(" + join(",", getCommunityList(baseURL).stream()
+		final String communityIdList = "(" + join(
+			",", getCommunityList(baseURL)
+				.stream()
 				.map(value -> "'" + value.toLowerCase() + "'")
-				.toArray(String[]::new)) + ")";
+				.toArray(String[]::new))
+			+ ")";
 
 		final String resultType = resultClassName.substring(resultClassName.lastIndexOf(".") + 1).toLowerCase();
 		log.info("resultType: {}", resultType);
@@ -161,18 +169,17 @@ public class PrepareResultCommunitySetStep1 {
 		relation.createOrReplaceTempView("relation");
 
 		Dataset<R> result = readPath(spark, inputResultPath, resultClazz)
-				.where("datainfo.deletedbyinference != true AND datainfo.invisible != true");
+			.where("datainfo.deletedbyinference != true AND datainfo.invisible != true");
 		result.createOrReplaceTempView("result");
 
 		final String outputResultPath = outputPath + "/" + resultType;
 		log.info("writing output results to: {}", outputResultPath);
 
-
 		String resultContextQuery = String
 			.format(
 				RESULT_CONTEXT_QUERY_TEMPLATE,
-					"AND  lower(co.id) IN " + communityIdList,
-					"AND lower(relClass) IN " + allowedsemrel);
+				"AND  lower(co.id) IN " + communityIdList,
+				"AND lower(relClass) IN " + allowedsemrel);
 		Dataset<Row> result_context = spark.sql(resultContextQuery);
 
 		Dataset<Row> rwc = spark.sql(String.format(RESULT_WITH_CONTEXT, communityIdList));
@@ -183,18 +190,17 @@ public class PrepareResultCommunitySetStep1 {
 		patents.createOrReplaceTempView("patents");
 		relatedToRelations.createOrReplaceTempView("relatedTorelations");
 
-
-		result_context = result_context.unionAll( spark.sql(RESULT_CONTEXT_QUERY_TEMPLATE_IS_RELATED_TO));
+		result_context = result_context.unionAll(spark.sql(RESULT_CONTEXT_QUERY_TEMPLATE_IS_RELATED_TO));
 
 		result_context.createOrReplaceTempView("result_context");
 
 		spark
-				.sql(RESULT_COMMUNITY_LIST_QUERY)
-				.as(Encoders.bean(ResultCommunityList.class))
-				.write()
-				.option("compression", "gzip")
-				.mode(SaveMode.Append)
-				.json(outputResultPath);
+			.sql(RESULT_COMMUNITY_LIST_QUERY)
+			.as(Encoders.bean(ResultCommunityList.class))
+			.write()
+			.option("compression", "gzip")
+			.mode(SaveMode.Append)
+			.json(outputResultPath);
 
 	}
 

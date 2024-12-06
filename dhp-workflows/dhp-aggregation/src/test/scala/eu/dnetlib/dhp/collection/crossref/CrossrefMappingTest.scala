@@ -28,17 +28,21 @@ class CrossrefMappingTest extends AbstractVocabularyTest {
     val input =
       IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/collection/crossref/issn_pub.json"), "utf-8")
 
-    Crossref2Oaf.convert(input, vocabularies, TransformationType.All).foreach(record => {
-      Assertions.assertNotNull(record)
-    })
+    Crossref2Oaf
+      .convert(input, vocabularies, TransformationType.All)
+      .foreach(record => {
+        Assertions.assertNotNull(record)
+      })
 
   }
-
 
   @Test
   def mappingAffiliation(): Unit = {
     val input =
-      IOUtils.toString(getClass.getResourceAsStream("/eu/dnetlib/dhp/collection/crossref/affiliationTest.json"), "utf-8")
+      IOUtils.toString(
+        getClass.getResourceAsStream("/eu/dnetlib/dhp/collection/crossref/affiliationTest.json"),
+        "utf-8"
+      )
     val data = Crossref2Oaf.convert(input, vocabularies, TransformationType.OnlyResult)
     data.foreach(record => {
       Assertions.assertNotNull(record)
@@ -46,10 +50,10 @@ class CrossrefMappingTest extends AbstractVocabularyTest {
       val publication = record.asInstanceOf[Publication]
       publication.getAuthor.asScala.foreach(author => {
         Assertions.assertNotNull(author.getRawAffiliationString)
-        Assertions.assertTrue(author.getRawAffiliationString.size()>0)
+        Assertions.assertTrue(author.getRawAffiliationString.size() > 0)
 
-        })
       })
+    })
     println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(data.head))
   }
 }
