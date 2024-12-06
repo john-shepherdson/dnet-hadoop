@@ -1,0 +1,232 @@
+{
+  "indexed": {
+    "date-parts": [
+      [
+        2022,
+        4,
+        3
+      ]
+    ],
+    "date-time": "2022-04-03T01:45:59Z",
+    "timestamp": 1648950359167
+  },
+  "reference-count": 0,
+  "publisher": "American Society of Clinical Oncology (ASCO)",
+  "issue": "18_suppl",
+  "content-domain": {
+    "domain": [],
+    "crossmark-restriction": false
+  },
+  "short-container-title": [
+    "JCO"
+  ],
+  "published-print": {
+    "date-parts": [
+      [
+        2007,
+        6,
+        20
+      ]
+    ]
+  },
+  "abstract": "<jats:p> 3507 </jats:p><jats:p> Purpose: To detect IGF-1R on circulating tumor cells (CTCs) as a biomarker in the clinical development of a monoclonal human antibody, CP-751,871, targeting IGF-1R. Experimental Design: An automated sample preparation and analysis system for enumerating CTCs (Celltracks) was adapted for detecting IGF-1R positive CTCs with a diagnostic antibody targeting a different IGF-1R epitope to CP-751,871. This assay was utilized in three phase I trials of CP-751,871 as a single agent or with chemotherapy and was validated using cell lines and blood samples from healthy volunteers and patients with metastatic carcinoma. Results: There was no interference between the analytical and therapeutic antibodies. CP-751,871 was well tolerated as a single agent, and in combination with docetaxel or carboplatin and paclitaxel, at doses ranging from 0.05 mg/kg to 20 mg/kg. Eighty patients were enrolled on phase 1 studies of CP-751,871, with 47 (59%) patients having CTCs detected during the study. Prior to treatment 26 patients (33%) had CTCs, with 23 having detectable IGF-1R positive CTCs. CP-751,871 alone, and CP-751,871 with cytotoxic chemotherapy, decreased CTCs and IGF-1R positive CTCs; these increased towards the end of the 21-day cycle in some patients, falling again with retreatment. CTCs were commonest in advanced hormone refractory prostate cancer (11/20). Detectable IGF-1R expression on CTCs before treatment with CP-751,871 and docetaxel was associated with a higher frequency of PSA decline by more than 50% (6/10 vs 2/8 patients). A relationship was observed between sustained falls in CTCs counts and PSA declines by more than 50%. Conclusions: IGF-1R expression is detectable by immunofluorescence on CTCs. These data support the further evaluation of CTCs in pharmacodynamic studies and patient selection, particularly in advanced prostate cancer. </jats:p><jats:p> No significant financial relationships to disclose. </jats:p>",
+  "DOI": "10.1200/jco.2007.25.18_suppl.3507",
+  "type": "journal-article",
+  "created": {
+    "date-parts": [
+      [
+        2020,
+        3,
+        6
+      ]
+    ],
+    "date-time": "2020-03-06T20:50:42Z",
+    "timestamp": 1583527842000
+  },
+  "page": "3507-3507",
+  "source": "Crossref",
+  "is-referenced-by-count": 0,
+  "title": [
+    "Circulating tumor cells expressing the insulin growth factor-1 receptor (IGF-1R): Method of detection, incidence and potential applications"
+  ],
+  "prefix": "10.1200",
+  "volume": "25",
+  "author": [
+    {
+      "given": "J. S.",
+      "family": "de Bono",
+      "sequence": "first",
+      "affiliation": [
+        {
+          "name": "Royal Marsden Hospital, Surrey, United Kingdom; Mayo Clinic, Rochester, MN; McGill University & Lady Davis Research Institute, Montreal, PQ, Canada; Pfizer Global Research & Development, New London, CT; Immunicon Corporation, Huntingdon Valley, PA"
+        }
+      ]
+    },
+    {
+      "given": "A.",
+      "family": "Adjei",
+      "sequence": "additional",
+      "affiliation": [
+        {
+          "name": "Royal Marsden Hospital, Surrey, United Kingdom; Mayo Clinic, Rochester, MN; McGill University & Lady Davis Research Institute, Montreal, PQ, Canada; Pfizer Global Research & Development, New London, CT; Immunicon Corporation, Huntingdon Valley, PA"
+        }
+      ]
+    },
+    {
+      "given": "G.",
+      "family": "Attard",
+      "sequence": "additional",
+      "affiliation": [
+        {
+          "name": "Royal Marsden Hospital, Surrey, United Kingdom; Mayo Clinic, Rochester, MN; McGill University & Lady Davis Research Institute, Montreal, PQ, Canada; Pfizer Global Research & Development, New London, CT; Immunicon Corporation, Huntingdon Valley, PA"
+        }
+      ]
+    },
+    {
+      "given": "M.",
+      "family": "Pollak",
+      "sequence": "additional",
+      "affiliation": [
+        {
+          "name": "Royal Marsden Hospital, Surrey, United Kingdom; Mayo Clinic, Rochester, MN; McGill University & Lady Davis Research Institute, Montreal, PQ, Canada; Pfizer Global Research & Development, New London, CT; Immunicon Corporation, Huntingdon Valley, PA"
+        }
+      ]
+    },
+    {
+      "given": "P.",
+      "family": "Fong",
+      "sequence": "additional",
+      "affiliation": [
+        {
+          "name": "Royal Marsden Hospital, Surrey, United Kingdom; Mayo Clinic, Rochester, MN; McGill University & Lady Davis Research Institute, Montreal, PQ, Canada; Pfizer Global Research & Development, New London, CT; Immunicon Corporation, Huntingdon Valley, PA"
+        }
+      ]
+    },
+    {
+      "given": "P.",
+      "family": "Haluska",
+      "sequence": "additional",
+      "affiliation": [
+        {
+          "name": "Royal Marsden Hospital, Surrey, United Kingdom; Mayo Clinic, Rochester, MN; McGill University & Lady Davis Research Institute, Montreal, PQ, Canada; Pfizer Global Research & Development, New London, CT; Immunicon Corporation, Huntingdon Valley, PA"
+        }
+      ]
+    },
+    {
+      "given": "L.",
+      "family": "Roberts",
+      "sequence": "additional",
+      "affiliation": [
+        {
+          "name": "Royal Marsden Hospital, Surrey, United Kingdom; Mayo Clinic, Rochester, MN; McGill University & Lady Davis Research Institute, Montreal, PQ, Canada; Pfizer Global Research & Development, New London, CT; Immunicon Corporation, Huntingdon Valley, PA"
+        }
+      ]
+    },
+    {
+      "given": "D.",
+      "family": "Chainese",
+      "sequence": "additional",
+      "affiliation": [
+        {
+          "name": "Royal Marsden Hospital, Surrey, United Kingdom; Mayo Clinic, Rochester, MN; McGill University & Lady Davis Research Institute, Montreal, PQ, Canada; Pfizer Global Research & Development, New London, CT; Immunicon Corporation, Huntingdon Valley, PA"
+        }
+      ]
+    },
+    {
+      "given": "L.",
+      "family": "Terstappen",
+      "sequence": "additional",
+      "affiliation": [
+        {
+          "name": "Royal Marsden Hospital, Surrey, United Kingdom; Mayo Clinic, Rochester, MN; McGill University & Lady Davis Research Institute, Montreal, PQ, Canada; Pfizer Global Research & Development, New London, CT; Immunicon Corporation, Huntingdon Valley, PA"
+        }
+      ]
+    },
+    {
+      "given": "A.",
+      "family": "Gualberto",
+      "sequence": "additional",
+      "affiliation": [
+        {
+          "name": "Royal Marsden Hospital, Surrey, United Kingdom; Mayo Clinic, Rochester, MN; McGill University & Lady Davis Research Institute, Montreal, PQ, Canada; Pfizer Global Research & Development, New London, CT; Immunicon Corporation, Huntingdon Valley, PA"
+        }
+      ]
+    }
+  ],
+  "member": "233",
+  "container-title": [
+    "Journal of Clinical Oncology"
+  ],
+  "original-title": [],
+  "language": "en",
+  "deposited": {
+    "date-parts": [
+      [
+        2020,
+        3,
+        6
+      ]
+    ],
+    "date-time": "2020-03-06T20:51:03Z",
+    "timestamp": 1583527863000
+  },
+  "score": 1,
+  "resource": {
+    "primary": {
+      "URL": "http://ascopubs.org/doi/10.1200/jco.2007.25.18_suppl.3507"
+    }
+  },
+  "subtitle": [],
+  "short-title": [],
+  "issued": {
+    "date-parts": [
+      [
+        2007,
+        6,
+        20
+      ]
+    ]
+  },
+  "references-count": 0,
+  "journal-issue": {
+    "issue": "18_suppl",
+    "published-print": {
+      "date-parts": [
+        [
+          2007,
+          6,
+          20
+        ]
+      ]
+    }
+  },
+  "alternative-id": [
+    "10.1200/jco.2007.25.18_suppl.3507"
+  ],
+  "URL": "http://dx.doi.org/10.1200/jco.2007.25.18_suppl.3507",
+  "relation": {},
+  "ISSN": [
+    "0732-183X",
+    "1527-7755"
+  ],
+  "issn-type": [
+    {
+      "value": "0732-183X",
+      "type": "print"
+    },
+    {
+      "value": "1527-7755",
+      "type": "electronic"
+    }
+  ],
+  "subject": [],
+  "published": {
+    "date-parts": [
+      [
+        2007,
+        6,
+        20
+      ]
+    ]
+  }
+}
