@@ -112,12 +112,6 @@ public class Constants {
 
 	}
 
-	public static Instance getInstance(Qualifier qualifier) {
-		Instance instance = new Instance();
-		instance.setInstancetype(qualifier);
-		return instance;
-	}
-
 	public static void removeOutputDir(SparkSession spark, String path) {
 		HdfsSupport.remove(path, spark.sparkContext().hadoopConfiguration());
 	}
