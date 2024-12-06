@@ -7,7 +7,7 @@
         </property>
         <property>
             <name>outputDir</name>
-            <description>the path where the the generated data will be stored</description>
+            <description>the path where the generated data will be stored</description>
         </property>
 		<property>
             <name>datasourceIdWhitelist</name>
@@ -179,17 +179,18 @@
             <master>yarn</master>
             <mode>cluster</mode>
             <name>PrepareSimpleEntititiesJob</name>
-            <class>eu.dnetlib.dhp.broker.oa.PrepareSimpleEntititiesJob</class>
+            <class>eu.dnetlib.dhp.broker.oa.PrepareSimpleEntitiesJob</class>
             <jar>dhp-broker-events-${projectVersion}.jar</jar>
             <spark-opts>
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=5000
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
@@ -209,11 +210,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
@@ -234,11 +236,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
@@ -258,11 +261,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=5000
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
@@ -282,11 +286,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=10000
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
@@ -306,11 +311,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=2000
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
@@ -332,11 +338,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
@@ -356,11 +363,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
@@ -380,11 +388,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
@@ -404,11 +413,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
@@ -428,11 +438,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
@@ -452,11 +463,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--graphPath</arg><arg>${graphInputPath}</arg>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
@@ -476,11 +488,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=3840
+                --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--workingDir</arg><arg>${workingDir}</arg>
             <arg>--outputDir</arg><arg>${outputDir}</arg>
@@ -503,6 +516,7 @@
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.dynamicAllocation.maxExecutors=${sparkMaxExecutorsForIndexing} 
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
@@ -535,6 +549,7 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -562,6 +577,7 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -585,6 +601,7 @@
             <spark-opts>
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.dynamicAllocation.maxExecutors=${sparkMaxExecutorsForIndexing} 
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}

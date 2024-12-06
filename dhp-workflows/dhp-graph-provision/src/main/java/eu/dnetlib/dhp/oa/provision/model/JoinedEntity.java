@@ -5,13 +5,11 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
-import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class JoinedEntity implements Serializable {
+
+	private static final long serialVersionUID = -6337458773099581114L;
 
 	private OafEntity entity;
 

@@ -12,6 +12,8 @@ public class PMAuthor implements Serializable {
 
 	private String lastName;
 	private String foreName;
+	private PMIdentifier identifier;
+	private PMAffiliation affiliation;
 
 	/**
 	 * Gets last name.
@@ -57,6 +59,42 @@ public class PMAuthor implements Serializable {
 	public String getFullName() {
 		return String
 			.format("%s, %s", this.foreName != null ? this.foreName : "", this.lastName != null ? this.lastName : "");
+	}
+
+	/**
+	 * Gets identifier.
+	 *
+	 * @return the identifier
+	 */
+	public PMIdentifier getIdentifier() {
+		return identifier;
+	}
+
+	/**
+	 * Sets identifier.
+	 *
+	 * @param identifier the identifier
+	 */
+	public void setIdentifier(PMIdentifier identifier) {
+		this.identifier = identifier;
+	}
+
+	/**
+	 * Gets affiliation.
+	 *
+	 * @return the affiliation
+	 */
+	public PMAffiliation getAffiliation() {
+		return affiliation;
+	}
+
+	/**
+	 * Sets affiliation.
+	 *
+	 * @param affiliation the affiliation
+	 */
+	public void setAffiliation(PMAffiliation affiliation) {
+		this.affiliation = affiliation;
 	}
 
 }

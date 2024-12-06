@@ -6,11 +6,11 @@ import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.amazonaws.util.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
 
@@ -81,7 +81,7 @@ public class Utils implements Serializable {
 		Community c = new Community();
 		c.setId(cm.getId());
 		c.setZenodoCommunities(cm.getOtherZenodoCommunities());
-		if (!StringUtils.isNullOrEmpty(cm.getZenodoCommunity()))
+		if (StringUtils.isNotBlank(cm.getZenodoCommunity()))
 			c.getZenodoCommunities().add(cm.getZenodoCommunity());
 		c.setSubjects(cm.getSubjects());
 		c.getSubjects().addAll(cm.getFos());
@@ -171,7 +171,7 @@ public class Utils implements Serializable {
 	public static List<String> getCommunityIdList(String baseURL) throws IOException {
 		return getValidCommunities(baseURL)
 			.stream()
-			.map(community -> community.getId())
+			.map(CommunityModel::getId)
 			.collect(Collectors.toList());
 	}
 

@@ -175,7 +175,7 @@ public class IdentifierFactory implements Serializable {
 			return entity
 				.getPid()
 				.stream()
-				.map(CleaningFunctions::normalizePidValue)
+				.map(PidCleaner::normalizePidValue)
 				.filter(CleaningFunctions::pidFilter)
 				.collect(
 					Collectors
@@ -204,10 +204,11 @@ public class IdentifierFactory implements Serializable {
 			.map(
 				pp -> pp
 					.stream()
+					.filter(p -> StringUtils.isNotBlank(p.getValue()))
 					// filter away PIDs provided by a DS that is not considered an authority for the
 					// given PID Type
 					.filter(p -> shouldFilterPidByCriteria(collectedFrom, p, mapHandles))
-					.map(CleaningFunctions::normalizePidValue)
+					.map(PidCleaner::normalizePidValue)
 					.filter(p -> isNotFromDelegatedAuthority(collectedFrom, p))
 					.filter(CleaningFunctions::pidFilter))
 			.orElse(Stream.empty());

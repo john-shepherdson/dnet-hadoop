@@ -398,6 +398,7 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 			o.setEcsmevalidated(field(Boolean.toString(rs.getBoolean("ecsmevalidated")), info));
 			o.setEcnutscode(field(Boolean.toString(rs.getBoolean("ecnutscode")), info));
 			o.setCountry(prepareQualifierSplitting(rs.getString("country")));
+			o.setOrganizationType(Organization.OrganizationType.valueOf(rs.getString("typology")));
 			o.setDataInfo(info);
 			o.setLastupdatetimestamp(lastUpdateTimestamp);
 
@@ -517,6 +518,28 @@ public class MigrateDbEntitiesApplication extends AbstractMigrationApplication i
 					case "resultResult_publicationDataset_isRelatedTo":
 						r1 = setRelationSemantic(r1, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO);
 						r2 = setRelationSemantic(r2, RESULT_RESULT, PUBLICATION_DATASET, IS_RELATED_TO);
+						break;
+					case "resultOrganization_affiliation_isAuthorInstitutionOf":
+						if (!"organization".equals(sourceType)) {
+							throw new IllegalStateException(
+								String
+									.format(
+										"invalid claim, sourceId: %s, targetId: %s, semantics: %s", sourceId, targetId,
+										semantics));
+						}
+						r1 = setRelationSemantic(r1, RESULT_ORGANIZATION, AFFILIATION, IS_AUTHOR_INSTITUTION_OF);
+						r2 = setRelationSemantic(r2, RESULT_ORGANIZATION, AFFILIATION, HAS_AUTHOR_INSTITUTION);
+						break;
+					case "resultOrganization_affiliation_hasAuthorInstitution":
+						if (!"organization".equals(targetType)) {
+							throw new IllegalStateException(
+								String
+									.format(
+										"invalid claim, sourceId: %s, targetId: %s, semantics: %s", sourceId, targetId,
+										semantics));
+						}
+						r1 = setRelationSemantic(r1, RESULT_ORGANIZATION, AFFILIATION, HAS_AUTHOR_INSTITUTION);
+						r2 = setRelationSemantic(r2, RESULT_ORGANIZATION, AFFILIATION, IS_AUTHOR_INSTITUTION_OF);
 						break;
 					default:
 						throw new IllegalArgumentException("claim semantics not managed: " + semantics);

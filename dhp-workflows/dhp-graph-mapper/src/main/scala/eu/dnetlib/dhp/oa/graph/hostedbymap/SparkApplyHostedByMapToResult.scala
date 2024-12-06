@@ -25,25 +25,36 @@ object SparkApplyHostedByMapToResult {
           val i = p.getInstance().asScala
           if (i.size == 1) {
             val inst: Instance = i.head
-            inst.getHostedby.setKey(ei.getHostedById)
-            inst.getHostedby.setValue(ei.getName)
-            if (ei.getOpenAccess) {
-              inst.setAccessright(
-                OafMapperUtils.accessRight(
-                  ModelConstants.ACCESS_RIGHT_OPEN,
-                  "Open Access",
-                  ModelConstants.DNET_ACCESS_MODES,
-                  ModelConstants.DNET_ACCESS_MODES
-                )
-              )
-              inst.getAccessright.setOpenAccessRoute(OpenAccessRoute.gold)
-              p.setBestaccessright(OafMapperUtils.createBestAccessRights(p.getInstance()));
-            }
+            patchInstance(p, ei, inst)
 
+          } else {
+            val cf = i.map(ii => ii.getCollectedfrom.getValue)
+            if (cf.contains("Crossref")) {
+              i.foreach(ii => {
+                patchInstance(p, ei, ii)
+              })
+            }
           }
         }
         p
       })(Encoders.bean(classOf[Publication]))
+  }
+
+  private def patchInstance(p: Publication, ei: EntityInfo, inst: Instance): Unit = {
+    inst.getHostedby.setKey(ei.getHostedById)
+    inst.getHostedby.setValue(ei.getName)
+    if (ei.getOpenAccess) {
+      inst.setAccessright(
+        OafMapperUtils.accessRight(
+          ModelConstants.ACCESS_RIGHT_OPEN,
+          "Open Access",
+          ModelConstants.DNET_ACCESS_MODES,
+          ModelConstants.DNET_ACCESS_MODES
+        )
+      )
+      inst.getAccessright.setOpenAccessRoute(OpenAccessRoute.gold)
+      p.setBestaccessright(OafMapperUtils.createBestAccessRights(p.getInstance()));
+    }
   }
 
   def main(args: Array[String]): Unit = {

@@ -1,0 +1,157 @@
+<PubmedArticle>
+    <MedlineCitation Status="MEDLINE" IndexingMethod="Curated" Owner="NLM">
+        <PMID Version="1">37318999</PMID>
+        <DateCompleted>
+            <Year>2024</Year>
+            <Month>02</Month>
+            <Day>09</Day>
+        </DateCompleted>
+        <DateRevised>
+            <Year>2024</Year>
+            <Month>02</Month>
+            <Day>09</Day>
+        </DateRevised>
+        <Article PubModel="Print-Electronic">
+            <Journal>
+                <ISSN IssnType="Electronic">1522-1229</ISSN>
+                <JournalIssue CitedMedium="Internet">
+                    <Volume>47</Volume>
+                    <Issue>3</Issue>
+                    <PubDate>
+                        <Year>2023</Year>
+                        <Month>Sep</Month>
+                        <Day>01</Day>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Advances in physiology education</Title>
+                <ISOAbbreviation>Adv Physiol Educ</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Providing the choice of in-person or videoconference attendance in a clinical physiology course may harm learning outcomes for the entire cohort.</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>548-556</MedlinePgn>
+            </Pagination>
+            <ELocationID EIdType="doi" ValidYN="Y">10.1152/advan.00160.2022</ELocationID>
+            <Abstract>
+                <AbstractText>Clinical Physiology 1 and 2 are flipped classes in which students watch prerecorded videos before class. During the 3-h class, students take practice assessments, work in groups on critical thinking exercises, work through case studies, and engage in drawing exercises. Due to the COVID pandemic, these courses were transitioned from in-person classes to online classes. Despite the university's return-to-class policy, some students were reluctant to return to in-person classes; therefore during the 2021-2022 academic year, Clinical Physiology 1 and 2 were offered as flipped, hybrid courses. In a hybrid format, students either attended the synchronous class in person or online. Here we evaluate the learning outcomes and the perceptions of the learning experience for students who attended Clinical Physiology 1 and 2 either online (2020-2021) or in a hybrid format (2021-2022). In addition to exam scores, in-class surveys and end of course evaluations were compiled to describe the student experience in the flipped hybrid setting. Retrospective linear mixed-model regression analysis of exam scores revealed that a hybrid modality (2021-2022) was associated with lower exam scores when controlling for sex, graduate/undergraduate status, delivery method, and the order in which the courses were taken (<i>F</i> test: <i>F</i> = 8.65, df1 = 2, df2 = 179.28, <i>P</i> = 0.0003). In addition, being a Black Indigenous Person of Color (BIPOC) student is associated with a lower exam score, controlling for the same previous factors (<i>F</i> test: <i>F</i> = 4.23, df1 = 1, df2 = 130.28, <i>P</i> = 0.04), albeit with lower confidence; the BIPOC representation in this sample is small (BIPOC: <i>n</i> = 144; total: <i>n</i> = 504). There is no significant interaction between the hybrid modality and race, meaning that BIPOC and White students are both negatively affected in a hybrid flipped course. Instructors should consider carefully about offering hybrid courses and build in extra student support.<b>NEW &amp; NOTEWORTHY</b> The transition from online to in-person teaching has been as challenging as the original transition to remote teaching with the onset of the pandemic. Since not all students were ready to return to the classroom, students could choose to take this course in person or online. This arrangement provided flexibility and opportunities for innovative class activities for students but introduced tradeoffs in lower test scores from the hybrid modality than fully online or fully in-person modalities.</AbstractText>
+            </Abstract>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Anderson</LastName>
+                    <ForeName>Lisa Carney</ForeName>
+                    <Initials>LC</Initials>
+                    <Identifier Source="ORCID">0000-0003-2261-1921</Identifier>
+                    <AffiliationInfo>
+                        <Affiliation>Department of Integrative Biology and Physiology, University of Minnesota, Minneapolis, Minnesota, United States.</Affiliation>
+                        <Identifier Source="ROR">https://ror.org/017zqws13</Identifier>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Jacobson</LastName>
+                    <ForeName>Tate</ForeName>
+                    <Initials>T</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Department of Statistics, University of Minnesota, Minneapolis, Minnesota, United States.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType UI="D016428">Journal Article</PublicationType>
+            </PublicationTypeList>
+            <ArticleDate DateType="Electronic">
+                <Year>2023</Year>
+                <Month>06</Month>
+                <Day>15</Day>
+            </ArticleDate>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>United States</Country>
+            <MedlineTA>Adv Physiol Educ</MedlineTA>
+            <NlmUniqueID>100913944</NlmUniqueID>
+            <ISSNLinking>1043-4046</ISSNLinking>
+        </MedlineJournalInfo>
+        <CitationSubset>IM</CitationSubset>
+        <MeshHeadingList>
+            <MeshHeading>
+                <DescriptorName UI="D010827" MajorTopicYN="Y">Physiology</DescriptorName>
+                <QualifierName UI="Q000193" MajorTopicYN="N">education</QualifierName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D012189" MajorTopicYN="N">Retrospective Studies</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D007858" MajorTopicYN="N">Learning</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D058873" MajorTopicYN="N">Pandemics</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D000086382" MajorTopicYN="N">COVID-19</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D012044" MajorTopicYN="N">Regression Analysis</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D013334" MajorTopicYN="N">Students</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D006801" MajorTopicYN="N">Humans</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D008297" MajorTopicYN="N">Male</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D005260" MajorTopicYN="N">Female</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D044465" MajorTopicYN="N">White People</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D044383" MajorTopicYN="N">Black People</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D020375" MajorTopicYN="N">Education, Distance</DescriptorName>
+            </MeshHeading>
+            <MeshHeading>
+                <DescriptorName UI="D003479" MajorTopicYN="N">Curriculum</DescriptorName>
+            </MeshHeading>
+        </MeshHeadingList>
+        <KeywordList Owner="NOTNLM">
+            <Keyword MajorTopicYN="N">flipped teaching</Keyword>
+            <Keyword MajorTopicYN="N">hybrid teaching</Keyword>
+            <Keyword MajorTopicYN="N">inequity</Keyword>
+            <Keyword MajorTopicYN="N">learning outcomes</Keyword>
+            <Keyword MajorTopicYN="N">responsive teaching</Keyword>
+        </KeywordList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2023</Year>
+                <Month>7</Month>
+                <Day>21</Day>
+                <Hour>6</Hour>
+                <Minute>44</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2023</Year>
+                <Month>6</Month>
+                <Day>15</Day>
+                <Hour>19</Hour>
+                <Minute>14</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2023</Year>
+                <Month>6</Month>
+                <Day>15</Day>
+                <Hour>12</Hour>
+                <Minute>53</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">37318999</ArticleId>
+            <ArticleId IdType="doi">10.1152/advan.00160.2022</ArticleId>
+        </ArticleIdList>
+    </PubmedData>
+</PubmedArticle>

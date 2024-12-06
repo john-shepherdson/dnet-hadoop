@@ -30,6 +30,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.common.vocabulary.VocabularyGroup;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.common.ModelSupport;
+import eu.dnetlib.dhp.schema.common.RelationInverse;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
 
@@ -334,6 +336,40 @@ class MigrateDbEntitiesApplicationTest {
 	@Test
 	void testProcessClaims_rels() throws Exception {
 		final List<TypedField> fields = prepareMocks("claimsrel_resultset_entry.json");
+
+		final List<Oaf> list = app.processClaims(rs);
+
+		assertEquals(2, list.size());
+		verifyMocks(fields);
+
+		assertTrue(list.get(0) instanceof Relation);
+		assertTrue(list.get(1) instanceof Relation);
+
+		final Relation r1 = (Relation) list.get(0);
+		final Relation r2 = (Relation) list.get(1);
+
+		assertValidId(r1.getSource());
+		assertValidId(r1.getTarget());
+		assertValidId(r2.getSource());
+		assertValidId(r2.getTarget());
+		assertNotNull(r1.getDataInfo());
+		assertNotNull(r2.getDataInfo());
+		assertNotNull(r1.getDataInfo().getTrust());
+		assertNotNull(r2.getDataInfo().getTrust());
+		assertEquals(r1.getSource(), r2.getTarget());
+		assertEquals(r2.getSource(), r1.getTarget());
+		assertTrue(StringUtils.isNotBlank(r1.getRelClass()));
+		assertTrue(StringUtils.isNotBlank(r2.getRelClass()));
+		assertTrue(StringUtils.isNotBlank(r1.getRelType()));
+		assertTrue(StringUtils.isNotBlank(r2.getRelType()));
+
+		assertValidId(r1.getCollectedfrom().get(0).getKey());
+		assertValidId(r2.getCollectedfrom().get(0).getKey());
+	}
+
+	@Test
+	void testProcessClaims_affiliation() throws Exception {
+		final List<TypedField> fields = prepareMocks("claimsrel_resultset_affiliation.json");
 
 		final List<Oaf> list = app.processClaims(rs);
 

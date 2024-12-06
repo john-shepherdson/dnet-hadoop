@@ -16,5 +16,11 @@
     "paramLongName": "hdfsNameNode",
     "paramDescription": "the hdfs name node",
     "paramRequired": true
+  },
+  {
+    "paramName": "bp",
+    "paramLongName": "backupPath",
+    "paramDescription": "the hdfs path to move the OC data after the extraction",
+    "paramRequired": true
   }
 ]

@@ -24,7 +24,7 @@
 
     <decision name="resume_from">
         <switch>
-            <case to="download">${wf:conf('resumeFrom') eq 'DownloadDump'}</case>
+            <case to="reset_workingDir">${wf:conf('resumeFrom') eq 'DownloadDump'}</case>
             <default to="create_actionset"/> <!-- first action to be done when downloadDump is to be performed -->
         </switch>
     </decision>
@@ -33,6 +33,14 @@
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
+    <action name="reset_workingDir">
+        <fs>
+            <delete path="${workingDir}"/>
+            <mkdir path="${workingDir}"/>
+        </fs>
+        <ok to="download"/>
+        <error to="Kill"/>
+    </action>
     <action name="download">
         <shell xmlns="uri:oozie:shell-action:0.2">
             <job-tracker>${jobTracker}</job-tracker>

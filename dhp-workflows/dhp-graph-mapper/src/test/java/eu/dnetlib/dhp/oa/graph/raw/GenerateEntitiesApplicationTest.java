@@ -44,7 +44,7 @@ class GenerateEntitiesApplicationTest {
 	}
 
 	@Test
-	void testMergeResult() throws IOException, DocumentException {
+	void testMergeResult() throws IOException {
 		Result publication = getResult("oaf_record.xml", Publication.class);
 		Result dataset = getResult("odf_dataset.xml", Dataset.class);
 		Result software = getResult("odf_software.xml", Software.class);
@@ -69,15 +69,15 @@ class GenerateEntitiesApplicationTest {
 		verifyMerge(orp, software, Software.class, ModelConstants.SOFTWARE_RESULTTYPE_CLASSID);
 	}
 
-	protected <T extends Result> void verifyMerge(Result publication, Result dataset, Class<T> clazz,
+	protected <T extends Result> void verifyMerge(Result r1, Result r2, Class<T> clazz,
 		String resultType) {
-		final Result merge = (Result) MergeUtils.merge(publication, dataset);
+		final Result merge = MergeUtils.checkedMerge(r1, r2, true);
 		assertTrue(clazz.isAssignableFrom(merge.getClass()));
 		assertEquals(resultType, merge.getResulttype().getClassid());
 	}
 
 	protected <T extends Result> Result getResult(String xmlFileName, Class<T> clazz)
-		throws IOException, DocumentException {
+		throws IOException {
 		final String xml = IOUtils.toString(getClass().getResourceAsStream(xmlFileName));
 		return new OdfToOafMapper(vocs, false, true)
 			.processMdRecord(xml)

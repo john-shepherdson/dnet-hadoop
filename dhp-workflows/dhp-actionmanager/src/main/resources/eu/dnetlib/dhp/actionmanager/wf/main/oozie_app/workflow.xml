@@ -125,6 +125,7 @@
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -134,20 +135,9 @@
             <arg>--outputPath</arg><arg>${workingDir}/action_payload_by_type</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
-        <ok to="ForkPromote"/>
+        <ok to="PromoteActionPayloadForDatasetTable"/>
         <error to="Kill"/>
     </action>
-
-    <fork name="ForkPromote">
-        <path start="PromoteActionPayloadForDatasetTable"/>
-        <path start="PromoteActionPayloadForDatasourceTable"/>
-        <path start="PromoteActionPayloadForOrganizationTable"/>
-        <path start="PromoteActionPayloadForOtherResearchProductTable"/>
-        <path start="PromoteActionPayloadForProjectTable"/>
-        <path start="PromoteActionPayloadForPublicationTable"/>
-        <path start="PromoteActionPayloadForRelationTable"/>
-        <path start="PromoteActionPayloadForSoftwareTable"/>
-    </fork>
 
     <action name="PromoteActionPayloadForDatasetTable">
         <sub-workflow>
@@ -160,7 +150,7 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="JoinPromote"/>
+        <ok to="PromoteActionPayloadForDatasourceTable"/>
         <error to="Kill"/>
     </action>
 
@@ -175,7 +165,7 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="JoinPromote"/>
+        <ok to="PromoteActionPayloadForOrganizationTable"/>
         <error to="Kill"/>
     </action>
 
@@ -190,7 +180,7 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="JoinPromote"/>
+        <ok to="PromoteActionPayloadForOtherResearchProductTable"/>
         <error to="Kill"/>
     </action>
 
@@ -205,7 +195,7 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="JoinPromote"/>
+        <ok to="PromoteActionPayloadForProjectTable"/>
         <error to="Kill"/>
     </action>
 
@@ -220,7 +210,7 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="JoinPromote"/>
+        <ok to="PromoteActionPayloadForPublicationTable"/>
         <error to="Kill"/>
     </action>
 
@@ -235,7 +225,7 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="JoinPromote"/>
+        <ok to="PromoteActionPayloadForRelationTable"/>
         <error to="Kill"/>
     </action>
 
@@ -250,7 +240,7 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="JoinPromote"/>
+        <ok to="PromoteActionPayloadForSoftwareTable"/>
         <error to="Kill"/>
     </action>
 
@@ -265,11 +255,9 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="JoinPromote"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
-
-    <join name="JoinPromote" to="End"/>
 
     <end name="End"/>
 </workflow-app>

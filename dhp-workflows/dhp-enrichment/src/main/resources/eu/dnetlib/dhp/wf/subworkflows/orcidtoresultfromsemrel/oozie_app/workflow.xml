@@ -34,6 +34,7 @@
         <path start="copy_organization"/>
         <path start="copy_projects"/>
         <path start="copy_datasources"/>
+        <path start="copy_persons"/>
     </fork>
 
     <action name="copy_relation">
@@ -75,6 +76,17 @@
             <name-node>${nameNode}</name-node>
             <arg>${nameNode}/${sourcePath}/datasource</arg>
             <arg>${nameNode}/${outputPath}/datasource</arg>
+        </distcp>
+        <ok to="copy_wait"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="copy_persons">
+        <distcp xmlns="uri:oozie:distcp-action:0.2">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <arg>${nameNode}/${sourcePath}/person</arg>
+            <arg>${nameNode}/${outputPath}/person</arg>
         </distcp>
         <ok to="copy_wait"/>
         <error to="Kill"/>

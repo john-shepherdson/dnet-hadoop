@@ -1,11 +1,14 @@
 
 package eu.dnetlib.dhp.resulttocommunityfromsemrel;
 
+import static java.lang.String.join;
+
 import static eu.dnetlib.dhp.PropagationConstant.*;
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkHiveSession;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -19,6 +22,7 @@ import com.google.gson.Gson;
 import eu.dnetlib.dhp.api.Utils;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.resulttocommunityfromorganization.ResultCommunityList;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.Relation;
 import eu.dnetlib.dhp.schema.oaf.Result;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
@@ -45,7 +49,7 @@ public class PrepareResultCommunitySetStep1 {
 
 	/**
 	 * a dataset for example could be linked to more than one publication. For each publication linked to that dataset
-	 * the previous query will produce a row: targetId set of community context the target could possibly inherit with
+	 * the previous query will produce a row: targetId, set of community context the target could possibly inherit. With
 	 * the following query there will be a single row for each result linked to more than one result of the result type
 	 * currently being used
 	 */
@@ -55,6 +59,27 @@ public class PrepareResultCommunitySetStep1 {
 		+ "lateral view explode (community_context) c as co "
 		+ "where length(co) > 0 "
 		+ "group by resultId";
+
+	private static final String RESULT_CONTEXT_QUERY_TEMPLATE_IS_RELATED_TO = "select target as resultId, community_context "
+		+
+		"from resultWithContext rwc " +
+		"join relatedToRelations r " +
+		"join patents p  " +
+		"on rwc.id = r.source and r.target = p.id";
+
+	private static final String RESULT_WITH_CONTEXT = "select id, collect_set(co.id) community_context        \n" +
+		"    from  result        " +
+		"    lateral view explode (context) c as co     " +
+		"    where  lower(co.id) IN %s" +
+		"    group by id";
+
+	private static final String RESULT_PATENT = "select id " +
+		"    from result " +
+		"    where array_contains(instance.instancetype.classname, 'Patent')";
+
+	private static final String IS_RELATED_TO_RELATIONS = "select source, target " +
+		"    from relation " +
+		"    where lower(relClass) = 'isrelatedto' and datainfo.deletedbyinference = false";
 
 	public static void main(String[] args) throws Exception {
 		String jsonConfiguration = IOUtils
@@ -82,14 +107,25 @@ public class PrepareResultCommunitySetStep1 {
 		SparkConf conf = new SparkConf();
 		conf.set("hive.metastore.uris", parser.get("hive_metastore_uris"));
 
-		final List<String> allowedsemrel = Arrays.asList(parser.get("allowedsemrels").split(";"));
-		log.info("allowedSemRel: {}", new Gson().toJson(allowedsemrel));
+		final String allowedsemrel = "(" + join(
+			",",
+			Arrays
+				.asList(parser.get("allowedsemrels").split(";"))
+				.stream()
+				.map(value -> "'" + value.toLowerCase() + "'")
+				.toArray(String[]::new))
+			+ ")";
+		log.info("allowedSemRel: {}", allowedsemrel);
 
 		final String baseURL = parser.get("baseURL");
 		log.info("baseURL: {}", baseURL);
 
-		final List<String> communityIdList = getCommunityList(baseURL);
-		log.info("communityIdList: {}", new Gson().toJson(communityIdList));
+		final String communityIdList = "(" + join(
+			",", getCommunityList(baseURL)
+				.stream()
+				.map(value -> "'" + value.toLowerCase() + "'")
+				.toArray(String[]::new))
+			+ ")";
 
 		final String resultType = resultClassName.substring(resultClassName.lastIndexOf(".") + 1).toLowerCase();
 		log.info("resultType: {}", resultType);
@@ -118,10 +154,10 @@ public class PrepareResultCommunitySetStep1 {
 		SparkSession spark,
 		String inputPath,
 		String outputPath,
-		List<String> allowedsemrel,
+		String allowedsemrel,
 		Class<R> resultClazz,
 		String resultType,
-		List<String> communityIdList) {
+		String communityIdList) {
 
 		final String inputResultPath = inputPath + "/" + resultType;
 		log.info("Reading Graph table from: {}", inputResultPath);
@@ -132,7 +168,8 @@ public class PrepareResultCommunitySetStep1 {
 		Dataset<Relation> relation = readPath(spark, inputRelationPath, Relation.class);
 		relation.createOrReplaceTempView("relation");
 
-		Dataset<R> result = readPath(spark, inputResultPath, resultClazz);
+		Dataset<R> result = readPath(spark, inputResultPath, resultClazz)
+			.where("datainfo.deletedbyinference != true AND datainfo.invisible != true");
 		result.createOrReplaceTempView("result");
 
 		final String outputResultPath = outputPath + "/" + resultType;
@@ -141,10 +178,20 @@ public class PrepareResultCommunitySetStep1 {
 		String resultContextQuery = String
 			.format(
 				RESULT_CONTEXT_QUERY_TEMPLATE,
-				getConstraintList(" lower(co.id) = '", communityIdList),
-				getConstraintList(" lower(relClass) = '", allowedsemrel));
-
+				"AND  lower(co.id) IN " + communityIdList,
+				"AND lower(relClass) IN " + allowedsemrel);
 		Dataset<Row> result_context = spark.sql(resultContextQuery);
+
+		Dataset<Row> rwc = spark.sql(String.format(RESULT_WITH_CONTEXT, communityIdList));
+		Dataset<Row> patents = spark.sql(RESULT_PATENT);
+		Dataset<Row> relatedToRelations = spark.sql(IS_RELATED_TO_RELATIONS);
+
+		rwc.createOrReplaceTempView("resultWithContext");
+		patents.createOrReplaceTempView("patents");
+		relatedToRelations.createOrReplaceTempView("relatedTorelations");
+
+		result_context = result_context.unionAll(spark.sql(RESULT_CONTEXT_QUERY_TEMPLATE_IS_RELATED_TO));
+
 		result_context.createOrReplaceTempView("result_context");
 
 		spark
@@ -152,8 +199,9 @@ public class PrepareResultCommunitySetStep1 {
 			.as(Encoders.bean(ResultCommunityList.class))
 			.write()
 			.option("compression", "gzip")
-			.mode(SaveMode.Overwrite)
+			.mode(SaveMode.Append)
 			.json(outputResultPath);
+
 	}
 
 	public static List<String> getCommunityList(final String baseURL) throws IOException {
