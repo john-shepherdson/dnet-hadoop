@@ -28,14 +28,6 @@
         <value>/user/spark/spark2ApplicationHistory</value>
     </property>
     <property>
-        <name>spark2ExtraListeners</name>
-        <value>"com.cloudera.spark.lineage.NavigatorAppListener"</value>
-    </property>
-    <property>
-        <name>spark2SqlQueryExecutionListeners</name>
-        <value>"com.cloudera.spark.lineage.NavigatorQueryListener"</value>
-    </property>
-    <property>
         <name>oozieActionShareLibForSpark2</name>
         <value>spark342</value>
     </property>
