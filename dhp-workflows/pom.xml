@@ -29,7 +29,6 @@
         <module>dhp-graph-mapper</module>
         <module>dhp-dedup-openaire</module>
         <module>dhp-enrichment</module>
-        <module>dhp-graph-provision</module>
         <module>dhp-blacklist</module>
         <module>dhp-stats-actionsets</module>
         <module>dhp-stats-hist-snaps</module>
@@ -579,6 +578,21 @@
                 </file>
             </activation>
         </profile>
+        <profile>
+            <id>spark-34</id>
+            <modules>
+                <module>dhp-graph-provision</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>spark-35</id>
+            <modules>
+                <module>dhp-graph-provision</module>
+            </modules>
+        </profile>
+
+
     </profiles>
 
 </project>

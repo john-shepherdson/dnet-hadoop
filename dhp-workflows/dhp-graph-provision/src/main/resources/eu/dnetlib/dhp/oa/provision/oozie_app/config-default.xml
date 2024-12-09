@@ -13,7 +13,7 @@
     </property>
     <property>
         <name>oozie.action.sharelib.for.spark</name>
-        <value>spark2</value>
+        <value>spark342</value>
     </property>
     <property>
         <name>hive_metastore_uris</name>
@@ -37,6 +37,6 @@
     </property>
     <property>
         <name>oozieActionShareLibForSpark2</name>
-        <value>spark2</value>
+        <value>spark342</value>
     </property>
 </configuration>

@@ -14,6 +14,10 @@
             <description>context API URL</description>
         </property>
         <property>
+            <name>zkHost</name>
+            <description>Solr cluster Zookeeper URLs</description>
+        </property>
+        <property>
             <name>validateXML</name>
             <value>false</value>
             <description>should the payload converter validate the XMLs</description>
@@ -729,13 +733,14 @@
                 --conf spark.speculation=false
                 --conf spark.hadoop.mapreduce.map.speculative=false
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
+                --conf spark.executorEnv.JAVA_HOME=/srv/java/openjdk-17
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=/srv/java/openjdk-17
             </spark-opts>
             <arg>--path</arg><arg>${workingDir}/xml_json</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>
-            <arg>--batchSize</arg><arg>${batchSize}</arg>
+            <arg>--collection</arg><arg>${shadowFormat}-index-openaire</arg>
+            <arg>--zkHost</arg><arg>${zkHost}</arg>
         </spark>
-        <ok to="commit_solr_collection"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
 
