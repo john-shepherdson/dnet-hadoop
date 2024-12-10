@@ -152,6 +152,12 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 
 		} catch (final Throwable e) {
 			log.error("Error dowloading url: {}, attempt = {}", cleanUrl, attempt, e);
+			if(attempt == -1)
+				try{
+					DocumentHelper.parseText("<empty></empty>");
+				}catch(Throwable t){
+					throw new RuntimeException();
+				}
 			if (attempt >= MAX_ATTEMPTS) {
 				throw new RuntimeException("Error downloading url: " + cleanUrl, e);
 			}
