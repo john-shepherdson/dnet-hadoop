@@ -1,17 +1,9 @@
 package eu.dnetlib.dhp.sx.graph
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import eu.dnetlib.dhp.schema.oaf.{KeyValue, Result, StructuredProperty}
+import eu.dnetlib.dhp.schema.oaf.{Result, StructuredProperty}
 import eu.dnetlib.dhp.schema.sx.scholix.flat.ScholixFlat
-import eu.dnetlib.dhp.schema.sx.scholix.{
-  Scholix,
-  ScholixCollectedFrom,
-  ScholixEntityId,
-  ScholixIdentifier,
-  ScholixRelationship,
-  ScholixResource
-}
-import org.apache.logging.log4j.core.appender.ConsoleAppender.Target
+import eu.dnetlib.dhp.schema.sx.scholix._
 import org.json4s
 import org.json4s.DefaultFormats
 import org.json4s.jackson.JsonMethods.parse
