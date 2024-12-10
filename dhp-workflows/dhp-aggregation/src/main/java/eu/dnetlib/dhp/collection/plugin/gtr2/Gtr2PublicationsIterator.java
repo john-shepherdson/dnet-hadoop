@@ -13,12 +13,21 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.function.Function;
 
+import eu.dnetlib.dhp.collection.plugin.utils.JsonUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.http.Header;
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,8 +36,6 @@ import eu.dnetlib.dhp.common.collection.HttpClientParams;
 import eu.dnetlib.dhp.common.collection.HttpConnector2;
 
 public class Gtr2PublicationsIterator implements Iterator<String> {
-
-	public static final int PAGE_SIZE = 20;
 
 	private static final Logger log = LoggerFactory.getLogger(Gtr2PublicationsIterator.class);
 
@@ -42,7 +49,6 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 	private int endPage;
 	private boolean incremental = false;
 	private LocalDate fromDate;
-
 	private final Map<String, String> cache = new HashMap<>();
 
 	private final Queue<String> queue = new LinkedList<>();
@@ -88,27 +94,27 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 
 	private void prepareNextElement() {
 		while ((this.currPage <= this.endPage) && this.queue.isEmpty()) {
-			log.debug("FETCHING PAGE + " + this.currPage + "/" + this.endPage);
+			log.info("FETCHING PAGE + " + this.currPage + "/" + this.endPage);
 			this.queue.addAll(fetchPage(this.currPage++));
 		}
 		this.nextElement = this.queue.poll();
 	}
 
+
 	private List<String> fetchPage(final int pageNumber) {
 
 		final List<String> res = new ArrayList<>();
-		try {
-			final Document doc = loadURL(cleanURL(this.baseUrl + "/outcomes/publications?p=" + pageNumber), 0);
 
-			if (this.endPage == Integer.MAX_VALUE) {
-				this.endPage = NumberUtils.toInt(doc.valueOf("/*/@*[local-name() = 'totalPages']"));
-			}
+		try {
+			final Document doc = loadURL(this.baseUrl + "/publication?page=" + pageNumber, 0);
 
 			for (final Object po : doc.selectNodes("//*[local-name() = 'publication']")) {
+
 				final Element mainEntity = (Element) ((Element) po).detach();
 
 				if (filterIncremental(mainEntity)) {
-					res.add(expandMainEntity(mainEntity));
+					final String publicationOverview =mainEntity.attributeValue("url");
+					res.add(loadURL(publicationOverview, 0).asXML());
 				} else {
 					log.debug("Skipped entity");
 				}
@@ -122,34 +128,6 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 		return res;
 	}
 
-	private void addLinkedEntities(final Element master, final String relType, final Element newRoot,
-		final Function<Document, Element> mapper) {
-
-		for (final Object o : master.selectNodes(".//*[local-name()='link']")) {
-			final String rel = ((Element) o).valueOf("@*[local-name()='rel']");
-			final String href = ((Element) o).valueOf("@*[local-name()='href']");
-
-			if (relType.equals(rel) && StringUtils.isNotBlank(href)) {
-				final String cacheKey = relType + "#" + href;
-				if (this.cache.containsKey(cacheKey)) {
-					try {
-						log.debug(" * from cache (" + relType + "): " + href);
-						newRoot.add(DocumentHelper.parseText(this.cache.get(cacheKey)).getRootElement());
-					} catch (final DocumentException e) {
-						log.error("Error retrieving cache element: " + cacheKey, e);
-						throw new RuntimeException("Error retrieving cache element: " + cacheKey, e);
-					}
-				} else {
-					final Document doc = loadURL(cleanURL(href), 0);
-					final Element elem = mapper.apply(doc);
-					newRoot.add(elem);
-					this.cache.put(cacheKey, elem.asXML());
-				}
-
-			}
-		}
-	}
-
 	private boolean filterIncremental(final Element e) {
 		if (!this.incremental || isAfter(e.valueOf("@*[local-name() = 'created']"), this.fromDate)
 			|| isAfter(e.valueOf("@*[local-name() = 'updated']"), this.fromDate)) {
@@ -158,39 +136,26 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 		return false;
 	}
 
-	private String expandMainEntity(final Element mainEntity) {
-		final Element newRoot = DocumentHelper.createElement("doc");
-		newRoot.add(mainEntity);
-		addLinkedEntities(mainEntity, "PROJECT", newRoot, this::asProjectElement);
-		return DocumentHelper.createDocument(newRoot).asXML();
-	}
-
-	private Element asProjectElement(final Document doc) {
-		final Element newOrg = DocumentHelper.createElement("project");
-		newOrg.addElement("id").setText(doc.valueOf("/*/@*[local-name()='id']"));
-		newOrg
-			.addElement("code")
-			.setText(doc.valueOf("//*[local-name()='identifier' and @*[local-name()='type'] = 'RCUK']"));
-		newOrg.addElement("title").setText(doc.valueOf("//*[local-name()='title']"));
-		return newOrg;
-	}
-
-	private static String cleanURL(final String url) {
-		String cleaned = url;
-		if (cleaned.contains("gtr.gtr")) {
-			cleaned = cleaned.replace("gtr.gtr", "gtr");
-		}
-		if (cleaned.startsWith("http://")) {
-			cleaned = cleaned.replaceFirst("http://", "https://");
-		}
-		return cleaned;
-	}
-
 	private Document loadURL(final String cleanUrl, final int attempt) {
-		try {
-			log.debug("  * Downloading Url: {}", cleanUrl);
-			final byte[] bytes = this.connector.getInputSource(cleanUrl).getBytes(StandardCharsets.UTF_8);
-			return DocumentHelper.parseText(new String(bytes));
+		try (final CloseableHttpClient client = HttpClients.createDefault()) {
+
+			final HttpGet req = new HttpGet(cleanUrl);
+			req.setHeader(HttpHeaders.ACCEPT, "application/xml");
+			try (final CloseableHttpResponse response = client.execute(req)) {
+				if(endPage == Integer.MAX_VALUE)
+					for (final Header header : response.getAllHeaders()) {
+						log.debug("HEADER: " + header.getName() + " = " + header.getValue());
+						if ("Link-Pages".equals(header.getName())) {
+							if (Integer.parseInt(header.getValue()) < endPage)
+								endPage = Integer.parseInt(header.getValue());
+						}
+					}
+
+				final String content = IOUtils.toString(response.getEntity().getContent());
+				return DocumentHelper.parseText(content);
+
+			}
+
 		} catch (final Throwable e) {
 			log.error("Error dowloading url: {}, attempt = {}", cleanUrl, attempt, e);
 			if (attempt >= MAX_ATTEMPTS) {
