@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -94,7 +95,6 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 		this.nextElement = this.queue.poll();
 	}
 
-
 	private List<String> fetchPage(final int pageNumber) {
 
 		final List<String> res = new ArrayList<>();
@@ -107,8 +107,8 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 				final Element mainEntity = (Element) ((Element) po).detach();
 
 				if (filterIncremental(mainEntity)) {
-					final String publicationOverview =mainEntity.attributeValue("url");
-					res.add(loadURL(publicationOverview, 0).asXML());
+					final String publicationOverview = mainEntity.attributeValue("url");
+					res.add(loadURL(publicationOverview, -1).asXML());
 				} else {
 					log.debug("Skipped entity");
 				}
@@ -136,7 +136,7 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 			final HttpGet req = new HttpGet(cleanUrl);
 			req.setHeader(HttpHeaders.ACCEPT, "application/xml");
 			try (final CloseableHttpResponse response = client.execute(req)) {
-				if(endPage == Integer.MAX_VALUE)
+				if (endPage == Integer.MAX_VALUE)
 					for (final Header header : response.getAllHeaders()) {
 						log.debug("HEADER: " + header.getName() + " = " + header.getValue());
 						if ("Link-Pages".equals(header.getName())) {
@@ -151,13 +151,14 @@ public class Gtr2PublicationsIterator implements Iterator<String> {
 			}
 
 		} catch (final Throwable e) {
-			log.error("Error dowloading url: {}, attempt = {}", cleanUrl, attempt, e);
-			if(attempt == -1)
-				try{
-					DocumentHelper.parseText("<empty></empty>");
-				}catch(Throwable t){
+
+			if (attempt == -1)
+				try {
+					return DocumentHelper.parseText("<empty></empty>");
+				} catch (Throwable t) {
 					throw new RuntimeException();
 				}
+			log.error("Error dowloading url: {}, attempt = {}", cleanUrl, attempt, e);
 			if (attempt >= MAX_ATTEMPTS) {
 				throw new RuntimeException("Error downloading url: " + cleanUrl, e);
 			}

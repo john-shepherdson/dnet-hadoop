@@ -47,9 +47,9 @@ class Gtr2PublicationsIteratorTest {
 	@Test
 	@Disabled
 	public void testOnePage() throws Exception {
-		final Iterator<String> iterator = new Gtr2PublicationsIterator(baseURL, null, "12", "12", clientParams);
+		final Iterator<String> iterator = new Gtr2PublicationsIterator(baseURL, null, "379", "380", clientParams);
 		final int count = iterateAndCount(iterator);
-		assertEquals(20, count);
+		assertEquals(50, count);
 	}
 
 	@Test
