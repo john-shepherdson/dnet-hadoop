@@ -472,23 +472,12 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 								.stream()
 								.filter(Objects::nonNull)
 								.filter(sp -> StringUtils.isNotBlank(sp.getValue()))
-								.filter(
-									sp -> {
-										final String title = sp
-											.getValue()
-											.toLowerCase();
-										final String decoded = Unidecode.decode(title);
-
-										if (StringUtils.contains(decoded, TITLE_TEST)) {
-											return decoded
-												.replaceAll(TITLE_FILTER_REGEX, "")
-												.length() > TITLE_FILTER_RESIDUAL_LENGTH;
-										}
-										return !decoded
-											.replaceAll("\\W|\\d", "")
-											.isEmpty();
-									})
+								.filter(GraphCleaningFunctions::checkTestTitle)
 								.map(GraphCleaningFunctions::cleanValue)
+								.sorted(
+									Comparator.comparingInt((StructuredProperty t) -> t.getValue().length()).reversed())
+								.limit(ModelHardLimits.MAX_TITLES)
+								.map(GraphCleaningFunctions::shortenTitles)
 								.collect(Collectors.toList()));
 				}
 				if (Objects.nonNull(r.getFormat())) {
@@ -813,6 +802,29 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 		}
 
 		return value;
+	}
+
+	private static StructuredProperty shortenTitles(StructuredProperty title) {
+		if (title.getValue().length() > ModelHardLimits.MAX_TITLE_LENGTH) {
+			title.setValue(StringUtils.left(title.getValue(), ModelHardLimits.MAX_TITLE_LENGTH));
+		}
+		return title;
+	}
+
+	private static boolean checkTestTitle(StructuredProperty sp) {
+		final String title = sp
+			.getValue()
+			.toLowerCase();
+		final String decoded = Unidecode.decode(title);
+
+		if (StringUtils.contains(decoded, TITLE_TEST)) {
+			return decoded
+				.replaceAll(TITLE_FILTER_REGEX, "")
+				.length() > TITLE_FILTER_RESIDUAL_LENGTH;
+		}
+		return !decoded
+			.replaceAll("\\W|\\d", "")
+			.isEmpty();
 	}
 
 	private static Author cleanupAuthor(Author author) {
