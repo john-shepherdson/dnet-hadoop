@@ -37,9 +37,6 @@ public class SolrAdminApplication implements Closeable {
 						.getResourceAsStream("/eu/dnetlib/dhp/oa/provision/input_solradmin_parameters.json")));
 		parser.parseArgument(args);
 
-		final String isLookupUrl = parser.get("isLookupUrl");
-		log.info("isLookupUrl: {}", isLookupUrl);
-
 		final Action action = Action.valueOf(parser.get("action"));
 		log.info("action: {}", action);
 
@@ -52,9 +49,7 @@ public class SolrAdminApplication implements Closeable {
 			.orElse(false);
 		log.info("commit: {}", commit);
 
-		final ISLookupClient isLookup = new ISLookupClient(ISLookupClientFactory.getLookUpService(isLookupUrl));
-
-		final String zkHost = isLookup.getZkHost();
+		final String zkHost = parser.get("zkHost");
 		log.info("zkHost: {}", zkHost);
 
 		final String publicFormat = parser.get("publicFormat");

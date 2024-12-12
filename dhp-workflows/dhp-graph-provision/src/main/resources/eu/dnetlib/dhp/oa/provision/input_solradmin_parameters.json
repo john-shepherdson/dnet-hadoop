@@ -1,11 +1,5 @@
 [
   {
-    "paramName": "isu",
-    "paramLongName": "isLookupUrl",
-    "paramDescription": "the URL to the ISLookUp Service",
-    "paramRequired": true
-  },
-  {
     "paramName": "a",
     "paramLongName": "action",
     "paramDescription": "the action to be performed by the application",

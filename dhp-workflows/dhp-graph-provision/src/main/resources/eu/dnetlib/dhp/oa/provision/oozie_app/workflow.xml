@@ -39,8 +39,9 @@
             <description>maximum number of relations allowed for a each entity grouping by target</description>
         </property>
         <property>
-            <name>shadowFormat</name>
-            <description>metadata format name (DMF|TMF)</description>
+            <name>collection</name>
+            <value>shadow</value>
+            <description>collection name, indexing target</description>
         </property>
         <property>
             <name>batchSize</name>
@@ -104,6 +105,11 @@
             <name>sparkNetworkTimeout</name>
             <description>configures spark.network.timeout</description>
         </property>
+        <property>
+            <name>JAVA_HOME</name>
+            <value>/srv/java/openjdk-17</value>
+            <description>Used to configure the Java home location</description>
+        </property>
     </parameters>
 
     <global>
@@ -113,6 +119,10 @@
             <property>
                 <name>oozie.action.sharelib.for.spark</name>
                 <value>${oozieActionShareLibForSpark2}</value>
+            </property>
+            <property>
+                <name>oozie.launcher.mapreduce.map.env</name>
+                <value>JAVA_HOME=${JAVA_HOME}</value>
             </property>
         </configuration>
     </global>
@@ -148,10 +158,14 @@
                 --executor-memory=6G
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.executor.memoryOverhead=6G
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=15000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${inputGraphRootPath}/relation</arg>
             <arg>--outputPath</arg><arg>${workingDir}/relation</arg>
@@ -187,10 +201,14 @@
                 --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=15000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/publication</arg>
@@ -213,10 +231,14 @@
                 --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=15000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/dataset</arg>
@@ -239,10 +261,14 @@
                 --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=10000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/otherresearchproduct</arg>
@@ -265,10 +291,14 @@
                 --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/software</arg>
@@ -291,10 +321,14 @@
                 --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/datasource</arg>
@@ -317,10 +351,14 @@
                 --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/organization</arg>
@@ -343,10 +381,14 @@
                 --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/project</arg>
@@ -369,10 +411,14 @@
                 --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputRelationsPath</arg><arg>${workingDir}/relation</arg>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/person</arg>
@@ -408,10 +454,14 @@
                 --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=15000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/publication</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
@@ -435,10 +485,14 @@
                 --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=10000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/dataset</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
@@ -462,10 +516,14 @@
                 --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=10000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/otherresearchproduct</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.OtherResearchProduct</arg>
@@ -489,10 +547,14 @@
                 --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/software</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
@@ -516,10 +578,14 @@
                 --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=8000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/datasource</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
@@ -543,10 +609,14 @@
                 --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=10000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/organization</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
@@ -570,10 +640,14 @@
                 --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/project</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
@@ -597,10 +671,14 @@
                 --executor-memory=${sparkExecutorMemoryForJoining}
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.executor.memoryOverhead=${sparkExecutorMemoryForJoining}
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=5000
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputEntityPath</arg><arg>${inputGraphRootPath}/person</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Person</arg>
@@ -626,10 +704,14 @@
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
                 --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
+                --conf spark.extraListeners=
+                --conf spark.sql.queryExecutionListeners=
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.shuffle.partitions=3840
                 --conf spark.network.timeout=${sparkNetworkTimeout}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputPath</arg><arg>${workingDir}/join_entities</arg>
             <arg>--outputPath</arg><arg>${workingDir}/xml_json</arg>
@@ -658,9 +740,9 @@
                 </property>
             </configuration>
             <main-class>eu.dnetlib.dhp.oa.provision.SolrAdminApplication</main-class>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--zkHost</arg><arg>${zkHost}</arg>
             <arg>--action</arg><arg>DELETE_BY_QUERY</arg>
-            <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>
+            <arg>--shadowFormat</arg><arg>${collection}</arg>
             <arg>--query</arg><arg>${solrDeletionQuery}</arg>
             <arg>--commit</arg><arg>true</arg>
         </java>
@@ -689,15 +771,15 @@
                 --conf spark.speculation=false
                 --conf spark.hadoop.mapreduce.map.speculative=false
                 --conf spark.hadoop.mapreduce.reduce.speculative=false
-                --conf spark.executorEnv.JAVA_HOME=/srv/java/openjdk-17
-                --conf spark.yarn.appMasterEnv.JAVA_HOME=/srv/java/openjdk-17
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--path</arg><arg>${workingDir}/xml_json</arg>
-            <arg>--collection</arg><arg>${shadowFormat}-index-openaire</arg>
+            <arg>--collection</arg><arg>${collection}</arg>
             <arg>--zkHost</arg><arg>${zkHost}</arg>
             <arg>--batchSize</arg><arg>${batchSize}</arg>
         </spark>
-        <ok to="End"/>
+        <ok to="commit_solr_collection"/>
         <error to="Kill"/>
     </action>
 
@@ -710,8 +792,8 @@
                 </property>
             </configuration>
             <main-class>eu.dnetlib.dhp.oa.provision.SolrAdminApplication</main-class>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>
+            <arg>--zkHost</arg><arg>${zkHost}</arg>
+            <arg>--shadowFormat</arg><arg>${collection}</arg>
             <arg>--action</arg><arg>COMMIT</arg>
         </java>
         <ok to="End"/>
@@ -731,10 +813,12 @@
                 --driver-memory=${sparkDriverMemoryForJoining}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.executorEnv.JAVA_HOME=${JAVA_HOME}
+                --conf spark.yarn.appMasterEnv.JAVA_HOME=${JAVA_HOME}
             </spark-opts>
             <arg>--inputPath</arg><arg>${workingDir}/xml_json</arg>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
-            <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>
+            <arg>--zkHost</arg><arg>${zkHost}</arg>
+            <arg>--shadowFormat</arg><arg>${collection}</arg>
             <arg>--outputPath</arg><arg>${workingDir}/solr_documents</arg>
         </spark>
         <ok to="End"/>
@@ -751,7 +835,7 @@
                 </property>
             </configuration>
             <main-class>eu.dnetlib.dhp.oa.provision.SolrAdminApplication</main-class>
-            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--zkHost</arg><arg>${zkHost}</arg>
             <arg>--action</arg><arg>UPDATE_ALIASES</arg>
             <arg>--publicFormat</arg><arg>${publicFormat}</arg>
             <arg>--shadowFormat</arg><arg>${shadowFormat}</arg>
