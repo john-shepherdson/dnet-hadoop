@@ -652,15 +652,11 @@ public class GraphCleaningFunctions extends CleaningFunctions {
 				if (Objects.isNull(r.getBestaccessright())
 					|| StringUtils.isBlank(r.getBestaccessright().getClassid())) {
 					Qualifier bestaccessrights = OafMapperUtils.createBestAccessRights(r.getInstance());
-					if (Objects.isNull(bestaccessrights)) {
-						r
-							.setBestaccessright(
-								qualifier(
-									ModelConstants.UNKNOWN, ModelConstants.NOT_AVAILABLE,
-									ModelConstants.DNET_ACCESS_MODES));
-					} else {
-						r.setBestaccessright(bestaccessrights);
+					if (!vocs.termExists(ModelConstants.DNET_ACCESS_MODES, bestaccessrights.getClassid())) {
+						bestaccessrights.setClassid(UNKNOWN);
+						bestaccessrights.setClassname(NOT_AVAILABLE);
 					}
+					r.setBestaccessright(bestaccessrights);
 				}
 				if (Objects.nonNull(r.getAuthor())) {
 					r

@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.schema.common.AccessRightComparator;
+import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class OafMapperUtils {
@@ -365,31 +366,36 @@ public class OafMapperUtils {
 	}
 
 	protected static Qualifier getBestAccessRights(final List<Instance> instanceList) {
-		if (instanceList != null) {
-			final Optional<AccessRight> min = instanceList
-				.stream()
-				.map(Instance::getAccessright)
-				.min(new AccessRightComparator<>());
+		return Optional
+			.ofNullable(instanceList)
+			.map(list -> {
+				Optional<AccessRight> min = list
+					.stream()
+					.map(Instance::getAccessright)
+					.min(new AccessRightComparator<>());
 
-			final Qualifier rights = min.map(OafMapperUtils::qualifier).orElseGet(Qualifier::new);
+				final Qualifier rights = min.map(OafMapperUtils::qualifier).orElseGet(Qualifier::new);
 
-			if (StringUtils.isBlank(rights.getClassid())) {
-				rights.setClassid(UNKNOWN);
-			}
-			if (StringUtils.isBlank(rights.getClassname())
-				|| UNKNOWN.equalsIgnoreCase(rights.getClassname())) {
-				rights.setClassname(NOT_AVAILABLE);
-			}
-			if (StringUtils.isBlank(rights.getSchemeid())) {
-				rights.setSchemeid(DNET_ACCESS_MODES);
-			}
-			if (StringUtils.isBlank(rights.getSchemename())) {
-				rights.setSchemename(DNET_ACCESS_MODES);
-			}
+				if (StringUtils.isBlank(rights.getClassid())) {
+					rights.setClassid(UNKNOWN);
+				}
+				if (StringUtils.isBlank(rights.getClassname())
+					|| UNKNOWN.equalsIgnoreCase(rights.getClassname())) {
+					rights.setClassname(NOT_AVAILABLE);
+				}
+				if (StringUtils.isBlank(rights.getSchemeid())) {
+					rights.setSchemeid(DNET_ACCESS_MODES);
+				}
+				if (StringUtils.isBlank(rights.getSchemename())) {
+					rights.setSchemename(DNET_ACCESS_MODES);
+				}
 
-			return rights;
-		}
-		return null;
+				return rights;
+			})
+			.orElse(
+				qualifier(
+					ModelConstants.UNKNOWN, ModelConstants.NOT_AVAILABLE,
+					ModelConstants.DNET_ACCESS_MODES, DNET_ACCESS_MODES));
 	}
 
 	public static KeyValue newKeyValueInstance(String key, String value, DataInfo dataInfo) {
