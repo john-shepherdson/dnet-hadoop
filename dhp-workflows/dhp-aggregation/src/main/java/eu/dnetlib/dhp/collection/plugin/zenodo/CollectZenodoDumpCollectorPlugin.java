@@ -51,6 +51,9 @@ public class CollectZenodoDumpCollectorPlugin implements CollectorPlugin {
 				log.info("Response code is {}", responseCode);
 				if (responseCode >= 200 && responseCode < 400) {
 					IOUtils.copy(response.getEntity().getContent(), fsDataOutputStream);
+					fsDataOutputStream.flush();
+					fsDataOutputStream.hflush();
+					fsDataOutputStream.close();
 				}
 			} catch (Throwable eu) {
 				throw new RuntimeException(eu);
@@ -60,16 +63,30 @@ public class CollectZenodoDumpCollectorPlugin implements CollectorPlugin {
 		}
 	}
 
+	public FileSystem initializeFileSystem(final String hdfsURI) {
+		try {
+			return FileSystem.get(getHadoopConfiguration(hdfsURI));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	@Override
 	public Stream<String> collect(ApiDescriptor api, AggregatorReport report) throws CollectorException {
-		try {
-			final String zenodoURL = api.getBaseUrl();
-			final String hdfsURI = api.getParams().get("hdfsURI");
-			final FileSystem fileSystem = FileSystem.get(getHadoopConfiguration(hdfsURI));
-			downloadItem("zenodoDump.tar.gz", zenodoURL, "/tmp", fileSystem);
-			CompressionCodecFactory factory = new CompressionCodecFactory(fileSystem.getConf());
 
-			Path sourcePath = new Path("/tmp/zenodoDump.tar.gz");
+		final String zenodoURL = api.getBaseUrl();
+		final String hdfsURI = api.getParams().get("hdfsURI");
+		final FileSystem fileSystem = initializeFileSystem(hdfsURI);
+		return doStream(fileSystem, zenodoURL, "/tmp");
+	}
+
+
+	public  Stream<String>  doStream(FileSystem fileSystem, String zenodoURL, String basePath) throws CollectorException {
+		try {
+
+			downloadItem("zenodoDump.tar.gz", zenodoURL, basePath, fileSystem);
+			CompressionCodecFactory factory = new CompressionCodecFactory(fileSystem.getConf());
+			Path sourcePath = new Path(basePath+"/zenodoDump.tar.gz");
 			CompressionCodec codec = factory.getCodec(sourcePath);
 			InputStream gzipInputStream = null;
 			try {
@@ -78,14 +95,13 @@ public class CollectZenodoDumpCollectorPlugin implements CollectorPlugin {
 
 			} catch (IOException e) {
 				throw new CollectorException(e);
-			} finally {
-				log.info("Closing gzip stream");
-				org.apache.hadoop.io.IOUtils.closeStream(gzipInputStream);
 			}
 		} catch (Exception e) {
 			throw new CollectorException(e);
 		}
 	}
+
+
 
 	private Stream<String> iterateTar(InputStream gzipInputStream) throws Exception {
 

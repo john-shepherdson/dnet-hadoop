@@ -1,19 +1,14 @@
 
 package eu.dnetlib.dhp.collection.plugin.zenodo;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import java.util.zip.GZIPInputStream;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.dnetlib.dhp.collection.ApiDescriptor;
-import eu.dnetlib.dhp.common.collection.CollectorException;
 
 public class ZenodoPluginCollectionTest {
+
+
 
 	@Test
 	public void testZenodoIterator() throws Exception {
@@ -31,5 +26,6 @@ public class ZenodoPluginCollectionTest {
 
 		}
 	}
+
 
 }
