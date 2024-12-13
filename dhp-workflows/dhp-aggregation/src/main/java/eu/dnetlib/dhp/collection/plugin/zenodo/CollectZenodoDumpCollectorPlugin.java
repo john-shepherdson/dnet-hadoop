@@ -80,13 +80,12 @@ public class CollectZenodoDumpCollectorPlugin implements CollectorPlugin {
 		return doStream(fileSystem, zenodoURL, "/tmp");
 	}
 
-
-	public  Stream<String>  doStream(FileSystem fileSystem, String zenodoURL, String basePath) throws CollectorException {
+	public Stream<String> doStream(FileSystem fileSystem, String zenodoURL, String basePath) throws CollectorException {
 		try {
 
 			downloadItem("zenodoDump.tar.gz", zenodoURL, basePath, fileSystem);
 			CompressionCodecFactory factory = new CompressionCodecFactory(fileSystem.getConf());
-			Path sourcePath = new Path(basePath+"/zenodoDump.tar.gz");
+			Path sourcePath = new Path(basePath + "/zenodoDump.tar.gz");
 			CompressionCodec codec = factory.getCodec(sourcePath);
 			InputStream gzipInputStream = null;
 			try {
@@ -100,8 +99,6 @@ public class CollectZenodoDumpCollectorPlugin implements CollectorPlugin {
 			throw new CollectorException(e);
 		}
 	}
-
-
 
 	private Stream<String> iterateTar(InputStream gzipInputStream) throws Exception {
 

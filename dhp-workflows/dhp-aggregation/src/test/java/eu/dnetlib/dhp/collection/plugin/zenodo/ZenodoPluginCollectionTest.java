@@ -2,13 +2,11 @@
 package eu.dnetlib.dhp.collection.plugin.zenodo;
 
 import java.util.zip.GZIPInputStream;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-
 public class ZenodoPluginCollectionTest {
-
-
 
 	@Test
 	public void testZenodoIterator() throws Exception {
@@ -26,6 +24,5 @@ public class ZenodoPluginCollectionTest {
 
 		}
 	}
-
 
 }
