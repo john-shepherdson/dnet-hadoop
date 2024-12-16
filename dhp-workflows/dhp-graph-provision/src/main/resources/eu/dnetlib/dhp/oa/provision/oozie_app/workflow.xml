@@ -742,7 +742,7 @@
             <main-class>eu.dnetlib.dhp.oa.provision.SolrAdminApplication</main-class>
             <arg>--zkHost</arg><arg>${zkHost}</arg>
             <arg>--action</arg><arg>DELETE_BY_QUERY</arg>
-            <arg>--shadowFormat</arg><arg>${collection}</arg>
+            <arg>--shadowCollection</arg><arg>${collection}</arg>
             <arg>--query</arg><arg>${solrDeletionQuery}</arg>
             <arg>--commit</arg><arg>true</arg>
         </java>
@@ -778,6 +778,7 @@
             <arg>--collection</arg><arg>${collection}</arg>
             <arg>--zkHost</arg><arg>${zkHost}</arg>
             <arg>--batchSize</arg><arg>${batchSize}</arg>
+            <arg>--shouldCommit</arg><arg>false</arg>
         </spark>
         <ok to="commit_solr_collection"/>
         <error to="Kill"/>
@@ -793,7 +794,7 @@
             </configuration>
             <main-class>eu.dnetlib.dhp.oa.provision.SolrAdminApplication</main-class>
             <arg>--zkHost</arg><arg>${zkHost}</arg>
-            <arg>--shadowFormat</arg><arg>${collection}</arg>
+            <arg>--shadowCollection</arg><arg>${collection}</arg>
             <arg>--action</arg><arg>COMMIT</arg>
         </java>
         <ok to="End"/>
