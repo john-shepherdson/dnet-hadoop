@@ -71,23 +71,24 @@ public class OrcidPropagationJobTest {
 			.getResource(
 				"/eu/dnetlib/dhp/orcidtoresultfromsemrel/preparedInfo/mergedOrcidAssoc")
 			.getPath();
-		SparkOrcidToResultFromSemRelJob
-			.main(
-				new String[] {
-					"-isTest", Boolean.TRUE.toString(),
-					"-isSparkSessionManaged", Boolean.FALSE.toString(),
-					"-sourcePath", sourcePath,
-					"-hive_metastore_uris", "",
-					"-saveGraph", "true",
-					"-resultTableName", Dataset.class.getCanonicalName(),
-					"-outputPath", workingDir.toString() + "/dataset",
-					"-possibleUpdatesPath", possibleUpdatesPath
-				});
+		SparkPropagateOrcidAuthor
+				.main(
+						new String[] {
+								"-graphPath",
+								getClass()
+										.getResource(
+												"/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/noupdate")
+										.getPath(),
+								"-targetPath",
+								workingDir.toString() + "/graph",
+								"-orcidPath", "",
+								"-workingDir", workingDir.toString()
+						});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());
 
 		JavaRDD<Dataset> tmp = sc
-			.textFile(workingDir.toString() + "/dataset")
+			.textFile(workingDir.toString() + "/graph/dataset")
 			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
 
 		// tmp.map(s -> new Gson().toJson(s)).foreach(s -> System.out.println(s));
@@ -110,36 +111,24 @@ public class OrcidPropagationJobTest {
 
 	@Test
 	void oneUpdateTest() throws Exception {
-		SparkOrcidToResultFromSemRelJob
-			.main(
-				new String[] {
-					"-isTest",
-					Boolean.TRUE.toString(),
-					"-isSparkSessionManaged",
-					Boolean.FALSE.toString(),
-					"-sourcePath",
-					getClass()
-						.getResource("/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/oneupdate")
-						.getPath(),
-					"-hive_metastore_uris",
-					"",
-					"-saveGraph",
-					"true",
-					"-resultTableName",
-					"eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath",
-					workingDir.toString() + "/dataset",
-					"-possibleUpdatesPath",
-					getClass()
-						.getResource(
-							"/eu/dnetlib/dhp/orcidtoresultfromsemrel/preparedInfo/mergedOrcidAssoc")
-						.getPath()
-				});
+		SparkPropagateOrcidAuthor
+				.main(
+						new String[] {
+								"-graphPath",
+								getClass()
+										.getResource(
+												"/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/oneupdate")
+										.getPath(),
+								"-targetPath",
+								workingDir.toString() + "/graph",
+								"-orcidPath", "",
+								"-workingDir", workingDir.toString()
+						});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
 
 		JavaRDD<Dataset> tmp = sc
-			.textFile(workingDir.toString() + "/dataset")
+			.textFile(workingDir.toString() + "/graph/dataset")
 			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
 
 		// tmp.map(s -> new Gson().toJson(s)).foreach(s -> System.out.println(s));
@@ -177,31 +166,18 @@ public class OrcidPropagationJobTest {
 
 	@Test
 	void twoUpdatesTest() throws Exception {
-		SparkOrcidToResultFromSemRelJob
+		SparkPropagateOrcidAuthor
 			.main(
 				new String[] {
-					"-isTest",
-					Boolean.TRUE.toString(),
-					"-isSparkSessionManaged",
-					Boolean.FALSE.toString(),
-					"-sourcePath",
+					"-graphPath",
 					getClass()
 						.getResource(
 							"/eu/dnetlib/dhp/orcidtoresultfromsemrel/sample/twoupdates")
 						.getPath(),
-					"-hive_metastore_uris",
-					"",
-					"-saveGraph",
-					"true",
-					"-resultTableName",
-					"eu.dnetlib.dhp.schema.oaf.Dataset",
-					"-outputPath",
+					"-targetPath",
 					workingDir.toString() + "/dataset",
-					"-possibleUpdatesPath",
-					getClass()
-						.getResource(
-							"/eu/dnetlib/dhp/orcidtoresultfromsemrel/preparedInfo/mergedOrcidAssoc")
-						.getPath()
+					"-orcidPath", "",
+					"-workingDir", workingDir.toString()
 				});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());

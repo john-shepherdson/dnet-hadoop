@@ -72,7 +72,7 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
 
   def createTemporaryData(spark: SparkSession, graphPath: String, orcidPath: String, targetPath: String): Unit
 
-  private def analisys(targetPath: String, classid:String, provenance:String): Unit = {
+  private def analisys(targetPath: String, classid: String, provenance: String): Unit = {
     ModelSupport.entityTypes.asScala
       .filter(e => ModelSupport.isResult(e._1))
       .foreach(e => {
@@ -94,4 +94,3 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
       })
   }
 }
-
