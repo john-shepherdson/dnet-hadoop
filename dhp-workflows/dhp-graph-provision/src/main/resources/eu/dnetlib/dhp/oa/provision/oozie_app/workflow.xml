@@ -514,6 +514,7 @@
                 ${sparkResourceOpts}
                 --conf spark.sql.shuffle.partitions=5000
             </spark-opts>
+        </spark>
         <ok to="should_index"/>
         <error to="Kill"/>
     </action>
