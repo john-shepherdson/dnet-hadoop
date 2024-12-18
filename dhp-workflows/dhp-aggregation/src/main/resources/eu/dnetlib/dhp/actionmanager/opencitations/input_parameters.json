@@ -1,13 +1,13 @@
 [
   {
-    "paramName": "if",
-    "paramLongName": "inputFile",
+    "paramName": "ip",
+    "paramLongName": "inputPath",
     "paramDescription": "the zipped opencitations file",
     "paramRequired": true
   },
   {
-    "paramName": "wp",
-    "paramLongName": "workingPath",
+    "paramName": "op",
+    "paramLongName": "outputPath",
     "paramDescription": "the working path",
     "paramRequired": true
   },
@@ -18,9 +18,9 @@
     "paramRequired": true
   },
   {
-    "paramName": "p",
-    "paramLongName": "prefix",
-    "paramDescription": "COCI or POCI",
+    "paramName": "bp",
+    "paramLongName": "backupPath",
+    "paramDescription": "the hdfs path to move the OC data after the extraction",
     "paramRequired": true
   }
 ]

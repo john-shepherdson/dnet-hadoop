@@ -50,14 +50,14 @@ public class EOSCFuture_Test {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final OtherResearchProduct p = OBJECT_MAPPER
 			.readValue(
 				IOUtils.toString(getClass().getResourceAsStream("eosc-future/photic-zone.json")),
 				OtherResearchProduct.class);
 
-		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
+		final String xml = xmlRecordFactory.build(new JoinedEntity(p));
 
 		assertNotNull(xml);
 

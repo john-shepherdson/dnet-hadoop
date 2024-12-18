@@ -96,7 +96,7 @@
         "aggregation": "MAX",
         "positive": "layer4",
         "negative": "NO_MATCH",
-        "undefined": "MATCH",
+        "undefined": "layer4",
         "ignoreUndefined": "true"
       },
       "layer4": {

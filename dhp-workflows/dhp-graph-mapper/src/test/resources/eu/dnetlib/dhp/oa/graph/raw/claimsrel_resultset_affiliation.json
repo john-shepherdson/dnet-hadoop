@@ -1,0 +1,27 @@
+[
+	{
+		"field": "source_type",
+		"type": "string",
+		"value": "organization"
+	},
+	{
+		"field": "source_id",
+		"type": "string",
+		"value": "openorgs____::b5ca9d4340e26454e367e2908ef3872f"
+	},
+	{
+		"field": "target_type",
+		"type": "string",
+		"value": "software"
+	},
+	{
+		"field": "target_id",
+		"type": "string",
+		"value": "userclaim___::bde53826d07c8cf47c99222a375cd2e8"
+	},
+	{
+		"field": "semantics",
+		"type": "string",
+		"value": "resultOrganization_affiliation_isAuthorInstitutionOf"
+	}
+]

@@ -1,0 +1,37 @@
+[ {
+    "paramName": "n",
+    "paramLongName": "namenode",
+    "paramDescription": "the Name Node URI",
+    "paramRequired": true
+  },
+  {
+    "paramName": "m",
+    "paramLongName": "master",
+    "paramDescription": "the master name",
+    "paramRequired": true
+  },
+  {
+    "paramName": "t",
+    "paramLongName": "targetPath",
+    "paramDescription": "the target PATH where download the files",
+    "paramRequired": true
+  },
+  {
+    "paramName": "a",
+    "paramLongName": "apiURL",
+    "paramDescription": "the URL  to download the tar file",
+    "paramRequired": true
+  },
+  {
+    "paramName": "g",
+    "paramLongName": "graphPath",
+    "paramDescription": "the path of the input graph",
+    "paramRequired": true
+  },
+  {
+    "paramName": "at",
+    "paramLongName": "accessToken",
+    "paramDescription": "the accessToken to contact API",
+    "paramRequired": true
+  }
+]

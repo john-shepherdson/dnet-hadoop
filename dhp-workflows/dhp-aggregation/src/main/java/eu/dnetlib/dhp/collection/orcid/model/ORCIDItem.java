@@ -11,4 +11,7 @@ public class ORCIDItem {
 	public void setOrcid(String orcid) {
 		this.orcid = orcid;
 	}
+
+	public ORCIDItem() {
+	}
 }

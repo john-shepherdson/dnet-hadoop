@@ -142,6 +142,7 @@
         <path start="clean_datasource"/>
         <path start="clean_organization"/>
         <path start="clean_project"/>
+        <path start="clean_person"/>
         <path start="clean_relation"/>
     </fork>
 
@@ -156,10 +157,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
                 --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/publication</arg>
@@ -190,10 +193,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
                 --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/dataset</arg>
@@ -224,10 +229,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
                 --conf spark.sql.shuffle.partitions=5000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/otherresearchproduct</arg>
@@ -258,10 +265,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
                 --conf spark.sql.shuffle.partitions=2000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/software</arg>
@@ -292,10 +301,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
                 --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/datasource</arg>
@@ -326,10 +337,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
                 --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/organization</arg>
@@ -360,15 +373,53 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
                 --conf spark.sql.shuffle.partitions=2000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/project</arg>
             <arg>--outputPath</arg><arg>${graphOutputPath}/project</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
+            <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
+            <arg>--contextId</arg><arg>${contextId}</arg>
+            <arg>--verifyParam</arg><arg>${verifyParam}</arg>
+            <arg>--country</arg><arg>${country}</arg>
+            <arg>--verifyCountryParam</arg><arg>${verifyCountryParam}</arg>
+            <arg>--hostedBy</arg><arg>${workingDir}/working/hostedby</arg>
+            <arg>--collectedfrom</arg><arg>${collectedfrom}</arg>
+            <arg>--masterDuplicatePath</arg><arg>${workingDir}/masterduplicate</arg>
+            <arg>--deepClean</arg><arg>${shouldClean}</arg>
+        </spark>
+        <ok to="wait_clean"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="clean_person">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Clean person</name>
+            <class>eu.dnetlib.dhp.oa.graph.clean.CleanGraphSparkJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-cores=${sparkExecutorCores}
+                --executor-memory=${sparkExecutorMemory}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
+                --conf spark.sql.shuffle.partitions=2000
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${graphInputPath}/person</arg>
+            <arg>--outputPath</arg><arg>${graphOutputPath}/person</arg>
+            <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Person</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
             <arg>--contextId</arg><arg>${contextId}</arg>
             <arg>--verifyParam</arg><arg>${verifyParam}</arg>
@@ -394,10 +445,12 @@
                 --executor-cores=${sparkExecutorCores}
                 --executor-memory=${sparkExecutorMemory}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.autoBroadcastJoinThreshold=-1
                 --conf spark.sql.shuffle.partitions=20000
             </spark-opts>
             <arg>--inputPath</arg><arg>${graphInputPath}/relation</arg>

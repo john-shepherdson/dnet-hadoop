@@ -4,6 +4,11 @@
 
 package eu.dnetlib.dhp.collection.plugin.rest;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -11,6 +16,8 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
 
 import eu.dnetlib.dhp.collection.ApiDescriptor;
 import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
@@ -25,18 +32,18 @@ class RestCollectorPluginTest {
 
 	private static final Logger log = LoggerFactory.getLogger(RestCollectorPluginTest.class);
 
-	private final String baseUrl = "https://share.osf.io/api/v2/search/creativeworks/_search";
-	private final String resumptionType = "count";
-	private final String resumptionParam = "from";
-	private final String entityXpath = "//hits/hits";
-	private final String resumptionXpath = "//hits";
-	private final String resultTotalXpath = "//hits/total";
-	private final String resultFormatParam = "format";
+	private final String baseUrl = "https://ddh-openapi.worldbank.org/search";
+	private final String resumptionType = "discover";
+	private final String resumptionParam = "skip";
+	private final String entityXpath = "//*[local-name()='data']";
+	private final String resumptionXpath = "";
+	private final String resultTotalXpath = "//*[local-name()='count']";
+	private final String resultFormatParam = "";
 	private final String resultFormatValue = "json";
-	private final String resultSizeParam = "size";
+	private final String resultSizeParam = "top";
 	private final String resultSizeValue = "10";
 	// private String query = "q=%28sources%3ASocArXiv+AND+type%3Apreprint%29";
-	private final String query = "q=%28sources%3AengrXiv+AND+type%3Apreprint%29";
+	private final String query = "";
 	// private String query = "=(sources:engrXiv AND type:preprint)";
 
 	private final String protocolDescriptor = "rest_json2xml";
@@ -56,6 +63,7 @@ class RestCollectorPluginTest {
 		params.put("resultSizeValue", resultSizeValue);
 		params.put("queryParams", query);
 		params.put("entityXpath", entityXpath);
+		params.put("requestHeaderMap", "{\"User-Agent\": \"OpenAIRE DEV\"}");
 
 		api.setBaseUrl(baseUrl);
 		api.setParams(params);
@@ -77,5 +85,20 @@ class RestCollectorPluginTest {
 
 		log.info("{}", i.intValue());
 		Assertions.assertTrue(i.intValue() > 0);
+	}
+
+	@Disabled
+	@Test
+	void testUrl() throws IOException {
+		String url_s = "https://ddh-openapi.worldbank.org/search?&top=10";
+		URL url = new URL(url_s);
+		final HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		conn.setRequestMethod("GET");
+		conn.setRequestProperty("User-Agent", "OpenAIRE");
+		Gson gson = new Gson();
+		System.out.println("Request header");
+		System.out.println(gson.toJson(conn.getHeaderFields()));
+		InputStream inputStream = conn.getInputStream();
+
 	}
 }

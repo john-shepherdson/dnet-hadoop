@@ -35,12 +35,20 @@ export HADOOP_USER="oozie"
 export HADOOP_USER_NAME="oozie"
 
 echo "Creating and populating impala tables"
-hive $HIVE_OPTS -e "create table ${TARGET_DB}.context (id string, name string) row format delimited fields terminated by ','"
-hive $HIVE_OPTS -e "create table ${TARGET_DB}.category (context string, id string, name string) row format delimited fields terminated by ','"
-hive $HIVE_OPTS -e "create table ${TARGET_DB}.concept (category string, id string, name string) row format delimited fields terminated by ','"
-hive $HIVE_OPTS -e "load data inpath '${TMP}/contexts.csv' into table ${TARGET_DB}.context"
-hive $HIVE_OPTS -e "load data inpath '${TMP}/categories.csv' into table ${TARGET_DB}.category"
-hive $HIVE_OPTS -e "load data inpath '${TMP}/concepts.csv' into table ${TARGET_DB}.concept"
+hive $HIVE_OPTS -e "create table ${TARGET_DB}.context_csv (id string, name string) row format delimited fields terminated by ','"
+hive $HIVE_OPTS -e "load data inpath '${TMP}/contexts.csv' into table ${TARGET_DB}.context_csv"
+hive $HIVE_OPTS -e "create table ${TARGET_DB}.context stored as parquet as select * from ${TARGET_DB}.context_csv"
+hive $HIVE_OPTS -e "drop table ${TARGET_DB}.context_csv purge"
+
+hive $HIVE_OPTS -e "create table ${TARGET_DB}.category_csv (context string, id string, name string) row format delimited fields terminated by ','"
+hive $HIVE_OPTS -e "load data inpath '${TMP}/categories.csv' into table ${TARGET_DB}.category_csv"
+hive $HIVE_OPTS -e "create table ${TARGET_DB}.category stored as parquet as select * from ${TARGET_DB}.category_csv"
+hive $HIVE_OPTS -e "drop table ${TARGET_DB}.category_csv purge"
+
+hive $HIVE_OPTS -e "create table ${TARGET_DB}.concept_csv (category string, id string, name string) row format delimited fields terminated by ','"
+hive $HIVE_OPTS -e "load data inpath '${TMP}/concepts.csv' into table ${TARGET_DB}.concept_csv"
+hive $HIVE_OPTS -e "create table ${TARGET_DB}.concept stored as parquet as select * from ${TARGET_DB}.concept_csv"
+hive $HIVE_OPTS -e "drop table ${TARGET_DB}.concept_csv purge"
 
 echo "Cleaning up"
 rm concepts.csv

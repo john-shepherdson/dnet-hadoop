@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>                                          
+<record>
+  <header xmlns="http://www.openarchives.org/OAI/2.0/">
+    <identifier>ftunivminnesdc:oai:conservancy.umn.edu:11299/109914</identifier>
+    <datestamp>2023-07-18T20:05:40Z</datestamp>
+  </header>
+  <metadata xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:base_dc="http://oai.base-search.net/base_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <base_dc:dc xsi:schemaLocation="http://oai.base-search.net/base_dc/ http://oai.base-search.net/base_dc/base_dc.xsd">
+      <base_dc:global_id>ftunivminnesdc:oai:conservancy.umn.edu:11299/109914</base_dc:global_id>
+      <base_dc:continent>cna</base_dc:continent>
+      <base_dc:country>us</base_dc:country>
+      <base_dc:collection opendoar_id="1008">ftunivminnesdc</base_dc:collection>
+      <base_dc:collname>University of Minnesota Digital Conservancy</base_dc:collname>
+      <dc:title>An Experimental Investigation of the influence of an air bubble layer on radiated noise and surface pressure fluctuations in a turbulent boundary layer</dc:title>
+      <dc:creator>Killen, John M.</dc:creator>
+      <dc:subject>Boundary layer noise</dc:subject>
+      <dc:subject>Kinetic energy dissipation</dc:subject>
+      <dc:subject>Air bubble layer</dc:subject>
+      <dc:subject>Maximum stable bubble size</dc:subject>
+      <dc:subject>bubble noise spectra</dc:subject>
+      <dc:description>between the noise spectra of a layer of air bubbles in a turbulent flow and' a maximum stable bubble size which can exist in the same flow. An air bubbie layer with individual bubble sizes greater than a maximum stable size was introduced into the boundary layer of water flowing along a smooth flat plate. It was found that the maximum stable bubble size was related to the turbulent kinetic energy dissipation as had been previously shown by other investigators ; Office of Naval Research Arlington, Virginia 22217</dc:description>
+      <dc:date>1981-09-31T21:42:52Z</dc:date>
+      <base_dc:year>1981</base_dc:year>
+      <dc:type>Report</dc:type>
+      <base_dc:typenorm>14</base_dc:typenorm>
+      <dc:identifier>http://purl.umn.edu/109914</dc:identifier>
+      <base_dc:link>http://purl.umn.edu/109914</base_dc:link>
+      <dc:language>en_US</dc:language>
+      <dc:relation>Project Reports</dc:relation>
+      <dc:relation>202</dc:relation>
+      <dc:relation>http://purl.umn.edu/109914</dc:relation>
+      <base_dc:oa>2</base_dc:oa>
+      <base_dc:lang>eng</base_dc:lang>
+    </base_dc:dc>
+  </metadata>
+</record>

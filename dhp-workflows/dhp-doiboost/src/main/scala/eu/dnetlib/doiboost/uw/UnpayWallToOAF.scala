@@ -71,6 +71,7 @@ object UnpayWallToOAF {
   }
 
   def convertToOAF(input: String): Publication = {
+
     val pub = new Publication
 
     implicit lazy val formats: DefaultFormats.type = org.json4s.DefaultFormats

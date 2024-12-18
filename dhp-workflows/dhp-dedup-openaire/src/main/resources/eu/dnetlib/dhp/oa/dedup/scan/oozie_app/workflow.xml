@@ -33,16 +33,14 @@
             <description>max number of elements in a connected component</description>
         </property>
         <property>
-            <name>sparkDriverMemory</name>
-            <description>memory for driver process</description>
+            <name>sparkResourceOpts</name>
+            <value>--executor-memory=6G --conf spark.executor.memoryOverhead=4G --executor-cores=6 --driver-memory=8G --driver-cores=4</value>
+            <description>spark resource options</description>
         </property>
         <property>
-            <name>sparkExecutorMemory</name>
-            <description>memory for individual executor</description>
-        </property>
-        <property>
-            <name>sparkExecutorCores</name>
-            <description>number of cores used by single executor</description>
+            <name>sparkResourceOptsCreateMergeRel</name>
+            <value>--executor-memory=6G --conf spark.executor.memoryOverhead=4G --executor-cores=6 --driver-memory=8G --driver-cores=4</value>
+            <description>spark resource options</description>
         </property>
         <property>
             <name>oozieActionShareLibForSpark2</name>
@@ -119,9 +117,7 @@
             <class>eu.dnetlib.dhp.oa.dedup.SparkCreateSimRels</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
+                ${sparkResourceOpts}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -146,9 +142,7 @@
             <class>eu.dnetlib.dhp.oa.dedup.SparkWhitelistSimRels</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
+                ${sparkResourceOpts}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -174,9 +168,7 @@
             <class>eu.dnetlib.dhp.oa.dedup.SparkCreateMergeRels</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
+                ${sparkResourceOptsCreateMergeRel}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -203,9 +195,7 @@
             <class>eu.dnetlib.dhp.oa.dedup.SparkCreateDedupRecord</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
+                ${sparkResourceOpts}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -230,9 +220,7 @@
             <class>eu.dnetlib.dhp.oa.dedup.SparkCopyOpenorgsMergeRels</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
+                ${sparkResourceOpts}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -257,9 +245,7 @@
             <class>eu.dnetlib.dhp.oa.dedup.SparkCreateOrgsDedupRecord</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
+                ${sparkResourceOpts}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -283,9 +269,7 @@
             <class>eu.dnetlib.dhp.oa.dedup.SparkUpdateEntity</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
+                ${sparkResourceOpts}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -309,9 +293,7 @@
             <class>eu.dnetlib.dhp.oa.dedup.SparkCopyRelationsNoOpenorgs</class>
             <jar>dhp-dedup-openaire-${projectVersion}.jar</jar>
             <spark-opts>
-                --executor-memory=${sparkExecutorMemory}
-                --executor-cores=${sparkExecutorCores}
-                --driver-memory=${sparkDriverMemory}
+                ${sparkResourceOpts}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}

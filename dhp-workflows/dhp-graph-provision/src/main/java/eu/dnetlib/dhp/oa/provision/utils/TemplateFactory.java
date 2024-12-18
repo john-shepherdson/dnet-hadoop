@@ -5,13 +5,10 @@ import static eu.dnetlib.dhp.oa.provision.utils.GraphMappingUtils.removePrefix;
 import static eu.dnetlib.dhp.oa.provision.utils.XmlSerializationUtils.escapeXml;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import javax.swing.text.html.Option;
 
 import org.apache.commons.lang3.StringUtils;
 import org.stringtemplate.v4.ST;
@@ -100,13 +97,17 @@ public class TemplateFactory {
 
 	public String getInstance(
 		final List<String> instancemetadata, final String url) {
+		return getInstance(instancemetadata, Lists.newArrayList(url));
+	}
+
+	public String getInstance(
+		final List<String> instancemetadata, final List<String> url) {
 		return getTemplate(resources.getInstance())
 			.add("metadata", instancemetadata)
 			.add(
 				"webresources",
 				Optional
 					.ofNullable(url)
-					.map(u -> Lists.newArrayList(url))
 					.orElse(Lists.newArrayList())
 					.stream()
 					.filter(StringUtils::isNotBlank)

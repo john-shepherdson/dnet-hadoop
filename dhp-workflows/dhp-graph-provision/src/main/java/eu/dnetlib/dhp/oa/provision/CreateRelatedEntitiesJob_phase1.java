@@ -3,6 +3,7 @@ package eu.dnetlib.dhp.oa.provision;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,14 +28,7 @@ import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
 import eu.dnetlib.dhp.schema.common.EntityType;
-import eu.dnetlib.dhp.schema.oaf.Datasource;
-import eu.dnetlib.dhp.schema.oaf.Field;
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
-import eu.dnetlib.dhp.schema.oaf.Organization;
-import eu.dnetlib.dhp.schema.oaf.Project;
-import eu.dnetlib.dhp.schema.oaf.Relation;
-import eu.dnetlib.dhp.schema.oaf.Result;
-import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
+import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.ModelHardLimits;
 import scala.Tuple2;
 
@@ -156,10 +150,39 @@ public class CreateRelatedEntitiesJob_phase1 {
 			case software:
 				final Result result = (Result) entity;
 
-				if (result.getTitle() != null && !result.getTitle().isEmpty()) {
-					final StructuredProperty title = result.getTitle().stream().findFirst().get();
-					title.setValue(StringUtils.left(title.getValue(), ModelHardLimits.MAX_TITLE_LENGTH));
-					re.setTitle(title);
+				if (Objects.nonNull(result.getTitle()) && !result.getTitle().isEmpty()) {
+					result
+						.getTitle()
+						.stream()
+						.filter(t -> StringUtils.isNotBlank(t.getValue()))
+						.findFirst()
+						.ifPresent(
+							title -> {
+								re.setTitle(title);
+								re
+									.getTitle()
+									.setValue(StringUtils.left(title.getValue(), ModelHardLimits.MAX_TITLE_LENGTH));
+							});
+				}
+				if (Objects.nonNull(result.getDescription()) && !result.getDescription().isEmpty()) {
+					result
+						.getDescription()
+						.stream()
+						.filter(d -> Objects.nonNull(d.getValue()))
+						.map(Field::getValue)
+						.max(Comparator.comparingInt(String::length))
+						.ifPresent(
+							d -> re.setDescription(StringUtils.left(d, ModelHardLimits.MAX_RELATED_ABSTRACT_LENGTH)));
+				}
+				if (Objects.nonNull(result.getAuthor()) && !result.getAuthor().isEmpty()) {
+					re
+						.setAuthor(
+							result
+								.getAuthor()
+								.stream()
+								.map(Author::getFullname)
+								.filter(StringUtils::isNotBlank)
+								.collect(Collectors.toList()));
 				}
 
 				re.setDateofacceptance(getValue(result.getDateofacceptance()));
@@ -210,6 +233,14 @@ public class CreateRelatedEntitiesJob_phase1 {
 				if (!f.isEmpty()) {
 					re.setFundingtree(f.stream().map(Field::getValue).collect(Collectors.toList()));
 				}
+				break;
+			case person:
+				final Person person = (Person) entity;
+
+				re.setGivenName(person.getGivenName());
+				re.setFamilyName(person.getFamilyName());
+				re.setAlternativeNames(person.getAlternativeNames());
+
 				break;
 		}
 		return re;

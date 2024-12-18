@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
@@ -16,6 +17,9 @@ import javax.xml.transform.TransformerException;
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrInputDocument;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.io.SAXReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +38,6 @@ import eu.dnetlib.dhp.utils.saxon.SaxonTransformerFactory;
 
 /**
  * This test can be used to produce a record that can be manually fed to Solr in XML format.
- *
  * The input is a JoinedEntity, i.e. a json representation of an OpenAIRE entity that embeds all the linked entities.
  */
 public class IndexRecordTransformerTest {
@@ -54,16 +57,16 @@ public class IndexRecordTransformerTest {
 	}
 
 	@Test
-	public void testPublicationRecordTransformation() throws IOException, TransformerException {
+	public void testPublicationRecordTransformation() throws IOException, TransformerException, DocumentException {
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final Publication p = load("publication.json", Publication.class);
 		final Project pj = load("project.json", Project.class);
 		final Relation rel = load("relToValidatedProject.json", Relation.class);
 
-		final JoinedEntity je = new JoinedEntity<>(p);
+		final JoinedEntity je = new JoinedEntity(p);
 		je
 			.setLinks(
 				Lists
@@ -71,22 +74,26 @@ public class IndexRecordTransformerTest {
 						new RelatedEntityWrapper(rel,
 							CreateRelatedEntitiesJob_phase1.asRelatedEntity(pj, Project.class))));
 
-		final String record = xmlRecordFactory.build(je);
+		final String xmlRecord = xmlRecordFactory.build(je);
 
-		assertNotNull(record);
+		assertNotNull(xmlRecord);
 
-		testRecordTransformation(record);
+		Document doc = new SAXReader().read(new StringReader(xmlRecord));
+
+		assertEquals("Article", doc.valueOf("//children/instance/instancetype/@classname"));
+
+		testRecordTransformation(xmlRecord);
 	}
 
 	@Test
 	void testPeerReviewed() throws IOException, TransformerException {
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final Publication p = load("publication.json", Publication.class);
 
-		final JoinedEntity<Publication> je = new JoinedEntity<>(p);
+		final JoinedEntity je = new JoinedEntity(p);
 		final String record = xmlRecordFactory.build(je);
 		assertNotNull(record);
 		SolrInputDocument solrDoc = testRecordTransformation(record);
@@ -98,11 +105,11 @@ public class IndexRecordTransformerTest {
 	public void testRiunet() throws IOException, TransformerException {
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final Publication p = load("riunet.json", Publication.class);
 
-		final JoinedEntity je = new JoinedEntity<>(p);
+		final JoinedEntity je = new JoinedEntity(p);
 		final String record = xmlRecordFactory.build(je);
 		assertNotNull(record);
 		testRecordTransformation(record);

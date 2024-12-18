@@ -1,0 +1,58 @@
+<record>
+  <header xmlns="http://www.openarchives.org/OAI/2.0/">
+    <identifier>ftdoajarticles:oai:doaj.org/article:e2d5b5126b2d4e479933cc7f9a9ae0c1</identifier>
+    <datestamp>2022-12-31T11:48:55Z</datestamp>
+  </header>
+  <metadata xmlns="http://www.openarchives.org/OAI/2.0/" xmlns:base_dc="http://oai.base-search.net/base_dc/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://purl.org/dc/elements/1.1/">
+    <base_dc:dc xsi:schemaLocation="http://oai.base-search.net/base_dc/ http://oai.base-search.net/base_dc/base_dc.xsd">
+      <base_dc:global_id>ftdoajarticles:oai:doaj.org/article:e2d5b5126b2d4e479933cc7f9a9ae0c1</base_dc:global_id>
+      <base_dc:continent>cww</base_dc:continent>
+      <base_dc:country>org</base_dc:country>
+      <base_dc:collection opendoar_id="1234" ror_id="ror1234">ftdoajarticles</base_dc:collection>
+      <base_dc:collname>TEST REPO</base_dc:collname>
+      <dc:title>Assessment of cultural heritage: the legislative and methodological framework of Russian Federation</dc:title>
+      <dc:creator>ALBU, Svetlana</dc:creator>
+      <dc:creator>LEȘAN, Anna</dc:creator>
+      <dc:subject>architectural heritage</dc:subject>
+      <dc:subject>evaluation of architectural heritage</dc:subject>
+      <dc:subject>types of values</dc:subject>
+      <dc:subject>experience of russian federation</dc:subject>
+      <dc:subject>Social Sciences</dc:subject>
+      <dc:subject>H</dc:subject>
+      <dc:description>Architectural heritage is the real estate inheritance by population of a country becoming an extremely valuable and specific category, preserving and capitalizing on those assets requires considerable effort. The state does not have sufficient means to maintain and preserve cultural heritage, as a result it is included in the civil circuit. The transfer of property right or of some partial rights over the architectural patrimony is accompanied by the necessity to estimate the value of goods. In this article, the authors examine the experience of Russian Federation (one of the largest countries with a huge architectural heritage) on the legislative framework of architectural and methodological heritage of architectural heritage assessment. The particularities of cultural assets valuation compared to other categories of real estate are examined, as well as the methodological aspects (types of values, methods applied in valuation, approaches according to the purpose of valuation) regarding the valuation of real estate with architectural value in Russian Federation.</dc:description>
+      <dc:publisher>Technical University of Moldova</dc:publisher>
+      <dc:date>2020-09-01T00:00:00Z</dc:date>
+      <base_dc:year>2020</base_dc:year>
+      <dc:type>article</dc:type>
+      <base_dc:typenorm>121</base_dc:typenorm>
+      <dc:identifier>https://doi.org/10.5281/zenodo.3971988</dc:identifier>
+      <dc:identifier>https://doaj.org/article/e2d5b5126b2d4e479933cc7f9a9ae0c1</dc:identifier>
+      <base_dc:link>https://doi.org/10.5281/zenodo.3971988</base_dc:link>
+      <dc:source>Journal of Social Sciences, Vol 3, Iss 3, Pp 134-143 (2020)</dc:source>
+      <dc:language>EN</dc:language>
+      <dc:language>FR</dc:language>
+      <dc:language>RO</dc:language>
+      <dc:relation>http://ibn.idsi.md/sites/default/files/imag_file/JSS-3-2020_134-143.pdf</dc:relation>
+      <dc:relation>https://doaj.org/toc/2587-3490</dc:relation>
+      <dc:relation>https://doaj.org/toc/2587-3504</dc:relation>
+      <dc:relation>doi:10.5281/zenodo.3971988</dc:relation>
+      <dc:relation>2587-3490</dc:relation>
+      <dc:relation>2587-3504</dc:relation>
+      <dc:relation>https://doaj.org/article/e2d5b5126b2d4e479933cc7f9a9ae0c1</dc:relation>
+      <base_dc:autoclasscode type="ddc">720</base_dc:autoclasscode>
+      <base_dc:authod_id>
+        <base_dc:creator_name>ALBU, Svetlana</base_dc:creator_name>
+        <base_dc:creator_id>https://orcid.org/0000-0002-8648-950X</base_dc:creator_id>
+      </base_dc:authod_id>
+      <base_dc:authod_id>
+        <base_dc:creator_name>LEȘAN, Anna</base_dc:creator_name>
+        <base_dc:creator_id>https://orcid.org/0000-0003-3284-0525</base_dc:creator_id>
+      </base_dc:authod_id>
+      <base_dc:doi>https://doi.org/10.5281/zenodo.3971988</base_dc:doi>
+      <base_dc:oa>1</base_dc:oa>
+      <base_dc:lang>eng</base_dc:lang>
+      <base_dc:lang>fre</base_dc:lang>
+      <base_dc:lang>rum</base_dc:lang>
+    </base_dc:dc>
+  </metadata>
+</record>

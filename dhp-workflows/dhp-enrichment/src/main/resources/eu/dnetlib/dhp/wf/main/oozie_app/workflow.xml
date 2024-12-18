@@ -122,6 +122,7 @@
             <case to="community_project">${wf:conf('resumeFrom') eq 'CommunityProject'}</case>
             <case to="community_sem_rel">${wf:conf('resumeFrom') eq 'CommunitySemanticRelation'}</case>
             <case to="country_propagation">${wf:conf('resumeFrom') eq 'CountryPropagation'}</case>
+            <case to="person_propagation">${wf:conf('resumeFrom') eq 'PersonPropagation'}</case>
             <default to="orcid_propagation"/>
         </switch>
     </decision>
@@ -291,10 +292,24 @@
                 </property>
             </configuration>
         </sub-workflow>
+        <ok to="person_propagation" />
+        <error to="Kill" />
+    </action>
+    <action name="person_propagation">
+        <sub-workflow>
+            <app-path>${wf:appPath()}/person_propagation
+            </app-path>
+            <propagate-configuration/>
+            <configuration>
+                <property>
+                    <name>sourcePath</name>
+                    <value>${outputPath}</value>
+                </property>
+            </configuration>
+        </sub-workflow>
         <ok to="country_propagation" />
         <error to="Kill" />
     </action>
-
     <action name="country_propagation">
         <sub-workflow>
             <app-path>${wf:appPath()}/country_propagation
@@ -318,6 +333,8 @@
         <ok to="End" />
         <error to="Kill" />
     </action>
+
+
 
     <end name="End"/>
 

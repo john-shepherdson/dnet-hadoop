@@ -1,0 +1,89 @@
+<record rank="null">
+    <result>
+        <header>
+            <objIdentifier>dedup_wf_002::532be02f990b479a1da46d71f1a4c3f0</objIdentifier>
+            <dateOfCollection>2023-03-31T18:37:45.599Z</dateOfCollection>
+            <dateOfTransformation>2023-03-31T18:45:52.701Z</dateOfTransformation>
+        </header>
+        <metadata>
+            <entity schemaLocation="http://namespace.openaire.eu/oaf https://www.openaire.eu/schema/1.0/oaf-1.0.xsd">
+                <result>
+                    <collectedfrom name="Waterford Institute of Technology - Open Access Repository" id="opendoar____::50c1f44e426560f3f2cdcb3e19e39903" />
+                    <collectedfrom name="SETU Open Access Repository" id="opendoar____::4daa3db355ef2b0e64b472968cb70f0d" />
+                    <originalId>50|od______6005::55a12e2e0fee45ce8005633c6c17fe9f</originalId>
+                    <originalId>oai:repository.wit.ie:3029</originalId>
+                    <originalId>50|od_______934::e7162a5632264cd622ee7180ca66fdce</originalId>
+                    <originalId>oai:generic.eprints.org:3029</originalId>
+                    <originalId>50|od_______934::55a12e2e0fee45ce8005633c6c17fe9f</originalId>
+                    <measure id="influence" score="3.1177596E-9" class="C5" />
+                    <measure id="popularity" score="1.2305752E-9" class="C5" />
+                    <measure id="influence_alt" score="0" class="C5" />
+                    <measure id="popularity_alt" score="0.0" class="C5" />
+                    <measure id="impulse" score="0" class="C5" />
+                    <fulltext>http://repository.wit.ie/3029/1/Research%20Day%202015%20-%20Poster%20Tadhg%20Blommerde.pdf</fulltext>
+                    <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title" inferred="false" provenanceaction="sysimport:crosswalk:repository" trust="0.9">A service innovation capability maturity model for SMEs</title>
+                    <bestaccessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                    <creator rank="1" name="Tadhg" surname="Blommerde">Blommerde, Tadhg</creator>
+                    <creator rank="2" name="Patrick" surname="Lynch">Lynch, Patrick</creator>
+                    <country classid="IE" classname="Ireland" schemeid="dnet:countries" schemename="dnet:countries" />
+                    <dateofacceptance>2015-04-28</dateofacceptance>
+                    <description>There is general consensus that service innovations are prerequisite to sustained competitive advantage and are an essential mechanism for responding to changes in customer needs and the operating environment of firms (Giannopoulou et al., 2011; Stryja et al., 2013). Services have been described as ubiquitous in their role of generating economic growth and wellbeing and represent over 70% of employment and GDP in developed nations (Janssen et al., 2012; Mustak, 2014). As a consequence, service innovations must be a core ambition of all countries, regions, and firms wishing to remain competitive (van Ark et al., 2003). While acknowledging the importance of once-off innovations, more critical still is the capability to repeatedly introduce and exploit service innovations (Siguaw et al., 2006). This is generally referred to as service innovation capability (SIC) and describes the repeatable routines and behaviours that organisations have in place to transform ideas and knowledge into innovations (Basterretxea and Martínez, 2012). However, despite links between SIC and continuous, sustainable, and consistent service innovations, there is evidence that many organisations struggle with its effective management (Adams et al., 2006; den Hertog et al., 2010). This is often attributed to the lack of formal guidance available and the absence of metrics to determine an organisation’s SIC performance (Hogan et al., 2011; Szczygielski, 2011). Maturity modelling research in this discipline remains at an embryonic stage, thus far presenting only conceptual and opaque discussions that fail to address the necessity for an assessment and strategic management framework (Gryszkiewicz et al., 2013; Hipp and Grupp, 2005). Therefore, the purpose of this ongoing research project is to evaluate the maturity of an organisation’s SIC to inform its effective management and enhancement. To achieve this it dimensionalises the concept into four constituent capabilities, specifically, strategising, customer involvement, knowledge management, and networking (Blommerde and Lynch, 2014). The study then tracks the maturity of these capabilities as they progress through eight evolutionary plateaus towards a fully developed or optimal state. This is accomplished through a capability maturity model that enables organisations to rapidly diagnose key areas of strength and weakness to systematically cultivate behaviours that leverage their untapped innovative potential (Wendler, 2012; Essmann and du Preez, 2010). As a result of the immense knowledge vacuum characteristic of this discipline, it is anticipated that this ongoing research project will make a substantial contribution to both academic understanding and take strides towards filling the void in practical support (Rapaccini et al., 2013). It expands the service innovation literature by detailing key service innovation levers, bolsters the discipline through clear definitions of terminology, provides a powerful explanation of the development of SICs, and operationalises the dynamic capabilities view through a novel self-assessment reference model (Jochem et al., 2011). The next step in the project is the evaluation of the, as yet, conceptual service innovation capability maturity model. Adopting a positivistic philosophical stance, the study proposes the use of structural equation modelling on data gathered through an extensive survey to confirm the model and support theoretical assumptions.</description>
+                    <subject classid="keyword" classname="keyword" schemeid="dnet:result_subject" schemename="dnet:result_subject" inferred="false" provenanceaction="sysimport:crosswalk:repository" trust="0.9">RIKON (Research in Inovation, Knowledge &amp; Organisational Networks)</subject>
+                    <language classid="eng" classname="English" schemeid="dnet:languages" schemename="dnet:languages" />
+                    <format>application/pdf</format>
+                    <resulttype classid="publication" classname="publication" schemeid="dnet:result_typologies" schemename="dnet:result_typologies" />
+                    <resourcetype classid="UNKNOWN" classname="UNKNOWN" schemeid="dnet:dataCite_resource" schemename="dnet:dataCite_resource" />
+                    <isgreen>false</isgreen>
+                    <isindiamondjournal>false</isindiamondjournal>
+                    <publiclyfunded>true</publiclyfunded>
+                    <context id="eu-conexus" label="European University for Smart Urban Coastal Sustainability" type="community" />
+                    <context id="tunet" label="TU-NET" type="community" />
+                    <datainfo>
+                        <inferred>true</inferred>
+                        <deletedbyinference>true</deletedbyinference>
+                        <trust>0.8</trust>
+                        <inferenceprovenance>dedup-result-decisiontree-v4</inferenceprovenance>
+                        <provenanceaction classid="sysimport:dedup" classname="Inferred by OpenAIRE" schemeid="dnet:provenanceActions" schemename="dnet:provenanceActions" />
+                    </datainfo>
+                    <rels>
+                        <rel inferred="true" trust="0.85" inferenceprovenance="propagation" provenanceaction="result:organization:instrepo">
+                            <to class="hasAuthorInstitution" scheme="dnet:result_organization_relations" type="organization">openorgs____::54cd984fc7d3b153ec2181f985041f02</to>
+                            <country classid="IE" classname="Ireland" schemeid="dnet:countries" schemename="dnet:countries" />
+                            <legalshortname>WIT</legalshortname>
+                            <legalname>South East Technological University</legalname>
+                        </rel>
+                    </rels>
+                    <children>
+                        <result objidentifier="od_______934::e7162a5632264cd622ee7180ca66fdce">
+                            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title" inferred="false" provenanceaction="sysimport:crosswalk:repository" trust="0.9">A service innovation capability maturity model for SMEs</title>
+                            <dateofacceptance>2015-04-28</dateofacceptance>
+                            <collectedfrom name="SETU Open Access Repository" id="opendoar____::4daa3db355ef2b0e64b472968cb70f0d" />
+                        </result>
+                        <result objidentifier="od______6005::55a12e2e0fee45ce8005633c6c17fe9f">
+                            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title" inferred="false" provenanceaction="sysimport:crosswalk:repository" trust="0.9">A service innovation capability maturity model for SMEs</title>
+                            <dateofacceptance>2015-04-28</dateofacceptance>
+                            <collectedfrom name="Waterford Institute of Technology - Open Access Repository" id="opendoar____::50c1f44e426560f3f2cdcb3e19e39903" />
+                        </result>
+                        <result objidentifier="od_______934::55a12e2e0fee45ce8005633c6c17fe9f">
+                            <title classid="main title" classname="main title" schemeid="dnet:dataCite_title" schemename="dnet:dataCite_title" inferred="false" provenanceaction="sysimport:crosswalk:repository" trust="0.9">A service innovation capability maturity model for SMEs</title>
+                            <dateofacceptance>2015-04-28</dateofacceptance>
+                            <collectedfrom name="SETU Open Access Repository" id="opendoar____::4daa3db355ef2b0e64b472968cb70f0d" />
+                        </result>
+                        <instance>
+                            <accessright classid="OPEN" classname="Open Access" schemeid="dnet:access_modes" schemename="dnet:access_modes" />
+                            <collectedfrom name="SETU Open Access Repository" id="opendoar____::4daa3db355ef2b0e64b472968cb70f0d" />
+                            <hostedby name="SETU Open Access Repository" id="opendoar____::4daa3db355ef2b0e64b472968cb70f0d" />
+                            <dateofacceptance>2015-04-28</dateofacceptance>
+                            <instancetype classid="0004" classname="Conference object" schemeid="dnet:publication_resource" schemename="dnet:publication_resource" />
+                            <refereed classid="0002" classname="nonPeerReviewed" schemeid="dnet:review_levels" schemename="dnet:review_levels" />
+                            <fulltext>http://repository.wit.ie/3029/1/Research%20Day%202015%20-%20Poster%20Tadhg%20Blommerde.pdf</fulltext>
+                            <webresource>
+                                <url>http://repository.wit.ie/3029/</url>
+                            </webresource>
+                        </instance>
+                    </children>
+                </result>
+            </entity>
+        </metadata>
+    </result>
+</record>

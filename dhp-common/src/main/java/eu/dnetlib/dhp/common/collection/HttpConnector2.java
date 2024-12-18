@@ -12,9 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.time.DateUtils;
 import org.apache.http.HttpHeaders;
-import org.joda.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -214,11 +212,11 @@ public class HttpConnector2 {
 					.format(
 						"Unexpected status code: %s errors: %s", urlConn.getResponseCode(),
 						MAPPER.writeValueAsString(report)));
-		} catch (MalformedURLException | UnknownHostException e) {
+		} catch (MalformedURLException e) {
 			log.error(e.getMessage(), e);
 			report.put(e.getClass().getName(), e.getMessage());
 			throw new CollectorException(e.getMessage(), e);
-		} catch (SocketTimeoutException | SocketException e) {
+		} catch (SocketTimeoutException | SocketException | UnknownHostException e) {
 			log.error(e.getMessage(), e);
 			report.put(e.getClass().getName(), e.getMessage());
 			backoffAndSleep(getClientParams().getRetryDelay() * retryNumber * 1000);

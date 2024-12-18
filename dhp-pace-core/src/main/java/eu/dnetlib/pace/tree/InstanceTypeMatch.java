@@ -23,15 +23,18 @@ public class InstanceTypeMatch extends AbstractListComparator {
 
 		// jolly types
 		translationMap.put("Conference object", "*");
+		translationMap.put("Research", "*");
 		translationMap.put("Other literature type", "*");
 		translationMap.put("Unknown", "*");
 		translationMap.put("UNKNOWN", "*");
 
 		// article types
 		translationMap.put("Article", "Article");
+		translationMap.put("Journal", "Article");
 		translationMap.put("Data Paper", "Article");
 		translationMap.put("Software Paper", "Article");
 		translationMap.put("Preprint", "Article");
+		translationMap.put("Part of book or chapter of book", "Article");
 
 		// thesis types
 		translationMap.put("Thesis", "Thesis");

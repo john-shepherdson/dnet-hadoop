@@ -24,7 +24,7 @@ import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import scala.Tuple2;
 
 /**
@@ -248,11 +248,10 @@ public class MergeGraphTableSparkJob {
 		private T mergeAndGet(T b, T a) {
 			if (Objects.nonNull(a) && Objects.nonNull(b)) {
 				if (ModelSupport.isSubClass(a, OafEntity.class) && ModelSupport.isSubClass(b, OafEntity.class)) {
-					return (T) OafMapperUtils.mergeEntities((OafEntity) b, (OafEntity) a);
+					return (T) MergeUtils.merge(b, a);
 				}
 				if (a instanceof Relation && b instanceof Relation) {
-					((Relation) a).mergeFrom(b);
-					return a;
+					return (T) MergeUtils.mergeRelation((Relation) a, (Relation) b);
 				}
 			}
 			return Objects.isNull(a) ? b : a;

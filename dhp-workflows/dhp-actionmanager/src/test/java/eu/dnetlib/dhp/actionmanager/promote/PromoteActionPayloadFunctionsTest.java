@@ -54,7 +54,7 @@ public class PromoteActionPayloadFunctionsTest {
 				RuntimeException.class,
 				() -> PromoteActionPayloadFunctions
 					.joinGraphTableWithActionPayloadAndMerge(
-						null, null, null, null, null, OafImplSubSub.class, OafImpl.class));
+						null, null, null, null, null, null, OafImplSubSub.class, OafImpl.class));
 		}
 
 		@Test
@@ -104,6 +104,7 @@ public class PromoteActionPayloadFunctionsTest {
 					rowIdFn,
 					actionPayloadIdFn,
 					mergeAndGetFn,
+					PromoteAction.Strategy.UPSERT,
 					OafImplSubSub.class,
 					OafImplSubSub.class)
 				.collectAsList();
@@ -183,6 +184,7 @@ public class PromoteActionPayloadFunctionsTest {
 					rowIdFn,
 					actionPayloadIdFn,
 					mergeAndGetFn,
+					PromoteAction.Strategy.UPSERT,
 					OafImplSubSub.class,
 					OafImplSub.class)
 				.collectAsList();

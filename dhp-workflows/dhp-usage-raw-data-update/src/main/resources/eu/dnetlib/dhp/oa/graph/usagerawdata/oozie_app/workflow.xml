@@ -30,6 +30,10 @@
                 <name>oozie.launcher.mapred.job.queue.name</name>
                 <value>${oozieLauncherQueueName}</value>
             </property>
+            <property>
+                <name>mapred.child.java.opts</name>
+                <value>-Xmx16g</value>
+            </property>
         </configuration>
     </global>
 

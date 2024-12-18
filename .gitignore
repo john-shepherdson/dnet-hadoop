@@ -27,3 +27,5 @@ spark-warehouse
 /**/.factorypath
 /**/.scalafmt.conf
 /.java-version
+/dhp-shade-package/dependency-reduced-pom.xml
+/**/job.properties

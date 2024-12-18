@@ -266,7 +266,7 @@ public class GraphCleaningFunctionsTest {
 			.collect(Collectors.toList());
 
 		assertNotNull(fos_subjects);
-		assertEquals(2, fos_subjects.size());
+		assertEquals(3, fos_subjects.size());
 
 		assertTrue(
 			fos_subjects
@@ -274,18 +274,18 @@ public class GraphCleaningFunctionsTest {
 				.anyMatch(
 					s -> "0101 mathematics".equals(s.getValue()) &
 						ModelConstants.DNET_SUBJECT_FOS_CLASSID.equals(s.getQualifier().getClassid()) &
-						"sysimport:crosswalk:datasetarchive"
-							.equals(s.getDataInfo().getProvenanceaction().getClassid())));
+						"subject:fos".equals(s.getDataInfo().getProvenanceaction().getClassid())));
 
 		assertTrue(
 			fos_subjects
 				.stream()
 				.anyMatch(
 					s -> "0102 computer and information sciences".equals(s.getValue()) &
-						ModelConstants.DNET_SUBJECT_FOS_CLASSID.equals(s.getQualifier().getClassid())));
+						ModelConstants.DNET_SUBJECT_FOS_CLASSID.equals(s.getQualifier().getClassid()) &
+						"subject:fos".equals(s.getDataInfo().getProvenanceaction().getClassid())));
 
-		verify_keyword(p_cleaned, "In Situ Hybridization");
-		verify_keyword(p_cleaned, "Avicennia");
+		verify_keyword(p_cleaned, "FOS: Computer and information sciences");
+		verify_keyword(p_cleaned, "FOS: Mathematics");
 
 		// TODO add more assertions to verity the cleaned values
 		System.out.println(MAPPER.writeValueAsString(p_cleaned));

@@ -25,12 +25,14 @@ SELECT
     		null                           AS ecinternationalorganization,
     		null                                           AS ecenterprise,
     		null                                        AS ecsmevalidated,
-    		null                                             AS ecnutscode
+    		null                                             AS ecnutscode,
+    org_types.name                                                                                              AS typology
 FROM organizations o
 	LEFT OUTER JOIN acronyms a    ON (a.id = o.id)
 	LEFT OUTER JOIN urls u        ON (u.id = o.id)
 	LEFT OUTER JOIN other_ids i   ON (i.id = o.id)
 	LEFT OUTER JOIN other_names n ON (n.id = o.id)
+    LEFT OUTER JOIN org_types ON (org_types.val = o.type)
 WHERE
     o.status = 'approved'
 GROUP BY
@@ -38,7 +40,8 @@ GROUP BY
 	o.name,
 	o.creation_date,
 	o.modification_date,
-	o.country
+	o.country,
+	org_types.name
 
 UNION ALL
 
@@ -69,13 +72,15 @@ SELECT
     (array_remove(array_cat(ARRAY[o.ec_internationalorganization], array_agg(od.ec_internationalorganization)), NULL))[1]              AS ecinternationalorganization,
     (array_remove(array_cat(ARRAY[o.ec_enterprise], array_agg(od.ec_enterprise)), NULL))[1]                      AS ecenterprise,
     (array_remove(array_cat(ARRAY[o.ec_smevalidated], array_agg(od.ec_smevalidated)), NULL))[1]                    AS ecsmevalidated,
-    (array_remove(array_cat(ARRAY[o.ec_nutscode], array_agg(od.ec_nutscode)), NULL))[1]                       AS ecnutscode
+    (array_remove(array_cat(ARRAY[o.ec_nutscode], array_agg(od.ec_nutscode)), NULL))[1]                       AS ecnutscode,
+    org_types.name                                                                                              AS typology
 FROM other_names n
 	LEFT OUTER JOIN organizations o ON (n.id = o.id)
 	LEFT OUTER JOIN urls u          ON (u.id = o.id)
 	LEFT OUTER JOIN other_ids i     ON (i.id = o.id)
 	LEFT OUTER JOIN oa_duplicates d ON (o.id = d.local_id)
     LEFT OUTER JOIN organizations od ON (d.oa_original_id = od.id)
+    LEFT OUTER JOIN org_types ON (org_types.val = o.type)
 WHERE
     o.status = 'approved'
 GROUP BY
@@ -83,4 +88,5 @@ GROUP BY
 	o.creation_date,
 	o.modification_date,
 	o.country,
+	org_types.name,
 	n.name;

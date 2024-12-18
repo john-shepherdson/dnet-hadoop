@@ -1,0 +1,17 @@
+{
+  "id": "50|DansKnawCris::0829b5191605bdbea36d6502b8c1ce1f",
+  "pid": [
+    {
+      "qualifier": {"classid": "urn"},
+      "value": "urn:nbn:nl:ui:29-f3ed5f9e-edf6-457e-8848-61b58a4075e2"
+    },
+    {
+      "qualifier": {"classid": "scp-number"},
+      "value": "79953761260"
+    },
+    {
+      "qualifier": {"classid": "pmc"},
+      "value": "21459329"
+    }
+  ]
+}

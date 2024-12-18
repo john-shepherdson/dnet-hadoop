@@ -1,3 +1,5 @@
+set mapred.job.queue.name=analytics; /*EOS*/
+
 -- noinspection SqlNoDataSourceInspectionForFile
 
 ------------------------------------------------------------
@@ -5,108 +7,73 @@
 -- Datasource table/view and Datasource related tables/views
 ------------------------------------------------------------
 ------------------------------------------------------------
-DROP TABLE IF EXISTS ${stats_db_name}.datasource_tmp purge;
+DROP TABLE IF EXISTS ${stats_db_name}.datasource purge; /*EOS*/
+DROP TABLE IF EXISTS ${stats_db_name}.harested_datasources purge; /*EOS*/
+DROP TABLE IF EXISTS ${stats_db_name}.piwik_datasource purge; /*EOS*/
 
-CREATE TABLE ${stats_db_name}.datasource_tmp
-(
-    `id`               string,
-    `name`             STRING,
-    `type`             STRING,
-    `dateofvalidation` STRING,
-    `yearofvalidation` string,
-    `harvested`        BOOLEAN,
-    `piwik_id`         INT,
-    `latitude`         STRING,
-    `longitude`        STRING,
-    `websiteurl`       STRING,
-    `compatibility`    STRING,
-    issn_printed       STRING,
-    issn_online        STRING
-) CLUSTERED BY (id) INTO 100 buckets stored AS orc tblproperties ('transactional' = 'true');
+create table ${stats_db_name}.harested_datasources stored as parquet as
+select distinct inst.hostedby.key as d_id
+from ${openaire_db_name}.result lateral view outer explode (instance) insts as inst; /*EOS*/
 
--- Insert statement that takes into account the piwik_id of the openAIRE graph
-INSERT INTO ${stats_db_name}.datasource_tmp
-SELECT substr(d1.id, 4)                                          AS id,
-       officialname.value                                        AS name,
-       datasourcetype.classname                                  AS type,
-       dateofvalidation.value                                    AS dateofvalidation,
-       date_format(d1.dateofvalidation.value, 'yyyy')            AS yearofvalidation,
-       FALSE                                                     AS harvested,
-       CASE WHEN d2.piwik_id IS NULL THEN 0 ELSE d2.piwik_id END AS piwik_id,
-       d1.latitude.value                                         AS latitude,
-       d1.longitude.value                                        AS longitude,
-       d1.websiteurl.value                                       AS websiteurl,
-       d1.openairecompatibility.classid                          AS compatibility,
-       d1.journal.issnprinted                                    AS issn_printed,
-       d1.journal.issnonline                                    AS issn_online
-FROM ${openaire_db_name}.datasource d1
-         LEFT OUTER JOIN
-     (SELECT id, split(originalidd, '\\:')[1] as piwik_id
-      FROM ${openaire_db_name}.datasource
-               LATERAL VIEW EXPLODE(originalid) temp AS originalidd
-      WHERE originalidd like "piwik:%") AS d2
-     ON d1.id = d2.id
-WHERE d1.datainfo.deletedbyinference = FALSE and d1.datainfo.invisible=false;
+create table ${stats_db_name}.piwik_datasource stored as parquet as
+select id, split(originalidd, '\\:')[1] as piwik_id
+from ${openaire_db_name}.datasource
+         lateral view explode(originalid) temp as originalidd
+where originalidd like "piwik:%"; /*EOS*/
 
--- Updating temporary table with everything that is not based on results -> This is done with the following "dual" table.
--- Creating a temporary dual table that will be removed after the following insert
+CREATE TABLE ${stats_db_name}.datasource stored as parquet as
+select /*+ COALESCE(100) */
+       substr(dtrce.id, 4)                                                                                                 as id,
+       case when dtrce.officialname.value='Unknown Repository' then 'Other' else dtrce.officialname.value end              as name,
+       dtrce.datasourcetype.classname                                                                                      as type,
+       dtrce.dateofvalidation.value                                                                                        as dateofvalidation,
+       case when dtrce.dateofvalidation.value='-1' then null else date_format(dtrce.dateofvalidation.value, 'yyyy') end    as yearofvalidation,
+       case when res.d_id is null then false else true end                                                                 as harvested,
+       case when piwik_d.piwik_id is null then 0 else piwik_d.piwik_id end                                                 as piwik_id,
+       dtrce.latitude.value                                                                                                as latitude,
+       dtrce.longitude.value                                                                                               as longitude,
+       dtrce.websiteurl.value                                                                                              as websiteurl,
+       dtrce.openairecompatibility.classid                                                                                 as compatibility,
+       dtrce.journal.issnprinted                                                                                           as issn_printed,
+       dtrce.journal.issnonline                                                                                            as issn_online
+from ${openaire_db_name}.datasource dtrce
+left outer join ${stats_db_name}.harested_datasources res on res.d_id=dtrce.id
+left outer join ${stats_db_name}.piwik_datasource piwik_d on piwik_d.id=dtrce.id
+where dtrce.datainfo.deletedbyinference = false and dtrce.datainfo.invisible = false; /*EOS*/
 
-CREATE TABLE ${stats_db_name}.dual ( dummy CHAR(1));
+drop table ${stats_db_name}.harested_datasources; /*EOS*/
+drop table ${stats_db_name}.piwik_datasource; /*EOS*/
 
-INSERT INTO ${stats_db_name}.dual VALUES ('X');
-
-INSERT INTO ${stats_db_name}.datasource_tmp (`id`, `name`, `type`, `dateofvalidation`, `yearofvalidation`, `harvested`,
-                                             `piwik_id`, `latitude`, `longitude`, `websiteurl`, `compatibility`, `issn_printed`, `issn_online`)
-SELECT 'other',
-       'Other',
-       'Repository',
-       NULL,
-       NULL,
-       false,
-       0,
-       NULL,
-       NULL,
-       NULL,
-       'unknown',
-       null,
-       null
-FROM ${stats_db_name}.dual
-WHERE 'other' not in (SELECT id FROM ${stats_db_name}.datasource_tmp WHERE name = 'Unknown Repository');
-DROP TABLE ${stats_db_name}.dual;
-
-UPDATE ${stats_db_name}.datasource_tmp SET name='Other' WHERE name = 'Unknown Repository';
-UPDATE ${stats_db_name}.datasource_tmp SET yearofvalidation=null WHERE yearofvalidation = '-1';
-
-DROP TABLE IF EXISTS ${stats_db_name}.datasource_languages purge;
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_languages purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.datasource_languages STORED AS PARQUET AS
-SELECT substr(d.id, 4) AS id, langs.languages AS language
+SELECT /*+ COALESCE(100) */ substr(d.id, 4) AS id, langs.languages AS language
 FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.odlanguages.value) langs AS languages
-where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false;
+where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.datasource_oids purge;
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_oids purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.datasource_oids STORED AS PARQUET AS
-SELECT substr(d.id, 4) AS id, oids.ids AS oid
+SELECT /*+ COALESCE(100) */ substr(d.id, 4) AS id, oids.ids AS oid
 FROM ${openaire_db_name}.datasource d LATERAL VIEW explode(d.originalid) oids AS ids
-where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false;
+where d.datainfo.deletedbyinference=false and d.datainfo.invisible=false; /*EOS*/
 
-DROP TABLE IF EXISTS ${stats_db_name}.datasource_organizations purge;
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_organizations purge; /*EOS*/
 
 CREATE TABLE ${stats_db_name}.datasource_organizations STORED AS PARQUET AS
-SELECT substr(r.target, 4) AS id, substr(r.source, 4) AS organization
+SELECT /*+ COALESCE(100) */ substr(r.target, 4) AS id, substr(r.source, 4) AS organization
 FROM ${openaire_db_name}.relation r
-WHERE r.reltype = 'datasourceOrganization' and r.datainfo.deletedbyinference = false and r.source like '20|%' and r.datainfo.invisible=false;
+WHERE r.reltype = 'datasourceOrganization' and r.datainfo.deletedbyinference = false and r.source like '20|%' and r.datainfo.invisible=false; /*EOS*/
 
 -- datasource sources:
 -- where the datasource info have been collected from.
-DROP TABLE IF EXISTS ${stats_db_name}.datasource_sources purge;
+DROP TABLE IF EXISTS ${stats_db_name}.datasource_sources purge; /*EOS*/
 
 create table if not exists ${stats_db_name}.datasource_sources STORED AS PARQUET AS
-select substr(d.id, 4) as id, substr(cf.key, 4) as datasource
+select /*+ COALESCE(100) */ substr(d.id, 4) as id, substr(cf.key, 4) as datasource
 from ${openaire_db_name}.datasource d lateral view explode(d.collectedfrom) cfrom as cf
-where d.datainfo.deletedbyinference = false and d.datainfo.invisible=false;
+where d.datainfo.deletedbyinference = false and d.datainfo.invisible=false; /*EOS*/
 
 CREATE OR REPLACE VIEW ${stats_db_name}.datasource_results AS
 SELECT datasource AS id, id AS result
-FROM ${stats_db_name}.result_datasources;
+FROM ${stats_db_name}.result_datasources; /*EOS*/

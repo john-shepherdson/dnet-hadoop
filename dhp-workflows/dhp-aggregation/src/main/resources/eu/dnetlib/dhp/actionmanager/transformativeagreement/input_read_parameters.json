@@ -1,0 +1,30 @@
+[
+
+  {
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "the hdfs name node",
+    "paramRequired": false
+  },
+  {
+    "paramName": "d",
+    "paramLongName": "delimiter",
+    "paramDescription": "the hdfs name node",
+    "paramRequired": false
+  },
+  {
+    "paramName": "op",
+    "paramLongName": "outputPath",
+    "paramDescription": "the hdfs name node",
+    "paramRequired": true
+  },
+  {
+    "paramName": "if",
+    "paramLongName": "inputFile",
+    "paramDescription": "the hdfs name node",
+    "paramRequired": true
+  }
+]
+
+
+

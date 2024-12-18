@@ -9,8 +9,10 @@ public class COCI implements Serializable {
 	private String oci;
 
 	private String citing;
+	private String citing_pid;
 
 	private String cited;
+	private String cited_pid;
 
 	public String getOci() {
 		return oci;
@@ -25,6 +27,8 @@ public class COCI implements Serializable {
 	}
 
 	public void setCiting(String citing) {
+		if (citing != null && citing.startsWith("omid:"))
+			citing = citing.substring(5);
 		this.citing = citing;
 	}
 
@@ -33,7 +37,24 @@ public class COCI implements Serializable {
 	}
 
 	public void setCited(String cited) {
+		if (cited != null && cited.startsWith("omid:"))
+			cited = cited.substring(5);
 		this.cited = cited;
 	}
 
+	public String getCiting_pid() {
+		return citing_pid;
+	}
+
+	public void setCiting_pid(String citing_pid) {
+		this.citing_pid = citing_pid;
+	}
+
+	public String getCited_pid() {
+		return cited_pid;
+	}
+
+	public void setCited_pid(String cited_pid) {
+		this.cited_pid = cited_pid;
+	}
 }

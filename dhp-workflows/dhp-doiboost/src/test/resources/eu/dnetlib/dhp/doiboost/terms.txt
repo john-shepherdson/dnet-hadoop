@@ -1,0 +1,1213 @@
+ModularUiLabels @=@ ModularUiLabels @=@ PendingRepositoryResources @=@ Pending datasource
+ModularUiLabels @=@ ModularUiLabels @=@ RepositoryServiceResources @=@ Valid datasource
+dnet:content_description_typologies @=@ D-Net Content Description Typologies @=@ file::EuropePMC @=@ file::EuropePMC
+dnet:content_description_typologies @=@ D-Net Content Description Typologies @=@ file::PDF @=@ file::PDF
+dnet:content_description_typologies @=@ D-Net Content Description Typologies @=@ file::WoS @=@ file::WoS
+dnet:content_description_typologies @=@ D-Net Content Description Typologies @=@ metadata @=@ metadata
+dnet:content_description_typologies @=@ D-Net Content Description Typologies @=@ file::hybrid @=@ file::hybrid
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:crosswalk:cris @=@ Harvested
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:actionset:orcidworks-no-doi @=@ Harvested
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:crosswalk:infospace @=@ Harvested
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:crosswalk @=@ Harvested
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:crosswalk:aggregator @=@ Harvested
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:crosswalk:datasetarchive @=@ Harvested
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:actionset @=@ Harvested
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:crosswalk:entityregistry @=@ Harvested
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:crosswalk:repository @=@ Harvested
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:mining:aggregator @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ community:subject @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ community:zenodocommunity @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ iis @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:mining:entityregistry @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ community:organization @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:mining:infospace @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:dedup @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ community:datasource @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ propagation:project:semrel @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:mining:cris @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:mining:repository @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ sysimport:mining:datasetarchive @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ community:semrel @=@ Inferred by OpenAIRE
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ user:claim @=@ Linked by user
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ user:claim:pid @=@ Linked by user
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ user:insert @=@ Linked by user
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ user:claim:search @=@ Linked by user
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ UNKNOWN @=@ UNKNOWN
+dnet:provenanceActions @=@ dnet:provenanceActions @=@ country:instrepos @=@ Inferred by OpenAIRE
+dnet:access_modes @=@ dnet:access_modes @=@ 12MONTHS @=@ 12 Months Embargo
+dnet:access_modes @=@ dnet:access_modes @=@ 6MONTHS @=@ 6 Months Embargo
+dnet:access_modes @=@ dnet:access_modes @=@ CLOSED @=@ Closed Access
+dnet:access_modes @=@ dnet:access_modes @=@ EMBARGO @=@ Embargo
+dnet:access_modes @=@ dnet:access_modes @=@ OPEN @=@ Open Access
+dnet:access_modes @=@ dnet:access_modes @=@ OPEN SOURCE @=@ Open Source
+dnet:access_modes @=@ dnet:access_modes @=@ OTHER @=@ Other
+dnet:access_modes @=@ dnet:access_modes @=@ RESTRICTED @=@ Restricted
+dnet:access_modes @=@ dnet:access_modes @=@ UNKNOWN @=@ not available
+fct:funding_typologies @=@ fct:funding_typologies @=@ fct:program @=@ fct:program
+dnet:compatibilityLevel @=@ dnet:compatibilityLevel @=@ openaire2.0 @=@ OpenAIRE 2.0 (EC funding)
+dnet:compatibilityLevel @=@ dnet:compatibilityLevel @=@ openaire3.0 @=@ OpenAIRE 3.0 (OA, funding)
+dnet:compatibilityLevel @=@ dnet:compatibilityLevel @=@ driver @=@ OpenAIRE Basic (DRIVER OA)
+dnet:compatibilityLevel @=@ dnet:compatibilityLevel @=@ openaire-cris_1.1 @=@ OpenAIRE CRIS v1.1
+dnet:compatibilityLevel @=@ dnet:compatibilityLevel @=@ openaire2.0_data @=@ OpenAIRE Data (funded, referenced datasets)
+dnet:compatibilityLevel @=@ dnet:compatibilityLevel @=@ openaire-pub_4.0 @=@ OpenAIRE PubRepos v4.0
+dnet:compatibilityLevel @=@ dnet:compatibilityLevel @=@ hostedBy @=@ collected from a compatible aggregator
+dnet:compatibilityLevel @=@ dnet:compatibilityLevel @=@ files @=@ files
+dnet:compatibilityLevel @=@ dnet:compatibilityLevel @=@ native @=@ native
+dnet:compatibilityLevel @=@ dnet:compatibilityLevel @=@ UNKNOWN @=@ not available
+dnet:compatibilityLevel @=@ dnet:compatibilityLevel @=@ notCompatible @=@ under validation
+dnet:dataCite_date @=@ dnet:dataCite_date @=@ UNKNOWN @=@ UNKNOWN
+dnet:dataCite_date @=@ dnet:dataCite_date @=@ available @=@ available
+dnet:dataCite_date @=@ dnet:dataCite_date @=@ copyrighted @=@ copyrighted
+dnet:dataCite_date @=@ dnet:dataCite_date @=@ created @=@ created
+dnet:dataCite_date @=@ dnet:dataCite_date @=@ endDate @=@ endDate
+dnet:dataCite_date @=@ dnet:dataCite_date @=@ issued @=@ issued
+dnet:dataCite_date @=@ dnet:dataCite_date @=@ startDate @=@ startDate
+dnet:dataCite_date @=@ dnet:dataCite_date @=@ submitted @=@ submitted
+dnet:dataCite_date @=@ dnet:dataCite_date @=@ updated @=@ updated
+dnet:dataCite_date @=@ dnet:dataCite_date @=@ valid @=@ valid
+dnet:dataCite_date @=@ dnet:dataCite_date @=@ published-print @=@ published-print
+dnet:dataCite_date @=@ dnet:dataCite_date @=@ published-online @=@ published-online
+dnet:dataCite_date @=@ dnet:dataCite_date @=@ accepted @=@ accepted
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ crissystem @=@ CRIS System
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ datarepository::unknown @=@ Data Repository
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ aggregator::datarepository @=@ Data Repository Aggregator
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ entityregistry::projects @=@ Funder database
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ infospace @=@ Information Space
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ pubsrepository::institutional @=@ Institutional Repository
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ aggregator::pubsrepository::institutional @=@ Institutional Repository Aggregator
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ pubsrepository::journal @=@ Journal
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ aggregator::pubsrepository::journals @=@ Journal Aggregator/Publisher
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ pubsrepository::mock @=@ Other
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ pubscatalogue::unknown @=@ Publication Catalogue
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ pubsrepository::unknown @=@ Publication Repository
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ aggregator::pubsrepository::unknown @=@ Publication Repository Aggregator
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ entityregistry @=@ Registry
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ entityregistry::repositories @=@ Registry of repositories
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ entityregistry::products @=@ Registry of research products
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ entityregistry::researchers @=@ Registry of researchers
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ entityregistry::organizations @=@ Registry of organizations
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ scholarcomminfra @=@ Scholarly Comm. Infrastructure
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ softwarerepository @=@ Software Repository
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ pubsrepository::thematic @=@ Thematic Repository
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ websource @=@ Web Source
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ aggregator::softwarerepository @=@ Software Repository Aggregator
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ orprepository @=@ Repository
+dnet:datasource_typologies @=@ dnet:datasource_typologies @=@ researchgraph @=@ Research Graph
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ ACM @=@ ACM Computing Classification System
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ agrovoc @=@ AGROVOC
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ bicssc @=@ BIC standard subject categories
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ DFG @=@ DFG Classification
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ ddc @=@ Dewey Decimal Classification
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ nsf:fieldOfApplication @=@ Field of Application (NSF)
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ gok @=@ Göttingen Online Classification
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ ec:h2020topics @=@ Horizon 2020 Topics
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ IPC @=@ International Patent Classification
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ jel @=@ JEL Classification
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ lcsh @=@ Library of Congress Subject Headings
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ msc @=@ Mathematics Subject Classification
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ mesheuropmc @=@ Medical Subject Headings
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ mesh @=@ Medical Subject Headings
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ bk @=@ Nederlandse basisclassificatie
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ dnet:od_subjects @=@ OpenDOAR subjects
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ ocis @=@ Optics Classification and Indexing Scheme
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ pacs @=@ Physics and Astronomy Classification Scheme
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ rvk @=@ Regensburger Verbundklassifikation
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ UNKNOWN @=@ UNKNOWN
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ udc @=@ Universal Decimal Classification
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ wos @=@ Web of Science Subject Areas
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ arxiv @=@ arXiv
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ keyword @=@ keyword
+dnet:subject_classification_typologies @=@ dnet:subject_classification_typologies @=@ MAG @=@ Microsoft Academic Graph classification
+fct:contractTypes @=@ fct:contractTypes @=@ UNKNOWN @=@ UNKNOWN
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0018 @=@ Annotation
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0001 @=@ Article
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0033 @=@ Audiovisual
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0008 @=@ Bachelor thesis
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0046 @=@ Bioentity
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0002 @=@ Book
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0037 @=@ Clinical Trial
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0022 @=@ Collection
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0004 @=@ Conference object
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0005 @=@ Contribution for newspaper or weekly magazine
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0045 @=@ Data Management Plan
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0031 @=@ Data Paper
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0021 @=@ Dataset
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0006 @=@ Doctoral thesis
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0023 @=@ Event
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0009 @=@ External research report
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0024 @=@ Film
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0025 @=@ Image
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0026 @=@ InteractiveResource
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0011 @=@ Internal report
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0043 @=@ Journal
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0010 @=@ Lecture
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0007 @=@ Master thesis
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0027 @=@ Model
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0012 @=@ Newsletter
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0020 @=@ Other ORP type
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0039 @=@ Other dataset type
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0038 @=@ Other literature type
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0040 @=@ Other software type
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0013 @=@ Part of book or chapter of book
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0019 @=@ Patent
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0028 @=@ PhysicalObject
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0016 @=@ Preprint
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0034 @=@ Project deliverable
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0035 @=@ Project milestone
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0036 @=@ Project proposal
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0017 @=@ Report
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0014 @=@ Research
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0015 @=@ Review
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0029 @=@ Software
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0032 @=@ Software Paper
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0030 @=@ Sound
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0044 @=@ Thesis
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0000 @=@ Unknown
+dnet:publication_resource @=@ dnet:publication_resource @=@ 0042 @=@ Virtual Appliance
+ec:funding_typologies @=@ ec:funding_typologies @=@ ec:frameworkprogram @=@ frameworkprogram
+ec:funding_typologies @=@ ec:funding_typologies @=@ ec:program @=@ program
+ec:funding_typologies @=@ ec:funding_typologies @=@ ec:specificprogram @=@ specificprogram
+ec:FP7contractTypes @=@ ec:FP7contractTypes @=@ 171 @=@ Article 171 of the Treaty
+ec:FP7contractTypes @=@ ec:FP7contractTypes @=@ BSG @=@ Research for the benefit of specific groups
+ec:FP7contractTypes @=@ ec:FP7contractTypes @=@ CIP-EIP-TN @=@ CIP-Eco-Innovation - CIP-Thematic Network
+ec:FP7contractTypes @=@ ec:FP7contractTypes @=@ CP @=@ Collaborative project
+ec:FP7contractTypes @=@ ec:FP7contractTypes @=@ CP-CSA @=@ Combination of CP & CSA
+ec:FP7contractTypes @=@ ec:FP7contractTypes @=@ CSA @=@ Coordination and support action
+ec:FP7contractTypes @=@ ec:FP7contractTypes @=@ ERC @=@ Support for frontier research (ERC)
+ec:FP7contractTypes @=@ ec:FP7contractTypes @=@ MC @=@ Support for training and career development of researchers (Marie Curie)
+ec:FP7contractTypes @=@ ec:FP7contractTypes @=@ NoE @=@ Network of Excellence
+wt:funding_relations @=@ wt:funding_relations @=@ wt:hasParentFunding @=@ wt:hasParentFunding
+dnet:languages @=@ dnet:languages @=@ abk @=@ Abkhazian
+dnet:languages @=@ dnet:languages @=@ ace @=@ Achinese
+dnet:languages @=@ dnet:languages @=@ ach @=@ Acoli
+dnet:languages @=@ dnet:languages @=@ ada @=@ Adangme
+dnet:languages @=@ dnet:languages @=@ aar @=@ Afar
+dnet:languages @=@ dnet:languages @=@ afh @=@ Afrihili
+dnet:languages @=@ dnet:languages @=@ afr @=@ Afrikaans
+dnet:languages @=@ dnet:languages @=@ afa @=@ Afro-Asiatic
+dnet:languages @=@ dnet:languages @=@ aka @=@ Akan
+dnet:languages @=@ dnet:languages @=@ akk @=@ Akkadian
+dnet:languages @=@ dnet:languages @=@ alb/sqi @=@ Albanian
+dnet:languages @=@ dnet:languages @=@ ale @=@ Aleut
+dnet:languages @=@ dnet:languages @=@ alg @=@ Algonquian languages
+dnet:languages @=@ dnet:languages @=@ tut @=@ Altaic
+dnet:languages @=@ dnet:languages @=@ amh @=@ Amharic
+dnet:languages @=@ dnet:languages @=@ egy @=@ Ancient Egyptian
+dnet:languages @=@ dnet:languages @=@ grc @=@ Ancient Greek
+dnet:languages @=@ dnet:languages @=@ apa @=@ Apache
+dnet:languages @=@ dnet:languages @=@ ara @=@ Arabic
+dnet:languages @=@ dnet:languages @=@ arg @=@ Aragonese
+dnet:languages @=@ dnet:languages @=@ arc @=@ Aramaic
+dnet:languages @=@ dnet:languages @=@ arp @=@ Arapaho
+dnet:languages @=@ dnet:languages @=@ arn @=@ Araucanian
+dnet:languages @=@ dnet:languages @=@ arw @=@ Arawak
+dnet:languages @=@ dnet:languages @=@ arm/hye @=@ Armenian
+dnet:languages @=@ dnet:languages @=@ art @=@ Artificial
+dnet:languages @=@ dnet:languages @=@ asm @=@ Assamese
+dnet:languages @=@ dnet:languages @=@ ath @=@ Athapascan
+dnet:languages @=@ dnet:languages @=@ map @=@ Austronesian
+dnet:languages @=@ dnet:languages @=@ ina @=@ Auxiliary Language Association)
+dnet:languages @=@ dnet:languages @=@ ava @=@ Avaric
+dnet:languages @=@ dnet:languages @=@ ave @=@ Avestan
+dnet:languages @=@ dnet:languages @=@ awa @=@ Awadhi
+dnet:languages @=@ dnet:languages @=@ aym @=@ Aymara
+dnet:languages @=@ dnet:languages @=@ aze @=@ Azerbaijani
+dnet:languages @=@ dnet:languages @=@ nah @=@ Aztec
+dnet:languages @=@ dnet:languages @=@ ban @=@ Balinese
+dnet:languages @=@ dnet:languages @=@ bat @=@ Baltic
+dnet:languages @=@ dnet:languages @=@ bal @=@ Baluchi
+dnet:languages @=@ dnet:languages @=@ bam @=@ Bambara
+dnet:languages @=@ dnet:languages @=@ bai @=@ Bamileke
+dnet:languages @=@ dnet:languages @=@ bad @=@ Banda
+dnet:languages @=@ dnet:languages @=@ bnt @=@ Bantu
+dnet:languages @=@ dnet:languages @=@ bas @=@ Basa
+dnet:languages @=@ dnet:languages @=@ bak @=@ Bashkir
+dnet:languages @=@ dnet:languages @=@ baq/eus @=@ Basque
+dnet:languages @=@ dnet:languages @=@ bej @=@ Beja
+dnet:languages @=@ dnet:languages @=@ bel @=@ Belarusian
+dnet:languages @=@ dnet:languages @=@ bem @=@ Bemba
+dnet:languages @=@ dnet:languages @=@ ben @=@ Bengali
+dnet:languages @=@ dnet:languages @=@ ber @=@ Berber
+dnet:languages @=@ dnet:languages @=@ bho @=@ Bhojpuri
+dnet:languages @=@ dnet:languages @=@ bih @=@ Bihari
+dnet:languages @=@ dnet:languages @=@ bik @=@ Bikol
+dnet:languages @=@ dnet:languages @=@ bin @=@ Bini
+dnet:languages @=@ dnet:languages @=@ bis @=@ Bislama
+dnet:languages @=@ dnet:languages @=@ nob @=@ Bokmål, Norwegian; Norwegian Bokmål
+dnet:languages @=@ dnet:languages @=@ bos @=@ Bosnian
+dnet:languages @=@ dnet:languages @=@ bra @=@ Braj
+dnet:languages @=@ dnet:languages @=@ bre @=@ Breton
+dnet:languages @=@ dnet:languages @=@ bug @=@ Buginese
+dnet:languages @=@ dnet:languages @=@ bul @=@ Bulgarian
+dnet:languages @=@ dnet:languages @=@ bua @=@ Buriat
+dnet:languages @=@ dnet:languages @=@ bur/mya @=@ Burmese
+dnet:languages @=@ dnet:languages @=@ cad @=@ Caddo
+dnet:languages @=@ dnet:languages @=@ car @=@ Carib
+dnet:languages @=@ dnet:languages @=@ cat @=@ Catalan; Valencian
+dnet:languages @=@ dnet:languages @=@ cau @=@ Caucasian
+dnet:languages @=@ dnet:languages @=@ ceb @=@ Cebuano
+dnet:languages @=@ dnet:languages @=@ cel @=@ Celtic
+dnet:languages @=@ dnet:languages @=@ cai @=@ Central American Indian
+dnet:languages @=@ dnet:languages @=@ chg @=@ Chagatai
+dnet:languages @=@ dnet:languages @=@ cha @=@ Chamorro
+dnet:languages @=@ dnet:languages @=@ che @=@ Chechen
+dnet:languages @=@ dnet:languages @=@ chr @=@ Cherokee
+dnet:languages @=@ dnet:languages @=@ nya @=@ Chewa; Chichewa; Nyanja
+dnet:languages @=@ dnet:languages @=@ chy @=@ Cheyenne
+dnet:languages @=@ dnet:languages @=@ chb @=@ Chibcha
+dnet:languages @=@ dnet:languages @=@ chi/zho @=@ Chinese
+dnet:languages @=@ dnet:languages @=@ chn @=@ Chinook jargon
+dnet:languages @=@ dnet:languages @=@ cho @=@ Choctaw
+dnet:languages @=@ dnet:languages @=@ chu @=@ Church Slavic; Slavonic; Church Slavonic; Old Bulgarian; Old Church Slavonic
+dnet:languages @=@ dnet:languages @=@ chv @=@ Chuvash
+dnet:languages @=@ dnet:languages @=@ cop @=@ Coptic
+dnet:languages @=@ dnet:languages @=@ cor @=@ Cornish
+dnet:languages @=@ dnet:languages @=@ cos @=@ Corsican
+dnet:languages @=@ dnet:languages @=@ cre @=@ Cree
+dnet:languages @=@ dnet:languages @=@ mus @=@ Creek
+dnet:languages @=@ dnet:languages @=@ crp @=@ Creoles and Pidgins
+dnet:languages @=@ dnet:languages @=@ hrv @=@ Croatian
+dnet:languages @=@ dnet:languages @=@ cus @=@ Cushitic
+dnet:languages @=@ dnet:languages @=@ ces/cze @=@ Czech
+dnet:languages @=@ dnet:languages @=@ dak @=@ Dakota
+dnet:languages @=@ dnet:languages @=@ dan @=@ Danish
+dnet:languages @=@ dnet:languages @=@ del @=@ Delaware
+dnet:languages @=@ dnet:languages @=@ din @=@ Dinka
+dnet:languages @=@ dnet:languages @=@ div @=@ Divehi
+dnet:languages @=@ dnet:languages @=@ doi @=@ Dogri
+dnet:languages @=@ dnet:languages @=@ dra @=@ Dravidian
+dnet:languages @=@ dnet:languages @=@ dua @=@ Duala
+dnet:languages @=@ dnet:languages @=@ dut/nld @=@ Dutch; Flemish
+dnet:languages @=@ dnet:languages @=@ dyu @=@ Dyula
+dnet:languages @=@ dnet:languages @=@ dzo @=@ Dzongkha
+dnet:languages @=@ dnet:languages @=@ efi @=@ Efik
+dnet:languages @=@ dnet:languages @=@ eka @=@ Ekajuk
+dnet:languages @=@ dnet:languages @=@ elx @=@ Elamite
+dnet:languages @=@ dnet:languages @=@ eng @=@ English
+dnet:languages @=@ dnet:languages @=@ cpe @=@ English-based Creoles and Pidgins
+dnet:languages @=@ dnet:languages @=@ esk @=@ Eskimo
+dnet:languages @=@ dnet:languages @=@ epo @=@ Esperanto
+dnet:languages @=@ dnet:languages @=@ est @=@ Estonian
+dnet:languages @=@ dnet:languages @=@ ewe @=@ Ewe
+dnet:languages @=@ dnet:languages @=@ ewo @=@ Ewondo
+dnet:languages @=@ dnet:languages @=@ fan @=@ Fang
+dnet:languages @=@ dnet:languages @=@ fat @=@ Fanti
+dnet:languages @=@ dnet:languages @=@ fao @=@ Faroese
+dnet:languages @=@ dnet:languages @=@ fij @=@ Fijian
+dnet:languages @=@ dnet:languages @=@ fin @=@ Finnish
+dnet:languages @=@ dnet:languages @=@ fiu @=@ Finno-Ugrian
+dnet:languages @=@ dnet:languages @=@ fon @=@ Fon
+dnet:languages @=@ dnet:languages @=@ fra/fre @=@ French
+dnet:languages @=@ dnet:languages @=@ cpf @=@ French-based Creoles and Pidgins
+dnet:languages @=@ dnet:languages @=@ fry @=@ Frisian
+dnet:languages @=@ dnet:languages @=@ ful @=@ Fulah
+dnet:languages @=@ dnet:languages @=@ gaa @=@ Ga
+dnet:languages @=@ dnet:languages @=@ gae/gdh @=@ Gaelic
+dnet:languages @=@ dnet:languages @=@ gla @=@ Gaelic; Scottish Gaelic
+dnet:languages @=@ dnet:languages @=@ glg @=@ Galician
+dnet:languages @=@ dnet:languages @=@ lug @=@ Ganda
+dnet:languages @=@ dnet:languages @=@ gay @=@ Gayo
+dnet:languages @=@ dnet:languages @=@ gez @=@ Geez
+dnet:languages @=@ dnet:languages @=@ geo/kat @=@ Georgian
+dnet:languages @=@ dnet:languages @=@ deu/ger @=@ German
+dnet:languages @=@ dnet:languages @=@ gem @=@ Germanic
+dnet:languages @=@ dnet:languages @=@ kik @=@ Gikuyu; Kikuyu
+dnet:languages @=@ dnet:languages @=@ gil @=@ Gilbertese
+dnet:languages @=@ dnet:languages @=@ gon @=@ Gondi
+dnet:languages @=@ dnet:languages @=@ got @=@ Gothic
+dnet:languages @=@ dnet:languages @=@ grb @=@ Grebo
+dnet:languages @=@ dnet:languages @=@ ell/gre @=@ Greek
+dnet:languages @=@ dnet:languages @=@ gre/ell @=@ Greek, Modern (1453-)
+dnet:languages @=@ dnet:languages @=@ kal @=@ Greenlandic; Kalaallisut
+dnet:languages @=@ dnet:languages @=@ grn @=@ Guarani
+dnet:languages @=@ dnet:languages @=@ guj @=@ Gujarati
+dnet:languages @=@ dnet:languages @=@ hai @=@ Haida
+dnet:languages @=@ dnet:languages @=@ hat @=@ Haitian; Haitian Creole
+dnet:languages @=@ dnet:languages @=@ hau @=@ Hausa
+dnet:languages @=@ dnet:languages @=@ haw @=@ Hawaiian
+dnet:languages @=@ dnet:languages @=@ heb @=@ Hebrew
+dnet:languages @=@ dnet:languages @=@ her @=@ Herero
+dnet:languages @=@ dnet:languages @=@ hil @=@ Hiligaynon
+dnet:languages @=@ dnet:languages @=@ him @=@ Himachali
+dnet:languages @=@ dnet:languages @=@ hin @=@ Hindi
+dnet:languages @=@ dnet:languages @=@ hmo @=@ Hiri Motu
+dnet:languages @=@ dnet:languages @=@ hun @=@ Hungarian
+dnet:languages @=@ dnet:languages @=@ hup @=@ Hupa
+dnet:languages @=@ dnet:languages @=@ iba @=@ Iban
+dnet:languages @=@ dnet:languages @=@ ice/isl @=@ Icelandic
+dnet:languages @=@ dnet:languages @=@ ido @=@ Ido
+dnet:languages @=@ dnet:languages @=@ ibo @=@ Igbo
+dnet:languages @=@ dnet:languages @=@ ijo @=@ Ijo
+dnet:languages @=@ dnet:languages @=@ ilo @=@ Iloko
+dnet:languages @=@ dnet:languages @=@ inc @=@ Indic
+dnet:languages @=@ dnet:languages @=@ ine @=@ Indo-European
+dnet:languages @=@ dnet:languages @=@ ind @=@ Indonesian
+dnet:languages @=@ dnet:languages @=@ ile @=@ Interlingue
+dnet:languages @=@ dnet:languages @=@ iku @=@ Inuktitut
+dnet:languages @=@ dnet:languages @=@ ipk @=@ Inupiaq
+dnet:languages @=@ dnet:languages @=@ ira @=@ Iranian
+dnet:languages @=@ dnet:languages @=@ gai/iri @=@ Irish
+dnet:languages @=@ dnet:languages @=@ iro @=@ Iroquoian
+dnet:languages @=@ dnet:languages @=@ ita @=@ Italian
+dnet:languages @=@ dnet:languages @=@ jpn @=@ Japanese
+dnet:languages @=@ dnet:languages @=@ jav @=@ Javanese
+dnet:languages @=@ dnet:languages @=@ jrb @=@ Judeo-Arabic
+dnet:languages @=@ dnet:languages @=@ jpr @=@ Judeo-Persian
+dnet:languages @=@ dnet:languages @=@ kab @=@ Kabyle
+dnet:languages @=@ dnet:languages @=@ kac @=@ Kachin
+dnet:languages @=@ dnet:languages @=@ kam @=@ Kamba
+dnet:languages @=@ dnet:languages @=@ kan @=@ Kannada
+dnet:languages @=@ dnet:languages @=@ kau @=@ Kanuri
+dnet:languages @=@ dnet:languages @=@ kaa @=@ Kara-Kalpak
+dnet:languages @=@ dnet:languages @=@ kar @=@ Karen
+dnet:languages @=@ dnet:languages @=@ kas @=@ Kashmiri
+dnet:languages @=@ dnet:languages @=@ kaw @=@ Kawi
+dnet:languages @=@ dnet:languages @=@ kaz @=@ Kazakh
+dnet:languages @=@ dnet:languages @=@ kha @=@ Khasi
+dnet:languages @=@ dnet:languages @=@ khm @=@ Khmer
+dnet:languages @=@ dnet:languages @=@ khi @=@ Khoisan
+dnet:languages @=@ dnet:languages @=@ kho @=@ Khotanese
+dnet:languages @=@ dnet:languages @=@ kin @=@ Kinyarwanda
+dnet:languages @=@ dnet:languages @=@ kir @=@ Kirghiz
+dnet:languages @=@ dnet:languages @=@ kom @=@ Komi
+dnet:languages @=@ dnet:languages @=@ kon @=@ Kongo
+dnet:languages @=@ dnet:languages @=@ kok @=@ Konkani
+dnet:languages @=@ dnet:languages @=@ kor @=@ Korean
+dnet:languages @=@ dnet:languages @=@ kpe @=@ Kpelle
+dnet:languages @=@ dnet:languages @=@ kro @=@ Kru
+dnet:languages @=@ dnet:languages @=@ kua @=@ Kuanyama; Kwanyama
+dnet:languages @=@ dnet:languages @=@ kum @=@ Kumyk
+dnet:languages @=@ dnet:languages @=@ kur @=@ Kurdish
+dnet:languages @=@ dnet:languages @=@ kru @=@ Kurukh
+dnet:languages @=@ dnet:languages @=@ kus @=@ Kusaie
+dnet:languages @=@ dnet:languages @=@ kut @=@ Kutenai
+dnet:languages @=@ dnet:languages @=@ lad @=@ Ladino
+dnet:languages @=@ dnet:languages @=@ lah @=@ Lahnda
+dnet:languages @=@ dnet:languages @=@ lam @=@ Lamba
+dnet:languages @=@ dnet:languages @=@ lao @=@ Lao
+dnet:languages @=@ dnet:languages @=@ lat @=@ Latin
+dnet:languages @=@ dnet:languages @=@ lav @=@ Latvian
+dnet:languages @=@ dnet:languages @=@ ltz @=@ Letzeburgesch; Luxembourgish
+dnet:languages @=@ dnet:languages @=@ lez @=@ Lezghian
+dnet:languages @=@ dnet:languages @=@ lim @=@ Limburgan; Limburger; Limburgish
+dnet:languages @=@ dnet:languages @=@ lin @=@ Lingala
+dnet:languages @=@ dnet:languages @=@ lit @=@ Lithuanian
+dnet:languages @=@ dnet:languages @=@ loz @=@ Lozi
+dnet:languages @=@ dnet:languages @=@ lub @=@ Luba-Katanga
+dnet:languages @=@ dnet:languages @=@ lui @=@ Luiseno
+dnet:languages @=@ dnet:languages @=@ lun @=@ Lunda
+dnet:languages @=@ dnet:languages @=@ luo @=@ Luo
+dnet:languages @=@ dnet:languages @=@ mac/mak @=@ Macedonian
+dnet:languages @=@ dnet:languages @=@ mad @=@ Madurese
+dnet:languages @=@ dnet:languages @=@ mag @=@ Magahi
+dnet:languages @=@ dnet:languages @=@ mai @=@ Maithili
+dnet:languages @=@ dnet:languages @=@ mak @=@ Makasar
+dnet:languages @=@ dnet:languages @=@ mlg @=@ Malagasy
+dnet:languages @=@ dnet:languages @=@ may/msa @=@ Malay
+dnet:languages @=@ dnet:languages @=@ mal @=@ Malayalam
+dnet:languages @=@ dnet:languages @=@ mlt @=@ Maltese
+dnet:languages @=@ dnet:languages @=@ man @=@ Mandingo
+dnet:languages @=@ dnet:languages @=@ mni @=@ Manipuri
+dnet:languages @=@ dnet:languages @=@ mno @=@ Manobo
+dnet:languages @=@ dnet:languages @=@ glv @=@ Manx
+dnet:languages @=@ dnet:languages @=@ mao/mri @=@ Maori
+dnet:languages @=@ dnet:languages @=@ mar @=@ Marathi
+dnet:languages @=@ dnet:languages @=@ chm @=@ Mari
+dnet:languages @=@ dnet:languages @=@ mah @=@ Marshallese
+dnet:languages @=@ dnet:languages @=@ mwr @=@ Marwari
+dnet:languages @=@ dnet:languages @=@ mas @=@ Masai
+dnet:languages @=@ dnet:languages @=@ myn @=@ Mayan
+dnet:languages @=@ dnet:languages @=@ men @=@ Mende
+dnet:languages @=@ dnet:languages @=@ mic @=@ Micmac
+dnet:languages @=@ dnet:languages @=@ dum @=@ Middle Dutch
+dnet:languages @=@ dnet:languages @=@ enm @=@ Middle English
+dnet:languages @=@ dnet:languages @=@ frm @=@ Middle French
+dnet:languages @=@ dnet:languages @=@ gmh @=@ Middle High German
+dnet:languages @=@ dnet:languages @=@ mga @=@ Middle Irish
+dnet:languages @=@ dnet:languages @=@ min @=@ Minangkabau
+dnet:languages @=@ dnet:languages @=@ mis @=@ Miscellaneous
+dnet:languages @=@ dnet:languages @=@ moh @=@ Mohawk
+dnet:languages @=@ dnet:languages @=@ mol @=@ Moldavian
+dnet:languages @=@ dnet:languages @=@ mkh @=@ Mon-Kmer
+dnet:languages @=@ dnet:languages @=@ lol @=@ Mongo
+dnet:languages @=@ dnet:languages @=@ mon @=@ Mongolian
+dnet:languages @=@ dnet:languages @=@ mos @=@ Mossi
+dnet:languages @=@ dnet:languages @=@ mul @=@ Multiple languages
+dnet:languages @=@ dnet:languages @=@ mun @=@ Munda
+dnet:languages @=@ dnet:languages @=@ nau @=@ Nauru
+dnet:languages @=@ dnet:languages @=@ nav @=@ Navajo; Navaho
+dnet:languages @=@ dnet:languages @=@ nde @=@ Ndebele, North
+dnet:languages @=@ dnet:languages @=@ nbl @=@ Ndebele, South
+dnet:languages @=@ dnet:languages @=@ ndo @=@ Ndonga
+dnet:languages @=@ dnet:languages @=@ nep @=@ Nepali
+dnet:languages @=@ dnet:languages @=@ new @=@ Newari
+dnet:languages @=@ dnet:languages @=@ nic @=@ Niger-Kordofanian
+dnet:languages @=@ dnet:languages @=@ ssa @=@ Nilo-Saharan
+dnet:languages @=@ dnet:languages @=@ niu @=@ Niuean
+dnet:languages @=@ dnet:languages @=@ non @=@ Norse
+dnet:languages @=@ dnet:languages @=@ nai @=@ North American Indian
+dnet:languages @=@ dnet:languages @=@ sme @=@ Northern Sami
+dnet:languages @=@ dnet:languages @=@ nor @=@ Norwegian
+dnet:languages @=@ dnet:languages @=@ nno @=@ Norwegian Nynorsk; Nynorsk, Norwegian
+dnet:languages @=@ dnet:languages @=@ nub @=@ Nubian
+dnet:languages @=@ dnet:languages @=@ nym @=@ Nyamwezi
+dnet:languages @=@ dnet:languages @=@ nyn @=@ Nyankole
+dnet:languages @=@ dnet:languages @=@ nyo @=@ Nyoro
+dnet:languages @=@ dnet:languages @=@ nzi @=@ Nzima
+dnet:languages @=@ dnet:languages @=@ oci @=@ Occitan (post 1500); Provençal
+dnet:languages @=@ dnet:languages @=@ oji @=@ Ojibwa
+dnet:languages @=@ dnet:languages @=@ ang @=@ Old English
+dnet:languages @=@ dnet:languages @=@ fro @=@ Old French
+dnet:languages @=@ dnet:languages @=@ goh @=@ Old High German
+dnet:languages @=@ dnet:languages @=@ ori @=@ Oriya
+dnet:languages @=@ dnet:languages @=@ orm @=@ Oromo
+dnet:languages @=@ dnet:languages @=@ osa @=@ Osage
+dnet:languages @=@ dnet:languages @=@ oss @=@ Ossetian; Ossetic
+dnet:languages @=@ dnet:languages @=@ oto @=@ Otomian
+dnet:languages @=@ dnet:languages @=@ ota @=@ Ottoman
+dnet:languages @=@ dnet:languages @=@ pal @=@ Pahlavi
+dnet:languages @=@ dnet:languages @=@ pau @=@ Palauan
+dnet:languages @=@ dnet:languages @=@ pli @=@ Pali
+dnet:languages @=@ dnet:languages @=@ pam @=@ Pampanga
+dnet:languages @=@ dnet:languages @=@ pag @=@ Pangasinan
+dnet:languages @=@ dnet:languages @=@ pan @=@ Panjabi; Punjabi
+dnet:languages @=@ dnet:languages @=@ pap @=@ Papiamento
+dnet:languages @=@ dnet:languages @=@ paa @=@ Papuan-Australian
+dnet:languages @=@ dnet:languages @=@ fas/per @=@ Persian
+dnet:languages @=@ dnet:languages @=@ peo @=@ Persian, Old (ca 600 - 400 B.C.)
+dnet:languages @=@ dnet:languages @=@ phn @=@ Phoenician
+dnet:languages @=@ dnet:languages @=@ pol @=@ Polish
+dnet:languages @=@ dnet:languages @=@ pon @=@ Ponape
+dnet:languages @=@ dnet:languages @=@ por @=@ Portuguese
+dnet:languages @=@ dnet:languages @=@ cpp @=@ Portuguese-based Creoles and Pidgins
+dnet:languages @=@ dnet:languages @=@ pra @=@ Prakrit
+dnet:languages @=@ dnet:languages @=@ pro @=@ Provencal
+dnet:languages @=@ dnet:languages @=@ pus @=@ Pushto
+dnet:languages @=@ dnet:languages @=@ que @=@ Quechua
+dnet:languages @=@ dnet:languages @=@ roh @=@ Raeto-Romance
+dnet:languages @=@ dnet:languages @=@ raj @=@ Rajasthani
+dnet:languages @=@ dnet:languages @=@ rar @=@ Rarotongan
+dnet:languages @=@ dnet:languages @=@ roa @=@ Romance
+dnet:languages @=@ dnet:languages @=@ ron/rum @=@ Romanian
+dnet:languages @=@ dnet:languages @=@ rom @=@ Romany
+dnet:languages @=@ dnet:languages @=@ run @=@ Rundi
+dnet:languages @=@ dnet:languages @=@ rus @=@ Russian
+dnet:languages @=@ dnet:languages @=@ sal @=@ Salishan
+dnet:languages @=@ dnet:languages @=@ sam @=@ Samaritan
+dnet:languages @=@ dnet:languages @=@ smi @=@ Sami
+dnet:languages @=@ dnet:languages @=@ smo @=@ Samoan
+dnet:languages @=@ dnet:languages @=@ sad @=@ Sandawe
+dnet:languages @=@ dnet:languages @=@ sag @=@ Sango
+dnet:languages @=@ dnet:languages @=@ san @=@ Sanskrit
+dnet:languages @=@ dnet:languages @=@ srd @=@ Sardinian
+dnet:languages @=@ dnet:languages @=@ sco @=@ Scots
+dnet:languages @=@ dnet:languages @=@ sel @=@ Selkup
+dnet:languages @=@ dnet:languages @=@ sem @=@ Semitic
+dnet:languages @=@ dnet:languages @=@ srp @=@ Serbian
+dnet:languages @=@ dnet:languages @=@ scr @=@ Serbo-Croatian
+dnet:languages @=@ dnet:languages @=@ srr @=@ Serer
+dnet:languages @=@ dnet:languages @=@ shn @=@ Shan
+dnet:languages @=@ dnet:languages @=@ sna @=@ Shona
+dnet:languages @=@ dnet:languages @=@ iii @=@ Sichuan Yi
+dnet:languages @=@ dnet:languages @=@ sid @=@ Sidamo
+dnet:languages @=@ dnet:languages @=@ bla @=@ Siksika
+dnet:languages @=@ dnet:languages @=@ snd @=@ Sindhi
+dnet:languages @=@ dnet:languages @=@ sin @=@ Sinhala; Sinhalese
+dnet:languages @=@ dnet:languages @=@ sit @=@ Sino-Tibetan
+dnet:languages @=@ dnet:languages @=@ sio @=@ Siouan
+dnet:languages @=@ dnet:languages @=@ sla @=@ Slavic
+dnet:languages @=@ dnet:languages @=@ slk/slo @=@ Slovak
+dnet:languages @=@ dnet:languages @=@ slv @=@ Slovenian
+dnet:languages @=@ dnet:languages @=@ sog @=@ Sogdian
+dnet:languages @=@ dnet:languages @=@ som @=@ Somali
+dnet:languages @=@ dnet:languages @=@ son @=@ Songhai
+dnet:languages @=@ dnet:languages @=@ wen @=@ Sorbian
+dnet:languages @=@ dnet:languages @=@ nso @=@ Sotho
+dnet:languages @=@ dnet:languages @=@ sot @=@ Sotho, Southern
+dnet:languages @=@ dnet:languages @=@ sai @=@ South American Indian
+dnet:languages @=@ dnet:languages @=@ esl/spa @=@ Spanish
+dnet:languages @=@ dnet:languages @=@ spa @=@ Spanish; Castilian
+dnet:languages @=@ dnet:languages @=@ suk @=@ Sukuma
+dnet:languages @=@ dnet:languages @=@ sux @=@ Sumerian
+dnet:languages @=@ dnet:languages @=@ sun @=@ Sundanese
+dnet:languages @=@ dnet:languages @=@ sus @=@ Susu
+dnet:languages @=@ dnet:languages @=@ swa @=@ Swahili
+dnet:languages @=@ dnet:languages @=@ ssw @=@ Swati
+dnet:languages @=@ dnet:languages @=@ swe @=@ Swedish
+dnet:languages @=@ dnet:languages @=@ syr @=@ Syriac
+dnet:languages @=@ dnet:languages @=@ tgl @=@ Tagalog
+dnet:languages @=@ dnet:languages @=@ tah @=@ Tahitian
+dnet:languages @=@ dnet:languages @=@ tgk @=@ Tajik
+dnet:languages @=@ dnet:languages @=@ tmh @=@ Tamashek
+dnet:languages @=@ dnet:languages @=@ tam @=@ Tamil
+dnet:languages @=@ dnet:languages @=@ tat @=@ Tatar
+dnet:languages @=@ dnet:languages @=@ tel @=@ Telugu
+dnet:languages @=@ dnet:languages @=@ ter @=@ Tereno
+dnet:languages @=@ dnet:languages @=@ tha @=@ Thai
+dnet:languages @=@ dnet:languages @=@ bod/tib @=@ Tibetan
+dnet:languages @=@ dnet:languages @=@ tig @=@ Tigre
+dnet:languages @=@ dnet:languages @=@ tir @=@ Tigrinya
+dnet:languages @=@ dnet:languages @=@ tem @=@ Timne
+dnet:languages @=@ dnet:languages @=@ tiv @=@ Tivi
+dnet:languages @=@ dnet:languages @=@ tli @=@ Tlingit
+dnet:languages @=@ dnet:languages @=@ ton @=@ Tonga (Tonga Islands)
+dnet:languages @=@ dnet:languages @=@ tog @=@ Tonga(Nyasa)
+dnet:languages @=@ dnet:languages @=@ tru @=@ Truk
+dnet:languages @=@ dnet:languages @=@ tsi @=@ Tsimshian
+dnet:languages @=@ dnet:languages @=@ tso @=@ Tsonga
+dnet:languages @=@ dnet:languages @=@ tsn @=@ Tswana
+dnet:languages @=@ dnet:languages @=@ tum @=@ Tumbuka
+dnet:languages @=@ dnet:languages @=@ tur @=@ Turkish
+dnet:languages @=@ dnet:languages @=@ tuk @=@ Turkmen
+dnet:languages @=@ dnet:languages @=@ tyv @=@ Tuvinian
+dnet:languages @=@ dnet:languages @=@ twi @=@ Twi
+dnet:languages @=@ dnet:languages @=@ uga @=@ Ugaritic
+dnet:languages @=@ dnet:languages @=@ uig @=@ Uighur; Uyghur
+dnet:languages @=@ dnet:languages @=@ ukr @=@ Ukrainian
+dnet:languages @=@ dnet:languages @=@ umb @=@ Umbundu
+dnet:languages @=@ dnet:languages @=@ und @=@ Undetermined
+dnet:languages @=@ dnet:languages @=@ urd @=@ Urdu
+dnet:languages @=@ dnet:languages @=@ uzb @=@ Uzbek
+dnet:languages @=@ dnet:languages @=@ vai @=@ Vai
+dnet:languages @=@ dnet:languages @=@ ven @=@ Venda
+dnet:languages @=@ dnet:languages @=@ vie @=@ Vietnamese
+dnet:languages @=@ dnet:languages @=@ vol @=@ Volapük
+dnet:languages @=@ dnet:languages @=@ vot @=@ Votic
+dnet:languages @=@ dnet:languages @=@ wak @=@ Wakashan
+dnet:languages @=@ dnet:languages @=@ wal @=@ Walamo
+dnet:languages @=@ dnet:languages @=@ wln @=@ Walloon
+dnet:languages @=@ dnet:languages @=@ war @=@ Waray
+dnet:languages @=@ dnet:languages @=@ was @=@ Washo
+dnet:languages @=@ dnet:languages @=@ cym/wel @=@ Welsh
+dnet:languages @=@ dnet:languages @=@ wol @=@ Wolof
+dnet:languages @=@ dnet:languages @=@ xho @=@ Xhosa
+dnet:languages @=@ dnet:languages @=@ sah @=@ Yakut
+dnet:languages @=@ dnet:languages @=@ yao @=@ Yao
+dnet:languages @=@ dnet:languages @=@ yap @=@ Yap
+dnet:languages @=@ dnet:languages @=@ yid @=@ Yiddish
+dnet:languages @=@ dnet:languages @=@ yor @=@ Yoruba
+dnet:languages @=@ dnet:languages @=@ zap @=@ Zapotec
+dnet:languages @=@ dnet:languages @=@ zen @=@ Zenaga
+dnet:languages @=@ dnet:languages @=@ zha @=@ Zhuang; Chuang
+dnet:languages @=@ dnet:languages @=@ zul @=@ Zulu
+dnet:languages @=@ dnet:languages @=@ zun @=@ Zuni
+dnet:languages @=@ dnet:languages @=@ sga @=@ old Irish
+nsf:contractTypes @=@ NSF Contract Types @=@ BOA/Task Order @=@ BOA/Task Order
+nsf:contractTypes @=@ NSF Contract Types @=@ Continuing grant @=@ Continuing grant
+nsf:contractTypes @=@ NSF Contract Types @=@ Contract @=@ Contract
+nsf:contractTypes @=@ NSF Contract Types @=@ Contract Interagency Agreement @=@ Contract Interagency Agreement
+nsf:contractTypes @=@ NSF Contract Types @=@ Cooperative Agreement @=@ Cooperative Agreement
+nsf:contractTypes @=@ NSF Contract Types @=@ Fellowship @=@ Fellowship
+nsf:contractTypes @=@ NSF Contract Types @=@ Fixed Price Award @=@ Fixed Price Award
+nsf:contractTypes @=@ NSF Contract Types @=@ GAA @=@ GAA
+nsf:contractTypes @=@ NSF Contract Types @=@ Interagency Agreement @=@ Interagency Agreement
+nsf:contractTypes @=@ NSF Contract Types @=@ Intergovernmental Personnel Award @=@ Intergovernmental Personnel Award
+nsf:contractTypes @=@ NSF Contract Types @=@ Personnel Agreement @=@ Personnel Agreement
+nsf:contractTypes @=@ NSF Contract Types @=@ Standard Grant @=@ Standard Grant
+ec:funding_relations @=@ ec:funding_relations @=@ ec:hasframeworkprogram @=@ hasframeworkprogram
+ec:funding_relations @=@ ec:funding_relations @=@ ec:hasprogram @=@ hasprogram
+ec:funding_relations @=@ ec:funding_relations @=@ ec:hasspecificprogram @=@ hasspecificprogram
+dnet:dataCite_resource @=@ dnet:dataCite_resource @=@ UNKNOWN @=@ UNKNOWN
+dnet:dataCite_resource @=@ dnet:dataCite_resource @=@ collection @=@ collection
+dnet:dataCite_resource @=@ dnet:dataCite_resource @=@ dataset @=@ dataset
+dnet:dataCite_resource @=@ dnet:dataCite_resource @=@ event @=@ event
+dnet:dataCite_resource @=@ dnet:dataCite_resource @=@ film @=@ film
+dnet:dataCite_resource @=@ dnet:dataCite_resource @=@ image @=@ image
+dnet:dataCite_resource @=@ dnet:dataCite_resource @=@ interactiveResource @=@ interactiveResource
+dnet:dataCite_resource @=@ dnet:dataCite_resource @=@ model @=@ model
+dnet:dataCite_resource @=@ dnet:dataCite_resource @=@ physicalObject @=@ physicalObject
+dnet:dataCite_resource @=@ dnet:dataCite_resource @=@ service @=@ service
+dnet:dataCite_resource @=@ dnet:dataCite_resource @=@ software @=@ software
+dnet:dataCite_resource @=@ dnet:dataCite_resource @=@ sound @=@ sound
+dnet:dataCite_resource @=@ dnet:dataCite_resource @=@ text @=@ text
+dnet:dataCite_resource @=@ dnet:dataCite_resource @=@ clinicalTrial @=@ Clinical trial
+dnet:dataCite_title @=@ dnet:dataCite_title @=@ alternative title @=@ alternative title
+dnet:dataCite_title @=@ dnet:dataCite_title @=@ main title @=@ main title
+dnet:dataCite_title @=@ dnet:dataCite_title @=@ subtitle @=@ subtitle
+dnet:dataCite_title @=@ dnet:dataCite_title @=@ translated title @=@ translated title
+datacite:relation_typologies @=@ datacite:relation_typologies @=@ IsCitedBy @=@ IsCitedBy
+datacite:relation_typologies @=@ datacite:relation_typologies @=@ IsNewVersionOf @=@ IsNewVersionOf
+datacite:relation_typologies @=@ datacite:relation_typologies @=@ IsPartOf @=@ IsPartOf
+datacite:relation_typologies @=@ datacite:relation_typologies @=@ IsPreviousVersionOf @=@ IsPreviousVersionOf
+datacite:relation_typologies @=@ datacite:relation_typologies @=@ IsReferencedBy @=@ IsReferencedBy
+datacite:relation_typologies @=@ datacite:relation_typologies @=@ References @=@ References
+datacite:relation_typologies @=@ datacite:relation_typologies @=@ UNKNOWN @=@ UNKNOWN
+dnet:result_typologies @=@ dnet:result_typologies @=@ dataset @=@ dataset
+dnet:result_typologies @=@ dnet:result_typologies @=@ other @=@ other
+dnet:result_typologies @=@ dnet:result_typologies @=@ publication @=@ publication
+dnet:result_typologies @=@ dnet:result_typologies @=@ software @=@ software
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ ERC-ADG @=@ Advanced Grant
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ BBI-CSA @=@ Bio-based Industries Coordination and Support action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ BBI-IA-DEMO @=@ Bio-based Industries Innovation action - Demonstration
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ BBI-IA-FLAG @=@ Bio-based Industries Innovation action - Flagship
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ BBI-RIA @=@ Bio-based Industries Research and Innovation action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ MSCA-IF-EF-CAR @=@ CAR – Career Restart panel
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ COFUND-EJP @=@ COFUND (European Joint Programme)
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ COFUND-PCP @=@ COFUND (PCP)
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ COFUND-PPI @=@ COFUND (PPI)
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ CS2-CSA @=@ CS2 Coordination and Support action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ CS2-IA @=@ CS2 Innovation Action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ CS2-RIA @=@ CS2 Research and Innovation action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ CSA-LS @=@ CSA Lump sum
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ ERC-COG @=@ Consolidator Grant
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ FCH2-CSA @=@ Coordination & support action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ CSA @=@ Coordination and support action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ MSCA-COFUND-DP @=@ Doctoral programmes
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ ECSEL-CSA @=@ ECSEL Coordination & Support action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ ECSEL-IA @=@ ECSEL Innovation Action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ ECSEL-RIA @=@ ECSEL Research and Innovation Actions
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ ERA-NET-Cofund @=@ ERA-NET Cofund
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ ERC-POC-LS @=@ ERC Proof of Concept Lump Sum Pilot
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ ERC-SyG @=@ ERC Synergy Grant
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ ERC-LVG @=@ ERC low value grant
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ H2020-EEN-SGA @=@ Enterprise Europe Network - Specific Grant Agreement
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ MSCA-ITN-EID @=@ European Industrial Doctorates
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ MSCA-ITN-EJD @=@ European Joint Doctorates
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ MSCA-ITN-ETN @=@ European Training Networks
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ FCH2-IA @=@ FCH2 Innovation action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ FCH2-RIA @=@ FCH2 Research and Innovation action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ MSCA-COFUND-FP @=@ Fellowship programmes
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ MSCA-IF-GF @=@ Global Fellowships
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ IMI2-CSA @=@ IMI2 Coordination & support action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ IMI2-RIA @=@ IMI2 Research and Innovation action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ Shift2Rail-IA-LS @=@ Innovation Action Lump-Sum
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ IA-LS @=@ Innovation Action Lump-Sum
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ IA @=@ Innovation action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ Shift2Rail-IA @=@ Innovation action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ PCP @=@ Pre-Commercial Procurement
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ ERC-POC @=@ Proof of Concept Grant
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ PPI @=@ Public Procurement of Innovative Solutions
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ MSCA-IF-EF-RI @=@ RI – Reintegration panel
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ MSCA-RISE @=@ RISE
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ Shift2Rail-RIA-LS @=@ Research and Innovation Action Lump-Sum
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ Shift2Rail-RIA @=@ Research and Innovation action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ RIA @=@ Research and Innovation action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ RIA-LS @=@ Research and Innovation action Lump Sum
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ SESAR-CSA @=@ SESAR: Coordination and Support Action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ SESAR-IA @=@ SESAR: Innovation action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ SESAR-RIA @=@ SESAR: Research and Innovation action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ SGA-RIA @=@ SGA Research and Innovation action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ SME-2b @=@ SME Instrument (grant only and blended finance)
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ SME-1 @=@ SME instrument phase 1
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ SME-2 @=@ SME instrument phase 2
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ Shift2Rail-CSA @=@ Shift2Rail - Coordination and Support action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ MSCA-IF-EF-SE @=@ Society and Enterprise panel
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ SGA-CSA @=@ Specific Grant agreement and Coordination and Support Action
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ MSCA-IF-EF-ST @=@ Standard EF
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ ERC-STG @=@ Starting Grant
+ec:h2020toas @=@ Horizon 2020 - Type of Actions @=@ MSCA-SNLS @=@ Grant to identified beneficiary - Coordination and support actions (MSCA-Special Needs lump sum)
+wt:contractTypes @=@ wt:contractTypes @=@ UNKNOWN @=@ UNKNOWN
+dnet:countries @=@ dnet:countries @=@ AF @=@ Afghanistan
+dnet:countries @=@ dnet:countries @=@ AL @=@ Albania
+dnet:countries @=@ dnet:countries @=@ DZ @=@ Algeria
+dnet:countries @=@ dnet:countries @=@ AS @=@ American Samoa
+dnet:countries @=@ dnet:countries @=@ AD @=@ Andorra
+dnet:countries @=@ dnet:countries @=@ AO @=@ Angola
+dnet:countries @=@ dnet:countries @=@ AI @=@ Anguilla
+dnet:countries @=@ dnet:countries @=@ AQ @=@ Antarctica
+dnet:countries @=@ dnet:countries @=@ AG @=@ Antigua and Barbuda
+dnet:countries @=@ dnet:countries @=@ AR @=@ Argentina
+dnet:countries @=@ dnet:countries @=@ AM @=@ Armenia
+dnet:countries @=@ dnet:countries @=@ AW @=@ Aruba
+dnet:countries @=@ dnet:countries @=@ AU @=@ Australia
+dnet:countries @=@ dnet:countries @=@ AT @=@ Austria
+dnet:countries @=@ dnet:countries @=@ AZ @=@ Azerbaijan
+dnet:countries @=@ dnet:countries @=@ BS @=@ Bahamas
+dnet:countries @=@ dnet:countries @=@ BH @=@ Bahrain
+dnet:countries @=@ dnet:countries @=@ BD @=@ Bangladesh
+dnet:countries @=@ dnet:countries @=@ BB @=@ Barbados
+dnet:countries @=@ dnet:countries @=@ BY @=@ Belarus
+dnet:countries @=@ dnet:countries @=@ BE @=@ Belgium
+dnet:countries @=@ dnet:countries @=@ BZ @=@ Belize
+dnet:countries @=@ dnet:countries @=@ BJ @=@ Benin
+dnet:countries @=@ dnet:countries @=@ BM @=@ Bermuda
+dnet:countries @=@ dnet:countries @=@ BT @=@ Bhutan
+dnet:countries @=@ dnet:countries @=@ BO @=@ Bolivia
+dnet:countries @=@ dnet:countries @=@ BQ @=@ Bonaire, Sint Eustatius and Saba
+dnet:countries @=@ dnet:countries @=@ BA @=@ Bosnia and Herzegovina
+dnet:countries @=@ dnet:countries @=@ BW @=@ Botswana
+dnet:countries @=@ dnet:countries @=@ BV @=@ Bouvet Island
+dnet:countries @=@ dnet:countries @=@ BR @=@ Brazil
+dnet:countries @=@ dnet:countries @=@ IO @=@ British Indian Ocean Territory
+dnet:countries @=@ dnet:countries @=@ BN @=@ Brunei Darussalam
+dnet:countries @=@ dnet:countries @=@ BG @=@ Bulgaria
+dnet:countries @=@ dnet:countries @=@ BF @=@ Burkina Faso
+dnet:countries @=@ dnet:countries @=@ BI @=@ Burundi
+dnet:countries @=@ dnet:countries @=@ KH @=@ Cambodia
+dnet:countries @=@ dnet:countries @=@ CM @=@ Cameroon
+dnet:countries @=@ dnet:countries @=@ CA @=@ Canada
+dnet:countries @=@ dnet:countries @=@ CV @=@ Cape Verde
+dnet:countries @=@ dnet:countries @=@ KY @=@ Cayman Islands
+dnet:countries @=@ dnet:countries @=@ CF @=@ Central African Republic
+dnet:countries @=@ dnet:countries @=@ TD @=@ Chad
+dnet:countries @=@ dnet:countries @=@ CL @=@ Chile
+dnet:countries @=@ dnet:countries @=@ CN @=@ China (People's Republic of)
+dnet:countries @=@ dnet:countries @=@ CX @=@ Christmas Island
+dnet:countries @=@ dnet:countries @=@ CC @=@ Cocos (Keeling) Islands
+dnet:countries @=@ dnet:countries @=@ CO @=@ Colombia
+dnet:countries @=@ dnet:countries @=@ KM @=@ Comoros
+dnet:countries @=@ dnet:countries @=@ CG @=@ Congo
+dnet:countries @=@ dnet:countries @=@ CD @=@ Congo (Democratic Republic of)
+dnet:countries @=@ dnet:countries @=@ CK @=@ Cook Islands
+dnet:countries @=@ dnet:countries @=@ CR @=@ Costa Rica
+dnet:countries @=@ dnet:countries @=@ CI @=@ Cote d'Ivoire
+dnet:countries @=@ dnet:countries @=@ HR @=@ Croatia
+dnet:countries @=@ dnet:countries @=@ CU @=@ Cuba
+dnet:countries @=@ dnet:countries @=@ CW @=@ Curaçao
+dnet:countries @=@ dnet:countries @=@ CY @=@ Cyprus
+dnet:countries @=@ dnet:countries @=@ CZ @=@ Czech Republic
+dnet:countries @=@ dnet:countries @=@ DK @=@ Denmark
+dnet:countries @=@ dnet:countries @=@ DJ @=@ Djibouti
+dnet:countries @=@ dnet:countries @=@ DM @=@ Dominica
+dnet:countries @=@ dnet:countries @=@ DO @=@ Dominican Republic
+dnet:countries @=@ dnet:countries @=@ EC @=@ Ecuador
+dnet:countries @=@ dnet:countries @=@ EG @=@ Egypt
+dnet:countries @=@ dnet:countries @=@ SV @=@ El Salvador
+dnet:countries @=@ dnet:countries @=@ GQ @=@ Equatorial Guinea
+dnet:countries @=@ dnet:countries @=@ ER @=@ Eritrea
+dnet:countries @=@ dnet:countries @=@ EE @=@ Estonia
+dnet:countries @=@ dnet:countries @=@ ET @=@ Ethiopia
+dnet:countries @=@ dnet:countries @=@ EU @=@ European Union
+dnet:countries @=@ dnet:countries @=@ FK @=@ Falkland Islands (Malvinas)
+dnet:countries @=@ dnet:countries @=@ FO @=@ Faroe Islands
+dnet:countries @=@ dnet:countries @=@ FJ @=@ Fiji
+dnet:countries @=@ dnet:countries @=@ FI @=@ Finland
+dnet:countries @=@ dnet:countries @=@ MK @=@ Former Yugoslav Republic of Macedonia
+dnet:countries @=@ dnet:countries @=@ FR @=@ France
+dnet:countries @=@ dnet:countries @=@ GF @=@ French Guiana
+dnet:countries @=@ dnet:countries @=@ PF @=@ French Polynesia
+dnet:countries @=@ dnet:countries @=@ TF @=@ French Southern Territories
+dnet:countries @=@ dnet:countries @=@ GA @=@ Gabon
+dnet:countries @=@ dnet:countries @=@ GM @=@ Gambia
+dnet:countries @=@ dnet:countries @=@ GE @=@ Georgia
+dnet:countries @=@ dnet:countries @=@ DE @=@ Germany
+dnet:countries @=@ dnet:countries @=@ GH @=@ Ghana
+dnet:countries @=@ dnet:countries @=@ GI @=@ Gibraltar
+dnet:countries @=@ dnet:countries @=@ GR @=@ Greece
+dnet:countries @=@ dnet:countries @=@ GL @=@ Greenland
+dnet:countries @=@ dnet:countries @=@ GD @=@ Grenada
+dnet:countries @=@ dnet:countries @=@ GP @=@ Guadeloupe
+dnet:countries @=@ dnet:countries @=@ GU @=@ Guam
+dnet:countries @=@ dnet:countries @=@ GT @=@ Guatemala
+dnet:countries @=@ dnet:countries @=@ GG @=@ Guernsey
+dnet:countries @=@ dnet:countries @=@ GN @=@ Guinea
+dnet:countries @=@ dnet:countries @=@ GW @=@ Guinea-Bissau
+dnet:countries @=@ dnet:countries @=@ GY @=@ Guyana
+dnet:countries @=@ dnet:countries @=@ HT @=@ Haiti
+dnet:countries @=@ dnet:countries @=@ HM @=@ Heard Island and McDonald Islands
+dnet:countries @=@ dnet:countries @=@ VA @=@ Holy See (Vatican City State)
+dnet:countries @=@ dnet:countries @=@ HN @=@ Honduras
+dnet:countries @=@ dnet:countries @=@ HK @=@ Hong Kong
+dnet:countries @=@ dnet:countries @=@ HU @=@ Hungary
+dnet:countries @=@ dnet:countries @=@ IS @=@ Iceland
+dnet:countries @=@ dnet:countries @=@ IN @=@ India
+dnet:countries @=@ dnet:countries @=@ ID @=@ Indonesia
+dnet:countries @=@ dnet:countries @=@ IR @=@ Iran (Islamic Republic of)
+dnet:countries @=@ dnet:countries @=@ IQ @=@ Iraq
+dnet:countries @=@ dnet:countries @=@ IE @=@ Ireland
+dnet:countries @=@ dnet:countries @=@ IM @=@ Isle of Man
+dnet:countries @=@ dnet:countries @=@ IL @=@ Israel
+dnet:countries @=@ dnet:countries @=@ IT @=@ Italy
+dnet:countries @=@ dnet:countries @=@ JM @=@ Jamaica
+dnet:countries @=@ dnet:countries @=@ JP @=@ Japan
+dnet:countries @=@ dnet:countries @=@ JE @=@ Jersey
+dnet:countries @=@ dnet:countries @=@ JO @=@ Jordan
+dnet:countries @=@ dnet:countries @=@ KZ @=@ Kazakhstan
+dnet:countries @=@ dnet:countries @=@ KE @=@ Kenya
+dnet:countries @=@ dnet:countries @=@ KI @=@ Kiribati
+dnet:countries @=@ dnet:countries @=@ KR @=@ Korea (Republic of)
+dnet:countries @=@ dnet:countries @=@ KP @=@ Korea, Democatric People's Republic of
+dnet:countries @=@ dnet:countries @=@ XK @=@ Kosovo * UN resolution
+dnet:countries @=@ dnet:countries @=@ KW @=@ Kuwait
+dnet:countries @=@ dnet:countries @=@ KG @=@ Kyrgyzstan
+dnet:countries @=@ dnet:countries @=@ LA @=@ Lao (People's Democratic Republic)
+dnet:countries @=@ dnet:countries @=@ LV @=@ Latvia
+dnet:countries @=@ dnet:countries @=@ LB @=@ Lebanon
+dnet:countries @=@ dnet:countries @=@ LS @=@ Lesotho
+dnet:countries @=@ dnet:countries @=@ LR @=@ Liberia
+dnet:countries @=@ dnet:countries @=@ LY @=@ Libyan Arab Jamahiriya
+dnet:countries @=@ dnet:countries @=@ LI @=@ Liechtenstein
+dnet:countries @=@ dnet:countries @=@ LT @=@ Lithuania
+dnet:countries @=@ dnet:countries @=@ LU @=@ Luxembourg
+dnet:countries @=@ dnet:countries @=@ MO @=@ Macao
+dnet:countries @=@ dnet:countries @=@ MG @=@ Madagascar
+dnet:countries @=@ dnet:countries @=@ MW @=@ Malawi
+dnet:countries @=@ dnet:countries @=@ MY @=@ Malaysia
+dnet:countries @=@ dnet:countries @=@ MV @=@ Maldives
+dnet:countries @=@ dnet:countries @=@ ML @=@ Mali
+dnet:countries @=@ dnet:countries @=@ MT @=@ Malta
+dnet:countries @=@ dnet:countries @=@ MH @=@ Marshall Islands
+dnet:countries @=@ dnet:countries @=@ MQ @=@ Martinique
+dnet:countries @=@ dnet:countries @=@ MR @=@ Mauritania
+dnet:countries @=@ dnet:countries @=@ MU @=@ Mauritius
+dnet:countries @=@ dnet:countries @=@ YT @=@ Mayotte
+dnet:countries @=@ dnet:countries @=@ MX @=@ Mexico
+dnet:countries @=@ dnet:countries @=@ FM @=@ Micronesia, Federated States of
+dnet:countries @=@ dnet:countries @=@ MD @=@ Moldova (Republic of)
+dnet:countries @=@ dnet:countries @=@ MN @=@ Mongolia
+dnet:countries @=@ dnet:countries @=@ ME @=@ Montenegro
+dnet:countries @=@ dnet:countries @=@ MS @=@ Montserrat
+dnet:countries @=@ dnet:countries @=@ MA @=@ Morocco
+dnet:countries @=@ dnet:countries @=@ MZ @=@ Mozambique
+dnet:countries @=@ dnet:countries @=@ MM @=@ Myanmar
+dnet:countries @=@ dnet:countries @=@ NA @=@ Namibia
+dnet:countries @=@ dnet:countries @=@ NR @=@ Nauru
+dnet:countries @=@ dnet:countries @=@ NP @=@ Nepal
+dnet:countries @=@ dnet:countries @=@ NL @=@ Netherlands
+dnet:countries @=@ dnet:countries @=@ AN @=@ Netherlands Antilles
+dnet:countries @=@ dnet:countries @=@ NC @=@ New Caledonia
+dnet:countries @=@ dnet:countries @=@ NZ @=@ New Zealand
+dnet:countries @=@ dnet:countries @=@ NI @=@ Nicaragua
+dnet:countries @=@ dnet:countries @=@ NE @=@ Niger
+dnet:countries @=@ dnet:countries @=@ NG @=@ Nigeria
+dnet:countries @=@ dnet:countries @=@ NU @=@ Niue
+dnet:countries @=@ dnet:countries @=@ NF @=@ Norfolk Island
+dnet:countries @=@ dnet:countries @=@ MP @=@ Northern Mariana Islands
+dnet:countries @=@ dnet:countries @=@ NO @=@ Norway
+dnet:countries @=@ dnet:countries @=@ OC @=@ Oceania
+dnet:countries @=@ dnet:countries @=@ OM @=@ Oman
+dnet:countries @=@ dnet:countries @=@ PK @=@ Pakistan
+dnet:countries @=@ dnet:countries @=@ PW @=@ Palau
+dnet:countries @=@ dnet:countries @=@ PS @=@ Palestinian-administered areas
+dnet:countries @=@ dnet:countries @=@ PA @=@ Panama
+dnet:countries @=@ dnet:countries @=@ PG @=@ Papua New Guinea
+dnet:countries @=@ dnet:countries @=@ PY @=@ Paraguay
+dnet:countries @=@ dnet:countries @=@ PE @=@ Peru
+dnet:countries @=@ dnet:countries @=@ PH @=@ Philippines
+dnet:countries @=@ dnet:countries @=@ PN @=@ Pitcairn
+dnet:countries @=@ dnet:countries @=@ PL @=@ Poland
+dnet:countries @=@ dnet:countries @=@ PT @=@ Portugal
+dnet:countries @=@ dnet:countries @=@ PR @=@ Puerto Rico
+dnet:countries @=@ dnet:countries @=@ QA @=@ Qatar
+dnet:countries @=@ dnet:countries @=@ RO @=@ Romania
+dnet:countries @=@ dnet:countries @=@ RU @=@ Russian Federation
+dnet:countries @=@ dnet:countries @=@ RW @=@ Rwanda
+dnet:countries @=@ dnet:countries @=@ RE @=@ Réunion
+dnet:countries @=@ dnet:countries @=@ SH @=@ Saint Helena, Ascension and Tristan da Cunha
+dnet:countries @=@ dnet:countries @=@ KN @=@ Saint Kitts and Nevis
+dnet:countries @=@ dnet:countries @=@ LC @=@ Saint Lucia
+dnet:countries @=@ dnet:countries @=@ MF @=@ Saint Martin (French Part)
+dnet:countries @=@ dnet:countries @=@ PM @=@ Saint Pierre and Miquelon
+dnet:countries @=@ dnet:countries @=@ VC @=@ Saint Vincent and the Grenadines
+dnet:countries @=@ dnet:countries @=@ BL @=@ Saint-Barthélemy
+dnet:countries @=@ dnet:countries @=@ WS @=@ Samoa
+dnet:countries @=@ dnet:countries @=@ SM @=@ San Marino
+dnet:countries @=@ dnet:countries @=@ SA @=@ Saudi Arabia
+dnet:countries @=@ dnet:countries @=@ SN @=@ Senegal
+dnet:countries @=@ dnet:countries @=@ RS @=@ Serbia
+dnet:countries @=@ dnet:countries @=@ CS @=@ Serbia and Montenegro
+dnet:countries @=@ dnet:countries @=@ SC @=@ Seychelles
+dnet:countries @=@ dnet:countries @=@ SL @=@ Sierra Leone
+dnet:countries @=@ dnet:countries @=@ SG @=@ Singapore
+dnet:countries @=@ dnet:countries @=@ SX @=@ Sint Maarten (Dutch Part)
+dnet:countries @=@ dnet:countries @=@ SK @=@ Slovakia
+dnet:countries @=@ dnet:countries @=@ SI @=@ Slovenia
+dnet:countries @=@ dnet:countries @=@ SB @=@ Solomon Islands
+dnet:countries @=@ dnet:countries @=@ SO @=@ Somalia
+dnet:countries @=@ dnet:countries @=@ ZA @=@ South Africa
+dnet:countries @=@ dnet:countries @=@ GS @=@ South Georgia and the South Sandwich Islands
+dnet:countries @=@ dnet:countries @=@ SS @=@ South Sudan
+dnet:countries @=@ dnet:countries @=@ ES @=@ Spain
+dnet:countries @=@ dnet:countries @=@ LK @=@ Sri Lanka
+dnet:countries @=@ dnet:countries @=@ SD @=@ Sudan
+dnet:countries @=@ dnet:countries @=@ SR @=@ Suriname
+dnet:countries @=@ dnet:countries @=@ SJ @=@ Svalbard and Jan Mayen
+dnet:countries @=@ dnet:countries @=@ SZ @=@ Swaziland
+dnet:countries @=@ dnet:countries @=@ SE @=@ Sweden
+dnet:countries @=@ dnet:countries @=@ CH @=@ Switzerland
+dnet:countries @=@ dnet:countries @=@ SY @=@ Syrian Arab Republic
+dnet:countries @=@ dnet:countries @=@ ST @=@ São Tomé and Príncipe
+dnet:countries @=@ dnet:countries @=@ TW @=@ Taiwan
+dnet:countries @=@ dnet:countries @=@ TJ @=@ Tajikistan
+dnet:countries @=@ dnet:countries @=@ TZ @=@ Tanzania (United Republic of)
+dnet:countries @=@ dnet:countries @=@ TH @=@ Thailand
+dnet:countries @=@ dnet:countries @=@ TL @=@ Timor-Leste
+dnet:countries @=@ dnet:countries @=@ TG @=@ Togo
+dnet:countries @=@ dnet:countries @=@ TK @=@ Tokelau
+dnet:countries @=@ dnet:countries @=@ TO @=@ Tonga
+dnet:countries @=@ dnet:countries @=@ TT @=@ Trinidad and Tobago
+dnet:countries @=@ dnet:countries @=@ TN @=@ Tunisia
+dnet:countries @=@ dnet:countries @=@ TR @=@ Turkey
+dnet:countries @=@ dnet:countries @=@ TM @=@ Turkmenistan
+dnet:countries @=@ dnet:countries @=@ TC @=@ Turks and Caicos Islands
+dnet:countries @=@ dnet:countries @=@ TV @=@ Tuvalu
+dnet:countries @=@ dnet:countries @=@ UNKNOWN @=@ UNKNOWN
+dnet:countries @=@ dnet:countries @=@ UG @=@ Uganda
+dnet:countries @=@ dnet:countries @=@ UA @=@ Ukraine
+dnet:countries @=@ dnet:countries @=@ AE @=@ United Arab Emirates
+dnet:countries @=@ dnet:countries @=@ GB @=@ United Kingdom
+dnet:countries @=@ dnet:countries @=@ US @=@ United States
+dnet:countries @=@ dnet:countries @=@ UM @=@ United States Minor Outlying Islands
+dnet:countries @=@ dnet:countries @=@ UY @=@ Uruguay
+dnet:countries @=@ dnet:countries @=@ UZ @=@ Uzbekistan
+dnet:countries @=@ dnet:countries @=@ VU @=@ Vanuatu
+dnet:countries @=@ dnet:countries @=@ VE @=@ Venezuela
+dnet:countries @=@ dnet:countries @=@ VN @=@ Viet Nam
+dnet:countries @=@ dnet:countries @=@ VG @=@ Virgin Islands (British)
+dnet:countries @=@ dnet:countries @=@ VI @=@ Virgin Islands, U.S.
+dnet:countries @=@ dnet:countries @=@ WF @=@ Wallis and Futuna
+dnet:countries @=@ dnet:countries @=@ EH @=@ Western Sahara
+dnet:countries @=@ dnet:countries @=@ YE @=@ Yemen
+dnet:countries @=@ dnet:countries @=@ YU @=@ Yugoslavia
+dnet:countries @=@ dnet:countries @=@ ZM @=@ Zambia
+dnet:countries @=@ dnet:countries @=@ ZW @=@ Zimbabwe
+dnet:countries @=@ dnet:countries @=@ AX @=@ Åland Islands
+dnet:datasourceCompatibilityLevel @=@ dnet:datasourceCompatibilityLevel @=@ openaire2.0 @=@ OpenAIRE 2.0 (EC funding)
+dnet:datasourceCompatibilityLevel @=@ dnet:datasourceCompatibilityLevel @=@ driver-openaire2.0 @=@ OpenAIRE 2.0+ (DRIVER OA, EC funding)
+dnet:datasourceCompatibilityLevel @=@ dnet:datasourceCompatibilityLevel @=@ openaire3.0 @=@ OpenAIRE 3.0 (OA, funding)
+dnet:datasourceCompatibilityLevel @=@ dnet:datasourceCompatibilityLevel @=@ openaire4.0 @=@ OpenAIRE 4.0 (inst.&thematic. repo.)
+dnet:datasourceCompatibilityLevel @=@ dnet:datasourceCompatibilityLevel @=@ driver @=@ OpenAIRE Basic (DRIVER OA)
+dnet:datasourceCompatibilityLevel @=@ dnet:datasourceCompatibilityLevel @=@ openaire2.0_data @=@ OpenAIRE Data (funded, referenced datasets)
+dnet:datasourceCompatibilityLevel @=@ dnet:datasourceCompatibilityLevel @=@ hostedBy @=@ collected from a compatible aggregator
+dnet:datasourceCompatibilityLevel @=@ dnet:datasourceCompatibilityLevel @=@ UNKNOWN @=@ not available
+dnet:datasourceCompatibilityLevel @=@ dnet:datasourceCompatibilityLevel @=@ native @=@ proprietary
+dnet:datasourceCompatibilityLevel @=@ dnet:datasourceCompatibilityLevel @=@ notCompatible @=@ under validation
+dnet:datasourceCompatibilityLevel @=@ dnet:datasourceCompatibilityLevel @=@ openaire-cris_1.1 @=@ OpenAIRE CRIS v1.1
+fct:funding_relations @=@ fct:funding_relations @=@ fct:hasParentFunding @=@ fct:hasParentFunding
+dnet:protocols @=@ dnet:protocols @=@ HTTPWithFileName @=@ HTTPWithFileName
+dnet:protocols @=@ dnet:protocols @=@ NetCDF @=@ NetCDF
+dnet:protocols @=@ dnet:protocols @=@ OpenDAP @=@ OpenDAP
+dnet:protocols @=@ dnet:protocols @=@ schemaorg @=@ Schema.org
+dnet:protocols @=@ dnet:protocols @=@ UNKNOWN @=@ UNKNOWN
+dnet:protocols @=@ dnet:protocols @=@ api @=@ api
+dnet:protocols @=@ dnet:protocols @=@ dataciteESPlugins @=@ dataciteESPlugins
+dnet:protocols @=@ dnet:protocols @=@ datasetsbyjournal @=@ datasetsbyjournal
+dnet:protocols @=@ dnet:protocols @=@ datasetsbyproject @=@ datasetsbyproject
+dnet:protocols @=@ dnet:protocols @=@ excelFile @=@ excelFile
+dnet:protocols @=@ dnet:protocols @=@ file @=@ file
+dnet:protocols @=@ dnet:protocols @=@ fileGzip @=@ fileGzip
+dnet:protocols @=@ dnet:protocols @=@ files_by_rpc @=@ files_by_rpc
+dnet:protocols @=@ dnet:protocols @=@ files_from_mdstore @=@ files_from_mdstore
+dnet:protocols @=@ dnet:protocols @=@ files_from_metadata @=@ files_from_metadata
+dnet:protocols @=@ dnet:protocols @=@ filesystem @=@ filesystem
+dnet:protocols @=@ dnet:protocols @=@ ftp @=@ ftp
+dnet:protocols @=@ dnet:protocols @=@ gristProjects @=@ gristProjects
+dnet:protocols @=@ dnet:protocols @=@ gtr2Projects @=@ gtr2Projects
+dnet:protocols @=@ dnet:protocols @=@ http @=@ http
+dnet:protocols @=@ dnet:protocols @=@ httpCSV @=@ httpCSV
+dnet:protocols @=@ dnet:protocols @=@ httpList @=@ httpList
+dnet:protocols @=@ dnet:protocols @=@ jdbc @=@ jdbc
+dnet:protocols @=@ dnet:protocols @=@ oai @=@ oai
+dnet:protocols @=@ dnet:protocols @=@ oai_sets @=@ oai_sets
+dnet:protocols @=@ dnet:protocols @=@ other @=@ other
+dnet:protocols @=@ dnet:protocols @=@ re3data @=@ re3data
+dnet:protocols @=@ dnet:protocols @=@ rest @=@ rest
+dnet:protocols @=@ dnet:protocols @=@ rest_json2xml @=@ rest_json2xml
+dnet:protocols @=@ dnet:protocols @=@ sftp @=@ sftp
+dnet:protocols @=@ dnet:protocols @=@ soap @=@ soap
+dnet:protocols @=@ dnet:protocols @=@ sparql @=@ sparql
+dnet:protocols @=@ dnet:protocols @=@ sword @=@ sword
+dnet:protocols @=@ dnet:protocols @=@ targz @=@ targz
+dnet:protocols @=@ dnet:protocols @=@ remoteMdstore @=@ remoteMdstore
+wt:funding_typologies @=@ Wellcome Trust: Funding Typologies @=@ wt:fundingStream @=@ Wellcome Trust: Funding Stream
+dnet:externalReference_typologies @=@ dnet:externalReference_typologies @=@ accessionNumber @=@ accessionNumber
+dnet:externalReference_typologies @=@ dnet:externalReference_typologies @=@ dataset @=@ dataset
+dnet:externalReference_typologies @=@ dnet:externalReference_typologies @=@ software @=@ software
+datacite:id_typologies @=@ datacite:id_typologies @=@ ARK @=@ ARK
+datacite:id_typologies @=@ datacite:id_typologies @=@ DOI @=@ DOI
+datacite:id_typologies @=@ datacite:id_typologies @=@ EAN13 @=@ EAN13
+datacite:id_typologies @=@ datacite:id_typologies @=@ EISSN @=@ EISSN
+datacite:id_typologies @=@ datacite:id_typologies @=@ Handle @=@ Handle
+datacite:id_typologies @=@ datacite:id_typologies @=@ ISBN @=@ ISBN
+datacite:id_typologies @=@ datacite:id_typologies @=@ ISSN @=@ ISSN
+datacite:id_typologies @=@ datacite:id_typologies @=@ ISTC @=@ ISTC
+datacite:id_typologies @=@ datacite:id_typologies @=@ LISSN @=@ LISSN
+datacite:id_typologies @=@ datacite:id_typologies @=@ LSID @=@ LSID
+datacite:id_typologies @=@ datacite:id_typologies @=@ PURL @=@ PURL
+datacite:id_typologies @=@ datacite:id_typologies @=@ UNKNOWN @=@ UNKNOWN
+datacite:id_typologies @=@ datacite:id_typologies @=@ UPC @=@ UPC
+datacite:id_typologies @=@ datacite:id_typologies @=@ URL @=@ URL
+datacite:id_typologies @=@ datacite:id_typologies @=@ URN @=@ URN
+dnet:pid_types @=@ dnet:pid_types @=@ actrn @=@ ACTRN Identifier
+dnet:pid_types @=@ dnet:pid_types @=@ nct @=@ ClinicalTrials.gov Identifier
+dnet:pid_types @=@ dnet:pid_types @=@ euctr @=@ EU Clinical Trials Register
+dnet:pid_types @=@ dnet:pid_types @=@ epo_id @=@ European Patent Office application ID
+dnet:pid_types @=@ dnet:pid_types @=@ gsk @=@ GSK Identifier
+dnet:pid_types @=@ dnet:pid_types @=@ GeoPass @=@ Geographic Location-Password Scheme
+dnet:pid_types @=@ dnet:pid_types @=@ GBIF @=@ Global Biodiversity Information Facility
+dnet:pid_types @=@ dnet:pid_types @=@ isrctn @=@ ISRCTN Identifier
+dnet:pid_types @=@ dnet:pid_types @=@ ISNI @=@ International Standard Name Identifier
+dnet:pid_types @=@ dnet:pid_types @=@ jprn @=@ JPRN Identifier
+dnet:pid_types @=@ dnet:pid_types @=@ mag_id @=@ Microsoft Academic Graph Identifier
+dnet:pid_types @=@ dnet:pid_types @=@ oai @=@ Open Archives Initiative
+dnet:pid_types @=@ dnet:pid_types @=@ orcid @=@ Open Researcher and Contributor ID
+dnet:pid_types @=@ dnet:pid_types @=@ PANGAEA @=@ PANGAEA
+dnet:pid_types @=@ dnet:pid_types @=@ epo_nr_epodoc @=@ Patent application number in EPODOC format
+dnet:pid_types @=@ dnet:pid_types @=@ UNKNOWN @=@ UNKNOWN
+dnet:pid_types @=@ dnet:pid_types @=@ VIAF @=@ Virtual International Authority File
+dnet:pid_types @=@ dnet:pid_types @=@ arXiv @=@ arXiv
+dnet:pid_types @=@ dnet:pid_types @=@ doi @=@ doi
+dnet:pid_types @=@ dnet:pid_types @=@ grid @=@ grid
+dnet:pid_types @=@ dnet:pid_types @=@ info:eu-repo/dai @=@ info:eu-repo/dai
+dnet:pid_types @=@ dnet:pid_types @=@ orcidworkid @=@ orcid workid
+dnet:pid_types @=@ dnet:pid_types @=@ pmc @=@ pmc
+dnet:pid_types @=@ dnet:pid_types @=@ pmid @=@ pmid
+dnet:pid_types @=@ dnet:pid_types @=@ urn @=@ urn
+dnet:pid_types @=@ dnet:pid_types @=@ who @=@ WHO Identifier
+dnet:pid_types @=@ dnet:pid_types @=@ drks @=@ DRKS Identifier
+dnet:pid_types @=@ dnet:pid_types @=@ handle @=@ Handle
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/SUBJECT/ACM @=@ An ACM classification term that can be associated to your publications
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/SUBJECT/ARXIV @=@ An ARXIV classification term that can be associated to your publications
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/SUBJECT/DDC @=@ A Dewey Decimal classification term (DDC) that can be associated to your publications
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/SUBJECT/JEL @=@ A Journal of Economic Literature (JEL) classification term that can be associated to your publications
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/OPENACCESS_VERSION @=@ An Open Access versions of your publications
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/DATASET/IS_REFERENCED_BY @=@ A dataset referenced by your records
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/DATASET/REFERENCES @=@ A dataset that refers to your records
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/DATASET/IS_RELATED_TO @=@ A dataset related to your records
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/DATASET/IS_SUPPLEMENTED_TO @=@ A dataset that supplements your records
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/PUBLICATION/IS_RELATED_TO @=@ A publication related to your records
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/PUBLICATION/REFERENCES @=@ A publication referenced by your records
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/PUBLICATION/IS_REFERENCED_BY @=@ A publication that refers to your records
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/PUBLICATION/IS_SUPPLEMENTED_BY @=@ A publication that is supplemented by your records
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/PUBLICATION/IS_SUPPLEMENTED_TO @=@ A publication that supplements your records
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/SOFTWARE @=@ A software referred by your records
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MORE/OPENACCESS_VERSION @=@ Another Open Access version of a publication
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MORE/PID @=@ Another persistent identifier associated to your publications
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/SUBJECT/MESHEUROPMC @=@ A classification term from the Medical Subject Headings (MeSH) that can be associated to your publications
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/ABSTRACT @=@ An abstract describing among your publications
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/PUBLICATION_DATE @=@ A date of publication missing in your content
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/PID @=@ A persistent identifier associated to your publications
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MORE/SUBJECT/ACM @=@ Another ACM classification term that can be associated to your publications
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MORE/SUBJECT/ARXIV @=@ Another ARXIV classification term that can be associated to your publications
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MORE/SUBJECT/DDC @=@ Another Dewey Decimal classification term (DDC) that can be associated to your publications
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MORE/SUBJECT/JEL @=@ Another Journal of Economic Literature (JEL) classification term that can be associated to your publications
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MORE/SUBJECT/MESHEUROPMC @=@ Another classification term from the Medical Subject Headings (MeSH) that can be associated to your publications
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/PROJECT @=@ A project reference that can be associated to your publications
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/DATASET/IS_SUPPLEMENTED_BY @=@ A dataset that is supplemented by your records
+dnet:topic_types @=@ dnet:topic_types @=@ ENRICH/MISSING/AUTHOR/ORCID @=@ An Open Researcher and Contributor ID (ORCID) that can be associated to an author of your publications
+dnet:review_levels @=@ dnet:review_levels @=@ 0000 @=@ Unknown
+dnet:review_levels @=@ dnet:review_levels @=@ 0002 @=@ nonPeerReviewed
+dnet:review_levels @=@ dnet:review_levels @=@ 0001 @=@ peerReviewed
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/00brf2d87 @=@ https://ror.org/00brf2d87
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/006qkqr45 @=@ https://ror.org/006qkqr45
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/054ye0e45 @=@ https://ror.org/054ye0e45
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/00ygy3d85 @=@ https://ror.org/00ygy3d85
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/000sy1f36 @=@ https://ror.org/000sy1f36
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/00x5wpm25 @=@ https://ror.org/00x5wpm25
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/03eqeqg74 @=@ https://ror.org/03eqeqg74
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/041xzk838 @=@ https://ror.org/041xzk838
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/00s2j5046 @=@ https://ror.org/00s2j5046
+cnr:institutes @=@ cnr:institutes @=@ __CDS010__ @=@ __CDS010__
+cnr:institutes @=@ cnr:institutes @=@ __CDS011__ @=@ __CDS011__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/02e5sbe24 @=@ https://ror.org/02e5sbe24
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/01nyatq71 @=@ https://ror.org/01nyatq71
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/01dy2q607 @=@ https://ror.org/01dy2q607
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/05nzf7q96 @=@ https://ror.org/05nzf7q96
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/05m1yqp60 @=@ https://ror.org/05m1yqp60
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/03rqtqb02 @=@ https://ror.org/03rqtqb02
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/04r5fge26 @=@ https://ror.org/04r5fge26
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/03wyf0g15 @=@ https://ror.org/03wyf0g15
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/02fkw1114 @=@ https://ror.org/02fkw1114
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/0141vn777 @=@ https://ror.org/0141vn777
+cnr:institutes @=@ cnr:institutes @=@ __CDS022__ @=@ __CDS022__
+cnr:institutes @=@ cnr:institutes @=@ __CDS023__ @=@ __CDS023__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/00be3zh53 @=@ https://ror.org/00be3zh53
+cnr:institutes @=@ cnr:institutes @=@ __CDS025__ @=@ __CDS025__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/02ynrme92 @=@ https://ror.org/02ynrme92
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/05wba8r86 @=@ https://ror.org/05wba8r86
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/03z58xd74 @=@ https://ror.org/03z58xd74
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/00n4jbh84 @=@ https://ror.org/00n4jbh84
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/04sn06036 @=@ https://ror.org/04sn06036
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/01rg40y89 @=@ https://ror.org/01rg40y89
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/00dqega85 @=@ https://ror.org/00dqega85
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/02n2bgz18 @=@ https://ror.org/02n2bgz18
+cnr:institutes @=@ cnr:institutes @=@ __CDS034__ @=@ __CDS034__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/01kdj2848 @=@ https://ror.org/01kdj2848
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/049ebw417 @=@ https://ror.org/049ebw417
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/01f5tnx94 @=@ https://ror.org/01f5tnx94
+cnr:institutes @=@ cnr:institutes @=@ __CDS038__ @=@ __CDS038__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/04hadk112 @=@ https://ror.org/04hadk112
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/03qpd8w66 @=@ https://ror.org/03qpd8w66
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/01gtsa866 @=@ https://ror.org/01gtsa866
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/00ytw6m58 @=@ https://ror.org/00ytw6m58
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/015bmra78 @=@ https://ror.org/015bmra78
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/02gdcn153 @=@ https://ror.org/02gdcn153
+cnr:institutes @=@ cnr:institutes @=@ __CDS045__ @=@ __CDS045__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/05hky6p02 @=@ https://ror.org/05hky6p02
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/011n2hw53 @=@ https://ror.org/011n2hw53
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/028g3pe33 @=@ https://ror.org/028g3pe33
+cnr:institutes @=@ cnr:institutes @=@ __CDS049__ @=@ __CDS049__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/03m0n3c07 @=@ https://ror.org/03m0n3c07
+cnr:institutes @=@ cnr:institutes @=@ __CDS051__ @=@ __CDS051__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/00z8ws214 @=@ https://ror.org/00z8ws214
+cnr:institutes @=@ cnr:institutes @=@ __CDS053__ @=@ __CDS053__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/00bc51d88 @=@ https://ror.org/00bc51d88
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/024ye7w89 @=@ https://ror.org/024ye7w89
+cnr:institutes @=@ cnr:institutes @=@ __CDS056__ @=@ __CDS056__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/05vk2g845 @=@ https://ror.org/05vk2g845
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/02qwy8e97 @=@ https://ror.org/02qwy8e97
+cnr:institutes @=@ cnr:institutes @=@ __CDS059__ @=@ __CDS059__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/02dr63s31 @=@ https://ror.org/02dr63s31
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/0240rwx68 @=@ https://ror.org/0240rwx68
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/02rzxrg25 @=@ https://ror.org/02rzxrg25
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/05patmk97 @=@ https://ror.org/05patmk97
+cnr:institutes @=@ cnr:institutes @=@ __CDS064__ @=@ __CDS064__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/029st3z03 @=@ https://ror.org/029st3z03
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/0040zx077 @=@ https://ror.org/0040zx077
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/044bfsy89 @=@ https://ror.org/044bfsy89
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/01n1ayq61 @=@ https://ror.org/01n1ayq61
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/02db0kh50 @=@ https://ror.org/02db0kh50
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/05813wx75 @=@ https://ror.org/05813wx75
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/04vnwke91 @=@ https://ror.org/04vnwke91
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/02wxw4x45 @=@ https://ror.org/02wxw4x45
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/01j6drw72 @=@ https://ror.org/01j6drw72
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/05kacka20 @=@ https://ror.org/05kacka20
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/00n8ttd98 @=@ https://ror.org/00n8ttd98
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/0013zhk30 @=@ https://ror.org/0013zhk30
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/03x7xkr71 @=@ https://ror.org/03x7xkr71
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/05w9g2j85 @=@ https://ror.org/05w9g2j85
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/032tyv240 @=@ https://ror.org/032tyv240
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/02hdf6119 @=@ https://ror.org/02hdf6119
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/01yg57d71 @=@ https://ror.org/01yg57d71
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/021z1mz76 @=@ https://ror.org/021z1mz76
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/01wqae691 @=@ https://ror.org/01wqae691
+cnr:institutes @=@ cnr:institutes @=@ __CDS084__ @=@ __CDS084__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/00awwz417 @=@ https://ror.org/00awwz417
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/03a111314 @=@ https://ror.org/03a111314
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/01zz9wh30 @=@ https://ror.org/01zz9wh30
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/035y5td47 @=@ https://ror.org/035y5td47
+cnr:institutes @=@ cnr:institutes @=@ __CDS089__ @=@ __CDS089__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/051t1q308 @=@ https://ror.org/051t1q308
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/05k3cs357 @=@ https://ror.org/05k3cs357
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/02gcxw165 @=@ https://ror.org/02gcxw165
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/05db0es39 @=@ https://ror.org/05db0es39
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/029k6t707 @=@ https://ror.org/029k6t707
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/00w6r1881 @=@ https://ror.org/00w6r1881
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/01mfmr054 @=@ https://ror.org/01mfmr054
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/058nrs650 @=@ https://ror.org/058nrs650
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/0331xj092 @=@ https://ror.org/0331xj092
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/052q58629 @=@ https://ror.org/052q58629
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/04ehykb85 @=@ https://ror.org/04ehykb85
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/0221agg28 @=@ https://ror.org/0221agg28
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/02xz4xc25 @=@ https://ror.org/02xz4xc25
+cnr:institutes @=@ cnr:institutes @=@ __CDS103__ @=@ __CDS103__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/01as2bh37 @=@ https://ror.org/01as2bh37
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/01y5w6t76 @=@ https://ror.org/01y5w6t76
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/04xy2mq71 @=@ https://ror.org/04xy2mq71
+cnr:institutes @=@ cnr:institutes @=@ __CDS107__ @=@ __CDS107__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/013nxtf56 @=@ https://ror.org/013nxtf56
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/05rcgef49 @=@ https://ror.org/05rcgef49
+cnr:institutes @=@ cnr:institutes @=@ __CDS110__ @=@ __CDS110__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/02dp3a879 @=@ https://ror.org/02dp3a879
+cnr:institutes @=@ cnr:institutes @=@ __CDS112__ @=@ __CDS112__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/00p03yg71 @=@ https://ror.org/00p03yg71
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/00yfw2296 @=@ https://ror.org/00yfw2296
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/0042e5975 @=@ https://ror.org/0042e5975
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/03ta8pf33 @=@ https://ror.org/03ta8pf33
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/040xhth73 @=@ https://ror.org/040xhth73
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/02qnx8e75 @=@ https://ror.org/02qnx8e75
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/05nr7xa08 @=@ https://ror.org/05nr7xa08
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/008fjbg42 @=@ https://ror.org/008fjbg42
+cnr:institutes @=@ cnr:institutes @=@ __CDS122__ @=@ __CDS122__
+cnr:institutes @=@ cnr:institutes @=@ __CDS123__ @=@ __CDS123__
+cnr:institutes @=@ cnr:institutes @=@ __CDS124__ @=@ __CDS124__
+cnr:institutes @=@ cnr:institutes @=@ __CDS125__ @=@ __CDS125__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/03a0vt050 @=@ https://ror.org/03a0vt050
+cnr:institutes @=@ cnr:institutes @=@ __CDS127__ @=@ __CDS127__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/03byxpq91 @=@ https://ror.org/03byxpq91
+cnr:institutes @=@ cnr:institutes @=@ __CDS129__ @=@ __CDS129__
+cnr:institutes @=@ cnr:institutes @=@ __CDS130__ @=@ __CDS130__
+cnr:institutes @=@ cnr:institutes @=@ __CDS131__ @=@ __CDS131__
+cnr:institutes @=@ cnr:institutes @=@ https://ror.org/0263zy895 @=@ https://ror.org/0263zy895
+cnr:institutes @=@ cnr:institutes @=@ __CDS133__ @=@ __CDS133__
+

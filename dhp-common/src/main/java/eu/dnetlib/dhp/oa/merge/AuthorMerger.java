@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.wcohen.ss.JaroWinkler;
 
 import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.pace.model.Person;
 import scala.Tuple2;
@@ -145,110 +146,21 @@ public class AuthorMerger {
 		return null;
 	}
 
-	/**
-	 * This method tries to figure out when two author are the same in the contest
-	 * of ORCID enrichment
-	 *
-	 * @param left  Author in the OAF entity
-	 * @param right Author ORCID
-	 * @return based on a heuristic on the names of the authors if they are the same.
-	 */
-	public static boolean checkORCIDSimilarity(final Author left, final Author right) {
-		final Person pl = parse(left);
-		final Person pr = parse(right);
-
-		// If one of them didn't have a surname we verify if they have the fullName not empty
-		// and verify if the normalized version is equal
-		if (!(pl.getSurname() != null && pl.getSurname().stream().anyMatch(StringUtils::isNotBlank) &&
-			pr.getSurname() != null && pr.getSurname().stream().anyMatch(StringUtils::isNotBlank))) {
-
-			if (pl.getFullname() != null && !pl.getFullname().isEmpty() && pr.getFullname() != null
-				&& !pr.getFullname().isEmpty()) {
-				return pl
-					.getFullname()
-					.stream()
-					.anyMatch(
-						fl -> pr.getFullname().stream().anyMatch(fr -> normalize(fl).equalsIgnoreCase(normalize(fr))));
-			} else {
-				return false;
-			}
-		}
-		// The Authors have one surname in common
-		if (pl.getSurname().stream().anyMatch(sl -> pr.getSurname().stream().anyMatch(sr -> sr.equalsIgnoreCase(sl)))) {
-
-			// If one of them has only a surname and is the same we can say that they are the same author
-			if ((pl.getName() == null || pl.getName().stream().allMatch(StringUtils::isBlank)) ||
-				(pr.getName() == null || pr.getName().stream().allMatch(StringUtils::isBlank)))
-				return true;
-			// The authors have the same initials of Name in common
-			if (pl
-				.getName()
-				.stream()
-				.anyMatch(
-					nl -> pr
-						.getName()
-						.stream()
-						.anyMatch(nr -> nr.equalsIgnoreCase(nl))))
-				return true;
-		}
-
-		// Sometimes we noticed that publication have author wrote in inverse order Surname, Name
-		// We verify if we have an exact match between name and surname
-		if (pl.getSurname().stream().anyMatch(sl -> pr.getName().stream().anyMatch(nr -> nr.equalsIgnoreCase(sl))) &&
-			pl.getName().stream().anyMatch(nl -> pr.getSurname().stream().anyMatch(sr -> sr.equalsIgnoreCase(nl))))
-			return true;
-		else
-			return false;
-	}
-	//
-
-	/**
-	 * Method to enrich ORCID information in one list of authors based on another list
-	 *
-	 * @param baseAuthor  the Author List in the OAF Entity
-	 * @param orcidAuthor The list of ORCID Author intersected
-	 * @return The Author List of the OAF Entity enriched with the orcid Author
-	 */
-	public static List<Author> enrichOrcid(List<Author> baseAuthor, List<Author> orcidAuthor) {
-
-		if (baseAuthor == null || baseAuthor.isEmpty())
-			return orcidAuthor;
-
-		if (orcidAuthor == null || orcidAuthor.isEmpty())
-			return baseAuthor;
-
-		if (baseAuthor.size() == 1 && orcidAuthor.size() > 10)
-			return baseAuthor;
-
-		final List<Author> oAuthor = new ArrayList<>();
-		oAuthor.addAll(orcidAuthor);
-
-		baseAuthor.forEach(ba -> {
-			Optional<Author> aMatch = oAuthor.stream().filter(oa -> checkORCIDSimilarity(ba, oa)).findFirst();
-			if (aMatch.isPresent()) {
-				final Author sameAuthor = aMatch.get();
-				addPid(ba, sameAuthor.getPid());
-				oAuthor.remove(sameAuthor);
-			}
-		});
-		return baseAuthor;
-	}
-
-	private static void addPid(final Author a, final List<StructuredProperty> pids) {
-
-		if (a.getPid() == null) {
-			a.setPid(new ArrayList<>());
-		}
-
-		a.getPid().addAll(pids);
-
-	}
-
 	public static String pidToComparableString(StructuredProperty pid) {
-		final String classid = pid.getQualifier().getClassid() != null ? pid.getQualifier().getClassid().toLowerCase()
-			: "";
-		return (pid.getQualifier() != null ? classid : "")
-			+ (pid.getValue() != null ? pid.getValue().toLowerCase() : "");
+		final String classId = Optional
+			.ofNullable(pid)
+			.map(
+				p -> Optional
+					.ofNullable(p.getQualifier())
+					.map(Qualifier::getClassid)
+					.map(String::toLowerCase)
+					.orElse(""))
+			.orElse("");
+		return Optional
+			.ofNullable(pid)
+			.map(StructuredProperty::getValue)
+			.map(v -> String.join("|", v, classId))
+			.orElse("");
 	}
 
 	public static int countAuthorsPids(List<Author> authors) {

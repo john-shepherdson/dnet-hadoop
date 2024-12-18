@@ -1,0 +1,21 @@
+[
+  {
+    "paramName": "m",
+    "paramLongName": "master",
+    "paramDescription": "the master name",
+    "paramRequired": true
+  },
+  {
+    "paramName": "o",
+    "paramLongName": "outputPath",
+    "paramDescription": "The as output Path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ma",
+    "paramLongName": "magBasePath",
+    "paramDescription": "The mag Base path",
+    "paramRequired": false
+  }
+
+]

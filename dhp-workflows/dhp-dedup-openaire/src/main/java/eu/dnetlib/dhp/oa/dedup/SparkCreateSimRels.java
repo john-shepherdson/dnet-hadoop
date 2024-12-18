@@ -44,8 +44,10 @@ public class SparkCreateSimRels extends AbstractSparkAction {
 		parser.parseArgument(args);
 
 		SparkConf conf = new SparkConf();
-		new SparkCreateSimRels(parser, getSparkSession(conf))
-			.run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
+		try (SparkSession session = getSparkSession(conf)) {
+			new SparkCreateSimRels(parser, session)
+				.run(ISLookupClientFactory.getLookUpService(parser.get("isLookUpUrl")));
+		}
 	}
 
 	@Override

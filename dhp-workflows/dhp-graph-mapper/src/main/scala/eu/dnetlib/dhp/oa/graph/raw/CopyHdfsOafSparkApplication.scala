@@ -93,8 +93,8 @@ object CopyHdfsOafSparkApplication {
       hasSource != null && hasTarget != null
     } else {
       val hasId = (json \ "id").extractOrElse[String](null)
-      val resultType = (json \ "resulttype" \ "classid").extractOrElse[String](null)
-      hasId != null && oafType.equalsIgnoreCase(resultType)
+      val resultType = (json \ "resulttype" \ "classid").extractOrElse[String]("")
+      hasId != null && oafType.startsWith(resultType)
     }
 
   }

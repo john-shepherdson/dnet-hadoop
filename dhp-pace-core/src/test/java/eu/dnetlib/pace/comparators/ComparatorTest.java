@@ -35,6 +35,7 @@ public class ComparatorTest extends AbstractPaceTest {
 		params.put("name_th", "0.95");
 		params.put("jpath_value", "$.value");
 		params.put("jpath_classid", "$.qualifier.classid");
+		params.put("codeRegex", "key::\\d+");
 	}
 
 	@Test
@@ -44,53 +45,61 @@ public class ComparatorTest extends AbstractPaceTest {
 	}
 
 	@Test
-	public void cityMatchTest() {
-		final CityMatch cityMatch = new CityMatch(params);
+	public void codeMatchTest() {
+		CodeMatch codeMatch = new CodeMatch(params);
 
-		// both names with no cities
-		assertEquals(1.0, cityMatch.distance("Università", "Centro di ricerca", conf));
+		// both names with no codes
+		assertEquals(1.0, codeMatch.distance("testing1", "testing2", conf));
 
-		// one of the two names with no cities
-		assertEquals(-1.0, cityMatch.distance("Università di Bologna", "Centro di ricerca", conf));
+		// one of the two names with no codes
+		assertEquals(-1.0, codeMatch.distance("testing1 key::1", "testing", conf));
 
-		// both names with cities (same)
-		assertEquals(1.0, cityMatch.distance("Universita di Bologna", "Biblioteca di Bologna", conf));
+		// both names with codes (same)
+		assertEquals(1.0, codeMatch.distance("testing1 key::1", "testing2 key::1", conf));
 
-		// both names with cities (different)
-		assertEquals(0.0, cityMatch.distance("Universita di Bologna", "Universita di Torino", conf));
-		assertEquals(0.0, cityMatch.distance("Franklin College", "Concordia College", conf));
+		// both names with codes (different)
+		assertEquals(0.0, codeMatch.distance("testing1 key::1", "testing2 key::2", conf));
 
-		// particular cases
-		assertEquals(1.0, cityMatch.distance("Free University of Bozen-Bolzano", "Università di Bolzano", conf));
-		assertEquals(
-			1.0,
-			cityMatch
-				.distance(
-					"Politechniki Warszawskiej (Warsaw University of Technology)", "Warsaw University of Technology",
-					conf));
+		// both names with codes (1 same, 1 different)
+		assertEquals(0.5, codeMatch.distance("key::1 key::2 testing1", "key::1 testing", conf));
 
-		// failing becasuse 'Allen' is a transliterrated greek stopword
-		// assertEquals(-1.0, cityMatch.distance("Allen (United States)", "United States Military Academy", conf));
-		assertEquals(-1.0, cityMatch.distance("Washington (United States)", "United States Military Academy", conf));
 	}
 
 	@Test
-	public void keywordMatchTest() {
-		params.put("threshold", "0.5");
+	public void datasetVersionCodeMatchTest() {
 
-		final KeywordMatch keywordMatch = new KeywordMatch(params);
+		params.put("codeRegex", "(?=[\\w-]*[a-zA-Z])(?=[\\w-]*\\d)[\\w-]+");
+		CodeMatch codeMatch = new CodeMatch(params);
 
+		// names have different codes
 		assertEquals(
-			0.5, keywordMatch.distance("Biblioteca dell'Universita di Bologna", "Università di Bologna", conf));
-		assertEquals(1.0, keywordMatch.distance("Universita degli studi di Pisa", "Universita di Pisa", conf));
-		assertEquals(1.0, keywordMatch.distance("Polytechnic University of Turin", "POLITECNICO DI TORINO", conf));
-		assertEquals(1.0, keywordMatch.distance("Istanbul Commerce University", "İstanbul Ticarət Universiteti", conf));
-		assertEquals(1.0, keywordMatch.distance("Franklin College", "Concordia College", conf));
-		assertEquals(2.0 / 3.0, keywordMatch.distance("University of Georgia", "Georgia State University", conf));
-		assertEquals(0.5, keywordMatch.distance("University College London", "University of London", conf));
-		assertEquals(0.5, keywordMatch.distance("Washington State University", "University of Washington", conf));
-		assertEquals(-1.0, keywordMatch.distance("Allen (United States)", "United States Military Academy", conf));
+			0.0,
+			codeMatch
+				.distance(
+					"physical oceanography at ctd station june 1998 ev02a",
+					"physical oceanography at ctd station june 1998 ir02", conf));
 
+		// names have same code
+		assertEquals(
+			1.0,
+			codeMatch
+				.distance(
+					"physical oceanography at ctd station june 1998 ev02a",
+					"physical oceanography at ctd station june 1998 ev02a", conf));
+
+		// code is not in both names
+		assertEquals(
+			-1,
+			codeMatch
+				.distance(
+					"physical oceanography at ctd station june 1998",
+					"physical oceanography at ctd station june 1998 ev02a", conf));
+		assertEquals(
+			1.0,
+			codeMatch
+				.distance(
+					"physical oceanography at ctd station june 1998", "physical oceanography at ctd station june 1998",
+					conf));
 	}
 
 	@Test
@@ -155,15 +164,15 @@ public class ComparatorTest extends AbstractPaceTest {
 	}
 
 	@Test
-	public void jaroWinklerNormalizedNameTest() {
+	public void jaroWinklerLegalnameTest() {
 
-		final JaroWinklerNormalizedName jaroWinklerNormalizedName = new JaroWinklerNormalizedName(params);
+		final JaroWinklerLegalname jaroWinklerLegalname = new JaroWinklerLegalname(params);
 
-		double result = jaroWinklerNormalizedName
-			.distance("AT&T (United States)", "United States Military Academy", conf);
+		double result = jaroWinklerLegalname
+			.distance("AT&T (United States)", "United States key::2 key::1", conf);
 		System.out.println("result = " + result);
 
-		result = jaroWinklerNormalizedName.distance("NOAA - Servicio Meteorol\\u00f3gico Nacional", "NOAA - NWS", conf);
+		result = jaroWinklerLegalname.distance("NOAA - Servicio Meteorol\\u00f3gico Nacional", "NOAA - NWS", conf);
 		System.out.println("result = " + result);
 
 	}
@@ -285,15 +294,15 @@ public class ComparatorTest extends AbstractPaceTest {
 		List<String> a = createFieldList(
 			Arrays
 				.asList(
-					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":null,\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:actionset\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"doi\",\"classname\":\"Digital Object Identifier\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"10.1111/pbi.12655\"}"),
+					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":null,\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:actionset\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"grid\",\"classname\":\"GRID Identifier\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"grid_1\"}",
+					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":null,\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:actionset\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"ror\",\"classname\":\"Research Organization Registry\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"ror_1\"}"),
 			"authors");
 		List<String> b = createFieldList(
 			Arrays
 				.asList(
-					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:crosswalk:repository\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"pmc\",\"classname\":\"PubMed Central ID\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"PMC5399005\"}",
-					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:crosswalk:repository\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"pmid\",\"classname\":\"PubMed ID\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"27775869\"}",
-					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"user:claim\",\"classname\":\"Linked by user\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"doi\",\"classname\":\"Digital Object Identifier\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"10.1111/pbi.12655\"}",
-					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:crosswalk:repository\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"handle\",\"classname\":\"Handle\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"1854/LU-8523529\"}"),
+					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:crosswalk:repository\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"grid\",\"classname\":\"GRID Identifier\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"grid_1\"}",
+					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"sysimport:crosswalk:repository\",\"classname\":\"Harvested\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"ror\",\"classname\":\"Research Organization Registry\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"ror_2\"}",
+					"{\"datainfo\":{\"deletedbyinference\":false,\"inferenceprovenance\":\"\",\"inferred\":false,\"invisible\":false,\"provenanceaction\":{\"classid\":\"user:claim\",\"classname\":\"Linked by user\",\"schemeid\":\"dnet:provenanceActions\",\"schemename\":\"dnet:provenanceActions\"},\"trust\":\"0.9\"},\"qualifier\":{\"classid\":\"isni\",\"classname\":\"ISNI Identifier\",\"schemeid\":\"dnet:pid_types\",\"schemename\":\"dnet:pid_types\"},\"value\":\"isni_1\"}"),
 			"authors");
 
 		double result = jsonListMatch.compare(a, b, conf);
@@ -305,6 +314,13 @@ public class ComparatorTest extends AbstractPaceTest {
 		result = jsonListMatch.compare(a, b, conf);
 
 		assertEquals(1.0, result);
+
+		params.put("mode", "type");
+		jsonListMatch = new JsonListMatch(params);
+		result = jsonListMatch.compare(a, b, conf);
+
+		assertEquals(0.5, result);
+
 	}
 
 	@Test
@@ -334,6 +350,55 @@ public class ComparatorTest extends AbstractPaceTest {
 		double compare = cosineSimilarity.compare(a, b, conf);
 
 		System.out.println("compare = " + compare);
+	}
+
+	@Test
+	public void countryMatch() {
+
+		CountryMatch countryMatch = new CountryMatch(params);
+
+		double result = countryMatch.distance("UNKNOWN", "UNKNOWN", conf);
+		assertEquals(-1.0, result);
+
+		result = countryMatch.distance("CL", "UNKNOWN", conf);
+		assertEquals(-1.0, result);
+
+		result = countryMatch.distance("CL", "IT", conf);
+		assertEquals(0.0, result);
+
+		result = countryMatch.distance("CL", "CL", conf);
+		assertEquals(1.0, result);
+
+	}
+
+	@Test
+	public void dateMatch() {
+
+		DateRange dateRange = new DateRange(params);
+
+		double result = dateRange.distance("2021-05-13", "2023-05-13", conf);
+		assertEquals(1.0, result);
+
+		result = dateRange.distance("2021-05-13", "2025-05-13", conf);
+		assertEquals(0.0, result);
+
+		result = dateRange.distance("", "2020-05-05", conf);
+		assertEquals(-1.0, result);
+
+		result = dateRange.distance("invalid date", "2021-05-02", conf);
+		assertEquals(-1.0, result);
+	}
+
+	@Test
+	public void titleVersionMatchTest() {
+
+		TitleVersionMatch titleVersionMatch = new TitleVersionMatch(params);
+
+		double result = titleVersionMatch
+			.compare(
+				"parp 2 regulates sirt 1 expression and whole body energy expenditure",
+				"parp 2 regulates sirt 1 expression and whole body energy expenditure", conf);
+		assertEquals(1.0, result);
 	}
 
 }

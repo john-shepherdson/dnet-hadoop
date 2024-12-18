@@ -217,8 +217,6 @@ public class ZenodoAPIClient implements Serializable {
 	 *            part of the url for the DOI Zenodo suggests to use to cite all versions: DOI: 10.xxx/zenodo.656930
 	 *            concept_rec_id = 656930
 	 * @return response code
-	 * @throws IOException
-	 * @throws MissingConceptDoiException
 	 */
 	public int newVersion(String concept_rec_id) throws IOException, MissingConceptDoiException {
 		setDepositionId(concept_rec_id, 1);

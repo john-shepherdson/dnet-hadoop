@@ -102,6 +102,7 @@
         <path start="import_datasource"/>
         <path start="import_organization"/>
         <path start="import_project"/>
+        <path start="import_person"/>
         <path start="import_relation"/>
     </fork>
 
@@ -116,17 +117,19 @@
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                --conf spark.sql.shuffle.partitions=10000
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/publication</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--numPartitions</arg><arg>8000</arg>
+            <arg>--numPartitions</arg><arg>10000</arg>
         </spark>
         <ok to="join_import"/>
         <error to="Kill"/>
@@ -143,17 +146,19 @@
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                --conf spark.sql.shuffle.partitions=4000
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/dataset</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--numPartitions</arg><arg>4000</arg>
+            <arg>--numPartitions</arg><arg>8000</arg>
         </spark>
         <ok to="join_import"/>
         <error to="Kill"/>
@@ -170,11 +175,13 @@
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/otherresearchproduct</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
@@ -197,17 +204,19 @@
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/software</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Software</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--numPartitions</arg><arg>300</arg>
+            <arg>--numPartitions</arg><arg>1000</arg>
         </spark>
         <ok to="join_import"/>
         <error to="Kill"/>
@@ -224,17 +233,19 @@
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                --conf spark.sql.shuffle.partitions=200
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/datasource</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Datasource</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--numPartitions</arg><arg>100</arg>
+            <arg>--numPartitions</arg><arg>200</arg>
         </spark>
         <ok to="join_import"/>
         <error to="Kill"/>
@@ -251,17 +262,19 @@
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/organization</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Organization</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--numPartitions</arg><arg>400</arg>
+            <arg>--numPartitions</arg><arg>1000</arg>
         </spark>
         <ok to="join_import"/>
         <error to="Kill"/>
@@ -278,17 +291,48 @@
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                --conf spark.sql.shuffle.partitions=1000
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/project</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Project</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--numPartitions</arg><arg>100</arg>
+            <arg>--numPartitions</arg><arg>1000</arg>
+        </spark>
+        <ok to="join_import"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="import_person">
+        <spark xmlns="uri:oozie:spark-action:0.2">
+            <master>yarn</master>
+            <mode>cluster</mode>
+            <name>Import table person</name>
+            <class>eu.dnetlib.dhp.oa.graph.hive.GraphHiveTableImporterJob</class>
+            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <spark-opts>
+                --executor-memory=${sparkExecutorMemory}
+                --executor-cores=${sparkExecutorCores}
+                --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
+                --conf spark.extraListeners=${spark2ExtraListeners}
+                --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
+                --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
+                --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                --conf spark.sql.shuffle.partitions=1000
+            </spark-opts>
+            <arg>--inputPath</arg><arg>${inputPath}/person</arg>
+            <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
+            <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Person</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
+            <arg>--numPartitions</arg><arg>1000</arg>
         </spark>
         <ok to="join_import"/>
         <error to="Kill"/>
@@ -305,17 +349,19 @@
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
+                --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--inputPath</arg><arg>${inputPath}/relation</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--className</arg><arg>eu.dnetlib.dhp.schema.oaf.Relation</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--numPartitions</arg><arg>10000</arg>
+            <arg>--numPartitions</arg><arg>15000</arg>
         </spark>
         <ok to="join_import"/>
         <error to="Kill"/>

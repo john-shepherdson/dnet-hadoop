@@ -5,11 +5,13 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-import eu.dnetlib.dhp.schema.oaf.OafEntity;
+import eu.dnetlib.dhp.schema.oaf.*;
 
-public class JoinedEntity<E extends OafEntity> implements Serializable {
+public class JoinedEntity implements Serializable {
 
-	private E entity;
+	private static final long serialVersionUID = -6337458773099581114L;
+
+	private OafEntity entity;
 
 	private List<RelatedEntityWrapper> links;
 
@@ -17,16 +19,16 @@ public class JoinedEntity<E extends OafEntity> implements Serializable {
 		links = new LinkedList<>();
 	}
 
-	public JoinedEntity(E entity) {
+	public JoinedEntity(OafEntity entity) {
 		this();
 		this.entity = entity;
 	}
 
-	public E getEntity() {
+	public OafEntity getEntity() {
 		return entity;
 	}
 
-	public void setEntity(E entity) {
+	public void setEntity(OafEntity entity) {
 		this.entity = entity;
 	}
 

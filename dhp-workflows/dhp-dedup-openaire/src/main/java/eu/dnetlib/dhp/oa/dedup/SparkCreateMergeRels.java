@@ -42,6 +42,7 @@ import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
 import eu.dnetlib.pace.config.DedupConfig;
+import eu.dnetlib.pace.util.SparkCompatUtils;
 import scala.Tuple3;
 import scala.collection.JavaConversions;
 
@@ -148,8 +149,7 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 			Dataset<Row> pivotHistory = spark
 				.createDataset(
 					Collections.emptyList(),
-					RowEncoder
-						.apply(StructType.fromDDL("id STRING, lastUsage STRING")));
+					SparkCompatUtils.encoderFor(StructType.fromDDL("id STRING, lastUsage STRING")));
 
 			if (StringUtils.isNotBlank(pivotHistoryDatabase)) {
 				pivotHistory = spark
@@ -175,6 +175,7 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 			}
 
 			// cap pidType at w3id as from there on they are considered equal
+
 			UserDefinedFunction mapPid = udf(
 				(String s) -> Math.min(PidType.tryValueOf(s).ordinal(), PidType.w3id.ordinal()), DataTypes.IntegerType);
 
@@ -202,8 +203,8 @@ public class SparkCreateMergeRels extends AbstractSparkAction {
 			WindowSpec w = Window
 				.partitionBy("groupId")
 				.orderBy(
-					col("lastUsage").desc_nulls_last(),
 					col("pidType").asc_nulls_last(),
+					col("lastUsage").desc_nulls_last(),
 					col("collectedfrom").desc_nulls_last(),
 					col("date").asc_nulls_last(),
 					col("id").asc_nulls_last());

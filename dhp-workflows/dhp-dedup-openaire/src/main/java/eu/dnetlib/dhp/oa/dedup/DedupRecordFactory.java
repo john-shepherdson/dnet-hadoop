@@ -2,13 +2,13 @@
 package eu.dnetlib.dhp.oa.dedup;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.FlatMapGroupsFunction;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.api.java.function.ReduceFunction;
 import org.apache.spark.sql.*;
 
 import eu.dnetlib.dhp.oa.dedup.model.Identifier;
@@ -18,6 +18,7 @@ import eu.dnetlib.dhp.schema.oaf.Author;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.Result;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import scala.Tuple2;
 import scala.Tuple3;
 import scala.collection.JavaConversions;
@@ -93,49 +94,93 @@ public class DedupRecordFactory {
 			.join(entities, JavaConversions.asScalaBuffer(Collections.singletonList("id")), "left")
 			.select("dedupId", "id", "kryoObject")
 			.as(Encoders.tuple(Encoders.STRING(), Encoders.STRING(), kryoEncoder))
-			.map(
-				(MapFunction<Tuple3<String, String, OafEntity>, DedupRecordReduceState>) t -> new DedupRecordReduceState(
-					t._1(), t._2(), t._3()),
-				Encoders.kryo(DedupRecordReduceState.class))
-			.groupByKey(
-				(MapFunction<DedupRecordReduceState, String>) DedupRecordReduceState::getDedupId, Encoders.STRING())
-			.reduceGroups(
-				(ReduceFunction<DedupRecordReduceState>) (t1, t2) -> {
-					if (t1.entity == null) {
-						t2.aliases.addAll(t1.aliases);
-						return t2;
-					}
-					if (t1.acceptanceDate.size() < MAX_ACCEPTANCE_DATE) {
-						t1.acceptanceDate.addAll(t2.acceptanceDate);
-					}
-					t1.aliases.addAll(t2.aliases);
-					t1.entity = reduceEntity(t1.entity, t2.entity);
+			.groupByKey((MapFunction<Tuple3<String, String, OafEntity>, String>) Tuple3::_1, Encoders.STRING())
+			.flatMapGroups(
+				(FlatMapGroupsFunction<String, Tuple3<String, String, OafEntity>, OafEntity>) (dedupId, it) -> {
+					if (!it.hasNext())
+						return Collections.emptyIterator();
 
-					return t1;
-				})
-			.flatMap((FlatMapFunction<Tuple2<String, DedupRecordReduceState>, OafEntity>) t -> {
-				String dedupId = t._1();
-				DedupRecordReduceState agg = t._2();
+					final ArrayList<OafEntity> cliques = new ArrayList<>();
 
-				if (agg.acceptanceDate.size() >= MAX_ACCEPTANCE_DATE) {
-					return Collections.emptyIterator();
-				}
+					final ArrayList<String> aliases = new ArrayList<>();
 
-				return Stream
-					.concat(Stream.of(agg.getDedupId()), agg.aliases.stream())
-					.map(id -> {
-						try {
-							OafEntity res = (OafEntity) BeanUtils.cloneBean(agg.entity);
-							res.setId(id);
-							res.setDataInfo(dataInfo);
-							res.setLastupdatetimestamp(ts);
-							return res;
-						} catch (Exception e) {
-							throw new RuntimeException(e);
+					final HashSet<String> acceptanceDate = new HashSet<>();
+
+					boolean isVisible = false;
+
+					while (it.hasNext()) {
+						Tuple3<String, String, OafEntity> t = it.next();
+						OafEntity entity = t._3();
+
+						if (entity == null) {
+							aliases.add(t._2());
+						} else {
+							isVisible = isVisible || !entity.getDataInfo().getInvisible();
+							cliques.add(entity);
+
+							if (acceptanceDate.size() < MAX_ACCEPTANCE_DATE) {
+								if (Result.class.isAssignableFrom(entity.getClass())) {
+									Result result = (Result) entity;
+									if (result.getDateofacceptance() != null
+										&& StringUtils.isNotBlank(result.getDateofacceptance().getValue())) {
+										acceptanceDate.add(result.getDateofacceptance().getValue());
+									}
+								}
+							}
 						}
-					})
-					.iterator();
-			}, beanEncoder);
+
+					}
+
+					if (!isVisible || acceptanceDate.size() >= MAX_ACCEPTANCE_DATE || cliques.isEmpty()) {
+						return Collections.emptyIterator();
+					}
+
+					OafEntity mergedEntity = MergeUtils.mergeGroup(cliques.iterator());
+					// dedup records do not have date of transformation attribute
+					mergedEntity.setDateoftransformation(null);
+					mergedEntity
+						.setMergedIds(
+							Stream
+								.concat(cliques.stream().map(OafEntity::getId), aliases.stream())
+								.distinct()
+								.sorted()
+								.collect(Collectors.toList()));
+
+					return Stream
+						.concat(
+							Stream
+								.of(dedupId)
+								.map(id -> createDedupOafEntity(id, mergedEntity, dataInfo, ts)),
+							aliases
+								.stream()
+								.map(id -> createMergedDedupAliasOafEntity(id, mergedEntity, dataInfo, ts)))
+						.iterator();
+
+				}, beanEncoder);
+	}
+
+	private static OafEntity createDedupOafEntity(String id, OafEntity base, DataInfo dataInfo, long ts) {
+		try {
+			OafEntity res = (OafEntity) BeanUtils.cloneBean(base);
+			res.setId(id);
+			res.setDataInfo(dataInfo);
+			res.setLastupdatetimestamp(ts);
+			return res;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static OafEntity createMergedDedupAliasOafEntity(String id, OafEntity base, DataInfo dataInfo, long ts) {
+		try {
+			OafEntity res = createDedupOafEntity(id, base, dataInfo, ts);
+			DataInfo ds = (DataInfo) BeanUtils.cloneBean(dataInfo);
+			ds.setDeletedbyinference(true);
+			res.setDataInfo(ds);
+			return res;
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	private static OafEntity reduceEntity(OafEntity entity, OafEntity duplicate) {
@@ -153,7 +198,7 @@ public class DedupRecordFactory {
 			entity = swap;
 		}
 
-		entity.mergeFrom(duplicate);
+		entity = MergeUtils.checkedMerge(entity, duplicate, false);
 
 		if (ModelSupport.isSubClass(duplicate, Result.class)) {
 			Result re = (Result) entity;

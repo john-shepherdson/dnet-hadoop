@@ -103,11 +103,12 @@
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7000
+                --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--inputGraphTablePath</arg><arg>${inputGraphRootPath}/publication</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
@@ -115,6 +116,7 @@
             <arg>--actionPayloadClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
             <arg>--outputGraphTablePath</arg><arg>${workingDir}/publication</arg>
             <arg>--mergeAndGetStrategy</arg><arg>${mergeAndGetStrategy}</arg>
+            <arg>--promoteActionStrategy</arg><arg>${promoteActionStrategy}</arg>
             <arg>--shouldGroupById</arg><arg>${shouldGroupById}</arg>
         </spark>
         <ok to="DecisionPromoteResultActionPayloadForPublicationTable"/>
@@ -155,11 +157,12 @@
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
-                --conf spark.sql.shuffle.partitions=7000
+                --conf spark.sql.shuffle.partitions=15000
             </spark-opts>
             <arg>--inputGraphTablePath</arg><arg>${workingDir}/publication</arg>
             <arg>--graphTableClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Publication</arg>
@@ -167,6 +170,7 @@
             <arg>--actionPayloadClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Result</arg>
             <arg>--outputGraphTablePath</arg><arg>${outputGraphRootPath}/publication</arg>
             <arg>--mergeAndGetStrategy</arg><arg>${mergeAndGetStrategy}</arg>
+            <arg>--promoteActionStrategy</arg><arg>${promoteActionStrategy}</arg>
             <arg>--shouldGroupById</arg><arg>${shouldGroupById}</arg>
         </spark>
         <ok to="End"/>

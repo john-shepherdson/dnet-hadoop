@@ -14,71 +14,11 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import eu.dnetlib.dhp.schema.common.AccessRightComparator;
-import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
 
 public class OafMapperUtils {
 
 	private OafMapperUtils() {
-	}
-
-	public static Oaf merge(final Oaf left, final Oaf right) {
-		if (ModelSupport.isSubClass(left, OafEntity.class)) {
-			return mergeEntities((OafEntity) left, (OafEntity) right);
-		} else if (ModelSupport.isSubClass(left, Relation.class)) {
-			((Relation) left).mergeFrom((Relation) right);
-		} else {
-			throw new IllegalArgumentException("invalid Oaf type:" + left.getClass().getCanonicalName());
-		}
-		return left;
-	}
-
-	public static OafEntity mergeEntities(OafEntity left, OafEntity right) {
-		if (ModelSupport.isSubClass(left, Result.class)) {
-			return mergeResults((Result) left, (Result) right);
-		} else if (ModelSupport.isSubClass(left, Datasource.class)) {
-			left.mergeFrom(right);
-		} else if (ModelSupport.isSubClass(left, Organization.class)) {
-			left.mergeFrom(right);
-		} else if (ModelSupport.isSubClass(left, Project.class)) {
-			left.mergeFrom(right);
-		} else {
-			throw new IllegalArgumentException("invalid OafEntity subtype:" + left.getClass().getCanonicalName());
-		}
-		return left;
-	}
-
-	public static Result mergeResults(Result left, Result right) {
-
-		final boolean leftFromDelegatedAuthority = isFromDelegatedAuthority(left);
-		final boolean rightFromDelegatedAuthority = isFromDelegatedAuthority(right);
-
-		if (leftFromDelegatedAuthority && !rightFromDelegatedAuthority) {
-			return left;
-		}
-		if (!leftFromDelegatedAuthority && rightFromDelegatedAuthority) {
-			return right;
-		}
-
-		if (new ResultTypeComparator().compare(left, right) < 0) {
-			left.mergeFrom(right);
-			return left;
-		} else {
-			right.mergeFrom(left);
-			return right;
-		}
-	}
-
-	private static boolean isFromDelegatedAuthority(Result r) {
-		return Optional
-			.ofNullable(r.getInstance())
-			.map(
-				instance -> instance
-					.stream()
-					.filter(i -> Objects.nonNull(i.getCollectedfrom()))
-					.map(i -> i.getCollectedfrom().getKey())
-					.anyMatch(cfId -> IdentifierFactory.delegatedAuthorityDatasourceIds().contains(cfId)))
-			.orElse(false);
 	}
 
 	public static KeyValue keyValue(final String k, final String v) {

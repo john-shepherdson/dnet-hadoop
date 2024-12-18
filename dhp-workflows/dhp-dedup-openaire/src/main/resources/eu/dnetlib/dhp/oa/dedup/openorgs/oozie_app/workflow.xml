@@ -198,6 +198,8 @@
             <arg>--isLookUpUrl</arg><arg>${isLookUpUrl}</arg>
             <arg>--actionSetId</arg><arg>${actionSetId}</arg>
             <arg>--cutConnectedComponent</arg><arg>${cutConnectedComponent}</arg>
+            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
+            <arg>--pivotHistoryDatabase</arg><arg>${pivotHistoryDatabase}</arg>
         </spark>
         <ok to="PrepareOrgRels"/>
         <error to="Kill"/>

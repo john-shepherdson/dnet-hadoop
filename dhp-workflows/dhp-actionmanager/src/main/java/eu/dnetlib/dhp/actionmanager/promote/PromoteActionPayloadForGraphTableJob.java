@@ -67,14 +67,21 @@ public class PromoteActionPayloadForGraphTableJob {
 		String outputGraphTablePath = parser.get("outputGraphTablePath");
 		logger.info("outputGraphTablePath: {}", outputGraphTablePath);
 
-		MergeAndGet.Strategy strategy = MergeAndGet.Strategy.valueOf(parser.get("mergeAndGetStrategy").toUpperCase());
-		logger.info("strategy: {}", strategy);
+		MergeAndGet.Strategy mergeAndGetStrategy = MergeAndGet.Strategy
+			.valueOf(parser.get("mergeAndGetStrategy").toUpperCase());
+		logger.info("mergeAndGetStrategy: {}", mergeAndGetStrategy);
 
 		Boolean shouldGroupById = Optional
 			.ofNullable(parser.get("shouldGroupById"))
 			.map(Boolean::valueOf)
 			.orElse(true);
 		logger.info("shouldGroupById: {}", shouldGroupById);
+
+		PromoteAction.Strategy promoteActionStrategy = Optional
+			.ofNullable(parser.get("promoteActionStrategy"))
+			.map(PromoteAction.Strategy::valueOf)
+			.orElse(PromoteAction.Strategy.UPSERT);
+		logger.info("promoteActionStrategy: {}", promoteActionStrategy);
 
 		@SuppressWarnings("unchecked")
 		Class<? extends Oaf> rowClazz = (Class<? extends Oaf>) Class.forName(graphTableClassName);
@@ -97,7 +104,8 @@ public class PromoteActionPayloadForGraphTableJob {
 					inputGraphTablePath,
 					inputActionPayloadPath,
 					outputGraphTablePath,
-					strategy,
+					mergeAndGetStrategy,
+					promoteActionStrategy,
 					rowClazz,
 					actionPayloadClazz,
 					shouldGroupById);
@@ -124,14 +132,16 @@ public class PromoteActionPayloadForGraphTableJob {
 		String inputGraphTablePath,
 		String inputActionPayloadPath,
 		String outputGraphTablePath,
-		MergeAndGet.Strategy strategy,
+		MergeAndGet.Strategy mergeAndGetStrategy,
+		PromoteAction.Strategy promoteActionStrategy,
 		Class<G> rowClazz,
 		Class<A> actionPayloadClazz, Boolean shouldGroupById) {
 		Dataset<G> rowDS = readGraphTable(spark, inputGraphTablePath, rowClazz);
 		Dataset<A> actionPayloadDS = readActionPayload(spark, inputActionPayloadPath, actionPayloadClazz);
 
 		Dataset<G> result = promoteActionPayloadForGraphTable(
-			rowDS, actionPayloadDS, strategy, rowClazz, actionPayloadClazz, shouldGroupById)
+			rowDS, actionPayloadDS, mergeAndGetStrategy, promoteActionStrategy, rowClazz, actionPayloadClazz,
+			shouldGroupById)
 				.map((MapFunction<G, G>) value -> value, Encoders.bean(rowClazz));
 
 		saveGraphTable(result, outputGraphTablePath);
@@ -141,12 +151,17 @@ public class PromoteActionPayloadForGraphTableJob {
 		SparkSession spark, String path, Class<G> rowClazz) {
 		logger.info("Reading graph table from path: {}", path);
 
-		return spark
-			.read()
-			.textFile(path)
-			.map(
-				(MapFunction<String, G>) value -> OBJECT_MAPPER.readValue(value, rowClazz),
-				Encoders.bean(rowClazz));
+		if (HdfsSupport.exists(path, spark.sparkContext().hadoopConfiguration())) {
+			return spark
+				.read()
+				.textFile(path)
+				.map(
+					(MapFunction<String, G>) value -> OBJECT_MAPPER.readValue(value, rowClazz),
+					Encoders.bean(rowClazz));
+		} else {
+			logger.info("Found empty graph table from path: {}", path);
+			return spark.emptyDataset(Encoders.bean(rowClazz));
+		}
 	}
 
 	private static <A extends Oaf> Dataset<A> readActionPayload(
@@ -183,7 +198,8 @@ public class PromoteActionPayloadForGraphTableJob {
 	private static <G extends Oaf, A extends Oaf> Dataset<G> promoteActionPayloadForGraphTable(
 		Dataset<G> rowDS,
 		Dataset<A> actionPayloadDS,
-		MergeAndGet.Strategy strategy,
+		MergeAndGet.Strategy mergeAndGetStrategy,
+		PromoteAction.Strategy promoteActionStrategy,
 		Class<G> rowClazz,
 		Class<A> actionPayloadClazz,
 		Boolean shouldGroupById) {
@@ -195,8 +211,9 @@ public class PromoteActionPayloadForGraphTableJob {
 
 		SerializableSupplier<Function<G, String>> rowIdFn = ModelSupport::idFn;
 		SerializableSupplier<Function<A, String>> actionPayloadIdFn = ModelSupport::idFn;
-		SerializableSupplier<BiFunction<G, A, G>> mergeRowWithActionPayloadAndGetFn = MergeAndGet.functionFor(strategy);
-		SerializableSupplier<BiFunction<G, G, G>> mergeRowsAndGetFn = MergeAndGet.functionFor(strategy);
+		SerializableSupplier<BiFunction<G, A, G>> mergeRowWithActionPayloadAndGetFn = MergeAndGet
+			.functionFor(mergeAndGetStrategy);
+		SerializableSupplier<BiFunction<G, G, G>> mergeRowsAndGetFn = MergeAndGet.functionFor(mergeAndGetStrategy);
 		SerializableSupplier<G> zeroFn = zeroFn(rowClazz);
 		SerializableSupplier<Function<G, Boolean>> isNotZeroFn = PromoteActionPayloadForGraphTableJob::isNotZeroFnUsingIdOrSourceAndTarget;
 
@@ -207,10 +224,11 @@ public class PromoteActionPayloadForGraphTableJob {
 				rowIdFn,
 				actionPayloadIdFn,
 				mergeRowWithActionPayloadAndGetFn,
+				promoteActionStrategy,
 				rowClazz,
 				actionPayloadClazz);
 
-		if (shouldGroupById) {
+		if (Boolean.TRUE.equals(shouldGroupById)) {
 			return PromoteActionPayloadFunctions
 				.groupGraphTableByIdAndMerge(
 					joinedAndMerged, rowIdFn, mergeRowsAndGetFn, zeroFn, isNotZeroFn, rowClazz);
@@ -237,6 +255,8 @@ public class PromoteActionPayloadForGraphTableJob {
 				return () -> clazz.cast(new eu.dnetlib.dhp.schema.oaf.Relation());
 			case "eu.dnetlib.dhp.schema.oaf.Software":
 				return () -> clazz.cast(new eu.dnetlib.dhp.schema.oaf.Software());
+			case "eu.dnetlib.dhp.schema.oaf.Person":
+				return () -> clazz.cast(new eu.dnetlib.dhp.schema.oaf.Person());
 			default:
 				throw new RuntimeException("unknown class: " + clazz.getCanonicalName());
 		}

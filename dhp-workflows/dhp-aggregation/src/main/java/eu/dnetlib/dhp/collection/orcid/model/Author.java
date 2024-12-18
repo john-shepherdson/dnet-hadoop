@@ -18,6 +18,11 @@ public class Author extends ORCIDItem {
 
 	private String biography;
 
+	private String lastModifiedDate;
+
+	public Author() {
+	}
+
 	public String getBiography() {
 		return biography;
 	}
@@ -72,6 +77,14 @@ public class Author extends ORCIDItem {
 
 	public void setOtherPids(List<Pid> otherPids) {
 		this.otherPids = otherPids;
+	}
+
+	public String getLastModifiedDate() {
+		return lastModifiedDate;
+	}
+
+	public void setLastModifiedDate(String lastModifiedDate) {
+		this.lastModifiedDate = lastModifiedDate;
 	}
 
 	public void addOtherPid(final Pid pid) {

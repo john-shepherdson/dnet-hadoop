@@ -5,6 +5,8 @@ import static eu.dnetlib.dhp.bulktag.community.TaggingConstants.*;
 import static eu.dnetlib.dhp.schema.common.ModelConstants.*;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -15,7 +17,10 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 
+import eu.dnetlib.dhp.bulktag.actions.MapModel;
+import eu.dnetlib.dhp.bulktag.actions.Parameters;
 import eu.dnetlib.dhp.bulktag.eosc.EoscIFTag;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
@@ -35,27 +40,59 @@ public class ResultTagger implements Serializable {
 		return (tmp != clist.size());
 	}
 
-	private Map<String, List<String>> getParamMap(final Result result, Map<String, String> params) {
+	private Map<String, List<String>> getParamMap(final Result result, Map<String, MapModel> params)
+		throws NoSuchMethodException, InvocationTargetException {
 		Map<String, List<String>> param = new HashMap<>();
 		String json = new Gson().toJson(result, Result.class);
 		DocumentContext jsonContext = JsonPath.parse(json);
+
 		if (params == null) {
 			params = new HashMap<>();
 		}
 		for (String key : params.keySet()) {
+			MapModel mapModel = params.get(key);
+
 			try {
-				param.put(key, jsonContext.read(params.get(key)));
-			} catch (com.jayway.jsonpath.PathNotFoundException e) {
+				String path = mapModel.getPath();
+				Object obj = jsonContext.read(path);
+				List<String> pathValue;
+				if (obj instanceof java.lang.String)
+					pathValue = Arrays.asList((String) obj);
+				else
+					pathValue = (List<String>) obj;
+				if (Optional.ofNullable(mapModel.getAction()).isPresent()) {
+					Class<?> c = Class.forName(mapModel.getAction().getClazz());
+					Object class_instance = c.newInstance();
+					Method setField = c.getMethod("setValue", String.class);
+					setField.invoke(class_instance, pathValue.get(0));
+					for (Parameters p : mapModel.getAction().getParams()) {
+						setField = c.getMethod("set" + p.getParamName(), String.class);
+						setField.invoke(class_instance, p.getParamValue());
+					}
+
+					param
+						.put(
+							key, Arrays
+								.asList((String) c.getMethod(mapModel.getAction().getMethod()).invoke(class_instance)));
+
+				}
+
+				else {
+					param.put(key, pathValue);
+				}
+
+			} catch (PathNotFoundException | ClassNotFoundException | InstantiationException
+				| IllegalAccessException e) {
 				param.put(key, new ArrayList<>());
 			}
 		}
 		return param;
+
 	}
 
 	public <R extends Result> R enrichContextCriteria(
-		final R result, final CommunityConfiguration conf, final Map<String, String> criteria) {
-
-		final Map<String, List<String>> param = getParamMap(result, criteria);
+		final R result, final CommunityConfiguration conf, final Map<String, MapModel> criteria)
+		throws InvocationTargetException, NoSuchMethodException {
 
 		// Verify if the entity is deletedbyinference. In case verify if to clean the context list
 		// from all the zenodo communities
@@ -63,6 +100,8 @@ public class ResultTagger implements Serializable {
 			clearContext(result);
 			return result;
 		}
+
+		final Map<String, List<String>> param = getParamMap(result, criteria);
 
 		// Execute the EOSCTag for the services
 		switch (result.getResulttype().getClassid()) {
@@ -91,6 +130,7 @@ public class ResultTagger implements Serializable {
 					// log.info("Remove constraints for " + communityId);
 					if (conf.getRemoveConstraintsMap().keySet().contains(communityId) &&
 						conf.getRemoveConstraintsMap().get(communityId).getCriteria() != null &&
+						!conf.getRemoveConstraintsMap().get(communityId).getCriteria().isEmpty() &&
 						conf
 							.getRemoveConstraintsMap()
 							.get(communityId)
@@ -122,29 +162,30 @@ public class ResultTagger implements Serializable {
 
 		// Tagging for datasource
 		final Set<String> datasources = new HashSet<>();
-		final Set<String> collfrom = new HashSet<>();
+		final Set<String> cfhb = new HashSet<>();
 		final Set<String> hostdby = new HashSet<>();
 
 		if (Objects.nonNull(result.getInstance())) {
 			for (Instance i : result.getInstance()) {
 				if (Objects.nonNull(i.getCollectedfrom()) && Objects.nonNull(i.getCollectedfrom().getKey())) {
-					collfrom.add(i.getCollectedfrom().getKey());
+					cfhb.add(i.getCollectedfrom().getKey());
 				}
 				if (Objects.nonNull(i.getHostedby()) && Objects.nonNull(i.getHostedby().getKey())) {
+					cfhb.add(i.getHostedby().getKey());
 					hostdby.add(i.getHostedby().getKey());
 				}
 
 			}
 
-			collfrom
+			cfhb
 				.forEach(
 					dsId -> datasources
 						.addAll(
 							conf.getCommunityForDatasource(dsId, param)));
 			hostdby.forEach(dsId -> {
-				datasources
-					.addAll(
-						conf.getCommunityForDatasource(dsId, param));
+//				datasources
+//					.addAll(
+//						conf.getCommunityForDatasource(dsId, param));
 				if (conf.isEoscDatasource(dsId)) {
 					datasources.add("eosc");
 				}
@@ -187,6 +228,7 @@ public class ResultTagger implements Serializable {
 			.forEach(communityId -> {
 				if (!removeCommunities.contains(communityId) &&
 					conf.getSelectionConstraintsMap().get(communityId).getCriteria() != null &&
+					!conf.getSelectionConstraintsMap().get(communityId).getCriteria().isEmpty() &&
 					conf
 						.getSelectionConstraintsMap()
 						.get(communityId)

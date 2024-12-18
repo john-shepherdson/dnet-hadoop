@@ -1,0 +1,966 @@
+<record:record path="/0000-0001-6816-8350" xmlns:internal="http://www.orcid.org/ns/internal" xmlns:education="http://www.orcid.org/ns/education" xmlns:distinction="http://www.orcid.org/ns/distinction" xmlns:deprecated="http://www.orcid.org/ns/deprecated" xmlns:other-name="http://www.orcid.org/ns/other-name" xmlns:membership="http://www.orcid.org/ns/membership" xmlns:error="http://www.orcid.org/ns/error" xmlns:common="http://www.orcid.org/ns/common" xmlns:record="http://www.orcid.org/ns/record" xmlns:personal-details="http://www.orcid.org/ns/personal-details" xmlns:keyword="http://www.orcid.org/ns/keyword" xmlns:email="http://www.orcid.org/ns/email" xmlns:external-identifier="http://www.orcid.org/ns/external-identifier" xmlns:funding="http://www.orcid.org/ns/funding" xmlns:preferences="http://www.orcid.org/ns/preferences" xmlns:address="http://www.orcid.org/ns/address" xmlns:invited-position="http://www.orcid.org/ns/invited-position" xmlns:work="http://www.orcid.org/ns/work" xmlns:history="http://www.orcid.org/ns/history" xmlns:employment="http://www.orcid.org/ns/employment" xmlns:qualification="http://www.orcid.org/ns/qualification" xmlns:service="http://www.orcid.org/ns/service" xmlns:person="http://www.orcid.org/ns/person" xmlns:activities="http://www.orcid.org/ns/activities" xmlns:researcher-url="http://www.orcid.org/ns/researcher-url" xmlns:peer-review="http://www.orcid.org/ns/peer-review" xmlns:bulk="http://www.orcid.org/ns/bulk" xmlns:research-resource="http://www.orcid.org/ns/research-resource">
+    <common:orcid-identifier>
+        <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+        <common:path>0000-0001-6816-8350</common:path>
+        <common:host>orcid.org</common:host>
+    </common:orcid-identifier>
+    <preferences:preferences>
+        <preferences:locale>en</preferences:locale>
+    </preferences:preferences>
+    <history:history>
+        <history:creation-method>Direct</history:creation-method>
+        <history:submission-date>2016-01-06T05:08:45.720Z</history:submission-date>
+        <common:last-modified-date>2024-01-02T20:07:05.186Z</common:last-modified-date>
+        <history:claimed>true</history:claimed>
+        <history:verified-email>true</history:verified-email>
+        <history:verified-primary-email>true</history:verified-primary-email>
+    </history:history>
+    <person:person path="/0000-0001-6816-8350/person">
+        <common:last-modified-date>2023-12-02T13:32:05.269Z</common:last-modified-date>
+        <other-name:other-names path="/0000-0001-6816-8350/other-names"/>
+        <researcher-url:researcher-urls path="/0000-0001-6816-8350/researcher-urls">
+            <common:last-modified-date>2016-02-09T09:18:18.417Z</common:last-modified-date>
+            <researcher-url:researcher-url put-code="633431" visibility="public" path="/0000-0001-6816-8350/researcher-urls/633431" display-index="0">
+                <common:created-date>2016-02-09T09:18:18.416Z</common:created-date>
+                <common:last-modified-date>2016-02-09T09:18:18.417Z</common:last-modified-date>
+                <common:source>
+                    <common:source-orcid>
+                        <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                        <common:path>0000-0001-6816-8350</common:path>
+                        <common:host>orcid.org</common:host>
+                    </common:source-orcid>
+                </common:source>
+                <researcher-url:url-name>Dr Michael Muchiri</researcher-url:url-name>
+                <researcher-url:url>http://www.rmit.edu.au/contact/staff-contacts/academic-staff/m/muchiri-dr-michael</researcher-url:url>
+            </researcher-url:researcher-url>
+        </researcher-url:researcher-urls>
+        <email:emails path="/0000-0001-6816-8350/email"/>
+        <address:addresses path="/0000-0001-6816-8350/address">
+            <common:last-modified-date>2023-12-02T13:32:05.269Z</common:last-modified-date>
+            <address:address put-code="897528" visibility="public" path="/0000-0001-6816-8350/address/897528" display-index="2">
+                <common:created-date>2018-02-13T02:32:04.094Z</common:created-date>
+                <common:last-modified-date>2023-12-02T13:32:05.269Z</common:last-modified-date>
+                <common:source>
+                    <common:source-orcid>
+                        <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                        <common:path>0000-0001-6816-8350</common:path>
+                        <common:host>orcid.org</common:host>
+                    </common:source-orcid>
+                </common:source>
+                <address:country>AU</address:country>
+            </address:address>
+            <address:address put-code="3191142" visibility="public" path="/0000-0001-6816-8350/address/3191142" display-index="1">
+                <common:created-date>2023-12-02T13:32:05.260Z</common:created-date>
+                <common:last-modified-date>2023-12-02T13:32:05.260Z</common:last-modified-date>
+                <common:source>
+                    <common:source-orcid>
+                        <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                        <common:path>0000-0001-6816-8350</common:path>
+                        <common:host>orcid.org</common:host>
+                    </common:source-orcid>
+                </common:source>
+                <address:country>SA</address:country>
+            </address:address>
+        </address:addresses>
+        <keyword:keywords path="/0000-0001-6816-8350/keywords">
+            <common:last-modified-date>2023-12-02T13:31:16.269Z</common:last-modified-date>
+            <keyword:keyword put-code="368304" visibility="public" path="/0000-0001-6816-8350/keywords/368304" display-index="4">
+                <common:created-date>2016-02-09T09:16:44.001Z</common:created-date>
+                <common:last-modified-date>2023-12-02T13:31:16.269Z</common:last-modified-date>
+                <common:source>
+                    <common:source-orcid>
+                        <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                        <common:path>0000-0001-6816-8350</common:path>
+                        <common:host>orcid.org</common:host>
+                    </common:source-orcid>
+                </common:source>
+                <keyword:content>Organizational Behavior</keyword:content>
+            </keyword:keyword>
+            <keyword:keyword put-code="368303" visibility="public" path="/0000-0001-6816-8350/keywords/368303" display-index="3">
+                <common:created-date>2016-02-09T09:16:27.374Z</common:created-date>
+                <common:last-modified-date>2023-12-02T13:31:16.269Z</common:last-modified-date>
+                <common:source>
+                    <common:source-orcid>
+                        <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                        <common:path>0000-0001-6816-8350</common:path>
+                        <common:host>orcid.org</common:host>
+                    </common:source-orcid>
+                </common:source>
+                <keyword:content>Organizational Leadership</keyword:content>
+            </keyword:keyword>
+            <keyword:keyword put-code="368306" visibility="public" path="/0000-0001-6816-8350/keywords/368306" display-index="2">
+                <common:created-date>2016-02-09T09:17:08.998Z</common:created-date>
+                <common:last-modified-date>2023-12-02T13:31:16.269Z</common:last-modified-date>
+                <common:source>
+                    <common:source-orcid>
+                        <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                        <common:path>0000-0001-6816-8350</common:path>
+                        <common:host>orcid.org</common:host>
+                    </common:source-orcid>
+                </common:source>
+                <keyword:content>Organizational performance</keyword:content>
+            </keyword:keyword>
+            <keyword:keyword put-code="3590814" visibility="public" path="/0000-0001-6816-8350/keywords/3590814" display-index="1">
+                <common:created-date>2023-12-02T13:31:16.259Z</common:created-date>
+                <common:last-modified-date>2023-12-02T13:31:16.259Z</common:last-modified-date>
+                <common:source>
+                    <common:source-orcid>
+                        <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                        <common:path>0000-0001-6816-8350</common:path>
+                        <common:host>orcid.org</common:host>
+                    </common:source-orcid>
+                </common:source>
+                <keyword:content>Thriving at work</keyword:content>
+            </keyword:keyword>
+        </keyword:keywords>
+        <external-identifier:external-identifiers path="/0000-0001-6816-8350/external-identifiers">
+            <common:last-modified-date>2018-04-10T00:49:55.386Z</common:last-modified-date>
+            <external-identifier:external-identifier put-code="998076" visibility="public" path="/0000-0001-6816-8350/external-identifiers/998076" display-index="0">
+                <common:created-date>2018-04-10T00:49:55.385Z</common:created-date>
+                <common:last-modified-date>2018-04-10T00:49:55.386Z</common:last-modified-date>
+                <common:source>
+                    <common:source-client-id>
+                        <common:uri>https://orcid.org/client/0000-0003-1377-5676</common:uri>
+                        <common:path>0000-0003-1377-5676</common:path>
+                        <common:host>orcid.org</common:host>
+                    </common:source-client-id>
+                    <common:source-name>ResearcherID</common:source-name>
+                    <common:assertion-origin-orcid>
+                        <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                        <common:path>0000-0001-6816-8350</common:path>
+                        <common:host>orcid.org</common:host>
+                    </common:assertion-origin-orcid>
+                </common:source>
+                <common:external-id-type>ResearcherID</common:external-id-type>
+                <common:external-id-value>D-1929-2018</common:external-id-value>
+                <common:external-id-url>http://www.researcherid.com/rid/D-1929-2018</common:external-id-url>
+                <common:external-id-relationship>self</common:external-id-relationship>
+            </external-identifier:external-identifier>
+        </external-identifier:external-identifiers>
+    </person:person>
+    <activities:activities-summary path="/0000-0001-6816-8350/activities">
+        <common:last-modified-date>2023-12-02T13:28:26.051Z</common:last-modified-date>
+        <activities:distinctions path="/0000-0001-6816-8350/distinctions"/>
+        <activities:educations path="/0000-0001-6816-8350/educations">
+            <common:last-modified-date>2018-02-13T02:33:38.225Z</common:last-modified-date>
+            <activities:affiliation-group>
+                <common:last-modified-date>2016-02-09T06:55:21.838Z</common:last-modified-date>
+                <common:external-ids/>
+                <education:education-summary put-code="1549986" display-index="0" path="/0000-0001-6816-8350/education/1549986" visibility="public">
+                    <common:created-date>2016-02-09T06:54:39.199Z</common:created-date>
+                    <common:last-modified-date>2016-02-09T06:55:21.838Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-orcid>
+                            <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                            <common:path>0000-0001-6816-8350</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-orcid>
+                    </common:source>
+                    <common:department-name>Management</common:department-name>
+                    <common:role-title>PhD</common:role-title>
+                    <common:start-date>
+                        <common:year>2021</common:year>
+                    </common:start-date>
+                    <common:end-date>
+                        <common:year>2022</common:year>
+                        <common:month>02</common:month>
+                        <common:day>12</common:day>
+                    </common:end-date>
+                    <common:start-date>
+                        <common:year>2003</common:year>
+                        <common:month>03</common:month>
+                    </common:start-date>
+                    <common:end-date>
+                        <common:year>2007</common:year>
+                        <common:month>03</common:month>
+                    </common:end-date>
+                    <common:organization>
+                        <common:name>University of New England</common:name>
+                        <common:address>
+                            <common:city>Armidale</common:city>
+                            <common:region>NSW</common:region>
+                            <common:country>AU</common:country>
+                        </common:address>
+                        <common:disambiguated-organization>
+                            <common:disambiguated-organization-identifier>1319</common:disambiguated-organization-identifier>
+                            <common:disambiguation-source>RINGGOLD</common:disambiguation-source>
+                        </common:disambiguated-organization>
+                    </common:organization>
+                </education:education-summary>
+            </activities:affiliation-group>
+            <activities:affiliation-group>
+                <common:last-modified-date>2018-02-13T02:33:38.225Z</common:last-modified-date>
+                <common:external-ids/>
+                <education:education-summary put-code="1549990" display-index="0" path="/0000-0001-6816-8350/education/1549990" visibility="public">
+                    <common:created-date>2016-02-09T06:57:04.181Z</common:created-date>
+                    <common:last-modified-date>2018-02-13T02:33:38.225Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-orcid>
+                            <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                            <common:path>0000-0001-6816-8350</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-orcid>
+                    </common:source>
+                    <common:department-name>Psychology</common:department-name>
+                    <common:role-title>Master of Science (Industrial and Organizational) Psychology</common:role-title>
+                    <common:start-date>
+                        <common:year>1998</common:year>
+                        <common:month>01</common:month>
+                    </common:start-date>
+                    <common:end-date>
+                        <common:year>2000</common:year>
+                        <common:month>01</common:month>
+                    </common:end-date>
+                    <common:organization>
+                        <common:name>Universitas Gadjah Mada</common:name>
+                        <common:address>
+                            <common:city>Yogyakarta</common:city>
+                            <common:region>Daerah Istimewa Yogyakart</common:region>
+                            <common:country>ID</common:country>
+                        </common:address>
+                        <common:disambiguated-organization>
+                            <common:disambiguated-organization-identifier>59166</common:disambiguated-organization-identifier>
+                            <common:disambiguation-source>RINGGOLD</common:disambiguation-source>
+                        </common:disambiguated-organization>
+                    </common:organization>
+                </education:education-summary>
+            </activities:affiliation-group>
+            <activities:affiliation-group>
+                <common:last-modified-date>2018-02-13T02:33:35.821Z</common:last-modified-date>
+                <common:external-ids/>
+                <education:education-summary put-code="1549998" display-index="0" path="/0000-0001-6816-8350/education/1549998" visibility="public">
+                    <common:created-date>2016-02-09T06:58:59.869Z</common:created-date>
+                    <common:last-modified-date>2018-02-13T02:33:35.821Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-orcid>
+                            <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                            <common:path>0000-0001-6816-8350</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-orcid>
+                    </common:source>
+                    <common:department-name>Education</common:department-name>
+                    <common:role-title>Bachelor of Education (Honors)</common:role-title>
+                    <common:start-date>
+                        <common:year>1988</common:year>
+                        <common:month>03</common:month>
+                    </common:start-date>
+                    <common:end-date>
+                        <common:year>1991</common:year>
+                        <common:month>03</common:month>
+                    </common:end-date>
+                    <common:organization>
+                        <common:name>Kenyatta University</common:name>
+                        <common:address>
+                            <common:city>Nairobi</common:city>
+                            <common:region>Nairobi</common:region>
+                            <common:country>KE</common:country>
+                        </common:address>
+                        <common:disambiguated-organization>
+                            <common:disambiguated-organization-identifier>107864</common:disambiguated-organization-identifier>
+                            <common:disambiguation-source>RINGGOLD</common:disambiguation-source>
+                        </common:disambiguated-organization>
+                    </common:organization>
+                </education:education-summary>
+            </activities:affiliation-group>
+        </activities:educations>
+        <activities:employments path="/0000-0001-6816-8350/employments">
+            <common:last-modified-date>2023-12-02T13:28:26.051Z</common:last-modified-date>
+            <activities:affiliation-group>
+                <common:last-modified-date>2023-12-02T13:28:26.051Z</common:last-modified-date>
+                <common:external-ids/>
+                <employment:employment-summary put-code="21884863" display-index="1" path="/0000-0001-6816-8350/employment/21884863" visibility="public">
+                    <common:created-date>2023-12-02T13:28:26.051Z</common:created-date>
+                    <common:last-modified-date>2023-12-02T13:28:26.051Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-orcid>
+                            <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                            <common:path>0000-0001-6816-8350</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-orcid>
+                    </common:source>
+                    <common:department-name>Management</common:department-name>
+                    <common:role-title>Associate Professor in Management</common:role-title>
+                    <common:start-date>
+                        <common:year>2023</common:year>
+                        <common:month>08</common:month>
+                        <common:day>20</common:day>
+                    </common:start-date>
+                    <common:organization>
+                        <common:name>Alfaisal University</common:name>
+                        <common:address>
+                            <common:city>Riyadh</common:city>
+                            <common:country>SA</common:country>
+                        </common:address>
+                        <common:disambiguated-organization>
+                            <common:disambiguated-organization-identifier>https://ror.org/00cdrtq48</common:disambiguated-organization-identifier>
+                            <common:disambiguation-source>ROR</common:disambiguation-source>
+                        </common:disambiguated-organization>
+                    </common:organization>
+                    <common:url>https://faculty.alfaisal.edu/user/mmuchiri</common:url>
+                </employment:employment-summary>
+            </activities:affiliation-group>
+            <activities:affiliation-group>
+                <common:last-modified-date>2016-02-09T07:00:06.052Z</common:last-modified-date>
+                <common:external-ids/>
+                <employment:employment-summary put-code="1550002" display-index="0" path="/0000-0001-6816-8350/employment/1550002" visibility="public">
+                    <common:created-date>2016-02-09T07:00:06.052Z</common:created-date>
+                    <common:last-modified-date>2016-02-09T07:00:06.052Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-orcid>
+                            <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                            <common:path>0000-0001-6816-8350</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-orcid>
+                    </common:source>
+                    <common:department-name>Management</common:department-name>
+                    <common:role-title>Senior Lecturer</common:role-title>
+                    <common:start-date>
+                        <common:year>2014</common:year>
+                        <common:month>02</common:month>
+                    </common:start-date>
+                    <common:organization>
+                        <common:name>RMIT University</common:name>
+                        <common:address>
+                            <common:city>Melbourne</common:city>
+                            <common:region>VIC</common:region>
+                            <common:country>AU</common:country>
+                        </common:address>
+                        <common:disambiguated-organization>
+                            <common:disambiguated-organization-identifier>5376</common:disambiguated-organization-identifier>
+                            <common:disambiguation-source>RINGGOLD</common:disambiguation-source>
+                        </common:disambiguated-organization>
+                    </common:organization>
+                </employment:employment-summary>
+            </activities:affiliation-group>
+            <activities:affiliation-group>
+                <common:last-modified-date>2016-02-09T07:01:08.398Z</common:last-modified-date>
+                <common:external-ids/>
+                <employment:employment-summary put-code="1550007" display-index="0" path="/0000-0001-6816-8350/employment/1550007" visibility="public">
+                    <common:created-date>2016-02-09T07:01:08.398Z</common:created-date>
+                    <common:last-modified-date>2016-02-09T07:01:08.398Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-orcid>
+                            <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                            <common:path>0000-0001-6816-8350</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-orcid>
+                    </common:source>
+                    <common:department-name>Management</common:department-name>
+                    <common:role-title>Senior Lecturer in Human Resource Management</common:role-title>
+                    <common:start-date>
+                        <common:year>2010</common:year>
+                        <common:month>01</common:month>
+                    </common:start-date>
+                    <common:end-date>
+                        <common:year>2014</common:year>
+                        <common:month>02</common:month>
+                    </common:end-date>
+                    <common:organization>
+                        <common:name>Central Queensland University</common:name>
+                        <common:address>
+                            <common:city>Rockhampton</common:city>
+                            <common:region>QLD</common:region>
+                            <common:country>AU</common:country>
+                        </common:address>
+                        <common:disambiguated-organization>
+                            <common:disambiguated-organization-identifier>273488</common:disambiguated-organization-identifier>
+                            <common:disambiguation-source>RINGGOLD</common:disambiguation-source>
+                        </common:disambiguated-organization>
+                    </common:organization>
+                </employment:employment-summary>
+            </activities:affiliation-group>
+            <activities:affiliation-group>
+                <common:last-modified-date>2016-02-09T07:01:47.814Z</common:last-modified-date>
+                <common:external-ids/>
+                <employment:employment-summary put-code="1550010" display-index="0" path="/0000-0001-6816-8350/employment/1550010" visibility="public">
+                    <common:created-date>2016-02-09T07:01:47.814Z</common:created-date>
+                    <common:last-modified-date>2016-02-09T07:01:47.814Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-orcid>
+                            <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                            <common:path>0000-0001-6816-8350</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-orcid>
+                    </common:source>
+                    <common:department-name>Management</common:department-name>
+                    <common:role-title>Lecturer in Management</common:role-title>
+                    <common:start-date>
+                        <common:year>2007</common:year>
+                        <common:month>01</common:month>
+                    </common:start-date>
+                    <common:end-date>
+                        <common:year>2010</common:year>
+                        <common:month>01</common:month>
+                    </common:end-date>
+                    <common:organization>
+                        <common:name>Central Queensland University</common:name>
+                        <common:address>
+                            <common:city>Rockhampton</common:city>
+                            <common:region>QLD</common:region>
+                            <common:country>AU</common:country>
+                        </common:address>
+                        <common:disambiguated-organization>
+                            <common:disambiguated-organization-identifier>273488</common:disambiguated-organization-identifier>
+                            <common:disambiguation-source>RINGGOLD</common:disambiguation-source>
+                        </common:disambiguated-organization>
+                    </common:organization>
+                </employment:employment-summary>
+            </activities:affiliation-group>
+            <activities:affiliation-group>
+                <common:last-modified-date>2018-02-13T02:33:13.213Z</common:last-modified-date>
+                <common:external-ids/>
+                <employment:employment-summary put-code="1550017" display-index="0" path="/0000-0001-6816-8350/employment/1550017" visibility="public">
+                    <common:created-date>2016-02-09T07:03:42.180Z</common:created-date>
+                    <common:last-modified-date>2018-02-13T02:33:13.213Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-orcid>
+                            <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                            <common:path>0000-0001-6816-8350</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-orcid>
+                    </common:source>
+                    <common:department-name>Human Resource Development Division</common:department-name>
+                    <common:role-title>Chief Human Resource Development Officer</common:role-title>
+                    <common:start-date>
+                        <common:year>2005</common:year>
+                        <common:month>01</common:month>
+                    </common:start-date>
+                    <common:end-date>
+                        <common:year>2007</common:year>
+                        <common:month>01</common:month>
+                    </common:end-date>
+                    <common:organization>
+                        <common:name>Government of Kenya Directorate of Personnel Management</common:name>
+                        <common:address>
+                            <common:city>Nairobi</common:city>
+                            <common:region>Nairobi</common:region>
+                            <common:country>KE</common:country>
+                        </common:address>
+                        <common:disambiguated-organization>
+                            <common:disambiguated-organization-identifier>360256</common:disambiguated-organization-identifier>
+                            <common:disambiguation-source>RINGGOLD</common:disambiguation-source>
+                        </common:disambiguated-organization>
+                    </common:organization>
+                </employment:employment-summary>
+            </activities:affiliation-group>
+            <activities:affiliation-group>
+                <common:last-modified-date>2016-02-09T07:05:02.300Z</common:last-modified-date>
+                <common:external-ids/>
+                <employment:employment-summary put-code="1550020" display-index="0" path="/0000-0001-6816-8350/employment/1550020" visibility="public">
+                    <common:created-date>2016-02-09T07:05:02.300Z</common:created-date>
+                    <common:last-modified-date>2016-02-09T07:05:02.300Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-orcid>
+                            <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                            <common:path>0000-0001-6816-8350</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-orcid>
+                    </common:source>
+                    <common:department-name>Human Resource Development Division</common:department-name>
+                    <common:role-title>Human Resource Development Officer</common:role-title>
+                    <common:start-date>
+                        <common:year>2001</common:year>
+                        <common:month>01</common:month>
+                    </common:start-date>
+                    <common:end-date>
+                        <common:year>2005</common:year>
+                        <common:month>01</common:month>
+                    </common:end-date>
+                    <common:organization>
+                        <common:name>Government of Kenya Directorate of Personnel Management</common:name>
+                        <common:address>
+                            <common:city>Nairobi</common:city>
+                            <common:region>Nairobi</common:region>
+                            <common:country>KE</common:country>
+                        </common:address>
+                        <common:disambiguated-organization>
+                            <common:disambiguated-organization-identifier>360256</common:disambiguated-organization-identifier>
+                            <common:disambiguation-source>RINGGOLD</common:disambiguation-source>
+                        </common:disambiguated-organization>
+                    </common:organization>
+                </employment:employment-summary>
+            </activities:affiliation-group>
+            <activities:affiliation-group>
+                <common:last-modified-date>2016-02-09T07:36:52.398Z</common:last-modified-date>
+                <common:external-ids/>
+                <employment:employment-summary put-code="1550050" display-index="0" path="/0000-0001-6816-8350/employment/1550050" visibility="public">
+                    <common:created-date>2016-02-09T07:36:52.398Z</common:created-date>
+                    <common:last-modified-date>2016-02-09T07:36:52.398Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-orcid>
+                            <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                            <common:path>0000-0001-6816-8350</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-orcid>
+                    </common:source>
+                    <common:department-name>Public Sector Management Technical Assistance Project</common:department-name>
+                    <common:role-title>Project Coordinator for Development Learning Centre</common:role-title>
+                    <common:start-date>
+                        <common:year>2002</common:year>
+                        <common:month>08</common:month>
+                    </common:start-date>
+                    <common:end-date>
+                        <common:year>2003</common:year>
+                        <common:month>03</common:month>
+                    </common:end-date>
+                    <common:organization>
+                        <common:name>Government of Kenya Directorate of Personnel Management</common:name>
+                        <common:address>
+                            <common:city>Nairobi</common:city>
+                            <common:region>Nairobi</common:region>
+                            <common:country>KE</common:country>
+                        </common:address>
+                        <common:disambiguated-organization>
+                            <common:disambiguated-organization-identifier>360256</common:disambiguated-organization-identifier>
+                            <common:disambiguation-source>RINGGOLD</common:disambiguation-source>
+                        </common:disambiguated-organization>
+                    </common:organization>
+                </employment:employment-summary>
+            </activities:affiliation-group>
+        </activities:employments>
+        <activities:fundings path="/0000-0001-6816-8350/fundings">
+            <common:last-modified-date>2016-02-09T09:05:27.100Z</common:last-modified-date>
+            <activities:group>
+                <common:last-modified-date>2016-02-09T09:05:27.100Z</common:last-modified-date>
+                <common:external-ids/>
+                <funding:funding-summary put-code="150520" path="/0000-0001-6816-8350/funding/150520" visibility="public" display-index="6">
+                    <common:created-date>2016-02-09T09:05:27.100Z</common:created-date>
+                    <common:last-modified-date>2016-02-09T09:05:27.100Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-orcid>
+                            <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                            <common:path>0000-0001-6816-8350</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-orcid>
+                    </common:source>
+                    <funding:title>
+                        <common:title>A cross-country examination of Employee Wellbeing,  Leadership, High Performance Work Systems and Innovative Behaviours</common:title>
+                    </funding:title>
+                    <funding:type>grant</funding:type>
+                    <common:start-date>
+                        <common:year>2016</common:year>
+                        <common:month>01</common:month>
+                    </common:start-date>
+                    <common:end-date>
+                        <common:year>2016</common:year>
+                        <common:month>12</common:month>
+                    </common:end-date>
+                    <common:organization>
+                        <common:name>RMIT University</common:name>
+                        <common:address>
+                            <common:city>VIC</common:city>
+                            <common:region>VIC</common:region>
+                            <common:country>AU</common:country>
+                        </common:address>
+                        <common:disambiguated-organization>
+                            <common:disambiguated-organization-identifier>http://dx.doi.org/10.13039/501100001780</common:disambiguated-organization-identifier>
+                            <common:disambiguation-source>FUNDREF</common:disambiguation-source>
+                        </common:disambiguated-organization>
+                    </common:organization>
+                </funding:funding-summary>
+            </activities:group>
+            <activities:group>
+                <common:last-modified-date>2016-02-09T09:03:51.641Z</common:last-modified-date>
+                <common:external-ids/>
+                <funding:funding-summary put-code="150518" path="/0000-0001-6816-8350/funding/150518" visibility="public" display-index="5">
+                    <common:created-date>2016-02-09T09:03:51.641Z</common:created-date>
+                    <common:last-modified-date>2016-02-09T09:03:51.641Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-orcid>
+                            <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                            <common:path>0000-0001-6816-8350</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-orcid>
+                    </common:source>
+                    <funding:title>
+                        <common:title>Leading Safe and Thriving Organisations: An Investigation of the Relationships between Leadership, Thriving Behaviour, Authentic Followership and Safety Climate in an Australian Multinational Enterprise</common:title>
+                    </funding:title>
+                    <funding:type>grant</funding:type>
+                    <common:start-date>
+                        <common:year>2015</common:year>
+                        <common:month>01</common:month>
+                    </common:start-date>
+                    <common:end-date>
+                        <common:year>2015</common:year>
+                        <common:month>12</common:month>
+                    </common:end-date>
+                    <common:organization>
+                        <common:name>RMIT University</common:name>
+                        <common:address>
+                            <common:city>VIC</common:city>
+                            <common:region>VIC</common:region>
+                            <common:country>AU</common:country>
+                        </common:address>
+                        <common:disambiguated-organization>
+                            <common:disambiguated-organization-identifier>http://dx.doi.org/10.13039/501100001780</common:disambiguated-organization-identifier>
+                            <common:disambiguation-source>FUNDREF</common:disambiguation-source>
+                        </common:disambiguated-organization>
+                    </common:organization>
+                </funding:funding-summary>
+            </activities:group>
+            <activities:group>
+                <common:last-modified-date>2016-02-09T09:02:28.297Z</common:last-modified-date>
+                <common:external-ids/>
+                <funding:funding-summary put-code="150516" path="/0000-0001-6816-8350/funding/150516" visibility="public" display-index="4">
+                    <common:created-date>2016-02-09T09:02:28.297Z</common:created-date>
+                    <common:last-modified-date>2016-02-09T09:02:28.297Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-orcid>
+                            <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                            <common:path>0000-0001-6816-8350</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-orcid>
+                    </common:source>
+                    <funding:title>
+                        <common:title>A multilevel, cross-country examination of leadership, followership and innovative behaviours in Australia and Indonesia. </common:title>
+                    </funding:title>
+                    <funding:type>grant</funding:type>
+                    <common:start-date>
+                        <common:year>2015</common:year>
+                        <common:month>01</common:month>
+                    </common:start-date>
+                    <common:end-date>
+                        <common:year>2015</common:year>
+                        <common:month>12</common:month>
+                    </common:end-date>
+                    <common:organization>
+                        <common:name>RMIT University</common:name>
+                        <common:address>
+                            <common:city>VIC</common:city>
+                            <common:region>VIC</common:region>
+                            <common:country>AU</common:country>
+                        </common:address>
+                        <common:disambiguated-organization>
+                            <common:disambiguated-organization-identifier>http://dx.doi.org/10.13039/501100001780</common:disambiguated-organization-identifier>
+                            <common:disambiguation-source>FUNDREF</common:disambiguation-source>
+                        </common:disambiguated-organization>
+                    </common:organization>
+                </funding:funding-summary>
+            </activities:group>
+            <activities:group>
+                <common:last-modified-date>2016-02-09T09:00:51.749Z</common:last-modified-date>
+                <common:external-ids/>
+                <funding:funding-summary put-code="150514" path="/0000-0001-6816-8350/funding/150514" visibility="public" display-index="3">
+                    <common:created-date>2016-02-09T09:00:51.749Z</common:created-date>
+                    <common:last-modified-date>2016-02-09T09:00:51.749Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-orcid>
+                            <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                            <common:path>0000-0001-6816-8350</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-orcid>
+                    </common:source>
+                    <funding:title>
+                        <common:title>Workplace safety and positive leadership: Exploring relationships between leader behaviours, organisational climate, safety climate, safety citizenship behaviours and innovative behaviours within city councils in Victoria </common:title>
+                    </funding:title>
+                    <funding:type>grant</funding:type>
+                    <common:start-date>
+                        <common:year>2014</common:year>
+                        <common:month>01</common:month>
+                    </common:start-date>
+                    <common:end-date>
+                        <common:year>2014</common:year>
+                        <common:month>12</common:month>
+                    </common:end-date>
+                    <common:organization>
+                        <common:name>RMIT University</common:name>
+                        <common:address>
+                            <common:city>VIC</common:city>
+                            <common:region>VIC</common:region>
+                            <common:country>AU</common:country>
+                        </common:address>
+                        <common:disambiguated-organization>
+                            <common:disambiguated-organization-identifier>http://dx.doi.org/10.13039/501100001780</common:disambiguated-organization-identifier>
+                            <common:disambiguation-source>FUNDREF</common:disambiguation-source>
+                        </common:disambiguated-organization>
+                    </common:organization>
+                </funding:funding-summary>
+            </activities:group>
+            <activities:group>
+                <common:last-modified-date>2016-02-09T07:46:44.919Z</common:last-modified-date>
+                <common:external-ids/>
+                <funding:funding-summary put-code="150485" path="/0000-0001-6816-8350/funding/150485" visibility="public" display-index="0">
+                    <common:created-date>2016-02-09T07:46:44.919Z</common:created-date>
+                    <common:last-modified-date>2016-02-09T07:46:44.919Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-orcid>
+                            <common:uri>https://orcid.org/0000-0001-6816-8350</common:uri>
+                            <common:path>0000-0001-6816-8350</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-orcid>
+                    </common:source>
+                    <funding:title>
+                        <common:title>Sustainable Business Model for Central Queensland Regional Information Systems.</common:title>
+                    </funding:title>
+                    <funding:type>grant</funding:type>
+                    <common:start-date>
+                        <common:year>2008</common:year>
+                        <common:month>01</common:month>
+                    </common:start-date>
+                    <common:end-date>
+                        <common:year>2008</common:year>
+                        <common:month>12</common:month>
+                    </common:end-date>
+                    <common:organization>
+                        <common:name>Department of Local Government, Planning, Sport and Recreation, Queensland, Australia </common:name>
+                        <common:address>
+                            <common:city>Rockhampton</common:city>
+                            <common:region>Central Queensland</common:region>
+                            <common:country>AU</common:country>
+                        </common:address>
+                    </common:organization>
+                </funding:funding-summary>
+            </activities:group>
+        </activities:fundings>
+        <activities:invited-positions path="/0000-0001-6816-8350/invited-positions"/>
+        <activities:memberships path="/0000-0001-6816-8350/memberships"/>
+        <activities:peer-reviews path="/0000-0001-6816-8350/peer-reviews">
+            <common:last-modified-date>2023-05-31T05:53:44.542Z</common:last-modified-date>
+            <activities:group>
+                <common:last-modified-date>2023-05-31T05:53:44.542Z</common:last-modified-date>
+                <common:external-ids>
+                    <common:external-id>
+                        <common:external-id-type>peer-review</common:external-id-type>
+                        <common:external-id-value>issn:0167-4544</common:external-id-value>
+                    </common:external-id>
+                </common:external-ids>
+                <activities:peer-review-group>
+                    <common:last-modified-date>2023-02-28T06:51:52.426Z</common:last-modified-date>
+                    <common:external-ids>
+                        <common:external-id>
+                            <common:external-id-type>source-work-id</common:external-id-type>
+                            <common:external-id-value>c9bdf086-cfee-4cd9-bcfb-268cc5423248</common:external-id-value>
+                            <common:external-id-normalized transient="true">c9bdf086-cfee-4cd9-bcfb-268cc5423248</common:external-id-normalized>
+                            <common:external-id-url></common:external-id-url>
+                            <common:external-id-relationship>self</common:external-id-relationship>
+                        </common:external-id>
+                    </common:external-ids>
+                    <peer-review:peer-review-summary put-code="8741329" path="/0000-0001-6816-8350/peer-review/8741329" visibility="public" display-index="0">
+                        <common:created-date>2023-02-28T06:51:52.426Z</common:created-date>
+                        <common:last-modified-date>2023-02-28T06:51:52.426Z</common:last-modified-date>
+                        <common:source>
+                            <common:source-client-id>
+                                <common:uri>https://orcid.org/client/APP-945VYTN20C7BZXYT</common:uri>
+                                <common:path>APP-945VYTN20C7BZXYT</common:path>
+                                <common:host>orcid.org</common:host>
+                            </common:source-client-id>
+                            <common:source-name>Springer Nature @ Editorial Manager</common:source-name>
+                        </common:source>
+                        <peer-review:reviewer-role>reviewer</peer-review:reviewer-role>
+                        <common:external-ids>
+                            <common:external-id>
+                                <common:external-id-type>source-work-id</common:external-id-type>
+                                <common:external-id-value>c9bdf086-cfee-4cd9-bcfb-268cc5423248</common:external-id-value>
+                                <common:external-id-normalized transient="true">c9bdf086-cfee-4cd9-bcfb-268cc5423248</common:external-id-normalized>
+                                <common:external-id-url></common:external-id-url>
+                                <common:external-id-relationship>self</common:external-id-relationship>
+                            </common:external-id>
+                        </common:external-ids>
+                        <peer-review:review-type>review</peer-review:review-type>
+                        <peer-review:completion-date>
+                            <common:year>2023</common:year>
+                        </peer-review:completion-date>
+                        <peer-review:review-group-id>issn:0167-4544</peer-review:review-group-id>
+                        <peer-review:convening-organization>
+                            <common:name>Springer Nature</common:name>
+                            <common:address>
+                                <common:city>New York</common:city>
+                                <common:country>US</common:country>
+                            </common:address>
+                            <common:disambiguated-organization>
+                                <common:disambiguated-organization-identifier>grid.467660.5</common:disambiguated-organization-identifier>
+                                <common:disambiguation-source>GRID</common:disambiguation-source>
+                            </common:disambiguated-organization>
+                        </peer-review:convening-organization>
+                    </peer-review:peer-review-summary>
+                </activities:peer-review-group>
+                <activities:peer-review-group>
+                    <common:last-modified-date>2023-05-31T05:53:44.542Z</common:last-modified-date>
+                    <common:external-ids>
+                        <common:external-id>
+                            <common:external-id-type>source-work-id</common:external-id-type>
+                            <common:external-id-value>c442840b-5807-459d-802a-303d8ba4e25e</common:external-id-value>
+                            <common:external-id-normalized transient="true">c442840b-5807-459d-802a-303d8ba4e25e</common:external-id-normalized>
+                            <common:external-id-url></common:external-id-url>
+                            <common:external-id-relationship>self</common:external-id-relationship>
+                        </common:external-id>
+                    </common:external-ids>
+                    <peer-review:peer-review-summary put-code="9680570" path="/0000-0001-6816-8350/peer-review/9680570" visibility="public" display-index="0">
+                        <common:created-date>2023-05-31T05:53:44.542Z</common:created-date>
+                        <common:last-modified-date>2023-05-31T05:53:44.542Z</common:last-modified-date>
+                        <common:source>
+                            <common:source-client-id>
+                                <common:uri>https://orcid.org/client/APP-945VYTN20C7BZXYT</common:uri>
+                                <common:path>APP-945VYTN20C7BZXYT</common:path>
+                                <common:host>orcid.org</common:host>
+                            </common:source-client-id>
+                            <common:source-name>Springer Nature @ Editorial Manager</common:source-name>
+                        </common:source>
+                        <peer-review:reviewer-role>reviewer</peer-review:reviewer-role>
+                        <common:external-ids>
+                            <common:external-id>
+                                <common:external-id-type>source-work-id</common:external-id-type>
+                                <common:external-id-value>c442840b-5807-459d-802a-303d8ba4e25e</common:external-id-value>
+                                <common:external-id-normalized transient="true">c442840b-5807-459d-802a-303d8ba4e25e</common:external-id-normalized>
+                                <common:external-id-url></common:external-id-url>
+                                <common:external-id-relationship>self</common:external-id-relationship>
+                            </common:external-id>
+                        </common:external-ids>
+                        <peer-review:review-type>review</peer-review:review-type>
+                        <peer-review:completion-date>
+                            <common:year>2023</common:year>
+                        </peer-review:completion-date>
+                        <peer-review:review-group-id>issn:0167-4544</peer-review:review-group-id>
+                        <peer-review:convening-organization>
+                            <common:name>Springer Nature</common:name>
+                            <common:address>
+                                <common:city>New York</common:city>
+                                <common:country>US</common:country>
+                            </common:address>
+                            <common:disambiguated-organization>
+                                <common:disambiguated-organization-identifier>grid.467660.5</common:disambiguated-organization-identifier>
+                                <common:disambiguation-source>GRID</common:disambiguation-source>
+                            </common:disambiguated-organization>
+                        </peer-review:convening-organization>
+                    </peer-review:peer-review-summary>
+                </activities:peer-review-group>
+            </activities:group>
+        </activities:peer-reviews>
+        <activities:qualifications path="/0000-0001-6816-8350/qualifications"/>
+        <activities:research-resources path="/0000-0001-6816-8350/research-resources"/>
+        <activities:services path="/0000-0001-6816-8350/services"/>
+        <activities:works path="/0000-0001-6816-8350/works">
+            <common:last-modified-date>2023-06-02T20:12:00.338Z</common:last-modified-date>
+            <activities:group>
+                <common:last-modified-date>2023-06-02T20:12:00.338Z</common:last-modified-date>
+                <common:external-ids>
+                    <common:external-id>
+                        <common:external-id-type>doi</common:external-id-type>
+                        <common:external-id-value>10.4337/9781800881945.00020</common:external-id-value>
+                        <common:external-id-normalized transient="true">10.4337/9781800881945.00020</common:external-id-normalized>
+                        <common:external-id-url>https://doi.org/10.4337/9781800881945.00020</common:external-id-url>
+                        <common:external-id-relationship>self</common:external-id-relationship>
+                    </common:external-id>
+                </common:external-ids>
+                <work:work-summary put-code="134891279" path="/0000-0001-6816-8350/work/134891279" visibility="public" display-index="0">
+                    <common:created-date>2023-05-11T21:05:54.188Z</common:created-date>
+                    <common:last-modified-date>2023-06-02T20:12:00.338Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-client-id>
+                            <common:uri>https://orcid.org/client/0000-0001-9884-1913</common:uri>
+                            <common:path>0000-0001-9884-1913</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-client-id>
+                        <common:source-name>Crossref</common:source-name>
+                    </common:source>
+                    <work:title>
+                        <common:title>Ethical leadership as workplace innovation and enabler for employee commitment and innovative work behaviours in Vietnam</common:title>
+                    </work:title>
+                    <common:external-ids>
+                        <common:external-id>
+                            <common:external-id-type>doi</common:external-id-type>
+                            <common:external-id-value>10.4337/9781800881945.00020</common:external-id-value>
+                            <common:external-id-normalized transient="true">10.4337/9781800881945.00020</common:external-id-normalized>
+                            <common:external-id-url>https://doi.org/10.4337/9781800881945.00020</common:external-id-url>
+                            <common:external-id-relationship>self</common:external-id-relationship>
+                        </common:external-id>
+                    </common:external-ids>
+                    <common:url>https://doi.org/10.4337/9781800881945.00020</common:url>
+                    <work:type>book-chapter</work:type>
+                    <common:publication-date>
+                        <common:year>2023</common:year>
+                        <common:month>05</common:month>
+                        <common:day>26</common:day>
+                    </common:publication-date>
+                </work:work-summary>
+            </activities:group>
+            <activities:group>
+                <common:last-modified-date>2023-03-01T11:30:31.972Z</common:last-modified-date>
+                <common:external-ids>
+                    <common:external-id>
+                        <common:external-id-type>doi</common:external-id-type>
+                        <common:external-id-value>10.1007/s10551-022-05081-6</common:external-id-value>
+                        <common:external-id-normalized transient="true">10.1007/s10551-022-05081-6</common:external-id-normalized>
+                        <common:external-id-url>https://doi.org/10.1007/s10551-022-05081-6</common:external-id-url>
+                        <common:external-id-relationship>self</common:external-id-relationship>
+                    </common:external-id>
+                </common:external-ids>
+                <work:work-summary put-code="110048777" path="/0000-0001-6816-8350/work/110048777" visibility="public" display-index="0">
+                    <common:created-date>2022-03-18T03:36:55.927Z</common:created-date>
+                    <common:last-modified-date>2023-03-01T11:30:31.972Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-client-id>
+                            <common:uri>https://orcid.org/client/0000-0001-9884-1913</common:uri>
+                            <common:path>0000-0001-9884-1913</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-client-id>
+                        <common:source-name>Crossref</common:source-name>
+                    </common:source>
+                    <work:title>
+                        <common:title>Unethical Leadership: Review, Synthesis and Directions for Future Research</common:title>
+                    </work:title>
+                    <common:external-ids>
+                        <common:external-id>
+                            <common:external-id-type>doi</common:external-id-type>
+                            <common:external-id-value>10.1007/s10551-022-05081-6</common:external-id-value>
+                            <common:external-id-normalized transient="true">10.1007/s10551-022-05081-6</common:external-id-normalized>
+                            <common:external-id-url>https://doi.org/10.1007/s10551-022-05081-6</common:external-id-url>
+                            <common:external-id-relationship>self</common:external-id-relationship>
+                        </common:external-id>
+                    </common:external-ids>
+                    <common:url>https://doi.org/10.1007/s10551-022-05081-6</common:url>
+                    <work:type>journal-article</work:type>
+                    <common:publication-date>
+                        <common:year>2023</common:year>
+                        <common:month>03</common:month>
+                    </common:publication-date>
+                    <work:journal-title>Journal of Business Ethics</work:journal-title>
+                </work:work-summary>
+            </activities:group>
+            <activities:group>
+                <common:last-modified-date>2022-05-28T18:16:16.575Z</common:last-modified-date>
+                <common:external-ids>
+                    <common:external-id>
+                        <common:external-id-type>doi</common:external-id-type>
+                        <common:external-id-value>10.1017/jmo.2019.33</common:external-id-value>
+                        <common:external-id-normalized transient="true">10.1017/jmo.2019.33</common:external-id-normalized>
+                        <common:external-id-url>https://doi.org/10.1017/jmo.2019.33</common:external-id-url>
+                        <common:external-id-relationship>self</common:external-id-relationship>
+                    </common:external-id>
+                </common:external-ids>
+                <work:work-summary put-code="57272180" path="/0000-0001-6816-8350/work/57272180" visibility="public" display-index="0">
+                    <common:created-date>2019-05-10T07:23:14.608Z</common:created-date>
+                    <common:last-modified-date>2022-05-28T18:16:16.575Z</common:last-modified-date>
+                    <common:source>
+                        <common:source-client-id>
+                            <common:uri>https://orcid.org/client/0000-0001-9884-1913</common:uri>
+                            <common:path>0000-0001-9884-1913</common:path>
+                            <common:host>orcid.org</common:host>
+                        </common:source-client-id>
+                        <common:source-name>Crossref</common:source-name>
+                    </common:source>
+                    <work:title>
+                        <common:title>And now for something completely different: Reframing social processes of leadership theory using positive organisational behaviour</common:title>
+                    </work:title>
+                    <common:external-ids>
+                        <common:external-id>
+                            <common:external-id-type>doi</common:external-id-type>
+                            <common:external-id-value>10.1017/jmo.2019.33</common:external-id-value>
+                            <common:external-id-normalized transient="true">10.1017/jmo.2019.33</common:external-id-normalized>
+                            <common:external-id-url>https://doi.org/10.1017/jmo.2019.33</common:external-id-url>
+                            <common:external-id-relationship>self</common:external-id-relationship>
+                        </common:external-id>
+                    </common:external-ids>
+                    <common:url>https://doi.org/10.1017/jmo.2019.33</common:url>
+                    <work:type>journal-article</work:type>
+                    <common:publication-date>
+                        <common:year>2019</common:year>
+                        <common:month>05</common:month>
+                        <common:day>09</common:day>
+                    </common:publication-date>
+                    <work:journal-title>Journal of Management &amp; Organization</work:journal-title>
+                </work:work-summary>
+            </activities:group>
+        </activities:works>
+    </activities:activities-summary>
+</record:record>

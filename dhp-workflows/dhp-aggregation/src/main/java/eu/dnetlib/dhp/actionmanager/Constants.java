@@ -13,6 +13,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.common.HdfsSupport;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
+import eu.dnetlib.dhp.schema.oaf.Instance;
+import eu.dnetlib.dhp.schema.oaf.Qualifier;
 import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import eu.dnetlib.dhp.schema.oaf.Subject;
 import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
@@ -41,6 +43,9 @@ public class Constants {
 
 	public static final String NULL = "NULL";
 	public static final String NA = "N/A";
+
+	public static final String WEB_CRAWL_ID = "10|openaire____::fb98a192f6a055ba495ef414c330834b";
+	public static final String WEB_CRAWL_NAME = "Web Crawl";
 
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 

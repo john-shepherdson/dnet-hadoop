@@ -26,7 +26,7 @@ public class PidCleaner {
 		String value = Optional
 			.ofNullable(pidValue)
 			.map(String::trim)
-			.orElseThrow(() -> new IllegalArgumentException("PID value cannot be empty"));
+			.orElseThrow(() -> new IllegalArgumentException("PID (" + pidType + ") value cannot be empty"));
 
 		switch (pidType) {
 

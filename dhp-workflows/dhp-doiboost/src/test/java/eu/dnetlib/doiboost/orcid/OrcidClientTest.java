@@ -47,7 +47,7 @@ public class OrcidClientTest {
 	private static Path testPath;
 
 	@BeforeAll
-	private static void setUp() throws IOException {
+	public static void setUp() throws IOException {
 		testPath = Files.createTempDirectory(OrcidClientTest.class.getName());
 		System.out.println("using test path: " + testPath);
 	}
@@ -150,9 +150,9 @@ public class OrcidClientTest {
 		System.out.println(valueDt.toString());
 	}
 
-	// @Test
+	@Test
 	@Disabled
-	private void testModifiedDate() throws ParseException {
+	public void testModifiedDate() throws ParseException {
 		testDate(toRetrieveDate);
 		testDate(toNotRetrieveDate);
 		testDate(shortDate);
@@ -225,7 +225,7 @@ public class OrcidClientTest {
 
 	@Test
 	@Disabled
-	private void slowedDownDownloadTest() throws Exception {
+	public void slowedDownDownloadTest() throws Exception {
 		String orcid = "0000-0001-5496-1243";
 		String record = slowedDownDownload(orcid);
 		String filename = "/tmp/downloaded_".concat(orcid).concat(".xml");

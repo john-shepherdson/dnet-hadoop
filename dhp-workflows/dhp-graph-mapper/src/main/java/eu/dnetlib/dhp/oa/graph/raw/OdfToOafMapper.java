@@ -24,6 +24,7 @@ import eu.dnetlib.dhp.schema.common.RelationInverse;
 import eu.dnetlib.dhp.schema.oaf.*;
 import eu.dnetlib.dhp.schema.oaf.utils.CleaningFunctions;
 import eu.dnetlib.dhp.schema.oaf.utils.IdentifierFactory;
+import eu.dnetlib.dhp.schema.oaf.utils.PidCleaner;
 
 public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
@@ -93,7 +94,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 					author.setFullname(String.format("%s, %s", author.getSurname(), author.getName()));
 				}
 
-				author.setAffiliation(prepareListFields(n, "./*[local-name()='affiliation']", info));
+				author.setRawAffiliationString(prepareListString(n, "./*[local-name()='affiliation']"));
 				author.setPid(preparePids(n, info));
 				author.setRank(pos++);
 				res.add(author);
@@ -125,7 +126,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 	}
 
 	@Override
-	protected List<Instance> prepareInstances(
+	protected Instance prepareInstances(
 		final Document doc,
 		final DataInfo info,
 		final KeyValue collectedfrom,
@@ -209,7 +210,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 			instance.setUrl(new ArrayList<>());
 			instance.getUrl().addAll(validUrl);
 		}
-		return Arrays.asList(instance);
+		return instance;
 	}
 
 	protected String trimAndDecodeUrl(String url) {
@@ -238,11 +239,23 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 				(Element) doc
 					.selectSingleNode(
 						"//*[local-name()='metadata']/*[local-name() = 'resource']/*[local-name() = 'resourceType']"))
-			.map(element -> {
-				final String resourceTypeURI = element.attributeValue("uri");
-				final String resourceTypeAnyURI = element.attributeValue("anyURI");
-				final String resourceTypeTxt = element.getText();
-				final String resourceTypeGeneral = element.attributeValue("resourceTypeGeneral");
+			.map(e -> {
+				final String resourceTypeURI = Optional
+					.ofNullable(e.attributeValue("uri"))
+					.filter(StringUtils::isNotBlank)
+					.orElse(null);
+				final String resourceTypeAnyURI = Optional
+					.ofNullable(e.attributeValue("anyURI"))
+					.filter(StringUtils::isNotBlank)
+					.orElse(null);
+				final String resourceTypeTxt = Optional
+					.ofNullable(e.getText())
+					.filter(StringUtils::isNotBlank)
+					.orElse(null);
+				final String resourceTypeGeneral = Optional
+					.ofNullable(e.attributeValue("resourceTypeGeneral"))
+					.filter(StringUtils::isNotBlank)
+					.orElse(null);
 
 				return ObjectUtils
 					.firstNonNull(resourceTypeURI, resourceTypeAnyURI, resourceTypeTxt, resourceTypeGeneral);
@@ -306,7 +319,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<Field<String>> prepareDescriptions(final Document doc, final DataInfo info) {
-		return prepareListFields(doc, "//*[local-name()='description' and ./@descriptionType='Abstract']", info);
+		return prepareListFields(doc, "//datacite:description[./@descriptionType='Abstract'] | //dc:description", info);
 	}
 
 	@Override
@@ -492,7 +505,7 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 	@Override
 	protected List<StructuredProperty> prepareResultPids(final Document doc, final DataInfo info) {
-		final Set<StructuredProperty> res = new HashSet<>();
+		final Set<HashableStructuredProperty> res = new HashSet<>();
 		res
 			.addAll(
 				prepareListStructPropsWithValidQualifier(
@@ -512,7 +525,8 @@ public class OdfToOafMapper extends AbstractMdRecordToOafMapper {
 
 		return res
 			.stream()
-			.map(CleaningFunctions::normalizePidValue)
+			.map(PidCleaner::normalizePidValue)
+			.filter(CleaningFunctions::pidFilter)
 			.collect(Collectors.toList());
 	}
 

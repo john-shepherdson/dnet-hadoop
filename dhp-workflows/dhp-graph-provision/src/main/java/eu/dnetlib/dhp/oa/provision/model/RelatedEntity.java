@@ -13,6 +13,8 @@ import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 
 public class RelatedEntity implements Serializable {
 
+	private static final long serialVersionUID = -4982643490443810597L;
+
 	private String id;
 	private String type;
 
@@ -21,6 +23,8 @@ public class RelatedEntity implements Serializable {
 	private String websiteurl; // datasource, organizations, projects
 
 	// results
+	private String description;
+	private List<String> author;
 	private String dateofacceptance;
 	private String publisher;
 	private List<StructuredProperty> pid;
@@ -46,6 +50,11 @@ public class RelatedEntity implements Serializable {
 	private String acronym;
 	private Qualifier contracttype;
 	private List<String> fundingtree;
+
+	// person
+	private String givenName;
+	private String familyName;
+	private List<String> alternativeNames;
 
 	public String getId() {
 		return id;
@@ -73,6 +82,22 @@ public class RelatedEntity implements Serializable {
 
 	public String getWebsiteurl() {
 		return websiteurl;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public List<String> getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(List<String> author) {
+		this.author = author;
 	}
 
 	public void setWebsiteurl(String websiteurl) {
@@ -231,6 +256,30 @@ public class RelatedEntity implements Serializable {
 		this.fundingtree = fundingtree;
 	}
 
+	public String getGivenName() {
+		return givenName;
+	}
+
+	public void setGivenName(String givenName) {
+		this.givenName = givenName;
+	}
+
+	public String getFamilyName() {
+		return familyName;
+	}
+
+	public void setFamilyName(String familyName) {
+		this.familyName = familyName;
+	}
+
+	public List<String> getAlternativeNames() {
+		return alternativeNames;
+	}
+
+	public void setAlternativeNames(List<String> alternativeNames) {
+		this.alternativeNames = alternativeNames;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o)
@@ -260,7 +309,10 @@ public class RelatedEntity implements Serializable {
 			&& Objects.equal(code, that.code)
 			&& Objects.equal(acronym, that.acronym)
 			&& Objects.equal(contracttype, that.contracttype)
-			&& Objects.equal(fundingtree, that.fundingtree);
+			&& Objects.equal(fundingtree, that.fundingtree)
+			&& Objects.equal(givenName, that.givenName)
+			&& Objects.equal(familyName, that.familyName)
+			&& Objects.equal(alternativeNames, that.alternativeNames);
 	}
 
 	@Override
@@ -289,6 +341,9 @@ public class RelatedEntity implements Serializable {
 				code,
 				acronym,
 				contracttype,
-				fundingtree);
+				fundingtree,
+				familyName,
+				givenName,
+				alternativeNames);
 	}
 }

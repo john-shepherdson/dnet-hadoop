@@ -103,6 +103,7 @@
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -115,6 +116,7 @@
             <arg>--actionPayloadClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Dataset</arg>
             <arg>--outputGraphTablePath</arg><arg>${workingDir}/dataset</arg>
             <arg>--mergeAndGetStrategy</arg><arg>${mergeAndGetStrategy}</arg>
+            <arg>--promoteActionStrategy</arg><arg>${promoteActionStrategy}</arg>
             <arg>--shouldGroupById</arg><arg>${shouldGroupById}</arg>
         </spark>
         <ok to="DecisionPromoteResultActionPayloadForDatasetTable"/>
@@ -155,6 +157,7 @@
                 --executor-memory=${sparkExecutorMemory}
                 --executor-cores=${sparkExecutorCores}
                 --driver-memory=${sparkDriverMemory}
+                --conf spark.executor.memoryOverhead=${sparkExecutorMemory}
                 --conf spark.extraListeners=${spark2ExtraListeners}
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
@@ -167,6 +170,7 @@
             <arg>--actionPayloadClassName</arg><arg>eu.dnetlib.dhp.schema.oaf.Result</arg>
             <arg>--outputGraphTablePath</arg><arg>${outputGraphRootPath}/dataset</arg>
             <arg>--mergeAndGetStrategy</arg><arg>${mergeAndGetStrategy}</arg>
+            <arg>--promoteActionStrategy</arg><arg>${promoteActionStrategy}</arg>
             <arg>--shouldGroupById</arg><arg>${shouldGroupById}</arg>
         </spark>
         <ok to="End"/>

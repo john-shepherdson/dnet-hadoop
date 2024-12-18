@@ -1,0 +1,21 @@
+[
+  {
+    "paramName": "m",
+    "paramLongName": "master",
+    "paramDescription": "the master name",
+    "paramRequired": true
+  },
+  {
+    "paramName": "mo",
+    "paramLongName": "mdstoreOutputVersion",
+    "paramDescription": "The mdstore output",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ma",
+    "paramLongName": "magBasePath",
+    "paramDescription": "The mag Base path",
+    "paramRequired": false
+  }
+
+]

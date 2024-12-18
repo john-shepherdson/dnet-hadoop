@@ -53,10 +53,10 @@
     </property>
     <property>
         <name>memoryOverhead</name>
-        <value>3G</value>
+        <value>4G</value>
     </property>
     <property>
         <name>partitions</name>
-        <value>3284</value>
+        <value>15000</value>
     </property>
 </configuration>

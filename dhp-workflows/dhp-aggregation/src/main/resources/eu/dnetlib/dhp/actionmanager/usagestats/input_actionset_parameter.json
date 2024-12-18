@@ -28,5 +28,11 @@
     "paramLongName": "workingPath",
     "paramDescription": "the workingPath where to save the content of the usage_stats table",
     "paramRequired": true
+  },
+  {
+    "paramName": "dp",
+    "paramLongName": "datasourcePath",
+    "paramDescription": "the workingPath where to save the content of the usage_stats table",
+    "paramRequired": true
   }
 ]

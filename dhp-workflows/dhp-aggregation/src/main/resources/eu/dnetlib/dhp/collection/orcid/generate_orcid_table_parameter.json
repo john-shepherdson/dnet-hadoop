@@ -16,6 +16,12 @@
     "paramLongName": "sourcePath",
     "paramDescription": "the PATH of the ORCID sequence file",
     "paramRequired": true
+  },
+  {
+    "paramName": "fu",
+    "paramLongName": "fromUpdate",
+    "paramDescription": "whether we have to generate table from dump or from update",
+    "paramRequired": false
   }
 
 ]

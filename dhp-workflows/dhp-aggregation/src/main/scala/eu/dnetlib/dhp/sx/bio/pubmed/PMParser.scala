@@ -1,7 +1,8 @@
 package eu.dnetlib.dhp.sx.bio.pubmed
 
 import scala.xml.MetaData
-import scala.xml.pull.{EvElemEnd, EvElemStart, EvText, XMLEventReader}
+import javax.xml.stream.XMLEventReader
+import scala.xml.pull.{EvElemEnd, EvElemStart, EvText}
 
 /** @param xml
   */

@@ -1,5 +1,8 @@
 package eu.dnetlib.dhp.application
 
+import eu.dnetlib.dhp.common.Constants
+import eu.dnetlib.dhp.utils.DHPUtils.writeHdfsFile
+
 import scala.io.Source
 
 /** This is the main Interface SparkApplication
@@ -62,12 +65,22 @@ abstract class AbstractScalaApplication(
     val conf: SparkConf = new SparkConf()
     val master = parser.get("master")
     log.info(s"Creating Spark session: Master: $master")
-    SparkSession
+    val b = SparkSession
       .builder()
       .config(conf)
       .appName(getClass.getSimpleName)
-      .master(master)
-      .getOrCreate()
+    if (master != null)
+      b.master(master)
+    b.getOrCreate()
+  }
+
+  def reportTotalSize(targetPath: String, outputBasePath: String): Unit = {
+    val total_items = spark.read.text(targetPath).count()
+    writeHdfsFile(
+      spark.sparkContext.hadoopConfiguration,
+      s"$total_items",
+      outputBasePath + Constants.MDSTORE_SIZE_PATH
+    )
   }
 
 }

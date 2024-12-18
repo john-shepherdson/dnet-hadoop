@@ -2,8 +2,7 @@
 package eu.dnetlib.dhp.oa.merge;
 
 import static eu.dnetlib.dhp.common.SparkSessionSupport.runWithSparkSession;
-import static org.apache.spark.sql.functions.col;
-import static org.apache.spark.sql.functions.when;
+import static org.apache.spark.sql.functions.*;
 
 import java.util.Map;
 import java.util.Optional;
@@ -14,7 +13,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
-import org.apache.spark.api.java.function.ReduceFunction;
+import org.apache.spark.api.java.function.MapGroupsFunction;
 import org.apache.spark.sql.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +25,7 @@ import eu.dnetlib.dhp.schema.common.EntityType;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.OafEntity;
 import eu.dnetlib.dhp.schema.oaf.utils.GraphCleaningFunctions;
-import eu.dnetlib.dhp.schema.oaf.utils.OafMapperUtils;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpException;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
@@ -135,10 +134,12 @@ public class GroupEntitiesSparkJob {
 					.applyCoarVocabularies(entity, vocs),
 				OAFENTITY_KRYO_ENC)
 			.groupByKey((MapFunction<OafEntity, String>) OafEntity::getId, Encoders.STRING())
-			.reduceGroups((ReduceFunction<OafEntity>) OafMapperUtils::mergeEntities)
+			.mapGroups(
+				(MapGroupsFunction<String, OafEntity, OafEntity>) (key, group) -> MergeUtils.mergeById(group, vocs),
+				OAFENTITY_KRYO_ENC)
 			.map(
-				(MapFunction<Tuple2<String, OafEntity>, Tuple2<String, OafEntity>>) t -> new Tuple2<>(
-					t._2().getClass().getName(), t._2()),
+				(MapFunction<OafEntity, Tuple2<String, OafEntity>>) t -> new Tuple2<>(
+					t.getClass().getName(), t),
 				Encoders.tuple(Encoders.STRING(), OAFENTITY_KRYO_ENC));
 
 		// pivot on "_1" (classname of the entity)

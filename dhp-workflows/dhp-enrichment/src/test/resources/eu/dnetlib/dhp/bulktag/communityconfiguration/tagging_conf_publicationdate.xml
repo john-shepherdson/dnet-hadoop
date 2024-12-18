@@ -1,0 +1,1431 @@
+<communities>
+    <community id="egi">
+        <subjects/>
+        <datasources/>
+        <zenodocommunities>
+            <zenodocommunity>
+                <zenodoid>zenodo</zenodoid>
+                <selcriteria/>
+            </zenodocommunity>
+        </zenodocommunities>
+        <organizations/>
+    </community>
+    <community id="fet-fp7">
+    <subjects/>
+    <datasources/>
+    <zenodocommunities/>
+    <organizations/>
+</community>
+    <community id="fet-h2020">
+    <subjects/>
+    <datasources/>
+    <zenodocommunities/>
+    <organizations/>
+</community>
+    <community id="clarin">
+    <subjects/>
+    <datasources>
+        <datasource>
+            <openaireId>10|re3data_____::a507cdacc5bbcc08761c92185dee5cab</openaireId>
+            <selcriteria/>
+        </datasource>
+    </datasources>
+    <zenodocommunities/>
+    <organizations/>
+</community>
+    <community id="rda">
+    <subjects/>
+    <datasources/>
+    <zenodocommunities>
+        <zenodocommunity>
+            <zenodoid>rda</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+    </zenodocommunities>
+    <organizations/>
+</community>
+    <community id="ee">
+    <subjects>
+        <subject>SDG13 - Climate action</subject>
+        <subject>SDG8 - Decent work and economic growth</subject>
+        <subject>SDG15 - Life on land</subject>
+        <subject>SDG2 - Zero hunger</subject>
+        <subject>SDG17 - Partnerships for the goals</subject>
+        <subject>SDG10 - Reduced inequalities</subject>
+        <subject>SDG5 - Gender equality</subject>
+        <subject>SDG12 - Responsible consumption and production</subject>
+        <subject>SDG14 - Life below water</subject>
+        <subject>SDG6 - Clean water and sanitation</subject>
+        <subject>SDG11 - Sustainable cities and communities</subject>
+        <subject>SDG1 - No poverty</subject>
+        <subject>SDG3 - Good health and well being</subject>
+        <subject>SDG7 - Affordable and clean energy</subject>
+        <subject>SDG4 - Quality education</subject>
+        <subject>SDG9 - Industry innovation and infrastructure</subject>
+        <subject>SDG16 - Peace justice and strong institutions</subject>
+    </subjects>
+    <datasources/>
+    <zenodocommunities/>
+    <organizations/>
+</community>
+    <community id="dh-ch">
+    <subjects>
+        <subject>modern art</subject>
+        <subject>monuments</subject>
+        <subject>europeana data model</subject>
+        <subject>sites</subject>
+        <subject>field walking</subject>
+        <subject>frescoes</subject>
+        <subject>LIDO metadata schema</subject>
+        <subject>art history</subject>
+        <subject>excavation</subject>
+        <subject>Arts and Humanities General</subject>
+        <subject>cities</subject>
+        <subject>coins</subject>
+        <subject>temples</subject>
+        <subject>numismatics</subject>
+        <subject>lithics</subject>
+        <subject>roads</subject>
+        <subject>environmental archaeology</subject>
+        <subject>digital cultural heritage</subject>
+        <subject>archaeological reports</subject>
+        <subject>history</subject>
+        <subject>CRMba</subject>
+        <subject>churches</subject>
+        <subject>cultural heritage</subject>
+        <subject>archaeological stratigraphy</subject>
+        <subject>religious art</subject>
+        <subject>buidings</subject>
+        <subject>digital humanities</subject>
+        <subject>survey</subject>
+        <subject>archaeological sites</subject>
+        <subject>linguistic studies</subject>
+        <subject>bioarchaeology</subject>
+        <subject>architectural orders</subject>
+        <subject>palaeoanthropology</subject>
+        <subject>fine arts</subject>
+        <subject>europeana</subject>
+        <subject>CIDOC CRM</subject>
+        <subject>decorations</subject>
+        <subject>classic art</subject>
+        <subject>stratigraphy</subject>
+        <subject>digital archaeology</subject>
+        <subject>intangible cultural heritage</subject>
+        <subject>walls</subject>
+        <subject>humanities</subject>
+        <subject>chapels</subject>
+        <subject>CRMtex</subject>
+        <subject>Language and Literature</subject>
+        <subject>paintings</subject>
+        <subject>archaeology</subject>
+        <subject>fair data</subject>
+        <subject>mosaics</subject>
+        <subject>burials</subject>
+        <subject>architecture</subject>
+        <subject>medieval art</subject>
+        <subject>castles</subject>
+        <subject>CARARE metadata schema</subject>
+        <subject>statues</subject>
+        <subject>natural language processing</subject>
+        <subject>inscriptions</subject>
+        <subject>CRMsci</subject>
+        <subject>vaults</subject>
+        <subject>contemporary art</subject>
+        <subject>Arts and Humanities</subject>
+        <subject>CRMarchaeo</subject>
+        <subject>pottery</subject>
+        <subject>site</subject>
+        <subject>architectural</subject>
+        <subject>vessels</subject>
+    </subjects>
+    <datasources>
+        <datasource>
+            <openaireId>10|re3data_____::9ebe127e5f3a0bf401875690f3bb6b81</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::c6cd4b532e12868c1d760a8d7cda6815</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::a6de4499bb87bf3c01add0a9e2c9ed0b</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::6eb31d13b12bc06bbac06aef63cf33c9</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::0da84e9dfdc8419576169e027baa8028</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|re3data_____::84e123776089ce3c7a33db98d9cd15a8</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|openaire____::c5502a43e76feab55dd00cf50f519125</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|re3data_____::a48f09c562b247a9919acfe195549b47</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|opendoar____::97275a23ca44226c9964043c8462be96</openaireId>
+            <selcriteria/>
+        </datasource>
+    </datasources>
+    <zenodocommunities>
+        <zenodocommunity>
+            <zenodoid>storm</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>crosscult</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>wholodance_eu</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>digcur2013</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>gravitate</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>dipp2014</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>digitalhumanities</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>dimpo</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>adho</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>chc</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>wahr</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>ibe</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>ariadne</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>parthenos-hub</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>parthenos-training</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>gandhara</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>cmsouthasia</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>nilgirihills</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>shamsa_mustecio</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>bodhgaya</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>oac_dh-ch</zenodoid>
+        </zenodocommunity>
+    </zenodocommunities>
+    <organizations/>
+</community>
+    <community id="fam">
+    <subjects>
+        <subject>Stock Assessment</subject>
+        <subject>pelagic</subject>
+        <subject>Acoustic</subject>
+        <subject>Fish farming</subject>
+        <subject>Fisheries</subject>
+        <subject>Fishermen</subject>
+        <subject>maximum sustainable yield</subject>
+        <subject>trawler</subject>
+        <subject>Fishing vessel</subject>
+        <subject>Fisherman</subject>
+        <subject>Fishing gear</subject>
+        <subject>mackerel</subject>
+        <subject>RFMO</subject>
+        <subject>Fish Aggregating Device</subject>
+        <subject>Bycatch</subject>
+        <subject>Fishery</subject>
+        <subject>common fisheries policy</subject>
+        <subject>Fishing fleet</subject>
+        <subject>Aquaculture</subject>
+    </subjects>
+    <datasources>
+        <datasource>
+            <openaireId>10|doajarticles::8cec81178926caaca531afbd8eb5d64c</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::0f7a7f30b5400615cae1829f3e743982</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::9740f7f5af3e506d2ad2c215cdccd51a</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::9f3fbaae044fa33cb7069b72935a3254</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::cb67f33eb9819f5c624ce0313957f6b3</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::e21c97cbb7a209afc75703681c462906</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::554cde3be9e5c4588b4c4f9f503120cb</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|tubitakulakb::11e22f49e65b9fd11d5b144b93861a1b</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::57c5d3837da943e93b28ec4db82ec7a5</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::a186f5ddb8e8c7ecc992ef51cf3315b1</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::e21c97cbb7a209afc75703681c462906</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::dca64612dfe0963fffc119098a319957</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::dd70e44479f0ade25aa106aef3e87a0a</openaireId>
+            <selcriteria/>
+        </datasource>
+    </datasources>
+    <zenodocommunities>
+        <zenodocommunity>
+            <zenodoid>discardless</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>farfish2020</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>facts</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>climefish</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>proeel</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>primefish</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>h2020_vicinaqua</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>meece</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>rlsadb</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>iotc_ctoi</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+    </zenodocommunities>
+    <organizations/>
+</community>
+    <community id="ni">
+    <subjects>
+        <subject>brain mapping</subject>
+        <subject>brain imaging</subject>
+        <subject>electroencephalography</subject>
+        <subject>arterial spin labelling</subject>
+        <subject>brain fingerprinting</subject>
+        <subject>brain</subject>
+        <subject>neuroimaging</subject>
+        <subject>Multimodal Brain Image Analysis</subject>
+        <subject>fMRI</subject>
+        <subject>neuroinformatics</subject>
+        <subject>fetal brain</subject>
+        <subject>brain ultrasonic imaging</subject>
+        <subject>topographic brain mapping</subject>
+        <subject>diffusion tensor imaging</subject>
+        <subject>computerized knowledge assessment</subject>
+        <subject>connectome mapping</subject>
+        <subject>brain magnetic resonance imaging</subject>
+        <subject>brain abnormalities</subject>
+    </subjects>
+    <datasources>
+        <datasource>
+            <openaireId>10|re3data_____::5b9bf9171d92df854cf3c520692e9122</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::c7d3de67dc77af72f6747157441252ec</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|re3data_____::8515794670370f49c1d176c399c714f5</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::d640648c84b10d425f96f11c3de468f3</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::0c0e74daa5d95504eade9c81ebbd5b8a</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|rest________::fb1a3d4523c95e63496e3bc7ba36244b</openaireId>
+            <selcriteria/>
+        </datasource>
+    </datasources>
+    <zenodocommunities>
+        <zenodocommunity>
+            <zenodoid>neuroinformatics</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>hbp</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>from_neuroscience_to_machine_learning</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>ci2c</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>opensourcebrain</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>brainspeak</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>braincom</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>nextgenvis</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>meso-brain</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>neuroplasticity-workshop</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>bionics</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>brainmattrain-676408</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>repronim</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>affectiveneuro</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>con</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>lab_neurol_sperim_irfmn_irccs_milano_it</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+    </zenodocommunities>
+    <organizations/>
+</community>
+    <community id="mes">
+    <subjects>
+        <subject>marine</subject>
+        <subject>ocean</subject>
+        <subject>fish</subject>
+        <subject>aqua</subject>
+        <subject>sea</subject>
+    </subjects>
+    <datasources/>
+    <zenodocommunities>
+        <zenodocommunity>
+            <zenodoid>adriplan</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>devotes-project</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>euro-basin</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>naclim</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>discardless</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>assisibf</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>meece</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>facts</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>proeel</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>aquatrace</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>myfish</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>atlas</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>blue-actionh2020</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>sponges</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>merces_project</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>bigdataocean</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>columbus</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>h2020-aquainvad-ed</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>aquarius</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>southern-ocean-observing-system</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>eawag</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>mossco</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>onc</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>oceanbiogeochemistry</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>oceanliteracy</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>openearth</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>ocean</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>calcifierraman</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>bermudabream</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>brcorp1</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>mce</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>biogeochem</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>ecc2014</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>fisheries</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>sedinstcjfas</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>narmada</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>umr-entropie</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>farfish2020</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>primefish</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>zf-ilcs</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>climefish</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>afrimed_eu</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>spi-ace</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>cice-consortium</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>nemo-ocean</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>mesopp-h2020</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>marxiv</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+    </zenodocommunities>
+    <organizations/>
+</community>
+    <community id="instruct">
+    <subjects/>
+    <datasources/>
+    <zenodocommunities>
+        <zenodocommunity>
+            <zenodoid>instruct</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>west-life</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+    </zenodocommunities>
+    <organizations/>
+</community>
+    <community id="elixir-gr">
+    <subjects/>
+    <datasources/>
+    <zenodocommunities/>
+    <organizations/>
+</community>
+    <community id="aginfra">
+    <subjects>
+        <subject>animal production and health</subject>
+        <subject>fisheries and aquaculture</subject>
+        <subject>food safety and human nutrition</subject>
+        <subject>information management</subject>
+        <subject>food technology</subject>
+        <subject>agri-food education and extension</subject>
+        <subject>natural resources and environment</subject>
+        <subject>food system</subject>
+        <subject>engineering technology and Research</subject>
+        <subject>agriculture</subject>
+        <subject>food safety risk assessment</subject>
+        <subject>food security</subject>
+        <subject>farming practices and systems</subject>
+        <subject>plant production and protection</subject>
+        <subject>agri-food economics and policy</subject>
+        <subject>Agri-food</subject>
+        <subject>food distribution</subject>
+        <subject>forestry</subject>
+    </subjects>
+    <datasources>
+        <datasource>
+            <openaireId>10|opendoar____::1a551829d50f1400b0dab21fdd969c04</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|opendoar____::49af6c4e558a7569d80eee2e035e2bd7</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|opendoar____::0266e33d3f546cb5436a10798e657d97</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|opendoar____::fd4c2dc64ccb8496e6f1f94c85f30d06</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|opendoar____::41bfd20a38bb1b0bec75acf0845530a7</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|opendoar____::87ae6fb631f7c8a627e8e28785d9992d</openaireId>
+            <selcriteria/>
+        </datasource>
+    </datasources>
+    <zenodocommunities>
+        <zenodocommunity>
+            <zenodoid>edenis</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>efsa-pilot</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>egene3</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>efsa-kj</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>euromixproject</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>discardless</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>sedinstcjfst</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>afinet-kc</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>2231-4784</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>2231-0606</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>solace</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>pa17</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>smartakis</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>sedinstcjae</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>phenology_camera</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>aginfra</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>erosa</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>bigdatagrapes</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+    </zenodocommunities>
+    <organizations/>
+</community>
+    <community id="dth">
+        <removeConstraints>{"criteria":[
+            {"constraint":[{"verb":"equals","field":"hostedby","value":"opendoar____::fake"}]},
+            {"constraint":[
+            {"verb":"equals","field":"collectedfrom","value":"opendoar____::fake"}]}
+            ]}</removeConstraints>
+        <advancedConstraints>
+            {"criteria":[
+            {"constraint":[
+            {"verb":"lesser_than","field":"publicationyear","value":"2019"},
+            {"verb":"greater_than","field":"publicationyear","value":"2017"}
+            ]}]}
+        </advancedConstraints>
+    <subjects/>
+    <datasources>
+        <datasource>
+            <openaireId>10|opendoar____::7e7757b1e12abcb736ab9a754ffb617a</openaireId>
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains","field":"contributor","value":"DARIAH"}]}]}</selcriteria>
+        </datasource>
+        <datasource>
+            <openaireId>10|opendoar____::96da2f590cd7246bbde0051047b0d6f7</openaireId>
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains","field":"contributor","value":"DARIAH"}]}]}</selcriteria>
+        </datasource>
+    </datasources>
+    <zenodocommunities>
+        <zenodocommunity>
+            <zenodoid>dimpo</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+    </zenodocommunities>
+    <organizations/>
+</community>
+    <community id="risis">
+    <subjects/>
+    <datasources/>
+    <zenodocommunities/>
+    <organizations/>
+</community>
+    <community id="epos">
+    <subjects/>
+    <datasources/>
+    <zenodocommunities/>
+    <organizations/>
+</community>
+    <community id="beopen">
+    <subjects>
+        <subject>Green Transport</subject>
+        <subject>City mobility systems</subject>
+        <subject>Vulnerable road users</subject>
+        <subject>Traffic engineering</subject>
+        <subject>Transport electrification</subject>
+        <subject>Mobility</subject>
+        <subject>Intermodal freight transport</subject>
+        <subject>Clean vehicle fleets</subject>
+        <subject>Intelligent mobility</subject>
+        <subject>Inflight refueling</subject>
+        <subject>District mobility systems</subject>
+        <subject>Navigation and control systems for optimised planning and routing</subject>
+        <subject>European Space Technology Platform</subject>
+        <subject>European Transport networks</subject>
+        <subject>Green cars</subject>
+        <subject>Inter-modality infrastructures</subject>
+        <subject>Advanced Take Off and Landing Ideas</subject>
+        <subject>Sustainable urban systems</subject>
+        <subject>port-area railway networks</subject>
+        <subject>Innovative forms of urban transport</subject>
+        <subject>Alliance for Logistics Innovation through Collaboration in Europe</subject>
+        <subject>Advisory Council for Aeronautics Research in Europe</subject>
+        <subject>Mobility services for people and goods</subject>
+        <subject>Guidance and traffic management</subject>
+        <subject>Passenger mobility</subject>
+        <subject>Smart mobility and services</subject>
+        <subject>transport innovation</subject>
+        <subject>high-speed railway</subject>
+        <subject>Vehicle design</subject>
+        <subject>Inland shipping</subject>
+        <subject>public transportation</subject>
+        <subject>aviation’s climate impact</subject>
+        <subject>Road transport</subject>
+        <subject>On-demand public transport</subject>
+        <subject>Personal Air Transport</subject>
+        <subject>Transport</subject>
+        <subject>transport vulnerability</subject>
+        <subject>Pipeline transport</subject>
+        <subject>European Association of Aviation Training and Education Organisations</subject>
+        <subject>Defrosting of railway infrastructure</subject>
+        <subject>Inclusive and affordable transport</subject>
+        <subject>River Information Services</subject>
+        <subject>jel:L92</subject>
+        <subject>Increased use of public transport</subject>
+        <subject>Seamless mobility</subject>
+        <subject>STRIA</subject>
+        <subject>trolleybus transport</subject>
+        <subject>Intelligent Transport System</subject>
+        <subject>Low-emission alternative energy for transport</subject>
+        <subject>Shared mobility for people and goods</subject>
+        <subject>Business model for urban mobility</subject>
+        <subject>Interoperability of transport systems</subject>
+        <subject>Cross-border train slot booking</subject>
+        <subject>Air transport</subject>
+        <subject>Transport pricing</subject>
+        <subject>Sustainable transport</subject>
+        <subject>European Rail Transport Research Advisory Council</subject>
+        <subject>Alternative aircraft configurations</subject>
+        <subject>Transport and Mobility</subject>
+        <subject>Railways applications</subject>
+        <subject>urban transport</subject>
+        <subject>Environmental impact of transport</subject>
+        <subject>urban freight delivery systems</subject>
+        <subject>Automated Road Transport</subject>
+        <subject>Alternative fuels in public transport</subject>
+        <subject>Active LIDAR-sensor for GHG-measurements</subject>
+        <subject>Autonomous logistics operations</subject>
+        <subject>Rational use of motorised transport</subject>
+        <subject>Network and traffic management systems</subject>
+        <subject>electrification of railway wagons</subject>
+        <subject>Single European Sky</subject>
+        <subject>Electrified road systems</subject>
+        <subject>transportation planning</subject>
+        <subject>Railway dynamics</subject>
+        <subject>Motorway of the Sea</subject>
+        <subject>smart railway communications</subject>
+        <subject>Maritime transport</subject>
+        <subject>Environmental- friendly transport</subject>
+        <subject>Combined transport</subject>
+        <subject>Connected automated driving technology</subject>
+        <subject>Innovative freight logistics services</subject>
+        <subject>automated and shared vehicles</subject>
+        <subject>Alternative Aircraft Systems</subject>
+        <subject>Land-use and transport interaction</subject>
+        <subject>Public transport system</subject>
+        <subject>Business plan for shared mobility</subject>
+        <subject>Shared mobility</subject>
+        <subject>Growing of mobility demand</subject>
+        <subject>European Road Transport Research Advisory Council</subject>
+        <subject>WATERBORNE ETP</subject>
+        <subject>Effective transport management system</subject>
+        <subject>Short Sea Shipping</subject>
+        <subject>air traffic management</subject>
+        <subject>Sea hubs and the motorways of the sea</subject>
+        <subject>Urban mobility solutions</subject>
+        <subject>Smart city planning</subject>
+        <subject>Maritime spatial planning</subject>
+        <subject>EUropean rail Research Network of Excellence</subject>
+        <subject>Transport governance</subject>
+        <subject>ENERGY CONSUMPTION BY THE TRANSPORT SECTOR</subject>
+        <subject>Integrated urban plan</subject>
+        <subject>inland waterway services</subject>
+        <subject>European Conference of Transport Research Institutes</subject>
+        <subject>air vehicles</subject>
+        <subject>E-freight</subject>
+        <subject>Automated Driving</subject>
+        <subject>Automated ships</subject>
+        <subject>pricing for cross-border passenger transport</subject>
+        <subject>Vehicle efficiency</subject>
+        <subject>Railway transport</subject>
+        <subject>Electric vehicles</subject>
+        <subject>Road traffic monitoring</subject>
+        <subject>Deep sea shipping</subject>
+        <subject>Circular economy in transport</subject>
+        <subject>Traffic congestion</subject>
+        <subject>air transport system</subject>
+        <subject>Urban logistics</subject>
+        <subject>Rail transport</subject>
+        <subject>OpenStreetMap</subject>
+        <subject>high speed rail</subject>
+        <subject>Transportation engineering</subject>
+        <subject>Intermodal travel information</subject>
+        <subject>Flight Data Recorders</subject>
+        <subject>Advanced driver assistance systems</subject>
+        <subject>long distance freight transport</subject>
+        <subject>Inland waterway transport</subject>
+        <subject>Smart mobility</subject>
+        <subject>Mobility integration</subject>
+        <subject>Personal Rapid Transit system</subject>
+        <subject>Safety measures &amp; requirements for roads</subject>
+        <subject>Green rail transport</subject>
+        <subject>Electrical</subject>
+        <subject>Vehicle manufacturing</subject>
+        <subject>Future Airport Layout</subject>
+        <subject>Rail technologies</subject>
+        <subject>European Intermodal Research Advisory Council</subject>
+        <subject>inland navigation</subject>
+        <subject>Automated urban vehicles</subject>
+        <subject>ECSS-standards</subject>
+        <subject>Traveller services</subject>
+        <subject>Polluting transport</subject>
+        <subject>Air Traffic Control</subject>
+        <subject>Cooperative and connected and automated transport</subject>
+        <subject>Innovative powertrains</subject>
+        <subject>Quality of transport system and services</subject>
+        <subject>door-to- door logistics chain</subject>
+        <subject>Inter-modal aspects of urban mobility</subject>
+        <subject>travel (and mobility)</subject>
+        <subject>Innovative freight delivery systems</subject>
+        <subject>urban freight delivery infrastructures</subject>
+    </subjects>
+    <datasources>
+        <datasource>
+            <openaireId>10|doajarticles::1c5bdf8fca58937894ad1441cca99b76</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::b37a634324a45c821687e6e80e6f53b4</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::4bf64f2a104040e4e055cd9594b2d77c</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::479ca537c12755d1868bbf02938a900c</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::55f31df96a60e2309f45b7c265fcf7a2</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::c52a09891a5301f9986ebbfe3761810c</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::379807bc7f6c71a227ef1651462c414c</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::36069db531a00b85a2e8fb301f4bdc19</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::b6a898da311ded96fabf49c520b80d5d</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::d0753d9180b35a271d8b4a31f449749f</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::172050a92511838393a3fe237ae47e31</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::301ed96c62abb160a3e29796efe5c95c</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::0f4f805b3d842f2c7f1b077c3426fa59</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::ba73728b84437b8d48ae287b867c7215</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::86faef424d804309ccf45f692523aa48</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::73bd758fa41671de70964c3ecba013af</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::e661fc0bdb24af42b740a08f0ddc6cf4</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::a6d3052047d5dbfbd43d95b4afb0f3d7</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::ca61df07089acc53a1569bde6673d82a</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::237dd6f1606600459d0297abd8ed9976</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::fba6191177ede7c51ea1cdf58eae7f8b</openaireId>
+            <selcriteria/>
+        </datasource>
+    </datasources>
+    <zenodocommunities>
+        <zenodocommunity>
+            <zenodoid>jsdtl</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>utc-martrec</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>utc-uti</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>stp</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>c2smart</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>stride-utc</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>crowd4roads</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>lemo</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>imov3d</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>tra2018</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>optimum</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>stars</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>iecteim</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>iccpt2019</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+    </zenodocommunities>
+    <organizations/>
+</community>
+
+    <community id="euromarine">
+
+    <subjects/>
+    <datasources/>
+    <zenodocommunities/>
+    <organizations/>
+</community>
+    <community id="ifremer">
+    <subjects/>
+    <datasources/>
+    <zenodocommunities/>
+    <organizations/>
+</community>
+    <community id="oa-pg">
+    <subjects/>
+    <datasources/>
+    <zenodocommunities/>
+    <organizations/>
+</community>
+    <community id="science-innovation-policy">
+        <advancedConstraints>{"criteria":[{"constraint":[{"verb":"equals_caseinsensitive","field":"subject","value":"ciencias de la comunicación"},
+            {"verb":"equals","field":"subject","value":"Miriam"}]},
+            {"constraint":[{"verb":"equals","field":"subject","value":"miriam"}]}]}</advancedConstraints>
+    <subjects>
+        <subject>Sustainability-oriented science policy</subject>
+        <subject> STI policies</subject>
+        <subject>science—society relations</subject>
+        <subject>Science &amp; Technology Policy</subject>
+        <subject>Innovation policy</subject>
+        <subject>science policy</subject>
+        <subject>Policy and Law</subject>
+    </subjects>
+    <datasources>
+        <datasource>
+            <openaireId>10|doajarticles::c6f0ed5fa41e98863e7c73501fe4bd6d</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::ae4c7286c79590f19fdca670156ce816</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::0f664bce92ce953e0c7a92068c46bfb3</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::00017183dc4c858fb77541985323a4ef</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::93b306f458cce3d7aaaf58c0a725f4f9</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::9dbf8fbf3e9fe0fe1fc01e55fbd90bfc</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::a2bda8785c863279bba4b8f34827b4c9</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::019a1fcb42c3fea1c1b689df76330b58</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::0daa8281938831e9c82bfed8b55a2975</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::f67ad6d268162079b3abd51a24468744</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::c6f0ed5fa41e98863e7c73501fe4bd6d</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::ad114356e196a4a3d84dda59c720dacd</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::01e8a54fdecaaf354c67a2dd74ae7d4f</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::449305f096b10a9464449ff2d0e10e06</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::982c0c0ac378256254cce2fa6572bb6c</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::49d6ed47138884566ce93cf0ccb12c02</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::a98e820dbc2e8ee0fc84ab66f263267c</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::50b1ce37427b36368f8f0f1317e47f83</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::f0ec29b7450b2ac5d0ad45327eeb531a</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::d8d421d3b0349a7aaa93758b27a54e84</openaireId>
+            <selcriteria/>
+        </datasource>
+        <datasource>
+            <openaireId>10|doajarticles::7ffc35ac5133da01d421ccf8af5b70bc</openaireId>
+            <selcriteria/>
+        </datasource>
+    </datasources>
+    <zenodocommunities>
+        <zenodocommunity>
+            <zenodoid>risis</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+    </zenodocommunities>
+    <organizations/>
+</community>
+    <community id="covid-19">
+    <subjects>
+        <subject>COVID-19</subject>
+        <subject>Severe acute respiratory syndrome coronavirus 2</subject>
+        <subject>SARS-CoV-2</subject>
+        <subject>COVID19</subject>
+        <subject>2019 novel coronavirus</subject>
+        <subject>coronavirus disease 2019</subject>
+        <subject>HCoV-19</subject>
+        <subject>mesh:C000657245</subject>
+        <subject>2019-nCoV</subject>
+        <subject>coronavirus disease-19</subject>
+        <subject>mesh:COVID-19</subject>
+        <subject>COVID2019</subject>
+    </subjects>
+    <datasources>
+        <datasource>
+            <openaireId>10|opendoar____::358aee4cc897452c00244351e4d91f69</openaireId>
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}}]}
+            </selcriteria>
+        </datasource>
+        <datasource>
+            <openaireId>10|re3data_____::7b0ad08687b2c960d5aeef06f811d5e6</openaireId>
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
+            </selcriteria>
+        </datasource>
+        <datasource>
+            <openaireId>10|driver______::bee53aa31dc2cbb538c10c2b65fa5824</openaireId>
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
+            </selcriteria>
+        </datasource>
+        <datasource>
+            <openaireId>10|openaire____::437f4b072b1aa198adcbc35910ff3b98</openaireId>
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
+            </selcriteria>
+        </datasource>
+        <datasource>
+            <openaireId>10|openaire____::081b82f96300b6a6e3d282bad31cb6e2</openaireId>
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
+            </selcriteria>
+        </datasource>
+        <datasource>
+            <openaireId>10|openaire____::9e3be59865b2c1c335d32dae2fe7b254</openaireId>
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
+            </selcriteria>
+        </datasource>
+        <datasource>
+            <openaireId>10|opendoar____::8b6dd7db9af49e67306feb59a8bdc52c</openaireId>
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
+            </selcriteria>
+        </datasource>
+        <datasource>
+            <openaireId>10|share_______::4719356ec8d7d55d3feb384ce879ad6c</openaireId>
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
+            </selcriteria>
+        </datasource>
+        <datasource>
+            <openaireId>10|share_______::bbd802baad85d1fd440f32a7a3a2c2b1</openaireId>
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
+            </selcriteria>
+        </datasource>
+        <datasource>
+            <openaireId>10|opendoar____::6f4922f45568161a8cdf4ad2299f6d23</openaireId>
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},
+                {"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCoV"}]}]}
+            </selcriteria>
+        </datasource>
+        <datasource>
+            <openaireId>10|re3data_____::7980778c78fb4cf0fab13ce2159030dc</openaireId>
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCov"}]}]}</selcriteria>
+        </datasource>
+        <datasource>
+            <openaireId>10|re3data_____::978378def740bbf2bfb420de868c460b</openaireId>
+            <selcriteria>{"criteria":[{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"SARS-CoV-2"}]},{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"COVID-19"}]},{"constraint":[{"verb":"contains_caseinsensitive","field":"title","value":"2019-nCov"}]}]}</selcriteria>
+        </datasource>
+    </datasources>
+    <zenodocommunities>
+        <zenodocommunity>
+            <zenodoid>chicago-covid-19</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>covid-19-senacyt-panama-sample</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>covid-19-tx-rct-stats-review</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+        <zenodocommunity>
+            <zenodoid>covid_19_senacyt_abc_panama</zenodoid>
+            <selcriteria/>
+        </zenodocommunity>
+    </zenodocommunities>
+    <organizations/>
+</community>
+</communities>

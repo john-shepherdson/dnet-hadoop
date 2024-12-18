@@ -8,7 +8,6 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.api.java.function.ReduceFunction;
 import org.apache.spark.sql.*;
-import org.apache.spark.sql.catalyst.encoders.RowEncoder;
 import org.apache.spark.sql.types.StructType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +19,10 @@ import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.DataInfo;
 import eu.dnetlib.dhp.schema.oaf.Relation;
+import eu.dnetlib.dhp.schema.oaf.utils.MergeUtils;
 import eu.dnetlib.dhp.utils.ISLookupClientFactory;
 import eu.dnetlib.enabling.is.lookup.rmi.ISLookUpService;
+import eu.dnetlib.pace.util.SparkCompatUtils;
 import scala.Tuple2;
 import scala.Tuple3;
 
@@ -68,6 +69,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 
 		Dataset<Relation> mergeRels = spark
 			.read()
+			.schema(REL_BEAN_ENC.schema())
 			.load(DedupUtility.createMergeRelPath(workingPath, "*", "*"))
 			.as(REL_BEAN_ENC);
 
@@ -127,10 +129,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 				(MapFunction<Relation, String>) r -> String
 					.join(" ", r.getSource(), r.getTarget(), r.getRelType(), r.getSubRelType(), r.getRelClass()),
 				Encoders.STRING())
-			.reduceGroups((ReduceFunction<Relation>) (b, a) -> {
-				b.mergeFrom(a);
-				return b;
-			})
+			.reduceGroups((ReduceFunction<Relation>) MergeUtils::mergeRelation)
 			.map((MapFunction<Tuple2<String, Relation>, Relation>) Tuple2::_2, REL_BEAN_ENC);
 
 		final String outputRelationPath = graphOutputPath + "/relation";
@@ -147,7 +146,7 @@ public class SparkPropagateRelation extends AbstractSparkAction {
 		StructType idsSchema = StructType
 			.fromDDL("`id` STRING, `dataInfo` STRUCT<`deletedbyinference`:BOOLEAN,`invisible`:BOOLEAN>");
 
-		Dataset<Row> allIds = spark.emptyDataset(RowEncoder.apply(idsSchema));
+		Dataset<Row> allIds = spark.emptyDataset(SparkCompatUtils.encoderFor(idsSchema));
 
 		for (EntityType entityType : ModelSupport.entityTypes.keySet()) {
 			String entityPath = graphBasePath + '/' + entityType.name();

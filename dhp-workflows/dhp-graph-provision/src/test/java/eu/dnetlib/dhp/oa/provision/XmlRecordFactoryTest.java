@@ -1,8 +1,7 @@
 
 package eu.dnetlib.dhp.oa.provision;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -22,6 +21,7 @@ import com.google.common.collect.Lists;
 import eu.dnetlib.dhp.oa.provision.model.JoinedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntity;
 import eu.dnetlib.dhp.oa.provision.model.RelatedEntityWrapper;
+import eu.dnetlib.dhp.oa.provision.utils.ContextDef;
 import eu.dnetlib.dhp.oa.provision.utils.ContextMapper;
 import eu.dnetlib.dhp.oa.provision.utils.XmlRecordFactory;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -37,12 +37,12 @@ public class XmlRecordFactoryTest {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final Publication p = OBJECT_MAPPER
 			.readValue(IOUtils.toString(getClass().getResourceAsStream("publication.json")), Publication.class);
 
-		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
+		final String xml = xmlRecordFactory.build(new JoinedEntity(p));
 
 		assertNotNull(xml);
 
@@ -51,7 +51,7 @@ public class XmlRecordFactoryTest {
 
 		assertNotNull(doc);
 
-		// System.out.println(doc.asXML());
+		System.out.println(doc.asXML());
 
 		assertEquals("0000-0001-9613-6638", doc.valueOf("//creator[@rank = '1']/@orcid"));
 		assertEquals("0000-0001-9613-6639", doc.valueOf("//creator[@rank = '1']/@orcid_pending"));
@@ -97,6 +97,8 @@ public class XmlRecordFactoryTest {
 		assertEquals("bronze", doc.valueOf("//*[local-name() = 'result']/openaccesscolor/text()"));
 		assertEquals("true", doc.valueOf("//*[local-name() = 'result']/isindiamondjournal/text()"));
 		assertEquals("true", doc.valueOf("//*[local-name() = 'result']/publiclyfunded/text()"));
+
+		assertEquals(15, doc.selectNodes("//*[local-name() = 'result']/*[local-name() = 'subject']").size());
 	}
 
 	@Test
@@ -105,7 +107,7 @@ public class XmlRecordFactoryTest {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final Publication p = OBJECT_MAPPER
 			.readValue(IOUtils.toString(getClass().getResourceAsStream("publication.json")), Publication.class);
@@ -117,7 +119,7 @@ public class XmlRecordFactoryTest {
 		final List<RelatedEntityWrapper> links = Lists.newArrayList();
 		final RelatedEntityWrapper rew = new RelatedEntityWrapper(rel, relatedProject);
 		links.add(rew);
-		final JoinedEntity je = new JoinedEntity<>(p);
+		final JoinedEntity je = new JoinedEntity(p);
 		je.setLinks(links);
 
 		final String xml = xmlRecordFactory.build(je);
@@ -136,7 +138,7 @@ public class XmlRecordFactoryTest {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final Publication p = OBJECT_MAPPER
 			.readValue(IOUtils.toString(getClass().getResourceAsStream("publication.json")), Publication.class);
@@ -148,7 +150,7 @@ public class XmlRecordFactoryTest {
 		final List<RelatedEntityWrapper> links = Lists.newArrayList();
 		final RelatedEntityWrapper rew = new RelatedEntityWrapper(rel, relatedProject);
 		links.add(rew);
-		final JoinedEntity je = new JoinedEntity<>(p);
+		final JoinedEntity je = new JoinedEntity(p);
 		je.setLinks(links);
 
 		final String xml = xmlRecordFactory.build(je);
@@ -166,12 +168,12 @@ public class XmlRecordFactoryTest {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final Datasource d = OBJECT_MAPPER
 			.readValue(IOUtils.toString(getClass().getResourceAsStream("datasource.json")), Datasource.class);
 
-		final String xml = xmlRecordFactory.build(new JoinedEntity<>(d));
+		final String xml = xmlRecordFactory.build(new JoinedEntity(d));
 
 		assertNotNull(xml);
 
@@ -203,14 +205,14 @@ public class XmlRecordFactoryTest {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final OtherResearchProduct p = OBJECT_MAPPER
 			.readValue(
 				IOUtils.toString(getClass().getResourceAsStream("d4science-1-training.json")),
 				OtherResearchProduct.class);
 
-		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
+		final String xml = xmlRecordFactory.build(new JoinedEntity(p));
 
 		assertNotNull(xml);
 
@@ -226,14 +228,14 @@ public class XmlRecordFactoryTest {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-			XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final OtherResearchProduct p = OBJECT_MAPPER
 			.readValue(
 				IOUtils.toString(getClass().getResourceAsStream("d4science-2-dataset.json")),
 				OtherResearchProduct.class);
 
-		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
+		final String xml = xmlRecordFactory.build(new JoinedEntity(p));
 
 		assertNotNull(xml);
 
@@ -249,14 +251,14 @@ public class XmlRecordFactoryTest {
 		final ContextMapper contextMapper = new ContextMapper();
 
 		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
-				XmlConverterJob.schemaLocation);
+			PayloadConverterJob.schemaLocation);
 
 		final Publication p = OBJECT_MAPPER
-				.readValue(
-						IOUtils.toString(getClass().getResourceAsStream("iris-odf-4.json")),
-						Publication.class);
+			.readValue(
+				IOUtils.toString(getClass().getResourceAsStream("iris-odf-4.json")),
+				Publication.class);
 
-		final String xml = xmlRecordFactory.build(new JoinedEntity<>(p));
+		final String xml = xmlRecordFactory.build(new JoinedEntity(p));
 
 		assertNotNull(xml);
 
@@ -265,6 +267,41 @@ public class XmlRecordFactoryTest {
 		assertNotNull(doc);
 		System.out.println(doc.asXML());
 
+	}
+
+	@Test
+	public void test_AKA_project() throws DocumentException, IOException {
+		final ContextMapper contextMapper = new ContextMapper();
+
+		contextMapper
+			.put("dh-ch", new ContextDef("dh-ch", "Digital Humanities and Cultural Heritage", "context", "community"));
+		contextMapper.put("dh-ch::projects", new ContextDef("dh-ch::projects", "DH-CH Projects", "category", ""));
+		contextMapper
+			.put("dh-ch::projects::2", new ContextDef("dh-ch::projects::2", "ARIADNE", "concept", "community"));
+
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+			PayloadConverterJob.schemaLocation);
+
+		final Project p = OBJECT_MAPPER
+			.readValue(
+				IOUtils.toString(getClass().getResourceAsStream("project_aka.json")),
+				Project.class);
+
+		assertNotNull(p.getContext());
+		assertEquals(1, p.getContext().size());
+		assertEquals("dh-ch::projects::2", p.getContext().get(0).getId());
+
+		final String xml = xmlRecordFactory.build(new JoinedEntity(p));
+
+		assertNotNull(xml);
+
+		final Document doc = new SAXReader().read(new StringReader(xml));
+
+		assertNotNull(doc);
+
+		assertEquals("dh-ch", doc.valueOf("//context/@id"));
+		assertEquals("dh-ch::projects", doc.valueOf("//context/category/@id"));
+		assertEquals("dh-ch::projects::2", doc.valueOf("//context/category/concept/@id"));
 	}
 
 }

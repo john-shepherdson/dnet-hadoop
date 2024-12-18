@@ -65,7 +65,11 @@ object ScholixUtils extends Serializable {
   }
 
   def generateScholixResourceFromResult(r: Result): ScholixResource = {
-    generateScholixResourceFromSummary(ScholixUtils.resultToSummary(r))
+    val sum = ScholixUtils.resultToSummary(r)
+    if (sum != null)
+      generateScholixResourceFromSummary(ScholixUtils.resultToSummary(r))
+    else
+      null
   }
 
   val statsAggregator: Aggregator[(String, String, Long), RelatedEntities, RelatedEntities] =
@@ -151,6 +155,14 @@ object ScholixUtils extends Serializable {
     )
     s
 
+  }
+
+  def invRel(rel: String): String = {
+    val semanticRelation = relations.getOrElse(rel.toLowerCase, null)
+    if (semanticRelation != null)
+      semanticRelation.inverse
+    else
+      null
   }
 
   def extractCollectedFrom(summary: ScholixResource): List[ScholixEntityId] = {
@@ -377,10 +389,7 @@ object ScholixUtils extends Serializable {
     if (persistentIdentifiers.isEmpty)
       return null
     s.setLocalIdentifier(persistentIdentifiers.asJava)
-    if (r.isInstanceOf[Publication])
-      s.setTypology(Typology.publication)
-    else
-      s.setTypology(Typology.dataset)
+//    s.setTypology(r.getResulttype.getClassid)
 
     s.setSubType(r.getInstance().get(0).getInstancetype.getClassname)
 

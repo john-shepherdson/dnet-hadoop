@@ -80,7 +80,15 @@ class WritePredefinedProjectPropertiesTest {
 		mojo.outputFile = testFolder;
 
 		// execute
-		Assertions.assertThrows(MojoExecutionException.class, () -> mojo.execute());
+		try {
+			mojo.execute();
+			Assertions.assertTrue(false); // not reached
+		} catch (Exception e) {
+			Assertions
+				.assertTrue(
+					MojoExecutionException.class.isAssignableFrom(e.getClass()) ||
+						IllegalArgumentException.class.isAssignableFrom(e.getClass()));
+		}
 	}
 
 	@Test

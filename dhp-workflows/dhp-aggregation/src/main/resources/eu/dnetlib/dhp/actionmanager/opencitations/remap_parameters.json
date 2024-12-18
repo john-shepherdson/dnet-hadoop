@@ -1,0 +1,25 @@
+[
+  {
+    "paramName": "ip",
+    "paramLongName": "inputPath",
+    "paramDescription": "the zipped opencitations file",
+    "paramRequired": true
+  },
+  {
+    "paramName": "op",
+    "paramLongName": "outputPath",
+    "paramDescription": "the working path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManged",
+    "paramDescription": "the hdfs name node",
+    "paramRequired": false
+  },{
+  "paramName": "nn",
+  "paramLongName": "nameNode",
+  "paramDescription": "the hdfs name node",
+  "paramRequired": true
+}
+]

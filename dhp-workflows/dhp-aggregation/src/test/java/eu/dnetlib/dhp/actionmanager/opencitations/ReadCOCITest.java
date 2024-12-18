@@ -119,7 +119,9 @@ public class ReadCOCITest {
 					workingDir.toString() + "/COCI",
 					"-outputPath",
 					workingDir.toString() + "/COCI_json/",
-					"-inputFile", "input1;input2;input3;input4;input5"
+					"-inputFile", "input1;input2;input3;input4;input5",
+					"-format",
+					"COCI"
 				});
 
 		final JavaSparkContext sc = JavaSparkContext.fromSparkContext(spark.sparkContext());

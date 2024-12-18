@@ -1,0 +1,111 @@
+<workflow-app name="Stats Monitor Update" xmlns="uri:oozie:workflow:0.5">
+    <parameters>
+        <property>
+            <name>stats_db_name</name>
+            <description>the target stats database name</description>
+        </property>
+        <property>
+            <name>monitor_db_name</name>
+            <description>the target monitor db name</description>
+        </property>
+        <property>
+            <name>monitor_db_shadow_name</name>
+            <description>the name of the shadow monitor db</description>
+        </property>
+        <property>
+            <name>hive_metastore_uris</name>
+            <description>hive server metastore URIs</description>
+        </property>
+        <property>
+            <name>hive_jdbc_url</name>
+            <description>hive server jdbc url</description>
+        </property>
+        <property>
+            <name>hive_timeout</name>
+            <description>the time period, in seconds, after which Hive fails a transaction if a Hive client has not sent a hearbeat. The default value is 300 seconds.</description>
+        </property>
+        <property>
+            <name>hadoop_user_name</name>
+            <description>user name of the wf owner</description>
+        </property>
+    </parameters>
+
+    <global>
+        <job-tracker>${jobTracker}</job-tracker>
+        <name-node>${nameNode}</name-node>
+        <configuration>
+            <property>
+                <name>hive.metastore.uris</name>
+                <value>${hive_metastore_uris}</value>
+            </property>
+            <property>
+            	<name>hive.txn.timeout</name>
+            	<value>${hive_timeout}</value>
+            </property>
+	<property>
+	    <name>mapred.job.queue.name</name>
+	    <value>analytics</value>
+	</property>
+        </configuration>
+    </global>
+
+    <start to="resume_from"/>
+    <decision name="resume_from">
+        <switch>
+            <case to="Step1-updateMonitorDB">${wf:conf('resumeFrom') eq 'Step1-updateMonitorDB'}</case>
+            <case to="Step2-copyDataToImpalaCluster">${wf:conf('resumeFrom') eq 'Step2-copyDataToImpalaCluster'}</case>
+            <case to="Step3-finalizeImpalaCluster">${wf:conf('resumeFrom') eq 'Step3-finalizeImpalaCluster'}</case>
+            <default to="Step1-updateMonitorDB"/>
+        </switch>
+    </decision>
+
+    <kill name="Kill">
+        <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+
+    <action name="Step1-updateMonitorDB">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>monitor.sh</exec>
+            <argument>${stats_db_name}</argument>
+            <argument>${monitor_db_name}</argument>
+            <argument>${monitor_db_shadow_name}</argument>
+            <argument>${wf:appPath()}/scripts/updateMonitorDB_institutions.sql</argument>
+            <argument>${wf:appPath()}/scripts/updateMonitorDB.sql</argument>
+            <argument>${wf:appPath()}/scripts/updateMonitorDBAll.sql</argument>
+            <file>monitor.sh</file>
+        </shell>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step2-copyDataToImpalaCluster">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>copyDataToImpalaCluster.sh</exec>
+            <argument>${monitor_db_name}</argument>
+            <argument>${hadoop_user_name}</argument>
+            <file>copyDataToImpalaCluster.sh</file>
+        </shell>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <action name="Step3-finalizeImpalaCluster">
+        <shell xmlns="uri:oozie:shell-action:0.1">
+            <job-tracker>${jobTracker}</job-tracker>
+            <name-node>${nameNode}</name-node>
+            <exec>finalizeImpalaCluster.sh</exec>
+            <argument>${monitor_db_name}</argument>
+            <argument>${monitor_db_prod_name}</argument>
+            <argument>${monitor_db_shadow_name}</argument>
+            <file>finalizeImpalaCluster.sh</file>
+        </shell>
+        <ok to="End"/>
+        <error to="Kill"/>
+    </action>
+
+    <end name="End"/>
+</workflow-app>

@@ -7,6 +7,8 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.google.common.collect.Lists;
 
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -142,7 +144,7 @@ public class XmlSerializationUtils {
 	}
 
 	public static String getAttributes(final Qualifier q) {
-		if (q == null || q.isBlank())
+		if (q == null || StringUtils.isBlank(q.getClassid()))
 			return "";
 
 		return new StringBuilder(" ")
@@ -161,6 +163,23 @@ public class XmlSerializationUtils {
 			sb.append(" ").append(attr(attr._1(), attr._2()));
 		}
 		sb.append("/>");
+		return sb.toString();
+	}
+
+	// <measure views="0" datasource="infrastruct_::f66f1bd369679b5b077dcdf006089556||OpenAIRE" />
+	// <measure downloads="0" datasource="infrastruct_::f66f1bd369679b5b077dcdf006089556||OpenAIRE" />
+	public static String usageMeasureAsXmlElement(String name, Measure measure) {
+		StringBuilder sb = new StringBuilder();
+		for (KeyValue kv : measure.getUnit()) {
+			sb
+				.append("<")
+				.append(name)
+				.append(" ")
+				.append(attr("id", measure.getId()))
+				.append(attr("score", kv.getValue()))
+				.append(attr("datasource", kv.getKey()))
+				.append(" />");
+		}
 		return sb.toString();
 	}
 
