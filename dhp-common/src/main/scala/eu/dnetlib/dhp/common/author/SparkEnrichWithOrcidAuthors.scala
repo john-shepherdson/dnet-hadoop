@@ -51,6 +51,8 @@ abstract class SparkEnrichWithOrcidAuthors(propertyPath: String, args: Array[Str
           .parquet(s"${workingDir}/${resultType}_matched")
           .selectExpr("id", "enriched_author")
 
+        matched.show(false)
+
         spark.read
           .schema(enc.schema)
           .json(s"$graphPath/$resultType")
