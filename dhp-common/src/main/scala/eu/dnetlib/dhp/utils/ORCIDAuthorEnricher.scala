@@ -9,6 +9,7 @@ import scala.beans.BeanProperty
 import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 import scala.util.control.Breaks.{break, breakable}
+import eu.dnetlib.dhp.common.enrichment.Constants._
 
 case class OrcidAuthor(
   @BeanProperty var orcid: String,
@@ -171,9 +172,19 @@ object ORCIDAuthorEnricher extends Serializable {
 
         val orcidPID = OafUtils.createSP(orcid.orcid, classid, classid)
         orcidPID.setDataInfo(OafUtils.generateDataInfo())
-        orcidPID.getDataInfo.setProvenanceaction(
-          OafUtils.createQualifier(provenance, provenance)
-        )
+        if (provenance.equalsIgnoreCase(PROPAGATION_DATA_INFO_TYPE)) {
+          orcidPID.getDataInfo.setInferenceprovenance(PROPAGATION_DATA_INFO_TYPE);
+          orcidPID.getDataInfo.setInferred(true);
+          orcidPID.getDataInfo.setProvenanceaction(
+            OafUtils.createQualifier(
+              PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_ID,
+              PROPAGATION_ORCID_TO_RESULT_FROM_SEM_REL_CLASS_NAME
+            )
+          )
+        } else
+          orcidPID.getDataInfo.setProvenanceaction(
+            OafUtils.createQualifier(provenance, provenance)
+          )
 
         author.getPid.add(orcidPID)
       }
