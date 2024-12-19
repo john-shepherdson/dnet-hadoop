@@ -43,7 +43,6 @@ public class HttpCsvCollectorPlugin implements CollectorPlugin {
 
 	private static final Logger log = LoggerFactory.getLogger(HttpCsvCollectorPlugin.class);
 
-	// TODO USE HDFS FILESSYSTEM FOR TEMP FILE
 	private final FileSystem fileSystem;
 
 	private final HttpConnector2 httpConnector;

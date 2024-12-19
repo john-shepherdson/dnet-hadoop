@@ -33,7 +33,6 @@ public class FileCsvCollectorPlugin implements CollectorPlugin {
 
 	private static final Logger log = LoggerFactory.getLogger(FileCsvCollectorPlugin.class);
 
-	// TODO USE HDFS FILESSYSTEM
 	private final FileSystem fileSystem;
 
 	public FileCsvCollectorPlugin(final FileSystem fileSystem) {
