@@ -11,10 +11,21 @@ public interface CollectorPlugin {
 
 	enum NAME {
 
-		oai, other, rest_json2xml, file, fileGzip, baseDump, gtr2Publications, osfPreprints, zenodoDump;
+		oai,
+		other,
+		rest_json2xml,
+		file,
+		fileGzip,
+		baseDump,
+		gtr2Publications,
+		osfPreprints,
+		zenodoDump,
+		fileCSV,
+		httpCSV;
 
 		public enum OTHER_NAME {
-			mdstore_mongodb_dump, mdstore_mongodb
+			mdstore_mongodb_dump,
+			mdstore_mongodb
 		}
 
 	}
