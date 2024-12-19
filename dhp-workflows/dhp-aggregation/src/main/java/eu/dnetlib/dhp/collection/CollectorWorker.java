@@ -134,7 +134,7 @@ public class CollectorWorker extends ReportingJob {
 		case fileCSV:
 			return new FileCsvCollectorPlugin(this.fileSystem);
 		case httpCSV:
-			return new HttpCsvCollectorPlugin(this.clientParams);
+			return new HttpCsvCollectorPlugin(this.clientParams, this.fileSystem);
 		case other:
 			final CollectorPlugin.NAME.OTHER_NAME plugin = Optional
 					.ofNullable(this.api.getParams().get("other_plugin_type"))
