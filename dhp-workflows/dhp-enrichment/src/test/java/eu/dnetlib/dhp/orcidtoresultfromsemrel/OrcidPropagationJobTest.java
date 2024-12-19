@@ -4,11 +4,19 @@ package eu.dnetlib.dhp.orcidtoresultfromsemrel;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
+import java.util.logging.Filter;
 
+import eu.dnetlib.dhp.common.enrichment.Constants;
+import eu.dnetlib.dhp.schema.oaf.Author;
+import eu.dnetlib.dhp.schema.oaf.StructuredProperty;
 import org.apache.commons.io.FileUtils;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.FilterFunction;
+import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.api.java.function.ForeachFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -122,7 +130,8 @@ public class OrcidPropagationJobTest {
 								"-targetPath",
 								workingDir.toString() + "/graph",
 								"-orcidPath", "",
-								"-workingDir", workingDir.toString()
+								"-workingDir", workingDir.toString(),
+								"-matchingSource", "propagation"
 						});
 
 		final JavaSparkContext sc = new JavaSparkContext(spark.sparkContext());
@@ -131,7 +140,6 @@ public class OrcidPropagationJobTest {
 			.textFile(workingDir.toString() + "/graph/dataset")
 			.map(item -> OBJECT_MAPPER.readValue(item, Dataset.class));
 
-		// tmp.map(s -> new Gson().toJson(s)).foreach(s -> System.out.println(s));
 
 		Assertions.assertEquals(10, tmp.count());
 
@@ -147,6 +155,7 @@ public class OrcidPropagationJobTest {
 			+ "where MyP.datainfo.inferenceprovenance = 'propagation'";
 
 		org.apache.spark.sql.Dataset<Row> propagatedAuthors = spark.sql(query);
+		propagatedAuthors.show(false);
 
 		Assertions.assertEquals(1, propagatedAuthors.count());
 
@@ -156,12 +165,12 @@ public class OrcidPropagationJobTest {
 				propagatedAuthors
 					.filter(
 						"id = '50|dedup_wf_001::95b033c0c3961f6a1cdcd41a99a9632e' "
-							+ "and name = 'Vajinder' and surname = 'Kumar' and pidType = '" +
+							+ "and name = 'Nicole' and surname = 'Jung' and pidType = '" +
 
 							ModelConstants.ORCID_PENDING + "'")
 					.count());
 
-		Assertions.assertEquals(1, propagatedAuthors.filter("pid = '0000-0002-8825-3517'").count());
+		Assertions.assertEquals(1, propagatedAuthors.filter("pid = '0000-0001-9513-2468'").count());
 	}
 
 	@Test
