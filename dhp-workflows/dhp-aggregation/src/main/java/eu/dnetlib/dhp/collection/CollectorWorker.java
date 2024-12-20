@@ -28,6 +28,7 @@ import eu.dnetlib.dhp.collection.plugin.mongodb.MongoDbDumpCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.oai.OaiCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.osf.OsfPreprintsCollectorPlugin;
 import eu.dnetlib.dhp.collection.plugin.rest.RestCollectorPlugin;
+import eu.dnetlib.dhp.collection.plugin.zenodo.CollectZenodoDumpCollectorPlugin;
 import eu.dnetlib.dhp.common.aggregation.AggregatorReport;
 import eu.dnetlib.dhp.common.collection.CollectorException;
 import eu.dnetlib.dhp.common.collection.HttpClientParams;
@@ -129,6 +130,8 @@ public class CollectorWorker extends ReportingJob {
 				return new Gtr2PublicationsCollectorPlugin(this.clientParams);
 			case osfPreprints:
 				return new OsfPreprintsCollectorPlugin(this.clientParams);
+			case zenodoDump:
+				return new CollectZenodoDumpCollectorPlugin();
 			case other:
 				final CollectorPlugin.NAME.OTHER_NAME plugin = Optional
 					.ofNullable(this.api.getParams().get("other_plugin_type"))

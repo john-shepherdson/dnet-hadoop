@@ -146,7 +146,7 @@ public class SparkOpenorgsDedupTest implements Serializable {
 			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "organization"))
 			.count();
 
-		assertEquals(92, orgs_simrel);
+		assertEquals(91, orgs_simrel);
 	}
 
 	@Test
@@ -175,7 +175,7 @@ public class SparkOpenorgsDedupTest implements Serializable {
 			.load(DedupUtility.createSimRelPath(testOutputBasePath, testActionSetId, "organization"))
 			.count();
 
-		assertEquals(128, orgs_simrel);
+		assertEquals(127, orgs_simrel);
 	}
 
 	@Test

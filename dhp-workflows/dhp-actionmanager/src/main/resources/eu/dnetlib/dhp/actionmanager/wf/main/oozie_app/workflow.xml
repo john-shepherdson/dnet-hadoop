@@ -135,21 +135,9 @@
             <arg>--outputPath</arg><arg>${workingDir}/action_payload_by_type</arg>
             <arg>--isLookupUrl</arg><arg>${isLookupUrl}</arg>
         </spark>
-        <ok to="ForkPromote"/>
+        <ok to="PromoteActionPayloadForDatasetTable"/>
         <error to="Kill"/>
     </action>
-
-    <fork name="ForkPromote">
-        <path start="PromoteActionPayloadForDatasetTable"/>
-        <path start="PromoteActionPayloadForDatasourceTable"/>
-        <path start="PromoteActionPayloadForOrganizationTable"/>
-        <path start="PromoteActionPayloadForOtherResearchProductTable"/>
-        <path start="PromoteActionPayloadForProjectTable"/>
-        <path start="PromoteActionPayloadForPublicationTable"/>
-        <path start="PromoteActionPayloadForRelationTable"/>
-        <path start="PromoteActionPayloadForSoftwareTable"/>
-        <path start="PromoteActionPayloadForPersonTable"/>
-    </fork>
 
     <action name="PromoteActionPayloadForDatasetTable">
         <sub-workflow>
@@ -162,7 +150,7 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="JoinPromote"/>
+        <ok to="PromoteActionPayloadForDatasourceTable"/>
         <error to="Kill"/>
     </action>
 
@@ -177,7 +165,7 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="JoinPromote"/>
+        <ok to="PromoteActionPayloadForOrganizationTable"/>
         <error to="Kill"/>
     </action>
 
@@ -192,7 +180,7 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="JoinPromote"/>
+        <ok to="PromoteActionPayloadForOtherResearchProductTable"/>
         <error to="Kill"/>
     </action>
 
@@ -207,7 +195,7 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="JoinPromote"/>
+        <ok to="PromoteActionPayloadForProjectTable"/>
         <error to="Kill"/>
     </action>
 
@@ -222,7 +210,7 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="JoinPromote"/>
+        <ok to="PromoteActionPayloadForPublicationTable"/>
         <error to="Kill"/>
     </action>
 
@@ -237,7 +225,7 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="JoinPromote"/>
+        <ok to="PromoteActionPayloadForRelationTable"/>
         <error to="Kill"/>
     </action>
 
@@ -252,7 +240,7 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="JoinPromote"/>
+        <ok to="PromoteActionPayloadForSoftwareTable"/>
         <error to="Kill"/>
     </action>
 
@@ -267,26 +255,9 @@
                 </property>
             </configuration>
         </sub-workflow>
-        <ok to="JoinPromote"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
-
-    <action name="PromoteActionPayloadForPersonTable">
-        <sub-workflow>
-            <app-path>${wf:appPath()}/promote_action_payload_for_person_table</app-path>
-            <propagate-configuration/>
-            <configuration>
-                <property>
-                    <name>inputActionPayloadRootPath</name>
-                    <value>${workingDir}/action_payload_by_type</value>
-                </property>
-            </configuration>
-        </sub-workflow>
-        <ok to="JoinPromote"/>
-        <error to="Kill"/>
-    </action>
-
-    <join name="JoinPromote" to="End"/>
 
     <end name="End"/>
 </workflow-app>
