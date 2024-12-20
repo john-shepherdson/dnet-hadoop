@@ -15,10 +15,8 @@ import org.apache.hadoop.fs.Path;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.function.FilterFunction;
 import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.*;
 import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Encoders;
-import org.apache.spark.sql.SaveMode;
-import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +29,8 @@ import eu.dnetlib.dhp.api.model.CommunityEntityMap;
 import eu.dnetlib.dhp.api.model.EntityCommunities;
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
 import eu.dnetlib.dhp.bulktag.community.*;
+import eu.dnetlib.dhp.common.action.ReadDatasourceMasterDuplicateFromDB;
+import eu.dnetlib.dhp.common.action.model.MasterDuplicate;
 import eu.dnetlib.dhp.schema.common.ModelConstants;
 import eu.dnetlib.dhp.schema.common.ModelSupport;
 import eu.dnetlib.dhp.schema.oaf.*;
@@ -88,6 +88,14 @@ public class SparkBulkTagJob {
 		log.info("protoMap: {}", temp);
 		ProtoMap protoMap = new Gson().fromJson(temp, ProtoMap.class);
 		log.info("pathMap: {}", new Gson().toJson(protoMap));
+		final String dbUrl = parser.get("dbUrl");
+		log.info("dbUrl: {}", dbUrl);
+		final String dbUser = parser.get("dbUser");
+		log.info("dbUser: {}", dbUser);
+		final String dbPassword = parser.get("dbPassword");
+		log.info("dbPassword: {}", dbPassword);
+		final String hdfsPath = outputPath + "masterDuplicate";
+		log.info("hdfsPath: {}", hdfsPath);
 
 		SparkConf conf = new SparkConf();
 		CommunityConfiguration cc;
@@ -101,7 +109,7 @@ public class SparkBulkTagJob {
 			cc = CommunityConfigurationFactory.newInstance(taggingConf);
 		} else {
 			cc = Utils.getCommunityConfiguration(baseURL);
-			log.info(OBJECT_MAPPER.writeValueAsString(cc));
+
 		}
 
 		runWithSparkSession(
@@ -109,18 +117,96 @@ public class SparkBulkTagJob {
 			isSparkSessionManaged,
 			spark -> {
 				extendCommunityConfigurationForEOSC(spark, inputPath, cc);
+				ReadDatasourceMasterDuplicateFromDB.execute(dbUrl, dbUser, dbPassword, hdfsPath, hdfsNameNode);
 				execBulkTag(
 					spark, inputPath, outputPath, protoMap, cc);
 				execEntityTag(
 					spark, inputPath + "organization", outputPath + "organization",
-					Utils.getCommunityOrganization(baseURL), Organization.class, TaggingConstants.CLASS_ID_ORGANIZATION,
+					mapWithRepresentativeOrganization(
+						spark, inputPath + "relation", Utils.getOrganizationCommunityMap(baseURL)),
+					Organization.class, TaggingConstants.CLASS_ID_ORGANIZATION,
 					TaggingConstants.CLASS_NAME_BULKTAG_ORGANIZATION);
 				execEntityTag(
-					spark, inputPath + "project", outputPath + "project", Utils.getCommunityProjects(baseURL),
+					spark, inputPath + "project", outputPath + "project",
+					Utils.getProjectCommunityMap(baseURL),
 					Project.class, TaggingConstants.CLASS_ID_PROJECT, TaggingConstants.CLASS_NAME_BULKTAG_PROJECT);
-				execDatasourceTag(spark, inputPath, outputPath, Utils.getDatasourceCommunities(baseURL));
+				execEntityTag(
+					spark, inputPath + "datasource", outputPath + "datasource",
+					mapWithMasterDatasource(spark, hdfsPath, Utils.getDatasourceCommunityMap(baseURL)),
+					Datasource.class, TaggingConstants.CLASS_ID_DATASOURCE,
+					TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE);
 
 			});
+	}
+
+	private static CommunityEntityMap mapWithMasterDatasource(SparkSession spark, String masterDuplicatePath,
+		CommunityEntityMap datasourceCommunityMap) {
+		// load master-duplicate relations
+		Dataset<MasterDuplicate> masterDuplicate = spark
+			.read()
+			.schema(Encoders.bean(MasterDuplicate.class).schema())
+			.json(masterDuplicatePath)
+			.as(Encoders.bean(MasterDuplicate.class));
+		// list of id for the communities related entities
+		List<String> idList = entityIdList(ModelSupport.idPrefixMap.get(Datasource.class), datasourceCommunityMap);
+
+		// find the mapping with the representative entity if any
+		Dataset<String> datasourceIdentifiers = spark.createDataset(idList, Encoders.STRING());
+		List<Row> mappedKeys = datasourceIdentifiers
+			.join(
+				masterDuplicate, datasourceIdentifiers.col("_1").equalTo(masterDuplicate.col("duplicateId")),
+				"left_semi")
+			.selectExpr("masterId as source", "duplicateId as target")
+			.collectAsList();
+
+		// remap the entity with its corresponding representative
+		return remapCommunityEntityMap(datasourceCommunityMap, mappedKeys);
+	}
+
+	private static List<String> entityIdList(String idPrefixMap, CommunityEntityMap datasourceCommunityMap) {
+		final String prefix = idPrefixMap + "|";
+		return datasourceCommunityMap
+			.keySet()
+			.stream()
+			.map(key -> prefix + key)
+			.collect(Collectors.toList());
+	}
+
+	private static CommunityEntityMap mapWithRepresentativeOrganization(SparkSession spark, String relationPath,
+		CommunityEntityMap organizationCommunityMap) {
+		Dataset<Row> mergesRel = spark
+			.read()
+			.schema(Encoders.bean(Relation.class).schema())
+			.json(relationPath)
+			.filter("datainfo.deletedbyinference != true and relClass = 'merges")
+			.select("source", "target");
+
+		List<String> idList = entityIdList(ModelSupport.idPrefixMap.get(Organization.class), organizationCommunityMap);
+
+		Dataset<String> organizationIdentifiers = spark.createDataset(idList, Encoders.STRING());
+		List<Row> mappedKeys = organizationIdentifiers
+			.join(mergesRel, organizationIdentifiers.col("_1").equalTo(mergesRel.col("target")), "left_semi")
+			.select("source", "target")
+			.collectAsList();
+
+		return remapCommunityEntityMap(organizationCommunityMap, mappedKeys);
+
+	}
+
+	private static CommunityEntityMap remapCommunityEntityMap(CommunityEntityMap entityCommunityMap,
+		List<Row> mappedKeys) {
+		for (Row mappedEntry : mappedKeys) {
+			String oldKey = mappedEntry.getAs("target");
+			String newKey = mappedEntry.getAs("source");
+			// inserts the newKey in the map while removing the oldKey. The remove produces the value in the Map, which
+			// will be used as the newValue parameter of the BiFunction
+			entityCommunityMap.merge(newKey, entityCommunityMap.remove(oldKey), (existing, newValue) -> {
+				existing.addAll(newValue);
+				return existing;
+			});
+
+		}
+		return entityCommunityMap;
 	}
 
 	private static <E extends OafEntity> void execEntityTag(SparkSession spark, String inputPath, String outputPath,
@@ -184,63 +270,6 @@ public class SparkBulkTagJob {
 			.json(inputPath);
 	}
 
-	private static void execDatasourceTag(SparkSession spark, String inputPath, String outputPath,
-		List<EntityCommunities> datasourceCommunities) {
-		Dataset<Datasource> datasource = readPath(spark, inputPath + "datasource", Datasource.class);
-
-		Dataset<EntityCommunities> dc = spark
-			.createDataset(datasourceCommunities, Encoders.bean(EntityCommunities.class));
-
-		datasource
-			.joinWith(dc, datasource.col("id").equalTo(dc.col("entityId")), "left")
-			.map((MapFunction<Tuple2<Datasource, EntityCommunities>, Datasource>) t2 -> {
-				Datasource ds = t2._1();
-				if (t2._2() != null) {
-
-					List<String> context = Optional
-						.ofNullable(ds.getContext())
-						.map(v -> v.stream().map(c -> c.getId()).collect(Collectors.toList()))
-						.orElse(new ArrayList<>());
-
-					if (!Optional.ofNullable(ds.getContext()).isPresent())
-						ds.setContext(new ArrayList<>());
-
-					t2._2().getCommunitiesId().forEach(c -> {
-						if (!context.contains(c)) {
-							Context con = new Context();
-							con.setId(c);
-							con
-								.setDataInfo(
-									Arrays
-										.asList(
-											OafMapperUtils
-												.dataInfo(
-													false, TaggingConstants.BULKTAG_DATA_INFO_TYPE, true, false,
-													OafMapperUtils
-														.qualifier(
-															TaggingConstants.CLASS_ID_DATASOURCE,
-															TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE,
-															ModelConstants.DNET_PROVENANCE_ACTIONS,
-															ModelConstants.DNET_PROVENANCE_ACTIONS),
-													"1")));
-							ds.getContext().add(con);
-						}
-					});
-				}
-				return ds;
-			}, Encoders.bean(Datasource.class))
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(outputPath + "datasource");
-
-		readPath(spark, outputPath + "datasource", Datasource.class)
-			.write()
-			.mode(SaveMode.Overwrite)
-			.option("compression", "gzip")
-			.json(inputPath + "datasource");
-	}
-
 	private static void extendCommunityConfigurationForEOSC(SparkSession spark, String inputPath,
 		CommunityConfiguration cc) {
 
@@ -278,11 +307,6 @@ public class SparkBulkTagJob {
 		ProtoMap protoMappingParams,
 		CommunityConfiguration communityConfiguration) {
 
-		try {
-			System.out.println(new ObjectMapper().writeValueAsString(protoMappingParams));
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
-		}
 		ModelSupport.entityTypes
 			.keySet()
 			.parallelStream()

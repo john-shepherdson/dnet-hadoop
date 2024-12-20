@@ -6,7 +6,6 @@ import static eu.dnetlib.dhp.bulktag.community.TaggingConstants.ZENODO_COMMUNITY
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -18,7 +17,6 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.FilterFunction;
-import org.apache.spark.api.java.function.MapFunction;
 import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
@@ -29,9 +27,13 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
+import eu.dnetlib.dhp.api.Utils;
+import eu.dnetlib.dhp.api.model.SubCommunityModel;
+import eu.dnetlib.dhp.bulktag.community.CommunityConfiguration;
 import eu.dnetlib.dhp.bulktag.community.ProtoMap;
 import eu.dnetlib.dhp.schema.oaf.*;
 
@@ -1947,6 +1949,23 @@ public class BulkTagJobTest {
 					"-nameNode", "local"
 				});
 
+	}
+
+	@Test
+	public void testApi() throws IOException {
+		String baseURL = "https://dev-openaire.d4science.org/openaire/community/";
+		List<SubCommunityModel> subcommunities = Utils.getSubcommunities("clarin", baseURL);
+
+		CommunityConfiguration tmp = Utils.getCommunityConfiguration(baseURL);
+		tmp.getCommunities().keySet().forEach(c -> {
+			try {
+				System.out.println(new ObjectMapper().writeValueAsString(tmp.getCommunities().get(c)));
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
+		});
+
+		System.out.println(new ObjectMapper().writeValueAsString(Utils.getOrganizationCommunityMap(baseURL)));
 	}
 
 }
