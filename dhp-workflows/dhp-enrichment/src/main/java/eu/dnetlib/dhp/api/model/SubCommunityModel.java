@@ -1,18 +1,19 @@
-package eu.dnetlib.dhp.api.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+package eu.dnetlib.dhp.api.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SubCommunityModel extends CommonConfigurationModel implements Serializable {
-    private String subCommunityId;
+	private String subCommunityId;
 
-    public String getSubCommunityId() {
-        return subCommunityId;
-    }
+	public String getSubCommunityId() {
+		return subCommunityId;
+	}
 
-    public void setSubCommunityId(String subCommunityId) {
-        this.subCommunityId = subCommunityId;
-    }
+	public void setSubCommunityId(String subCommunityId) {
+		this.subCommunityId = subCommunityId;
+	}
 }

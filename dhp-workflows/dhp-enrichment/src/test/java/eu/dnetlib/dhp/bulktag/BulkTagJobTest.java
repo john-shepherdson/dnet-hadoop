@@ -8,10 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import eu.dnetlib.dhp.api.Utils;
-import eu.dnetlib.dhp.api.model.SubCommunityModel;
-import eu.dnetlib.dhp.bulktag.community.CommunityConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -31,9 +27,13 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 
+import eu.dnetlib.dhp.api.Utils;
+import eu.dnetlib.dhp.api.model.SubCommunityModel;
+import eu.dnetlib.dhp.bulktag.community.CommunityConfiguration;
 import eu.dnetlib.dhp.bulktag.community.ProtoMap;
 import eu.dnetlib.dhp.schema.oaf.*;
 
@@ -1957,13 +1957,13 @@ public class BulkTagJobTest {
 		List<SubCommunityModel> subcommunities = Utils.getSubcommunities("clarin", baseURL);
 
 		CommunityConfiguration tmp = Utils.getCommunityConfiguration(baseURL);
-				tmp.getCommunities().keySet().forEach(c -> {
-                    try {
-                        System.out.println(new ObjectMapper().writeValueAsString(tmp.getCommunities().get(c)));
-                    } catch (JsonProcessingException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
+		tmp.getCommunities().keySet().forEach(c -> {
+			try {
+				System.out.println(new ObjectMapper().writeValueAsString(tmp.getCommunities().get(c)));
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException(e);
+			}
+		});
 
 		System.out.println(new ObjectMapper().writeValueAsString(Utils.getOrganizationCommunityMap(baseURL)));
 	}

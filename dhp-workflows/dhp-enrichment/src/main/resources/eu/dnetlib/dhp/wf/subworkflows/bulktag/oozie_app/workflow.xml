@@ -17,15 +17,15 @@
             <value>undelete</value>
         </property>
         <property>
-            <name>dbUrl></name>
+            <name>dbUrl</name>
 
         </property>
         <property>
-            <name>dbUser></name>
+            <name>dbUser</name>
 
         </property>
         <property>
-            <name>dbPassword></name>
+            <name>dbPassword</name>
 
         </property>
 

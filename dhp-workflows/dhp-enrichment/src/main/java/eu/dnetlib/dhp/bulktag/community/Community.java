@@ -43,7 +43,7 @@ public class Community implements Serializable {
 	}
 
 	public void setSubjects(List<String> subjects) {
-		if(subjects != null)
+		if (subjects != null)
 			this.subjects = subjects;
 	}
 
@@ -60,7 +60,7 @@ public class Community implements Serializable {
 	}
 
 	public void setZenodoCommunities(List<String> zenodoCommunities) {
-		if(zenodoCommunities!=null)
+		if (zenodoCommunities != null)
 			this.zenodoCommunities = zenodoCommunities;
 	}
 

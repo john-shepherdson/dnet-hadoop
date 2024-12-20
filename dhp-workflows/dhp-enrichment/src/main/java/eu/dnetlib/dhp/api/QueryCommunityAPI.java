@@ -44,14 +44,11 @@ public class QueryCommunityAPI {
 
 	}
 
-
 	public static String communityDatasource(String id, String baseURL) throws IOException {
 
 		return get(baseURL + id + "/datasources");
 
 	}
-
-
 
 	public static String communityPropagationOrganization(String id, String baseURL) throws IOException {
 
@@ -86,16 +83,21 @@ public class QueryCommunityAPI {
 		return body;
 	}
 
-	public static String subcommunityDatasource(String communityId, String subcommunityId, String baseURL) throws IOException {
+	public static String subcommunityDatasource(String communityId, String subcommunityId, String baseURL)
+		throws IOException {
 		return get(baseURL + communityId + "/subcommunities/datasources?subCommunityId=" + subcommunityId);
 	}
 
-	public static String subcommunityPropagationOrganization(String communityId, String subcommunityId , String baseURL) throws IOException {
+	public static String subcommunityPropagationOrganization(String communityId, String subcommunityId, String baseURL)
+		throws IOException {
 		return get(baseURL + communityId + "/subcommunities/propagationOrganizations?subCommunityId=" + subcommunityId);
 	}
 
-	public static String subcommunityProjects(String communityId, String subcommunityId, String page, String size, String baseURL) throws IOException {
-		return get(baseURL + communityId + "/subcommunities/projects/" + page + "/" + size + "?subCommunityId=" + subcommunityId);
+	public static String subcommunityProjects(String communityId, String subcommunityId, String page, String size,
+		String baseURL) throws IOException {
+		return get(
+			baseURL + communityId + "/subcommunities/projects/" + page + "/" + size + "?subCommunityId="
+				+ subcommunityId);
 	}
 
 	public static String propagationDatasourceCommunityMap(String baseURL) throws IOException {
