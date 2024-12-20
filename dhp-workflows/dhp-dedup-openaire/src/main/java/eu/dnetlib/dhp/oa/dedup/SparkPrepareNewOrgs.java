@@ -111,7 +111,9 @@ public class SparkPrepareNewOrgs extends AbstractSparkAction {
 		// collect diffrels from the raw graph relations: <other id, "diffRel">
 		JavaPairRDD<String, String> diffRels = spark
 			.read()
-			.textFile(relationPath)
+			.schema(Encoders.bean(Relation.class).schema())
+			.json(relationPath)
+			.as(Encoders.bean(Relation.class))
 			.map(patchRelFn(), Encoders.bean(Relation.class))
 			.toJavaRDD()
 			.filter(r -> filterRels(r, ModelSupport.getMainType(EntityType.organization)))

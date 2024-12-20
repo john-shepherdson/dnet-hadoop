@@ -45,11 +45,11 @@
 <!--            <artifactId>dhp-broker-events</artifactId>-->
 <!--            <version>${project.version}</version>-->
 <!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>eu.dnetlib.dhp</groupId>-->
-<!--            <artifactId>dhp-dedup-openaire</artifactId>-->
-<!--            <version>${project.version}</version>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>eu.dnetlib.dhp</groupId>
+            <artifactId>dhp-dedup-openaire</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 <!--        <dependency>-->
 <!--            <groupId>eu.dnetlib.dhp</groupId>-->
 <!--            <artifactId>dhp-enrichment</artifactId>-->
