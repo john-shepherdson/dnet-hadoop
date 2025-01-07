@@ -440,7 +440,8 @@ public class SparkDedupTest implements Serializable {
 			.count();
 
 		final List<Relation> merges = pubs
-			.filter("source == '50|doi_dedup___::d5021b53204e4fdeab6ff5d5bc468032'")// and relClass = '"+ModelConstants.MERGES+"'")
+			.filter("source == '50|doi_dedup___::d5021b53204e4fdeab6ff5d5bc468032'")// and relClass =
+																					// '"+ModelConstants.MERGES+"'")
 			.collectAsList();
 		assertEquals(4, merges.size());
 		Set<String> dups = Sets
