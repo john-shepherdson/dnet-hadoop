@@ -639,6 +639,7 @@
                 --conf spark.sql.queryExecutionListeners=${spark2SqlQueryExecutionListeners}
                 --conf spark.yarn.historyServer.address=${spark2YarnHistoryServerAddress}
                 --conf spark.eventLog.dir=${nameNode}${spark2EventLogDir}
+                --conf spark.sql.shuffle.partitions=8000
             </spark-opts>
             <arg>--master</arg><arg>yarn</arg>
             <arg>--hdfsPath</arg><arg>${workingDir}/graph_raw</arg>
