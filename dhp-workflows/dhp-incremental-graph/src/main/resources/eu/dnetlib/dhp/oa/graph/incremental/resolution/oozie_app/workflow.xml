@@ -98,10 +98,10 @@
             <arg>${nameNode}/${graphBasePath}/otherresearchproduct</arg>
             <arg>${nameNode}/${targetGraph}/otherresearchproduct</arg>
         </distcp>
-        <ok to="copy_person"/>
+        <ok to="copy_project"/>
         <error to="Kill"/>
     </action>
-    <action name="copy_person">
+<!--    <action name="copy_person">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <arg>${nameNode}/${graphBasePath}/person</arg>
             <arg>${nameNode}/${targetGraph}/person</arg>
@@ -109,6 +109,7 @@
         <ok to="copy_project"/>
         <error to="Kill"/>
     </action>
+-->
     <action name="copy_project">
         <distcp xmlns="uri:oozie:distcp-action:0.2">
             <arg>${nameNode}/${graphBasePath}/project</arg>

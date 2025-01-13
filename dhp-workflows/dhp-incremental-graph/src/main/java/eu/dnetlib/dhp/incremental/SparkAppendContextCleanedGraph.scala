@@ -21,19 +21,15 @@ object SparkAppendContextCleanedGraph {
     val parser = new ArgumentApplicationParser(
       IOUtils.toString(
         getClass.getResourceAsStream(
-          "/eu/dnetlib/dhp/oa/graph/incremental/resolution/resolve_relationsbyid_params.json"
+          "/eu/dnetlib/dhp/oa/graph/incremental/export_hive/append_context_cleaned_graph.json"
         )
       )
     )
     parser.parseArgument(args)
     conf.set("hive.metastore.uris", parser.get("hiveMetastoreUris"))
 
-    val graphBasePath = parser.get("graphBasePath")
-    log.info(s"graphBasePath  -> $graphBasePath")
-    val relationPath = parser.get("relationPath")
-    log.info(s"relationPath  -> $relationPath")
-    val targetPath = parser.get("targetGraph")
-    log.info(s"targetGraph  -> $targetPath")
+    val outputPath = parser.get("outputPath")
+    log.info(s"outputPath  -> $outputPath")
 
     val hiveDbName = parser.get("hiveDbName")
     log.info(s"hiveDbName  -> $hiveDbName")
@@ -46,7 +42,7 @@ object SparkAppendContextCleanedGraph {
         .appName(getClass.getSimpleName)
         .getOrCreate()
 
-    for ((entity, clazz) <- ModelSupport.oafTypes.asScala) {
+    for ((entity, clazz) <- ModelSupport.oafTypes.asScala.filter(t => !Seq("datasource", "organization", "person", "project").contains(t._1))) {
       if (classOf[OafEntity].isAssignableFrom(clazz)) {
         val classEnc: Encoder[Oaf] = Encoders.bean(clazz).asInstanceOf[Encoder[Oaf]]
 
@@ -63,8 +59,9 @@ object SparkAppendContextCleanedGraph {
                       c.getDataInfo.asScala
                         .filter(
                           di =>
-                            !di.getInferenceprovenance.equals(PropagationConstant.PROPAGATION_DATA_INFO_TYPE)
-                            && !di.getInferenceprovenance.equals(TaggingConstants.BULKTAG_DATA_INFO_TYPE)
+                            di == null || di.getInferenceprovenance == null ||
+                              (!di.getInferenceprovenance.equals(PropagationConstant.PROPAGATION_DATA_INFO_TYPE)
+                            && !di.getInferenceprovenance.equals(TaggingConstants.BULKTAG_DATA_INFO_TYPE))
                         )
                         .toList
                         .asJava
@@ -82,14 +79,14 @@ object SparkAppendContextCleanedGraph {
           .write
           .option("compression", "gzip")
           .mode(SaveMode.Append)
-          .json(s"$targetPath/${entity}")
+          .json(s"$outputPath/${entity}")
       } else {
         spark
           .table(s"${hiveDbName}.${entity}")
           .write
           .option("compression", "gzip")
           .mode(SaveMode.Append)
-          .json(s"$targetPath/${entity}")
+          .json(s"$outputPath/${entity}")
       }
     }
   }
