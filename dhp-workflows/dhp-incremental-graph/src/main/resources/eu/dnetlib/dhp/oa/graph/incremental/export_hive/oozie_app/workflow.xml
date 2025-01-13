@@ -31,127 +31,32 @@
         </property>
     </parameters>
 
-    <start to="fork_export"/>
+    <start to="merge_db_entities"/>
 
     <kill name="Kill">
         <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
     </kill>
 
-    <fork name="fork_export">
-        <path start="export_publication"/>
-        <path start="export_dataset"/>
-        <path start="export_otherresearchproduct"/>
-        <path start="export_software"/>
-        <path start="export_relation"/>
-    </fork>
-
-    <action name="export_publication">
+    <action name="merge_db_entities">
         <spark xmlns="uri:oozie:spark-action:0.2">
             <master>yarn</master>
             <mode>cluster</mode>
-            <name>Merge table publication</name>
-            <class>eu.dnetlib.dhp.oa.graph.hive.GraphHiveTableExporterJob</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
+            <name>Merge Oaf Entities from hive db</name>
+            <class>eu.dnetlib.dhp.incremental.SparkAppendContextCleanedGraph</class>
+            <jar>dhp-incremental-graph-${projectVersion}.jar</jar>
             <spark-opts>
                 --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
                 ${sparkClusterOpts}
                 ${sparkResourceOpts}
                 ${sparkApplicationOpts}
             </spark-opts>
-            <arg>--outputPath</arg><arg>${outputPath}/publication</arg>
-            <arg>--mode</arg><arg>append</arg>
-            <arg>--hiveTableName</arg><arg>${hiveDbName}.publication</arg>
+            <arg>--outputPath</arg><arg>${outputPath}</arg>
+            <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
         </spark>
-        <ok to="join_export"/>
+        <ok to="End"/>
         <error to="Kill"/>
     </action>
-    <action name="export_dataset">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Merge table dataset</name>
-            <class>eu.dnetlib.dhp.oa.graph.hive.GraphHiveTableExporterJob</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>
-                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
-                ${sparkClusterOpts}
-                ${sparkResourceOpts}
-                ${sparkApplicationOpts}
-            </spark-opts>
-            <arg>--outputPath</arg><arg>${outputPath}/dataset</arg>
-            <arg>--mode</arg><arg>append</arg>
-            <arg>--hiveTableName</arg><arg>${hiveDbName}.dataset</arg>
-            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-        </spark>
-        <ok to="join_export"/>
-        <error to="Kill"/>
-    </action>
-    <action name="export_otherresearchproduct">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Merge table otherresearchproduct</name>
-            <class>eu.dnetlib.dhp.oa.graph.hive.GraphHiveTableExporterJob</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>
-                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
-                ${sparkClusterOpts}
-                ${sparkResourceOpts}
-                ${sparkApplicationOpts}
-            </spark-opts>
-            <arg>--outputPath</arg><arg>${outputPath}/otherresearchproduct</arg>
-            <arg>--mode</arg><arg>append</arg>
-            <arg>--hiveTableName</arg><arg>${hiveDbName}.otherresearchproduct</arg>
-            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-        </spark>
-        <ok to="join_export"/>
-        <error to="Kill"/>
-    </action>
-    <action name="export_software">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Merge table software</name>
-            <class>eu.dnetlib.dhp.oa.graph.hive.GraphHiveTableExporterJob</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>
-                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
-                ${sparkClusterOpts}
-                ${sparkResourceOpts}
-                ${sparkApplicationOpts}
-            </spark-opts>
-            <arg>--outputPath</arg><arg>${outputPath}/software</arg>
-            <arg>--mode</arg><arg>append</arg>
-            <arg>--hiveTableName</arg><arg>${hiveDbName}.software</arg>
-            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-        </spark>
-        <ok to="join_export"/>
-        <error to="Kill"/>
-    </action>
-    <action name="export_relation">
-        <spark xmlns="uri:oozie:spark-action:0.2">
-            <master>yarn</master>
-            <mode>cluster</mode>
-            <name>Merge table relation</name>
-            <class>eu.dnetlib.dhp.oa.graph.hive.GraphHiveTableExporterJob</class>
-            <jar>dhp-graph-mapper-${projectVersion}.jar</jar>
-            <spark-opts>
-                --conf spark.sql.warehouse.dir=${sparkSqlWarehouseDir}
-                ${sparkClusterOpts}
-                ${sparkResourceOpts}
-                ${sparkApplicationOpts}
-            </spark-opts>
-            <arg>--outputPath</arg><arg>${outputPath}/relation</arg>
-            <arg>--mode</arg><arg>append</arg>
-            <arg>--hiveTableName</arg><arg>${hiveDbName}.relation</arg>
-            <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-        </spark>
-        <ok to="join_export"/>
-        <error to="Kill"/>
-    </action>
-
-    <join name="join_export" to="End"/>
 
     <end name="End"/>
 
