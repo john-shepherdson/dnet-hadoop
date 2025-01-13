@@ -58,7 +58,9 @@ public class SparkCopyRelationsNoOpenorgs extends AbstractSparkAction {
 
 		JavaRDD<Relation> simRels = spark
 			.read()
-			.textFile(relationPath)
+			.schema(Encoders.bean(Relation.class).schema())
+			.json(relationPath)
+			.as(Encoders.bean(Relation.class))
 			.map(patchRelFn(), Encoders.bean(Relation.class))
 			.toJavaRDD()
 			.filter(x -> !isOpenorgsDedupRel(x));

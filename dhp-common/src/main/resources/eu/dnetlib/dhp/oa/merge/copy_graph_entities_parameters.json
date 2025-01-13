@@ -1,0 +1,32 @@
+[
+  {
+    "paramName": "issm",
+    "paramLongName": "isSparkSessionManaged",
+    "paramDescription": "when true will stop SparkSession after job execution",
+    "paramRequired": false
+  },
+  {
+    "paramName": "gin",
+    "paramLongName": "graphInputPath",
+    "paramDescription": "the input graph root path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "out",
+    "paramLongName": "outputPath",
+    "paramDescription": "the output graph root path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "ent",
+    "paramLongName": "entities",
+    "paramDescription": "the output graph root path",
+    "paramRequired": true
+  },
+  {
+    "paramName": "fmt",
+    "paramLongName": "format",
+    "paramDescription": "the output graph root path",
+    "paramRequired": true
+  }
+]
