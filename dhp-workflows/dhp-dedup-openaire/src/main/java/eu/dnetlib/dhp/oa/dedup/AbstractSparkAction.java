@@ -128,13 +128,12 @@ abstract class AbstractSparkAction implements Serializable {
 			.collect(Collectors.joining(SP_SEPARATOR));
 	}
 
-	protected static MapFunction<String, Relation> patchRelFn() {
+	protected static MapFunction<Relation, Relation> patchRelFn() {
 		return value -> {
-			final Relation rel = OBJECT_MAPPER.readValue(value, Relation.class);
-			if (rel.getDataInfo() == null) {
-				rel.setDataInfo(new DataInfo());
+			if (value.getDataInfo() == null) {
+				value.setDataInfo(new DataInfo());
 			}
-			return rel;
+			return value;
 		};
 	}
 

@@ -19,9 +19,13 @@ class JsonPathTest {
 	void testJPath() throws IOException {
 
 		DedupConfig conf = DedupConfig
-			.load(IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/jpath/dedup_conf_organization.json")));
+			.load(
+				IOUtils
+					.toString(
+						getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/jpath/dedup_conf_organization.json")));
 
-		final String org = IOUtils.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/jpath/organization.json"));
+		final String org = IOUtils
+			.toString(getClass().getResourceAsStream("/eu/dnetlib/dhp/oa/dedup/jpath/organization.json"));
 
 		Row row = SparkModel.apply(conf).rowFromJson(org);
 

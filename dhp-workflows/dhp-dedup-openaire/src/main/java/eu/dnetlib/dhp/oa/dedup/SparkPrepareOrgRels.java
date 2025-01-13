@@ -133,7 +133,9 @@ public class SparkPrepareOrgRels extends AbstractSparkAction {
 		// collect diffrels from the raw graph relations: <<best id, other id>, "diffRel">
 		JavaRDD<Tuple2<Tuple2<String, String>, String>> diffRels = spark
 			.read()
-			.textFile(relationPath)
+			.schema(Encoders.bean(Relation.class).schema())
+			.json(relationPath)
+			.as(Encoders.bean(Relation.class))
 			.map(patchRelFn(), Encoders.bean(Relation.class))
 			.toJavaRDD()
 			.filter(r -> filterRels(r, "organization"))

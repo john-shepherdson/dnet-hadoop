@@ -170,6 +170,18 @@
                     <name>pathMap</name>
                     <value>${pathMap}</value>
                 </property>
+                <property>
+                    <name>dbUrl</name>
+                    <value>${dbUrl}</value>
+                </property>
+                <property>
+                    <name>dbUser</name>
+                    <value>${dbUser}</value>
+                </property>
+                <property>
+                    <name>dbPassword</name>
+                    <value>${dbPassword}</value>
+                </property>
             </configuration>
         </sub-workflow>
         <ok to="affiliation_inst_repo" />
