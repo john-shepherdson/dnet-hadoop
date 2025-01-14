@@ -7,7 +7,6 @@
 		<artifactId>dhp</artifactId>
 		<version>1.2.5-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
-
 	</parent>
 
 	<artifactId>dhp-common</artifactId>
