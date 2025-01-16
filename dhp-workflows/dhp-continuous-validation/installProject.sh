@@ -8,7 +8,7 @@ cd ../../
 
 # Select the build profile.
 DEFAULT_PROFILE=''  # It's the empty profile.
-NEWER_VERSIONS_PROFILE='-Pscala-2.12'
+NEWER_VERSIONS_PROFILE='-P spark-34'
 CHOSEN_MAVEN_PROFILE=${DEFAULT_PROFILE}
 
 # Install the project.
