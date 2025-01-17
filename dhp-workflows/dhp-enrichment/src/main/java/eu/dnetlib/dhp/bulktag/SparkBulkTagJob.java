@@ -178,7 +178,7 @@ public class SparkBulkTagJob {
 			.read()
 			.schema(Encoders.bean(Relation.class).schema())
 			.json(relationPath)
-			.filter("datainfo.deletedbyinference != true and relClass = 'merges")
+			.filter("datainfo.deletedbyinference != true and relClass = 'merges'")
 			.select("source", "target");
 
 		List<String> idList = entityIdList(ModelSupport.idPrefixMap.get(Organization.class), organizationCommunityMap);
