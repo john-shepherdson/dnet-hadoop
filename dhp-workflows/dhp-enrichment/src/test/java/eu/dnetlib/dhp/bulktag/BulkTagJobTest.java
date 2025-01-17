@@ -1953,7 +1953,7 @@ public class BulkTagJobTest {
 
 	@Test
 	public void testApi() throws IOException {
-		String baseURL = "https://dev-openaire.d4science.org/openaire/community/";
+		String baseURL = "https://beta.services.openaire.eu/openaire/community/";
 		List<SubCommunityModel> subcommunities = Utils.getSubcommunities("clarin", baseURL);
 
 		CommunityConfiguration tmp = Utils.getCommunityConfiguration(baseURL);

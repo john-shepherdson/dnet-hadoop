@@ -200,12 +200,15 @@ public class SparkBulkTagJob {
 		for (Row mappedEntry : mappedKeys) {
 			String oldKey = mappedEntry.getAs("target");
 			String newKey = mappedEntry.getAs("source");
+			if(entityCommunityMap.containsKey(oldKey)){
+				entityCommunityMap.put(newKey,entityCommunityMap.remove(oldKey));
+			}
 			// inserts the newKey in the map while removing the oldKey. The remove produces the value in the Map, which
 			// will be used as the newValue parameter of the BiFunction
-			entityCommunityMap.merge(newKey, entityCommunityMap.remove(oldKey), (existing, newValue) -> {
-				existing.addAll(newValue);
-				return existing;
-			});
+//			entityCommunityMap.merge(newKey, entityCommunityMap.remove(oldKey), (existing, newValue) -> {
+//				existing.addAll(newValue);
+//				return existing;
+//			});
 
 		}
 		return entityCommunityMap;
