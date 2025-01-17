@@ -154,7 +154,7 @@ public class SparkBulkTagJob {
 		Dataset<String> datasourceIdentifiers = spark.createDataset(idList, Encoders.STRING());
 		List<Row> mappedKeys = datasourceIdentifiers
 			.join(
-				masterDuplicate, datasourceIdentifiers.col("_1").equalTo(masterDuplicate.col("duplicateId")),
+				masterDuplicate, datasourceIdentifiers.col("value").equalTo(masterDuplicate.col("duplicateId")),
 				"left_semi")
 			.selectExpr("masterId as source", "duplicateId as target")
 			.collectAsList();
