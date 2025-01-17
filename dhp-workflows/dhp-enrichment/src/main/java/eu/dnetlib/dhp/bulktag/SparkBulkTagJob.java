@@ -185,7 +185,9 @@ public class SparkBulkTagJob {
 
 		Dataset<String> organizationIdentifiers = spark.createDataset(idList, Encoders.STRING());
 		List<Row> mappedKeys = mergesRel
-			.join(organizationIdentifiers, organizationIdentifiers.col("value").equalTo(mergesRel.col("target")), "left_semi")
+			.join(
+				organizationIdentifiers, organizationIdentifiers.col("value").equalTo(mergesRel.col("target")),
+				"left_semi")
 			.select("source", "target")
 			.collectAsList();
 
