@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.List;
 
+import eu.dnetlib.dhp.oa.provision.model.ProvisionModelSupport;
+import eu.dnetlib.dhp.schema.solr.SolrRecord;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -221,6 +223,33 @@ public class XmlRecordFactoryTest {
 		assertNotNull(doc);
 		System.out.println(doc.asXML());
 
+	}
+
+	@Test
+	void testRaid() throws DocumentException, IOException {
+		final ContextMapper contextMapper = new ContextMapper();
+
+		final XmlRecordFactory xmlRecordFactory = new XmlRecordFactory(contextMapper, false,
+				PayloadConverterJob.schemaLocation);
+
+		final OtherResearchProduct p = OBJECT_MAPPER
+				.readValue(
+						IOUtils.toString(getClass().getResourceAsStream("raid.json")),
+						OtherResearchProduct.class);
+
+		final JoinedEntity je = new JoinedEntity(p);
+		final String xml = xmlRecordFactory.build(je);
+
+		assertNotNull(xml);
+
+		final Document doc = new SAXReader().read(new StringReader(xml));
+
+		assertNotNull(doc);
+		System.out.println(doc.asXML());
+
+		SolrRecord sr = ProvisionModelSupport.transform(je, contextMapper, null);
+
+		System.out.println(OBJECT_MAPPER.writeValueAsString(sr));
 	}
 
 	@Test

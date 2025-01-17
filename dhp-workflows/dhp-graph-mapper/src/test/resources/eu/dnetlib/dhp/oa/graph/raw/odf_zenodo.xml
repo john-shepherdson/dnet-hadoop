@@ -20,6 +20,7 @@
             <identifier identifierType="DOI">10.5281/zenodo.3406824</identifier>
             <alternateIdentifiers xmlns="http://datacite.org/schema/kernel-3">
                 <alternateIdentifier alternateIdentifierType="URL">http://dx.doi.org/10.5281/zenodo.3406824</alternateIdentifier>
+                <alternateIdentifier alternateIdentifierType="URL">https://zenodo.org/records/274730</alternateIdentifier>
             </alternateIdentifiers>
             <creators>
                 <creator>
