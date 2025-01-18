@@ -118,6 +118,11 @@ public class SparkBulkTagJob {
 			spark -> {
 				extendCommunityConfigurationForEOSC(spark, inputPath, cc);
 				ReadDatasourceMasterDuplicateFromDB.execute(dbUrl, dbUser, dbPassword, hdfsPath, hdfsNameNode);
+				execEntityTag(
+						spark, inputPath + "datasource", outputPath + "datasource",
+						mapWithMasterDatasource(spark, hdfsPath, Utils.getDatasourceCommunities(baseURL)),
+						Datasource.class, TaggingConstants.CLASS_ID_DATASOURCE,
+						TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE);
 				execBulkTag(
 					spark, inputPath, outputPath, protoMap, cc);
 				execEntityTag(
@@ -130,11 +135,7 @@ public class SparkBulkTagJob {
 					spark, inputPath + "project", outputPath + "project",
 					Utils.getProjectCommunityMap(baseURL),
 					Project.class, TaggingConstants.CLASS_ID_PROJECT, TaggingConstants.CLASS_NAME_BULKTAG_PROJECT);
-				execEntityTag(
-					spark, inputPath + "datasource", outputPath + "datasource",
-					mapWithMasterDatasource(spark, hdfsPath, Utils.getDatasourceCommunities(baseURL)),
-					Datasource.class, TaggingConstants.CLASS_ID_DATASOURCE,
-					TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE);
+
 
 			});
 	}
@@ -152,9 +153,9 @@ public class SparkBulkTagJob {
 
 		// find the mapping with the representative entity if any
 		Dataset<String> datasourceIdentifiers = spark.createDataset(idList, Encoders.STRING());
-		List<Row> mappedKeys = datasourceIdentifiers
+		List<Row> mappedKeys = masterDuplicate
 			.join(
-				masterDuplicate, datasourceIdentifiers.col("value").equalTo(masterDuplicate.col("duplicateId")),
+					datasourceIdentifiers, datasourceIdentifiers.col("value").equalTo(masterDuplicate.col("duplicateId")),
 				"left_semi")
 			.selectExpr("masterId as source", "duplicateId as target")
 			.collectAsList();
