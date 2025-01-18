@@ -1957,16 +1957,16 @@ public class BulkTagJobTest {
 		List<SubCommunityModel> subcommunities = Utils.getSubcommunities("clarin", baseURL);
 
 		CommunityConfiguration tmp = Utils.getCommunityConfiguration(baseURL);
-		tmp.getCommunities().keySet().forEach(c -> {
-			try {
-				System.out.println(new ObjectMapper().writeValueAsString(tmp.getCommunities().get(c)));
-			} catch (JsonProcessingException e) {
-				throw new RuntimeException(e);
-			}
-		});
+//		tmp.getCommunities().keySet().forEach(c -> {
+//			try {
+//				System.out.println(new ObjectMapper().writeValueAsString(tmp.getCommunities().get(c)));
+//			} catch (JsonProcessingException e) {
+//				throw new RuntimeException(e);
+//			}
+//		});
 
-		//System.out.println(new ObjectMapper().writeValueAsString(Utils.getOrganizationCommunityMap(baseURL)));
-		System.out.println(new ObjectMapper().writeValueAsString(Utils.getDatasourceCommunityMap(baseURL)));
+		System.out.println(new ObjectMapper().writeValueAsString(Utils.getOrganizationCommunityMap(baseURL)));
+		System.out.println(new ObjectMapper().writeValueAsString(Utils.getDatasourceCommunities(baseURL)));
 	}
 
 }
