@@ -300,20 +300,23 @@ public class Utils implements Serializable {
 	}
 
 	public static CommunityEntityMap getOrganizationCommunityMap(String baseURL) throws IOException {
-		return addPrefixToKey(ModelSupport.getIdPrefix(Organization.class) + "|" , MAPPER
-			.readValue(QueryCommunityAPI.propagationOrganizationCommunityMap(baseURL), CommunityEntityMap.class));
+		return addPrefixToKey(
+			ModelSupport.getIdPrefix(Organization.class) + "|", MAPPER
+				.readValue(QueryCommunityAPI.propagationOrganizationCommunityMap(baseURL), CommunityEntityMap.class));
 	}
 
 	private static CommunityEntityMap addPrefixToKey(String prefix, CommunityEntityMap communityEntityMap) {
 		CommunityEntityMap cem = new CommunityEntityMap();
 		Set<String> keySet = communityEntityMap.keySet();
-		for (String key: keySet)
-			 cem.put(prefix + key, communityEntityMap.get(key));
+		for (String key : keySet)
+			cem.put(prefix + key, communityEntityMap.get(key));
 		return cem;
 	}
 
 	public static CommunityEntityMap getDatasourceCommunityMap(String baseURL) throws IOException {
-		return addPrefixToKey(ModelSupport.getIdPrefix(Datasource.class) + "|", MAPPER.readValue(QueryCommunityAPI.propagationDatasourceCommunityMap(baseURL), CommunityEntityMap.class));
+		return addPrefixToKey(
+			ModelSupport.getIdPrefix(Datasource.class) + "|",
+			MAPPER.readValue(QueryCommunityAPI.propagationDatasourceCommunityMap(baseURL), CommunityEntityMap.class));
 	}
 
 	public static CommunityEntityMap getDatasourceCommunities(String baseURL) throws IOException {
@@ -321,45 +324,47 @@ public class Utils implements Serializable {
 		HashMap<String, Set<String>> map = new HashMap<>();
 
 		validCommunities.forEach(c -> {
-			try{
+			try {
 				addDatasources(c.getId(), QueryCommunityAPI.communityDatasource(c.getId(), baseURL), map);
-				Utils.getSubcommunities(c.getId(), baseURL)
-								.forEach(sc -> {
-									try{
-										addDatasources(sc.getSubCommunityId(), QueryCommunityAPI.subcommunityDatasource(c.getId(),sc.getSubCommunityId(), baseURL), map);
-									}catch(IOException ioException){
-										throw new RuntimeException();
-									}
-								});
+				Utils
+					.getSubcommunities(c.getId(), baseURL)
+					.forEach(sc -> {
+						try {
+							addDatasources(
+								sc.getSubCommunityId(),
+								QueryCommunityAPI.subcommunityDatasource(c.getId(), sc.getSubCommunityId(), baseURL),
+								map);
+						} catch (IOException ioException) {
+							throw new RuntimeException();
+						}
+					});
 
-			}catch(IOException e){
+			} catch (IOException e) {
 				throw new RuntimeException();
 			}
-
 
 		});
 		String prefix = ModelSupport.getIdPrefix(Datasource.class) + "|";
 		CommunityEntityMap cem = new CommunityEntityMap();
 		map
-				.keySet()
-				.forEach(k ->
-                    cem.put(prefix + k, getCollect(k, map))
-                );
+			.keySet()
+			.forEach(k -> cem.put(prefix + k, getCollect(k, map)));
 
 		return cem;
 
 	}
 
-	private static void addDatasources(String communityId, String dsl, HashMap<String, Set<String>> map) throws IOException{
+	private static void addDatasources(String communityId, String dsl, HashMap<String, Set<String>> map)
+		throws IOException {
 
-			new ObjectMapper()
-					.readValue(dsl, DatasourceList.class)
-					.forEach(d -> {
-						if (!map.keySet().contains(d.getOpenaireId()))
-							map.put(d.getOpenaireId(), new HashSet<>());
+		new ObjectMapper()
+			.readValue(dsl, DatasourceList.class)
+			.forEach(d -> {
+				if (!map.keySet().contains(d.getOpenaireId()))
+					map.put(d.getOpenaireId(), new HashSet<>());
 
-						map.get(d.getOpenaireId()).add(communityId);
-					});
+				map.get(d.getOpenaireId()).add(communityId);
+			});
 
 	}
 
@@ -368,6 +373,7 @@ public class Utils implements Serializable {
 		List<String> temp = map.get(k).stream().collect(Collectors.toList());
 		return temp;
 	}
+
 	private static void getRelatedOrganizations(String communityId, String baseURL,
 		CommunityEntityMap communityEntityMap) {
 

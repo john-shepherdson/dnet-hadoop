@@ -132,7 +132,7 @@ public class SparkBulkTagJob {
 					Project.class, TaggingConstants.CLASS_ID_PROJECT, TaggingConstants.CLASS_NAME_BULKTAG_PROJECT);
 				execEntityTag(
 					spark, inputPath + "datasource", outputPath + "datasource",
-					mapWithMasterDatasource(spark, hdfsPath, Utils.getDatasourceCommunityMap(baseURL)),
+					mapWithMasterDatasource(spark, hdfsPath, Utils.getDatasourceCommunities(baseURL)),
 					Datasource.class, TaggingConstants.CLASS_ID_DATASOURCE,
 					TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE);
 
@@ -148,7 +148,7 @@ public class SparkBulkTagJob {
 			.json(masterDuplicatePath)
 			.as(Encoders.bean(MasterDuplicate.class));
 		// list of id for the communities related entities
-		List<String> idList = entityIdList( datasourceCommunityMap);
+		List<String> idList = entityIdList(datasourceCommunityMap);
 
 		// find the mapping with the representative entity if any
 		Dataset<String> datasourceIdentifiers = spark.createDataset(idList, Encoders.STRING());
@@ -163,10 +163,10 @@ public class SparkBulkTagJob {
 		return remapCommunityEntityMap(datasourceCommunityMap, mappedKeys);
 	}
 
-	private static List<String> entityIdList( CommunityEntityMap datasourceCommunityMap) {
+	private static List<String> entityIdList(CommunityEntityMap datasourceCommunityMap) {
 
 		return new ArrayList<>(datasourceCommunityMap
-                .keySet());
+			.keySet());
 	}
 
 	private static CommunityEntityMap mapWithRepresentativeOrganization(SparkSession spark, String relationPath,
@@ -178,7 +178,7 @@ public class SparkBulkTagJob {
 			.filter("datainfo.deletedbyinference != true and relClass = 'merges'")
 			.select("source", "target");
 
-		List<String> idList = entityIdList( organizationCommunityMap);
+		List<String> idList = entityIdList(organizationCommunityMap);
 
 		Dataset<String> organizationIdentifiers = spark.createDataset(idList, Encoders.STRING());
 		List<Row> mappedKeys = mergesRel
@@ -197,9 +197,9 @@ public class SparkBulkTagJob {
 		for (Row mappedEntry : mappedKeys) {
 			String oldKey = mappedEntry.getAs("target");
 			String newKey = mappedEntry.getAs("source");
-			if(entityCommunityMap.containsKey(oldKey)){
+			if (entityCommunityMap.containsKey(oldKey)) {
 				List<String> content = entityCommunityMap.remove(oldKey);
-				entityCommunityMap.put(newKey,content);
+				entityCommunityMap.put(newKey, content);
 			}
 			// inserts the newKey in the map while removing the oldKey. The remove produces the value in the Map, which
 			// will be used as the newValue parameter of the BiFunction
