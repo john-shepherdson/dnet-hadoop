@@ -148,7 +148,7 @@ public class SparkBulkTagJob {
 			.json(masterDuplicatePath)
 			.as(Encoders.bean(MasterDuplicate.class));
 		// list of id for the communities related entities
-		List<String> idList = entityIdList(ModelSupport.idPrefixMap.get(Datasource.class), datasourceCommunityMap);
+		List<String> idList = entityIdList( datasourceCommunityMap);
 
 		// find the mapping with the representative entity if any
 		Dataset<String> datasourceIdentifiers = spark.createDataset(idList, Encoders.STRING());
@@ -163,13 +163,10 @@ public class SparkBulkTagJob {
 		return remapCommunityEntityMap(datasourceCommunityMap, mappedKeys);
 	}
 
-	private static List<String> entityIdList(String idPrefixMap, CommunityEntityMap datasourceCommunityMap) {
-		final String prefix = idPrefixMap + "|";
-		return datasourceCommunityMap
-			.keySet()
-			.stream()
-			.map(key -> prefix + key)
-			.collect(Collectors.toList());
+	private static List<String> entityIdList( CommunityEntityMap datasourceCommunityMap) {
+
+		return new ArrayList<>(datasourceCommunityMap
+                .keySet());
 	}
 
 	private static CommunityEntityMap mapWithRepresentativeOrganization(SparkSession spark, String relationPath,
@@ -181,7 +178,7 @@ public class SparkBulkTagJob {
 			.filter("datainfo.deletedbyinference != true and relClass = 'merges'")
 			.select("source", "target");
 
-		List<String> idList = entityIdList(ModelSupport.idPrefixMap.get(Organization.class), organizationCommunityMap);
+		List<String> idList = entityIdList( organizationCommunityMap);
 
 		Dataset<String> organizationIdentifiers = spark.createDataset(idList, Encoders.STRING());
 		List<Row> mappedKeys = mergesRel
@@ -201,7 +198,8 @@ public class SparkBulkTagJob {
 			String oldKey = mappedEntry.getAs("target");
 			String newKey = mappedEntry.getAs("source");
 			if(entityCommunityMap.containsKey(oldKey)){
-				entityCommunityMap.put(newKey,entityCommunityMap.remove(oldKey));
+				List<String> content = entityCommunityMap.remove(oldKey);
+				entityCommunityMap.put(newKey,content);
 			}
 			// inserts the newKey in the map while removing the oldKey. The remove produces the value in the Map, which
 			// will be used as the newValue parameter of the BiFunction

@@ -300,12 +300,20 @@ public class Utils implements Serializable {
 	}
 
 	public static CommunityEntityMap getOrganizationCommunityMap(String baseURL) throws IOException {
-		return MAPPER
-			.readValue(QueryCommunityAPI.propagationOrganizationCommunityMap(baseURL), CommunityEntityMap.class);
+		return addPrefixToKey(ModelSupport.getIdPrefix(Organization.class) + "|" , MAPPER
+			.readValue(QueryCommunityAPI.propagationOrganizationCommunityMap(baseURL), CommunityEntityMap.class));
+	}
+
+	private static CommunityEntityMap addPrefixToKey(String prefix, CommunityEntityMap communityEntityMap) {
+		CommunityEntityMap cem = new CommunityEntityMap();
+		Set<String> keySet = communityEntityMap.keySet();
+		for (String key: keySet)
+			 cem.put(prefix + key, communityEntityMap.get(key));
+		return cem;
 	}
 
 	public static CommunityEntityMap getDatasourceCommunityMap(String baseURL) throws IOException {
-		return MAPPER.readValue(QueryCommunityAPI.propagationDatasourceCommunityMap(baseURL), CommunityEntityMap.class);
+		return addPrefixToKey(ModelSupport.getIdPrefix(Datasource.class) + "|", MAPPER.readValue(QueryCommunityAPI.propagationDatasourceCommunityMap(baseURL), CommunityEntityMap.class));
 	}
 
 	public static CommunityEntityMap getDatasourceCommunities(String baseURL) throws IOException {
@@ -330,11 +338,12 @@ public class Utils implements Serializable {
 
 
 		});
+		String prefix = ModelSupport.getIdPrefix(Datasource.class) + "|";
 		CommunityEntityMap cem = new CommunityEntityMap();
 		map
 				.keySet()
 				.forEach(k ->
-                    cem.put(k, getCollect(k, map))
+                    cem.put(prefix + k, getCollect(k, map))
                 );
 
 		return cem;
