@@ -85,8 +85,6 @@ public class GroupEntitiesSparkJob {
 		log.info("filterInvisible: {}", filterInvisible);
 
 		SparkConf conf = new SparkConf();
-		conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
-		conf.registerKryoClasses(ModelSupport.getOafModelClasses());
 
 		final VocabularyGroup vocs = VocabularyGroup.loadVocsFromIS(isLookUpService);
 

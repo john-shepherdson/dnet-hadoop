@@ -101,6 +101,6 @@ public class QueryCommunityAPI {
 	}
 
 	public static String propagationDatasourceCommunityMap(String baseURL) throws IOException {
-		return get(baseURL + "/propagationDatasourceCommunityMap");
+		return get(baseURL + "propagationDatasourceCommunityMap");
 	}
 }

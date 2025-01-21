@@ -15,13 +15,10 @@
             <name>hiveDbName</name>
             <description>hive database containing last generated graph</description>
         </property>
-        <property>
-            <name>action</name>
-        </property>
         <!-- General oozie workflow properties -->
         <property>
             <name>sparkClusterOpts</name>
-            <value>--conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-m3.ocean.icm.edu.pl:18088 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/applicationHistory</value>
+            <value>--conf spark.network.timeout=600 --conf spark.extraListeners= --conf spark.sql.queryExecutionListeners= --conf spark.yarn.historyServer.address=http://iis-cdh5-test-m3.ocean.icm.edu.pl:18088 --conf spark.eventLog.dir=hdfs://nameservice1/user/spark/applicationHistory</value>
             <description>spark cluster-wide options</description>
         </property>
         <property>
@@ -56,7 +53,7 @@
                 ${sparkApplicationOpts}
             </spark-opts>
             <arg>--hiveMetastoreUris</arg><arg>${hiveMetastoreUris}</arg>
-            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/incremental/migrate/oozie_app/${action}.sql</arg>
+            <arg>--sql</arg><arg>eu/dnetlib/dhp/oa/graph/incremental/migrate/oozie_app/migration.sql</arg>
             <arg>--hiveDbName</arg><arg>${hiveDbName}</arg>
             <arg>--outputPath</arg><arg>${outputPath}</arg>
         </spark>
