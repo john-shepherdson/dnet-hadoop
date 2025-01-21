@@ -1,7 +1,7 @@
 # Install the whole "dnet-hadoop" project.
 
 # Delete this module's previous build-files in order to avoid any conflicts.
-rm -rf target/ ||
+rm -rf target/ || true
 
 # Go to the root directory of this project.
 cd ../../

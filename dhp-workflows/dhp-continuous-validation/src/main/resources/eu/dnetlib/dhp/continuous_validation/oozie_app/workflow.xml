@@ -2,7 +2,7 @@
     <parameters>
         <property>
             <name>parquet_path</name>
-            <value>/var/lib/dnet/mdstore_PROD/md-7763c517-538d-4aa7-83f8-6096b3ce0d96/md-7763c517-538d-4aa7-83f8-6096b3ce0d96-1702622132535/store</value>
+            <value>/var/lib/dnet/mdstore_PROD/md-ffd7d83f-fdb3-443f-ab48-7e67f706537d/md-ffd7d83f-fdb3-443f-ab48-7e67f706537d-1737050727792/store</value>
             <description>the full path of a parquet-file or a directory with parquet files, to be processed</description>
         </property>
         <property>
