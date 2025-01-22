@@ -10,23 +10,24 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static eu.dnetlib.dhp.utils.DHPUtils.getHadoopConfiguration;
-
 public class DBLPCollectorPlugin implements CollectorPlugin {
-    @Override
-    public Stream<String> collect(ApiDescriptor api, AggregatorReport report) throws CollectorException {
-        final String dblpURL = api.getBaseUrl();
-        final String hdfsURI = api.getParams().get("hdfsURI");
-        final FileSystem fileSystem = initializeFileSystem(hdfsURI);
-        return doStream(fileSystem, dblpURL);
+
+    private final FileSystem fileSystem;
+
+    public DBLPCollectorPlugin(FileSystem fileSystem) {
+        this.fileSystem = fileSystem;
     }
 
-    private Stream<String> doStream(FileSystem fileSystem, String dblpURL) throws CollectorException {
+    @Override
+    public Stream<String> collect(ApiDescriptor api, AggregatorReport report) throws CollectorException {
+        return doStream(api.getBaseUrl());
+    }
+
+    private Stream<String> doStream(String dblpURL) throws CollectorException {
         try {
             CompressionCodecFactory factory = new CompressionCodecFactory(fileSystem.getConf());
             Path sourcePath = new Path(dblpURL);
@@ -45,11 +46,5 @@ public class DBLPCollectorPlugin implements CollectorPlugin {
         }
     }
 
-    public FileSystem initializeFileSystem(final String hdfsURI) {
-        try {
-            return FileSystem.get(getHadoopConfiguration(hdfsURI));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+
 }
