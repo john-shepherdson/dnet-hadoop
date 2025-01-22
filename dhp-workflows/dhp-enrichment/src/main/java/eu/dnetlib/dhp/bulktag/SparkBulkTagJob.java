@@ -118,6 +118,7 @@ public class SparkBulkTagJob {
 			spark -> {
 				extendCommunityConfigurationForEOSC(spark, inputPath, cc);
 				ReadDatasourceMasterDuplicateFromDB.execute(dbUrl, dbUser, dbPassword, hdfsPath, hdfsNameNode);
+
 				execBulkTag(
 					spark, inputPath, outputPath, protoMap, cc);
 				execEntityTag(
@@ -131,10 +132,10 @@ public class SparkBulkTagJob {
 					Utils.getProjectCommunityMap(baseURL),
 					Project.class, TaggingConstants.CLASS_ID_PROJECT, TaggingConstants.CLASS_NAME_BULKTAG_PROJECT);
 				execEntityTag(
-					spark, inputPath + "datasource", outputPath + "datasource",
-					mapWithMasterDatasource(spark, hdfsPath, Utils.getDatasourceCommunityMap(baseURL)),
-					Datasource.class, TaggingConstants.CLASS_ID_DATASOURCE,
-					TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE);
+						spark, inputPath + "datasource", outputPath + "datasource",
+						mapWithMasterDatasource(spark, hdfsPath, Utils.getDatasourceCommunities(baseURL)),
+						Datasource.class, TaggingConstants.CLASS_ID_DATASOURCE,
+						TaggingConstants.CLASS_NAME_BULKTAG_DATASOURCE);
 
 			});
 	}
@@ -148,13 +149,13 @@ public class SparkBulkTagJob {
 			.json(masterDuplicatePath)
 			.as(Encoders.bean(MasterDuplicate.class));
 		// list of id for the communities related entities
-		List<String> idList = entityIdList(ModelSupport.idPrefixMap.get(Datasource.class), datasourceCommunityMap);
+		List<String> idList = entityIdList(datasourceCommunityMap);
 
 		// find the mapping with the representative entity if any
 		Dataset<String> datasourceIdentifiers = spark.createDataset(idList, Encoders.STRING());
-		List<Row> mappedKeys = datasourceIdentifiers
+		List<Row> mappedKeys = masterDuplicate
 			.join(
-				masterDuplicate, datasourceIdentifiers.col("_1").equalTo(masterDuplicate.col("duplicateId")),
+				datasourceIdentifiers, datasourceIdentifiers.col("value").equalTo(masterDuplicate.col("duplicateId")),
 				"left_semi")
 			.selectExpr("masterId as source", "duplicateId as target")
 			.collectAsList();
@@ -163,13 +164,10 @@ public class SparkBulkTagJob {
 		return remapCommunityEntityMap(datasourceCommunityMap, mappedKeys);
 	}
 
-	private static List<String> entityIdList(String idPrefixMap, CommunityEntityMap datasourceCommunityMap) {
-		final String prefix = idPrefixMap + "|";
-		return datasourceCommunityMap
-			.keySet()
-			.stream()
-			.map(key -> prefix + key)
-			.collect(Collectors.toList());
+	private static List<String> entityIdList(CommunityEntityMap datasourceCommunityMap) {
+
+		return new ArrayList<>(datasourceCommunityMap
+			.keySet());
 	}
 
 	private static CommunityEntityMap mapWithRepresentativeOrganization(SparkSession spark, String relationPath,
@@ -178,14 +176,16 @@ public class SparkBulkTagJob {
 			.read()
 			.schema(Encoders.bean(Relation.class).schema())
 			.json(relationPath)
-			.filter("datainfo.deletedbyinference != true and relClass = 'merges")
+			.filter("datainfo.deletedbyinference != true and relClass = 'merges'")
 			.select("source", "target");
 
-		List<String> idList = entityIdList(ModelSupport.idPrefixMap.get(Organization.class), organizationCommunityMap);
+		List<String> idList = entityIdList(organizationCommunityMap);
 
 		Dataset<String> organizationIdentifiers = spark.createDataset(idList, Encoders.STRING());
-		List<Row> mappedKeys = organizationIdentifiers
-			.join(mergesRel, organizationIdentifiers.col("_1").equalTo(mergesRel.col("target")), "left_semi")
+		List<Row> mappedKeys = mergesRel
+			.join(
+				organizationIdentifiers, organizationIdentifiers.col("value").equalTo(mergesRel.col("target")),
+				"left_semi")
 			.select("source", "target")
 			.collectAsList();
 
@@ -198,12 +198,16 @@ public class SparkBulkTagJob {
 		for (Row mappedEntry : mappedKeys) {
 			String oldKey = mappedEntry.getAs("target");
 			String newKey = mappedEntry.getAs("source");
+			if (entityCommunityMap.containsKey(oldKey)) {
+				List<String> content = entityCommunityMap.remove(oldKey);
+				entityCommunityMap.put(newKey, content);
+			}
 			// inserts the newKey in the map while removing the oldKey. The remove produces the value in the Map, which
 			// will be used as the newValue parameter of the BiFunction
-			entityCommunityMap.merge(newKey, entityCommunityMap.remove(oldKey), (existing, newValue) -> {
-				existing.addAll(newValue);
-				return existing;
-			});
+//			entityCommunityMap.merge(newKey, entityCommunityMap.remove(oldKey), (existing, newValue) -> {
+//				existing.addAll(newValue);
+//				return existing;
+//			});
 
 		}
 		return entityCommunityMap;

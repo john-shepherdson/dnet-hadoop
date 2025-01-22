@@ -33,6 +33,14 @@ public class HdfsSupport {
 			() -> {
 				Path f = new Path(path);
 				FileSystem fileSystem = FileSystem.get(configuration);
+				if (path.contains("*")) {
+					FileStatus[] fileStatus = fileSystem.globStatus(f);
+					if (fileStatus != null) {
+						Arrays.stream(fileStatus).forEach(fs -> logger.info("Glob path: {}", fs.getPath()));
+					}
+					logger.info("Glob path exists: {}", fileStatus != null && fileStatus.length > 0);
+					return fileStatus != null && fileStatus.length > 0;
+				}
 				return fileSystem.exists(f);
 			});
 	}

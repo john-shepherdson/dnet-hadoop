@@ -22,6 +22,7 @@ import org.apache.spark.sql.SparkSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dnetlib.dhp.application.ArgumentApplicationParser;
@@ -34,7 +35,8 @@ public class MergeClaimsApplication {
 
 	private static final Logger log = LoggerFactory.getLogger(MergeClaimsApplication.class);
 
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
+		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	public static void main(final String[] args) throws Exception {
 		final ArgumentApplicationParser parser = new ArgumentApplicationParser(
